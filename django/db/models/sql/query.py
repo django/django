@@ -7,6 +7,7 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 
+import itertools
 from copy import deepcopy
 
 from django.utils.tree import Node
@@ -223,13 +224,13 @@ class Query(object):
 
         if where:
             result.append('WHERE %s' % where)
+            params.extend(w_params)
         if self.extra_where:
             if not where:
                 result.append('WHERE')
             else:
                 result.append('AND')
             result.append(' AND'.join(self.extra_where))
-        params.extend(w_params)
 
         if self.group_by:
             grouping = self.get_grouping()
@@ -361,39 +362,40 @@ class Query(object):
                     if hasattr(col, 'alias'):
                         aliases.append(col.alias)
         elif self.default_cols:
-            result = self.get_default_columns(lambda x, y: "%s.%s" % (qn(x), qn(y)))
+            result = self.get_default_columns(True)
             aliases = result[:]
 
         result.extend(['(%s) AS %s' % (col, alias)
                 for alias, col in self.extra_select.items()])
         aliases.extend(self.extra_select.keys())
 
-        self._select_aliases = dict.fromkeys(aliases)
+        self._select_aliases = set(aliases)
         return result
 
-    def get_default_columns(self, combine_func=None):
+    def get_default_columns(self, as_str=False):
         """
         Computes the default columns for selecting every field in the base
         model. Returns a list of default (alias, column) pairs suitable for
-        direct inclusion as the select columns. The 'combine_func' can be
-        passed in to change the returned data set to a list of some other
-        structure.
+        inclusion as the select columns. If 'as_str' is True, returns a list of
+        strings, quoted appropriately for use in SQL directly.
         """
-        # Note: We allow 'combine_func' here because this method is called a
-        # lot. The extra overhead from returning a list and then transforming
-        # it in get_columns() hurt performance in a measurable way.
         result = []
         table_alias = self.tables[0]
         root_pk = self.model._meta.pk.column
         seen = {None: table_alias}
+        qn = self.quote_name_unless_alias
+        qn2 = self.connection.ops.quote_name
         for field, model in self.model._meta.get_fields_with_model():
-            if model not in seen:
-                seen[model] = self.join((table_alias, model._meta.db_table,
+            try:
+                alias = seen[model]
+            except KeyError:
+                alias = self.join((table_alias, model._meta.db_table,
                         root_pk, model._meta.pk.column))
-            if combine_func:
-                result.append(combine_func(seen[model], field.column))
+                seen[model] = alias
+            if as_str:
+                result.append('%s.%s' % (qn(alias), qn2(field.column)))
             else:
-                result.append((seen[model], field.column))
+                result.append((alias, field.column))
         return result
 
     def get_from_clause(self):
@@ -897,7 +899,7 @@ class Query(object):
             # from any previous joins (ref count is 1 in the table list), we
             # make the new additions (and any existing ones not used in the new
             # join list) an outer join.
-            join_it = nested_iter(join_list)
+            join_it = itertools.chain(*join_list)
             table_it = iter(self.tables)
             join_it.next(), table_it.next()
             for join in join_it:
@@ -1325,21 +1327,19 @@ class Query(object):
                 raise EmptyResultSet
         except EmptyResultSet:
             if result_type == MULTI:
-                raise StopIteration
+                return empty_iter()
             else:
                 return
 
         cursor = self.connection.cursor()
         cursor.execute(sql, params)
 
-        if result_type is None:
+        if not result_type:
             return cursor
-
         if result_type == SINGLE:
             return cursor.fetchone()
-
         # The MULTI case.
-        return results_iter(cursor)
+        return iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)), [])
 
 def get_order_dir(field, default='ASC'):
     """
@@ -1354,24 +1354,11 @@ def get_order_dir(field, default='ASC'):
         return field[1:], dirn[1]
     return field, dirn[0]
 
-def results_iter(cursor):
+def empty_iter():
     """
-    An iterator over the result set that returns a chunk of rows at a time.
+    Returns an iterator containing no results.
     """
-    while 1:
-        rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-        if not rows:
-            raise StopIteration
-        yield rows
-
-def nested_iter(nested):
-    """
-    An iterator over a sequence of sequences. Each element is returned in turn.
-    Only handles one level of nesting, since that's all we need here.
-    """
-    for seq in nested:
-        for elt in seq:
-            yield elt
+    yield iter([]).next()
 
 def setup_join_cache(sender):
     """

@@ -31,10 +31,9 @@ class _QuerySet(object):
         return repr(list(self))
 
     def __len__(self):
-        # Since __len__ is called quite frequently (as part of list(qs), which
-        # means as part of qs.get(), for example), we make some effort here to
-        # be as efficient as possible whilst not messing up any existing
-        # iterators against the queryset.
+        # Since __len__ is called quite frequently (for example, as part of
+        # list(qs), we make some effort here to be as efficient as possible
+        # whilst not messing up any existing iterators against the queryset.
         if self._result_cache is None:
             if self._iter:
                 self._result_cache = list(self._iter())
@@ -50,6 +49,8 @@ class _QuerySet(object):
             self._result_cache = []
         if self._iter:
             return self._result_iter()
+        # Python's list iterator is better than our version when we're just
+        # iterating over the cache.
         return iter(self._result_cache)
 
     def _result_iter(self):

@@ -263,5 +263,6 @@ True
 <Chef: Albert the chef>
 >>> len(db.connection.queries)
 3
+>>> settings.DEBUG = False
 
 """}

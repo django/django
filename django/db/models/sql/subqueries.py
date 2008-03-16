@@ -238,40 +238,29 @@ class UpdateQuery(Query):
 class InsertQuery(Query):
     def __init__(self, *args, **kwargs):
         super(InsertQuery, self).__init__(*args, **kwargs)
-        self._setup_query()
-
-    def _setup_query(self):
-        """
-        Run on initialisation and after cloning.
-        """
         self.columns = []
         self.values = []
+        self.params = ()
+
+    def clone(self, klass=None, **kwargs):
+        extras = {'columns': self.columns[:], 'values': self.values[:],
+                'params': self.params}
+        return super(InsertQuery, self).clone(klass, extras)
 
     def as_sql(self):
-        self.select_related = False
-        self.pre_sql_setup()
-        qn = self.quote_name_unless_alias
-        result = ['INSERT INTO %s' % qn(self.tables[0])]
+        # We don't need quote_name_unless_alias() here, since these are all
+        # going to be column names (so we can avoid the extra overhead).
+        qn = self.connection.ops.quote_name
+        result = ['INSERT INTO %s' % qn(self.model._meta.db_table)]
         result.append('(%s)' % ', '.join([qn(c) for c in self.columns]))
-        result.append('VALUES (')
-        params = []
-        first = True
-        for value in self.values:
-            prefix = not first and ', ' or ''
-            if isinstance(value, RawValue):
-                result.append('%s%s' % (prefix, value.value))
-            else:
-                result.append('%s%%s' % prefix)
-                params.append(value)
-            first = False
-        result.append(')')
-        return ' '.join(result), tuple(params)
+        result.append('VALUES (%s)' % ', '.join(self.values))
+        return ' '.join(result), self.params
 
     def execute_sql(self, return_id=False):
         cursor = super(InsertQuery, self).execute_sql(None)
         if return_id:
-            return self.connection.ops.last_insert_id(cursor, self.tables[0],
-                    self.model._meta.pk.column)
+            return self.connection.ops.last_insert_id(cursor,
+                    self.model._meta.db_table, self.model._meta.pk.column)
 
     def insert_values(self, insert_values, raw_values=False):
         """
@@ -285,16 +274,18 @@ class InsertQuery(Query):
         """
         func = lambda x: self.model._meta.get_field_by_name(x)[0].column
         # keys() and values() return items in the same order, providing the
-        # dictionary hasn't changed between calls. So these lines work as
-        # intended.
+        # dictionary hasn't changed between calls. So the dual iteration here
+        # works as intended.
         for name in insert_values:
             if name == 'pk':
                 name = self.model._meta.pk.name
             self.columns.append(func(name))
         if raw_values:
-            self.values.extend([RawValue(v) for v in insert_values.values()])
-        else:
             self.values.extend(insert_values.values())
+        else:
+            values = insert_values.values()
+            self.params += tuple(values)
+            self.values.extend(['%s'] * len(values))
 
 class DateQuery(Query):
     """

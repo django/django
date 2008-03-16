@@ -160,11 +160,10 @@ class Field(object):
         # mapped to one of the built-in Django field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
-        data_types = get_creation_module().DATA_TYPES
-        internal_type = self.get_internal_type()
-        if internal_type not in data_types:
+        try:
+            return get_creation_module().DATA_TYPES[self.get_internal_type()] % self.__dict__
+        except KeyError:
             return None
-        return data_types[internal_type] % self.__dict__
 
     def validate_full(self, field_data, all_data):
         """

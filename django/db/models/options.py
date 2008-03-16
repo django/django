@@ -123,6 +123,7 @@ class Options(object):
             self.setup_pk(field)
             if hasattr(self, '_field_cache'):
                 del self._field_cache
+                del self._field_name_cache
 
         if hasattr(self, '_name_map'):
             del self._name_map
@@ -155,17 +156,20 @@ class Options(object):
         """
         The getter for self.fields. This returns the list of field objects
         available to this model (including through parent models).
+
+        Callers are not permitted to modify this list, since it's a reference
+        to this instance (not a copy).
         """
         try:
-            self._field_cache
+            self._field_name_cache
         except AttributeError:
             self._fill_fields_cache()
-        return self._field_cache.keys()
+        return self._field_name_cache
     fields = property(_fields)
 
     def get_fields_with_model(self):
         """
-        Returns a list of (field, model) pairs for all fields. The "model"
+        Returns a sequence of (field, model) pairs for all fields. The "model"
         element is None for fields on the current model. Mostly of use when
         constructing queries so that we know which model a field belongs to.
         """
@@ -173,19 +177,19 @@ class Options(object):
             self._field_cache
         except AttributeError:
             self._fill_fields_cache()
-        return self._field_cache.items()
+        return self._field_cache
 
     def _fill_fields_cache(self):
-        cache = SortedDict()
+        cache = []
         for parent in self.parents:
             for field, model in parent._meta.get_fields_with_model():
                 if model:
-                    cache[field] = model
+                    cache.append((field, model))
                 else:
-                    cache[field] = parent
-        for field in self.local_fields:
-            cache[field] = None
-        self._field_cache = cache
+                    cache.append((field, parent))
+        cache.extend([(f, None) for f in self.local_fields])
+        self._field_cache = tuple(cache)
+        self._field_name_cache = [x for x, _ in cache]
 
     def _many_to_many(self):
         try:
