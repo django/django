@@ -137,7 +137,7 @@ class WhereNode(tree.Node):
         elif lookup_type == 'isnull':
             return ('%s IS %sNULL' % (field_sql, (not value and 'NOT ' or '')),
                     params)
-        elif lookup_type in 'search':
+        elif lookup_type == 'search':
             return (connection.ops.fulltext_search_sql(field_sql), params)
         elif lookup_type in ('regex', 'iregex'):
             return connection.ops.regex_lookup % (field_sql, cast_sql), params
