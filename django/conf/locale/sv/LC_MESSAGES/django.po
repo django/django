@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-02 21:20+0100\n"
-"PO-Revision-Date: 2008-02-02 21:25+0100\n"
-"Last-Translator: Mikko Hellsing <mikko@sorl.net>\n"
+"POT-Creation-Date: 2008-03-16 16:53+0100\n"
+"PO-Revision-Date: 2008-03-02 00:49+0100\n"
+"Last-Translator: Ludvig Ericson <ludvig.ericson@gmail.com>\n"
 "Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,134 +66,142 @@ msgid "Argentinean Spanish"
 msgstr "Argentisk Spanska"
 
 #: conf/global_settings.py:51
+msgid "Basque"
+msgstr "Baskiska"
+
+#: conf/global_settings.py:52
 msgid "Persian"
 msgstr "Persiska"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Finnish"
 msgstr "Finska"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "French"
 msgstr "Franska"
 
-#: conf/global_settings.py:54
-msgid "Gaeilge"
-msgstr "Gaeliska"
-
 #: conf/global_settings.py:55
+msgid "Irish"
+msgstr "Irländska"
+
+#: conf/global_settings.py:56
 msgid "Galician"
 msgstr "Galisiska"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Hungarian"
 msgstr "Ungerska"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Hebrew"
 msgstr "Hebreiska"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:59
 msgid "Croatian"
 msgstr "Kroatiska"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Icelandic"
 msgstr "Isländska"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Italian"
 msgstr "Italienska"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Japanese"
 msgstr "Japanska"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
+msgid "Georgian"
+msgstr "Georgiska"
+
+#: conf/global_settings.py:64
 msgid "Korean"
 msgstr "Koreanska"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:65
 msgid "Khmer"
 msgstr "Khmer"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:66
 msgid "Kannada"
 msgstr "Kannada"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:67
 msgid "Latvian"
 msgstr "Lettiska"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:68
 msgid "Macedonian"
 msgstr "Makedonska"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:69
 msgid "Dutch"
 msgstr "Holländska"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:70
 msgid "Norwegian"
 msgstr "Norska"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:71
 msgid "Polish"
 msgstr "Polska"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:72
 msgid "Portugese"
 msgstr "Portugisiska"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:73
 msgid "Brazilian"
 msgstr "Brasilianska"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:74
 msgid "Romanian"
 msgstr "Rumänska"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:75
 msgid "Russian"
 msgstr "Ryska"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:76
 msgid "Slovak"
 msgstr "Slovakiska"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:77
 msgid "Slovenian"
 msgstr "Slovenska"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:78
 msgid "Serbian"
 msgstr "Serbiska"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:79
 msgid "Swedish"
 msgstr "Svenska"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:80
 msgid "Tamil"
 msgstr "Tamilska"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:81
 msgid "Telugu"
 msgstr "Telugu"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:82
 msgid "Turkish"
 msgstr "Turkiska"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:83
 msgid "Ukrainian"
 msgstr "Ukrainska"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:84
 msgid "Simplified Chinese"
 msgstr "Förenklad Kinesiska"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:85
 msgid "Traditional Chinese"
 msgstr "Traditionell Kinesiska"
 
@@ -395,7 +403,7 @@ msgid ""
 "following types of objects:"
 msgstr ""
 "Att ta bort %(object_name)s '%(escaped_object)s' skulle innebära att "
-"relaterade objekt togs bort men ditt konto har inte rättigheter att ta bort "
+"relaterade objekt togs bort, men ditt konto har inte rättigheter att ta bort "
 "följande objekttyper:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:20
@@ -471,7 +479,7 @@ msgid "Password:"
 msgstr "Lösenord:"
 
 #: contrib/admin/templates/admin/login.html:25
-#: contrib/admin/views/decorators.py:25
+#: contrib/admin/views/decorators.py:31
 msgid "Log in"
 msgstr "Logga in"
 
@@ -796,7 +804,7 @@ msgstr "Lösenordet ändrades."
 msgid "Change password: %s"
 msgstr "Ändra lösenord: %s"
 
-#: contrib/admin/views/decorators.py:11 contrib/auth/forms.py:60
+#: contrib/admin/views/decorators.py:17 contrib/auth/forms.py:60
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -804,7 +812,7 @@ msgstr ""
 "Var god ange ett korrekt användarnamn och lösenord. Tänk på att skilja "
 "mellan gemener och versaler."
 
-#: contrib/admin/views/decorators.py:63
+#: contrib/admin/views/decorators.py:69
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
@@ -812,7 +820,7 @@ msgstr ""
 "Du måste logga in igen eftersom din session har förfallit. Oroa dig inte: "
 "Din data har sparats."
 
-#: contrib/admin/views/decorators.py:70
+#: contrib/admin/views/decorators.py:76
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -820,11 +828,11 @@ msgstr ""
 "Det verkar som att din webläsare inte är konfigurerad att acceptera cookies. "
 "Aktivera cookies, ladda om den här sidan och försök igen."
 
-#: contrib/admin/views/decorators.py:84
+#: contrib/admin/views/decorators.py:90
 msgid "Usernames cannot contain the '@' character."
 msgstr "Användarnamn får inte innehålla '@'-tecknet."
 
-#: contrib/admin/views/decorators.py:86
+#: contrib/admin/views/decorators.py:92
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Din e-postadress är inte ditt användarnamn. Försök med '%s' istället."
@@ -852,7 +860,7 @@ msgstr "Applikation %r hittades inte"
 #: contrib/admin/views/doc.py:173
 #, python-format
 msgid "Model %(name)r not found in app %(label)r"
-msgstr "Modellen %(name)r hittades inte i applikation %(label)r"
+msgstr "Modell %(name)r hittades inte i applikation %(label)r"
 
 #: contrib/admin/views/doc.py:185
 #, python-format
@@ -1602,110 +1610,110 @@ msgstr "statisk sida"
 msgid "flat pages"
 msgstr "statiska sidor"
 
-#: contrib/humanize/templatetags/humanize.py:20
+#: contrib/humanize/templatetags/humanize.py:19
 msgid "th"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:20
+#: contrib/humanize/templatetags/humanize.py:19
 msgid "st"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:20
+#: contrib/humanize/templatetags/humanize.py:19
 msgid "nd"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:20
+#: contrib/humanize/templatetags/humanize.py:19
 msgid "rd"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:52
+#: contrib/humanize/templatetags/humanize.py:51
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f miljon"
 msgstr[1] "%(value).1f miljoner"
 
-#: contrib/humanize/templatetags/humanize.py:55
+#: contrib/humanize/templatetags/humanize.py:54
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] "%(value)1.f miljard"
 msgstr[1] "%(value)1.f miljarder"
 
-#: contrib/humanize/templatetags/humanize.py:58
+#: contrib/humanize/templatetags/humanize.py:57
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value)1.f biljon"
 msgstr[1] "%(value)1.f biljoner"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "one"
 msgstr "ett"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "two"
 msgstr "två"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "three"
 msgstr "tre"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "four"
 msgstr "fyra"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "five"
 msgstr "fem"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "six"
 msgstr "sex"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "seven"
 msgstr "sju"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "eight"
 msgstr "åtta"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "nine"
 msgstr "nio"
 
-#: contrib/humanize/templatetags/humanize.py:94
+#: contrib/humanize/templatetags/humanize.py:93
 msgid "today"
 msgstr "idag"
 
-#: contrib/humanize/templatetags/humanize.py:96
+#: contrib/humanize/templatetags/humanize.py:95
 msgid "tomorrow"
 msgstr "imorgon"
 
-#: contrib/humanize/templatetags/humanize.py:98
+#: contrib/humanize/templatetags/humanize.py:97
 msgid "yesterday"
 msgstr "igår"
 
-#: contrib/localflavor/ar/forms.py:28
+#: contrib/localflavor/ar/forms.py:27
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
 msgstr "Fyll i ett postnummer med formatet NNNN eller ANNNNAAA."
 
-#: contrib/localflavor/ar/forms.py:50 contrib/localflavor/br/forms.py:96
+#: contrib/localflavor/ar/forms.py:49 contrib/localflavor/br/forms.py:96
 #: contrib/localflavor/br/forms.py:135 contrib/localflavor/pe/forms.py:23
 #: contrib/localflavor/pe/forms.py:51
 msgid "This field requires only numbers."
 msgstr "Detta fält kräver enbart siffror."
 
-#: contrib/localflavor/ar/forms.py:51
+#: contrib/localflavor/ar/forms.py:50
 msgid "This field requires 7 or 8 digits."
 msgstr "Detta fält kräver 7 eller 8 sifrror."
 
-#: contrib/localflavor/ar/forms.py:80
+#: contrib/localflavor/ar/forms.py:79
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
 msgstr "Fyll i ett giltigt CUIT med formatet XX-XXXXXXXX-X eller XXXXXXXXXXXX."
 
-#: contrib/localflavor/ar/forms.py:81
+#: contrib/localflavor/ar/forms.py:80
 msgid "Invalid CUIT."
 msgstr "Felaktigt CUIT."
 
@@ -1750,11 +1758,10 @@ msgid "Enter a postal code in the format XXX XXX."
 msgstr "Fyll i ett postnummer med formatet XXX XXX."
 
 #: contrib/localflavor/ca/forms.py:88
-#, fuzzy
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
 msgstr ""
-"Fyll i ett giltigt Kannadensiskt \"social insurance number\" med formatet "
-"XXX-XXX-XXX."
+"Fyll i ett giltigt Kanadensiskt \"social insurance number\" med formatet XXX-"
+"XXX-XXX."
 
 #: contrib/localflavor/ch/ch_states.py:5
 msgid "Aargau"
@@ -1873,19 +1880,16 @@ msgstr ""
 "X1234567<0 eller 1234567890."
 
 #: contrib/localflavor/cl/forms.py:29
-#, fuzzy
 msgid "Enter a valid Chilean RUT."
 msgstr "Fyll i ett giltigt chilenskt RUT"
 
 #: contrib/localflavor/cl/forms.py:30
-#, fuzzy
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
 msgstr "Fyll i ett giltigt chilenskt RUT. Formatet är XX.XXX.XXX-X."
 
 #: contrib/localflavor/cl/forms.py:31
-#, fuzzy
 msgid "The Chilean RUT is not valid."
-msgstr "Det här fältet är ogiltigt."
+msgstr "Det chilenska RUT:et var inte giltigt."
 
 #: contrib/localflavor/de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -1977,14 +1981,12 @@ msgid "Alacant"
 msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:8
-#, fuzzy
 msgid "Almeria"
-msgstr "Aomori"
+msgstr "Almería"
 
 #: contrib/localflavor/es/es_provinces.py:9
-#, fuzzy
 msgid "Avila"
-msgstr "Akita"
+msgstr "Ávila"
 
 #: contrib/localflavor/es/es_provinces.py:10
 msgid "Badajoz"
@@ -1995,262 +1997,243 @@ msgid "Illes Balears"
 msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:12
-#, fuzzy
 msgid "Barcelona"
-msgstr "Makedonska"
+msgstr "Barcelona"
 
 #: contrib/localflavor/es/es_provinces.py:13
 msgid "Burgos"
-msgstr ""
+msgstr "Burgos"
 
 #: contrib/localflavor/es/es_provinces.py:14
 msgid "Caceres"
-msgstr ""
+msgstr "Cáceres"
 
 #: contrib/localflavor/es/es_provinces.py:15
 msgid "Cadiz"
-msgstr ""
+msgstr "Cádiz"
 
 #: contrib/localflavor/es/es_provinces.py:16
 msgid "Castello"
-msgstr ""
+msgstr "Castellón"
 
 #: contrib/localflavor/es/es_provinces.py:17
 msgid "Ciudad Real"
-msgstr ""
+msgstr "Ciudad Real"
 
 #: contrib/localflavor/es/es_provinces.py:18
 msgid "Cordoba"
-msgstr ""
+msgstr "Córdoba"
 
 #: contrib/localflavor/es/es_provinces.py:19
 msgid "A Coruna"
-msgstr ""
+msgstr "A Coruña"
 
 #: contrib/localflavor/es/es_provinces.py:20
 msgid "Cuenca"
-msgstr ""
+msgstr "Cuenca"
 
 #: contrib/localflavor/es/es_provinces.py:21
 msgid "Girona"
-msgstr ""
+msgstr "Girona"
 
 #: contrib/localflavor/es/es_provinces.py:22
-#, fuzzy
 msgid "Granada"
-msgstr "Kannada"
+msgstr "Granada"
 
 #: contrib/localflavor/es/es_provinces.py:23
 msgid "Guadalajara"
-msgstr ""
+msgstr "Guadalajara"
 
 #: contrib/localflavor/es/es_provinces.py:24
 msgid "Guipuzkoa"
-msgstr ""
+msgstr "Guipuzkoa"
 
 #: contrib/localflavor/es/es_provinces.py:25
 msgid "Huelva"
-msgstr ""
+msgstr "Huelva"
 
 #: contrib/localflavor/es/es_provinces.py:26
-#, fuzzy
 msgid "Huesca"
-msgstr "Tisdag"
+msgstr "Huesca"
 
 #: contrib/localflavor/es/es_provinces.py:27
-#, fuzzy
 msgid "Jaen"
-msgstr "Januari"
+msgstr "Jaén"
 
 #: contrib/localflavor/es/es_provinces.py:28
-#, fuzzy
 msgid "Leon"
-msgstr "Logga in"
+msgstr "León"
 
 #: contrib/localflavor/es/es_provinces.py:29
 msgid "Lleida"
-msgstr ""
+msgstr "Lleida"
 
 #: contrib/localflavor/es/es_provinces.py:30
 #: contrib/localflavor/es/es_regions.py:17
 msgid "La Rioja"
-msgstr ""
+msgstr "La Rioja"
 
 #: contrib/localflavor/es/es_provinces.py:31
 msgid "Lugo"
-msgstr ""
+msgstr "Lugo"
 
 #: contrib/localflavor/es/es_provinces.py:32
 #: contrib/localflavor/es/es_regions.py:18
 msgid "Madrid"
-msgstr ""
+msgstr "Madrid"
 
 #: contrib/localflavor/es/es_provinces.py:33
-#, fuzzy
 msgid "Malaga"
-msgstr "Saga"
+msgstr "Málaga"
 
 #: contrib/localflavor/es/es_provinces.py:34
-#, fuzzy
 msgid "Murcia"
-msgstr "Jura"
+msgstr "Murcia"
 
 #: contrib/localflavor/es/es_provinces.py:35
 msgid "Navarre"
-msgstr ""
+msgstr "Navarra"
 
 #: contrib/localflavor/es/es_provinces.py:36
 msgid "Ourense"
-msgstr ""
+msgstr "Ourense"
 
 #: contrib/localflavor/es/es_provinces.py:37
 msgid "Asturias"
-msgstr ""
+msgstr "Asturien"
 
 #: contrib/localflavor/es/es_provinces.py:38
-#, fuzzy
 msgid "Palencia"
-msgstr "Galisiska"
+msgstr "Palencia"
 
 #: contrib/localflavor/es/es_provinces.py:39
 msgid "Las Palmas"
-msgstr ""
+msgstr "Las Palmas"
 
 #: contrib/localflavor/es/es_provinces.py:40
 msgid "Pontevedra"
-msgstr ""
+msgstr "Pontevedra"
 
 #: contrib/localflavor/es/es_provinces.py:41
-#, fuzzy
 msgid "Salamanca"
-msgstr "Saitama"
+msgstr "Salamanca"
 
 #: contrib/localflavor/es/es_provinces.py:42
 msgid "Santa Cruz de Tenerife"
-msgstr ""
+msgstr "Santa Cruz de Tenerife"
 
 #: contrib/localflavor/es/es_provinces.py:43
 #: contrib/localflavor/es/es_regions.py:11
-#, fuzzy
 msgid "Cantabria"
-msgstr "Katalanska"
+msgstr "Kantabrien"
 
 #: contrib/localflavor/es/es_provinces.py:44
-#, fuzzy
 msgid "Segovia"
-msgstr "Slovenska"
+msgstr "Segovia"
 
 #: contrib/localflavor/es/es_provinces.py:45
 msgid "Seville"
-msgstr ""
+msgstr "Sevilla"
 
 #: contrib/localflavor/es/es_provinces.py:46
-#, fuzzy
 msgid "Soria"
-msgstr "Serbiska"
+msgstr "Soria"
 
 #: contrib/localflavor/es/es_provinces.py:47
 msgid "Tarragona"
-msgstr ""
+msgstr "Tarragona"
 
 #: contrib/localflavor/es/es_provinces.py:48
-#, fuzzy
 msgid "Teruel"
-msgstr "Tis"
+msgstr "Teruel"
 
 #: contrib/localflavor/es/es_provinces.py:49
 msgid "Toledo"
-msgstr ""
+msgstr "Toledo"
 
 #: contrib/localflavor/es/es_provinces.py:50
-#, fuzzy
 msgid "Valencia"
-msgstr "Galisiska"
+msgstr "Valencia"
 
 #: contrib/localflavor/es/es_provinces.py:51
-#, fuzzy
 msgid "Valladolid"
-msgstr "Valais"
+msgstr "Valladolid"
 
 #: contrib/localflavor/es/es_provinces.py:52
 msgid "Bizkaia"
-msgstr ""
+msgstr "Biscaya"
 
 #: contrib/localflavor/es/es_provinces.py:53
-#, fuzzy
 msgid "Zamora"
-msgstr "Nara"
+msgstr "Zamora"
 
 #: contrib/localflavor/es/es_provinces.py:54
 msgid "Zaragoza"
-msgstr ""
+msgstr "Zaragoza"
 
 #: contrib/localflavor/es/es_provinces.py:55
 msgid "Ceuta"
-msgstr ""
+msgstr "Ceuta"
 
 #: contrib/localflavor/es/es_provinces.py:56
 msgid "Melilla"
-msgstr ""
+msgstr "Melilla"
 
 #: contrib/localflavor/es/es_regions.py:5
 msgid "Andalusia"
-msgstr ""
+msgstr "Andalusien"
 
 #: contrib/localflavor/es/es_regions.py:6
 msgid "Aragon"
-msgstr ""
+msgstr "Aragonien"
 
 #: contrib/localflavor/es/es_regions.py:7
 msgid "Principality of Asturias"
-msgstr ""
+msgstr "Asturien"
 
 #: contrib/localflavor/es/es_regions.py:8
 msgid "Balearic Islands"
-msgstr ""
+msgstr "Balearerna"
 
 #: contrib/localflavor/es/es_regions.py:9
 msgid "Basque Country"
-msgstr ""
+msgstr "Baskien"
 
 #: contrib/localflavor/es/es_regions.py:10
-#, fuzzy
 msgid "Canary Islands"
-msgstr "Saarland"
+msgstr "Kanarieöarna"
 
 #: contrib/localflavor/es/es_regions.py:12
 msgid "Castile-La Mancha"
-msgstr ""
+msgstr "Kastilien-La Mancha"
 
 #: contrib/localflavor/es/es_regions.py:13
 msgid "Castile and Leon"
-msgstr ""
+msgstr "Kastilien och Leon"
 
 #: contrib/localflavor/es/es_regions.py:14
-#, fuzzy
 msgid "Catalonia"
-msgstr "Katalanska"
+msgstr "Katalonien"
 
 #: contrib/localflavor/es/es_regions.py:15
 msgid "Extremadura"
-msgstr ""
+msgstr "Extremadura"
 
 #: contrib/localflavor/es/es_regions.py:16
-#, fuzzy
 msgid "Galicia"
-msgstr "Galisiska"
+msgstr "Galicien"
 
 #: contrib/localflavor/es/es_regions.py:19
 msgid "Region of Murcia"
-msgstr ""
+msgstr "Murciaregionen"
 
 #: contrib/localflavor/es/es_regions.py:20
 msgid "Foral Community of Navarre"
-msgstr ""
+msgstr "Navarra"
 
 #: contrib/localflavor/es/es_regions.py:21
 msgid "Valencian Community"
-msgstr ""
+msgstr "Valenciaregionen"
 
 #: contrib/localflavor/es/forms.py:19
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
@@ -2274,24 +2257,25 @@ msgstr "Var god fyll i giltigt NIF eller NIE."
 
 #: contrib/localflavor/es/forms.py:68
 msgid "Invalid checksum for NIF."
-msgstr ""
+msgstr "Ogiltig kontrollsumma för NIF."
 
 #: contrib/localflavor/es/forms.py:69
 msgid "Invalid checksum for NIE."
-msgstr ""
+msgstr "Ogiltig kontrollsumma för NIE."
 
 #: contrib/localflavor/es/forms.py:70
 msgid "Invalid checksum for CIF."
-msgstr ""
+msgstr "Ogiltig kontrollsumma för CIF."
 
 #: contrib/localflavor/es/forms.py:142
 msgid ""
 "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr ""
+"Var god fyll i ett giltigt bankkontonummer i XXXX-XXXX-XX-XXXXXXXXXX-format."
 
 #: contrib/localflavor/es/forms.py:143
 msgid "Invalid checksum for bank account number."
-msgstr ""
+msgstr "Ogiltig kontrollsumma för bankkontonummer."
 
 #: contrib/localflavor/fi/forms.py:28
 msgid "Enter a valid Finnish social security number."
@@ -2322,7 +2306,7 @@ msgstr "Fyll i ett giltigt personnummer."
 msgid "Enter a valid VAT number."
 msgstr "Fyll i ett giltigt VAT-nummer."
 
-#: contrib/localflavor/jp/forms.py:19
+#: contrib/localflavor/jp/forms.py:17
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
 msgstr "Fyll i ett postnummer med formatet XXXXXXX eller XXX-XXXX."
 
@@ -2572,7 +2556,7 @@ msgstr "Jalisco"
 
 #: contrib/localflavor/mx/mx_states.py:26
 msgid "Estado de México"
-msgstr ""
+msgstr "Mexikanska staten"
 
 #: contrib/localflavor/mx/mx_states.py:27
 msgid "Michoacán"
@@ -2716,11 +2700,11 @@ msgstr "Detta fält kräver 11 sifrror."
 
 #: contrib/localflavor/pl/forms.py:39
 msgid "National Identification Number consists of 11 digits."
-msgstr ""
+msgstr "\"National Identification Number\" består av 11 siffror."
 
 #: contrib/localflavor/pl/forms.py:40
 msgid "Wrong checksum for the National Identification Number."
-msgstr ""
+msgstr "Fel kontrollsumma för \"National Identification Number\""
 
 #: contrib/localflavor/pl/forms.py:72
 msgid ""
@@ -2730,15 +2714,16 @@ msgstr ""
 
 #: contrib/localflavor/pl/forms.py:73
 msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr ""
+msgstr "Fel kontrollsumma för skattenumret (NIP)."
 
 #: contrib/localflavor/pl/forms.py:112
 msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
 msgstr ""
+"\"National Business Register Number\" (REGON) består av 7 eller 9 siffror."
 
 #: contrib/localflavor/pl/forms.py:113
 msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr ""
+msgstr "Fel kontrollsumma för \"National Business Register Number\" (REGON)."
 
 #: contrib/localflavor/pl/forms.py:156
 msgid "Enter a postal code in the format XX-XXX."
@@ -2773,9 +2758,8 @@ msgid "Masovia"
 msgstr ""
 
 #: contrib/localflavor/pl/pl_voivodeships.py:15
-#, fuzzy
 msgid "Opole"
-msgstr "Valfri"
+msgstr ""
 
 #: contrib/localflavor/pl/pl_voivodeships.py:16
 msgid "Subcarpatia"
@@ -2786,14 +2770,12 @@ msgid "Podlasie"
 msgstr ""
 
 #: contrib/localflavor/pl/pl_voivodeships.py:18
-#, fuzzy
 msgid "Pomerania"
-msgstr "Rumänska"
+msgstr ""
 
 #: contrib/localflavor/pl/pl_voivodeships.py:19
-#, fuzzy
 msgid "Silesia"
-msgstr "Slovenska"
+msgstr ""
 
 #: contrib/localflavor/pl/pl_voivodeships.py:20
 msgid "Swietokrzyskie"
@@ -2808,14 +2790,12 @@ msgid "Greater Poland"
 msgstr ""
 
 #: contrib/localflavor/pl/pl_voivodeships.py:23
-#, fuzzy
 msgid "West Pomerania"
-msgstr "Mecklenburg-Vorpommern"
+msgstr ""
 
 #: contrib/localflavor/sk/forms.py:30
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "Fyll i ett postnummer med formatet XXXXXXX eller XXX-XXXX."
+msgstr "Fyll i ett postnummer med formatet XXXXX eller XXX XX."
 
 #: contrib/localflavor/sk/sk_districts.py:8
 msgid "Banska Bystrica"
@@ -2834,9 +2814,8 @@ msgid "Banovce nad Bebravou"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:12
-#, fuzzy
 msgid "Brezno"
-msgstr "Bremen"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:13
 msgid "Bratislava I"
@@ -2879,14 +2858,12 @@ msgid "Dunajska Streda"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:23
-#, fuzzy
 msgid "Galanta"
-msgstr "Galisiska"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:24
-#, fuzzy
 msgid "Gelnica"
-msgstr "Galisiska"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:25
 msgid "Hlohovec"
@@ -2905,9 +2882,8 @@ msgid "Kezmarok"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:29
-#, fuzzy
 msgid "Komarno"
-msgstr "Koreanska"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:30
 msgid "Kosice I"
@@ -2950,19 +2926,16 @@ msgid "Liptovsky Mikulas"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:40
-#, fuzzy
 msgid "Lucenec"
-msgstr "Luzern"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:41
-#, fuzzy
 msgid "Malacky"
-msgstr "Maj"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:42
-#, fuzzy
 msgid "Martin"
-msgstr "Lettiska"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:43
 msgid "Medzilaborce"
@@ -2981,9 +2954,8 @@ msgid "Namestovo"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:47
-#, fuzzy
 msgid "Nitra"
-msgstr "Niigata"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:48
 msgid "Nove Mesto nad Vahom"
@@ -3002,9 +2974,8 @@ msgid "Pezinok"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:52
-#, fuzzy
 msgid "Piestany"
-msgstr "Persiska"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:53
 msgid "Poltar"
@@ -3047,29 +3018,24 @@ msgid "Ruzomberok"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:63
-#, fuzzy
 msgid "Sabinov"
-msgstr "nov"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:64
-#, fuzzy
 msgid "Senec"
-msgstr "Bern"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:65
-#, fuzzy
 msgid "Senica"
-msgstr "Slovenska"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:66
-#, fuzzy
 msgid "Skalica"
-msgstr "Galisiska"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:67
-#, fuzzy
 msgid "Snina"
-msgstr "nio"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:68
 msgid "Sobrance"
@@ -3092,9 +3058,8 @@ msgid "Svidnik"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:73
-#, fuzzy
 msgid "Sala"
-msgstr "Saga"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:74
 msgid "Topolcany"
@@ -3105,9 +3070,8 @@ msgid "Trebisov"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:76
-#, fuzzy
 msgid "Trencin"
-msgstr "Franska"
+msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:77
 msgid "Trnava"
@@ -3210,22 +3174,20 @@ msgid "Derbyshire"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:18
-#, fuzzy
 msgid "Devon"
-msgstr "sju"
+msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:19
 msgid "Dorset"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:20
-#, fuzzy
 msgid "Durham"
-msgstr "Jura"
+msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:21
 msgid "East Sussex"
-msgstr ""
+msgstr "Östsussex"
 
 #: contrib/localflavor/uk/uk_regions.py:22
 msgid "Essex"
@@ -3252,14 +3214,12 @@ msgid "Hertfordshire"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:28
-#, fuzzy
 msgid "Kent"
-msgstr "Koreanska"
+msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:29
-#, fuzzy
 msgid "Lancashire"
-msgstr "Yamanashi"
+msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:30
 msgid "Leicestershire"
@@ -3318,9 +3278,8 @@ msgid "Suffolk"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:44
-#, fuzzy
 msgid "Surrey"
-msgstr "Aktuell:"
+msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:45
 msgid "Tyne and Wear"
@@ -3359,8 +3318,11 @@ msgid "County Armagh"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:57
-#: contrib/localflavor/uk/uk_regions.py:58
 msgid "County Down"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:58
+msgid "County Fermanagh"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:59
@@ -3404,9 +3366,8 @@ msgid "West Glamorgan"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:75
-#, fuzzy
 msgid "Borders"
-msgstr "Sortera:"
+msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:76
 msgid "Central Scotland"
@@ -3417,23 +3378,20 @@ msgid "Dumfries and Galloway"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:78
-#, fuzzy
 msgid "Fife"
-msgstr "Filter"
+msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:79
-#, fuzzy
 msgid "Grampian"
-msgstr "Tyska"
+msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:80
 msgid "Highland"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:81
-#, fuzzy
 msgid "Lothian"
-msgstr "Lettiska"
+msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:82
 msgid "Orkney Islands"
@@ -3456,23 +3414,20 @@ msgid "Western Isles"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:90
-#, fuzzy
 msgid "England"
-msgstr "och"
+msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:91
 msgid "Northern Ireland"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:92
-#, fuzzy
 msgid "Scotland"
-msgstr "Saarland"
+msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:93
-#, fuzzy
 msgid "Wales"
-msgstr "Walesiska"
+msgstr ""
 
 #: contrib/localflavor/us/forms.py:16
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
@@ -3483,29 +3438,24 @@ msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr "Fyll i ett giltigt amerikanskt personnummer i formatet XXX-XX-XXXX."
 
 #: contrib/localflavor/za/forms.py:20
-#, fuzzy
 msgid "Enter a valid South African ID number"
-msgstr "Fyll i ett giltigt VAT-nummer."
+msgstr "Fyll i ett giltigt Sydafrikanskt ID-nummer."
 
 #: contrib/localflavor/za/forms.py:54
-#, fuzzy
 msgid "Enter a valid South African postal code"
-msgstr "Fyll i ett giltigt postnummer."
+msgstr "Fyll i ett giltigt Afrikanskt postnummer."
 
 #: contrib/localflavor/za/za_provinces.py:4
-#, fuzzy
 msgid "Eastern Cape"
-msgstr "Användarnamn"
+msgstr ""
 
 #: contrib/localflavor/za/za_provinces.py:5
-#, fuzzy
 msgid "Free State"
-msgstr "poängen tillsatt den"
+msgstr ""
 
 #: contrib/localflavor/za/za_provinces.py:6
-#, fuzzy
 msgid "Gauteng"
-msgstr "aug"
+msgstr ""
 
 #: contrib/localflavor/za/za_provinces.py:7
 msgid "KwaZulu-Natal"
@@ -3524,14 +3474,12 @@ msgid "Northern Cape"
 msgstr ""
 
 #: contrib/localflavor/za/za_provinces.py:11
-#, fuzzy
 msgid "North West"
-msgstr "Nordrhein-Westfalen"
+msgstr ""
 
 #: contrib/localflavor/za/za_provinces.py:12
-#, fuzzy
 msgid "Western Cape"
-msgstr "Användarnamn"
+msgstr ""
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
@@ -3565,23 +3513,23 @@ msgstr "omdirigera"
 msgid "redirects"
 msgstr "omdirigeringar"
 
-#: contrib/sessions/models.py:46
+#: contrib/sessions/models.py:41
 msgid "session key"
 msgstr "sessionsnyckel"
 
-#: contrib/sessions/models.py:47
+#: contrib/sessions/models.py:42
 msgid "session data"
 msgstr "sessionsdata"
 
-#: contrib/sessions/models.py:48
+#: contrib/sessions/models.py:43
 msgid "expire date"
 msgstr "utgångsdatum"
 
-#: contrib/sessions/models.py:53
+#: contrib/sessions/models.py:48
 msgid "session"
 msgstr "session"
 
-#: contrib/sessions/models.py:54
+#: contrib/sessions/models.py:49
 msgid "sessions"
 msgstr "sessioner"
 
@@ -3669,7 +3617,7 @@ msgstr "Årtal måste vara 1900 eller senare."
 msgid "Invalid date: %s"
 msgstr "Ogiltigt datum: %s"
 
-#: core/validators.py:156 db/models/fields/__init__.py:509
+#: core/validators.py:156 db/models/fields/__init__.py:522
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Fyll i ett giltigt datum med formatet ÅÅÅÅ-MM-DD."
 
@@ -3677,7 +3625,7 @@ msgstr "Fyll i ett giltigt datum med formatet ÅÅÅÅ-MM-DD."
 msgid "Enter a valid time in HH:MM format."
 msgstr "Fyll i ett giltigt klockslag med formatet TT:MM."
 
-#: core/validators.py:165 db/models/fields/__init__.py:583
+#: core/validators.py:165 db/models/fields/__init__.py:599
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Fyll i en giltig tidpunkt med formatet ÅÅÅÅ-MM-DD TT:MM."
 
@@ -3931,52 +3879,52 @@ msgstr "%(object)s med typen %(type)s finns redan för %(field)s."
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "%(optname)s med det här %(fieldname)s finns redan."
 
-#: db/models/fields/__init__.py:161 db/models/fields/__init__.py:318
-#: db/models/fields/__init__.py:735 db/models/fields/__init__.py:746
+#: db/models/fields/__init__.py:161 db/models/fields/__init__.py:322
+#: db/models/fields/__init__.py:754 db/models/fields/__init__.py:765
 #: newforms/fields.py:45 oldforms/__init__.py:374
 msgid "This field is required."
 msgstr "Det här fältet är obligatoriskt."
 
-#: db/models/fields/__init__.py:418
+#: db/models/fields/__init__.py:422
 msgid "This value must be an integer."
 msgstr "Det här värdet måste vara ett heltal."
 
-#: db/models/fields/__init__.py:454
+#: db/models/fields/__init__.py:461
 msgid "This value must be either True or False."
 msgstr "Det här värdet måste vara antingen True eller False."
 
-#: db/models/fields/__init__.py:475
+#: db/models/fields/__init__.py:485
 msgid "This field cannot be null."
 msgstr "Det här fältet får inte vara tomt."
 
-#: db/models/fields/__init__.py:644
+#: db/models/fields/__init__.py:663
 msgid "This value must be a decimal number."
 msgstr "Det här värdet måste vara ett decimaltal."
 
-#: db/models/fields/__init__.py:755
+#: db/models/fields/__init__.py:774
 msgid "Enter a valid filename."
 msgstr "Fyll i ett giltigt filnamn."
 
-#: db/models/fields/__init__.py:908
+#: db/models/fields/__init__.py:945
 msgid "This value must be either None, True or False."
 msgstr "Det här värdet måste vara antingen None, True eller False."
 
-#: db/models/fields/related.py:55
+#: db/models/fields/related.py:93
 #, python-format
 msgid "Please enter a valid %s."
 msgstr "Var god fyll i giltig %s."
 
-#: db/models/fields/related.py:658
+#: db/models/fields/related.py:694
 msgid "Separate multiple IDs with commas."
 msgstr "Separera flera ID-nummer med kommatecken."
 
-#: db/models/fields/related.py:660
+#: db/models/fields/related.py:696
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Håll ner \"Control\" eller \"Command\" på en Mac för att välja fler än en."
 
-#: db/models/fields/related.py:707
+#: db/models/fields/related.py:743
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -4059,7 +4007,7 @@ msgstr "Fyll i en giltig URL."
 msgid "This URL appears to be a broken link."
 msgstr "Denna URL verkar vara en trasig länk."
 
-#: newforms/fields.py:559 newforms/models.py:317
+#: newforms/fields.py:559 newforms/models.py:300
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Välj ett giltigt alternativ. Det valet finns inte bland tillgängliga "
@@ -4072,7 +4020,7 @@ msgstr ""
 "Välj ett giltigt alternativ. %(value)s finns inte bland tillgängliga "
 "alternativ."
 
-#: newforms/fields.py:599 newforms/fields.py:661 newforms/models.py:377
+#: newforms/fields.py:599 newforms/fields.py:661 newforms/models.py:360
 msgid "Enter a list of values."
 msgstr "Fyll i en lista med värden."
 
@@ -4080,7 +4028,7 @@ msgstr "Fyll i en lista med värden."
 msgid "Enter a valid IPv4 address."
 msgstr "Fyll i en giltig IPv4 adress."
 
-#: newforms/models.py:378
+#: newforms/models.py:361
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr ""
@@ -4114,28 +4062,28 @@ msgstr "Fyll i ett positivt tal."
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Fyll i ett heltal mellan 0 och 32767."
 
-#: template/defaultfilters.py:691
+#: template/defaultfilters.py:695
 msgid "yes,no,maybe"
 msgstr "ja,nej,kanske"
 
-#: template/defaultfilters.py:722
+#: template/defaultfilters.py:726
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d byte"
 
-#: template/defaultfilters.py:724
+#: template/defaultfilters.py:728
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:726
+#: template/defaultfilters.py:730
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:727
+#: template/defaultfilters.py:731
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
@@ -4398,23 +4346,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:399
+#: utils/translation/trans_real.py:403
 msgid "DATE_FORMAT"
 msgstr "Y-m-d"
 
-#: utils/translation/trans_real.py:400
+#: utils/translation/trans_real.py:404
 msgid "DATETIME_FORMAT"
 msgstr "Y-m-d H:i"
 
-#: utils/translation/trans_real.py:401
+#: utils/translation/trans_real.py:405
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: utils/translation/trans_real.py:417
+#: utils/translation/trans_real.py:421
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:418
+#: utils/translation/trans_real.py:422
 msgid "MONTH_DAY_FORMAT"
 msgstr "j F"
 
@@ -4432,3 +4380,6 @@ msgstr "%(verbose_name)s uppdaterades."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s togs bort."
+
+#~ msgid "Gaeilge"
+#~ msgstr "Gaeliska"
