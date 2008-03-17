@@ -102,9 +102,12 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             (related_url, url, name))
         output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>' % settings.ADMIN_MEDIA_PREFIX)
         if value:
-            output.append('&nbsp;<strong>%s</strong>' % \
-                truncate_words(self.rel.to.objects.get(pk=value), 14))
+            output.append(self.label_for_value(value))
         return mark_safe(u''.join(output))
+    
+    def label_for_value(self, value):
+        return '&nbsp;<strong>%s</strong>' % \
+            truncate_words(self.rel.to.objects.get(pk=value), 14)
             
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """
@@ -121,6 +124,9 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         else:
             value = ''
         return super(ManyToManyRawIdWidget, self).render(name, value, attrs)
+    
+    def label_for_value(self, value):
+        return ''
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name, None)
