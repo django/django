@@ -11,7 +11,7 @@
          <th {% if forloop.first %}colspan="2"{% endif %}>{{ field.label|capfirst|escape }}</th>
         {% endif %}
      {% endfor %}
-     {% if inline_admin_formset.formset.deletable %}<th>{% trans "Delete" %}?</th>{% endif %}
+     {% if inline_admin_formset.formset.can_delete %}<th>{% trans "Delete" %}?</th>{% endif %}
      </tr></thead>
    
      {% for inline_admin_form in inline_admin_formset %}
@@ -45,7 +45,7 @@
           {% endfor %}
         {% endfor %}
                 
-        {% if inline_admin_formset.formset.deletable %}<td class="delete">{{ inline_admin_form.deletion_field.field }}</td>{% endif %}
+        {% if inline_admin_formset.formset.can_delete %}<td class="delete">{{ inline_admin_form.deletion_field.field }}</td>{% endif %}
         
         </tr>
 
