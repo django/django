@@ -147,6 +147,15 @@ This template expects the following context:
       that you'll need to run this through the ``safe`` template filter, to
       prevent auto-escaping, because it's raw HTML.
 
+It will also be passed any objects in ``extra_context``, which is a dictionary
+you can specify that contains extra values to add to the context. You can
+specify it in two ways:
+
+    * Set the ``extra_context`` attribute on your ``FormWizard`` subclass to a
+      dictionary.
+
+    * Pass ``extra_context`` as extra parameters in the URLconf.
+
 Here's a full example template::
 
     {% extends "base.html" %}
