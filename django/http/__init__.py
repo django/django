@@ -1,5 +1,5 @@
 import os
-from Cookie import SimpleCookie
+from Cookie import SimpleCookie, CookieError
 from pprint import pformat
 from urllib import urlencode
 from urlparse import urljoin
@@ -239,8 +239,13 @@ class QueryDict(MultiValueDict):
 def parse_cookie(cookie):
     if cookie == '':
         return {}
-    c = SimpleCookie()
-    c.load(cookie)
+    try:
+        c = SimpleCookie()
+        c.load(cookie)
+    except CookieError:
+        # Invalid cookie
+        return {}
+
     cookiedict = {}
     for key in c.keys():
         cookiedict[key] = c.get(key).value
