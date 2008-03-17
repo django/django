@@ -11,10 +11,12 @@ urlpatterns = patterns('',
 
     # test urlconf for {% url %} template tag
     (r'^url_tag/', include('regressiontests.templates.urls')),
-    
+
     # django built-in views
     (r'^views/', include('regressiontests.views.urls')),
 
     # test urlconf for middleware tests
     (r'^middleware/', include('regressiontests.middleware.urls')),
+
+    (r'^utils/', include('regressiontests.utils.urls')),
 )
