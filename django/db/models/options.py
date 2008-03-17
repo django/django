@@ -231,7 +231,7 @@ class Options(object):
                 return f
         raise FieldDoesNotExist, '%s has no field named %r' % (self.object_name, name)
 
-    def get_field_by_name(self, name, only_direct=False):
+    def get_field_by_name(self, name):
         """
         Returns the (field_object, model, direct, m2m), where field_object is
         the Field instance for the given name, model is the model containing
@@ -241,21 +241,17 @@ class Options(object):
         for this field (since the field doesn't have an instance associated
         with it).
 
-        If 'only_direct' is True, only forwards relations (and non-relations)
-        are considered in the result.
-
         Uses a cache internally, so after the first access, this is very fast.
         """
         try:
-            result = self._name_map.get(name)
-        except AttributeError:
-            cache = self.init_name_map()
-            result = cache.get(name)
-
-        if not result or (only_direct and not result[2]):
+            try:
+                return self._name_map[name]
+            except AttributeError:
+                cache = self.init_name_map()
+                return self._name_map[name]
+        except KeyError:
             raise FieldDoesNotExist('%s has no field named %r'
                     % (self.object_name, name))
-        return result
 
     def get_all_field_names(self):
         """

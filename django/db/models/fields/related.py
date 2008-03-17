@@ -28,21 +28,21 @@ def add_lazy_relation(cls, field, relation):
     """
     Adds a lookup on ``cls`` when a related field is defined using a string,
     i.e.::
-    
+
         class MyModel(Model):
             fk = ForeignKey("AnotherModel")
-            
+
     This string can be:
-    
+
         * RECURSIVE_RELATIONSHIP_CONSTANT (i.e. "self") to indicate a recursive
           relation.
-          
+
         * The name of a model (i.e "AnotherModel") to indicate another model in
           the same app.
-          
+
         * An app-label and model name (i.e. "someapp.AnotherModel") to indicate
           another model in a different app.
-          
+
     If the other model hasn't yet been loaded -- almost a given if you're using
     lazy relationships -- then the relation won't be set up until the
     class_prepared signal fires at the end of model initialization.
@@ -51,7 +51,7 @@ def add_lazy_relation(cls, field, relation):
     if relation == RECURSIVE_RELATIONSHIP_CONSTANT:
         app_label = cls._meta.app_label
         model_name = cls.__name__
-    
+
     else:
         # Look for an "app.Model" relation
         try:
@@ -60,10 +60,10 @@ def add_lazy_relation(cls, field, relation):
             # If we can't split, assume a model in current app
             app_label = cls._meta.app_label
             model_name = relation
-    
+
     # Try to look up the related model, and if it's already loaded resolve the
     # string right away. If get_model returns None, it means that the related
-    # model isn't loaded yet, so we need to pend the relation until the class 
+    # model isn't loaded yet, so we need to pend the relation until the class
     # is prepared.
     model = get_model(app_label, model_name, False)
     if model:
@@ -73,7 +73,7 @@ def add_lazy_relation(cls, field, relation):
         key = (app_label, model_name)
         value = (cls, field)
         pending_lookups.setdefault(key, []).append(value)
-    
+
 def do_pending_lookups(sender):
     """
     Handle any pending relations to the sending model. Sent from class_prepared.
@@ -530,7 +530,11 @@ class ManyToOneRel(object):
         Returns the Field in the 'to' object to which this relationship is
         tied.
         """
-        return self.to._meta.get_field_by_name(self.field_name, True)[0]
+        data = self.to._meta.get_field_by_name(self.field_name)
+        if not data[2]:
+            raise FieldDoesNotExist("No related field named '%s'" %
+                    self.field_name)
+        return data[0]
 
 class OneToOneRel(ManyToOneRel):
     def __init__(self, to, field_name, num_in_admin=0, min_num_in_admin=None,
