@@ -4,7 +4,7 @@
 # makoto tsuyuki <mtsuyuki@gmail.com>, 2005.
 msgid ""
 msgstr ""
-"Project-Id-Version: Django 1.0\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-03-26 23:41+0900\n"
 "PO-Revision-Date: 2006-05-08 13:39+0900\n"

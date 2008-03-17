@@ -6,7 +6,7 @@
 # Antoni Aloy <antoni.aloy@trespams.com>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: djangojs\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-05-20 18:25+0200\n"
 "PO-Revision-Date: 2008-01-22 19:39+0100\n"

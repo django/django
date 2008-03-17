@@ -5,7 +5,7 @@
 # PONNUSAMY.A <ponnusamy.simpleman@gmail.com>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: djangojs\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-12-09 11:51+0100\n"
 "PO-Revision-Date: 2007-03-14 16:40+0530\n"
