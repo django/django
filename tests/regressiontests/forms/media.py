@@ -4,6 +4,7 @@
 media_tests = r"""
 >>> from django.newforms import TextInput, Media, TextInput, CharField, Form, MultiWidget
 >>> from django.conf import settings
+>>> ORIGINAL_MEDIA_URL = settings.MEDIA_URL
 >>> settings.MEDIA_URL = 'http://media.example.com/media/'
 
 # Check construction of media objects
@@ -354,4 +355,5 @@ media_tests = r"""
 <script type="text/javascript" src="/path/to/js4"></script>
 <script type="text/javascript" src="/some/form/javascript"></script>
 
+>>> settings.MEDIA_URL = ORIGINAL_MEDIA_URL
 """
