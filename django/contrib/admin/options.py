@@ -197,18 +197,10 @@ class BaseModelAdmin(object):
         return None
     declared_fieldsets = property(_declared_fieldsets)
 
-    def fieldsets_add(self, request):
-        "Hook for specifying fieldsets for the add form."
-        raise NotImplementedError
-    
-    def fieldsets_change(self, request, obj):
-        "Hook for specifying fieldsets for the change form."
-        raise NotImplementedError
-
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
     __metaclass__ = forms.MediaDefiningClass
-    
+
     list_display = ('__str__',)
     list_display_links = ()
     list_filter = ()
@@ -269,7 +261,7 @@ class ModelAdmin(BaseModelAdmin):
         
         return forms.Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
     media = property(_media)
-    
+
     def has_add_permission(self, request):
         "Returns True if the given request has permission to add an object."
         opts = self.opts
@@ -300,42 +292,22 @@ class ModelAdmin(BaseModelAdmin):
     def queryset(self, request):
         """
         Returns a QuerySet of all model instances that can be edited by the
-        admin site.
+        admin site. This is used by changelist_view.
         """
         ordering = self.ordering or () # otherwise we might try to *None, which is bad ;)
         return self.model._default_manager.get_query_set().order_by(*ordering)
 
-    def queryset_add(self, request):
-        """
-        Returns a QuerySet of all model instances that can be edited by the
-        admin site in the "add" stage.
-        """
-        return self.queryset(request)
-
-    def queryset_change(self, request):
-        """
-        Returns a QuerySet of all model instances that can be edited by the
-        admin site in the "change" stage.
-        """
-        return self.queryset(request)
-
-    def fieldsets_add(self, request):
+    def get_fieldsets(self, request, obj=None):
         "Hook for specifying fieldsets for the add form."
         if self.declared_fieldsets:
             return self.declared_fieldsets
-        form = self.form_add(request)
+        form = self.get_form(request)
         return [(None, {'fields': form.base_fields.keys()})]
 
-    def fieldsets_change(self, request, obj):
-        "Hook for specifying fieldsets for the change form."
-        if self.declared_fieldsets:
-            return self.declared_fieldsets
-        form = self.form_change(request, obj)
-        return [(None, {'fields': form.base_fields.keys()})]
-
-    def form_add(self, request):
+    def get_form(self, request, obj=None):
         """
-        Returns a Form class for use in the admin add view.
+        Returns a Form class for use in the admin add view. This is used by
+        add_view and change_view.
         """
         if self.declared_fieldsets:
             fields = flatten_fieldsets(self.declared_fieldsets)
@@ -343,15 +315,9 @@ class ModelAdmin(BaseModelAdmin):
             fields = None
         return _modelform_factory(self.model, fields=fields, formfield_callback=self.formfield_for_dbfield)
 
-    def form_change(self, request, obj):
-        """
-        Returns a Form class for use in the admin change view.
-        """
-        if self.declared_fieldsets:
-            fields = flatten_fieldsets(self.declared_fieldsets)
-        else:
-            fields = None
-        return _modelform_factory(self.model, fields=fields, formfield_callback=self.formfield_for_dbfield)
+    def get_formsets(self, request, obj=None):
+        for inline in self.inline_instances:
+            yield inline.get_formset(request, obj)
 
     def save_add(self, request, model, form, formsets, post_url_continue):
         """
@@ -491,30 +457,30 @@ class ModelAdmin(BaseModelAdmin):
             # Object list will give 'Permission Denied', so go back to admin home
             post_url = '../../../'
 
-        ModelForm = self.form_add(request)
+        ModelForm = self.get_form(request)
         inline_formsets = []
         obj = self.model()
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES)
-            for FormSet in self.formsets_add(request):
+            for FormSet in self.get_formsets(request):
                 inline_formset = FormSet(data=request.POST, files=request.FILES, instance=obj)
                 inline_formsets.append(inline_formset)
             if all_valid(inline_formsets) and form.is_valid():
                 return self.save_add(request, model, form, inline_formsets, '../%s/')
         else:
             form = ModelForm(initial=request.GET)
-            for FormSet in self.formsets_add(request):
+            for FormSet in self.get_formsets(request):
                 inline_formset = FormSet(instance=obj)
                 inline_formsets.append(inline_formset)
 
-        adminForm = AdminForm(form, list(self.fieldsets_add(request)), self.prepopulated_fields)
+        adminForm = AdminForm(form, list(self.get_fieldsets(request)), self.prepopulated_fields)
         media = self.media + adminForm.media
         for fs in inline_formsets:
             media = media + fs.media
 
         inline_admin_formsets = []
         for inline, formset in zip(self.inline_instances, inline_formsets):
-            fieldsets = list(inline.fieldsets_add(request))
+            fieldsets = list(inline.get_fieldsets(request))
             inline_admin_formset = InlineAdminFormSet(inline, formset, fieldsets)
             inline_admin_formsets.append(inline_admin_formset)
 
@@ -551,11 +517,11 @@ class ModelAdmin(BaseModelAdmin):
         if request.POST and request.POST.has_key("_saveasnew"):
             return self.add_view(request, form_url='../../add/')
 
-        ModelForm = self.form_change(request, obj)
+        ModelForm = self.get_form(request, obj)
         inline_formsets = []
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES, instance=obj)
-            for FormSet in self.formsets_change(request, obj):
+            for FormSet in self.get_formsets(request, obj):
                 inline_formset = FormSet(request.POST, request.FILES, instance=obj)
                 inline_formsets.append(inline_formset)
 
@@ -563,7 +529,7 @@ class ModelAdmin(BaseModelAdmin):
                 return self.save_change(request, model, form, inline_formsets)
         else:
             form = ModelForm(instance=obj)
-            for FormSet in self.formsets_change(request, obj):
+            for FormSet in self.get_formsets(request, obj):
                 inline_formset = FormSet(instance=obj)
                 inline_formsets.append(inline_formset)
 
@@ -581,14 +547,14 @@ class ModelAdmin(BaseModelAdmin):
                 #orig_list = func()
                 #oldform.order_objects.extend(orig_list)
                 
-        adminForm = AdminForm(form, self.fieldsets_change(request, obj), self.prepopulated_fields)
+        adminForm = AdminForm(form, self.get_fieldsets(request, obj), self.prepopulated_fields)
         media = self.media + adminForm.media
         for fs in inline_formsets:
             media = media + fs.media
 
         inline_admin_formsets = []
         for inline, formset in zip(self.inline_instances, inline_formsets):
-            fieldsets = list(inline.fieldsets_change(request, obj))
+            fieldsets = list(inline.get_fieldsets(request, obj))
             inline_admin_formset = InlineAdminFormSet(inline, formset, fieldsets)
             inline_admin_formsets.append(inline_admin_formset)
 
@@ -702,14 +668,6 @@ class ModelAdmin(BaseModelAdmin):
         ]
         return render_to_response(template_list, extra_context, context_instance=template.RequestContext(request))
 
-    def formsets_add(self, request):
-        for inline in self.inline_instances:
-            yield inline.formset_add(request)
-
-    def formsets_change(self, request, obj):
-        for inline in self.inline_instances:
-            yield inline.formset_change(request, obj)
-
 class InlineModelAdmin(BaseModelAdmin):
     """
     Options for inline editing of ``model`` instances.
@@ -735,32 +693,18 @@ class InlineModelAdmin(BaseModelAdmin):
         if self.verbose_name_plural is None:
             self.verbose_name_plural = self.model._meta.verbose_name_plural
 
-    def formset_add(self, request):
-        """Returns an InlineFormSet class for use in admin add views."""
+    def get_formset(self, request, obj=None):
+        """Returns a BaseInlineFormSet class for use in admin add/change views."""
         if self.declared_fieldsets:
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
         return _inlineformset_factory(self.parent_model, self.model, fk_name=self.fk_name, fields=fields, formfield_callback=self.formfield_for_dbfield, extra=self.extra)
 
-    def formset_change(self, request, obj):
-        """Returns an InlineFormSet class for use in admin change views."""
-        if self.declared_fieldsets:
-            fields = flatten_fieldsets(self.declared_fieldsets)
-        else:
-            fields = None
-        return _inlineformset_factory(self.parent_model, self.model, fk_name=self.fk_name, fields=fields, formfield_callback=self.formfield_for_dbfield, extra=self.extra)
-
-    def fieldsets_add(self, request):
+    def get_fieldsets(self, request, obj=None):
         if self.declared_fieldsets:
             return self.declared_fieldsets
-        form = self.formset_add(request).form
-        return [(None, {'fields': form.base_fields.keys()})]
-
-    def fieldsets_change(self, request, obj):
-        if self.declared_fieldsets:
-            return self.declared_fieldsets
-        form = self.formset_change(request, obj).form
+        form = self.get_formset(request).form
         return [(None, {'fields': form.base_fields.keys()})]
 
 class StackedInline(InlineModelAdmin):

@@ -25,7 +25,7 @@ for testing.
 >>> site = AdminSite()
 >>> ma = ModelAdmin(Band, site)
 
->>> ma.form_add(request).base_fields.keys()
+>>> ma.get_form(request).base_fields.keys()
 ['name', 'bio']
 
 
@@ -39,9 +39,9 @@ Here's the default case. There are no custom form_add/form_change methods,
 no fields argument, and no fieldsets argument.
 
 >>> ma = ModelAdmin(Band, site)
->>> ma.fieldsets_add(request)
+>>> ma.get_fieldsets(request)
 [(None, {'fields': ['name', 'bio']})]
->>> ma.fieldsets_change(request, band)
+>>> ma.get_fieldsets(request, band)
 [(None, {'fields': ['name', 'bio']})]
 
 
@@ -52,9 +52,9 @@ just stick the fields into a formsets structure and return it.
 ...     fields = ['name']
 
 >>> ma = BandAdmin(Band, site)
->>> ma.fieldsets_add(request)
+>>> ma.get_fieldsets(request)
 [(None, {'fields': ['name']})]
->>> ma.fieldsets_change(request, band)
+>>> ma.get_fieldsets(request, band)
 [(None, {'fields': ['name']})]
 
 
@@ -70,18 +70,18 @@ displayed because you forgot to add it to fields/fielsets
 ...     fields = ['name']
 
 >>> ma = BandAdmin(Band, site)
->>> ma.form_add(request).base_fields.keys()
+>>> ma.get_form(request).base_fields.keys()
 ['name']
->>> ma.form_change(request, band).base_fields.keys()
+>>> ma.get_form(request, band).base_fields.keys()
 ['name']
 
 >>> class BandAdmin(ModelAdmin):
 ...     fieldsets = [(None, {'fields': ['name']})]
 
 >>> ma = BandAdmin(Band, site)
->>> ma.form_add(request).base_fields.keys()
+>>> ma.get_form(request).base_fields.keys()
 ['name']
->>> ma.form_change(request, band).base_fields.keys()
+>>> ma.get_form(request, band).base_fields.keys()
 ['name']
 
 
