@@ -49,6 +49,7 @@ class FormWizard(object):
         if 'extra_context' in kwargs:
             self.extra_context.update(kwargs['extra_context'])
         current_step = self.determine_step(request, *args, **kwargs)
+        self.parse_params(request, *args, **kwargs)
 
         # Sanity check.
         if current_step >= self.num_steps():
@@ -166,6 +167,15 @@ class FormWizard(object):
         except ValueError:
             return 0
         return step
+
+    def parse_params(self, request, *args, **kwargs):
+        """
+        Hook for setting some state, given the request object and whatever
+        *args and **kwargs were passed to __call__(), sets some state.
+
+        This is called at the beginning of __call__().
+        """
+        pass
 
     def get_template(self, step):
         """
