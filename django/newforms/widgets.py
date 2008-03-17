@@ -164,15 +164,19 @@ class Widget(object):
         of this widget. Returns None if it's not provided.
         """
         return data.get(name, None)
-    
-    def is_empty(self, value):
+
+    def _has_changed(self, initial, data):
         """
-        Given a dictionary of data and this widget's name, return True if the
-        widget data is empty or False when not empty.
+        Return True if data differs from initial.
         """
-        if value not in (None, ''):
-            return False
-        return True
+        # For purposes of seeing whether something has changed, None is
+        # the same as an empty string, if the data or inital value we get
+        # is None, replace it w/ u''.
+        data_value = data or u''
+        initial_value = initial or u''
+        if force_unicode(initial_value) != force_unicode(data_value):
+            return True
+        return False
 
     def id_for_label(self, id_):
         """
@@ -309,11 +313,11 @@ class CheckboxInput(Widget):
             # send results for unselected checkboxes.
             return False
         return super(CheckboxInput, self).value_from_datadict(data, files, name)
-    
-    def is_empty(self, value):
-        # this widget will always either be True or False, so always return the
-        # opposite value so False values will make the form empty
-        return not value
+
+    def _has_changed(self, initial, data):
+        # Sometimes data or initial could be None or u'' which should be the
+        # same thing as False.
+        return bool(initial) != bool(data)
 
 class Select(Widget):
     def __init__(self, attrs=None, choices=()):
@@ -356,12 +360,11 @@ class NullBooleanSelect(Select):
     def value_from_datadict(self, data, files, name):
         value = data.get(name, None)
         return {u'2': True, u'3': False, True: True, False: False}.get(value, None)
-    
-    def is_empty(self, value):
-        # this widget will always either be True, False or None, so always
-        # return the opposite value so False and None values will make the
-        # form empty.
-        return not value
+
+    def _has_changed(self, initial, data):
+        # Sometimes data or initial could be None or u'' which should be the
+        # same thing as False.
+        return bool(initial) != bool(data)
 
 class SelectMultiple(Widget):
     def __init__(self, attrs=None, choices=()):
@@ -559,9 +562,11 @@ class MultiWidget(Widget):
     def value_from_datadict(self, data, files, name):
         return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
     
-    def is_empty(self, value):
-        for widget, val in zip(self.widgets, value):
-            if not widget.is_empty(val):
+    def _has_changed(self, initial, data):
+        if initial is None:
+            initial = [u'' for x in range(0, len(data))]
+        for widget, initial, data in zip(self.widgets, initial, data):
+            if not widget._has_changed(initial, data):
                 return False
         return True
 

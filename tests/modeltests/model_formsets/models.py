@@ -16,12 +16,12 @@ class Book(models.Model):
 
 __test__ = {'API_TESTS': """
 
->>> from django.newforms.models import formset_for_model
+>>> from django.newforms.models import _modelformset_factory
 
 >>> qs = Author.objects.all()
->>> AuthorFormSet = formset_for_model(Author, extra=3)
+>>> AuthorFormSet = _modelformset_factory(Author, extra=3)
 
->>> formset = AuthorFormSet(qs)
+>>> formset = AuthorFormSet(queryset=qs)
 >>> for form in formset.forms:
 ...     print form.as_p()
 <p><label for="id_form-0-name">Name:</label> <input id="id_form-0-name" type="text" name="form-0-name" maxlength="100" /><input type="hidden" name="form-0-id" id="id_form-0-id" /></p>
@@ -29,13 +29,14 @@ __test__ = {'API_TESTS': """
 <p><label for="id_form-2-name">Name:</label> <input id="id_form-2-name" type="text" name="form-2-name" maxlength="100" /><input type="hidden" name="form-2-id" id="id_form-2-id" /></p>
 
 >>> data = {
-...     'form-COUNT': '3',
+...     'form-TOTAL_FORMS': '3', # the number of forms rendered
+...     'form-INITIAL_FORMS': '0', # the number of forms with initial data
 ...     'form-0-name': 'Charles Baudelaire',
 ...     'form-1-name': 'Arthur Rimbaud',
 ...     'form-2-name': '',
 ... }
 
->>> formset = AuthorFormSet(qs, data=data)
+>>> formset = AuthorFormSet(data=data, queryset=qs)
 >>> formset.is_valid()
 True
 
@@ -54,9 +55,9 @@ We *could* use formset_for_queryset to restrict the Author objects we edit,
 but in that case we'll use it to display them in alphabetical order by name.
 
 >>> qs = Author.objects.order_by('name')
->>> AuthorFormSet = formset_for_model(Author, extra=1, deletable=False)
+>>> AuthorFormSet = _modelformset_factory(Author, extra=1, can_delete=False)
 
->>> formset = AuthorFormSet(qs)
+>>> formset = AuthorFormSet(queryset=qs)
 >>> for form in formset.forms:
 ...     print form.as_p()
 <p><label for="id_form-0-name">Name:</label> <input id="id_form-0-name" type="text" name="form-0-name" value="Arthur Rimbaud" maxlength="100" /><input type="hidden" name="form-0-id" value="2" id="id_form-0-id" /></p>
@@ -65,7 +66,8 @@ but in that case we'll use it to display them in alphabetical order by name.
 
 
 >>> data = {
-...     'form-COUNT': '3',
+...     'form-TOTAL_FORMS': '3', # the number of forms rendered
+...     'form-INITIAL_FORMS': '2', # the number of forms with initial data
 ...     'form-0-id': '2',
 ...     'form-0-name': 'Arthur Rimbaud',
 ...     'form-1-id': '1',
@@ -73,7 +75,7 @@ but in that case we'll use it to display them in alphabetical order by name.
 ...     'form-2-name': 'Paul Verlaine',
 ... }
 
->>> formset = AuthorFormSet(qs, data=data)
+>>> formset = AuthorFormSet(data=data, queryset=qs)
 >>> formset.is_valid()
 True
 
@@ -91,9 +93,9 @@ This probably shouldn't happen, but it will. If an add form was marked for
 deltetion, make sure we don't save that form.
 
 >>> qs = Author.objects.order_by('name')
->>> AuthorFormSet = formset_for_model(Author, extra=1, deletable=True)
+>>> AuthorFormSet = _modelformset_factory(Author, extra=1, can_delete=True)
 
->>> formset = AuthorFormSet(qs)
+>>> formset = AuthorFormSet(queryset=qs)
 >>> for form in formset.forms:
 ...     print form.as_p()
 <p><label for="id_form-0-name">Name:</label> <input id="id_form-0-name" type="text" name="form-0-name" value="Arthur Rimbaud" maxlength="100" /></p>
@@ -106,7 +108,8 @@ deltetion, make sure we don't save that form.
 <p><label for="id_form-3-DELETE">Delete:</label> <input type="checkbox" name="form-3-DELETE" id="id_form-3-DELETE" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></p>
 
 >>> data = {
-...     'form-COUNT': '4',
+...     'form-TOTAL_FORMS': '4', # the number of forms rendered
+...     'form-INITIAL_FORMS': '3', # the number of forms with initial data
 ...     'form-0-id': '2',
 ...     'form-0-name': 'Arthur Rimbaud',
 ...     'form-1-id': '1',
@@ -117,7 +120,7 @@ deltetion, make sure we don't save that form.
 ...     'form-3-DELETE': 'on',
 ... }
 
->>> formset = AuthorFormSet(qs, data=data)
+>>> formset = AuthorFormSet(data=data, queryset=qs)
 >>> formset.is_valid()
 True
 
@@ -131,15 +134,17 @@ Charles Baudelaire
 Paul Verlaine
 
 
+# Inline Formsets ############################################################
+
 We can also create a formset that is tied to a parent model. This is how the
 admin system's edit inline functionality works.
 
->>> from django.newforms.models import inline_formset
+>>> from django.newforms.models import _inlineformset_factory
 
->>> AuthorBooksFormSet = inline_formset(Author, Book, deletable=False, extra=3)
+>>> AuthorBooksFormSet = _inlineformset_factory(Author, Book, can_delete=False, extra=3)
 >>> author = Author.objects.get(name='Charles Baudelaire')
 
->>> formset = AuthorBooksFormSet(author)
+>>> formset = AuthorBooksFormSet(instance=author)
 >>> for form in formset.forms:
 ...     print form.as_p()
 <p><label for="id_book_set-0-title">Title:</label> <input id="id_book_set-0-title" type="text" name="book_set-0-title" maxlength="100" /><input type="hidden" name="book_set-0-id" id="id_book_set-0-id" /></p>
@@ -147,13 +152,14 @@ admin system's edit inline functionality works.
 <p><label for="id_book_set-2-title">Title:</label> <input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" /><input type="hidden" name="book_set-2-id" id="id_book_set-2-id" /></p>
 
 >>> data = {
-...     'book_set-COUNT': '3',
+...     'book_set-TOTAL_FORMS': '3', # the number of forms rendered
+...     'book_set-INITIAL_FORMS': '0', # the number of forms with initial data
 ...     'book_set-0-title': 'Les Fleurs du Mal',
 ...     'book_set-1-title': '',
 ...     'book_set-2-title': '',
 ... }
 
->>> formset = AuthorBooksFormSet(author, data=data)
+>>> formset = AuthorBooksFormSet(data, instance=author)
 >>> formset.is_valid()
 True
 
@@ -169,10 +175,10 @@ Now that we've added a book to Charles Baudelaire, let's try adding another
 one. This time though, an edit form will be available for every existing
 book.
 
->>> AuthorBooksFormSet = inline_formset(Author, Book, deletable=False, extra=2)
+>>> AuthorBooksFormSet = _inlineformset_factory(Author, Book, can_delete=False, extra=2)
 >>> author = Author.objects.get(name='Charles Baudelaire')
 
->>> formset = AuthorBooksFormSet(author)
+>>> formset = AuthorBooksFormSet(instance=author)
 >>> for form in formset.forms:
 ...     print form.as_p()
 <p><label for="id_book_set-0-title">Title:</label> <input id="id_book_set-0-title" type="text" name="book_set-0-title" value="Les Fleurs du Mal" maxlength="100" /><input type="hidden" name="book_set-0-id" value="1" id="id_book_set-0-id" /></p>
@@ -180,14 +186,15 @@ book.
 <p><label for="id_book_set-2-title">Title:</label> <input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" /><input type="hidden" name="book_set-2-id" id="id_book_set-2-id" /></p>
 
 >>> data = {
-...     'book_set-COUNT': '3',
+...     'book_set-TOTAL_FORMS': '3', # the number of forms rendered
+...     'book_set-INITIAL_FORMS': '1', # the number of forms with initial data
 ...     'book_set-0-id': '1',
 ...     'book_set-0-title': 'Les Fleurs du Mal',
 ...     'book_set-1-title': 'Le Spleen de Paris',
 ...     'book_set-2-title': '',
 ... }
 
->>> formset = AuthorBooksFormSet(author, data=data)
+>>> formset = AuthorBooksFormSet(data, instance=author)
 >>> formset.is_valid()
 True
 

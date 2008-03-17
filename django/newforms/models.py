@@ -13,13 +13,12 @@ from django.core.exceptions import ImproperlyConfigured
 from util import ValidationError, ErrorList
 from forms import BaseForm, get_declared_fields
 from fields import Field, ChoiceField, IntegerField, EMPTY_VALUES
-from formsets import BaseFormSet, formset_for_form, DELETION_FIELD_NAME
 from widgets import Select, SelectMultiple, HiddenInput, MultipleHiddenInput
+from formsets import BaseFormSet, _formset_factory, DELETION_FIELD_NAME
 
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
     'save_instance', 'form_for_model', 'form_for_instance', 'form_for_fields',
-    'formset_for_model', 'inline_formset',
     'ModelChoiceField', 'ModelMultipleChoiceField',
 )
 
@@ -245,7 +244,7 @@ class ModelFormMetaclass(type):
 class BaseModelForm(BaseForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
-                 instance=None):
+                 empty_permitted=False, instance=None):
         opts = self._meta
         if instance is None:
             # if we didn't get an instance, instantiate a new one
@@ -257,7 +256,8 @@ class BaseModelForm(BaseForm):
         # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)
-        BaseForm.__init__(self, data, files, auto_id, prefix, object_data, error_class, label_suffix)
+        BaseForm.__init__(self, data, files, auto_id, prefix, object_data,
+                          error_class, label_suffix, empty_permitted)
 
     def save(self, commit=True):
         """
@@ -275,6 +275,182 @@ class BaseModelForm(BaseForm):
 
 class ModelForm(BaseModelForm):
     __metaclass__ = ModelFormMetaclass
+
+# XXX: This API *will* change. Use at your own risk.
+def _modelform_factory(model, form=BaseForm, fields=None, exclude=None,
+                       formfield_callback=lambda f: f.formfield()):
+    # HACK: we should be able to construct a ModelForm without creating
+    # and passing in a temporary inner class
+    class Meta:
+        pass
+    setattr(Meta, 'model', model)
+    setattr(Meta, 'fields', fields)
+    setattr(Meta, 'exclude', exclude)
+    class_name = model.__name__ + 'Form'
+    return ModelFormMetaclass(class_name, (ModelForm,), {'Meta': Meta},
+                              formfield_callback=formfield_callback)
+
+
+# ModelFormSets ##############################################################
+
+class BaseModelFormSet(BaseFormSet):
+    """
+    A ``FormSet`` for editing a queryset and/or adding new objects to it.
+    """
+    model = None
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, queryset=None):
+        self.queryset = queryset
+        kwargs = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
+        kwargs['initial'] = [model_to_dict(obj) for obj in self.get_queryset()]
+        super(BaseModelFormSet, self).__init__(**kwargs)
+
+    def get_queryset(self):
+        if self.queryset is not None:
+            return self.queryset
+        return self.model._default_manager.get_query_set()
+
+    def save_new(self, form, commit=True):
+        """Saves and returns a new model instance for the given form."""
+        return save_instance(form, self.model(), commit=commit)
+
+    def save_existing(self, form, instance, commit=True):
+        """Saves and returns an existing model instance for the given form."""
+        return save_instance(form, instance, commit=commit)
+
+    def save(self, commit=True):
+        """Saves model instances for every form, adding and changing instances
+        as necessary, and returns the list of instances.
+        """
+        return self.save_existing_objects(commit) + self.save_new_objects(commit)
+
+    def save_existing_objects(self, commit=True):
+        if not self.get_queryset():
+            return []
+        # Put the objects from self.get_queryset into a dict so they are easy to lookup by pk
+        existing_objects = {}
+        for obj in self.get_queryset():
+            existing_objects[obj.pk] = obj
+        saved_instances = []
+        for form in self.initial_forms:
+            obj = existing_objects[form.cleaned_data[self.model._meta.pk.attname]]
+            if self.can_delete and form.cleaned_data[DELETION_FIELD_NAME]:
+                obj.delete()
+            else:
+                saved_instances.append(self.save_existing(form, obj, commit=commit))
+        return saved_instances
+
+    def save_new_objects(self, commit=True):
+        new_objects = []
+        for form in self.extra_forms:
+            if not form.has_changed():
+                continue
+            # If someone has marked an add form for deletion, don't save the
+            # object. At some point it would be nice if we didn't display
+            # the deletion widget for add forms.
+            if self.can_delete and form.cleaned_data[DELETION_FIELD_NAME]:
+                continue
+            new_objects.append(self.save_new(form, commit=commit))
+        return new_objects
+
+    def add_fields(self, form, index):
+        """Add a hidden field for the object's primary key."""
+        self._pk_field_name = self.model._meta.pk.attname
+        form.fields[self._pk_field_name] = IntegerField(required=False, widget=HiddenInput)
+        super(BaseModelFormSet, self).add_fields(form, index)
+
+# XXX: Use at your own risk. This API *will* change.
+def _modelformset_factory(model, form=BaseModelForm, formfield_callback=lambda f: f.formfield(),
+                          formset=BaseModelFormSet,
+                          extra=1, can_delete=False, can_order=False,
+                          fields=None, exclude=None):
+    """
+    Returns a FormSet class for the given Django model class.
+    """
+    form = _modelform_factory(model, form=form, fields=fields, exclude=exclude,
+                              formfield_callback=formfield_callback)
+    FormSet = _formset_factory(form, formset, extra=extra, can_order=can_order, can_delete=can_delete)
+    FormSet.model = model
+    return FormSet
+
+
+# InlineFormSets #############################################################
+
+class BaseInlineFormset(BaseModelFormSet):
+    """A formset for child objects related to a parent."""
+    def __init__(self, data=None, files=None, instance=None):
+        from django.db.models.fields.related import RelatedObject
+        self.instance = instance
+        # is there a better way to get the object descriptor?
+        self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
+        super(BaseInlineFormset, self).__init__(data, files, prefix=self.rel_name)
+
+    def get_queryset(self):
+        """
+        Returns this FormSet's queryset, but restricted to children of 
+        self.instance
+        """
+        kwargs = {self.fk.name: self.instance}
+        return self.model._default_manager.filter(**kwargs)
+
+    def save_new(self, form, commit=True):
+        kwargs = {self.fk.get_attname(): self.instance.pk}
+        new_obj = self.model(**kwargs)
+        return save_instance(form, new_obj, commit=commit)
+
+def _get_foreign_key(parent_model, model, fk_name=None):
+    """
+    Finds and returns the ForeignKey from model to parent if there is one.
+    If fk_name is provided, assume it is the name of the ForeignKey field.
+    """
+    # avoid circular import
+    from django.db.models import ForeignKey
+    opts = model._meta
+    if fk_name:
+        fks_to_parent = [f for f in opts.fields if f.name == fk_name]
+        if len(fks_to_parent) == 1:
+            fk = fks_to_parent[0]
+            if not isinstance(fk, ForeignKey) or fk.rel.to != parent_model:
+                raise Exception("fk_name '%s' is not a ForeignKey to %s" % (fk_name, parent_model))
+        elif len(fks_to_parent) == 0:
+            raise Exception("%s has no field named '%s'" % (model, fk_name))
+    else:
+        # Try to discover what the ForeignKey from model to parent_model is
+        fks_to_parent = [f for f in opts.fields if isinstance(f, ForeignKey) and f.rel.to == parent_model]
+        if len(fks_to_parent) == 1:
+            fk = fks_to_parent[0]
+        elif len(fks_to_parent) == 0:
+            raise Exception("%s has no ForeignKey to %s" % (model, parent_model))
+        else:
+            raise Exception("%s has more than 1 ForeignKey to %s" % (model, parent_model))
+    return fk
+
+
+# XXX: This API *will* change. Use at your own risk.
+def _inlineformset_factory(parent_model, model, form=BaseModelForm, fk_name=None,
+                           fields=None, exclude=None,
+                           extra=3, can_order=False, can_delete=True,
+                           formfield_callback=lambda f: f.formfield()):
+    """
+    Returns an ``InlineFormset`` for the given kwargs.
+
+    You must provide ``fk_name`` if ``model`` has more than one ``ForeignKey``
+    to ``parent_model``.
+    """
+    fk = _get_foreign_key(parent_model, model, fk_name=fk_name)
+    # let the formset handle object deletion by default
+    
+    if exclude is not None:
+        exclude.append(fk.name)
+    else:
+        exclude = [fk.name]
+    FormSet = _modelformset_factory(model, form=form,
+                                    formfield_callback=formfield_callback,
+                                    formset=BaseInlineFormset,
+                                    extra=extra, can_delete=can_delete, can_order=can_order,
+                                    fields=fields, exclude=exclude)
+    FormSet.fk = fk
+    return FormSet
 
 
 # Fields #####################################################################
@@ -387,180 +563,3 @@ class ModelMultipleChoiceField(ModelChoiceField):
             else:
                 final_values.append(obj)
         return final_values
-
-# Model-FormSet integration ###################################################
-
-def initial_data(instance, fields=None):
-    """
-    Return a dictionary from data in ``instance`` that is suitable for
-    use as a ``Form`` constructor's ``initial`` argument.
-
-    Provide ``fields`` to specify the names of specific fields to return.
-    All field values in the instance will be returned if ``fields`` is not
-    provided.
-    """
-    # avoid a circular import
-    from django.db.models.fields.related import ManyToManyField
-    opts = instance._meta
-    initial = {}
-    for f in opts.fields + opts.many_to_many:
-        if not f.editable:
-            continue
-        if fields and not f.name in fields:
-            continue
-        if isinstance(f, ManyToManyField):
-            # MultipleChoiceWidget needs a list of ints, not object instances.
-            initial[f.name] = [obj.pk for obj in f.value_from_object(instance)]
-        else:
-            initial[f.name] = f.value_from_object(instance)
-    return initial
-
-class BaseModelFormSet(BaseFormSet):
-    """
-    A ``FormSet`` for editing a queryset and/or adding new objects to it.
-    """
-    model = None
-    queryset = None
-
-    def __init__(self, qs, data=None, files=None, auto_id='id_%s', prefix=None):
-        kwargs = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
-        self.queryset = qs
-        kwargs['initial'] = [initial_data(obj) for obj in qs]
-        super(BaseModelFormSet, self).__init__(**kwargs)
-
-    def save_new(self, form, commit=True):
-        """Saves and returns a new model instance for the given form."""
-        return save_instance(form, self.model(), commit=commit)
-
-    def save_instance(self, form, instance, commit=True):
-        """Saves and returns an existing model instance for the given form."""
-        return save_instance(form, instance, commit=commit)
-
-    def save(self, commit=True):
-        """Saves model instances for every form, adding and changing instances
-        as necessary, and returns the list of instances.
-        """
-        return self.save_existing_objects(commit) + self.save_new_objects(commit)
-
-    def save_existing_objects(self, commit=True):
-        if not self.queryset:
-            return []
-        # Put the objects from self.get_queryset into a dict so they are easy to lookup by pk
-        existing_objects = {}
-        for obj in self.queryset:
-            existing_objects[obj.pk] = obj
-        saved_instances = []
-        for form in self.change_forms:
-            obj = existing_objects[form.cleaned_data[self.model._meta.pk.attname]]
-            if self.deletable and form.cleaned_data[DELETION_FIELD_NAME]:
-                obj.delete()
-            else:
-                saved_instances.append(self.save_instance(form, obj, commit=commit))
-        return saved_instances
-
-    def save_new_objects(self, commit=True):
-        new_objects = []
-        for form in self.add_forms:
-            if form.is_empty():
-                continue
-            # If someone has marked an add form for deletion, don't save the
-            # object. At some point it would be nice if we didn't display
-            # the deletion widget for add forms.
-            if self.deletable and form.cleaned_data[DELETION_FIELD_NAME]:
-                continue
-            new_objects.append(self.save_new(form, commit=commit))
-        return new_objects
-
-    def add_fields(self, form, index):
-        """Add a hidden field for the object's primary key."""
-        self._pk_field_name = self.model._meta.pk.attname
-        form.fields[self._pk_field_name] = IntegerField(required=False, widget=HiddenInput)
-        super(BaseModelFormSet, self).add_fields(form, index)
-
-def formset_for_model(model, form=BaseForm, formfield_callback=lambda f: f.formfield(),
-                      formset=BaseModelFormSet, extra=1, orderable=False, deletable=False, fields=None):
-    """
-    Returns a FormSet class for the given Django model class. This FormSet
-    will contain change forms for every instance of the given model as well
-    as the number of add forms specified by ``extra``.
-    
-    This is essentially the same as ``formset_for_queryset``, but automatically
-    uses the model's default manager to determine the queryset.
-    """
-    form = form_for_model(model, form=form, fields=fields, formfield_callback=formfield_callback)
-    FormSet = formset_for_form(form, formset, extra, orderable, deletable)
-    FormSet.model = model
-    return FormSet
-
-class InlineFormset(BaseModelFormSet):
-    """A formset for child objects related to a parent."""
-    def __init__(self, instance, data=None, files=None):
-        from django.db.models.fields.related import RelatedObject
-        self.instance = instance
-        # is there a better way to get the object descriptor?
-        self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
-        qs = self.get_queryset()
-        super(InlineFormset, self).__init__(qs, data, files, prefix=self.rel_name)
-
-    def get_queryset(self):
-        """
-        Returns this FormSet's queryset, but restricted to children of 
-        self.instance
-        """
-        kwargs = {self.fk.name: self.instance}
-        return self.model._default_manager.filter(**kwargs)
-
-    def save_new(self, form, commit=True):
-        kwargs = {self.fk.get_attname(): self.instance.pk}
-        new_obj = self.model(**kwargs)
-        return save_instance(form, new_obj, commit=commit)
-
-def get_foreign_key(parent_model, model, fk_name=None):
-    """
-    Finds and returns the ForeignKey from model to parent if there is one.
-    If fk_name is provided, assume it is the name of the ForeignKey field.
-    """
-    # avoid circular import
-    from django.db.models import ForeignKey
-    opts = model._meta
-    if fk_name:
-        fks_to_parent = [f for f in opts.fields if f.name == fk_name]
-        if len(fks_to_parent) == 1:
-            fk = fks_to_parent[0]
-            if not isinstance(fk, ForeignKey) or fk.rel.to != parent_model:
-                raise Exception("fk_name '%s' is not a ForeignKey to %s" % (fk_name, parent_model))
-        elif len(fks_to_parent) == 0:
-            raise Exception("%s has no field named '%s'" % (model, fk_name))
-    else:
-        # Try to discover what the ForeignKey from model to parent_model is
-        fks_to_parent = [f for f in opts.fields if isinstance(f, ForeignKey) and f.rel.to == parent_model]
-        if len(fks_to_parent) == 1:
-            fk = fks_to_parent[0]
-        elif len(fks_to_parent) == 0:
-            raise Exception("%s has no ForeignKey to %s" % (model, parent_model))
-        else:
-            raise Exception("%s has more than 1 ForeignKey to %s" % (model, parent_model))
-    return fk
-
-def inline_formset(parent_model, model, fk_name=None, fields=None, extra=3, orderable=False, deletable=True, formfield_callback=lambda f: f.formfield()):
-    """
-    Returns an ``InlineFormset`` for the given kwargs.
-
-    You must provide ``fk_name`` if ``model`` has more than one ``ForeignKey``
-    to ``parent_model``.
-    """
-    fk = get_foreign_key(parent_model, model, fk_name=fk_name)
-    # let the formset handle object deletion by default
-    FormSet = formset_for_model(model, formset=InlineFormset, fields=fields,
-                                formfield_callback=formfield_callback,
-                                extra=extra, orderable=orderable,
-                                deletable=deletable)
-    # HACK: remove the ForeignKey to the parent from every form
-    # This should be done a line above before we pass 'fields' to formset_for_model
-    # an 'omit' argument would be very handy here
-    try:
-        del FormSet.form_class.base_fields[fk.name]
-    except KeyError:
-        pass
-    FormSet.fk = fk
-    return FormSet

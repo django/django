@@ -69,7 +69,8 @@ class BaseForm(StrAndUnicode):
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':'):
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
         self.files = files or {}
@@ -78,6 +79,7 @@ class BaseForm(StrAndUnicode):
         self.initial = initial or {}
         self.error_class = error_class
         self.label_suffix = label_suffix
+        self.empty_permitted = empty_permitted
         self._errors = None # Stores the errors after clean() has been called.
 
         # The base_fields class attribute is the *class-wide* definition of
@@ -189,24 +191,6 @@ class BaseForm(StrAndUnicode):
         """
         return self.errors.get(NON_FIELD_ERRORS, self.error_class())
 
-    def is_empty(self, exceptions=None):
-        """
-        Returns True if this form has been bound and all fields that aren't
-        listed in exceptions are empty.
-        """
-        # TODO: This could probably use some optimization
-        exceptions = exceptions or []
-        for name, field in self.fields.items():
-            if name in exceptions:
-                continue
-            # value_from_datadict() gets the data from the data dictionaries.
-            # Each widget type knows how to retrieve its own data, because some
-            # widgets split data over several HTML fields.
-            value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
-            if not field.widget.is_empty(value):
-                return False
-        return True
-
     def full_clean(self):
         """
         Cleans all of self.data and populates self._errors and
@@ -216,6 +200,10 @@ class BaseForm(StrAndUnicode):
         if not self.is_bound: # Stop further processing.
             return
         self.cleaned_data = {}
+        # If the form is permitted to be empty, and none of the form data has
+        # changed from the initial data, short circuit any validation.
+        if self.empty_permitted and not self.has_changed():
+            return
         for name, field in self.fields.items():
             # value_from_datadict() gets the data from the data dictionaries.
             # Each widget type knows how to retrieve its own data, because some
@@ -251,11 +239,24 @@ class BaseForm(StrAndUnicode):
         """
         return self.cleaned_data
 
-    def reset(self):
-        """Return this form to the state it was in before data was passed to it."""
-        self.data = {}
-        self.is_bound = False
-        self.__errors = None
+    def has_changed(self):
+        """
+        Returns True if data differs from initial.
+        """
+        # XXX: For now we're asking the individual widgets whether or not the
+        # data has changed. It would probably be more efficient to hash the
+        # initial data, store it in a hidden field, and compare a hash of the
+        # submitted data, but we'd need a way to easily get the string value
+        # for a given field. Right now, that logic is embedded in the render
+        # method of each widget.
+        for name, field in self.fields.items():
+            prefixed_name = self.add_prefix(name)
+            data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
+            initial_value = self.initial.get(name, field.initial)
+            if field.widget._has_changed(initial_value, data_value):
+                #print field
+                return True
+        return False
 
     def _get_media(self):
         """

@@ -1,38 +1,39 @@
 # -*- coding: utf-8 -*-
-formset_tests = """
+tests = """
 # Basic FormSet creation and usage ############################################
 
 FormSet allows us to use multiple instance of the same form on 1 page. For now,
-the best way to create a FormSet is by using the formset_for_form function.
+the best way to create a FormSet is by using the _formset_factory function.
 
 >>> from django.newforms import Form, CharField, IntegerField, ValidationError
->>> from django.newforms.formsets import formset_for_form, BaseFormSet
+>>> from django.newforms.formsets import _formset_factory, BaseFormSet
 
 >>> class Choice(Form):
 ...     choice = CharField()
 ...     votes = IntegerField()
 
->>> ChoiceFormSet = formset_for_form(Choice)
-
+>>> ChoiceFormSet = _formset_factory(Choice)
 
 A FormSet constructor takes the same arguments as Form. Let's create a FormSet
 for adding data. By default, it displays 1 blank form. It can display more,
 but we'll look at how to do so later.
 
 >>> formset = ChoiceFormSet(auto_id=False, prefix='choices')
->>> for form in formset.forms:
-...    print form.as_ul()
-<li>Choice: <input type="text" name="choices-0-choice" /></li>
-<li>Votes: <input type="text" name="choices-0-votes" /></li>
+>>> print formset
+<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" />
+<tr><th>Choice:</th><td><input type="text" name="choices-0-choice" /></td></tr>
+<tr><th>Votes:</th><td><input type="text" name="choices-0-votes" /></td></tr>
+
 
 On thing to note is that there needs to be a special value in the data. This
 value tells the FormSet how many forms were displayed so it can tell how
 many forms it needs to clean and validate. You could use javascript to create
 new forms on the client side, but they won't get validated unless you increment
-the COUNT field appropriately.
+the TOTAL_FORMS field appropriately.
 
 >>> data = {
-...     'choices-COUNT': '1', # the number of forms rendered
+...     'choices-TOTAL_FORMS': '1', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ... }
@@ -45,7 +46,7 @@ errors will be a list of dicts rather than just a single dict.
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> formset.cleaned_data
+>>> [form.cleaned_data for form in formset.forms]
 [{'votes': 100, 'choice': u'Calexico'}]
 
 If a FormSet was not passed any data, its is_valid method should return False.
@@ -57,7 +58,8 @@ FormSet instances can also have an error attribute if validation failed for
 any of the forms.
 
 >>> data = {
-...     'choices-COUNT': '1', # the number of forms rendered
+...     'choices-TOTAL_FORMS': '1', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '',
 ... }
@@ -67,13 +69,6 @@ any of the forms.
 False
 >>> formset.errors
 [{'votes': [u'This field is required.']}]
-
-Like a Form instance, cleaned_data won't exist if the formset wasn't validated.
-
->>> formset.cleaned_data
-Traceback (most recent call last):
-...
-AttributeError: 'ChoiceFormSet' object has no attribute 'cleaned_data'
 
 
 We can also prefill a FormSet with existing data by providing an ``initial``
@@ -93,7 +88,8 @@ an extra blank form is included.
 Let's simulate what would happen if we submitted this form.
 
 >>> data = {
-...     'choices-COUNT': '2', # the number of forms rendered
+...     'choices-TOTAL_FORMS': '2', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '1', # the number of forms with initial data
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-1-choice': '',
@@ -103,8 +99,8 @@ Let's simulate what would happen if we submitted this form.
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> formset.cleaned_data
-[{'votes': 100, 'choice': u'Calexico'}]
+>>> [form.cleaned_data for form in formset.forms]
+[{'votes': 100, 'choice': u'Calexico'}, {}]
 
 But the second form was blank! Shouldn't we get some errors? No. If we display
 a form as blank, it's ok for it to be submitted as blank. If we fill out even
@@ -113,7 +109,8 @@ required that at least x number of forms are completed, but we'll show how to
 handle that later.
 
 >>> data = {
-...     'choices-COUNT': '2', # the number of forms rendered
+...     'choices-TOTAL_FORMS': '2', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '1', # the number of forms with initial data
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-1-choice': 'The Decemberists',
@@ -126,13 +123,13 @@ False
 >>> formset.errors
 [{}, {'votes': [u'This field is required.']}]
 
-
 If we delete data that was pre-filled, we should get an error. Simply removing
 data from form fields isn't the proper way to delete it. We'll see how to
 handle that case later.
 
 >>> data = {
-...     'choices-COUNT': '2', # the number of forms rendered
+...     'choices-TOTAL_FORMS': '2', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '1', # the number of forms with initial data
 ...     'choices-0-choice': '', # deleted value
 ...     'choices-0-votes': '', # deleted value
 ...     'choices-1-choice': '',
@@ -143,15 +140,15 @@ handle that case later.
 >>> formset.is_valid()
 False
 >>> formset.errors
-[{'votes': [u'This field is required.'], 'choice': [u'This field is required.']}]
+[{'votes': [u'This field is required.'], 'choice': [u'This field is required.']}, {}]
 
 
 # Displaying more than 1 blank form ###########################################
 
 We can also display more than 1 empty form at a time. To do so, pass a
-num_extra argument to formset_for_form.
+extra argument to _formset_factory.
 
->>> ChoiceFormSet = formset_for_form(Choice, num_extra=3)
+>>> ChoiceFormSet = _formset_factory(Choice, extra=3)
 
 >>> formset = ChoiceFormSet(auto_id=False, prefix='choices')
 >>> for form in formset.forms:
@@ -168,7 +165,8 @@ This may seem a little strange, but later we will show how to require a minimum
 number of forms to be completed.
 
 >>> data = {
-...     'choices-COUNT': '3', # the number of forms rendered
+...     'choices-TOTAL_FORMS': '3', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
 ...     'choices-0-choice': '',
 ...     'choices-0-votes': '',
 ...     'choices-1-choice': '',
@@ -180,14 +178,15 @@ number of forms to be completed.
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> formset.cleaned_data
-[]
+>>> [form.cleaned_data for form in formset.forms]
+[{}, {}, {}]
 
 
 We can just fill out one of the forms.
 
 >>> data = {
-...     'choices-COUNT': '3', # the number of forms rendered
+...     'choices-TOTAL_FORMS': '3', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-1-choice': '',
@@ -199,14 +198,15 @@ We can just fill out one of the forms.
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> formset.cleaned_data
-[{'votes': 100, 'choice': u'Calexico'}]
+>>> [form.cleaned_data for form in formset.forms]
+[{'votes': 100, 'choice': u'Calexico'}, {}, {}]
 
 
 And once again, if we try to partially complete a form, validation will fail.
 
 >>> data = {
-...     'choices-COUNT': '3', # the number of forms rendered
+...     'choices-TOTAL_FORMS': '3', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-1-choice': 'The Decemberists',
@@ -219,10 +219,10 @@ And once again, if we try to partially complete a form, validation will fail.
 >>> formset.is_valid()
 False
 >>> formset.errors
-[{}, {'votes': [u'This field is required.']}]
+[{}, {'votes': [u'This field is required.']}, {}]
 
 
-The num_extra argument also works when the formset is pre-filled with initial
+The extra argument also works when the formset is pre-filled with initial
 data.
 
 >>> initial = [{'choice': u'Calexico', 'votes': 100}]
@@ -239,36 +239,13 @@ data.
 <li>Votes: <input type="text" name="choices-3-votes" /></li>
 
 
-If we try to skip a form, even if it was initially displayed as blank, we will
-get an error.
-
->>> data = {
-...     'choices-COUNT': '3', # the number of forms rendered
-...     'choices-0-choice': 'Calexico',
-...     'choices-0-votes': '100',
-...     'choices-1-choice': '',
-...     'choices-1-votes': '',
-...     'choices-2-choice': 'The Decemberists',
-...     'choices-2-votes': '12',
-...     'choices-3-choice': '',
-...     'choices-3-votes': '',
-... }
-
->>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
->>> formset.is_valid()
-False
->>> formset.errors
-[{}, {'votes': [u'This field is required.'], 'choice': [u'This field is required.']}, {}]
-
-
 # FormSets with deletion ######################################################
 
 We can easily add deletion ability to a FormSet with an agrument to
-formset_for_form. This will add a boolean field to each form instance. When
-that boolean field is True, the cleaned data will be in formset.deleted_data
-rather than formset.cleaned_data
+_formset_factory. This will add a boolean field to each form instance. When
+that boolean field is True, the form will be in formset.deleted_forms
 
->>> ChoiceFormSet = formset_for_form(Choice, deletable=True)
+>>> ChoiceFormSet = _formset_factory(Choice, can_delete=True)
 
 >>> initial = [{'choice': u'Calexico', 'votes': 100}, {'choice': u'Fergie', 'votes': 900}]
 >>> formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
@@ -288,7 +265,8 @@ To delete something, we just need to set that form's special delete field to
 'on'. Let's go ahead and delete Fergie.
 
 >>> data = {
-...     'choices-COUNT': '3', # the number of forms rendered
+...     'choices-TOTAL_FORMS': '3', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '2', # the number of forms with initial data
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-0-DELETE': '',
@@ -303,22 +281,23 @@ To delete something, we just need to set that form's special delete field to
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> formset.cleaned_data
-[{'votes': 100, 'DELETE': False, 'choice': u'Calexico'}]
->>> formset.deleted_data
+>>> [form.cleaned_data for form in formset.forms]
+[{'votes': 100, 'DELETE': False, 'choice': u'Calexico'}, {'votes': 900, 'DELETE': True, 'choice': u'Fergie'}, {}]
+>>> [form.cleaned_data for form in formset.deleted_forms]
 [{'votes': 900, 'DELETE': True, 'choice': u'Fergie'}]
+
 
 # FormSets with ordering ######################################################
 
 We can also add ordering ability to a FormSet with an agrument to
-formset_for_form. This will add a integer field to each form instance. When
-form validation succeeds, formset.cleaned_data will have the data in the correct
+_formset_factory. This will add a integer field to each form instance. When
+form validation succeeds, [form.cleaned_data for form in formset.forms] will have the data in the correct
 order specified by the ordering fields. If a number is duplicated in the set
 of ordering fields, for instance form 0 and form 3 are both marked as 1, then
 the form index used as a secondary ordering criteria. In order to put
 something at the front of the list, you'd need to set it's order to 0.
 
->>> ChoiceFormSet = formset_for_form(Choice, orderable=True)
+>>> ChoiceFormSet = _formset_factory(Choice, can_order=True)
 
 >>> initial = [{'choice': u'Calexico', 'votes': 100}, {'choice': u'Fergie', 'votes': 900}]
 >>> formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
@@ -332,10 +311,11 @@ something at the front of the list, you'd need to set it's order to 0.
 <li>Order: <input type="text" name="choices-1-ORDER" value="2" /></li>
 <li>Choice: <input type="text" name="choices-2-choice" /></li>
 <li>Votes: <input type="text" name="choices-2-votes" /></li>
-<li>Order: <input type="text" name="choices-2-ORDER" value="3" /></li>
+<li>Order: <input type="text" name="choices-2-ORDER" /></li>
 
 >>> data = {
-...     'choices-COUNT': '3', # the number of forms rendered
+...     'choices-TOTAL_FORMS': '3', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '2', # the number of forms with initial data
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-0-ORDER': '1',
@@ -350,17 +330,48 @@ something at the front of the list, you'd need to set it's order to 0.
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> for cleaned_data in formset.cleaned_data:
-...    print cleaned_data
+>>> for form in formset.ordered_forms:
+...    print form.cleaned_data
 {'votes': 500, 'ORDER': 0, 'choice': u'The Decemberists'}
 {'votes': 100, 'ORDER': 1, 'choice': u'Calexico'}
 {'votes': 900, 'ORDER': 2, 'choice': u'Fergie'}
+
+Ordering fields are allowed to be left blank, and if they *are* left blank,
+they will be sorted below everything else.
+
+>>> data = {
+...     'choices-TOTAL_FORMS': '4', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '3', # the number of forms with initial data
+...     'choices-0-choice': 'Calexico',
+...     'choices-0-votes': '100',
+...     'choices-0-ORDER': '1',
+...     'choices-1-choice': 'Fergie',
+...     'choices-1-votes': '900',
+...     'choices-1-ORDER': '2',
+...     'choices-2-choice': 'The Decemberists',
+...     'choices-2-votes': '500',
+...     'choices-2-ORDER': '',
+...     'choices-3-choice': 'Basia Bulat',
+...     'choices-3-votes': '50',
+...     'choices-3-ORDER': '',
+... }
+
+>>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+>>> formset.is_valid()
+True
+>>> for form in formset.ordered_forms:
+...    print form.cleaned_data
+{'votes': 100, 'ORDER': 1, 'choice': u'Calexico'}
+{'votes': 900, 'ORDER': 2, 'choice': u'Fergie'}
+{'votes': 500, 'ORDER': None, 'choice': u'The Decemberists'}
+{'votes': 50, 'ORDER': None, 'choice': u'Basia Bulat'}
+
 
 # FormSets with ordering + deletion ###########################################
 
 Let's try throwing ordering and deletion into the same form.
 
->>> ChoiceFormSet = formset_for_form(Choice, orderable=True, deletable=True)
+>>> ChoiceFormSet = _formset_factory(Choice, can_order=True, can_delete=True)
 
 >>> initial = [
 ...     {'choice': u'Calexico', 'votes': 100},
@@ -384,13 +395,14 @@ Let's try throwing ordering and deletion into the same form.
 <li>Delete: <input type="checkbox" name="choices-2-DELETE" /></li>
 <li>Choice: <input type="text" name="choices-3-choice" /></li>
 <li>Votes: <input type="text" name="choices-3-votes" /></li>
-<li>Order: <input type="text" name="choices-3-ORDER" value="4" /></li>
+<li>Order: <input type="text" name="choices-3-ORDER" /></li>
 <li>Delete: <input type="checkbox" name="choices-3-DELETE" /></li>
 
 Let's delete Fergie, and put The Decemberists ahead of Calexico.
 
 >>> data = {
-...     'choices-COUNT': '4', # the number of forms rendered
+...     'choices-TOTAL_FORMS': '4', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '3', # the number of forms with initial data
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-0-ORDER': '1',
@@ -405,18 +417,18 @@ Let's delete Fergie, and put The Decemberists ahead of Calexico.
 ...     'choices-2-DELETE': '',
 ...     'choices-3-choice': '',
 ...     'choices-3-votes': '',
-...     'choices-3-ORDER': '4',
+...     'choices-3-ORDER': '',
 ...     'choices-3-DELETE': '',
 ... }
 
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> for cleaned_data in formset.cleaned_data:
-...    print cleaned_data
+>>> for form in formset.ordered_forms:
+...    print form.cleaned_data
 {'votes': 500, 'DELETE': False, 'ORDER': 0, 'choice': u'The Decemberists'}
 {'votes': 100, 'DELETE': False, 'ORDER': 1, 'choice': u'Calexico'}
->>> formset.deleted_data
+>>> [form.cleaned_data for form in formset.deleted_forms]
 [{'votes': 900, 'DELETE': True, 'ORDER': 2, 'choice': u'Fergie'}]
 
 
@@ -433,10 +445,10 @@ error if there are any duplicates.
 ...
 
 >>> class FavoriteDrinksFormSet(BaseFormSet):
-...     form_class = FavoriteDrinkForm
-...     num_extra = 2
-...     orderable = False
-...     deletable = False
+...     form = FavoriteDrinkForm
+...     extra = 2
+...     can_order = False
+...     can_delete = False
 ...
 ...     def clean(self):
 ...         seen_drinks = []
@@ -444,13 +456,13 @@ error if there are any duplicates.
 ...             if drink['name'] in seen_drinks:
 ...                 raise ValidationError('You may only specify a drink once.')
 ...             seen_drinks.append(drink['name'])
-...         return self.cleaned_data
 ...
 
 We start out with a some duplicate data.
 
 >>> data = {
-...     'drinks-COUNT': '2',
+...     'drinks-TOTAL_FORMS': '2', # the number of forms rendered
+...     'drinks-INITIAL_FORMS': '0', # the number of forms with initial data
 ...     'drinks-0-name': 'Gin and Tonic',
 ...     'drinks-1-name': 'Gin and Tonic',
 ... }
@@ -470,7 +482,8 @@ You may only specify a drink once.
 Make sure we didn't break the valid case.
 
 >>> data = {
-...     'drinks-COUNT': '2',
+...     'drinks-TOTAL_FORMS': '2', # the number of forms rendered
+...     'drinks-INITIAL_FORMS': '0', # the number of forms with initial data
 ...     'drinks-0-name': 'Gin and Tonic',
 ...     'drinks-1-name': 'Bloody Mary',
 ... }

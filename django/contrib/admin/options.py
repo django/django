@@ -1,6 +1,7 @@
 from django import oldforms, template
 from django import newforms as forms
 from django.newforms.formsets import all_valid
+from django.newforms.models import _modelform_factory, _inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets
 from django.contrib.admin.util import get_deleted_objects
@@ -340,7 +341,7 @@ class ModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
-        return forms.form_for_model(self.model, fields=fields, formfield_callback=self.formfield_for_dbfield)
+        return _modelform_factory(self.model, fields=fields, formfield_callback=self.formfield_for_dbfield)
 
     def form_change(self, request, obj):
         """
@@ -350,7 +351,7 @@ class ModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
-        return forms.form_for_instance(obj, fields=fields, formfield_callback=self.formfield_for_dbfield)
+        return _modelform_factory(self.model, fields=fields, formfield_callback=self.formfield_for_dbfield)
 
     def save_add(self, request, model, form, formsets, post_url_continue):
         """
@@ -496,14 +497,14 @@ class ModelAdmin(BaseModelAdmin):
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES)
             for FormSet in self.formsets_add(request):
-                inline_formset = FormSet(obj, data=request.POST, files=request.FILES)
+                inline_formset = FormSet(data=request.POST, files=request.FILES, instance=obj)
                 inline_formsets.append(inline_formset)
             if all_valid(inline_formsets) and form.is_valid():
                 return self.save_add(request, model, form, inline_formsets, '../%s/')
         else:
             form = ModelForm(initial=request.GET)
             for FormSet in self.formsets_add(request):
-                inline_formset = FormSet(obj)
+                inline_formset = FormSet(instance=obj)
                 inline_formsets.append(inline_formset)
 
         adminForm = AdminForm(form, list(self.fieldsets_add(request)), self.prepopulated_fields)
@@ -553,17 +554,17 @@ class ModelAdmin(BaseModelAdmin):
         ModelForm = self.form_change(request, obj)
         inline_formsets = []
         if request.method == 'POST':
-            form = ModelForm(request.POST, request.FILES)
+            form = ModelForm(request.POST, request.FILES, instance=obj)
             for FormSet in self.formsets_change(request, obj):
-                inline_formset = FormSet(obj, request.POST, request.FILES)
+                inline_formset = FormSet(request.POST, request.FILES, instance=obj)
                 inline_formsets.append(inline_formset)
 
             if all_valid(inline_formsets) and form.is_valid():
                 return self.save_change(request, model, form, inline_formsets)
         else:
-            form = ModelForm()
+            form = ModelForm(instance=obj)
             for FormSet in self.formsets_change(request, obj):
-                inline_formset = FormSet(obj)
+                inline_formset = FormSet(instance=obj)
                 inline_formsets.append(inline_formset)
 
         ## Populate the FormWrapper.
@@ -740,7 +741,7 @@ class InlineModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
-        return forms.inline_formset(self.parent_model, self.model, fk_name=self.fk_name, fields=fields, formfield_callback=self.formfield_for_dbfield, extra=self.extra)
+        return _inlineformset_factory(self.parent_model, self.model, fk_name=self.fk_name, fields=fields, formfield_callback=self.formfield_for_dbfield, extra=self.extra)
 
     def formset_change(self, request, obj):
         """Returns an InlineFormSet class for use in admin change views."""
@@ -748,18 +749,18 @@ class InlineModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
-        return forms.inline_formset(self.parent_model, self.model, fk_name=self.fk_name, fields=fields, formfield_callback=self.formfield_for_dbfield, extra=self.extra)
+        return _inlineformset_factory(self.parent_model, self.model, fk_name=self.fk_name, fields=fields, formfield_callback=self.formfield_for_dbfield, extra=self.extra)
 
     def fieldsets_add(self, request):
         if self.declared_fieldsets:
             return self.declared_fieldsets
-        form = self.formset_add(request).form_class
+        form = self.formset_add(request).form
         return [(None, {'fields': form.base_fields.keys()})]
 
     def fieldsets_change(self, request, obj):
         if self.declared_fieldsets:
             return self.declared_fieldsets
-        form = self.formset_change(request, obj).form_class
+        form = self.formset_change(request, obj).form
         return [(None, {'fields': form.base_fields.keys()})]
 
 class StackedInline(InlineModelAdmin):
@@ -778,14 +779,14 @@ class InlineAdminFormSet(object):
         self.fieldsets = fieldsets
 
     def __iter__(self):
-        for form, original in zip(self.formset.change_forms, self.formset.get_queryset()):
+        for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):
             yield InlineAdminForm(self.formset, form, self.fieldsets, self.opts.prepopulated_fields, original)
-        for form in self.formset.add_forms:
+        for form in self.formset.extra_forms:
             yield InlineAdminForm(self.formset, form, self.fieldsets, self.opts.prepopulated_fields, None)
 
     def fields(self):
         for field_name in flatten_fieldsets(self.fieldsets):
-            yield self.formset.form_class.base_fields[field_name]
+            yield self.formset.form.base_fields[field_name]
 
 class InlineAdminForm(AdminForm):
     """
