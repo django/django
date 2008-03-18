@@ -652,7 +652,7 @@ class Query(object):
                 data[LHS_ALIAS] = change_map[lhs]
                 self.alias_map[alias] = tuple(data)
 
-    def bump_prefix(self):
+    def bump_prefix(self, exceptions=()):
         """
         Changes the alias prefix to the next letter in the alphabet and
         relabels all the aliases. Even tables that previously had no alias will
@@ -661,12 +661,17 @@ class Query(object):
 
         Subclasses who create their own prefix should override this method to
         produce a similar result (a new prefix and relabelled aliases).
+
+        The 'exceptions' parameter is a container that holds alias names which
+        should not be changed.
         """
         assert ord(self.alias_prefix) < ord('Z')
         self.alias_prefix = chr(ord(self.alias_prefix) + 1)
         change_map = {}
         prefix = self.alias_prefix
         for pos, alias in enumerate(self.tables):
+            if alias in exceptions:
+                continue
             new_alias = '%s%d' % (prefix, pos)
             change_map[alias] = new_alias
             self.tables[pos] = new_alias
