@@ -401,8 +401,8 @@ For example::
         # ...
 
         def get_db_prep_save(self, value):
-            return ''.join([''.join(l) for l in (self.north,
-                    self.east, self.south, self.west)])
+            return ''.join([''.join(l) for l in (value.north,
+                    value.east, value.south, value.west)])
 
 ``pre_save(self, model_instance, add)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
