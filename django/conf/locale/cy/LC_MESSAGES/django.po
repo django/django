@@ -1,12 +1,11 @@
 # Translation of Django to Welsh.
 # Copyright (C) 2005 Django.
 # This file is distributed under the same license as the Django package.
-# Jason Davies <jason@jasondavies.com>, 2005.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-05-16 10:12+0200\n"
 "PO-Revision-Date: 2005-11-05 HO:MI+ZONE\n"

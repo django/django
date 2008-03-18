@@ -1,12 +1,11 @@
 # Django Latvian translation.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# ARVIS BICKOVSKIS <viestards.lists@gmail.com>, 2006.
 #
 # , fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-05-07 23:28+0300\n"
 "PO-Revision-Date: 2007-05-08 00:35+0300\n"

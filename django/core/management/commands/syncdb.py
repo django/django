@@ -67,6 +67,8 @@ class Command(NoArgsCommand):
                 created_models.add(model)
                 for refto, refs in references.items():
                     pending_references.setdefault(refto, []).extend(refs)
+                    if refto in seen_models:
+                        sql.extend(sql_for_pending_references(refto, self.style, pending_references))
                 sql.extend(sql_for_pending_references(model, self.style, pending_references))
                 if verbosity >= 1:
                     print "Creating table %s" % model._meta.db_table

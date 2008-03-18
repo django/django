@@ -629,9 +629,10 @@ the given Python module name, not the name of the app.
 Once you've created that Python module, you'll just have to write a bit of
 Python code, depending on whether you're writing filters or tags.
 
-To be a valid tag library, the module contain a module-level variable named
-``register`` that is a ``template.Library`` instance, in which all the tags and
-filters are registered. So, near the top of your module, put the following::
+To be a valid tag library, the module must contain a module-level variable
+named ``register`` that is a ``template.Library`` instance, in which all the
+tags and filters are registered. So, near the top of your module, put the
+following::
 
     from django import template
 
@@ -983,7 +984,7 @@ Notes:
       exception. It should fail silently, just as template filters should.
 
 Ultimately, this decoupling of compilation and rendering results in an
-efficient template system, because a template can render multiple context
+efficient template system, because a template can render multiple contexts
 without having to be parsed multiple times.
 
 Auto-escaping considerations

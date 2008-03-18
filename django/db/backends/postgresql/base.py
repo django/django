@@ -56,6 +56,9 @@ class UnicodeCursorWrapper(object):
         else:
             return getattr(self.cursor, attr)
 
+    def __iter__(self):
+        return iter(self.cursor)
+
 class DatabaseFeatures(BaseDatabaseFeatures):
     pass # This backend uses all the defaults.
 

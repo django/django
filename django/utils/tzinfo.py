@@ -5,7 +5,11 @@ import time
 from datetime import timedelta, tzinfo
 from django.utils.encoding import smart_unicode
 
-DEFAULT_ENCODING = locale.getdefaultlocale()[1] or 'ascii'
+try:
+    DEFAULT_ENCODING = locale.getdefaultlocale()[1] or 'ascii'
+except:
+    # Any problems at all determining the locale and we fallback. See #5846.
+    DEFAULT_ENCODING = 'ascii'
 
 class FixedOffset(tzinfo):
     "Fixed offset in minutes east from UTC."

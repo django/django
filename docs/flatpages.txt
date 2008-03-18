@@ -24,11 +24,14 @@ Installation
 
 To install the flatpages app, follow these steps:
 
-    1. Add ``'django.contrib.flatpages'`` to your INSTALLED_APPS_ setting.
-    2. Add ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
+    1. Install the `sites framework`_ by adding ``'django.contrib.sites'`` to
+       your INSTALLED_APPS_ setting, if it's not already in there.
+    2. Add ``'django.contrib.flatpages'`` to your INSTALLED_APPS_ setting.
+    3. Add ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
        to your MIDDLEWARE_CLASSES_ setting.
-    3. Run the command ``manage.py syncdb``.
+    4. Run the command ``manage.py syncdb``.
 
+.. _sites framework: ../sites/
 .. _INSTALLED_APPS: ../settings/#installed-apps
 .. _MIDDLEWARE_CLASSES: ../settings/#middleware-classes
 

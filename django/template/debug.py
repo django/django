@@ -75,7 +75,7 @@ class DebugNodeList(NodeList):
             raise
         except Exception, e:
             from sys import exc_info
-            wrapped = TemplateSyntaxError('Caught an exception while rendering: %s' % e)
+            wrapped = TemplateSyntaxError(u'Caught an exception while rendering: %s' % force_unicode(e, errors='replace'))
             wrapped.source = node.source
             wrapped.exc_info = exc_info()
             raise wrapped

@@ -788,10 +788,10 @@ Note, however, that this only refers to models in the same models.py file -- you
 cannot use a string to reference a model defined in another application or
 imported from elsewhere.
 
-**New in Django development version:** to refer to models defined in another
-application, you must instead explicitially specify the application label. That
-is, if the ``Manufacturer`` model above is defined in another application called
-``production``, you'd need to use::
+**New in Django development version:** To refer to models defined in another
+application, you must instead explicitly specify the application label. For
+example, if the ``Manufacturer`` model above is defined in another application
+called ``production``, you'd need to use::
 
     class Car(models.Model):
         manufacturer = models.ForeignKey('production.Manufacturer')
@@ -1021,6 +1021,8 @@ See the `One-to-one relationship model example`_ for a full example.
 
 Custom field types
 ------------------
+
+**New in Django development version**
 
 If one of the existing model fields cannot be used to fit your purposes, or if
 you wish to take advantage of some less common database column types, you can

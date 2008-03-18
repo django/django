@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 27. Default manipulators
 
@@ -21,7 +22,7 @@ class Album(models.Model):
     def __unicode__(self):
         return self.name
 
-__test__ = {'API_TESTS':"""
+__test__ = {'API_TESTS':u"""
 >>> from django.utils.datastructures import MultiValueDict
 
 # Create a Musician object via the default AddManipulator.
@@ -88,4 +89,9 @@ True
 <Album: Ultimate Ella>
 >>> a2.release_date
 datetime.date(2005, 2, 13)
+
+# Test isValidFloat Unicode coercion
+>>> from django.core.validators import isValidFloat, ValidationError
+>>> try: isValidFloat(u"ä", None)
+... except ValidationError: pass
 """}

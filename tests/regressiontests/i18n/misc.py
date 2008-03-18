@@ -87,11 +87,12 @@ source tree.
 'es-ar'
 """
 
-# Python 2.3 returns slightly different results for completely bogus locales,
-# so we omit this test for that anything below 2.4. It's relatively harmless in
-# any cases (GIGO). This also means this won't be executed on Jython currently,
-# but life's like that sometimes.
-if sys.version_info >= (2, 4):
+# Python 2.3 and 2.4 return slightly different results for completely bogus
+# locales, so we omit this test for that anything below 2.4. It's relatively
+# harmless in any cases (GIGO). This also means this won't be executed on
+# Jython currently, but life's like that sometimes. (On those platforms,
+# passing in a truly bogus locale will get you the default locale back.)
+if sys.version_info >= (2, 5):
     tests += """
 This test assumes there won't be a Django translation to a US variation
 of the Spanish language, a safe assumption. When the user sets it

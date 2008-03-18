@@ -1,11 +1,10 @@
 # Português do Brasil translation of django.
 # Copyright (C) 2006 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Carlos Eduardo de Paula <carlosedp@gmail.com>, 2006.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-09 11:51+0100\n"
 "PO-Revision-Date: 2006-11-01 17:45-0300\n"

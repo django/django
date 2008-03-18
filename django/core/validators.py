@@ -18,7 +18,7 @@ except ImportError:
 from django.conf import settings
 from django.utils.translation import ugettext as _, ugettext_lazy, ungettext
 from django.utils.functional import Promise, lazy
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_unicode, smart_str
 
 _datere = r'\d{4}-\d{1,2}-\d{1,2}'
 _timere = r'(?:[01]?[0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?'
@@ -451,7 +451,7 @@ class IsValidDecimal(object):
                 "Please enter a valid decimal number with at most %s decimal places.", self.decimal_places) % self.decimal_places
 
 def isValidFloat(field_data, all_data):
-    data = str(field_data)
+    data = smart_str(field_data)
     try:
         float(data)
     except ValueError:

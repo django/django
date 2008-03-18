@@ -318,8 +318,8 @@ def send_mail(subject, message, from_email, recipient_list, fail_silently=False,
     If auth_user is None, the EMAIL_HOST_USER setting is used.
     If auth_password is None, the EMAIL_HOST_PASSWORD setting is used.
 
-    NOTE: This method is deprecated. It exists for backwards compatibility.
-    New code should use the EmailMessage class directly.
+    Note: The API for this method is frozen. New code wanting to extend the
+    functionality should use the EmailMessage class directly.
     """
     connection = SMTPConnection(username=auth_user, password=auth_password,
                                  fail_silently=fail_silently)
@@ -335,8 +335,8 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password
     If auth_user is None, the EMAIL_HOST_USER setting is used.
     If auth_password is None, the EMAIL_HOST_PASSWORD setting is used.
 
-    NOTE: This method is deprecated. It exists for backwards compatibility.
-    New code should use the EmailMessage class directly.
+    Note: The API for this method is frozen. New code wanting to extend the
+    functionality should use the EmailMessage class directly.
     """
     connection = SMTPConnection(username=auth_user, password=auth_password,
                                  fail_silently=fail_silently)
