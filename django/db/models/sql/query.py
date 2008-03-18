@@ -18,7 +18,7 @@ from django.db.models.sql.where import WhereNode, EverythingNode, AND, OR
 from django.db.models.sql.datastructures import Count
 from django.db.models.fields import FieldDoesNotExist
 from django.core.exceptions import FieldError
-from datastructures import EmptyResultSet, Empty, JoinError
+from datastructures import EmptyResultSet, Empty, MultiJoin
 from constants import *
 
 try:
@@ -523,11 +523,8 @@ class Query(object):
         pieces = name.split(LOOKUP_SEP)
         if not alias:
             alias = self.get_initial_alias()
-        try:
-            field, target, opts, joins, last = self.setup_joins(pieces, opts,
-                    alias, False, False)
-        except JoinError:
-            raise FieldError("Cannot order by many-valued field: '%s'" % name)
+        field, target, opts, joins, last = self.setup_joins(pieces, opts,
+                alias, False)
         alias = joins[-1]
         col = target.column
 
@@ -848,7 +845,7 @@ class Query(object):
         try:
             field, target, opts, join_list, last = self.setup_joins(parts, opts,
                     alias, (connector == AND), allow_many)
-        except JoinError, e:
+        except MultiJoin, e:
             self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]))
             return
         final = len(join_list)
@@ -1007,7 +1004,7 @@ class Query(object):
             if not allow_many and (m2m or not direct):
                 for alias in joins:
                     self.unref_alias(alias)
-                raise JoinError(pos + 1)
+                raise MultiJoin(pos + 1)
             if model:
                 # The field lives on a base class of the current model.
                 alias_list = []
@@ -1175,7 +1172,7 @@ class Query(object):
                         name.split(LOOKUP_SEP), opts, alias, False, allow_m2m,
                         True)
                 self.select.append((joins[-1], target.column))
-        except JoinError:
+        except MultiJoin:
             raise FieldError("Invalid field name: '%s'" % name)
 
     def add_ordering(self, *ordering):
