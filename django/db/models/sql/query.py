@@ -1255,7 +1255,7 @@ class Query(object):
 
     def add_extra(self, select, where, params, tables, order_by):
         """
-        Adds data to the various extra_* attributes for user-created additiosn
+        Adds data to the various extra_* attributes for user-created additions
         to the query.
         """
         if select:
