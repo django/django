@@ -754,7 +754,9 @@ ROOT_URLCONF
 Default: Not defined
 
 A string representing the full Python import path to your root URLconf. For example:
-``"mydjangoapps.urls"``. See `How Django processes a request`_.
+``"mydjangoapps.urls"``. Can be overridden on a per-request basis by
+setting the attribute ``urlconf`` on the incoming ``HttpRequest``
+object. See `How Django processes a request`_ for details.
 
 .. _How Django processes a request: ../url_dispatch/#how-django-processes-a-request
 

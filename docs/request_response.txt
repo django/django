@@ -141,6 +141,16 @@ All attributes except ``session`` should be considered read-only.
     The raw HTTP POST data. This is only useful for advanced processing. Use
     ``POST`` instead.
 
+``urlconf``
+    Not defined by Django itself, but will be read if other code
+    (e.g., a custom middleware class) sets it; when present, this will
+    be used as the root URLConf for the current request, overriding
+    the ``ROOT_URLCONF`` setting. See `How Django processes a
+    request`_ for details.
+
+.. _How Django processes a request: ../url_dispatch/#how-django-processes-a-request
+
+
 Methods
 -------
 
