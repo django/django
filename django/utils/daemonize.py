@@ -29,6 +29,8 @@ if os.name == 'posix':
         os.dup2(si.fileno(), sys.stdin.fileno())
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
+        # Set custom file descriptors so that they get proper buffering.
+        sys.stdout, sys.stderr = so, se
 else:
     def become_daemon(our_home_dir='.', out_log=None, err_log=None):
         """
