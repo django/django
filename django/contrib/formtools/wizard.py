@@ -146,7 +146,7 @@ class FormWizard(object):
         Subclasses may want to take into account request-specific information,
         such as the IP address.
         """
-        data = [(bf.name, bf.data) for bf in form] + [settings.SECRET_KEY]
+        data = [(bf.name, bf.data or '') for bf in form] + [settings.SECRET_KEY]
         # Use HIGHEST_PROTOCOL because it's the most efficient. It requires
         # Python 2.3, but Django requires 2.3 anyway, so that's OK.
         pickled = pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL)
@@ -198,6 +198,7 @@ class FormWizard(object):
             step_field -- The name of the hidden field containing the step.
             step0      -- The current step (zero-based).
             step       -- The current step (one-based).
+            step_count -- The total number of steps.
             form       -- The Form instance for the current step (either empty
                           or with errors).
             previous_fields -- A string representing every previous data field,
