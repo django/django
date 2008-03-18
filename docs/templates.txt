@@ -1224,6 +1224,12 @@ add
 
 Adds the arg to the value.
 
+For example::
+
+    {{ value|add:2 }}
+
+If ``value`` is 4, then the output will be 6.
+
 addslashes
 ~~~~~~~~~~
 
@@ -1247,20 +1253,45 @@ cut
 
 Removes all values of arg from the given string.
 
+For example::
+
+    {{ value|cut:" "}}
+
+If ``value`` is "String with spaces", the output will be ``Stringwithspaces``.
+
 date
 ~~~~
 
 Formats a date according to the given format (same as the `now`_ tag).
+
+For example::
+
+    {{ value|date:"D d M Y" }}
+
+If ``value`` is a datetime object (ie. datetime.datetime.now()), the output
+would be formatted like ``Wed 09 Jan 2008``.
 
 default
 ~~~~~~~
 
 If value is unavailable, use given default.
 
+For example::
+
+    {{ value|default:"nothing" }}
+
+If ``value`` is ``Undefined``, the output would be ``nothing``.
+
 default_if_none
 ~~~~~~~~~~~~~~~
 
 If value is ``None``, use given default.
+
+For example::
+
+    {{ value|default_if_none:"nothing" }}
+
+If ``value`` is ``None``, the output would be ``nothing``.
 
 dictsort
 ~~~~~~~~
@@ -1268,16 +1299,43 @@ dictsort
 Takes a list of dictionaries, returns that list sorted by the key given in
 the argument.
 
+For example::
+
+    {{ value|dictsort:"name" }}
+
+If ``value`` is::
+    
+    [
+        {'name': 'zed', 'age': 19}
+        {'name': 'amy', 'age': 22}, 
+        {'name': 'joe', 'age': 31}, 
+    ]
+
+then the output would be::
+
+    [
+        {'name': 'amy', 'age': 22}, 
+        {'name': 'joe', 'age': 31}, 
+        {'name': 'zed', 'age': 19}
+    ]
+
 dictsortreversed
 ~~~~~~~~~~~~~~~~
 
 Takes a list of dictionaries, returns that list sorted in reverse order by the
-key given in the argument.
+key given in the argument. This works exactly the same as the above filter, but
+the returned value will be in reverse order.
 
 divisibleby
 ~~~~~~~~~~~
 
 Returns true if the value is divisible by the argument.
+
+For example::
+
+    {{ value|divisibleby:3 }}
+
+If ``value`` is ``21``, the output would be ``True``.
 
 escape
 ~~~~~~
@@ -1319,15 +1377,37 @@ filesizeformat
 Format the value like a 'human-readable' file size (i.e. ``'13 KB'``,
 ``'4.1 MB'``, ``'102 bytes'``, etc).
 
+For example::
+
+    {{ value|filesizeformat }}
+
+If ``value`` is 123456789, the output would be ``117.7 MB``.
+
 first
 ~~~~~
 
 Returns the first item in a list.
 
+For example::
+
+    {{ value|first }}
+
+If ``value`` is ``['a', 'b', 'c']``, the output would be `a`.
+
 fix_ampersands
 ~~~~~~~~~~~~~~
 
 Replaces ampersands with ``&amp;`` entities.
+
+For example::
+
+    {{ value|fix_ampersands }}
+
+If ``value`` is ``Tom & Jerry``, the output would be ``Tom &amp; Jerry``.
+
+**New in Django development version**: you probably don't need to use this
+filter since ampersands will be automatically escaped. See escape_ for more on
+how auto-escaping works.
 
 floatformat
 ~~~~~~~~~~~
@@ -1388,6 +1468,12 @@ right-most digit, 2 is the second-right-most digit, etc. Returns the original
 value for invalid input (if input or argument is not an integer, or if argument
 is less than 1). Otherwise, output is always an integer.
 
+For example::
+    
+    {{ value|get_digit:2 }}
+
+If ``value`` is 123456789, the output would be ``8``.
+
 iriencode
 ~~~~~~~~~
 
@@ -1401,7 +1487,13 @@ It's safe to use this filter on a string that has already gone through the
 join
 ~~~~
 
-Joins a list with a string, like Python's ``str.join(list)``.
+Joins a list with a string, like Python's ``str.join(list)``
+
+For example::
+
+    {{ value|join:" // " }}
+
+If ``value`` is ``['a', 'b', 'c']``, the output would be ``a // b // c``.
 
 last
 ~~~~
@@ -1410,15 +1502,33 @@ last
 
 Returns the last item in a list.
 
+For example::
+
+    {{ value|last }}
+
+If ``value`` is ``['a', 'b', 'c', 'd']``, the output would be ``d``.
+
 length
 ~~~~~~
 
 Returns the length of the value. Useful for lists.
 
+For example::
+
+    {{ value|length }}
+
+If ``value`` is ``['a', 'b', 'c', 'd']``, the output would be ``4``.
+
 length_is
 ~~~~~~~~~
 
 Returns a boolean of whether the value's length is the argument.
+
+For example::
+
+    {{ value|length_is:4 }}
+
+If ``value`` is ``['a', 'b', 'c', 'd']``, the output would be ``True``.
 
 linebreaks
 ~~~~~~~~~~
@@ -1426,6 +1536,13 @@ linebreaks
 Replaces line breaks in plain text with appropriate HTML; a single
 newline becomes an HTML line break (``<br />``) and a new line
 followed by a blank line becomes a paragraph break (``</p>``).
+
+For example::
+
+    {{ value|linebreaks }}
+
+If ``value`` is ``Joel\nis a slug``, the output would be ``<p>Joe<br>is a
+slug</p>``.
 
 linebreaksbr
 ~~~~~~~~~~~~
@@ -1450,11 +1567,24 @@ lower
 
 Converts a string into all lowercase.
 
+For example::
+
+    {{ value|lower }}
+
+If ``value`` is ``Joel Is a Slug``, the output would be ``joel is a slug``.
+
 make_list
 ~~~~~~~~~
 
 Returns the value turned into a list. For an integer, it's a list of
 digits. For a string, it's a list of characters.
+
+For example::
+
+    {{ value|make_list }}
+
+If ``value`` is "Joe", the output would be ``[u'J', u'o', u'e']. If ``value`` is
+123, the output would be ``[1, 2, 3]``.
 
 phone2numeric
 ~~~~~~~~~~~~~
@@ -1492,17 +1622,32 @@ Example::
 pprint
 ~~~~~~
 
-A wrapper around pprint.pprint -- for debugging, really.
+A wrapper around `pprint.pprint`__ -- for debugging, really.
+
+__ http://www.python.org/doc/2.5/lib/module-pprint.html
 
 random
 ~~~~~~
 
 Returns a random item from the list.
 
+For example::
+
+    {{ value|random }}
+
+If ``value`` is ``['a', 'b', 'c', 'd']``, the output could be ``b``.
+
 removetags
 ~~~~~~~~~~
 
 Removes a space separated list of [X]HTML tags from the output.
+
+For example::
+
+    {{ value|removetags:"b span"|safe }}
+
+If ``value`` is ``<b>Joel</b> <button>is</button> a <span>slug</span>`` the
+output would be ``Joel <button>is</button> a slug``.
 
 rjust
 ~~~~~
@@ -1535,6 +1680,12 @@ Converts to lowercase, removes non-word characters (alphanumerics and
 underscores) and converts spaces to hyphens. Also strips leading and trailing
 whitespace.
 
+For example::
+
+    {{ value|slugify }}
+
+If ``value`` is ``Joel is a slug``, the output would be ``joel-is-a-slug``.
+
 stringformat
 ~~~~~~~~~~~~
 
@@ -1545,10 +1696,23 @@ the leading "%" is dropped.
 See http://docs.python.org/lib/typesseq-strings.html for documentation of
 Python string formatting
 
+For example::
+
+    {{ value|stringformat:"s" }}
+
+If ``value`` is ``Joel is a slug``, the output would be ``Joel is a slug``.
+
 striptags
 ~~~~~~~~~
 
 Strips all [X]HTML tags.
+
+For example::
+
+    {{ value|striptags }}
+
+If ``value`` is ``<b>Joel</b> <button>is</button> a <span>slug</span>`` the
+output would be ``Joel is a slug``.
 
 time
 ~~~~
@@ -1557,6 +1721,13 @@ Formats a time according to the given format (same as the `now`_ tag).
 The time filter will only accept parameters in the format string that relate
 to the time of day, not the date (for obvious reasons). If you need to
 format a date, use the `date`_ filter.
+
+For example::
+
+    {{ value|time:"H:i" }}
+
+If ``value`` is ``datetime.datetime.now()``, the output would be formatted
+like ``01:23``.
 
 timesince
 ~~~~~~~~~
@@ -1598,6 +1769,12 @@ truncatewords
 Truncates a string after a certain number of words.
 
 **Argument:** Number of words to truncate after
+
+For example::
+
+    {{ value|truncatewords:2 }}
+
+If ``value`` is ``Joel is a slug``, the output would be ``Joel is ...``.
 
 truncatewords_html
 ~~~~~~~~~~~~~~~~~~
@@ -1644,6 +1821,12 @@ upper
 
 Converts a string into all uppercase.
 
+For example::
+
+    {{ value|upper }}
+
+If ``value`` is ``Joel is a slug``, the output would be ``JOEL IS A SLUG``.
+
 urlencode
 ~~~~~~~~~
 
@@ -1657,6 +1840,14 @@ Converts URLs in plain text into clickable links.
 Note that if ``urlize`` is applied to text that already contains HTML markup,
 things won't work as expected. Apply this filter only to *plain* text.
 
+For example::
+
+    {{ value|urlize }}
+
+If ``value`` is ``Check out www.djangoproject.com``, the output would be
+``Check out <a
+href="http://www.djangoproject.com">www.djangoproject.com</a>``.
+
 urlizetrunc
 ~~~~~~~~~~~
 
@@ -1666,6 +1857,14 @@ character limit.
 As with urlize_, this filter should only be applied to *plain* text.
 
 **Argument:** Length to truncate URLs to
+
+For example::
+
+    {{ value|urlizetrunc:15 }}
+
+If ``value`` is ``Check out www.djangoproject.com``, the output would be
+``Check out <a
+href="http://www.djangoproject.com">www.djangopr...</a>``.
 
 wordcount
 ~~~~~~~~~
@@ -1678,6 +1877,16 @@ wordwrap
 Wraps words at specified line length.
 
 **Argument:** number of characters at which to wrap the text
+
+For example::
+
+    {{ value|wordwrap:5 }}
+
+If ``value`` is ``Joel is a slug``, the output would be::
+
+    Joel
+    is a
+    slug
 
 yesno
 ~~~~~
