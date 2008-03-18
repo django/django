@@ -5,7 +5,7 @@ import sys
 from django.conf import settings
 from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
-from django.http import HttpResponseServerError, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotFound
 from django.utils.encoding import smart_unicode
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST')
@@ -195,7 +195,7 @@ def empty_urlconf(request):
     c = Context({
         'project_name': settings.SETTINGS_MODULE.split('.')[0]
     })
-    return HttpResponseNotFound(t.render(c), mimetype='text/html')
+    return HttpResponse(t.render(c), mimetype='text/html')
 
 def _get_lines_from_file(filename, lineno, context_lines, loader=None, module_name=None):
     """
