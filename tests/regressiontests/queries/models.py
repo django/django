@@ -426,8 +426,8 @@ FieldError: Infinite loop caused by ordering.
 # Ordering by a many-valued attribute (e.g. a many-to-many or reverse
 # ForeignKey) is legal, but the results might not make sense. That isn't
 # Django's problem. Garbage in, garbage out.
->>> Item.objects.all().order_by('tags')
-[...]
+>>> Item.objects.all().order_by('tags', 'id')
+[<Item: one>, <Item: two>, <Item: one>, <Item: two>, <Item: four>]
 
 # If we replace the default ordering, Django adjusts the required tables
 # automatically. Item normally requires a join with Note to do the default
