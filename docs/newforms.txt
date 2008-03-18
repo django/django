@@ -1596,9 +1596,9 @@ The three types of cleaning methods are:
 
 These methods are run in the order given above, one field at a time.  That is,
 for each field in the form (in the order they are declared in the form
-definition), the ``Field.clean()`` method (or it's override) is run, then
+definition), the ``Field.clean()`` method (or its override) is run, then
 ``clean_<fieldname>()``. Finally, once those two methods are run for every
-field, the ``Form.clean()`` method, or it's override, is executed.
+field, the ``Form.clean()`` method, or its override, is executed.
 
 As mentioned above, any of these methods can raise a ``ValidationError``. For
 any field, if the ``Field.clean()`` method raises a ``ValidationError``, any
@@ -1720,7 +1720,7 @@ For example, take the following simple form::
         comment = forms.CharField()
 
 This form will include three default TextInput widgets, with default rendering -
-no CSS class, no extra attributes. This means that the inputs boxes provided for
+no CSS class, no extra attributes. This means that the input boxes provided for
 each widget will be rendered exactly the same::
 
     >>> f = CommentForm(auto_id=False)
