@@ -381,8 +381,6 @@ class _QuerySet(object):
         related objects are included in the selection.
         """
         depth = kwargs.pop('depth', 0)
-        # TODO: Remove this? select_related(False) isn't really useful.
-        true_or_false = kwargs.pop('true_or_false', True)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to select_related: %s'
                     % (kwargs.keys(),))
@@ -392,7 +390,7 @@ class _QuerySet(object):
                 raise TypeError('Cannot pass both "depth" and fields to select_related()')
             obj.query.add_select_related(fields)
         else:
-            obj.query.select_related = true_or_false
+            obj.query.select_related = True
         if depth:
             obj.query.max_depth = depth
         return obj
