@@ -308,6 +308,11 @@ class ModelAdmin(BaseModelAdmin):
         """
         Returns a Form class for use in the admin add view. This is used by
         add_view and change_view.
+        
+        Note that if you override this method, your form will *not*
+        automatically get the custom admin widgets. raw_id_fields, fields,
+        fieldsets, filter_vertical, and filter_horizonal will not apply to
+        your form. You will have manually specify those widgets.
         """
         if self.declared_fieldsets:
             fields = flatten_fieldsets(self.declared_fieldsets)
