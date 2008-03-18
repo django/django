@@ -144,6 +144,10 @@ True
 # Legacy API (ObjectPaginator) #
 ################################
 
+# Don't print out the deprecation warnings during testing.
+>>> from warnings import filterwarnings
+>>> filterwarnings("ignore")
+
 >>> from django.core.paginator import ObjectPaginator, InvalidPage
 >>> paginator = ObjectPaginator(Article.objects.all(), 5)
 >>> paginator.hits
