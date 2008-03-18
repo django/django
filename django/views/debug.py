@@ -70,6 +70,11 @@ def technical_500_response(request, exc_type, exc_value, tb):
     Create a technical server error response. The last three arguments are
     the values returned from sys.exc_info() and friends.
     """
+    html = get_traceback_html(request, exc_type, exc_value, tb)
+    return HttpResponseServerError(html, mimetype='text/html')
+
+def get_traceback_html(request, exc_type, exc_value, tb):
+    "Return HTML code for traceback."
     template_info = None
     template_does_not_exist = False
     loader_debug_info = None
@@ -159,7 +164,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'template_does_not_exist': template_does_not_exist,
         'loader_debug_info': loader_debug_info,
     })
-    return HttpResponseServerError(t.render(c), mimetype='text/html')
+    return t.render(c)
 
 def technical_404_response(request, exception):
     "Create a technical 404 error response. The exception should be the Http404."
