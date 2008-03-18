@@ -1,7 +1,7 @@
 from django.template import loader, RequestContext
 from django.http import Http404, HttpResponse
 from django.core.xheaders import populate_xheaders
-from django.core.paginator import ObjectPaginator, InvalidPage
+from django.core.paginator import QuerySetPaginator, InvalidPage
 from django.core.exceptions import ObjectDoesNotExist
 
 def object_list(request, queryset, paginate_by=None, page=None,
@@ -45,43 +45,47 @@ def object_list(request, queryset, paginate_by=None, page=None,
     if extra_context is None: extra_context = {}
     queryset = queryset._clone()
     if paginate_by:
-        paginator = ObjectPaginator(queryset, paginate_by)
+        paginator = QuerySetPaginator(queryset, paginate_by, allow_empty_first_page=allow_empty)
         if not page:
             page = request.GET.get('page', 1)
         try:
             page_number = int(page)
         except ValueError:
             if page == 'last':
-                page_number = paginator.pages
+                page_number = paginator.num_pages
             else:
-                # Page is not 'last', nor can it be converted to an int
+                # Page is not 'last', nor can it be converted to an int.
                 raise Http404
         try:
-            object_list = paginator.get_page(page_number - 1)
+            page_obj = paginator.page(page_number)
         except InvalidPage:
-            if page_number == 1 and allow_empty:
-                object_list = []
-            else:
-                raise Http404
+            raise Http404
         c = RequestContext(request, {
-            '%s_list' % template_object_name: object_list,
-            'is_paginated': paginator.pages > 1,
-            'results_per_page': paginate_by,
-            'has_next': paginator.has_next_page(page_number - 1),
-            'has_previous': paginator.has_previous_page(page_number - 1),
-            'page': page_number,
-            'next': page_number + 1,
-            'previous': page_number - 1,
-            'last_on_page': paginator.last_on_page(page_number - 1),
-            'first_on_page': paginator.first_on_page(page_number - 1),
-            'pages': paginator.pages,
-            'hits' : paginator.hits,
-            'page_range' : paginator.page_range
+            '%s_list' % template_object_name: page_obj.object_list,
+            'paginator': paginator,
+            'page_obj': page_obj,
+
+            # Legacy template context stuff. New templates should use page_obj
+            # to access this instead.
+            'is_paginated': page_obj.has_other_pages(),
+            'results_per_page': paginator.per_page,
+            'has_next': page_obj.has_next(),
+            'has_previous': page_obj.has_previous(),
+            'page': page_obj.number,
+            'next': page_obj.next_page_number(),
+            'previous': page_obj.previous_page_number(),
+            'last_on_page': page_obj.start_index(),
+            'first_on_page': page_obj.end_index(),
+            'pages': paginator.num_pages,
+            'hits': paginator.count,
+            'page_range': paginator.page_range,
         }, context_processors)
     else:
         c = RequestContext(request, {
             '%s_list' % template_object_name: queryset,
-            'is_paginated': False
+            'paginator': None,
+            'page_obj': None,
+            'is_paginated': False,
         }, context_processors)
         if not allow_empty and len(queryset) == 0:
             raise Http404
