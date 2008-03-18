@@ -31,4 +31,8 @@ GET:{},
 POST:{},
 COOKIES:{},
 META:{}>
+
+>>> from django.http import parse_cookie
+>>> parse_cookie('invalid:key=true')
+{}
 """

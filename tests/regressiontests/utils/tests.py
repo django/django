@@ -8,6 +8,7 @@ from django.utils import html, checksums
 
 import timesince
 import datastructures
+from decorators import DecoratorFromMiddlewareTests
 
 # Extra tests
 __test__ = {

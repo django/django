@@ -39,13 +39,19 @@ class GenericForeignKey(object):
         # content-type/object-id fields.
         if self.name in kwargs:
             value = kwargs.pop(self.name)
-            kwargs[self.ct_field] = self.get_content_type(value)
+            kwargs[self.ct_field] = self.get_content_type(obj=value)
             kwargs[self.fk_field] = value._get_pk_val()
 
-    def get_content_type(self, obj):
+    def get_content_type(self, obj=None, id=None):
         # Convenience function using get_model avoids a circular import when using this model
         ContentType = get_model("contenttypes", "contenttype")
-        return ContentType.objects.get_for_model(obj)
+        if obj:
+            return ContentType.objects.get_for_model(obj)
+        elif id:
+            return ContentType.objects.get_for_id(id)
+        else:
+            # This should never happen. I love comments like this, don't you?
+            raise Exception("Impossible arguments to GFK.get_content_type!")
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
@@ -55,8 +61,15 @@ class GenericForeignKey(object):
             return getattr(instance, self.cache_attr)
         except AttributeError:
             rel_obj = None
-            ct = getattr(instance, self.ct_field)
-            if ct:
+            
+            # Make sure to use ContentType.objects.get_for_id() to ensure that
+            # lookups are cached (see ticket #5570). This takes more code than
+            # the naive ``getattr(instance, self.ct_field)``, but has better 
+            # performance when dealing with GFKs in loops and such.
+            f = self.model._meta.get_field(self.ct_field)
+            ct_id = getattr(instance, f.get_attname(), None)
+            if ct_id:
+                ct = self.get_content_type(id=ct_id)
                 try:
                     rel_obj = ct.get_object_for_this_type(pk=getattr(instance, self.fk_field))
                 except ObjectDoesNotExist:
@@ -71,7 +84,7 @@ class GenericForeignKey(object):
         ct = None
         fk = None
         if value is not None:
-            ct = self.get_content_type(value)
+            ct = self.get_content_type(obj=value)
             fk = value._get_pk_val()
 
         setattr(instance, self.ct_field, ct)

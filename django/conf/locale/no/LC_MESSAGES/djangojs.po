@@ -1,11 +1,10 @@
 # translation of djangojs.po to norwegian
 # Copyright (C) 2005 and beyond
 # This file is distributed under the same license as the Django package.
-# Espen Grindhaug <espen.grindhaug@mail.com>, 2006.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: djangojs\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-09 11:51+0100\n"
 "PO-Revision-Date: 2007-08-29 18:22+0200\n"

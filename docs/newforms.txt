@@ -1564,7 +1564,7 @@ The three types of cleaning methods are:
 
       Note that any errors raised by your ``Form.clean()`` override will not
       be associated with any field in particular. They go into a special
-      "field" (called ``__all__``, which you can access via the
+      "field" (called ``__all__``), which you can access via the
       ``non_field_errors()`` method if you need to.
 
 These methods are run in the order given above, one field at a time.  That is,

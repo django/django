@@ -129,7 +129,10 @@ class VariableDoesNotExist(Exception):
         self.params = params
 
     def __str__(self):
-        return self.msg % self.params
+        return unicode(self).encode('utf-8')
+
+    def __unicode__(self):
+        return self.msg % tuple([force_unicode(p, errors='replace') for p in self.params])
 
 class InvalidTemplateLibrary(Exception):
     pass

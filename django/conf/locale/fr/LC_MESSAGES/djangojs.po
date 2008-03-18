@@ -1,11 +1,10 @@
 # French translation for js. 
 # Copyright (C) 2005 Mikaël Barbero 
 # This file is distributed under the same license as the PACKAGE package. 
-# Mikaël Barbero <mikael.barbero nospam at nospam free.fr>, 2005. 
 # 
 msgid "" 
 msgstr "" 
-"Project-Id-Version: PACKAGE VERSION\n" 
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n" 
 "POT-Creation-Date: 2005-12-24 16:39+0100\n" 
 "PO-Revision-Date: 2005-12-24 16:39+0100\n" 

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Django Serbian (latin) translation v1.0\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-05-16 10:11+0200\n"
 "PO-Revision-Date: 2007-02-20 18:50+0100\n"

@@ -1,7 +1,6 @@
 # Translation of Django admin JS to Welsh.
 # Copyright (C) 2005 Django project
 # This file is distributed under the same license as the Django package.
-# Jason Davies <jason@jasondavies.com>, 2005.
 #
 #, fuzzy
 msgid ""

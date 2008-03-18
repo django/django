@@ -41,6 +41,9 @@ class CursorDebugWrapper(object):
         else:
             return getattr(self.cursor, attr)
 
+    def __iter__(self):
+        return iter(self.cursor)
+
 ###############################################
 # Converters from database (string) to Python #
 ###############################################
