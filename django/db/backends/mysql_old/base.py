@@ -66,6 +66,7 @@ class MysqlDebugWrapper:
 class DatabaseFeatures(BaseDatabaseFeatures):
     autoindexes_primary_keys = False
     inline_fk_references = False
+    empty_fetchmany_value = ()
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):

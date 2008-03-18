@@ -1330,7 +1330,8 @@ class Query(object):
         if result_type == SINGLE:
             return cursor.fetchone()
         # The MULTI case.
-        return iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)), [])
+        return iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
+                self.connection.features.empty_fetchmany_value)
 
 def get_order_dir(field, default='ASC'):
     """

@@ -50,6 +50,7 @@ class BaseDatabaseFeatures(object):
     supports_tablespaces = False
     uses_case_insensitive_names = False
     uses_custom_queryset = False
+    empty_fetchmany_value = []
 
 class BaseDatabaseOperations(object):
     """
