@@ -1171,7 +1171,20 @@ class Query(object):
                 u1, target, u2, joins, u3 = self.setup_joins(
                         name.split(LOOKUP_SEP), opts, alias, False, allow_m2m,
                         True)
-                self.select.append((joins[-1], target.column))
+                final_alias = joins[-1]
+                col = target.column
+                if len(joins) > 1:
+                    join = self.alias_map[final_alias]
+                    if col == join[RHS_JOIN_COL]:
+                        self.unref_alias(final_alias)
+                        final_alias = join[LHS_ALIAS]
+                        col = join[LHS_JOIN_COL]
+                        joins = joins[:-1]
+                for join in joins[1:]:
+                    # Only nullable aliases are promoted, so we don't end up
+                    # doing unnecessary left outer joins here.
+                    self.promote_alias(join)
+                self.select.append((final_alias, col))
         except MultiJoin:
             raise FieldError("Invalid field name: '%s'" % name)
 
