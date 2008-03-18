@@ -429,8 +429,9 @@ all block tags. For example::
     # base.html
 
     {% autoescape off %}
-    <h1>{% block title %}</h1>
+    <h1>{% block title %}{% endblock %}</h1>
     {% block content %}
+    {% endblock %}
     {% endautoescape %}
 
 
@@ -438,10 +439,11 @@ all block tags. For example::
 
     {% extends "base.html" %}
     {% block title %}This & that{% endblock %}
-    {% block content %}<b>Hello!</b>{% endblock %}
+    {% block content %}{{ greeting }}{% endblock %}
 
 Because auto-escaping is turned off in the base template, it will also be
-turned off in the child template, resulting in the following rendered HTML::
+turned off in the child template, resulting in the following rendered
+HTML when the ``greeting`` variable contains the string ``<b>Hello!</b>``::
 
     <h1>This & that</h1>
     <b>Hello!</b>
