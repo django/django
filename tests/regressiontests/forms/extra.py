@@ -22,7 +22,7 @@ classes that demonstrate some of the library's abilities.
 >>> from django.newforms.extras import SelectDateWidget
 >>> w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'))
 >>> print w.render('mydate', '')
-<select name="mydate_month">
+<select name="mydate_month" id="id_mydate_month">
 <option value="1">January</option>
 <option value="2">February</option>
 <option value="3">March</option>
@@ -36,7 +36,7 @@ classes that demonstrate some of the library's abilities.
 <option value="11">November</option>
 <option value="12">December</option>
 </select>
-<select name="mydate_day">
+<select name="mydate_day" id="id_mydate_day">
 <option value="1">1</option>
 <option value="2">2</option>
 <option value="3">3</option>
@@ -69,7 +69,7 @@ classes that demonstrate some of the library's abilities.
 <option value="30">30</option>
 <option value="31">31</option>
 </select>
-<select name="mydate_year">
+<select name="mydate_year" id="id_mydate_year">
 <option value="2007">2007</option>
 <option value="2008">2008</option>
 <option value="2009">2009</option>
@@ -84,7 +84,7 @@ classes that demonstrate some of the library's abilities.
 >>> w.render('mydate', None) == w.render('mydate', '')
 True
 >>> print w.render('mydate', '2010-04-15')
-<select name="mydate_month">
+<select name="mydate_month" id="id_mydate_month">
 <option value="1">January</option>
 <option value="2">February</option>
 <option value="3">March</option>
@@ -98,7 +98,7 @@ True
 <option value="11">November</option>
 <option value="12">December</option>
 </select>
-<select name="mydate_day">
+<select name="mydate_day" id="id_mydate_day">
 <option value="1">1</option>
 <option value="2">2</option>
 <option value="3">3</option>
@@ -131,7 +131,7 @@ True
 <option value="30">30</option>
 <option value="31">31</option>
 </select>
-<select name="mydate_year">
+<select name="mydate_year" id="id_mydate_year">
 <option value="2007">2007</option>
 <option value="2008">2008</option>
 <option value="2009">2009</option>
