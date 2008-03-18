@@ -55,18 +55,23 @@ class Feed(object):
                 return attr()
         return attr
 
+    def get_object(self, bits):
+        return None
+
     def get_feed(self, url=None):
         """
         Returns a feedgenerator.DefaultFeed object, fully populated, for
         this feed. Raises FeedDoesNotExist for invalid parameters.
         """
         if url:
-            try:
-                obj = self.get_object(url.split('/'))
-            except (AttributeError, ObjectDoesNotExist):
-                raise FeedDoesNotExist
+            bits = url.split('/')
         else:
-            obj = None
+            bits = []
+
+        try:
+            obj = self.get_object(bits)
+        except ObjectDoesNotExist:
+            raise FeedDoesNotExist
 
         if Site._meta.installed:
             current_site = Site.objects.get_current()
