@@ -18,10 +18,10 @@ if os.name == 'posix':
         # Second fork
         try:
             if os.fork() > 0:
-                sys.exit(0)
+                os._exit(0)
         except OSError, e:
             sys.stderr.write("fork #2 failed: (%d) %s\n" % (e.errno, e.strerror))
-            sys.exit(1)
+            os._exit(1)
 
         si = open('/dev/null', 'r')
         so = open(out_log, 'a+', 0)
