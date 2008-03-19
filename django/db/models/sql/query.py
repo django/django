@@ -809,7 +809,7 @@ class Query(object):
                     used, next, restricted)
 
     def add_filter(self, filter_expr, connector=AND, negate=False, trim=False,
-            merge_negated=False):
+            single_filter=False):
         """
         Add a single filter to the query. The 'filter_expr' is a pair:
         (filter_string, value). E.g. ('name__contains', 'fred')
@@ -818,9 +818,8 @@ class Query(object):
         automatically trim the final join group (used internally when
         constructing nested queries).
 
-        If 'merge_negated' is True, this negated filter will be merged with the
-        existing negated where node (if it exists). This is used when
-        constructing an exclude filter from combined subfilters.
+        If 'single_filter' is True, we are processing a component of a
+        multi-component filter (e.g. filter(Q1, Q2)).
         """
         arg, value = filter_expr
         parts = arg.split(LOOKUP_SEP)
@@ -849,7 +848,7 @@ class Query(object):
 
         try:
             field, target, opts, join_list, last = self.setup_joins(parts, opts,
-                    alias, (connector == AND), allow_many)
+                    alias, (connector == AND) and not single_filter, allow_many)
         except MultiJoin, e:
             self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]))
             return
@@ -917,7 +916,7 @@ class Query(object):
                 self.promote_alias(table)
 
         entry = (alias, col, field, lookup_type, value)
-        if merge_negated:
+        if negate and single_filter:
             # This case is when we're doing the Q2 filter in exclude(Q1, Q2).
             # It's different from exclude(Q1).exclude(Q2).
             for node in self.where.children:
@@ -957,7 +956,7 @@ class Query(object):
         else:
             subtree = False
         connector = AND
-        merge = False
+        internal = False
         for child in q_object.children:
             if isinstance(child, Node):
                 self.where.start_subtree(connector)
@@ -965,8 +964,8 @@ class Query(object):
                 self.where.end_subtree()
             else:
                 self.add_filter(child, connector, q_object.negated,
-                        merge_negated=merge)
-                merge = q_object.negated
+                        single_filter=internal)
+                internal = True
             connector = q_object.connector
         if subtree:
             self.where.end_subtree()

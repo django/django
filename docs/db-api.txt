@@ -1559,7 +1559,7 @@ equivalent::
     model's primary key in queries.
 
 Lookups that span relationships
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Django offers a powerful and intuitive way to "follow" relationships in
 lookups, taking care of the SQL ``JOIN``\s for you automatically, behind the
@@ -1582,8 +1582,66 @@ whose ``headline`` contains ``'Lennon'``::
 
     Blog.objects.filter(entry__headline__contains='Lennon')
 
+Spanning multi-valued relationships
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+.. note::
+    This is an experimental API and subject to change prior to
+    queryset-refactor being merged into trunk.
+
+When you are filtering an object based on a ``ManyToManyField`` or a reverse
+``ForeignKeyField``, there are two different sorts of filter you may be
+interested in. Consider the ``Blog``/``Entry`` relationship (``Blog`` to
+``Entry`` is a one-to-many relation). We might be interested in finding blogs
+that have an entry which has both *"Lennon"* in the headline and was published
+today. Or we might want to find blogs that have an entry with *"Lennon"* in
+the headline as well as an entry that was published today. Since there are
+multiple entries associated with a single ``Blog``, both of these queries are
+possible and make sense in some situations.
+
+The same type of situation arises with a ``ManyToManyField``. For example, if
+an ``Entry`` has a ``ManyToManyField`` called ``tags``, we might want to find
+entries linked to tags called *"music"* and *"bands"* or we might want an
+entry that contains a tag with a name of *"music"* and a status of *"public"*.
+
+To handle both of these situations, Django has a consistent way of processing
+``filter()`` and ``exclude()`` calls. Everything inside a single ``filter()``
+call is applied simultaneously to filter out items matching all those
+requirements. Successive ``filter()`` calls further restrict the set of
+objects, but for multi-valued relations, they apply to any object linked to
+the primary model, not necessarily those objects that were selected by an
+earlier ``filter()`` call.
+
+That may sound a bit confusing, so hopefully an example will clarify. To
+select all blogs that contains entries with *"Lennon"* in the headline and
+were published today, we would write::
+
+    Blog.objects.filter(entry__headline__contains='Lennon',
+            entry__pub_date=datetime.date.today())
+
+To select all blogs that contain an entry with *"Lennon"* in the headline
+**as well as** an entry that was published today, we would write::
+
+    Blog.objects.filter(entry__headline__contains='Lennon').filter(
+            entry__pub_date=datetime.date.today())
+
+In this second example, the first filter restricted the queryset to all those
+blogs linked to that particular type of entry. The second filter restricted
+the set of blogs *further* to those that are also linked to the second type of
+entry. The entries select by the second filter may or may not be the same as
+the entries in the first filter. We are filtering the ``Blog`` items with each
+filter statement, not the ``Entry`` items.
+
+All of this behaviour also applies to ``exclude()``: all the conditions in a
+single ``exclude()`` statement apply to a single instance (if those conditions
+are talking about the same multi-valued relation). Conditions in subsequent
+``filter()`` or ``exclude()`` calls that refer to the same relation may end up
+filtering on different linked objects.
+
 Escaping percent signs and underscores in LIKE statements
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------------
 
 The field lookups that equate to ``LIKE`` SQL statements (``iexact``,
 ``contains``, ``icontains``, ``startswith``, ``istartswith``, ``endswith``
