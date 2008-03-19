@@ -126,9 +126,9 @@ class UpdateQuery(Query):
         result = ['UPDATE %s' % qn(table)]
         result.append('SET')
         values, update_params = [], []
-        for name, val in self.values:
+        for name, val, placeholder in self.values:
             if val is not None:
-                values.append('%s = %%s' % qn(name))
+                values.append('%s = %s' % (qn(name), placeholder))
                 update_params.append(val)
             else:
                 values.append('%s = NULL' % qn(name))
@@ -190,33 +190,40 @@ class UpdateQuery(Query):
             self.where.add((None, f.column, f, 'in',
                     pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
                     AND)
-            self.values = [(related_field.column, None)]
+            self.values = [(related_field.column, None, '%s')]
             self.execute_sql(None)
 
     def add_update_values(self, values):
         from django.db.models.base import Model
-        for name, val in values.items():
+        for name, val in values.iteritems():
             field, model, direct, m2m = self.model._meta.get_field_by_name(name)
             if not direct or m2m:
                 raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
             # FIXME: Some sort of db_prep_* is probably more appropriate here.
             if field.rel and isinstance(val, Model):
                 val = val.pk
-            if model:
-                self.add_related_update(model, field.column, val)
-            else:
-                self.values.append((field.column, val))
 
-    def add_related_update(self, model, column, value):
+            # Getting the placeholder for the field.
+            if hasattr(field, 'get_placeholder'):
+                placeholder = field.get_placeholder(val)
+            else:
+                placeholder = '%s'
+
+            if model:
+                self.add_related_update(model, field.column, val, placeholder)
+            else:
+                self.values.append((field.column, val, placeholder))
+
+    def add_related_update(self, model, column, value, placeholder):
         """
         Adds (name, value) to an update query for an ancestor model.
 
         Updates are coalesced so that we only run one update query per ancestor.
         """
         try:
-            self.related_updates[model].append((column, value))
+            self.related_updates[model].append((column, value, placeholder))
         except KeyError:
-            self.related_updates[model] = [(column, value)]
+            self.related_updates[model] = [(column, value, placeholder)]
 
     def get_related_updates(self):
         """
@@ -227,7 +234,7 @@ class UpdateQuery(Query):
         if not self.related_updates:
             return []
         result = []
-        for model, values in self.related_updates.items():
+        for model, values in self.related_updates.iteritems():
             query = UpdateQuery(model, self.connection)
             query.values = values
             if self.related_ids:
@@ -272,20 +279,31 @@ class InsertQuery(Query):
         parameters. This provides a way to insert NULL and DEFAULT keywords
         into the query, for example.
         """
-        func = lambda x: self.model._meta.get_field_by_name(x)[0].column
+        func = lambda x: self.model._meta.get_field_by_name(x)[0]
         # keys() and values() return items in the same order, providing the
         # dictionary hasn't changed between calls. So the dual iteration here
         # works as intended.
-        for name in insert_values:
+        placeholders, values = [], []
+        for name, val in insert_values.iteritems():
             if name == 'pk':
                 name = self.model._meta.pk.name
-            self.columns.append(func(name))
+            # Getting the Field associated w/the name.
+            field = func(name)
+
+            if hasattr(field, 'get_placeholder'):
+                # Some fields (e.g. geo fields) need special munging before
+                # they can be inserted.
+                placeholders.append(field.get_placeholder(val))
+            else:
+                placeholders.append('%s')
+
+            self.columns.append(field.column)
+            values.append(val)
         if raw_values:
-            self.values.extend(insert_values.values())
+            self.values.extend(values)
         else:
-            values = insert_values.values()
             self.params += tuple(values)
-            self.values.extend(['%s'] * len(values))
+            self.values.extend(placeholders)
 
 class DateQuery(Query):
     """
