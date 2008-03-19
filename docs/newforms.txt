@@ -1549,15 +1549,23 @@ additional required argument:
 ``ModelChoiceField``
 ~~~~~~~~~~~~~~~~~~~~
 
-Allows the selection of a single model object, suitable for
-representing a foreign key.
+Allows the selection of a single model object, suitable for representing a
+foreign key. The method receives an object as an argument and must return a
+string to represent it.
+
+The labels for the choice field call the ``__unicode__`` method of the model to
+generate string representations. To provide custom labels, subclass ``ModelChoiceField`` and override ``label_for_model``::
+
+    class MyModelChoiceField(ModelChoiceField):
+        def label_from_instance(self, obj):
+            return "My Object #%i" % obj.id
 
 ``ModelMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Allows the selection of one or more model objects, suitable for
-representing a many-to-many relation.
-
+Allows the selection of one or more model objects, suitable for representing a
+many-to-many relation. As with ``ModelChoiceField``, you can use
+``label_from_instance`` to customize the object labels.
 
 Creating custom fields
 ----------------------

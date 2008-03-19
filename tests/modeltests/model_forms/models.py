@@ -659,6 +659,19 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
 
+# check that we can safely iterate choices repeatedly
+>>> gen_one = list(f.choices)
+>>> gen_two = f.choices
+>>> gen_one[2]
+(2L, u"It's a test")
+>>> list(gen_two)
+[(u'', u'---------'), (1L, u'Entertainment'), (2L, u"It's a test"), (3L, u'Third')]
+
+# check that we can override the label_from_instance method to print custom labels (#4620)
+>>> f.queryset = Category.objects.all()
+>>> f.label_from_instance = lambda obj: "category " + str(obj)
+>>> list(f.choices)
+[(u'', u'---------'), (1L, 'category Entertainment'), (2L, "category It's a test"), (3L, 'category Third'), (4L, 'category Fourth')]
 
 # ModelMultipleChoiceField ####################################################
 
@@ -744,6 +757,10 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 4 is not one of the available choices.']
 
+>>> f.queryset = Category.objects.all()
+>>> f.label_from_instance = lambda obj: "multicategory " + str(obj)
+>>> list(f.choices)
+[(1L, 'multicategory Entertainment'), (2L, "multicategory It's a test"), (3L, 'multicategory Third'), (4L, 'multicategory Fourth')]
 
 # PhoneNumberField ############################################################
 
