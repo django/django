@@ -243,7 +243,7 @@ def setup_environ(settings_mod):
     # way. For example, if this file (manage.py) lives in a directory
     # "myproject", this code would add "/path/to/myproject" to sys.path.
     project_directory, settings_filename = os.path.split(settings_mod.__file__)
-    if not project_directory:
+    if project_directory == os.curdir or not project_directory:
         project_directory = os.getcwd()
     project_name = os.path.basename(project_directory)
     settings_name = os.path.splitext(settings_filename)[0]
