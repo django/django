@@ -3,7 +3,8 @@ from django.template import Context, loader, Template, TemplateDoesNotExist
 from django.contrib.sites.models import Site, RequestSite
 from django.utils import feedgenerator
 from django.utils.encoding import smart_unicode, iri_to_uri
-from django.conf import settings
+from django.conf import settings         
+from django.template import RequestContext
 
 def add_domain(domain, url):
     if not (url.startswith('http://') or url.startswith('https://')):
@@ -124,9 +125,9 @@ class Feed(object):
             else:
                 author_email = author_link = None
             feed.add_item(
-                title = title_tmp.render(Context({'obj': item, 'site': current_site})),
+                title = title_tmp.render(RequestContext(self.request, {'obj': item, 'site': current_site})),
                 link = link,
-                description = description_tmp.render(Context({'obj': item, 'site': current_site})),
+                description = description_tmp.render(RequestContext(self.request, {'obj': item, 'site': current_site})),
                 unique_id = self.__get_dynamic_attr('item_guid', item, link),
                 enclosure = enc,
                 pubdate = self.__get_dynamic_attr('item_pubdate', item),
