@@ -1333,13 +1333,14 @@ given length.
 
 An ``UploadedFile`` object has two attributes:
 
-    ======================  =====================================================
-    Argument                Description
-    ======================  =====================================================
+    ======================  ====================================================
+    Attribute               Description
+    ======================  ====================================================
     ``filename``            The name of the file, provided by the uploading
                             client.
+                            
     ``content``             The array of bytes comprising the file content.
-    ======================  =====================================================
+    ======================  ====================================================
 
 The string representation of an ``UploadedFile`` is the same as the filename
 attribute.
@@ -1348,6 +1349,38 @@ When you use a ``FileField`` on a form, you must also remember to
 `bind the file data to the form`_.
 
 .. _`bind the file data to the form`: `Binding uploaded files to a form`_
+
+``FilePathField``
+~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+    * Default widget: ``Select``
+    * Empty value: ``None``
+    * Normalizes to: A unicode object
+    * Validates that the selected choice exists in the list of choices.
+    * Error message keys: ``required``, ``invalid_choice``
+
+The field allows choosing from files inside a certain directory. It takes three
+extra arguments:
+
+    ==============  ==========  ===============================================
+    Argument        Required?   Description
+    ==============  ==========  ===============================================
+    ``path``        Yes         The absolute path to the directory whose 
+                                contents you want listed. This directory must 
+                                exist.
+                            
+    ``recursive``   No          If ``False`` (the default) only the direct
+                                contents of ``path`` will be offered as choices.
+                                If ``True``, the directory will be descended
+                                into recursively and all descendants will be
+                                listed as choices.
+                                
+    ``match``       No          A regular expression pattern; only files with
+                                names matching this expression will be allowed
+                                as choices.
+    ==============  ==========  ===============================================
 
 ``ImageField``
 ~~~~~~~~~~~~~~
