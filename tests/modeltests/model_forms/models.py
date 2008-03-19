@@ -234,8 +234,12 @@ We can also subclass the Meta inner class to change the fields list.
 >>> f = CategoryForm({'name': 'Entertainment', 'slug': 'entertainment', 'url': 'entertainment'})
 >>> f.is_valid()
 True
->>> f.cleaned_data
-{'url': u'entertainment', 'name': u'Entertainment', 'slug': u'entertainment'}
+>>> f.cleaned_data['url']
+u'entertainment'
+>>> f.cleaned_data['name']
+u'Entertainment'
+>>> f.cleaned_data['slug']
+u'entertainment'
 >>> obj = f.save()
 >>> obj
 <Category: Entertainment>
@@ -245,8 +249,12 @@ True
 >>> f = CategoryForm({'name': "It's a test", 'slug': 'its-test', 'url': 'test'})
 >>> f.is_valid()
 True
->>> f.cleaned_data
-{'url': u'test', 'name': u"It's a test", 'slug': u'its-test'}
+>>> f.cleaned_data['url']
+u'test'
+>>> f.cleaned_data['name']
+u"It's a test"
+>>> f.cleaned_data['slug']
+u'its-test'
 >>> obj = f.save()
 >>> obj
 <Category: It's a test>
@@ -259,8 +267,12 @@ save() on the resulting model instance.
 >>> f = CategoryForm({'name': 'Third test', 'slug': 'third-test', 'url': 'third'})
 >>> f.is_valid()
 True
->>> f.cleaned_data
-{'url': u'third', 'name': u'Third test', 'slug': u'third-test'}
+>>> f.cleaned_data['url']
+u'third'
+>>> f.cleaned_data['name']
+u'Third test'
+>>> f.cleaned_data['slug']
+u'third-test'
 >>> obj = f.save(commit=False)
 >>> obj
 <Category: Third test>
@@ -272,8 +284,10 @@ True
 
 If you call save() with invalid data, you'll get a ValueError.
 >>> f = CategoryForm({'name': '', 'slug': '', 'url': 'foo'})
->>> f.errors
-{'name': [u'This field is required.'], 'slug': [u'This field is required.']}
+>>> f.errors['name']
+[u'This field is required.']
+>>> f.errors['slug']
+[u'This field is required.']
 >>> f.cleaned_data
 Traceback (most recent call last):
 ...
@@ -739,8 +753,10 @@ ValidationError: [u'Select a valid choice. 4 is not one of the available choices
 >>> f = PhoneNumberForm({'phone': '(312) 555-1212', 'description': 'Assistance'})
 >>> f.is_valid()
 True
->>> f.cleaned_data
-{'phone': u'312-555-1212', 'description': u'Assistance'}
+>>> f.cleaned_data['phone']
+u'312-555-1212'
+>>> f.cleaned_data['description']
+u'Assistance'
 
 # FileField ###################################################################
 

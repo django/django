@@ -252,8 +252,8 @@ ValidationError: [u'This field is required.']
 </select>
 <input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" /><input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" /></td></tr>
 
->>> f.cleaned_data
-{'field1': u'some text,JP,2007-04-25 06:24:00'}
+>>> f.cleaned_data['field1']
+u'some text,JP,2007-04-25 06:24:00'
 
 
 # IPAddressField ##################################################################
