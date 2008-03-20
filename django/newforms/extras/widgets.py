@@ -3,12 +3,15 @@ Extra HTML Widget classes
 """
 
 import datetime
+import re
 
 from django.newforms.widgets import Widget, Select
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 
 __all__ = ('SelectDateWidget',)
+
+RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
 
 class SelectDateWidget(Widget):
     """
@@ -32,10 +35,13 @@ class SelectDateWidget(Widget):
 
     def render(self, name, value, attrs=None):
         try:
-            value = datetime.date(*map(int, value.split('-')))
             year_val, month_val, day_val = value.year, value.month, value.day
-        except (AttributeError, TypeError, ValueError):
+        except AttributeError:
             year_val = month_val = day_val = None
+            if isinstance(value, basestring):
+                match = RE_DATE.match(value)
+                if match:
+                    year_val, month_val, day_val = [int(v) for v in match.groups()]
 
         output = []
 
