@@ -82,6 +82,9 @@ class HttpRequest(object):
     def is_secure(self):
         return os.environ.get("HTTPS") == "on"
 
+    def is_ajax(self):
+        return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
     def _set_encoding(self, val):
         """
         Sets the encoding used for GET/POST accesses. If the GET or POST

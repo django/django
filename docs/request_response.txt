@@ -199,6 +199,23 @@ Methods
    Returns ``True`` if the request is secure; that is, if it was made with
    HTTPS.
 
+``is_ajax()``
+   **New in Django development version**
+
+   Returns ``True`` if the request was made via an XMLHttpRequest by checking
+   the ``HTTP_X_REQUESTED_WITH`` header for the string *'XMLHttpRequest'*. The
+   following major Javascript libraries all send this header:
+
+   * jQuery
+   * Dojo
+   * MochiKit
+   * MooTools
+   * Prototype
+   * YUI
+
+   If you write your own XMLHttpRequest call (on the browser side), you will
+   have to set this header manually to use this method.
+
 QueryDict objects
 -----------------
 
