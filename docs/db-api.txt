@@ -1372,7 +1372,7 @@ equivalent::
     Entry.objects.filter(blog__pk=3) # __pk implies __id__exact
 
 Lookups that span relationships
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Django offers a powerful and intuitive way to "follow" relationships in
 lookups, taking care of the SQL ``JOIN``\s for you automatically, behind the
@@ -1396,7 +1396,7 @@ whose ``headline`` contains ``'Lennon'``::
     Blog.objects.filter(entry__headline__contains='Lennon')
 
 Escaping percent signs and underscores in LIKE statements
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------------
 
 The field lookups that equate to ``LIKE`` SQL statements (``iexact``,
 ``contains``, ``icontains``, ``startswith``, ``istartswith``, ``endswith``
