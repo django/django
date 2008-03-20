@@ -626,7 +626,8 @@ option is ignored.
 ``default``
 ~~~~~~~~~~~
 
-The default value for the field.
+The default value for the field. This can be a value or a callable object. If
+callable it will be called every time a new object is created.
 
 ``editable``
 ~~~~~~~~~~~~

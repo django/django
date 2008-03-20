@@ -548,6 +548,13 @@ class ForeignKey(RelatedField, Field):
             params['choices'] = self.get_choices_default()
         return field_objs, params
 
+    def get_default(self):
+        "Here we check if the default value is an object and return the to_field if so."
+        field_default = super(ForeignKey, self).get_default()
+        if isinstance(field_default, self.rel.to):
+            return getattr(field_default, self.rel.get_related_field().attname)
+        return field_default
+
     def get_manipulator_field_objs(self):
         rel_field = self.rel.get_related_field()
         if self.rel.raw_id_admin and not isinstance(rel_field, AutoField):
