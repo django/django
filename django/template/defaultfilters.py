@@ -124,7 +124,10 @@ def floatformat(text, arg=-1):
         d = int(arg)
     except ValueError:
         return force_unicode(f)
-    m = f - int(f)
+    try:
+        m = f - int(f)
+    except OverflowError:
+        return force_unicode(f)
     if not m and d < 0:
         return mark_safe(u'%d' % int(f))
     else:
