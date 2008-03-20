@@ -841,8 +841,9 @@ You can only refer to ``ForeignKey`` relations in the list of fields passed to
 list of fields and the ``depth`` parameter in the same ``select_related()``
 call, since they are conflicting options.
 
-``extra(select=None, where=None, params=None, tables=None, order_by=None)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``extra(select=None, where=None, params=None, tables=None, order_by=None,
+select_params=None)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes, the Django query syntax by itself can't easily express a complex
 ``WHERE`` clause. For these edge cases, Django provides the ``extra()``
@@ -901,31 +902,18 @@ of the arguments is required, but you should use at least one of them.
 
     **New in Django development version**
     In some rare cases, you might wish to pass parameters to the SQL fragments
-    in ``extra(select=...)```. Since the ``params`` attribute is a sequence
-    and the ``select`` attribute is a dictionary, some care is required so
-    that the parameters are matched up correctly with the extra select pieces.
-    Firstly, in this situation, you should use a
-    ``django.utils.datastructures.SortedDict`` for the ``select`` value, not
-    just a normal Python dictionary. Secondly, make sure that your parameters
-    for the ``select`` come first in the list and that you have not passed any
-    parameters to an earlier ``extra()`` call for this queryset.
+    in ``extra(select=...)```. For this purpose, use the ``select_params``
+    parameter. Since ``select_params`` is a sequence and the ``select``
+    attribute is a dictionary, some care is required so that the parameters
+    are matched up correctly with the extra select pieces.  In this situation,
+    you should use a ``django.utils.datastructures.SortedDict`` for the
+    ``select`` value, not just a normal Python dictionary.
 
-    This will work::
+    This will work, for example::
 
         Blog.objects.extra(
             select=SortedDict(('a', '%s'), ('b', '%s')),
-            params=('one', 'two'))
-
-    ... while this won't::
-
-        # Will not work!
-        Blog.objects.extra(where=['foo=%s'], params=('bar',)).extra(
-            select=SortedDict(('a', '%s'), ('b', '%s')),
-            params=('one', 'two'))
-
-    In the second example, the earlier ``params`` usage will mess up the later
-    one. So always put your extra select pieces in the first ``extra()`` call
-    if you need to use parameters in them.
+            select_params=('one', 'two'))
 
 ``where`` / ``tables``
     You can define explicit SQL ``WHERE`` clauses -- perhaps to perform
@@ -965,19 +953,18 @@ of the arguments is required, but you should use at least one of them.
     time).
 
 ``params``
-    The ``select`` and ``where`` parameters described above may use standard
-    Python database string placeholders -- ``'%s'`` to indicate parameters the
-    database engine should automatically quote. The ``params`` argument is a
-    list of any extra parameters to be substituted.
+    The ``where`` parameter described above may use standard Python database
+    string placeholders -- ``'%s'`` to indicate parameters the database engine
+    should automatically quote. The ``params`` argument is a list of any extra
+    parameters to be substituted.
 
     Example::
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-    Always use ``params`` instead of embedding values directly into ``select``
-    or ``where`` because ``params`` will ensure values are quoted correctly
-    according to your particular backend. (For example, quotes will be escaped
-    correctly.)
+    Always use ``params`` instead of embedding values directly into ``where``
+    because ``params`` will ensure values are quoted correctly according to
+    your particular backend. (For example, quotes will be escaped correctly.)
 
     Bad::
 
@@ -987,8 +974,9 @@ of the arguments is required, but you should use at least one of them.
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-    The combined number of placeholders in the list of strings for ``select``
-    or ``where`` should equal the number of values in the ``params`` list.
+**New in Django development version** The ``select_params`` argument to
+``extra()`` is new. Previously, you could attempt to pass parameters for
+``select`` in the ``params`` argument, but it worked very unreliably.
 
 QuerySet methods that do not return QuerySets
 ---------------------------------------------

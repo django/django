@@ -142,16 +142,16 @@ class _QuerySet(object):
         else:
             requested = None
         max_depth = self.query.max_depth
-        index_end = len(self.model._meta.fields)
         extra_select = self.query.extra_select.keys()
+        index_start = len(extra_select)
         for row in self.query.results_iter():
             if fill_cache:
-                obj, index_end = get_cached_row(self.model, row, 0, max_depth,
-                        requested=requested)
+                obj, _ = get_cached_row(self.model, row, index_start,
+                        max_depth, requested=requested)
             else:
-                obj = self.model(*row[:index_end])
+                obj = self.model(*row[index_start:])
             for i, k in enumerate(extra_select):
-                setattr(obj, k, row[index_end + i])
+                setattr(obj, k, row[i])
             yield obj
 
     def count(self):
@@ -413,14 +413,14 @@ class _QuerySet(object):
         return obj
 
     def extra(self, select=None, where=None, params=None, tables=None,
-            order_by=None):
+            order_by=None, select_params=None):
         """
         Add extra SQL fragments to the query.
         """
         assert self.query.can_filter(), \
                 "Cannot change a query once a slice has been taken"
         clone = self._clone()
-        clone.query.add_extra(select, where, params, tables, order_by)
+        clone.query.add_extra(select, select_params, where, params, tables, order_by)
         return clone
 
     def reverse(self):
@@ -475,9 +475,10 @@ class ValuesQuerySet(QuerySet):
         return self.iterator()
 
     def iterator(self):
-        self.field_names.extend([f for f in self.query.extra_select.keys()])
+        self.query.trim_extra_select(self.extra_names)
+        names = self.query.extra_select.keys() + self.field_names
         for row in self.query.results_iter():
-            yield dict(zip(self.field_names, row))
+            yield dict(zip(names, row))
 
     def _setup_query(self):
         """
@@ -487,6 +488,7 @@ class ValuesQuerySet(QuerySet):
         Called by the _clone() method after initialising the rest of the
         instance.
         """
+        self.extra_names = []
         if self._fields:
             if not self.query.extra_select:
                 field_names = list(self._fields)
@@ -496,7 +498,9 @@ class ValuesQuerySet(QuerySet):
                 for f in self._fields:
                     if f in names:
                         field_names.append(f)
-                    elif not self.query.extra_select.has_key(f):
+                    elif self.query.extra_select.has_key(f):
+                        self.extra_names.append(f)
+                    else:
                         raise FieldDoesNotExist('%s has no field named %r'
                                 % (self.model._meta.object_name, f))
         else:
@@ -513,7 +517,8 @@ class ValuesQuerySet(QuerySet):
         """
         c = super(ValuesQuerySet, self)._clone(klass, **kwargs)
         c._fields = self._fields[:]
-        c.field_names = self.field_names[:]
+        c.field_names = self.field_names
+        c.extra_names = self.extra_names
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
         return c

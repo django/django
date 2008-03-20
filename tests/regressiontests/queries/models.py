@@ -282,6 +282,10 @@ Bug #1878, #2939
 >>> xx.save()
 >>> Item.objects.exclude(name='two').values('creator', 'name').distinct().count()
 4
+>>> Item.objects.exclude(name='two').extra(select={'foo': '%s'}, select_params=(1,)).values('creator', 'name', 'foo').distinct().count()
+4
+>>> Item.objects.exclude(name='two').extra(select={'foo': '%s'}, select_params=(1,)).values('creator', 'name').distinct().count()
+4
 >>> xx.delete()
 
 Bug #2253
@@ -386,6 +390,8 @@ AssertionError: Cannot combine queries on two different base models.
 Bug #3141
 >>> Author.objects.extra(select={'foo': '1'}).count()
 4
+>>> Author.objects.extra(select={'foo': '%s'}, select_params=(1,)).count()
+4
 
 Bug #2400
 >>> Author.objects.filter(item__isnull=True)
@@ -462,6 +468,11 @@ True
 >>> qs.extra(order_by=('-good', 'id'))
 [<Ranking: 3: a1>, <Ranking: 2: a2>, <Ranking: 1: a3>]
 
+# Despite having some extra aliases in the query, we can still omit them in a
+# values() query.
+>>> qs.values('id', 'rank').order_by('id')
+[{'id': 1, 'rank': 2}, {'id': 2, 'rank': 1}, {'id': 3, 'rank': 3}]
+
 Bugs #2874, #3002
 >>> qs = Item.objects.select_related().order_by('note__note', 'name')
 >>> list(qs)
@@ -533,7 +544,7 @@ thus fail.)
 # This slightly odd comparison works aorund the fact that PostgreSQL will
 # return 'one' and 'two' as strings, not Unicode objects. It's a side-effect of
 # using constants here and not a real concern.
->>> d = Item.objects.extra(select=SortedDict(s), params=params).values('a', 'b')[0]
+>>> d = Item.objects.extra(select=SortedDict(s), select_params=params).values('a', 'b')[0]
 >>> d == {'a': u'one', 'b': u'two'}
 True
 

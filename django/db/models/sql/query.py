@@ -73,6 +73,7 @@ class Query(object):
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.
         self.extra_select = {}  # Maps col_alias -> col_sql.
+        self.extra_select_params = ()
         self.extra_tables = ()
         self.extra_where = ()
         self.extra_params = ()
@@ -150,6 +151,7 @@ class Query(object):
         obj.select_related = self.select_related
         obj.max_depth = self.max_depth
         obj.extra_select = self.extra_select.copy()
+        obj.extra_select_params = self.extra_select_params
         obj.extra_tables = self.extra_tables
         obj.extra_where = self.extra_where
         obj.extra_params = self.extra_params
@@ -214,6 +216,7 @@ class Query(object):
         # get_from_clause() for details.
         from_, f_params = self.get_from_clause()
         where, w_params = self.where.as_sql(qn=self.quote_name_unless_alias)
+        params = list(self.extra_select_params)
 
         result = ['SELECT']
         if self.distinct:
@@ -222,7 +225,7 @@ class Query(object):
 
         result.append('FROM')
         result.extend(from_)
-        params = list(f_params)
+        params.extend(f_params)
 
         if where:
             result.append('WHERE %s' % where)
@@ -351,8 +354,8 @@ class Query(object):
         the model.
         """
         qn = self.quote_name_unless_alias
-        result = []
-        aliases = []
+        result = ['(%s) AS %s' % (col, alias) for alias, col in self.extra_select.items()]
+        aliases = self.extra_select.keys()
         if self.select:
             for col in self.select:
                 if isinstance(col, (list, tuple)):
@@ -364,12 +367,9 @@ class Query(object):
                     if hasattr(col, 'alias'):
                         aliases.append(col.alias)
         elif self.default_cols:
-            result = self.get_default_columns(True)
-            aliases = result[:]
-
-        result.extend(['(%s) AS %s' % (col, alias)
-                for alias, col in self.extra_select.items()])
-        aliases.extend(self.extra_select.keys())
+            cols = self.get_default_columns(True)
+            result.extend(cols)
+            aliases.extend(cols)
 
         self._select_aliases = set(aliases)
         return result
@@ -403,9 +403,9 @@ class Query(object):
     def get_from_clause(self):
         """
         Returns a list of strings that are joined together to go after the
-        "FROM" part of the query, as well as any extra parameters that need to
-        be included. Sub-classes, can override this to create a from-clause via
-        a "select", for example (e.g. CountQuery).
+        "FROM" part of the query, as well as a list any extra parameters that
+        need to be included. Sub-classes, can override this to create a
+        from-clause via a "select", for example (e.g. CountQuery).
 
         This should only be called after any SQL construction methods that
         might change the tables we need. This means the select columns and
@@ -1253,6 +1253,7 @@ class Query(object):
             self.distinct = False
         self.select = [select]
         self.extra_select = {}
+        self.extra_select_params = ()
 
     def add_select_related(self, fields):
         """
@@ -1267,7 +1268,7 @@ class Query(object):
                 d = d.setdefault(part, {})
         self.select_related = field_dict
 
-    def add_extra(self, select, where, params, tables, order_by):
+    def add_extra(self, select, select_params, where, params, tables, order_by):
         """
         Adds data to the various extra_* attributes for user-created additions
         to the query.
@@ -1279,6 +1280,8 @@ class Query(object):
                     not isinstance(self.extra_select, SortedDict)):
                 self.extra_select = SortedDict(self.extra_select)
             self.extra_select.update(select)
+        if select_params:
+            self.extra_select_params += tuple(select_params)
         if where:
             self.extra_where += tuple(where)
         if params:
@@ -1287,6 +1290,17 @@ class Query(object):
             self.extra_tables += tuple(tables)
         if order_by:
             self.extra_order_by = order_by
+
+    def trim_extra_select(self, names):
+        """
+        Removes any aliases in the extra_select dictionary that aren't in
+        'names'.
+
+        This is needed if we are selecting certain values that don't incldue
+        all of the extra_select names.
+        """
+        for key in set(self.extra_select).difference(set(names)):
+            del self.extra_select[key]
 
     def set_start(self, start):
         """
