@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import datetime
 
 from django.conf import settings
 from django.template import Template, Context, TemplateDoesNotExist
@@ -158,6 +159,7 @@ def get_traceback_html(request, exc_type, exc_value, tb):
         'settings': get_safe_settings(),
         'sys_executable': sys.executable,
         'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
+        'server_time': datetime.datetime.now(),
         'django_version_info': get_version(),
         'sys_path' : sys.path,
         'template_info': template_info,
@@ -388,6 +390,10 @@ TECHNICAL_500_TEMPLATE = """
     <tr>
       <th>Python Path:</th>
       <td>{{ sys_path }}</td>
+    </tr>
+    <tr>
+      <th>Server time:</th>
+      <td>{{server_time|date:"r"}}</td>
     </tr>
   </table>
 </div>
