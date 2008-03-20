@@ -3,8 +3,8 @@ import sys
 import os
 from itertools import izip
 
-import django.db.models.manipulators
-import django.db.models.manager
+import django.db.models.manipulators    # Imported to register signal handler.
+import django.db.models.manager         # Ditto.
 from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
@@ -59,9 +59,11 @@ class ModelBase(type):
                 if not hasattr(meta, 'get_latest_by'):
                     new_class._meta.get_latest_by = base_meta.get_latest_by
 
-        if getattr(new_class, '_default_manager', None) is not None:
-            # We have a parent who set the default manager. We need to override
-            # this.
+        old_default_mgr = None
+        if getattr(new_class, '_default_manager', None):
+            # We have a parent who set the default manager.
+            if new_class._default_manager.model._meta.abstract:
+                old_default_mgr = new_class._default_manager
             new_class._default_manager = None
         if getattr(new_class._meta, 'app_label', None) is None:
             # Figure out the app_label by looking one level up.
@@ -113,6 +115,8 @@ class ModelBase(type):
             new_class.Meta = attr_meta
             return new_class
 
+        if old_default_mgr and not new_class._default_manager:
+            new_class._default_manager = old_default_mgr._copy_to_model(new_class)
         new_class._prepare()
         register_models(new_class._meta.app_label, new_class)
 

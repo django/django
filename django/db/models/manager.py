@@ -1,3 +1,5 @@
+import copy
+
 from django.db.models.query import QuerySet, EmptyQuerySet, insert_query
 from django.dispatch import dispatcher
 from django.db.models import signals
@@ -5,7 +7,7 @@ from django.db.models.fields import FieldDoesNotExist
 
 def ensure_default_manager(sender):
     cls = sender
-    if not hasattr(cls, '_default_manager') or cls._default_manager is None:
+    if not getattr(cls, '_default_manager', None) and not cls._meta.abstract:
         # Create the default manager, if needed.
         try:
             cls._meta.get_field('objects')
@@ -31,8 +33,19 @@ class Manager(object):
         # TODO: Use weakref because of possible memory leak / circular reference.
         self.model = model
         setattr(model, name, ManagerDescriptor(self))
-        if not hasattr(model, '_default_manager') or model._default_manager is None or self.creation_counter < model._default_manager.creation_counter:
+        if not getattr(model, '_default_manager', None) or self.creation_counter < model._default_manager.creation_counter:
             model._default_manager = self
+
+    def _copy_to_model(self, model):
+        """
+        Makes a copy of the manager and assigns it to 'model', which should be
+        a child of the existing model (used when inheriting a manager from an
+        abstract base class).
+        """
+        assert issubclass(model, self.model)
+        mgr = copy.copy(self)
+        mgr.model = model
+        return mgr
 
     #######################
     # PROXIES TO QUERYSET #
