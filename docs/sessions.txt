@@ -48,10 +48,10 @@ Using file-based sessions
 To use file-based sessions, set the ``SESSION_ENGINE`` setting to
 ``"django.contrib.sessions.backends.file"``.
 
-You might also want to set the ``SESSION_FILE_PATH`` setting (which
-defaults to ``/tmp``) to control where Django stores session files. Be
-sure to check that your Web server has permissions to read and write to
-this location.
+You might also want to set the ``SESSION_FILE_PATH`` setting (which defaults
+to output from ``tempfile.gettempdir()``, most likely  ``/tmp``) to control
+where Django stores session files. Be sure to check that your Web server has
+permissions to read and write to this location.
 
 Using cache-based sessions
 --------------------------
