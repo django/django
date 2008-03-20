@@ -37,6 +37,12 @@ A quick rundown:
       form will alter data server-side. Whenever you create a form that alters
       data server-side, use ``method="post"``. This tip isn't specific to
       Django; it's just good Web development practice.
+    
+    * ``forloop.counter`` indicates how many times the ``for`` tag has
+      gone through its loop; for more information, see `the
+      documentation for the "for" tag`_.
+
+.. _the documentation for the "for" tag: ../templates/#for
 
 Now, let's create a Django view that handles the submitted data and does
 something with it. Remember, in `Tutorial 3`_, we created a URLconf for the

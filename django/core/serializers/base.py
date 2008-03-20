@@ -22,10 +22,10 @@ class Serializer(object):
     Abstract serializer base class.
     """
 
-    # Indicates if the implemented serializer is only available for 
+    # Indicates if the implemented serializer is only available for
     # internal Django use.
     internal_use_only = False
-    
+
     def serialize(self, queryset, **options):
         """
         Serialize a queryset.
@@ -60,8 +60,6 @@ class Serializer(object):
         """
         if isinstance(field, models.DateTimeField):
             value = getattr(obj, field.name).strftime("%Y-%m-%d %H:%M:%S")
-        elif isinstance(field, models.FileField):
-            value = getattr(obj, "get_%s_url" % field.name, lambda: None)()
         else:
             value = field.flatten_data(follow=None, obj=obj).get(field.name, "")
         return smart_unicode(value)

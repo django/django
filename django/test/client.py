@@ -1,3 +1,4 @@
+import urllib
 import sys
 from cStringIO import StringIO
 from django.conf import settings
@@ -208,7 +209,7 @@ class Client:
         r = {
             'CONTENT_LENGTH':  None,
             'CONTENT_TYPE':    'text/html; charset=utf-8',
-            'PATH_INFO':       path,
+            'PATH_INFO':       urllib.unquote(path),
             'QUERY_STRING':    urlencode(data, doseq=True),
             'REQUEST_METHOD': 'GET',
         }
@@ -227,7 +228,7 @@ class Client:
         r = {
             'CONTENT_LENGTH': len(post_data),
             'CONTENT_TYPE':   content_type,
-            'PATH_INFO':      path,
+            'PATH_INFO':      urllib.unquote(path),
             'REQUEST_METHOD': 'POST',
             'wsgi.input':     StringIO(post_data),
         }

@@ -20,8 +20,13 @@ class Command(LabelCommand):
         # the parent directory.
         directory = os.getcwd()
 
-        if project_name in INVALID_PROJECT_NAMES:
-            raise CommandError("%r conflicts with the name of an existing Python module and cannot be used as a project name. Please try another name." % project_name)
+        try:
+            proj_name = __import__(project_name)
+            if proj_name:
+                raise CommandError("%r conflicts with the name of an existing Python module and cannot be used as a project name. Please try another name." % project_name)
+        except ImportError:
+            if project_name in INVALID_PROJECT_NAMES:
+                raise CommandError("%r contains an invalid project name. Please try another name." % project_name)
 
         copy_helper(self.style, 'project', project_name, directory)
 

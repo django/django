@@ -19,4 +19,7 @@ urlpatterns = patterns('',
     (r'^middleware/', include('regressiontests.middleware.urls')),
 
     (r'^utils/', include('regressiontests.utils.urls')),
+
+    # test urlconf for syndication tests
+    (r'^syndication/', include('regressiontests.syndication.urls')),
 )

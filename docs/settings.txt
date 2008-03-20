@@ -185,8 +185,11 @@ ADMIN_MEDIA_PREFIX
 
 Default: ``'/media/'``
 
-The URL prefix for admin media -- CSS, JavaScript and images. Make sure to use
-a trailing slash.
+The URL prefix for admin media -- CSS, JavaScript and images used by
+the Django administrative interface. Make sure to use a trailing
+slash, and to have this be different from the ``MEDIA_URL`` setting
+(since the same URL cannot be mapped onto two different sets of
+files).
 
 ADMINS
 ------
@@ -754,7 +757,9 @@ ROOT_URLCONF
 Default: Not defined
 
 A string representing the full Python import path to your root URLconf. For example:
-``"mydjangoapps.urls"``. See `How Django processes a request`_.
+``"mydjangoapps.urls"``. Can be overridden on a per-request basis by
+setting the attribute ``urlconf`` on the incoming ``HttpRequest``
+object. See `How Django processes a request`_ for details.
 
 .. _How Django processes a request: ../url_dispatch/#how-django-processes-a-request
 

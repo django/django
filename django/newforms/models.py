@@ -277,19 +277,18 @@ class ModelForm(BaseModelForm):
 
 # Fields #####################################################################
 
-class QuerySetIterator(object):
-    def __init__(self, queryset, empty_label, cache_choices):
-        self.queryset = queryset
-        self.empty_label = empty_label
-        self.cache_choices = cache_choices
+class ModelChoiceIterator(object):
+    def __init__(self, field):
+        self.field = field
+        self.queryset = field.queryset
 
     def __iter__(self):
-        if self.empty_label is not None:
-            yield (u"", self.empty_label)
+        if self.field.empty_label is not None:
+            yield (u"", self.field.empty_label)
         for obj in self.queryset:
-            yield (obj.pk, smart_unicode(obj))
+            yield (obj.pk, self.field.label_from_instance(obj))
         # Clear the QuerySet cache if required.
-        if not self.cache_choices:
+        if not self.field.cache_choices:
             self.queryset._result_cache = None
 
 class ModelChoiceField(ChoiceField):
@@ -306,6 +305,7 @@ class ModelChoiceField(ChoiceField):
                  help_text=None, *args, **kwargs):
         self.empty_label = empty_label
         self.cache_choices = cache_choices
+        
         # Call Field instead of ChoiceField __init__() because we don't need
         # ChoiceField.__init__().
         Field.__init__(self, required, widget, label, initial, help_text,
@@ -321,19 +321,30 @@ class ModelChoiceField(ChoiceField):
 
     queryset = property(_get_queryset, _set_queryset)
 
+    # this method will be used to create object labels by the QuerySetIterator. 
+    # Override it to customize the label. 
+    def label_from_instance(self, obj):
+        """
+        This method is used to convert objects into strings; it's used to
+        generate the labels for the choices presented by this object. Subclasses
+        can override this method to customize the display of the choices.
+        """
+        return smart_unicode(obj)
+    
     def _get_choices(self):
         # If self._choices is set, then somebody must have manually set
         # the property self.choices. In this case, just return self._choices.
         if hasattr(self, '_choices'):
             return self._choices
+
         # Otherwise, execute the QuerySet in self.queryset to determine the
-        # choices dynamically. Return a fresh QuerySetIterator that has not
-        # been consumed. Note that we're instantiating a new QuerySetIterator
-        # *each* time _get_choices() is called (and, thus, each time
-        # self.choices is accessed) so that we can ensure the QuerySet has not
-        # been consumed.
-        return QuerySetIterator(self.queryset, self.empty_label,
-                                self.cache_choices)
+        # choices dynamically. Return a fresh QuerySetIterator that has not been
+        # consumed. Note that we're instantiating a new QuerySetIterator *each*
+        # time _get_choices() is called (and, thus, each time self.choices is
+        # accessed) so that we can ensure the QuerySet has not been consumed. This
+        # construct might look complicated but it allows for lazy evaluation of
+        # the queryset.
+        return ModelChoiceIterator(self)
 
     def _set_choices(self, value):
         # This method is copied from ChoiceField._set_choices(). It's necessary

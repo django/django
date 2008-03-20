@@ -245,6 +245,13 @@ request to the URL ``/rss/beats/0613/``:
       subclass of ``ObjectDoesNotExist``. Raising ``ObjectDoesNotExist`` in
       ``get_object()`` tells Django to produce a 404 error for that request.
 
+      **New in Django development version:** The ``get_object()`` method also
+      has a chance to handle the ``/rss/beats/`` url.  In this case, ``bits``
+      will be an empty list. In our example, ``len(bits) != 1`` and an
+      ``ObjectDoesNotExist`` exception will be raised, so ``/rss/beats/`` will
+      generate a 404 page. But you can handle this case however you like.  For
+      example you could generate a combined feed for all beats.
+
     * To generate the feed's ``<title>``, ``<link>`` and ``<description>``,
       Django uses the ``title()``, ``link()`` and ``description()`` methods. In
       the previous example, they were simple string class attributes, but this

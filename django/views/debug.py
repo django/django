@@ -1,11 +1,12 @@
 import os
 import re
 import sys
+import datetime
 
 from django.conf import settings
 from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
-from django.http import HttpResponseServerError, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotFound
 from django.utils.encoding import smart_unicode
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST')
@@ -70,6 +71,11 @@ def technical_500_response(request, exc_type, exc_value, tb):
     Create a technical server error response. The last three arguments are
     the values returned from sys.exc_info() and friends.
     """
+    html = get_traceback_html(request, exc_type, exc_value, tb)
+    return HttpResponseServerError(html, mimetype='text/html')
+
+def get_traceback_html(request, exc_type, exc_value, tb):
+    "Return HTML code for traceback."
     template_info = None
     template_does_not_exist = False
     loader_debug_info = None
@@ -153,13 +159,14 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'settings': get_safe_settings(),
         'sys_executable': sys.executable,
         'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
+        'server_time': datetime.datetime.now(),
         'django_version_info': get_version(),
         'sys_path' : sys.path,
         'template_info': template_info,
         'template_does_not_exist': template_does_not_exist,
         'loader_debug_info': loader_debug_info,
     })
-    return HttpResponseServerError(t.render(c), mimetype='text/html')
+    return t.render(c)
 
 def technical_404_response(request, exception):
     "Create a technical 404 error response. The exception should be the Http404."
@@ -190,7 +197,7 @@ def empty_urlconf(request):
     c = Context({
         'project_name': settings.SETTINGS_MODULE.split('.')[0]
     })
-    return HttpResponseNotFound(t.render(c), mimetype='text/html')
+    return HttpResponse(t.render(c), mimetype='text/html')
 
 def _get_lines_from_file(filename, lineno, context_lines, loader=None, module_name=None):
     """
@@ -383,6 +390,10 @@ TECHNICAL_500_TEMPLATE = """
     <tr>
       <th>Python Path:</th>
       <td>{{ sys_path }}</td>
+    </tr>
+    <tr>
+      <th>Server time:</th>
+      <td>{{server_time|date:"r"}}</td>
     </tr>
   </table>
 </div>

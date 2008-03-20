@@ -32,9 +32,11 @@ How Django processes a request
 When a user requests a page from your Django-powered site, this is the
 algorithm the system follows to determine which Python code to execute:
 
-    1. Django looks at the ``ROOT_URLCONF`` setting in your `settings file`_.
-       This should be a string representing the full Python import path to your
-       URLconf. For example: ``"mydjangoapps.urls"``.
+    1. Django determines the root URLConf module to use; ordinarily
+       this is the value of the ``ROOT_URLCONF`` setting in your
+       `settings file`_, but if the incoming ``HttpRequest`` object
+       has an attribute called ``urlconf``, its value will be used in
+       place of the ``ROOT_URLCONF`` setting.
     2. Django loads that Python module and looks for the variable
        ``urlpatterns``. This should be a Python list, in the format returned by
        the function ``django.conf.urls.defaults.patterns()``.
