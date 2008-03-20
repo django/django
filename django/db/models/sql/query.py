@@ -232,7 +232,7 @@ class Query(object):
                 result.append('WHERE')
             else:
                 result.append('AND')
-            result.append(' AND'.join(self.extra_where))
+            result.append(' AND '.join(self.extra_where))
 
         if self.group_by:
             grouping = self.get_grouping()
