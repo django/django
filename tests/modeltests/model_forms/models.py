@@ -799,7 +799,7 @@ True
 <class 'django.newforms.fields.UploadedFile'>
 >>> instance = f.save()
 >>> instance.file
-u'.../test1.txt'
+u'...test1.txt'
 
 # Edit an instance that already has the file defined in the model. This will not
 # save the file again, but leave it exactly as it is.
@@ -808,10 +808,10 @@ u'.../test1.txt'
 >>> f.is_valid()
 True
 >>> f.cleaned_data['file']
-u'.../test1.txt'
+u'...test1.txt'
 >>> instance = f.save()
 >>> instance.file
-u'.../test1.txt'
+u'...test1.txt'
 
 # Delete the current file since this is not done by Django.
 
@@ -824,7 +824,7 @@ u'.../test1.txt'
 True
 >>> instance = f.save()
 >>> instance.file
-u'.../test2.txt'
+u'...test2.txt'
 
 >>> instance.delete()
 
@@ -843,7 +843,7 @@ True
 True
 >>> instance = f.save()
 >>> instance.file
-u'.../test3.txt'
+u'...test3.txt'
 >>> instance.delete()
 
 # ImageField ###################################################################
@@ -865,7 +865,7 @@ True
 <class 'django.newforms.fields.UploadedFile'>
 >>> instance = f.save()
 >>> instance.image
-u'.../test.png'
+u'...test.png'
 
 # Edit an instance that already has the image defined in the model. This will not
 # save the image again, but leave it exactly as it is.
@@ -874,10 +874,10 @@ u'.../test.png'
 >>> f.is_valid()
 True
 >>> f.cleaned_data['image']
-u'.../test.png'
+u'...test.png'
 >>> instance = f.save()
 >>> instance.image
-u'.../test.png'
+u'...test.png'
 
 # Delete the current image since this is not done by Django.
 
@@ -890,7 +890,7 @@ u'.../test.png'
 True
 >>> instance = f.save()
 >>> instance.image
-u'.../test2.png'
+u'...test2.png'
 
 >>> instance.delete()
 
@@ -909,7 +909,7 @@ True
 True
 >>> instance = f.save()
 >>> instance.image
-u'.../test3.png'
+u'...test3.png'
 >>> instance.delete()
 
 """}
