@@ -118,12 +118,22 @@ class _QuerySet(object):
         except self.model.DoesNotExist, e:
             raise IndexError, e.args
 
+    def _merge_sanity_check(self, other):
+        """
+        Checks that we are merging two comparable queyrset classes.
+        """
+        if self.__class__ is not other.__class__:
+            raise TypeError("Cannot merge querysets of different types ('%s' and '%s'."
+                    % (self.__class__.__name__, other.__class__.__name__))
+
     def __and__(self, other):
+        self._merge_sanity_check(other)
         combined = self._clone()
         combined.query.combine(other.query, sql.AND)
         return combined
 
     def __or__(self, other):
+        self._merge_sanity_check(other)
         combined = self._clone()
         combined.query.combine(other.query, sql.OR)
         return combined
@@ -526,6 +536,13 @@ class ValuesQuerySet(QuerySet):
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
         return c
+
+    def _merge_sanity_check(self, other):
+        super(ValuesQuerySet, self)._merge_sanity_check(other)
+        if (set(self.extra_names) != set(other.extra_names) or
+                set(self.field_names) != set(other.field_names)):
+            raise TypeError("Merging '%s' classes must involve the same values in each case."
+                    % self.__class__.__name__)
 
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
