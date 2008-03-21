@@ -934,10 +934,13 @@ class Query(object):
             if not merged:
                 self.where.negate()
             if final > 1 and lookup_type != 'isnull':
-                j_col = self.alias_map[alias][RHS_JOIN_COL]
-                entry = Node([(alias, j_col, None, 'isnull', True)])
-                entry.negate()
-                self.where.add(entry, AND)
+                for alias in join_list:
+                    if self.alias_map[alias] == self.LOUTER:
+                        j_col = self.alias_map[alias][RHS_JOIN_COL]
+                        entry = Node([(alias, j_col, None, 'isnull', True)])
+                        entry.negate()
+                        self.where.add(entry, AND)
+                        break
 
     def add_q(self, q_object):
         """
