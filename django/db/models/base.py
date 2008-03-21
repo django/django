@@ -20,6 +20,11 @@ from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.conf import settings
 
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback
+
 class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
@@ -100,8 +105,9 @@ class ModelBase(type):
                     new_class.add_to_class(attr_name, field)
                 new_class._meta.parents[base] = field
             else:
-                names = [f.name for f in new_class._meta.local_fields + new_class._meta.many_to_many]
-                for field in base._meta.local_fields:
+                # The abstract base class case.
+                names = set([f.name for f in new_class._meta.local_fields + new_class._meta.many_to_many])
+                for field in base._meta.local_fields + base._meta.local_many_to_many:
                     if field.name in names:
                         raise FieldError('Local field %r in class %r clashes with field of similar name from abstract base class %r'
                                 % (field.name, name, base.__name__))
