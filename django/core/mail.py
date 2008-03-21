@@ -2,20 +2,21 @@
 Tools for sending email.
 """
 
-from django.conf import settings
-from django.utils.encoding import smart_str, force_unicode
-from email import Charset, Encoders
-from email.MIMEText import MIMEText
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
-from email.Header import Header
-from email.Utils import formatdate, parseaddr, formataddr
 import mimetypes
 import os
 import smtplib
 import socket
 import time
 import random
+from email import Charset, Encoders
+from email.MIMEText import MIMEText
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEBase import MIMEBase
+from email.Header import Header
+from email.Utils import formatdate, parseaddr, formataddr
+
+from django.conf import settings
+from django.utils.encoding import smart_str, force_unicode
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
@@ -69,7 +70,7 @@ class BadHeaderError(ValueError):
     pass
 
 def forbid_multi_line_headers(name, val):
-    "Forbids multi-line headers, to prevent header injection."
+    """Forbids multi-line headers, to prevent header injection."""
     if '\n' in val or '\r' in val:
         raise BadHeaderError("Header values can't contain newlines (got %r for header %r)" % (val, name))
     try:
@@ -102,7 +103,7 @@ class SMTPConnection(object):
     """
 
     def __init__(self, host=None, port=None, username=None, password=None,
-            use_tls=None, fail_silently=False):
+                 use_tls=None, fail_silently=False):
         self.host = host or settings.EMAIL_HOST
         self.port = port or settings.EMAIL_PORT
         self.username = username or settings.EMAIL_HOST_USER
@@ -113,8 +114,8 @@ class SMTPConnection(object):
 
     def open(self):
         """
-        Ensure we have a connection to the email server. Returns whether or not
-        a new connection was required.
+        Ensures we have a connection to the email server. Returns whether or
+        not a new connection was required (True or False).
         """
         if self.connection:
             # Nothing to do if the connection is already open.
@@ -136,7 +137,7 @@ class SMTPConnection(object):
                 raise
 
     def close(self):
-        """Close the connection to the email server."""
+        """Closes the connection to the email server."""
         try:
             try:
                 self.connection.quit()
@@ -153,7 +154,7 @@ class SMTPConnection(object):
 
     def send_messages(self, email_messages):
         """
-        Send one or more EmailMessage objects and return the number of email
+        Sends one or more EmailMessage objects and returns the number of email
         messages sent.
         """
         if not email_messages:
@@ -196,7 +197,7 @@ class EmailMessage(object):
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
             connection=None, attachments=None, headers=None):
         """
-        Initialise a single email message (which can be sent to multiple
+        Initialize a single email message (which can be sent to multiple
         recipients).
 
         All strings used to create the message can be unicode strings (or UTF-8
@@ -225,7 +226,8 @@ class EmailMessage(object):
 
     def message(self):
         encoding = self.encoding or settings.DEFAULT_CHARSET
-        msg = SafeMIMEText(smart_str(self.body, settings.DEFAULT_CHARSET), self.content_subtype, encoding)
+        msg = SafeMIMEText(smart_str(self.body, settings.DEFAULT_CHARSET),
+                           self.content_subtype, encoding)
         if self.attachments:
             body_msg = msg
             msg = SafeMIMEMultipart(_subtype=self.multipart_subtype)
@@ -253,7 +255,7 @@ class EmailMessage(object):
         return self.to + self.bcc
 
     def send(self, fail_silently=False):
-        """Send the email message."""
+        """Sends the email message."""
         return self.get_connection(fail_silently).send_messages([self])
 
     def attach(self, filename=None, content=None, mimetype=None):
@@ -280,7 +282,7 @@ class EmailMessage(object):
 
     def _create_attachment(self, filename, content, mimetype=None):
         """
-        Convert the filename, content, mimetype triple into a MIME attachment
+        Converts the filename, content, mimetype triple into a MIME attachment
         object.
         """
         if mimetype is None:
@@ -297,7 +299,8 @@ class EmailMessage(object):
             attachment.set_payload(content)
             Encoders.encode_base64(attachment)
         if filename:
-            attachment.add_header('Content-Disposition', 'attachment', filename=filename)
+            attachment.add_header('Content-Disposition', 'attachment',
+                                  filename=filename)
         return attachment
 
 class EmailMultiAlternatives(EmailMessage):
@@ -312,7 +315,8 @@ class EmailMultiAlternatives(EmailMessage):
         """Attach an alternative content representation."""
         self.attach(content=content, mimetype=mimetype)
 
-def send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None):
+def send_mail(subject, message, from_email, recipient_list,
+              fail_silently=False, auth_user=None, auth_password=None):
     """
     Easy wrapper for sending a single message to a recipient list. All members
     of the recipient list will see the other recipients in the 'To' field.
@@ -324,10 +328,12 @@ def send_mail(subject, message, from_email, recipient_list, fail_silently=False,
     functionality should use the EmailMessage class directly.
     """
     connection = SMTPConnection(username=auth_user, password=auth_password,
-                                 fail_silently=fail_silently)
-    return EmailMessage(subject, message, from_email, recipient_list, connection=connection).send()
+                                fail_silently=fail_silently)
+    return EmailMessage(subject, message, from_email, recipient_list,
+                        connection=connection).send()
 
-def send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None):
+def send_mass_mail(datatuple, fail_silently=False, auth_user=None,
+                   auth_password=None):
     """
     Given a datatuple of (subject, message, from_email, recipient_list), sends
     each message to each recipient list. Returns the number of e-mails sent.
@@ -341,19 +347,19 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password
     functionality should use the EmailMessage class directly.
     """
     connection = SMTPConnection(username=auth_user, password=auth_password,
-                                 fail_silently=fail_silently)
-    messages = [EmailMessage(subject, message, sender, recipient) for subject, message, sender, recipient in datatuple]
+                                fail_silently=fail_silently)
+    messages = [EmailMessage(subject, message, sender, recipient)
+                for subject, message, sender, recipient in datatuple]
     return connection.send_messages(messages)
 
 def mail_admins(subject, message, fail_silently=False):
-    "Sends a message to the admins, as defined by the ADMINS setting."
+    """Sends a message to the admins, as defined by the ADMINS setting."""
     EmailMessage(settings.EMAIL_SUBJECT_PREFIX + subject, message,
-            settings.SERVER_EMAIL, [a[1] for a in
-                settings.ADMINS]).send(fail_silently=fail_silently)
+                 settings.SERVER_EMAIL, [a[1] for a in settings.ADMINS]
+                 ).send(fail_silently=fail_silently)
 
 def mail_managers(subject, message, fail_silently=False):
-    "Sends a message to the managers, as defined by the MANAGERS setting."
+    """Sends a message to the managers, as defined by the MANAGERS setting."""
     EmailMessage(settings.EMAIL_SUBJECT_PREFIX + subject, message,
-            settings.SERVER_EMAIL, [a[1] for a in
-                settings.MANAGERS]).send(fail_silently=fail_silently)
-
+                 settings.SERVER_EMAIL, [a[1] for a in settings.MANAGERS]
+                 ).send(fail_silently=fail_silently)
