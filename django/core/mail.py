@@ -119,7 +119,10 @@ class SMTPConnection(object):
             # Nothing to do if the connection is already open.
             return False
         try:
-            self.connection = smtplib.SMTP(self.host, self.port)
+            # If local_hostname is not specified, socket.getfqdn() gets used.
+            # For performance, we use the cached FQDN for local_hostname.
+            self.connection = smtplib.SMTP(self.host, self.port,
+                                           local_hostname=DNS_NAME.get_fqdn())
             if self.use_tls:
                 self.connection.ehlo()
                 self.connection.starttls()
