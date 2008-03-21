@@ -38,8 +38,9 @@ class CachedDnsName(object):
 
 DNS_NAME = CachedDnsName()
 
-# Copied from Python standard library and modified to used the cached hostname
-# for performance.
+# Copied from Python standard library, with the following modifications:
+# * Used cached hostname for performance.
+# * Added try/except to support lack of getpid() in Jython (#5496).
 def make_msgid(idstring=None):
     """Returns a string suitable for RFC 2822 compliant Message-ID, e.g:
 
@@ -53,7 +54,7 @@ def make_msgid(idstring=None):
     try:
         pid = os.getpid()
     except AttributeError:
-        # Not getpid() in Jython, for example.
+        # No getpid() in Jython, for example.
         pid = 1
     randint = random.randrange(100000)
     if idstring is None:
