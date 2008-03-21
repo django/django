@@ -120,7 +120,7 @@ class _QuerySet(object):
 
     def _merge_sanity_check(self, other):
         """
-        Checks that we are merging two comparable queyrset classes.
+        Checks that we are merging two comparable queryset classes.
         """
         if self.__class__ is not other.__class__:
             raise TypeError("Cannot merge querysets of different types ('%s' and '%s'."
