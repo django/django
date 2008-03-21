@@ -162,7 +162,7 @@ True
 >>> Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_two')
 Traceback (most recent call last):
     ...
-FieldDoesNotExist: Article has no field named 'id_plus_two'
+FieldError: Cannot resolve keyword 'id_plus_two' into field. Choices are: headline, id, id_plus_one, pub_date
 
 # If you don't specify field names to values(), all are returned.
 >>> list(Article.objects.filter(id=5).values()) == [{'id': 5, 'headline': 'Article 5', 'pub_date': datetime(2005, 8, 1, 9, 0)}]

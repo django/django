@@ -1191,6 +1191,11 @@ class Query(object):
                 self.select.append((final_alias, col))
         except MultiJoin:
             raise FieldError("Invalid field name: '%s'" % name)
+        except FieldError:
+            names = opts.get_all_field_names() + self.extra_select.keys()
+            names.sort()
+            raise FieldError("Cannot resolve keyword %r into field. "
+                    "Choices are: %s" % (name, ", ".join(names)))
 
     def add_ordering(self, *ordering):
         """

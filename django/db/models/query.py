@@ -508,15 +508,11 @@ class ValuesQuerySet(QuerySet):
                 field_names = list(self._fields)
             else:
                 field_names = []
-                names = set(self.model._meta.get_all_field_names())
                 for f in self._fields:
-                    if f in names:
-                        field_names.append(f)
-                    elif self.query.extra_select.has_key(f):
+                    if self.query.extra_select.has_key(f):
                         self.extra_names.append(f)
                     else:
-                        raise FieldDoesNotExist('%s has no field named %r'
-                                % (self.model._meta.object_name, f))
+                        field_names.append(f)
         else:
             # Default to all fields.
             field_names = [f.attname for f in self.model._meta.fields]
