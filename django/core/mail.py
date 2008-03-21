@@ -237,8 +237,6 @@ class EmailMessage(object):
         msg['To'] = ', '.join(self.to)
         msg['Date'] = formatdate()
         msg['Message-ID'] = make_msgid()
-        if self.bcc:
-            msg['Bcc'] = ', '.join(self.bcc)
         for name, value in self.extra_headers.items():
             msg[name] = value
         return msg
