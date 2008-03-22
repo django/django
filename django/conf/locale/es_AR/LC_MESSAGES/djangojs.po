@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django Javascript 1.0\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-10-06 14:18-0300\n"
 "PO-Revision-Date: 2007-07-14 14:36-0300\n"

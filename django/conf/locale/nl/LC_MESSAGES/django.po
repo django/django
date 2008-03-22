@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Django 1.0\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-02-27 08:53+0100\n"
 "PO-Revision-Date: 2008-02-27 11:22+0100\n"

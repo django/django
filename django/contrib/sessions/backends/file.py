@@ -9,7 +9,9 @@ class SessionStore(SessionBase):
     Implements a file based session store.
     """
     def __init__(self, session_key=None):
-        self.storage_path = getattr(settings, "SESSION_FILE_PATH", tempfile.gettempdir())
+        self.storage_path = getattr(settings, "SESSION_FILE_PATH", None)
+        if not self.storage_path:
+            self.storage_path = tempfile.gettempdir()
 
         # Make sure the storage path is valid.
         if not os.path.isdir(self.storage_path):

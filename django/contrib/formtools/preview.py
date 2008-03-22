@@ -105,7 +105,7 @@ class FormPreview(object):
         Subclasses may want to take into account request-specific information
         such as the IP address.
         """
-        data = [(bf.name, bf.data) for bf in form] + [settings.SECRET_KEY]
+        data = [(bf.name, bf.data or '') for bf in form] + [settings.SECRET_KEY]
         # Use HIGHEST_PROTOCOL because it's the most efficient. It requires
         # Python 2.3, but Django requires 2.3 anyway, so that's OK.
         pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)

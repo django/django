@@ -1,11 +1,10 @@
 # Dutch Javascript translations.
 # Copyright (C) 2006
 # This file is distributed under the same license as the Django package.
-# Rudolph Froger <rfroger@estrate.nl>, 2006.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django 1.0\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-02-27 10:34+0100\n"
 "PO-Revision-Date: 2008-02-27 11:22+0100\n"

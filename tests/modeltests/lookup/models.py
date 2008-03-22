@@ -76,8 +76,11 @@ Article 4
 
 # in_bulk() takes a list of IDs and returns a dictionary mapping IDs
 # to objects.
->>> Article.objects.in_bulk([1, 2])
-{1: <Article: Article 1>, 2: <Article: Article 2>}
+>>> arts = Article.objects.in_bulk([1, 2])
+>>> arts[1]
+<Article: Article 1>
+>>> arts[2]
+<Article: Article 2>
 >>> Article.objects.in_bulk([3])
 {3: <Article: Article 3>}
 >>> Article.objects.in_bulk([1000])

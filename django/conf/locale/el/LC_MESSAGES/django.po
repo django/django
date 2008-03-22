@@ -1,12 +1,10 @@
 # translation of django.po to el
 # Copyright (C) 2006 and beyond
 # This file is distributed under the same license as the DJANGO package.
-# Panos Laganakos <panos.laganakos@gmail.com>, Mar 2006.
 #
-# Dimitris Glezos <dimitris@glezos.com>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-04-05 01:32+1000\n"
 "PO-Revision-Date: 2007-09-03 04:19+0100\n"

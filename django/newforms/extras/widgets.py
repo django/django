@@ -3,12 +3,15 @@ Extra HTML Widget classes
 """
 
 import datetime
+import re
 
 from django.newforms.widgets import Widget, Select
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 
 __all__ = ('SelectDateWidget',)
+
+RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
 
 class SelectDateWidget(Widget):
     """
@@ -32,27 +35,42 @@ class SelectDateWidget(Widget):
 
     def render(self, name, value, attrs=None):
         try:
-            value = datetime.date(*map(int, value.split('-')))
             year_val, month_val, day_val = value.year, value.month, value.day
-        except (AttributeError, TypeError, ValueError):
+        except AttributeError:
             year_val = month_val = day_val = None
+            if isinstance(value, basestring):
+                match = RE_DATE.match(value)
+                if match:
+                    year_val, month_val, day_val = [int(v) for v in match.groups()]
 
         output = []
 
+        if 'id' in self.attrs:
+            id_ = self.attrs['id']
+        else:
+            id_ = 'id_%s' % name
+
         month_choices = MONTHS.items()
         month_choices.sort()
-        select_html = Select(choices=month_choices).render(self.month_field % name, month_val)
+        local_attrs = self.build_attrs(id=self.month_field % id_)
+        select_html = Select(choices=month_choices).render(self.month_field % name, month_val, local_attrs)
         output.append(select_html)
 
         day_choices = [(i, i) for i in range(1, 32)]
-        select_html = Select(choices=day_choices).render(self.day_field % name, day_val)
+        local_attrs['id'] = self.day_field % id_
+        select_html = Select(choices=day_choices).render(self.day_field % name, day_val, local_attrs)
         output.append(select_html)
 
         year_choices = [(i, i) for i in self.years]
-        select_html = Select(choices=year_choices).render(self.year_field % name, year_val)
+        local_attrs['id'] = self.year_field % id_
+        select_html = Select(choices=year_choices).render(self.year_field % name, year_val, local_attrs)
         output.append(select_html)
 
         return mark_safe(u'\n'.join(output))
+
+    def id_for_label(self, id_):
+        return '%s_month' % id_
+    id_for_label = classmethod(id_for_label)
 
     def value_from_datadict(self, data, files, name):
         y, m, d = data.get(self.year_field % name), data.get(self.month_field % name), data.get(self.day_field % name)

@@ -3,7 +3,7 @@ Regression tests for the Test Client, especially the customized assertions.
 
 """
 from django.test import Client, TestCase
-from django.core import mail
+from django.core.urlresolvers import reverse
 import os
 
 class AssertContainsTests(TestCase):
@@ -261,3 +261,31 @@ class LoginTests(TestCase):
         # Check that assertRedirects uses the original client, not the
         # default client.
         self.assertRedirects(response, "http://testserver/test_client_regress/get_view/")
+
+
+class URLEscapingTests(TestCase):
+    def test_simple_argument_get(self):
+        "Get a view that has a simple string argument"
+        response = self.client.get(reverse('arg_view', args=['Slartibartfast']))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'Howdy, Slartibartfast')
+
+    def test_argument_with_space_get(self):
+        "Get a view that has a string argument that requires escaping"
+        response = self.client.get(reverse('arg_view', args=['Arthur Dent']))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'Hi, Arthur')
+
+    def test_simple_argument_post(self):
+        "Post for a view that has a simple string argument"
+        response = self.client.post(reverse('arg_view', args=['Slartibartfast']))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'Howdy, Slartibartfast')
+
+    def test_argument_with_space_post(self):
+        "Post for a view that has a string argument that requires escaping"
+        response = self.client.post(reverse('arg_view', args=['Arthur Dent']))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'Hi, Arthur')
+
+

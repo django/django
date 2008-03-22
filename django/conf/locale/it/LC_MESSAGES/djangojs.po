@@ -3,11 +3,9 @@
 # Copyright (C) 2006 the Lawrence Journal-World
 # This file is distributed under the same license as the Django package.
 #
-# Carlo C8E Miron <carlo.miron AT gmail.com>, 2006.
-# Nicola 'tekNico' Larosa <nico@tekNico.net>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: djangojs\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-02-26 20:46+0100\n"
 "PO-Revision-Date: 2007-02-26 20:55+0100\n"

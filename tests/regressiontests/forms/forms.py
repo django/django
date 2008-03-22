@@ -36,8 +36,8 @@ True
 u''
 >>> p.errors.as_text()
 u''
->>> p.cleaned_data
-{'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
+>>> p.cleaned_data["first_name"], p.cleaned_data["last_name"], p.cleaned_data["birthday"]
+(u'John', u'Lennon', datetime.date(1940, 10, 9))
 >>> print p['first_name']
 <input type="text" name="first_name" value="John" id="id_first_name" />
 >>> print p['last_name']
@@ -68,8 +68,12 @@ Empty dictionaries are valid, too.
 >>> p = Person({})
 >>> p.is_bound
 True
->>> p.errors
-{'first_name': [u'This field is required.'], 'last_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
+>>> p.errors['first_name']
+[u'This field is required.']
+>>> p.errors['last_name']
+[u'This field is required.']
+>>> p.errors['birthday']
+[u'This field is required.']
 >>> p.is_valid()
 False
 >>> p.cleaned_data
@@ -137,8 +141,10 @@ u'<li><label for="id_first_name">First name:</label> <input type="text" name="fi
 u'<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" value="John" id="id_first_name" /></p>\n<p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></p>\n<p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></p>'
 
 >>> p = Person({'last_name': u'Lennon'})
->>> p.errors
-{'first_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
+>>> p.errors['first_name']
+[u'This field is required.']
+>>> p.errors['birthday']
+[u'This field is required.']
 >>> p.is_valid()
 False
 >>> p.errors.as_ul()
@@ -175,8 +181,13 @@ but cleaned_data contains only the form's fields.
 >>> p = Person(data)
 >>> p.is_valid()
 True
->>> p.cleaned_data
-{'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
+>>> p.cleaned_data['first_name']
+u'John'
+>>> p.cleaned_data['last_name']
+u'Lennon'
+>>> p.cleaned_data['birthday']
+datetime.date(1940, 10, 9)
+
 
 cleaned_data will include a key and value for *all* fields defined in the Form,
 even if the Form's data didn't include a value for fields that are not
@@ -191,8 +202,12 @@ empty string.
 >>> f = OptionalPersonForm(data)
 >>> f.is_valid()
 True
->>> f.cleaned_data
-{'nick_name': u'', 'first_name': u'John', 'last_name': u'Lennon'}
+>>> f.cleaned_data['nick_name']
+u''
+>>> f.cleaned_data['first_name']
+u'John'
+>>> f.cleaned_data['last_name']
+u'Lennon'
 
 For DateFields, it's set to None.
 >>> class OptionalPersonForm(Form):
@@ -203,8 +218,12 @@ For DateFields, it's set to None.
 >>> f = OptionalPersonForm(data)
 >>> f.is_valid()
 True
->>> f.cleaned_data
-{'birth_date': None, 'first_name': u'John', 'last_name': u'Lennon'}
+>>> print f.cleaned_data['birth_date']
+None
+>>> f.cleaned_data['first_name']
+u'John'
+>>> f.cleaned_data['last_name']
+u'Lennon'
 
 "auto_id" tells the Form to add an "id" attribute to each form element.
 If it's a string that contains '%s', Django will use that as a format string
@@ -549,18 +568,22 @@ The MultipleHiddenInput widget renders multiple values as hidden fields.
 When using CheckboxSelectMultiple, the framework expects a list of input and
 returns a list of input.
 >>> f = SongForm({'name': 'Yesterday'}, auto_id=False)
->>> f.errors
-{'composers': [u'This field is required.']}
+>>> f.errors['composers']
+[u'This field is required.']
 >>> f = SongForm({'name': 'Yesterday', 'composers': ['J']}, auto_id=False)
 >>> f.errors
 {}
->>> f.cleaned_data
-{'composers': [u'J'], 'name': u'Yesterday'}
+>>> f.cleaned_data['composers']
+[u'J']
+>>> f.cleaned_data['name']
+u'Yesterday'
 >>> f = SongForm({'name': 'Yesterday', 'composers': ['J', 'P']}, auto_id=False)
 >>> f.errors
 {}
->>> f.cleaned_data
-{'composers': [u'J', u'P'], 'name': u'Yesterday'}
+>>> f.cleaned_data['composers']
+[u'J', u'P']
+>>> f.cleaned_data['name']
+u'Yesterday'
 
 Validation errors are HTML-escaped when output as HTML.
 >>> class EscapingForm(Form):
@@ -598,16 +621,24 @@ including the current field (e.g., the field XXX if you're in clean_XXX()).
 >>> f.errors
 {}
 >>> f = UserRegistration({}, auto_id=False)
->>> f.errors
-{'username': [u'This field is required.'], 'password1': [u'This field is required.'], 'password2': [u'This field is required.']}
+>>> f.errors['username']
+[u'This field is required.']
+>>> f.errors['password1']
+[u'This field is required.']
+>>> f.errors['password2']
+[u'This field is required.']
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
->>> f.errors
-{'password2': [u'Please make sure your passwords match.']}
+>>> f.errors['password2']
+[u'Please make sure your passwords match.']
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'}, auto_id=False)
 >>> f.errors
 {}
->>> f.cleaned_data
-{'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
+>>> f.cleaned_data['username']
+u'adrian'
+>>> f.cleaned_data['password1']
+u'foo'
+>>> f.cleaned_data['password2']
+u'foo'
 
 Another way of doing multiple-field validation is by implementing the
 Form's clean() method. If you do this, any ValidationError raised by that
@@ -632,11 +663,15 @@ Form.clean() is required to return a dictionary of all clean data.
 <tr><th>Username:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="username" maxlength="10" /></td></tr>
 <tr><th>Password1:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="password" name="password1" /></td></tr>
 <tr><th>Password2:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="password" name="password2" /></td></tr>
->>> f.errors
-{'username': [u'This field is required.'], 'password1': [u'This field is required.'], 'password2': [u'This field is required.']}
+>>> f.errors['username']
+[u'This field is required.']
+>>> f.errors['password1']
+[u'This field is required.']
+>>> f.errors['password2']
+[u'This field is required.']
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
->>> f.errors
-{'__all__': [u'Please make sure your passwords match.']}
+>>> f.errors['__all__']
+[u'Please make sure your passwords match.']
 >>> print f.as_table()
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><th>Username:</th><td><input type="text" name="username" value="adrian" maxlength="10" /></td></tr>
@@ -650,8 +685,12 @@ Form.clean() is required to return a dictionary of all clean data.
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'}, auto_id=False)
 >>> f.errors
 {}
->>> f.cleaned_data
-{'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
+>>> f.cleaned_data['username']
+u'adrian'
+>>> f.cleaned_data['password1']
+u'foo'
+>>> f.cleaned_data['password2']
+u'foo'
 
 # Dynamic construction ########################################################
 
@@ -1024,8 +1063,8 @@ An 'initial' value is *not* used as a fallback if data is not provided. In this
 example, we don't provide a value for 'username', and the form raises a
 validation error rather than using the initial value for 'username'.
 >>> p = UserRegistration({'password': 'secret'})
->>> p.errors
-{'username': [u'This field is required.']}
+>>> p.errors['username']
+[u'This field is required.']
 >>> p.is_valid()
 False
 
@@ -1069,8 +1108,8 @@ A dynamic 'initial' value is *not* used as a fallback if data is not provided.
 In this example, we don't provide a value for 'username', and the form raises a
 validation error rather than using the initial value for 'username'.
 >>> p = UserRegistration({'password': 'secret'}, initial={'username': 'django'})
->>> p.errors
-{'username': [u'This field is required.']}
+>>> p.errors['username']
+[u'This field is required.']
 >>> p.is_valid()
 False
 
@@ -1123,8 +1162,8 @@ A callable 'initial' value is *not* used as a fallback if data is not provided.
 In this example, we don't provide a value for 'username', and the form raises a
 validation error rather than using the initial value for 'username'.
 >>> p = UserRegistration({'password': 'secret'}, initial={'username': initial_django})
->>> p.errors
-{'username': [u'This field is required.']}
+>>> p.errors['username']
+[u'This field is required.']
 >>> p.is_valid()
 False
 
@@ -1258,8 +1297,12 @@ actual field name.
 {}
 >>> p.is_valid()
 True
->>> p.cleaned_data
-{'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
+>>> p.cleaned_data['first_name']
+u'John'
+>>> p.cleaned_data['last_name']
+u'Lennon'
+>>> p.cleaned_data['birthday']
+datetime.date(1940, 10, 9)
 
 Let's try submitting some bad data to make sure form.errors and field.errors
 work as expected.
@@ -1269,8 +1312,12 @@ work as expected.
 ...     'person1-birthday': u''
 ... }
 >>> p = Person(data, prefix='person1')
->>> p.errors
-{'first_name': [u'This field is required.'], 'last_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
+>>> p.errors['first_name']
+[u'This field is required.']
+>>> p.errors['last_name']
+[u'This field is required.']
+>>> p.errors['birthday']
+[u'This field is required.']
 >>> p['first_name'].errors
 [u'This field is required.']
 >>> p['person1-first_name'].errors
@@ -1286,8 +1333,12 @@ the form doesn't "see" the fields.
 ...     'birthday': u'1940-10-9'
 ... }
 >>> p = Person(data, prefix='person1')
->>> p.errors
-{'first_name': [u'This field is required.'], 'last_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
+>>> p.errors['first_name']
+[u'This field is required.']
+>>> p.errors['last_name']
+[u'This field is required.']
+>>> p.errors['birthday']
+[u'This field is required.']
 
 With prefixes, a single data dictionary can hold data for multiple instances
 of the same form.
@@ -1302,13 +1353,21 @@ of the same form.
 >>> p1 = Person(data, prefix='person1')
 >>> p1.is_valid()
 True
->>> p1.cleaned_data
-{'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
+>>> p1.cleaned_data['first_name']
+u'John'
+>>> p1.cleaned_data['last_name']
+u'Lennon'
+>>> p1.cleaned_data['birthday']
+datetime.date(1940, 10, 9)
 >>> p2 = Person(data, prefix='person2')
 >>> p2.is_valid()
 True
->>> p2.cleaned_data
-{'first_name': u'Jim', 'last_name': u'Morrison', 'birthday': datetime.date(1943, 12, 8)}
+>>> p2.cleaned_data['first_name']
+u'Jim'
+>>> p2.cleaned_data['last_name']
+u'Morrison'
+>>> p2.cleaned_data['birthday']
+datetime.date(1943, 12, 8)
 
 By default, forms append a hyphen between the prefix and the field name, but a
 form can alter that behavior by implementing the add_prefix() method. This
@@ -1333,8 +1392,12 @@ self.prefix.
 >>> p = Person(data, prefix='foo')
 >>> p.is_valid()
 True
->>> p.cleaned_data
-{'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
+>>> p.cleaned_data['first_name']
+u'John'
+>>> p.cleaned_data['last_name']
+u'Lennon'
+>>> p.cleaned_data['birthday']
+datetime.date(1940, 10, 9)
 
 # Forms with NullBooleanFields ################################################
 

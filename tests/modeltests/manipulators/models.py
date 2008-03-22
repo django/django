@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 27. Default manipulators
 
@@ -21,7 +22,7 @@ class Album(models.Model):
     def __unicode__(self):
         return self.name
 
-__test__ = {'API_TESTS':"""
+__test__ = {'API_TESTS':u"""
 >>> from django.utils.datastructures import MultiValueDict
 
 # Create a Musician object via the default AddManipulator.
@@ -40,25 +41,33 @@ __test__ = {'API_TESTS':"""
 True
 
 # Attempt to add a Musician without a first_name.
->>> man.get_validation_errors(MultiValueDict({'last_name': ['Blakey']}))
-{'first_name': [u'This field is required.']}
+>>> man.get_validation_errors(MultiValueDict({'last_name': ['Blakey']}))['first_name']
+[u'This field is required.']
 
 # Attempt to add a Musician without a first_name and last_name.
->>> man.get_validation_errors(MultiValueDict({}))
-{'first_name': [u'This field is required.'], 'last_name': [u'This field is required.']}
+>>> errors = man.get_validation_errors(MultiValueDict({}))
+>>> errors['first_name']
+[u'This field is required.']
+>>> errors['last_name']
+[u'This field is required.']
 
 # Attempt to create an Album without a name or musician.
 >>> man = Album.AddManipulator()
->>> man.get_validation_errors(MultiValueDict({}))
-{'musician': [u'This field is required.'], 'name': [u'This field is required.']}
+>>> errors = man.get_validation_errors(MultiValueDict({}))
+>>> errors['musician']
+[u'This field is required.']
+>>> errors['name']
+[u'This field is required.']
 
 # Attempt to create an Album with an invalid musician.
->>> man.get_validation_errors(MultiValueDict({'name': ['Sallies Fforth'], 'musician': ['foo']}))
-{'musician': [u"Select a valid choice; 'foo' is not in [u'', u'1']."]}
+>>> errors = man.get_validation_errors(MultiValueDict({'name': ['Sallies Fforth'], 'musician': ['foo']}))
+>>> errors['musician']
+[u"Select a valid choice; 'foo' is not in [u'', u'1']."]
 
 # Attempt to create an Album with an invalid release_date.
->>> man.get_validation_errors(MultiValueDict({'name': ['Sallies Fforth'], 'musician': ['1'], 'release_date': 'today'}))
-{'release_date': [u'Enter a valid date in YYYY-MM-DD format.']}
+>>> errors = man.get_validation_errors(MultiValueDict({'name': ['Sallies Fforth'], 'musician': ['1'], 'release_date': 'today'}))
+>>> errors['release_date']
+[u'Enter a valid date in YYYY-MM-DD format.']
 
 # Create an Album without a release_date (because it's optional).
 >>> data = MultiValueDict({'name': ['Ella and Basie'], 'musician': ['1']})
@@ -88,4 +97,9 @@ True
 <Album: Ultimate Ella>
 >>> a2.release_date
 datetime.date(2005, 2, 13)
+
+# Test isValidFloat Unicode coercion
+>>> from django.core.validators import isValidFloat, ValidationError
+>>> try: isValidFloat(u"ä", None)
+... except ValidationError: pass
 """}

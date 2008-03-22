@@ -71,8 +71,9 @@ u'ABC123'
 >>> fran.save()
 >>> Employee.objects.filter(last_name__exact='Jones')
 [<Employee: Dan Jones>, <Employee: Fran Jones>]
->>> Employee.objects.in_bulk(['ABC123', 'XYZ456'])
-{u'XYZ456': <Employee: Fran Jones>, u'ABC123': <Employee: Dan Jones>}
+>>> emps = Employee.objects.in_bulk(['ABC123', 'XYZ456'])
+>>> emps['ABC123']
+<Employee: Dan Jones>
 
 >>> b = Business(name='Sears')
 >>> b.save()

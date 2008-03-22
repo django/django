@@ -4,7 +4,7 @@
 # This file is distributed under the same license as the Django package.
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-02-02 18:31+0100\n"
 "PO-Revision-Date: 2008-03-02 11:40+0100\n"

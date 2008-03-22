@@ -1336,13 +1336,14 @@ given length.
 
 An ``UploadedFile`` object has two attributes:
 
-    ======================  =====================================================
-    Argument                Description
-    ======================  =====================================================
+    ======================  ====================================================
+    Attribute               Description
+    ======================  ====================================================
     ``filename``            The name of the file, provided by the uploading
                             client.
+                            
     ``content``             The array of bytes comprising the file content.
-    ======================  =====================================================
+    ======================  ====================================================
 
 The string representation of an ``UploadedFile`` is the same as the filename
 attribute.
@@ -1351,6 +1352,38 @@ When you use a ``FileField`` on a form, you must also remember to
 `bind the file data to the form`_.
 
 .. _`bind the file data to the form`: `Binding uploaded files to a form`_
+
+``FilePathField``
+~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+    * Default widget: ``Select``
+    * Empty value: ``None``
+    * Normalizes to: A unicode object
+    * Validates that the selected choice exists in the list of choices.
+    * Error message keys: ``required``, ``invalid_choice``
+
+The field allows choosing from files inside a certain directory. It takes three
+extra arguments:
+
+    ==============  ==========  ===============================================
+    Argument        Required?   Description
+    ==============  ==========  ===============================================
+    ``path``        Yes         The absolute path to the directory whose 
+                                contents you want listed. This directory must 
+                                exist.
+                            
+    ``recursive``   No          If ``False`` (the default) only the direct
+                                contents of ``path`` will be offered as choices.
+                                If ``True``, the directory will be descended
+                                into recursively and all descendants will be
+                                listed as choices.
+                                
+    ``match``       No          A regular expression pattern; only files with
+                                names matching this expression will be allowed
+                                as choices.
+    ==============  ==========  ===============================================
 
 ``ImageField``
 ~~~~~~~~~~~~~~
@@ -1502,6 +1535,41 @@ the bottom of this document, for examples of their use.
 ``SplitDateTimeField``
 ~~~~~~~~~~~~~~~~~~~~~~
 
+Fields which handle relationships
+---------------------------------
+
+For representing relationships between models, two fields are
+provided which can derive their choices from a ``QuerySet``, and which
+place one or more model objects into the ``cleaned_data`` dictionary
+of forms in which they're used. Both of these fields have an
+additional required argument:
+
+``queryset``
+    A ``QuerySet`` of model objects from which the choices for the
+    field will be derived, and which will be used to validate the
+    user's selection.
+
+``ModelChoiceField``
+~~~~~~~~~~~~~~~~~~~~
+
+Allows the selection of a single model object, suitable for representing a
+foreign key. The method receives an object as an argument and must return a
+string to represent it.
+
+The labels for the choice field call the ``__unicode__`` method of the model to
+generate string representations. To provide custom labels, subclass ``ModelChoiceField`` and override ``label_for_model``::
+
+    class MyModelChoiceField(ModelChoiceField):
+        def label_from_instance(self, obj):
+            return "My Object #%i" % obj.id
+
+``ModelMultipleChoiceField``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Allows the selection of one or more model objects, suitable for representing a
+many-to-many relation. As with ``ModelChoiceField``, you can use
+``label_from_instance`` to customize the object labels.
+
 Creating custom fields
 ----------------------
 
@@ -1572,9 +1640,9 @@ The three types of cleaning methods are:
 
 These methods are run in the order given above, one field at a time.  That is,
 for each field in the form (in the order they are declared in the form
-definition), the ``Field.clean()`` method (or it's override) is run, then
+definition), the ``Field.clean()`` method (or its override) is run, then
 ``clean_<fieldname>()``. Finally, once those two methods are run for every
-field, the ``Form.clean()`` method, or it's override, is executed.
+field, the ``Form.clean()`` method, or its override, is executed.
 
 As mentioned above, any of these methods can raise a ``ValidationError``. For
 any field, if the ``Field.clean()`` method raises a ``ValidationError``, any
@@ -1696,7 +1764,7 @@ For example, take the following simple form::
         comment = forms.CharField()
 
 This form will include three default TextInput widgets, with default rendering -
-no CSS class, no extra attributes. This means that the inputs boxes provided for
+no CSS class, no extra attributes. This means that the input boxes provided for
 each widget will be rendered exactly the same::
 
     >>> f = CommentForm(auto_id=False)
