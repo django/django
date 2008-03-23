@@ -751,6 +751,19 @@ In addition to ``extra_context``, the template's context will be:
 
 If the results are paginated, the context will contain these extra variables:
 
+    * **New in Django development version:** ``paginator``: An instance of
+      ``django.core.paginator.Paginator``.
+
+    * **New in Django development version:** ``page_obj``: An instance of
+      ``django.core.paginator.Page``.
+
+In older versions of Django, before ``paginator`` and ``page_obj`` were added
+to this template's context, the template included several other variables
+related to pagination. Note that you should *NOT* use these variables anymore;
+use ``paginator`` and ``page_obj`` instead, because they let you do everything
+these old variables let you do (and more!). But for legacy installations,
+here's a list of those old template variables:
+
     * ``results_per_page``: The number of objects per page. (Same as the
       ``paginate_by`` parameter.)
 
@@ -777,8 +790,8 @@ If the results are paginated, the context will contain these extra variables:
     * ``hits``: The total number of objects across *all* pages, not just this
       page.
 
-    * **New in Django development version:** ``page_range``: A list of the 
-      page numbers that are available. This is 1-based.
+    * ``page_range``: A list of the page numbers that are available. This is
+      1-based.
 
 Notes on pagination
 ~~~~~~~~~~~~~~~~~~~

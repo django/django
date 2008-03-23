@@ -37,7 +37,9 @@ Optional Fcgi settings: (setting=value)
   maxchildren=NUMBER   hard limit number of processes / threads
   daemonize=BOOL       whether to detach from terminal.
   pidfile=FILE         write the spawned process-id to this file.
-  workdir=DIRECTORY    change to this directory when daemonizing
+  workdir=DIRECTORY    change to this directory when daemonizing.
+  outlog=FILE          write stdout to this file.
+  errlog=FILE          write stderr to this file.
 
 Examples:
   Run a "standard" fastcgi process on a file-descriptor
@@ -69,6 +71,8 @@ FASTCGI_OPTIONS = {
     'minspare': 2,
     'maxchildren': 50,
     'maxrequests': 0,
+    'outlog': None,
+    'errlog': None,
 }
 
 def fastcgi_help(message=None):
@@ -150,9 +154,15 @@ def runfastcgi(argset=[], **kwargs):
         else:
             return fastcgi_help("ERROR: Invalid option for daemonize parameter.")
 
+    daemon_kwargs = {}
+    if options['outlog']:
+        daemon_kwargs['out_log'] = options['outlog']
+    if options['errlog']:
+        daemon_kwargs['err_log'] = options['errlog']
+
     if daemonize:
         from django.utils.daemonize import become_daemon
-        become_daemon(our_home_dir=options["workdir"])
+        become_daemon(our_home_dir=options["workdir"], **daemon_kwargs)
 
     if options["pidfile"]:
         fp = open(options["pidfile"], "w")

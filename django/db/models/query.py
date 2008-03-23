@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db import connection, transaction
+from django.db import connection, transaction, IntegrityError
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models import signals, loading
 from django.dispatch import dispatcher
@@ -285,11 +285,14 @@ class _QuerySet(object):
         try:
             return self.get(**kwargs), False
         except self.model.DoesNotExist:
-            params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
-            params.update(defaults)
-            obj = self.model(**params)
-            obj.save()
-            return obj, True
+            try:
+                params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
+                params.update(defaults)
+                obj = self.model(**params)
+                obj.save()
+                return obj, True
+            except IntegrityError, e:
+                return self.get(**kwargs), False
 
     def latest(self, field_name=None):
         """

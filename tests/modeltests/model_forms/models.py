@@ -234,8 +234,12 @@ We can also subclass the Meta inner class to change the fields list.
 >>> f = CategoryForm({'name': 'Entertainment', 'slug': 'entertainment', 'url': 'entertainment'})
 >>> f.is_valid()
 True
->>> f.cleaned_data
-{'url': u'entertainment', 'name': u'Entertainment', 'slug': u'entertainment'}
+>>> f.cleaned_data['url']
+u'entertainment'
+>>> f.cleaned_data['name']
+u'Entertainment'
+>>> f.cleaned_data['slug']
+u'entertainment'
 >>> obj = f.save()
 >>> obj
 <Category: Entertainment>
@@ -245,8 +249,12 @@ True
 >>> f = CategoryForm({'name': "It's a test", 'slug': 'its-test', 'url': 'test'})
 >>> f.is_valid()
 True
->>> f.cleaned_data
-{'url': u'test', 'name': u"It's a test", 'slug': u'its-test'}
+>>> f.cleaned_data['url']
+u'test'
+>>> f.cleaned_data['name']
+u"It's a test"
+>>> f.cleaned_data['slug']
+u'its-test'
 >>> obj = f.save()
 >>> obj
 <Category: It's a test>
@@ -259,8 +267,12 @@ save() on the resulting model instance.
 >>> f = CategoryForm({'name': 'Third test', 'slug': 'third-test', 'url': 'third'})
 >>> f.is_valid()
 True
->>> f.cleaned_data
-{'url': u'third', 'name': u'Third test', 'slug': u'third-test'}
+>>> f.cleaned_data['url']
+u'third'
+>>> f.cleaned_data['name']
+u'Third test'
+>>> f.cleaned_data['slug']
+u'third-test'
 >>> obj = f.save(commit=False)
 >>> obj
 <Category: Third test>
@@ -272,8 +284,10 @@ True
 
 If you call save() with invalid data, you'll get a ValueError.
 >>> f = CategoryForm({'name': '', 'slug': '', 'url': 'foo'})
->>> f.errors
-{'name': [u'This field is required.'], 'slug': [u'This field is required.']}
+>>> f.errors['name']
+[u'This field is required.']
+>>> f.errors['slug']
+[u'This field is required.']
 >>> f.cleaned_data
 Traceback (most recent call last):
 ...
@@ -645,6 +659,19 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
 
+# check that we can safely iterate choices repeatedly
+>>> gen_one = list(f.choices)
+>>> gen_two = f.choices
+>>> gen_one[2]
+(2L, u"It's a test")
+>>> list(gen_two)
+[(u'', u'---------'), (1L, u'Entertainment'), (2L, u"It's a test"), (3L, u'Third')]
+
+# check that we can override the label_from_instance method to print custom labels (#4620)
+>>> f.queryset = Category.objects.all()
+>>> f.label_from_instance = lambda obj: "category " + str(obj)
+>>> list(f.choices)
+[(u'', u'---------'), (1L, 'category Entertainment'), (2L, "category It's a test"), (3L, 'category Third'), (4L, 'category Fourth')]
 
 # ModelMultipleChoiceField ####################################################
 
@@ -730,6 +757,10 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 4 is not one of the available choices.']
 
+>>> f.queryset = Category.objects.all()
+>>> f.label_from_instance = lambda obj: "multicategory " + str(obj)
+>>> list(f.choices)
+[(1L, 'multicategory Entertainment'), (2L, "multicategory It's a test"), (3L, 'multicategory Third'), (4L, 'multicategory Fourth')]
 
 # PhoneNumberField ############################################################
 
@@ -739,8 +770,10 @@ ValidationError: [u'Select a valid choice. 4 is not one of the available choices
 >>> f = PhoneNumberForm({'phone': '(312) 555-1212', 'description': 'Assistance'})
 >>> f.is_valid()
 True
->>> f.cleaned_data
-{'phone': u'312-555-1212', 'description': u'Assistance'}
+>>> f.cleaned_data['phone']
+u'312-555-1212'
+>>> f.cleaned_data['description']
+u'Assistance'
 
 # FileField ###################################################################
 
@@ -766,7 +799,7 @@ True
 <class 'django.newforms.fields.UploadedFile'>
 >>> instance = f.save()
 >>> instance.file
-u'.../test1.txt'
+u'...test1.txt'
 
 # Edit an instance that already has the file defined in the model. This will not
 # save the file again, but leave it exactly as it is.
@@ -775,10 +808,10 @@ u'.../test1.txt'
 >>> f.is_valid()
 True
 >>> f.cleaned_data['file']
-u'.../test1.txt'
+u'...test1.txt'
 >>> instance = f.save()
 >>> instance.file
-u'.../test1.txt'
+u'...test1.txt'
 
 # Delete the current file since this is not done by Django.
 
@@ -791,7 +824,7 @@ u'.../test1.txt'
 True
 >>> instance = f.save()
 >>> instance.file
-u'.../test2.txt'
+u'...test2.txt'
 
 >>> instance.delete()
 
@@ -810,7 +843,7 @@ True
 True
 >>> instance = f.save()
 >>> instance.file
-u'.../test3.txt'
+u'...test3.txt'
 >>> instance.delete()
 
 # ImageField ###################################################################
@@ -832,7 +865,7 @@ True
 <class 'django.newforms.fields.UploadedFile'>
 >>> instance = f.save()
 >>> instance.image
-u'.../test.png'
+u'...test.png'
 
 # Edit an instance that already has the image defined in the model. This will not
 # save the image again, but leave it exactly as it is.
@@ -841,10 +874,10 @@ u'.../test.png'
 >>> f.is_valid()
 True
 >>> f.cleaned_data['image']
-u'.../test.png'
+u'...test.png'
 >>> instance = f.save()
 >>> instance.image
-u'.../test.png'
+u'...test.png'
 
 # Delete the current image since this is not done by Django.
 
@@ -857,7 +890,7 @@ u'.../test.png'
 True
 >>> instance = f.save()
 >>> instance.image
-u'.../test2.png'
+u'...test2.png'
 
 >>> instance.delete()
 
@@ -876,7 +909,7 @@ True
 True
 >>> instance = f.save()
 >>> instance.image
-u'.../test3.png'
+u'...test3.png'
 >>> instance.delete()
 
 """}

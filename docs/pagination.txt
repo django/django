@@ -1,0 +1,133 @@
+==========
+Pagination
+==========
+
+**New in Django development version**
+
+Django provides a few classes that help you manage paginated data -- that is,
+data that's split across several pages, with "Previous/Next" links. These
+classes live in the module ``django/core/paginator.py``.
+
+Example
+=======
+
+Give ``Paginator`` a list of objects, plus the number of items you'd like to
+have on each page, and it gives you methods for accessing the items for each
+page::
+
+    >>> from django.core.paginator import Paginator
+    >>> objects = ['john', 'paul', 'george', 'ringo']
+    >>> p = Paginator(objects, 2)
+
+    >>> p.count
+    4
+    >>> p.num_pages
+    2
+    >>> p.page_range
+    [1, 2]
+
+    >>> page1 = p.page(1)
+    >>> page1
+    <Page 1 of 2>
+    >>> page1.object_list
+    ['john', 'paul']
+
+    >>> page2 = p.page(2)
+    >>> page2.object_list
+    ['george', 'ringo']
+    >>> page2.has_next()
+    False
+    >>> page2.has_previous()
+    True
+    >>> page2.has_other_pages()
+    True
+    >>> page2.next_page_number()
+    3
+    >>> page2.previous_page_number()
+    1
+    >>> page2.start_index() # The 1-based index of the first item on this page
+    3
+    >>> page2.end_index() # The 1-based index of the last item on this page
+    4
+
+    >>> p.page(0)
+    Traceback (most recent call last):
+    ...
+    InvalidPage
+    >>> p.page(3)
+    Traceback (most recent call last):
+    ...
+    InvalidPage
+
+``Paginator`` objects
+=====================
+
+Methods
+-------
+
+``page(number)`` -- Returns a ``Page`` object with the given 1-based index.
+Raises ``InvalidPage`` if the given page number doesn't exist.
+
+Attributes
+----------
+
+``count`` -- The total number of objects, across all pages.
+
+``num_pages`` -- The total number of pages.
+
+``page_range`` -- A 1-based range of page numbers, e.g., ``[1, 2, 3, 4]``.
+
+``Page`` objects
+================
+
+Methods
+-------
+
+``has_next()`` -- Returns ``True`` if there's a next page.
+
+``has_previous()`` -- Returns ``True`` if there's a previous page.
+
+``has_other_pages()`` -- Returns ``True`` if there's a next *or* previous page.
+
+``next_page_number()`` -- Returns the next page number. Note that this is
+"dumb" and will return the next page number regardless of whether a subsequent
+page exists.
+
+``previous_page_number()`` -- Returns the previous page number. Note that this
+is "dumb" and will return the previous page number regardless of whether a
+previous page exists.
+
+``start_index()`` -- Returns the 1-based index of the first object on the page,
+relative to all of the objects in the paginator's list. For example, when
+paginating a list of 5 objects with 2 objects per page, the second page's
+``start_index()`` would return ``3``.
+
+``end_index()`` -- Returns the 1-based index of the last object on the page,
+relative to all of the objects in the paginator's list. For example, when
+paginating a list of 5 objects with 2 objects per page, the second page's
+``end_index()`` would return ``4``.
+
+Attributes
+----------
+
+``object_list`` -- The list of objects on this page.
+
+``number`` -- The 1-based page number for this page.
+
+``paginator`` -- The associated ``Paginator`` object.
+
+``QuerySetPaginator`` objects
+=============================
+
+Use ``QuerySetPaginator`` instead of ``Paginator`` if you're paginating across
+a ``QuerySet`` from Django's database API. This is slightly more efficient, and
+there are no API differences between the two classes.
+
+The legacy ``ObjectPaginator`` class
+====================================
+
+The ``Paginator`` and ``Page`` classes are new in the Django development
+version, as of revision 7306. In previous versions, Django provided an
+``ObjectPaginator`` class that offered similar functionality but wasn't as
+convenient. This class still exists, for backwards compatibility, but Django
+now issues a ``DeprecationWarning`` if you try to use it.
