@@ -277,7 +277,7 @@ class ModelForm(BaseModelForm):
     __metaclass__ = ModelFormMetaclass
 
 # XXX: This API *will* change. Use at your own risk.
-def _modelform_factory(model, form=BaseForm, fields=None, exclude=None,
+def _modelform_factory(model, form=ModelForm, fields=None, exclude=None,
                        formfield_callback=lambda f: f.formfield()):
     # HACK: we should be able to construct a ModelForm without creating
     # and passing in a temporary inner class
@@ -287,7 +287,7 @@ def _modelform_factory(model, form=BaseForm, fields=None, exclude=None,
     setattr(Meta, 'fields', fields)
     setattr(Meta, 'exclude', exclude)
     class_name = model.__name__ + 'Form'
-    return ModelFormMetaclass(class_name, (ModelForm,), {'Meta': Meta},
+    return ModelFormMetaclass(class_name, (form,), {'Meta': Meta},
                               formfield_callback=formfield_callback)
 
 
@@ -360,7 +360,7 @@ class BaseModelFormSet(BaseFormSet):
         super(BaseModelFormSet, self).add_fields(form, index)
 
 # XXX: Use at your own risk. This API *will* change.
-def _modelformset_factory(model, form=BaseModelForm, formfield_callback=lambda f: f.formfield(),
+def _modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.formfield(),
                           formset=BaseModelFormSet,
                           extra=1, can_delete=False, can_order=False,
                           fields=None, exclude=None):
@@ -427,7 +427,7 @@ def _get_foreign_key(parent_model, model, fk_name=None):
 
 
 # XXX: This API *will* change. Use at your own risk.
-def _inlineformset_factory(parent_model, model, form=BaseModelForm, fk_name=None,
+def _inlineformset_factory(parent_model, model, form=ModelForm, fk_name=None,
                            fields=None, exclude=None,
                            extra=3, can_order=False, can_delete=True,
                            formfield_callback=lambda f: f.formfield()):

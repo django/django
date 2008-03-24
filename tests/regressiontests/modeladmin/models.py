@@ -4,6 +4,7 @@ from django.db import models
 class Band(models.Model):
     name = models.CharField(max_length=100)
     bio = models.TextField()
+    sign_date = models.DateField()
 
 
 __test__ = {'API_TESTS': """
@@ -26,7 +27,7 @@ for testing.
 >>> ma = ModelAdmin(Band, site)
 
 >>> ma.get_form(request).base_fields.keys()
-['name', 'bio']
+['name', 'bio', 'sign_date']
 
 
 # form/fields/fieldsets interaction ##########################################
@@ -40,9 +41,9 @@ no fields argument, and no fieldsets argument.
 
 >>> ma = ModelAdmin(Band, site)
 >>> ma.get_fieldsets(request)
-[(None, {'fields': ['name', 'bio']})]
+[(None, {'fields': ['name', 'bio', 'sign_date']})]
 >>> ma.get_fieldsets(request, band)
-[(None, {'fields': ['name', 'bio']})]
+[(None, {'fields': ['name', 'bio', 'sign_date']})]
 
 
 If we specify the fields argument, fieldsets_add and fielsets_change should
@@ -85,7 +86,24 @@ displayed because you forgot to add it to fields/fielsets
 ['name']
 
 
+If we specify a form, it should use it allowing custom validation to work
+properly. This won't, however, break any of the admin widgets or media.
 
+>>> from django import newforms as forms
+>>> class AdminBandForm(forms.ModelForm):
+...     delete = forms.BooleanField()
+...     
+...     class Meta:
+...         model = Band
+
+>>> class BandAdmin(ModelAdmin):
+...     form = AdminBandForm
+
+>>> ma = BandAdmin(Band, site)
+>>> ma.get_form(request).base_fields.keys()
+['name', 'bio', 'sign_date', 'delete']
+>>> type(ma.get_form(request).base_fields['sign_date'].widget)
+<class 'django.contrib.admin.widgets.AdminDateWidget'>
 
 """
 }

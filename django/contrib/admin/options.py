@@ -129,6 +129,7 @@ class BaseModelAdmin(object):
     raw_id_fields = ()
     fields = None
     fieldsets = None
+    form = forms.ModelForm
     filter_vertical = ()
     filter_horizontal = ()
     prepopulated_fields = {}
@@ -308,17 +309,12 @@ class ModelAdmin(BaseModelAdmin):
         """
         Returns a Form class for use in the admin add view. This is used by
         add_view and change_view.
-        
-        Note that if you override this method, your form will *not*
-        automatically get the custom admin widgets. raw_id_fields, fields,
-        fieldsets, filter_vertical, and filter_horizonal will not apply to
-        your form. You will have manually specify those widgets.
         """
         if self.declared_fieldsets:
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
-        return _modelform_factory(self.model, fields=fields, formfield_callback=self.formfield_for_dbfield)
+        return _modelform_factory(self.model, form=self.form, fields=fields, formfield_callback=self.formfield_for_dbfield)
 
     def get_formsets(self, request, obj=None):
         for inline in self.inline_instances:
@@ -704,7 +700,7 @@ class InlineModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
-        return _inlineformset_factory(self.parent_model, self.model, fk_name=self.fk_name, fields=fields, formfield_callback=self.formfield_for_dbfield, extra=self.extra)
+        return _inlineformset_factory(self.parent_model, self.model, form=self.form, fk_name=self.fk_name, fields=fields, formfield_callback=self.formfield_for_dbfield, extra=self.extra)
 
     def get_fieldsets(self, request, obj=None):
         if self.declared_fieldsets:
