@@ -39,7 +39,7 @@ A quick rundown:
       Django; it's just good Web development practice.
     
     * ``forloop.counter`` indicates how many times the ``for`` tag has
-      gone through its loop; for more information, see `the
+      gone through its loop. For more information, see `the
       documentation for the "for" tag`_.
 
 .. _the documentation for the "for" tag: ../templates/#for

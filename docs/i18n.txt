@@ -825,14 +825,14 @@ The interpolation syntax is borrowed from Python, so the ``interpolate``
 function supports both positional and named interpolation:
 
     * Positional interpolation: ``obj`` contains a JavaScript Array object
-      whose elements values are then sequentially  interpolated in their
+      whose elements values are then sequentially interpolated in their
       corresponding ``fmt`` placeholders in the same order they appear.
       For example::
 
         fmts = ngettext('There is %s object. Remaining: %s',
                 'There are %s objects. Remaining: %s', 11);
         s = interpolate(fmts, [11, 20]);
-	// s is 'There are 11 objects. Remaining: 20'
+        // s is 'There are 11 objects. Remaining: 20'
 
     * Named interpolation: This mode is selected by passing the optional
       boolean ``named`` parameter as true. ``obj`` contains a JavaScript
@@ -844,7 +844,7 @@ function supports both positional and named interpolation:
         };
 
         fmts = ngettext('Total: %(total)s, there is %(count)s object',
-	    'there are %(count)s of a total of %(total)s objects', d.count);
+        'there are %(count)s of a total of %(total)s objects', d.count);
         s = interpolate(fmts, d, true);
 
 You shouldn't go over the top with string interpolation, though: this is still
