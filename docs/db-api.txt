@@ -1306,9 +1306,6 @@ SQL equivalents::
 Using raw strings (e.g., ``r'foo'`` instead of ``'foo'``) for passing in the
 regular expression syntax is recommended.
 
-Regular expression matching is not supported on the ``ado_mssql`` backend.
-It will raise a ``NotImplementedError`` at runtime.
-
 iregex
 ~~~~~~
 
