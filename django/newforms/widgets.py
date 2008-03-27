@@ -172,8 +172,14 @@ class Widget(object):
         # For purposes of seeing whether something has changed, None is
         # the same as an empty string, if the data or inital value we get
         # is None, replace it w/ u''.
-        data_value = data or u''
-        initial_value = initial or u''
+        if data is None:
+            data_value = u''
+        else:
+            data_value = data
+        if initial is None:
+            initial_value = u''
+        else:
+            initial_value = initial
         if force_unicode(initial_value) != force_unicode(data_value):
             return True
         return False

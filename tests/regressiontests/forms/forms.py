@@ -1717,4 +1717,25 @@ Traceback (most recent call last):
 ...
 AttributeError: 'SongForm' object has no attribute 'cleaned_data'
 
+If a field is not given in the data then None is returned for its data. Lets
+make sure that when checking for empty_permitted that None is treated
+accordingly.
+
+>>> data = {'artist': None, 'song': ''}
+>>> form = SongForm(data, empty_permitted=True)
+>>> form.is_valid()
+True
+
+However, we *really* need to be sure we are checking for None as any data in
+initial that returns False on a boolean call needs to be treated literally.
+
+>>> class PriceForm(Form):
+...     amount = FloatField()
+...     qty = IntegerField()
+
+>>> data = {'amount': '0.0', 'qty': ''}
+>>> form = PriceForm(data, initial={'amount': 0.0}, empty_permitted=True)
+>>> form.is_valid()
+True
+
 """

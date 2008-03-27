@@ -254,7 +254,6 @@ class BaseForm(StrAndUnicode):
             data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
             initial_value = self.initial.get(name, field.initial)
             if field.widget._has_changed(initial_value, data_value):
-                #print field
                 return True
         return False
 
