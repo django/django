@@ -40,7 +40,7 @@ copyright = '2008, Django Software Foundation'
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '$Revision$'.split()[1]
+version = 'SVN'
 # The full version, including alpha/beta/rc tags.
 release = version
 
