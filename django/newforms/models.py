@@ -14,6 +14,7 @@ from util import ValidationError, ErrorList
 from forms import BaseForm, get_declared_fields
 from fields import Field, ChoiceField, IntegerField, EMPTY_VALUES
 from widgets import Select, SelectMultiple, HiddenInput, MultipleHiddenInput
+from widgets import media_property
 from formsets import BaseFormSet, _formset_factory, DELETION_FIELD_NAME
 
 __all__ = (
@@ -226,6 +227,8 @@ class ModelFormMetaclass(type):
                     attrs)
 
         new_class = type.__new__(cls, name, bases, attrs)
+        if 'media' not in attrs:
+            new_class.media = media_property(new_class)
         declared_fields = get_declared_fields(bases, attrs, False)
         opts = new_class._meta = ModelFormOptions(getattr(new_class, 'Meta', None))
         if opts.model:
