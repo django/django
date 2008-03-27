@@ -45,7 +45,7 @@
           {% endfor %}
         {% endfor %}
                 
-        {% if inline_admin_formset.formset.can_delete %}<td class="delete">{{ inline_admin_form.deletion_field.field }}</td>{% endif %}
+        {% if inline_admin_formset.formset.can_delete %}<td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>{% endif %}
         
         </tr>
 
