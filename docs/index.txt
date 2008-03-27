@@ -1,0 +1,128 @@
+====================
+Django Documentation
+====================
+
+The essential documentation
+===========================
+
+If you're new to Django, make sure to read the following documentation in
+order.. The rest (in the "reference" section below) can be ready in any order as
+you need various functionality.
+
+.. toctree::
+   :maxdepth: 1
+   
+   overview
+   install
+   tutorial01
+   tutorial02
+   tutorial03
+   tutorial04
+   faq
+   documentation
+   
+Reference
+=========
+
+.. toctree::
+   :maxdepth: 1
+   
+   django-admin
+   model-api
+   db-api
+   transactions
+   templates
+   templates_python
+   newforms
+   modelforms
+   testing
+   sessions
+   cache
+   settings
+   url_dispatch
+   request_response
+   generic_views
+   authentication
+   shortcuts
+   unicode
+   pagination
+   serialization
+   i18n
+   middleware
+   custom_model_fields
+   databases
+   
+``django.contrib`` add-ons
+--------------------------
+
+.. toctree::
+   :maxdepth: 1
+   
+   add_ons
+   contenttypes
+   csrf
+   databrowse
+   flatpages
+   form_preview
+   form_wizard
+   localflavor
+   redirects
+   sites
+   sitemaps
+   syndication_feeds
+   webdesign
+   
+Deployment
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   modpython
+   fastcgi
+    
+Solving specific problems
+-------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   apache_auth
+   static_files
+   email
+   legacy_databases
+   outputting_pdf
+   outputting_csv
+    
+Et cetera
+---------
+
+.. toctree::
+   :maxdepth: 1
+
+   design_philosophies
+   contributing
+   admin_css
+   api_stability
+
+Release notes
+-------------
+
+.. toctree::
+   :maxdepth: 1
+
+   release_notes_0.96
+   release_notes_0.95
+
+Also see the list of `backwards-incompatible changes`__ for changes made between
+releases.
+
+__ http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
