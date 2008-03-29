@@ -37,7 +37,7 @@ A quick rundown:
       form will alter data server-side. Whenever you create a form that alters
       data server-side, use ``method="post"``. This tip isn't specific to
       Django; it's just good Web development practice.
-    
+
     * ``forloop.counter`` indicates how many times the ``for`` tag has
       gone through its loop. For more information, see `the
       documentation for the "for" tag`_.
@@ -247,8 +247,8 @@ template. Note that we use ``dict()`` to return an altered dictionary in place.
     which is "lazy" and doesn't hit your database until it absolutely has to. By
     the time the database query happens, the ``object_detail`` generic view will
     have narrowed its scope down to a single object, so the eventual query will
-    only select one row from the database. 
-    
+    only select one row from the database.
+
     If you'd like to know more about how that works, The Django database API
     documentation `explains the lazy nature of QuerySet objects`_.
 
@@ -266,9 +266,8 @@ from ``polls/views.py``. We don't need them anymore -- they have been replaced
 by generic views.
 
 The ``vote()`` view is still required. However, it must be modified to match
-the new templates and context variables. Change the template call from
-``polls/detail.html`` to ``polls/poll_detail.html``, and pass ``object`` in the
-context instead of ``poll``.
+the new context variables. In the ``render_to_repsonse()`` call, rename the
+``poll`` context variable to ``object``.
 
 The last thing to do is fix the URL handling to account for the use of generic
 views. In the vote view above, we used the ``reverse()`` function to avoid
@@ -276,7 +275,7 @@ hard-coding our URLs. Now that we've switched to a generic view, we'll need to
 change the ``reverse()`` call to point back to our new generic view. We can't
 simply use the view function anymore -- generic views can be (and are) used
 multiple times -- but we can use the name we've given::
-    
+
     return HttpResponseRedirect(reverse('poll_results', args=(p.id,)))
 
 Run the server, and use your new polling app based on generic views.
