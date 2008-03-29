@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-02-15 01:00+0200\n"
-"PO-Revision-Date: 2008-03-28 23:52+0100\n"
+"PO-Revision-Date: 2008-03-29 01:37+0100\n"
 "Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
 "Language-Team: Catalan <ca@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgstr "Bengalí"
 
 #: conf/global_settings.py:41
 msgid "Bulgarian"
-msgstr "Bulgar"
+msgstr "Búlgar"
 
 #: conf/global_settings.py:42
 msgid "Catalan"
@@ -80,13 +80,12 @@ msgid "French"
 msgstr "Francès"
 
 #: conf/global_settings.py:55
-#, fuzzy
 msgid "Irish"
-msgstr "Turc"
+msgstr "Irlandès"
 
 #: conf/global_settings.py:56
 msgid "Galician"
-msgstr "Galleg"
+msgstr "Gallec"
 
 #: conf/global_settings.py:57
 msgid "Hungarian"
@@ -113,9 +112,8 @@ msgid "Japanese"
 msgstr "Japonès"
 
 #: conf/global_settings.py:63
-#, fuzzy
 msgid "Georgian"
-msgstr "Alemany"
+msgstr "Georgià"
 
 #: conf/global_settings.py:64
 msgid "Korean"
@@ -289,7 +287,7 @@ msgstr "No s'ha pogut trobar la pàgina"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Ho sentim, però no s'ha pogut trobar la pàgina solicitada"
+msgstr "Ho sentim, però no s'ha pogut trobar la pàgina sol·licitada"
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/base.html:37
@@ -325,8 +323,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Hi ha hagut un error. S'ha informat als administradors del lloc per correu "
-"electrònic y hauria d'arreglar-se en breu. Gràcies per la seva paciència."
+"Ha ocorregut un error. S'ha informat als administradors del lloc per correu "
+"electrònic y hauria d'arreglar-se en breu. Gràcies per la vostra paciència."
 
 #: contrib/admin/templates/admin/base.html:26
 msgid "Welcome,"
@@ -354,7 +352,7 @@ msgstr "Lloc administratiu de Django"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr "Adminisitració de Django"
+msgstr "Administració de Django"
 
 #: contrib/admin/templates/admin/change_form.html:14
 #: contrib/admin/templates/admin/index.html:28
@@ -374,8 +372,8 @@ msgstr "Veure en el lloc"
 #: contrib/admin/templates/admin/auth/user/change_password.html:23
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "Si us plau, corregeixi l'error mostrat abaix."
-msgstr[1] "Si us plau, corregeixi els errors mostrats abaix."
+msgstr[0] "Si us plau, corregiu l'error mostrat a baix."
+msgstr[1] "Si us plau, corregiu els errors mostrats a baix."
 
 #: contrib/admin/templates/admin/change_form.html:49
 msgid "Ordering"
@@ -403,7 +401,7 @@ msgid ""
 "following types of objects:"
 msgstr ""
 "Eliminar el/la %(object_name)s '%(escaped_object)s' provocaria l'eliminació "
-"d'objectes relacionats, però el seu compte no te permisos per a esborrar els "
+"d'objectes relacionats, però el vostre compte no te permissos per a esborrar els "
 "tipus d'objecte següents:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:20
@@ -431,7 +429,7 @@ msgstr "Filtre"
 #: contrib/admin/templates/admin/index.html:17
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr "Models disponibles en la aplicació %(name)s."
+msgstr "Models disponibles en l'aplicació %(name)s."
 
 #: contrib/admin/templates/admin/index.html:18
 #, python-format
@@ -444,7 +442,7 @@ msgstr "Modificar"
 
 #: contrib/admin/templates/admin/index.html:44
 msgid "You don't have permission to edit anything."
-msgstr "No té permís per editar res."
+msgstr "No teniu permís per editar res."
 
 #: contrib/admin/templates/admin/index.html:52
 msgid "Recent Actions"
@@ -464,8 +462,8 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Alguna cosa està malament en la instal·lació de la teva base de dades. "
-"Assegurat de que s'han creat les taules, i de que la base de dades és "
+"Alguna cosa està malament en la instal·lació de la vostra base de dades. "
+"Assegureu-vos de que s'han creat les taules, i de que la base de dades és "
 "llegible per l'usuari apropiat."
 
 #: contrib/admin/templates/admin/login.html:17
@@ -505,7 +503,7 @@ msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
-"Aquest objecte no te historial de canvis. Probablement no va ser afegit "
+"Aquest objecte no té historial de canvis. Probablement no va ser afegit "
 "utilitzant aquest lloc administratiu."
 
 #: contrib/admin/templates/admin/pagination.html:10
@@ -550,7 +548,7 @@ msgid ""
 "options."
 msgstr ""
 "Primer, entri un usuari i una contrasenya. Després podrà editar més opcions "
-"del usuari."
+"de l'usuari."
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:12
 msgid "Username"
@@ -569,12 +567,12 @@ msgstr "Contrasenya (de nou)"
 #: contrib/admin/templates/admin/auth/user/add_form.html:24
 #: contrib/admin/templates/admin/auth/user/change_password.html:39
 msgid "Enter the same password as above, for verification."
-msgstr "Introdueixi la mateixa contrasenya que a sobre, per a verificació."
+msgstr "Introduïu la mateixa contrasenya de dalt, per fer-ne la verificació."
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:27
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Introdueixi una contrasenya per l'usuari <strong>%(username)s</strong>"
+msgstr "Introduïu una contrasenya per l'usuari <strong>%(username)s</strong>"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
@@ -595,7 +593,7 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Per a instalar 'bookmarklets', arrosegui l'enllaç a la "
+"<p class=\"help\">Per a instal·lar 'bookmarklets', arrosegui l'enllaç a la "
 "seva barra de\n"
 "marcadors, o faci click amb el botò dret en l'enllaç i afegeixi'l als "
 "marcadors.\n"
@@ -648,7 +646,7 @@ msgstr "Com abans, però obre la pàgina d'administració en una nova finestra."
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Gràcies per emprar algun temps de cualitat amb el lloc web avui."
+msgstr "Gràcies per destinar el vostre temps en el web durant el dia d'avui."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
@@ -664,7 +662,7 @@ msgstr "Canvi de clau"
 #: contrib/admin/templates/registration/password_change_done.html:5
 #: contrib/admin/templates/registration/password_change_done.html:9
 msgid "Password change successful"
-msgstr "Canvi de clau exitò"
+msgstr "Canvi de clau exitòs"
 
 #: contrib/admin/templates/registration/password_change_done.html:11
 msgid "Your password was changed."
@@ -676,7 +674,7 @@ msgid ""
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "Si us plau, introdueixi la seva contrasenya antiga, per seguretat, i tot "
-"seguit introdueixi la seva nova contrasenya dues vegades per verificar que "
+"seguit introdueixi la seva contrasenya nova dues vegades per verificar que "
 "l'ha escrit correctament."
 
 #: contrib/admin/templates/registration/password_change_form.html:16
@@ -705,7 +703,7 @@ msgstr "Restablir contrasenya"
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "Contrasenya restaber-ta amb èxit"
+msgstr "Restabliment de contrasenya exitòs"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
 msgid ""
@@ -754,7 +752,7 @@ msgid ""
 "your password and e-mail the new one to you."
 msgstr ""
 "Ha oblidat la seva contrasenya? Introdueixi la seva adreça de correu "
-"electrònic i crearem una nova que li enviarem per correu."
+"electrònic i en crearem una de nova que li enviarem per correu."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -800,7 +798,7 @@ msgstr "Afegir usuari"
 
 #: contrib/admin/views/auth.py:58
 msgid "Password changed successfully."
-msgstr "Canvi de clau exitós"
+msgstr "Clau cambiada exitosament"
 
 #: contrib/admin/views/auth.py:65
 #, python-format
@@ -860,7 +858,7 @@ msgstr "vista:"
 #: contrib/admin/views/doc.py:166
 #, python-format
 msgid "App %r not found"
-msgstr "La aplicació %r no s'ha pogut trobar"
+msgstr "No s'ha pogut trobar l'aplicació %r"
 
 #: contrib/admin/views/doc.py:173
 #, python-format
@@ -870,7 +868,7 @@ msgstr "El model %(name)r no s'ha trobat en la aplicació %(label)r"
 #: contrib/admin/views/doc.py:185
 #, python-format
 msgid "the related `%(label)s.%(type)s` object"
-msgstr "el objecte relacionat `%(label)s.%(type)s`"
+msgstr "l'objecte relacionat `%(label)s.%(type)s`"
 
 #: contrib/admin/views/doc.py:185 contrib/admin/views/doc.py:207
 #: contrib/admin/views/doc.py:221 contrib/admin/views/doc.py:226
@@ -975,7 +973,7 @@ msgstr "Estat dels E.U.A. (dos lletres majúscules)"
 
 #: contrib/admin/views/doc.py:320
 msgid "XML text"
-msgstr "Texte XML"
+msgstr "Text XML"
 
 #: contrib/admin/views/doc.py:346
 #, python-format
@@ -1024,14 +1022,14 @@ msgstr "Cap camp canviat."
 #: contrib/admin/views/main.py:354
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "S'ha modificat amb èxist el/la %(name)s \"%(obj)s."
+msgstr "S'ha modificat exitosament el/la %(name)s \"%(obj)s."
 
 #: contrib/admin/views/main.py:362
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
-"S'ha agregat amb èxit el/la %(name)s \"%(obj)s\". Pot editar-lo de nou abaix."
+"S'ha agregat exitosament el/la %(name)s \"%(obj)s\". Pot editar-lo de nou abaix."
 
 #: contrib/admin/views/main.py:400
 #, python-format
@@ -1055,7 +1053,7 @@ msgstr "El/la %(name)s \"%(obj)s\".ha estat eliminat amb èxit."
 
 #: contrib/admin/views/main.py:527
 msgid "Are you sure?"
-msgstr "Està segur?"
+msgstr "Esteu segurs?"
 
 #: contrib/admin/views/main.py:549
 #, python-format
@@ -1151,7 +1149,7 @@ msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
 msgstr ""
-"Requerit. 30 o menys caracters. Només caracters alfanumèrics (lletres, "
+"Obligatori. 30 o menys caracters. Només caracters alfanumèrics (lletres, "
 "dígits i guions baixos)."
 
 #: contrib/auth/models.py:132
@@ -1196,7 +1194,7 @@ msgid ""
 "instead of deleting accounts."
 msgstr ""
 "Designa si aquest usuari pot iniciar sessió a la interfície administrativa "
-"Djano. Deselecciona-ho enlloc de esborrar comptes d'usuari."
+"Djano. Deseleccioni-ho enlloc d'esborrar comptes d'usuari."
 
 #: contrib/auth/models.py:138
 msgid "superuser status"
@@ -1207,7 +1205,7 @@ msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"Designa que aquest usuari té tots els permisos sense assignar-los "
+"Designa que aquest usuari té tots els permissos sense assignar-los "
 "explícitament."
 
 #: contrib/auth/models.py:139
@@ -1240,7 +1238,7 @@ msgstr "usuaris"
 
 #: contrib/auth/models.py:154
 msgid "Personal info"
-msgstr "Informaciò personal"
+msgstr "Informació personal"
 
 #: contrib/auth/models.py:155
 msgid "Permissions"
@@ -1451,7 +1449,7 @@ msgstr "Qualificacions"
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Required"
-msgstr "Requerit"
+msgstr "Obligatori"
 
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
@@ -1494,12 +1492,12 @@ msgid_plural ""
 "\n"
 "%(text)s"
 msgstr[0] ""
-"Aquest comentari ha estat publicat per un usuari que ha publicat menys de %"
+"Aquest comentari va ser enviat per un usuari que ha enviat menys de %"
 "(count)s comentari:\n"
 "\n"
 "%(text)s"
 msgstr[1] ""
-"Aquest comentari ha estat publicat per un usuari que ha publicat menys de %"
+"Aquest comentari va ser enviat per un usuari que ha enviat menys de %"
 "(count)s comentaris:\n"
 "\n"
 "%(text)s"
@@ -1518,12 +1516,12 @@ msgstr ""
 #: contrib/comments/views/comments.py:190
 #: contrib/comments/views/comments.py:283
 msgid "Only POSTs are allowed"
-msgstr "Només s'admed POST"
+msgstr "Només s'admet POST"
 
 #: contrib/comments/views/comments.py:194
 #: contrib/comments/views/comments.py:287
 msgid "One or more of the required fields wasn't submitted"
-msgstr "Un o més dels caps requerits no ha estat sotmès"
+msgstr "Un o més dels caps obligatoris no ha estat sotmès"
 
 #: contrib/comments/views/comments.py:198
 #: contrib/comments/views/comments.py:289
@@ -1579,7 +1577,7 @@ msgstr ""
 
 #: contrib/flatpages/models.py:9
 msgid "title"
-msgstr "tìtol"
+msgstr "títol"
 
 #: contrib/flatpages/models.py:10
 msgid "content"
@@ -1598,12 +1596,12 @@ msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
 msgstr ""
-"Exemple: 'flatpages/contact_page.html'. Si no el proporciona, el sistema "
-"utilitzarà 'flatpages/defaula.htmlt'."
+"Exemple: 'flatpages/contact_page.html'. Si no es proporciona, el sistema "
+"utilitzarà 'flatpages/default.htmlt'."
 
 #: contrib/flatpages/models.py:14
 msgid "registration required"
-msgstr "s'ha de estar registrat"
+msgstr "cal estar registrat"
 
 #: contrib/flatpages/models.py:14
 msgid "If this is checked, only logged-in users will be able to view the page."
@@ -1668,7 +1666,7 @@ msgstr "tres"
 
 #: contrib/humanize/templatetags/humanize.py:73
 msgid "four"
-msgstr "cuatre"
+msgstr "quatre"
 
 #: contrib/humanize/templatetags/humanize.py:73
 msgid "five"
@@ -1710,11 +1708,11 @@ msgstr "Introdueixi un codi postal en el format NNNN o ANNNNAAA."
 #: contrib/localflavor/br/forms.py:135 contrib/localflavor/pe/forms.py:23
 #: contrib/localflavor/pe/forms.py:51
 msgid "This field requires only numbers."
-msgstr "Aquest camps requereix només números."
+msgstr "Aquest camp precisa només números."
 
 #: contrib/localflavor/ar/forms.py:50
 msgid "This field requires 7 or 8 digits."
-msgstr "Aquest camp requereix 7 o 8 dígits."
+msgstr "Aquest camp precisa 7 o 8 dígits."
 
 #: contrib/localflavor/ar/forms.py:79
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
@@ -1735,7 +1733,7 @@ msgstr "Introdueixi un codi zip en el format XXXXX-XXX."
 
 #: contrib/localflavor/br/forms.py:30
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "El número de telèfon ha de ser en el format XX-XXXX-XXXX."
+msgstr "El número de telèfon ha de estar en el format XX-XXXX-XXXX."
 
 #: contrib/localflavor/br/forms.py:58
 msgid ""
@@ -1751,7 +1749,7 @@ msgstr "Número CPF invàlid."
 
 #: contrib/localflavor/br/forms.py:95
 msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Aquest camp requereix com a màxim 11 dígits o 14 caracters."
+msgstr "Aquest camp precisa com a màxim 11 dígits o 14 caracters."
 
 #: contrib/localflavor/br/forms.py:134
 msgid "Invalid CNPJ number."
@@ -1759,18 +1757,17 @@ msgstr "Número CNPJ invàlid."
 
 #: contrib/localflavor/br/forms.py:136
 msgid "This field requires at least 14 digits"
-msgstr "Aquest camp requereix almenys 14 dígits."
+msgstr "Aquest camp precisa almenys 14 dígits."
 
 #: contrib/localflavor/ca/forms.py:17
 msgid "Enter a postal code in the format XXX XXX."
 msgstr "Introdueixi un codi postal en el format XXX XXX."
 
 #: contrib/localflavor/ca/forms.py:88
-#, fuzzy
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
 msgstr ""
-"Introdueixi un número vàlid de la Seguretat Social de Canadà en el format "
-"XXX-XXX-XXXX."
+"Introdueixi un número vàlid de la Assegurança Social de Canadà en el format "
+"XXX-XXX-XXX."
 
 #: contrib/localflavor/ch/ch_states.py:5
 msgid "Aargau"
@@ -1778,31 +1775,31 @@ msgstr "Argau"
 
 #: contrib/localflavor/ch/ch_states.py:6
 msgid "Appenzell Innerrhoden"
-msgstr "Appenzell Innerrhoden"
+msgstr "Appenzell Inner-Rhoden"
 
 #: contrib/localflavor/ch/ch_states.py:7
 msgid "Appenzell Ausserrhoden"
-msgstr "Appenzell Ausserrhoden"
+msgstr "Appenzell Ausser-Rhoden"
 
 #: contrib/localflavor/ch/ch_states.py:8
 msgid "Basel-Stadt"
-msgstr "Basel-Stadt"
+msgstr "Basel-Ciutat"
 
 #: contrib/localflavor/ch/ch_states.py:9
 msgid "Basel-Land"
-msgstr "Basel-Land"
+msgstr "Basel-Camp"
 
 #: contrib/localflavor/ch/ch_states.py:10
 msgid "Berne"
-msgstr "Berne"
+msgstr "Berna"
 
 #: contrib/localflavor/ch/ch_states.py:11
 msgid "Fribourg"
-msgstr "Fribourg"
+msgstr "Friburg"
 
 #: contrib/localflavor/ch/ch_states.py:12
 msgid "Geneva"
-msgstr "Geneva"
+msgstr "Ginebra"
 
 #: contrib/localflavor/ch/ch_states.py:13
 msgid "Glarus"
@@ -1818,7 +1815,7 @@ msgstr "Jura"
 
 #: contrib/localflavor/ch/ch_states.py:16
 msgid "Lucerne"
-msgstr "Lucerne"
+msgstr "Lucerna"
 
 #: contrib/localflavor/ch/ch_states.py:17
 msgid "Neuchatel"
@@ -1874,7 +1871,7 @@ msgstr "Zug"
 
 #: contrib/localflavor/ch/ch_states.py:30
 msgid "Zurich"
-msgstr "Zurich"
+msgstr "Zuric"
 
 #: contrib/localflavor/ch/forms.py:16 contrib/localflavor/no/forms.py:12
 msgid "Enter a zip code in the format XXXX."
@@ -1885,7 +1882,7 @@ msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
 "1234567890 format."
 msgstr ""
-"Introdueixi un número de identificació o de passaport Suïssos en els formats "
+"Introdueixi un número d'identificació o de passaport Suïssos en els formats "
 "1234567890 o X1234567<0."
 
 #: contrib/localflavor/cl/forms.py:29
@@ -1902,15 +1899,15 @@ msgstr "El RUT Xilè no és vàlid."
 
 #: contrib/localflavor/de/de_states.py:5
 msgid "Baden-Wuerttemberg"
-msgstr "Baden-Wuerttemberg"
+msgstr "Baden-Württemberg"
 
 #: contrib/localflavor/de/de_states.py:6
 msgid "Bavaria"
-msgstr "Bavaria"
+msgstr "Baviera"
 
 #: contrib/localflavor/de/de_states.py:7
 msgid "Berlin"
-msgstr "Berlin"
+msgstr "Berlín"
 
 #: contrib/localflavor/de/de_states.py:8
 msgid "Brandenburg"
@@ -1930,19 +1927,19 @@ msgstr "Hessen"
 
 #: contrib/localflavor/de/de_states.py:12
 msgid "Mecklenburg-Western Pomerania"
-msgstr "Mecklenburg-Western Pomerania"
+msgstr "Mecklenburg-Pomerània Occidental"
 
 #: contrib/localflavor/de/de_states.py:13
 msgid "Lower Saxony"
-msgstr "Lower Saxony"
+msgstr "Baixa Saxònia"
 
 #: contrib/localflavor/de/de_states.py:14
 msgid "North Rhine-Westphalia"
-msgstr "North Rhine-Westphalia"
+msgstr "Renània del Nord-Westfàlia"
 
 #: contrib/localflavor/de/de_states.py:15
 msgid "Rhineland-Palatinate"
-msgstr "Rhineland-Palatinate"
+msgstr "Renània-Palatinat"
 
 #: contrib/localflavor/de/de_states.py:16
 msgid "Saarland"
@@ -1950,19 +1947,19 @@ msgstr "Saarland"
 
 #: contrib/localflavor/de/de_states.py:17
 msgid "Saxony"
-msgstr "Saxony"
+msgstr "Saxònia"
 
 #: contrib/localflavor/de/de_states.py:18
 msgid "Saxony-Anhalt"
-msgstr "Saxony-Anhalt"
+msgstr "Saxònia-Anhalt"
 
 #: contrib/localflavor/de/de_states.py:19
 msgid "Schleswig-Holstein"
-msgstr "Schleswig-Holstein"
+msgstr "Slesvig-Holstein"
 
 #: contrib/localflavor/de/de_states.py:20
 msgid "Thuringia"
-msgstr "Thuringia"
+msgstr "Turíngia"
 
 #: contrib/localflavor/de/forms.py:14 contrib/localflavor/fi/forms.py:12
 #: contrib/localflavor/fr/forms.py:15
@@ -2515,11 +2512,11 @@ msgstr "Aguascalientes"
 
 #: contrib/localflavor/mx/mx_states.py:13
 msgid "Baja California"
-msgstr "Baja California"
+msgstr "Baixa California"
 
 #: contrib/localflavor/mx/mx_states.py:14
 msgid "Baja California Sur"
-msgstr "Baja California Sur"
+msgstr "Baixa California Sud"
 
 #: contrib/localflavor/mx/mx_states.py:15
 msgid "Campeche"
@@ -2543,7 +2540,7 @@ msgstr "Colima"
 
 #: contrib/localflavor/mx/mx_states.py:20
 msgid "Distrito Federal"
-msgstr "Distrito Federal"
+msgstr "Districte Federal"
 
 #: contrib/localflavor/mx/mx_states.py:21
 msgid "Durango"
@@ -2567,7 +2564,7 @@ msgstr "Jalisco"
 
 #: contrib/localflavor/mx/mx_states.py:26
 msgid "Estado de México"
-msgstr "Estado de México"
+msgstr "Estat de Mèxic"
 
 #: contrib/localflavor/mx/mx_states.py:27
 msgid "Michoacán"
@@ -2639,15 +2636,15 @@ msgstr "Zacatecas"
 
 #: contrib/localflavor/nl/forms.py:21
 msgid "Enter a valid postal code"
-msgstr "Introdueixi un codi postal vàlid."
+msgstr "Introduïu un codi postal vàlid."
 
 #: contrib/localflavor/nl/forms.py:52
 msgid "Enter a valid phone number"
-msgstr "Introdueixi un número de telèfon vàlid."
+msgstr "Introduïu un número de telèfon vàlid."
 
 #: contrib/localflavor/nl/forms.py:78
 msgid "Enter a valid SoFi number"
-msgstr "Introdueixi un número SoFi vàlid."
+msgstr "Introduïu un número SoFi vàlid."
 
 #: contrib/localflavor/nl/nl_provinces.py:4
 msgid "Drente"
@@ -2699,15 +2696,15 @@ msgstr "Zuid-Holland"
 
 #: contrib/localflavor/no/forms.py:33
 msgid "Enter a valid Norwegian social security number."
-msgstr "Introdueixi un número de la seguretat social Noruega vàlid."
+msgstr "Introduïu un número de la seguretat social Noruega vàlid."
 
 #: contrib/localflavor/pe/forms.py:24
 msgid "This field requires 8 digits."
-msgstr "Aquest camp requereix 8 dígits."
+msgstr "Aquest camp precisa 8 dígits."
 
 #: contrib/localflavor/pe/forms.py:52
 msgid "This field requires 11 digits."
-msgstr "Aquest camp requereix 11 dígits."
+msgstr "Aquest camp precisa 11 dígits."
 
 #: contrib/localflavor/pl/forms.py:39
 msgid "National Identification Number consists of 11 digits."
@@ -2737,7 +2734,7 @@ msgstr "Validació invàlida del número nacional de registre de negocis."
 
 #: contrib/localflavor/pl/forms.py:156
 msgid "Enter a postal code in the format XX-XXX."
-msgstr "Introdueixi un codi postal en el format XX-XXX."
+msgstr "Introduïu un codi postal en el format XX-XXX."
 
 #: contrib/localflavor/pl/pl_voivodeships.py:8
 msgid "Lower Silesia"
@@ -2805,7 +2802,7 @@ msgstr "West Pomerania"
 
 #: contrib/localflavor/sk/forms.py:30
 msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "Introdueixi un codi postal en el format XXXXX or XXX XX."
+msgstr "Introduïu un codi postal en el format XXXXX or XXX XX."
 
 #: contrib/localflavor/sk/sk_districts.py:8
 msgid "Banska Bystrica"
@@ -3157,7 +3154,7 @@ msgstr "Regió de Zilina"
 
 #: contrib/localflavor/uk/forms.py:21
 msgid "Enter a valid postcode."
-msgstr "Introdueixi un codi postal vàlid."
+msgstr "Introdueix un codi postal vàlid."
 
 #: contrib/localflavor/uk/uk_regions.py:11
 msgid "Bedfordshire"
@@ -3332,9 +3329,8 @@ msgid "County Down"
 msgstr "County Down"
 
 #: contrib/localflavor/uk/uk_regions.py:58
-#, fuzzy
 msgid "County Fermanagh"
-msgstr "County Armagh"
+msgstr "Comptat de Fermanagh"
 
 #: contrib/localflavor/uk/uk_regions.py:59
 msgid "County Londonderry"
@@ -3370,11 +3366,11 @@ msgstr "Powys"
 
 #: contrib/localflavor/uk/uk_regions.py:70
 msgid "South Glamorgan"
-msgstr "South Glamorgan"
+msgstr "Glamorgan Sud"
 
 #: contrib/localflavor/uk/uk_regions.py:71
 msgid "West Glamorgan"
-msgstr "West Glamorgan"
+msgstr "Glamorgan Oest"
 
 #: contrib/localflavor/uk/uk_regions.py:75
 msgid "Borders"
@@ -3382,7 +3378,7 @@ msgstr "Borders"
 
 #: contrib/localflavor/uk/uk_regions.py:76
 msgid "Central Scotland"
-msgstr "Central Scotland"
+msgstr "Escòcia central"
 
 #: contrib/localflavor/uk/uk_regions.py:77
 msgid "Dumfries and Galloway"
@@ -3426,19 +3422,19 @@ msgstr "Western Isles"
 
 #: contrib/localflavor/uk/uk_regions.py:90
 msgid "England"
-msgstr "England"
+msgstr "Anglaterra"
 
 #: contrib/localflavor/uk/uk_regions.py:91
 msgid "Northern Ireland"
-msgstr "Northern Ireland"
+msgstr "Irlanda del Nord"
 
 #: contrib/localflavor/uk/uk_regions.py:92
 msgid "Scotland"
-msgstr "Scotland"
+msgstr "Escòcia"
 
 #: contrib/localflavor/uk/uk_regions.py:93
 msgid "Wales"
-msgstr "Wales"
+msgstr "Gal·les"
 
 #: contrib/localflavor/us/forms.py:16
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
@@ -3460,11 +3456,11 @@ msgstr "Introdueixi un codi postal Sud Africà vàlid."
 
 #: contrib/localflavor/za/za_provinces.py:4
 msgid "Eastern Cape"
-msgstr "Eastern Cape"
+msgstr "Cap Oriental"
 
 #: contrib/localflavor/za/za_provinces.py:5
 msgid "Free State"
-msgstr "Free State"
+msgstr "Estat lliure"
 
 #: contrib/localflavor/za/za_provinces.py:6
 msgid "Gauteng"
@@ -3484,15 +3480,15 @@ msgstr "Mpumalanga"
 
 #: contrib/localflavor/za/za_provinces.py:10
 msgid "Northern Cape"
-msgstr "Northern Cape"
+msgstr "Cap Nord"
 
 #: contrib/localflavor/za/za_provinces.py:11
 msgid "North West"
-msgstr "North West"
+msgstr "Cap Oest"
 
 #: contrib/localflavor/za/za_provinces.py:12
 msgid "Western Cape"
-msgstr "Western Cape"
+msgstr "Cap Occidental"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
@@ -3515,7 +3511,7 @@ msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"Això pot ser bé una ruta absoluta (com abans) o una URL completa que comenci "
+"Això pot ser bé una ruta absoluta (com adalt) o una URL completa que comenci "
 "per http:// ."
 
 #: contrib/redirects/models.py:13
@@ -3564,14 +3560,14 @@ msgstr "llocs"
 
 #: core/validators.py:72
 msgid "This value must contain only letters, numbers and underscores."
-msgstr "Aquest valor ha de contenir només números, guions, i guions baixos."
+msgstr "Aquest valor ha de contenir només lletres, números i guions baixos."
 
 #: core/validators.py:76
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
 msgstr ""
-"Aquest valor ha de contenir només lletres, números, guions, guions baixos, i "
+"Aquest valor ha de contenir només lletres, números, guions baixos, guions i "
 "barres (/)."
 
 #: core/validators.py:80
@@ -3597,7 +3593,7 @@ msgstr "Introdueixi adreces de correu electrònic vàlides separades per comes."
 
 #: core/validators.py:111
 msgid "Please enter a valid IP address."
-msgstr "Per favor introdueixi una adreça IP vàlida."
+msgstr "Si el plau, introdueixi una adreça IP vàlida."
 
 #: core/validators.py:115
 msgid "Empty values are not allowed here."
@@ -3617,7 +3613,7 @@ msgstr "Introdueixi un número sencer."
 
 #: core/validators.py:132
 msgid "Only alphabetical characters are allowed here."
-msgstr "Només s'admeted caracters alfabètics aquí."
+msgstr "Només s'admeten caracters alfabètics aquí."
 
 #: core/validators.py:147
 msgid "Year must be 1900 or later."
@@ -3655,7 +3651,7 @@ msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Envii una imatge vàilda. El fitxer que ha enviat no era una imatge o estaba "
+"Envii una imatge vàlida. El fitxer que ha enviat no era una imatge o estaba "
 "corrupte."
 
 #: core/validators.py:200
@@ -3667,7 +3663,7 @@ msgstr "La URL %s no apunta una imatge vàlida."
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr ""
-"El números de telèfon han de guardar-se en el format XXX-XXX-XXXX. \"%s\" no "
+"Els números de telèfon han de guardar-se en el format XXX-XXX-XXXX. \"%s\" no "
 "és vàlid."
 
 #: core/validators.py:212
@@ -3677,7 +3673,7 @@ msgstr "La URL %s no apunta a un video QuickTime vàlid."
 
 #: core/validators.py:216
 msgid "A valid URL is required."
-msgstr "Es precisa d'una URL vàlida."
+msgstr "Es precisa una URL vàlida."
 
 #: core/validators.py:230
 #, python-format
@@ -3685,7 +3681,7 @@ msgid ""
 "Valid HTML is required. Specific errors are:\n"
 "%s"
 msgstr ""
-"Es precisa HTML vàlid. Els errors específics sòn:\n"
+"Es precisa HTML vàlid. Els errors específics són:\n"
 "%s"
 
 #: core/validators.py:237
@@ -3705,14 +3701,14 @@ msgstr "La URL %sés un enllaç trencat."
 
 #: core/validators.py:267
 msgid "Enter a valid U.S. state abbreviation."
-msgstr "Introdueixi una abreviatura vàlida d'estat d'els E.U.A.."
+msgstr "Introdueixi una abreviatura vàlida d'estat dels E.U.A.."
 
 #: core/validators.py:281
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Vigili la seva boca! Aquí no admetem la paraula: %s."
-msgstr[1] "Vigili la seva boca! Aquí no admetem les paraules: %s."
+msgstr[0] "Vigili amb el llenguatge! Aquí no s'admet la paraula: %s."
+msgstr[1] "Vigili amb el llenguatge! Aquí no s'admeten les paraules: %s."
 
 #: core/validators.py:288
 #, python-format
@@ -3730,12 +3726,12 @@ msgstr "Si us plau, ompli els dos camps o deixi'ls tots dos en blanc."
 #: core/validators.py:335
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
-msgstr "S'ha de proporcionar aquest camps si %(field)s és %(value)s"
+msgstr "S'ha de proporcionar aquest camp si %(field)s és %(value)s"
 
 #: core/validators.py:348
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "S'ha de proporcionar aquest camps si %(field)s no és %(value)s"
+msgstr "S'ha de proporcionar aquest camp si %(field)s no és %(value)s"
 
 #: core/validators.py:367
 msgid "Duplicate values are not allowed."
@@ -3744,7 +3740,7 @@ msgstr "No s'admeten valors duplicats."
 #: core/validators.py:382
 #, python-format
 msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "Aquest valor ha de estar comprés entre %(lower)s i %(upper)s."
+msgstr "Aquest valor ha d'estar comprès entre %(lower)s i %(upper)s."
 
 #: core/validators.py:384
 #, python-format
@@ -3897,7 +3893,7 @@ msgstr "Ja existeix un %(object)s del tipus %(type)s amb aquest %(field)s."
 #: db/models/fields/__init__.py:52
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "Ja existeix  %(optname)s amb auqest %(fieldname)s."
+msgstr "Ja existeix %(optname)s amb aquest %(fieldname)s."
 
 #: db/models/fields/__init__.py:161 db/models/fields/__init__.py:327
 #: db/models/fields/__init__.py:759 db/models/fields/__init__.py:770
@@ -3907,7 +3903,7 @@ msgstr "Aquest camp és obligatori."
 
 #: db/models/fields/__init__.py:427
 msgid "This value must be an integer."
-msgstr "Aquest valor ha de ser  un enter."
+msgstr "Aquest valor ha de ser un enter."
 
 #: db/models/fields/__init__.py:466
 msgid "This value must be either True or False."
@@ -4165,11 +4161,11 @@ msgstr "Dl"
 
 #: utils/dates.py:10
 msgid "Tue"
-msgstr "Dt"
+msgstr "Dm"
 
 #: utils/dates.py:10
 msgid "Wed"
-msgstr "Dc"
+msgstr "Dmx"
 
 #: utils/dates.py:10
 msgid "Thu"
@@ -4181,7 +4177,7 @@ msgstr "Dv"
 
 #: utils/dates.py:11
 msgid "Sat"
-msgstr "Db"
+msgstr "Ds"
 
 #: utils/dates.py:11
 msgid "Sun"
