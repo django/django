@@ -32,7 +32,7 @@ How Django processes a request
 When a user requests a page from your Django-powered site, this is the
 algorithm the system follows to determine which Python code to execute:
 
-    1. Django determines the root URLConf module to use; ordinarily
+    1. Django determines the root URLconf module to use. Ordinarily,
        this is the value of the ``ROOT_URLCONF`` setting in your
        `settings file`_, but if the incoming ``HttpRequest`` object
        has an attribute called ``urlconf``, its value will be used in

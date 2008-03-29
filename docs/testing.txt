@@ -80,7 +80,7 @@ read Python's official documentation for the details.
 .. admonition:: What's a **docstring**?
 
     A good explanation of docstrings (and some guidelines for using them
-    effectively) can be found in :PEP:`257`:
+    effectively) can be found in :pep:`257`:
 
         A docstring is a string literal that occurs as the first statement in
         a module, function, class, or method definition.  Such a docstring

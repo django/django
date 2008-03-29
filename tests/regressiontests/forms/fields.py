@@ -1135,29 +1135,39 @@ u''
 
 # FilePathField ###############################################################
 
+>>> def fix_os_paths(x):
+...     if isinstance(x, basestring):
+...         return x.replace('\\', '/')
+...     elif isinstance(x, tuple):
+...         return tuple(fix_os_paths(list(x)))
+...     elif isinstance(x, list):
+...         return [fix_os_paths(y) for y in x]
+...     else:
+...         return x
+...
 >>> import os
 >>> from django import newforms as forms
 >>> path = forms.__file__
 >>> path = os.path.dirname(path) + '/'
->>> path
+>>> fix_os_paths(path)
 '.../django/newforms/'
 >>> f = forms.FilePathField(path=path)
 >>> f.choices.sort()
->>> f.choices
+>>> fix_os_paths(f.choices)
 [('.../django/newforms/__init__.py', '__init__.py'), ('.../django/newforms/__init__.pyc', '__init__.pyc'), ('.../django/newforms/fields.py', 'fields.py'), ('.../django/newforms/fields.pyc', 'fields.pyc'), ('.../django/newforms/forms.py', 'forms.py'), ('.../django/newforms/forms.pyc', 'forms.pyc'), ('.../django/newforms/models.py', 'models.py'), ('.../django/newforms/models.pyc', 'models.pyc'), ('.../django/newforms/util.py', 'util.py'), ('.../django/newforms/util.pyc', 'util.pyc'), ('.../django/newforms/widgets.py', 'widgets.py'), ('.../django/newforms/widgets.pyc', 'widgets.pyc')]
 >>> f.clean('fields.py')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
->>> f.clean(path + 'fields.py')
+>>> fix_os_paths(f.clean(path + 'fields.py'))
 u'.../django/newforms/fields.py'
 >>> f = forms.FilePathField(path=path, match='^.*?\.py$')
 >>> f.choices.sort()
->>> f.choices
+>>> fix_os_paths(f.choices)
 [('.../django/newforms/__init__.py', '__init__.py'), ('.../django/newforms/fields.py', 'fields.py'), ('.../django/newforms/forms.py', 'forms.py'), ('.../django/newforms/models.py', 'models.py'), ('.../django/newforms/util.py', 'util.py'), ('.../django/newforms/widgets.py', 'widgets.py')]
 >>> f = forms.FilePathField(path=path, recursive=True, match='^.*?\.py$')
 >>> f.choices.sort()
->>> f.choices
+>>> fix_os_paths(f.choices)
 [('.../django/newforms/__init__.py', '__init__.py'), ('.../django/newforms/extras/__init__.py', 'extras/__init__.py'), ('.../django/newforms/extras/widgets.py', 'extras/widgets.py'), ('.../django/newforms/fields.py', 'fields.py'), ('.../django/newforms/forms.py', 'forms.py'), ('.../django/newforms/models.py', 'models.py'), ('.../django/newforms/util.py', 'util.py'), ('.../django/newforms/widgets.py', 'widgets.py')]
 
 # SplitDateTimeField ##########################################################

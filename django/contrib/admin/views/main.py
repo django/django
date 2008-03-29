@@ -3,7 +3,7 @@ from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.cache import never_cache
-from django.core.paginator import ObjectPaginator, InvalidPage
+from django.core.paginator import QuerySetPaginator, InvalidPage
 from django.shortcuts import render_to_response
 from django.db import models
 from django.db.models.query import handle_legacy_orderlist, QuerySet
@@ -177,11 +177,11 @@ class ChangeList(object):
         return mark_safe('?' + '&amp;'.join([u'%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20'))
 
     def get_results(self, request):
-        paginator = ObjectPaginator(self.query_set, self.list_per_page)
+        paginator = QuerySetPaginator(self.query_set, self.lookup_opts.admin.list_per_page)
 
         # Get the number of objects, with admin filters applied.
         try:
-            result_count = paginator.hits
+            result_count = paginator.count
         # Naked except! Because we don't have any other way of validating
         # "params". They might be invalid if the keyword arguments are
         # incorrect, or if the values are not in the correct type (which would
@@ -206,7 +206,7 @@ class ChangeList(object):
             result_list = list(self.query_set)
         else:
             try:
-                result_list = paginator.get_page(self.page_num)
+                result_list = paginator.page(self.page_num+1).object_list
             except InvalidPage:
                 result_list = ()
 

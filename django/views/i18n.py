@@ -82,6 +82,17 @@ function interpolate(fmt, obj, named) {
 }
 """
 
+PluralIdx = r"""
+function pluralidx(n) {
+  var v=%s;
+  if (typeof(v) == 'boolean') {
+    return v ? 1 : 0;
+  } else {
+    return v;
+  }
+}
+"""
+
 def null_javascript_catalog(request, domain=None, packages=None):
     """
     Returns "identity" versions of the JavaScript i18n functions -- i.e.,
@@ -154,7 +165,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         # this should actually be a compiled function of a typical plural-form:
         # Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;
         plural = [el.strip() for el in plural.split(';') if el.strip().startswith('plural=')][0].split('=',1)[1]
-        src.append('function pluralidx(n) {\n    return %s;\n}\n' % plural)
+        src.append(PluralIdx % plural)
     else:
         src.append(SimplePlural)
     csrc = []
