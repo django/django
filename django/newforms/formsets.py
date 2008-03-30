@@ -40,20 +40,21 @@ class BaseFormSet(StrAndUnicode):
         self._non_form_errors = None
         # initialization is different depending on whether we recieved data, initial, or nothing
         if data or files:
-            self.management_form = ManagementForm(data, files, auto_id=self.auto_id, prefix=self.prefix)
+            self.management_form = ManagementForm(data, auto_id=self.auto_id, prefix=self.prefix)
             if self.management_form.is_valid():
                 self._total_form_count = self.management_form.cleaned_data[TOTAL_FORM_COUNT]
                 self._initial_form_count = self.management_form.cleaned_data[INITIAL_FORM_COUNT]
             else:
                 raise ValidationError('ManagementForm data is missing or has been tampered with')
-        elif initial:
-            self._initial_form_count = len(initial)
-            self._total_form_count = self._initial_form_count + self.extra
         else:
-            self._initial_form_count = 0
-            self._total_form_count = self.extra
-        initial = {TOTAL_FORM_COUNT: self._total_form_count, INITIAL_FORM_COUNT: self._initial_form_count}
-        self.management_form = ManagementForm(initial=initial, auto_id=auto_id, prefix=prefix)
+            if initial:
+                self._initial_form_count = len(initial)
+                self._total_form_count = self._initial_form_count + self.extra
+            else:
+                self._initial_form_count = 0
+                self._total_form_count = self.extra
+            initial = {TOTAL_FORM_COUNT: self._total_form_count, INITIAL_FORM_COUNT: self._initial_form_count}
+            self.management_form = ManagementForm(initial=initial, auto_id=self.auto_id, prefix=self.prefix)
 
         # instantiate all the forms and put them in self.forms
         self.forms = []

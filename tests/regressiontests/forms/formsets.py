@@ -494,4 +494,21 @@ True
 >>> for error in formset.non_form_errors():
 ...     print error
 
+
+# Regression test for #6926 ##################################################
+
+Make sure the management form has the correct prefix.
+
+>>> formset = FavoriteDrinksFormSet()
+>>> formset.management_form.prefix
+'form'
+
+>>> formset = FavoriteDrinksFormSet(data={})
+>>> formset.management_form.prefix
+'form'
+
+>>> formset = FavoriteDrinksFormSet(initial={})
+>>> formset.management_form.prefix
+'form'
+
 """
