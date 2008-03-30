@@ -597,6 +597,7 @@ class LayerMapping(object):
                         stream.write('Ignoring Feature ID %s because: %s\n' % (feat.fid, msg))
                 else:
                     # Constructing the model using the keyword args
+                    is_update = False
                     if self.unique:
                         # If we want unique models on a particular field, handle the
                         # geometry appropriately.
@@ -605,6 +606,7 @@ class LayerMapping(object):
                             # the unique model.
                             u_kwargs = self.unique_kwargs(kwargs)
                             m = self.model.objects.get(**u_kwargs)
+                            is_update = True
                                 
                             # Getting the geometry (in OGR form), creating 
                             # one from the kwargs WKT, adding in additional 
@@ -624,7 +626,7 @@ class LayerMapping(object):
                         # Attempting to save.
                         m.save()
                         num_saved += 1
-                        if verbose: stream.write('Saved: %s\n' % m)
+                        if verbose: stream.write('%s: %s\n' % (is_update and 'Updated' or 'Saved', m))
                     except SystemExit:
                         raise
                     except Exception, msg:
