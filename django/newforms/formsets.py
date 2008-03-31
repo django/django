@@ -1,7 +1,7 @@
 from forms import Form
 from django.utils.encoding import StrAndUnicode
 from fields import IntegerField, BooleanField
-from widgets import HiddenInput, TextInput
+from widgets import Media, HiddenInput, TextInput
 from util import ErrorList, ValidationError
 
 __all__ = ('BaseFormSet', 'all_valid')
