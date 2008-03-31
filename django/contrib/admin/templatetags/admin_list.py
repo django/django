@@ -148,6 +148,8 @@ def items_for_result(cl, result):
                 # function has an "allow_tags" attribute set to True.
                 if not allow_tags:
                     result_repr = escape(result_repr)
+                else:
+                    result_repr = mark_safe(result_repr)
         else:
             field_val = getattr(result, f.attname)
 
