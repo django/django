@@ -183,6 +183,8 @@ class Command(InspectCommand):
                 if comment_notes:
                     field_desc += ' # ' + ' '.join(comment_notes)
                 yield '    %s' % field_desc
+            if table_name in geo_cols:
+                yield '    objects = models.GeoManager()'
             yield '    class Meta:'
             yield '        db_table = %r' % table_name
             yield ''
