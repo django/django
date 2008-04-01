@@ -581,7 +581,7 @@ class ForeignKey(RelatedField, Field):
 
         if 'edit_inline_type' in kwargs:
             import warnings
-            warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
+            warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.", DeprecationWarning)
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
 
         kwargs['rel'] = rel_class(to, to_field,

@@ -17,7 +17,8 @@ except ImportError, e:
 version = Database.version_info
 if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
         (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
-    raise ImportError("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE

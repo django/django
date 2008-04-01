@@ -26,6 +26,9 @@ class Movie(models.Model):
     movie_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=60)
 
+class Party(models.Model):
+    when = models.DateField()
+
 __test__ = {'API_TESTS': """
 (NOTE: Part of the regression test here is merely parsing the model
 declaration. The verbose_name, in particular, did not always work.)
@@ -50,6 +53,20 @@ u''
 >>> a4 = Article.objects.get(pk=a3.id)
 >>> len(a4.article_text)
 5000
+
+# #659 regression test
+>>> import datetime
+>>> p = Party.objects.create(when = datetime.datetime(1999, 12, 31))
+>>> p = Party.objects.create(when = datetime.datetime(1998, 12, 31))
+>>> p = Party.objects.create(when = datetime.datetime(1999, 1, 1))
+>>> [p.when for p in Party.objects.filter(when__month = 2)]
+[]
+>>> [p.when for p in Party.objects.filter(when__month = 1)]
+[datetime.date(1999, 1, 1)]
+>>> [p.when for p in Party.objects.filter(when__month = 12)]
+[datetime.date(1999, 12, 31), datetime.date(1998, 12, 31)]
+>>> [p.when for p in Party.objects.filter(when__year = 1998)]
+[datetime.date(1998, 12, 31)]
 
 """
 }

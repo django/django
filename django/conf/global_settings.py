@@ -114,7 +114,7 @@ SERVER_EMAIL = 'root@localhost'
 SEND_BROKEN_LINK_EMAILS = False
 
 # Database connection info.
-DATABASE_ENGINE = ''           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
+DATABASE_ENGINE = ''           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = ''             # Or path to database file if using sqlite3.
 DATABASE_USER = ''             # Not used with sqlite3.
 DATABASE_PASSWORD = ''         # Not used with sqlite3.
@@ -287,7 +287,7 @@ SESSION_COOKIE_PATH = '/'                               # The path of the sessio
 SESSION_SAVE_EVERY_REQUEST = False                      # Whether to save the session data on every request.
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False                 # Whether sessions expire when a user closes his browser.
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # The module to store session data
-SESSION_FILE_PATH = None                                # Directory to store session files if using the file session module. If set to None the backend will use a sensible default.
+SESSION_FILE_PATH = None                                # Directory to store session files if using the file session module. If None, the backend will use a sensible default.
 
 #########
 # CACHE #

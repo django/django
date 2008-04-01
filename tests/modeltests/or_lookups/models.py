@@ -103,7 +103,7 @@ __test__ = {'API_TESTS':"""
 >>> Article.objects.filter(Q(pk=1) & (~Q(pk=2) | Q(pk=3)))
 [<Article: Hello>]
 
-# Try some arg queries with operations other than get_list
+# Try some arg queries with operations other than filter.
 >>> Article.objects.get(Q(headline__startswith='Hello'), Q(headline__contains='bye'))
 <Article: Hello and goodbye>
 
