@@ -118,14 +118,6 @@ class _QuerySet(object):
         except self.model.DoesNotExist, e:
             raise IndexError, e.args
 
-    def _merge_sanity_check(self, other):
-        """
-        Checks that we are merging two comparable queryset classes.
-        """
-        if self.__class__ is not other.__class__:
-            raise TypeError("Cannot merge querysets of different types ('%s' and '%s'."
-                    % (self.__class__.__name__, other.__class__.__name__))
-
     def __and__(self, other):
         self._merge_sanity_check(other)
         combined = self._clone()
@@ -469,6 +461,14 @@ class _QuerySet(object):
                     self._result_cache.append(self._iter.next())
             except StopIteration:
                 self._iter = None
+
+    def _merge_sanity_check(self, other):
+        """
+        Checks that we are merging two comparable queryset classes.
+        """
+        if self.__class__ is not other.__class__:
+            raise TypeError("Cannot merge querysets of different types ('%s' and '%s'."
+                    % (self.__class__.__name__, other.__class__.__name__))
 
 # Use the backend's QuerySet class if it defines one. Otherwise, use _QuerySet.
 if connection.features.uses_custom_queryset:
