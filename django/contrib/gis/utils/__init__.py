@@ -20,3 +20,4 @@ try:
 except:
     HAS_GEOIP = False
 
+from django.contrib.gis.utils.srs import add_postgis_srs
