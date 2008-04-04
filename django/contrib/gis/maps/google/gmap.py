@@ -3,12 +3,8 @@ from django.contrib.gis import geos
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-# Declaring the GoogleMapException prior to getting the 
-# default `GZOOM` GoogleZoom instance.
 class GoogleMapException(Exception): pass
 from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline
-from django.contrib.gis.maps.google.zoom import GoogleZoom
-GZOOM = GoogleZoom()
 
 # The default Google Maps URL (for the API javascript)
 # TODO: Internationalize for Japan, UK, etc.
@@ -22,9 +18,8 @@ class GoogleMap(object):
     vml_css  = mark_safe('v\:* {behavior:url(#default#VML);}') # CSS for IE VML
     xmlns    = mark_safe('xmlns:v="urn:schemas-microsoft-com:vml"') # XML Namespace (for IE VML).
 
-    def __init__(self, key=None, api_url=None, version=None,
-                 center=None, center_lat=0.0, center_lon=0.0,
-                 zoom=None, dom_id='map', load_func='gmap_load', 
+    def __init__(self, key=None, api_url=None, version=None, 
+                 center=None, zoom=None, dom_id='map', load_func='gmap_load', 
                  kml_urls=[], polygons=[], polylines=[],
                  template='gis/google/js/google-map.js',
                  extra_context={}):
@@ -75,32 +70,25 @@ class GoogleMap(object):
                 else:
                     self.polylines.append(GPolyline(pline))
        
-        # Automatically determining the zoom level if there are
-        # GPolygon and/or GPolyline overlays.
-        if (self.polygons or self.polylines) and zoom is None:
-            envelopes = [p.envelope for p in self.polygons]
-            envelopes.extend([p.envelope for p in self.polylines])
-            # Creating a MultiPolygon of all the envelopes, this will
-            # be used in determining the zoom level.
-            zoom = geos.MultiPolygon(envelopes)
-            zoom.srid = 4326
-        
-        # If a GEOSGeometry object is passed in for the `zoom` keyword
-        # argument, then try to automatically determine an appropriate
-        # zoom level.
-        if isinstance(zoom, geos.GEOSGeometry):
-            self.zoom = GZOOM.get_zoom(zoom)
-        else:
-            self.zoom = zoom
-
-        # The map center coordinate -- the `center_lon` and `center_lat` keyword
-        # are deprecated.
-        if not center:
-            center = (center_lon, center_lat)
+        # If GPolygons and/or GPolylines are used the zoom will be automatically
+        # calculated via the Google Maps API.  If both a zoom level and a
+        # center coordinate are provided with polygons/polylines, no automatic
+        # determination will occur.
+        self.calc_zoom = False
+        if self.polygons or self.polylines:
+            if center is None or zoom is None:
+                self.calc_zoom = True
+    
+        # Defaults for the zoom level and center coordinates if the zoom
+        # is not automatically calculated.
+        if zoom is None: zoom = 4
+        self.zoom = zoom
+        if center is None: center = (0, 0)
         self.center = center
 
         # Setting the parameters for the javascript template.
-        params = {'center' : self.center,
+        params = {'calc_zoom' : self.calc_zoom,
+                  'center' : self.center,
                   'dom_id' : self.dom_id,
                   'kml_urls' : self.kml_urls,
                   'load_func' : self.load_func,
