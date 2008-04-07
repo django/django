@@ -139,14 +139,6 @@ class SpatialReference(object):
         else:
             return self.attr_value(target)
 
-    def __nonzero__(self):
-        "Returns True if this SpatialReference object is valid."
-        try:
-            self.validate()
-            return True
-        except OGRException:
-            return False
-
     def __str__(self):
         "The string representation uses 'pretty' WKT."
         return self.pretty_wkt

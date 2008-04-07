@@ -281,8 +281,14 @@ class OGRGeomTest(unittest.TestCase):
         ct = CoordTransform(SpatialReference('WGS84'), SpatialReference(2774))
         t3.transform(ct)
 
-        for p in (t1, t2, t3):
-            prec = 3
+        # Testing use of the `clone` keyword.
+        k1 = orig.clone()
+        k2 = k1.transform(trans.srid, clone=True)
+        self.assertEqual(k1, orig)
+        self.assertNotEqual(k1, k2)
+
+        prec = 3
+        for p in (t1, t2, t3, k2):
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
 

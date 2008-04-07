@@ -325,11 +325,19 @@ class OGRGeometry(object):
         # Closing the open rings.
         geom_close_rings(self._ptr)
 
-    def transform(self, coord_trans):
+    def transform(self, coord_trans, clone=False):
         """
-        Transforms this geometry to a different spatial reference system.  May take
-        either a CoordTransform object or a SpatialReference object.
+        Transforms this geometry to a different spatial reference system.
+        May take a CoordTransform object, a SpatialReference object, string
+        WKT or PROJ.4, and/or an integer SRID.  By default nothing is returned
+        and the geometry is transformed in-place.  However, if the `clone`
+        keyword is set, then a transformed clone of this geometry will be
+        returned.
         """
+        if clone:
+            klone = self.clone()
+            klone.transform(coord_trans)
+            return klone
         if isinstance(coord_trans, CoordTransform):
             geom_transform(self._ptr, coord_trans._ptr)
         elif isinstance(coord_trans, SpatialReference):
@@ -338,7 +346,7 @@ class OGRGeometry(object):
             sr = SpatialReference(coord_trans)
             geom_transform_to(self._ptr, sr._ptr)
         else:
-            raise TypeError('Either a CoordTransform or a SpatialReference object required for transformation.')
+            raise TypeError('Transform only accepts CoordTransform, SpatialReference, string, and integer objects.')
 
     def transform_to(self, srs):
         "For backwards-compatibility."
@@ -431,7 +439,7 @@ class OGRGeometry(object):
 
     def union(self, other):
         """
-        Returns a new geometry consisting of the region which is the union of                                                                                                   
+        Returns a new geometry consisting of the region which is the union of
         this geometry and the other.
         """
         return self._geomgen(geom_union, other)
