@@ -703,8 +703,15 @@ class GEOSTest(unittest.TestCase):
         t2.transform(SpatialReference('EPSG:2774'))
         ct = CoordTransform(SpatialReference('WGS84'), SpatialReference(2774))
         t3.transform(ct)
+
+        # Testing use of the `clone` keyword.
+        k1 = orig.clone()
+        k2 = k1.transform(trans.srid, clone=True)
+        self.assertEqual(k1, orig)
+        self.assertNotEqual(k1, k2)
+
         prec = 3
-        for p in (t1, t2, t3):
+        for p in (t1, t2, t3, k2):
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
 
@@ -723,6 +730,27 @@ class GEOSTest(unittest.TestCase):
         xmin, ymin = min(x), min(y)
         xmax, ymax = max(x), max(y)
         self.assertEqual((xmin, ymin, xmax, ymax), poly.extent)
+
+    def test25_pickle(self):
+        "Testing pickling and unpickling support."
+        # Using both pickle and cPickle -- just 'cause.
+        import pickle, cPickle
+
+        # Creating a list of test geometries for pickling, 
+        # and setting the SRID on some of them.
+        def get_geoms(lst, srid=None):
+            return [GEOSGeometry(tg.wkt, srid) for tg in lst]
+        tgeoms = get_geoms(points)
+        tgeoms.extend(get_geoms(multilinestrings, 4326))
+        tgeoms.extend(get_geoms(polygons, 3084))
+        tgeoms.extend(get_geoms(multipolygons, 900913))
+        
+        for geom in tgeoms:
+            s1, s2 = cPickle.dumps(geom), pickle.dumps(geom)
+            g1, g2 = cPickle.loads(s1), pickle.loads(s2)
+            for tmpg in (g1, g2):
+                self.assertEqual(geom, tmpg)
+                self.assertEqual(geom.srid, tmpg.srid)
 
 def suite():
     s = unittest.TestSuite()

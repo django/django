@@ -87,16 +87,21 @@ class GEOSGeometry(object):
         else:
             raise GEOSException('Could not initialize GEOS Geometry with given input.')
 
+        # Post-initialization setup.
+        self._post_init(srid)
+
+    def _post_init(self, srid):
+        "Helper routine for performing post-initialization setup."
         # Setting the SRID, if given.
         if srid and isinstance(srid, int): self.srid = srid
-
+        
         # Setting the class type (e.g., Point, Polygon, etc.)
         self.__class__ = GEOS_CLASSES[self.geom_typeid]
 
         # Setting the coordinate sequence for the geometry (will be None on 
-        #  geometries that do not have coordinate sequences)
+        # geometries that do not have coordinate sequences)
         self._set_cs()
-        
+
     @property
     def ptr(self):
         """
@@ -138,6 +143,20 @@ class GEOSGeometry(object):
     def __repr__(self):
         "Short-hand representation because WKT may be very large."
         return '<%s object at %s>' % (self.geom_type, hex(addressof(self.ptr)))
+
+    # Pickling support
+    def __getstate__(self):
+        # The pickled state is simply a tuple of the WKB (in string form)
+        # and the SRID.
+        return str(self.wkb), self.srid
+
+    def __setstate__(self, state):
+        # Instantiating from the tuple state that was pickled.
+        wkb, srid = state
+        ptr = from_wkb(wkb, len(wkb))
+        if not ptr: raise GEOSException('Invalid Geometry loaded from pickled state.')
+        self._ptr = ptr
+        self._post_init(srid)
 
     # Comparison operators
     def __eq__(self, other):
@@ -413,23 +432,32 @@ class GEOSGeometry(object):
         "Alias for `srs` property."
         return self.srs
 
-    def transform(self, ct):
-        "Transforms this Geometry; only works with GDAL."
+    def transform(self, ct, clone=False):
+        """
+        Requires GDAL. Transforms the geometry according to the given 
+        transformation object, which may be an integer SRID, and WKT or 
+        PROJ.4 string. By default, the geometry is transformed in-place and 
+        nothing is returned. However if the `clone` keyword is set, then this 
+        geometry will not be modified and a transformed clone will be returned
+        instead.
+        """
         srid = self.srid
         if HAS_GDAL and srid:
             g = OGRGeometry(self.wkb, srid)
             g.transform(ct)
             wkb = str(g.wkb)
             ptr = from_wkb(wkb, len(wkb))
+            if clone: 
+                # User wants a cloned transformed geometry returned.
+                return GEOSGeometry(ptr, srid=g.srid)
             if ptr:
-                # Reassigning pointer, and getting the new coordinate sequence pointer.
+                # Reassigning pointer, and performing post-initialization setup
+                # again due to the reassignment.
                 destroy_geom(self.ptr)
                 self._ptr = ptr
-                self._set_cs()
-
-                # Some coordinate transformations do not have an SRID associated
-                # with them; only set if one exists.
-                if g.srid: self.srid = g.srid
+                self._post_init(g.srid)
+            else:
+                raise GEOSException('Transformed WKB was invalid.')
 
     #### Topology Routines ####
     def _topology(self, gptr):
