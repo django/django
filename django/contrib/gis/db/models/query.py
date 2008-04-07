@@ -291,7 +291,7 @@ class GeoQuerySet(QuerySet):
                 # some error checking is required.
                 if not isinstance(geo_field, PointField): 
                     raise TypeError('Spherical distance calculation only supported on PointFields.')
-                if not isinstance(GEOSGeometry(params[0].wkb), Point):
+                if not isinstance(GEOSGeometry(buffer(params[0].wkb)), Point):
                     raise TypeError('Spherical distance calculation only supported with Point Geometry parameters')
 
                 # Call to distance_spheroid() requires the spheroid as well.

@@ -8,9 +8,10 @@ from psycopg2.extensions import ISQLQuote
 
 class PostGISAdaptor(object):
     def __init__(self, geom):
-        "Initializes on the geometry and the SRID."
-        # Getting the WKB and the SRID
-        self.wkb = geom.wkb
+        "Initializes on the geometry."
+        # Getting the WKB (in string form, to allow easy pickling of
+        # the adaptor) and the SRID from the geometry.
+        self.wkb = str(geom.wkb)
         self.srid = geom.srid
 
     def __conform__(self, proto):
@@ -19,6 +20,9 @@ class PostGISAdaptor(object):
             return self
         else:
             raise Exception('Error implementing psycopg2 protocol. Is psycopg2 installed?')
+
+    def __eq__(self, other):
+        return (self.wkb == other.wkb) and (self.srid == other.srid)
 
     def __str__(self):
         return self.getquoted()

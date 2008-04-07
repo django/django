@@ -47,8 +47,7 @@ if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     VERSION = (MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2)
     SPATIAL_BACKEND = 'postgis'
 elif settings.DATABASE_ENGINE == 'oracle':
-    from django.contrib.gis.db.backend.oracle.adaptor import \
-        OracleSpatialAdaptor as GeoAdaptor
+    from django.contrib.gis.db.backend.adaptor import WKTAdaptor as GeoAdaptor
     from django.contrib.gis.db.backend.oracle.field import \
         OracleSpatialField as GeoBackendField
     from django.contrib.gis.db.backend.oracle.creation import create_spatial_db
@@ -58,8 +57,7 @@ elif settings.DATABASE_ENGINE == 'oracle':
     SPATIAL_BACKEND = 'oracle'
     LIMITED_WHERE = ['relate']
 elif settings.DATABASE_ENGINE == 'mysql':
-    from django.contrib.gis.db.backend.mysql.adaptor import \
-        MySQLAdaptor as GeoAdaptor
+    from django.contrib.gis.db.backend.adaptor import WKTAdaptor as GeoAdaptor
     from django.contrib.gis.db.backend.mysql.field import \
         MySQLGeoField as GeoBackendField
     from django.contrib.gis.db.backend.mysql.creation import create_spatial_db
