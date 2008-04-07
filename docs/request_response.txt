@@ -143,13 +143,12 @@ All attributes except ``session`` should be considered read-only.
 
 ``urlconf``
     Not defined by Django itself, but will be read if other code
-    (e.g., a custom middleware class) sets it; when present, this will
-    be used as the root URLConf for the current request, overriding
+    (e.g., a custom middleware class) sets it. When present, this will
+    be used as the root URLconf for the current request, overriding
     the ``ROOT_URLCONF`` setting. See `How Django processes a
     request`_ for details.
 
 .. _How Django processes a request: ../url_dispatch/#how-django-processes-a-request
-
 
 Methods
 -------
@@ -202,19 +201,19 @@ Methods
 ``is_ajax()``
    **New in Django development version**
 
-   Returns ``True`` if the request was made via an XMLHttpRequest by checking
-   the ``HTTP_X_REQUESTED_WITH`` header for the string *'XMLHttpRequest'*. The
-   following major Javascript libraries all send this header:
+   Returns ``True`` if the request was made via an ``XMLHttpRequest``, by checking
+   the ``HTTP_X_REQUESTED_WITH`` header for the string ``'XMLHttpRequest'``. The
+   following major JavaScript libraries all send this header:
 
-   * jQuery
-   * Dojo
-   * MochiKit
-   * MooTools
-   * Prototype
-   * YUI
+       * jQuery
+       * Dojo
+       * MochiKit
+       * MooTools
+       * Prototype
+       * YUI
 
-   If you write your own XMLHttpRequest call (on the browser side), you will
-   have to set this header manually to use this method.
+   If you write your own XMLHttpRequest call (on the browser side), you'll
+   have to set this header manually if you want ``is_ajax()`` to work.
 
 QueryDict objects
 -----------------

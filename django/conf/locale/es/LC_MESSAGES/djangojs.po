@@ -1,14 +1,14 @@
 # Spanish translation for the django-admin JS files.
-# Copyright (C)
-# This file is distributed under the same license as the PACKAGE package.
-#
+# Copyright (C) 2008, The Django Project
+# This file is distributed under the same license as the django package.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-14 13:47-0500\n"
-"PO-Revision-Date: 2007-07-14 13:41-0500\n"
-"Last-Translator: Jorge Gajon <gajon@gajon.org>\n"
+"POT-Creation-Date: 2005-10-04 00:00+0200\n"
+"PO-Revision-Date: 2008-03-30 00:54+0100\n"
+"Last-Translator: Django Spanish Group <django-i18n@googlegroups.com>\n"
+"Language-Team: Spanish <django-i18n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

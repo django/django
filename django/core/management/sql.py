@@ -294,8 +294,14 @@ def sql_model_create(model, style, known_models=set()):
             style.SQL_COLTYPE(models.IntegerField().db_type()) + ' ' + \
             style.SQL_KEYWORD('NULL'))
     for field_constraints in opts.unique_together:
-        table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' % \
+        constraint_output = [style.SQL_KEYWORD('UNIQUE')]
+        constraint_output.append('(%s)' % \
             ", ".join([style.SQL_FIELD(qn(opts.get_field(f).column)) for f in field_constraints]))
+        if opts.db_tablespace and connection.features.supports_tablespaces \
+               and connection.features.autoindexes_primary_keys:
+            constraint_output.append(connection.ops.tablespace_sql(
+                opts.db_tablespace, inline=True))
+        table_output.append(' '.join(constraint_output))
 
     full_statement = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + style.SQL_TABLE(qn(opts.db_table)) + ' (']
     for i, line in enumerate(table_output): # Combine and add commas.

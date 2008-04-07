@@ -92,7 +92,7 @@ __test__ = {'API_TESTS':"""
 >>> Article.objects.filter(Q(headline__contains='bye'), headline__startswith='Hello')
 [<Article: Hello and goodbye>]
 
-# Try some arg queries with operations other than get_list
+# Try some arg queries with operations other than filter.
 >>> Article.objects.get(Q(headline__startswith='Hello'), Q(headline__contains='bye'))
 <Article: Hello and goodbye>
 
