@@ -1555,8 +1555,9 @@ representing a foreign key.
 The ``__unicode__`` method of the model will be called to generate
 string representations of the objects for use in the field's choices;
 to provide customized representations, subclass ``ModelChoiceField``
-and override ``label_for_model``. This method will receive model
-object, and should return a string suitable for representing it::
+and override ``label_for_model``. This method will receive a model
+object, and should return a string suitable for representing it. For
+example::
 
     class MyModelChoiceField(ModelChoiceField):
         def label_from_instance(self, obj):
