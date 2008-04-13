@@ -65,7 +65,7 @@ msgstr "Castellà Argentí"
 #: conf/global_settings.py:51
 #, fuzzy
 msgid "Basque"
-msgstr "Euskadi"
+msgstr "Euskera"
 
 #: conf/global_settings.py:52
 msgid "Persian"
@@ -197,11 +197,11 @@ msgstr "Ucranià"
 
 #: conf/global_settings.py:84
 msgid "Simplified Chinese"
-msgstr "Xinés simplificat"
+msgstr "Xinès simplificat"
 
 #: conf/global_settings.py:85
 msgid "Traditional Chinese"
-msgstr "Xinés tradicional"
+msgstr "Xinès tradicional"
 
 #: contrib/admin/filterspecs.py:44
 #, python-format
@@ -328,7 +328,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin/base.html:26
 msgid "Welcome,"
-msgstr "Benvingut,"
+msgstr "Benvingut/da,"
 
 #: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
@@ -339,7 +339,7 @@ msgstr "Documentació"
 #: contrib/admin/templates/admin/auth/user/change_password.html:14
 #: contrib/admin/templates/admin/auth/user/change_password.html:45
 msgid "Change password"
-msgstr "Canviar clau"
+msgstr "Canviar contrasenya"
 
 #: contrib/admin/templates/admin/base.html:30
 #: contrib/comments/templates/comments/form.html:6
@@ -366,7 +366,7 @@ msgstr "Històric"
 
 #: contrib/admin/templates/admin/change_form.html:21
 msgid "View on site"
-msgstr "Veure en el lloc"
+msgstr "Veure al lloc"
 
 #: contrib/admin/templates/admin/change_form.html:31
 #: contrib/admin/templates/admin/auth/user/change_password.html:23
@@ -657,16 +657,16 @@ msgstr "Iniciar sessió de nou"
 #: contrib/admin/templates/registration/password_change_form.html:5
 #: contrib/admin/templates/registration/password_change_form.html:9
 msgid "Password change"
-msgstr "Canvi de clau"
+msgstr "Canvi de contrasenya"
 
 #: contrib/admin/templates/registration/password_change_done.html:5
 #: contrib/admin/templates/registration/password_change_done.html:9
 msgid "Password change successful"
-msgstr "Canvi de clau exitòs"
+msgstr "Contrasenya canviada amb èxit"
 
 #: contrib/admin/templates/registration/password_change_done.html:11
 msgid "Your password was changed."
-msgstr "La seva clau ha estat canviada."
+msgstr "La seva contrasenya ha estat canviada."
 
 #: contrib/admin/templates/registration/password_change_form.html:11
 msgid ""
@@ -790,7 +790,7 @@ msgstr "El/la %(name)s \"%(obj)s\".ha estat agregat/da amb èxit."
 #: contrib/admin/views/auth.py:25 contrib/admin/views/main.py:271
 #: contrib/admin/views/main.py:356
 msgid "You may edit it again below."
-msgstr "Pot editar-lo de nou abaix."
+msgstr "Pot editar-lo de nou a baix."
 
 #: contrib/admin/views/auth.py:31
 msgid "Add user"
@@ -798,12 +798,12 @@ msgstr "Afegir usuari"
 
 #: contrib/admin/views/auth.py:58
 msgid "Password changed successfully."
-msgstr "Clau cambiada exitosament"
+msgstr "Contrasenya cambiada amb èxit"
 
 #: contrib/admin/views/auth.py:65
 #, python-format
 msgid "Change password: %s"
-msgstr "Canviar clau: %s"
+msgstr "Canviar contrasenya: %s"
 
 #: contrib/admin/views/decorators.py:17 contrib/auth/forms.py:60
 msgid ""
@@ -863,7 +863,7 @@ msgstr "No s'ha pogut trobar l'aplicació %r"
 #: contrib/admin/views/doc.py:173
 #, python-format
 msgid "Model %(name)r not found in app %(label)r"
-msgstr "El model %(name)r no s'ha trobat en la aplicació %(label)r"
+msgstr "El model %(name)r no s'ha trobat en l'aplicació %(label)r"
 
 #: contrib/admin/views/doc.py:185
 #, python-format
@@ -957,7 +957,7 @@ msgstr "Número de telèfon"
 
 #: contrib/admin/views/doc.py:316
 msgid "Text"
-msgstr "Texte"
+msgstr "Text"
 
 #: contrib/admin/views/doc.py:317
 msgid "Time"
@@ -997,7 +997,7 @@ msgstr "Afegir %s"
 #: contrib/admin/views/main.py:344
 #, python-format
 msgid "Added %s."
-msgstr "Agregat %s."
+msgstr "Afegit %s."
 
 #: contrib/admin/views/main.py:344 contrib/admin/views/main.py:346
 #: contrib/admin/views/main.py:348 core/validators.py:283
@@ -1022,7 +1022,7 @@ msgstr "Cap camp canviat."
 #: contrib/admin/views/main.py:354
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "S'ha modificat exitosament el/la %(name)s \"%(obj)s."
+msgstr "S'ha modificat amb èxit el/la %(name)s \"%(obj)s."
 
 #: contrib/admin/views/main.py:362
 #, python-format
@@ -1049,7 +1049,7 @@ msgstr "Un o més %(fieldname)s en %(name)s:"
 #: contrib/admin/views/main.py:524
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "El/la %(name)s \"%(obj)s\".ha estat eliminat amb èxit."
+msgstr "El/la %(name)s \"%(obj)s\" ha estat eliminat amb èxit."
 
 #: contrib/admin/views/main.py:527
 msgid "Are you sure?"
@@ -1072,7 +1072,7 @@ msgstr "Seleccioni %s per modificar"
 
 #: contrib/admin/views/main.py:784
 msgid "Database error"
-msgstr "Error de/en la base de dades"
+msgstr "Error de base de dades"
 
 #: contrib/auth/forms.py:17 contrib/auth/forms.py:138
 msgid "The two password fields didn't match."
@@ -1130,7 +1130,7 @@ msgstr "permís"
 
 #: contrib/auth/models.py:79 contrib/auth/models.py:94
 msgid "permissions"
-msgstr "permissos"
+msgstr "permisos"
 
 #: contrib/auth/models.py:97
 msgid "group"
@@ -1149,8 +1149,8 @@ msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
 msgstr ""
-"Obligatori. 30 o menys caracters. Només caracters alfanumèrics (lletres, "
-"dígits i guions baixos)."
+"Obligatori. 30 o menys caràcters. Només caràcters alfanumèrics (lletres, "
+"dígits i el guió baix)."
 
 #: contrib/auth/models.py:132
 msgid "first name"
@@ -1178,7 +1178,7 @@ msgstr ""
 
 #: contrib/auth/models.py:136
 msgid "staff status"
-msgstr "és membre del personal"
+msgstr "membre del personal"
 
 #: contrib/auth/models.py:136
 msgid "Designates whether the user can log into this admin site."
@@ -1194,7 +1194,7 @@ msgid ""
 "instead of deleting accounts."
 msgstr ""
 "Designa si aquest usuari pot iniciar sessió a la interfície administrativa "
-"Djano. Deseleccioni-ho enlloc d'esborrar comptes d'usuari."
+"Django. Deseleccioni-ho enlloc d'esborrar comptes d'usuari."
 
 #: contrib/auth/models.py:138
 msgid "superuser status"
@@ -1362,7 +1362,7 @@ msgstr "adreça ip"
 
 #: contrib/comments/models.py:183
 msgid "approved by staff"
-msgstr "aprovat per el \"staff\""
+msgstr "aprovat pels membres del personal"
 
 #: contrib/comments/models.py:187
 msgid "free comment"
@@ -1521,13 +1521,12 @@ msgstr "Només s'admet POST"
 #: contrib/comments/views/comments.py:194
 #: contrib/comments/views/comments.py:287
 msgid "One or more of the required fields wasn't submitted"
-msgstr "Un o més dels caps obligatoris no ha estat sotmès"
+msgstr "Un o més dels camps obligatoris no ha estat enviat"
 
 #: contrib/comments/views/comments.py:198
 #: contrib/comments/views/comments.py:289
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr ""
-"Algú està jugant amb el formulari de comentaris (violació de seguretat)"
+msgstr "Algú ha manipulat el formulari de comentaris (violació de seguretat)"
 
 #: contrib/comments/views/comments.py:208
 #: contrib/comments/views/comments.py:295
@@ -3511,7 +3510,7 @@ msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"Això pot ser bé una ruta absoluta (com adalt) o una URL completa que comenci "
+"Això pot ser bé una ruta absoluta (com a dalt) o una URL completa que comenci "
 "per http:// ."
 
 #: contrib/redirects/models.py:13
@@ -3601,7 +3600,7 @@ msgstr "No s'admeten valor buits."
 
 #: core/validators.py:119
 msgid "Non-numeric characters aren't allowed here."
-msgstr "No s'admeten caracters no numèrics."
+msgstr "No s'admeten caràcters no numèrics."
 
 #: core/validators.py:123
 msgid "This value can't be comprised solely of digits."
@@ -3687,12 +3686,12 @@ msgstr ""
 #: core/validators.py:237
 #, python-format
 msgid "Badly formed XML: %s"
-msgstr "XML incorrectament formatejat: %s"
+msgstr "XML incorrectament format: %s"
 
 #: core/validators.py:254
 #, python-format
 msgid "Invalid URL: %s"
-msgstr "URL invalida: %s"
+msgstr "URL invàlida: %s"
 
 #: core/validators.py:259 core/validators.py:261
 #, python-format
@@ -3717,7 +3716,7 @@ msgstr "Aquest camp ha de concordar amb el camp '%s'."
 
 #: core/validators.py:307
 msgid "Please enter something for at least one field."
-msgstr "Si us plau, introdueixi alguna cosa alemnys en un camp."
+msgstr "Si us plau, introdueixi alguna cosa almenys en un camp."
 
 #: core/validators.py:316 core/validators.py:327
 msgid "Please enter both fields or leave them both empty."
@@ -3911,7 +3910,7 @@ msgstr "Aquest valor ha de ser True (Veritat) o False (Fals)"
 
 #: db/models/fields/__init__.py:490
 msgid "This field cannot be null."
-msgstr "Aquest camp no pot ser null (estar buit)."
+msgstr "Aquest camp no pot ser nul."
 
 #: db/models/fields/__init__.py:668
 msgid "This value must be a decimal number."
@@ -3937,7 +3936,7 @@ msgstr "Separi múltiples IDs amb comes."
 #: db/models/fields/related.py:703
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "Premi \"Control\" o \"Command\" en un Mac per escollir més d'un."
+msgstr "Premeu la tecla \"Control\" -o \"Command\" en un Mac- per seleccionar més d'un valor."
 
 #: db/models/fields/related.py:750
 #, python-format
@@ -3996,7 +3995,7 @@ msgstr "Asseguris de que no hi ha més de %s decimals."
 #: newforms/fields.py:215
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr "Asseguris de que no hia ha més de %s dígits decimals."
+msgstr "Asseguris de que no hi ha més de %s dígits decimals."
 
 #: newforms/fields.py:263 newforms/fields.py:751
 msgid "Enter a valid date."
@@ -4053,8 +4052,8 @@ msgstr "Esculli una opció vàlida; %s' no és una de les opcions vàlides."
 #, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Asseguris de que el seu texte té menys de %s caracter."
-msgstr[1] "Asseguris de que el seu texte té menys de %s caracters."
+msgstr[0] "Asseguris de que el seu text té menys de %s caràcter."
+msgstr[1] "Asseguris de que el seu text té menys de %s caràcters."
 
 #: oldforms/__init__.py:414
 msgid "Line breaks are not allowed here."
@@ -4067,7 +4066,7 @@ msgstr "Esculli una opció vàlida; %(data)s' no està dintre de %(choices)s."
 
 #: oldforms/__init__.py:745
 msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Introdueixi un número enter entre -32,768 i 32,767."
+msgstr "Introdueixi un enter entre -32,768 i 32,767."
 
 #: oldforms/__init__.py:755
 msgid "Enter a positive number."

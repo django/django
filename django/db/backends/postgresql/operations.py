@@ -1,4 +1,8 @@
+import re
+
 from django.db.backends import BaseDatabaseOperations
+
+server_version_re = re.compile(r'PostgreSQL (\d{1,2})\.(\d{1,2})\.?(\d{1,2})?')
 
 # This DatabaseOperations class lives in here instead of base.py because it's
 # used by both the 'postgresql' and 'postgresql_psycopg2' backends.
@@ -12,7 +16,11 @@ class DatabaseOperations(BaseDatabaseOperations):
             from django.db import connection
             cursor = connection.cursor()
             cursor.execute("SELECT version()")
-            self._postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]
+            version_string = cursor.fetchone()[0]
+            m = server_version_re.match(version_string)
+            if not m:
+                raise Exception('Unable to determine PostgreSQL version from version() function string: %r' % version_string)
+            self._postgres_version = [int(val) for val in m.groups() if val]
         return self._postgres_version
     postgres_version = property(_get_postgres_version)
 
