@@ -584,6 +584,12 @@ Test that parallel iterators work.
 >>> i1.next()
 <Tag: t3>
 
+>>> qs = X.objects.all()
+>>> bool(qs)
+False
+>>> bool(qs)
+False
+
 We can do slicing beyond what is currently in the result cache, too.
 
 # FIXME!! This next test causes really weird PostgreSQL behaviour, but it's

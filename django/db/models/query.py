@@ -72,7 +72,8 @@ class _QuerySet(object):
                 iter(self).next()
             except StopIteration:
                 return False
-        return True
+            return True
+        return bool(self._result_cache)
 
     def __getitem__(self, k):
         "Retrieve an item or slice from the set of results."
