@@ -134,7 +134,7 @@ class User(models.Model):
     email = models.EmailField(_('e-mail address'), blank=True)
     password = models.CharField(_('password'), max_length=128, help_text=_("Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."))
     is_staff = models.BooleanField(_('staff status'), default=False, help_text=_("Designates whether the user can log into this admin site."))
-    is_active = models.BooleanField(_('active'), default=True, help_text=_("Designates whether this user can log into the Django admin. Unselect this instead of deleting accounts."))
+    is_active = models.BooleanField(_('active'), default=True, help_text=_("Designates whether this user should be treated as active. Unselect this instead of deleting accounts."))
     is_superuser = models.BooleanField(_('superuser status'), default=False, help_text=_("Designates that this user has all permissions without explicitly assigning them."))
     last_login = models.DateTimeField(_('last login'), default=datetime.datetime.now)
     date_joined = models.DateTimeField(_('date joined'), default=datetime.datetime.now)
@@ -226,7 +226,7 @@ class User(models.Model):
         for backend in auth.get_backends():
             if hasattr(backend, "get_all_permissions"):
                 permissions.update(backend.get_all_permissions(self))
-        return permissions 
+        return permissions
 
     def has_perm(self, perm):
         """
@@ -238,11 +238,11 @@ class User(models.Model):
         # Inactive users have no permissions.
         if not self.is_active:
             return False
-        
+
         # Superusers have all permissions.
         if self.is_superuser:
             return True
-            
+
         # Otherwise we need to check the backends.
         for backend in auth.get_backends():
             if hasattr(backend, "has_perm"):
