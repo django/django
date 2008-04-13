@@ -67,13 +67,13 @@ class _QuerySet(object):
                 self._fill_cache()
 
     def __nonzero__(self):
-        if self._result_cache is None:
-            try:
-                iter(self).next()
-            except StopIteration:
-                return False
-            return True
-        return bool(self._result_cache)
+        if self._result_cache is not None:
+            return bool(self._result_cache)
+        try:
+            iter(self).next()
+        except StopIteration:
+            return False
+        return True
 
     def __getitem__(self, k):
         "Retrieve an item or slice from the set of results."
