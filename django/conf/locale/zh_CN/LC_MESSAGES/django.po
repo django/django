@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-05-16 10:10+0200\n"
-"PO-Revision-Date: 2008-04-02 11:43+0800\n"
+"PO-Revision-Date: 2008-04-10 11:57+0800\n"
 "Last-Translator: hutuworm <hutuworm@gmail.com>\n"
 "Language-Team: Simplified Chinese <limodou@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -252,7 +252,7 @@ msgstr "简体中文"
 
 #: conf/global_settings.py:77
 msgid "Traditional Chinese"
-msgstr "繁体中文"
+msgstr "正体中文"
 
 #: utils/timesince.py:12
 msgid "year"
@@ -489,7 +489,7 @@ msgstr "MONTH_DAY_FORMAT"
 #, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "确定你输入的文本少于 %s 个字符。"
+msgstr[0] "确保你输入的文本少于 %s 个字符。"
 
 #: oldforms/__init__.py:397
 msgid "Line breaks are not allowed here."
@@ -524,15 +524,15 @@ msgstr "否"
 #: core/validators.py:174
 #: core/validators.py:445
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "没有文件被提交。请检查表单的编码类型。"
+msgstr "未提交文件。请检查表单的编码类型。"
 
 #: oldforms/__init__.py:674
 msgid "The submitted file is empty."
-msgstr "所提交的文件为空。"
+msgstr "所提交的是空文件。"
 
 #: oldforms/__init__.py:730
 msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "输入在 -32,768 到 32,767 之间的一个整数。"
+msgstr "输入在 -32,768 与 32,767 之间的一个整数。"
 
 #: oldforms/__init__.py:740
 msgid "Enter a positive number."
@@ -544,7 +544,7 @@ msgstr "输入在 0 到 32,767 之间的一个整数。"
 
 #: contrib/localflavor/no/forms.py:15
 msgid "Enter a zip code in the format XXXX."
-msgstr "用 XXXX 的格式输入一个邮编。"
+msgstr "以 XXXX 的格式输入一个邮政编码。"
 
 #: contrib/localflavor/no/forms.py:36
 msgid "Enter a valid Norwegian social security number."
@@ -555,11 +555,11 @@ msgstr "请输入一个有效的挪威社会保障号码。"
 #: contrib/localflavor/fi/forms.py:14
 #: contrib/localflavor/de/forms.py:16
 msgid "Enter a zip code in the format XXXXX."
-msgstr "以 XXXXX 的格式输入一个邮编。"
+msgstr "以 XXXXX 的格式输入一个邮政编码。"
 
 #: contrib/localflavor/jp/forms.py:21
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr "以 XXXXXXX 或 XXX-XXXX 的格式输入一个邮编。"
+msgstr "以 XXXXXXX 或 XXX-XXXX 的格式输入一个邮政编码。"
 
 #: contrib/localflavor/jp/jp_prefectures.py:4
 msgid "Hokkaido"
@@ -751,7 +751,7 @@ msgstr "冲绳岛"
 
 #: contrib/localflavor/br/forms.py:18
 msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "以 XXXXX-XXX 的格式输入一个邮编。"
+msgstr "以 XXXXX-XXX 的格式输入一个邮政编码。"
 
 #: contrib/localflavor/br/forms.py:30
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
@@ -764,7 +764,7 @@ msgstr "输入一个有效的芬兰社会保障号码。"
 
 #: contrib/localflavor/uk/forms.py:18
 msgid "Enter a postcode. A space is required between the two postcode parts."
-msgstr "输入一个邮政编码。两个邮编部分之间的空格是必须的。"
+msgstr "输入一个邮政编码。前后两个部分之间必须有一个空格。"
 
 #: contrib/localflavor/de/forms.py:63
 msgid "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format"
@@ -836,7 +836,7 @@ msgstr "图林根州"
 
 #: contrib/localflavor/usa/forms.py:18
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr "以 XXXXX 或 XXXXX-XXX 的格式输入一个邮编。"
+msgstr "以 XXXXX 或 XXXXX-XXX 的格式输入一个邮政编码。"
 
 #: contrib/localflavor/usa/forms.py:51
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
@@ -844,23 +844,23 @@ msgstr "以 XXX-XX-XXXX 的格式输入一个有效的美国社会保障号码�
 
 #: contrib/sessions/models.py:68
 msgid "session key"
-msgstr "session键字"
+msgstr "会话密钥"
 
 #: contrib/sessions/models.py:69
 msgid "session data"
-msgstr "session数据"
+msgstr "会话数据"
 
 #: contrib/sessions/models.py:70
 msgid "expire date"
-msgstr "过期日期"
+msgstr "过期时间"
 
 #: contrib/sessions/models.py:74
 msgid "session"
-msgstr "会话(session)"
+msgstr "会话"
 
 #: contrib/sessions/models.py:75
 msgid "sessions"
-msgstr "会话(session)"
+msgstr "会话"
 
 #: contrib/auth/forms.py:17
 #: contrib/auth/forms.py:138
@@ -869,16 +869,16 @@ msgstr "两个口令字段不一致。"
 
 #: contrib/auth/forms.py:25
 msgid "A user with that username already exists."
-msgstr "一个使用此用户名的用户已经存在。"
+msgstr "已存在一位使用该名字的用户。"
 
 #: contrib/auth/forms.py:53
 msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
-msgstr "你的Web浏览器好象不允许使用cookie。登录需要使用cookie。"
+msgstr "你的浏览器好象不允许使用cookie。登录需要使用cookie。"
 
 #: contrib/auth/forms.py:60
 #: contrib/admin/views/decorators.py:10
 msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
-msgstr "请输入正确的用户名和口令。请注意两个域都是大小写敏感的。"
+msgstr "请输入正确的用户名和口令。请注意两者都是大小写敏感的。"
 
 #: contrib/auth/forms.py:62
 msgid "This account is inactive."
@@ -886,7 +886,7 @@ msgstr "该帐号未激活。"
 
 #: contrib/auth/forms.py:85
 msgid "That e-mail address doesn't have an associated user account. Are you sure you've registered?"
-msgstr "该电子邮件地址没有关联任何用户帐号。你确定你已经注册过了？"
+msgstr "该电子邮件地址没有关联任何用户帐号。你确定已经注册过了？"
 
 #: contrib/auth/forms.py:117
 msgid "The two 'new password' fields didn't match."
@@ -933,7 +933,7 @@ msgstr "用户名"
 
 #: contrib/auth/models.py:90
 msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
-msgstr "必须。不多于30个字符。只能用字母数字（字母、数字和下横线）"
+msgstr "必填。不多于30个字符。只能用字母数字（字母、数字和下横线）"
 
 #: contrib/auth/models.py:91
 msgid "first name"
@@ -941,11 +941,11 @@ msgstr "名字"
 
 #: contrib/auth/models.py:92
 msgid "last name"
-msgstr "姓"
+msgstr "姓氏"
 
 #: contrib/auth/models.py:93
 msgid "e-mail address"
-msgstr "邮件地址"
+msgstr "e-mail 地址"
 
 #: contrib/auth/models.py:94
 msgid "password"
@@ -957,19 +957,19 @@ msgstr "使用 '[algo]$[salt]$[hexdigest]' 或使用 <a href=\"password/\">修�
 
 #: contrib/auth/models.py:95
 msgid "staff status"
-msgstr "人员状态"
+msgstr "职员状态"
 
 #: contrib/auth/models.py:95
 msgid "Designates whether the user can log into this admin site."
-msgstr "指定是否用户可以登录到这个管理站点。"
+msgstr "指明用户是否可以登录到这个管理站点。"
 
 #: contrib/auth/models.py:96
 msgid "active"
-msgstr "活动"
+msgstr "有效"
 
 #: contrib/auth/models.py:96
 msgid "Designates whether this user can log into the Django admin. Unselect this instead of deleting accounts."
-msgstr "指定是否用户可以登录到这个管理站点。用取消选择来取代删除帐号。"
+msgstr "指明用户是否可以登录到这个管理站点。以反选代替删除帐号。"
 
 #: contrib/auth/models.py:97
 msgid "superuser status"
@@ -977,7 +977,7 @@ msgstr "超级用户状态"
 
 #: contrib/auth/models.py:97
 msgid "Designates that this user has all permissions without explicitly assigning them."
-msgstr "指定是否用户可以登录到这个管理站点。"
+msgstr "指明用户是否可以登录到这个管理站点。"
 
 #: contrib/auth/models.py:98
 msgid "last login"
@@ -989,7 +989,7 @@ msgstr "加入日期"
 
 #: contrib/auth/models.py:101
 msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
-msgstr "除了手动设置权限以外，用户也会从他(她)所在的小组获得所赋组小组的所有权限。"
+msgstr "除了手工设置权限以外，用户也会从其所在组获得赋予该组的所有权限。"
 
 #: contrib/auth/models.py:102
 msgid "user permissions"
@@ -1095,7 +1095,7 @@ msgstr "九"
 
 #: contrib/contenttypes/models.py:36
 msgid "python model class name"
-msgstr "python模块类名"
+msgstr "python 模型类名"
 
 #: contrib/contenttypes/models.py:39
 msgid "content type"
@@ -1119,7 +1119,7 @@ msgstr "重定向到"
 
 #: contrib/redirects/models.py:10
 msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
-msgstr "可以是绝对路径(同上)或以'http://'开始的全URL。"
+msgstr "可以是绝对路径（同上）或以'http://'起始的全URL。"
 
 #: contrib/redirects/models.py:13
 msgid "redirect"
@@ -1136,7 +1136,7 @@ msgstr "URL"
 
 #: contrib/flatpages/models.py:8
 msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "例如：'/about/contact/'。请确保前导和结尾的除号。"
+msgstr "例如：'/about/contact/'。请确保前导和结尾的斜杠。"
 
 #: contrib/flatpages/models.py:9
 msgid "title"
@@ -1156,7 +1156,7 @@ msgstr "模板名称"
 
 #: contrib/flatpages/models.py:13
 msgid "Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use 'flatpages/default.html'."
-msgstr "例如：'flatpages/contact_page.html'。如果未提供，系统将使用'flatpages/default.html'。"
+msgstr "例如：'flatpages/contact_page.html'。若未提供，系统将使用'flatpages/default.html'。"
 
 #: contrib/flatpages/models.py:14
 msgid "registration required"
@@ -1223,7 +1223,7 @@ msgstr "等级 #8"
 
 #: contrib/comments/models.py:82
 msgid "is valid rating"
-msgstr "是无效等级"
+msgstr "是有效等级"
 
 #: contrib/comments/models.py:83
 #: contrib/comments/models.py:169
@@ -1238,15 +1238,15 @@ msgstr "公开"
 #: contrib/comments/models.py:85
 #: contrib/admin/views/doc.py:304
 msgid "IP address"
-msgstr "IP地址"
+msgstr "IP 地址"
 
 #: contrib/comments/models.py:86
 msgid "is removed"
-msgstr "被删除"
+msgstr "已删除"
 
 #: contrib/comments/models.py:86
 msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
-msgstr "如果评论不适合选中这个检查框。评论将被一条\"此评论已经被删除\"的消息所替换。"
+msgstr "若评论内容不妥，则选中这个检查框。该评论将被一条\"此评论已经被删除\"的消息所替换。"
 
 #: contrib/comments/models.py:91
 msgid "comments"
@@ -1278,7 +1278,7 @@ msgstr "人名"
 
 #: contrib/comments/models.py:171
 msgid "ip address"
-msgstr "IP地址"
+msgstr "IP 地址"
 
 #: contrib/comments/models.py:173
 msgid "approved by staff"
@@ -1302,16 +1302,16 @@ msgstr "得分日期"
 
 #: contrib/comments/models.py:237
 msgid "karma score"
-msgstr "Karma得分"
+msgstr "Karma 得分"
 
 #: contrib/comments/models.py:238
 msgid "karma scores"
-msgstr "Karma得分"
+msgstr "Karma 得分"
 
 #: contrib/comments/models.py:242
 #, python-format
 msgid "%(score)d rating by %(user)s"
-msgstr "被 %(user)s 定级为 %(score)d"
+msgstr "被 %(user)s 评为 %(score)d"
 
 #: contrib/comments/models.py:258
 #, python-format
@@ -1347,16 +1347,16 @@ msgstr "删除日期"
 
 #: contrib/comments/models.py:280
 msgid "moderator deletion"
-msgstr "删除仲裁"
+msgstr "管理员删除"
 
 #: contrib/comments/models.py:281
 msgid "moderator deletions"
-msgstr "删除仲裁"
+msgstr "管理员删除"
 
 #: contrib/comments/models.py:285
 #, python-format
 msgid "Moderator deletion by %r"
-msgstr "被 %r 仲裁删除"
+msgstr "被管理员 %r 删除"
 
 #: contrib/comments/templates/comments/form.html:6
 #: contrib/comments/templates/comments/form.html:8
@@ -1393,7 +1393,7 @@ msgstr "口令："
 
 #: contrib/comments/templates/comments/form.html:8
 msgid "Forgotten your password?"
-msgstr "忘记你的口令？"
+msgstr "忘记了你的口令？"
 
 #: contrib/comments/templates/comments/form.html:12
 msgid "Ratings"
@@ -1441,7 +1441,7 @@ msgstr "不能给自已投票"
 
 #: contrib/comments/views/comments.py:27
 msgid "This rating is required because you've entered at least one other rating."
-msgstr "要求此等级，因为你已经输入了至少一个等级。"
+msgstr "该等级必填，因为你已经输入了至少一个等级。"
 
 #: contrib/comments/views/comments.py:111
 #, python-format
@@ -1472,27 +1472,27 @@ msgstr ""
 #: contrib/comments/views/comments.py:188
 #: contrib/comments/views/comments.py:280
 msgid "Only POSTs are allowed"
-msgstr "只允许张贴"
+msgstr "只允许 POST"
 
 #: contrib/comments/views/comments.py:192
 #: contrib/comments/views/comments.py:284
 msgid "One or more of the required fields wasn't submitted"
-msgstr "一个或多个必填字段没有被提交"
+msgstr "一个或多个必填字段没有提交"
 
 #: contrib/comments/views/comments.py:196
 #: contrib/comments/views/comments.py:286
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr "有人篡改了评论表格(安全侵害)"
+msgstr "有人通过评论表单篡改（安全侵害）"
 
 #: contrib/comments/views/comments.py:206
 #: contrib/comments/views/comments.py:292
 msgid "The comment form had an invalid 'target' parameter -- the object ID was invalid"
-msgstr "评论表格有一个无效的 'target' 参数 -- 对象 ID 无效"
+msgstr "评论表单有一个无效的 'target' 参数 -- 对象 ID 无效"
 
 #: contrib/comments/views/comments.py:257
 #: contrib/comments/views/comments.py:321
 msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "评论表格无法提供 '预览' 或 '张贴' 功能"
+msgstr "评论表单无法提供 '预览' 或 '张贴' 功能"
 
 #: contrib/sites/models.py:10
 msgid "domain name"
@@ -1500,7 +1500,7 @@ msgstr "域名"
 
 #: contrib/sites/models.py:11
 msgid "display name"
-msgstr "显示名"
+msgstr "显示名称"
 
 #: contrib/sites/models.py:15
 msgid "site"
@@ -1516,7 +1516,7 @@ msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 msgstr ""
-"<h3>由 %s:</h3>\n"
+"<h3>以 %s:</h3>\n"
 "<ul>\n"
 
 #: contrib/admin/filterspecs.py:70
@@ -1576,7 +1576,7 @@ msgstr "日志记录"
 
 #: contrib/admin/templatetags/admin_list.py:247
 msgid "All dates"
-msgstr "全有日期"
+msgstr "所有日期"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 #: contrib/admin/templates/admin/500.html:4
@@ -1649,40 +1649,39 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">为安装书签，拖动链接到你的工具条，\n"
-"或右击鼠标，然后增加到你的书签上。现在你可以从这个站\n"
-"点的任何页面选择书签。注意一些这样的书签要求你从一个\n"
-"被指定为\"内部\"的计算机上来进行查看（如果你不确定是\n"
-"否你的计算机是否是\"内部\"的，同你的系统管理员沟通一\n"
-"下。</p>\n"
+"<p class=\"help\">为了安装书签，将链接拖到你的书签工具条，\n"
+"或者鼠标右击链接，添加到你的书签中。现在你可以从这个站\n"
+"点的任何页面选择书签。注意，其中某些书签要求你在一台\n"
+"被指定为\"内部\"的计算机上查看（如果不确定你的计算机\n"
+"是否为\"内部\"的，不妨跟你的系统管理员沟通一下）。</p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
 msgid "Documentation for this page"
-msgstr "本页面的文档"
+msgstr "关于本页面的文档"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:20
 msgid "Jumps you from any page to the documentation for the view that generates that page."
-msgstr "对于任何页面跳转到生成这个页面的view所在的文件。"
+msgstr "从任何页面跳转到生成该页面的view文档。"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:22
 msgid "Show object ID"
-msgstr "显示对象ID"
+msgstr "显示对象 ID"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:23
 msgid "Shows the content-type and unique ID for pages that represent a single object."
-msgstr "用于那些表现单个对象的页面显示 content-type 和唯一ID。"
+msgstr "为那些展现单个对象的页面，显示 content-type 和唯一ID。"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Edit this object (current window)"
-msgstr "编辑本对象(当前窗口)"
+msgstr "编辑该对象(当前窗口)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:26
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "用于那些表现单个对象的页面跳转到管理页面。"
+msgstr "跳转到用于展现单个对象的页面的管理页。"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "Edit this object (new window)"
-msgstr "编辑本对象(新窗口)"
+msgstr "编辑该对象(新窗口)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
@@ -1723,12 +1722,12 @@ msgstr "服务器错误 <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
 msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
-msgstr "存在一个错误。它已经通过电子邮件被报告给站点管理员了，并且应该很快被改正。谢谢你的关心。"
+msgstr "发生了一个错误。它已经通过电子邮件报告给站点管理员了，而且应该很快会得到解决。感谢您的耐心。"
 
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
-msgstr " 由 %(filter_title)s"
+msgstr " 以 %(filter_title)s"
 
 #: contrib/admin/templates/admin/filters.html:4
 msgid "Filter"
@@ -1736,11 +1735,11 @@ msgstr "过滤器"
 
 #: contrib/admin/templates/admin/invalid_setup.html:8
 msgid "Something's wrong with your database installation. Make sure the appropriate database tables have been created, and make sure the database is readable by the appropriate user."
-msgstr "你的数据库安装有错误。确保合适的数据库表已经创建好，并确保数据库可被适合的用户读取。"
+msgstr "你的数据库安装有误。确保已经创建了相应的数据库表，并确保数据库可被相关的用户读取。"
 
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
-msgstr "去"
+msgstr "执行"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
@@ -1773,11 +1772,11 @@ msgstr "动作"
 
 #: contrib/admin/templates/admin/object_history.html:26
 msgid "DATE_WITH_TIME_FULL"
-msgstr "N j, Y, P"
+msgstr "DATE_WITH_TIME_FULL"
 
 #: contrib/admin/templates/admin/object_history.html:36
 msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
-msgstr "此对象没有修改历史。可能不能通过这个管理站点来增加。"
+msgstr "该对象没有变更历史记录。可能从未通过这个管理站点添加。"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
@@ -1787,7 +1786,7 @@ msgstr "删除 %(object_name)s  '%(escaped_object)s' 会导致删除相关的对
 #: contrib/admin/templates/admin/delete_confirmation.html:21
 #, python-format
 msgid "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? All of the following related items will be deleted:"
-msgstr "你确信相要删除 %(object_name)s \"%(escaped_object)s\"？下列所有相关的项目都将被删除："
+msgstr "你确认想要删除 %(object_name)s \"%(escaped_object)s\"？ 下列所有相关的项目都将被删除："
 
 #: contrib/admin/templates/admin/delete_confirmation.html:26
 msgid "Yes, I'm sure"
@@ -1815,7 +1814,7 @@ msgstr "在站点上查看"
 #: contrib/admin/templates/admin/auth/user/change_password.html:24
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "请改正下面的错误。"
+msgstr[0] "请修正下面的错误。"
 
 #: contrib/admin/templates/admin/change_form.html:50
 msgid "Ordering"
@@ -1846,7 +1845,7 @@ msgstr "登录"
 #: contrib/admin/templates/admin/index.html:17
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr "在 %(name)s 应用中模块有效。"
+msgstr "模型在 %(name)s 应用中可用。"
 
 #: contrib/admin/templates/admin/index.html:18
 #, python-format
@@ -1875,15 +1874,15 @@ msgstr "无可用的"
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr "Django管理站点"
+msgstr "Django 站点管理员"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr "Django管理员"
+msgstr "Django 管理"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid "First, enter a username and password. Then, you'll be able to edit more user options."
-msgstr "首先，输入一个用户名和口令。然后，你可以编辑更多的用户选项。"
+msgstr "首先，输入一个用户名和口令。然后，你就可以编辑更多的用户选项。"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:12
 msgid "Username"
@@ -1927,7 +1926,7 @@ msgstr "时间："
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "感谢今天在本网站花费了您的一些宝贵时间。"
+msgstr "感谢您今天在本站花费了一些宝贵时间。"
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
@@ -1935,7 +1934,7 @@ msgstr "重新登录"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "你所收到的这封邮件是由于你请求了口令重设"
+msgstr "之所以收到这封邮件，是因为你请求了口令重设"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -1953,7 +1952,7 @@ msgstr "到这个页面可以自由地修改口令："
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Your username, in case you've forgotten:"
-msgstr "你的用户名，一旦你忘记了："
+msgstr "你的用户名，如果已忘记的话："
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
 msgid "Thanks for using our site!"
@@ -1962,7 +1961,7 @@ msgstr "感谢使用我们的站点！"
 #: contrib/admin/templates/registration/password_reset_email.html:15
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "%(site_name)s 小组"
+msgstr "%(site_name)s 团队"
 
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
@@ -1978,7 +1977,7 @@ msgstr "口令重设成功"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
 msgid "We've e-mailed a new password to the e-mail address you submitted. You should be receiving it shortly."
-msgstr "我们已经按你所提交的邮箱地址发送了一个新的口令给你。你应该很会收到这封邮件。"
+msgstr "我们已经按你所提交的邮箱地址发送了一个新的口令。你应该很快就能收到这封邮件。"
 
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/registration/password_change_form.html:6
@@ -1989,7 +1988,7 @@ msgstr "口令修改"
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
-msgstr "请输入你的旧口令，为了安全起见，接着要输入你的新口令两遍，这样我们可以校验你输入的是否正确。"
+msgstr "请输入你的旧口令，为了安全起见，接着要输入两遍新口令，以便我们校验你输入的是否正确。"
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
@@ -2014,15 +2013,15 @@ msgstr "口令修改成功"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
-msgstr "你的口令已经被修改。"
+msgstr "你的口令已修改。"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
 msgid "Forgotten your password? Enter your e-mail address below, and we'll reset your password and e-mail the new one to you."
-msgstr "忘记你的口令？在下面输入你的邮箱地址，我们将重设你的口令并且将新的口令通过邮件发送给你。"
+msgstr "忘记了你的口令？请在下面输入你的 e-mail 地址，我们将重设你的口令并将新口令通过邮件发送给你。"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
-msgstr "邮箱地址："
+msgstr "E-mail 地址："
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "Reset my password"
@@ -2030,7 +2029,7 @@ msgstr "重设我的口令"
 
 #: contrib/admin/views/main.py:223
 msgid "Site administration"
-msgstr "站点管理员"
+msgstr "站点管理"
 
 #: contrib/admin/views/main.py:257
 #: contrib/admin/views/auth.py:19
@@ -2106,12 +2105,12 @@ msgstr "%(name)s \"%(obj)s\" 删除成功。"
 
 #: contrib/admin/views/main.py:517
 msgid "Are you sure?"
-msgstr "你确信吗？"
+msgstr "你确认吗？"
 
 #: contrib/admin/views/main.py:539
 #, python-format
 msgid "Change history: %s"
-msgstr "修改历史： %s"
+msgstr "变更历史： %s"
 
 #: contrib/admin/views/main.py:573
 #, python-format
@@ -2129,11 +2128,11 @@ msgstr "数据库错误"
 
 #: contrib/admin/views/decorators.py:62
 msgid "Please log in again, because your session has expired. Don't worry: Your submission has been saved."
-msgstr "请重新登录，因为你的会话已经过期。不用担心：你的提交已经被保存。"
+msgstr "请重新登录，因为你的会话已经过期。不用担心：你的提交已保存。"
 
 #: contrib/admin/views/decorators.py:69
 msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
-msgstr "看上去你的浏览器没有配置成接受 cookie 。请允许 cookie，重新装入本页面，再试一次。"
+msgstr "似乎你的浏览器没有配置为接受 cookie 。请允许 cookie，重新装入本页面，再试一次。"
 
 #: contrib/admin/views/decorators.py:83
 msgid "Usernames cannot contain the '@' character."
@@ -2142,7 +2141,7 @@ msgstr "用户名不能包含 '@' 字符。"
 #: contrib/admin/views/decorators.py:85
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "你的邮箱地址不是你的用户名。换 '%s' 试试。"
+msgstr "你的 e-mail 地址不是你的用户名。换 '%s' 试试。"
 
 #: contrib/admin/views/doc.py:46
 #: contrib/admin/views/doc.py:48
@@ -2237,7 +2236,7 @@ msgstr "日期(带时间)"
 
 #: contrib/admin/views/doc.py:297
 msgid "E-mail address"
-msgstr "邮箱地址"
+msgstr "E-mail 地址"
 
 #: contrib/admin/views/doc.py:298
 #: contrib/admin/views/doc.py:299
@@ -2251,7 +2250,7 @@ msgstr "小数"
 
 #: contrib/admin/views/doc.py:306
 msgid "Boolean (Either True, False or None)"
-msgstr "布尔(True, False或None)"
+msgstr "布尔值(True, False或None)"
 
 #: contrib/admin/views/doc.py:307
 msgid "Relation to parent model"
@@ -2275,7 +2274,7 @@ msgstr "美国州名(两个大写字母)"
 
 #: contrib/admin/views/doc.py:317
 msgid "XML text"
-msgstr "XML文本"
+msgstr "XML 文本"
 
 #: contrib/admin/views/doc.py:343
 #, python-format
@@ -2284,7 +2283,7 @@ msgstr "%s 似乎不是一个 urlpattern 对象"
 
 #: contrib/admin/views/auth.py:30
 msgid "Add user"
-msgstr "增加用户"
+msgstr "新增用户"
 
 #: contrib/admin/views/auth.py:57
 msgid "Password changed successfully."
@@ -2341,27 +2340,27 @@ msgstr "输入一个有效的值。"
 #: newforms/fields.py:271
 #: core/validators.py:162
 msgid "Enter a valid e-mail address."
-msgstr "输入一个有效的邮件地址。"
+msgstr "输入一个有效的 e-mail 地址。"
 
 #: newforms/fields.py:289
 #: newforms/fields.py:311
 msgid "Enter a valid URL."
-msgstr "输入一个有效的URL。"
+msgstr "输入一个有效的 URL。"
 
 #: newforms/fields.py:313
 msgid "This URL appears to be a broken link."
-msgstr "URL %s 似乎是一个坏的链接。"
+msgstr "URL %s 似乎是一个已损坏的链接。"
 
 #: newforms/fields.py:362
 #: newforms/models.py:165
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "选择一个有效的选项： 此选择不在可用的选项中。"
+msgstr "选择一个有效的选项： 该选择不在可用的选项中。"
 
 #: newforms/fields.py:380
 #: newforms/fields.py:456
 #: newforms/models.py:182
 msgid "Enter a list of values."
-msgstr "输入一个值的列表。"
+msgstr "输入一系列值。"
 
 #: newforms/fields.py:389
 #: newforms/models.py:188
@@ -2390,15 +2389,15 @@ msgstr "%(verbose_name)s 已被删除。"
 
 #: core/validators.py:64
 msgid "This value must contain only letters, numbers and underscores."
-msgstr "此值只能包含字母、数字和下划线。"
+msgstr "该值只能包含字母、数字和下划线。"
 
 #: core/validators.py:68
 msgid "This value must contain only letters, numbers, underscores, dashes or slashes."
-msgstr "此值只能包含字母、数字、下划线、反斜线和斜线。"
+msgstr "该值只能包含字母、数字、下划线、反斜线和斜线。"
 
 #: core/validators.py:72
 msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr "此值只能包含字母、数字和下划线。"
+msgstr "该值只能包含字母、数字和下划线。"
 
 #: core/validators.py:76
 msgid "Uppercase letters are not allowed here."
@@ -2414,11 +2413,11 @@ msgstr "只能输入用逗号分隔的数字。"
 
 #: core/validators.py:99
 msgid "Enter valid e-mail addresses separated by commas."
-msgstr "输入用逗号分隔的有效邮件地址。"
+msgstr "输入用逗号分隔的有效 e-mail 地址。"
 
 #: core/validators.py:103
 msgid "Please enter a valid IP address."
-msgstr "请输入一个有效的IP地址。"
+msgstr "请输入一个有效的 IP 地址。"
 
 #: core/validators.py:107
 msgid "Empty values are not allowed here."
@@ -2430,7 +2429,7 @@ msgstr "这里不允许非数字字符。"
 
 #: core/validators.py:115
 msgid "This value can't be comprised solely of digits."
-msgstr "此值不能全部由数字组成。"
+msgstr "该值不能全部由数字组成。"
 
 #: core/validators.py:124
 msgid "Only alphabetical characters are allowed here."
@@ -2438,7 +2437,7 @@ msgstr "这里只允许字母。"
 
 #: core/validators.py:139
 msgid "Year must be 1900 or later."
-msgstr "年份必须是1900或之后"
+msgstr "年份必须为1900之后。"
 
 #: core/validators.py:143
 #, python-format
@@ -2451,12 +2450,12 @@ msgstr "输入一个 HH:MM 格式的有效时间。"
 
 #: core/validators.py:178
 msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
-msgstr "上传一个有效的图片。您所上传的文件或者不是图片或是一个破坏的图片。"
+msgstr "请上传一张有效的图片。您所上传的文件不是图片或者是已损坏的图片。"
 
 #: core/validators.py:185
 #, python-format
 msgid "The URL %s does not point to a valid image."
-msgstr "URL %s 指向的不是一个有效的图片。"
+msgstr "URL %s 所指向的并非有效图片。"
 
 #: core/validators.py:189
 #, python-format
@@ -2466,11 +2465,11 @@ msgstr "电话号码必须为 XXX-XXX-XXXX 格式。\"%s\"是无效的。"
 #: core/validators.py:197
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "URL %s 指向的不是一个有效的 QuickTime 视频。"
+msgstr "URL %s 所指向的并非有效 QuickTime 视频。"
 
 #: core/validators.py:201
 msgid "A valid URL is required."
-msgstr "需要是一个有效的URL。"
+msgstr "需要一个有效的 URL。"
 
 #: core/validators.py:215
 #, python-format
@@ -2478,7 +2477,7 @@ msgid ""
 "Valid HTML is required. Specific errors are:\n"
 "%s"
 msgstr ""
-"需要有效的HTML。详细的错误是：\n"
+"需要有效的 HTML。详细的错误是：\n"
 "%s"
 
 #: core/validators.py:222
@@ -2495,17 +2494,17 @@ msgstr "无效 URL: %s"
 #: core/validators.py:246
 #, python-format
 msgid "The URL %s is a broken link."
-msgstr "URL %s 是一个断开的链接。"
+msgstr "URL %s 是一个损坏的链接。"
 
 #: core/validators.py:252
 msgid "Enter a valid U.S. state abbreviation."
-msgstr "输入一个有效的 U.S. 州缩写。"
+msgstr "输入一个有效的美国州名缩写。"
 
 #: core/validators.py:266
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "看住你的嘴！%s 不允许在这里出现。"
+msgstr[0] "注意言论！%s 不允许在这里出现。"
 
 #: core/validators.py:273
 #, python-format
@@ -2519,7 +2518,7 @@ msgstr "请至少在一个字段上输入些什么。"
 #: core/validators.py:301
 #: core/validators.py:312
 msgid "Please enter both fields or leave them both empty."
-msgstr "请要么两个字段都输入或者两个字段都空着。"
+msgstr "请输入两个字段或者两个字段都空着。"
 
 #: core/validators.py:320
 #, python-format
@@ -2533,7 +2532,7 @@ msgstr "如果 %(field)s 不是 %(value)s 时这个字段必须给出"
 
 #: core/validators.py:352
 msgid "Duplicate values are not allowed."
-msgstr "重复值不允许。"
+msgstr "不允许重复值。"
 
 #: core/validators.py:367
 #, python-format
@@ -2543,7 +2542,7 @@ msgstr "这个值必须介于 %(lower)s 和 %(upper)s 之间。"
 #: core/validators.py:369
 #, python-format
 msgid "This value must be at least %s."
-msgstr "这个值需要至少为 %s"
+msgstr "这个值必须至少为 %s"
 
 #: core/validators.py:371
 #, python-format
@@ -2589,11 +2588,11 @@ msgstr "请确保你上传的文件至多 %s 字节大。"
 
 #: core/validators.py:456
 msgid "The format for this field is wrong."
-msgstr "这个字段的格式不正确。"
+msgstr "该字段的格式不正确。"
 
 #: core/validators.py:471
 msgid "This field is invalid."
-msgstr "这个字段无效。"
+msgstr "该字段无效。"
 
 #: core/validators.py:507
 #, python-format
@@ -2608,27 +2607,27 @@ msgstr "URL %(url)s 返回了无效的 Content-Type 头 '%(contenttype)s'。"
 #: core/validators.py:543
 #, python-format
 msgid "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with \"%(start)s\".)"
-msgstr "请关闭未关闭的 %(tag)s 标签从第 %(line)s 行。(行开始于 \"%(start)s\"。)"
+msgstr "请关闭还处于打开状态的 %(tag)s 标签从第 %(line)s 行。(行开始于 \"%(start)s\"。)"
 
 #: core/validators.py:547
 #, python-format
 msgid "Some text starting on line %(line)s is not allowed in that context. (Line starts with \"%(start)s\".)"
-msgstr "在 %(line)s 行开始的一些文本不允许在那个上下文中。(行开始于 \"%(start)s\"。)"
+msgstr "从 %(line)s 行开始的一些文本，不允许出现在上下文中。(行开始于 \"%(start)s\"。)"
 
 #: core/validators.py:552
 #, python-format
 msgid "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%(start)s\".)"
-msgstr "在 %(line)s 行的\"%(attr)s\"不是一个有效的属性。(行开始于 \"%(start)s\"。)"
+msgstr "在 %(line)s 行的\"%(attr)s\"是无效的属性。(行开始于 \"%(start)s\"。)"
 
 #: core/validators.py:557
 #, python-format
 msgid "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%(start)s\".)"
-msgstr "在 %(line)s 行的\"<%(tag)s>\"不是一个有效的标签。(行开始于 \"%(start)s\"。)"
+msgstr "在 %(line)s 行的\"<%(tag)s>\"是无效的标签。(行开始于 \"%(start)s\"。)"
 
 #: core/validators.py:561
 #, python-format
 msgid "A tag on line %(line)s is missing one or more required attributes. (Line starts with \"%(start)s\".)"
-msgstr "在行 %(line)s 的标签少了一个或多个必须的属性。(行开始于 \"%(start)s\"。)"
+msgstr "在行 %(line)s 的标签少了一个或多个必填的属性。(行开始于 \"%(start)s\"。)"
 
 #: core/validators.py:566
 #, python-format
