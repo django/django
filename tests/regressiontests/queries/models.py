@@ -561,6 +561,10 @@ Multiple filter statements are joined using "AND" all the time.
 >>> Author.objects.filter(Q(extra__note=n1)|Q(item__note=n3)).filter(id=a1.id)
 [<Author: a1>]
 
+Bug #6981
+>>> Tag.objects.select_related('parent').order_by('name')
+[<Tag: t1>, <Tag: t2>, <Tag: t3>, <Tag: t4>, <Tag: t5>]
+
 Bug #6180, #6203
 >>> Item.objects.count()
 4

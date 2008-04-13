@@ -793,11 +793,13 @@ class Query(object):
                     lhs_col = int_opts.parents[int_model].column
                     int_opts = int_model._meta
                     alias = self.join((alias, int_opts.db_table, lhs_col,
-                            int_opts.pk.column), exclusions=used)
+                            int_opts.pk.column), exclusions=used,
+                            promote=f.null)
             else:
                 alias = root_alias
             alias = self.join((alias, table, f.column,
-                    f.rel.get_related_field().column), exclusions=used)
+                    f.rel.get_related_field().column), exclusions=used,
+                    promote=f.null)
             used.add(alias)
             self.select.extend([(alias, f2.column)
                     for f2 in f.rel.to._meta.fields])
