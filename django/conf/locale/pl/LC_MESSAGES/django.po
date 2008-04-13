@@ -5,9 +5,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-29 20:56+0100\n"
+"POT-Creation-Date: 2008-04-13 16:16+0200\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
-"Last-Translator: Łukasz Czyżykowki <lukasz.czyzykowski@gmail.com>\n"
+"Last-Translator: Piotr Lewandowski <django@icomputing.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -153,8 +153,8 @@ msgid "Portugese"
 msgstr "Portugalski"
 
 #: conf/global_settings.py:73
-msgid "Brazilian"
-msgstr "Brazylijski"
+msgid "Brazilian Portuguese"
+msgstr "Brazylijski portugalski"
 
 #: conf/global_settings.py:74
 msgid "Romanian"
@@ -1181,11 +1181,11 @@ msgstr "aktywny"
 
 #: contrib/auth/models.py:137
 msgid ""
-"Designates whether this user can log into the Django admin. Unselect this "
+"Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Oznacza czy użytkownik może zalogować się do panelu administratora. Odznacz "
-"to zamiast usuwać konta."
+"Oznacza czy użytkownika należy uważać za aktywnego. Odznacz to"
+"zamiast usuwać konta."
 
 #: contrib/auth/models.py:138
 msgid "superuser status"
@@ -2561,12 +2561,10 @@ msgid "Jalisco"
 msgstr "Jalisco"
 
 #: contrib/localflavor/mx/mx_states.py:26
-#, fuzzy
 msgid "Estado de México"
 msgstr "Meksyk (stan)"
 
 #: contrib/localflavor/mx/mx_states.py:27
-#, fuzzy
 msgid "Michoacán"
 msgstr "Michocan"
 
@@ -2579,7 +2577,6 @@ msgid "Nayarit"
 msgstr "Nayarit"
 
 #: contrib/localflavor/mx/mx_states.py:30
-#, fuzzy
 msgid "Nuevo León"
 msgstr "Nuevo Leon"
 
@@ -2592,7 +2589,6 @@ msgid "Puebla"
 msgstr "Puebla"
 
 #: contrib/localflavor/mx/mx_states.py:33
-#, fuzzy
 msgid "Querétaro"
 msgstr "Queretaro"
 
@@ -2605,7 +2601,6 @@ msgid "Sinaloa"
 msgstr "Sinaloa"
 
 #: contrib/localflavor/mx/mx_states.py:36
-#, fuzzy
 msgid "San Luis Potosí"
 msgstr "San Luis Potasi"
 
@@ -2630,7 +2625,6 @@ msgid "Veracruz"
 msgstr "Veracruz"
 
 #: contrib/localflavor/mx/mx_states.py:42
-#, fuzzy
 msgid "Yucatán"
 msgstr "Jukatan"
 
@@ -4411,6 +4405,9 @@ msgstr "%(verbose_name)s zostało pomyślnie zmienione."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s zostało usunięte."
+
+#~ msgid "Brazilian"
+#~ msgstr "Brazylijski"
 
 #~ msgid "Gaeilge"
 #~ msgstr "Gaelicki"
