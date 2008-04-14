@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-04-13 16:16+0200\n"
+"POT-Creation-Date: 2008-04-14 18:02+0200\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Piotr Lewandowski <django@icomputing.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -98,7 +98,7 @@ msgstr "Hebrajski"
 
 #: conf/global_settings.py:59
 msgid "Croatian"
-msgstr "Horwacki"
+msgstr "Chorwacki"
 
 #: conf/global_settings.py:60
 msgid "Icelandic"
@@ -263,7 +263,7 @@ msgstr "id obiektu"
 
 #: contrib/admin/models.py:22
 msgid "object repr"
-msgstr "reprezentacj obiektu"
+msgstr "reprezentacja obiektu"
 
 #: contrib/admin/models.py:23
 msgid "action flag"
@@ -288,7 +288,7 @@ msgstr "Strona nie znaleziona"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Niestety nie można znaleźć rządanej strony."
+msgstr "Niestety, żądana strona nie została znaleziona."
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/base.html:37
@@ -313,7 +313,7 @@ msgstr "Błąd serwera"
 
 #: contrib/admin/templates/admin/500.html:6
 msgid "Server error (500)"
-msgstr "Bład serwera (500)"
+msgstr "Błąd serwera (500)"
 
 #: contrib/admin/templates/admin/500.html:9
 msgid "Server Error <em>(500)</em>"
@@ -324,8 +324,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Wystąpił niespodziewany błąd. Raport został wysłany emailem administratorowi "
-"strony."
+"Wystąpił niespodziewany błąd. Raport został wysłany e-mailem "
+"administratorowi strony."
 
 #: contrib/admin/templates/admin/base.html:26
 msgid "Welcome,"
@@ -599,7 +599,7 @@ msgstr ""
 "<p class=\"help\">Aby zainstalować skryptozakładki, przeciągnij łącze do "
 "paska zakładek\n"
 "lub kliknij prawym klawiszem na łączu i dodaj je do zakładek. Teraz możesz\n"
-"wybrać skryptozakładkę na dowolnej stronie serwisu.  Uwaga: niektóre z tych "
+"wybrać skryptozakładkę na dowolnej stronie serwisu. Uwaga: niektóre z tych "
 "skryptozakładek wymagają przeglądania serwisu z komputera\n"
 "\"wewnętrznego\" (skontaktuj się z administratorem systemu, jeśli nie jesteś "
 "pewien, czy ten komputer jest \"wewnętrznym\").</p>\n"
@@ -633,11 +633,13 @@ msgstr "Edytuj ten obiekt (bieżące okno)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Przeskok do panelu admina dla stron reprezentujących pojedynczy obiekt"
+msgstr ""
+"Przeskok do panelu administratora dla stron reprezentujących pojedynczy "
+"obiekt."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
-msgstr "Edytuj ten obiekt (nowe onko)"
+msgstr "Edytuj ten obiekt (nowe okno)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
@@ -706,12 +708,12 @@ msgid ""
 "We've e-mailed a new password to the e-mail address you submitted. You "
 "should be receiving it shortly."
 msgstr ""
-"Nowe hasło zostało wysłane na podany adres email. Powinieneś otrzymać je "
+"Nowe hasło zostało wysłane na podany adres e-mail. Powinieneś otrzymać je "
 "niebawem."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Otrzymałeś email gdyż zażądałeś zresetowania hasła"
+msgstr "Otrzymałeś ten e-mail gdyż zażądałeś zresetowania hasła"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -733,7 +735,7 @@ msgstr "Twój login:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
 msgid "Thanks for using our site!"
-msgstr "Dziękujemy za używanie strony!"
+msgstr "Dziękujemy za używanie naszej strony!"
 
 #: contrib/admin/templates/registration/password_reset_email.html:15
 #, python-format
@@ -745,8 +747,7 @@ msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll reset "
 "your password and e-mail the new one to you."
 msgstr ""
-"Podaj swój adres email. Hasło zostanie zresetowane i wysłane na twój adres "
-"email."
+"Podaj swój adres e-mail. Hasło zostanie zresetowane i wysłane na ten adres."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -1184,8 +1185,8 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Oznacza czy użytkownika należy uważać za aktywnego. Odznacz to"
-"zamiast usuwać konta."
+"Oznacza czy użytkownika należy uważać za aktywnego. Odznacz tozamiast usuwać "
+"konta."
 
 #: contrib/auth/models.py:138
 msgid "superuser status"
@@ -1306,7 +1307,7 @@ msgstr "data/czas dodania"
 
 #: contrib/comments/models.py:88 contrib/comments/models.py:180
 msgid "is public"
-msgstr "publicznie dostepny"
+msgstr "publicznie dostępny"
 
 #: contrib/comments/models.py:90
 msgid "is removed"
@@ -1505,7 +1506,7 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-"Ten komentarze został dodany przez użytkownika::\n"
+"Ten komentarz został dodany przez użytkownika::\n"
 "\n"
 "%(text)s"
 
@@ -1522,7 +1523,9 @@ msgstr "Jedno lub więcej wymaganych pól nie zostało wypełnionych"
 #: contrib/comments/views/comments.py:198
 #: contrib/comments/views/comments.py:289
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Ktoś próbował obejść zabezpieczenia formularza komentarzy"
+msgstr ""
+"Ktoś próbował obejść zabezpieczenia formularza komentarzy (naruszenie "
+"bezpieczeństwa)"
 
 #: contrib/comments/views/comments.py:208
 #: contrib/comments/views/comments.py:295
@@ -1887,15 +1890,15 @@ msgstr ""
 
 #: contrib/localflavor/cl/forms.py:29
 msgid "Enter a valid Chilean RUT."
-msgstr "Wpisz poprawny czilijski RUT"
+msgstr "Wpisz poprawny chilijski RUT"
 
 #: contrib/localflavor/cl/forms.py:30
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "Podaj poprawny czilijski RUT w formacie XX.XXX.XXX-X."
+msgstr "Podaj poprawny chilijski RUT w formacie XX.XXX.XXX-X."
 
 #: contrib/localflavor/cl/forms.py:31
 msgid "The Chilean RUT is not valid."
-msgstr "Podany czilijski RUT jest nieprawidłowy."
+msgstr "Podany chilijski RUT jest nieprawidłowy."
 
 #: contrib/localflavor/de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -1971,7 +1974,7 @@ msgid ""
 "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
 "format."
 msgstr ""
-"Podaj poprawny niemiecki numer dowodu osobistego w formacie XXXXXXXXXXX-"
+"Podaj poprawny numer niemieckiego dowodu osobistego w formacie XXXXXXXXXXX-"
 "XXXXXXX-XXXXXXX-X."
 
 #: contrib/localflavor/es/es_provinces.py:5
@@ -3451,7 +3454,7 @@ msgstr "Wpisz poprawny południowoafrykański kod pocztowy"
 
 #: contrib/localflavor/za/za_provinces.py:4
 msgid "Eastern Cape"
-msgstr "Prowincja Przylądkowa Wshodnia"
+msgstr "Prowincja Przylądkowa Wschodnia"
 
 #: contrib/localflavor/za/za_provinces.py:5
 msgid "Free State"
@@ -3575,7 +3578,7 @@ msgstr "Małe litery nie są tutaj dozwolone."
 
 #: core/validators.py:95
 msgid "Enter only digits separated by commas."
-msgstr "Wpisz tylko cyfry odddzielone przecinkami."
+msgstr "Wpisz tylko cyfry oddzielone przecinkami."
 
 #: core/validators.py:107
 msgid "Enter valid e-mail addresses separated by commas."
@@ -3773,10 +3776,9 @@ msgid_plural ""
 msgstr[0] ""
 "Proszę wpisać poprawną liczbę dziesiętną zawierającą nie więcej niż %s cyfrę."
 msgstr[1] ""
-"Proszę wpisać poprawną liczbę dziesiętną zawierającą nie więcej niż  %s "
-"cyfry."
+"Proszę wpisać poprawną liczbę dziesiętną zawierającą nie więcej niż %s cyfry."
 msgstr[2] ""
-"Proszę wpisać poprawną liczbę dziesiętną zawierającą nie więcej niż  %s cyfr."
+"Proszę wpisać poprawną liczbę dziesiętną zawierającą nie więcej niż %s cyfr."
 
 #: core/validators.py:450
 #, python-format
@@ -3903,7 +3905,8 @@ msgstr "Ta wartość musi być liczbą całkowitą."
 
 #: db/models/fields/__init__.py:466
 msgid "This value must be either True or False."
-msgstr "Ta wartość musi być logiczna (True, False - prawda lub fałsz)."
+msgstr ""
+"Ta wartość musi być wartością logiczną (True, False - prawda lub fałsz)."
 
 #: db/models/fields/__init__.py:490
 msgid "This field cannot be null."
@@ -3920,7 +3923,7 @@ msgstr "Wpisz poprawną nazwę pliku."
 #: db/models/fields/__init__.py:960
 msgid "This value must be either None, True or False."
 msgstr ""
-"Ta wartość musi być jedną z None (żadne), True (prawda) lub False (fałsz)."
+"Ta wartość musi być jedną z None (nic), True (prawda) lub False (fałsz)."
 
 #: db/models/fields/related.py:93
 #, python-format
@@ -4225,7 +4228,7 @@ msgstr "Wrzesień"
 
 #: utils/dates.py:19
 msgid "October"
-msgstr "Pażdziernik"
+msgstr "Październik"
 
 #: utils/dates.py:19
 msgid "November"
@@ -4326,7 +4329,7 @@ msgstr[2] "lat"
 msgid "month"
 msgid_plural "months"
 msgstr[0] "miesiąc"
-msgstr[1] "miesięce"
+msgstr[1] "miesiące"
 msgstr[2] "miesięcy"
 
 #: utils/timesince.py:23
