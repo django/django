@@ -402,6 +402,13 @@ class _QuerySet(object):
             obj.query.max_depth = depth
         return obj
 
+    def dup_select_related(self, other):
+        """
+        Copies the related selection status from the queryset 'other' to the
+        current queryset.
+        """
+        self.query.select_related = other.query.select_related
+
     def order_by(self, *field_names):
         """Returns a new QuerySet instance with the ordering changed."""
         assert self.query.can_filter(), \
