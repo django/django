@@ -1,3 +1,4 @@
+import copy
 import datetime
 import os
 import time
@@ -126,11 +127,13 @@ class Field(object):
         return cmp(self.creation_counter, other.creation_counter)
 
     def __deepcopy__(self, memodict):
-        # Slight hack; deepcopy() is difficult to do on classes with
-        # dynamically created methods. Fortunately, we can get away with doing
-        # a shallow copy in this particular case.
-        import copy
-        return copy.copy(self)
+        # We don't have to deepcopy very much here, since most things are not
+        # intended to be altered after initial creation.
+        obj = copy.copy(self)
+        if self.rel:
+            obj.rel = copy.copy(self.rel)
+        memodict[id(self)] = obj
+        return obj
 
     def to_python(self, value):
         """

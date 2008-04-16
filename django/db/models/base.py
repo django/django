@@ -1,3 +1,4 @@
+import copy
 import types
 import sys
 import os
@@ -111,7 +112,7 @@ class ModelBase(type):
                     if field.name in names:
                         raise FieldError('Local field %r in class %r clashes with field of similar name from abstract base class %r'
                                 % (field.name, name, base.__name__))
-                    new_class.add_to_class(field.name, field)
+                    new_class.add_to_class(field.name, copy.deepcopy(field))
 
         if abstract:
             # Abstract base models can't be instantiated and don't appear in
