@@ -24,7 +24,7 @@ class DeleteQuery(Query):
         """
         assert len(self.tables) == 1, \
                 "Can only delete from one table at a time."
-        result = ['DELETE FROM %s' % self.tables[0]]
+        result = ['DELETE FROM %s' % self.quote_name_unless_alias(self.tables[0])]
         where, params = self.where.as_sql()
         result.append('WHERE %s' % where)
         return ' '.join(result), tuple(params)
