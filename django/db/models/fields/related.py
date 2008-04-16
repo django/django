@@ -1,3 +1,5 @@
+import copy
+
 from django.db import connection, transaction
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, get_ul_class
@@ -108,6 +110,8 @@ class RelatedField(object):
             add_lazy_relation(cls, self, other)
         else:
             self.do_related_class(other, cls)
+        if not cls._meta.abstract and self.rel.related_name:
+            self.rel.related_name = self.rel.related_name % {'class': cls.__name__.lower()}
 
     def set_attributes_from_rel(self):
         self.name = self.name or (self.rel.to._meta.object_name.lower() + '_' + self.rel.to._meta.pk.name)
@@ -149,9 +153,10 @@ class RelatedField(object):
         raise TypeError, "Related Field has invalid lookup: %s" % lookup_type
 
     def _get_related_query_name(self, opts):
-        # This method defines the name that can be used to identify this related object
-        # in a table-spanning query. It uses the lower-cased object_name by default,
-        # but this can be overridden with the "related_name" option.
+        # This method defines the name that can be used to identify this
+        # related object in a table-spanning query. It uses the lower-cased
+        # object_name by default, but this can be overridden with the
+        # "related_name" option.
         return self.rel.related_name or opts.object_name.lower()
 
 class SingleRelatedObjectDescriptor(object):

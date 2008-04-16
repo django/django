@@ -886,6 +886,10 @@ relationship should work. All are optional:
                              `related objects documentation`_ for a full
                              explanation and example.
 
+                             If using this in an `abstract base class`_, be
+                             sure to read the `extra notes`_ in that section
+                             about ``related_name``.
+
     ``to_field``             The field on the related object that the relation
                              is to. By default, Django uses the primary key of
                              the related object.
@@ -893,6 +897,8 @@ relationship should work. All are optional:
 
 .. _`Database API reference`: ../db-api/
 .. _related objects documentation: ../db-api/#related-objects
+.. _abstract base class: `Abstract base classes`_
+.. _extra notes: `Be careful with related_name`_
 
 Many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2145,6 +2151,39 @@ Some attributes won't make sense to include in the ``Meta`` class of an
 abstract base class. For example, including ``db_table`` would mean that all
 the child classes (the ones that don't specify their own ``Meta``) would use
 the same database table, which is almost certainly not what you want.
+
+Be careful with ``related_name``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are using the ``related_name`` attribute on a ``ForeignKey`` or
+``ManyToManyField``, you must always specify a *unique* reverse name for the
+field. This would normally cause a problem in abstract base classes, since the
+fields on this class are included into each of the child classes, with exactly
+the same values for the attributes (including ``related_name``) each time.
+
+To work around this problem, when you are using ``related_name`` in an
+abstract base class (only), part of the name should be the string
+``'%(class)s'``. This is replaced by the lower-cased name of the child class
+that the field is used in. Since each class has a different name, each related
+name will end up being different. For example::
+
+    class Base(models.Model):
+        m2m = models.ManyToMany(OtherModel, related_name="%(class)s_related")
+
+        class Meta:
+            abstract = True
+
+    class ChildA(Base):
+        pass
+
+    class ChildB(Base):
+        pass
+
+The reverse name of the ``ChildA.m2m`` field will be ``childa_related``,
+whilst the reverse name of the ``ChildB.m2m`` field will be
+``childb_related``. It is up to you how you use the ``'%(class)s'`` portion to
+construct your related name, but if you forget to use it, Django will raise
+errors when you validate your models (or run ``syncdb``).
 
 Multi-table inheritance
 -----------------------
