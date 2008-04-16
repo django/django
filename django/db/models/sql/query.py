@@ -13,6 +13,7 @@ from copy import deepcopy
 from django.utils.tree import Node
 from django.utils.datastructures import SortedDict
 from django.dispatch import dispatcher
+from django.db import connection
 from django.db.models import signals
 from django.db.models.sql.where import WhereNode, EverythingNode, AND, OR
 from django.db.models.sql.datastructures import Count
@@ -1370,6 +1371,11 @@ class Query(object):
         # The MULTI case.
         return iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
                 self.connection.features.empty_fetchmany_value)
+
+# Use the backend's custom Query class if it defines one. Otherwise, use the
+# default.
+if connection.features.uses_custom_query_class:
+    Query = connection.ops.query_class(Query)
 
 def get_order_dir(field, default='ASC'):
     """

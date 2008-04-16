@@ -16,7 +16,7 @@ ITER_CHUNK_SIZE = CHUNK_SIZE
 # Pull into this namespace for backwards compatibility
 EmptyResultSet = sql.EmptyResultSet
 
-class _QuerySet(object):
+class QuerySet(object):
     "Represents a lazy database lookup for a set of objects"
     def __init__(self, model=None, query=None):
         self.model = model
@@ -477,12 +477,6 @@ class _QuerySet(object):
         if self.__class__ is not other.__class__:
             raise TypeError("Cannot merge querysets of different types ('%s' and '%s'."
                     % (self.__class__.__name__, other.__class__.__name__))
-
-# Use the backend's QuerySet class if it defines one. Otherwise, use _QuerySet.
-if connection.features.uses_custom_queryset:
-    QuerySet = connection.ops.query_set_class(_QuerySet)
-else:
-    QuerySet = _QuerySet
 
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
