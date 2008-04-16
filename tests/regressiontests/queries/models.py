@@ -111,6 +111,12 @@ class LoopY(models.Model):
     class Meta:
         ordering = ['x']
 
+class LoopZ(models.Model):
+    z = models.ForeignKey('self')
+
+    class Meta:
+        ordering = ['z']
+
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag(name='t1')
 >>> t1.save()
@@ -426,9 +432,14 @@ Traceback (most recent call last):
 ...
 FieldError: Infinite loop caused by ordering.
 
+>>> LoopZ.objects.all()
+Traceback (most recent call last):
+...
+FieldError: Infinite loop caused by ordering.
+
 # ... but you can still order in a non-recursive fashion amongst linked fields
 # (the previous test failed because the default ordering was recursive).
->>> LoopX.objects.all().order_by('y__x__id')
+>>> LoopX.objects.all().order_by('y__x__y__x__id')
 []
 
 # If the remote model does not have a default ordering, we order by its 'id'

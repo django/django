@@ -535,7 +535,7 @@ class Query(object):
             # Firstly, avoid infinite loops.
             if not already_seen:
                 already_seen = set()
-            join_tuple = tuple(joins)
+            join_tuple = tuple([self.alias_map[j][TABLE_NAME] for j in joins])
             if join_tuple in already_seen:
                 raise FieldError('Infinite loop caused by ordering.')
             already_seen.add(join_tuple)
