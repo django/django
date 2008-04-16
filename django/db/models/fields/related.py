@@ -1,5 +1,3 @@
-import copy
-
 from django.db import connection, transaction
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, get_ul_class
