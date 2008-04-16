@@ -4,10 +4,10 @@ Oracle database backend for Django.
 Requires cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 """
 
-import datetime
 import os
 
 from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
+from django.db.backends.oracle import query
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_str, force_unicode
 
@@ -30,7 +30,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     needs_upper_for_iops = True
     supports_tablespaces = True
     uses_case_insensitive_names = True
-    uses_custom_queryset = True
+    uses_custom_query_class = True
 
 class DatabaseOperations(BaseDatabaseOperations):
     def autoinc_sql(self, table, column):
@@ -99,118 +99,8 @@ class DatabaseOperations(BaseDatabaseOperations):
     def max_name_length(self):
         return 30
 
-    def query_set_class(self, DefaultQuerySet):
-        # Getting the base default `Query` object.
-        DefaultQuery = DefaultQuerySet().query.__class__
-
-        class OracleQuery(DefaultQuery):
-            def resolve_columns(self, row, fields=()):
-                from django.db.models.fields import DateField, DateTimeField, \
-                     TimeField, BooleanField, NullBooleanField, DecimalField, Field
-                values = []
-                for value, field in map(None, row, fields):
-                    if isinstance(value, Database.LOB):
-                        value = value.read()
-                    # Oracle stores empty strings as null. We need to undo this in
-                    # order to adhere to the Django convention of using the empty
-                    # string instead of null, but only if the field accepts the
-                    # empty string.
-                    if value is None and isinstance(field, Field) and field.empty_strings_allowed:
-                        value = u''
-                    # Convert 1 or 0 to True or False
-                    elif value in (1, 0) and isinstance(field, (BooleanField, NullBooleanField)):
-                        value = bool(value)
-                    # Convert floats to decimals
-                    elif value is not None and isinstance(field, DecimalField):
-                        value = util.typecast_decimal(field.format_number(value))
-                    # cx_Oracle always returns datetime.datetime objects for
-                    # DATE and TIMESTAMP columns, but Django wants to see a
-                    # python datetime.date, .time, or .datetime.  We use the type
-                    # of the Field to determine which to cast to, but it's not
-                    # always available.
-                    # As a workaround, we cast to date if all the time-related
-                    # values are 0, or to time if the date is 1/1/1900.
-                    # This could be cleaned a bit by adding a method to the Field
-                    # classes to normalize values from the database (the to_python
-                    # method is used for validation and isn't what we want here).
-                    elif isinstance(value, Database.Timestamp):
-                        # In Python 2.3, the cx_Oracle driver returns its own
-                        # Timestamp object that we must convert to a datetime class.
-                        if not isinstance(value, datetime.datetime):
-                            value = datetime.datetime(value.year, value.month, value.day, value.hour,
-                                                      value.minute, value.second, value.fsecond)
-                        if isinstance(field, DateTimeField):
-                            pass  # DateTimeField subclasses DateField so must be checked first.
-                        elif isinstance(field, DateField):
-                            value = value.date()
-                        elif isinstance(field, TimeField) or (value.year == 1900 and value.month == value.day == 1):
-                            value = value.time()
-                        elif value.hour == value.minute == value.second == value.microsecond == 0:
-                            value = value.date()
-                    values.append(value)
-                return values
-
-            def as_sql(self, with_limits=True):
-                """
-                Creates the SQL for this query. Returns the SQL string and list
-                of parameters.  This is overriden from the original Query class
-                to accommodate Oracle's limit/offset SQL.
-
-                If 'with_limits' is False, any limit/offset information is not
-                included in the query.
-                """
-                # The `do_offset` flag indicates whether we need to construct
-                # the SQL needed to use limit/offset w/Oracle.
-                do_offset = with_limits and (self.high_mark or self.low_mark)
-
-                # If no offsets, just return the result of the base class
-                # `as_sql`.
-                if not do_offset:
-                    return super(OracleQuery, self).as_sql(with_limits=False)
-
-                # `get_columns` needs to be called before `get_ordering` to
-                # populate `_select_alias`.
-                self.pre_sql_setup()
-                out_cols = self.get_columns()
-                ordering = self.get_ordering()
-
-                # Getting the "ORDER BY" SQL for the ROW_NUMBER() result.
-                if ordering:
-                    rn_orderby = ', '.join(ordering)
-                else:
-                    # Oracle's ROW_NUMBER() function always requires an
-                    # order-by clause.  So we need to define a default
-                    # order-by, since none was provided.
-                    qn = self.quote_name_unless_alias
-                    opts = self.model._meta
-                    rn_orderby = '%s.%s' % (qn(opts.db_table), qn(opts.fields[0].db_column or opts.fields[0].column))
-
-                # Getting the selection SQL and the params, which has the `rn`
-                # extra selection SQL; we pop `rn` after this completes so we do
-                # not get the attribute on the returned models.
-                self.extra_select['rn'] = 'ROW_NUMBER() OVER (ORDER BY %s )' % rn_orderby
-                sql, params= super(OracleQuery, self).as_sql(with_limits=False)
-                self.extra_select.pop('rn')
-
-                # Constructing the result SQL, using the initial select SQL
-                # obtained above.
-                result = ['SELECT * FROM (%s)' % sql]
-
-                # Place WHERE condition on `rn` for the desired range.
-                result.append('WHERE rn > %d' % self.low_mark)
-                if self.high_mark:
-                    result.append('AND rn <= %d' % self.high_mark)
-
-                # Returning the SQL w/params.
-                return ' '.join(result), params
-
-        from django.db import connection
-        class OracleQuerySet(DefaultQuerySet):
-            "The OracleQuerySet is overriden to use OracleQuery."
-            def __init__(self, model=None, query=None):
-                super(OracleQuerySet, self).__init__(model=model, query=query)
-                self.query = query or OracleQuery(self.model, connection)
-        return OracleQuerySet
+    def query_class(self, DefaultQueryClass):
+        return query.query_class(DefaultQueryClass, Database)
 
     def quote_name(self, name):
         # SQL92 requires delimited (quoted) names to be case-sensitive.  When

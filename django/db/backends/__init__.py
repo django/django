@@ -49,7 +49,7 @@ class BaseDatabaseFeatures(object):
     supports_constraints = True
     supports_tablespaces = False
     uses_case_insensitive_names = False
-    uses_custom_queryset = False
+    uses_custom_query_class = False
     empty_fetchmany_value = []
 
 class BaseDatabaseOperations(object):
@@ -199,11 +199,11 @@ class BaseDatabaseOperations(object):
         """
         return 'DEFAULT'
 
-    def query_set_class(self, DefaultQuerySet):
+    def query_class(self, DefaultQueryClass):
         """
         Given the default QuerySet class, returns a custom QuerySet class
         to use for this backend. Returns None if a custom QuerySet isn't used.
-        See also BaseDatabaseFeatures.uses_custom_queryset, which regulates
+        See also BaseDatabaseFeatures.uses_custom_query_class, which regulates
         whether this method is called at all.
         """
         return None
