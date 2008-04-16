@@ -469,7 +469,7 @@ class ModelAdmin(BaseModelAdmin):
             if all_valid(inline_formsets) and form.is_valid():
                 return self.save_add(request, model, form, inline_formsets, '../%s/')
         else:
-            form = ModelForm(initial=request.GET)
+            form = ModelForm(initial=dict(request.GET.items()))
             for FormSet in self.get_formsets(request):
                 inline_formset = FormSet(instance=obj)
                 inline_formsets.append(inline_formset)
