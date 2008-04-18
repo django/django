@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
 
+
 class FlatPage(models.Model):
     url = models.CharField(_('URL'), max_length=100, validator_list=[validators.isAlphaNumericURL], db_index=True,
         help_text=_("Example: '/about/contact/'. Make sure to have leading and trailing slashes."))
@@ -35,7 +36,7 @@ from django.contrib import admin
 class FlatPageAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('url', 'title', 'content', 'sites')}),
-        ('Advanced options', {'classes': ('collapse',), 'fields': ('enable_comments', 'registration_required', 'template_name')}),
+        (_('Advanced options'), {'classes': ('collapse',), 'fields': ('enable_comments', 'registration_required', 'template_name')}),
     )
     list_filter = ('sites',)
     search_fields = ('url', 'title')

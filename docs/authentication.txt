@@ -819,16 +819,17 @@ Django developers are currently discussing.
 Default permissions
 -------------------
 
-Three basic permissions -- add, change and delete -- are automatically created
-for each Django model that has a ``class Admin`` set. Behind the scenes, these
-permissions are added to the ``auth_permission`` database table when you run
-``manage.py syncdb``.
+When ``django.contrib.auth`` is listed in your ``INSTALLED_APPS``
+setting, it will ensure that three default permissions -- add, change
+and delete -- are created for each Django model defined in one of your
+installed applications.
 
-Note that if your model doesn't have ``class Admin`` set when you run
-``syncdb``, the permissions won't be created. If you initialize your database
-and add ``class Admin`` to models after the fact, you'll need to run
-``manage.py syncdb`` again. It will create any missing permissions for
-all of your installed apps.
+These permissions will be created when you run ``manage.py syncdb``;
+the first time you run ``syncdb`` after adding ``django.contrib.auth``
+to ``INSTALLED_APPS``, the default permissions will be created for all
+previously-installed models, as well as for any new models being
+installed at that time. Afterward, it will create default permissions
+for new models each time you run ``manage.py syncdb``.
 
 Custom permissions
 ------------------

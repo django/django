@@ -65,7 +65,13 @@ def markdown(value, arg=''):
                 safe_mode = True
             else:
                 safe_mode = False
-            return mark_safe(force_unicode(markdown.markdown(smart_str(value), extensions, safe_mode=safe_mode)))
+
+            # Unicode support only in markdown v1.7 or above. Version_info
+            # exist only in markdown v1.6.2rc-2 or above.
+            if getattr(markdown, "version_info", None) < (1,7):
+                return mark_safe(force_unicode(markdown.markdown(smart_str(value), extensions, safe_mode=safe_mode)))
+            else:
+                return mark_safe(markdown.markdown(force_unicode(value), extensions, safe_mode=safe_mode))
         else:
             return mark_safe(force_unicode(markdown.markdown(smart_str(value))))
 markdown.is_safe = True

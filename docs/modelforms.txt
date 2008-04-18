@@ -121,6 +121,7 @@ A full example
 Consider this set of models::
 
     from django.db import models
+    from django.newforms import ModelForm
 
     TITLE_CHOICES = (
         ('MR', 'Mr.'),

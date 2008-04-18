@@ -70,7 +70,7 @@ LANGUAGES = (
     ('no', gettext_noop('Norwegian')),
     ('pl', gettext_noop('Polish')),
     ('pt', gettext_noop('Portugese')),
-    ('pt-br', gettext_noop('Brazilian')),
+    ('pt-br', gettext_noop('Brazilian Portuguese')),
     ('ro', gettext_noop('Romanian')),
     ('ru', gettext_noop('Russian')),
     ('sk', gettext_noop('Slovak')),
