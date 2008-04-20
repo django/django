@@ -28,8 +28,9 @@ def query_class(QueryClass, Database):
         def resolve_columns(self, row, fields=()):
             from django.db.models.fields import DateField, DateTimeField, \
                  TimeField, BooleanField, NullBooleanField, DecimalField, Field
+            index_start = len(self.extra_select.keys())
             values = []
-            for value, field in map(None, row, fields):
+            for value, field in map(None, row[index_start:], fields):
                 if isinstance(value, Database.LOB):
                     value = value.read()
                 # Oracle stores empty strings as null. We need to undo this in
@@ -111,7 +112,6 @@ def query_class(QueryClass, Database):
             # not get the attribute on the returned models.
             self.extra_select['rn'] = 'ROW_NUMBER() OVER (ORDER BY %s )' % rn_orderby
             sql, params= super(OracleQuery, self).as_sql(with_limits=False)
-            self.extra_select.pop('rn')
 
             # Constructing the result SQL, using the initial select SQL
             # obtained above.
