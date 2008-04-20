@@ -123,8 +123,11 @@ class Manager(object):
     def reverse(self, *args, **kwargs):
         return self.get_query_set().reverse(*args, **kwargs)
 
-    def _insert(self, **kwargs):
-        return insert_query(self.model, **kwargs)
+    def _insert(self, values, **kwargs):
+        return insert_query(self.model, values, **kwargs)
+
+    def _update(self, values, **kwargs):
+        return self.get_query_set()._update(values, **kwargs)
 
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.

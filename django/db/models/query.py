@@ -287,6 +287,19 @@ class QuerySet(object):
         self._result_cache = None
     update.alters_data = True
 
+    def _update(self, values):
+        """
+        A version of update that accepts field objects instead of field names.
+        Used primarily for model saving and not intended for use by general
+        code (it requires too much poking around at model internals to be
+        useful at that level).
+        """
+        query = self.query.clone(sql.UpdateQuery)
+        query.add_update_fields(values)
+        query.execute_sql(None)
+        self._result_cache = None
+    _update.alters_data = True
+
     ##################################################
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
     ##################################################
@@ -692,13 +705,13 @@ def delete_objects(seen_objs):
 
     transaction.commit_unless_managed()
 
-def insert_query(__model, __return_id=False, __raw_values=False, **kwargs):
+def insert_query(model, values, return_id=False, raw_values=False):
     """
     Inserts a new record for the given model. This provides an interface to
     the InsertQuery class and is how Model.save() is implemented. It is not
     part of the public API.
     """
-    query = sql.InsertQuery(__model, connection)
-    query.insert_values(kwargs, __raw_values)
-    return query.execute_sql(__return_id)
+    query = sql.InsertQuery(model, connection)
+    query.insert_values(values, raw_values)
+    return query.execute_sql(return_id)
 

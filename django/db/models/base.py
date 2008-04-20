@@ -308,29 +308,28 @@ class Model(object):
             if manager.filter(pk=pk_val).extra(select={'a': 1}).values('a').order_by():
                 # It does already exist, so do an UPDATE.
                 if non_pks:
-                    values = [(f.name, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, False))) for f in non_pks]
-                    manager.filter(pk=pk_val).update(**dict(values))
+                    values = [(f, None, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, False))) for f in non_pks]
+                    manager.filter(pk=pk_val)._update(values)
             else:
                 record_exists = False
         if not pk_set or not record_exists:
             if not pk_set:
-                values = [(f.name, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in meta.local_fields if not isinstance(f, AutoField)]
+                values = [(f, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in meta.local_fields if not isinstance(f, AutoField)]
             else:
-                values = [(f.name, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in meta.local_fields]
+                values = [(f, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in meta.local_fields]
 
             if meta.order_with_respect_to:
                 field = meta.order_with_respect_to
-                values.append(('_order', manager.filter(**{field.name: getattr(self, field.attname)}).count()))
+                values.append((meta.get_field_by_name('_order')[0], manager.filter(**{field.name: getattr(self, field.attname)}).count()))
             record_exists = False
 
             update_pk = bool(meta.has_auto_field and not pk_set)
             if values:
                 # Create a new record.
-                result = manager._insert(__return_id=update_pk, **dict(values))
+                result = manager._insert(values, return_id=update_pk)
             else:
                 # Create a new record with defaults for everything.
-                result = manager._insert(__return_id=update_pk,
-                        __raw_values=True, pk=connection.ops.pk_default_value())
+                result = manager._insert([(meta.pk, connection.ops.pk_default_value())], return_id=update_pk, raw_values=True)
 
             if update_pk:
                 setattr(self, meta.pk.attname, result)

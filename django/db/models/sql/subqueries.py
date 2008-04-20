@@ -194,11 +194,27 @@ class UpdateQuery(Query):
             self.execute_sql(None)
 
     def add_update_values(self, values):
-        from django.db.models.base import Model
+        """
+        Convert a dictionary of field name to value mappings into an update
+        query. This is the entry point for the public update() method on
+        querysets.
+        """
+        values_seq = []
         for name, val in values.iteritems():
             field, model, direct, m2m = self.model._meta.get_field_by_name(name)
             if not direct or m2m:
                 raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
+            values_seq.append((field, model, val))
+        return self.add_update_fields(values_seq)
+
+    def add_update_fields(self, values_seq):
+        """
+        Turn a sequence of (field, model, value) triples into an update query.
+        Used by add_update_values() as well as the "fast" update path when
+        saving models.
+        """
+        from django.db.models.base import Model
+        for field, model, val in values_seq:
             # FIXME: Some sort of db_prep_* is probably more appropriate here.
             if field.rel and isinstance(val, Model):
                 val = val.pk
@@ -279,17 +295,11 @@ class InsertQuery(Query):
         parameters. This provides a way to insert NULL and DEFAULT keywords
         into the query, for example.
         """
-        func = lambda x: self.model._meta.get_field_by_name(x)[0]
         # keys() and values() return items in the same order, providing the
         # dictionary hasn't changed between calls. So the dual iteration here
         # works as intended.
         placeholders, values = [], []
-        for name, val in insert_values.iteritems():
-            if name == 'pk':
-                name = self.model._meta.pk.name
-            # Getting the Field associated w/the name.
-            field = func(name)
-
+        for field, val in insert_values:
             if hasattr(field, 'get_placeholder'):
                 # Some fields (e.g. geo fields) need special munging before
                 # they can be inserted.
