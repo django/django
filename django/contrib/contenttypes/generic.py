@@ -35,15 +35,18 @@ class GenericForeignKey(object):
         setattr(cls, name, self)
 
     def instance_pre_init(self, signal, sender, args, kwargs):
-        # Handle initalizing an object with the generic FK instaed of
-        # content-type/object-id fields.
+        """
+        Handles initializing an object with the generic FK instaed of
+        content-type/object-id fields.
+        """
         if self.name in kwargs:
             value = kwargs.pop(self.name)
             kwargs[self.ct_field] = self.get_content_type(obj=value)
             kwargs[self.fk_field] = value._get_pk_val()
 
     def get_content_type(self, obj=None, id=None):
-        # Convenience function using get_model avoids a circular import when using this model
+        # Convenience function using get_model avoids a circular import when
+        # using this model
         ContentType = get_model("contenttypes", "contenttype")
         if obj:
             return ContentType.objects.get_for_model(obj)
@@ -61,10 +64,10 @@ class GenericForeignKey(object):
             return getattr(instance, self.cache_attr)
         except AttributeError:
             rel_obj = None
-            
+
             # Make sure to use ContentType.objects.get_for_id() to ensure that
             # lookups are cached (see ticket #5570). This takes more code than
-            # the naive ``getattr(instance, self.ct_field)``, but has better 
+            # the naive ``getattr(instance, self.ct_field)``, but has better
             # performance when dealing with GFKs in loops and such.
             f = self.model._meta.get_field(self.ct_field)
             ct_id = getattr(instance, f.get_attname(), None)
