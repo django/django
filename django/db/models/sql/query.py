@@ -420,7 +420,7 @@ class Query(object):
             if not self.alias_refcount[alias]:
                 continue
             name, alias, join_type, lhs, lhs_col, col, nullable = self.alias_map[alias]
-            alias_str = (alias != name and ' AS %s' % alias or '')
+            alias_str = (alias != name and ' %s' % alias or '')
             if join_type and not first:
                 result.append('%s %s%s ON (%s.%s = %s.%s)'
                         % (join_type, qn(name), alias_str, qn(lhs),

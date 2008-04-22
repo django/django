@@ -361,7 +361,7 @@ class CountQuery(Query):
     """
     def get_from_clause(self):
         result, params = self._query.as_sql()
-        return ['(%s) AS A1' % result], params
+        return ['(%s) A1' % result], params
 
     def get_ordering(self):
         return ()
