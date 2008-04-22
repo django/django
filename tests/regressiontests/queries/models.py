@@ -473,7 +473,7 @@ FieldError: Infinite loop caused by ordering.
 >>> Ranking.objects.extra(tables=['django_site'], order_by=['-django_site.id', 'rank'])
 [<Ranking: 1: a3>, <Ranking: 2: a2>, <Ranking: 3: a1>]
 
->>> qs = Ranking.objects.extra(select={'good': 'rank > 2'})
+>>> qs = Ranking.objects.extra(select={'good': 'case when rank > 2 then 1 else 0 end'})
 >>> [o.good for o in qs.extra(order_by=('-good',))] == [True, False, False]
 True
 >>> qs.extra(order_by=('-good', 'id'))
