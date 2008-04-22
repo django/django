@@ -1,6 +1,7 @@
 import os, unittest
 from models import Country, City, State, Feature
 from django.contrib.gis import gdal
+from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.geos import *
 from django.contrib.gis.measure import Distance
 from django.contrib.gis.tests.utils import no_oracle, no_postgis, oracle, postgis
@@ -123,11 +124,22 @@ class GeoModelTest(unittest.TestCase):
         qs = City.objects.all()
         self.assertRaises(TypeError, qs.kml, 'name')
 
+        # The reference KML depends on the version of PostGIS used 
+        # (the output stopped including altitude in 1.3.3).
+        major, minor1, minor2 = SpatialBackend.version
+        ref_kml1 = '<Point><coordinates>-104.609252,38.255001,0</coordinates></Point>'
+        ref_kml2 = '<Point><coordinates>-104.609252,38.255001</coordinates></Point>'
+        if major == 1:
+            if minor1 > 3 or (minor1 == 3 and minor2 >= 3): ref_kml = ref_kml2
+            else: ref_kml = ref_kml1
+        else:
+            ref_kml = ref_kml2
+
         # Ensuring the KML is as expected.
         ptown1 = City.objects.kml('point', precision=9).get(name='Pueblo')
         ptown2 = City.objects.kml(precision=9).get(name='Pueblo')
         for ptown in [ptown1, ptown2]:
-            self.assertEqual('<Point><coordinates>-104.609252,38.255001,0</coordinates></Point>', ptown.kml)
+            self.assertEqual(ref_kml, ptown.kml)
 
     def test03b_gml(self):
         "Testing GML output from the database using GeoManager.gml()."

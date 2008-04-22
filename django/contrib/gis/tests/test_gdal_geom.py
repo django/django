@@ -1,6 +1,7 @@
 import unittest
 from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, \
-    OGRException, OGRIndexError, SpatialReference, CoordTransform
+    OGRException, OGRIndexError, SpatialReference, CoordTransform, \
+    gdal_version
 from django.contrib.gis.tests.geometries import *
 
 class OGRGeomTest(unittest.TestCase):
@@ -196,7 +197,12 @@ class OGRGeomTest(unittest.TestCase):
             self.fail('Should have raised an OGRException!')
         print "\nEND - expecting IllegalArgumentException; safe to ignore.\n"
 
-        # Closing the rings
+        # Closing the rings -- doesn't work on GDAL versions 1.4.1 and below:
+        # http://trac.osgeo.org/gdal/ticket/1673
+        major, minor1, minor2 = gdal_version().split('.')
+        if major == '1':
+            iminor1 = int(minor1)
+            if iminor1 < 4 or (iminor1 == 4 and minor2.startswith('1')): return
         poly.close_rings()
         self.assertEqual(10, poly.point_count) # Two closing points should've been added
         self.assertEqual(OGRGeometry('POINT(2.5 2.5)'), poly.centroid)
