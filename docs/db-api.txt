@@ -1572,10 +1572,6 @@ Spanning multi-valued relationships
 
 **New in Django development version**
 
-.. note::
-    This is an experimental API and subject to change prior to
-    queryset-refactor being merged into trunk.
-
 When you are filtering an object based on a ``ManyToManyField`` or a reverse
 ``ForeignKeyField``, there are two different sorts of filter you may be
 interested in. Consider the ``Blog``/``Entry`` relationship (``Blog`` to
