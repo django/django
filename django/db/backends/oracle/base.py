@@ -119,10 +119,17 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def regex_lookup_10(self, lookup_type):
         if lookup_type == 'regex':
-            match_option = 'c'
+            match_option = "'c'"
         else:
-            match_option = 'i'
-        return 'REGEXP_LIKE(%%s %%s %s)' % match_option
+            match_option = "'i'"
+        return 'REGEXP_LIKE(%%s, %%s, %s)' % match_option
+
+    def regex_lookup(self, lookup_type):
+        # If regex_lookup is called before it's been initialized, then create
+        # a cursor to initialize it and recur.
+        from django.db import connection
+        connection.cursor()
+        return connection.ops.regex_lookup(lookup_type)
 
     def sql_flush(self, style, tables, sequences):
         # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',

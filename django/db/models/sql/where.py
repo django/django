@@ -140,7 +140,7 @@ class WhereNode(tree.Node):
         elif lookup_type == 'search':
             return (connection.ops.fulltext_search_sql(field_sql), params)
         elif lookup_type in ('regex', 'iregex'):
-            return connection.ops.regex_lookup % (field_sql, cast_sql), params
+            return connection.ops.regex_lookup(lookup_type) % (field_sql, cast_sql), params
 
         raise TypeError('Invalid lookup_type: %r' % lookup_type)
 
