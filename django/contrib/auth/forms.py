@@ -4,7 +4,7 @@ from django.contrib.sites.models import Site
 from django.template import Context, loader
 from django.core import validators
 from django import newforms as forms
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -47,8 +47,8 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    username = forms.CharField(max_length=30)
-    password = forms.CharField(max_length=30, widget=forms.PasswordInput)
+    username = forms.CharField(label=_("Username"), max_length=30)
+    password = forms.CharField(label=_("Password"), max_length=30, widget=forms.PasswordInput)
     
     def __init__(self, request=None, *args, **kwargs):
         """
@@ -88,7 +88,7 @@ class AuthenticationForm(forms.Form):
         return self.user_cache
 
 class PasswordResetForm(forms.Form):
-    email = forms.EmailField(max_length=40)
+    email = forms.EmailField(label=_("Email"), max_length=40)
     
     def clean_email(self):
         """
@@ -129,9 +129,9 @@ class PasswordChangeForm(forms.Form):
     """
     A form that lets a user change his/her password.
     """
-    old_password = forms.CharField(max_length=30, widget=forms.PasswordInput)
-    new_password1 = forms.CharField(max_length=30, widget=forms.PasswordInput)
-    new_password2 = forms.CharField(max_length=30, widget=forms.PasswordInput)
+    old_password = forms.CharField(label=_("Old password"), max_length=30, widget=forms.PasswordInput)
+    new_password1 = forms.CharField(label=_("New password"), max_length=30, widget=forms.PasswordInput)
+    new_password2 = forms.CharField(label=_("New password confirmation"), max_length=30, widget=forms.PasswordInput)
     
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -164,8 +164,8 @@ class AdminPasswordChangeForm(forms.Form):
     """
     A form used to change the password of a user in the admin interface.
     """
-    password1 = forms.CharField(max_length=60, widget=forms.PasswordInput)
-    password2 = forms.CharField(max_length=60, widget=forms.PasswordInput)
+    password1 = forms.CharField(label=_("Password"), max_length=60, widget=forms.PasswordInput)
+    password2 = forms.CharField(label=_("Password (again)"), max_length=60, widget=forms.PasswordInput)
     
     def __init__(self, user, *args, **kwargs):
         self.user = user
