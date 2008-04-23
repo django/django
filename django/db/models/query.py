@@ -557,13 +557,21 @@ class ValuesQuerySet(QuerySet):
 
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
-        self.field_names.extend([f for f in self.query.extra_select.keys()])
+        self.query.trim_extra_select(self.extra_names)
         if self.flat and len(self._fields) == 1:
             for row in self.query.results_iter():
                 yield row[0]
-        else:
+        elif not self.query.extra_select:
             for row in self.query.results_iter():
                 yield row
+        else:
+            # When extra(select=...) is involved, the extra cols come are
+            # always at the start of the row, so we need to reorder the fields
+            # to match the order in self._fields.
+            names = self.query.extra_select.keys() + self.field_names
+            for row in self.query.results_iter():
+                data = dict(zip(names, row))
+                yield tuple([data[f] for f in self._fields])
 
     def _clone(self, *args, **kwargs):
         clone = super(ValuesListQuerySet, self)._clone(*args, **kwargs)

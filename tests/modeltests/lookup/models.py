@@ -180,6 +180,13 @@ True
 >>> Article.objects.valueslist('id', flat=True).order_by('id')
 [1, 2, 3, 4, 5, 6, 7]
 
+>>> Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').valueslist('id')
+[(1,), (2,), (3,), (4,), (5,), (6,), (7,)]
+>>> Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').valueslist('id_plus_one', 'id')
+[(2, 1), (3, 2), (4, 3), (5, 4), (6, 5), (7, 6), (8, 7)]
+>>> Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').valueslist('id', 'id_plus_one')
+[(1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8)]
+
 >>> Article.objects.valueslist('id', 'headline', flat=True)
 Traceback (most recent call last):
 ...
