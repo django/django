@@ -7,7 +7,6 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 
-import itertools
 from copy import deepcopy
 
 from django.utils.tree import Node
@@ -66,6 +65,7 @@ class Query(object):
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
         self.distinct = False
         self.select_related = False
+        self.related_select_cols = []
 
         # Arbitrary maximum limit for select_related. Prevents infinite
         # recursion. Can be changed by the depth parameter to select_related().
@@ -150,6 +150,7 @@ class Query(object):
         obj.low_mark, obj.high_mark = self.low_mark, self.high_mark
         obj.distinct = self.distinct
         obj.select_related = self.select_related
+        obj.related_select_cols = []
         obj.max_depth = self.max_depth
         obj.extra_select = self.extra_select.copy()
         obj.extra_select_params = self.extra_select_params
@@ -183,6 +184,7 @@ class Query(object):
         obj.clear_ordering(True)
         obj.clear_limits()
         obj.select_related = False
+        obj.related_select_cols = []
         if obj.distinct and len(obj.select) > 1:
             obj = self.clone(CountQuery, _query=obj, where=self.where_class(),
                     distinct=False)
@@ -345,7 +347,7 @@ class Query(object):
         """
         if not self.tables:
             self.join((None, self.model._meta.db_table, None, None))
-        if self.select_related:
+        if self.select_related and not self.related_select_cols:
             self.fill_related_selections()
 
     def get_columns(self):
@@ -371,6 +373,10 @@ class Query(object):
             cols = self.get_default_columns(True)
             result.extend(cols)
             aliases.extend(cols)
+        for table, col in self.related_select_cols:
+            r = '%s.%s' % (qn(table), qn(col))
+            result.append(r)
+            aliases.append(r)
 
         self._select_aliases = set(aliases)
         return result
@@ -769,7 +775,7 @@ class Query(object):
         if not opts:
             opts = self.get_meta()
             root_alias = self.get_initial_alias()
-            self.select.extend(self.get_default_columns())
+            self.related_select_cols = []
         if not used:
             used = set()
 
@@ -802,7 +808,7 @@ class Query(object):
                     f.rel.get_related_field().column), exclusions=used,
                     promote=f.null)
             used.add(alias)
-            self.select.extend([(alias, f2.column)
+            self.related_select_cols.extend([(alias, f2.column)
                     for f2 in f.rel.to._meta.fields])
             if restricted:
                 next = requested.get(f.name, {})
@@ -1278,6 +1284,7 @@ class Query(object):
             for part in field.split(LOOKUP_SEP):
                 d = d.setdefault(part, {})
         self.select_related = field_dict
+        self.related_select_cols = []
 
     def add_extra(self, select, select_params, where, params, tables, order_by):
         """
