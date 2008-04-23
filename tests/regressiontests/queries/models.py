@@ -634,5 +634,11 @@ True
 Traceback (most recent call last):
 ...
 IndexError: ...
+
+Bug #7045 -- extra tables used to crash SQL construction on the second use.
+>>> qs = Ranking.objects.extra(tables=['django_site'])
+>>> s = qs.query.as_sql()
+>>> s = qs.query.as_sql()   # test passes if this doesn't raise an exception.
+
 """}
 

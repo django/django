@@ -425,7 +425,12 @@ class Query(object):
         for alias in self.tables:
             if not self.alias_refcount[alias]:
                 continue
-            name, alias, join_type, lhs, lhs_col, col, nullable = self.alias_map[alias]
+            try:
+                name, alias, join_type, lhs, lhs_col, col, nullable = self.alias_map[alias]
+            except KeyError:
+                # Extra tables can end up in self.tables, but not in the
+                # alias_map if they aren't in a join. That's OK. We skip them.
+                continue
             alias_str = (alias != name and ' %s' % alias or '')
             if join_type and not first:
                 result.append('%s %s%s ON (%s.%s = %s.%s)'
@@ -436,10 +441,10 @@ class Query(object):
                 result.append('%s%s%s' % (connector, qn(name), alias_str))
             first = False
         for t in self.extra_tables:
-            alias, created = self.table_alias(t)
-            if created:
+            alias, unused = self.table_alias(t)
+            if alias not in self.alias_map:
                 connector = not first and ', ' or ''
-                result.append('%s%s' % (connector, alias))
+                result.append('%s%s' % (connector, qn(alias)))
                 first = False
         return result, []
 
