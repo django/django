@@ -29,7 +29,7 @@ def query_class(QueryClass, Database):
             from django.db.models.fields import DateField, DateTimeField, \
                  TimeField, BooleanField, NullBooleanField, DecimalField, Field
             index_start = len(self.extra_select.keys())
-            values = []
+            values = list(row[:index_start])
             for value, field in map(None, row[index_start:], fields):
                 if isinstance(value, Database.LOB):
                     value = value.read()
@@ -108,8 +108,7 @@ def query_class(QueryClass, Database):
                 rn_orderby = '%s.%s' % (qn(opts.db_table), qn(opts.fields[0].db_column or opts.fields[0].column))
 
             # Getting the selection SQL and the params, which has the `rn`
-            # extra selection SQL; we pop `rn` after this completes so we do
-            # not get the attribute on the returned models.
+            # extra selection SQL.
             self.extra_select['rn'] = 'ROW_NUMBER() OVER (ORDER BY %s )' % rn_orderby
             sql, params= super(OracleQuery, self).as_sql(with_limits=False)
 
@@ -124,6 +123,20 @@ def query_class(QueryClass, Database):
 
             # Returning the SQL w/params.
             return ' '.join(result), params
+
+        def set_limits(self, low=None, high=None):
+            super(OracleQuery, self).set_limits(low, high)
+
+            # We need to select the row number for the LIMIT/OFFSET sql.
+            # A placeholder is added to extra_select now, because as_sql is
+            # too late to be modifying extra_select.  However, the actual sql
+            # depends on the ordering, so that is generated in as_sql.
+            self.extra_select['rn'] = '1'
+
+        def clear_limits(self):
+            super(OracleQuery, self).clear_limits()
+            if 'rn' in self.extra_select:
+                del self.extra_select['rn']
 
     _classes[QueryClass] = OracleQuery
     return OracleQuery
