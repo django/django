@@ -648,32 +648,32 @@ followed (optionally) by any output-affecting methods (such as ``values()``),
 but it doesn't really matter. This is your chance to really flaunt your
 individualism.
 
-``valueslist(*fields)``
+``values_list(*fields)``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 **New in Django development version**
 
 This is similar to ``values()`` except that instead of returning a list of
 dictionaries, it returns a list of tuples. Each tuple contains the value from
-the respective field passed into the ``valueslist()`` call -- so the first
+the respective field passed into the ``values_list()`` call -- so the first
 item is the first field, etc. For example::
 
-    >>> Entry.objects.valueslist('id', 'headling')
+    >>> Entry.objects.values_list('id', 'headling')
     [(1, u'First entry'), ...]
 
 If you only pass in a single field, you can also pass in the ``flat``
 parameter. If ``True``, this will mean the returned results are single values,
 rather than one-tuples. An example should make the difference clearer::
 
-    >>> Entry.objects.valueslist('id').order_by('id')
+    >>> Entry.objects.values_list('id').order_by('id')
     [(1,), (2,), (3,), ...]
 
-    >>> Entry.objects.valueslist('id', flat=True).order_by('id')
+    >>> Entry.objects.values_list('id', flat=True).order_by('id')
     [1, 2, 3, ...]
 
 It is an error to pass in ``flat`` when there is more than one field.
 
-If you don't pass any values to ``valueslist()``, it will return all the
+If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
 
 ``dates(field, kind, order='ASC')``

@@ -168,29 +168,29 @@ FieldError: Cannot resolve keyword 'id_plus_two' into field. Choices are: headli
 >>> list(Article.objects.filter(id=5).values()) == [{'id': 5, 'headline': 'Article 5', 'pub_date': datetime(2005, 8, 1, 9, 0)}]
 True
 
-# valueslist() is similar to values(), except that the results are returned as
+# values_list() is similar to values(), except that the results are returned as
 # a list of tuples, rather than a list of dictionaries. Within each tuple, the
-# order of the elemnts is the same as the order of fields in the valueslist()
+# order of the elemnts is the same as the order of fields in the values_list()
 # call.
->>> Article.objects.valueslist('headline')
+>>> Article.objects.values_list('headline')
 [(u'Article 5',), (u'Article 6',), (u'Article 4',), (u'Article 2',), (u'Article 3',), (u'Article 7',), (u'Article 1',)]
 
->>> Article.objects.valueslist('id').order_by('id')
+>>> Article.objects.values_list('id').order_by('id')
 [(1,), (2,), (3,), (4,), (5,), (6,), (7,)]
->>> Article.objects.valueslist('id', flat=True).order_by('id')
+>>> Article.objects.values_list('id', flat=True).order_by('id')
 [1, 2, 3, 4, 5, 6, 7]
 
->>> Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').valueslist('id')
+>>> Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').values_list('id')
 [(1,), (2,), (3,), (4,), (5,), (6,), (7,)]
->>> Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').valueslist('id_plus_one', 'id')
+>>> Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').values_list('id_plus_one', 'id')
 [(2, 1), (3, 2), (4, 3), (5, 4), (6, 5), (7, 6), (8, 7)]
->>> Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').valueslist('id', 'id_plus_one')
+>>> Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').values_list('id', 'id_plus_one')
 [(1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8)]
 
->>> Article.objects.valueslist('id', 'headline', flat=True)
+>>> Article.objects.values_list('id', 'headline', flat=True)
 Traceback (most recent call last):
 ...
-TypeError: 'flat' is not valid when valueslist is called with more than one field.
+TypeError: 'flat' is not valid when values_list is called with more than one field.
 
 # Every DateField and DateTimeField creates get_next_by_FOO() and
 # get_previous_by_FOO() methods.

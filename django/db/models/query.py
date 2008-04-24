@@ -307,13 +307,13 @@ class QuerySet(object):
     def values(self, *fields):
         return self._clone(klass=ValuesQuerySet, setup=True, _fields=fields)
 
-    def valueslist(self, *fields, **kwargs):
+    def values_list(self, *fields, **kwargs):
         flat = kwargs.pop('flat', False)
         if kwargs:
-            raise TypeError('Unexpected keyword arguments to valueslist: %s'
+            raise TypeError('Unexpected keyword arguments to values_list: %s'
                     % (kwargs.keys(),))
         if flat and len(fields) > 1:
-            raise TypeError("'flat' is not valid when valueslist is called with more than one field.")
+            raise TypeError("'flat' is not valid when values_list is called with more than one field.")
         return self._clone(klass=ValuesListQuerySet, setup=True, flat=flat,
                 _fields=fields)
 
