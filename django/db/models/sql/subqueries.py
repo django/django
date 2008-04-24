@@ -295,9 +295,6 @@ class InsertQuery(Query):
         parameters. This provides a way to insert NULL and DEFAULT keywords
         into the query, for example.
         """
-        # keys() and values() return items in the same order, providing the
-        # dictionary hasn't changed between calls. So the dual iteration here
-        # works as intended.
         placeholders, values = [], []
         for field, val in insert_values:
             if hasattr(field, 'get_placeholder'):

@@ -357,7 +357,7 @@ class Query(object):
         the model.
         """
         qn = self.quote_name_unless_alias
-        result = ['(%s) AS %s' % (col, alias) for alias, col in self.extra_select.items()]
+        result = ['(%s) AS %s' % (col, alias) for alias, col in self.extra_select.iteritems()]
         aliases = self.extra_select.keys()
         if self.select:
             for col in self.select:
@@ -633,7 +633,7 @@ class Query(object):
                 col.relabel_aliases(change_map)
 
         # 2. Rename the alias in the internal table/alias datastructures.
-        for old_alias, new_alias in change_map.items():
+        for old_alias, new_alias in change_map.iteritems():
             alias_data = list(self.alias_map[old_alias])
             alias_data[RHS_ALIAS] = new_alias
 
@@ -657,7 +657,7 @@ class Query(object):
                     break
 
         # 3. Update any joins that refer to the old alias.
-        for alias, data in self.alias_map.items():
+        for alias, data in self.alias_map.iteritems():
             lhs = data[LHS_ALIAS]
             if lhs in change_map:
                 data = list(data)
@@ -706,7 +706,7 @@ class Query(object):
         Returns the number of tables in this query with a non-zero reference
         count.
         """
-        return len([1 for count in self.alias_refcount.values() if count])
+        return len([1 for count in self.alias_refcount.itervalues() if count])
 
     def join(self, connection, always_create=False, exclusions=(),
             promote=False, outer_if_first=False, nullable=False):
