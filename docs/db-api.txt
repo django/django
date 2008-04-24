@@ -649,7 +649,7 @@ but it doesn't really matter. This is your chance to really flaunt your
 individualism.
 
 ``values_list(*fields)``
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 **New in Django development version**
 
@@ -930,6 +930,27 @@ of the arguments is required, but you should use at least one of them.
     ...translates (roughly) into the following SQL::
 
         SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
+
+    Be careful when using the ``tables`` parameter if you're specifying
+    tables that are already used in the query. When you add extra tables
+    via the ``tables`` parameter, Django assumes you want that table included
+    an extra time, if it is already included. That creates a problem,
+    since the table name will then be given an alias. If a table appears
+    multiple times in an SQL statement, the second and subsequent occurrences
+    must use aliases so the database can tell them apart. If you're
+    referring to the extra table you added in the extra ``where`` parameter
+    this is going to cause errors.
+
+    Normally you'll only be adding extra tables that don't already appear in
+    the query. However, if the case outlined above does occur, there are a few
+    solutions. First, see if you can get by without including the extra table
+    and use the one already in the query. If that isn't possible, put your
+    ``extra()`` call at the front of the queryset construction so that your
+    table is the first use of that table. Finally, if all else fails, look at
+    the query produced and rewrite your ``where`` addition to use the alias
+    given to your extra table. The alias will be the same each time you
+    construct the queryset in the same way, so you can rely upon the alias
+    name to not change.
 
 ``order_by``
     If you need to order the resulting queryset using some of the new fields
