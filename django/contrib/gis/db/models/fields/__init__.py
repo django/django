@@ -79,15 +79,22 @@ class GeometryField(SpatialBackend.Field):
         super(GeometryField, self).__init__(**kwargs) # Calling the parent initializtion function
 
     ### Routines specific to GeometryField ###
-    def get_distance(self, dist):
+    @property
+    def geodetic(self):
+        return self._unit_name in self.geodetic_units
+
+    def get_distance(self, dist, lookup_type):
         """
         Returns a distance number in units of the field.  For example, if 
         `D(km=1)` was passed in and the units of the field were in meters,
         then 1000 would be returned.
         """
-        
+        postgis = SpatialBackend.name == 'postgis'
         if isinstance(dist, Distance):
-            if self._unit_name in self.geodetic_units:
+            if self.geodetic:
+                # Won't allow Distance objects w/DWithin lookups on PostGIS.
+                if postgis and lookup_type == 'dwithin':
+                    raise TypeError('Only numeric values of degree units are allowed on geographic DWithin queries.')
                 # Spherical distance calculation parameter should be in meters.
                 dist_param = dist.m
             else:
@@ -97,7 +104,7 @@ class GeometryField(SpatialBackend.Field):
             dist_param = dist
 
         # Sphereical distance query; returning meters.
-        if SpatialBackend.name == 'postgis' and self._unit_name in self.geodetic_units:
+        if postgis and self.geodetic and lookup_type != 'dwithin':
             return [gqn(self._spheroid), dist_param]
         else:
             return [dist_param]
@@ -170,7 +177,7 @@ class GeometryField(SpatialBackend.Field):
             if isinstance(value, (tuple, list)):
                 if lookup_type in SpatialBackend.distance_functions:
                     # Getting the distance parameter in the units of the field.
-                    where += self.get_distance(value[1])
+                    where += self.get_distance(value[1], lookup_type)
                 elif lookup_type in SpatialBackend.limited_where:
                     pass
                 else:

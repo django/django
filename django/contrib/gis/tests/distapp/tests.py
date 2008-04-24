@@ -17,7 +17,9 @@ class DistanceTest(unittest.TestCase):
     # the coordinate system of the field, EPSG:32140 (Texas South Central
     # w/units in meters)
     stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
-    
+    # Another one for Australia
+    au_pnt = GEOSGeometry('POINT (150.791 -34.4919)', 4326)
+
     def get_cities(self, qs):
         cities = [c.name for c in qs]
         cities.sort()
@@ -43,8 +45,17 @@ class DistanceTest(unittest.TestCase):
         dists = [7000, D(km=7), D(mi=4.349)]
         for dist in dists:
             qs = SouthTexasCity.objects.filter(point__dwithin=(self.stx_pnt, dist))
-            cities = self.get_cities(qs)
-            self.assertEqual(cities, ['Downtown Houston', 'Southside Place'])
+            self.assertEqual(['Downtown Houston', 'Southside Place'], self.get_cities(qs))
+
+            if isinstance(dist, D):
+                # A TypeError should be raised when trying to pass Distance objects
+                # into a DWithin query using a geodetic field.
+                qs = AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, dist))
+                self.assertRaises(TypeError, qs.count)
+            else:
+                # Actually using a distance value of 0.5 degrees.
+                qs = AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, 0.5)).order_by('name')
+                self.assertEqual(['Mittagong', 'Shellharbour', 'Thirroul', 'Wollongong'], self.get_cities(qs))
 
     def test03_distance_aggregate(self):
         "Testing the `distance` GeoQuerySet method."

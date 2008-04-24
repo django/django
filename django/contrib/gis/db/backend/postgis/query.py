@@ -228,7 +228,7 @@ def get_geo_where_clause(lookup_type, table_prefix, field, value):
             if lookup_type == 'relate': 
                 op = op(value[1])
             elif lookup_type in DISTANCE_FUNCTIONS and lookup_type != 'dwithin':
-                if field._unit_name == 'degree':
+                if field.geodetic:
                     # Geodetic distances are only availble from Points to PointFields.
                     if field._geom != 'POINT':
                         raise TypeError('PostGIS spherical operations are only valid on PointFields.')
