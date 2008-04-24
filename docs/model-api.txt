@@ -2185,6 +2185,10 @@ whilst the reverse name of the ``ChildB.m2m`` field will be
 construct your related name, but if you forget to use it, Django will raise
 errors when you validate your models (or run ``syncdb``).
 
+If you don't specify a ``related_name`` attribute for a field in an abstract
+base class, the default reverse name will be the name of the child class
+followed by ``'_set'``, just as it normally would be if you'd declared the field directly on the child class. For example, in the above code, if the ``related_name`` attribute was omitted, the reverse name for the ``m2m`` field would be ``childa_set`` in the ``ChildA`` case and ``childb_set`` for the ``ChildB`` field.
+
 Multi-table inheritance
 -----------------------
 
