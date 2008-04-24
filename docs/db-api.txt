@@ -510,6 +510,10 @@ primary key if there is no ``Meta.ordering`` specified. For example::
 
 ...since the ``Blog`` model has no default ordering specified.
 
+Be cautious when ordering by fields in related models if you are also using
+``distinct()``. See the note in the `distinct()`_ section for an explanation
+of how related model ordering can change the expected results.
+
 It is permissible to specify a multi-valued field to order the results by (for
 example, a ``ManyToMany`` field). Normally this won't be a sensible thing to
 do and it's really an advanced usage feature. However, if you know that your
@@ -559,10 +563,28 @@ eliminates duplicate rows from the query results.
 
 By default, a ``QuerySet`` will not eliminate duplicate rows. In practice, this
 is rarely a problem, because simple queries such as ``Blog.objects.all()``
-don't introduce the possibility of duplicate result rows.
+don't introduce the possibility of duplicate result rows. However, if your
+query spans multiple tables, it's possible to get duplicate results when a
+``QuerySet`` is evaluated. That's when you'd use ``distinct()``.
 
-However, if your query spans multiple tables, it's possible to get duplicate
-results when a ``QuerySet`` is evaluated. That's when you'd use ``distinct()``.
+.. note::
+    Any fields used in an ``order_by()`` call are included in the SQL
+    ``SELECT`` columns. This can sometimes lead to unexpected results when
+    used in conjuntion with ``distinct()``. If you order by fields from a
+    related model, those fields will be added to the selected columns and they
+    may make otherwise duplicate rows appear to be distinct. Since the extra
+    columns don't appear in the returned results (they are only there to
+    support ordering), it sometimes looks like non-distinct results are being
+    returned.
+
+    Similarly, if you use a ``values()`` query to restrict the columns
+    selected, the columns used in any ``order_by()`` (or default model
+    ordering) will still be involved and may affect uniqueness of the results.
+
+    The moral here is that if you are using ``distinct()`` be careful about
+    ordering by related models. Similarly, when using ``distinct()`` and
+    ``values()`` together, be careful when ordering by fields not in the
+    ``values()`` call.
 
 ``values(*fields)``
 ~~~~~~~~~~~~~~~~~~~
@@ -627,6 +649,9 @@ A couple of subtleties that are worth mentioning:
 
         >>> Entry.objects.values('blog_id')
         [{'blog_id': 1}, ...]
+    * When using ``values()`` together with ``distinct()``, be aware that
+      ordering can affect the results. See the note in the `distinct()`_
+      section, above, for details.
 
 **New in Django development version:** Previously, it was not possible to pass
 ``blog_id`` to ``values()`` in the above example, only ``blog``.
@@ -841,8 +866,7 @@ You can only refer to ``ForeignKey`` relations in the list of fields passed to
 list of fields and the ``depth`` parameter in the same ``select_related()``
 call, since they are conflicting options.
 
-``extra(select=None, where=None, params=None, tables=None, order_by=None,
-select_params=None)``
+``extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes, the Django query syntax by itself can't easily express a complex

@@ -52,6 +52,7 @@ class Query(object):
         self.default_cols = True
         self.default_ordering = True
         self.standard_ordering = True
+        self.ordering_aliases = []
         self.start_meta = None
 
         # SQL-related attributes
@@ -139,6 +140,7 @@ class Query(object):
         obj.default_cols = self.default_cols
         obj.default_ordering = self.default_ordering
         obj.standard_ordering = self.standard_ordering
+        obj.ordering_aliases = []
         obj.start_meta = self.start_meta
         obj.select = self.select[:]
         obj.tables = self.tables[:]
@@ -215,16 +217,18 @@ class Query(object):
         self.pre_sql_setup()
         out_cols = self.get_columns()
         ordering = self.get_ordering()
+
         # This must come after 'select' and 'ordering' -- see docstring of
         # get_from_clause() for details.
         from_, f_params = self.get_from_clause()
+
         where, w_params = self.where.as_sql(qn=self.quote_name_unless_alias)
         params = list(self.extra_select_params)
 
         result = ['SELECT']
         if self.distinct:
             result.append('DISTINCT')
-        result.append(', '.join(out_cols))
+        result.append(', '.join(out_cols + self.ordering_aliases))
 
         result.append('FROM')
         result.extend(from_)
@@ -465,15 +469,13 @@ class Query(object):
 
     def get_ordering(self):
         """
-        Returns a tuple representing the SQL elements in the "order by" clause.
+        Returns list representing the SQL elements in the "order by" clause.
+        Also sets the ordering_aliases attribute on this instance to a list of
+        extra aliases needed in the select.
 
         Determining the ordering SQL can change the tables we need to include,
         so this should be run *before* get_from_clause().
         """
-        # FIXME: It's an SQL-92 requirement that all ordering columns appear as
-        # output columns in the query (in the select statement) or be ordinals.
-        # We don't enforce that here, but we should (by adding to the select
-        # columns), for portability.
         if self.extra_order_by:
             ordering = self.extra_order_by
         elif not self.default_ordering:
@@ -485,6 +487,7 @@ class Query(object):
         distinct = self.distinct
         select_aliases = self._select_aliases
         result = []
+        ordering_aliases = []
         if self.standard_ordering:
             asc, desc = ORDER_DIR['ASC']
         else:
@@ -515,13 +518,16 @@ class Query(object):
                 for table, col, order in self.find_ordering_name(field,
                         self.model._meta, default_order=asc):
                     elt = '%s.%s' % (qn(table), qn2(col))
-                    if not distinct or elt in select_aliases:
-                        result.append('%s %s' % (elt, order))
+                    if distinct and elt not in select_aliases:
+                        ordering_aliases.append(elt)
+                    result.append('%s %s' % (elt, order))
             else:
                 col, order = get_order_dir(field, asc)
                 elt = qn(col)
-                if not distinct or elt in select_aliases:
-                    result.append('%s %s' % (elt, order))
+                if distinct and elt not in select_aliases:
+                    ordering_aliases.append(elt)
+                result.append('%s %s' % (elt, order))
+        self.ordering_aliases = ordering_aliases
         return result
 
     def find_ordering_name(self, name, opts, alias=None, default_order='ASC',
@@ -1379,8 +1385,14 @@ class Query(object):
         if not result_type:
             return cursor
         if result_type == SINGLE:
+            if self.ordering_aliases:
+                return cursor.fetchone()[:-len(results.ordering_aliases)]
             return cursor.fetchone()
+
         # The MULTI case.
+        if self.ordering_aliases:
+            return order_modified_iter(cursor, len(self.ordering_aliases),
+                    self.connection.features.empty_fetchmany_value)
         return iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
                 self.connection.features.empty_fetchmany_value)
 
@@ -1407,6 +1419,17 @@ def empty_iter():
     Returns an iterator containing no results.
     """
     yield iter([]).next()
+
+def order_modified_iter(cursor, trim, sentinel):
+    """
+    Yields blocks of rows from a cursor. We use this iterator in the special
+    case when extra output columns have been added to support ordering
+    requirements. We must trim those extra columns before anything else can use
+    the results, since they're only needed to make the SQL valid.
+    """
+    for rows in iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
+            sentinel):
+        yield [r[:-trim] for r in rows]
 
 def setup_join_cache(sender):
     """

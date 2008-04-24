@@ -498,9 +498,15 @@ Bug #3037
 >>> Item.objects.filter(Q(creator__name='a3', name='two')|Q(creator__name='a4', name='four'))
 [<Item: four>]
 
-Bug #5321
+Bug #5321, #7070
+
+Ordering columns must be included in the output columns. Note that this means
+results that might otherwise be distinct are not (if there are multiple values
+in the ordering cols), as in this example. This isn't a bug; it's a warning to
+be careful with the selection of ordering columns.
+
 >>> Note.objects.values('misc').distinct().order_by('note', '-misc')
-[{'misc': u'foo'}, {'misc': u'bar'}]
+[{'misc': u'foo'}, {'misc': u'bar'}, {'misc': u'foo'}]
 
 Bug #4358
 If you don't pass any fields to values(), relation fields are returned as
