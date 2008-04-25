@@ -218,11 +218,15 @@ True
 [<Item: one>, <Item: two>]
 >>> Item.objects.filter(Q(tags=t1)).filter(Q(tags=t2))
 [<Item: one>]
+>>> Item.objects.filter(Q(tags=t1)).filter(Q(creator__name='fred')|Q(tags=t2))
+[<Item: one>]
 
 Each filter call is processed "at once" against a single table, so this is
 different from the previous example as it tries to find tags that are two
 things at once (rather than two tags).
 >>> Item.objects.filter(Q(tags=t1) & Q(tags=t2))
+[]
+>>> Item.objects.filter(Q(tags=t1), Q(creator__name='fred')|Q(tags=t2))
 []
 
 >>> qs = Author.objects.filter(ranking__rank=2, ranking__id=rank1.id)

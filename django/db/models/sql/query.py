@@ -746,7 +746,7 @@ class Query(object):
         return len([1 for count in self.alias_refcount.itervalues() if count])
 
     def join(self, connection, always_create=False, exclusions=(),
-            promote=False, outer_if_first=False, nullable=False):
+            promote=False, outer_if_first=False, nullable=False, reuse=None):
         """
         Returns an alias for the join in 'connection', either reusing an
         existing alias for that join or creating a new one. 'connection' is a
@@ -756,8 +756,10 @@ class Query(object):
 
             lhs.lhs_col = table.col
 
-        If 'always_create' is True, a new alias is always created, regardless
-        of whether one already exists or not.
+        If 'always_create' is True and 'reuse' is None, a new alias is always
+        created, regardless of whether one already exists or not. Otherwise
+        'reuse' must be a set and a new join is created unless one of the
+        aliases in `reuse` can be used.
 
         If 'exclusions' is specified, it is something satisfying the container
         protocol ("foo in exclusions" must work) and specifies a list of
@@ -779,13 +781,20 @@ class Query(object):
             lhs_table = self.alias_map[lhs][TABLE_NAME]
         else:
             lhs_table = lhs
+
+        if reuse and always_create and table in self.table_map:
+            # Convert the 'reuse' to case to be "exclude everything but the
+            # reusable set for this table".
+            exclusions = set(self.table_map[table]).difference(reuse)
+            always_create = False
         t_ident = (lhs_table, table, lhs_col, col)
-        for alias in self.join_map.get(t_ident, ()):
-            if alias and not always_create and alias not in exclusions:
-                self.ref_alias(alias)
-                if promote:
-                    self.promote_alias(alias)
-                return alias
+        if not always_create:
+            for alias in self.join_map.get(t_ident, ()):
+                if alias not in exclusions:
+                    self.ref_alias(alias)
+                    if promote:
+                        self.promote_alias(alias)
+                    return alias
 
         # No reuse is possible, so we need a new alias.
         alias, _ = self.table_alias(table, True)
@@ -863,7 +872,7 @@ class Query(object):
                     used, next, restricted)
 
     def add_filter(self, filter_expr, connector=AND, negate=False, trim=False,
-            single_filter=False):
+            can_reuse=None):
         """
         Add a single filter to the query. The 'filter_expr' is a pair:
         (filter_string, value). E.g. ('name__contains', 'fred')
@@ -872,8 +881,11 @@ class Query(object):
         automatically trim the final join group (used internally when
         constructing nested queries).
 
-        If 'single_filter' is True, we are processing a component of a
-        multi-component filter (e.g. filter(Q1, Q2)).
+        If 'can_reuse' is a set, we are processing a component of a
+        multi-component filter (e.g. filter(Q1, Q2)). In this case, 'can_reuse'
+        will be a set of table aliases that can be reused in this filter, even
+        if we would otherwise force the creation of new aliases for a join
+        (needed for nested Q-filters). The set is updated by this method.
         """
         arg, value = filter_expr
         parts = arg.split(LOOKUP_SEP)
@@ -902,7 +914,7 @@ class Query(object):
 
         try:
             field, target, opts, join_list, last = self.setup_joins(parts, opts,
-                    alias, (connector == AND) and not single_filter, allow_many)
+                    alias, True, allow_many, can_reuse=can_reuse)
         except MultiJoin, e:
             self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]))
             return
@@ -982,8 +994,10 @@ class Query(object):
                         entry.negate()
                         self.where.add(entry, AND)
                         break
+        if can_reuse is not None:
+            can_reuse.update(join_list)
 
-    def add_q(self, q_object):
+    def add_q(self, q_object, used_aliases=None):
         """
         Adds a Q-object to the current filter.
 
@@ -1000,24 +1014,24 @@ class Query(object):
         else:
             subtree = False
         connector = AND
-        internal = False
+        if used_aliases is None:
+            used_aliases = set()
         for child in q_object.children:
             if isinstance(child, Node):
                 self.where.start_subtree(connector)
-                self.add_q(child)
+                self.add_q(child, used_aliases)
                 self.where.end_subtree()
                 if q_object.negated:
                     self.where.children[-1].negate()
             else:
                 self.add_filter(child, connector, q_object.negated,
-                        single_filter=internal)
-                internal = True
+                        can_reuse=used_aliases)
             connector = q_object.connector
         if subtree:
             self.where.end_subtree()
 
     def setup_joins(self, names, opts, alias, dupe_multis, allow_many=True,
-            allow_explicit_fk=False):
+            allow_explicit_fk=False, can_reuse=None):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -1087,9 +1101,9 @@ class Query(object):
                                 target)
 
                     int_alias = self.join((alias, table1, from_col1, to_col1),
-                            dupe_multis, joins, nullable=True)
+                            dupe_multis, joins, nullable=True, reuse=can_reuse)
                     alias = self.join((int_alias, table2, from_col2, to_col2),
-                            dupe_multis, joins, nullable=True)
+                            dupe_multis, joins, nullable=True, reuse=can_reuse)
                     joins.extend([int_alias, alias])
                 elif field.rel:
                     # One-to-one or many-to-one field
@@ -1133,9 +1147,9 @@ class Query(object):
                                 target)
 
                     int_alias = self.join((alias, table1, from_col1, to_col1),
-                            dupe_multis, joins, nullable=True)
+                            dupe_multis, joins, nullable=True, reuse=can_reuse)
                     alias = self.join((int_alias, table2, from_col2, to_col2),
-                            dupe_multis, joins, nullable=True)
+                            dupe_multis, joins, nullable=True, reuse=can_reuse)
                     joins.extend([int_alias, alias])
                 else:
                     # One-to-many field (ForeignKey defined on the target model)
@@ -1153,7 +1167,7 @@ class Query(object):
                                 opts, target)
 
                     alias = self.join((alias, table, from_col, to_col),
-                            dupe_multis, joins, nullable=True)
+                            dupe_multis, joins, nullable=True, reuse=can_reuse)
                     joins.append(alias)
 
         if pos != len(names) - 1:
