@@ -9,6 +9,18 @@ if HAS_GDAL: from django.contrib.gis.gdal import OGRGeometry, SpatialReference, 
 
 class GEOSTest(unittest.TestCase):
 
+    @property
+    def null_srid(self):
+        """
+        Returns the proper null SRID depending on the GEOS version.
+        See the comments in `test15_srid` for more details. 
+        """
+        info = geos_version_info()
+        if info['version'] == '3.0.0' and info['release_candidate']:
+            return -1
+        else:
+            return None
+
     def test01a_wkt(self):
         "Testing WKT output."
         for g in wkt_out:
@@ -498,16 +510,10 @@ class GEOSTest(unittest.TestCase):
         p1 = fromstr(hex)
         self.assertEqual(4326, p1.srid)
 
-        # However, when HEX is exported, the SRID information is lost
-        # and set to -1.  Essentially, the 'E' of the EWKB is not
-        # encoded in HEX by the GEOS C library unless the GEOSWKBWriter
-        # method is used.  GEOS 3.0.0 will not encode -1 in the HEX
-        # as is done in the release candidates.
-        info = geos_version_info()
-        if info['version'] == '3.0.0' and info['release_candidate']:
-            exp_srid = -1
-        else:
-            exp_srid = None
+        # In GEOS 3.0.0rc1-4  when the EWKB and/or HEXEWKB is exported,
+        # the SRID information is lost and set to -1 -- this is not a
+        # problem on the 3.0.0 version (another reason to upgrade).  
+        exp_srid = self.null_srid
 
         p2 = fromstr(p1.hex)
         self.assertEqual(exp_srid, p2.srid)
@@ -744,13 +750,15 @@ class GEOSTest(unittest.TestCase):
         tgeoms.extend(get_geoms(multilinestrings, 4326))
         tgeoms.extend(get_geoms(polygons, 3084))
         tgeoms.extend(get_geoms(multipolygons, 900913))
-        
+
+        # The SRID won't be exported in GEOS 3.0 release candidates.
+        no_srid = self.null_srid == -1 
         for geom in tgeoms:
             s1, s2 = cPickle.dumps(geom), pickle.dumps(geom)
             g1, g2 = cPickle.loads(s1), pickle.loads(s2)
             for tmpg in (g1, g2):
                 self.assertEqual(geom, tmpg)
-                self.assertEqual(geom.srid, tmpg.srid)
+                if not no_srid: self.assertEqual(geom.srid, tmpg.srid)
 
 def suite():
     s = unittest.TestSuite()
