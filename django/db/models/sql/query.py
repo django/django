@@ -206,7 +206,7 @@ class Query(object):
 
         return number
 
-    def as_sql(self, with_limits=True):
+    def as_sql(self, with_limits=True, with_col_aliases=False):
         """
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
@@ -215,7 +215,7 @@ class Query(object):
         in the query.
         """
         self.pre_sql_setup()
-        out_cols = self.get_columns()
+        out_cols = self.get_columns(with_col_aliases)
         ordering = self.get_ordering()
 
         # This must come after 'select' and 'ordering' -- see docstring of
@@ -354,38 +354,62 @@ class Query(object):
         if self.select_related and not self.related_select_cols:
             self.fill_related_selections()
 
-    def get_columns(self):
+    def get_columns(self, with_aliases=False):
         """
         Return the list of columns to use in the select statement. If no
         columns have been specified, returns all columns relating to fields in
         the model.
+
+        If 'with_aliases' is true, any column names that are duplicated
+        (without the table names) are given unique aliases. This is needed in
+        some cases to avoid ambiguitity with nested queries.
         """
         qn = self.quote_name_unless_alias
         result = ['(%s) AS %s' % (col, alias) for alias, col in self.extra_select.iteritems()]
         aliases = self.extra_select.keys()
+        if with_aliases:
+            col_aliases = set(aliases)
+        else:
+            col_aliases = set()
         if self.select:
             for col in self.select:
                 if isinstance(col, (list, tuple)):
                     r = '%s.%s' % (qn(col[0]), qn(col[1]))
-                    result.append(r)
-                    aliases.append(r)
+                    if with_aliases and col[1] in col_aliases:
+                        c_alias = 'Col%d' % len(col_aliases)
+                        result.append('%s AS %s' % (r, c_alias))
+                        aliases.append(c_alias)
+                        col_aliases.add(c_alias)
+                    else:
+                        result.append(r)
+                        aliases.append(r)
+                        col_aliases.add(col[1])
                 else:
                     result.append(col.as_sql(quote_func=qn))
                     if hasattr(col, 'alias'):
                         aliases.append(col.alias)
+                        col_aliases.add(col.alias)
         elif self.default_cols:
-            cols = self.get_default_columns(True)
+            cols = self.get_default_columns(True, with_aliases, col_aliases)
             result.extend(cols)
             aliases.extend(cols)
         for table, col in self.related_select_cols:
             r = '%s.%s' % (qn(table), qn(col))
-            result.append(r)
-            aliases.append(r)
+            if with_aliases and col in col_aliases:
+                c_alias = 'Col%d' % len(col_aliases)
+                result.append('%s AS %s' % (r, c_alias))
+                aliases.append(c_alias)
+                col_aliases.add(c_alias)
+            else:
+                result.append(r)
+                aliases.append(r)
+                col_aliases.add(col)
 
         self._select_aliases = set(aliases)
         return result
 
-    def get_default_columns(self, as_str=False):
+    def get_default_columns(self, as_str=False, with_aliases=False,
+            col_aliases=None):
         """
         Computes the default columns for selecting every field in the base
         model. Returns a list of default (alias, column) pairs suitable for
@@ -406,7 +430,12 @@ class Query(object):
                         root_pk, model._meta.pk.column))
                 seen[model] = alias
             if as_str:
-                result.append('%s.%s' % (qn(alias), qn2(field.column)))
+                if with_aliases and field.column in col_aliases:
+                    c_alias = 'Col%d' % len(col_aliases)
+                    result.append('%s.%s AS %s' % (qn(alias),
+                        qn2(field.column), c_aliase))
+                else:
+                    result.append('%s.%s' % (qn(alias), qn2(field.column)))
             else:
                 result.append((alias, field.column))
         return result

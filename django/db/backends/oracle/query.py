@@ -72,7 +72,7 @@ def query_class(QueryClass, Database):
                 values.append(value)
             return values
 
-        def as_sql(self, with_limits=True):
+        def as_sql(self, with_limits=True, with_col_aliases=False):
             """
             Creates the SQL for this query. Returns the SQL string and list
             of parameters.  This is overriden from the original Query class
@@ -88,7 +88,8 @@ def query_class(QueryClass, Database):
             # If no offsets, just return the result of the base class
             # `as_sql`.
             if not do_offset:
-                return super(OracleQuery, self).as_sql(with_limits=False)
+                return super(OracleQuery, self).as_sql(with_limits=False,
+                        with_col_aliases=with_col_aliases)
 
             # `get_columns` needs to be called before `get_ordering` to
             # populate `_select_alias`.
@@ -110,7 +111,8 @@ def query_class(QueryClass, Database):
             # Getting the selection SQL and the params, which has the `rn`
             # extra selection SQL.
             self.extra_select['rn'] = 'ROW_NUMBER() OVER (ORDER BY %s )' % rn_orderby
-            sql, params= super(OracleQuery, self).as_sql(with_limits=False)
+            sql, params= super(OracleQuery, self).as_sql(with_limits=False,
+                    with_col_aliases=True)
 
             # Constructing the result SQL, using the initial select SQL
             # obtained above.
