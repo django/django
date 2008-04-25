@@ -673,7 +673,9 @@ class Query(object):
             alias_data[RHS_ALIAS] = new_alias
 
             t = self.rev_join_map[old_alias]
-            self.join_map[t] = new_alias
+            data = list(self.join_map[t])
+            data[data.index(old_alias)] = new_alias
+            self.join_map[t] = tuple(data)
             self.rev_join_map[new_alias] = t
             del self.rev_join_map[old_alias]
             self.alias_refcount[new_alias] = self.alias_refcount[old_alias]
@@ -778,12 +780,12 @@ class Query(object):
         else:
             lhs_table = lhs
         t_ident = (lhs_table, table, lhs_col, col)
-        alias = self.join_map.get(t_ident)
-        if alias and not always_create and alias not in exclusions:
-            self.ref_alias(alias)
-            if promote:
-                self.promote_alias(alias)
-            return alias
+        for alias in self.join_map.get(t_ident, ()):
+            if alias and not always_create and alias not in exclusions:
+                self.ref_alias(alias)
+                if promote:
+                    self.promote_alias(alias)
+                return alias
 
         # No reuse is possible, so we need a new alias.
         alias, _ = self.table_alias(table, True)
@@ -797,7 +799,10 @@ class Query(object):
             join_type = self.INNER
         join = (table, alias, join_type, lhs, lhs_col, col, nullable)
         self.alias_map[alias] = join
-        self.join_map[t_ident] = alias
+        if t_ident in self.join_map:
+            self.join_map[t_ident] += (alias,)
+        else:
+            self.join_map[t_ident] = (alias,)
         self.rev_join_map[alias] = t_ident
         return alias
 
