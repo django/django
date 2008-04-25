@@ -61,7 +61,7 @@ class WhereNode(tree.Node):
                     sql, params = self.make_atom(child, qn)
                     format = '%s'
             except EmptyResultSet:
-                if self.connector == AND and not node.negated:
+                if node.connector == AND and not node.negated:
                     # We can bail out early in this particular case (only).
                     raise
                 elif node.negated:
