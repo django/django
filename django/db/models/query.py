@@ -3,7 +3,7 @@ import warnings
 from django.conf import settings
 from django.db import connection, transaction, IntegrityError
 from django.db.models.fields import DateField, FieldDoesNotExist
-from django.db.models.query_utils import Q, not_q
+from django.db.models.query_utils import Q
 from django.db.models import signals, sql
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
@@ -355,29 +355,25 @@ class QuerySet(object):
         Returns a new QuerySet instance with the args ANDed to the existing
         set.
         """
-        return self._filter_or_exclude(None, *args, **kwargs)
+        return self._filter_or_exclude(False, *args, **kwargs)
 
     def exclude(self, *args, **kwargs):
         """
         Returns a new QuerySet instance with NOT (args) ANDed to the existing
         set.
         """
-        return self._filter_or_exclude(not_q, *args, **kwargs)
+        return self._filter_or_exclude(True, *args, **kwargs)
 
-    def _filter_or_exclude(self, mapper, *args, **kwargs):
-        # mapper is a callable used to transform Q objects,
-        # or None for identity transform.
-        if mapper is None:
-            mapper = lambda x: x
+    def _filter_or_exclude(self, negate, *args, **kwargs):
         if args or kwargs:
             assert self.query.can_filter(), \
-                "Cannot filter a query once a slice has been taken."
+                    "Cannot filter a query once a slice has been taken."
 
         clone = self._clone()
-        if kwargs:
-            clone.query.add_q(mapper(Q(**kwargs)))
-        for arg in args:
-            clone.query.add_q(mapper(arg))
+        if negate:
+            clone.query.add_q(~Q(*args, **kwargs))
+        else:
+            clone.query.add_q(Q(*args, **kwargs))
         return clone
 
     def complex_filter(self, filter_obj):

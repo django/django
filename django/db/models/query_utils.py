@@ -28,10 +28,7 @@ class Q(tree.Node):
     default = AND
 
     def __init__(self, *args, **kwargs):
-        if args and kwargs:
-            raise TypeError('Use positional *or* kwargs; not both!')
-        nodes = list(args) + kwargs.items()
-        super(Q, self).__init__(children=nodes)
+        super(Q, self).__init__(children=list(args) + kwargs.items())
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):
@@ -50,7 +47,4 @@ class Q(tree.Node):
         obj = deepcopy(self)
         obj.negate()
         return obj
-
-def not_q(q):
-    return ~q
 

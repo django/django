@@ -969,24 +969,11 @@ class Query(object):
                 # that's harmless.
                 self.promote_alias(table)
 
-        entry = (alias, col, field, lookup_type, value)
-        if negate and single_filter:
-            # This case is when we're doing the Q2 filter in exclude(Q1, Q2).
-            # It's different from exclude(Q1).exclude(Q2).
-            for node in self.where.children:
-                if getattr(node, 'negated', False):
-                    node.add(entry, connector)
-                    merged = True
-                    break
-        else:
-            self.where.add(entry, connector)
-            merged = False
-
+        self.where.add((alias, col, field, lookup_type, value), connector)
         if negate:
+            self.where.negate()
             for alias in join_list:
                 self.promote_alias(alias)
-            if not merged:
-                self.where.negate()
             if final > 1 and lookup_type != 'isnull':
                 for alias in join_list:
                     if self.alias_map[alias] == self.LOUTER:
@@ -1019,6 +1006,8 @@ class Query(object):
                 self.where.start_subtree(connector)
                 self.add_q(child)
                 self.where.end_subtree()
+                if q_object.negated:
+                    self.where.children[-1].negate()
             else:
                 self.add_filter(child, connector, q_object.negated,
                         single_filter=internal)
