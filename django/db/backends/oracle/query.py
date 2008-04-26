@@ -29,48 +29,54 @@ def query_class(QueryClass, Database):
             from django.db.models.fields import DateField, DateTimeField, \
                  TimeField, BooleanField, NullBooleanField, DecimalField, Field
             index_start = len(self.extra_select.keys())
-            values = list(row[:index_start])
+            values = [self.convert_values(v, None) for v in row[:index_start]]
             for value, field in map(None, row[index_start:], fields):
-                if isinstance(value, Database.LOB):
-                    value = value.read()
-                # Oracle stores empty strings as null. We need to undo this in
-                # order to adhere to the Django convention of using the empty
-                # string instead of null, but only if the field accepts the
-                # empty string.
-                if value is None and isinstance(field, Field) and field.empty_strings_allowed:
-                    value = u''
-                # Convert 1 or 0 to True or False
-                elif value in (1, 0) and isinstance(field, (BooleanField, NullBooleanField)):
-                    value = bool(value)
-                # Convert floats to decimals
-                elif value is not None and isinstance(field, DecimalField):
-                    value = util.typecast_decimal(field.format_number(value))
-                # cx_Oracle always returns datetime.datetime objects for
-                # DATE and TIMESTAMP columns, but Django wants to see a
-                # python datetime.date, .time, or .datetime.  We use the type
-                # of the Field to determine which to cast to, but it's not
-                # always available.
-                # As a workaround, we cast to date if all the time-related
-                # values are 0, or to time if the date is 1/1/1900.
-                # This could be cleaned a bit by adding a method to the Field
-                # classes to normalize values from the database (the to_python
-                # method is used for validation and isn't what we want here).
-                elif isinstance(value, Database.Timestamp):
-                    # In Python 2.3, the cx_Oracle driver returns its own
-                    # Timestamp object that we must convert to a datetime class.
-                    if not isinstance(value, datetime.datetime):
-                        value = datetime.datetime(value.year, value.month, value.day, value.hour,
-                                                  value.minute, value.second, value.fsecond)
-                    if isinstance(field, DateTimeField):
-                        pass  # DateTimeField subclasses DateField so must be checked first.
-                    elif isinstance(field, DateField):
-                        value = value.date()
-                    elif isinstance(field, TimeField) or (value.year == 1900 and value.month == value.day == 1):
-                        value = value.time()
-                    elif value.hour == value.minute == value.second == value.microsecond == 0:
-                        value = value.date()
-                values.append(value)
+                values.append(self.convert_values(value, field))
             return values
+
+        def convert_values(self, value, field):
+            if isinstance(value, Database.LOB):
+                value = value.read()
+            # Oracle stores empty strings as null. We need to undo this in
+            # order to adhere to the Django convention of using the empty
+            # string instead of null, but only if the field accepts the
+            # empty string.
+            if value is None and isinstance(field, Field) and field.empty_strings_allowed:
+                value = u''
+            # Convert 1 or 0 to True or False
+            elif value in (1, 0) and isinstance(field, (BooleanField, NullBooleanField)):
+                value = bool(value)
+            # Convert floats to decimals
+            elif value is not None and isinstance(field, DecimalField):
+                value = util.typecast_decimal(field.format_number(value))
+            # cx_Oracle always returns datetime.datetime objects for
+            # DATE and TIMESTAMP columns, but Django wants to see a
+            # python datetime.date, .time, or .datetime.  We use the type
+            # of the Field to determine which to cast to, but it's not
+            # always available.
+            # As a workaround, we cast to date if all the time-related
+            # values are 0, or to time if the date is 1/1/1900.
+            # This could be cleaned a bit by adding a method to the Field
+            # classes to normalize values from the database (the to_python
+            # method is used for validation and isn't what we want here).
+            elif isinstance(value, Database.Timestamp):
+                # In Python 2.3, the cx_Oracle driver returns its own
+                # Timestamp object that we must convert to a datetime class.
+                if not isinstance(value, datetime.datetime):
+                    value = datetime.datetime(value.year, value.month,
+                            value.day, value.hour, value.minute, value.second,
+                            value.fsecond)
+                if isinstance(field, DateTimeField):
+                    # DateTimeField subclasses DateField so must be checked
+                    # first.
+                    pass
+                elif isinstance(field, DateField):
+                    value = value.date()
+                elif isinstance(field, TimeField) or (value.year == 1900 and value.month == value.day == 1):
+                    value = value.time()
+                elif value.hour == value.minute == value.second == value.microsecond == 0:
+                    value = value.date()
+            return value
 
         def as_sql(self, with_limits=True, with_col_aliases=False):
             """
