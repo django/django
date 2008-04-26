@@ -433,7 +433,7 @@ class Query(object):
                 if with_aliases and field.column in col_aliases:
                     c_alias = 'Col%d' % len(col_aliases)
                     result.append('%s.%s AS %s' % (qn(alias),
-                        qn2(field.column), c_aliase))
+                        qn2(field.column), c_alias))
                 else:
                     result.append('%s.%s' % (qn(alias), qn2(field.column)))
             else:
