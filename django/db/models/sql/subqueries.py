@@ -348,6 +348,7 @@ class DateQuery(Query):
         select = Date((alias, column), lookup_type,
                 self.connection.ops.date_trunc_sql)
         self.select = [select]
+        self.select_fields = [None]
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
 

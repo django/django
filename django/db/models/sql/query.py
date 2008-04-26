@@ -54,6 +54,8 @@ class Query(object):
         self.standard_ordering = True
         self.ordering_aliases = []
         self.start_meta = None
+        self.select_fields = []
+        self.related_select_fields = []
 
         # SQL-related attributes
         self.select = []
@@ -142,6 +144,8 @@ class Query(object):
         obj.standard_ordering = self.standard_ordering
         obj.ordering_aliases = []
         obj.start_meta = self.start_meta
+        obj.select_fields = self.select_fields[:]
+        obj.related_select_fields = self.related_select_fields[:]
         obj.select = self.select[:]
         obj.tables = self.tables[:]
         obj.where = deepcopy(self.where)
@@ -169,8 +173,12 @@ class Query(object):
         """
         Returns an iterator over the results from executing this query.
         """
-        fields = self.model._meta.fields
         resolve_columns = hasattr(self, 'resolve_columns')
+        if resolve_columns:
+            if self.select_fields:
+                fields = self.select_fields + self.related_select_fields
+            else:
+                fields = self.model._meta.fields
         for rows in self.execute_sql(MULTI):
             for row in rows:
                 if resolve_columns:
@@ -187,6 +195,7 @@ class Query(object):
         obj.clear_limits()
         obj.select_related = False
         obj.related_select_cols = []
+        obj.related_select_fields = []
         if obj.distinct and len(obj.select) > 1:
             obj = self.clone(CountQuery, _query=obj, where=self.where_class(),
                     distinct=False)
@@ -199,7 +208,8 @@ class Query(object):
         number = data[0]
 
         # Apply offset and limit constraints manually, since using LIMIT/OFFSET
-        # in SQL doesn't change the COUNT output.
+        # in SQL (in variants that provide them) doesn't change the COUNT
+        # output.
         number = max(0, number - self.low_mark)
         if self.high_mark:
             number = min(number, self.high_mark - self.low_mark)
@@ -333,6 +343,7 @@ class Query(object):
                 item = deepcopy(col)
                 item.relabel_aliases(change_map)
                 self.select.append(item)
+        self.select_fields = rhs.select_fields[:]
         self.extra_select = rhs.extra_select.copy()
         self.extra_tables = rhs.extra_tables
         self.extra_where = rhs.extra_where
@@ -835,6 +846,7 @@ class Query(object):
             opts = self.get_meta()
             root_alias = self.get_initial_alias()
             self.related_select_cols = []
+            self.related_select_fields = []
         if not used:
             used = set()
 
@@ -869,6 +881,7 @@ class Query(object):
             used.add(alias)
             self.related_select_cols.extend([(alias, f2.column)
                     for f2 in f.rel.to._meta.fields])
+            self.related_select_fields.extend(f.rel.to._meta.fields)
             if restricted:
                 next = requested.get(f.name, {})
             else:
@@ -1237,7 +1250,7 @@ class Query(object):
         opts = self.get_meta()
         try:
             for name in field_names:
-                u1, target, u2, joins, u3 = self.setup_joins(
+                field, target, u2, joins, u3 = self.setup_joins(
                         name.split(LOOKUP_SEP), opts, alias, False, allow_m2m,
                         True)
                 final_alias = joins[-1]
@@ -1254,6 +1267,7 @@ class Query(object):
                     # doing unnecessary left outer joins here.
                     self.promote_alias(join)
                 self.select.append((final_alias, col))
+                self.select_fields.append(field)
         except MultiJoin:
             raise FieldError("Invalid field name: '%s'" % name)
         except FieldError:
@@ -1322,6 +1336,7 @@ class Query(object):
             # level.
             self.distinct = False
         self.select = [select]
+        self.select_fields = [None]
         self.extra_select = {}
         self.extra_select_params = ()
 
@@ -1338,6 +1353,7 @@ class Query(object):
                 d = d.setdefault(part, {})
         self.select_related = field_dict
         self.related_select_cols = []
+        self.related_select_fields = []
 
     def add_extra(self, select, select_params, where, params, tables, order_by):
         """
@@ -1390,6 +1406,7 @@ class Query(object):
                 start.split(LOOKUP_SEP), opts, alias, False)
         alias = joins[last[-1]]
         self.select = [(alias, self.alias_map[alias][RHS_JOIN_COL])]
+        self.select_fields = [field]
         self.start_meta = opts
 
         # The call to setup_joins add an extra reference to everything in
