@@ -4277,23 +4277,33 @@ msgstr "ou"
 
 #: utils/timesince.py:21
 msgid "year"
-msgstr "année"
+msgid_plural "years"
+msgstr[0] "année"
+msgstr[1] "années"
 
 #: utils/timesince.py:22
 msgid "month"
-msgstr "mois"
+msgid_plural "months"
+msgstr[0] "mois"
+msgstr[1] "mois"
 
 #: utils/timesince.py:23
 msgid "week"
-msgstr "semaine"
+msgid_plural "weeks"
+msgstr[0] "semaine"
+msgstr[1] "semaines"
 
 #: utils/timesince.py:24
 msgid "day"
-msgstr "journée"
+msgid_plural "days"
+msgstr[0] "journée"
+msgstr[1] "journées"
 
 #: utils/timesince.py:25
 msgid "hour"
-msgstr "heure"
+msgid_plural "hours"
+msgstr[0] "heure"
+msgstr[1] "heures"
 
 #: utils/timesince.py:26
 msgid "minute"
