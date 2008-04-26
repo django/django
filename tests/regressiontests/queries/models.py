@@ -586,7 +586,7 @@ Bug #6981
 >>> Tag.objects.select_related('parent').order_by('name')
 [<Tag: t1>, <Tag: t2>, <Tag: t3>, <Tag: t4>, <Tag: t5>]
 
-Bug #6180, #6203
+Bug #6180, #6203 -- dates with limits and/or counts
 >>> Item.objects.count()
 4
 >>> Item.objects.dates('created', 'month').count()
@@ -597,6 +597,10 @@ Bug #6180, #6203
 2
 >>> Item.objects.dates('created', 'day')[0]
 datetime.datetime(2007, 12, 19, 0, 0)
+
+Bug #7087 -- dates with extra select columns
+>>> Item.objects.dates('created', 'day').extra(select={'a': 1})
+[datetime.datetime(2007, 12, 19, 0, 0), datetime.datetime(2007, 12, 20, 0, 0)]
 
 Test that parallel iterators work.
 

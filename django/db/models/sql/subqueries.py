@@ -330,9 +330,10 @@ class DateQuery(Query):
             from django.db.backends.util import typecast_timestamp
             needs_string_cast = self.connection.features.needs_datetime_string_cast
 
+        offset = len(self.extra_select)
         for rows in self.execute_sql(MULTI):
             for row in rows:
-                date = row[0]
+                date = row[offset]
                 if resolve_columns:
                     date = self.resolve_columns([date], fields)[0]
                 elif needs_string_cast:
