@@ -1008,9 +1008,11 @@ class Query(object):
 
         Can also be used to add anything that has an 'add_to_query()' method.
         """
+        if used_aliases is None:
+            used_aliases = set()
         if hasattr(q_object, 'add_to_query'):
             # Complex custom objects are responsible for adding themselves.
-            q_object.add_to_query(self)
+            q_object.add_to_query(self, used_aliases)
             return
 
         if self.where and q_object.connector != AND and len(q_object) > 1:
@@ -1019,8 +1021,6 @@ class Query(object):
         else:
             subtree = False
         connector = AND
-        if used_aliases is None:
-            used_aliases = set()
         for child in q_object.children:
             if isinstance(child, Node):
                 self.where.start_subtree(connector)
