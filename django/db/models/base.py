@@ -165,33 +165,6 @@ class ModelBase(type):
 class Model(object):
     __metaclass__ = ModelBase
 
-    def _get_pk_val(self, meta=None):
-        if not meta:
-            meta = self._meta
-        return getattr(self, meta.pk.attname)
-
-    def _set_pk_val(self, value):
-        return setattr(self, self._meta.pk.attname, value)
-
-    pk = property(_get_pk_val, _set_pk_val)
-
-    def __repr__(self):
-        return smart_str(u'<%s: %s>' % (self.__class__.__name__, unicode(self)))
-
-    def __str__(self):
-        if hasattr(self, '__unicode__'):
-            return force_unicode(self).encode('utf-8')
-        return '%s object' % self.__class__.__name__
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self._get_pk_val() == other._get_pk_val()
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __hash__(self):
-        return hash(self._get_pk_val())
-
     def __init__(self, *args, **kwargs):
         dispatcher.send(signal=signals.pre_init, sender=self.__class__, args=args, kwargs=kwargs)
 
@@ -263,6 +236,59 @@ class Model(object):
             if kwargs:
                 raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
+
+    def from_sequence(cls, values):
+        """
+        An alternate class constructor, primarily for internal use.
+
+        Creates a model instance from a sequence of values (which corresponds
+        to all the non-many-to-many fields in creation order. If there are more
+        fields than values, the remaining (final) fields are given their
+        default values.
+
+        ForeignKey fields can only be initialised using id values, not
+        instances, in this method.
+        """
+        dispatcher.send(signal=signals.pre_init, sender=cls, args=values,
+                kwargs={})
+        obj = Empty()
+        obj.__class__ = cls
+        field_iter = iter(obj._meta.fields)
+        for val, field in izip(values, field_iter):
+            setattr(obj, field.attname, val)
+        for field in field_iter:
+            setattr(obj, field.attname, field.get_default())
+        dispatcher.send(signal=signals.post_init, sender=cls, instance=obj)
+        return obj
+
+    from_sequence = classmethod(from_sequence)
+
+    def __repr__(self):
+        return smart_str(u'<%s: %s>' % (self.__class__.__name__, unicode(self)))
+
+    def __str__(self):
+        if hasattr(self, '__unicode__'):
+            return force_unicode(self).encode('utf-8')
+        return '%s object' % self.__class__.__name__
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self._get_pk_val() == other._get_pk_val()
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self._get_pk_val())
+
+    def _get_pk_val(self, meta=None):
+        if not meta:
+            meta = self._meta
+        return getattr(self, meta.pk.attname)
+
+    def _set_pk_val(self, value):
+        return setattr(self, self._meta.pk.attname, value)
+
+    pk = property(_get_pk_val, _set_pk_val)
 
     def save(self):
         """
@@ -532,6 +558,9 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 ########
 # MISC #
 ########
+
+class Empty(object):
+    pass
 
 if sys.version_info < (2, 5):
     # Prior to Python 2.5, Exception was an old-style class
