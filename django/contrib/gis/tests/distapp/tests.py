@@ -41,21 +41,36 @@ class DistanceTest(unittest.TestCase):
 
     def test02_dwithin(self):
         "Testing the `dwithin` lookup type."
-        pnt = self.stx_pnt
-        dists = [7000, D(km=7), D(mi=4.349)]
-        for dist in dists:
-            qs = SouthTexasCity.objects.filter(point__dwithin=(self.stx_pnt, dist))
-            self.assertEqual(['Downtown Houston', 'Southside Place'], self.get_cities(qs))
+        # Distances -- all should be equal (except for the
+        # degree/meter pair in au_cities, that's somewhat
+        # approximate).
+        tx_dists = [7000, D(km=7), D(mi=4.349)]
+        au_dists = [(0.5, 32000), D(km=32), D(mi=19.884)]
+        
+        # Expected cities for Australia and Texas.
+        tx_cities = ['Downtown Houston', 'Southside Place']
+        au_cities = ['Mittagong', 'Shellharbour', 'Thirroul', 'Wollongong']
 
-            if isinstance(dist, D):
-                # A TypeError should be raised when trying to pass Distance objects
-                # into a DWithin query using a geodetic field.
-                qs = AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, dist))
+        for dist in tx_dists:
+            qs = SouthTexasCity.objects.filter(point__dwithin=(self.stx_pnt, dist))
+            self.assertEqual(tx_cities, self.get_cities(qs))
+
+        for dist in au_dists:
+            if isinstance(dist, D) and not oracle: type_error = True
+            else: type_error = False
+
+            if isinstance(dist, tuple):
+                if oracle: dist = dist[1]
+                else: dist = dist[0]
+                
+            # Creating the query set.
+            qs = AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, dist)).order_by('name')
+            if type_error:
+                # A TypeError should be raised on PostGIS when trying to pass
+                # Distance objects into a DWithin query using a geodetic field.  
                 self.assertRaises(TypeError, qs.count)
             else:
-                # Actually using a distance value of 0.5 degrees.
-                qs = AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, 0.5)).order_by('name')
-                self.assertEqual(['Mittagong', 'Shellharbour', 'Thirroul', 'Wollongong'], self.get_cities(qs))
+                self.assertEqual(au_cities, self.get_cities(qs))
 
     def test03_distance_aggregate(self):
         "Testing the `distance` GeoQuerySet method."
