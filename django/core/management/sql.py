@@ -26,7 +26,7 @@ def django_table_list(only_existing=False):
     for app in models.get_apps():
         for model in models.get_models(app):
             tables.append(model._meta.db_table)
-            tables.extend([f.m2m_db_table() for f in model._meta.many_to_many])
+            tables.extend([f.m2m_db_table() for f in model._meta.local_many_to_many])
     if only_existing:
         existing = table_list()
         tables = [t for t in tables if t in existing]
@@ -54,12 +54,12 @@ def sequence_list():
 
     for app in apps:
         for model in models.get_models(app):
-            for f in model._meta.fields:
+            for f in model._meta.local_fields:
                 if isinstance(f, models.AutoField):
                     sequence_list.append({'table': model._meta.db_table, 'column': f.column})
                     break # Only one AutoField is allowed per model, so don't bother continuing.
 
-            for f in model._meta.many_to_many:
+            for f in model._meta.local_many_to_many:
                 sequence_list.append({'table': f.m2m_db_table(), 'column': None})
 
     return sequence_list
@@ -149,7 +149,7 @@ def sql_delete(app, style):
         if cursor and table_name_converter(model._meta.db_table) in table_names:
             # The table exists, so it needs to be dropped
             opts = model._meta
-            for f in opts.fields:
+            for f in opts.local_fields:
                 if f.rel and f.rel.to not in to_delete:
                     references_to_delete.setdefault(f.rel.to, []).append( (model, f) )
 
@@ -181,7 +181,7 @@ def sql_delete(app, style):
     # Output DROP TABLE statements for many-to-many tables.
     for model in app_models:
         opts = model._meta
-        for f in opts.many_to_many:
+        for f in opts.local_many_to_many:
             if isinstance(f.rel, generic.GenericRel):
                 continue
             if cursor and table_name_converter(f.m2m_db_table()) in table_names:
@@ -258,7 +258,7 @@ def sql_model_create(model, style, known_models=set()):
     pending_references = {}
     qn = connection.ops.quote_name
     inline_references = connection.features.inline_fk_references
-    for f in opts.fields:
+    for f in opts.local_fields:
         col_type = f.db_type()
         tablespace = f.db_tablespace or opts.db_tablespace
         if col_type is None:
@@ -294,14 +294,8 @@ def sql_model_create(model, style, known_models=set()):
             style.SQL_COLTYPE(models.IntegerField().db_type()) + ' ' + \
             style.SQL_KEYWORD('NULL'))
     for field_constraints in opts.unique_together:
-        constraint_output = [style.SQL_KEYWORD('UNIQUE')]
-        constraint_output.append('(%s)' % \
+        table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' % \
             ", ".join([style.SQL_FIELD(qn(opts.get_field(f).column)) for f in field_constraints]))
-        if opts.db_tablespace and connection.features.supports_tablespaces \
-               and connection.features.autoindexes_primary_keys:
-            constraint_output.append(connection.ops.tablespace_sql(
-                opts.db_tablespace, inline=True))
-        table_output.append(' '.join(constraint_output))
 
     full_statement = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + style.SQL_TABLE(qn(opts.db_table)) + ' (']
     for i, line in enumerate(table_output): # Combine and add commas.
@@ -359,7 +353,7 @@ def many_to_many_sql_for_model(model, style):
     final_output = []
     qn = connection.ops.quote_name
     inline_references = connection.features.inline_fk_references
-    for f in opts.many_to_many:
+    for f in opts.local_many_to_many:
         if not isinstance(f.rel, generic.GenericRel):
             tablespace = f.db_tablespace or opts.db_tablespace
             if tablespace and connection.features.supports_tablespaces and connection.features.autoindexes_primary_keys:
@@ -466,7 +460,7 @@ def sql_indexes_for_model(model, style):
     output = []
 
     qn = connection.ops.quote_name
-    for f in model._meta.fields:
+    for f in model._meta.local_fields:
         if f.db_index and not ((f.primary_key or f.unique) and connection.features.autoindexes_primary_keys):
             unique = f.unique and 'UNIQUE ' or ''
             tablespace = f.db_tablespace or model._meta.db_tablespace

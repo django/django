@@ -1,11 +1,13 @@
-from django.db.models.query import QuerySet, EmptyQuerySet
+import copy
+
+from django.db.models.query import QuerySet, EmptyQuerySet, insert_query
 from django.dispatch import dispatcher
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 
 def ensure_default_manager(sender):
     cls = sender
-    if not hasattr(cls, '_default_manager'):
+    if not getattr(cls, '_default_manager', None) and not cls._meta.abstract:
         # Create the default manager, if needed.
         try:
             cls._meta.get_field('objects')
@@ -31,13 +33,24 @@ class Manager(object):
         # TODO: Use weakref because of possible memory leak / circular reference.
         self.model = model
         setattr(model, name, ManagerDescriptor(self))
-        if not hasattr(model, '_default_manager') or self.creation_counter < model._default_manager.creation_counter:
+        if not getattr(model, '_default_manager', None) or self.creation_counter < model._default_manager.creation_counter:
             model._default_manager = self
+
+    def _copy_to_model(self, model):
+        """
+        Makes a copy of the manager and assigns it to 'model', which should be
+        a child of the existing model (used when inheriting a manager from an
+        abstract base class).
+        """
+        assert issubclass(model, self.model)
+        mgr = copy.copy(self)
+        mgr.model = model
+        return mgr
 
     #######################
     # PROXIES TO QUERYSET #
     #######################
-    
+
     def get_empty_query_set(self):
         return EmptyQuerySet(self.model)
 
@@ -46,7 +59,7 @@ class Manager(object):
         to easily customize the behavior of the Manager.
         """
         return QuerySet(self.model)
-    
+
     def none(self):
         return self.get_empty_query_set()
 
@@ -70,7 +83,7 @@ class Manager(object):
 
     def get_or_create(self, **kwargs):
         return self.get_query_set().get_or_create(**kwargs)
-        
+
     def create(self, **kwargs):
         return self.get_query_set().create(**kwargs)
 
@@ -100,6 +113,21 @@ class Manager(object):
 
     def values(self, *args, **kwargs):
         return self.get_query_set().values(*args, **kwargs)
+
+    def values_list(self, *args, **kwargs):
+        return self.get_query_set().values_list(*args, **kwargs)
+
+    def update(self, *args, **kwargs):
+        return self.get_query_set().update(*args, **kwargs)
+
+    def reverse(self, *args, **kwargs):
+        return self.get_query_set().reverse(*args, **kwargs)
+
+    def _insert(self, values, **kwargs):
+        return insert_query(self.model, values, **kwargs)
+
+    def _update(self, values, **kwargs):
+        return self.get_query_set()._update(values, **kwargs)
 
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.

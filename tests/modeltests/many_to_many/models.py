@@ -126,6 +126,11 @@ __test__ = {'API_TESTS':"""
 >>> Publication.objects.filter(article__in=[a1,a2]).distinct()
 [<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]
 
+# Excluding a related item works as you would expect, too (although the SQL
+# involved is a little complex).
+>>> Article.objects.exclude(publications=p2)
+[<Article: Django lets you build Web apps easily>]
+
 # If we delete a Publication, its Articles won't be able to access it.
 >>> p1.delete()
 >>> Publication.objects.all()

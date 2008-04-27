@@ -22,7 +22,7 @@ class Author(models.Model):
 
     class Meta:
         ordering = ('name',)
-    
+
     def __unicode__(self):
         return self.name
 
@@ -39,21 +39,21 @@ class Article(models.Model):
         return self.headline
 
 class AuthorProfile(models.Model):
-    author = models.OneToOneField(Author)
+    author = models.OneToOneField(Author, primary_key=True)
     date_of_birth = models.DateField()
-    
+
     def __unicode__(self):
         return u"Profile of %s" % self.author
-        
+
 class Actor(models.Model):
     name = models.CharField(max_length=20, primary_key=True)
 
     class Meta:
         ordering = ('name',)
-    
+
     def __unicode__(self):
         return self.name
-    
+
 class Movie(models.Model):
     actor = models.ForeignKey(Actor)
     title = models.CharField(max_length=50)
@@ -63,7 +63,7 @@ class Movie(models.Model):
 
     def __unicode__(self):
         return self.title
-        
+
 class Score(models.Model):
     score = models.FloatField()
 
@@ -100,7 +100,7 @@ __test__ = {'API_TESTS':"""
 >>> dom = minidom.parseString(xml)
 
 # Deserializing has a similar interface, except that special DeserializedObject
-# instances are returned.  This is because data might have changed in the 
+# instances are returned.  This is because data might have changed in the
 # database since the data was serialized (we'll simulate that below).
 >>> for obj in serializers.deserialize("xml", xml):
 ...     print obj
@@ -148,7 +148,7 @@ __test__ = {'API_TESTS':"""
 >>> Article.objects.all()
 [<Article: Just kidding; I love TV poker>, <Article: Time to reform copyright>]
 
-# If you use your own primary key field (such as a OneToOneField), 
+# If you use your own primary key field (such as a OneToOneField),
 # it doesn't appear in the serialized field list - it replaces the
 # pk identifier.
 >>> profile = AuthorProfile(author=joe, date_of_birth=datetime(1970,1,1))
@@ -186,7 +186,7 @@ __test__ = {'API_TESTS':"""
 >>> print serializers.serialize("json", Article.objects.all(), fields=('headline','pub_date'))
 [{"pk": 1, "model": "serializers.article", "fields": {"headline": "Just kidding; I love TV poker", "pub_date": "2006-06-16 11:00:00"}}, {"pk": 2, "model": "serializers.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:11"}}, {"pk": 3, "model": "serializers.article", "fields": {"headline": "Forward references pose no problem", "pub_date": "2006-06-16 15:00:00"}}]
 
-# Every string is serialized as a unicode object, also primary key 
+# Every string is serialized as a unicode object, also primary key
 # which is 'varchar'
 >>> ac = Actor(name="Zażółć")
 >>> mv = Movie(title="Gęślą jaźń", actor=ac)
@@ -247,12 +247,13 @@ try:
   pk: 2
 <BLANKLINE>
 
->>> obs = list(serializers.deserialize("yaml", serialized)) 
->>> for i in obs: 
+>>> obs = list(serializers.deserialize("yaml", serialized))
+>>> for i in obs:
 ...     print i
 <DeserializedObject: Just kidding; I love TV poker>
 <DeserializedObject: Time to reform copyright>
 
 """
-except ImportError: pass
-    
+except ImportError:
+    pass
+

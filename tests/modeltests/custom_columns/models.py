@@ -55,8 +55,8 @@ __test__ = {'API_TESTS':"""
 >>> art.save()
 >>> art.authors = [a, a2]
 
-# Although the table and column names on Author have been set to 
-# custom values, nothing about using the Author model has changed...
+# Although the table and column names on Author have been set to custom values,
+# nothing about using the Author model has changed...
 
 # Query the available authors
 >>> Author.objects.all()
@@ -71,7 +71,7 @@ __test__ = {'API_TESTS':"""
 >>> Author.objects.filter(firstname__exact='John')
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'firstname' into field. Choices are: article, id, first_name, last_name
+FieldError: Cannot resolve keyword 'firstname' into field. Choices are: article, first_name, id, last_name
 
 >>> a = Author.objects.get(last_name__exact='Smith')
 >>> a.first_name
