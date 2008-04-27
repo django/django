@@ -49,7 +49,8 @@ class BaseDatabaseFeatures(object):
     supports_constraints = True
     supports_tablespaces = False
     uses_case_insensitive_names = False
-    uses_custom_queryset = False
+    uses_custom_query_class = False
+    empty_fetchmany_value = []
 
 class BaseDatabaseOperations(object):
     """
@@ -86,10 +87,9 @@ class BaseDatabaseOperations(object):
         Returns the SQL necessary to cast a datetime value so that it will be
         retrieved as a Python datetime object instead of a string.
 
-        This SQL should include a '%s' in place of the field's name. This
-        method should return None if no casting is necessary.
+        This SQL should include a '%s' in place of the field's name.
         """
-        return None
+        return "%s"
 
     def deferrable_sql(self):
         """
@@ -169,12 +169,28 @@ class BaseDatabaseOperations(object):
             sql += " OFFSET %s" % offset
         return sql
 
+    def lookup_cast(self, lookup_type):
+        """
+        Returns the string to use in a query when performing lookups
+        ("contains", "like", etc). The resulting string should contain a '%s'
+        placeholder for the column being searched against.
+        """
+        return "%s"
+
     def max_name_length(self):
         """
         Returns the maximum length of table and column names, or None if there
         is no limit.
         """
         return None
+
+    def no_limit_value(self):
+        """
+        Returns the value to use for the LIMIT when we are wanting "LIMIT
+        infinity". Returns None if the limit clause can be omitted in this case.
+        """
+        # FIXME: API may need to change once Oracle backend is repaired.
+        raise NotImplementedError()
 
     def pk_default_value(self):
         """
@@ -183,11 +199,11 @@ class BaseDatabaseOperations(object):
         """
         return 'DEFAULT'
 
-    def query_set_class(self, DefaultQuerySet):
+    def query_class(self, DefaultQueryClass):
         """
         Given the default QuerySet class, returns a custom QuerySet class
         to use for this backend. Returns None if a custom QuerySet isn't used.
-        See also BaseDatabaseFeatures.uses_custom_queryset, which regulates
+        See also BaseDatabaseFeatures.uses_custom_query_class, which regulates
         whether this method is called at all.
         """
         return None
@@ -204,6 +220,17 @@ class BaseDatabaseOperations(object):
         Returns a SQL expression that returns a random value.
         """
         return 'RANDOM()'
+
+    def regex_lookup(self, lookup_type):
+        """
+        Returns the string to use in a query when performing regular expression
+        lookups (using "regex" or "iregex"). The resulting string should
+        contain a '%s' placeholder for the column being searched against.
+
+        If the feature is not supported (or part of it is not supported), a
+        NotImplementedError exception can be raised.
+        """
+        raise NotImplementedError
 
     def sql_flush(self, style, tables, sequences):
         """

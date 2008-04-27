@@ -1,5 +1,3 @@
-from decimal import Decimal
-from django.conf import settings
 from django.db import connection
 # Getting the SpatialBackend container and the geographic quoting method.
 from django.contrib.gis.db.backend import SpatialBackend, gqn

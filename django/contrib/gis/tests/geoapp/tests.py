@@ -187,6 +187,7 @@ class GeoModelTest(unittest.TestCase):
     @no_oracle # Most likely can do this in Oracle, however, it is not yet implemented (patches welcome!)
     def test05_extent(self):
         "Testing the extent() GeoManager method."
+        if DISABLE: return
         # Reference query:
         # `SELECT ST_extent(point) FROM geoapp_city WHERE (name='Houston' or name='Dallas');`
         #   =>  BOX(-96.8016128540039 29.7633724212646,-95.3631439208984 32.7820587158203)
@@ -378,7 +379,7 @@ class GeoModelTest(unittest.TestCase):
         # a ValueError.
         bad_args = [((pnt1, 0), TypeError),
                     ((pnt2, 'T*T***FF*', 0), ValueError),
-                    ((23, 'foo'), TypeError),
+                    ((23, 'foo'), ValueError),
                     ]
         for args, e in bad_args:
             qs = Country.objects.filter(mpoly__relate=args)

@@ -85,8 +85,7 @@ def make_messages():
                 src = pythonize_re.sub('\n#', src)
                 open(os.path.join(dirpath, '%s.py' % file), "wb").write(src)
                 thefile = '%s.py' % file
-                cmd = 'xgettext %s -d %s -L Perl --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (
-                    os.path.exists(potfile) and '--omit-header' or '', domain, os.path.join(dirpath, thefile))
+                cmd = 'xgettext -d %s -L Perl --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (domain, os.path.join(dirpath, thefile))
                 (stdin, stdout, stderr) = os.popen3(cmd, 't')
                 msgs = stdout.read()
                 errors = stderr.read()
@@ -97,6 +96,11 @@ def make_messages():
                 old = '#: '+os.path.join(dirpath, thefile)[2:]
                 new = '#: '+os.path.join(dirpath, file)[2:]
                 msgs = msgs.replace(old, new)
+                if os.path.exists(potfile):
+                    # Strip the header
+                    msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
+                else:
+                    msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
                 if msgs:
                     open(potfile, 'ab').write(msgs)
                 os.unlink(os.path.join(dirpath, thefile))

@@ -60,7 +60,7 @@ class GeoModelTest(unittest.TestCase):
         inner = LinearRing((40, 40), (40, 60), (60, 60), (60, 40), (40, 40))
 
         # Creating a State object using a built Polygon
-        ply = Polygon(shell.clone(), inner.clone())
+        ply = Polygon(shell, inner)
         nullstate = State(name='NullState', poly=ply)
         self.assertEqual(4326, nullstate.poly.srid) # SRID auto-set from None
         nullstate.save()
@@ -77,12 +77,12 @@ class GeoModelTest(unittest.TestCase):
 
         # Changing the interior ring on the poly attribute.
         new_inner = LinearRing((30, 30), (30, 70), (70, 70), (70, 30), (30, 30))
-        nullstate.poly[1] = new_inner.clone()
+        ns.poly[1] = new_inner
         ply[1] = new_inner
-        self.assertEqual(4326, nullstate.poly.srid)
-        nullstate.save()
+        self.assertEqual(4326, ns.poly.srid)
+        ns.save()
         self.assertEqual(ply, State.objects.get(name='NullState').poly)
-        nullstate.delete()
+        ns.delete()
 
     def test03_contains_contained(self):
         "Testing the 'contained', 'contains', and 'bbcontains' lookup types."
@@ -121,7 +121,19 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('Texas', qs[0].name)
 
-    def test04_equals(self):
+    def test04_disjoint(self):
+        "Testing the `disjoint` lookup type."
+        ptown = City.objects.get(name='Pueblo')
+        qs1 = City.objects.filter(point__disjoint=ptown.point)
+        self.assertEqual(7, qs1.count())
+        # TODO: This query should work in MySQL, but it appears the
+        # `MBRDisjoint` function doesn't work properly (I went down
+        # to the SQL level for debugging and still got bogus answers).
+        #qs2 = State.objects.filter(poly__disjoint=ptown.point)
+        #self.assertEqual(1, qs2.count())
+        #self.assertEqual('Kansas', qs2[0].name)
+
+    def test05_equals(self):
         "Testing the 'same_as' and 'equals' lookup types."
         pnt = fromstr('POINT (-95.363151 29.763374)', srid=4326)
         c1 = City.objects.get(point=pnt)
@@ -129,7 +141,7 @@ class GeoModelTest(unittest.TestCase):
         c3 = City.objects.get(point__equals=pnt)
         for c in [c1, c2, c3]: self.assertEqual('Houston', c.name)
 
-    def test05_geometryfield(self):
+    def test06_geometryfield(self):
         "Testing GeometryField."
         f1 = Feature(name='Point', geom=Point(1, 1))
         f2 = Feature(name='LineString', geom=LineString((0, 0), (1, 1), (5, 5)))
@@ -155,7 +167,7 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual(True, isinstance(f_4.geom, GeometryCollection))
         self.assertEqual(f_3.geom, f_4.geom[2])
     
-    def test06_mysql_limitations(self):
+    def test07_mysql_limitations(self):
         "Testing that union(), kml(), gml() raise exceptions."
         self.assertRaises(ImproperlyConfigured, City.objects.union, 'point')
         self.assertRaises(ImproperlyConfigured, State.objects.all().kml, 'poly')

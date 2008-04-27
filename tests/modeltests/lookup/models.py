@@ -162,11 +162,35 @@ True
 >>> Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_two')
 Traceback (most recent call last):
     ...
-FieldDoesNotExist: Article has no field named 'id_plus_two'
+FieldError: Cannot resolve keyword 'id_plus_two' into field. Choices are: headline, id, id_plus_one, pub_date
 
 # If you don't specify field names to values(), all are returned.
 >>> list(Article.objects.filter(id=5).values()) == [{'id': 5, 'headline': 'Article 5', 'pub_date': datetime(2005, 8, 1, 9, 0)}]
 True
+
+# values_list() is similar to values(), except that the results are returned as
+# a list of tuples, rather than a list of dictionaries. Within each tuple, the
+# order of the elemnts is the same as the order of fields in the values_list()
+# call.
+>>> Article.objects.values_list('headline')
+[(u'Article 5',), (u'Article 6',), (u'Article 4',), (u'Article 2',), (u'Article 3',), (u'Article 7',), (u'Article 1',)]
+
+>>> Article.objects.values_list('id').order_by('id')
+[(1,), (2,), (3,), (4,), (5,), (6,), (7,)]
+>>> Article.objects.values_list('id', flat=True).order_by('id')
+[1, 2, 3, 4, 5, 6, 7]
+
+>>> Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').values_list('id')
+[(1,), (2,), (3,), (4,), (5,), (6,), (7,)]
+>>> Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').values_list('id_plus_one', 'id')
+[(2, 1), (3, 2), (4, 3), (5, 4), (6, 5), (7, 6), (8, 7)]
+>>> Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').values_list('id', 'id_plus_one')
+[(1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8)]
+
+>>> Article.objects.values_list('id', 'headline', flat=True)
+Traceback (most recent call last):
+...
+TypeError: 'flat' is not valid when values_list is called with more than one field.
 
 # Every DateField and DateTimeField creates get_next_by_FOO() and
 # get_previous_by_FOO() methods.
@@ -240,6 +264,8 @@ DoesNotExist: Article matching query does not exist.
 []
 >>> Article.objects.none().filter(headline__startswith='Article')
 []
+>>> Article.objects.filter(headline__startswith='Article').none()
+[]
 >>> Article.objects.none().count()
 0
 >>> [article for article in Article.objects.none().iterator()]
@@ -256,12 +282,12 @@ DoesNotExist: Article matching query does not exist.
 >>> Article.objects.filter(pub_date_year='2005').count()
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'pub_date_year' into field. Choices are: id, headline, pub_date
+FieldError: Cannot resolve keyword 'pub_date_year' into field. Choices are: headline, id, pub_date
 
 >>> Article.objects.filter(headline__starts='Article')
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'headline__starts' into field. Choices are: id, headline, pub_date
+FieldError: Join on field 'headline' not permitted.
 
 # Create some articles with a bit more interesting headlines for testing field lookups:
 >>> now = datetime.now()
