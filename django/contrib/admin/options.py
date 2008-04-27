@@ -299,7 +299,7 @@ class ModelAdmin(BaseModelAdmin):
         # TODO: this should be handled by some parameter to the ChangeList.
         ordering = self.ordering or () # otherwise we might try to *None, which is bad ;)
         if ordering:
-            qs.order_by(*ordering)
+            qs = qs.order_by(*ordering)
         return qs
 
     def get_fieldsets(self, request, obj=None):
