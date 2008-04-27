@@ -26,8 +26,6 @@ def query_class(QueryClass, Database):
 
     class OracleQuery(QueryClass):
         def resolve_columns(self, row, fields=()):
-            from django.db.models.fields import DateField, DateTimeField, \
-                 TimeField, BooleanField, NullBooleanField, DecimalField, Field
             index_start = len(self.extra_select.keys())
             values = [self.convert_values(v, None) for v in row[:index_start]]
             for value, field in map(None, row[index_start:], fields):
@@ -35,6 +33,8 @@ def query_class(QueryClass, Database):
             return values
 
         def convert_values(self, value, field):
+            from django.db.models.fields import DateField, DateTimeField, \
+                 TimeField, BooleanField, NullBooleanField, DecimalField, Field
             if isinstance(value, Database.LOB):
                 value = value.read()
             # Oracle stores empty strings as null. We need to undo this in
