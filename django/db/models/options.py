@@ -248,7 +248,7 @@ class Options(object):
                 return self._name_map[name]
             except AttributeError:
                 cache = self.init_name_map()
-                return self._name_map[name]
+                return cache[name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r'
                     % (self.object_name, name))
