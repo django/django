@@ -74,7 +74,7 @@ msgstr "Часы"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
 msgid "Choose a time"
-msgstr "Выбирите время"
+msgstr "Выберите время"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Midnight"
