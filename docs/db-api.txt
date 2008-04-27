@@ -392,7 +392,7 @@ This returns the sixth through tenth objects (``OFFSET 5 LIMIT 5``)::
     Entry.objects.all()[5:10]
 
 You can also slice from the item ''N'' to the end of the queryset. For
-example, to return everything from the fixth item onwards::
+example, to return everything from the sixth item onwards::
 
     Entry.objects.all()[5:]
 
@@ -570,7 +570,7 @@ query spans multiple tables, it's possible to get duplicate results when a
 .. note::
     Any fields used in an ``order_by()`` call are included in the SQL
     ``SELECT`` columns. This can sometimes lead to unexpected results when
-    used in conjuntion with ``distinct()``. If you order by fields from a
+    used in conjunction with ``distinct()``. If you order by fields from a
     related model, those fields will be added to the selected columns and they
     may make otherwise duplicate rows appear to be distinct. Since the extra
     columns don't appear in the returned results (they are only there to
@@ -683,7 +683,7 @@ dictionaries, it returns a list of tuples. Each tuple contains the value from
 the respective field passed into the ``values_list()`` call -- so the first
 item is the first field, etc. For example::
 
-    >>> Entry.objects.values_list('id', 'headling')
+    >>> Entry.objects.values_list('id', 'headline')
     [(1, u'First entry'), ...]
 
 If you only pass in a single field, you can also pass in the ``flat``
@@ -837,7 +837,7 @@ models. In these cases, you can pass the related field names to
 ``select_related()`` and it will only follow those relations. You can even do
 this for models that are more than one relation away by separating the field
 names with double underscores, just as for filters. For example, if we have
-thise model::
+this model::
 
     class Room(models.Model):
         # ...
@@ -2103,7 +2103,7 @@ Updating multiple objects at once
 Sometimes you want to set a field to a particular value for all the objects in
 a queryset. You can do this with the ``update()`` method. For example::
 
-    # Update all the headlings to the same value.
+    # Update all the headlines to the same value.
     Entry.objects.all().update(headline='Everything is the same')
 
 You can only set non-relation fields and ``ForeignKey`` fields using this

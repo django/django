@@ -52,7 +52,7 @@ Some technical notes:
     * The name of the table, ``myapp_person``, is automatically derived from
       some model metadata but can be overridden. See `Table names`_ below.
     * An ``id`` field is added automatically, but this behavior can be
-      overriden. See `Automatic primary key fields`_ below.
+      overridden. See `Automatic primary key fields`_ below.
     * The ``CREATE TABLE`` SQL in this example is formatted using PostgreSQL
       syntax, but it's worth noting Django uses SQL tailored to the database
       backend specified in your `settings file`_.
@@ -2194,7 +2194,7 @@ Multi-table inheritance
 
 The second type of model inheritance supported by Django is when each model in
 the hierarchy is a model all by itself. Each model corresponds to its own
-database table and can be queried and created indvidually. The inheritance
+database table and can be queried and created individually. The inheritance
 relationship introduces links between the child model and each of its parents
 (via an automatically created ``OneToOneField``). For example::
 
@@ -2242,7 +2242,7 @@ parent: if the child does not specify an ``ordering`` attribute or a
 ``get_latest_by`` attribute, it will inherit these from its parent.
 
 If the parent has an ordering and you don't want the child to have any natural
-ordering, you can explicity set it to be empty::
+ordering, you can explicitly set it to be empty::
 
     class ChildModel(ParentModel):
         ...
