@@ -56,9 +56,10 @@ class SDORelate(SpatialFunction):
     masks = 'TOUCH|OVERLAPBDYDISJOINT|OVERLAPBDYINTERSECT|EQUAL|INSIDE|COVEREDBY|CONTAINS|COVERS|ANYINTERACT|ON'
     mask_regex = re.compile(r'^(%s)(\+(%s))*$' % (masks, masks), re.I)
     def __init__(self, mask):
+        func = 'SDO_RELATE'
         if not self.mask_regex.match(mask):
-            raise ValueError('Invalid %s mask: "%s"' % (self.lookup, mask))
-        super(SDORelate, self).__init__('SDO_RELATE', end_subst=", 'mask=%s') = 'TRUE'" % mask)
+            raise ValueError('Invalid %s mask: "%s"' % (func, mask))
+        super(SDORelate, self).__init__(func, end_subst=", 'mask=%s') = 'TRUE'" % mask)
 
 #### Lookup type mapping dictionaries of Oracle spatial operations ####
 
