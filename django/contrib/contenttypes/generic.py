@@ -154,6 +154,11 @@ class GenericRelation(RelatedField, Field):
     def get_internal_type(self):
         return "ManyToManyField"
 
+    def db_type(self):
+        # Since we're simulating a ManyToManyField, in effect, best return the
+        # same db_type as well.
+        return None
+
 class ReverseGenericRelatedObjectsDescriptor(object):
     """
     This class provides the functionality that makes the related-object

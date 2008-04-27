@@ -11,16 +11,18 @@ if not settings.DATABASE_ENGINE:
     settings.DATABASE_ENGINE = 'dummy'
 
 try:
-    # Most of the time, the database backend will be one of the official 
+    # Most of the time, the database backend will be one of the official
     # backends that ships with Django, so look there first.
     _import_path = 'django.db.backends.'
     backend = __import__('%s%s.base' % (_import_path, settings.DATABASE_ENGINE), {}, {}, [''])
+    creation = __import__('%s%s.creation' % (_import_path, settings.DATABASE_ENGINE), {}, {}, [''])
 except ImportError, e:
-    # If the import failed, we might be looking for a database backend 
+    # If the import failed, we might be looking for a database backend
     # distributed external to Django. So we'll try that next.
     try:
         _import_path = ''
         backend = __import__('%s.base' % settings.DATABASE_ENGINE, {}, {}, [''])
+        creation = __import__('%s.creation' % settings.DATABASE_ENGINE, {}, {}, [''])
     except ImportError, e_user:
         # The database backend wasn't found. Display a helpful error message
         # listing all possible (built-in) database backends.
@@ -37,10 +39,12 @@ def _import_database_module(import_path='', module_name=''):
     """Lazily import a database module when requested."""
     return __import__('%s%s.%s' % (import_path, settings.DATABASE_ENGINE, module_name), {}, {}, [''])
 
-# We don't want to import the introspect/creation modules unless 
-# someone asks for 'em, so lazily load them on demmand.
+# We don't want to import the introspect module unless someone asks for it, so
+# lazily load it on demmand.
 get_introspection_module = curry(_import_database_module, _import_path, 'introspection')
-get_creation_module = curry(_import_database_module, _import_path, 'creation')
+
+def get_creation_module():
+    return creation
 
 # We want runshell() to work the same way, but we have to treat it a
 # little differently (since it just runs instead of returning a module like

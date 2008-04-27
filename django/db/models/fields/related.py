@@ -2,6 +2,7 @@ from django.db import connection, transaction
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, get_ul_class
 from django.db.models.related import RelatedObject
+from django.db.models.query_utils import QueryWrapper
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, string_concat, ungettext, ugettext as _
 from django.utils.functional import curry
@@ -27,21 +28,21 @@ def add_lazy_relation(cls, field, relation):
     """
     Adds a lookup on ``cls`` when a related field is defined using a string,
     i.e.::
-    
+
         class MyModel(Model):
             fk = ForeignKey("AnotherModel")
-            
+
     This string can be:
-    
+
         * RECURSIVE_RELATIONSHIP_CONSTANT (i.e. "self") to indicate a recursive
           relation.
-          
+
         * The name of a model (i.e "AnotherModel") to indicate another model in
           the same app.
-          
+
         * An app-label and model name (i.e. "someapp.AnotherModel") to indicate
           another model in a different app.
-          
+
     If the other model hasn't yet been loaded -- almost a given if you're using
     lazy relationships -- then the relation won't be set up until the
     class_prepared signal fires at the end of model initialization.
@@ -50,7 +51,7 @@ def add_lazy_relation(cls, field, relation):
     if relation == RECURSIVE_RELATIONSHIP_CONSTANT:
         app_label = cls._meta.app_label
         model_name = cls.__name__
-    
+
     else:
         # Look for an "app.Model" relation
         try:
@@ -59,10 +60,10 @@ def add_lazy_relation(cls, field, relation):
             # If we can't split, assume a model in current app
             app_label = cls._meta.app_label
             model_name = relation
-    
+
     # Try to look up the related model, and if it's already loaded resolve the
     # string right away. If get_model returns None, it means that the related
-    # model isn't loaded yet, so we need to pend the relation until the class 
+    # model isn't loaded yet, so we need to pend the relation until the class
     # is prepared.
     model = get_model(app_label, model_name, False)
     if model:
@@ -72,7 +73,7 @@ def add_lazy_relation(cls, field, relation):
         key = (app_label, model_name)
         value = (cls, field)
         pending_lookups.setdefault(key, []).append(value)
-    
+
 def do_pending_lookups(sender):
     """
     Handle any pending relations to the sending model. Sent from class_prepared.
@@ -107,6 +108,8 @@ class RelatedField(object):
             add_lazy_relation(cls, self, other)
         else:
             self.do_related_class(other, cls)
+        if not cls._meta.abstract and self.rel.related_name:
+            self.rel.related_name = self.rel.related_name % {'class': cls.__name__.lower()}
 
     def set_attributes_from_rel(self):
         self.name = self.name or (self.rel.to._meta.object_name.lower() + '_' + self.rel.to._meta.pk.name)
@@ -136,6 +139,9 @@ class RelatedField(object):
                 pass
             return v
 
+        if hasattr(value, 'as_sql'):
+            sql, params = value.as_sql()
+            return QueryWrapper(('(%s)' % sql), params)
         if lookup_type == 'exact':
             return [pk_trace(value)]
         if lookup_type == 'in':
@@ -145,9 +151,10 @@ class RelatedField(object):
         raise TypeError, "Related Field has invalid lookup: %s" % lookup_type
 
     def _get_related_query_name(self, opts):
-        # This method defines the name that can be used to identify this related object
-        # in a table-spanning query. It uses the lower-cased object_name by default,
-        # but this can be overridden with the "related_name" option.
+        # This method defines the name that can be used to identify this
+        # related object in a table-spanning query. It uses the lower-cased
+        # object_name by default, but this can be overridden with the
+        # "related_name" option.
         return self.rel.related_name or opts.object_name.lower()
 
 class SingleRelatedObjectDescriptor(object):
@@ -158,14 +165,19 @@ class SingleRelatedObjectDescriptor(object):
     # SingleRelatedObjectDescriptor instance.
     def __init__(self, related):
         self.related = related
+        self.cache_name = '_%s_cache' % related.field.name
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
             raise AttributeError, "%s must be accessed via instance" % self.related.opts.object_name
 
-        params = {'%s__pk' % self.related.field.name: instance._get_pk_val()}
-        rel_obj = self.related.model._default_manager.get(**params)
-        return rel_obj
+        try:
+            return getattr(instance, self.cache_name)
+        except AttributeError:
+            params = {'%s__pk' % self.related.field.name: instance._get_pk_val()}
+            rel_obj = self.related.model._default_manager.get(**params)
+            setattr(instance, self.cache_name, rel_obj)
+            return rel_obj
 
     def __set__(self, instance, value):
         if instance is None:
@@ -495,13 +507,77 @@ class ReverseManyRelatedObjectsDescriptor(object):
         manager.clear()
         manager.add(*value)
 
+class ManyToOneRel(object):
+    def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
+            max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
+            related_name=None, limit_choices_to=None, lookup_overrides=None,
+            raw_id_admin=False, parent_link=False):
+        try:
+            to._meta
+        except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
+            assert isinstance(to, basestring), "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
+        self.to, self.field_name = to, field_name
+        self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
+        self.min_num_in_admin, self.max_num_in_admin = min_num_in_admin, max_num_in_admin
+        self.num_extra_on_change, self.related_name = num_extra_on_change, related_name
+        if limit_choices_to is None:
+            limit_choices_to = {}
+        self.limit_choices_to = limit_choices_to
+        self.lookup_overrides = lookup_overrides or {}
+        self.raw_id_admin = raw_id_admin
+        self.multiple = True
+        self.parent_link = parent_link
+
+    def get_related_field(self):
+        """
+        Returns the Field in the 'to' object to which this relationship is
+        tied.
+        """
+        data = self.to._meta.get_field_by_name(self.field_name)
+        if not data[2]:
+            raise FieldDoesNotExist("No related field named '%s'" %
+                    self.field_name)
+        return data[0]
+
+class OneToOneRel(ManyToOneRel):
+    def __init__(self, to, field_name, num_in_admin=0, min_num_in_admin=None,
+            max_num_in_admin=None, num_extra_on_change=None, edit_inline=False,
+            related_name=None, limit_choices_to=None, lookup_overrides=None,
+            raw_id_admin=False, parent_link=False):
+        # NOTE: *_num_in_admin and num_extra_on_change are intentionally
+        # ignored here. We accept them as parameters only to match the calling
+        # signature of ManyToOneRel.__init__().
+        super(OneToOneRel, self).__init__(to, field_name, num_in_admin,
+                edit_inline=edit_inline, related_name=related_name,
+                limit_choices_to=limit_choices_to,
+                lookup_overrides=lookup_overrides, raw_id_admin=raw_id_admin,
+                parent_link=parent_link)
+        self.multiple = False
+
+class ManyToManyRel(object):
+    def __init__(self, to, num_in_admin=0, related_name=None,
+        filter_interface=None, limit_choices_to=None, raw_id_admin=False, symmetrical=True):
+        self.to = to
+        self.num_in_admin = num_in_admin
+        self.related_name = related_name
+        self.filter_interface = filter_interface
+        if limit_choices_to is None:
+            limit_choices_to = {}
+        self.limit_choices_to = limit_choices_to
+        self.edit_inline = False
+        self.raw_id_admin = raw_id_admin
+        self.symmetrical = symmetrical
+        self.multiple = True
+
+        assert not (self.raw_id_admin and self.filter_interface), "ManyToManyRels may not use both raw_id_admin and filter_interface"
+
 class ForeignKey(RelatedField, Field):
     empty_strings_allowed = False
-    def __init__(self, to, to_field=None, **kwargs):
+    def __init__(self, to, to_field=None, rel_class=ManyToOneRel, **kwargs):
         try:
             to_name = to._meta.object_name.lower()
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, basestring), "ForeignKey(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
+            assert isinstance(to, basestring), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
         else:
             to_field = to_field or to._meta.pk.name
         kwargs['verbose_name'] = kwargs.get('verbose_name', '')
@@ -511,7 +587,7 @@ class ForeignKey(RelatedField, Field):
             warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.", DeprecationWarning)
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
 
-        kwargs['rel'] = ManyToOneRel(to, to_field,
+        kwargs['rel'] = rel_class(to, to_field,
             num_in_admin=kwargs.pop('num_in_admin', 3),
             min_num_in_admin=kwargs.pop('min_num_in_admin', None),
             max_num_in_admin=kwargs.pop('max_num_in_admin', None),
@@ -520,7 +596,8 @@ class ForeignKey(RelatedField, Field):
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             lookup_overrides=kwargs.pop('lookup_overrides', None),
-            raw_id_admin=kwargs.pop('raw_id_admin', False))
+            raw_id_admin=kwargs.pop('raw_id_admin', False),
+            parent_link=kwargs.pop('parent_link', False))
         Field.__init__(self, **kwargs)
 
         self.db_index = True
@@ -606,81 +683,24 @@ class ForeignKey(RelatedField, Field):
             return IntegerField().db_type()
         return rel_field.db_type()
 
-class OneToOneField(RelatedField, IntegerField):
+class OneToOneField(ForeignKey):
+    """
+    A OneToOneField is essentially the same as a ForeignKey, with the exception
+    that always carries a "unique" constraint with it and the reverse relation
+    always returns the object pointed to (since there will only ever be one),
+    rather than returning a list.
+    """
     def __init__(self, to, to_field=None, **kwargs):
-        try:
-            to_name = to._meta.object_name.lower()
-        except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, basestring), "OneToOneField(%r) is invalid. First parameter to OneToOneField must be either a model, a model name, or the string %r" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
-        else:
-            to_field = to_field or to._meta.pk.name
-        kwargs['verbose_name'] = kwargs.get('verbose_name', '')
-
-        if 'edit_inline_type' in kwargs:
-            import warnings
-            warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.", DeprecationWarning)
-            kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
-
-        kwargs['rel'] = OneToOneRel(to, to_field,
-            num_in_admin=kwargs.pop('num_in_admin', 0),
-            edit_inline=kwargs.pop('edit_inline', False),
-            related_name=kwargs.pop('related_name', None),
-            limit_choices_to=kwargs.pop('limit_choices_to', None),
-            lookup_overrides=kwargs.pop('lookup_overrides', None),
-            raw_id_admin=kwargs.pop('raw_id_admin', False))
-        kwargs['primary_key'] = True
-        IntegerField.__init__(self, **kwargs)
-
-        self.db_index = True
-
-    def get_attname(self):
-        return '%s_id' % self.name
-
-    def get_validator_unique_lookup_type(self):
-        return '%s__%s__exact' % (self.name, self.rel.get_related_field().name)
-
-    # TODO: Copied from ForeignKey... putting this in RelatedField adversely affects
-    # ManyToManyField. This works for now.
-    def prepare_field_objs_and_params(self, manipulator, name_prefix):
-        params = {'validator_list': self.validator_list[:], 'member_name': name_prefix + self.attname}
-        if self.rel.raw_id_admin:
-            field_objs = self.get_manipulator_field_objs()
-            params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
-        else:
-            if self.radio_admin:
-                field_objs = [oldforms.RadioSelectField]
-                params['ul_class'] = get_ul_class(self.radio_admin)
-            else:
-                if self.null:
-                    field_objs = [oldforms.NullSelectField]
-                else:
-                    field_objs = [oldforms.SelectField]
-            params['choices'] = self.get_choices_default()
-        return field_objs, params
-
-    def contribute_to_class(self, cls, name):
-        super(OneToOneField, self).contribute_to_class(cls, name)
-        setattr(cls, self.name, ReverseSingleRelatedObjectDescriptor(self))
+        kwargs['unique'] = True
+        if 'num_in_admin' not in kwargs:
+            kwargs['num_in_admin'] = 0
+        super(OneToOneField, self).__init__(to, to_field, OneToOneRel, **kwargs)
 
     def contribute_to_related_class(self, cls, related):
-        setattr(cls, related.get_accessor_name(), SingleRelatedObjectDescriptor(related))
+        setattr(cls, related.get_accessor_name(),
+                SingleRelatedObjectDescriptor(related))
         if not cls._meta.one_to_one_field:
             cls._meta.one_to_one_field = self
-
-    def formfield(self, **kwargs):
-        defaults = {'form_class': forms.ModelChoiceField, 'queryset': self.rel.to._default_manager.all()}
-        defaults.update(kwargs)
-        return super(OneToOneField, self).formfield(**defaults)
-
-    def db_type(self):
-        # The database column type of a OneToOneField is the column type
-        # of the field to which it points. An exception is if the OneToOneField
-        # points to an AutoField/PositiveIntegerField/PositiveSmallIntegerField,
-        # in which case the column type is simply that of an IntegerField.
-        rel_field = self.rel.get_related_field()
-        if isinstance(rel_field, (AutoField, PositiveIntegerField, PositiveSmallIntegerField)):
-            return IntegerField().db_type()
-        return rel_field.db_type()
 
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
@@ -798,7 +818,7 @@ class ManyToManyField(RelatedField, Field):
 
     def save_form_data(self, instance, data):
         setattr(instance, self.attname, data)
-        
+
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.ModelMultipleChoiceField, 'queryset': self.rel.to._default_manager.all()}
         defaults.update(kwargs)
@@ -813,56 +833,3 @@ class ManyToManyField(RelatedField, Field):
         # so return None.
         return None
 
-class ManyToOneRel(object):
-    def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
-        max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
-        related_name=None, limit_choices_to=None, lookup_overrides=None, raw_id_admin=False):
-        try:
-            to._meta
-        except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, basestring), "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
-        self.to, self.field_name = to, field_name
-        self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
-        self.min_num_in_admin, self.max_num_in_admin = min_num_in_admin, max_num_in_admin
-        self.num_extra_on_change, self.related_name = num_extra_on_change, related_name
-        if limit_choices_to is None:
-            limit_choices_to = {}
-        self.limit_choices_to = limit_choices_to
-        self.lookup_overrides = lookup_overrides or {}
-        self.raw_id_admin = raw_id_admin
-        self.multiple = True
-
-    def get_related_field(self):
-        "Returns the Field in the 'to' object to which this relationship is tied."
-        return self.to._meta.get_field(self.field_name)
-
-class OneToOneRel(ManyToOneRel):
-    def __init__(self, to, field_name, num_in_admin=0, edit_inline=False,
-        related_name=None, limit_choices_to=None, lookup_overrides=None,
-        raw_id_admin=False):
-        self.to, self.field_name = to, field_name
-        self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
-        self.related_name = related_name
-        if limit_choices_to is None:
-            limit_choices_to = {}
-        self.limit_choices_to = limit_choices_to
-        self.lookup_overrides = lookup_overrides or {}
-        self.raw_id_admin = raw_id_admin
-        self.multiple = False
-
-class ManyToManyRel(object):
-    def __init__(self, to, num_in_admin=0, related_name=None,
-        filter_interface=None, limit_choices_to=None, raw_id_admin=False, symmetrical=True):
-        self.to = to
-        self.num_in_admin = num_in_admin
-        self.related_name = related_name
-        self.filter_interface = filter_interface
-        if limit_choices_to is None:
-            limit_choices_to = {}
-        self.limit_choices_to = limit_choices_to
-        self.edit_inline = False
-        self.raw_id_admin = raw_id_admin
-        self.symmetrical = symmetrical
-        self.multiple = True
-
-        assert not (self.raw_id_admin and self.filter_interface), "ManyToManyRels may not use both raw_id_admin and filter_interface"

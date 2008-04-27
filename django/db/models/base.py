@@ -1,10 +1,16 @@
-import django.db.models.manipulators
-import django.db.models.manager
+import copy
+import types
+import sys
+import os
+from itertools import izip
+
+import django.db.models.manipulators    # Imported to register signal handler.
+import django.db.models.manager         # Ditto.
 from django.core import validators
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
-from django.db.models.fields.related import OneToOneRel, ManyToOneRel
-from django.db.models.query import delete_objects
+from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
+from django.db.models.query import delete_objects, Q
 from django.db.models.options import Options, AdminOptions
 from django.db import connection, transaction
 from django.db.models import signals
@@ -14,10 +20,11 @@ from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.conf import settings
-from itertools import izip
-import types
-import sys
-import os
+
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback
 
 class ModelBase(type):
     "Metaclass for all models"
@@ -25,29 +32,45 @@ class ModelBase(type):
         # If this isn't a subclass of Model, don't do anything special.
         try:
             parents = [b for b in bases if issubclass(b, Model)]
-            if not parents:
-                return super(ModelBase, cls).__new__(cls, name, bases, attrs)
         except NameError:
             # 'Model' isn't defined yet, meaning we're looking at Django's own
             # Model class, defined below.
+            parents = []
+        if not parents:
             return super(ModelBase, cls).__new__(cls, name, bases, attrs)
 
         # Create the class.
-        new_class = type.__new__(cls, name, bases, {'__module__': attrs.pop('__module__')})
-        new_class.add_to_class('_meta', Options(attrs.pop('Meta', None)))
-        new_class.add_to_class('DoesNotExist', types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {}))
-        new_class.add_to_class('MultipleObjectsReturned',
-            types.ClassType('MultipleObjectsReturned', (MultipleObjectsReturned, ), {}))
+        module = attrs.pop('__module__')
+        new_class = type.__new__(cls, name, bases, {'__module__': module})
+        attr_meta = attrs.pop('Meta', None)
+        abstract = getattr(attr_meta, 'abstract', False)
+        if not attr_meta:
+            meta = getattr(new_class, 'Meta', None)
+        else:
+            meta = attr_meta
+        base_meta = getattr(new_class, '_meta', None)
 
-        # Build complete list of parents
-        for base in parents:
-            # Things without _meta aren't functional models, so they're
-            # uninteresting parents.
-            if hasattr(base, '_meta'):
-                new_class._meta.parents.append(base)
-                new_class._meta.parents.extend(base._meta.parents)
+        new_class.add_to_class('_meta', Options(meta))
+        if not abstract:
+            new_class.add_to_class('DoesNotExist',
+                    subclass_exception('DoesNotExist', ObjectDoesNotExist, module))
+            new_class.add_to_class('MultipleObjectsReturned',
+                    subclass_exception('MultipleObjectsReturned', MultipleObjectsReturned, module))
+            if base_meta and not base_meta.abstract:
+                # Non-abstract child classes inherit some attributes from their
+                # non-abstract parent (unless an ABC comes before it in the
+                # method resolution order).
+                if not hasattr(meta, 'ordering'):
+                    new_class._meta.ordering = base_meta.ordering
+                if not hasattr(meta, 'get_latest_by'):
+                    new_class._meta.get_latest_by = base_meta.get_latest_by
 
-
+        old_default_mgr = None
+        if getattr(new_class, '_default_manager', None):
+            # We have a parent who set the default manager.
+            if new_class._default_manager.model._meta.abstract:
+                old_default_mgr = new_class._default_manager
+            new_class._default_manager = None
         if getattr(new_class._meta, 'app_label', None) is None:
             # Figure out the app_label by looking one level up.
             # For 'django.contrib.sites.models', this would be 'sites'.
@@ -63,21 +86,50 @@ class ModelBase(type):
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
 
-        # Add Fields inherited from parents
-        for parent in new_class._meta.parents:
-            for field in parent._meta.fields:
-                # Only add parent fields if they aren't defined for this class.
-                try:
-                    new_class._meta.get_field(field.name)
-                except FieldDoesNotExist:
-                    field.contribute_to_class(new_class, field.name)
+        # Do the appropriate setup for any model parents.
+        o2o_map = dict([(f.rel.to, f) for f in new_class._meta.local_fields
+                if isinstance(f, OneToOneField)])
+        for base in parents:
+            if not hasattr(base, '_meta'):
+                # Things without _meta aren't functional models, so they're
+                # uninteresting parents.
+                continue
+            if not base._meta.abstract:
+                if base in o2o_map:
+                    field = o2o_map[base]
+                    field.primary_key = True
+                    new_class._meta.setup_pk(field)
+                else:
+                    attr_name = '%s_ptr' % base._meta.module_name
+                    field = OneToOneField(base, name=attr_name,
+                            auto_created=True, parent_link=True)
+                    new_class.add_to_class(attr_name, field)
+                new_class._meta.parents[base] = field
+            else:
+                # The abstract base class case.
+                names = set([f.name for f in new_class._meta.local_fields + new_class._meta.many_to_many])
+                for field in base._meta.local_fields + base._meta.local_many_to_many:
+                    if field.name in names:
+                        raise FieldError('Local field %r in class %r clashes with field of similar name from abstract base class %r'
+                                % (field.name, name, base.__name__))
+                    new_class.add_to_class(field.name, copy.deepcopy(field))
 
+        if abstract:
+            # Abstract base models can't be instantiated and don't appear in
+            # the list of models for an app. We do the final setup for them a
+            # little differently from normal models.
+            attr_meta.abstract = False
+            new_class.Meta = attr_meta
+            return new_class
+
+        if old_default_mgr and not new_class._default_manager:
+            new_class._default_manager = old_default_mgr._copy_to_model(new_class)
         new_class._prepare()
-
         register_models(new_class._meta.app_label, new_class)
+
         # Because of the way imports happen (recursively), we may or may not be
-        # the first class for this model to register with the framework. There
-        # should only be one class for each model, so we must always return the
+        # the first time this model tries to register with the framework. There
+        # should only be one class for each model, so we always return the
         # registered version.
         return get_model(new_class._meta.app_label, name, False)
 
@@ -112,31 +164,6 @@ class ModelBase(type):
 
 class Model(object):
     __metaclass__ = ModelBase
-
-    def _get_pk_val(self):
-        return getattr(self, self._meta.pk.attname)
-
-    def _set_pk_val(self, value):
-        return setattr(self, self._meta.pk.attname, value)
-
-    pk = property(_get_pk_val, _set_pk_val)
-
-    def __repr__(self):
-        return smart_str(u'<%s: %s>' % (self.__class__.__name__, unicode(self)))
-
-    def __str__(self):
-        if hasattr(self, '__unicode__'):
-            return force_unicode(self).encode('utf-8')
-        return '%s object' % self.__class__.__name__
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self._get_pk_val() == other._get_pk_val()
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __hash__(self):
-        return hash(self._get_pk_val())
 
     def __init__(self, *args, **kwargs):
         dispatcher.send(signal=signals.pre_init, sender=self.__class__, args=args, kwargs=kwargs)
@@ -210,72 +237,133 @@ class Model(object):
                 raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
 
-    def save(self, raw=False):
-        dispatcher.send(signal=signals.pre_save, sender=self.__class__,
-                        instance=self, raw=raw)
+    def from_sequence(cls, values):
+        """
+        An alternate class constructor, primarily for internal use.
 
-        non_pks = [f for f in self._meta.fields if not f.primary_key]
-        cursor = connection.cursor()
+        Creates a model instance from a sequence of values (which corresponds
+        to all the non-many-to-many fields in creation order. If there are more
+        fields than values, the remaining (final) fields are given their
+        default values.
 
-        qn = connection.ops.quote_name
+        ForeignKey fields can only be initialised using id values, not
+        instances, in this method.
+        """
+        dispatcher.send(signal=signals.pre_init, sender=cls, args=values,
+                kwargs={})
+        obj = Empty()
+        obj.__class__ = cls
+        field_iter = iter(obj._meta.fields)
+        for val, field in izip(values, field_iter):
+            setattr(obj, field.attname, val)
+        for field in field_iter:
+            setattr(obj, field.attname, field.get_default())
+        dispatcher.send(signal=signals.post_init, sender=cls, instance=obj)
+        return obj
+
+    from_sequence = classmethod(from_sequence)
+
+    def __repr__(self):
+        return smart_str(u'<%s: %s>' % (self.__class__.__name__, unicode(self)))
+
+    def __str__(self):
+        if hasattr(self, '__unicode__'):
+            return force_unicode(self).encode('utf-8')
+        return '%s object' % self.__class__.__name__
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self._get_pk_val() == other._get_pk_val()
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self._get_pk_val())
+
+    def _get_pk_val(self, meta=None):
+        if not meta:
+            meta = self._meta
+        return getattr(self, meta.pk.attname)
+
+    def _set_pk_val(self, value):
+        return setattr(self, self._meta.pk.attname, value)
+
+    pk = property(_get_pk_val, _set_pk_val)
+
+    def save(self):
+        """
+        Save the current instance. Override this in a subclass if you want to
+        control the saving process.
+        """
+        self.save_base()
+
+    save.alters_data = True
+
+    def save_base(self, raw=False, cls=None):
+        """
+        Does the heavy-lifting involved in saving. Subclasses shouldn't need to
+        override this method. It's separate from save() in order to hide the
+        need for overrides of save() to pass around internal-only parameters
+        ('raw' and 'cls').
+        """
+        if not cls:
+            cls = self.__class__
+            meta = self._meta
+            signal = True
+            dispatcher.send(signal=signals.pre_save, sender=self.__class__,
+                    instance=self, raw=raw)
+        else:
+            meta = cls._meta
+            signal = False
+
+        for parent, field in meta.parents.items():
+            self.save_base(raw, parent)
+            setattr(self, field.attname, self._get_pk_val(parent._meta))
+
+        non_pks = [f for f in meta.local_fields if not f.primary_key]
 
         # First, try an UPDATE. If that doesn't update anything, do an INSERT.
-        pk_val = self._get_pk_val()
+        pk_val = self._get_pk_val(meta)
         # Note: the comparison with '' is required for compatibility with
         # oldforms-style model creation.
         pk_set = pk_val is not None and smart_unicode(pk_val) != u''
         record_exists = True
+        manager = cls._default_manager
         if pk_set:
             # Determine whether a record with the primary key already exists.
-            cursor.execute("SELECT 1 FROM %s WHERE %s=%%s" % \
-                (qn(self._meta.db_table), qn(self._meta.pk.column)),
-                self._meta.pk.get_db_prep_lookup('exact', pk_val))
-            # If it does already exist, do an UPDATE.
-            if cursor.fetchone():
-                db_values = [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, False)) for f in non_pks]
-                if db_values:
-                    cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
-                        (qn(self._meta.db_table),
-                        ','.join(['%s=%%s' % qn(f.column) for f in non_pks]),
-                        qn(self._meta.pk.column)),
-                        db_values + self._meta.pk.get_db_prep_lookup('exact', pk_val))
+            if manager.filter(pk=pk_val).extra(select={'a': 1}).values('a').order_by():
+                # It does already exist, so do an UPDATE.
+                if non_pks:
+                    values = [(f, None, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, False))) for f in non_pks]
+                    manager.filter(pk=pk_val)._update(values)
             else:
                 record_exists = False
         if not pk_set or not record_exists:
-            field_names = [qn(f.column) for f in self._meta.fields if not isinstance(f, AutoField)]
-            db_values = [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True)) for f in self._meta.fields if not isinstance(f, AutoField)]
-            # If the PK has been manually set, respect that.
-            if pk_set:
-                field_names += [f.column for f in self._meta.fields if isinstance(f, AutoField)]
-                db_values += [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True)) for f in self._meta.fields if isinstance(f, AutoField)]
-            placeholders = ['%s'] * len(field_names)
-            if self._meta.order_with_respect_to:
-                field_names.append(qn('_order'))
-                placeholders.append('%s')
-                subsel = 'SELECT COUNT(*) FROM %s WHERE %s = %%s' % (
-                    qn(self._meta.db_table),
-                    qn(self._meta.order_with_respect_to.column))
-                cursor.execute(subsel, (getattr(self, self._meta.order_with_respect_to.attname),))
-                db_values.append(cursor.fetchone()[0])
+            if not pk_set:
+                values = [(f, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in meta.local_fields if not isinstance(f, AutoField)]
+            else:
+                values = [(f, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in meta.local_fields]
+
+            if meta.order_with_respect_to:
+                field = meta.order_with_respect_to
+                values.append((meta.get_field_by_name('_order')[0], manager.filter(**{field.name: getattr(self, field.attname)}).count()))
             record_exists = False
-            if db_values:
-                cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
-                    (qn(self._meta.db_table), ','.join(field_names),
-                    ','.join(placeholders)), db_values)
+
+            update_pk = bool(meta.has_auto_field and not pk_set)
+            if values:
+                # Create a new record.
+                result = manager._insert(values, return_id=update_pk)
             else:
                 # Create a new record with defaults for everything.
-                cursor.execute("INSERT INTO %s (%s) VALUES (%s)" %
-                    (qn(self._meta.db_table), qn(self._meta.pk.column),
-                     connection.ops.pk_default_value()))
-            if self._meta.has_auto_field and not pk_set:
-                setattr(self, self._meta.pk.attname, connection.ops.last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
+                result = manager._insert([(meta.pk, connection.ops.pk_default_value())], return_id=update_pk, raw_values=True)
+
+            if update_pk:
+                setattr(self, meta.pk.attname, result)
         transaction.commit_unless_managed()
 
-        # Run any post-save hooks.
-        dispatcher.send(signal=signals.post_save, sender=self.__class__,
-                        instance=self, created=(not record_exists), raw=raw)
-
-    save.alters_data = True
+        if signal:
+            dispatcher.send(signal=signals.post_save, sender=self.__class__,
+                    instance=self, created=(not record_exists), raw=raw)
 
     def validate(self):
         """
@@ -341,32 +429,31 @@ class Model(object):
         return force_unicode(dict(field.choices).get(value, value), strings_only=True)
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
-        qn = connection.ops.quote_name
-        op = is_next and '>' or '<'
-        where = '(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
-            (qn(field.column), op, qn(field.column),
-            qn(self._meta.db_table), qn(self._meta.pk.column), op)
+        op = is_next and 'gt' or 'lt'
+        order = not is_next and '-' or ''
         param = smart_str(getattr(self, field.attname))
-        q = self.__class__._default_manager.filter(**kwargs).order_by((not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name)
-        q._where.append(where)
-        q._params.extend([param, param, getattr(self, self._meta.pk.attname)])
+        q = Q(**{'%s__%s' % (field.name, op): param})
+        q = q|Q(**{field.name: param, 'pk__%s' % op: self.pk})
+        qs = self.__class__._default_manager.filter(**kwargs).filter(q).order_by('%s%s' % (order, field.name), '%spk' % order)
         try:
-            return q[0]
+            return qs[0]
         except IndexError:
             raise self.DoesNotExist, "%s matching query does not exist." % self.__class__._meta.object_name
 
     def _get_next_or_previous_in_order(self, is_next):
-        qn = connection.ops.quote_name
         cachename = "__%s_order_cache" % is_next
         if not hasattr(self, cachename):
+            qn = connection.ops.quote_name
             op = is_next and '>' or '<'
+            order = not is_next and '-_order' or '_order'
             order_field = self._meta.order_with_respect_to
+            # FIXME: When querysets support nested queries, this can be turned
+            # into a pure queryset operation.
             where = ['%s %s (SELECT %s FROM %s WHERE %s=%%s)' % \
                 (qn('_order'), op, qn('_order'),
-                qn(self._meta.db_table), qn(self._meta.pk.column)),
-                '%s=%%s' % qn(order_field.column)]
-            params = [self._get_pk_val(), getattr(self, order_field.attname)]
-            obj = self._default_manager.order_by('_order').extra(where=where, params=params)[:1].get()
+                qn(self._meta.db_table), qn(self._meta.pk.column))]
+            params = [self.pk]
+            obj = self._default_manager.filter(**{order_field.name: getattr(self, order_field.attname)}).extra(where=where, params=params).order_by(order)[:1].get()
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
@@ -446,29 +533,20 @@ class Model(object):
 # ORDERING METHODS #########################
 
 def method_set_order(ordered_obj, self, id_list):
-    qn = connection.ops.quote_name
-    cursor = connection.cursor()
-    # Example: "UPDATE poll_choices SET _order = %s WHERE poll_id = %s AND id = %s"
-    sql = "UPDATE %s SET %s = %%s WHERE %s = %%s AND %s = %%s" % \
-        (qn(ordered_obj._meta.db_table), qn('_order'),
-        qn(ordered_obj._meta.order_with_respect_to.column),
-        qn(ordered_obj._meta.pk.column))
     rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
-    cursor.executemany(sql, [(i, rel_val, j) for i, j in enumerate(id_list)])
+    order_name = ordered_obj._meta.order_with_respect_to.name
+    # FIXME: It would be nice if there was an "update many" version of update
+    # for situations like this.
+    for i, j in enumerate(id_list):
+        ordered_obj.objects.filter(**{'pk': j, order_name: rel_val}).update(_order=i)
     transaction.commit_unless_managed()
 
 def method_get_order(ordered_obj, self):
-    qn = connection.ops.quote_name
-    cursor = connection.cursor()
-    # Example: "SELECT id FROM poll_choices WHERE poll_id = %s ORDER BY _order"
-    sql = "SELECT %s FROM %s WHERE %s = %%s ORDER BY %s" % \
-        (qn(ordered_obj._meta.pk.column),
-        qn(ordered_obj._meta.db_table),
-        qn(ordered_obj._meta.order_with_respect_to.column),
-        qn('_order'))
     rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
-    cursor.execute(sql, [rel_val])
-    return [r[0] for r in cursor.fetchall()]
+    order_name = ordered_obj._meta.order_with_respect_to.name
+    pk_name = ordered_obj._meta.pk.name
+    return [r[pk_name] for r in
+            ordered_obj.objects.filter(**{order_name: rel_val}).values(pk_name)]
 
 ##############################################
 # HELPER FUNCTIONS (CURRIED MODEL FUNCTIONS) #
@@ -476,3 +554,20 @@ def method_get_order(ordered_obj, self):
 
 def get_absolute_url(opts, func, self, *args, **kwargs):
     return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.module_name), func)(self, *args, **kwargs)
+
+########
+# MISC #
+########
+
+class Empty(object):
+    pass
+
+if sys.version_info < (2, 5):
+    # Prior to Python 2.5, Exception was an old-style class
+    def subclass_exception(name, parent, unused):
+        return types.ClassType(name, (parent,), {})
+
+else:
+    def subclass_exception(name, parent, module):
+        return type(name, (parent,), {'__module__': module})
+

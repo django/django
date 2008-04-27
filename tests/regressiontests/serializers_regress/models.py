@@ -77,7 +77,7 @@ class USStateData(models.Model):
 
 class XMLData(models.Model):
     data = models.XMLField(null=True)
-    
+
 class Tag(models.Model):
     """A tag on an item."""
     data = models.SlugField()
@@ -93,39 +93,38 @@ class GenericData(models.Model):
     data = models.CharField(max_length=30)
 
     tags = generic.GenericRelation(Tag)
-    
+
 # The following test classes are all for validation
 # of related objects; in particular, forward, backward,
 # and self references.
-    
+
 class Anchor(models.Model):
-    """This is a model that can be used as 
+    """This is a model that can be used as
     something for other models to point at"""
-    
+
     data = models.CharField(max_length=30)
 
 class UniqueAnchor(models.Model):
-    """This is a model that can be used as 
+    """This is a model that can be used as
     something for other models to point at"""
 
     data = models.CharField(unique=True, max_length=30)
-    
+
 class FKData(models.Model):
     data = models.ForeignKey(Anchor, null=True)
-    
+
 class M2MData(models.Model):
     data = models.ManyToManyField(Anchor, null=True)
-    
+
 class O2OData(models.Model):
-    # One to one field can't be null, since it is a PK.
-    data = models.OneToOneField(Anchor)
+    # One to one field can't be null here, since it is a PK.
+    data = models.OneToOneField(Anchor, primary_key=True)
 
 class FKSelfData(models.Model):
     data = models.ForeignKey('self', null=True)
-    
+
 class M2MSelfData(models.Model):
     data = models.ManyToManyField('self', null=True, symmetrical=False)
-
 
 class FKDataToField(models.Model):
     data = models.ForeignKey(UniqueAnchor, null=True, to_field='data')
@@ -142,7 +141,7 @@ class FKDataToO2O(models.Model):
 
 class BooleanPKData(models.Model):
     data = models.BooleanField(primary_key=True)
-    
+
 class CharPKData(models.Model):
     data = models.CharField(max_length=30, primary_key=True)
 

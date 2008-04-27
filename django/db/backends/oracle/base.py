@@ -4,11 +4,12 @@ Oracle database backend for Django.
 Requires cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 """
 
+import os
+
 from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
+from django.db.backends.oracle import query
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_str, force_unicode
-import datetime
-import os
 
 # Oracle takes client-side character set encoding from the environment.
 os.environ['NLS_LANG'] = '.UTF8'
@@ -24,11 +25,12 @@ IntegrityError = Database.IntegrityError
 class DatabaseFeatures(BaseDatabaseFeatures):
     allows_group_by_ordinal = False
     allows_unique_and_pk = False        # Suppress UNIQUE/PK for Oracle (ORA-02259)
+    empty_fetchmany_value = ()
     needs_datetime_string_cast = False
     needs_upper_for_iops = True
     supports_tablespaces = True
     uses_case_insensitive_names = True
-    uses_custom_queryset = True
+    uses_custom_query_class = True
 
 class DatabaseOperations(BaseDatabaseOperations):
     def autoinc_sql(self, table, column):
@@ -89,243 +91,16 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Instead, they are handled in django/db/backends/oracle/query.py.
         return ""
 
+    def lookup_cast(self, lookup_type):
+        if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith'):
+            return "UPPER(%s)"
+        return "%s"
+
     def max_name_length(self):
         return 30
 
-    def query_set_class(self, DefaultQuerySet):
-        from django.db import connection
-        from django.db.models.query import EmptyResultSet, GET_ITERATOR_CHUNK_SIZE, quote_only_if_word
-
-        class OracleQuerySet(DefaultQuerySet):
-
-            def iterator(self):
-                "Performs the SELECT database lookup of this QuerySet."
-
-                from django.db.models.query import get_cached_row
-
-                # self._select is a dictionary, and dictionaries' key order is
-                # undefined, so we convert it to a list of tuples.
-                extra_select = self._select.items()
-
-                full_query = None
-
-                try:
-                    try:
-                        select, sql, params, full_query = self._get_sql_clause(get_full_query=True)
-                    except TypeError:
-                        select, sql, params = self._get_sql_clause()
-                except EmptyResultSet:
-                    raise StopIteration
-                if not full_query:
-                    full_query = "SELECT %s%s\n%s" % ((self._distinct and "DISTINCT " or ""), ', '.join(select), sql)
-
-                cursor = connection.cursor()
-                cursor.execute(full_query, params)
-
-                fill_cache = self._select_related
-                fields = self.model._meta.fields
-                index_end = len(fields)
-
-                # so here's the logic;
-                # 1. retrieve each row in turn
-                # 2. convert NCLOBs
-
-                while 1:
-                    rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-                    if not rows:
-                        raise StopIteration
-                    for row in rows:
-                        row = self.resolve_columns(row, fields)
-                        if fill_cache:
-                            obj, index_end = get_cached_row(klass=self.model, row=row,
-                                                            index_start=0, max_depth=self._max_related_depth)
-                        else:
-                            obj = self.model(*row[:index_end])
-                        for i, k in enumerate(extra_select):
-                            setattr(obj, k[0], row[index_end+i])
-                        yield obj
-
-
-            def _get_sql_clause(self, get_full_query=False):
-                from django.db.models.query import fill_table_cache, \
-                    handle_legacy_orderlist, orderfield2column
-
-                opts = self.model._meta
-                qn = connection.ops.quote_name
-
-                # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
-                select = ["%s.%s" % (qn(opts.db_table), qn(f.column)) for f in opts.fields]
-                tables = [quote_only_if_word(t) for t in self._tables]
-                joins = SortedDict()
-                where = self._where[:]
-                params = self._params[:]
-
-                # Convert self._filters into SQL.
-                joins2, where2, params2 = self._filters.get_sql(opts)
-                joins.update(joins2)
-                where.extend(where2)
-                params.extend(params2)
-
-                # Add additional tables and WHERE clauses based on select_related.
-                if self._select_related:
-                    fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
-
-                # Add any additional SELECTs.
-                if self._select:
-                    select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), qn(s[0])) for s in self._select.items()])
-
-                # Start composing the body of the SQL statement.
-                sql = [" FROM", qn(opts.db_table)]
-
-                # Compose the join dictionary into SQL describing the joins.
-                if joins:
-                    sql.append(" ".join(["%s %s %s ON %s" % (join_type, table, alias, condition)
-                                    for (alias, (table, join_type, condition)) in joins.items()]))
-
-                # Compose the tables clause into SQL.
-                if tables:
-                    sql.append(", " + ", ".join(tables))
-
-                # Compose the where clause into SQL.
-                if where:
-                    sql.append(where and "WHERE " + " AND ".join(where))
-
-                # ORDER BY clause
-                order_by = []
-                if self._order_by is not None:
-                    ordering_to_use = self._order_by
-                else:
-                    ordering_to_use = opts.ordering
-                for f in handle_legacy_orderlist(ordering_to_use):
-                    if f == '?': # Special case.
-                        order_by.append(DatabaseOperations().random_function_sql())
-                    else:
-                        if f.startswith('-'):
-                            col_name = f[1:]
-                            order = "DESC"
-                        else:
-                            col_name = f
-                            order = "ASC"
-                        if "." in col_name:
-                            table_prefix, col_name = col_name.split('.', 1)
-                            table_prefix = qn(table_prefix) + '.'
-                        else:
-                            # Use the database table as a column prefix if it wasn't given,
-                            # and if the requested column isn't a custom SELECT.
-                            if "." not in col_name and col_name not in (self._select or ()):
-                                table_prefix = qn(opts.db_table) + '.'
-                            else:
-                                table_prefix = ''
-                        order_by.append('%s%s %s' % (table_prefix, qn(orderfield2column(col_name, opts)), order))
-                if order_by:
-                    sql.append("ORDER BY " + ", ".join(order_by))
-
-                # Look for column name collisions in the select elements
-                # and fix them with an AS alias.  This allows us to do a
-                # SELECT * later in the paging query.
-                cols = [clause.split('.')[-1] for clause in select]
-                for index, col in enumerate(cols):
-                    if cols.count(col) > 1:
-                        col = '%s%d' % (col.replace('"', ''), index)
-                        cols[index] = col
-                        select[index] = '%s AS %s' % (select[index], col)
-
-                # LIMIT and OFFSET clauses
-                # To support limits and offsets, Oracle requires some funky rewriting of an otherwise normal looking query.
-                select_clause = ",".join(select)
-                distinct = (self._distinct and "DISTINCT " or "")
-
-                if order_by:
-                    order_by_clause = " OVER (ORDER BY %s )" % (", ".join(order_by))
-                else:
-                    #Oracle's row_number() function always requires an order-by clause.
-                    #So we need to define a default order-by, since none was provided.
-                    order_by_clause = " OVER (ORDER BY %s.%s)" % \
-                        (qn(opts.db_table), qn(opts.fields[0].db_column or opts.fields[0].column))
-                # limit_and_offset_clause
-                if self._limit is None:
-                    assert self._offset is None, "'offset' is not allowed without 'limit'"
-
-                if self._offset is not None:
-                    offset = int(self._offset)
-                else:
-                    offset = 0
-                if self._limit is not None:
-                    limit = int(self._limit)
-                else:
-                    limit = None
-
-                limit_and_offset_clause = ''
-                if limit is not None:
-                    limit_and_offset_clause = "WHERE rn > %s AND rn <= %s" % (offset, limit+offset)
-                elif offset:
-                    limit_and_offset_clause = "WHERE rn > %s" % (offset)
-
-                if len(limit_and_offset_clause) > 0:
-                    fmt = \
-    """SELECT * FROM
-      (SELECT %s%s,
-              ROW_NUMBER()%s AS rn
-       %s)
-    %s"""
-                    full_query = fmt % (distinct, select_clause,
-                                        order_by_clause, ' '.join(sql).strip(),
-                                        limit_and_offset_clause)
-                else:
-                    full_query = None
-
-                if get_full_query:
-                    return select, " ".join(sql), params, full_query
-                else:
-                    return select, " ".join(sql), params
-
-            def resolve_columns(self, row, fields=()):
-                from django.db.models.fields import DateField, DateTimeField, \
-                    TimeField, BooleanField, NullBooleanField, DecimalField, Field
-                values = []
-                for value, field in map(None, row, fields):
-                    if isinstance(value, Database.LOB):
-                        value = value.read()
-                    # Oracle stores empty strings as null. We need to undo this in
-                    # order to adhere to the Django convention of using the empty
-                    # string instead of null, but only if the field accepts the
-                    # empty string.
-                    if value is None and isinstance(field, Field) and field.empty_strings_allowed:
-                        value = u''
-                    # Convert 1 or 0 to True or False
-                    elif value in (1, 0) and isinstance(field, (BooleanField, NullBooleanField)):
-                        value = bool(value)
-                    # Convert floats to decimals
-                    elif value is not None and isinstance(field, DecimalField):
-                        value = util.typecast_decimal(field.format_number(value))
-                    # cx_Oracle always returns datetime.datetime objects for
-                    # DATE and TIMESTAMP columns, but Django wants to see a
-                    # python datetime.date, .time, or .datetime.  We use the type
-                    # of the Field to determine which to cast to, but it's not
-                    # always available.
-                    # As a workaround, we cast to date if all the time-related
-                    # values are 0, or to time if the date is 1/1/1900.
-                    # This could be cleaned a bit by adding a method to the Field
-                    # classes to normalize values from the database (the to_python
-                    # method is used for validation and isn't what we want here).
-                    elif isinstance(value, Database.Timestamp):
-                        # In Python 2.3, the cx_Oracle driver returns its own
-                        # Timestamp object that we must convert to a datetime class.
-                        if not isinstance(value, datetime.datetime):
-                            value = datetime.datetime(value.year, value.month, value.day, value.hour,
-                                                      value.minute, value.second, value.fsecond)
-                        if isinstance(field, DateTimeField):
-                            pass  # DateTimeField subclasses DateField so must be checked first.
-                        elif isinstance(field, DateField):
-                            value = value.date()
-                        elif isinstance(field, TimeField) or (value.year == 1900 and value.month == value.day == 1):
-                            value = value.time()
-                        elif value.hour == value.minute == value.second == value.microsecond == 0:
-                            value = value.date()
-                    values.append(value)
-                return values
-
-        return OracleQuerySet
+    def query_class(self, DefaultQueryClass):
+        return query.query_class(DefaultQueryClass, Database)
 
     def quote_name(self, name):
         # SQL92 requires delimited (quoted) names to be case-sensitive.  When
@@ -338,6 +113,23 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def random_function_sql(self):
         return "DBMS_RANDOM.RANDOM"
+
+    def regex_lookup_9(self, lookup_type):
+        raise NotImplementedError("Regexes are not supported in Oracle before version 10g.")
+
+    def regex_lookup_10(self, lookup_type):
+        if lookup_type == 'regex':
+            match_option = "'c'"
+        else:
+            match_option = "'i'"
+        return 'REGEXP_LIKE(%%s, %%s, %s)' % match_option
+
+    def regex_lookup(self, lookup_type):
+        # If regex_lookup is called before it's been initialized, then create
+        # a cursor to initialize it and recur.
+        from django.db import connection
+        connection.cursor()
+        return connection.ops.regex_lookup(lookup_type)
 
     def sql_flush(self, style, tables, sequences):
         # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
@@ -430,6 +222,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                            "NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'")
             try:
                 self.oracle_version = int(self.connection.version.split('.')[0])
+                # There's no way for the DatabaseOperations class to know the
+                # currently active Oracle version, so we do some setups here.
+                # TODO: Multi-db support will need a better solution (a way to
+                # communicate the current version).
+                if self.oracle_version <= 9:
+                    self.ops.regex_lookup = self.ops.regex_lookup_9
+                else:
+                    self.ops.regex_lookup = self.ops.regex_lookup_10
             except ValueError:
                 pass
             try:

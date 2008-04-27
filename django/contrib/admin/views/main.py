@@ -8,7 +8,7 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, Per
 from django.core.paginator import QuerySetPaginator, InvalidPage
 from django.shortcuts import get_object_or_404, render_to_response
 from django.db import models
-from django.db.models.query import handle_legacy_orderlist, QuerySet
+from django.db.models.query import QuerySet
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
@@ -627,7 +627,7 @@ class ChangeList(object):
         # Perform a slight optimization: Check to see whether any filters were
         # given. If not, use paginator.hits to calculate the number of objects,
         # because we've already done paginator.hits and the value is cached.
-        if isinstance(self.query_set._filters, models.Q) and not self.query_set._filters.kwargs:
+        if not self.query_set.query.where:
             full_result_count = result_count
         else:
             full_result_count = self.manager.count()
@@ -653,14 +653,11 @@ class ChangeList(object):
 
     def get_ordering(self):
         lookup_opts, params = self.lookup_opts, self.params
-        # For ordering, first check the "ordering" parameter in the admin options,
-        # then check the object's default ordering. If neither of those exist,
-        # order descending by ID by default. Finally, look for manually-specified
-        # ordering from the query string.
+        # For ordering, first check the "ordering" parameter in the admin
+        # options, then check the object's default ordering. If neither of
+        # those exist, order descending by ID by default. Finally, look for
+        # manually-specified ordering from the query string.
         ordering = lookup_opts.admin.ordering or lookup_opts.ordering or ['-' + lookup_opts.pk.name]
-
-        # Normalize it to new-style ordering.
-        ordering = handle_legacy_orderlist(ordering)
 
         if ordering[0].startswith('-'):
             order_field, order_type = ordering[0][1:], 'desc'
@@ -753,8 +750,7 @@ class ChangeList(object):
             for bit in self.query.split():
                 or_queries = [models.Q(**{construct_search(field_name): bit}) for field_name in self.lookup_opts.admin.search_fields]
                 other_qs = QuerySet(self.model)
-                if qs._select_related:
-                    other_qs = other_qs.select_related()
+                other_qs.dup_select_related(qs)
                 other_qs = other_qs.filter(reduce(operator.or_, or_queries))
                 qs = qs & other_qs
 

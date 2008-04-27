@@ -32,7 +32,7 @@ def get_validation_errors(outfile, app=None):
         opts = cls._meta
 
         # Do field-specific validation.
-        for f in opts.fields:
+        for f in opts.local_fields:
             if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
                 e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
             if f.name.endswith('_'):
@@ -69,8 +69,8 @@ def get_validation_errors(outfile, app=None):
                 if db_version < (5, 0, 3) and isinstance(f, (models.CharField, models.CommaSeparatedIntegerField, models.SlugField)) and f.max_length > 255:
                     e.add(opts, '"%s": %s cannot have a "max_length" greater than 255 when you are using a version of MySQL prior to 5.0.3 (you are using %s).' % (f.name, f.__class__.__name__, '.'.join([str(n) for n in db_version[:3]])))
 
-            # Check to see if the related field will clash with any
-            # existing fields, m2m fields, m2m related objects or related objects
+            # Check to see if the related field will clash with any existing
+            # fields, m2m fields, m2m related objects or related objects
             if f.rel:
                 if f.rel.to not in models.get_models():
                     e.add(opts, "'%s' has relation with model %s, which has not been installed" % (f.name, f.rel.to))
@@ -87,7 +87,7 @@ def get_validation_errors(outfile, app=None):
                         e.add(opts, "Accessor for field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
                     if r.name == rel_query_name:
                         e.add(opts, "Reverse query name for field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
-                for r in rel_opts.many_to_many:
+                for r in rel_opts.local_many_to_many:
                     if r.name == rel_name:
                         e.add(opts, "Accessor for field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
                     if r.name == rel_query_name:
@@ -104,9 +104,10 @@ def get_validation_errors(outfile, app=None):
                         if r.get_accessor_name() == rel_query_name:
                             e.add(opts, "Reverse query name for field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
 
-        for i, f in enumerate(opts.many_to_many):
+        for i, f in enumerate(opts.local_many_to_many):
             # Check to see if the related m2m field will clash with any
-            # existing fields, m2m fields, m2m related objects or related objects
+            # existing fields, m2m fields, m2m related objects or related
+            # objects
             if f.rel.to not in models.get_models():
                 e.add(opts, "'%s' has m2m relation with model %s, which has not been installed" % (f.name, f.rel.to))
                 # it is a string and we could not find the model it refers to
@@ -117,17 +118,17 @@ def get_validation_errors(outfile, app=None):
             rel_opts = f.rel.to._meta
             rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
             rel_query_name = f.related_query_name()
-            # If rel_name is none, there is no reverse accessor.
-            # (This only occurs for symmetrical m2m relations to self).
-            # If this is the case, there are no clashes to check for this field, as
-            # there are no reverse descriptors for this field.
+            # If rel_name is none, there is no reverse accessor (this only
+            # occurs for symmetrical m2m relations to self). If this is the
+            # case, there are no clashes to check for this field, as there are
+            # no reverse descriptors for this field.
             if rel_name is not None:
                 for r in rel_opts.fields:
                     if r.name == rel_name:
                         e.add(opts, "Accessor for m2m field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
                     if r.name == rel_query_name:
                         e.add(opts, "Reverse query name for m2m field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
-                for r in rel_opts.many_to_many:
+                for r in rel_opts.local_many_to_many:
                     if r.name == rel_name:
                         e.add(opts, "Accessor for m2m field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
                     if r.name == rel_query_name:
@@ -200,7 +201,10 @@ def get_validation_errors(outfile, app=None):
                     field_name = field_name[1:]
                 if opts.order_with_respect_to and field_name == '_order':
                     continue
-                if '.' in field_name: continue # Skip ordering in the format 'table.field'.
+                # Skip ordering in the format field1__field2 (FIXME: checking
+                # this format would be nice, but it's a little fiddly).
+                if '_' in field_name:
+                    continue
                 try:
                     opts.get_field(field_name, many_to_many=False)
                 except models.FieldDoesNotExist:
@@ -228,5 +232,7 @@ def get_validation_errors(outfile, app=None):
                 else:
                     if isinstance(f.rel, models.ManyToManyRel):
                         e.add(opts, '"unique_together" refers to %s. ManyToManyFields are not supported in unique_together.' % f.name)
+                    if f not in opts.local_fields:
+                        e.add(opts, '"unique_together" refers to %s. This is not in the same model as the unique_together statement.' % f.name)
 
     return len(e.errors)

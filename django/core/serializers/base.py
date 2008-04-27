@@ -165,7 +165,7 @@ class DeserializedObject(object):
         # This ensures that the data that is deserialized is literally
         # what came from the file, not post-processed by pre_save/save
         # methods.
-        models.Model.save(self.object, raw=True)
+        models.Model.save_base(self.object, raw=True)
         if self.m2m_data and save_m2m:
             for accessor_name, object_list in self.m2m_data.items():
                 setattr(self.object, accessor_name, object_list)

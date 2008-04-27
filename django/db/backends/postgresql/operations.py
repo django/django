@@ -44,6 +44,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         cursor.execute("SELECT CURRVAL('\"%s_%s_seq\"')" % (table_name, pk_name))
         return cursor.fetchone()[0]
 
+    def no_limit_value(self):
+        return None
+
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
             return name # Quoting once is enough.

@@ -292,11 +292,9 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> Article.objects.all()[2:][2:3]
 [<Article: Default headline>]
 
-# Note that you can't use 'offset' without 'limit' (on some dbs), so this doesn't work:
->>> Article.objects.all()[2:]
-Traceback (most recent call last):
-    ...
-AssertionError: 'offset' is not allowed without 'limit'
+# Using an offset without a limit is also possible.
+>>> Article.objects.all()[5:]
+[<Article: Fourth article>, <Article: Article 7>, <Article: Updated article 8>]
 
 # Also, once you have sliced you can't filter, re-order or combine
 >>> Article.objects.all()[0:5].filter(id=1)

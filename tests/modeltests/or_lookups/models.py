@@ -4,11 +4,9 @@
 To perform an OR lookup, or a lookup that combines ANDs and ORs,
 combine QuerySet objects using & and | operators.
 
-Alternatively, use positional arguments, and pass one or more expressions
-of clauses using the variable ``django.db.models.Q`` (or any object with
-a get_sql method).
-
-
+Alternatively, use positional arguments, and pass one or more expressions of
+clauses using the variable ``django.db.models.Q`` (or any object with an
+add_to_query method).
 """
 
 from django.db import models
@@ -72,6 +70,8 @@ __test__ = {'API_TESTS':"""
 # You could also use "in" to accomplish the same as above.
 >>> Article.objects.filter(pk__in=[1,2,3])
 [<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
+>>> Article.objects.filter(pk__in=(1,2,3))
+[<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
 
 >>> Article.objects.filter(pk__in=[1,2,3,4])
 [<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
@@ -91,6 +91,17 @@ __test__ = {'API_TESTS':"""
 # Q arg AND order is irrelevant
 >>> Article.objects.filter(Q(headline__contains='bye'), headline__startswith='Hello')
 [<Article: Hello and goodbye>]
+
+# Q objects can be negated
+>>> Article.objects.filter(Q(pk=1) | ~Q(pk=2))
+[<Article: Hello>, <Article: Hello and goodbye>]
+>>> Article.objects.filter(~Q(pk=1) & ~Q(pk=2))
+[<Article: Hello and goodbye>]
+
+# This allows for more complex queries than filter() and exclude() alone would
+# allow
+>>> Article.objects.filter(Q(pk=1) & (~Q(pk=2) | Q(pk=3)))
+[<Article: Hello>]
 
 # Try some arg queries with operations other than filter.
 >>> Article.objects.get(Q(headline__startswith='Hello'), Q(headline__contains='bye'))

@@ -31,13 +31,13 @@ except ImportError:
 def data_create(pk, klass, data):
     instance = klass(id=pk)
     instance.data = data
-    models.Model.save(instance, raw=True)
+    models.Model.save_base(instance, raw=True)
     return instance
 
 def generic_create(pk, klass, data):
     instance = klass(id=pk)
     instance.data = data[0]
-    models.Model.save(instance, raw=True)
+    models.Model.save_base(instance, raw=True)
     for tag in data[1:]:
         instance.tags.create(data=tag)
     return instance
@@ -45,25 +45,25 @@ def generic_create(pk, klass, data):
 def fk_create(pk, klass, data):
     instance = klass(id=pk)
     setattr(instance, 'data_id', data)
-    models.Model.save(instance, raw=True)
+    models.Model.save_base(instance, raw=True)
     return instance
 
 def m2m_create(pk, klass, data):
     instance = klass(id=pk)
-    models.Model.save(instance, raw=True)
+    models.Model.save_base(instance, raw=True)
     instance.data = data
     return instance
 
 def o2o_create(pk, klass, data):
     instance = klass()
     instance.data_id = data
-    models.Model.save(instance, raw=True)
+    models.Model.save_base(instance, raw=True)
     return instance
 
 def pk_create(pk, klass, data):
     instance = klass()
     instance.data = data
-    models.Model.save(instance, raw=True)
+    models.Model.save_base(instance, raw=True)
     return instance
 
 # A set of functions that can be used to compare
@@ -309,7 +309,7 @@ def fieldsTest(format, self):
     management.call_command('flush', verbosity=0, interactive=False)
 
     obj = ComplexModel(field1='first',field2='second',field3='third')
-    obj.save(raw=True)
+    obj.save_base(raw=True)
 
     # Serialize then deserialize the test database
     serialized_data = serializers.serialize(format, [obj], indent=2, fields=('field1','field3'))
@@ -325,7 +325,7 @@ def streamTest(format, self):
     management.call_command('flush', verbosity=0, interactive=False)
 
     obj = ComplexModel(field1='first',field2='second',field3='third')
-    obj.save(raw=True)
+    obj.save_base(raw=True)
 
     # Serialize the test database to a stream
     stream = StringIO()

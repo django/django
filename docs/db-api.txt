@@ -160,37 +160,6 @@ When you save an object, Django performs the following steps:
        is used to provide notification that an object has been successfully
        saved. (These signals are not yet documented.)
 
-Raw saves
-~~~~~~~~~
-
-**New in Django development version**
-
-The pre-processing step (#2 in the previous section) is useful, but it modifies
-the data stored in a field. This can cause problems if you're relying upon the
-data you provide being used as-is.
-
-For example, if you're setting up conditions for a test, you'll want the test
-conditions to be repeatable. If pre-processing is performed, the data used
-to specify test conditions may be modified, changing the conditions for the
-test each time the test is run.
-
-In cases such as this, you need to prevent pre-processing from being performed
-when you save an object. To do this, you can invoke a **raw save**  by passing
-``raw=True`` as an argument to the ``save()`` method::
-
-    b4.save(raw=True) # Save object, but do no pre-processing
-
-A raw save skips the usual data pre-processing that is performed during the
-save. All other steps in the save (pre-save signal, data preparation, data
-insertion, and post-save signal) are performed as normal.
-
-.. admonition:: When to use a raw save
-
-    Generally speaking, you shouldn't need to use a raw save. Disabling field
-    pre-processing is an extraordinary measure that should only be required
-    in extraordinary circumstances, such as setting up reliable test
-    conditions.
-
 Saving changes to objects
 =========================
 
@@ -211,11 +180,11 @@ Saving ForeignKey and ManyToManyField fields
 --------------------------------------------
 
 Updating ``ForeignKey`` fields works exactly the same way as saving a normal
-field; simply assign an object of the right type to the field in question:: 
+field; simply assign an object of the right type to the field in question::
 
-    cheese_blog = Blog.objects.get(name="Cheddar Talk") 
-    entry.blog = cheese_blog 
-    entry.save() 
+    cheese_blog = Blog.objects.get(name="Cheddar Talk")
+    entry.blog = cheese_blog
+    entry.save()
 
 Updating a ``ManyToManyField`` works a little differently; use the ``add()``
 method on the field to add a record to the relation::
@@ -422,6 +391,14 @@ This returns the sixth through tenth objects (``OFFSET 5 LIMIT 5``)::
 
     Entry.objects.all()[5:10]
 
+You can also slice from the item ''N'' to the end of the queryset. For
+example, to return everything from the fixth item onwards::
+
+    Entry.objects.all()[5:]
+
+How this last example is implemented in SQL varies depending upon the database
+used, but it is supported in all cases.
+
 Generally, slicing a ``QuerySet`` returns a new ``QuerySet`` -- it doesn't
 evaluate the query. An exception is if you use the "step" parameter of Python
 slice syntax. For example, this would actually execute the query in order to
@@ -514,14 +491,69 @@ like so::
 Note: ``order_by('?')`` queries may be expensive and slow, depending on the
 database backend you're using.
 
-To order by a field in a different table, add the other table's name and a dot,
-like so::
+To order by a field in a different model, use the same syntax as when you are
+querying across model relations. That is, the name of the field, followed by a
+double underscore (``__``), followed by the name of the field in the new model,
+and so on for as many models as you want to join. For example::
 
-    Entry.objects.order_by('blogs_blog.name', 'headline')
+    Entry.objects.order_by('blog__name', 'headline')
+
+If you try to order by a field that is a relation to another model, Django will
+use the default ordering on the related model (or order by the related model's
+primary key if there is no ``Meta.ordering`` specified. For example::
+
+    Entry.objects.order_by('blog')
+
+...is identical to::
+
+    Entry.objects.order_by('blog__id')
+
+...since the ``Blog`` model has no default ordering specified.
+
+Be cautious when ordering by fields in related models if you are also using
+``distinct()``. See the note in the `distinct()`_ section for an explanation
+of how related model ordering can change the expected results.
+
+It is permissible to specify a multi-valued field to order the results by (for
+example, a ``ManyToMany`` field). Normally this won't be a sensible thing to
+do and it's really an advanced usage feature. However, if you know that your
+queryset's filtering or available data implies that there will only be one
+ordering piece of data for each of the main items you are selecting, the
+ordering may well be exactly what you want to do. Use ordering on multi-valued
+fields with care and make sure the results are what you expect.
+
+**New in Django development version:** If you don't want any ordering to be
+applied to a query, not even the default ordering, call ``order_by()`` with no
+parameters.
+
+**New in Django development version:** The syntax for ordering across related
+models has changed. See the `Django 0.96 documentation`_ for the old behaviour.
+
+.. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
 
 There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
+
+``reverse()``
+~~~~~~~~~~~~~
+
+**New in Django development version**
+
+If you want to reverse the order in which a queryset's elements are returned,
+you can use the ``reverse()`` method. Calling ``reverse()`` a second time
+restores the ordering back to the normal direction.
+
+To retrieve the ''last'' five items in a queryset, you could do this::
+
+    my_queryset.reverse()[:5]
+
+Note that this is not quite the same as slicing from the end of a sequence in
+Python. The above example will return the last item first, then the
+penultimate item and so on. If we had a Python sequence and looked at
+``seq[:-5]``, we would see the fifth-last item first. Django doesn't support
+that mode of access (slicing from the end), since it is not possible to do it
+efficiently in SQL.
 
 ``distinct()``
 ~~~~~~~~~~~~~~
@@ -531,10 +563,28 @@ eliminates duplicate rows from the query results.
 
 By default, a ``QuerySet`` will not eliminate duplicate rows. In practice, this
 is rarely a problem, because simple queries such as ``Blog.objects.all()``
-don't introduce the possibility of duplicate result rows.
+don't introduce the possibility of duplicate result rows. However, if your
+query spans multiple tables, it's possible to get duplicate results when a
+``QuerySet`` is evaluated. That's when you'd use ``distinct()``.
 
-However, if your query spans multiple tables, it's possible to get duplicate
-results when a ``QuerySet`` is evaluated. That's when you'd use ``distinct()``.
+.. note::
+    Any fields used in an ``order_by()`` call are included in the SQL
+    ``SELECT`` columns. This can sometimes lead to unexpected results when
+    used in conjuntion with ``distinct()``. If you order by fields from a
+    related model, those fields will be added to the selected columns and they
+    may make otherwise duplicate rows appear to be distinct. Since the extra
+    columns don't appear in the returned results (they are only there to
+    support ordering), it sometimes looks like non-distinct results are being
+    returned.
+
+    Similarly, if you use a ``values()`` query to restrict the columns
+    selected, the columns used in any ``order_by()`` (or default model
+    ordering) will still be involved and may affect uniqueness of the results.
+
+    The moral here is that if you are using ``distinct()`` be careful about
+    ordering by related models. Similarly, when using ``distinct()`` and
+    ``values()`` together, be careful when ordering by fields not in the
+    ``values()`` call.
 
 ``values(*fields)``
 ~~~~~~~~~~~~~~~~~~~
@@ -569,6 +619,43 @@ Example::
     >>> Blog.objects.values('id', 'name')
     [{'id': 1, 'name': 'Beatles Blog'}]
 
+You can also retrieve values from across ``ForeignKey`` relations by using
+double underscores to separate the field names, just as when calling the
+``filter()`` command. For example::
+
+    >>> Entry.objects.values('blog__name').distinct()
+    [{'name': 'Beatles Blog'}]
+
+A couple of subtleties that are worth mentioning:
+
+    * The ``values()`` method does not return anything for ``ManyToManyField``
+      attributes and will raise an error if you try to pass in this type of
+      field to it.
+    * If you have a field called ``foo`` that is a ``ForeignKey``, the default
+      ``values()`` call will return a dictionary key called ``foo_id``, since
+      this is the name of the hidden model attribute that stores the actual
+      value (the ``foo`` attribute refers to the related model). When you are
+      calling ``values()`` and passing in field names, you can pass in either
+      ``foo`` or ``foo_id`` and you will get back the same thing (the
+      dictionary key will match the field name you passed in).
+
+      For example::
+
+        >>> Entry.objects.values()
+        [{'blog_id: 1, 'headline': u'First Entry', ...}, ...]
+
+        >>> Entry.objects.values('blog')
+        [{'blog': 1}, ...]
+
+        >>> Entry.objects.values('blog_id')
+        [{'blog_id': 1}, ...]
+    * When using ``values()`` together with ``distinct()``, be aware that
+      ordering can affect the results. See the note in the `distinct()`_
+      section, above, for details.
+
+**New in Django development version:** Previously, it was not possible to pass
+``blog_id`` to ``values()`` in the above example, only ``blog``.
+
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
 from a small number of the available fields and you won't need the
 functionality of a model instance object. It's more efficient to select only
@@ -585,6 +672,34 @@ The people who made Django prefer to put all the SQL-affecting methods first,
 followed (optionally) by any output-affecting methods (such as ``values()``),
 but it doesn't really matter. This is your chance to really flaunt your
 individualism.
+
+``values_list(*fields)``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+This is similar to ``values()`` except that instead of returning a list of
+dictionaries, it returns a list of tuples. Each tuple contains the value from
+the respective field passed into the ``values_list()`` call -- so the first
+item is the first field, etc. For example::
+
+    >>> Entry.objects.values_list('id', 'headling')
+    [(1, u'First entry'), ...]
+
+If you only pass in a single field, you can also pass in the ``flat``
+parameter. If ``True``, this will mean the returned results are single values,
+rather than one-tuples. An example should make the difference clearer::
+
+    >>> Entry.objects.values_list('id').order_by('id')
+    [(1,), (2,), (3,), ...]
+
+    >>> Entry.objects.values_list('id', flat=True).order_by('id')
+    [1, 2, 3, ...]
+
+It is an error to pass in ``flat`` when there is more than one field.
+
+If you don't pass any values to ``values_list()``, it will return all the
+fields in the model, in the order they were declared.
 
 ``dates(field, kind, order='ASC')``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -634,6 +749,17 @@ Examples::
 
     >>> Entry.objects.none()
     []
+
+``all()``
+~~~~~~~~~~
+
+**New in Django development version**
+
+Returns a ''copy'' of the current ``QuerySet`` (or ``QuerySet`` subclass you
+pass in). This can be useful in some situations where you might want to pass
+in either a model manager or a ``QuerySet`` and do further filtering on the
+result. You can safely call ``all()`` on either object and then you'll
+definitely have a ``QuerySet`` to work with.
 
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~
@@ -687,8 +813,8 @@ related ``Person`` *and* the related ``City``::
     p = b.author         # Hits the database.
     c = p.hometown       # Hits the database.
 
-Note that ``select_related()`` does not follow foreign keys that have
-``null=True``.
+Note that, by default, ``select_related()`` does not follow foreign keys that
+have ``null=True``.
 
 Usually, using ``select_related()`` can vastly improve performance because your
 app can avoid many database calls. However, in situations with deeply nested
@@ -705,8 +831,43 @@ follow::
 
 The ``depth`` argument is new in the Django development version.
 
-``extra(select=None, where=None, params=None, tables=None)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**New in Django development version:** Sometimes you only need to access
+specific models that are related to your root model, not all of the related
+models. In these cases, you can pass the related field names to
+``select_related()`` and it will only follow those relations. You can even do
+this for models that are more than one relation away by separating the field
+names with double underscores, just as for filters. For example, if we have
+thise model::
+
+    class Room(models.Model):
+        # ...
+        building = models.ForeignKey(...)
+
+    class Group(models.Model):
+        # ...
+        teacher = models.ForeignKey(...)
+        room = models.ForeignKey(Room)
+        subject = models.ForeignKey(...)
+
+...and we only needed to work with the ``room`` and ``subject`` attributes, we
+could write this::
+
+    g = Group.objects.select_related('room', 'subject')
+
+This is also valid::
+
+    g = Group.objects.select_related('room__building', 'subject')
+
+...and would also pull in the ``building`` relation.
+
+You can only refer to ``ForeignKey`` relations in the list of fields passed to
+``select_related``. You *can* refer to foreign keys that have ``null=True``
+(unlike the default ``select_related()`` call). It's an error to use both a
+list of fields and the ``depth`` parameter in the same ``select_related()``
+call, since they are conflicting options.
+
+``extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes, the Django query syntax by itself can't easily express a complex
 ``WHERE`` clause. For these edge cases, Django provides the ``extra()``
@@ -763,6 +924,21 @@ of the arguments is required, but you should use at least one of them.
     some database backends, such as some MySQL versions, don't support
     subqueries.
 
+    **New in Django development version**
+    In some rare cases, you might wish to pass parameters to the SQL fragments
+    in ``extra(select=...)```. For this purpose, use the ``select_params``
+    parameter. Since ``select_params`` is a sequence and the ``select``
+    attribute is a dictionary, some care is required so that the parameters
+    are matched up correctly with the extra select pieces.  In this situation,
+    you should use a ``django.utils.datastructures.SortedDict`` for the
+    ``select`` value, not just a normal Python dictionary.
+
+    This will work, for example::
+
+        Blog.objects.extra(
+            select=SortedDict(('a', '%s'), ('b', '%s')),
+            select_params=('one', 'two'))
+
 ``where`` / ``tables``
     You can define explicit SQL ``WHERE`` clauses -- perhaps to perform
     non-explicit joins -- by using ``where``. You can manually add tables to
@@ -779,20 +955,61 @@ of the arguments is required, but you should use at least one of them.
 
         SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
 
+    Be careful when using the ``tables`` parameter if you're specifying
+    tables that are already used in the query. When you add extra tables
+    via the ``tables`` parameter, Django assumes you want that table included
+    an extra time, if it is already included. That creates a problem,
+    since the table name will then be given an alias. If a table appears
+    multiple times in an SQL statement, the second and subsequent occurrences
+    must use aliases so the database can tell them apart. If you're
+    referring to the extra table you added in the extra ``where`` parameter
+    this is going to cause errors.
+
+    Normally you'll only be adding extra tables that don't already appear in
+    the query. However, if the case outlined above does occur, there are a few
+    solutions. First, see if you can get by without including the extra table
+    and use the one already in the query. If that isn't possible, put your
+    ``extra()`` call at the front of the queryset construction so that your
+    table is the first use of that table. Finally, if all else fails, look at
+    the query produced and rewrite your ``where`` addition to use the alias
+    given to your extra table. The alias will be the same each time you
+    construct the queryset in the same way, so you can rely upon the alias
+    name to not change.
+
+``order_by``
+    If you need to order the resulting queryset using some of the new fields
+    or tables you have included via ``extra()`` use the ``order_by`` parameter
+    to ``extra()`` and pass in a sequence of strings. These strings should
+    either be model fields (as in the normal ``order_by()`` method on
+    querysets), of the form ``table_name.column_name`` or an alias for a column
+    that you specified in the ``select`` parameter to ``extra()``.
+
+    For example::
+
+        q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+        q = q.extra(order_by = ['-is_recent'])
+
+    This would sort all the items for which ``is_recent`` is true to the front
+    of the result set (``True`` sorts before ``False`` in a descending
+    ordering).
+
+    This shows, by the way, that you can make multiple calls to
+    ``extra()`` and it will behave as you expect (adding new constraints each
+    time).
+
 ``params``
-    The ``select`` and ``where`` parameters described above may use standard
-    Python database string placeholders -- ``'%s'`` to indicate parameters the
-    database engine should automatically quote. The ``params`` argument is a
-    list of any extra parameters to be substituted.
+    The ``where`` parameter described above may use standard Python database
+    string placeholders -- ``'%s'`` to indicate parameters the database engine
+    should automatically quote. The ``params`` argument is a list of any extra
+    parameters to be substituted.
 
     Example::
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-    Always use ``params`` instead of embedding values directly into ``select``
-    or ``where`` because ``params`` will ensure values are quoted correctly
-    according to your particular backend. (For example, quotes will be escaped
-    correctly.)
+    Always use ``params`` instead of embedding values directly into ``where``
+    because ``params`` will ensure values are quoted correctly according to
+    your particular backend. (For example, quotes will be escaped correctly.)
 
     Bad::
 
@@ -802,8 +1019,9 @@ of the arguments is required, but you should use at least one of them.
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-    The combined number of placeholders in the list of strings for ``select``
-    or ``where`` should equal the number of values in the ``params`` list.
+**New in Django development version** The ``select_params`` argument to
+``extra()`` is new. Previously, you could attempt to pass parameters for
+``select`` in the ``params`` argument, but it worked very unreliably.
 
 QuerySet methods that do not return QuerySets
 ---------------------------------------------
@@ -1031,7 +1249,12 @@ Examples::
 SQL equivalents::
 
     SELECT ... WHERE id = 14;
-    SELECT ... WHERE id = NULL;
+    SELECT ... WHERE id IS NULL;
+
+**New in Django development version:** The semantics of ``id__exact=None`` have
+changed in the development version. Previously, it was (intentionally)
+converted to ``WHERE id = NULL`` at the SQL level, which would never match
+anything. It has now been changed to behave the same as ``id__isnull=True``.
 
 iexact
 ~~~~~~
@@ -1261,14 +1484,6 @@ SQL equivalent::
 
     SELECT ... WHERE pub_date IS NULL;
 
-.. admonition:: ``__isnull=True`` vs ``__exact=None``
-
-    There is an important difference between ``__isnull=True`` and
-    ``__exact=None``. ``__exact=None`` will *always* return an empty result
-    set, because SQL requires that no value is equal to ``NULL``.
-    ``__isnull`` determines if the field is currently holding the value
-    of ``NULL`` without performing a comparison.
-
 search
 ~~~~~~
 
@@ -1368,6 +1583,11 @@ equivalent::
     Entry.objects.filter(blog__id=3) # __exact is implied
     Entry.objects.filter(blog__pk=3) # __pk implies __id__exact
 
+.. note::
+    Because of this shortcut, you cannot have a field called ``pk`` that is not
+    the primary key of the model. It will always be replaced by the name of the
+    model's primary key in queries.
+
 Lookups that span relationships
 -------------------------------
 
@@ -1391,6 +1611,60 @@ This example retrieves all ``Blog`` objects which have at least one ``Entry``
 whose ``headline`` contains ``'Lennon'``::
 
     Blog.objects.filter(entry__headline__contains='Lennon')
+
+Spanning multi-valued relationships
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+When you are filtering an object based on a ``ManyToManyField`` or a reverse
+``ForeignKeyField``, there are two different sorts of filter you may be
+interested in. Consider the ``Blog``/``Entry`` relationship (``Blog`` to
+``Entry`` is a one-to-many relation). We might be interested in finding blogs
+that have an entry which has both *"Lennon"* in the headline and was published
+today. Or we might want to find blogs that have an entry with *"Lennon"* in
+the headline as well as an entry that was published today. Since there are
+multiple entries associated with a single ``Blog``, both of these queries are
+possible and make sense in some situations.
+
+The same type of situation arises with a ``ManyToManyField``. For example, if
+an ``Entry`` has a ``ManyToManyField`` called ``tags``, we might want to find
+entries linked to tags called *"music"* and *"bands"* or we might want an
+entry that contains a tag with a name of *"music"* and a status of *"public"*.
+
+To handle both of these situations, Django has a consistent way of processing
+``filter()`` and ``exclude()`` calls. Everything inside a single ``filter()``
+call is applied simultaneously to filter out items matching all those
+requirements. Successive ``filter()`` calls further restrict the set of
+objects, but for multi-valued relations, they apply to any object linked to
+the primary model, not necessarily those objects that were selected by an
+earlier ``filter()`` call.
+
+That may sound a bit confusing, so hopefully an example will clarify. To
+select all blogs that contains entries with *"Lennon"* in the headline and
+were published today, we would write::
+
+    Blog.objects.filter(entry__headline__contains='Lennon',
+            entry__pub_date=datetime.date.today())
+
+To select all blogs that contain an entry with *"Lennon"* in the headline
+**as well as** an entry that was published today, we would write::
+
+    Blog.objects.filter(entry__headline__contains='Lennon').filter(
+            entry__pub_date=datetime.date.today())
+
+In this second example, the first filter restricted the queryset to all those
+blogs linked to that particular type of entry. The second filter restricted
+the set of blogs *further* to those that are also linked to the second type of
+entry. The entries select by the second filter may or may not be the same as
+the entries in the first filter. We are filtering the ``Blog`` items with each
+filter statement, not the ``Entry`` items.
+
+All of this behaviour also applies to ``exclude()``: all the conditions in a
+single ``exclude()`` statement apply to a single instance (if those conditions
+are talking about the same multi-valued relation). Conditions in subsequent
+``filter()`` or ``exclude()`` calls that refer to the same relation may end up
+filtering on different linked objects.
 
 Escaping percent signs and underscores in LIKE statements
 ---------------------------------------------------------
@@ -1495,6 +1769,12 @@ This is equivalent to the following SQL ``WHERE`` clause::
 
 You can compose statements of arbitrary complexity by combining ``Q`` objects
 with the ``&`` and ``|`` operators. You can also use parenthetical grouping.
+
+**New in Django development version:** ``Q`` objects can also be negated using
+the ``~`` operator, allowing for combined lookups that combine both a normal
+query and a negated (``NOT``) query::
+
+    Q(question__startswith='Who') | ~Q(pub_date__year=2005)
 
 Each lookup function that takes keyword-arguments (e.g. ``filter()``,
 ``exclude()``, ``get()``) can also be passed one or more ``Q`` objects as
@@ -1814,6 +2094,34 @@ requesting ``Entry.objects.delete()``, and deleting *all* the entries. If you
 complete query set::
 
     Entry.objects.all().delete()
+
+Updating multiple objects at once
+=================================
+
+**New in Django development version**
+
+Sometimes you want to set a field to a particular value for all the objects in
+a queryset. You can do this with the ``update()`` method. For example::
+
+    # Update all the headlings to the same value.
+    Entry.objects.all().update(headline='Everything is the same')
+
+You can only set non-relation fields and ``ForeignKey`` fields using this
+method and the value you set the field to must be a normal Python value (you
+can't set a field to be equal to some other field at the moment).
+
+To update ``ForeignKey`` fields, set the new value to be the new model
+instance you want to point to. Example::
+
+    b = Blog.objects.get(pk=1)
+    # Make all entries belong to this blog.
+    Entry.objects.all().update(blog=b)
+
+The ``update()`` method is applied instantly and doesn't return anything
+(similar to ``delete()``). The only restriction on the queryset that is
+updated is that it can only access one database table, the model's main
+table. So don't try to filter based on related fields or anything like that;
+it won't work.
 
 Extra instance methods
 ======================

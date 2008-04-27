@@ -145,18 +145,18 @@ False
 [<Article: John's second story>, <Article: This is a test>]
 
 # The underlying query only makes one join when a related table is referenced twice.
->>> query = Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
->>> null, sql, null = query._get_sql_clause()
+>>> queryset = Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
+>>> sql = queryset.query.as_sql()[0]
 >>> sql.count('INNER JOIN')
 1
 
 # The automatically joined table has a predictable name.
->>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_article__reporter.last_name='Smith'"])
+>>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_reporter.last_name='Smith'"])
 [<Article: John's second story>, <Article: This is a test>]
 
 # And should work fine with the unicode that comes out of
 # newforms.Form.cleaned_data
->>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_article__reporter.last_name='%s'" % u'Smith'])
+>>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_reporter.last_name='%s'" % u'Smith'])
 [<Article: John's second story>, <Article: This is a test>]
 
 # Find all Articles for the Reporter whose ID is 1.
@@ -179,13 +179,13 @@ False
 >>> Article.objects.filter(reporter_id__exact=1)
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'reporter_id' into field. Choices are: id, headline, pub_date, reporter
+FieldError: Cannot resolve keyword 'reporter_id' into field. Choices are: headline, id, pub_date, reporter
 
 # You need to specify a comparison clause
 >>> Article.objects.filter(reporter_id=1)
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'reporter_id' into field. Choices are: id, headline, pub_date, reporter
+FieldError: Cannot resolve keyword 'reporter_id' into field. Choices are: headline, id, pub_date, reporter
 
 # You can also instantiate an Article by passing
 # the Reporter's ID instead of a Reporter object.
@@ -249,6 +249,11 @@ TypeError: Cannot resolve keyword 'reporter_id' into field. Choices are: id, hea
 # Check that implied __exact also works
 >>> Reporter.objects.filter(article__reporter=r).distinct()
 [<Reporter: John Smith>]
+
+# It's possible to use values() calls across many-to-one relations. (Note, too, that we clear the ordering here so as not to drag the 'headline' field into the columns being used to determine uniqueness.)
+>>> d = {'reporter__first_name': u'John', 'reporter__last_name': u'Smith'}
+>>> list(Article.objects.filter(reporter=r).distinct().order_by().values('reporter__first_name', 'reporter__last_name')) == [d]
+True
 
 # If you delete a reporter, his articles will be deleted.
 >>> Article.objects.all()

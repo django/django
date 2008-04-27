@@ -62,6 +62,7 @@ server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 class DatabaseFeatures(BaseDatabaseFeatures):
     autoindexes_primary_keys = False
     inline_fk_references = False
+    empty_fetchmany_value = ()
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
@@ -93,6 +94,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         if offset and offset != 0:
             sql += "%s," % offset
         return sql + str(limit)
+
+    def no_limit_value(self):
+        # 2**64 - 1, as recommended by the MySQL documentation
+        return 18446744073709551615L
 
     def quote_name(self, name):
         if name.startswith("`") and name.endswith("`"):
