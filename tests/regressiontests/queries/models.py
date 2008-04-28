@@ -658,5 +658,24 @@ Bug #7098 -- Make sure semi-deprecated ordering by related models syntax still
 works.
 >>> Item.objects.values('note__note').order_by('queries_note.note', 'id')
 [{'note__note': u'n2'}, {'note__note': u'n3'}, {'note__note': u'n3'}, {'note__note': u'n3'}]
+
+Bug #7096 -- Make sure exclude() with multiple conditions continues to work.
+>>> Tag.objects.filter(parent=t1, name='t3').order_by('name')
+[<Tag: t3>]
+>>> Tag.objects.exclude(parent=t1, name='t3').order_by('name')
+[<Tag: t1>, <Tag: t2>, <Tag: t4>, <Tag: t5>]
+>>> Item.objects.exclude(tags__name='t1', name='one').order_by('name').distinct()
+[<Item: four>, <Item: three>, <Item: two>]
+>>> Item.objects.filter(name__in=['three', 'four']).exclude(tags__name='t1').order_by('name')
+[<Item: four>, <Item: three>]
+
+More twisted cases, involving nested negations.
+>>> Item.objects.exclude(~Q(tags__name='t1', name='one'))
+[<Item: one>]
+>>> Item.objects.filter(~Q(tags__name='t1', name='one'), name='two')
+[<Item: two>]
+>>> Item.objects.exclude(~Q(tags__name='t1', name='one'), name='two')
+[<Item: four>, <Item: one>, <Item: three>]
+
 """}
 
