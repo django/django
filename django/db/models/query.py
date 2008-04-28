@@ -28,6 +28,17 @@ class QuerySet(object):
     # PYTHON MAGIC METHODS #
     ########################
 
+    def __getstate__(self):
+        """
+        Allows the Queryset to be pickled.
+        """
+        # Force the cache to be fully populated.
+        len(self)
+
+        obj_dict = self.__dict__.copy()
+        obj_dict['_iter'] = None
+        return obj_dict
+
     def __repr__(self):
         return repr(list(self))
 
@@ -37,7 +48,7 @@ class QuerySet(object):
         # whilst not messing up any existing iterators against the queryset.
         if self._result_cache is None:
             if self._iter:
-                self._result_cache = list(self._iter())
+                self._result_cache = list(self._iter)
             else:
                 self._result_cache = list(self.iterator())
         elif self._iter:

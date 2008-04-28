@@ -376,6 +376,29 @@ You can evaluate a ``QuerySet`` in the following ways:
       iterating over a ``QuerySet`` will take advantage of your database to
       load data and instantiate objects only as you need them.
 
+
+Pickling QuerySets
+~~~~~~~~~~~~~~~~~~
+
+If you pickle_ a ``QuerySet``, this will also force all the results to be
+loaded into memory prior to pickling. This is because pickling is usually used
+as a precursor to caching and when the cached queryset is reloaded, you want
+the results to already be present. This means that when you unpickle a
+``QuerySet``, it contains the results at the moment it was pickled, rather
+than the results that are currently in the database.
+
+If you only want to pickle the necessary information to recreate the
+``Queryset`` from the database at a later time, pickle the ``query`` attribute
+of the ``QuerySet``. You can then recreate the original ``QuerySet`` (without
+any results loaded) using some code like this::
+
+    >>> import pickle
+    >>> query = pickle.loads(s)     # Assuming 's' is the pickled string.
+    >>> qs = MyModel.objects.all()
+    >>> qs.query = query            # Restore the original 'query'.
+
+.. _pickle: http://docs.python.org/lib/module-pickle.html
+
 Limiting QuerySets
 ------------------
 
