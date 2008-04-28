@@ -654,5 +654,9 @@ Bug #7045 -- extra tables used to crash SQL construction on the second use.
 >>> s = qs.query.as_sql()
 >>> s = qs.query.as_sql()   # test passes if this doesn't raise an exception.
 
+Bug #7098 -- Make sure semi-deprecated ordering by related models syntax still
+works.
+>>> Item.objects.values('note__note').order_by('queries_note.note', 'id')
+[{'note__note': u'n2'}, {'note__note': u'n3'}, {'note__note': u'n3'}, {'note__note': u'n3'}]
 """}
 

@@ -28,7 +28,7 @@ NULLABLE = 6
 MULTI = 'multi'
 SINGLE = 'single'
 
-ORDER_PATTERN = re.compile(r'\?|[-+]?\w+$')
+ORDER_PATTERN = re.compile(r'\?|[-+]?[.\w]+$')
 ORDER_DIR = {
     'ASC': ('ASC', 'DESC'),
     'DESC': ('DESC', 'ASC')}
