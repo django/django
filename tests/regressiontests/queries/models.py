@@ -117,6 +117,24 @@ class LoopZ(models.Model):
     class Meta:
         ordering = ['z']
 
+# A model and custom default manager combination.
+class CustomManager(models.Manager):
+    def get_query_set(self):
+        return super(CustomManager, self).get_query_set().filter(public=True,
+                tag__name='t1')
+
+class ManagedModel(models.Model):
+    data = models.CharField(max_length=10)
+    tag = models.ForeignKey(Tag)
+    public = models.BooleanField(default=True)
+
+    objects = CustomManager()
+    normal_manager = models.Manager()
+
+    def __unicode__(self):
+        return self.data
+
+
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag(name='t1')
 >>> t1.save()
@@ -676,6 +694,12 @@ More twisted cases, involving nested negations.
 [<Item: two>]
 >>> Item.objects.exclude(~Q(tags__name='t1', name='one'), name='two')
 [<Item: four>, <Item: one>, <Item: three>]
+
+Bug #7095
+Updates that are filtered on the model being updated are somewhat tricky to get
+in MySQL. This exercises that case.
+>>> mm = ManagedModel.objects.create(data='mm1', tag=t1, public=True)
+>>> ManagedModel.objects.update(data='mm')
 
 """}
 
