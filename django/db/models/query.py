@@ -497,9 +497,6 @@ class ValuesQuerySet(QuerySet):
         # QuerySet.clone() will also set up the _fields attribute with the
         # names of the model fields to select.
 
-    def __iter__(self):
-        return self.iterator()
-
     def iterator(self):
         self.query.trim_extra_select(self.extra_names)
         names = self.query.extra_select.keys() + self.field_names
