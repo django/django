@@ -99,6 +99,24 @@ class Query(object):
         memo[id(self)] = result
         return result
 
+    def __getstate__(self):
+        """
+        Pickling support.
+        """
+        obj_dict = self.__dict__.copy()
+        del obj_dict['connection']
+        return obj_dict
+
+    def __setstate__(self, obj_dict):
+        """
+        Unpickling support.
+        """
+        self.__dict__.update(obj_dict)
+        # XXX: Need a better solution for this when multi-db stuff is
+        # supported. It's the only class-reference to the module-level
+        # connection variable.
+        self.connection = connection
+
     def get_meta(self):
         """
         Returns the Options instance (the model._meta) from which to start
@@ -895,9 +913,15 @@ class Query(object):
         Add a single filter to the query. The 'filter_expr' is a pair:
         (filter_string, value). E.g. ('name__contains', 'fred')
 
-        If 'negate' is True, this is an exclude() filter. If 'trim' is True, we
-        automatically trim the final join group (used internally when
-        constructing nested queries).
+        If 'negate' is True, this is an exclude() filter. It's important to
+        note that this method does not negate anything in the where-clause
+        object when inserting the filter constraints. This is because negated
+        filters often require multiple calls to add_filter() and the negation
+        should only happen once. So the caller is responsible for this (the
+        caller will normally be add_q(), so that as an example).
+
+        If 'trim' is True, we automatically trim the final join group (used
+        internally when constructing nested queries).
 
         If 'can_reuse' is a set, we are processing a component of a
         multi-component filter (e.g. filter(Q1, Q2)). In this case, 'can_reuse'
@@ -1001,7 +1025,6 @@ class Query(object):
 
         self.where.add((alias, col, field, lookup_type, value), connector)
         if negate:
-            self.where.negate()
             for alias in join_list:
                 self.promote_alias(alias)
             if final > 1 and lookup_type != 'isnull':
@@ -1039,12 +1062,12 @@ class Query(object):
                 self.where.start_subtree(connector)
                 self.add_q(child, used_aliases)
                 self.where.end_subtree()
-                if q_object.negated:
-                    self.where.children[-1].negate()
             else:
                 self.add_filter(child, connector, q_object.negated,
                         can_reuse=used_aliases)
             connector = q_object.connector
+        if q_object.negated:
+            self.where.negate()
         if subtree:
             self.where.end_subtree()
 
