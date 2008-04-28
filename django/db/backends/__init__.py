@@ -51,6 +51,7 @@ class BaseDatabaseFeatures(object):
     uses_case_insensitive_names = False
     uses_custom_query_class = False
     empty_fetchmany_value = []
+    update_can_self_select = True
 
 class BaseDatabaseOperations(object):
     """
