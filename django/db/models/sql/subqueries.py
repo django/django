@@ -95,7 +95,7 @@ class UpdateQuery(Query):
 
     def _setup_query(self):
         """
-        Runs on initialisation and after cloning. Any attributes that would
+        Runs on initialization and after cloning. Any attributes that would
         normally be set in __init__ should go in here, instead, so that they
         are also set up after a clone() call.
         """
@@ -159,20 +159,37 @@ class UpdateQuery(Query):
         # from other tables.
         query = self.clone(klass=Query)
         query.bump_prefix()
-        query.select = []
         query.extra_select = {}
-        query.add_fields([query.model._meta.pk.name])
+        first_table = query.tables[0]
+        if query.alias_refcount[first_table] == 1:
+            # We can remove one table from the inner query.
+            query.unref_alias(first_table)
+            for i in xrange(1, len(query.tables)):
+                table = query.tables[i]
+                if query.alias_refcount[table]:
+                    break
+            join_info = query.alias_map[table]
+            query.select = [(join_info[RHS_ALIAS], join_info[RHS_JOIN_COL])]
+            must_pre_select = False
+        else:
+            query.select = []
+            query.add_fields([query.model._meta.pk.name])
+            must_pre_select = not self.connection.features.update_can_self_select
 
         # Now we adjust the current query: reset the where clause and get rid
         # of all the tables we don't need (since they're in the sub-select).
         self.where = self.where_class()
-        if self.related_updates:
+        if self.related_updates or must_pre_select:
+            # Either we're using the idents in multiple update queries (so
+            # don't want them to change), or the db backend doesn't support
+            # selecting from the updating table (e.g. MySQL).
             idents = []
             for rows in query.execute_sql(MULTI):
                 idents.extend([r[0] for r in rows])
             self.add_filter(('pk__in', idents))
             self.related_ids = idents
         else:
+            # The fast path. Filters and updates in one query.
             self.add_filter(('pk__in', query))
         for alias in self.tables[1:]:
             self.alias_refcount[alias] = 0
@@ -349,6 +366,7 @@ class DateQuery(Query):
                 self.connection.ops.date_trunc_sql)
         self.select = [select]
         self.select_fields = [None]
+        self.select_related = False # See #7097.
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
 

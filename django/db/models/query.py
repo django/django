@@ -284,6 +284,7 @@ class QuerySet(object):
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
         query.execute_sql(None)
+        transaction.commit_unless_managed()
         self._result_cache = None
     update.alters_data = True
 
@@ -495,9 +496,6 @@ class ValuesQuerySet(QuerySet):
 
         # QuerySet.clone() will also set up the _fields attribute with the
         # names of the model fields to select.
-
-    def __iter__(self):
-        return self.iterator()
 
     def iterator(self):
         self.query.trim_extra_select(self.extra_names)

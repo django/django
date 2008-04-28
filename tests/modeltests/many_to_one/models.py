@@ -246,7 +246,7 @@ FieldError: Cannot resolve keyword 'reporter_id' into field. Choices are: headli
 >>> Reporter.objects.filter(article__reporter__exact=r).distinct()
 [<Reporter: John Smith>]
 
-# Check that implied __exact also works
+# Check that implied __exact also works.
 >>> Reporter.objects.filter(article__reporter=r).distinct()
 [<Reporter: John Smith>]
 
@@ -266,11 +266,24 @@ True
 >>> Reporter.objects.order_by('first_name')
 [<Reporter: John Smith>]
 
-# Deletes using a join in the query
+# You can delete using a JOIN in the query.
 >>> Reporter.objects.filter(article__headline__startswith='This').delete()
 >>> Reporter.objects.all()
 []
 >>> Article.objects.all()
 []
 
+# Check that Article.objects.select_related().dates() works properly when
+# there are multiple Articles with the same date but different foreign-key
+# objects (Reporters).
+>>> r1 = Reporter.objects.create(first_name='Mike', last_name='Royko', email='royko@suntimes.com')
+>>> r2 = Reporter.objects.create(first_name='John', last_name='Kass', email='jkass@tribune.com')
+>>> a1 = Article.objects.create(headline='First', pub_date=datetime(1980, 4, 23), reporter=r1)
+>>> a2 = Article.objects.create(headline='Second', pub_date=datetime(1980, 4, 23), reporter=r2)
+>>> Article.objects.select_related().dates('pub_date', 'day')
+[datetime.datetime(1980, 4, 23, 0, 0)]
+>>> Article.objects.select_related().dates('pub_date', 'month')
+[datetime.datetime(1980, 4, 1, 0, 0)]
+>>> Article.objects.select_related().dates('pub_date', 'year')
+[datetime.datetime(1980, 1, 1, 0, 0)]
 """}

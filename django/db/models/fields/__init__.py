@@ -9,6 +9,7 @@ except ImportError:
 
 from django.db import get_creation_module
 from django.db.models import signals
+from django.db.models.query_utils import QueryWrapper
 from django.dispatch import dispatcher
 from django.conf import settings
 from django.core import validators
@@ -226,6 +227,9 @@ class Field(object):
 
     def get_db_prep_lookup(self, lookup_type, value):
         "Returns field's value prepared for database lookup."
+        if hasattr(value, 'as_sql'):
+            sql, params = value.as_sql()
+            return QueryWrapper(('(%s)' % sql), params)
         if lookup_type in ('exact', 'regex', 'iregex', 'gt', 'gte', 'lt', 'lte', 'month', 'day', 'search'):
             return [value]
         elif lookup_type in ('range', 'in'):
