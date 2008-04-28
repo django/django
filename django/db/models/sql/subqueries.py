@@ -95,7 +95,7 @@ class UpdateQuery(Query):
 
     def _setup_query(self):
         """
-        Runs on initialisation and after cloning. Any attributes that would
+        Runs on initialization and after cloning. Any attributes that would
         normally be set in __init__ should go in here, instead, so that they
         are also set up after a clone() call.
         """
@@ -349,6 +349,7 @@ class DateQuery(Query):
                 self.connection.ops.date_trunc_sql)
         self.select = [select]
         self.select_fields = [None]
+        self.select_related = False # See #7097.
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
 

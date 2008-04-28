@@ -284,6 +284,7 @@ class QuerySet(object):
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
         query.execute_sql(None)
+        transaction.commit_unless_managed()
         self._result_cache = None
     update.alters_data = True
 
