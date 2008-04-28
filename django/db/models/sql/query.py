@@ -394,7 +394,8 @@ class Query(object):
         some cases to avoid ambiguitity with nested queries.
         """
         qn = self.quote_name_unless_alias
-        result = ['(%s) AS %s' % (col, alias) for alias, col in self.extra_select.iteritems()]
+        qn2 = self.connection.ops.quote_name
+        result = ['(%s) AS %s' % (col, qn2(alias)) for alias, col in self.extra_select.iteritems()]
         aliases = set(self.extra_select.keys())
         if with_aliases:
             col_aliases = aliases.copy()
