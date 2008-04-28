@@ -527,7 +527,7 @@ applied to a query, not even the default ordering, call ``order_by()`` with no
 parameters.
 
 **New in Django development version:** The syntax for ordering across related
-models has changed. See the `Django 0.96 documentation`_ for the old behaviour.
+models has changed. See the `Django 0.96 documentation`_ for the old behavior.
 
 .. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
 
@@ -540,9 +540,9 @@ backend normally orders them.
 
 **New in Django development version**
 
-If you want to reverse the order in which a queryset's elements are returned,
-you can use the ``reverse()`` method. Calling ``reverse()`` a second time
-restores the ordering back to the normal direction.
+Use the ``reverse()`` method to reverse the order in which a queryset's
+elements are returned. Calling ``reverse()`` a second time restores the
+ordering back to the normal direction.
 
 To retrieve the ''last'' five items in a queryset, you could do this::
 
@@ -552,7 +552,7 @@ Note that this is not quite the same as slicing from the end of a sequence in
 Python. The above example will return the last item first, then the
 penultimate item and so on. If we had a Python sequence and looked at
 ``seq[:-5]``, we would see the fifth-last item first. Django doesn't support
-that mode of access (slicing from the end), since it is not possible to do it
+that mode of access (slicing from the end), because it's not possible to do it
 efficiently in SQL.
 
 ``distinct()``
@@ -1660,7 +1660,7 @@ entry. The entries select by the second filter may or may not be the same as
 the entries in the first filter. We are filtering the ``Blog`` items with each
 filter statement, not the ``Entry`` items.
 
-All of this behaviour also applies to ``exclude()``: all the conditions in a
+All of this behavior also applies to ``exclude()``: all the conditions in a
 single ``exclude()`` statement apply to a single instance (if those conditions
 are talking about the same multi-valued relation). Conditions in subsequent
 ``filter()`` or ``exclude()`` calls that refer to the same relation may end up
@@ -2101,24 +2101,24 @@ Updating multiple objects at once
 **New in Django development version**
 
 Sometimes you want to set a field to a particular value for all the objects in
-a queryset. You can do this with the ``update()`` method. For example::
+a ``QuerySet``. You can do this with the ``update()`` method. For example::
 
-    # Update all the headlines to the same value.
-    Entry.objects.all().update(headline='Everything is the same')
+    # Update all the headlines with pub_date in 2007.
+    Entry.objects.filter(pub_date__year=2007).update(headline='Everything is the same')
 
 You can only set non-relation fields and ``ForeignKey`` fields using this
-method and the value you set the field to must be a normal Python value (you
-can't set a field to be equal to some other field at the moment).
+method, and the value you set the field to must be a hard-coded Python value
+(i.e., you can't set a field to be equal to some other field at the moment).
 
 To update ``ForeignKey`` fields, set the new value to be the new model
 instance you want to point to. Example::
 
     b = Blog.objects.get(pk=1)
-    # Make all entries belong to this blog.
+    # Change every Entry so that it belongs to this Blog.
     Entry.objects.all().update(blog=b)
 
 The ``update()`` method is applied instantly and doesn't return anything
-(similar to ``delete()``). The only restriction on the queryset that is
+(similar to ``delete()``). The only restriction on the ``QuerySet`` that is
 updated is that it can only access one database table, the model's main
 table. So don't try to filter based on related fields or anything like that;
 it won't work.
