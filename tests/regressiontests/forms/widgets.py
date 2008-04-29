@@ -292,6 +292,21 @@ checkboxes).
 >>> w.value_from_datadict({}, {}, 'testing')
 False
 
+>>> w._has_changed(None, None)
+False
+>>> w._has_changed(None, u'')
+False
+>>> w._has_changed(u'', None)
+False
+>>> w._has_changed(u'', u'')
+False
+>>> w._has_changed(False, u'on')
+True
+>>> w._has_changed(True, u'on')
+False
+>>> w._has_changed(True, u'')
+True
+
 # Select Widget ###############################################################
 
 >>> w = Select()
