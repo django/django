@@ -237,32 +237,6 @@ class Model(object):
                 raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
 
-    def from_sequence(cls, values):
-        """
-        An alternate class constructor, primarily for internal use.
-
-        Creates a model instance from a sequence of values (which corresponds
-        to all the non-many-to-many fields in creation order. If there are more
-        fields than values, the remaining (final) fields are given their
-        default values.
-
-        ForeignKey fields can only be initialised using id values, not
-        instances, in this method.
-        """
-        dispatcher.send(signal=signals.pre_init, sender=cls, args=values,
-                kwargs={})
-        obj = Empty()
-        obj.__class__ = cls
-        field_iter = iter(obj._meta.fields)
-        for val, field in izip(values, field_iter):
-            setattr(obj, field.attname, val)
-        for field in field_iter:
-            setattr(obj, field.attname, field.get_default())
-        dispatcher.send(signal=signals.post_init, sender=cls, instance=obj)
-        return obj
-
-    from_sequence = classmethod(from_sequence)
-
     def __repr__(self):
         return smart_str(u'<%s: %s>' % (self.__class__.__name__, unicode(self)))
 
