@@ -50,9 +50,9 @@ Charles Baudelaire
 
 
 Gah! We forgot Paul Verlaine. Let's create a formset to edit the existing
-authors with an extra form to add him. This time we'll use formset_for_queryset.
-We *could* use formset_for_queryset to restrict the Author objects we edit,
-but in that case we'll use it to display them in alphabetical order by name.
+authors with an extra form to add him. We *could* pass in a queryset to
+restrict the Author objects we edit, but in this case we'll use it to display
+them in alphabetical order by name.
 
 >>> qs = Author.objects.order_by('name')
 >>> AuthorFormSet = _modelformset_factory(Author, extra=1, can_delete=False)
@@ -79,8 +79,9 @@ but in that case we'll use it to display them in alphabetical order by name.
 >>> formset.is_valid()
 True
 
+# Only changed or new objects are returned from formset.save()
 >>> formset.save()
-[<Author: Arthur Rimbaud>, <Author: Charles Baudelaire>, <Author: Paul Verlaine>]
+[<Author: Paul Verlaine>]
 
 >>> for author in Author.objects.order_by('name'):
 ...     print author.name
@@ -124,8 +125,9 @@ deltetion, make sure we don't save that form.
 >>> formset.is_valid()
 True
 
+# No objects were changed or saved so nothing will come back.
 >>> formset.save()
-[<Author: Arthur Rimbaud>, <Author: Charles Baudelaire>, <Author: Paul Verlaine>]
+[]
 
 >>> for author in Author.objects.order_by('name'):
 ...     print author.name
@@ -133,6 +135,28 @@ Arthur Rimbaud
 Charles Baudelaire
 Paul Verlaine
 
+Let's edit a record to ensure save only returns that one record.
+
+>>> data = {
+...     'form-TOTAL_FORMS': '4', # the number of forms rendered
+...     'form-INITIAL_FORMS': '3', # the number of forms with initial data
+...     'form-0-id': '2',
+...     'form-0-name': 'Walt Whitman',
+...     'form-1-id': '1',
+...     'form-1-name': 'Charles Baudelaire',
+...     'form-2-id': '3',
+...     'form-2-name': 'Paul Verlaine',
+...     'form-3-name': '',
+...     'form-3-DELETE': '',
+... }
+
+>>> formset = AuthorFormSet(data=data, queryset=qs)
+>>> formset.is_valid()
+True
+
+# One record has changed.
+>>> formset.save()
+[<Author: Walt Whitman>]
 
 # Inline Formsets ############################################################
 
@@ -199,7 +223,7 @@ book.
 True
 
 >>> formset.save()
-[<Book: Les Fleurs du Mal>, <Book: Le Spleen de Paris>]
+[<Book: Le Spleen de Paris>]
 
 As you can see, 'Le Spleen de Paris' is now a book belonging to Charles Baudelaire.
 

@@ -389,17 +389,26 @@ class ModelAdmin(BaseModelAdmin):
             for formset in formsets:
                 formset.save()
 
-        # Construct the change message. TODO: Temporarily commented-out,
-        # as manipulator object doesn't exist anymore, and we don't yet
-        # have a way to get fields_added, fields_changed, fields_deleted.
+        # Construct the change message.                 
         change_message = []
-        #if manipulator.fields_added:
-            #change_message.append(_('Added %s.') % get_text_list(manipulator.fields_added, _('and')))
-        #if manipulator.fields_changed:
-            #change_message.append(_('Changed %s.') % get_text_list(manipulator.fields_changed, _('and')))
-        #if manipulator.fields_deleted:
-            #change_message.append(_('Deleted %s.') % get_text_list(manipulator.fields_deleted, _('and')))
-        #change_message = ' '.join(change_message)
+        if form.changed_data:
+            change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
+            
+        if formsets:
+            for formset in formsets:
+                for added_object in formset.new_objects:
+                    change_message.append(_('Added %s "%s".') 
+                                          % (added_object._meta.verbose_name, added_object))
+                for changed_object, changed_fields in formset.changed_objects:
+                    change_message.append(_('Changed %s for %s "%s".') 
+                                          % (get_text_list(changed_fields, _('and')), 
+                                             changed_object._meta.verbose_name, 
+                                             changed_object))
+                for deleted_object in formset.deleted_objects:
+                    change_message.append(_('Deleted %s "%s".') 
+                                          % (deleted_object._meta.verbose_name, deleted_object))
+            
+        change_message = ' '.join(change_message)
         if not change_message:
             change_message = _('No fields changed.')
         LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, force_unicode(new_object), CHANGE, change_message)

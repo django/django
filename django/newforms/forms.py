@@ -81,6 +81,7 @@ class BaseForm(StrAndUnicode):
         self.label_suffix = label_suffix
         self.empty_permitted = empty_permitted
         self._errors = None # Stores the errors after clean() has been called.
+        self._changed_data = None
 
         # The base_fields class attribute is the *class-wide* definition of
         # fields. Because a particular *instance* of the class might want to
@@ -243,19 +244,25 @@ class BaseForm(StrAndUnicode):
         """
         Returns True if data differs from initial.
         """
-        # XXX: For now we're asking the individual widgets whether or not the
-        # data has changed. It would probably be more efficient to hash the
-        # initial data, store it in a hidden field, and compare a hash of the
-        # submitted data, but we'd need a way to easily get the string value
-        # for a given field. Right now, that logic is embedded in the render
-        # method of each widget.
-        for name, field in self.fields.items():
-            prefixed_name = self.add_prefix(name)
-            data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
-            initial_value = self.initial.get(name, field.initial)
-            if field.widget._has_changed(initial_value, data_value):
-                return True
-        return False
+        return bool(self.changed_data)
+    
+    def _get_changed_data(self):
+        if self._changed_data is None:
+            self._changed_data = []
+            # XXX: For now we're asking the individual widgets whether or not the
+            # data has changed. It would probably be more efficient to hash the
+            # initial data, store it in a hidden field, and compare a hash of the
+            # submitted data, but we'd need a way to easily get the string value
+            # for a given field. Right now, that logic is embedded in the render
+            # method of each widget.
+            for name, field in self.fields.items():
+                prefixed_name = self.add_prefix(name)
+                data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
+                initial_value = self.initial.get(name, field.initial)
+                if field.widget._has_changed(initial_value, data_value):
+                    self._changed_data.append(name)
+        return self._changed_data
+    changed_data = property(_get_changed_data)
 
     def _get_media(self):
         """

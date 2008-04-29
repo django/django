@@ -328,8 +328,11 @@ class BaseModelFormSet(BaseFormSet):
         return self.save_existing_objects(commit) + self.save_new_objects(commit)
 
     def save_existing_objects(self, commit=True):
+        self.changed_objects = []
+        self.deleted_objects = []
         if not self.get_queryset():
             return []
+
         # Put the objects from self.get_queryset into a dict so they are easy to lookup by pk
         existing_objects = {}
         for obj in self.get_queryset():
@@ -338,23 +341,25 @@ class BaseModelFormSet(BaseFormSet):
         for form in self.initial_forms:
             obj = existing_objects[form.cleaned_data[self.model._meta.pk.attname]]
             if self.can_delete and form.cleaned_data[DELETION_FIELD_NAME]:
+                self.deleted_objects.append(obj)
                 obj.delete()
             else:
-                saved_instances.append(self.save_existing(form, obj, commit=commit))
+                if form.changed_data:
+                    self.changed_objects.append((obj, form.changed_data))
+                    saved_instances.append(self.save_existing(form, obj, commit=commit))
         return saved_instances
 
     def save_new_objects(self, commit=True):
-        new_objects = []
+        self.new_objects = []
         for form in self.extra_forms:
             if not form.has_changed():
                 continue
             # If someone has marked an add form for deletion, don't save the
-            # object. At some point it would be nice if we didn't display
-            # the deletion widget for add forms.
+            # object.
             if self.can_delete and form.cleaned_data[DELETION_FIELD_NAME]:
                 continue
-            new_objects.append(self.save_new(form, commit=commit))
-        return new_objects
+            self.new_objects.append(self.save_new(form, commit=commit))
+        return self.new_objects
 
     def add_fields(self, form, index):
         """Add a hidden field for the object's primary key."""
