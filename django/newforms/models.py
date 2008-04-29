@@ -435,7 +435,8 @@ def _get_foreign_key(parent_model, model, fk_name=None):
 
 
 # XXX: This API *will* change. Use at your own risk.
-def _inlineformset_factory(parent_model, model, form=ModelForm, fk_name=None,
+def _inlineformset_factory(parent_model, model, form=ModelForm,
+                           formset=BaseInlineFormset, fk_name=None,
                            fields=None, exclude=None,
                            extra=3, can_order=False, can_delete=True,
                            formfield_callback=lambda f: f.formfield()):
@@ -454,7 +455,7 @@ def _inlineformset_factory(parent_model, model, form=ModelForm, fk_name=None,
         exclude = [fk.name]
     FormSet = _modelformset_factory(model, form=form,
                                     formfield_callback=formfield_callback,
-                                    formset=BaseInlineFormset,
+                                    formset=formset,
                                     extra=extra, can_delete=can_delete, can_order=can_order,
                                     fields=fields, exclude=exclude)
     FormSet.fk = fk
