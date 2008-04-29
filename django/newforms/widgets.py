@@ -571,6 +571,8 @@ class MultiWidget(Widget):
     def _has_changed(self, initial, data):
         if initial is None:
             initial = [u'' for x in range(0, len(data))]
+        else:
+            initial = self.decompress(initial)
         for widget, initial, data in zip(self.widgets, initial, data):
             if not widget._has_changed(initial, data):
                 return False

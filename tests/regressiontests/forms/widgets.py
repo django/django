@@ -895,6 +895,12 @@ u'<input id="foo_0" type="text" class="big" value="john" name="name_0" /><br /><
 >>> w.render('name', ['john', 'lennon'])
 u'<input id="bar_0" type="text" class="big" value="john" name="name_0" /><br /><input id="bar_1" type="text" class="small" value="lennon" name="name_1" />'
 
+>>> w = MyMultiWidget(widgets=(TextInput(), TextInput()))
+>>> w._has_changed(None, ['john', 'lennon'])
+True
+>>> w._has_changed('john__lennon', ['john', 'lennon'])
+False
+
 # SplitDateTimeWidget #########################################################
 
 >>> w = SplitDateTimeWidget()
