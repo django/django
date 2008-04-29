@@ -262,6 +262,11 @@ class FileInput(Input):
     def value_from_datadict(self, data, files, name):
         "File widgets take data from FILES, not POST"
         return files.get(name, None)
+    
+    def _has_changed(self, initial, data):
+        if data is None:
+            return False
+        return True
 
 class Textarea(Widget):
     def __init__(self, attrs=None):

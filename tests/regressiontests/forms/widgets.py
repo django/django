@@ -202,6 +202,30 @@ u'<input type="file" class="fun" name="email" />'
 >>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
 u'<input type="file" class="fun" name="email" />'
 
+Test for the behavior of _has_changed for FileInput. The value of data will
+more than likely come from request.FILES. The value of initial data will
+likely be a filename stored in the database. Since its value is of no use to
+a FileInput it is ignored.
+
+>>> w = FileInput()
+
+# No file was uploaded and no initial data.
+>>> w._has_changed(u'', None)
+False
+
+# A file was uploaded and no initial data.
+>>> w._has_changed(u'', {'filename': 'resume.txt', 'content': 'My resume'})
+True
+
+# A file was not uploaded, but there is initial data
+>>> w._has_changed(u'resume.txt', None)
+False
+
+# A file was uploaded and there is initial data (file identity is not dealt
+# with here)
+>>> w._has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'})
+True
+
 # Textarea Widget #############################################################
 
 >>> w = Textarea()
