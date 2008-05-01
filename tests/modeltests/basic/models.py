@@ -398,4 +398,16 @@ u'\u6797\u539f \u3081\u3050\u307f'
 >>> s = set([a10, a11, a12])
 >>> Article.objects.get(headline='Article 11') in s
 True
+
+# The 'select' argument to extra() supports names with dashes in them, as long
+# as you use values().
+>>> Article.objects.filter(pub_date__year=2008).extra(select={'dashed-value': '1'}).values('headline', 'dashed-value')
+[{'headline': u'Article 11', 'dashed-value': 1}, {'headline': u'Article 12', 'dashed-value': 1}]
+
+# If you use 'select' with extra() and names containing dashes on a query
+# that's *not* a values() query, those extra 'select' values will silently be
+# ignored.
+>>> articles = Article.objects.filter(pub_date__year=2008).extra(select={'dashed-value': '1', 'undashedvalue': '2'})
+>>> articles[0].undashedvalue
+2
 """

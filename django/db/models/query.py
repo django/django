@@ -28,6 +28,17 @@ class QuerySet(object):
     # PYTHON MAGIC METHODS #
     ########################
 
+    def __getstate__(self):
+        """
+        Allows the Queryset to be pickled.
+        """
+        # Force the cache to be fully populated.
+        len(self)
+
+        obj_dict = self.__dict__.copy()
+        obj_dict['_iter'] = None
+        return obj_dict
+
     def __repr__(self):
         return repr(list(self))
 
@@ -37,7 +48,7 @@ class QuerySet(object):
         # whilst not messing up any existing iterators against the queryset.
         if self._result_cache is None:
             if self._iter:
-                self._result_cache = list(self._iter())
+                self._result_cache = list(self._iter)
             else:
                 self._result_cache = list(self.iterator())
         elif self._iter:
@@ -153,7 +164,7 @@ class QuerySet(object):
                 obj, _ = get_cached_row(self.model, row, index_start,
                         max_depth, requested=requested)
             else:
-                obj = self.model.from_sequence(row[index_start:])
+                obj = self.model(*row[index_start:])
             for i, k in enumerate(extra_select):
                 setattr(obj, k, row[i])
             yield obj
@@ -644,7 +655,7 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
 
     restricted = requested is not None
     index_end = index_start + len(klass._meta.fields)
-    obj = klass.from_sequence(row[index_start:index_end])
+    obj = klass(*row[index_start:index_end])
     for f in klass._meta.fields:
         if (not f.rel or (not restricted and f.null) or
                 (restricted and f.name not in requested) or f.rel.parent_link):

@@ -99,6 +99,24 @@ class Query(object):
         memo[id(self)] = result
         return result
 
+    def __getstate__(self):
+        """
+        Pickling support.
+        """
+        obj_dict = self.__dict__.copy()
+        del obj_dict['connection']
+        return obj_dict
+
+    def __setstate__(self, obj_dict):
+        """
+        Unpickling support.
+        """
+        self.__dict__.update(obj_dict)
+        # XXX: Need a better solution for this when multi-db stuff is
+        # supported. It's the only class-reference to the module-level
+        # connection variable.
+        self.connection = connection
+
     def get_meta(self):
         """
         Returns the Options instance (the model._meta) from which to start
@@ -376,7 +394,8 @@ class Query(object):
         some cases to avoid ambiguitity with nested queries.
         """
         qn = self.quote_name_unless_alias
-        result = ['(%s) AS %s' % (col, alias) for alias, col in self.extra_select.iteritems()]
+        qn2 = self.connection.ops.quote_name
+        result = ['(%s) AS %s' % (col, qn2(alias)) for alias, col in self.extra_select.iteritems()]
         aliases = set(self.extra_select.keys())
         if with_aliases:
             col_aliases = aliases.copy()
