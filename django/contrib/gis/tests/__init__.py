@@ -11,7 +11,7 @@ from django.conf import settings
 if not settings._target: settings.configure()
 
 # Tests that require use of a spatial database (e.g., creation of models)
-test_models = ['geoapp']
+test_models = ['geoapp', 'relatedapp']
 
 # Tests that do not require setting up and tearing down a spatial database.
 test_suite_names = [
