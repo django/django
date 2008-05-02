@@ -436,9 +436,12 @@ def custom_sql_for_model(model, style):
     output = []
 
     # Post-creation SQL should come before any initial SQL data is loaded.
-    for f in opts.fields:
-        if hasattr(f, '_post_create_sql'):
-            output.extend(f._post_create_sql(style, model._meta.db_table))
+    # However, this should not be done for fields that are part of a 
+    # a parent model (via model inheritance).
+    nm = opts.init_name_map()
+    post_sql_fields = [f for f in opts.fields if nm[f.name][1] is None and hasattr(f, '_post_create_sql')]
+    for f in post_sql_fields:
+        output.extend(f._post_create_sql(style, model._meta.db_table))
 
     # Some backends can't execute more than one SQL statement at a time,
     # so split into separate statements.
