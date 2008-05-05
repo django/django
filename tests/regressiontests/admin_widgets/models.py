@@ -66,6 +66,18 @@ Currently: <a target="_blank" href="%(MEDIA_URL)stest">test</a> <br />Change: <i
 >>> w = ManyToManyRawIdWidget(rel)
 >>> print conditional_escape(w.render('test', [m1.pk, m2.pk], attrs={}))
 <input type="text" name="test" value="1,2" class="vManyToManyRawIdAdminField" /><a href="../../../admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>
+>>> w._has_changed(None, None)
+False
+>>> w._has_changed([], None)
+False
+>>> w._has_changed(None, [u'1'])
+True
+>>> w._has_changed([1, 2], [u'1', u'2'])
+False
+>>> w._has_changed([1, 2], [u'1'])
+True
+>>> w._has_changed([1, 2], [u'1', u'3'])
+True
 
 """ % {
     'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX,

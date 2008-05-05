@@ -7,6 +7,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.text import capfirst, truncate_words
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
+from django.utils.encoding import force_unicode
 from django.conf import settings
 
 class FilteredSelectMultiple(forms.SelectMultiple):
@@ -135,6 +136,18 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         if value:
             return [value]
         return None
+    
+    def _has_changed(self, initial, data):
+        if initial is None:
+            initial = []
+        if data is None:
+            data = []
+        if len(initial) != len(data):
+            return True
+        for pk1, pk2 in zip(initial, data):
+            if force_unicode(pk1) != force_unicode(pk2):
+                return True
+        return False
 
 class RelatedFieldWidgetWrapper(object):
     """
