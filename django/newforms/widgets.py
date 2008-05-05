@@ -591,9 +591,9 @@ class MultiWidget(Widget):
         else:
             initial = self.decompress(initial)
         for widget, initial, data in zip(self.widgets, initial, data):
-            if not widget._has_changed(initial, data):
-                return False
-        return True
+            if widget._has_changed(initial, data):
+                return True
+        return False
 
     def format_output(self, rendered_widgets):
         """

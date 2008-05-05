@@ -963,10 +963,19 @@ u'<input id="foo_0" type="text" class="big" value="john" name="name_0" /><br /><
 u'<input id="bar_0" type="text" class="big" value="john" name="name_0" /><br /><input id="bar_1" type="text" class="small" value="lennon" name="name_1" />'
 
 >>> w = MyMultiWidget(widgets=(TextInput(), TextInput()))
->>> w._has_changed(None, ['john', 'lennon'])
+# test with no initial data
+>>> w._has_changed(None, [u'john', u'lennon'])
 True
->>> w._has_changed('john__lennon', ['john', 'lennon'])
+# test when the data is the same as initial
+>>> w._has_changed(u'john__lennon', [u'john', u'lennon'])
 False
+# test when the first widget's data has changed
+>>> w._has_changed(u'john__lennon', [u'alfred', u'lennon'])
+True
+# test when the last widget's data has changed. this ensures that it is not
+# short circuiting while testing the widgets.
+>>> w._has_changed(u'john__lennon', [u'john', u'denver'])
+True
 
 # SplitDateTimeWidget #########################################################
 
