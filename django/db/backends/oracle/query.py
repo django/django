@@ -1,6 +1,6 @@
 """
-Custom Query class for this backend (a derivative of
-django.db.models.sql.query.Query).
+Custom Query class for Oracle.
+Derives from: django.db.models.sql.query.Query
 """
 
 import datetime
@@ -12,8 +12,8 @@ _classes = {}
 
 def query_class(QueryClass, Database):
     """
-    Returns a custom djang.db.models.sql.query.Query subclass that is
-    appropraite for Oracle.
+    Returns a custom django.db.models.sql.query.Query subclass that is
+    appropriate for Oracle.
 
     The 'Database' module (cx_Oracle) is passed in here so that all the setup
     required to import it only needs to be done by the calling module.
