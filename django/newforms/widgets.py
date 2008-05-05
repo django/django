@@ -401,6 +401,18 @@ class SelectMultiple(Widget):
         if isinstance(data, MultiValueDict):
             return data.getlist(name)
         return data.get(name, None)
+    
+    def _has_changed(self, initial, data):
+        if initial is None:
+            initial = []
+        if data is None:
+            data = []
+        if len(initial) != len(data):
+            return True
+        for value1, value2 in zip(initial, data):
+            if force_unicode(value1) != force_unicode(value2):
+                return True
+        return False
 
 class RadioInput(StrAndUnicode):
     """

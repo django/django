@@ -612,6 +612,20 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 >>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<select multiple="multiple" name="nums">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>'
 
+# Test the usage of _has_changed
+>>> w._has_changed(None, None)
+False
+>>> w._has_changed([], None)
+False
+>>> w._has_changed(None, [u'1'])
+True
+>>> w._has_changed([1, 2], [u'1', u'2'])
+False
+>>> w._has_changed([1, 2], [u'1'])
+True
+>>> w._has_changed([1, 2], [u'1', u'3'])
+True
+
 # RadioSelect Widget ##########################################################
 
 >>> w = RadioSelect()
@@ -909,6 +923,20 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <li><label><input type="checkbox" name="escape" value="bad" /> you &amp; me</label></li>
 <li><label><input type="checkbox" name="escape" value="good" /> you &gt; me</label></li>
 </ul>
+
+# Test the usage of _has_changed
+>>> w._has_changed(None, None)
+False
+>>> w._has_changed([], None)
+False
+>>> w._has_changed(None, [u'1'])
+True
+>>> w._has_changed([1, 2], [u'1', u'2'])
+False
+>>> w._has_changed([1, 2], [u'1'])
+True
+>>> w._has_changed([1, 2], [u'1', u'3'])
+True
 
 # Unicode choices are correctly rendered as HTML
 >>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
