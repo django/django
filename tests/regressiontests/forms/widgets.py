@@ -999,6 +999,11 @@ included on both widgets.
 >>> w.render('date', datetime.datetime(2006, 1, 10, 7, 30))
 u'<input type="text" class="pretty" value="2006-01-10" name="date_0" /><input type="text" class="pretty" value="07:30:00" name="date_1" />'
 
+>>> w._has_changed(datetime.datetime(2008, 5, 5, 12, 40, 00), [u'2008-05-05', u'12:40:00'])
+False
+>>> w._has_changed(datetime.datetime(2008, 5, 5, 12, 40, 00), [u'2008-05-05', u'12:41:00'])
+True
+
 # DateTimeInput ###############################################################
 
 >>> w = DateTimeInput()
