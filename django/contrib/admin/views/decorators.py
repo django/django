@@ -29,7 +29,7 @@ def _display_login_form(request, error_message=''):
         post_data = _encode_post_data({})
     return render_to_response('admin/login.html', {
         'title': _('Log in'),
-        'app_path': mark_safe(request.path),
+        'app_path': request.path,
         'post_data': post_data,
         'error_message': error_message
     }, context_instance=template.RequestContext(request))
