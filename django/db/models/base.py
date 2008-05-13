@@ -339,6 +339,8 @@ class Model(object):
             dispatcher.send(signal=signals.post_save, sender=self.__class__,
                     instance=self, created=(not record_exists), raw=raw)
 
+    save_base.alters_data = True
+
     def validate(self):
         """
         First coerces all fields on this instance to their proper Python types.
