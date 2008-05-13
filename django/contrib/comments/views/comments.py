@@ -7,6 +7,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.comments.models import Comment, FreeComment, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth import authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
 from django.utils.text import normalize_newlines
