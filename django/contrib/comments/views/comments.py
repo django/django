@@ -1,3 +1,6 @@
+import base64
+import datetime
+
 from django.core import validators
 from django import oldforms
 from django.core.mail import mail_admins, mail_managers
@@ -8,15 +11,18 @@ from django.template import RequestContext
 from django.contrib.comments.models import Comment, FreeComment, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import authenticate
-from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
 from django.utils.text import normalize_newlines
 from django.conf import settings
 from django.utils.translation import ungettext, ugettext as _
 from django.utils.encoding import smart_unicode
-import base64, datetime
 
 COMMENTS_PER_PAGE = 20
+
+# TODO: This is a copy of the manipulator-based form that used to live in
+# contrib.auth.forms.  It should be replaced with the newforms version that
+# has now been added to contrib.auth.forms when the comments app gets updated
+# for newforms.
 
 class AuthenticationForm(oldforms.Manipulator):
     """
