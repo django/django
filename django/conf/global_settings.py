@@ -237,7 +237,7 @@ TRANSACTIONS_MANAGED = False
 
 # The User-Agent string to use when checking for URL validity through the
 # isExistingURL validator.
-URL_VALIDATOR_USER_AGENT = "Django/0.96.1 (http://www.djangoproject.com)"
+URL_VALIDATOR_USER_AGENT = "Django/0.96.2 (http://www.djangoproject.com)"
 
 ##############
 # MIDDLEWARE #
