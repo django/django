@@ -2,6 +2,7 @@ from django.core.extensions import DjangoContext, render_to_response
 from django.conf.settings import SECRET_KEY
 from django.models.auth import users
 from django.utils import httpwrappers
+from django.utils.html import escape
 from django.utils.translation import gettext_lazy
 import base64, datetime, md5
 import cPickle as pickle
@@ -21,7 +22,7 @@ def _display_login_form(request, error_message=''):
         post_data = _encode_post_data({})
     return render_to_response('admin/login', {
         'title': _('Log in'),
-        'app_path': request.path,
+        'app_path': escape(request.path),
         'post_data': post_data,
         'error_message': error_message
     }, context_instance=DjangoContext(request))
