@@ -51,12 +51,12 @@ class WhereNode(tree.Node):
                     format = '(%s)'
                 elif isinstance(child, tree.Node):
                     sql, params = self.as_sql(child, qn)
-                    if len(child.children) == 1:
+                    if child.negated:
+                        format = 'NOT (%s)'
+                    elif len(child.children) == 1:
                         format = '%s'
                     else:
                         format = '(%s)'
-                    if child.negated:
-                        format = 'NOT %s' % format
                 else:
                     sql, params = self.make_atom(child, qn)
                     format = '%s'

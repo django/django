@@ -402,6 +402,27 @@ hard-coded strings. If you use this technique, follow these guidelines:
       content, you can't use the ``HttpResponse`` instance as a file-like
       object. Doing so will raise ``Exception``.
 
+Setting headers
+~~~~~~~~~~~~~~~
+
+To set a header in your response, just treat it like a dictionary::
+
+    >>> response = HttpResponse()
+    >>> response['Pragma'] = 'no-cache'
+
+Telling the browser to treat the response as a file attachment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To tell the browser to treat the response as a file attachment, use the
+``mimetype`` argument and set the ``Content-Disposition`` header. For example,
+this is how you might return a Microsoft Excel spreadsheet::
+
+    >>> response = HttpResponse(my_data, mimetype='application/vnd.ms-excel')
+    >>> response['Content-Disposition'] = 'attachment; filename=foo.xls'
+
+There's nothing Django-specific about the ``Content-Disposition`` header, but
+it's easy to forget the syntax, so we've included it here.
+
 Methods
 -------
 
@@ -420,7 +441,7 @@ Methods
     but since this is actually the value included in the HTTP ``Content-Type``
     header, it can also include the character set encoding, which makes it
     more than just a MIME type specification. If ``mimetype`` is specified
-    (not None), that value is used. Otherwise, ``content_type`` is used. If
+    (not ``None``), that value is used. Otherwise, ``content_type`` is used. If
     neither is given, the ``DEFAULT_CONTENT_TYPE`` setting is used.
 
 ``__setitem__(header, value)``
