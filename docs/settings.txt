@@ -391,6 +391,16 @@ are inappropriate for public consumption. File paths, configuration options, and
 the like all give attackers extra information about your server. Never deploy a
 site with ``DEBUG`` turned on.
 
+DEBUG_PROPAGATE_EXCEPTIONS
+--------------------
+
+Default: ``False``
+
+If set to True, Django's normal exception handling of view functions
+will be suppressed, and exceptions will propagate upwards.  This can
+be useful for some test setups, and should never be used on a live
+site.
+
 DEFAULT_CHARSET
 ---------------
 
