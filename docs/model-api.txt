@@ -1372,9 +1372,10 @@ link. Fieldsets with the ``wide`` style will be given extra horizontal space.
 ``description``
 ~~~~~~~~~~~~~~~
 
-A string of optional extra text to be displayed at the top of each fieldset,
-under the heading of the fieldset. It's used verbatim, so you can use any HTML
-and you must escape any special HTML characters (such as ampersands) yourself.
+A string of optional extra text to be displayed at the top of each
+fieldset, under the heading of the fieldset. If you want this to
+include HTML, use ``django.utils.safestring.mark_safe`` so the HTML
+will not be escaped.
 
 ``js``
 ------
