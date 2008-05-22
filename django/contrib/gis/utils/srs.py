@@ -1,3 +1,5 @@
+from django.contrib.gis.gdal import SpatialReference
+
 def add_postgis_srs(srs):
     """
     This function takes a GDAL SpatialReference system and adds its
@@ -13,6 +15,9 @@ def add_postgis_srs(srs):
     probably be changed.
     """
     from django.contrib.gis.models import SpatialRefSys
+
+    if not isinstance(srs, SpatialReference):
+        srs = SpatialReference(srs)
 
     if srs.srid is None:
         raise Exception('Spatial reference requires an SRID to be compatible with PostGIS.')

@@ -21,3 +21,5 @@ except:
     HAS_GEOIP = False
 
 from django.contrib.gis.utils.srs import add_postgis_srs
+from django.contrib.gis.utils.wkt import precision_wkt
+
