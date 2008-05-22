@@ -115,7 +115,10 @@ class BaseHandler(object):
             # Get the exception info now, in case another exception is thrown later.
             exc_info = sys.exc_info()
             receivers = dispatcher.send(signal=signals.got_request_exception, request=request)
-            if settings.DEBUG:
+
+            if settings.DEBUG_PROPAGATE_EXCEPTIONS:
+                raise
+            elif settings.DEBUG:
                 from django.views import debug
                 return debug.technical_500_response(request, *exc_info)
             else:

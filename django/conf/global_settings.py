@@ -11,6 +11,10 @@ gettext_noop = lambda s: s
 
 DEBUG = False
 TEMPLATE_DEBUG = False
+# True if BaseHandler.get_response() should propagate raw exceptions
+# rather than catching them.  This is useful under some testing siutations,
+# and should never be used on a live site.
+DEBUG_PROPAGATE_EXCEPTIONS = False
 
 # Whether to use the "Etag" header. This saves bandwidth but slows down performance.
 USE_ETAGS = False
