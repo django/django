@@ -112,7 +112,7 @@ Django "ships" with a few included serializers:
                 strings, etc.).  Not really all that useful on its own, but
                 used as a base for other serializers.
 
-    ``yaml``    Serializes to YAML (Yet Another Markup Lanuage). This
+    ``yaml``    Serializes to YAML (YAML Ain't a Markup Language). This
                 serializer is only available if PyYAML_ is installed.
     ==========  ==============================================================
 
