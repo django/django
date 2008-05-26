@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-02-15 00:00+0200\n"
+"POT-Creation-Date: 2008-05-26 10:31+0200\n"
 "PO-Revision-Date: 2008-05-14 11:15+0200\n"
 "Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
 "Language-Team: Catalan <ca@li.org>\n"
@@ -14,191 +14,191 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:43
 msgid "Arabic"
 msgstr "Arabic"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:44
 msgid "Bengali"
 msgstr "Bengalí"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:45
 msgid "Bulgarian"
 msgstr "Búlgar"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:46
 msgid "Catalan"
 msgstr "Català"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:47
 msgid "Czech"
 msgstr "Txec"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:48
 msgid "Welsh"
 msgstr "Galès"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:49
 msgid "Danish"
 msgstr "Danès"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:50
 msgid "German"
 msgstr "Alemany"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:51
 msgid "Greek"
 msgstr "Grec"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:52
 msgid "English"
 msgstr "Anglès"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:53
 msgid "Spanish"
 msgstr "Espanyol"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:54
 msgid "Argentinean Spanish"
 msgstr "Castellà Argentí"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:55
 msgid "Basque"
 msgstr "Euskera"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:56
 msgid "Persian"
 msgstr "Persa"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:57
 msgid "Finnish"
 msgstr "Finlandès"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:58
 msgid "French"
 msgstr "Francès"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:59
 msgid "Irish"
 msgstr "Irlandès"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:60
 msgid "Galician"
 msgstr "Gallec"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:61
 msgid "Hungarian"
 msgstr "Húngar"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:62
 msgid "Hebrew"
 msgstr "Hebreu"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:63
 msgid "Croatian"
 msgstr "Croat"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:64
 msgid "Icelandic"
 msgstr "Islandès"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:65
 msgid "Italian"
 msgstr "Italià"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:66
 msgid "Japanese"
 msgstr "Japonès"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:67
 msgid "Georgian"
 msgstr "Georgià"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:68
 msgid "Korean"
 msgstr "Coreà"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:69
 msgid "Khmer"
 msgstr "Khmer"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:70
 msgid "Kannada"
 msgstr "Canès"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:71
 msgid "Latvian"
 msgstr "Letó"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:72
 msgid "Macedonian"
 msgstr "Macedoni"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:73
 msgid "Dutch"
 msgstr "Holandès"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:74
 msgid "Norwegian"
 msgstr "Norueg"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:75
 msgid "Polish"
 msgstr "Polac"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:76
 msgid "Portugese"
 msgstr "Portuguès"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:77
 msgid "Brazilian Portuguese"
 msgstr "Portuguès de Brasil"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:78
 msgid "Romanian"
 msgstr "Rumanès"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:79
 msgid "Russian"
 msgstr "Rús"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:80
 msgid "Slovak"
 msgstr "Eslovac"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:81
 msgid "Slovenian"
 msgstr "Esloveni"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:82
 msgid "Serbian"
 msgstr "Serbi"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:83
 msgid "Swedish"
 msgstr "Suec"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:84
 msgid "Tamil"
 msgstr "Tàmil"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:85
 msgid "Telugu"
 msgstr "Telugu"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:86
 msgid "Turkish"
 msgstr "Turc"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:87
 msgid "Ukrainian"
 msgstr "Ucranià"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:88
 msgid "Simplified Chinese"
 msgstr "Xinès simplificat"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:89
 msgid "Traditional Chinese"
 msgstr "Xinès tradicional"
 
@@ -829,16 +829,16 @@ msgstr ""
 "'cookies' (galetes). Si us plau, habiliteu les 'cookies', recarregueu "
 "aquesta pàgina i proveu-ho de nou. "
 
-#: contrib/admin/views/decorators.py:90
-msgid "Usernames cannot contain the '@' character."
-msgstr "Els noms d'usuari no poden contenir el caracter '@'."
-
-#: contrib/admin/views/decorators.py:92
+#: contrib/admin/views/decorators.py:89
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
 "La vostra adreça de correu no és el vostre nom d'usuari. Provi '%s' en tot "
 "cas."
+
+#: contrib/admin/views/decorators.py:93
+msgid "Usernames cannot contain the '@' character."
+msgstr "Els noms d'usuari no poden contenir el caracter '@'."
 
 #: contrib/admin/views/doc.py:48 contrib/admin/views/doc.py:50
 #: contrib/admin/views/doc.py:52
@@ -4038,8 +4038,7 @@ msgstr "Aquesta URL sembla ser un enllaç trencat."
 #: newforms/fields.py:560 newforms/models.py:299
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
-"Escolli una opció vàlida; Aquesta opció no és una de les opcions "
-"disponibles."
+"Escolli una opció vàlida; Aquesta opció no és una de les opcions disponibles."
 
 #: newforms/fields.py:599
 #, python-format
