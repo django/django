@@ -1021,7 +1021,7 @@ msgstr "No ha cambiado ningún campo."
 #: contrib/admin/views/main.py:354
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "Se modificó con éxito el %(name)s \"%(obj)s."
+msgstr "Se modificó con éxito el %(name)s \"%(obj)s\"."
 
 #: contrib/admin/views/main.py:362
 #, python-format
