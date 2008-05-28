@@ -66,6 +66,17 @@ resort.
 
 For more on middleware, read the `middleware docs`_.
 
+.. admonition:: Ensure that your 404 template works
+    
+    Note that the ``FlatpageFallbackMiddleware`` only steps in once
+    another view has successfully produced a 404 response. If another
+    view or middleware class attempts to produce a 404 but ends up
+    raising an exception instead (such as a ``TemplateDoesNotExist``
+    exception if your site does not have an appropriate template to
+    use for HTTP 404 responses), the response will become an HTTP 500
+    ("Internal Server Error") and the ``FlatpageFallbackMiddleware``
+    will not attempt to serve a flat page.
+
 .. _SITE_ID: ../settings/#site-id
 .. _RequestContext: ../templates_python/#subclassing-context-djangocontext
 .. _middleware docs: ../middleware/
