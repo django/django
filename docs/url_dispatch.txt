@@ -157,10 +157,10 @@ The URLconf searches against the requested URL, as a normal Python string. This
 does not include GET or POST parameters, or the domain name.
 
 For example, in a request to ``http://www.example.com/myapp/``, the URLconf
-will look for ``/myapp/``.
+will look for ``myapp/``.
 
 In a request to ``http://www.example.com/myapp/?page=3``, the URLconf will look
-for ``/myapp/``.
+for ``myapp/``.
 
 The URLconf doesn't look at the request method. In other words, all request
 methods -- ``POST``, ``GET``, ``HEAD``, etc. -- will be routed to the same
