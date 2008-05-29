@@ -165,7 +165,7 @@ class SingleRelatedObjectDescriptor(object):
     # SingleRelatedObjectDescriptor instance.
     def __init__(self, related):
         self.related = related
-        self.cache_name = '_%s_cache' % related.field.name
+        self.cache_name = '_%s_cache' % related.get_accessor_name()
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
