@@ -101,7 +101,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         # API to determine the ID dynamically.
         output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
             (related_url, url, name))
-        output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>' % settings.ADMIN_MEDIA_PREFIX)
+        output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % settings.ADMIN_MEDIA_PREFIX)
         if value:
             output.append(self.label_for_value(value))
         return mark_safe(u''.join(output))
