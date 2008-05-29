@@ -46,7 +46,7 @@ def find_template_source(name, dirs=None):
     # circular import errors. See Django ticket #1292.
     global template_source_loaders
     if template_source_loaders is None:
-        template_source_loaders = []
+        loaders = []
         for path in settings.TEMPLATE_LOADERS:
             i = path.rfind('.')
             module, attr = path[:i], path[i+1:]
@@ -62,7 +62,8 @@ def find_template_source(name, dirs=None):
                 import warnings
                 warnings.warn("Your TEMPLATE_LOADERS setting includes %r, but your Python installation doesn't support that type of template loading. Consider removing that line from TEMPLATE_LOADERS." % path)
             else:
-                template_source_loaders.append(func)
+                loaders.append(func)
+        template_source_loaders = tuple(loaders)
     for loader in template_source_loaders:
         try:
             source, display_name = loader(name, dirs)
