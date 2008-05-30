@@ -59,7 +59,11 @@ class EggLoader(unittest.TestCase):
             'templates/y.html' : StringIO.StringIO("y"),
             'templates/x.txt' : StringIO.StringIO("x"),
         })
+        self._old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = []
+        
+    def tearDown(self):
+        settings.INSTALLED_APPS = self._old_installed_apps
 
     def test_empty(self):
         "Loading any template on an empty egg should fail"
