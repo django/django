@@ -7,13 +7,13 @@ try:
 except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
-def table_list():
+def table_names():
     "Returns a list of all table names that exist in the database."
     from django.db import connection, get_introspection_module
     cursor = connection.cursor()
-    return get_introspection_module().get_table_list(cursor)
+    return set(get_introspection_module().get_table_list(cursor))
 
-def django_table_list(only_existing=False):
+def django_table_names(only_existing=False):
     """
     Returns a list of all table names that have associated Django models and
     are in INSTALLED_APPS.
@@ -22,14 +22,13 @@ def django_table_list(only_existing=False):
     that actually exist in the database.
     """
     from django.db import models
-    tables = []
+    tables = set()
     for app in models.get_apps():
         for model in models.get_models(app):
-            tables.append(model._meta.db_table)
-            tables.extend([f.m2m_db_table() for f in model._meta.local_many_to_many])
+            tables.add(model._meta.db_table)
+            tables.update([f.m2m_db_table() for f in model._meta.local_many_to_many])
     if only_existing:
-        existing = table_list()
-        tables = [t for t in tables if t in existing]
+        tables = [t for t in tables if t in table_names()]
     return tables
 
 def installed_models(table_list):
@@ -82,7 +81,7 @@ def sql_create(app, style):
     # we can be conservative).
     app_models = models.get_models(app)
     final_output = []
-    known_models = set([model for model in installed_models(table_list()) if model not in app_models])
+    known_models = set([model for model in installed_models(table_names()) if model not in app_models])
     pending_references = {}
 
     for model in app_models:
@@ -214,9 +213,9 @@ def sql_flush(style, only_django=False):
     """
     from django.db import connection
     if only_django:
-        tables = django_table_list()
+        tables = django_table_names()
     else:
-        tables = table_list()
+        tables = table_names()
     statements = connection.ops.sql_flush(style, tables, sequence_list())
     return statements
 
