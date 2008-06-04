@@ -15,6 +15,13 @@ class Restaurant(models.Model):
     def __unicode__(self):
         return u"%s the restaurant" % self.place.name
 
+class Bar(models.Model):
+    place = models.OneToOneField(Place)
+    serves_cocktails = models.BooleanField()
+
+    def __unicode__(self):
+        return u"%s the bar" % self.place.name
+
 class Favorites(models.Model):
     name = models.CharField(max_length = 50)
     restaurants = models.ManyToManyField(Restaurant)
@@ -34,4 +41,13 @@ __test__ = {'API_TESTS':"""
 >>> f.restaurants = [r]
 >>> f.restaurants.all()
 [<Restaurant: Demon Dogs the restaurant>]
+
+# Regression test for #7173: Check that the name of the cache for the 
+# reverse object is correct.
+>>> b = Bar(place=p1, serves_cocktails=False)
+>>> b.save()
+>>> p1.restaurant
+<Restaurant: Demon Dogs the restaurant>
+>>> p1.bar
+<Bar: Demon Dogs the bar>
 """}

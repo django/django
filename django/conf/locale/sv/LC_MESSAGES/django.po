@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-16 16:53+0100\n"
-"PO-Revision-Date: 2008-03-02 00:49+0100\n"
+"POT-Creation-Date: 2008-05-26 10:58+0200\n"
+"PO-Revision-Date: 2008-05-26 11:15+0200\n"
 "Last-Translator: Ludvig Ericson <ludvig.ericson@gmail.com>\n"
 "Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -17,191 +17,191 @@ msgstr ""
 "X-Poedit-Language: Swedish\n"
 "X-Poedit-Country: SWEDEN\n"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:43
 msgid "Arabic"
 msgstr "Arabiska"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:44
 msgid "Bengali"
 msgstr "Bengaliska"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:45
 msgid "Bulgarian"
 msgstr "Bulgariska"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:46
 msgid "Catalan"
 msgstr "Katalanska"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:47
 msgid "Czech"
 msgstr "Tjeckiska"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:48
 msgid "Welsh"
 msgstr "Walesiska"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:49
 msgid "Danish"
 msgstr "Danska"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:50
 msgid "German"
 msgstr "Tyska"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:51
 msgid "Greek"
 msgstr "Grekiska"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:52
 msgid "English"
 msgstr "Engelska"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:53
 msgid "Spanish"
 msgstr "Spanska"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:54
 msgid "Argentinean Spanish"
 msgstr "Argentisk Spanska"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:55
 msgid "Basque"
 msgstr "Baskiska"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:56
 msgid "Persian"
 msgstr "Persiska"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:57
 msgid "Finnish"
 msgstr "Finska"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:58
 msgid "French"
 msgstr "Franska"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:59
 msgid "Irish"
 msgstr "Irländska"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:60
 msgid "Galician"
 msgstr "Galisiska"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:61
 msgid "Hungarian"
 msgstr "Ungerska"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:62
 msgid "Hebrew"
 msgstr "Hebreiska"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:63
 msgid "Croatian"
 msgstr "Kroatiska"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:64
 msgid "Icelandic"
 msgstr "Isländska"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:65
 msgid "Italian"
 msgstr "Italienska"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:66
 msgid "Japanese"
 msgstr "Japanska"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:67
 msgid "Georgian"
 msgstr "Georgiska"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:68
 msgid "Korean"
 msgstr "Koreanska"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:69
 msgid "Khmer"
 msgstr "Khmer"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:70
 msgid "Kannada"
 msgstr "Kannada"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:71
 msgid "Latvian"
 msgstr "Lettiska"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:72
 msgid "Macedonian"
 msgstr "Makedonska"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:73
 msgid "Dutch"
 msgstr "Holländska"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:74
 msgid "Norwegian"
 msgstr "Norska"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:75
 msgid "Polish"
 msgstr "Polska"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:76
 msgid "Portugese"
 msgstr "Portugisiska"
 
-#: conf/global_settings.py:73
-msgid "Brazilian"
-msgstr "Brasilianska"
+#: conf/global_settings.py:77
+msgid "Brazilian Portuguese"
+msgstr "Brasiliensk portugisiska"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:78
 msgid "Romanian"
 msgstr "Rumänska"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:79
 msgid "Russian"
 msgstr "Ryska"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:80
 msgid "Slovak"
 msgstr "Slovakiska"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:81
 msgid "Slovenian"
 msgstr "Slovenska"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:82
 msgid "Serbian"
 msgstr "Serbiska"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:83
 msgid "Swedish"
 msgstr "Svenska"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:84
 msgid "Tamil"
 msgstr "Tamilska"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:85
 msgid "Telugu"
 msgstr "Telugu"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:86
 msgid "Turkish"
 msgstr "Turkiska"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:87
 msgid "Ukrainian"
 msgstr "Ukrainska"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:88
 msgid "Simplified Chinese"
 msgstr "Förenklad Kinesiska"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:89
 msgid "Traditional Chinese"
 msgstr "Traditionell Kinesiska"
 
@@ -504,8 +504,8 @@ msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
-"Detta objekt har ingen ändringshistorik. Det lades antagligen inte till "
-"via denna administrationssida."
+"Detta objekt har ingen ändringshistorik. Det lades antagligen inte till via "
+"denna administrationssida."
 
 #: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
@@ -729,8 +729,7 @@ msgstr "Ditt nya lösenord är: %(new_password)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:7
 msgid "Feel free to change this password by going to this page:"
-msgstr ""
-"Du är välkommen att ändra detta lösenord genom att gå till denna sida:"
+msgstr "Du är välkommen att ändra detta lösenord genom att gå till denna sida:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Your username, in case you've forgotten:"
@@ -828,14 +827,14 @@ msgstr ""
 "Det verkar som att din webläsare inte är konfigurerad att acceptera cookies. "
 "Aktivera cookies, ladda om denna sida och försök igen."
 
-#: contrib/admin/views/decorators.py:90
-msgid "Usernames cannot contain the '@' character."
-msgstr "Användarnamn får inte innehålla '@'-tecknet."
-
-#: contrib/admin/views/decorators.py:92
+#: contrib/admin/views/decorators.py:89
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Din e-postadress är inte ditt användarnamn. Försök med '%s' istället."
+
+#: contrib/admin/views/decorators.py:93
+msgid "Usernames cannot contain the '@' character."
+msgstr "Användarnamn får inte innehålla '@'-tecknet."
 
 #: contrib/admin/views/doc.py:48 contrib/admin/views/doc.py:50
 #: contrib/admin/views/doc.py:52
@@ -960,7 +959,7 @@ msgstr "Text"
 msgid "Time"
 msgstr "Tid"
 
-#: contrib/admin/views/doc.py:318 contrib/flatpages/models.py:7
+#: contrib/admin/views/doc.py:318 contrib/flatpages/models.py:8
 msgid "URL"
 msgstr "URL"
 
@@ -1067,7 +1066,7 @@ msgstr "Välj %s"
 msgid "Select %s to change"
 msgstr "Välj %s att ändra"
 
-#: contrib/admin/views/main.py:784
+#: contrib/admin/views/main.py:765
 msgid "Database error"
 msgstr "Databasfel"
 
@@ -1186,11 +1185,11 @@ msgstr "aktiv"
 
 #: contrib/auth/models.py:137
 msgid ""
-"Designates whether this user can log into the Django admin. Unselect this "
+"Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Anger om användaren kan logga in till Django-adminsidan. Avmarkera denna "
-"istället för att ta bort konton."
+"Anger om användaren skall betraktas som aktiv. Avmarkera detta istället "
+"för att ta bort konton."
 
 #: contrib/auth/models.py:138
 msgid "superuser status"
@@ -1322,8 +1321,8 @@ msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Bocka för denna ruta om kommentaren är olämplig. Ett \"Denna "
-"kommentar har tagits bort\"-meddelande kommer visas istället."
+"Bocka för denna ruta om kommentaren är olämplig. Ett \"Denna kommentar har "
+"tagits bort\"-meddelande kommer visas istället."
 
 #: contrib/comments/models.py:96
 msgid "comments"
@@ -1488,13 +1487,13 @@ msgid_plural ""
 "\n"
 "%(text)s"
 msgstr[0] ""
-"Denna kommentar postades av en användare som har postat färre än %(count)"
-"s kommentar:\n"
+"Denna kommentar postades av en användare som har postat färre än %(count)s "
+"kommentar:\n"
 "\n"
 "%(text)s"
 msgstr[1] ""
-"Denna kommentar postades av en användare som har postat färre än %(count)"
-"s kommentarer:\n"
+"Denna kommentar postades av en användare som har postat färre än %(count)s "
+"kommentarer:\n"
 "\n"
 "%(text)s"
 
@@ -1551,80 +1550,92 @@ msgstr "Ogiltigt kommentar-ID"
 msgid "No voting for yourself"
 msgstr "Du får inte rösta på dig själv"
 
-#: contrib/contenttypes/models.py:37
+#: contrib/contenttypes/models.py:67
 msgid "python model class name"
 msgstr "python klassnamn för modell"
 
-#: contrib/contenttypes/models.py:40
+#: contrib/contenttypes/models.py:71
 msgid "content type"
 msgstr "innehålls typ"
 
-#: contrib/contenttypes/models.py:41
+#: contrib/contenttypes/models.py:72
 msgid "content types"
 msgstr "innehålls typer"
 
-#: contrib/flatpages/models.py:8
+#: contrib/flatpages/models.py:9
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "Exempel: '/om/kontakt/'. Se till att ha inledande och avslutande snedstreck."
 
-#: contrib/flatpages/models.py:9
+#: contrib/flatpages/models.py:10
 msgid "title"
 msgstr "titel"
 
-#: contrib/flatpages/models.py:10
+#: contrib/flatpages/models.py:11
 msgid "content"
 msgstr "innehåll"
 
-#: contrib/flatpages/models.py:11
+#: contrib/flatpages/models.py:12
 msgid "enable comments"
 msgstr "aktivera kommentarer"
 
-#: contrib/flatpages/models.py:12
+#: contrib/flatpages/models.py:13
 msgid "template name"
 msgstr "mallnamn"
 
-#: contrib/flatpages/models.py:13
+#: contrib/flatpages/models.py:14
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
 msgstr ""
-"Exempel: 'sidor/kontaktsida.html'. Om detta inte fylls i kommer systemet "
-"att använda 'flatpages/default.html'."
+"Exempel: 'sidor/kontaktsida.html'. Om detta inte fylls i kommer systemet att "
+"använda 'flatpages/default.html'."
 
-#: contrib/flatpages/models.py:14
+#: contrib/flatpages/models.py:15
 msgid "registration required"
 msgstr "registrering krävs"
 
-#: contrib/flatpages/models.py:14
+#: contrib/flatpages/models.py:15
 msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Om detta bockas för kommer endast inloggade användare kunna se sidan."
+msgstr "Om detta bockas för kommer endast inloggade användare kunna se sidan."
 
-#: contrib/flatpages/models.py:18
+#: contrib/flatpages/models.py:20
 msgid "flat page"
 msgstr "statisk sida"
 
-#: contrib/flatpages/models.py:19
+#: contrib/flatpages/models.py:21
 msgid "flat pages"
 msgstr "statiska sidor"
 
+#: contrib/flatpages/models.py:27
+msgid "Advanced options"
+msgstr "Avancerade inställningar"
+
+# Setting these as fuzzy because they might not make sense in Swedish. Consider
+# the code's usage of them. They turn numbers such as 1 in to 1st, which isn't
+# how we do it in Swedish, we do it by textualizing the number: first, första.
+# For the time being, we'll leave these as fuzzy, IMO.  // toxik
+
 #: contrib/humanize/templatetags/humanize.py:19
+#,fuzzy
 msgid "th"
-msgstr ""
+msgstr ":a"
 
 #: contrib/humanize/templatetags/humanize.py:19
+#,fuzzy
 msgid "st"
-msgstr ""
+msgstr ":a"
 
 #: contrib/humanize/templatetags/humanize.py:19
+#,fuzzy
 msgid "nd"
-msgstr ""
+msgstr ":e"
 
 #: contrib/humanize/templatetags/humanize.py:19
+#,fuzzy
 msgid "rd"
-msgstr ""
+msgstr ":e"
 
 #: contrib/humanize/templatetags/humanize.py:51
 #, python-format
@@ -3551,8 +3562,7 @@ msgstr "webbplatser"
 
 #: core/validators.py:72
 msgid "This value must contain only letters, numbers and underscores."
-msgstr ""
-"Detta värde får endast innehålla bokstäver, siffror och understreck."
+msgstr "Detta värde får endast innehålla bokstäver, siffror och understreck."
 
 #: core/validators.py:76
 msgid ""
@@ -3600,7 +3610,7 @@ msgstr "Icke-numeriska tecken är inte tillåtna här."
 msgid "This value can't be comprised solely of digits."
 msgstr "Detta värde kan inte enbart bestå av siffror."
 
-#: core/validators.py:128 newforms/fields.py:151
+#: core/validators.py:128 newforms/fields.py:152
 msgid "Enter a whole number."
 msgstr "Fyll i ett heltal."
 
@@ -3617,7 +3627,7 @@ msgstr "Årtal måste vara 1900 eller senare."
 msgid "Invalid date: %s"
 msgstr "Ogiltigt datum: %s"
 
-#: core/validators.py:156 db/models/fields/__init__.py:522
+#: core/validators.py:156 db/models/fields/__init__.py:548
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Fyll i ett giltigt datum med formatet ÅÅÅÅ-MM-DD."
 
@@ -3625,20 +3635,20 @@ msgstr "Fyll i ett giltigt datum med formatet ÅÅÅÅ-MM-DD."
 msgid "Enter a valid time in HH:MM format."
 msgstr "Fyll i ett giltigt klockslag med formatet TT:MM."
 
-#: core/validators.py:165 db/models/fields/__init__.py:599
+#: core/validators.py:165 db/models/fields/__init__.py:625
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Fyll i en giltig tidpunkt med formatet ÅÅÅÅ-MM-DD TT:MM."
 
-#: core/validators.py:170 newforms/fields.py:402
+#: core/validators.py:170 newforms/fields.py:403
 msgid "Enter a valid e-mail address."
 msgstr "Fyll i en giltig e-postadress."
 
-#: core/validators.py:182 core/validators.py:474 newforms/fields.py:432
+#: core/validators.py:182 core/validators.py:474 newforms/fields.py:433
 #: oldforms/__init__.py:687
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ingen fil skickades. Kontrollera kodningnstypen i formuläret."
 
-#: core/validators.py:193 newforms/fields.py:458
+#: core/validators.py:193 newforms/fields.py:459
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -3874,57 +3884,57 @@ msgstr ""
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "%(object)s med typen %(type)s finns redan för %(field)s."
 
-#: db/models/fields/__init__.py:52
+#: db/models/fields/__init__.py:54
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "%(optname)s med detta %(fieldname)s finns redan."
 
-#: db/models/fields/__init__.py:161 db/models/fields/__init__.py:322
-#: db/models/fields/__init__.py:754 db/models/fields/__init__.py:765
-#: newforms/fields.py:45 oldforms/__init__.py:374
+#: db/models/fields/__init__.py:179 db/models/fields/__init__.py:348
+#: db/models/fields/__init__.py:780 db/models/fields/__init__.py:791
+#: newforms/fields.py:46 oldforms/__init__.py:374
 msgid "This field is required."
 msgstr "Detta fält måste fyllas i."
 
-#: db/models/fields/__init__.py:422
+#: db/models/fields/__init__.py:448
 msgid "This value must be an integer."
 msgstr "Detta värde måste vara ett heltal."
 
-#: db/models/fields/__init__.py:461
+#: db/models/fields/__init__.py:487
 msgid "This value must be either True or False."
 msgstr "Detta värde måste vara antingen True eller False."
 
-#: db/models/fields/__init__.py:485
+#: db/models/fields/__init__.py:511
 msgid "This field cannot be null."
 msgstr "Detta fält får inte vara null."
 
-#: db/models/fields/__init__.py:663
+#: db/models/fields/__init__.py:689
 msgid "This value must be a decimal number."
 msgstr "Detta värde måste vara ett decimaltal."
 
-#: db/models/fields/__init__.py:774
+#: db/models/fields/__init__.py:800
 msgid "Enter a valid filename."
 msgstr "Fyll i ett giltigt filnamn."
 
-#: db/models/fields/__init__.py:945
+#: db/models/fields/__init__.py:981
 msgid "This value must be either None, True or False."
 msgstr "Detta värde måste vara antingen None, True eller False."
 
-#: db/models/fields/related.py:93
+#: db/models/fields/related.py:94
 #, python-format
 msgid "Please enter a valid %s."
 msgstr "Var god fyll i giltig %s."
 
-#: db/models/fields/related.py:694
+#: db/models/fields/related.py:721
 msgid "Separate multiple IDs with commas."
 msgstr "Separera flera ID-nummer med kommatecken."
 
-#: db/models/fields/related.py:696
+#: db/models/fields/related.py:723
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Håll ner \"Control\" eller \"Command\" på en Mac för att välja fler än en."
 
-#: db/models/fields/related.py:743
+#: db/models/fields/related.py:770
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3934,101 +3944,101 @@ msgstr[0] ""
 msgstr[1] ""
 "Var god och fyll giltiga %(self)s ID-nummer. Värdena %(value)r är ogiltiga."
 
-#: newforms/fields.py:46
+#: newforms/fields.py:47
 msgid "Enter a valid value."
 msgstr "Fyll i ett giltigt värde."
 
-#: newforms/fields.py:123
+#: newforms/fields.py:124
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Kontrollera att detta värde har högst %(max)d tecken (det har %(length)d)."
 
-#: newforms/fields.py:124
+#: newforms/fields.py:125
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 "Kontrollera att detta värde har minst %(min)d tecken (det har %(length)d)."
 
-#: newforms/fields.py:152 newforms/fields.py:181 newforms/fields.py:210
+#: newforms/fields.py:153 newforms/fields.py:182 newforms/fields.py:211
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Kontrollera att detta värde är mindre eller lika med %s."
 
-#: newforms/fields.py:153 newforms/fields.py:182 newforms/fields.py:211
+#: newforms/fields.py:154 newforms/fields.py:183 newforms/fields.py:212
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Kontrollera att detta värde är mer eller lika med %s."
 
-#: newforms/fields.py:180 newforms/fields.py:209
+#: newforms/fields.py:181 newforms/fields.py:210
 msgid "Enter a number."
 msgstr "Fyll i ett tal."
 
-#: newforms/fields.py:212
+#: newforms/fields.py:213
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Kontrollera att det inte finns mer än totalt %s siffror."
 
-#: newforms/fields.py:213
+#: newforms/fields.py:214
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Kontrollera att det inte finns mer än %s decimaler."
 
-#: newforms/fields.py:214
+#: newforms/fields.py:215
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Kontrollera att det inte finns mer än %s siffror före decimaltecknet."
 
-#: newforms/fields.py:262 newforms/fields.py:723
+#: newforms/fields.py:263 newforms/fields.py:751
 msgid "Enter a valid date."
 msgstr "Fyll i ett giltigt datum."
 
-#: newforms/fields.py:295 newforms/fields.py:724
+#: newforms/fields.py:296 newforms/fields.py:752
 msgid "Enter a valid time."
 msgstr "Fyll i en giltig tid."
 
-#: newforms/fields.py:334
+#: newforms/fields.py:335
 msgid "Enter a valid date/time."
 msgstr "Fyll i ett giltigt datum/tid."
 
-#: newforms/fields.py:433
+#: newforms/fields.py:434
 msgid "No file was submitted."
 msgstr "Ingen fil skickades."
 
-#: newforms/fields.py:434 oldforms/__init__.py:689
+#: newforms/fields.py:435 oldforms/__init__.py:689
 msgid "The submitted file is empty."
 msgstr "Den skickade filen är tom."
 
-#: newforms/fields.py:496
+#: newforms/fields.py:497
 msgid "Enter a valid URL."
 msgstr "Fyll i en giltig URL."
 
-#: newforms/fields.py:497
+#: newforms/fields.py:498
 msgid "This URL appears to be a broken link."
 msgstr "Denna URL verkar vara en trasig länk."
 
-#: newforms/fields.py:559 newforms/models.py:300
+#: newforms/fields.py:560 newforms/models.py:299
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Välj ett giltigt alternativ. Det valet finns inte bland tillgängliga "
 "alternativ."
 
-#: newforms/fields.py:598
+#: newforms/fields.py:599
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Välj ett giltigt alternativ. %(value)s finns inte bland tillgängliga "
 "alternativ."
 
-#: newforms/fields.py:599 newforms/fields.py:661 newforms/models.py:360
+#: newforms/fields.py:600 newforms/fields.py:662 newforms/models.py:371
 msgid "Enter a list of values."
 msgstr "Fyll i en lista med värden."
 
-#: newforms/fields.py:752
+#: newforms/fields.py:780
 msgid "Enter a valid IPv4 address."
 msgstr "Fyll i en giltig IPv4 adress."
 
-#: newforms/models.py:361
+#: newforms/models.py:372
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr ""
@@ -4062,28 +4072,28 @@ msgstr "Fyll i ett positivt tal."
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Fyll i ett heltal mellan 0 och 32767."
 
-#: template/defaultfilters.py:695
+#: template/defaultfilters.py:698
 msgid "yes,no,maybe"
 msgstr "ja,nej,kanske"
 
-#: template/defaultfilters.py:726
+#: template/defaultfilters.py:729
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d byte"
 
-#: template/defaultfilters.py:728
+#: template/defaultfilters.py:731
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:730
+#: template/defaultfilters.py:733
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:731
+#: template/defaultfilters.py:734
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
@@ -4380,6 +4390,9 @@ msgstr "%(verbose_name)s uppdaterades."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s togs bort."
+
+#~ msgid "Brazilian"
+#~ msgstr "Brasilianska"
 
 #~ msgid "Gaeilge"
 #~ msgstr "Gaeliska"

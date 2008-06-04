@@ -1,13 +1,12 @@
 # translation of django.po to Italiano
-# Nicola Larosa <nico@tekNico.net>, 2008.
 # Italian translation of Django.
 # Copyright (C) 2006 the Lawrence Journal-World
 # This file is distributed under the same license as the Django package.
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django vSVN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-18 18:39+0200\n"
+"POT-Creation-Date: 2008-06-02 18:40+0200\n"
 "PO-Revision-Date: 2008-05-18 19:13+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "Language-Team: Italiano\n"
@@ -1710,7 +1709,7 @@ msgstr "Inserire un codice postale nel formato NNNN o ANNNNAAA."
 #: contrib/localflavor/br/forms.py:135 contrib/localflavor/pe/forms.py:23
 #: contrib/localflavor/pe/forms.py:51
 msgid "This field requires only numbers."
-msgstr "In questo campo possono essere solo presenti numeri."
+msgstr "Questo campo può contenere solo numeri."
 
 #: contrib/localflavor/ar/forms.py:50
 msgid "This field requires 7 or 8 digits."
@@ -2308,7 +2307,7 @@ msgstr "Inserire un codice postale valido."
 
 #: contrib/localflavor/it/forms.py:43
 msgid "Enter a valid Social Security number."
-msgstr "Inserire un numero di assistenza sociale valido."
+msgstr "Inserire un numero di codice fiscale valido."
 
 #: contrib/localflavor/it/forms.py:68
 msgid "Enter a valid VAT number."

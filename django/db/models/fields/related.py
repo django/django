@@ -1,6 +1,6 @@
 from django.db import connection, transaction
 from django.db.models import signals, get_model
-from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, get_ul_class
+from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, get_ul_class, FieldDoesNotExist
 from django.db.models.related import RelatedObject
 from django.db.models.query_utils import QueryWrapper
 from django.utils.text import capfirst
@@ -165,7 +165,7 @@ class SingleRelatedObjectDescriptor(object):
     # SingleRelatedObjectDescriptor instance.
     def __init__(self, related):
         self.related = related
-        self.cache_name = '_%s_cache' % related.field.name
+        self.cache_name = '_%s_cache' % related.get_accessor_name()
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
