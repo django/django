@@ -72,9 +72,13 @@ class DataSource(object):
         if isinstance(ds_input, basestring):
             # The data source driver is a void pointer.
             ds_driver = c_void_p()
-
-            # OGROpen will auto-detect the data source type.
-            ds = open_ds(ds_input, self._write, byref(ds_driver))
+            try:
+                # OGROpen will auto-detect the data source type.
+                ds = open_ds(ds_input, self._write, byref(ds_driver))
+            except OGRException:
+                # Making the error message more clear rather than something
+                # like "Invalid pointer returned from OGROpen".
+                raise OGRException('Could not open the datasource at "%s"' % ds_input)
         elif isinstance(ds_input, c_void_p) and isinstance(ds_driver, c_void_p):
             ds = ds_input
         else:
