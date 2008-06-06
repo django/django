@@ -467,7 +467,7 @@ class FilterExpression(object):
         >>> len(fe.filters)
         2
         >>> fe.var
-        'variable'
+        <Variable: 'variable'>
 
     This class should never be instantiated outside of the
     get_filters_from_token helper function.
@@ -598,15 +598,15 @@ class Variable(object):
     a hard-coded string (if it begins and ends with single or double quote
     marks)::
 
-        >>> c = {'article': {'section':'News'}}
+        >>> c = {'article': {'section':u'News'}}
         >>> Variable('article.section').resolve(c)
         u'News'
         >>> Variable('article').resolve(c)
-        {'section': 'News'}
+        {'section': u'News'}
         >>> class AClass: pass
         >>> c = AClass()
         >>> c.article = AClass()
-        >>> c.article.section = 'News'
+        >>> c.article.section = u'News'
         >>> Variable('article.section').resolve(c)
         u'News'
 
