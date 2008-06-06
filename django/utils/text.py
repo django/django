@@ -118,7 +118,7 @@ def get_valid_filename(s):
     spaces are converted to underscores; and all non-filename-safe characters
     are removed.
     >>> get_valid_filename("john's portrait in 2004.jpg")
-    'johns_portrait_in_2004.jpg'
+    u'johns_portrait_in_2004.jpg'
     """
     s = force_unicode(s).strip().replace(' ', '_')
     return re.sub(r'[^-A-Za-z0-9_.]', '', s)
@@ -127,15 +127,15 @@ get_valid_filename = allow_lazy(get_valid_filename, unicode)
 def get_text_list(list_, last_word=ugettext_lazy(u'or')):
     """
     >>> get_text_list(['a', 'b', 'c', 'd'])
-    'a, b, c or d'
+    u'a, b, c or d'
     >>> get_text_list(['a', 'b', 'c'], 'and')
-    'a, b and c'
+    u'a, b and c'
     >>> get_text_list(['a', 'b'], 'and')
-    'a and b'
+    u'a and b'
     >>> get_text_list(['a'])
-    'a'
+    u'a'
     >>> get_text_list([])
-    ''
+    u''
     """
     if len(list_) == 0: return u''
     if len(list_) == 1: return force_unicode(list_[0])
@@ -198,14 +198,18 @@ javascript_quote = allow_lazy(javascript_quote, unicode)
 
 smart_split_re = re.compile('("(?:[^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'(?:[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\'|[^\\s]+)')
 def smart_split(text):
-    """
+    r"""
     Generator that splits a string by spaces, leaving quoted phrases together.
     Supports both single and double quotes, and supports escaping quotes with
     backslashes. In the output, strings will keep their initial and trailing
     quote marks.
 
-    >>> list(smart_split('This is "a person\'s" test.'))
-    ['This', 'is', '"a person\'s"', 'test.']
+    >>> list(smart_split(r'This is "a person\'s" test.'))
+    [u'This', u'is', u'"a person\\\'s"', u'test.']
+   	>>> list(smart_split(r"Another 'person\'s' test.")) 
+   	[u'Another', u"'person's'", u'test.']
+   	>>> list(smart_split(r'A "\"funky\" style" test.')) 
+   	[u'A', u'""funky" style"', u'test.']
     """
     text = force_unicode(text)
     for bit in smart_split_re.finditer(text):
