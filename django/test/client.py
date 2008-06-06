@@ -1,5 +1,6 @@
 import urllib
 import sys
+import os
 from cStringIO import StringIO
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -67,7 +68,7 @@ def encode_multipart(boundary, data):
         if isinstance(value, file):
             lines.extend([
                 '--' + boundary,
-                'Content-Disposition: form-data; name="%s"; filename="%s"' % (to_str(key), to_str(value.name)),
+                'Content-Disposition: form-data; name="%s"; filename="%s"' % (to_str(key), to_str(os.path.basename(value.name))),
                 'Content-Type: application/octet-stream',
                 '',
                 value.read()

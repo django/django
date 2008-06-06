@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 
@@ -13,6 +15,10 @@ def file_upload_view(request):
     form_data = request.POST.copy()
     form_data.update(request.FILES)
     if isinstance(form_data['file_field'], dict) and isinstance(form_data['name'], unicode):
+        # If a file is posted, the dummy client should only post the file name,
+        # not the full path.
+        if os.path.dirname(form_data['file_field']['filename']) != '':
+            return HttpResponseServerError()            
         return HttpResponse('')
     else:
         return HttpResponseServerError()
