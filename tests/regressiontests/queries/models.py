@@ -503,8 +503,9 @@ True
 
 # Despite having some extra aliases in the query, we can still omit them in a
 # values() query.
->>> qs.values('id', 'rank').order_by('id')
-[{'id': 1, 'rank': 2}, {'id': 2, 'rank': 1}, {'id': 3, 'rank': 3}]
+>>> dicts = qs.values('id', 'rank').order_by('id')
+>>> [sorted(d.items()) for d in dicts]
+[[('id', 1), ('rank', 2)], [('id', 2), ('rank', 1)], [('id', 3), ('rank', 3)]]
 
 Bugs #2874, #3002
 >>> qs = Item.objects.select_related().order_by('note__note', 'name')

@@ -822,6 +822,10 @@ useful for testing Web applications:
     that ``text`` appears in the content of the response. If ``count`` is
     provided, ``text`` must occur exactly ``count`` times in the response.
 
+``assertNotContains(response, text, status_code=200)``
+    Asserts that a ``Response`` instance produced the given ``status_code`` and
+    that ``text`` does not appears in the content of the response.
+
 ``assertFormError(response, form, field, errors)``
     Asserts that a field on a form raises the provided list of errors when
     rendered on the form.
@@ -837,6 +841,12 @@ useful for testing Web applications:
     ``errors`` is an error string, or a list of error strings, that are
     expected as a result of form validation.
 
+``assertTemplateUsed(response, template_name)``
+    Asserts that the template with the given name was used in rendering the
+    response.
+
+    The name is a string such as ``'admin/index.html'``.
+
 ``assertTemplateNotUsed(response, template_name)``
     Asserts that the template with the given name was *not* used in rendering
     the response.
@@ -845,12 +855,6 @@ useful for testing Web applications:
     Asserts that the response return a ``status_code`` redirect status,
     it redirected to ``expected_url`` (including any GET data), and the subsequent
     page was received with ``target_status_code``.
-
-``assertTemplateUsed(response, template_name)``
-    Asserts that the template with the given name was used in rendering the
-    response.
-
-    The name is a string such as ``'admin/index.html'``.
 
 E-mail services
 ---------------

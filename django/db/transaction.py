@@ -16,6 +16,10 @@ try:
     import thread
 except ImportError:
     import dummy_thread as thread
+try:
+    from functools import wraps
+except ImportError:
+    from django.utils.functional import wraps  # Python 2.3, 2.4 fallback. 
 from django.db import connection
 from django.conf import settings
 
@@ -177,7 +181,7 @@ def autocommit(func):
             return func(*args, **kw)
         finally:
             leave_transaction_management()
-    return _autocommit
+    return wraps(func)(_autocommit)
 
 def commit_on_success(func):
     """
@@ -202,7 +206,7 @@ def commit_on_success(func):
             return res
         finally:
             leave_transaction_management()
-    return _commit_on_success
+    return wraps(func)(_commit_on_success)
 
 def commit_manually(func):
     """
@@ -219,4 +223,4 @@ def commit_manually(func):
         finally:
             leave_transaction_management()
 
-    return _commit_manually
+    return wraps(func)(_commit_manually)

@@ -21,7 +21,7 @@ class Command(NoArgsCommand):
     def handle_noargs(self, **options):
         from django.db import connection, transaction, models
         from django.conf import settings
-        from django.core.management.sql import table_list, installed_models, sql_model_create, sql_for_pending_references, many_to_many_sql_for_model, custom_sql_for_model, sql_indexes_for_model, emit_post_sync_signal
+        from django.core.management.sql import table_names, installed_models, sql_model_create, sql_for_pending_references, many_to_many_sql_for_model, custom_sql_for_model, sql_indexes_for_model, emit_post_sync_signal
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive')
@@ -45,7 +45,7 @@ class Command(NoArgsCommand):
             table_name_converter = lambda x: x
         # Get a list of all existing database tables, so we know what needs to
         # be added.
-        tables = [table_name_converter(name) for name in table_list()]
+        tables = [table_name_converter(name) for name in table_names()]
 
         # Get a list of already installed *models* so that references work right.
         seen_models = installed_models(tables)

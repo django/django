@@ -128,6 +128,18 @@ class TestCase(unittest.TestCase):
             self.failUnless(real_count != 0,
                             "Couldn't find '%s' in response" % text)
 
+    def assertNotContains(self, response, text, status_code=200):
+        """
+        Asserts that a response indicates that a page was retrieved
+        successfully, (i.e., the HTTP status code was as expected), and that
+        ``text`` doesn't occurs in the content of the response.
+        """
+        self.assertEqual(response.status_code, status_code,
+            "Couldn't retrieve page: Response code was %d (expected %d)'" %
+                (response.status_code, status_code))
+        self.assertEqual(response.content.count(text), 0,
+                         "Response should not contain '%s'" % text)
+
     def assertFormError(self, response, form, field, errors):
         """
         Asserts that a form used to render the response has a specific field

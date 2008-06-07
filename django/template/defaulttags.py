@@ -515,7 +515,7 @@ debug = register.tag(debug)
 #@register.tag(name="filter")
 def do_filter(parser, token):
     """
-    Filters the contents of the blog through variable filters.
+    Filters the contents of the block through variable filters.
 
     Filters can also be piped through each other, and they can have
     arguments -- just like in variable syntax.

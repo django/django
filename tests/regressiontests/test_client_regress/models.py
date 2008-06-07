@@ -4,6 +4,7 @@ Regression tests for the Test Client, especially the customized assertions.
 """
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
+from django.core.exceptions import SuspiciousOperation
 import os
 
 class AssertContainsTests(TestCase):
@@ -11,12 +12,18 @@ class AssertContainsTests(TestCase):
         "Responses can be inspected for content, including counting repeated substrings"
         response = self.client.get('/test_client_regress/no_template_view/')
 
+        self.assertNotContains(response, 'never')
         self.assertContains(response, 'never', 0)
         self.assertContains(response, 'once')
         self.assertContains(response, 'once', 1)
         self.assertContains(response, 'twice')
         self.assertContains(response, 'twice', 2)
 
+        try:
+            self.assertNotContains(response, 'once')
+        except AssertionError, e:
+            self.assertEquals(str(e), "Response should not contain 'once'")
+            
         try:
             self.assertContains(response, 'never', 1)
         except AssertionError, e:
@@ -288,4 +295,26 @@ class URLEscapingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, 'Hi, Arthur')
 
+class ExceptionTests(TestCase):
+    fixtures = ['testdata.json']
+    
+    def test_exception_cleared(self):
+        "#5836 - A stale user exception isn't re-raised by the test client."
 
+        login = self.client.login(username='testclient',password='password')
+        self.failUnless(login, 'Could not log in')
+        try:
+            response = self.client.get("/test_client_regress/staff_only/")
+            self.fail("General users should not be able to visit this page")
+        except SuspiciousOperation:
+            pass
+
+        # At this point, an exception has been raised, and should be cleared.
+        
+        # This next operation should be successful; if it isn't we have a problem.
+        login = self.client.login(username='staff', password='password')
+        self.failUnless(login, 'Could not log in')
+        try:
+            self.client.get("/test_client_regress/staff_only/")
+        except SuspiciousOperation:
+            self.fail("Staff should be able to visit this page")
