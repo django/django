@@ -2,6 +2,7 @@ import os
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
+from django.core.exceptions import SuspiciousOperation
 
 def no_template_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -23,6 +24,13 @@ def file_upload_view(request):
     else:
         return HttpResponseServerError()
 
+def staff_only_view(request):
+    "A view that can only be visited by staff. Non staff members get an exception"
+    if request.user.is_staff:
+        return HttpResponse('')
+    else:
+        raise SuspiciousOperation()
+    
 def get_view(request):
     "A simple login protected view"
     return HttpResponse("Hello world")
