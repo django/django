@@ -26,14 +26,14 @@ class SessionMiddleware(object):
             if accessed:
                 patch_vary_headers(response, ('Cookie',))
             if modified or settings.SESSION_SAVE_EVERY_REQUEST:
-                if settings.SESSION_EXPIRE_AT_BROWSER_CLOSE:
+                if request.session.get_expire_at_browser_close():
                     max_age = None
                     expires = None
                 else:
-                    max_age = settings.SESSION_COOKIE_AGE
-                    expires_time = time.time() + settings.SESSION_COOKIE_AGE
+                    max_age = request.session.get_expiry_age()
+                    expires_time = time.time() + max_age
                     expires = cookie_date(expires_time)
-                # Save the seesion data and refresh the client cookie.
+                # Save the session data and refresh the client cookie.
                 request.session.save()
                 response.set_cookie(settings.SESSION_COOKIE_NAME,
                         request.session.session_key, max_age=max_age,

@@ -88,6 +88,100 @@ False
 
 >>> s.pop('some key', 'does not exist')
 'does not exist'
+
+#########################
+# Custom session expiry #
+#########################
+
+>>> from django.conf import settings
+>>> from datetime import datetime, timedelta
+
+>>> td10 = timedelta(seconds=10)
+
+# A normal session has a max age equal to settings
+>>> s.get_expiry_age() == settings.SESSION_COOKIE_AGE
+True
+
+# So does a custom session with an idle expiration time of 0 (but it'll expire
+# at browser close)
+>>> s.set_expiry(0)
+>>> s.get_expiry_age() == settings.SESSION_COOKIE_AGE
+True
+
+# Custom session idle expiration time
+>>> s.set_expiry(10)
+>>> delta = s.get_expiry_date() - datetime.now()
+>>> delta.seconds in (9, 10)
+True
+>>> age = s.get_expiry_age()
+>>> age in (9, 10)
+True
+
+# Custom session fixed expiry date (timedelta)
+>>> s.set_expiry(td10)
+>>> delta = s.get_expiry_date() - datetime.now()
+>>> delta.seconds in (9, 10)
+True
+>>> age = s.get_expiry_age()
+>>> age in (9, 10)
+True
+
+# Custom session fixed expiry date (fixed datetime)
+>>> s.set_expiry(datetime.now() + td10)
+>>> delta = s.get_expiry_date() - datetime.now()
+>>> delta.seconds in (9, 10)
+True
+>>> age = s.get_expiry_age()
+>>> age in (9, 10)
+True
+
+# Set back to default session age
+>>> s.set_expiry(None)
+>>> s.get_expiry_age() == settings.SESSION_COOKIE_AGE
+True
+
+# Allow to set back to default session age even if no alternate has been set
+>>> s.set_expiry(None)
+
+
+# We're changing the setting then reverting back to the original setting at the
+# end of these tests.
+>>> original_expire_at_browser_close = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE
+>>> settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Custom session age
+>>> s.set_expiry(10)
+>>> s.get_expire_at_browser_close()
+False
+
+# Custom expire-at-browser-close
+>>> s.set_expiry(0)
+>>> s.get_expire_at_browser_close()
+True
+
+# Default session age
+>>> s.set_expiry(None)
+>>> s.get_expire_at_browser_close()
+False
+
+>>> settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Custom session age
+>>> s.set_expiry(10)
+>>> s.get_expire_at_browser_close()
+False
+
+# Custom expire-at-browser-close
+>>> s.set_expiry(0)
+>>> s.get_expire_at_browser_close()
+True
+
+# Default session age
+>>> s.set_expiry(None)
+>>> s.get_expire_at_browser_close()
+True
+
+>>> settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = original_expire_at_browser_close
 """
 
 if __name__ == '__main__':
