@@ -1,5 +1,6 @@
 from forms import Form
 from django.utils.encoding import StrAndUnicode
+from django.utils.safestring import mark_safe
 from fields import IntegerField, BooleanField
 from widgets import Media, HiddenInput, TextInput
 from util import ErrorList, ValidationError
@@ -258,7 +259,7 @@ class BaseFormSet(StrAndUnicode):
         # probably should be. It might make sense to render each form as a
         # table row with each field as a td.
         forms = u' '.join([form.as_table() for form in self.forms])
-        return u'\n'.join([unicode(self.management_form), forms])
+        return mark_safe(u'\n'.join([unicode(self.management_form), forms]))
 
 # XXX: This API *will* change. Use at your own risk.
 def _formset_factory(form, formset=BaseFormSet, extra=1, can_order=False, can_delete=False):
