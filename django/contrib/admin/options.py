@@ -646,6 +646,8 @@ class ModelAdmin(BaseModelAdmin):
             obj.delete()
             LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, object_id, obj_display, DELETION)
             request.user.message_set.create(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
+            if not self.has_change_permission(request, None):
+                return HttpResponseRedirect("../../../../")
             return HttpResponseRedirect("../../")
         extra_context = {
             "title": _("Are you sure?"),
