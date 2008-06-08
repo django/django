@@ -446,7 +446,7 @@ def custom_sql_for_model(model):
             fp = open(sql_file, 'U')
             for statement in statements.split(fp.read().decode(settings.FILE_CHARSET)):
                 # Remove any comments from the file
-                statement = re.sub(ur"--.*[\n\Z]", "", statement)
+                statement = re.sub(ur"--.*([\n\Z]|$)", "", statement)
                 if statement.strip():
                     output.append(statement + u";")
             fp.close()
