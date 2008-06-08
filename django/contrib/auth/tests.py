@@ -35,4 +35,21 @@ False
 []
 >>> a.user_permissions.all()
 []
+
+#
+# Tests for createsuperuser management command.
+# It's nearly impossible to test the interactive mode -- a command test helper
+# would be needed (and *awesome*) -- so just test the non-interactive mode.
+# This covers most of the important validation, but not all.
+#
+>>> from django.core.management import call_command
+
+>>> call_command("createsuperuser", noinput=True, username="joe", email="joe@somewhere.org")
+Superuser created successfully.
+
+>>> u = User.objects.get(username="joe")
+>>> u.email
+u'joe@somewhere.org'
+>>> u.password
+u'!'
 """

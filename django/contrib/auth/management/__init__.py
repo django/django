@@ -32,7 +32,7 @@ def create_permissions(app, created_models, verbosity):
 
 def create_superuser(app, created_models, verbosity, **kwargs):
     from django.contrib.auth.models import User
-    from django.contrib.auth.create_superuser import createsuperuser as do_create
+    from django.core.management import call_command
     if User in created_models and kwargs.get('interactive', True):
         msg = "\nYou just installed Django's auth system, which means you don't have " \
                 "any superusers defined.\nWould you like to create one now? (yes/no): "
@@ -42,8 +42,10 @@ def create_superuser(app, created_models, verbosity, **kwargs):
                 confirm = raw_input('Please enter either "yes" or "no": ')
                 continue
             if confirm == 'yes':
-                do_create()
+                call_command("createsuperuser")
             break
 
-dispatcher.connect(create_permissions, signal=signals.post_syncdb)
-dispatcher.connect(create_superuser, sender=auth_app, signal=signals.post_syncdb)
+if 'create_permissions' not in [i.__name__ for i in dispatcher.getAllReceivers(signal=signals.post_syncdb)]:
+    dispatcher.connect(create_permissions, signal=signals.post_syncdb)
+if 'create_superuser' not in [i.__name__ for i in dispatcher.getAllReceivers(signal=signals.post_syncdb, sender=auth_app)]:
+    dispatcher.connect(create_superuser, sender=auth_app, signal=signals.post_syncdb)
