@@ -42,7 +42,7 @@ def create_superuser(app, created_models, verbosity, **kwargs):
                 confirm = raw_input('Please enter either "yes" or "no": ')
                 continue
             if confirm == 'yes':
-                call_command("createsuperuser")
+                call_command("createsuperuser", interactive=True)
             break
 
 if 'create_permissions' not in [i.__name__ for i in dispatcher.getAllReceivers(signal=signals.post_syncdb)]:

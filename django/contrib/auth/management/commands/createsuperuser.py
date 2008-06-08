@@ -42,7 +42,8 @@ class Command(BaseCommand):
                 validators.isValidEmail(email, None)
             except validators.ValidationError:
                 raise CommandError("Invalid email address.")
-            password = ''
+
+        password = ''
 
         # Try to determine the current system user's username to use as a default.
         try:
