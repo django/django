@@ -71,4 +71,27 @@ __test__ = {'API_TESTS':"""
 >>> Absolute.load_count
 1
 
+###############################################
+# Test for ticket #4371 -- fixture loading fails silently in testcases
+# Validate that error conditions are caught correctly
+
+# redirect stderr for the next few tests...
+>>> import sys
+>>> savestderr = sys.stderr
+>>> sys.stderr = sys.stdout
+
+# Loading data of an unknown format should fail
+>>> management.call_command('loaddata', 'bad_fixture1.unkn', verbosity=0)
+Problem installing fixture 'bad_fixture1': unkn is not a known serialization format.
+
+# Loading a fixture file with invalid data using explicit filename
+>>> management.call_command('loaddata', 'bad_fixture2.xml', verbosity=0)
+No fixture data found for 'bad_fixture2'. (File format may be invalid.)
+
+# Loading a fixture file with invalid data without file extension
+>>> management.call_command('loaddata', 'bad_fixture2', verbosity=0)
+No fixture data found for 'bad_fixture2'. (File format may be invalid.)
+
+>>> sys.stderr = savestderr
+
 """}
