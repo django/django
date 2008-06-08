@@ -129,6 +129,11 @@ using the ``--username`` and ``--email`` arguments on the command
 line; if not supplied, ``createsuperuser`` will prompt for them when
 running interactively.
 
+This command is only available if Django's `authentication system`_
+(``django.contrib.auth``) is installed.
+
+.. _authentication system: ../authentication/
+
 diffsettings
 ------------
 
