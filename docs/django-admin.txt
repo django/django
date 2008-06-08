@@ -85,27 +85,6 @@ your admin's index page. See `Tutorial 2`_ for more information.
 
 .. _Tutorial 2: ../tutorial02/
 
-createsuperuser
----------------
-
-**New in Django development version**
-
-Creates a superuser account (a user who has all permissions). This is
-useful if you need to create an initial superuser account but did not
-do so during ``syncdb``, or if you need to programmatically generate
-superuser accounts for your site(s).
-
-When run interactively, this command will prompt for a password for
-the new superuser account; when run non-interactively, no password
-will be set and the superuser account will not be able to log in until
-a password has been manually set for it.
-
-The username and e-mail address for the new account can be supplied by
-using the ``--username`` and ``--email`` arguments on the command
-line; if not supplied, ``createsuperuser`` will prompt for them when
-running interactively.
-
-
 createcachetable <tablename>
 ----------------------------
 
@@ -129,6 +108,26 @@ This command assumes the programs are on your ``PATH`` so that a simple call to
 the program name (``psql``, ``mysql``, ``sqlite3``) will find the program in
 the right place. There's no way to specify the location of the program
 manually.
+
+createsuperuser
+---------------
+
+**New in Django development version**
+
+Creates a superuser account (a user who has all permissions). This is
+useful if you need to create an initial superuser account but did not
+do so during ``syncdb``, or if you need to programmatically generate
+superuser accounts for your site(s).
+
+When run interactively, this command will prompt for a password for
+the new superuser account; when run non-interactively, no password
+will be set and the superuser account will not be able to log in until
+a password has been manually set for it.
+
+The username and e-mail address for the new account can be supplied by
+using the ``--username`` and ``--email`` arguments on the command
+line; if not supplied, ``createsuperuser`` will prompt for them when
+running interactively.
 
 diffsettings
 ------------
