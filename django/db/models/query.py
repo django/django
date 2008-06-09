@@ -292,6 +292,8 @@ class QuerySet(object):
         Updates all elements in the current QuerySet, setting all the given
         fields to the appropriate values.
         """
+        assert self.query.can_filter(), \
+                "Cannot update a query once a slice has been taken."
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
         query.execute_sql(None)
@@ -306,6 +308,8 @@ class QuerySet(object):
         code (it requires too much poking around at model internals to be
         useful at that level).
         """
+        assert self.query.can_filter(), \
+                "Cannot update a query once a slice has been taken."
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_fields(values)
         query.execute_sql(None)
