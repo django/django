@@ -147,8 +147,13 @@ Test constructor for Restaurant.
 >>> c.save()
 >>> ir = ItalianRestaurant(name='Ristorante Miron', address='1234 W. Ash', serves_hot_dogs=False, serves_pizza=False, serves_gnocchi=True, rating=4, chef=c)
 >>> ir.save()
+>>> ItalianRestaurant.objects.filter(address='1234 W. Ash')
+[<ItalianRestaurant: Ristorante Miron the italian restaurant>]
+
 >>> ir.address = '1234 W. Elm'
 >>> ir.save()
+>>> ItalianRestaurant.objects.filter(address='1234 W. Elm')
+[<ItalianRestaurant: Ristorante Miron the italian restaurant>]
 
 # Make sure Restaurant and ItalianRestaurant have the right fields in the right
 # order.

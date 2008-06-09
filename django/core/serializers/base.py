@@ -38,7 +38,7 @@ class Serializer(object):
         self.start_serialization()
         for obj in queryset:
             self.start_object(obj)
-            for field in obj._meta.fields:
+            for field in obj._meta.local_fields:
                 if field.serialize:
                     if field.rel is None:
                         if self.selected_fields is None or field.attname in self.selected_fields:

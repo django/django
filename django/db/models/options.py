@@ -102,7 +102,7 @@ class Options(object):
                 # field.
                 field = self.parents.value_for_index(0)
                 field.primary_key = True
-                self.pk = field
+                self.setup_pk(field)
             else:
                 auto = AutoField(verbose_name='ID', primary_key=True,
                         auto_created=True)

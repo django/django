@@ -63,6 +63,41 @@ be serialized.
     doesn't specify all the fields that are required by a model, the deserializer
     will not be able to save deserialized instances.
 
+Inherited Models
+~~~~~~~~~~~~~~~~
+
+If you have a model that is defined using an `abstract base class`_, you don't
+have to do anything special to serialize that model. Just call the serializer
+on the object (or objects) that you want to serialize, and the output will be
+a complete representation of the serialized object.
+
+However, if you have a model that uses `multi-table inheritance`_, you also
+need to serialize all of the base classes for the model. This is because only
+the fields that are locally defined on the model will be serialized. For
+example, consider the following models::
+	
+	class Place(models.Model):
+		name = models.CharField(max_length=50)
+		
+	class Restaurant(Place):
+		serves_hot_dogs = models.BooleanField()
+		
+If you only serialize the Restaurant model::
+
+	data = serializers.serialize('xml', Restaurant.objects.all())
+
+the fields on the serialized output will only contain the `serves_hot_dogs`
+attribute. The `name` attribute of the base class will be ignored.
+
+In order to fully serialize your Restaurant instances, you will need to
+serialize the Place models as well::
+
+	all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
+	data = serializers.serialize('xml', all_objects)
+
+.. _abstract base class: http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
+.. _multi-table inheritance: http://www.djangoproject.com/documentation/model-api/#multi-table-inheritance
+
 Deserializing data
 ------------------
 

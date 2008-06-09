@@ -290,12 +290,17 @@ class Model(object):
             meta = cls._meta
             signal = False
 
-        for parent, field in meta.parents.items():
-            self.save_base(raw, parent)
-            setattr(self, field.attname, self._get_pk_val(parent._meta))
+        # If we are in a raw save, save the object exactly as presented.
+        # That means that we don't try to be smart about saving attributes
+        # that might have come from the parent class - we just save the 
+        # attributes we have been given to the class we have been given.
+        if not raw:
+            for parent, field in meta.parents.items():
+                self.save_base(raw, parent)
+                setattr(self, field.attname, self._get_pk_val(parent._meta))
 
         non_pks = [f for f in meta.local_fields if not f.primary_key]
-
+            
         # First, try an UPDATE. If that doesn't update anything, do an INSERT.
         pk_val = self._get_pk_val(meta)
         # Note: the comparison with '' is required for compatibility with
