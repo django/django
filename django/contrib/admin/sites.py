@@ -113,7 +113,12 @@ class AdminSite(object):
             return self.logout(request)
 
         if not self.has_permission(request):
-            return self.login(request)
+            response = self.login(request)
+            if response:
+                # make sure that there is a response before returning
+                # this addresses any post data that might persist from
+                # expired sessions and continue through (#5999)
+                return response
 
 
         if url == '':
@@ -245,7 +250,7 @@ class AdminSite(object):
                         # overwrite request.POST with the saved post_data, and continue
                         request.POST = post_data
                         request.user = user
-                        return view_func(request, *args, **kwargs)
+                        return None
                     else:
                         request.session.delete_test_cookie()
                         return http.HttpResponseRedirect(request.path)

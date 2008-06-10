@@ -145,6 +145,15 @@ class AdminViewPermissionsTest(TestCase):
         self.failUnlessEqual(Article.objects.all().count(), 3)
         self.client.get('/test_admin/admin/logout/')
         
+        # Check and make sure that if user expires, data still persists
+        post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
+        self.assertContains(post, 'Please log in again, because your session has expired.')
+        self.super_login['post_data'] = _encode_post_data(add_dict)
+        post = self.client.post('/test_admin/admin/admin_views/article/add/', self.super_login)
+        self.assertRedirects(post, '/test_admin/admin/admin_views/article/')
+        self.failUnlessEqual(Article.objects.all().count(), 4)
+        self.client.get('/test_admin/admin/logout/')
+        
     def testChangeView(self):
         """Change view should restrict access and allow users to edit items."""
         
