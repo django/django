@@ -53,6 +53,7 @@ class UserAdmin(admin.ModelAdmin):
             'has_absolute_url': False,
             'auto_populated_fields': (),
             'opts': User._meta,
+            'save_as': False,
             'username_help_text': User._meta.get_field('username').help_text,
         }, context_instance=template.RequestContext(request))
 

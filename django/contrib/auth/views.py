@@ -122,5 +122,6 @@ def user_change_password(request, id):
         'has_absolute_url': False,
         'opts': User._meta,
         'original': user,
+        'save_as': False,
         'show_save': True,
     }, context_instance=RequestContext(request))
