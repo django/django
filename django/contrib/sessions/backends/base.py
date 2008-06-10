@@ -4,6 +4,7 @@ import os
 import random
 import sys
 import time
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 
@@ -127,6 +128,62 @@ class SessionBase(object):
         return self._session_cache
 
     _session = property(_get_session)
+
+    def get_expiry_age(self):
+        """Get the number of seconds until the session expires."""
+        expiry = self.get('_session_expiry')
+        if not expiry:   # Checks both None and 0 cases
+            return settings.SESSION_COOKIE_AGE
+        if not isinstance(expiry, datetime):
+            return expiry
+        delta = expiry - datetime.now()
+        return delta.days * 86400 + delta.seconds
+
+    def get_expiry_date(self):
+        """Get session the expiry date (as a datetime object)."""
+        expiry = self.get('_session_expiry')
+        if isinstance(expiry, datetime):
+            return expiry
+        if not expiry:   # Checks both None and 0 cases
+            expiry = settings.SESSION_COOKIE_AGE
+        return datetime.now() + timedelta(seconds=expiry)
+
+    def set_expiry(self, value):
+        """
+        Sets a custom expiration for the session. ``value`` can be an integer, a
+        Python ``datetime`` or ``timedelta`` object or ``None``.
+
+        If ``value`` is an integer, the session will expire after that many
+        seconds of inactivity. If set to ``0`` then the session will expire on
+        browser close.
+
+        If ``value`` is a ``datetime`` or ``timedelta`` object, the session
+        will expire at that specific future time.
+
+        If ``value`` is ``None``, the session uses the global session expiry
+        policy.
+        """
+        if value is None:
+            # Remove any custom expiration for this session.
+            try:
+                del self['_session_expiry']
+            except KeyError:
+                pass
+            return
+        if isinstance(value, timedelta):
+            value = datetime.now() + value
+        self['_session_expiry'] = value
+
+    def get_expire_at_browser_close(self):
+        """
+        Returns ``True`` if the session is set to expire when the browser
+        closes, and ``False`` if there's an expiry date. Use
+        ``get_expiry_date()`` or ``get_expiry_age()`` to find the actual expiry
+        date/age, if there is one.
+        """
+        if self.get('_session_expiry') is None:
+            return settings.SESSION_EXPIRE_AT_BROWSER_CLOSE
+        return self.get('_session_expiry') == 0
 
     # Methods that child classes must implement.
 

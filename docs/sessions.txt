@@ -80,19 +80,24 @@ attribute, which is a dictionary-like object. You can read it and write to it.
 It implements the following standard dictionary methods:
 
     * ``__getitem__(key)``
+
       Example: ``fav_color = request.session['fav_color']``
 
     * ``__setitem__(key, value)``
+
       Example: ``request.session['fav_color'] = 'blue'``
 
     * ``__delitem__(key)``
+
       Example: ``del request.session['fav_color']``. This raises ``KeyError``
       if the given ``key`` isn't already in the session.
 
     * ``__contains__(key)``
+
       Example: ``'fav_color' in request.session``
 
     * ``get(key, default=None)``
+
       Example: ``fav_color = request.session.get('fav_color', 'red')``
 
     * ``keys()``
@@ -101,22 +106,69 @@ It implements the following standard dictionary methods:
 
     * ``setdefault()`` (**New in Django development version**)
 
-It also has these three methods:
+It also has these methods:
 
     * ``set_test_cookie()``
+
       Sets a test cookie to determine whether the user's browser supports
       cookies. Due to the way cookies work, you won't be able to test this
       until the user's next page request. See "Setting test cookies" below for
       more information.
 
     * ``test_cookie_worked()``
+
       Returns either ``True`` or ``False``, depending on whether the user's
       browser accepted the test cookie. Due to the way cookies work, you'll
       have to call ``set_test_cookie()`` on a previous, separate page request.
       See "Setting test cookies" below for more information.
 
     * ``delete_test_cookie()``
+
       Deletes the test cookie. Use this to clean up after yourself.
+
+    * ``set_expiry(value)``
+
+      **New in Django development version**
+
+      Sets the expiration time for the session. You can pass a number of
+      different values:
+
+            * If ``value`` is an integer, the session will expire after that
+              many seconds of inactivity. For example, calling
+              ``request.session.set_expiry(300)`` would make the session expire
+              in 5 minutes.
+
+            * If ``value`` is a ``datetime`` or ``timedelta`` object, the
+              session will expire at that specific time.
+      
+            * If ``value`` is ``0`` then the user's session cookie will expire
+              when their browser is closed.
+
+            * If ``value`` is ``None``, the session reverts to using the global
+              session expiry policy.
+
+    * ``get_expiry_age()``
+
+      **New in Django development version**
+
+      Returns the number of seconds until this session expires. For sessions
+      with no custom expiration (or those set to expire at browser close), this
+      will equal ``settings.SESSION_COOKIE_AGE``.
+
+    * ``get_expiry_date()``
+
+      **New in Django development version**
+
+      Returns the date this session will expire. For sessions with no custom
+      expiration (or those set to expire at browser close), this will equal the
+      date ``settings.SESSION_COOKIE_AGE`` seconds from now.
+
+    * ``get_expire_at_browser_close()``
+
+      **New in Django development version**
+
+      Returns either ``True`` or ``False``, depending on whether the user's
+      session cookie will expire when their browser is closed.
 
 You can edit ``request.session`` at any point in your view. You can edit it
 multiple times.
@@ -277,6 +329,12 @@ If ``SESSION_EXPIRE_AT_BROWSER_CLOSE`` is set to ``True``, Django will use
 browser-length cookies -- cookies that expire as soon as the user closes his or
 her browser. Use this if you want people to have to log in every time they open
 a browser.
+
+**New in Django development version**
+
+This setting is a global default and can be overwritten at a per-session level
+by explicitly calling ``request.session.set_expiry()`` as described above in
+`using sessions in views`_.
 
 Clearing the session table
 ==========================

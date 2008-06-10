@@ -32,7 +32,7 @@ def data_create(pk, klass, data):
     instance = klass(id=pk)
     instance.data = data
     models.Model.save_base(instance, raw=True)
-    return instance
+    return [instance]
 
 def generic_create(pk, klass, data):
     instance = klass(id=pk)
@@ -40,32 +40,45 @@ def generic_create(pk, klass, data):
     models.Model.save_base(instance, raw=True)
     for tag in data[1:]:
         instance.tags.create(data=tag)
-    return instance
+    return [instance]
 
 def fk_create(pk, klass, data):
     instance = klass(id=pk)
     setattr(instance, 'data_id', data)
     models.Model.save_base(instance, raw=True)
-    return instance
+    return [instance]
 
 def m2m_create(pk, klass, data):
     instance = klass(id=pk)
     models.Model.save_base(instance, raw=True)
     instance.data = data
-    return instance
+    return [instance]
 
 def o2o_create(pk, klass, data):
     instance = klass()
     instance.data_id = data
     models.Model.save_base(instance, raw=True)
-    return instance
+    return [instance]
 
 def pk_create(pk, klass, data):
     instance = klass()
     instance.data = data
     models.Model.save_base(instance, raw=True)
-    return instance
+    return [instance]
 
+def inherited_create(pk, klass, data):
+    instance = klass(id=pk,**data)
+    # This isn't a raw save because:
+    #  1) we're testing inheritance, not field behaviour, so none
+    #     of the field values need to be protected.
+    #  2) saving the child class and having the parent created
+    #     automatically is easier than manually creating both. 
+    models.Model.save(instance)
+    created = [instance]
+    for klass,field in instance._meta.parents.items():
+        created.append(klass.objects.get(id=pk))
+    return created
+    
 # A set of functions that can be used to compare
 # test data objects of various kinds
 def data_compare(testcase, pk, klass, data):
@@ -94,6 +107,11 @@ def pk_compare(testcase, pk, klass, data):
     instance = klass.objects.get(data=data)
     testcase.assertEqual(data, instance.data)
 
+def inherited_compare(testcase, pk, klass, data):
+    instance = klass.objects.get(id=pk)
+    for key,value in data.items():
+        testcase.assertEqual(value, getattr(instance,key))
+    
 # Define some data types. Each data type is
 # actually a pair of functions; one to create
 # and one to compare objects of that type
@@ -103,6 +121,7 @@ fk_obj = (fk_create, fk_compare)
 m2m_obj = (m2m_create, m2m_compare)
 o2o_obj = (o2o_create, o2o_compare)
 pk_obj = (pk_create, pk_compare)
+inherited_obj = (inherited_create, inherited_compare)
 
 test_data = [
     # Format: (data type, PK value, Model Class, data)
@@ -255,6 +274,10 @@ The end."""),
 
     (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006,6,16,10,42,37)),
     (data_obj, 810, ModifyingSaveData, 42),
+    
+    (inherited_obj, 900, InheritAbstractModel, {'child_data':37,'parent_data':42}),
+    (inherited_obj, 910, ExplicitInheritBaseModel, {'child_data':37,'parent_data':42}),
+    (inherited_obj, 920, InheritBaseModel, {'child_data':37,'parent_data':42}),
 ]
 
 # Because Oracle treats the empty string as NULL, Oracle is expected to fail
@@ -277,13 +300,19 @@ def serializerTest(format, self):
 
     # Create all the objects defined in the test data
     objects = []
+    instance_count = {}
     transaction.enter_transaction_management()
     transaction.managed(True)
     for (func, pk, klass, datum) in test_data:
-        objects.append(func[0](pk, klass, datum))
+        objects.extend(func[0](pk, klass, datum))
+        instance_count[klass] = 0
     transaction.commit()
     transaction.leave_transaction_management()
 
+    # Get a count of the number of objects created for each class
+    for klass in instance_count:
+        instance_count[klass] = klass.objects.count()
+        
     # Add the generic tagged objects to the object list
     objects.extend(Tag.objects.all())
 
@@ -303,6 +332,11 @@ def serializerTest(format, self):
     # as the original source
     for (func, pk, klass, datum) in test_data:
         func[1](self, pk, klass, datum)
+
+    # Assert that the number of objects deserialized is the
+    # same as the number that was serialized.
+    for klass, count in instance_count.items():
+        self.assertEquals(count, klass.objects.count())
 
 def fieldsTest(format, self):
     # Clear the database first

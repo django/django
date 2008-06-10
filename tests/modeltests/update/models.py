@@ -63,5 +63,12 @@ a manager method.
 >>> DataPoint.objects.values('value').distinct()
 [{'value': u'thing'}]
 
+We do not support update on already sliced query sets.
+
+>>> DataPoint.objects.all()[:2].update(another_value='another thing')
+Traceback (most recent call last):
+    ...
+AssertionError: Cannot update a query once a slice has been taken.
+
 """
 }

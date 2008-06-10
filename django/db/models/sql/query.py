@@ -851,7 +851,7 @@ class Query(object):
         return alias
 
     def fill_related_selections(self, opts=None, root_alias=None, cur_depth=1,
-            used=None, requested=None, restricted=None):
+            used=None, requested=None, restricted=None, nullable=None):
         """
         Fill in the information needed for a select_related query. The current
         depth is measured as the number of connections away from the root model
@@ -883,6 +883,10 @@ class Query(object):
                     (not restricted and f.null) or f.rel.parent_link):
                 continue
             table = f.rel.to._meta.db_table
+            if nullable or f.null:
+                promote = True
+            else:
+                promote = False
             if model:
                 int_opts = opts
                 alias = root_alias
@@ -891,12 +895,12 @@ class Query(object):
                     int_opts = int_model._meta
                     alias = self.join((alias, int_opts.db_table, lhs_col,
                             int_opts.pk.column), exclusions=used,
-                            promote=f.null)
+                            promote=promote)
             else:
                 alias = root_alias
             alias = self.join((alias, table, f.column,
                     f.rel.get_related_field().column), exclusions=used,
-                    promote=f.null)
+                    promote=promote)
             used.add(alias)
             self.related_select_cols.extend([(alias, f2.column)
                     for f2 in f.rel.to._meta.fields])
@@ -905,8 +909,12 @@ class Query(object):
                 next = requested.get(f.name, {})
             else:
                 next = False
+            if f.null is not None:
+                new_nullable = f.null
+            else:
+                new_nullable = None
             self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
-                    used, next, restricted)
+                    used, next, restricted, new_nullable)
 
     def add_filter(self, filter_expr, connector=AND, negate=False, trim=False,
             can_reuse=None):
