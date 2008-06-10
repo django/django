@@ -232,4 +232,26 @@ As you can see, 'Le Spleen de Paris' is now a book belonging to Charles Baudelai
 Le Spleen de Paris
 Les Fleurs du Mal
 
+The save_as_new parameter lets you re-associate the data to a new instance.
+This is used in the admin for save_as functionality.
+
+>>> data = {
+...     'book_set-TOTAL_FORMS': '3', # the number of forms rendered
+...     'book_set-INITIAL_FORMS': '2', # the number of forms with initial data
+...     'book_set-0-id': '1',
+...     'book_set-0-title': 'Les Fleurs du Mal',
+...     'book_set-1-id': '2',
+...     'book_set-1-title': 'Le Spleen de Paris',
+...     'book_set-2-title': '',
+... }
+
+>>> formset = AuthorBooksFormSet(data, instance=Author(), save_as_new=True)
+>>> formset.is_valid()
+True
+
+>>> new_author = Author.objects.create(name='Charles Baudelaire')
+>>> formset.instance = new_author
+>>> [book for book in formset.save() if book.author.pk == new_author.pk]
+[<Book: Les Fleurs du Mal>, <Book: Le Spleen de Paris>]
+
 """}

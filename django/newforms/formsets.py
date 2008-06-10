@@ -57,14 +57,18 @@ class BaseFormSet(StrAndUnicode):
             initial = {TOTAL_FORM_COUNT: self._total_form_count, INITIAL_FORM_COUNT: self._initial_form_count}
             self.management_form = ManagementForm(initial=initial, auto_id=self.auto_id, prefix=self.prefix)
 
-        # instantiate all the forms and put them in self.forms
-        self.forms = []
-        for i in range(self._total_form_count):
-            self.forms.append(self._construct_form(i))
+        # construct the forms in the formset
+        self._construct_forms()
 
     def __unicode__(self):
         return self.as_table()
 
+    def _construct_forms(self):
+        # instantiate all the forms and put them in self.forms
+        self.forms = []
+        for i in xrange(self._total_form_count):
+            self.forms.append(self._construct_form(i))
+    
     def _construct_form(self, i):
         """
         Instantiates and returns the i-th form instance in a formset.

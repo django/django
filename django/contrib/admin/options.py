@@ -447,6 +447,7 @@ class ModelAdmin(BaseModelAdmin):
             'form_url': mark_safe(form_url),
             'opts': opts,
             'content_type_id': ContentType.objects.get_for_model(model).id,
+            'save_as': self.save_as,
             'save_on_top': self.save_on_top,
         }
         context.update(extra_context)
@@ -477,7 +478,8 @@ class ModelAdmin(BaseModelAdmin):
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES)
             for FormSet in self.get_formsets(request):
-                inline_formset = FormSet(data=request.POST, files=request.FILES, instance=obj)
+                inline_formset = FormSet(data=request.POST, files=request.FILES,
+                    instance=obj, save_as_new=request.POST.has_key("_saveasnew"))
                 inline_formsets.append(inline_formset)
             if all_valid(inline_formsets) and form.is_valid():
                 return self.save_add(request, model, form, inline_formsets, '../%s/')

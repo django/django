@@ -302,11 +302,13 @@ class BaseModelFormSet(BaseFormSet):
     """
     model = None
 
-    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, queryset=None):
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 queryset=None, **kwargs):
         self.queryset = queryset
-        kwargs = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
-        kwargs['initial'] = [model_to_dict(obj) for obj in self.get_queryset()]
-        super(BaseModelFormSet, self).__init__(**kwargs)
+        defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
+        defaults['initial'] = [model_to_dict(obj) for obj in self.get_queryset()]
+        defaults.update(kwargs)
+        super(BaseModelFormSet, self).__init__(**defaults)
 
     def get_queryset(self):
         if self.queryset is not None:
@@ -386,12 +388,20 @@ def _modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.
 
 class BaseInlineFormset(BaseModelFormSet):
     """A formset for child objects related to a parent."""
-    def __init__(self, data=None, files=None, instance=None):
+    def __init__(self, data=None, files=None, instance=None, save_as_new=False):
         from django.db.models.fields.related import RelatedObject
         self.instance = instance
+        self.save_as_new = save_as_new
         # is there a better way to get the object descriptor?
         self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
         super(BaseInlineFormset, self).__init__(data, files, prefix=self.rel_name)
+    
+    def _construct_forms(self):
+        from django.newforms.formsets import INITIAL_FORM_COUNT
+        if self.save_as_new:
+            self._total_form_count = self.management_form.cleaned_data[INITIAL_FORM_COUNT]
+            self._initial_form_count = 0
+        super(BaseInlineFormset, self)._construct_forms()
 
     def get_queryset(self):
         """

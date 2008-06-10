@@ -20,9 +20,7 @@ def submit_row(context):
     opts = context['opts']
     change = context['change']
     is_popup = context['is_popup']
-    # TODO: Fix this hack.
-    # save_as = opts.admin.save_as
-    save_as = False
+    save_as = context['save_as']
     return {
         'onclick_attrib': (opts.get_ordered_objects() and change
                             and 'onclick="submitOrderForm();"' or ''),
