@@ -15,7 +15,7 @@ from forms import BaseForm, get_declared_fields
 from fields import Field, ChoiceField, IntegerField, EMPTY_VALUES
 from widgets import Select, SelectMultiple, HiddenInput, MultipleHiddenInput
 from widgets import media_property
-from formsets import BaseFormSet, _formset_factory, DELETION_FIELD_NAME
+from formsets import BaseFormSet, formset_factory, DELETION_FIELD_NAME
 
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
@@ -377,7 +377,7 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.f
     """
     form = modelform_factory(model, form=form, fields=fields, exclude=exclude,
                               formfield_callback=formfield_callback)
-    FormSet = _formset_factory(form, formset, extra=extra, can_order=can_order, can_delete=can_delete)
+    FormSet = formset_factory(form, formset, extra=extra, can_order=can_order, can_delete=can_delete)
     FormSet.model = model
     return FormSet
 

@@ -265,8 +265,8 @@ class BaseFormSet(StrAndUnicode):
         forms = u' '.join([form.as_table() for form in self.forms])
         return mark_safe(u'\n'.join([unicode(self.management_form), forms]))
 
-# XXX: This API *will* change. Use at your own risk.
-def _formset_factory(form, formset=BaseFormSet, extra=1, can_order=False, can_delete=False):
+def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
+                    can_delete=False):
     """Return a FormSet for the given form class."""
     attrs = {'form': form, 'extra': extra, 'can_order': can_order, 'can_delete': can_delete}
     return type(form.__name__ + 'FormSet', (formset,), attrs)

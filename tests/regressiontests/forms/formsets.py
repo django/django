@@ -3,16 +3,16 @@ tests = """
 # Basic FormSet creation and usage ############################################
 
 FormSet allows us to use multiple instance of the same form on 1 page. For now,
-the best way to create a FormSet is by using the _formset_factory function.
+the best way to create a FormSet is by using the formset_factory function.
 
 >>> from django.newforms import Form, CharField, IntegerField, ValidationError
->>> from django.newforms.formsets import _formset_factory, BaseFormSet
+>>> from django.newforms.formsets import formset_factory, BaseFormSet
 
 >>> class Choice(Form):
 ...     choice = CharField()
 ...     votes = IntegerField()
 
->>> ChoiceFormSet = _formset_factory(Choice)
+>>> ChoiceFormSet = formset_factory(Choice)
 
 A FormSet constructor takes the same arguments as Form. Let's create a FormSet
 for adding data. By default, it displays 1 blank form. It can display more,
@@ -146,9 +146,9 @@ False
 # Displaying more than 1 blank form ###########################################
 
 We can also display more than 1 empty form at a time. To do so, pass a
-extra argument to _formset_factory.
+extra argument to formset_factory.
 
->>> ChoiceFormSet = _formset_factory(Choice, extra=3)
+>>> ChoiceFormSet = formset_factory(Choice, extra=3)
 
 >>> formset = ChoiceFormSet(auto_id=False, prefix='choices')
 >>> for form in formset.forms:
@@ -242,10 +242,10 @@ data.
 # FormSets with deletion ######################################################
 
 We can easily add deletion ability to a FormSet with an agrument to
-_formset_factory. This will add a boolean field to each form instance. When
+formset_factory. This will add a boolean field to each form instance. When
 that boolean field is True, the form will be in formset.deleted_forms
 
->>> ChoiceFormSet = _formset_factory(Choice, can_delete=True)
+>>> ChoiceFormSet = formset_factory(Choice, can_delete=True)
 
 >>> initial = [{'choice': u'Calexico', 'votes': 100}, {'choice': u'Fergie', 'votes': 900}]
 >>> formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
@@ -290,14 +290,14 @@ True
 # FormSets with ordering ######################################################
 
 We can also add ordering ability to a FormSet with an agrument to
-_formset_factory. This will add a integer field to each form instance. When
+formset_factory. This will add a integer field to each form instance. When
 form validation succeeds, [form.cleaned_data for form in formset.forms] will have the data in the correct
 order specified by the ordering fields. If a number is duplicated in the set
 of ordering fields, for instance form 0 and form 3 are both marked as 1, then
 the form index used as a secondary ordering criteria. In order to put
 something at the front of the list, you'd need to set it's order to 0.
 
->>> ChoiceFormSet = _formset_factory(Choice, can_order=True)
+>>> ChoiceFormSet = formset_factory(Choice, can_order=True)
 
 >>> initial = [{'choice': u'Calexico', 'votes': 100}, {'choice': u'Fergie', 'votes': 900}]
 >>> formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
@@ -371,7 +371,7 @@ True
 
 Let's try throwing ordering and deletion into the same form.
 
->>> ChoiceFormSet = _formset_factory(Choice, can_order=True, can_delete=True)
+>>> ChoiceFormSet = formset_factory(Choice, can_order=True, can_delete=True)
 
 >>> initial = [
 ...     {'choice': u'Calexico', 'votes': 100},
