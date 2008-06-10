@@ -16,10 +16,10 @@ class Book(models.Model):
 
 __test__ = {'API_TESTS': """
 
->>> from django.newforms.models import _modelformset_factory
+>>> from django.newforms.models import modelformset_factory
 
 >>> qs = Author.objects.all()
->>> AuthorFormSet = _modelformset_factory(Author, extra=3)
+>>> AuthorFormSet = modelformset_factory(Author, extra=3)
 
 >>> formset = AuthorFormSet(queryset=qs)
 >>> for form in formset.forms:
@@ -55,7 +55,7 @@ restrict the Author objects we edit, but in this case we'll use it to display
 them in alphabetical order by name.
 
 >>> qs = Author.objects.order_by('name')
->>> AuthorFormSet = _modelformset_factory(Author, extra=1, can_delete=False)
+>>> AuthorFormSet = modelformset_factory(Author, extra=1, can_delete=False)
 
 >>> formset = AuthorFormSet(queryset=qs)
 >>> for form in formset.forms:
@@ -94,7 +94,7 @@ This probably shouldn't happen, but it will. If an add form was marked for
 deltetion, make sure we don't save that form.
 
 >>> qs = Author.objects.order_by('name')
->>> AuthorFormSet = _modelformset_factory(Author, extra=1, can_delete=True)
+>>> AuthorFormSet = modelformset_factory(Author, extra=1, can_delete=True)
 
 >>> formset = AuthorFormSet(queryset=qs)
 >>> for form in formset.forms:
@@ -163,9 +163,9 @@ True
 We can also create a formset that is tied to a parent model. This is how the
 admin system's edit inline functionality works.
 
->>> from django.newforms.models import _inlineformset_factory
+>>> from django.newforms.models import inlineformset_factory
 
->>> AuthorBooksFormSet = _inlineformset_factory(Author, Book, can_delete=False, extra=3)
+>>> AuthorBooksFormSet = inlineformset_factory(Author, Book, can_delete=False, extra=3)
 >>> author = Author.objects.get(name='Charles Baudelaire')
 
 >>> formset = AuthorBooksFormSet(instance=author)
@@ -199,7 +199,7 @@ Now that we've added a book to Charles Baudelaire, let's try adding another
 one. This time though, an edit form will be available for every existing
 book.
 
->>> AuthorBooksFormSet = _inlineformset_factory(Author, Book, can_delete=False, extra=2)
+>>> AuthorBooksFormSet = inlineformset_factory(Author, Book, can_delete=False, extra=2)
 >>> author = Author.objects.get(name='Charles Baudelaire')
 
 >>> formset = AuthorBooksFormSet(instance=author)

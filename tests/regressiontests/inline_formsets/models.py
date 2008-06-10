@@ -15,13 +15,13 @@ class Child(models.Model):
 
 __test__ = {'API_TESTS': """
 
->>> from django.newforms.models import _inlineformset_factory
+>>> from django.newforms.models import inlineformset_factory
 
 
 Child has two ForeignKeys to Parent, so if we don't specify which one to use
 for the inline formset, we should get an exception.
 
->>> ifs = _inlineformset_factory(Parent, Child)
+>>> ifs = inlineformset_factory(Parent, Child)
 Traceback (most recent call last):
     ...
 Exception: <class 'regressiontests.inline_formsets.models.Child'> has more than 1 ForeignKey to <class 'regressiontests.inline_formsets.models.Parent'>
@@ -29,14 +29,14 @@ Exception: <class 'regressiontests.inline_formsets.models.Child'> has more than 
 
 These two should both work without a problem.
 
->>> ifs = _inlineformset_factory(Parent, Child, fk_name='mother')
->>> ifs = _inlineformset_factory(Parent, Child, fk_name='father')
+>>> ifs = inlineformset_factory(Parent, Child, fk_name='mother')
+>>> ifs = inlineformset_factory(Parent, Child, fk_name='father')
 
 
 If we specify fk_name, but it isn't a ForeignKey from the child model to the
 parent model, we should get an exception.
 
->>> ifs = _inlineformset_factory(Parent, Child, fk_name='school')
+>>> ifs = inlineformset_factory(Parent, Child, fk_name='school')
 Traceback (most recent call last):
     ...
 Exception: fk_name 'school' is not a ForeignKey to <class 'regressiontests.inline_formsets.models.Parent'>
@@ -45,7 +45,7 @@ Exception: fk_name 'school' is not a ForeignKey to <class 'regressiontests.inlin
 If the field specified in fk_name is not a ForeignKey, we should get an
 exception.
 
->>> ifs = _inlineformset_factory(Parent, Child, fk_name='test')
+>>> ifs = inlineformset_factory(Parent, Child, fk_name='test')
 Traceback (most recent call last):
     ...
 Exception: <class 'regressiontests.inline_formsets.models.Child'> has no field named 'test'

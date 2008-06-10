@@ -279,8 +279,7 @@ class BaseModelForm(BaseForm):
 class ModelForm(BaseModelForm):
     __metaclass__ = ModelFormMetaclass
 
-# XXX: This API *will* change. Use at your own risk.
-def _modelform_factory(model, form=ModelForm, fields=None, exclude=None,
+def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
                        formfield_callback=lambda f: f.formfield()):
     # HACK: we should be able to construct a ModelForm without creating
     # and passing in a temporary inner class
@@ -369,15 +368,14 @@ class BaseModelFormSet(BaseFormSet):
         form.fields[self._pk_field_name] = IntegerField(required=False, widget=HiddenInput)
         super(BaseModelFormSet, self).add_fields(form, index)
 
-# XXX: Use at your own risk. This API *will* change.
-def _modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.formfield(),
+def modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.formfield(),
                           formset=BaseModelFormSet,
                           extra=1, can_delete=False, can_order=False,
                           fields=None, exclude=None):
     """
     Returns a FormSet class for the given Django model class.
     """
-    form = _modelform_factory(model, form=form, fields=fields, exclude=exclude,
+    form = modelform_factory(model, form=form, fields=fields, exclude=exclude,
                               formfield_callback=formfield_callback)
     FormSet = _formset_factory(form, formset, extra=extra, can_order=can_order, can_delete=can_delete)
     FormSet.model = model
@@ -444,8 +442,7 @@ def _get_foreign_key(parent_model, model, fk_name=None):
     return fk
 
 
-# XXX: This API *will* change. Use at your own risk.
-def _inlineformset_factory(parent_model, model, form=ModelForm,
+def inlineformset_factory(parent_model, model, form=ModelForm,
                            formset=BaseInlineFormset, fk_name=None,
                            fields=None, exclude=None,
                            extra=3, can_order=False, can_delete=True,
@@ -463,7 +460,7 @@ def _inlineformset_factory(parent_model, model, form=ModelForm,
         exclude.append(fk.name)
     else:
         exclude = [fk.name]
-    FormSet = _modelformset_factory(model, form=form,
+    FormSet = modelformset_factory(model, form=form,
                                     formfield_callback=formfield_callback,
                                     formset=formset,
                                     extra=extra, can_delete=can_delete, can_order=can_order,
