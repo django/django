@@ -2,6 +2,7 @@
 <div class="inline-group">
 {{ inline_admin_formset.formset.management_form }}
 {# <h3 class="header">{{ inline_admin_formset.opts.verbose_name_plural|title }}</h3> #}
+{{ inline_admin_formset.formset.non_form_errors }}
 
 {% for inline_admin_form in inline_admin_formset %}
 <div class="inline-related {% if forloop.last %}last-related{% endif %}">
