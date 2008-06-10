@@ -2,6 +2,7 @@ from django import oldforms, template
 from django import newforms as forms
 from django.newforms.formsets import all_valid
 from django.newforms.models import modelform_factory, inlineformset_factory
+from django.newforms.models import BaseInlineFormset
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets
 from django.contrib.admin.util import get_deleted_objects
@@ -696,6 +697,7 @@ class InlineModelAdmin(BaseModelAdmin):
     """
     model = None
     fk_name = None
+    formset = BaseInlineFormset
     extra = 3
     template = None
     verbose_name = None
@@ -717,7 +719,10 @@ class InlineModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
-        return inlineformset_factory(self.parent_model, self.model, form=self.form, fk_name=self.fk_name, fields=fields, formfield_callback=self.formfield_for_dbfield, extra=self.extra)
+        return inlineformset_factory(self.parent_model, self.model,
+            form=self.form, formset=self.formset, fk_name=self.fk_name,
+            fields=fields, formfield_callback=self.formfield_for_dbfield,
+            extra=self.extra)
 
     def get_fieldsets(self, request, obj=None):
         if self.declared_fieldsets:
