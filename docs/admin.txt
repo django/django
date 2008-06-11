@@ -330,6 +330,11 @@ For more on ``select_related()``, see `the select_related() docs`_.
 
 .. _the select_related() docs: ../db-api/#select-related
 
+``inlines``
+-----------
+
+See ``InlineModelAdmin`` objects below.
+
 ``ordering``
 ------------
 
@@ -421,6 +426,114 @@ with an operator:
 ``@``
     Performs a full-text match. This is like the default search method but uses
     an index. Currently this is only available for MySQL.
+
+``InlineModelAdmin`` objects
+============================
+
+The admin interface has the ability to edit models on the same page as a
+parent model. These are called inlines. You can add them a model being
+specifing them in a ``ModelAdmin.inlines`` attribute::
+
+    class BookInline(admin.TabularInline):
+        model = Book
+    
+    class AuthorAdmin(admin.ModelAdmin):
+        inlines = [
+            BookInline,
+        ]
+
+Django provides two subclasses of ``InlineModelAdmin`` and they are::
+
+    * ``TabularInline``
+    * ``StackedInline``
+
+The difference between these two is merely the template used to render them.
+
+``InlineModelAdmin`` options
+-----------------------------
+
+The ``InlineModelAdmin`` class is a subclass of ``ModelAdmin`` so it inherits
+all the same functionality as well as some of its own:
+
+``model``
+~~~~~~~~~
+
+The model in which the inline is using. This is required.
+
+``fk_name``
+~~~~~~~~~~~
+
+The name of the foreign key on the model. In most cases this will be dealt
+with automatically, but ``fk_name`` must be specified explicitly if there are
+more than one foreign key to the same parent model.
+
+``formset``
+~~~~~~~~~~~
+
+This defaults to ``BaseInlineFormset``. Using your own formset can give you
+many possibilities of customization. Inlines are built around
+`model formsets`_.
+
+.. _model formsets: ../modelforms/#
+
+``form``
+~~~~~~~~
+
+The value for ``form`` is inherited from ``ModelAdmin``. This is what is
+passed through to ``formset_factory`` when creating the formset for this
+inline.
+
+``extra``
+~~~~~~~~~
+
+This controls the number of extra forms the formset will display in addition
+to the initial forms. See `extra in formsets`_ for more information.
+
+``max_num``
+~~~~~~~~~~~
+
+This controls the maximum number of forms to show in the inline. This doesn't
+directly corrolate to the number of objects, but can if the value is small
+enough. See `max_num in model formsets`_ for more information.
+
+``template``
+~~~~~~~~~~~~
+
+The template used to render the inline on the page.
+
+``verbose_name``
+~~~~~~~~~~~~~~~~
+
+An override to the ``verbose_name`` found in the model's inner ``Meta`` class.
+
+``verbose_name_plural``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+An override to the ``verbose_name_plural`` found in the model's inner ``Meta``
+class.
+
+Working with a model with two or more foreign keys to the same parent model
+---------------------------------------------------------------------------
+
+It is sometimes possible to have more than one foreign key to the same model.
+Take this model for instance::
+
+    class Friendship(models.Model):
+        to_person = models.ForeignKey(Person, related_name="friends")
+        from_person = models.ForeignKey(Person, related_name="from_friends")
+    
+If you wanted to display an inline on the ``Person`` admin add/change pages
+you need to explicitly define the foreign key since it is unable to do so
+automatically::
+
+    class FriendshipInline(admin.TabularInline):
+        model = Friendship
+        fk_name = "to_person"
+    
+    class PersonAdmin(admin.ModelAdmin):
+        inlines = [
+            FriendshipInline,
+        ]
 
 ``AdminSite`` objects
 =====================
