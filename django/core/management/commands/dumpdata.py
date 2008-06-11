@@ -9,6 +9,8 @@ class Command(BaseCommand):
             help='Specifies the output serialization format for fixtures.'),
         make_option('--indent', default=None, dest='indent', type='int',
             help='Specifies the indent level to use when pretty-printing output'),
+        make_option('-e', '--exclude', dest='exclude',action='append', default=[], 
+            help='App to exclude (use multiple --exclude to exclude multiple apps).'),
     )
     help = 'Output the contents of the database as a fixture of the given format.'
     args = '[appname ...]'
@@ -16,12 +18,15 @@ class Command(BaseCommand):
     def handle(self, *app_labels, **options):
         from django.db.models import get_app, get_apps, get_models
 
-        format = options.get('format', 'json')
-        indent = options.get('indent', None)
-        show_traceback = options.get('traceback', False)
+        format = options['format']
+        indent = options['indent']
+        exclude = options['exclude']
+        show_traceback = options['traceback']
+
+        excluded_apps = [get_app(app_label) for app_label in exclude]
 
         if len(app_labels) == 0:
-            app_list = get_apps()
+            app_list = [app for app in get_apps() if app not in excluded_apps]
         else:
             app_list = [get_app(app_label) for app_label in app_labels]
 

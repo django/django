@@ -164,6 +164,22 @@ dumped.
 
 .. _custom manager: ../model-api/#custom-managers
 
+--exclude
+~~~~~~~~~
+
+**New in Django development version**
+
+Exclude a specific application from the applications whose contents is
+output. For example, to specifically exclude the `auth` application from
+the output, you would call::
+
+	django-admin.py dumpdata --exclude=auth
+
+If you want to exclude multiple applications, use multiple ``--exclude``
+directives::
+
+	django-admin.py dumpdata --exclude=auth --exclude=contenttype
+
 --format
 ~~~~~~~~
 
