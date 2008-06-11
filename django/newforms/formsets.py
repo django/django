@@ -10,6 +10,7 @@ __all__ = ('BaseFormSet', 'all_valid')
 # special field names
 TOTAL_FORM_COUNT = 'TOTAL_FORMS'
 INITIAL_FORM_COUNT = 'INITIAL_FORMS'
+MAX_FORM_COUNT = 'MAX_FORMS'
 ORDERING_FIELD_NAME = 'ORDER'
 DELETION_FIELD_NAME = 'DELETE'
 
@@ -22,6 +23,7 @@ class ManagementForm(Form):
     def __init__(self, *args, **kwargs):
         self.base_fields[TOTAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
         self.base_fields[INITIAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
+        self.base_fields[MAX_FORM_COUNT] = IntegerField(widget=HiddenInput)
         super(ManagementForm, self).__init__(*args, **kwargs)
 
 class BaseFormSet(StrAndUnicode):
@@ -29,7 +31,7 @@ class BaseFormSet(StrAndUnicode):
     A collection of instances of the same Form class.
     """
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-            initial=None, error_class=ErrorList):
+                 initial=None, error_class=ErrorList):
         self.is_bound = data is not None or files is not None
         self.prefix = prefix or 'form'
         self.auto_id = auto_id
@@ -45,18 +47,25 @@ class BaseFormSet(StrAndUnicode):
             if self.management_form.is_valid():
                 self._total_form_count = self.management_form.cleaned_data[TOTAL_FORM_COUNT]
                 self._initial_form_count = self.management_form.cleaned_data[INITIAL_FORM_COUNT]
+                self._max_form_count = self.management_form.cleaned_data[MAX_FORM_COUNT]
             else:
                 raise ValidationError('ManagementForm data is missing or has been tampered with')
         else:
             if initial:
                 self._initial_form_count = len(initial)
+                if self._initial_form_count > self._max_form_count and self._max_form_count > 0:
+                    self._initial_form_count = self._max_form_count
                 self._total_form_count = self._initial_form_count + self.extra
             else:
                 self._initial_form_count = 0
                 self._total_form_count = self.extra
-            initial = {TOTAL_FORM_COUNT: self._total_form_count, INITIAL_FORM_COUNT: self._initial_form_count}
+            if self._total_form_count > self._max_form_count and self._max_form_count > 0:
+                self._total_form_count = self._max_form_count
+            initial = {TOTAL_FORM_COUNT: self._total_form_count,
+                       INITIAL_FORM_COUNT: self._initial_form_count,
+                       MAX_FORM_COUNT: self._max_form_count}
             self.management_form = ManagementForm(initial=initial, auto_id=self.auto_id, prefix=self.prefix)
-
+        
         # construct the forms in the formset
         self._construct_forms()
 
@@ -266,9 +275,11 @@ class BaseFormSet(StrAndUnicode):
         return mark_safe(u'\n'.join([unicode(self.management_form), forms]))
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
-                    can_delete=False):
+                    can_delete=False, max_num=0):
     """Return a FormSet for the given form class."""
-    attrs = {'form': form, 'extra': extra, 'can_order': can_order, 'can_delete': can_delete}
+    attrs = {'form': form, 'extra': extra,
+             'can_order': can_order, 'can_delete': can_delete,
+             '_max_form_count': max_num}
     return type(form.__name__ + 'FormSet', (formset,), attrs)
 
 def all_valid(formsets):

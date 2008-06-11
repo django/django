@@ -305,7 +305,11 @@ class BaseModelFormSet(BaseFormSet):
                  queryset=None, **kwargs):
         self.queryset = queryset
         defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
-        defaults['initial'] = [model_to_dict(obj) for obj in self.get_queryset()]
+        if self._max_form_count > 0:
+            qs = self.get_queryset()[:self._max_form_count]
+        else:
+            qs = self.get_queryset()
+        defaults['initial'] = [model_to_dict(obj) for obj in qs]
         defaults.update(kwargs)
         super(BaseModelFormSet, self).__init__(**defaults)
 
@@ -369,15 +373,16 @@ class BaseModelFormSet(BaseFormSet):
         super(BaseModelFormSet, self).add_fields(form, index)
 
 def modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.formfield(),
-                          formset=BaseModelFormSet,
-                          extra=1, can_delete=False, can_order=False,
-                          fields=None, exclude=None):
+                         formset=BaseModelFormSet,
+                         extra=1, can_delete=False, can_order=False,
+                         max_num=0, fields=None, exclude=None):
     """
     Returns a FormSet class for the given Django model class.
     """
     form = modelform_factory(model, form=form, fields=fields, exclude=exclude,
-                              formfield_callback=formfield_callback)
-    FormSet = formset_factory(form, formset, extra=extra, can_order=can_order, can_delete=can_delete)
+                             formfield_callback=formfield_callback)
+    FormSet = formset_factory(form, formset, extra=extra, max_num=max_num,
+                              can_order=can_order, can_delete=can_delete)
     FormSet.model = model
     return FormSet
 
@@ -395,9 +400,8 @@ class BaseInlineFormset(BaseModelFormSet):
         super(BaseInlineFormset, self).__init__(data, files, prefix=self.rel_name)
     
     def _construct_forms(self):
-        from django.newforms.formsets import INITIAL_FORM_COUNT
         if self.save_as_new:
-            self._total_form_count = self.management_form.cleaned_data[INITIAL_FORM_COUNT]
+            self._total_form_count = self._initial_form_count
             self._initial_form_count = 0
         super(BaseInlineFormset, self)._construct_forms()
 
@@ -443,10 +447,10 @@ def _get_foreign_key(parent_model, model, fk_name=None):
 
 
 def inlineformset_factory(parent_model, model, form=ModelForm,
-                           formset=BaseInlineFormset, fk_name=None,
-                           fields=None, exclude=None,
-                           extra=3, can_order=False, can_delete=True,
-                           formfield_callback=lambda f: f.formfield()):
+                          formset=BaseInlineFormset, fk_name=None,
+                          fields=None, exclude=None,
+                          extra=3, can_order=False, can_delete=True, max_num=0,
+                          formfield_callback=lambda f: f.formfield()):
     """
     Returns an ``InlineFormset`` for the given kwargs.
 
@@ -464,7 +468,7 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
                                     formfield_callback=formfield_callback,
                                     formset=formset,
                                     extra=extra, can_delete=can_delete, can_order=can_order,
-                                    fields=fields, exclude=exclude)
+                                    fields=fields, exclude=exclude, max_num=max_num)
     FormSet.fk = fk
     return FormSet
 

@@ -699,6 +699,7 @@ class InlineModelAdmin(BaseModelAdmin):
     fk_name = None
     formset = BaseInlineFormset
     extra = 3
+    max_num = 0
     template = None
     verbose_name = None
     verbose_name_plural = None
@@ -722,7 +723,7 @@ class InlineModelAdmin(BaseModelAdmin):
         return inlineformset_factory(self.parent_model, self.model,
             form=self.form, formset=self.formset, fk_name=self.fk_name,
             fields=fields, formfield_callback=self.formfield_for_dbfield,
-            extra=self.extra)
+            extra=self.extra, max_num=self.max_num)
 
     def get_fieldsets(self, request, obj=None):
         if self.declared_fieldsets:
