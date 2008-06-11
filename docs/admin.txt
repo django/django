@@ -474,7 +474,7 @@ This defaults to ``BaseInlineFormset``. Using your own formset can give you
 many possibilities of customization. Inlines are built around
 `model formsets`_.
 
-.. _model formsets: ../modelforms/#
+.. _model formsets: ../modelforms/#model-formsets
 
 ``form``
 ~~~~~~~~
@@ -487,7 +487,9 @@ inline.
 ~~~~~~~~~
 
 This controls the number of extra forms the formset will display in addition
-to the initial forms. See `extra in formsets`_ for more information.
+to the initial forms. See the `formsets documentation`_ for more information.
+
+.. _formsets documentation: ../newforms/#formsets
 
 ``max_num``
 ~~~~~~~~~~~
@@ -495,6 +497,8 @@ to the initial forms. See `extra in formsets`_ for more information.
 This controls the maximum number of forms to show in the inline. This doesn't
 directly corrolate to the number of objects, but can if the value is small
 enough. See `max_num in model formsets`_ for more information.
+
+.. _max_num in formsets: ../modelforms/#limiting-the-number-of-objects-editable
 
 ``template``
 ~~~~~~~~~~~~
