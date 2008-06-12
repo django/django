@@ -139,10 +139,10 @@ It also has these methods:
               in 5 minutes.
 
             * If ``value`` is a ``datetime`` or ``timedelta`` object, the
-              session will expire at that specific time.
-      
-            * If ``value`` is ``0`` then the user's session cookie will expire
-              when their browser is closed.
+              session will expire at that specific date/time.
+
+            * If ``value`` is ``0``, the user's session cookie will expire
+              when the user's Web browser is closed.
 
             * If ``value`` is ``None``, the session reverts to using the global
               session expiry policy.
@@ -168,7 +168,7 @@ It also has these methods:
       **New in Django development version**
 
       Returns either ``True`` or ``False``, depending on whether the user's
-      session cookie will expire when their browser is closed.
+      session cookie will expire when the user's Web browser is closed.
 
 You can edit ``request.session`` at any point in your view. You can edit it
 multiple times.

@@ -104,14 +104,14 @@ do so during ``syncdb``, or if you need to programmatically generate
 superuser accounts for your site(s).
 
 When run interactively, this command will prompt for a password for
-the new superuser account; when run non-interactively, no password
-will be set and the superuser account will not be able to log in until
+the new superuser account. When run non-interactively, no password
+will be set, and the superuser account will not be able to log in until
 a password has been manually set for it.
 
 The username and e-mail address for the new account can be supplied by
 using the ``--username`` and ``--email`` arguments on the command
-line; if not supplied, ``createsuperuser`` will prompt for them when
-running interactively.
+line. If either of those is not supplied, ``createsuperuser`` will prompt for
+it when running interactively.
 
 This command is only available if Django's `authentication system`_
 (``django.contrib.auth``) is installed.
