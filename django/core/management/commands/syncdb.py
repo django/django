@@ -34,7 +34,16 @@ class Command(NoArgsCommand):
             try:
                 __import__(app_name + '.management', {}, {}, [''])
             except ImportError, exc:
-                if not exc.args[0].startswith('No module named management'):
+                # This is slightly hackish. We want to ignore ImportErrors
+                # if the "management" module itself is missing -- but we don't
+                # want to ignore the exception if the management module exists
+                # but raises an ImportError for some reason. The only way we
+                # can do this is to check the text of the exception. Note that
+                # we're a bit broad in how we check the text, because different
+                # Python implementations may not use the same text. CPython
+                # uses the text "No module named management".
+                msg = exc.args[0]
+                if not msg.startswith('No module named management') or 'management' not in msg:
                     raise
 
         cursor = connection.cursor()
