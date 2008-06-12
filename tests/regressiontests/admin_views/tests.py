@@ -182,6 +182,13 @@ class AdminViewPermissionsTest(TestCase):
         self.assertRedirects(post, '/test_admin/admin/admin_views/article/')
         self.failUnlessEqual(Article.objects.get(pk=1).content, '<p>edited article</p>')
         self.client.get('/test_admin/admin/logout/')
+        
+    def testCustomChangelistView(self):
+        self.client.get('/test_admin/admin/')
+        self.client.post('/test_admin/admin/', self.super_login)
+        request = self.client.get('/test_admin/admin/admin_views/customarticle/')
+        self.failUnlessEqual(request.status_code, 200)
+        self.assert_("var hello = 'Hello!';" in request.content)
 
     def testDeleteView(self):
         """Delete view should restrict access and actually delete items."""

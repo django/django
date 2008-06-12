@@ -455,7 +455,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = model._meta
         app_label = opts.app_label
         ordered_objects = opts.get_ordered_objects()
-        extra_context = {
+        context.update({
             'add': add,
             'change': change,
             'has_add_permission': self.has_add_permission(request),
@@ -469,14 +469,14 @@ class ModelAdmin(BaseModelAdmin):
             'content_type_id': ContentType.objects.get_for_model(model).id,
             'save_as': self.save_as,
             'save_on_top': self.save_on_top,
-        }
-        context.update(extra_context)
+        })
         return render_to_response([
             "admin/%s/%s/change_form.html" % (app_label, opts.object_name.lower()),
             "admin/%s/change_form.html" % app_label,
-            "admin/change_form.html"], context_instance=context)
+            "admin/change_form.html"
+        ], context, context_instance=template.RequestContext(request))
 
-    def add_view(self, request, form_url=''):
+    def add_view(self, request, form_url='', extra_context=None):
         "The 'add' admin view for this model."
         model = self.model
         opts = model._meta
@@ -520,17 +520,18 @@ class ModelAdmin(BaseModelAdmin):
             inline_admin_formset = InlineAdminFormSet(inline, formset, fieldsets)
             inline_admin_formsets.append(inline_admin_formset)
 
-        c = template.RequestContext(request, {
+        context = {
             'title': _('Add %s') % opts.verbose_name,
             'adminform': adminForm,
             'is_popup': request.REQUEST.has_key('_popup'),
             'show_delete': False,
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
-        })
-        return self.render_change_form(request, model, c, add=True)
+        }
+        context.update(extra_context or {})
+        return self.render_change_form(request, model, context, add=True)
 
-    def change_view(self, request, object_id):
+    def change_view(self, request, object_id, extra_context=None):
         "The 'change' admin view for this model."
         model = self.model
         opts = model._meta
@@ -594,7 +595,7 @@ class ModelAdmin(BaseModelAdmin):
             inline_admin_formset = InlineAdminFormSet(inline, formset, fieldsets)
             inline_admin_formsets.append(inline_admin_formset)
 
-        c = template.RequestContext(request, {
+        context = {
             'title': _('Change %s') % opts.verbose_name,
             'adminform': adminForm,
             'object_id': object_id,
@@ -602,10 +603,11 @@ class ModelAdmin(BaseModelAdmin):
             'is_popup': request.REQUEST.has_key('_popup'),
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
-        })
-        return self.render_change_form(request, model, c, change=True, obj=obj)
+        }
+        context.update(extra_context or {})
+        return self.render_change_form(request, model, context, change=True, obj=obj)
 
-    def changelist_view(self, request):
+    def changelist_view(self, request, extra_context=None):
         "The 'change list' admin view for this model."
         from django.contrib.admin.views.main import ChangeList, ERROR_FLAG
         opts = self.model._meta
@@ -624,17 +626,20 @@ class ModelAdmin(BaseModelAdmin):
             if ERROR_FLAG in request.GET.keys():
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
-        c = template.RequestContext(request, {
+        context = {
             'title': cl.title,
             'is_popup': cl.is_popup,
             'cl': cl,
-        })
-        c.update({'has_add_permission': self.has_add_permission(request)}),
-        return render_to_response(['admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
-                                'admin/%s/change_list.html' % app_label,
-                                'admin/change_list.html'], context_instance=c)
+        }
+        context.update({'has_add_permission': self.has_add_permission(request)}),
+        context.update(extra_context or {})
+        return render_to_response([
+            'admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
+            'admin/%s/change_list.html' % app_label,
+            'admin/change_list.html'
+        ], context, context_instance=template.RequestContext(request))
 
-    def delete_view(self, request, object_id):
+    def delete_view(self, request, object_id, extra_context=None):
         "The 'delete' admin view for this model."
         from django.contrib.contenttypes.models import ContentType
         from django.contrib.admin.models import LogEntry, DELETION
@@ -671,7 +676,7 @@ class ModelAdmin(BaseModelAdmin):
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect("../../../../")
             return HttpResponseRedirect("../../")
-        extra_context = {
+        context = {
             "title": _("Are you sure?"),
             "object_name": opts.verbose_name,
             "object": obj,
@@ -679,11 +684,14 @@ class ModelAdmin(BaseModelAdmin):
             "perms_lacking": perms_needed,
             "opts": opts,
         }
-        return render_to_response(["admin/%s/%s/delete_confirmation.html" % (app_label, opts.object_name.lower() ),
-                                "admin/%s/delete_confirmation.html" % app_label ,
-                                "admin/delete_confirmation.html"], extra_context, context_instance=template.RequestContext(request))
+        context.update(extra_context or {})
+        return render_to_response([
+            "admin/%s/%s/delete_confirmation.html" % (app_label, opts.object_name.lower()),
+            "admin/%s/delete_confirmation.html" % app_label,
+            "admin/delete_confirmation.html"
+        ], context, context_instance=template.RequestContext(request))
 
-    def history_view(self, request, object_id):
+    def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
         from django.contrib.contenttypes.models import ContentType
         from django.contrib.admin.models import LogEntry
@@ -693,18 +701,18 @@ class ModelAdmin(BaseModelAdmin):
             content_type__id__exact=ContentType.objects.get_for_model(model).id).select_related().order_by('action_time')
         # If no history was found, see whether this object even exists.
         obj = get_object_or_404(model, pk=object_id)
-        extra_context = {
+        context = {
             'title': _('Change history: %s') % force_unicode(obj),
             'action_list': action_list,
             'module_name': capfirst(opts.verbose_name_plural),
             'object': obj,
         }
-        template_list = [
+        context.update(extra_context or {})
+        return render_to_response([
             "admin/%s/%s/object_history.html" % (opts.app_label, opts.object_name.lower()),
             "admin/%s/object_history.html" % opts.app_label,
             "admin/object_history.html"
-        ]
-        return render_to_response(template_list, extra_context, context_instance=template.RequestContext(request))
+        ], context, context_instance=template.RequestContext(request))
 
 class InlineModelAdmin(BaseModelAdmin):
     """
