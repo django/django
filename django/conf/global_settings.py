@@ -11,9 +11,10 @@ gettext_noop = lambda s: s
 
 DEBUG = False
 TEMPLATE_DEBUG = False
-# True if BaseHandler.get_response() should propagate raw exceptions
-# rather than catching them.  This is useful under some testing siutations,
-# and should never be used on a live site.
+
+# Whether the framework should propagate raw exceptions rather than catching
+# them. This is useful under some testing siutations and should never be used
+# on a live site.
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
 # Whether to use the "Etag" header. This saves bandwidth but slows down performance.
@@ -289,7 +290,7 @@ SESSION_COOKIE_DOMAIN = None                            # A string like ".lawren
 SESSION_COOKIE_SECURE = False                           # Whether the session cookie should be secure (https:// only).
 SESSION_COOKIE_PATH = '/'                               # The path of the session cookie.
 SESSION_SAVE_EVERY_REQUEST = False                      # Whether to save the session data on every request.
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False                 # Whether a user's session cookie expires when they close their browser.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False                 # Whether a user's session cookie expires when the Web browser is closed.
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # The module to store session data
 SESSION_FILE_PATH = None                                # Directory to store session files if using the file session module. If None, the backend will use a sensible default.
 
