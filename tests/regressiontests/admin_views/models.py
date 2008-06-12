@@ -19,8 +19,9 @@ class ArticleAdmin(admin.ModelAdmin):
             'extra_var': 'Hello!'
         })
 
-class CustomArticle(Article):
-    pass
+class CustomArticle(models.Model):
+    content = models.TextField()
+    date = models.DateTimeField()
 
 class CustomArticleAdmin(admin.ModelAdmin):
     def changelist_view(self, request):
