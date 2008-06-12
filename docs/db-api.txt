@@ -1373,6 +1373,17 @@ SQL equivalent::
 
     SELECT ... WHERE id IN (1, 3, 4);
 
+You can also use a queryset to dynamically evaluate the list of values
+instead of providing a list of literal values. The queryset must be
+reduced to a list of individual values using the ``values()`` method, 
+and then converted into a query using the ``query`` attribute::
+
+    Entry.objects.filter(blog__in=Blog.objects.filter(name__contains='Cheddar').values('pk').query)
+
+This queryset will be evaluated as subselect statement::
+
+    SELET ... WHERE blog.id IN (SELECT id FROM ... WHERE NAME LIKE '%Cheddar%')
+
 startswith
 ~~~~~~~~~~
 

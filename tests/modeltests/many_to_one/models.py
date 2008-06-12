@@ -175,6 +175,12 @@ False
 >>> Article.objects.filter(reporter__in=[r,r2]).distinct()
 [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]
 
+# You can also use a queryset instead of a literal list of instances.
+# The queryset must be reduced to a list of values using values(), 
+# then converted into a query
+>>> Article.objects.filter(reporter__in=Reporter.objects.filter(first_name='John').values('pk').query).distinct()
+[<Article: John's second story>, <Article: This is a test>]
+
 # You need two underscores between "reporter" and "id" -- not one.
 >>> Article.objects.filter(reporter_id__exact=1)
 Traceback (most recent call last):
