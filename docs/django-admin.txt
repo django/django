@@ -354,9 +354,9 @@ The ``dumpdata`` command can be used to generate input for ``loaddata``.
 Use ``--verbosity`` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console.
 
-	* ``0`` means no input.
-	* ``1`` means normal input (default).
-	* ``2`` means verbose input.
+	* ``0`` means no output.
+	* ``1`` means normal output (default).
+	* ``2`` means verbose output.
 
 Example usage::
 
@@ -597,9 +597,9 @@ data files.
 Use ``--verbosity`` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console.
 
-	* ``0`` means no input.
-	* ``1`` means normal input (default).
-	* ``2`` means verbose input.
+	* ``0`` means no output.
+	* ``1`` means normal output (default).
+	* ``2`` means verbose output.
 
 Example usage::
 
@@ -633,9 +633,9 @@ is being executed as an unattended, automated script.
 Use ``--verbosity`` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console.
 
-	* ``0`` means no input.
-	* ``1`` means normal input (default).
-	* ``2`` means verbose input.
+	* ``0`` means no output.
+	* ``1`` means normal output (default).
+	* ``2`` means verbose output.
 
 Example usage::
 
@@ -709,9 +709,9 @@ To run on 1.2.3.4:7000 with a ``test`` fixture::
 Use ``--verbosity`` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console.
 
-	* ``0`` means no input.
-	* ``1`` means normal input (default).
-	* ``2`` means verbose input.
+	* ``0`` means no output.
+	* ``1`` means normal output (default).
+	* ``2`` means verbose output.
 
 Example usage::
 
