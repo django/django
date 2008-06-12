@@ -17,6 +17,10 @@ from django.utils.translation import ugettext as _
 from django.utils.encoding import force_unicode
 import sets
 
+HORIZONTAL, VERTICAL = 1, 2
+# returns the <ul> class for a given radio_admin field
+get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
+
 class IncorrectLookupParameters(Exception):
     pass
 
@@ -133,6 +137,7 @@ class BaseModelAdmin(object):
     form = forms.ModelForm
     filter_vertical = ()
     filter_horizontal = ()
+    radio_fields = {}
     prepopulated_fields = {}
 
     def __init__(self):
@@ -173,6 +178,11 @@ class BaseModelAdmin(object):
         if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
             if isinstance(db_field, models.ForeignKey) and db_field.name in self.raw_id_fields:
                 kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.rel)
+            elif isinstance(db_field, models.ForeignKey) and db_field.name in self.radio_fields:
+                kwargs['widget'] = widgets.AdminRadioSelect(attrs={
+                    'class': get_ul_class(self.radio_fields[db_field.name]),
+                })
+                kwargs['empty_label'] = db_field.blank and _('None') or None
             else:
                 if isinstance(db_field, models.ManyToManyField):
                     if db_field.name in self.raw_id_fields:
@@ -187,6 +197,15 @@ class BaseModelAdmin(object):
             if not db_field.name in self.raw_id_fields:
                 formfield.widget.render = widgets.RelatedFieldWidgetWrapper(formfield.widget.render, db_field.rel, self.admin_site)
             return formfield
+        
+        if db_field.choices and db_field.name in self.radio_fields:
+            kwargs['widget'] = widgets.AdminRadioSelect(
+                choices=db_field.get_choices(include_blank=db_field.blank,
+                    blank_choice=[('', _('None'))]),
+                attrs={
+                    'class': get_ul_class(self.radio_fields[db_field.name]),
+                }
+            )
 
         # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)

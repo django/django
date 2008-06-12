@@ -26,17 +26,12 @@ from django.utils.maxlength import LegacyMaxlength
 class NOT_PROVIDED:
     pass
 
-HORIZONTAL, VERTICAL = 1, 2
-
 # The values to use for "blank" in SelectFields. Will be appended to the start of most "choices" lists.
 BLANK_CHOICE_DASH = [("", "---------")]
 BLANK_CHOICE_NONE = [("", "None")]
 
 # prepares a value for use in a LIKE query
 prep_for_like_query = lambda x: smart_unicode(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
-
-# returns the <ul> class for a given radio_admin value
-get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
 
 class FieldDoesNotExist(Exception):
     pass
@@ -87,8 +82,8 @@ class Field(object):
             db_index=False, core=False, rel=None, default=NOT_PROVIDED,
             editable=True, serialize=True, unique_for_date=None,
             unique_for_month=None, unique_for_year=None, validator_list=None,
-            choices=None, radio_admin=None, help_text='', db_column=None,
-            db_tablespace=None, auto_created=False):
+            choices=None, help_text='', db_column=None, db_tablespace=None,
+            auto_created=False):
         self.name = name
         self.verbose_name = verbose_name
         self.primary_key = primary_key
@@ -105,7 +100,6 @@ class Field(object):
         self.unique_for_date, self.unique_for_month = unique_for_date, unique_for_month
         self.unique_for_year = unique_for_year
         self._choices = choices or []
-        self.radio_admin = radio_admin
         self.help_text = help_text
         self.db_column = db_column
         self.db_tablespace = db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
@@ -285,11 +279,7 @@ class Field(object):
             params['max_length'] = self.max_length
 
         if self.choices:
-            if self.radio_admin:
-                field_objs = [oldforms.RadioSelectField]
-                params['ul_class'] = get_ul_class(self.radio_admin)
-            else:
-                field_objs = [oldforms.SelectField]
+            field_objs = [oldforms.SelectField]
 
             params['choices'] = self.get_choices_default()
         else:
@@ -377,10 +367,7 @@ class Field(object):
         return first_choice + lst
 
     def get_choices_default(self):
-        if self.radio_admin:
-            return self.get_choices(include_blank=self.blank, blank_choice=BLANK_CHOICE_NONE)
-        else:
-            return self.get_choices()
+        return self.get_choices()
 
     def _get_val_from_obj(self, obj):
         if obj:

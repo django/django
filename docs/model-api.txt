@@ -663,16 +663,6 @@ unless you want to override the default primary-key behavior.
 ``primary_key=True`` implies ``blank=False``, ``null=False`` and
 ``unique=True``. Only one primary key is allowed on an object.
 
-``radio_admin``
-~~~~~~~~~~~~~~~
-
-By default, Django's admin uses a select-box interface (<select>) for
-fields that are ``ForeignKey`` or have ``choices`` set. If ``radio_admin``
-is set to ``True``, Django will use a radio-button interface instead.
-
-Don't use this for a field unless it's a ``ForeignKey`` or has ``choices``
-set.
-
 ``unique``
 ~~~~~~~~~~
 

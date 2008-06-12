@@ -3,6 +3,8 @@ Form Widget classes specific to the Django admin site.
 """
 
 from django import newforms as forms
+from django.newforms.widgets import RadioFieldRenderer
+from django.newforms.util import flatatt
 from django.utils.datastructures import MultiValueDict
 from django.utils.text import capfirst, truncate_words
 from django.utils.translation import ugettext as _
@@ -61,6 +63,17 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
     def format_output(self, rendered_widgets):
         return mark_safe(u'<p class="datetime">%s %s<br />%s %s</p>' % \
             (_('Date:'), rendered_widgets[0], _('Time:'), rendered_widgets[1]))
+
+class AdminRadioFieldRenderer(RadioFieldRenderer):
+    def render(self):
+        """Outputs a <ul> for this set of radio fields."""
+        return mark_safe(u'<ul%s>\n%s\n</ul>' % (
+            flatatt(self.attrs),
+            u'\n'.join([u'<li>%s</li>' % force_unicode(w) for w in self]))
+        )
+
+class AdminRadioSelect(forms.RadioSelect):
+    renderer = AdminRadioFieldRenderer
 
 class AdminFileWidget(forms.FileInput):
     """

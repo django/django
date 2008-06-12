@@ -1,15 +1,30 @@
 # coding: utf-8
 from django.db import models
+from datetime import date
 
 class Band(models.Model):
     name = models.CharField(max_length=100)
     bio = models.TextField()
     sign_date = models.DateField()
+    
+    def __unicode__(self):
+        return self.name
+
+class Concert(models.Model):
+    main_band = models.ForeignKey(Band, related_name='main_concerts')
+    opening_band = models.ForeignKey(Band, related_name='opening_concerts',
+        blank=True)
+    day = models.CharField(max_length=3, choices=((1, 'Fri'), (2, 'Sat')))
+    transport = models.CharField(max_length=100, choices=(
+        (1, 'Plane'),
+        (2, 'Train'),
+        (3, 'Bus')
+    ), blank=True)
 
 
 __test__ = {'API_TESTS': """
 
->>> from django.contrib.admin.options import ModelAdmin
+>>> from django.contrib.admin.options import ModelAdmin, HORIZONTAL, VERTICAL
 >>> from django.contrib.admin.sites import AdminSite
 
 None of the following tests really depend on the content of the request, so
@@ -17,7 +32,9 @@ we'll just pass in None.
 
 >>> request = None
 
->>> band = Band(name='The Doors', bio='')
+# the sign_date is not 100 percent accurate ;)
+>>> band = Band(name='The Doors', bio='', sign_date=date(1965, 1, 1))
+>>> band.save()
 
 Under the covers, the admin system will initialize ModelAdmin with a Model
 class and an AdminSite instance, so let's just go ahead and do that manually
@@ -104,6 +121,81 @@ properly. This won't, however, break any of the admin widgets or media.
 ['name', 'bio', 'sign_date', 'delete']
 >>> type(ma.get_form(request).base_fields['sign_date'].widget)
 <class 'django.contrib.admin.widgets.AdminDateWidget'>
+
+# radio_fields behavior ################################################
+
+First, without any radio_fields specified, the widgets for ForeignKey
+and fields with choices specified ought to be a basic Select widget.
+For Select fields, all of the choices lists have a first entry of dashes.
+
+>>> cma = ModelAdmin(Concert, site)
+>>> cmafa = cma.get_form(request)
+
+>>> type(cmafa.base_fields['main_band'].widget)
+<class 'django.newforms.widgets.Select'>
+>>> list(cmafa.base_fields['main_band'].widget.choices)
+[(u'', u'---------'), (1, u'The Doors')]
+
+>>> type(cmafa.base_fields['opening_band'].widget)
+<class 'django.newforms.widgets.Select'>
+>>> list(cmafa.base_fields['opening_band'].widget.choices)
+[(u'', u'---------'), (1, u'The Doors')]
+
+>>> type(cmafa.base_fields['day'].widget)
+<class 'django.newforms.widgets.Select'>
+>>> list(cmafa.base_fields['day'].widget.choices)
+[('', '---------'), (1, 'Fri'), (2, 'Sat')]
+
+>>> type(cmafa.base_fields['transport'].widget)
+<class 'django.newforms.widgets.Select'>
+>>> list(cmafa.base_fields['transport'].widget.choices)
+[('', '---------'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')]
+
+Now specify all the fields as radio_fields.  Widgets should now be
+RadioSelect, and the choices list should have a first entry of 'None' iff
+blank=True for the model field.  Finally, the widget should have the
+'radiolist' attr, and 'inline' as well if the field is specified HORIZONTAL.
+
+>>> class ConcertAdmin(ModelAdmin):
+...     radio_fields = {
+...         'main_band': HORIZONTAL,
+...         'opening_band': VERTICAL,
+...         'day': VERTICAL,
+...         'transport': HORIZONTAL,
+...     }
+
+>>> cma = ConcertAdmin(Concert, site)
+>>> cmafa = cma.get_form(request)
+
+>>> type(cmafa.base_fields['main_band'].widget)
+<class 'django.contrib.admin.widgets.AdminRadioSelect'>
+>>> cmafa.base_fields['main_band'].widget.attrs
+{'class': 'radiolist inline'}
+>>> list(cmafa.base_fields['main_band'].widget.choices)
+[(1, u'The Doors')]
+
+>>> type(cmafa.base_fields['opening_band'].widget)
+<class 'django.contrib.admin.widgets.AdminRadioSelect'>
+>>> cmafa.base_fields['opening_band'].widget.attrs
+{'class': 'radiolist'}
+>>> list(cmafa.base_fields['opening_band'].widget.choices)
+[(u'', u'None'), (1, u'The Doors')]
+
+>>> type(cmafa.base_fields['day'].widget)
+<class 'django.contrib.admin.widgets.AdminRadioSelect'>
+>>> cmafa.base_fields['day'].widget.attrs
+{'class': 'radiolist'}
+>>> list(cmafa.base_fields['day'].widget.choices)
+[(1, 'Fri'), (2, 'Sat')]
+
+>>> type(cmafa.base_fields['transport'].widget)
+<class 'django.contrib.admin.widgets.AdminRadioSelect'>
+>>> cmafa.base_fields['transport'].widget.attrs
+{'class': 'radiolist inline'}
+>>> list(cmafa.base_fields['transport'].widget.choices)
+[('', u'None'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')]
+
+>>> band.delete()
 
 """
 }

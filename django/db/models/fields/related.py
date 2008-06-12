@@ -1,6 +1,6 @@
 from django.db import connection, transaction
 from django.db.models import signals, get_model
-from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, get_ul_class, FieldDoesNotExist
+from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist
 from django.db.models.related import RelatedObject
 from django.db.models.query_utils import QueryWrapper
 from django.utils.text import capfirst
@@ -628,14 +628,10 @@ class ForeignKey(RelatedField, Field):
 
     def prepare_field_objs_and_params(self, manipulator, name_prefix):
         params = {'validator_list': self.validator_list[:], 'member_name': name_prefix + self.attname}
-        if self.radio_admin:
-            field_objs = [oldforms.RadioSelectField]
-            params['ul_class'] = get_ul_class(self.radio_admin)
+        if self.null:
+            field_objs = [oldforms.NullSelectField]
         else:
-            if self.null:
-                field_objs = [oldforms.NullSelectField]
-            else:
-                field_objs = [oldforms.SelectField]
+            field_objs = [oldforms.SelectField]
         params['choices'] = self.get_choices_default()
         return field_objs, params
 
@@ -660,15 +656,11 @@ class ForeignKey(RelatedField, Field):
         if not obj:
             # In required many-to-one fields with only one available choice,
             # select that one available choice. Note: For SelectFields
-            # (radio_admin=False), we have to check that the length of choices
-            # is *2*, not 1, because SelectFields always have an initial
-            # "blank" value. Otherwise (radio_admin=True), we check that the
-            # length is 1.
+            # we have to check that the length of choices is *2*, not 1,
+            # because SelectFields always have an initial "blank" value.
             if not self.blank and self.choices:
                 choice_list = self.get_choices_default()
-                if self.radio_admin and len(choice_list) == 1:
-                    return {self.attname: choice_list[0][0]}
-                if not self.radio_admin and len(choice_list) == 2:
+                if len(choice_list) == 2:
                     return {self.attname: choice_list[1][0]}
         return Field.flatten_data(self, follow, obj)
 

@@ -3,7 +3,7 @@ from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
 
 class Redirect(models.Model):
-    site = models.ForeignKey(Site, radio_admin=models.VERTICAL)
+    site = models.ForeignKey(Site)
     old_path = models.CharField(_('redirect from'), max_length=200, db_index=True,
         help_text=_("This should be an absolute path, excluding the domain name. Example: '/events/search/'."))
     new_path = models.CharField(_('redirect to'), max_length=200, blank=True,
@@ -28,6 +28,7 @@ from django.contrib import admin
 class RedirectAdmin(admin.ModelAdmin):
     list_filter = ('site',)
     search_fields = ('old_path', 'new_path')
+    radio_fields = {'site': admin.VERTICAL}
 
 admin.site.register(Redirect, RedirectAdmin)
 
