@@ -23,23 +23,6 @@ class AlreadyRegistered(Exception):
 class NotRegistered(Exception):
     pass
 
-def _display_login_form(request, error_message=''):
-    request.session.set_test_cookie()
-    if request.POST and request.POST.has_key('post_data'):
-        # User has failed login BUT has previously saved post data.
-        post_data = request.POST['post_data']
-    elif request.POST:
-        # User's session must have expired; save their post data.
-        post_data = _encode_post_data(request.POST)
-    else:
-        post_data = _encode_post_data({})
-    return render_to_response('admin/login.html', {
-        'title': _('Log in'),
-        'app_path': request.path,
-        'post_data': post_data,
-        'error_message': error_message
-    }, context_instance=template.RequestContext(request))
-
 def _encode_post_data(post_data):
     from django.conf import settings
     pickled = pickle.dumps(post_data)
@@ -56,6 +39,16 @@ def _decode_post_data(encoded_data):
     return pickle.loads(pickled)
 
 class AdminSite(object):
+    """
+    An AdminSite object encapsulates an instance of the Django admin application, ready
+    to be hooked in to your URLConf. Models are registered with the AdminSite using the
+    register() method, and the root() method can then be used as a Django view function
+    that presents a full admin interface for the collection of registered models.
+    """
+    
+    index_template = None
+    login_template = None
+    
     def __init__(self):
         self._registry = {} # model_class class -> admin_class instance
 
@@ -119,7 +112,6 @@ class AdminSite(object):
                 # this addresses any post data that might persist from
                 # expired sessions and continue through (#5999)
                 return response
-
 
         if url == '':
             return self.index(request)
@@ -214,12 +206,12 @@ class AdminSite(object):
                 message = _("Please log in again, because your session has expired. Don't worry: Your submission has been saved.")
             else:
                 message = ""
-            return _display_login_form(request, message)
+            return self.display_login_form(request, message)
 
         # Check that the user accepts cookies.
         if not request.session.test_cookie_worked():
             message = _("Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again.")
-            return _display_login_form(request, message)
+            return self.display_login_form(request, message)
 
         # Check the password.
         username = request.POST.get('username', None)
@@ -235,7 +227,7 @@ class AdminSite(object):
                     message = _("Usernames cannot contain the '@' character.")
                 else:
                     message = _("Your e-mail address is not your username. Try '%s' instead.") % user.username
-            return _display_login_form(request, message)
+            return self.display_login_form(request, message)
 
         # The user data is correct; log in the user in and continue.
         else:
@@ -255,7 +247,7 @@ class AdminSite(object):
                         request.session.delete_test_cookie()
                         return http.HttpResponseRedirect(request.path)
             else:
-                return _display_login_form(request, ERROR_MESSAGE)
+                return self.display_login_form(request, ERROR_MESSAGE)
 
     def index(self, request):
         """
@@ -300,10 +292,28 @@ class AdminSite(object):
         for app in app_list:
             app['models'].sort(lambda x, y: cmp(x['name'], y['name']))
 
-        return render_to_response('admin/index.html', {
+        return render_to_response(self.index_template or 'admin/index.html', {
             'title': _('Site administration'),
             'app_list': app_list,
         }, context_instance=template.RequestContext(request))
+
+    def display_login_form(self, request, error_message=''):
+        request.session.set_test_cookie()
+        if request.POST and request.POST.has_key('post_data'):
+            # User has failed login BUT has previously saved post data.
+            post_data = request.POST['post_data']
+        elif request.POST:
+            # User's session must have expired; save their post data.
+            post_data = _encode_post_data(request.POST)
+        else:
+            post_data = _encode_post_data({})
+        return render_to_response(self.login_template or 'admin/login.html', {
+            'title': _('Log in'),
+            'app_path': request.path,
+            'post_data': post_data,
+            'error_message': error_message
+        }, context_instance=template.RequestContext(request))
+
 
 # This global object represents the default admin site, for the common case.
 # You can instantiate AdminSite in your own code to create a custom admin site.

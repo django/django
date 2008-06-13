@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.sites import LOGIN_FORM_KEY, _encode_post_data
 
 # local test models
-from models import Article
+from models import Article, CustomArticle
 
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
@@ -183,13 +183,64 @@ class AdminViewPermissionsTest(TestCase):
         self.failUnlessEqual(Article.objects.get(pk=1).content, '<p>edited article</p>')
         self.client.get('/test_admin/admin/logout/')
         
-    def testCustomChangelistView(self):
+    def testCustomModelAdminTemplates(self):
         self.client.get('/test_admin/admin/')
         self.client.post('/test_admin/admin/', self.super_login)
+        
+        # Test custom change list template with custom extra context
         request = self.client.get('/test_admin/admin/admin_views/customarticle/')
         self.failUnlessEqual(request.status_code, 200)
         self.assert_("var hello = 'Hello!';" in request.content)
-
+        self.assertTemplateUsed(request, 'custom_admin/change_list.html')
+        
+        # Test custom change form template
+        request = self.client.get('/test_admin/admin/admin_views/customarticle/add/')
+        self.assertTemplateUsed(request, 'custom_admin/change_form.html')
+        
+        # Add an article so we can test delete and history views
+        post = self.client.post('/test_admin/admin/admin_views/customarticle/add/', {
+            'content': '<p>great article</p>',
+            'date_0': '2008-03-18',
+            'date_1': '10:54:39'
+        })
+        self.assertRedirects(post, '/test_admin/admin/admin_views/customarticle/')
+        self.failUnlessEqual(CustomArticle.objects.all().count(), 1)
+        
+        # Test custom delete and object history templates
+        request = self.client.get('/test_admin/admin/admin_views/customarticle/1/delete/')
+        self.assertTemplateUsed(request, 'custom_admin/delete_confirmation.html')
+        request = self.client.get('/test_admin/admin/admin_views/customarticle/1/history/')
+        self.assertTemplateUsed(request, 'custom_admin/object_history.html')
+        
+        self.client.get('/test_admin/admin/logout/')
+        
+    def testCustomAdminSiteTemplates(self):
+        from django.contrib import admin
+        self.assertEqual(admin.site.index_template, None)
+        self.assertEqual(admin.site.login_template, None)
+        
+        self.client.get('/test_admin/admin/logout/')
+        request = self.client.get('/test_admin/admin/')
+        self.assertTemplateUsed(request, 'admin/login.html')
+        self.client.post('/test_admin/admin/', self.changeuser_login)
+        request = self.client.get('/test_admin/admin/')
+        self.assertTemplateUsed(request, 'admin/index.html')
+        
+        self.client.get('/test_admin/admin/logout/')
+        admin.site.login_template = 'custom_admin/login.html'
+        admin.site.index_template = 'custom_admin/index.html'
+        request = self.client.get('/test_admin/admin/')
+        self.assertTemplateUsed(request, 'custom_admin/login.html')
+        self.assert_('Hello from a custom login template' in request.content)
+        self.client.post('/test_admin/admin/', self.changeuser_login)
+        request = self.client.get('/test_admin/admin/')
+        self.assertTemplateUsed(request, 'custom_admin/index.html')
+        self.assert_('Hello from a custom index template' in request.content)
+        
+        self.client.get('/test_admin/admin/logout/')
+        admin.site.login_template = None
+        admin.site.index_template = None
+    
     def testDeleteView(self):
         """Delete view should restrict access and actually delete items."""
 

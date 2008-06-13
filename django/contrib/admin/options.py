@@ -59,7 +59,10 @@ def flatten_fieldsets(fieldsets):
 class AdminForm(object):
     def __init__(self, form, fieldsets, prepopulated_fields):
         self.form, self.fieldsets = form, fieldsets
-        self.prepopulated_fields = [{'field': form[field_name], 'dependencies': [form[f] for f in dependencies]} for field_name, dependencies in prepopulated_fields.items()]
+        self.prepopulated_fields = [{
+            'field': form[field_name],
+            'dependencies': [form[f] for f in dependencies]
+        } for field_name, dependencies in prepopulated_fields.items()]
 
     def __iter__(self):
         for name, options in self.fieldsets:
@@ -233,6 +236,12 @@ class ModelAdmin(BaseModelAdmin):
     save_on_top = False
     ordering = None
     inlines = []
+    
+    # Custom templates (designed to be over-ridden in subclasses)
+    change_form_template = None
+    change_list_template = None
+    delete_confirmation_template = None
+    object_history_template = None
 
     def __init__(self, model, admin_site):
         self.model = model
@@ -372,6 +381,7 @@ class ModelAdmin(BaseModelAdmin):
             if request.POST.has_key("_popup"):
                 post_url_continue += "?_popup=1"
             return HttpResponseRedirect(post_url_continue % pk_value)
+        
         if request.POST.has_key("_popup"):
             return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % \
                 # escape() calls force_unicode.
@@ -470,7 +480,7 @@ class ModelAdmin(BaseModelAdmin):
             'save_as': self.save_as,
             'save_on_top': self.save_on_top,
         })
-        return render_to_response([
+        return render_to_response(self.change_form_template or [
             "admin/%s/%s/change_form.html" % (app_label, opts.object_name.lower()),
             "admin/%s/change_form.html" % app_label,
             "admin/change_form.html"
@@ -626,6 +636,7 @@ class ModelAdmin(BaseModelAdmin):
             if ERROR_FLAG in request.GET.keys():
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
+        
         context = {
             'title': cl.title,
             'is_popup': cl.is_popup,
@@ -633,7 +644,7 @@ class ModelAdmin(BaseModelAdmin):
         }
         context.update({'has_add_permission': self.has_add_permission(request)}),
         context.update(extra_context or {})
-        return render_to_response([
+        return render_to_response(self.change_list_template or [
             'admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
             'admin/%s/change_list.html' % app_label,
             'admin/change_list.html'
@@ -676,6 +687,7 @@ class ModelAdmin(BaseModelAdmin):
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect("../../../../")
             return HttpResponseRedirect("../../")
+        
         context = {
             "title": _("Are you sure?"),
             "object_name": opts.verbose_name,
@@ -685,7 +697,7 @@ class ModelAdmin(BaseModelAdmin):
             "opts": opts,
         }
         context.update(extra_context or {})
-        return render_to_response([
+        return render_to_response(self.delete_confirmation_template or [
             "admin/%s/%s/delete_confirmation.html" % (app_label, opts.object_name.lower()),
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
@@ -697,8 +709,10 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import LogEntry
         model = self.model
         opts = model._meta
-        action_list = LogEntry.objects.filter(object_id=object_id,
-            content_type__id__exact=ContentType.objects.get_for_model(model).id).select_related().order_by('action_time')
+        action_list = LogEntry.objects.filter(
+            object_id = object_id,
+            content_type__id__exact = ContentType.objects.get_for_model(model).id
+        ).select_related().order_by('action_time')
         # If no history was found, see whether this object even exists.
         obj = get_object_or_404(model, pk=object_id)
         context = {
@@ -708,7 +722,7 @@ class ModelAdmin(BaseModelAdmin):
             'object': obj,
         }
         context.update(extra_context or {})
-        return render_to_response([
+        return render_to_response(self.object_history_template or [
             "admin/%s/%s/object_history.html" % (opts.app_label, opts.object_name.lower()),
             "admin/%s/object_history.html" % opts.app_label,
             "admin/object_history.html"

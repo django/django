@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib import admin
 
-
 class Article(models.Model):
     """
     A simple article to test admin views. Test backwards compabilty.
@@ -24,6 +23,14 @@ class CustomArticle(models.Model):
     date = models.DateTimeField()
 
 class CustomArticleAdmin(admin.ModelAdmin):
+    """
+    Tests various hooks for using custom templates and contexts.
+    """
+    change_list_template = 'custom_admin/change_list.html'
+    change_form_template = 'custom_admin/change_form.html'
+    object_history_template = 'custom_admin/object_history.html'
+    delete_confirmation_template = 'custom_admin/delete_confirmation.html'
+    
     def changelist_view(self, request):
         "Test that extra_context works"
         return super(CustomArticleAdmin, self).changelist_view(request, extra_context={
