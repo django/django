@@ -98,7 +98,7 @@ class AdminSite(object):
         Handles main URL routing for the admin app.
 
         `url` is the remainder of the URL -- e.g. 'comments/comment/'.
-        """
+        """        
         url = url.rstrip('/') # Trim trailing slash, if it exists.
 
         # The 'logout' view doesn't require that the person is logged in.
@@ -249,7 +249,7 @@ class AdminSite(object):
             else:
                 return self.display_login_form(request, ERROR_MESSAGE)
 
-    def index(self, request):
+    def index(self, request, extra_context=None):
         """
         Displays the main admin index page, which lists all of the installed
         apps that have been registered in this site.
@@ -291,13 +291,17 @@ class AdminSite(object):
         # Sort the models alphabetically within each app.
         for app in app_list:
             app['models'].sort(lambda x, y: cmp(x['name'], y['name']))
-
-        return render_to_response(self.index_template or 'admin/index.html', {
+        
+        context = {
             'title': _('Site administration'),
             'app_list': app_list,
-        }, context_instance=template.RequestContext(request))
+        }
+        context.update(extra_context or {})
+        return render_to_response(self.index_template or 'admin/index.html', context, 
+            context_instance=template.RequestContext(request)
+        )
 
-    def display_login_form(self, request, error_message=''):
+    def display_login_form(self, request, error_message='', extra_context=None):
         request.session.set_test_cookie()
         if request.POST and request.POST.has_key('post_data'):
             # User has failed login BUT has previously saved post data.
@@ -307,12 +311,17 @@ class AdminSite(object):
             post_data = _encode_post_data(request.POST)
         else:
             post_data = _encode_post_data({})
-        return render_to_response(self.login_template or 'admin/login.html', {
+        
+        context = {
             'title': _('Log in'),
             'app_path': request.path,
             'post_data': post_data,
             'error_message': error_message
-        }, context_instance=template.RequestContext(request))
+        }
+        context.update(extra_context or {})
+        return render_to_response(self.login_template or 'admin/login.html', context,
+            context_instance=template.RequestContext(request)
+        )
 
 
 # This global object represents the default admin site, for the common case.

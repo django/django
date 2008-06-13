@@ -236,8 +236,19 @@ class AdminViewPermissionsTest(TestCase):
         request = self.client.get('/test_admin/admin/')
         self.assertTemplateUsed(request, 'custom_admin/index.html')
         self.assert_('Hello from a custom index template' in request.content)
+                
+        # Finally, using monkey patching check we can inject custom_context arguments in to index
+        original_index = admin.site.index
+        def index(*args, **kwargs):
+            kwargs['extra_context'] = {'foo': '*bar*'}
+            return original_index(*args, **kwargs)
+        admin.site.index = index
+        request = self.client.get('/test_admin/admin/')
+        self.assertTemplateUsed(request, 'custom_admin/index.html')
+        self.assert_('Hello from a custom index template *bar*' in request.content)
         
         self.client.get('/test_admin/admin/logout/')
+        del admin.site.index # Resets to using the original
         admin.site.login_template = None
         admin.site.index_template = None
     
