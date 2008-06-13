@@ -18,10 +18,10 @@ class Command(BaseCommand):
     def handle(self, *app_labels, **options):
         from django.db.models import get_app, get_apps, get_models
 
-        format = options['format']
-        indent = options['indent']
-        exclude = options['exclude']
-        show_traceback = options['traceback']
+        format = options.get('format','json')
+        indent = options.get('indent',None)
+        exclude = options.get('exclude',[])
+        show_traceback = options.get('traceback', False)
 
         excluded_apps = [get_app(app_label) for app_label in exclude]
 
