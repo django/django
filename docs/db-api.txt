@@ -2037,6 +2037,37 @@ Each "reverse" operation described in this section has an immediate effect on
 the database. Every addition, creation and deletion is immediately and
 automatically saved to the database.
 
+One-to-one relationships
+------------------------
+
+One-to-one relationships are very similar to Many-to-one relationships.
+If you define a OneToOneField on your model, instances of that model will have 
+access to the related object via a simple attribute of the model.
+
+For example::
+
+    class EntryDetail(models.Model):
+        entry = models.OneToOneField(Entry)
+        details = models.TextField()
+
+    ed = EntryDetail.objects.get(id=2)
+    ed.entry # Returns the related Entry object.
+
+The difference comes in reverse queries. The related model in a One-to-one
+relationship also has access to a ``Manager`` object; however, that ``Manager``
+represents a single object, rather than a collection of objects::
+
+    e = Entry.objects.get(id=2)
+    e.entrydetail # returns the related EntryDetail object
+
+If no object has been assigned to this relationship, Django will raise
+a ``DoesNotExist`` exception.
+
+Instances can be assigned to the reverse relationship in the same way as 
+you would assign the forward relationship::
+    
+    e.entrydetail = ed
+
 Many-to-many relationships
 --------------------------
 
@@ -2063,12 +2094,6 @@ Like ``ForeignKey``, ``ManyToManyField`` can specify ``related_name``. In the
 above example, if the ``ManyToManyField`` in ``Entry`` had specified
 ``related_name='entries'``, then each ``Author`` instance would have an
 ``entries`` attribute instead of ``entry_set``.
-
-One-to-one relationships
-------------------------
-
-The semantics of one-to-one relationships will be changing soon, so we don't
-recommend you use them.
 
 How are the backward relationships possible?
 --------------------------------------------
