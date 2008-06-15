@@ -10,6 +10,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
+import re
 
 def login(request, template_name='registration/login.html', redirect_field_name=REDIRECT_FIELD_NAME):
     "Displays the login form and handles the login action."
@@ -124,4 +125,5 @@ def user_change_password(request, id):
         'original': user,
         'save_as': False,
         'show_save': True,
+        'root_path': re.sub('auth/user/(\d+)/password/$', '', request.path),
     }, context_instance=RequestContext(request))
