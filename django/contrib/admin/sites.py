@@ -94,11 +94,14 @@ class AdminSite(object):
         return request.user.is_authenticated() and request.user.is_staff
 
     def root(self, request, url):
-        """
+        """ 
         Handles main URL routing for the admin app.
 
         `url` is the remainder of the URL -- e.g. 'comments/comment/'.
-        """        
+        """
+        # Figure out the admin base URL path and stash it for later use
+        self.root_path = re.sub(re.escape(url) + '$', '', request.path)
+        
         url = url.rstrip('/') # Trim trailing slash, if it exists.
 
         # The 'logout' view doesn't require that the person is logged in.
@@ -295,6 +298,7 @@ class AdminSite(object):
         context = {
             'title': _('Site administration'),
             'app_list': app_list,
+            'root_path': self.root_path,
         }
         context.update(extra_context or {})
         return render_to_response(self.index_template or 'admin/index.html', context, 
@@ -316,7 +320,8 @@ class AdminSite(object):
             'title': _('Log in'),
             'app_path': request.path,
             'post_data': post_data,
-            'error_message': error_message
+            'error_message': error_message,
+            'root_path': self.root_path,
         }
         context.update(extra_context or {})
         return render_to_response(self.login_template or 'admin/login.html', context,
