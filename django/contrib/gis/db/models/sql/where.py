@@ -1,5 +1,5 @@
 from django.db.models.sql.where import WhereNode
-from django.contrib.gis.db.backend import get_geo_where_clause, GIS_TERMS
+from django.contrib.gis.db.backend import get_geo_where_clause, SpatialBackend
 
 class GeoWhereNode(WhereNode):
     """
@@ -9,7 +9,7 @@ class GeoWhereNode(WhereNode):
     def make_atom(self, child, qn):
         table_alias, name, field, lookup_type, value = child
         if hasattr(field, '_geom'):
-            if lookup_type in GIS_TERMS:
+            if lookup_type in SpatialBackend.gis_terms:
                 # Getting the geographic where clause; substitution parameters
                 # will be populated in the GeoFieldSQL object returned by the
                 # GeometryField.

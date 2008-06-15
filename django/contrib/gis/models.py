@@ -209,9 +209,54 @@ class SpatialRefSysMixin(object):
             return unicode(self.wkt)
 
 # The SpatialRefSys and GeometryColumns models
+_srid_info = True
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     from django.contrib.gis.db.backend.postgis.models import GeometryColumns, SpatialRefSys
 elif settings.DATABASE_ENGINE == 'oracle':
     from django.contrib.gis.db.backend.oracle.models import GeometryColumns, SpatialRefSys
 else:
-    pass
+    _srid_info = False
+
+if _srid_info:
+    def get_srid_info(srid):
+        """
+        Returns the units, unit name, and spheroid WKT associated with the
+        given SRID from the `spatial_ref_sys` (or equivalent) spatial database
+        table.  We use a database cursor to execute the query because this
+        function is used when it is not possible to use the ORM (for example,
+        during field initialization).
+        """
+        from django.db import connection
+        # Getting the spatial reference WKT associated with the SRID from the
+        # `spatial_ref_sys` (or equivalent) spatial database table.
+        #
+        # The following doesn't work: SpatialRefSys.objects.get(srid=srid)
+        # Why?  `syncdb` fails to recognize installed geographic models when there's
+        # an ORM query instantiated within a model field.
+        cur = connection.cursor()
+        qn = connection.ops.quote_name
+        stmt = 'SELECT %(table)s.%(wkt_col)s FROM %(table)s WHERE (%(table)s.%(srid_col)s = %(srid)s)'
+        stmt = stmt % {'table' : qn(SpatialRefSys._meta.db_table),
+                       'wkt_col' : qn(SpatialRefSys.wkt_col()),
+                       'srid_col' : qn('srid'),
+                       'srid' : srid,
+                       }
+        cur.execute(stmt)
+        srs_wkt = cur.fetchone()[0]
+        if srs_wkt is None:
+            raise ValueError('Failed to find Spatial Reference System entry corresponding to SRID=%s' % srid)
+
+        # Getting metadata associated with the spatial reference system identifier.
+        # Specifically, getting the unit information and spheroid information 
+        # (both required for distance queries).
+        unit, unit_name = SpatialRefSys.get_units(srs_wkt)
+        spheroid = SpatialRefSys.get_spheroid(srs_wkt)
+        return unit, unit_name, spheroid
+else:
+    def get_srid_info(srid):
+        """
+        Dummy routine for the backends that do not have the OGC required
+        spatial metadata tables (like MySQL).
+        """
+        return None, None, None
+   

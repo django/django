@@ -30,14 +30,60 @@
 Distance and Area objects to allow for sensible and convienient calculation 
 and conversions.
 
-Author: Robert Coup
+Author: Robert Coup, Justin Bronn
 
 Inspired by GeoPy (http://exogen.case.edu/projects/geopy/)
 and Geoff Biggs' PhD work on dimensioned units for robotics.
 """
+__all__ = ['A', 'Area', 'D', 'Distance']
 from decimal import Decimal
 
-class Distance(object):
+class MeasureBase(object):
+    def default_units(self, kwargs):
+        """
+        Return the unit value and the the default units specified
+        from the given keyword arguments dictionary.
+        """
+        val = 0.0
+        for unit, value in kwargs.iteritems():
+            if unit in self.UNITS:
+                val += self.UNITS[unit] * value
+                default_unit = unit
+            elif unit in self.ALIAS:
+                u = self.ALIAS[unit]
+                val += self.UNITS[u] * value
+                default_unit = u
+            else:
+                lower = unit.lower()
+                if lower in self.UNITS:
+                    val += self.UNITS[lower] * value
+                    default_unit = lower
+                elif lower in self.LALIAS:
+                    u = self.LALIAS[lower]
+                    val += self.UNITS[u] * value
+                    default_unit = u
+                else:
+                    raise AttributeError('Unknown unit type: %s' % unit)
+        return val, default_unit
+
+    @classmethod
+    def unit_attname(cls, unit_str):
+        """
+        Retrieves the unit attribute name for the given unit string.  
+        For example, if the given unit string is 'metre', 'm' would be returned.
+        An exception is raised if an attribute cannot be found.
+        """
+        lower = unit_str.lower()
+        if unit_str in cls.UNITS:
+            return unit_str
+        elif lower in cls.UNITS:
+            return lower
+        elif lower in cls.LALIAS:
+            return cls.LALIAS[lower]
+        else:
+            raise Exception('Could not find a unit keyword associated with "%s"' % unit_str)
+
+class Distance(MeasureBase):
     UNITS = {
         'chain' : 20.1168,
         'chain_benoit' : 20.116782,
@@ -53,7 +99,6 @@ class Distance(object):
         'fathom' :  1.8288,
         'ft': 0.3048,
         'german_m' : 1.0000135965,
-        'grad' : 0.0157079632679,
         'gold_coast_ft' : 0.304799710181508,
         'indian_yd' : 0.914398530744,
         'in' : 0.0254,
@@ -92,9 +137,10 @@ class Distance(object):
         'British chain (Sears 1922)' : 'british_chain_sears',
         'British chain (Sears 1922 truncated)' : 'british_chain_sears_truncated',
         'British foot (Sears 1922)' : 'british_ft',
+        'British foot' : 'british_ft',
         'British yard (Sears 1922)' : 'british_yd',
+        'British yard' : 'british_yd',
         "Clarke's Foot" : 'clarke_ft',
-        "Clarke's foot" : 'clarke_ft',
         "Clarke's link" : 'clarke_link',
         'Chain (Benoit)' : 'chain_benoit',
         'Chain (Sears)' : 'chain_sears',
@@ -111,33 +157,11 @@ class Distance(object):
         'Yard (Indian)' : 'indian_yd',
         'Yard (Sears)' : 'sears_yd'
         }
-    REV_ALIAS = dict((value, key) for key, value in ALIAS.items())
+    LALIAS = dict([(k.lower(), v) for k, v in ALIAS.items()])
 
     def __init__(self, default_unit=None, **kwargs):
         # The base unit is in meters.
-        self.m = 0.0
-        self._default_unit = 'm'
-        
-        for unit,value in kwargs.items():
-            if unit in self.UNITS:
-                self.m += self.UNITS[unit] * value
-                self._default_unit = unit
-            elif unit in self.ALIAS:
-                u = self.ALIAS[unit]
-                self.m += self.UNITS[u] * value
-                self._default_unit = u
-            else:
-                lower = unit.lower()
-                if lower in self.UNITS:
-                    self.m += self.UNITS[lower] * value
-                    self._default_unit = lower
-                elif lower in self.ALIAS:
-                    u = self.ALIAS[lower]
-                    self.m += self.UNITS[u] * value
-                    self._default_unit = u
-                else:
-                    raise AttributeError('Unknown unit type: %s' % unit)
-
+        self.m, self._default_unit = self.default_units(kwargs)
         if default_unit and isinstance(default_unit, str):
             self._default_unit = default_unit
     
@@ -216,49 +240,15 @@ class Distance(object):
     def __nonzero__(self):
         return bool(self.m)
 
-    @classmethod
-    def unit_attname(cls, unit_str):
-        """
-        Retrieves the unit attribute name for the given unit string.  
-        For example, if the given unit string is 'metre', 'm' would be returned.  
-        An exception is raised if an attribute cannot be found.
-        """
-        lower = unit_str.lower()
-
-        if unit_str in cls.UNITS:
-            return unit_str
-        elif lower in cls.UNITS:
-            return lower
-        elif unit_str in cls.ALIAS:
-            return cls.ALIAS[unit_str]
-        elif lower in cls.ALIAS:
-            return cls.ALIAS[lower]
-        else:
-            raise Exception('Could not find a unit keyword associated with "%s"' % unit_str)
-
-class Area(object):
-    # TODO: Add units from above.
-    UNITS = {
-        'sq_m': 1.0,
-        'sq_km': 1000000.0,
-        'sq_mi': 2589988.110336,
-        'sq_ft': 0.09290304,
-        'sq_yd': 0.83612736,
-        'sq_nm': 3429904.0,
-    }
+class Area(MeasureBase):
+    # Getting the square units values and the alias dictionary.
+    UNITS = dict([('sq_%s' % k, v ** 2) for k, v in Distance.UNITS.items()])
+    ALIAS = dict([(k, 'sq_%s' % v) for k, v in Distance.ALIAS.items()])
+    LALIAS = dict([(k.lower(), v) for k, v in ALIAS.items()])
 
     def __init__(self, default_unit=None, **kwargs):
-        self.sq_m = 0.0
-        self._default_unit = 'sq_m'
-        
-        for unit,value in kwargs.items():
-            if unit in self.UNITS:
-                self.sq_m += self.UNITS[unit] * value
-                self._default_unit = unit
-            else:
-                raise AttributeError('Unknown unit type: ' + unit)
-
-        if default_unit:
+        self.sq_m, self._default_unit = self.default_units(kwargs)
+        if default_unit and isinstance(default_unit, str):
             self._default_unit = default_unit
     
     def __getattr__(self, name):
@@ -333,7 +323,6 @@ class Area(object):
 
     def __nonzero__(self):
         return bool(self.sq_m)
-
         
 # Shortcuts
 D = Distance

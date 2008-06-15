@@ -69,7 +69,7 @@ class LayerMapTest(unittest.TestCase):
             city = City.objects.get(name=feat['Name'].value)
             self.assertEqual(feat['Population'].value, city.population)
             self.assertEqual(Decimal(str(feat['Density'])), city.density)
-            self.assertEqual(feat['Created'].value, city.date)
+            self.assertEqual(feat['Created'].value, city.dt)
 
             # Comparing the geometries.
             pnt1, pnt2 = feat.geom, city.point

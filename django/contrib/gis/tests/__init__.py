@@ -11,7 +11,7 @@ from django.conf import settings
 if not settings._target: settings.configure()
 
 # Tests that require use of a spatial database (e.g., creation of models)
-test_models = ['geoapp', 'relatedapp']
+test_models = ['geoapp',]
 
 # Tests that do not require setting up and tearing down a spatial database.
 test_suite_names = [
@@ -20,11 +20,14 @@ test_suite_names = [
 ]
 if HAS_GDAL:
     if oracle:
-        # TODO: There is a problem with the `syncdb` SQL for the LayerMapping
-        # tests on Oracle.
-        test_models += ['distapp']
-    elif postgis:
+        # TODO: There's a problem with `select_related` and GeoQuerySet on
+        # Oracle -- e.g., GeoModel.objects.distance(geom, field_name='fk__point')
+        # doesn't work so we don't test `relatedapp`.
         test_models += ['distapp', 'layermap']
+    elif postgis:
+        test_models += ['distapp', 'layermap', 'relatedapp']
+    elif mysql:
+        test_models += ['relatedapp']
 
     test_suite_names += [
         'test_gdal_driver',

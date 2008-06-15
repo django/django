@@ -169,9 +169,9 @@ class GeoModelTest(unittest.TestCase):
     
     def test07_mysql_limitations(self):
         "Testing that union(), kml(), gml() raise exceptions."
-        self.assertRaises(ImproperlyConfigured, City.objects.union, 'point')
-        self.assertRaises(ImproperlyConfigured, State.objects.all().kml, 'poly')
-        self.assertRaises(ImproperlyConfigured, Country.objects.all().gml, 'mpoly')
+        self.assertRaises(ImproperlyConfigured, City.objects.union, Point(5, 23), field_name='point')
+        self.assertRaises(ImproperlyConfigured, State.objects.all().kml, field_name='poly')
+        self.assertRaises(ImproperlyConfigured, Country.objects.all().gml, field_name='mpoly')
 
 def suite():
     s = unittest.TestSuite()

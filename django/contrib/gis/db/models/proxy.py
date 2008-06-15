@@ -1,7 +1,7 @@
 """
  The GeometryProxy object, allows for lazy-geometries.  The proxy uses
-  Python descriptors for instantiating and setting GEOS Geometry objects
-  corresponding to geographic model fields.
+ Python descriptors for instantiating and setting Geometry objects
+ corresponding to geographic model fields.
 
  Thanks to Robert Coup for providing this functionality (see #4322).
 """
@@ -31,8 +31,8 @@ class GeometryProxy(object):
         elif (geom_value is None) or (geom_value==''):
             geom = None
         else: 
-            # Otherwise, a GEOSGeometry object is built using the field's contents,
-            #  and the model's corresponding attribute is set.
+            # Otherwise, a Geometry object is built using the field's contents,
+            # and the model's corresponding attribute is set.
             geom = self._klass(geom_value)
             setattr(obj, self._field.attname, geom) 
         return geom 

@@ -19,7 +19,7 @@ class City(models.Model):
     name = models.CharField(max_length=25)
     population = models.IntegerField()
     density = models.DecimalField(max_digits=7, decimal_places=1)
-    date = models.DateField()
+    dt = models.DateField()
     point = models.PointField()
     objects = models.GeoManager()
 
@@ -42,7 +42,7 @@ cofeat_mapping = {'name' : 'Name',
 city_mapping = {'name' : 'Name',
                 'population' : 'Population',
                 'density' : 'Density',
-                'date' : 'Created',
+                'dt' : 'Created',
                 'point' : 'POINT',
                 }
 

@@ -21,7 +21,7 @@ if MAJOR_VERSION != 1 or (MAJOR_VERSION == 1 and MINOR_VERSION1 < 1):
 
 # Versions of PostGIS >= 1.2.2 changed their naming convention to be
 #  'SQL-MM-centric' to conform with the ISO standard. Practically, this
-#  means that 'ST_' is prefixes geometry function names.
+#  means that 'ST_' prefixes geometry function names.
 GEOM_FUNC_PREFIX = ''
 if MAJOR_VERSION >= 1:
     if (MINOR_VERSION1 > 2 or
@@ -30,26 +30,46 @@ if MAJOR_VERSION >= 1:
 
     def get_func(func): return '%s%s' % (GEOM_FUNC_PREFIX, func)
 
-    # Custom selection not needed for PostGIS since GEOS geometries may be
+    # Custom selection not needed for PostGIS because GEOS geometries are
     # instantiated directly from the HEXEWKB returned by default.  If
     # WKT is needed for some reason in the future, this value may be changed,
-    # 'AsText(%s)'
+    # e.g,, 'AsText(%s)'.
     GEOM_SELECT = None
 
     # Functions used by the GeoManager & GeoQuerySet
+    AREA = get_func('Area')
     ASKML = get_func('AsKML')
     ASGML = get_func('AsGML')
+    ASSVG = get_func('AsSVG')
+    CENTROID = get_func('Centroid')
+    DIFFERENCE = get_func('Difference')
     DISTANCE = get_func('Distance')
+    DISTANCE_SPHERE = get_func('distance_sphere')
     DISTANCE_SPHEROID = get_func('distance_spheroid')
+    ENVELOPE = get_func('Envelope')
     EXTENT = get_func('extent')
     GEOM_FROM_TEXT = get_func('GeomFromText')
     GEOM_FROM_WKB = get_func('GeomFromWKB')
+    INTERSECTION = get_func('Intersection')
+    LENGTH = get_func('Length')
+    LENGTH_SPHEROID = get_func('length_spheroid')
+    MAKE_LINE = get_func('MakeLine')
+    MEM_SIZE = get_func('mem_size')
+    NUM_GEOM = get_func('NumGeometries')
+    NUM_POINTS = get_func('npoints')
+    PERIMETER = get_func('Perimeter')
+    POINT_ON_SURFACE = get_func('PointOnSurface')
+    SCALE = get_func('Scale')
+    SYM_DIFFERENCE = get_func('SymDifference')
     TRANSFORM = get_func('Transform')
+    TRANSLATE = get_func('Translate')
 
     # Special cases for union and KML methods.
     if MINOR_VERSION1 < 3:
-        UNION = 'GeomUnion'
+        UNIONAGG = 'GeomUnion'
+        UNION = 'Union'
     else:
+        UNIONAGG = 'ST_Union'
         UNION = 'ST_Union'
 
     if MINOR_VERSION1 == 1:
@@ -80,16 +100,23 @@ class PostGISDistance(PostGISFunction):
         super(PostGISDistance, self).__init__(self.dist_func, end_subst=') %s %s', 
                                               operator=operator, result='%%s')
 
-class PostGISSphereDistance(PostGISFunction):
-    "For PostGIS spherical distance operations."
+class PostGISSpheroidDistance(PostGISFunction):
+    "For PostGIS spherical distance operations (using the spheroid)."
     dist_func = 'distance_spheroid'
     def __init__(self, operator):
         # An extra parameter in `end_subst` is needed for the spheroid string.
-        super(PostGISSphereDistance, self).__init__(self.dist_func, 
-                                                    beg_subst='%s(%s, %%s, %%s', 
-                                                    end_subst=') %s %s',
-                                                    operator=operator, result='%%s')
+        super(PostGISSpheroidDistance, self).__init__(self.dist_func, 
+                                                      beg_subst='%s(%s, %%s, %%s', 
+                                                      end_subst=') %s %s',
+                                                      operator=operator, result='%%s')
 
+class PostGISSphereDistance(PostGISFunction):
+    "For PostGIS spherical distance operations."
+    dist_func = 'distance_sphere'
+    def __init__(self, operator):
+        super(PostGISSphereDistance, self).__init__(self.dist_func, end_subst=') %s %s',
+                                                    operator=operator, result='%%s')
+                                                    
 class PostGISRelate(PostGISFunctionParam):
     "For PostGIS Relate(<geom>, <pattern>) calls."
     pattern_regex = re.compile(r'^[012TF\*]{9}$')
@@ -164,7 +191,7 @@ POSTGIS_GEOMETRY_FUNCTIONS = {
 dtypes = (Decimal, Distance, float, int, long)
 def get_dist_ops(operator):
     "Returns operations for both regular and spherical distances."
-    return (PostGISDistance(operator), PostGISSphereDistance(operator))
+    return (PostGISDistance(operator), PostGISSphereDistance(operator), PostGISSpheroidDistance(operator))
 DISTANCE_FUNCTIONS = {
     'distance_gt' : (get_dist_ops('>'), dtypes),
     'distance_gte' : (get_dist_ops('>='), dtypes),
@@ -193,6 +220,13 @@ POSTGIS_TERMS += POSTGIS_GEOMETRY_FUNCTIONS.keys() # Adding on the Geometry Func
 POSTGIS_TERMS += MISC_TERMS # Adding any other miscellaneous terms (e.g., 'isnull')
 POSTGIS_TERMS = tuple(POSTGIS_TERMS) # Making immutable
 
+# For checking tuple parameters -- not very pretty but gets job done.
+def exactly_two(val): return val == 2
+def two_to_three(val): return val >= 2 and val <=3
+def num_params(lookup_type, val):
+    if lookup_type in DISTANCE_FUNCTIONS and lookup_type != 'dwithin': return two_to_three(val)
+    else: return exactly_two(val)
+
 #### The `get_geo_where_clause` function for PostGIS. ####
 def get_geo_where_clause(lookup_type, table_prefix, field, value):
     "Returns the SQL WHERE clause for use in PostGIS SQL construction."
@@ -216,8 +250,10 @@ def get_geo_where_clause(lookup_type, table_prefix, field, value):
             # Ensuring that a tuple _value_ was passed in from the user
             if not isinstance(value, (tuple, list)): 
                 raise TypeError('Tuple required for `%s` lookup type.' % lookup_type)
-            if len(value) != 2:
-                raise ValueError('2-element tuple required or `%s` lookup type.' % lookup_type)
+            # Number of valid tuple parameters depends on the lookup type.
+            nparams = len(value)
+            if not num_params(lookup_type, nparams):
+                raise ValueError('Incorrect number of parameters given for `%s` lookup type.' % lookup_type)
             
             # Ensuring the argument type matches what we expect.
             if not isinstance(value[1], arg_type):
@@ -234,7 +270,9 @@ def get_geo_where_clause(lookup_type, table_prefix, field, value):
                         raise TypeError('PostGIS spherical operations are only valid on PointFields.')
                     if value[0].geom_typeid != 0:
                         raise TypeError('PostGIS geometry distance parameter is required to be of type Point.')
-                    op = op[1]
+                    # Setting up the geodetic operation appropriately.
+                    if nparams == 3 and value[2] == 'spheroid': op = op[2]
+                    else: op = op[1]
                 else:
                     op = op[0]
         else:

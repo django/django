@@ -1,6 +1,5 @@
 from django.db import connection
 from django.db.models.fields import Field # Django base Field class
-from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.db.backend.util import gqn
 from django.contrib.gis.db.backend.postgis.query import TRANSFORM
 

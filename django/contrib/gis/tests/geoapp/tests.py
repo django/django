@@ -28,14 +28,10 @@ class GeoModelTest(unittest.TestCase):
             def get_file(wkt_file):
                 return os.path.join(data_dir, wkt_file)
 
-            co = State(name='Colorado', poly=fromfile(get_file('co.wkt')))
-            co.save()
-            ks = State(name='Kansas', poly=fromfile(get_file('ks.wkt')))
-            ks.save()
-            tx = Country(name='Texas', mpoly=fromfile(get_file('tx.wkt')))
-            tx.save()
-            nz = Country(name='New Zealand', mpoly=fromfile(get_file('nz.wkt')))
-            nz.save()
+            State(name='Colorado', poly=fromfile(get_file('co.wkt'))).save()
+            State(name='Kansas', poly=fromfile(get_file('ks.wkt'))).save()
+            Country(name='Texas', mpoly=fromfile(get_file('tx.wkt'))).save()
+            Country(name='New Zealand', mpoly=fromfile(get_file('nz.wkt'))).save()
 
         # Ensuring that data was loaded from initial SQL.
         self.assertEqual(2, Country.objects.count())
@@ -49,7 +45,7 @@ class GeoModelTest(unittest.TestCase):
     def test02_proxy(self):
         "Testing Lazy-Geometry support (using the GeometryProxy)."
         if DISABLE: return
-        #### Testing on a Point
+        ## Testing on a Point
         pnt = Point(0, 0)
         nullcity = City(name='NullCity', point=pnt)
         nullcity.save()
@@ -86,7 +82,7 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual(Point(23, 5), City.objects.get(name='NullCity').point)
         nullcity.delete()
 
-        #### Testing on a Polygon
+        ## Testing on a Polygon
         shell = LinearRing((0, 0), (0, 100), (100, 100), (100, 0), (0, 0))
         inner = LinearRing((40, 40), (40, 60), (60, 60), (60, 40), (40, 40))
 
@@ -136,7 +132,7 @@ class GeoModelTest(unittest.TestCase):
             ref_kml = ref_kml2
 
         # Ensuring the KML is as expected.
-        ptown1 = City.objects.kml('point', precision=9).get(name='Pueblo')
+        ptown1 = City.objects.kml(field_name='point', precision=9).get(name='Pueblo')
         ptown2 = City.objects.kml(precision=9).get(name='Pueblo')
         for ptown in [ptown1, ptown2]:
             self.assertEqual(ref_kml, ptown.kml)
@@ -147,8 +143,8 @@ class GeoModelTest(unittest.TestCase):
         # Should throw a TypeError when tyring to obtain GML from a
         #  non-geometry field.
         qs = City.objects.all()
-        self.assertRaises(TypeError, qs.gml, 'name')
-        ptown1 = City.objects.gml('point', precision=9).get(name='Pueblo')
+        self.assertRaises(TypeError, qs.gml, field_name='name')
+        ptown1 = City.objects.gml(field_name='point', precision=9).get(name='Pueblo')
         ptown2 = City.objects.gml(precision=9).get(name='Pueblo')
 
         if oracle:
@@ -172,12 +168,12 @@ class GeoModelTest(unittest.TestCase):
         # Asserting the result of the transform operation with the values in
         #  the pre-transformed points.  Oracle does not have the 3084 SRID.
         if not oracle:
-            h = City.objects.transform('point', srid=htown.srid).get(name='Houston')
+            h = City.objects.transform(htown.srid).get(name='Houston')
             self.assertEqual(3084, h.point.srid)
             self.assertAlmostEqual(htown.x, h.point.x, prec)
             self.assertAlmostEqual(htown.y, h.point.y, prec)
 
-        p1 = City.objects.transform('point', srid=ptown.srid).get(name='Pueblo')
+        p1 = City.objects.transform(ptown.srid, field_name='point').get(name='Pueblo')
         p2 = City.objects.transform(srid=ptown.srid).get(name='Pueblo')
         for p in [p1, p2]:
             self.assertEqual(2774, p.point.srid)
@@ -186,7 +182,7 @@ class GeoModelTest(unittest.TestCase):
 
     @no_oracle # Most likely can do this in Oracle, however, it is not yet implemented (patches welcome!)
     def test05_extent(self):
-        "Testing the extent() GeoManager method."
+        "Testing the `extent` GeoQuerySet method."
         if DISABLE: return
         # Reference query:
         # `SELECT ST_extent(point) FROM geoapp_city WHERE (name='Houston' or name='Dallas');`
@@ -198,6 +194,17 @@ class GeoModelTest(unittest.TestCase):
 
         for val, exp in zip(extent, expected):
             self.assertAlmostEqual(exp, val, 8)
+
+    @no_oracle
+    def test06_make_line(self):
+        "Testing the `make_line` GeoQuerySet method."
+        # Ensuring that a `TypeError` is raised on models without PointFields.
+        self.assertRaises(TypeError, State.objects.make_line)
+        self.assertRaises(TypeError, Country.objects.make_line)
+        # Reference query:
+        # SELECT AsText(ST_MakeLine(geoapp_city.point)) FROM geoapp_city;
+        self.assertEqual(GEOSGeometry('LINESTRING(-95.363151 29.763374,-96.801611 32.782057,-97.521157 34.464642,174.783117 -41.315268,-104.609252 38.255001,-95.23506 38.971823,-87.650175 41.850385,-123.305196 48.462611)', srid=4326),
+                         City.objects.make_line())
 
     def test09_disjoint(self):
         "Testing the `disjoint` lookup type."
@@ -317,8 +324,7 @@ class GeoModelTest(unittest.TestCase):
         # Saving another commonwealth w/a NULL geometry.
         if not oracle:
             # TODO: Fix saving w/NULL geometry on Oracle.
-            nmi = State(name='Northern Mariana Islands', poly=None)
-            nmi.save()
+            State(name='Northern Mariana Islands', poly=None).save()
 
     @no_oracle # No specific `left` or `right` operators in Oracle.
     def test13_left_right(self):
@@ -416,34 +422,36 @@ class GeoModelTest(unittest.TestCase):
         c = City()
         self.assertEqual(c.point, None)
 
-    def test17_union(self):
-        "Testing the union() GeoManager method."
+    def test17_unionagg(self):
+        "Testing the `unionagg` (aggregate union) GeoManager method."
         if DISABLE: return
         tx = Country.objects.get(name='Texas').mpoly
-        # Houston, Dallas, San Antonio
-        union = fromstr('MULTIPOINT(-98.493183 29.424170,-96.801611 32.782057,-95.363151 29.763374)')
+        # Houston, Dallas, San Antonio -- Oracle has different order.
+        union1 = fromstr('MULTIPOINT(-98.493183 29.424170,-96.801611 32.782057,-95.363151 29.763374)')
+        union2 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374,-98.493183 29.424170)')
         qs = City.objects.filter(point__within=tx)
-        self.assertRaises(TypeError, qs.union, 'name')
-        u1 = qs.union('point')
-        u2 = qs.union()
-        self.assertEqual(True, union.equals_exact(u1, 10)) # Going up to 10 digits of precision.
-        self.assertEqual(True, union.equals_exact(u2, 10))
+        self.assertRaises(TypeError, qs.unionagg, 'name')
+        u1 = qs.unionagg(field_name='point')
+        u2 = qs.unionagg()
+        tol = 0.00001
+        if SpatialBackend.oracle:
+            union = union2
+        else:
+            union = union1
+        self.assertEqual(True, union.equals_exact(u1, tol))
+        self.assertEqual(True, union.equals_exact(u2, tol))
         qs = City.objects.filter(name='NotACity')
-        self.assertEqual(None, qs.union('point'))
+        self.assertEqual(None, qs.unionagg(field_name='point'))
 
     def test18_geometryfield(self):
         "Testing GeometryField."
         if DISABLE: return
-        f1 = Feature(name='Point', geom=Point(1, 1))
-        f2 = Feature(name='LineString', geom=LineString((0, 0), (1, 1), (5, 5)))
-        f3 = Feature(name='Polygon', geom=Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0))))
-        f4 = Feature(name='GeometryCollection', 
-                     geom=GeometryCollection(Point(2, 2), LineString((0, 0), (2, 2)), 
-                                             Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0)))))
-        f1.save()
-        f2.save()
-        f3.save()
-        f4.save()
+        Feature(name='Point', geom=Point(1, 1)).save()
+        Feature(name='LineString', geom=LineString((0, 0), (1, 1), (5, 5))).save()
+        Feature(name='Polygon', geom=Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0)))).save()
+        Feature(name='GeometryCollection', 
+                geom=GeometryCollection(Point(2, 2), LineString((0, 0), (2, 2)), 
+                                        Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0))))).save()
 
         f_1 = Feature.objects.get(name='Point')
         self.assertEqual(True, isinstance(f_1.geom, Point))
@@ -458,6 +466,82 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual(True, isinstance(f_4.geom, GeometryCollection))
         self.assertEqual(f_3.geom, f_4.geom[2])
     
+    def test19_centroid(self):
+        "Testing the `centroid` GeoQuerySet method."
+        qs = State.objects.exclude(poly__isnull=True).centroid()
+        if oracle: tol = 0.1
+        else: tol = 0.000000001
+        for s in qs:
+            self.assertEqual(True, s.poly.centroid.equals_exact(s.centroid, tol))
+
+    def test20_pointonsurface(self):
+        "Testing the `point_on_surface` GeoQuerySet method."
+        # Reference values.
+        if SpatialBackend.oracle:
+            # SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOM.SDO_POINTONSURFACE(GEOAPP_COUNTRY.MPOLY, 0.05)) FROM GEOAPP_COUNTRY;
+            ref = {'New Zealand' : fromstr('POINT (174.616364 -36.100861)', srid=4326),
+                   'Texas' : fromstr('POINT (-103.002434 36.500397)', srid=4326),
+                   }
+        elif SpatialBackend.postgis:
+            # Using GEOSGeometry to compute the reference point on surface values 
+            # -- since PostGIS also uses GEOS these should be the same.
+            ref = {'New Zealand' : Country.objects.get(name='New Zealand').mpoly.point_on_surface,
+                   'Texas' : Country.objects.get(name='Texas').mpoly.point_on_surface
+                   }
+        for cntry in Country.objects.point_on_surface():
+            self.assertEqual(ref[cntry.name], cntry.point_on_surface)
+
+    @no_oracle
+    def test21_scale(self):
+        "Testing the `scale` GeoQuerySet method."
+        xfac, yfac = 2, 3
+        qs = Country.objects.scale(xfac, yfac, model_att='scaled')
+        for c in qs:
+            for p1, p2 in zip(c.mpoly, c.scaled):
+                for r1, r2 in zip(p1, p2):
+                    for c1, c2 in zip(r1.coords, r2.coords):
+                        self.assertEqual(c1[0] * xfac, c2[0])
+                        self.assertEqual(c1[1] * yfac, c2[1])
+
+    @no_oracle
+    def test22_translate(self):
+        "Testing the `translate` GeoQuerySet method."
+        xfac, yfac = 5, -23
+        qs = Country.objects.translate(xfac, yfac, model_att='translated')
+        for c in qs:
+            for p1, p2 in zip(c.mpoly, c.translated):
+                for r1, r2 in zip(p1, p2):
+                    for c1, c2 in zip(r1.coords, r2.coords):
+                        self.assertEqual(c1[0] + xfac, c2[0])
+                        self.assertEqual(c1[1] + yfac, c2[1])
+
+    def test23_numgeom(self):
+        "Testing the `num_geom` GeoQuerySet method."
+        # Both 'countries' only have two geometries.
+        for c in Country.objects.num_geom(): self.assertEqual(2, c.num_geom)
+        for c in City.objects.filter(point__isnull=False).num_geom(): 
+            # Oracle will return 1 for the number of geometries on non-collections,
+            # whereas PostGIS will return None.
+            if postgis: self.assertEqual(None, c.num_geom)
+            else: self.assertEqual(1, c.num_geom)
+
+    def test24_numpoints(self):
+        "Testing the `num_points` GeoQuerySet method."
+        for c in Country.objects.num_points(): self.assertEqual(c.mpoly.num_points, c.num_points)
+        if postgis:
+            # Oracle cannot count vertices in Point geometries.
+            for c in City.objects.num_points(): self.assertEqual(1, c.num_points)
+
+    @no_oracle
+    def test25_geoset(self):
+        "Testing the `difference`, `intersection`, `sym_difference`, and `union` GeoQuerySet methods."
+        geom = Point(5, 23)
+        for c in Country.objects.all().intersection(geom).difference(geom).sym_difference(geom).union(geom):
+            self.assertEqual(c.mpoly.difference(geom), c.difference)
+            self.assertEqual(c.mpoly.intersection(geom), c.intersection)
+            self.assertEqual(c.mpoly.sym_difference(geom), c.sym_difference)
+            self.assertEqual(c.mpoly.union(geom), c.union)
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(GeoModelTest))
