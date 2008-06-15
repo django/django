@@ -507,6 +507,12 @@ True
 >>> [sorted(d.items()) for d in dicts]
 [[('id', 1), ('rank', 2)], [('id', 2), ('rank', 1)], [('id', 3), ('rank', 3)]]
 
+Bug #7256
+# An empty values() call includes all aliases, including those from an extra()
+>>> dicts = qs.values().order_by('id')
+>>> [sorted(d.items()) for d in dicts]
+[[('author_id', 2), ('good', 0), ('id', 1), ('rank', 2)], [('author_id', 3), ('good', 0), ('id', 2), ('rank', 1)], [('author_id', 1), ('good', 1), ('id', 3), ('rank', 3)]]
+
 Bugs #2874, #3002
 >>> qs = Item.objects.select_related().order_by('note__note', 'name')
 >>> list(qs)
