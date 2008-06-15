@@ -1,5 +1,8 @@
 from django.conf.urls.defaults import *
 
+# This file is NO LONGER USED in newforms-admin. See AdminSite.root() and 
+# django.contrib.auth.admin instead.
+
 urlpatterns = patterns('',
     #('^$', 'django.contrib.admin.views.main.index'),
     ('^r/', include('django.conf.urls.shortcut')),

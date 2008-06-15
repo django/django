@@ -55,6 +55,7 @@ class UserAdmin(admin.ModelAdmin):
             'opts': User._meta,
             'save_as': False,
             'username_help_text': User._meta.get_field('username').help_text,
+            'root_path': self.admin_site.root_path,
         }, context_instance=template.RequestContext(request))
 
 admin.site.register(Group, GroupAdmin)
