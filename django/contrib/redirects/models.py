@@ -17,6 +17,7 @@ class Redirect(models.Model):
         ordering = ('old_path',)
 
     class Admin:
+        list_display = ('old_path', 'new_path')
         list_filter = ('site',)
         search_fields = ('old_path', 'new_path')
 
