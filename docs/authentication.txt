@@ -516,8 +516,8 @@ It's your responsibility to provide the login form in a template called
 ``registration/login.html`` by default. This template gets passed three
 template context variables:
 
-    * ``form``: A ``FormWrapper`` object representing the login form. See the
-      `forms documentation`_ for more on ``FormWrapper`` objects.
+    * ``form``: A ``Form`` object representing the login form. See the
+      `newforms documentation`_ for more on ``Form`` objects.
     * ``next``: The URL to redirect to after successful login. This may contain
       a query string, too.
     * ``site_name``: The name of the current ``Site``, according to the
@@ -557,7 +557,7 @@ block::
 
     {% endblock %}
 
-.. _forms documentation: ../forms/
+.. _newforms documentation: ../newforms/
 .. _site framework docs: ../sites/
 
 Other built-in views
