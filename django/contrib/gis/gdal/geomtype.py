@@ -5,10 +5,10 @@ class OGRGeomType(object):
     "Encapulates OGR Geometry Types."
 
     # Ordered array of acceptable strings and their corresponding OGRwkbGeometryType
-    __ogr_str = ['Point', 'LineString', 'Polygon', 'MultiPoint',
+    __ogr_str = ['Unknown', 'Point', 'LineString', 'Polygon', 'MultiPoint',
                  'MultiLineString', 'MultiPolygon', 'GeometryCollection',
                  'LinearRing']
-    __ogr_int = [1, 2, 3, 4, 5, 6, 7, 101]
+    __ogr_int = [0, 1, 2, 3, 4, 5, 6, 7, 101]
 
     def __init__(self, type_input):
         "Figures out the correct OGR Type based upon the input."
@@ -46,6 +46,9 @@ class OGRGeomType(object):
             return self.__ogr_int.index(other) == self._index
         else:
             raise TypeError('Cannot compare with type: %s' % str(type(other)))
+
+    def __ne__(self, other):
+        return not (self == other)
 
     def _has_str(self, arr, s):
         "Case-insensitive search of the string array for the given pattern."

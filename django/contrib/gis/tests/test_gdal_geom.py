@@ -17,6 +17,7 @@ class OGRGeomTest(unittest.TestCase):
             g = OGRGeomType('point')
             g = OGRGeomType('GeometrycollectioN')
             g = OGRGeomType('LINearrING')
+            g = OGRGeomType('Unknown')
         except:
             self.fail('Could not create an OGRGeomType object!')
 
@@ -30,8 +31,11 @@ class OGRGeomTest(unittest.TestCase):
         self.assertEqual(True, OGRGeomType(7) == 'GeometryCollection')
         self.assertEqual(True, OGRGeomType('point') == 'POINT')
         self.assertEqual(False, OGRGeomType('point') == 2)
+        self.assertEqual(True, OGRGeomType('unknown') == 0)
         self.assertEqual(True, OGRGeomType(6) == 'MULtiPolyGON')
-        
+        self.assertEqual(False, OGRGeomType(1) != OGRGeomType('point'))
+        self.assertEqual(True, OGRGeomType('POINT') != OGRGeomType(6))
+
     def test01a_wkt(self):
         "Testing WKT output."
         for g in wkt_out:
