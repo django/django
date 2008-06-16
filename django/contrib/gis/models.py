@@ -226,13 +226,17 @@ if _srid_info:
         function is used when it is not possible to use the ORM (for example,
         during field initialization).
         """
-        from django.db import connection
+        # SRID=-1 is a common convention for indicating the geometry has no
+        # spatial reference information associated with it.  Thus, we will
+        # return all None values without raising an exception.
+        if srid == -1: return None, None, None
+
         # Getting the spatial reference WKT associated with the SRID from the
-        # `spatial_ref_sys` (or equivalent) spatial database table.
-        #
-        # The following doesn't work: SpatialRefSys.objects.get(srid=srid)
-        # Why?  `syncdb` fails to recognize installed geographic models when there's
-        # an ORM query instantiated within a model field.
+        # `spatial_ref_sys` (or equivalent) spatial database table. This query
+        # cannot be executed using the ORM because this information is needed
+        # when the ORM cannot be used (e.g., during the initialization of 
+        # `GeometryField`).
+        from django.db import connection
         cur = connection.cursor()
         qn = connection.ops.quote_name
         stmt = 'SELECT %(table)s.%(wkt_col)s FROM %(table)s WHERE (%(table)s.%(srid_col)s = %(srid)s)'
@@ -242,9 +246,13 @@ if _srid_info:
                        'srid' : srid,
                        }
         cur.execute(stmt)
-        srs_wkt = cur.fetchone()[0]
-        if srs_wkt is None:
-            raise ValueError('Failed to find Spatial Reference System entry corresponding to SRID=%s' % srid)
+        
+        # Fetching the WKT from the cursor; if the query failed raise an Exception.
+        fetched = cur.fetchone()
+        if not fetched:
+            raise ValueError('Failed to find spatial reference entry in "%s" corresponding to SRID=%s.' % 
+                             (SpatialRefSys._meta.db_table, srid))
+        srs_wkt = fetched[0]
 
         # Getting metadata associated with the spatial reference system identifier.
         # Specifically, getting the unit information and spheroid information 

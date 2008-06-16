@@ -273,7 +273,7 @@ class DistanceTest(unittest.TestCase):
         len_m = 473504.769553813
         qs = Interstate.objects.length()
         if oracle: tol = 2
-        else: tol = 7
+        else: tol = 5
         self.assertAlmostEqual(len_m, qs[0].length.m, tol)
 
     def test08_perimeter(self):
