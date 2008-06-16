@@ -346,13 +346,7 @@ class ModelChoiceField(ChoiceField):
         # the queryset.
         return ModelChoiceIterator(self)
 
-    def _set_choices(self, value):
-        # This method is copied from ChoiceField._set_choices(). It's necessary
-        # because property() doesn't allow a subclass to overwrite only
-        # _get_choices without implementing _set_choices.
-        self._choices = self.widget.choices = list(value)
-
-    choices = property(_get_choices, _set_choices)
+    choices = property(_get_choices, ChoiceField._set_choices)
 
     def clean(self, value):
         Field.clean(self, value)
