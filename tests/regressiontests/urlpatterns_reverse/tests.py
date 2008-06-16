@@ -17,6 +17,7 @@ test_data = (
     ('^hardcoded/$', 'hardcoded/', [], {}),
     ('^hardcoded/$', 'hardcoded/', ['any arg'], {}),
     ('^hardcoded/$', 'hardcoded/', [], {'kwarg': 'foo'}),
+    ('^hardcoded/doc\\.pdf$', 'hardcoded/doc.pdf', [], {}),
     ('^people/(?P<state>\w\w)/(?P<name>\w+)/$', 'people/il/adrian/', [], {'state': 'il', 'name': 'adrian'}),
     ('^people/(?P<state>\w\w)/(?P<name>\d)/$', NoReverseMatch, [], {'state': 'il', 'name': 'adrian'}),
     ('^people/(?P<state>\w\w)/(?P<name>\w+)/$', NoReverseMatch, [], {'state': 'il'}),

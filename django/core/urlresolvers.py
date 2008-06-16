@@ -86,7 +86,7 @@ def reverse_helper(regex, *args, **kwargs):
     """
     # TODO: Handle nested parenthesis in the following regex.
     result = re.sub(r'\(([^)]+)\)', MatchChecker(args, kwargs), regex.pattern)
-    return result.replace('^', '').replace('$', '')
+    return result.replace('^', '').replace('$', '').replace('\\', '')
 
 class MatchChecker(object):
     "Class used in reverse RegexURLPattern lookup."
