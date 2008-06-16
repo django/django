@@ -400,7 +400,7 @@ to the ``Author`` model. It works just like a regular formset::
     and by default uses ``can_delete=True``.
 
 Changing the queryset
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 By default when you create a formset from a model the queryset will be all
 objects in the model. This is best shown as ``Author.objects.all()``. This is
