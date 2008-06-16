@@ -111,7 +111,10 @@ class Command(BaseCommand):
                                     models.add(obj.object.__class__)
                                     obj.save()
                                 label_found = True
-                            except Exception, e:
+                            except (SystemExit, KeyboardInterrupt):
+                                raise
+                            except Exception:
+                                import traceback
                                 fixture.close()
                                 transaction.rollback()
                                 transaction.leave_transaction_management()
@@ -121,7 +124,7 @@ class Command(BaseCommand):
                                 else:
                                     sys.stderr.write(
                                         self.style.ERROR("Problem installing fixture '%s': %s\n" %
-                                             (full_path, str(e))))
+                                             (full_path, traceback.format_exc())))
                                 return
                             fixture.close()
                     except:
