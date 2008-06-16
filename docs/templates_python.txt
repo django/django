@@ -1059,8 +1059,8 @@ Passing template variables to the tag
 
 Although you can pass any number of arguments to a template tag using
 ``token.split_contents()``, the arguments are all unpacked as
-string literals. A little more work is required in order to dynamic content (a
-template variable) to a template tag as an argument.
+string literals. A little more work is required in order to pass dynamic
+content (a template variable) to a template tag as an argument.
 
 While the previous examples have formatted the current time into a string and
 returned the string, suppose you wanted to pass in a ``DateTimeField`` from an
@@ -1169,10 +1169,11 @@ Our earlier ``current_time`` function could thus be written like this::
 In Python 2.4, the decorator syntax also works::
 
     @register.simple_tag
-    def current_time(token):
+    def current_time(format_string):
         ...
 
 A couple of things to note about the ``simple_tag`` helper function:
+
     * Checking for the required number of arguments, etc, has already been
       done by the time our function is called, so we don't need to do that.
     * The quotes around the argument (if any) have already been stripped away,
