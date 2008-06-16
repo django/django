@@ -719,7 +719,7 @@ True
 False
 >>> r[1].name, r[1].value, r[1].choice_value, r[1].choice_label
 ('beatle', u'J', u'P', u'Paul')
->>> r[10]
+>>> r[10] # doctest: +IGNORE_EXCEPTION_DETAIL
 Traceback (most recent call last):
 ...
 IndexError: list index out of range
