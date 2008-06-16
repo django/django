@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-06-13 16:14+0200\n"
-"PO-Revision-Date: 2008-03-30 01:04+0100\n"
+"PO-Revision-Date: 2008-06-16 10:04+0200\n"
 "Last-Translator: Django Spanish Translation Team <django-cat@googlegroups.com>\n"
 "Language-Team: Django Spanish Translation Team <django-cat@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -128,7 +128,7 @@ msgstr "Kannada"
 
 #: conf/global_settings.py:72
 msgid "Latvian"
-msgstr "Latvio"
+msgstr "Letón"
 
 #: conf/global_settings.py:73
 msgid "Macedonian"
@@ -148,11 +148,11 @@ msgstr "Polaco"
 
 #: conf/global_settings.py:77
 msgid "Portugese"
-msgstr "Portugés"
+msgstr "Portugués"
 
 #: conf/global_settings.py:78
 msgid "Brazilian Portuguese"
-msgstr "Portugés Brasileño"
+msgstr "Portugués Brasileño"
 
 #: conf/global_settings.py:79
 msgid "Romanian"
@@ -339,7 +339,7 @@ msgstr "Documentación"
 #: contrib/admin/templates/admin/auth/user/change_password.html:14
 #: contrib/admin/templates/admin/auth/user/change_password.html:45
 msgid "Change password"
-msgstr "Cambiar clave"
+msgstr "Cambiar contraseña"
 
 #: contrib/admin/templates/admin/base.html:30
 #: contrib/comments/templates/comments/form.html:6
@@ -356,8 +356,8 @@ msgstr "Administración de Django"
 
 #: contrib/admin/templates/admin/change_form.html:14
 #: contrib/admin/templates/admin/index.html:28
-msgid "Añadir"
-msgstr "Agregar"
+msgid "Add"
+msgstr "Añadir"
 
 #: contrib/admin/templates/admin/change_form.html:20
 #: contrib/admin/templates/admin/object_history.html:4
@@ -802,14 +802,14 @@ msgstr "La contraseña se ha cambiado con éxito."
 #: contrib/admin/views/auth.py:65
 #, python-format
 msgid "Change password: %s"
-msgstr "Cambiar clave: %s"
+msgstr "Cambiar contraseña: %s"
 
 #: contrib/admin/views/decorators.py:17 contrib/auth/forms.py:60
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Por favor, introduzca un nombre de usuario correcto y una contraseña. Note que "
+"Por favor, introduzca un nombre de usuario y contraseña correctos. Note que "
 "ambos campos son sensibles a mayúsculas/minúsculas."
 
 #: contrib/admin/views/decorators.py:69
@@ -867,7 +867,7 @@ msgstr "El modelo %(name)s no se ha encontrado en la aplicación %(label)r"
 #: contrib/admin/views/doc.py:185
 #, python-format
 msgid "the related `%(label)s.%(type)s` object"
-msgstr "el objeto relacionado`%(label)s.%(type)s` "
+msgstr "el objeto relacionado `%(label)s.%(type)s`"
 
 #: contrib/admin/views/doc.py:185 contrib/admin/views/doc.py:207
 #: contrib/admin/views/doc.py:221 contrib/admin/views/doc.py:226
@@ -1057,7 +1057,7 @@ msgstr "¿Está seguro?"
 #: contrib/admin/views/main.py:549
 #, python-format
 msgid "Change history: %s"
-msgstr "Modificar histórico: %s"
+msgstr "Histórico de modificaciones: %s"
 
 #: contrib/admin/views/main.py:583
 #, python-format
@@ -1067,7 +1067,7 @@ msgstr "Escoja %s"
 #: contrib/admin/views/main.py:583
 #, python-format
 msgid "Select %s to change"
-msgstr "Escoja %s para modificar"
+msgstr "Escoja %s a modificar"
 
 #: contrib/admin/views/main.py:765
 msgid "Database error"
@@ -1079,7 +1079,7 @@ msgstr "Las dos contraseñas no coinciden."
 
 #: contrib/auth/forms.py:25
 msgid "A user with that username already exists."
-msgstr "Ya existe  un usuario con este nombre."
+msgstr "Ya existe un usuario con este nombre."
 
 #: contrib/auth/forms.py:53
 msgid ""
@@ -1114,7 +1114,7 @@ msgstr ""
 #: contrib/auth/forms.py:124
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
-"Tu contraseña antigua es incorrecta. Por favor, vuelva a introducirla "
+"Su contraseña antigua es incorrecta. Por favor, vuelva a introducirla "
 "correctamente."
 
 #: contrib/auth/models.py:73 contrib/auth/models.py:93
@@ -1211,7 +1211,7 @@ msgstr ""
 
 #: contrib/auth/models.py:146
 msgid "last login"
-msgstr "Último inicio de sesión"
+msgstr "último inicio de sesión"
 
 #: contrib/auth/models.py:147
 msgid "date joined"
@@ -1424,11 +1424,11 @@ msgstr "Marca de %r"
 
 #: contrib/comments/models.py:300
 msgid "deletion date"
-msgstr "fecha de borrado"
+msgstr "fecha de eliminación"
 
 #: contrib/comments/models.py:303
 msgid "moderator deletion"
-msgstr "borrado del moderador"
+msgstr "eliminación del moderador"
 
 #: contrib/comments/models.py:304
 msgid "moderator deletions"
@@ -1441,7 +1441,7 @@ msgstr "Eliminación del moderador %r"
 
 #: contrib/comments/templates/comments/form.html:8
 msgid "Forgotten your password?"
-msgstr "¿Has olvidado tu contraseña?"
+msgstr "¿Ha olvidado su contraseña?"
 
 #: contrib/comments/templates/comments/form.html:12
 msgid "Ratings"
@@ -1473,7 +1473,7 @@ msgstr "Previsualizar comentario"
 
 #: contrib/comments/templates/comments/freeform.html:4
 msgid "Your name:"
-msgstr "Tu nombre:"
+msgstr "Su nombre:"
 
 #: contrib/comments/views/comments.py:28
 msgid ""
@@ -1528,8 +1528,7 @@ msgstr "No se proporcionó uno o más de los siguientes campos requeridos"
 #: contrib/comments/views/comments.py:289
 msgid "Somebody tampered with the comment form (security violation)"
 msgstr ""
-"Alguien realizó manipulaciones con el formulario de comentarios (violación de "
-"seguridad)"
+"Alguien manipuló el formulario de comentarios (violación de seguridad)"
 
 #: contrib/comments/views/comments.py:208
 #: contrib/comments/views/comments.py:295
@@ -1555,7 +1554,7 @@ msgstr "ID de comentario no válido"
 
 #: contrib/comments/views/karma.py:27
 msgid "No voting for yourself"
-msgstr "No puedes votarte a ti mismo"
+msgstr "No puede votarse a sí mismo"
 
 #: contrib/contenttypes/models.py:67
 msgid "python model class name"
@@ -1641,21 +1640,21 @@ msgstr "º"
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f millón"
-msgstr[1] "%(value).1f millión"
+msgstr[1] "%(value).1f millón"
 
 #: contrib/humanize/templatetags/humanize.py:54
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f billón"
-msgstr[1] "%(value).1f billón"
+msgstr[0] "%(value).1f mil millones"
+msgstr[1] "%(value).1f mil millones"
 
 #: contrib/humanize/templatetags/humanize.py:57
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f trillón"
-msgstr[1] "%(value).1f trillón"
+msgstr[0] "%(value).1f billón"
+msgstr[1] "%(value).1f billón"
 
 #: contrib/humanize/templatetags/humanize.py:73
 msgid "one"
@@ -1717,11 +1716,11 @@ msgstr "Este campo sólo acepta números."
 
 #: contrib/localflavor/ar/forms.py:50
 msgid "This field requires 7 or 8 digits."
-msgstr "Este campo necesita 7 o 8 dígitos."
+msgstr "Este campo necesita 7 u 8 dígitos."
 
 #: contrib/localflavor/ar/forms.py:79
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr "Introduzca un CUIT válido en el formato XX-XXXXXXXX-X or XXXXXXXXXXXX."
+msgstr "Introduzca un CUIT válido en el formato XX-XXXXXXXX-X o XXXXXXXXXXXX."
 
 #: contrib/localflavor/ar/forms.py:80
 msgid "Invalid CUIT."
@@ -1753,15 +1752,15 @@ msgstr "Número CPF inválido."
 
 #: contrib/localflavor/br/forms.py:95
 msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Este campo necesita al menos 11 o 14 caracteres"
+msgstr "Este campo necesita un máximo de 11 dígitos o 14 caracteres."
 
 #: contrib/localflavor/br/forms.py:134
 msgid "Invalid CNPJ number."
-msgstr "Número CNPJ inválido"
+msgstr "Número CNPJ inválido."
 
 #: contrib/localflavor/br/forms.py:136
 msgid "This field requires at least 14 digits"
-msgstr "Este campo necesita 14 dígitos como máximo"
+msgstr "Este campo necesita 14 dígitos como mínimo"
 
 #: contrib/localflavor/ca/forms.py:17
 msgid "Enter a postal code in the format XXX XXX."
@@ -1770,7 +1769,7 @@ msgstr "Introduzca un código postal en el formato XXX XXX."
 #: contrib/localflavor/ca/forms.py:88
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
 msgstr ""
-"Introduzca un Número del Seguro Social de Canada válido en el formato XXX-"
+"Introduzca un Número del Seguro Social de Canadá válido en el formato XXX-"
 "XXX-XXX."
 
 #: contrib/localflavor/ch/ch_states.py:5
@@ -1886,12 +1885,12 @@ msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
 "1234567890 format."
 msgstr ""
-"Introduzca una identificación suiza válida o un número de pasaporte en el "
-"formato X1234567<0 or 1234567890."
+"Introduzca un número de identificación o pasaporte suizos válidos en el "
+"formato X1234567<0 o 1234567890."
 
 #: contrib/localflavor/cl/forms.py:29
 msgid "Enter a valid Chilean RUT."
-msgstr "Introduzca un RUT chileno válido"
+msgstr "Introduzca un RUT chileno válido."
 
 #: contrib/localflavor/cl/forms.py:30
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
@@ -2255,7 +2254,7 @@ msgid ""
 "9XXXXXXXX."
 msgstr ""
 "Introduzca un número de teléfono válido en el formato 6XXXXXXXX, 8XXXXXXXX "
-"or 9XXXXXXXX."
+"o 9XXXXXXXX."
 
 #: contrib/localflavor/es/forms.py:66
 msgid "Please enter a valid NIF, NIE, or CIF."
@@ -2723,7 +2722,7 @@ msgstr "El Número de Identificación Nacional es incorrecto."
 msgid ""
 "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgstr ""
-"Introduzca un número de impuesto (NIP) en el formato XXX-XXX-XX-XX or XX-XX-"
+"Introduzca un número de impuesto (NIP) en el formato XXX-XXX-XX-XX o XX-XX-"
 "XXX-XXX."
 
 #: contrib/localflavor/pl/forms.py:73
@@ -2733,7 +2732,7 @@ msgstr "El Número de Identificación Tributaria (NIP) es incorrecto."
 #: contrib/localflavor/pl/forms.py:112
 msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
 msgstr ""
-"El Número Nacional de Registro de Negocios (REGON) consiste en 11 dígitos"
+"El Número Nacional de Registro de Negocios (REGON) consiste en 7 o 9 dígitos."
 
 #: contrib/localflavor/pl/forms.py:113
 msgid "Wrong checksum for the National Business Register Number (REGON)."
@@ -3161,7 +3160,7 @@ msgstr "Región de Zilina"
 
 #: contrib/localflavor/uk/forms.py:21
 msgid "Enter a valid postcode."
-msgstr "Introduzca un código postal válido"
+msgstr "Introduzca un código postal válido."
 
 #: contrib/localflavor/uk/uk_regions.py:11
 msgid "Bedfordshire"
@@ -3454,11 +3453,11 @@ msgstr ""
 
 #: contrib/localflavor/za/forms.py:20
 msgid "Enter a valid South African ID number"
-msgstr "Introduzca un ID Sur Africano válido"
+msgstr "Introduzca un ID surafricano válido"
 
 #: contrib/localflavor/za/forms.py:54
 msgid "Enter a valid South African postal code"
-msgstr "Introduzca un código postal Sur Africano válido"
+msgstr "Introduzca un código postal surafricano válido"
 
 #: contrib/localflavor/za/za_provinces.py:4
 msgid "Eastern Cape"
@@ -3642,7 +3641,7 @@ msgstr "Introduzca una fecha/hora válida en formato AAAA-MM-DD HH:MM."
 
 #: core/validators.py:170 newforms/fields.py:403
 msgid "Enter a valid e-mail address."
-msgstr "Introduzca una dirección de correo electrónico válida"
+msgstr "Introduzca una dirección de correo electrónico válida."
 
 #: core/validators.py:182 core/validators.py:474 newforms/fields.py:433
 #: oldforms/__init__.py:687
@@ -3712,8 +3711,8 @@ msgstr "Introduzca una abreviatura válida de estado de los EEUU."
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "¡Cuida tu vocabulario! Aquí no admitimos la palabra %s."
-msgstr[1] "¡Cuida tu vocabulario! Aquí no admitimos las palabras %s."
+msgstr[0] "¡Cuide su vocabulario! Aquí no admitimos la palabra %s."
+msgstr[1] "¡Cuide su vocabulario! Aquí no admitimos las palabras %s."
 
 #: core/validators.py:288
 #, python-format
@@ -3805,7 +3804,7 @@ msgstr[1] ""
 
 #: core/validators.py:458
 msgid "Please enter a valid floating point number."
-msgstr "Por favor, introduzca un número decimal válido."
+msgstr "Por favor, introduzca un número de coma flotante válido."
 
 #: core/validators.py:467
 #, python-format
@@ -4005,7 +4004,7 @@ msgstr "Asegúrese de que no hay más de %s decimales."
 #: newforms/fields.py:215
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr "Asegúrese de que no hay más de %s dígitos antes del punto decimal."
+msgstr "Asegúrese de que no hay más de %s dígitos antes de la coma decimal."
 
 #: newforms/fields.py:263 newforms/fields.py:751
 msgid "Enter a valid date."
@@ -4037,7 +4036,7 @@ msgstr "La URL parece ser un enlace roto."
 
 #: newforms/fields.py:560 newforms/models.py:299
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Escoja una opción válida. Esa opción no está entre las aceptadas."
+msgstr "Escoja una opción válida. Esa opción no está entre las disponibles."
 
 #: newforms/fields.py:599
 #, python-format
@@ -4076,7 +4075,7 @@ msgstr "Escoja una opción válida; '%(data)s' no está en %(choices)s."
 
 #: oldforms/__init__.py:745
 msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Introduzca un número entero entre -32,768 y 32,767."
+msgstr "Introduzca un número entero entre -32.768 y 32.767."
 
 #: oldforms/__init__.py:755
 msgid "Enter a positive number."
@@ -4084,7 +4083,7 @@ msgstr "Introduzca un número positivo."
 
 #: oldforms/__init__.py:765
 msgid "Enter a whole number between 0 and 32,767."
-msgstr "Introduzca un número entero entre 0 y 32,767."
+msgstr "Introduzca un número entero entre 0 y 32.767."
 
 #: template/defaultfilters.py:698
 msgid "yes,no,maybe"
@@ -4114,11 +4113,11 @@ msgstr "%.1f GB"
 
 #: utils/dateformat.py:41
 msgid "p.m."
-msgstr "p.m"
+msgstr "p.m."
 
 #: utils/dateformat.py:42
 msgid "a.m."
-msgstr "a.m"
+msgstr "a.m."
 
 #: utils/dateformat.py:47
 msgid "PM"
@@ -4174,7 +4173,7 @@ msgstr "Mar"
 
 #: utils/dates.py:10
 msgid "Wed"
-msgstr "Mie"
+msgstr "Mié"
 
 #: utils/dates.py:10
 msgid "Thu"
@@ -4186,7 +4185,7 @@ msgstr "Vie"
 
 #: utils/dates.py:11
 msgid "Sat"
-msgstr "Sab"
+msgstr "Sáb"
 
 #: utils/dates.py:11
 msgid "Sun"
@@ -4393,7 +4392,7 @@ msgstr "j \\de F"
 #: views/generic/create_update.py:43
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
-msgstr "El %(verbose_name)s se ha creado correctamente."
+msgstr "El %(verbose_name)s se ha creado exitosamente."
 
 #: views/generic/create_update.py:117
 #, python-format
