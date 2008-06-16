@@ -1,4 +1,3 @@
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import PermissionDenied
 from django import oldforms, template
@@ -25,6 +24,8 @@ class UserAdmin(admin.ModelAdmin):
     filter_horizontal = ('user_permissions',)
 
     def add_view(self, request):
+        # avoid a circular import. see #6718.
+        from django.contrib.auth.forms import UserCreationForm
         if not self.has_change_permission(request):
             raise PermissionDenied
         if request.method == 'POST':
