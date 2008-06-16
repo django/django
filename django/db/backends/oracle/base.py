@@ -31,6 +31,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_tablespaces = True
     uses_case_insensitive_names = True
     uses_custom_query_class = True
+    time_field_needs_date = True
+    interprets_empty_strings_as_nulls = True
+    date_field_supports_time_value = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def autoinc_sql(self, table, column):

@@ -39,6 +39,14 @@ __test__ = {'API_TESTS':"""
 
 # Create an Article.
 >>> a1 = Article(id=None, headline='Django lets you build Web apps easily')
+
+# You can't associate it with a Publication until it's been saved.
+>>> a1.publications.add(p1)
+Traceback (most recent call last):
+...
+ValueError: 'Article' instance needs to have a primary key value before a many-to-many relationship can be used.
+
+# Save it!
 >>> a1.save()
 
 # Associate the Article with a Publication.

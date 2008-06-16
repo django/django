@@ -270,17 +270,17 @@ to create a superuser at a later date, you can use a command line utility.
 
     manage.py createsuperuser --username=joe --email=joe@example.com
 
-You will be prompted for a password. Once entered, the user is created. If you
-leave off the ``--username`` or the ``--email`` option, It will prompt you for
-those values as well.
+You will be prompted for a password. After you enter one, the user will be
+created immediately. If you leave off the ``--username`` or the ``--email``
+options, it will prompt you for those values.
 
 If you're using an older release of Django, the old way of creating a superuser
 on the command line still works::
 
     python /path/to/django/contrib/auth/create_superuser.py
 
-Where ``/path/to`` is the path to the Django codebase on your filesystem. The
-``manage.py`` command is prefered since it'll figure out the correct path and
+...where ``/path/to`` is the path to the Django codebase on your filesystem. The
+``manage.py`` command is preferred because it figures out the correct path and
 environment for you.
 
 Storing additional information about users

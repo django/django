@@ -513,7 +513,9 @@ class ValuesQuerySet(QuerySet):
         # names of the model fields to select.
 
     def iterator(self):
-        self.query.trim_extra_select(self.extra_names)
+        if (not self.extra_names and 
+            len(self.field_names) != len(self.model._meta.fields)):
+            self.query.trim_extra_select(self.extra_names)
         names = self.query.extra_select.keys() + self.field_names
         for row in self.query.results_iter():
             yield dict(zip(names, row))

@@ -20,7 +20,7 @@ class FlatPage(models.Model):
         verbose_name = _('flat page')
         verbose_name_plural = _('flat pages')
         ordering = ('url',)
-
+    
     def __unicode__(self):
         return u"%s -- %s" % (self.url, self.title)
 
@@ -38,7 +38,8 @@ class FlatPageAdmin(admin.ModelAdmin):
         (None, {'fields': ('url', 'title', 'content', 'sites')}),
         (_('Advanced options'), {'classes': ('collapse',), 'fields': ('enable_comments', 'registration_required', 'template_name')}),
     )
-    list_filter = ('sites',)
+    list_display = ('url', 'title')
+    list_filter = ('sites', 'enable_comments', 'registration_required')
     search_fields = ('url', 'title')
 
 admin.site.register(FlatPage, FlatPageAdmin)

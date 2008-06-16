@@ -27,7 +27,7 @@ class ITRegionSelect(Select):
 
 class ITProvinceSelect(Select):
     """
-    A Select widget that uses a list of IT regions as its choices.
+    A Select widget that uses a list of IT provinces as its choices.
     """
     def __init__(self, attrs=None):
         from it_province import PROVINCE_CHOICES

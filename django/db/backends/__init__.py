@@ -52,6 +52,10 @@ class BaseDatabaseFeatures(object):
     uses_custom_query_class = False
     empty_fetchmany_value = []
     update_can_self_select = True
+    supports_usecs = True
+    time_field_needs_date = False
+    interprets_empty_strings_as_nulls = False
+    date_field_supports_time_value = True
 
 class BaseDatabaseOperations(object):
     """
@@ -202,8 +206,8 @@ class BaseDatabaseOperations(object):
 
     def query_class(self, DefaultQueryClass):
         """
-        Given the default QuerySet class, returns a custom QuerySet class
-        to use for this backend. Returns None if a custom QuerySet isn't used.
+        Given the default Query class, returns a custom Query class
+        to use for this backend. Returns None if a custom Query isn't used.
         See also BaseDatabaseFeatures.uses_custom_query_class, which regulates
         whether this method is called at all.
         """
@@ -266,3 +270,8 @@ class BaseDatabaseOperations(object):
         tablespaces.
         """
         return None
+
+    def prep_for_like_query(self, x):
+        """Prepares a value for use in a LIKE query."""
+        from django.utils.encoding import smart_unicode
+        return smart_unicode(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")

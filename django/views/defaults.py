@@ -68,8 +68,7 @@ def shortcut(request, content_type_id, object_id):
 
 def page_not_found(request, template_name='404.html'):
     """
-    Default 404 handler, which looks for the requested URL in the redirects
-    table, redirects if found, and displays 404 page if not redirected.
+    Default 404 handler.
 
     Templates: `404.html`
     Context:

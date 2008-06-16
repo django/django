@@ -112,7 +112,7 @@ It also has these methods:
 
       Sets a test cookie to determine whether the user's browser supports
       cookies. Due to the way cookies work, you won't be able to test this
-      until the user's next page request. See "Setting test cookies" below for
+      until the user's next page request. See `Setting test cookies`_ below for
       more information.
 
     * ``test_cookie_worked()``
@@ -120,7 +120,7 @@ It also has these methods:
       Returns either ``True`` or ``False``, depending on whether the user's
       browser accepted the test cookie. Due to the way cookies work, you'll
       have to call ``set_test_cookie()`` on a previous, separate page request.
-      See "Setting test cookies" below for more information.
+      See `Setting test cookies`_ below for more information.
 
     * ``delete_test_cookie()``
 
@@ -139,10 +139,10 @@ It also has these methods:
               in 5 minutes.
 
             * If ``value`` is a ``datetime`` or ``timedelta`` object, the
-              session will expire at that specific time.
-      
-            * If ``value`` is ``0`` then the user's session cookie will expire
-              when their browser is closed.
+              session will expire at that specific date/time.
+
+            * If ``value`` is ``0``, the user's session cookie will expire
+              when the user's Web browser is closed.
 
             * If ``value`` is ``None``, the session reverts to using the global
               session expiry policy.
@@ -168,7 +168,7 @@ It also has these methods:
       **New in Django development version**
 
       Returns either ``True`` or ``False``, depending on whether the user's
-      session cookie will expire when their browser is closed.
+      session cookie will expire when the user's Web browser is closed.
 
 You can edit ``request.session`` at any point in your view. You can edit it
 multiple times.

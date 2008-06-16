@@ -394,6 +394,8 @@ site with ``DEBUG`` turned on.
 DEBUG_PROPAGATE_EXCEPTIONS
 --------------------------
 
+**New in Django development version**
+
 Default: ``False``
 
 If set to True, Django's normal exception handling of view functions

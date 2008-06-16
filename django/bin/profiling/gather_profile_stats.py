@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 gather_profile_stats.py /path/to/dir/of/profiles
 

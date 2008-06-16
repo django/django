@@ -2,10 +2,9 @@
 Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
-from django.contrib.contenttypes import generic
 from django.core.exceptions import FieldError
 from django.db.models.sql.constants import *
-from django.db.models.sql.datastructures import RawValue, Date
+from django.db.models.sql.datastructures import Date
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND
 
@@ -43,6 +42,7 @@ class DeleteQuery(Query):
         More than one physical query may be executed if there are a
         lot of values in pk_list.
         """
+        from django.contrib.contenttypes import generic
         cls = self.model
         for related in cls._meta.get_all_related_many_to_many_objects():
             if not isinstance(related.field, generic.GenericRelation):
@@ -382,4 +382,3 @@ class CountQuery(Query):
 
     def get_ordering(self):
         return ()
-

@@ -148,15 +148,17 @@ Once you've claimed a ticket, you have a responsibility to work on that ticket
 in a reasonably timely fashion. If you don't have time to work on it, either
 unclaim it or don't claim it in the first place!
 
-Core Django developers go through the list of claimed tickets from time to
+Ticket triagers go through the list of claimed tickets from time to
 time, checking whether any progress has been made. If there's no sign of
-progress on a particular claimed ticket for a week or two after it's been
-claimed, we will unclaim it for you so that it's no longer monopolized and
+progress on a particular claimed ticket for a week or two, a triager may ask
+you to relinquish the ticket claim so that it's no longer monopolized and
 somebody else can claim it.
 
 If you've claimed a ticket and it's taking a long time (days or weeks) to code,
-keep everybody updated by posting comments on the ticket. That way, we'll know
-not to unclaim it. More communication is better than less communication!
+keep everybody updated by posting comments on the ticket. If you don't provide
+regular updates, and you don't respond to a request for a progress report,
+your claim on the ticket may be revoked. As always, more communication is
+better than less communication!
 
 Which tickets should be claimed?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -177,10 +179,10 @@ Patch style
       English than in code. Indentation is the most common example; it's hard to
       read patches when the only difference in code is that it's indented.
 
-	* When creating patches, always run ``svn diff`` from the top-level
-	  ``trunk`` directory -- i.e., the one that contains ``django``, ``docs``,
-	  ``tests``, ``AUTHORS``, etc. This makes it easy for other people to apply
-	  your patches.
+    * When creating patches, always run ``svn diff`` from the top-level
+      ``trunk`` directory -- i.e., the one that contains ``django``, ``docs``,
+      ``tests``, ``AUTHORS``, etc. This makes it easy for other people to apply
+      your patches.
 
     * Attach patches to a ticket in the `ticket tracker`_, using the "attach file"
       button. Please *don't* put the patch in the ticket description or comment
@@ -234,22 +236,28 @@ Since a picture is worth a thousand words, let's start there:
    :width: 590
    :alt: Django's ticket workflow
 
-We've got two roles here:
+We've got two official roles here:
 
-    * Core developers: people with commit access who make the decisions and
-      write the bulk of the code.
+    * Core developers: people with commit access who make the big decisions 
+      and write the bulk of the code.
 
-    * Ticket triagers: community members who keep track of tickets, making
-      sure the tickets are always categorized correctly.
-
+    * Ticket triagers: trusted community members with a proven history of
+      working with the Django community. As a result of this history, they
+      have been entrusted by the core developers to make some of the smaller
+      decisions about tickets.
+     
 Second, note the five triage stages:
 
-    1. A ticket starts as "Unreviewed", meaning that a triager has yet to
-       examine the ticket and move it along.
+    1. A ticket starts as "Unreviewed", meaning that nobody has examined
+       the ticket.
 
     2. "Design decision needed" means "this concept requires a design
        decision," which should be discussed either in the ticket comments or on
-       django-developers.
+       `django-developers`_. The "Design decision needed" step will generally
+       only be used for feature requests. It can also be used for issues 
+       that *might* be bugs, depending on opinion or interpretation. Obvious
+       bugs (such as crashes, incorrect query results, or non-compliance with a
+       standard) skip this step and move straight to "Accepted".
 
     3. Once a ticket is ruled to be approved for fixing, it's moved into the
        "Accepted" stage. This stage is where all the real work gets done.
@@ -269,7 +277,7 @@ ticket has or needs in order to be "ready for checkin":
 
     "Has patch"
         This means the ticket has an associated patch_. These will be
-        reviewed to see if the patch is "good".
+        reviewed by the triage team to see if the patch is "good".
 
     "Needs documentation"
         This flag is used for tickets with patches that need associated
@@ -292,7 +300,11 @@ A ticket can be resolved in a number of ways:
         Django and the issue is fixed.
 
     "invalid"
-        Used if the ticket is found to be incorrect or a user error.
+        Used if the ticket is found to be incorrect. This means that the
+        issue in the ticket is actually the result of a user error, or
+        describes a problem with something other than Django, or isn't
+        a bug report or feature request at all (for example, some new users
+        submit support queries as tickets).
 
     "wontfix"
         Used when a core developer decides that this request is not
@@ -305,7 +317,8 @@ A ticket can be resolved in a number of ways:
         tickets, we keep all the discussion in one place, which helps everyone.
 
     "worksforme"
-        Used when the triage team is unable to replicate the original bug.
+        Used when the the ticket doesn't contain enough detail to replicate 
+        the original bug.
 
 If you believe that the ticket was closed in error -- because you're
 still having the issue, or it's popped up somewhere else, or the triagers have
@@ -315,6 +328,55 @@ reopen tickets that have been marked as "wontfix" by core developers.
 .. _required details: `Reporting bugs`_
 .. _good patch: `Patch style`_
 .. _patch: `Submitting patches`_
+
+Triage by the general community
+-------------------------------
+
+Although the Core Developers and Ticket Triagers make the big decisions in
+the ticket triage process, there is also a lot that general community 
+members can do to help the triage process. In particular, you can help out by:
+
+    * Closing "Unreviewed" tickets as "invalid", "worksforme", or "duplicate".
+
+    * Promoting "Unreviewed" tickets to "Design Decision Required" if there
+      is a design decision that needs to be made, or "Accepted" if they are
+      an obvious bug.
+
+    * Correcting the "Needs Tests", "Needs documentation", or "Has Patch" flags
+      for tickets where they are incorrectly set.
+ 
+    * Checking that old tickets are still valid. If a ticket hasn't seen
+      any activity in a long time, it's possible that the problem has been
+      fixed, but the ticket hasn't been closed. 
+
+    * Contact the owners of tickets that have been claimed, but have not seen 
+      any recent activity. If the owner doesn't respond after a week or so, 
+      remove the owner's claim on the ticket.
+
+    * Identifying trends and themes in the tickets. If there a lot of bug reports
+      about a particular part of Django, it possibly indicates that we need
+      to consider refactoring that part of the code. If a trend is emerging,
+      you should raise it for discussion (referencing the relevant tickets)
+      on `django-developers`_.
+
+However, we do ask that as a general community member working in the
+ticket database:
+
+    * Please **don't** close tickets as "wontfix". The core developers will 
+      make the final determination of the fate of a ticket, usually after  
+      consultation with the community.
+    
+    * Please **don't** promote tickets to "Ready for checkin" unless they are
+      *trivial* changes - for example, spelling mistakes or
+      broken links in documentation. 
+
+    * Please **don't** reverse a decision that has been made by a core 
+      developer. If you disagree with a discussion that has been made, 
+      please post a message to `django-developers`_.
+
+    * Please be conservative in your actions. If you're unsure if you should
+      be making a change, don't make the change - leave a comment with your 
+      concerns on the ticket, or post a message to `django-developers`_.
 
 Submitting and maintaining translations
 =======================================

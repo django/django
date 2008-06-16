@@ -226,7 +226,7 @@ When will you release Django 1.0?
 
 Short answer: When we're comfortable with Django's APIs, have added all
 features that we feel are necessary to earn a "1.0" status, and are ready to
-begin maintaining backwards compatibility. 
+begin maintaining backwards compatibility.
 
 The merging of Django's `Queryset Refactor branch`_ went a long way toward Django
 1.0. Merging the `Newforms Admin branch` will be another important step.
@@ -260,8 +260,8 @@ Where can I find Django developers for hire?
 Consult our `developers for hire page`_ for a list of Django developers who
 would be happy to help you.
 
-You might also be interested in posting a job to http://djangogigs.com/ . 
-If you want to find Django-capable people in your local area, try 
+You might also be interested in posting a job to http://djangogigs.com/ .
+If you want to find Django-capable people in your local area, try
 http://djangopeople.net/ .
 
 .. _developers for hire page: http://code.djangoproject.com/wiki/DevelopersForHire
@@ -646,18 +646,18 @@ You can also use the Python API. See `creating users`_ for full info.
 
 .. _creating users: ../authentication/#creating-users
 
-Getting Help
+Getting help
 ============
 
 How do I do X? Why doesn't Y work? Where can I go to get help?
 --------------------------------------------------------------
 
 If this FAQ doesn't contain an answer to your question, you might want to
-try the `django-users mailing list`_. Feel free to ask any question related 
-to installing, using, or debugging Django. 
+try the `django-users mailing list`_. Feel free to ask any question related
+to installing, using, or debugging Django.
 
-If you prefer IRC, the `#django IRC channel`_ on freenode is an active
-community of helpful individuals who may be able to solve your problem. 
+If you prefer IRC, the `#django IRC channel`_ on the Freenode IRC network is an
+active community of helpful individuals who may be able to solve your problem.
 
 .. _`django-users mailing list`: http://groups.google.com/group/django-users
 .. _`#django IRC channel`: irc://irc.freenode.net/django
@@ -666,35 +666,36 @@ Why hasn't my message appeared on django-users?
 -----------------------------------------------
 
 django-users_ has a lot of subscribers. This is good for the community, as
-there are lot of people that can contribute answers to questions.
+it means many people are available to contribute answers to questions.
 Unfortunately, it also means that django-users_ is an attractive target for
-spammers. 
+spammers.
 
 In order to combat the spam problem, when you join the django-users_ mailing
-list, we manually moderate the first message you send to the list. This means 
-that spammers get caught, but it also means that your first question to the 
+list, we manually moderate the first message you send to the list. This means
+that spammers get caught, but it also means that your first question to the
 list might take a little longer to get answered. We apologize for any
 inconvenience that this policy may cause.
 
 .. _django-users: http://groups.google.com/group/django-users
 
-Nobody on django-users answered my question? What should I do?
+Nobody on django-users answered my question! What should I do?
 --------------------------------------------------------------
 
-Wait. Ask again later. Try making your question more specific, or provide
-a better example of your problem.
+Try making your question more specific, or provide a better example of your
+problem.
 
-Remember, the readers of django-users_ are all volunteers. If nobody has
-answered your question, it may be because nobody knows the answer, it may
-be because nobody can understand the question, or it may be that everybody
-that can help is extremely busy.
+As with most open-source mailing lists, the folks on django-users_ are
+volunteers. If nobody has answered your question, it may be because nobody
+knows the answer, it may be because nobody can understand the question, or it
+may be that everybody that can help is busy. One thing you might try is to ask
+the question on IRC -- visit the `#django IRC channel`_ on the Freenode IRC
+network.
 
-Resist any temptation to mail the `django-developers mailing list`_ in an 
-attempt to get an answer to your question. django-developers_ is for discussing 
-the development of Django itself. Attempts to use django-developers_ as
-a second-tier support mechanism will not be met an enthusiastic response.
+You might notice we have a second mailing list, called django-developers_ --
+but please don't e-mail support questions to this mailing list. This list is
+for discussion of the development of Django itself. Asking a tech support
+question there is considered quite impolite.
 
-.. _`django-developers mailing list`: http://groups.google.com/group/django-developers
 .. _django-developers: http://groups.google.com/group/django-developers
 
 I think I've found a bug! What should I do?
@@ -708,15 +709,14 @@ Detailed instructions on how to handle a potential bug can be found in our
 I think I've found a security problem! What should I do?
 --------------------------------------------------------
 
-If you think you have found a security problem with Django, please send 
-a message to security@djangoproject.com. This is a private list only
-open to long-time, highly trusted Django developers, and its archives 
-are not publicly readable. 
+If you think you've found a security problem with Django, please send a message
+to security@djangoproject.com. This is a private list only open to long-time,
+highly trusted Django developers, and its archives are not publicly readable.
 
 Due to the sensitive nature of security issues, we ask that if you think you
-have found a security problem, *please* don't send a message to one of the 
+have found a security problem, *please* don't send a message to one of the
 public mailing lists. Django has a `policy for handling security issues`_;
-while a defect is outstanding, we would like to minimize any damage that 
+while a defect is outstanding, we would like to minimize any damage that
 could be inflicted through public knowledge of that defect.
 
 .. _`policy for handling security issues`: ../contributing/#reporting-security-issues
@@ -742,10 +742,10 @@ ignored" and "a ticket has not been attended to yet." Django's ticket system
 contains hundreds of open tickets, of various degrees of impact on end-user
 functionality, and Django's developers have to review and prioritize.
 
-On top of that - the team working on Django are all volunteers. As a result, 
-the amount of time that we have to work on Django is limited, and will vary
-from week to week depending on how much spare time we have. If we are busy, we
-may not be able to spend as much time on Django as we might want.
+On top of that: the people who work on Django are all volunteers. As a result,
+the amount of time that we have to work on the framework is limited and will
+vary from week to week depending on our spare time. If we're busy, we may not
+be able to spend as much time on Django as we might want.
 
 Besides, if your feature request stands no chance of inclusion in Django, we
 won't ignore it -- we'll just close the ticket. So if your ticket is still
