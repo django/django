@@ -438,6 +438,10 @@ means any Python code changes you make while the server is running will *not*
 take effect if the particular Python modules have already been loaded into
 memory.
 
+Example usage::
+
+    django-admin.py runserver --noreload
+
 Examples of using different ports and addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -466,14 +470,6 @@ you want to configure Django to serve static media, read the `serving static fil
 documentation.
 
 .. _serving static files: ../static_files/
-
-Turning off auto-reload
-~~~~~~~~~~~~~~~~~~~~~~~
-
-To disable auto-reloading of code while the development server is running, use the
-``--noreload`` option, like so::
-
-    django-admin.py runserver --noreload
 
 shell
 -----
