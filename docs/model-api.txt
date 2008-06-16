@@ -681,7 +681,7 @@ set.
 If ``True``, this field must be unique throughout the table.
 
 This is enforced at the database level and at the Django admin-form level. If
-you try to add save a model with a duplicate value in a ``unique`` field, a
+you try to save a model with a duplicate value in a ``unique`` field, a
 ``django.db.IntegrityError`` will be raised by the model's ``save()`` method.
 
 ``unique_for_date``
