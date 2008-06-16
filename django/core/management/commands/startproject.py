@@ -3,8 +3,6 @@ import os
 import re
 from random import choice
 
-INVALID_PROJECT_NAMES = ('django', 'site', 'test')
-
 class Command(LabelCommand):
     help = "Creates a Django project directory structure for the given project name in the current directory."
     args = "[projectname]"
@@ -20,13 +18,13 @@ class Command(LabelCommand):
         # the parent directory.
         directory = os.getcwd()
 
+        # Check that the project_name cannot be imported.
         try:
-            proj_name = __import__(project_name)
-            if proj_name:
-                raise CommandError("%r conflicts with the name of an existing Python module and cannot be used as a project name. Please try another name." % project_name)
+            __import__(project_name)
         except ImportError:
-            if project_name in INVALID_PROJECT_NAMES:
-                raise CommandError("%r contains an invalid project name. Please try another name." % project_name)
+            pass
+        else:
+            raise CommandError("%r conflicts with the name of an existing Python module and cannot be used as a project name. Please try another name." % project_name)
 
         copy_helper(self.style, 'project', project_name, directory)
 
