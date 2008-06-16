@@ -401,8 +401,9 @@ True
 
 # The 'select' argument to extra() supports names with dashes in them, as long
 # as you use values().
->>> Article.objects.filter(pub_date__year=2008).extra(select={'dashed-value': '1'}).values('headline', 'dashed-value')
-[{'headline': u'Article 11', 'dashed-value': 1}, {'headline': u'Article 12', 'dashed-value': 1}]
+>>> dicts = Article.objects.filter(pub_date__year=2008).extra(select={'dashed-value': '1'}).values('headline', 'dashed-value')
+>>> [sorted(d.items()) for d in dicts]
+[[('dashed-value', 1), ('headline', u'Article 11')], [('dashed-value', 1), ('headline', u'Article 12')]]
 
 # If you use 'select' with extra() and names containing dashes on a query
 # that's *not* a values() query, those extra 'select' values will silently be

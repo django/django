@@ -41,7 +41,7 @@ class SessionStore(SessionBase):
         Session.objects.create(
             session_key = self.session_key,
             session_data = self.encode(self._session),
-            expire_date = datetime.datetime.now() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE)
+            expire_date = self.get_expiry_date()
         )
 
     def delete(self, session_key):

@@ -18,7 +18,7 @@ class WhereNode(tree.Node):
     Used to represent the SQL where-clause.
 
     The class is tied to the Query class that created it (in order to create
-    the corret SQL).
+    the correct SQL).
 
     The children in this tree are usually either Q-like objects or lists of
     [table_alias, field_name, field_class, lookup_type, value]. However, a

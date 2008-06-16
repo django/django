@@ -1,5 +1,6 @@
 import urllib
 import sys
+import os
 from cStringIO import StringIO
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -67,7 +68,7 @@ def encode_multipart(boundary, data):
         if isinstance(value, file):
             lines.extend([
                 '--' + boundary,
-                'Content-Disposition: form-data; name="%s"; filename="%s"' % (to_str(key), to_str(value.name)),
+                'Content-Disposition: form-data; name="%s"; filename="%s"' % (to_str(key), to_str(os.path.basename(value.name))),
                 'Content-Type: application/octet-stream',
                 '',
                 value.read()
@@ -178,10 +179,15 @@ class Client:
             if e.args != ('500.html',):
                 raise
 
-        # Look for a signalled exception and reraise it
+        # Look for a signalled exception, clear the current context
+        # exception data, then re-raise the signalled exception.
+        # Also make sure that the signalled exception is cleared from
+        # the local cache!
         if self.exc_info:
-            raise self.exc_info[1], None, self.exc_info[2]
-
+            exc_info = self.exc_info
+            self.exc_info = None
+            raise exc_info[1], None, exc_info[2]
+            
         # Save the client and request that stimulated the response
         response.client = self
         response.request = request

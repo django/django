@@ -226,15 +226,17 @@ u'some <b>html</b> with alert("You smell") disallowed  tags'
 >>> striptags(u'some <b>html</b> with <script>alert("You smell")</script> disallowed <img /> tags')
 u'some html with alert("You smell") disallowed  tags'
 
->>> dictsort([{'age': 23, 'name': 'Barbara-Ann'},
-...           {'age': 63, 'name': 'Ra Ra Rasputin'},
-...           {'name': 'Jonny B Goode', 'age': 18}], 'age')
-[{'age': 18, 'name': 'Jonny B Goode'}, {'age': 23, 'name': 'Barbara-Ann'}, {'age': 63, 'name': 'Ra Ra Rasputin'}]
+>>> sorted_dicts = dictsort([{'age': 23, 'name': 'Barbara-Ann'},
+...                          {'age': 63, 'name': 'Ra Ra Rasputin'},
+...                          {'name': 'Jonny B Goode', 'age': 18}], 'age')
+>>> [sorted(dict.items()) for dict in sorted_dicts]
+[[('age', 18), ('name', 'Jonny B Goode')], [('age', 23), ('name', 'Barbara-Ann')], [('age', 63), ('name', 'Ra Ra Rasputin')]]
 
->>> dictsortreversed([{'age': 23, 'name': 'Barbara-Ann'},
-...           {'age': 63, 'name': 'Ra Ra Rasputin'},
-...           {'name': 'Jonny B Goode', 'age': 18}], 'age')
-[{'age': 63, 'name': 'Ra Ra Rasputin'}, {'age': 23, 'name': 'Barbara-Ann'}, {'age': 18, 'name': 'Jonny B Goode'}]
+>>> sorted_dicts = dictsortreversed([{'age': 23, 'name': 'Barbara-Ann'},
+...                                  {'age': 63, 'name': 'Ra Ra Rasputin'},
+...                                  {'name': 'Jonny B Goode', 'age': 18}], 'age')
+>>> [sorted(dict.items()) for dict in sorted_dicts]
+[[('age', 63), ('name', 'Ra Ra Rasputin')], [('age', 23), ('name', 'Barbara-Ann')], [('age', 18), ('name', 'Jonny B Goode')]]
 
 >>> first([0,1,2])
 0

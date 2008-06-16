@@ -80,11 +80,8 @@ DoesNotExist: Restaurant matching query does not exist.
 >>> r.place
 <Place: Ace Hardware the place>
 
-# Set the place back again, using assignment in the reverse direction. Need to
-# reload restaurant object first, because the reverse set can't update the
-# existing restaurant instance
+# Set the place back again, using assignment in the reverse direction.
 >>> p1.restaurant = r
->>> r.save()
 >>> p1.restaurant
 <Restaurant: Demon Dogs the restaurant>
 

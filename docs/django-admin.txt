@@ -93,6 +93,31 @@ backend. See the `cache documentation`_ for more information.
 
 .. _cache documentation: ../cache/
 
+createsuperuser
+---------------
+
+**New in Django development version**
+
+Creates a superuser account (a user who has all permissions). This is
+useful if you need to create an initial superuser account but did not
+do so during ``syncdb``, or if you need to programmatically generate
+superuser accounts for your site(s).
+
+When run interactively, this command will prompt for a password for
+the new superuser account. When run non-interactively, no password
+will be set, and the superuser account will not be able to log in until
+a password has been manually set for it.
+
+The username and e-mail address for the new account can be supplied by
+using the ``--username`` and ``--email`` arguments on the command
+line. If either of those is not supplied, ``createsuperuser`` will prompt for
+it when running interactively.
+
+This command is only available if Django's `authentication system`_
+(``django.contrib.auth``) is installed.
+
+.. _authentication system: ../authentication/
+
 dbshell
 -------
 
@@ -138,6 +163,22 @@ and it filters some of the available records, not all of the objects will be
 dumped.
 
 .. _custom manager: ../model-api/#custom-managers
+
+--exclude
+~~~~~~~~~
+
+**New in Django development version**
+
+Exclude a specific application from the applications whose contents is
+output. For example, to specifically exclude the `auth` application from
+the output, you would call::
+
+	django-admin.py dumpdata --exclude=auth
+
+If you want to exclude multiple applications, use multiple ``--exclude``
+directives::
+
+	django-admin.py dumpdata --exclude=auth --exclude=contenttype
 
 --format
 ~~~~~~~~
@@ -313,9 +354,9 @@ The ``dumpdata`` command can be used to generate input for ``loaddata``.
 Use ``--verbosity`` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console.
 
-	* ``0`` means no input.
-	* ``1`` means normal input (default).
-	* ``2`` means verbose input.
+	* ``0`` means no output.
+	* ``1`` means normal output (default).
+	* ``2`` means verbose output.
 
 Example usage::
 
@@ -556,9 +597,9 @@ data files.
 Use ``--verbosity`` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console.
 
-	* ``0`` means no input.
-	* ``1`` means normal input (default).
-	* ``2`` means verbose input.
+	* ``0`` means no output.
+	* ``1`` means normal output (default).
+	* ``2`` means verbose output.
 
 Example usage::
 
@@ -592,9 +633,9 @@ is being executed as an unattended, automated script.
 Use ``--verbosity`` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console.
 
-	* ``0`` means no input.
-	* ``1`` means normal input (default).
-	* ``2`` means verbose input.
+	* ``0`` means no output.
+	* ``1`` means normal output (default).
+	* ``2`` means verbose output.
 
 Example usage::
 
@@ -668,9 +709,9 @@ To run on 1.2.3.4:7000 with a ``test`` fixture::
 Use ``--verbosity`` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console.
 
-	* ``0`` means no input.
-	* ``1`` means normal input (default).
-	* ``2`` means verbose input.
+	* ``0`` means no output.
+	* ``1`` means normal output (default).
+	* ``2`` means verbose output.
 
 Example usage::
 

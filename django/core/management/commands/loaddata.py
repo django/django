@@ -32,6 +32,7 @@ class Command(BaseCommand):
         # Keep a count of the installed objects and fixtures
         fixture_count = 0
         object_count = 0
+        objects_per_fixture = []
         models = set()
 
         humanize = lambda dirname: dirname and "'%s'" % dirname or 'absolute path'
@@ -60,11 +61,16 @@ class Command(BaseCommand):
                 else:
                     formats = []
 
-            if verbosity >= 2:
-                if formats:
+            if formats:
+                if verbosity > 1:
                     print "Loading '%s' fixtures..." % fixture_name
-                else:
-                    print "Skipping fixture '%s': %s is not a known serialization format" % (fixture_name, format)
+            else:
+                sys.stderr.write(
+                    self.style.ERROR("Problem installing fixture '%s': %s is not a known serialization format." %
+                        (fixture_name, format)))
+                transaction.rollback()
+                transaction.leave_transaction_management()
+                return
 
             if os.path.isabs(fixture_name):
                 fixture_dirs = [fixture_name]
@@ -93,6 +99,7 @@ class Command(BaseCommand):
                             return
                         else:
                             fixture_count += 1
+                            objects_per_fixture.append(0)
                             if verbosity > 0:
                                 print "Installing %s fixture '%s' from %s." % \
                                     (format, fixture_name, humanize(fixture_dir))
@@ -100,6 +107,7 @@ class Command(BaseCommand):
                                 objects = serializers.deserialize(format, fixture)
                                 for obj in objects:
                                     object_count += 1
+                                    objects_per_fixture[-1] += 1
                                     models.add(obj.object.__class__)
                                     obj.save()
                                 label_found = True
@@ -117,10 +125,23 @@ class Command(BaseCommand):
                                 return
                             fixture.close()
                     except:
-                        if verbosity >= 2:
+                        if verbosity > 1:
                             print "No %s fixture '%s' in %s." % \
                                 (format, fixture_name, humanize(fixture_dir))
 
+
+        # If any of the fixtures we loaded contain 0 objects, assume that an 
+        # error was encountered during fixture loading.
+        if 0 in objects_per_fixture:
+            sys.stderr.write(
+                self.style.ERROR("No fixture data found for '%s'. (File format may be invalid.)" %
+                    (fixture_name)))
+            transaction.rollback()
+            transaction.leave_transaction_management()
+            return
+            
+        # If we found even one object in a fixture, we need to reset the 
+        # database sequences.
         if object_count > 0:
             sequence_sql = connection.ops.sequence_reset_sql(self.style, models)
             if sequence_sql:
@@ -128,12 +149,12 @@ class Command(BaseCommand):
                     print "Resetting sequences"
                 for line in sequence_sql:
                     cursor.execute(line)
-
+            
         transaction.commit()
         transaction.leave_transaction_management()
 
         if object_count == 0:
-            if verbosity >= 2:
+            if verbosity > 1:
                 print "No fixtures found."
         else:
             if verbosity > 0:

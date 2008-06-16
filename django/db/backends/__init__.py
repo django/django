@@ -202,8 +202,8 @@ class BaseDatabaseOperations(object):
 
     def query_class(self, DefaultQueryClass):
         """
-        Given the default QuerySet class, returns a custom QuerySet class
-        to use for this backend. Returns None if a custom QuerySet isn't used.
+        Given the default Query class, returns a custom Query class
+        to use for this backend. Returns None if a custom Query isn't used.
         See also BaseDatabaseFeatures.uses_custom_query_class, which regulates
         whether this method is called at all.
         """

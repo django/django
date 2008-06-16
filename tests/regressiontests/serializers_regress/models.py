@@ -223,3 +223,23 @@ class ModifyingSaveData(models.Model):
         "A save method that modifies the data in the object"
         self.data = 666
         super(ModifyingSaveData, self).save(raw)
+
+# Tests for serialization of models using inheritance.
+# Regression for #7202, #7350
+class AbstractBaseModel(models.Model):
+    parent_data = models.IntegerField()
+    class Meta:
+        abstract = True
+
+class InheritAbstractModel(AbstractBaseModel):
+    child_data = models.IntegerField()
+    
+class BaseModel(models.Model):
+    parent_data = models.IntegerField()
+
+class InheritBaseModel(BaseModel):
+    child_data = models.IntegerField()
+
+class ExplicitInheritBaseModel(BaseModel):
+    parent = models.OneToOneField(BaseModel)
+    child_data = models.IntegerField()

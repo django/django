@@ -110,8 +110,9 @@ __test__ = {'API_TESTS':"""
 >>> Article.objects.filter(Q(headline__startswith='Hello') | Q(headline__contains='bye')).count()
 3
 
->>> list(Article.objects.filter(Q(headline__startswith='Hello'), Q(headline__contains='bye')).values())
-[{'headline': u'Hello and goodbye', 'pub_date': datetime.datetime(2005, 11, 29, 0, 0), 'id': 3}]
+>>> dicts = list(Article.objects.filter(Q(headline__startswith='Hello'), Q(headline__contains='bye')).values())
+>>> [sorted(d.items()) for d in dicts]
+[[('headline', u'Hello and goodbye'), ('id', 3), ('pub_date', datetime.datetime(2005, 11, 29, 0, 0))]]
 
 >>> Article.objects.filter(Q(headline__startswith='Hello')).in_bulk([1,2])
 {1: <Article: Hello>}
