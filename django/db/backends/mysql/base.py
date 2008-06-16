@@ -64,6 +64,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     inline_fk_references = False
     empty_fetchmany_value = ()
     update_can_self_select = False
+    supports_usecs = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):

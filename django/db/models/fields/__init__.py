@@ -7,7 +7,7 @@ try:
 except ImportError:
     from django.utils import _decimal as decimal    # for Python 2.3
 
-from django.db import get_creation_module
+from django.db import connection, get_creation_module
 from django.db.models import signals
 from django.db.models.query_utils import QueryWrapper
 from django.dispatch import dispatcher
@@ -32,9 +32,6 @@ HORIZONTAL, VERTICAL = 1, 2
 # The values to use for "blank" in SelectFields. Will be appended to the start of most "choices" lists.
 BLANK_CHOICE_DASH = [("", "---------")]
 BLANK_CHOICE_NONE = [("", "None")]
-
-# prepares a value for use in a LIKE query
-prep_for_like_query = lambda x: smart_unicode(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
 
 # returns the <ul> class for a given radio_admin value
 get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
@@ -97,7 +94,7 @@ class Field(object):
         self.blank, self.null = blank, null
         # Oracle treats the empty string ('') as null, so coerce the null
         # option whenever '' is a possible value.
-        if self.empty_strings_allowed and settings.DATABASE_ENGINE == 'oracle':
+        if self.empty_strings_allowed and connection.features.interprets_empty_strings_as_nulls:
             self.null = True
         self.core, self.rel, self.default = core, rel, default
         self.editable = editable
@@ -235,13 +232,13 @@ class Field(object):
         elif lookup_type in ('range', 'in'):
             return value
         elif lookup_type in ('contains', 'icontains'):
-            return ["%%%s%%" % prep_for_like_query(value)]
+            return ["%%%s%%" % connection.ops.prep_for_like_query(value)]
         elif lookup_type == 'iexact':
-            return [prep_for_like_query(value)]
+            return [connection.ops.prep_for_like_query(value)]
         elif lookup_type in ('startswith', 'istartswith'):
-            return ["%s%%" % prep_for_like_query(value)]
+            return ["%s%%" % connection.ops.prep_for_like_query(value)]
         elif lookup_type in ('endswith', 'iendswith'):
-            return ["%%%s" % prep_for_like_query(value)]
+            return ["%%%s" % connection.ops.prep_for_like_query(value)]
         elif lookup_type == 'isnull':
             return []
         elif lookup_type == 'year':
@@ -252,9 +249,12 @@ class Field(object):
             if settings.DATABASE_ENGINE == 'sqlite3':
                 first = '%s-01-01'
                 second = '%s-12-31 23:59:59.999999'
-            elif settings.DATABASE_ENGINE == 'oracle' and self.get_internal_type() == 'DateField':
+            elif not connection.features.date_field_supports_time_value and self.get_internal_type() == 'DateField':
                 first = '%s-01-01'
                 second = '%s-12-31'
+            elif not connection.features.supports_usecs:
+                first = '%s-01-01 00:00:00'
+                second = '%s-12-31 23:59:59.99'
             else:
                 first = '%s-01-01 00:00:00'
                 second = '%s-12-31 23:59:59.999999'
@@ -271,7 +271,7 @@ class Field(object):
             if callable(self.default):
                 return self.default()
             return force_unicode(self.default, strings_only=True)
-        if not self.empty_strings_allowed or (self.null and settings.DATABASE_ENGINE != 'oracle'):
+        if not self.empty_strings_allowed or (self.null and not connection.features.interprets_empty_strings_as_nulls):
             return None
         return ""
 
@@ -629,7 +629,7 @@ class DateTimeField(DateField):
         if value is not None:
             # MySQL will throw a warning if microseconds are given, because it
             # doesn't support microseconds.
-            if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
+            if not connection.features.supports_usecs and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
             value = smart_unicode(value)
         return Field.get_db_prep_save(self, value)
@@ -863,7 +863,7 @@ class FilePathField(Field):
         self.path, self.match, self.recursive = path, match, recursive
         kwargs['max_length'] = kwargs.get('max_length', 100)
         Field.__init__(self, verbose_name, name, **kwargs)
-    
+
     def formfield(self, **kwargs):
         defaults = {
             'path': self.path,
@@ -1071,7 +1071,7 @@ class TimeField(Field):
         return "TimeField"
 
     def get_db_prep_lookup(self, lookup_type, value):
-        if settings.DATABASE_ENGINE == 'oracle':
+        if connection.features.time_field_needs_date:
             # Oracle requires a date in order to parse.
             def prep(value):
                 if isinstance(value, datetime.time):
@@ -1098,9 +1098,9 @@ class TimeField(Field):
         if value is not None:
             # MySQL will throw a warning if microseconds are given, because it
             # doesn't support microseconds.
-            if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
+            if not connection.features.supports_usecs and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
-            if settings.DATABASE_ENGINE == 'oracle':
+            if connection.features.time_field_needs_date:
                 # cx_Oracle expects a datetime.datetime to persist into TIMESTAMP field.
                 if isinstance(value, datetime.time):
                     value = datetime.datetime(1900, 1, 1, value.hour, value.minute,
