@@ -46,6 +46,9 @@ Let's take a look at a very simple example the ``ModelAdmin``::
         pass
     admin.site.register(Author, AuthorAdmin)
 
+``ModelAdmin`` Options
+----------------------
+
 The ``ModelAdmin`` is very flexible. It has several options for dealing with
 customizing the interface. All options are defined on the ``ModelAdmin``
 subclass::
@@ -54,7 +57,7 @@ subclass::
         date_hierarchy = 'pub_date'
 
 ``date_hierarchy``
-------------------
+~~~~~~~~~~~~~~~~~~
 
 Set ``date_hierarchy`` to the name of a ``DateField`` or ``DateTimeField`` in
 your model, and the change list page will include a date-based drilldown
@@ -65,7 +68,7 @@ Example::
     date_hierarchy = 'pub_date'
 
 ``fieldsets``
--------------
+~~~~~~~~~~~~~
 
 Set ``fieldsets`` to control the layout of admin "add" and "change" pages.
 
@@ -102,55 +105,49 @@ in the same order as the fields are defined in the model.
 The ``field_options`` dictionary can have the following keys:
 
 ``fields``
-~~~~~~~~~~
+    A tuple of field names to display in this fieldset. This key is required.
+    
+    Example::
+        
+        {
+        'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
+        }
 
-A tuple of field names to display in this fieldset. This key is required.
-
-Example::
-
-    {
-    'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
-    }
-
-To display multiple fields on the same line, wrap those fields in their own
-tuple. In this example, the ``first_name`` and ``last_name`` fields will
-display on the same line::
-
-    {
-    'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
-    }
+    To display multiple fields on the same line, wrap those fields in their own
+    tuple. In this example, the ``first_name`` and ``last_name`` fields will
+    display on the same line::
+        
+        {
+        'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
+        }
 
 ``classes``
-~~~~~~~~~~~
+    A string containing extra CSS classes to apply to the fieldset.
+    
+    Example::
+        
+        {
+        'classes': 'wide',
+        }
 
-A string containing extra CSS classes to apply to the fieldset.
-
-Example::
-
-    {
-    'classes': 'wide',
-    }
-
-Apply multiple classes by separating them with spaces. Example::
-
-    {
-    'classes': 'wide extrapretty',
-    }
-
-Two useful classes defined by the default admin-site stylesheet are
-``collapse`` and ``wide``. Fieldsets with the ``collapse`` style will be
-initially collapsed in the admin and replaced with a small "click to expand"
-link. Fieldsets with the ``wide`` style will be given extra horizontal space.
+    Apply multiple classes by separating them with spaces. Example::
+        
+        {
+        'classes': 'wide extrapretty',
+        }
+    
+    Two useful classes defined by the default admin-site stylesheet are
+    ``collapse`` and ``wide``. Fieldsets with the ``collapse`` style will be
+    initially collapsed in the admin and replaced with a small "click to expand"
+    link. Fieldsets with the ``wide`` style will be given extra horizontal space.
 
 ``description``
-~~~~~~~~~~~~~~~
-
-A string of optional extra text to be displayed at the top of each fieldset,
-under the heading of the fieldset. It's used verbatim, so you can use any HTML
-and you must escape any special HTML characters (such as ampersands) yourself.
+    A string of optional extra text to be displayed at the top of each fieldset,
+    under the heading of the fieldset. It's used verbatim, so you can use any HTML
+    and you must escape any special HTML characters (such as ampersands) yourself.
 
 ``list_display``
-----------------
+~~~~~~~~~~~~~~~~
 
 Set ``list_display`` to control which fields are displayed on the change list
 page of the admin.
@@ -261,7 +258,7 @@ A few special cases to note about ``list_display``:
       trying to sort by ``colored_first_name`` in the admin.
 
 ``list_display_links``
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 Set ``list_display_links`` to control which fields in ``list_display`` should
 be linked to the "change" page for an object.
@@ -288,7 +285,7 @@ Finally, note that in order to use ``list_display_links``, you must define
 ``list_display``, too.
 
 ``list_filter``
----------------
+~~~~~~~~~~~~~~~
 
 Set ``list_filter`` to activate filters in the right sidebar of the change list
 page of the admin. This should be a list of field names, and each specified
@@ -309,13 +306,13 @@ The above code results in an admin change list page that looks like this:
 (This example also has ``search_fields`` defined. See below.)
 
 ``list_per_page``
------------------
+~~~~~~~~~~~~~~~~~
 
 Set ``list_per_page`` to control how many items appear on each paginated admin
 change list page. By default, this is set to ``100``.
 
 ``list_select_related``
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Set ``list_select_related`` to tell Django to use ``select_related()`` in
 retrieving the list of objects on the admin change list page. This can save you
@@ -331,12 +328,12 @@ For more on ``select_related()``, see `the select_related() docs`_.
 .. _the select_related() docs: ../db-api/#select-related
 
 ``inlines``
------------
+~~~~~~~~~~~
 
 See ``InlineModelAdmin`` objects below.
 
 ``ordering``
-------------
+~~~~~~~~~~~~
 
 Set ``ordering`` to specify how objects on the admin change list page should be
 ordered. This should be a list or tuple in the same format as a model's
@@ -345,7 +342,7 @@ ordered. This should be a list or tuple in the same format as a model's
 If this isn't provided, the Django admin will use the model's default ordering.
 
 ``radio_fields``
-----------------
+~~~~~~~~~~~~~~~~
 
 By default, Django's admin uses a select-box interface (<select>) for
 fields that are ``ForeignKey`` or have ``choices`` set. If a field is present
@@ -362,7 +359,7 @@ Don't include a field in ``radio_fields`` unless it's a ``ForeignKey`` or has
 ``choices`` set.
 
 ``save_as``
------------
+~~~~~~~~~~~
 
 Set ``save_as`` to enable a "save as" feature on admin change forms.
 
@@ -376,7 +373,7 @@ rather than the old object.
 By default, ``save_as`` is set to ``False``.
 
 ``save_on_top``
----------------
+~~~~~~~~~~~~~~~
 
 Set ``save_on_top`` to add save buttons across the top of your admin change
 forms.
@@ -387,7 +384,7 @@ Normally, the save buttons appear only at the bottom of the forms. If you set
 By default, ``save_on_top`` is set to ``False``.
 
 ``search_fields``
------------------
+~~~~~~~~~~~~~~~~~
 
 Set ``search_fields`` to enable a search box on the admin change list page.
 This should be set to a list of field names that will be searched whenever
@@ -513,7 +510,7 @@ to the initial forms. See the `formsets documentation`_ for more information.
 
 This controls the maximum number of forms to show in the inline. This doesn't
 directly corrolate to the number of objects, but can if the value is small
-enough. See `max_num in model formsets`_ for more information.
+enough. See `max_num in formsets`_ for more information.
 
 .. _max_num in formsets: ../modelforms/#limiting-the-number-of-objects-editable
 
@@ -560,7 +557,7 @@ automatically::
 =====================
 
 Hooking ``AdminSite`` instances into your URLconf
-=================================================
+-------------------------------------------------
 
 The last step in setting up the Django admin is to hook your ``AdminSite``
 instance into your URLconf. Do this by pointing a given URL at the
@@ -601,7 +598,7 @@ root each one at a different URL.
 In this example, the URLs ``/basic-admin/`` and ``/advanced-admin/`` feature
 separate versions of the admin site -- using the ``AdminSite`` instances
 ``myproject.admin.basic_site`` and ``myproject.admin.advanced_site``,
-respectively.
+respectively::
 
     # urls.py
     from django.conf.urls.defaults import *
