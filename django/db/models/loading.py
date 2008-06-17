@@ -157,7 +157,7 @@ class AppCache(object):
         """
         for model in models:
             # Store as 'name: model' pair in a dictionary
-            # in the _app_models dictionary
+            # in the app_models dictionary
             model_name = model._meta.object_name.lower()
             model_dict = self.app_models.setdefault(app_label, {})
             if model_name in model_dict:
