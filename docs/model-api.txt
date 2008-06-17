@@ -2005,6 +2005,36 @@ In this way, you're tying the model's absolute URL to the view that is used
 to display it, without repeating the URL information anywhere. You can still
 use the ``get_absolute_url`` method in templates, as before.
 
+In some cases, such as the use of generic views or the re-use of
+custom views for multiple models, specifying the view function may
+confuse the reverse URL matcher (because multiple patterns point to
+the same view).
+
+For that problem, Django has **named URL patterns**. Using a named
+URL patter, it's possible to give a name to a pattern, and then 
+reference the name, rather than the view function. A named URL 
+pattern is defined by replacing the pattern tuple by a call to
+the ``url`` function)::
+
+    from django.conf.urls.defaults import *
+
+    url(r'^people/(\d+)/$',
+        'django.views.generic.list_detail.object_detail',
+        name='people_view'),
+
+and then using that name to perform the reverse URL resolution instead
+of the view name::
+
+    from django.db.models import permalink
+
+    def get_absolute_url(self):
+        return ('people_view', [str(self.id)])
+    get_absolute_url = permalink(get_absolute_url)
+
+More details on named URL patterns can be found in `URL dispatch documentation`_.
+
+.. _URL dispatch: ../url_dispatch/#naming-url-patterns
+
 Executing custom SQL
 --------------------
 
