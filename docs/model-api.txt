@@ -423,18 +423,6 @@ not specified, Django will use a default length of 50.
 
 Implies ``db_index=True``.
 
-Accepts an extra option, ``prepopulate_from``, which is a list of fields
-from which to auto-populate the slug, via JavaScript, in the object's admin
-form::
-
-    models.SlugField(prepopulate_from=("pre_name", "name"))
-
-``prepopulate_from`` doesn't accept DateTimeFields, ForeignKeys nor
-ManyToManyFields.
-
-The admin represents ``SlugField`` as an ``<input type="text">`` (a
-single-line input).
-
 ``SmallIntegerField``
 ~~~~~~~~~~~~~~~~~~~~~
 
