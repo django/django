@@ -2011,8 +2011,8 @@ confuse the reverse URL matcher (because multiple patterns point to
 the same view).
 
 For that problem, Django has **named URL patterns**. Using a named
-URL patter, it's possible to give a name to a pattern, and then 
-reference the name, rather than the view function. A named URL 
+URL pattern, it's possible to give a name to a pattern, and then
+reference the name rather than the view function. A named URL
 pattern is defined by replacing the pattern tuple by a call to
 the ``url`` function)::
 
@@ -2033,7 +2033,7 @@ of the view name::
 
 More details on named URL patterns can be found in `URL dispatch documentation`_.
 
-.. _URL dispatch: ../url_dispatch/#naming-url-patterns
+.. _URL dispatch documentation: ../url_dispatch/#naming-url-patterns
 
 Executing custom SQL
 --------------------
