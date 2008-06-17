@@ -3,10 +3,10 @@
 # This file is distributed under the same license as the django package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Django"
-"Report-Msgid-Bugs-To: \n"
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: <removethis-eallik_at_gmail-com>\n"
 "POT-Creation-Date: 2008-06-02 19:42+0300\n"
-"PO-Revision-Date: 2008-06-16 19:55+0200\n"
+"PO-Revision-Date: 2008-06-17 12:29+0300\n"
 "Last-Translator: Erik Allik <removethis-eallik_at_gmail-com>\n"
 "Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"

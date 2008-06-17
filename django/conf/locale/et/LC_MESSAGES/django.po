@@ -4,9 +4,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: removethis-eallik_at_gmail-com\n"
 "POT-Creation-Date: 2008-06-02 19:15+0300\n"
-"PO-Revision-Date: 2008-06-16 19:55+0200\n"
+"PO-Revision-Date: 2008-06-17 12:29+0300\n"
 "Last-Translator: Erik Allik <removethis-eallik_at_gmail-com>\n"
 "Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -35,7 +35,7 @@ msgstr "tšehhi"
 
 #: conf/global_settings.py:48
 msgid "Welsh"
-msgstr "wales'i"
+msgstr "uelsi"
 
 #: conf/global_settings.py:49
 msgid "Danish"
@@ -59,7 +59,7 @@ msgstr "hispaania"
 
 #: conf/global_settings.py:54
 msgid "Argentinean Spanish"
-msgstr "argentiina hispaania keel"
+msgstr "argentiina hispaania"
 
 #: conf/global_settings.py:55
 msgid "Basque"
@@ -151,7 +151,7 @@ msgstr "portugali"
 
 #: conf/global_settings.py:77
 msgid "Brazilian Portuguese"
-msgstr "brasiilia portugali keel"
+msgstr "brasiilia portugali"
 
 #: conf/global_settings.py:78
 msgid "Romanian"
@@ -195,11 +195,11 @@ msgstr "ukrania"
 
 #: conf/global_settings.py:88
 msgid "Simplified Chinese"
-msgstr "lihtsustatud hiina keel"
+msgstr "lihtsustatud hiina"
 
 #: conf/global_settings.py:89
 msgid "Traditional Chinese"
-msgstr "traditsiooniline hiina keel"
+msgstr "traditsiooniline hiina"
 
 #: contrib/admin/filterspecs.py:44
 #, python-format
@@ -229,11 +229,11 @@ msgstr "Viimased 7 päeva"
 
 #: contrib/admin/filterspecs.py:119
 msgid "This month"
-msgstr "See kuu"
+msgstr "Käesolev kuu"
 
 #: contrib/admin/filterspecs.py:121
 msgid "This year"
-msgstr "See aasta"
+msgstr "Käesolev aasta"
 
 #: contrib/admin/filterspecs.py:147 newforms/widgets.py:231
 #: oldforms/__init__.py:592
@@ -420,7 +420,7 @@ msgstr "Jah, olen kindel"
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
-msgstr " %(filter_title)s järgi "
+msgstr " %(filter_title)s "
 
 #: contrib/admin/templates/admin/filters.html:4
 msgid "Filter"
@@ -446,7 +446,7 @@ msgstr "Teil ei ole õigust midagi muuta."
 
 #: contrib/admin/templates/admin/index.html:52
 msgid "Recent Actions"
-msgstr "Hiljtuised Toimingud"
+msgstr "Hiljutised Toimingud"
 
 #: contrib/admin/templates/admin/index.html:53
 msgid "My Actions"
@@ -480,7 +480,7 @@ msgstr "Salasõna:"
 #: contrib/admin/templates/admin/login.html:25
 #: contrib/admin/views/decorators.py:31
 msgid "Log in"
-msgstr "Logi sisse"
+msgstr "Sisene"
 
 #: contrib/admin/templates/admin/object_history.html:17
 msgid "Date/time"
