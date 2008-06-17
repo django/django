@@ -958,7 +958,10 @@ See the `template documentation`_.
 TEMPLATE_LOADERS
 ----------------
 
-Default: ``('django.template.loaders.filesystem.load_template_source',)``
+Default::
+
+     ('django.template.loaders.filesystem.load_template_source',
+      'django.template.loaders.app_directories.load_template_source')
 
 A tuple of callables (as strings) that know how to import templates from
 various sources. See the `template documentation`_.
