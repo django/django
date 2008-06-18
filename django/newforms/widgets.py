@@ -281,8 +281,12 @@ class RadioInput(StrAndUnicode):
         self.index = index
 
     def __unicode__(self):
-        return mark_safe(u'<label>%s %s</label>' % (self.tag(),
-                conditional_escape(force_unicode(self.choice_label))))
+        if 'id' in self.attrs:
+            label_for = ' for="%s_%s"' % (self.attrs['id'], self.index)
+        else:
+            label_for = ''
+        choice_label = conditional_escape(force_unicode(self.choice_label))
+        return mark_safe(u'<label%s>%s %s</label>' % (label_for, self.tag(), choice_label))
 
     def is_checked(self):
         return self.value == self.choice_value
@@ -364,11 +368,15 @@ class CheckboxSelectMultiple(SelectMultiple):
             # so that the checkboxes don't all have the same ID attribute.
             if has_id:
                 final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
+                label_for = u' for="%s"' % final_attrs['id']
+            else:
+                label_for = ''
+                
             cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
             option_value = force_unicode(option_value)
             rendered_cb = cb.render(name, option_value)
-            output.append(u'<li><label>%s %s</label></li>' % (rendered_cb,
-                    conditional_escape(force_unicode(option_label))))
+            option_label = conditional_escape(force_unicode(option_label))
+            output.append(u'<li><label%s>%s %s</label></li>' % (label_for, rendered_cb, option_label))
         output.append(u'</ul>')
         return mark_safe(u'\n'.join(output))
 

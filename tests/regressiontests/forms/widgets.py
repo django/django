@@ -741,20 +741,20 @@ u'<ul>\n<li><label><input checked="checked" type="radio" name="email" value="\u0
 >>> w = RadioSelect(attrs={'id':'foo'})
 >>> print w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
 <ul>
-<li><label><input checked="checked" type="radio" id="foo_0" value="J" name="beatle" /> John</label></li>
-<li><label><input type="radio" id="foo_1" value="P" name="beatle" /> Paul</label></li>
-<li><label><input type="radio" id="foo_2" value="G" name="beatle" /> George</label></li>
-<li><label><input type="radio" id="foo_3" value="R" name="beatle" /> Ringo</label></li>
+<li><label for="foo_0"><input checked="checked" type="radio" id="foo_0" value="J" name="beatle" /> John</label></li>
+<li><label for="foo_1"><input type="radio" id="foo_1" value="P" name="beatle" /> Paul</label></li>
+<li><label for="foo_2"><input type="radio" id="foo_2" value="G" name="beatle" /> George</label></li>
+<li><label for="foo_3"><input type="radio" id="foo_3" value="R" name="beatle" /> Ringo</label></li>
 </ul>
 
 # Attributes provided at render-time are passed to the constituent inputs
 >>> w = RadioSelect()
 >>> print w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')), attrs={'id':'bar'})
 <ul>
-<li><label><input checked="checked" type="radio" id="bar_0" value="J" name="beatle" /> John</label></li>
-<li><label><input type="radio" id="bar_1" value="P" name="beatle" /> Paul</label></li>
-<li><label><input type="radio" id="bar_2" value="G" name="beatle" /> George</label></li>
-<li><label><input type="radio" id="bar_3" value="R" name="beatle" /> Ringo</label></li>
+<li><label for="bar_0"><input checked="checked" type="radio" id="bar_0" value="J" name="beatle" /> John</label></li>
+<li><label for="bar_1"><input type="radio" id="bar_1" value="P" name="beatle" /> Paul</label></li>
+<li><label for="bar_2"><input type="radio" id="bar_2" value="G" name="beatle" /> George</label></li>
+<li><label for="bar_3"><input type="radio" id="bar_3" value="R" name="beatle" /> Ringo</label></li>
 </ul>
 
 # CheckboxSelectMultiple Widget ###############################################
