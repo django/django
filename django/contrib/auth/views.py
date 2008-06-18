@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 
 def login(request, template_name='registration/login.html', redirect_field_name=REDIRECT_FIELD_NAME):
     "Displays the login form and handles the login action."
-    manipulator = AuthenticationForm(request)
+    manipulator = AuthenticationForm()
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     if request.POST:
         errors = manipulator.get_validation_errors(request.POST)
@@ -22,7 +22,8 @@ def login(request, template_name='registration/login.html', redirect_field_name=
                 redirect_to = settings.LOGIN_REDIRECT_URL
             from django.contrib.auth import login
             login(request, manipulator.get_user())
-            request.session.delete_test_cookie()
+            if request.session.test_cookie_worked():
+                request.session.delete_test_cookie()
             return HttpResponseRedirect(redirect_to)
     else:
         errors = {}
