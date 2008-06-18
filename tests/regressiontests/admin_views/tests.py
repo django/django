@@ -49,6 +49,14 @@ class AdminViewPermissionsTest(TestCase):
                      LOGIN_FORM_KEY: 1,
                      'username': 'super',
                      'password': 'secret'}
+        self.super_email_login = {'post_data': _encode_post_data({}),
+                     LOGIN_FORM_KEY: 1,
+                     'username': 'super@example.com',
+                     'password': 'secret'}
+        self.super_email_bad_login = {'post_data': _encode_post_data({}),
+                      LOGIN_FORM_KEY: 1,
+                      'username': 'super@example.com',
+                      'password': 'notsecret'}
         self.adduser_login = {'post_data': _encode_post_data({}),
                      LOGIN_FORM_KEY: 1,
                      'username': 'adduser',
@@ -82,6 +90,21 @@ class AdminViewPermissionsTest(TestCase):
         self.assertRedirects(login, '/test_admin/admin/')
         self.assertFalse(login.context)
         self.client.get('/test_admin/admin/logout/')
+        
+        # Test if user enters e-mail address
+        request = self.client.get('/test_admin/admin/')
+        self.failUnlessEqual(request.status_code, 200)
+        login = self.client.post('/test_admin/admin/', self.super_email_login)
+        print login
+        self.assertContains(login, "Your e-mail address is not your username")
+        # only correct passwords get a username hint
+        login = self.client.post('/test_admin/admin/', self.super_email_bad_login)
+        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")
+        new_user = User(username='jondoe', password='secret', email='super@example.com')
+        new_user.save()
+        # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
+        login = self.client.post('/test_admin/admin/', self.super_email_login)
+        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")        
         
         # Add User
         request = self.client.get('/test_admin/admin/')
