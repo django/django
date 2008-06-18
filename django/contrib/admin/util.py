@@ -19,7 +19,7 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
         return # Avoid recursing too deep.
     opts_seen = []
     for related in opts.get_all_related_objects():
-        has_admin = related.__class__ in admin_site._registry
+        has_admin = related.model in admin_site._registry
         if related.opts in opts_seen:
             continue
         opts_seen.append(related.opts)
@@ -68,7 +68,7 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
                 if not user.has_perm(p):
                     perms_needed.add(related.opts.verbose_name)
     for related in opts.get_all_related_many_to_many_objects():
-        has_admin = related.__class__ in admin_site._registry
+        has_admin = related.model in admin_site._registry
         if related.opts in opts_seen:
             continue
         opts_seen.append(related.opts)

@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.sites import LOGIN_FORM_KEY, _encode_post_data
 
 # local test models
-from models import Article, CustomArticle
+from models import Article, CustomArticle, Section
 
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
@@ -40,6 +40,9 @@ class AdminViewPermissionsTest(TestCase):
         delete_user = User.objects.get(username='deleteuser')
         delete_user.user_permissions.add(get_perm(Article,
             opts.get_delete_permission()))
+
+        delete_user.user_permissions.add(get_perm(Section,
+            Section._meta.get_delete_permission()))
         
         # login POST dicts
         self.super_login = {'post_data': _encode_post_data({}),
@@ -116,7 +119,8 @@ class AdminViewPermissionsTest(TestCase):
         """Test add view restricts access and actually adds items."""
         
         add_dict = {'content': '<p>great article</p>',
-                    'date_0': '2008-03-18', 'date_1': '10:54:39'}
+                    'date_0': '2008-03-18', 'date_1': '10:54:39',
+                    'section': 1}
         
         # Change User should not have access to add articles
         self.client.get('/test_admin/admin/')
@@ -158,7 +162,8 @@ class AdminViewPermissionsTest(TestCase):
         """Change view should restrict access and allow users to edit items."""
         
         change_dict = {'content': '<p>edited article</p>',
-                    'date_0': '2008-03-18', 'date_1': '10:54:39'}
+                    'date_0': '2008-03-18', 'date_1': '10:54:39',
+                    'section': 1}
         
         # add user shoud not be able to view the list of article or change any of them
         self.client.get('/test_admin/admin/')
@@ -270,8 +275,12 @@ class AdminViewPermissionsTest(TestCase):
         # Delete user can delete
         self.client.get('/test_admin/admin/')
         self.client.post('/test_admin/admin/', self.deleteuser_login)
-        request = self.client.get('/test_admin/admin/admin_views/article/1/delete/')
-        self.failUnlessEqual(request.status_code, 200)
+        response = self.client.get('/test_admin/admin/admin_views/section/1/delete/')
+         # test response contains link to related Article
+        self.assertContains(response, "admin_views/article/1/")
+
+        response = self.client.get('/test_admin/admin/admin_views/article/1/delete/')
+        self.failUnlessEqual(response.status_code, 200)
         post = self.client.post('/test_admin/admin/admin_views/article/1/delete/', delete_dict)
         # TODO: http://code.djangoproject.com/ticket/6819 or the next line fails
         self.assertRedirects(post, '/test_admin/admin/')

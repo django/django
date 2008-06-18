@@ -1,12 +1,20 @@
 from django.db import models
 from django.contrib import admin
 
+class Section(models.Model):
+    """
+    A simple section that links to articles, to test linking to related items 
+    in admin views.
+    """
+    name = models.CharField(max_length=100)
+
 class Article(models.Model):
     """
-    A simple article to test admin views. Test backwards compabilty.
+    A simple article to test admin views. Test backwards compatibility.
     """
     content = models.TextField()
     date = models.DateTimeField()
+    section = models.ForeignKey(Section)
 
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('content', 'date')
@@ -14,9 +22,11 @@ class ArticleAdmin(admin.ModelAdmin):
     
     def changelist_view(self, request):
         "Test that extra_context works"
-        return super(ArticleAdmin, self).changelist_view(request, extra_context={
-            'extra_var': 'Hello!'
-        })
+        return super(ArticleAdmin, self).changelist_view(
+            request, extra_context={
+                'extra_var': 'Hello!'
+            }
+        )
 
 class CustomArticle(models.Model):
     content = models.TextField()
@@ -33,9 +43,12 @@ class CustomArticleAdmin(admin.ModelAdmin):
     
     def changelist_view(self, request):
         "Test that extra_context works"
-        return super(CustomArticleAdmin, self).changelist_view(request, extra_context={
-            'extra_var': 'Hello!'
-        })
+        return super(CustomArticleAdmin, self).changelist_view(
+            request, extra_context={
+                'extra_var': 'Hello!'
+            }
+        )
         
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
+admin.site.register(Section)
