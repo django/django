@@ -4,14 +4,14 @@ DE-specific Form helpers
 
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 import re
 
 id_re = re.compile(r"^(?P<residence>\d{10})(?P<origin>\w{1,3})[-\ ]?(?P<birthday>\d{7})[-\ ]?(?P<validity>\d{7})[-\ ]?(?P<checksum>\d{1})$")
 
 class DEZipCodeField(RegexField):
     default_error_messages = {
-        'invalid': ugettext('Enter a zip code in the format XXXXX.'),
+        'invalid': _('Enter a zip code in the format XXXXX.'),
     }
     def __init__(self, *args, **kwargs):
         super(DEZipCodeField, self).__init__(r'^\d{5}$',
@@ -38,7 +38,7 @@ class DEIdentityCardNumberField(Field):
     Algorithm is documented at http://de.wikipedia.org/wiki/Personalausweis
     """
     default_error_messages = {
-        'invalid': ugettext('Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.'),
+        'invalid': _('Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.'),
     }
 
     def has_valid_checksum(self, number):

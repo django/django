@@ -4,7 +4,7 @@ Chile specific form helpers.
 
 from django.newforms import ValidationError
 from django.newforms.fields import RegexField, Select, EMPTY_VALUES
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 
 
@@ -26,9 +26,9 @@ class CLRutField(RegexField):
     https://palena.sii.cl/cvc/dte/ee_empresas_emisoras.html
     """
     default_error_messages = {
-        'invalid': ugettext('Enter a valid Chilean RUT.'),
-        'strict': ugettext('Enter a valid Chilean RUT. The format is XX.XXX.XXX-X.'),
-        'checksum': ugettext('The Chilean RUT is not valid.'),
+        'invalid': _('Enter a valid Chilean RUT.'),
+        'strict': _('Enter a valid Chilean RUT. The format is XX.XXX.XXX-X.'),
+        'checksum': _('The Chilean RUT is not valid.'),
     }
 
     def __init__(self, *args, **kwargs):

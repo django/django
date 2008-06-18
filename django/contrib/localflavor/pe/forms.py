@@ -5,7 +5,7 @@ PE-specific Form helpers.
 
 from django.newforms import ValidationError
 from django.newforms.fields import RegexField, CharField, Select, EMPTY_VALUES
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 
 class PEDepartmentSelect(Select):
     """
@@ -20,8 +20,8 @@ class PEDNIField(CharField):
     A field that validates `Documento Nacional de IdentidadŽ (DNI) numbers.
     """
     default_error_messages = {
-        'invalid': ugettext("This field requires only numbers."),
-        'max_digits': ugettext("This field requires 8 digits."),
+        'invalid': _("This field requires only numbers."),
+        'max_digits': _("This field requires 8 digits."),
     }
 
     def __init__(self, *args, **kwargs):
@@ -48,8 +48,8 @@ class PERUCField(RegexField):
     the form XXXXXXXXXXX.
     """
     default_error_messages = {
-        'invalid': ugettext("This field requires only numbers."),
-        'max_digits': ugettext("This field requires 11 digits."),
+        'invalid': _("This field requires only numbers."),
+        'max_digits': _("This field requires 11 digits."),
     }
 
     def __init__(self, *args, **kwargs):

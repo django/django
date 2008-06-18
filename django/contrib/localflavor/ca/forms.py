@@ -5,7 +5,7 @@ Canada-specific Form helpers
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
 from django.newforms.util import smart_unicode
-from django.utils.translation import gettext, ugettext
+from django.utils.translation import ugettext_lazy as _
 import re
 
 phone_digits_re = re.compile(r'^(?:1-?)?(\d{3})[-\.]?(\d{3})[-\.]?(\d{4})$')
@@ -14,7 +14,7 @@ sin_re = re.compile(r"^(\d{3})-(\d{3})-(\d{3})$")
 class CAPostalCodeField(RegexField):
     """Canadian postal code field."""
     default_error_messages = {
-        'invalid': gettext(u'Enter a postal code in the format XXX XXX.'),
+        'invalid': _(u'Enter a postal code in the format XXX XXX.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -85,7 +85,7 @@ class CASocialInsuranceNumberField(Field):
              See: http://en.wikipedia.org/wiki/Social_Insurance_Number
     """
     default_error_messages = {
-        'invalid': ugettext('Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format.'),
+        'invalid': _('Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format.'),
     }
 
     def clean(self, value):

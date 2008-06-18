@@ -5,7 +5,7 @@ Iceland specific form helpers.
 from django.newforms import ValidationError
 from django.newforms.fields import RegexField, EMPTY_VALUES
 from django.newforms.widgets import Select
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 
 class ISIdNumberField(RegexField):
@@ -14,8 +14,8 @@ class ISIdNumberField(RegexField):
     of Iceland has.
     """
     default_error_messages = {
-        'invalid': ugettext('Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.'),
-        'checksum': ugettext(u'The Icelandic identification number is not valid.'),
+        'invalid': _('Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.'),
+        'checksum': _(u'The Icelandic identification number is not valid.'),
     }
 
     def __init__(self, *args, **kwargs):

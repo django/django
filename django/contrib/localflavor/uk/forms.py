@@ -6,7 +6,7 @@ import re
 
 from django.newforms.fields import CharField, Select
 from django.newforms import ValidationError
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 
 class UKPostcodeField(CharField):
     """
@@ -18,7 +18,7 @@ class UKPostcodeField(CharField):
     The value is uppercased and a space added in the correct place, if required.
     """
     default_error_messages = {
-        'invalid': ugettext(u'Enter a valid postcode.'),
+        'invalid': _(u'Enter a valid postcode.'),
     }
     outcode_pattern = '[A-PR-UWYZ]([0-9]{1,2}|([A-HIK-Y][0-9](|[0-9]|[ABEHMNPRVWXY]))|[0-9][A-HJKSTUW])'
     incode_pattern = '[0-9][ABD-HJLNP-UW-Z]{2}'
