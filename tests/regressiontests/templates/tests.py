@@ -704,6 +704,12 @@ class Templates(unittest.TestCase):
             # Inheritance from local context with variable parent template
             'inheritance25': ("{% extends context_template.1 %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {'context_template': [template.Template("Wrong"), template.Template("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}")]}, '1234'),
 
+            # Set up a base template to extend
+         	'inheritance26': ("no tags", {}, 'no tags'),
+
+         	# Inheritance from a template that doesn't have any blocks
+         	'inheritance27': ("{% extends 'inheritance26' %}", {}, 'no tags'),
+         	
             ### I18N ##################################################################
 
             # {% spaceless %} tag
