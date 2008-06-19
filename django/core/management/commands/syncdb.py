@@ -25,6 +25,7 @@ class Command(NoArgsCommand):
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive')
+        show_traceback = options.get('traceback', False)
 
         self.style = no_style()
 
@@ -119,12 +120,17 @@ class Command(NoArgsCommand):
                             for sql in custom_sql:
                                 cursor.execute(sql)
                         except Exception, e:
-                            sys.stderr.write("Failed to install custom SQL for %s.%s model: %s" % \
+                            sys.stderr.write("Failed to install custom SQL for %s.%s model: %s\n" % \
                                                 (app_name, model._meta.object_name, e))
+                            if show_traceback:
+                                import traceback
+                                traceback.print_exc()
                             transaction.rollback_unless_managed()
                         else:
                             transaction.commit_unless_managed()
-
+                    else:
+                        if verbosity >= 2:
+                            print "No custom SQL for %s.%s model" % (app_name, model._meta.object_name)
         # Install SQL indicies for all newly created models
         for app in models.get_apps():
             app_name = app.__name__.split('.')[-2]

@@ -756,6 +756,17 @@ variable.
 Note that this option is unnecessary in ``manage.py``, because it uses
 ``settings.py`` from the current project by default.
 
+--traceback
+-----------
+
+Example usage::
+
+    django-admin.py syncdb --traceback
+
+By default, ``django-admin.py`` will show a simple error message whenever an
+error occurs. If you specify ``--traceback``, ``django-admin.py``  will
+output a full stack trace whenever an exception is raised.
+
 Extra niceties
 ==============
 
