@@ -95,7 +95,6 @@ class AdminViewPermissionsTest(TestCase):
         request = self.client.get('/test_admin/admin/')
         self.failUnlessEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/', self.super_email_login)
-        print login
         self.assertContains(login, "Your e-mail address is not your username")
         # only correct passwords get a username hint
         login = self.client.post('/test_admin/admin/', self.super_email_bad_login)
