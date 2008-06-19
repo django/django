@@ -166,6 +166,27 @@ u'<a href="http://31characteruri.com/test/" rel="nofollow">http://31characteruri
 >>> urlizetrunc(uri, 2)
 u'<a href="http://31characteruri.com/test/" rel="nofollow">...</a>'
 
+# Check normal urlize
+>>> urlize('http://google.com') 
+u'<a href="http://google.com" rel="nofollow">http://google.com</a>'
+
+>>> urlize('http://google.com/') 
+u'<a href="http://google.com/" rel="nofollow">http://google.com/</a>'
+
+>>> urlize('www.google.com') 
+u'<a href="http://www.google.com" rel="nofollow">http://www.google.com</a>'
+
+>>> urlize('djangoproject.org') 
+u'<a href="http://djangoproject.org" rel="nofollow">http://djangoproject.org</a>'
+
+>>> urlize('info@djangoproject.org') 
+u'<a href="mailto:info@djangoproject.org">info@djangoproject.org</a>'
+
+# Check urlize with https addresses
+>>> urlize('https://google.com') 
+u'<a href="https://google.com" rel="nofollow">https://google.com</a>'
+
+
 >>> wordcount('')
 0
 
