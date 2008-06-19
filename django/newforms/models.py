@@ -285,11 +285,17 @@ class ModelChoiceIterator(object):
     def __iter__(self):
         if self.field.empty_label is not None:
             yield (u"", self.field.empty_label)
-        for obj in self.queryset:
-            yield (obj.pk, self.field.label_from_instance(obj))
-        # Clear the QuerySet cache if required.
-        if not self.field.cache_choices:
-            self.queryset._result_cache = None
+        if self.field.cache_choices:
+            if self.field.choice_cache is None:
+                self.field.choice_cache = [
+                    (obj.pk, self.field.label_from_instance(obj))
+                    for obj in self.queryset.all()
+                ]
+            for choice in self.field.choice_cache:
+                yield choice
+        else:
+            for obj in self.queryset.all():
+                yield (obj.pk, self.field.label_from_instance(obj))
 
 class ModelChoiceField(ChoiceField):
     """A ChoiceField whose choices are a model QuerySet."""
@@ -311,6 +317,7 @@ class ModelChoiceField(ChoiceField):
         Field.__init__(self, required, widget, label, initial, help_text,
                        *args, **kwargs)
         self.queryset = queryset
+        self.choice_cache = None
 
     def _get_queryset(self):
         return self._queryset
