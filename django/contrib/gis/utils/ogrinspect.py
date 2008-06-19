@@ -10,7 +10,7 @@ from itertools import izip
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.field import OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime
 
-def mapping(data_source, geom_name='geom', layer_key=0):
+def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
     """
     Given a DataSource, generates a dictionary that may be used 
     for invoking the LayerMapping utility.
@@ -21,6 +21,8 @@ def mapping(data_source, geom_name='geom', layer_key=0):
      `layer_key` => The key for specifying which layer in the DataSource to use;
        defaults to 0 (the first layer).  May be an integer index or a string
        identifier for the layer.
+
+     `multi_geom` => Boolean (default: False) - specify as multigeometry.
     """
     if isinstance(data_source, basestring):
         # Instantiating the DataSource from the string.
@@ -39,8 +41,9 @@ def mapping(data_source, geom_name='geom', layer_key=0):
         if mfield[-1:] == '_': mfield += 'field'
         _mapping[mfield] = field
     gtype = data_source[layer_key].geom_type
-    _mapping[geom_name] = str(gtype).upper()
-
+    if multi_geom and gtype.num in (1, 2, 3): prefix = 'MULTI'
+    else: prefix = ''
+    _mapping[geom_name] = prefix + str(gtype).upper()
     return _mapping
 
 def ogrinspect(*args, **kwargs):
