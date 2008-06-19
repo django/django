@@ -388,8 +388,13 @@ be able to give backtraces without seeing sensitive (or offensive) settings.
 
 Still, note that there are always going to be sections of your debug output that
 are inappropriate for public consumption. File paths, configuration options, and
-the like all give attackers extra information about your server. Never deploy a
-site with ``DEBUG`` turned on.
+the like all give attackers extra information about your server. 
+
+It is also important to remember that when running with ``DEBUG`` turned on, Django
+will remember every SQL query it executes. This is useful when you are debugging,
+but on a production server, it will rapidly consume memory.
+
+Never deploy a site into production with ``DEBUG`` turned on.
 
 DEBUG_PROPAGATE_EXCEPTIONS
 --------------------------
