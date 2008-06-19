@@ -7,4 +7,4 @@ class Command(AppCommand):
 
     def handle_app(self, app, **options):
         from django.core.management.sql import sql_delete
-        return '\n'.join(sql_delete(app, self.style))
+        return u'\n'.join(sql_delete(app, self.style)).encode('utf-8')

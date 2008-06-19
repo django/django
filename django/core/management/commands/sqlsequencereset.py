@@ -6,4 +6,4 @@ class Command(AppCommand):
 
     def handle_app(self, app, **options):
         from django.db import connection, models
-        return '\n'.join(connection.ops.sequence_reset_sql(self.style, models.get_models(app)))
+        return u'\n'.join(connection.ops.sequence_reset_sql(self.style, models.get_models(app))).encode('utf-8')
