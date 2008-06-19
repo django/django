@@ -147,6 +147,16 @@ class GeoQuery(sql.Query):
                     col_aliases.add(field.column)
         return result, aliases
 
+    def get_ordering(self):
+        """
+        This routine is overridden to disable ordering for aggregate
+        spatial queries.
+        """
+        if not self.aggregate:
+            return super(GeoQuery, self).get_ordering()
+        else:
+            return ()
+
     def resolve_columns(self, row, fields=()):
         """
         This routine is necessary so that distances and geometries returned

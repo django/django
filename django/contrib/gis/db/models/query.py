@@ -601,14 +601,16 @@ class GeoQuerySet(QuerySet):
         column.  Takes into account if the geographic field is in a
         ForeignKey relation to the current model.
         """
+        # If this is an aggregate spatial query, the flag needs to be
+        # set on the `GeoQuery` object of this queryset.
+        if aggregate: self.query.aggregate = True
+
         # Is this operation going to be on a related geographic field?
         if not geo_field in self.model._meta.fields:
             # If so, it'll have to be added to the select related information
             # (e.g., if 'location__point' was given as the field name).
             self.query.add_select_related([field_name])
             self.query.pre_sql_setup()
-            # Can't non-aggregate and aggregate selections together.
-            if aggregate: self.query.aggregate = True 
             rel_table, rel_col = self.query.related_select_cols[self.query.related_select_fields.index(geo_field)]
             return self.query._field_column(geo_field, rel_table)
         else:

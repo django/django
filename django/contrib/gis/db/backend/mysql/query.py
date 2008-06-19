@@ -19,7 +19,8 @@ GEOM_SELECT = 'AsText(%s)'
 # _every_ one of these lookup types is on the _bounding box_ only.
 MYSQL_GIS_FUNCTIONS = {
     'bbcontains' : 'MBRContains', # For consistency w/PostGIS API
-    'contained' : 'MBRWithin',    # (ditto)
+    'bboverlaps' : 'MBROverlaps', # .. ..
+    'contained' : 'MBRWithin',    # .. ..
     'contains' : 'MBRContains',
     'disjoint' : 'MBRDisjoint',
     'equals' : 'MBREqual',

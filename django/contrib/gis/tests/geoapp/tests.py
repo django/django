@@ -431,8 +431,11 @@ class GeoModelTest(unittest.TestCase):
         union2 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374,-98.493183 29.424170)')
         qs = City.objects.filter(point__within=tx)
         self.assertRaises(TypeError, qs.unionagg, 'name')
-        u1 = qs.unionagg(field_name='point')
-        u2 = qs.unionagg()
+        # Using `field_name` keyword argument in one query and specifying an
+        # order in the other (which should not be used because this is
+        # an aggregate method on a spatial column)
+        u1 = qs.unionagg(field_name='point') 
+        u2 = qs.order_by('name').unionagg()
         tol = 0.00001
         if SpatialBackend.oracle:
             union = union2
