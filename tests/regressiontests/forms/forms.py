@@ -443,8 +443,8 @@ zero-based index.
 >>> f = FrameworkForm(auto_id='id_%s')
 >>> print f['language']
 <ul>
-<li><label><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
-<li><label><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
+<li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
+<li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul>
 
 When RadioSelect is used with auto_id, and the whole form is printed using
@@ -453,20 +453,20 @@ ID of the *first* radio button.
 >>> print f
 <tr><th><label for="id_name">Name:</label></th><td><input type="text" name="name" id="id_name" /></td></tr>
 <tr><th><label for="id_language_0">Language:</label></th><td><ul>
-<li><label><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
-<li><label><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
+<li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
+<li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></td></tr>
 >>> print f.as_ul()
 <li><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
 <li><label for="id_language_0">Language:</label> <ul>
-<li><label><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
-<li><label><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
+<li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
+<li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></li>
 >>> print f.as_p()
 <p><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></p>
 <p><label for="id_language_0">Language:</label> <ul>
-<li><label><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
-<li><label><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
+<li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
+<li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></p>
 
 MultipleChoiceField is a special case, as its data is required to be a list:
@@ -535,8 +535,8 @@ zero-based index.
 >>> f = SongForm(auto_id='%s_id')
 >>> print f['composers']
 <ul>
-<li><label><input type="checkbox" name="composers" value="J" id="composers_id_0" /> John Lennon</label></li>
-<li><label><input type="checkbox" name="composers" value="P" id="composers_id_1" /> Paul McCartney</label></li>
+<li><label for="composers_id_0"><input type="checkbox" name="composers" value="J" id="composers_id_0" /> John Lennon</label></li>
+<li><label for="composers_id_1"><input type="checkbox" name="composers" value="P" id="composers_id_1" /> Paul McCartney</label></li>
 </ul>
 
 Data for a MultipleChoiceField should be a list. QueryDict and MultiValueDict

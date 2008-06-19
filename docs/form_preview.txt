@@ -69,11 +69,9 @@ How to use ``FormPreview``
 
        ...and add the following line to the appropriate model in your URLconf::
 
-           (r'^post/$', SomeModelFormPreview(forms.models.form_for_model(SomeModel))),
-
-       Or, if you already have a Form class defined for the model::
-
            (r'^post/$', SomeModelFormPreview(SomeModelForm)),
+
+       where ``SomeModelForm`` is a Form or ModelForm class for the model.
 
     4. Run the Django server and visit ``/post/`` in your browser.
 

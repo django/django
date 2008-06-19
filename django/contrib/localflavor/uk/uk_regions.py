@@ -5,7 +5,7 @@ Sources:
     Welsh regions: http://en.wikipedia.org/wiki/Preserved_counties_of_Wales
     Scottish regions: http://en.wikipedia.org/wiki/Regions_and_districts_of_Scotland
 """
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 ENGLAND_REGION_CHOICES = (
     ("Bedfordshire", _("Bedfordshire")),

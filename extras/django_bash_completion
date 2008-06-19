@@ -53,9 +53,10 @@ _django_completion()
     action_shell_opts="--plain"
     action_runfcgi_opts="host port socket method maxspare minspare maxchildren daemonize pidfile workdir"
 
-    if [[ # django-admin.py, ./manage, manage.py
+    if [[ # django-admin.py, django-admin, ./manage, manage.py
           ( ${COMP_CWORD} -eq 1 &&
             ( ${COMP_WORDS[0]} == django-admin.py ||
+              ${COMP_WORDS[0]} == django-admin ||
               ${COMP_WORDS[0]} == ./manage.py ||
               ${COMP_WORDS[0]} == manage.py ) )
           ||
@@ -68,6 +69,11 @@ _django_completion()
           ( ${COMP_CWORD} -eq 2 &&
             ( $( basename -- ${COMP_WORDS[0]} ) == python?([1-9]\.[0-9]) ) &&
             ( $( basename -- ${COMP_WORDS[1]} ) == django-admin.py) &&
+            ( -r ${COMP_WORDS[1]} ) ) 
+          ||
+          ( ${COMP_CWORD} -eq 2 &&
+            ( $( basename -- ${COMP_WORDS[0]} ) == python?([1-9]\.[0-9]) ) &&
+            ( $( basename -- ${COMP_WORDS[1]} ) == django-admin) &&
             ( -r ${COMP_WORDS[1]} ) ) ]] ; then
 
         case ${cur} in
@@ -142,7 +148,7 @@ _django_completion()
     fi
 }
 
-complete -F _django_completion django-admin.py manage.py
+complete -F _django_completion django-admin.py manage.py django-admin
 
 # Support for multiple interpreters.
 unset pythons

@@ -4,14 +4,14 @@ IT-specific Form helpers
 
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from django.contrib.localflavor.it.util import ssn_check_digit, vat_number_check_digit
 import re
 
 class ITZipCodeField(RegexField):
     default_error_messages = {
-        'invalid': ugettext('Enter a valid zip code.'),
+        'invalid': _('Enter a valid zip code.'),
     }
     def __init__(self, *args, **kwargs):
         super(ITZipCodeField, self).__init__(r'^\d{5}$',
@@ -40,7 +40,7 @@ class ITSocialSecurityNumberField(RegexField):
     'Informazioni sulla codificazione delle persone fisiche'.
     """
     default_error_messages = {
-        'invalid': ugettext(u'Enter a valid Social Security number.'),
+        'invalid': _(u'Enter a valid Social Security number.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -65,7 +65,7 @@ class ITVatNumberField(Field):
     A form field that validates Italian VAT numbers (partita IVA).
     """
     default_error_messages = {
-        'invalid': ugettext(u'Enter a valid VAT number.'),
+        'invalid': _(u'Enter a valid VAT number.'),
     }
 
     def clean(self, value):

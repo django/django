@@ -16,7 +16,7 @@ def login(request, template_name='registration/login.html', redirect_field_name=
     "Displays the login form and handles the login action."
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     if request.method == "POST":
-        form = AuthenticationForm(request, request.POST)
+        form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             # Light security check -- make sure redirect_to isn't garbage.
             if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
@@ -24,7 +24,8 @@ def login(request, template_name='registration/login.html', redirect_field_name=
                 redirect_to = settings.LOGIN_REDIRECT_URL
             from django.contrib.auth import login
             login(request, form.get_user())
-            request.session.delete_test_cookie()
+            if request.session.test_cookie_worked():
+                request.session.delete_test_cookie()
             return HttpResponseRedirect(redirect_to)
     else:
         form = AuthenticationForm(request)

@@ -6,7 +6,7 @@ import re
 
 from django.newforms import ValidationError
 from django.newforms.fields import Field, Select, EMPTY_VALUES
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 
 pc_re = re.compile('^\d{4}[A-Z]{2}$')

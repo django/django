@@ -69,10 +69,6 @@ class ExtendsNode(Node):
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
-        pos = 0
-        while isinstance(compiled_parent.nodelist[pos], TextNode):
-            pos += 1
-        parent_is_child = isinstance(compiled_parent.nodelist[pos], ExtendsNode)
         parent_blocks = dict([(n.name, n) for n in compiled_parent.nodelist.get_nodes_by_type(BlockNode)])
         for block_node in self.nodelist.get_nodes_by_type(BlockNode):
             # Check for a BlockNode with this node's name, and replace it if found.
@@ -83,8 +79,16 @@ class ExtendsNode(Node):
                 # parent block might be defined in the parent's *parent*, so we
                 # add this BlockNode to the parent's ExtendsNode nodelist, so
                 # it'll be checked when the parent node's render() is called.
-                if parent_is_child:
-                    compiled_parent.nodelist[pos].nodelist.append(block_node)
+
+                # Find out if the parent template has a parent itself
+                for node in compiled_parent.nodelist:
+                    if not isinstance(node, TextNode):
+                        # If the first non-text node is an extends, handle it.
+                        if isinstance(node, ExtendsNode):
+                            node.nodelist.append(block_node)
+                        # Extends must be the first non-text node, so once you find
+                        # the first non-text node you can stop looking. 
+                        break
             else:
                 # Keep any existing parents and add a new one. Used by BlockNode.
                 parent_block.parent = block_node.parent

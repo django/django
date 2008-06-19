@@ -5,7 +5,7 @@ Spanish-specific Form helpers
 
 from django.newforms import ValidationError
 from django.newforms.fields import RegexField, Select, EMPTY_VALUES
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 import re
 
 class ESPostalCodeField(RegexField):

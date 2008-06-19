@@ -87,6 +87,25 @@ class SessionBase(object):
         except:
             return {}
 
+    def update(self, dict_):
+        self._session.update(dict_)
+        self.modified = True
+
+    def has_key(self, key):
+        return self._session.has_key(key)
+
+    def values(self):
+        return self._session.values()
+
+    def iterkeys(self):
+        return self._session.iterkeys()
+
+    def itervalues(self):
+        return self._session.itervalues()
+
+    def iteritems(self):
+        return self._session.iteritems()
+
     def _get_new_session_key(self):
         "Returns session key that isn't being used."
         # The random module is seeded when this Apache child is created.

@@ -5,11 +5,11 @@ FI-specific Form helpers
 import re
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 
 class FIZipCodeField(RegexField):
     default_error_messages = {
-        'invalid': ugettext('Enter a zip code in the format XXXXX.'),
+        'invalid': _('Enter a zip code in the format XXXXX.'),
     }
     def __init__(self, *args, **kwargs):
         super(FIZipCodeField, self).__init__(r'^\d{5}$',
@@ -25,7 +25,7 @@ class FIMunicipalitySelect(Select):
 
 class FISocialSecurityNumber(Field):
     default_error_messages = {
-        'invalid': ugettext('Enter a valid Finnish social security number.'),
+        'invalid': _('Enter a valid Finnish social security number.'),
     }
 
     def clean(self, value):

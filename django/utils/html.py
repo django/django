@@ -99,7 +99,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             lead, middle, trail = match.groups()
             if safe_input:
                 middle = mark_safe(middle)
-            if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
+            if middle.startswith('www.') or ('@' not in middle and not (middle.startswith('http://') or middle.startswith('https://')) and \
                     len(middle) > 0 and middle[0] in string.ascii_letters + string.digits and \
                     (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
                 middle = 'http://%s' % middle

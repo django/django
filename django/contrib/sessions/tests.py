@@ -89,6 +89,66 @@ False
 >>> s.pop('some key', 'does not exist')
 'does not exist'
 
+
+>>> s.get('update key', None)
+
+# test .update()
+>>> s.modified = s.accessed = False   # Reset to pretend this wasn't accessed previously
+>>> s.update({'update key':1})
+>>> s.accessed, s.modified
+(True, True)
+>>> s.get('update key', None)
+1
+
+# test .has_key()
+>>> s.modified = s.accessed = False   # Reset to pretend this wasn't accessed previously
+>>> s.has_key('update key')
+True
+>>> s.accessed, s.modified
+(True, False)
+
+# test .values()
+>>> s = SessionBase()
+>>> s.values()
+[]
+>>> s.accessed
+True
+>>> s['x'] = 1
+>>> s.values()
+[1]
+
+# test .iterkeys()
+>>> s.accessed = False
+>>> i = s.iterkeys()
+>>> hasattr(i,'__iter__')
+True
+>>> s.accessed
+True
+>>> list(i)
+['x']
+
+# test .itervalues()
+>>> s.accessed = False
+>>> i = s.itervalues()
+>>> hasattr(i,'__iter__')
+True
+>>> s.accessed
+True
+>>> list(i)
+[1]
+
+# test .iteritems()
+>>> s.accessed = False
+>>> i = s.iteritems()
+>>> hasattr(i,'__iter__')
+True
+>>> s.accessed
+True
+>>> list(i)
+[('x', 1)]
+
+ 
+
 #########################
 # Custom session expiry #
 #########################

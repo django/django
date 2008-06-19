@@ -3,7 +3,7 @@ Slovak-specific form helpers
 """
 
 from django.newforms.fields import Select, RegexField
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 
 class SKRegionSelect(Select):
     """
@@ -27,7 +27,7 @@ class SKPostalCodeField(RegexField):
     Valid form is XXXXX or XXX XX, where X represents integer.
     """
     default_error_messages = {
-        'invalid': ugettext(u'Enter a postal code in the format XXXXX or XXX XX.'),
+        'invalid': _(u'Enter a postal code in the format XXXXX or XXX XX.'),
     }
 
     def __init__(self, *args, **kwargs):
