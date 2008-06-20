@@ -662,8 +662,8 @@ Django will automatically add this field::
 Thus, you don't need to set ``primary_key=True`` on any of your fields
 unless you want to override the default primary-key behavior.
 
-``primary_key=True`` implies ``blank=False``, ``null=False`` and
-``unique=True``. Only one primary key is allowed on an object.
+``primary_key=True`` implies ``null=False`` and ``unique=True``. Only
+one primary key is allowed on an object.
 
 ``radio_admin``
 ~~~~~~~~~~~~~~~
