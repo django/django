@@ -702,13 +702,8 @@ Django tarball. It's our policy to make sure all tests pass at all times.
 The tests cover:
 
     * Models and the database API (``tests/modeltests/``).
-    * The cache system (``tests/regressiontests/cache.py``).
-    * The ``django.utils.dateformat`` module (``tests/regressiontests/dateformat/``).
-    * Database typecasts (``tests/regressiontests/db_typecasts/``).
-    * The template system (``tests/regressiontests/templates/`` and
-      ``tests/regressiontests/defaultfilters/``).
-    * ``QueryDict`` objects (``tests/regressiontests/httpwrappers/``).
-    * Markup template tags (``tests/regressiontests/markup/``).
+    * Everything else in core Django code (``tests/regressiontests``)
+    * Contrib apps (``django/contrib/<contribapp>/tests``, see below)
 
 We appreciate any and all contributions to the test suite!
 
@@ -754,6 +749,21 @@ for generic relations and internationalization, type::
 
     PYTHONPATH=..
     ./runtests.py --settings=settings generic_relations i18n
+
+Contrib apps
+------------
+
+Tests for apps in ``django/contrib/`` go in their respective directories,
+in a ``tests.py`` file. (You can split the tests over multiple modules
+by using a ``tests`` folder in the normal Python way).
+
+For the tests to be found, a ``models.py`` file must exist (it doesn't
+have to have anything in it).
+
+To run tests for just one contrib app (e.g. ``markup``), use the same
+method as above::
+
+    ./runtests.py --settings=settings markup
 
 Requesting features
 ===================
