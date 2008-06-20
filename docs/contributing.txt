@@ -758,7 +758,8 @@ in a ``tests.py`` file. (You can split the tests over multiple modules
 by using a ``tests`` folder in the normal Python way).
 
 For the tests to be found, a ``models.py`` file must exist (it doesn't
-have to have anything in it).
+have to have anything in it).  If you have URLs that need to be
+mapped, you must add them in ``tests/urls.py``.
 
 To run tests for just one contrib app (e.g. ``markup``), use the same
 method as above::
