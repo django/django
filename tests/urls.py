@@ -22,4 +22,7 @@ urlpatterns = patterns('',
 
     # test urlconf for syndication tests
     (r'^syndication/', include('regressiontests.syndication.urls')),
+
+    # Other contrib apps
+    (r'^auth/', include('django.contrib.auth.urls')),
 )
