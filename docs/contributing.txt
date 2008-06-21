@@ -751,7 +751,7 @@ you should install:
 Of these dependencies, setuptools_ is the only dependency that is required - if
 setuptools_ is not installed, you will get import errors when running one of
 the template tests. The tests using the other libraries will be skipped if the
-Django the dependency can't be found. 
+dependency can't be found. 
 
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
 .. _Markdown: http://pypi.python.org/pypi/Markdown/1.7
