@@ -1382,7 +1382,7 @@ and then converted into a query using the ``query`` attribute::
 
 This queryset will be evaluated as subselect statement::
 
-    SELET ... WHERE blog.id IN (SELECT id FROM ... WHERE NAME LIKE '%Cheddar%')
+    SELECT ... WHERE blog.id IN (SELECT id FROM ... WHERE NAME LIKE '%Cheddar%')
 
 startswith
 ~~~~~~~~~~
