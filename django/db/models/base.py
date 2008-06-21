@@ -378,7 +378,7 @@ class Model(object):
         pk_val = self._get_pk_val()
         if pk_val in seen_objs.setdefault(self.__class__, {}):
             return
-        seen_objs.setdefault(self.__class__, {})[pk_val] = self
+        seen_objs[self.__class__][pk_val] = self
 
         for related in self._meta.get_all_related_objects():
             rel_opts_name = related.get_accessor_name()
