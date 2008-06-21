@@ -2,6 +2,8 @@
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.datastructures import SortedDict
+
 import sys
 import os
 import threading
@@ -18,10 +20,10 @@ class AppCache(object):
     # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66531.
     __shared_state = dict(
         # Keys of app_store are the model modules for each application.
-        app_store = {},
+        app_store = SortedDict(),
 
         # Mapping of app_labels to a dictionary of model names to model code.
-        app_models = {},
+        app_models = SortedDict(),
 
         # Mapping of app_labels to errors raised when trying to import the app.
         app_errors = {},
@@ -133,7 +135,7 @@ class AppCache(object):
         """
         self._populate()
         if app_mod:
-            return self.app_models.get(app_mod.__name__.split('.')[-2], {}).values()
+            return self.app_models.get(app_mod.__name__.split('.')[-2], SortedDict()).values()
         else:
             model_list = []
             for app_entry in self.app_models.itervalues():
@@ -149,7 +151,7 @@ class AppCache(object):
         """
         if seed_cache:
             self._populate()
-        return self.app_models.get(app_label, {}).get(model_name.lower())
+        return self.app_models.get(app_label, SortedDict()).get(model_name.lower())
 
     def register_models(self, app_label, *models):
         """
@@ -159,7 +161,7 @@ class AppCache(object):
             # Store as 'name: model' pair in a dictionary
             # in the app_models dictionary
             model_name = model._meta.object_name.lower()
-            model_dict = self.app_models.setdefault(app_label, {})
+            model_dict = self.app_models.setdefault(app_label, SortedDict())
             if model_name in model_dict:
                 # The same model may be imported via different paths (e.g.
                 # appname.models and project.appname.models). We use the source
