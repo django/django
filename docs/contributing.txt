@@ -739,6 +739,26 @@ If you're using another backend:
       deleted when the tests are finished. This means your user account needs
       permission to execute ``CREATE DATABASE``.
 
+If you want to run the full suite of tests, there are a number of dependencies that 
+you should install:
+
+    *  PyYAML_
+    *  Markdown_
+    *  Textile_
+    *  Docutils_
+    *  setuptools_
+
+Of these dependencies, setuptools_ is the only dependency that is required - if
+setuptools_ is not installed, you will get import errors when running one of
+the template tests. The tests using the other libraries will be skipped if the
+Django the dependency can't be found. 
+
+.. _PyYAML: http://pyyaml.org/wiki/PyYAML
+.. _Markdown: http://pypi.python.org/pypi/Markdown/1.7
+.. _Textile: http://pypi.python.org/pypi/textile
+.. _docutils: http://pypi.python.org/pypi/docutils/0.4
+.. _setuptools: http://pypi.python.org/pypi/setuptools/
+
 To run a subset of the unit tests, append the names of the test modules to the
 ``runtests.py`` command line. See the list of directories in
 ``tests/modeltests`` and ``tests/regressiontests`` for module names.
