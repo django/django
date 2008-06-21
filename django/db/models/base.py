@@ -10,7 +10,7 @@ from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
-from django.db.models.query import delete_objects, Q
+from django.db.models.query import delete_objects, Q, CollectedObjects
 from django.db.models.options import Options, AdminOptions
 from django.db import connection, transaction
 from django.db.models import signals
@@ -368,17 +368,16 @@ class Model(object):
                 error_dict[f.name] = errors
         return error_dict
 
-    def _collect_sub_objects(self, seen_objs):
+    def _collect_sub_objects(self, seen_objs, parent=None, nullable=False):
         """
         Recursively populates seen_objs with all objects related to this object.
-        When done, seen_objs will be in the format:
-            {model_class: {pk_val: obj, pk_val: obj, ...},
-             model_class: {pk_val: obj, pk_val: obj, ...}, ...}
+        When done, seen_objs.items() will be in the format:
+            [(model_class, {pk_val: obj, pk_val: obj, ...}),
+             (model_class, {pk_val: obj, pk_val: obj, ...}),...]
         """
         pk_val = self._get_pk_val()
-        if pk_val in seen_objs.setdefault(self.__class__, {}):
+        if seen_objs.add(self.__class__, pk_val, self, parent, nullable):
             return
-        seen_objs[self.__class__][pk_val] = self
 
         for related in self._meta.get_all_related_objects():
             rel_opts_name = related.get_accessor_name()
@@ -388,16 +387,16 @@ class Model(object):
                 except ObjectDoesNotExist:
                     pass
                 else:
-                    sub_obj._collect_sub_objects(seen_objs)
+                    sub_obj._collect_sub_objects(seen_objs, self.__class__, related.field.null)
             else:
                 for sub_obj in getattr(self, rel_opts_name).all():
-                    sub_obj._collect_sub_objects(seen_objs)
+                    sub_obj._collect_sub_objects(seen_objs, self.__class__, related.field.null)
 
     def delete(self):
         assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
 
         # Find all the objects than need to be deleted
-        seen_objs = SortedDict()
+        seen_objs = CollectedObjects()
         self._collect_sub_objects(seen_objs)
 
         # Actually delete the objects
