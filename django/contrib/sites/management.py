@@ -13,5 +13,6 @@ def create_default_site(app, created_models, verbosity):
             print "Creating example.com Site object"
         s = Site(domain="example.com", name="example.com")
         s.save()
+    Site.objects.clear_cache()
 
 dispatcher.connect(create_default_site, sender=site_app, signal=signals.post_syncdb)
