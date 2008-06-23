@@ -182,6 +182,13 @@ supplied, ``save()`` will update that instance. If it's not supplied,
     # Create a form to edit an existing Article.
     >>> a = Article.objects.get(pk=1)
     >>> f = ArticleForm(instance=a)
+    >>> f.save()
+
+    # Create a form to edit an existing Article, but use
+    # POST data to populate the form.
+    >>> a = Article.objects.get(pk=1)
+    >>> f = ArticleForm(request.POST, instance=a)
+    >>> f.save()
 
 Note that ``save()`` will raise a ``ValueError`` if the data in the form
 doesn't validate -- i.e., ``if form.errors``.

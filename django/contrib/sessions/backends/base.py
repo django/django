@@ -5,13 +5,14 @@ import random
 import sys
 import time
 from datetime import datetime, timedelta
-from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
-
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
+
+from django.conf import settings
+from django.core.exceptions import SuspiciousOperation
+
 
 class SessionBase(object):
     """
@@ -169,8 +170,8 @@ class SessionBase(object):
 
     def set_expiry(self, value):
         """
-        Sets a custom expiration for the session. ``value`` can be an integer, a
-        Python ``datetime`` or ``timedelta`` object or ``None``.
+        Sets a custom expiration for the session. ``value`` can be an integer,
+        a Python ``datetime`` or ``timedelta`` object or ``None``.
 
         If ``value`` is an integer, the session will expire after that many
         seconds of inactivity. If set to ``0`` then the session will expire on

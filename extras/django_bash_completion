@@ -44,7 +44,7 @@ _django_completion()
     # Standalone options
     opts="--help --settings --pythonpath --noinput --noreload --format --indent --verbosity --adminmedia --version"
     # Actions
-    actions="adminindex createcachetable dbshell diffsettings \
+    actions="adminindex createcachetable createsuperuser dbshell diffsettings \
              dumpdata flush inspectdb loaddata reset runfcgi runserver \
              shell sql sqlall sqlclear sqlcustom sqlflush sqlindexes \
              sqlreset sqlsequencereset startapp startproject \

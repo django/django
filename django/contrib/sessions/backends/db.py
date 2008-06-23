@@ -1,12 +1,14 @@
+import datetime
+
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.exceptions import SuspiciousOperation
-import datetime
+
 
 class SessionStore(SessionBase):
     """
-    Implements database session store
+    Implements database session store.
     """
     def __init__(self, session_key=None):
         super(SessionStore, self).__init__(session_key)

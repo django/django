@@ -41,7 +41,15 @@ class Site(models.Model):
 
     def __unicode__(self):
         return self.domain
-
+    
+    def delete(self):
+        pk = self.pk
+        super(Site, self).delete()
+        try:
+            del(SITE_CACHE[pk])
+        except KeyError:
+            pass
+    
 # Register the admin options for these models.
 # TODO: Maybe this should live in a separate module admin.py, but how would we
 # ensure that module was loaded?

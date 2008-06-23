@@ -1,8 +1,10 @@
 import os
 import tempfile
+
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
+
 
 class SessionStore(SessionBase):
     """
@@ -15,10 +17,10 @@ class SessionStore(SessionBase):
 
         # Make sure the storage path is valid.
         if not os.path.isdir(self.storage_path):
-            raise ImproperlyConfigured("The session storage path %r doesn't exist. "\
-                                       "Please set your SESSION_FILE_PATH setting "\
-                                       "to an existing directory in which Django "\
-                                       "can store session data." % self.storage_path)
+            raise ImproperlyConfigured(
+                "The session storage path %r doesn't exist. Please set your"
+                " SESSION_FILE_PATH setting to an existing directory in which"
+                " Django can store session data." % self.storage_path)
 
         self.file_prefix = settings.SESSION_COOKIE_NAME
         super(SessionStore, self).__init__(session_key)
@@ -31,9 +33,11 @@ class SessionStore(SessionBase):
             session_key = self.session_key
 
         # Make sure we're not vulnerable to directory traversal. Session keys
-        # should always be md5s, so they should never contain directory components.
+        # should always be md5s, so they should never contain directory
+        # components.
         if os.path.sep in session_key:
-            raise SuspiciousOperation("Invalid characters (directory components) in session key")
+            raise SuspiciousOperation(
+                "Invalid characters (directory components) in session key")
 
         return os.path.join(self.storage_path, self.file_prefix + session_key)
 

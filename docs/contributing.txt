@@ -702,13 +702,8 @@ Django tarball. It's our policy to make sure all tests pass at all times.
 The tests cover:
 
     * Models and the database API (``tests/modeltests/``).
-    * The cache system (``tests/regressiontests/cache.py``).
-    * The ``django.utils.dateformat`` module (``tests/regressiontests/dateformat/``).
-    * Database typecasts (``tests/regressiontests/db_typecasts/``).
-    * The template system (``tests/regressiontests/templates/`` and
-      ``tests/regressiontests/defaultfilters/``).
-    * ``QueryDict`` objects (``tests/regressiontests/httpwrappers/``).
-    * Markup template tags (``tests/regressiontests/markup/``).
+    * Everything else in core Django code (``tests/regressiontests``)
+    * Contrib apps (``django/contrib/<contribapp>/tests``, see below)
 
 We appreciate any and all contributions to the test suite!
 
@@ -744,6 +739,26 @@ If you're using another backend:
       deleted when the tests are finished. This means your user account needs
       permission to execute ``CREATE DATABASE``.
 
+If you want to run the full suite of tests, there are a number of dependencies that 
+you should install:
+
+    *  PyYAML_
+    *  Markdown_
+    *  Textile_
+    *  Docutils_
+    *  setuptools_
+
+Of these dependencies, setuptools_ is the only dependency that is required - if
+setuptools_ is not installed, you will get import errors when running one of
+the template tests. The tests using the other libraries will be skipped if the
+dependency can't be found. 
+
+.. _PyYAML: http://pyyaml.org/wiki/PyYAML
+.. _Markdown: http://pypi.python.org/pypi/Markdown/1.7
+.. _Textile: http://pypi.python.org/pypi/textile
+.. _docutils: http://pypi.python.org/pypi/docutils/0.4
+.. _setuptools: http://pypi.python.org/pypi/setuptools/
+
 To run a subset of the unit tests, append the names of the test modules to the
 ``runtests.py`` command line. See the list of directories in
 ``tests/modeltests`` and ``tests/regressiontests`` for module names.
@@ -754,6 +769,22 @@ for generic relations and internationalization, type::
 
     PYTHONPATH=..
     ./runtests.py --settings=settings generic_relations i18n
+
+Contrib apps
+------------
+
+Tests for apps in ``django/contrib/`` go in their respective directories,
+in a ``tests.py`` file. (You can split the tests over multiple modules
+by using a ``tests`` folder in the normal Python way).
+
+For the tests to be found, a ``models.py`` file must exist (it doesn't
+have to have anything in it).  If you have URLs that need to be
+mapped, you must add them in ``tests/urls.py``.
+
+To run tests for just one contrib app (e.g. ``markup``), use the same
+method as above::
+
+    ./runtests.py --settings=settings markup
 
 Requesting features
 ===================
