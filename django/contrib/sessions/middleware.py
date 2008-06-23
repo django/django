@@ -7,6 +7,7 @@ from django.utils.http import cookie_date
 TEST_COOKIE_NAME = 'testcookie'
 TEST_COOKIE_VALUE = 'worked'
 
+
 class SessionMiddleware(object):
 
     def process_request(self, request):
@@ -40,5 +41,4 @@ class SessionMiddleware(object):
                         expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
                         path=settings.SESSION_COOKIE_PATH,
                         secure=settings.SESSION_COOKIE_SECURE or None)
-
         return response
