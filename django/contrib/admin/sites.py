@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
+from django.views.decorators.cache import never_cache
 import base64
 import cPickle as pickle
 import datetime
@@ -152,6 +153,7 @@ class AdminSite(object):
         except KeyError:
             raise http.Http404("This model exists but has not been registered with the admin site.")
         return admin_obj(request, rest_of_url)
+    model_page = never_cache(model_page)
 
     def password_change(self, request):
         """
@@ -196,6 +198,7 @@ class AdminSite(object):
         """
         from django.contrib.auth.views import logout
         return logout(request)
+    logout = never_cache(logout)
 
     def login(self, request):
         """
@@ -255,6 +258,7 @@ class AdminSite(object):
                         return http.HttpResponseRedirect(request.path)
             else:
                 return self.display_login_form(request, ERROR_MESSAGE)
+    login = never_cache(login)
 
     def index(self, request, extra_context=None):
         """
@@ -308,6 +312,7 @@ class AdminSite(object):
         return render_to_response(self.index_template or 'admin/index.html', context, 
             context_instance=template.RequestContext(request)
         )
+    index = never_cache(index)
 
     def display_login_form(self, request, error_message='', extra_context=None):
         request.session.set_test_cookie()
