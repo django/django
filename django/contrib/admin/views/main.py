@@ -1,13 +1,8 @@
-from django import template
 from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.views.decorators import staff_member_required
-from django.views.decorators.cache import never_cache
 from django.core.paginator import QuerySetPaginator, InvalidPage
-from django.shortcuts import render_to_response
 from django.db import models
 from django.db.models.query import QuerySet
-from django.http import Http404
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext
 from django.utils.safestring import mark_safe
@@ -34,8 +29,6 @@ ERROR_FLAG = 'e'
 # Text to display within change-list table cells if the value is blank.
 EMPTY_CHANGELIST_VALUE = '(None)'
 
-use_raw_id_admin = lambda field: isinstance(field.rel, (models.ManyToOneRel, models.ManyToManyRel)) and field.rel.raw_id_admin
-
 def quote(s):
     """
     Ensure that primary key values do not confuse the admin URLs by escaping
@@ -51,69 +44,6 @@ def quote(s):
         if c in ':/_':
             res[i] = '_%02X' % ord(c)
     return ''.join(res)
-
-def model_admin_view(request, app_label, model_name, rest_of_url):
-    model = models.get_model(app_label, model_name)
-    if model is None:
-        raise Http404("App %r, model %r, not found" % (app_label, model_name))
-    if not model._meta.admin:
-        raise Http404("This object has no admin interface.")
-    mav = model._meta.admin(model)
-    return mav(request, rest_of_url)
-model_admin_view = staff_member_required(never_cache(model_admin_view))
-
-class AdminBoundField(object):
-    def __init__(self, field, field_mapping, original):
-        self.field = field
-        self.original = original
-        self.form_fields = [field_mapping[name] for name in self.field.get_manipulator_field_names('')]
-        self.has_label_first = not isinstance(self.field, models.BooleanField)
-        self.raw_id_admin = use_raw_id_admin(field)
-        self.is_date_time = isinstance(field, models.DateTimeField)
-        self.is_file_field = isinstance(field, models.FileField)
-        self.hidden = isinstance(self.field, models.AutoField)
-        self.first = False
-
-        classes = []
-        if self.raw_id_admin:
-            classes.append(u'nowrap')
-        if max([bool(f.errors()) for f in self.form_fields]):
-            classes.append(u'error')
-        if classes:
-            self.cell_class_attribute = u' class="%s" ' % ' '.join(classes)
-        self._repr_filled = False
-
-    def original_value(self):
-        if self.original:
-            return self.original.__dict__[self.field.attname]
-
-    def existing_display(self):
-        try:
-            return self._display
-        except AttributeError:
-            if isinstance(self.field.rel, models.ManyToOneRel):
-                self._display = force_unicode(getattr(self.original, self.field.name), strings_only=True)
-            elif isinstance(self.field.rel, models.ManyToManyRel):
-                self._display = u", ".join([force_unicode(obj) for obj in getattr(self.original, self.field.name).all()])
-            return self._display
-
-    def __repr__(self):
-        return repr(self.__dict__)
-
-    def html_error_list(self):
-        return mark_safe(" ".join([form_field.html_error_list() for form_field in self.form_fields if form_field.errors]))
-
-    def original_url(self):
-        if self.is_file_field and self.original and self.field.attname:
-            url_method = getattr(self.original, 'get_%s_url' % self.field.attname)
-            if callable(url_method):
-                return url_method()
-        return ''
-
-def index(request):
-    return render_to_response('admin/index.html', {'title': ugettext('Site administration')}, context_instance=template.RequestContext(request))
-index = staff_member_required(never_cache(index))
-
 
 class ChangeList(object):
     def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related, list_per_page, model_admin):
