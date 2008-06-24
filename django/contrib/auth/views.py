@@ -65,9 +65,10 @@ def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_N
     return HttpResponseRedirect('%s?%s=%s' % (login_url, redirect_field_name, next))
 
 def password_reset(request, is_admin_site=False, template_name='registration/password_reset_form.html',
-        email_template_name='registration/password_reset_email.html'):
+        email_template_name='registration/password_reset_email.html',
+        password_reset_form=PasswordResetForm):
     if request.method == "POST":
-        form = PasswordResetForm(request.POST)
+        form = password_reset_form(request.POST)
         if form.is_valid():
             if is_admin_site:
                 form.save(domain_override=request.META['HTTP_HOST'])
@@ -75,7 +76,7 @@ def password_reset(request, is_admin_site=False, template_name='registration/pas
                 form.save(email_template_name=email_template_name)
             return HttpResponseRedirect('%sdone/' % request.path)
     else:
-        form = PasswordResetForm()
+        form = password_reset_form()
     return render_to_response(template_name, {
         'form': form,
     }, context_instance=RequestContext(request))
