@@ -690,7 +690,7 @@ class DateQuerySet(QuerySet):
         self.query.select = []
         self.query.add_date_select(self._field.column, self._kind, self._order)
         if self._field.null:
-            self.query.add_filter(('%s__isnull' % self._field.name, True))
+            self.query.add_filter(('%s__isnull' % self._field.name, False))
 
     def _clone(self, klass=None, setup=False, **kwargs):
         c = super(DateQuerySet, self)._clone(klass, False, **kwargs)

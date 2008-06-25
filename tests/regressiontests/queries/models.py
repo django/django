@@ -45,6 +45,7 @@ class Author(models.Model):
 class Item(models.Model):
     name = models.CharField(max_length=10)
     created = models.DateTimeField()
+    modified = models.DateTimeField(blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True, null=True)
     creator = models.ForeignKey(Author)
     note = models.ForeignKey(Note)
@@ -174,7 +175,7 @@ by 'info'. Helps detect some problems later.
 >>> time2 = datetime.datetime(2007, 12, 19, 21, 0, 0)
 >>> time3 = datetime.datetime(2007, 12, 20, 22, 25, 0)
 >>> time4 = datetime.datetime(2007, 12, 20, 21, 0, 0)
->>> i1 = Item(name='one', created=time1, creator=a1, note=n3)
+>>> i1 = Item(name='one', created=time1, modified=time1, creator=a1, note=n3)
 >>> i1.save()
 >>> i1.tags = [t1, t2]
 >>> i2 = Item(name='two', created=time2, creator=a2, note=n2)
@@ -626,6 +627,10 @@ datetime.datetime(2007, 12, 19, 0, 0)
 Bug #7087 -- dates with extra select columns
 >>> Item.objects.dates('created', 'day').extra(select={'a': 1})
 [datetime.datetime(2007, 12, 19, 0, 0), datetime.datetime(2007, 12, 20, 0, 0)]
+
+Bug #7155 -- nullable dates
+>>> Item.objects.dates('modified', 'day')
+[datetime.datetime(2007, 12, 19, 0, 0)]
 
 Test that parallel iterators work.
 
