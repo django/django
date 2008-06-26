@@ -747,10 +747,8 @@ dependencies:
     *  Docutils_
     *  setuptools_
 
-Of these dependencies, setuptools_ is the only dependency that is required. If
-setuptools_ is not installed, you'll get import errors when running one of
-the template tests. The tests using the other dependencies will be skipped if the
-particular library can't be found.
+Each of these dependencies is optional. If you're missing any of them, the
+associated tests will be skipped.
 
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
 .. _Markdown: http://pypi.python.org/pypi/Markdown/1.7
