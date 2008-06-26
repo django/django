@@ -36,7 +36,7 @@ class CollectedObjects(object):
         """
         Adds an item.
         model is the class of the object being added,
-        pk is the primary key, obj is the object itself, 
+        pk is the primary key, obj is the object itself,
         parent_model is the model of the parent object
         that this object was reached through, nullable should
         be True if this relation is nullable.
@@ -77,7 +77,7 @@ class CollectedObjects(object):
 
     def ordered_keys(self):
         """
-        Returns the models in the order that they should be 
+        Returns the models in the order that they should be
         dealth with i.e. models with no dependencies first.
         """
         dealt_with = SortedDict()
@@ -92,7 +92,7 @@ class CollectedObjects(object):
                     found = True
             if not found:
                 raise CyclicDependency("There is a cyclic dependency of items to be processed.")
-            
+
         return dealt_with.keys()
 
     def unordered_keys(self):
@@ -583,11 +583,11 @@ class QuerySet(object):
 
     def _merge_sanity_check(self, other):
         """
-        Checks that we are merging two comparable queryset classes.
+        Checks that we are merging two comparable queryset classes. By default
+        this does nothing, but see the ValuesQuerySet for an example of where
+        it's useful.
         """
-        if self.__class__ is not other.__class__:
-            raise TypeError("Cannot merge querysets of different types ('%s' and '%s'."
-                    % (self.__class__.__name__, other.__class__.__name__))
+        pass
 
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
@@ -599,7 +599,7 @@ class ValuesQuerySet(QuerySet):
         # names of the model fields to select.
 
     def iterator(self):
-        if (not self.extra_names and 
+        if (not self.extra_names and
             len(self.field_names) != len(self.model._meta.fields)):
             self.query.trim_extra_select(self.extra_names)
         names = self.query.extra_select.keys() + self.field_names
@@ -773,7 +773,7 @@ def delete_objects(seen_objs):
     except CyclicDependency:
         # if there is a cyclic dependency, we cannot in general delete
         # the objects.  However, if an appropriate transaction is set
-        # up, or if the database is lax enough, it will succeed. 
+        # up, or if the database is lax enough, it will succeed.
         # So for now, we go ahead and try anway.
         ordered_classes = seen_objs.unordered_keys()
 
