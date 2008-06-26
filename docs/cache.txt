@@ -336,6 +336,17 @@ template tag to uniquely identify the cache fragment::
 It's perfectly fine to specify more than one argument to identify the fragment.
 Simply pass as many arguments to ``{% cache %}`` as you need.
 
+The cache timeout can be a template variable, as long as the template variable
+resolves to an integer value. For example, if the template variable
+``my_timeout`` is set to the value ``600``, then the following two examples are
+equivalent::
+
+    {% cache 600 sidebar %} ... {% endcache %}
+    {% cache my_timeout sidebar %} ... {% endcache %}
+
+This feature is useful in avoiding repetition in templates. You can set the
+timeout in a variable, in one place, and just reuse that value.
+
 The low-level cache API
 =======================
 
