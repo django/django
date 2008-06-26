@@ -90,6 +90,15 @@ class Number(models.Model):
     def __unicode__(self):
         return unicode(self.num)
 
+# Symmetrical m2m field with a normal field using the reverse accesor name
+# ("valid").
+class Valid(models.Model):
+    valid = models.CharField(max_length=10)
+    parent = models.ManyToManyField('self')
+
+    class Meta:
+        ordering = ['valid']
+
 # Some funky cross-linked models for testing a couple of infinite recursion
 # cases.
 class X(models.Model):
@@ -767,6 +776,10 @@ test is a little tricky, since NULL ordering is database dependent. Instead, we
 just count the number of results).
 >>> len(Tag.objects.order_by('parent__name'))
 5
+
+Bug #7107 -- this shouldn't create an infinite loop.
+>>> Valid.objects.all()
+[]
 
 """}
 

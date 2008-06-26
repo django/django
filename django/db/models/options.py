@@ -274,14 +274,17 @@ class Options(object):
         """
         Initialises the field name -> field object mapping.
         """
-        cache = dict([(f.name, (f, m, True, False)) for f, m in
-                self.get_fields_with_model()])
-        for f, model in self.get_m2m_with_model():
-            cache[f.name] = (f, model, True, True)
+        cache = {}
+        # We intentionally handle related m2m objects first so that symmetrical
+        # m2m accessor names can be overridden, if necessary.
         for f, model in self.get_all_related_m2m_objects_with_model():
             cache[f.field.related_query_name()] = (f, model, False, True)
         for f, model in self.get_all_related_objects_with_model():
             cache[f.field.related_query_name()] = (f, model, False, False)
+        for f, model in self.get_m2m_with_model():
+            cache[f.name] = (f, model, True, True)
+        for f, model in self.get_fields_with_model():
+            cache[f.name] = (f, model, True, False)
         if self.order_with_respect_to:
             cache['_order'] = OrderWrt(), None, True, False
         if app_cache_ready():
