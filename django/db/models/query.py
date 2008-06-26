@@ -218,6 +218,8 @@ class QuerySet(object):
 
     def __and__(self, other):
         self._merge_sanity_check(other)
+        if isinstance(other, EmptyQuerySet):
+            return other._clone()
         combined = self._clone()
         combined.query.combine(other.query, sql.AND)
         return combined
@@ -225,6 +227,8 @@ class QuerySet(object):
     def __or__(self, other):
         self._merge_sanity_check(other)
         combined = self._clone()
+        if isinstance(other, EmptyQuerySet):
+            return combined
         combined.query.combine(other.query, sql.OR)
         return combined
 
@@ -704,6 +708,12 @@ class EmptyQuerySet(QuerySet):
     def __init__(self, model=None, query=None):
         super(EmptyQuerySet, self).__init__(model, query)
         self._result_cache = []
+
+    def __and__(self, other):
+        return self._clone()
+
+    def __or__(self, other):
+        return other._clone()
 
     def count(self):
         return 0

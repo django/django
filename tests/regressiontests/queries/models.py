@@ -781,5 +781,15 @@ Bug #7107 -- this shouldn't create an infinite loop.
 >>> Valid.objects.all()
 []
 
+Empty querysets can be merged with others.
+>>> Note.objects.none() | Note.objects.all()
+[<Note: n1>, <Note: n2>, <Note: n3>]
+>>> Note.objects.all() | Note.objects.none()
+[<Note: n1>, <Note: n2>, <Note: n3>]
+>>> Note.objects.none() & Note.objects.all()
+[]
+>>> Note.objects.all() & Note.objects.none()
+[]
+
 """}
 
