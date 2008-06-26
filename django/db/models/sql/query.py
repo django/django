@@ -679,12 +679,16 @@ class Query(object):
         for the join to contain NULL values on the left. If 'unconditional' is
         False, the join is only promoted if it is nullable, otherwise it is
         always promoted.
+
+        Returns True if the join was promoted.
         """
         if ((unconditional or self.alias_map[alias][NULLABLE]) and
                 self.alias_map[alias] != self.LOUTER):
             data = list(self.alias_map[alias])
             data[JOIN_TYPE] = self.LOUTER
             self.alias_map[alias] = tuple(data)
+            return True
+        return False
 
     def change_aliases(self, change_map):
         """
@@ -1294,10 +1298,12 @@ class Query(object):
                         final_alias = join[LHS_ALIAS]
                         col = join[LHS_JOIN_COL]
                         joins = joins[:-1]
+                promote = False
                 for join in joins[1:]:
                     # Only nullable aliases are promoted, so we don't end up
                     # doing unnecessary left outer joins here.
-                    self.promote_alias(join)
+                    if self.promote_alias(join, promote):
+                        promote = True
                 self.select.append((final_alias, col))
                 self.select_fields.append(field)
         except MultiJoin:

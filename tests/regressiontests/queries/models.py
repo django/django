@@ -58,7 +58,7 @@ class Item(models.Model):
 
 class Report(models.Model):
     name = models.CharField(max_length=10)
-    creator = models.ForeignKey(Author, to_field='num')
+    creator = models.ForeignKey(Author, to_field='num', null=True)
 
     def __unicode__(self):
         return self.name
@@ -191,6 +191,8 @@ by 'info'. Helps detect some problems later.
 >>> r1.save()
 >>> r2 = Report(name='r2', creator=a3)
 >>> r2.save()
+>>> r3 = Report(name='r3')
+>>> r3.save()
 
 Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the Meta.ordering
 will be rank3, rank2, rank1.
@@ -712,6 +714,11 @@ Updates that are filtered on the model being updated are somewhat tricky to get
 in MySQL. This exercises that case.
 >>> mm = ManagedModel.objects.create(data='mm1', tag=t1, is_public=True)
 >>> ManagedModel.objects.update(data='mm')
+
+A values() or values_list() query across joined models must use outer joins
+appropriately.
+>>> Report.objects.values_list("creator__extra__info", flat=True).order_by("name")
+[u'e1', u'e2', None]
 
 """}
 
