@@ -125,4 +125,12 @@ Init from sequence of tuples
 >>> d = FileDict({'other-key': 'once upon a time...'})
 >>> repr(d)
 "{'other-key': 'once upon a time...'}"
+
+### DictWrapper #############################################################
+
+>>> f = lambda x: "*%s" % x
+>>> d = DictWrapper({'a': 'a'}, f, 'xx_')
+>>> "Normal: %(a)s. Modified: %(xx_a)s" % d
+'Normal: a. Modified: *a'
+
 """
