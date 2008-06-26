@@ -2022,7 +2022,7 @@ the ``url`` function)::
         'django.views.generic.list_detail.object_detail',
         name='people_view'),
 
-and then using that name to perform the reverse URL resolution instead
+...and then using that name to perform the reverse URL resolution instead
 of the view name::
 
     from django.db.models import permalink
@@ -2031,7 +2031,7 @@ of the view name::
         return ('people_view', [str(self.id)])
     get_absolute_url = permalink(get_absolute_url)
 
-More details on named URL patterns can be found in `URL dispatch documentation`_.
+More details on named URL patterns are in the `URL dispatch documentation`_.
 
 .. _URL dispatch documentation: ../url_dispatch/#naming-url-patterns
 
