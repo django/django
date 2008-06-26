@@ -893,7 +893,7 @@ class Templates(unittest.TestCase):
             'cache06' : ('{% load cache %}{% cache 2 test foo %}cache06{% endcache %}', {'foo': 2}, 'cache06'),
             'cache07' : ('{% load cache %}{% cache 2 test foo %}cache06{% endcache %}', {'foo': 1}, 'cache05'),
 
-            # Raise exception if we dont have at least 2 args, first one integer.
+            # Raise exception if we don't have at least 2 args, first one integer.
             'cache08' : ('{% load cache %}{% cache %}{% endcache %}', {}, template.TemplateSyntaxError),
             'cache09' : ('{% load cache %}{% cache 1 %}{% endcache %}', {}, template.TemplateSyntaxError),
             'cache10' : ('{% load cache %}{% cache foo bar %}{% endcache %}', {}, template.TemplateSyntaxError),
