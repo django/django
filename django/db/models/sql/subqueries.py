@@ -357,12 +357,14 @@ class DateQuery(Query):
                     date = typecast_timestamp(str(date))
                 yield date
 
-    def add_date_select(self, column, lookup_type, order='ASC'):
+    def add_date_select(self, field, lookup_type, order='ASC'):
         """
         Converts the query into a date extraction query.
         """
-        alias = self.join((None, self.model._meta.db_table, None, None))
-        select = Date((alias, column), lookup_type,
+        result = self.setup_joins([field.name], self.get_meta(),
+                self.get_initial_alias(), False)
+        alias = result[3][-1]
+        select = Date((alias, field.column), lookup_type,
                 self.connection.ops.date_trunc_sql)
         self.select = [select]
         self.select_fields = [None]

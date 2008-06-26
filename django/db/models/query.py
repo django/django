@@ -688,7 +688,7 @@ class DateQuerySet(QuerySet):
         """
         self.query = self.query.clone(klass=sql.DateQuery, setup=True)
         self.query.select = []
-        self.query.add_date_select(self._field.column, self._kind, self._order)
+        self.query.add_date_select(self._field, self._kind, self._order)
         if self._field.null:
             self.query.add_filter(('%s__isnull' % self._field.name, False))
 
