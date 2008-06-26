@@ -2,6 +2,8 @@
 Regression tests for Model inheritance behaviour.
 """
 
+import datetime
+
 from django.db import models
 
 class Place(models.Model):
@@ -10,7 +12,7 @@ class Place(models.Model):
 
     class Meta:
         ordering = ('name',)
-        
+
     def __unicode__(self):
         return u"%s the place" % self.name
 
@@ -35,11 +37,17 @@ class ParkingLot(Place):
     def __unicode__(self):
         return u"%s the parking lot" % self.name
 
+class Parent(models.Model):
+    created = models.DateTimeField(default=datetime.datetime.now)
+
+class Child(Parent):
+    name = models.CharField(max_length=10)
+
 __test__ = {'API_TESTS':"""
 # Regression for #7350, #7202
-# Check that when you create a Parent object with a specific reference to an existent
-# child instance, saving the Parent doesn't duplicate the child. 
-# This behaviour is only activated during a raw save - it is mostly relevant to 
+# Check that when you create a Parent object with a specific reference to an
+# existent child instance, saving the Parent doesn't duplicate the child. This
+# behaviour is only activated during a raw save - it is mostly relevant to
 # deserialization, but any sort of CORBA style 'narrow()' API would require a
 # similar approach.
 
@@ -116,5 +124,11 @@ __test__ = {'API_TESTS':"""
 >>> dicts = ItalianRestaurant.objects.values('name','serves_hot_dogs','serves_gnocchi')
 >>> [sorted(d.items()) for d in dicts]
 [[('name', u"Guido's All New House of Pasta"), ('serves_gnocchi', False), ('serves_hot_dogs', False)]]
+
+# Regressions tests for #7105: dates() queries should be able to use fields
+# from the parent model as easily as the child.
+>>> obj = Child.objects.create(name='child', created=datetime.datetime(2008, 6, 26, 17, 0, 0))
+>>> Child.objects.dates('created', 'month')
+[datetime.datetime(2008, 6, 1, 0, 0)]
 
 """}

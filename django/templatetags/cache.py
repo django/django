@@ -1,4 +1,4 @@
-from django.template import Library, Node, TemplateSyntaxError
+from django.template import Library, Node, TemplateSyntaxError, Variable, VariableDoesNotExist
 from django.template import resolve_variable
 from django.core.cache import cache
 from django.utils.encoding import force_unicode
@@ -6,20 +6,27 @@ from django.utils.encoding import force_unicode
 register = Library()
 
 class CacheNode(Node):
-    def __init__(self, nodelist, expire_time, fragment_name, vary_on):
+    def __init__(self, nodelist, expire_time_var, fragment_name, vary_on):
         self.nodelist = nodelist
-        self.expire_time = expire_time
+        self.expire_time_var = Variable(expire_time_var)
         self.fragment_name = fragment_name
         self.vary_on = vary_on
 
     def render(self, context):
+        try:
+            expire_time = self.expire_time_var.resolve(context)
+        except VariableDoesNotExist:
+            raise TemplateSyntaxError('"cache" tag got an unknkown variable: %r' % self.expire_time_var.var)
+        try:
+            expire_time = int(expire_time)
+        except (ValueError, TypeError):
+            raise TemplateSyntaxError('"cache" tag got a non-integer timeout value: %r' % expire_time)
         # Build a unicode key for this fragment and all vary-on's.
-        cache_key = u':'.join([self.fragment_name] + \
-            [force_unicode(resolve_variable(var, context)) for var in self.vary_on])
+        cache_key = u':'.join([self.fragment_name] + [force_unicode(resolve_variable(var, context)) for var in self.vary_on])
         value = cache.get(cache_key)
         if value is None:
             value = self.nodelist.render(context)
-            cache.set(cache_key, value, self.expire_time)
+            cache.set(cache_key, value, expire_time)
         return value
 
 def do_cache(parser, token):
@@ -48,10 +55,6 @@ def do_cache(parser, token):
     tokens = token.contents.split()
     if len(tokens) < 3:
         raise TemplateSyntaxError(u"'%r' tag requires at least 2 arguments." % tokens[0])
-    try:
-        expire_time = int(tokens[1])
-    except ValueError:
-        raise TemplateSyntaxError(u"First argument to '%r' must be an integer (got '%s')." % (tokens[0], tokens[1]))
-    return CacheNode(nodelist, expire_time, tokens[2], tokens[3:])
+    return CacheNode(nodelist, tokens[1], tokens[2], tokens[3:])
 
 register.tag('cache', do_cache)

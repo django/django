@@ -22,8 +22,8 @@ installed.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    to `django-users`_ or drop by `#django`_ on ``irc.freenode.net`` and we'll
-    try to help.
+    to `django-users`_ or drop by `#django`_ on ``irc.freenode.net`` to chat
+    with other Django users who might be able to help.
 
 .. _django-users: http://groups.google.com/group/django-users
 .. _#django: irc://irc.freenode.net/django

@@ -150,7 +150,7 @@ u'fran%C3%A7ois%20%26%20jill'
 u'<a href="http://short.com/" rel="nofollow">http://short.com/</a>'
 
 >>> urlizetrunc(u'http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=', 20)
-u'<a href="http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=" rel="nofollow">http://www.google....</a>'
+u'<a href="http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=" rel="nofollow">http://www.google...</a>'
 
 >>> urlizetrunc('http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=', 20)
 u'<a href="http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=" rel="nofollow">http://www.google...</a>'
@@ -165,6 +165,27 @@ u'<a href="http://31characteruri.com/test/" rel="nofollow">http://31characteruri
 u'<a href="http://31characteruri.com/test/" rel="nofollow">http://31characteruri.com/t...</a>'
 >>> urlizetrunc(uri, 2)
 u'<a href="http://31characteruri.com/test/" rel="nofollow">...</a>'
+
+# Check normal urlize
+>>> urlize('http://google.com') 
+u'<a href="http://google.com" rel="nofollow">http://google.com</a>'
+
+>>> urlize('http://google.com/') 
+u'<a href="http://google.com/" rel="nofollow">http://google.com/</a>'
+
+>>> urlize('www.google.com') 
+u'<a href="http://www.google.com" rel="nofollow">www.google.com</a>'
+
+>>> urlize('djangoproject.org') 
+u'<a href="http://djangoproject.org" rel="nofollow">djangoproject.org</a>'
+
+>>> urlize('info@djangoproject.org') 
+u'<a href="mailto:info@djangoproject.org">info@djangoproject.org</a>'
+
+# Check urlize with https addresses
+>>> urlize('https://google.com') 
+u'<a href="https://google.com" rel="nofollow">https://google.com</a>'
+
 
 >>> wordcount('')
 0

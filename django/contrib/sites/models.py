@@ -44,6 +44,15 @@ class Site(models.Model):
     def __unicode__(self):
         return self.domain
 
+    def delete(self):
+        pk = self.pk
+        super(Site, self).delete()
+        try:
+            del(SITE_CACHE[pk])
+        except KeyError:
+            pass
+        
+
 class RequestSite(object):
     """
     A class that shares the primary interface of Site (i.e., it has

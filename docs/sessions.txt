@@ -112,7 +112,7 @@ It also has these methods:
 
       Sets a test cookie to determine whether the user's browser supports
       cookies. Due to the way cookies work, you won't be able to test this
-      until the user's next page request. See "Setting test cookies" below for
+      until the user's next page request. See `Setting test cookies`_ below for
       more information.
 
     * ``test_cookie_worked()``
@@ -120,7 +120,7 @@ It also has these methods:
       Returns either ``True`` or ``False``, depending on whether the user's
       browser accepted the test cookie. Due to the way cookies work, you'll
       have to call ``set_test_cookie()`` on a previous, separate page request.
-      See "Setting test cookies" below for more information.
+      See `Setting test cookies`_ below for more information.
 
     * ``delete_test_cookie()``
 

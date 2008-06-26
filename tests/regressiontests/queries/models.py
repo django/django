@@ -45,6 +45,7 @@ class Author(models.Model):
 class Item(models.Model):
     name = models.CharField(max_length=10)
     created = models.DateTimeField()
+    modified = models.DateTimeField(blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True, null=True)
     creator = models.ForeignKey(Author)
     note = models.ForeignKey(Note)
@@ -57,7 +58,7 @@ class Item(models.Model):
 
 class Report(models.Model):
     name = models.CharField(max_length=10)
-    creator = models.ForeignKey(Author, to_field='num')
+    creator = models.ForeignKey(Author, to_field='num', null=True)
 
     def __unicode__(self):
         return self.name
@@ -88,6 +89,15 @@ class Number(models.Model):
 
     def __unicode__(self):
         return unicode(self.num)
+
+# Symmetrical m2m field with a normal field using the reverse accesor name
+# ("valid").
+class Valid(models.Model):
+    valid = models.CharField(max_length=10)
+    parent = models.ManyToManyField('self')
+
+    class Meta:
+        ordering = ['valid']
 
 # Some funky cross-linked models for testing a couple of infinite recursion
 # cases.
@@ -121,18 +131,36 @@ class LoopZ(models.Model):
 class CustomManager(models.Manager):
     def get_query_set(self):
         qs = super(CustomManager, self).get_query_set()
-        return qs.filter(is_public=True, tag__name='t1')
+        return qs.filter(public=True, tag__name='t1')
 
 class ManagedModel(models.Model):
     data = models.CharField(max_length=10)
     tag = models.ForeignKey(Tag)
-    is_public = models.BooleanField(default=True)
+    public = models.BooleanField(default=True)
 
     objects = CustomManager()
     normal_manager = models.Manager()
 
     def __unicode__(self):
         return self.data
+
+# An inter-related setup with multiple paths from Child to Detail.
+class Detail(models.Model):
+    data = models.CharField(max_length=10)
+
+class MemberManager(models.Manager):
+    def get_query_set(self):
+        return super(MemberManager, self).get_query_set().select_related("details")
+
+class Member(models.Model):
+    name = models.CharField(max_length=10)
+    details = models.OneToOneField(Detail, primary_key=True)
+
+    objects = MemberManager()
+
+class Child(models.Model):
+    person = models.OneToOneField(Member, primary_key=True)
+    parent = models.ForeignKey(Member, related_name="children")
 
 
 __test__ = {'API_TESTS':"""
@@ -174,7 +202,7 @@ by 'info'. Helps detect some problems later.
 >>> time2 = datetime.datetime(2007, 12, 19, 21, 0, 0)
 >>> time3 = datetime.datetime(2007, 12, 20, 22, 25, 0)
 >>> time4 = datetime.datetime(2007, 12, 20, 21, 0, 0)
->>> i1 = Item(name='one', created=time1, creator=a1, note=n3)
+>>> i1 = Item(name='one', created=time1, modified=time1, creator=a1, note=n3)
 >>> i1.save()
 >>> i1.tags = [t1, t2]
 >>> i2 = Item(name='two', created=time2, creator=a2, note=n2)
@@ -190,6 +218,8 @@ by 'info'. Helps detect some problems later.
 >>> r1.save()
 >>> r2 = Report(name='r2', creator=a3)
 >>> r2.save()
+>>> r3 = Report(name='r3')
+>>> r3.save()
 
 Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the Meta.ordering
 will be rank3, rank2, rank1.
@@ -478,7 +508,7 @@ FieldError: Infinite loop caused by ordering.
 # Ordering by a many-valued attribute (e.g. a many-to-many or reverse
 # ForeignKey) is legal, but the results might not make sense. That isn't
 # Django's problem. Garbage in, garbage out.
->>> Item.objects.all().order_by('tags', 'id')
+>>> Item.objects.filter(tags__isnull=False).order_by('tags', 'id')
 [<Item: one>, <Item: two>, <Item: one>, <Item: two>, <Item: four>]
 
 # If we replace the default ordering, Django adjusts the required tables
@@ -627,6 +657,10 @@ Bug #7087 -- dates with extra select columns
 >>> Item.objects.dates('created', 'day').extra(select={'a': 1})
 [datetime.datetime(2007, 12, 19, 0, 0), datetime.datetime(2007, 12, 20, 0, 0)]
 
+Bug #7155 -- nullable dates
+>>> Item.objects.dates('modified', 'day')
+[datetime.datetime(2007, 12, 19, 0, 0)]
+
 Test that parallel iterators work.
 
 >>> qs = Tag.objects.all()
@@ -705,8 +739,57 @@ More twisted cases, involving nested negations.
 Bug #7095
 Updates that are filtered on the model being updated are somewhat tricky to get
 in MySQL. This exercises that case.
->>> mm = ManagedModel.objects.create(data='mm1', tag=t1, is_public=True)
+>>> mm = ManagedModel.objects.create(data='mm1', tag=t1, public=True)
 >>> ManagedModel.objects.update(data='mm')
+
+A values() or values_list() query across joined models must use outer joins
+appropriately.
+>>> Report.objects.values_list("creator__extra__info", flat=True).order_by("name")
+[u'e1', u'e2', None]
+
+Similarly for select_related(), joins beyond an initial nullable join must
+use outer joins so that all results are included.
+>>> Report.objects.select_related("creator", "creator__extra").order_by("name")
+[<Report: r1>, <Report: r2>, <Report: r3>]
+
+When there are multiple paths to a table from another table, we have to be
+careful not to accidentally reuse an inappropriate join when using
+select_related(). We used to return the parent's Detail record here by mistake.
+
+>>> d1 = Detail.objects.create(data="d1")
+>>> d2 = Detail.objects.create(data="d2")
+>>> m1 = Member.objects.create(name="m1", details=d1)
+>>> m2 = Member.objects.create(name="m2", details=d2)
+>>> c1 = Child.objects.create(person=m2, parent=m1)
+>>> obj = m1.children.select_related("person__details")[0]
+>>> obj.person.details.data
+u'd2'
+
+Bug #7076 -- excluding shouldn't eliminate NULL entries.
+>>> Item.objects.exclude(modified=time1).order_by('name')
+[<Item: four>, <Item: three>, <Item: two>]
+>>> Tag.objects.exclude(parent__name=t1.name)
+[<Tag: t1>, <Tag: t4>, <Tag: t5>]
+
+Bug #7181 -- ordering by related tables should accomodate nullable fields (this
+test is a little tricky, since NULL ordering is database dependent. Instead, we
+just count the number of results).
+>>> len(Tag.objects.order_by('parent__name'))
+5
+
+Bug #7107 -- this shouldn't create an infinite loop.
+>>> Valid.objects.all()
+[]
+
+Empty querysets can be merged with others.
+>>> Note.objects.none() | Note.objects.all()
+[<Note: n1>, <Note: n2>, <Note: n3>]
+>>> Note.objects.all() | Note.objects.none()
+[<Note: n1>, <Note: n2>, <Note: n3>]
+>>> Note.objects.none() & Note.objects.all()
+[]
+>>> Note.objects.all() & Note.objects.none()
+[]
 
 """}
 

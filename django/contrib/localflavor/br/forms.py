@@ -6,7 +6,7 @@ BR-specific Form helpers
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, CharField, Select, EMPTY_VALUES
 from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 import re
 
 try:

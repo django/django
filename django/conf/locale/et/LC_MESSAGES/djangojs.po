@@ -1,0 +1,115 @@
+# Estonian translation for the Django Project.
+# Copyright (C) 2008, Django Project
+# This file is distributed under the same license as the django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: <removethis-eallik_at_gmail-com>\n"
+"POT-Creation-Date: 2008-06-02 19:42+0300\n"
+"PO-Revision-Date: 2008-06-17 12:29+0300\n"
+"Last-Translator: Erik Allik <removethis-eallik_at_gmail-com>\n"
+"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/admin/media/js/SelectFilter2.js:33
+#, perl-format
+msgid "Available %s"
+msgstr "Saadaval %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:41
+msgid "Choose all"
+msgstr "Vali kõik"
+
+#: contrib/admin/media/js/SelectFilter2.js:46
+msgid "Add"
+msgstr "Lisa"
+
+#: contrib/admin/media/js/SelectFilter2.js:48
+msgid "Remove"
+msgstr "Eemalda"
+
+#: contrib/admin/media/js/SelectFilter2.js:53
+#, perl-format
+msgid "Chosen %s"
+msgstr "Valitud %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:54
+msgid "Select your choice(s) and click "
+msgstr "Tee valik(ud) ja klõpsa"
+
+#: contrib/admin/media/js/SelectFilter2.js:59
+msgid "Clear all"
+msgstr "Puhasta kõik"
+
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr "Jaanuar Veebruar Märts Aprill Mai Juuni Juuli August September Oktoober November Detsember"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "P E T K N R L"
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Pühapäev Esmaspäev Teisipäev Kolmapäev Neljapäev Reede Laupäev"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "Näita"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "Varja"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+msgid "Now"
+msgstr "Praegu"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
+msgid "Clock"
+msgstr "Kell"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
+msgid "Choose a time"
+msgstr "Vali aeg"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+msgid "Midnight"
+msgstr "Kesköö"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+msgid "6 a.m."
+msgstr "6 hommikul"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+msgid "Noon"
+msgstr "Keskpäev"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
+msgid "Cancel"
+msgstr "Tühista"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
+msgid "Today"
+msgstr "Täna"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
+msgid "Calendar"
+msgstr "Kalender"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
+msgid "Yesterday"
+msgstr "Eile"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
+msgid "Tomorrow"
+msgstr "Homme"

@@ -5,13 +5,14 @@ import random
 import sys
 import time
 from datetime import datetime, timedelta
-from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
-
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
+
+from django.conf import settings
+from django.core.exceptions import SuspiciousOperation
+
 
 class SessionBase(object):
     """
@@ -87,6 +88,25 @@ class SessionBase(object):
         except:
             return {}
 
+    def update(self, dict_):
+        self._session.update(dict_)
+        self.modified = True
+
+    def has_key(self, key):
+        return self._session.has_key(key)
+
+    def values(self):
+        return self._session.values()
+
+    def iterkeys(self):
+        return self._session.iterkeys()
+
+    def itervalues(self):
+        return self._session.itervalues()
+
+    def iteritems(self):
+        return self._session.iteritems()
+
     def _get_new_session_key(self):
         "Returns session key that isn't being used."
         # The random module is seeded when this Apache child is created.
@@ -150,8 +170,8 @@ class SessionBase(object):
 
     def set_expiry(self, value):
         """
-        Sets a custom expiration for the session. ``value`` can be an integer, a
-        Python ``datetime`` or ``timedelta`` object or ``None``.
+        Sets a custom expiration for the session. ``value`` can be an integer,
+        a Python ``datetime`` or ``timedelta`` object or ``None``.
 
         If ``value`` is an integer, the session will expire after that many
         seconds of inactivity. If set to ``0`` then the session will expire on

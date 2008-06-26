@@ -610,6 +610,10 @@ class Query(object):
         alias = joins[-1]
         col = target.column
 
+        # Must use left outer joins for nullable fields.
+        for join in joins:
+            self.promote_alias(join)
+
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model.
         if field.rel and len(joins) > 1 and opts.ordering:
@@ -631,8 +635,10 @@ class Query(object):
             # We have to do the same "final join" optimisation as in
             # add_filter, since the final column might not otherwise be part of
             # the select set (so we can't order on it).
-            join = self.alias_map[alias]
-            if col == join[RHS_JOIN_COL]:
+            while 1:
+                join = self.alias_map[alias]
+                if col != join[RHS_JOIN_COL]:
+                    break
                 self.unref_alias(alias)
                 alias = join[LHS_ALIAS]
                 col = join[LHS_JOIN_COL]
@@ -679,12 +685,16 @@ class Query(object):
         for the join to contain NULL values on the left. If 'unconditional' is
         False, the join is only promoted if it is nullable, otherwise it is
         always promoted.
+
+        Returns True if the join was promoted.
         """
         if ((unconditional or self.alias_map[alias][NULLABLE]) and
                 self.alias_map[alias] != self.LOUTER):
             data = list(self.alias_map[alias])
             data[JOIN_TYPE] = self.LOUTER
             self.alias_map[alias] = tuple(data)
+            return True
+        return False
 
     def change_aliases(self, change_map):
         """
@@ -826,6 +836,10 @@ class Query(object):
         if not always_create:
             for alias in self.join_map.get(t_ident, ()):
                 if alias not in exclusions:
+                    if lhs_table and not self.alias_refcount[self.alias_map[alias][LHS_ALIAS]]:
+                        # The LHS of this join tuple is no longer part of the
+                        # query, so skip this possibility.
+                        continue
                     self.ref_alias(alias)
                     if promote:
                         self.promote_alias(alias)
@@ -985,20 +999,22 @@ class Query(object):
             col = target.column
         alias = join_list[-1]
 
-        if final > 1:
+        while final > 1:
             # An optimization: if the final join is against the same column as
             # we are comparing against, we can go back one step in the join
-            # chain and compare against the lhs of the join instead. The result
-            # (potentially) involves one less table join.
+            # chain and compare against the lhs of the join instead (and then
+            # repeat the optimization). The result, potentially, involves less
+            # table joins.
             join = self.alias_map[alias]
-            if col == join[RHS_JOIN_COL]:
-                self.unref_alias(alias)
-                alias = join[LHS_ALIAS]
-                col = join[LHS_JOIN_COL]
-                join_list = join_list[:-1]
-                final -= 1
-                if final == penultimate:
-                    penultimate = last.pop()
+            if col != join[RHS_JOIN_COL]:
+                break
+            self.unref_alias(alias)
+            alias = join[LHS_ALIAS]
+            col = join[LHS_JOIN_COL]
+            join_list = join_list[:-1]
+            final -= 1
+            if final == penultimate:
+                penultimate = last.pop()
 
         if (lookup_type == 'isnull' and value is True and not negate and
                 final > 1):
@@ -1033,17 +1049,27 @@ class Query(object):
                 self.promote_alias(table)
 
         self.where.add((alias, col, field, lookup_type, value), connector)
+
         if negate:
             for alias in join_list:
                 self.promote_alias(alias)
-            if final > 1 and lookup_type != 'isnull':
-                for alias in join_list:
-                    if self.alias_map[alias] == self.LOUTER:
-                        j_col = self.alias_map[alias][RHS_JOIN_COL]
-                        entry = Node([(alias, j_col, None, 'isnull', True)])
-                        entry.negate()
-                        self.where.add(entry, AND)
-                        break
+            if lookup_type != 'isnull':
+                if final > 1:
+                    for alias in join_list:
+                        if self.alias_map[alias][JOIN_TYPE] == self.LOUTER:
+                            j_col = self.alias_map[alias][RHS_JOIN_COL]
+                            entry = Node([(alias, j_col, None, 'isnull', True)])
+                            entry.negate()
+                            self.where.add(entry, AND)
+                            break
+                elif not (lookup_type == 'in' and not value):
+                    # Leaky abstraction artifact: We have to specifically
+                    # exclude the "foo__in=[]" case from this handling, because
+                    # it's short-circuited in the Where class.
+                    entry = Node([(alias, col, field, 'isnull', True)])
+                    entry.negate()
+                    self.where.add(entry, AND)
+
         if can_reuse is not None:
             can_reuse.update(join_list)
 
@@ -1294,10 +1320,12 @@ class Query(object):
                         final_alias = join[LHS_ALIAS]
                         col = join[LHS_JOIN_COL]
                         joins = joins[:-1]
+                promote = False
                 for join in joins[1:]:
                     # Only nullable aliases are promoted, so we don't end up
                     # doing unnecessary left outer joins here.
-                    self.promote_alias(join)
+                    if self.promote_alias(join, promote):
+                        promote = True
                 self.select.append((final_alias, col))
                 self.select_fields.append(field)
         except MultiJoin:

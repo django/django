@@ -1,17 +1,18 @@
+from django import oldforms
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
-from django import oldforms
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.contrib.sites.models import Site, RequestSite
 from django.http import HttpResponseRedirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.utils.http import urlquote
 from django.utils.translation import ugettext as _
 
 def login(request, template_name='registration/login.html', redirect_field_name=REDIRECT_FIELD_NAME):
     "Displays the login form and handles the login action."
-    manipulator = AuthenticationForm(request)
+    manipulator = AuthenticationForm()
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     if request.POST:
         errors = manipulator.get_validation_errors(request.POST)
@@ -22,7 +23,8 @@ def login(request, template_name='registration/login.html', redirect_field_name=
                 redirect_to = settings.LOGIN_REDIRECT_URL
             from django.contrib.auth import login
             login(request, manipulator.get_user())
-            request.session.delete_test_cookie()
+            if request.session.test_cookie_worked():
+                request.session.delete_test_cookie()
             return HttpResponseRedirect(redirect_to)
     else:
         errors = {}
@@ -61,7 +63,7 @@ def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_N
     if not login_url:
         from django.conf import settings
         login_url = settings.LOGIN_URL
-    return HttpResponseRedirect('%s?%s=%s' % (login_url, redirect_field_name, next))
+    return HttpResponseRedirect('%s?%s=%s' % (login_url, urlquote(redirect_field_name), urlquote(next)))
 
 def password_reset(request, is_admin_site=False, template_name='registration/password_reset_form.html',
         email_template_name='registration/password_reset_email.html'):
@@ -74,7 +76,10 @@ def password_reset(request, is_admin_site=False, template_name='registration/pas
             if is_admin_site:
                 form.save(domain_override=request.META['HTTP_HOST'])
             else:
-                form.save(email_template_name=email_template_name)
+                if Site._meta.installed:
+                    form.save(email_template_name=email_template_name)
+                else:
+                    form.save(domain_override=RequestSite(request).domain, email_template_name=email_template_name)
             return HttpResponseRedirect('%sdone/' % request.path)
     return render_to_response(template_name, {'form': oldforms.FormWrapper(form, new_data, errors)},
         context_instance=RequestContext(request))

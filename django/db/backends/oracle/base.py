@@ -27,10 +27,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allows_unique_and_pk = False        # Suppress UNIQUE/PK for Oracle (ORA-02259)
     empty_fetchmany_value = ()
     needs_datetime_string_cast = False
-    needs_upper_for_iops = True
     supports_tablespaces = True
     uses_case_insensitive_names = True
     uses_custom_query_class = True
+    time_field_needs_date = True
+    interprets_empty_strings_as_nulls = True
+    date_field_supports_time_value = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def autoinc_sql(self, table, column):

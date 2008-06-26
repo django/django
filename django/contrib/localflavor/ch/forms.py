@@ -5,7 +5,7 @@ Swiss-specific Form helpers
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
 from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 import re
 
 id_re = re.compile(r"^(?P<idnumber>\w{8})(?P<pos9>(\d{1}|<))(?P<checksum>\d{1})$")
@@ -13,7 +13,7 @@ phone_digits_re = re.compile(r'^0([1-9]{1})\d{8}$')
 
 class CHZipCodeField(RegexField):
     default_error_messages = {
-        'invalid': ugettext('Enter a zip code in the format XXXX.'),
+        'invalid': _('Enter a zip code in the format XXXX.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -61,7 +61,7 @@ class CHIdentityCardNumberField(Field):
     Algorithm is documented at http://adi.kousz.ch/artikel/IDCHE.htm
     """
     default_error_messages = {
-        'invalid': ugettext('Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format.'),
+        'invalid': _('Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format.'),
     }
 
     def has_valid_checksum(self, number):

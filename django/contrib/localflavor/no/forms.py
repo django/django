@@ -5,11 +5,11 @@ Norwegian-specific Form helpers
 import re, datetime
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 
 class NOZipCodeField(RegexField):
     default_error_messages = {
-        'invalid': ugettext('Enter a zip code in the format XXXX.'),
+        'invalid': _('Enter a zip code in the format XXXX.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -30,7 +30,7 @@ class NOSocialSecurityNumber(Field):
     Algorithm is documented at http://no.wikipedia.org/wiki/Personnummer
     """
     default_error_messages = {
-        'invalid': ugettext(u'Enter a valid Norwegian social security number.'),
+        'invalid': _(u'Enter a valid Norwegian social security number.'),
     }
 
     def clean(self, value):

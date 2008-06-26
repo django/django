@@ -6,7 +6,7 @@ AR-specific Form helpers.
 from django.newforms import ValidationError
 from django.newforms.fields import RegexField, CharField, Select, EMPTY_VALUES
 from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 
 class ARProvinceSelect(Select):
     """
@@ -24,7 +24,7 @@ class ARPostalCodeField(RegexField):
     See http://www.correoargentino.com.ar/consulta_cpa/home.php
     """
     default_error_messages = {
-        'invalid': ugettext("Enter a postal code in the format NNNN or ANNNNAAA."),
+        'invalid': _("Enter a postal code in the format NNNN or ANNNNAAA."),
     }
 
     def __init__(self, *args, **kwargs):
@@ -46,8 +46,8 @@ class ARDNIField(CharField):
     A field that validates 'Documento Nacional de Identidad' (DNI) numbers.
     """
     default_error_messages = {
-        'invalid': ugettext("This field requires only numbers."),
-        'max_digits': ugettext("This field requires 7 or 8 digits."),
+        'invalid': _("This field requires only numbers."),
+        'max_digits': _("This field requires 7 or 8 digits."),
     }
 
     def __init__(self, *args, **kwargs):
@@ -76,8 +76,8 @@ class ARCUITField(RegexField):
     CUIT is of the form XX-XXXXXXXX-V. The last digit is a check digit.
     """
     default_error_messages = {
-        'invalid': ugettext('Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.'),
-        'checksum': ugettext("Invalid CUIT."),
+        'invalid': _('Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.'),
+        'checksum': _("Invalid CUIT."),
     }
 
     def __init__(self, *args, **kwargs):

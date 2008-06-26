@@ -346,7 +346,7 @@ To avoid this problem, you have two options:
 
     * One, you can make sure to run each untrusted variable through the
       ``escape`` filter (documented below), which converts potentially harmful
-      HTML characters to unharmful ones. This was default the default solution
+      HTML characters to unharmful ones. This was the default solution
       in Django for its first few years, but the problem is that it puts the
       onus on *you*, the developer / template author, to ensure you're escaping
       everything. It's easy to forget to escape data.
@@ -819,7 +819,7 @@ The 'ifchanged' block tag is used within a loop. It has two possible uses.
 
 2. If given a variable, check whether that variable has changed. For
    example, the following shows the date every time it changes, but
-   only shows the hour if both the hour and the date has changed::
+   only shows the hour if both the hour and the date have changed::
 
         {% for date in days %}
             {% ifchanged date.date %} {{ date.date }} {% endifchanged %}

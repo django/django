@@ -5,14 +5,14 @@ FR-specific Form helpers
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
 from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 import re
 
 phone_digits_re = re.compile(r'^0\d(\s|\.)?(\d{2}(\s|\.)?){3}\d{2}$')
 
 class FRZipCodeField(RegexField):
     default_error_messages = {
-        'invalid': ugettext('Enter a zip code in the format XXXXX.'),
+        'invalid': _('Enter a zip code in the format XXXXX.'),
     }
 
     def __init__(self, *args, **kwargs):

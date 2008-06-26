@@ -4,7 +4,7 @@ JP-specific Form helpers
 
 from django.core import validators
 from django.newforms import ValidationError
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 from django.newforms.fields import RegexField, Select
 
 class JPPostalCodeField(RegexField):
@@ -14,7 +14,7 @@ class JPPostalCodeField(RegexField):
     Accepts 7 digits, with or without a hyphen.
     """
     default_error_messages = {
-        'invalid': ugettext('Enter a postal code in the format XXXXXXX or XXX-XXXX.'),
+        'invalid': _('Enter a postal code in the format XXXXXXX or XXX-XXXX.'),
     }
 
     def __init__(self, *args, **kwargs):

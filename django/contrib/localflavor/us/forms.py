@@ -5,7 +5,7 @@ USA-specific Form helpers
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
 from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 import re
 
 phone_digits_re = re.compile(r'^(?:1-?)?(\d{3})[-\.]?(\d{3})[-\.]?(\d{4})$')
@@ -13,7 +13,7 @@ ssn_re = re.compile(r"^(?P<area>\d{3})[-\ ]?(?P<group>\d{2})[-\ ]?(?P<serial>\d{
 
 class USZipCodeField(RegexField):
     default_error_messages = {
-        'invalid': ugettext('Enter a zip code in the format XXXXX or XXXXX-XXXX.'),
+        'invalid': _('Enter a zip code in the format XXXXX or XXXXX-XXXX.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -51,7 +51,7 @@ class USSocialSecurityNumberField(Field):
           1962 promotional number).
     """
     default_error_messages = {
-        'invalid': ugettext('Enter a valid U.S. Social Security number in XXX-XX-XXXX format.'),
+        'invalid': _('Enter a valid U.S. Social Security number in XXX-XX-XXXX format.'),
     }
 
     def clean(self, value):

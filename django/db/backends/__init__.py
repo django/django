@@ -45,13 +45,16 @@ class BaseDatabaseFeatures(object):
     autoindexes_primary_keys = True
     inline_fk_references = True
     needs_datetime_string_cast = True
-    needs_upper_for_iops = False
     supports_constraints = True
     supports_tablespaces = False
     uses_case_insensitive_names = False
     uses_custom_query_class = False
     empty_fetchmany_value = []
     update_can_self_select = True
+    supports_usecs = True
+    time_field_needs_date = False
+    interprets_empty_strings_as_nulls = False
+    date_field_supports_time_value = True
 
 class BaseDatabaseOperations(object):
     """
@@ -266,3 +269,8 @@ class BaseDatabaseOperations(object):
         tablespaces.
         """
         return None
+
+    def prep_for_like_query(self, x):
+        """Prepares a value for use in a LIKE query."""
+        from django.utils.encoding import smart_unicode
+        return smart_unicode(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")

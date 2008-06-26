@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-26 10:35+0200\n"
-"PO-Revision-Date: 2008-05-14 11:15+0200\n"
+"POT-Creation-Date: 2008-06-20 12:36+0200\n"
+"PO-Revision-Date: 2008-06-20 12:48+0200\n"
 "Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
 "Language-Team: Catalan <ca@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -14,193 +14,201 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: conf/global_settings.py:43
-msgid "Arabic"
-msgstr "Arabic"
-
 #: conf/global_settings.py:44
-msgid "Bengali"
-msgstr "Bengalí"
+msgid "Arabic"
+msgstr "aràbic"
 
 #: conf/global_settings.py:45
-msgid "Bulgarian"
-msgstr "Búlgar"
+msgid "Bengali"
+msgstr "bengalí"
 
 #: conf/global_settings.py:46
-msgid "Catalan"
-msgstr "Català"
+msgid "Bulgarian"
+msgstr "búlgar"
 
 #: conf/global_settings.py:47
-msgid "Czech"
-msgstr "Txec"
+msgid "Catalan"
+msgstr "català"
 
 #: conf/global_settings.py:48
-msgid "Welsh"
-msgstr "Galès"
+msgid "Czech"
+msgstr "txec"
 
 #: conf/global_settings.py:49
-msgid "Danish"
-msgstr "Danès"
+msgid "Welsh"
+msgstr "galès"
 
 #: conf/global_settings.py:50
-msgid "German"
-msgstr "Alemany"
+msgid "Danish"
+msgstr "danès"
 
 #: conf/global_settings.py:51
-msgid "Greek"
-msgstr "Grec"
+msgid "German"
+msgstr "alemany"
 
 #: conf/global_settings.py:52
-msgid "English"
-msgstr "Anglès"
+msgid "Greek"
+msgstr "grec"
 
 #: conf/global_settings.py:53
-msgid "Spanish"
-msgstr "Espanyol"
+msgid "English"
+msgstr "anglès"
 
 #: conf/global_settings.py:54
-msgid "Argentinean Spanish"
-msgstr "Castellà Argentí"
+msgid "Spanish"
+msgstr "espanyol"
 
 #: conf/global_settings.py:55
-msgid "Basque"
-msgstr "Euskera"
+msgid "Estonian"
+msgstr "estonià"
 
 #: conf/global_settings.py:56
-msgid "Persian"
-msgstr "Persa"
+msgid "Argentinean Spanish"
+msgstr "castellà argentí"
 
 #: conf/global_settings.py:57
-msgid "Finnish"
-msgstr "Finlandès"
+msgid "Basque"
+msgstr "euskera"
 
 #: conf/global_settings.py:58
-msgid "French"
-msgstr "Francès"
+msgid "Persian"
+msgstr "persa"
 
 #: conf/global_settings.py:59
-msgid "Irish"
-msgstr "Irlandès"
+msgid "Finnish"
+msgstr "finlandès"
 
 #: conf/global_settings.py:60
-msgid "Galician"
-msgstr "Gallec"
+msgid "French"
+msgstr "francès"
 
 #: conf/global_settings.py:61
-msgid "Hungarian"
-msgstr "Húngar"
+msgid "Irish"
+msgstr "irlandès"
 
 #: conf/global_settings.py:62
-msgid "Hebrew"
-msgstr "Hebreu"
+msgid "Galician"
+msgstr "gallec"
 
 #: conf/global_settings.py:63
-msgid "Croatian"
-msgstr "Croat"
+msgid "Hungarian"
+msgstr "húngar"
 
 #: conf/global_settings.py:64
-msgid "Icelandic"
-msgstr "Islandès"
+msgid "Hebrew"
+msgstr "hebreu"
 
 #: conf/global_settings.py:65
-msgid "Italian"
-msgstr "Italià"
+msgid "Croatian"
+msgstr "croat"
 
 #: conf/global_settings.py:66
-msgid "Japanese"
-msgstr "Japonès"
+msgid "Icelandic"
+msgstr "islandès"
 
 #: conf/global_settings.py:67
-msgid "Georgian"
-msgstr "Georgià"
+msgid "Italian"
+msgstr "italià"
 
 #: conf/global_settings.py:68
-msgid "Korean"
-msgstr "Coreà"
+msgid "Japanese"
+msgstr "japonès"
 
 #: conf/global_settings.py:69
-msgid "Khmer"
-msgstr "Khmer"
+msgid "Georgian"
+msgstr "georgià"
 
 #: conf/global_settings.py:70
-msgid "Kannada"
-msgstr "Canès"
+msgid "Korean"
+msgstr "coreà"
 
 #: conf/global_settings.py:71
-msgid "Latvian"
-msgstr "Letó"
+msgid "khmer"
+msgstr "khmer"
 
 #: conf/global_settings.py:72
-msgid "Macedonian"
-msgstr "Macedoni"
+msgid "Kannada"
+msgstr "canès"
 
 #: conf/global_settings.py:73
-msgid "Dutch"
-msgstr "Holandès"
+msgid "Latvian"
+msgstr "letó"
 
 #: conf/global_settings.py:74
-msgid "Norwegian"
-msgstr "Norueg"
+msgid "Lithuanian"
+msgstr "lituà"
 
 #: conf/global_settings.py:75
-msgid "Polish"
-msgstr "Polac"
+msgid "Macedonian"
+msgstr "macedoni"
 
 #: conf/global_settings.py:76
-msgid "Portugese"
-msgstr "Portuguès"
+msgid "Dutch"
+msgstr "holandès"
 
 #: conf/global_settings.py:77
-msgid "Brazilian Portuguese"
-msgstr "Portuguès de Brasil"
+msgid "Norwegian"
+msgstr "norueg"
 
 #: conf/global_settings.py:78
-msgid "Romanian"
-msgstr "Rumanès"
+msgid "Polish"
+msgstr "polac"
 
 #: conf/global_settings.py:79
-msgid "Russian"
-msgstr "Rús"
+msgid "Portugese"
+msgstr "portuguès"
 
 #: conf/global_settings.py:80
-msgid "Slovak"
-msgstr "Eslovac"
+msgid "Brazilian Portuguese"
+msgstr "portuguès de brasil"
 
 #: conf/global_settings.py:81
-msgid "Slovenian"
-msgstr "Esloveni"
+msgid "Romanian"
+msgstr "rumanès"
 
 #: conf/global_settings.py:82
-msgid "Serbian"
-msgstr "Serbi"
+msgid "Russian"
+msgstr "rús"
 
 #: conf/global_settings.py:83
-msgid "Swedish"
-msgstr "Suec"
+msgid "Slovak"
+msgstr "eslovac"
 
 #: conf/global_settings.py:84
-msgid "Tamil"
-msgstr "Tàmil"
+msgid "Slovenian"
+msgstr "esloveni"
 
 #: conf/global_settings.py:85
-msgid "Telugu"
-msgstr "Telugu"
+msgid "Serbian"
+msgstr "serbi"
 
 #: conf/global_settings.py:86
-msgid "Turkish"
-msgstr "Turc"
+msgid "Swedish"
+msgstr "suec"
 
 #: conf/global_settings.py:87
-msgid "Ukrainian"
-msgstr "Ucranià"
+msgid "Tamil"
+msgstr "tàmil"
 
 #: conf/global_settings.py:88
-msgid "Simplified Chinese"
-msgstr "Xinès simplificat"
+msgid "Telugu"
+msgstr "telugu"
 
 #: conf/global_settings.py:89
+msgid "Turkish"
+msgstr "turc"
+
+#: conf/global_settings.py:90
+msgid "Ukrainian"
+msgstr "ucranià"
+
+#: conf/global_settings.py:91
+msgid "Simplified Chinese"
+msgstr "xinès simplificat"
+
+#: conf/global_settings.py:92
 msgid "Traditional Chinese"
-msgstr "Xinès tradicional"
+msgstr "xinès tradicional"
 
 #: contrib/admin/filterspecs.py:44
 #, python-format
@@ -1137,15 +1145,15 @@ msgstr "permisos"
 msgid "group"
 msgstr "grup"
 
-#: contrib/auth/models.py:98 contrib/auth/models.py:141
+#: contrib/auth/models.py:98 contrib/auth/models.py:148
 msgid "groups"
 msgstr "grups"
 
-#: contrib/auth/models.py:131
+#: contrib/auth/models.py:138
 msgid "username"
 msgstr "nom d'usuari"
 
-#: contrib/auth/models.py:131
+#: contrib/auth/models.py:138
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
@@ -1153,23 +1161,23 @@ msgstr ""
 "Obligatori. 30 o menys caràcters. Només caràcters alfanumèrics (lletres, "
 "dígits i el guió baix)."
 
-#: contrib/auth/models.py:132
+#: contrib/auth/models.py:139
 msgid "first name"
 msgstr "nom propi"
 
-#: contrib/auth/models.py:133
+#: contrib/auth/models.py:140
 msgid "last name"
 msgstr "cognoms"
 
-#: contrib/auth/models.py:134
+#: contrib/auth/models.py:141
 msgid "e-mail address"
 msgstr "adreça de correu electrònic"
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:142
 msgid "password"
 msgstr "contrasenya"
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:142
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
@@ -1177,19 +1185,19 @@ msgstr ""
 "Utilitzeu '[algo]$[salt]$[hexdigest]' o el <a href=\"password/\">formulari "
 "de canvi de contrasenya</a>."
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:143
 msgid "staff status"
 msgstr "membre del personal"
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:143
 msgid "Designates whether the user can log into this admin site."
 msgstr "Indica si l'usuari pot entrar en el lloc administratiu."
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:144
 msgid "active"
 msgstr "actiu"
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:144
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -1197,11 +1205,11 @@ msgstr ""
 "Designa si aquest usuari ha de ser tractat com a actiu. Deseleccioneu-ho "
 "enlloc d'esborrar comptes d'usuari."
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:145
 msgid "superuser status"
 msgstr "estat de superusuari"
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:145
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -1209,15 +1217,15 @@ msgstr ""
 "Designa que aquest usuari té tots els permissos sense assignar-los "
 "explícitament."
 
-#: contrib/auth/models.py:139
+#: contrib/auth/models.py:146
 msgid "last login"
 msgstr "últim inici de sessió"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:147
 msgid "date joined"
 msgstr "data de creació"
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:149
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
@@ -1225,39 +1233,39 @@ msgstr ""
 "Junt amb els permissos asignats manualment, aquest usuari tindrà, també, els "
 "permissos dels grups dels que sigui membre."
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:150
 msgid "user permissions"
 msgstr "permissos de l'usuari"
 
-#: contrib/auth/models.py:147
+#: contrib/auth/models.py:154
 msgid "user"
 msgstr "usuari"
 
-#: contrib/auth/models.py:148
+#: contrib/auth/models.py:155
 msgid "users"
 msgstr "usuaris"
 
-#: contrib/auth/models.py:154
+#: contrib/auth/models.py:161
 msgid "Personal info"
 msgstr "Informació personal"
 
-#: contrib/auth/models.py:155
+#: contrib/auth/models.py:162
 msgid "Permissions"
 msgstr "permisos"
 
-#: contrib/auth/models.py:156
+#: contrib/auth/models.py:163
 msgid "Important dates"
 msgstr "Dates importants"
 
-#: contrib/auth/models.py:157
+#: contrib/auth/models.py:164
 msgid "Groups"
 msgstr "Grups"
 
-#: contrib/auth/models.py:316
+#: contrib/auth/models.py:323
 msgid "message"
 msgstr "missatge"
 
-#: contrib/auth/views.py:47
+#: contrib/auth/views.py:48
 msgid "Logged out"
 msgstr "Sessió finalitzada"
 
@@ -3897,12 +3905,12 @@ msgstr ""
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "Ja existeix un %(object)s del tipus %(type)s amb aquest %(field)s."
 
-#: db/models/fields/__init__.py:54
+#: db/models/fields/__init__.py:51
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "Ja existeix %(optname)s amb aquest %(fieldname)s."
 
-#: db/models/fields/__init__.py:179 db/models/fields/__init__.py:348
+#: db/models/fields/__init__.py:176 db/models/fields/__init__.py:348
 #: db/models/fields/__init__.py:780 db/models/fields/__init__.py:791
 #: newforms/fields.py:46 oldforms/__init__.py:374
 msgid "This field is required."
@@ -3937,18 +3945,18 @@ msgstr "Aquest valor ha de ser None (Cap), True (Veritat) o False (Fals)"
 msgid "Please enter a valid %s."
 msgstr "Si us plau, introduïu un %s vàlid."
 
-#: db/models/fields/related.py:721
+#: db/models/fields/related.py:746
 msgid "Separate multiple IDs with commas."
 msgstr "Separi múltiples IDs amb comes."
 
-#: db/models/fields/related.py:723
+#: db/models/fields/related.py:748
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Premeu la tecla \"Control\" -o \"Command\" en un Mac- per seleccionar més "
 "d'un valor."
 
-#: db/models/fields/related.py:770
+#: db/models/fields/related.py:795
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -4007,11 +4015,11 @@ msgstr "Assegureu-vos de que no hi ha més de %s decimals."
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Assegureu-vos de que no hi ha més de %s dígits decimals."
 
-#: newforms/fields.py:263 newforms/fields.py:751
+#: newforms/fields.py:263 newforms/fields.py:750
 msgid "Enter a valid date."
 msgstr "Introduïu una data vàlida."
 
-#: newforms/fields.py:296 newforms/fields.py:752
+#: newforms/fields.py:296 newforms/fields.py:751
 msgid "Enter a valid time."
 msgstr "Introduïu una hora vàlida."
 
@@ -4035,25 +4043,25 @@ msgstr "Introduïu una URL vàlida."
 msgid "This URL appears to be a broken link."
 msgstr "Aquesta URL sembla ser un enllaç trencat."
 
-#: newforms/fields.py:560 newforms/models.py:299
+#: newforms/fields.py:559 newforms/models.py:305
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Escolli una opció vàlida; Aquesta opció no és una de les opcions disponibles."
 
-#: newforms/fields.py:599
+#: newforms/fields.py:598
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Esculliu una opció vàlida. %(value)s no és una de les opcions vàlides."
 
-#: newforms/fields.py:600 newforms/fields.py:662 newforms/models.py:371
+#: newforms/fields.py:599 newforms/fields.py:661 newforms/models.py:372
 msgid "Enter a list of values."
 msgstr "Introduïu una llista de valors."
 
-#: newforms/fields.py:780
+#: newforms/fields.py:779
 msgid "Enter a valid IPv4 address."
 msgstr "Introduïu una adreça IPv4 vàlida."
 
-#: newforms/models.py:372
+#: newforms/models.py:373
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Escolliu una opció vàlida; %s' no és una de les opcions vàlides."
@@ -4194,51 +4202,51 @@ msgstr "Dg"
 
 #: utils/dates.py:18
 msgid "January"
-msgstr "Gener"
+msgstr "gener"
 
 #: utils/dates.py:18
 msgid "February"
-msgstr "Febrer"
+msgstr "febrer"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "March"
-msgstr "Març"
+msgstr "març"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "May"
-msgstr "Maig"
+msgstr "maig"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "June"
-msgstr "Juny"
+msgstr "juny"
 
 #: utils/dates.py:19 utils/dates.py:31
 msgid "July"
-msgstr "Juliol"
+msgstr "juliol"
 
 #: utils/dates.py:19
 msgid "August"
-msgstr "Agost"
+msgstr "agost"
 
 #: utils/dates.py:19
 msgid "September"
-msgstr "Setembre"
+msgstr "setembre"
 
 #: utils/dates.py:19
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 #: utils/dates.py:19
 msgid "November"
-msgstr "Novembre"
+msgstr "novembre"
 
 #: utils/dates.py:20
 msgid "December"
-msgstr "Desembre"
+msgstr "desembre"
 
 #: utils/dates.py:23
 msgid "jan"
@@ -4290,31 +4298,31 @@ msgstr "des"
 
 #: utils/dates.py:31
 msgid "Jan."
-msgstr "Gen."
+msgstr "gen."
 
 #: utils/dates.py:31
 msgid "Feb."
-msgstr "Feb."
+msgstr "feb."
 
 #: utils/dates.py:32
 msgid "Aug."
-msgstr "Ago."
+msgstr "ago."
 
 #: utils/dates.py:32
 msgid "Sept."
-msgstr "Set."
+msgstr "set."
 
 #: utils/dates.py:32
 msgid "Oct."
-msgstr "Oct."
+msgstr "oct."
 
 #: utils/dates.py:32
 msgid "Nov."
-msgstr "Nov."
+msgstr "nov."
 
 #: utils/dates.py:32
 msgid "Dec."
-msgstr "Des."
+msgstr "des."
 
 #: utils/text.py:127
 msgid "or"
