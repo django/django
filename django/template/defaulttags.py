@@ -682,8 +682,10 @@ ifnotequal = register.tag(ifnotequal)
 def do_if(parser, token):
     """
     The ``{% if %}`` tag evaluates a variable, and if that variable is "true"
-    (i.e. exists, is not empty, and is not a false boolean value) the contents
-    of the block are output::
+    (i.e., exists, is not empty, and is not a false boolean value), the
+    contents of the block are output:
+
+    ::
 
         {% if athlete_list %}
             Number of athletes: {{ athlete_list|count }}
