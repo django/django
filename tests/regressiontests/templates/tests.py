@@ -135,8 +135,7 @@ class Templates(unittest.TestCase):
 
         # Quickly check that we aren't accidentally using a name in both
         # template and filter tests.
-        overlapping_names = [name for name in filter_tests if name in
-                template_tests]
+        overlapping_names = [name for name in filter_tests if name in template_tests]
         assert not overlapping_names, 'Duplicate test name(s): %s' % ', '.join(overlapping_names)
 
         template_tests.update(filter_tests)
@@ -159,7 +158,7 @@ class Templates(unittest.TestCase):
         # Turn TEMPLATE_DEBUG off, because tests assume that.
         old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, False
 
-        # Set TEMPLATE_STRING_IF_INVALID to a known string
+        # Set TEMPLATE_STRING_IF_INVALID to a known string.
         old_invalid = settings.TEMPLATE_STRING_IF_INVALID
         expected_invalid_str = 'INVALID'
 
@@ -549,6 +548,7 @@ class Templates(unittest.TestCase):
             'ifchanged05': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1, 1, 1), 'numx': (1, 2, 3)}, '1123123123'),
             'ifchanged06': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1, 1, 1), 'numx': (2, 2, 2)}, '1222'),
             'ifchanged07': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% for y in numy %}{% ifchanged %}{{ y }}{% endifchanged %}{% endfor %}{% endfor %}{% endfor %}', {'num': (1, 1, 1), 'numx': (2, 2, 2), 'numy': (3, 3, 3)}, '1233323332333'),
+            'ifchanged08': ('{% for data in datalist %}{% for c,d in data %}{% if c %}{% ifchanged %}{{ d }}{% endifchanged %}{% endif %}{% endfor %}{% endfor %}', {'datalist': [[(1, 'a'), (1, 'a'), (0, 'b'), (1, 'c')], [(0, 'a'), (1, 'c'), (1, 'd'), (1, 'd'), (0, 'e')]]}, 'accd'),
 
             # Test one parameter given to ifchanged.
             'ifchanged-param01': ('{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', { 'num': (1,2,3) }, '..1..2..3'),

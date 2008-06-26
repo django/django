@@ -162,10 +162,12 @@ class IfChangedNode(Node):
         self.nodelist = nodelist
         self._last_seen = None
         self._varlist = map(Variable, varlist)
+        self._id = str(id(self))
 
     def render(self, context):
-        if 'forloop' in context and context['forloop']['first']:
+        if 'forloop' in context and self._id not in context['forloop']:
             self._last_seen = None
+            context['forloop'][self._id] = 1
         try:
             if self._varlist:
                 # Consider multiple parameters.  This automatically behaves
