@@ -2,6 +2,8 @@
 Form Widget classes specific to the Django admin site.
 """
 
+import copy
+
 from django import newforms as forms
 from django.newforms.widgets import RadioFieldRenderer
 from django.newforms.util import flatatt
@@ -162,21 +164,34 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
                 return True
         return False
 
-class RelatedFieldWidgetWrapper(object):
+class RelatedFieldWidgetWrapper(forms.Widget):
     """
-    This class is a wrapper whose __call__() method mimics the interface of a
-    Widget's render() method.
+    This class is a wrapper to a given widget to add the add icon for the
+    admin interface.
     """
-    def __init__(self, render_func, rel, admin_site):
-        self.render_func, self.rel = render_func, rel
+    def __init__(self, widget, rel, admin_site):
+        self.is_hidden = widget.is_hidden
+        self.needs_multipart_form = widget.needs_multipart_form
+        self.attrs = widget.attrs
+        self.choices = widget.choices
+        self.widget = widget
+        self.rel = rel
         # so we can check if the related object is registered with this AdminSite
         self.admin_site = admin_site
 
-    def __call__(self, name, value, *args, **kwargs):
+    def __deepcopy__(self, memo):
+        obj = copy.copy(self)
+        obj.widget = copy.deepcopy(self.widget, memo)
+        obj.attrs = self.widget.attrs
+        memo[id(self)] = obj
+        return obj
+
+    def render(self, name, value, *args, **kwargs):
         from django.conf import settings
         rel_to = self.rel.to
         related_url = '../../../%s/%s/' % (rel_to._meta.app_label, rel_to._meta.object_name.lower())
-        output = [self.render_func(name, value, *args, **kwargs)]
+        self.widget.choices = self.choices
+        output = [self.widget.render(name, value, *args, **kwargs)]
         if rel_to in self.admin_site._registry: # If the related object has an admin interface:
             # TODO: "id_" is hard-coded here. This should instead use the correct
             # API to determine the ID dynamically.
@@ -185,7 +200,16 @@ class RelatedFieldWidgetWrapper(object):
             output.append(u'<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="Add Another"/></a>' % settings.ADMIN_MEDIA_PREFIX)
         return mark_safe(u''.join(output))
 
-    def __deepcopy__(self, memo):
-        # There's no reason to deepcopy admin_site, etc, so just return self.
-        memo[id(self)] = self
-        return self
+    def build_attrs(self, extra_attrs=None, **kwargs):
+        "Helper function for building an attribute dictionary."
+        self.attrs = self.widget.build_attrs(extra_attrs=None, **kwargs)
+        return self.attrs
+
+    def value_from_datadict(self, data, files, name):
+        return self.widget.value_from_datadict(data, files, name)
+
+    def _has_changed(self, initial, data):
+        return self.widget._has_changed(initial, data)
+
+    def id_for_label(self, id_):
+        return self.widget.id_for_label(id_)

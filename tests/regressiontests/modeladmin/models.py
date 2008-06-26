@@ -122,21 +122,50 @@ properly. This won't, however, break any of the admin widgets or media.
 >>> type(ma.get_form(request).base_fields['sign_date'].widget)
 <class 'django.contrib.admin.widgets.AdminDateWidget'>
 
+If we need to override the queryset of a ModelChoiceField in our custom form
+make sure that RelatedFieldWidgetWrapper doesn't mess that up.
+
+>>> band2 = Band(name='The Beetles', bio='', sign_date=date(1962, 1, 1))
+>>> band2.save()
+
+>>> class AdminConcertForm(forms.ModelForm):
+...     class Meta:
+...         model = Concert
+...
+...     def __init__(self, *args, **kwargs):
+...         super(AdminConcertForm, self).__init__(*args, **kwargs)
+...         self.fields["main_band"].queryset = Band.objects.filter(name='The Doors')
+
+>>> class ConcertAdmin(ModelAdmin):
+...     form = AdminConcertForm
+
+>>> ma = ConcertAdmin(Concert, site)
+>>> form = ma.get_form(request)()
+>>> print form["main_band"]
+<select name="main_band" id="id_main_band">
+<option value="" selected="selected">---------</option>
+<option value="1">The Doors</option>
+</select>
+
+>>> band2.delete()
+
 # radio_fields behavior ################################################
 
 First, without any radio_fields specified, the widgets for ForeignKey
 and fields with choices specified ought to be a basic Select widget.
-For Select fields, all of the choices lists have a first entry of dashes.
+ForeignKey widgets in the admin are wrapped with RelatedFieldWidgetWrapper so
+they need to be handled properly when type checking. For Select fields, all of
+the choices lists have a first entry of dashes.
 
 >>> cma = ModelAdmin(Concert, site)
 >>> cmafa = cma.get_form(request)
 
->>> type(cmafa.base_fields['main_band'].widget)
+>>> type(cmafa.base_fields['main_band'].widget.widget)
 <class 'django.newforms.widgets.Select'>
 >>> list(cmafa.base_fields['main_band'].widget.choices)
 [(u'', u'---------'), (1, u'The Doors')]
 
->>> type(cmafa.base_fields['opening_band'].widget)
+>>> type(cmafa.base_fields['opening_band'].widget.widget)
 <class 'django.newforms.widgets.Select'>
 >>> list(cmafa.base_fields['opening_band'].widget.choices)
 [(u'', u'---------'), (1, u'The Doors')]
@@ -152,7 +181,7 @@ For Select fields, all of the choices lists have a first entry of dashes.
 [('', '---------'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')]
 
 Now specify all the fields as radio_fields.  Widgets should now be
-RadioSelect, and the choices list should have a first entry of 'None' iff
+RadioSelect, and the choices list should have a first entry of 'None' if
 blank=True for the model field.  Finally, the widget should have the
 'radiolist' attr, and 'inline' as well if the field is specified HORIZONTAL.
 
@@ -167,14 +196,14 @@ blank=True for the model field.  Finally, the widget should have the
 >>> cma = ConcertAdmin(Concert, site)
 >>> cmafa = cma.get_form(request)
 
->>> type(cmafa.base_fields['main_band'].widget)
+>>> type(cmafa.base_fields['main_band'].widget.widget)
 <class 'django.contrib.admin.widgets.AdminRadioSelect'>
 >>> cmafa.base_fields['main_band'].widget.attrs
 {'class': 'radiolist inline'}
 >>> list(cmafa.base_fields['main_band'].widget.choices)
 [(1, u'The Doors')]
 
->>> type(cmafa.base_fields['opening_band'].widget)
+>>> type(cmafa.base_fields['opening_band'].widget.widget)
 <class 'django.contrib.admin.widgets.AdminRadioSelect'>
 >>> cmafa.base_fields['opening_band'].widget.attrs
 {'class': 'radiolist'}

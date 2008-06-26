@@ -198,7 +198,7 @@ class BaseModelAdmin(object):
             formfield = db_field.formfield(**kwargs)
             # Don't wrap raw_id fields. Their add function is in the popup window.
             if not db_field.name in self.raw_id_fields:
-                formfield.widget.render = widgets.RelatedFieldWidgetWrapper(formfield.widget.render, db_field.rel, self.admin_site)
+                formfield.widget = widgets.RelatedFieldWidgetWrapper(formfield.widget, db_field.rel, self.admin_site)
             return formfield
         
         if db_field.choices and db_field.name in self.radio_fields:
