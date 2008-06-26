@@ -17,7 +17,7 @@ import urllib
 from django.utils.http import http_date
 
 __version__ = "0.1"
-__all__ = ['WSGIServer','WSGIRequestHandler','demo_app']
+__all__ = ['WSGIServer','WSGIRequestHandler']
 
 server_version = "WSGIServer/" + __version__
 sys_version = "Python/" + sys.version.split()[0]

@@ -45,7 +45,6 @@ class BaseDatabaseFeatures(object):
     autoindexes_primary_keys = True
     inline_fk_references = True
     needs_datetime_string_cast = True
-    needs_upper_for_iops = False
     supports_constraints = True
     supports_tablespaces = False
     uses_case_insensitive_names = False

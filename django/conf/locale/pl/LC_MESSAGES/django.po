@@ -5,9 +5,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-04-14 18:02+0200\n"
+"POT-Creation-Date: 2008-06-24 07:36+0200\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
-"Last-Translator: Piotr Lewandowski <django@icomputing.pl>\n"
+"Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,191 +16,199 @@ msgstr ""
 "Plural-Forms:  nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%"
 "100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:44
 msgid "Arabic"
 msgstr "Arabski"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:45
 msgid "Bengali"
 msgstr "Bengalski"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:46
 msgid "Bulgarian"
 msgstr "Bułgarski"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:47
 msgid "Catalan"
 msgstr "Kataloński"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:48
 msgid "Czech"
 msgstr "Czeski"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:49
 msgid "Welsh"
 msgstr "Walijski"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:50
 msgid "Danish"
 msgstr "Duński"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:51
 msgid "German"
 msgstr "Niemiecki"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:52
 msgid "Greek"
 msgstr "Grecki"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:53
 msgid "English"
 msgstr "Angielski"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:54
 msgid "Spanish"
 msgstr "Hiszpański"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:55
+msgid "Estonian"
+msgstr "Estoński"
+
+#: conf/global_settings.py:56
 msgid "Argentinean Spanish"
 msgstr "Hiszpański argentyński"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:57
 msgid "Basque"
 msgstr "Baskijski"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:58
 msgid "Persian"
 msgstr "Perski"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:59
 msgid "Finnish"
 msgstr "Fiński"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:60
 msgid "French"
 msgstr "Francuski"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:61
 msgid "Irish"
 msgstr "Irlandzki"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:62
 msgid "Galician"
 msgstr "Galicyjski"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:63
 msgid "Hungarian"
 msgstr "Węgierski"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:64
 msgid "Hebrew"
 msgstr "Hebrajski"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:65
 msgid "Croatian"
 msgstr "Chorwacki"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:66
 msgid "Icelandic"
 msgstr "Islandzki"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:67
 msgid "Italian"
 msgstr "Włoski"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:68
 msgid "Japanese"
 msgstr "Japoński"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:69
 msgid "Georgian"
 msgstr "Gruziński"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:70
 msgid "Korean"
 msgstr "Koreański"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:71
 msgid "Khmer"
 msgstr "Khmerski"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:72
 msgid "Kannada"
 msgstr "Kannada"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:73
 msgid "Latvian"
 msgstr "Łotewski"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:74
+msgid "Lithuanian"
+msgstr "Litewski"
+
+#: conf/global_settings.py:75
 msgid "Macedonian"
 msgstr "Macedoński"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:76
 msgid "Dutch"
 msgstr "Holenderski"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:77
 msgid "Norwegian"
 msgstr "Norweski"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:78
 msgid "Polish"
 msgstr "Polski"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:79
 msgid "Portugese"
 msgstr "Portugalski"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:80
 msgid "Brazilian Portuguese"
 msgstr "Brazylijski portugalski"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:81
 msgid "Romanian"
 msgstr "Rumuński"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:82
 msgid "Russian"
 msgstr "Rosyjski"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:83
 msgid "Slovak"
 msgstr "Słowacki"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:84
 msgid "Slovenian"
 msgstr "Słoweński"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:85
 msgid "Serbian"
 msgstr "Serbski"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:86
 msgid "Swedish"
 msgstr "Szwedzki"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:87
 msgid "Tamil"
 msgstr "Tamilski"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:88
 msgid "Telugu"
 msgstr "Telugu"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:89
 msgid "Turkish"
 msgstr "Turecki"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:90
 msgid "Ukrainian"
 msgstr "Ukraiński"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:91
 msgid "Simplified Chinese"
 msgstr "Uproszczony chiński"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:92
 msgid "Traditional Chinese"
 msgstr "Chiński tradycyjny"
 
@@ -417,7 +425,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin/delete_confirmation.html:25
 msgid "Yes, I'm sure"
-msgstr "Tak, usuń"
+msgstr "Tak, na pewno"
 
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
@@ -824,14 +832,14 @@ msgstr ""
 "Twoja przeglądarka nie chce akceptować ciasteczek. Zmień jej ustawienia i "
 "spróbuj ponownie."
 
-#: contrib/admin/views/decorators.py:90
-msgid "Usernames cannot contain the '@' character."
-msgstr "Nazwy użytkowników nie mogą zawierać znaków '@'."
-
-#: contrib/admin/views/decorators.py:92
+#: contrib/admin/views/decorators.py:89
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Twój adres e-mail to nie jest twój login. Spróbuj '%s'."
+
+#: contrib/admin/views/decorators.py:93
+msgid "Usernames cannot contain the '@' character."
+msgstr "Nazwy użytkowników nie mogą zawierać znaków '@'."
 
 #: contrib/admin/views/doc.py:48 contrib/admin/views/doc.py:50
 #: contrib/admin/views/doc.py:52
@@ -1063,7 +1071,7 @@ msgstr "Zaznacz %s"
 msgid "Select %s to change"
 msgstr "Zaznacz %s aby zmienić"
 
-#: contrib/admin/views/main.py:784
+#: contrib/admin/views/main.py:765
 msgid "Database error"
 msgstr "Błąd bazy danych"
 
@@ -1128,15 +1136,15 @@ msgstr "uprawnienia"
 msgid "group"
 msgstr "grupa"
 
-#: contrib/auth/models.py:98 contrib/auth/models.py:141
+#: contrib/auth/models.py:98 contrib/auth/models.py:148
 msgid "groups"
 msgstr "grupy"
 
-#: contrib/auth/models.py:131
+#: contrib/auth/models.py:138
 msgid "username"
 msgstr "użytkownik"
 
-#: contrib/auth/models.py:131
+#: contrib/auth/models.py:138
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
@@ -1144,23 +1152,23 @@ msgstr ""
 "Wymagane. 30 znaków lub mniej. Tylko znaki alfanumeryczne (litery, cyfry i "
 "podkreślenia)."
 
-#: contrib/auth/models.py:132
+#: contrib/auth/models.py:139
 msgid "first name"
 msgstr "Imię"
 
-#: contrib/auth/models.py:133
+#: contrib/auth/models.py:140
 msgid "last name"
 msgstr "Nazwisko"
 
-#: contrib/auth/models.py:134
+#: contrib/auth/models.py:141
 msgid "e-mail address"
 msgstr "adres e-mail"
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:142
 msgid "password"
 msgstr "hasło"
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:142
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
@@ -1168,19 +1176,19 @@ msgstr ""
 "Użyj '[algo]$[salt]$[hexdigest]' lub <a href=\"password/\">formularza zmiany "
 "hasła</a>."
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:143
 msgid "staff status"
 msgstr "w zespole"
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:143
 msgid "Designates whether the user can log into this admin site."
 msgstr "Oznacza czy użytkownik może zalogować się do panelu admina."
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:144
 msgid "active"
 msgstr "aktywny"
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:144
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -1188,11 +1196,11 @@ msgstr ""
 "Oznacza czy użytkownika należy uważać za aktywnego. Odznacz tozamiast usuwać "
 "konta."
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:145
 msgid "superuser status"
 msgstr "Główny Administrator"
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:145
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -1200,15 +1208,15 @@ msgstr ""
 "Oznacza, że ten użytkownik ma wszystkie uprawnienia bez jawnego "
 "przypisywania ich."
 
-#: contrib/auth/models.py:139
+#: contrib/auth/models.py:146
 msgid "last login"
 msgstr "ostatnio zalogowany"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:147
 msgid "date joined"
 msgstr "data przyłączenia"
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:149
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
@@ -1216,39 +1224,39 @@ msgstr ""
 "Oprócz uprawnień przypisanych bezpośrednio użytkownikowi otrzyma on "
 "uprawnienia grup, do których należy."
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:150
 msgid "user permissions"
 msgstr "uprawnienia użytkownika"
 
-#: contrib/auth/models.py:147
+#: contrib/auth/models.py:154
 msgid "user"
 msgstr "użytkownik"
 
-#: contrib/auth/models.py:148
+#: contrib/auth/models.py:155
 msgid "users"
 msgstr "użytkownicy"
 
-#: contrib/auth/models.py:154
+#: contrib/auth/models.py:161
 msgid "Personal info"
 msgstr "Dane osobowe"
 
-#: contrib/auth/models.py:155
+#: contrib/auth/models.py:162
 msgid "Permissions"
 msgstr "Uprawnienia"
 
-#: contrib/auth/models.py:156
+#: contrib/auth/models.py:163
 msgid "Important dates"
 msgstr "Ważne daty"
 
-#: contrib/auth/models.py:157
+#: contrib/auth/models.py:164
 msgid "Groups"
 msgstr "Grupy"
 
-#: contrib/auth/models.py:316
+#: contrib/auth/models.py:323
 msgid "message"
 msgstr "wiadomość"
 
-#: contrib/auth/views.py:47
+#: contrib/auth/views.py:48
 msgid "Logged out"
 msgstr "Wylogowany"
 
@@ -3516,23 +3524,23 @@ msgstr "przekieruj"
 msgid "redirects"
 msgstr "przekierowania"
 
-#: contrib/sessions/models.py:41
+#: contrib/sessions/models.py:45
 msgid "session key"
 msgstr "klucz sesji"
 
-#: contrib/sessions/models.py:42
+#: contrib/sessions/models.py:47
 msgid "session data"
 msgstr "data sesji"
 
-#: contrib/sessions/models.py:43
+#: contrib/sessions/models.py:48
 msgid "expire date"
 msgstr "data wygaśnięcia sesji"
 
-#: contrib/sessions/models.py:48
+#: contrib/sessions/models.py:53
 msgid "session"
 msgstr "sesja"
 
-#: contrib/sessions/models.py:49
+#: contrib/sessions/models.py:54
 msgid "sessions"
 msgstr "sesje"
 
@@ -3617,7 +3625,7 @@ msgstr "Rok nie może być wcześniejszy niż 1900."
 msgid "Invalid date: %s"
 msgstr "Niepoprawna data: %s"
 
-#: core/validators.py:156 db/models/fields/__init__.py:527
+#: core/validators.py:156 db/models/fields/__init__.py:548
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Proszę wpisać poprawną datę w formacie RRRR-MM-DD."
 
@@ -3625,7 +3633,7 @@ msgstr "Proszę wpisać poprawną datę w formacie RRRR-MM-DD."
 msgid "Enter a valid time in HH:MM format."
 msgstr "Proszę wpisać poprawną godzinę w formacie HH:MM."
 
-#: core/validators.py:165 db/models/fields/__init__.py:604
+#: core/validators.py:165 db/models/fields/__init__.py:625
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Wprowadź poprawną datę i godzinę w formacie RRRR-MM-DD GG:MM."
 
@@ -3888,60 +3896,60 @@ msgstr ""
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "%(object)s z %(type)s już istnieje dla %(field)s."
 
-#: db/models/fields/__init__.py:52
+#: db/models/fields/__init__.py:51
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "Już istnieje %(optname)s z %(fieldname)s."
 
-#: db/models/fields/__init__.py:161 db/models/fields/__init__.py:327
-#: db/models/fields/__init__.py:759 db/models/fields/__init__.py:770
+#: db/models/fields/__init__.py:176 db/models/fields/__init__.py:348
+#: db/models/fields/__init__.py:780 db/models/fields/__init__.py:791
 #: newforms/fields.py:46 oldforms/__init__.py:374
 msgid "This field is required."
 msgstr "To pole jest wymagane."
 
-#: db/models/fields/__init__.py:427
+#: db/models/fields/__init__.py:448
 msgid "This value must be an integer."
 msgstr "Ta wartość musi być liczbą całkowitą."
 
-#: db/models/fields/__init__.py:466
+#: db/models/fields/__init__.py:487
 msgid "This value must be either True or False."
 msgstr ""
 "Ta wartość musi być wartością logiczną (True, False - prawda lub fałsz)."
 
-#: db/models/fields/__init__.py:490
+#: db/models/fields/__init__.py:511
 msgid "This field cannot be null."
 msgstr "To pole nie może być puste."
 
-#: db/models/fields/__init__.py:668
+#: db/models/fields/__init__.py:689
 msgid "This value must be a decimal number."
 msgstr "Ta wartość musi być liczbą dziesiętną."
 
-#: db/models/fields/__init__.py:779
+#: db/models/fields/__init__.py:800
 msgid "Enter a valid filename."
 msgstr "Wpisz poprawną nazwę pliku."
 
-#: db/models/fields/__init__.py:960
+#: db/models/fields/__init__.py:981
 msgid "This value must be either None, True or False."
 msgstr ""
 "Ta wartość musi być jedną z None (nic), True (prawda) lub False (fałsz)."
 
-#: db/models/fields/related.py:93
+#: db/models/fields/related.py:94
 #, python-format
 msgid "Please enter a valid %s."
 msgstr "Proszę wpisać poprawne %s."
 
-#: db/models/fields/related.py:701
+#: db/models/fields/related.py:746
 msgid "Separate multiple IDs with commas."
 msgstr "Oddziel identyfikatory przecinkami."
 
-#: db/models/fields/related.py:703
+#: db/models/fields/related.py:748
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Przytrzymaj wciśnięty klawisz \"Ctrl\" lub \"Command\" na Mac'u aby "
 "zaznaczyć więcej niż jeden wybór."
 
-#: db/models/fields/related.py:750
+#: db/models/fields/related.py:795
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -4003,11 +4011,11 @@ msgstr "Upewnij się, że jest nie więcej niż %s miejsc po przecinku."
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Upewnij się, że jest nie więcej niż %s miejsc przed przecinkiem."
 
-#: newforms/fields.py:263 newforms/fields.py:751
+#: newforms/fields.py:263 newforms/fields.py:750
 msgid "Enter a valid date."
 msgstr "Wpisz poprawną datę."
 
-#: newforms/fields.py:296 newforms/fields.py:752
+#: newforms/fields.py:296 newforms/fields.py:751
 msgid "Enter a valid time."
 msgstr "Wpisz poprawną godzinę."
 
@@ -4031,25 +4039,25 @@ msgstr "Wpisz poprawny URL."
 msgid "This URL appears to be a broken link."
 msgstr "Ten odnośnik jest nieprawidłowy."
 
-#: newforms/fields.py:560 newforms/models.py:299
+#: newforms/fields.py:559 newforms/models.py:305
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wyborów."
 
-#: newforms/fields.py:599
+#: newforms/fields.py:598
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Wybierz poprawną wartość. %(value)s nie jest jednym z dostępnych wyborów."
 
-#: newforms/fields.py:600 newforms/fields.py:662 newforms/models.py:371
+#: newforms/fields.py:599 newforms/fields.py:661 newforms/models.py:372
 msgid "Enter a list of values."
 msgstr "Podaj listę wartości."
 
-#: newforms/fields.py:780
+#: newforms/fields.py:779
 msgid "Enter a valid IPv4 address."
 msgstr "Wprowadź poprawny adres IPv4."
 
-#: newforms/models.py:372
+#: newforms/models.py:373
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Wybierz poprawną wartość. %s nie jest jednym z dostępnych wyborów."

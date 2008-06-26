@@ -382,7 +382,7 @@ Pickling QuerySets
 
 If you pickle_ a ``QuerySet``, this will also force all the results to be
 loaded into memory prior to pickling. This is because pickling is usually used
-as a precursor to caching and when the cached queryset is reloaded, you want
+as a precursor to caching and when the cached ``QuerySet`` is reloaded, you want
 the results to already be present. This means that when you unpickle a
 ``QuerySet``, it contains the results at the moment it was pickled, rather
 than the results that are currently in the database.
@@ -2040,7 +2040,7 @@ automatically saved to the database.
 One-to-one relationships
 ------------------------
 
-One-to-one relationships are very similar to Many-to-one relationships.
+One-to-one relationships are very similar to many-to-one relationships.
 If you define a OneToOneField on your model, instances of that model will have 
 access to the related object via a simple attribute of the model.
 
@@ -2053,8 +2053,8 @@ For example::
     ed = EntryDetail.objects.get(id=2)
     ed.entry # Returns the related Entry object.
 
-The difference comes in reverse queries. The related model in a One-to-one
-relationship also has access to a ``Manager`` object; however, that ``Manager``
+The difference comes in "reverse" queries. The related model in a one-to-one
+relationship also has access to a ``Manager`` object, but that ``Manager``
 represents a single object, rather than a collection of objects::
 
     e = Entry.objects.get(id=2)

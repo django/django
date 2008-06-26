@@ -36,7 +36,7 @@ class CollectedObjects(object):
         """
         Adds an item.
         model is the class of the object being added,
-        pk is the primary key, obj is the object itself, 
+        pk is the primary key, obj is the object itself,
         parent_model is the model of the parent object
         that this object was reached through, nullable should
         be True if this relation is nullable.
@@ -77,7 +77,7 @@ class CollectedObjects(object):
 
     def ordered_keys(self):
         """
-        Returns the models in the order that they should be 
+        Returns the models in the order that they should be
         dealth with i.e. models with no dependencies first.
         """
         dealt_with = SortedDict()
@@ -92,7 +92,7 @@ class CollectedObjects(object):
                     found = True
             if not found:
                 raise CyclicDependency("There is a cyclic dependency of items to be processed.")
-            
+
         return dealt_with.keys()
 
     def unordered_keys(self):
@@ -218,6 +218,8 @@ class QuerySet(object):
 
     def __and__(self, other):
         self._merge_sanity_check(other)
+        if isinstance(other, EmptyQuerySet):
+            return other._clone()
         combined = self._clone()
         combined.query.combine(other.query, sql.AND)
         return combined
@@ -225,6 +227,8 @@ class QuerySet(object):
     def __or__(self, other):
         self._merge_sanity_check(other)
         combined = self._clone()
+        if isinstance(other, EmptyQuerySet):
+            return combined
         combined.query.combine(other.query, sql.OR)
         return combined
 
@@ -488,7 +492,9 @@ class QuerySet(object):
         and usually it will be more natural to use other methods.
         """
         if isinstance(filter_obj, Q) or hasattr(filter_obj, 'add_to_query'):
-            return self._filter_or_exclude(None, filter_obj)
+            clone = self._clone()
+            clone.query.add_q(filter_obj)
+            return clone
         else:
             return self._filter_or_exclude(None, **filter_obj)
 
@@ -583,11 +589,11 @@ class QuerySet(object):
 
     def _merge_sanity_check(self, other):
         """
-        Checks that we are merging two comparable queryset classes.
+        Checks that we are merging two comparable queryset classes. By default
+        this does nothing, but see the ValuesQuerySet for an example of where
+        it's useful.
         """
-        if self.__class__ is not other.__class__:
-            raise TypeError("Cannot merge querysets of different types ('%s' and '%s'."
-                    % (self.__class__.__name__, other.__class__.__name__))
+        pass
 
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
@@ -599,7 +605,7 @@ class ValuesQuerySet(QuerySet):
         # names of the model fields to select.
 
     def iterator(self):
-        if (not self.extra_names and 
+        if (not self.extra_names and
             len(self.field_names) != len(self.model._meta.fields)):
             self.query.trim_extra_select(self.extra_names)
         names = self.query.extra_select.keys() + self.field_names
@@ -688,9 +694,9 @@ class DateQuerySet(QuerySet):
         """
         self.query = self.query.clone(klass=sql.DateQuery, setup=True)
         self.query.select = []
-        self.query.add_date_select(self._field.column, self._kind, self._order)
+        self.query.add_date_select(self._field, self._kind, self._order)
         if self._field.null:
-            self.query.add_filter(('%s__isnull' % self._field.name, True))
+            self.query.add_filter(('%s__isnull' % self._field.name, False))
 
     def _clone(self, klass=None, setup=False, **kwargs):
         c = super(DateQuerySet, self)._clone(klass, False, **kwargs)
@@ -704,6 +710,12 @@ class EmptyQuerySet(QuerySet):
     def __init__(self, model=None, query=None):
         super(EmptyQuerySet, self).__init__(model, query)
         self._result_cache = []
+
+    def __and__(self, other):
+        return self._clone()
+
+    def __or__(self, other):
+        return other._clone()
 
     def count(self):
         return 0
@@ -773,7 +785,7 @@ def delete_objects(seen_objs):
     except CyclicDependency:
         # if there is a cyclic dependency, we cannot in general delete
         # the objects.  However, if an appropriate transaction is set
-        # up, or if the database is lax enough, it will succeed. 
+        # up, or if the database is lax enough, it will succeed.
         # So for now, we go ahead and try anway.
         ordered_classes = seen_objs.unordered_keys()
 
