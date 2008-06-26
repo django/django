@@ -822,7 +822,7 @@ relationship should work. All are optional:
     =======================  ============================================================
     Argument                 Description
     =======================  ============================================================
-    ``edit_inline``          If not ``False``, this related object is edited
+    ``edit_inline``          If ``True``, this related object is edited
                              "inline" on the related object's page. This means
                              that the object will not have its own admin
                              interface. Use either ``models.TABULAR`` or ``models.STACKED``,
