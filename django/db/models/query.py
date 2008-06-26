@@ -492,7 +492,9 @@ class QuerySet(object):
         and usually it will be more natural to use other methods.
         """
         if isinstance(filter_obj, Q) or hasattr(filter_obj, 'add_to_query'):
-            return self._filter_or_exclude(None, filter_obj)
+            clone = self._clone()
+            clone.query.add_q(filter_obj)
+            return clone
         else:
             return self._filter_or_exclude(None, **filter_obj)
 
