@@ -135,6 +135,24 @@ class ManagedModel(models.Model):
     def __unicode__(self):
         return self.data
 
+# An inter-related setup with multiple paths from Child to Detail.
+class Detail(models.Model):
+    data = models.CharField(max_length=10)
+
+class MemberManager(models.Manager):
+    def get_query_set(self):
+        return super(MemberManager, self).get_query_set().select_related("details")
+
+class Member(models.Model):
+    name = models.CharField(max_length=10)
+    details = models.OneToOneField(Detail, primary_key=True)
+
+    objects = MemberManager()
+
+class Child(models.Model):
+    person = models.OneToOneField(Member, primary_key=True)
+    parent = models.ForeignKey(Member, related_name="children")
+
 
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag(name='t1')
@@ -719,6 +737,24 @@ A values() or values_list() query across joined models must use outer joins
 appropriately.
 >>> Report.objects.values_list("creator__extra__info", flat=True).order_by("name")
 [u'e1', u'e2', None]
+
+Similarly for select_related(), joins beyond an initial nullable join must
+use outer joins so that all results are included.
+>>> Report.objects.select_related("creator", "creator__extra").order_by("name")
+[<Report: r1>, <Report: r2>, <Report: r3>]
+
+When there are multiple paths to a table from another table, we have to be
+careful not to accidentally reuse an inappropriate join when using
+select_related(). We used to return the parent's Detail record here by mistake.
+
+>>> d1 = Detail.objects.create(data="d1")
+>>> d2 = Detail.objects.create(data="d2")
+>>> m1 = Member.objects.create(name="m1", details=d1)
+>>> m2 = Member.objects.create(name="m2", details=d2)
+>>> c1 = Child.objects.create(person=m2, parent=m1)
+>>> obj = m1.children.select_related("person__details")[0]
+>>> obj.person.details.data
+u'd2'
 
 """}
 

@@ -631,8 +631,10 @@ class Query(object):
             # We have to do the same "final join" optimisation as in
             # add_filter, since the final column might not otherwise be part of
             # the select set (so we can't order on it).
-            join = self.alias_map[alias]
-            if col == join[RHS_JOIN_COL]:
+            while 1:
+                join = self.alias_map[alias]
+                if col != join[RHS_JOIN_COL]:
+                    break
                 self.unref_alias(alias)
                 alias = join[LHS_ALIAS]
                 col = join[LHS_JOIN_COL]
@@ -830,6 +832,10 @@ class Query(object):
         if not always_create:
             for alias in self.join_map.get(t_ident, ()):
                 if alias not in exclusions:
+                    if lhs_table and not self.alias_refcount[self.alias_map[alias][LHS_ALIAS]]:
+                        # The LHS of this join tuple is no longer part of the
+                        # query, so skip this possibility.
+                        continue
                     self.ref_alias(alias)
                     if promote:
                         self.promote_alias(alias)
@@ -989,20 +995,22 @@ class Query(object):
             col = target.column
         alias = join_list[-1]
 
-        if final > 1:
+        while final > 1:
             # An optimization: if the final join is against the same column as
             # we are comparing against, we can go back one step in the join
-            # chain and compare against the lhs of the join instead. The result
-            # (potentially) involves one less table join.
+            # chain and compare against the lhs of the join instead (and then
+            # repeat the optimization). The result, potentially, involves less
+            # table joins.
             join = self.alias_map[alias]
-            if col == join[RHS_JOIN_COL]:
-                self.unref_alias(alias)
-                alias = join[LHS_ALIAS]
-                col = join[LHS_JOIN_COL]
-                join_list = join_list[:-1]
-                final -= 1
-                if final == penultimate:
-                    penultimate = last.pop()
+            if col != join[RHS_JOIN_COL]:
+                break
+            self.unref_alias(alias)
+            alias = join[LHS_ALIAS]
+            col = join[LHS_JOIN_COL]
+            join_list = join_list[:-1]
+            final -= 1
+            if final == penultimate:
+                penultimate = last.pop()
 
         if (lookup_type == 'isnull' and value is True and not negate and
                 final > 1):
