@@ -75,7 +75,10 @@ def password_reset(request, is_admin_site=False, template_name='registration/pas
             if is_admin_site:
                 form.save(domain_override=request.META['HTTP_HOST'])
             else:
-                form.save(email_template_name=email_template_name)
+                if Site._meta.installed:
+                    form.save(email_template_name=email_template_name)
+                else:
+                    form.save(domain_override=RequestSite(request).domain, email_template_name=email_template_name)
             return HttpResponseRedirect('%sdone/' % request.path)
     return render_to_response(template_name, {'form': oldforms.FormWrapper(form, new_data, errors)},
         context_instance=RequestContext(request))
