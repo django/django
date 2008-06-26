@@ -1045,17 +1045,27 @@ class Query(object):
                 self.promote_alias(table)
 
         self.where.add((alias, col, field, lookup_type, value), connector)
+
         if negate:
             for alias in join_list:
                 self.promote_alias(alias)
-            if final > 1 and lookup_type != 'isnull':
-                for alias in join_list:
-                    if self.alias_map[alias] == self.LOUTER:
-                        j_col = self.alias_map[alias][RHS_JOIN_COL]
-                        entry = Node([(alias, j_col, None, 'isnull', True)])
-                        entry.negate()
-                        self.where.add(entry, AND)
-                        break
+            if lookup_type != 'isnull':
+                if final > 1:
+                    for alias in join_list:
+                        if self.alias_map[alias][JOIN_TYPE] == self.LOUTER:
+                            j_col = self.alias_map[alias][RHS_JOIN_COL]
+                            entry = Node([(alias, j_col, None, 'isnull', True)])
+                            entry.negate()
+                            self.where.add(entry, AND)
+                            break
+                elif not (lookup_type == 'in' and not value):
+                    # Leaky abstraction artifact: We have to specifically
+                    # exclude the "foo__in=[]" case from this handling, because
+                    # it's short-circuited in the Where class.
+                    entry = Node([(alias, col, field, 'isnull', True)])
+                    entry.negate()
+                    self.where.add(entry, AND)
+
         if can_reuse is not None:
             can_reuse.update(join_list)
 

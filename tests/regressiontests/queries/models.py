@@ -756,5 +756,11 @@ select_related(). We used to return the parent's Detail record here by mistake.
 >>> obj.person.details.data
 u'd2'
 
+Bug #7076 -- excluding shouldn't eliminate NULL entries.
+>>> Item.objects.exclude(modified=time1).order_by('name')
+[<Item: four>, <Item: three>, <Item: two>]
+>>> Tag.objects.exclude(parent__name=t1.name)
+[<Tag: t1>, <Tag: t4>, <Tag: t5>]
+
 """}
 
