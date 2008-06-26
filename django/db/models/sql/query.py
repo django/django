@@ -610,6 +610,10 @@ class Query(object):
         alias = joins[-1]
         col = target.column
 
+        # Must use left outer joins for nullable fields.
+        for join in joins:
+            self.promote_alias(join)
+
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model.
         if field.rel and len(joins) > 1 and opts.ordering:

@@ -499,7 +499,7 @@ FieldError: Infinite loop caused by ordering.
 # Ordering by a many-valued attribute (e.g. a many-to-many or reverse
 # ForeignKey) is legal, but the results might not make sense. That isn't
 # Django's problem. Garbage in, garbage out.
->>> Item.objects.all().order_by('tags', 'id')
+>>> Item.objects.filter(tags__isnull=False).order_by('tags', 'id')
 [<Item: one>, <Item: two>, <Item: one>, <Item: two>, <Item: four>]
 
 # If we replace the default ordering, Django adjusts the required tables
@@ -761,6 +761,12 @@ Bug #7076 -- excluding shouldn't eliminate NULL entries.
 [<Item: four>, <Item: three>, <Item: two>]
 >>> Tag.objects.exclude(parent__name=t1.name)
 [<Tag: t1>, <Tag: t4>, <Tag: t5>]
+
+Bug #7181 -- ordering by related tables should accomodate nullable fields (this
+test is a little tricky, since NULL ordering is database dependent. Instead, we
+just count the number of results).
+>>> len(Tag.objects.order_by('parent__name'))
+5
 
 """}
 
