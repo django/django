@@ -39,12 +39,11 @@ class CommentNode(Node):
 
 class CycleNode(Node):
     def __init__(self, cyclevars, variable_name=None):
-        self.cycle_iter = itertools_cycle(cyclevars)
+        self.cycle_iter = itertools_cycle([Variable(v) for v in cyclevars])
         self.variable_name = variable_name
 
     def render(self, context):
-        value = self.cycle_iter.next()
-        value = Variable(value).resolve(context)
+        value = self.cycle_iter.next().resolve(context)
         if self.variable_name:
             context[self.variable_name] = value
         return value
@@ -454,17 +453,17 @@ def cycle(parser, token):
             <tr class="{% cycle rowcolors %}">...</tr>
             <tr class="{% cycle rowcolors %}">...</tr>
 
-    You can use any number of values, seperated by spaces. Commas can also
+    You can use any number of values, separated by spaces. Commas can also
     be used to separate values; if a comma is used, the cycle values are
     interpreted as literal strings.
     """
 
     # Note: This returns the exact same node on each {% cycle name %} call;
     # that is, the node object returned from {% cycle a b c as name %} and the
-    # one returned from {% cycle name %} are the exact same object.  This
+    # one returned from {% cycle name %} are the exact same object. This
     # shouldn't cause problems (heh), but if it does, now you know.
     #
-    # Ugly hack warning: this stuffs the named template dict into parser so
+    # Ugly hack warning: This stuffs the named template dict into parser so
     # that names are only unique within each template (as opposed to using
     # a global variable, which would make cycle names have to be unique across
     # *all* templates.
@@ -483,8 +482,7 @@ def cycle(parser, token):
         # {% cycle foo %} case.
         name = args[1]
         if not hasattr(parser, '_namedCycleNodes'):
-            raise TemplateSyntaxError("No named cycles in template."
-                                      " '%s' is not defined" % name)
+            raise TemplateSyntaxError("No named cycles in template. '%s' is not defined" % name)
         if not name in parser._namedCycleNodes:
             raise TemplateSyntaxError("Named cycle '%s' does not exist" % name)
         return parser._namedCycleNodes[name]
