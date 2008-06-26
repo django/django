@@ -103,13 +103,15 @@ class RelatedField(object):
 
         if hasattr(sup, 'contribute_to_class'):
             sup.contribute_to_class(cls, name)
+
+        if not cls._meta.abstract and self.rel.related_name:
+            self.rel.related_name = self.rel.related_name % {'class': cls.__name__.lower()}
+
         other = self.rel.to
         if isinstance(other, basestring):
             add_lazy_relation(cls, self, other)
         else:
             self.do_related_class(other, cls)
-        if not cls._meta.abstract and self.rel.related_name:
-            self.rel.related_name = self.rel.related_name % {'class': cls.__name__.lower()}
 
     def set_attributes_from_rel(self):
         self.name = self.name or (self.rel.to._meta.object_name.lower() + '_' + self.rel.to._meta.pk.name)
@@ -119,7 +121,8 @@ class RelatedField(object):
     def do_related_class(self, other, cls):
         self.set_attributes_from_rel()
         related = RelatedObject(other, cls, self)
-        self.contribute_to_related_class(other, related)
+        if not cls._meta.abstract:
+            self.contribute_to_related_class(other, related)
 
     def get_db_prep_lookup(self, lookup_type, value):
         # If we are doing a lookup on a Related Field, we must be
