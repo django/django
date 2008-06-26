@@ -5,9 +5,13 @@ from django.core import management
 # types, as strings. Column-type strings can contain format strings; they'll
 # be interpolated against the values of Field.__dict__ before being output.
 # If a column type is set to None, it won't be included in the output.
+#
+# Any format strings starting with "qn_" are quoted before being used in the
+# output (the "qn_" prefix is stripped before the lookup is performed.
+
 DATA_TYPES = {
     'AutoField':                    'NUMBER(11)',
-    'BooleanField':                 'NUMBER(1) CHECK (%(column)s IN (0,1))',
+    'BooleanField':                 'NUMBER(1) CHECK (%(qn_column)s IN (0,1))',
     'CharField':                    'NVARCHAR2(%(max_length)s)',
     'CommaSeparatedIntegerField':   'VARCHAR2(%(max_length)s)',
     'DateField':                    'DATE',
@@ -19,11 +23,11 @@ DATA_TYPES = {
     'ImageField':                   'NVARCHAR2(%(max_length)s)',
     'IntegerField':                 'NUMBER(11)',
     'IPAddressField':               'VARCHAR2(15)',
-    'NullBooleanField':             'NUMBER(1) CHECK ((%(column)s IN (0,1)) OR (%(column)s IS NULL))',
+    'NullBooleanField':             'NUMBER(1) CHECK ((%(qn_column)s IN (0,1)) OR (%(column)s IS NULL))',
     'OneToOneField':                'NUMBER(11)',
     'PhoneNumberField':             'VARCHAR2(20)',
-    'PositiveIntegerField':         'NUMBER(11) CHECK (%(column)s >= 0)',
-    'PositiveSmallIntegerField':    'NUMBER(11) CHECK (%(column)s >= 0)',
+    'PositiveIntegerField':         'NUMBER(11) CHECK (%(qn_column)s >= 0)',
+    'PositiveSmallIntegerField':    'NUMBER(11) CHECK (%(qn_column)s >= 0)',
     'SlugField':                    'NVARCHAR2(50)',
     'SmallIntegerField':            'NUMBER(11)',
     'TextField':                    'NCLOB',

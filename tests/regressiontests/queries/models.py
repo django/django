@@ -122,12 +122,12 @@ class LoopZ(models.Model):
 class CustomManager(models.Manager):
     def get_query_set(self):
         qs = super(CustomManager, self).get_query_set()
-        return qs.filter(is_public=True, tag__name='t1')
+        return qs.filter(public=True, tag__name='t1')
 
 class ManagedModel(models.Model):
     data = models.CharField(max_length=10)
     tag = models.ForeignKey(Tag)
-    is_public = models.BooleanField(default=True)
+    public = models.BooleanField(default=True)
 
     objects = CustomManager()
     normal_manager = models.Manager()
@@ -730,7 +730,7 @@ More twisted cases, involving nested negations.
 Bug #7095
 Updates that are filtered on the model being updated are somewhat tricky to get
 in MySQL. This exercises that case.
->>> mm = ManagedModel.objects.create(data='mm1', tag=t1, is_public=True)
+>>> mm = ManagedModel.objects.create(data='mm1', tag=t1, public=True)
 >>> ManagedModel.objects.update(data='mm')
 
 A values() or values_list() query across joined models must use outer joins

@@ -16,6 +16,7 @@ from django.core import validators
 from django import oldforms
 from django import newforms as forms
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.datastructures import DictWrapper
 from django.utils.functional import curry
 from django.utils.itercompat import tee
 from django.utils.text import capfirst
@@ -161,8 +162,9 @@ class Field(object):
         # mapped to one of the built-in Django field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
+        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         try:
-            return get_creation_module().DATA_TYPES[self.get_internal_type()] % self.__dict__
+            return get_creation_module().DATA_TYPES[self.get_internal_type()] % data
         except KeyError:
             return None
 
