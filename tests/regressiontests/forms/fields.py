@@ -887,7 +887,7 @@ u'http://www.google.com'
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
->>> f.clean('http://www.jfoiwjfoi23jfoijoaijfoiwjofiwjefewl.com') # bad domain
+>>> f.clean('http://www.test.invalid') # bad domain
 Traceback (most recent call last):
 ...
 ValidationError: [u'This URL appears to be a broken link.']
