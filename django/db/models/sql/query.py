@@ -7,6 +7,7 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 
+import datetime
 from copy import deepcopy
 
 from django.utils.tree import Node
@@ -1048,7 +1049,19 @@ class Query(object):
                 # that's harmless.
                 self.promote_alias(table)
 
-        self.where.add((alias, col, field, lookup_type, value), connector)
+        # To save memory and copying time, convert the value from the Python
+        # object to the actual value used in the SQL query.
+        if field:
+            params = field.get_db_prep_lookup(lookup_type, value)
+        else:
+            params = Field().get_db_prep_lookup(lookup_type, value)
+        if isinstance(value, datetime.datetime):
+            annotation = datetime.datetime
+        else:
+            annotation = bool(value)
+
+        self.where.add((alias, col, field.db_type(), lookup_type, annotation,
+            params), connector)
 
         if negate:
             for alias in join_list:
@@ -1058,7 +1071,8 @@ class Query(object):
                     for alias in join_list:
                         if self.alias_map[alias][JOIN_TYPE] == self.LOUTER:
                             j_col = self.alias_map[alias][RHS_JOIN_COL]
-                            entry = Node([(alias, j_col, None, 'isnull', True)])
+                            entry = Node([(alias, j_col, None, 'isnull', True,
+                                    [True])])
                             entry.negate()
                             self.where.add(entry, AND)
                             break
@@ -1066,7 +1080,7 @@ class Query(object):
                     # Leaky abstraction artifact: We have to specifically
                     # exclude the "foo__in=[]" case from this handling, because
                     # it's short-circuited in the Where class.
-                    entry = Node([(alias, col, field, 'isnull', True)])
+                    entry = Node([(alias, col, None, 'isnull', True, [True])])
                     entry.negate()
                     self.where.add(entry, AND)
 

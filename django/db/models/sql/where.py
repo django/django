@@ -21,8 +21,9 @@ class WhereNode(tree.Node):
     the correct SQL).
 
     The children in this tree are usually either Q-like objects or lists of
-    [table_alias, field_name, field_class, lookup_type, value]. However, a
-    child could also be any class with as_sql() and relabel_aliases() methods.
+    [table_alias, field_name, db_type, lookup_type, value_annotation,
+    params]. However, a child could also be any class with as_sql() and
+    relabel_aliases() methods.
     """
     default = AND
 
@@ -88,29 +89,25 @@ class WhereNode(tree.Node):
 
     def make_atom(self, child, qn):
         """
-        Turn a tuple (table_alias, field_name, field_class, lookup_type, value)
-        into valid SQL.
+        Turn a tuple (table_alias, field_name, db_type, lookup_type,
+        value_annot, params) into valid SQL.
 
         Returns the string for the SQL fragment and the parameters to use for
         it.
         """
-        table_alias, name, field, lookup_type, value = child
+        table_alias, name, db_type, lookup_type, value_annot, params = child
         if table_alias:
             lhs = '%s.%s' % (qn(table_alias), qn(name))
         else:
             lhs = qn(name)
-        db_type = field and field.db_type() or None
+        ##db_type = field and field.db_type() or None
         field_sql = connection.ops.field_cast_sql(db_type) % lhs
 
-        if isinstance(value, datetime.datetime):
+        if value_annot is datetime.datetime:
             cast_sql = connection.ops.datetime_cast_sql()
         else:
             cast_sql = '%s'
 
-        if field:
-            params = field.get_db_prep_lookup(lookup_type, value)
-        else:
-            params = Field().get_db_prep_lookup(lookup_type, value)
         if isinstance(params, QueryWrapper):
             extra, params = params.data
         else:
@@ -123,11 +120,11 @@ class WhereNode(tree.Node):
                     connection.operators[lookup_type] % cast_sql), params)
 
         if lookup_type == 'in':
-            if not value:
+            if not value_annot:
                 raise EmptyResultSet
             if extra:
                 return ('%s IN %s' % (field_sql, extra), params)
-            return ('%s IN (%s)' % (field_sql, ', '.join(['%s'] * len(value))),
+            return ('%s IN (%s)' % (field_sql, ', '.join(['%s'] * len(params))),
                     params)
         elif lookup_type in ('range', 'year'):
             return ('%s BETWEEN %%s and %%s' % field_sql, params)
@@ -135,8 +132,8 @@ class WhereNode(tree.Node):
             return ('%s = %%s' % connection.ops.date_extract_sql(lookup_type,
                     field_sql), params)
         elif lookup_type == 'isnull':
-            return ('%s IS %sNULL' % (field_sql, (not value and 'NOT ' or '')),
-                    params)
+            return ('%s IS %sNULL' % (field_sql,
+                (not value_annot and 'NOT ' or '')), ())
         elif lookup_type == 'search':
             return (connection.ops.fulltext_search_sql(field_sql), params)
         elif lookup_type in ('regex', 'iregex'):

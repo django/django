@@ -3,6 +3,7 @@ Various complex queries that have been problematic in the past.
 """
 
 import datetime
+import pickle
 
 from django.db import models
 from django.db.models.query import Q
@@ -790,6 +791,10 @@ Empty querysets can be merged with others.
 []
 >>> Note.objects.all() & Note.objects.none()
 []
+
+Bug #7204, #7506 -- make sure querysets with related fields can be pickled. If
+this doesn't crash, it's a Good Thing.
+>>> out = pickle.dumps(Item.objects.all())
 
 """}
 
