@@ -100,7 +100,6 @@ class WhereNode(tree.Node):
             lhs = '%s.%s' % (qn(table_alias), qn(name))
         else:
             lhs = qn(name)
-        ##db_type = field and field.db_type() or None
         field_sql = connection.ops.field_cast_sql(db_type) % lhs
 
         if value_annot is datetime.datetime:
