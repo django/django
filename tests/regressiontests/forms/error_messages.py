@@ -237,7 +237,7 @@ ValidationError: [u'REQUIRED']
 Traceback (most recent call last):
 ...
 ValidationError: [u'INVALID']
->>> f.clean('http://www.test.invalid')
+>>> f.clean('http://www.broken.djangoproject.com')
 Traceback (most recent call last):
 ...
 ValidationError: [u'INVALID LINK']
