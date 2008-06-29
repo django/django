@@ -1484,8 +1484,6 @@ class Query(object):
             if not self.select:
                 select = Count()
             else:
-                assert len(self.select) == 1, \
-                        "Cannot add count col with multiple cols in 'select': %r" % self.select
                 select = Count(self.select[0])
         else:
             opts = self.model._meta

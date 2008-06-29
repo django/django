@@ -338,6 +338,10 @@ Bug #1878, #2939
 4
 >>> xx.delete()
 
+Bug #7323
+>>> Item.objects.values('creator', 'name').count()
+4
+
 Bug #2253
 >>> q1 = Item.objects.order_by('name')
 >>> q2 = Item.objects.filter(id=i1.id)
