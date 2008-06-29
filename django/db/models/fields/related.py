@@ -185,11 +185,11 @@ class SingleRelatedObjectDescriptor(object):
     def __set__(self, instance, value):
         if instance is None:
             raise AttributeError, "%s must be accessed via instance" % self.related.opts.object_name
-        
-        # The similarity of the code below to the code in 
+
+        # The similarity of the code below to the code in
         # ReverseSingleRelatedObjectDescriptor is annoying, but there's a bunch
         # of small differences that would make a common base class convoluted.
-        
+
         # If null=True, we can assign null here, but otherwise the value needs
         # to be an instance of the related class.
         if value is None and self.related.field.null == False:
@@ -197,14 +197,14 @@ class SingleRelatedObjectDescriptor(object):
                                 (instance._meta.object_name, self.related.get_accessor_name()))
         elif value is not None and not isinstance(value, self.related.model):
             raise ValueError('Cannot assign "%r": "%s.%s" must be a "%s" instance.' %
-                                (value, instance._meta.object_name, 
+                                (value, instance._meta.object_name,
                                  self.related.get_accessor_name(), self.related.opts.object_name))
-        
+
         # Set the value of the related field
         setattr(value, self.related.field.rel.get_related_field().attname, instance)
 
         # Since we already know what the related object is, seed the related
-        # object caches now, too. This avoids another db hit if you get the 
+        # object caches now, too. This avoids another db hit if you get the
         # object you just set.
         setattr(instance, self.cache_name, value)
         setattr(value, self.related.field.get_cache_name(), instance)
@@ -243,7 +243,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
     def __set__(self, instance, value):
         if instance is None:
             raise AttributeError, "%s must be accessed via instance" % self._field.name
-        
+
         # If null=True, we can assign null here, but otherwise the value needs
         # to be an instance of the related class.
         if value is None and self.field.null == False:
@@ -251,9 +251,9 @@ class ReverseSingleRelatedObjectDescriptor(object):
                                 (instance._meta.object_name, self.field.name))
         elif value is not None and not isinstance(value, self.field.rel.to):
             raise ValueError('Cannot assign "%r": "%s.%s" must be a "%s" instance.' %
-                                (value, instance._meta.object_name, 
+                                (value, instance._meta.object_name,
                                  self.field.name, self.field.rel.to._meta.object_name))
-        
+
         # Set the value of the related field
         try:
             val = getattr(value, self.field.rel.get_related_field().attname)
@@ -262,7 +262,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
         setattr(instance, self.field.attname, val)
 
         # Since we already know what the related object is, seed the related
-        # object cache now, too. This avoids another db hit if you get the 
+        # object cache now, too. This avoids another db hit if you get the
         # object you just set.
         setattr(instance, self.field.get_cache_name(), value)
 
@@ -322,7 +322,9 @@ class ForeignRelatedObjectsDescriptor(object):
                 clear.alters_data = True
 
         manager = RelatedManager()
-        manager.core_filters = {'%s__pk' % rel_field.name: getattr(instance, rel_field.rel.get_related_field().attname)}
+        attname = rel_field.rel.get_related_field().name
+        manager.core_filters = {'%s__%s' % (rel_field.name, attname):
+                getattr(instance, attname)}
         manager.model = self.related.model
 
         return manager

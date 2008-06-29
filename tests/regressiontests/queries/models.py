@@ -368,6 +368,10 @@ Bug #4510
 >>> Author.objects.filter(report__name='r1')
 [<Author: a1>]
 
+Bug #7378
+>>> a1.report_set.all()
+[<Report: r1>]
+
 Bug #5324, #6704
 >>> Item.objects.filter(tags__name='t4')
 [<Item: four>]
@@ -777,8 +781,8 @@ this doesn't crash, it's a Good Thing.
 >>> out = pickle.dumps(Item.objects.all())
 
 Bug #7277
->>> a1 = Annotation.objects.create(name='a1', tag=t1)
->>> a1.notes.add(n1)
+>>> ann1 = Annotation.objects.create(name='a1', tag=t1)
+>>> ann1.notes.add(n1)
 >>> n1.annotation_set.filter(Q(tag=t5) | Q(tag__children=t5) | Q(tag__children__children=t5))
 [<Annotation: a1>]
 
