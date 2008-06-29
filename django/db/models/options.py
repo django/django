@@ -44,6 +44,7 @@ class Options(object):
         self.one_to_one_field = None
         self.abstract = False
         self.parents = SortedDict()
+        self.duplicate_targets = {}
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
@@ -114,6 +115,24 @@ class Options(object):
                 auto = AutoField(verbose_name='ID', primary_key=True,
                         auto_created=True)
                 model.add_to_class('id', auto)
+
+        # Determine any sets of fields that are pointing to the same targets
+        # (e.g. two ForeignKeys to the same remote model). The query
+        # construction code needs to know this. At the end of this,
+        # self.duplicate_targets will map each duplicate field column to the
+        # columns it duplicates.
+        collections = {}
+        for column, target in self.duplicate_targets.iteritems():
+            try:
+                collections[target].add(column)
+            except KeyError:
+                collections[target] = set([column])
+        self.duplicate_targets = {}
+        for elt in collections.itervalues():
+            if len(elt) == 1:
+                continue
+            for column in elt:
+                self.duplicate_targets[column] = elt.difference(set([column]))
 
     def add_field(self, field):
         # Insert the given field in the order in which it was created, using

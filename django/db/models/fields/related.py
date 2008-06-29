@@ -692,6 +692,11 @@ class ForeignKey(RelatedField, Field):
     def contribute_to_class(self, cls, name):
         super(ForeignKey, self).contribute_to_class(cls, name)
         setattr(cls, self.name, ReverseSingleRelatedObjectDescriptor(self))
+        if isinstance(self.rel.to, basestring):
+            target = self.rel.to
+        else:
+            target = self.rel.to._meta.db_table
+        cls._meta.duplicate_targets[self.column] = (target, "o2m")
 
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
@@ -825,6 +830,12 @@ class ManyToManyField(RelatedField, Field):
 
         # Set up the accessor for the m2m table name for the relation
         self.m2m_db_table = curry(self._get_m2m_db_table, cls._meta)
+
+        if isinstance(self.rel.to, basestring):
+            target = self.rel.to
+        else:
+            target = self.rel.to._meta.db_table
+        cls._meta.duplicate_targets[self.column] = (target, "m2m")
 
     def contribute_to_related_class(self, cls, related):
         # m2m relations to self do not have a ManyRelatedObjectsDescriptor,
