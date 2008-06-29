@@ -25,7 +25,7 @@ DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'abstract')
 
 class Options(object):
-    def __init__(self, meta):
+    def __init__(self, meta, app_label=None):
         self.local_fields, self.local_many_to_many = [], []
         self.module_name, self.verbose_name = None, None
         self.verbose_name_plural = None
@@ -33,7 +33,7 @@ class Options(object):
         self.ordering = []
         self.unique_together =  []
         self.permissions =  []
-        self.object_name, self.app_label = None, None
+        self.object_name, self.app_label = None, app_label
         self.get_latest_by = None
         self.order_with_respect_to = None
         self.db_tablespace = settings.DEFAULT_TABLESPACE
@@ -46,6 +46,9 @@ class Options(object):
         self.parents = SortedDict()
 
     def contribute_to_class(self, cls, name):
+        from django.db import connection
+        from django.db.backends.util import truncate_name
+
         cls._meta = self
         self.installed = re.sub('\.models$', '', cls.__module__) in settings.INSTALLED_APPS
         # First, construct the default values for these options.
@@ -87,9 +90,13 @@ class Options(object):
             self.verbose_name_plural = string_concat(self.verbose_name, 's')
         del self.meta
 
+        # If the db_table wasn't provided, use the app_label + module_name.
+        if not self.db_table:
+            self.db_table = "%s_%s" % (self.app_label, self.module_name)
+            self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
+
+
     def _prepare(self, model):
-        from django.db import connection
-        from django.db.backends.util import truncate_name
         if self.order_with_respect_to:
             self.order_with_respect_to = self.get_field(self.order_with_respect_to)
             self.ordering = ('_order',)
@@ -107,11 +114,6 @@ class Options(object):
                 auto = AutoField(verbose_name='ID', primary_key=True,
                         auto_created=True)
                 model.add_to_class('id', auto)
-
-        # If the db_table wasn't provided, use the app_label + module_name.
-        if not self.db_table:
-            self.db_table = "%s_%s" % (self.app_label, self.module_name)
-            self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
 
     def add_field(self, field):
         # Insert the given field in the order in which it was created, using
