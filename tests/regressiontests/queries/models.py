@@ -172,6 +172,17 @@ class Child(models.Model):
     person = models.OneToOneField(Member, primary_key=True)
     parent = models.ForeignKey(Member, related_name="children")
 
+# Custom primary keys interfered with ordering in the past.
+class CustomPk(models.Model):
+    name = models.CharField(max_length=10, primary_key=True)
+    extra = models.CharField(max_length=10)
+
+    class Meta:
+        ordering = ['name', 'extra']
+
+class Related(models.Model):
+    custom = models.ForeignKey(CustomPk)
+
 
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag.objects.create(name='t1')
@@ -785,6 +796,10 @@ Bug #7277
 >>> ann1.notes.add(n1)
 >>> n1.annotation_set.filter(Q(tag=t5) | Q(tag__children=t5) | Q(tag__children__children=t5))
 [<Annotation: a1>]
+
+Bug #7371
+>>> Related.objects.order_by('custom')
+[]
 
 """}
 

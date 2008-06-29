@@ -626,6 +626,11 @@ class Query(object):
                 alias, False)
         alias = joins[-1]
         col = target.column
+        if not field.rel:
+            # To avoid inadvertent trimming of a necessary alias, use the
+            # refcount to show that we are referencing a non-relation field on
+            # the model.
+            self.ref_alias(alias)
 
         # Must use left outer joins for nullable fields.
         for join in joins:
