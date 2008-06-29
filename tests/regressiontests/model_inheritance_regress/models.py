@@ -131,4 +131,26 @@ __test__ = {'API_TESTS':"""
 >>> Child.objects.dates('created', 'month')
 [datetime.datetime(2008, 6, 1, 0, 0)]
 
+# Regression test for #7276: calling delete() on a model with multi-table
+# inheritance should delete the associated rows from any ancestor tables, as
+# well as any descendent objects.
+
+>>> ident = ItalianRestaurant.objects.all()[0].id
+>>> Place.objects.get(pk=ident)
+<Place: Guido's All New House of Pasta the place>
+>>> xx = Restaurant.objects.create(name='a', address='xx', serves_hot_dogs=True, serves_pizza=False)
+
+# This should delete both Restuarants, plus the related places, plus the ItalianRestaurant.
+>>> Restaurant.objects.all().delete()
+
+>>> Place.objects.get(pk=ident)
+Traceback (most recent call last):
+...
+DoesNotExist: Place matching query does not exist.
+
+>>> ItalianRestaurant.objects.get(pk=ident)
+Traceback (most recent call last):
+...
+DoesNotExist: ItalianRestaurant matching query does not exist.
+
 """}
