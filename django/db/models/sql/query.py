@@ -15,9 +15,10 @@ from django.utils.datastructures import SortedDict
 from django.dispatch import dispatcher
 from django.db import connection
 from django.db.models import signals
+from django.db.models.fields import FieldDoesNotExist
+from django.db.models.query_utils import select_related_descend
 from django.db.models.sql.where import WhereNode, EverythingNode, AND, OR
 from django.db.models.sql.datastructures import Count
-from django.db.models.fields import FieldDoesNotExist
 from django.core.exceptions import FieldError
 from datastructures import EmptyResultSet, Empty, MultiJoin
 from constants import *
@@ -915,8 +916,7 @@ class Query(object):
                 restricted = False
 
         for f, model in opts.get_fields_with_model():
-            if (not f.rel or (restricted and f.name not in requested) or
-                    (not restricted and f.null) or f.rel.parent_link):
+            if not select_related_descend(f, restricted, requested):
                 continue
             dupe_set = orig_dupe_set.copy()
             used = orig_used.copy()

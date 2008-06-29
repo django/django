@@ -3,7 +3,7 @@ import warnings
 from django.conf import settings
 from django.db import connection, transaction, IntegrityError
 from django.db.models.fields import DateField, FieldDoesNotExist
-from django.db.models.query_utils import Q
+from django.db.models.query_utils import Q, select_related_descend
 from django.db.models import signals, sql
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
@@ -761,8 +761,7 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
     index_end = index_start + len(klass._meta.fields)
     obj = klass(*row[index_start:index_end])
     for f in klass._meta.fields:
-        if (not f.rel or (not restricted and f.null) or
-                (restricted and f.name not in requested) or f.rel.parent_link):
+        if not select_related_descend(f, restricted, requested):
             continue
         if restricted:
             next = requested[f.name]
