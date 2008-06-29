@@ -442,28 +442,39 @@ class Query(object):
         self._select_aliases = aliases
         return result
 
-    def get_default_columns(self, with_aliases=False, col_aliases=None):
+    def get_default_columns(self, with_aliases=False, col_aliases=None,
+            start_alias=None, opts=None, as_pairs=False):
         """
         Computes the default columns for selecting every field in the base
         model.
 
         Returns a list of strings, quoted appropriately for use in SQL
-        directly, as well as a set of aliases used in the select statement.
+        directly, as well as a set of aliases used in the select statement (if
+        'as_pairs' is True, returns a list of (alias, col_name) pairs instead
+        of strings as the first component and None as the second component).
         """
         result = []
-        table_alias = self.tables[0]
-        root_pk = self.model._meta.pk.column
+        if opts is None:
+            opts = self.model._meta
+        if start_alias:
+            table_alias = start_alias
+        else:
+            table_alias = self.tables[0]
+        root_pk = opts.pk.column
         seen = {None: table_alias}
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         aliases = set()
-        for field, model in self.model._meta.get_fields_with_model():
+        for field, model in opts.get_fields_with_model():
             try:
                 alias = seen[model]
             except KeyError:
                 alias = self.join((table_alias, model._meta.db_table,
                         root_pk, model._meta.pk.column))
                 seen[model] = alias
+            if as_pairs:
+                result.append((alias, field.column))
+                continue
             if with_aliases and field.column in col_aliases:
                 c_alias = 'Col%d' % len(col_aliases)
                 result.append('%s.%s AS %s' % (qn(alias),
@@ -476,6 +487,8 @@ class Query(object):
                 aliases.add(r)
                 if with_aliases:
                     col_aliases.add(field.column)
+        if as_pairs:
+            return result, None
         return result, aliases
 
     def get_from_clause(self):
@@ -941,8 +954,8 @@ class Query(object):
                     f.rel.get_related_field().column), exclusions=used,
                     promote=promote)
             used.add(alias)
-            self.related_select_cols.extend([(alias, f2.column)
-                    for f2 in f.rel.to._meta.fields])
+            self.related_select_cols.extend(self.get_default_columns(
+                start_alias=alias, opts=f.rel.to._meta, as_pairs=True)[0])
             self.related_select_fields.extend(f.rel.to._meta.fields)
             if restricted:
                 next = requested.get(f.name, {})
