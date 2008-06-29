@@ -218,7 +218,7 @@ class Query(object):
         obj.select_related = False
         obj.related_select_cols = []
         obj.related_select_fields = []
-        if obj.distinct and len(obj.select) > 1:
+        if len(obj.select) > 1:
             obj = self.clone(CountQuery, _query=obj, where=self.where_class(),
                     distinct=False)
             obj.select = []
@@ -1484,6 +1484,8 @@ class Query(object):
             if not self.select:
                 select = Count()
             else:
+                assert len(self.select) == 1, \
+                        "Cannot add count col with multiple cols in 'select': %r" % self.select
                 select = Count(self.select[0])
         else:
             opts = self.model._meta
