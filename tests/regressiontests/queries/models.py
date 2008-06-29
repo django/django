@@ -10,7 +10,8 @@ from django.db.models.query import Q
 
 class Tag(models.Model):
     name = models.CharField(max_length=10)
-    parent = models.ForeignKey('self', blank=True, null=True)
+    parent = models.ForeignKey('self', blank=True, null=True,
+            related_name='children')
 
     def __unicode__(self):
         return self.name
@@ -24,6 +25,14 @@ class Note(models.Model):
 
     def __unicode__(self):
         return self.note
+
+class Annotation(models.Model):
+    name = models.CharField(max_length=10)
+    tag = models.ForeignKey(Tag)
+    notes = models.ManyToManyField(Note)
+
+    def __unicode__(self):
+        return self.name
 
 class ExtraInfo(models.Model):
     info = models.CharField(max_length=100)
@@ -236,12 +245,12 @@ will be rank3, rank2, rank1.
 >>> c2 = Cover(title="second", item=i2)
 >>> c2.save()
 
->>> n1 = Number(num=4)
->>> n1.save()
->>> n2 = Number(num=8)
->>> n2.save()
->>> n3 = Number(num=12)
->>> n3.save()
+>>> num1 = Number(num=4)
+>>> num1.save()
+>>> num2 = Number(num=8)
+>>> num2.save()
+>>> num3 = Number(num=12)
+>>> num3.save()
 
 Bug #1050
 >>> Item.objects.filter(tags__isnull=True)
@@ -795,6 +804,12 @@ Empty querysets can be merged with others.
 Bug #7204, #7506 -- make sure querysets with related fields can be pickled. If
 this doesn't crash, it's a Good Thing.
 >>> out = pickle.dumps(Item.objects.all())
+
+Bug #7277
+>>> a1 = Annotation.objects.create(name='a1', tag=t1)
+>>> a1.notes.add(n1)
+>>> n1.annotation_set.filter(Q(tag=t5) | Q(tag__children=t5) | Q(tag__children__children=t5))
+[<Annotation: a1>]
 
 """}
 
