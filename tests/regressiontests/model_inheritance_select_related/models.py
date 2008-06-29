@@ -39,7 +39,6 @@ Regression test for #7246
 >>> Person.objects.order_by('name').select_related()
 [<Person: Jane>, <Person: John>]
 
->>> Person.objects.order_by('name').select_related('favorite_restaurant').query.as_sql()
 >>> jane = Person.objects.order_by('name').select_related('favorite_restaurant')[0]
 >>> jane.favorite_restaurant.name
 u'Craft'
