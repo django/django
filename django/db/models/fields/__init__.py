@@ -1166,12 +1166,3 @@ class XMLField(TextField):
     def get_manipulator_field_objs(self):
         return [curry(oldforms.XMLLargeTextField, schema_path=self.schema_path)]
 
-class OrderingField(IntegerField):
-    empty_strings_allowed=False
-    def __init__(self, with_respect_to, **kwargs):
-        self.wrt = with_respect_to
-        kwargs['null'] = True
-        IntegerField.__init__(self, **kwargs )
-
-    def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
-        return [oldforms.HiddenField(name_prefix + self.name)]
