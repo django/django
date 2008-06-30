@@ -695,7 +695,7 @@ class DecimalField(Field):
                 _("This value must be a decimal number."))
 
     def _format(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, basestring) or value is None:
             return value
         else:
             return self.format_number(value)
@@ -716,8 +716,7 @@ class DecimalField(Field):
         return u"%.*f" % (self.decimal_places, value)
 
     def get_db_prep_save(self, value):
-        if value is not None:
-            value = self._format(value)
+        value = self._format(value)
         return super(DecimalField, self).get_db_prep_save(value)
 
     def get_db_prep_lookup(self, lookup_type, value):
