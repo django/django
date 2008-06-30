@@ -937,18 +937,24 @@ ValidationError: [u'This field is required.']
 >>> f.clean(True)
 True
 >>> f.clean(False)
-False
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 >>> f.clean(1)
 True
 >>> f.clean(0)
-False
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 >>> f.clean('Django rocks')
 True
 
 >>> f.clean('True')
 True
 >>> f.clean('False')
-False
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 
 >>> f = BooleanField(required=False)
 >>> f.clean('')

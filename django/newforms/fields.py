@@ -535,13 +535,17 @@ class BooleanField(Field):
 
     def clean(self, value):
         """Returns a Python boolean object."""
-        super(BooleanField, self).clean(value)
         # Explicitly check for the string 'False', which is what a hidden field
         # will submit for False. Because bool("True") == True, we don't need to
         # handle that explicitly.
         if value == 'False':
-            return False
-        return bool(value)
+            value = False
+        else:
+            value = bool(value)
+        super(BooleanField, self).clean(value)
+        if not value and self.required:
+            raise ValidationError(self.error_messages['required'])
+        return value
 
 class NullBooleanField(BooleanField):
     """
