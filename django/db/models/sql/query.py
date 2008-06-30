@@ -366,10 +366,21 @@ class Query(object):
                 item.relabel_aliases(change_map)
                 self.select.append(item)
         self.select_fields = rhs.select_fields[:]
-        self.extra_select = rhs.extra_select.copy()
-        self.extra_tables = rhs.extra_tables
-        self.extra_where = rhs.extra_where
-        self.extra_params = rhs.extra_params
+
+        if connector == OR:
+            # It would be nice to be able to handle this, but the queries don't
+            # really make sense (or return consistent value sets). Not worth
+            # the extra complexity when you can write a real query instead.
+            if self.extra_select and rhs.extra_select:
+                raise ValueError("When merging querysets using 'or', you "
+                        "cannot have extra(select=...) on both sides.")
+            if self.extra_where and rhs.extra_where:
+                raise ValueError("When merging querysets using 'or', you "
+                        "cannot have extra(where=...) on both sides.")
+        self.extra_select.update(rhs.extra_select)
+        self.extra_tables += rhs.extra_tables
+        self.extra_where += rhs.extra_where
+        self.extra_params += rhs.extra_params
 
         # Ordering uses the 'rhs' ordering, unless it has none, in which case
         # the current ordering is used.
