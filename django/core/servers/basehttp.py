@@ -551,6 +551,9 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         from django.conf import settings
         self.admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
+        # We set self.path to avoid crashes in log_message() on unsupported
+        # requests (like "OPTIONS").
+        self.path = ''
         BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
 
     def get_environ(self):
