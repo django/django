@@ -296,3 +296,8 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None):
     kwargs = kwargs or {}
     return iri_to_uri(u'/' + get_resolver(urlconf).reverse(viewname, *args, **kwargs))
 
+def clear_url_caches():
+    global _resolver_cache
+    global _callable_cache
+    _resolver_cache.clear()
+    _callable_cache.clear()
