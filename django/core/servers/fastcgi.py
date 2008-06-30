@@ -40,6 +40,7 @@ Optional Fcgi settings: (setting=value)
   workdir=DIRECTORY    change to this directory when daemonizing.
   outlog=FILE          write stdout to this file.
   errlog=FILE          write stderr to this file.
+  umask=UMASK          umask to use when daemonizing (default 022).
 
 Examples:
   Run a "standard" fastcgi process on a file-descriptor
@@ -73,6 +74,7 @@ FASTCGI_OPTIONS = {
     'maxrequests': 0,
     'outlog': None,
     'errlog': None,
+    'umask': None,
 }
 
 def fastcgi_help(message=None):
@@ -159,6 +161,8 @@ def runfastcgi(argset=[], **kwargs):
         daemon_kwargs['out_log'] = options['outlog']
     if options['errlog']:
         daemon_kwargs['err_log'] = options['errlog']
+    if options['umask']:
+        daemon_kwargs['umask'] = int(options['umask'])
 
     if daemonize:
         from django.utils.daemonize import become_daemon
