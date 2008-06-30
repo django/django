@@ -135,7 +135,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     features = DatabaseFeatures()
     ops = DatabaseOperations()
     operators = {
-        'exact': '= %s',
+        'exact': '= BINARY %s',
         'iexact': 'LIKE %s',
         'contains': 'LIKE BINARY %s',
         'icontains': 'LIKE %s',
