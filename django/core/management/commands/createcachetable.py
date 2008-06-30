@@ -21,10 +21,10 @@ class Command(LabelCommand):
         for f in fields:
             field_output = [qn(f.name), f.db_type()]
             field_output.append("%sNULL" % (not f.null and "NOT " or ""))
-            if f.unique:
-                field_output.append("UNIQUE")
             if f.primary_key:
                 field_output.append("PRIMARY KEY")
+            elif f.unique:
+                field_output.append("UNIQUE")
             if f.db_index:
                 unique = f.unique and "UNIQUE " or ""
                 index_output.append("CREATE %sINDEX %s_%s ON %s (%s);" % \

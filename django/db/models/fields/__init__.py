@@ -91,7 +91,7 @@ class Field(object):
         self.name = name
         self.verbose_name = verbose_name
         self.primary_key = primary_key
-        self.max_length, self.unique = max_length, unique
+        self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null
         # Oracle treats the empty string ('') as null, so coerce the null
         # option whenever '' is a possible value.
@@ -167,6 +167,10 @@ class Field(object):
             return get_creation_module().DATA_TYPES[self.get_internal_type()] % data
         except KeyError:
             return None
+
+    def unique(self):
+        return self._unique or self.primary_key
+    unique = property(unique)
 
     def validate_full(self, field_data, all_data):
         """

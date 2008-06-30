@@ -268,11 +268,11 @@ def sql_model_create(model, style, known_models=set()):
         field_output = [style.SQL_FIELD(qn(f.column)),
             style.SQL_COLTYPE(col_type)]
         field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
-        if f.unique and (not f.primary_key or connection.features.allows_unique_and_pk):
-            field_output.append(style.SQL_KEYWORD('UNIQUE'))
         if f.primary_key:
             field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
-        if tablespace and connection.features.supports_tablespaces and (f.unique or f.primary_key) and connection.features.autoindexes_primary_keys:
+        elif f.unique:
+            field_output.append(style.SQL_KEYWORD('UNIQUE'))
+        if tablespace and connection.features.supports_tablespaces and f.unique:
             # We must specify the index tablespace inline, because we
             # won't be generating a CREATE INDEX statement for this field.
             field_output.append(connection.ops.tablespace_sql(tablespace, inline=True))
@@ -355,7 +355,7 @@ def many_to_many_sql_for_model(model, style):
     for f in opts.local_many_to_many:
         if not isinstance(f.rel, generic.GenericRel):
             tablespace = f.db_tablespace or opts.db_tablespace
-            if tablespace and connection.features.supports_tablespaces and connection.features.autoindexes_primary_keys:
+            if tablespace and connection.features.supports_tablespaces: 
                 tablespace_sql = ' ' + connection.ops.tablespace_sql(tablespace, inline=True)
             else:
                 tablespace_sql = ''
@@ -460,15 +460,14 @@ def sql_indexes_for_model(model, style):
 
     qn = connection.ops.quote_name
     for f in model._meta.local_fields:
-        if f.db_index and not ((f.primary_key or f.unique) and connection.features.autoindexes_primary_keys):
-            unique = f.unique and 'UNIQUE ' or ''
+        if f.db_index and not f.unique:
             tablespace = f.db_tablespace or model._meta.db_tablespace
             if tablespace and connection.features.supports_tablespaces:
                 tablespace_sql = ' ' + connection.ops.tablespace_sql(tablespace)
             else:
                 tablespace_sql = ''
             output.append(
-                style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
+                style.SQL_KEYWORD('CREATE INDEX') + ' ' + \
                 style.SQL_TABLE(qn('%s_%s' % (model._meta.db_table, f.column))) + ' ' + \
                 style.SQL_KEYWORD('ON') + ' ' + \
                 style.SQL_TABLE(qn(model._meta.db_table)) + ' ' + \

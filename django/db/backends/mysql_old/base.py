@@ -64,7 +64,6 @@ class MysqlDebugWrapper:
             return getattr(self.cursor, attr)
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    autoindexes_primary_keys = False
     inline_fk_references = False
     empty_fetchmany_value = ()
     update_can_self_select = False
