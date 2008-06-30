@@ -318,3 +318,22 @@ class ExceptionTests(TestCase):
             self.client.get("/test_client_regress/staff_only/")
         except SuspiciousOperation:
             self.fail("Staff should be able to visit this page")
+
+# We need two different tests to check URLconf subsitution -  one to check
+# it was changed, and another one (without self.urls) to check it was reverted on
+# teardown. This pair of tests relies upon the alphabetical ordering of test execution.
+class UrlconfSubstitutionTests(TestCase):
+    urls = 'regressiontests.test_client_regress.urls'
+
+    def test_urlconf_was_changed(self):
+        "TestCase can enforce a custom URLConf on a per-test basis"
+        url = reverse('arg_view', args=['somename'])
+        self.assertEquals(url, '/arg_view/somename/')
+
+# This test needs to run *after* UrlconfSubstitutionTests; the zz prefix in the
+# name is to ensure alphabetical ordering.
+class zzUrlconfSubstitutionTests(TestCase):
+    def test_urlconf_was_reverted(self):
+        "URLconf is reverted to original value after modification in a TestCase"
+        url = reverse('arg_view', args=['somename'])
+        self.assertEquals(url, '/test_client_regress/arg_view/somename/')

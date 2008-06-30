@@ -96,8 +96,7 @@ class Group(models.Model):
     class Meta:
         verbose_name = _('group')
         verbose_name_plural = _('groups')
-        ordering = ('name',)
-
+        
     def __unicode__(self):
         return self.name
 
@@ -150,8 +149,7 @@ class User(models.Model):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-        ordering = ('username',)
-
+        
     def __unicode__(self):
         return self.username
 

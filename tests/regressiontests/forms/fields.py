@@ -887,7 +887,7 @@ u'http://www.google.com'
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
->>> f.clean('http://www.jfoiwjfoi23jfoijoaijfoiwjofiwjefewl.com') # bad domain
+>>> f.clean('http://www.broken.djangoproject.com') # bad domain
 Traceback (most recent call last):
 ...
 ValidationError: [u'This URL appears to be a broken link.']
@@ -937,18 +937,24 @@ ValidationError: [u'This field is required.']
 >>> f.clean(True)
 True
 >>> f.clean(False)
-False
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 >>> f.clean(1)
 True
 >>> f.clean(0)
-False
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 >>> f.clean('Django rocks')
 True
 
 >>> f.clean('True')
 True
 >>> f.clean('False')
-False
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 
 >>> f = BooleanField(required=False)
 >>> f.clean('')

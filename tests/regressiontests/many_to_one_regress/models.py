@@ -28,6 +28,24 @@ class Child(models.Model):
     parent = models.ForeignKey(Parent)
 
 
+# Multiple paths to the same model (#7110, #7125)
+class Category(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __unicode__(self):
+        return self.name
+
+class Record(models.Model):
+    category = models.ForeignKey(Category)
+
+class Relation(models.Model):
+    left = models.ForeignKey(Record, related_name='left_set')
+    right = models.ForeignKey(Record, related_name='right_set')
+
+    def __unicode__(self):
+        return u"%s - %s" % (self.left.category.name, self.right.category.name)
+
+
 __test__ = {'API_TESTS':"""
 >>> Third.objects.create(id='3', name='An example')
 <Third: Third object>
@@ -72,5 +90,27 @@ ValueError: Cannot assign None: "Child.parent" does not allow null values.
 Traceback (most recent call last):
     ...
 ValueError: Cannot assign "<First: First object>": "Child.parent" must be a "Parent" instance.
+
+# Test of multiple ForeignKeys to the same model (bug #7125)
+
+>>> c1 = Category.objects.create(name='First')
+>>> c2 = Category.objects.create(name='Second')
+>>> c3 = Category.objects.create(name='Third')
+>>> r1 = Record.objects.create(category=c1)
+>>> r2 = Record.objects.create(category=c1)
+>>> r3 = Record.objects.create(category=c2)
+>>> r4 = Record.objects.create(category=c2)
+>>> r5 = Record.objects.create(category=c3)
+>>> r = Relation.objects.create(left=r1, right=r2)
+>>> r = Relation.objects.create(left=r3, right=r4)
+>>> r = Relation.objects.create(left=r1, right=r3)
+>>> r = Relation.objects.create(left=r5, right=r2)
+>>> r = Relation.objects.create(left=r3, right=r2)
+
+>>> Relation.objects.filter(left__category__name__in=['First'], right__category__name__in=['Second'])
+[<Relation: First - Second>]
+
+>>> Category.objects.filter(record__left_set__right__category__name='Second').order_by('name')
+[<Category: First>, <Category: Second>]
 
 """}

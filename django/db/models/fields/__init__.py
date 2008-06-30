@@ -85,7 +85,7 @@ class Field(object):
         self.name = name
         self.verbose_name = verbose_name
         self.primary_key = primary_key
-        self.max_length, self.unique = max_length, unique
+        self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null
         # Oracle treats the empty string ('') as null, so coerce the null
         # option whenever '' is a possible value.
@@ -159,6 +159,10 @@ class Field(object):
             return get_creation_module().DATA_TYPES[self.get_internal_type()] % data
         except KeyError:
             return None
+
+    def unique(self):
+        return self._unique or self.primary_key
+    unique = property(unique)
 
     def validate_full(self, field_data, all_data):
         """
@@ -676,7 +680,7 @@ class DecimalField(Field):
                 _("This value must be a decimal number."))
 
     def _format(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, basestring) or value is None:
             return value
         else:
             return self.format_number(value)
@@ -697,8 +701,7 @@ class DecimalField(Field):
         return u"%.*f" % (self.decimal_places, value)
 
     def get_db_prep_save(self, value):
-        if value is not None:
-            value = self._format(value)
+        value = self._format(value)
         return super(DecimalField, self).get_db_prep_save(value)
 
     def get_db_prep_lookup(self, lookup_type, value):
@@ -1151,12 +1154,3 @@ class XMLField(TextField):
     def get_manipulator_field_objs(self):
         return [curry(oldforms.XMLLargeTextField, schema_path=self.schema_path)]
 
-class OrderingField(IntegerField):
-    empty_strings_allowed=False
-    def __init__(self, with_respect_to, **kwargs):
-        self.wrt = with_respect_to
-        kwargs['null'] = True
-        IntegerField.__init__(self, **kwargs )
-
-    def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
-        return [oldforms.HiddenField(name_prefix + self.name)]

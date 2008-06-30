@@ -24,7 +24,6 @@ IntegrityError = Database.IntegrityError
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     allows_group_by_ordinal = False
-    allows_unique_and_pk = False        # Suppress UNIQUE/PK for Oracle (ORA-02259)
     empty_fetchmany_value = ()
     needs_datetime_string_cast = False
     supports_tablespaces = True

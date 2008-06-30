@@ -41,8 +41,6 @@ class BaseDatabaseWrapper(local):
 
 class BaseDatabaseFeatures(object):
     allows_group_by_ordinal = True
-    allows_unique_and_pk = True
-    autoindexes_primary_keys = True
     inline_fk_references = True
     needs_datetime_string_cast = True
     supports_constraints = True
