@@ -19,14 +19,14 @@ class ConditionalGetMiddleware(object):
                 # Setting the status is enough here. The response handling path
                 # automatically removes content for this status code (in
                 # http.conditional_content_removal()).
-                response.status = 304
+                response.status_code = 304
 
         if response.has_header('Last-Modified'):
             if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE', None)
             if if_modified_since == response['Last-Modified']:
                 # Setting the status code is enough here (same reasons as
                 # above).
-                response.status = 304
+                response.status_code = 304
 
         return response
 
