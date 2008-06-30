@@ -6,6 +6,7 @@ from django.db.models.query import QuerySet
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext
 from django.utils.safestring import mark_safe
+from django.utils.http import urlencode
 import operator
 
 try:
@@ -100,11 +101,12 @@ class ChangeList(object):
                 if k.startswith(r):
                     del p[k]
         for k, v in new_params.items():
-            if k in p and v is None:
-                del p[k]
-            elif v is not None:
+            if v is None:
+                if k in p:
+                    del p[k]
+            else:
                 p[k] = v
-        return mark_safe('?' + '&amp;'.join([u'%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20'))
+        return '?%s' % urlencode(p)
 
     def get_results(self, request):
         paginator = QuerySetPaginator(self.query_set, self.list_per_page)
