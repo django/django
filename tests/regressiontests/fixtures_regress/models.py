@@ -20,7 +20,7 @@ class Plant(models.Model):
 class Stuff(models.Model):
     name = models.CharField(max_length=20, null=True)
     owner = models.ForeignKey(User, null=True)
-    
+
     def __unicode__(self):
         # Oracle doesn't distinguish between None and the empty string.
         # This hack makes the test case pass using Oracle.
@@ -38,13 +38,19 @@ class Absolute(models.Model):
         super(Absolute, self).__init__(*args, **kwargs)
         Absolute.load_count += 1
 
+class Parent(models.Model):
+    name = models.CharField(max_length=10)
+
+class Child(Parent):
+    data = models.CharField(max_length=10)
+
 
 __test__ = {'API_TESTS':"""
 >>> from django.core import management
 
 # Load a fixture that uses PK=1
 >>> management.call_command('loaddata', 'sequence', verbosity=0)
-        
+
 # Create a new animal. Without a sequence reset, this new object
 # will take a PK of 1 (on Postgres), and the save will fail.
 # This is a regression test for ticket #3790.
@@ -61,9 +67,9 @@ __test__ = {'API_TESTS':"""
 [<Stuff: None is owned by None>]
 
 ###############################################
-# Regression test for ticket #6436 -- 
+# Regression test for ticket #6436 --
 # os.path.join will throw away the initial parts of a path if it encounters
-# an absolute path. This means that if a fixture is specified as an absolute path, 
+# an absolute path. This means that if a fixture is specified as an absolute path,
 # we need to make sure we don't discover the absolute path in every fixture directory.
 
 >>> load_absolute_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'absolute.json')
@@ -93,5 +99,12 @@ No fixture data found for 'bad_fixture2'. (File format may be invalid.)
 No fixture data found for 'bad_fixture2'. (File format may be invalid.)
 
 >>> sys.stderr = savestderr
+
+###############################################
+# Test for ticket #7565 -- PostgreSQL sequence resetting checks shouldn't
+# ascend to parent models when inheritance is used (since they are treated
+# individually).
+
+>>> management.call_command('loaddata', 'model-inheritance.json', verbosity=0)
 
 """}
