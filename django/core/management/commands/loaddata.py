@@ -162,3 +162,9 @@ class Command(BaseCommand):
         else:
             if verbosity > 0:
                 print "Installed %d object(s) from %d fixture(s)" % (object_count, fixture_count)
+                
+        # Close the DB connection. This is required as a workaround for an
+        # edge case in MySQL: if the same connection is used to
+        # create tables, load data, and query, the query can return
+        # incorrect results. See Django #7572, MySQL #37735.
+        connection.close()

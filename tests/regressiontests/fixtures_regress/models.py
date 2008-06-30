@@ -44,6 +44,16 @@ class Parent(models.Model):
 class Child(Parent):
     data = models.CharField(max_length=10)
 
+# Models to regresison check #7572
+class Channel(models.Model):
+    name = models.CharField(max_length=255)
+
+class Article(models.Model):
+    title = models.CharField(max_length=255)
+    channels = models.ManyToManyField(Channel)
+    
+    class Meta:
+        ordering = ('id',)
 
 __test__ = {'API_TESTS':"""
 >>> from django.core import management
@@ -106,5 +116,22 @@ No fixture data found for 'bad_fixture2'. (File format may be invalid.)
 # individually).
 
 >>> management.call_command('loaddata', 'model-inheritance.json', verbosity=0)
+
+###############################################
+# Test for ticket #7572 -- MySQL has a problem if the same connection is 
+# used to create tables, load data, and then query over that data.
+# To compensate, we close the connection after running loaddata.
+# This ensures that a new connection is opened when test queries are issued.
+
+>>> management.call_command('loaddata', 'big-fixture.json', verbosity=0)
+
+>>> articles = Article.objects.exclude(id=9)
+>>> articles.values_list('id', flat=True)
+[1, 2, 3, 4, 5, 6, 7, 8]
+
+# Just for good measure, run the same query again. Under the influence of
+# ticket #7572, this will give a different result to the previous call.
+>>> articles.values_list('id', flat=True)
+[1, 2, 3, 4, 5, 6, 7, 8]
 
 """}
