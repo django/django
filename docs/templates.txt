@@ -477,11 +477,11 @@ escaped when the template is written.
 
 This means you would write ::
 
-    {{ data|default:"3 &gt; 2" }}
+    {{ data|default:"3 &lt; 2" }}
 
 ...rather than ::
 
-    {{ data|default:"3 > 2" }}  <-- Bad! Don't do this.
+    {{ data|default:"3 < 2" }}  <-- Bad! Don't do this.
 
 This doesn't affect what happens to data coming from the variable itself.
 The variable's contents are still automatically escaped, if necessary, because

@@ -1,7 +1,10 @@
 import urllib
 import sys
 import os
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.core.handlers.base import BaseHandler
@@ -18,6 +21,25 @@ from django.utils.itercompat import is_iterable
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
+
+class FakePayload(object):
+    """
+    A wrapper around StringIO that restricts what can be read since data from
+    the network can't be seeked and cannot be read outside of its content
+    length. This makes sure that views can't do anything under the test client
+    that wouldn't work in Real Life.
+    """
+    def __init__(self, content):
+        self.__content = StringIO(content)
+        self.__len = len(content)
+
+    def read(self, num_bytes=None):
+        if num_bytes is None:
+            num_bytes = self.__len or 1
+        assert self.__len >= num_bytes, "Cannot read more than the available bytes from the HTTP incoming data."
+        content = self.__content.read(num_bytes)
+        self.__len -= num_bytes
+        return content
 
 class ClientHandler(BaseHandler):
     """
@@ -236,7 +258,7 @@ class Client:
             'CONTENT_TYPE':   content_type,
             'PATH_INFO':      urllib.unquote(path),
             'REQUEST_METHOD': 'POST',
-            'wsgi.input':     StringIO(post_data),
+            'wsgi.input':     FakePayload(post_data),
         }
         r.update(extra)
 

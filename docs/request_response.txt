@@ -80,19 +80,36 @@ All attributes except ``session`` should be considered read-only.
     strings.
 
 ``FILES``
+    
+    .. admonition:: Changed in Django development version
+        
+        In previous versions of Django, ``request.FILES`` contained
+        simple ``dict`` objects representing uploaded files. This is
+        no longer true -- files are represented by ``UploadedFile``
+        objects as described below.
+        
+        These ``UploadedFile`` objects will emulate the old-style ``dict``
+        interface, but this is deprecated and will be removed in the next
+        release of Django.
+        
     A dictionary-like object containing all uploaded files. Each key in
     ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
-    value in ``FILES`` is a standard Python dictionary with the following three
-    keys:
+    value in ``FILES`` is an ``UploadedFile`` object containing the following
+    attributes:
 
-        * ``filename`` -- The name of the uploaded file, as a Python string.
-        * ``content-type`` -- The content type of the uploaded file.
-        * ``content`` -- The raw content of the uploaded file.
+        * ``read(num_bytes=None)`` -- Read a number of bytes from the file.
+        * ``file_name`` -- The name of the uploaded file.
+        * ``file_size`` -- The size, in bytes, of the uploaded file.
+        * ``chunk()`` -- A generator that yields sequential chunks of data.
 
+    See `File Uploads`_ for more information. 
+    
     Note that ``FILES`` will only contain data if the request method was POST
     and the ``<form>`` that posted to the request had
     ``enctype="multipart/form-data"``. Otherwise, ``FILES`` will be a blank
     dictionary-like object.
+    
+    .. _File Uploads: ../upload_handling/
 
 ``META``
     A standard Python dictionary containing all available HTTP headers.

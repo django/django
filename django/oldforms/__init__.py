@@ -680,17 +680,26 @@ class FileUploadField(FormField):
         self.field_name, self.is_required = field_name, is_required
         self.validator_list = [self.isNonEmptyFile] + validator_list
 
-    def isNonEmptyFile(self, field_data, all_data):
+    def isNonEmptyFile(self, new_data, all_data):
+        if hasattr(new_data, 'upload_errors'):
+            upload_errors = new_data.upload_errors()
+            if upload_errors:
+                raise validators.CriticalValidationError, upload_errors
         try:
-            content = field_data['content']
-        except TypeError:
-            raise validators.CriticalValidationError, ugettext("No file was submitted. Check the encoding type on the form.")
-        if not content:
+            file_size = new_data.file_size
+        except AttributeError:
+            file_size = len(new_data['content'])
+        if not file_size:
             raise validators.CriticalValidationError, ugettext("The submitted file is empty.")
 
     def render(self, data):
         return mark_safe(u'<input type="file" id="%s" class="v%s" name="%s" />' % \
             (self.get_id(), self.__class__.__name__, self.field_name))
+
+    def prepare(self, new_data):
+        if hasattr(new_data, 'upload_errors'):
+            upload_errors = new_data.upload_errors()
+            new_data[self.field_name] = { '_file_upload_error': upload_errors }
 
     def html2python(data):
         if data is None:

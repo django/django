@@ -1131,7 +1131,7 @@ class Query(object):
                             entry.negate()
                             self.where.add(entry, AND)
                             break
-                elif not (lookup_type == 'in' and not value):
+                elif not (lookup_type == 'in' and not value) and field.null:
                     # Leaky abstraction artifact: We have to specifically
                     # exclude the "foo__in=[]" case from this handling, because
                     # it's short-circuited in the Where class.

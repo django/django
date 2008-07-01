@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 tests = r"""
 >>> from django.newforms import *
+>>> from django.core.files.uploadedfile import SimpleUploadedFile
 
 # CharField ###################################################################
 
@@ -214,11 +215,11 @@ ValidationError: [u'REQUIRED']
 Traceback (most recent call last):
 ...
 ValidationError: [u'INVALID']
->>> f.clean({})
+>>> f.clean(SimpleUploadedFile('name', None))
 Traceback (most recent call last):
 ...
-ValidationError: [u'MISSING']
->>> f.clean({'filename': 'name', 'content':''})
+ValidationError: [u'EMPTY FILE']
+>>> f.clean(SimpleUploadedFile('name', ''))
 Traceback (most recent call last):
 ...
 ValidationError: [u'EMPTY FILE']
