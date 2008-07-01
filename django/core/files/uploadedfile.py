@@ -139,8 +139,8 @@ class InMemoryUploadedFile(UploadedFile):
     """
     A file uploaded into memory (i.e. stream-to-memory).
     """
-    def __init__(self, file, field_name, file_name, content_type, charset, file_size):
-        super(InMemoryUploadedFile, self).__init__(file_name, content_type, charset, file_size)
+    def __init__(self, file, field_name, file_name, content_type, file_size, charset):
+        super(InMemoryUploadedFile, self).__init__(file_name, content_type, file_size, charset)
         self.file = file
         self.field_name = field_name
         self.file.seek(0)
