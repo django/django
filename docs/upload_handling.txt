@@ -7,7 +7,7 @@ File Uploads
 Most Web sites wouldn't be complete without a way to upload files. When Django
 handles a file upload, the file data ends up placed in ``request.FILES`` (for
 more on the ``request`` object see the documentation for `request and response
-objects`_). This document explains how files are stored on disk an in memory,
+objects`_). This document explains how files are stored on disk and in memory,
 and how to customize the default behavior.
 
 .. _request and response objects: ../request_response/#attributes
