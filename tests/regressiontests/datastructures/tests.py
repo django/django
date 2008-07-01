@@ -117,14 +117,25 @@ Init from sequence of tuples
 >>> d['person']['2']['firstname']
 ['Adrian']
 
-### FileDict ################################################################
-
->>> d = FileDict({'content': 'once upon a time...'})
+### ImmutableList ################################################################
+>>> d = ImmutableList(range(10))
+>>> d.sort()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/var/lib/python-support/python2.5/django/utils/datastructures.py", line 359, in complain
+    raise AttributeError, self.warning
+AttributeError: ImmutableList object is immutable.
 >>> repr(d)
-"{'content': '<omitted>'}"
->>> d = FileDict({'other-key': 'once upon a time...'})
->>> repr(d)
-"{'other-key': 'once upon a time...'}"
+'(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)'
+>>> d = ImmutableList(range(10), warning="Object is immutable!")
+>>> d[1]
+1
+>>> d[1] = 'test'
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/var/lib/python-support/python2.5/django/utils/datastructures.py", line 359, in complain
+    raise AttributeError, self.warning
+AttributeError: Object is immutable!
 
 ### DictWrapper #############################################################
 

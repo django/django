@@ -231,6 +231,21 @@ MEDIA_ROOT = ''
 # Example: "http://media.lawrence.com"
 MEDIA_URL = ''
 
+# List of upload handler classes to be applied in order.
+FILE_UPLOAD_HANDLERS = (
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+)
+
+# Maximum size, in bytes, of a request before it will be streamed to the
+# file system instead of into memory.
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440 # i.e. 2.5 MB
+
+# Directory in which upload streamed files will be temporarily saved. A value of
+# `None` will make Django use the operating system's default temporary directory
+# (i.e. "/tmp" on *nix systems).
+FILE_UPLOAD_TEMP_DIR = None
+
 # Default formatting for date objects. See all available format strings here:
 # http://www.djangoproject.com/documentation/templates/#now
 DATE_FORMAT = 'N j, Y'

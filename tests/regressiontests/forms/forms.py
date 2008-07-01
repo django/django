@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 tests = r"""
 >>> from django.newforms import *
+>>> from django.core.files.uploadedfile import SimpleUploadedFile
 >>> import datetime
 >>> import time
 >>> import re
@@ -1465,7 +1466,7 @@ not request.POST.
 >>> print f
 <tr><th>File1:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="file" name="file1" /></td></tr>
 
->>> f = FileForm(data={}, files={'file1': {'filename': 'name', 'content':''}}, auto_id=False)
+>>> f = FileForm(data={}, files={'file1': SimpleUploadedFile('name', '')}, auto_id=False)
 >>> print f
 <tr><th>File1:</th><td><ul class="errorlist"><li>The submitted file is empty.</li></ul><input type="file" name="file1" /></td></tr>
 
@@ -1473,7 +1474,7 @@ not request.POST.
 >>> print f
 <tr><th>File1:</th><td><ul class="errorlist"><li>No file was submitted. Check the encoding type on the form.</li></ul><input type="file" name="file1" /></td></tr>
 
->>> f = FileForm(data={}, files={'file1': {'filename': 'name', 'content':'some content'}}, auto_id=False)
+>>> f = FileForm(data={}, files={'file1': SimpleUploadedFile('name', 'some content')}, auto_id=False)
 >>> print f
 <tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>
 >>> f.is_valid()

@@ -19,6 +19,8 @@ from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
+from django.core.files.move import file_move_safe
+from django.core.files import locks
 from django.conf import settings
 
 try:
@@ -469,16 +471,51 @@ class Model(object):
     def _get_FIELD_size(self, field):
         return os.path.getsize(self._get_FIELD_filename(field))
 
-    def _save_FIELD_file(self, field, filename, raw_contents, save=True):
+    def _save_FIELD_file(self, field, filename, raw_field, save=True):
         directory = field.get_directory_name()
         try: # Create the date-based directory if it doesn't exist.
             os.makedirs(os.path.join(settings.MEDIA_ROOT, directory))
         except OSError: # Directory probably already exists.
             pass
+
+        #
+        # Check for old-style usage (files-as-dictionaries). Warn here first
+        # since there are multiple locations where we need to support both new
+        # and old usage.
+        #
+        if isinstance(raw_field, dict):
+            import warnings
+            warnings.warn(
+                message = "Representing uploaded files as dictionaries is"\
+                          " deprected. Use django.core.files.SimpleUploadedFile"\
+                          " instead.",
+                category = DeprecationWarning,
+                stacklevel = 2
+            )
+            from django.core.files.uploadedfile import SimpleUploadedFile
+            raw_field = SimpleUploadedFile.from_dict(raw_field)
+
+        elif isinstance(raw_field, basestring):
+            import warnings
+            warnings.warn(
+                message = "Representing uploaded files as strings is "\
+                          " deprecated. Use django.core.files.SimpleUploadedFile "\
+                          " instead.",
+                category = DeprecationWarning,
+                stacklevel = 2
+            )
+            from django.core.files.uploadedfile import SimpleUploadedFile
+            raw_field = SimpleUploadedFile(filename, raw_field)
+
+        if filename is None:
+            filename = raw_field.file_name
+
         filename = field.get_filename(filename)
 
+        #
         # If the filename already exists, keep adding an underscore to the name of
         # the file until the filename doesn't exist.
+        #
         while os.path.exists(os.path.join(settings.MEDIA_ROOT, filename)):
             try:
                 dot_index = filename.rindex('.')
@@ -486,14 +523,27 @@ class Model(object):
                 filename += '_'
             else:
                 filename = filename[:dot_index] + '_' + filename[dot_index:]
+        #
+        # Save the file name on the object and write the file to disk
+        #
 
-        # Write the file to disk.
         setattr(self, field.attname, filename)
 
         full_filename = self._get_FIELD_filename(field)
-        fp = open(full_filename, 'wb')
-        fp.write(raw_contents)
-        fp.close()
+
+        if hasattr(raw_field, 'temporary_file_path'):
+            # This file has a file path that we can move.
+            raw_field.close()
+            file_move_safe(raw_field.temporary_file_path(), full_filename)
+
+        else:
+            # This is a normal uploadedfile that we can stream.
+            fp = open(full_filename, 'wb')
+            locks.lock(fp, locks.LOCK_EX)
+            for chunk in raw_field.chunk():
+                fp.write(chunk)
+            locks.unlock(fp)
+            fp.close()
 
         # Save the width and/or height, if applicable.
         if isinstance(field, ImageField) and (field.width_field or field.height_field):

@@ -7,6 +7,11 @@ import datetime
 import os
 import re
 import time
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
 # Python 2.3 fallbacks
 try:
     from decimal import Decimal, DecimalException
@@ -416,9 +421,9 @@ except ImportError:
 
 class UploadedFile(StrAndUnicode):
     "A wrapper for files uploaded in a FileField"
-    def __init__(self, filename, content):
+    def __init__(self, filename, data):
         self.filename = filename
-        self.content = content
+        self.data = data
 
     def __unicode__(self):
         """
@@ -444,15 +449,34 @@ class FileField(Field):
             return None
         elif not data and initial:
             return initial
+
+        if isinstance(data, dict):
+            # We warn once, then support both ways below.
+            import warnings
+            warnings.warn(
+                message = "Representing uploaded files as dictionaries is"\
+                          " deprecated. Use django.core.files.SimpleUploadedFile "\
+                          " instead.",
+                category = DeprecationWarning,
+                stacklevel = 2
+            )
+
         try:
-            f = UploadedFile(data['filename'], data['content'])
-        except TypeError:
+            file_name = data.file_name
+            file_size = data.file_size
+        except AttributeError:
+            try:
+                file_name = data.get('filename')
+                file_size = bool(data['content'])
+            except (AttributeError, KeyError):
+                raise ValidationError(self.error_messages['invalid'])
+
+        if not file_name:
             raise ValidationError(self.error_messages['invalid'])
-        except KeyError:
-            raise ValidationError(self.error_messages['missing'])
-        if not f.content:
+        if not file_size:
             raise ValidationError(self.error_messages['empty'])
-        return f
+
+        return UploadedFile(file_name, data)
 
 class ImageField(FileField):
     default_error_messages = {
@@ -470,15 +494,31 @@ class ImageField(FileField):
         elif not data and initial:
             return initial
         from PIL import Image
-        from cStringIO import StringIO
+
+        # We need to get a file object for PIL. We might have a path or we might
+        # have to read the data into memory.
+        if hasattr(data, 'temporary_file_path'):
+            file = data.temporary_file_path()
+        else:
+            if hasattr(data, 'read'):
+                file = StringIO(data.read())
+            else:
+                file = StringIO(data['content'])
+
         try:
             # load() is the only method that can spot a truncated JPEG,
             #  but it cannot be called sanely after verify()
-            trial_image = Image.open(StringIO(f.content))
+            trial_image = Image.open(file)
             trial_image.load()
+
+            # Since we're about to use the file again we have to reset the
+            # file object if possible.
+            if hasattr(file, 'reset'):
+                file.reset()
+
             # verify() is the only method that can spot a corrupt PNG,
             #  but it must be called immediately after the constructor
-            trial_image = Image.open(StringIO(f.content))
+            trial_image = Image.open(file)
             trial_image.verify()
         except Exception: # Python Imaging Library doesn't recognize it as an image
             raise ValidationError(self.error_messages['invalid_image'])

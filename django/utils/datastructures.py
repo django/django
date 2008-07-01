@@ -332,17 +332,49 @@ class DotExpandedDict(dict):
             except TypeError: # Special-case if current isn't a dict.
                 current = {bits[-1]: v}
 
-class FileDict(dict):
+class ImmutableList(tuple):
     """
-    A dictionary used to hold uploaded file contents. The only special feature
-    here is that repr() of this object won't dump the entire contents of the
-    file to the output. A handy safeguard for a large file upload.
+    A tuple-like object that raises useful errors when it is asked to mutate.
+
+    Example::
+
+        >>> a = ImmutableList(range(5), warning="You cannot mutate this.")
+        >>> a[3] = '4'
+        Traceback (most recent call last):
+            ...
+        AttributeError: You cannot mutate this.
     """
-    def __repr__(self):
-        if 'content' in self:
-            d = dict(self, content='<omitted>')
-            return dict.__repr__(d)
-        return dict.__repr__(self)
+
+    def __new__(cls, *args, **kwargs):
+        if 'warning' in kwargs:
+            warning = kwargs['warning']
+            del kwargs['warning']
+        else:
+            warning = 'ImmutableList object is immutable.'
+        self = tuple.__new__(cls, *args, **kwargs)
+        self.warning = warning
+        return self
+
+    def complain(self, *wargs, **kwargs):
+        if isinstance(self.warning, Exception):
+            raise self.warning
+        else:
+            raise AttributeError, self.warning
+
+    # All list mutation functions complain.
+    __delitem__  = complain
+    __delslice__ = complain
+    __iadd__     = complain
+    __imul__     = complain
+    __setitem__  = complain
+    __setslice__ = complain
+    append       = complain
+    extend       = complain
+    insert       = complain
+    pop          = complain
+    remove       = complain
+    sort         = complain
+    reverse      = complain
 
 class DictWrapper(dict):
     """

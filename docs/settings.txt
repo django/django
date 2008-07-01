@@ -279,7 +279,7 @@ Default: ``''`` (Empty string)
 
 The database backend to use. The build-in database backends are
 ``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'mysql_old'``,
-``'sqlite3'`` and ``'oracle'``.
+``'sqlite3'``, ``'oracle'``, and ``'oracle'``.
 
 In the Django development version, you can use a database backend that doesn't
 ship with Django by setting ``DATABASE_ENGINE`` to a fully-qualified path (i.e.
@@ -529,6 +529,43 @@ Default: ``'utf-8'``
 
 The character encoding used to decode any files read from disk. This includes
 template files and initial SQL data files.
+
+FILE_UPLOAD_HANDLERS
+--------------------
+
+**New in Django development version**
+
+Default::
+
+    ("django.core.files.fileuploadhandler.MemoryFileUploadHandler",
+     "django.core.files.fileuploadhandler.TemporaryFileUploadHandler",)
+
+A tuple of handlers to use for uploading. See `file uploads`_ for details.
+
+.. _file uploads: ../upload_handling/
+
+FILE_UPLOAD_MAX_MEMORY_SIZE
+---------------------------
+
+**New in Django development version**
+
+Default: ``2621440`` (i.e. 2.5 MB).
+
+The maximum size (in bytes) that an upload will be before it gets streamed to
+the file system. See `file uploads`_ for details.
+
+FILE_UPLOAD_TEMP_DIR
+--------------------
+
+**New in Django development version**
+
+Default: ``None``
+
+The directory to store data temporarily while uploading files. If ``None``,
+Django will use the standard temporary directory for the operating system. For
+example, this will default to '/tmp' on *nix-style operating systems.
+
+See `file uploads`_ for details.
 
 FIXTURE_DIRS
 -------------

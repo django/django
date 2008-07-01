@@ -67,7 +67,13 @@ class TextFile(models.Model):
 
 class ImageFile(models.Model):
     description = models.CharField(max_length=20)
-    image = models.FileField(upload_to=tempfile.gettempdir())
+    try:
+        # If PIL is available, try testing PIL.
+        # Otherwise, it's equivalent to TextFile above.
+        import Image
+        image = models.ImageField(upload_to=tempfile.gettempdir())
+    except ImportError:
+        image = models.FileField(upload_to=tempfile.gettempdir())
 
     def __unicode__(self):
         return self.description
@@ -75,6 +81,7 @@ class ImageFile(models.Model):
 __test__ = {'API_TESTS': """
 >>> from django import newforms as forms
 >>> from django.newforms.models import ModelForm
+>>> from django.core.files.uploadedfile import SimpleUploadedFile
 
 The bare bones, absolutely nothing custom, basic case.
 
@@ -792,7 +799,18 @@ False
 
 # Upload a file and ensure it all works as expected.
 
->>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': {'filename': 'test1.txt', 'content': 'hello world'}})
+>>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': SimpleUploadedFile('test1.txt', 'hello world')})
+>>> f.is_valid()
+True
+>>> type(f.cleaned_data['file'])
+<class 'django.newforms.fields.UploadedFile'>
+>>> instance = f.save()
+>>> instance.file
+u'...test1.txt'
+
+>>> os.unlink(instance.get_file_filename())
+
+>>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': SimpleUploadedFile('test1.txt', 'hello world')})
 >>> f.is_valid()
 True
 >>> type(f.cleaned_data['file'])
@@ -814,17 +832,29 @@ u'...test1.txt'
 u'...test1.txt'
 
 # Delete the current file since this is not done by Django.
-
 >>> os.unlink(instance.get_file_filename())
 
 # Override the file by uploading a new one.
 
->>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': {'filename': 'test2.txt', 'content': 'hello world'}}, instance=instance)
+>>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': SimpleUploadedFile('test2.txt', 'hello world')}, instance=instance)
 >>> f.is_valid()
 True
 >>> instance = f.save()
 >>> instance.file
 u'...test2.txt'
+
+# Delete the current file since this is not done by Django.
+>>> os.unlink(instance.get_file_filename())
+
+>>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': SimpleUploadedFile('test2.txt', 'hello world')})
+>>> f.is_valid()
+True
+>>> instance = f.save()
+>>> instance.file
+u'...test2.txt'
+
+# Delete the current file since this is not done by Django.
+>>> os.unlink(instance.get_file_filename())
 
 >>> instance.delete()
 
@@ -838,12 +868,26 @@ True
 >>> instance.file
 ''
 
->>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': {'filename': 'test3.txt', 'content': 'hello world'}}, instance=instance)
+>>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': SimpleUploadedFile('test3.txt', 'hello world')}, instance=instance)
 >>> f.is_valid()
 True
 >>> instance = f.save()
 >>> instance.file
 u'...test3.txt'
+
+# Delete the current file since this is not done by Django.
+>>> os.unlink(instance.get_file_filename())
+>>> instance.delete()
+
+>>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': SimpleUploadedFile('test3.txt', 'hello world')})
+>>> f.is_valid()
+True
+>>> instance = f.save()
+>>> instance.file
+u'...test3.txt'
+
+# Delete the current file since this is not done by Django.
+>>> os.unlink(instance.get_file_filename())
 >>> instance.delete()
 
 # ImageField ###################################################################
@@ -858,7 +902,19 @@ u'...test3.txt'
 
 >>> image_data = open(os.path.join(os.path.dirname(__file__), "test.png")).read()
 
->>> f = ImageFileForm(data={'description': u'An image'}, files={'image': {'filename': 'test.png', 'content': image_data}})
+>>> f = ImageFileForm(data={'description': u'An image'}, files={'image': SimpleUploadedFile('test.png', image_data)})
+>>> f.is_valid()
+True
+>>> type(f.cleaned_data['image'])
+<class 'django.newforms.fields.UploadedFile'>
+>>> instance = f.save()
+>>> instance.image
+u'...test.png'
+
+# Delete the current file since this is not done by Django.
+>>> os.unlink(instance.get_image_filename())
+
+>>> f = ImageFileForm(data={'description': u'An image'}, files={'image': SimpleUploadedFile('test.png', image_data)})
 >>> f.is_valid()
 True
 >>> type(f.cleaned_data['image'])
@@ -885,13 +941,26 @@ u'...test.png'
 
 # Override the file by uploading a new one.
 
->>> f = ImageFileForm(data={'description': u'Changed it'}, files={'image': {'filename': 'test2.png', 'content': image_data}}, instance=instance)
+>>> f = ImageFileForm(data={'description': u'Changed it'}, files={'image': SimpleUploadedFile('test2.png', image_data)}, instance=instance)
 >>> f.is_valid()
 True
 >>> instance = f.save()
 >>> instance.image
 u'...test2.png'
 
+# Delete the current file since this is not done by Django.
+>>> os.unlink(instance.get_image_filename())
+>>> instance.delete()
+
+>>> f = ImageFileForm(data={'description': u'Changed it'}, files={'image': SimpleUploadedFile('test2.png', image_data)})
+>>> f.is_valid()
+True
+>>> instance = f.save()
+>>> instance.image
+u'...test2.png'
+
+# Delete the current file since this is not done by Django.
+>>> os.unlink(instance.get_image_filename())
 >>> instance.delete()
 
 # Test the non-required ImageField
@@ -904,7 +973,18 @@ True
 >>> instance.image
 ''
 
->>> f = ImageFileForm(data={'description': u'And a final one'}, files={'image': {'filename': 'test3.png', 'content': image_data}}, instance=instance)
+>>> f = ImageFileForm(data={'description': u'And a final one'}, files={'image': SimpleUploadedFile('test3.png', image_data)}, instance=instance)
+>>> f.is_valid()
+True
+>>> instance = f.save()
+>>> instance.image
+u'...test3.png'
+
+# Delete the current file since this is not done by Django.
+>>> os.unlink(instance.get_image_filename())
+>>> instance.delete()
+
+>>> f = ImageFileForm(data={'description': u'And a final one'}, files={'image': SimpleUploadedFile('test3.png', image_data)})
 >>> f.is_valid()
 True
 >>> instance = f.save()

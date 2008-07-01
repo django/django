@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils.encoding import force_unicode
 from django.utils.functional import allow_lazy
 from django.utils.translation import ugettext_lazy
+from htmlentitydefs import name2codepoint
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and force_unicode(x)[0].upper() + force_unicode(x)[1:]
@@ -222,3 +223,26 @@ def smart_split(text):
             yield bit
 smart_split = allow_lazy(smart_split, unicode)
 
+def _replace_entity(match):
+     text = match.group(1)
+     if text[0] == u'#':
+         text = text[1:]
+         try:
+             if text[0] in u'xX':
+                 c = int(text[1:], 16)
+             else:
+                 c = int(text)
+             return unichr(c)
+         except ValueError:
+             return match.group(0)
+     else:
+         try:
+             return unichr(name2codepoint[text])
+         except (ValueError, KeyError):
+             return match.group(0)
+
+_entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
+
+def unescape_entities(text):
+     return _entity_re.sub(_replace_entity, text)
+unescape_entities = allow_lazy(unescape_entities, unicode)
