@@ -74,7 +74,19 @@ class AdminViewPermissionsTest(TestCase):
                      'username': 'joepublic',
                      'password': 'secret'}
            
+    def testTrailingSlashRequired(self):
+        """
+        If you leave off the trailing slash, app should redirect and add it.
+        """
+        self.client.post('/test_admin/admin/', self.super_login)
         
+        request = self.client.get(
+            '/test_admin/admin/admin_views/article/add'
+        )
+        self.assertRedirects(request,
+            '/test_admin/admin/admin_views/article/add/'
+        )
+    
     def testLogin(self):
         """
         Make sure only staff members can log in.

@@ -100,6 +100,9 @@ class AdminSite(object):
 
         `url` is the remainder of the URL -- e.g. 'comments/comment/'.
         """
+        if request.method == 'GET' and not request.path.endswith('/'):
+            return http.HttpResponseRedirect(request.path + '/')
+        
         # Figure out the admin base URL path and stash it for later use
         self.root_path = re.sub(re.escape(url) + '$', '', request.path)
         
