@@ -200,6 +200,29 @@ InvalidPage: ...
 >>> paginator.page_range
 [1]
 
+# ObjectPaginator can be passed lists too.
+>>> paginator = ObjectPaginator([1, 2, 3], 5)
+>>> paginator.hits
+3
+>>> paginator.pages
+1
+>>> paginator.page_range
+[1]
+
+
+# ObjectPaginator can be passed other objects with a count() method.
+>>> class Container:
+...     def __len__(self):
+...         return 42
+>>> paginator = ObjectPaginator(Container(), 10)
+>>> paginator.hits
+42
+>>> paginator.pages
+5
+>>> paginator.page_range
+[1, 2, 3, 4, 5]
+
+
 ##################
 # Orphan support #
 ##################
