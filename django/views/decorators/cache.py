@@ -42,6 +42,9 @@ def never_cache(view_func):
     """
     def _wrapped_view_func(request, *args, **kwargs):
         response = view_func(request, *args, **kwargs)
-        add_never_cache_headers(response)
+        # Although rare, it is possible for a view to return None (e.g. the
+        # django.contrib.admin.sites.AdminSite.login view in one corner-case)
+        if response:
+            add_never_cache_headers(response)
         return response
     return wraps(view_func)(_wrapped_view_func)
