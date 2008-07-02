@@ -291,12 +291,16 @@ class Client:
             login(request, user)
 
             # Set the cookie to represent the session.
-            self.cookies[settings.SESSION_COOKIE_NAME] = request.session.session_key
-            self.cookies[settings.SESSION_COOKIE_NAME]['max-age'] = None
-            self.cookies[settings.SESSION_COOKIE_NAME]['path'] = '/'
-            self.cookies[settings.SESSION_COOKIE_NAME]['domain'] = settings.SESSION_COOKIE_DOMAIN
-            self.cookies[settings.SESSION_COOKIE_NAME]['secure'] = settings.SESSION_COOKIE_SECURE or None
-            self.cookies[settings.SESSION_COOKIE_NAME]['expires'] = None
+            session_cookie = settings.SESSION_COOKIE_NAME
+            self.cookies[session_cookie] = request.session.session_key
+            cookie_data = {
+                'max-age': None,
+                'path': '/',
+                'domain': settings.SESSION_COOKIE_DOMAIN,
+                'secure': settings.SESSION_COOKIE_SECURE or None,
+                'expires': None,
+            }
+            self.cookies[session_cookie].update(cookie_data)
 
             # Save the session values.
             request.session.save()
