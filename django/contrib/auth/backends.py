@@ -68,7 +68,10 @@ class ModelBackend(object):
         """
         Returns True if user_obj has any permissions in the given app_label.
         """
-        return bool(len([p for p in self.get_all_permissions(user_obj) if p[:p.index('.')] == app_label]))
+        for perm in self.get_all_permissions(user_obj):
+            if perm[:perm.index('.')] == app_label:
+                return True
+        return False
 
     def get_user(self, user_id):
         try:
