@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-03-14 01:38+0200\n"
-"PO-Revision-Date: 2007-12-30 12:15+0200\n"
+"PO-Revision-Date: 2008-07-02 23:37+0200\n"
 "Last-Translator: Can Burak Çilingir <canburak@cs.bilgi.edu.tr>\n"
 "Language-Team: Turkish <bahadir@pardus.org.tr>\n"
 "MIME-Version: 1.0\n"
@@ -2466,3 +2466,8 @@ msgstr "evet,hayır,olabilir"
 
 #~ msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 #~ msgstr "<a href=\"/password_reset/\">Şifrenizi mi unuttunuz?</a>"
+
+#: contrib/auth/forms.py:107
+#, python-format
+msgid "Password reset on %s"
+msgstr "%s sitesindeki hesabınızın parolasının sıfırlanması"
