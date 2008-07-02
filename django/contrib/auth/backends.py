@@ -1,14 +1,15 @@
+try:
+    set
+except NameError:
+    from sets import Set as set # Python 2.3 fallback
+
 from django.db import connection
 from django.contrib.auth.models import User
 
-try: 
-    set 
-except NameError: 
-    from sets import Set as set # Python 2.3 fallback
- 	
+
 class ModelBackend(object):
     """
-    Authenticate against django.contrib.auth.models.User
+    Authenticates against django.contrib.auth.models.User.
     """
     # TODO: Model, login attribute name and password attribute name should be
     # configurable.
@@ -21,7 +22,10 @@ class ModelBackend(object):
             return None
 
     def get_group_permissions(self, user_obj):
-        "Returns a list of permission strings that this user has through his/her groups."
+        """
+        Returns a set of permission strings that this user has through his/her
+        groups.
+        """
         if not hasattr(user_obj, '_group_perm_cache'):
             cursor = connection.cursor()
             # The SQL below works out to the following, after DB quoting:
@@ -50,7 +54,7 @@ class ModelBackend(object):
             cursor.execute(sql, [user_obj.id])
             user_obj._group_perm_cache = set(["%s.%s" % (row[0], row[1]) for row in cursor.fetchall()])
         return user_obj._group_perm_cache
-    
+
     def get_all_permissions(self, user_obj):
         if not hasattr(user_obj, '_perm_cache'):
             user_obj._perm_cache = set([u"%s.%s" % (p.content_type.app_label, p.codename) for p in user_obj.user_permissions.select_related()])
@@ -61,6 +65,9 @@ class ModelBackend(object):
         return perm in self.get_all_permissions(user_obj)
 
     def has_module_perms(self, user_obj, app_label):
+        """
+        Returns True if user_obj has any permissions in the given app_label.
+        """
         return bool(len([p for p in self.get_all_permissions(user_obj) if p[:p.index('.')] == app_label]))
 
     def get_user(self, user_id):
