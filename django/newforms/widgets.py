@@ -120,7 +120,8 @@ def media_property(cls):
 class MediaDefiningClass(type):
     "Metaclass for classes that can have media definitions"
     def __new__(cls, name, bases, attrs):            
-        new_class = type.__new__(cls, name, bases, attrs)
+        new_class = super(MediaDefiningClass, cls).__new__(cls, name, bases,
+                                                           attrs)
         if 'media' not in attrs:
             new_class.media = media_property(new_class)
         return new_class
