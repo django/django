@@ -146,11 +146,11 @@ class DatabaseOperations(BaseDatabaseOperations):
             # Since we've just deleted all the rows, running our sequence
             # ALTER code will reset the sequence to 0.
             for sequence_info in sequences:
-                table_name = sequence_info['table']
-                seq_name = get_sequence_name(table_name)
+                sequence_name = get_sequence_name(sequence_info['table'])
+                table_name = self.quote_name(sequence_info['table'])
                 column_name = self.quote_name(sequence_info['column'] or 'id')
-                query = _get_sequence_reset_sql() % {'sequence': seq_name,
-                                                     'table': self.quote_name(table_name),
+                query = _get_sequence_reset_sql() % {'sequence': sequence_name,
+                                                     'table': table_name,
                                                      'column': column_name}
                 sql.append(query)
             return sql
@@ -174,9 +174,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             for f in model._meta.many_to_many:
                 table_name = self.quote_name(f.m2m_db_table())
                 sequence_name = get_sequence_name(f.m2m_db_table())
+                column_name = self.quote_name('id')
                 output.append(query % {'sequence': sequence_name,
                                        'table': table_name,
-                                       'column': self.quote_name('id')})
+                                       'column': column_name})
         return output
 
     def start_transaction_sql(self):
