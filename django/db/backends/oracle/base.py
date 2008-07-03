@@ -162,18 +162,20 @@ class DatabaseOperations(BaseDatabaseOperations):
         output = []
         query = _get_sequence_reset_sql()
         for model in model_list:
-            for f in model._meta.fields:
+            for f in model._meta.local_fields:
                 if isinstance(f, models.AutoField):
+                    table_name = self.quote_name(model._meta.db_table)
                     sequence_name = get_sequence_name(model._meta.db_table)
-                    column_name = self.quote_name(f.db_column or f.name)
+                    column_name = self.quote_name(f.column)
                     output.append(query % {'sequence': sequence_name,
-                                           'table': model._meta.db_table,
+                                           'table': table_name,
                                            'column': column_name})
                     break # Only one AutoField is allowed per model, so don't bother continuing.
             for f in model._meta.many_to_many:
+                table_name = self.quote_name(f.m2m_db_table())
                 sequence_name = get_sequence_name(f.m2m_db_table())
                 output.append(query % {'sequence': sequence_name,
-                                       'table': f.m2m_db_table(),
+                                       'table': table_name,
                                        'column': self.quote_name('id')})
         return output
 
