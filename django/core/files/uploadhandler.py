@@ -140,9 +140,13 @@ class TemporaryFileUploadHandler(FileUploadHandler):
 
     def file_complete(self, file_size):
         self.file.seek(0)
-        return TemporaryUploadedFile(self.file, self.file_name,
-                                     self.content_type, file_size,
-                                     self.charset)
+        return TemporaryUploadedFile(
+            file = self.file, 
+            file_name = self.file_name, 
+            content_type = self.content_type, 
+            file_size = file_size, 
+            charset = self.charset
+        )
 
 class MemoryFileUploadHandler(FileUploadHandler):
     """
@@ -182,8 +186,14 @@ class MemoryFileUploadHandler(FileUploadHandler):
         if not self.activated:
             return
 
-        return InMemoryUploadedFile(self.file, self.field_name, self.file_name,
-                                    self.content_type, self.charset, file_size)
+        return InMemoryUploadedFile(
+            file = self.file,
+            field_name = self.field_name,
+            file_name = self.file_name,
+            content_type = self.content_type,
+            file_size = file_size,
+            charset = self.charset
+        )
 
 class TemporaryFile(object):
     """

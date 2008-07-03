@@ -15,10 +15,10 @@ class Device(models.Model):
 
 class Port(models.Model):
     device = models.ForeignKey('Device')
-    number = models.CharField(max_length=10)
+    port_number = models.CharField(max_length=10)
 
     def __unicode__(self):
-        return u"%s/%s" % (self.device.name, self.number)
+        return u"%s/%s" % (self.device.name, self.port_number)
 
 class Connection(models.Model):
     start = models.ForeignKey(Port, related_name='connection_start',
@@ -38,9 +38,9 @@ the "connections = ..." queries here should give the same results.
 >>> dev1=Device.objects.create(name="router", building=b)
 >>> dev2=Device.objects.create(name="switch", building=b)
 >>> dev3=Device.objects.create(name="server", building=b)
->>> port1=Port.objects.create(number='4',device=dev1)
->>> port2=Port.objects.create(number='7',device=dev2)
->>> port3=Port.objects.create(number='1',device=dev3)
+>>> port1=Port.objects.create(port_number='4',device=dev1)
+>>> port2=Port.objects.create(port_number='7',device=dev2)
+>>> port3=Port.objects.create(port_number='1',device=dev3)
 >>> c1=Connection.objects.create(start=port1, end=port2)
 >>> c2=Connection.objects.create(start=port2, end=port3)
 
