@@ -218,7 +218,7 @@ MISC_TERMS = ['isnull']
 POSTGIS_TERMS = POSTGIS_OPERATORS.keys() # Getting the operators first
 POSTGIS_TERMS += POSTGIS_GEOMETRY_FUNCTIONS.keys() # Adding on the Geometry Functions
 POSTGIS_TERMS += MISC_TERMS # Adding any other miscellaneous terms (e.g., 'isnull')
-POSTGIS_TERMS = tuple(POSTGIS_TERMS) # Making immutable
+POSTGIS_TERMS = dict((term, None) for term in POSTGIS_TERMS) # Making a dictionary for fast lookups
 
 # For checking tuple parameters -- not very pretty but gets job done.
 def exactly_two(val): return val == 2
@@ -228,10 +228,10 @@ def num_params(lookup_type, val):
     else: return exactly_two(val)
 
 #### The `get_geo_where_clause` function for PostGIS. ####
-def get_geo_where_clause(lookup_type, table_prefix, field, value):
+def get_geo_where_clause(table_alias, name, lookup_type, geo_annot):
     "Returns the SQL WHERE clause for use in PostGIS SQL construction."
     # Getting the quoted field as `geo_col`.
-    geo_col = '%s.%s' % (qn(table_prefix), qn(field.column))
+    geo_col = '%s.%s' % (qn(table_alias), qn(name))
     if lookup_type in POSTGIS_OPERATORS:
         # See if a PostGIS operator matches the lookup type.
         return POSTGIS_OPERATORS[lookup_type].as_sql(geo_col)
@@ -248,30 +248,31 @@ def get_geo_where_clause(lookup_type, table_prefix, field, value):
             op, arg_type = tmp
 
             # Ensuring that a tuple _value_ was passed in from the user
-            if not isinstance(value, (tuple, list)): 
+            if not isinstance(geo_annot.value, (tuple, list)): 
                 raise TypeError('Tuple required for `%s` lookup type.' % lookup_type)
+           
             # Number of valid tuple parameters depends on the lookup type.
-            nparams = len(value)
+            nparams = len(geo_annot.value)
             if not num_params(lookup_type, nparams):
                 raise ValueError('Incorrect number of parameters given for `%s` lookup type.' % lookup_type)
             
             # Ensuring the argument type matches what we expect.
-            if not isinstance(value[1], arg_type):
-                raise TypeError('Argument type should be %s, got %s instead.' % (arg_type, type(value[1])))
+            if not isinstance(geo_annot.value[1], arg_type):
+                raise TypeError('Argument type should be %s, got %s instead.' % (arg_type, type(geo_annot.value[1])))
 
             # For lookup type `relate`, the op instance is not yet created (has
             # to be instantiated here to check the pattern parameter).
             if lookup_type == 'relate': 
-                op = op(value[1])
+                op = op(geo_annot.value[1])
             elif lookup_type in DISTANCE_FUNCTIONS and lookup_type != 'dwithin':
-                if field.geodetic:
+                if geo_annot.geodetic:
                     # Geodetic distances are only availble from Points to PointFields.
-                    if field._geom != 'POINT':
+                    if geo_annot.geom_type != 'POINT':
                         raise TypeError('PostGIS spherical operations are only valid on PointFields.')
-                    if value[0].geom_typeid != 0:
+                    if geo_annot.value[0].geom_typeid != 0:
                         raise TypeError('PostGIS geometry distance parameter is required to be of type Point.')
                     # Setting up the geodetic operation appropriately.
-                    if nparams == 3 and value[2] == 'spheroid': op = op[2]
+                    if nparams == 3 and geo_annot.value[2] == 'spheroid': op = op[2]
                     else: op = op[1]
                 else:
                     op = op[0]
@@ -281,6 +282,6 @@ def get_geo_where_clause(lookup_type, table_prefix, field, value):
         return op.as_sql(geo_col)
     elif lookup_type == 'isnull':
         # Handling 'isnull' lookup type
-        return "%s IS %sNULL" % (geo_col, (not value and 'NOT ' or ''))
+        return "%s IS %sNULL" % (geo_col, (not geo_annot.value and 'NOT ' or ''))
 
     raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))

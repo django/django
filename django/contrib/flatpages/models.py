@@ -8,7 +8,7 @@ class FlatPage(models.Model):
     url = models.CharField(_('URL'), max_length=100, validator_list=[validators.isAlphaNumericURL], db_index=True,
         help_text=_("Example: '/about/contact/'. Make sure to have leading and trailing slashes."))
     title = models.CharField(_('title'), max_length=200)
-    content = models.TextField(_('content'))
+    content = models.TextField(_('content'), blank=True)
     enable_comments = models.BooleanField(_('enable comments'))
     template_name = models.CharField(_('template name'), max_length=70, blank=True,
         help_text=_("Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use 'flatpages/default.html'."))

@@ -3,13 +3,15 @@ Various complex queries that have been problematic in the past.
 """
 
 import datetime
+import pickle
 
 from django.db import models
 from django.db.models.query import Q
 
 class Tag(models.Model):
     name = models.CharField(max_length=10)
-    parent = models.ForeignKey('self', blank=True, null=True)
+    parent = models.ForeignKey('self', blank=True, null=True,
+            related_name='children')
 
     def __unicode__(self):
         return self.name
@@ -23,6 +25,14 @@ class Note(models.Model):
 
     def __unicode__(self):
         return self.note
+
+class Annotation(models.Model):
+    name = models.CharField(max_length=10)
+    tag = models.ForeignKey(Tag)
+    notes = models.ManyToManyField(Note)
+
+    def __unicode__(self):
+        return self.name
 
 class ExtraInfo(models.Model):
     info = models.CharField(max_length=100)
@@ -162,85 +172,67 @@ class Child(models.Model):
     person = models.OneToOneField(Member, primary_key=True)
     parent = models.ForeignKey(Member, related_name="children")
 
+# Custom primary keys interfered with ordering in the past.
+class CustomPk(models.Model):
+    name = models.CharField(max_length=10, primary_key=True)
+    extra = models.CharField(max_length=10)
+
+    class Meta:
+        ordering = ['name', 'extra']
+
+class Related(models.Model):
+    custom = models.ForeignKey(CustomPk)
+
 
 __test__ = {'API_TESTS':"""
->>> t1 = Tag(name='t1')
->>> t1.save()
->>> t2 = Tag(name='t2', parent=t1)
->>> t2.save()
->>> t3 = Tag(name='t3', parent=t1)
->>> t3.save()
->>> t4 = Tag(name='t4', parent=t3)
->>> t4.save()
->>> t5 = Tag(name='t5', parent=t3)
->>> t5.save()
+>>> t1 = Tag.objects.create(name='t1')
+>>> t2 = Tag.objects.create(name='t2', parent=t1)
+>>> t3 = Tag.objects.create(name='t3', parent=t1)
+>>> t4 = Tag.objects.create(name='t4', parent=t3)
+>>> t5 = Tag.objects.create(name='t5', parent=t3)
 
->>> n1 = Note(note='n1', misc='foo')
->>> n1.save()
->>> n2 = Note(note='n2', misc='bar')
->>> n2.save()
->>> n3 = Note(note='n3', misc='foo')
->>> n3.save()
+>>> n1 = Note.objects.create(note='n1', misc='foo')
+>>> n2 = Note.objects.create(note='n2', misc='bar')
+>>> n3 = Note.objects.create(note='n3', misc='foo')
 
 Create these out of order so that sorting by 'id' will be different to sorting
 by 'info'. Helps detect some problems later.
->>> e2 = ExtraInfo(info='e2', note=n2)
->>> e2.save()
->>> e1 = ExtraInfo(info='e1', note=n1)
->>> e1.save()
+>>> e2 = ExtraInfo.objects.create(info='e2', note=n2)
+>>> e1 = ExtraInfo.objects.create(info='e1', note=n1)
 
->>> a1 = Author(name='a1', num=1001, extra=e1)
->>> a1.save()
->>> a2 = Author(name='a2', num=2002, extra=e1)
->>> a2.save()
->>> a3 = Author(name='a3', num=3003, extra=e2)
->>> a3.save()
->>> a4 = Author(name='a4', num=4004, extra=e2)
->>> a4.save()
+>>> a1 = Author.objects.create(name='a1', num=1001, extra=e1)
+>>> a2 = Author.objects.create(name='a2', num=2002, extra=e1)
+>>> a3 = Author.objects.create(name='a3', num=3003, extra=e2)
+>>> a4 = Author.objects.create(name='a4', num=4004, extra=e2)
 
 >>> time1 = datetime.datetime(2007, 12, 19, 22, 25, 0)
 >>> time2 = datetime.datetime(2007, 12, 19, 21, 0, 0)
 >>> time3 = datetime.datetime(2007, 12, 20, 22, 25, 0)
 >>> time4 = datetime.datetime(2007, 12, 20, 21, 0, 0)
->>> i1 = Item(name='one', created=time1, modified=time1, creator=a1, note=n3)
->>> i1.save()
+>>> i1 = Item.objects.create(name='one', created=time1, modified=time1, creator=a1, note=n3)
 >>> i1.tags = [t1, t2]
->>> i2 = Item(name='two', created=time2, creator=a2, note=n2)
->>> i2.save()
+>>> i2 = Item.objects.create(name='two', created=time2, creator=a2, note=n2)
 >>> i2.tags = [t1, t3]
->>> i3 = Item(name='three', created=time3, creator=a2, note=n3)
->>> i3.save()
->>> i4 = Item(name='four', created=time4, creator=a4, note=n3)
->>> i4.save()
+>>> i3 = Item.objects.create(name='three', created=time3, creator=a2, note=n3)
+>>> i4 = Item.objects.create(name='four', created=time4, creator=a4, note=n3)
 >>> i4.tags = [t4]
 
->>> r1 = Report(name='r1', creator=a1)
->>> r1.save()
->>> r2 = Report(name='r2', creator=a3)
->>> r2.save()
->>> r3 = Report(name='r3')
->>> r3.save()
+>>> r1 = Report.objects.create(name='r1', creator=a1)
+>>> r2 = Report.objects.create(name='r2', creator=a3)
+>>> r3 = Report.objects.create(name='r3')
 
 Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the Meta.ordering
 will be rank3, rank2, rank1.
->>> rank1 = Ranking(rank=2, author=a2)
->>> rank1.save()
->>> rank2 = Ranking(rank=1, author=a3)
->>> rank2.save()
->>> rank3 = Ranking(rank=3, author=a1)
->>> rank3.save()
+>>> rank1 = Ranking.objects.create(rank=2, author=a2)
+>>> rank2 = Ranking.objects.create(rank=1, author=a3)
+>>> rank3 = Ranking.objects.create(rank=3, author=a1)
 
->>> c1 = Cover(title="first", item=i4)
->>> c1.save()
->>> c2 = Cover(title="second", item=i2)
->>> c2.save()
+>>> c1 = Cover.objects.create(title="first", item=i4)
+>>> c2 = Cover.objects.create(title="second", item=i2)
 
->>> n1 = Number(num=4)
->>> n1.save()
->>> n2 = Number(num=8)
->>> n2.save()
->>> n3 = Number(num=12)
->>> n3.save()
+>>> num1 = Number.objects.create(num=4)
+>>> num2 = Number.objects.create(num=8)
+>>> num3 = Number.objects.create(num=12)
 
 Bug #1050
 >>> Item.objects.filter(tags__isnull=True)
@@ -346,6 +338,10 @@ Bug #1878, #2939
 4
 >>> xx.delete()
 
+Bug #7323
+>>> Item.objects.values('creator', 'name').count()
+4
+
 Bug #2253
 >>> q1 = Item.objects.order_by('name')
 >>> q2 = Item.objects.filter(id=i1.id)
@@ -386,6 +382,10 @@ Bugs #4088, #4306
 Bug #4510
 >>> Author.objects.filter(report__name='r1')
 [<Author: a1>]
+
+Bug #7378
+>>> a1.report_set.all()
+[<Report: r1>]
 
 Bug #5324, #6704
 >>> Item.objects.filter(tags__name='t4')
@@ -789,6 +789,20 @@ Empty querysets can be merged with others.
 >>> Note.objects.none() & Note.objects.all()
 []
 >>> Note.objects.all() & Note.objects.none()
+[]
+
+Bug #7204, #7506 -- make sure querysets with related fields can be pickled. If
+this doesn't crash, it's a Good Thing.
+>>> out = pickle.dumps(Item.objects.all())
+
+Bug #7277
+>>> ann1 = Annotation.objects.create(name='a1', tag=t1)
+>>> ann1.notes.add(n1)
+>>> n1.annotation_set.filter(Q(tag=t5) | Q(tag__children=t5) | Q(tag__children__children=t5))
+[<Annotation: a1>]
+
+Bug #7371
+>>> Related.objects.order_by('custom')
 []
 
 """}

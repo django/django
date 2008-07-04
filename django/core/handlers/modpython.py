@@ -53,7 +53,8 @@ class ModPythonRequest(http.HttpRequest):
     def _load_post_and_files(self):
         "Populates self._post and self._files"
         if 'content-type' in self._req.headers_in and self._req.headers_in['content-type'].startswith('multipart'):
-            self._post, self._files = http.parse_file_upload(self._req.headers_in, self.raw_post_data)
+            self._raw_post_data = ''
+            self._post, self._files = self.parse_file_upload(self.META, self._req)
         else:
             self._post, self._files = http.QueryDict(self.raw_post_data, encoding=self._encoding), datastructures.MultiValueDict()
 

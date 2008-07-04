@@ -19,6 +19,8 @@ from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
+from django.core.files.move import file_move_safe
+from django.core.files import locks
 from django.conf import settings
 
 try:
@@ -50,7 +52,15 @@ class ModelBase(type):
             meta = attr_meta
         base_meta = getattr(new_class, '_meta', None)
 
-        new_class.add_to_class('_meta', Options(meta))
+        if getattr(meta, 'app_label', None) is None:
+            # Figure out the app_label by looking one level up.
+            # For 'django.contrib.sites.models', this would be 'sites'.
+            model_module = sys.modules[new_class.__module__]
+            kwargs = {"app_label": model_module.__name__.split('.')[-2]}
+        else:
+            kwargs = {}
+
+        new_class.add_to_class('_meta', Options(meta, **kwargs))
         if not abstract:
             new_class.add_to_class('DoesNotExist',
                     subclass_exception('DoesNotExist', ObjectDoesNotExist, module))
@@ -71,11 +81,6 @@ class ModelBase(type):
             if new_class._default_manager.model._meta.abstract:
                 old_default_mgr = new_class._default_manager
             new_class._default_manager = None
-        if getattr(new_class._meta, 'app_label', None) is None:
-            # Figure out the app_label by looking one level up.
-            # For 'django.contrib.sites.models', this would be 'sites'.
-            model_module = sys.modules[new_class.__module__]
-            new_class._meta.app_label = model_module.__name__.split('.')[-2]
 
         # Bail out early if we have already created this class.
         m = get_model(new_class._meta.app_label, name, False)
@@ -392,6 +397,21 @@ class Model(object):
                 for sub_obj in getattr(self, rel_opts_name).all():
                     sub_obj._collect_sub_objects(seen_objs, self.__class__, related.field.null)
 
+        # Handle any ancestors (for the model-inheritance case). We do this by
+        # traversing to the most remote parent classes -- those with no parents
+        # themselves -- and then adding those instances to the collection. That
+        # will include all the child instances down to "self".
+        parent_stack = self._meta.parents.values()
+        while parent_stack:
+            link = parent_stack.pop()
+            parent_obj = getattr(self, link.name)
+            if parent_obj._meta.parents:
+                parent_stack.extend(parent_obj._meta.parents.values())
+                continue
+            # At this point, parent_obj is base class (no ancestor models). So
+            # delete it and all its descendents.
+            parent_obj._collect_sub_objects(seen_objs)
+
     def delete(self):
         assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
 
@@ -439,7 +459,7 @@ class Model(object):
 
     def _get_FIELD_filename(self, field):
         if getattr(self, field.attname): # value is not blank
-            return os.path.join(settings.MEDIA_ROOT, getattr(self, field.attname))
+            return os.path.normpath(os.path.join(settings.MEDIA_ROOT, getattr(self, field.attname)))
         return ''
 
     def _get_FIELD_url(self, field):
@@ -451,16 +471,51 @@ class Model(object):
     def _get_FIELD_size(self, field):
         return os.path.getsize(self._get_FIELD_filename(field))
 
-    def _save_FIELD_file(self, field, filename, raw_contents, save=True):
+    def _save_FIELD_file(self, field, filename, raw_field, save=True):
         directory = field.get_directory_name()
         try: # Create the date-based directory if it doesn't exist.
             os.makedirs(os.path.join(settings.MEDIA_ROOT, directory))
         except OSError: # Directory probably already exists.
             pass
+
+        #
+        # Check for old-style usage (files-as-dictionaries). Warn here first
+        # since there are multiple locations where we need to support both new
+        # and old usage.
+        #
+        if isinstance(raw_field, dict):
+            import warnings
+            warnings.warn(
+                message = "Representing uploaded files as dictionaries is"\
+                          " deprected. Use django.core.files.SimpleUploadedFile"\
+                          " instead.",
+                category = DeprecationWarning,
+                stacklevel = 2
+            )
+            from django.core.files.uploadedfile import SimpleUploadedFile
+            raw_field = SimpleUploadedFile.from_dict(raw_field)
+
+        elif isinstance(raw_field, basestring):
+            import warnings
+            warnings.warn(
+                message = "Representing uploaded files as strings is "\
+                          " deprecated. Use django.core.files.SimpleUploadedFile "\
+                          " instead.",
+                category = DeprecationWarning,
+                stacklevel = 2
+            )
+            from django.core.files.uploadedfile import SimpleUploadedFile
+            raw_field = SimpleUploadedFile(filename, raw_field)
+
+        if filename is None:
+            filename = raw_field.file_name
+
         filename = field.get_filename(filename)
 
+        #
         # If the filename already exists, keep adding an underscore to the name of
         # the file until the filename doesn't exist.
+        #
         while os.path.exists(os.path.join(settings.MEDIA_ROOT, filename)):
             try:
                 dot_index = filename.rindex('.')
@@ -468,14 +523,27 @@ class Model(object):
                 filename += '_'
             else:
                 filename = filename[:dot_index] + '_' + filename[dot_index:]
+        #
+        # Save the file name on the object and write the file to disk
+        #
 
-        # Write the file to disk.
         setattr(self, field.attname, filename)
 
         full_filename = self._get_FIELD_filename(field)
-        fp = open(full_filename, 'wb')
-        fp.write(raw_contents)
-        fp.close()
+
+        if hasattr(raw_field, 'temporary_file_path'):
+            # This file has a file path that we can move.
+            raw_field.close()
+            file_move_safe(raw_field.temporary_file_path(), full_filename)
+
+        else:
+            # This is a normal uploadedfile that we can stream.
+            fp = open(full_filename, 'wb')
+            locks.lock(fp, locks.LOCK_EX)
+            for chunk in raw_field.chunk():
+                fp.write(chunk)
+            locks.unlock(fp)
+            fp.close()
 
         # Save the width and/or height, if applicable.
         if isinstance(field, ImageField) and (field.width_field or field.height_field):

@@ -198,6 +198,7 @@ class GeoModelTest(unittest.TestCase):
     @no_oracle
     def test06_make_line(self):
         "Testing the `make_line` GeoQuerySet method."
+        if DISABLE: return
         # Ensuring that a `TypeError` is raised on models without PointFields.
         self.assertRaises(TypeError, State.objects.make_line)
         self.assertRaises(TypeError, Country.objects.make_line)
@@ -381,14 +382,13 @@ class GeoModelTest(unittest.TestCase):
         pnt1 = fromstr('POINT (649287.0363174 4177429.4494686)', srid=2847)
         pnt2 = fromstr('POINT(-98.4919715741052 29.4333344025053)', srid=4326)
 
-        # Testing bad argument tuples that should return a TypeError or
-        # a ValueError.
-        bad_args = [((pnt1, 0), TypeError),
-                    ((pnt2, 'T*T***FF*', 0), ValueError),
-                    ((23, 'foo'), ValueError),
-                    ]
-        for args, e in bad_args:
-            qs = Country.objects.filter(mpoly__relate=args)
+        # Not passing in a geometry as first param shoud 
+        # raise a type error when initializing the GeoQuerySet
+        self.assertRaises(TypeError, Country.objects.filter, mpoly__relate=(23, 'foo'))
+        # Making sure the right exception is raised for the given
+        # bad arguments.
+        for bad_args, e in [((pnt1, 0), TypeError), ((pnt2, 'T*T***FF*', 0), ValueError)]:
+            qs = Country.objects.filter(mpoly__relate=bad_args)
             self.assertRaises(e, qs.count)
 
         # Relate works differently for the different backends.
@@ -471,6 +471,7 @@ class GeoModelTest(unittest.TestCase):
     
     def test19_centroid(self):
         "Testing the `centroid` GeoQuerySet method."
+        if DISABLE: return
         qs = State.objects.exclude(poly__isnull=True).centroid()
         if oracle: tol = 0.1
         else: tol = 0.000000001
@@ -479,6 +480,7 @@ class GeoModelTest(unittest.TestCase):
 
     def test20_pointonsurface(self):
         "Testing the `point_on_surface` GeoQuerySet method."
+        if DISABLE: return
         # Reference values.
         if SpatialBackend.oracle:
             # SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOM.SDO_POINTONSURFACE(GEOAPP_COUNTRY.MPOLY, 0.05)) FROM GEOAPP_COUNTRY;
@@ -497,6 +499,7 @@ class GeoModelTest(unittest.TestCase):
     @no_oracle
     def test21_scale(self):
         "Testing the `scale` GeoQuerySet method."
+        if DISABLE: return
         xfac, yfac = 2, 3
         qs = Country.objects.scale(xfac, yfac, model_att='scaled')
         for c in qs:
@@ -509,6 +512,7 @@ class GeoModelTest(unittest.TestCase):
     @no_oracle
     def test22_translate(self):
         "Testing the `translate` GeoQuerySet method."
+        if DISABLE: return
         xfac, yfac = 5, -23
         qs = Country.objects.translate(xfac, yfac, model_att='translated')
         for c in qs:
@@ -520,6 +524,7 @@ class GeoModelTest(unittest.TestCase):
 
     def test23_numgeom(self):
         "Testing the `num_geom` GeoQuerySet method."
+        if DISABLE: return
         # Both 'countries' only have two geometries.
         for c in Country.objects.num_geom(): self.assertEqual(2, c.num_geom)
         for c in City.objects.filter(point__isnull=False).num_geom(): 
@@ -530,6 +535,7 @@ class GeoModelTest(unittest.TestCase):
 
     def test24_numpoints(self):
         "Testing the `num_points` GeoQuerySet method."
+        if DISABLE: return
         for c in Country.objects.num_points(): self.assertEqual(c.mpoly.num_points, c.num_points)
         if postgis:
             # Oracle cannot count vertices in Point geometries.
@@ -538,6 +544,7 @@ class GeoModelTest(unittest.TestCase):
     @no_oracle
     def test25_geoset(self):
         "Testing the `difference`, `intersection`, `sym_difference`, and `union` GeoQuerySet methods."
+        if DISABLE: return
         geom = Point(5, 23)
         for c in Country.objects.all().intersection(geom).difference(geom).sym_difference(geom).union(geom):
             self.assertEqual(c.mpoly.difference(geom), c.difference)

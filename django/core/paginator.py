@@ -173,7 +173,10 @@ class ObjectPaginator(Paginator):
         if self._count is None:
             try:
                 self._count = self.object_list.count()
-            except TypeError:
+            except (AttributeError, TypeError):
+                # AttributeError if object_list has no count() method.
+                # TypeError if object_list.count() requires arguments
+                # (i.e. is of type list).
                 self._count = len(self.object_list)
         return self._count
     count = property(_get_count)

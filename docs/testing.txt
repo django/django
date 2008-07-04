@@ -797,6 +797,37 @@ another test, or by the order of test execution.
 .. _dumpdata documentation: ../django-admin/#dumpdata-appname-appname
 .. _loaddata documentation: ../django-admin/#loaddata-fixture-fixture
 
+URLconf configuration
+~~~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+If your application provides views, you may want to include tests that
+use the test client to exercise those views. However, an end user is free
+to deploy the views in your application at any URL of their choosing.
+This means that your tests can't rely upon the fact that your views will
+be available at a particular URL.
+
+In order to provide a reliable URL space for your test,
+``django.test.TestCase`` provides the ability to customize the URLconf
+configuration for the duration of the execution of a test suite.
+If your ``TestCase`` instance defines an ``urls`` attribute, the
+``TestCase`` will use the value of that attribute as the ``ROOT_URLCONF``
+for the duration of that test. 
+
+For example::
+
+    from django.test import TestCase
+    
+    class TestMyViews(TestCase):
+        urls = 'myapp.test_urls'
+
+        def testIndexPageView(self):
+            # Here you'd test your view using ``Client``.
+
+This test case will use the contents of ``myapp.test_urls`` as the
+URLconf for the duration of the test case.
+
 Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

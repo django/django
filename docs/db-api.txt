@@ -443,6 +443,31 @@ This is roughly equivalent to::
 Note, however, that the first of these will raise ``IndexError`` while the
 second will raise ``DoesNotExist`` if no objects match the given criteria.
 
+Combining QuerySets
+-------------------
+
+If you have two ``QuerySet`` instances that act on the same model, you can
+combine them using ``&`` and ``|`` to get the items that are in both result
+sets or in either results set, respectively. For example::
+
+    Entry.objects.filter(pubdate__gte=date1) & \
+            Entry.objects.filter(headline__startswith="What")
+
+will combine the two queries into a single SQL query. Of course, in this case
+you could have achieved the same result using multiple filters on the same
+``QuerySet``, but sometimes the ability to combine individual ``QuerySet``
+instance is useful.
+
+Be careful, if you are using ``extra()`` to add custom handling to your
+``QuerySet`` however. All the ``extra()`` components are merged and the result
+may or may not make sense. If you are using custom SQL fragments in your
+``extra()`` calls, Django will not inspect these fragments to see if they need
+to be rewritten because of changes in the merged query. So test the effects
+carefully. Also realise that if you are combining two ``QuerySets`` with
+``|``, you cannot use ``extra(select=...)`` or ``extra(where=...)`` on *both*
+``QuerySets``. You can only use those calls on one or the other (Django will
+raise a ``ValueError`` if you try to use this incorrectly).
+
 QuerySet methods that return new QuerySets
 ------------------------------------------
 

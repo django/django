@@ -38,12 +38,12 @@ MISC_TERMS = ['isnull']
 # Assacceptable lookup types for Oracle spatial.
 MYSQL_GIS_TERMS  = MYSQL_GIS_FUNCTIONS.keys()
 MYSQL_GIS_TERMS += MISC_TERMS
-MYSQL_GIS_TERMS = tuple(MYSQL_GIS_TERMS) # Making immutable
+MYSQL_GIS_TERMS = dict((term, None) for term in MYSQL_GIS_TERMS) # Making dictionary 
 
-def get_geo_where_clause(lookup_type, table_prefix, field, value):
+def get_geo_where_clause(table_alias, name, lookup_type, geo_annot):
     "Returns the SQL WHERE clause for use in MySQL spatial SQL construction."
     # Getting the quoted field as `geo_col`.
-    geo_col = '%s.%s' % (qn(table_prefix), qn(field.column))
+    geo_col = '%s.%s' % (qn(table_alias), qn(name))
 
     # See if a MySQL Geometry function matches the lookup type next
     lookup_info = MYSQL_GIS_FUNCTIONS.get(lookup_type, False)
@@ -54,6 +54,6 @@ def get_geo_where_clause(lookup_type, table_prefix, field, value):
     # TODO: Is this needed because MySQL cannot handle NULL
     # geometries in its spatial indices.
     if lookup_type == 'isnull':
-        return "%s IS %sNULL" % (geo_col, (not value and 'NOT ' or ''))
+        return "%s IS %sNULL" % (geo_col, (not geo_annot.value and 'NOT ' or ''))
 
     raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))

@@ -21,18 +21,14 @@ class TestForm(forms.Form):
 
 
 class PreviewTests(TestCase):
+    urls = 'django.contrib.formtools.test_urls'
 
     def setUp(self):
-        self._old_root_urlconf = settings.ROOT_URLCONF
-        settings.ROOT_URLCONF = 'django.contrib.formtools.test_urls'
         # Create a FormPreview instance to share between tests
         self.preview = preview.FormPreview(TestForm)
         input_template = '<input type="hidden" name="%s" value="%s" />'
         self.input = input_template % (self.preview.unused_name('stage'), "%d")
 
-    def tearDown(self):
-        settings.ROOT_URLCONF = self._old_root_urlconf
-        
     def test_unused_name(self):
         """
         Verifies name mangling to get uniue field name.

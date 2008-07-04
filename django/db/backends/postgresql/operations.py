@@ -97,7 +97,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # Use `coalesce` to set the sequence for each model to the max pk value if there are records,
             # or 1 if there are none. Set the `is_called` property (the third argument to `setval`) to true
             # if there are records (as the max pk value is already in use), otherwise set it to false.
-            for f in model._meta.fields:
+            for f in model._meta.local_fields:
                 if isinstance(f, models.AutoField):
                     output.append("%s setval('%s', coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
                         (style.SQL_KEYWORD('SELECT'),

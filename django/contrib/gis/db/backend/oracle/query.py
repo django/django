@@ -110,10 +110,10 @@ ORACLE_SPATIAL_TERMS += MISC_TERMS
 ORACLE_SPATIAL_TERMS = tuple(ORACLE_SPATIAL_TERMS) # Making immutable
 
 #### The `get_geo_where_clause` function for Oracle ####
-def get_geo_where_clause(lookup_type, table_prefix, field, value):
+def get_geo_where_clause(table_alias, name, lookup_type, geo_annot):
     "Returns the SQL WHERE clause for use in Oracle spatial SQL construction."
     # Getting the quoted table name as `geo_col`.
-    geo_col = '%s.%s' % (qn(table_prefix), qn(field.column))
+    geo_col = '%s.%s' % (qn(table_alias), qn(name))
 
     # See if a Oracle Geometry function matches the lookup type next
     lookup_info = ORACLE_GEOMETRY_FUNCTIONS.get(lookup_type, False)
@@ -126,19 +126,19 @@ def get_geo_where_clause(lookup_type, table_prefix, field, value):
             sdo_op, arg_type = lookup_info
 
             # Ensuring that a tuple _value_ was passed in from the user
-            if not isinstance(value, tuple):
+            if not isinstance(geo_annot.value, tuple):
                 raise TypeError('Tuple required for `%s` lookup type.' % lookup_type)
-            if len(value) != 2: 
+            if len(geo_annot.value) != 2: 
                 raise ValueError('2-element tuple required for %s lookup type.' % lookup_type)
             
             # Ensuring the argument type matches what we expect.
-            if not isinstance(value[1], arg_type):
-                raise TypeError('Argument type should be %s, got %s instead.' % (arg_type, type(value[1])))
+            if not isinstance(geo_annot.value[1], arg_type):
+                raise TypeError('Argument type should be %s, got %s instead.' % (arg_type, type(geo_annot.value[1])))
 
             if lookup_type == 'relate':
                 # The SDORelate class handles construction for these queries, 
                 # and verifies the mask argument.
-                return sdo_op(value[1]).as_sql(geo_col)
+                return sdo_op(geo_annot.value[1]).as_sql(geo_col)
             else:
                 # Otherwise, just call the `as_sql` method on the SDOOperation instance.
                 return sdo_op.as_sql(geo_col)
@@ -149,6 +149,6 @@ def get_geo_where_clause(lookup_type, table_prefix, field, value):
             return lookup_info.as_sql(geo_col)
     elif lookup_type == 'isnull':
         # Handling 'isnull' lookup type
-        return "%s IS %sNULL" % (geo_col, (not value and 'NOT ' or ''))
+        return "%s IS %sNULL" % (geo_col, (not geo_annot.value and 'NOT ' or ''))
 
     raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))

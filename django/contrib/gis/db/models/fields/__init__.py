@@ -111,7 +111,7 @@ class GeometryField(SpatialBackend.Field):
             except SpatialBackend.GeometryException:
                 raise ValueError('Could not create geometry from lookup value: %s' % str(value))
         else:
-            raise TypeError('Cannot use parameter of `%s` type as lookup parameter.' % type(value))
+            raise TypeError('Cannot use parameter of `%s` type as a geometry lookup parameter.' % type(value))
 
         # Assigning the SRID value.
         geom.srid = self.get_srid(geom)

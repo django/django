@@ -9,13 +9,14 @@ try:
 except ImportError:
     from cgi import parse_qsl
 
-from django.utils.datastructures import MultiValueDict, FileDict
+from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
-
+from django.http.multipartparser import MultiPartParser
+from django.conf import settings
+from django.core.files import uploadhandler
 from utils import *
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
-
 
 class Http404(Exception):
     pass
@@ -25,6 +26,7 @@ class HttpRequest(object):
 
     # The encoding used in GET/POST dicts. None means use default setting.
     _encoding = None
+    _upload_handlers = []
 
     def __init__(self):
         self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
@@ -102,39 +104,31 @@ class HttpRequest(object):
 
     encoding = property(_get_encoding, _set_encoding)
 
-def parse_file_upload(header_dict, post_data):
-    """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
-    import email, email.Message
-    from cgi import parse_header
-    raw_message = '\r\n'.join(['%s:%s' % pair for pair in header_dict.items()])
-    raw_message += '\r\n\r\n' + post_data
-    msg = email.message_from_string(raw_message)
-    POST = QueryDict('', mutable=True)
-    FILES = MultiValueDict()
-    for submessage in msg.get_payload():
-        if submessage and isinstance(submessage, email.Message.Message):
-            name_dict = parse_header(submessage['Content-Disposition'])[1]
-            # name_dict is something like {'name': 'file', 'filename': 'test.txt'} for file uploads
-            # or {'name': 'blah'} for POST fields
-            # We assume all uploaded files have a 'filename' set.
-            if 'filename' in name_dict:
-                assert type([]) != type(submessage.get_payload()), "Nested MIME messages are not supported"
-                if not name_dict['filename'].strip():
-                    continue
-                # IE submits the full path, so trim everything but the basename.
-                # (We can't use os.path.basename because that uses the server's
-                # directory separator, which may not be the same as the
-                # client's one.)
-                filename = name_dict['filename'][name_dict['filename'].rfind("\\")+1:]
-                FILES.appendlist(name_dict['name'], FileDict({
-                    'filename': filename,
-                    'content-type': 'Content-Type' in submessage and submessage['Content-Type'] or None,
-                    'content': submessage.get_payload(),
-                }))
-            else:
-                POST.appendlist(name_dict['name'], submessage.get_payload())
-    return POST, FILES
+    def _initialize_handlers(self):
+        self._upload_handlers = [uploadhandler.load_handler(handler, self)
+                                 for handler in settings.FILE_UPLOAD_HANDLERS]
 
+    def _set_upload_handlers(self, upload_handlers):
+        if hasattr(self, '_files'):
+            raise AttributeError("You cannot set the upload handlers after the upload has been processed.")
+        self._upload_handlers = upload_handlers
+
+    def _get_upload_handlers(self):
+        if not self._upload_handlers:
+            # If thre are no upload handlers defined, initialize them from settings.
+            self._initialize_handlers()
+        return self._upload_handlers
+
+    upload_handlers = property(_get_upload_handlers, _set_upload_handlers)
+
+    def parse_file_upload(self, META, post_data):
+        """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
+        self.upload_handlers = ImmutableList(
+            self.upload_handlers,
+            warning = "You cannot alter upload handlers after the upload has been processed."
+        )
+        parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
+        return parser.parse()
 
 class QueryDict(MultiValueDict):
     """

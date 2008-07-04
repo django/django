@@ -96,10 +96,10 @@ class Group(models.Model):
     class Meta:
         verbose_name = _('group')
         verbose_name_plural = _('groups')
-        ordering = ('name',)
 
     class Admin:
         search_fields = ('name',)
+        ordering = ('name',)
 
     def __unicode__(self):
         return self.name
@@ -153,7 +153,6 @@ class User(models.Model):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-        ordering = ('username',)
 
     class Admin:
         fields = (
@@ -166,6 +165,7 @@ class User(models.Model):
         list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
         list_filter = ('is_staff', 'is_superuser')
         search_fields = ('username', 'first_name', 'last_name', 'email')
+        ordering = ('username',)
 
     def __unicode__(self):
         return self.username

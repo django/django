@@ -2155,7 +2155,7 @@ still only creating one database table per child model at the database level.
 
 When an abstract base class is created, Django makes any ``Meta`` inner class
 you declared on the base class available as an attribute. If a child class
-does not declared its own ``Meta`` class, it will inherit the parent's
+does not declare its own ``Meta`` class, it will inherit the parent's
 ``Meta``. If the child wants to extend the parent's ``Meta`` class, it can
 subclass it. For example::
 

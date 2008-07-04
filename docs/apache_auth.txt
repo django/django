@@ -39,9 +39,10 @@ with the standard ``Auth*`` and ``Require`` directives::
     example at the bottom of this note).
 
     You'll also need to insert configuration directives that prevent Apache
-    from trying to use other authentication modules. Depending on which other
-    authentication modules you have loaded, you might need one or more of
-    the following directives::
+    from trying to use other authentication modules, as well as specifying
+    the ``AuthUserFile`` directive and pointing it to ``/dev/null``. Depending
+    on which other authentication modules you have loaded, you might need one
+    or more of the following directives::
 
         AuthBasicAuthoritative Off
         AuthDefaultAuthoritative Off
@@ -65,6 +66,7 @@ with the standard ``Auth*`` and ``Require`` directives::
         <Location /example/>
             AuthType Basic
             AuthName "example.com"
+            **AuthUserFile /dev/null**
             **AuthBasicAuthoritative Off**
             Require valid-user
 

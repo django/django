@@ -91,7 +91,7 @@ class Field(object):
         self.name = name
         self.verbose_name = verbose_name
         self.primary_key = primary_key
-        self.max_length, self.unique = max_length, unique
+        self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null
         # Oracle treats the empty string ('') as null, so coerce the null
         # option whenever '' is a possible value.
@@ -167,6 +167,10 @@ class Field(object):
             return get_creation_module().DATA_TYPES[self.get_internal_type()] % data
         except KeyError:
             return None
+
+    def unique(self):
+        return self._unique or self.primary_key
+    unique = property(unique)
 
     def validate_full(self, field_data, all_data):
         """
@@ -695,7 +699,7 @@ class DecimalField(Field):
                 _("This value must be a decimal number."))
 
     def _format(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, basestring) or value is None:
             return value
         else:
             return self.format_number(value)
@@ -716,8 +720,7 @@ class DecimalField(Field):
         return u"%.*f" % (self.decimal_places, value)
 
     def get_db_prep_save(self, value):
-        if value is not None:
-            value = self._format(value)
+        value = self._format(value)
         return super(DecimalField, self).get_db_prep_save(value)
 
     def get_db_prep_lookup(self, lookup_type, value):
@@ -812,7 +815,7 @@ class FileField(Field):
         setattr(cls, 'get_%s_filename' % self.name, curry(cls._get_FIELD_filename, field=self))
         setattr(cls, 'get_%s_url' % self.name, curry(cls._get_FIELD_url, field=self))
         setattr(cls, 'get_%s_size' % self.name, curry(cls._get_FIELD_size, field=self))
-        setattr(cls, 'save_%s_file' % self.name, lambda instance, filename, raw_contents, save=True: instance._save_FIELD_file(self, filename, raw_contents, save))
+        setattr(cls, 'save_%s_file' % self.name, lambda instance, filename, raw_field, save=True: instance._save_FIELD_file(self, filename, raw_field, save))
         dispatcher.connect(self.delete_file, signal=signals.post_delete, sender=cls)
 
     def delete_file(self, instance):
@@ -835,9 +838,19 @@ class FileField(Field):
         if new_data.get(upload_field_name, False):
             func = getattr(new_object, 'save_%s_file' % self.name)
             if rel:
-                func(new_data[upload_field_name][0]["filename"], new_data[upload_field_name][0]["content"], save)
+                file = new_data[upload_field_name][0]
             else:
-                func(new_data[upload_field_name]["filename"], new_data[upload_field_name]["content"], save)
+                file = new_data[upload_field_name]
+
+            # Backwards-compatible support for files-as-dictionaries.
+            # We don't need to raise a warning because Model._save_FIELD_file will
+            # do so for us.
+            try:
+                file_name = file.file_name
+            except AttributeError:
+                file_name = file['filename']
+
+            func(file_name, file, save)
 
     def get_directory_name(self):
         return os.path.normpath(force_unicode(datetime.datetime.now().strftime(smart_str(self.upload_to))))
@@ -850,7 +863,7 @@ class FileField(Field):
     def save_form_data(self, instance, data):
         from django.newforms.fields import UploadedFile
         if data and isinstance(data, UploadedFile):
-            getattr(instance, "save_%s_file" % self.name)(data.filename, data.content, save=False)
+            getattr(instance, "save_%s_file" % self.name)(data.filename, data.data, save=False)
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.FileField}
@@ -1166,12 +1179,3 @@ class XMLField(TextField):
     def get_manipulator_field_objs(self):
         return [curry(oldforms.XMLLargeTextField, schema_path=self.schema_path)]
 
-class OrderingField(IntegerField):
-    empty_strings_allowed=False
-    def __init__(self, with_respect_to, **kwargs):
-        self.wrt = with_respect_to
-        kwargs['null'] = True
-        IntegerField.__init__(self, **kwargs )
-
-    def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
-        return [oldforms.HiddenField(name_prefix + self.name)]

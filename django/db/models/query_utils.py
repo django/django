@@ -48,3 +48,20 @@ class Q(tree.Node):
         obj.negate()
         return obj
 
+def select_related_descend(field, restricted, requested):
+    """
+    Returns True if this field should be used to descend deeper for
+    select_related() purposes. Used by both the query construction code
+    (sql.query.fill_related_selections()) and the model instance creation code
+    (query.get_cached_row()).
+    """
+    if not field.rel:
+        return False
+    if field.rel.parent_link:
+        return False
+    if restricted and field.name not in requested:
+        return False
+    if not restricted and field.null:
+        return False
+    return True
+

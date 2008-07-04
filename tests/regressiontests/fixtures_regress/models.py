@@ -20,7 +20,7 @@ class Plant(models.Model):
 class Stuff(models.Model):
     name = models.CharField(max_length=20, null=True)
     owner = models.ForeignKey(User, null=True)
-    
+
     def __unicode__(self):
         # Oracle doesn't distinguish between None and the empty string.
         # This hack makes the test case pass using Oracle.
@@ -38,13 +38,29 @@ class Absolute(models.Model):
         super(Absolute, self).__init__(*args, **kwargs)
         Absolute.load_count += 1
 
+class Parent(models.Model):
+    name = models.CharField(max_length=10)
+
+class Child(Parent):
+    data = models.CharField(max_length=10)
+
+# Models to regresison check #7572
+class Channel(models.Model):
+    name = models.CharField(max_length=255)
+
+class Article(models.Model):
+    title = models.CharField(max_length=255)
+    channels = models.ManyToManyField(Channel)
+    
+    class Meta:
+        ordering = ('id',)
 
 __test__ = {'API_TESTS':"""
 >>> from django.core import management
 
 # Load a fixture that uses PK=1
 >>> management.call_command('loaddata', 'sequence', verbosity=0)
-        
+
 # Create a new animal. Without a sequence reset, this new object
 # will take a PK of 1 (on Postgres), and the save will fail.
 # This is a regression test for ticket #3790.
@@ -61,9 +77,9 @@ __test__ = {'API_TESTS':"""
 [<Stuff: None is owned by None>]
 
 ###############################################
-# Regression test for ticket #6436 -- 
+# Regression test for ticket #6436 --
 # os.path.join will throw away the initial parts of a path if it encounters
-# an absolute path. This means that if a fixture is specified as an absolute path, 
+# an absolute path. This means that if a fixture is specified as an absolute path,
 # we need to make sure we don't discover the absolute path in every fixture directory.
 
 >>> load_absolute_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'absolute.json')
@@ -93,5 +109,29 @@ No fixture data found for 'bad_fixture2'. (File format may be invalid.)
 No fixture data found for 'bad_fixture2'. (File format may be invalid.)
 
 >>> sys.stderr = savestderr
+
+###############################################
+# Test for ticket #7565 -- PostgreSQL sequence resetting checks shouldn't
+# ascend to parent models when inheritance is used (since they are treated
+# individually).
+
+>>> management.call_command('loaddata', 'model-inheritance.json', verbosity=0)
+
+###############################################
+# Test for ticket #7572 -- MySQL has a problem if the same connection is 
+# used to create tables, load data, and then query over that data.
+# To compensate, we close the connection after running loaddata.
+# This ensures that a new connection is opened when test queries are issued.
+
+>>> management.call_command('loaddata', 'big-fixture.json', verbosity=0)
+
+>>> articles = Article.objects.exclude(id=9)
+>>> articles.values_list('id', flat=True)
+[1, 2, 3, 4, 5, 6, 7, 8]
+
+# Just for good measure, run the same query again. Under the influence of
+# ticket #7572, this will give a different result to the previous call.
+>>> articles.values_list('id', flat=True)
+[1, 2, 3, 4, 5, 6, 7, 8]
 
 """}

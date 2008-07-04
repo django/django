@@ -4,10 +4,12 @@ from urlparse import urlsplit, urlunsplit
 
 from django.http import QueryDict
 from django.db import transaction
+from django.conf import settings
 from django.core import mail
 from django.core.management import call_command
 from django.test import _doctest as doctest
 from django.test.client import Client
+from django.core.urlresolvers import clear_url_caches
 
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
 
@@ -54,6 +56,8 @@ class TestCase(unittest.TestCase):
             * Flushing the database.
             * If the Test Case class has a 'fixtures' member, installing the 
               named fixtures.
+            * If the Test Case class has a 'urls' member, replace the
+              ROOT_URLCONF with it.
             * Clearing the mail test outbox.
         """
         call_command('flush', verbosity=0, interactive=False)
@@ -61,6 +65,10 @@ class TestCase(unittest.TestCase):
             # We have to use this slightly awkward syntax due to the fact
             # that we're using *args and **kwargs together.
             call_command('loaddata', *self.fixtures, **{'verbosity': 0})
+        if hasattr(self, 'urls'):
+            self._old_root_urlconf = settings.ROOT_URLCONF
+            settings.ROOT_URLCONF = self.urls
+            clear_url_caches()
         mail.outbox = []
 
     def __call__(self, result=None):
@@ -79,6 +87,23 @@ class TestCase(unittest.TestCase):
             result.addError(self, sys.exc_info())
             return
         super(TestCase, self).__call__(result)
+        try:
+            self._post_teardown()
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except Exception:
+            import sys
+            result.addError(self, sys.exc_info())
+            return
+
+    def _post_teardown(self):
+        """ Performs any post-test things. This includes:
+
+            * Putting back the original ROOT_URLCONF if it was changed.
+        """
+        if hasattr(self, '_old_root_urlconf'):
+            settings.ROOT_URLCONF = self._old_root_urlconf
+            clear_url_caches()
 
     def assertRedirects(self, response, expected_url, status_code=302,
                         target_status_code=200, host=None):

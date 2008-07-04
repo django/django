@@ -112,9 +112,8 @@ class WSGIRequest(http.HttpRequest):
         # Populates self._post and self._files
         if self.method == 'POST':
             if self.environ.get('CONTENT_TYPE', '').startswith('multipart'):
-                header_dict = dict([(k, v) for k, v in self.environ.items() if k.startswith('HTTP_')])
-                header_dict['Content-Type'] = self.environ.get('CONTENT_TYPE', '')
-                self._post, self._files = http.parse_file_upload(header_dict, self.raw_post_data)
+                self._raw_post_data = ''
+                self._post, self._files = self.parse_file_upload(self.META, self.environ['wsgi.input'])
             else:
                 self._post, self._files = http.QueryDict(self.raw_post_data, encoding=self._encoding), datastructures.MultiValueDict()
         else:

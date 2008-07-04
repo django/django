@@ -88,14 +88,14 @@ class DistanceTest(unittest.TestCase):
                 else: dist = dist[0]
                 
             # Creating the query set.
-            qs = AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, dist)).order_by('name')
+            qs = AustraliaCity.objects.order_by('name')
             if type_error:
                 # A TypeError should be raised on PostGIS when trying to pass
                 # Distance objects into a DWithin query using a geodetic field.  
-                self.assertRaises(TypeError, qs.count)
+                self.assertRaises(TypeError, AustraliaCity.objects.filter, point__dwithin=(self.au_pnt, dist))
             else:
-                self.assertEqual(au_cities, self.get_names(qs))
-
+                self.assertEqual(au_cities, self.get_names(qs.filter(point__dwithin=(self.au_pnt, dist))))
+                                 
     def test03a_distance_method(self):
         "Testing the `distance` GeoQuerySet method on projected coordinate systems."
         # The point for La Grange, TX
@@ -217,11 +217,11 @@ class DistanceTest(unittest.TestCase):
                               AustraliaCity.objects.filter(point__distance_lte=(mp, D(km=100))))
             # Too many params (4 in this case) should raise a ValueError.
             self.assertRaises(ValueError, 
-                              AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)', D(km=100), 'spheroid', '4')).count)
+                              AustraliaCity.objects.filter, point__distance_lte=('POINT(5 23)', D(km=100), 'spheroid', '4'))
 
         # Not enough params should raise a ValueError.
         self.assertRaises(ValueError,
-                          AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)',)).count)
+                          AustraliaCity.objects.filter, point__distance_lte=('POINT(5 23)',))
 
         # Getting all cities w/in 550 miles of Hobart.
         hobart = AustraliaCity.objects.get(name='Hobart')

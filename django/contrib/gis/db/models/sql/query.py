@@ -103,7 +103,8 @@ class GeoQuery(sql.Query):
         self._select_aliases = aliases
         return result
 
-    def get_default_columns(self, with_aliases=False, col_aliases=None):
+    def get_default_columns(self, with_aliases=False, col_aliases=None,
+                            start_alias=None, opts=None, as_pairs=False):
         """
         Computes the default columns for selecting every field in the base
         model.
@@ -115,11 +116,14 @@ class GeoQuery(sql.Query):
         geometry columns.
         """
         result = []
-        table_alias = self.tables[0]
+        if opts is None:
+            opts = self.model._meta
+        if start_alias:
+            table_alias = start_alias
+        else:
+            table_alias = self.tables[0]
         root_pk = self.model._meta.pk.column
         seen = {None: table_alias}
-        qn = self.quote_name_unless_alias
-        qn2 = self.connection.ops.quote_name
         aliases = set()
         for field, model in self.model._meta.get_fields_with_model():
             try:
@@ -128,12 +132,13 @@ class GeoQuery(sql.Query):
                 alias = self.join((table_alias, model._meta.db_table,
                         root_pk, model._meta.pk.column))
                 seen[model] = alias
-
+            if as_pairs:
+                result.append((alias, field.column))
+                continue
             # This part of the function is customized for GeoQuery. We
             # see if there was any custom selection specified in the
             # dictionary, and set up the selection format appropriately.
             field_sel = self.get_field_select(field, alias)
-
             if with_aliases and field.column in col_aliases:
                 c_alias = 'Col%d' % len(col_aliases)
                 result.append('%s AS %s' % (field_sel, c_alias))
@@ -145,6 +150,8 @@ class GeoQuery(sql.Query):
                 aliases.add(r)
                 if with_aliases:
                     col_aliases.add(field.column)
+        if as_pairs:
+            return result, None
         return result, aliases
 
     def get_ordering(self):

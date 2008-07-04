@@ -9,6 +9,7 @@ import unittest
 from regressiontests.bug639.models import Photo
 from django.http import QueryDict
 from django.utils.datastructures import MultiValueDict
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 class Bug639Test(unittest.TestCase):
         
@@ -21,12 +22,8 @@ class Bug639Test(unittest.TestCase):
         
         # Fake a request query dict with the file
         qd = QueryDict("title=Testing&image=", mutable=True)
-        qd["image_file"] = {
-            "filename" : "test.jpg",
-            "content-type" : "image/jpeg",
-            "content" : img
-        }
-        
+        qd["image_file"] = SimpleUploadedFile('test.jpg', img, 'image/jpeg')
+
         manip = Photo.AddManipulator()
         manip.do_html2python(qd)
         p = manip.save(qd)

@@ -2,6 +2,7 @@
 tests = r"""
 >>> from django.newforms import *
 >>> from django.newforms.widgets import RadioFieldRenderer
+>>> from django.core.files.uploadedfile import SimpleUploadedFile
 >>> import datetime
 >>> import time
 >>> import re
@@ -770,17 +771,17 @@ ValidationError: [u'This field is required.']
 >>> f.clean(None, 'files/test2.pdf')
 'files/test2.pdf'
 
->>> f.clean({})
+>>> f.clean(SimpleUploadedFile('', ''))
 Traceback (most recent call last):
 ...
-ValidationError: [u'No file was submitted.']
+ValidationError: [u'No file was submitted. Check the encoding type on the form.']
 
->>> f.clean({}, '')
+>>> f.clean(SimpleUploadedFile('', ''), '')
 Traceback (most recent call last):
 ...
-ValidationError: [u'No file was submitted.']
+ValidationError: [u'No file was submitted. Check the encoding type on the form.']
 
->>> f.clean({}, 'files/test3.pdf')
+>>> f.clean(None, 'files/test3.pdf')
 'files/test3.pdf'
 
 >>> f.clean('some content that is not a file')
@@ -788,20 +789,20 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'No file was submitted. Check the encoding type on the form.']
 
->>> f.clean({'filename': 'name', 'content': None})
+>>> f.clean(SimpleUploadedFile('name', None))
 Traceback (most recent call last):
 ...
 ValidationError: [u'The submitted file is empty.']
 
->>> f.clean({'filename': 'name', 'content': ''})
+>>> f.clean(SimpleUploadedFile('name', ''))
 Traceback (most recent call last):
 ...
 ValidationError: [u'The submitted file is empty.']
 
->>> type(f.clean({'filename': 'name', 'content': 'Some File Content'}))
+>>> type(f.clean(SimpleUploadedFile('name', 'Some File Content')))
 <class 'django.newforms.fields.UploadedFile'>
 
->>> type(f.clean({'filename': 'name', 'content': 'Some File Content'}, 'files/test4.pdf'))
+>>> type(f.clean(SimpleUploadedFile('name', 'Some File Content'), 'files/test4.pdf'))
 <class 'django.newforms.fields.UploadedFile'>
 
 # URLField ##################################################################
@@ -887,7 +888,7 @@ u'http://www.google.com'
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
->>> f.clean('http://www.jfoiwjfoi23jfoijoaijfoiwjofiwjefewl.com') # bad domain
+>>> f.clean('http://www.broken.djangoproject.com') # bad domain
 Traceback (most recent call last):
 ...
 ValidationError: [u'This URL appears to be a broken link.']
@@ -937,18 +938,24 @@ ValidationError: [u'This field is required.']
 >>> f.clean(True)
 True
 >>> f.clean(False)
-False
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 >>> f.clean(1)
 True
 >>> f.clean(0)
-False
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 >>> f.clean('Django rocks')
 True
 
 >>> f.clean('True')
 True
 >>> f.clean('False')
-False
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 
 >>> f = BooleanField(required=False)
 >>> f.clean('')
