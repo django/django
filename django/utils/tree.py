@@ -29,6 +29,22 @@ class Node(object):
         self.subtree_parents = []
         self.negated = negated
 
+    # We need this because of django.db.models.query_utils.Q. Q. __init__() is
+    # problematic, but it is a natural Node subclass in all other respects.
+    def _new_instance(cls, children=None, connector=None, negated=False):
+        """
+        This is called to create a new instance of this class when we need new
+        Nodes (or subclasses) in the internal code in this class. Normally, it
+        just shadows __init__(). However, subclasses with an __init__ signature
+        that is not an extension of Node.__init__ might need to implement this
+        method to allow a Node to create a new instance of them (if they have
+        any extra setting up to do).
+        """
+        obj = Node(children, connector, negated)
+        obj.__class__ = cls
+        return obj
+    _new_instance = classmethod(_new_instance)
+
     def __str__(self):
         if self.negated:
             return '(NOT (%s: %s))' % (self.connector, ', '.join([str(c) for c
@@ -82,7 +98,8 @@ class Node(object):
             else:
                 self.children.append(node)
         else:
-            obj = Node(self.children, self.connector, self.negated)
+            obj = self._new_instance(self.children, self.connector,
+                    self.negated)
             self.connector = conn_type
             self.children = [obj, node]
 
@@ -96,7 +113,8 @@ class Node(object):
         Interpreting the meaning of this negate is up to client code. This
         method is useful for implementing "not" arrangements.
         """
-        self.children = [Node(self.children, self.connector, not self.negated)]
+        self.children = [self._new_instance(self.children, self.connector,
+                not self.negated)]
         self.connector = self.default
 
     def start_subtree(self, conn_type):
@@ -108,12 +126,13 @@ class Node(object):
         if len(self.children) == 1:
             self.connector = conn_type
         elif self.connector != conn_type:
-            self.children = [Node(self.children, self.connector, self.negated)]
+            self.children = [self._new_instance(self.children, self.connector,
+                    self.negated)]
             self.connector = conn_type
             self.negated = False
 
-        self.subtree_parents.append(Node(self.children, self.connector,
-                self.negated))
+        self.subtree_parents.append(self.__class__(self.children,
+                self.connector, self.negated))
         self.connector = self.default
         self.negated = False
         self.children = []
@@ -126,7 +145,7 @@ class Node(object):
         the current instances state to be the parent.
         """
         obj = self.subtree_parents.pop()
-        node = Node(self.children, self.connector)
+        node = self.__class__(self.children, self.connector)
         self.connector = obj.connector
         self.negated = obj.negated
         self.children = obj.children

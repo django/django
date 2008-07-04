@@ -49,7 +49,7 @@ class DeleteQuery(Query):
                 for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                     where = self.where_class()
                     where.add((None, related.field.m2m_reverse_name(),
-                            related.field.db_type(), 'in', True,
+                            related.field, 'in',
                             pk_list[offset : offset+GET_ITERATOR_CHUNK_SIZE]),
                             AND)
                     self.do_query(related.field.m2m_db_table(), where)
@@ -59,11 +59,11 @@ class DeleteQuery(Query):
             if isinstance(f, generic.GenericRelation):
                 from django.contrib.contenttypes.models import ContentType
                 field = f.rel.to._meta.get_field(f.content_type_field_name)
-                w1.add((None, field.column, field.db_type(), 'exact', True,
-                        [ContentType.objects.get_for_model(cls).id]), AND)
+                w1.add((None, field.column, field, 'exact',
+                        ContentType.objects.get_for_model(cls).id), AND)
             for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                 where = self.where_class()
-                where.add((None, f.m2m_column_name(), f.db_type(), 'in', True,
+                where.add((None, f.m2m_column_name(), f, 'in',
                         pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
                         AND)
                 if w1:
@@ -81,7 +81,7 @@ class DeleteQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             where = self.where_class()
             field = self.model._meta.pk
-            where.add((None, field.column, field.db_type(), 'in', True,
+            where.add((None, field.column, field, 'in',
                     pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]), AND)
             self.do_query(self.model._meta.db_table, where)
 
@@ -204,7 +204,7 @@ class UpdateQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             f = self.model._meta.pk
-            self.where.add((None, f.column, f.db_type(), 'in', True,
+            self.where.add((None, f.column, f, 'in',
                     pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
                     AND)
             self.values = [(related_field.column, None, '%s')]
