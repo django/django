@@ -27,3 +27,7 @@ class Feature(models.Model):
     geom = models.GeometryField()
     objects = models.GeoManager()
     def __unicode__(self): return self.name
+
+class MinusOneSRID(models.Model):
+    geom = models.PointField(srid=-1) # Minus one SRID.
+    objects = models.GeoManager()

@@ -1,5 +1,5 @@
 import os, unittest
-from models import Country, City, State, Feature
+from models import Country, City, State, Feature, MinusOneSRID
 from django.contrib.gis import gdal
 from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.geos import *
@@ -301,6 +301,12 @@ class GeoModelTest(unittest.TestCase):
         sa = City.objects.get(name='San Antonio')
         self.assertAlmostEqual(wgs_pnt.x, sa.point.x, 6)
         self.assertAlmostEqual(wgs_pnt.y, sa.point.y, 6)
+
+        # If the GeometryField SRID is -1, then we shouldn't perform any
+        # transformation if the SRID of the input geometry is different.
+        m1 = MinusOneSRID(geom=Point(17, 23, srid=4326))
+        m1.save()
+        self.assertEqual(-1, m1.geom.srid)
 
     # Oracle does not support NULL geometries in its spatial index for
     # some routines (e.g., SDO_GEOM.RELATE).

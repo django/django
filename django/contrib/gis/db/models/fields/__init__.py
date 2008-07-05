@@ -120,13 +120,15 @@ class GeometryField(SpatialBackend.Field):
 
     def get_srid(self, geom):
         """
-        Has logic for retrieving the default SRID taking into account 
-        the SRID of the field.
+        Returns the default SRID for the given geometry, taking into account
+        the SRID set for the field.  For example, if the input geometry
+        has no SRID, then that of the field will be returned.
         """
-        if geom.srid is None or (geom.srid == -1 and self._srid != -1):
+        gsrid = geom.srid # SRID of given geometry.
+        if gsrid is None or self._srid == -1 or (gsrid == -1 and self._srid != -1):
             return self._srid
         else:
-            return geom.srid
+            return gsrid
 
     ### Routines overloaded from Field ###
     def contribute_to_class(self, cls, name):
@@ -171,12 +173,10 @@ class GeometryField(SpatialBackend.Field):
 
     def get_db_prep_save(self, value):
         "Prepares the value for saving in the database."
-        if isinstance(value, SpatialBackend.Geometry):
-            return SpatialBackend.Adaptor(value)
-        elif value is None:
+        if value is None:
             return None
         else:
-            raise TypeError('Geometry Proxy should only return Geometry objects or None.')
+            return SpatialBackend.Adaptor(self.get_geometry(value))
 
     def get_manipulator_field_objs(self):
         "Using the WKTField (oldforms) to be our manipulator."
