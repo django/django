@@ -25,43 +25,26 @@ class GeoWhereNode(WhereNode):
         This is overridden from the regular WhereNode to handle the 
         peculiarties of GeometryFields, because they need a special 
         annotation object that contains the spatial metadata from the 
-        field so that the correct spatial SQL is generated.
+        field to generate the spatial SQL.
         """
         if not isinstance(data, (list, tuple)):
-            super(WhereNode, self).add(data, connector)
-            return
-
-        alias, col, field, lookup_type, value = data
-        # Do we have a geographic field?
-        geo_field = hasattr(field, '_geom')
-        if field:
-            if geo_field:
-                # `GeometryField.get_db_prep_lookup` returns a where clause
-                # substitution array in addition to the parameters.
-                where, params = field.get_db_prep_lookup(lookup_type, value)
-            else:
-                params = field.get_db_prep_lookup(lookup_type, value)
-            db_type = field.db_type()
+            return super(WhereNode, self).add(data, connector)
+        alias, col, field, lookup_type, value = data     
+        if not hasattr(field, "_geom"):
+            # Not a geographic field, so call `WhereNode.add`.
+            return super(GeoWhereNode, self).add(data, connector)
         else:
-            # This is possible when we add a comparison to NULL sometimes (we
-            # don't really need to waste time looking up the associated field
-            # object).
-            params = Field().get_db_prep_lookup(lookup_type, value)
-            db_type = None
-  
-        if geo_field:
+            # `GeometryField.get_db_prep_lookup` returns a where clause
+            # substitution array in addition to the parameters.
+            where, params = field.get_db_prep_lookup(lookup_type, value)
+
             # The annotation will be a `GeoAnnotation` object that
             # will contain the necessary geometry field metadata for
             # the `get_geo_where_clause` to construct the appropriate
             # spatial SQL when `make_atom` is called.
             annotation = GeoAnnotation(field, value, where)
-        elif isinstance(value, datetime.datetime):
-            annotation = datetime.datetime
-        else:
-            annotation = bool(value)
-
-        super(WhereNode, self).add((alias, col, db_type, lookup_type,
-                                    annotation, params), connector)
+            return super(WhereNode, self).add((alias, col, field.db_type(), lookup_type,
+                                               annotation, params), connector)
 
     def make_atom(self, child, qn):
         table_alias, name, db_type, lookup_type, value_annot, params = child
