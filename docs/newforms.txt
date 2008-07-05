@@ -1345,7 +1345,7 @@ An ``UploadedFile`` object has two attributes:
 The string representation of an ``UploadedFile`` is the same as the filename
 attribute.
 
-When you use a ``FileField`` on a form, you must also remember to
+When you use a ``FileField`` in a form, you must also remember to
 `bind the file data to the form`_.
 
 .. _`bind the file data to the form`: `Binding uploaded files to a form`_
@@ -1412,7 +1412,7 @@ These control the range of values permitted in the field.
 
 Using an ImageField requires that the `Python Imaging Library`_ is installed.
 
-When you use a ``FileField`` on a form, you must also remember to
+When you use an ``ImageField`` in a form, you must also remember to
 `bind the file data to the form`_.
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
