@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 class GoogleMapException(Exception): pass
-from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline
+from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline, GMarker
 
 # The default Google Maps URL (for the API javascript)
 # TODO: Internationalize for Japan, UK, etc.
@@ -20,7 +20,7 @@ class GoogleMap(object):
 
     def __init__(self, key=None, api_url=None, version=None, 
                  center=None, zoom=None, dom_id='map', load_func='gmap_load', 
-                 kml_urls=[], polygons=[], polylines=[],
+                 kml_urls=[], polygons=[], polylines=[], markers=[],
                  template='gis/google/js/google-map.js',
                  extra_context={}):
 
@@ -55,8 +55,14 @@ class GoogleMap(object):
         self.template = template
         self.kml_urls = kml_urls
         
-        # Does the user want any GPolygon or GPolyline overlays?
-        self.polygons, self.polylines = [], []
+        # Does the user want any GMarker, GPolygon, and/or GPolyline overlays?
+        self.polygons, self.polylines, self.markers = [], [], []
+        if markers:
+            for point in markers:
+                if isinstance(point, GMarker): 
+                    self.markers.append(point)
+                else:
+                    self.markers.append(GMarker(point))
         if polygons:
             for poly in polygons:
                 if isinstance(poly, GPolygon): 
@@ -70,12 +76,13 @@ class GoogleMap(object):
                 else:
                     self.polylines.append(GPolyline(pline))
        
-        # If GPolygons and/or GPolylines are used the zoom will be automatically
+        # If GMarker, GPolygons, and/or GPolylines 
+        # are used the zoom will be automatically
         # calculated via the Google Maps API.  If both a zoom level and a
         # center coordinate are provided with polygons/polylines, no automatic
         # determination will occur.
         self.calc_zoom = False
-        if self.polygons or self.polylines:
+        if self.polygons or self.polylines  or self.markers:
             if center is None or zoom is None:
                 self.calc_zoom = True
     
@@ -95,6 +102,7 @@ class GoogleMap(object):
                   'zoom' : self.zoom,
                   'polygons' : self.polygons,
                   'polylines' : self.polylines,
+                  'markers' : self.markers,
                   }
         params.update(extra_context)
         self.js = render_to_string(self.template, params)
