@@ -6,6 +6,11 @@ import django
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
 
+try:
+    set
+except NameError:
+    from sets import Set as set     # For Python 2.3
+
 class CommandError(Exception):
     pass
 

@@ -85,6 +85,32 @@ your admin's index page. See `Tutorial 2`_ for more information.
 
 .. _Tutorial 2: ../tutorial02/
 
+cleanup 
+-------
+
+**New in Django development version**
+
+Can be run as a cronjob or directly to clean out old data from the database
+(only expired sessions at the moment).
+
+compilemessages
+---------------
+
+**New in Django development version**
+
+Compiles .po files created with ``makemessages`` to .mo files for use with
+the builtin gettext support. See the `i18n documentation`_ for details.
+
+--locale
+~~~~~~~~
+
+Use the ``--locale`` or ``-l`` option to specify the locale to process.
+If not provided all locales are processed.
+
+Example usage::
+
+    django-admin.py compilemessages --locale=br_PT
+
 createcachetable <tablename>
 ----------------------------
 
@@ -361,6 +387,62 @@ that ``django-admin.py`` should print to the console.
 Example usage::
 
     django-admin.py loaddata --verbosity=2
+
+makemessages
+------------
+
+**New in Django development version**
+
+Runs over the entire source tree of the current directory and pulls out all
+strings marked for translation. It creates (or updates) a message file in the
+conf/locale (in the django tree) or locale (for project and application)
+directory. After making changes to the messages files you need to compile them
+with ``compilemessages`` for use with the builtin gettext support. See the
+`i18n documentation`_ for details.
+
+.. _i18n documentation: ../i18n/#how-to-create-language-files
+
+--all
+~~~~~
+
+Use the ``--all`` or ``-a`` option to update the message files for all
+available languages.
+
+Example usage::
+
+    django-admin.py makemessages --all
+
+--locale
+~~~~~~~~
+
+Use the ``--locale`` or ``-l`` option to specify the locale to process.
+
+Example usage::
+
+    django-admin.py makemessages --locale=br_PT
+
+--domain
+~~~~~~~~
+
+Use the ``--domain`` or ``-d`` option to change the domain of the messages files.
+Currently supported:
+
+	* ``django`` for all ``*.py`` and ``*.html`` files (default) 
+	* ``djangojs`` for ``*.js`` files
+
+--verbosity
+~~~~~~~~~~~
+
+Use ``--verbosity`` or ``-v`` to specify the amount of notification and debug
+information that ``django-admin.py`` should print to the console.
+
+	* ``0`` means no output.
+	* ``1`` means normal output (default).
+	* ``2`` means verbose output.
+
+Example usage::
+
+    django-admin.py makemessages --verbosity=2
 
 reset <appname appname ...>
 ---------------------------

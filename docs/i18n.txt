@@ -122,8 +122,8 @@ Translation works on variables. Again, here's an identical example::
 
 (The caveat with using variables or computed values, as in the previous two
 examples, is that Django's translation-string-detecting utility,
-``make-messages.py``, won't be able to find these strings. More on
-``make-messages`` later.)
+``django-admin.py makemessages``, won't be able to find these strings. More on
+``makemessages`` later.)
 
 The strings you pass to ``_()`` or ``ugettext()`` can take placeholders,
 specified with Python's standard named-string interpolation syntax. Example::
@@ -393,12 +393,17 @@ file is a plain-text file, representing a single language, that contains all
 available translation strings and how they should be represented in the given
 language. Message files have a ``.po`` file extension.
 
-Django comes with a tool, ``bin/make-messages.py``, that automates the creation
-and upkeep of these files.
+Django comes with a tool, ``django-admin.py makemessages``, that automates the
+creation and upkeep of these files. 
+
+.. admonition:: A note to Django veterans
+
+    The old tool ``bin/make-messages.py`` has been moved to the command
+    ``django-admin.py makemessages`` to provide consistency throughout Django.
 
 To create or update a message file, run this command::
 
-    bin/make-messages.py -l de
+    django-admin.py makemessages -l de
 
 ...where ``de`` is the language code for the message file you want to create.
 The language code, in this case, is in locale format. For example, it's
@@ -423,11 +428,11 @@ do the same, but the location of the locale directory is ``locale/LANG/LC_MESSAG
 
 .. admonition:: No gettext?
 
-    If you don't have the ``gettext`` utilities installed, ``make-messages.py``
-    will create empty files. If that's the case, either install the ``gettext``
-    utilities or just copy the English message file
-    (``conf/locale/en/LC_MESSAGES/django.po``) and use it as a starting point;
-    it's just an empty translation file.
+    If you don't have the ``gettext`` utilities installed,
+    ``django-admin.py makemessages`` will create empty files. If that's the
+    case, either install the ``gettext`` utilities or just copy the English
+    message file (``conf/locale/en/LC_MESSAGES/django.po``) and use it as a
+    starting point; it's just an empty translation file.
 
 The format of ``.po`` files is straightforward. Each ``.po`` file contains a
 small bit of metadata, such as the translation maintainer's contact
@@ -440,8 +445,8 @@ For example, if your Django app contained a translation string for the text
 
     _("Welcome to my site.")
 
-...then ``make-messages.py`` will have created a ``.po`` file containing the
-following snippet -- a message::
+...then ``django-admin.py makemessages`` will have created a ``.po`` file
+containing the following snippet -- a message::
 
     #: path/to/python/module.py:23
     msgid "Welcome to my site."
@@ -476,23 +481,29 @@ otherwise, they'll be tacked together without whitespace!
 To reexamine all source code and templates for new translation strings and
 update all message files for **all** languages, run this::
 
-    make-messages.py -a
+    django-admin.py makemessages -a
 
 Compiling message files
 -----------------------
 
 After you create your message file -- and each time you make changes to it --
 you'll need to compile it into a more efficient form, for use by ``gettext``.
-Do this with the ``bin/compile-messages.py`` utility.
+Do this with the ``django-admin.py compilemessages`` utility.
 
 This tool runs over all available ``.po`` files and creates ``.mo`` files,
 which are binary files optimized for use by ``gettext``. In the same directory
-from which you ran ``make-messages.py``, run ``compile-messages.py`` like
-this::
+from which you ran ``django-admin.py makemessages``, run
+``django-admin.py compilemessages`` like this::
 
-   bin/compile-messages.py
+   django-admin.py compilemessages
 
 That's it. Your translations are ready for use.
+
+.. admonition:: A note to Django veterans
+
+    The old tool ``bin/compile-messages.py`` has been moved to the command
+    ``django-admin.py compilemessages`` to provide consistency throughout
+    Django.
 
 .. admonition:: A note to translators
 
@@ -598,9 +609,9 @@ Notes:
               ('en', ugettext('English')),
           )
 
-      With this arrangement, ``make-messages.py`` will still find and mark
-      these strings for translation, but the translation won't happen at
-      runtime -- so you'll have to remember to wrap the languages in the *real*
+      With this arrangement, ``django-admin.py makemessages`` will still find
+      and mark these strings for translation, but the translation won't happen
+      at runtime -- so you'll have to remember to wrap the languages in the *real*
       ``ugettext()`` in any code that uses ``LANGUAGES`` at runtime.
 
     * The ``LocaleMiddleware`` can only select languages for which there is a
@@ -677,15 +688,16 @@ All message file repositories are structured the same way. They are:
       searched in that order for ``<language>/LC_MESSAGES/django.(po|mo)``
     * ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
 
-To create message files, you use the same ``make-messages.py`` tool as with the
-Django message files. You only need to be in the right place -- in the directory
-where either the ``conf/locale`` (in case of the source tree) or the ``locale/``
-(in case of app messages or project messages) directory are located. And you
-use the same ``compile-messages.py`` to produce the binary ``django.mo`` files
-that are used by ``gettext``.
+To create message files, you use the same ``django-admin.py makemessages``
+tool as with the Django message files. You only need to be in the right place
+-- in the directory where either the ``conf/locale`` (in case of the source
+tree) or the ``locale/`` (in case of app messages or project messages)
+directory are located. And you use the same ``django-admin.py compilemessages``
+to produce the binary ``django.mo`` files that are used by ``gettext``.
 
-You can also run ``compile-message.py --settings=path.to.settings`` to make
-the compiler process all the directories in your ``LOCALE_PATHS`` setting.
+You can also run ``django-admin.py compilemessages --settings=path.to.settings``
+to make the compiler process all the directories in your ``LOCALE_PATHS``
+setting.
 
 Application message files are a bit complicated to discover -- they need the
 ``LocaleMiddleware``. If you don't use the middleware, only the Django message
@@ -695,15 +707,15 @@ Finally, you should give some thought to the structure of your translation
 files. If your applications need to be delivered to other users and will
 be used in other projects, you might want to use app-specific translations.
 But using app-specific translations and project translations could produce
-weird problems with ``make-messages``: ``make-messages`` will traverse all
+weird problems with ``makemessages``: ``makemessages`` will traverse all
 directories below the current path and so might put message IDs into the
 project message file that are already in application message files.
 
 The easiest way out is to store applications that are not part of the project
 (and so carry their own translations) outside the project tree. That way,
-``make-messages`` on the project level will only translate strings that are
-connected to your explicit project and not strings that are distributed
-independently.
+``django-admin.py makemessages`` on the project level will only translate
+strings that are connected to your explicit project and not strings that are
+distributed independently.
 
 The ``set_language`` redirect view
 ==================================
@@ -858,14 +870,14 @@ Creating JavaScript translation catalogs
 ----------------------------------------
 
 You create and update the translation catalogs the same way as the other
-Django translation catalogs -- with the make-messages.py tool. The only
-difference is you need to provide a ``-d djangojs`` parameter, like this::
+Django translation catalogs -- with the django-admin.py makemessages tool. The
+only difference is you need to provide a ``-d djangojs`` parameter, like this::
 
-    make-messages.py -d djangojs -l de
+    django-admin.py makemessages -d djangojs -l de
 
 This would create or update the translation catalog for JavaScript for German.
-After updating translation catalogs, just run ``compile-messages.py`` the same
-way as you do with normal Django translation catalogs.
+After updating translation catalogs, just run ``django-admin.py compilemessages``
+the same way as you do with normal Django translation catalogs.
 
 Specialties of Django translation
 ==================================

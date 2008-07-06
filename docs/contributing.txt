@@ -392,7 +392,7 @@ translated, here's what to do:
     * Create translations using the methods described in the
       `i18n documentation`_.
     * Create a diff of the ``.po`` file against the current Subversion trunk.
-    * Make sure that `` bin/compile-messages.py -l <lang>`` runs without
+    * Make sure that `` django-admin.py compilemessages -l <lang>`` runs without
       producing any warnings.
     * Attach the patch to a ticket in Django's ticket system.
 

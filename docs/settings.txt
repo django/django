@@ -682,10 +682,10 @@ settings file::
         ('en', gettext('English')),
     )
 
-With this arrangement, ``make-messages.py`` will still find and mark these
-strings for translation, but the translation won't happen at runtime -- so
-you'll have to remember to wrap the languages in the *real* ``gettext()`` in
-any code that uses ``LANGUAGES`` at runtime.
+With this arrangement, ``django-admin.py makemessages`` will still find and
+mark these strings for translation, but the translation won't happen at
+runtime -- so you'll have to remember to wrap the languages in the *real*
+``gettext()`` in any code that uses ``LANGUAGES`` at runtime.
 
 LOCALE_PATHS
 ------------
