@@ -266,10 +266,11 @@ Internally, all block and inline translations use the appropriate
 Each ``RequestContext`` has access to three translation-specific variables:
 
     * ``LANGUAGES`` is a list of tuples in which the first element is the
-      language code and the second is the language name (in that language).
+      language code and the second is the language name (translated into the
+      currently active locale).
     * ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
       Example: ``en-us``. (See "How language preference is discovered", below.)
-    * ``LANGUAGE_BIDI`` is the current language's direction. If True, it's a
+    * ``LANGUAGE_BIDI`` is the current locale's direction. If True, it's a
       right-to-left language, e.g: Hebrew, Arabic. If False it's a
       left-to-right language, e.g: English, French, German etc.
 
