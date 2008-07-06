@@ -10,12 +10,15 @@ pythonize_re = re.compile(r'\n\s*//')
 def make_messages(locale=None, domain='django', verbosity='1', all=False):
     """
     Uses the locale directory from the Django SVN tree or an application/
-    project to process all 
+    project to process all
     """
     # Need to ensure that the i18n framework is enabled
     from django.conf import settings
-    settings.configure(USE_I18N = True)
-    
+    if settings.configured:
+        settings.USE_I18N = True
+    else:
+        settings.configure(USE_I18N = True)
+
     from django.utils.translation import templatize
 
     if os.path.isdir(os.path.join('conf', 'locale')):
@@ -24,7 +27,7 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False):
         localedir = os.path.abspath('locale')
     else:
         raise CommandError("This script should be run from the Django SVN tree or your project or app tree. If you did indeed run it from the SVN checkout or your project or application, maybe you are just missing the conf/locale (in the django tree) or locale (for project and application) directory? It is not created automatically, you have to create it by hand if you want to enable i18n for your project or application.")
-    
+
     if domain not in ('django', 'djangojs'):
         raise CommandError("currently makemessages only supports domains 'django' and 'djangojs'")
 

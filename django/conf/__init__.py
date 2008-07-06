@@ -71,6 +71,13 @@ class LazySettings(object):
             setattr(holder, name, value)
         self._target = holder
 
+    def configured(self):
+        """
+        Returns True if the settings have already been configured.
+        """
+        return bool(self._target)
+    configured = property(configured)
+
 class Settings(object):
     def __init__(self, settings_module):
         # update this dict from global settings (but only for ALL_CAPS settings)
