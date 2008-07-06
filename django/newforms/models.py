@@ -290,8 +290,8 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
     setattr(Meta, 'fields', fields)
     setattr(Meta, 'exclude', exclude)
     class_name = model.__name__ + 'Form'
-    return ModelFormMetaclass(class_name, (form,), {'Meta': Meta},
-                              formfield_callback=formfield_callback)
+    return ModelFormMetaclass(class_name, (form,), {'Meta': Meta, 
+                              'formfield_callback': formfield_callback})
 
 
 # ModelFormSets ##############################################################
