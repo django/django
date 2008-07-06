@@ -56,7 +56,8 @@ class DeclarativeFieldsMetaclass(type):
     """
     def __new__(cls, name, bases, attrs):
         attrs['base_fields'] = get_declared_fields(bases, attrs)
-        return type.__new__(cls, name, bases, attrs)
+        return super(DeclarativeFieldsMetaclass,
+                     cls).__new__(cls, name, bases, attrs)
 
 class BaseForm(StrAndUnicode):
     # This is the main implementation of all the Form logic. Note that this
