@@ -87,11 +87,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         cursor.execute('SELECT %s_sq.currval FROM dual' % sq_name)
         return cursor.fetchone()[0]
 
-    def limit_offset_sql(self, limit, offset=None):
-        # Limits and offset are too complicated to be handled here.
-        # Instead, they are handled in django/db/backends/oracle/query.py.
-        return ""
-
     def lookup_cast(self, lookup_type):
         if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith'):
             return "UPPER(%s)"
