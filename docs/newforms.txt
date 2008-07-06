@@ -1817,14 +1817,20 @@ reuse certain sets of widget attributes over and over again. Rather than
 repeat these attribute definitions every time you need them, Django allows
 you to capture those definitions as a custom widget.
 
-For example, if you find that you are including a lot of comment fields on forms,
-you could capture the idea of a ``TextInput`` with a specific ``size`` attribute
-as a custom extension to the ``TextInput`` widget::
+For example, if you find that you are including a lot of comment fields on
+forms, you could capture the idea of a ``TextInput`` with a specific
+default ``size`` attribute as a custom extension to the ``TextInput`` widget::
 
     class CommentWidget(forms.TextInput):
         def __init__(self, *args, **kwargs):
-            kwargs.setdefault('attrs',{}).update({'size': '40'})
+            attrs = kwargs.setdefault('attrs',{})
+            if 'size' not in attrs:
+                attrs['size'] = 40
             super(CommentWidget, self).__init__(*args, **kwargs)
+
+We allow the ``size`` attribute to be overridden by the user, but, by default,
+this widget will behave as if ``attrs={'size': 40}`` was always passed into the
+constructor.
 
 Then you can use this widget in your forms::
 
