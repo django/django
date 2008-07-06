@@ -87,11 +87,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         cursor.execute('SELECT %s_sq.currval FROM dual' % sq_name)
         return cursor.fetchone()[0]
 
-    def limit_offset_sql(self, limit, offset=None):
-        # Limits and offset are too complicated to be handled here.
-        # Instead, they are handled in django/db/backends/oracle/query.py.
-        return ""
-
     def lookup_cast(self, lookup_type):
         if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith'):
             return "UPPER(%s)"
@@ -146,11 +141,11 @@ class DatabaseOperations(BaseDatabaseOperations):
             # Since we've just deleted all the rows, running our sequence
             # ALTER code will reset the sequence to 0.
             for sequence_info in sequences:
-                table_name = sequence_info['table']
-                seq_name = get_sequence_name(table_name)
+                sequence_name = get_sequence_name(sequence_info['table'])
+                table_name = self.quote_name(sequence_info['table'])
                 column_name = self.quote_name(sequence_info['column'] or 'id')
-                query = _get_sequence_reset_sql() % {'sequence': seq_name,
-                                                     'table': self.quote_name(table_name),
+                query = _get_sequence_reset_sql() % {'sequence': sequence_name,
+                                                     'table': table_name,
                                                      'column': column_name}
                 sql.append(query)
             return sql
@@ -162,19 +157,22 @@ class DatabaseOperations(BaseDatabaseOperations):
         output = []
         query = _get_sequence_reset_sql()
         for model in model_list:
-            for f in model._meta.fields:
+            for f in model._meta.local_fields:
                 if isinstance(f, models.AutoField):
+                    table_name = self.quote_name(model._meta.db_table)
                     sequence_name = get_sequence_name(model._meta.db_table)
-                    column_name = self.quote_name(f.db_column or f.name)
+                    column_name = self.quote_name(f.column)
                     output.append(query % {'sequence': sequence_name,
-                                           'table': model._meta.db_table,
+                                           'table': table_name,
                                            'column': column_name})
                     break # Only one AutoField is allowed per model, so don't bother continuing.
             for f in model._meta.many_to_many:
+                table_name = self.quote_name(f.m2m_db_table())
                 sequence_name = get_sequence_name(f.m2m_db_table())
+                column_name = self.quote_name('id')
                 output.append(query % {'sequence': sequence_name,
-                                       'table': f.m2m_db_table(),
-                                       'column': self.quote_name('id')})
+                                       'table': table_name,
+                                       'column': column_name})
         return output
 
     def start_transaction_sql(self):

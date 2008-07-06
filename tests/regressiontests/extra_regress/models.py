@@ -39,7 +39,7 @@ Second Revision of First Revision
 (2, 1)
 
 Queryset to match most recent revision:
->>> qs = RevisionableModel.objects.extra(where=["%(table)s.id IN (SELECT MAX(rev.id) FROM %(table)s AS rev GROUP BY rev.base_id)" % {'table': RevisionableModel._meta.db_table,}],)
+>>> qs = RevisionableModel.objects.extra(where=["%(table)s.id IN (SELECT MAX(rev.id) FROM %(table)s rev GROUP BY rev.base_id)" % {'table': RevisionableModel._meta.db_table,}],)
 >>> qs
 [<RevisionableModel: Second Revision (2, 1)>]
 

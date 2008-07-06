@@ -215,18 +215,19 @@ class ModelFormOptions(object):
 
 
 class ModelFormMetaclass(type):
-    def __new__(cls, name, bases, attrs,
-                formfield_callback=lambda f: f.formfield()):
+    def __new__(cls, name, bases, attrs):
+        formfield_callback = attrs.pop('formfield_callback',
+                lambda f: f.formfield())
         try:
             parents = [b for b in bases if issubclass(b, ModelForm)]
         except NameError:
             # We are defining ModelForm itself.
             parents = None
+        new_class = super(ModelFormMetaclass, cls).__new__(cls, name, bases,
+                attrs)
         if not parents:
-            return super(ModelFormMetaclass, cls).__new__(cls, name, bases,
-                    attrs)
+            return new_class
 
-        new_class = type.__new__(cls, name, bases, attrs)
         if 'media' not in attrs:
             new_class.media = media_property(new_class)
         declared_fields = get_declared_fields(bases, attrs, False)

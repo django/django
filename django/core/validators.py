@@ -177,7 +177,7 @@ def isValidImage(field_data, all_data):
     from PIL import Image
     from cStringIO import StringIO
     try:
-        content = field_data['content']
+        content = field_data.read()
     except TypeError:
         raise ValidationError, _("No file was submitted. Check the encoding type on the form.")
     try:
@@ -469,7 +469,7 @@ class HasAllowableSize(object):
 
     def __call__(self, field_data, all_data):
         try:
-            content = field_data['content']
+            content = field_data.read()
         except TypeError:
             raise ValidationError, ugettext_lazy("No file was submitted. Check the encoding type on the form.")
         if self.min_size is not None and len(content) < self.min_size:

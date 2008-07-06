@@ -1,4 +1,4 @@
-.TH "django-admin.py" "1" "June 2007" "Django Project" ""
+.TH "django-admin.py" "1" "March 2008" "Django Project" ""
 .SH "NAME"
 django\-admin.py \- Utility script for the Django web framework
 .SH "SYNOPSIS"
@@ -21,6 +21,12 @@ script found at the top level of each Django project directory.
 .BI "adminindex [" "appname ..." "]"
 Prints the admin\-index template snippet for the given app name(s).
 .TP
+.BI cleanup
+Cleans out old data from the database (only expired sessions at the moment).
+.TP
+.BI "compilemessages [" "\-\-locale=LOCALE" "]"
+Compiles .po files to .mo files for use with builtin gettext support.
+.TP
 .BI "createcachetable [" "tablename" "]"
 Creates the table needed to use the SQL cache backend
 .TP
@@ -42,6 +48,11 @@ model module.
 Executes
 .B sqlall
 for the given app(s) in the current database.
+.TP
+.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-all" "]"
+Runs over the entire source tree of the current directory and pulls out all
+strings marked for translation. It creates (or updates) a message file in the
+conf/locale (in the django tree) or locale (for project and application) directory.
 .TP
 .BI "reset [" "appname ..." "]"
 Executes
@@ -136,7 +147,15 @@ Verbosity level: 0=minimal output, 1=normal output, 2=all output.
 .TP
 .I \-\-adminmedia=ADMIN_MEDIA_PATH
 Specifies the directory from which to serve admin media when using the development server.
-
+.TP
+.I \-l, \-\-locale=LOCALE
+The locale to process when using makemessages or compilemessages.
+.TP
+.I \-d, \-\-domain=DOMAIN
+The domain of the message files (default: "django") when using makemessages.
+.TP
+.I \-a, \-\-all
+Process all available locales when using makemessages.
 .SH "ENVIRONMENT"
 .TP
 .I DJANGO_SETTINGS_MODULE

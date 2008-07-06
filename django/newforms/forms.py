@@ -57,8 +57,8 @@ class DeclarativeFieldsMetaclass(type):
     """
     def __new__(cls, name, bases, attrs):
         attrs['base_fields'] = get_declared_fields(bases, attrs)
-
-        new_class = type.__new__(cls, name, bases, attrs)
+        new_class = super(DeclarativeFieldsMetaclass,
+                     cls).__new__(cls, name, bases, attrs)
         if 'media' not in attrs:
             new_class.media = media_property(new_class)
         return new_class

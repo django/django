@@ -27,7 +27,36 @@ class WhereNode(tree.Node):
     """
     default = AND
 
-    def as_sql(self, node=None, qn=None):
+    def add(self, data, connector):
+        """
+        Add a node to the where-tree. If the data is a list or tuple, it is
+        expected to be of the form (alias, col_name, field_obj, lookup_type,
+        value), which is then slightly munged before being stored (to avoid
+        storing any reference to field objects). Otherwise, the 'data' is
+        stored unchanged and can be anything with an 'as_sql()' method.
+        """
+        if not isinstance(data, (list, tuple)):
+            super(WhereNode, self).add(data, connector)
+            return
+
+        alias, col, field, lookup_type, value = data
+        if field:
+            params = field.get_db_prep_lookup(lookup_type, value)
+            db_type = field.db_type()
+        else:
+            # This is possible when we add a comparison to NULL sometimes (we
+            # don't really need to waste time looking up the associated field
+            # object).
+            params = Field().get_db_prep_lookup(lookup_type, value)
+            db_type = None
+        if isinstance(value, datetime.datetime):
+            annotation = datetime.datetime
+        else:
+            annotation = bool(value)
+        super(WhereNode, self).add((alias, col, db_type, lookup_type,
+                annotation, params), connector)
+
+    def as_sql(self, qn=None):
         """
         Returns the SQL version of the where clause and the value to be
         substituted in. Returns None, None if this node is empty.
@@ -36,60 +65,56 @@ class WhereNode(tree.Node):
         (generally not needed except by the internal implementation for
         recursion).
         """
-        if node is None:
-            node = self
         if not qn:
             qn = connection.ops.quote_name
-        if not node.children:
+        if not self.children:
             return None, []
         result = []
         result_params = []
         empty = True
-        for child in node.children:
+        for child in self.children:
             try:
                 if hasattr(child, 'as_sql'):
                     sql, params = child.as_sql(qn=qn)
-                    format = '(%s)'
-                elif isinstance(child, tree.Node):
-                    sql, params = self.as_sql(child, qn)
-                    if child.negated:
-                        format = 'NOT (%s)'
-                    elif len(child.children) == 1:
-                        format = '%s'
-                    else:
-                        format = '(%s)'
                 else:
+                    # A leaf node in the tree.
                     sql, params = self.make_atom(child, qn)
-                    format = '%s'
             except EmptyResultSet:
-                if node.connector == AND and not node.negated:
+                if self.connector == AND and not self.negated:
                     # We can bail out early in this particular case (only).
                     raise
-                elif node.negated:
+                elif self.negated:
                     empty = False
                 continue
             except FullResultSet:
                 if self.connector == OR:
-                    if node.negated:
+                    if self.negated:
                         empty = True
                         break
                     # We match everything. No need for any constraints.
                     return '', []
-                if node.negated:
+                if self.negated:
                     empty = True
                 continue
             empty = False
             if sql:
-                result.append(format % sql)
+                result.append(sql)
                 result_params.extend(params)
         if empty:
             raise EmptyResultSet
-        conn = ' %s ' % node.connector
-        return conn.join(result), result_params
+
+        conn = ' %s ' % self.connector
+        sql_string = conn.join(result)
+        if sql_string:
+            if self.negated:
+                sql_string = 'NOT (%s)' % sql_string
+            elif len(self.children) != 1:
+                sql_string = '(%s)' % sql_string
+        return sql_string, result_params
 
     def make_atom(self, child, qn):
         """
-        Turn a tuple (table_alias, field_name, db_type, lookup_type,
+        Turn a tuple (table_alias, column_name, db_type, lookup_type,
         value_annot, params) into valid SQL.
 
         Returns the string for the SQL fragment and the parameters to use for

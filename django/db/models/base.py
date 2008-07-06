@@ -31,19 +31,15 @@ except NameError:
 class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
-        # If this isn't a subclass of Model, don't do anything special.
-        try:
-            parents = [b for b in bases if issubclass(b, Model)]
-        except NameError:
-            # 'Model' isn't defined yet, meaning we're looking at Django's own
-            # Model class, defined below.
-            parents = []
+        super_new = super(ModelBase, cls).__new__
+        parents = [b for b in bases if isinstance(b, ModelBase)]
         if not parents:
-            return super(ModelBase, cls).__new__(cls, name, bases, attrs)
+            # If this isn't a subclass of Model, don't do anything special.
+            return super_new(cls, name, bases, attrs)
 
         # Create the class.
         module = attrs.pop('__module__')
-        new_class = type.__new__(cls, name, bases, {'__module__': module})
+        new_class = super_new(cls, name, bases, {'__module__': module})
         attr_meta = attrs.pop('Meta', None)
         abstract = getattr(attr_meta, 'abstract', False)
         if not attr_meta:

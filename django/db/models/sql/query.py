@@ -1104,19 +1104,7 @@ class Query(object):
                 # that's harmless.
                 self.promote_alias(table)
 
-        # To save memory and copying time, convert the value from the Python
-        # object to the actual value used in the SQL query.
-        if field:
-            params = field.get_db_prep_lookup(lookup_type, value)
-        else:
-            params = Field().get_db_prep_lookup(lookup_type, value)
-        if isinstance(value, datetime.datetime):
-            annotation = datetime.datetime
-        else:
-            annotation = bool(value)
-
-        self.where.add((alias, col, field.db_type(), lookup_type, annotation,
-            params), connector)
+        self.where.add((alias, col, field, lookup_type, value), connector)
 
         if negate:
             for alias in join_list:
@@ -1126,8 +1114,8 @@ class Query(object):
                     for alias in join_list:
                         if self.alias_map[alias][JOIN_TYPE] == self.LOUTER:
                             j_col = self.alias_map[alias][RHS_JOIN_COL]
-                            entry = Node([(alias, j_col, None, 'isnull', True,
-                                    [True])])
+                            entry = self.where_class()
+                            entry.add((alias, j_col, None, 'isnull', True), AND)
                             entry.negate()
                             self.where.add(entry, AND)
                             break
@@ -1135,7 +1123,8 @@ class Query(object):
                     # Leaky abstraction artifact: We have to specifically
                     # exclude the "foo__in=[]" case from this handling, because
                     # it's short-circuited in the Where class.
-                    entry = Node([(alias, col, None, 'isnull', True, [True])])
+                    entry = self.where_class()
+                    entry.add((alias, col, None, 'isnull', True), AND)
                     entry.negate()
                     self.where.add(entry, AND)
 
