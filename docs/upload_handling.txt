@@ -91,7 +91,7 @@ objects; see `UploadedFile objects`_ for a complete reference.
 Putting it all together, here's a common way you might handle an uploaded file::
 
     def handle_uploaded_file(f):
-        destination = open('some/file/name.txt', 'wb')
+        destination = open('some/file/name.txt', 'wb+')
         for chunk in f.chunks():
             destination.write(chunk)
 
