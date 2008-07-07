@@ -6,8 +6,12 @@ from django.dispatch import dispatcher
 
 class BaseHandler(object):
     # Changes that are always applied to a response (in this order).
-    response_fixes = [http.fix_location_header,
-            http.conditional_content_removal]
+    response_fixes = [
+        http.fix_location_header,
+        http.conditional_content_removal,
+        http.fix_IE_for_attach,
+        http.fix_IE_for_vary,
+    ]
 
     def __init__(self):
         self._request_middleware = self._view_middleware = self._response_middleware = self._exception_middleware = None
