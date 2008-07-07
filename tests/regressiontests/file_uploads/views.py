@@ -68,3 +68,13 @@ def file_upload_quota_broken(request):
     response = file_upload_echo(request)
     request.upload_handlers.insert(0, QuotaUploadHandler())
     return response
+
+def file_upload_getlist_count(request):
+    """
+    Check the .getlist() function to ensure we receive the correct number of files.
+    """
+    file_counts = {}
+
+    for key in request.FILES.keys():
+        file_counts[key] = len(request.FILES.getlist(key))
+    return HttpResponse(simplejson.dumps(file_counts))

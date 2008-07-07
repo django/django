@@ -90,32 +90,34 @@ def encode_multipart(boundary, data):
     """
     lines = []
     to_str = lambda s: smart_str(s, settings.DEFAULT_CHARSET)
+
+    # Not by any means perfect, but good enough for our purposes.
+    is_file = lambda thing: hasattr(thing, "read") and callable(thing.read)
+
+    # Each bit of the multipart form data could be either a form value or a
+    # file, or a *list* of form values and/or files. Remember that HTTP field
+    # names can be duplicated!
     for (key, value) in data.items():
-        if isinstance(value, file):
-            lines.extend([
-                '--' + boundary,
-                'Content-Disposition: form-data; name="%s"; filename="%s"' \
-                    % (to_str(key), to_str(os.path.basename(value.name))),
-                'Content-Type: application/octet-stream',
-                '',
-                value.read()
-            ])
-        else:
-            if not isinstance(value, basestring) and is_iterable(value):
-                for item in value:
+        if is_file(value):
+            lines.extend(encode_file(boundary, key, value))
+        elif not isinstance(value, basestring) and is_iterable(value):
+            for item in value:
+                if is_file(item):
+                    lines.extend(encode_file(boundary, key, item))
+                else:
                     lines.extend([
                         '--' + boundary,
                         'Content-Disposition: form-data; name="%s"' % to_str(key),
                         '',
                         to_str(item)
                     ])
-            else:
-                lines.extend([
-                    '--' + boundary,
-                    'Content-Disposition: form-data; name="%s"' % to_str(key),
-                    '',
-                    to_str(value)
-                ])
+        else:
+            lines.extend([
+                '--' + boundary,
+                'Content-Disposition: form-data; name="%s"' % to_str(key),
+                '',
+                to_str(value)
+            ])
 
     lines.extend([
         '--' + boundary + '--',
@@ -123,6 +125,17 @@ def encode_multipart(boundary, data):
     ])
     return '\r\n'.join(lines)
 
+def encode_file(boundary, key, file):
+    to_str = lambda s: smart_str(s, settings.DEFAULT_CHARSET)
+    return [
+        '--' + boundary,
+        'Content-Disposition: form-data; name="%s"; filename="%s"' \
+            % (to_str(key), to_str(os.path.basename(file.name))),
+        'Content-Type: application/octet-stream',
+        '',
+        file.read()
+    ]
+    
 class Client:
     """
     A class that can act as a client for testing purposes.
