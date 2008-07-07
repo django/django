@@ -78,23 +78,24 @@ class BaseFormSet(StrAndUnicode):
         for i in xrange(self._total_form_count):
             self.forms.append(self._construct_form(i))
     
-    def _construct_form(self, i):
+    def _construct_form(self, i, **kwargs):
         """
         Instantiates and returns the i-th form instance in a formset.
         """
-        kwargs = {'auto_id': self.auto_id, 'prefix': self.add_prefix(i)}
+        defaults = {'auto_id': self.auto_id, 'prefix': self.add_prefix(i)}
         if self.data or self.files:
-            kwargs['data'] = self.data
-            kwargs['files'] = self.files
+            defaults['data'] = self.data
+            defaults['files'] = self.files
         if self.initial:
             try:
-                kwargs['initial'] = self.initial[i]
+                defaults['initial'] = self.initial[i]
             except IndexError:
                 pass
         # Allow extra forms to be empty.
         if i >= self._initial_form_count:
-            kwargs['empty_permitted'] = True
-        form = self.form(**kwargs)
+            defaults['empty_permitted'] = True
+        defaults.update(kwargs)
+        form = self.form(**defaults)
         self.add_fields(form, i)
         return form
 
