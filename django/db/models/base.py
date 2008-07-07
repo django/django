@@ -536,7 +536,7 @@ class Model(object):
             # This is a normal uploadedfile that we can stream.
             fp = open(full_filename, 'wb')
             locks.lock(fp, locks.LOCK_EX)
-            for chunk in raw_field.chunk():
+            for chunk in raw_field.chunks():
                 fp.write(chunk)
             locks.unlock(fp)
             fp.close()

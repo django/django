@@ -15,7 +15,7 @@ def file_upload_view(request):
     if isinstance(form_data.get('file_field'), UploadedFile) and isinstance(form_data['name'], unicode):
         # If a file is posted, the dummy client should only post the file name,
         # not the full path.
-        if os.path.dirname(form_data['file_field'].file_name) != '':
+        if os.path.dirname(form_data['file_field'].name) != '':
             return HttpResponseServerError()            
         return HttpResponse('')
     else:
@@ -29,7 +29,7 @@ def file_upload_view_verify(request):
     form_data.update(request.FILES)
 
     # Check to see if unicode names worked out.
-    if not request.FILES['file_unicode'].file_name.endswith(u'test_\u4e2d\u6587_Orl\xe9ans.jpg'):
+    if not request.FILES['file_unicode'].name.endswith(u'test_\u4e2d\u6587_Orl\xe9ans.jpg'):
         return HttpResponseServerError()
 
     for key, value in form_data.items():
@@ -51,7 +51,7 @@ def file_upload_echo(request):
     """
     Simple view to echo back info about uploaded files for tests.
     """
-    r = dict([(k, f.file_name) for k, f in request.FILES.items()])
+    r = dict([(k, f.name) for k, f in request.FILES.items()])
     return HttpResponse(simplejson.dumps(r))
     
 def file_upload_quota(request):

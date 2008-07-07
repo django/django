@@ -27,7 +27,7 @@ from django.utils.encoding import StrAndUnicode, smart_unicode, smart_str
 
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateTimeInput
-
+from django.core.files.uploadedfile import SimpleUploadedFile as UploadedFile
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
@@ -419,18 +419,6 @@ except ImportError:
     # It's OK if Django settings aren't configured.
     URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
 
-class UploadedFile(StrAndUnicode):
-    "A wrapper for files uploaded in a FileField"
-    def __init__(self, filename, data):
-        self.filename = filename
-        self.data = data
-
-    def __unicode__(self):
-        """
-        The unicode representation is the filename, so that the pre-database-insertion
-        logic can use UploadedFile objects
-        """
-        return self.filename
 
 class FileField(Field):
     widget = FileInput
@@ -460,23 +448,20 @@ class FileField(Field):
                 category = DeprecationWarning,
                 stacklevel = 2
             )
+            data = UploadedFile(data['filename'], data['content'])
 
         try:
-            file_name = data.file_name
-            file_size = data.file_size
+            file_name = data.name
+            file_size = data.size
         except AttributeError:
-            try:
-                file_name = data.get('filename')
-                file_size = bool(data['content'])
-            except (AttributeError, KeyError):
-                raise ValidationError(self.error_messages['invalid'])
+            raise ValidationError(self.error_messages['invalid'])
 
         if not file_name:
             raise ValidationError(self.error_messages['invalid'])
         if not file_size:
             raise ValidationError(self.error_messages['empty'])
 
-        return UploadedFile(file_name, data)
+        return data
 
 class ImageField(FileField):
     default_error_messages = {

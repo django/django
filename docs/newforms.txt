@@ -1331,23 +1331,12 @@ given length.
     * Validates that non-empty file data has been bound to the form.
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``
 
-An ``UploadedFile`` object has two attributes:
-
-    ======================  ====================================================
-    Attribute               Description
-    ======================  ====================================================
-    ``filename``            The name of the file, provided by the uploading
-                            client.
-                            
-    ``content``             The array of bytes comprising the file content.
-    ======================  ====================================================
-
-The string representation of an ``UploadedFile`` is the same as the filename
-attribute.
+To learn more about the ``UploadedFile`` object, see the `file uploads documentation`_.
 
 When you use a ``FileField`` in a form, you must also remember to
 `bind the file data to the form`_.
 
+.. _file uploads documentation: ../upload_handling/
 .. _`bind the file data to the form`: `Binding uploaded files to a form`_
 
 ``FilePathField``

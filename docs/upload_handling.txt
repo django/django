@@ -22,7 +22,7 @@ Consider a simple form containing a ``FileField``::
     class UploadFileForm(forms.Form):
         title = forms.CharField(max_length=50)
         file  = forms.FileField()
-        
+
 A view handling this form will receive the file data in ``request.FILES``, which
 is a dictionary containing a key for each ``FileField`` (or ``ImageField``, or
 other ``FileField`` subclass) in the form. So the data from the above form would
@@ -64,32 +64,32 @@ methods to access the uploaded content:
     ``UploadedFile.read()``
         Read the entire uploaded data from the file. Be careful with this
         method: if the uploaded file is huge it can overwhelm your system if you
-        try to read it into memory. You'll probably want to use ``chunk()``
+        try to read it into memory. You'll probably want to use ``chunks()``
         instead; see below.
-        
+
     ``UploadedFile.multiple_chunks()``
         Returns ``True`` if the uploaded file is big enough to require
         reading in multiple chunks. By default this will be any file
         larger than 2.5 megabytes, but that's configurable; see below.
-    
+
     ``UploadedFile.chunk()``
         A generator returning chunks of the file. If ``multiple_chunks()`` is
         ``True``, you should use this method in a loop instead of ``read()``.
-        
+
         In practice, it's often easiest simply to use ``chunks()`` all the time;
         see the example below.
-    
+
     ``UploadedFile.file_name``
         The name of the uploaded file (e.g. ``my_file.txt``).
-        
+
     ``UploadedFile.file_size``
         The size, in bytes, of the uploaded file.
-        
+
 There are a few other methods and attributes available on ``UploadedFile``
 objects; see `UploadedFile objects`_ for a complete reference.
 
 Putting it all together, here's a common way you might handle an uploaded file::
-    
+
     def handle_uploaded_file(f):
         destination = open('some/file/name.txt', 'wb')
         for chunk in f.chunks():
@@ -126,27 +126,27 @@ Three `settings`_ control Django's file upload behavior:
         The maximum size, in bytes, for files that will be uploaded
         into memory. Files larger than ``FILE_UPLOAD_MAX_MEMORY_SIZE``
         will be streamed to disk.
-        
+
         Defaults to 2.5 megabytes.
-        
+
     ``FILE_UPLOAD_TEMP_DIR``
         The directory where uploaded files larger than ``FILE_UPLOAD_TEMP_DIR``
         will be stored.
-        
+
         Defaults to your system's standard temporary directory (i.e. ``/tmp`` on
         most Unix-like systems).
-        
+
     ``FILE_UPLOAD_HANDLERS``
         The actual handlers for uploaded files. Changing this setting
         allows complete customization -- even replacement -- of
         Django's upload process. See `upload handlers`_, below,
         for details.
-        
+
         Defaults to::
-        
+
             ("django.core.files.uploadhandler.MemoryFileUploadHandler",
              "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
-            
+
         Which means "try to upload to memory first, then fall back to temporary
         files."
 
@@ -161,34 +161,38 @@ All ``UploadedFile`` objects define the following methods/attributes:
         Returns a byte string of length ``num_bytes``, or the complete file if
         ``num_bytes`` is ``None``.
 
-    ``UploadedFile.chunk(self, chunk_size=None)``
+    ``UploadedFile.chunks(self, chunk_size=None)``
         A generator yielding small chunks from the file. If ``chunk_size`` isn't
-        given, chunks will be 64 kb.
+        given, chunks will be 64 KB.
 
     ``UploadedFile.multiple_chunks(self, chunk_size=None)``
         Returns ``True`` if you can expect more than one chunk when calling
-        ``UploadedFile.chunk(self, chunk_size)``.
+        ``UploadedFile.chunks(self, chunk_size)``.
 
     ``UploadedFile.file_size``
         The size, in bytes, of the uploaded file.
-    
+
     ``UploadedFile.file_name``
         The name of the uploaded file as provided by the user.
-    
+
     ``UploadedFile.content_type``
         The content-type header uploaded with the file (e.g. ``text/plain`` or
         ``application/pdf``). Like any data supplied by the user, you shouldn't
         trust that the uploaded file is actually this type. You'll still need to
         validate that the file contains the content that the content-type header
         claims -- "trust but verify."
-    
+
     ``UploadedFile.charset``
         For ``text/*`` content-types, the character set (i.e. ``utf8``) supplied
         by the browser. Again, "trust but verify" is the best policy here.
 
+    ``UploadedFile.__iter__()``
+        Iterates over the lines in the file.
+
     ``UploadedFile.temporary_file_path()``
         Only files uploaded onto disk will have this method; it returns the full
         path to the temporary uploaded file.
+
 
 Upload Handlers
 ===============

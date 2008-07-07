@@ -766,9 +766,12 @@ class FileField(Field):
     def get_db_prep_save(self, value):
         "Returns field's value prepared for saving into a database."
         # Need to convert UploadedFile objects provided via a form to unicode for database insertion
-        if value is None:
+        if hasattr(value, 'name'):
+            return value.name
+        elif value is None:
             return None
-        return unicode(value)
+        else:
+            return unicode(value)
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         field_list = Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel, follow)
@@ -842,7 +845,7 @@ class FileField(Field):
             # We don't need to raise a warning because Model._save_FIELD_file will
             # do so for us.
             try:
-                file_name = file.file_name
+                file_name = file.name
             except AttributeError:
                 file_name = file['filename']
 
@@ -857,9 +860,9 @@ class FileField(Field):
         return os.path.normpath(f)
 
     def save_form_data(self, instance, data):
-        from django.newforms.fields import UploadedFile
+        from django.core.files.uploadedfile import UploadedFile
         if data and isinstance(data, UploadedFile):
-            getattr(instance, "save_%s_file" % self.name)(data.filename, data.data, save=False)
+            getattr(instance, "save_%s_file" % self.name)(data.name, data, save=False)
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.FileField}

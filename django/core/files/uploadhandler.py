@@ -132,21 +132,15 @@ class TemporaryFileUploadHandler(FileUploadHandler):
         Create the file object to append to as data is coming in.
         """
         super(TemporaryFileUploadHandler, self).new_file(file_name, *args, **kwargs)
-        self.file = TemporaryFile(settings.FILE_UPLOAD_TEMP_DIR)
-        self.write = self.file.write
+        self.file = TemporaryUploadedFile(self.file_name, self.content_type, 0, self.charset)
 
     def receive_data_chunk(self, raw_data, start):
-        self.write(raw_data)
+        self.file.write(raw_data)
 
     def file_complete(self, file_size):
         self.file.seek(0)
-        return TemporaryUploadedFile(
-            file = self.file, 
-            file_name = self.file_name, 
-            content_type = self.content_type, 
-            file_size = file_size, 
-            charset = self.charset
-        )
+        self.file.size = file_size
+        return self.file
 
 class MemoryFileUploadHandler(FileUploadHandler):
     """
@@ -189,37 +183,12 @@ class MemoryFileUploadHandler(FileUploadHandler):
         return InMemoryUploadedFile(
             file = self.file,
             field_name = self.field_name,
-            file_name = self.file_name,
+            name = self.file_name,
             content_type = self.content_type,
-            file_size = file_size,
+            size = file_size,
             charset = self.charset
         )
 
-class TemporaryFile(object):
-    """
-    A temporary file that tries to delete itself when garbage collected.
-    """
-    def __init__(self, dir):
-        if not dir:
-            dir = tempfile.gettempdir()
-        try:
-            (fd, name) = tempfile.mkstemp(suffix='.upload', dir=dir)
-            self.file = os.fdopen(fd, 'w+b')
-        except (OSError, IOError):
-            raise OSError("Could not create temporary file for uploading, have you set settings.FILE_UPLOAD_TEMP_DIR correctly?")
-        self.name = name
-
-    def __getattr__(self, name):
-        a = getattr(self.__dict__['file'], name)
-        if type(a) != type(0):
-            setattr(self, name, a)
-        return a
-
-    def __del__(self):
-        try:
-            os.unlink(self.name)
-        except OSError:
-            pass
 
 def load_handler(path, *args, **kwargs):
     """

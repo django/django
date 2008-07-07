@@ -800,10 +800,10 @@ Traceback (most recent call last):
 ValidationError: [u'The submitted file is empty.']
 
 >>> type(f.clean(SimpleUploadedFile('name', 'Some File Content')))
-<class 'django.newforms.fields.UploadedFile'>
+<class 'django.core.files.uploadedfile.SimpleUploadedFile'>
 
 >>> type(f.clean(SimpleUploadedFile('name', 'Some File Content'), 'files/test4.pdf'))
-<class 'django.newforms.fields.UploadedFile'>
+<class 'django.core.files.uploadedfile.SimpleUploadedFile'>
 
 # URLField ##################################################################
 
