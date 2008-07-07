@@ -96,8 +96,16 @@ class UploadedFile(object):
     filename = deprecated_property(old="filename", new="name")
     file_name = deprecated_property(old="file_name", new="name")
     file_size = deprecated_property(old="file_size", new="size")
-    data = deprecated_property(old="data", new="read", readonly=True)
     chunk = deprecated_property(old="chunk", new="chunks", readonly=True)
+
+    def _get_data(self):
+        warnings.warn(
+            message = "UploadedFile.data is deprecated; use UploadedFile.read() instead.",
+            category = DeprecationWarning,
+            stacklevel = 2
+        )
+        return self.read()
+    data = property(_get_data)
 
     def multiple_chunks(self, chunk_size=None):
         """
