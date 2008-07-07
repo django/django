@@ -93,6 +93,7 @@ class UploadedFile(object):
             counter -= chunk_size
 
     # Deprecated properties
+    filename = deprecated_property(old="filename", new="name")
     file_name = deprecated_property(old="file_name", new="name")
     file_size = deprecated_property(old="file_size", new="size")
     data = deprecated_property(old="data", new="read", readonly=True)
