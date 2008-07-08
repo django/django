@@ -3,6 +3,10 @@ import types
 import sys
 import os
 from itertools import izip
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback.
 
 import django.db.models.manipulators    # Imported to register signal handler.
 import django.db.models.manager         # Ditto.
@@ -23,13 +27,11 @@ from django.core.files.move import file_move_safe
 from django.core.files import locks
 from django.conf import settings
 
-try:
-    set
-except NameError:
-    from sets import Set as set     # Python 2.3 fallback
 
 class ModelBase(type):
-    "Metaclass for all models"
+    """
+    Metaclass for all models.
+    """
     def __new__(cls, name, bases, attrs):
         super_new = super(ModelBase, cls).__new__
         parents = [b for b in bases if isinstance(b, ModelBase)]
@@ -144,7 +146,9 @@ class ModelBase(type):
             setattr(cls, name, value)
 
     def _prepare(cls):
-        # Creates some methods once self._meta has been populated.
+        """
+        Creates some methods once self._meta has been populated.
+        """
         opts = cls._meta
         opts._prepare(cls)
 
@@ -162,6 +166,7 @@ class ModelBase(type):
             cls.get_absolute_url = curry(get_absolute_url, opts, cls.get_absolute_url)
 
         dispatcher.send(signal=signals.class_prepared, sender=cls)
+
 
 class Model(object):
     __metaclass__ = ModelBase
@@ -267,7 +272,7 @@ class Model(object):
 
     def save(self):
         """
-        Save the current instance. Override this in a subclass if you want to
+        Saves the current instance. Override this in a subclass if you want to
         control the saving process.
         """
         self.save_base()
@@ -293,7 +298,7 @@ class Model(object):
 
         # If we are in a raw save, save the object exactly as presented.
         # That means that we don't try to be smart about saving attributes
-        # that might have come from the parent class - we just save the 
+        # that might have come from the parent class - we just save the
         # attributes we have been given to the class we have been given.
         if not raw:
             for parent, field in meta.parents.items():
@@ -301,7 +306,7 @@ class Model(object):
                 setattr(self, field.attname, self._get_pk_val(parent._meta))
 
         non_pks = [f for f in meta.local_fields if not f.primary_key]
-            
+
         # First, try an UPDATE. If that doesn't update anything, do an INSERT.
         pk_val = self._get_pk_val(meta)
         # Note: the comparison with '' is required for compatibility with
@@ -371,10 +376,12 @@ class Model(object):
 
     def _collect_sub_objects(self, seen_objs, parent=None, nullable=False):
         """
-        Recursively populates seen_objs with all objects related to this object.
+        Recursively populates seen_objs with all objects related to this
+        object.
+
         When done, seen_objs.items() will be in the format:
             [(model_class, {pk_val: obj, pk_val: obj, ...}),
-             (model_class, {pk_val: obj, pk_val: obj, ...}),...]
+             (model_class, {pk_val: obj, pk_val: obj, ...}), ...]
         """
         pk_val = self._get_pk_val()
         if seen_objs.add(self.__class__, pk_val, self, parent, nullable):
@@ -411,11 +418,11 @@ class Model(object):
     def delete(self):
         assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
 
-        # Find all the objects than need to be deleted
+        # Find all the objects than need to be deleted.
         seen_objs = CollectedObjects()
         self._collect_sub_objects(seen_objs)
 
-        # Actually delete the objects
+        # Actually delete the objects.
         delete_objects(seen_objs)
 
     delete.alters_data = True
@@ -454,12 +461,12 @@ class Model(object):
         return getattr(self, cachename)
 
     def _get_FIELD_filename(self, field):
-        if getattr(self, field.attname): # value is not blank
+        if getattr(self, field.attname): # Value is not blank.
             return os.path.normpath(os.path.join(settings.MEDIA_ROOT, getattr(self, field.attname)))
         return ''
 
     def _get_FIELD_url(self, field):
-        if getattr(self, field.attname): # value is not blank
+        if getattr(self, field.attname): # Value is not blank.
             import urlparse
             return urlparse.urljoin(settings.MEDIA_URL, getattr(self, field.attname)).replace('\\', '/')
         return ''
@@ -474,16 +481,14 @@ class Model(object):
         except OSError: # Directory probably already exists.
             pass
 
-        #
         # Check for old-style usage (files-as-dictionaries). Warn here first
         # since there are multiple locations where we need to support both new
         # and old usage.
-        #
         if isinstance(raw_field, dict):
             import warnings
             warnings.warn(
                 message = "Representing uploaded files as dictionaries is"\
-                          " deprected. Use django.core.files.SimpleUploadedFile"\
+                          " deprecated. Use django.core.files.SimpleUploadedFile"\
                           " instead.",
                 category = DeprecationWarning,
                 stacklevel = 2
@@ -508,30 +513,23 @@ class Model(object):
 
         filename = field.get_filename(filename)
 
-        #
-        # If the filename already exists, keep adding an underscore to the name of
-        # the file until the filename doesn't exist.
-        #
+        # If the filename already exists, keep adding an underscore to the name
+        # of the file until the filename doesn't exist.
         while os.path.exists(os.path.join(settings.MEDIA_ROOT, filename)):
             try:
                 dot_index = filename.rindex('.')
-            except ValueError: # filename has no dot
+            except ValueError: # filename has no dot.
                 filename += '_'
             else:
                 filename = filename[:dot_index] + '_' + filename[dot_index:]
-        #
-        # Save the file name on the object and write the file to disk
-        #
 
+        # Save the file name on the object and write the file to disk.
         setattr(self, field.attname, filename)
-
         full_filename = self._get_FIELD_filename(field)
-
         if hasattr(raw_field, 'temporary_file_path'):
             # This file has a file path that we can move.
             raw_field.close()
             file_move_safe(raw_field.temporary_file_path(), full_filename)
-
         else:
             # This is a normal uploadedfile that we can stream.
             fp = open(full_filename, 'wb')
@@ -542,7 +540,8 @@ class Model(object):
             fp.close()
 
         # Save the width and/or height, if applicable.
-        if isinstance(field, ImageField) and (field.width_field or field.height_field):
+        if isinstance(field, ImageField) and \
+                (field.width_field or field.height_field):
             from django.utils.images import get_image_dimensions
             width, height = get_image_dimensions(full_filename)
             if field.width_field:
@@ -550,7 +549,7 @@ class Model(object):
             if field.height_field:
                 setattr(self, field.height_field, height)
 
-        # Save the object because it has changed unless save is False
+        # Save the object because it has changed, unless save is False.
         if save:
             self.save()
 
@@ -570,6 +569,7 @@ class Model(object):
             setattr(self, cachename, get_image_dimensions(filename))
         return getattr(self, cachename)
 
+
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
 ############################################
@@ -585,6 +585,7 @@ def method_set_order(ordered_obj, self, id_list):
         ordered_obj.objects.filter(**{'pk': j, order_name: rel_val}).update(_order=i)
     transaction.commit_unless_managed()
 
+
 def method_get_order(ordered_obj, self):
     rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
     order_name = ordered_obj._meta.order_with_respect_to.name
@@ -592,12 +593,14 @@ def method_get_order(ordered_obj, self):
     return [r[pk_name] for r in
             ordered_obj.objects.filter(**{order_name: rel_val}).values(pk_name)]
 
+
 ##############################################
 # HELPER FUNCTIONS (CURRIED MODEL FUNCTIONS) #
 ##############################################
 
 def get_absolute_url(opts, func, self, *args, **kwargs):
     return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.module_name), func)(self, *args, **kwargs)
+
 
 ########
 # MISC #
@@ -610,8 +613,6 @@ if sys.version_info < (2, 5):
     # Prior to Python 2.5, Exception was an old-style class
     def subclass_exception(name, parent, unused):
         return types.ClassType(name, (parent,), {})
-
 else:
     def subclass_exception(name, parent, module):
         return type(name, (parent,), {'__module__': module})
-
