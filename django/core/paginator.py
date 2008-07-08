@@ -36,7 +36,11 @@ class Paginator(object):
     def _get_count(self):
         "Returns the total number of objects, across all pages."
         if self._count is None:
-            self._count = len(self.object_list)
+            from django.db.models.query import QuerySet
+            if isinstance(self.object_list, QuerySet):
+                self._count = self.object_list.count()
+            else:
+                self._count = len(self.object_list)
         return self._count
     count = property(_get_count)
 
@@ -61,15 +65,7 @@ class Paginator(object):
         return range(1, self.num_pages + 1)
     page_range = property(_get_page_range)
 
-class QuerySetPaginator(Paginator):
-    """
-    Like Paginator, but works on QuerySets.
-    """
-    def _get_count(self):
-        if self._count is None:
-            self._count = self.object_list.count()
-        return self._count
-    count = property(_get_count)
+QuerySetPaginator = Paginator # For backwards-compatibility.
 
 class Page(object):
     def __init__(self, object_list, number, paginator):

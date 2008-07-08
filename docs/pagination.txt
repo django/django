@@ -59,6 +59,11 @@ page::
     ...
     InvalidPage
 
+Note that you can give ``Paginator`` a list/tuple or a Django ``QuerySet``. The
+only difference is in implementation; if you pass a ``QuerySet``, the
+``Paginator`` will call its ``count()`` method instead of using ``len()``,
+because the former is more efficient.
+
 ``Paginator`` objects
 =====================
 
@@ -115,13 +120,6 @@ Attributes
 ``number`` -- The 1-based page number for this page.
 
 ``paginator`` -- The associated ``Paginator`` object.
-
-``QuerySetPaginator`` objects
-=============================
-
-Use ``QuerySetPaginator`` instead of ``Paginator`` if you're paginating across
-a ``QuerySet`` from Django's database API. This is slightly more efficient, and
-there are no API differences between the two classes.
 
 The legacy ``ObjectPaginator`` class
 ====================================
