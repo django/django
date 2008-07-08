@@ -10,7 +10,7 @@ from django.contrib.gis.measure import Area, Distance
 
 # Valid GIS query types.
 ALL_TERMS = sql.constants.QUERY_TERMS.copy()
-ALL_TERMS.update(dict([(term, None) for term in SpatialBackend.gis_terms]))
+ALL_TERMS.update(SpatialBackend.gis_terms)
 
 class GeoQuery(sql.Query):
     """
@@ -125,7 +125,7 @@ class GeoQuery(sql.Query):
         root_pk = self.model._meta.pk.column
         seen = {None: table_alias}
         aliases = set()
-        for field, model in self.model._meta.get_fields_with_model():
+        for field, model in opts.get_fields_with_model():
             try:
                 alias = seen[model]
             except KeyError:

@@ -104,10 +104,10 @@ ORACLE_GEOMETRY_FUNCTIONS.update(DISTANCE_FUNCTIONS)
 # This lookup type does not require a mapping.
 MISC_TERMS = ['isnull']
 
-# Assacceptable lookup types for Oracle spatial.
+# Acceptable lookup types for Oracle spatial.
 ORACLE_SPATIAL_TERMS  = ORACLE_GEOMETRY_FUNCTIONS.keys()
 ORACLE_SPATIAL_TERMS += MISC_TERMS
-ORACLE_SPATIAL_TERMS = tuple(ORACLE_SPATIAL_TERMS) # Making immutable
+ORACLE_SPATIAL_TERMS = dict((term, None) for term in ORACLE_SPATIAL_TERMS) # Making dictionary for fast lookups
 
 #### The `get_geo_where_clause` function for Oracle ####
 def get_geo_where_clause(table_alias, name, lookup_type, geo_annot):
