@@ -611,7 +611,7 @@ class ChangeList(object):
         return mark_safe('?' + '&amp;'.join([u'%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20'))
 
     def get_results(self, request):
-        paginator = QuerySetPaginator(self.query_set, self.lookup_opts.admin.list_per_page)
+        paginator = Paginator(self.query_set, self.lookup_opts.admin.list_per_page)
 
         # Get the number of objects, with admin filters applied.
         try:
