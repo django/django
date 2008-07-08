@@ -1,6 +1,12 @@
 class InvalidPage(Exception):
     pass
 
+class PageNotAnInteger(InvalidPage):
+    pass
+
+class EmptyPage(InvalidPage):
+    pass
+
 class Paginator(object):
     def __init__(self, object_list, per_page, orphans=0, allow_empty_first_page=True):
         self.object_list = object_list
@@ -14,14 +20,14 @@ class Paginator(object):
         try:
             number = int(number)
         except ValueError:
-            raise InvalidPage('That page number is not an integer')
+            raise PageNotAnInteger('That page number is not an integer')
         if number < 1:
-            raise InvalidPage('That page number is less than 1')
+            raise EmptyPage('That page number is less than 1')
         if number > self.num_pages:
             if number == 1 and self.allow_empty_first_page:
                 pass
             else:
-                raise InvalidPage('That page contains no results')
+                raise EmptyPage('That page contains no results')
         return number
 
     def page(self, number):
@@ -129,14 +135,14 @@ class ObjectPaginator(Paginator):
         try:
             page_number = int(page_number) + 1
         except ValueError:
-            raise InvalidPage
+            raise PageNotAnInteger
         return self.validate_number(page_number)
 
     def get_page(self, page_number):
         try:
             page_number = int(page_number) + 1
         except ValueError:
-            raise InvalidPage
+            raise PageNotAnInteger
         return self.page(page_number).object_list
 
     def has_next_page(self, page_number):

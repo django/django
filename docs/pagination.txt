@@ -82,6 +82,21 @@ Attributes
 
 ``page_range`` -- A 1-based range of page numbers, e.g., ``[1, 2, 3, 4]``.
 
+``InvalidPage`` exceptions
+==========================
+
+The ``page()`` method raises ``InvalidPage`` if the requested page is invalid
+(i.e., not an integer) or contains no objects. Generally, it's enough to trap
+the ``InvalidPage`` exception, but if you'd like more granularity, you can trap
+either of the following exceptions:
+
+``PageNotAnInteger`` -- Raised when ``page()`` is given a value that isn't an integer.
+
+``EmptyPage`` -- Raised when ``page()`` is given a valid value but no objects exist on that page.
+
+Both of the exceptions are subclasses of ``InvalidPage``, so you can handle
+them both with a simple ``except InvalidPage``.
+
 ``Page`` objects
 ================
 
