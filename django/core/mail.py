@@ -205,10 +205,12 @@ class EmailMessage(object):
         conversions.
         """
         if to:
+            assert not isinstance(to, basestring), '"to" argument must be a list or tuple'
             self.to = list(to)
         else:
             self.to = []
         if bcc:
+            assert not isinstance(bcc, basestring), '"bcc" argument must be a list or tuple'
             self.bcc = list(bcc)
         else:
             self.bcc = []
