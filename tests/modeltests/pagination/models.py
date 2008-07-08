@@ -31,7 +31,7 @@ __test__ = {'API_TESTS':"""
 # New/current API (Paginator/Page) #
 ####################################
 
->>> from django.core.paginator import Paginator, InvalidPage
+>>> from django.core.paginator import Paginator
 >>> paginator = Paginator(Article.objects.all(), 5)
 >>> paginator.count
 9
@@ -82,15 +82,15 @@ True
 >>> p.end_index()
 9
 
-# Invalid pages raise InvalidPage.
+# Empty pages raise EmptyPage.
 >>> paginator.page(0)
 Traceback (most recent call last):
 ...
-InvalidPage: ...
+EmptyPage: ...
 >>> paginator.page(3)
 Traceback (most recent call last):
 ...
-InvalidPage: ...
+EmptyPage: ...
 
 # Empty paginators with allow_empty_first_page=True.
 >>> paginator = Paginator(Article.objects.filter(id=0), 5, allow_empty_first_page=True)
@@ -148,7 +148,7 @@ True
 >>> from warnings import filterwarnings
 >>> filterwarnings("ignore")
 
->>> from django.core.paginator import ObjectPaginator, InvalidPage
+>>> from django.core.paginator import ObjectPaginator, EmptyPage
 >>> paginator = ObjectPaginator(Article.objects.all(), 5)
 >>> paginator.hits
 9
@@ -181,15 +181,15 @@ True
 >>> paginator.last_on_page(1)
 9
 
-# Invalid pages raise InvalidPage.
+# Invalid pages raise EmptyPage.
 >>> paginator.get_page(-1)
 Traceback (most recent call last):
 ...
-InvalidPage: ...
+EmptyPage: ...
 >>> paginator.get_page(2)
 Traceback (most recent call last):
 ...
-InvalidPage: ...
+EmptyPage: ...
 
 # Empty paginators with allow_empty_first_page=True.
 >>> paginator = ObjectPaginator(Article.objects.filter(id=0), 5)
