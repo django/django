@@ -427,17 +427,17 @@ class ModelAdmin(BaseModelAdmin):
         if formsets:
             for formset in formsets:
                 for added_object in formset.new_objects:
-                    change_message.append(_('Added %s "%s".') 
-                                          % (added_object._meta.verbose_name, added_object))
+                    change_message.append(_('Added %(name)s "%(object)s".') 
+                                          % {'name': added_object._meta.verbose_name, % 'object': added_object})
                 for changed_object, changed_fields in formset.changed_objects:
-                    change_message.append(_('Changed %s for %s "%s".') 
-                                          % (get_text_list(changed_fields, _('and')), 
-                                             changed_object._meta.verbose_name, 
-                                             changed_object))
+                    change_message.append(_('Changed %(list)s for %(name)s "%(object)s".') 
+                                          % {'list': get_text_list(changed_fields, _('and')), 
+                                             'name': changed_object._meta.verbose_name, 
+                                             'object': changed_object})
                 for deleted_object in formset.deleted_objects:
-                    change_message.append(_('Deleted %s "%s".') 
-                                          % (deleted_object._meta.verbose_name, deleted_object))
-            
+                    change_message.append(_('Deleted %(name)s "%(object)s".') 
+                                          % {'name': deleted_object._meta.verbose_name,
+                                             'object': deleted_object})
         change_message = ' '.join(change_message)
         if not change_message:
             change_message = _('No fields changed.')
