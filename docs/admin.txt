@@ -481,6 +481,25 @@ with an operator:
     Performs a full-text match. This is like the default search method but uses
     an index. Currently this is only available for MySQL.
 
+``ModelAdmin`` media definitions
+--------------------------------
+
+There are times where you would like add a bit of CSS and/or Javascript to
+the add/change views. This can be accomplished by using a Media inner class
+on your ``ModelAdmin``::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        class Media:
+            css = {
+                "all": ("my_styles.css",)
+            }
+            js = ("my_code.js",)
+
+Keep in mind that this will be prepended with ``MEDIA_URL``. The same rules
+apply as `regular media definitions on forms`_.
+
+.. _regular media definitions on forms: ../newforms/#media
+
 ``InlineModelAdmin`` objects
 ============================
 
