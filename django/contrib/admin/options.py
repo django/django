@@ -428,7 +428,8 @@ class ModelAdmin(BaseModelAdmin):
             for formset in formsets:
                 for added_object in formset.new_objects:
                     change_message.append(_('Added %(name)s "%(object)s".') 
-                                          % {'name': added_object._meta.verbose_name, % 'object': added_object})
+                                          % {'name': added_object._meta.verbose_name,
+                                             'object': added_object})
                 for changed_object, changed_fields in formset.changed_objects:
                     change_message.append(_('Changed %(list)s for %(name)s "%(object)s".') 
                                           % {'list': get_text_list(changed_fields, _('and')), 
