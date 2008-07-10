@@ -539,6 +539,7 @@ class ModelAdmin(BaseModelAdmin):
             'show_delete': False,
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
+            'errors': AdminErrorList(form, inline_formsets),
             'root_path': self.admin_site.root_path,
         }
         context.update(extra_context or {})
@@ -616,6 +617,7 @@ class ModelAdmin(BaseModelAdmin):
             'is_popup': request.REQUEST.has_key('_popup'),
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
+            'errors': AdminErrorList(form, inline_formsets),
             'root_path': self.admin_site.root_path,
         }
         context.update(extra_context or {})
@@ -824,3 +826,15 @@ class InlineAdminForm(AdminForm):
     def ordering_field(self):
         from django.newforms.formsets import ORDERING_FIELD_NAME
         return AdminField(self.form, ORDERING_FIELD_NAME, False)
+
+class AdminErrorList(forms.util.ErrorList):
+    """
+    Stores all errors for the form/formsets in an add/change stage view.
+    """
+    def __init__(self, form, inline_formsets):
+        if form.is_bound:
+            self.extend(form.errors.values())
+            for inline_formset in inline_formsets:
+                self.extend(inline_formset.non_form_errors())
+                for errors_in_inline_form in inline_formset.errors:
+                    self.extend(errors_in_inline_form.values())
