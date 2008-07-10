@@ -31,3 +31,54 @@ def conditional_content_removal(request, response):
     if request.method == 'HEAD':
         response.content = ''
     return response
+
+def fix_IE_for_attach(request, response):
+    """
+    This function will prevent Django from serving a Content-Disposition header
+    while expecting the browser to cache it (only when the browser is IE). This
+    leads to IE not allowing the client to download.
+    """
+    if 'MSIE' not in request.META.get('HTTP_USER_AGENT', '').upper():
+        return response
+
+    offending_headers = ('no-cache', 'no-store')
+    if response.has_header('Content-Disposition'):
+        try:
+            del response['Pragma']
+        except KeyError:
+            pass
+        if response.has_header('Cache-Control'):
+            cache_control_values = [value.strip() for value in
+                    response['Cache-Control'].split(',')
+                    if value.strip().lower() not in offending_headers]
+
+            if not len(cache_control_values):
+                del response['Cache-Control']
+            else:
+                response['Cache-Control'] = ', '.join(cache_control_values)
+
+    return response
+
+def fix_IE_for_vary(request, response):
+    """
+    This function will fix the bug reported at
+    http://support.microsoft.com/kb/824847/en-us?spid=8722&sid=global
+    by clearing the Vary header whenever the mime-type is not safe
+    enough for Internet Explorer to handle.  Poor thing.
+    """
+    if 'MSIE' not in request.META.get('HTTP_USER_AGENT', '').upper():
+        return response
+
+    # These mime-types that are decreed "Vary-safe" for IE:
+    safe_mime_types = ('text/html', 'text/plain', 'text/sgml')
+
+    # The first part of the Content-Type field will be the MIME type,
+    # everything after ';', such as character-set, can be ignored.
+    if response['Content-Type'].split(';')[0] not in safe_mime_types:
+        try:
+            del response['Vary']
+        except KeyError:
+            pass
+
+    return response
+

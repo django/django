@@ -1,6 +1,6 @@
 from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.core.paginator import QuerySetPaginator, InvalidPage
+from django.core.paginator import Paginator, InvalidPage
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils.encoding import force_unicode, smart_str
@@ -109,8 +109,7 @@ class ChangeList(object):
         return '?%s' % urlencode(p)
 
     def get_results(self, request):
-        paginator = QuerySetPaginator(self.query_set, self.list_per_page)
-
+        paginator = Paginator(self.query_set, self.list_per_page)
         # Get the number of objects, with admin filters applied.
         try:
             result_count = paginator.count

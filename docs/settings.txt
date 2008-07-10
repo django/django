@@ -279,7 +279,7 @@ Default: ``''`` (Empty string)
 
 The database backend to use. The build-in database backends are
 ``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'mysql_old'``,
-``'sqlite3'``, ``'oracle'``, and ``'oracle'``.
+``'sqlite3'``, and ``'oracle'``.
 
 In the Django development version, you can use a database backend that doesn't
 ship with Django by setting ``DATABASE_ENGINE`` to a fully-qualified path (i.e.

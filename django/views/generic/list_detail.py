@@ -1,7 +1,7 @@
 from django.template import loader, RequestContext
 from django.http import Http404, HttpResponse
 from django.core.xheaders import populate_xheaders
-from django.core.paginator import QuerySetPaginator, InvalidPage
+from django.core.paginator import Paginator, InvalidPage
 from django.core.exceptions import ObjectDoesNotExist
 
 def object_list(request, queryset, paginate_by=None, page=None,
@@ -45,7 +45,7 @@ def object_list(request, queryset, paginate_by=None, page=None,
     if extra_context is None: extra_context = {}
     queryset = queryset._clone()
     if paginate_by:
-        paginator = QuerySetPaginator(queryset, paginate_by, allow_empty_first_page=allow_empty)
+        paginator = Paginator(queryset, paginate_by, allow_empty_first_page=allow_empty)
         if not page:
             page = request.GET.get('page', 1)
         try:

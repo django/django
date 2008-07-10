@@ -136,6 +136,7 @@ class MultiPartParser(object):
                     # since we cannot be sure a file is complete until
                     # we hit the next boundary/part of the multipart content.
                     self.handle_file_complete(old_field_name, counters)
+                    old_field_name = None
 
                 try:
                     disposition = meta_data['content-disposition'][1]

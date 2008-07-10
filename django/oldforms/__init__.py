@@ -686,7 +686,7 @@ class FileUploadField(FormField):
             if upload_errors:
                 raise validators.CriticalValidationError, upload_errors
         try:
-            file_size = new_data.file_size
+            file_size = new_data.size
         except AttributeError:
             file_size = len(new_data['content'])
         if not file_size:

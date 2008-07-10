@@ -13,19 +13,20 @@ from django.utils.datastructures import SortedDict
 CHUNK_SIZE = 100
 ITER_CHUNK_SIZE = CHUNK_SIZE
 
-# Pull into this namespace for backwards compatibility
+# Pull into this namespace for backwards compatibility.
 EmptyResultSet = sql.EmptyResultSet
 
 class CyclicDependency(Exception):
     pass
 
+
 class CollectedObjects(object):
     """
-    A container that stores keys and lists of values along with
-    remembering the parent objects for all the keys.
+    A container that stores keys and lists of values along with remembering the
+    parent objects for all the keys.
 
-    This is used for the database object deletion routines so that we
-    can calculate the 'leaf' objects which should be deleted first.
+    This is used for the database object deletion routines so that we can
+    calculate the 'leaf' objects which should be deleted first.
     """
 
     def __init__(self):
@@ -34,26 +35,27 @@ class CollectedObjects(object):
 
     def add(self, model, pk, obj, parent_model, nullable=False):
         """
-        Adds an item.
-        model is the class of the object being added,
-        pk is the primary key, obj is the object itself,
-        parent_model is the model of the parent object
-        that this object was reached through, nullable should
-        be True if this relation is nullable.
+        Adds an item to the container.
 
-        If the item already existed in the structure,
-        returns true, otherwise false.
+        Arguments:
+        * model - the class of the object being added.
+        * pk - the primary key.
+        * obj - the object itself.
+        * parent_model - the model of the parent object that this object was
+          reached through.
+        * nullable - should be True if this relation is nullable.
+
+        Returns True if the item already existed in the structure and
+        False otherwise.
         """
         d = self.data.setdefault(model, SortedDict())
         retval = pk in d
         d[pk] = obj
-        # Nullable relationships can be ignored -- they
-        # are nulled out before deleting, and therefore
-        # do not affect the order in which objects have
-        # to be deleted.
+        # Nullable relationships can be ignored -- they are nulled out before
+        # deleting, and therefore do not affect the order in which objects
+        # have to be deleted.
         if parent_model is not None and not nullable:
             self.children.setdefault(parent_model, []).append(model)
-
         return retval
 
     def __contains__(self, key):
@@ -77,8 +79,8 @@ class CollectedObjects(object):
 
     def ordered_keys(self):
         """
-        Returns the models in the order that they should be
-        dealth with i.e. models with no dependencies first.
+        Returns the models in the order that they should be dealt with (i.e.
+        models with no dependencies first).
         """
         dealt_with = SortedDict()
         # Start with items that have no children
@@ -91,19 +93,22 @@ class CollectedObjects(object):
                     dealt_with[model] = None
                     found = True
             if not found:
-                raise CyclicDependency("There is a cyclic dependency of items to be processed.")
+                raise CyclicDependency(
+                    "There is a cyclic dependency of items to be processed.")
 
         return dealt_with.keys()
 
     def unordered_keys(self):
         """
-        Fallback for the case where is a cyclic dependency but we
-        don't care.
+        Fallback for the case where is a cyclic dependency but we don't  care.
         """
         return self.data.keys()
 
+
 class QuerySet(object):
-    "Represents a lazy database lookup for a set of objects"
+    """
+    Represents a lazy database lookup for a set of objects.
+    """
     def __init__(self, model=None, query=None):
         self.model = model
         self.query = query or sql.Query(self.model, connection)
@@ -116,7 +121,7 @@ class QuerySet(object):
 
     def __getstate__(self):
         """
-        Allows the Queryset to be pickled.
+        Allows the QuerySet to be pickled.
         """
         # Force the cache to be fully populated.
         len(self)
@@ -131,7 +136,7 @@ class QuerySet(object):
     def __len__(self):
         # Since __len__ is called quite frequently (for example, as part of
         # list(qs), we make some effort here to be as efficient as possible
-        # whilst not messing up any existing iterators against the queryset.
+        # whilst not messing up any existing iterators against the QuerySet.
         if self._result_cache is None:
             if self._iter:
                 self._result_cache = list(self._iter)
@@ -173,7 +178,9 @@ class QuerySet(object):
         return True
 
     def __getitem__(self, k):
-        "Retrieve an item or slice from the set of results."
+        """
+        Retrieves an item or slice from the set of results.
+        """
         if not isinstance(k, (slice, int, long)):
             raise TypeError
         assert ((not isinstance(k, slice) and (k >= 0))
@@ -264,7 +271,7 @@ class QuerySet(object):
         Performs a SELECT COUNT() and returns the number of records as an
         integer.
 
-        If the queryset is already cached (i.e. self._result_cache is set) this
+        If the QuerySet is already cached (i.e. self._result_cache is set) this
         simply returns the length of the cached results set to avoid multiple
         SELECT COUNT(*) calls.
         """
@@ -290,7 +297,7 @@ class QuerySet(object):
 
     def create(self, **kwargs):
         """
-        Create a new object with the given kwargs, saving it to the database
+        Creates a new object with the given kwargs, saving it to the database
         and returning the created object.
         """
         obj = self.model(**kwargs)
@@ -425,8 +432,8 @@ class QuerySet(object):
 
     def dates(self, field_name, kind, order='ASC'):
         """
-        Returns a list of datetime objects representing all available dates
-        for the given field_name, scoped to 'kind'.
+        Returns a list of datetime objects representing all available dates for
+        the given field_name, scoped to 'kind'.
         """
         assert kind in ("month", "year", "day"), \
                 "'kind' must be one of 'year', 'month' or 'day'."
@@ -441,7 +448,7 @@ class QuerySet(object):
 
     def none(self):
         """
-        Returns an empty queryset.
+        Returns an empty QuerySet.
         """
         return self._clone(klass=EmptyQuerySet)
 
@@ -485,6 +492,7 @@ class QuerySet(object):
     def complex_filter(self, filter_obj):
         """
         Returns a new QuerySet instance with filter_obj added to the filters.
+
         filter_obj can be a Q object (or anything with an add_to_query()
         method) or a dictionary of keyword lookup arguments.
 
@@ -500,8 +508,9 @@ class QuerySet(object):
 
     def select_related(self, *fields, **kwargs):
         """
-        Returns a new QuerySet instance that will select related objects. If
-        fields are specified, they must be ForeignKey fields and only those
+        Returns a new QuerySet instance that will select related objects.
+
+        If fields are specified, they must be ForeignKey fields and only those
         related objects are included in the selection.
         """
         depth = kwargs.pop('depth', 0)
@@ -521,13 +530,15 @@ class QuerySet(object):
 
     def dup_select_related(self, other):
         """
-        Copies the related selection status from the queryset 'other' to the
-        current queryset.
+        Copies the related selection status from the QuerySet 'other' to the
+        current QuerySet.
         """
         self.query.select_related = other.query.select_related
 
     def order_by(self, *field_names):
-        """Returns a new QuerySet instance with the ordering changed."""
+        """
+        Returns a new QuerySet instance with the ordering changed.
+        """
         assert self.query.can_filter(), \
                 "Cannot reorder a query once a slice has been taken."
         obj = self._clone()
@@ -544,9 +555,9 @@ class QuerySet(object):
         return obj
 
     def extra(self, select=None, where=None, params=None, tables=None,
-            order_by=None, select_params=None):
+              order_by=None, select_params=None):
         """
-        Add extra SQL fragments to the query.
+        Adds extra SQL fragments to the query.
         """
         assert self.query.can_filter(), \
                 "Cannot change a query once a slice has been taken"
@@ -556,7 +567,7 @@ class QuerySet(object):
 
     def reverse(self):
         """
-        Reverses the ordering of the queryset.
+        Reverses the ordering of the QuerySet.
         """
         clone = self._clone()
         clone.query.standard_ordering = not clone.query.standard_ordering
@@ -589,11 +600,12 @@ class QuerySet(object):
 
     def _merge_sanity_check(self, other):
         """
-        Checks that we are merging two comparable queryset classes. By default
+        Checks that we are merging two comparable QuerySet classes. By default
         this does nothing, but see the ValuesQuerySet for an example of where
         it's useful.
         """
         pass
+
 
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
@@ -617,7 +629,7 @@ class ValuesQuerySet(QuerySet):
         Constructs the field_names list that the values query will be
         retrieving.
 
-        Called by the _clone() method after initialising the rest of the
+        Called by the _clone() method after initializing the rest of the
         instance.
         """
         self.extra_names = []
@@ -658,6 +670,7 @@ class ValuesQuerySet(QuerySet):
             raise TypeError("Merging '%s' classes must involve the same values in each case."
                     % self.__class__.__name__)
 
+
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
         self.query.trim_extra_select(self.extra_names)
@@ -681,6 +694,7 @@ class ValuesListQuerySet(ValuesQuerySet):
         clone.flat = self.flat
         return clone
 
+
 class DateQuerySet(QuerySet):
     def iterator(self):
         return self.query.results_iter()
@@ -689,7 +703,7 @@ class DateQuerySet(QuerySet):
         """
         Sets up any special features of the query attribute.
 
-        Called by the _clone() method after initialising the rest of the
+        Called by the _clone() method after initializing the rest of the
         instance.
         """
         self.query = self.query.clone(klass=sql.DateQuery, setup=True)
@@ -705,6 +719,7 @@ class DateQuerySet(QuerySet):
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
         return c
+
 
 class EmptyQuerySet(QuerySet):
     def __init__(self, model=None, query=None):
@@ -733,6 +748,7 @@ class EmptyQuerySet(QuerySet):
         # (it raises StopIteration immediately).
         yield iter([]).next()
 
+
 # QOperator, QNot, QAnd and QOr are temporarily retained for backwards
 # compatibility. All the old functionality is now part of the 'Q' class.
 class QOperator(Q):
@@ -743,12 +759,14 @@ class QOperator(Q):
 
 QOr = QAnd = QOperator
 
+
 def QNot(q):
     warnings.warn('Use ~q instead of QNot(q)', DeprecationWarning, stacklevel=2)
     return ~q
 
+
 def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
-        requested=None):
+                   requested=None):
     """
     Helper function that recursively returns an object with the specified
     related attributes already populated.
@@ -774,6 +792,7 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
             setattr(obj, f.get_cache_name(), rel_obj)
     return obj, index_end
 
+
 def delete_objects(seen_objs):
     """
     Iterate through a list of seen classes, and remove any instances that are
@@ -782,10 +801,10 @@ def delete_objects(seen_objs):
     try:
         ordered_classes = seen_objs.keys()
     except CyclicDependency:
-        # if there is a cyclic dependency, we cannot in general delete
-        # the objects.  However, if an appropriate transaction is set
-        # up, or if the database is lax enough, it will succeed.
-        # So for now, we go ahead and try anway.
+        # If there is a cyclic dependency, we cannot in general delete the
+        # objects.  However, if an appropriate transaction is set up, or if the
+        # database is lax enough, it will succeed. So for now, we go ahead and
+        # try anyway.
         ordered_classes = seen_objs.unordered_keys()
 
     obj_pairs = {}
@@ -794,7 +813,7 @@ def delete_objects(seen_objs):
         items.sort()
         obj_pairs[cls] = items
 
-        # Pre notify all instances to be deleted
+        # Pre-notify all instances to be deleted.
         for pk_val, instance in items:
             dispatcher.send(signal=signals.pre_delete, sender=cls,
                     instance=instance)
@@ -808,7 +827,7 @@ def delete_objects(seen_objs):
             if field.rel and field.null and field.rel.to in seen_objs:
                 update_query.clear_related(field, pk_list)
 
-    # Now delete the actual data
+    # Now delete the actual data.
     for cls in ordered_classes:
         items = obj_pairs[cls]
         items.reverse()
@@ -831,6 +850,7 @@ def delete_objects(seen_objs):
 
     transaction.commit_unless_managed()
 
+
 def insert_query(model, values, return_id=False, raw_values=False):
     """
     Inserts a new record for the given model. This provides an interface to
@@ -840,4 +860,3 @@ def insert_query(model, values, return_id=False, raw_values=False):
     query = sql.InsertQuery(model, connection)
     query.insert_values(values, raw_values)
     return query.execute_sql(return_id)
-
