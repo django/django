@@ -8,7 +8,7 @@ from django.contrib.gis.gdal.srs import SpatialReference
 from django.contrib.gis.gdal.prototypes.ds import \
     destroy_feature, feature_equal, get_fd_geom_type, get_feat_geom_ref, \
     get_feat_name, get_feat_field_count, get_fid, get_field_defn, \
-    get_field_index
+    get_field_index, get_field_name
 from django.contrib.gis.gdal.prototypes.geom import clone_geom, get_geom_srs
 from django.contrib.gis.gdal.prototypes.srs import clone_srs
 
