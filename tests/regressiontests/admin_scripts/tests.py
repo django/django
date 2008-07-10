@@ -58,6 +58,7 @@ class AdminScriptTestCase(unittest.TestCase):
         # Remember the old environment
         old_django_settings_module = os.environ.get('DJANGO_SETTINGS_MODULE', None)
         old_python_path = os.environ.get('PYTHONPATH', None)
+        old_cwd = os.getcwd()
         
         # Set the test environment
         if settings_file:
@@ -77,6 +78,9 @@ class AdminScriptTestCase(unittest.TestCase):
             os.environ['DJANGO_SETTINGS_MODULE'] = old_django_settings_module
         if old_python_path:
             os.environ['PYTHONPATH'] = old_python_path
+
+        # Move back to the old working directory
+        os.chdir(old_cwd)
         
         return out, err
         
