@@ -105,7 +105,10 @@ class Command(NoArgsCommand):
         # Send the post_syncdb signal, so individual apps can do whatever they need
         # to do at this point.
         emit_post_sync_signal(created_models, verbosity, interactive)
-
+        
+        # The connection may have been closed by a syncdb handler.
+        cursor = connection.cursor()
+        
         # Install custom SQL for the app (but only if this
         # is a model we've just created)
         for app in models.get_apps():
@@ -144,7 +147,7 @@ class Command(NoArgsCommand):
                             for sql in index_sql:
                                 cursor.execute(sql)
                         except Exception, e:
-                            sys.stderr.write("Failed to install index for %s.%s model: %s" % \
+                            sys.stderr.write("Failed to install index for %s.%s model: %s\n" % \
                                                 (app_name, model._meta.object_name, e))
                             transaction.rollback_unless_managed()
                         else:
