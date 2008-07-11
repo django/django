@@ -7,7 +7,7 @@ import os
 import unittest
 import shutil
 
-from django import conf, bin
+from django import conf, bin, get_version
 from django.conf import settings
 
 class AdminScriptTestCase(unittest.TestCase):
@@ -725,26 +725,62 @@ class CommandTypes(AdminScriptTestCase):
     def tearDown(self):
         self.remove_settings('settings.py')
     
+    def test_version(self):
+        "--version is handled as a special case"
+        args = ['--version']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        # Only check the first part of the version number
+        self.assertOutput(out, get_version().split('-')[0])
+
+    def test_help(self):
+        "--help is handled as a special case"
+        args = ['--help']
+        out, err = self.run_manage(args)
+        self.assertOutput(out, "Usage: manage.py [options]")
+        self.assertOutput(err, "Type 'manage.py help <subcommand>' for help on a specific subcommand.")
+
+    def test_specific_help(self):
+        "--help can be used on a specific command"
+        args = ['sqlall','--help']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "Prints the CREATE TABLE, custom SQL and CREATE INDEX SQL statements for the given model module name(s).")
+    
     def test_base_command(self):
         "User BaseCommands can execute when a label is provided"
         args = ['base_command','testlabel']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', '1'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None)]")
         
     def test_base_command_no_label(self):
         "User BaseCommands can execute when no labels are provided"
         args = ['base_command']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=(), options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=(), options=[('option_a', '1'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None)]")
 
     def test_base_command_multiple_label(self):
         "User BaseCommands can execute when no labels are provided"
         args = ['base_command','testlabel','anotherlabel']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel', 'anotherlabel'), options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel', 'anotherlabel'), options=[('option_a', '1'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None)]")
+
+    def test_base_command_with_option(self):
+        "User BaseCommands can execute with options when a label is provided"
+        args = ['base_command','testlabel','--option_a=x']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None)]")
+
+    def test_base_command_with_options(self):
+        "User BaseCommands can execute with multiple options when a label is provided"
+        args = ['base_command','testlabel','-a','x','--option_b=y']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', 'y'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None)]")
                 
     def test_noargs(self):
         "NoArg Commands can be executed"
@@ -815,3 +851,56 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
         self.assertOutput(out, "EXECUTE:LabelCommand label=anotherlabel, options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
+
+class ArgumentOrder(AdminScriptTestCase):
+    """Tests for 2-stage argument parsing scheme.
+
+    django-admin command arguments are parsed in 2 parts; the core arguments
+    (--settings, --traceback and --pythonpath) are parsed using a Lax parser.
+    This Lax parser ignores any unknown options. Then the full settings are 
+    passed to the command parser, which extracts commands of interest to the
+    individual command.    
+    """
+    def setUp(self):
+        self.write_settings('settings.py', apps=['django.contrib.auth','django.contrib.contenttypes'])
+        self.write_settings('alternate_settings.py')
+        
+    def tearDown(self):
+        self.remove_settings('settings.py')
+        self.remove_settings('alternate_settings.py')
+
+    def test_setting_then_option(self):
+        "Options passed after settings are correctly handled"
+        args = ['base_command','testlabel','--settings=alternate_settings','--option_a=x']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None)]")
+
+    def test_setting_then_short_option(self):
+        "Short options passed after settings are correctly handled"
+        args = ['base_command','testlabel','--settings=alternate_settings','--option_a=x']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None)]")
+
+    def test_option_then_setting(self):
+        "Options passed before settings are correctly handled"
+        args = ['base_command','testlabel','--option_a=x','--settings=alternate_settings']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None)]")
+
+    def test_short_option_then_setting(self):
+        "Short options passed before settings are correctly handled"
+        args = ['base_command','testlabel','-a','x','--settings=alternate_settings']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None)]")
+
+    def test_option_then_setting_then_option(self):
+        "Options are correctly handled when they are passed before and after a setting"
+        args = ['base_command','testlabel','--option_a=x','--settings=alternate_settings','--option_b=y']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', 'y'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None)]")
+
