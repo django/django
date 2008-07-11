@@ -283,7 +283,6 @@ class Query(object):
         if ordering:
             result.append('ORDER BY %s' % ', '.join(ordering))
 
-        # FIXME: Pull this out to make life easier for Oracle et al.
         if with_limits:
             if self.high_mark is not None:
                 result.append('LIMIT %d' % (self.high_mark - self.low_mark))
