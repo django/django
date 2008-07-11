@@ -29,7 +29,7 @@ class AdminScriptTestCase(unittest.TestCase):
                 settings_file.write("%s = '%s'\n" % (s, str(getattr(settings,s))))
                 
         if apps is None:
-            apps = ['django.contrib.auth', 'django.contrib.contenttypes', 'regressiontests.admin_scripts']
+            apps = ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts']
 
         if apps:
             settings_file.write("INSTALLED_APPS = %s\n" % apps)
@@ -66,8 +66,8 @@ class AdminScriptTestCase(unittest.TestCase):
         elif 'DJANGO_SETTINGS_MODULE' in os.environ:
             del os.environ['DJANGO_SETTINGS_MODULE']
         
-        os.environ['PYTHONPATH'] = os.pathsep.join([project_dir,base_dir])
-        
+        os.environ['PYTHONPATH'] = os.pathsep.join([test_dir,base_dir])
+
         # Move to the test directory and run
         os.chdir(test_dir)
         stdin, stdout, stderr = os.popen3(cmd)
@@ -129,17 +129,17 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
                 
     def test_builtin_with_bad_settings(self):
         "no settings: django-admin builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall','--settings=regressiontests.bad_settings', 'admin_scripts']
+        args = ['sqlall','--settings=bad_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "Could not import settings 'regressiontests.bad_settings'")
+        self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_builtin_with_bad_environment(self):
         "no settings: django-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['sqlall','admin_scripts']
-        out, err = self.run_django_admin(args,'regressiontests.bad_settings')
+        out, err = self.run_django_admin(args,'bad_settings')
         self.assertNoOutput(out)
-        self.assertOutput(err, "Could not import settings 'regressiontests.bad_settings'")
+        self.assertOutput(err, "Could not import settings 'bad_settings'")
 
 
 class DjangoAdminDefaultSettings(AdminScriptTestCase):
@@ -161,7 +161,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         
     def test_builtin_with_settings(self):
         "default: django-admin builtin commands succeed if settings are provided as argument"
-        args = ['sqlall','--settings=regressiontests.settings', 'admin_scripts']
+        args = ['sqlall','--settings=settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
@@ -169,23 +169,23 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
     def test_builtin_with_environment(self):
         "default: django-admin builtin commands succeed if settings are provided in the environment"
         args = ['sqlall','admin_scripts']
-        out, err = self.run_django_admin(args,'regressiontests.settings')
+        out, err = self.run_django_admin(args,'settings')
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_bad_settings(self):
         "default: django-admin builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall','--settings=regressiontests.bad_settings', 'admin_scripts']
+        args = ['sqlall','--settings=bad_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "Could not import settings 'regressiontests.bad_settings'")
+        self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_builtin_with_bad_environment(self):
         "default: django-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['sqlall','admin_scripts']
-        out, err = self.run_django_admin(args,'regressiontests.bad_settings')
+        out, err = self.run_django_admin(args,'bad_settings')
         self.assertNoOutput(out)
-        self.assertOutput(err, "Could not import settings 'regressiontests.bad_settings'")
+        self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_custom_command(self):
         "default: django-admin can't execute user commands"
@@ -196,7 +196,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
             
     def test_custom_command_with_settings(self):
         "default: django-admin can't execute user commands, even if settings are provided as argument"
-        args = ['noargs_command', '--settings=regressiontests.settings']
+        args = ['noargs_command', '--settings=settings']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
@@ -204,7 +204,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
     def test_custom_command_with_environment(self):
         "default: django-admin can't execute user commands, even if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args,'regressiontests.settings')
+        out, err = self.run_django_admin(args,'settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
@@ -227,7 +227,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         
     def test_builtin_with_settings(self):
         "minimal: django-admin builtin commands fail if settings are provided as argument"
-        args = ['sqlall','--settings=regressiontests.settings', 'admin_scripts']
+        args = ['sqlall','--settings=settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'App with label admin_scripts could not be found')
@@ -235,23 +235,23 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
     def test_builtin_with_environment(self):
         "minimal: django-admin builtin commands fail if settings are provided in the environment"
         args = ['sqlall','admin_scripts']
-        out, err = self.run_django_admin(args,'regressiontests.settings')
+        out, err = self.run_django_admin(args,'settings')
         self.assertNoOutput(out)
         self.assertOutput(err, 'App with label admin_scripts could not be found')
 
     def test_builtin_with_bad_settings(self):
         "minimal: django-admin builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall','--settings=regressiontests.bad_settings', 'admin_scripts']
+        args = ['sqlall','--settings=bad_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "Could not import settings 'regressiontests.bad_settings'")
+        self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_builtin_with_bad_environment(self):
         "minimal: django-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['sqlall','admin_scripts']
-        out, err = self.run_django_admin(args,'regressiontests.bad_settings')
+        out, err = self.run_django_admin(args,'bad_settings')
         self.assertNoOutput(out)
-        self.assertOutput(err, "Could not import settings 'regressiontests.bad_settings'")
+        self.assertOutput(err, "Could not import settings 'bad_settings'")
             
     def test_custom_command(self):
         "minimal: django-admin can't execute user commands"
@@ -262,7 +262,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
             
     def test_custom_command_with_settings(self):
         "minimal: django-admin can't execute user commands, even if settings are provided as argument"
-        args = ['noargs_command', '--settings=regressiontests.settings']
+        args = ['noargs_command', '--settings=settings']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
@@ -270,7 +270,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
     def test_custom_command_with_environment(self):
         "minimal: django-admin can't execute user commands, even if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args,'regressiontests.settings')
+        out, err = self.run_django_admin(args,'settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
@@ -293,7 +293,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
     def test_builtin_with_settings(self):
         "alternate: django-admin builtin commands succeed if settings are provided as argument"
-        args = ['sqlall','--settings=regressiontests.alternate_settings', 'admin_scripts']
+        args = ['sqlall','--settings=alternate_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
@@ -301,23 +301,23 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
     def test_builtin_with_environment(self):
         "alternate: django-admin builtin commands succeed if settings are provided in the environment"
         args = ['sqlall','admin_scripts']
-        out, err = self.run_django_admin(args,'regressiontests.alternate_settings')
+        out, err = self.run_django_admin(args,'alternate_settings')
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_bad_settings(self):
         "alternate: django-admin builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall','--settings=regressiontests.bad_settings', 'admin_scripts']
+        args = ['sqlall','--settings=bad_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "Could not import settings 'regressiontests.bad_settings'")
+        self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_builtin_with_bad_environment(self):
         "alternate: django-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['sqlall','admin_scripts']
-        out, err = self.run_django_admin(args,'regressiontests.bad_settings')
+        out, err = self.run_django_admin(args,'bad_settings')
         self.assertNoOutput(out)
-        self.assertOutput(err, "Could not import settings 'regressiontests.bad_settings'")
+        self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_custom_command(self):
         "alternate: django-admin can't execute user commands"
@@ -328,7 +328,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
     def test_custom_command_with_settings(self):
         "alternate: django-admin can't execute user commands, even if settings are provided as argument"
-        args = ['noargs_command', '--settings=regressiontests.alternate_settings']
+        args = ['noargs_command', '--settings=alternate_settings']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
@@ -336,7 +336,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
     def test_custom_command_with_environment(self):
         "alternate: django-admin can't execute user commands, even if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args,'regressiontests.alternate_settings')
+        out, err = self.run_django_admin(args,'alternate_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
@@ -364,7 +364,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
     def test_builtin_with_settings(self):
         "alternate: django-admin builtin commands succeed if settings are provided as argument"
-        args = ['sqlall','--settings=regressiontests.alternate_settings', 'admin_scripts']
+        args = ['sqlall','--settings=alternate_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
@@ -372,22 +372,22 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
     def test_builtin_with_environment(self):
         "alternate: django-admin builtin commands succeed if settings are provided in the environment"
         args = ['sqlall','admin_scripts']
-        out, err = self.run_django_admin(args,'regressiontests.alternate_settings')
+        out, err = self.run_django_admin(args,'alternate_settings')
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_bad_settings(self):
         "alternate: django-admin builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall','--settings=regressiontests.bad_settings', 'admin_scripts']
+        args = ['sqlall','--settings=bad_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
-        self.assertOutput(err, "Could not import settings 'regressiontests.bad_settings'")
+        self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_builtin_with_bad_environment(self):
         "alternate: django-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['sqlall','admin_scripts']
-        out, err = self.run_django_admin(args,'regressiontests.bad_settings')
+        out, err = self.run_django_admin(args,'bad_settings')
         self.assertNoOutput(out)
-        self.assertOutput(err, "Could not import settings 'regressiontests.bad_settings'")
+        self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_custom_command(self):
         "alternate: django-admin can't execute user commands"
@@ -398,7 +398,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
     def test_custom_command_with_settings(self):
         "alternate: django-admin can't execute user commands, even if settings are provided as argument"
-        args = ['noargs_command', '--settings=regressiontests.alternate_settings']
+        args = ['noargs_command', '--settings=alternate_settings']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
@@ -406,7 +406,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
     def test_custom_command_with_environment(self):
         "alternate: django-admin can't execute user commands, even if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args,'regressiontests.alternate_settings')
+        out, err = self.run_django_admin(args,'alternate_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
         
