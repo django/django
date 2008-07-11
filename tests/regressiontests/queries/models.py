@@ -805,5 +805,10 @@ Bug #7371
 >>> Related.objects.order_by('custom')
 []
 
+Bug #7448, #7707 -- Complex objects should be converted to strings before being
+used in lookups.
+>>> Item.objects.filter(created__in=[time1, time2])
+[<Item: one>, <Item: two>]
+
 """}
 

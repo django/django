@@ -554,7 +554,7 @@ class DateField(Field):
             raise validators.ValidationError, _('Enter a valid date in YYYY-MM-DD format.')
 
     def get_db_prep_lookup(self, lookup_type, value):
-        if lookup_type == 'range':
+        if lookup_type in ('range', 'in'):
             value = [smart_unicode(v) for v in value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte') and hasattr(value, 'strftime'):
             value = value.strftime('%Y-%m-%d')
@@ -641,7 +641,7 @@ class DateTimeField(DateField):
         return Field.get_db_prep_save(self, value)
 
     def get_db_prep_lookup(self, lookup_type, value):
-        if lookup_type == 'range':
+        if lookup_type in ('range', 'in'):
             value = [smart_unicode(v) for v in value]
         else:
             value = smart_unicode(value)
@@ -720,7 +720,7 @@ class DecimalField(Field):
         return super(DecimalField, self).get_db_prep_save(value)
 
     def get_db_prep_lookup(self, lookup_type, value):
-        if lookup_type == 'range':
+        if lookup_type in ('range', 'in'):
             value = [self._format(v) for v in value]
         else:
             value = self._format(value)
@@ -1097,7 +1097,7 @@ class TimeField(Field):
                 return smart_unicode(value)
         else:
             prep = smart_unicode
-        if lookup_type == 'range':
+        if lookup_type in ('range', 'in'):
             value = [prep(v) for v in value]
         else:
             value = prep(value)
