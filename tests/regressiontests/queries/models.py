@@ -810,5 +810,9 @@ used in lookups.
 >>> Item.objects.filter(created__in=[time1, time2])
 [<Item: one>, <Item: two>]
 
+Bug #7698 -- People like to slice with '0' as the high-water mark.
+>>> Item.objects.all()[0:0]
+[]
+
 """}
 
