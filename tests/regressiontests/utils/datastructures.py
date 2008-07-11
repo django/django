@@ -44,8 +44,8 @@
 >>> d.keys()
 [2, 1]
 >>> real_dict = dict(tuples)
->>> real_dict.values()
+>>> sorted(real_dict.values())
 ['one', 'second-two']
->>> d.values()
+>>> d.values() # Here the order of SortedDict values *is* what we are testing
 ['second-two', 'one']
 """
