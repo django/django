@@ -41,10 +41,11 @@ class Command(NoArgsCommand):
                 # but raises an ImportError for some reason. The only way we
                 # can do this is to check the text of the exception. Note that
                 # we're a bit broad in how we check the text, because different
-                # Python implementations may not use the same text. CPython
-                # uses the text "No module named management".
+                # Python implementations may not use the same text. 
+                # CPython uses the text "No module named management"
+                # PyPy uses "No module named myproject.myapp.management"
                 msg = exc.args[0]
-                if not msg.startswith('No module named management') or 'management' not in msg:
+                if not msg.startswith('No module named') or 'management' not in msg:
                     raise
 
         cursor = connection.cursor()
