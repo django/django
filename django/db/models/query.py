@@ -8,6 +8,11 @@ from django.db.models import signals, sql
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback
+
 # Used to control how many objects are worked with at once in some cases (e.g.
 # when deleting objects).
 CHUNK_SIZE = 100
