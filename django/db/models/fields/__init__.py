@@ -835,11 +835,13 @@ class FileField(Field):
     def save_file(self, new_data, new_object, original_object, change, rel, save=True):
         upload_field_name = self.get_manipulator_field_names('')[0]
         if new_data.get(upload_field_name, False):
-            func = getattr(new_object, 'save_%s_file' % self.name)
             if rel:
                 file = new_data[upload_field_name][0]
             else:
                 file = new_data[upload_field_name]
+
+            if not file:
+                return
 
             # Backwards-compatible support for files-as-dictionaries.
             # We don't need to raise a warning because Model._save_FIELD_file will
@@ -849,6 +851,7 @@ class FileField(Field):
             except AttributeError:
                 file_name = file['filename']
 
+            func = getattr(new_object, 'save_%s_file' % self.name)
             func(file_name, file, save)
 
     def get_directory_name(self):
