@@ -193,7 +193,7 @@ class TemporaryUploadedFile(UploadedFile):
         """
         Returns the full path of this file.
         """
-        return self.name
+        return self._file.name
     
     # Most methods on this object get proxied to NamedTemporaryFile.
     # We can't directly subclass because NamedTemporaryFile is actually a
