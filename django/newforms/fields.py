@@ -507,6 +507,8 @@ class ImageField(FileField):
             trial_image.verify()
         except Exception: # Python Imaging Library doesn't recognize it as an image
             raise ValidationError(self.error_messages['invalid_image'])
+        if hasattr(f, 'seek') and callable(f.seek):
+            f.seek(0)
         return f
 
 url_re = re.compile(
