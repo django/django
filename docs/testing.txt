@@ -600,8 +600,6 @@ Specifically, a ``Response`` object has the following attributes:
                      ``context`` will be a list of ``Context``
                      objects, in the order in which they were rendered.
 
-    ``headers``      The HTTP headers of the response. This is a dictionary.
-
     ``request``      The request data that stimulated the response.
 
     ``status_code``  The HTTP status of the response, as an integer. See
@@ -618,6 +616,10 @@ Specifically, a ``Response`` object has the following attributes:
                      be a list of ``Template`` instances, in the order in
                      which they were rendered.
     ===============  ==========================================================
+
+You can also use dictionary syntax on the response object to query the value
+of any settings in the HTTP headers. For example, you could determine the
+content type of a response using ``response['Content-Type']``.
 
 .. _RFC2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 .. _template inheritance: ../templates/#template-inheritance
