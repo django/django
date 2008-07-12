@@ -286,7 +286,7 @@ class Query(object):
         if with_limits:
             if self.high_mark is not None:
                 result.append('LIMIT %d' % (self.high_mark - self.low_mark))
-            if self.low_mark is not None:
+            if self.low_mark:
                 if self.high_mark is None:
                     val = self.connection.ops.no_limit_value()
                     if val:
