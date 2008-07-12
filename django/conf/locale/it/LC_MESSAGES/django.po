@@ -60,6 +60,10 @@ msgstr "Inglese"
 msgid "Spanish"
 msgstr "Spagnolo"
 
+#: conf/global_settings.py:55
+msgid "Estonian"
+msgstr "Estone"
+
 #: conf/global_settings.py:56
 msgid "Argentinean Spanish"
 msgstr "Spagnolo argentino"
@@ -131,6 +135,10 @@ msgstr "Kannada"
 #: conf/global_settings.py:73
 msgid "Latvian"
 msgstr "Lettone"
+
+#: conf/global_settings.py:74
+msgid "Lithuanian"
+msgstr "Lituano"
 
 #: conf/global_settings.py:75
 msgid "Macedonian"
