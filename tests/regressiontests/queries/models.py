@@ -8,6 +8,12 @@ import pickle
 from django.db import models
 from django.db.models.query import Q
 
+# Python 2.3 doesn't have sorted()
+try:
+    sorted
+except NameError:
+    from django.utils.itercompat import sorted
+                
 class Tag(models.Model):
     name = models.CharField(max_length=10)
     parent = models.ForeignKey('self', blank=True, null=True,

@@ -6,6 +6,12 @@ import datetime
 
 from django.db import models
 
+# Python 2.3 doesn't have sorted()
+try:
+    sorted
+except NameError:
+    from django.utils.itercompat import sorted
+
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)

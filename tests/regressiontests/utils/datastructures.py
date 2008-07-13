@@ -49,3 +49,10 @@
 >>> d.values() # Here the order of SortedDict values *is* what we are testing
 ['second-two', 'one']
 """
+
+# Python 2.3 doesn't have sorted()
+try:
+    sorted
+except NameError:
+    from django.utils.itercompat import sorted
+        

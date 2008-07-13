@@ -67,3 +67,8 @@ def is_iterable(x):
     else:
         return True
 
+def sorted(in_value):
+    "A naive implementation of sorted"
+    out_value = in_value[:]
+    out_value.sort()
+    return out_value
