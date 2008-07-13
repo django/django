@@ -801,8 +801,9 @@ class CommandTypes(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
-        self.assertOutput(out, os.sep.join(['django','contrib','auth','models.pyc']) + "'>, options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
-
+        self.assertOutput(out, os.sep.join(['django','contrib','auth','models.py'])) 
+        self.assertOutput(out, "'>, options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
+         	
     def test_app_command_no_apps(self):
         "User AppCommands raise an error when no app name is provided"
         args = ['app_command']
@@ -817,7 +818,8 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
         self.assertOutput(out, os.sep.join(['django','contrib','auth','models.pyc']) + "'>, options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
         self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.contenttypes.models'")
-        self.assertOutput(out, os.sep.join(['django','contrib','contenttypes','models.pyc']) + "'>, options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
+        self.assertOutput(out, os.sep.join(['django','contrib','contenttypes','models.py']))
+        self.assertOutput(out, "'>, options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
 
     def test_app_command_invalid_appname(self):
         "User AppCommands can execute when a single app name is provided"
