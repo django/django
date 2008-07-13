@@ -21,7 +21,12 @@ ITER_CHUNK_SIZE = CHUNK_SIZE
 # Pull into this namespace for backwards compatibility.
 EmptyResultSet = sql.EmptyResultSet
 
+
 class CyclicDependency(Exception):
+    """
+    An error when dealing with a collection of objects that have a cyclic
+    dependency, i.e. when deleting multiple objects.
+    """
     pass
 
 
