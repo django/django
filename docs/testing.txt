@@ -89,7 +89,7 @@ read Python's official documentation for the details.
     For example, this function has a docstring that describes what it does::
 
         def add_two(num):
-            "Adds 2 to the given number and returns the result."
+            "Return the result of adding two to the provided number."
             return num + 2
 
     Because tests often make great documentation, putting tests directly in
