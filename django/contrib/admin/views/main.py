@@ -5,7 +5,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.cache import never_cache
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
-from django.core.paginator import QuerySetPaginator, InvalidPage
+from django.core.paginator import Paginator, InvalidPage
 from django.shortcuts import get_object_or_404, render_to_response
 from django.db import models
 from django.db.models.query import QuerySet
@@ -611,7 +611,7 @@ class ChangeList(object):
         return mark_safe('?' + '&amp;'.join([u'%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20'))
 
     def get_results(self, request):
-        paginator = QuerySetPaginator(self.query_set, self.lookup_opts.admin.list_per_page)
+        paginator = Paginator(self.query_set, self.lookup_opts.admin.list_per_page)
 
         # Get the number of objects, with admin filters applied.
         try:

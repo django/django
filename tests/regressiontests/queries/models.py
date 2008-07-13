@@ -8,6 +8,12 @@ import pickle
 from django.db import models
 from django.db.models.query import Q
 
+# Python 2.3 doesn't have sorted()
+try:
+    sorted
+except NameError:
+    from django.utils.itercompat import sorted
+                
 class Tag(models.Model):
     name = models.CharField(max_length=10)
     parent = models.ForeignKey('self', blank=True, null=True,
@@ -803,6 +809,15 @@ Bug #7277
 
 Bug #7371
 >>> Related.objects.order_by('custom')
+[]
+
+Bug #7448, #7707 -- Complex objects should be converted to strings before being
+used in lookups.
+>>> Item.objects.filter(created__in=[time1, time2])
+[<Item: one>, <Item: two>]
+
+Bug #7698 -- People like to slice with '0' as the high-water mark.
+>>> Item.objects.all()[0:0]
 []
 
 """}

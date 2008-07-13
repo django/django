@@ -537,6 +537,12 @@ u'123'
 from django.template.defaultfilters import *
 import datetime
 
+# Python 2.3 doesn't have sorted()
+try:
+    sorted
+except NameError:
+    from django.utils.itercompat import sorted
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()

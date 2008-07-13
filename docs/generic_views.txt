@@ -816,15 +816,14 @@ specify the page number in the URL in one of two ways:
 These values and lists are 1-based, not 0-based, so the first page would be
 represented as page ``1``. 
 
-An example of the use of pagination can be found in the `object pagination`_
-example model. 
+For more on pagination, read the `pagination documentation`_.
 	 
-.. _`object pagination`: ../models/pagination/
+.. _`pagination documentation`: ../pagination/
 
 **New in Django development version:** 
 
-As a special case, you are also permitted to use 
-``last`` as a value for ``page``::
+As a special case, you are also permitted to use ``last`` as a value for
+``page``::
 
     /objects/?page=last
 

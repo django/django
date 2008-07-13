@@ -8,12 +8,14 @@ from django.utils import html, checksums
 
 import timesince
 import datastructures
+import itercompat
 from decorators import DecoratorFromMiddlewareTests
 
 # Extra tests
 __test__ = {
     'timesince': timesince,
     'datastructures': datastructures,
+    'itercompat': itercompat,
 }
 
 class TestUtilsHtml(TestCase):

@@ -283,12 +283,11 @@ class Query(object):
         if ordering:
             result.append('ORDER BY %s' % ', '.join(ordering))
 
-        # FIXME: Pull this out to make life easier for Oracle et al.
         if with_limits:
-            if self.high_mark:
+            if self.high_mark is not None:
                 result.append('LIMIT %d' % (self.high_mark - self.low_mark))
             if self.low_mark:
-                if not self.high_mark:
+                if self.high_mark is None:
                     val = self.connection.ops.no_limit_value()
                     if val:
                         result.append('LIMIT %d' % val)
@@ -1381,12 +1380,12 @@ class Query(object):
         constraints. So low is added to the current low value and both will be
         clamped to any existing high value.
         """
-        if high:
+        if high is not None:
             if self.high_mark:
                 self.high_mark = min(self.high_mark, self.low_mark + high)
             else:
                 self.high_mark = self.low_mark + high
-        if low:
+        if low is not None:
             if self.high_mark:
                 self.low_mark = min(self.high_mark, self.low_mark + low)
             else:

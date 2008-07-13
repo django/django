@@ -25,7 +25,7 @@ class FileUploadTests(TestCase):
         file2.seek(0)
 
         # This file contains chinese symbols for a name.
-        file3 = open(os.path.join(tdir, u'test_&#20013;&#25991;_Orl\u00e9ans.jpg'), 'w+b')
+        file3 = open(os.path.join(tdir, u'test_&#20013;&#25991;_Orl\u00e9ans.jpg'.encode('utf-8')), 'w+b')
         file3.write('b' * (2 ** 10))
         file3.seek(0)
 
@@ -147,12 +147,35 @@ class FileUploadTests(TestCase):
     def test_broken_custom_upload_handler(self):
         f = tempfile.NamedTemporaryFile()
         f.write('a' * (2 ** 21))
-        
+
         # AttributeError: You cannot alter upload handlers after the upload has been processed.
         self.assertRaises(
             AttributeError,
             self.client.post,
-            '/file_uploads/quota/broken/', 
+            '/file_uploads/quota/broken/',
             {'f': open(f.name)}
-        )        
-        
+        )
+
+    def test_fileupload_getlist(self):
+        file1 = tempfile.NamedTemporaryFile()
+        file1.write('a' * (2 ** 23))
+
+        file2 = tempfile.NamedTemporaryFile()
+        file2.write('a' * (2 * 2 ** 18))
+
+        file2a = tempfile.NamedTemporaryFile()
+        file2a.write('a' * (5 * 2 ** 20))
+
+        response = self.client.post('/file_uploads/getlist_count/', {
+            'file1': open(file1.name),
+            'field1': u'test',
+            'field2': u'test3',
+            'field3': u'test5',
+            'field4': u'test6',
+            'field5': u'test7',
+            'file2': (open(file2.name), open(file2a.name))
+        })
+        got = simplejson.loads(response.content)
+
+        self.assertEqual(got.get('file1'), 1)
+        self.assertEqual(got.get('file2'), 2)

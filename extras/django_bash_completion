@@ -42,13 +42,13 @@ _django_completion()
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
     # Standalone options
-    opts="--help --settings --pythonpath --noinput --noreload --format --indent --verbosity --adminmedia --version"
+    opts="--help --settings --pythonpath --noinput --noreload --format --indent --verbosity --adminmedia --version --locale --domain"
     # Actions
-    actions="adminindex createcachetable createsuperuser dbshell diffsettings \
-             dumpdata flush inspectdb loaddata reset runfcgi runserver \
-             shell sql sqlall sqlclear sqlcustom sqlflush sqlindexes \
-             sqlreset sqlsequencereset startapp startproject \
-             syncdb test validate"
+    actions="adminindex createcachetable createsuperuser compilemessages \
+             dbshell diffsettings dumpdata flush inspectdb loaddata \
+             makemessages reset runfcgi runserver shell sql sqlall sqlclear \
+             sqlcustom sqlflush sqlindexes sqlreset sqlsequencereset startapp \
+             startproject syncdb test validate"
     # Action's options
     action_shell_opts="--plain"
     action_runfcgi_opts="host port socket method maxspare minspare maxchildren daemonize pidfile workdir"
@@ -118,8 +118,9 @@ _django_completion()
                 return 0
                 ;;
 
-            createcachetable|dbshell|diffsettings| \
-            inspectdb|runserver|startapp|startproject|syncdb| \
+            createcachetable|cleanup|compilemessages|dbshell| \
+            diffsettings|inspectdb|makemessages| \
+            runserver|startapp|startproject|syncdb| \
             validate)
                 COMPREPLY=()
                 return 0

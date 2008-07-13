@@ -392,7 +392,7 @@ translated, here's what to do:
     * Create translations using the methods described in the
       `i18n documentation`_.
     * Create a diff of the ``.po`` file against the current Subversion trunk.
-    * Make sure that `` bin/compile-messages.py -l <lang>`` runs without
+    * Make sure that `` django-admin.py compilemessages -l <lang>`` runs without
       producing any warnings.
     * Attach the patch to a ticket in Django's ticket system.
 
@@ -738,6 +738,11 @@ If you're using another backend:
       deleted when the tests are finished. This means your user account needs
       permission to execute ``CREATE DATABASE``.
 
+You will also need to ensure that your database uses UTF-8 as the default
+character set. If your database server doesn't use UTF-8 as a default charset,
+you will need to include a value for ``TEST_DATABASE_CHARSET`` in your settings
+file.
+   
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
