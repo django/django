@@ -257,7 +257,6 @@ class ModelAdmin(BaseModelAdmin):
         # Check that LogEntry, ContentType and the auth context processor are installed.
         from django.conf import settings
         if settings.DEBUG:
-            from django.contrib.contenttypes.models import ContentType
             from django.contrib.admin.models import LogEntry
             if not LogEntry._meta.installed:
                 raise ImproperlyConfigured("Put 'django.contrib.admin' in your INSTALLED_APPS setting in order to use the admin application.")
@@ -360,7 +359,6 @@ class ModelAdmin(BaseModelAdmin):
         `form` is a bound Form instance that's verified to be valid.
         """
         from django.contrib.admin.models import LogEntry, ADDITION
-        from django.contrib.contenttypes.models import ContentType
         opts = model._meta
         new_object = form.save(commit=True)
 
@@ -410,7 +408,6 @@ class ModelAdmin(BaseModelAdmin):
         `formsets` is a sequence of InlineFormSet instances that are verified to be valid.
         """
         from django.contrib.admin.models import LogEntry, CHANGE
-        from django.contrib.contenttypes.models import ContentType
         opts = model._meta
         new_object = form.save(commit=True)
         pk_value = new_object._get_pk_val()
@@ -659,7 +656,6 @@ class ModelAdmin(BaseModelAdmin):
 
     def delete_view(self, request, object_id, extra_context=None):
         "The 'delete' admin view for this model."
-        from django.contrib.contenttypes.models import ContentType
         from django.contrib.admin.models import LogEntry, DELETION
         opts = self.model._meta
         app_label = opts.app_label
@@ -713,7 +709,6 @@ class ModelAdmin(BaseModelAdmin):
 
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
-        from django.contrib.contenttypes.models import ContentType
         from django.contrib.admin.models import LogEntry
         model = self.model
         opts = model._meta
