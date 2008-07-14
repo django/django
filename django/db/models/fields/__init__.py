@@ -314,7 +314,7 @@ class Field(object):
             params['validator_list'].append(getattr(manipulator, 'isUnique%sFor%s' % (self.name, self.unique_for_month)))
         if self.unique_for_year:
             params['validator_list'].append(getattr(manipulator, 'isUnique%sFor%s' % (self.name, self.unique_for_year)))
-        if self.unique or (self.primary_key and not rel):
+        if self.unique and not rel:
             params['validator_list'].append(curry(manipulator_validator_unique, self, opts, manipulator))
 
         # Only add is_required=True if the field cannot be blank. Primary keys
@@ -539,7 +539,7 @@ class DateField(Field):
             raise validators.ValidationError, _('Enter a valid date in YYYY-MM-DD format.')
 
     def get_db_prep_lookup(self, lookup_type, value):
-        if lookup_type == 'range':
+        if lookup_type in ('range', 'in'):
             value = [smart_unicode(v) for v in value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte') and hasattr(value, 'strftime'):
             value = value.strftime('%Y-%m-%d')
@@ -626,7 +626,7 @@ class DateTimeField(DateField):
         return Field.get_db_prep_save(self, value)
 
     def get_db_prep_lookup(self, lookup_type, value):
-        if lookup_type == 'range':
+        if lookup_type in ('range', 'in'):
             value = [smart_unicode(v) for v in value]
         else:
             value = smart_unicode(value)
@@ -705,7 +705,7 @@ class DecimalField(Field):
         return super(DecimalField, self).get_db_prep_save(value)
 
     def get_db_prep_lookup(self, lookup_type, value):
-        if lookup_type == 'range':
+        if lookup_type in ('range', 'in'):
             value = [self._format(v) for v in value]
         else:
             value = self._format(value)
@@ -820,11 +820,13 @@ class FileField(Field):
     def save_file(self, new_data, new_object, original_object, change, rel, save=True):
         upload_field_name = self.get_manipulator_field_names('')[0]
         if new_data.get(upload_field_name, False):
-            func = getattr(new_object, 'save_%s_file' % self.name)
             if rel:
                 file = new_data[upload_field_name][0]
             else:
                 file = new_data[upload_field_name]
+
+            if not file:
+                return
 
             # Backwards-compatible support for files-as-dictionaries.
             # We don't need to raise a warning because Model._save_FIELD_file will
@@ -834,6 +836,7 @@ class FileField(Field):
             except AttributeError:
                 file_name = file['filename']
 
+            func = getattr(new_object, 'save_%s_file' % self.name)
             func(file_name, file, save)
 
     def get_directory_name(self):
@@ -1086,7 +1089,7 @@ class TimeField(Field):
                 return smart_unicode(value)
         else:
             prep = smart_unicode
-        if lookup_type == 'range':
+        if lookup_type in ('range', 'in'):
             value = [prep(v) for v in value]
         else:
             value = prep(value)

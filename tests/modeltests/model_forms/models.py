@@ -900,7 +900,7 @@ u'...test3.txt'
 ...     class Meta:
 ...         model = ImageFile
 
->>> image_data = open(os.path.join(os.path.dirname(__file__), "test.png")).read()
+>>> image_data = open(os.path.join(os.path.dirname(__file__), "test.png"), 'rb').read()
 
 >>> f = ImageFileForm(data={'description': u'An image'}, files={'image': SimpleUploadedFile('test.png', image_data)})
 >>> f.is_valid()

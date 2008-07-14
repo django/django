@@ -25,7 +25,7 @@ class FileUploadTests(TestCase):
         file2.seek(0)
 
         # This file contains chinese symbols for a name.
-        file3 = open(os.path.join(tdir, u'test_&#20013;&#25991;_Orl\u00e9ans.jpg'), 'w+b')
+        file3 = open(os.path.join(tdir, u'test_&#20013;&#25991;_Orl\u00e9ans.jpg'.encode('utf-8')), 'w+b')
         file3.write('b' * (2 ** 10))
         file3.seek(0)
 

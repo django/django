@@ -8,6 +8,11 @@ Alternatively, use positional arguments, and pass one or more expressions of
 clauses using the variable ``django.db.models.Q`` (or any object with an
 add_to_query method).
 """
+# Python 2.3 doesn't have sorted()
+try:
+    sorted
+except NameError:
+    from django.utils.itercompat import sorted
 
 from django.db import models
 

@@ -5,6 +5,7 @@ import views
 urlpatterns = patterns('',
     (r'^get_view/$', views.get_view),
     (r'^post_view/$', views.post_view),
+    (r'^header_view/$', views.view_with_header),
     (r'^raw_post_view/$', views.raw_post_view),
     (r'^redirect_view/$', views.redirect_view),
     (r'^permanent_redirect_view/$', redirect_to, { 'url': '/test_client/get_view/' }),

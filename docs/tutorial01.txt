@@ -146,7 +146,7 @@ database's connection parameters:
     * ``DATABASE_ENGINE`` -- Either 'postgresql_psycopg2', 'mysql' or 'sqlite3'.
       Other backends are `also available`_.
     * ``DATABASE_NAME`` -- The name of your database, or the full (absolute)
-      path to the database file if you're using SQLite.
+      path to the database file if you're using SQLite. 
     * ``DATABASE_USER`` -- Your database username (not used for SQLite).
     * ``DATABASE_PASSWORD`` -- Your database password (not used for SQLite).
     * ``DATABASE_HOST`` -- The host your database is on. Leave this as an
@@ -160,6 +160,9 @@ database's connection parameters:
     If you're using PostgreSQL or MySQL, make sure you've created a database by
     this point. Do that with "``CREATE DATABASE database_name;``" within your
     database's interactive prompt.
+
+    If you're using SQLite, you don't need to create anything beforehand - the
+    database file will be created automatically when it is needed.
 
 While you're editing ``settings.py``, take note of the ``INSTALLED_APPS``
 setting towards the bottom of the file. That variable holds the names of all

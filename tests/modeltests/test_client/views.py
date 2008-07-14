@@ -32,6 +32,12 @@ def post_view(request):
 
     return HttpResponse(t.render(c))
 
+def view_with_header(request):
+    "A view that has a custom header"
+    response = HttpResponse()
+    response['X-DJANGO-TEST'] = 'Slartibartfast'
+    return response
+        
 def raw_post_view(request):
     """A view which expects raw XML to be posted and returns content extracted
     from the XML"""

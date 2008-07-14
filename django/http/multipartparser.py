@@ -270,24 +270,9 @@ class LazyStream(object):
         self._empty = False
         self._leftover = ''
         self.length = length
-        self._position = 0
+        self.position = 0
         self._remaining = length
-
-        # These fields are to do sanity checking to make sure we don't
-        # have infinite loops getting/ungetting from the stream. The
-        # purpose overall is to raise an exception if we perform lots
-        # of stream get/unget gymnastics without getting
-        # anywhere. Naturally this is not sound, but most probably
-        # would indicate a bug if the exception is raised.
-
-        # largest position tell us how far this lazystream has ever
-        # been advanced
-        self._largest_position = 0
-
-        # "modifications since" will start at zero and increment every
-        # time the position is modified but a new largest position is
-        # not achieved.
-        self._modifications_since = 0
+        self._unget_history = []
 
     def tell(self):
         return self.position
@@ -329,6 +314,7 @@ class LazyStream(object):
             self._leftover = ''
         else:
             output = self._producer.next()
+            self._unget_history = []
         self.position += len(output)
         return output
 
@@ -351,25 +337,30 @@ class LazyStream(object):
         Future calls to read() will return those bytes first. The
         stream position and thus tell() will be rewound.
         """
+        if not bytes:
+            return
+        self._update_unget_history(len(bytes))
         self.position -= len(bytes)
         self._leftover = ''.join([bytes, self._leftover])
 
-    def _set_position(self, value):
-        if value > self._largest_position:
-            self._modifications_since = 0
-            self._largest_position = value
-        else:
-            self._modifications_since += 1
-            if self._modifications_since > 500:
-                raise SuspiciousOperation(
-                    "The multipart parser got stuck, which shouldn't happen with"
-                    " normal uploaded files. Check for malicious upload activity;"
-                    " if there is none, report this to the Django developers."
-                )
+    def _update_unget_history(self, num_bytes):
+        """
+        Updates the unget history as a sanity check to see if we've pushed
+        back the same number of bytes in one chunk. If we keep ungetting the
+        same number of bytes many times (here, 50), we're mostly likely in an
+        infinite loop of some sort. This is usually caused by a
+        maliciously-malformed MIME request.
+        """
+        self._unget_history = [num_bytes] + self._unget_history[:49]
+        number_equal = len([current_number for current_number in self._unget_history
+                            if current_number == num_bytes])
 
-        self._position = value
-
-    position = property(lambda self: self._position, _set_position)
+        if number_equal > 40:
+            raise SuspiciousOperation(
+                "The multipart parser got stuck, which shouldn't happen with"
+                " normal uploaded files. Check for malicious upload activity;"
+                " if there is none, report this to the Django developers."
+            )
 
 class ChunkIter(object):
     """

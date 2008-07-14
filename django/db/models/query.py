@@ -1,12 +1,16 @@
 import warnings
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback
 
-from django.conf import settings
 from django.db import connection, transaction, IntegrityError
-from django.db.models.fields import DateField, FieldDoesNotExist
+from django.db.models.fields import DateField
 from django.db.models.query_utils import Q, select_related_descend
 from django.db.models import signals, sql
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
+
 
 # Used to control how many objects are worked with at once in some cases (e.g.
 # when deleting objects).
@@ -16,7 +20,12 @@ ITER_CHUNK_SIZE = CHUNK_SIZE
 # Pull into this namespace for backwards compatibility.
 EmptyResultSet = sql.EmptyResultSet
 
+
 class CyclicDependency(Exception):
+    """
+    An error when dealing with a collection of objects that have a cyclic
+    dependency, i.e. when deleting multiple objects.
+    """
     pass
 
 
