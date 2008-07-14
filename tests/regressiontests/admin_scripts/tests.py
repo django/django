@@ -53,7 +53,7 @@ class AdminScriptTestCase(unittest.TestCase):
         
         # Build the command line
         cmd = 'python "%s"' % script
-        cmd += ''.join(' %s' % arg for arg in args)
+        cmd += ''.join([' %s' % arg for arg in args])
         
         # Remember the old environment
         old_django_settings_module = os.environ.get('DJANGO_SETTINGS_MODULE', None)
