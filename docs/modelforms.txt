@@ -454,7 +454,9 @@ model instances without any database interaction::
     ...     instance.save()
 
 This gives you the ability to attach data to the instances before saving them
-to the database.
+to the database. If your formset contains a ``ManyToManyField`` you will also
+need to make a call to ``formset.save_m2m()`` to ensure the many-to-many
+relationships are saved properly.
 
 Limiting the number of objects editable
 ---------------------------------------

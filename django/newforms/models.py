@@ -331,6 +331,12 @@ class BaseModelFormSet(BaseFormSet):
         """Saves model instances for every form, adding and changing instances
         as necessary, and returns the list of instances.
         """
+        if not commit:
+            self.saved_forms = []
+            def save_m2m():
+                for form in self.saved_forms:
+                    form.save_m2m()
+            self.save_m2m = save_m2m
         return self.save_existing_objects(commit) + self.save_new_objects(commit)
 
     def save_existing_objects(self, commit=True):
@@ -353,6 +359,8 @@ class BaseModelFormSet(BaseFormSet):
                 if form.changed_data:
                     self.changed_objects.append((obj, form.changed_data))
                     saved_instances.append(self.save_existing(form, obj, commit=commit))
+                    if not commit:
+                        self.saved_forms.append(form)
         return saved_instances
 
     def save_new_objects(self, commit=True):
@@ -365,6 +373,8 @@ class BaseModelFormSet(BaseFormSet):
             if self.can_delete and form.cleaned_data[DELETION_FIELD_NAME]:
                 continue
             self.new_objects.append(self.save_new(form, commit=commit))
+            if not commit:
+                self.saved_forms.append(form)
         return self.new_objects
 
     def add_fields(self, form, index):

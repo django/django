@@ -13,8 +13,18 @@ class Book(models.Model):
     def __unicode__(self):
         return self.title
 
+class AuthorMeeting(models.Model):
+    name = models.CharField(max_length=100)
+    authors = models.ManyToManyField(Author)
+    created = models.DateField(editable=False)
+    
+    def __unicode__(self):
+        return self.name
+
 
 __test__ = {'API_TESTS': """
+
+>>> from datetime import date
 
 >>> from django.newforms.models import modelformset_factory
 
@@ -161,6 +171,40 @@ True
 # One record has changed.
 >>> formset.save()
 [<Author: Walt Whitman>]
+
+Test the behavior of commit=False and save_m2m
+
+>>> meeting = AuthorMeeting.objects.create(created=date.today())
+>>> meeting.authors = Author.objects.all()
+
+# create an Author instance to add to the meeting.
+>>> new_author = Author.objects.create(name=u'John Steinbeck')
+
+>>> AuthorMeetingFormSet = modelformset_factory(AuthorMeeting, extra=1, can_delete=True)
+>>> data = {
+...     'form-TOTAL_FORMS': '2', # the number of forms rendered
+...     'form-INITIAL_FORMS': '1', # the number of forms with initial data
+...     'form-MAX_FORMS': '0', # the max number of forms
+...     'form-0-id': '1',
+...     'form-0-name': '2nd Tuesday of the Week Meeting',
+...     'form-0-authors': [2, 1, 3, 4],
+...     'form-1-name': '',
+...     'form-1-authors': '',
+...     'form-1-DELETE': '',
+... }
+>>> formset = AuthorMeetingFormSet(data=data, queryset=AuthorMeeting.objects.all())
+>>> formset.is_valid()
+True
+>>> instances = formset.save(commit=False)
+>>> for instance in instances:
+...     instance.created = date.today()
+...     instance.save()
+>>> formset.save_m2m()
+>>> instances[0].authors.all()
+[<Author: Charles Baudelaire>, <Author: Walt Whitman>, <Author: Paul Verlaine>, <Author: John Steinbeck>]
+
+# delete the author we created to allow later tests to continue working.
+>>> new_author.delete()
 
 Test the behavior of max_num with model formsets. It should properly limit
 the queryset to reduce the amount of objects being pulled in when not being
