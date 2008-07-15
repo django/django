@@ -6,14 +6,14 @@ import datetime
 import pickle
 
 from django.db import models
-from django.db.models.query import Q
+from django.db.models.query import Q, ITER_CHUNK_SIZE
 
 # Python 2.3 doesn't have sorted()
 try:
     sorted
 except NameError:
     from django.utils.itercompat import sorted
-                
+
 class Tag(models.Model):
     name = models.CharField(max_length=10)
     parent = models.ForeignKey('self', blank=True, null=True,
@@ -819,6 +819,16 @@ used in lookups.
 Bug #7698 -- People like to slice with '0' as the high-water mark.
 >>> Item.objects.all()[0:0]
 []
+
+Bug #7411 - saving to db must work even with partially read result set in
+another cursor.
+
+>>> for num in range(2 * ITER_CHUNK_SIZE + 1):
+...     _ = Number.objects.create(num=num)
+
+>>> for i, obj in enumerate(Number.objects.all()):
+...     obj.save()
+...     if i > 10: break
 
 """}
 

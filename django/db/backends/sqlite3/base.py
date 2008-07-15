@@ -40,6 +40,11 @@ Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     supports_constraints = False
+    # SQLite cannot handle us only partially reading from a cursor's result set
+    # and then writing the same rows to the database in another cursor. This
+    # setting ensures we always read result sets fully into memory all in one
+    # go.
+    can_use_chunked_reads = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
