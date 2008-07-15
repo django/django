@@ -1,6 +1,8 @@
 # coding: utf-8
-from django.db import models
 from datetime import date
+
+from django.db import models
+from django.contrib.auth.models import User
 
 class Band(models.Model):
     name = models.CharField(max_length=100)
@@ -21,6 +23,16 @@ class Concert(models.Model):
         (3, 'Bus')
     ), blank=True)
 
+class ValidationTestModel(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField()
+    users = models.ManyToManyField(User)
+    state = models.CharField(max_length=2, choices=(("CO", "Colorado"), ("WA", "Washington")))
+    is_active = models.BooleanField()
+    pub_date = models.DateTimeField()
+
+class ValidationTestInlineModel(models.Model):
+    parent = models.ForeignKey(ValidationTestModel)
 
 __test__ = {'API_TESTS': """
 
@@ -225,6 +237,560 @@ blank=True for the model field.  Finally, the widget should have the
 [('', u'None'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')]
 
 >>> band.delete()
+
+# ModelAdmin Option Validation ################################################
+
+>>> from django.contrib.admin.validation import validate
+>>> from django.conf import settings
+
+# Ensure validation only runs when DEBUG = True
+
+>>> settings.DEBUG = True
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     raw_id_fields = 10
+>>> site = AdminSite()
+>>> site.register(ValidationTestModel, ValidationTestModelAdmin)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.raw_id_fields` must be a list or tuple.
+
+>>> settings.DEBUG = False
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     raw_id_fields = 10
+>>> site = AdminSite()
+>>> site.register(ValidationTestModel, ValidationTestModelAdmin)
+
+# raw_id_fields
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     raw_id_fields = 10
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.raw_id_fields` must be a list or tuple.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     raw_id_fields = ('non_existent_field',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.raw_id_fields` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     raw_id_fields = ('name',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.raw_id_fields[0]`, `name` must be either a ForeignKey or ManyToManyField.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     raw_id_fields = ('users',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# fieldsets
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     fieldsets = 10
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets` must be a list or tuple.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     fieldsets = ({},)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets[0]` must be a list or tuple.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     fieldsets = ((),)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets[0]` does not have exactly two elements.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     fieldsets = (("General", ()),)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets[0][1]` must be a dictionary.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     fieldsets = (("General", {}),)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `fields` key is required in ValidationTestModelAdmin.fieldsets[0][1] field options dict.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     fieldsets = (("General", {"fields": ("non_existent_field",)}),)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets[0][1]['fields']` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     fieldsets = (("General", {"fields": ("name",)}),)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# form
+
+>>> class FakeForm(object):
+...     pass
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     form = FakeForm
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: ValidationTestModelAdmin.form does not inherit from BaseModelForm.
+
+# filter_vertical
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     filter_vertical = 10
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.filter_vertical` must be a list or tuple.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     filter_vertical = ("non_existent_field",)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.filter_vertical` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     filter_vertical = ("name",)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.filter_vertical[0]` must be a ManyToManyField.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     filter_vertical = ("users",)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# filter_horizontal
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     filter_horizontal = 10
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.filter_horizontal` must be a list or tuple.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     filter_horizontal = ("non_existent_field",)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.filter_horizontal` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     filter_horizontal = ("name",)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.filter_horizontal[0]` must be a ManyToManyField.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     filter_horizontal = ("users",)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# radio_fields
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     radio_fields = ()
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.radio_fields` must be a dictionary.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     radio_fields = {"non_existent_field": None}
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.radio_fields` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     radio_fields = {"name": None}
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.radio_fields['name']` is neither an instance of ForeignKey nor does have choices set.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     radio_fields = {"state": None}
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.radio_fields['state']` is neither admin.HORIZONTAL nor admin.VERTICAL.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     radio_fields = {"state": VERTICAL}
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# prepopulated_fields
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     prepopulated_fields = ()
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.prepopulated_fields` must be a dictionary.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     prepopulated_fields = {"non_existent_field": None}
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.prepopulated_fields` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     prepopulated_fields = {"slug": ("non_existent_field",)}
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.prepopulated_fields['non_existent_field'][0]` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     prepopulated_fields = {"users": ("name",)}
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.prepopulated_fields['users']` is either a DateTimeField, ForeignKey or ManyToManyField. This isn't allowed.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     prepopulated_fields = {"slug": ("name",)}
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# list_display
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_display = 10
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.list_display` must be a list or tuple.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_display = ('non_existent_field',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.list_display[0]` refers to `non_existent_field` that is neither a field, method or property of model `ValidationTestModel`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_display = ('users',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.list_display[0]`, `users` is a ManyToManyField which is not supported.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_display = ('name',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# list_display_links
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_display_links = 10
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.list_display_links` must be a list or tuple.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_display_links = ('non_existent_field',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.list_display_links[0]` refers to `non_existent_field` that is neither a field, method or property of model `ValidationTestModel`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_display_links = ('name',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.list_display_links[0]`refers to `name` which is not defined in `list_display`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_display = ('name',)
+...     list_display_links = ('name',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# list_filter
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_filter = 10
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.list_filter` must be a list or tuple.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_filter = ('non_existent_field',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.list_filter[0]` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_filter = ('is_active',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# list_per_page
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_per_page = 'hello'
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.list_per_page` should be a integer.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_per_page = 100
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# search_fields
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     search_fields = 10
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.search_fields` must be a list or tuple.
+
+# date_hierarchy
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     date_hierarchy = 'non_existent_field'
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.date_hierarchy` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     date_hierarchy = 'name'
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.date_hierarchy is neither an instance of DateField nor DateTimeField.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     date_hierarchy = 'pub_date'
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# ordering
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     ordering = 10
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.ordering` must be a list or tuple.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     ordering = ('non_existent_field',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.ordering[0]` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     ordering = ('?', 'name')
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.ordering` has the random ordering marker `?`, but contains other fields as well. Please either remove `?` or the other fields.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     ordering = ('name',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# list_select_related
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_select_related = 1
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.list_select_related` should be a boolean.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     list_select_related = False
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# save_as
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     save_as = 1
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.save_as` should be a boolean.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     save_as = True
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# save_on_top
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     save_on_top = 1
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.save_on_top` should be a boolean.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     save_on_top = True
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# inlines
+
+>>> from django.contrib.admin.options import TabularInline
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = 10
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.inlines` must be a list or tuple.
+
+>>> class ValidationTestInline(object):
+...     pass
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.inlines[0]` does not inherit from BaseModelAdmin.
+
+>>> class ValidationTestInline(TabularInline):
+...     pass
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `model` is a required attribute of `ValidationTestModelAdmin.inlines[0]`.
+
+>>> class SomethingBad(object):
+...     pass
+>>> class ValidationTestInline(TabularInline):
+...     model = SomethingBad
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestModelAdmin.inlines[0].model` does not inherit from models.Model.
+
+>>> class ValidationTestInline(TabularInline):
+...     model = ValidationTestInlineModel
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# fields
+
+>>> class ValidationTestInline(TabularInline):
+...     model = ValidationTestInlineModel
+...     fields = 10
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestInline.fields` must be a list or tuple.
+
+>>> class ValidationTestInline(TabularInline):
+...     model = ValidationTestInlineModel
+...     fields = ("non_existent_field",)
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestInline.fields` refers to field `non_existent_field` that is missing from model `ValidationTestInlineModel`.
+
+# fk_name
+
+>>> class ValidationTestInline(TabularInline):
+...     model = ValidationTestInlineModel
+...     fk_name = "non_existent_field"
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestInline.fk_name` refers to field `non_existent_field` that is missing from model `ValidationTestInlineModel`.
+
+>>> class ValidationTestInline(TabularInline):
+...     model = ValidationTestInlineModel
+...     fk_name = "parent"
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# extra
+
+>>> class ValidationTestInline(TabularInline):
+...     model = ValidationTestInlineModel
+...     extra = "hello"
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestInline.extra` should be a integer.
+
+>>> class ValidationTestInline(TabularInline):
+...     model = ValidationTestInlineModel
+...     extra = 2
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# max_num
+
+>>> class ValidationTestInline(TabularInline):
+...     model = ValidationTestInlineModel
+...     max_num = "hello"
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestInline.max_num` should be a integer.
+
+>>> class ValidationTestInline(TabularInline):
+...     model = ValidationTestInlineModel
+...     max_num = 2
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+# formset
+
+>>> class FakeFormSet(object):
+...     pass
+>>> class ValidationTestInline(TabularInline):
+...     model = ValidationTestInlineModel
+...     formset = FakeFormSet
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `ValidationTestInline.formset` does not inherit from BaseInlineFormset.
 
 """
 }

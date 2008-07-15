@@ -7,6 +7,7 @@ from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.views.decorators.cache import never_cache
+from django.conf import settings
 import base64
 import cPickle as pickle
 import datetime
@@ -65,6 +66,10 @@ class AdminSite(object):
 
         If a model is already registered, this will raise AlreadyRegistered.
         """
+        do_validate = admin_class and settings.DEBUG
+        if do_validate:
+            # don't import the humongous validation code unless required
+            from django.contrib.admin.validation import validate
         admin_class = admin_class or ModelAdmin
         # TODO: Handle options
         if isinstance(model_or_iterable, ModelBase):
@@ -72,6 +77,8 @@ class AdminSite(object):
         for model in model_or_iterable:
             if model in self._registry:
                 raise AlreadyRegistered('The model %s is already registered' % model.__name__)
+            if do_validate:
+                validate(admin_class, model)
             self._registry[model] = admin_class(model, self)
 
     def unregister(self, model_or_iterable):
