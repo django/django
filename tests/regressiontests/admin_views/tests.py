@@ -11,7 +11,6 @@ def get_perm(Model, perm):
     """Return the permission object, for the Model"""
     ct = ContentType.objects.get_for_model(Model)
     return Permission.objects.get(content_type=ct,codename=perm)
-    
 
 class AdminViewPermissionsTest(TestCase):
     """Tests for Admin Views Permissions."""
@@ -40,7 +39,7 @@ class AdminViewPermissionsTest(TestCase):
         delete_user = User.objects.get(username='deleteuser')
         delete_user.user_permissions.add(get_perm(Article,
             opts.get_delete_permission()))
-
+        
         delete_user.user_permissions.add(get_perm(Section,
             Section._meta.get_delete_permission()))
         
@@ -73,7 +72,7 @@ class AdminViewPermissionsTest(TestCase):
                      LOGIN_FORM_KEY: 1,
                      'username': 'joepublic',
                      'password': 'secret'}
-           
+
     def testTrailingSlashRequired(self):
         """
         If you leave off the trailing slash, app should redirect and add it.
@@ -86,7 +85,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertRedirects(request,
             '/test_admin/admin/admin_views/article/add/'
         )
-    
+
     def testLogin(self):
         """
         Make sure only staff members can log in.
@@ -115,7 +114,7 @@ class AdminViewPermissionsTest(TestCase):
         new_user.save()
         # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
         login = self.client.post('/test_admin/admin/', self.super_email_login)
-        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")        
+        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")
         
         # Add User
         request = self.client.get('/test_admin/admin/')
@@ -148,7 +147,7 @@ class AdminViewPermissionsTest(TestCase):
         self.failUnlessEqual(login.status_code, 200)
         # Login.context is a list of context dicts we just need to check the first one.
         self.assert_(login.context[0].get('error_message'))
-    
+
     def testAddView(self):
         """Test add view restricts access and actually adds items."""
         
@@ -191,7 +190,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertRedirects(post, '/test_admin/admin/admin_views/article/')
         self.failUnlessEqual(Article.objects.all().count(), 4)
         self.client.get('/test_admin/admin/logout/')
-        
+
     def testChangeView(self):
         """Change view should restrict access and allow users to edit items."""
         
@@ -221,7 +220,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertRedirects(post, '/test_admin/admin/admin_views/article/')
         self.failUnlessEqual(Article.objects.get(pk=1).content, '<p>edited article</p>')
         self.client.get('/test_admin/admin/logout/')
-        
+
     def testCustomModelAdminTemplates(self):
         self.client.get('/test_admin/admin/')
         self.client.post('/test_admin/admin/', self.super_login)
@@ -252,7 +251,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertTemplateUsed(request, 'custom_admin/object_history.html')
         
         self.client.get('/test_admin/admin/logout/')
-        
+
     def testCustomAdminSiteTemplates(self):
         from django.contrib import admin
         self.assertEqual(admin.site.index_template, None)
@@ -275,7 +274,7 @@ class AdminViewPermissionsTest(TestCase):
         request = self.client.get('/test_admin/admin/')
         self.assertTemplateUsed(request, 'custom_admin/index.html')
         self.assert_('Hello from a custom index template' in request.content)
-                
+        
         # Finally, using monkey patching check we can inject custom_context arguments in to index
         original_index = admin.site.index
         def index(*args, **kwargs):
@@ -290,10 +289,10 @@ class AdminViewPermissionsTest(TestCase):
         del admin.site.index # Resets to using the original
         admin.site.login_template = None
         admin.site.index_template = None
-    
+
     def testDeleteView(self):
         """Delete view should restrict access and actually delete items."""
-
+        
         delete_dict = {'post': 'yes'}
         
         # add user shoud not be able to delete articles
@@ -312,12 +311,10 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/section/1/delete/')
          # test response contains link to related Article
         self.assertContains(response, "admin_views/article/1/")
-
+        
         response = self.client.get('/test_admin/admin/admin_views/article/1/delete/')
         self.failUnlessEqual(response.status_code, 200)
         post = self.client.post('/test_admin/admin/admin_views/article/1/delete/', delete_dict)
-        # TODO: http://code.djangoproject.com/ticket/6819 or the next line fails
         self.assertRedirects(post, '/test_admin/admin/')
         self.failUnlessEqual(Article.objects.all().count(), 0)
         self.client.get('/test_admin/admin/logout/')
-        
