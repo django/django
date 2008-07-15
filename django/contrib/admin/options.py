@@ -352,14 +352,14 @@ class ModelAdmin(BaseModelAdmin):
         for inline in self.inline_instances:
             yield inline.get_formset(request, obj)
 
-    def save_add(self, request, model, form, formsets, post_url_continue):
+    def save_add(self, request, form, formsets, post_url_continue):
         """
         Saves the object in the "add" stage and returns an HttpResponseRedirect.
 
         `form` is a bound Form instance that's verified to be valid.
         """
         from django.contrib.admin.models import LogEntry, ADDITION
-        opts = model._meta
+        opts = self.model._meta
         new_object = form.save(commit=True)
 
         if formsets:
@@ -370,7 +370,7 @@ class ModelAdmin(BaseModelAdmin):
                 formset.save()
 
         pk_value = new_object._get_pk_val()
-        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, force_unicode(new_object), ADDITION)
+        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, pk_value, force_unicode(new_object), ADDITION)
         msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
@@ -399,7 +399,7 @@ class ModelAdmin(BaseModelAdmin):
             return HttpResponseRedirect(post_url)
     save_add = transaction.commit_on_success(save_add)
 
-    def save_change(self, request, model, form, formsets=None):
+    def save_change(self, request, form, formsets=None):
         """
         Saves the object in the "change" stage and returns an HttpResponseRedirect.
 
@@ -408,7 +408,7 @@ class ModelAdmin(BaseModelAdmin):
         `formsets` is a sequence of InlineFormSet instances that are verified to be valid.
         """
         from django.contrib.admin.models import LogEntry, CHANGE
-        opts = model._meta
+        opts = self.model._meta
         new_object = form.save(commit=True)
         pk_value = new_object._get_pk_val()
 
@@ -439,7 +439,7 @@ class ModelAdmin(BaseModelAdmin):
         change_message = ' '.join(change_message)
         if not change_message:
             change_message = _('No fields changed.')
-        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, force_unicode(new_object), CHANGE, change_message)
+        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, pk_value, force_unicode(new_object), CHANGE, change_message)
 
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
         if request.POST.has_key("_continue"):
@@ -459,8 +459,8 @@ class ModelAdmin(BaseModelAdmin):
             return HttpResponseRedirect("../")
     save_change = transaction.commit_on_success(save_change)
 
-    def render_change_form(self, request, model, context, add=False, change=False, form_url='', obj=None):
-        opts = model._meta
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        opts = self.model._meta
         app_label = opts.app_label
         ordered_objects = opts.get_ordered_objects()
         context.update({
@@ -470,11 +470,11 @@ class ModelAdmin(BaseModelAdmin):
             'has_change_permission': self.has_change_permission(request, obj),
             'has_delete_permission': self.has_delete_permission(request, obj),
             'has_file_field': True, # FIXME - this should check if form or formsets have a FileField,
-            'has_absolute_url': hasattr(model, 'get_absolute_url'),
+            'has_absolute_url': hasattr(self.model, 'get_absolute_url'),
             'ordered_objects': ordered_objects,
             'form_url': mark_safe(form_url),
             'opts': opts,
-            'content_type_id': ContentType.objects.get_for_model(model).id,
+            'content_type_id': ContentType.objects.get_for_model(self.model).id,
             'save_as': self.save_as,
             'save_on_top': self.save_on_top,
             'root_path': self.admin_site.root_path,
@@ -511,7 +511,7 @@ class ModelAdmin(BaseModelAdmin):
                     instance=obj, save_as_new=request.POST.has_key("_saveasnew"))
                 inline_formsets.append(inline_formset)
             if all_valid(inline_formsets) and form.is_valid():
-                return self.save_add(request, model, form, inline_formsets, '../%s/')
+                return self.save_add(request, form, inline_formsets, '../%s/')
         else:
             form = ModelForm(initial=dict(request.GET.items()))
             for FormSet in self.get_formsets(request):
@@ -540,7 +540,7 @@ class ModelAdmin(BaseModelAdmin):
             'root_path': self.admin_site.root_path,
         }
         context.update(extra_context or {})
-        return self.render_change_form(request, model, context, add=True)
+        return self.render_change_form(request, context, add=True)
 
     def change_view(self, request, object_id, extra_context=None):
         "The 'change' admin view for this model."
@@ -574,7 +574,7 @@ class ModelAdmin(BaseModelAdmin):
                 inline_formsets.append(inline_formset)
 
             if all_valid(inline_formsets) and form.is_valid():
-                return self.save_change(request, model, form, inline_formsets)
+                return self.save_change(request, form, inline_formsets)
         else:
             form = ModelForm(instance=obj)
             for FormSet in self.get_formsets(request, obj):
@@ -618,7 +618,7 @@ class ModelAdmin(BaseModelAdmin):
             'root_path': self.admin_site.root_path,
         }
         context.update(extra_context or {})
-        return self.render_change_form(request, model, context, change=True, obj=obj)
+        return self.render_change_form(request, context, change=True, obj=obj)
 
     def changelist_view(self, request, extra_context=None):
         "The 'change list' admin view for this model."
