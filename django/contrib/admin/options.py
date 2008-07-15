@@ -379,7 +379,7 @@ class ModelAdmin(BaseModelAdmin):
             if request.POST.has_key("_popup"):
                 post_url_continue += "?_popup=1"
             return HttpResponseRedirect(post_url_continue % pk_value)
-        
+
         if request.POST.has_key("_popup"):
             return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % \
                 # escape() calls force_unicode.
@@ -416,7 +416,7 @@ class ModelAdmin(BaseModelAdmin):
             for formset in formsets:
                 formset.save()
 
-        # Construct the change message.                 
+        # Construct the change message.
         change_message = []
         if form.changed_data:
             change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
@@ -581,20 +581,6 @@ class ModelAdmin(BaseModelAdmin):
                 inline_formset = FormSet(instance=obj)
                 inline_formsets.append(inline_formset)
 
-        ## Populate the FormWrapper.
-        #oldform = oldforms.FormWrapper(manipulator, new_data, errors)
-        #oldform.original = manipulator.original_object
-        #oldform.order_objects = []
-
-        ## TODO: Should be done in flatten_data  / FormWrapper construction
-        #for related in opts.get_followed_related_objects():
-            #wrt = related.opts.order_with_respect_to
-            #if wrt and wrt.rel and wrt.rel.to == opts:
-                #func = getattr(manipulator.original_object, 'get_%s_list' %
-                        #related.get_accessor_name())
-                #orig_list = func()
-                #oldform.order_objects.extend(orig_list)
-                
         adminForm = AdminForm(form, self.get_fieldsets(request, obj), self.prepopulated_fields)
         media = self.media + adminForm.media
         for fs in inline_formsets:
