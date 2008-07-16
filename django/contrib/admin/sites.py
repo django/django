@@ -118,14 +118,10 @@ class AdminSite(object):
         # The 'logout' view doesn't require that the person is logged in.
         if url == 'logout':
             return self.logout(request)
-
+        
+        # Check permission to continue or display login form.
         if not self.has_permission(request):
-            response = self.login(request)
-            if response:
-                # make sure that there is a response before returning
-                # this addresses any post data that might persist from
-                # expired sessions and continue through (#5999)
-                return response
+            return self.login(request)
 
         if url == '':
             return self.index(request)
@@ -262,7 +258,7 @@ class AdminSite(object):
                         # overwrite request.POST with the saved post_data, and continue
                         request.POST = post_data
                         request.user = user
-                        return None
+                        return self.root(request, request.path.split(self.root_path)[-1])
                     else:
                         request.session.delete_test_cookie()
                         return http.HttpResponseRedirect(request.path)
