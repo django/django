@@ -137,10 +137,6 @@ class ModelBase(type):
         return get_model(new_class._meta.app_label, name, False)
 
     def add_to_class(cls, name, value):
-        if name == 'Admin':
-            import warnings
-            warnings.warn("The inner Admin class for %s is no longer supported. "
-                "Please use a ModelAdmin instead." % cls.__name__)
         if hasattr(value, 'contribute_to_class'):
             value.contribute_to_class(cls, name)
         else:
