@@ -830,5 +830,13 @@ another cursor.
 ...     obj.save()
 ...     if i > 10: break
 
+Bug #7759 -- count should work with a partially read result set.
+>>> count = Number.objects.count()
+>>> qs = Number.objects.all()
+>>> for obj in qs:
+...     qs.count() == count
+...     break
+True
+
 """}
 

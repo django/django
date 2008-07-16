@@ -280,11 +280,10 @@ class QuerySet(object):
         Performs a SELECT COUNT() and returns the number of records as an
         integer.
 
-        If the QuerySet is already cached (i.e. self._result_cache is set) this
-        simply returns the length of the cached results set to avoid multiple
-        SELECT COUNT(*) calls.
+        If the QuerySet is already fully cached this simply returns the length
+        of the cached results set to avoid multiple SELECT COUNT(*) calls.
         """
-        if self._result_cache is not None:
+        if self._result_cache is not None and not self._iter:
             return len(self._result_cache)
 
         return self.query.get_count()
