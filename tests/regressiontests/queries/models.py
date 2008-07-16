@@ -4,6 +4,7 @@ Various complex queries that have been problematic in the past.
 
 import datetime
 import pickle
+import sys
 
 from django.db import models
 from django.db.models.query import Q, ITER_CHUNK_SIZE
@@ -483,23 +484,6 @@ Bug #2076
 >>> Cover.objects.all()
 [<Cover: first>, <Cover: second>]
 
-# If you're not careful, it's possible to introduce infinite loops via default
-# ordering on foreign keys in a cycle. We detect that.
->>> LoopX.objects.all()
-Traceback (most recent call last):
-...
-FieldError: Infinite loop caused by ordering.
-
->>> LoopZ.objects.all()
-Traceback (most recent call last):
-...
-FieldError: Infinite loop caused by ordering.
-
-# ... but you can still order in a non-recursive fashion amongst linked fields
-# (the previous test failed because the default ordering was recursive).
->>> LoopX.objects.all().order_by('y__x__y__x__id')
-[]
-
 # If the remote model does not have a default ordering, we order by its 'id'
 # field.
 >>> Item.objects.order_by('creator', 'name')
@@ -840,3 +824,27 @@ True
 
 """}
 
+# In Python 2.3, exceptions raised in __len__ are swallowed (Python issue
+# 1242657), so these cases return an empty list, rather than raising an
+# exception. Not a lot we can do about that, unfortunately, due to the way
+# Python handles list() calls internally. Thus, we skip the tests for Python
+# 2.3.
+if sys.version_info >= (2, 4):
+    __test__["API_TESTS"] += """
+# If you're not careful, it's possible to introduce infinite loops via default
+# ordering on foreign keys in a cycle. We detect that.
+>>> LoopX.objects.all()
+Traceback (most recent call last):
+...
+FieldError: Infinite loop caused by ordering.
+
+>>> LoopZ.objects.all()
+Traceback (most recent call last):
+...
+FieldError: Infinite loop caused by ordering.
+
+# ... but you can still order in a non-recursive fashion amongst linked fields
+# (the previous test failed because the default ordering was recursive).
+>>> LoopX.objects.all().order_by('y__x__y__x__id')
+[]
+"""
