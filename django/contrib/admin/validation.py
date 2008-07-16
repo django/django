@@ -79,8 +79,14 @@ def validate(cls, model):
                         "ordering marker `?`, but contains other fields as "
                         "well. Please either remove `?` or the other fields."
                         % cls.__name__)
+            if field == '?':
+                continue
             if field.startswith('-'):
                 field = field[1:]
+            # Skip ordering in the format field1__field2 (FIXME: checking
+            # this format would be nice, but it's a little fiddly).
+            if '__' in field:
+                continue
             _check_field_existsw('ordering[%d]' % idx, field)
 
     # list_select_related = False

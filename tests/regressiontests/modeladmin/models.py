@@ -30,6 +30,7 @@ class ValidationTestModel(models.Model):
     state = models.CharField(max_length=2, choices=(("CO", "Colorado"), ("WA", "Washington")))
     is_active = models.BooleanField()
     pub_date = models.DateTimeField()
+    band = models.ForeignKey(Band)
 
 class ValidationTestInlineModel(models.Model):
     parent = models.ForeignKey(ValidationTestModel)
@@ -609,6 +610,14 @@ ImproperlyConfigured: `ValidationTestModelAdmin.ordering[0]` refers to field `no
 Traceback (most recent call last):
 ...
 ImproperlyConfigured: `ValidationTestModelAdmin.ordering` has the random ordering marker `?`, but contains other fields as well. Please either remove `?` or the other fields.
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     ordering = ('?',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     ordering = ('band__name',)
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     ordering = ('name',)
