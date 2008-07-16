@@ -1,5 +1,6 @@
 from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.util import quote
 from django.core.paginator import Paginator, InvalidPage
 from django.db import models
 from django.db.models.query import QuerySet
@@ -29,22 +30,6 @@ ERROR_FLAG = 'e'
 
 # Text to display within change-list table cells if the value is blank.
 EMPTY_CHANGELIST_VALUE = '(None)'
-
-def quote(s):
-    """
-    Ensure that primary key values do not confuse the admin URLs by escaping
-    any '/', '_' and ':' characters. Similar to urllib.quote, except that the
-    quoting is slightly different so that it doesn't get automatically
-    unquoted by the Web browser.
-    """
-    if type(s) != type(''):
-        return s
-    res = list(s)
-    for i in range(len(res)):
-        c = res[i]
-        if c in ':/_':
-            res[i] = '_%02X' % ord(c)
-    return ''.join(res)
 
 class ChangeList(object):
     def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related, list_per_page, model_admin):

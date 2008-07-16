@@ -2,10 +2,13 @@
 from django.test import TestCase
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import LOGIN_FORM_KEY, _encode_post_data
+from django.contrib.admin.util import quote
+from django.utils.html import escape
 
 # local test models
-from models import Article, CustomArticle, Section
+from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey
 
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
@@ -318,3 +321,42 @@ class AdminViewPermissionsTest(TestCase):
         self.assertRedirects(post, '/test_admin/admin/')
         self.failUnlessEqual(Article.objects.all().count(), 0)
         self.client.get('/test_admin/admin/logout/')
+
+class AdminViewStringPrimaryKeyTest(TestCase):
+    fixtures = ['admin-views-users.xml', 'string-primary-key.xml']
+    
+    def __init__(self, *args):
+        super(AdminViewStringPrimaryKeyTest, self).__init__(*args)
+        self.pk = """abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890 -_.!~*'() ;/?:@&=+$, <>#%" {}|\^[]`"""
+    
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+        content_type_pk = ContentType.objects.get_for_model(ModelWithStringPrimaryKey).pk
+        LogEntry.objects.log_action(100, content_type_pk, self.pk, self.pk, 2, change_message='')
+    
+    def tearDown(self):
+        self.client.logout()
+    
+    def test_get_change_view(self):
+        "Retrieving the object using urlencoded form of primary key should work"
+        response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(self.pk))
+        self.assertContains(response, escape(self.pk))
+        self.failUnlessEqual(response.status_code, 200)
+    
+    def test_changelist_to_changeform_link(self):
+        "The link from the changelist referring to the changeform of the object should be quoted"
+        response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/')
+        should_contain = """<tr class="row1"><th><a href="%s/">%s</a></th></tr>""" % (quote(self.pk), escape(self.pk))
+        self.assertContains(response, should_contain)
+    
+    def test_recentactions_link(self):
+        "The link from the recent actions list referring to the changeform of the object should be quoted"
+        response = self.client.get('/test_admin/admin/')
+        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (quote(self.pk), escape(self.pk))
+        self.assertContains(response, should_contain)
+    
+    def test_deleteconfirmation_link(self):
+        "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
+        response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/delete/' % quote(self.pk))
+        should_contain = """<a href="../../%s/">%s</a>""" % (quote(self.pk), escape(self.pk))
+        self.assertContains(response, should_contain)

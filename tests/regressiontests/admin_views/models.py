@@ -48,7 +48,14 @@ class CustomArticleAdmin(admin.ModelAdmin):
                 'extra_var': 'Hello!'
             }
         )
+
+class ModelWithStringPrimaryKey(models.Model):
+    id = models.CharField(max_length=255, primary_key=True)
+    
+    def __unicode__(self):
+        return self.id
         
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section)
+admin.site.register(ModelWithStringPrimaryKey)

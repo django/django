@@ -5,7 +5,7 @@ from django.newforms.models import modelform_factory, inlineformset_factory
 from django.newforms.models import BaseInlineFormset
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets
-from django.contrib.admin.util import get_deleted_objects
+from django.contrib.admin.util import quote, unquote, get_deleted_objects
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import models, transaction
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -23,26 +23,6 @@ get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
 
 class IncorrectLookupParameters(Exception):
     pass
-
-def unquote(s):
-    """
-    Undo the effects of quote(). Based heavily on urllib.unquote().
-    """
-    mychr = chr
-    myatoi = int
-    list = s.split('_')
-    res = [list[0]]
-    myappend = res.append
-    del list[0]
-    for item in list:
-        if item[1:2]:
-            try:
-                myappend(mychr(myatoi(item[:2], 16)) + item[2:])
-            except ValueError:
-                myappend('_' + item)
-        else:
-            myappend('_' + item)
-    return "".join(res)
 
 def flatten_fieldsets(fieldsets):
     """Returns a list of field names from an admin fieldsets structure."""
@@ -656,7 +636,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
-        deleted_objects = [mark_safe(u'%s: <a href="../../%s/">%s</a>' % (escape(force_unicode(capfirst(opts.verbose_name))), force_unicode(object_id), escape(obj))), []]
+        deleted_objects = [mark_safe(u'%s: <a href="../../%s/">%s</a>' % (escape(force_unicode(capfirst(opts.verbose_name))), quote(object_id), escape(obj))), []]
         perms_needed = sets.Set()
         get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1, self.admin_site)
 
