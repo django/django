@@ -19,42 +19,6 @@ def linebreak_iter(template_source):
         p = template_source.find('\n', p+1)
     yield len(template_source) + 1
 
-def get_template_exception_info(exc_type, exc_value, tb):
-    origin, (start, end) = exc_value.source
-    template_source = origin.reload()
-    context_lines = 10
-    line = 0
-    upto = 0
-    source_lines = []
-    before = during = after = ""
-    for num, next in enumerate(linebreak_iter(template_source)):
-        if start >= upto and end <= next:
-            line = num
-            before = escape(template_source[upto:start])
-            during = escape(template_source[start:end])
-            after = escape(template_source[end:next])
-        source_lines.append( (num, escape(template_source[upto:next])) )
-        upto = next
-    total = len(source_lines)
-
-    top = max(1, line - context_lines)
-    bottom = min(total, line + 1 + context_lines)
-
-    template_info = {
-        'message': exc_value.args[0],
-        'source_lines': source_lines[top:bottom],
-        'before': before,
-        'during': during,
-        'after': after,
-        'top': top,
-        'bottom': bottom,
-        'total': total,
-        'line': line,
-        'name': origin.name,
-    }
-    exc_info = hasattr(exc_value, 'exc_info') and exc_value.exc_info or (exc_type, exc_value, tb)
-    return exc_info + (template_info,)
-
 def get_safe_settings():
     "Returns a dictionary of the settings module, with sensitive settings blurred out."
     settings_dict = {}
@@ -71,102 +35,212 @@ def technical_500_response(request, exc_type, exc_value, tb):
     Create a technical server error response. The last three arguments are
     the values returned from sys.exc_info() and friends.
     """
-    html = get_traceback_html(request, exc_type, exc_value, tb)
+    reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+    html = reporter.get_traceback_html()
     return HttpResponseServerError(html, mimetype='text/html')
 
-def get_traceback_html(request, exc_type, exc_value, tb):
-    "Return HTML code for traceback."
-    template_info = None
-    template_does_not_exist = False
-    loader_debug_info = None
+class ExceptionReporter:
+    """
+    A class to organize and coordinate reporting on exceptions.
+    """
+    def __init__(self, request, exc_type, exc_value, tb):
+        self.request = request
+        self.exc_type = exc_type
+        self.exc_value = exc_value
+        self.tb = tb
 
-    # Handle deprecated string exceptions
-    if isinstance(exc_type, basestring):
-        exc_value = Exception('Deprecated String Exception: %r' % exc_type)
-        exc_type = type(exc_value)
+        self.template_info = None
+        self.template_does_not_exist = False
+        self.loader_debug_info = None
 
-    if issubclass(exc_type, TemplateDoesNotExist):
-        from django.template.loader import template_source_loaders
-        template_does_not_exist = True
-        loader_debug_info = []
-        for loader in template_source_loaders:
+        # Handle deprecated string exceptions
+        if isinstance(self.exc_type, basestring):
+            self.exc_value = Exception('Deprecated String Exception: %r' % self.exc_type)
+            self.exc_type = type(self.exc_value)
+
+    def get_traceback_html(self):
+        "Return HTML code for traceback."
+
+        if issubclass(self.exc_type, TemplateDoesNotExist):
+            from django.template.loader import template_source_loaders
+            self.template_does_not_exist = True
+            self.loader_debug_info = []
+            for loader in template_source_loaders:
+                try:
+                    source_list_func = getattr(__import__(loader.__module__, {}, {}, ['get_template_sources']), 'get_template_sources')
+                    # NOTE: This assumes exc_value is the name of the template that
+                    # the loader attempted to load.
+                    template_list = [{'name': t, 'exists': os.path.exists(t)} \
+                        for t in source_list_func(str(self.exc_value))]
+                except (ImportError, AttributeError):
+                    template_list = []
+                self.loader_debug_info.append({
+                    'loader': loader.__module__ + '.' + loader.__name__,
+                    'templates': template_list,
+                })
+        if settings.TEMPLATE_DEBUG and hasattr(self.exc_value, 'source'):
+            self.get_template_exception_info()
+
+        frames = self.get_traceback_frames()
+
+        unicode_hint = ''
+        if issubclass(self.exc_type, UnicodeError):
+            start = getattr(self.exc_value, 'start', None)
+            end = getattr(self.exc_value, 'end', None)
+            if start is not None and end is not None:
+                unicode_str = self.exc_value.args[1]
+                unicode_hint = smart_unicode(unicode_str[max(start-5, 0):min(end+5, len(unicode_str))], 'ascii', errors='replace')
+        from django import get_version
+        t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
+        c = Context({
+            'exception_type': self.exc_type.__name__,
+            'exception_value': smart_unicode(self.exc_value, errors='replace'),
+            'unicode_hint': unicode_hint,
+            'frames': frames,
+            'lastframe': frames[-1],
+            'request': self.request,
+            'request_protocol': self.request.is_secure() and "https" or "http",
+            'settings': get_safe_settings(),
+            'sys_executable': sys.executable,
+            'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
+            'server_time': datetime.datetime.now(),
+            'django_version_info': get_version(),
+            'sys_path' : sys.path,
+            'template_info': self.template_info,
+            'template_does_not_exist': self.template_does_not_exist,
+            'loader_debug_info': self.loader_debug_info,
+        })
+        return t.render(c)
+
+    def get_template_exception_info(self):
+        origin, (start, end) = self.exc_value.source
+        template_source = origin.reload()
+        context_lines = 10
+        line = 0
+        upto = 0
+        source_lines = []
+        before = during = after = ""
+        for num, next in enumerate(linebreak_iter(template_source)):
+            if start >= upto and end <= next:
+                line = num
+                before = escape(template_source[upto:start])
+                during = escape(template_source[start:end])
+                after = escape(template_source[end:next])
+            source_lines.append( (num, escape(template_source[upto:next])) )
+            upto = next
+        total = len(source_lines)
+
+        top = max(1, line - context_lines)
+        bottom = min(total, line + 1 + context_lines)
+
+        self.template_info = {
+            'message': self.exc_value.args[0],
+            'source_lines': source_lines[top:bottom],
+            'before': before,
+            'during': during,
+            'after': after,
+            'top': top,
+            'bottom': bottom,
+            'total': total,
+            'line': line,
+            'name': origin.name,
+        }
+        if hasattr(self.exc_value, 'exc_info') and self.exc_value.exc_info:
+            exc_type, exc_value, tb = self.exc_value.exc_info
+
+    def _get_lines_from_file(self, filename, lineno, context_lines, loader=None, module_name=None):
+        """
+        Returns context_lines before and after lineno from file.
+        Returns (pre_context_lineno, pre_context, context_line, post_context).
+        """
+        source = None
+        if loader is not None and hasattr(loader, "get_source"):
+            source = loader.get_source(module_name)
+            if source is not None:
+                source = source.splitlines()
+        if source is None:
             try:
-                source_list_func = getattr(__import__(loader.__module__, {}, {}, ['get_template_sources']), 'get_template_sources')
-                # NOTE: This assumes exc_value is the name of the template that
-                # the loader attempted to load.
-                template_list = [{'name': t, 'exists': os.path.exists(t)} \
-                    for t in source_list_func(str(exc_value))]
-            except (ImportError, AttributeError):
-                template_list = []
-            loader_debug_info.append({
-                'loader': loader.__module__ + '.' + loader.__name__,
-                'templates': template_list,
-            })
-    if settings.TEMPLATE_DEBUG and hasattr(exc_value, 'source'):
-        exc_type, exc_value, tb, template_info = get_template_exception_info(exc_type, exc_value, tb)
-    frames = []
-    while tb is not None:
-        # support for __traceback_hide__ which is used by a few libraries
-        # to hide internal frames.
-        if tb.tb_frame.f_locals.get('__traceback_hide__'):
+                f = open(filename)
+                try:
+                    source = f.readlines()
+                finally:
+                    f.close()
+            except (OSError, IOError):
+                pass
+        if source is None:
+            return None, [], None, []
+
+        encoding = 'ascii'
+        for line in source[:2]:
+            # File coding may be specified. Match pattern from PEP-263
+            # (http://www.python.org/dev/peps/pep-0263/)
+            match = re.search(r'coding[:=]\s*([-\w.]+)', line)
+            if match:
+                encoding = match.group(1)
+                break
+        source = [unicode(sline, encoding, 'replace') for sline in source]
+
+        lower_bound = max(0, lineno - context_lines)
+        upper_bound = lineno + context_lines
+
+        pre_context = [line.strip('\n') for line in source[lower_bound:lineno]]
+        context_line = source[lineno].strip('\n')
+        post_context = [line.strip('\n') for line in source[lineno+1:upper_bound]]
+
+        return lower_bound, pre_context, context_line, post_context
+
+    def get_traceback_frames(self):
+        frames = []
+        tb = self.tb
+        while tb is not None:
+            # support for __traceback_hide__ which is used by a few libraries
+            # to hide internal frames.
+            if tb.tb_frame.f_locals.get('__traceback_hide__'):
+                tb = tb.tb_next
+                continue
+            filename = tb.tb_frame.f_code.co_filename
+            function = tb.tb_frame.f_code.co_name
+            lineno = tb.tb_lineno - 1
+            loader = tb.tb_frame.f_globals.get('__loader__')
+            module_name = tb.tb_frame.f_globals.get('__name__')
+            pre_context_lineno, pre_context, context_line, post_context = self._get_lines_from_file(filename, lineno, 7, loader, module_name)
+            if pre_context_lineno is not None:
+                frames.append({
+                    'tb': tb,
+                    'filename': filename,
+                    'function': function,
+                    'lineno': lineno + 1,
+                    'vars': tb.tb_frame.f_locals.items(),
+                    'id': id(tb),
+                    'pre_context': pre_context,
+                    'context_line': context_line,
+                    'post_context': post_context,
+                    'pre_context_lineno': pre_context_lineno + 1,
+                })
             tb = tb.tb_next
-            continue
-        filename = tb.tb_frame.f_code.co_filename
-        function = tb.tb_frame.f_code.co_name
-        lineno = tb.tb_lineno - 1
-        loader = tb.tb_frame.f_globals.get('__loader__')
-        module_name = tb.tb_frame.f_globals.get('__name__')
-        pre_context_lineno, pre_context, context_line, post_context = _get_lines_from_file(filename, lineno, 7, loader, module_name)
-        if pre_context_lineno is not None:
-            frames.append({
-                'tb': tb,
-                'filename': filename,
-                'function': function,
-                'lineno': lineno + 1,
-                'vars': tb.tb_frame.f_locals.items(),
-                'id': id(tb),
-                'pre_context': pre_context,
-                'context_line': context_line,
-                'post_context': post_context,
-                'pre_context_lineno': pre_context_lineno + 1,
-            })
-        tb = tb.tb_next
 
-    if not frames:
-        frames = [{
-            'filename': '&lt;unknown&gt;',
-            'function': '?',
-            'lineno': '?',
-        }]
+        if not frames:
+            frames = [{
+                'filename': '&lt;unknown&gt;',
+                'function': '?',
+                'lineno': '?',
+                'context_line': '???',
+            }]
 
-    unicode_hint = ''
-    if issubclass(exc_type, UnicodeError):
-        start = getattr(exc_value, 'start', None)
-        end = getattr(exc_value, 'end', None)
-        if start is not None and end is not None:
-            unicode_str = exc_value.args[1]
-            unicode_hint = smart_unicode(unicode_str[max(start-5, 0):min(end+5, len(unicode_str))], 'ascii', errors='replace')
-    from django import get_version
-    t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
-    c = Context({
-        'exception_type': exc_type.__name__,
-        'exception_value': smart_unicode(exc_value, errors='replace'),
-        'unicode_hint': unicode_hint,
-        'frames': frames,
-        'lastframe': frames[-1],
-        'request': request,
-        'request_protocol': request.is_secure() and "https" or "http",
-        'settings': get_safe_settings(),
-        'sys_executable': sys.executable,
-        'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
-        'server_time': datetime.datetime.now(),
-        'django_version_info': get_version(),
-        'sys_path' : sys.path,
-        'template_info': template_info,
-        'template_does_not_exist': template_does_not_exist,
-        'loader_debug_info': loader_debug_info,
-    })
-    return t.render(c)
+        return frames
+
+    def format_exception(self):
+        """
+        Return the same data as from traceback.format_exception.
+        """
+        import traceback
+        frames = self.get_traceback_frames()
+        tb = [ (f['filename'], f['lineno'], f['function'], f['context_line']) for f in frames ]
+        list = ['Traceback (most recent call last):\n']
+        list += traceback.format_list(tb)
+        list += traceback.format_exception_only(self.exc_type, self.exc_value)
+        return list
+
 
 def technical_404_response(request, exception):
     "Create a technical 404 error response. The exception should be the Http404."
@@ -198,47 +272,6 @@ def empty_urlconf(request):
         'project_name': settings.SETTINGS_MODULE.split('.')[0]
     })
     return HttpResponse(t.render(c), mimetype='text/html')
-
-def _get_lines_from_file(filename, lineno, context_lines, loader=None, module_name=None):
-    """
-    Returns context_lines before and after lineno from file.
-    Returns (pre_context_lineno, pre_context, context_line, post_context).
-    """
-    source = None
-    if loader is not None and hasattr(loader, "get_source"):
-        source = loader.get_source(module_name)
-        if source is not None:
-            source = source.splitlines()
-    if source is None:
-        try:
-            f = open(filename)
-            try:
-                source = f.readlines()
-            finally:
-                f.close()
-        except (OSError, IOError):
-            pass
-    if source is None:
-        return None, [], None, []
-
-    encoding = 'ascii'
-    for line in source[:2]:
-        # File coding may be specified. Match pattern from PEP-263
-        # (http://www.python.org/dev/peps/pep-0263/)
-        match = re.search(r'coding[:=]\s*([-\w.]+)', line)
-        if match:
-            encoding = match.group(1)
-            break
-    source = [unicode(sline, encoding, 'replace') for sline in source]
-
-    lower_bound = max(0, lineno - context_lines)
-    upper_bound = lineno + context_lines
-
-    pre_context = [line.strip('\n') for line in source[lower_bound:lineno]]
-    context_line = source[lineno].strip('\n')
-    post_context = [line.strip('\n') for line in source[lineno+1:upper_bound]]
-
-    return lower_bound, pre_context, context_line, post_context
 
 #
 # Templates are embedded in the file so that we know the error handler will
