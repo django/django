@@ -338,6 +338,14 @@ ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets[0][1]['fields']` refer
 ...     fieldsets = (("General", {"fields": ("name",)}),)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     fieldsets = (("General", {"fields": ("name",)}),)
+...     fields = ["name",]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: Both fieldsets and fields are specified in ValidationTestModelAdmin.
+
 # form
 
 >>> class FakeForm(object):

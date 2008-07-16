@@ -160,6 +160,8 @@ def _validate_base(cls, model):
         _check_istuplew('fields', cls.fields)
         for field in cls.fields:
             _check_field_existsw('fields', field)
+        if cls.fieldsets:
+            raise ImproperlyConfigured('Both fieldsets and fields are specified in %s.' % cls.__name__)
 
     # fieldsets
     if cls.fieldsets: # default value is None

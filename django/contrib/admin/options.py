@@ -143,12 +143,6 @@ class BaseModelAdmin(object):
     radio_fields = {}
     prepopulated_fields = {}
 
-    def __init__(self):
-        # TODO: This should really go in django.core.validation, but validation
-        # doesn't work on ModelAdmin classes yet.
-        if self.fieldsets and self.fields:
-            raise ImproperlyConfigured('Both fieldsets and fields is specified for %s.' % self.model)
-
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
         Hook for specifying the form Field instance for a given database Field
