@@ -797,6 +797,8 @@ ImproperlyConfigured: `ValidationTestInline.max_num` should be a integer.
 
 # formset
 
+>>> from django.newforms.models import BaseModelFormSet
+
 >>> class FakeFormSet(object):
 ...     pass
 >>> class ValidationTestInline(TabularInline):
@@ -807,7 +809,16 @@ ImproperlyConfigured: `ValidationTestInline.max_num` should be a integer.
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestInline.formset` does not inherit from BaseInlineFormset.
+ImproperlyConfigured: `ValidationTestInline.formset` does not inherit from BaseModelFormSet.
+
+>>> class RealModelFormSet(BaseModelFormSet):
+...     pass
+>>> class ValidationTestInline(TabularInline):
+...     model = ValidationTestInlineModel
+...     formset = RealModelFormSet
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     inlines = [ValidationTestInline]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
 
 """
 }

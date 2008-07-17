@@ -1,7 +1,7 @@
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.newforms.models import BaseModelForm, BaseInlineFormset
+from django.newforms.models import BaseModelForm, BaseModelFormSet
 from django.contrib.admin.options import flatten_fieldsets, BaseModelAdmin
 from django.contrib.admin.options import HORIZONTAL, VERTICAL
 
@@ -129,9 +129,9 @@ def _validate_inline(cls):
                     % (cls.__name__, attr))
 
     # formset
-    if hasattr(cls, 'formset') and not issubclass(cls.formset, BaseInlineFormset):
+    if hasattr(cls, 'formset') and not issubclass(cls.formset, BaseModelFormSet):
         raise ImproperlyConfigured("`%s.formset` does not inherit from "
-                "BaseInlineFormset." % cls.__name__)
+                "BaseModelFormSet." % cls.__name__)
 
 def _validate_base(cls, model):
     opts = model._meta
