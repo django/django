@@ -332,7 +332,7 @@ ImproperlyConfigured: `fields` key is required in ValidationTestModelAdmin.field
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets[0][1]['fields']` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets[0][1]['fields']` refers to field `non_existent_field` that is missing from the form.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     fieldsets = (("General", {"fields": ("name",)}),)
@@ -356,6 +356,58 @@ ImproperlyConfigured: Both fieldsets and fields are specified in ValidationTestM
 Traceback (most recent call last):
 ...
 ImproperlyConfigured: ValidationTestModelAdmin.form does not inherit from BaseModelForm.
+
+# fielsets with custom form
+
+>>> class BandAdmin(ModelAdmin):
+...     fieldsets = (
+...         ('Band', {
+...             'fields': ('non_existent_field',)
+...         }),
+...     )
+>>> validate(BandAdmin, Band)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `BandAdmin.fieldsets[0][1]['fields']` refers to field `non_existent_field` that is missing from the form.
+
+>>> class BandAdmin(ModelAdmin):
+...     fieldsets = (
+...         ('Band', {
+...             'fields': ('name',)
+...         }),
+...     )
+>>> validate(BandAdmin, Band)
+
+>>> class AdminBandForm(forms.ModelForm):
+...     class Meta:
+...         model = Band
+>>> class BandAdmin(ModelAdmin):
+...     form = AdminBandForm
+...
+...     fieldsets = (
+...         ('Band', {
+...             'fields': ('non_existent_field',)
+...         }),
+...     )
+>>> validate(BandAdmin, Band)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: `BandAdmin.fieldsets[0][1]['fields']` refers to field `non_existent_field` that is missing from the form.
+
+>>> class AdminBandForm(forms.ModelForm):
+...     delete = forms.BooleanField()
+...
+...     class Meta:
+...         model = Band
+>>> class BandAdmin(ModelAdmin):
+...     form = AdminBandForm
+...
+...     fieldsets = (
+...         ('Band', {
+...             'fields': ('name', 'bio', 'sign_date', 'delete')
+...         }),
+...     )
+>>> validate(BandAdmin, Band)
 
 # filter_vertical
 
@@ -736,7 +788,7 @@ ImproperlyConfigured: `ValidationTestInline.fields` must be a list or tuple.
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestInline.fields` refers to field `non_existent_field` that is missing from model `ValidationTestInlineModel`.
+ImproperlyConfigured: `ValidationTestInline.fields` refers to field `non_existent_field` that is missing from the form.
 
 # fk_name
 

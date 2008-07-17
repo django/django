@@ -1,7 +1,7 @@
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.newforms.models import BaseModelForm, BaseModelFormSet
+from django.newforms.models import BaseModelForm, BaseModelFormSet, fields_for_model
 from django.contrib.admin.options import flatten_fieldsets, BaseModelAdmin
 from django.contrib.admin.options import HORIZONTAL, VERTICAL
 
@@ -144,6 +144,9 @@ def _validate_base(cls, model):
 
     def _check_field_existsw(label, field):
         return _check_field_exists(cls, model, opts, label, field)
+    
+    def _check_form_field_existsw(label, field):
+        return _check_form_field_exists(cls, model, opts, label, field)
 
     # raw_id_fields
     if hasattr(cls, 'raw_id_fields'):
@@ -159,7 +162,7 @@ def _validate_base(cls, model):
     if cls.fields: # default value is None
         _check_istuplew('fields', cls.fields)
         for field in cls.fields:
-            _check_field_existsw('fields', field)
+            _check_form_field_existsw('fields', field)
         if cls.fieldsets:
             raise ImproperlyConfigured('Both fieldsets and fields are specified in %s.' % cls.__name__)
 
@@ -177,7 +180,7 @@ def _validate_base(cls, model):
                         "%s.fieldsets[%d][1] field options dict."
                         % (cls.__name__, idx))
         for field in flatten_fieldsets(cls.fieldsets):
-            _check_field_existsw("fieldsets[%d][1]['fields']" % idx, field)
+            _check_form_field_existsw("fieldsets[%d][1]['fields']" % idx, field)
 
     # form
     if hasattr(cls, 'form') and not issubclass(cls.form, BaseModelForm):
@@ -249,6 +252,21 @@ def _check_field_exists(cls, model, opts, label, field):
         raise ImproperlyConfigured("`%s.%s` refers to "
                 "field `%s` that is missing from model `%s`."
                 % (cls.__name__, label, field, model.__name__))
+
+def _check_form_field_exists(cls, model, opts, label, field):
+    if hasattr(cls.form, 'base_fields'):
+        try:
+            cls.form.base_fields[field]
+        except KeyError:
+            raise ImproperlyConfigured("`%s.%s` refers to field `%s` that "
+                "is missing from the form." % (cls.__name__, label, field))
+    else:
+        fields = fields_for_model(model)
+        try:
+            fields[field]
+        except KeyError:
+            raise ImproperlyConfigured("`%s.%s` refers to field `%s` that "
+                "is missing from the form." % (cls.__name__, label, field))
 
 def _check_attr_exists(cls, model, opts, label, field):
     try:
