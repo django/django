@@ -9,6 +9,7 @@ from django.utils.datastructures import DotExpandedDict
 from django.utils.text import capfirst
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
+from django.utils import datetime_safe
 
 def add_manipulators(sender):
     cls = sender
@@ -332,5 +333,6 @@ def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_t
             pass
         else:
             format_string = (lookup_type == 'date') and '%B %d, %Y' or '%B %Y'
+            date_val = datetime_safe.new_datetime(date_val)
             raise validators.ValidationError, "Please enter a different %s. The one you entered is already being used for %s." % \
                 (from_field.verbose_name, date_val.strftime(format_string))

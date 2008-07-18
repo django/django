@@ -15,6 +15,7 @@ from django.utils.html import escape, conditional_escape
 from django.utils.translation import ugettext
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
+from django.utils import datetime_safe
 from util import flatatt
 
 __all__ = (
@@ -170,6 +171,7 @@ class DateTimeInput(Input):
         if value is None:
             value = ''
         elif hasattr(value, 'strftime'):
+            value = datetime_safe.new_datetime(value)
             value = value.strftime(self.format)
         return super(DateTimeInput, self).render(name, value, attrs)
 

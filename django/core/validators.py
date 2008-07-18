@@ -141,10 +141,6 @@ def _isValidDate(date_string):
     # Could use time.strptime here and catch errors, but datetime.date below
     # produces much friendlier error messages.
     year, month, day = map(int, date_string.split('-'))
-    # This check is needed because strftime is used when saving the date
-    # value to the database, and strftime requires that the year be >=1900.
-    if year < 1900:
-        raise ValidationError, _('Year must be 1900 or later.')
     try:
         date(year, month, day)
     except ValueError, e:
@@ -407,12 +403,12 @@ class IsAPowerOf(object):
     """
     Usage: If you create an instance of the IsPowerOf validator:
         v = IsAPowerOf(2)
-    
+
     The following calls will succeed:
-        v(4, None) 
+        v(4, None)
         v(8, None)
         v(16, None)
-    
+
     But this call:
         v(17, None)
     will raise "django.core.validators.ValidationError: ['This value must be a power of 2.']"
