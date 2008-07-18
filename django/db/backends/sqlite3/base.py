@@ -110,6 +110,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _cursor(self, settings):
         if self.connection is None:
+            if not settings.DATABASE_NAME:
+                from django.core.exceptions import ImproperlyConfigured
+                raise ImproperlyConfigured, "Please fill out DATABASE_NAME in the settings module before using the database."
             kwargs = {
                 'database': settings.DATABASE_NAME,
                 'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
