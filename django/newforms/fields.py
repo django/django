@@ -442,9 +442,7 @@ class FileField(Field):
             # We warn once, then support both ways below.
             import warnings
             warnings.warn(
-                message = "Representing uploaded files as dictionaries is"\
-                          " deprecated. Use django.core.files.SimpleUploadedFile "\
-                          " instead.",
+                message = "Representing uploaded files as dictionaries is deprecated. Use django.core.files.uploadedfile.SimpleUploadedFile instead.",
                 category = DeprecationWarning,
                 stacklevel = 2
             )

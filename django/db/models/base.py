@@ -487,9 +487,7 @@ class Model(object):
         if isinstance(raw_field, dict):
             import warnings
             warnings.warn(
-                message = "Representing uploaded files as dictionaries is"\
-                          " deprecated. Use django.core.files.SimpleUploadedFile"\
-                          " instead.",
+                message = "Representing uploaded files as dictionaries is deprecated. Use django.core.files.uploadedfile.SimpleUploadedFile instead.",
                 category = DeprecationWarning,
                 stacklevel = 2
             )
@@ -499,9 +497,7 @@ class Model(object):
         elif isinstance(raw_field, basestring):
             import warnings
             warnings.warn(
-                message = "Representing uploaded files as strings is "\
-                          " deprecated. Use django.core.files.SimpleUploadedFile "\
-                          " instead.",
+                message = "Representing uploaded files as dictionaries is deprecated. Use django.core.files.uploadedfile.SimpleUploadedFile instead.",
                 category = DeprecationWarning,
                 stacklevel = 2
             )
