@@ -68,7 +68,7 @@ def redirect(post_save_redirect, obj):
     by ``get_absolute_url()``.  If ``obj`` has no ``get_absolute_url`` method,
     then raise ImproperlyConfigured.
 
-    This method is meant to handle the post_save_redirect parameter to the
+    This function is meant to handle the post_save_redirect parameter to the
     ``create_object`` and ``update_object`` views.
     """
     if post_save_redirect:
