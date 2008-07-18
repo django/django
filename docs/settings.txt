@@ -252,7 +252,7 @@ The site-specific user profile model used by this site. See the
 CACHE_BACKEND
 -------------
 
-Default: ``'simple://'``
+Default: ``'locmem://'``
 
 The cache backend to use. See the `cache docs`_.
 
