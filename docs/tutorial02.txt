@@ -232,7 +232,7 @@ But, really, this is an inefficient way of adding Choice objects to the system.
 It'd be better if you could add a bunch of Choices directly when you create the
 Poll object. Let's make that happen.
 
-Remove the ``register()`` cal for the Choice model. Then, edit the ``Poll``
+Remove the ``register()`` call for the Choice model. Then, edit the ``Poll``
 registration code to read::
 
     class ChoiceInline(admin.StackedInline):
