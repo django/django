@@ -20,7 +20,6 @@ DATA_TYPES = {
     'FileField':                    'NVARCHAR2(%(max_length)s)',
     'FilePathField':                'NVARCHAR2(%(max_length)s)',
     'FloatField':                   'DOUBLE PRECISION',
-    'ImageField':                   'NVARCHAR2(%(max_length)s)',
     'IntegerField':                 'NUMBER(11)',
     'IPAddressField':               'VARCHAR2(15)',
     'NullBooleanField':             'NUMBER(1) CHECK ((%(qn_column)s IN (0,1)) OR (%(qn_column)s IS NULL))',

@@ -60,9 +60,17 @@ class LocalTimezone(tzinfo):
         tt = (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.weekday(), 0, -1)
         try:
             stamp = time.mktime(tt)
-        except OverflowError:
-            # 32 bit systems can't handle dates after Jan 2038, so we fake it
-            # in that case (since we only care about the DST flag here).
+        except (OverflowError, ValueError):
+            # 32 bit systems can't handle dates after Jan 2038, and certain
+            # systems can't handle dates before ~1901-12-01:
+            #
+            # >>> time.mktime((1900, 1, 13, 0, 0, 0, 0, 0, 0))
+            # OverflowError: mktime argument out of range
+            # >>> time.mktime((1850, 1, 13, 0, 0, 0, 0, 0, 0))
+            # ValueError: year out of range
+            #
+            # In this case, we fake the date, because we only care about the
+            # DST flag.
             tt = (2037,) + tt[1:]
             stamp = time.mktime(tt)
         tt = time.localtime(stamp)

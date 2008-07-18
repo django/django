@@ -23,6 +23,7 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
 from django.utils.maxlength import LegacyMaxlength
+from django.utils import datetime_safe
 
 class NOT_PROVIDED:
     pass
@@ -542,7 +543,7 @@ class DateField(Field):
         if lookup_type in ('range', 'in'):
             value = [smart_unicode(v) for v in value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte') and hasattr(value, 'strftime'):
-            value = value.strftime('%Y-%m-%d')
+            value = datetime_safe.new_date(value).strftime('%Y-%m-%d')
         else:
             value = smart_unicode(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
@@ -574,7 +575,7 @@ class DateField(Field):
         # Casts dates into string format for entry into database.
         if value is not None:
             try:
-                value = value.strftime('%Y-%m-%d')
+                value = datetime_safe.new_date(value).strftime('%Y-%m-%d')
             except AttributeError:
                 # If value is already a string it won't have a strftime method,
                 # so we'll just let it pass through.
@@ -586,7 +587,11 @@ class DateField(Field):
 
     def flatten_data(self, follow, obj=None):
         val = self._get_val_from_obj(obj)
-        return {self.attname: (val is not None and val.strftime("%Y-%m-%d") or '')}
+        if val is None:
+            data = ''
+        else:
+            data = datetime_safe.new_date(val).strftime("%Y-%m-%d")
+        return {self.attname: data}
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.DateField}
@@ -653,8 +658,13 @@ class DateTimeField(DateField):
     def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj)
         date_field, time_field = self.get_manipulator_field_names('')
-        return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
-                time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
+        if val is None:
+            date_data = time_data = ''
+        else:
+            d = datetime_safe.new_datetime(val)
+            date_data = d.strftime('%Y-%m-%d')
+            time_data = d.strftime('%H:%M:%S')
+        return {date_field: date_data, time_field: time_data}
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.DateTimeField}
@@ -916,9 +926,6 @@ class ImageField(FileField):
             setattr(cls, 'get_%s_width' % self.name, curry(cls._get_FIELD_width, field=self))
         if not self.height_field:
             setattr(cls, 'get_%s_height' % self.name, curry(cls._get_FIELD_height, field=self))
-
-    def get_internal_type(self):
-        return "ImageField"
 
     def save_file(self, new_data, new_object, original_object, change, rel, save=True):
         FileField.save_file(self, new_data, new_object, original_object, change, rel, save)
