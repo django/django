@@ -278,8 +278,8 @@ DATABASE_ENGINE
 Default: ``''`` (Empty string)
 
 The database backend to use. The build-in database backends are
-``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'mysql_old'``,
-``'sqlite3'``, and ``'oracle'``.
+``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'sqlite3'``, and
+``'oracle'``.
 
 In the Django development version, you can use a database backend that doesn't
 ship with Django by setting ``DATABASE_ENGINE`` to a fully-qualified path (i.e.
@@ -1029,7 +1029,7 @@ The character set encoding used to create the test database. The value of this
 string is passed directly through to the database, so its format is
 backend-specific.
 
-Supported for the PostgreSQL_ (``postgresql``, ``postgresql_psycopg2``) and MySQL_ (``mysql``, ``mysql_old``) backends.
+Supported for the PostgreSQL_ (``postgresql``, ``postgresql_psycopg2``) and MySQL_ (``mysql``) backends.
 
 .. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
 .. _MySQL: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
@@ -1044,8 +1044,8 @@ Default: ``None``
 The collation order to use when creating the test database. This value is
 passed directly to the backend, so its format is backend-specific.
 
-Only supported for ``mysql`` and ``mysql_old`` backends (see `section 10.3.2`_
-of the MySQL manual for details).
+Only supported for the ``mysql`` backend (see `section 10.3.2`_ of the MySQL
+manual for details).
 
 .. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
 

@@ -58,7 +58,7 @@ __test__ = {'API_TESTS': """
 
 # Database flushing does not work on MySQL with the default storage engine
 # because it requires transaction support.
-if settings.DATABASE_ENGINE not in ('mysql', 'mysql_old'):
+if settings.DATABASE_ENGINE != 'mysql':
     __test__['API_TESTS'] += \
 """
 # Reset the database representation of this app. This will delete all data.
