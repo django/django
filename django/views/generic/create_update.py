@@ -1,154 +1,195 @@
-from django.core.xheaders import populate_xheaders
-from django.template import loader
-from django import oldforms
-from django.db.models import FileField
-from django.contrib.auth.views import redirect_to_login
-from django.template import RequestContext
+from django.newforms.models import ModelFormMetaclass, ModelForm
+from django.template import RequestContext, loader
 from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.core.xheaders import populate_xheaders
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from django.utils.translation import ugettext
+from django.contrib.auth.views import redirect_to_login
+from django.views.generic import GenericViewError
 
-def create_object(request, model, template_name=None,
-        template_loader=loader, extra_context=None, post_save_redirect=None,
-        login_required=False, follow=None, context_processors=None):
+def deprecate_follow(follow):
     """
-    Generic object-creation function.
+    Issues a DeprecationWarning if follow is anything but None.
 
-    Templates: ``<app_label>/<model_name>_form.html``
-    Context:
-        form
-            the form wrapper for the object
+    The old Manipulator-based forms used a follow argument that is no longer
+    needed for newforms-based forms.
     """
-    if extra_context is None: extra_context = {}
-    if login_required and not request.user.is_authenticated():
-        return redirect_to_login(request.path)
+    if follow is not None:
+        import warning
+        msg = ("Generic views have been changed to use newforms, and the"
+               "'follow' argument is no longer used.  Please update your code"
+               "to not use the 'follow' argument.")
+        warning.warn(msg, DeprecationWarning, stacklevel=3)
 
-    manipulator = model.AddManipulator(follow=follow)
-    if request.POST:
-        # If data was POSTed, we're trying to create a new object
-        new_data = request.POST.copy()
-
-        if model._meta.has_field_type(FileField):
-            new_data.update(request.FILES)
-
-        # Check for errors
-        errors = manipulator.get_validation_errors(new_data)
-        manipulator.do_html2python(new_data)
-
-        if not errors:
-            # No errors -- this means we can save the data!
-            new_object = manipulator.save(new_data)
-
-            if request.user.is_authenticated():
-                request.user.message_set.create(message=ugettext("The %(verbose_name)s was created successfully.") % {"verbose_name": model._meta.verbose_name})
-
-            # Redirect to the new object: first by trying post_save_redirect,
-            # then by obj.get_absolute_url; fail if neither works.
-            if post_save_redirect:
-                return HttpResponseRedirect(post_save_redirect % new_object.__dict__)
-            elif hasattr(new_object, 'get_absolute_url'):
-                return HttpResponseRedirect(new_object.get_absolute_url())
-            else:
-                raise ImproperlyConfigured("No URL to redirect to from generic create view.")
-    else:
-        # No POST, so we want a brand new form without any data or errors
-        errors = {}
-        new_data = manipulator.flatten_data()
-
-    # Create the FormWrapper, template, context, response
-    form = oldforms.FormWrapper(manipulator, new_data, errors)
-    if not template_name:
-        template_name = "%s/%s_form.html" % (model._meta.app_label, model._meta.object_name.lower())
-    t = template_loader.get_template(template_name)
-    c = RequestContext(request, {
-        'form': form,
-    }, context_processors)
-    for key, value in extra_context.items():
+def apply_extra_context(extra_context, context):
+    """
+    Adds items from extra_context dict to context.  If a value in extra_context
+    is callable, then it is called and the result is added to context.
+    """
+    for key, value in extra_context.iteritems():
         if callable(value):
-            c[key] = value()
+            context[key] = value()
         else:
-            c[key] = value
-    return HttpResponse(t.render(c))
+            context[key] = value
 
-def update_object(request, model, object_id=None, slug=None,
-        slug_field='slug', template_name=None, template_loader=loader,
-        extra_context=None, post_save_redirect=None,
-        login_required=False, follow=None, context_processors=None,
-        template_object_name='object'):
+def get_model_and_form_class(model, form_class):
     """
-    Generic object-update function.
+    Returns a model and form class based on the model and form_class
+    parameters that were passed to the generic view.
 
-    Templates: ``<app_label>/<model_name>_form.html``
-    Context:
-        form
-            the form wrapper for the object
-        object
-            the original object being edited
+    If ``form_class`` is given then its associated model will be returned along
+    with ``form_class`` itself.  Otherwise, if ``model`` is given, ``model``
+    itself will be returned along with a ``ModelForm`` class created from
+    ``model``.
     """
-    if extra_context is None: extra_context = {}
-    if login_required and not request.user.is_authenticated():
-        return redirect_to_login(request.path)
+    if form_class:
+        return form_class._meta.model, form_class
+    if model:
+        # The inner Meta class fails if model = model is used for some reason.
+        tmp_model = model
+        # TODO: we should be able to construct a ModelForm without creating
+        # and passing in a temporary inner class.
+        class Meta:
+            model = tmp_model
+        class_name = model.__name__ + 'Form'
+        form_class = ModelFormMetaclass(class_name, (ModelForm,), {'Meta': Meta})
+        return model, form_class
+    raise GenericViewError("Generic view must be called with either a model or"
+                           " form_class argument.")
 
-    # Look up the object to be edited
+def redirect(post_save_redirect, obj):
+    """
+    Returns a HttpResponseRedirect to ``post_save_redirect``.
+
+    ``post_save_redirect`` should be a string, and can contain named string-
+    substitution place holders of ``obj`` field names.
+
+    If ``post_save_redirect`` is None, then redirect to ``obj``'s URL returned
+    by ``get_absolute_url()``.  If ``obj`` has no ``get_absolute_url`` method,
+    then raise ImproperlyConfigured.
+
+    This method is meant to handle the post_save_redirect parameter to the
+    ``create_object`` and ``update_object`` views.
+    """
+    if post_save_redirect:
+        return HttpResponseRedirect(post_save_redirect % obj.__dict__)
+    elif hasattr(obj, 'get_absolute_url'):
+        return HttpResponseRedirect(obj.get_absolute_url())
+    else:
+        raise ImproperlyConfigured(
+            "No URL to redirect to.  Either pass a post_save_redirect"
+            " parameter to the generic view or define a get_absolute_url"
+            " method on the Model.")
+
+def lookup_object(model, object_id, slug, slug_field):
+    """
+    Return the ``model`` object with the passed ``object_id``.  If
+    ``object_id`` is None, then return the the object whose ``slug_field``
+    equals the passed ``slug``.  If ``slug`` and ``slug_field`` are not passed,
+    then raise Http404 exception.
+    """
     lookup_kwargs = {}
     if object_id:
         lookup_kwargs['%s__exact' % model._meta.pk.name] = object_id
     elif slug and slug_field:
         lookup_kwargs['%s__exact' % slug_field] = slug
     else:
-        raise AttributeError("Generic edit view must be called with either an object_id or a slug/slug_field")
+        raise GenericViewError(
+            "Generic view must be called with either an object_id or a"
+            " slug/slug_field.")
     try:
-        object = model.objects.get(**lookup_kwargs)
+        return model.objects.get(**lookup_kwargs)
     except ObjectDoesNotExist:
-        raise Http404, "No %s found for %s" % (model._meta.verbose_name, lookup_kwargs)
+        raise Http404("No %s found for %s"
+                      % (model._meta.verbose_name, lookup_kwargs))
 
-    manipulator = model.ChangeManipulator(getattr(object, object._meta.pk.attname), follow=follow)
+def create_object(request, model=None, template_name=None,
+        template_loader=loader, extra_context=None, post_save_redirect=None,
+        login_required=False, follow=None, context_processors=None,
+        form_class=None):
+    """
+    Generic object-creation function.
 
-    if request.POST:
-        new_data = request.POST.copy()
-        if model._meta.has_field_type(FileField):
-            new_data.update(request.FILES)
-        errors = manipulator.get_validation_errors(new_data)
-        manipulator.do_html2python(new_data)
-        if not errors:
-            object = manipulator.save(new_data)
+    Templates: ``<app_label>/<model_name>_form.html``
+    Context:
+        form
+            the form for the object
+    """
+    deprecate_follow(follow)
+    if extra_context is None: extra_context = {}
+    if login_required and not request.user.is_authenticated():
+        return redirect_to_login(request.path)
 
+    model, form_class = get_model_and_form_class(model, form_class)
+    if request.method == 'POST':
+        form = form_class(request.POST, request.FILES)
+        if form.is_valid():
+            new_object = form.save()
             if request.user.is_authenticated():
-                request.user.message_set.create(message=ugettext("The %(verbose_name)s was updated successfully.") % {"verbose_name": model._meta.verbose_name})
-
-            # Do a post-after-redirect so that reload works, etc.
-            if post_save_redirect:
-                return HttpResponseRedirect(post_save_redirect % object.__dict__)
-            elif hasattr(object, 'get_absolute_url'):
-                return HttpResponseRedirect(object.get_absolute_url())
-            else:
-                raise ImproperlyConfigured("No URL to redirect to from generic create view.")
+                request.user.message_set.create(message=ugettext("The %(verbose_name)s was created successfully.") % {"verbose_name": model._meta.verbose_name})
+            return redirect(post_save_redirect, new_object)
     else:
-        errors = {}
-        # This makes sure the form acurate represents the fields of the place.
-        new_data = manipulator.flatten_data()
+        form = form_class()
 
-    form = oldforms.FormWrapper(manipulator, new_data, errors)
+    # Create the template, context, response
     if not template_name:
         template_name = "%s/%s_form.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     c = RequestContext(request, {
         'form': form,
-        template_object_name: object,
     }, context_processors)
-    for key, value in extra_context.items():
-        if callable(value):
-            c[key] = value()
-        else:
-            c[key] = value
+    apply_extra_context(extra_context, c)
+    return HttpResponse(t.render(c))
+
+def update_object(request, model=None, object_id=None, slug=None,
+        slug_field='slug', template_name=None, template_loader=loader,
+        extra_context=None, post_save_redirect=None,
+        login_required=False, follow=None, context_processors=None,
+        template_object_name='object', form_class=None):
+    """
+    Generic object-update function.
+
+    Templates: ``<app_label>/<model_name>_form.html``
+    Context:
+        form
+            the form for the object
+        object
+            the original object being edited
+    """
+    deprecate_follow(follow)
+    if extra_context is None: extra_context = {}
+    if login_required and not request.user.is_authenticated():
+        return redirect_to_login(request.path)
+
+    model, form_class = get_model_and_form_class(model, form_class)
+    obj = lookup_object(model, object_id, slug, slug_field)
+
+    if request.method == 'POST':
+        form = form_class(request.POST, request.FILES, instance=obj)
+        if form.is_valid():
+            obj = form.save()
+            if request.user.is_authenticated():
+                request.user.message_set.create(message=ugettext("The %(verbose_name)s was updated successfully.") % {"verbose_name": model._meta.verbose_name})
+            return redirect(post_save_redirect, obj)
+    else:
+        form = form_class(instance=obj)
+
+    if not template_name:
+        template_name = "%s/%s_form.html" % (model._meta.app_label, model._meta.object_name.lower())
+    t = template_loader.get_template(template_name)
+    c = RequestContext(request, {
+        'form': form,
+        template_object_name: obj,
+    }, context_processors)
+    apply_extra_context(extra_context, c)
     response = HttpResponse(t.render(c))
-    populate_xheaders(request, response, model, getattr(object, object._meta.pk.attname))
+    populate_xheaders(request, response, model, getattr(obj, obj._meta.pk.attname))
     return response
 
-def delete_object(request, model, post_delete_redirect,
-        object_id=None, slug=None, slug_field='slug', template_name=None,
-        template_loader=loader, extra_context=None,
-        login_required=False, context_processors=None, template_object_name='object'):
+def delete_object(request, model, post_delete_redirect, object_id=None,
+        slug=None, slug_field='slug', template_name=None,
+        template_loader=loader, extra_context=None, login_required=False,
+        context_processors=None, template_object_name='object'):
     """
     Generic object-delete function.
 
@@ -165,21 +206,10 @@ def delete_object(request, model, post_delete_redirect,
     if login_required and not request.user.is_authenticated():
         return redirect_to_login(request.path)
 
-    # Look up the object to be edited
-    lookup_kwargs = {}
-    if object_id:
-        lookup_kwargs['%s__exact' % model._meta.pk.name] = object_id
-    elif slug and slug_field:
-        lookup_kwargs['%s__exact' % slug_field] = slug
-    else:
-        raise AttributeError("Generic delete view must be called with either an object_id or a slug/slug_field")
-    try:
-        object = model._default_manager.get(**lookup_kwargs)
-    except ObjectDoesNotExist:
-        raise Http404, "No %s found for %s" % (model._meta.app_label, lookup_kwargs)
+    obj = lookup_object(model, object_id, slug, slug_field)
 
     if request.method == 'POST':
-        object.delete()
+        obj.delete()
         if request.user.is_authenticated():
             request.user.message_set.create(message=ugettext("The %(verbose_name)s was deleted.") % {"verbose_name": model._meta.verbose_name})
         return HttpResponseRedirect(post_delete_redirect)
@@ -188,13 +218,9 @@ def delete_object(request, model, post_delete_redirect,
             template_name = "%s/%s_confirm_delete.html" % (model._meta.app_label, model._meta.object_name.lower())
         t = template_loader.get_template(template_name)
         c = RequestContext(request, {
-            template_object_name: object,
+            template_object_name: obj,
         }, context_processors)
-        for key, value in extra_context.items():
-            if callable(value):
-                c[key] = value()
-            else:
-                c[key] = value
+        apply_extra_context(extra_context, c)
         response = HttpResponse(t.render(c))
-        populate_xheaders(request, response, model, getattr(object, object._meta.pk.attname))
+        populate_xheaders(request, response, model, getattr(obj, obj._meta.pk.attname))
         return response

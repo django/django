@@ -701,7 +701,7 @@ A page representing a list of objects.
       query string parameter (via ``GET``) or a ``page`` variable specified in
       the URLconf. See `Notes on pagination`_ below.
 
-    * ``page``: The current page number, as an integer. This is 1-based. 
+    * ``page``: The current page number, as an integer. This is 1-based.
       See `Notes on pagination`_ below.
 
     * ``template_name``: The full name of a template to use in rendering the
@@ -809,25 +809,25 @@ specify the page number in the URL in one of two ways:
 
         /objects/?page=3
 
-    * To loop over all the available page numbers, use the ``page_range`` 
-      variable. You can iterate over the list provided by ``page_range`` 
+    * To loop over all the available page numbers, use the ``page_range``
+      variable. You can iterate over the list provided by ``page_range``
       to create a link to every page of results.
 
 These values and lists are 1-based, not 0-based, so the first page would be
-represented as page ``1``. 
+represented as page ``1``.
 
 For more on pagination, read the `pagination documentation`_.
 	 
 .. _`pagination documentation`: ../pagination/
 
-**New in Django development version:** 
+**New in Django development version:**
 
 As a special case, you are also permitted to use ``last`` as a value for
 ``page``::
 
     /objects/?page=last
 
-This allows you to access the final page of results without first having to 
+This allows you to access the final page of results without first having to
 determine how many pages there are.
 
 Note that ``page`` *must* be either a valid page number or the value ``last``;
@@ -906,19 +906,33 @@ Create/update/delete generic views
 The ``django.views.generic.create_update`` module contains a set of functions
 for creating, editing and deleting objects.
 
+**Changed in Django development version:**
+
+``django.views.generic.create_update.create_object`` and
+``django.views.generic.create_update.update_object`` now use `newforms`_ to
+build and display the form.
+
+.. _newforms: ../newforms/
+
 ``django.views.generic.create_update.create_object``
 ----------------------------------------------------
 
 **Description:**
 
 A page that displays a form for creating an object, redisplaying the form with
-validation errors (if there are any) and saving the object. This uses the
-automatic manipulators that come with Django models.
+validation errors (if there are any) and saving the object.
 
 **Required arguments:**
 
-    * ``model``: The Django model class of the object that the form will
-      create.
+    * Either ``form_class`` or ``model`` is required.
+
+      If you provide ``form_class``, it should be a
+      ``django.newforms.ModelForm`` subclass.  Use this argument when you need
+      to customize the model's form.  See the `ModelForm docs`_ for more
+      information.
+
+      Otherwise, ``model`` should be a Django model class and the form used
+      will be a standard ``ModelForm`` for ``model``.
 
 **Optional arguments:**
 
@@ -959,22 +973,23 @@ If ``template_name`` isn't specified, this view will use the template
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``form``: A ``django.oldforms.FormWrapper`` instance representing the form
-      for editing the object. This lets you refer to form fields easily in the
+    * ``form``: A ``django.newforms.ModelForm`` instance representing the form
+      for creating the object. This lets you refer to form fields easily in the
       template system.
 
-      For example, if ``model`` has two fields, ``name`` and ``address``::
+      For example, if the model has two fields, ``name`` and ``address``::
 
           <form action="" method="post">
-          <p><label for="id_name">Name:</label> {{ form.name }}</p>
-          <p><label for="id_address">Address:</label> {{ form.address }}</p>
+          <p>{{ form.name.label_tag }} {{ form.name }}</p>
+          <p>{{ form.address.label_tag }} {{ form.address }}</p>
           </form>
 
-      See the `manipulator and formfield documentation`_ for more information
-      about using ``FormWrapper`` objects in templates.
+      See the `newforms documentation`_ for more information about using
+      ``Form`` objects in templates.
 
 .. _authentication system: ../authentication/
-.. _manipulator and formfield documentation: ../forms/
+.. _ModelForm docs: ../newforms/modelforms
+.. _newforms documentation: ../newforms/
 
 ``django.views.generic.create_update.update_object``
 ----------------------------------------------------
@@ -987,8 +1002,15 @@ object. This uses the automatic manipulators that come with Django models.
 
 **Required arguments:**
 
-    * ``model``: The Django model class of the object that the form will
-      create.
+    * Either ``form_class`` or ``model`` is required.
+
+      If you provide ``form_class``, it should be a
+      ``django.newforms.ModelForm`` subclass.  Use this argument when you need
+      to customize the model's form.  See the `ModelForm docs`_ for more
+      information.
+
+      Otherwise, ``model`` should be a Django model class and the form used
+      will be a standard ``ModelForm`` for ``model``.
 
     * Either ``object_id`` or (``slug`` *and* ``slug_field``) is required.
 
@@ -1041,19 +1063,19 @@ If ``template_name`` isn't specified, this view will use the template
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``form``: A ``django.oldforms.FormWrapper`` instance representing the form
+    * ``form``: A ``django.newforms.ModelForm`` instance representing the form
       for editing the object. This lets you refer to form fields easily in the
       template system.
 
-      For example, if ``model`` has two fields, ``name`` and ``address``::
+      For example, if the model has two fields, ``name`` and ``address``::
 
           <form action="" method="post">
-          <p><label for="id_name">Name:</label> {{ form.name }}</p>
-          <p><label for="id_address">Address:</label> {{ form.address }}</p>
+          <p>{{ form.name.label_tag }} {{ form.name }}</p>
+          <p>{{ form.address.label_tag }} {{ form.address }}</p>
           </form>
 
-      See the `manipulator and formfield documentation`_ for more information
-      about using ``FormWrapper`` objects in templates.
+      See the `newforms documentation`_ for more information about using
+      ``Form`` objects in templates.
 
     * ``object``: The original object being edited. This variable's name
       depends on the ``template_object_name`` parameter, which is ``'object'``
