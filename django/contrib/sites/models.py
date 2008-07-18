@@ -49,18 +49,6 @@ class Site(models.Model):
             del(SITE_CACHE[pk])
         except KeyError:
             pass
-    
-# Register the admin options for these models.
-# TODO: Maybe this should live in a separate module admin.py, but how would we
-# ensure that module was loaded?
-
-from django.contrib import admin
-
-class SiteAdmin(admin.ModelAdmin):
-    list_display = ('domain', 'name')
-    search_fields = ('domain', 'name')
-
-admin.site.register(Site, SiteAdmin)
 
 class RequestSite(object):
     """

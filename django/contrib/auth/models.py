@@ -369,6 +369,3 @@ class AnonymousUser(object):
 
     def is_authenticated(self):
         return False
-
-# Register the admin options for these models.
-from django.contrib.auth import admin
