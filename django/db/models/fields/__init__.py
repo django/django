@@ -942,9 +942,6 @@ class ImageField(FileField):
         if not self.height_field:
             setattr(cls, 'get_%s_height' % self.name, curry(cls._get_FIELD_height, field=self))
 
-    def get_internal_type(self):
-        return "ImageField"
-
     def save_file(self, new_data, new_object, original_object, change, rel, save=True):
         FileField.save_file(self, new_data, new_object, original_object, change, rel, save)
         # If the image has height and/or width field(s) and they haven't
