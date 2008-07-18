@@ -1,5 +1,6 @@
-
 from django.contrib import admin
+from django.contrib.comments.models import Comment, FreeComment
+
 
 class CommentAdmin(admin.ModelAdmin):
     fieldsets = (
