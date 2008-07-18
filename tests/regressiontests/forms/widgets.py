@@ -202,6 +202,30 @@ u'<input type="file" class="fun" name="email" />'
 >>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
 u'<input type="file" class="fun" name="email" />'
 
+Test for the behavior of _has_changed for FileInput. The value of data will
+more than likely come from request.FILES. The value of initial data will
+likely be a filename stored in the database. Since its value is of no use to
+a FileInput it is ignored.
+
+>>> w = FileInput()
+
+# No file was uploaded and no initial data.
+>>> w._has_changed(u'', None)
+False
+
+# A file was uploaded and no initial data.
+>>> w._has_changed(u'', {'filename': 'resume.txt', 'content': 'My resume'})
+True
+
+# A file was not uploaded, but there is initial data
+>>> w._has_changed(u'resume.txt', None)
+False
+
+# A file was uploaded and there is initial data (file identity is not dealt
+# with here)
+>>> w._has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'})
+True
+
 # Textarea Widget #############################################################
 
 >>> w = Textarea()
@@ -291,6 +315,21 @@ dictionary (because HTML form submission doesn't send any result for unchecked
 checkboxes).
 >>> w.value_from_datadict({}, {}, 'testing')
 False
+
+>>> w._has_changed(None, None)
+False
+>>> w._has_changed(None, u'')
+False
+>>> w._has_changed(u'', None)
+False
+>>> w._has_changed(u'', u'')
+False
+>>> w._has_changed(False, u'on')
+True
+>>> w._has_changed(True, u'on')
+False
+>>> w._has_changed(True, u'')
+True
 
 # Select Widget ###############################################################
 
@@ -572,6 +611,20 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 # Unicode choices are correctly rendered as HTML
 >>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<select multiple="multiple" name="nums">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>'
+
+# Test the usage of _has_changed
+>>> w._has_changed(None, None)
+False
+>>> w._has_changed([], None)
+False
+>>> w._has_changed(None, [u'1'])
+True
+>>> w._has_changed([1, 2], [u'1', u'2'])
+False
+>>> w._has_changed([1, 2], [u'1'])
+True
+>>> w._has_changed([1, 2], [u'1', u'3'])
+True
 
 # RadioSelect Widget ##########################################################
 
@@ -871,6 +924,20 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <li><label><input type="checkbox" name="escape" value="good" /> you &gt; me</label></li>
 </ul>
 
+# Test the usage of _has_changed
+>>> w._has_changed(None, None)
+False
+>>> w._has_changed([], None)
+False
+>>> w._has_changed(None, [u'1'])
+True
+>>> w._has_changed([1, 2], [u'1', u'2'])
+False
+>>> w._has_changed([1, 2], [u'1'])
+True
+>>> w._has_changed([1, 2], [u'1', u'3'])
+True
+
 # Unicode choices are correctly rendered as HTML
 >>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<ul>\n<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>\n<li><label><input type="checkbox" name="nums" value="2" /> 2</label></li>\n<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>\n<li><label><input checked="checked" type="checkbox" name="nums" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="checkbox" name="nums" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>'
@@ -895,6 +962,25 @@ u'<input id="foo_0" type="text" class="big" value="john" name="name_0" /><br /><
 >>> w.render('name', ['john', 'lennon'])
 u'<input id="bar_0" type="text" class="big" value="john" name="name_0" /><br /><input id="bar_1" type="text" class="small" value="lennon" name="name_1" />'
 
+>>> w = MyMultiWidget(widgets=(TextInput(), TextInput()))
+
+# test with no initial data
+>>> w._has_changed(None, [u'john', u'lennon'])
+True
+
+# test when the data is the same as initial
+>>> w._has_changed(u'john__lennon', [u'john', u'lennon'])
+False
+
+# test when the first widget's data has changed
+>>> w._has_changed(u'john__lennon', [u'alfred', u'lennon'])
+True
+
+# test when the last widget's data has changed. this ensures that it is not
+# short circuiting while testing the widgets.
+>>> w._has_changed(u'john__lennon', [u'john', u'denver'])
+True
+
 # SplitDateTimeWidget #########################################################
 
 >>> w = SplitDateTimeWidget()
@@ -912,6 +998,11 @@ included on both widgets.
 >>> w = SplitDateTimeWidget(attrs={'class': 'pretty'})
 >>> w.render('date', datetime.datetime(2006, 1, 10, 7, 30))
 u'<input type="text" class="pretty" value="2006-01-10" name="date_0" /><input type="text" class="pretty" value="07:30:00" name="date_1" />'
+
+>>> w._has_changed(datetime.datetime(2008, 5, 5, 12, 40, 00), [u'2008-05-05', u'12:40:00'])
+False
+>>> w._has_changed(datetime.datetime(2008, 5, 5, 12, 40, 00), [u'2008-05-05', u'12:41:00'])
+True
 
 # DateTimeInput ###############################################################
 

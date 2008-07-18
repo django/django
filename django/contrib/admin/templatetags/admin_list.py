@@ -71,7 +71,7 @@ pagination = register.inclusion_tag('admin/pagination.html')(pagination)
 def result_headers(cl):
     lookup_opts = cl.lookup_opts
 
-    for i, field_name in enumerate(lookup_opts.admin.list_display):
+    for i, field_name in enumerate(cl.list_display):
         try:
             f = lookup_opts.get_field(field_name)
             admin_order_field = None
@@ -123,7 +123,7 @@ def _boolean_icon(field_val):
 def items_for_result(cl, result):
     first = True
     pk = cl.lookup_opts.pk.attname
-    for field_name in cl.lookup_opts.admin.list_display:
+    for field_name in cl.list_display:
         row_class = ''
         try:
             f = cl.lookup_opts.get_field(field_name)
@@ -189,7 +189,7 @@ def items_for_result(cl, result):
         if force_unicode(result_repr) == '':
             result_repr = mark_safe('&nbsp;')
         # If list_display_links not defined, add the link tag to the first field
-        if (first and not cl.lookup_opts.admin.list_display_links) or field_name in cl.lookup_opts.admin.list_display_links:
+        if (first and not cl.list_display_links) or field_name in cl.list_display_links:
             table_tag = {True:'th', False:'td'}[first]
             first = False
             url = cl.url_for_result(result)
@@ -212,8 +212,8 @@ def result_list(cl):
 result_list = register.inclusion_tag("admin/change_list_results.html")(result_list)
 
 def date_hierarchy(cl):
-    if cl.lookup_opts.admin.date_hierarchy:
-        field_name = cl.lookup_opts.admin.date_hierarchy
+    if cl.date_hierarchy:
+        field_name = cl.date_hierarchy
         year_field = '%s__year' % field_name
         month_field = '%s__month' % field_name
         day_field = '%s__day' % field_name
@@ -280,10 +280,6 @@ def search_form(cl):
     }
 search_form = register.inclusion_tag('admin/search_form.html')(search_form)
 
-def filter(cl, spec):
+def admin_list_filter(cl, spec):
     return {'title': spec.title(), 'choices' : list(spec.choices(cl))}
-filter = register.inclusion_tag('admin/filter.html')(filter)
-
-def filters(cl):
-    return {'cl': cl}
-filters = register.inclusion_tag('admin/filters.html')(filters)
+admin_list_filter = register.inclusion_tag('admin/filter.html')(admin_list_filter)

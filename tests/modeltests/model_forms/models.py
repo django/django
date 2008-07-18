@@ -992,4 +992,22 @@ True
 u'...test3.png'
 >>> instance.delete()
 
+# Media on a ModelForm ########################################################
+
+# Similar to a regular Form class you can define custom media to be used on
+# the ModelForm.
+
+>>> class ModelFormWithMedia(ModelForm):
+...     class Media:
+...         js = ('/some/form/javascript',)
+...         css = {
+...             'all': ('/some/form/css',)
+...         }
+...     class Meta:
+...         model = PhoneNumber
+>>> f = ModelFormWithMedia()
+>>> print f.media
+<link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/some/form/javascript"></script>
+
 """}

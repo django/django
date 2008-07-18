@@ -1,7 +1,0 @@
-{% load admin_list %}
-{% load i18n %}
-{% if cl.has_filters %}<div id="changelist-filter">
-<h2>{% trans 'Filter' %}</h2>
-{% for spec in cl.filter_specs %}
-   {% filter cl spec %}
-{% endfor %}</div>{% endif %}

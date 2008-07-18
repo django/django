@@ -204,7 +204,6 @@ order:
     * ``unique_for_year``
     * ``validator_list``
     * ``choices``
-    * ``radio_admin``
     * ``help_text``
     * ``db_column``
     * ``db_tablespace``: Currently only used with the Oracle backend and only

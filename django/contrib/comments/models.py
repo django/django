@@ -66,7 +66,7 @@ class CommentManager(models.Manager):
 
 class Comment(models.Model):
     """A comment by a registered user."""
-    user = models.ForeignKey(User, raw_id_admin=True)
+    user = models.ForeignKey(User)
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField(_('object ID'))
     headline = models.CharField(_('headline'), max_length=255, blank=True)
@@ -95,18 +95,6 @@ class Comment(models.Model):
         verbose_name = _('comment')
         verbose_name_plural = _('comments')
         ordering = ('-submit_date',)
-
-    class Admin:
-        fields = (
-            (None, {'fields': ('content_type', 'object_id', 'site')}),
-            ('Content', {'fields': ('user', 'headline', 'comment')}),
-            ('Ratings', {'fields': ('rating1', 'rating2', 'rating3', 'rating4', 'rating5', 'rating6', 'rating7', 'rating8', 'valid_rating')}),
-            ('Meta', {'fields': ('is_public', 'is_removed', 'ip_address')}),
-        )
-        list_display = ('user', 'submit_date', 'content_type', 'get_content_object')
-        list_filter = ('submit_date',)
-        date_hierarchy = 'submit_date'
-        search_fields = ('comment', 'user__username')
 
     def __unicode__(self):
         return "%s: %s..." % (self.user.username, self.comment[:100])
@@ -187,17 +175,6 @@ class FreeComment(models.Model):
         verbose_name = _('free comment')
         verbose_name_plural = _('free comments')
         ordering = ('-submit_date',)
-
-    class Admin:
-        fields = (
-            (None, {'fields': ('content_type', 'object_id', 'site')}),
-            ('Content', {'fields': ('person_name', 'comment')}),
-            ('Meta', {'fields': ('submit_date', 'is_public', 'ip_address', 'approved')}),
-        )
-        list_display = ('person_name', 'submit_date', 'content_type', 'get_content_object')
-        list_filter = ('submit_date',)
-        date_hierarchy = 'submit_date'
-        search_fields = ('comment', 'person_name')
 
     def __unicode__(self):
         return "%s: %s..." % (self.person_name, self.comment[:100])
@@ -306,3 +283,4 @@ class ModeratorDeletion(models.Model):
 
     def __unicode__(self):
         return _("Moderator deletion by %r") % self.user
+        

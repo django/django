@@ -8,21 +8,26 @@
 <fieldset class="module aligned">
 
 <div class="form-row">
-  {{ form.username.html_error_list }}
+  {{ form.username.errors }}
+  {# TODO: get required class on label_tag #}
   <label for="id_username" class="required">{% trans 'Username' %}:</label> {{ form.username }}
-  <p class="help">{{ username_help_text }}</p>
+  <p class="help">{{ form.username.help_text }}</p>
 </div>
 
 <div class="form-row">
-  {{ form.password1.html_error_list }}
+  {{ form.password1.errors }}
+  {# TODO: get required class on label_tag #}
   <label for="id_password1" class="required">{% trans 'Password' %}:</label> {{ form.password1 }}
 </div>
 
 <div class="form-row">
-  {{ form.password2.html_error_list }}
+  {{ form.password2.errors }}
+  {# TODO: get required class on label_tag #}
   <label for="id_password2" class="required">{% trans 'Password (again)' %}:</label> {{ form.password2 }}
   <p class="help">{% trans 'Enter the same password as above, for verification.' %}</p>
 </div>
+
+<script type="text/javascript">document.getElementById("id_username").focus();</script>
 
 </fieldset>
 {% endblock %}

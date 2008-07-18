@@ -1,4 +1,4 @@
-// Handles related-objects functionality: lookup link for raw_id_admin=True
+// Handles related-objects functionality: lookup link for raw_id_fields
 // and Add Another links.
 
 function html_unescape(text) {
@@ -29,7 +29,7 @@ function showRelatedObjectLookupPopup(triggeringLink) {
 function dismissRelatedLookupPopup(win, chosenId) {
     var name = win.name.replace(/___/g, '.');
     var elem = document.getElementById(name);
-    if (elem.className.indexOf('vRawIdAdminField') != -1 && elem.value) {
+    if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1 && elem.value) {
         elem.value += ',' + chosenId;
     } else {
         document.getElementById(name).value = chosenId;

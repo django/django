@@ -15,7 +15,7 @@ import datetime
 
 class FilterSpec(object):
     filter_specs = []
-    def __init__(self, f, request, params, model):
+    def __init__(self, f, request, params, model, model_admin):
         self.field = f
         self.params = params
 
@@ -23,10 +23,10 @@ class FilterSpec(object):
         cls.filter_specs.append((test, factory))
     register = classmethod(register)
 
-    def create(cls, f, request, params, model):
+    def create(cls, f, request, params, model, model_admin):
         for test, factory in cls.filter_specs:
             if test(f):
-                return factory(f, request, params, model)
+                return factory(f, request, params, model, model_admin)
     create = classmethod(create)
 
     def has_output(self):
@@ -52,8 +52,8 @@ class FilterSpec(object):
         return mark_safe("".join(t))
 
 class RelatedFilterSpec(FilterSpec):
-    def __init__(self, f, request, params, model):
-        super(RelatedFilterSpec, self).__init__(f, request, params, model)
+    def __init__(self, f, request, params, model, model_admin):
+        super(RelatedFilterSpec, self).__init__(f, request, params, model, model_admin)
         if isinstance(f, models.ManyToManyField):
             self.lookup_title = f.rel.to._meta.verbose_name
         else:
@@ -81,8 +81,8 @@ class RelatedFilterSpec(FilterSpec):
 FilterSpec.register(lambda f: bool(f.rel), RelatedFilterSpec)
 
 class ChoicesFilterSpec(FilterSpec):
-    def __init__(self, f, request, params, model):
-        super(ChoicesFilterSpec, self).__init__(f, request, params, model)
+    def __init__(self, f, request, params, model, model_admin):
+        super(ChoicesFilterSpec, self).__init__(f, request, params, model, model_admin)
         self.lookup_kwarg = '%s__exact' % f.name
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)
 
@@ -98,8 +98,8 @@ class ChoicesFilterSpec(FilterSpec):
 FilterSpec.register(lambda f: bool(f.choices), ChoicesFilterSpec)
 
 class DateFieldFilterSpec(FilterSpec):
-    def __init__(self, f, request, params, model):
-        super(DateFieldFilterSpec, self).__init__(f, request, params, model)
+    def __init__(self, f, request, params, model, model_admin):
+        super(DateFieldFilterSpec, self).__init__(f, request, params, model, model_admin)
 
         self.field_generic = '%s__' % self.field.name
 
@@ -133,8 +133,8 @@ class DateFieldFilterSpec(FilterSpec):
 FilterSpec.register(lambda f: isinstance(f, models.DateField), DateFieldFilterSpec)
 
 class BooleanFieldFilterSpec(FilterSpec):
-    def __init__(self, f, request, params, model):
-        super(BooleanFieldFilterSpec, self).__init__(f, request, params, model)
+    def __init__(self, f, request, params, model, model_admin):
+        super(BooleanFieldFilterSpec, self).__init__(f, request, params, model, model_admin)
         self.lookup_kwarg = '%s__exact' % f.name
         self.lookup_kwarg2 = '%s__isnull' % f.name
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)
@@ -159,10 +159,10 @@ FilterSpec.register(lambda f: isinstance(f, models.BooleanField) or isinstance(f
 # if a field is eligible to use the BooleanFieldFilterSpec, that'd be much
 # more appropriate, and the AllValuesFilterSpec won't get used for it.
 class AllValuesFilterSpec(FilterSpec):
-    def __init__(self, f, request, params, model):
-        super(AllValuesFilterSpec, self).__init__(f, request, params, model)
+    def __init__(self, f, request, params, model, model_admin):
+        super(AllValuesFilterSpec, self).__init__(f, request, params, model, model_admin)
         self.lookup_val = request.GET.get(f.name, None)
-        self.lookup_choices = model._meta.admin.manager.distinct().order_by(f.name).values(f.name)
+        self.lookup_choices = model_admin.queryset(request).distinct().order_by(f.name).values(f.name)
 
     def title(self):
         return self.field.verbose_name

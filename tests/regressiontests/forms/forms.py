@@ -1667,4 +1667,76 @@ the list of errors is empty). You can also use it in {% if %} statements.
 <p><label>Password (again): <input type="password" name="password2" value="bar" /></label></p>
 <input type="submit" />
 </form>
+
+
+# The empty_permitted attribute ##############################################
+
+Sometimes (pretty much in formsets) we want to allow a form to pass validation
+if it is completely empty. We can accomplish this by using the empty_permitted
+agrument to a form constructor.
+
+>>> class SongForm(Form):
+...     artist = CharField()
+...     name = CharField()
+
+First let's show what happens id empty_permitted=False (the default):
+
+>>> data = {'artist': '', 'song': ''}
+
+>>> form = SongForm(data, empty_permitted=False)
+>>> form.is_valid()
+False
+>>> form.errors
+{'name': [u'This field is required.'], 'artist': [u'This field is required.']}
+>>> form.cleaned_data
+Traceback (most recent call last):
+...
+AttributeError: 'SongForm' object has no attribute 'cleaned_data'
+
+
+Now let's show what happens when empty_permitted=True and the form is empty.
+
+>>> form = SongForm(data, empty_permitted=True)
+>>> form.is_valid()
+True
+>>> form.errors
+{}
+>>> form.cleaned_data
+{}
+
+But if we fill in data for one of the fields, the form is no longer empty and
+the whole thing must pass validation.
+
+>>> data = {'artist': 'The Doors', 'song': ''}
+>>> form = SongForm(data, empty_permitted=False)
+>>> form.is_valid()
+False
+>>> form.errors
+{'name': [u'This field is required.']}
+>>> form.cleaned_data
+Traceback (most recent call last):
+...
+AttributeError: 'SongForm' object has no attribute 'cleaned_data'
+
+If a field is not given in the data then None is returned for its data. Lets
+make sure that when checking for empty_permitted that None is treated
+accordingly.
+
+>>> data = {'artist': None, 'song': ''}
+>>> form = SongForm(data, empty_permitted=True)
+>>> form.is_valid()
+True
+
+However, we *really* need to be sure we are checking for None as any data in
+initial that returns False on a boolean call needs to be treated literally.
+
+>>> class PriceForm(Form):
+...     amount = FloatField()
+...     qty = IntegerField()
+
+>>> data = {'amount': '0.0', 'qty': ''}
+>>> form = PriceForm(data, initial={'amount': 0.0}, empty_permitted=True)
+>>> form.is_valid()
+True
+
 """

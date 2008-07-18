@@ -10,7 +10,7 @@ from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
 from django.utils.safestring import mark_safe
 
 from fields import Field, FileField
-from widgets import TextInput, Textarea
+from widgets import Media, media_property, TextInput, Textarea
 from util import flatatt, ErrorDict, ErrorList, ValidationError
 
 __all__ = ('BaseForm', 'Form')
@@ -31,6 +31,7 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
     If 'with_base_fields' is True, all fields from the bases are used.
     Otherwise, only fields in the 'declared_fields' attribute on the bases are
     used. The distinction is useful in ModelForm subclassing.
+    Also integrates any additional media definitions
     """
     fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
     fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
@@ -56,8 +57,11 @@ class DeclarativeFieldsMetaclass(type):
     """
     def __new__(cls, name, bases, attrs):
         attrs['base_fields'] = get_declared_fields(bases, attrs)
-        return super(DeclarativeFieldsMetaclass,
+        new_class = super(DeclarativeFieldsMetaclass,
                      cls).__new__(cls, name, bases, attrs)
+        if 'media' not in attrs:
+            new_class.media = media_property(new_class)
+        return new_class
 
 class BaseForm(StrAndUnicode):
     # This is the main implementation of all the Form logic. Note that this
@@ -65,7 +69,8 @@ class BaseForm(StrAndUnicode):
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':'):
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
         self.files = files or {}
@@ -74,7 +79,9 @@ class BaseForm(StrAndUnicode):
         self.initial = initial or {}
         self.error_class = error_class
         self.label_suffix = label_suffix
+        self.empty_permitted = empty_permitted
         self._errors = None # Stores the errors after clean() has been called.
+        self._changed_data = None
 
         # The base_fields class attribute is the *class-wide* definition of
         # fields. Because a particular *instance* of the class might want to
@@ -194,6 +201,10 @@ class BaseForm(StrAndUnicode):
         if not self.is_bound: # Stop further processing.
             return
         self.cleaned_data = {}
+        # If the form is permitted to be empty, and none of the form data has
+        # changed from the initial data, short circuit any validation.
+        if self.empty_permitted and not self.has_changed():
+            return
         for name, field in self.fields.items():
             # value_from_datadict() gets the data from the data dictionaries.
             # Each widget type knows how to retrieve its own data, because some
@@ -228,6 +239,40 @@ class BaseForm(StrAndUnicode):
         association with the field named '__all__'.
         """
         return self.cleaned_data
+
+    def has_changed(self):
+        """
+        Returns True if data differs from initial.
+        """
+        return bool(self.changed_data)
+    
+    def _get_changed_data(self):
+        if self._changed_data is None:
+            self._changed_data = []
+            # XXX: For now we're asking the individual widgets whether or not the
+            # data has changed. It would probably be more efficient to hash the
+            # initial data, store it in a hidden field, and compare a hash of the
+            # submitted data, but we'd need a way to easily get the string value
+            # for a given field. Right now, that logic is embedded in the render
+            # method of each widget.
+            for name, field in self.fields.items():
+                prefixed_name = self.add_prefix(name)
+                data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
+                initial_value = self.initial.get(name, field.initial)
+                if field.widget._has_changed(initial_value, data_value):
+                    self._changed_data.append(name)
+        return self._changed_data
+    changed_data = property(_get_changed_data)
+
+    def _get_media(self):
+        """
+        Provide a description of all media required to render the widgets on this form
+        """
+        media = Media()
+        for field in self.fields.values():
+            media = media + field.widget.media
+        return media
+    media = property(_get_media)
 
     def is_multipart(self):
         """

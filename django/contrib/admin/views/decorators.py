@@ -12,7 +12,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render_to_response
 from django.utils.translation import ugettext_lazy, ugettext as _
-from django.utils.safestring import mark_safe
 
 ERROR_MESSAGE = ugettext_lazy("Please enter a correct username and password. Note that both fields are case-sensitive.")
 LOGIN_FORM_KEY = 'this_is_the_login_form'

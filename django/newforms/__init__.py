@@ -15,3 +15,4 @@ from widgets import *
 from fields import *
 from forms import *
 from models import *
+from formsets import *
