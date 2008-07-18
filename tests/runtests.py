@@ -140,7 +140,6 @@ def django_tests(verbosity, interactive, test_labels):
     for model_dir, model_name in get_invalid_models():
         model_label = '.'.join([model_dir, model_name])
         if not test_labels or model_name in test_labels:
-            print >> sys.stderr,'****', model_label
             extra_tests.append(InvalidModelTestCase(model_label))
             try:
                 # Invalid models are not working apps, so we cannot pass them into 
