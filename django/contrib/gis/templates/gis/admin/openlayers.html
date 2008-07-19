@@ -1,0 +1,37 @@
+{% block extrastyle %}
+<style type="text/css">
+  #{{ id }}_map { width: {{ map_width }}px; height: {{ map_height }}px; }
+  #{{ id }}_map .aligned label { float:inherit; }
+  #{{ id }}_admin_map { position: relative; vertical-align: top; float: left; }
+  {% if not display_wkt %}#{{ id }} { display: none; }{% endif %}
+  .olControlEditingToolbar .olControlModifyFeatureItemActive { 
+     background-image: url("{{ admin_media_prefix }}img/gis/move_vertex_on.png");
+     background-repeat: no-repeat;
+  }
+  .olControlEditingToolbar .olControlModifyFeatureItemInactive { 
+     background-image: url("{{ admin_media_prefix }}img/gis/move_vertex_off.png");
+     background-repeat: no-repeat;
+  }
+</style>
+<!--[if IE]>
+<style type="text/css">
+  /* This fixes the the mouse offset issues in IE. */
+  #{{ id }}_admin_map { position: static; vertical-align: top; }
+  /* `font-size: 0` fixes the 1px border between tiles, but borks LayerSwitcher.
+      Thus, this is disabled until a better fix is found.
+  #{{ id }}_map { width: {{ map_width }}px; height: {{ map_height }}px; font-size: 0; } */
+</style>
+<![endif]-->
+{% endblock %}
+<span id="{{ id }}_admin_map">
+<script type="text/javascript">
+//<![CDATA[
+{% block openlayers %}{% include "gis/admin/openlayers.js" %}{% endblock %}
+//]]>
+</script>
+<div id="{{ id }}_map"></div>
+<a href="javascript:{{ module }}.clearFeatures()">Delete all Features</a>
+{% if display_wkt %}<p> WKT debugging window:</p>{% endif %}
+<textarea id="{{ id }}" class="vWKTField required" cols="150" rows="10" name="{{ field_name }}">{{ wkt }}</textarea>
+<script type="text/javascript">{% block init_function %}{{ module }}.init();{% endblock %}</script>
+</span>

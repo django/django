@@ -1,3 +1,4 @@
+from django.contrib.gis import forms
 from django.db import connection
 # Getting the SpatialBackend container and the geographic quoting method.
 from django.contrib.gis.db.backend import SpatialBackend, gqn
@@ -111,7 +112,7 @@ class GeometryField(SpatialBackend.Field):
             except SpatialBackend.GeometryException:
                 raise ValueError('Could not create geometry from lookup value: %s' % str(value))
         else:
-            raise TypeError('Cannot use parameter of `%s` type as a geometry lookup parameter.' % type(value))
+            raise TypeError('Cannot use parameter of `%s` type as lookup parameter.' % type(value))
 
         # Assigning the SRID value.
         geom.srid = self.get_srid(geom)
@@ -136,6 +137,14 @@ class GeometryField(SpatialBackend.Field):
         
         # Setup for lazy-instantiated Geometry object.
         setattr(cls, self.attname, GeometryProxy(SpatialBackend.Geometry, self))
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class' : forms.GeometryField, 
+                    'geom_type' : self._geom,
+                    'null' : self.null,
+                    }
+        defaults.update(kwargs)
+        return super(GeometryField, self).formfield(**defaults)
 
     def get_db_prep_lookup(self, lookup_type, value):
         """
