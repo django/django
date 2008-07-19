@@ -27,7 +27,6 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         super(FilteredSelectMultiple, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
-        from django.conf import settings
         output = [super(FilteredSelectMultiple, self).render(name, value, attrs, choices)]
         output.append(u'<script type="text/javascript">addEvent(window, "load", function(e) {')
         # TODO: "id_" is hard-coded here. This should instead use the correct
@@ -85,7 +84,6 @@ class AdminFileWidget(forms.FileInput):
         super(AdminFileWidget, self).__init__(attrs)
         
     def render(self, name, value, attrs=None):
-        from django.conf import settings
         output = []
         if value:
             output.append('%s <a target="_blank" href="%s%s">%s</a> <br />%s ' % \
@@ -103,7 +101,6 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         super(ForeignKeyRawIdWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
-        from django.conf import settings
         related_url = '../../../%s/%s/' % (self.rel.to._meta.app_label, self.rel.to._meta.object_name.lower())
         if self.rel.limit_choices_to:
             url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in self.rel.limit_choices_to.items()])
@@ -187,7 +184,6 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         return obj
 
     def render(self, name, value, *args, **kwargs):
-        from django.conf import settings
         rel_to = self.rel.to
         related_url = '../../../%s/%s/' % (rel_to._meta.app_label, rel_to._meta.object_name.lower())
         self.widget.choices = self.choices
