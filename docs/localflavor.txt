@@ -47,6 +47,7 @@ Countries currently supported by ``localflavor`` are:
     * Norway_
     * Peru_
     * Poland_
+    * Romania_
     * Slovakia_
     * `South Africa`_
     * Spain_
@@ -84,6 +85,7 @@ them::
 .. _Norway: `Norway (django.contrib.localflavor.no)`_
 .. _Peru: `Peru (django.contrib.localflavor.pe)`_
 .. _Poland: `Poland (django.contrib.localflavor.pl)`_
+.. _Romania: `Romania (django.contrib.localflavor.ro)`_
 .. _Slovakia: `Slovakia (django.contrib.localflavor.sk)`_
 .. _South Africa: `South Africa (django.contrib.localflavor.za)`_
 .. _Spain: `Spain (django.contrib.localflavor.es)`_
@@ -496,6 +498,52 @@ PLVoivodeshipSelect
 
 A ``Select`` widget that uses a list of Polish voivodeships (administrative
 provinces) as its choices.
+
+Romania (``django.contrib.localflavor.ro``)
+============================================
+
+ROCIFField
+----------
+
+A form field that validates Romanian fiscal identification codes (CIF). The
+return value strips the leading RO, if given.
+
+ROCNPField
+----------
+
+A form field that validates Romanian personal numeric codes (CNP).
+
+ROCountyField
+-------------
+
+A form field that validates its input as a Romanian county (judet) name or
+abbreviation. It normalizes the input to the standard vehicle registration
+abbreviation for the given county. This field will only accept names written
+with diacritics; consider using ROCountySelect as an alternative.
+
+ROCountySelect
+--------------
+
+A ``Select`` widget that uses a list of Romanian counties (judete) as its
+choices.
+
+ROIBANField
+-----------
+
+A form field that validates its input as a Romanian International Bank 
+Account Number (IBAN). The valid format is ROXX-XXXX-XXXX-XXXX-XXXX-XXXX,
+with or without hyphens.
+
+ROPhoneNumberField
+------------------
+
+A form field that validates Romanian phone numbers, short special numbers
+excluded.
+
+ROPostalCodeField
+-----------------
+
+A form field that validates Romanian postal codes.
 
 Slovakia (``django.contrib.localflavor.sk``)
 ============================================
