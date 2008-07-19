@@ -288,7 +288,7 @@ class Field(object):
         if self.choices:
             field_objs = [oldforms.SelectField]
 
-            params['choices'] = self.get_choices_default()
+            params['choices'] = self.flatchoices
         else:
             field_objs = self.get_manipulator_field_objs()
         return (field_objs, params)
@@ -407,6 +407,16 @@ class Field(object):
             return self._choices
     choices = property(_get_choices)
 
+    def _get_flatchoices(self):
+        flat = []
+        for choice, value in self.get_choices_default():
+            if type(value) in (list, tuple):
+                flat.extend(value)
+            else:
+                flat.append((choice,value))
+        return flat
+    flatchoices = property(_get_flatchoices)
+    
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)
 

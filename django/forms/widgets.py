@@ -345,16 +345,31 @@ class Select(Widget):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<select%s>' % flatatt(final_attrs)]
-        # Normalize to string.
-        str_value = force_unicode(value)
-        for option_value, option_label in chain(self.choices, choices):
-            option_value = force_unicode(option_value)
-            selected_html = (option_value == str_value) and u' selected="selected"' or ''
-            output.append(u'<option value="%s"%s>%s</option>' % (
-                    escape(option_value), selected_html,
-                    conditional_escape(force_unicode(option_label))))
-        output.append(u'</select>')
+        options = self.render_options(choices, [value])
+        if options:
+            output.append(options)
+        output.append('</select>')
         return mark_safe(u'\n'.join(output))
+
+    def render_options(self, choices, selected_choices):
+        def render_option(option_value, option_label):
+            option_value = force_unicode(option_value)
+            selected_html = (option_value in selected_choices) and u' selected="selected"' or ''
+            return u'<option value="%s"%s>%s</option>' % (
+                escape(option_value), selected_html,
+                conditional_escape(force_unicode(option_label)))
+        # Normalize to strings.
+        selected_choices = set([force_unicode(v) for v in selected_choices])
+        output = []
+        for option_value, option_label in chain(self.choices, choices):
+            if isinstance(option_label, (list, tuple)):
+                output.append(u'<optgroup label="%s">' % escape(force_unicode(option_value)))
+                for option in option_label:
+                    output.append(render_option(*option))
+                output.append(u'</optgroup>')
+            else:
+                output.append(render_option(option_value, option_label))
+        return u'\n'.join(output)
 
 class NullBooleanSelect(Select):
     """
@@ -380,24 +395,15 @@ class NullBooleanSelect(Select):
         # same thing as False.
         return bool(initial) != bool(data)
 
-class SelectMultiple(Widget):
-    def __init__(self, attrs=None, choices=()):
-        super(SelectMultiple, self).__init__(attrs)
-        # choices can be any iterable
-        self.choices = choices
-
+class SelectMultiple(Select):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<select multiple="multiple"%s>' % flatatt(final_attrs)]
-        str_values = set([force_unicode(v) for v in value]) # Normalize to strings.
-        for option_value, option_label in chain(self.choices, choices):
-            option_value = force_unicode(option_value)
-            selected_html = (option_value in str_values) and ' selected="selected"' or ''
-            output.append(u'<option value="%s"%s>%s</option>' % (
-                    escape(option_value), selected_html,
-                    conditional_escape(force_unicode(option_label))))
-        output.append(u'</select>')
+        options = self.render_options(choices, value)
+        if options:
+            output.append(options)
+        output.append('</select>')
         return mark_safe(u'\n'.join(output))
 
     def value_from_datadict(self, data, files, name):

@@ -980,7 +980,7 @@ False
 
 # ChoiceField #################################################################
 
->>> f = ChoiceField(choices=[('1', '1'), ('2', '2')])
+>>> f = ChoiceField(choices=[('1', 'One'), ('2', 'Two')])
 >>> f.clean('')
 Traceback (most recent call last):
 ...
@@ -996,9 +996,9 @@ u'1'
 >>> f.clean('3')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
 
->>> f = ChoiceField(choices=[('1', '1'), ('2', '2')], required=False)
+>>> f = ChoiceField(choices=[('1', 'One'), ('2', 'Two')], required=False)
 >>> f.clean('')
 u''
 >>> f.clean(None)
@@ -1010,7 +1010,7 @@ u'1'
 >>> f.clean('3')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
 
 >>> f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')])
 >>> f.clean('J')
@@ -1018,7 +1018,25 @@ u'J'
 >>> f.clean('John')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+ValidationError: [u'Select a valid choice. John is not one of the available choices.']
+
+>>> f = ChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
+>>> f.clean(1)
+u'1'
+>>> f.clean('1')
+u'1'
+>>> f.clean(3)
+u'3'
+>>> f.clean('3')
+u'3'
+>>> f.clean(5)
+u'5'
+>>> f.clean('5')
+u'5'
+>>> f.clean('6')
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 6 is not one of the available choices.']
 
 # NullBooleanField ############################################################
 
@@ -1036,7 +1054,7 @@ False
 
 # MultipleChoiceField #########################################################
 
->>> f = MultipleChoiceField(choices=[('1', '1'), ('2', '2')])
+>>> f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two')])
 >>> f.clean('')
 Traceback (most recent call last):
 ...
@@ -1072,7 +1090,7 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
 
->>> f = MultipleChoiceField(choices=[('1', '1'), ('2', '2')], required=False)
+>>> f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two')], required=False)
 >>> f.clean('')
 []
 >>> f.clean(None)
@@ -1099,6 +1117,29 @@ ValidationError: [u'Enter a list of values.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
+
+>>> f = MultipleChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
+>>> f.clean([1])
+[u'1']
+>>> f.clean(['1'])
+[u'1']
+>>> f.clean([1, 5])
+[u'1', u'5']
+>>> f.clean([1, '5'])
+[u'1', u'5']
+>>> f.clean(['1', 5])
+[u'1', u'5']
+>>> f.clean(['1', '5'])
+[u'1', u'5']
+>>> f.clean(['6'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 6 is not one of the available choices.']
+>>> f.clean(['1','6'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 6 is not one of the available choices.']
+
 
 # ComboField ##################################################################
 
@@ -1165,7 +1206,7 @@ u''
 >>> f.clean('fields.py')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+ValidationError: [u'Select a valid choice. fields.py is not one of the available choices.']
 >>> fix_os_paths(f.clean(path + 'fields.py'))
 u'.../django/forms/fields.py'
 >>> f = forms.FilePathField(path=path, match='^.*?\.py$')

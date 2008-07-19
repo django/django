@@ -1236,7 +1236,11 @@ given length.
     * Error message keys: ``required``, ``invalid_choice``
 
 Takes one extra argument, ``choices``, which is an iterable (e.g., a list or
-tuple) of 2-tuples to use as choices for this field.
+tuple) of 2-tuples to use as choices for this field. This argument accepts
+the same formats as the ``choices`` argument to a model field. See the 
+`model API documentation on choices`_ for more details.
+
+.. _model API documentation on choices: ../model-api#choices
 
 ``DateField``
 ~~~~~~~~~~~~~
@@ -1444,7 +1448,9 @@ These control the range of values permitted in the field.
     * Error message keys: ``required``, ``invalid_choice``, ``invalid_list``
 
 Takes one extra argument, ``choices``, which is an iterable (e.g., a list or
-tuple) of 2-tuples to use as choices for this field.
+tuple) of 2-tuples to use as choices for this field. This argument accepts
+the same formats as the ``choices`` argument to a model field. See the 
+`model API documentation on choices`_ for more details.
 
 ``NullBooleanField``
 ~~~~~~~~~~~~~~~~~~~~

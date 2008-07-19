@@ -585,7 +585,7 @@ class NullBooleanField(BooleanField):
 class ChoiceField(Field):
     widget = Select
     default_error_messages = {
-        'invalid_choice': _(u'Select a valid choice. That choice is not one of the available choices.'),
+        'invalid_choice': _(u'Select a valid choice. %(value)s is not one of the available choices.'),
     }
 
     def __init__(self, choices=(), required=True, widget=None, label=None,
@@ -615,11 +615,23 @@ class ChoiceField(Field):
         value = smart_unicode(value)
         if value == u'':
             return value
-        valid_values = set([smart_unicode(k) for k, v in self.choices])
-        if value not in valid_values:
+        if not self.valid_value(value):
             raise ValidationError(self.error_messages['invalid_choice'] % {'value': value})
         return value
 
+    def valid_value(self, value):
+        "Check to see if the provided value is a valid choice"
+        for k, v in self.choices:
+            if type(v) in (tuple, list):
+                # This is an optgroup, so look inside the group for options
+                for k2, v2 in v:
+                    if value == smart_unicode(k2):
+                        return True
+            else:
+                if value == smart_unicode(k):
+                    return True
+        return False
+        
 class MultipleChoiceField(ChoiceField):
     hidden_widget = MultipleHiddenInput
     widget = SelectMultiple
@@ -640,9 +652,8 @@ class MultipleChoiceField(ChoiceField):
             raise ValidationError(self.error_messages['invalid_list'])
         new_value = [smart_unicode(val) for val in value]
         # Validate that each value in the value list is in self.choices.
-        valid_values = set([smart_unicode(k) for k, v in self.choices])
         for val in new_value:
-            if val not in valid_values:
+            if not self.valid_value(val):
                 raise ValidationError(self.error_messages['invalid_choice'] % {'value': val})
         return new_value
 

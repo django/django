@@ -458,6 +458,35 @@ over multiple times without getting consumed:
 <option value="4">4</option>
 </select>
 
+Choices can be nested one level in order to create HTML optgroups:
+>>> w.choices=(('outer1', 'Outer 1'), ('Group "1"', (('inner1', 'Inner 1'), ('inner2', 'Inner 2'))))
+>>> print w.render('nestchoice', None)
+<select name="nestchoice">
+<option value="outer1">Outer 1</option>
+<optgroup label="Group &quot;1&quot;">
+<option value="inner1">Inner 1</option>
+<option value="inner2">Inner 2</option>
+</optgroup>
+</select>
+
+>>> print w.render('nestchoice', 'outer1')
+<select name="nestchoice">
+<option value="outer1" selected="selected">Outer 1</option>
+<optgroup label="Group &quot;1&quot;">
+<option value="inner1">Inner 1</option>
+<option value="inner2">Inner 2</option>
+</optgroup>
+</select>
+
+>>> print w.render('nestchoice', 'inner1')
+<select name="nestchoice">
+<option value="outer1">Outer 1</option>
+<optgroup label="Group &quot;1&quot;">
+<option value="inner1" selected="selected">Inner 1</option>
+<option value="inner2">Inner 2</option>
+</optgroup>
+</select>
+
 # NullBooleanSelect Widget ####################################################
 
 >>> w = NullBooleanSelect()
@@ -625,6 +654,44 @@ False
 True
 >>> w._has_changed([1, 2], [u'1', u'3'])
 True
+
+# Choices can be nested one level in order to create HTML optgroups:
+>>> w.choices = (('outer1', 'Outer 1'), ('Group "1"', (('inner1', 'Inner 1'), ('inner2', 'Inner 2'))))
+>>> print w.render('nestchoice', None)
+<select multiple="multiple" name="nestchoice">
+<option value="outer1">Outer 1</option>
+<optgroup label="Group &quot;1&quot;">
+<option value="inner1">Inner 1</option>
+<option value="inner2">Inner 2</option>
+</optgroup>
+</select>
+
+>>> print w.render('nestchoice', ['outer1'])
+<select multiple="multiple" name="nestchoice">
+<option value="outer1" selected="selected">Outer 1</option>
+<optgroup label="Group &quot;1&quot;">
+<option value="inner1">Inner 1</option>
+<option value="inner2">Inner 2</option>
+</optgroup>
+</select>
+
+>>> print w.render('nestchoice', ['inner1'])
+<select multiple="multiple" name="nestchoice">
+<option value="outer1">Outer 1</option>
+<optgroup label="Group &quot;1&quot;">
+<option value="inner1" selected="selected">Inner 1</option>
+<option value="inner2">Inner 2</option>
+</optgroup>
+</select>
+
+>>> print w.render('nestchoice', ['outer1', 'inner2'])
+<select multiple="multiple" name="nestchoice">
+<option value="outer1" selected="selected">Outer 1</option>
+<optgroup label="Group &quot;1&quot;">
+<option value="inner1">Inner 1</option>
+<option value="inner2" selected="selected">Inner 2</option>
+</optgroup>
+</select>
 
 # RadioSelect Widget ##########################################################
 
