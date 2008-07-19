@@ -94,7 +94,9 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     words = word_split_re.split(force_unicode(text))
     nofollow_attr = nofollow and ' rel="nofollow"' or ''
     for i, word in enumerate(words):
-        match = punctuation_re.match(word)
+        match = None
+        if '.' in word or '@' in word or ':' in word:
+            match = punctuation_re.match(word)
         if match:
             lead, middle, trail = match.groups()
             # Make URL we want to point to.
@@ -102,7 +104,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             if middle.startswith('http://') or middle.startswith('https://'):
                 url = urlquote(middle, safe='/&=:;#?+*')
             elif middle.startswith('www.') or ('@' not in middle and \
-                    len(middle) > 0 and middle[0] in string.ascii_letters + string.digits and \
+                    middle and middle[0] in string.ascii_letters + string.digits and \
                     (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
                 url = urlquote('http://%s' % middle, safe='/&=:;#?+*')
             elif '@' in middle and not ':' in middle and simple_email_re.match(middle):
