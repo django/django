@@ -459,13 +459,13 @@ class Model(object):
 
     def _get_FIELD_filename(self, field):
         if getattr(self, field.attname): # Value is not blank.
-            return os.path.normpath(os.path.join(settings.MEDIA_ROOT, getattr(self, field.attname)))
+            return os.path.normpath(os.path.join(settings.MEDIA_ROOT, field.get_filename(getattr(self, field.attname))))
         return ''
 
     def _get_FIELD_url(self, field):
         if getattr(self, field.attname): # Value is not blank.
             import urlparse
-            return urlparse.urljoin(settings.MEDIA_URL, getattr(self, field.attname)).replace('\\', '/')
+            return urlparse.urljoin(settings.MEDIA_URL, field.get_filename(getattr(self, field.attname))).replace('\\', '/')
         return ''
 
     def _get_FIELD_size(self, field):
@@ -494,7 +494,7 @@ class Model(object):
         elif isinstance(raw_field, basestring):
             import warnings
             warnings.warn(
-                message = "Representing uploaded files as dictionaries is deprecated. Use django.core.files.uploadedfile.SimpleUploadedFile instead.",
+                message = "Representing uploaded files as strings is deprecated. Use django.core.files.uploadedfile.SimpleUploadedFile instead.",
                 category = DeprecationWarning,
                 stacklevel = 2
             )
