@@ -3,6 +3,7 @@ import sys
 from django import http
 from django.core import signals
 from django.dispatch import dispatcher
+from django.utils.encoding import force_unicode
 
 class BaseHandler(object):
     # Changes that are always applied to a response (in this order).
@@ -73,7 +74,8 @@ class BaseHandler(object):
 
         resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
         try:
-            callback, callback_args, callback_kwargs = resolver.resolve(request.path)
+            callback, callback_args, callback_kwargs = resolver.resolve(
+                    request.path_info)
 
             # Apply view middleware
             for middleware_method in self._view_middleware:
@@ -169,4 +171,21 @@ class BaseHandler(object):
         for func in self.response_fixes:
             response = func(request, response)
         return response
+
+def get_script_name(environ):
+    """
+    Returns the equivalent of the HTTP request's SCRIPT_NAME environment
+    variable. If Apache mod_rewrite has been used, returns what would have been
+    the script name prior to any rewriting (so it's the script name as seen
+    from the client's perspective).
+
+    Note: this isn't used by the mod_python handler, since the equivalent of
+    SCRIPT_NAME isn't available there.
+    """
+    # If mod_rewrite had a whack at the URL, Apache set SCRIPT_URL to
+    # SCRIPT_NAME before applying any rewrites.
+    script_url = force_unicode(environ.get('SCRIPT_URL', ''))
+    if script_url:
+        return script_url
+    return force_unicode(environ.get('SCRIPT_NAME', ''))
 
