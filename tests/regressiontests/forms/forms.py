@@ -1480,6 +1480,10 @@ not request.POST.
 >>> f.is_valid()
 True
 
+>>> f = FileForm(data={}, files={'file1': SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह')}, auto_id=False)
+>>> print f
+<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>
+
 # Basic form processing in a view #############################################
 
 >>> from django.template import Template, Context
