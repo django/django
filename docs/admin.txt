@@ -122,20 +122,14 @@ The ``field_options`` dictionary can have the following keys:
         }
 
 ``classes``
-    A string containing extra CSS classes to apply to the fieldset.
+    A list containing extra CSS classes to apply to the fieldset.
     
     Example::
         
         {
-        'classes': 'wide',
+        'classes': ['wide', 'extrapretty'],
         }
 
-    Apply multiple classes by separating them with spaces. Example::
-        
-        {
-        'classes': 'wide extrapretty',
-        }
-    
     Two useful classes defined by the default admin-site stylesheet are
     ``collapse`` and ``wide``. Fieldsets with the ``collapse`` style will be
     initially collapsed in the admin and replaced with a small "click to expand"

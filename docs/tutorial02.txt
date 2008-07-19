@@ -192,7 +192,7 @@ aren't commonly used::
         class PollAdmin(admin.ModelAdmin):
             fieldsets = [
                 (None,               {'fields': ['question']}),
-                ('Date information', {'fields': ['pub_date'], 'classes': 'pub_date'}),
+                ('Date information', {'fields': ['pub_date'], 'classes': ['pub_date']}),
             ]
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin09.png
@@ -242,7 +242,7 @@ registration code to read::
     class PollAdmin(admin.ModelAdmin):
         fieldsets = [
             (None,               {'fields': ['question']}),
-            ('Date information', {'fields': ['pub_date'], 'classes': 'pub_date'}),
+            ('Date information', {'fields': ['pub_date'], 'classes': ['pub_date']}),
         ]
         inlines = [ChoiceInline]
 
