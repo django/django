@@ -2,9 +2,9 @@
 Iceland specific form helpers.
 """
 
-from django.newforms import ValidationError
-from django.newforms.fields import RegexField, EMPTY_VALUES
-from django.newforms.widgets import Select
+from django.forms import ValidationError
+from django.forms.fields import RegexField, EMPTY_VALUES
+from django.forms.widgets import Select
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 

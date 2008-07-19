@@ -2,7 +2,7 @@
 Slovak-specific form helpers
 """
 
-from django.newforms.fields import Select, RegexField
+from django.forms.fields import Select, RegexField
 from django.utils.translation import ugettext_lazy as _
 
 class SKRegionSelect(Select):

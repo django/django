@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 tests = r"""
->>> from django.newforms import *
->>> from django.newforms.widgets import RadioFieldRenderer
+>>> from django.forms import *
+>>> from django.forms.widgets import RadioFieldRenderer
 >>> from django.utils.safestring import mark_safe
 >>> import datetime
 >>> import time

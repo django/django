@@ -119,7 +119,7 @@ displayed because you forgot to add it to fields/fielsets
 If we specify a form, it should use it allowing custom validation to work
 properly. This won't, however, break any of the admin widgets or media.
 
->>> from django import newforms as forms
+>>> from django import forms
 >>> class AdminBandForm(forms.ModelForm):
 ...     delete = forms.BooleanField()
 ...     
@@ -174,22 +174,22 @@ the choices lists have a first entry of dashes.
 >>> cmafa = cma.get_form(request)
 
 >>> type(cmafa.base_fields['main_band'].widget.widget)
-<class 'django.newforms.widgets.Select'>
+<class 'django.forms.widgets.Select'>
 >>> list(cmafa.base_fields['main_band'].widget.choices)
 [(u'', u'---------'), (1, u'The Doors')]
 
 >>> type(cmafa.base_fields['opening_band'].widget.widget)
-<class 'django.newforms.widgets.Select'>
+<class 'django.forms.widgets.Select'>
 >>> list(cmafa.base_fields['opening_band'].widget.choices)
 [(u'', u'---------'), (1, u'The Doors')]
 
 >>> type(cmafa.base_fields['day'].widget)
-<class 'django.newforms.widgets.Select'>
+<class 'django.forms.widgets.Select'>
 >>> list(cmafa.base_fields['day'].widget.choices)
 [('', '---------'), (1, 'Fri'), (2, 'Sat')]
 
 >>> type(cmafa.base_fields['transport'].widget)
-<class 'django.newforms.widgets.Select'>
+<class 'django.forms.widgets.Select'>
 >>> list(cmafa.base_fields['transport'].widget.choices)
 [('', '---------'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')]
 
@@ -849,7 +849,7 @@ ImproperlyConfigured: `ValidationTestInline.max_num` should be a integer.
 
 # formset
 
->>> from django.newforms.models import BaseModelFormSet
+>>> from django.forms.models import BaseModelFormSet
 
 >>> class FakeFormSet(object):
 ...     pass

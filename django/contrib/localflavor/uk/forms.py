@@ -4,8 +4,8 @@ UK-specific Form helpers
 
 import re
 
-from django.newforms.fields import CharField, Select
-from django.newforms import ValidationError
+from django.forms.fields import CharField, Select
+from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 class UKPostcodeField(CharField):

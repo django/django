@@ -1,17 +1,17 @@
 # coding: utf-8
 """
-Tests for newforms/util.py module.
+Tests for forms/util.py module.
 """
 
 tests = r"""
->>> from django.newforms.util import *
+>>> from django.forms.util import *
 >>> from django.utils.translation import ugettext_lazy
 
 ###########
 # flatatt #
 ###########
 
->>> from django.newforms.util import flatatt
+>>> from django.forms.util import flatatt
 >>> flatatt({'id': "header"})
 u' id="header"'
 >>> flatatt({'class': "news", 'title': "Read this"})

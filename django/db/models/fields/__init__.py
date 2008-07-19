@@ -14,7 +14,7 @@ from django.dispatch import dispatcher
 from django.conf import settings
 from django.core import validators
 from django import oldforms
-from django import newforms as forms
+from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import curry
@@ -411,7 +411,7 @@ class Field(object):
         setattr(instance, self.name, data)
 
     def formfield(self, form_class=forms.CharField, **kwargs):
-        "Returns a django.newforms.Field instance for this database Field."
+        "Returns a django.forms.Field instance for this database Field."
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         if self.choices:
             defaults['widget'] = forms.Select(choices=self.get_choices(include_blank=self.blank or not (self.has_default() or 'initial' in kwargs)))

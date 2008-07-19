@@ -9,7 +9,7 @@ from django.utils.functional import curry
 from django.utils.encoding import smart_unicode
 from django.core import validators
 from django import oldforms
-from django import newforms as forms
+from django import forms
 from django.dispatch import dispatcher
 
 try:

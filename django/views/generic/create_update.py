@@ -1,4 +1,4 @@
-from django.newforms.models import ModelFormMetaclass, ModelForm
+from django.forms.models import ModelFormMetaclass, ModelForm
 from django.template import RequestContext, loader
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.core.xheaders import populate_xheaders

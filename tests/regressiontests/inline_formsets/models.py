@@ -15,7 +15,7 @@ class Child(models.Model):
 
 __test__ = {'API_TESTS': """
 
->>> from django.newforms.models import inlineformset_factory
+>>> from django.forms.models import inlineformset_factory
 
 
 Child has two ForeignKeys to Parent, so if we don't specify which one to use

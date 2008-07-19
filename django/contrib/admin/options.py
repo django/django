@@ -1,8 +1,8 @@
 from django import oldforms, template
-from django import newforms as forms
-from django.newforms.formsets import all_valid
-from django.newforms.models import modelform_factory, inlineformset_factory
-from django.newforms.models import BaseInlineFormset
+from django import forms
+from django.forms.formsets import all_valid
+from django.forms.models import modelform_factory, inlineformset_factory
+from django.forms.models import BaseInlineFormset
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets
 from django.contrib.admin.util import quote, unquote, get_deleted_objects
@@ -775,11 +775,11 @@ class InlineAdminForm(AdminForm):
         return AdminField(self.form, self.formset._pk_field_name, False)
 
     def deletion_field(self):
-        from django.newforms.formsets import DELETION_FIELD_NAME
+        from django.forms.formsets import DELETION_FIELD_NAME
         return AdminField(self.form, DELETION_FIELD_NAME, False)
 
     def ordering_field(self):
-        from django.newforms.formsets import ORDERING_FIELD_NAME
+        from django.forms.formsets import ORDERING_FIELD_NAME
         return AdminField(self.form, ORDERING_FIELD_NAME, False)
 
 class AdminErrorList(forms.util.ErrorList):

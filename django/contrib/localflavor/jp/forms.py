@@ -3,9 +3,9 @@ JP-specific Form helpers
 """
 
 from django.core import validators
-from django.newforms import ValidationError
+from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
-from django.newforms.fields import RegexField, Select
+from django.forms.fields import RegexField, Select
 
 class JPPostalCodeField(RegexField):
     """

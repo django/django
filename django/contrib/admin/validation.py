@@ -1,7 +1,7 @@
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.newforms.models import BaseModelForm, BaseModelFormSet, fields_for_model
+from django.forms.models import BaseModelForm, BaseModelFormSet, fields_for_model
 from django.contrib.admin.options import flatten_fieldsets, BaseModelAdmin
 from django.contrib.admin.options import HORIZONTAL, VERTICAL
 

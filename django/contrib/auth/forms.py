@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from django.contrib.sites.models import Site
 from django.template import Context, loader
 from django.core import validators
-from django import newforms as forms
+from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 class UserCreationForm(forms.ModelForm):

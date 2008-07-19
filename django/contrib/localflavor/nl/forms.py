@@ -4,8 +4,8 @@ NL-specific Form helpers
 
 import re
 
-from django.newforms import ValidationError
-from django.newforms.fields import Field, Select, EMPTY_VALUES
+from django.forms import ValidationError
+from django.forms.fields import Field, Select, EMPTY_VALUES
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 

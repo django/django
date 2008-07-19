@@ -5,7 +5,7 @@ Extra HTML Widget classes
 import datetime
 import re
 
-from django.newforms.widgets import Widget, Select
+from django.forms.widgets import Widget, Select
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 

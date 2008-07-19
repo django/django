@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-import django.newforms as forms
+from django import forms
 from django.views.generic.create_update import create_object
 
 from models import Article

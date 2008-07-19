@@ -79,8 +79,8 @@ class ImageFile(models.Model):
         return self.description
 
 __test__ = {'API_TESTS': """
->>> from django import newforms as forms
->>> from django.newforms.models import ModelForm
+>>> from django import forms
+>>> from django.forms.models import ModelForm
 >>> from django.core.files.uploadedfile import SimpleUploadedFile
 
 The bare bones, absolutely nothing custom, basic case.
@@ -113,7 +113,7 @@ Replacing a field.
 ...         model = Category
 
 >>> CategoryForm.base_fields['url'].__class__
-<class 'django.newforms.fields.BooleanField'>
+<class 'django.forms.fields.BooleanField'>
 
 
 Using 'fields'.
@@ -211,7 +211,7 @@ We can also subclass the Meta inner class to change the fields list.
 
 # Old form_for_x tests #######################################################
 
->>> from django.newforms import ModelForm, CharField
+>>> from django.forms import ModelForm, CharField
 >>> import datetime
 
 >>> Category.objects.all()
@@ -605,7 +605,7 @@ the data in the database when the form is instantiated.
 
 # ModelChoiceField ############################################################
 
->>> from django.newforms import ModelChoiceField, ModelMultipleChoiceField
+>>> from django.forms import ModelChoiceField, ModelMultipleChoiceField
 
 >>> f = ModelChoiceField(Category.objects.all())
 >>> list(f.choices)

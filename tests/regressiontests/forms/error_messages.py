@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 tests = r"""
->>> from django.newforms import *
+>>> from django.forms import *
 >>> from django.core.files.uploadedfile import SimpleUploadedFile
 
 # CharField ###################################################################

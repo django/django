@@ -26,7 +26,7 @@ __test__ = {'API_TESTS': """
 
 >>> from datetime import date
 
->>> from django.newforms.models import modelformset_factory
+>>> from django.forms.models import modelformset_factory
 
 >>> qs = Author.objects.all()
 >>> AuthorFormSet = modelformset_factory(Author, extra=3)
@@ -227,7 +227,7 @@ used.
 We can also create a formset that is tied to a parent model. This is how the
 admin system's edit inline functionality works.
 
->>> from django.newforms.models import inlineformset_factory
+>>> from django.forms.models import inlineformset_factory
 
 >>> AuthorBooksFormSet = inlineformset_factory(Author, Book, can_delete=False, extra=3)
 >>> author = Author.objects.get(name='Charles Baudelaire')

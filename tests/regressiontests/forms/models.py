@@ -15,7 +15,7 @@ class ChoiceModel(models.Model):
     name = models.CharField(max_length=10)
 
 __test__ = {'API_TESTS': """
->>> from django.newforms import form_for_model, form_for_instance
+>>> from django.forms import form_for_model, form_for_instance
 
 # Boundary conditions on a PostitiveIntegerField #########################
 >>> BoundaryForm = form_for_model(BoundaryModel)

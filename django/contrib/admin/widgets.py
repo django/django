@@ -4,9 +4,9 @@ Form Widget classes specific to the Django admin site.
 
 import copy
 
-from django import newforms as forms
-from django.newforms.widgets import RadioFieldRenderer
-from django.newforms.util import flatatt
+from django import forms
+from django.forms.widgets import RadioFieldRenderer
+from django.forms.util import flatatt
 from django.utils.datastructures import MultiValueDict
 from django.utils.text import capfirst, truncate_words
 from django.utils.translation import ugettext as _

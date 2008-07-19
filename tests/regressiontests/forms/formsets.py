@@ -5,8 +5,8 @@ tests = """
 FormSet allows us to use multiple instance of the same form on 1 page. For now,
 the best way to create a FormSet is by using the formset_factory function.
 
->>> from django.newforms import Form, CharField, IntegerField, ValidationError
->>> from django.newforms.formsets import formset_factory, BaseFormSet
+>>> from django.forms import Form, CharField, IntegerField, ValidationError
+>>> from django.forms.formsets import formset_factory, BaseFormSet
 
 >>> class Choice(Form):
 ...     choice = CharField()

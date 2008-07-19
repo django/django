@@ -155,7 +155,7 @@ False
 [<Article: John's second story>, <Article: This is a test>]
 
 # And should work fine with the unicode that comes out of
-# newforms.Form.cleaned_data
+# forms.Form.cleaned_data
 >>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_reporter.last_name='%s'" % u'Smith'])
 [<Article: John's second story>, <Article: This is a test>]
 

@@ -3,8 +3,8 @@
 PE-specific Form helpers.
 """
 
-from django.newforms import ValidationError
-from django.newforms.fields import RegexField, CharField, Select, EMPTY_VALUES
+from django.forms import ValidationError
+from django.forms.fields import RegexField, CharField, Select, EMPTY_VALUES
 from django.utils.translation import ugettext_lazy as _
 
 class PEDepartmentSelect(Select):

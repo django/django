@@ -2,7 +2,7 @@
 # Tests for the media handling on widgets and forms
 
 media_tests = r"""
->>> from django.newforms import TextInput, Media, TextInput, CharField, Form, MultiWidget
+>>> from django.forms import TextInput, Media, TextInput, CharField, Form, MultiWidget
 >>> from django.conf import settings
 >>> ORIGINAL_MEDIA_URL = settings.MEDIA_URL
 >>> settings.MEDIA_URL = 'http://media.example.com/media/'
