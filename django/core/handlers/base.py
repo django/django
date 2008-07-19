@@ -182,10 +182,11 @@ def get_script_name(environ):
     Note: this isn't used by the mod_python handler, since the equivalent of
     SCRIPT_NAME isn't available there.
     """
-    # If mod_rewrite had a whack at the URL, Apache set SCRIPT_URL to
-    # SCRIPT_NAME before applying any rewrites.
-    script_url = force_unicode(environ.get('SCRIPT_URL', ''))
-    if script_url:
-        return script_url
+    if not environ.get('DJANGO_USE_POST_REWRITE'):
+        # If mod_rewrite had a whack at the URL, Apache set SCRIPT_URL to
+        # SCRIPT_NAME before applying any rewrites.
+        script_url = force_unicode(environ.get('SCRIPT_URL', ''))
+        if script_url:
+            return script_url
     return force_unicode(environ.get('SCRIPT_NAME', ''))
 
