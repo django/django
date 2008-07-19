@@ -2196,7 +2196,7 @@ form::
     ...     pub_date = forms.DateField()
 
 You might want to allow the user to create several articles at once. To create
-a formset of ``ArticleForm``s you would do::
+a formset of out of an ``ArticleForm`` you would do::
 
     >>> from django.newforms.formsets import formset_factory
     >>> ArticleFormSet = formset_factory(ArticleForm)
@@ -2471,8 +2471,8 @@ default fields/attributes of the order and deletion fields::
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
     <tr><th><label for="id_form-0-my_field">My field:</label></th><td><input type="text" name="form-0-my_field" id="id_form-0-my_field" /></td></tr>
 
-Using a formsets in views and templates
----------------------------------------
+Using a formset in views and templates
+--------------------------------------
 
 Using a formset inside a view is as easy as using a regular ``Form`` class.
 The only thing you will want to be aware of is making sure to use the
