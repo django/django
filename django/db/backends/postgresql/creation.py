@@ -13,7 +13,6 @@ DATA_TYPES = {
     'FileField':         'varchar(%(max_length)s)',
     'FilePathField':     'varchar(%(max_length)s)',
     'FloatField':        'double precision',
-    'ImageField':        'varchar(%(max_length)s)',
     'IntegerField':      'integer',
     'IPAddressField':    'inet',
     'NullBooleanField':  'boolean',

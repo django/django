@@ -40,6 +40,11 @@ Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     supports_constraints = False
+    # SQLite cannot handle us only partially reading from a cursor's result set
+    # and then writing the same rows to the database in another cursor. This
+    # setting ensures we always read result sets fully into memory all in one
+    # go.
+    can_use_chunked_reads = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
@@ -105,6 +110,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _cursor(self, settings):
         if self.connection is None:
+            if not settings.DATABASE_NAME:
+                from django.core.exceptions import ImproperlyConfigured
+                raise ImproperlyConfigured, "Please fill out DATABASE_NAME in the settings module before using the database."
             kwargs = {
                 'database': settings.DATABASE_NAME,
                 'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,

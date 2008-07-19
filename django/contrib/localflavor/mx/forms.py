@@ -2,7 +2,7 @@
 Mexican-specific form helpers.
 """
 
-from django.newforms.fields import Select
+from django.forms.fields import Select
 
 class MXStateSelect(Select):
     """

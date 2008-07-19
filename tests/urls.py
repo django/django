@@ -20,6 +20,9 @@ urlpatterns = patterns('',
 
     # test urlconf for middleware tests
     (r'^middleware/', include('regressiontests.middleware.urls')),
+    
+    # admin view tests
+    (r'^test_admin/', include('regressiontests.admin_views.urls')),
 
     (r'^utils/', include('regressiontests.utils.urls')),
 

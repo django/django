@@ -15,7 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, 
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
 from django.db.models.query import delete_objects, Q, CollectedObjects
-from django.db.models.options import Options, AdminOptions
+from django.db.models.options import Options
 from django.db import connection, transaction
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
@@ -137,9 +137,6 @@ class ModelBase(type):
         return get_model(new_class._meta.app_label, name, False)
 
     def add_to_class(cls, name, value):
-        if name == 'Admin':
-            assert type(value) == types.ClassType, "%r attribute of %s model must be a class, not a %s object" % (name, cls.__name__, type(value))
-            value = AdminOptions(**dict([(k, v) for k, v in value.__dict__.items() if not k.startswith('_')]))
         if hasattr(value, 'contribute_to_class'):
             value.contribute_to_class(cls, name)
         else:
@@ -429,7 +426,7 @@ class Model(object):
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
-        return force_unicode(dict(field.choices).get(value, value), strings_only=True)
+        return force_unicode(dict(field.flatchoices).get(value, value), strings_only=True)
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         op = is_next and 'gt' or 'lt'
@@ -487,9 +484,7 @@ class Model(object):
         if isinstance(raw_field, dict):
             import warnings
             warnings.warn(
-                message = "Representing uploaded files as dictionaries is"\
-                          " deprecated. Use django.core.files.SimpleUploadedFile"\
-                          " instead.",
+                message = "Representing uploaded files as dictionaries is deprecated. Use django.core.files.uploadedfile.SimpleUploadedFile instead.",
                 category = DeprecationWarning,
                 stacklevel = 2
             )
@@ -499,9 +494,7 @@ class Model(object):
         elif isinstance(raw_field, basestring):
             import warnings
             warnings.warn(
-                message = "Representing uploaded files as strings is "\
-                          " deprecated. Use django.core.files.SimpleUploadedFile "\
-                          " instead.",
+                message = "Representing uploaded files as dictionaries is deprecated. Use django.core.files.uploadedfile.SimpleUploadedFile instead.",
                 category = DeprecationWarning,
                 stacklevel = 2
             )

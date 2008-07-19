@@ -53,7 +53,7 @@ class AdminScriptTestCase(unittest.TestCase):
         
         # Build the command line
         cmd = 'python "%s"' % script
-        cmd += ''.join(' %s' % arg for arg in args)
+        cmd += ''.join([' %s' % arg for arg in args])
         
         # Remember the old environment
         old_django_settings_module = os.environ.get('DJANGO_SETTINGS_MODULE', None)
@@ -108,7 +108,7 @@ class AdminScriptTestCase(unittest.TestCase):
         self.assertEquals(len(stream), 0, "Stream should be empty: actually contains '%s'" % stream)
     def assertOutput(self, stream, msg):
         "Utility assertion: assert that the given message exists in the output"
-        self.assertTrue(msg in stream, "'%s' does not match actual output text '%s'" % (msg, stream))
+        self.failUnless(msg in stream, "'%s' does not match actual output text '%s'" % (msg, stream))
 
 ##########################################################################
 # DJANGO ADMIN TESTS

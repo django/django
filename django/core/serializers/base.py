@@ -8,6 +8,7 @@ except ImportError:
     from StringIO import StringIO
 from django.db import models
 from django.utils.encoding import smart_str, smart_unicode
+from django.utils import datetime_safe
 
 class SerializationError(Exception):
     """Something bad happened during serialization."""
@@ -59,7 +60,8 @@ class Serializer(object):
         Convert a field's value to a string.
         """
         if isinstance(field, models.DateTimeField):
-            value = getattr(obj, field.name).strftime("%Y-%m-%d %H:%M:%S")
+            d = datetime_safe.new_datetime(getattr(obj, field.name))
+            value = d.strftime("%Y-%m-%d %H:%M:%S")
         else:
             value = field.flatten_data(follow=None, obj=obj).get(field.name, "")
         return smart_unicode(value)

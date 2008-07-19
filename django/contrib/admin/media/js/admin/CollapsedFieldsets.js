@@ -47,7 +47,7 @@ var CollapsedFieldsets = {
         // Returns true if any fields in the fieldset have validation errors.
         var divs = fs.getElementsByTagName('div');
         for (var i=0; i<divs.length; i++) {
-            if (divs[i].className.match(/\berror\b/)) {
+            if (divs[i].className.match(/\berrors\b/)) {
                 return true;
             }
         }

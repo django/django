@@ -205,6 +205,11 @@ model. There are three parts to setting up a ``GenericForeignKey``:
        models you'll be relating to. (For most models, this means an
        ``IntegerField`` or ``PositiveIntegerField``.)
 
+   	   This field must be of the same type as the primary key of the models
+   	   that will be involved in the generic relation. For example, if you use
+   	   ``IntegerField``, you won't be able to form a generic relation with a
+   	   model that uses a ``CharField`` as a primary key.
+
     3. Give your model a ``GenericForeignKey``, and pass it the names of
        the two fields described above. If these fields are named
        "content_type" and "object_id", you can omit this -- those are the

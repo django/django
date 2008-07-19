@@ -4,16 +4,17 @@ Various complex queries that have been problematic in the past.
 
 import datetime
 import pickle
+import sys
 
 from django.db import models
-from django.db.models.query import Q
+from django.db.models.query import Q, ITER_CHUNK_SIZE
 
 # Python 2.3 doesn't have sorted()
 try:
     sorted
 except NameError:
     from django.utils.itercompat import sorted
-                
+
 class Tag(models.Model):
     name = models.CharField(max_length=10)
     parent = models.ForeignKey('self', blank=True, null=True,
@@ -483,23 +484,6 @@ Bug #2076
 >>> Cover.objects.all()
 [<Cover: first>, <Cover: second>]
 
-# If you're not careful, it's possible to introduce infinite loops via default
-# ordering on foreign keys in a cycle. We detect that.
->>> LoopX.objects.all()
-Traceback (most recent call last):
-...
-FieldError: Infinite loop caused by ordering.
-
->>> LoopZ.objects.all()
-Traceback (most recent call last):
-...
-FieldError: Infinite loop caused by ordering.
-
-# ... but you can still order in a non-recursive fashion amongst linked fields
-# (the previous test failed because the default ordering was recursive).
->>> LoopX.objects.all().order_by('y__x__y__x__id')
-[]
-
 # If the remote model does not have a default ordering, we order by its 'id'
 # field.
 >>> Item.objects.order_by('creator', 'name')
@@ -820,5 +804,47 @@ Bug #7698 -- People like to slice with '0' as the high-water mark.
 >>> Item.objects.all()[0:0]
 []
 
+Bug #7411 - saving to db must work even with partially read result set in
+another cursor.
+
+>>> for num in range(2 * ITER_CHUNK_SIZE + 1):
+...     _ = Number.objects.create(num=num)
+
+>>> for i, obj in enumerate(Number.objects.all()):
+...     obj.save()
+...     if i > 10: break
+
+Bug #7759 -- count should work with a partially read result set.
+>>> count = Number.objects.count()
+>>> qs = Number.objects.all()
+>>> for obj in qs:
+...     qs.count() == count
+...     break
+True
+
 """}
 
+# In Python 2.3, exceptions raised in __len__ are swallowed (Python issue
+# 1242657), so these cases return an empty list, rather than raising an
+# exception. Not a lot we can do about that, unfortunately, due to the way
+# Python handles list() calls internally. Thus, we skip the tests for Python
+# 2.3.
+if sys.version_info >= (2, 4):
+    __test__["API_TESTS"] += """
+# If you're not careful, it's possible to introduce infinite loops via default
+# ordering on foreign keys in a cycle. We detect that.
+>>> LoopX.objects.all()
+Traceback (most recent call last):
+...
+FieldError: Infinite loop caused by ordering.
+
+>>> LoopZ.objects.all()
+Traceback (most recent call last):
+...
+FieldError: Infinite loop caused by ordering.
+
+# ... but you can still order in a non-recursive fashion amongst linked fields
+# (the previous test failed because the default ordering was recursive).
+>>> LoopX.objects.all().order_by('y__x__y__x__id')
+[]
+"""

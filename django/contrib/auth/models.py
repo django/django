@@ -91,16 +91,12 @@ class Group(models.Model):
     Beyond permissions, groups are a convenient way to categorize users to apply some label, or extended functionality, to them. For example, you could create a group 'Special users', and you could write code that would do special things to those users -- such as giving them access to a members-only portion of your site, or sending them members-only e-mail messages.
     """
     name = models.CharField(_('name'), max_length=80, unique=True)
-    permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True, filter_interface=models.HORIZONTAL)
+    permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True)
 
     class Meta:
         verbose_name = _('group')
         verbose_name_plural = _('groups')
-
-    class Admin:
-        search_fields = ('name',)
-        ordering = ('name',)
-
+        
     def __unicode__(self):
         return self.name
 
@@ -147,26 +143,13 @@ class User(models.Model):
     date_joined = models.DateTimeField(_('date joined'), default=datetime.datetime.now)
     groups = models.ManyToManyField(Group, verbose_name=_('groups'), blank=True,
         help_text=_("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
-    user_permissions = models.ManyToManyField(Permission, verbose_name=_('user permissions'), blank=True, filter_interface=models.HORIZONTAL)
+    user_permissions = models.ManyToManyField(Permission, verbose_name=_('user permissions'), blank=True)
     objects = UserManager()
 
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-
-    class Admin:
-        fields = (
-            (None, {'fields': ('username', 'password')}),
-            (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
-            (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
-            (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
-            (_('Groups'), {'fields': ('groups',)}),
-        )
-        list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
-        list_filter = ('is_staff', 'is_superuser')
-        search_fields = ('username', 'first_name', 'last_name', 'email')
-        ordering = ('username',)
-
+        
     def __unicode__(self):
         return self.username
 

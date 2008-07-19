@@ -5,12 +5,11 @@ This example exists purely to point out errors in models.
 """
 
 from django.db import models
-
+model_errors = ""
 class FieldErrors(models.Model):
     charfield = models.CharField()
     decimalfield = models.DecimalField()
     filefield = models.FileField()
-    prepopulate = models.CharField(max_length=10, prepopulate_from='bad')
     choices = models.CharField(max_length=10, choices='bad')
     choices2 = models.CharField(max_length=10, choices=[(1,2,3),(1,2,3)])
     index = models.CharField(max_length=10, db_index='bad')
@@ -116,7 +115,6 @@ model_errors = """invalid_models.fielderrors: "charfield": CharFields require a 
 invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute.
 invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute.
 invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
-invalid_models.fielderrors: "prepopulate": prepopulate_from should be a list or tuple.
 invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tuple or list).
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.

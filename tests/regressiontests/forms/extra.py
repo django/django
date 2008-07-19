@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 tests = r"""
->>> from django.newforms import *
+>>> from django.forms import *
 >>> from django.utils.encoding import force_unicode
 >>> import datetime
 >>> import time
@@ -14,12 +14,12 @@ tests = r"""
 # Extra stuff #
 ###############
 
-The newforms library comes with some extra, higher-level Field and Widget
+The forms library comes with some extra, higher-level Field and Widget
 classes that demonstrate some of the library's abilities.
 
 # SelectDateWidget ############################################################
 
->>> from django.newforms.extras import SelectDateWidget
+>>> from django.forms.extras import SelectDateWidget
 >>> w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'))
 >>> print w.render('mydate', '')
 <select name="mydate_month" id="id_mydate_month">
@@ -424,7 +424,7 @@ u'sirrobin'
 # Test overriding ErrorList in a form #
 #######################################
 
->>> from django.newforms.util import ErrorList
+>>> from django.forms.util import ErrorList
 >>> class DivErrorList(ErrorList):
 ...     def __unicode__(self):
 ...         return self.as_divs()

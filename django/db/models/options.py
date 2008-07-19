@@ -11,7 +11,6 @@ from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.db.models.loading import get_models, app_cache_ready
-from django.db.models import Manager
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.datastructures import SortedDict
@@ -485,77 +484,3 @@ class Options(object):
             else:
                 self._field_types[field_type] = False
         return self._field_types[field_type]
-
-class AdminOptions(object):
-    def __init__(self, fields=None, js=None, list_display=None, list_display_links=None, list_filter=None,
-        date_hierarchy=None, save_as=False, ordering=None, search_fields=None,
-        save_on_top=False, list_select_related=False, manager=None, list_per_page=100):
-        self.fields = fields
-        self.js = js or []
-        self.list_display = list_display or ['__str__']
-        self.list_display_links = list_display_links or []
-        self.list_filter = list_filter or []
-        self.date_hierarchy = date_hierarchy
-        self.save_as, self.ordering = save_as, ordering
-        self.search_fields = search_fields or []
-        self.save_on_top = save_on_top
-        self.list_select_related = list_select_related
-        self.list_per_page = list_per_page
-        self.manager = manager or Manager()
-
-    def get_field_sets(self, opts):
-        "Returns a list of AdminFieldSet objects for this AdminOptions object."
-        if self.fields is None:
-            field_struct = ((None, {'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, AutoField)]}),)
-        else:
-            field_struct = self.fields
-        new_fieldset_list = []
-        for fieldset in field_struct:
-            fs_options = fieldset[1]
-            classes = fs_options.get('classes', ())
-            description = fs_options.get('description', '')
-            new_fieldset_list.append(AdminFieldSet(fieldset[0], classes,
-                opts.get_field, fs_options['fields'], description))
-        return new_fieldset_list
-
-    def contribute_to_class(self, cls, name):
-        cls._meta.admin = self
-        # Make sure the admin manager has access to the model
-        self.manager.model = cls
-
-class AdminFieldSet(object):
-    def __init__(self, name, classes, field_locator_func, line_specs, description):
-        self.name = name
-        self.field_lines = [AdminFieldLine(field_locator_func, line_spec) for line_spec in line_specs]
-        self.classes = classes
-        self.description = description
-
-    def __repr__(self):
-        return "FieldSet: (%s, %s)" % (self.name, self.field_lines)
-
-    def bind(self, field_mapping, original, bound_field_set_class):
-        return bound_field_set_class(self, field_mapping, original)
-
-    def __iter__(self):
-        for field_line in self.field_lines:
-            yield field_line
-
-    def __len__(self):
-        return len(self.field_lines)
-
-class AdminFieldLine(object):
-    def __init__(self, field_locator_func, linespec):
-        if isinstance(linespec, basestring):
-            self.fields = [field_locator_func(linespec)]
-        else:
-            self.fields = [field_locator_func(field_name) for field_name in linespec]
-
-    def bind(self, field_mapping, original, bound_field_line_class):
-        return bound_field_line_class(self, field_mapping, original)
-
-    def __iter__(self):
-        for field in self.fields:
-            yield field
-
-    def __len__(self):
-        return len(self.fields)

@@ -26,6 +26,8 @@ from localflavor.za import tests as localflavor_za_tests
 from regressions import tests as regression_tests
 from util import tests as util_tests
 from widgets import tests as widgets_tests
+from formsets import tests as formset_tests
+from media import media_tests
 
 __test__ = {
     'extra_tests': extra_tests,
@@ -53,6 +55,8 @@ __test__ = {
     'localflavor_us_tests': localflavor_us_tests,
     'localflavor_za_tests': localflavor_za_tests,
     'regression_tests': regression_tests,
+    'formset_tests': formset_tests,
+    'media_tests': media_tests,
     'util_tests': util_tests,
     'widgets_tests': widgets_tests,
 }

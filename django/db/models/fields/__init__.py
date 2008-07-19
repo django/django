@@ -14,7 +14,7 @@ from django.dispatch import dispatcher
 from django.conf import settings
 from django.core import validators
 from django import oldforms
-from django import newforms as forms
+from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import curry
@@ -23,19 +23,14 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
 from django.utils.maxlength import LegacyMaxlength
+from django.utils import datetime_safe
 
 class NOT_PROVIDED:
     pass
 
-# Values for filter_interface.
-HORIZONTAL, VERTICAL = 1, 2
-
 # The values to use for "blank" in SelectFields. Will be appended to the start of most "choices" lists.
 BLANK_CHOICE_DASH = [("", "---------")]
 BLANK_CHOICE_NONE = [("", "None")]
-
-# returns the <ul> class for a given radio_admin value
-get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
 
 class FieldDoesNotExist(Exception):
     pass
@@ -84,10 +79,10 @@ class Field(object):
     def __init__(self, verbose_name=None, name=None, primary_key=False,
             max_length=None, unique=False, blank=False, null=False,
             db_index=False, core=False, rel=None, default=NOT_PROVIDED,
-            editable=True, serialize=True, prepopulate_from=None,
-            unique_for_date=None, unique_for_month=None, unique_for_year=None,
-            validator_list=None, choices=None, radio_admin=None, help_text='',
-            db_column=None, db_tablespace=None, auto_created=False):
+            editable=True, serialize=True, unique_for_date=None,
+            unique_for_month=None, unique_for_year=None, validator_list=None,
+            choices=None, help_text='', db_column=None, db_tablespace=None,
+            auto_created=False):
         self.name = name
         self.verbose_name = verbose_name
         self.primary_key = primary_key
@@ -101,11 +96,9 @@ class Field(object):
         self.editable = editable
         self.serialize = serialize
         self.validator_list = validator_list or []
-        self.prepopulate_from = prepopulate_from
         self.unique_for_date, self.unique_for_month = unique_for_date, unique_for_month
         self.unique_for_year = unique_for_year
         self._choices = choices or []
-        self.radio_admin = radio_admin
         self.help_text = help_text
         self.db_column = db_column
         self.db_tablespace = db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
@@ -297,13 +290,9 @@ class Field(object):
             params['max_length'] = self.max_length
 
         if self.choices:
-            if self.radio_admin:
-                field_objs = [oldforms.RadioSelectField]
-                params['ul_class'] = get_ul_class(self.radio_admin)
-            else:
-                field_objs = [oldforms.SelectField]
+            field_objs = [oldforms.SelectField]
 
-            params['choices'] = self.get_choices_default()
+            params['choices'] = self.flatchoices
         else:
             field_objs = self.get_manipulator_field_objs()
         return (field_objs, params)
@@ -389,10 +378,7 @@ class Field(object):
         return first_choice + lst
 
     def get_choices_default(self):
-        if self.radio_admin:
-            return self.get_choices(include_blank=self.blank, blank_choice=BLANK_CHOICE_NONE)
-        else:
-            return self.get_choices()
+        return self.get_choices()
 
     def _get_val_from_obj(self, obj):
         if obj:
@@ -425,11 +411,21 @@ class Field(object):
             return self._choices
     choices = property(_get_choices)
 
+    def _get_flatchoices(self):
+        flat = []
+        for choice, value in self.get_choices_default():
+            if type(value) in (list, tuple):
+                flat.extend(value)
+            else:
+                flat.append((choice,value))
+        return flat
+    flatchoices = property(_get_flatchoices)
+    
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)
 
     def formfield(self, form_class=forms.CharField, **kwargs):
-        "Returns a django.newforms.Field instance for this database Field."
+        "Returns a django.forms.Field instance for this database Field."
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         if self.choices:
             defaults['widget'] = forms.Select(choices=self.get_choices(include_blank=self.blank or not (self.has_default() or 'initial' in kwargs)))
@@ -561,7 +557,7 @@ class DateField(Field):
         if lookup_type in ('range', 'in'):
             value = [smart_unicode(v) for v in value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte') and hasattr(value, 'strftime'):
-            value = value.strftime('%Y-%m-%d')
+            value = datetime_safe.new_date(value).strftime('%Y-%m-%d')
         else:
             value = smart_unicode(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
@@ -593,7 +589,7 @@ class DateField(Field):
         # Casts dates into string format for entry into database.
         if value is not None:
             try:
-                value = value.strftime('%Y-%m-%d')
+                value = datetime_safe.new_date(value).strftime('%Y-%m-%d')
             except AttributeError:
                 # If value is already a string it won't have a strftime method,
                 # so we'll just let it pass through.
@@ -605,7 +601,11 @@ class DateField(Field):
 
     def flatten_data(self, follow, obj=None):
         val = self._get_val_from_obj(obj)
-        return {self.attname: (val is not None and val.strftime("%Y-%m-%d") or '')}
+        if val is None:
+            data = ''
+        else:
+            data = datetime_safe.new_date(val).strftime("%Y-%m-%d")
+        return {self.attname: data}
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.DateField}
@@ -672,8 +672,13 @@ class DateTimeField(DateField):
     def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj)
         date_field, time_field = self.get_manipulator_field_names('')
-        return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
-                time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
+        if val is None:
+            date_data = time_data = ''
+        else:
+            d = datetime_safe.new_datetime(val)
+            date_data = d.strftime('%Y-%m-%d')
+            time_data = d.strftime('%H:%M:%S')
+        return {date_field: date_data, time_field: time_data}
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.DateTimeField}
@@ -936,9 +941,6 @@ class ImageField(FileField):
         if not self.height_field:
             setattr(cls, 'get_%s_height' % self.name, curry(cls._get_FIELD_height, field=self))
 
-    def get_internal_type(self):
-        return "ImageField"
-
     def save_file(self, new_data, new_object, original_object, change, rel, save=True):
         FileField.save_file(self, new_data, new_object, original_object, change, rel, save)
         # If the image has height and/or width field(s) and they haven't
@@ -1009,7 +1011,11 @@ class NullBooleanField(Field):
         return [oldforms.NullBooleanField]
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.NullBooleanField}
+        defaults = {
+            'form_class': forms.NullBooleanField,
+            'required': not self.blank,
+            'label': capfirst(self.verbose_name),
+            'help_text': self.help_text}
         defaults.update(kwargs)
         return super(NullBooleanField, self).formfield(**defaults)
 

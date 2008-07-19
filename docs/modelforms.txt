@@ -376,3 +376,125 @@ There are a couple of things to note, however.
 
 Chances are these notes won't affect you unless you're trying to do something
 tricky with subclassing.
+
+Model Formsets
+==============
+
+Similar to regular formsets there are a couple enhanced formset classes that
+provide all the right things to work with your models. Lets reuse the
+``Author`` model from above::
+
+    >>> from django.newforms.models import modelformset_factory
+    >>> AuthorFormSet = modelformset_factory(Author)
+
+This will create a formset that is capable of working with the data associated
+to the ``Author`` model. It works just like a regular formset::
+
+    >>> formset = AuthorFormSet()
+    >>> print formset
+    <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS" />
+    <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" maxlength="100" /></td></tr>
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><select name="form-0-title" id="id_form-0-title">
+    <option value="" selected="selected">---------</option>
+    <option value="MR">Mr.</option>
+    <option value="MRS">Mrs.</option>
+    <option value="MS">Ms.</option>
+    </select></td></tr>
+    <tr><th><label for="id_form-0-birth_date">Birth date:</label></th><td><input type="text" name="form-0-birth_date" id="id_form-0-birth_date" /><input type="hidden" name="form-0-id" id="id_form-0-id" /></td></tr>
+
+.. note::
+    One thing to note is that ``modelformset_factory`` uses ``formset_factory``
+    and by default uses ``can_delete=True``.
+
+Changing the queryset
+---------------------
+
+By default when you create a formset from a model the queryset will be all
+objects in the model. This is best shown as ``Author.objects.all()``. This is
+configurable::
+
+    >>> formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
+
+Alternatively, you can use a subclassing based approach::
+
+    from django.newforms.models import BaseModelFormSet
+    
+    class BaseAuthorFormSet(BaseModelFormSet):
+        def get_queryset(self):
+            return super(BaseAuthorFormSet, self).get_queryset().filter(name__startswith='O')
+
+Then your ``BaseAuthorFormSet`` would be passed into the factory function to
+be used as a base::
+
+    >>> AuthorFormSet = modelformset_factory(Author, formset=BaseAuthorFormSet)
+
+Saving objects in the formset
+-----------------------------
+
+Similar to a ``ModelForm`` you can save the data into the model. This is done
+with the ``save()`` method on the formset::
+
+    # create a formset instance with POST data.
+    >>> formset = AuthorFormSet(request.POST)
+    
+    # assuming all is valid, save the data
+    >>> instances = formset.save()
+
+The ``save()`` method will return the instances that have been saved to the
+database. If an instance did not change in the bound data it will not be
+saved to the database and not found in ``instances`` in the above example.
+
+You can optionally pass in ``commit=False`` to ``save()`` to only return the
+model instances without any database interaction::
+
+    # don't save to the database
+    >>> instances = formset.save(commit=False)
+    >>> for instance in instances:
+    ...     # do something with instance
+    ...     instance.save()
+
+This gives you the ability to attach data to the instances before saving them
+to the database. If your formset contains a ``ManyToManyField`` you will also
+need to make a call to ``formset.save_m2m()`` to ensure the many-to-many
+relationships are saved properly.
+
+Limiting the number of objects editable
+---------------------------------------
+
+Similar to regular formsets you can use the ``max_num`` parameter to
+``modelformset_factory`` to limit the number of forms displayed. With
+model formsets this will properly limit the query to only select the maximum
+number of objects needed::
+
+    >>> Author.objects.order_by('name')
+    [<Author: Charles Baudelaire>, <Author: Paul Verlaine>, <Author: Walt Whitman>]
+    
+    >>> AuthorFormSet = modelformset_factory(Author, max_num=2, extra=1)
+    >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
+    >>> formset.initial
+    [{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}]
+
+If the value of ``max_num`` is less than the total objects returned it will
+fill the rest with extra forms::
+
+    >>> AuthorFormSet = modelformset_factory(Author, max_num=4, extra=1)
+    >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" value="Charles Baudelaire" maxlength="100" /><input type="hidden" name="form-0-id" value="1" id="id_form-0-id" /></td></tr>
+    <tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100" /><input type="hidden" name="form-1-id" value="3" id="id_form-1-id" /></td></tr>
+    <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
+    <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
+
+Using ``inlineformset_factory``
+-------------------------------
+
+The ``inlineformset_factory`` is a helper to a common usage pattern of working
+with related objects through a foreign key. Suppose you have two models
+``Author`` and ``Book``. You want to create a formset that works with the
+books of a specific author. Here is how you could accomplish this::
+
+    >>> from django.newforms.models import inlineformset_factory
+    >>> BookFormSet = inlineformset_factory(Author, Book)
+    >>> author = Author.objects.get(name=u'Orson Scott Card')
+    >>> formset = BookFormSet(instance=author)

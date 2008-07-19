@@ -1,5 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
      <a href="../../../../">{% trans "Home" %}</a> &rsaquo;
@@ -8,6 +9,7 @@
      {% trans 'Delete' %}
 </div>
 {% endblock %}
+
 {% block content %}
 {% if perms_lacking %}
     <p>{% blocktrans with object|escape as escaped_object %}Deleting the {{ object_name }} '{{ escaped_object }}' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktrans %}</p>

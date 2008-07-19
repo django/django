@@ -380,7 +380,7 @@ FieldError: Join on field 'headline' not permitted.
 """}
 
 
-if settings.DATABASE_ENGINE not in ('mysql', 'mysql_old'):
+if settings.DATABASE_ENGINE != 'mysql':
     __test__['API_TESTS'] += r"""
 # grouping and backreferences
 >>> Article.objects.filter(headline__regex=r'b(.).*b\1')

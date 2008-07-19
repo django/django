@@ -2,8 +2,8 @@
 DE-specific Form helpers
 """
 
-from django.newforms import ValidationError
-from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
+from django.forms import ValidationError
+from django.forms.fields import Field, RegexField, Select, EMPTY_VALUES
 from django.utils.translation import ugettext_lazy as _
 import re
 

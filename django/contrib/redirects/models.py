@@ -3,7 +3,7 @@ from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
 
 class Redirect(models.Model):
-    site = models.ForeignKey(Site, radio_admin=models.VERTICAL)
+    site = models.ForeignKey(Site)
     old_path = models.CharField(_('redirect from'), max_length=200, db_index=True,
         help_text=_("This should be an absolute path, excluding the domain name. Example: '/events/search/'."))
     new_path = models.CharField(_('redirect to'), max_length=200, blank=True,
@@ -15,11 +15,21 @@ class Redirect(models.Model):
         db_table = 'django_redirect'
         unique_together=(('site', 'old_path'),)
         ordering = ('old_path',)
-
-    class Admin:
-        list_display = ('old_path', 'new_path')
-        list_filter = ('site',)
-        search_fields = ('old_path', 'new_path')
-
+    
     def __unicode__(self):
-        return u"%s ---> %s" % (self.old_path, self.new_path)
+        return "%s ---> %s" % (self.old_path, self.new_path)
+
+# Register the admin options for these models.
+# TODO: Maybe this should live in a separate module admin.py, but how would we
+# ensure that module was loaded?
+
+from django.contrib import admin
+
+class RedirectAdmin(admin.ModelAdmin):
+    list_display = ('old_path', 'new_path')
+    list_filter = ('site',)
+    search_fields = ('old_path', 'new_path')
+    radio_fields = {'site': admin.VERTICAL}
+
+admin.site.register(Redirect, RedirectAdmin)
+

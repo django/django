@@ -53,6 +53,7 @@ class BaseDatabaseFeatures(object):
     time_field_needs_date = False
     interprets_empty_strings_as_nulls = False
     date_field_supports_time_value = True
+    can_use_chunked_reads = True
 
 class BaseDatabaseOperations(object):
     """

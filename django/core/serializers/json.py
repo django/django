@@ -6,6 +6,7 @@ import datetime
 from django.utils import simplejson
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
+from django.utils import datetime_safe
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -20,7 +21,7 @@ class Serializer(PythonSerializer):
     Convert a queryset to JSON.
     """
     internal_use_only = False
-    
+
     def end_serialization(self):
         self.options.pop('stream', None)
         self.options.pop('fields', None)
@@ -51,9 +52,11 @@ class DjangoJSONEncoder(simplejson.JSONEncoder):
 
     def default(self, o):
         if isinstance(o, datetime.datetime):
-            return o.strftime("%s %s" % (self.DATE_FORMAT, self.TIME_FORMAT))
+            d = datetime_safe.new_datetime(o)
+            return d.strftime("%s %s" % (self.DATE_FORMAT, self.TIME_FORMAT))
         elif isinstance(o, datetime.date):
-            return o.strftime(self.DATE_FORMAT)
+            d = datetime_safe.new_date(o)
+            return d.strftime(self.DATE_FORMAT)
         elif isinstance(o, datetime.time):
             return o.strftime(self.TIME_FORMAT)
         elif isinstance(o, decimal.Decimal):

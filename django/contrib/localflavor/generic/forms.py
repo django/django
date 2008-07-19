@@ -1,4 +1,4 @@
-from django import newforms as forms
+from django import forms
 
 DEFAULT_DATE_INPUT_FORMATS = (
     '%Y-%m-%d', '%d/%m/%Y', '%d/%m/%y', # '2006-10-25', '25/10/2006', '25/10/06'

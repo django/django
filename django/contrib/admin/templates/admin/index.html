@@ -2,15 +2,16 @@
 {% load i18n %}
 
 {% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css{% endblock %}
+
 {% block coltype %}colMS{% endblock %}
+
 {% block bodyclass %}dashboard{% endblock %}
+
 {% block breadcrumbs %}{% endblock %}
+
 {% block content %}
 <div id="content-main">
 
-{% load adminapplist %}
-
-{% get_admin_app_list as app_list %}
 {% if app_list %}
     {% for app in app_list %}
         <div class="module">

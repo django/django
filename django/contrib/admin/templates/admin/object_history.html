@@ -1,16 +1,15 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs"><a href="../../../../">{% trans 'Home' %}</a> &rsaquo; <a href="../../">{{ module_name }}</a> &rsaquo; <a href="../">{{ object|truncatewords:"18" }}</a> &rsaquo; {% trans 'History' %}</div>
 {% endblock %}
 
 {% block content %}
-
 <div id="content-main">
 <div class="module">
 
 {% if action_list %}
-
     <table id="change-history">
         <thead>
         <tr>
@@ -29,14 +28,9 @@
         {% endfor %}
         </tbody>
     </table>
-
 {% else %}
-
     <p>{% trans "This object doesn't have a change history. It probably wasn't added via this admin site." %}</p>
-
 {% endif %}
-
 </div>
 </div>
-
 {% endblock %}

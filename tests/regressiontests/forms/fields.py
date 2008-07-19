@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 tests = r"""
->>> from django.newforms import *
->>> from django.newforms.widgets import RadioFieldRenderer
+>>> from django.forms import *
+>>> from django.forms.widgets import RadioFieldRenderer
 >>> from django.core.files.uploadedfile import SimpleUploadedFile
 >>> import datetime
 >>> import time
@@ -17,7 +17,7 @@ tests = r"""
 ##########
 
 Each Field class does some sort of validation. Each Field has a clean() method,
-which either raises django.newforms.ValidationError or returns the "clean"
+which either raises django.forms.ValidationError or returns the "clean"
 data -- usually a Unicode object, but, in some rare cases, a list.
 
 Each Field's __init__() takes at least these parameters:
@@ -980,7 +980,7 @@ False
 
 # ChoiceField #################################################################
 
->>> f = ChoiceField(choices=[('1', '1'), ('2', '2')])
+>>> f = ChoiceField(choices=[('1', 'One'), ('2', 'Two')])
 >>> f.clean('')
 Traceback (most recent call last):
 ...
@@ -996,9 +996,9 @@ u'1'
 >>> f.clean('3')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
 
->>> f = ChoiceField(choices=[('1', '1'), ('2', '2')], required=False)
+>>> f = ChoiceField(choices=[('1', 'One'), ('2', 'Two')], required=False)
 >>> f.clean('')
 u''
 >>> f.clean(None)
@@ -1010,7 +1010,7 @@ u'1'
 >>> f.clean('3')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
 
 >>> f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')])
 >>> f.clean('J')
@@ -1018,7 +1018,25 @@ u'J'
 >>> f.clean('John')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+ValidationError: [u'Select a valid choice. John is not one of the available choices.']
+
+>>> f = ChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
+>>> f.clean(1)
+u'1'
+>>> f.clean('1')
+u'1'
+>>> f.clean(3)
+u'3'
+>>> f.clean('3')
+u'3'
+>>> f.clean(5)
+u'5'
+>>> f.clean('5')
+u'5'
+>>> f.clean('6')
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 6 is not one of the available choices.']
 
 # NullBooleanField ############################################################
 
@@ -1036,7 +1054,7 @@ False
 
 # MultipleChoiceField #########################################################
 
->>> f = MultipleChoiceField(choices=[('1', '1'), ('2', '2')])
+>>> f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two')])
 >>> f.clean('')
 Traceback (most recent call last):
 ...
@@ -1072,7 +1090,7 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
 
->>> f = MultipleChoiceField(choices=[('1', '1'), ('2', '2')], required=False)
+>>> f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two')], required=False)
 >>> f.clean('')
 []
 >>> f.clean(None)
@@ -1099,6 +1117,29 @@ ValidationError: [u'Enter a list of values.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
+
+>>> f = MultipleChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
+>>> f.clean([1])
+[u'1']
+>>> f.clean(['1'])
+[u'1']
+>>> f.clean([1, 5])
+[u'1', u'5']
+>>> f.clean([1, '5'])
+[u'1', u'5']
+>>> f.clean(['1', 5])
+[u'1', u'5']
+>>> f.clean(['1', '5'])
+[u'1', u'5']
+>>> f.clean(['6'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 6 is not one of the available choices.']
+>>> f.clean(['1','6'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 6 is not one of the available choices.']
+
 
 # ComboField ##################################################################
 
@@ -1153,29 +1194,29 @@ u''
 ...         return x
 ...
 >>> import os
->>> from django import newforms as forms
+>>> from django import forms
 >>> path = forms.__file__
 >>> path = os.path.dirname(path) + '/'
 >>> fix_os_paths(path)
-'.../django/newforms/'
+'.../django/forms/'
 >>> f = forms.FilePathField(path=path)
 >>> f.choices.sort()
 >>> fix_os_paths(f.choices)
-[('.../django/newforms/__init__.py', '__init__.py'), ('.../django/newforms/__init__.pyc', '__init__.pyc'), ('.../django/newforms/fields.py', 'fields.py'), ('.../django/newforms/fields.pyc', 'fields.pyc'), ('.../django/newforms/forms.py', 'forms.py'), ('.../django/newforms/forms.pyc', 'forms.pyc'), ('.../django/newforms/models.py', 'models.py'), ('.../django/newforms/models.pyc', 'models.pyc'), ('.../django/newforms/util.py', 'util.py'), ('.../django/newforms/util.pyc', 'util.pyc'), ('.../django/newforms/widgets.py', 'widgets.py'), ('.../django/newforms/widgets.pyc', 'widgets.pyc')]
+[('.../django/forms/__init__.py', '__init__.py'), ('.../django/forms/__init__.pyc', '__init__.pyc'), ('.../django/forms/fields.py', 'fields.py'), ('.../django/forms/fields.pyc', 'fields.pyc'), ('.../django/forms/forms.py', 'forms.py'), ('.../django/forms/forms.pyc', 'forms.pyc'), ('.../django/forms/models.py', 'models.py'), ('.../django/forms/models.pyc', 'models.pyc'), ('.../django/forms/util.py', 'util.py'), ('.../django/forms/util.pyc', 'util.pyc'), ('.../django/forms/widgets.py', 'widgets.py'), ('.../django/forms/widgets.pyc', 'widgets.pyc')]
 >>> f.clean('fields.py')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+ValidationError: [u'Select a valid choice. fields.py is not one of the available choices.']
 >>> fix_os_paths(f.clean(path + 'fields.py'))
-u'.../django/newforms/fields.py'
+u'.../django/forms/fields.py'
 >>> f = forms.FilePathField(path=path, match='^.*?\.py$')
 >>> f.choices.sort()
 >>> fix_os_paths(f.choices)
-[('.../django/newforms/__init__.py', '__init__.py'), ('.../django/newforms/fields.py', 'fields.py'), ('.../django/newforms/forms.py', 'forms.py'), ('.../django/newforms/models.py', 'models.py'), ('.../django/newforms/util.py', 'util.py'), ('.../django/newforms/widgets.py', 'widgets.py')]
+[('.../django/forms/__init__.py', '__init__.py'), ('.../django/forms/fields.py', 'fields.py'), ('.../django/forms/forms.py', 'forms.py'), ('.../django/forms/models.py', 'models.py'), ('.../django/forms/util.py', 'util.py'), ('.../django/forms/widgets.py', 'widgets.py')]
 >>> f = forms.FilePathField(path=path, recursive=True, match='^.*?\.py$')
 >>> f.choices.sort()
 >>> fix_os_paths(f.choices)
-[('.../django/newforms/__init__.py', '__init__.py'), ('.../django/newforms/extras/__init__.py', 'extras/__init__.py'), ('.../django/newforms/extras/widgets.py', 'extras/widgets.py'), ('.../django/newforms/fields.py', 'fields.py'), ('.../django/newforms/forms.py', 'forms.py'), ('.../django/newforms/models.py', 'models.py'), ('.../django/newforms/util.py', 'util.py'), ('.../django/newforms/widgets.py', 'widgets.py')]
+[('.../django/forms/__init__.py', '__init__.py'), ('.../django/forms/extras/__init__.py', 'extras/__init__.py'), ('.../django/forms/extras/widgets.py', 'extras/widgets.py'), ('.../django/forms/fields.py', 'fields.py'), ('.../django/forms/forms.py', 'forms.py'), ('.../django/forms/models.py', 'models.py'), ('.../django/forms/util.py', 'util.py'), ('.../django/forms/widgets.py', 'widgets.py')]
 
 # SplitDateTimeField ##########################################################
 

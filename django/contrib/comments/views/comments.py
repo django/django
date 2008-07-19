@@ -1,3 +1,6 @@
+import base64
+import datetime
+
 from django.core import validators
 from django import oldforms
 from django.core.mail import mail_admins, mail_managers
@@ -7,15 +10,60 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.comments.models import Comment, FreeComment, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate
 from django.http import HttpResponseRedirect
 from django.utils.text import normalize_newlines
 from django.conf import settings
 from django.utils.translation import ungettext, ugettext as _
 from django.utils.encoding import smart_unicode
-import base64, datetime
 
 COMMENTS_PER_PAGE = 20
+
+# TODO: This is a copy of the manipulator-based form that used to live in
+# contrib.auth.forms.  It should be replaced with the newforms version that
+# has now been added to contrib.auth.forms when the comments app gets updated
+# for newforms.
+
+class AuthenticationForm(oldforms.Manipulator):
+    """
+    Base class for authenticating users. Extend this to get a form that accepts
+    username/password logins.
+    """
+    def __init__(self, request=None):
+        """
+        If request is passed in, the manipulator will validate that cookies are
+        enabled. Note that the request (a HttpRequest object) must have set a
+        cookie with the key TEST_COOKIE_NAME and value TEST_COOKIE_VALUE before
+        running this validator.
+        """
+        self.request = request
+        self.fields = [
+            oldforms.TextField(field_name="username", length=15, max_length=30, is_required=True,
+                validator_list=[self.isValidUser, self.hasCookiesEnabled]),
+            oldforms.PasswordField(field_name="password", length=15, max_length=30, is_required=True),
+        ]
+        self.user_cache = None
+
+    def hasCookiesEnabled(self, field_data, all_data):
+        if self.request and not self.request.session.test_cookie_worked():
+            raise validators.ValidationError, _("Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in.")
+
+    def isValidUser(self, field_data, all_data):
+        username = field_data
+        password = all_data.get('password', None)
+        self.user_cache = authenticate(username=username, password=password)
+        if self.user_cache is None:
+            raise validators.ValidationError, _("Please enter a correct username and password. Note that both fields are case-sensitive.")
+        elif not self.user_cache.is_active:
+            raise validators.ValidationError, _("This account is inactive.")
+
+    def get_user_id(self):
+        if self.user_cache:
+            return self.user_cache.id
+        return None
+
+    def get_user(self):
+        return self.user_cache
 
 class PublicCommentManipulator(AuthenticationForm):
     "Manipulator that handles public registered comments"

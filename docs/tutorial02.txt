@@ -31,10 +31,10 @@ activate the admin site for your installation, do these three things:
     * Add ``"django.contrib.admin"`` to your ``INSTALLED_APPS`` setting.
     * Run ``python manage.py syncdb``. Since you have added a new application
       to ``INSTALLED_APPS``, the database tables need to be updated.
-    * Edit your ``mysite/urls.py`` file and uncomment the line below
-      "Uncomment this for admin:". This file is a URLconf; we'll dig into
-      URLconfs in the next tutorial. For now, all you need to know is that it
-      maps URL roots to applications.
+    * Edit your ``mysite/urls.py`` file and uncomment the lines below the
+      "Uncomment this for admin:" comments. This file is a URLconf; we'll dig
+      into URLconfs in the next tutorial. For now, all you need to know is that
+      it maps URL roots to applications.
 
 Start the development server
 ============================
@@ -71,19 +71,13 @@ Make the poll app modifiable in the admin
 
 But where's our poll app? It's not displayed on the admin index page.
 
-Just one thing to do: We need to specify in the ``Poll`` model that ``Poll``
+Just one thing to do: We need to tell the admin that ``Poll``
 objects have an admin interface. Edit the ``mysite/polls/models.py`` file and
-make the following change to add an inner ``Admin`` class::
+add the following to the bottom of the file::
 
-    class Poll(models.Model):
-        # ...
-        class Admin:
-            pass
-
-The ``class Admin`` will contain all the settings that control how this model
-appears in the Django admin.  All the settings are optional, however, so
-creating an empty class means "give this object an admin interface using
-all the default options."
+    from django.contrib import admin
+    
+    admin.site.register(Poll)
 
 Now reload the Django admin page to see your changes. Note that you don't have
 to restart the development server -- the server will auto-reload your project,
@@ -92,8 +86,8 @@ so any modifications code will be seen immediately in your browser.
 Explore the free admin functionality
 ====================================
 
-Now that ``Poll`` has the inner ``Admin`` class, Django knows that it should be
-displayed on the admin index page:
+Now that we've registered ``Poll``, Django knows that it should be displayed on
+the admin index page:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin03t.png
    :alt: Django admin index page, now with polls displayed
@@ -145,17 +139,26 @@ with the timestamp and username of the person who made the change:
 Customize the admin form
 ========================
 
-Take a few minutes to marvel at all the code you didn't have to write.
+Take a few minutes to marvel at all the code you didn't have to write. When you
+call ``admin.site.register(Poll)``, Django just lets you edit the object and
+"guess" at how to display it within the admin. Often you'll want to control how
+the admin looks and works. You'll do this by telling Django about the options
+you want when you register the object.
 
-Let's customize this a bit. We can reorder the fields by explicitly adding a
-``fields`` parameter to ``Admin``::
+Let's see how this works by reordering the fields on the edit form. Replace the
+``admin.site.register(Poll)`` line with::
 
-        class Admin:
-            fields = (
-                (None, {'fields': ('pub_date', 'question')}),
-            )
+    class PollAdmin(admin.ModelAdmin):
+        fields = ['pub_date', 'question']
+        
+    admin.site.register(Poll, PollAdmin)
 
-That made the "Publication date" show up first instead of second:
+You'll follow this pattern -- create a model admin object, then pass it as the
+second argument to ``admin.site.register()`` -- any time you need to change the
+admin options for an object.
+    
+This particular change above makes the "Publication date" come before the
+"Question" field:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin07.png
    :alt: Fields have been reordered
@@ -166,13 +169,15 @@ of fields, choosing an intuitive order is an important usability detail.
 And speaking of forms with dozens of fields, you might want to split the form
 up into fieldsets::
 
-        class Admin:
-            fields = (
-                (None, {'fields': ('question',)}),
-                ('Date information', {'fields': ('pub_date',)}),
-            )
+    class PollAdmin(admin.ModelAdmin):
+        fieldsets = [
+            (None,               {'fields': ['question']}),
+            ('Date information', {'fields': ['pub_date']}),
+        ]
+        
+    admin.site.register(Poll, PollAdmin)
 
-The first element of each tuple in ``fields`` is the title of the fieldset.
+The first element of each tuple in ``fieldsets`` is the title of the fieldset.
 Here's what our form looks like now:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin08t.png
@@ -184,11 +189,11 @@ You can assign arbitrary HTML classes to each fieldset. Django provides a
 This is useful when you have a long form that contains a number of fields that
 aren't commonly used::
 
-        class Admin:
-            fields = (
-                (None, {'fields': ('question',)}),
-                ('Date information', {'fields': ('pub_date',), 'classes': 'collapse'}),
-            )
+        class PollAdmin(admin.ModelAdmin):
+            fieldsets = [
+                (None,               {'fields': ['question']}),
+                ('Date information', {'fields': ['pub_date'], 'classes': 'pub_date'}),
+            ]
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin09.png
    :alt: Fieldset is initially collapsed
@@ -201,14 +206,10 @@ the admin page doesn't display choices.
 
 Yet.
 
-There are two ways to solve this problem. The first is to give the ``Choice``
-model its own inner ``Admin`` class, just as we did with ``Poll``. Here's what
-that would look like::
+There are two ways to solve this problem. The first register ``Choice`` with the
+admin just as we did with ``Poll``. That's easy::
 
-    class Choice(models.Model):
-        # ...
-        class Admin:
-            pass
+    admin.site.register(Choice)
 
 Now "Choices" is an available option in the Django admin. The "Add choice" form
 looks like this:
@@ -220,33 +221,35 @@ In that form, the "Poll" field is a select box containing every poll in the
 database. Django knows that a ``ForeignKey`` should be represented in the admin
 as a ``<select>`` box. In our case, only one poll exists at this point.
 
-Also note the "Add Another" link next to "Poll." Every object with a ForeignKey
-relationship to another gets this for free. When you click "Add Another," you'll
-get a popup window with the "Add poll" form. If you add a poll in that window
-and click "Save," Django will save the poll to the database and dynamically add
-it as the selected choice on the "Add choice" form you're looking at.
+Also note the "Add Another" link next to "Poll." Every object with a
+``ForeignKey`` relationship to another gets this for free. When you click "Add
+Another," you'll get a popup window with the "Add poll" form. If you add a poll
+in that window and click "Save," Django will save the poll to the database and
+dynamically add it as the selected choice on the "Add choice" form you're
+looking at.
 
 But, really, this is an inefficient way of adding Choice objects to the system.
 It'd be better if you could add a bunch of Choices directly when you create the
 Poll object. Let's make that happen.
 
-Remove the ``Admin`` for the Choice model. Then, edit the ``ForeignKey(Poll)``
-field like so::
+Remove the ``register()`` call for the Choice model. Then, edit the ``Poll``
+registration code to read::
 
-    poll = models.ForeignKey(Poll, edit_inline=models.STACKED, num_in_admin=3)
+    class ChoiceInline(admin.StackedInline):
+        model = Choice
+        extra = 3
+        
+    class PollAdmin(admin.ModelAdmin):
+        fieldsets = [
+            (None,               {'fields': ['question']}),
+            ('Date information', {'fields': ['pub_date'], 'classes': 'pub_date'}),
+        ]
+        inlines = [ChoiceInline]
+
+    admin.site.register(Poll, PollAdmin)
 
 This tells Django: "Choice objects are edited on the Poll admin page. By
-default, provide enough fields for 3 Choices."
-
-Then change the other fields in ``Choice`` to give them ``core=True``::
-
-    choice = models.CharField(max_length=200, core=True)
-    votes = models.IntegerField(core=True)
-
-This tells Django: "When you edit a Choice on the Poll admin page, the 'choice'
-and 'votes' fields are required. The presence of at least one of them signifies
-the addition of a new Choice object, and clearing both of them signifies the
-deletion of that existing Choice object."
+default, provide enough fields for 3 choices."
 
 Load the "Add poll" page to see how that looks:
 
@@ -255,19 +258,18 @@ Load the "Add poll" page to see how that looks:
    :target: http://media.djangoproject.com/img/doc/tutorial-trunk/admin11.png
 
 It works like this: There are three slots for related Choices -- as specified
-by ``num_in_admin`` -- but each time you come back to the "Change" page for an
-already-created object, you get one extra slot. (This means there's no
-hard-coded limit on how many related objects can be added.) If you wanted space
-for three extra Choices each time you changed the poll, you'd use
-``num_extra_on_change=3``.
+by ``extra`` -- and each time you come back to the "Change" page for an
+already-created object, you get another three extra slots.
 
 One small problem, though. It takes a lot of screen space to display all the
 fields for entering related Choice objects. For that reason, Django offers an
-alternate way of displaying inline related objects::
+tabular way of displaying inline related objects; you just need to change
+the ``ChoiceInline`` declaration to read::
 
-    poll = models.ForeignKey(Poll, edit_inline=models.TABULAR, num_in_admin=3)
+    class ChoiceInline(admin.TabularInline):
+        #...
 
-With that ``edit_inline=models.TABULAR`` (instead of ``models.STACKED``), the
+With that ``TabularInline`` (instead of ``StackedInline``), the
 related objects are displayed in a more compact, table-based format:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin12.png
@@ -285,21 +287,21 @@ Here's what it looks like at this point:
    :alt: Polls change list page
    :target: http://media.djangoproject.com/img/doc/tutorial-trunk/admin04.png
 
-By default, Django displays the ``str()`` of each object. But sometimes it'd
-be more helpful if we could display individual fields. To do that, use the
-``list_display`` option, which is a tuple of field names to display, as columns,
-on the change list page for the object::
+By default, Django displays the ``str()`` of each object. But sometimes it'd be
+more helpful if we could display individual fields. To do that, use the
+``list_display`` admin option, which is a tuple of field names to display, as
+columns, on the change list page for the object::
 
-    class Poll(models.Model):
+    class PollAdmin(admin.ModelAdmin):
         # ...
-        class Admin:
-            # ...
-            list_display = ('question', 'pub_date')
+        list_display = ('question', 'pub_date')
 
 Just for good measure, let's also include the ``was_published_today`` custom
 method from Tutorial 1::
 
-    list_display = ('question', 'pub_date', 'was_published_today')
+    class PollAdmin(admin.ModelAdmin):
+        # ...
+        list_display = ('question', 'pub_date', 'was_published_today')
 
 Now the poll change list page looks like this:
 
@@ -318,9 +320,8 @@ method a ``short_description`` attribute::
         return self.pub_date.date() == datetime.date.today()
     was_published_today.short_description = 'Published today?'
 
-
 Let's add another improvement to the Poll change list page: Filters. Add the
-following line to ``Poll.Admin``::
+following line to ``PollAdmin``::
 
     list_filter = ['pub_date']
 

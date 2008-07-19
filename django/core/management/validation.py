@@ -51,8 +51,6 @@ def get_validation_errors(outfile, app=None):
                     from PIL import Image
                 except ImportError:
                     e.add(opts, '"%s": To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
-            if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
-                e.add(opts, '"%s": prepopulate_from should be a list or tuple.' % f.name)
             if f.choices:
                 if isinstance(f.choices, basestring) or not is_iterable(f.choices):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
@@ -145,54 +143,6 @@ def get_validation_errors(outfile, app=None):
                     if r.get_accessor_name() == rel_query_name:
                         e.add(opts, "Reverse query name for m2m field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
 
-        # Check admin attribute.
-        if opts.admin is not None:
-            if not isinstance(opts.admin, models.AdminOptions):
-                e.add(opts, '"admin" attribute, if given, must be set to a models.AdminOptions() instance.')
-            else:
-                # list_display
-                if not isinstance(opts.admin.list_display, (list, tuple)):
-                    e.add(opts, '"admin.list_display", if given, must be set to a list or tuple.')
-                else:
-                    for fn in opts.admin.list_display:
-                        try:
-                            f = opts.get_field(fn)
-                        except models.FieldDoesNotExist:
-                            if not hasattr(cls, fn):
-                                e.add(opts, '"admin.list_display" refers to %r, which isn\'t an attribute, method or property.' % fn)
-                        else:
-                            if isinstance(f, models.ManyToManyField):
-                                e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
-                # list_display_links
-                if opts.admin.list_display_links and not opts.admin.list_display:
-                    e.add(opts, '"admin.list_display" must be defined for "admin.list_display_links" to be used.')
-                if not isinstance(opts.admin.list_display_links, (list, tuple)):
-                    e.add(opts, '"admin.list_display_links", if given, must be set to a list or tuple.')
-                else:
-                    for fn in opts.admin.list_display_links:
-                        try:
-                            f = opts.get_field(fn)
-                        except models.FieldDoesNotExist:
-                            if not hasattr(cls, fn):
-                                e.add(opts, '"admin.list_display_links" refers to %r, which isn\'t an attribute, method or property.' % fn)
-                        if fn not in opts.admin.list_display:
-                            e.add(opts, '"admin.list_display_links" refers to %r, which is not defined in "admin.list_display".' % fn)
-                # list_filter
-                if not isinstance(opts.admin.list_filter, (list, tuple)):
-                    e.add(opts, '"admin.list_filter", if given, must be set to a list or tuple.')
-                else:
-                    for fn in opts.admin.list_filter:
-                        try:
-                            f = opts.get_field(fn)
-                        except models.FieldDoesNotExist:
-                            e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
-                # date_hierarchy
-                if opts.admin.date_hierarchy:
-                    try:
-                        f = opts.get_field(opts.admin.date_hierarchy)
-                    except models.FieldDoesNotExist:
-                        e.add(opts, '"admin.date_hierarchy" refers to %r, which isn\'t a field.' % opts.admin.date_hierarchy)
-
         # Check ordering attribute.
         if opts.ordering:
             for field_name in opts.ordering:
@@ -209,18 +159,6 @@ def get_validation_errors(outfile, app=None):
                     opts.get_field(field_name, many_to_many=False)
                 except models.FieldDoesNotExist:
                     e.add(opts, '"ordering" refers to "%s", a field that doesn\'t exist.' % field_name)
-
-        # Check core=True, if needed.
-        for related in opts.get_followed_related_objects():
-            if not related.edit_inline:
-                continue
-            try:
-                for f in related.opts.fields:
-                    if f.core:
-                        raise StopIteration
-                e.add(related.opts, "At least one field in %s should have core=True, because it's being edited inline by %s.%s." % (related.opts.object_name, opts.module_name, opts.object_name))
-            except StopIteration:
-                pass
 
         # Check unique_together.
         for ut in opts.unique_together:

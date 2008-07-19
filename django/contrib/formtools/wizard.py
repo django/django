@@ -4,7 +4,7 @@ step and storing the form's state as HTML hidden fields so that no state is
 stored on the server side.
 """
 
-from django import newforms as forms
+from django import forms
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render_to_response

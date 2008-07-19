@@ -74,7 +74,10 @@ def teardown_test_environment():
 def _set_autocommit(connection):
     "Make sure a connection is in autocommit mode."
     if hasattr(connection.connection, "autocommit"):
-        connection.connection.autocommit(True)
+        if callable(connection.connection.autocommit):
+            connection.connection.autocommit(True)
+        else:
+            connection.connection.autocommit = True
     elif hasattr(connection.connection, "set_isolation_level"):
         connection.connection.set_isolation_level(0)
 
@@ -137,7 +140,6 @@ def create_test_db(verbosity=1, autoclobber=False):
             'postgresql': get_postgresql_create_suffix,
             'postgresql_psycopg2': get_postgresql_create_suffix,
             'mysql': get_mysql_create_suffix,
-            'mysql_old': get_mysql_create_suffix,
         }.get(settings.DATABASE_ENGINE, lambda: '')()
         if settings.TEST_DATABASE_NAME:
             TEST_DATABASE_NAME = settings.TEST_DATABASE_NAME

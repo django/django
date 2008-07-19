@@ -1,12 +1,17 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_modify adminmedia %}
+
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript" src="../../../jsi18n/"></script>
-{% for js in javascript_imports %}{% include_admin_script js %}{% endfor %}
+{{ media }}
 {% endblock %}
+
 {% block stylesheet %}{% admin_media_prefix %}css/forms.css{% endblock %}
+
 {% block coltype %}{% if ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
+
 {% block bodyclass %}{{ opts.app_label }}-{{ opts.object_name.lower }} change-form{% endblock %}
+
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
@@ -14,6 +19,7 @@
      {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
 </div>
 {% endif %}{% endblock %}
+
 {% block content %}<div id="content-main">
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
@@ -25,45 +31,48 @@
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form">{% block form_top %}{% endblock %}
 <div>
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
-{% if opts.admin.save_on_top %}{% submit_row %}{% endif %}
-{% if form.error_dict %}
+{% if save_on_top %}{% submit_row %}{% endif %}
+{% if errors %}
     <p class="errornote">
-    {% blocktrans count form.error_dict.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+    {% blocktrans count errors.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
     </p>
+    <ul class="errorlist">{% for error in adminform.form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
 {% endif %}
-{% for bound_field_set in bound_field_sets %}
-   <fieldset class="module aligned {{ bound_field_set.classes }}">
-    {% if bound_field_set.name %}<h2>{{ bound_field_set.name }}</h2>{% endif %}
-    {% if bound_field_set.description %}<div class="description">{{ bound_field_set.description|safe }}</div>{% endif %}
-    {% for bound_field_line in bound_field_set %}
-        {% admin_field_line bound_field_line %}
-        {% for bound_field in bound_field_line %}
-            {% filter_interface_script_maybe bound_field %}
-        {% endfor %}
-    {% endfor %}
-   </fieldset>
+
+{% for fieldset in adminform %}
+  {% include "admin/includes/fieldset.html" %}
 {% endfor %}
+
 {% block after_field_sets %}{% endblock %}
-{% if change %}
-   {% if ordered_objects %}
-   <fieldset class="module"><h2>{% trans "Ordering" %}</h2>
-   <div class="form-row{% if form.order_.errors %} error{% endif %} ">
-   {% if form.order_.errors %}{{ form.order_.html_error_list }}{% endif %}
-   <p><label for="id_order_">{% trans "Order:" %}</label> {{ form.order_ }}</p>
-   </div></fieldset>
-   {% endif %}
-{% endif %}
-{% for related_object in inline_related_objects %}{% edit_inline related_object %}{% endfor %}
+
+{% for inline_admin_formset in inline_admin_formsets %}
+    {% include inline_admin_formset.opts.template %}
+{% endfor %}
+
 {% block after_related_objects %}{% endblock %}
+
 {% submit_row %}
+
 {% if add %}
-   <script type="text/javascript">document.getElementById("{{ first_form_field_id }}").focus();</script>
+   <script type="text/javascript">document.getElementById("{{ adminform.first_field.auto_id }}").focus();</script>
 {% endif %}
-{% if auto_populated_fields %}
-   <script type="text/javascript">
-   {% auto_populated_field_script auto_populated_fields change %}
-   </script>
+
+{# JavaScript for prepopulated fields #}
+
+{% if add %}
+<script type="text/javascript">
+{% for field in adminform.prepopulated_fields %}
+    document.getElementById("{{ field.field.auto_id }}").onchange = function() { this._changed = true; };
+    {% for dependency in field.dependencies %}
+    document.getElementById("{{ dependency.auto_id }}").onkeyup = function() {
+        var e = document.getElementById("{{ field.field.auto_id }}");
+        if (!e._changed) { e.value = URLify({% for innerdep in field.dependencies %}document.getElementById("{{ innerdep.auto_id }}").value{% if not forloop.last %} + ' ' + {% endif %}{% endfor %}, {{ field.field.field.max_length }}); }
+    }
+    {% endfor %}
+{% endfor %}
+</script>
 {% endif %}
+
 </div>
 </form></div>
 {% endblock %}

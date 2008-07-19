@@ -1,4 +1,4 @@
-from django import newforms as forms
+from django import forms
 from django.contrib.formtools import preview
 from django import http
 from django.conf import settings

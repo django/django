@@ -3,7 +3,7 @@
 
 tests = r"""
 It should be possible to re-use attribute dictionaries (#3810)
->>> from django.newforms import *
+>>> from django.forms import *
 >>> extra_attrs = {'class': 'special'}
 >>> class TestForm(Form):
 ...     f1 = CharField(max_length=10, widget=TextInput(attrs=extra_attrs))
