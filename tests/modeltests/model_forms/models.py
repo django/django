@@ -12,8 +12,6 @@ import tempfile
 
 from django.db import models
 
-TEMP_DIR = tempfile.gettempdir()
-
 ARTICLE_STATUS = (
     (1, 'Draft'),
     (2, 'Pending'),
@@ -62,7 +60,7 @@ class PhoneNumber(models.Model):
 
 class TextFile(models.Model):
     description = models.CharField(max_length=20)
-    file = models.FileField(upload_to=TEMP_DIR)
+    file = models.FileField(upload_to=tempfile.gettempdir())
 
     def __unicode__(self):
         return self.description
@@ -73,9 +71,9 @@ class ImageFile(models.Model):
         # If PIL is available, try testing PIL.
         # Otherwise, it's equivalent to TextFile above.
         import Image
-        image = models.ImageField(upload_to=TEMP_DIR)
+        image = models.ImageField(upload_to=tempfile.gettempdir())
     except ImportError:
-        image = models.FileField(upload_to=TEMP_DIR)
+        image = models.FileField(upload_to=tempfile.gettempdir())
 
     def __unicode__(self):
         return self.description
@@ -785,24 +783,6 @@ u'312-555-1212'
 u'Assistance'
 
 # FileField ###################################################################
-
-# File instance methods. Tests fix for #5619.
-
->>> instance = TextFile(description='nothing', file='name')
->>> expected = '%s/name' % TEMP_DIR
->>> instance.get_file_filename() == expected
-True
->>> instance.get_file_url() == expected
-True
->>> instance.save_file_file(instance.file, SimpleUploadedFile(instance.file, 'some text'))
->>> instance.get_file_filename() == expected
-True
->>> instance.get_file_url() == expected
-True
-
->>> os.unlink(instance.get_file_filename())
-
-# File forms.
 
 >>> class TextFileForm(ModelForm):
 ...     class Meta:
