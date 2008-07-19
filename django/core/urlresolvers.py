@@ -291,11 +291,10 @@ class RegexURLResolver(object):
 def resolve(path, urlconf=None):
     return get_resolver(urlconf).resolve(path)
 
-def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=u'/'):
+def reverse(viewname, urlconf=None, args=None, kwargs=None):
     args = args or []
     kwargs = kwargs or {}
-    return iri_to_uri(prefix +
-            get_resolver(urlconf).reverse(viewname, *args, **kwargs))
+    return iri_to_uri(u'/' + get_resolver(urlconf).reverse(viewname, *args, **kwargs))
 
 def clear_url_caches():
     global _resolver_cache

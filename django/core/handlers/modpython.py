@@ -16,15 +16,6 @@ class ModPythonRequest(http.HttpRequest):
     def __init__(self, req):
         self._req = req
         self.path = force_unicode(req.uri)
-        root = req.get_options().get('django.root', '')
-        self._django_root = root
-        # req.path_info isn't necessarily computed correctly in all
-        # circumstances (it's out of mod_python's control a bit), so we use
-        # req.uri and some string manipulations to get the right value.
-        if root and req.uri.startswith(root):
-            self.path_info = force_unicode(req.uri[len(root):])
-        else:
-            self.path_info = self.path
 
     def __repr__(self):
         # Since this is called as part of error handling, we need to be very
@@ -109,7 +100,7 @@ class ModPythonRequest(http.HttpRequest):
                 'CONTENT_LENGTH':    self._req.clength, # This may be wrong
                 'CONTENT_TYPE':      self._req.content_type, # This may be wrong
                 'GATEWAY_INTERFACE': 'CGI/1.1',
-                'PATH_INFO':         self.path_info,
+                'PATH_INFO':         self._req.path_info,
                 'PATH_TRANSLATED':   None, # Not supported
                 'QUERY_STRING':      self._req.args,
                 'REMOTE_ADDR':       self._req.connection.remote_ip,
@@ -117,7 +108,7 @@ class ModPythonRequest(http.HttpRequest):
                 'REMOTE_IDENT':      self._req.connection.remote_logname,
                 'REMOTE_USER':       self._req.user,
                 'REQUEST_METHOD':    self._req.method,
-                'SCRIPT_NAME':       self._django_root,
+                'SCRIPT_NAME':       None, # Not supported
                 'SERVER_NAME':       self._req.server.server_hostname,
                 'SERVER_PORT':       self._req.server.port,
                 'SERVER_PROTOCOL':   self._req.protocol,

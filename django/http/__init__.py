@@ -31,7 +31,6 @@ class HttpRequest(object):
     def __init__(self):
         self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
         self.path = ''
-        self.path_info = ''
         self.method = None
 
     def __repr__(self):
@@ -443,4 +442,3 @@ def str_to_unicode(s, encoding):
         return unicode(s, encoding, 'replace')
     else:
         return s
-

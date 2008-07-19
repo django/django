@@ -7,7 +7,7 @@ except ImportError:
 
 from django import http
 from django.core import signals
-from django.core.handlers import base
+from django.core.handlers.base import BaseHandler
 from django.dispatch import dispatcher
 from django.utils import datastructures
 from django.utils.encoding import force_unicode
@@ -74,14 +74,9 @@ def safe_copyfileobj(fsrc, fdst, length=16*1024, size=0):
 
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
-        script_name = base.get_script_name()
-        path_info = force_unicode(environ.get('PATH_INFO', '/'))
         self.environ = environ
-        self.path_info = path_info
-        self.path = '%s%s' % (script_name, path_info)
+        self.path = force_unicode(environ['PATH_INFO'])
         self.META = environ
-        self.META['PATH_INFO'] = path_info
-        self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
 
     def __repr__(self):
@@ -183,7 +178,7 @@ class WSGIRequest(http.HttpRequest):
     REQUEST = property(_get_request)
     raw_post_data = property(_get_raw_post_data)
 
-class WSGIHandler(base.BaseHandler):
+class WSGIHandler(BaseHandler):
     initLock = Lock()
     request_class = WSGIRequest
 

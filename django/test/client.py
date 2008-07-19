@@ -190,7 +190,7 @@ class Client:
             'PATH_INFO':         '/',
             'QUERY_STRING':      '',
             'REQUEST_METHOD':    'GET',
-            'SCRIPT_NAME':       '',
+            'SCRIPT_NAME':       None,
             'SERVER_NAME':       'testserver',
             'SERVER_PORT':       80,
             'SERVER_PROTOCOL':   'HTTP/1.1',
