@@ -107,8 +107,11 @@ class BaseHandler(object):
                 from django.views import debug
                 return debug.technical_404_response(request, e)
             else:
-                callback, param_dict = resolver.resolve404()
-                return callback(request, **param_dict)
+                try:
+                    callback, param_dict = resolver.resolve404()
+                    return callback(request, **param_dict)
+                except:
+                    return self.handle_uncaught_exception(request, resolver, sys.exc_info())
         except exceptions.PermissionDenied:
             return http.HttpResponseForbidden('<h1>Permission denied</h1>')
         except SystemExit:
@@ -118,9 +121,6 @@ class BaseHandler(object):
             # Get the exception info now, in case another exception is thrown later.
             exc_info = sys.exc_info()
             receivers = dispatcher.send(signal=signals.got_request_exception, request=request)
-
-            if settings.DEBUG_PROPAGATE_EXCEPTIONS:
-                raise
             return self.handle_uncaught_exception(request, resolver, exc_info)
 
     def handle_uncaught_exception(self, request, resolver, exc_info):
@@ -135,6 +135,9 @@ class BaseHandler(object):
         """
         from django.conf import settings
         from django.core.mail import mail_admins
+
+        if settings.DEBUG_PROPAGATE_EXCEPTIONS:
+            raise
 
         if settings.DEBUG:
             from django.views import debug
