@@ -2280,6 +2280,12 @@ For every ``FileField``, the object will have a ``get_FOO_filename()`` method,
 where ``FOO`` is the name of the field. This returns the full filesystem path
 to the file, according to your ``MEDIA_ROOT`` setting.
 
+.. note::
+    If you are using the ``upload_to`` parameter in your ``FileField``, it is
+    only valid to call this method **after** saving the model when the field
+    has been set. Prior to saving, the value returned will not contain the
+    upload directory in the path.
+
 Note that ``ImageField`` is technically a subclass of ``FileField``, so every
 model with an ``ImageField`` will also get this method.
 
@@ -2290,6 +2296,12 @@ For every ``FileField``, the object will have a ``get_FOO_url()`` method,
 where ``FOO`` is the name of the field. This returns the full URL to the file,
 according to your ``MEDIA_URL`` setting. If the value is blank, this method
 returns an empty string.
+
+.. note::
+    As with ``get_FOO_filename()``, if you are using the ``upload_to``
+    parameter on your ``FileField``, it is only valid to call this method
+    **after** saving the model, otherwise an incorrect result will be
+    returned.
 
 get_FOO_size()
 --------------
