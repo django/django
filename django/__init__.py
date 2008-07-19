@@ -1,4 +1,4 @@
-VERSION = (0, 97, 'newforms-admin')
+VERSION = (0, 97, 'pre')
 
 def get_version():
     "Returns the version as a human-format string."
