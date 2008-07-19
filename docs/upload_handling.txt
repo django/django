@@ -72,7 +72,7 @@ methods to access the uploaded content:
         reading in multiple chunks. By default this will be any file
         larger than 2.5 megabytes, but that's configurable; see below.
 
-    ``UploadedFile.chunk()``
+    ``UploadedFile.chunks()``
         A generator returning chunks of the file. If ``multiple_chunks()`` is
         ``True``, you should use this method in a loop instead of ``read()``.
 
