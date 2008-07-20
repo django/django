@@ -32,10 +32,10 @@ r"""
 >>> def produce_xml_fragment():
 ...     stream = StringIO()
 ...     xml = SimplerXMLGenerator(stream, encoding='utf-8')
-...     xml.startElement("foo", {"aaa" : "1.0", "bbb": "2.0"})
+...     xml.startElement("foo", {"aaa": "1.0", "bbb": "2.0"})
 ...     xml.characters("Hello")
 ...     xml.endElement("foo")
-...     xml.startElement("bar", {})
+...     xml.startElement("bar", {"ccc": "3.0", "ddd": "4.0"})
 ...     xml.endElement("bar")
 ...     return stream.getvalue()
 
@@ -64,9 +64,9 @@ r"""
 '<?xml version="1.0" encoding="UTF-8"?>\n<foo bbb="2.0" aaa="1.0"><bar ccc="3.0">Hello</bar><whiz>Goodbye</whiz></foo>'
 
 >>> produce_xml_fragment()
-'<foo aaa="1.0" bbb="2.0">Hello</foo><bar></bar>'
+'<foo aaa="1.0" bbb="2.0">Hello</foo><bar ccc="3.0" ddd="4.0"></bar>'
 
 >>> produce_xml_fragment()
-'<foo bbb="2.0" aaa="1.0">Hello</foo><bar></bar>'
+'<foo bbb="2.0" aaa="1.0">Hello</foo><bar ddd="4.0" ccc="3.0"></bar>'
 
 """
