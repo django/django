@@ -472,11 +472,12 @@ class Model(object):
         return os.path.getsize(self._get_FIELD_filename(field))
 
     def _save_FIELD_file(self, field, filename, raw_field, save=True):
-        directory = field.get_directory_name()
-        try: # Create the date-based directory if it doesn't exist.
-            os.makedirs(os.path.join(settings.MEDIA_ROOT, directory))
-        except OSError: # Directory probably already exists.
-            pass
+        # Create the upload directory if it doesn't already exist
+        directory = os.path.join(settings.MEDIA_ROOT, field.get_directory_name())
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        elif not os.path.isdir(directory):
+            raise IOError('%s exists and is not a directory' % directory)        
 
         # Check for old-style usage (files-as-dictionaries). Warn here first
         # since there are multiple locations where we need to support both new

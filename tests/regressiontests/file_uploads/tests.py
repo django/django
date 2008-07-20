@@ -1,8 +1,15 @@
 import os
+import errno
 import sha
+import shutil
 import tempfile
+import unittest
+
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, client
 from django.utils import simplejson
+
+from models import FileModel, UPLOAD_ROOT, UPLOAD_TO
 
 class FileUploadTests(TestCase):
     def test_simple_upload(self):
@@ -179,3 +186,42 @@ class FileUploadTests(TestCase):
 
         self.assertEqual(got.get('file1'), 1)
         self.assertEqual(got.get('file2'), 2)
+
+class DirectoryCreationTests(unittest.TestCase):
+    """
+    Tests for error handling during directory creation 
+    via _save_FIELD_file (ticket #6450)
+    """
+    def setUp(self):
+        self.obj = FileModel()
+        if not os.path.isdir(UPLOAD_ROOT):
+            os.makedirs(UPLOAD_ROOT)
+
+    def tearDown(self):
+        os.chmod(UPLOAD_ROOT, 0700)
+        shutil.rmtree(UPLOAD_ROOT)
+
+    def test_readonly_root(self):
+        """Permission errors are not swallowed"""
+        os.chmod(UPLOAD_ROOT, 0500)
+        try:
+            self.obj.save_testfile_file('foo.txt', SimpleUploadedFile('foo.txt', 'x'))
+        except OSError, err:
+            self.assertEquals(err.errno, errno.EACCES)
+        except:
+            self.fail("OSError [Errno %s] not raised" % errno.EACCES)
+
+    def test_not_a_directory(self):
+        """The correct IOError is raised when the upload directory name exists but isn't a directory"""
+        # Create a file with the upload directory name
+        fd = open(UPLOAD_TO, 'w')
+        fd.close()
+        try:
+            self.obj.save_testfile_file('foo.txt', SimpleUploadedFile('foo.txt', 'x'))
+        except IOError, err:
+            # The test needs to be done on a specific string as IOError
+            # is raised even without the patch (just not early enough)
+            self.assertEquals(err.args[0], 
+                              "%s exists and is not a directory" % UPLOAD_TO)
+        except:
+            self.fail("IOError not raised")
