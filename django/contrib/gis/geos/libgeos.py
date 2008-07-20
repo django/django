@@ -8,6 +8,7 @@
 """
 import atexit, os, re, sys
 from ctypes import c_char_p, Structure, CDLL, CFUNCTYPE, POINTER
+from ctypes.util import find_library
 from django.contrib.gis.geos.error import GEOSException
 
 # NumPy supported?
@@ -20,33 +21,41 @@ except ImportError:
 # Custom library path set?
 try:
     from django.conf import settings
-    lib_name = settings.GEOS_LIBRARY_PATH
+    lib_path = settings.GEOS_LIBRARY_PATH
 except (AttributeError, EnvironmentError, ImportError):
-    lib_name = None
+    lib_path = None
 
-# Setting the appropriate name for the GEOS-C library, depending on which
-# OS and POSIX platform we're running.
-if lib_name:
-    pass
+# Setting the appropriate names for the GEOS-C library.
+if lib_path:
+    lib_names = None
 elif os.name == 'nt':
-    # Windows NT library
-    lib_name = 'libgeos_c-1.dll'
+    # Windows NT libraries
+    lib_names = ['libgeos_c-1']
 elif os.name == 'posix':
-    platform = os.uname()[0] # Using os.uname()
-    if platform == 'Darwin':
-        # Mac OSX Shared Library (Thanks Matt!)
-        lib_name = 'libgeos_c.dylib'
-    else:
-        # Attempting to use the .so extension for all other platforms
-        lib_name = 'libgeos_c.so'
+    # *NIX libraries
+    lib_names = ['geos_c']
 else:
     raise GEOSException('Unsupported OS "%s"' % os.name)
+
+# Using the ctypes `find_library` utility to find the the path to the GEOS 
+# shared library.  This is better than manually specifiying each library name 
+# and extension (e.g., libgeos_c.[so|so.1|dylib].).
+if lib_names: 
+    for lib_name in lib_names:
+        lib_path = find_library(lib_name)
+        if not lib_path is None: break
+
+# No GEOS library could be found.
+if lib_path is None: 
+    raise GEOSException('Could not find the GEOS library (tried "%s"). '
+                        'Try setting GEOS_LIBRARY_PATH in your settings.' % 
+                        '", "'.join(lib_names))
 
 # Getting the GEOS C library.  The C interface (CDLL) is used for
 #  both *NIX and Windows.
 # See the GEOS C API source code for more details on the library function calls:
 #  http://geos.refractions.net/ro/doxygen_docs/html/geos__c_8h-source.html
-lgeos = CDLL(lib_name)
+lgeos = CDLL(lib_path)
 
 # The notice and error handler C function callback definitions.
 #  Supposed to mimic the GEOS message handler (C below):

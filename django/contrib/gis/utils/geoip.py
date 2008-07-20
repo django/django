@@ -40,6 +40,7 @@
 """
 import os, re
 from ctypes import c_char_p, c_float, c_int, Structure, CDLL, POINTER
+from ctypes.util import find_library
 from django.conf import settings
 if not settings._target: settings.configure()
 
@@ -47,26 +48,24 @@ if not settings._target: settings.configure()
 GEOIP_SETTINGS = dict((key, getattr(settings, key)) 
                       for key in ('GEOIP_PATH', 'GEOIP_LIBRARY_PATH', 'GEOIP_COUNTRY', 'GEOIP_CITY')
                       if hasattr(settings, key))
-lib_name = GEOIP_SETTINGS.get('GEOIP_LIBRARY_PATH', None)
+lib_path = GEOIP_SETTINGS.get('GEOIP_LIBRARY_PATH', None)
 
 # GeoIP Exception class.
 class GeoIPException(Exception): pass
 
 # The shared library for the GeoIP C API.  May be downloaded
 #  from http://www.maxmind.com/download/geoip/api/c/
-if lib_name:
-    pass
-elif os.name == 'nt':
-    lib_name = 'libGeoIP.dll'
-elif os.name == 'posix':
-    platform = os.uname()[0]
-    if platform == 'Darwin':
-        lib_name = 'libGeoIP.dylib'
-    else:
-        lib_name = 'libGeoIP.so'
+if lib_path:
+    lib_name = None
 else:
-    raise GeoIPException('Unknown POSIX platform "%s"' % platform)
-lgeoip = CDLL(lib_name)
+    # TODO: Is this really the library name for Windows?
+    lib_name = 'GeoIP'
+
+# Getting the path to the GeoIP library.
+if lib_name: lib_path = find_library(lib_name)
+if lib_path is None: raise GeoIPException('Could not find the GeoIP library (tried "%s"). '
+                                          'Try setting GEOIP_LIBRARY_PATH in your settings.' % lib_name)
+lgeoip = CDLL(lib_path)
 
 # Regular expressions for recognizing IP addresses and the GeoIP
 # free database editions.

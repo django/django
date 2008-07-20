@@ -6,28 +6,35 @@ from django.contrib.gis.gdal.error import OGRException
 # Custom library path set?
 try:
     from django.conf import settings
-    lib_name = settings.GDAL_LIBRARY_PATH
+    lib_path = settings.GDAL_LIBRARY_PATH
 except (AttributeError, EnvironmentError, ImportError):
-    lib_name = None
+    lib_path = None
 
-if lib_name:
-    pass
+if lib_path:
+    lib_names = None
 elif os.name == 'nt':
     # Windows NT shared library
-    lib_name = 'gdal15.dll'
+    lib_names = ['gdal15']
 elif os.name == 'posix':
-    platform = os.uname()[0]
-    if platform == 'Darwin':
-        # Mac OSX shared library
-        lib_name = 'libgdal.dylib'
-    else: 
-        # Attempting to use .so extension for all other platforms.
-        lib_name = 'libgdal.so'
+    # *NIX library names.
+    lib_names = ['gdal', 'gdal1.5.0']
 else:
     raise OGRException('Unsupported OS "%s"' % os.name)
 
+# Using the ctypes `find_library` utility  to find the 
+# path to the GDAL library from the list of library names.
+if lib_names:
+    for lib_name in lib_names:
+        lib_path = find_library(lib_name)
+        if not lib_path is None: break
+        
+if lib_path is None:
+    raise OGRException('Could not find the GDAL library (tried "%s"). '
+                       'Try setting GDAL_LIBRARY_PATH in your settings.' % 
+                       '", "'.join(lib_names))
+
 # This loads the GDAL/OGR C library
-lgdal = CDLL(lib_name)
+lgdal = CDLL(lib_path)
 
 # On Windows, the GDAL binaries have some OSR routines exported with 
 # STDCALL, while others are not.  Thus, the library will also need to 
