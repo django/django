@@ -25,5 +25,4 @@ DATA_TYPES = {
     'TextField':         'text',
     'TimeField':         'time',
     'USStateField':      'varchar(2)',
-    'NoField':           '',
 }

@@ -280,10 +280,6 @@ class Field(object):
         """
         return [name_prefix + self.name]
 
-    def get_placeholder(self, value):
-        "Returns the placeholder substitution string for the field with the given value."
-        return '%s'
-
     def prepare_field_objs_and_params(self, manipulator, name_prefix):
         params = {'validator_list': self.validator_list[:]}
         if self.max_length and not self.choices: # Don't give SelectFields a max_length parameter.

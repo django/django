@@ -33,7 +33,6 @@ DATA_TYPES = {
     'TimeField':                    'TIMESTAMP',
     'URLField':                     'VARCHAR2(%(max_length)s)',
     'USStateField':                 'CHAR(2)',
-    'NoField':           None,
 }
 
 TEST_DATABASE_PREFIX = 'test_'

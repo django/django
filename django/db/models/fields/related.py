@@ -729,9 +729,6 @@ class ManyToManyField(RelatedField, Field):
         msg = ugettext_lazy('Hold down "Control", or "Command" on a Mac, to select more than one.')
         self.help_text = string_concat(self.help_text, ' ', msg)
 
-    def get_internal_type(self):
-        return "NoField"
-
     def get_manipulator_field_objs(self):
         choices = self.get_choices_default()
         return [curry(oldforms.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
