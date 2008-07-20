@@ -58,18 +58,9 @@ class OutputChecker(doctest.OutputChecker):
         
         Based on http://codespeak.net/svn/lxml/trunk/src/lxml/doctestcompare.py
         """
-        
-        # We use this to distinguish the output of repr() from an XML element:
-        _repr_re = re.compile(r'^<[^>]+ (at|object) ')
-
         _norm_whitespace_re = re.compile(r'[ \t\n][ \t\n]+')
         def norm_whitespace(v):
             return _norm_whitespace_re.sub(' ', v)
-
-        def looks_like_xml(s):
-            s = s.strip()
-            return (s.startswith('<')
-                    and not _repr_re.search(s))
 
         def child_text(element):
             return ''.join([c.data for c in element.childNodes
@@ -104,12 +95,14 @@ class OutputChecker(doctest.OutputChecker):
         want, got = self._strip_quotes(want, got)
         want = want.replace('\\n','\n')
         got = got.replace('\\n','\n')
-        
-        # If what we want doesn't look like markup, don't bother trying
-        # to parse it.
-        if not looks_like_xml(want):
-            return False
 
+        # If the string is not a complete xml document, we may need to add a
+        # root element. This allow us to compare fragments, like "<foo/><bar/>"
+        if not want.startswith('<?xml'):
+            wrapper = '<root>%s</root>'
+            want = wrapper % want
+            got = wrapper % got
+            
         # Parse the want and got strings, and compare the parsings.
         try:
             want_root = parseString(want).firstChild

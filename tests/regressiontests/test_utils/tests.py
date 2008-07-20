@@ -29,6 +29,16 @@ r"""
 ...     xml.endDocument()
 ...     return stream.getvalue()
 
+>>> def produce_xml_fragment():
+...     stream = StringIO()
+...     xml = SimplerXMLGenerator(stream, encoding='utf-8')
+...     xml.startElement("foo", {"aaa" : "1.0", "bbb": "2.0"})
+...     xml.characters("Hello")
+...     xml.endElement("foo")
+...     xml.startElement("bar", {})
+...     xml.endElement("bar")
+...     return stream.getvalue()
+
 # Long values are normalized and are comparable to normal integers ...
 >>> produce_long()
 42
@@ -53,5 +63,10 @@ r"""
 >>> produce_xml()
 '<?xml version="1.0" encoding="UTF-8"?>\n<foo bbb="2.0" aaa="1.0"><bar ccc="3.0">Hello</bar><whiz>Goodbye</whiz></foo>'
 
+>>> produce_xml_fragment()
+'<foo aaa="1.0" bbb="2.0">Hello</foo><bar></bar>'
+
+>>> produce_xml_fragment()
+'<foo bbb="2.0" aaa="1.0">Hello</foo><bar></bar>'
 
 """
