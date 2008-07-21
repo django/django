@@ -42,7 +42,9 @@ class F(DefaultRepr, models.Model):
 
 
 __test__ = {'API_TESTS': """
-# First, some tests for the datastructure we use
+### Tests for models A,B,C,D ###
+
+## First, test the CollectedObjects data structure directly
 
 >>> from django.db.models.query import CollectedObjects
 
@@ -72,6 +74,7 @@ Traceback (most recent call last):
 CyclicDependency: There is a cyclic dependency of items to be processed.
 
 
+## Second, test the usage of CollectedObjects by Model.delete()
 
 # Due to the way that transactions work in the test harness,
 # doing m.delete() here can work but fail in a real situation,
@@ -84,14 +87,21 @@ CyclicDependency: There is a cyclic dependency of items to be processed.
 # then try again with a known 'tricky' order.  Slightly naughty
 # access to internals here :-)
 
+# If implementation changes, then the tests may need to be simplified:
+#  - remove the lines that set the .keyOrder and clear the related
+#    object caches
+#  - remove the second set of tests (with a2, b2 etc)
+
 >>> from django.db.models.loading import cache
+
+>>> def clear_rel_obj_caches(models):
+...     for m in models:
+...         if hasattr(m._meta, '_related_objects_cache'): 
+...             del m._meta._related_objects_cache
 
 # Nice order
 >>> cache.app_models['delete'].keyOrder = ['a', 'b', 'c', 'd']
->>> del A._meta._related_objects_cache
->>> del B._meta._related_objects_cache
->>> del C._meta._related_objects_cache
->>> del D._meta._related_objects_cache
+>>> clear_rel_obj_caches([A, B, C, D])
 
 >>> a1 = A()
 >>> a1.save()
@@ -110,10 +120,7 @@ CyclicDependency: There is a cyclic dependency of items to be processed.
 
 # Same again with a known bad order
 >>> cache.app_models['delete'].keyOrder = ['d', 'c', 'b', 'a']
->>> del A._meta._related_objects_cache
->>> del B._meta._related_objects_cache
->>> del C._meta._related_objects_cache
->>> del D._meta._related_objects_cache
+>>> clear_rel_obj_caches([A, B, C, D])
 
 >>> a2 = A()
 >>> a2.save()
@@ -130,7 +137,9 @@ CyclicDependency: There is a cyclic dependency of items to be processed.
 [<class 'modeltests.delete.models.D'>, <class 'modeltests.delete.models.C'>, <class 'modeltests.delete.models.B'>, <class 'modeltests.delete.models.A'>]
 >>> a2.delete()
 
-# Tests for nullable related fields
+### Tests for models E,F - nullable related fields ###
+
+## First, test the CollectedObjects data structure directly
 
 >>> g = CollectedObjects()
 >>> g.add("key1", 1, "item1", None)
@@ -141,6 +150,8 @@ False
 True
 >>> g.ordered_keys()
 ['key1', 'key2']
+
+## Second, test the usage of CollectedObjects by Model.delete()
 
 >>> e1 = E()
 >>> e1.save()
