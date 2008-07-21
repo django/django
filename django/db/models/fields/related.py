@@ -2,6 +2,7 @@ from django.db import connection, transaction
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist
 from django.db.models.related import RelatedObject
+from django.db.models.query import QuerySet
 from django.db.models.query_utils import QueryWrapper
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, string_concat, ungettext, ugettext as _
@@ -236,7 +237,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
                 params = {'%s__pk' % self.field.rel.field_name: val}
             else:
                 params = {'%s__exact' % self.field.rel.field_name: val}
-            rel_obj = self.field.rel.to._default_manager.get(**params)
+            rel_obj = QuerySet(self.field.rel.to).get(**params)
             setattr(instance, cache_name, rel_obj)
             return rel_obj
 
