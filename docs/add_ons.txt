@@ -76,7 +76,7 @@ Requires the sites_ contrib package to be installed as well.
 formtools
 =========
 
-A set of high-level abstractions for Django forms (django.newforms).
+A set of high-level abstractions for Django forms (django.forms).
 
 django.contrib.formtools.preview
 --------------------------------

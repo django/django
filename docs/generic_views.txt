@@ -984,12 +984,12 @@ In addition to ``extra_context``, the template's context will be:
           <p>{{ form.address.label_tag }} {{ form.address }}</p>
           </form>
 
-      See the `newforms documentation`_ for more information about using
+      See the `forms documentation`_ for more information about using
       ``Form`` objects in templates.
 
 .. _authentication system: ../authentication/
 .. _ModelForm docs: ../newforms/modelforms
-.. _newforms documentation: ../newforms/
+.. _forms documentation: ../forms/
 
 ``django.views.generic.create_update.update_object``
 ----------------------------------------------------

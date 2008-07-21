@@ -17,7 +17,7 @@ Basic file uploads
 
 Consider a simple form containing a ``FileField``::
 
-    from django import newforms as forms
+    from django import forms
 
     class UploadFileForm(forms.Form):
         title = forms.CharField(max_length=50)
@@ -48,7 +48,7 @@ something like::
             form = UploadFileForm()
         return render_to_response('upload.html', {'form': form})
 
-.. _binding uploaded files to a form: ../newforms/#binding-uploaded-files-to-a- form
+.. _binding uploaded files to a form: ../forms/#binding-uploaded-files-to-a- form
 
 Notice that we have to pass ``request.FILES`` into the form's constructor; this
 is how file data gets bound into a form.

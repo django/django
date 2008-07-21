@@ -111,7 +111,7 @@ into the precise details of what ``Field`` can do later on; for now, suffice it
 to say that everything descends from ``Field`` and then customizes key pieces
 of the class behavior.
 
-.. _form fields: ../newforms/#fields
+.. _form fields: ../forms/#fields
 
 It's important to realize that a Django field class is not what is stored in
 your model attributes. The model attributes contain normal Python objects. The
@@ -493,8 +493,8 @@ This assumes we're imported a ``MyFormField`` field class (which has its own
 default widget). This document doesn't cover the details of writing custom form
 fields.
 
-.. _helper functions: ../newforms/#generating-forms-for-models
-.. _forms documentation: ../newforms/
+.. _helper functions: ../forms/#generating-forms-for-models
+.. _forms documentation: ../forms/
 
 ``get_internal_type(self)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

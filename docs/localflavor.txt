@@ -11,7 +11,7 @@ Inside that package, country- or culture-specific code is organized into
 subpackages, named using `ISO 3166 country codes`_.
 
 Most of the ``localflavor`` add-ons are localized form components deriving from
-the newforms_ framework -- for example, a ``USStateField`` that knows how to
+the forms_ framework -- for example, a ``USStateField`` that knows how to
 validate U.S. state abbreviations, and a ``FISocialSecurityNumber`` that knows
 how to validate Finnish social security numbers.
 
@@ -19,7 +19,7 @@ To use one of these localized components, just import the relevant subpackage.
 For example, here's how you can create a form with a field representing a
 French telephone number::
 
-    from django import newforms as forms
+    from django import forms
     from django.contrib.localflavor import fr
 
     class MyForm(forms.Form):
@@ -58,10 +58,10 @@ Countries currently supported by ``localflavor`` are:
 The ``localflavor`` package also includes a ``generic`` subpackage, containing
 useful code that is not specific to one particular country or culture.
 Currently, it defines date and datetime input fields based on those from
-newforms_, but with non-US default formats. Here's an example of how to use
+forms_, but with non-US default formats. Here's an example of how to use
 them::
 
-    from django import newforms as forms
+    from django import forms
     from django.contrib.localflavor import generic
 
     class MyForm(forms.Form):
@@ -92,7 +92,7 @@ them::
 .. _Switzerland: `Switzerland (django.contrib.localflavor.ch)`_
 .. _United Kingdom: `United Kingdom (django.contrib.localflavor.uk)`_
 .. _United States of America: `United States of America (django.contrib.localflavor.us)`_
-.. _newforms: ../newforms/
+.. _forms: ../forms/
 
 Adding flavors
 ==============

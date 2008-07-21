@@ -115,6 +115,6 @@ change:
 .. _template language: ../templates/
 .. _transactions: ../transactions/
 .. _url dispatch: ../url_dispatch/
-.. _forms and validation: ../forms/
+.. _forms and validation: ../oldforms/
 .. _serialization: ../serialization/
 .. _authentication: ../authentication/

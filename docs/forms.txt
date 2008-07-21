@@ -1,700 +1,2523 @@
-===============================
-Forms, fields, and manipulators
-===============================
+=================
+The forms library
+=================
 
-Forwards-compatibility note
-===========================
+``django.forms`` is Django's fantastic new form-handling library. It's a
+replacement for the old form/manipulator/validation framework, which has been
+moved to ``django.oldforms``. This document explains how to use this new
+library.
 
-The legacy forms/manipulators system described in this document is going to be
-replaced in the next Django release. If you're starting from scratch, we
-strongly encourage you not to waste your time learning this. Instead, learn and
-use the django.newforms system, which we have begun to document in the
-`newforms documentation`_.
+Migration plan
+==============
 
-If you have legacy form/manipulator code, read the "Migration plan" section in
-that document to understand how we're making the switch.
+``django.newforms`` is new in Django's 0.96 release, but, as it won't be new
+forever, we plan to rename it to ``django.forms`` in the future. The current
+``django.forms`` package will be available as ``django.oldforms`` until Django
+1.0, when we plan to remove it for good.
 
-.. _newforms documentation: ../newforms/
+That has direct repercussions on the forward compatibility of your code. Please
+read the following migration plan and code accordingly:
 
-Introduction
+    * The old forms framework (the current ``django.forms``) has been copied to
+      ``django.oldforms``. Thus, you can start upgrading your code *now*,
+      rather than waiting for the future backwards-incompatible change, by
+      changing your import statements like this::
+
+          from django import forms             # old
+          from django import oldforms as forms # new
+
+    * In the next Django release (0.97), we will move the current
+      ``django.newforms`` to ``django.forms``. This will be a
+      backwards-incompatible change, and anybody who is still using the old
+      version of ``django.forms`` at that time will need to change their import
+      statements, as described in the previous bullet.
+
+    * We will remove ``django.oldforms`` in the release *after* the next Django
+      release -- either 0.98 or 1.0, whichever comes first.
+
+With this in mind, we recommend you use the following import statement when
+using ``django.newforms``::
+
+    from django import newforms as forms
+
+This way, your code can refer to the ``forms`` module, and when
+``django.newforms`` is renamed to ``django.forms``, you'll only have to change
+your ``import`` statements.
+
+If you prefer "``import *``" syntax, you can do the following::
+
+    from django.newforms import *
+
+This will import all fields, widgets, form classes and other various utilities
+into your local namespace. Some people find this convenient; others find it
+too messy. The choice is yours.
+
+Overview
+========
+
+As with the ``django.oldforms`` ("manipulators") system before it,
+``django.forms`` is intended to handle HTML form display, data processing
+(validation) and redisplay. It's what you use if you want to perform
+server-side validation for an HTML form.
+
+For example, if your Web site has a contact form that visitors can use to
+send you e-mail, you'd use this library to implement the display of the HTML
+form fields, along with the form validation. Any time you need to use an HTML
+``<form>``, you can use this library.
+
+The library deals with these concepts:
+
+    * **Widget** -- A class that corresponds to an HTML form widget, e.g.
+      ``<input type="text">`` or ``<textarea>``. This handles rendering of the
+      widget as HTML.
+
+    * **Field** -- A class that is responsible for doing validation, e.g.
+      an ``EmailField`` that makes sure its data is a valid e-mail address.
+
+    * **Form** -- A collection of fields that knows how to validate itself and
+      display itself as HTML.
+
+    * **Media** -- A definition of the CSS and JavaScript resources that are
+      required to render a form.
+      
+The library is decoupled from the other Django components, such as the database
+layer, views and templates. It relies only on Django settings, a couple of
+``django.utils`` helper functions and Django's internationalization hooks (but
+you're not required to be using internationalization features to use this
+library).
+
+Form objects
 ============
 
-Once you've got a chance to play with Django's admin interface, you'll probably
-wonder if the fantastic form validation framework it uses is available to user
-code. It is, and this document explains how the framework works.
+The primary way of using the ``forms`` library is to create a form object.
+Do this by subclassing ``django.forms.Form`` and specifying the form's
+fields, in a declarative style that you'll be familiar with if you've used
+Django database models. In this section, we'll iteratively develop a form
+object that you might use to implement "contact me" functionality on your
+personal Web site.
 
-We'll take a top-down approach to examining Django's form validation framework,
-because much of the time you won't need to use the lower-level APIs. Throughout
-this document, we'll be working with the following model, a "place" object::
+Start with this basic ``Form`` subclass, which we'll call ``ContactForm``::
 
-    from django.db import models
+    from django import forms
 
-    PLACE_TYPES = (
-        (1, 'Bar'),
-        (2, 'Restaurant'),
-        (3, 'Movie Theater'),
-        (4, 'Secret Hideout'),
-    )
+    class ContactForm(forms.Form):
+        subject = forms.CharField(max_length=100)
+        message = forms.CharField()
+        sender = forms.EmailField()
+        cc_myself = forms.BooleanField(required=False)
 
-    class Place(models.Model):
-        name = models.CharField(max_length=100)
-        address = models.CharField(max_length=100, blank=True)
-        city = models.CharField(max_length=50, blank=True)
-        state = models.USStateField()
-        zip_code = models.CharField(max_length=5, blank=True)
-        place_type = models.IntegerField(choices=PLACE_TYPES)
+A form is composed of ``Field`` objects. In this case, our form has four
+fields: ``subject``, ``message``, ``sender`` and ``cc_myself``. We'll explain
+the different types of fields -- e.g., ``CharField`` and ``EmailField`` --
+shortly.
 
-        class Admin:
-            pass
+Creating ``Form`` instances
+---------------------------
 
-        def __unicode__(self):
-            return self.name
+A ``Form`` instance is either **bound** to a set of data, or **unbound**.
 
-Defining the above class is enough to create an admin interface to a ``Place``,
-but what if you want to allow public users to submit places?
+    * If it's **bound** to a set of data, it's capable of validating that data
+      and rendering the form as HTML with the data displayed in the HTML.
 
-Automatic Manipulators
-======================
+    * If it's **unbound**, it cannot do validation (because there's no data to
+      validate!), but it can still render the blank form as HTML.
 
-The highest-level interface for object creation and modification is the
-**automatic Manipulator** framework. An automatic manipulator is a utility
-class tied to a given model that "knows" how to create or modify instances of
-that model and how to validate data for the object. Automatic Manipulators come
-in two flavors: ``AddManipulators`` and ``ChangeManipulators``. Functionally
-they are quite similar, but the former knows how to create new instances of the
-model, while the latter modifies existing instances. Both types of classes are
-automatically created when you define a new class::
+To create an unbound ``Form`` instance, simply instantiate the class::
 
-    >>> from mysite.myapp.models import Place
-    >>> Place.AddManipulator
-    <class 'django.models.manipulators.AddManipulator'>
-    >>> Place.ChangeManipulator
-    <class 'django.models.manipulators.ChangeManipulator'>
+    >>> f = ContactForm()
 
-Using the ``AddManipulator``
+To bind data to a form, pass the data as a dictionary as the first parameter to
+your ``Form`` class constructor::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+
+In this dictionary, the keys are the field names, which correspond to the
+attributes in your ``Form`` class. The values are the data you're trying
+to validate. These will usually be strings, but there's no requirement that
+they be strings; the type of data you pass depends on the ``Field``, as we'll
+see in a moment.
+
+If you need to distinguish between bound and unbound form instances at runtime,
+check the value of the form's ``is_bound`` attribute::
+
+    >>> f = ContactForm()
+    >>> f.is_bound
+    False
+    >>> f = ContactForm({'subject': 'hello'})
+    >>> f.is_bound
+    True
+
+Note that passing an empty dictionary creates a *bound* form with empty data::
+
+    >>> f = ContactForm({})
+    >>> f.is_bound
+    True
+
+If you have a bound ``Form`` instance and want to change the data somehow, or
+if you want to bind an unbound ``Form`` instance to some data, create another
+``Form`` instance. There is no way to change data in a ``Form`` instance. Once
+a ``Form`` instance has been created, you should consider its data immutable,
+whether it has data or not.
+
+Using forms to validate data
 ----------------------------
 
-We'll start with the ``AddManipulator``.  Here's a very simple view that takes
-POSTed data from the browser and creates a new ``Place`` object::
+The primary task of a ``Form`` object is to validate data. With a bound
+``Form`` instance, call the ``is_valid()`` method to run validation and return
+a boolean designating whether the data was valid::
 
-    from django.shortcuts import render_to_response
-    from django.http import Http404, HttpResponse, HttpResponseRedirect
-    from django import forms
-    from mysite.myapp.models import Place
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    True
 
-    def naive_create_place(request):
-        """A naive approach to creating places; don't actually use this!"""
-        # Create the AddManipulator.
-        manipulator = Place.AddManipulator()
+Let's try with some invalid data. In this case, ``subject`` is blank (an error,
+because all fields are required by default) and ``sender`` is not a valid
+e-mail address::
 
-        # Make a copy of the POSTed data so that do_html2python can
-        # modify it in place (request.POST is immutable).
-        new_data = request.POST.copy()
+    >>> data = {'subject': '',
+    ...         'message': 'Hi there',
+    ...         'sender': 'invalid e-mail address',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    False
 
-        # Convert the request data (which will all be strings) into the
-        # appropriate Python types for those fields.
-        manipulator.do_html2python(new_data)
+Access the ``errors`` attribute to get a dictionary of error messages::
 
-        # Save the new object.
-        new_place = manipulator.save(new_data)
+    >>> f.errors
+    {'sender': [u'Enter a valid e-mail address.'], 'subject': [u'This field is required.']}
 
-        # It worked!
-        return HttpResponse("Place created: %s" % new_place)
+In this dictionary, the keys are the field names, and the values are lists of
+Unicode strings representing the error messages. The error messages are stored
+in lists because a field can have multiple error messages.
 
-The ``naive_create_place`` example works, but as you probably can tell, this
-view has a number of problems:
+You can access ``errors`` without having to call ``is_valid()`` first. The
+form's data will be validated the first time either you call ``is_valid()`` or
+access ``errors``.
 
-    * No validation of any sort is performed. If, for example, the ``name`` field
-      isn't given in ``request.POST``, the save step will cause a database error
-      because that field is required. Ugly.
+The validation routines will only get called once, regardless of how many times
+you access ``errors`` or call ``is_valid()``. This means that if validation has
+side effects, those side effects will only be triggered once.
 
-    * Even if you *do* perform validation, there's still no way to give that
-      information to the user in any sort of useful way.
+Behavior of unbound forms
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    * You'll have to separately create a form (and view) that submits to this
-      page, which is a pain and is redundant.
+It's meaningless to validate a form with no data, but, for the record, here's
+what happens with unbound forms::
 
-Let's dodge these problems momentarily to take a look at how you could create a
-view with a form that submits to this flawed creation view::
+    >>> f = ContactForm()
+    >>> f.is_valid()
+    False
+    >>> f.errors
+    {}
 
-    def naive_create_place_form(request):
-        """Simplistic place form view; don't actually use anything like this!"""
-        # Create a FormWrapper object that the template can use. Ignore
-        # the last two arguments to FormWrapper for now.
-        form = forms.FormWrapper(Place.AddManipulator(), {}, {})
-        return render_to_response('places/naive_create_form.html', {'form': form})
+Accessing "clean" data
+----------------------
 
-(This view, as well as all the following ones, has the same imports as in the
-first example above.)
+Each ``Field`` in a ``Form`` class is responsible not only for validating data,
+but also for "cleaning" it -- normalizing it to a consistent format. This is a
+nice feature, because it allows data for a particular field to be input in
+a variety of ways, always resulting in consistent output.
 
-The ``forms.FormWrapper`` object is a wrapper that templates can
-easily deal with to create forms. Here's the ``naive_create_form.html``
-template::
+For example, ``DateField`` normalizes input into a Python ``datetime.date``
+object. Regardless of whether you pass it a string in the format
+``'1994-07-15'``, a ``datetime.date`` object or a number of other formats,
+``DateField`` will always normalize it to a ``datetime.date`` object as long as
+it's valid.
 
-    {% extends "base.html" %}
+Once you've created a ``Form`` instance with a set of data and validated it,
+you can access the clean data via the ``cleaned_data`` attribute of the ``Form``
+object::
 
-    {% block content %}
-    <h1>Create a place:</h1>
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    True
+    >>> f.cleaned_data
+    {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
 
-    <form method="post" action="../do_new/">
-    <p><label for="id_name">Name:</label> {{ form.name }}</p>
-    <p><label for="id_address">Address:</label> {{ form.address }}</p>
-    <p><label for="id_city">City:</label> {{ form.city }}</p>
-    <p><label for="id_state">State:</label> {{ form.state }}</p>
-    <p><label for="id_zip_code">Zip:</label> {{ form.zip_code }}</p>
-    <p><label for="id_place_type">Place type:</label> {{ form.place_type }}</p>
+.. note::
+    **New in Django development version** The ``cleaned_data`` attribute was
+    called ``clean_data`` in earlier releases.
+
+Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
+always cleans the input into a Unicode string. We'll cover the encoding
+implications later in this document.
+
+If your data does *not* validate, your ``Form`` instance will not have a
+``cleaned_data`` attribute::
+
+    >>> data = {'subject': '',
+    ...         'message': 'Hi there',
+    ...         'sender': 'invalid e-mail address',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    False
+    >>> f.cleaned_data
+    Traceback (most recent call last):
+    ...
+    AttributeError: 'ContactForm' object has no attribute 'cleaned_data'
+
+``cleaned_data`` will always *only* contain a key for fields defined in the
+``Form``, even if you pass extra data when you define the ``Form``. In this
+example, we pass a bunch of extra fields to the ``ContactForm`` constructor,
+but ``cleaned_data`` contains only the form's fields::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True,
+    ...         'extra_field_1': 'foo',
+    ...         'extra_field_2': 'bar',
+    ...         'extra_field_3': 'baz'}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    True
+    >>> f.cleaned_data # Doesn't contain extra_field_1, etc.
+    {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
+
+``cleaned_data`` will include a key and value for *all* fields defined in the
+``Form``, even if the data didn't include a value for fields that are not
+required. In this example, the data dictionary doesn't include a value for the
+``nick_name`` field, but ``cleaned_data`` includes it, with an empty value::
+
+    >>> class OptionalPersonForm(Form):
+    ...     first_name = CharField()
+    ...     last_name = CharField()
+    ...     nick_name = CharField(required=False)
+    >>> data = {'first_name': u'John', 'last_name': u'Lennon'}
+    >>> f = OptionalPersonForm(data)
+    >>> f.is_valid()
+    True
+    >>> f.cleaned_data
+    {'nick_name': u'', 'first_name': u'John', 'last_name': u'Lennon'}
+
+In this above example, the ``cleaned_data`` value for ``nick_name`` is set to an
+empty string, because ``nick_name`` is ``CharField``, and ``CharField``\s treat
+empty values as an empty string. Each field type knows what its "blank" value
+is -- e.g., for ``DateField``, it's ``None`` instead of the empty string. For
+full details on each field's behavior in this case, see the "Empty value" note
+for each field in the "Built-in ``Field`` classes" section below.
+
+You can write code to perform validation for particular form fields (based on
+their name) or for the form as a whole (considering combinations of various
+fields). More information about this is in the `Custom form and field
+validation`_ section, below.
+
+Behavior of unbound forms
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's meaningless to request "cleaned" data in a form with no data, but, for the
+record, here's what happens with unbound forms::
+
+    >>> f = ContactForm()
+    >>> f.cleaned_data
+    Traceback (most recent call last):
+    ...
+    AttributeError: 'ContactForm' object has no attribute 'cleaned_data'
+
+Outputting forms as HTML
+------------------------
+
+The second task of a ``Form`` object is to render itself as HTML. To do so,
+simply ``print`` it::
+
+    >>> f = ContactForm()
+    >>> print f
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
+    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+
+If the form is bound to data, the HTML output will include that data
+appropriately. For example, if a field is represented by an
+``<input type="text">``, the data will be in the ``value`` attribute. If a
+field is represented by an ``<input type="checkbox">``, then that HTML will
+include ``checked="checked"`` if appropriate::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> print f
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" value="hello" /></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" value="Hi there" /></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" value="foo@example.com" /></td></tr>
+    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" checked="checked" /></td></tr>
+
+This default output is a two-column HTML table, with a ``<tr>`` for each field.
+Notice the following:
+
+    * For flexibility, the output does *not* include the ``<table>`` and
+      ``</table>`` tags, nor does it include the ``<form>`` and ``</form>``
+      tags or an ``<input type="submit">`` tag. It's your job to do that.
+
+    * Each field type has a default HTML representation. ``CharField`` and
+      ``EmailField`` are represented by an ``<input type="text">``.
+      ``BooleanField`` is represented by an ``<input type="checkbox">``. Note
+      these are merely sensible defaults; you can specify which HTML to use for
+      a given field by using widgets, which we'll explain shortly.
+
+    * The HTML ``name`` for each tag is taken directly from its attribute name
+      in the ``ContactForm`` class.
+
+    * The text label for each field -- e.g. ``'Subject:'``, ``'Message:'`` and
+      ``'Cc myself:'`` is generated from the field name by converting all
+      underscores to spaces and upper-casing the first letter. Again, note
+      these are merely sensible defaults; you can also specify labels manually.
+
+    * Each text label is surrounded in an HTML ``<label>`` tag, which points
+      to the appropriate form field via its ``id``. Its ``id``, in turn, is
+      generated by prepending ``'id_'`` to the field name. The ``id``
+      attributes and ``<label>`` tags are included in the output by default, to
+      follow best practices, but you can change that behavior.
+
+Although ``<table>`` output is the default output style when you ``print`` a
+form, other output styles are available. Each style is available as a method on
+a form object, and each rendering method returns a Unicode object.
+
+``as_p()``
+~~~~~~~~~~
+
+``Form.as_p()`` renders the form as a series of ``<p>`` tags, with each ``<p>``
+containing one field::
+
+    >>> f = ContactForm()
+    >>> f.as_p()
+    u'<p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>\n<p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>\n<p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>\n<p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>'
+    >>> print f.as_p()
+    <p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
+    <p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>
+    <p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>
+    <p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
+
+``as_ul()``
+~~~~~~~~~~~
+
+``Form.as_ul()`` renders the form as a series of ``<li>`` tags, with each
+``<li>`` containing one field. It does *not* include the ``<ul>`` or ``</ul>``,
+so that you can specify any HTML attributes on the ``<ul>`` for flexibility::
+
+    >>> f = ContactForm()
+    >>> f.as_ul()
+    u'<li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>\n<li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>\n<li><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></li>\n<li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>'
+    >>> print f.as_ul()
+    <li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>
+    <li><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></li>
+    <li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>
+
+``as_table()``
+~~~~~~~~~~~~~~
+
+Finally, ``Form.as_table()`` outputs the form as an HTML ``<table>``. This is
+exactly the same as ``print``. In fact, when you ``print`` a form object, it
+calls its ``as_table()`` method behind the scenes::
+
+    >>> f = ContactForm()
+    >>> f.as_table()
+    u'<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>'
+    >>> print f.as_table()
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
+    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+
+Configuring HTML ``<label>`` tags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An HTML ``<label>`` tag designates which label text is associated with which
+form element. This small enhancement makes forms more usable and more accessible
+to assistive devices. It's always a good idea to use ``<label>`` tags.
+
+By default, the form rendering methods include HTML ``id`` attributes on the
+form elements and corresponding ``<label>`` tags around the labels. The ``id``
+attribute values are generated by prepending ``id_`` to the form field names.
+This behavior is configurable, though, if you want to change the ``id``
+convention or remove HTML ``id`` attributes and ``<label>`` tags entirely.
+
+Use the ``auto_id`` argument to the ``Form`` constructor to control the label
+and ``id`` behavior. This argument must be ``True``, ``False`` or a string.
+
+If ``auto_id`` is ``False``, then the form output will not include ``<label>``
+tags nor ``id`` attributes::
+
+    >>> f = ContactForm(auto_id=False)
+    >>> print f.as_table()
+    <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th>Message:</th><td><input type="text" name="message" /></td></tr>
+    <tr><th>Sender:</th><td><input type="text" name="sender" /></td></tr>
+    <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself" /></td></tr>
+    >>> print f.as_ul()
+    <li>Subject: <input type="text" name="subject" maxlength="100" /></li>
+    <li>Message: <input type="text" name="message" /></li>
+    <li>Sender: <input type="text" name="sender" /></li>
+    <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
+    >>> print f.as_p()
+    <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
+    <p>Message: <input type="text" name="message" /></p>
+    <p>Sender: <input type="text" name="sender" /></p>
+    <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
+
+If ``auto_id`` is set to ``True``, then the form output *will* include
+``<label>`` tags and will simply use the field name as its ``id`` for each form
+field::
+
+    >>> f = ContactForm(auto_id=True)
+    >>> print f.as_table()
+    <tr><th><label for="subject">Subject:</label></th><td><input id="subject" type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th><label for="message">Message:</label></th><td><input type="text" name="message" id="message" /></td></tr>
+    <tr><th><label for="sender">Sender:</label></th><td><input type="text" name="sender" id="sender" /></td></tr>
+    <tr><th><label for="cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="cc_myself" /></td></tr>
+    >>> print f.as_ul()
+    <li><label for="subject">Subject:</label> <input id="subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="message">Message:</label> <input type="text" name="message" id="message" /></li>
+    <li><label for="sender">Sender:</label> <input type="text" name="sender" id="sender" /></li>
+    <li><label for="cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="cc_myself" /></li>
+    >>> print f.as_p()
+    <p><label for="subject">Subject:</label> <input id="subject" type="text" name="subject" maxlength="100" /></p>
+    <p><label for="message">Message:</label> <input type="text" name="message" id="message" /></p>
+    <p><label for="sender">Sender:</label> <input type="text" name="sender" id="sender" /></p>
+    <p><label for="cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="cc_myself" /></p>
+
+If ``auto_id`` is set to a string containing the format character ``'%s'``,
+then the form output will include ``<label>`` tags, and will generate ``id``
+attributes based on the format string. For example, for a format string
+``'field_%s'``, a field named ``subject`` will get the ``id`` value
+``'field_subject'``. Continuing our example::
+
+    >>> f = ContactForm(auto_id='id_for_%s')
+    >>> print f.as_table()
+    <tr><th><label for="id_for_subject">Subject:</label></th><td><input id="id_for_subject" type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th><label for="id_for_message">Message:</label></th><td><input type="text" name="message" id="id_for_message" /></td></tr>
+    <tr><th><label for="id_for_sender">Sender:</label></th><td><input type="text" name="sender" id="id_for_sender" /></td></tr>
+    <tr><th><label for="id_for_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></td></tr>
+    >>> print f.as_ul()
+    <li><label for="id_for_subject">Subject:</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="id_for_message">Message:</label> <input type="text" name="message" id="id_for_message" /></li>
+    <li><label for="id_for_sender">Sender:</label> <input type="text" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
+    >>> print f.as_p()
+    <p><label for="id_for_subject">Subject:</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></p>
+    <p><label for="id_for_message">Message:</label> <input type="text" name="message" id="id_for_message" /></p>
+    <p><label for="id_for_sender">Sender:</label> <input type="text" name="sender" id="id_for_sender" /></p>
+    <p><label for="id_for_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></p>
+
+If ``auto_id`` is set to any other true value -- such as a string that doesn't
+include ``%s`` -- then the library will act as if ``auto_id`` is ``True``.
+
+By default, ``auto_id`` is set to the string ``'id_%s'``.
+
+Normally, a colon (``:``) will be appended after any label name when a form is
+rendered. It's possible to change the colon to another character, or omit it
+entirely, using the ``label_suffix`` parameter::
+
+    >>> f = ContactForm(auto_id='id_for_%s', label_suffix='')
+    >>> print f.as_ul()
+    <li><label for="id_for_subject">Subject</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="id_for_message">Message</label> <input type="text" name="message" id="id_for_message" /></li>
+    <li><label for="id_for_sender">Sender</label> <input type="text" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_cc_myself">Cc myself</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
+    >>> f = ContactForm(auto_id='id_for_%s', label_suffix=' ->')
+    >>> print f.as_ul()
+    <li><label for="id_for_subject">Subject -></label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="id_for_message">Message -></label> <input type="text" name="message" id="id_for_message" /></li>
+    <li><label for="id_for_sender">Sender -></label> <input type="text" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_cc_myself">Cc myself -></label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
+
+Note that the label suffix is added only if the last character of the
+label isn't a punctuation character (``.``, ``!``, ``?`` or ``:``)
+
+Notes on field ordering
+~~~~~~~~~~~~~~~~~~~~~~~
+
+In the ``as_p()``, ``as_ul()`` and ``as_table()`` shortcuts, the fields are
+displayed in the order in which you define them in your form class. For
+example, in the ``ContactForm`` example, the fields are defined in the order
+``subject``, ``message``, ``sender``, ``cc_myself``. To reorder the HTML
+output, just change the order in which those fields are listed in the class.
+
+How errors are displayed
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you render a bound ``Form`` object, the act of rendering will automatically
+run the form's validation if it hasn't already happened, and the HTML output
+will include the validation errors as a ``<ul class="errorlist">`` near the
+field. The particular positioning of the error messages depends on the output
+method you're using::
+
+    >>> data = {'subject': '',
+    ...         'message': 'Hi there',
+    ...         'sender': 'invalid e-mail address',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data, auto_id=False)
+    >>> print f.as_table()
+    <tr><th>Subject:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th>Message:</th><td><input type="text" name="message" value="Hi there" /></td></tr>
+    <tr><th>Sender:</th><td><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul><input type="text" name="sender" value="invalid e-mail address" /></td></tr>
+    <tr><th>Cc myself:</th><td><input checked="checked" type="checkbox" name="cc_myself" /></td></tr>
+    >>> print f.as_ul()
+    <li><ul class="errorlist"><li>This field is required.</li></ul>Subject: <input type="text" name="subject" maxlength="100" /></li>
+    <li>Message: <input type="text" name="message" value="Hi there" /></li>
+    <li><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul>Sender: <input type="text" name="sender" value="invalid e-mail address" /></li>
+    <li>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></li>
+    >>> print f.as_p()
+    <p><ul class="errorlist"><li>This field is required.</li></ul></p>
+    <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
+    <p>Message: <input type="text" name="message" value="Hi there" /></p>
+    <p><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul></p>
+    <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
+    <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
+
+Customizing the error list format
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, forms use ``django.forms.util.ErrorList`` to format validation
+errors. If you'd like to use an alternate class for displaying errors, you can
+pass that in at construction time::
+
+    >>> from django.forms.util import ErrorList
+    >>> class DivErrorList(ErrorList):
+    ...     def __unicode__(self):
+    ...         return self.as_divs()
+    ...     def as_divs(self):
+    ...         if not self: return u''
+    ...         return u'<div class="errorlist">%s</div>' % ''.join([u'<div class="error">%s</div>' % e for e in self])
+    >>> f = ContactForm(data, auto_id=False, error_class=DivErrorList)
+    >>> f.as_p()
+    <div class="errorlist"><div class="error">This field is required.</div></div>
+    <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
+    <p>Message: <input type="text" name="message" value="Hi there" /></p>
+    <div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
+    <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
+    <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
+
+More granular output
+~~~~~~~~~~~~~~~~~~~~
+
+The ``as_p()``, ``as_ul()`` and ``as_table()`` methods are simply shortcuts for
+lazy developers -- they're not the only way a form object can be displayed.
+
+To display the HTML for a single field in your form, use dictionary lookup
+syntax using the field's name as the key, and print the resulting object::
+
+    >>> f = ContactForm()
+    >>> print f['subject']
+    <input id="id_subject" type="text" name="subject" maxlength="100" />
+    >>> print f['message']
+    <input type="text" name="message" id="id_message" />
+    >>> print f['sender']
+    <input type="text" name="sender" id="id_sender" />
+    >>> print f['cc_myself']
+    <input type="checkbox" name="cc_myself" id="id_cc_myself" />
+
+Call ``str()`` or ``unicode()`` on the field to get its rendered HTML as a
+string or Unicode object, respectively::
+
+    >>> str(f['subject'])
+    '<input id="id_subject" type="text" name="subject" maxlength="100" />'
+    >>> unicode(f['subject'])
+    u'<input id="id_subject" type="text" name="subject" maxlength="100" />'
+
+The field-specific output honors the form object's ``auto_id`` setting::
+
+    >>> f = ContactForm(auto_id=False)
+    >>> print f['message']
+    <input type="text" name="message" />
+    >>> f = ContactForm(auto_id='id_%s')
+    >>> print f['message']
+    <input type="text" name="message" id="id_message" />
+
+For a field's list of errors, access the field's ``errors`` attribute. This
+is a list-like object that is displayed as an HTML ``<ul class="errorlist">``
+when printed::
+
+    >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
+    >>> f = ContactForm(data, auto_id=False)
+    >>> print f['message']
+    <input type="text" name="message" />
+    >>> f['message'].errors
+    [u'This field is required.']
+    >>> print f['message'].errors
+    <ul class="errorlist"><li>This field is required.</li></ul>
+    >>> f['subject'].errors
+    []
+    >>> print f['subject'].errors
+
+    >>> str(f['subject'].errors)
+    ''
+
+Using forms in views and templates
+----------------------------------
+
+Let's put this all together and use the ``ContactForm`` example in a Django
+view and template.
+
+Simple view example
+~~~~~~~~~~~~~~~~~~~
+
+This example view displays the contact form by default and validates/processes
+it if accessed via a POST request::
+
+    def contact(request):
+        if request.method == 'POST':
+            form = ContactForm(request.POST)
+            if form.is_valid():
+                # Do form processing here...
+                return HttpResponseRedirect('/url/on_success/')
+        else:
+            form = ContactForm()
+        return render_to_response('contact.html', {'form': form})
+
+Simple template example
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The template in the above view example, ``contact.html``, is responsible for
+displaying the form as HTML. To do this, we can use the techniques outlined in
+the "Outputting forms as HTML" section above.
+
+The simplest way to display a form's HTML is to use the variable on its own,
+like this::
+
+    <form method="post" action="">
+    <table>{{ form }}</table>
     <input type="submit" />
     </form>
-    {% endblock %}
 
-Before we get back to the problems with these naive set of views, let's go over
-some salient points of the above template:
+The above template code will display the form as an HTML table, using the
+``form.as_table()`` method explained previously. This works because Django's
+template system displays an object's ``__str__()`` value, and the ``Form``
+class' ``__str__()`` method calls its ``as_table()`` method.
 
-    * Field "widgets" are handled for you: ``{{ form.field }}`` automatically
-      creates the "right" type of widget for the form, as you can see with the
-      ``place_type`` field above.
+The following is equivalent but a bit more explicit::
 
-    * There isn't a way just to spit out the form. You'll still need to define
-      how the form gets laid out. This is a feature: Every form should be
-      designed differently. Django doesn't force you into any type of mold.
-      If you must use tables, use tables. If you're a semantic purist, you can
-      probably find better HTML than in the above template.
+    <form method="post" action="">
+    <table>{{ form.as_table }}</table>
+    <input type="submit" />
+    </form>
 
-    * To avoid name conflicts, the ``id`` values of form elements take the
-      form "id_*fieldname*".
+``form.as_ul`` and ``form.as_p`` are also available, as you may expect.
 
-By creating a creation form we've solved problem number 3 above, but we still
-don't have any validation. Let's revise the validation issue by writing a new
-creation view that takes validation into account::
+Note that in the above two examples, we included the ``<form>``, ``<table>``
+``<input type="submit" />``, ``</table>`` and ``</form>`` tags. The form
+convenience methods (``as_table()``, ``as_ul()`` and ``as_p()``) do not include
+that HTML.
 
-    def create_place_with_validation(request):
-        manipulator = Place.AddManipulator()
-        new_data = request.POST.copy()
+Complex template output
+~~~~~~~~~~~~~~~~~~~~~~~
 
-        # Check for validation errors
-        errors = manipulator.get_validation_errors(new_data)
-        manipulator.do_html2python(new_data)
-        if errors:
-            return render_to_response('places/errors.html', {'errors': errors})
-        else:
-            new_place = manipulator.save(new_data)
-            return HttpResponse("Place created: %s" % new_place)
+As we've stressed several times, the ``as_table()``, ``as_ul()`` and ``as_p()``
+methods are just shortcuts for the common case. You can also work with the
+individual fields for complete template control over the form's design.
 
-In this new version, errors will be found -- ``manipulator.get_validation_errors``
-handles all the validation for you -- and those errors can be nicely presented
-on an error page (templated, of course)::
+The easiest way is to iterate over the form's fields, with
+``{% for field in form %}``. For example::
 
-    {% extends "base.html" %}
+    <form method="post" action="">
+    <dl>
+    {% for field in form %}
+        <dt>{{ field.label_tag }}</dt>
+        <dd>{{ field }}</dd>
+        {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
+        {% if field.errors %}<dd class="myerrors">{{ field.errors }}</dd>{% endif %}
+    {% endfor %}
+    </dl>
+    <input type="submit" />
+    </form>
 
-    {% block content %}
+This iteration technique is useful if you want to apply the same HTML
+formatting to each field, or if you don't know the names of the form fields
+ahead of time. Note that the fields will be iterated over in the order in which
+they're defined in the ``Form`` class.
 
-    <h1>Please go back and correct the following error{{ errors|pluralize }}:</h1>
-    <ul>
-        {% for e in errors.items %}
-        <li>Field "{{ e.0 }}": {{ e.1|join:", " }}</li>
-        {% endfor %}
+Alternatively, you can arrange the form's fields explicitly, by name. Do that
+by accessing ``{{ form.fieldname }}``, where ``fieldname`` is the field's name.
+For example::
+
+    <form method="post" action="">
+    <ul class="myformclass">
+        <li>{{ form.sender.label_tag }} {{ form.sender }}</li>
+        <li class="helptext">{{ form.sender.help_text }}</li>
+        {% if form.sender.errors %}<ul class="errorlist">{{ form.sender.errors }}</ul>{% endif %}
+
+        <li>{{ form.subject.label_tag }} {{ form.subject }}</li>
+        <li class="helptext">{{ form.subject.help_text }}</li>
+        {% if form.subject.errors %}<ul class="errorlist">{{ form.subject.errors }}</ul>{% endif %}
+
+        ...
     </ul>
+    </form>
 
-    {% endblock %}
+Highlighting required fields in templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Still, this has its own problems:
+It's common to show a user which fields are required. Here's an example of how
+to do that, using the above example modified to insert an asterisk after the
+label of each required field::
 
-    * There's still the issue of creating a separate (redundant) view for the
-      submission form.
-
-    * Errors, though nicely presented, are on a separate page, so the user will
-      have to use the "back" button to fix errors. That's ridiculous and unusable.
-
-The best way to deal with these issues is to collapse the two views -- the form
-and the submission -- into a single view.  This view will be responsible for
-creating the form, validating POSTed data, and creating the new object (if the
-data is valid). An added bonus of this approach is that errors and the form will
-both be available on the same page, so errors with fields can be presented in
-context.
-
-.. admonition:: Philosophy:
-
-    Finally, for the HTTP purists in the audience (and the authorship), this
-    nicely matches the "true" meanings of HTTP GET and HTTP POST: GET fetches
-    the form, and POST creates the new object.
-
-Below is the finished view::
-
-    def create_place(request):
-        manipulator = Place.AddManipulator()
-
-        if request.method == 'POST':
-            # If data was POSTed, we're trying to create a new Place.
-            new_data = request.POST.copy()
-
-            # Check for errors.
-            errors = manipulator.get_validation_errors(new_data)
-            manipulator.do_html2python(new_data)
-
-            if not errors:
-                # No errors. This means we can save the data!
-                new_place = manipulator.save(new_data)
-
-                # Redirect to the object's "edit" page. Always use a redirect
-                # after POST data, so that reloads don't accidently create
-                # duplicate entires, and so users don't see the confusing
-                # "Repost POST data?" alert box in their browsers.
-                return HttpResponseRedirect("/places/edit/%i/" % new_place.id)
-        else:
-            # No POST, so we want a brand new form without any data or errors.
-            errors = new_data = {}
-
-        # Create the FormWrapper, template, context, response.
-        form = forms.FormWrapper(manipulator, new_data, errors)
-        return render_to_response('places/create_form.html', {'form': form})
-
-and here's the ``create_form`` template::
-
-    {% extends "base.html" %}
-
-    {% block content %}
-    <h1>Create a place:</h1>
-
-    {% if form.has_errors %}
-    <h2>Please correct the following error{{ form.error_dict|pluralize }}:</h2>
-    {% endif %}
-
-    <form method="post" action=".">
-    <p>
-        <label for="id_name">Name:</label> {{ form.name }}
-        {% if form.name.errors %}*** {{ form.name.errors|join:", " }}{% endif %}
-    </p>
-    <p>
-        <label for="id_address">Address:</label> {{ form.address }}
-        {% if form.address.errors %}*** {{ form.address.errors|join:", " }}{% endif %}
-    </p>
-    <p>
-        <label for="id_city">City:</label> {{ form.city }}
-        {% if form.city.errors %}*** {{ form.city.errors|join:", " }}{% endif %}
-    </p>
-    <p>
-        <label for="id_state">State:</label> {{ form.state }}
-        {% if form.state.errors %}*** {{ form.state.errors|join:", " }}{% endif %}
-    </p>
-    <p>
-        <label for="id_zip_code">Zip:</label> {{ form.zip_code }}
-        {% if form.zip_code.errors %}*** {{ form.zip_code.errors|join:", " }}{% endif %}
-    </p>
-    <p>
-        <label for="id_place_type">Place type:</label> {{ form.place_type }}
-        {% if form.place_type.errors %}*** {{ form.place_type.errors|join:", " }}{% endif %}
-    </p>
+    <form method="post" action="">
+    <dl>
+    {% for field in form %}
+        <dt>{{ field.label_tag }}{% if field.field.required %}*{% endif %}</dt>
+        <dd>{{ field }}</dd>
+        {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
+        {% if field.errors %}<dd class="myerrors">{{ field.errors }}</dd>{% endif %}
+    {% endfor %}
+    </dl>
     <input type="submit" />
     </form>
-    {% endblock %}
 
-The second two arguments to ``FormWrapper`` (``new_data`` and ``errors``)
-deserve some mention.
+The ``{% if field.field.required %}*{% endif %}`` fragment is the relevant
+addition here. It adds the asterisk only if the field is required.
 
-The first is any "default" data to be used as values for the fields. Pulling
-the data from ``request.POST``, as is done above, makes sure that if there are
-errors, the values the user put in aren't lost. If you try the above example,
-you'll see this in action.
+Note that we check ``field.field.required`` and not ``field.required``. In the
+template, ``field`` is a ``forms.forms.BoundField`` instance, which holds
+the actual ``Field`` instance in its ``field`` attribute.
 
-The second argument is the error list retrieved from
-``manipulator.get_validation_errors``.  When passed into the ``FormWrapper``,
-this gives each field an ``errors`` item (which is a list of error messages
-associated with the field) as well as a ``html_error_list`` item, which is a
-``<ul>`` of error messages. The above template uses these error items to
-display a simple error message next to each field. The error list is saved as
-an ``error_dict`` attribute of the ``FormWrapper`` object.
+Binding uploaded files to a form
+--------------------------------
 
-Using the ``ChangeManipulator``
--------------------------------
+**New in Django development version**
 
-The above has covered using the ``AddManipulator`` to create a new object. What
-about editing an existing one? It's shockingly similar to creating a new one::
+Dealing with forms that have ``FileField`` and ``ImageField`` fields
+is a little more complicated than a normal form.
 
-    def edit_place(request, place_id):
-        # Get the place in question from the database and create a
-        # ChangeManipulator at the same time.
-        try:
-            manipulator = Place.ChangeManipulator(place_id)
-        except Place.DoesNotExist:
-            raise Http404
-
-        # Grab the Place object in question for future use.
-        place = manipulator.original_object
-
-        if request.method == 'POST':
-            new_data = request.POST.copy()
-            errors = manipulator.get_validation_errors(new_data)
-            manipulator.do_html2python(new_data)
-            if not errors:
-                manipulator.save(new_data)
-
-                # Do a post-after-redirect so that reload works, etc.
-                return HttpResponseRedirect("/places/edit/%i/" % place.id)
-        else:
-            errors = {}
-            # This makes sure the form accurate represents the fields of the place.
-            new_data = manipulator.flatten_data()
-
-        form = forms.FormWrapper(manipulator, new_data, errors)
-        return render_to_response('places/edit_form.html', {'form': form, 'place': place})
-
-The only real differences are:
-
-    * We create a ``ChangeManipulator`` instead of an ``AddManipulator``.
-      The argument to a ``ChangeManipulator`` is the ID of the object
-      to be changed. As you can see, the initializer will raise an
-      ``ObjectDoesNotExist`` exception if the ID is invalid.
-
-    * ``ChangeManipulator.original_object`` stores the instance of the
-      object being edited.
-
-    * We set ``new_data`` based upon ``flatten_data()`` from the manipulator.
-      ``flatten_data()`` takes the data from the original object under
-      manipulation, and converts it into a data dictionary that can be used
-      to populate form elements with the existing values for the object.
-
-    * The above example uses a different template, so create and edit can be
-      "skinned" differently if needed, but the form chunk itself is completely
-      identical to the one in the create form above.
-
-The astute programmer will notice the add and create functions are nearly
-identical and could in fact be collapsed into a single view. This is left as an
-exercise for said programmer.
-
-(However, the even-more-astute programmer will take heed of the note at the top
-of this document and check out the `generic views`_ documentation if all she
-wishes to do is this type of simple create/update.)
-
-Custom forms and manipulators
-=============================
-
-All the above is fine and dandy if you just want to use the automatically
-created manipulators. But the coolness doesn't end there: You can easily create
-your own custom manipulators for handling custom forms.
-
-Custom manipulators are pretty simple. Here's a manipulator that you might use
-for a "contact" form on a website::
-
-    from django import forms
-
-    urgency_choices = (
-        (1, "Extremely urgent"),
-        (2, "Urgent"),
-        (3, "Normal"),
-        (4, "Unimportant"),
-    )
-
-    class ContactManipulator(forms.Manipulator):
-        def __init__(self):
-            self.fields = (
-                forms.EmailField(field_name="from", is_required=True),
-                forms.TextField(field_name="subject", length=30, max_length=200, is_required=True),
-                forms.SelectField(field_name="urgency", choices=urgency_choices),
-                forms.LargeTextField(field_name="contents", is_required=True),
-            )
-
-A certain similarity to Django's models should be apparent. The only required
-method of a custom manipulator is ``__init__`` which must define the fields
-present in the manipulator.  See the ``django.forms`` module for
-all the form fields provided by Django.
-
-You use this custom manipulator exactly as you would use an auto-generated one.
-Here's a simple function that might drive the above form::
-
-    def contact_form(request):
-        manipulator = ContactManipulator()
-        if request.method == 'POST':
-            new_data = request.POST.copy()
-            errors = manipulator.get_validation_errors(new_data)
-            manipulator.do_html2python(new_data)
-            if not errors:
-
-                # Send e-mail using new_data here...
-
-                return HttpResponseRedirect("/contact/thankyou/")
-        else:
-            errors = new_data = {}
-        form = forms.FormWrapper(manipulator, new_data, errors)
-        return render_to_response('contact_form.html', {'form': form})
-
-Implementing ``flatten_data`` for custom manipulators
-------------------------------------------------------
-
-It is possible (although rarely needed) to replace the default automatically
-created manipulators on a model with your own custom manipulators. If you do
-this and you are intending to use those models in generic views, you should
-also define a ``flatten_data`` method in any ``ChangeManipulator`` replacement.
-This should act like the default ``flatten_data`` and return a dictionary
-mapping field names to their values, like so::
-
-    def flatten_data(self):
-        obj = self.original_object
-        return dict(
-            from = obj.from,
-            subject = obj.subject,
-            ...
-        )
-
-In this way, your new change manipulator will act exactly like the default
-version.
-
-``FileField`` and ``ImageField`` special cases
-==============================================
-
-Dealing with ``FileField`` and ``ImageField`` objects is a little more
-complicated.
-
-First, you'll need to make sure that your ``<form>`` element correctly defines
-the ``enctype`` as ``"multipart/form-data"``, in order to upload files::
+Firstly, in order to upload files, you'll need to make sure that your
+``<form>`` element correctly defines the ``enctype`` as
+``"multipart/form-data"``::
 
   <form enctype="multipart/form-data" method="post" action="/foo/">
 
-Next, you'll need to treat the field in the template slightly differently. A
-``FileField`` or ``ImageField`` is represented by *two* HTML form elements.
+Secondly, when you use the form, you need to bind the file data. File
+data is handled separately to normal form data, so when your form
+contains a ``FileField`` and ``ImageField``, you will need to specify
+a second argument when you bind your form. So if we extend our
+ContactForm to include an ``ImageField`` called ``mugshot``, we
+need to bind the file data containing the mugshot image::
 
-For example, given this field in a model::
+    # Bound form with an image field
+    >>> from django.core.files.uploadedfile import SimpleUploadedFile
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> file_data = {'mugshot': SimpleUploadedFile('face.jpg', <file data>)}
+    >>> f = ContactFormWithMugshot(data, file_data)
 
-   photo = model.ImageField('/path/to/upload/location')
+In practice, you will usually specify ``request.FILES`` as the source
+of file data (just like you use ``request.POST`` as the source of
+form data)::
 
-You'd need to display two formfields in the template::
+    # Bound form with an image field, data from the request
+    >>> f = ContactFormWithMugshot(request.POST, request.FILES)
 
-   <p><label for="id_photo">Photo:</label> {{ form.photo }}{{ form.photo_file }}</p>
+Constructing an unbound form is the same as always -- just omit both
+form data *and* file data::
 
-The first bit (``{{ form.photo }}``) displays the currently-selected file,
-while the second (``{{ form.photo_file }}``) actually contains the file upload
-form field. Thus, at the validation layer you need to check the ``photo_file``
-key.
+    # Unbound form with a image field
+    >>> f = ContactFormWithMugshot()
 
-Finally, in your view, make sure to access ``request.FILES``, rather than
-``request.POST``, for the uploaded files. This is necessary because
-``request.POST`` does not contain file-upload data.
+Testing for multipart forms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For example, following the ``new_data`` convention, you might do something like
-this::
+If you're writing reusable views or templates, you may not know ahead of time
+whether your form is a multipart form or not. The ``is_multipart()`` method
+tells you whether the form requires multipart encoding for submission::
 
-   new_data = request.POST.copy()
-   new_data.update(request.FILES)
+    >>> f = ContactFormWithMugshot()
+    >>> f.is_multipart()
+    True
 
-Validators
-==========
+Here's an example of how you might use this in a template::
 
-One useful feature of manipulators is the automatic validation. Validation is
-done using a simple validation API: A validator is a callable that raises a
-``ValidationError`` if there's something wrong with the data.
-``django.core.validators`` defines a host of validator functions (see below),
-but defining your own couldn't be easier::
+    {% if form.is_multipart %}
+        <form enctype="multipart/form-data" method="post" action="/foo/">
+    {% else %}
+        <form method="post" action="/foo/">
+    {% endif %}
+    {% form %}
+    </form>
 
-    from django.core import validators
+Subclassing forms
+-----------------
+
+If you have multiple ``Form`` classes that share fields, you can use
+subclassing to remove redundancy.
+
+When you subclass a custom ``Form`` class, the resulting subclass will
+include all fields of the parent class(es), followed by the fields you define
+in the subclass.
+
+In this example, ``ContactFormWithPriority`` contains all the fields from
+``ContactForm``, plus an additional field, ``priority``. The ``ContactForm``
+fields are ordered first::
+
+    >>> class ContactFormWithPriority(ContactForm):
+    ...     priority = forms.CharField()
+    >>> f = ContactFormWithPriority(auto_id=False)
+    >>> print f.as_ul()
+    <li>Subject: <input type="text" name="subject" maxlength="100" /></li>
+    <li>Message: <input type="text" name="message" /></li>
+    <li>Sender: <input type="text" name="sender" /></li>
+    <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
+    <li>Priority: <input type="text" name="priority" /></li>
+
+It's possible to subclass multiple forms, treating forms as "mix-ins." In this
+example, ``BeatleForm`` subclasses both ``PersonForm`` and ``InstrumentForm``
+(in that order), and its field list includes the fields from the parent
+classes::
+
+    >>> class PersonForm(Form):
+    ...     first_name = CharField()
+    ...     last_name = CharField()
+    >>> class InstrumentForm(Form):
+    ...     instrument = CharField()
+    >>> class BeatleForm(PersonForm, InstrumentForm):
+    ...     haircut_type = CharField()
+    >>> b = BeatleForm(auto_id=False)
+    >>> print b.as_ul()
+    <li>First name: <input type="text" name="first_name" /></li>
+    <li>Last name: <input type="text" name="last_name" /></li>
+    <li>Instrument: <input type="text" name="instrument" /></li>
+    <li>Haircut type: <input type="text" name="haircut_type" /></li>
+
+Prefixes for forms
+------------------
+
+You can put several Django forms inside one ``<form>`` tag. To give each
+``Form`` its own namespace, use the ``prefix`` keyword argument::
+
+    >>> mother = PersonForm(prefix="mother")
+    >>> father = PersonForm(prefix="father")
+    >>> print mother.as_ul()
+    <li><label for="id_mother-first_name">First name:</label> <input type="text" name="mother-first_name" id="id_mother-first_name" /></li>
+    <li><label for="id_mother-last_name">Last name:</label> <input type="text" name="mother-last_name" id="id_mother-last_name" /></li>
+    >>> print father.as_ul()
+    <li><label for="id_father-first_name">First name:</label> <input type="text" name="father-first_name" id="id_father-first_name" /></li>
+    <li><label for="id_father-last_name">Last name:</label> <input type="text" name="father-last_name" id="id_father-last_name" /></li>
+
+Fields
+======
+
+When you create a ``Form`` class, the most important part is defining the
+fields of the form. Each field has custom validation logic, along with a few
+other hooks.
+
+Although the primary way you'll use ``Field`` classes is in ``Form`` classes,
+you can also instantiate them and use them directly to get a better idea of
+how they work. Each ``Field`` instance has a ``clean()`` method, which takes
+a single argument and either raises a ``django.forms.ValidationError``
+exception or returns the clean value::
+
+    >>> f = forms.EmailField()
+    >>> f.clean('foo@example.com')
+    u'foo@example.com'
+    >>> f.clean(u'foo@example.com')
+    u'foo@example.com'
+    >>> f.clean('invalid e-mail address')
+    Traceback (most recent call last):
+    ...
+    ValidationError: [u'Enter a valid e-mail address.']
+
+If you've used Django's old forms/validation framework, take care in noticing
+this ``ValidationError`` is different than the previous ``ValidationError``.
+This one lives at ``django.forms.ValidationError`` rather than
+``django.core.validators.ValidationError``.
+
+Core field arguments
+--------------------
+
+Each ``Field`` class constructor takes at least these arguments. Some
+``Field`` classes take additional, field-specific arguments, but the following
+should *always* be accepted:
+
+``required``
+~~~~~~~~~~~~
+
+By default, each ``Field`` class assumes the value is required, so if you pass
+an empty value -- either ``None`` or the empty string (``""``) -- then
+``clean()`` will raise a ``ValidationError`` exception::
+
+    >>> f = forms.CharField()
+    >>> f.clean('foo')
+    u'foo'
+    >>> f.clean('')
+    Traceback (most recent call last):
+    ...
+    ValidationError: [u'This field is required.']
+    >>> f.clean(None)
+    Traceback (most recent call last):
+    ...
+    ValidationError: [u'This field is required.']
+    >>> f.clean(' ')
+    u' '
+    >>> f.clean(0)
+    u'0'
+    >>> f.clean(True)
+    u'True'
+    >>> f.clean(False)
+    u'False'
+
+To specify that a field is *not* required, pass ``required=False`` to the
+``Field`` constructor::
+
+    >>> f = forms.CharField(required=False)
+    >>> f.clean('foo')
+    u'foo'
+    >>> f.clean('')
+    u''
+    >>> f.clean(None)
+    u''
+    >>> f.clean(0)
+    u'0'
+    >>> f.clean(True)
+    u'True'
+    >>> f.clean(False)
+    u'False'
+
+If a ``Field`` has ``required=False`` and you pass ``clean()`` an empty value,
+then ``clean()`` will return a *normalized* empty value rather than raising
+``ValidationError``. For ``CharField``, this will be a Unicode empty string.
+For other ``Field`` classes, it might be ``None``. (This varies from field to
+field.)
+
+``label``
+~~~~~~~~~
+
+The ``label`` argument lets you specify the "human-friendly" label for this
+field. This is used when the ``Field`` is displayed in a ``Form``.
+
+As explained in "Outputting forms as HTML" above, the default label for a
+``Field`` is generated from the field name by converting all underscores to
+spaces and upper-casing the first letter. Specify ``label`` if that default
+behavior doesn't result in an adequate label.
+
+Here's a full example ``Form`` that implements ``label`` for two of its fields.
+We've specified ``auto_id=False`` to simplify the output::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(label='Your name')
+    ...     url = forms.URLField(label='Your Web site', required=False)
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(auto_id=False)
+    >>> print f
+    <tr><th>Your name:</th><td><input type="text" name="name" /></td></tr>
+    <tr><th>Your Web site:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+``initial``
+~~~~~~~~~~~
+
+The ``initial`` argument lets you specify the initial value to use when
+rendering this ``Field`` in an unbound ``Form``.
+
+The use-case for this is when you want to display an "empty" form in which a
+field is initialized to a particular value. For example::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(initial='Your name')
+    ...     url = forms.URLField(initial='http://')
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="Your name" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" value="http://" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+You may be thinking, why not just pass a dictionary of the initial values as
+data when displaying the form? Well, if you do that, you'll trigger validation,
+and the HTML output will include any validation errors::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField()
+    ...     url = forms.URLField()
+    ...     comment = forms.CharField()
+    >>> default_data = {'name': 'Your name', 'url': 'http://'}
+    >>> f = CommentForm(default_data, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="Your name" /></td></tr>
+    <tr><th>Url:</th><td><ul class="errorlist"><li>Enter a valid URL.</li></ul><input type="text" name="url" value="http://" /></td></tr>
+    <tr><th>Comment:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="comment" /></td></tr>
+
+This is why ``initial`` values are only displayed for unbound forms. For bound
+forms, the HTML output will use the bound data.
+
+Also note that ``initial`` values are *not* used as "fallback" data in
+validation if a particular field's value is not given. ``initial`` values are
+*only* intended for initial form display::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(initial='Your name')
+    ...     url = forms.URLField(initial='http://')
+    ...     comment = forms.CharField()
+    >>> data = {'name': '', 'url': '', 'comment': 'Foo'}
+    >>> f = CommentForm(data)
+    >>> f.is_valid()
+    False
+    # The form does *not* fall back to using the initial values.
+    >>> f.errors
+    {'url': [u'This field is required.'], 'name': [u'This field is required.']}
+
+``widget``
+~~~~~~~~~~
+
+The ``widget`` argument lets you specify a ``Widget`` class to use when
+rendering this ``Field``. See `Widgets`_ below for more information.
+
+``help_text``
+~~~~~~~~~~~~~
+
+The ``help_text`` argument lets you specify descriptive text for this
+``Field``. If you provide ``help_text``, it will be displayed next to the
+``Field`` when the ``Field`` is rendered by one of the convenience ``Form``
+methods (e.g., ``as_ul()``).
+
+Here's a full example ``Form`` that implements ``help_text`` for two of its
+fields. We've specified ``auto_id=False`` to simplify the output::
+
+    >>> class HelpTextContactForm(forms.Form):
+    ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
+    ...     message = forms.CharField()
+    ...     sender = forms.EmailField(help_text='A valid e-mail address, please.')
+    ...     cc_myself = forms.BooleanField(required=False)
+    >>> f = HelpTextContactForm(auto_id=False)
+    >>> print f.as_table()
+    <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /><br />100 characters max.</td></tr>
+    <tr><th>Message:</th><td><input type="text" name="message" /></td></tr>
+    <tr><th>Sender:</th><td><input type="text" name="sender" /><br />A valid e-mail address, please.</td></tr>
+    <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself" /></td></tr>
+    >>> print f.as_ul()
+    <li>Subject: <input type="text" name="subject" maxlength="100" /> 100 characters max.</li>
+    <li>Message: <input type="text" name="message" /></li>
+    <li>Sender: <input type="text" name="sender" /> A valid e-mail address, please.</li>
+    <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
+    >>> print f.as_p()
+    <p>Subject: <input type="text" name="subject" maxlength="100" /> 100 characters max.</p>
+    <p>Message: <input type="text" name="message" /></p>
+    <p>Sender: <input type="text" name="sender" /> A valid e-mail address, please.</p>
+    <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
+
+``error_messages``
+~~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+The ``error_messages`` argument lets you override the default messages that the
+field will raise. Pass in a dictionary with keys matching the error messages you
+want to override. For example, here is the default error message::
+
+    >>> generic = forms.CharField()
+    >>> generic.clean('')
+    Traceback (most recent call last):
+      ...
+    ValidationError: [u'This field is required.']
+
+And here is a custom error message::
+
+    >>> name = forms.CharField(error_messages={'required': 'Please enter your name'})
+    >>> name.clean('')
+    Traceback (most recent call last):
+      ...
+    ValidationError: [u'Please enter your name']
+
+In the `built-in Field classes`_ section below, each ``Field`` defines the
+error message keys it uses.
+
+Dynamic initial values
+----------------------
+
+The ``initial`` argument to ``Field`` (explained above) lets you hard-code the
+initial value for a ``Field`` -- but what if you want to declare the initial
+value at runtime? For example, you might want to fill in a ``username`` field
+with the username of the current session.
+
+To accomplish this, use the ``initial`` argument to a ``Form``. This argument,
+if given, should be a dictionary mapping field names to initial values. Only
+include the fields for which you're specifying an initial value; it's not
+necessary to include every field in your form. For example::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField()
+    ...     url = forms.URLField()
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(initial={'name': 'your username'}, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="your username" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+    >>> f = CommentForm(initial={'name': 'another username'}, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="another username" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+Just like the ``initial`` parameter to ``Field``, these values are only
+displayed for unbound forms, and they're not used as fallback values if a
+particular value isn't provided.
+
+Finally, note that if a ``Field`` defines ``initial`` *and* you include
+``initial`` when instantiating the ``Form``, then the latter ``initial`` will
+have precedence. In this example, ``initial`` is provided both at the field
+level and at the form instance level, and the latter gets precedence::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(initial='class')
+    ...     url = forms.URLField()
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(initial={'name': 'instance'}, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="instance" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+Built-in ``Field`` classes
+--------------------------
+
+Naturally, the ``forms`` library comes with a set of ``Field`` classes that
+represent common validation needs. This section documents each built-in field.
+
+For each field, we describe the default widget used if you don't specify
+``widget``. We also specify the value returned when you provide an empty value
+(see the section on ``required`` above to understand what that means).
+
+``BooleanField``
+~~~~~~~~~~~~~~~~
+
+    * Default widget: ``CheckboxInput``
+    * Empty value: ``False``
+    * Normalizes to: A Python ``True`` or ``False`` value.
+    * Validates that the check box is checked (i.e. the value is ``True``) if
+      the field has ``required=True``.
+    * Error message keys: ``required``
+
+**New in Django development version:** The empty value for a ``CheckboxInput``
+(and hence the standard ``BooleanField``) has changed to return ``False``
+instead of ``None`` in the development version.
+
+.. note::
+    Since all ``Field`` subclasses have ``required=True`` by default, the
+    validation condition here is important. If you want to include a checkbox
+    in your form that can be either checked or unchecked, you must remember to
+    pass in ``required=False`` when creating the ``BooleanField``.
+
+``CharField``
+~~~~~~~~~~~~~
+
+    * Default widget: ``TextInput``
+    * Empty value: ``''`` (an empty string)
+    * Normalizes to: A Unicode object.
+    * Validates ``max_length`` or ``min_length``, if they are provided.
+      Otherwise, all inputs are valid.
+    * Error message keys: ``required``, ``max_length``, ``min_length``
+
+Has two optional arguments for validation, ``max_length`` and ``min_length``.
+If provided, these arguments ensure that the string is at most or at least the
+given length.
+
+``ChoiceField``
+~~~~~~~~~~~~~~~
+
+    * Default widget: ``Select``
+    * Empty value: ``''`` (an empty string)
+    * Normalizes to: A Unicode object.
+    * Validates that the given value exists in the list of choices.
+    * Error message keys: ``required``, ``invalid_choice``
+
+Takes one extra argument, ``choices``, which is an iterable (e.g., a list or
+tuple) of 2-tuples to use as choices for this field. This argument accepts
+the same formats as the ``choices`` argument to a model field. See the 
+`model API documentation on choices`_ for more details.
+
+.. _model API documentation on choices: ../model-api#choices
+
+``DateField``
+~~~~~~~~~~~~~
+
+    * Default widget: ``TextInput``
+    * Empty value: ``None``
+    * Normalizes to: A Python ``datetime.date`` object.
+    * Validates that the given value is either a ``datetime.date``,
+      ``datetime.datetime`` or string formatted in a particular date format.
+    * Error message keys: ``required``, ``invalid``
+
+Takes one optional argument, ``input_formats``, which is a list of formats used
+to attempt to convert a string to a valid ``datetime.date`` object.
+
+If no ``input_formats`` argument is provided, the default input formats are::
+
+    '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
+    '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
+    '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
+    '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
+    '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
+
+``DateTimeField``
+~~~~~~~~~~~~~~~~~
+
+    * Default widget: ``DateTimeInput``
+    * Empty value: ``None``
+    * Normalizes to: A Python ``datetime.datetime`` object.
+    * Validates that the given value is either a ``datetime.datetime``,
+      ``datetime.date`` or string formatted in a particular datetime format.
+    * Error message keys: ``required``, ``invalid``
+
+Takes one optional argument, ``input_formats``, which is a list of formats used
+to attempt to convert a string to a valid ``datetime.datetime`` object.
+
+If no ``input_formats`` argument is provided, the default input formats are::
+
+    '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
+    '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
+    '%Y-%m-%d',              # '2006-10-25'
+    '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
+    '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
+    '%m/%d/%Y',              # '10/25/2006'
+    '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
+    '%m/%d/%y %H:%M',        # '10/25/06 14:30'
+    '%m/%d/%y',              # '10/25/06'
+
+**New in Django development version:** The ``DateTimeField`` used to use a
+``TextInput`` widget by default. This has now changed.
+
+``DecimalField``
+~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+    * Default widget: ``TextInput``
+    * Empty value: ``None``
+    * Normalizes to: A Python ``decimal``.
+    * Validates that the given value is a decimal. Leading and trailing
+      whitespace is ignored.
+    * Error message keys: ``required``, ``invalid``, ``max_value``,
+      ``min_value``, ``max_digits``, ``max_decimal_places``,
+      ``max_whole_digits``
+
+Takes four optional arguments: ``max_value``, ``min_value``, ``max_digits``,
+and ``decimal_places``. The first two define the limits for the fields value.
+``max_digits`` is the maximum number of digits (those before the decimal
+point plus those after the decimal point, with leading zeros stripped)
+permitted in the value, whilst ``decimal_places`` is the maximum number of
+decimal places permitted.
+
+``EmailField``
+~~~~~~~~~~~~~~
+
+    * Default widget: ``TextInput``
+    * Empty value: ``''`` (an empty string)
+    * Normalizes to: A Unicode object.
+    * Validates that the given value is a valid e-mail address, using a
+      moderately complex regular expression.
+    * Error message keys: ``required``, ``invalid``
+
+Has two optional arguments for validation, ``max_length`` and ``min_length``.
+If provided, these arguments ensure that the string is at most or at least the
+given length.
+
+``FileField``
+~~~~~~~~~~~~~
+
+**New in Django development version**
+
+    * Default widget: ``FileInput``
+    * Empty value: ``None``
+    * Normalizes to: An ``UploadedFile`` object that wraps the file content
+      and file name into a single object.
+    * Validates that non-empty file data has been bound to the form.
+    * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``
+
+To learn more about the ``UploadedFile`` object, see the `file uploads documentation`_.
+
+When you use a ``FileField`` in a form, you must also remember to
+`bind the file data to the form`_.
+
+.. _file uploads documentation: ../upload_handling/
+.. _`bind the file data to the form`: `Binding uploaded files to a form`_
+
+``FilePathField``
+~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+    * Default widget: ``Select``
+    * Empty value: ``None``
+    * Normalizes to: A unicode object
+    * Validates that the selected choice exists in the list of choices.
+    * Error message keys: ``required``, ``invalid_choice``
+
+The field allows choosing from files inside a certain directory. It takes three
+extra arguments:
+
+    ==============  ==========  ===============================================
+    Argument        Required?   Description
+    ==============  ==========  ===============================================
+    ``path``        Yes         The absolute path to the directory whose 
+                                contents you want listed. This directory must 
+                                exist.
+                            
+    ``recursive``   No          If ``False`` (the default) only the direct
+                                contents of ``path`` will be offered as choices.
+                                If ``True``, the directory will be descended
+                                into recursively and all descendants will be
+                                listed as choices.
+                                
+    ``match``       No          A regular expression pattern; only files with
+                                names matching this expression will be allowed
+                                as choices.
+    ==============  ==========  ===============================================
+
+``FloatField`` 
+~~~~~~~~~~~~~~ 
+
+    * Default widget: ``TextInput`` 
+    * Empty value: ``None`` 
+    * Normalizes to: A Python float. 
+    * Validates that the given value is an float. Leading and trailing 
+      whitespace is allowed, as in Python's ``float()`` function. 
+    * Error message keys: ``required``, ``invalid``, ``max_value``, 
+      ``min_value`` 
+	 
+Takes two optional arguments for validation, ``max_value`` and ``min_value``. 
+These control the range of values permitted in the field.
+
+``ImageField``
+~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+    * Default widget: ``FileInput``
+    * Empty value: ``None``
+    * Normalizes to: An ``UploadedFile`` object that wraps the file content
+      and file name into a single object.
+    * Validates that file data has been bound to the form, and that the
+      file is of an image format understood by PIL.
+    * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
+      ``invalid_image``
+
+Using an ImageField requires that the `Python Imaging Library`_ is installed.
+
+When you use an ``ImageField`` in a form, you must also remember to
+`bind the file data to the form`_.
+
+.. _Python Imaging Library: http://www.pythonware.com/products/pil/
+
+``IntegerField``
+~~~~~~~~~~~~~~~~
+
+    * Default widget: ``TextInput``
+    * Empty value: ``None``
+    * Normalizes to: A Python integer or long integer.
+    * Validates that the given value is an integer. Leading and trailing
+      whitespace is allowed, as in Python's ``int()`` function.
+    * Error message keys: ``required``, ``invalid``, ``max_value``,
+      ``min_value``
+
+Takes two optional arguments for validation, ``max_value`` and ``min_value``.
+These control the range of values permitted in the field.
+
+``IPAddressField``
+~~~~~~~~~~~~~~~~~~
+
+    * Default widget: ``TextInput``
+    * Empty value: ``''`` (an empty string)
+    * Normalizes to: A Unicode object.
+    * Validates that the given value is a valid IPv4 address, using a regular
+      expression.
+    * Error message keys: ``required``, ``invalid``
+
+``MultipleChoiceField``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+    * Default widget: ``SelectMultiple``
+    * Empty value: ``[]`` (an empty list)
+    * Normalizes to: A list of Unicode objects.
+    * Validates that every value in the given list of values exists in the list
+      of choices.
+    * Error message keys: ``required``, ``invalid_choice``, ``invalid_list``
+
+Takes one extra argument, ``choices``, which is an iterable (e.g., a list or
+tuple) of 2-tuples to use as choices for this field. This argument accepts
+the same formats as the ``choices`` argument to a model field. See the 
+`model API documentation on choices`_ for more details.
+
+``NullBooleanField``
+~~~~~~~~~~~~~~~~~~~~
+
+    * Default widget: ``NullBooleanSelect``
+    * Empty value: ``None``
+    * Normalizes to: A Python ``True``, ``False`` or ``None`` value.
+    * Validates nothing (i.e., it never raises a ``ValidationError``).
+
+``RegexField``
+~~~~~~~~~~~~~~
+
+    * Default widget: ``TextInput``
+    * Empty value: ``''`` (an empty string)
+    * Normalizes to: A Unicode object.
+    * Validates that the given value matches against a certain regular
+      expression.
+    * Error message keys: ``required``, ``invalid``
+
+Takes one required argument, ``regex``, which is a regular expression specified
+either as a string or a compiled regular expression object.
+
+Also takes the following optional arguments:
+
+    ======================  =====================================================
+    Argument                Description
+    ======================  =====================================================
+    ``max_length``          Ensures the string has at most this many characters.
+    ``min_length``          Ensures the string has at least this many characters.
+    ======================  =====================================================
+
+The optional argument ``error_message`` is also accepted for backwards
+compatibility. The preferred way to provide an error message is to use the
+``error_messages`` argument, passing a dictionary with ``'invalid'`` as a key
+and the error message as the value.
+
+``TimeField``
+~~~~~~~~~~~~~
+
+    * Default widget: ``TextInput``
+    * Empty value: ``None``
+    * Normalizes to: A Python ``datetime.time`` object.
+    * Validates that the given value is either a ``datetime.time`` or string
+      formatted in a particular time format.
+    * Error message keys: ``required``, ``invalid``
+
+Takes one optional argument, ``input_formats``, which is a list of formats used
+to attempt to convert a string to a valid ``datetime.time`` object.
+
+If no ``input_formats`` argument is provided, the default input formats are::
+
+    '%H:%M:%S',     # '14:30:59'
+    '%H:%M',        # '14:30'
+
+``URLField``
+~~~~~~~~~~~~
+
+    * Default widget: ``TextInput``
+    * Empty value: ``''`` (an empty string)
+    * Normalizes to: A Unicode object.
+    * Validates that the given value is a valid URL.
+    * Error message keys: ``required``, ``invalid``, ``invalid_link``
+
+Takes the following optional arguments:
+
+    ========================  =====================================================
+    Argument                  Description
+    ========================  =====================================================
+    ``max_length``            Ensures the string has at most this many characters.
+    ``min_length``            Ensures the string has at least this many characters.
+    ``verify_exists``         If ``True``, the validator will attempt to load the
+                              given URL, raising ``ValidationError`` if the page
+                              gives a 404. Defaults to ``False``.
+    ``validator_user_agent``  String used as the user-agent used when checking for
+                              a URL's existence. Defaults to the value of the
+                              ``URL_VALIDATOR_USER_AGENT`` setting.
+    ========================  =====================================================
+
+Slightly complex built-in ``Field`` classes
+-------------------------------------------
+
+The following are not yet documented here. See the unit tests, linked-to from
+the bottom of this document, for examples of their use.
+
+``ComboField``
+~~~~~~~~~~~~~~
+
+``MultiValueField``
+~~~~~~~~~~~~~~~~~~~
+
+``SplitDateTimeField``
+~~~~~~~~~~~~~~~~~~~~~~
+
+Fields which handle relationships
+---------------------------------
+
+For representing relationships between models, two fields are
+provided which can derive their choices from a ``QuerySet``, and which
+place one or more model objects into the ``cleaned_data`` dictionary
+of forms in which they're used. Both of these fields have an
+additional required argument:
+
+``queryset``
+    A ``QuerySet`` of model objects from which the choices for the
+    field will be derived, and which will be used to validate the
+    user's selection.
+
+``ModelChoiceField``
+~~~~~~~~~~~~~~~~~~~~
+
+Allows the selection of a single model object, suitable for
+representing a foreign key.
+
+The ``__unicode__`` method of the model will be called to generate
+string representations of the objects for use in the field's choices;
+to provide customized representations, subclass ``ModelChoiceField``
+and override ``label_from_instance``. This method will receive a model
+object, and should return a string suitable for representing it. For
+example::
+
+    class MyModelChoiceField(ModelChoiceField):
+        def label_from_instance(self, obj):
+            return "My Object #%i" % obj.id
+
+``ModelMultipleChoiceField``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Allows the selection of one or more model objects, suitable for
+representing a many-to-many relation. As with ``ModelChoiceField``,
+you can use ``label_from_instance`` to customize the object
+representations.
+
+Creating custom fields
+----------------------
+
+If the built-in ``Field`` classes don't meet your needs, you can easily create
+custom ``Field`` classes. To do this, just create a subclass of
+``django.forms.Field``. Its only requirements are that it implement a
+``clean()`` method and that its ``__init__()`` method accept the core arguments
+mentioned above (``required``, ``label``, ``initial``, ``widget``,
+``help_text``).
+
+Custom form and field validation
+---------------------------------
+
+Form validation happens when the data is cleaned. If you want to customise
+this process, there are various places you can change, each one serving a
+different purpose. Three types of cleaning methods are run during form
+processing. These are normally executed when you call the ``is_valid()``
+method on a form. There are other things that can trigger cleaning and
+validation (accessing the ``errors`` attribute or calling ``full_clean()``
+directly), but normally they won't be needed.
+
+In general, any cleaning method can raise ``ValidationError`` if there is a
+problem with the data it is processing, passing the relevant error message to
+the ``ValidationError`` constructor. If no ``ValidationError`` is raised, the
+method should return the cleaned (normalised) data as a Python object.
+
+If you detect multiple errors during a cleaning method and wish to signal all
+of them to the form submitter, it is possible to pass a list of errors to the
+``ValidationError`` constructor.
+
+The three types of cleaning methods are:
+
+    * The ``clean()`` method on a Field subclass. This is responsible
+      for cleaning the data in a way that is generic for that type of field.
+      For example, a FloatField will turn the data into a Python ``float`` or
+      raise a ``ValidationError``.
+
+    * The ``clean_<fieldname>()`` method in a form subclass -- where
+      ``<fieldname>`` is replaced with the name of the form field attribute.
+      This method does any cleaning that is specific to that particular
+      attribute, unrelated to the type of field that it is. This method is not
+      passed any parameters. You will need to look up the value of the field
+      in ``self.cleaned_data`` and remember that it will be a Python object
+      at this point, not the original string submitted in the form (it will be
+      in ``cleaned_data`` because the general field ``clean()`` method, above,
+      has already cleaned the data once).
+
+      For example, if you wanted to validate that the contents of a
+      ``CharField`` called ``serialnumber`` was unique,
+      ``clean_serialnumber()`` would be the right place to do this. You don't
+      need a specific field (it's just a ``CharField``), but you want a
+      formfield-specific piece of validation and, possibly,
+      cleaning/normalizing the data.
+
+    * The Form subclass's ``clean()`` method. This method can perform
+      any validation that requires access to multiple fields from the form at
+      once. This is where you might put in things to check that if field ``A``
+      is supplied, field ``B`` must contain a valid email address and the
+      like. The data that this method returns is the final ``cleaned_data``
+      attribute for the form, so don't forget to return the full list of
+      cleaned data if you override this method (by default, ``Form.clean()``
+      just returns ``self.cleaned_data``).
+
+      Note that any errors raised by your ``Form.clean()`` override will not
+      be associated with any field in particular. They go into a special
+      "field" (called ``__all__``), which you can access via the
+      ``non_field_errors()`` method if you need to.
+
+These methods are run in the order given above, one field at a time.  That is,
+for each field in the form (in the order they are declared in the form
+definition), the ``Field.clean()`` method (or its override) is run, then
+``clean_<fieldname>()``. Finally, once those two methods are run for every
+field, the ``Form.clean()`` method, or its override, is executed.
+
+As mentioned above, any of these methods can raise a ``ValidationError``. For
+any field, if the ``Field.clean()`` method raises a ``ValidationError``, any
+field-specific cleaning method is not called. However, the cleaning methods
+for all remaining fields are still executed.
+
+The ``clean()`` method for the ``Form`` class or subclass is always run. If
+that method raises a ``ValidationError``, ``cleaned_data`` will be an empty
+dictionary.
+
+The previous paragraph means that if you are overriding ``Form.clean()``, you
+should iterate through ``self.cleaned_data.items()``, possibly considering the
+``_errors`` dictionary attribute on the form as well. In this way, you will
+already know which fields have passed their individual validation requirements.
+
+A simple example
+~~~~~~~~~~~~~~~~
+
+Here's a simple example of a custom field that validates its input is a string
+containing comma-separated e-mail addresses, with at least one address. We'll
+keep it simple and assume e-mail validation is contained in a function called
+``is_valid_email()``. The full class::
+
     from django import forms
 
-    class ContactManipulator(forms.Manipulator):
-        def __init__(self):
-            self.fields = (
-                # ... snip fields as above ...
-                forms.EmailField(field_name="to", validator_list=[self.isValidToAddress])
-            )
+    class MultiEmailField(forms.Field):
+        def clean(self, value):
+            if not value:
+                raise forms.ValidationError('Enter at least one e-mail address.')
+            emails = value.split(',')
+            for email in emails:
+                if not is_valid_email(email):
+                    raise forms.ValidationError('%s is not a valid e-mail address.' % email)
+            return emails
 
-        def isValidToAddress(self, field_data, all_data):
-            if not field_data.endswith("@example.com"):
-                raise validators.ValidationError("You can only send messages to example.com e-mail addresses.")
+Let's alter the ongoing ``ContactForm`` example to demonstrate how you'd use
+this in a form. Simply use ``MultiEmailField`` instead of ``forms.EmailField``,
+like so::
 
-Above, we've added a "to" field to the contact form, but required that the "to"
-address end with "@example.com" by adding the ``isValidToAddress`` validator to
-the field's ``validator_list``.
+    class ContactForm(forms.Form):
+        subject = forms.CharField(max_length=100)
+        message = forms.CharField()
+        senders = MultiEmailField()
+        cc_myself = forms.BooleanField(required=False)
 
-The arguments to a validator function take a little explanation.  ``field_data``
-is the value of the field in question, and ``all_data`` is a dictionary of all
-the data being validated.
+Widgets
+=======
 
-.. admonition:: Note::
+A widget is Django's representation of a HTML input element. The widget
+handles the rendering of the HTML, and the extraction of data from a GET/POST
+dictionary that corresponds to the widget.
 
-    At the point validators are called all data will still be
-    strings (as ``do_html2python`` hasn't been called yet).
+Django provides a representation of all the basic HTML widgets, plus some
+commonly used groups of widgets:
 
-Also, because consistency in user interfaces is important, we strongly urge you
-to put punctuation at the end of your validation messages.
+    ============================  ===========================================
+    Widget                        HTML Equivalent
+    ============================  ===========================================
+    ``TextInput``                 ``<input type='text' ...``
+    ``PasswordInput``             ``<input type='password' ...``
+    ``HiddenInput``               ``<input type='hidden' ...``
+    ``MultipleHiddenInput``       Multiple ``<input type='hidden' ...``
+                                  instances.
+    ``FileInput``                 ``<input type='file' ...``
+    ``DateTimeInput``             ``<input type='text' ...``
+    ``Textarea``                  ``<textarea>...</textarea>``
+    ``CheckboxInput``             ``<input type='checkbox' ...``
+    ``Select``                    ``<select><option ...``
+    ``NullBooleanSelect``         Select widget with options 'Unknown',
+                                  'Yes' and 'No'
+    ``SelectMultiple``            ``<select multiple='multiple'><option ...``
+    ``RadioSelect``               ``<ul><li><input type='radio' ...``
+    ``CheckboxSelectMultiple``    ``<ul><li><input type='checkbox' ...``
+    ``MultiWidget``               Wrapper around multiple other widgets
+    ``SplitDateTimeWidget``       Wrapper around two ``TextInput`` widgets:
+                                  one for the Date, and one for the Time.
+    ============================  ===========================================
 
-When are validators called?
+**New in Django development version:** The ``DateTimeInput`` has been added
+since the last release.
+
+Specifying widgets
+------------------
+
+Whenever you specify a field on a form, Django will use a default widget
+that is appropriate to the type of data that is to be displayed. To find
+which widget is used on which field, see the documentation for the
+built-in Field classes.
+
+However, if you want to use a different widget for a field, you can -
+just use the 'widget' argument on the field definition. For example::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField(widget=forms.Textarea)
+
+This would specify a form with a comment that uses a larger Textarea widget,
+rather than the default TextInput widget.
+
+Customizing widget instances
+----------------------------
+
+When Django renders a widget as HTML, it only renders the bare minimum
+HTML - Django doesn't add a class definition, or any other widget-specific
+attributes. This means that all 'TextInput' widgets will appear the same
+on your web page.
+
+If you want to make one widget look different to another, you need to
+specify additional attributes for each widget. When you specify a
+widget, you can provide a list of attributes that will be added to the
+rendered HTML for the widget.
+
+For example, take the following simple form::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField()
+
+This form will include three default TextInput widgets, with default rendering -
+no CSS class, no extra attributes. This means that the input boxes provided for
+each widget will be rendered exactly the same::
+
+    >>> f = CommentForm(auto_id=False)
+    >>> f.as_table()
+    <tr><th>Name:</th><td><input type="text" name="name" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+On a real web page, you probably don't want every widget to look the same. You
+might want a larger input element for the comment, and you might want the
+'name' widget to have some special CSS class. To do this, you specify a
+custom widget for your fields, and specify some attributes to use
+when rendering those widgets::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField(
+                    widget=forms.TextInput(attrs={'class':'special'}))
+        url = forms.URLField()
+        comment = forms.CharField(
+                   widget=forms.TextInput(attrs={'size':'40'}))
+
+Django will then include the extra attributes in the rendered output::
+
+    >>> f = CommentForm(auto_id=False)
+    >>> f.as_table()
+    <tr><th>Name:</th><td><input type="text" name="name" class="special"/></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>
+
+Custom Widgets
+--------------
+
+When you start to write a lot of forms, you will probably find that you will
+reuse certain sets of widget attributes over and over again. Rather than
+repeat these attribute definitions every time you need them, Django allows
+you to capture those definitions as a custom widget.
+
+For example, if you find that you are including a lot of comment fields on
+forms, you could capture the idea of a ``TextInput`` with a specific
+default ``size`` attribute as a custom extension to the ``TextInput`` widget::
+
+    class CommentWidget(forms.TextInput):
+        def __init__(self, *args, **kwargs):
+            attrs = kwargs.setdefault('attrs',{})
+            if 'size' not in attrs:
+                attrs['size'] = 40
+            super(CommentWidget, self).__init__(*args, **kwargs)
+
+We allow the ``size`` attribute to be overridden by the user, but, by default,
+this widget will behave as if ``attrs={'size': 40}`` was always passed into the
+constructor.
+
+Then you can use this widget in your forms::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField(widget=CommentWidget)
+
+You can even customize your custom widget, in the same way as you would
+any other widget. Adding a once-off class to your ``CommentWidget`` is as
+simple as adding an attribute definition::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField(max_length=20)
+        url = forms.URLField()
+        comment = forms.CharField(
+                    widget=CommentWidget(attrs={'class': 'special'}))
+
+Django also makes it easy to specify a custom field type that uses your custom
+widget. For example, you could define a customized field type for comments
+by defining::
+
+    class CommentInput(forms.CharField):
+        widget = CommentWidget
+
+You can then use this field whenever you have a form that requires a comment::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = CommentInput()
+
+Generating forms for models
+===========================
+
+The prefered way of generating forms that work with models is explained in the
+`ModelForms documentation`_.
+
+Looking for the ``form_for_model`` and ``form_for_instance`` documentation?
+They've been deprecated, but you can still `view the documentation`_.
+
+.. _ModelForms documentation: ../modelforms/
+.. _view the documentation: ../form_for_model/
+
+Media
+=====
+
+Rendering an attractive and easy-to-use web form requires more than just 
+HTML - it also requires CSS stylesheets, and if you want to use fancy 
+"Web2.0" widgets, you may also need to include some JavaScript on each 
+page. The exact combination of CSS and JavaScript that is required for 
+any given page will depend upon the widgets that are in use on that page.
+
+This is where Django media definitions come in. Django allows you to 
+associate different media files with the forms and widgets that require
+that media. For example, if you want to use a calendar to render DateFields, 
+you can define a custom Calendar widget. This widget can then be associated 
+with the CSS and Javascript that is required to render the calendar. When 
+the Calendar widget is used on a form, Django is able to identify the CSS and
+JavaScript files that are required, and provide the list of file names
+in a form suitable for easy inclusion on your web page.
+
+.. admonition:: Media and Django Admin
+
+    The Django Admin application defines a number of customized widgets
+    for calendars, filtered selections, and so on. These widgets define
+    media requirements, and the Django Admin uses the custom widgets
+    in place of the Django defaults. The Admin templates will only include
+    those media files that are required to render the widgets on any 
+    given page.
+    
+    If you like the widgets that the Django Admin application uses,
+    feel free to use them in your own application! They're all stored
+    in ``django.contrib.admin.widgets``.
+
+.. admonition:: Which JavaScript toolkit?
+
+    Many JavaScript toolkits exist, and many of them include widgets (such
+    as calendar widgets) that can be used to enhance your application. 
+    Django has deliberately avoided blessing any one JavaScript toolkit.
+    Each toolkit has its own relative strengths and weaknesses - use 
+    whichever toolkit suits your requirements. Django is able to integrate
+    with any JavaScript toolkit. 
+
+Media as a static definition
+----------------------------
+
+The easiest way to define media is as a static definition. Using this method,
+the media declaration is an inner class. The properties of the inner class
+define the media requirements. 
+
+Here's a simple example::
+
+    class CalendarWidget(forms.TextInput):
+        class Media:
+            css = {
+                'all': ('pretty.css',)
+            }
+            js = ('animations.js', 'actions.js')
+
+This code defines a ``CalendarWidget``, which will be based on ``TextInput``.
+Every time the CalendarWidget is used on a form, that form will be directed 
+to include the CSS file ``pretty.css``, and the JavaScript files 
+``animations.js`` and ``actions.js``. 
+
+This static media definition is converted at runtime into a widget property
+named ``media``. The media for a CalendarWidget instance can be retrieved 
+through this property::
+
+    >>> w = CalendarWidget()
+    >>> print w.media
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+
+Here's a list of all possible ``Media`` options. There are no required options.
+
+``css``
+~~~~~~~
+
+A dictionary describing the CSS files required for various forms of output 
+media. 
+
+The values in the dictionary should be a tuple/list of file names. See
+`the section on media paths`_ for details of how to specify paths to media 
+files.
+
+.. _the section on media paths: `Paths in media definitions`_
+
+The keys in the dictionary are the output media types. These are the same 
+types accepted by CSS files in media declarations: 'all', 'aural', 'braille',
+'embossed', 'handheld', 'print', 'projection', 'screen', 'tty' and 'tv'. If
+you need to have different stylesheets for different media types, provide
+a list of CSS files for each output medium. The following example would
+provide two CSS options -- one for the screen, and one for print::
+
+    class Media:
+        css = {
+            'screen': ('pretty.css',),
+            'print': ('newspaper.css',)
+        }
+
+If a group of CSS files are appropriate for multiple output media types, 
+the dictionary key can be a comma separated list of output media types. 
+In the following example, TV's and projectors will have the same media 
+requirements::
+
+    class Media:
+        css = {
+            'screen': ('pretty.css',),
+            'tv,projector': ('lo_res.css',),
+            'print': ('newspaper.css',)
+        }
+    
+If this last CSS definition were to be rendered, it would become the following HTML::
+
+    <link href="http://media.example.com/pretty.css" type="text/css" media="screen" rel="stylesheet" />
+    <link href="http://media.example.com/lo_res.css" type="text/css" media="tv,projector" rel="stylesheet" />
+    <link href="http://media.example.com/newspaper.css" type="text/css" media="print" rel="stylesheet" />
+                 
+``js``
+~~~~~~
+
+A tuple describing the required javascript files. See
+`the section on media paths`_ for details of how to specify paths to media 
+files.
+
+``extend``   
+~~~~~~~~~~
+
+A boolean defining inheritance behavior for media declarations. 
+
+By default, any object using a static media definition will inherit all the
+media associated with the parent widget. This occurs regardless of how the 
+parent defines its media requirements. For example, if we were to extend our
+basic Calendar widget from the example above:: 
+
+    class FancyCalendarWidget(CalendarWidget):
+        class Media:
+            css = {
+                'all': ('fancy.css',)
+            }
+            js = ('whizbang.js',)
+
+    >>> w = FancyCalendarWidget()
+    >>> print w.media
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://media.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+
+The FancyCalendar widget inherits all the media from it's parent widget. If 
+you don't want media to be inherited in this way, add an ``extend=False``
+declaration to the media declaration::
+
+    class FancyCalendar(Calendar):
+        class Media:
+            extend = False 
+            css = {
+                'all': ('fancy.css',)
+            }
+            js = ('whizbang.js',)
+
+    >>> w = FancyCalendarWidget()
+    >>> print w.media
+    <link href="http://media.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+
+If you require even more control over media inheritance, define your media 
+using a `dynamic property`_. Dynamic properties give you complete control over
+which media files are inherited, and which are not.
+
+.. _dynamic property: `Media as a dynamic property`_
+    
+Media as a dynamic property
 ---------------------------
 
-After a form has been submitted, Django validates each field in turn. First,
-if the field is required, Django checks that it is present and non-empty. Then,
-if that test passes *and the form submission contained data* for that field, all
-the validators for that field are called in turn. The emphasized portion in the
-last sentence is important: if a form field is not submitted (because it
-contains no data -- which is normal HTML behavior), the validators are not
-run against the field.
+If you need to perform some more sophisticated manipulation of media
+requirements, you can define the media property directly. This is done
+by defining a model property that returns an instance of ``forms.Media``.
+The constructor for ``forms.Media`` accepts ``css`` and ``js`` keyword 
+arguments in the same format as that used in a static media definition.
 
-This feature is particularly important for models using
-``models.BooleanField`` or custom manipulators using things like
-``forms.CheckBoxField``. If the checkbox is not selected, it will not
-contribute to the form submission.
+For example, the static media definition for our Calendar Widget could
+also be defined in a dynamic fashion::
 
-If you would like your validator to run *always*, regardless of whether its
-attached field contains any data, set the ``always_test`` attribute on the
-validator function. For example::
+    class CalendarWidget(forms.TextInput):
+        def _media(self):
+            return forms.Media(css={'all': ('pretty.css',)},
+                               js=('animations.js', 'actions.js'))
+        media = property(_media)
 
-    def my_custom_validator(field_data, all_data):
-        # ...
-    my_custom_validator.always_test = True
+See the section on `Media objects`_ for more details on how to construct
+return values for dynamic media properties.
 
-This validator will always be executed for any field it is attached to.
+Paths in media definitions
+--------------------------
 
-Ready-made validators
----------------------
+Paths used to specify media can be either relative or absolute. If a path 
+starts with '/', 'http://' or 'https://', it will be interpreted as an absolute
+path, and left as-is. All other paths will be prepended with the value of
+``settings.MEDIA_URL``. For example, if the MEDIA_URL for your site was
+``http://media.example.com/``::
 
-Writing your own validator is not difficult, but there are some situations
-that come up over and over again. Django comes with a number of validators
-that can be used directly in your code. All of these functions and classes
-reside in ``django/core/validators.py``.
+    class CalendarWidget(forms.TextInput):
+        class Media:
+            css = {
+                'all': ('/css/pretty.css',),
+            }
+            js = ('animations.js', 'http://othersite.com/actions.js')
 
-The following validators should all be self-explanatory. Each one provides a
-check for the given property:
+    >>> w = CalendarWidget()
+    >>> print w.media
+    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://othersite.com/actions.js"></script>
 
-    * isAlphaNumeric
-    * isAlphaNumericURL
-    * isSlug
-    * isLowerCase
-    * isUpperCase
-    * isCommaSeparatedIntegerList
-    * isCommaSeparatedEmailList
-    * isValidIPAddress4
-    * isNotEmpty
-    * isOnlyDigits
-    * isNotOnlyDigits
-    * isInteger
-    * isOnlyLetters
-    * isValidANSIDate
-    * isValidANSITime
-    * isValidEmail
-    * isValidFloat
-    * isValidImage
-    * isValidImageURL
-    * isValidPhone
-    * isValidQuicktimeVideoURL
-    * isValidURL
-    * isValidHTML
-    * isWellFormedXml
-    * isWellFormedXmlFragment
-    * isExistingURL
-    * isValidUSState
-    * hasNoProfanities
+Media objects
+-------------
 
-There are also a group of validators that are slightly more flexible. For
-these validators, you create a validator instance, passing in the parameters
-described below. The returned object is a callable that can be used as a
-validator.
+When you interrogate the media attribute of a widget or form, the value that
+is returned is a ``forms.Media`` object. As we have already seen, the string
+representation of a Media object is the HTML required to include media 
+in the ``<head>`` block of your HTML page. 
 
-For example::
+However, Media objects have some other interesting properties.
 
-    from django.core import validators
-    from django import forms
+Media subsets
+~~~~~~~~~~~~~
 
-    power_validator = validators.IsAPowerOf(2)
+If you only want media of a particular type, you can use the subscript operator 
+to filter out a medium of interest. For example::
 
-    class InstallationManipulator(forms.Manipulator)
-        def __init__(self):
-            self.fields = (
-                ...
-                forms.IntegerField(field_name = "size", validator_list=[power_validator])
-            )
+    >>> w = CalendarWidget()
+    >>> print w.media
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
 
-Here, ``validators.IsAPowerOf(...)`` returned something that could be used as
-a validator (in this case, a check that a number was a power of 2).
+    >>> print w.media['css']
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
 
-Each of the standard validators that take parameters have an optional final
-argument (``error_message``) that is the message returned when validation
-fails. If no message is passed in, a default message is used.
+When you use the subscript operator, the value that is returned is a new 
+Media object -- but one that only contains the media of interest.
 
-``AlwaysMatchesOtherField``
-    Takes a field name and the current field is valid if and only if its value
-    matches the contents of the other field.
+Combining media objects
+~~~~~~~~~~~~~~~~~~~~~~~
 
-``ValidateIfOtherFieldEquals``
-    Takes three parameters: ``other_field``, ``other_value`` and
-    ``validator_list``, in that order. If ``other_field`` has a value of
-    ``other_value``, then the validators in ``validator_list`` are all run
-    against the current field.
+Media objects can also be added together. When two media objects are added,
+the resulting Media object contains the union of the media from both files::
 
-``RequiredIfOtherFieldGiven``
-    Takes a field name of the current field is only required if the other
-    field has a value.
+    class CalendarWidget(forms.TextInput):
+        class Media:
+            css = {
+                'all': ('pretty.css',)
+            }
+            js = ('animations.js', 'actions.js')
 
-``RequiredIfOtherFieldsGiven``
-    Similar to ``RequiredIfOtherFieldGiven``, except that it takes a list of
-    field names and if any one of the supplied fields has a value provided,
-    the current field being validated is required.
+    class OtherWidget(forms.TextInput):
+        class Media:
+            js = ('whizbang.js',)
 
-``RequiredIfOtherFieldNotGiven``
-    Takes the name of the other field and this field is only required if the
-    other field has no value.
+    >>> w1 = CalendarWidget()
+    >>> w2 = OtherWidget()
+    >>> print w1+w2
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+    
+Media on Forms
+--------------
 
-``RequiredIfOtherFieldEquals`` and ``RequiredIfOtherFieldDoesNotEqual``
-    Each of these validator classes takes a field name and a value (in that
-    order). If the given field does (or does not have, in the latter case) the
-    given value, then the current field being validated is required.
+Widgets aren't the only objects that can have media definitions -- forms
+can also define media. The rules for media definitions on forms are the
+same as the rules for widgets: declarations can be static or dynamic;
+path and inheritance rules for those declarations are exactly the same.
 
-    An optional ``other_label`` argument can be passed which, if given, is used
-    in error messages instead of the value. This allows more user friendly error
-    messages if the value itself is not descriptive enough.
+Regardless of whether you define a media declaration, *all* Form objects 
+have a media property. The default value for this property is the result 
+of adding the media definitions for all widgets that are part of the form::
 
-    Note that because validators are called before any ``do_html2python()``
-    functions, the value being compared against is a string. So
-    ``RequiredIfOtherFieldEquals('choice', '1')`` is correct, whilst
-    ``RequiredIfOtherFieldEquals('choice', 1)`` will never result in the
-    equality test succeeding.
+    class ContactForm(forms.Form):
+        date = DateField(widget=CalendarWidget)
+        name = CharField(max_length=40, widget=OtherWidget)
 
-``IsLessThanOtherField``
-    Takes a field name and validates that the current field being validated
-    has a value that is less than (or equal to) the other field's value.
-    Again, comparisons are done using strings, so be cautious about using
-    this function to compare data that should be treated as another type. The
-    string "123" is less than the string "2", for example. If you don't want
-    string comparison here, you will need to write your own validator.
+    >>> f = ContactForm()
+    >>> f.media
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
 
-``NumberIsInRange``
-    Takes two boundary numbers, ``lower`` and ``upper``, and checks that the
-    field is greater than ``lower`` (if given) and less than ``upper`` (if
-    given).
+If you want to associate additional media with a form -- for example, CSS for form 
+layout -- simply add a media declaration to the form::
 
-    Both checks are inclusive. That is, ``NumberIsInRange(10, 20)`` will allow
-    values of both 10 and 20. This validator only checks numeric values
-    (e.g., float and integer values).
+    class ContactForm(forms.Form):
+        date = DateField(widget=CalendarWidget)
+        name = CharField(max_length=40, widget=OtherWidget)
 
-``IsAPowerOf``
-    Takes an integer argument and when called as a validator, checks that the
-    field being validated is a power of the integer.
+        class Media:
+            css = {
+                'all': ('layout.css',)
+            }
+            
+    >>> f = ContactForm()
+    >>> f.media
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://media.example.com/layout.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
 
-``IsValidDecimal``
-    Takes a maximum number of digits and number of decimal places (in that
-    order) and validates whether the field is a decimal with no more than the
-    maximum number of digits and decimal places.
+Formsets
+========
 
-``MatchesRegularExpression``
-    Takes a regular expression (a string) as a parameter and validates the
-    field value against it.
+A formset is a layer of abstraction to working with multiple forms on the same
+page. It can be best compared to a data grid. Let's say you have the following
+form::
 
-``AnyValidator``
-    Takes a list of validators as a parameter. At validation time, if the
-    field successfully validates against any one of the validators, it passes
-    validation. The validators are tested in the order specified in the
-    original list.
+    >>> from django import newforms as forms
+    >>> class ArticleForm(forms.Form):
+    ...     title = forms.CharField()
+    ...     pub_date = forms.DateField()
 
-``URLMimeTypeCheck``
-    Used to validate URL fields. Takes a list of MIME types (such as
-    ``text/plain``) at creation time. At validation time, it verifies that the
-    field is indeed a URL and then tries to retrieve the content at the URL.
-    Validation succeeds if the content could be retrieved and it has a content
-    type from the list used to create the validator.
+You might want to allow the user to create several articles at once. To create
+a formset of out of an ``ArticleForm`` you would do::
 
-``RelaxNGCompact``
-    Used to validate an XML document against a Relax NG compact schema. Takes
-    a file path to the location of the schema and an optional root element
-    (which is wrapped around the XML fragment before validation, if supplied).
-    At validation time, the XML fragment is validated against the schema using
-    the executable specified in the ``JING_PATH`` setting (see the settings_
-    document for more details).
+    >>> from django.newforms.formsets import formset_factory
+    >>> ArticleFormSet = formset_factory(ArticleForm)
 
-.. _`generic views`: ../generic_views/
-.. _`models API`: ../model-api/
-.. _settings: ../settings/
+You now have created a formset named ``ArticleFormSet``. The formset gives you
+the ability to iterate over the forms in the formset and display them as you
+would with a regular form::
+
+    >>> formset = ArticleFormSet()
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
+
+As you can see it only displayed one form. This is because by default the
+``formset_factory`` defines one extra form. This can be controlled with the
+``extra`` parameter::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
+
+Using initial data with a formset
+---------------------------------
+
+Initial data is what drives the main usability of a formset. As shown above
+you can define the number of extra forms. What this means is that you are
+telling the formset how many additional forms to show in addition to the
+number of forms it generates from the initial data. Lets take a look at an
+example::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
+    >>> formset = ArticleFormSet(initial=[
+    ...     {'title': u'Django is now open source',
+    ...      'pub_date': datetime.date.today()},
+    ... ])
+    
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Django is now open source" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-12" id="id_form-0-pub_date" /></td></tr>
+    <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" id="id_form-1-title" /></td></tr>
+    <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" id="id_form-1-pub_date" /></td></tr>
+    <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title" /></td></tr>
+    <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
+
+There are now a total of three forms showing above. One for the initial data
+that was passed in and two extra forms. Also note that we are passing in a
+list of dictionaries as the initial data.
+
+Limiting the maximum number of forms
+------------------------------------
+
+The ``max_num`` parameter to ``formset_factory`` gives you the ability to
+force the maximum number of forms the formset will display::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
+    >>> formset = ArticleFormset()
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
+
+The default value of ``max_num`` is ``0`` which is the same as saying put no
+limit on the number forms displayed.
+
+Formset validation
+------------------
+
+Validation with a formset is about identical to a regular ``Form``. There is
+an ``is_valid`` method on the formset to provide a convenient way to validate
+each form in the formset::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm)
+    >>> formset = ArticleFormSet({})
+    >>> formset.is_valid()
+    True
+
+We passed in no data to the formset which is resulting in a valid form. The
+formset is smart enough to ignore extra forms that were not changed. If we
+attempt to provide an article, but fail to do so::
+
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'1',
+    ...     'form-INITIAL_FORMS': u'1',
+    ...     'form-0-title': u'Test',
+    ...     'form-0-pub_date': u'',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    >>> formset.is_valid()
+    False
+    >>> formset.errors
+    [{'pub_date': [u'This field is required.']}]
+
+As we can see the formset properly performed validation and gave us the
+expected errors.
+
+Understanding the ManagementForm
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You may have noticed the additional data that was required in the formset's
+data above. This data is coming from the ``ManagementForm``. This form is
+dealt with internally to the formset. If you don't use it, it will result in
+an exception::
+
+    >>> data = {
+    ...     'form-0-title': u'Test',
+    ...     'form-0-pub_date': u'',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    Traceback (most recent call last):
+    ...
+    django.newforms.util.ValidationError: [u'ManagementForm data is missing or has been tampered with']
+
+It is used to keep track of how many form instances are being displayed. If
+you are adding new forms via javascript, you should increment the count fields
+in this form as well.
+
+Custom formset validation
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A formset has a ``clean`` method similar to the one on a ``Form`` class. This
+is where you define your own validation that deals at the formset level::
+
+    >>> from django.newforms.formsets import BaseFormSet
+    
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     def clean(self):
+    ...         raise forms.ValidationError, u'An error occured.'
+    
+    >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
+    >>> formset = ArticleFormSet({})
+    >>> formset.is_valid()
+    False
+    >>> formset.non_form_errors()
+    [u'An error occured.']
+
+The formset ``clean`` method is called after all the ``Form.clean`` methods
+have been called. The errors will be found using the ``non_form_errors()``
+method on the formset.
+
+Dealing with ordering and deletion of forms
+-------------------------------------------
+
+Common use cases with a formset is dealing with ordering and deletion of the
+form instances. This has been dealt with for you. The ``formset_factory``
+provides two optional parameters ``can_order`` and ``can_delete`` that will do
+the extra work of adding the extra fields and providing simpler ways of
+getting to that data.
+
+``can_order``
+~~~~~~~~~~~~~
+
+Default: ``False``
+
+Lets create a formset with the ability to order::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, can_order=True)
+    >>> formset = ArticleFormSet(initial=[
+    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ... ])
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
+    <tr><th><label for="id_form-0-ORDER">Order:</label></th><td><input type="text" name="form-0-ORDER" value="1" id="id_form-0-ORDER" /></td></tr>
+    <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" value="Article #2" id="id_form-1-title" /></td></tr>
+    <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" value="2008-05-11" id="id_form-1-pub_date" /></td></tr>
+    <tr><th><label for="id_form-1-ORDER">Order:</label></th><td><input type="text" name="form-1-ORDER" value="2" id="id_form-1-ORDER" /></td></tr>
+    <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title" /></td></tr>
+    <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
+    <tr><th><label for="id_form-2-ORDER">Order:</label></th><td><input type="text" name="form-2-ORDER" id="id_form-2-ORDER" /></td></tr>
+
+This adds an additional field to each form. This new field is named ``ORDER``
+and is an ``forms.IntegerField``. For the forms that came from the initial
+data it automatically assigned them a numeric value. Lets look at what will
+happen when the user changes these values::
+
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'3',
+    ...     'form-INITIAL_FORMS': u'2',
+    ...     'form-0-title': u'Article #1',
+    ...     'form-0-pub_date': u'2008-05-10',
+    ...     'form-0-ORDER': u'2',
+    ...     'form-1-title': u'Article #2',
+    ...     'form-1-pub_date': u'2008-05-11',
+    ...     'form-1-ORDER': u'1',
+    ...     'form-2-title': u'Article #3',
+    ...     'form-2-pub_date': u'2008-05-01',
+    ...     'form-2-ORDER': u'0',
+    ... }
+    
+    >>> formset = ArticleFormSet(data, initial=[
+    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ... ])
+    >>> formset.is_valid()
+    True
+    >>> for form in formset.ordered_forms:
+    ...     print form.cleaned_data
+    {'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0, 'title': u'Article #3'}
+    {'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1, 'title': u'Article #2'}
+    {'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2, 'title': u'Article #1'}
+
+``can_delete``
+~~~~~~~~~~~~~~
+
+Default: ``False``
+
+Lets create a formset with the ability to delete::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, can_delete=True)
+    >>> formset = ArticleFormSet(initial=[
+    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ... ])
+    >>> for form in formset.forms:
+    ....    print form.as_table()
+    <input type="hidden" name="form-TOTAL_FORMS" value="3" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="2" id="id_form-INITIAL_FORMS" />
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
+    <tr><th><label for="id_form-0-DELETE">Delete:</label></th><td><input type="checkbox" name="form-0-DELETE" id="id_form-0-DELETE" /></td></tr>
+    <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" value="Article #2" id="id_form-1-title" /></td></tr>
+    <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" value="2008-05-11" id="id_form-1-pub_date" /></td></tr>
+    <tr><th><label for="id_form-1-DELETE">Delete:</label></th><td><input type="checkbox" name="form-1-DELETE" id="id_form-1-DELETE" /></td></tr>
+    <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title" /></td></tr>
+    <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
+    <tr><th><label for="id_form-2-DELETE">Delete:</label></th><td><input type="checkbox" name="form-2-DELETE" id="id_form-2-DELETE" /></td></tr>
+
+Similar to ``can_order`` this adds a new field to each form named ``DELETE``
+and is a ``forms.BooleanField``. When data comes through marking any of the
+delete fields you can access them with ``deleted_forms``::
+
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'3',
+    ...     'form-INITIAL_FORMS': u'2',
+    ...     'form-0-title': u'Article #1',
+    ...     'form-0-pub_date': u'2008-05-10',
+    ...     'form-0-DELETE': u'on',
+    ...     'form-1-title': u'Article #2',
+    ...     'form-1-pub_date': u'2008-05-11',
+    ...     'form-1-DELETE': u'',
+    ...     'form-2-title': u'',
+    ...     'form-2-pub_date': u'',
+    ...     'form-2-DELETE': u'',
+    ... }
+    
+    >>> formset = ArticleFormSet(data, initial=[
+    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ... ])
+    >>> [form.cleaned_data for form in formset.deleted_forms]
+    [{'DELETE': True, 'pub_date': datetime.date(2008, 5, 10), 'title': u'Article #1'}]
+
+Adding additional fields to a formset
+-------------------------------------
+
+If you need to add additional fields to the formset this can be easily
+accomplished. The formset base class provides an ``add_fields`` method. You
+can simply override this method to add your own fields or even redefine the
+default fields/attributes of the order and deletion fields::
+
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     def add_fields(self, form, index):
+    ...         super(BaseArticleFormSet, self).add_fields(form, index)
+    ...         form.fields["my_field"] = forms.CharField()
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
+    >>> formset = ArticleFormSet()
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
+    <tr><th><label for="id_form-0-my_field">My field:</label></th><td><input type="text" name="form-0-my_field" id="id_form-0-my_field" /></td></tr>
+
+Using a formset in views and templates
+--------------------------------------
+
+Using a formset inside a view is as easy as using a regular ``Form`` class.
+The only thing you will want to be aware of is making sure to use the
+management form inside the template. Lets look at a sample view::
+
+    def manage_articles(request):
+        ArticleFormSet = formset_factory(ArticleForm)
+        if request.method == 'POST':
+            formset = ArticleFormSet(request.POST, request.FILES)
+            if formset.is_valid():
+                # do something with the formset.cleaned_data
+        else:
+            formset = ArticleFormSet()
+        return render_to_response('manage_articles.html', {'formset': formset})
+
+The ``manage_articles.html`` template might look like this::
+
+    <form method="POST" action="">
+        {{ formset.management_form }}
+        <table>
+            {% for form in formset.forms %}
+            {{ form }}
+            {% endfor %}
+        </table>
+    </form>
+
+However the above can be slightly shortcutted and let the formset itself deal
+with the management form::
+
+    <form method="POST" action="">
+        <table>
+            {{ formset }}
+        </table>
+    </form>
+
+The above ends up calling the ``as_table`` method on the formset class.
+
+More coming soon
+================
+
+That's all the documentation for now. For more, see the file
+http://code.djangoproject.com/browser/django/trunk/tests/regressiontests/forms
+-- the unit tests for ``django.forms``. This can give you a good idea of
+what's possible. (Each submodule there contains separate tests.)
+
+If you're really itching to learn and use this library, please be patient.
+We're working hard on finishing both the code and documentation.

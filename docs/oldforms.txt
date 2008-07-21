@@ -1,0 +1,700 @@
+===============================
+Forms, fields, and manipulators
+===============================
+
+Forwards-compatibility note
+===========================
+
+The legacy forms/manipulators system described in this document is going to be
+replaced in the next Django release. If you're starting from scratch, we
+strongly encourage you not to waste your time learning this. Instead, learn and
+use the django.forms system, which we have begun to document in the
+`forms documentation`_.
+
+If you have legacy form/manipulator code, read the "Migration plan" section in
+that document to understand how we're making the switch.
+
+.. _forms documentation: ../forms/
+
+Introduction
+============
+
+Once you've got a chance to play with Django's admin interface, you'll probably
+wonder if the fantastic form validation framework it uses is available to user
+code. It is, and this document explains how the framework works.
+
+We'll take a top-down approach to examining Django's form validation framework,
+because much of the time you won't need to use the lower-level APIs. Throughout
+this document, we'll be working with the following model, a "place" object::
+
+    from django.db import models
+
+    PLACE_TYPES = (
+        (1, 'Bar'),
+        (2, 'Restaurant'),
+        (3, 'Movie Theater'),
+        (4, 'Secret Hideout'),
+    )
+
+    class Place(models.Model):
+        name = models.CharField(max_length=100)
+        address = models.CharField(max_length=100, blank=True)
+        city = models.CharField(max_length=50, blank=True)
+        state = models.USStateField()
+        zip_code = models.CharField(max_length=5, blank=True)
+        place_type = models.IntegerField(choices=PLACE_TYPES)
+
+        class Admin:
+            pass
+
+        def __unicode__(self):
+            return self.name
+
+Defining the above class is enough to create an admin interface to a ``Place``,
+but what if you want to allow public users to submit places?
+
+Automatic Manipulators
+======================
+
+The highest-level interface for object creation and modification is the
+**automatic Manipulator** framework. An automatic manipulator is a utility
+class tied to a given model that "knows" how to create or modify instances of
+that model and how to validate data for the object. Automatic Manipulators come
+in two flavors: ``AddManipulators`` and ``ChangeManipulators``. Functionally
+they are quite similar, but the former knows how to create new instances of the
+model, while the latter modifies existing instances. Both types of classes are
+automatically created when you define a new class::
+
+    >>> from mysite.myapp.models import Place
+    >>> Place.AddManipulator
+    <class 'django.models.manipulators.AddManipulator'>
+    >>> Place.ChangeManipulator
+    <class 'django.models.manipulators.ChangeManipulator'>
+
+Using the ``AddManipulator``
+----------------------------
+
+We'll start with the ``AddManipulator``.  Here's a very simple view that takes
+POSTed data from the browser and creates a new ``Place`` object::
+
+    from django.shortcuts import render_to_response
+    from django.http import Http404, HttpResponse, HttpResponseRedirect
+    from django import oldforms as forms
+    from mysite.myapp.models import Place
+
+    def naive_create_place(request):
+        """A naive approach to creating places; don't actually use this!"""
+        # Create the AddManipulator.
+        manipulator = Place.AddManipulator()
+
+        # Make a copy of the POSTed data so that do_html2python can
+        # modify it in place (request.POST is immutable).
+        new_data = request.POST.copy()
+
+        # Convert the request data (which will all be strings) into the
+        # appropriate Python types for those fields.
+        manipulator.do_html2python(new_data)
+
+        # Save the new object.
+        new_place = manipulator.save(new_data)
+
+        # It worked!
+        return HttpResponse("Place created: %s" % new_place)
+
+The ``naive_create_place`` example works, but as you probably can tell, this
+view has a number of problems:
+
+    * No validation of any sort is performed. If, for example, the ``name`` field
+      isn't given in ``request.POST``, the save step will cause a database error
+      because that field is required. Ugly.
+
+    * Even if you *do* perform validation, there's still no way to give that
+      information to the user in any sort of useful way.
+
+    * You'll have to separately create a form (and view) that submits to this
+      page, which is a pain and is redundant.
+
+Let's dodge these problems momentarily to take a look at how you could create a
+view with a form that submits to this flawed creation view::
+
+    def naive_create_place_form(request):
+        """Simplistic place form view; don't actually use anything like this!"""
+        # Create a FormWrapper object that the template can use. Ignore
+        # the last two arguments to FormWrapper for now.
+        form = forms.FormWrapper(Place.AddManipulator(), {}, {})
+        return render_to_response('places/naive_create_form.html', {'form': form})
+
+(This view, as well as all the following ones, has the same imports as in the
+first example above.)
+
+The ``forms.FormWrapper`` object is a wrapper that templates can
+easily deal with to create forms. Here's the ``naive_create_form.html``
+template::
+
+    {% extends "base.html" %}
+
+    {% block content %}
+    <h1>Create a place:</h1>
+
+    <form method="post" action="../do_new/">
+    <p><label for="id_name">Name:</label> {{ form.name }}</p>
+    <p><label for="id_address">Address:</label> {{ form.address }}</p>
+    <p><label for="id_city">City:</label> {{ form.city }}</p>
+    <p><label for="id_state">State:</label> {{ form.state }}</p>
+    <p><label for="id_zip_code">Zip:</label> {{ form.zip_code }}</p>
+    <p><label for="id_place_type">Place type:</label> {{ form.place_type }}</p>
+    <input type="submit" />
+    </form>
+    {% endblock %}
+
+Before we get back to the problems with these naive set of views, let's go over
+some salient points of the above template:
+
+    * Field "widgets" are handled for you: ``{{ form.field }}`` automatically
+      creates the "right" type of widget for the form, as you can see with the
+      ``place_type`` field above.
+
+    * There isn't a way just to spit out the form. You'll still need to define
+      how the form gets laid out. This is a feature: Every form should be
+      designed differently. Django doesn't force you into any type of mold.
+      If you must use tables, use tables. If you're a semantic purist, you can
+      probably find better HTML than in the above template.
+
+    * To avoid name conflicts, the ``id`` values of form elements take the
+      form "id_*fieldname*".
+
+By creating a creation form we've solved problem number 3 above, but we still
+don't have any validation. Let's revise the validation issue by writing a new
+creation view that takes validation into account::
+
+    def create_place_with_validation(request):
+        manipulator = Place.AddManipulator()
+        new_data = request.POST.copy()
+
+        # Check for validation errors
+        errors = manipulator.get_validation_errors(new_data)
+        manipulator.do_html2python(new_data)
+        if errors:
+            return render_to_response('places/errors.html', {'errors': errors})
+        else:
+            new_place = manipulator.save(new_data)
+            return HttpResponse("Place created: %s" % new_place)
+
+In this new version, errors will be found -- ``manipulator.get_validation_errors``
+handles all the validation for you -- and those errors can be nicely presented
+on an error page (templated, of course)::
+
+    {% extends "base.html" %}
+
+    {% block content %}
+
+    <h1>Please go back and correct the following error{{ errors|pluralize }}:</h1>
+    <ul>
+        {% for e in errors.items %}
+        <li>Field "{{ e.0 }}": {{ e.1|join:", " }}</li>
+        {% endfor %}
+    </ul>
+
+    {% endblock %}
+
+Still, this has its own problems:
+
+    * There's still the issue of creating a separate (redundant) view for the
+      submission form.
+
+    * Errors, though nicely presented, are on a separate page, so the user will
+      have to use the "back" button to fix errors. That's ridiculous and unusable.
+
+The best way to deal with these issues is to collapse the two views -- the form
+and the submission -- into a single view.  This view will be responsible for
+creating the form, validating POSTed data, and creating the new object (if the
+data is valid). An added bonus of this approach is that errors and the form will
+both be available on the same page, so errors with fields can be presented in
+context.
+
+.. admonition:: Philosophy:
+
+    Finally, for the HTTP purists in the audience (and the authorship), this
+    nicely matches the "true" meanings of HTTP GET and HTTP POST: GET fetches
+    the form, and POST creates the new object.
+
+Below is the finished view::
+
+    def create_place(request):
+        manipulator = Place.AddManipulator()
+
+        if request.method == 'POST':
+            # If data was POSTed, we're trying to create a new Place.
+            new_data = request.POST.copy()
+
+            # Check for errors.
+            errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
+
+            if not errors:
+                # No errors. This means we can save the data!
+                new_place = manipulator.save(new_data)
+
+                # Redirect to the object's "edit" page. Always use a redirect
+                # after POST data, so that reloads don't accidently create
+                # duplicate entires, and so users don't see the confusing
+                # "Repost POST data?" alert box in their browsers.
+                return HttpResponseRedirect("/places/edit/%i/" % new_place.id)
+        else:
+            # No POST, so we want a brand new form without any data or errors.
+            errors = new_data = {}
+
+        # Create the FormWrapper, template, context, response.
+        form = forms.FormWrapper(manipulator, new_data, errors)
+        return render_to_response('places/create_form.html', {'form': form})
+
+and here's the ``create_form`` template::
+
+    {% extends "base.html" %}
+
+    {% block content %}
+    <h1>Create a place:</h1>
+
+    {% if form.has_errors %}
+    <h2>Please correct the following error{{ form.error_dict|pluralize }}:</h2>
+    {% endif %}
+
+    <form method="post" action=".">
+    <p>
+        <label for="id_name">Name:</label> {{ form.name }}
+        {% if form.name.errors %}*** {{ form.name.errors|join:", " }}{% endif %}
+    </p>
+    <p>
+        <label for="id_address">Address:</label> {{ form.address }}
+        {% if form.address.errors %}*** {{ form.address.errors|join:", " }}{% endif %}
+    </p>
+    <p>
+        <label for="id_city">City:</label> {{ form.city }}
+        {% if form.city.errors %}*** {{ form.city.errors|join:", " }}{% endif %}
+    </p>
+    <p>
+        <label for="id_state">State:</label> {{ form.state }}
+        {% if form.state.errors %}*** {{ form.state.errors|join:", " }}{% endif %}
+    </p>
+    <p>
+        <label for="id_zip_code">Zip:</label> {{ form.zip_code }}
+        {% if form.zip_code.errors %}*** {{ form.zip_code.errors|join:", " }}{% endif %}
+    </p>
+    <p>
+        <label for="id_place_type">Place type:</label> {{ form.place_type }}
+        {% if form.place_type.errors %}*** {{ form.place_type.errors|join:", " }}{% endif %}
+    </p>
+    <input type="submit" />
+    </form>
+    {% endblock %}
+
+The second two arguments to ``FormWrapper`` (``new_data`` and ``errors``)
+deserve some mention.
+
+The first is any "default" data to be used as values for the fields. Pulling
+the data from ``request.POST``, as is done above, makes sure that if there are
+errors, the values the user put in aren't lost. If you try the above example,
+you'll see this in action.
+
+The second argument is the error list retrieved from
+``manipulator.get_validation_errors``.  When passed into the ``FormWrapper``,
+this gives each field an ``errors`` item (which is a list of error messages
+associated with the field) as well as a ``html_error_list`` item, which is a
+``<ul>`` of error messages. The above template uses these error items to
+display a simple error message next to each field. The error list is saved as
+an ``error_dict`` attribute of the ``FormWrapper`` object.
+
+Using the ``ChangeManipulator``
+-------------------------------
+
+The above has covered using the ``AddManipulator`` to create a new object. What
+about editing an existing one? It's shockingly similar to creating a new one::
+
+    def edit_place(request, place_id):
+        # Get the place in question from the database and create a
+        # ChangeManipulator at the same time.
+        try:
+            manipulator = Place.ChangeManipulator(place_id)
+        except Place.DoesNotExist:
+            raise Http404
+
+        # Grab the Place object in question for future use.
+        place = manipulator.original_object
+
+        if request.method == 'POST':
+            new_data = request.POST.copy()
+            errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
+            if not errors:
+                manipulator.save(new_data)
+
+                # Do a post-after-redirect so that reload works, etc.
+                return HttpResponseRedirect("/places/edit/%i/" % place.id)
+        else:
+            errors = {}
+            # This makes sure the form accurate represents the fields of the place.
+            new_data = manipulator.flatten_data()
+
+        form = forms.FormWrapper(manipulator, new_data, errors)
+        return render_to_response('places/edit_form.html', {'form': form, 'place': place})
+
+The only real differences are:
+
+    * We create a ``ChangeManipulator`` instead of an ``AddManipulator``.
+      The argument to a ``ChangeManipulator`` is the ID of the object
+      to be changed. As you can see, the initializer will raise an
+      ``ObjectDoesNotExist`` exception if the ID is invalid.
+
+    * ``ChangeManipulator.original_object`` stores the instance of the
+      object being edited.
+
+    * We set ``new_data`` based upon ``flatten_data()`` from the manipulator.
+      ``flatten_data()`` takes the data from the original object under
+      manipulation, and converts it into a data dictionary that can be used
+      to populate form elements with the existing values for the object.
+
+    * The above example uses a different template, so create and edit can be
+      "skinned" differently if needed, but the form chunk itself is completely
+      identical to the one in the create form above.
+
+The astute programmer will notice the add and create functions are nearly
+identical and could in fact be collapsed into a single view. This is left as an
+exercise for said programmer.
+
+(However, the even-more-astute programmer will take heed of the note at the top
+of this document and check out the `generic views`_ documentation if all she
+wishes to do is this type of simple create/update.)
+
+Custom forms and manipulators
+=============================
+
+All the above is fine and dandy if you just want to use the automatically
+created manipulators. But the coolness doesn't end there: You can easily create
+your own custom manipulators for handling custom forms.
+
+Custom manipulators are pretty simple. Here's a manipulator that you might use
+for a "contact" form on a website::
+
+    from django import oldforms as forms
+
+    urgency_choices = (
+        (1, "Extremely urgent"),
+        (2, "Urgent"),
+        (3, "Normal"),
+        (4, "Unimportant"),
+    )
+
+    class ContactManipulator(forms.Manipulator):
+        def __init__(self):
+            self.fields = (
+                forms.EmailField(field_name="from", is_required=True),
+                forms.TextField(field_name="subject", length=30, max_length=200, is_required=True),
+                forms.SelectField(field_name="urgency", choices=urgency_choices),
+                forms.LargeTextField(field_name="contents", is_required=True),
+            )
+
+A certain similarity to Django's models should be apparent. The only required
+method of a custom manipulator is ``__init__`` which must define the fields
+present in the manipulator.  See the ``django.forms`` module for
+all the form fields provided by Django.
+
+You use this custom manipulator exactly as you would use an auto-generated one.
+Here's a simple function that might drive the above form::
+
+    def contact_form(request):
+        manipulator = ContactManipulator()
+        if request.method == 'POST':
+            new_data = request.POST.copy()
+            errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
+            if not errors:
+
+                # Send e-mail using new_data here...
+
+                return HttpResponseRedirect("/contact/thankyou/")
+        else:
+            errors = new_data = {}
+        form = forms.FormWrapper(manipulator, new_data, errors)
+        return render_to_response('contact_form.html', {'form': form})
+
+Implementing ``flatten_data`` for custom manipulators
+------------------------------------------------------
+
+It is possible (although rarely needed) to replace the default automatically
+created manipulators on a model with your own custom manipulators. If you do
+this and you are intending to use those models in generic views, you should
+also define a ``flatten_data`` method in any ``ChangeManipulator`` replacement.
+This should act like the default ``flatten_data`` and return a dictionary
+mapping field names to their values, like so::
+
+    def flatten_data(self):
+        obj = self.original_object
+        return dict(
+            from = obj.from,
+            subject = obj.subject,
+            ...
+        )
+
+In this way, your new change manipulator will act exactly like the default
+version.
+
+``FileField`` and ``ImageField`` special cases
+==============================================
+
+Dealing with ``FileField`` and ``ImageField`` objects is a little more
+complicated.
+
+First, you'll need to make sure that your ``<form>`` element correctly defines
+the ``enctype`` as ``"multipart/form-data"``, in order to upload files::
+
+  <form enctype="multipart/form-data" method="post" action="/foo/">
+
+Next, you'll need to treat the field in the template slightly differently. A
+``FileField`` or ``ImageField`` is represented by *two* HTML form elements.
+
+For example, given this field in a model::
+
+   photo = model.ImageField('/path/to/upload/location')
+
+You'd need to display two formfields in the template::
+
+   <p><label for="id_photo">Photo:</label> {{ form.photo }}{{ form.photo_file }}</p>
+
+The first bit (``{{ form.photo }}``) displays the currently-selected file,
+while the second (``{{ form.photo_file }}``) actually contains the file upload
+form field. Thus, at the validation layer you need to check the ``photo_file``
+key.
+
+Finally, in your view, make sure to access ``request.FILES``, rather than
+``request.POST``, for the uploaded files. This is necessary because
+``request.POST`` does not contain file-upload data.
+
+For example, following the ``new_data`` convention, you might do something like
+this::
+
+   new_data = request.POST.copy()
+   new_data.update(request.FILES)
+
+Validators
+==========
+
+One useful feature of manipulators is the automatic validation. Validation is
+done using a simple validation API: A validator is a callable that raises a
+``ValidationError`` if there's something wrong with the data.
+``django.core.validators`` defines a host of validator functions (see below),
+but defining your own couldn't be easier::
+
+    from django.core import validators
+    from django import oldforms as forms
+
+    class ContactManipulator(forms.Manipulator):
+        def __init__(self):
+            self.fields = (
+                # ... snip fields as above ...
+                forms.EmailField(field_name="to", validator_list=[self.isValidToAddress])
+            )
+
+        def isValidToAddress(self, field_data, all_data):
+            if not field_data.endswith("@example.com"):
+                raise validators.ValidationError("You can only send messages to example.com e-mail addresses.")
+
+Above, we've added a "to" field to the contact form, but required that the "to"
+address end with "@example.com" by adding the ``isValidToAddress`` validator to
+the field's ``validator_list``.
+
+The arguments to a validator function take a little explanation.  ``field_data``
+is the value of the field in question, and ``all_data`` is a dictionary of all
+the data being validated.
+
+.. admonition:: Note::
+
+    At the point validators are called all data will still be
+    strings (as ``do_html2python`` hasn't been called yet).
+
+Also, because consistency in user interfaces is important, we strongly urge you
+to put punctuation at the end of your validation messages.
+
+When are validators called?
+---------------------------
+
+After a form has been submitted, Django validates each field in turn. First,
+if the field is required, Django checks that it is present and non-empty. Then,
+if that test passes *and the form submission contained data* for that field, all
+the validators for that field are called in turn. The emphasized portion in the
+last sentence is important: if a form field is not submitted (because it
+contains no data -- which is normal HTML behavior), the validators are not
+run against the field.
+
+This feature is particularly important for models using
+``models.BooleanField`` or custom manipulators using things like
+``forms.CheckBoxField``. If the checkbox is not selected, it will not
+contribute to the form submission.
+
+If you would like your validator to run *always*, regardless of whether its
+attached field contains any data, set the ``always_test`` attribute on the
+validator function. For example::
+
+    def my_custom_validator(field_data, all_data):
+        # ...
+    my_custom_validator.always_test = True
+
+This validator will always be executed for any field it is attached to.
+
+Ready-made validators
+---------------------
+
+Writing your own validator is not difficult, but there are some situations
+that come up over and over again. Django comes with a number of validators
+that can be used directly in your code. All of these functions and classes
+reside in ``django/core/validators.py``.
+
+The following validators should all be self-explanatory. Each one provides a
+check for the given property:
+
+    * isAlphaNumeric
+    * isAlphaNumericURL
+    * isSlug
+    * isLowerCase
+    * isUpperCase
+    * isCommaSeparatedIntegerList
+    * isCommaSeparatedEmailList
+    * isValidIPAddress4
+    * isNotEmpty
+    * isOnlyDigits
+    * isNotOnlyDigits
+    * isInteger
+    * isOnlyLetters
+    * isValidANSIDate
+    * isValidANSITime
+    * isValidEmail
+    * isValidFloat
+    * isValidImage
+    * isValidImageURL
+    * isValidPhone
+    * isValidQuicktimeVideoURL
+    * isValidURL
+    * isValidHTML
+    * isWellFormedXml
+    * isWellFormedXmlFragment
+    * isExistingURL
+    * isValidUSState
+    * hasNoProfanities
+
+There are also a group of validators that are slightly more flexible. For
+these validators, you create a validator instance, passing in the parameters
+described below. The returned object is a callable that can be used as a
+validator.
+
+For example::
+
+    from django.core import validators
+    from django import oldforms as forms
+
+    power_validator = validators.IsAPowerOf(2)
+
+    class InstallationManipulator(forms.Manipulator)
+        def __init__(self):
+            self.fields = (
+                ...
+                forms.IntegerField(field_name = "size", validator_list=[power_validator])
+            )
+
+Here, ``validators.IsAPowerOf(...)`` returned something that could be used as
+a validator (in this case, a check that a number was a power of 2).
+
+Each of the standard validators that take parameters have an optional final
+argument (``error_message``) that is the message returned when validation
+fails. If no message is passed in, a default message is used.
+
+``AlwaysMatchesOtherField``
+    Takes a field name and the current field is valid if and only if its value
+    matches the contents of the other field.
+
+``ValidateIfOtherFieldEquals``
+    Takes three parameters: ``other_field``, ``other_value`` and
+    ``validator_list``, in that order. If ``other_field`` has a value of
+    ``other_value``, then the validators in ``validator_list`` are all run
+    against the current field.
+
+``RequiredIfOtherFieldGiven``
+    Takes a field name of the current field is only required if the other
+    field has a value.
+
+``RequiredIfOtherFieldsGiven``
+    Similar to ``RequiredIfOtherFieldGiven``, except that it takes a list of
+    field names and if any one of the supplied fields has a value provided,
+    the current field being validated is required.
+
+``RequiredIfOtherFieldNotGiven``
+    Takes the name of the other field and this field is only required if the
+    other field has no value.
+
+``RequiredIfOtherFieldEquals`` and ``RequiredIfOtherFieldDoesNotEqual``
+    Each of these validator classes takes a field name and a value (in that
+    order). If the given field does (or does not have, in the latter case) the
+    given value, then the current field being validated is required.
+
+    An optional ``other_label`` argument can be passed which, if given, is used
+    in error messages instead of the value. This allows more user friendly error
+    messages if the value itself is not descriptive enough.
+
+    Note that because validators are called before any ``do_html2python()``
+    functions, the value being compared against is a string. So
+    ``RequiredIfOtherFieldEquals('choice', '1')`` is correct, whilst
+    ``RequiredIfOtherFieldEquals('choice', 1)`` will never result in the
+    equality test succeeding.
+
+``IsLessThanOtherField``
+    Takes a field name and validates that the current field being validated
+    has a value that is less than (or equal to) the other field's value.
+    Again, comparisons are done using strings, so be cautious about using
+    this function to compare data that should be treated as another type. The
+    string "123" is less than the string "2", for example. If you don't want
+    string comparison here, you will need to write your own validator.
+
+``NumberIsInRange``
+    Takes two boundary numbers, ``lower`` and ``upper``, and checks that the
+    field is greater than ``lower`` (if given) and less than ``upper`` (if
+    given).
+
+    Both checks are inclusive. That is, ``NumberIsInRange(10, 20)`` will allow
+    values of both 10 and 20. This validator only checks numeric values
+    (e.g., float and integer values).
+
+``IsAPowerOf``
+    Takes an integer argument and when called as a validator, checks that the
+    field being validated is a power of the integer.
+
+``IsValidDecimal``
+    Takes a maximum number of digits and number of decimal places (in that
+    order) and validates whether the field is a decimal with no more than the
+    maximum number of digits and decimal places.
+
+``MatchesRegularExpression``
+    Takes a regular expression (a string) as a parameter and validates the
+    field value against it.
+
+``AnyValidator``
+    Takes a list of validators as a parameter. At validation time, if the
+    field successfully validates against any one of the validators, it passes
+    validation. The validators are tested in the order specified in the
+    original list.
+
+``URLMimeTypeCheck``
+    Used to validate URL fields. Takes a list of MIME types (such as
+    ``text/plain``) at creation time. At validation time, it verifies that the
+    field is indeed a URL and then tries to retrieve the content at the URL.
+    Validation succeeds if the content could be retrieved and it has a content
+    type from the list used to create the validator.
+
+``RelaxNGCompact``
+    Used to validate an XML document against a Relax NG compact schema. Takes
+    a file path to the location of the schema and an optional root element
+    (which is wrapped around the XML fragment before validation, if supplied).
+    At validation time, the XML fragment is validated against the schema using
+    the executable specified in the ``JING_PATH`` setting (see the settings_
+    document for more details).
+
+.. _`generic views`: ../generic_views/
+.. _`models API`: ../model-api/
+.. _settings: ../settings/

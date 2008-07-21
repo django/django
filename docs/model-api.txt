@@ -716,7 +716,7 @@ that takes the parameters ``field_data, all_data`` and raises
 
 Django comes with quite a few validators. They're in ``django.core.validators``.
 
-.. _validator docs: ../forms/#validators
+.. _validator docs: ../oldforms/#validators
 
 Verbose field names
 -------------------

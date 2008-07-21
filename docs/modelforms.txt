@@ -1,6 +1,6 @@
-==========================
-Using newforms with models
-==========================
+=======================
+Using forms with models
+=======================
 
 ``ModelForm``
 =============
@@ -16,7 +16,7 @@ class from a Django model.
 
 For example::
 
-    >>> from django.newforms import ModelForm
+    >>> from django.forms import ModelForm
 
     # Create the form class.
     >>> class ArticleForm(ModelForm):
@@ -86,11 +86,11 @@ the full list of conversions:
 As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
 types are special cases:
 
-    * ``ForeignKey`` is represented by ``django.newforms.ModelChoiceField``,
+    * ``ForeignKey`` is represented by ``django.forms.ModelChoiceField``,
       which is a ``ChoiceField`` whose choices are a model ``QuerySet``.
 
     * ``ManyToManyField`` is represented by
-      ``django.newforms.ModelMultipleChoiceField``, which is a
+      ``django.forms.ModelMultipleChoiceField``, which is a
       ``MultipleChoiceField`` whose choices are a model ``QuerySet``.
 
 In addition, each generated form field has attributes set as follows:
@@ -121,7 +121,7 @@ A full example
 Consider this set of models::
 
     from django.db import models
-    from django.newforms import ModelForm
+    from django.forms import ModelForm
 
     TITLE_CHOICES = (
         ('MR', 'Mr.'),
@@ -240,14 +240,14 @@ For example::
     >>> new_author = f.save()
 
 Other than the ``save()`` and ``save_m2m()`` methods, a ``ModelForm``
-works exactly the same way as any other ``newforms`` form. For
+works exactly the same way as any other ``forms`` form. For
 example, the ``is_valid()`` method is used to check for validity, the
 ``is_multipart()`` method is used to determine whether a form requires
 multipart file upload (and hence whether ``request.FILES`` must be
-passed to the form), etc. See `the standard newforms documentation`_
+passed to the form), etc. See `the standard forms documentation`_
 for more information.
 
-.. _the standard newforms documentation: ../newforms/
+.. _the standard forms documentation: ../forms/
 
 Using a subset of fields on the form
 ------------------------------------

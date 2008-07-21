@@ -13,7 +13,7 @@ Python class.
 Overview
 =========
 
-Given a ``django.newforms.Form`` subclass that you define, this application
+Given a ``django.forms.Form`` subclass that you define, this application
 takes care of the following workflow:
 
     1. Displays the form as HTML on a Web page.
@@ -65,7 +65,7 @@ How to use ``FormPreview``
 
            from myapp.preview import SomeModelFormPreview
            from myapp.models import SomeModel
-           from django import newforms as forms
+           from django import forms
 
        ...and add the following line to the appropriate model in your URLconf::
 
