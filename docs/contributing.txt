@@ -525,7 +525,6 @@ Model style
 
         * All database fields
         * ``class Meta``
-        * ``class Admin``
         * ``def __unicode__()``
         * ``def __str__()``
         * ``def save()``
