@@ -2,60 +2,20 @@
 The forms library
 =================
 
-``django.forms`` is Django's fantastic new form-handling library. It's a
-replacement for the old form/manipulator/validation framework, which has been
-moved to ``django.oldforms``. This document explains how to use this new
-library.
+``django.forms`` is Django's form-handling library.
 
-Migration plan
-==============
+.. adminition:: Looking for oldforms?
 
-``django.newforms`` is new in Django's 0.96 release, but, as it won't be new
-forever, we plan to rename it to ``django.forms`` in the future. The current
-``django.forms`` package will be available as ``django.oldforms`` until Django
-1.0, when we plan to remove it for good.
+    ``django.forms`` was once called ``newforms`` since it replaced Django's
+    original form/manipulator/validation framework. The old form handling
+    library is still available as `django.oldforms`_, but will be removed
+    in a future version of Django.
 
-That has direct repercussions on the forward compatibility of your code. Please
-read the following migration plan and code accordingly:
-
-    * The old forms framework (the current ``django.forms``) has been copied to
-      ``django.oldforms``. Thus, you can start upgrading your code *now*,
-      rather than waiting for the future backwards-incompatible change, by
-      changing your import statements like this::
-
-          from django import forms             # old
-          from django import oldforms as forms # new
-
-    * In the next Django release (0.97), we will move the current
-      ``django.newforms`` to ``django.forms``. This will be a
-      backwards-incompatible change, and anybody who is still using the old
-      version of ``django.forms`` at that time will need to change their import
-      statements, as described in the previous bullet.
-
-    * We will remove ``django.oldforms`` in the release *after* the next Django
-      release -- either 0.98 or 1.0, whichever comes first.
-
-With this in mind, we recommend you use the following import statement when
-using ``django.newforms``::
-
-    from django import newforms as forms
-
-This way, your code can refer to the ``forms`` module, and when
-``django.newforms`` is renamed to ``django.forms``, you'll only have to change
-your ``import`` statements.
-
-If you prefer "``import *``" syntax, you can do the following::
-
-    from django.newforms import *
-
-This will import all fields, widgets, form classes and other various utilities
-into your local namespace. Some people find this convenient; others find it
-too messy. The choice is yours.
+.. _django.oldforms: ../oldforms/
 
 Overview
 ========
 
-As with the ``django.oldforms`` ("manipulators") system before it,
 ``django.forms`` is intended to handle HTML form display, data processing
 (validation) and redisplay. It's what you use if you want to perform
 server-side validation for an HTML form.

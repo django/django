@@ -11,9 +11,6 @@ strongly encourage you not to waste your time learning this. Instead, learn and
 use the django.forms system, which we have begun to document in the
 `forms documentation`_.
 
-If you have legacy form/manipulator code, read the "Migration plan" section in
-that document to understand how we're making the switch.
-
 .. _forms documentation: ../forms/
 
 Introduction
