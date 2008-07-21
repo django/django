@@ -29,12 +29,36 @@ The Django admin site is not activated by default -- it's an opt-in thing. To
 activate the admin site for your installation, do these three things:
 
     * Add ``"django.contrib.admin"`` to your ``INSTALLED_APPS`` setting.
+    
     * Run ``python manage.py syncdb``. Since you have added a new application
       to ``INSTALLED_APPS``, the database tables need to be updated.
+      
     * Edit your ``mysite/urls.py`` file and uncomment the lines below the
       "Uncomment this for admin:" comments. This file is a URLconf; we'll dig
       into URLconfs in the next tutorial. For now, all you need to know is that
-      it maps URL roots to applications.
+      it maps URL roots to applications. In the end, you should have a
+      ``urls.py`` file that looks like this:
+      
+      .. parsed-literal::
+      
+          from django.conf.urls.defaults import *
+
+          # Uncomment the next two lines to enable the admin:
+          **from django.contrib import admin**
+          **admin.autodiscover()**
+
+          urlpatterns = patterns('',
+              # Example:
+              # (r'^{{ project_name }}/', include('{{ project_name }}.foo.urls')),
+
+              # Uncomment the next line to enable admin documentation:
+              # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
+
+              # Uncomment the next line for to enable the admin:
+              **(r'^admin/(.*)', admin.site.root),**
+          )
+          
+      (The bold lines are the ones that needed to be uncommented.)
 
 Start the development server
 ============================
