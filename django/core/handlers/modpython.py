@@ -4,6 +4,7 @@ from pprint import pformat
 from django import http
 from django.core import signals
 from django.core.handlers.base import BaseHandler
+from django.core.urlresolvers import set_script_prefix
 from django.dispatch import dispatcher
 from django.utils import datastructures
 from django.utils.encoding import force_unicode, smart_str
@@ -15,7 +16,21 @@ from django.utils.encoding import force_unicode, smart_str
 class ModPythonRequest(http.HttpRequest):
     def __init__(self, req):
         self._req = req
+        # FIXME: This isn't ideal. The request URI may be encoded (it's
+        # non-normalized) slightly differently to the "real" SCRIPT_NAME
+        # and PATH_INFO values. This causes problems when we compute path_info,
+        # below. For now, don't use script names that will be subject to
+        # encoding/decoding.
         self.path = force_unicode(req.uri)
+        root = req.get_options().get('django.root', '')
+        self.django_root = root
+        # req.path_info isn't necessarily computed correctly in all
+        # circumstances (it's out of mod_python's control a bit), so we use
+        # req.uri and some string manipulations to get the right value.
+        if root and req.uri.startswith(root):
+            self.path_info = force_unicode(req.uri[len(root):])
+        else:
+            self.path_info = self.path
 
     def __repr__(self):
         # Since this is called as part of error handling, we need to be very
@@ -100,7 +115,7 @@ class ModPythonRequest(http.HttpRequest):
                 'CONTENT_LENGTH':    self._req.clength, # This may be wrong
                 'CONTENT_TYPE':      self._req.content_type, # This may be wrong
                 'GATEWAY_INTERFACE': 'CGI/1.1',
-                'PATH_INFO':         self._req.path_info,
+                'PATH_INFO':         self.path_info,
                 'PATH_TRANSLATED':   None, # Not supported
                 'QUERY_STRING':      self._req.args,
                 'REMOTE_ADDR':       self._req.connection.remote_ip,
@@ -108,7 +123,7 @@ class ModPythonRequest(http.HttpRequest):
                 'REMOTE_IDENT':      self._req.connection.remote_logname,
                 'REMOTE_USER':       self._req.user,
                 'REQUEST_METHOD':    self._req.method,
-                'SCRIPT_NAME':       None, # Not supported
+                'SCRIPT_NAME':       self.django_root,
                 'SERVER_NAME':       self._req.server.server_hostname,
                 'SERVER_PORT':       self._req.server.port,
                 'SERVER_PROTOCOL':   self._req.protocol,
@@ -153,6 +168,7 @@ class ModPythonHandler(BaseHandler):
         if self._request_middleware is None:
             self.load_middleware()
 
+        set_script_prefix(req.get_options().get('django.root', ''))
         dispatcher.send(signal=signals.request_started)
         try:
             try:

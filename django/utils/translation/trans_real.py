@@ -8,18 +8,7 @@ import gettext as gettext_module
 from cStringIO import StringIO
 
 from django.utils.safestring import mark_safe, SafeData
-
-try:
-    import threading
-    hasThreads = True
-except ImportError:
-    hasThreads = False
-
-if hasThreads:
-    currentThread = threading.currentThread
-else:
-    def currentThread():
-        return 'no threading'
+from django.utils.thread_support import currentThread
 
 # Translations are cached in a dictionary for every language+app tuple.
 # The active translations are stored by threadid to make them thread local.

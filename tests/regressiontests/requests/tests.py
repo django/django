@@ -20,8 +20,9 @@ META:{...}>
 ...    def __init__(self, *args, **kwargs):
 ...        super(FakeModPythonRequest, self).__init__(*args, **kwargs)
 ...        self._get = self._post = self._meta = self._cookies = {}
->>> class Dummy: pass
-...
+>>> class Dummy:
+...     def get_options(self):
+...         return {}
 >>> req = Dummy()
 >>> req.uri = 'bogus'
 >>> print repr(FakeModPythonRequest(req))

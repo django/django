@@ -79,9 +79,9 @@ your ``manage.py`` is), and then run ``manage.py`` with the ``runfcgi`` option::
 If you specify ``help`` as the only option after ``runfcgi``, it'll display a
 list of all the available options.
 
-You'll need to specify either a ``socket``, ``protocol`` or both ``host`` and ``port``.
-Then, when you set up your Web server, you'll just need to point it at the host/port
-or socket you specified when starting the FastCGI server.
+You'll need to specify either a ``socket``, ``protocol`` or both ``host`` and
+``port``. Then, when you set up your Web server, you'll just need to point it
+at the host/port or socket you specified when starting the FastCGI server.
 
 Protocols
 ---------
@@ -209,6 +209,9 @@ This is probably the most common case, if you're using Django's admin site::
 
 .. _mod_rewrite: http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html
 
+Django will automatically use the pre-rewrite version of the URL when
+constructing URLs with the ``{% url %}`` template tag (and similar methods).
+
 lighttpd setup
 ==============
 
@@ -335,4 +338,31 @@ advice given in the modpython_ documentation is also applicable in the setups
 detailed above.
 
 .. _modpython: ../modpython/#serving-the-admin-files
+
+Forcing the URL prefix to a particular value
+============================================
+
+Because many of these fastcgi-based solutions require rewriting the URL at
+some point inside the webserver, the path information that Django sees may not
+resemble the original URL that was passed in. This is a problem if the Django
+application is being served from under a particular prefix and you want your
+URLs from the ``{% url %}`` tag to look like the prefix, rather than the
+rewritten version, which might contain, for example, ``mysite.fcgi``.
+
+Django makes a good attempt to work out what the real script name prefix
+should be. In particular, if the webserver sets the ``SCRIPT_URL`` (specific
+to Apache's mod_rewrite), or ``REDIRECT_URL`` (set by a few servers, including
+Apache + mod_rewrite in some situations), Django will work out the original
+prefix automatically.
+
+In the cases where Django cannot work out the prefix correctly and where you
+wan the original value to be used in URLs, you can set the
+``FORCE_SCRIPT_NAME`` setting in your main ``settings`` file. This sets the
+script name uniformly for every URL served via that settings file. Thus you'll
+need to use different settings files is you want different sets of URLs to
+have different script names in this case, but that is a rare situation.
+
+As an example of how to use it, if your Django configuration is serving all of
+the URLs under ``'/'`` and you wanted to use this setting, you would set
+``FORCE_SCRIPT_NAME = ''`` in your settings file.
 

@@ -578,6 +578,16 @@ these paths should use Unix-style forward slashes, even on Windows. See
 
 .. _Testing Django Applications: ../testing/
 
+FORCE_SCRIPT_NAME
+------------------
+
+Default: ``None``
+
+If not ``None``, this will be used as the value of the ``SCRIPT_NAME``
+environment variable in any HTTP request. This setting can be used to override
+the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
+of the preferred value or not supplied at all.
+
 IGNORABLE_404_ENDS
 ------------------
 
