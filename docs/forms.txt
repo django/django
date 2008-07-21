@@ -4,7 +4,7 @@ The forms library
 
 ``django.forms`` is Django's form-handling library.
 
-.. adminition:: Looking for oldforms?
+.. admonition:: Looking for oldforms?
 
     ``django.forms`` was once called ``newforms`` since it replaced Django's
     original form/manipulator/validation framework. The old form handling
