@@ -192,8 +192,8 @@ database user must have privileges to run the following commands:
 
 To run Django's test suite, the user needs these *additional* privileges:
 
- 	* CREATE DATABASE
-	* DROP DATABASE
+ 	* CREATE USER
+	* DROP USER
 	* CREATE TABLESPACE
 	* DROP TABLESPACE
 
