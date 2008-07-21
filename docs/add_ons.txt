@@ -23,9 +23,10 @@ admin
 =====
 
 The automatic Django administrative interface. For more information, see
-`Tutorial 2`_.
+`Tutorial 2`_ and the `admin documentation`_.
 
 .. _Tutorial 2: ../tutorial02/
+.. _admin documentation: ../admin/
 
 Requires the auth_ and contenttypes_ contrib packages to be installed.
 
