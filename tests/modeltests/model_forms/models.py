@@ -69,8 +69,10 @@ class ImageFile(models.Model):
     description = models.CharField(max_length=20)
     try:
         # If PIL is available, try testing PIL.
-        # Otherwise, it's equivalent to TextFile above.
-        import Image
+        # Checking for the existence of Image is enough for CPython, but
+        # for PyPy, you need to check for the underlying modules
+        # If PIL is not available, this test is equivalent to TextFile above.
+        import Image, _imaging
         image = models.ImageField(upload_to=tempfile.gettempdir())
     except ImportError:
         image = models.FileField(upload_to=tempfile.gettempdir())

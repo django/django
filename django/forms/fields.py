@@ -503,6 +503,11 @@ class ImageField(FileField):
             #  but it must be called immediately after the constructor
             trial_image = Image.open(file)
             trial_image.verify()
+        except ImportError: 
+            # Under PyPy, it is possible to import PIL. However, the underlying
+            # _imaging C module isn't available, so an ImportError will be 
+            # raised. Catch and re-raise. 
+            raise
         except Exception: # Python Imaging Library doesn't recognize it as an image
             raise ValidationError(self.error_messages['invalid_image'])
         if hasattr(f, 'seek') and callable(f.seek):
