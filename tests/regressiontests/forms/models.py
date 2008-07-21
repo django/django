@@ -3,7 +3,7 @@ import datetime
 
 from django.db import models
 # Can't import as "forms" due to implementation details in the test suite (the
-# current file is called "forms" an is already imported).
+# current file is called "forms" and is already imported).
 from django import forms as django_forms
 
 class BoundaryModel(models.Model):
