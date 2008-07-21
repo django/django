@@ -31,6 +31,11 @@ class ModPythonRequest(http.HttpRequest):
             self.path_info = force_unicode(req.uri[len(root):])
         else:
             self.path_info = self.path
+        if not self.path_info:
+            # Django prefers empty paths to be '/', rather than '', to give us
+            # a common start character for URL patterns. So this is a little
+            # naughty, but also pretty harmless.
+            self.path_info = u'/'
 
     def __repr__(self):
         # Since this is called as part of error handling, we need to be very

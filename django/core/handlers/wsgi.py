@@ -76,7 +76,13 @@ def safe_copyfileobj(fsrc, fdst, length=16*1024, size=0):
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         script_name = base.get_script_name(environ)
-        path_info = force_unicode(environ.get('PATH_INFO', '/'))
+        path_info = force_unicode(environ.get('PATH_INFO', u'/'))
+        if not path_info:
+            # Sometimes PATH_INFO exists, but is empty (e.g. accessing
+            # the SCRIPT_NAME URL without a trailing slash). We really need to
+            # operate as if they'd requested '/'. Not amazingly nice to force
+            # the path like this, but should be harmless.
+            path_info = u'/'
         self.environ = environ
         self.path_info = path_info
         self.path = '%s%s' % (script_name, path_info)
