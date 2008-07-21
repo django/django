@@ -384,7 +384,7 @@ Similar to regular formsets there are a couple enhanced formset classes that
 provide all the right things to work with your models. Lets reuse the
 ``Author`` model from above::
 
-    >>> from django.newforms.models import modelformset_factory
+    >>> from django.forms.models import modelformset_factory
     >>> AuthorFormSet = modelformset_factory(Author)
 
 This will create a formset that is capable of working with the data associated
@@ -417,7 +417,7 @@ configurable::
 
 Alternatively, you can use a subclassing based approach::
 
-    from django.newforms.models import BaseModelFormSet
+    from django.forms.models import BaseModelFormSet
     
     class BaseAuthorFormSet(BaseModelFormSet):
         def get_queryset(self):
@@ -494,7 +494,7 @@ with related objects through a foreign key. Suppose you have two models
 ``Author`` and ``Book``. You want to create a formset that works with the
 books of a specific author. Here is how you could accomplish this::
 
-    >>> from django.newforms.models import inlineformset_factory
+    >>> from django.forms.models import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book)
     >>> author = Author.objects.get(name=u'Orson Scott Card')
     >>> formset = BookFormSet(instance=author)

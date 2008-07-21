@@ -864,7 +864,7 @@ useful for testing Web applications:
     rendered on the form.
 
     ``form`` is the name the ``Form`` instance was given in the template
-    context. Note that this works only for ``newforms.Form`` instances, not
+    context. Note that this works only for ``forms.Form`` instances, not
     ``oldforms.Form`` instances.
 
     ``field`` is the name of the field on the form to check. If ``field``

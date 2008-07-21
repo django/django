@@ -494,7 +494,7 @@ on your ``ModelAdmin``::
 Keep in mind that this will be prepended with ``MEDIA_URL``. The same rules
 apply as `regular media definitions on forms`_.
 
-.. _regular media definitions on forms: ../newforms/#media
+.. _regular media definitions on forms: ../forms/#media
 
 ``InlineModelAdmin`` objects
 ============================
@@ -558,7 +558,7 @@ inline.
 This controls the number of extra forms the formset will display in addition
 to the initial forms. See the `formsets documentation`_ for more information.
 
-.. _formsets documentation: ../newforms/#formsets
+.. _formsets documentation: ../forms/#formsets
 
 ``max_num``
 ~~~~~~~~~~~

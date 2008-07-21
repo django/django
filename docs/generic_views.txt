@@ -817,7 +817,7 @@ These values and lists are 1-based, not 0-based, so the first page would be
 represented as page ``1``.
 
 For more on pagination, read the `pagination documentation`_.
-	 
+
 .. _`pagination documentation`: ../pagination/
 
 **New in Django development version:**
@@ -909,10 +909,10 @@ for creating, editing and deleting objects.
 **Changed in Django development version:**
 
 ``django.views.generic.create_update.create_object`` and
-``django.views.generic.create_update.update_object`` now use `newforms`_ to
-build and display the form.
+``django.views.generic.create_update.update_object`` now use the new `forms
+library`_ to build and display the form.
 
-.. _newforms: ../newforms/
+.. _forms library: ../forms/
 
 ``django.views.generic.create_update.create_object``
 ----------------------------------------------------
@@ -927,7 +927,7 @@ validation errors (if there are any) and saving the object.
     * Either ``form_class`` or ``model`` is required.
 
       If you provide ``form_class``, it should be a
-      ``django.newforms.ModelForm`` subclass.  Use this argument when you need
+      ``django.forms.ModelForm`` subclass.  Use this argument when you need
       to customize the model's form.  See the `ModelForm docs`_ for more
       information.
 
@@ -973,7 +973,7 @@ If ``template_name`` isn't specified, this view will use the template
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``form``: A ``django.newforms.ModelForm`` instance representing the form
+    * ``form``: A ``django.forms.ModelForm`` instance representing the form
       for creating the object. This lets you refer to form fields easily in the
       template system.
 
@@ -988,7 +988,7 @@ In addition to ``extra_context``, the template's context will be:
       ``Form`` objects in templates.
 
 .. _authentication system: ../authentication/
-.. _ModelForm docs: ../newforms/modelforms
+.. _ModelForm docs: ../forms/modelforms
 .. _forms documentation: ../forms/
 
 ``django.views.generic.create_update.update_object``
@@ -1005,7 +1005,7 @@ object. This uses the automatic manipulators that come with Django models.
     * Either ``form_class`` or ``model`` is required.
 
       If you provide ``form_class``, it should be a
-      ``django.newforms.ModelForm`` subclass.  Use this argument when you need
+      ``django.forms.ModelForm`` subclass.  Use this argument when you need
       to customize the model's form.  See the `ModelForm docs`_ for more
       information.
 
@@ -1063,7 +1063,7 @@ If ``template_name`` isn't specified, this view will use the template
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``form``: A ``django.newforms.ModelForm`` instance representing the form
+    * ``form``: A ``django.forms.ModelForm`` instance representing the form
       for editing the object. This lets you refer to form fields easily in the
       template system.
 
@@ -1074,7 +1074,7 @@ In addition to ``extra_context``, the template's context will be:
           <p>{{ form.address.label_tag }} {{ form.address }}</p>
           </form>
 
-      See the `newforms documentation`_ for more information about using
+      See the `forms documentation`_ for more information about using
       ``Form`` objects in templates.
 
     * ``object``: The original object being edited. This variable's name

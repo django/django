@@ -2191,7 +2191,7 @@ A formset is a layer of abstraction to working with multiple forms on the same
 page. It can be best compared to a data grid. Let's say you have the following
 form::
 
-    >>> from django import newforms as forms
+    >>> from django import forms
     >>> class ArticleForm(forms.Form):
     ...     title = forms.CharField()
     ...     pub_date = forms.DateField()
@@ -2199,7 +2199,7 @@ form::
 You might want to allow the user to create several articles at once. To create
 a formset of out of an ``ArticleForm`` you would do::
 
-    >>> from django.newforms.formsets import formset_factory
+    >>> from django.forms.formsets import formset_factory
     >>> ArticleFormSet = formset_factory(ArticleForm)
 
 You now have created a formset named ``ArticleFormSet``. The formset gives you
@@ -2308,7 +2308,7 @@ an exception::
     >>> formset = ArticleFormSet(data)
     Traceback (most recent call last):
     ...
-    django.newforms.util.ValidationError: [u'ManagementForm data is missing or has been tampered with']
+    django.forms.util.ValidationError: [u'ManagementForm data is missing or has been tampered with']
 
 It is used to keep track of how many form instances are being displayed. If
 you are adding new forms via javascript, you should increment the count fields
@@ -2320,7 +2320,7 @@ Custom formset validation
 A formset has a ``clean`` method similar to the one on a ``Form`` class. This
 is where you define your own validation that deals at the formset level::
 
-    >>> from django.newforms.formsets import BaseFormSet
+    >>> from django.forms.formsets import BaseFormSet
     
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def clean(self):
