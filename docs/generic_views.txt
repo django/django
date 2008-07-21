@@ -988,7 +988,7 @@ In addition to ``extra_context``, the template's context will be:
       ``Form`` objects in templates.
 
 .. _authentication system: ../authentication/
-.. _ModelForm docs: ../forms/modelforms
+.. _ModelForm docs: ../modelforms/
 .. _forms documentation: ../forms/
 
 ``django.views.generic.create_update.update_object``
