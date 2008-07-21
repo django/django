@@ -2470,14 +2470,3 @@ with the management form::
     </form>
 
 The above ends up calling the ``as_table`` method on the formset class.
-
-More coming soon
-================
-
-That's all the documentation for now. For more, see the file
-http://code.djangoproject.com/browser/django/trunk/tests/regressiontests/forms
--- the unit tests for ``django.forms``. This can give you a good idea of
-what's possible. (Each submodule there contains separate tests.)
-
-If you're really itching to learn and use this library, please be patient.
-We're working hard on finishing both the code and documentation.
