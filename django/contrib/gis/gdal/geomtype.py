@@ -4,31 +4,42 @@ from django.contrib.gis.gdal.error import OGRException
 class OGRGeomType(object):
     "Encapulates OGR Geometry Types."
 
-    # Ordered array of acceptable strings and their corresponding OGRwkbGeometryType
-    __ogr_str = ['Unknown', 'Point', 'LineString', 'Polygon', 'MultiPoint',
-                 'MultiLineString', 'MultiPolygon', 'GeometryCollection',
-                 'LinearRing']
-    __ogr_int = [0, 1, 2, 3, 4, 5, 6, 7, 101]
+    # Dictionary of acceptable OGRwkbGeometryType s and their string names.
+    _types = {0 : 'Unknown',
+              1 : 'Point',
+              2 : 'LineString',
+              3 : 'Polygon',
+              4 : 'MultiPoint',
+              5 : 'MultiLineString',
+              6 : 'MultiPolygon',
+              7 : 'GeometryCollection',
+              100 : 'None',
+              101 : 'LinearRing',
+              }
+    # Reverse type dictionary, keyed by lower-case of the name.
+    _str_types = dict([(v.lower(), k) for k, v in _types.items()])
 
     def __init__(self, type_input):
         "Figures out the correct OGR Type based upon the input."
         if isinstance(type_input, OGRGeomType):
-            self._index = type_input._index
+            num = type_input.num
         elif isinstance(type_input, basestring):
-            idx = self._has_str(self.__ogr_str, type_input)
-            if idx == None:
+            num = self._str_types.get(type_input.lower(), None)
+            if num is None:
                 raise OGRException('Invalid OGR String Type "%s"' % type_input)
-            self._index = idx
         elif isinstance(type_input, int):
-            if not type_input in self.__ogr_int:
+            if not type_input in self._types:
                 raise OGRException('Invalid OGR Integer Type: %d' % type_input)
-            self._index =  self.__ogr_int.index(type_input)
+            num = type_input
         else:
             raise TypeError('Invalid OGR input type given.')
+        
+        # Setting the OGR geometry type number.
+        self.num = num
 
     def __str__(self):
-        "Returns a short-hand string form of the OGR Geometry type."
-        return self.__ogr_str[self._index]
+        "Returns the value of the name property."
+        return self.name
 
     def __eq__(self, other):
         """
@@ -36,37 +47,27 @@ class OGRGeomType(object):
         other OGRGeomType, the short-hand string, or the integer.
         """
         if isinstance(other, OGRGeomType):
-            return self._index == other._index
+            return self.num == other.num
         elif isinstance(other, basestring):
-            idx = self._has_str(self.__ogr_str, other)
-            if not (idx == None): return self._index == idx
-            return False
+            return self.name.lower() == other.lower()
         elif isinstance(other, int):
-            if not other in self.__ogr_int: return False
-            return self.__ogr_int.index(other) == self._index
+            return self.num == other
         else:
-            raise TypeError('Cannot compare with type: %s' % str(type(other)))
+            return False
 
     def __ne__(self, other):
         return not (self == other)
 
-    def _has_str(self, arr, s):
-        "Case-insensitive search of the string array for the given pattern."
-        s_low = s.lower()
-        for i in xrange(len(arr)):
-            if s_low == arr[i].lower(): return i
-        return None
+    @property
+    def name(self):
+        "Returns a short-hand string form of the OGR Geometry type."
+        return self._types[self.num]
 
     @property
     def django(self):
         "Returns the Django GeometryField for this OGR Type."
-        s = self.__ogr_str[self._index]
-        if s in ('Unknown', 'LinearRing'):
+        s = self.name
+        if s in ('Unknown', 'LinearRing', 'None'):
             return None
         else:
             return s + 'Field'
-
-    @property
-    def num(self):
-        "Returns the OGRwkbGeometryType number for the OGR Type."
-        return self.__ogr_int[self._index]

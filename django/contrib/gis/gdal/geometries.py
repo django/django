@@ -201,7 +201,13 @@ class OGRGeometry(object):
     @property
     def geom_type(self):
         "Returns the Type for this Geometry."
-        return OGRGeomType(get_geom_type(self._ptr))
+        try:
+            return OGRGeomType(get_geom_type(self._ptr))
+        except OGRException:
+            # VRT datasources return an invalid geometry type
+            # number, but a valid name -- we'll try that instead.
+            # See: http://trac.osgeo.org/gdal/ticket/2491
+            return OGRGeomType(get_geom_name(self._ptr))
 
     @property
     def geom_name(self):

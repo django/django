@@ -36,6 +36,11 @@ class OGRGeomTest(unittest.TestCase):
         self.assertEqual(False, OGRGeomType(1) != OGRGeomType('point'))
         self.assertEqual(True, OGRGeomType('POINT') != OGRGeomType(6))
 
+        # Testing the Django field name equivalent property.
+        self.assertEqual('PointField', OGRGeomType('Point').django)
+        self.assertEqual(None, OGRGeomType('Unknown').django)
+        self.assertEqual(None, OGRGeomType('none').django)
+
     def test01a_wkt(self):
         "Testing WKT output."
         for g in wkt_out:

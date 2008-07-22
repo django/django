@@ -25,6 +25,7 @@ OGRERR_DICT = { 1 : (OGRException, 'Not enough data.'),
                 5 : (OGRException, 'Corrupt data.'),
                 6 : (OGRException, 'OGR failure.'),
                 7 : (SRSException, 'Unsupported SRS.'),
+                8 : (OGRException, 'Invalid handle.'),
                 }
 OGRERR_NONE = 0
 

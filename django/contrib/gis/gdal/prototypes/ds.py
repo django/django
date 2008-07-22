@@ -37,6 +37,7 @@ get_layer_defn = voidptr_output(lgdal.OGR_L_GetLayerDefn, [c_void_p])
 get_layer_srs = srs_output(lgdal.OGR_L_GetSpatialRef, [c_void_p])
 get_next_feature = voidptr_output(lgdal.OGR_L_GetNextFeature, [c_void_p])
 reset_reading = void_output(lgdal.OGR_L_ResetReading, [c_void_p], errcheck=False)
+test_capability = int_output(lgdal.OGR_L_TestCapability, [c_void_p, c_char_p])
 
 ### Feature Definition Routines ###
 get_fd_geom_type = int_output(lgdal.OGR_FD_GetGeomType, [c_void_p])
