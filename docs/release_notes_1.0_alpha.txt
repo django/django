@@ -30,7 +30,7 @@ Refactored admin application (newforms-admin)
     ``django.newforms``, and now available as simply ``django.forms``)
     and redesigned with extensibility and customization in mind. Full
     documentation for the admin application is available online in the
-    official Django documentation::
+    official Django documentation:
     
          http://www.djangoproject.com/documentation/admin/
 
@@ -38,10 +38,10 @@ Improved Unicode handling
     Django's internals have been refactored to use Unicode throughout;
     this drastically simplifies the task of dealing with
     non-Western-European content and data in Django. Additionally,
-    utility functions have been provided to eash interoperability with
+    utility functions have been provided to each interoperability with
     third-party libraries and systems which may or may not handle
     Unicode gracefully. Details are available in Django's
-    Unicode-handling documentation::
+    Unicode-handling documentation:
     
          http://www.djangoproject.com/documentation/unicode/
 
@@ -55,7 +55,7 @@ An improved Django ORM
     took place in the ORM's internals. A guide to the changes,
     including backwards-incompatible modifications and mentions of new
     features opened up by this refactoring, is available on the Django
-    wiki::
+    wiki:
     
          http://code.djangoproject.com/wiki/QuerysetRefactorBranch
 
@@ -66,12 +66,12 @@ Automatic escaping of template variables
     and allows both variables and larger template constructs to be
     marked as safe (requiring no escaping) or unsafe (requiring
     escaping). A full guide to this feature is in the documentation
-    for the Django template system::
+    for the Django template system:
     
         http://www.djangoproject.com/documentation/templates/#automatic-html-escaping
 
 There are many more new features, many bugfixes and many enhancements
-to existing features from previous releases; the ``newforms` library,
+to existing features from previous releases; the ``newforms`` library,
 for example, has undergone massive improvements including several
 useful add-ons in ``django.contrib`` which complement and build on
 Django's form-handling capabilities, and Django's file-uploading
@@ -84,7 +84,7 @@ fleshed out and APIs have been finalized for the 1.0 release. A
 complete guide to these changes will be available as part of the final
 Django 1.0 release, and a comprehensive list of backwards-incompatible
 changes is also available on the Django wiki for those who want to
-begin developing and testing their upgrade process::
+begin developing and testing their upgrade process:
     
     http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
 
@@ -123,7 +123,7 @@ followed soon after by Django 1.0. The timeline is projected to be:
 
 Of course, like any estimated timeline this is subject to change as
 requirements dictate; the latest information will always be available
-on the Django project wiki::
+on the Django project wiki:
 
     http://code.djangoproject.com/wiki/VersionOneRoadmap
 
@@ -137,23 +137,23 @@ production use, you can help the Django team by trying out the alpha
 codebase in a safe test environment and reporting any bugs or issues
 you encounter. The Django ticket tracker is the central place to
 search for open issues and open new issues if no existing ticket
-corresponds to a problem you're running into::
+corresponds to a problem you're running into:
 
     http://code.djangoproject.com/timeline
 
 Additionally, discussion of Django development, including progress
 toward the 1.0 release, takes place daily on the django-developers
-mailing list::
+mailing list:
 
     http://groups.google.com/group/django-developers
 
 And in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If
 you're interested in helping out with Django's development, feel free
 to join the discussions there. Django's online documentation also
-includes pointers on how to contribute to Django::
+includes pointers on how to contribute to Django:
 
     http://www.djangoproject.com/documentation/contributing/
 
 Contributions on any level -- from developing code to writing
 documentation to simply triaging tickets and helping to test proposed
-bugifxes -- are always welcome and always appreciated.
+bugfixes -- are always welcome and always appreciated.
