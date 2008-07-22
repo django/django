@@ -2095,7 +2095,7 @@ the resulting Media object contains the union of the media from both files::
 
     >>> w1 = CalendarWidget()
     >>> w2 = OtherWidget()
-    >>> print w1+w2
+    >>> print w1.media + w2.media
     <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
     <script type="text/javascript" src="http://media.example.com/animations.js"></script>
     <script type="text/javascript" src="http://media.example.com/actions.js"></script>
