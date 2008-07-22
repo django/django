@@ -808,7 +808,7 @@ Here's an example of how you might use this in a template::
     {% else %}
         <form method="post" action="/foo/">
     {% endif %}
-    {% form %}
+    {{ form }}
     </form>
 
 Subclassing forms
