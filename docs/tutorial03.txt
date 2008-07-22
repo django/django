@@ -441,11 +441,11 @@ Here's what happens if a user goes to "/polls/34/" in this system:
 
 * Django will find the match at ``'^polls/'``
 * It will strip off the matching text (``"polls/"``) and send the remaining
-  text -- ``"34/"`` -- to the 'mysite.polls.urls' urlconf for
+  text -- ``"34/"`` -- to the 'mysite.polls.urls' URLconf for
   further processing.
 
 Now that we've decoupled that, we need to decouple the
-'mysite.polls.urls' urlconf by removing the leading "polls/" from each
+'mysite.polls.urls' URLconf by removing the leading "polls/" from each
 line::
 
     urlpatterns = patterns('mysite.polls.views',

@@ -1557,7 +1557,7 @@ mentioned above (``required``, ``label``, ``initial``, ``widget``,
 Custom form and field validation
 ---------------------------------
 
-Form validation happens when the data is cleaned. If you want to customise
+Form validation happens when the data is cleaned. If you want to customize
 this process, there are various places you can change, each one serving a
 different purpose. Three types of cleaning methods are run during form
 processing. These are normally executed when you call the ``is_valid()``
@@ -1568,7 +1568,7 @@ directly), but normally they won't be needed.
 In general, any cleaning method can raise ``ValidationError`` if there is a
 problem with the data it is processing, passing the relevant error message to
 the ``ValidationError`` constructor. If no ``ValidationError`` is raised, the
-method should return the cleaned (normalised) data as a Python object.
+method should return the cleaned (normalized) data as a Python object.
 
 If you detect multiple errors during a cleaning method and wish to signal all
 of them to the form submitter, it is possible to pass a list of errors to the
@@ -1601,7 +1601,7 @@ The three types of cleaning methods are:
     * The Form subclass's ``clean()`` method. This method can perform
       any validation that requires access to multiple fields from the form at
       once. This is where you might put in things to check that if field ``A``
-      is supplied, field ``B`` must contain a valid email address and the
+      is supplied, field ``B`` must contain a valid e-mail address and the
       like. The data that this method returns is the final ``cleaned_data``
       attribute for the form, so don't forget to return the full list of
       cleaned data if you override this method (by default, ``Form.clean()``
@@ -1723,7 +1723,7 @@ Customizing widget instances
 When Django renders a widget as HTML, it only renders the bare minimum
 HTML - Django doesn't add a class definition, or any other widget-specific
 attributes. This means that all 'TextInput' widgets will appear the same
-on your web page.
+on your Web page.
 
 If you want to make one widget look different to another, you need to
 specify additional attributes for each widget. When you specify a
@@ -1747,7 +1747,7 @@ each widget will be rendered exactly the same::
     <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
-On a real web page, you probably don't want every widget to look the same. You
+On a real Web page, you probably don't want every widget to look the same. You
 might want a larger input element for the comment, and you might want the
 'name' widget to have some special CSS class. To do this, you specify a
 custom widget for your fields, and specify some attributes to use

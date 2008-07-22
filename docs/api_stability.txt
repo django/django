@@ -59,7 +59,7 @@ These APIs are stable:
    
    - `Request/response objects`_.
    
-   - `Sending email`_.
+   - `Sending e-mail`_.
    
    - `Sessions`_.
    
@@ -108,7 +108,7 @@ change:
 .. _mod_python integration: ../modpython/
 .. _redirects: ../redirects/
 .. _request/response objects: ../request_response/
-.. _sending email: ../email/
+.. _sending e-mail: ../email/
 .. _sessions: ../sessions/
 .. _settings: ../settings/
 .. _syndication: ../syndication_feeds/

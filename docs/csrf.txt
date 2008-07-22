@@ -4,8 +4,8 @@ Cross Site Request Forgery protection
 
 The CsrfMiddleware class provides easy-to-use protection against
 `Cross Site Request Forgeries`_.  This type of attack occurs when a malicious
-web site creates a link or form button that is intended to perform some action
-on your web site, using the credentials of a logged-in user who is tricked
+Web site creates a link or form button that is intended to perform some action
+on your Web site, using the credentials of a logged-in user who is tricked
 into clicking on the link in their browser.
 
 The first defense against CSRF attacks is to ensure that GET requests
@@ -38,7 +38,7 @@ CsrfMiddleware does two things:
    checks that the 'csrfmiddlewaretoken' is present and correct. If it
    isn't, the user will get a 403 error.
 
-This ensures that only forms that have originated from your web site
+This ensures that only forms that have originated from your Web site
 can be used to POST data back.
 
 It deliberately only targets HTTP POST requests (and the corresponding POST
@@ -47,7 +47,7 @@ effects (see `9.1.1 Safe Methods, HTTP 1.1, RFC 2616`_), and so a
 CSRF attack with a GET request ought to be harmless.
 
 POST requests that are not accompanied by a session cookie are not protected,
-but they do not need to be protected, since the 'attacking' web site
+but they do not need to be protected, since the 'attacking' Web site
 could make these kind of requests anyway.
 
 The Content-Type is checked before modifying the response, and only

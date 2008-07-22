@@ -463,7 +463,7 @@ Be careful, if you are using ``extra()`` to add custom handling to your
 may or may not make sense. If you are using custom SQL fragments in your
 ``extra()`` calls, Django will not inspect these fragments to see if they need
 to be rewritten because of changes in the merged query. So test the effects
-carefully. Also realise that if you are combining two ``QuerySets`` with
+carefully. Also realize that if you are combining two ``QuerySets`` with
 ``|``, you cannot use ``extra(select=...)`` or ``extra(where=...)`` on *both*
 ``QuerySets``. You can only use those calls on one or the other (Django will
 raise a ``ValueError`` if you try to use this incorrectly).

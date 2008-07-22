@@ -1945,7 +1945,7 @@ information.
 django.contrib.webdesign
 ------------------------
 
-A collection of template tags that can be useful while designing a website,
+A collection of template tags that can be useful while designing a Web site,
 such as a generator of Lorem Ipsum text. See the `webdesign documentation`_.
 
 .. _webdesign documentation: ../webdesign/

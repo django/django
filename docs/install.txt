@@ -18,7 +18,7 @@ Install Apache and mod_python
 =============================
 
 If you just want to experiment with Django, skip ahead to the next
-section; Django includes a lightweight web server you can use for
+section; Django includes a lightweight Web server you can use for
 testing, so you won't need to set up Apache until you're ready to
 deploy Django in production.
 
@@ -64,7 +64,7 @@ installed.
   You will also want to read the database-specific notes for the `MySQL backend`_.
 
 * If you're using SQLite and either Python 2.3 or Python 2.4, you'll need
-  pysqlite_. Use version 2.0.3 or higher. Python 2.5 ships with an sqlite
+  pysqlite_. Use version 2.0.3 or higher. Python 2.5 ships with an SQLite
   wrapper in the standard library, so you don't need to install anything extra
   in that case.
 

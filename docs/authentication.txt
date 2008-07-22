@@ -631,7 +631,7 @@ The page shown after a user has changed their password.
 **Description:**
 
 Allows a user to reset their password, and sends them the new password
-in an email.
+in an e-mail.
 
 **Optional arguments:**
 
@@ -640,7 +640,7 @@ in an email.
       ``registration/password_reset_form.html`` if not supplied.
 
     * ``email_template_name``: The full name of a template to use for
-      generating the email with the new password. This will default to
+      generating the e-mail with the new password. This will default to
       ``registration/password_reset_email.html`` if not supplied.
 
 **Template context:**
@@ -696,7 +696,7 @@ system provides several built-in forms:
       user to change their password.
 
     * ``django.contrib.auth.forms.PasswordResetForm``: A form for resetting a
-      user's password and emailing the new password to them.
+      user's password and e-mailing the new password to them.
 
     * ``django.contrib.auth.forms.UserCreationForm``: A form for creating a
       new user.

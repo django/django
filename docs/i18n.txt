@@ -888,7 +888,7 @@ does translation:
     * The string domain is ``django`` or ``djangojs``. This string domain is
       used to differentiate between different programs that store their data
       in a common message-file library (usually ``/usr/share/locale/``). The
-      ``django`` domain is used for python and template translation strings
+      ``django`` domain is used for Python and template translation strings
       and is loaded into the global translation catalogs. The ``djangojs``
       domain is only used for JavaScript translation catalogs to make sure
       that those are as small as possible.
