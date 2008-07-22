@@ -1616,8 +1616,9 @@ class Query(object):
         if self.ordering_aliases:
             result = order_modified_iter(cursor, len(self.ordering_aliases),
                     self.connection.features.empty_fetchmany_value)
-        result = iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
-                self.connection.features.empty_fetchmany_value)
+        else:
+            result = iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
+                    self.connection.features.empty_fetchmany_value)
         if not self.connection.features.can_use_chunked_reads:
             # If we are using non-chunked reads, we return the same data
             # structure as normally, but ensure it is all read into memory

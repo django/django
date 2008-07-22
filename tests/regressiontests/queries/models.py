@@ -822,6 +822,11 @@ Bug #7759 -- count should work with a partially read result set.
 ...     break
 True
 
+Bug #7791 -- there were "issues" when ordering and distinct-ing on fields
+related via ForeignKeys.
+>>> Note.objects.order_by('extrainfo__info').distinct()
+[<Note: n3>, <Note: n1>, <Note: n2>]
+
 """}
 
 # In Python 2.3, exceptions raised in __len__ are swallowed (Python issue
