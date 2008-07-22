@@ -159,4 +159,19 @@ Traceback (most recent call last):
 ...
 DoesNotExist: ItalianRestaurant matching query does not exist.
 
+# Regression test for #6755
+>>> r = Restaurant(serves_pizza=False)
+>>> r.save()
+>>> r.id
+3
+>>> r.place_ptr_id
+3
+>>> r = Restaurant(place_ptr_id=3, serves_pizza=True)
+>>> r.save()
+>>> r.id
+3
+>>> r.place_ptr_id
+3
+
+
 """}

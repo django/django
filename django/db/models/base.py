@@ -299,6 +299,12 @@ class Model(object):
         # attributes we have been given to the class we have been given.
         if not raw:
             for parent, field in meta.parents.items():
+                # At this point, parent's primary key field may be unknown
+                # (for example, from administration form which doesn't fill
+                # this field). If so, fill it.
+                if getattr(self, parent._meta.pk.attname) is None and getattr(self, field.attname) is not None:
+                    setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
+
                 self.save_base(raw, parent)
                 setattr(self, field.attname, self._get_pk_val(parent._meta))
 

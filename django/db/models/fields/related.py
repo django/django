@@ -706,6 +706,7 @@ class OneToOneField(ForeignKey):
     """
     def __init__(self, to, to_field=None, **kwargs):
         kwargs['unique'] = True
+        kwargs['editable'] = False
         if 'num_in_admin' not in kwargs:
             kwargs['num_in_admin'] = 0
         super(OneToOneField, self).__init__(to, to_field, OneToOneRel, **kwargs)
