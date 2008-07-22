@@ -106,6 +106,8 @@ class Query(object):
         Pickling support.
         """
         obj_dict = self.__dict__.copy()
+        obj_dict['related_select_fields'] = []
+        obj_dict['related_select_cols'] = []
         del obj_dict['connection']
         return obj_dict
 

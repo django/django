@@ -785,6 +785,15 @@ Bug #7204, #7506 -- make sure querysets with related fields can be pickled. If
 this doesn't crash, it's a Good Thing.
 >>> out = pickle.dumps(Item.objects.all())
 
+We should also be able to pickle things that use select_related(). The only
+tricky thing here is to ensure that we do the related selections properly after
+unpickling.
+>>> qs = Item.objects.select_related()
+>>> query = qs.query.as_sql()[0]
+>>> query2 = pickle.loads(pickle.dumps(qs.query))
+>>> query2.as_sql()[0] == query
+True
+
 Bug #7277
 >>> ann1 = Annotation.objects.create(name='a1', tag=t1)
 >>> ann1.notes.add(n1)
