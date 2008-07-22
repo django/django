@@ -166,8 +166,10 @@ class GEOSGeometry(object):
         """
         if isinstance(other, basestring):
             return self.wkt == other
-        else:
+        elif isinstance(other, GEOSGeometry):
             return self.equals_exact(other)
+        else:
+            return False
 
     def __ne__(self, other):
         "The not equals operator."

@@ -107,13 +107,19 @@ class GEOSTest(unittest.TestCase):
             self.assertEqual(GEOSGeometry(g.wkt), GEOSGeometry(geom.json))
 
     def test01j_eq(self):
-        "Testing equivalence with WKT."
+        "Testing equivalence."
         p = fromstr('POINT(5 23)')
         self.assertEqual(p, p.wkt)
         self.assertNotEqual(p, 'foo')
         ls = fromstr('LINESTRING(0 0, 1 1, 5 5)')
         self.assertEqual(ls, ls.wkt)
         self.assertNotEqual(p, 'bar')
+        # Error shouldn't be raise on equivalence testing with 
+        # an invalid type.
+        for g in (p, ls):
+            self.assertNotEqual(g, None)
+            self.assertNotEqual(g, {'foo' : 'bar'})
+            self.assertNotEqual(g, False)
 
     def test02a_points(self):
         "Testing Point objects."
