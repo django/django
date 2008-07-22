@@ -1213,7 +1213,6 @@ class Query(object):
                 raise MultiJoin(pos + 1)
             if model:
                 # The field lives on a base class of the current model.
-                alias_list = []
                 for int_model in opts.get_base_chain(model):
                     lhs_col = opts.parents[int_model].column
                     dedupe = lhs_col in opts.duplicate_targets

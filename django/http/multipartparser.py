@@ -4,6 +4,7 @@ Multi-part parsing for file uploads.
 Exposes one class, ``MultiPartParser``, which feeds chunks of uploaded data to
 file upload handlers for processing.
 """
+
 import cgi
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
@@ -12,7 +13,7 @@ from django.utils.encoding import force_unicode
 from django.utils.text import unescape_entities
 from django.core.files.uploadhandler import StopUpload, SkipFile, StopFutureHandlers
 
-__all__ = ('MultiPartParser','MultiPartParserError','InputStreamExhausted')
+__all__ = ('MultiPartParser', 'MultiPartParserError', 'InputStreamExhausted')
 
 class MultiPartParserError(Exception):
     pass
@@ -162,7 +163,6 @@ class MultiPartParser(object):
                                           force_unicode(data, encoding, errors='replace'))
                 elif item_type == FILE:
                     # This is a file, use the handler...
-                    file_successful = True
                     file_name = disposition.get('filename')
                     if not file_name:
                         continue
@@ -209,7 +209,6 @@ class MultiPartParser(object):
                                     break
 
                     except SkipFile, e:
-                        file_successful = False
                         # Just use up the rest of this file...
                         exhaust(field_stream)
                     else:
@@ -515,21 +514,11 @@ class BoundaryIter(object):
         else:
             end = index
             next = index + len(self._boundary)
-            data_len = len(data) - 1
             # backup over CRLF
             if data[max(0,end-1)] == '\n':
                 end -= 1
             if data[max(0,end-1)] == '\r':
                 end -= 1
-            # skip over --CRLF
-            #if data[min(data_len,next)] == '-':
-            #    next += 1
-            #if data[min(data_len,next)] == '-':
-            #    next += 1
-            #if data[min(data_len,next)] == '\r':
-            #    next += 1
-            #if data[min(data_len,next)] == '\n':
-            #    next += 1
             return end, next
 
 def exhaust(stream_or_iterable):

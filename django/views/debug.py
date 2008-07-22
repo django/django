@@ -145,8 +145,6 @@ class ExceptionReporter:
             'line': line,
             'name': origin.name,
         }
-        if hasattr(self.exc_value, 'exc_info') and self.exc_value.exc_info:
-            exc_type, exc_value, tb = self.exc_value.exc_info
 
     def _get_lines_from_file(self, filename, lineno, context_lines, loader=None, module_name=None):
         """
