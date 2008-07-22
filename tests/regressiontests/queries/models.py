@@ -833,8 +833,8 @@ True
 
 Bug #7791 -- there were "issues" when ordering and distinct-ing on fields
 related via ForeignKeys.
->>> Note.objects.order_by('extrainfo__info').distinct()
-[<Note: n3>, <Note: n1>, <Note: n2>]
+>>> len(Note.objects.order_by('extrainfo__info').distinct())
+3
 
 """}
 
