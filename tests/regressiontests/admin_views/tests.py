@@ -102,7 +102,7 @@ class AdminViewPermissionsTest(TestCase):
         self.failUnlessEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/', self.super_login)
         self.assertRedirects(login, '/test_admin/admin/')
-        self.assertFalse(login.context)
+        self.failIf(login.context)
         self.client.get('/test_admin/admin/logout/')
         
         # Test if user enters e-mail address
@@ -124,7 +124,7 @@ class AdminViewPermissionsTest(TestCase):
         self.failUnlessEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/', self.adduser_login)
         self.assertRedirects(login, '/test_admin/admin/')
-        self.assertFalse(login.context)
+        self.failIf(login.context)
         self.client.get('/test_admin/admin/logout/')
         
         # Change User
@@ -132,7 +132,7 @@ class AdminViewPermissionsTest(TestCase):
         self.failUnlessEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/', self.changeuser_login)
         self.assertRedirects(login, '/test_admin/admin/')
-        self.assertFalse(login.context)
+        self.failIf(login.context)
         self.client.get('/test_admin/admin/logout/')
         
         # Delete User
@@ -140,7 +140,7 @@ class AdminViewPermissionsTest(TestCase):
         self.failUnlessEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/', self.deleteuser_login)
         self.assertRedirects(login, '/test_admin/admin/')
-        self.assertFalse(login.context)
+        self.failIf(login.context)
         self.client.get('/test_admin/admin/logout/')
         
         # Regular User should not be able to login.

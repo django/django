@@ -6,6 +6,7 @@ and default settings.py files.
 import os
 import unittest
 import shutil
+import sys
 
 from django import conf, bin, get_version
 from django.conf import settings
@@ -737,7 +738,10 @@ class CommandTypes(AdminScriptTestCase):
         "--help is handled as a special case"
         args = ['--help']
         out, err = self.run_manage(args)
-        self.assertOutput(out, "Usage: manage.py [options]")
+        if sys.version_info < (2, 4):
+            self.assertOutput(out, "usage: manage.py [options]")
+        else:
+            self.assertOutput(out, "Usage: manage.py [options]")
         self.assertOutput(err, "Type 'manage.py help <subcommand>' for help on a specific subcommand.")
 
     def test_specific_help(self):
