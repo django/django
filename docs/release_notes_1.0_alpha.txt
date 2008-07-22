@@ -38,7 +38,7 @@ Improved Unicode handling
     Django's internals have been refactored to use Unicode throughout;
     this drastically simplifies the task of dealing with
     non-Western-European content and data in Django. Additionally,
-    utility functions have been provided to each interoperability with
+    utility functions have been provided to ease interoperability with
     third-party libraries and systems which may or may not handle
     Unicode gracefully. Details are available in Django's
     Unicode-handling documentation:
@@ -62,7 +62,7 @@ An improved Django ORM
 Automatic escaping of template variables
     To provide improved security against cross-site scripting (XSS)
     vulnerabilities, Django's template system now automatically
-    escapes the output of variables; this behavior is configurable,
+    escapes the output of variables. This behavior is configurable,
     and allows both variables and larger template constructs to be
     marked as safe (requiring no escaping) or unsafe (requiring
     escaping). A full guide to this feature is in the documentation
@@ -71,15 +71,15 @@ Automatic escaping of template variables
         http://www.djangoproject.com/documentation/templates/#automatic-html-escaping
 
 There are many more new features, many bugfixes and many enhancements
-to existing features from previous releases; the ``newforms`` library,
+to existing features from previous releases. The ``newforms`` library,
 for example, has undergone massive improvements including several
 useful add-ons in ``django.contrib`` which complement and build on
 Django's form-handling capabilities, and Django's file-uploading
 handlers have been refactored to allow finer-grained control over the
 uploading process as well as streaming uploads of large files.
 
-Along with these improvements and additions, there have been a number
-of backwards-incompatible changes as features in Django have been
+Along with these improvements and additions, we've made a number of
+of backwards-incompatible changes to the framework, as features have been
 fleshed out and APIs have been finalized for the 1.0 release. A
 complete guide to these changes will be available as part of the final
 Django 1.0 release, and a comprehensive list of backwards-incompatible
@@ -94,35 +94,35 @@ The Django 1.0 roadmap
 
 One of the primary goals of this alpha release is to focus attention
 on the remaining features to be implemented for Django 1.0, and on the
-bugs which need to be resolved before the final release. Following
+bugs that need to be resolved before the final release. Following
 this release, we'll be conducting a series of sprints building up to a
-series of beta releases and finally a release-candidate stage,
-followed soon after by Django 1.0. The timeline is projected to be:
+series of beta releases and a release-candidate stage, followed soon
+after by Django 1.0. The timeline is projected to be:
 
-* August 1, 2008: Sprint (based in Washington, D.C. and online).
+* August 1, 2008: Sprint (based in Washington, DC, and online).
 
 * August 5, 2008: Django 1.0 beta 1 release. This will also constitute
-  the feature freeze for 1.0; any feature to be included in 1.0 must
+  the feature freeze for 1.0. Any feature to be included in 1.0 must
   be completed and in trunk by this time.
 
-* August 8, 2008: Sprint (based in Lawrence, KS and online).
+* August 8, 2008: Sprint (based in Lawrence, KS, and online).
 
 * August 12, 2008: Django 1.0 beta 2 release.
 
-* August 15, 2008: Sprint (based in Austin, TX and online).
+* August 15, 2008: Sprint (based in Austin, TX, and online).
 
 * August 19, 2008: Django 1.0 release candidate 1.
 
-* August 22, 2008: Sprint (based in Portland, OR and online).
+* August 22, 2008: Sprint (based in Portland, OR, and online).
 
 * August 26, 2008: Django 1.0 release candidate 2.
 
 * September 2, 2008: Django 1.0 final release. The official Django 1.0
   release party will take place during the first-ever DjangoCon, to be
-  held in Mountain View, CA September 6-7.
+  held in Mountain View, CA, September 6-7.
 
-Of course, like any estimated timeline this is subject to change as
-requirements dictate; the latest information will always be available
+Of course, like any estimated timeline, this is subject to change as
+requirements dictate. The latest information will always be available
 on the Django project wiki:
 
     http://code.djangoproject.com/wiki/VersionOneRoadmap
@@ -136,10 +136,12 @@ help. Although this alpha release is, again, *not* intended for
 production use, you can help the Django team by trying out the alpha
 codebase in a safe test environment and reporting any bugs or issues
 you encounter. The Django ticket tracker is the central place to
-search for open issues and open new issues if no existing ticket
-corresponds to a problem you're running into:
+search for open issues:
 
     http://code.djangoproject.com/timeline
+
+Please open new tickets if no existing ticket corresponds to a problem
+you're running into.
 
 Additionally, discussion of Django development, including progress
 toward the 1.0 release, takes place daily on the django-developers
@@ -147,13 +149,15 @@ mailing list:
 
     http://groups.google.com/group/django-developers
 
-And in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If
+...and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If
 you're interested in helping out with Django's development, feel free
-to join the discussions there. Django's online documentation also
-includes pointers on how to contribute to Django:
+to join the discussions there.
+
+Django's online documentation also includes pointers on how to
+contribute to Django:
 
     http://www.djangoproject.com/documentation/contributing/
 
-Contributions on any level -- from developing code to writing
-documentation to simply triaging tickets and helping to test proposed
-bugfixes -- are always welcome and always appreciated.
+Contributions on any level -- developing code, writing
+documentation or simply triaging tickets and helping to test proposed
+bugfixes -- are always welcome and appreciated.
