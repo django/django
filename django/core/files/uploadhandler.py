@@ -1,8 +1,7 @@
 """
 Base file upload handler classes, and the built-in concrete subclasses
 """
-import os
-import tempfile
+
 try:
     from cStringIO import StringIO
 except ImportError:

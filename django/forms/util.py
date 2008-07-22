@@ -1,6 +1,5 @@
 from django.utils.html import escape
 from django.utils.encoding import smart_unicode, StrAndUnicode, force_unicode
-from django.utils.functional import Promise
 from django.utils.safestring import mark_safe
 
 def flatatt(attrs):

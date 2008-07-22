@@ -6,7 +6,6 @@ from django.shortcuts import render_to_response
 from django.utils.text import capfirst
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.safestring import mark_safe
-from django.views.generic import date_based
 import urllib
 
 class FieldChoicePlugin(DatabrowsePlugin):

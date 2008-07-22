@@ -2,7 +2,7 @@ from forms import Form
 from django.utils.encoding import StrAndUnicode
 from django.utils.safestring import mark_safe
 from fields import IntegerField, BooleanField
-from widgets import Media, HiddenInput, TextInput
+from widgets import Media, HiddenInput
 from util import ErrorList, ValidationError
 
 __all__ = ('BaseFormSet', 'all_valid')

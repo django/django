@@ -6,7 +6,6 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext
-from django.utils.safestring import mark_safe
 from django.utils.http import urlencode
 import operator
 

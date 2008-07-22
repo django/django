@@ -17,7 +17,6 @@ class Command(BaseCommand):
     requires_model_validation = False
 
     def handle(self, *fixture_labels, **options):
-        from django.conf import settings
         from django.core.management import call_command
         from django.test.utils import create_test_db
 

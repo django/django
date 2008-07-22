@@ -8,7 +8,6 @@ import os
 
 from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
 from django.db.backends.oracle import query
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_str, force_unicode
 
 # Oracle takes client-side character set encoding from the environment.

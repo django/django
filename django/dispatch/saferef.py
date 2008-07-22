@@ -1,6 +1,5 @@
 """Refactored "safe reference" from dispatcher.py"""
 import weakref, traceback
-from django.utils.functional import curry
 
 def safeRef(target, onDelete = None):
     """Return a *safe* weak reference to a callable target

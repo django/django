@@ -8,7 +8,6 @@ from warnings import warn
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from django.utils.datastructures import SortedDict
-from django.core.exceptions import ImproperlyConfigured
 
 from util import ValidationError, ErrorList
 from forms import BaseForm, get_declared_fields

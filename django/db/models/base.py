@@ -12,7 +12,7 @@ import django.db.models.manipulators    # Imported to register signal handler.
 import django.db.models.manager         # Ditto.
 from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
-from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
+from django.db.models.fields import AutoField, ImageField
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
 from django.db.models.query import delete_objects, Q, CollectedObjects
 from django.db.models.options import Options
@@ -20,7 +20,6 @@ from django.db import connection, transaction
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.dispatch import dispatcher
-from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.core.files.move import file_move_safe

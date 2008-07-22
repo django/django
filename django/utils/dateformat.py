@@ -13,7 +13,7 @@ Usage:
 
 from django.utils.dates import MONTHS, MONTHS_3, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR
 from django.utils.tzinfo import LocalTimezone
-from django.utils.translation import string_concat, ugettext as _
+from django.utils.translation import ugettext as _
 from django.utils.encoding import force_unicode
 from calendar import isleap, monthrange
 import re, time

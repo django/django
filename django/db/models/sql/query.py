@@ -7,7 +7,6 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 
-import datetime
 from copy import deepcopy
 
 from django.utils.tree import Node

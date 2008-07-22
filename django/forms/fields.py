@@ -23,7 +23,7 @@ except NameError:
     from sets import Set as set
 
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import StrAndUnicode, smart_unicode, smart_str
+from django.utils.encoding import smart_unicode, smart_str
 
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateTimeInput

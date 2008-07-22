@@ -4,10 +4,8 @@ from django.db.models.fields import AutoField, Field, IntegerField, PositiveInte
 from django.db.models.related import RelatedObject
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import QueryWrapper
-from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, string_concat, ungettext, ugettext as _
 from django.utils.functional import curry
-from django.utils.encoding import smart_unicode
 from django.core import validators
 from django import oldforms
 from django import forms

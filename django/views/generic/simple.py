@@ -1,4 +1,3 @@
-from django.shortcuts import render_to_response
 from django.template import loader, RequestContext
 from django.http import HttpResponse, HttpResponsePermanentRedirect, HttpResponseGone
 

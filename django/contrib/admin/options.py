@@ -1,5 +1,4 @@
-from django import oldforms, template
-from django import forms
+from django import forms, template
 from django.forms.formsets import all_valid
 from django.forms.models import modelform_factory, inlineformset_factory
 from django.forms.models import BaseInlineFormset
