@@ -401,13 +401,14 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.f
 
 class BaseInlineFormset(BaseModelFormSet):
     """A formset for child objects related to a parent."""
-    def __init__(self, data=None, files=None, instance=None, save_as_new=False):
+    def __init__(self, data=None, files=None, instance=None,
+                 save_as_new=False, prefix=None):
         from django.db.models.fields.related import RelatedObject
         self.instance = instance
         self.save_as_new = save_as_new
         # is there a better way to get the object descriptor?
         self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
-        super(BaseInlineFormset, self).__init__(data, files, prefix=self.rel_name)
+        super(BaseInlineFormset, self).__init__(data, files, prefix=prefix or self.rel_name)
     
     def _construct_forms(self):
         if self.save_as_new:

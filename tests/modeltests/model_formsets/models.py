@@ -313,4 +313,13 @@ True
 >>> [book for book in formset.save() if book.author.pk == new_author.pk]
 [<Book: Les Fleurs du Mal>, <Book: Le Spleen de Paris>]
 
+Test using a custom prefix on an inline formset.
+
+>>> formset = AuthorBooksFormSet(prefix="test")
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_test-0-title">Title:</label> <input id="id_test-0-title" type="text" name="test-0-title" maxlength="100" /><input type="hidden" name="test-0-id" id="id_test-0-id" /></p>
+<p><label for="id_test-1-title">Title:</label> <input id="id_test-1-title" type="text" name="test-1-title" maxlength="100" /><input type="hidden" name="test-1-id" id="id_test-1-id" /></p>
+
+
 """}
