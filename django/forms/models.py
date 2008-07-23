@@ -305,8 +305,8 @@ class BaseModelFormSet(BaseFormSet):
                  queryset=None, **kwargs):
         self.queryset = queryset
         defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
-        if self._max_form_count > 0:
-            qs = self.get_queryset()[:self._max_form_count]
+        if self.max_num > 0:
+            qs = self.get_queryset()[:self.max_num]
         else:
             qs = self.get_queryset()
         defaults['initial'] = [model_to_dict(obj) for obj in qs]

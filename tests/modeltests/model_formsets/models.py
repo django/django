@@ -41,7 +41,6 @@ __test__ = {'API_TESTS': """
 >>> data = {
 ...     'form-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'form-INITIAL_FORMS': '0', # the number of forms with initial data
-...     'form-MAX_FORMS': '0', # the max number of forms
 ...     'form-0-name': 'Charles Baudelaire',
 ...     'form-1-name': 'Arthur Rimbaud',
 ...     'form-2-name': '',
@@ -79,7 +78,6 @@ them in alphabetical order by name.
 >>> data = {
 ...     'form-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'form-INITIAL_FORMS': '2', # the number of forms with initial data
-...     'form-MAX_FORMS': '0', # the max number of forms
 ...     'form-0-id': '2',
 ...     'form-0-name': 'Arthur Rimbaud',
 ...     'form-1-id': '1',
@@ -123,7 +121,6 @@ deltetion, make sure we don't save that form.
 >>> data = {
 ...     'form-TOTAL_FORMS': '4', # the number of forms rendered
 ...     'form-INITIAL_FORMS': '3', # the number of forms with initial data
-...     'form-MAX_FORMS': '0', # the max number of forms
 ...     'form-0-id': '2',
 ...     'form-0-name': 'Arthur Rimbaud',
 ...     'form-1-id': '1',
@@ -153,7 +150,6 @@ Let's edit a record to ensure save only returns that one record.
 >>> data = {
 ...     'form-TOTAL_FORMS': '4', # the number of forms rendered
 ...     'form-INITIAL_FORMS': '3', # the number of forms with initial data
-...     'form-MAX_FORMS': '0', # the max number of forms
 ...     'form-0-id': '2',
 ...     'form-0-name': 'Walt Whitman',
 ...     'form-1-id': '1',
@@ -184,7 +180,6 @@ Test the behavior of commit=False and save_m2m
 >>> data = {
 ...     'form-TOTAL_FORMS': '2', # the number of forms rendered
 ...     'form-INITIAL_FORMS': '1', # the number of forms with initial data
-...     'form-MAX_FORMS': '0', # the max number of forms
 ...     'form-0-id': '1',
 ...     'form-0-name': '2nd Tuesday of the Week Meeting',
 ...     'form-0-authors': [2, 1, 3, 4],
@@ -242,7 +237,6 @@ admin system's edit inline functionality works.
 >>> data = {
 ...     'book_set-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'book_set-INITIAL_FORMS': '0', # the number of forms with initial data
-...     'book_set-MAX_FORMS': '0', # the max number of forms
 ...     'book_set-0-title': 'Les Fleurs du Mal',
 ...     'book_set-1-title': '',
 ...     'book_set-2-title': '',
@@ -277,7 +271,6 @@ book.
 >>> data = {
 ...     'book_set-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'book_set-INITIAL_FORMS': '1', # the number of forms with initial data
-...     'book_set-MAX_FORMS': '0', # the max number of forms
 ...     'book_set-0-id': '1',
 ...     'book_set-0-title': 'Les Fleurs du Mal',
 ...     'book_set-1-title': 'Le Spleen de Paris',
@@ -304,7 +297,6 @@ This is used in the admin for save_as functionality.
 >>> data = {
 ...     'book_set-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'book_set-INITIAL_FORMS': '2', # the number of forms with initial data
-...     'book_set-MAX_FORMS': '0', # the max number of forms
 ...     'book_set-0-id': '1',
 ...     'book_set-0-title': 'Les Fleurs du Mal',
 ...     'book_set-1-id': '2',
