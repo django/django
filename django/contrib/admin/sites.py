@@ -1,6 +1,7 @@
 from django import http, template
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth import authenticate, login
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
 from django.shortcuts import render_to_response
 from django.utils.safestring import mark_safe
@@ -66,19 +67,33 @@ class AdminSite(object):
 
         If a model is already registered, this will raise AlreadyRegistered.
         """
-        do_validate = admin_class and settings.DEBUG
-        if do_validate:
-            # don't import the humongous validation code unless required
+        # Don't import the humongous validation code unless required
+        if admin_class and settings.DEBUG:
             from django.contrib.admin.validation import validate
-        admin_class = admin_class or ModelAdmin
-        # TODO: Handle options
+        else:
+            validate = lambda model, adminclass: None
+
+        if not admin_class:
+            admin_class = ModelAdmin
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model in self._registry:
                 raise AlreadyRegistered('The model %s is already registered' % model.__name__)
-            if do_validate:
-                validate(admin_class, model)
+
+            # If we got **options then dynamically construct a subclass of
+            # admin_class with those **options.
+            if options:
+                # For reasons I don't quite understand, without a __module__
+                # the created class appears to "live" in the wrong place,
+                # which causes issues later on.
+                options['__module__'] = __name__
+                admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
+
+            # Validate (which might be a no-op)
+            validate(admin_class, model)
+
+            # Instantiate the admin class to save in the registry
             self._registry[model] = admin_class(model, self)
 
     def unregister(self, model_or_iterable):
