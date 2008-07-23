@@ -500,8 +500,8 @@ apply as `regular media definitions on forms`_.
 ============================
 
 The admin interface has the ability to edit models on the same page as a
-parent model. These are called inlines. You can add them a model being
-specifing them in a ``ModelAdmin.inlines`` attribute::
+parent model. These are called inlines. You can add them to a model by
+specifying them in a ``ModelAdmin.inlines`` attribute::
 
     class BookInline(admin.TabularInline):
         model = Book
