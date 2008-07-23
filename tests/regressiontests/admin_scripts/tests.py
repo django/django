@@ -53,7 +53,7 @@ class AdminScriptTestCase(unittest.TestCase):
         base_dir = os.path.dirname(project_dir)
         
         # Build the command line
-        cmd = 'python "%s"' % script
+        cmd = '%s "%s"' % (sys.executable, script)
         cmd += ''.join([' %s' % arg for arg in args])
         
         # Remember the old environment
