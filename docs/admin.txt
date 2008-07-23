@@ -511,7 +511,7 @@ specifying them in a ``ModelAdmin.inlines`` attribute::
             BookInline,
         ]
 
-Django provides two subclasses of ``InlineModelAdmin`` and they are::
+Django provides two subclasses of ``InlineModelAdmin`` and they are:
 
     * ``TabularInline``
     * ``StackedInline``
