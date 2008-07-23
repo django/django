@@ -43,11 +43,16 @@ class ParkingLot(Place):
     def __unicode__(self):
         return u"%s the parking lot" % self.name
 
+class Supplier(models.Model):
+    restaurant = models.ForeignKey(Restaurant)
+
 class Parent(models.Model):
     created = models.DateTimeField(default=datetime.datetime.now)
 
 class Child(Parent):
     name = models.CharField(max_length=10)
+
+
 
 __test__ = {'API_TESTS':"""
 # Regression for #7350, #7202
@@ -171,5 +176,10 @@ True
 True
 >>> r.id == r.place_ptr_id
 True
+
+# Regression test for #7488. This looks a little crazy, but it's the equivalent
+# of what the admin interface has to do for the edit-inline case.
+>>> Supplier.objects.filter(restaurant=Restaurant(name='xx', address='yy'))
+[]
 
 """}
