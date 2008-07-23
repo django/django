@@ -556,14 +556,13 @@ class ModelAdmin(BaseModelAdmin):
 
         adminForm = AdminForm(form, self.get_fieldsets(request, obj), self.prepopulated_fields)
         media = self.media + adminForm.media
-        for fs in inline_formsets:
-            media = media + fs.media
 
         inline_admin_formsets = []
         for inline, formset in zip(self.inline_instances, inline_formsets):
             fieldsets = list(inline.get_fieldsets(request, obj))
             inline_admin_formset = InlineAdminFormSet(inline, formset, fieldsets)
             inline_admin_formsets.append(inline_admin_formset)
+            media = media + inline_admin_formset.media
 
         context = {
             'title': _('Change %s') % opts.verbose_name,
@@ -759,6 +758,13 @@ class InlineAdminFormSet(object):
     def fields(self):
         for field_name in flatten_fieldsets(self.fieldsets):
             yield self.formset.form.base_fields[field_name]
+    
+    def _media(self):
+        media = self.formset.media
+        for fs in self:
+            media = media + fs.media
+        return media
+    media = property(_media)
 
 class InlineAdminForm(AdminForm):
     """
