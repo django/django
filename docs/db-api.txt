@@ -2218,7 +2218,7 @@ statement. It is a bulk operation for direct updates. It doesn't run any
 signals (which are a consequence of calling ``save()``). If you want to save
 every item in a ``QuerySet`` and make sure that the ``save()`` method is
 called on each instance, you don't need any special function to handle that.
-Just loop over them and call ``save()``:
+Just loop over them and call ``save()``::
 
     for item in my_queryset:
         item.save()
