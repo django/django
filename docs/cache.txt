@@ -6,8 +6,8 @@ A fundamental tradeoff in dynamic Web sites is, well, they're dynamic. Each
 time a user requests a page, the Web server makes all sorts of calculations --
 from database queries to template rendering to business logic -- to create the
 page that your site's visitor sees. This is a lot more expensive, from a
-processing-overhead perspective, than your standard read-a-file-off-the-filesystem
-server arrangement.
+processing-overhead perspective, than your standard
+read-a-file-off-the-filesystem server arrangement.
 
 For most Web applications, this overhead isn't a big deal. Most Web
 applications aren't washingtonpost.com or slashdot.org; they're simply small-
@@ -185,6 +185,27 @@ production environment still will. To activate dummy caching, set
 ``CACHE_BACKEND`` like so::
 
     CACHE_BACKEND = 'dummy:///'
+
+Using a custom cache backend
+----------------------------
+
+**New in Django development version**
+
+While Django includes support for a number of cache backends out-of-the-box,
+sometimes you will want to use a customised verison or your own backend.  To
+use an external cache backend with Django, use a Python import path as the
+scheme portion (the part before the initial colon) of the ``CACHE_BACKEND``
+URI, like so::
+
+    CACHE_BACKEND = 'path.to.backend://'
+
+If you're building your own backend, you can use the standard cache backends
+as reference implementations. You'll find the code in the
+``django/core/cache/backends/`` directory of the Django source.
+
+Note: Without a really compelling reason, like a host that doesn't support the
+them, you should stick to the cache backends included with Django. They've
+been really well-tested and are quite easy to use.
 
 CACHE_BACKEND arguments
 -----------------------

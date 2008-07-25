@@ -19,8 +19,10 @@ from cgi import parse_qsl
 from django.conf import settings
 from django.core.cache.backends.base import InvalidCacheBackendError
 
+# Name for use in settings file --> name of module in "backends" directory.
+# Any backend scheme that is not in this dictionary is treated as a Python
+# import path to a custom backend.
 BACKENDS = {
-    # name for use in settings file --> name of module in "backends" directory
     'memcached': 'memcached',
     'locmem': 'locmem',
     'file': 'filebased',
@@ -44,8 +46,6 @@ def get_cache(backend_uri):
         warnings.warn("'%s' backend is deprecated. Use '%s' instead." % 
             (scheme, DEPRECATED_BACKENDS[scheme]), DeprecationWarning)
         scheme = DEPRECATED_BACKENDS[scheme]
-    if scheme not in BACKENDS:
-        raise InvalidCacheBackendError, "%r is not a valid cache backend" % scheme
 
     host = rest[2:]
     qpos = rest.find('?')
@@ -57,7 +57,10 @@ def get_cache(backend_uri):
     if host.endswith('/'):
         host = host[:-1]
 
-    cache_class = getattr(__import__('django.core.cache.backends.%s' % BACKENDS[scheme], {}, {}, ['']), 'CacheClass')
-    return cache_class(host, params)
+    if scheme in BACKENDS:
+        module = __import__('django.core.cache.backends.%s' % BACKENDS[scheme], {}, {}, [''])
+    else:
+        module = __import__(scheme, {}, {}, [''])
+    return getattr(module, 'CacheClass')(host, params)
 
 cache = get_cache(settings.CACHE_BACKEND)
