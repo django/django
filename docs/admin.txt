@@ -139,8 +139,13 @@ The ``field_options`` dictionary can have the following keys:
 
 ``description``
     A string of optional extra text to be displayed at the top of each fieldset,
-    under the heading of the fieldset. It's used verbatim, so you can use any HTML
-    and you must escape any special HTML characters (such as ampersands) yourself.
+    under the heading of the fieldset. 
+
+    Note that this value is *not* HTML-escaped when it's displayed in
+    the admin interface. This lets you include HTML if you so desire.
+    Alternatively you can use plain text and
+    ``django.utils.html.escape()`` to escape any HTML special
+    characters.
 
 ``filter_horizontal``
 ~~~~~~~~~~~~~~~~~~~~~

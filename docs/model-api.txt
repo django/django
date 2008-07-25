@@ -658,6 +658,9 @@ example::
 
 	help_text="Please use the following format: <em>YYYY-MM-DD</em>."
 
+Alternatively you can use plain text and
+``django.utils.html.escape()`` to escape any HTML special characters.
+
 ``primary_key``
 ~~~~~~~~~~~~~~~
 
