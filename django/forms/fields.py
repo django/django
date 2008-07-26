@@ -7,6 +7,7 @@ import datetime
 import os
 import re
 import time
+import urlparse
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -539,6 +540,9 @@ class URLField(RegexField):
         # If no URL scheme given, assume http://
         if value and '://' not in value:
             value = u'http://%s' % value
+        # If no URL path given, assume /
+        if value and not urlparse.urlsplit(value).path:
+            value += '/'
         value = super(URLField, self).clean(value)
         if value == u'':
             return value

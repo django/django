@@ -820,15 +820,15 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
 >>> f.clean('http://localhost')
-u'http://localhost'
+u'http://localhost/'
 >>> f.clean('http://example.com')
-u'http://example.com'
+u'http://example.com/'
 >>> f.clean('http://www.example.com')
-u'http://www.example.com'
+u'http://www.example.com/'
 >>> f.clean('http://www.example.com:8000/test')
 u'http://www.example.com:8000/test'
 >>> f.clean('http://200.8.9.10')
-u'http://200.8.9.10'
+u'http://200.8.9.10/'
 >>> f.clean('http://200.8.9.10:8000/test')
 u'http://200.8.9.10:8000/test'
 >>> f.clean('foo')
@@ -858,9 +858,9 @@ u''
 >>> f.clean(None)
 u''
 >>> f.clean('http://example.com')
-u'http://example.com'
+u'http://example.com/'
 >>> f.clean('http://www.example.com')
-u'http://www.example.com'
+u'http://www.example.com/'
 >>> f.clean('foo')
 Traceback (most recent call last):
 ...
@@ -886,7 +886,7 @@ URLField takes an optional verify_exists parameter, which is False by default.
 This verifies that the URL is live on the Internet and doesn't return a 404 or 500:
 >>> f = URLField(verify_exists=True)
 >>> f.clean('http://www.google.com') # This will fail if there's no Internet connection
-u'http://www.google.com'
+u'http://www.google.com/'
 >>> f.clean('http://example')
 Traceback (most recent call last):
 ...
@@ -903,29 +903,38 @@ ValidationError: [u'This URL appears to be a broken link.']
 >>> f.clean('')
 u''
 >>> f.clean('http://www.google.com') # This will fail if there's no Internet connection
-u'http://www.google.com'
+u'http://www.google.com/'
 
 URLField also access min_length and max_length parameters, for convenience.
 >>> f = URLField(min_length=15, max_length=20)
 >>> f.clean('http://f.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 15 characters (it has 12).']
+ValidationError: [u'Ensure this value has at least 15 characters (it has 13).']
 >>> f.clean('http://example.com')
-u'http://example.com'
+u'http://example.com/'
 >>> f.clean('http://abcdefghijklmnopqrstuvwxyz.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 20 characters (it has 37).']
+ValidationError: [u'Ensure this value has at most 20 characters (it has 38).']
 
 URLField should prepend 'http://' if no scheme was given
 >>> f = URLField(required=False)
 >>> f.clean('example.com')
-u'http://example.com'
+u'http://example.com/'
 >>> f.clean('')
 u''
 >>> f.clean('https://example.com')
-u'https://example.com'
+u'https://example.com/'
+
+URLField should append '/' if no path was given
+>>> f = URLField()
+>>> f.clean('http://example.com')
+u'http://example.com/'
+
+URLField shouldn't change the path if it was given
+>>> f.clean('http://example.com/test')
+u'http://example.com/test'
 
 # BooleanField ################################################################
 
