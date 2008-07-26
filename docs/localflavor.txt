@@ -32,6 +32,7 @@ Countries currently supported by ``localflavor`` are:
 
     * Argentina_
     * Australia_
+    * Austria_
     * Brazil_
     * Canada_
     * Chile_
@@ -70,6 +71,7 @@ them::
 .. _ISO 3166 country codes: http://www.iso.org/iso/country_codes/iso_3166_code_lists/english_country_names_and_code_elements.htm
 .. _Argentina: `Argentina (django.contrib.localflavor.ar)`_
 .. _Australia: `Australia (django.contrib.localflavor.au)`_
+.. _Austria: `Austria (django.contrib.localflavor.at)`_
 .. _Brazil: `Brazil (django.contrib.localflavor.br)`_
 .. _Canada: `Canada (django.contrib.localflavor.ca)`_
 .. _Chile: `Chile (django.contrib.localflavor.cl)`_
@@ -152,6 +154,19 @@ AUStateSelect
 
 A ``Select`` widget that uses a list of Australian states/territories as its
 choices.
+
+Austria (``django.contrib.localflavor.at``)
+=============================================
+
+ATZipCodeField
+---------------
+
+A form field that validates its input is an Austrian postcode.
+
+ATStateSelect
+-------------
+
+A ``Select`` widget that uses a list of Austrian states as its choices. 
 
 Brazil (``django.contrib.localflavor.br``)
 ==========================================
