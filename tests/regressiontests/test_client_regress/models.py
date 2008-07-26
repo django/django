@@ -309,7 +309,7 @@ class ExceptionTests(TestCase):
         except SuspiciousOperation:
             self.fail("Staff should be able to visit this page")
 
-# We need two different tests to check URLconf subsitution -  one to check
+# We need two different tests to check URLconf substitution -  one to check
 # it was changed, and another one (without self.urls) to check it was reverted on
 # teardown. This pair of tests relies upon the alphabetical ordering of test execution.
 class UrlconfSubstitutionTests(TestCase):
