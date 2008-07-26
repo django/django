@@ -175,7 +175,7 @@ class SMTPConnection(object):
 
     def _send(self, email_message):
         """A helper method that does the actual sending."""
-        if not email_message.to:
+        if not email_message.recipients():
             return False
         try:
             self.connection.sendmail(email_message.from_email,
