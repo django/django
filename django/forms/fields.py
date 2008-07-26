@@ -541,7 +541,7 @@ class URLField(RegexField):
         if value and '://' not in value:
             value = u'http://%s' % value
         # If no URL path given, assume /
-        if value and not urlparse.urlsplit(value).path:
+        if value and not urlparse.urlsplit(value)[2]:
             value += '/'
         value = super(URLField, self).clean(value)
         if value == u'':
