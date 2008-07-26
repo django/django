@@ -3,6 +3,9 @@ from django.db import models
 class Author(models.Model):
     name = models.CharField(max_length=100)
 
+    class Meta:
+        ordering = ('name',)
+
     def __unicode__(self):
         return self.name
 
@@ -196,7 +199,7 @@ True
 ...     instance.save()
 >>> formset.save_m2m()
 >>> instances[0].authors.all()
-[<Author: Charles Baudelaire>, <Author: Walt Whitman>, <Author: Paul Verlaine>, <Author: John Steinbeck>]
+[<Author: Charles Baudelaire>, <Author: John Steinbeck>, <Author: Paul Verlaine>, <Author: Walt Whitman>]
 
 # delete the author we created to allow later tests to continue working.
 >>> new_author.delete()
