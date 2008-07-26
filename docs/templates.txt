@@ -1550,7 +1550,7 @@ For example::
 
     {{ value|linebreaks }}
 
-If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joe<br>is a
+If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joel<br>is a
 slug</p>``.
 
 linebreaksbr
@@ -1592,9 +1592,9 @@ For example::
 
     {{ value|make_list }}
 
-If ``value`` is the string ``"Joe"``, the output would be the list
-``[u'J', u'o', u'e']``. If ``value`` is ``123``, the output will be the list
-``[1, 2, 3]``.
+If ``value`` is the string ``"Joel"``, the output would be the list
+``[u'J', u'o', u'e', u'l']``. If ``value`` is ``123``, the output will be the
+list ``[1, 2, 3]``.
 
 phone2numeric
 ~~~~~~~~~~~~~
