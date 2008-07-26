@@ -58,7 +58,7 @@ frameworks are:
 
           import unittest
 
-          class MyFuncTestCase(unittest.TestCase)
+          class MyFuncTestCase(unittest.TestCase):
               def testBasic(self):
                   a = ['larry', 'curly', 'moe']
                   self.assertEquals(my_func(a, 0), 'larry')
