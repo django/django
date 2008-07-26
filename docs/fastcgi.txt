@@ -356,10 +356,10 @@ Apache + mod_rewrite in some situations), Django will work out the original
 prefix automatically.
 
 In the cases where Django cannot work out the prefix correctly and where you
-wan the original value to be used in URLs, you can set the
+want the original value to be used in URLs, you can set the
 ``FORCE_SCRIPT_NAME`` setting in your main ``settings`` file. This sets the
 script name uniformly for every URL served via that settings file. Thus you'll
-need to use different settings files is you want different sets of URLs to
+need to use different settings files if you want different sets of URLs to
 have different script names in this case, but that is a rare situation.
 
 As an example of how to use it, if your Django configuration is serving all of
