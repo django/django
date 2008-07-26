@@ -3,7 +3,6 @@ Classes representing uploaded files.
 """
 
 import os
-import tempfile
 import warnings
 try:
     from cStringIO import StringIO
@@ -11,6 +10,8 @@ except ImportError:
     from StringIO import StringIO
 
 from django.conf import settings
+
+from django.core.files import temp as tempfile
 
 __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile', 'SimpleUploadedFile')
 
