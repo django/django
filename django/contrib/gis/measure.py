@@ -30,7 +30,7 @@
 Distance and Area objects to allow for sensible and convienient calculation 
 and conversions.
 
-Author: Robert Coup, Justin Bronn
+Authors: Robert Coup, Justin Bronn
 
 Inspired by GeoPy (http://exogen.case.edu/projects/geopy/)
 and Geoff Biggs' PhD work on dimensioned units for robotics.
@@ -101,7 +101,7 @@ class Distance(MeasureBase):
         'german_m' : 1.0000135965,
         'gold_coast_ft' : 0.304799710181508,
         'indian_yd' : 0.914398530744,
-        'in' : 0.0254,
+        'inch' : 0.0254,
         'km': 1000.0,
         'link' : 0.201168,
         'link_benoit' : 0.20116782,
@@ -122,7 +122,7 @@ class Distance(MeasureBase):
     ALIAS = {
         'centimeter' : 'cm',
         'foot' : 'ft',
-        'inches' : 'in',
+        'inches' : 'inch',
         'kilometer' : 'km',
         'kilometre' : 'km',
         'meter' : 'm',
