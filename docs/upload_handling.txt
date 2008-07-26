@@ -79,10 +79,10 @@ methods to access the uploaded content:
         In practice, it's often easiest simply to use ``chunks()`` all the time;
         see the example below.
 
-    ``UploadedFile.file_name``
+    ``UploadedFile.name``
         The name of the uploaded file (e.g. ``my_file.txt``).
 
-    ``UploadedFile.file_size``
+    ``UploadedFile.size``
         The size, in bytes, of the uploaded file.
 
 There are a few other methods and attributes available on ``UploadedFile``
@@ -169,10 +169,10 @@ All ``UploadedFile`` objects define the following methods/attributes:
         Returns ``True`` if you can expect more than one chunk when calling
         ``UploadedFile.chunks(self, chunk_size)``.
 
-    ``UploadedFile.file_size``
+    ``UploadedFile.size``
         The size, in bytes, of the uploaded file.
 
-    ``UploadedFile.file_name``
+    ``UploadedFile.name``
         The name of the uploaded file as provided by the user.
 
     ``UploadedFile.content_type``
