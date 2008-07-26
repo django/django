@@ -157,8 +157,8 @@ class ForNode(Node):
         return nodelist.render(context)
 
 class IfChangedNode(Node):
-    def __init__(self, nodelist, *varlist):
-        self.nodelist = nodelist
+    def __init__(self, nodelist_true, nodelist_false, *varlist):
+        self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
         self._last_seen = None
         self._varlist = map(Variable, varlist)
         self._id = str(id(self))
@@ -173,20 +173,21 @@ class IfChangedNode(Node):
                 # like an OR evaluation of the multiple variables.
                 compare_to = [var.resolve(context) for var in self._varlist]
             else:
-                compare_to = self.nodelist.render(context)
+                compare_to = self.nodelist_true.render(context)
         except VariableDoesNotExist:
             compare_to = None
 
-        if  compare_to != self._last_seen:
+        if compare_to != self._last_seen:
             firstloop = (self._last_seen == None)
             self._last_seen = compare_to
             context.push()
             context['ifchanged'] = {'firstloop': firstloop}
-            content = self.nodelist.render(context)
+            content = self.nodelist_true.render(context)
             context.pop()
             return content
-        else:
-            return ''
+        elif self.nodelist_false:
+            return self.nodelist_false.render(context)
+        return ''
 
 class IfEqualNode(Node):
     def __init__(self, var1, var2, nodelist_true, nodelist_false, negate):
@@ -803,9 +804,14 @@ def ifchanged(parser, token):
             {% endfor %}
     """
     bits = token.contents.split()
-    nodelist = parser.parse(('endifchanged',))
-    parser.delete_first_token()
-    return IfChangedNode(nodelist, *bits[1:])
+    nodelist_true = parser.parse(('else', 'endifchanged'))
+    token = parser.next_token()
+    if token.contents == 'else':
+        nodelist_false = parser.parse(('endifchanged',))
+        parser.delete_first_token()
+    else:
+        nodelist_false = NodeList()
+    return IfChangedNode(nodelist_true, nodelist_false, *bits[1:])
 ifchanged = register.tag(ifchanged)
 
 #@register.tag
