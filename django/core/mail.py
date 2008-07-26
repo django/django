@@ -71,10 +71,11 @@ class BadHeaderError(ValueError):
 
 def forbid_multi_line_headers(name, val):
     """Forbids multi-line headers, to prevent header injection."""
+    val = force_unicode(val)
     if '\n' in val or '\r' in val:
         raise BadHeaderError("Header values can't contain newlines (got %r for header %r)" % (val, name))
     try:
-        val = force_unicode(val).encode('ascii')
+        val = val.encode('ascii')
     except UnicodeEncodeError:
         if name.lower() in ('to', 'from', 'cc'):
             result = []
@@ -84,7 +85,7 @@ def forbid_multi_line_headers(name, val):
                 result.append(formataddr((nm, str(addr))))
             val = ', '.join(result)
         else:
-            val = Header(force_unicode(val), settings.DEFAULT_CHARSET)
+            val = Header(val, settings.DEFAULT_CHARSET)
     return name, val
 
 class SafeMIMEText(MIMEText):
