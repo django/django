@@ -282,6 +282,10 @@ This will automatically generate a ``sitemap.xml`` file that references
 both ``sitemap-flatpages.xml`` and ``sitemap-blog.xml``. The ``Sitemap``
 classes and the ``sitemaps`` dict don't change at all.
 
+If one of your sitemaps is going to have more than 50,000 URLs you should 
+create an index file. Your sitemap will be paginated and the index will 
+reflect that.
+
 Pinging Google
 ==============
 
