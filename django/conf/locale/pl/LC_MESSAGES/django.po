@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-24 14:20+0200\n"
+"POT-Creation-Date: 2008-07-27 21:57+0200\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -1768,6 +1768,53 @@ msgstr "Podaj poprawny numer CUIT w formacie XX-XXXXXXXX-X lub XXXXXXXXXXXX."
 msgid "Invalid CUIT."
 msgstr "Niepoprawny CUIT"
 
+#: contrib/localflavor/at/at_states.py:5
+#, fuzzy
+msgid "Burgenland"
+msgstr "Fryzja"
+
+#: contrib/localflavor/at/at_states.py:6
+msgid "Carinthia"
+msgstr "Karyntia"
+
+#: contrib/localflavor/at/at_states.py:7
+msgid "Lower Austria"
+msgstr "Dolna Austria"
+
+#: contrib/localflavor/at/at_states.py:8
+msgid "Upper Austria"
+msgstr "Górna Austria"
+
+#: contrib/localflavor/at/at_states.py:9
+msgid "Salzburg"
+msgstr "Salzburg"
+
+#: contrib/localflavor/at/at_states.py:10
+msgid "Styria"
+msgstr "Styria"
+
+#: contrib/localflavor/at/at_states.py:11
+msgid "Tyrol"
+msgstr "Tyrol"
+
+#: contrib/localflavor/at/at_states.py:12
+msgid "Vorarlberg"
+msgstr "Vorarlberg"
+
+#: contrib/localflavor/at/at_states.py:13
+msgid "Vienna"
+msgstr "Wiedeń"
+
+#: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:16
+#: contrib/localflavor/no/forms.py:12
+msgid "Enter a zip code in the format XXXX."
+msgstr "Wpisz kod pocztowy w formacie XXXX."
+
+#: contrib/localflavor/at/forms.py:48
+msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
+msgstr ""
+"Wpisz poprawny numer austriackiego ubezpieczenia w formacie XXXX XXXXXX."
+
 #: contrib/localflavor/au/forms.py:16
 msgid "Enter a 4 digit post code."
 msgstr "Wpisz czterocyfrowy kod pocztowy."
@@ -1916,10 +1963,6 @@ msgstr "Zug"
 #: contrib/localflavor/ch/ch_states.py:30
 msgid "Zurich"
 msgstr "Zurych"
-
-#: contrib/localflavor/ch/forms.py:16 contrib/localflavor/no/forms.py:12
-msgid "Enter a zip code in the format XXXX."
-msgstr "Wpisz kod pocztowy w formacie XXXX."
 
 #: contrib/localflavor/ch/forms.py:64
 msgid ""
@@ -3657,7 +3700,7 @@ msgstr "Tu mogą być tylko cyfry."
 msgid "This value can't be comprised solely of digits."
 msgstr "To pole nie może zawierać jedynie cyfr."
 
-#: core/validators.py:128 forms/fields.py:157
+#: core/validators.py:128 forms/fields.py:158
 msgid "Enter a whole number."
 msgstr "Wpisz liczbę całkowitą."
 
@@ -3670,7 +3713,7 @@ msgstr "Tutaj są dozwolone tylko litery."
 msgid "Invalid date: %s"
 msgstr "Niepoprawna data: %s"
 
-#: core/validators.py:152 db/models/fields/__init__.py:552
+#: core/validators.py:152 db/models/fields/__init__.py:559
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Proszę wpisać poprawną datę w formacie RRRR-MM-DD."
 
@@ -3678,19 +3721,19 @@ msgstr "Proszę wpisać poprawną datę w formacie RRRR-MM-DD."
 msgid "Enter a valid time in HH:MM format."
 msgstr "Proszę wpisać poprawną godzinę w formacie HH:MM."
 
-#: core/validators.py:161 db/models/fields/__init__.py:633
+#: core/validators.py:161 db/models/fields/__init__.py:640
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Wprowadź poprawną datę i godzinę w formacie RRRR-MM-DD GG:MM."
 
-#: core/validators.py:166 forms/fields.py:408
+#: core/validators.py:166 forms/fields.py:409
 msgid "Enter a valid e-mail address."
 msgstr "Wprowadź poprawny adres e-mail."
 
-#: core/validators.py:178 core/validators.py:470 forms/fields.py:426
+#: core/validators.py:178 core/validators.py:470 forms/fields.py:427
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Nie wysłano żadnego pliku. Sprawdź typ kodowania formularza."
 
-#: core/validators.py:189 forms/fields.py:466
+#: core/validators.py:189 forms/fields.py:467
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -3946,33 +3989,33 @@ msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "Już istnieje %(optname)s z %(fieldname)s."
 
 #: db/models/fields/__init__.py:175 db/models/fields/__init__.py:343
-#: db/models/fields/__init__.py:795 db/models/fields/__init__.py:806
-#: forms/fields.py:51 oldforms/__init__.py:374
+#: db/models/fields/__init__.py:802 db/models/fields/__init__.py:813
+#: forms/fields.py:52 oldforms/__init__.py:374
 msgid "This field is required."
 msgstr "To pole jest wymagane."
 
-#: db/models/fields/__init__.py:450
+#: db/models/fields/__init__.py:457
 msgid "This value must be an integer."
 msgstr "Ta wartość musi być liczbą całkowitą."
 
-#: db/models/fields/__init__.py:491
+#: db/models/fields/__init__.py:498
 msgid "This value must be either True or False."
 msgstr ""
 "Ta wartość musi być wartością logiczną (True, False - prawda lub fałsz)."
 
-#: db/models/fields/__init__.py:515
+#: db/models/fields/__init__.py:522
 msgid "This field cannot be null."
 msgstr "To pole nie może być puste."
 
-#: db/models/fields/__init__.py:702
+#: db/models/fields/__init__.py:709
 msgid "This value must be a decimal number."
 msgstr "Ta wartość musi być liczbą dziesiętną."
 
-#: db/models/fields/__init__.py:815
+#: db/models/fields/__init__.py:822
 msgid "Enter a valid filename."
 msgstr "Wpisz poprawną nazwę pliku."
 
-#: db/models/fields/__init__.py:1006
+#: db/models/fields/__init__.py:1013
 msgid "This value must be either None, True or False."
 msgstr ""
 "Ta wartość musi być jedną z None (nic), True (prawda) lub False (fałsz)."
@@ -4004,92 +4047,92 @@ msgstr[2] ""
 "Proszę podać poprawne identyfikatory %(self)s. Wartości %(value)r są "
 "niepoprawne."
 
-#: forms/fields.py:52
+#: forms/fields.py:53
 msgid "Enter a valid value."
 msgstr "Wpisz poprawną wartość."
 
-#: forms/fields.py:129
+#: forms/fields.py:130
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Upewnij się, że ta wartość ma co najwyżej %(max)d znaków (ma długość %"
 "(length)d)."
 
-#: forms/fields.py:130
+#: forms/fields.py:131
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 "Upewnij się, że ta wartość ma co najmniej %(min)d znaków (ma długość %"
 "(length)d)."
 
-#: forms/fields.py:158 forms/fields.py:187 forms/fields.py:216
+#: forms/fields.py:159 forms/fields.py:188 forms/fields.py:217
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Upewnij się, że ta wartość jest mniejsza lub równa %s."
 
-#: forms/fields.py:159 forms/fields.py:188 forms/fields.py:217
+#: forms/fields.py:160 forms/fields.py:189 forms/fields.py:218
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Upewnij się, że ta wartość jest większa lub równa %s."
 
-#: forms/fields.py:186 forms/fields.py:215
+#: forms/fields.py:187 forms/fields.py:216
 msgid "Enter a number."
 msgstr "Wpisz liczbę."
 
-#: forms/fields.py:218
+#: forms/fields.py:219
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Upewnij się, że jest nie więcej niż %s cyfr."
 
-#: forms/fields.py:219
+#: forms/fields.py:220
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Upewnij się, że jest nie więcej niż %s miejsc po przecinku."
 
-#: forms/fields.py:220
+#: forms/fields.py:221
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Upewnij się, że jest nie więcej niż %s miejsc przed przecinkiem."
 
-#: forms/fields.py:268 forms/fields.py:795
+#: forms/fields.py:269 forms/fields.py:799
 msgid "Enter a valid date."
 msgstr "Wpisz poprawną datę."
 
-#: forms/fields.py:301 forms/fields.py:796
+#: forms/fields.py:302 forms/fields.py:800
 msgid "Enter a valid time."
 msgstr "Wpisz poprawną godzinę."
 
-#: forms/fields.py:340
+#: forms/fields.py:341
 msgid "Enter a valid date/time."
 msgstr "Wpisz poprawną datę/godzinę."
 
-#: forms/fields.py:427
+#: forms/fields.py:428
 msgid "No file was submitted."
 msgstr "Żaden plik nie został przesłany."
 
-#: forms/fields.py:428 oldforms/__init__.py:693
+#: forms/fields.py:429 oldforms/__init__.py:693
 msgid "The submitted file is empty."
 msgstr "Wysłany plik jest pusty."
 
-#: forms/fields.py:527
+#: forms/fields.py:528
 msgid "Enter a valid URL."
 msgstr "Wpisz poprawny URL."
 
-#: forms/fields.py:528
+#: forms/fields.py:529
 msgid "This URL appears to be a broken link."
 msgstr "Ten odnośnik jest nieprawidłowy."
 
-#: forms/fields.py:593 forms/fields.py:644
+#: forms/fields.py:597 forms/fields.py:648
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Wybierz poprawną wartość. %(value)s nie jest jednym z dostępnych wyborów."
 
-#: forms/fields.py:645 forms/fields.py:706 forms/models.py:581
+#: forms/fields.py:649 forms/fields.py:710 forms/models.py:581
 msgid "Enter a list of values."
 msgstr "Podaj listę wartości."
 
-#: forms/fields.py:824
+#: forms/fields.py:828
 msgid "Enter a valid IPv4 address."
 msgstr "Wprowadź poprawny adres IPv4."
 
