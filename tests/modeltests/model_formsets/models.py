@@ -20,7 +20,7 @@ class AuthorMeeting(models.Model):
     name = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author)
     created = models.DateField(editable=False)
-    
+
     def __unicode__(self):
         return self.name
 
@@ -289,10 +289,10 @@ True
 
 As you can see, 'Le Spleen de Paris' is now a book belonging to Charles Baudelaire.
 
->>> for book in author.book_set.order_by('title'):
+>>> for book in author.book_set.order_by('id'):
 ...     print book.title
-Le Spleen de Paris
 Les Fleurs du Mal
+Le Spleen de Paris
 
 The save_as_new parameter lets you re-associate the data to a new instance.
 This is used in the admin for save_as functionality.
