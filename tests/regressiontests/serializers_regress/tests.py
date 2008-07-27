@@ -72,13 +72,13 @@ def inherited_create(pk, klass, data):
     #  1) we're testing inheritance, not field behaviour, so none
     #     of the field values need to be protected.
     #  2) saving the child class and having the parent created
-    #     automatically is easier than manually creating both. 
+    #     automatically is easier than manually creating both.
     models.Model.save(instance)
     created = [instance]
     for klass,field in instance._meta.parents.items():
         created.append(klass.objects.get(id=pk))
     return created
-    
+
 # A set of functions that can be used to compare
 # test data objects of various kinds
 def data_compare(testcase, pk, klass, data):
@@ -111,7 +111,7 @@ def inherited_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
     for key,value in data.items():
         testcase.assertEqual(value, getattr(instance,key))
-    
+
 # Define some data types. Each data type is
 # actually a pair of functions; one to create
 # and one to compare objects of that type
@@ -274,7 +274,7 @@ The end."""),
 
     (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006,6,16,10,42,37)),
     (data_obj, 810, ModifyingSaveData, 42),
-    
+
     (inherited_obj, 900, InheritAbstractModel, {'child_data':37,'parent_data':42}),
     (inherited_obj, 910, ExplicitInheritBaseModel, {'child_data':37,'parent_data':42}),
     (inherited_obj, 920, InheritBaseModel, {'child_data':37,'parent_data':42}),
@@ -302,17 +302,19 @@ def serializerTest(format, self):
     objects = []
     instance_count = {}
     transaction.enter_transaction_management()
-    transaction.managed(True)
-    for (func, pk, klass, datum) in test_data:
-        objects.extend(func[0](pk, klass, datum))
-        instance_count[klass] = 0
-    transaction.commit()
-    transaction.leave_transaction_management()
+    try:
+        transaction.managed(True)
+        for (func, pk, klass, datum) in test_data:
+            objects.extend(func[0](pk, klass, datum))
+            instance_count[klass] = 0
+        transaction.commit()
+    finally:
+        transaction.leave_transaction_management()
 
     # Get a count of the number of objects created for each class
     for klass in instance_count:
         instance_count[klass] = klass.objects.count()
-        
+
     # Add the generic tagged objects to the object list
     objects.extend(Tag.objects.all())
 
@@ -322,11 +324,13 @@ def serializerTest(format, self):
     # Flush the database and recreate from the serialized data
     management.call_command('flush', verbosity=0, interactive=False)
     transaction.enter_transaction_management()
-    transaction.managed(True)
-    for obj in serializers.deserialize(format, serialized_data):
-        obj.save()
-    transaction.commit()
-    transaction.leave_transaction_management()
+    try:
+        transaction.managed(True)
+        for obj in serializers.deserialize(format, serialized_data):
+            obj.save()
+        transaction.commit()
+    finally:
+        transaction.leave_transaction_management()
 
     # Assert that the deserialized data is the same
     # as the original source
