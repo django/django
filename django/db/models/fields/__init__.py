@@ -288,7 +288,7 @@ class Field(object):
         if self.choices:
             field_objs = [oldforms.SelectField]
 
-            params['choices'] = self.flatchoices
+            params['choices'] = self.get_flatchoices()
         else:
             field_objs = self.get_manipulator_field_objs()
         return (field_objs, params)
@@ -362,7 +362,8 @@ class Field(object):
         return val
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
-        "Returns a list of tuples used as SelectField choices for this field."
+        """Returns choices with a default blank choices included, for use
+        as SelectField choices for this field."""
         first_choice = include_blank and blank_choice or []
         if self.choices:
             return first_choice + list(self.choices)
@@ -375,6 +376,11 @@ class Field(object):
 
     def get_choices_default(self):
         return self.get_choices()
+
+    def get_flatchoices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
+        "Returns flattened choices with a default blank choice included."
+        first_choice = include_blank and blank_choice or []
+        return first_choices + list(self.flatchoices)
 
     def _get_val_from_obj(self, obj):
         if obj:
@@ -408,15 +414,16 @@ class Field(object):
     choices = property(_get_choices)
 
     def _get_flatchoices(self):
+        """Flattened version of choices tuple."""
         flat = []
-        for choice, value in self.get_choices_default():
+        for choice, value in self.choices:
             if type(value) in (list, tuple):
                 flat.extend(value)
             else:
                 flat.append((choice,value))
         return flat
     flatchoices = property(_get_flatchoices)
-    
+
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)
 
