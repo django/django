@@ -49,25 +49,21 @@ u'First'
 
 # Test a top level value
 >>> w.c = 0
->>> w.save()
 >>> w.get_c_display()
 u'Other'
 
 # Test an invalid data value
 >>> w.c = 9
->>> w.save()
 >>> w.get_c_display()
 9
 
 # Test a blank data value
 >>> w.c = None
->>> w.save()
 >>> print w.get_c_display()
 None
 
 # Test an empty data value
 >>> w.c = ''
->>> w.save()
 >>> w.get_c_display()
 u''
 
