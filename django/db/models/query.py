@@ -785,7 +785,11 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
 
     restricted = requested is not None
     index_end = index_start + len(klass._meta.fields)
-    obj = klass(*row[index_start:index_end])
+    fields = row[index_start:index_end]
+    if not [x for x in fields if x is not None]:
+        # If we only have a list of Nones, there was not related object.
+        return None, index_end
+    obj = klass(*fields)
     for f in klass._meta.fields:
         if not select_related_descend(f, restricted, requested):
             continue
