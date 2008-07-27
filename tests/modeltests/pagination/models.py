@@ -140,6 +140,31 @@ True
 >>> p.end_index()
 5
 
+# Paginator can be passed other objects with a count() method.
+>>> class CountContainer:
+...     def count(self):
+...         return 42
+>>> paginator = Paginator(CountContainer(), 10)
+>>> paginator.count
+42
+>>> paginator.num_pages
+5
+>>> paginator.page_range
+[1, 2, 3, 4, 5]
+
+# Paginator can be passed other objects that implement __len__.
+>>> class LenContainer:
+...     def __len__(self):
+...         return 42
+>>> paginator = Paginator(LenContainer(), 10)
+>>> paginator.count
+42
+>>> paginator.num_pages
+5
+>>> paginator.page_range
+[1, 2, 3, 4, 5]
+
+
 ################################
 # Legacy API (ObjectPaginator) #
 ################################

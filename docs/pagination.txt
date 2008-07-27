@@ -59,10 +59,12 @@ page::
     ...
     InvalidPage
 
-Note that you can give ``Paginator`` a list/tuple or a Django ``QuerySet``. The
-only difference is in implementation; if you pass a ``QuerySet``, the
-``Paginator`` will call its ``count()`` method instead of using ``len()``,
-because the former is more efficient.
+Note that you can give ``Paginator`` a list/tuple, a Django ``QuerySet``, or
+any other object with a ``count()`` or ``__len__()`` method. When determining
+the number of objects contained in the passed object, ``Paginator`` will first
+try calling ``count()``, then fallback to using ``len()`` if the passed object
+has no ``count()`` method. This allows objects such as Django's ``QuerySet`` to
+use a more efficient ``count()`` method when available.
 
 ``Paginator`` objects
 =====================

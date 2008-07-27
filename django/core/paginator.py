@@ -42,10 +42,12 @@ class Paginator(object):
     def _get_count(self):
         "Returns the total number of objects, across all pages."
         if self._count is None:
-            from django.db.models.query import QuerySet
-            if isinstance(self.object_list, QuerySet):
+            try:
                 self._count = self.object_list.count()
-            else:
+            except (AttributeError, TypeError):
+                # AttributeError if object_list has no count() method.
+                # TypeError if object_list.count() requires arguments
+                # (i.e. is of type list).
                 self._count = len(self.object_list)
         return self._count
     count = property(_get_count)
@@ -169,22 +171,8 @@ class ObjectPaginator(Paginator):
             return self.count
         return page_number * self.num_per_page
 
-    def _get_count(self):
-        # The old API allowed for self.object_list to be either a QuerySet or a
-        # list. Here, we handle both.
-        if self._count is None:
-            try:
-                self._count = self.object_list.count()
-            except (AttributeError, TypeError):
-                # AttributeError if object_list has no count() method.
-                # TypeError if object_list.count() requires arguments
-                # (i.e. is of type list).
-                self._count = len(self.object_list)
-        return self._count
-    count = property(_get_count)
-
     # The old API called it "hits" instead of "count".
-    hits = count
+    hits = Paginator.count
 
     # The old API called it "pages" instead of "num_pages".
     pages = Paginator.num_pages
