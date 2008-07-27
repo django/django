@@ -112,7 +112,7 @@ class. Django uses the field class types to determine a few things:
     * The widget to use in Django's admin interface, if you care to use it
       (e.g. ``<input type="text">``, ``<select>``).
     * The minimal validation requirements, used in Django's admin and in
-      manipulators.
+      automatically-generated forms.
 
 Here are all available field types:
 
@@ -641,9 +641,8 @@ callable it will be called every time a new object is created.
 ``editable``
 ~~~~~~~~~~~~
 
-If ``False``, the field will not be editable in the admin or via form
-processing using the object's ``AddManipulator`` or ``ChangeManipulator``
-classes. Default is ``True``.
+If ``False``, the field will not be editable in the admin or via forms
+automatically generated from the model class. Default is ``True``.
 
 ``help_text``
 ~~~~~~~~~~~~~
