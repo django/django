@@ -701,8 +701,8 @@ A page representing a list of objects.
       query string parameter (via ``GET``) or a ``page`` variable specified in
       the URLconf. See `Notes on pagination`_ below.
 
-    * ``page``: The current page number, as an integer. This is 1-based.
-      See `Notes on pagination`_ below.
+    * ``page``: The current (1-based) page number, as an integer, or the string
+      ``'last'``. See `Notes on pagination`_ below.
 
     * ``template_name``: The full name of a template to use in rendering the
       page. This lets you override the default template name (see below).
