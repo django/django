@@ -210,7 +210,7 @@ EmptyPage: ...
 [1]
 
 
-# ObjectPaginator can be passed other objects with a count() method.
+# ObjectPaginator can be passed other objects without a count() method.
 >>> class Container:
 ...     def __len__(self):
 ...         return 42
