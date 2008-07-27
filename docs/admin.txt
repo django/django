@@ -21,7 +21,7 @@ Overview
 There are five steps in activating the Django admin site:
 
     1. Add ``django.contrib.admin`` to your ``INSTALLED_APPS`` setting.
-    
+
     2. Determine which of your application's models should be editable in the
        admin interface.
 
@@ -43,7 +43,7 @@ Let's take a look at a very simple example the ``ModelAdmin``::
 
     from django.contrib import admin
     from myproject.myapp.models import Author
-    
+
     class AuthorAdmin(admin.ModelAdmin):
         pass
     admin.site.register(Author, AuthorAdmin)
@@ -84,7 +84,7 @@ dictionary of information about the fieldset, including a list of fields to be
 displayed in it.
 
 A full example, taken from the ``django.contrib.flatpages.FlatPage`` model::
-    
+
     class FlatPageAdmin(admin.ModelAdmin):
         fieldsets = (
             (None, {
@@ -108,9 +108,9 @@ The ``field_options`` dictionary can have the following keys:
 
 ``fields``
     A tuple of field names to display in this fieldset. This key is required.
-    
+
     Example::
-        
+
         {
         'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
         }
@@ -118,16 +118,16 @@ The ``field_options`` dictionary can have the following keys:
     To display multiple fields on the same line, wrap those fields in their own
     tuple. In this example, the ``first_name`` and ``last_name`` fields will
     display on the same line::
-        
+
         {
         'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
         }
 
 ``classes``
     A list containing extra CSS classes to apply to the fieldset.
-    
+
     Example::
-        
+
         {
         'classes': ['wide', 'extrapretty'],
         }
@@ -139,7 +139,7 @@ The ``field_options`` dictionary can have the following keys:
 
 ``description``
     A string of optional extra text to be displayed at the top of each fieldset,
-    under the heading of the fieldset. 
+    under the heading of the fieldset.
 
     Note that this value is *not* HTML-escaped when it's displayed in
     the admin interface. This lets you include HTML if you so desire.
@@ -193,7 +193,7 @@ A few special cases to note about ``list_display``:
       function attribute, for use as the header for the field.
 
       Here's a full example model::
-          
+
           class Person(models.Model):
               name = models.CharField(max_length=50)
               birthday = models.DateField()
@@ -201,7 +201,7 @@ A few special cases to note about ``list_display``:
               def decade_born_in(self):
                   return self.birthday.strftime('%Y')[:3] + "0's"
               decade_born_in.short_description = 'Birth decade'
-          
+
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'decade_born_in')
 
@@ -219,7 +219,7 @@ A few special cases to note about ``list_display``:
               def colored_name(self):
                   return '<span style="color: #%s;">%s %s</span>' % (self.color_code, self.first_name, self.last_name)
               colored_name.allow_tags = True
-          
+
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name', 'colored_name')
 
@@ -236,7 +236,7 @@ A few special cases to note about ``list_display``:
               def born_in_fifties(self):
                   return self.birthday.strftime('%Y')[:3] == 5
               born_in_fifties.boolean = True
-          
+
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'born_in_fifties')
 
@@ -265,7 +265,7 @@ A few special cases to note about ``list_display``:
                 return '<span style="color: #%s;">%s</span>' % (self.color_code, self.first_name)
             colored_first_name.allow_tags = True
             colored_first_name.admin_order_field = 'first_name'
-        
+
         class PersonAdmin(admin.ModelAdmin):
             list_display = ('first_name', 'colored_first_name')
 
@@ -514,7 +514,7 @@ specifying them in a ``ModelAdmin.inlines`` attribute::
 
     class BookInline(admin.TabularInline):
         model = Book
-    
+
     class AuthorAdmin(admin.ModelAdmin):
         inlines = [
             BookInline,
@@ -603,7 +603,7 @@ Take this model for instance::
     class Friendship(models.Model):
         to_person = models.ForeignKey(Person, related_name="friends")
         from_person = models.ForeignKey(Person, related_name="from_friends")
-    
+
 If you wanted to display an inline on the ``Person`` admin add/change pages
 you need to explicitly define the foreign key since it is unable to do so
 automatically::
@@ -611,7 +611,7 @@ automatically::
     class FriendshipInline(admin.TabularInline):
         model = Friendship
         fk_name = "to_person"
-    
+
     class PersonAdmin(admin.ModelAdmin):
         inlines = [
             FriendshipInline,
@@ -633,7 +633,7 @@ In this example, we register the default ``AdminSite`` instance
     # urls.py
     from django.conf.urls.defaults import *
     from django.contrib import admin
-    
+
     admin.autodiscover()
 
     urlpatterns = patterns('',
