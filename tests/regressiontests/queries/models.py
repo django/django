@@ -203,6 +203,19 @@ class TvChef(Celebrity):
 class Fan(models.Model):
     fan_of = models.ForeignKey(Celebrity)
 
+# Multiple foreign keys
+class LeafA(models.Model):
+    data = models.CharField(max_length=10)
+
+    def __unicode__(self):
+        return self.data
+
+class LeafB(models.Model):
+    data = models.CharField(max_length=10)
+
+class Join(models.Model):
+    a = models.ForeignKey(LeafA)
+    b = models.ForeignKey(LeafB)
 
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag.objects.create(name='t1')
@@ -334,6 +347,16 @@ constraints.
 >>> Number.objects.filter(Q(num__gt=7) & Q(num__lt=12) | Q(num__lt=4))
 [<Number: 8>]
 
+Bug #7872
+Another variation on the disjunctive filtering theme.
+
+# For the purposes of this regression test, it's important that there is no
+# Join object releated to the LeafA we create.
+>>> LeafA.objects.create(data='first')
+<LeafA: first>
+>>> LeafA.objects.filter(Q(data='first')|Q(join__b__data='second'))
+[<LeafA: first>]
+
 Bug #6074
 Merging two empty result sets shouldn't leave a queryset with no constraints
 (which would match everything).
@@ -430,9 +453,9 @@ Bug #5324, #6704
 >>> query.LOUTER not in [x[2] for x in query.alias_map.values()]
 True
 
-Similarly, when one of the joins cannot possibly, ever, involve NULL values (Author -> ExtraInfo, in the following), it should never be promoted to a left outer join. So hte following query should only involve one "left outer" join (Author -> Item is 0-to-many).
+Similarly, when one of the joins cannot possibly, ever, involve NULL values (Author -> ExtraInfo, in the following), it should never be promoted to a left outer join. So the following query should only involve one "left outer" join (Author -> Item is 0-to-many).
 >>> qs = Author.objects.filter(id=a1.id).filter(Q(extra__note=n1)|Q(item__note=n3))
->>> len([x[2] for x in qs.query.alias_map.values() if x[2] == query.LOUTER])
+>>> len([x[2] for x in qs.query.alias_map.values() if x[2] == query.LOUTER and qs.query.alias_refcount[x[1]]])
 1
 
 The previous changes shouldn't affect nullable foreign key joins.

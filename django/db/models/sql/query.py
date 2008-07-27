@@ -1089,20 +1089,23 @@ class Query(object):
             join_it = iter(join_list)
             table_it = iter(self.tables)
             join_it.next(), table_it.next()
+            table_promote = False
             for join in join_it:
                 table = table_it.next()
                 if join == table and self.alias_refcount[join] > 1:
                     continue
-                self.promote_alias(join)
+                join_promote = self.promote_alias(join)
                 if table != join:
-                    self.promote_alias(table)
+                    table_promote = self.promote_alias(table)
                 break
             for join in join_it:
-                self.promote_alias(join)
+                if self.promote_alias(join, join_promote):
+                    join_promote = True
             for table in table_it:
                 # Some of these will have been promoted from the join_list, but
                 # that's harmless.
-                self.promote_alias(table)
+                if self.promote_alias(table, table_promote):
+                    table_promote = True
 
         self.where.add((alias, col, field, lookup_type, value), connector)
 
