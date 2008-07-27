@@ -538,11 +538,11 @@ serializer output in some other place, outside of Django.
     Although implementing this method is necessary to allow field
     serialization, the API might change in the future.
 
-Returns a dictionary, mapping the field's attribute name to a flattened string
-version of the data. This method has some internal uses that aren't of
-interest to use here (mostly having to do with manipulators). For our
-purposes, it's sufficient to return a one item dictionary that maps the
-attribute name to a string.
+Returns a dictionary, mapping the field's attribute name to a
+flattened string version of the data. This method has some internal
+uses that aren't of interest to use here (mostly having to do with
+formss). For our purposes, it's sufficient to return a one item
+dictionary that maps the attribute name to a string.
 
 This method is used by the serializers to convert the field into a string for
 output. You can ignore the input parameters for serialization purposes,

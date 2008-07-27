@@ -998,7 +998,8 @@ In addition to ``extra_context``, the template's context will be:
 
 A page that displays a form for editing an existing object, redisplaying the
 form with validation errors (if there are any) and saving changes to the
-object. This uses the automatic manipulators that come with Django models.
+object. This uses a form automatically generated from the object's
+model class.
 
 **Required arguments:**
 
