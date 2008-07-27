@@ -63,4 +63,18 @@ u''
 >>> f.render('bundesland', 'WI')
 u'<select name="bundesland">\n<option value="BL">Burgenland</option>\n<option value="KA">Carinthia</option>\n<option value="NO">Lower Austria</option>\n<option value="OO">Upper Austria</option>\n<option value="SA">Salzburg</option>\n<option value="ST">Styria</option>\n<option value="TI">Tyrol</option>\n<option value="VO">Vorarlberg</option>\n<option value="WI" selected="selected">Vienna</option>\n</select>'
 
+# ATSocialSecurityNumberField ################################################
+
+>>> from django.contrib.localflavor.at.forms import ATSocialSecurityNumberField
+>>> f = ATSocialSecurityNumberField()
+>>> f.clean('1237 010180')
+u'1237 010180'
+>>> f.clean('1237 010181')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid Austrian Social Security Number in XXXX XXXXXX format.']
+>>> f.clean('12370 010180')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid Austrian Social Security Number in XXXX XXXXXX format.']
 """

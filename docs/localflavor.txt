@@ -161,12 +161,17 @@ Austria (``django.contrib.localflavor.at``)
 ATZipCodeField
 ---------------
 
-A form field that validates its input is an Austrian postcode.
+A form field that validates its input as an Austrian zip code.
 
 ATStateSelect
 -------------
 
 A ``Select`` widget that uses a list of Austrian states as its choices. 
+
+ATSocialSecurityNumberField
+---------------------------
+
+A form field that validates its input as an Austrian social security number.
 
 Brazil (``django.contrib.localflavor.br``)
 ==========================================
