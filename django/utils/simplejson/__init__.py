@@ -65,6 +65,9 @@ Specializing JSON object decoding::
     >>> simplejson.loads('{"__complex__": true, "real": 1, "imag": 2}',
     ...     object_hook=as_complex)
     (1+2j)
+    >>> import decimal
+    >>> simplejson.loads('1.1', parse_float=decimal.Decimal)
+    Decimal("1.1")
 
 Extending JSONEncoder::
     
@@ -83,20 +86,48 @@ Extending JSONEncoder::
     ['[', '2.0', ', ', '1.0', ']']
     
 
+Using simplejson from the shell to validate and
+pretty-print::
+    
+    $ echo '{"json":"obj"}' | python -msimplejson.tool
+    {
+        "json": "obj"
+    }
+    $ echo '{ 1.2:3.4}' | python -msimplejson.tool
+    Expecting property name: line 1 column 2 (char 2)
+
 Note that the JSON produced by this module's default settings
 is a subset of YAML, so it may be used as a serializer for that as well.
 """
-__version__ = '1.5'
+__version__ = '1.9.2'
 __all__ = [
     'dump', 'dumps', 'load', 'loads',
     'JSONDecoder', 'JSONEncoder',
 ]
 
-from django.utils.simplejson.decoder import JSONDecoder
-from django.utils.simplejson.encoder import JSONEncoder
+if __name__ == '__main__':
+    import warnings
+    warnings.warn('python -msimplejson is deprecated, use python -msiplejson.tool', DeprecationWarning)
+    from django.utils.simplejson.decoder import JSONDecoder
+    from django.utils.simplejson.encoder import JSONEncoder
+else:
+    from decoder import JSONDecoder
+    from encoder import JSONEncoder
+
+_default_encoder = JSONEncoder(
+    skipkeys=False,
+    ensure_ascii=True,
+    check_circular=True,
+    allow_nan=True,
+    indent=None,
+    separators=None,
+    encoding='utf-8',
+    default=None,
+)
 
 def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
-        allow_nan=True, cls=None, indent=None, **kw):
+        allow_nan=True, cls=None, indent=None, separators=None,
+        encoding='utf-8', default=None, **kw):
     """
     Serialize ``obj`` as a JSON formatted stream to ``fp`` (a
     ``.write()``-supporting file-like object).
@@ -107,7 +138,7 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
 
     If ``ensure_ascii`` is ``False``, then the some chunks written to ``fp``
     may be ``unicode`` instances, subject to normal Python ``str`` to
-    ``unicode`` coercion rules.  Unless ``fp.write()`` explicitly
+    ``unicode`` coercion rules. Unless ``fp.write()`` explicitly
     understands ``unicode`` (as in ``codecs.getwriter()``) this is likely
     to cause an error.
 
@@ -121,25 +152,44 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
     JavaScript equivalents (``NaN``, ``Infinity``, ``-Infinity``).
 
     If ``indent`` is a non-negative integer, then JSON array elements and object
-    members will be pretty-printed with that indent level.  An indent level
-    of 0 will only insert newlines.  ``None`` is the most compact representation.
+    members will be pretty-printed with that indent level. An indent level
+    of 0 will only insert newlines. ``None`` is the most compact representation.
+
+    If ``separators`` is an ``(item_separator, dict_separator)`` tuple
+    then it will be used instead of the default ``(', ', ': ')`` separators.
+    ``(',', ':')`` is the most compact JSON representation.
+
+    ``encoding`` is the character encoding for str instances, default is UTF-8.
+
+    ``default(obj)`` is a function that should return a serializable version
+    of obj or raise TypeError. The default simply raises TypeError.
 
     To use a custom ``JSONEncoder`` subclass (e.g. one that overrides the
     ``.default()`` method to serialize additional types), specify it with
     the ``cls`` kwarg.
     """
-    if cls is None:
-        cls = JSONEncoder
-    iterable = cls(skipkeys=skipkeys, ensure_ascii=ensure_ascii,
-        check_circular=check_circular, allow_nan=allow_nan, indent=indent,
-        **kw).iterencode(obj)
+    # cached encoder
+    if (skipkeys is False and ensure_ascii is True and
+        check_circular is True and allow_nan is True and
+        cls is None and indent is None and separators is None and
+        encoding == 'utf-8' and default is None and not kw):
+        iterable = _default_encoder.iterencode(obj)
+    else:
+        if cls is None:
+            cls = JSONEncoder
+        iterable = cls(skipkeys=skipkeys, ensure_ascii=ensure_ascii,
+            check_circular=check_circular, allow_nan=allow_nan, indent=indent,
+            separators=separators, encoding=encoding,
+            default=default, **kw).iterencode(obj)
     # could accelerate with writelines in some versions of Python, at
     # a debuggability cost
     for chunk in iterable:
         fp.write(chunk)
 
+
 def dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
-        allow_nan=True, cls=None, indent=None, separators=None, **kw):
+        allow_nan=True, cls=None, indent=None, separators=None,
+        encoding='utf-8', default=None, **kw):
     """
     Serialize ``obj`` to a JSON formatted ``str``.
 
@@ -161,88 +211,159 @@ def dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
     JavaScript equivalents (``NaN``, ``Infinity``, ``-Infinity``).
 
     If ``indent`` is a non-negative integer, then JSON array elements and
-    object members will be pretty-printed with that indent level.  An indent
-    level of 0 will only insert newlines.  ``None`` is the most compact
+    object members will be pretty-printed with that indent level. An indent
+    level of 0 will only insert newlines. ``None`` is the most compact
     representation.
 
     If ``separators`` is an ``(item_separator, dict_separator)`` tuple
     then it will be used instead of the default ``(', ', ': ')`` separators.
     ``(',', ':')`` is the most compact JSON representation.
 
+    ``encoding`` is the character encoding for str instances, default is UTF-8.
+
+    ``default(obj)`` is a function that should return a serializable version
+    of obj or raise TypeError. The default simply raises TypeError.
+
     To use a custom ``JSONEncoder`` subclass (e.g. one that overrides the
     ``.default()`` method to serialize additional types), specify it with
     the ``cls`` kwarg.
     """
+    # cached encoder
+    if (skipkeys is False and ensure_ascii is True and
+        check_circular is True and allow_nan is True and
+        cls is None and indent is None and separators is None and
+        encoding == 'utf-8' and default is None and not kw):
+        return _default_encoder.encode(obj)
     if cls is None:
         cls = JSONEncoder
     return cls(
         skipkeys=skipkeys, ensure_ascii=ensure_ascii,
         check_circular=check_circular, allow_nan=allow_nan, indent=indent,
-        separators=separators,
+        separators=separators, encoding=encoding, default=default,
         **kw).encode(obj)
 
-def load(fp, encoding=None, cls=None, object_hook=None, **kw):
+
+_default_decoder = JSONDecoder(encoding=None, object_hook=None)
+
+
+def load(fp, encoding=None, cls=None, object_hook=None, parse_float=None,
+        parse_int=None, parse_constant=None, **kw):
     """
     Deserialize ``fp`` (a ``.read()``-supporting file-like object containing
     a JSON document) to a Python object.
 
     If the contents of ``fp`` is encoded with an ASCII based encoding other
     than utf-8 (e.g. latin-1), then an appropriate ``encoding`` name must
-    be specified.  Encodings that are not ASCII based (such as UCS-2) are
+    be specified. Encodings that are not ASCII based (such as UCS-2) are
     not allowed, and should be wrapped with
     ``codecs.getreader(fp)(encoding)``, or simply decoded to a ``unicode``
     object and passed to ``loads()``
 
     ``object_hook`` is an optional function that will be called with the
-    result of any object literal decode (a ``dict``).  The return value of
-    ``object_hook`` will be used instead of the ``dict``.  This feature
+    result of any object literal decode (a ``dict``). The return value of
+    ``object_hook`` will be used instead of the ``dict``. This feature
     can be used to implement custom decoders (e.g. JSON-RPC class hinting).
     
     To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
     kwarg.
     """
-    if cls is None:
-        cls = JSONDecoder
-    if object_hook is not None:
-        kw['object_hook'] = object_hook
-    return cls(encoding=encoding, **kw).decode(fp.read())
+    return loads(fp.read(),
+        encoding=encoding, cls=cls, object_hook=object_hook,
+        parse_float=parse_float, parse_int=parse_int,
+        parse_constant=parse_constant, **kw)
 
-def loads(s, encoding=None, cls=None, object_hook=None, **kw):
+
+def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+        parse_int=None, parse_constant=None, **kw):
     """
     Deserialize ``s`` (a ``str`` or ``unicode`` instance containing a JSON
     document) to a Python object.
 
     If ``s`` is a ``str`` instance and is encoded with an ASCII based encoding
     other than utf-8 (e.g. latin-1) then an appropriate ``encoding`` name
-    must be specified.  Encodings that are not ASCII based (such as UCS-2)
+    must be specified. Encodings that are not ASCII based (such as UCS-2)
     are not allowed and should be decoded to ``unicode`` first.
 
     ``object_hook`` is an optional function that will be called with the
-    result of any object literal decode (a ``dict``).  The return value of
-    ``object_hook`` will be used instead of the ``dict``.  This feature
+    result of any object literal decode (a ``dict``). The return value of
+    ``object_hook`` will be used instead of the ``dict``. This feature
     can be used to implement custom decoders (e.g. JSON-RPC class hinting).
+
+    ``parse_float``, if specified, will be called with the string
+    of every JSON float to be decoded. By default this is equivalent to
+    float(num_str). This can be used to use another datatype or parser
+    for JSON floats (e.g. decimal.Decimal).
+
+    ``parse_int``, if specified, will be called with the string
+    of every JSON int to be decoded. By default this is equivalent to
+    int(num_str). This can be used to use another datatype or parser
+    for JSON integers (e.g. float).
+
+    ``parse_constant``, if specified, will be called with one of the
+    following strings: -Infinity, Infinity, NaN, null, true, false.
+    This can be used to raise an exception if invalid JSON numbers
+    are encountered.
 
     To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
     kwarg.
     """
+    if (cls is None and encoding is None and object_hook is None and
+            parse_int is None and parse_float is None and
+            parse_constant is None and not kw):
+        return _default_decoder.decode(s)
     if cls is None:
         cls = JSONDecoder
     if object_hook is not None:
         kw['object_hook'] = object_hook
+    if parse_float is not None:
+        kw['parse_float'] = parse_float
+    if parse_int is not None:
+        kw['parse_int'] = parse_int
+    if parse_constant is not None:
+        kw['parse_constant'] = parse_constant
     return cls(encoding=encoding, **kw).decode(s)
+
+
+#
+# Compatibility cruft from other libraries
+#
+
+
+def decode(s):
+    """
+    demjson, python-cjson API compatibility hook. Use loads(s) instead.
+    """
+    import warnings
+    warnings.warn("simplejson.loads(s) should be used instead of decode(s)",
+        DeprecationWarning)
+    return loads(s)
+
+
+def encode(obj):
+    """
+    demjson, python-cjson compatibility hook. Use dumps(s) instead.
+    """
+    import warnings
+    warnings.warn("simplejson.dumps(s) should be used instead of encode(s)",
+        DeprecationWarning)
+    return dumps(obj)
+
 
 def read(s):
     """
-    json-py API compatibility hook.  Use loads(s) instead.
+    jsonlib, JsonUtils, python-json, json-py API compatibility hook.
+    Use loads(s) instead.
     """
     import warnings
     warnings.warn("simplejson.loads(s) should be used instead of read(s)",
         DeprecationWarning)
     return loads(s)
 
+
 def write(obj):
     """
-    json-py API compatibility hook.  Use dumps(s) instead.
+    jsonlib, JsonUtils, python-json, json-py API compatibility hook.
+    Use dumps(s) instead.
     """
     import warnings
     warnings.warn("simplejson.dumps(s) should be used instead of write(s)",
@@ -250,3 +371,6 @@ def write(obj):
     return dumps(obj)
 
 
+if __name__ == '__main__':
+    import simplejson.tool
+    simplejson.tool.main()

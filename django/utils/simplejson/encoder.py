@@ -3,11 +3,15 @@ Implementation of JSONEncoder
 """
 import re
 
-ESCAPE = re.compile(r'[\x00-\x19\\"\b\f\n\r\t]')
-ESCAPE_ASCII = re.compile(r'([\\"/]|[^\ -~])')
+try:
+    from django.utils.simplejson._speedups import encode_basestring_ascii as c_encode_basestring_ascii
+except ImportError:
+    pass
+
+ESCAPE = re.compile(r'[\x00-\x1f\\"\b\f\n\r\t]')
+ESCAPE_ASCII = re.compile(r'([\\"]|[^\ -~])')
+HAS_UTF8 = re.compile(r'[\x80-\xff]')
 ESCAPE_DCT = {
-    # escape all forward slashes to prevent </script> attack
-    '/': '\\/',
     '\\': '\\\\',
     '"': '\\"',
     '\b': '\\b',
@@ -19,8 +23,9 @@ ESCAPE_DCT = {
 for i in range(0x20):
     ESCAPE_DCT.setdefault(chr(i), '\\u%04x' % (i,))
 
-# assume this produces an infinity on all machines (probably not guaranteed)
+# Assume this produces an infinity on all machines (probably not guaranteed)
 INFINITY = float('1e66666')
+FLOAT_REPR = repr
 
 def floatstr(o, allow_nan=True):
     # Check for specials.  Note that this type of test is processor- and/or
@@ -33,7 +38,7 @@ def floatstr(o, allow_nan=True):
     elif o == -INFINITY:
         text = '-Infinity'
     else:
-        return str(o)
+        return FLOAT_REPR(o)
 
     if not allow_nan:
         raise ValueError("Out of range float values are not JSON compliant: %r"
@@ -50,15 +55,32 @@ def encode_basestring(s):
         return ESCAPE_DCT[match.group(0)]
     return '"' + ESCAPE.sub(replace, s) + '"'
 
-def encode_basestring_ascii(s):
+
+def py_encode_basestring_ascii(s):
+    if isinstance(s, str) and HAS_UTF8.search(s) is not None:
+        s = s.decode('utf-8')
     def replace(match):
         s = match.group(0)
         try:
             return ESCAPE_DCT[s]
         except KeyError:
-            return '\\u%04x' % (ord(s),)
+            n = ord(s)
+            if n < 0x10000:
+                return '\\u%04x' % (n,)
+            else:
+                # surrogate pair
+                n -= 0x10000
+                s1 = 0xd800 | ((n >> 10) & 0x3ff)
+                s2 = 0xdc00 | (n & 0x3ff)
+                return '\\u%04x\\u%04x' % (s1, s2)
     return '"' + str(ESCAPE_ASCII.sub(replace, s)) + '"'
-        
+
+
+try:
+    encode_basestring_ascii = c_encode_basestring_ascii
+except NameError:
+    encode_basestring_ascii = py_encode_basestring_ascii
+
 
 class JSONEncoder(object):
     """
@@ -94,7 +116,7 @@ class JSONEncoder(object):
     key_separator = ': '
     def __init__(self, skipkeys=False, ensure_ascii=True,
             check_circular=True, allow_nan=True, sort_keys=False,
-            indent=None, separators=None):
+            indent=None, separators=None, encoding='utf-8', default=None):
         """
         Constructor for JSONEncoder, with sensible defaults.
 
@@ -126,8 +148,16 @@ class JSONEncoder(object):
         None is the most compact representation.
 
         If specified, separators should be a (item_separator, key_separator)
-        tuple. The default is (', ', ': '). To get the most compact JSON
+        tuple.  The default is (', ', ': ').  To get the most compact JSON
         representation you should specify (',', ':') to eliminate whitespace.
+
+        If specified, default is a function that gets called for objects
+        that can't otherwise be serialized.  It should return a JSON encodable
+        version of the object or raise a ``TypeError``.
+
+        If encoding is not None, then all input strings will be
+        transformed into unicode using that encoding prior to JSON-encoding.
+        The default is UTF-8.
         """
 
         self.skipkeys = skipkeys
@@ -139,6 +169,9 @@ class JSONEncoder(object):
         self.current_indent_level = 0
         if separators is not None:
             self.item_separator, self.key_separator = separators
+        if default is not None:
+            self.default = default
+        self.encoding = encoding
 
     def _newline_indent(self):
         return '\n' + (' ' * (self.indent * self.current_indent_level))
@@ -207,8 +240,14 @@ class JSONEncoder(object):
             items = [(k, dct[k]) for k in keys]
         else:
             items = dct.iteritems()
+        _encoding = self.encoding
+        _do_decode = (_encoding is not None
+            and not (_encoding == 'utf-8'))
         for key, value in items:
-            if isinstance(key, basestring):
+            if isinstance(key, str):
+                if _do_decode:
+                    key = key.decode(_encoding)
+            elif isinstance(key, basestring):
                 pass
             # JavaScript is weakly typed for these, so it makes sense to
             # also allow them.  Many encoders seem to do something like this.
@@ -247,6 +286,10 @@ class JSONEncoder(object):
                 encoder = encode_basestring_ascii
             else:
                 encoder = encode_basestring
+            _encoding = self.encoding
+            if (_encoding is not None and isinstance(o, str)
+                    and not (_encoding == 'utf-8')):
+                o = o.decode(_encoding)
             yield encoder(o)
         elif o is None:
             yield 'null'
@@ -304,11 +347,22 @@ class JSONEncoder(object):
         Return a JSON string representation of a Python data structure.
 
         >>> JSONEncoder().encode({"foo": ["bar", "baz"]})
-        '{"foo":["bar", "baz"]}'
+        '{"foo": ["bar", "baz"]}'
         """
-        # This doesn't pass the iterator directly to ''.join() because it
-        # sucks at reporting exceptions.  It's going to do this internally
-        # anyway because it uses PySequence_Fast or similar.
+        # This is for extremely simple cases and benchmarks.
+        if isinstance(o, basestring):
+            if isinstance(o, str):
+                _encoding = self.encoding
+                if (_encoding is not None 
+                        and not (_encoding == 'utf-8')):
+                    o = o.decode(_encoding)
+            if self.ensure_ascii:
+                return encode_basestring_ascii(o)
+            else:
+                return encode_basestring(o)
+        # This doesn't pass the iterator directly to ''.join() because the
+        # exceptions aren't as detailed.  The list call should be roughly
+        # equivalent to the PySequence_Fast that ''.join() would do.
         chunks = list(self.iterencode(o))
         return ''.join(chunks)
 
