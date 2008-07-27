@@ -836,7 +836,9 @@ def delete_objects(seen_objs):
 
         update_query = sql.UpdateQuery(cls, connection)
         for field in cls._meta.fields:
-            if field.rel and field.null and field.rel.to in seen_objs:
+            if (field.rel and field.null and field.rel.to in seen_objs and
+                    filter(lambda f: f.column == field.column,
+                    field.rel.to._meta.fields)):
                 update_query.clear_related(field, pk_list)
 
     # Now delete the actual data.

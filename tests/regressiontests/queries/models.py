@@ -190,6 +190,19 @@ class CustomPk(models.Model):
 class Related(models.Model):
     custom = models.ForeignKey(CustomPk)
 
+# An inter-related setup with a model subclass that has a nullable
+# path to another model, and a return path from that model.
+
+class Celebrity(models.Model):
+    name = models.CharField("Name", max_length=20)
+    greatest_fan = models.ForeignKey("Fan", null=True, unique=True)
+
+class TvChef(Celebrity):
+    pass
+
+class Fan(models.Model):
+    fan_of = models.ForeignKey(Celebrity)
+
 
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag.objects.create(name='t1')
@@ -835,6 +848,21 @@ Bug #7791 -- there were "issues" when ordering and distinct-ing on fields
 related via ForeignKeys.
 >>> len(Note.objects.order_by('extrainfo__info').distinct())
 3
+
+Bug #7778 - Model subclasses could not be deleted if a nullable foreign key
+relates to a model that relates back.
+
+>>> num_celebs = Celebrity.objects.count()
+>>> tvc = TvChef.objects.create(name="Huey")
+>>> Celebrity.objects.count() == num_celebs + 1
+True
+>>> f1 = Fan.objects.create(fan_of=tvc)
+>>> f2 = Fan.objects.create(fan_of=tvc)
+>>> tvc.delete()
+
+# The parent object should have been deleted as well.
+>>> Celebrity.objects.count() == num_celebs
+True
 
 """}
 
