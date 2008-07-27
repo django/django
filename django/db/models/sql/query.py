@@ -197,14 +197,18 @@ class Query(object):
         Returns an iterator over the results from executing this query.
         """
         resolve_columns = hasattr(self, 'resolve_columns')
-        if resolve_columns:
-            if self.select_fields:
-                fields = self.select_fields + self.related_select_fields
-            else:
-                fields = self.model._meta.fields
+        fields = None
         for rows in self.execute_sql(MULTI):
             for row in rows:
                 if resolve_columns:
+                    if fields is None:
+                        # We only set this up here because
+                        # related_select_fields isn't populated until
+                        # execute_sql() has been called.
+                        if self.select_fields:
+                            fields = self.select_fields + self.related_select_fields
+                        else:
+                            fields = self.model._meta.fields
                     row = self.resolve_columns(row, fields)
                 yield row
 
