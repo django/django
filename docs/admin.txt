@@ -365,11 +365,15 @@ it should prepopulate from::
     class ArticleAdmin(admin.ModelAdmin):
         prepopulated_fields = {"slug": ("title",)}
 
-When set the given fields will use a bit of Javascript to populate from the
-fields assigned.
+When set, the given fields will use a bit of JavaScript to populate from the
+fields assigned. The main use for this functionality is to automatically
+generate the value for ``SlugField`` fields from one or more other fields. The
+generated value is produced by concatenating the values of the source fields,
+and then by transforming that result into a valid slug (e.g. substituting
+dashes for spaces).
 
-``prepopulated_fields`` doesn't accept DateTimeFields, ForeignKeys nor
-ManyToManyFields.
+``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``, nor
+``ManyToManyField`` fields.
 
 ``radio_fields``
 ~~~~~~~~~~~~~~~~
