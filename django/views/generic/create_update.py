@@ -17,8 +17,8 @@ def deprecate_follow(follow):
     if follow is not None:
         import warnings
         msg = ("Generic views have been changed to use newforms, and the"
-               "'follow' argument is no longer used.  Please update your code"
-               "to not use the 'follow' argument.")
+               " 'follow' argument is no longer used.  Please update your code"
+               " to not use the 'follow' argument.")
         warnings.warn(msg, DeprecationWarning, stacklevel=3)
 
 def apply_extra_context(extra_context, context):
