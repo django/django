@@ -150,7 +150,7 @@ The ``field_options`` dictionary can have the following keys:
 ``filter_horizontal``
 ~~~~~~~~~~~~~~~~~~~~~
 
-Use a nifty unobtrusive Javascript "filter" interface instead of the
+Use a nifty unobtrusive JavaScript "filter" interface instead of the
 usability-challenged ``<select multiple>`` in the admin form. The value is a
 list of fields that should be displayed as a horizontal filter interface. See
 ``filter_vertical`` to use a vertical interface.
@@ -489,7 +489,7 @@ with an operator:
 ``ModelAdmin`` media definitions
 --------------------------------
 
-There are times where you would like add a bit of CSS and/or Javascript to
+There are times where you would like add a bit of CSS and/or JavaScript to
 the add/change views. This can be accomplished by using a Media inner class
 on your ``ModelAdmin``::
 

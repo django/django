@@ -64,7 +64,7 @@ a custom authentication system that manually sets cookies and the like,
 it won't help you.
 
 If your app creates HTML pages and forms in some unusual way, (e.g.
-it sends fragments of HTML in javascript document.write statements)
+it sends fragments of HTML in JavaScript document.write statements)
 you might bypass the filter that adds the hidden field to the form,
 in which case form submission will always fail.  It may still be possible
 to use the middleware, provided you can find some way to get the

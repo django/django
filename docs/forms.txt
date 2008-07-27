@@ -1847,7 +1847,7 @@ This is where Django media definitions come in. Django allows you to
 associate different media files with the forms and widgets that require
 that media. For example, if you want to use a calendar to render DateFields, 
 you can define a custom Calendar widget. This widget can then be associated 
-with the CSS and Javascript that is required to render the calendar. When 
+with the CSS and JavaScript that is required to render the calendar. When 
 the Calendar widget is used on a form, Django is able to identify the CSS and
 JavaScript files that are required, and provide the list of file names
 in a form suitable for easy inclusion on your web page.
@@ -1953,7 +1953,7 @@ If this last CSS definition were to be rendered, it would become the following H
 ``js``
 ~~~~~~
 
-A tuple describing the required javascript files. See
+A tuple describing the required JavaScript files. See
 `the section on media paths`_ for details of how to specify paths to media 
 files.
 
@@ -2271,7 +2271,7 @@ an exception::
     django.forms.util.ValidationError: [u'ManagementForm data is missing or has been tampered with']
 
 It is used to keep track of how many form instances are being displayed. If
-you are adding new forms via javascript, you should increment the count fields
+you are adding new forms via JavaScript, you should increment the count fields
 in this form as well.
 
 Custom formset validation
