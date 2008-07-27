@@ -139,7 +139,7 @@ msgstr "Lettiska"
 
 #: conf/global_settings.py:74
 msgid "Lithuanian"
-msgstr ""
+msgstr "Lettiska"
 
 #: conf/global_settings.py:75
 msgid "Macedonian"
