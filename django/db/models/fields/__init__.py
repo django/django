@@ -191,8 +191,7 @@ class Field(object):
     def set_attributes_from_name(self, name):
         self.name = name
         self.attname, self.column = self.get_attname_column()
-        if self.verbose_name is None and name:
-            self.verbose_name = name.replace('_', ' ')
+        self.verbose_name = self.verbose_name or (name and name.replace('_', ' '))
 
     def contribute_to_class(self, cls, name):
         self.set_attributes_from_name(name)
