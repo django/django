@@ -835,11 +835,15 @@ def delete_objects(seen_objs):
         del_query.delete_batch_related(pk_list)
 
         update_query = sql.UpdateQuery(cls, connection)
-        for field in cls._meta.fields:
+        for field, model in cls._meta.get_fields_with_model():
             if (field.rel and field.null and field.rel.to in seen_objs and
                     filter(lambda f: f.column == field.column,
                     field.rel.to._meta.fields)):
-                update_query.clear_related(field, pk_list)
+                if model:
+                    sql.UpdateQuery(model, connection).clear_related(field,
+                            pk_list)
+                else:
+                    update_query.clear_related(field, pk_list)
 
     # Now delete the actual data.
     for cls in ordered_classes:

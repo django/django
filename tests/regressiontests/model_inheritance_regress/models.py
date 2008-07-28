@@ -52,7 +52,12 @@ class Parent(models.Model):
 class Child(Parent):
     name = models.CharField(max_length=10)
 
+class SelfRefParent(models.Model):
+    parent_data = models.IntegerField()
+    self_data = models.ForeignKey('self', null=True)
 
+class SelfRefChild(SelfRefParent):
+    child_data = models.IntegerField()
 
 __test__ = {'API_TESTS':"""
 # Regression for #7350, #7202
@@ -181,5 +186,12 @@ True
 # of what the admin interface has to do for the edit-inline case.
 >>> Supplier.objects.filter(restaurant=Restaurant(name='xx', address='yy'))
 []
+
+# Regression test for #7853
+# If the parent class has a self-referential link, make sure that any updates
+# to that link via the child update the right table.
+
+>>> obj = SelfRefChild.objects.create(child_data=37, parent_data=42)
+>>> obj.delete()
 
 """}
