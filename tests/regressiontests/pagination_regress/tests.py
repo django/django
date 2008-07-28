@@ -10,7 +10,7 @@ class PaginatorTests(TestCase):
     def check_paginator(self, params, output):
         """
         Helper method that instantiates a Paginator object from the passed
-        params and then checks that it's attributes match the passed output.
+        params and then checks that its attributes match the passed output.
         """
         count, num_pages, page_range = output
         paginator = Paginator(*params)
@@ -20,7 +20,7 @@ class PaginatorTests(TestCase):
 
     def check_attribute(self, name, paginator, expected, params):
         """
-        Helper method to check a single attribute and gives a nice error
+        Helper method that checks a single attribute and gives a nice error
         message upon test failure.
         """
         got = getattr(paginator, name)
@@ -93,7 +93,7 @@ class PaginatorTests(TestCase):
     def check_indexes(self, params, page_num, indexes):
         """
         Helper method that instantiates a Paginator object from the passed
-        params and then checks that the start and end indexes of for the passed
+        params and then checks that the start and end indexes of the passed
         page_num match those given as a 2-tuple in indexes.
         """
         paginator = Paginator(*params)
