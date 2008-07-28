@@ -1,3 +1,5 @@
+from math import ceil
+
 class InvalidPage(Exception):
     pass
 
@@ -55,13 +57,11 @@ class Paginator(object):
     def _get_num_pages(self):
         "Returns the total number of pages."
         if self._num_pages is None:
-            hits = self.count - 1 - self.orphans
-            if hits < 1:
-                hits = 0
-            if hits == 0 and not self.allow_empty_first_page:
+            if self.count == 0 and not self.allow_empty_first_page:
                 self._num_pages = 0
             else:
-                self._num_pages = hits // self.per_page + 1
+                hits = max(1, self.count - self.orphans)
+                self._num_pages = int(ceil(hits / float(self.per_page)))
         return self._num_pages
     num_pages = property(_get_num_pages)
 
@@ -104,6 +104,9 @@ class Page(object):
         Returns the 1-based index of the first object on this page,
         relative to total objects in the paginator.
         """
+        # Special case, return zero if no items.
+        if self.paginator.count == 0:
+            return 0
         return (self.paginator.per_page * (self.number - 1)) + 1
 
     def end_index(self):
@@ -111,6 +114,7 @@ class Page(object):
         Returns the 1-based index of the last object on this page,
         relative to total objects found (hits).
         """
+        # Special case for the last page because there can be orphans.
         if self.number == self.paginator.num_pages:
             return self.paginator.count
         return self.number * self.paginator.per_page
