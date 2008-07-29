@@ -5,6 +5,8 @@ Requires cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 """
 
 import os
+import datetime
+import time
 
 from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
 from django.db.backends.oracle import query
@@ -28,9 +30,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_tablespaces = True
     uses_case_insensitive_names = True
     uses_custom_query_class = True
-    time_field_needs_date = True
     interprets_empty_strings_as_nulls = True
-    date_field_supports_time_value = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def autoinc_sql(self, table, column):
@@ -179,6 +179,21 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def tablespace_sql(self, tablespace, inline=False):
         return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""), self.quote_name(tablespace))
+
+    def value_to_db_time(self, value):
+        if value is None:
+            return None
+        if isinstance(value, basestring):
+            return datetime.datetime(*(time.strptime(value, '%H:%M:%S')[:6]))
+        return datetime.datetime(1900, 1, 1, value.hour, value.minute,
+                                 value.second, value.microsecond)
+
+    def year_lookup_bounds_for_date_field(self, value):
+        first = '%s-01-01'
+        second = '%s-12-31'
+        return [first % value, second % value]
+
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     features = DatabaseFeatures()

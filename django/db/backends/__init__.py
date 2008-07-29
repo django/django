@@ -5,6 +5,9 @@ except ImportError:
     # Import copy of _thread_local.py from Python 2.4
     from django.utils._threading_local import local
 
+from django.db.backends import util
+from django.utils import datetime_safe
+
 class BaseDatabaseWrapper(local):
     """
     Represents a database connection.
@@ -36,12 +39,13 @@ class BaseDatabaseWrapper(local):
         return cursor
 
     def make_debug_cursor(self, cursor):
-        from django.db.backends import util
         return util.CursorDebugWrapper(cursor, self)
 
 class BaseDatabaseFeatures(object):
     allows_group_by_ordinal = True
     inline_fk_references = True
+    # True if django.db.backend.utils.typecast_timestamp is used on values
+    # returned from dates() calls.
     needs_datetime_string_cast = True
     supports_constraints = True
     supports_tablespaces = False
@@ -49,10 +53,7 @@ class BaseDatabaseFeatures(object):
     uses_custom_query_class = False
     empty_fetchmany_value = []
     update_can_self_select = True
-    supports_usecs = True
-    time_field_needs_date = False
     interprets_empty_strings_as_nulls = False
-    date_field_supports_time_value = True
     can_use_chunked_reads = True
 
 class BaseDatabaseOperations(object):
@@ -263,3 +264,64 @@ class BaseDatabaseOperations(object):
         """Prepares a value for use in a LIKE query."""
         from django.utils.encoding import smart_unicode
         return smart_unicode(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
+
+    def value_to_db_date(self, value):
+        """
+        Transform a date value to an object compatible with what is expected
+        by the backend driver for date columns.
+        """
+        if value is None:
+            return None
+        return datetime_safe.new_date(value).strftime('%Y-%m-%d')
+
+    def value_to_db_datetime(self, value):
+        """
+        Transform a datetime value to an object compatible with what is expected
+        by the backend driver for date columns.
+        """
+        if value is None:
+            return None
+        return unicode(value)
+
+    def value_to_db_time(self, value):
+        """
+        Transform a datetime value to an object compatible with what is expected
+        by the backend driver for date columns.
+        """
+        if value is None:
+            return None
+        return unicode(value)
+
+    def value_to_db_decimal(self, value, max_digits, decimal_places):
+        """
+        Transform a decimal.Decimal value to an object compatible with what is
+        expected by the backend driver for decimal (numeric) columns.
+        """
+        if value is None:
+            return None
+        return util.format_number(value, max_digits, decimal_places)
+
+    def year_lookup_bounds(self, value):
+        """
+        Returns a two-elements list with the lower and upper bound to be used
+        with a BETWEEN operator to query a field value using a year lookup
+
+        `value` is an int, containing the looked-up year.
+        """
+        first = '%s-01-01 00:00:00'
+        second = '%s-12-31 23:59:59.999999'
+        return [first % value, second % value]
+
+    def year_lookup_bounds_for_date_field(self, value):
+        """
+        Returns a two-elements list with the lower and upper bound to be used
+        with a BETWEEN operator to query a DateField value using a year lookup
+
+        `value` is an int, containing the looked-up year.
+
+        By default, it just calls `self.year_lookup_bounds`. Some backends need
+        this hook because on their DB date fields can't be compared to values
+        which include a time part.
+        """
+        return self.year_lookup_bounds(value)
+

@@ -63,7 +63,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     inline_fk_references = False
     empty_fetchmany_value = ()
     update_can_self_select = False
-    supports_usecs = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
@@ -123,6 +122,24 @@ class DatabaseOperations(BaseDatabaseOperations):
             return sql
         else:
             return []
+
+    def value_to_db_datetime(self, value):
+        # MySQL doesn't support microseconds
+        if value is None:
+            return None
+        return unicode(value.replace(microsecond=0))
+
+    def value_to_db_time(self, value):
+        # MySQL doesn't support microseconds
+        if value is None:
+            return None
+        return unicode(value.replace(microsecond=0))
+
+    def year_lookup_bounds(self, value):
+        # Again, no microseconds
+        first = '%s-01-01 00:00:00'
+        second = '%s-12-31 23:59:59.99'
+        return [first % value, second % value]
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     features = DatabaseFeatures()

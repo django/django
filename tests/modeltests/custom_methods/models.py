@@ -31,7 +31,8 @@ class Article(models.Model):
             SELECT id, headline, pub_date
             FROM custom_methods_article
             WHERE pub_date = %s
-                AND id != %s""", [str(self.pub_date), self.id])
+                AND id != %s""", [connection.ops.value_to_db_date(self.pub_date),
+                                  self.id])
         # The asterisk in "(*row)" tells Python to expand the list into
         # positional arguments to Article().
         return [self.__class__(*row) for row in cursor.fetchall()]

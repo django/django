@@ -117,3 +117,10 @@ def truncate_name(name, length=None):
     hash = md5.md5(name).hexdigest()[:4]
 
     return '%s%s' % (name[:length-4], hash)
+
+def format_number(value, max_digits, decimal_places):
+    """
+    Formats a number into a string with the requisite number of digits and
+    decimal places.
+    """
+    return u"%.*f" % (decimal_places, value)

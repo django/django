@@ -218,19 +218,30 @@ class Field(object):
         "Returns field's value just before saving."
         return getattr(model_instance, self.attname)
 
+    def get_db_prep_value(self, value):
+        """Returns field's value prepared for interacting with the database
+        backend.
+
+        Used by the default implementations of ``get_db_prep_save``and
+        `get_db_prep_lookup```
+        """
+        return value
+
     def get_db_prep_save(self, value):
         "Returns field's value prepared for saving into a database."
-        return value
+        return self.get_db_prep_value(value)
 
     def get_db_prep_lookup(self, lookup_type, value):
         "Returns field's value prepared for database lookup."
         if hasattr(value, 'as_sql'):
             sql, params = value.as_sql()
             return QueryWrapper(('(%s)' % sql), params)
-        if lookup_type in ('exact', 'regex', 'iregex', 'gt', 'gte', 'lt', 'lte', 'month', 'day', 'search'):
+        if lookup_type in ('regex', 'iregex', 'month', 'day', 'search'):
             return [value]
+        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
+            return [self.get_db_prep_value(value)]
         elif lookup_type in ('range', 'in'):
-            return value
+            return [self.get_db_prep_value(v) for v in value]
         elif lookup_type in ('contains', 'icontains'):
             return ["%%%s%%" % connection.ops.prep_for_like_query(value)]
         elif lookup_type == 'iexact':
@@ -246,19 +257,12 @@ class Field(object):
                 value = int(value)
             except ValueError:
                 raise ValueError("The __year lookup type requires an integer argument")
-            if settings.DATABASE_ENGINE == 'sqlite3':
-                first = '%s-01-01'
-                second = '%s-12-31 23:59:59.999999'
-            elif not connection.features.date_field_supports_time_value and self.get_internal_type() == 'DateField':
-                first = '%s-01-01'
-                second = '%s-12-31'
-            elif not connection.features.supports_usecs:
-                first = '%s-01-01 00:00:00'
-                second = '%s-12-31 23:59:59.99'
+
+            if self.get_internal_type() == 'DateField':
+                return connection.ops.year_lookup_bounds_for_date_field(value)
             else:
-                first = '%s-01-01 00:00:00'
-                second = '%s-12-31 23:59:59.999999'
-            return [first % value, second % value]
+                return connection.ops.year_lookup_bounds(value)
+
         raise TypeError("Field has invalid lookup: %s" % lookup_type)
 
     def has_default(self):
@@ -457,6 +461,11 @@ class AutoField(Field):
         except (TypeError, ValueError):
             raise validators.ValidationError, _("This value must be an integer.")
 
+    def get_db_prep_value(self, value):
+        if value is None:
+            return None
+        return int(value)
+
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         if not rel:
             return [] # Don't add a FormField unless it's in a related context.
@@ -497,6 +506,11 @@ class BooleanField(Field):
         if value in ('t', 'True', '1'): return True
         if value in ('f', 'False', '0'): return False
         raise validators.ValidationError, _("This value must be either True or False.")
+
+    def get_db_prep_value(self, value):
+        if value is None:
+            return None
+        return bool(value)
 
     def get_manipulator_field_objs(self):
         return [oldforms.CheckboxField]
@@ -559,15 +573,6 @@ class DateField(Field):
         except ValueError:
             raise validators.ValidationError, _('Enter a valid date in YYYY-MM-DD format.')
 
-    def get_db_prep_lookup(self, lookup_type, value):
-        if lookup_type in ('range', 'in'):
-            value = [smart_unicode(v) for v in value]
-        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte') and hasattr(value, 'strftime'):
-            value = datetime_safe.new_date(value).strftime('%Y-%m-%d')
-        else:
-            value = smart_unicode(value)
-        return Field.get_db_prep_lookup(self, lookup_type, value)
-
     def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):
             value = datetime.datetime.now()
@@ -591,16 +596,9 @@ class DateField(Field):
         else:
             return self.editable or self.auto_now or self.auto_now_add
 
-    def get_db_prep_save(self, value):
-        # Casts dates into string format for entry into database.
-        if value is not None:
-            try:
-                value = datetime_safe.new_date(value).strftime('%Y-%m-%d')
-            except AttributeError:
-                # If value is already a string it won't have a strftime method,
-                # so we'll just let it pass through.
-                pass
-        return Field.get_db_prep_save(self, value)
+    def get_db_prep_value(self, value):
+        # Casts dates into the format expected by the backend
+        return connection.ops.value_to_db_date(self.to_python(value))
 
     def get_manipulator_field_objs(self):
         return [oldforms.DateField]
@@ -629,33 +627,37 @@ class DateTimeField(DateField):
             return value
         if isinstance(value, datetime.date):
             return datetime.datetime(value.year, value.month, value.day)
+
+        # Attempt to parse a datetime:
+        value = smart_str(value)
+        # split usecs, because they are not recognized by strptime.
+        if '.' in value:
+            try:
+                value, usecs = value.split('.')
+                usecs = int(usecs)
+            except ValueError:
+                raise validators.ValidationError, _('Enter a valid date/time in YYYY-MM-DD HH:MM[ss[.uuuuuu]] format.')
+        else:
+            usecs = 0
+        kwargs = {'microsecond': usecs}
         try: # Seconds are optional, so try converting seconds first.
-            return datetime.datetime(*time.strptime(value, '%Y-%m-%d %H:%M:%S')[:6])
+            return datetime.datetime(*time.strptime(value, '%Y-%m-%d %H:%M:%S')[:6],
+                                     **kwargs)
+
         except ValueError:
             try: # Try without seconds.
-                return datetime.datetime(*time.strptime(value, '%Y-%m-%d %H:%M')[:5])
+                return datetime.datetime(*time.strptime(value, '%Y-%m-%d %H:%M')[:5],
+                                         **kwargs)
             except ValueError: # Try without hour/minutes/seconds.
                 try:
-                    return datetime.datetime(*time.strptime(value, '%Y-%m-%d')[:3])
+                    return datetime.datetime(*time.strptime(value, '%Y-%m-%d')[:3],
+                                             **kwargs)
                 except ValueError:
-                    raise validators.ValidationError, _('Enter a valid date/time in YYYY-MM-DD HH:MM format.')
+                    raise validators.ValidationError, _('Enter a valid date/time in YYYY-MM-DD HH:MM[ss[.uuuuuu]] format.')
 
-    def get_db_prep_save(self, value):
-        # Casts dates into string format for entry into database.
-        if value is not None:
-            # MySQL will throw a warning if microseconds are given, because it
-            # doesn't support microseconds.
-            if not connection.features.supports_usecs and hasattr(value, 'microsecond'):
-                value = value.replace(microsecond=0)
-            value = smart_unicode(value)
-        return Field.get_db_prep_save(self, value)
-
-    def get_db_prep_lookup(self, lookup_type, value):
-        if lookup_type in ('range', 'in'):
-            value = [smart_unicode(v) for v in value]
-        else:
-            value = smart_unicode(value)
-        return Field.get_db_prep_lookup(self, lookup_type, value)
+    def get_db_prep_value(self, value):
+        # Casts dates into the format expected by the backend
+        return connection.ops.value_to_db_datetime(self.to_python(value))
 
     def get_manipulator_field_objs(self):
         return [oldforms.DateField, oldforms.TimeField]
@@ -720,26 +722,18 @@ class DecimalField(Field):
         Formats a number into a string with the requisite number of digits and
         decimal places.
         """
-        num_chars = self.max_digits
-        # Allow for a decimal point
-        if self.decimal_places > 0:
-            num_chars += 1
-        # Allow for a minus sign
-        if value < 0:
-            num_chars += 1
+        # Method moved to django.db.backends.util.
+        #
+        # It is preserved because it is used by the oracle backend
+        # (django.db.backends.oracle.query), and also for
+        # backwards-compatibility with any external code which may have used
+        # this method.
+        from django.db.backends import util
+        return util.format_number(value, self.max_digits, self.decimal_places)
 
-        return u"%.*f" % (self.decimal_places, value)
-
-    def get_db_prep_save(self, value):
-        value = self._format(value)
-        return super(DecimalField, self).get_db_prep_save(value)
-
-    def get_db_prep_lookup(self, lookup_type, value):
-        if lookup_type in ('range', 'in'):
-            value = [self._format(v) for v in value]
-        else:
-            value = self._format(value)
-        return super(DecimalField, self).get_db_prep_lookup(lookup_type, value)
+    def get_db_prep_value(self, value):
+        return connection.ops.value_to_db_decimal(value, self.max_digits,
+                                                  self.decimal_places)
 
     def get_manipulator_field_objs(self):
         return [curry(oldforms.DecimalField, max_digits=self.max_digits, decimal_places=self.decimal_places)]
@@ -778,7 +772,7 @@ class FileField(Field):
     def get_internal_type(self):
         return "FileField"
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_value(self, value):
         "Returns field's value prepared for saving into a database."
         # Need to convert UploadedFile objects provided via a form to unicode for database insertion
         if hasattr(value, 'name'):
@@ -919,6 +913,11 @@ class FilePathField(Field):
 class FloatField(Field):
     empty_strings_allowed = False
 
+    def get_db_prep_value(self, value):
+        if value is None:
+            return None
+        return float(value)
+
     def get_manipulator_field_objs(self):
         return [oldforms.FloatField]
 
@@ -966,6 +965,11 @@ class ImageField(FileField):
 
 class IntegerField(Field):
     empty_strings_allowed = False
+    def get_db_prep_value(self, value):
+        if value is None:
+            return None
+        return int(value)
+
     def get_manipulator_field_objs(self):
         return [oldforms.IntegerField]
 
@@ -1013,6 +1017,11 @@ class NullBooleanField(Field):
         if value in ('f', 'False', '0'): return False
         raise validators.ValidationError, _("This value must be either None, True or False.")
 
+    def get_db_prep_value(self, value):
+        if value is None:
+            return None
+        return bool(value)
+
     def get_manipulator_field_objs(self):
         return [oldforms.NullBooleanField]
 
@@ -1025,7 +1034,7 @@ class NullBooleanField(Field):
         defaults.update(kwargs)
         return super(NullBooleanField, self).formfield(**defaults)
 
-class PhoneNumberField(IntegerField):
+class PhoneNumberField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.PhoneNumberField]
 
@@ -1107,20 +1116,34 @@ class TimeField(Field):
     def get_internal_type(self):
         return "TimeField"
 
-    def get_db_prep_lookup(self, lookup_type, value):
-        if connection.features.time_field_needs_date:
-            # Oracle requires a date in order to parse.
-            def prep(value):
-                if isinstance(value, datetime.time):
-                    value = datetime.datetime.combine(datetime.date(1900, 1, 1), value)
-                return smart_unicode(value)
+    def to_python(self, value):
+        if value is None:
+            return None
+        if isinstance(value, datetime.time):
+            return value
+
+        # Attempt to parse a datetime:
+        value = smart_str(value)
+        # split usecs, because they are not recognized by strptime.
+        if '.' in value:
+            try:
+                value, usecs = value.split('.')
+                usecs = int(usecs)
+            except ValueError:
+                raise validators.ValidationError, _('Enter a valid time in HH:MM[:ss[.uuuuuu]] format.')
         else:
-            prep = smart_unicode
-        if lookup_type in ('range', 'in'):
-            value = [prep(v) for v in value]
-        else:
-            value = prep(value)
-        return Field.get_db_prep_lookup(self, lookup_type, value)
+            usecs = 0
+        kwargs = {'microsecond': usecs}
+
+        try: # Seconds are optional, so try converting seconds first.
+            return datetime.time(*time.strptime(value, '%H:%M:%S')[3:6],
+                                 **kwargs)
+        except ValueError:
+            try: # Try without seconds.
+                return datetime.time(*time.strptime(value, '%H:%M')[3:5],
+                                         **kwargs)
+            except ValueError:
+                raise validators.ValidationError, _('Enter a valid time in HH:MM[:ss[.uuuuuu]] format.')
 
     def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):
@@ -1130,23 +1153,9 @@ class TimeField(Field):
         else:
             return super(TimeField, self).pre_save(model_instance, add)
 
-    def get_db_prep_save(self, value):
-        # Casts dates into string format for entry into database.
-        if value is not None:
-            # MySQL will throw a warning if microseconds are given, because it
-            # doesn't support microseconds.
-            if not connection.features.supports_usecs and hasattr(value, 'microsecond'):
-                value = value.replace(microsecond=0)
-            if connection.features.time_field_needs_date:
-                # cx_Oracle expects a datetime.datetime to persist into TIMESTAMP field.
-                if isinstance(value, datetime.time):
-                    value = datetime.datetime(1900, 1, 1, value.hour, value.minute,
-                                              value.second, value.microsecond)
-                elif isinstance(value, basestring):
-                    value = datetime.datetime(*(time.strptime(value, '%H:%M:%S')[:6]))
-            else:
-                value = smart_unicode(value)
-        return Field.get_db_prep_save(self, value)
+    def get_db_prep_value(self, value):
+        # Casts times into the format expected by the backend
+        return connection.ops.value_to_db_time(self.to_python(value))
 
     def get_manipulator_field_objs(self):
         return [oldforms.TimeField]

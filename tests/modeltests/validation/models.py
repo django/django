@@ -16,6 +16,7 @@ class Person(models.Model):
     birthdate = models.DateField()
     favorite_moment = models.DateTimeField()
     email = models.EmailField()
+    best_time = models.TimeField()
 
     def __unicode__(self):
         return self.name
@@ -28,7 +29,8 @@ __test__ = {'API_TESTS':"""
 ...     'name': 'John',
 ...     'birthdate': datetime.date(2000, 5, 3),
 ...     'favorite_moment': datetime.datetime(2002, 4, 3, 13, 23),
-...     'email': 'john@example.com'
+...     'email': 'john@example.com',
+...     'best_time': datetime.time(16, 20),
 ... }
 >>> p = Person(**valid_params)
 >>> p.validate()
@@ -130,6 +132,22 @@ datetime.datetime(2002, 4, 3, 13, 23)
 >>> p.favorite_moment
 datetime.datetime(2002, 4, 3, 0, 0)
 
+>>> p = Person(**dict(valid_params, best_time='16:20:00'))
+>>> p.validate()
+{}
+>>> p.best_time
+datetime.time(16, 20)
+
+>>> p = Person(**dict(valid_params, best_time='16:20'))
+>>> p.validate()
+{}
+>>> p.best_time
+datetime.time(16, 20)
+
+>>> p = Person(**dict(valid_params, best_time='bar'))
+>>> p.validate()['best_time']
+[u'Enter a valid time in HH:MM[:ss[.uuuuuu]] format.']
+
 >>> p = Person(**dict(valid_params, email='john@example.com'))
 >>> p.validate()
 {}
@@ -152,6 +170,8 @@ u'john@example.com'
 >>> errors['favorite_moment']
 [u'This field is required.']
 >>> errors['birthdate']
+[u'This field is required.']
+>>> errors['best_time']
 [u'This field is required.']
 
 """}

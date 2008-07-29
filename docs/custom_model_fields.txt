@@ -385,8 +385,8 @@ Python object type we want to store in the model's attribute.
 called when it is created, you should be using `The SubfieldBase metaclass`_
 mentioned earlier. Otherwise ``to_python()`` won't be called automatically.
 
-``get_db_prep_save(self, value)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``get_db_prep_value(self, value)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is the reverse of ``to_python()`` when working with the database backends
 (as opposed to serialization). The ``value`` parameter is the current value of
@@ -399,9 +399,19 @@ For example::
     class HandField(models.Field):
         # ...
 
-        def get_db_prep_save(self, value):
+        def get_db_prep_value(self, value):
             return ''.join([''.join(l) for l in (value.north,
                     value.east, value.south, value.west)])
+
+``get_db_prep_save(self, value)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Same as the above, but called when the Field value must be *saved* to the
+database. As the default implementation just calls ``get_db_prep_value``, you
+shouldn't need to implement this method unless your custom field need a special
+conversion when being saved that is not the same as the used for normal query
+parameters (which is implemented by ``get_db_prep_value``).
+
 
 ``pre_save(self, model_instance, add)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -440,14 +450,21 @@ by with handling the lookup types that need special handling for your field
 and pass the rest of the ``get_db_prep_lookup()`` method of the parent class.
 
 If you needed to implement ``get_db_prep_save()``, you will usually need to
-implement ``get_db_prep_lookup()``. The usual reason is because of the
-``range``  and ``in`` lookups. In these case, you will passed a list of
-objects (presumably of the right type) and will need to convert them to a list
-of things of the right type for passing to the database. Sometimes you can
-reuse ``get_db_prep_save()``, or at least factor out some common pieces from
-both methods into a help function.
+implement ``get_db_prep_lookup()``. If you don't, ``get_db_prep_value`` will be
+called by the default implementation, to manage ``exact``, ``gt``, ``gte``,
+``lt``, ``lte``, ``in`` and ``range`` lookups.
 
-For example::
+You may also want to implement this method to limit the lookup types that could
+be used with your custom field type.
+
+Note that, for ``range`` and ``in`` lookups, ``get_db_prep_lookup`` will receive
+a list of objects (presumably of the right type) and will need to convert them
+to a list of things of the right type for passing to the database. Most of the
+time, you can reuse ``get_db_prep_value()``, or at least factor out some common
+pieces.
+
+For example, the following code implements ``get_db_prep_lookup`` to limit the
+accepted lookup types to ``exact`` and ``in``::
 
     class HandField(models.Field):
         # ...
@@ -455,9 +472,9 @@ For example::
         def get_db_prep_lookup(self, lookup_type, value):
             # We only handle 'exact' and 'in'. All others are errors.
             if lookup_type == 'exact':
-                return self.get_db_prep_save(value)
+                return self.get_db_prep_value(value)
             elif lookup_type == 'in':
-                return [self.get_db_prep_save(v) for v in value]
+                return [self.get_db_prep_value(v) for v in value]
             else:
                 raise TypeError('Lookup type %r not supported.' % lookup_type)
 
@@ -557,7 +574,7 @@ we can reuse some existing conversion code::
 
         def flatten_data(self, follow, obj=None):
             value = self._get_val_from_obj(obj)
-            return {self.attname: self.get_db_prep_save(value)}
+            return {self.attname: self.get_db_prep_value(value)}
 
 Some general advice
 --------------------

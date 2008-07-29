@@ -84,6 +84,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         # sql_flush() implementations). Just return SQL at this point
         return sql
 
+    def year_lookup_bounds(self, value):
+        first = '%s-01-01'
+        second = '%s-12-31 23:59:59.999999'
+        return [first % value, second % value]
+
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     features = DatabaseFeatures()
     ops = DatabaseOperations()
@@ -159,7 +165,7 @@ def _sqlite_extract(lookup_type, dt):
         dt = util.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
-    return str(getattr(dt, lookup_type))
+    return getattr(dt, lookup_type)
 
 def _sqlite_date_trunc(lookup_type, dt):
     try:

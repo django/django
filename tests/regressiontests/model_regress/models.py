@@ -29,6 +29,9 @@ class Movie(models.Model):
 class Party(models.Model):
     when = models.DateField()
 
+class Event(models.Model):
+    when = models.DateTimeField()
+
 __test__ = {'API_TESTS': """
 (NOTE: Part of the regression test here is merely parsing the model
 declaration. The verbose_name, in particular, did not always work.)
@@ -68,5 +71,21 @@ u''
 >>> [p.when for p in Party.objects.filter(when__year = 1998)]
 [datetime.date(1998, 12, 31)]
 
+# Check that get_next_by_FIELD and get_previous_by_FIELD don't crash when we
+# have usecs values stored on the database
+#
+# [It crashed after the Field.get_db_prep_* refactor, because on most backends
+#  DateTimeFields supports usecs, but DateTimeField.to_python didn't recognize
+#  them. (Note that Model._get_next_or_previous_by_FIELD coerces values to
+#  strings)]
+#
+>>> e = Event.objects.create(when = datetime.datetime(2000, 1, 1, 16, 0, 0))
+>>> e = Event.objects.create(when = datetime.datetime(2000, 1, 1, 6, 1, 1))
+>>> e = Event.objects.create(when = datetime.datetime(2000, 1, 1, 13, 1, 1))
+>>> e = Event.objects.create(when = datetime.datetime(2000, 1, 1, 12, 0, 20, 24))
+>>> e.get_next_by_when().when
+datetime.datetime(2000, 1, 1, 13, 1, 1)
+>>> e.get_previous_by_when().when
+datetime.datetime(2000, 1, 1, 6, 1, 1)
 """
 }
