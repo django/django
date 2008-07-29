@@ -116,7 +116,7 @@ class Command(NoArgsCommand):
             app_name = app.__name__.split('.')[-2]
             for model in models.get_models(app):
                 if model in created_models:
-                    custom_sql = custom_sql_for_model(model)
+                    custom_sql = custom_sql_for_model(model, self.style)
                     if custom_sql:
                         if verbosity >= 1:
                             print "Installing custom SQL for %s.%s model" % (app_name, model._meta.object_name)

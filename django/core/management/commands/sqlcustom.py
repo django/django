@@ -7,4 +7,4 @@ class Command(AppCommand):
 
     def handle_app(self, app, **options):
         from django.core.management.sql import sql_custom
-        return u'\n'.join(sql_custom(app)).encode('utf-8')
+        return u'\n'.join(sql_custom(app, self.style)).encode('utf-8')
