@@ -624,7 +624,7 @@ class ForeignKey(RelatedField, Field):
             assert isinstance(to, basestring), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
         else:
             to_field = to_field or to._meta.pk.name
-        kwargs['verbose_name'] = kwargs.get('verbose_name', '')
+        kwargs['verbose_name'] = kwargs.get('verbose_name', None)
 
         if 'edit_inline_type' in kwargs:
             import warnings
