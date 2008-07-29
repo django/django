@@ -88,24 +88,3 @@ class GenericSitemap(Sitemap):
         if self.date_field is not None:
             return getattr(item, self.date_field)
         return None
-
-
-class KMLSitemap(Sitemap):
-    """
-    A minimal hook to 
-    """
-    def __init__(self, locations=None):
-        if locations is None:
-            self.locations = []
-        else:
-            self.locations = locations
-
-    def items(self):
-        return self.locations
-
-    def location(self, obj):
-        urlresolvers.reverse('django.contrib.gis.sitemaps.kml',
-                             kwargs={'label':obj[0],
-                                     'field':obj[1]})
-        
-
