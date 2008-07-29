@@ -434,6 +434,12 @@ do the same, but the location of the locale directory is ``locale/LANG/LC_MESSAG
     message file (``conf/locale/en/LC_MESSAGES/django.po``) and use it as a
     starting point; it's just an empty translation file.
 
+.. admonition:: Working on Windows?
+
+   If you're using Windows and need to install the GNU gettext utilites so
+   ``django-admin makemessages`` works see `gettext on Windows`_ for more
+   information.
+
 The format of ``.po`` files is straightforward. Each ``.po`` file contains a
 small bit of metadata, such as the translation maintainer's contact
 information, but the bulk of the file is a list of **messages** -- simple
@@ -512,6 +518,12 @@ That's it. Your translations are ready for use.
     the steps to take.
 
     .. _Submitting and maintaining translations: ../contributing/
+
+.. admonition:: Working on Windows?
+
+   If you're using Windows and need to install the GNU gettext utilites so
+   ``django-admin compilemessages`` works see `gettext on Windows`_ for more
+   information.
 
 3. How Django discovers language preference
 ===========================================
@@ -895,3 +907,24 @@ does translation:
     * Django doesn't use ``xgettext`` alone. It uses Python wrappers around
       ``xgettext`` and ``msgfmt``. This is mostly for convenience.
 
+``gettext`` on Windows
+======================
+
+This is only needed for people who either want to extract message IDs or
+compile ``.po`` files. Translation work itself just involves editing existing
+``.po`` files, but if you want to create your own .po files, or want to test
+or compile a changed ``.po`` file, you will need the ``gettext`` utilities:
+
+    * Download the following zip files from http://sourceforge.net/projects/gettext
+
+      * ``gettext-runtime-X.bin.woe32.zip``
+      * ``gettext-tools-X.bin.woe32.zip``
+      * ``libiconv-X.bin.woe32.zip``
+
+    * Extract the 3 files in the same folder (i.e. ``C:\Program Files\gettext-utils``)
+
+    * Update the system PATH:
+
+      * ``Control Panel > System > Advanced > Environment Variables``
+      * In the ``System variables`` list, click ``Path``, click ``Edit``
+      * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the ``Variable value``
