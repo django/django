@@ -385,7 +385,7 @@ class Field(object):
     def get_flatchoices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
         "Returns flattened choices with a default blank choice included."
         first_choice = include_blank and blank_choice or []
-        return first_choices + list(self.flatchoices)
+        return first_choice + list(self.flatchoices)
 
     def _get_val_from_obj(self, obj):
         if obj:
