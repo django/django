@@ -114,7 +114,8 @@ class RelatedField(object):
 
     def set_attributes_from_rel(self):
         self.name = self.name or (self.rel.to._meta.object_name.lower() + '_' + self.rel.to._meta.pk.name)
-        self.verbose_name = self.verbose_name or self.rel.to._meta.verbose_name
+        if self.verbose_name is None:
+            self.verbose_name = self.rel.to._meta.verbose_name
         self.rel.field_name = self.rel.field_name or self.rel.to._meta.pk.name
 
     def do_related_class(self, other, cls):
