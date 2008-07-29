@@ -655,7 +655,7 @@ Note that this value is *not* HTML-escaped when it's displayed in the admin
 interface. This lets you include HTML in ``help_text`` if you so desire. For
 example::
 
-	help_text="Please use the following format: <em>YYYY-MM-DD</em>."
+    help_text="Please use the following format: <em>YYYY-MM-DD</em>."
 
 Alternatively you can use plain text and
 ``django.utils.html.escape()`` to escape any HTML special characters.
@@ -944,6 +944,131 @@ the relationship should work. All are optional:
 
     =======================  ============================================================
 
+Extra fields on many-to-many relationships
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version** 
+
+When you're only dealing with simple many-to-many relationships such as
+mixing and matching pizzas and toppings, a standard ``ManyToManyField``
+is all you need. However, sometimes you may need to associate data with the
+relationship between two models. 
+
+For example, consider the case of an application tracking the musical groups
+which musicians belong to. There is a many-to-many relationship between a person
+and the groups of which they are a member, so you could use a ManyToManyField
+to represent this relationship. However, there is a lot of detail about the
+membership that you might want to collect, such as the date at which the person
+joined the group.
+
+For these situations, Django allows you to specify the model that will be used
+to govern the many-to-many relationship. You can then put extra fields on the
+intermediate model. The intermediate model is associated with the
+``ManyToManyField`` using the ``through`` argument to point to the model
+that will act as an intermediary. For our musician example, the code would look
+something like this::
+
+    class Person(models.Model):
+        name = models.CharField(max_length=128)
+
+        def __unicode__(self):
+            return self.name
+
+    class Group(models.Model):
+        name = models.CharField(max_length=128)
+        members = models.ManyToManyField(Person, through='Membership')
+
+        def __unicode__(self):
+            return self.name
+
+    class Membership(models.Model):
+        person = models.ForeignKey(Person)
+        group = models.ForeignKey(Group)
+        date_joined = models.DateField()
+        invite_reason = models.CharField(max_length=64)
+
+When you set up the intermediary model, you explicitly specify foreign 
+keys to the models that are involved in the ManyToMany relation. This
+explicit declaration defines how the two models are related.
+
+There are a few restrictions on the intermediate model:
+
+    * Your intermediate model must contain one - and *only* one - foreign key
+      on the target model (this would be ``Person`` in our example). If you
+      have more than one foreign key, a validation error will be raised.
+  
+    * Your intermediate model must contain one - and *only* one - foreign key 
+      on the source model (this would be ``Group`` in our example). If you
+      have more than one foreign key, a validation error will be raised.
+      
+    * If the many-to-many relation is a relation on itself, the relationship
+      must be non-symmetric.
+
+Now that you have set up your ``ManyToManyField`` to use your intermediary 
+model (Membership, in this case), you're ready to start creating some
+many-to-many relationships. You do this by creating instances of the
+intermediate model::
+    
+    >>> ringo = Person.objects.create(name="Ringo Starr")
+    >>> paul = Person.objects.create(name="Paul McCartney")
+    >>> beatles = Group.objects.create(name="The Beatles")
+    >>> m1 = Membership(person=ringo, group=beatles,
+    ...     date_joined=date(1962, 8, 16), 
+    ...     invite_reason= "Needed a new drummer.")
+    >>> m1.save()
+    >>> beatles.members.all()
+    [<Person: Ringo Starr>]
+    >>> ringo.group_set.all()
+    [<Group: The Beatles>]
+    >>> m2 = Membership.objects.create(person=paul, group=beatles,
+    ...     date_joined=date(1960, 8, 1), 
+    ...     invite_reason= "Wanted to form a band.")
+    >>> beatles.members.all()
+    [<Person: Ringo Starr>, <Person: Paul McCartney>]
+
+Unlike normal many-to-many fields, you *can't* use ``add``, ``create``,
+or assignment (i.e., ``beatles.members = [...]``) to create relationships::
+
+    # THIS WILL NOT WORK
+    >>> beatles.members.add(john)
+    # NEITHER WILL THIS
+    >>> beatles.members.create(name="George Harrison")
+    # AND NEITHER WILL THIS
+    >>> beatles.members = [john, paul, ringo, george]
+    
+Why? You can't just create a relationship between a Person and a Group - you
+need to specify all the detail for the relationship required by the
+Membership table. The simple ``add``, ``create`` and assignment calls
+don't provide a way to specify this extra detail. As a result, they are
+disabled for many-to-many relationships that use an intermediate model.
+The only way to create a many-to-many relationship with an intermediate table
+is to create instances of the intermediate model.
+
+The ``remove`` method is disabled for similar reasons. However, the
+``clear()`` method can be used to remove all many-to-many relationships
+for an instance::
+
+    # Beatles have broken up
+    >>> beatles.members.clear()
+
+Once you have established the many-to-many relationships by creating instances
+of your intermediate model, you can issue queries. Just as with normal 
+many-to-many relationships, you can query using the attributes of the 
+many-to-many-related model::
+
+    # Find all the groups with a member whose name starts with 'Paul'
+    >>> Groups.objects.filter(person__name__startswith='Paul')
+    [<Group: The Beatles>]
+
+As you are using an intermediate table, you can also query on the attributes 
+of the intermediate model::
+
+    # Find all the members of the Beatles that joined after 1 Jan 1961
+    >>> Person.objects.filter(
+    ...     group__name='The Beatles',
+    ...     membership__date_joined__gt=date(1961,1,1))
+    [<Person: Ringo Starr]
+    
 One-to-one relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1145,7 +1270,7 @@ any parent classes in ``unique_together``.
 For convenience, unique_together can be a single list when dealing
 with a single set of fields::
 
-	unique_together = ("driver", "restaurant")
+    unique_together = ("driver", "restaurant")
 
 ``verbose_name``
 ----------------

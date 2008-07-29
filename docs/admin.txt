@@ -617,6 +617,61 @@ automatically::
             FriendshipInline,
         ]
 
+Working with Many-to-Many Intermediary Models
+----------------------------------------------
+
+By default, admin widgets for many-to-many relations will be displayed inline
+on whichever model contains the actual reference to the `ManyToManyField`.  
+However, when you specify an intermediary model using the ``through``
+argument to a ``ManyToManyField``, the admin will not display a widget by 
+default. This is because each instance of that intermediary model requires
+more information than could be displayed in a single widget, and the layout
+required for multiple widgets will vary depending on the intermediate model.
+
+However, we still want to be able to edit that information inline. Fortunately,
+this is easy to do with inline admin models. Suppose we have the following
+models::
+
+    class Person(models.Model):
+        name = models.CharField(max_length=128)
+    
+    class Group(models.Model):
+        name = models.CharField(max_length=128)
+        members = models.ManyToManyField(Person, through='Membership')
+
+    class Membership(models.Model):
+        person = models.ForeignKey(Person)
+        group = models.ForeignKey(Group)
+        date_joined = models.DateField()
+        invite_reason = models.CharField(max_length=64)
+
+The first step in displaying this intermediate model in the admin is to
+define an inline model for the Membership table::
+
+    class MembershipInline(admin.TabularInline):
+        model = Membership
+        extra = 1
+
+This simple example uses the defaults inline form for the Membership model,
+and shows 1 extra line. This could be customized using any of the options
+available to inline models.
+
+Now create admin views for the ``Person`` and ``Group`` models::
+
+    class PersonAdmin(admin.ModelAdmin):
+        inlines = (MembershipInline,)
+
+    class GroupAdmin(admin.ModelAdmin):
+        inlines = (MembershipInline,)
+
+Finally, register your ``Person`` and ``Group`` models with the admin site::
+    
+    admin.site.register(Person, PersonAdmin)
+    admin.site.register(Group, GroupAdmin)
+
+Now your admin site is set up to edit ``Membership`` objects inline from either
+the ``Person`` or the ``Group`` detail pages.
+
 ``AdminSite`` objects
 =====================
 

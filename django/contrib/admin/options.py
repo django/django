@@ -161,7 +161,10 @@ class BaseModelAdmin(object):
                 kwargs['empty_label'] = db_field.blank and _('None') or None
             else:
                 if isinstance(db_field, models.ManyToManyField):
-                    if db_field.name in self.raw_id_fields:
+                    # If it uses an intermediary model, don't show field in admin. 
+                    if db_field.rel.through is not None:
+                        return None
+                    elif db_field.name in self.raw_id_fields:
                         kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.rel)
                         kwargs['help_text'] = ''
                     elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):

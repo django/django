@@ -104,6 +104,9 @@ class GenericRelation(RelatedField, Field):
                             limit_choices_to=kwargs.pop('limit_choices_to', None),
                             symmetrical=kwargs.pop('symmetrical', True))
 
+        # By its very nature, a GenericRelation doesn't create a table.
+        self.creates_table = False
+
         # Override content-type/object-id field names on the related class
         self.object_id_field_name = kwargs.pop("object_id_field", "object_id")
         self.content_type_field_name = kwargs.pop("content_type_field", "content_type")

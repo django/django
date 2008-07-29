@@ -353,7 +353,7 @@ def many_to_many_sql_for_model(model, style):
     qn = connection.ops.quote_name
     inline_references = connection.features.inline_fk_references
     for f in opts.local_many_to_many:
-        if not isinstance(f.rel, generic.GenericRel):
+        if f.creates_table:
             tablespace = f.db_tablespace or opts.db_tablespace
             if tablespace and connection.features.supports_tablespaces: 
                 tablespace_sql = ' ' + connection.ops.tablespace_sql(tablespace, inline=True)
