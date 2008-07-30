@@ -703,9 +703,9 @@ You can loop over a list in reverse by using ``{% for obj in list reversed %}``.
 
 **New in Django development version**
 If you need to loop over a list of lists, you can unpack the values
-in eachs sub-list into a set of known names. For example, if your context contains
-a list of (x,y) coordinates called ``points``, you could use the following
-to output the list of points::
+in each sub-list into individual variables. For example, if your context
+contains a list of (x,y) coordinates called ``points``, you could use the
+following to output the list of points::
 
     {% for x, y in points %}
         There is a point at {{ x }},{{ y }}
