@@ -74,7 +74,10 @@ class Field(object):
         if label is not None:
             label = smart_unicode(label)
         self.required, self.label, self.initial = required, label, initial
-        self.help_text = smart_unicode(help_text or '')
+        if help_text is None:
+            self.help_text = u''
+        else:
+            self.help_text = smart_unicode(help_text)
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
