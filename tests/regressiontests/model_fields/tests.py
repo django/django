@@ -3,7 +3,7 @@
 
 # DecimalField
 
->>> f = DecimalField()
+>>> f = DecimalField(max_digits=4, decimal_places=2)
 
 >>> f.to_python(3)
 Decimal("3")
