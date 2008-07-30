@@ -67,7 +67,10 @@ class AdminScriptTestCase(unittest.TestCase):
         elif 'DJANGO_SETTINGS_MODULE' in os.environ:
             del os.environ['DJANGO_SETTINGS_MODULE']
 
-        os.environ['PYTHONPATH'] = os.pathsep.join([test_dir,base_dir])
+        if old_python_path:
+            os.environ['PYTHONPATH'] = os.pathsep.join([test_dir, base_dir, old_python_path])
+        else:
+            os.environ['PYTHONPATH'] = os.pathsep.join([test_dir, base_dir])
 
         # Move to the test directory and run
         os.chdir(test_dir)
