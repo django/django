@@ -732,8 +732,8 @@ class DecimalField(Field):
         return util.format_number(value, self.max_digits, self.decimal_places)
 
     def get_db_prep_value(self, value):
-        return connection.ops.value_to_db_decimal(value, self.max_digits,
-                                                  self.decimal_places)
+        return connection.ops.value_to_db_decimal(self.to_python(value),
+                self.max_digits, self.decimal_places)
 
     def get_manipulator_field_objs(self):
         return [curry(oldforms.DecimalField, max_digits=self.max_digits, decimal_places=self.decimal_places)]
