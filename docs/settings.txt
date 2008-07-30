@@ -537,8 +537,8 @@ FILE_UPLOAD_HANDLERS
 
 Default::
 
-    ("django.core.files.fileuploadhandler.MemoryFileUploadHandler",
-     "django.core.files.fileuploadhandler.TemporaryFileUploadHandler",)
+    ("django.core.files.uploadhandler.MemoryFileUploadHandler",
+     "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
 
 A tuple of handlers to use for uploading. See `file uploads`_ for details.
 
@@ -563,7 +563,7 @@ Default: ``None``
 
 The directory to store data temporarily while uploading files. If ``None``,
 Django will use the standard temporary directory for the operating system. For
-example, this will default to '/tmp' on *nix-style operating systems.
+example, this will default to '/tmp' on \*nix-style operating systems.
 
 See `file uploads`_ for details.
 
