@@ -129,6 +129,23 @@ class BaseModelAdmin(object):
 
         If kwargs are given, they're passed to the form Field's constructor.
         """
+    
+        # If the field specifies choices, we don't need to look for special
+        # admin widgets - we just need to use a select widget of some kind.
+        if db_field.choices:
+            if db_field.name in self.radio_fields:
+                # If the field is named as a radio_field, use a RadioSelect
+                kwargs['widget'] = widgets.AdminRadioSelect(
+                    choices=db_field.get_choices(include_blank=db_field.blank,
+                        blank_choice=[('', _('None'))]),
+                    attrs={
+                        'class': get_ul_class(self.radio_fields[db_field.name]),
+                    }
+                )
+            else:
+                # Otherwise, use the default select widget.
+                return db_field.formfield(**kwargs)
+        
         # For DateTimeFields, use a special field and widget.
         if isinstance(db_field, models.DateTimeField):
             kwargs['form_class'] = forms.SplitDateTimeField
@@ -176,15 +193,6 @@ class BaseModelAdmin(object):
             if not db_field.name in self.raw_id_fields:
                 formfield.widget = widgets.RelatedFieldWidgetWrapper(formfield.widget, db_field.rel, self.admin_site)
             return formfield
-        
-        if db_field.choices and db_field.name in self.radio_fields:
-            kwargs['widget'] = widgets.AdminRadioSelect(
-                choices=db_field.get_choices(include_blank=db_field.blank,
-                    blank_choice=[('', _('None'))]),
-                attrs={
-                    'class': get_ul_class(self.radio_fields[db_field.name]),
-                }
-            )
 
         # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)
