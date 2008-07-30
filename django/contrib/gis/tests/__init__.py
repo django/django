@@ -44,8 +44,13 @@ if HAS_GEOIP:
     if hasattr(settings, 'GEOIP_PATH'):
         test_suite_names.append('test_geoip')
 
-def suite():
-    "Builds a test suite for the GIS package."
+def geo_suite():
+    """
+    Builds a test suite for the GIS package.  This is not named
+    `suite` so it will not interfere with the Django test suite (since
+    spatial database tables are required to execute these tests on
+    some backends).
+    """
     s = TestSuite()
     for test_suite in test_suite_names:
         tsuite = getattr(__import__('django.contrib.gis.tests', globals(), locals(), [test_suite]),test_suite)
@@ -54,7 +59,7 @@ def suite():
 
 def run(verbosity=1):
     "Runs the tests that do not require geographic (GEOS, GDAL, etc.) models."
-    TextTestRunner(verbosity=verbosity).run(suite())
+    TextTestRunner(verbosity=verbosity).run(geo_suite())
 
 def run_tests(module_list, verbosity=1, interactive=True):
     """
@@ -105,7 +110,7 @@ def run_tests(module_list, verbosity=1, interactive=True):
 
     # Creating the test suite, adding the test models to INSTALLED_APPS, and
     #  adding the model test suites to our suite package.
-    test_suite = suite()
+    test_suite = geo_suite()
     for test_model in test_models:
         module_name = 'django.contrib.gis.tests.%s' % test_model
         if mysql:

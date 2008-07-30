@@ -211,9 +211,23 @@ class SpatialRefSysMixin(object):
 # The SpatialRefSys and GeometryColumns models
 _srid_info = True
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
-    from django.contrib.gis.db.backend.postgis.models import GeometryColumns, SpatialRefSys
+    # Because the PostGIS version is checked when initializing the spatial 
+    # backend a `ProgrammingError` will be raised if the PostGIS tables 
+    # and functions are not installed.  We catch here so it won't be raised when 
+    # running the Django test suite.
+    from psycopg2 import ProgrammingError
+    try:
+        from django.contrib.gis.db.backend.postgis.models import GeometryColumns, SpatialRefSys
+    except ProgrammingError:
+        _srid_info = False
 elif settings.DATABASE_ENGINE == 'oracle':
-    from django.contrib.gis.db.backend.oracle.models import GeometryColumns, SpatialRefSys
+    # Same thing as above, except the GEOS library is attempted to be loaded for
+    # `BaseSpatialBackend`, and an exception will be raised during the
+    # Django test suite if it doesn't exist.
+    try:
+        from django.contrib.gis.db.backend.oracle.models import GeometryColumns, SpatialRefSys
+    except:
+        _srid_info = False
 else:
     _srid_info = False
 
