@@ -4,12 +4,7 @@ from django.conf import settings
 from django.utils.cache import patch_vary_headers
 from django.utils.http import cookie_date
 
-TEST_COOKIE_NAME = 'testcookie'
-TEST_COOKIE_VALUE = 'worked'
-
-
 class SessionMiddleware(object):
-
     def process_request(self, request):
         engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
         session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME, None)
