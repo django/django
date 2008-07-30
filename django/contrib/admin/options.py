@@ -347,7 +347,7 @@ class ModelAdmin(BaseModelAdmin):
 
         pk_value = new_object._get_pk_val()
         LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, pk_value, force_unicode(new_object), ADDITION)
-        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object}
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
         if request.POST.has_key("_continue"):
@@ -361,7 +361,7 @@ class ModelAdmin(BaseModelAdmin):
                 # escape() calls force_unicode.
                 (escape(pk_value), escape(new_object)))
         elif request.POST.has_key("_addanother"):
-            request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+            request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
             return HttpResponseRedirect(request.path)
         else:
             request.user.message_set.create(message=msg)
@@ -417,7 +417,7 @@ class ModelAdmin(BaseModelAdmin):
             change_message = _('No fields changed.')
         LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, pk_value, force_unicode(new_object), CHANGE, change_message)
 
-        msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+        msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object}
         if request.POST.has_key("_continue"):
             request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
             if request.REQUEST.has_key('_popup'):
@@ -425,10 +425,10 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 return HttpResponseRedirect(request.path)
         elif request.POST.has_key("_saveasnew"):
-            request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
+            request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object})
             return HttpResponseRedirect("../%s/" % pk_value)
         elif request.POST.has_key("_addanother"):
-            request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+            request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
             return HttpResponseRedirect("../add/")
         else:
             request.user.message_set.create(message=msg)
@@ -506,7 +506,7 @@ class ModelAdmin(BaseModelAdmin):
             inline_admin_formsets.append(inline_admin_formset)
 
         context = {
-            'title': _('Add %s') % opts.verbose_name,
+            'title': _('Add %s') % force_unicode(opts.verbose_name),
             'adminform': adminForm,
             'is_popup': request.REQUEST.has_key('_popup'),
             'show_delete': False,
@@ -536,7 +536,7 @@ class ModelAdmin(BaseModelAdmin):
             raise PermissionDenied
 
         if obj is None:
-            raise Http404('%s object with primary key %r does not exist.' % (opts.verbose_name, escape(object_id)))
+            raise Http404('%s object with primary key %r does not exist.' % (force_unicode(opts.verbose_name), escape(object_id)))
 
         if request.POST and request.POST.has_key("_saveasnew"):
             return self.add_view(request, form_url='../../add/')
@@ -568,7 +568,7 @@ class ModelAdmin(BaseModelAdmin):
             media = media + inline_admin_formset.media
 
         context = {
-            'title': _('Change %s') % opts.verbose_name,
+            'title': _('Change %s') % force_unicode(opts.verbose_name),
             'adminform': adminForm,
             'object_id': object_id,
             'original': obj,
@@ -633,7 +633,7 @@ class ModelAdmin(BaseModelAdmin):
             raise PermissionDenied
 
         if obj is None:
-            raise Http404('%s object with primary key %r does not exist.' % (opts.verbose_name, escape(object_id)))
+            raise Http404('%s object with primary key %r does not exist.' % (force_unicode(opts.verbose_name), escape(object_id)))
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
@@ -654,7 +654,7 @@ class ModelAdmin(BaseModelAdmin):
         
         context = {
             "title": _("Are you sure?"),
-            "object_name": opts.verbose_name,
+            "object_name": force_unicode(opts.verbose_name),
             "object": obj,
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,
@@ -682,7 +682,7 @@ class ModelAdmin(BaseModelAdmin):
         context = {
             'title': _('Change history: %s') % force_unicode(obj),
             'action_list': action_list,
-            'module_name': capfirst(opts.verbose_name_plural),
+            'module_name': capfirst(force_unicode(opts.verbose_name_plural)),
             'object': obj,
             'root_path': self.admin_site.root_path,
         }
