@@ -277,7 +277,7 @@ class BaseDatabaseOperations(object):
     def value_to_db_datetime(self, value):
         """
         Transform a datetime value to an object compatible with what is expected
-        by the backend driver for date columns.
+        by the backend driver for datetime columns.
         """
         if value is None:
             return None
@@ -286,7 +286,7 @@ class BaseDatabaseOperations(object):
     def value_to_db_time(self, value):
         """
         Transform a datetime value to an object compatible with what is expected
-        by the backend driver for date columns.
+        by the backend driver for time columns.
         """
         if value is None:
             return None
