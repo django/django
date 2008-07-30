@@ -2,10 +2,8 @@
 Module for abstract serializer/unserializer base classes.
 """
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from StringIO import StringIO
+
 from django.db import models
 from django.utils.encoding import smart_str, smart_unicode
 from django.utils import datetime_safe
