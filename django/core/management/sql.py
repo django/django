@@ -181,7 +181,7 @@ def sql_delete(app, style):
     for model in app_models:
         opts = model._meta
         for f in opts.local_many_to_many:
-            if isinstance(f.rel, generic.GenericRel):
+            if not f.creates_table:
                 continue
             if cursor and table_name_converter(f.m2m_db_table()) in table_names:
                 output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
