@@ -87,7 +87,7 @@ class AuthenticationForm(forms.Form):
         return self.user_cache
 
 class PasswordResetForm(forms.Form):
-    email = forms.EmailField(label=_("E-mail"), max_length=40)
+    email = forms.EmailField(label=_("E-mail"), max_length=75)
     
     def clean_email(self):
         """
