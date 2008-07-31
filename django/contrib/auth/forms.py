@@ -1,9 +1,11 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.template import Context, loader
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.utils.http import int_to_base36
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -97,16 +99,14 @@ class PasswordResetForm(forms.Form):
         self.users_cache = User.objects.filter(email__iexact=email)
         if len(self.users_cache) == 0:
             raise forms.ValidationError(_("That e-mail address doesn't have an associated user account. Are you sure you've registered?"))
-    
-    def save(self, domain_override=None, email_template_name='registration/password_reset_email.html'):
+
+    def save(self, domain_override=None, email_template_name='registration/password_reset_email.html',
+             use_https=False, token_generator=default_token_generator):
         """
-        Calculates a new password randomly and sends it to the user.
+        Generates a one-use only link for restting password and sends to the user
         """
         from django.core.mail import send_mail
         for user in self.users_cache:
-            new_pass = User.objects.make_random_password()
-            user.set_password(new_pass)
-            user.save()
             if not domain_override:
                 current_site = Site.objects.get_current()
                 site_name = current_site.name
@@ -115,26 +115,49 @@ class PasswordResetForm(forms.Form):
                 site_name = domain = domain_override
             t = loader.get_template(email_template_name)
             c = {
-                'new_password': new_pass,
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,
+                'uid': int_to_base36(user.id),
                 'user': user,
+                'token': token_generator.make_token(user),
+                'protocol': use_https and 'https' or 'http',
             }
             send_mail(_("Password reset on %s") % site_name,
                 t.render(Context(c)), None, [user.email])
 
-class PasswordChangeForm(forms.Form):
+class SetPasswordForm(forms.Form):
     """
-    A form that lets a user change his/her password.
+    A form that lets a user change set his/her password without
+    entering the old password
     """
-    old_password = forms.CharField(label=_("Old password"), max_length=30, widget=forms.PasswordInput)
-    new_password1 = forms.CharField(label=_("New password"), max_length=30, widget=forms.PasswordInput)
-    new_password2 = forms.CharField(label=_("New password confirmation"), max_length=30, widget=forms.PasswordInput)
-    
+    new_password1 = forms.CharField(label=_("New password"), max_length=60, widget=forms.PasswordInput)
+    new_password2 = forms.CharField(label=_("New password confirmation"), max_length=60, widget=forms.PasswordInput)
+
     def __init__(self, user, *args, **kwargs):
         self.user = user
-        super(PasswordChangeForm, self).__init__(*args, **kwargs)
+        super(SetPasswordForm, self).__init__(*args, **kwargs)
+
+    def clean_new_password2(self):
+        password1 = self.cleaned_data.get('new_password1')
+        password2 = self.cleaned_data.get('new_password2')
+        if password1 and password2:
+            if password1 != password2:
+                raise forms.ValidationError(_("The two password fields didn't match."))
+        return password2
+
+    def save(self, commit=True):
+        self.user.set_password(self.cleaned_data['new_password1'])
+        if commit:
+            self.user.save()
+        return self.user
+    
+class PasswordChangeForm(SetPasswordForm):
+    """
+    A form that lets a user change his/her password by entering
+    their old password.
+    """
+    old_password = forms.CharField(label=_("Old password"), max_length=60, widget=forms.PasswordInput)
     
     def clean_old_password(self):
         """
@@ -144,21 +167,8 @@ class PasswordChangeForm(forms.Form):
         if not self.user.check_password(old_password):
             raise forms.ValidationError(_("Your old password was entered incorrectly. Please enter it again."))
         return old_password
+PasswordChangeForm.base_fields.keyOrder = ['old_password', 'new_password1', 'new_password2']
     
-    def clean_new_password2(self):
-        password1 = self.cleaned_data.get('new_password1')
-        password2 = self.cleaned_data.get('new_password2')
-        if password1 and password2:
-            if password1 != password2:
-                raise forms.ValidationError(_("The two password fields didn't match."))
-        return password2
-    
-    def save(self, commit=True):
-        self.user.set_password(self.cleaned_data['new_password1'])
-        if commit:
-            self.user.save()
-        return self.user
-
 class AdminPasswordChangeForm(forms.Form):
     """
     A form used to change the password of a user in the admin interface.
