@@ -7,6 +7,7 @@ import os
 import unittest
 import shutil
 import sys
+import re
 
 from django import conf, bin, get_version
 from django.conf import settings
@@ -39,22 +40,37 @@ class AdminScriptTestCase(unittest.TestCase):
 
     def remove_settings(self, filename):
         test_dir = os.path.dirname(os.path.dirname(__file__))
-        os.remove(os.path.join(test_dir, filename))
-        # Also try to remove the pyc file; if it exists, it could
+        full_name = os.path.join(test_dir, filename)
+        os.remove(full_name)
+        
+        # Also try to remove the compiled file; if it exists, it could
         # mess up later tests that depend upon the .py file not existing
         try:
-            os.remove(os.path.join(test_dir, filename + 'c'))
+            if sys.platform.startswith('java'):
+                # Jython produces module$py.class files
+                os.remove(re.sub(r'\.py$', '$py.class', fullname))
+            else:
+                # CPython produces module.pyc files
+                os.remove(full_name + 'c')
         except OSError:
             pass
+        
+    def _sys_executable(self):
+        """
+        Returns the command line needed to run a python interpreter, including
+        the options for setting sys.path on Jython, which doesn't recognize
+        PYTHONPATH.
+        """
+        if sys.platform.startswith('java'):
+            return "%s -J-Dpython.path=%s" % \
+                   (sys.executable, os.environ['PYTHONPATH'])
+        else:
+            return sys.executable
 
     def run_test(self, script, args, settings_file=None, apps=None):
         test_dir = os.path.dirname(os.path.dirname(__file__))
         project_dir = os.path.dirname(test_dir)
         base_dir = os.path.dirname(project_dir)
-
-        # Build the command line
-        cmd = '%s "%s"' % (sys.executable, script)
-        cmd += ''.join([' %s' % arg for arg in args])
 
         # Remember the old environment
         old_django_settings_module = os.environ.get('DJANGO_SETTINGS_MODULE', None)
@@ -66,11 +82,15 @@ class AdminScriptTestCase(unittest.TestCase):
             os.environ['DJANGO_SETTINGS_MODULE'] = settings_file
         elif 'DJANGO_SETTINGS_MODULE' in os.environ:
             del os.environ['DJANGO_SETTINGS_MODULE']
-
+            
         if old_python_path:
             os.environ['PYTHONPATH'] = os.pathsep.join([test_dir, base_dir, old_python_path])
         else:
             os.environ['PYTHONPATH'] = os.pathsep.join([test_dir, base_dir])
+
+        # Build the command line
+        cmd = '%s "%s"' % (self._sys_executable(), script)
+        cmd += ''.join([' %s' % arg for arg in args])
 
         # Move to the test directory and run
         os.chdir(test_dir)
@@ -82,7 +102,6 @@ class AdminScriptTestCase(unittest.TestCase):
             os.environ['DJANGO_SETTINGS_MODULE'] = old_django_settings_module
         if old_python_path:
             os.environ['PYTHONPATH'] = old_python_path
-
         # Move back to the old working directory
         os.chdir(old_cwd)
 
@@ -823,7 +842,8 @@ class CommandTypes(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
-        self.assertOutput(out, os.sep.join(['django','contrib','auth','models.pyc']) + "'>, options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
+        self.assertOutput(out, os.sep.join(['django','contrib','auth','models.py']))
+        self.assertOutput(out, "'>, options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
         self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.contenttypes.models'")
         self.assertOutput(out, os.sep.join(['django','contrib','contenttypes','models.py']))
         self.assertOutput(out, "'>, options=[('pythonpath', None), ('settings', None), ('traceback', None)]")
