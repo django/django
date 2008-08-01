@@ -22,6 +22,10 @@ class Bar(models.Model):
     def __unicode__(self):
         return u"%s the bar" % self.place.name
 
+class UndergroundBar(models.Model):
+    place = models.OneToOneField(Place, null=True)
+    serves_cocktails = models.BooleanField()
+
 class Favorites(models.Model):
     name = models.CharField(max_length = 50)
     restaurants = models.ManyToManyField(Restaurant)
@@ -42,7 +46,7 @@ __test__ = {'API_TESTS':"""
 >>> f.restaurants.all()
 [<Restaurant: Demon Dogs the restaurant>]
 
-# Regression test for #7173: Check that the name of the cache for the 
+# Regression test for #7173: Check that the name of the cache for the
 # reverse object is correct.
 >>> b = Bar(place=p1, serves_cocktails=False)
 >>> b.save()
@@ -53,7 +57,7 @@ __test__ = {'API_TESTS':"""
 
 #
 # Regression test for #6886 (the related-object cache)
-# 
+#
 
 # Look up the objects again so that we get "fresh" objects
 >>> p = Place.objects.get(name="Demon Dogs")
@@ -76,6 +80,12 @@ False
 >>> p.restaurant is r2
 True
 
+# Assigning None succeeds if field is null=True.
+>>> ug_bar = UndergroundBar.objects.create(place=p, serves_cocktails=False)
+>>> ug_bar.place = None
+>>> ug_bar.place is None
+True
+
 # Assigning None fails: Place.restaurant is null=False
 >>> p.restaurant = None
 Traceback (most recent call last):
@@ -87,5 +97,26 @@ ValueError: Cannot assign None: "Place.restaurant" does not allow null values.
 Traceback (most recent call last):
     ...
 ValueError: Cannot assign "<Place: Demon Dogs the place>": "Place.restaurant" must be a "Restaurant" instance.
+
+# Creation using keyword argument should cache the related object.
+>>> p = Place.objects.get(name="Demon Dogs")
+>>> r = Restaurant(place=p)
+>>> r.place is p
+True
+
+# Creation using keyword argument and unsaved related instance (#8070).
+>>> p = Place()
+>>> r = Restaurant(place=p)
+>>> r.place is p
+True
+
+# Creation using attname keyword argument and an id will cause the related
+# object to be fetched.
+>>> p = Place.objects.get(name="Demon Dogs")
+>>> r = Restaurant(place_id=p.id)
+>>> r.place is p
+False
+>>> r.place == p
+True
 
 """}

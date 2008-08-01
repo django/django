@@ -200,6 +200,7 @@ class Model(object):
         # keywords, or default.
 
         for field in fields_iter:
+            rel_obj = None
             if kwargs:
                 if isinstance(field.rel, ManyToOneRel):
                     try:
@@ -216,17 +217,18 @@ class Model(object):
                         # pass in "None" for related objects if it's allowed.
                         if rel_obj is None and field.null:
                             val = None
-                        else:
-                            try:
-                                val = getattr(rel_obj, field.rel.get_related_field().attname)
-                            except AttributeError:
-                                raise TypeError("Invalid value: %r should be a %s instance, not a %s" %
-                                    (field.name, field.rel.to, type(rel_obj)))
                 else:
                     val = kwargs.pop(field.attname, field.get_default())
             else:
                 val = field.get_default()
-            setattr(self, field.attname, val)
+            # If we got passed a related instance, set it using the field.name
+            # instead of field.attname (e.g. "user" instead of "user_id") so
+            # that the object gets properly cached (and type checked) by the
+            # RelatedObjectDescriptor.
+            if rel_obj:
+                setattr(self, field.name, rel_obj)
+            else:
+                setattr(self, field.attname, val)
 
         if kwargs:
             for prop in kwargs.keys():

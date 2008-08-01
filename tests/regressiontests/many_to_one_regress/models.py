@@ -55,31 +55,36 @@ __test__ = {'API_TESTS':"""
 <Child: Child object>
 
 #
-# Tests of ForeignKey assignment and the related-object cache (see #6886)
+# Tests of ForeignKey assignment and the related-object cache (see #6886).
 #
 >>> p = Parent.objects.create(name="Parent")
 >>> c = Child.objects.create(name="Child", parent=p)
 
-# Look up the object again so that we get a "fresh" object
+# Look up the object again so that we get a "fresh" object.
 >>> c = Child.objects.get(name="Child")
 >>> p = c.parent
 
-# Accessing the related object again returns the exactly same object
+# Accessing the related object again returns the exactly same object.
 >>> c.parent is p
 True
 
-# But if we kill the cache, we get a new object
+# But if we kill the cache, we get a new object.
 >>> del c._parent_cache
 >>> c.parent is p
 False
 
-# Assigning a new object results in that object getting cached immediately
+# Assigning a new object results in that object getting cached immediately.
 >>> p2 = Parent.objects.create(name="Parent 2")
 >>> c.parent = p2
 >>> c.parent is p2
 True
 
-# Assigning None fails: Child.parent is null=False
+# Assigning None succeeds if field is null=True.
+>>> p.bestchild = None
+>>> p.bestchild is None
+True
+
+# Assigning None fails: Child.parent is null=False.
 >>> c.parent = None
 Traceback (most recent call last):
     ...
@@ -91,8 +96,31 @@ Traceback (most recent call last):
     ...
 ValueError: Cannot assign "<First: First object>": "Child.parent" must be a "Parent" instance.
 
-# Test of multiple ForeignKeys to the same model (bug #7125)
+# Creation using keyword argument should cache the related object.
+>>> p = Parent.objects.get(name="Parent")
+>>> c = Child(parent=p)
+>>> c.parent is p
+True
 
+# Creation using keyword argument and unsaved related instance (#8070).
+>>> p = Parent()
+>>> c = Child(parent=p)
+>>> c.parent is p
+True
+
+# Creation using attname keyword argument and an id will cause the related
+# object to be fetched.
+>>> p = Parent.objects.get(name="Parent")
+>>> c = Child(parent_id=p.id)
+>>> c.parent is p
+False
+>>> c.parent == p
+True
+
+
+#
+# Test of multiple ForeignKeys to the same model (bug #7125).
+#
 >>> c1 = Category.objects.create(name='First')
 >>> c2 = Category.objects.create(name='Second')
 >>> c3 = Category.objects.create(name='Third')

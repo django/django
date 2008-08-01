@@ -46,8 +46,12 @@ __test__ = {'API_TESTS':"""
 
 # Article objects have access to their related Reporter objects.
 >>> r = a.reporter
+
+# These are strings instead of unicode strings because that's what was used in
+# the creation of this reporter (and we haven't refreshed the data from the
+# database, which always returns unicode strings).
 >>> r.first_name, r.last_name
-(u'John', u'Smith')
+('John', 'Smith')
 
 # Create an Article via the Reporter object.
 >>> new_article = r.article_set.create(headline="John's second story", pub_date=datetime(2005, 7, 29))
@@ -176,7 +180,7 @@ False
 [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]
 
 # You can also use a queryset instead of a literal list of instances.
-# The queryset must be reduced to a list of values using values(), 
+# The queryset must be reduced to a list of values using values(),
 # then converted into a query
 >>> Article.objects.filter(reporter__in=Reporter.objects.filter(first_name='John').values('pk').query).distinct()
 [<Article: John's second story>, <Article: This is a test>]
