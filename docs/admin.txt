@@ -147,6 +147,26 @@ The ``field_options`` dictionary can have the following keys:
     ``django.utils.html.escape()`` to escape any HTML special
     characters.
 
+``fields``
+~~~~~~~~~~
+
+Use this option as an alternative to ``fieldsets`` if the layout does not
+matter and if you want to only show a subset of the available fields in the
+form. For example, you could define a simpler version of the admin form for
+the ``django.contrib.flatpages.FlatPage`` model as follows::
+
+    class FlatPageAdmin(admin.ModelAdmin):
+        fields = ('url', 'title', 'content')
+
+In the above example, only the fields 'url', 'title' and 'content' will be
+displayed, sequencially, in the form.
+
+.. admonition:: Note
+
+    This ``fields`` option should not be confused with the ``fields``
+    dictionary key that is within the ``fieldsets`` option, as described in
+    the previous section.
+
 ``filter_horizontal``
 ~~~~~~~~~~~~~~~~~~~~~
 
