@@ -1,5 +1,10 @@
 from django.db import models
 
+try:
+    sorted
+except NameError:
+    from django.utils.itercompat import sorted
+
 class Author(models.Model):
     name = models.CharField(max_length=100)
 
@@ -212,13 +217,14 @@ used.
 
 >>> AuthorFormSet = modelformset_factory(Author, max_num=2)
 >>> formset = AuthorFormSet(queryset=qs)
->>> formset.initial
-[{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}]
+>>> [sorted(x.items()) for x in formset.initial]
+[[('id', 1), ('name', u'Charles Baudelaire')], [('id', 3), ('name', u'Paul Verlaine')]]
 
 >>> AuthorFormSet = modelformset_factory(Author, max_num=3)
 >>> formset = AuthorFormSet(queryset=qs)
->>> formset.initial
-[{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}, {'id': 2, 'name': u'Walt Whitman'}]
+>>> [sorted(x.items()) for x in formset.initial]
+[[('id', 1), ('name', u'Charles Baudelaire')], [('id', 3), ('name', u'Paul Verlaine')], [('id', 2), ('name', u'Walt Whitman')]]
+
 
 # Inline Formsets ############################################################
 
