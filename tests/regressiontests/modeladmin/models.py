@@ -346,6 +346,20 @@ Traceback (most recent call last):
 ...
 ImproperlyConfigured: Both fieldsets and fields are specified in ValidationTestModelAdmin.
 
+>>> class ValidationTestModelAdmin(ModelAdmin): 
+...     fieldsets = [(None, {'fields': ['name', 'name']})] 
+>>> validate(ValidationTestModelAdmin, ValidationTestModel) 
+Traceback (most recent call last): 
+... 
+ImproperlyConfigured: There are duplicate field(s) in ValidationTestModelAdmin.fieldsets
+
+>>> class ValidationTestModelAdmin(ModelAdmin):
+...     fields = ["name", "name"]
+>>> validate(ValidationTestModelAdmin, ValidationTestModel)
+Traceback (most recent call last):
+...
+ImproperlyConfigured: There are duplicate field(s) in ValidationTestModelAdmin.fields
+
 # form
 
 >>> class FakeForm(object):

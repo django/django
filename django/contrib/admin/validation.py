@@ -1,3 +1,7 @@
+try:
+    set
+except NameError:
+    from sets import Set as set   # Python 2.3 fallback
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
@@ -165,6 +169,8 @@ def _validate_base(cls, model):
             _check_form_field_existsw('fields', field)
         if cls.fieldsets:
             raise ImproperlyConfigured('Both fieldsets and fields are specified in %s.' % cls.__name__)
+        if len(cls.fields) > len(set(cls.fields)):
+            raise ImproperlyConfigured('There are duplicate field(s) in %s.fields' % cls.__name__)
 
     # fieldsets
     if cls.fieldsets: # default value is None
@@ -179,7 +185,10 @@ def _validate_base(cls, model):
                 raise ImproperlyConfigured("`fields` key is required in "
                         "%s.fieldsets[%d][1] field options dict."
                         % (cls.__name__, idx))
-        for field in flatten_fieldsets(cls.fieldsets):
+        flattened_fieldsets = flatten_fieldsets(cls.fieldsets)
+        if len(flattened_fieldsets) > len(set(flattened_fieldsets)):
+            raise ImproperlyConfigured('There are duplicate field(s) in %s.fieldsets' % cls.__name__)
+        for field in flattened_fieldsets:
             _check_form_field_existsw("fieldsets[%d][1]['fields']" % idx, field)
 
     # form
