@@ -29,6 +29,10 @@ class AuthorMeeting(models.Model):
     def __unicode__(self):
         return self.name
 
+class CustomPrimaryKey(models.Model):
+    my_pk = models.CharField(max_length=10, primary_key=True)
+    some_field = models.CharField(max_length=100)
+
 
 __test__ = {'API_TESTS': """
 
@@ -330,5 +334,15 @@ Test using a custom prefix on an inline formset.
 <p><label for="id_test-0-title">Title:</label> <input id="id_test-0-title" type="text" name="test-0-title" maxlength="100" /><input type="hidden" name="test-0-id" id="id_test-0-id" /></p>
 <p><label for="id_test-1-title">Title:</label> <input id="id_test-1-title" type="text" name="test-1-title" maxlength="100" /><input type="hidden" name="test-1-id" id="id_test-1-id" /></p>
 
+# Test a custom primary key ###################################################
+
+We need to ensure that it is displayed
+
+>>> CustomPrimaryKeyFormSet = modelformset_factory(CustomPrimaryKey)
+>>> formset = CustomPrimaryKeyFormSet()
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_form-0-my_pk">My pk:</label> <input id="id_form-0-my_pk" type="text" name="form-0-my_pk" maxlength="10" /></p>
+<p><label for="id_form-0-some_field">Some field:</label> <input id="id_form-0-some_field" type="text" name="form-0-some_field" maxlength="100" /></p>
 
 """}

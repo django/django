@@ -378,8 +378,9 @@ class BaseModelFormSet(BaseFormSet):
 
     def add_fields(self, form, index):
         """Add a hidden field for the object's primary key."""
-        self._pk_field_name = self.model._meta.pk.attname
-        form.fields[self._pk_field_name] = IntegerField(required=False, widget=HiddenInput)
+        if self.model._meta.has_auto_field:
+            self._pk_field_name = self.model._meta.pk.attname
+            form.fields[self._pk_field_name] = IntegerField(required=False, widget=HiddenInput)
         super(BaseModelFormSet, self).add_fields(form, index)
 
 def modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.formfield(),
