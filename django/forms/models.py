@@ -441,13 +441,20 @@ def _get_foreign_key(parent_model, model, fk_name=None):
         fks_to_parent = [f for f in opts.fields if f.name == fk_name]
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
-            if not isinstance(fk, ForeignKey) or fk.rel.to != parent_model:
+            if not isinstance(fk, ForeignKey) or \
+                    (fk.rel.to != parent_model and 
+                     fk.rel.to not in parent_model._meta.parents.keys()):
                 raise Exception("fk_name '%s' is not a ForeignKey to %s" % (fk_name, parent_model))
         elif len(fks_to_parent) == 0:
             raise Exception("%s has no field named '%s'" % (model, fk_name))
     else:
         # Try to discover what the ForeignKey from model to parent_model is
-        fks_to_parent = [f for f in opts.fields if isinstance(f, ForeignKey) and f.rel.to == parent_model]
+        fks_to_parent = [
+            f for f in opts.fields 
+            if isinstance(f, ForeignKey) 
+            and (f.rel.to == parent_model 
+                or f.rel.to in parent_model._meta.parents.keys())
+        ]
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
         elif len(fks_to_parent) == 0:
