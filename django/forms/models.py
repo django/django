@@ -259,8 +259,8 @@ class BaseModelForm(BaseForm):
         # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)
-        BaseForm.__init__(self, data, files, auto_id, prefix, object_data,
-                          error_class, label_suffix, empty_permitted)
+        super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
+                                            error_class, label_suffix, empty_permitted)
 
     def save(self, commit=True):
         """
