@@ -8,6 +8,7 @@ def autodiscover():
     not present. This forces an import on them to register any admin bits they
     may want.
     """
+    import imp
     from django.conf import settings
     for app in settings.INSTALLED_APPS:
         try:
