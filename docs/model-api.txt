@@ -1000,9 +1000,17 @@ There are a few restrictions on the intermediate model:
     * Your intermediate model must contain one - and *only* one - foreign key 
       on the source model (this would be ``Group`` in our example). If you
       have more than one foreign key, a validation error will be raised.
-      
-    * If the many-to-many relation is a relation on itself, the relationship
-      must be non-symmetric.
+
+    * The only exception to this is a model which has a many-to-many
+      relationship to itself, through an intermediary model. In this
+      case, two foreign keys to the same model are permitted, but they
+      will be treated as the two (different) sides of the many-to-many
+      relation.
+    
+    * When defining a many-to-many relationship from a model to
+      itself, using an intermediary model, you *must* use
+      ``symmetrical=False`` (see the documentation for
+      ``ManyToManyField`` above).
 
 Now that you have set up your ``ManyToManyField`` to use your intermediary 
 model (Membership, in this case), you're ready to start creating some
