@@ -95,7 +95,7 @@ class GenericForeignKey(object):
         setattr(instance, self.cache_attr, value)
 
 class GenericRelation(RelatedField, Field):
-    """Provides an accessor to generic related objects (i.e. comments)"""
+    """Provides an accessor to generic related objects (e.g. comments)"""
 
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)

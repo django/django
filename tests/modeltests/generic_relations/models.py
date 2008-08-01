@@ -27,11 +27,32 @@ class TaggedItem(models.Model):
     def __unicode__(self):
         return self.tag
 
+class Comparison(models.Model):
+    """
+    A model that tests having multiple GenericForeignKeys
+    """
+    comparative = models.CharField(max_length=50)
+    
+    content_type1 = models.ForeignKey(ContentType, related_name="comparative1_set")
+    object_id1 = models.PositiveIntegerField()
+
+    content_type2 = models.ForeignKey(ContentType,  related_name="comparative2_set")
+    object_id2 = models.PositiveIntegerField()
+
+    first_obj = generic.GenericForeignKey(ct_field="content_type1", fk_field="object_id1")
+    other_obj = generic.GenericForeignKey(ct_field="content_type2", fk_field="object_id2")
+
+    def __unicode__(self):
+        return u"%s is %s than %s" % (self.first_obj, self.comparative, self.other_obj)
+
 class Animal(models.Model):
     common_name = models.CharField(max_length=150)
     latin_name = models.CharField(max_length=150)
 
     tags = generic.GenericRelation(TaggedItem)
+    comparisons = generic.GenericRelation(Comparison, 
+                                          object_id_field="object_id1",
+                                          content_type_field="content_type1")
 
     def __unicode__(self):
         return self.common_name
@@ -136,4 +157,38 @@ __test__ = {'API_TESTS':"""
 >>> Animal.objects.filter(tags__content_type=ctype)
 [<Animal: Platypus>]
 
+# Simple tests for multiple GenericForeignKeys
+# only uses one model, since the above tests should be sufficient.
+>>> tiger, cheetah, bear = Animal(common_name="tiger"), Animal(common_name="cheetah"), Animal(common_name="bear")
+>>> for o in [tiger, cheetah, bear]: o.save()
+
+# Create directly
+>>> Comparison(first_obj=cheetah, other_obj=tiger, comparative="faster").save()
+>>> Comparison(first_obj=tiger, other_obj=cheetah, comparative="cooler").save()
+
+# Create using GenericRelation
+>>> tiger.comparisons.create(other_obj=bear, comparative="cooler")
+<Comparison: tiger is cooler than bear>
+>>> tiger.comparisons.create(other_obj=cheetah, comparative="stronger")
+<Comparison: tiger is stronger than cheetah>
+
+>>> cheetah.comparisons.all()
+[<Comparison: cheetah is faster than tiger>]
+
+# Filtering works
+>>> tiger.comparisons.filter(comparative="cooler")
+[<Comparison: tiger is cooler than cheetah>, <Comparison: tiger is cooler than bear>]
+
+# Filtering and deleting works
+>>> subjective = ["cooler"]
+>>> tiger.comparisons.filter(comparative__in=subjective).delete()
+>>> Comparison.objects.all()
+[<Comparison: cheetah is faster than tiger>, <Comparison: tiger is stronger than cheetah>]
+
+# If we delete cheetah, Comparisons with cheetah as 'first_obj' will be deleted
+# since Animal has an explicit GenericRelation to Comparison through first_obj.
+# Comparisons with cheetah as 'other_obj' will not be deleted.
+>>> cheetah.delete()
+>>> Comparison.objects.all()
+[<Comparison: tiger is stronger than None>]
 """}
