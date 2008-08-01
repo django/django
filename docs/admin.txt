@@ -421,7 +421,10 @@ overhead of having to select all the related instances to display in the
 drop-down.
 
 ``raw_id_fields`` is a list of fields you would like to change
-into a ``Input`` widget for the primary key.
+into a ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        raw_id_fields = ("newspaper",)
 
 ``save_as``
 ~~~~~~~~~~~
@@ -597,6 +600,21 @@ directly corrolate to the number of objects, but can if the value is small
 enough. See `max_num in formsets`_ for more information.
 
 .. _max_num in formsets: ../modelforms/#limiting-the-number-of-objects-editable
+
+``raw_id_fields``
+~~~~~~~~~~~~~~~~~
+
+By default, Django's admin uses a select-box interface (<select>) for
+fields that are ``ForeignKey``. Sometimes you don't want to incur the
+overhead of having to select all the related instances to display in the
+drop-down.
+
+``raw_id_fields`` is a list of fields you would like to change
+into a ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
+
+    class BookInline(admin.TabularInline):
+        model = Book
+        raw_id_fields = ("pages",)
 
 ``template``
 ~~~~~~~~~~~~
