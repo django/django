@@ -30,7 +30,7 @@ class Membership(models.Model):
     invite_reason = models.CharField(max_length=64, null=True)
 
     class Meta:
-        ordering = ('date_joined','invite_reason')
+        ordering = ('date_joined', 'invite_reason', 'group')
     
     def __unicode__(self):
         return "%s is a member of %s" % (self.person.name, self.group.name)
