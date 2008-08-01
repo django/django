@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
@@ -130,7 +131,8 @@ def password_reset_confirm(request, uidb36=None, token=None, template_name='regi
     return render_to_response(template_name, context_instance=context_instance)
 
 def password_reset_complete(request, template_name='registration/password_reset_complete.html'):
-    return render_to_response(template_name, context_instance=RequestContext(request))
+    return render_to_response(template_name, context_instance=RequestContext(request,
+                                                                             {'login_url': settings.LOGIN_URL}))
 
 def password_change(request, template_name='registration/password_change_form.html'):
     if request.method == "POST":
