@@ -14,8 +14,8 @@ class UserCreationForm(forms.ModelForm):
     username = forms.RegexField(label=_("Username"), max_length=30, regex=r'^\w+$',
         help_text = _("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."),
         error_message = _("This value must contain only letters, numbers and underscores."))
-    password1 = forms.CharField(label=_("Password"), max_length=60, widget=forms.PasswordInput)
-    password2 = forms.CharField(label=_("Password confirmation"), max_length=60, widget=forms.PasswordInput)
+    password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
+    password2 = forms.CharField(label=_("Password confirmation"), widget=forms.PasswordInput)
     
     class Meta:
         model = User
@@ -49,7 +49,7 @@ class AuthenticationForm(forms.Form):
     username/password logins.
     """
     username = forms.CharField(label=_("Username"), max_length=30)
-    password = forms.CharField(label=_("Password"), max_length=30, widget=forms.PasswordInput)
+    password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
     
     def __init__(self, request=None, *args, **kwargs):
         """
@@ -131,8 +131,8 @@ class SetPasswordForm(forms.Form):
     A form that lets a user change set his/her password without
     entering the old password
     """
-    new_password1 = forms.CharField(label=_("New password"), max_length=60, widget=forms.PasswordInput)
-    new_password2 = forms.CharField(label=_("New password confirmation"), max_length=60, widget=forms.PasswordInput)
+    new_password1 = forms.CharField(label=_("New password"), widget=forms.PasswordInput)
+    new_password2 = forms.CharField(label=_("New password confirmation"), widget=forms.PasswordInput)
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -157,7 +157,7 @@ class PasswordChangeForm(SetPasswordForm):
     A form that lets a user change his/her password by entering
     their old password.
     """
-    old_password = forms.CharField(label=_("Old password"), max_length=60, widget=forms.PasswordInput)
+    old_password = forms.CharField(label=_("Old password"), widget=forms.PasswordInput)
     
     def clean_old_password(self):
         """
@@ -173,8 +173,8 @@ class AdminPasswordChangeForm(forms.Form):
     """
     A form used to change the password of a user in the admin interface.
     """
-    password1 = forms.CharField(label=_("Password"), max_length=60, widget=forms.PasswordInput)
-    password2 = forms.CharField(label=_("Password (again)"), max_length=60, widget=forms.PasswordInput)
+    password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
+    password2 = forms.CharField(label=_("Password (again)"), widget=forms.PasswordInput)
     
     def __init__(self, user, *args, **kwargs):
         self.user = user
