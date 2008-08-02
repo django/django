@@ -1,15 +1,19 @@
 """
 >>> from django.db.models.fields import *
+>>> try:
+...     from decimal import Decimal
+... except ImportError:
+...     from django.utils._decimal import Decimal
 
 # DecimalField
 
 >>> f = DecimalField(max_digits=4, decimal_places=2)
 
->>> f.to_python(3)
-Decimal("3")
+>>> f.to_python(3) == Decimal("3")
+True
 
->>> f.to_python("3.14")
-Decimal("3.14")
+>>> f.to_python("3.14") == Decimal("3.14")
+True
 
 >>> f.to_python("abc")
 Traceback (most recent call last):

@@ -308,18 +308,18 @@ ValidationError: [u'This field is required.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
->>> f.clean('1')
-Decimal("1")
+>>> f.clean('1') == Decimal("1")
+True
 >>> isinstance(f.clean('1'), Decimal)
 True
->>> f.clean('23')
-Decimal("23")
->>> f.clean('3.14')
-Decimal("3.14")
->>> f.clean(3.14)
-Decimal("3.14")
->>> f.clean(Decimal('3.14'))
-Decimal("3.14")
+>>> f.clean('23') == Decimal("23")
+True
+>>> f.clean('3.14') == Decimal("3.14")
+True
+>>> f.clean(3.14) == Decimal("3.14")
+True
+>>> f.clean(Decimal('3.14')) == Decimal("3.14")
+True
 >>> f.clean('a')
 Traceback (most recent call last):
 ...
@@ -328,12 +328,12 @@ ValidationError: [u'Enter a number.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a number.']
->>> f.clean('1.0 ')
-Decimal("1.0")
->>> f.clean(' 1.0')
-Decimal("1.0")
->>> f.clean(' 1.0 ')
-Decimal("1.0")
+>>> f.clean('1.0 ') == Decimal("1.0")
+True
+>>> f.clean(' 1.0') == Decimal("1.0")
+True
+>>> f.clean(' 1.0 ') == Decimal("1.0")
+True
 >>> f.clean('1.0a')
 Traceback (most recent call last):
 ...
@@ -350,18 +350,18 @@ ValidationError: [u'Ensure that there are no more than 2 decimal places.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure that there are no more than 2 digits before the decimal point.']
->>> f.clean('-12.34')
-Decimal("-12.34")
+>>> f.clean('-12.34') == Decimal("-12.34")
+True
 >>> f.clean('-123.45')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure that there are no more than 4 digits in total.']
->>> f.clean('-.12')
-Decimal("-0.12")
->>> f.clean('-00.12')
-Decimal("-0.12")
->>> f.clean('-000.12')
-Decimal("-0.12")
+>>> f.clean('-.12') == Decimal("-0.12")
+True
+>>> f.clean('-00.12') == Decimal("-0.12")
+True
+>>> f.clean('-000.12') == Decimal("-0.12")
+True
 >>> f.clean('-000.123')
 Traceback (most recent call last):
 ...
@@ -380,8 +380,8 @@ ValidationError: [u'Enter a number.']
 
 >>> f.clean(None)
 
->>> f.clean('1')
-Decimal("1")
+>>> f.clean('1') == Decimal("1")
+True
 
 DecimalField accepts min_value and max_value just like IntegerField:
 >>> f = DecimalField(max_digits=4, decimal_places=2, max_value=Decimal('1.5'), min_value=Decimal('0.5'))
@@ -394,14 +394,14 @@ ValidationError: [u'Ensure this value is less than or equal to 1.5.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure this value is greater than or equal to 0.5.']
->>> f.clean('1.5')
-Decimal("1.5")
->>> f.clean('0.5')
-Decimal("0.5")
->>> f.clean('.5')
-Decimal("0.5")
->>> f.clean('00.50')
-Decimal("0.50")
+>>> f.clean('1.5') == Decimal("1.5")
+True
+>>> f.clean('0.5') == Decimal("0.5")
+True
+>>> f.clean('.5') == Decimal("0.5")
+True
+>>> f.clean('00.50') == Decimal("0.50")
+True
 
 # DateField ###################################################################
 
