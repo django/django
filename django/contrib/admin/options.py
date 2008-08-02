@@ -14,7 +14,10 @@ from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_unicode
-import sets
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback
 
 HORIZONTAL, VERTICAL = 1, 2
 # returns the <ul> class for a given radio_admin field
@@ -129,7 +132,7 @@ class BaseModelAdmin(object):
 
         If kwargs are given, they're passed to the form Field's constructor.
         """
-    
+
         # If the field specifies choices, we don't need to look for special
         # admin widgets - we just need to use a select widget of some kind.
         if db_field.choices:
@@ -145,7 +148,7 @@ class BaseModelAdmin(object):
             else:
                 # Otherwise, use the default select widget.
                 return db_field.formfield(**kwargs)
-        
+
         # For DateTimeFields, use a special field and widget.
         if isinstance(db_field, models.DateTimeField):
             kwargs['form_class'] = forms.SplitDateTimeField
@@ -178,7 +181,7 @@ class BaseModelAdmin(object):
                 kwargs['empty_label'] = db_field.blank and _('None') or None
             else:
                 if isinstance(db_field, models.ManyToManyField):
-                    # If it uses an intermediary model, don't show field in admin. 
+                    # If it uses an intermediary model, don't show field in admin.
                     if db_field.rel.through is not None:
                         return None
                     elif db_field.name in self.raw_id_fields:
@@ -220,7 +223,7 @@ class ModelAdmin(BaseModelAdmin):
     save_on_top = False
     ordering = None
     inlines = []
-    
+
     # Custom templates (designed to be over-ridden in subclasses)
     change_form_template = None
     change_list_template = None
@@ -271,7 +274,7 @@ class ModelAdmin(BaseModelAdmin):
             js.extend(['js/getElementsBySelector.js', 'js/dom-drag.js' , 'js/admin/ordering.js'])
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
-        
+
         return forms.Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
     media = property(_media)
 
@@ -388,7 +391,7 @@ class ModelAdmin(BaseModelAdmin):
         Saves the object in the "change" stage and returns an HttpResponseRedirect.
 
         `form` is a bound Form instance that's verified to be valid.
-        
+
         `formsets` is a sequence of InlineFormSet instances that are verified to be valid.
         """
         from django.contrib.admin.models import LogEntry, CHANGE
@@ -404,20 +407,20 @@ class ModelAdmin(BaseModelAdmin):
         change_message = []
         if form.changed_data:
             change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
-            
+
         if formsets:
             for formset in formsets:
                 for added_object in formset.new_objects:
-                    change_message.append(_('Added %(name)s "%(object)s".') 
+                    change_message.append(_('Added %(name)s "%(object)s".')
                                           % {'name': added_object._meta.verbose_name,
                                              'object': added_object})
                 for changed_object, changed_fields in formset.changed_objects:
-                    change_message.append(_('Changed %(list)s for %(name)s "%(object)s".') 
-                                          % {'list': get_text_list(changed_fields, _('and')), 
-                                             'name': changed_object._meta.verbose_name, 
+                    change_message.append(_('Changed %(list)s for %(name)s "%(object)s".')
+                                          % {'list': get_text_list(changed_fields, _('and')),
+                                             'name': changed_object._meta.verbose_name,
                                              'object': changed_object})
                 for deleted_object in formset.deleted_objects:
-                    change_message.append(_('Deleted %(name)s "%(object)s".') 
+                    change_message.append(_('Deleted %(name)s "%(object)s".')
                                           % {'name': deleted_object._meta.verbose_name,
                                              'object': deleted_object})
         change_message = ' '.join(change_message)
@@ -608,7 +611,7 @@ class ModelAdmin(BaseModelAdmin):
             if ERROR_FLAG in request.GET.keys():
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
-        
+
         context = {
             'title': cl.title,
             'is_popup': cl.is_popup,
@@ -646,7 +649,7 @@ class ModelAdmin(BaseModelAdmin):
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
         deleted_objects = [mark_safe(u'%s: <a href="../../%s/">%s</a>' % (escape(force_unicode(capfirst(opts.verbose_name))), quote(object_id), escape(obj))), []]
-        perms_needed = sets.Set()
+        perms_needed = set()
         get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1, self.admin_site)
 
         if request.POST: # The user has already confirmed the deletion.
@@ -659,7 +662,7 @@ class ModelAdmin(BaseModelAdmin):
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect("../../../../")
             return HttpResponseRedirect("../../")
-        
+
         context = {
             "title": _("Are you sure?"),
             "object_name": force_unicode(opts.verbose_name),
@@ -769,7 +772,7 @@ class InlineAdminFormSet(object):
     def fields(self):
         for field_name in flatten_fieldsets(self.fieldsets):
             yield self.formset.form.base_fields[field_name]
-    
+
     def _media(self):
         media = self.formset.media
         for fs in self:
