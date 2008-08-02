@@ -1,12 +1,10 @@
 import base64
 import cPickle as pickle
-import datetime
 import re
 
 from django import http, template
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth import authenticate, login
-from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
 from django.shortcuts import render_to_response
 from django.utils.safestring import mark_safe
@@ -28,13 +26,11 @@ class NotRegistered(Exception):
     pass
 
 def _encode_post_data(post_data):
-    from django.conf import settings
     pickled = pickle.dumps(post_data)
     pickled_md5 = md5_constructor(pickled + settings.SECRET_KEY).hexdigest()
     return base64.encodestring(pickled + pickled_md5)
 
 def _decode_post_data(encoded_data):
-    from django.conf import settings
     encoded_data = base64.decodestring(encoded_data)
     pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
     if md5_constructor(pickled + settings.SECRET_KEY).hexdigest() != tamper_check:
@@ -205,7 +201,6 @@ class AdminSite(object):
         This takes into account the USE_I18N setting. If it's set to False, the
         generated JavaScript will be leaner and faster.
         """
-        from django.conf import settings
         if settings.USE_I18N:
             from django.views.i18n import javascript_catalog
         else:
