@@ -1,6 +1,5 @@
 import os
 import errno
-import sha
 import shutil
 import unittest
 
@@ -8,6 +7,7 @@ from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, client
 from django.utils import simplejson
+from django.utils.hashcompat import sha_constructor
 
 from models import FileModel, UPLOAD_ROOT, UPLOAD_TO
 
@@ -45,10 +45,10 @@ class FileUploadTests(TestCase):
 
         for key in post_data.keys():
             try:
-                post_data[key + '_hash'] = sha.new(post_data[key].read()).hexdigest()
+                post_data[key + '_hash'] = sha_constructor(post_data[key].read()).hexdigest()
                 post_data[key].seek(0)
             except AttributeError:
-                post_data[key + '_hash'] = sha.new(post_data[key]).hexdigest()
+                post_data[key + '_hash'] = sha_constructor(post_data[key]).hexdigest()
 
         response = self.client.post('/file_uploads/verify/', post_data)
 

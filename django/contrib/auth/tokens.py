@@ -50,17 +50,17 @@ class PasswordResetTokenGenerator(object):
         # last_login will also change), we produce a hash that will be
         # invalid as soon as it is used.
         # We limit the hash to 20 chars to keep URL short
-        import sha
-        hash = sha.new(settings.SECRET_KEY + unicode(user.id) + 
-                       user.password + unicode(user.last_login) + 
-                       unicode(timestamp)).hexdigest()[::2]
+        from django.utils.hashcompat import sha_constructor
+        hash = sha_constructor(settings.SECRET_KEY + unicode(user.id) +
+                               user.password + unicode(user.last_login) +
+                               unicode(timestamp)).hexdigest()[::2]
         return "%s-%s" % (ts_b36, hash)
 
     def _num_days(self, dt):
-        return (dt - date(2001,1,1)).days 
+        return (dt - date(2001,1,1)).days
 
     def _today(self):
         # Used for mocking in tests
-        return date.today()        
+        return date.today()
 
 default_token_generator = PasswordResetTokenGenerator()

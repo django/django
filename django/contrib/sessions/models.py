@@ -1,10 +1,10 @@
 import base64
-import md5
 import cPickle as pickle
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.utils.hashcompat import md5_constructor
 
 
 class SessionManager(models.Manager):
@@ -13,7 +13,7 @@ class SessionManager(models.Manager):
         Returns the given session dictionary pickled and encoded as a string.
         """
         pickled = pickle.dumps(session_dict)
-        pickled_md5 = md5.new(pickled + settings.SECRET_KEY).hexdigest()
+        pickled_md5 = md5_constructor(pickled + settings.SECRET_KEY).hexdigest()
         return base64.encodestring(pickled + pickled_md5)
 
     def save(self, session_key, session_dict, expire_date):
@@ -56,7 +56,7 @@ class Session(models.Model):
     def get_decoded(self):
         encoded_data = base64.decodestring(self.session_data)
         pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
-        if md5.new(pickled + settings.SECRET_KEY).hexdigest() != tamper_check:
+        if md5_constructor(pickled + settings.SECRET_KEY).hexdigest() != tamper_check:
             from django.core.exceptions import SuspiciousOperation
             raise SuspiciousOperation, "User tampered with session cookie."
         try:

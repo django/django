@@ -1,4 +1,3 @@
-import md5
 import re
 
 from django.conf import settings
@@ -6,6 +5,7 @@ from django import http
 from django.core.mail import mail_managers
 from django.utils.http import urlquote
 from django.core import urlresolvers
+from django.utils.hashcompat import md5_constructor
 
 class CommonMiddleware(object):
     """
@@ -21,7 +21,7 @@ class CommonMiddleware(object):
               slash, and it is not found in urlpatterns, a new URL is formed by
               appending a slash at the end. If this new URL is found in
               urlpatterns, then an HTTP-redirect is returned to this new URL;
-              otherwise the initial URL is processed as usual. 
+              otherwise the initial URL is processed as usual.
 
         - ETags: If the USE_ETAGS setting is set, ETags will be calculated from
           the entire page content and Not Modified responses will be returned
@@ -108,7 +108,7 @@ class CommonMiddleware(object):
             if response.has_header('ETag'):
                 etag = response['ETag']
             else:
-                etag = '"%s"' % md5.new(response.content).hexdigest()
+                etag = '"%s"' % md5_constructor(response.content).hexdigest()
             if response.status_code >= 200 and response.status_code < 300 and request.META.get('HTTP_IF_NONE_MATCH') == etag:
                 cookies = response.cookies
                 response = http.HttpResponseNotModified()

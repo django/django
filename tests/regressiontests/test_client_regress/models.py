@@ -1,12 +1,10 @@
 """
 Regression tests for the Test Client, especially the customized assertions.
-
 """
+
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.core.exceptions import SuspiciousOperation
-import os
-import sha
 
 class AssertContainsTests(TestCase):
     def test_contains(self):
@@ -24,7 +22,7 @@ class AssertContainsTests(TestCase):
             self.assertNotContains(response, 'once')
         except AssertionError, e:
             self.assertEquals(str(e), "Response should not contain 'once'")
-            
+
         try:
             self.assertContains(response, 'never', 1)
         except AssertionError, e:
@@ -287,7 +285,7 @@ class URLEscapingTests(TestCase):
 
 class ExceptionTests(TestCase):
     fixtures = ['testdata.json']
-    
+
     def test_exception_cleared(self):
         "#5836 - A stale user exception isn't re-raised by the test client."
 
@@ -300,7 +298,7 @@ class ExceptionTests(TestCase):
             pass
 
         # At this point, an exception has been raised, and should be cleared.
-        
+
         # This next operation should be successful; if it isn't we have a problem.
         login = self.client.login(username='staff', password='password')
         self.failUnless(login, 'Could not log in')

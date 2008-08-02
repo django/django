@@ -4,13 +4,14 @@ step and storing the form's state as HTML hidden fields so that no state is
 stored on the server side.
 """
 
+import cPickle as pickle
+
 from django import forms
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-import cPickle as pickle
-import md5
+from django.utils.hashcompat import md5_constructor
 
 class FormWizard(object):
     # Dictionary of extra template context variables.
@@ -150,7 +151,7 @@ class FormWizard(object):
         # Use HIGHEST_PROTOCOL because it's the most efficient. It requires
         # Python 2.3, but Django requires 2.3 anyway, so that's OK.
         pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
-        return md5.new(pickled).hexdigest()
+        return md5_constructor(pickled).hexdigest()
 
     def determine_step(self, request, *args, **kwargs):
         """

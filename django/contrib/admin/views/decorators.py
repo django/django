@@ -1,5 +1,4 @@
 import base64
-import md5
 import cPickle as pickle
 try:
     from functools import wraps
@@ -12,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render_to_response
 from django.utils.translation import ugettext_lazy, ugettext as _
+from django.utils.hashcompat import md5_constructor
 
 ERROR_MESSAGE = ugettext_lazy("Please enter a correct username and password. Note that both fields are case-sensitive.")
 LOGIN_FORM_KEY = 'this_is_the_login_form'
@@ -35,13 +35,13 @@ def _display_login_form(request, error_message=''):
 
 def _encode_post_data(post_data):
     pickled = pickle.dumps(post_data)
-    pickled_md5 = md5.new(pickled + settings.SECRET_KEY).hexdigest()
+    pickled_md5 = md5_constructor(pickled + settings.SECRET_KEY).hexdigest()
     return base64.encodestring(pickled + pickled_md5)
 
 def _decode_post_data(encoded_data):
     encoded_data = base64.decodestring(encoded_data)
     pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
-    if md5.new(pickled + settings.SECRET_KEY).hexdigest() != tamper_check:
+    if md5_constructor(pickled + settings.SECRET_KEY).hexdigest() != tamper_check:
         from django.core.exceptions import SuspiciousOperation
         raise SuspiciousOperation, "User may have tampered with session cookie."
     return pickle.loads(pickled)
@@ -87,7 +87,7 @@ def staff_member_required(view_func):
                 if len(users) == 1:
                     message = _("Your e-mail address is not your username. Try '%s' instead.") % users[0].username
                 else:
-                    # Either we cannot find the user, or if more than 1 
+                    # Either we cannot find the user, or if more than 1
                     # we cannot guess which user is the correct one.
                     message = _("Usernames cannot contain the '@' character.")
             return _display_login_form(request, message)
