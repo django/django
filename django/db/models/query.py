@@ -757,22 +757,6 @@ class EmptyQuerySet(QuerySet):
         yield iter([]).next()
 
 
-# QOperator, QNot, QAnd and QOr are temporarily retained for backwards
-# compatibility. All the old functionality is now part of the 'Q' class.
-class QOperator(Q):
-    def __init__(self, *args, **kwargs):
-        warnings.warn('Use Q instead of QOr, QAnd or QOperation.',
-                DeprecationWarning, stacklevel=2)
-        super(QOperator, self).__init__(*args, **kwargs)
-
-QOr = QAnd = QOperator
-
-
-def QNot(q):
-    warnings.warn('Use ~q instead of QNot(q)', DeprecationWarning, stacklevel=2)
-    return ~q
-
-
 def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
                    requested=None):
     """

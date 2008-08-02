@@ -137,12 +137,3 @@ Attributes
 ``number`` -- The 1-based page number for this page.
 
 ``paginator`` -- The associated ``Paginator`` object.
-
-The legacy ``ObjectPaginator`` class
-====================================
-
-The ``Paginator`` and ``Page`` classes are new in the Django development
-version, as of revision 7306. In previous versions, Django provided an
-``ObjectPaginator`` class that offered similar functionality but wasn't as
-convenient. This class still exists, for backwards compatibility, but Django
-now issues a ``DeprecationWarning`` if you try to use it.

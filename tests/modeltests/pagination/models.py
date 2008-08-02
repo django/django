@@ -4,11 +4,6 @@
 Django provides a framework for paginating a list of objects in a few lines
 of code. This is often useful for dividing search results or long lists of
 objects into easily readable pages.
-
-In Django 0.96 and earlier, a single ObjectPaginator class implemented this
-functionality. In the Django development version, the behavior is split across
-two classes -- Paginator and Page -- that are more easier to use. The legacy
-ObjectPaginator class is deprecated.
 """
 
 from django.db import models
@@ -27,9 +22,9 @@ __test__ = {'API_TESTS':"""
 ...     a = Article(headline='Article %s' % x, pub_date=datetime(2005, 7, 29))
 ...     a.save()
 
-####################################
-# New/current API (Paginator/Page) #
-####################################
+##################
+# Paginator/Page #
+##################
 
 >>> from django.core.paginator import Paginator
 >>> paginator = Paginator(Article.objects.all(), 5)
@@ -165,89 +160,6 @@ True
 [1, 2, 3, 4, 5]
 
 
-################################
-# Legacy API (ObjectPaginator) #
-################################
-
-# Don't print out the deprecation warnings during testing.
->>> from warnings import filterwarnings
->>> filterwarnings("ignore")
-
->>> from django.core.paginator import ObjectPaginator, EmptyPage
->>> paginator = ObjectPaginator(Article.objects.all(), 5)
->>> paginator.hits
-9
->>> paginator.pages
-2
->>> paginator.page_range
-[1, 2]
-
-# Get the first page.
->>> paginator.get_page(0)
-[<Article: Article 1>, <Article: Article 2>, <Article: Article 3>, <Article: Article 4>, <Article: Article 5>]
->>> paginator.has_next_page(0)
-True
->>> paginator.has_previous_page(0)
-False
->>> paginator.first_on_page(0)
-1
->>> paginator.last_on_page(0)
-5
-
-# Get the second page.
->>> paginator.get_page(1)
-[<Article: Article 6>, <Article: Article 7>, <Article: Article 8>, <Article: Article 9>]
->>> paginator.has_next_page(1)
-False
->>> paginator.has_previous_page(1)
-True
->>> paginator.first_on_page(1)
-6
->>> paginator.last_on_page(1)
-9
-
-# Invalid pages raise EmptyPage.
->>> paginator.get_page(-1)
-Traceback (most recent call last):
-...
-EmptyPage: ...
->>> paginator.get_page(2)
-Traceback (most recent call last):
-...
-EmptyPage: ...
-
-# Empty paginators with allow_empty_first_page=True.
->>> paginator = ObjectPaginator(Article.objects.filter(id=0), 5)
->>> paginator.count
-0
->>> paginator.num_pages
-1
->>> paginator.page_range
-[1]
-
-# ObjectPaginator can be passed lists too.
->>> paginator = ObjectPaginator([1, 2, 3], 5)
->>> paginator.hits
-3
->>> paginator.pages
-1
->>> paginator.page_range
-[1]
-
-
-# ObjectPaginator can be passed other objects without a count() method.
->>> class Container:
-...     def __len__(self):
-...         return 42
->>> paginator = ObjectPaginator(Container(), 10)
->>> paginator.hits
-42
->>> paginator.pages
-5
->>> paginator.page_range
-[1, 2, 3, 4, 5]
-
-
 ##################
 # Orphan support #
 ##################
@@ -262,17 +174,7 @@ EmptyPage: ...
 1
 
 # With orphans only set to 1, we should get two pages.
->>> paginator = ObjectPaginator(Article.objects.all(), 10, orphans=1)
+>>> paginator = Paginator(Article.objects.all(), 10, orphans=1)
 >>> paginator.num_pages
-2
-
-# LEGACY: With orphans set to 3 and 10 items per page, we should get all 12 items on a single page.
->>> paginator = ObjectPaginator(Article.objects.all(), 10, orphans=3)
->>> paginator.pages
-1
-
-# LEGACY: With orphans only set to 1, we should get two pages.
->>> paginator = ObjectPaginator(Article.objects.all(), 10, orphans=1)
->>> paginator.pages
 2
 """}

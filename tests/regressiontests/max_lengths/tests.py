@@ -13,7 +13,7 @@ class MaxLengthArgumentsTests(TestCase):
         self.verify_max_length(PersonWithDefaultMaxLengths, 'homepage', 200)
         self.verify_max_length(PersonWithDefaultMaxLengths, 'avatar', 100)
 
-    def test_custom_maxlengths(self):
+    def test_custom_max_lengths(self):
         self.verify_max_length(PersonWithCustomMaxLengths, 'email', 384)
         self.verify_max_length(PersonWithCustomMaxLengths, 'vcard', 1024)
         self.verify_max_length(PersonWithCustomMaxLengths, 'homepage', 256)

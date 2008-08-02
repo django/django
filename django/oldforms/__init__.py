@@ -5,7 +5,6 @@ from django.utils.safestring import mark_safe
 from django.conf import settings
 from django.utils.translation import ugettext, ungettext
 from django.utils.encoding import smart_unicode, force_unicode
-from django.utils.maxlength import LegacyMaxlength
 
 FORM_FIELD_ID_PREFIX = 'id_'
 
@@ -304,9 +303,6 @@ class FormField(object):
     Subclasses should also implement a render(data) method, which is responsible
     for rending the form field in XHTML.
     """
-    # Provide backwards compatibility for the maxlength attribute and
-    # argument for this class and all subclasses.
-    __metaclass__ = LegacyMaxlength
 
     def __str__(self):
         return unicode(self).encode('utf-8')

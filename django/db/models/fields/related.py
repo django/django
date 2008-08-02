@@ -626,11 +626,6 @@ class ForeignKey(RelatedField, Field):
             to_field = to_field or to._meta.pk.name
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
 
-        if 'edit_inline_type' in kwargs:
-            import warnings
-            warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.", DeprecationWarning)
-            kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
-
         kwargs['rel'] = rel_class(to, to_field,
             num_in_admin=kwargs.pop('num_in_admin', 3),
             min_num_in_admin=kwargs.pop('min_num_in_admin', None),

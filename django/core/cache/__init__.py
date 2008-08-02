@@ -30,22 +30,12 @@ BACKENDS = {
     'dummy': 'dummy',
 }
 
-DEPRECATED_BACKENDS = {
-    # deprecated backend --> replacement module
-    'simple': 'locmem',
-}
-
 def get_cache(backend_uri):
     if backend_uri.find(':') == -1:
         raise InvalidCacheBackendError, "Backend URI must start with scheme://"
     scheme, rest = backend_uri.split(':', 1)
     if not rest.startswith('//'):
         raise InvalidCacheBackendError, "Backend URI must start with scheme://"
-    if scheme in DEPRECATED_BACKENDS:
-        import warnings
-        warnings.warn("'%s' backend is deprecated. Use '%s' instead." % 
-            (scheme, DEPRECATED_BACKENDS[scheme]), DeprecationWarning)
-        scheme = DEPRECATED_BACKENDS[scheme]
 
     host = rest[2:]
     qpos = rest.find('?')

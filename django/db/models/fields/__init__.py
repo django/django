@@ -22,7 +22,6 @@ from django.utils.itercompat import tee
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
-from django.utils.maxlength import LegacyMaxlength
 from django.utils import datetime_safe
 
 class NOT_PROVIDED:
@@ -62,10 +61,6 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
 #     getattr(obj, opts.pk.attname)
 
 class Field(object):
-    # Provide backwards compatibility for the maxlength attribute and
-    # argument for this class and all subclasses.
-    __metaclass__ = LegacyMaxlength
-
     # Designates whether empty strings fundamentally are allowed at the
     # database level.
     empty_strings_allowed = True

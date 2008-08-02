@@ -5,9 +5,7 @@ Add SubfieldBase as the __metaclass__ for your Field subclass, implement
 to_python() and the other necessary methods and everything will work seamlessly.
 """
 
-from django.utils.maxlength import LegacyMaxlength
-
-class SubfieldBase(LegacyMaxlength):
+class SubfieldBase(type):
     """
     A metaclass for custom Field subclasses. This ensures the model's attribute
     has the descriptor protocol attached to it.
@@ -50,4 +48,3 @@ def make_contrib(func=None):
         setattr(cls, self.name, Creator(self))
 
     return contribute_to_class
-

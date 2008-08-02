@@ -65,10 +65,10 @@ you've configured your cache; see the `cache documentation`_ for details.
 .. note::
 
     You should probably only use cache-based sessions if you're using the
-    memcached cache backend. The local memory and simple cache backends
-    don't retain data long enough to be good choices, and it'll be faster
-    to use file or database sessions directly instead of sending everything
-    through the file or database cache backends.
+    Memcached cache backend. The local-memory cache backend doesn't retain data
+    long enough to be a good choice, and it'll be faster to use file or
+    database sessions directly instead of sending everything through the file
+    or database cache backends.
 
 Using sessions in views
 =======================

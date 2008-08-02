@@ -144,10 +144,6 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 (in characters) of the field. The max_length is enforced at the database level
 and in Django's validation.
 
-Django veterans: Note that the argument is now called ``max_length`` to
-provide consistency throughout Django. There is full legacy support for
-the old ``maxlength`` argument, but ``max_length`` is preferred.
-
 ``CommaSeparatedIntegerField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

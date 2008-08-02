@@ -159,19 +159,6 @@ cache is multi-process and thread-safe. To use it, set ``CACHE_BACKEND`` to
 
     CACHE_BACKEND = 'locmem:///'
 
-Simple caching (for development)
---------------------------------
-
-A simple, single-process memory cache is available as ``"simple:///"``. This
-merely saves cached data in-process, which means it should only be used in
-development or testing environments. For example::
-
-    CACHE_BACKEND = 'simple:///'
-
-**New in Django development version:** This cache backend is deprecated and
-will be removed in a future release. New code should use the ``locmem`` backend
-instead.
-
 Dummy caching (for development)
 -------------------------------
 
