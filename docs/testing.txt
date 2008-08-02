@@ -25,13 +25,6 @@ The best part is, it's really easy.
 This document is split into two primary sections. First, we explain how to
 write tests with Django. Then, we explain how to run them.
 
-.. admonition:: Note
-
-    This testing framework is currently under development. It may change
-    slightly before the next official Django release.
-
-    (That's *no* excuse not to write tests, though!)
-
 Writing tests
 =============
 
@@ -815,12 +808,12 @@ In order to provide a reliable URL space for your test,
 configuration for the duration of the execution of a test suite.
 If your ``TestCase`` instance defines an ``urls`` attribute, the
 ``TestCase`` will use the value of that attribute as the ``ROOT_URLCONF``
-for the duration of that test. 
+for the duration of that test.
 
 For example::
 
     from django.test import TestCase
-    
+
     class TestMyViews(TestCase):
         urls = 'myapp.test_urls'
 
