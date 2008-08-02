@@ -12,7 +12,7 @@ def autodiscover():
     from django.conf import settings
     for app in settings.INSTALLED_APPS:
         try:
-            imp.find_module("admin", __import__(app, fromlist=[app.split(".")[-1]]).__path__)
+            imp.find_module("admin", __import__(app, {}, {}, [app.split(".")[-1]]).__path__)
         except ImportError:
             # there is no app admin.py, skip it
             continue
