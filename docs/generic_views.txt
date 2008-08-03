@@ -83,24 +83,29 @@ and issuing a redirect.
 ``django.views.generic.simple.direct_to_template``
 --------------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 Renders a given template, passing it a ``{{ params }}`` template variable,
 which is a dictionary of the parameters captured in the URL.
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``template``: The full name of a template to use.
+``template``
+    The full name of a template to use.
 
-**Optional arguments:**
+Optional arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+``extra_context``
+    A dictionary of values to add to the template context. By default, this is
+    an empty dictionary. If a value in the dictionary is callable, the generic
+    view will call it just before rendering the template.
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+``mimetype``
+    The MIME type to use for the resulting document. Defaults to the value of
+    the ``DEFAULT_CONTENT_TYPE`` setting.
 
 **Example:**
 
@@ -118,7 +123,8 @@ variable ``{{ params.id }}`` that is set to ``15``.
 ``django.views.generic.simple.redirect_to``
 -------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 Redirects to a given URL.
 
@@ -127,10 +133,12 @@ interpolated against the parameters captured in the URL.
 
 If the given URL is ``None``, Django will return an ``HttpResponseGone`` (410).
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``url``: The URL to redirect to, as a string. Or ``None`` to raise a 410
-      (Gone) HTTP error.
+``url``
+    The URL to redirect to, as a string. Or ``None`` to raise a 410 (Gone)
+    HTTP error.
 
 **Example:**
 
@@ -155,57 +163,69 @@ are views for displaying drilldown pages for date-based data.
 ``django.views.generic.date_based.archive_index``
 -------------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 A top-level index page showing the "latest" objects, by date. Objects with
 a date in the *future* are not included unless you set ``allow_future`` to
 ``True``.
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``queryset``: A ``QuerySet`` of objects for which the archive serves.
+``queryset``
+    A ``QuerySet`` of objects for which the archive serves.
 
-    * ``date_field``: The name of the ``DateField`` or ``DateTimeField`` in
-      the ``QuerySet``'s model that the date-based archive should use to
-      determine the objects on the page.
+``date_field``
+    The name of the ``DateField`` or ``DateTimeField`` in the ``QuerySet``'s
+    model that the date-based archive should use to determine the objects on
+    the page.
 
-**Optional arguments:**
+Optional arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``num_latest``: The number of latest objects to send to the template
-      context. By default, it's 15.
+``num_latest``
+    The number of latest objects to send to the template context. By default,
+    it's 15.
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+``template_name``
+    The full name of a template to use in rendering the page. This lets you
+    override the default template name (see below).
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+``template_loader``
+    The template loader to use when loading the template. By default, it's
+    ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+``extra_context``
+    A dictionary of values to add to the template context. By default, this is
+    an empty dictionary. If a value in the dictionary is callable, the generic
+    view will call it just before rendering the template.
 
-    * ``allow_empty``: A boolean specifying whether to display the page if no
-      objects are available. If this is ``False`` and no objects are available,
-      the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``True``.
+``allow_empty``
+    A boolean specifying whether to display the page if no objects are
+    available. If this is ``False`` and no objects are available, the view will
+    raise a 404 instead of displaying an empty page. By default, this is
+    ``True``.
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template. See the `RequestContext docs`_.
+``context_processors``
+    A list of template-context processors to apply to the view's template. See
+    the `RequestContext docs`_.
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+``mimetype``
+    The MIME type to use for the resulting document. Defaults to the value of
+    the ``DEFAULT_CONTENT_TYPE`` setting.
 
-    * ``allow_future``: A boolean specifying whether to include "future"
-      objects on this page, where "future" means objects in which the field
-      specified in ``date_field`` is greater than the current date/time. By
-      default, this is ``False``.
+``allow_future``
+    A boolean specifying whether to include "future" objects on this page,
+    where "future" means objects in which the field specified in ``date_field``
+    is greater than the current date/time. By default, this is ``False``.
 
-    * **New in Django development version:** ``template_object_name``:
-      Designates the name of the template variable to use in the template
-      context. By default, this is ``'latest'``.
+``template_object_name`` (**New in Django development version**)
+    Designates the name of the template variable to use in the template
+    context. By default, this is ``'latest'``.
 
-**Template name:**
+Template name
+~~~~~~~~~~~~~
 
 If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_archive.html`` by default, where:
@@ -217,365 +237,435 @@ If ``template_name`` isn't specified, this view will use the template
       your model's app. For example, if your model lives in
       ``apps/blog/models.py``, that'd be ``blog``.
 
-**Template context:**
+Template context
+~~~~~~~~~~~~~~~~
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``date_list``: A list of ``datetime.date`` objects representing all
-      years that have objects available according to ``queryset``. These are
-      ordered in reverse. This is equivalent to
-      ``queryset.dates(date_field, 'year')[::-1]``.
+``date_list``
+    A list of ``datetime.date`` objects representing all years that have
+    objects available according to ``queryset``. These are ordered in reverse.
+    This is equivalent to ``queryset.dates(date_field, 'year')[::-1]``.
 
-    * ``latest``: The ``num_latest`` objects in the system, ordered descending
-      by ``date_field``. For example, if ``num_latest`` is ``10``, then
-      ``latest`` will be a list of the latest 10 objects in ``queryset``.
+``latest``
+    The ``num_latest`` objects in the system, ordered descending by
+    ``date_field``. For example, if ``num_latest`` is ``10``, then ``latest``
+    will be a list of the latest 10 objects in ``queryset``.
 
-      **New in Django development version:** This variable's name depends on
-      the ``template_object_name`` parameter, which is ``'latest'`` by default.
-      If ``template_object_name`` is ``'foo'``, this variable's name will be
-      ``foo``.
+    **New in Django development version:** This variable's name depends on the
+    ``template_object_name`` parameter, which is ``'latest'`` by default.
+    If ``template_object_name`` is ``'foo'``, this variable's name will be
+    ``foo``.
 
 .. _RequestContext docs: ../templates_python/#subclassing-context-requestcontext
 
 ``django.views.generic.date_based.archive_year``
 ------------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 A yearly archive page showing all available months in a given year. Objects
 with a date in the *future* are not displayed unless you set ``allow_future``
 to ``True``.
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``year``: The four-digit year for which the archive serves.
+``year``
+    The four-digit year for which the archive serves.
 
-    * ``queryset``: A ``QuerySet`` of objects for which the archive serves.
+``queryset``
+    A ``QuerySet`` of objects for which the archive serves.
 
-    * ``date_field``: The name of the ``DateField`` or ``DateTimeField`` in
-      the ``QuerySet``'s model that the date-based archive should use to
-      determine the objects on the page.
+``date_field``
+    The name of the ``DateField`` or ``DateTimeField`` in the ``QuerySet``'s
+    model that the date-based archive should use to determine the objects on
+    the page.
 
-**Optional arguments:**
+Optional arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+``template_name``
+    The full name of a template to use in rendering the page. This lets you
+    override the default template name (see below).
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+``template_loader``
+    The template loader to use when loading the template. By default, it's
+    ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+``extra_context``
+    A dictionary of values to add to the template context. By default, this is
+    an empty dictionary. If a value in the dictionary is callable, the generic
+    view will call it just before rendering the template.
 
-    * ``allow_empty``: A boolean specifying whether to display the page if no
-      objects are available. If this is ``False`` and no objects are available,
-      the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``False``.
+``allow_empty``
+    A boolean specifying whether to display the page if no objects are
+    available. If this is ``False`` and no objects are available, the view will
+    raise a 404 instead of displaying an empty page. By default, this is
+    ``False``.
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template. See the `RequestContext docs`_.
+``context_processors``
+    A list of template-context processors to apply to the view's template. See
+    the `RequestContext docs`_.
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``. The
-      view will append ``'_list'`` to the value of this parameter in
-      determining the variable's name.
+``template_object_name``
+    Designates the name of the template variable to use in the template
+    context. By default, this is ``'object'``. The view will append ``'_list'``
+    to the value of this parameter in determining the variable's name.
 
-    * ``make_object_list``: A boolean specifying whether to retrieve the full
-      list of objects for this year and pass those to the template. If ``True``,
-      this list of objects will be made available to the template as
-      ``object_list``. (The name ``object_list`` may be different; see the docs
-      for ``object_list`` in the "Template context" section below.) By default,
-      this is ``False``.
+``make_object_list``
+    A boolean specifying whether to retrieve the full  list of objects for this
+    year and pass those to the template. If ``True``, this list of objects will
+    be made available to the template as ``object_list``. (The name
+    ``object_list`` may be different; see the docs for ``object_list`` in the
+    "Template context" section below.) By default, this is ``False``.
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+``mimetype``
+    The MIME type to use for the resulting document. Defaults to the value of
+    the ``DEFAULT_CONTENT_TYPE`` setting.
 
-    * ``allow_future``: A boolean specifying whether to include "future"
-      objects on this page, where "future" means objects in which the field
-      specified in ``date_field`` is greater than the current date/time. By
-      default, this is ``False``.
+``allow_future``
+    A boolean specifying whether to include "future" objects on this page,
+    where "future" means objects in which the field specified in ``date_field``
+    is greater than the current date/time. By default, this is ``False``.
 
-**Template name:**
+Template name
+~~~~~~~~~~~~~
 
 If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_archive_year.html`` by default.
 
-**Template context:**
+Template context
+~~~~~~~~~~~~~~~~
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``date_list``: A list of ``datetime.date`` objects representing all
-      months that have objects available in the given year, according to
-      ``queryset``, in ascending order.
+``date_list``
+    A list of ``datetime.date`` objects representing all months that have
+    objects available in the given year, according to ``queryset``, in
+    ascending order.
 
-    * ``year``: The given year, as a four-character string.
+``year``
+    The given year, as a four-character string.
 
-    * ``object_list``: If the ``make_object_list`` parameter is ``True``, this
-      will be set to a list of objects available for the given year, ordered by
-      the date field. This variable's name depends on the
-      ``template_object_name`` parameter, which is ``'object'`` by default. If
-      ``template_object_name`` is ``'foo'``, this variable's name will be
-      ``foo_list``.
+``object_list``
+    If the ``make_object_list`` parameter is ``True``, this will be set to a
+    list of objects available for the given year, ordered by the date field.
+    This variable's name depends on the ``template_object_name`` parameter,
+    which is ``'object'`` by default. If ``template_object_name`` is ``'foo'``,
+    this variable's name will be ``foo_list``.
 
-      If ``make_object_list`` is ``False``, ``object_list`` will be passed to
-      the template as an empty list.
+    If ``make_object_list`` is ``False``, ``object_list`` will be passed to the
+    template as an empty list.
 
 ``django.views.generic.date_based.archive_month``
 -------------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 A monthly archive page showing all objects in a given month. Objects with a
 date in the *future* are not displayed unless you set ``allow_future`` to
 ``True``.
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``year``: The four-digit year for which the archive serves (a string).
+``year``
+    The four-digit year for which the archive serves (a string).
 
-    * ``month``: The month for which the archive serves, formatted according to
-      the ``month_format`` argument.
+``month``
+    The month for which the archive serves, formatted according to the
+    ``month_format`` argument.
 
-    * ``queryset``: A ``QuerySet`` of objects for which the archive serves.
+``queryset``
+    A ``QuerySet`` of objects for which the archive serves.
 
-    * ``date_field``: The name of the ``DateField`` or ``DateTimeField`` in
-      the ``QuerySet``'s model that the date-based archive should use to
-      determine the objects on the page.
+``date_field``
+    The name of the ``DateField`` or ``DateTimeField`` in the ``QuerySet``'s
+    model that the date-based archive should use to determine the objects on
+    the page.
 
-**Optional arguments:**
+Optional arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``month_format``: A format string that regulates what format the
-      ``month`` parameter uses. This should be in the syntax accepted by
-      Python's ``time.strftime``. (See the `strftime docs`_.) It's set to
-      ``"%b"`` by default, which is a three-letter month abbreviation. To
-      change it to use numbers, use ``"%m"``.
+``month_format``
+    A format string that regulates what format the ``month`` parameter uses.
+    This should be in the syntax accepted by Python's ``time.strftime``. (See
+    the `strftime docs`_.) It's set to ``"%b"`` by default, which is a three-
+    letter month abbreviation. To change it to use numbers, use ``"%m"``.
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+``template_name``
+    The full name of a template to use in rendering the page. This lets you
+    override the default template name (see below).
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+``template_loader``
+    The template loader to use when loading the template. By default, it's
+    ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+``extra_context``
+    A dictionary of values to add to the template context. By default, this is
+    an empty dictionary. If a value in the dictionary is callable, the generic
+    view will call it just before rendering the template.
 
-    * ``allow_empty``: A boolean specifying whether to display the page if no
-      objects are available. If this is ``False`` and no objects are available,
-      the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``False``.
+``allow_empty``
+    A boolean specifying whether to display the page if no objects are
+    available. If this is ``False`` and no objects are available, the view will
+    raise a 404 instead of displaying an empty page. By default, this is
+    ``False``.
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template. See the `RequestContext docs`_.
+``context_processors``
+    A list of template-context processors to apply to the view's template. See
+    the `RequestContext docs`_.
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``. The
-      view will append ``'_list'`` to the value of this parameter in
-      determining the variable's name.
+``template_object_name``
+    Designates the name of the template variable to use in the template
+    context. By default, this is ``'object'``. The view will append ``'_list'``
+    to the value of this parameter in determining the variable's name.
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+``mimetype``
+    The MIME type to use for the resulting document. Defaults to the value of
+    the ``DEFAULT_CONTENT_TYPE`` setting.
 
-    * ``allow_future``: A boolean specifying whether to include "future"
-      objects on this page, where "future" means objects in which the field
-      specified in ``date_field`` is greater than the current date/time. By
-      default, this is ``False``.
+``allow_future``
+    A boolean specifying whether to include "future" objects on this page,
+    where "future" means objects in which the field specified in ``date_field``
+    is greater than the current date/time. By default, this is ``False``.
 
-**Template name:**
+Template name
+~~~~~~~~~~~~~
 
 If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_archive_month.html`` by default.
 
-**Template context:**
+Template context
+~~~~~~~~~~~~~~~~
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``month``: A ``datetime.date`` object representing the given month.
+``month``
+    A ``datetime.date`` object representing the given month.
 
-    * ``next_month``: A ``datetime.date`` object representing the first day of
-      the next month. If the next month is in the future, this will be
-      ``None``.
+``next_month``
+    A ``datetime.date`` object representing the first day of the next month. If
+     the next month is in the future, this will be ``None``.
 
-    * ``previous_month``: A ``datetime.date`` object representing the first day
-      of the previous month. Unlike ``next_month``, this will never be
-      ``None``.
+``previous_month``
+    A ``datetime.date`` object representing the first day of the previous
+    month. Unlike ``next_month``, this will never be ``None``.
 
-    * ``object_list``: A list of objects available for the given month. This
-      variable's name depends on the ``template_object_name`` parameter, which
-      is ``'object'`` by default. If ``template_object_name`` is ``'foo'``,
-      this variable's name will be ``foo_list``.
+``object_list``
+    A list of objects available for the given month. This variable's name
+    depends on the ``template_object_name`` parameter, which is ``'object'`` by
+    default. If ``template_object_name`` is ``'foo'``, this variable's name
+    will be ``foo_list``.
 
 .. _strftime docs: http://www.python.org/doc/current/lib/module-time.html#l2h-1941
 
 ``django.views.generic.date_based.archive_week``
 ------------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 A weekly archive page showing all objects in a given week. Objects with a date
 in the *future* are not displayed unless you set ``allow_future`` to ``True``.
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``year``: The four-digit year for which the archive serves (a string).
+``year``
+    The four-digit year for which the archive serves (a string).
 
-    * ``week``: The week of the year for which the archive serves (a string).
-      Weeks start with Sunday.
+``week``
+    The week of the year for which the archive serves (a string). Weeks start
+    with Sunday.
 
-    * ``queryset``: A ``QuerySet`` of objects for which the archive serves.
+``queryset``
+    A ``QuerySet`` of objects for which the archive serves.
 
-    * ``date_field``: The name of the ``DateField`` or ``DateTimeField`` in
-      the ``QuerySet``'s model that the date-based archive should use to
-      determine the objects on the page.
+``date_field``
+    The name of the ``DateField`` or ``DateTimeField`` in the ``QuerySet``'s
+    model that the date-based archive should use to determine the objects on
+    the page.
 
-**Optional arguments:**
+Optional arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+``template_name``
+    The full name of a template to use in rendering the page. This lets you
+    override the default template name (see below).
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+``template_loader``
+    The template loader to use when loading the template. By default, it's
+    ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+``extra_context``
+    A dictionary of values to add to the template context. By default, this is
+    an empty dictionary. If a value in the dictionary is callable, the generic
+    view will call it just before rendering the template.
 
-    * ``allow_empty``: A boolean specifying whether to display the page if no
-      objects are available. If this is ``False`` and no objects are available,
-      the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``True``.
+``allow_empty``
+    A boolean specifying whether to display the page if no objects are
+    available. If this is ``False`` and no objects are available, the view will
+    raise a 404 instead of displaying an empty page. By default, this is
+    ``True``.
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template. See the `RequestContext docs`_.
+``context_processors``
+    A list of template-context processors to apply to the view's template. See
+    the `RequestContext docs`_.
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``. The
-      view will append ``'_list'`` to the value of this parameter in
-      determining the variable's name.
+``template_object_name``
+    Designates the name of the template variable to use in the template
+    context. By default, this is ``'object'``. The view will append ``'_list'``
+    to the value of this parameter in determining the variable's name.
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+``mimetype``
+    The MIME type to use for the resulting document. Defaults to the value of
+    the ``DEFAULT_CONTENT_TYPE`` setting.
 
-    * ``allow_future``: A boolean specifying whether to include "future"
-      objects on this page, where "future" means objects in which the field
-      specified in ``date_field`` is greater than the current date/time. By
-      default, this is ``False``.
+``allow_future``
+    A boolean specifying whether to include "future" objects on this page,
+    where "future" means objects in which the field specified in ``date_field``
+    is greater than the current date/time. By default, this is ``False``.
 
-**Template name:**
+Template name
+~~~~~~~~~~~~~
 
 If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_archive_week.html`` by default.
 
-**Template context:**
+Template context
+~~~~~~~~~~~~~~~~
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``week``: A ``datetime.date`` object representing the first day of the
-      given week.
+``week``
+    A ``datetime.date`` object representing the first day of the given week.
 
-    * ``object_list``: A list of objects available for the given week. This
-      variable's name depends on the ``template_object_name`` parameter, which
-      is ``'object'`` by default. If ``template_object_name`` is ``'foo'``,
-      this variable's name will be ``foo_list``.
+``object_list``
+    A list of objects available for the given week. This variable's name
+    depends on the ``template_object_name`` parameter, which is ``'object'`` by
+    default. If ``template_object_name`` is ``'foo'``, this variable's name
+    will be ``foo_list``.
 
 ``django.views.generic.date_based.archive_day``
 -----------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 A day archive page showing all objects in a given day. Days in the future throw
 a 404 error, regardless of whether any objects exist for future days, unless
 you set ``allow_future`` to ``True``.
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``year``: The four-digit year for which the archive serves (a string).
+``year``
+    The four-digit year for which the archive serves (a string).
 
-    * ``month``: The month for which the archive serves, formatted according to
-      the ``month_format`` argument.
+``month``
+    The month for which the archive serves, formatted according to the
+    ``month_format`` argument.
 
-    * ``day``: The day for which the archive serves, formatted according to the
-      ``day_format`` argument.
+``day``
+    The day for which the archive serves, formatted according to the
+    ``day_format`` argument.
 
-    * ``queryset``: A ``QuerySet`` of objects for which the archive serves.
+``queryset``
+    A ``QuerySet`` of objects for which the archive serves.
 
-    * ``date_field``: The name of the ``DateField`` or ``DateTimeField`` in
-      the ``QuerySet``'s model that the date-based archive should use to
-      determine the objects on the page.
+``date_field``
+    The name of the ``DateField`` or ``DateTimeField`` in the ``QuerySet``'s
+    model that the date-based archive should use to determine the objects on
+    the page.
 
-**Optional arguments:**
+Optional arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``month_format``: A format string that regulates what format the
-      ``month`` parameter uses. This should be in the syntax accepted by
-      Python's ``time.strftime``. (See the `strftime docs`_.) It's set to
-      ``"%b"`` by default, which is a three-letter month abbreviation. To
-      change it to use numbers, use ``"%m"``.
+``month_format``
+    A format string that regulates what format the ``month`` parameter uses.
+    This should be in the syntax accepted by Python's ``time.strftime``. (See
+    the `strftime docs`_.) It's set to ``"%b"`` by default, which is a three-
+    letter month abbreviation. To change it to use numbers, use ``"%m"``.
 
-    * ``day_format``: Like ``month_format``, but for the ``day`` parameter.
-      It defaults to ``"%d"`` (day of the month as a decimal number, 01-31).
+``day_format``
+    Like ``month_format``, but for the ``day`` parameter. It defaults to
+    ``"%d"`` (day of the month as a decimal number, 01-31).
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+``template_name``
+    The full name of a template to use in rendering the page. This lets you
+    override the default template name (see below).
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+``template_loader``
+    The template loader to use when loading the template. By default, it's
+    ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+``extra_context``
+    A dictionary of values to add to the template context. By default, this is
+    an empty dictionary. If a value in the dictionary is callable, the generic
+    view will call it just before rendering the template.
 
-    * ``allow_empty``: A boolean specifying whether to display the page if no
-      objects are available. If this is ``False`` and no objects are available,
-      the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``False``.
+``allow_empty``
+    A boolean specifying whether to display the page if no objects are
+    available. If this is ``False`` and no objects are available, the view will
+    raise a 404 instead of displaying an empty page. By default, this is
+    ``False``.
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template. See the `RequestContext docs`_.
+``context_processors``
+    A list of template-context processors to apply to the view's template. See
+    the `RequestContext docs`_.
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``. The
-      view will append ``'_list'`` to the value of this parameter in
-      determining the variable's name.
+``template_object_name``
+     Designates the name of the template variable to use in the template
+     context. By default, this is ``'object'``. The view will append
+     ``'_list'`` to the value of this parameter in determining the variable's
+     name.
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+``mimetype``
+    The MIME type to use for the resulting document. Defaults to the value of
+    the ``DEFAULT_CONTENT_TYPE`` setting.
 
-    * ``allow_future``: A boolean specifying whether to include "future"
-      objects on this page, where "future" means objects in which the field
-      specified in ``date_field`` is greater than the current date/time. By
-      default, this is ``False``.
+``allow_future``
+    A boolean specifying whether to include "future" objects on this page,
+    where "future" means objects in which the field specified in ``date_field``
+    is greater than the current date/time. By default, this is ``False``.
 
-**Template name:**
+Template name
+~~~~~~~~~~~~~
 
 If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_archive_day.html`` by default.
 
-**Template context:**
+Template context
+~~~~~~~~~~~~~~~~
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``day``: A ``datetime.date`` object representing the given day.
+``day``
+    A ``datetime.date`` object representing the given day.
 
-    * ``next_day``: A ``datetime.date`` object representing the next day. If
-      the next day is in the future, this will be ``None``.
+``next_day``
+    A ``datetime.date`` object representing the next day. If the next day is in
+    the future, this will be ``None``.
 
-    * ``previous_day``: A ``datetime.date`` object representing the given day.
-      Unlike ``next_day``, this will never be ``None``.
+``previous_day``
+    A ``datetime.date`` object representing the given day. Unlike ``next_day``,
+    this will never be ``None``.
 
-    * ``object_list``: A list of objects available for the given day. This
-      variable's name depends on the ``template_object_name`` parameter, which
-      is ``'object'`` by default. If ``template_object_name`` is ``'foo'``,
-      this variable's name will be ``foo_list``.
+``object_list``
+    A list of objects available for the given day. This variable's name depends
+    on the ``template_object_name`` parameter, which is ``'object'`` by
+    default. If ``template_object_name`` is ``'foo'``, this variable's name
+    will be ``foo_list``.
 
 ``django.views.generic.date_based.archive_today``
 -------------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 A day archive page showing all objects for *today*. This is exactly the same as
 ``archive_day``, except the ``year``/``month``/``day`` arguments are not used,
@@ -584,95 +674,108 @@ and today's date is used instead.
 ``django.views.generic.date_based.object_detail``
 -------------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 A page representing an individual object. If the object has a date value in the
 future, the view will throw a 404 error by default, unless you set
 ``allow_future`` to ``True``.
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``year``: The object's four-digit year (a string).
+``year``
+    The object's four-digit year (a string).
 
-    * ``month``: The object's month , formatted according to the
-      ``month_format`` argument.
+``month``
+    The object's month , formatted according to the ``month_format`` argument.
 
-    * ``day``: The object's day , formatted according to the ``day_format``
-      argument.
+``day``
+    The object's day , formatted according to the ``day_format`` argument.
 
-    * ``queryset``: A ``QuerySet`` that contains the object.
+``queryset``
+    A ``QuerySet`` that contains the object.
 
-    * ``date_field``: The name of the ``DateField`` or ``DateTimeField`` in
-      the ``QuerySet``'s model that the generic view should use to look up the
-      object according to ``year``, ``month`` and ``day``.
+``date_field``
+    The name of the ``DateField`` or ``DateTimeField`` in the ``QuerySet``'s
+    model that the generic view should use to look up the object according to
+    ``year``, ``month`` and ``day``.
 
-    * Either ``object_id`` or (``slug`` *and* ``slug_field``) is required.
+Either ``object_id`` or (``slug`` *and* ``slug_field``) is required.
+    If you provide ``object_id``, it should be the value of the primary-key
+    field for the object being displayed on this page.
 
-      If you provide ``object_id``, it should be the value of the primary-key
-      field for the object being displayed on this page.
+    Otherwise, ``slug`` should be the slug of the given object, and
+    ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
+    model. By default, ``slug_field`` is ``'slug'``.
 
-      Otherwise, ``slug`` should be the slug of the given object, and
-      ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
-      model. By default, ``slug_field`` is ``'slug'``.
+Optional arguments
+~~~~~~~~~~~~~~~~~~
 
-**Optional arguments:**
+``month_format``
+    A format string that regulates what format the ``month`` parameter uses.
+    This should be in the syntax accepted by Python's ``time.strftime``. (See
+    the `strftime docs`_.) It's set to ``"%b"`` by default, which is a three-
+    letter month abbreviation. To change it to use numbers, use ``"%m"``.
 
-    * ``month_format``: A format string that regulates what format the
-      ``month`` parameter uses. This should be in the syntax accepted by
-      Python's ``time.strftime``. (See the `strftime docs`_.) It's set to
-      ``"%b"`` by default, which is a three-letter month abbreviation. To
-      change it to use numbers, use ``"%m"``.
+``day_format``
+    Like ``month_format``, but for the ``day`` parameter. It defaults to
+    ``"%d"`` (day of the month as a decimal number, 01-31).
 
-    * ``day_format``: Like ``month_format``, but for the ``day`` parameter.
-      It defaults to ``"%d"`` (day of the month as a decimal number, 01-31).
+``template_name``
+    The full name of a template to use in rendering the page. This lets you
+    override the default template name (see below).
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+``template_name_field``
+    The name of a field on the object whose value is the template name to use.
+    This lets you store template names in the data. In other words, if your
+    object has a field ``'the_template'`` that contains a string
+    ``'foo.html'``, and you set ``template_name_field`` to ``'the_template'``,
+    then the generic view for this object will use the template ``'foo.html'``.
 
-    * ``template_name_field``: The name of a field on the object whose value is
-      the template name to use. This lets you store template names in the data.
-      In other words, if your object has a field ``'the_template'`` that
-      contains a string ``'foo.html'``, and you set ``template_name_field`` to
-      ``'the_template'``, then the generic view for this object will use the
-      template ``'foo.html'``.
+    It's a bit of a brain-bender, but it's useful in some cases.
 
-      It's a bit of a brain-bender, but it's useful in some cases.
+``template_loader``
+    The template loader to use when loading the  template. By default, it's
+    ``django.template.loader``.
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+``extra_context``
+    A dictionary of values to add to the template context. By default, this is
+    an empty dictionary. If a value in the dictionary is callable, the generic
+    view will call it just before rendering the template.
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+``context_processors``
+    A list of template-context processors to apply to the view's template. See
+    the `RequestContext docs`_.
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template. See the `RequestContext docs`_.
+``template_object_name``
+    Designates the name of the template variable to use in the template
+    context. By default, this is ``'object'``.
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``.
+``mimetype``
+    The MIME type to use for the resulting document. Defaults to the value of
+    the ``DEFAULT_CONTENT_TYPE`` setting.
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+``allow_future``
+    A boolean specifying whether to include "future" objects on this page,
+    where "future" means objects in which the field specified in ``date_field``
+    is greater than the current date/time. By default, this is ``False``.
 
-    * ``allow_future``: A boolean specifying whether to include "future"
-      objects on this page, where "future" means objects in which the field
-      specified in ``date_field`` is greater than the current date/time. By
-      default, this is ``False``.
-
-**Template name:**
+Template name
+~~~~~~~~~~~~~
 
 If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_detail.html`` by default.
 
-**Template context:**
+Template context
+~~~~~~~~~~~~~~~~
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``object``: The object. This variable's name depends on the
-      ``template_object_name`` parameter, which is ``'object'`` by default. If
-      ``template_object_name`` is ``'foo'``, this variable's name will be
-      ``foo``.
+``object``
+    The object. This variable's name depends on the ``template_object_name``
+    parameter, which is ``'object'`` by default. If ``template_object_name`` is
+    ``'foo'``, this variable's name will be ``foo``.
 
 List/detail generic views
 =========================
@@ -685,77 +788,92 @@ object page.
 ``django.views.generic.list_detail.object_list``
 ------------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 A page representing a list of objects.
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``queryset``: A ``QuerySet`` that represents the objects.
+``queryset``
+    A ``QuerySet`` that represents the objects.
 
-**Optional arguments:**
+Optional arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``paginate_by``: An integer specifying how many objects should be
-      displayed per page. If this is given, the view will paginate objects with
-      ``paginate_by`` objects per page. The view will expect either a ``page``
-      query string parameter (via ``GET``) or a ``page`` variable specified in
-      the URLconf. See `Notes on pagination`_ below.
+``paginate_by``
+    An integer specifying how many objects should be displayed per page. If
+    this is given, the view will paginate objects with ``paginate_by`` objects
+    per page. The view will expect either a ``page`` query string parameter
+    (via ``GET``) or a ``page`` variable specified in the URLconf. See `Notes
+    on pagination`_ below.
 
-    * ``page``: The current (1-based) page number, as an integer, or the string
-      ``'last'``. See `Notes on pagination`_ below.
+``page``
+    The current (1-based) page number, as an integer, or the string ``'last'``.
+    See `Notes on pagination`_ below.
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+``template_name``
+    The full name of a template to use in rendering the page. This lets you
+    override the default template name (see below).
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+``template_loader``
+    The template loader to use when loading the template. By default, it's
+    ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+``extra_context``
+    A dictionary of values to add to the template context. By default, this is
+    an empty dictionary. If a value in the dictionary is callable, the generic
+    view will call it just before rendering the template.
 
-    * ``allow_empty``: A boolean specifying whether to display the page if no
-      objects are available. If this is ``False`` and no objects are available,
-      the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``True``.
+``allow_empty``
+    A boolean specifying whether to display the page if no objects are
+    available. If this is ``False`` and no objects are available, the view will
+    raise a 404 instead of displaying an empty page. By default, this is
+    ``True``.
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template. See the `RequestContext docs`_.
+``context_processors``
+    A list of template-context processors to apply to the view's template. See
+    the `RequestContext docs`_.
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``. The
-      view will append ``'_list'`` to the value of this parameter in
-      determining the variable's name.
+``template_object_name``
+    Designates the name of the template variable to use in the template
+    context. By default, this is ``'object'``. The view will append ``'_list'``
+    to the value of this parameter in determining the variable's name.
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+``mimetype``
+    The MIME type to use for the resulting document. Defaults to the value of
+    the ``DEFAULT_CONTENT_TYPE`` setting.
 
-**Template name:**
+Template name
+~~~~~~~~~~~~~
 
 If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_list.html`` by default.
 
-**Template context:**
+Template context
+~~~~~~~~~~~~~~~~
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``object_list``: The list of objects. This variable's name depends on the
-      ``template_object_name`` parameter, which is ``'object'`` by default. If
-      ``template_object_name`` is ``'foo'``, this variable's name will be
-      ``foo_list``.
+``object_list``
+    The list of objects. This variable's name depends on the
+    ``template_object_name`` parameter, which is ``'object'`` by default. If
+    ``template_object_name`` is ``'foo'``, this variable's name will be
+    ``foo_list``.
 
-    * ``is_paginated``: A boolean representing whether the results are
-      paginated. Specifically, this is set to ``False`` if the number of
-      available objects is less than or equal to ``paginate_by``.
+``is_paginated``
+    A boolean representing whether the results are paginated. Specifically,
+    this is set to ``False`` if the number of available objects is less than or
+    equal to ``paginate_by``.
 
 If the results are paginated, the context will contain these extra variables:
 
-    * **New in Django development version:** ``paginator``: An instance of
-      ``django.core.paginator.Paginator``.
+``paginator`` (**New in Django development version**)
+    An instance of ``django.core.paginator.Paginator``.
 
-    * **New in Django development version:** ``page_obj``: An instance of
-      ``django.core.paginator.Page``.
+``page_obj`` (**New in Django development version**)
+    An instance of ``django.core.paginator.Page``.
 
 In older versions of Django, before ``paginator`` and ``page_obj`` were added
 to this template's context, the template included several other variables
@@ -838,67 +956,77 @@ any other value for ``page`` will result in a 404 error.
 
 A page representing an individual object.
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 A page representing an individual object.
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``queryset``: A ``QuerySet`` that contains the object.
+``queryset``
+    A ``QuerySet`` that contains the object.
 
-    * Either ``object_id`` or (``slug`` *and* ``slug_field``) is required.
+Either ``object_id`` or (``slug`` *and* ``slug_field``)
+    If you provide ``object_id``, it should be the value of the primary-key
+    field for the object being displayed on this page.
 
-      If you provide ``object_id``, it should be the value of the primary-key
-      field for the object being displayed on this page.
+    Otherwise, ``slug`` should be the slug of the given object, and
+    ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
+    model. By default, ``slug_field`` is ``'slug'``.
 
-      Otherwise, ``slug`` should be the slug of the given object, and
-      ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
-      model. By default, ``slug_field`` is ``'slug'``.
+Optional arguments
+~~~~~~~~~~~~~~~~~~
 
-**Optional arguments:**
+``template_name``
+    The full name of a template to use in rendering the page. This lets you
+    override the default template name (see below).
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+``template_name_field``
+    The name of a field on the object whose value is the template name to use.
+    This lets you store template names in the data. In other words, if your
+    object has a field ``'the_template'`` that contains a string
+    ``'foo.html'``, and you set ``template_name_field`` to ``'the_template'``,
+    then the generic view for this object will use the template ``'foo.html'``.
 
-    * ``template_name_field``: The name of a field on the object whose value is
-      the template name to use. This lets you store template names in the data.
-      In other words, if your object has a field ``'the_template'`` that
-      contains a string ``'foo.html'``, and you set ``template_name_field`` to
-      ``'the_template'``, then the generic view for this object will use the
-      template ``'foo.html'``.
+    It's a bit of a brain-bender, but it's useful in some cases.
 
-      It's a bit of a brain-bender, but it's useful in some cases.
+``template_loader``
+    The template loader to use when loading the template. By default, it's
+    ``django.template.loader``.
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+``extra_context``
+    A dictionary of values to add to the template context. By default, this is
+    an empty dictionary. If a value in the dictionary is callable, the generic
+    view will call it just before rendering the template.
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+``context_processors``
+    A list of template-context processors to apply to the view's template. See
+    the `RequestContext docs`_.
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template. See the `RequestContext docs`_.
+``template_object_name``
+    Designates the name of the template variable to use in the template
+    context. By default, this is ``'object'``.
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``.
+``mimetype``
+    The MIME type to use for the resulting document. Defaults to the value of
+    the ``DEFAULT_CONTENT_TYPE`` setting.
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
-
-**Template name:**
+Template name
+~~~~~~~~~~~~~
 
 If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_detail.html`` by default.
 
-**Template context:**
+Template context
+~~~~~~~~~~~~~~~~
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``object``: The object. This variable's name depends on the
-      ``template_object_name`` parameter, which is ``'object'`` by default. If
-      ``template_object_name`` is ``'foo'``, this variable's name will be
-      ``foo``.
+``object``
+    The object. This variable's name depends on the ``template_object_name``
+    parameter, which is ``'object'`` by default. If ``template_object_name`` is
+    ``'foo'``, this variable's name will be ``foo``.
 
 Create/update/delete generic views
 ==================================
@@ -917,75 +1045,84 @@ library`_ to build and display the form.
 ``django.views.generic.create_update.create_object``
 ----------------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 A page that displays a form for creating an object, redisplaying the form with
 validation errors (if there are any) and saving the object.
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * Either ``form_class`` or ``model`` is required.
+Either ``form_class`` or ``model``
+    If you provide ``form_class``, it should be a ``django.forms.ModelForm``
+    subclass.  Use this argument when you need to customize the model's form.
+    See the `ModelForm docs`_ for more information.
 
-      If you provide ``form_class``, it should be a
-      ``django.forms.ModelForm`` subclass.  Use this argument when you need
-      to customize the model's form.  See the `ModelForm docs`_ for more
-      information.
+    Otherwise, ``model`` should be a Django model class and the form used will
+    be a standard ``ModelForm`` for ``model``.
 
-      Otherwise, ``model`` should be a Django model class and the form used
-      will be a standard ``ModelForm`` for ``model``.
+Optional arguments
+~~~~~~~~~~~~~~~~~~
 
-**Optional arguments:**
+``post_save_redirect``
+    A URL to which the view will redirect after saving the object. By default,
+    it's ``object.get_absolute_url()``.
 
-    * ``post_save_redirect``: A URL to which the view will redirect after
-      saving the object. By default, it's ``object.get_absolute_url()``.
+    ``post_save_redirect`` may contain dictionary string formatting, which will
+    be interpolated against the object's field attributes. For example, you
+    could use ``post_save_redirect="/polls/%(slug)s/"``.
 
-      ``post_save_redirect`` may contain dictionary string formatting, which
-      will be interpolated against the object's field attributes. For example,
-      you could use ``post_save_redirect="/polls/%(slug)s/"``.
+``login_required``
+    A boolean that designates whether a user must be logged in, in order to see
+    the page and save changes. This hooks into the Django `authentication
+    system`_. By default, this is ``False``.
 
-    * ``login_required``: A boolean that designates whether a user must be
-      logged in, in order to see the page and save changes. This hooks into the
-      Django `authentication system`_. By default, this is ``False``.
+    If this is ``True``, and a non-logged-in user attempts to visit this page
+    or save the form, Django will redirect the request to ``/accounts/login/``.
 
-      If this is ``True``, and a non-logged-in user attempts to visit this page
-      or save the form, Django will redirect the request to ``/accounts/login/``.
+``template_name``
+    The full name of a template to use in rendering the page. This lets you
+    override the default template name (see below).
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+``template_loader``
+    The template loader to use when loading the template. By default, it's
+    ``django.template.loader``.
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+``extra_context``
+    A dictionary of values to add to the template context. By default, this is
+    an empty dictionary. If a value in the dictionary is callable, the generic
+    view will call it just before rendering the template.
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+``context_processors``
+    A list of template-context processors to apply to the view's template. See
+    the `RequestContext docs`_.
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template. See the `RequestContext docs`_.
-
-**Template name:**
+Template name
+~~~~~~~~~~~~~
 
 If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_form.html`` by default.
 
-**Template context:**
+Template context
+~~~~~~~~~~~~~~~~
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``form``: A ``django.forms.ModelForm`` instance representing the form
-      for creating the object. This lets you refer to form fields easily in the
-      template system.
+``form``
+    A ``django.forms.ModelForm`` instance representing the form for creating
+    the object. This lets you refer to form fields easily in the template
+    system.
 
-      For example, if the model has two fields, ``name`` and ``address``::
+    For example, if the model has two fields, ``name`` and ``address``::
 
-          <form action="" method="post">
-          <p>{{ form.name.label_tag }} {{ form.name }}</p>
-          <p>{{ form.address.label_tag }} {{ form.address }}</p>
-          </form>
+        <form action="" method="post">
+        <p>{{ form.name.label_tag }} {{ form.name }}</p>
+        <p>{{ form.address.label_tag }} {{ form.address }}</p>
+        </form>
 
-      See the `forms documentation`_ for more information about using
-      ``Form`` objects in templates.
+    See the `forms documentation`_ for more information about using ``Form``
+    objects in templates.
 
 .. _authentication system: ../authentication/
 .. _ModelForm docs: ../modelforms/
@@ -994,158 +1131,176 @@ In addition to ``extra_context``, the template's context will be:
 ``django.views.generic.create_update.update_object``
 ----------------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 A page that displays a form for editing an existing object, redisplaying the
 form with validation errors (if there are any) and saving changes to the
 object. This uses a form automatically generated from the object's
 model class.
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * Either ``form_class`` or ``model`` is required.
+Either ``form_class`` or ``model``
+    If you provide ``form_class``, it should be a ``django.forms.ModelForm``
+    subclass.  Use this argument when you need to customize the model's form.
+    See the `ModelForm docs`_ for more information.
 
-      If you provide ``form_class``, it should be a
-      ``django.forms.ModelForm`` subclass.  Use this argument when you need
-      to customize the model's form.  See the `ModelForm docs`_ for more
-      information.
+    Otherwise, ``model`` should be a Django model class and the form used will
+    be a standard ``ModelForm`` for ``model``.
 
-      Otherwise, ``model`` should be a Django model class and the form used
-      will be a standard ``ModelForm`` for ``model``.
+Either ``object_id`` or (``slug`` *and* ``slug_field``)
+    If you provide ``object_id``, it should be the value of the primary-key
+    field for the object being displayed on this page.
 
-    * Either ``object_id`` or (``slug`` *and* ``slug_field``) is required.
+    Otherwise, ``slug`` should be the slug of the given object, and
+    ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
+    model. By default, ``slug_field`` is ``'slug'``.
 
-      If you provide ``object_id``, it should be the value of the primary-key
-      field for the object being displayed on this page.
+Optional arguments
+~~~~~~~~~~~~~~~~~~
 
-      Otherwise, ``slug`` should be the slug of the given object, and
-      ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
-      model. By default, ``slug_field`` is ``'slug'``.
+``post_save_redirect``
+    A URL to which the view will redirect after saving the object. By default,
+    it's ``object.get_absolute_url()``.
 
-**Optional arguments:**
+    ``post_save_redirect`` may contain dictionary string formatting, which will
+    be interpolated against the object's field attributes. For example, you
+    could use ``post_save_redirect="/polls/%(slug)s/"``.
 
-    * ``post_save_redirect``: A URL to which the view will redirect after
-      saving the object. By default, it's ``object.get_absolute_url()``.
+``login_required``
+    A boolean that designates whether a user must be logged in, in order to see
+    the page and save changes. This hooks into the Django `authentication
+    system`_. By default, this is ``False``.
 
-      ``post_save_redirect`` may contain dictionary string formatting, which
-      will be interpolated against the object's field attributes. For example,
-      you could use ``post_save_redirect="/polls/%(slug)s/"``.
+    If this is ``True``, and a non-logged-in user attempts to visit this page
+    or save the form, Django will redirect the request to ``/accounts/login/``.
 
-    * ``login_required``: A boolean that designates whether a user must be
-      logged in, in order to see the page and save changes. This hooks into the
-      Django `authentication system`_. By default, this is ``False``.
+``template_name``
+    The full name of a template to use in rendering the page. This lets you
+    override the default template name (see below).
 
-      If this is ``True``, and a non-logged-in user attempts to visit this page
-      or save the form, Django will redirect the request to ``/accounts/login/``.
+``template_loader``
+    The template loader to use when loading the template. By default, it's
+    ``django.template.loader``.
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+``extra_context``
+    A dictionary of values to add to the template context. By default, this is
+    an empty dictionary. If a value in the dictionary is callable, the generic
+    view will call it just before rendering the template.
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
-
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
-
-    * ``context_processors``: A list of template-context processors to apply to
+``context_processors``: A list of template-context processors to apply to
       the view's template. See the `RequestContext docs`_.
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``.
+``template_object_name``
+    Designates the name of the template variable to use in the template
+    context. By default, this is ``'object'``.
 
-**Template name:**
+Template name
+~~~~~~~~~~~~~
 
 If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_form.html`` by default.
 
-**Template context:**
+Template context
+~~~~~~~~~~~~~~~~
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``form``: A ``django.forms.ModelForm`` instance representing the form
-      for editing the object. This lets you refer to form fields easily in the
-      template system.
+``form``
+    A ``django.forms.ModelForm`` instance representing the form for editing the
+    object. This lets you refer to form fields easily in the template system.
 
-      For example, if the model has two fields, ``name`` and ``address``::
+    For example, if the model has two fields, ``name`` and ``address``::
 
-          <form action="" method="post">
-          <p>{{ form.name.label_tag }} {{ form.name }}</p>
-          <p>{{ form.address.label_tag }} {{ form.address }}</p>
-          </form>
+        <form action="" method="post">
+        <p>{{ form.name.label_tag }} {{ form.name }}</p>
+        <p>{{ form.address.label_tag }} {{ form.address }}</p>
+        </form>
 
-      See the `forms documentation`_ for more information about using
-      ``Form`` objects in templates.
+    See the `forms documentation`_ for more information about using ``Form``
+    objects in templates.
 
-    * ``object``: The original object being edited. This variable's name
-      depends on the ``template_object_name`` parameter, which is ``'object'``
-      by default. If ``template_object_name`` is ``'foo'``, this variable's
-      name will be ``foo``.
+``object``
+    The original object being edited. This variable's name depends on the
+    ``template_object_name`` parameter, which is ``'object'`` by default. If
+    ``template_object_name`` is ``'foo'``, this variable's name will be
+    ``foo``.
 
 ``django.views.generic.create_update.delete_object``
 ----------------------------------------------------
 
-**Description:**
+Description
+~~~~~~~~~~~
 
 A view that displays a confirmation page and deletes an existing object. The
 given object will only be deleted if the request method is ``POST``. If this
 view is fetched via ``GET``, it will display a confirmation page that should
 contain a form that POSTs to the same URL.
 
-**Required arguments:**
+Required arguments
+~~~~~~~~~~~~~~~~~~
 
-    * ``model``: The Django model class of the object that the form will
-      create.
+``model``
+    The Django model class of the object that the form will create.
 
-    * Either ``object_id`` or (``slug`` *and* ``slug_field``) is required.
+Either ``object_id`` or (``slug`` *and* ``slug_field``)
+    If you provide ``object_id``, it should be the value of the primary-key
+    field for the object being displayed on this page.
 
-      If you provide ``object_id``, it should be the value of the primary-key
-      field for the object being displayed on this page.
+    Otherwise, ``slug`` should be the slug of the given object, and
+    ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
+    model. By default, ``slug_field`` is ``'slug'``.
 
-      Otherwise, ``slug`` should be the slug of the given object, and
-      ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
-      model. By default, ``slug_field`` is ``'slug'``.
+``post_delete_redirect``
+    A URL to which the view will redirect after deleting the object.
 
-    * ``post_delete_redirect``: A URL to which the view will redirect after
-      deleting the object.
+Optional arguments
+~~~~~~~~~~~~~~~~~~
 
-**Optional arguments:**
+``login_required``
+    A boolean that designates whether a user must be logged in, in order to see
+    the page and save changes. This hooks into the Django `authentication
+    system`_. By default, this is ``False``.
 
-    * ``login_required``: A boolean that designates whether a user must be
-      logged in, in order to see the page and save changes. This hooks into the
-      Django `authentication system`_. By default, this is ``False``.
+    If this is ``True``, and a non-logged-in user attempts to visit this page
+    or save the form, Django will redirect the request to ``/accounts/login/``.
 
-      If this is ``True``, and a non-logged-in user attempts to visit this page
-      or save the form, Django will redirect the request to ``/accounts/login/``.
+``template_name``
+    The full name of a template to use in rendering the page. This lets you
+    override the default template name (see below).
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+``template_loader``
+    The template loader to use when loading the template. By default, it's
+    ``django.template.loader``.
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+``extra_context``
+    A dictionary of values to add to the template context. By default, this is
+    an empty dictionary. If a value in the dictionary is callable, the generic
+    view will call it just before rendering the template.
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+``context_processors``
+    A list of template-context processors to apply to the view's template. See
+    the `RequestContext docs`_.
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template. See the `RequestContext docs`_.
+``template_object_name``
+    Designates the name of the template variable to use in the template
+    context. By default, this is ``'object'``.
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``.
-
-**Template name:**
+Template name
+~~~~~~~~~~~~~
 
 If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_confirm_delete.html`` by default.
 
-**Template context:**
+Template context
+~~~~~~~~~~~~~~~~
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``object``: The original object that's about to be deleted. This
-      variable's name depends on the ``template_object_name`` parameter, which
-      is ``'object'`` by default. If ``template_object_name`` is ``'foo'``,
-      this variable's name will be ``foo``.
+``object``
+    The original object that's about to be deleted. This variable's name
+    depends on the ``template_object_name`` parameter, which is ``'object'`` by
+    default. If ``template_object_name`` is ``'foo'``, this variable's name
+    will be ``foo``.
