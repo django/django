@@ -2,13 +2,6 @@
 Serializing Django objects
 ==========================
 
-.. note::
-
-    This API is currently under heavy development and may change --
-    perhaps drastically -- in the future.
-
-    You have been warned.
-
 Django's serialization framework provides a mechanism for "translating" Django
 objects into other formats. Usually these other formats will be text-based and
 used for sending Django objects over a wire, but it's possible for a
