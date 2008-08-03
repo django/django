@@ -39,17 +39,6 @@ class HttpRequest(object):
             (pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
             pformat(self.META))
 
-    def __getitem__(self, key):
-        for d in (self.POST, self.GET):
-            if key in d:
-                return d[key]
-        raise KeyError, "%s not found in either POST or GET" % key
-
-    def has_key(self, key):
-        return key in self.GET or key in self.POST
-
-    __contains__ = has_key
-
     def get_host(self):
         """Returns the HTTP host using the environment or request headers."""
         # We try three options, in order of decreasing preference.

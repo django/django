@@ -1,0 +1,13 @@
+{% if request %}
+Have request
+{% else %}
+No request
+{% endif %}
+
+{% if request.is_secure %}
+Secure
+{% else %}
+Not secure
+{% endif %}
+
+{{ request.path }}

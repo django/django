@@ -170,18 +170,6 @@ All attributes except ``session`` should be considered read-only.
 Methods
 -------
 
-``__getitem__(key)``
-   Returns the GET/POST value for the given key, checking POST first, then
-   GET. Raises ``KeyError`` if the key doesn't exist.
-
-   This lets you use dictionary-accessing syntax on an ``HttpRequest``
-   instance. Example: ``request["foo"]`` would return ``True`` if either
-   ``request.POST`` or ``request.GET`` had a ``"foo"`` key.
-
-``has_key()``
-   Returns ``True`` or ``False``, designating whether ``request.GET`` or
-   ``request.POST`` has the given key.
-
 ``get_host()``
    **New in Django development version**
 
