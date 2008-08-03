@@ -84,6 +84,16 @@ True
 >>> p.bestchild is None
 True
 
+# bestchild should still be None after saving.
+>>> p.save()
+>>> p.bestchild is None
+True
+
+# bestchild should still be None after fetching the object again.
+>>> p = Parent.objects.get(name="Parent")
+>>> p.bestchild is None
+True
+
 # Assigning None fails: Child.parent is null=False.
 >>> c.parent = None
 Traceback (most recent call last):
