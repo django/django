@@ -1,4 +1,3 @@
-import warnings
 try:
     set
 except NameError:
