@@ -51,10 +51,10 @@ be serialized.
 
 .. note::
 
-    Depending on your model, you may find that it is not possible to deserialize
-    a model that only serializes a subset of its fields. If a serialized object
-    doesn't specify all the fields that are required by a model, the deserializer
-    will not be able to save deserialized instances.
+    Depending on your model, you may find that it is not possible to
+    deserialize a model that only serializes a subset of its fields. If a
+    serialized object doesn't specify all the fields that are required by a
+    model, the deserializer will not be able to save deserialized instances.
 
 Inherited Models
 ~~~~~~~~~~~~~~~~
@@ -68,13 +68,13 @@ However, if you have a model that uses `multi-table inheritance`_, you also
 need to serialize all of the base classes for the model. This is because only
 the fields that are locally defined on the model will be serialized. For
 example, consider the following models::
-	
+
 	class Place(models.Model):
 		name = models.CharField(max_length=50)
-		
+
 	class Restaurant(Place):
 		serves_hot_dogs = models.BooleanField()
-		
+
 If you only serialize the Restaurant model::
 
 	data = serializers.serialize('xml', Restaurant.objects.all())
@@ -119,7 +119,8 @@ something like::
             deserialized_object.save()
 
 In other words, the usual use is to examine the deserialized objects to make
-sure that they are "appropriate" for saving before doing so.  Of course, if you trust your data source you could just save the object and move on.
+sure that they are "appropriate" for saving before doing so.  Of course, if you
+trust your data source you could just save the object and move on.
 
 The Django object itself can be inspected as ``deserialized_object.object``.
 
