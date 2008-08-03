@@ -875,41 +875,8 @@ If the results are paginated, the context will contain these extra variables:
 ``page_obj`` (**New in Django development version**)
     An instance of ``django.core.paginator.Page``.
 
-In older versions of Django, before ``paginator`` and ``page_obj`` were added
-to this template's context, the template included several other variables
-related to pagination. Note that you should *NOT* use these variables anymore;
-use ``paginator`` and ``page_obj`` instead, because they let you do everything
-these old variables let you do (and more!). But for legacy installations,
-here's a list of those old template variables:
-
-    * ``results_per_page``: The number of objects per page. (Same as the
-      ``paginate_by`` parameter.)
-
-    * ``has_next``: A boolean representing whether there's a next page.
-
-    * ``has_previous``: A boolean representing whether there's a previous page.
-
-    * ``page``: The current page number, as an integer. This is 1-based.
-
-    * ``next``: The next page number, as an integer. If there's no next page,
-      this will still be an integer representing the theoretical next-page
-      number. This is 1-based.
-
-    * ``previous``: The previous page number, as an integer. This is 1-based.
-
-    * ``last_on_page``: The number of the
-      last result on the current page. This is 1-based.
-
-    * ``first_on_page``: The number of the
-      first result on the current page. This is 1-based.
-
-    * ``pages``: The total number of pages, as an integer.
-
-    * ``hits``: The total number of objects across *all* pages, not just this
-      page.
-
-    * ``page_range``: A list of the page numbers that are available. This is
-      1-based.
+See the `pagination documentation`_ for more information on the ``Paginator``
+and ``Page`` objects.
 
 Notes on pagination
 ~~~~~~~~~~~~~~~~~~~
