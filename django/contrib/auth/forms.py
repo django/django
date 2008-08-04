@@ -103,7 +103,7 @@ class PasswordResetForm(forms.Form):
     def save(self, domain_override=None, email_template_name='registration/password_reset_email.html',
              use_https=False, token_generator=default_token_generator):
         """
-        Generates a one-use only link for restting password and sends to the user
+        Generates a one-use only link for resetting password and sends to the user
         """
         from django.core.mail import send_mail
         for user in self.users_cache:
