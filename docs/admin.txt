@@ -383,6 +383,11 @@ ordered. This should be a list or tuple in the same format as a model's
 
 If this isn't provided, the Django admin will use the model's default ordering.
 
+.. admonition:: Note
+
+    Django will only honor the first element in the list/tuple; any others
+    will be ignored.
+
 ``prepopulated_fields``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
