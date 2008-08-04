@@ -691,7 +691,7 @@ Working with Many-to-Many Intermediary Models
 ----------------------------------------------
 
 By default, admin widgets for many-to-many relations will be displayed inline
-on whichever model contains the actual reference to the `ManyToManyField`.  
+on whichever model contains the actual reference to the ``ManyToManyField``.
 However, when you specify an intermediary model using the ``through``
 argument to a ``ManyToManyField``, the admin will not display a widget by 
 default. This is because each instance of that intermediary model requires
@@ -716,15 +716,15 @@ models::
         invite_reason = models.CharField(max_length=64)
 
 The first step in displaying this intermediate model in the admin is to
-define an inline model for the Membership table::
+define an inline class for the ``Membership`` model::
 
     class MembershipInline(admin.TabularInline):
         model = Membership
         extra = 1
 
-This simple example uses the defaults inline form for the Membership model,
-and shows 1 extra line. This could be customized using any of the options
-available to inline models.
+This simple example uses the default ``InlineModelAdmin`` values for the
+``Membership`` model, and limits the extra add forms to one. This could be
+customized using any of the options available to ``InlineModelAdmin`` classes.
 
 Now create admin views for the ``Person`` and ``Group`` models::
 
@@ -739,8 +739,8 @@ Finally, register your ``Person`` and ``Group`` models with the admin site::
     admin.site.register(Person, PersonAdmin)
     admin.site.register(Group, GroupAdmin)
 
-Now your admin site is set up to edit ``Membership`` objects inline from either
-the ``Person`` or the ``Group`` detail pages.
+Now your admin site is set up to edit ``Membership`` objects inline from
+either the ``Person`` or the ``Group`` detail pages.
 
 ``AdminSite`` objects
 =====================
