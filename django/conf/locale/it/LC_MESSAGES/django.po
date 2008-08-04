@@ -5,10 +5,10 @@
 # This file is distributed under the same license as the Django package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Django vSVN\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-08-04 11:52+0200\n"
-"PO-Revision-Date: 2008-07-19 21:59+0200\n"
+"PO-Revision-Date: 2008-08-04 12:08+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "Language-Team: Italiano\n"
 "MIME-Version: 1.0\n"
@@ -345,8 +345,7 @@ msgstr "Il %(name)s \"%(obj)s\" è stato modificato correttamente."
 
 #: contrib/admin/options.py:439
 #, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "Il %(name)s \"%(obj)s\" è stato aggiunto correttamente. È possibile "
 "modificarlo nuovamente qui sotto."
@@ -412,8 +411,7 @@ msgstr "I nomi utente non possono contenere il carattere '@'."
 #: contrib/admin/sites.py:253 contrib/admin/views/decorators.py:88
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-"Il nome utente non è costituito dall'indirizzo e-mail. Provare con '%s'."
+msgstr "Il nome utente non è costituito dall'indirizzo e-mail. Provare con '%s'."
 
 #: contrib/admin/sites.py:321
 msgid "Site administration"
@@ -742,8 +740,7 @@ msgstr "Inserire la stessa password inserita sopra, come verifica."
 #: contrib/admin/templates/admin/auth/user/change_password.html:26
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr ""
-"Inserire una nuova password per l'utente <strong>%(username)s</strong>."
+msgstr "Inserire una nuova password per l'utente <strong>%(username)s</strong>."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
@@ -815,8 +812,7 @@ msgstr "Modifica quest'oggetto (in una nuova finestra)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
-msgstr ""
-"Come sopra, ma apre la pagina di amministrazione in una nuova finestra."
+msgstr "Come sopra, ma apre la pagina di amministrazione in una nuova finestra."
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -880,43 +876,36 @@ msgstr "Reimposta la password"
 
 #: contrib/admin/templates/registration/password_reset_complete.html:6
 #: contrib/admin/templates/registration/password_reset_complete.html:10
-#, fuzzy
 msgid "Password reset complete"
-msgstr "Reimposta la password"
+msgstr "Password reimpostata"
 
 #: contrib/admin/templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr ""
+msgstr "La tua password è stata impostata. Ora puoi effettuare l'accesso."
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:4
-#, fuzzy
 msgid "Password reset confirmation"
-msgstr "Conferma password"
+msgstr "Conferma reimpostazione password"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:12
-#, fuzzy
 msgid "Enter new password"
-msgstr "Nuova password"
+msgstr "Inserisci la nuova password"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:14
-#, fuzzy
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr ""
-"Inserire la password attuale, per ragioni di sicurezza, e poi la nuova "
-"password due volte, per verificare di averla scritta correttamente."
+msgstr "Inserire la nuova password due volte, per verificare di averla scritta correttamente."
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:26
-#, fuzzy
 msgid "Password reset unsuccessful"
-msgstr "Password reimpostata correttamente"
+msgstr "Password NON reimpostata"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:28
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr ""
+msgstr "Il link per la reimpostazione della password non era valido, forse perché era già stato usato. Richiedi una nuova reimpostazione della password."
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
@@ -924,18 +913,14 @@ msgid "Password reset successful"
 msgstr "Password reimpostata correttamente"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
-#, fuzzy
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr ""
-"La nuova password è stata inviata all'indirizzo e-mail inserito. Arriverà a "
-"breve."
+msgstr "Abbiamo inviato le istruzioni per impostare la tua password all'indirizzo e-mail inserito. Arriverà a breve."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr ""
-"Hai ricevuto questa e-mail perché hai chiesto di reimpostare la password"
+msgstr "Hai ricevuto questa e-mail perché hai chiesto di reimpostare la password"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -944,7 +929,7 @@ msgstr "per il tuo account utente su %(site_name)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "Vai alla pagina seguente e scegli una nuova password:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:9
 msgid "Your username, in case you've forgotten:"
@@ -960,13 +945,10 @@ msgid "The %(site_name)s team"
 msgstr "Il team di %(site_name)s"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
-#, fuzzy
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr ""
-"Dimenticata la password? Inserire il proprio indirizzo e-mail qui sotto: la "
-"password sarà reimpostata, e la nuova ti verrà inviata per e-mail."
+msgstr "Dimenticata la password? Inserisci il tuo indirizzo email qui sotto, e ti invieremo per email le istruzioni per impostarne una nuova."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -1218,8 +1200,7 @@ msgstr "Password attuale"
 
 #: contrib/auth/forms.py:168
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr ""
-"La password attuale non è stata inserita correttamente: va inserita di nuovo."
+msgstr "La password attuale non è stata inserita correttamente: va inserita di nuovo."
 
 #: contrib/auth/models.py:73 contrib/auth/models.py:93
 msgid "name"
@@ -1565,8 +1546,7 @@ msgid "Your name:"
 msgstr "Il tuo nome:"
 
 #: contrib/comments/views/comments.py:76
-msgid ""
-"This rating is required because you've entered at least one other rating."
+msgid "This rating is required because you've entered at least one other rating."
 msgstr ""
 "Questa valutazione è obbligatoria perché hai inserito almeno un'altra "
 "valutazione."
@@ -1663,8 +1643,7 @@ msgid "Advanced options"
 msgstr "Opzioni avanzate"
 
 #: contrib/flatpages/models.py:9
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "Esempio: '/about/contact/'. Assicurarsi di inserire le barre diagonali "
 "iniziali e finali."
@@ -1819,46 +1798,40 @@ msgid "Invalid CUIT."
 msgstr "CUIT non valido."
 
 #: contrib/localflavor/at/at_states.py:5
-#, fuzzy
 msgid "Burgenland"
-msgstr "Friesland"
+msgstr "Burgenland"
 
 #: contrib/localflavor/at/at_states.py:6
-#, fuzzy
 msgid "Carinthia"
-msgstr "Cantabria"
+msgstr "Carinthia"
 
 #: contrib/localflavor/at/at_states.py:7
-#, fuzzy
 msgid "Lower Austria"
-msgstr "Bassa Silesia"
+msgstr "Bassa Austria"
 
 #: contrib/localflavor/at/at_states.py:8
 msgid "Upper Austria"
-msgstr ""
+msgstr "Alta Austria"
 
 #: contrib/localflavor/at/at_states.py:9
-#, fuzzy
 msgid "Salzburg"
-msgstr "Amburgo"
+msgstr "Salisburgo"
 
 #: contrib/localflavor/at/at_states.py:10
-#, fuzzy
 msgid "Styria"
-msgstr "Soria"
+msgstr "Styria"
 
 #: contrib/localflavor/at/at_states.py:11
-#, fuzzy
 msgid "Tyrol"
-msgstr "Tokyo"
+msgstr "Tirolo"
 
 #: contrib/localflavor/at/at_states.py:12
 msgid "Vorarlberg"
-msgstr ""
+msgstr "Vorarlberg"
 
 #: contrib/localflavor/at/at_states.py:13
 msgid "Vienna"
-msgstr ""
+msgstr "Vienna"
 
 #: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:16
 #: contrib/localflavor/no/forms.py:12
@@ -1866,11 +1839,8 @@ msgid "Enter a zip code in the format XXXX."
 msgstr "Inserire un codice postale nel formato XXXXX ."
 
 #: contrib/localflavor/at/forms.py:48
-#, fuzzy
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr ""
-"Inserire un numero di assistenza sociale statunitense valido, nel formato "
-"XXX-XX-XXXX ."
+msgstr "Inserire un Numero di Assistenza Sociale Austriaco valido, nel formato XXXX XXXXXX."
 
 #: contrib/localflavor/au/forms.py:16
 msgid "Enter a 4 digit post code."
@@ -2388,8 +2358,7 @@ msgstr "Comunità di Valenza"
 
 #: contrib/localflavor/es/forms.py:19
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr ""
-"Inserire un codice postale valido nell'intervallo e formato 01XXX - 52XXX."
+msgstr "Inserire un codice postale valido nell'intervallo e formato 01XXX - 52XXX."
 
 #: contrib/localflavor/es/forms.py:39
 msgid ""
@@ -2420,8 +2389,7 @@ msgid "Invalid checksum for CIF."
 msgstr "Checksum non valido per il CIF."
 
 #: contrib/localflavor/es/forms.py:142
-msgid ""
-"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
+msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr ""
 "Inserire un numero di conto corrente bancario valido nel formato XXXX-XXXX-"
 "XX-XXXXXXXXXX."
@@ -2439,8 +2407,7 @@ msgid "Enter a zip code in the format XXXXXXX."
 msgstr "Inserire un codice postale nel formato XXXXXXX."
 
 #: contrib/localflavor/is_/forms.py:17
-msgid ""
-"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+msgid "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
 msgstr ""
 "Inserire un numero di identificazione islandese valido. Il formato è XXXXXX-"
 "XXXX ."
@@ -2862,8 +2829,7 @@ msgid "Wrong checksum for the National Identification Number."
 msgstr "Checksum errato per il Numero Identificativo Nazionale."
 
 #: contrib/localflavor/pl/forms.py:72
-msgid ""
-"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
+msgid "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgstr ""
 "Inserire un campo di numero d'imposta (NIP) nel formato XXX-XXX-XX-XX o XX-"
 "XX-XXX-XXX."
@@ -2960,8 +2926,7 @@ msgstr "Inserire un codice CNP valido."
 
 #: contrib/localflavor/ro/forms.py:141
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr ""
-"Inserire un codice IBAN valido nel formato ROXX-XXXX-XXXX-XXXX-XXXX-XXXX."
+msgstr "Inserire un codice IBAN valido nel formato ROXX-XXXX-XXXX-XXXX-XXXX-XXXX."
 
 #: contrib/localflavor/ro/forms.py:171
 msgid "Phone numbers must be in XXXX-XXXXXX format."
@@ -3739,8 +3704,7 @@ msgstr ""
 
 #: core/validators.py:80
 msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr ""
-"Questo valore può contenere solo lettere, cifre, sottolineati e trattini."
+msgstr "Questo valore può contenere solo lettere, cifre, sottolineati e trattini."
 
 #: core/validators.py:84
 msgid "Uppercase letters are not allowed here."
@@ -3805,15 +3769,13 @@ msgstr "Inserire un indirizzo e-mail valido."
 
 #: core/validators.py:178 core/validators.py:470 forms/fields.py:430
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
-"Non è stato inviato alcun file. Verificare il tipo di codifica della form."
+msgstr "Non è stato inviato alcun file. Verificare il tipo di codifica della form."
 
 #: core/validators.py:189 forms/fields.py:470
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
-msgstr ""
-"Caricare un'immagine valida. Il file caricato non è un'immagine o è corrotto."
+msgstr "Caricare un'immagine valida. Il file caricato non è un'immagine o è corrotto."
 
 #: core/validators.py:196
 #, python-format
@@ -3925,17 +3887,14 @@ msgstr "Inserire un numero decimale valido."
 #: core/validators.py:440
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
+msgid_plural "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] "Inserire un numero decimale con non più di %s cifra in totale."
 msgstr[1] "Inserire un numero decimale con non più di %s cifre in totale."
 
 #: core/validators.py:443
 #, python-format
-msgid ""
-"Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural ""
-"Please enter a valid decimal number with a whole part of at most %s digits."
+msgid "Please enter a valid decimal number with a whole part of at most %s digit."
+msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
 msgstr[0] ""
 "Inserire un numero decimale la cui parte intera sia composta da non più di %"
 "s cifra."
@@ -3946,8 +3905,7 @@ msgstr[1] ""
 #: core/validators.py:446
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
+msgid_plural "Please enter a valid decimal number with at most %s decimal places."
 msgstr[0] "Inserire un decimale con non più di %s cifra decimale."
 msgstr[1] "Inserire un decimale con non più di %s cifre decimali."
 
@@ -3980,8 +3938,7 @@ msgstr "Impossibile recuperare alcunché da %s."
 
 #: core/validators.py:535
 #, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
 "La URL %(url)s ha restituito un header Content-Type non valido: '%"
 "(contenttype)s'."
@@ -4069,9 +4026,8 @@ msgid "This field cannot be null."
 msgstr "Questo campo non può essere nullo."
 
 #: db/models/fields/__init__.py:634 db/models/fields/__init__.py:651
-#, fuzzy
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[ss[.uuuuuu]] format."
-msgstr "Inserire una data/ora valida in formato AAAA-MM-GG OO:MM."
+msgstr "Inserire una data/ora valida nel formato AAAA-MM-GG OO:MM[ss[.uuuuuu]]."
 
 #: db/models/fields/__init__.py:707
 msgid "This value must be a decimal number."
@@ -4086,9 +4042,8 @@ msgid "This value must be either None, True or False."
 msgstr "Questo valore deve essere None, True o False."
 
 #: db/models/fields/__init__.py:1128 db/models/fields/__init__.py:1141
-#, fuzzy
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "Inserire un ora valida in formato OO:MM."
+msgstr "Inserire un ora valida nel formato OO:MM[ss[.uuuuuu]]."
 
 #: db/models/fields/related.py:93
 #, python-format
@@ -4096,8 +4051,7 @@ msgid "Please enter a valid %s."
 msgstr "Inserire un %s valido."
 
 #: db/models/fields/related.py:753
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Tenere premuto \"Control\", o \"Command\" su Mac, per selezionarne più di "
 "uno."
@@ -4105,12 +4059,9 @@ msgstr ""
 #: db/models/fields/related.py:833
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] ""
-"Inserire un ID valido per %(self)s. Il valore %(value)r non è valido."
-msgstr[1] ""
-"Inserire ID validi per %(self)s. I valori %(value)r non sono validi."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "Inserire un ID valido per %(self)s. Il valore %(value)r non è valido."
+msgstr[1] "Inserire ID validi per %(self)s. I valori %(value)r non sono validi."
 
 #: forms/fields.py:53
 msgid "Enter a valid value."
@@ -4190,8 +4141,7 @@ msgstr "Questa URL non sembra funzionare."
 #: forms/fields.py:600 forms/fields.py:651
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr ""
-"Scegliere un'opzione valida. '%(value)s non compare tra quelle disponibili."
+msgstr "Scegliere un'opzione valida. '%(value)s non compare tra quelle disponibili."
 
 #: forms/fields.py:652 forms/fields.py:713 forms/models.py:589
 msgid "Enter a list of values."
@@ -4559,8 +4509,3 @@ msgstr "%(verbose_name)s è stato aggiornato correttamente."
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s è stato cancellato."
 
-#~ msgid "Your new password is: %(new_password)s"
-#~ msgstr "La tua nuova password è: %(new_password)s"
-
-#~ msgid "Feel free to change this password by going to this page:"
-#~ msgstr "Puoi liberamente cambiare la tua password tramite questa pagina:"
