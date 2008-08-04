@@ -69,6 +69,13 @@ Example::
 
     date_hierarchy = 'pub_date'
 
+``form``
+~~~~~~~~
+
+The default ``forms.ModelForm`` class used to generate the form on the
+add/change pages for models. You can easily change this to your own
+``ModelForm`` to override the default form behavior of the add/change pages.
+
 ``fieldsets``
 ~~~~~~~~~~~~~
 
@@ -527,6 +534,31 @@ Keep in mind that this will be prepended with ``MEDIA_URL``. The same rules
 apply as `regular media definitions on forms`_.
 
 .. _regular media definitions on forms: ../forms/#media
+
+Adding custom validation to the admin
+-------------------------------------
+
+Adding custom validation of data in the admin is quite easy. The automatic
+admin interfaces reuses the Django `forms`_ module. The ``ModelAdmin`` class
+gives you the ability define your own form::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        form = MyArticleAdminForm
+
+``MyArticleAdminForm`` can be defined anywhere as long as you import where
+needed. Now within your form you can add your own custom validation for
+any field::
+    
+    class MyArticleAdminForm(forms.ModelForm):
+        def clean_name(self):
+            # do something that validates your data
+            return self.cleaned_data["name"]
+
+It is important you use a ``ModelForm`` here otherwise things can break. See
+the `forms`_ documentation on `custom validation`_ for more information.
+
+.. _forms: ../forms/
+.. _custom validation: ../forms/#custom-form-and-field-validation
 
 ``InlineModelAdmin`` objects
 ============================
