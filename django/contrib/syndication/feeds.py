@@ -129,19 +129,19 @@ class Feed(object):
                 author_email = author_link = None
 
             pubdate = self.__get_dynamic_attr('item_pubdate', item)
-            now = datetime.now()
-            utcnow = datetime.utcnow()
-
-            # Must always subtract smaller time from larger time here.
-            if utcnow > now:
-                sign = -1
-                tzDifference = (utcnow - now)
-            else:
-                sign = 1
-                tzDifference = (now - utcnow)
-
-            # Round the timezone offset to the nearest half hour.
             if pubdate:
+                now = datetime.now()
+                utcnow = datetime.utcnow()
+
+                # Must always subtract smaller time from larger time here.
+                if utcnow > now:
+                    sign = -1
+                    tzDifference = (utcnow - now)
+                else:
+                    sign = 1
+                    tzDifference = (now - utcnow)
+
+                # Round the timezone offset to the nearest half hour.
                 tzOffsetMinutes = sign * ((tzDifference.seconds / 60 + 15) / 30) * 30
                 tzOffset = timedelta(minutes=tzOffsetMinutes)
                 pubdate = pubdate.replace(tzinfo=FixedOffset(tzOffset))
