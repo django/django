@@ -1,7 +1,7 @@
 from django.contrib.flatpages.models import FlatPage
 from django.template import loader, RequestContext
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.core.xheaders import populate_xheaders
 from django.utils.safestring import mark_safe
@@ -19,6 +19,8 @@ def flatpage(request, url):
         flatpage
             `flatpages.flatpages` object
     """
+    if not url.endswith('/') and settings.APPEND_SLASH:
+        return HttpResponseRedirect(url + "/")
     if not url.startswith('/'):
         url = "/" + url
     f = get_object_or_404(FlatPage, url__exact=url, sites__id__exact=settings.SITE_ID)
