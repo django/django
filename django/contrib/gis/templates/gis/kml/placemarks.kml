@@ -1,0 +1,8 @@
+{% extends "gis/kml/base.kml" %}
+{% block placemarks %}{% for place in places %}
+  <Placemark>
+    <name>{{ place.name|escape }}</name>
+    <description>{{ place.description|escape }}</description>
+    {{ place.kml }}
+  </Placemark>{% endfor %}{% endblock %}
+
