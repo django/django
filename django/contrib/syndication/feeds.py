@@ -1,7 +1,10 @@
+from datetime import datetime, timedelta
+
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.template import loader, Template, TemplateDoesNotExist
 from django.contrib.sites.models import Site, RequestSite
 from django.utils import feedgenerator
+from django.utils.tzinfo import FixedOffset
 from django.utils.encoding import smart_unicode, iri_to_uri
 from django.conf import settings         
 from django.template import RequestContext
@@ -124,13 +127,31 @@ class Feed(object):
                 author_link = self.__get_dynamic_attr('item_author_link', item)
             else:
                 author_email = author_link = None
+
+            pubdate = self.__get_dynamic_attr('item_pubdate', item)
+            now = datetime.now()
+            utcnow = datetime.utcnow()
+
+            # Must always subtract smaller time from larger time here.
+            if utcnow > now:
+                sign = -1
+                tzDifference = (utcnow - now)
+            else:
+                sign = 1
+                tzDifference = (now - utcnow)
+
+            # Round the timezone offset to the nearest half hour.
+            tzOffsetMinutes = sign * ((tzDifference.seconds / 60 + 15) / 30) * 30
+            tzOffset = timedelta(minutes=tzOffsetMinutes)
+            pubdate = pubdate.replace(tzinfo=FixedOffset(tzOffset))
+
             feed.add_item(
                 title = title_tmp.render(RequestContext(self.request, {'obj': item, 'site': current_site})),
                 link = link,
                 description = description_tmp.render(RequestContext(self.request, {'obj': item, 'site': current_site})),
                 unique_id = self.__get_dynamic_attr('item_guid', item, link),
                 enclosure = enc,
-                pubdate = self.__get_dynamic_attr('item_pubdate', item),
+                pubdate = pubdate,
                 author_name = author_name,
                 author_email = author_email,
                 author_link = author_link,

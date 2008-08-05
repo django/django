@@ -22,14 +22,25 @@ http://diveintomark.org/archives/2004/02/04/incompatible-rss
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import force_unicode, iri_to_uri
 import datetime, re, time
-import email.Utils
 
 def rfc2822_date(date):
-    return email.Utils.formatdate(time.mktime(date.timetuple()))
+    # We do this ourselves to be timezone aware, email.Utils is not tz aware.
+    if date.tzinfo:
+        time_str = date.strftime('%a, %d %b %Y %H:%M:%S ')
+        offset = date.tzinfo.utcoffset(date)
+        timezone = (offset.days * 24 * 60) + (offset.seconds / 60)
+        hour, minute = divmod(timezone, 60)
+        return time_str + "%+03d%02d" % (hour, minute)
+    else:
+        return date.strftime('%a, %d %b %Y %H:%M:%S -0000')
 
 def rfc3339_date(date):
     if date.tzinfo:
-        return date.strftime('%Y-%m-%dT%H:%M:%S%z')
+        time_str = date.strftime('%Y-%m-%dT%H:%M:%S')
+        offset = date.tzinfo.utcoffset(date)
+        timezone = (offset.days * 24 * 60) + (offset.seconds / 60)
+        hour, minute = divmod(timezone, 60)
+        return time_str + "%+03d:%02d" % (hour, minute)
     else:
         return date.strftime('%Y-%m-%dT%H:%M:%SZ')
 
