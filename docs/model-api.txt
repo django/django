@@ -1511,7 +1511,9 @@ Using managers for related object access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, Django uses a "bare" (i.e. default) manager when accessing related
-objects (i.e. ``choice.poll``). If this default isn't appropriate for your default manager, you can force Django to use a custom manager for related object attributes by giving it a ``use_for_related_fields`` property::
+objects (i.e. ``choice.poll``). If this default isn't appropriate for your
+default manager, you can force Django to use a custom manager for related object
+attributes by giving it a ``use_for_related_fields`` property::
 
     class MyManager(models.Manager)::
         use_for_related_fields = True
