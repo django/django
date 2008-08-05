@@ -529,8 +529,8 @@ class Model(object):
         full_filename = self._get_FIELD_filename(field)
         if hasattr(raw_field, 'temporary_file_path'):
             # This file has a file path that we can move.
-            raw_field.close()
             file_move_safe(raw_field.temporary_file_path(), full_filename)
+            raw_field.close()
         else:
             # This is a normal uploadedfile that we can stream.
             fp = open(full_filename, 'wb')

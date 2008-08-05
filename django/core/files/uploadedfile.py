@@ -202,11 +202,21 @@ class TemporaryUploadedFile(UploadedFile):
     def read(self, *args):          return self._file.read(*args)
     def seek(self, offset):         return self._file.seek(offset)
     def write(self, s):             return self._file.write(s)
-    def close(self):                return self._file.close()
     def __iter__(self):             return iter(self._file)
     def readlines(self, size=None): return self._file.readlines(size)
     def xreadlines(self):           return self._file.xreadlines()
-
+    def close(self):
+        try:
+            return self._file.close()
+        except OSError, e:
+            if e.errno == 2:
+                # Means the file was moved or deleted before the tempfile could unlink it.
+                # Still sets self._file.close_called and calls self._file.file.close()
+                # before the exception
+                return
+            else: 
+                raise e
+        
 class InMemoryUploadedFile(UploadedFile):
     """
     A file uploaded into memory (i.e. stream-to-memory).
