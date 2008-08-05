@@ -11,6 +11,7 @@ import unittest
 from datetime import datetime, timedelta
 
 from django import template
+from django.core import urlresolvers
 from django.template import loader
 from django.template.loaders import app_directories, filesystem
 from django.utils.translation import activate, deactivate, ugettext as _
@@ -888,8 +889,8 @@ class Templates(unittest.TestCase):
 
             # Failures
             'url-fail01': ('{% url %}', {}, template.TemplateSyntaxError),
-            'url-fail02': ('{% url no_such_view %}', {}, ''),
-            'url-fail03': ('{% url regressiontests.templates.views.client no_such_param="value" %}', {}, ''),
+            'url-fail02': ('{% url no_such_view %}', {}, urlresolvers.NoReverseMatch),
+            'url-fail03': ('{% url regressiontests.templates.views.client %}', {}, urlresolvers.NoReverseMatch),
 
             ### CACHE TAG ######################################################
             'cache01': ('{% load cache %}{% cache -1 test %}cache01{% endcache %}', {}, 'cache01'),

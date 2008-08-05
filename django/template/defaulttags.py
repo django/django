@@ -364,12 +364,9 @@ class URLNode(Node):
         try:
             return reverse(self.view_name, args=args, kwargs=kwargs)
         except NoReverseMatch:
-            try:
-                project_name = settings.SETTINGS_MODULE.split('.')[0]
-                return reverse(project_name + '.' + self.view_name,
-                               args=args, kwargs=kwargs)
-            except NoReverseMatch:
-                return ''
+            project_name = settings.SETTINGS_MODULE.split('.')[0]
+            return reverse(project_name + '.' + self.view_name,
+                           args=args, kwargs=kwargs)
 
 class WidthRatioNode(Node):
     def __init__(self, val_expr, max_expr, max_width):
