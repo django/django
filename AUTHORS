@@ -41,6 +41,7 @@ And here is an inevitably incomplete list of MUCH-APPRECIATED CONTRIBUTORS --
 people who have submitted patches, reported bugs, added translations, helped
 answer newbie questions, and generally made Django that much better:
 
+    ajs <adi@sieker.info>
     alang@bright-green.com
     Marty Alchin <gulopine@gamemusic.org>
     atlithorn <atlithorn@gmail.com>
@@ -70,7 +71,7 @@ answer newbie questions, and generally made Django that much better:
     Esdras Beleza <linux@esdrasbeleza.com>
     Chris Bennett <chrisrbennett@yahoo.com>
     James Bennett
-    Ben Godfrey <http://aftnn.org>
+    Julian Bez
     Arvis Bickovskis <viestards.lists@gmail.com>
     Paul Bissex <http://e-scribe.com/>
     Simon Blanchard
@@ -150,8 +151,10 @@ answer newbie questions, and generally made Django that much better:
     Stefane Fermgier <sf@fermigier.com>
     Afonso Fernández Nogueira <fonzzo.django@gmail.com>
     J. Pablo Fernandez <pupeno@pupeno.com>
+    Maciej Fijalkowski
     Matthew Flanagan <http://wadofstuff.blogspot.com>
     Eric Floehr <eric@intellovations.com>
+    Eric Florenzano <floguy@gmail.com>
     Vincent Foley <vfoleybourgon@yahoo.ca>
     Rudolph Froger <rfroger@estrate.nl>
     Jorge Gajon <gajon@gajon.org>
@@ -164,6 +167,7 @@ answer newbie questions, and generally made Django that much better:
     glin@seznam.cz
     martin.glueck@gmail.com
     Artyom Gnilov <boobsd@gmail.com>
+    Ben Godfrey <http://aftnn.org>
     GomoX <gomo@datafull.com>
     Guilherme Mesquita Gondim <semente@taurinus.org>
     Mario Gonzalez <gonzalemario@gmail.com>
@@ -172,6 +176,7 @@ answer newbie questions, and generally made Django that much better:
     Owen Griffiths
     Espen Grindhaug <http://grindhaug.org/>
     Thomas Güttler <hv@tbz-pariv.de>
+    Horst Gutmann <zerok@zerokspot.com>
     dAniel hAhler
     hambaloney
     Brian Harring <ferringb@gmail.com>
@@ -234,6 +239,7 @@ answer newbie questions, and generally made Django that much better:
     Stuart Langridge <http://www.kryogenix.org/>
     Paul Lanier <planier@google.com>
     Nicola Larosa <nico@teknico.net>
+    Lau Bech Lauritzen
     Rune Rønde Laursen <runerl@skjoldhoej.dk>
     Eugene Lazutkin <http://lazutkin.com/blog/>
     lcordier@point45.com
@@ -276,6 +282,7 @@ answer newbie questions, and generally made Django that much better:
     Eric Moritz <http://eric.themoritzfamily.com/>
     mrmachine <real.human@mrmachine.net>
     Robin Munn <http://www.geekforgod.com/>
+    James Murty
     msundstr
     Robert Myers <myer0052@gmail.com>
     Nebojša Dorđević
@@ -301,6 +308,7 @@ answer newbie questions, and generally made Django that much better:
     phil@produxion.net
     phil.h.smith@gmail.com
     Gustavo Picon
+    Michael Placentra II <someone@michaelplacentra2.net>
     Luke Plant <http://lukeplant.me.uk/>
     plisk
     Mihai Preda <mihai_preda@yahoo.com>
@@ -338,8 +346,10 @@ answer newbie questions, and generally made Django that much better:
     Pete Shinners <pete@shinners.org>
     Leo Shklovskii
     jason.sidabras@gmail.com
+    Brenton Simpson <http://theillustratedlife.com>
     Jozko Skrablin <jozko.skrablin@gmail.com>
     Ben Slavin <benjamin.slavin@gmail.com>
+    sloonz <simon.lipp@insa-lyon.fr>
     SmileyChris <smileychris@gmail.com>
     smurf@smurf.noris.de
     Vsevolod Solovyov
@@ -398,6 +408,7 @@ answer newbie questions, and generally made Django that much better:
     charly.wilhelm@gmail.com
     Rachel Willmer <http://www.willmer.com/kb/>
     Gary Wilson <gary.wilson@gmail.com>
+    Jakub Wilk <ubanus@users.sf.net>
     Jakub Wiśniowski <restless.being@gmail.com>
     Maciej Wiśniowski <pigletto@gmail.com>
     wojtek

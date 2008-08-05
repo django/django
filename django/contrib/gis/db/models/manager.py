@@ -4,6 +4,11 @@ from django.contrib.gis.db.models.query import GeoQuerySet
 class GeoManager(Manager):
     "Overrides Manager to return Geographic QuerySets."
 
+    # This manager should be used for queries on related fields
+    # so that geometry columns on Oracle and MySQL are selected
+    # properly.
+    use_for_related_fields = True
+
     def get_query_set(self):
         return GeoQuerySet(model=self.model)
 

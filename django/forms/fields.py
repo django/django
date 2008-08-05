@@ -7,6 +7,7 @@ import datetime
 import os
 import re
 import time
+import urlparse
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -23,7 +24,7 @@ except NameError:
     from sets import Set as set
 
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import StrAndUnicode, smart_unicode, smart_str
+from django.utils.encoding import smart_unicode, smart_str
 
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateTimeInput
@@ -73,7 +74,10 @@ class Field(object):
         if label is not None:
             label = smart_unicode(label)
         self.required, self.label, self.initial = required, label, initial
-        self.help_text = smart_unicode(help_text or '')
+        if help_text is None:
+            self.help_text = u''
+        else:
+            self.help_text = smart_unicode(help_text)
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
@@ -503,6 +507,11 @@ class ImageField(FileField):
             #  but it must be called immediately after the constructor
             trial_image = Image.open(file)
             trial_image.verify()
+        except ImportError: 
+            # Under PyPy, it is possible to import PIL. However, the underlying
+            # _imaging C module isn't available, so an ImportError will be 
+            # raised. Catch and re-raise. 
+            raise
         except Exception: # Python Imaging Library doesn't recognize it as an image
             raise ValidationError(self.error_messages['invalid_image'])
         if hasattr(f, 'seek') and callable(f.seek):
@@ -534,6 +543,9 @@ class URLField(RegexField):
         # If no URL scheme given, assume http://
         if value and '://' not in value:
             value = u'http://%s' % value
+        # If no URL path given, assume /
+        if value and not urlparse.urlsplit(value)[2]:
+            value += '/'
         value = super(URLField, self).clean(value)
         if value == u'':
             return value

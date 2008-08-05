@@ -1,4 +1,3 @@
-import warnings
 try:
     set
 except NameError:
@@ -757,22 +756,6 @@ class EmptyQuerySet(QuerySet):
         yield iter([]).next()
 
 
-# QOperator, QNot, QAnd and QOr are temporarily retained for backwards
-# compatibility. All the old functionality is now part of the 'Q' class.
-class QOperator(Q):
-    def __init__(self, *args, **kwargs):
-        warnings.warn('Use Q instead of QOr, QAnd or QOperation.',
-                DeprecationWarning, stacklevel=2)
-        super(QOperator, self).__init__(*args, **kwargs)
-
-QOr = QAnd = QOperator
-
-
-def QNot(q):
-    warnings.warn('Use ~q instead of QNot(q)', DeprecationWarning, stacklevel=2)
-    return ~q
-
-
 def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
                    requested=None):
     """
@@ -785,7 +768,11 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
 
     restricted = requested is not None
     index_end = index_start + len(klass._meta.fields)
-    obj = klass(*row[index_start:index_end])
+    fields = row[index_start:index_end]
+    if not [x for x in fields if x is not None]:
+        # If we only have a list of Nones, there was not related object.
+        return None, index_end
+    obj = klass(*fields)
     for f in klass._meta.fields:
         if not select_related_descend(f, restricted, requested):
             continue
@@ -831,9 +818,15 @@ def delete_objects(seen_objs):
         del_query.delete_batch_related(pk_list)
 
         update_query = sql.UpdateQuery(cls, connection)
-        for field in cls._meta.fields:
-            if field.rel and field.null and field.rel.to in seen_objs:
-                update_query.clear_related(field, pk_list)
+        for field, model in cls._meta.get_fields_with_model():
+            if (field.rel and field.null and field.rel.to in seen_objs and
+                    filter(lambda f: f.column == field.column,
+                    field.rel.to._meta.fields)):
+                if model:
+                    sql.UpdateQuery(model, connection).clear_related(field,
+                            pk_list)
+                else:
+                    update_query.clear_related(field, pk_list)
 
     # Now delete the actual data.
     for cls in ordered_classes:

@@ -7,8 +7,7 @@ import copy
 from django import forms
 from django.forms.widgets import RadioFieldRenderer
 from django.forms.util import flatatt
-from django.utils.datastructures import MultiValueDict
-from django.utils.text import capfirst, truncate_words
+from django.utils.text import truncate_words
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_unicode

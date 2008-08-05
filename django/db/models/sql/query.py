@@ -7,7 +7,6 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 
-import datetime
 from copy import deepcopy
 
 from django.utils.tree import Node
@@ -107,6 +106,8 @@ class Query(object):
         Pickling support.
         """
         obj_dict = self.__dict__.copy()
+        obj_dict['related_select_fields'] = []
+        obj_dict['related_select_cols'] = []
         del obj_dict['connection']
         return obj_dict
 
@@ -196,14 +197,18 @@ class Query(object):
         Returns an iterator over the results from executing this query.
         """
         resolve_columns = hasattr(self, 'resolve_columns')
-        if resolve_columns:
-            if self.select_fields:
-                fields = self.select_fields + self.related_select_fields
-            else:
-                fields = self.model._meta.fields
+        fields = None
         for rows in self.execute_sql(MULTI):
             for row in rows:
                 if resolve_columns:
+                    if fields is None:
+                        # We only set this up here because
+                        # related_select_fields isn't populated until
+                        # execute_sql() has been called.
+                        if self.select_fields:
+                            fields = self.select_fields + self.related_select_fields
+                        else:
+                            fields = self.model._meta.fields
                     row = self.resolve_columns(row, fields)
                 yield row
 
@@ -1088,20 +1093,23 @@ class Query(object):
             join_it = iter(join_list)
             table_it = iter(self.tables)
             join_it.next(), table_it.next()
+            table_promote = False
             for join in join_it:
                 table = table_it.next()
                 if join == table and self.alias_refcount[join] > 1:
                     continue
-                self.promote_alias(join)
+                join_promote = self.promote_alias(join)
                 if table != join:
-                    self.promote_alias(table)
+                    table_promote = self.promote_alias(table)
                 break
             for join in join_it:
-                self.promote_alias(join)
+                if self.promote_alias(join, join_promote):
+                    join_promote = True
             for table in table_it:
                 # Some of these will have been promoted from the join_list, but
                 # that's harmless.
-                self.promote_alias(table)
+                if self.promote_alias(table, table_promote):
+                    table_promote = True
 
         self.where.add((alias, col, field, lookup_type, value), connector)
 
@@ -1214,7 +1222,6 @@ class Query(object):
                 raise MultiJoin(pos + 1)
             if model:
                 # The field lives on a base class of the current model.
-                alias_list = []
                 for int_model in opts.get_base_chain(model):
                     lhs_col = opts.parents[int_model].column
                     dedupe = lhs_col in opts.duplicate_targets
@@ -1618,8 +1625,9 @@ class Query(object):
         if self.ordering_aliases:
             result = order_modified_iter(cursor, len(self.ordering_aliases),
                     self.connection.features.empty_fetchmany_value)
-        result = iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
-                self.connection.features.empty_fetchmany_value)
+        else:
+            result = iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
+                    self.connection.features.empty_fetchmany_value)
         if not self.connection.features.can_use_chunked_reads:
             # If we are using non-chunked reads, we return the same data
             # structure as normally, but ensure it is all read into memory

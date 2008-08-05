@@ -463,7 +463,7 @@ Be careful, if you are using ``extra()`` to add custom handling to your
 may or may not make sense. If you are using custom SQL fragments in your
 ``extra()`` calls, Django will not inspect these fragments to see if they need
 to be rewritten because of changes in the merged query. So test the effects
-carefully. Also realise that if you are combining two ``QuerySets`` with
+carefully. Also realize that if you are combining two ``QuerySets`` with
 ``|``, you cannot use ``extra(select=...)`` or ``extra(where=...)`` on *both*
 ``QuerySets``. You can only use those calls on one or the other (Django will
 raise a ``ValueError`` if you try to use this incorrectly).
@@ -1676,6 +1676,28 @@ whose ``headline`` contains ``'Lennon'``::
 
     Blog.objects.filter(entry__headline__contains='Lennon')
 
+If you are filtering across multiple relationships and one of the intermediate
+models doesn't have a value that meets the filter condition, Django will treat
+it as if there is an empty (all values are ``NULL``), but valid, object there.
+All this means is that no error will be raised. For example, in this filter::
+
+    Blog.objects.filter(entry__author__name='Lennon')
+
+(if there was a related ``Author`` model), if there was no ``author``
+associated with an entry, it would be treated as if there was also no ``name``
+attached, rather than raising an error because of the missing ``author``.
+Usually this is exactly what you want to have happen. The only case where it
+might be confusing is if you are using ``isnull``. Thus::
+
+    Blog.objects.filter(entry__author__name__isnull=True)
+
+will return ``Blog`` objects that have an empty ``name`` on the ``author`` and
+also those which have an empty ``author`` on the ``entry``. If you don't want
+those latter objects, you could write::
+
+    Blog.objetcs.filter(entry__author__isnull=False,
+            entry__author__name__isnull=True)
+
 Spanning multi-valued relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2218,7 +2240,7 @@ statement. It is a bulk operation for direct updates. It doesn't run any
 signals (which are a consequence of calling ``save()``). If you want to save
 every item in a ``QuerySet`` and make sure that the ``save()`` method is
 called on each instance, you don't need any special function to handle that.
-Just loop over them and call ``save()``:
+Just loop over them and call ``save()``::
 
     for item in my_queryset:
         item.save()
@@ -2280,6 +2302,11 @@ For every ``FileField``, the object will have a ``get_FOO_filename()`` method,
 where ``FOO`` is the name of the field. This returns the full filesystem path
 to the file, according to your ``MEDIA_ROOT`` setting.
 
+.. note::
+    It is only valid to call this method **after** saving the model when the
+    field has been set. Prior to saving, the value returned will not contain
+    the upload directory (the `upload_to` parameter) in the path.
+
 Note that ``ImageField`` is technically a subclass of ``FileField``, so every
 model with an ``ImageField`` will also get this method.
 
@@ -2290,6 +2317,11 @@ For every ``FileField``, the object will have a ``get_FOO_url()`` method,
 where ``FOO`` is the name of the field. This returns the full URL to the file,
 according to your ``MEDIA_URL`` setting. If the value is blank, this method
 returns an empty string.
+
+.. note::
+    As with ``get_FOO_filename()``, it is only valid to call this method
+    **after** saving the model, otherwise an incorrect result will be
+    returned.
 
 get_FOO_size()
 --------------

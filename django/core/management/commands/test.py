@@ -17,7 +17,6 @@ class Command(BaseCommand):
 
     def handle(self, *test_labels, **options):
         from django.conf import settings
-        from django.db.models import get_app, get_apps
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)

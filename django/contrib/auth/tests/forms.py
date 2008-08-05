@@ -2,7 +2,7 @@
 FORM_TESTS = """
 >>> from django.contrib.auth.models import User
 >>> from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
->>> from django.contrib.auth.forms import PasswordChangeForm
+>>> from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 
 The user already exists.
 
@@ -95,6 +95,32 @@ True
 >>> form.non_field_errors()
 []
 
+SetPasswordForm:
+
+The two new passwords do not match.
+
+>>> data = {
+...     'new_password1': 'abc123',
+...     'new_password2': 'abc',
+... }
+>>> form = SetPasswordForm(user, data)
+>>> form.is_valid()
+False
+>>> form["new_password2"].errors
+[u"The two password fields didn't match."]
+
+The success case.
+
+>>> data = {
+...     'new_password1': 'abc123',
+...     'new_password2': 'abc123',
+... }
+>>> form = SetPasswordForm(user, data)
+>>> form.is_valid()
+True
+
+PasswordChangeForm:
+
 The old password is incorrect.
 
 >>> data = {
@@ -131,5 +157,10 @@ The success case.
 >>> form = PasswordChangeForm(user, data)
 >>> form.is_valid()
 True
+
+Regression test - check the order of fields:
+
+>>> PasswordChangeForm(user, {}).fields.keys()
+['old_password', 'new_password1', 'new_password2']
 
 """

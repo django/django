@@ -33,7 +33,7 @@ quick example::
     class Article(models.Model):
         pub_date = models.DateTimeField()
         headline = models.CharField(max_length=200)
-        article = models.TextField()
+        content = models.TextField()
         reporter = models.ForeignKey(Reporter)
 
         def __unicode__(self):
@@ -95,7 +95,7 @@ is created on the fly, no code generation necessary::
     # Create an article.
     >>> from datetime import datetime
     >>> a = Article(pub_date=datetime.now(), headline='Django is cool',
-    ...     article='Yeah.', reporter=r)
+    ...     content='Yeah.', reporter=r)
     >>> a.save()
 
     # Now the article is in the database.
@@ -135,7 +135,7 @@ your model classes::
     class Article(models.Model):
         pub_date = models.DateTimeField()
         headline = models.CharField(max_length=200)
-        article = models.TextField()
+        content = models.TextField()
         reporter = models.ForeignKey(Reporter)
         class Admin: pass
 

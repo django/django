@@ -5,10 +5,11 @@ Requires cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 """
 
 import os
+import datetime
+import time
 
 from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
 from django.db.backends.oracle import query
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_str, force_unicode
 
 # Oracle takes client-side character set encoding from the environment.
@@ -29,9 +30,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_tablespaces = True
     uses_case_insensitive_names = True
     uses_custom_query_class = True
-    time_field_needs_date = True
     interprets_empty_strings_as_nulls = True
-    date_field_supports_time_value = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def autoinc_sql(self, table, column):
@@ -181,6 +180,21 @@ class DatabaseOperations(BaseDatabaseOperations):
     def tablespace_sql(self, tablespace, inline=False):
         return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""), self.quote_name(tablespace))
 
+    def value_to_db_time(self, value):
+        if value is None:
+            return None
+        if isinstance(value, basestring):
+            return datetime.datetime(*(time.strptime(value, '%H:%M:%S')[:6]))
+        return datetime.datetime(1900, 1, 1, value.hour, value.minute,
+                                 value.second, value.microsecond)
+
+    def year_lookup_bounds_for_date_field(self, value):
+        first = '%s-01-01'
+        second = '%s-12-31'
+        return [first % value, second % value]
+
+
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     features = DatabaseFeatures()
     ops = DatabaseOperations()
@@ -245,10 +259,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
 class OracleParam(object):
     """
-    Wrapper object for formatting parameters for Oracle. If the string 
-    representation of the value is large enough (greater than 4000 characters) 
+    Wrapper object for formatting parameters for Oracle. If the string
+    representation of the value is large enough (greater than 4000 characters)
     the input size needs to be set as NCLOB. Alternatively, if the parameter has
-    an `input_size` attribute, then the value of the `input_size` attribute will 
+    an `input_size` attribute, then the value of the `input_size` attribute will
     be used instead. Otherwise, no input size will be set for the parameter when
     executing the query.
     """
@@ -282,7 +296,7 @@ class FormatStylePlaceholderCursor(Database.Cursor):
             return result
         else:
             return tuple([OracleParam(p, self.charset, True) for p in params])
-    
+
     def _guess_input_sizes(self, params_list):
         if isinstance(params_list[0], dict):
             sizes = {}
@@ -303,7 +317,7 @@ class FormatStylePlaceholderCursor(Database.Cursor):
             return dict([(k, p.smart_str) for k, p in params.iteritems()])
         else:
             return [p.smart_str for p in params]
-        
+
     def execute(self, query, params=None):
         if params is None:
             params = []

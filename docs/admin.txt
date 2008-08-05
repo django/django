@@ -18,19 +18,21 @@ Django's admin interface.
 Overview
 ========
 
-There are four steps in activating the Django admin site:
+There are five steps in activating the Django admin site:
 
-    1. Determine which of your application's models should be editable in the
+    1. Add ``django.contrib.admin`` to your ``INSTALLED_APPS`` setting.
+
+    2. Determine which of your application's models should be editable in the
        admin interface.
 
-    2. For each of those models, optionally create a ``ModelAdmin`` class that
+    3. For each of those models, optionally create a ``ModelAdmin`` class that
        encapsulates the customized admin functionality and options for that
        particular model.
 
-    3. Instantiate an ``AdminSite`` and tell it about each of your models and
+    4. Instantiate an ``AdminSite`` and tell it about each of your models and
        ``ModelAdmin`` classes.
 
-    4. Hook the ``AdminSite`` instance into your URLconf.
+    5. Hook the ``AdminSite`` instance into your URLconf.
 
 ``ModelAdmin`` objects
 ======================
@@ -41,7 +43,7 @@ Let's take a look at a very simple example the ``ModelAdmin``::
 
     from django.contrib import admin
     from myproject.myapp.models import Author
-    
+
     class AuthorAdmin(admin.ModelAdmin):
         pass
     admin.site.register(Author, AuthorAdmin)
@@ -67,6 +69,13 @@ Example::
 
     date_hierarchy = 'pub_date'
 
+``form``
+~~~~~~~~
+
+The default ``forms.ModelForm`` class used to generate the form on the
+add/change pages for models. You can easily change this to your own
+``ModelForm`` to override the default form behavior of the add/change pages.
+
 ``fieldsets``
 ~~~~~~~~~~~~~
 
@@ -82,7 +91,7 @@ dictionary of information about the fieldset, including a list of fields to be
 displayed in it.
 
 A full example, taken from the ``django.contrib.flatpages.FlatPage`` model::
-    
+
     class FlatPageAdmin(admin.ModelAdmin):
         fieldsets = (
             (None, {
@@ -106,9 +115,9 @@ The ``field_options`` dictionary can have the following keys:
 
 ``fields``
     A tuple of field names to display in this fieldset. This key is required.
-    
+
     Example::
-        
+
         {
         'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
         }
@@ -116,26 +125,20 @@ The ``field_options`` dictionary can have the following keys:
     To display multiple fields on the same line, wrap those fields in their own
     tuple. In this example, the ``first_name`` and ``last_name`` fields will
     display on the same line::
-        
+
         {
         'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
         }
 
 ``classes``
-    A string containing extra CSS classes to apply to the fieldset.
-    
+    A list containing extra CSS classes to apply to the fieldset.
+
     Example::
-        
+
         {
-        'classes': 'wide',
+        'classes': ['wide', 'extrapretty'],
         }
 
-    Apply multiple classes by separating them with spaces. Example::
-        
-        {
-        'classes': 'wide extrapretty',
-        }
-    
     Two useful classes defined by the default admin-site stylesheet are
     ``collapse`` and ``wide``. Fieldsets with the ``collapse`` style will be
     initially collapsed in the admin and replaced with a small "click to expand"
@@ -143,13 +146,38 @@ The ``field_options`` dictionary can have the following keys:
 
 ``description``
     A string of optional extra text to be displayed at the top of each fieldset,
-    under the heading of the fieldset. It's used verbatim, so you can use any HTML
-    and you must escape any special HTML characters (such as ampersands) yourself.
+    under the heading of the fieldset.
+
+    Note that this value is *not* HTML-escaped when it's displayed in
+    the admin interface. This lets you include HTML if you so desire.
+    Alternatively you can use plain text and
+    ``django.utils.html.escape()`` to escape any HTML special
+    characters.
+
+``fields``
+~~~~~~~~~~
+
+Use this option as an alternative to ``fieldsets`` if the layout does not
+matter and if you want to only show a subset of the available fields in the
+form. For example, you could define a simpler version of the admin form for
+the ``django.contrib.flatpages.FlatPage`` model as follows::
+
+    class FlatPageAdmin(admin.ModelAdmin):
+        fields = ('url', 'title', 'content')
+
+In the above example, only the fields 'url', 'title' and 'content' will be
+displayed, sequencially, in the form.
+
+.. admonition:: Note
+
+    This ``fields`` option should not be confused with the ``fields``
+    dictionary key that is within the ``fieldsets`` option, as described in
+    the previous section.
 
 ``filter_horizontal``
 ~~~~~~~~~~~~~~~~~~~~~
 
-Use a nifty unobtrusive Javascript "filter" interface instead of the
+Use a nifty unobtrusive JavaScript "filter" interface instead of the
 usability-challenged ``<select multiple>`` in the admin form. The value is a
 list of fields that should be displayed as a horizontal filter interface. See
 ``filter_vertical`` to use a vertical interface.
@@ -192,7 +220,7 @@ A few special cases to note about ``list_display``:
       function attribute, for use as the header for the field.
 
       Here's a full example model::
-          
+
           class Person(models.Model):
               name = models.CharField(max_length=50)
               birthday = models.DateField()
@@ -200,7 +228,7 @@ A few special cases to note about ``list_display``:
               def decade_born_in(self):
                   return self.birthday.strftime('%Y')[:3] + "0's"
               decade_born_in.short_description = 'Birth decade'
-          
+
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'decade_born_in')
 
@@ -218,7 +246,7 @@ A few special cases to note about ``list_display``:
               def colored_name(self):
                   return '<span style="color: #%s;">%s %s</span>' % (self.color_code, self.first_name, self.last_name)
               colored_name.allow_tags = True
-          
+
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name', 'colored_name')
 
@@ -235,7 +263,7 @@ A few special cases to note about ``list_display``:
               def born_in_fifties(self):
                   return self.birthday.strftime('%Y')[:3] == 5
               born_in_fifties.boolean = True
-          
+
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'born_in_fifties')
 
@@ -264,7 +292,7 @@ A few special cases to note about ``list_display``:
                 return '<span style="color: #%s;">%s</span>' % (self.color_code, self.first_name)
             colored_first_name.allow_tags = True
             colored_first_name.admin_order_field = 'first_name'
-        
+
         class PersonAdmin(admin.ModelAdmin):
             list_display = ('first_name', 'colored_first_name')
 
@@ -355,6 +383,11 @@ ordered. This should be a list or tuple in the same format as a model's
 
 If this isn't provided, the Django admin will use the model's default ordering.
 
+.. admonition:: Note
+
+    Django will only honor the first element in the list/tuple; any others
+    will be ignored.
+
 ``prepopulated_fields``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -364,11 +397,15 @@ it should prepopulate from::
     class ArticleAdmin(admin.ModelAdmin):
         prepopulated_fields = {"slug": ("title",)}
 
-When set the given fields will use a bit of Javascript to populate from the
-fields assigned.
+When set, the given fields will use a bit of JavaScript to populate from the
+fields assigned. The main use for this functionality is to automatically
+generate the value for ``SlugField`` fields from one or more other fields. The
+generated value is produced by concatenating the values of the source fields,
+and then by transforming that result into a valid slug (e.g. substituting
+dashes for spaces).
 
-``prepopulated_fields`` doesn't accept DateTimeFields, ForeignKeys nor
-ManyToManyFields.
+``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``, nor
+``ManyToManyField`` fields.
 
 ``radio_fields``
 ~~~~~~~~~~~~~~~~
@@ -396,7 +433,10 @@ overhead of having to select all the related instances to display in the
 drop-down.
 
 ``raw_id_fields`` is a list of fields you would like to change
-into a ``Input`` widget for the primary key.
+into a ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        raw_id_fields = ("newspaper",)
 
 ``save_as``
 ~~~~~~~~~~~
@@ -484,7 +524,7 @@ with an operator:
 ``ModelAdmin`` media definitions
 --------------------------------
 
-There are times where you would like add a bit of CSS and/or Javascript to
+There are times where you would like add a bit of CSS and/or JavaScript to
 the add/change views. This can be accomplished by using a Media inner class
 on your ``ModelAdmin``::
 
@@ -498,24 +538,49 @@ on your ``ModelAdmin``::
 Keep in mind that this will be prepended with ``MEDIA_URL``. The same rules
 apply as `regular media definitions on forms`_.
 
-.. _regular media definitions on forms: ../newforms/#media
+.. _regular media definitions on forms: ../forms/#media
+
+Adding custom validation to the admin
+-------------------------------------
+
+Adding custom validation of data in the admin is quite easy. The automatic
+admin interfaces reuses the Django `forms`_ module. The ``ModelAdmin`` class
+gives you the ability define your own form::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        form = MyArticleAdminForm
+
+``MyArticleAdminForm`` can be defined anywhere as long as you import where
+needed. Now within your form you can add your own custom validation for
+any field::
+    
+    class MyArticleAdminForm(forms.ModelForm):
+        def clean_name(self):
+            # do something that validates your data
+            return self.cleaned_data["name"]
+
+It is important you use a ``ModelForm`` here otherwise things can break. See
+the `forms`_ documentation on `custom validation`_ for more information.
+
+.. _forms: ../forms/
+.. _custom validation: ../forms/#custom-form-and-field-validation
 
 ``InlineModelAdmin`` objects
 ============================
 
 The admin interface has the ability to edit models on the same page as a
-parent model. These are called inlines. You can add them a model being
-specifing them in a ``ModelAdmin.inlines`` attribute::
+parent model. These are called inlines. You can add them to a model by
+specifying them in a ``ModelAdmin.inlines`` attribute::
 
     class BookInline(admin.TabularInline):
         model = Book
-    
+
     class AuthorAdmin(admin.ModelAdmin):
         inlines = [
             BookInline,
         ]
 
-Django provides two subclasses of ``InlineModelAdmin`` and they are::
+Django provides two subclasses of ``InlineModelAdmin`` and they are:
 
     * ``TabularInline``
     * ``StackedInline``
@@ -562,7 +627,7 @@ inline.
 This controls the number of extra forms the formset will display in addition
 to the initial forms. See the `formsets documentation`_ for more information.
 
-.. _formsets documentation: ../newforms/#formsets
+.. _formsets documentation: ../forms/#formsets
 
 ``max_num``
 ~~~~~~~~~~~
@@ -572,6 +637,21 @@ directly corrolate to the number of objects, but can if the value is small
 enough. See `max_num in formsets`_ for more information.
 
 .. _max_num in formsets: ../modelforms/#limiting-the-number-of-objects-editable
+
+``raw_id_fields``
+~~~~~~~~~~~~~~~~~
+
+By default, Django's admin uses a select-box interface (<select>) for
+fields that are ``ForeignKey``. Sometimes you don't want to incur the
+overhead of having to select all the related instances to display in the
+drop-down.
+
+``raw_id_fields`` is a list of fields you would like to change
+into a ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
+
+    class BookInline(admin.TabularInline):
+        model = Book
+        raw_id_fields = ("pages",)
 
 ``template``
 ~~~~~~~~~~~~
@@ -598,7 +678,7 @@ Take this model for instance::
     class Friendship(models.Model):
         to_person = models.ForeignKey(Person, related_name="friends")
         from_person = models.ForeignKey(Person, related_name="from_friends")
-    
+
 If you wanted to display an inline on the ``Person`` admin add/change pages
 you need to explicitly define the foreign key since it is unable to do so
 automatically::
@@ -606,11 +686,66 @@ automatically::
     class FriendshipInline(admin.TabularInline):
         model = Friendship
         fk_name = "to_person"
-    
+
     class PersonAdmin(admin.ModelAdmin):
         inlines = [
             FriendshipInline,
         ]
+
+Working with Many-to-Many Intermediary Models
+----------------------------------------------
+
+By default, admin widgets for many-to-many relations will be displayed inline
+on whichever model contains the actual reference to the ``ManyToManyField``.
+However, when you specify an intermediary model using the ``through``
+argument to a ``ManyToManyField``, the admin will not display a widget by 
+default. This is because each instance of that intermediary model requires
+more information than could be displayed in a single widget, and the layout
+required for multiple widgets will vary depending on the intermediate model.
+
+However, we still want to be able to edit that information inline. Fortunately,
+this is easy to do with inline admin models. Suppose we have the following
+models::
+
+    class Person(models.Model):
+        name = models.CharField(max_length=128)
+    
+    class Group(models.Model):
+        name = models.CharField(max_length=128)
+        members = models.ManyToManyField(Person, through='Membership')
+
+    class Membership(models.Model):
+        person = models.ForeignKey(Person)
+        group = models.ForeignKey(Group)
+        date_joined = models.DateField()
+        invite_reason = models.CharField(max_length=64)
+
+The first step in displaying this intermediate model in the admin is to
+define an inline class for the ``Membership`` model::
+
+    class MembershipInline(admin.TabularInline):
+        model = Membership
+        extra = 1
+
+This simple example uses the default ``InlineModelAdmin`` values for the
+``Membership`` model, and limits the extra add forms to one. This could be
+customized using any of the options available to ``InlineModelAdmin`` classes.
+
+Now create admin views for the ``Person`` and ``Group`` models::
+
+    class PersonAdmin(admin.ModelAdmin):
+        inlines = (MembershipInline,)
+
+    class GroupAdmin(admin.ModelAdmin):
+        inlines = (MembershipInline,)
+
+Finally, register your ``Person`` and ``Group`` models with the admin site::
+    
+    admin.site.register(Person, PersonAdmin)
+    admin.site.register(Group, GroupAdmin)
+
+Now your admin site is set up to edit ``Membership`` objects inline from
+either the ``Person`` or the ``Group`` detail pages.
 
 ``AdminSite`` objects
 =====================
@@ -628,7 +763,7 @@ In this example, we register the default ``AdminSite`` instance
     # urls.py
     from django.conf.urls.defaults import *
     from django.contrib import admin
-    
+
     admin.autodiscover()
 
     urlpatterns = patterns('',

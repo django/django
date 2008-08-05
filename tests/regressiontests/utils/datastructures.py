@@ -50,9 +50,3 @@
 ['second-two', 'one']
 """
 
-# Python 2.3 doesn't have sorted()
-try:
-    sorted
-except NameError:
-    from django.utils.itercompat import sorted
-        

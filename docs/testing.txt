@@ -25,13 +25,6 @@ The best part is, it's really easy.
 This document is split into two primary sections. First, we explain how to
 write tests with Django. Then, we explain how to run them.
 
-.. admonition:: Note
-
-    This testing framework is currently under development. It may change
-    slightly before the next official Django release.
-
-    (That's *no* excuse not to write tests, though!)
-
 Writing tests
 =============
 
@@ -58,7 +51,7 @@ frameworks are:
 
           import unittest
 
-          class MyFuncTestCase(unittest.TestCase)
+          class MyFuncTestCase(unittest.TestCase):
               def testBasic(self):
                   a = ['larry', 'curly', 'moe']
                   self.assertEquals(my_func(a, 0), 'larry')
@@ -815,12 +808,12 @@ In order to provide a reliable URL space for your test,
 configuration for the duration of the execution of a test suite.
 If your ``TestCase`` instance defines an ``urls`` attribute, the
 ``TestCase`` will use the value of that attribute as the ``ROOT_URLCONF``
-for the duration of that test. 
+for the duration of that test.
 
 For example::
 
     from django.test import TestCase
-    
+
     class TestMyViews(TestCase):
         urls = 'myapp.test_urls'
 
@@ -864,7 +857,7 @@ useful for testing Web applications:
     rendered on the form.
 
     ``form`` is the name the ``Form`` instance was given in the template
-    context. Note that this works only for ``newforms.Form`` instances, not
+    context. Note that this works only for ``forms.Form`` instances, not
     ``oldforms.Form`` instances.
 
     ``field`` is the name of the field on the form to check. If ``field``

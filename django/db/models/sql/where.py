@@ -35,20 +35,30 @@ class WhereNode(tree.Node):
         storing any reference to field objects). Otherwise, the 'data' is
         stored unchanged and can be anything with an 'as_sql()' method.
         """
+        # Because of circular imports, we need to import this here.
+        from django.db.models.base import ObjectDoesNotExist
+
         if not isinstance(data, (list, tuple)):
             super(WhereNode, self).add(data, connector)
             return
 
         alias, col, field, lookup_type, value = data
-        if field:
-            params = field.get_db_prep_lookup(lookup_type, value)
-            db_type = field.db_type()
-        else:
-            # This is possible when we add a comparison to NULL sometimes (we
-            # don't really need to waste time looking up the associated field
-            # object).
-            params = Field().get_db_prep_lookup(lookup_type, value)
-            db_type = None
+        try:
+            if field:
+                params = field.get_db_prep_lookup(lookup_type, value)
+                db_type = field.db_type()
+            else:
+                # This is possible when we add a comparison to NULL sometimes
+                # (we don't really need to waste time looking up the associated
+                # field object).
+                params = Field().get_db_prep_lookup(lookup_type, value)
+                db_type = None
+        except ObjectDoesNotExist:
+            # This can happen when trying to insert a reference to a null pk.
+            # We break out of the normal path and indicate there's nothing to
+            # match.
+            super(WhereNode, self).add(NothingNode(), connector)
+            return
         if isinstance(value, datetime.datetime):
             annotation = datetime.datetime
         else:
@@ -190,3 +200,14 @@ class EverythingNode(object):
 
     def relabel_aliases(self, change_map, node=None):
         return
+
+class NothingNode(object):
+    """
+    A node that matches nothing.
+    """
+    def as_sql(self, qn=None):
+        raise EmptyResultSet
+
+    def relabel_aliases(self, change_map, node=None):
+        return
+

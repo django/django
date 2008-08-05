@@ -107,7 +107,7 @@ class CacheClass(BaseCache):
         else:
             doomed = [k for (i, k) in enumerate(self._cache) if i % self._cull_frequency == 0]
             for k in doomed:
-                self.delete(k)
+                self._delete(k)
 
     def _delete(self, key):
         try:

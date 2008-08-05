@@ -224,19 +224,10 @@ means!).
 When will you release Django 1.0?
 ---------------------------------
 
-Short answer: When we're comfortable with Django's APIs, have added all
-features that we feel are necessary to earn a "1.0" status, and are ready to
-begin maintaining backwards compatibility.
+See our `version one roadmap`_ for the detailed timeline. We're aiming for
+September 2, 2008.
 
-The merging of Django's `Queryset Refactor branch`_ went a long way toward Django
-1.0. Merging the `Newforms Admin branch` will be another important step.
-
-Of course, you should note that `quite a few production sites`_ use Django in
-its current status. Don't let the lack of a 1.0 turn you off.
-
-.. _Queryset Refactor branch: http://code.djangoproject.com/wiki/QuerysetRefactorBranch
-.. _Newforms Admin branch: http://code.djangoproject.com/wiki/NewformsAdminBranch
-.. _quite a few production sites: http://code.djangoproject.com/wiki/DjangoPoweredSites
+.. _version one roadmap: http://code.djangoproject.com/wiki/VersionOneRoadmap
 
 How can I download the Django documentation to read it offline?
 ---------------------------------------------------------------
@@ -434,7 +425,7 @@ Using a ``FileField`` or an ``ImageField`` in a model takes a few steps:
        of ``MEDIA_ROOT`` it should upload files.
 
     #. All that will be stored in your database is a path to the file
-       (relative to ``MEDIA_ROOT``). You'll must likely want to use the
+       (relative to ``MEDIA_ROOT``). You'll most likely want to use the
        convenience ``get_<fieldname>_url`` function provided by Django. For
        example, if your ``ImageField`` is called ``mug_shot``, you can get the
        absolute URL to your image in a template with

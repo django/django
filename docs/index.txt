@@ -33,7 +33,7 @@ Reference
    transactions
    templates
    templates_python
-   newforms
+   forms
    modelforms
    testing
    sessions

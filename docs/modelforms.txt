@@ -1,6 +1,6 @@
-==========================
-Using newforms with models
-==========================
+=======================
+Using forms with models
+=======================
 
 ``ModelForm``
 =============
@@ -16,7 +16,7 @@ class from a Django model.
 
 For example::
 
-    >>> from django.newforms import ModelForm
+    >>> from django.forms import ModelForm
 
     # Create the form class.
     >>> class ArticleForm(ModelForm):
@@ -86,11 +86,11 @@ the full list of conversions:
 As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
 types are special cases:
 
-    * ``ForeignKey`` is represented by ``django.newforms.ModelChoiceField``,
+    * ``ForeignKey`` is represented by ``django.forms.ModelChoiceField``,
       which is a ``ChoiceField`` whose choices are a model ``QuerySet``.
 
     * ``ManyToManyField`` is represented by
-      ``django.newforms.ModelMultipleChoiceField``, which is a
+      ``django.forms.ModelMultipleChoiceField``, which is a
       ``MultipleChoiceField`` whose choices are a model ``QuerySet``.
 
 In addition, each generated form field has attributes set as follows:
@@ -121,7 +121,7 @@ A full example
 Consider this set of models::
 
     from django.db import models
-    from django.newforms import ModelForm
+    from django.forms import ModelForm
 
     TITLE_CHOICES = (
         ('MR', 'Mr.'),
@@ -240,14 +240,14 @@ For example::
     >>> new_author = f.save()
 
 Other than the ``save()`` and ``save_m2m()`` methods, a ``ModelForm``
-works exactly the same way as any other ``newforms`` form. For
+works exactly the same way as any other ``forms`` form. For
 example, the ``is_valid()`` method is used to check for validity, the
 ``is_multipart()`` method is used to determine whether a form requires
 multipart file upload (and hence whether ``request.FILES`` must be
-passed to the form), etc. See `the standard newforms documentation`_
+passed to the form), etc. See `the standard forms documentation`_
 for more information.
 
-.. _the standard newforms documentation: ../newforms/
+.. _the standard forms documentation: ../forms/
 
 Using a subset of fields on the form
 ------------------------------------
@@ -384,7 +384,7 @@ Similar to regular formsets there are a couple enhanced formset classes that
 provide all the right things to work with your models. Lets reuse the
 ``Author`` model from above::
 
-    >>> from django.newforms.models import modelformset_factory
+    >>> from django.forms.models import modelformset_factory
     >>> AuthorFormSet = modelformset_factory(Author)
 
 This will create a formset that is capable of working with the data associated
@@ -417,7 +417,7 @@ configurable::
 
 Alternatively, you can use a subclassing based approach::
 
-    from django.newforms.models import BaseModelFormSet
+    from django.forms.models import BaseModelFormSet
     
     class BaseAuthorFormSet(BaseModelFormSet):
         def get_queryset(self):
@@ -494,7 +494,7 @@ with related objects through a foreign key. Suppose you have two models
 ``Author`` and ``Book``. You want to create a formset that works with the
 books of a specific author. Here is how you could accomplish this::
 
-    >>> from django.newforms.models import inlineformset_factory
+    >>> from django.forms.models import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book)
     >>> author = Author.objects.get(name=u'Orson Scott Card')
     >>> formset = BookFormSet(instance=author)

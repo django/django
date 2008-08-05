@@ -4,7 +4,6 @@ from django.contrib.databrowse.datastructures import EasyModel
 from django.contrib.databrowse.sites import DatabrowsePlugin
 from django.shortcuts import render_to_response
 from django.utils.text import capfirst
-from django.utils.translation import get_date_formats
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.views.generic import date_based

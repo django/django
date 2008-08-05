@@ -17,7 +17,7 @@ etc.
 The term "wizard," in this context, is `explained on Wikipedia`_.
 
 .. _explained on Wikipedia: http://en.wikipedia.org/wiki/Wizard_%28software%29
-.. _forms: ../newforms/
+.. _forms: ../forms/
 
 How it works
 ============
@@ -41,7 +41,7 @@ Usage
 This application handles as much machinery for you as possible. Generally, you
 just have to do these things:
 
-    1. Define a number of ``django.newforms`` ``Form`` classes -- one per wizard
+    1. Define a number of ``django.forms`` ``Form`` classes -- one per wizard
        page.
     2. Create a ``FormWizard`` class that specifies what to do once all of your
        forms have been submitted and validated. This also lets you override some
@@ -55,8 +55,8 @@ Defining ``Form`` classes
 =========================
 
 The first step in creating a form wizard is to create the ``Form`` classes.
-These should be standard ``django.newforms`` ``Form`` classes, covered in the
-`newforms documentation`_.
+These should be standard ``django.forms`` ``Form`` classes, covered in the
+`forms documentation`_.
 
 These classes can live anywhere in your codebase, but convention is to put them
 in a file called ``forms.py`` in your application.
@@ -65,7 +65,7 @@ For example, let's write a "contact form" wizard, where the first page's form
 collects the sender's e-mail address and subject, and the second page collects
 the message itself. Here's what the ``forms.py`` might look like::
 
-    from django import newforms as forms
+    from django import forms
 
     class ContactForm1(forms.Form):
         subject = forms.CharField(max_length=100)
@@ -78,7 +78,7 @@ the message itself. Here's what the ``forms.py`` might look like::
 data between pages, you may not include a ``FileField`` in any form except the
 last one.
 
-.. _newforms documentation: ../newforms/
+.. _forms documentation: ../forms/
 
 Creating a ``FormWizard`` class
 ===============================
@@ -94,7 +94,7 @@ which specifies what should happen when the data for *every* form is submitted
 and validated. This method is passed two arguments:
 
     * ``request`` -- an HttpRequest_ object
-    * ``form_list`` -- a list of ``django.newforms`` ``Form`` classes
+    * ``form_list`` -- a list of ``django.forms`` ``Form`` classes
 
 In this simplistic example, rather than perform any database operation, the
 method simply renders a template of the validated data::
@@ -209,7 +209,7 @@ Default implementation::
     def prefix_for_step(self, step):
         return str(step)
 
-.. _form prefix documentation: ../newforms/#prefixes-for-forms
+.. _form prefix documentation: ../forms/#prefixes-for-forms
 
 ``render_hash_failure``
 ~~~~~~~~~~~~~~~~~~~~~~~

@@ -3,6 +3,7 @@ import sys
 from django import http
 from django.core import signals
 from django.dispatch import dispatcher
+from django.utils.encoding import force_unicode
 
 class BaseHandler(object):
     # Changes that are always applied to a response (in this order).
@@ -73,7 +74,8 @@ class BaseHandler(object):
 
         resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
         try:
-            callback, callback_args, callback_kwargs = resolver.resolve(request.path)
+            callback, callback_args, callback_kwargs = resolver.resolve(
+                    request.path_info)
 
             # Apply view middleware
             for middleware_method in self._view_middleware:
@@ -107,8 +109,11 @@ class BaseHandler(object):
                 from django.views import debug
                 return debug.technical_404_response(request, e)
             else:
-                callback, param_dict = resolver.resolve404()
-                return callback(request, **param_dict)
+                try:
+                    callback, param_dict = resolver.resolve404()
+                    return callback(request, **param_dict)
+                except:
+                    return self.handle_uncaught_exception(request, resolver, sys.exc_info())
         except exceptions.PermissionDenied:
             return http.HttpResponseForbidden('<h1>Permission denied</h1>')
         except SystemExit:
@@ -118,9 +123,6 @@ class BaseHandler(object):
             # Get the exception info now, in case another exception is thrown later.
             exc_info = sys.exc_info()
             receivers = dispatcher.send(signal=signals.got_request_exception, request=request)
-
-            if settings.DEBUG_PROPAGATE_EXCEPTIONS:
-                raise
             return self.handle_uncaught_exception(request, resolver, exc_info)
 
     def handle_uncaught_exception(self, request, resolver, exc_info):
@@ -135,6 +137,9 @@ class BaseHandler(object):
         """
         from django.conf import settings
         from django.core.mail import mail_admins
+
+        if settings.DEBUG_PROPAGATE_EXCEPTIONS:
+            raise
 
         if settings.DEBUG:
             from django.views import debug
@@ -166,4 +171,28 @@ class BaseHandler(object):
         for func in self.response_fixes:
             response = func(request, response)
         return response
+
+def get_script_name(environ):
+    """
+    Returns the equivalent of the HTTP request's SCRIPT_NAME environment
+    variable. If Apache mod_rewrite has been used, returns what would have been
+    the script name prior to any rewriting (so it's the script name as seen
+    from the client's perspective), unless DJANGO_USE_POST_REWRITE is set (to
+    anything).
+    """
+    from django.conf import settings
+    if settings.FORCE_SCRIPT_NAME is not None:
+        return force_unicode(settings.FORCE_SCRIPT_NAME)
+
+    # If Apache's mod_rewrite had a whack at the URL, Apache set either
+    # SCRIPT_URL or REDIRECT_URL to the full resource URL before applying any
+    # rewrites. Unfortunately not every webserver (lighttpd!) passes this
+    # information through all the time, so FORCE_SCRIPT_NAME, above, is still
+    # needed.
+    script_url = environ.get('SCRIPT_URL', u'')
+    if not script_url:
+        script_url = environ.get('REDIRECT_URL', u'')
+    if script_url:
+        return force_unicode(script_url[:-len(environ.get('PATH_INFO', ''))])
+    return force_unicode(environ.get('SCRIPT_NAME', u''))
 

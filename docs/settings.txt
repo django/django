@@ -537,8 +537,8 @@ FILE_UPLOAD_HANDLERS
 
 Default::
 
-    ("django.core.files.fileuploadhandler.MemoryFileUploadHandler",
-     "django.core.files.fileuploadhandler.TemporaryFileUploadHandler",)
+    ("django.core.files.uploadhandler.MemoryFileUploadHandler",
+     "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
 
 A tuple of handlers to use for uploading. See `file uploads`_ for details.
 
@@ -563,7 +563,7 @@ Default: ``None``
 
 The directory to store data temporarily while uploading files. If ``None``,
 Django will use the standard temporary directory for the operating system. For
-example, this will default to '/tmp' on *nix-style operating systems.
+example, this will default to '/tmp' on \*nix-style operating systems.
 
 See `file uploads`_ for details.
 
@@ -577,6 +577,16 @@ these paths should use Unix-style forward slashes, even on Windows. See
 `Testing Django Applications`_.
 
 .. _Testing Django Applications: ../testing/
+
+FORCE_SCRIPT_NAME
+------------------
+
+Default: ``None``
+
+If not ``None``, this will be used as the value of the ``SCRIPT_NAME``
+environment variable in any HTTP request. This setting can be used to override
+the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
+of the preferred value or not supplied at all.
 
 IGNORABLE_404_ENDS
 ------------------

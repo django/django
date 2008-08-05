@@ -44,3 +44,6 @@ div.breadcrumbs { text-align:right; }
 
 .selector { float: right;}
 .selector .selector-filter { text-align: right;}
+
+/* x unsorted */
+.inline-related h2 { text-align:right }

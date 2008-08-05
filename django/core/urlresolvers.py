@@ -7,11 +7,13 @@ a string) and returns a tuple in this format:
     (view_function, function_args, function_kwargs)
 """
 
+import re
+
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.encoding import iri_to_uri, force_unicode, smart_str
 from django.utils.functional import memoize
-import re
+from django.utils.thread_support import currentThread
 
 try:
     reversed
@@ -20,6 +22,11 @@ except NameError:
 
 _resolver_cache = {} # Maps urlconf modules to RegexURLResolver instances.
 _callable_cache = {} # Maps view and url pattern names to their view functions.
+
+# SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
+# the current thread (which is the only one we ever access), it is assumed to
+# be empty.
+_prefixes = {}
 
 class Resolver404(Http404):
     pass
@@ -291,13 +298,33 @@ class RegexURLResolver(object):
 def resolve(path, urlconf=None):
     return get_resolver(urlconf).resolve(path)
 
-def reverse(viewname, urlconf=None, args=None, kwargs=None):
+def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None):
     args = args or []
     kwargs = kwargs or {}
-    return iri_to_uri(u'/' + get_resolver(urlconf).reverse(viewname, *args, **kwargs))
+    if prefix is None:
+        prefix = get_script_prefix()
+    return iri_to_uri(u'%s%s' % (prefix, get_resolver(urlconf).reverse(viewname,
+            *args, **kwargs)))
 
 def clear_url_caches():
     global _resolver_cache
     global _callable_cache
     _resolver_cache.clear()
     _callable_cache.clear()
+
+def set_script_prefix(prefix):
+    """
+    Sets the script prefix for the current thread.
+    """
+    if not prefix.endswith('/'):
+        prefix += '/'
+    _prefixes[currentThread()] = prefix
+
+def get_script_prefix():
+    """
+    Returns the currently active script prefix. Useful for client code that
+    wishes to construct their own URLs manually (although accessing the request
+    instance is normally going to be a lot cleaner).
+    """
+    return _prefixes.get(currentThread(), u'/')
+

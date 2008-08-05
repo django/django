@@ -99,7 +99,7 @@ Problem reports and getting help
 ================================
 
 Need help resolving a problem with Django? The documentation in the
-distribution is also available online_ at the `Django website`_. The FAQ_
+distribution is also available online_ at the `Django Web site`_. The FAQ_
 document is especially recommended, as it contains a number of issues that
 come up time and again.
 
@@ -115,7 +115,7 @@ Django users and developers from around the world. Friendly people are usually
 available at any hour of the day -- to help, or just to chat.
 
 .. _online: http://www.djangoproject.com/documentation/0.95/
-.. _Django website: http://www.djangoproject.com/
+.. _Django Web site: http://www.djangoproject.com/
 .. _FAQ: http://www.djangoproject.com/documentation/faq/
 .. _django-users: http://groups.google.com/group/django-users
 

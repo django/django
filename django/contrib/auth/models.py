@@ -358,6 +358,9 @@ class AnonymousUser(object):
     def has_perm(self, perm):
         return False
 
+    def has_perms(self, perm_list):
+        return False
+
     def has_module_perms(self, module):
         return False
 

@@ -1,7 +1,5 @@
-from django.db.models import FieldDoesNotExist, DateTimeField
 from django.http import Http404
 from django.shortcuts import render_to_response
-from django.contrib.databrowse.datastructures import EasyModel, EasyChoice
 
 ###########
 # CHOICES #

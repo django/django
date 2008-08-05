@@ -1,3 +1,7 @@
+import base64
+import cPickle as pickle
+import re
+
 from django import http, template
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth import authenticate, login
@@ -8,11 +12,7 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.views.decorators.cache import never_cache
 from django.conf import settings
-import base64
-import cPickle as pickle
-import datetime
-import md5
-import re
+from django.utils.hashcompat import md5_constructor
 
 ERROR_MESSAGE = ugettext_lazy("Please enter a correct username and password. Note that both fields are case-sensitive.")
 LOGIN_FORM_KEY = 'this_is_the_login_form'
@@ -26,16 +26,14 @@ class NotRegistered(Exception):
     pass
 
 def _encode_post_data(post_data):
-    from django.conf import settings
     pickled = pickle.dumps(post_data)
-    pickled_md5 = md5.new(pickled + settings.SECRET_KEY).hexdigest()
+    pickled_md5 = md5_constructor(pickled + settings.SECRET_KEY).hexdigest()
     return base64.encodestring(pickled + pickled_md5)
 
 def _decode_post_data(encoded_data):
-    from django.conf import settings
     encoded_data = base64.decodestring(encoded_data)
     pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
-    if md5.new(pickled + settings.SECRET_KEY).hexdigest() != tamper_check:
+    if md5_constructor(pickled + settings.SECRET_KEY).hexdigest() != tamper_check:
         from django.core.exceptions import SuspiciousOperation
         raise SuspiciousOperation, "User may have tampered with session cookie."
     return pickle.loads(pickled)
@@ -47,10 +45,10 @@ class AdminSite(object):
     register() method, and the root() method can then be used as a Django view function
     that presents a full admin interface for the collection of registered models.
     """
-    
+
     index_template = None
     login_template = None
-    
+
     def __init__(self):
         self._registry = {} # model_class class -> admin_class instance
 
@@ -66,19 +64,33 @@ class AdminSite(object):
 
         If a model is already registered, this will raise AlreadyRegistered.
         """
-        do_validate = admin_class and settings.DEBUG
-        if do_validate:
-            # don't import the humongous validation code unless required
+        # Don't import the humongous validation code unless required
+        if admin_class and settings.DEBUG:
             from django.contrib.admin.validation import validate
-        admin_class = admin_class or ModelAdmin
-        # TODO: Handle options
+        else:
+            validate = lambda model, adminclass: None
+
+        if not admin_class:
+            admin_class = ModelAdmin
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model in self._registry:
                 raise AlreadyRegistered('The model %s is already registered' % model.__name__)
-            if do_validate:
-                validate(admin_class, model)
+
+            # If we got **options then dynamically construct a subclass of
+            # admin_class with those **options.
+            if options:
+                # For reasons I don't quite understand, without a __module__
+                # the created class appears to "live" in the wrong place,
+                # which causes issues later on.
+                options['__module__'] = __name__
+                admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
+
+            # Validate (which might be a no-op)
+            validate(admin_class, model)
+
+            # Instantiate the admin class to save in the registry
             self._registry[model] = admin_class(model, self)
 
     def unregister(self, model_or_iterable):
@@ -102,23 +114,23 @@ class AdminSite(object):
         return request.user.is_authenticated() and request.user.is_staff
 
     def root(self, request, url):
-        """ 
+        """
         Handles main URL routing for the admin app.
 
         `url` is the remainder of the URL -- e.g. 'comments/comment/'.
         """
         if request.method == 'GET' and not request.path.endswith('/'):
             return http.HttpResponseRedirect(request.path + '/')
-        
+
         # Figure out the admin base URL path and stash it for later use
         self.root_path = re.sub(re.escape(url) + '$', '', request.path)
-        
+
         url = url.rstrip('/') # Trim trailing slash, if it exists.
 
         # The 'logout' view doesn't require that the person is logged in.
         if url == 'logout':
             return self.logout(request)
-        
+
         # Check permission to continue or display login form.
         if not self.has_permission(request):
             return self.login(request)
@@ -139,7 +151,7 @@ class AdminSite(object):
             match = USER_CHANGE_PASSWORD_URL_RE.match(url)
             if match:
                 return self.user_change_password(request, match.group(1))
-                
+
             if '/' in url:
                 return self.model_page(request, *url.split('/', 2))
 
@@ -189,7 +201,6 @@ class AdminSite(object):
         This takes into account the USE_I18N setting. If it's set to False, the
         generated JavaScript will be leaner and faster.
         """
-        from django.conf import settings
         if settings.USE_I18N:
             from django.views.i18n import javascript_catalog
         else:
@@ -249,9 +260,6 @@ class AdminSite(object):
         else:
             if user.is_active and user.is_staff:
                 login(request, user)
-                # TODO: set last_login with an event.
-                user.last_login = datetime.datetime.now()
-                user.save()
                 if request.POST.has_key('post_data'):
                     post_data = _decode_post_data(request.POST['post_data'])
                     if post_data and not post_data.has_key(LOGIN_FORM_KEY):
@@ -308,14 +316,14 @@ class AdminSite(object):
         # Sort the models alphabetically within each app.
         for app in app_list:
             app['models'].sort(lambda x, y: cmp(x['name'], y['name']))
-        
+
         context = {
             'title': _('Site administration'),
             'app_list': app_list,
             'root_path': self.root_path,
         }
         context.update(extra_context or {})
-        return render_to_response(self.index_template or 'admin/index.html', context, 
+        return render_to_response(self.index_template or 'admin/index.html', context,
             context_instance=template.RequestContext(request)
         )
     index = never_cache(index)
@@ -330,7 +338,7 @@ class AdminSite(object):
             post_data = _encode_post_data(request.POST)
         else:
             post_data = _encode_post_data({})
-        
+
         context = {
             'title': _('Log in'),
             'app_path': request.path,

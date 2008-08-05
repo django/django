@@ -12,7 +12,7 @@ import django.db.models.manipulators    # Imported to register signal handler.
 import django.db.models.manager         # Ditto.
 from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
-from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
+from django.db.models.fields import AutoField, ImageField
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
 from django.db.models.query import delete_objects, Q, CollectedObjects
 from django.db.models.options import Options
@@ -20,7 +20,6 @@ from django.db import connection, transaction
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.dispatch import dispatcher
-from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.core.files.move import file_move_safe
@@ -201,6 +200,7 @@ class Model(object):
         # keywords, or default.
 
         for field in fields_iter:
+            rel_obj = None
             if kwargs:
                 if isinstance(field.rel, ManyToOneRel):
                     try:
@@ -217,17 +217,18 @@ class Model(object):
                         # pass in "None" for related objects if it's allowed.
                         if rel_obj is None and field.null:
                             val = None
-                        else:
-                            try:
-                                val = getattr(rel_obj, field.rel.get_related_field().attname)
-                            except AttributeError:
-                                raise TypeError("Invalid value: %r should be a %s instance, not a %s" %
-                                    (field.name, field.rel.to, type(rel_obj)))
                 else:
                     val = kwargs.pop(field.attname, field.get_default())
             else:
                 val = field.get_default()
-            setattr(self, field.attname, val)
+            # If we got passed a related instance, set it using the field.name
+            # instead of field.attname (e.g. "user" instead of "user_id") so
+            # that the object gets properly cached (and type checked) by the
+            # RelatedObjectDescriptor.
+            if rel_obj:
+                setattr(self, field.name, rel_obj)
+            else:
+                setattr(self, field.attname, val)
 
         if kwargs:
             for prop in kwargs.keys():
@@ -299,6 +300,12 @@ class Model(object):
         # attributes we have been given to the class we have been given.
         if not raw:
             for parent, field in meta.parents.items():
+                # At this point, parent's primary key field may be unknown
+                # (for example, from administration form which doesn't fill
+                # this field). If so, fill it.
+                if getattr(self, parent._meta.pk.attname) is None and getattr(self, field.attname) is not None:
+                    setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
+
                 self.save_base(raw, parent)
                 setattr(self, field.attname, self._get_pk_val(parent._meta))
 
@@ -472,11 +479,12 @@ class Model(object):
         return os.path.getsize(self._get_FIELD_filename(field))
 
     def _save_FIELD_file(self, field, filename, raw_field, save=True):
-        directory = field.get_directory_name()
-        try: # Create the date-based directory if it doesn't exist.
-            os.makedirs(os.path.join(settings.MEDIA_ROOT, directory))
-        except OSError: # Directory probably already exists.
-            pass
+        # Create the upload directory if it doesn't already exist
+        directory = os.path.join(settings.MEDIA_ROOT, field.get_directory_name())
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        elif not os.path.isdir(directory):
+            raise IOError('%s exists and is not a directory' % directory)        
 
         # Check for old-style usage (files-as-dictionaries). Warn here first
         # since there are multiple locations where we need to support both new
@@ -494,7 +502,7 @@ class Model(object):
         elif isinstance(raw_field, basestring):
             import warnings
             warnings.warn(
-                message = "Representing uploaded files as dictionaries is deprecated. Use django.core.files.uploadedfile.SimpleUploadedFile instead.",
+                message = "Representing uploaded files as strings is deprecated. Use django.core.files.uploadedfile.SimpleUploadedFile instead.",
                 category = DeprecationWarning,
                 stacklevel = 2
             )

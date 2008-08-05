@@ -50,7 +50,7 @@ class PostGISField(Field):
               style.SQL_KEYWORD(index_opts) + ' );'
         return sql
 
-    def _post_create_sql(self, style, db_table):
+    def post_create_sql(self, style, db_table):
         """
         Returns SQL that will be executed after the model has been
         created. Geometry columns must be added after creation with the

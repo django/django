@@ -148,42 +148,54 @@ def lazy(func, *resultclasses):
     function is evaluated on every access.
     """
     class __proxy__(Promise):
-        # This inner class encapsulates the code that should be evaluated
-        # lazily. On calling of one of the magic methods it will force
-        # the evaluation and store the result. Afterwards, the result
-        # is delivered directly. So the result is memoized.
+        """
+        Encapsulate a function call and act as a proxy for methods that are
+        called on the result of that function. The function is not evaluated
+        until one of the methods on the result is called.
+        """
+        __dispatch = None
+
         def __init__(self, args, kw):
             self.__func = func
             self.__args = args
             self.__kw = kw
-            self.__dispatch = {}
-            for resultclass in resultclasses:
-                self.__dispatch[resultclass] = {}
-                for (k, v) in resultclass.__dict__.items():
-                    setattr(self, k, self.__promise__(resultclass, k, v))
-            self._delegate_str = str in resultclasses
-            self._delegate_unicode = unicode in resultclasses
-            assert not (self._delegate_str and self._delegate_unicode), "Cannot call lazy() with both str and unicode return types."
-            if self._delegate_unicode:
-                # Each call to lazy() makes a new __proxy__ object, so this
-                # doesn't interfere with any other lazy() results.
-                __proxy__.__unicode__ = __proxy__.__unicode_cast
-            elif self._delegate_str:
-                __proxy__.__str__ = __proxy__.__str_cast
+            if self.__dispatch is None:
+                self.__prepare_class__()
 
-        def __promise__(self, klass, funcname, func):
+        def __prepare_class__(cls):
+            cls.__dispatch = {}
+            for resultclass in resultclasses:
+                cls.__dispatch[resultclass] = {}
+                for (k, v) in resultclass.__dict__.items():
+                    if hasattr(cls, k):
+                        continue
+                    setattr(cls, k, cls.__promise__(resultclass, k, v))
+            cls._delegate_str = str in resultclasses
+            cls._delegate_unicode = unicode in resultclasses
+            assert not (cls._delegate_str and cls._delegate_unicode), "Cannot call lazy() with both str and unicode return types."
+            if cls._delegate_unicode:
+                cls.__unicode__ = cls.__unicode_cast
+            elif cls._delegate_str:
+                cls.__str__ = cls.__str_cast
+        __prepare_class__ = classmethod(__prepare_class__)
+
+        def __promise__(cls, klass, funcname, func):
             # Builds a wrapper around some magic method and registers that magic
             # method for the given type and method name.
-            def __wrapper__(*args, **kw):
+            def __wrapper__(self, *args, **kw):
                 # Automatically triggers the evaluation of a lazy value and
                 # applies the given magic method of the result type.
                 res = self.__func(*self.__args, **self.__kw)
-                return self.__dispatch[type(res)][funcname](res, *args, **kw)
+                for t in type(res).mro():
+                    if t in self.__dispatch:
+                        return self.__dispatch[t][funcname](res, *args, **kw)
+                raise TypeError("Lazy object returned unexpected type.")
 
-            if klass not in self.__dispatch:
-                self.__dispatch[klass] = {}
-            self.__dispatch[klass][funcname] = func
+            if klass not in cls.__dispatch:
+                cls.__dispatch[klass] = {}
+            cls.__dispatch[klass][funcname] = func
             return __wrapper__
+        __promise__ = classmethod(__promise__)
 
         def __unicode_cast(self):
             return self.__func(*self.__args, **self.__kw)

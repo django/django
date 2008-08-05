@@ -70,7 +70,7 @@ class OracleSpatialField(Field):
               style.SQL_TABLE('MDSYS.SPATIAL_INDEX') + ';'
         return sql
 
-    def _post_create_sql(self, style, db_table):
+    def post_create_sql(self, style, db_table):
         """
         Returns SQL that will be executed after the model has been
         created.

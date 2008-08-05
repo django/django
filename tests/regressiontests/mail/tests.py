@@ -3,6 +3,7 @@ r"""
 # Tests for the django.core.mail.
 
 >>> from django.core.mail import EmailMessage
+>>> from django.utils.translation import ugettext_lazy
 
 # Test normal ascii character case:
 
@@ -36,6 +37,12 @@ r"""
 >>> message = email.message()
 Traceback (most recent call last):
     ...
-BadHeaderError: Header values can't contain newlines (got 'Subject\nInjection Test' for header 'Subject')
+BadHeaderError: Header values can't contain newlines (got u'Subject\nInjection Test' for header 'Subject')
+
+>>> email = EmailMessage(ugettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com'])
+>>> message = email.message()
+Traceback (most recent call last):
+    ...
+BadHeaderError: Header values can't contain newlines (got u'Subject\nInjection Test' for header 'Subject')
 
 """

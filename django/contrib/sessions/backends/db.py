@@ -1,10 +1,7 @@
 import datetime
-
-from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.exceptions import SuspiciousOperation
-
 
 class SessionStore(SessionBase):
     """

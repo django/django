@@ -4,7 +4,7 @@ except NameError:
     from sets import Set as set     # Python 2.3 fallback
 
 __test__ = {'API_TESTS': """
->>> from django.contrib.auth.models import User, Group, Permission
+>>> from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 >>> from django.contrib.contenttypes.models import ContentType
 
 # No Permissions assigned yet, should return False except for superuser
@@ -69,4 +69,10 @@ True
 True
 >>> user.has_perms(['auth.test3', 'auth.test_group'])
 True
+
+>>> user = AnonymousUser()
+>>> user.has_perm('test')
+False
+>>> user.has_perms(['auth.test2', 'auth.test3'])
+False
 """}

@@ -181,7 +181,7 @@ def sql_delete(app, style):
     for model in app_models:
         opts = model._meta
         for f in opts.local_many_to_many:
-            if isinstance(f.rel, generic.GenericRel):
+            if not f.creates_table:
                 continue
             if cursor and table_name_converter(f.m2m_db_table()) in table_names:
                 output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
@@ -353,7 +353,7 @@ def many_to_many_sql_for_model(model, style):
     qn = connection.ops.quote_name
     inline_references = connection.features.inline_fk_references
     for f in opts.local_many_to_many:
-        if not isinstance(f.rel, generic.GenericRel):
+        if f.creates_table:
             tablespace = f.db_tablespace or opts.db_tablespace
             if tablespace and connection.features.supports_tablespaces: 
                 tablespace_sql = ' ' + connection.ops.tablespace_sql(tablespace, inline=True)
@@ -435,12 +435,12 @@ def custom_sql_for_model(model, style):
     output = []
 
     # Post-creation SQL should come before any initial SQL data is loaded.
-    # However, this should not be done for fields that are part of a 
-    # a parent model (via model inheritance).
+    # However, this should not be done for fields that are part of a a parent
+    # model (via model inheritance).
     nm = opts.init_name_map()
-    post_sql_fields = [f for f in opts.fields if nm[f.name][1] is None and hasattr(f, '_post_create_sql')]
+    post_sql_fields = [f for f in opts.local_fields if hasattr(f, 'post_create_sql')]
     for f in post_sql_fields:
-        output.extend(f._post_create_sql(style, model._meta.db_table))
+        output.extend(f.post_create_sql(style, model._meta.db_table))
 
     # Some backends can't execute more than one SQL statement at a time,
     # so split into separate statements.

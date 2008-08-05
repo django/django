@@ -36,4 +36,15 @@ __test__ = {'API_TESTS':"""
 u'Male'
 >>> s.get_gender_display()
 u'Female'
+
+# If the value for the field doesn't correspond to a valid choice,
+# the value itself is provided as a display value.
+>>> a.gender = ''
+>>> a.get_gender_display()
+u''
+
+>>> a.gender = 'U'
+>>> a.get_gender_display()
+u'U'
+
 """}

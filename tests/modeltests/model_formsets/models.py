@@ -1,7 +1,15 @@
 from django.db import models
 
+try:
+    sorted
+except NameError:
+    from django.utils.itercompat import sorted
+
 class Author(models.Model):
     name = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ('name',)
 
     def __unicode__(self):
         return self.name
@@ -17,9 +25,13 @@ class AuthorMeeting(models.Model):
     name = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author)
     created = models.DateField(editable=False)
-    
+
     def __unicode__(self):
         return self.name
+
+class CustomPrimaryKey(models.Model):
+    my_pk = models.CharField(max_length=10, primary_key=True)
+    some_field = models.CharField(max_length=100)
 
 
 __test__ = {'API_TESTS': """
@@ -41,7 +53,6 @@ __test__ = {'API_TESTS': """
 >>> data = {
 ...     'form-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'form-INITIAL_FORMS': '0', # the number of forms with initial data
-...     'form-MAX_FORMS': '0', # the max number of forms
 ...     'form-0-name': 'Charles Baudelaire',
 ...     'form-1-name': 'Arthur Rimbaud',
 ...     'form-2-name': '',
@@ -79,7 +90,6 @@ them in alphabetical order by name.
 >>> data = {
 ...     'form-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'form-INITIAL_FORMS': '2', # the number of forms with initial data
-...     'form-MAX_FORMS': '0', # the max number of forms
 ...     'form-0-id': '2',
 ...     'form-0-name': 'Arthur Rimbaud',
 ...     'form-1-id': '1',
@@ -123,7 +133,6 @@ deltetion, make sure we don't save that form.
 >>> data = {
 ...     'form-TOTAL_FORMS': '4', # the number of forms rendered
 ...     'form-INITIAL_FORMS': '3', # the number of forms with initial data
-...     'form-MAX_FORMS': '0', # the max number of forms
 ...     'form-0-id': '2',
 ...     'form-0-name': 'Arthur Rimbaud',
 ...     'form-1-id': '1',
@@ -153,7 +162,6 @@ Let's edit a record to ensure save only returns that one record.
 >>> data = {
 ...     'form-TOTAL_FORMS': '4', # the number of forms rendered
 ...     'form-INITIAL_FORMS': '3', # the number of forms with initial data
-...     'form-MAX_FORMS': '0', # the max number of forms
 ...     'form-0-id': '2',
 ...     'form-0-name': 'Walt Whitman',
 ...     'form-1-id': '1',
@@ -184,7 +192,6 @@ Test the behavior of commit=False and save_m2m
 >>> data = {
 ...     'form-TOTAL_FORMS': '2', # the number of forms rendered
 ...     'form-INITIAL_FORMS': '1', # the number of forms with initial data
-...     'form-MAX_FORMS': '0', # the max number of forms
 ...     'form-0-id': '1',
 ...     'form-0-name': '2nd Tuesday of the Week Meeting',
 ...     'form-0-authors': [2, 1, 3, 4],
@@ -201,7 +208,7 @@ True
 ...     instance.save()
 >>> formset.save_m2m()
 >>> instances[0].authors.all()
-[<Author: Charles Baudelaire>, <Author: Walt Whitman>, <Author: Paul Verlaine>, <Author: John Steinbeck>]
+[<Author: Charles Baudelaire>, <Author: John Steinbeck>, <Author: Paul Verlaine>, <Author: Walt Whitman>]
 
 # delete the author we created to allow later tests to continue working.
 >>> new_author.delete()
@@ -214,13 +221,14 @@ used.
 
 >>> AuthorFormSet = modelformset_factory(Author, max_num=2)
 >>> formset = AuthorFormSet(queryset=qs)
->>> formset.initial
-[{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}]
+>>> [sorted(x.items()) for x in formset.initial]
+[[('id', 1), ('name', u'Charles Baudelaire')], [('id', 3), ('name', u'Paul Verlaine')]]
 
 >>> AuthorFormSet = modelformset_factory(Author, max_num=3)
 >>> formset = AuthorFormSet(queryset=qs)
->>> formset.initial
-[{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}, {'id': 2, 'name': u'Walt Whitman'}]
+>>> [sorted(x.items()) for x in formset.initial]
+[[('id', 1), ('name', u'Charles Baudelaire')], [('id', 3), ('name', u'Paul Verlaine')], [('id', 2), ('name', u'Walt Whitman')]]
+
 
 # Inline Formsets ############################################################
 
@@ -242,7 +250,6 @@ admin system's edit inline functionality works.
 >>> data = {
 ...     'book_set-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'book_set-INITIAL_FORMS': '0', # the number of forms with initial data
-...     'book_set-MAX_FORMS': '0', # the max number of forms
 ...     'book_set-0-title': 'Les Fleurs du Mal',
 ...     'book_set-1-title': '',
 ...     'book_set-2-title': '',
@@ -277,7 +284,6 @@ book.
 >>> data = {
 ...     'book_set-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'book_set-INITIAL_FORMS': '1', # the number of forms with initial data
-...     'book_set-MAX_FORMS': '0', # the max number of forms
 ...     'book_set-0-id': '1',
 ...     'book_set-0-title': 'Les Fleurs du Mal',
 ...     'book_set-1-title': 'Le Spleen de Paris',
@@ -293,10 +299,10 @@ True
 
 As you can see, 'Le Spleen de Paris' is now a book belonging to Charles Baudelaire.
 
->>> for book in author.book_set.order_by('title'):
+>>> for book in author.book_set.order_by('id'):
 ...     print book.title
-Le Spleen de Paris
 Les Fleurs du Mal
+Le Spleen de Paris
 
 The save_as_new parameter lets you re-associate the data to a new instance.
 This is used in the admin for save_as functionality.
@@ -304,7 +310,6 @@ This is used in the admin for save_as functionality.
 >>> data = {
 ...     'book_set-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'book_set-INITIAL_FORMS': '2', # the number of forms with initial data
-...     'book_set-MAX_FORMS': '0', # the max number of forms
 ...     'book_set-0-id': '1',
 ...     'book_set-0-title': 'Les Fleurs du Mal',
 ...     'book_set-1-id': '2',
@@ -320,5 +325,24 @@ True
 >>> formset.instance = new_author
 >>> [book for book in formset.save() if book.author.pk == new_author.pk]
 [<Book: Les Fleurs du Mal>, <Book: Le Spleen de Paris>]
+
+Test using a custom prefix on an inline formset.
+
+>>> formset = AuthorBooksFormSet(prefix="test")
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_test-0-title">Title:</label> <input id="id_test-0-title" type="text" name="test-0-title" maxlength="100" /><input type="hidden" name="test-0-id" id="id_test-0-id" /></p>
+<p><label for="id_test-1-title">Title:</label> <input id="id_test-1-title" type="text" name="test-1-title" maxlength="100" /><input type="hidden" name="test-1-id" id="id_test-1-id" /></p>
+
+# Test a custom primary key ###################################################
+
+We need to ensure that it is displayed
+
+>>> CustomPrimaryKeyFormSet = modelformset_factory(CustomPrimaryKey)
+>>> formset = CustomPrimaryKeyFormSet()
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_form-0-my_pk">My pk:</label> <input id="id_form-0-my_pk" type="text" name="form-0-my_pk" maxlength="10" /></p>
+<p><label for="id_form-0-some_field">Some field:</label> <input id="id_form-0-some_field" type="text" name="form-0-some_field" maxlength="100" /></p>
 
 """}

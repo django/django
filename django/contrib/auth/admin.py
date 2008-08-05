@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import PermissionDenied
-from django import oldforms, template
+from django import template
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext, ugettext_lazy as _

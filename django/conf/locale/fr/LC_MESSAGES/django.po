@@ -1,7 +1,7 @@
 # translation of django.po to french
 # This file is distributed under the same license as the PACKAGE package.
 # Copyright (C) 2008 THE PACKAGE'S COPYRIGHT HOLDER.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
@@ -1066,7 +1066,7 @@ msgstr "Sélectionnez %s"
 #: contrib/admin/views/main.py:583
 #, python-format
 msgid "Select %s to change"
-msgstr "Sélectionnez %s pour changer"
+msgstr "Sélectionnez l'objet %s à changer"
 
 #: contrib/admin/views/main.py:784
 msgid "Database error"
@@ -4093,107 +4093,107 @@ msgstr "midi"
 
 #: utils/dates.py:6
 msgid "Monday"
-msgstr "Lundi"
+msgstr "lundi"
 
 #: utils/dates.py:6
 msgid "Tuesday"
-msgstr "Mardi"
+msgstr "mardi"
 
 #: utils/dates.py:6
 msgid "Wednesday"
-msgstr "Mercredi"
+msgstr "mercredi"
 
 #: utils/dates.py:6
 msgid "Thursday"
-msgstr "Jeudi"
+msgstr "jeudi"
 
 #: utils/dates.py:6
 msgid "Friday"
-msgstr "Vendredi"
+msgstr "vendredi"
 
 #: utils/dates.py:7
 msgid "Saturday"
-msgstr "Samedi"
+msgstr "samedi"
 
 #: utils/dates.py:7
 msgid "Sunday"
-msgstr "Dimanche"
+msgstr "dimanche"
 
 #: utils/dates.py:10
 msgid "Mon"
-msgstr "Lun"
+msgstr "lun"
 
 #: utils/dates.py:10
 msgid "Tue"
-msgstr "Mar"
+msgstr "mar"
 
 #: utils/dates.py:10
 msgid "Wed"
-msgstr "Mer"
+msgstr "mer"
 
 #: utils/dates.py:10
 msgid "Thu"
-msgstr "Jeu"
+msgstr "jeu"
 
 #: utils/dates.py:10
 msgid "Fri"
-msgstr "Ven"
+msgstr "ven"
 
 #: utils/dates.py:11
 msgid "Sat"
-msgstr "Sam"
+msgstr "sam"
 
 #: utils/dates.py:11
 msgid "Sun"
-msgstr "Dim"
+msgstr "dim"
 
 #: utils/dates.py:18
 msgid "January"
-msgstr "Janvier"
+msgstr "janvier"
 
 #: utils/dates.py:18
 msgid "February"
-msgstr "Février"
+msgstr "février"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "March"
-msgstr "Mars"
+msgstr "mars"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "April"
-msgstr "Avril"
+msgstr "avril"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "May"
-msgstr "Mai"
+msgstr "mai"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "June"
-msgstr "Juin"
+msgstr "juin"
 
 #: utils/dates.py:19 utils/dates.py:31
 msgid "July"
-msgstr "Juillet"
+msgstr "juillet"
 
 #: utils/dates.py:19
 msgid "August"
-msgstr "Août"
+msgstr "août"
 
 #: utils/dates.py:19
 msgid "September"
-msgstr "Septembre"
+msgstr "septembre"
 
 #: utils/dates.py:19
 msgid "October"
-msgstr "Octobre"
+msgstr "octobre"
 
 #: utils/dates.py:19
 msgid "November"
-msgstr "Novembre"
+msgstr "novembre"
 
 #: utils/dates.py:20
 msgid "December"
-msgstr "Décembre"
+msgstr "décembre"
 
 #: utils/dates.py:23
 msgid "jan"
@@ -4245,31 +4245,31 @@ msgstr "déc"
 
 #: utils/dates.py:31
 msgid "Jan."
-msgstr "Jan."
+msgstr "jan."
 
 #: utils/dates.py:31
 msgid "Feb."
-msgstr "Fév."
+msgstr "fév."
 
 #: utils/dates.py:32
 msgid "Aug."
-msgstr "Août"
+msgstr "août"
 
 #: utils/dates.py:32
 msgid "Sept."
-msgstr "Sept."
+msgstr "sept."
 
 #: utils/dates.py:32
 msgid "Oct."
-msgstr "Oct."
+msgstr "oct."
 
 #: utils/dates.py:32
 msgid "Nov."
-msgstr "Nov."
+msgstr "nov."
 
 #: utils/dates.py:32
 msgid "Dec."
-msgstr "Déc."
+msgstr "déc."
 
 #: utils/text.py:127
 msgid "or"

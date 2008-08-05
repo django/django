@@ -1,29 +1,31 @@
 "File-based cache backend"
 
-import md5
-import os, time
+import os
+import time
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
+
 from django.core.cache.backends.base import BaseCache
+from django.utils.hashcompat import md5_constructor
 
 class CacheClass(BaseCache):
     def __init__(self, dir, params):
         BaseCache.__init__(self, params)
-        
+
         max_entries = params.get('max_entries', 300)
         try:
             self._max_entries = int(max_entries)
         except (ValueError, TypeError):
             self._max_entries = 300
-            
+
         cull_frequency = params.get('cull_frequency', 3)
         try:
             self._cull_frequency = int(cull_frequency)
         except (ValueError, TypeError):
             self._cull_frequency = 3
-            
+
         self._dir = dir
         if not os.path.exists(self._dir):
             self._createdir()
@@ -31,7 +33,7 @@ class CacheClass(BaseCache):
     def add(self, key, value, timeout=None):
         if self.has_key(key):
             return None
-        
+
         self.set(key, value, timeout)
 
     def get(self, key, default=None):
@@ -52,12 +54,12 @@ class CacheClass(BaseCache):
     def set(self, key, value, timeout=None):
         fname = self._key_to_file(key)
         dirname = os.path.dirname(fname)
-        
+
         if timeout is None:
             timeout = self.default_timeout
-            
+
         self._cull()
-        
+
         try:
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
@@ -103,12 +105,12 @@ class CacheClass(BaseCache):
     def _cull(self):
         if int(self._num_entries) < self._max_entries:
             return
-        
+
         try:
             filelist = os.listdir(self._dir)
         except (IOError, OSError):
             return
-        
+
         if self._cull_frequency == 0:
             doomed = filelist
         else:
@@ -133,11 +135,11 @@ class CacheClass(BaseCache):
         Convert the filename into an md5 string. We'll turn the first couple
         bits of the path into directory prefixes to be nice to filesystems
         that have problems with large numbers of files in a directory.
-        
+
         Thus, a cache key of "foo" gets turnned into a file named
         ``{cache-dir}ac/bd/18db4cc2f85cedef654fccc4a4d8``.
         """
-        path = md5.new(key.encode('utf-8')).hexdigest()
+        path = md5_constructor(key.encode('utf-8')).hexdigest()
         path = os.path.join(path[:2], path[2:4], path[4:])
         return os.path.join(self._dir, path)
 
@@ -147,4 +149,3 @@ class CacheClass(BaseCache):
             count += len(files)
         return count
     _num_entries = property(_get_num_entries)
-

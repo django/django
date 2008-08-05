@@ -62,6 +62,8 @@ class Context(object):
 
     def update(self, other_dict):
         "Like dict.update(). Pushes an entire dictionary's keys and values onto the context."
+        if not hasattr(other_dict, '__getitem__'): 
+            raise TypeError('other_dict must be a mapping (dictionary-like) object.')
         self.dicts = [other_dict] + self.dicts
         return other_dict
 

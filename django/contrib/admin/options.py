@@ -1,5 +1,4 @@
-from django import oldforms, template
-from django import forms
+from django import forms, template
 from django.forms.formsets import all_valid
 from django.forms.models import modelform_factory, inlineformset_factory
 from django.forms.models import BaseInlineFormset
@@ -15,7 +14,10 @@ from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_unicode
-import sets
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback
 
 HORIZONTAL, VERTICAL = 1, 2
 # returns the <ul> class for a given radio_admin field
@@ -90,7 +92,7 @@ class Fieldline(object):
             yield AdminField(self.form, field, is_first=(i == 0))
 
     def errors(self):
-        return mark_safe(u'\n'.join([self.form[f].errors.as_ul() for f in self.fields]))
+        return mark_safe(u'\n'.join([self.form[f].errors.as_ul() for f in self.fields]).strip('\n'))
 
 class AdminField(object):
     def __init__(self, form, field, is_first):
@@ -130,6 +132,23 @@ class BaseModelAdmin(object):
 
         If kwargs are given, they're passed to the form Field's constructor.
         """
+
+        # If the field specifies choices, we don't need to look for special
+        # admin widgets - we just need to use a select widget of some kind.
+        if db_field.choices:
+            if db_field.name in self.radio_fields:
+                # If the field is named as a radio_field, use a RadioSelect
+                kwargs['widget'] = widgets.AdminRadioSelect(
+                    choices=db_field.get_choices(include_blank=db_field.blank,
+                        blank_choice=[('', _('None'))]),
+                    attrs={
+                        'class': get_ul_class(self.radio_fields[db_field.name]),
+                    }
+                )
+            else:
+                # Otherwise, use the default select widget.
+                return db_field.formfield(**kwargs)
+
         # For DateTimeFields, use a special field and widget.
         if isinstance(db_field, models.DateTimeField):
             kwargs['form_class'] = forms.SplitDateTimeField
@@ -162,10 +181,13 @@ class BaseModelAdmin(object):
                 kwargs['empty_label'] = db_field.blank and _('None') or None
             else:
                 if isinstance(db_field, models.ManyToManyField):
-                    if db_field.name in self.raw_id_fields:
+                    # If it uses an intermediary model, don't show field in admin.
+                    if db_field.rel.through is not None:
+                        return None
+                    elif db_field.name in self.raw_id_fields:
                         kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.rel)
                         kwargs['help_text'] = ''
-                    elif db_field.name in (self.filter_vertical + self.filter_horizontal):
+                    elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
                         kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
             # Wrap the widget's render() method with a method that adds
             # extra HTML to the end of the rendered output.
@@ -174,15 +196,6 @@ class BaseModelAdmin(object):
             if not db_field.name in self.raw_id_fields:
                 formfield.widget = widgets.RelatedFieldWidgetWrapper(formfield.widget, db_field.rel, self.admin_site)
             return formfield
-        
-        if db_field.choices and db_field.name in self.radio_fields:
-            kwargs['widget'] = widgets.AdminRadioSelect(
-                choices=db_field.get_choices(include_blank=db_field.blank,
-                    blank_choice=[('', _('None'))]),
-                attrs={
-                    'class': get_ul_class(self.radio_fields[db_field.name]),
-                }
-            )
 
         # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)
@@ -210,7 +223,7 @@ class ModelAdmin(BaseModelAdmin):
     save_on_top = False
     ordering = None
     inlines = []
-    
+
     # Custom templates (designed to be over-ridden in subclasses)
     change_form_template = None
     change_list_template = None
@@ -261,7 +274,7 @@ class ModelAdmin(BaseModelAdmin):
             js.extend(['js/getElementsBySelector.js', 'js/dom-drag.js' , 'js/admin/ordering.js'])
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
-        
+
         return forms.Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
     media = property(_media)
 
@@ -345,7 +358,7 @@ class ModelAdmin(BaseModelAdmin):
 
         pk_value = new_object._get_pk_val()
         LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, pk_value, force_unicode(new_object), ADDITION)
-        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object}
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
         if request.POST.has_key("_continue"):
@@ -359,7 +372,7 @@ class ModelAdmin(BaseModelAdmin):
                 # escape() calls force_unicode.
                 (escape(pk_value), escape(new_object)))
         elif request.POST.has_key("_addanother"):
-            request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+            request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
             return HttpResponseRedirect(request.path)
         else:
             request.user.message_set.create(message=msg)
@@ -378,7 +391,7 @@ class ModelAdmin(BaseModelAdmin):
         Saves the object in the "change" stage and returns an HttpResponseRedirect.
 
         `form` is a bound Form instance that's verified to be valid.
-        
+
         `formsets` is a sequence of InlineFormSet instances that are verified to be valid.
         """
         from django.contrib.admin.models import LogEntry, CHANGE
@@ -394,20 +407,20 @@ class ModelAdmin(BaseModelAdmin):
         change_message = []
         if form.changed_data:
             change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
-            
+
         if formsets:
             for formset in formsets:
                 for added_object in formset.new_objects:
-                    change_message.append(_('Added %(name)s "%(object)s".') 
+                    change_message.append(_('Added %(name)s "%(object)s".')
                                           % {'name': added_object._meta.verbose_name,
                                              'object': added_object})
                 for changed_object, changed_fields in formset.changed_objects:
-                    change_message.append(_('Changed %(list)s for %(name)s "%(object)s".') 
-                                          % {'list': get_text_list(changed_fields, _('and')), 
-                                             'name': changed_object._meta.verbose_name, 
+                    change_message.append(_('Changed %(list)s for %(name)s "%(object)s".')
+                                          % {'list': get_text_list(changed_fields, _('and')),
+                                             'name': changed_object._meta.verbose_name,
                                              'object': changed_object})
                 for deleted_object in formset.deleted_objects:
-                    change_message.append(_('Deleted %(name)s "%(object)s".') 
+                    change_message.append(_('Deleted %(name)s "%(object)s".')
                                           % {'name': deleted_object._meta.verbose_name,
                                              'object': deleted_object})
         change_message = ' '.join(change_message)
@@ -415,7 +428,7 @@ class ModelAdmin(BaseModelAdmin):
             change_message = _('No fields changed.')
         LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, pk_value, force_unicode(new_object), CHANGE, change_message)
 
-        msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+        msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object}
         if request.POST.has_key("_continue"):
             request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
             if request.REQUEST.has_key('_popup'):
@@ -423,10 +436,10 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 return HttpResponseRedirect(request.path)
         elif request.POST.has_key("_saveasnew"):
-            request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
+            request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object})
             return HttpResponseRedirect("../%s/" % pk_value)
         elif request.POST.has_key("_addanother"):
-            request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+            request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
             return HttpResponseRedirect("../add/")
         else:
             request.user.message_set.create(message=msg)
@@ -504,7 +517,7 @@ class ModelAdmin(BaseModelAdmin):
             inline_admin_formsets.append(inline_admin_formset)
 
         context = {
-            'title': _('Add %s') % opts.verbose_name,
+            'title': _('Add %s') % force_unicode(opts.verbose_name),
             'adminform': adminForm,
             'is_popup': request.REQUEST.has_key('_popup'),
             'show_delete': False,
@@ -534,7 +547,7 @@ class ModelAdmin(BaseModelAdmin):
             raise PermissionDenied
 
         if obj is None:
-            raise Http404('%s object with primary key %r does not exist.' % (opts.verbose_name, escape(object_id)))
+            raise Http404('%s object with primary key %r does not exist.' % (force_unicode(opts.verbose_name), escape(object_id)))
 
         if request.POST and request.POST.has_key("_saveasnew"):
             return self.add_view(request, form_url='../../add/')
@@ -557,17 +570,16 @@ class ModelAdmin(BaseModelAdmin):
 
         adminForm = AdminForm(form, self.get_fieldsets(request, obj), self.prepopulated_fields)
         media = self.media + adminForm.media
-        for fs in inline_formsets:
-            media = media + fs.media
 
         inline_admin_formsets = []
         for inline, formset in zip(self.inline_instances, inline_formsets):
             fieldsets = list(inline.get_fieldsets(request, obj))
             inline_admin_formset = InlineAdminFormSet(inline, formset, fieldsets)
             inline_admin_formsets.append(inline_admin_formset)
+            media = media + inline_admin_formset.media
 
         context = {
-            'title': _('Change %s') % opts.verbose_name,
+            'title': _('Change %s') % force_unicode(opts.verbose_name),
             'adminform': adminForm,
             'object_id': object_id,
             'original': obj,
@@ -599,7 +611,7 @@ class ModelAdmin(BaseModelAdmin):
             if ERROR_FLAG in request.GET.keys():
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
-        
+
         context = {
             'title': cl.title,
             'is_popup': cl.is_popup,
@@ -632,12 +644,12 @@ class ModelAdmin(BaseModelAdmin):
             raise PermissionDenied
 
         if obj is None:
-            raise Http404('%s object with primary key %r does not exist.' % (opts.verbose_name, escape(object_id)))
+            raise Http404('%s object with primary key %r does not exist.' % (force_unicode(opts.verbose_name), escape(object_id)))
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
         deleted_objects = [mark_safe(u'%s: <a href="../../%s/">%s</a>' % (escape(force_unicode(capfirst(opts.verbose_name))), quote(object_id), escape(obj))), []]
-        perms_needed = sets.Set()
+        perms_needed = set()
         get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1, self.admin_site)
 
         if request.POST: # The user has already confirmed the deletion.
@@ -650,10 +662,10 @@ class ModelAdmin(BaseModelAdmin):
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect("../../../../")
             return HttpResponseRedirect("../../")
-        
+
         context = {
             "title": _("Are you sure?"),
-            "object_name": opts.verbose_name,
+            "object_name": force_unicode(opts.verbose_name),
             "object": obj,
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,
@@ -681,7 +693,7 @@ class ModelAdmin(BaseModelAdmin):
         context = {
             'title': _('Change history: %s') % force_unicode(obj),
             'action_list': action_list,
-            'module_name': capfirst(opts.verbose_name_plural),
+            'module_name': capfirst(force_unicode(opts.verbose_name_plural)),
             'object': obj,
             'root_path': self.admin_site.root_path,
         }
@@ -760,6 +772,13 @@ class InlineAdminFormSet(object):
     def fields(self):
         for field_name in flatten_fieldsets(self.fieldsets):
             yield self.formset.form.base_fields[field_name]
+
+    def _media(self):
+        media = self.formset.media
+        for fs in self:
+            media = media + fs.media
+        return media
+    media = property(_media)
 
 class InlineAdminForm(AdminForm):
     """

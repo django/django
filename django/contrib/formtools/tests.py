@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.formtools import preview
 from django import http
-from django.conf import settings
 from django.test import TestCase
 
 success_string = "Done was called!"

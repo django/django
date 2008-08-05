@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-22 21:55+0400\n"
+"POT-Creation-Date: 2008-07-15 21:17+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: David Avsajanishvili <avsd05@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,191 +14,199 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:44
 msgid "Arabic"
 msgstr "არაბული"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:45
 msgid "Bengali"
 msgstr "ბენგალიური"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:46
 msgid "Bulgarian"
 msgstr "ბულგარული"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:47
 msgid "Catalan"
 msgstr "კატალანური"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:48
 msgid "Czech"
 msgstr "ჩეხური"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:49
 msgid "Welsh"
 msgstr "უელსური"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:50
 msgid "Danish"
 msgstr "დანიური"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:51
 msgid "German"
 msgstr "გერმანული"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:52
 msgid "Greek"
 msgstr "ბერძნული"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:53
 msgid "English"
 msgstr "ინგლისური"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:54
 msgid "Spanish"
 msgstr "ესპანური"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:55
+msgid "Estonian"
+msgstr "ესტონური"
+
+#: conf/global_settings.py:56
 msgid "Argentinean Spanish"
 msgstr "არგენტინის ესპანური"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:57
 msgid "Basque"
 msgstr "ბასკური"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:58
 msgid "Persian"
 msgstr "სპარსული"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:59
 msgid "Finnish"
 msgstr "ფინური"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:60
 msgid "French"
 msgstr "ფრანგული"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:61
 msgid "Irish"
 msgstr "ირლანდიური"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:62
 msgid "Galician"
 msgstr "გალიციური"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:63
 msgid "Hungarian"
 msgstr "უნგრული"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:64
 msgid "Hebrew"
 msgstr "ებრაული"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:65
 msgid "Croatian"
 msgstr "ხორვატიული"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:66
 msgid "Icelandic"
 msgstr "ისლანდიური"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:67
 msgid "Italian"
 msgstr "იტალიური"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:68
 msgid "Japanese"
 msgstr "იაპონური"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:69
 msgid "Georgian"
 msgstr "ქართული"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:70
 msgid "Korean"
 msgstr "კორეული"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:71
 msgid "Khmer"
 msgstr "ხმერული"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:72
 msgid "Kannada"
 msgstr "კანნადა"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:73
 msgid "Latvian"
 msgstr "ლატვიური"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:74
+msgid "Lithuanian"
+msgstr "ლიტვური"
+
+#: conf/global_settings.py:75
 msgid "Macedonian"
 msgstr "მაკედონური"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:76
 msgid "Dutch"
 msgstr "ჰოლანდიური"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:77
 msgid "Norwegian"
 msgstr "ნორვეგიული"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:78
 msgid "Polish"
 msgstr "პოლონური"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:79
 msgid "Portugese"
 msgstr "პორტუგალიური"
 
-#: conf/global_settings.py:73
-msgid "Brazilian"
-msgstr "ბრაზილიური"
+#: conf/global_settings.py:80
+msgid "Brazilian Portuguese"
+msgstr "ბრაზილიური პორტუგალიური"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:81
 msgid "Romanian"
 msgstr "რუმინული"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:82
 msgid "Russian"
 msgstr "რუსული"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:83
 msgid "Slovak"
 msgstr "სლოვარური"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:84
 msgid "Slovenian"
 msgstr "სლოვენიური"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:85
 msgid "Serbian"
 msgstr "სერბული"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:86
 msgid "Swedish"
 msgstr "შვედური"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:87
 msgid "Tamil"
 msgstr "თამილური"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:88
 msgid "Telugu"
 msgstr "ტელუგუ"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:89
 msgid "Turkish"
 msgstr "თურქული"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:90
 msgid "Ukrainian"
 msgstr "უკრაინული"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:91
 msgid "Simplified Chinese"
 msgstr "გამარტივებული ჩინური"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:92
 msgid "Traditional Chinese"
 msgstr "ტრადიციული ჩინური"
 
@@ -322,7 +330,7 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"აქ იყო შეცდომა. იგი გადაგზავნილია საიტის ადმინისტრატორის ელექტრონულ ფოსტაზე "
+"სისტემაში მოხდა შეცდომა. იგი გადაგზავნილია საიტის ადმინისტრატორის ელექტრონულ ფოსტაზე "
 "და მალე გამოსწორდება. გმადლობთ მოთმინებისათვის."
 
 #: contrib/admin/templates/admin/base.html:26
@@ -477,7 +485,7 @@ msgid "Password:"
 msgstr "პაროლი:"
 
 #: contrib/admin/templates/admin/login.html:25
-#: contrib/admin/views/decorators.py:25
+#: contrib/admin/views/decorators.py:31
 msgid "Log in"
 msgstr "შესვლა"
 
@@ -799,7 +807,7 @@ msgstr "პაროლი წარმატებით შეიცვალ�
 msgid "Change password: %s"
 msgstr "შევცვალოთ პაროლი: %s"
 
-#: contrib/admin/views/decorators.py:11 contrib/auth/forms.py:60
+#: contrib/admin/views/decorators.py:17 contrib/auth/forms.py:60
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -807,7 +815,7 @@ msgstr ""
 "გთხოვთ, შეიყვანოთ სწორი მომხმარებლის სახელი და პაროლი. გაითვალისწინეთ, რომ "
 "ორივე ველი დამოკიდებულია რეგისტრზე."
 
-#: contrib/admin/views/decorators.py:63
+#: contrib/admin/views/decorators.py:69
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
@@ -815,7 +823,7 @@ msgstr ""
 "გთხოვთ, შეხვიდეთ კიდევ ერთხელ, რადგანაც თქვენი სესიის დრო ამოიწურა. ნუ "
 "ღელავთ: თქვენს მიერ შეტანილი ცვლილებები შენახულია."
 
-#: contrib/admin/views/decorators.py:70
+#: contrib/admin/views/decorators.py:76
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -823,16 +831,16 @@ msgstr ""
 "როგორც ჩანს, თქვენი ბროუზერი არ ღებულობს cookie-ებს. გთხოვთ, ჩართოთ cookie-"
 "ების მიღების ფუნქცია, განაახლეთ ეს გვერდი და სცადეთ კიდევ ერთხელ."
 
-#: contrib/admin/views/decorators.py:84
-msgid "Usernames cannot contain the '@' character."
-msgstr "მომხმარებლის სახელი არ უნდა შეიცავდეს სიმბოლოს '@'."
-
-#: contrib/admin/views/decorators.py:86
+#: contrib/admin/views/decorators.py:89
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
 "ელ-ფოსტის მისამართი არ არის თქვენი მომხმარებლის სახელი. სცადეთ '%s' მის "
 "ნაცვლად."
+
+#: contrib/admin/views/decorators.py:93
+msgid "Usernames cannot contain the '@' character."
+msgstr "მომხმარებლის სახელი არ უნდა შეიცავდეს სიმბოლოს '@'."
 
 #: contrib/admin/views/doc.py:48 contrib/admin/views/doc.py:50
 #: contrib/admin/views/doc.py:52
@@ -957,7 +965,7 @@ msgstr "ტექსტი"
 msgid "Time"
 msgstr "დრო"
 
-#: contrib/admin/views/doc.py:318 contrib/flatpages/models.py:7
+#: contrib/admin/views/doc.py:318 contrib/flatpages/models.py:8
 msgid "URL"
 msgstr ""
 
@@ -1065,7 +1073,7 @@ msgstr "ავირჩიოთ %s"
 msgid "Select %s to change"
 msgstr "აირჩიეთ %s შესაცვლელად"
 
-#: contrib/admin/views/main.py:784
+#: contrib/admin/views/main.py:765
 msgid "Database error"
 msgstr "მონაცემთა ბაზის შეცდომა"
 
@@ -1129,15 +1137,15 @@ msgstr "უფლებები"
 msgid "group"
 msgstr "ჯგუფი"
 
-#: contrib/auth/models.py:98 contrib/auth/models.py:141
+#: contrib/auth/models.py:98 contrib/auth/models.py:148
 msgid "groups"
 msgstr "ჯგუფები"
 
-#: contrib/auth/models.py:131
+#: contrib/auth/models.py:138
 msgid "username"
 msgstr "მომხმარებლის სახელი"
 
-#: contrib/auth/models.py:131
+#: contrib/auth/models.py:138
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
@@ -1145,23 +1153,23 @@ msgstr ""
 "აუცილებელია. 30 ან ნაკლები სიმბოლო. მხოლოდ ლათინური ასოები, ციფრები და "
 "ხაზგასმა."
 
-#: contrib/auth/models.py:132
+#: contrib/auth/models.py:139
 msgid "first name"
 msgstr "სახელი"
 
-#: contrib/auth/models.py:133
+#: contrib/auth/models.py:140
 msgid "last name"
 msgstr "გვარი"
 
-#: contrib/auth/models.py:134
+#: contrib/auth/models.py:141
 msgid "e-mail address"
 msgstr "ელ. ფოსტა"
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:142
 msgid "password"
 msgstr "პაროლი"
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:142
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
@@ -1169,46 +1177,46 @@ msgstr ""
 "გამოიყენეთ '[algo]$[salt]$[hexdigest]' ან <a href=\"password/\">პაროლის "
 "შეცვლის ფორმა</a>."
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:143
 msgid "staff status"
 msgstr "თანამშრომლობის სტატუსი"
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:143
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 "განსაზღვრავს, აქვს თუ არა მომხმარებელს ადმინისტრირების საიტზე შესვლის უფლება."
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:144
 msgid "active"
 msgstr "აქტიურია"
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:144
 msgid ""
-"Designates whether this user can log into the Django admin. Unselect this "
+"Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"განსაზღვრავს, აქვს თუ არა მომხმარებელს Django-ს ადმინისტრირების საიტზე "
-"შესვლის შესაძლებლობა. გადანიშნეთ ეს დროშა მომხმარებლის წაშლის მაგივრად."
+"განსაზღვრავს, რომ მომხმარებელი გააქტიურებულია. "
+"მომხმარებლის წაშლის მაგივრად გადანიშნეთ ეს დროშა."
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:145
 msgid "superuser status"
 msgstr "სუპერმომხმარებლის სტატუსი"
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:145
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "განსაზღვრავს, რომ ამ მომხმარებელს აქვს ყველა უფლება."
 
-#: contrib/auth/models.py:139
+#: contrib/auth/models.py:146
 msgid "last login"
 msgstr "ბოლო შესვლა"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:147
 msgid "date joined"
 msgstr "გაწევრიანების თარიღი"
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:149
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
@@ -1216,39 +1224,39 @@ msgstr ""
 "ინდივიდუალურად მითითებული უფლებების გარდა, ეს მომხმარებელი მიიღებს აგრეთვე "
 "ყველა იმ ჯგუფის უფლებას, რომელშიც იგი გაწევრიანებულია."
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:150
 msgid "user permissions"
 msgstr "მომხმარებლის უფლებები"
 
-#: contrib/auth/models.py:147
+#: contrib/auth/models.py:154
 msgid "user"
 msgstr "მომხმარებელი"
 
-#: contrib/auth/models.py:148
+#: contrib/auth/models.py:155
 msgid "users"
 msgstr "მომხმარებლები"
 
-#: contrib/auth/models.py:154
+#: contrib/auth/models.py:160
 msgid "Personal info"
 msgstr "პირადი ინფორმაცია"
 
-#: contrib/auth/models.py:155
+#: contrib/auth/models.py:161
 msgid "Permissions"
 msgstr "უფლებები"
 
-#: contrib/auth/models.py:156
+#: contrib/auth/models.py:162
 msgid "Important dates"
 msgstr "მნიშვნელოვანი თარიღები"
 
-#: contrib/auth/models.py:157
+#: contrib/auth/models.py:163
 msgid "Groups"
 msgstr "ჯგუფები"
 
-#: contrib/auth/models.py:316
+#: contrib/auth/models.py:323
 msgid "message"
 msgstr "შეტყობინება"
 
-#: contrib/auth/views.py:47
+#: contrib/auth/views.py:49
 msgid "Logged out"
 msgstr "გამოსული ხართ"
 
@@ -1546,42 +1554,42 @@ msgstr "კომენტარის ID არასწორია"
 msgid "No voting for yourself"
 msgstr "საკუთარი თავისათვის ხმის მიცემა აკრძალულია"
 
-#: contrib/contenttypes/models.py:37
+#: contrib/contenttypes/models.py:67
 msgid "python model class name"
 msgstr "python-ის მოდელის კლასის სახელი"
 
-#: contrib/contenttypes/models.py:40
+#: contrib/contenttypes/models.py:71
 msgid "content type"
 msgstr "კონტენტის ტიპი"
 
-#: contrib/contenttypes/models.py:41
+#: contrib/contenttypes/models.py:72
 msgid "content types"
 msgstr "კონტენტის ტიპები"
 
-#: contrib/flatpages/models.py:8
+#: contrib/flatpages/models.py:9
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "მაგალითი: '/about/contact/'. ყურადღება მიაქციეთ დახრილ ხაზებს თავში და "
 "ბოლოში."
 
-#: contrib/flatpages/models.py:9
+#: contrib/flatpages/models.py:10
 msgid "title"
 msgstr "სათაური"
 
-#: contrib/flatpages/models.py:10
+#: contrib/flatpages/models.py:11
 msgid "content"
 msgstr "კონტენტი"
 
-#: contrib/flatpages/models.py:11
+#: contrib/flatpages/models.py:12
 msgid "enable comments"
 msgstr "ჩავრთოთ კომენტარები"
 
-#: contrib/flatpages/models.py:12
+#: contrib/flatpages/models.py:13
 msgid "template name"
 msgstr "შაბლონის სახელი"
 
-#: contrib/flatpages/models.py:13
+#: contrib/flatpages/models.py:14
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -1589,23 +1597,27 @@ msgstr ""
 "მაგალითი: 'flatpages/contact_page.html'. თუ იგი მითითებული არ არის, "
 "გამოყენებული იქნება 'flatpages/default.html'."
 
-#: contrib/flatpages/models.py:14
+#: contrib/flatpages/models.py:15
 msgid "registration required"
 msgstr "რეგისტრაცია აუცილებელია"
 
-#: contrib/flatpages/models.py:14
+#: contrib/flatpages/models.py:15
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "თუ ეს დროშა ჩართულია, მხოლო შემოსულ მომხმარებლებს ექნებათ გვერდის "
 "დათვალიერების საშუალება."
 
-#: contrib/flatpages/models.py:18
+#: contrib/flatpages/models.py:20
 msgid "flat page"
 msgstr "უბრალო გვერდი"
 
-#: contrib/flatpages/models.py:19
+#: contrib/flatpages/models.py:21
 msgid "flat pages"
 msgstr "უბრალო გვერდები"
+
+#: contrib/flatpages/models.py:27
+msgid "Advanced options"
+msgstr "დამატებითი პარამეტრები"
 
 #: contrib/humanize/templatetags/humanize.py:19
 msgid "th"
@@ -3632,23 +3644,23 @@ msgstr "გადამისამართება"
 msgid "redirects"
 msgstr "გადამისამართებები"
 
-#: contrib/sessions/models.py:41
+#: contrib/sessions/models.py:45
 msgid "session key"
 msgstr "სესიის გასაღები"
 
-#: contrib/sessions/models.py:42
+#: contrib/sessions/models.py:47
 msgid "session data"
 msgstr "სესიის მონაცემები"
 
-#: contrib/sessions/models.py:43
+#: contrib/sessions/models.py:48
 msgid "expire date"
 msgstr "ამოწურვის თარიღი"
 
-#: contrib/sessions/models.py:48
+#: contrib/sessions/models.py:53
 msgid "session"
 msgstr "სესია"
 
-#: contrib/sessions/models.py:49
+#: contrib/sessions/models.py:54
 msgid "sessions"
 msgstr "სესიები"
 
@@ -3720,7 +3732,7 @@ msgstr "არაციფრული სიმბოლოები აქ დ
 msgid "This value can't be comprised solely of digits."
 msgstr "ეს მნიშვნელობა არ უნდა შედგებოდეს მხოლოდ ციფრებისაგან."
 
-#: core/validators.py:128 newforms/fields.py:151
+#: core/validators.py:128 newforms/fields.py:157
 msgid "Enter a whole number."
 msgstr "შეიყვანეთ მთელი რიცხვი"
 
@@ -3737,7 +3749,7 @@ msgstr "წელი უნდა იყოს 1900 ან მეტი."
 msgid "Invalid date: %s"
 msgstr "არასწორი თარიღი: %s"
 
-#: core/validators.py:156 db/models/fields/__init__.py:518
+#: core/validators.py:156 db/models/fields/__init__.py:565
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "შეიყვანეთ სწორი თარიღი YYYY-MM-DD ფორმატში."
 
@@ -3745,21 +3757,20 @@ msgstr "შეიყვანეთ სწორი თარიღი YYYY-MM-D
 msgid "Enter a valid time in HH:MM format."
 msgstr "შეიყვანეთ სწორი დრო HH:MM ფორმატში."
 
-#: core/validators.py:165 db/models/fields/__init__.py:595
+#: core/validators.py:165 db/models/fields/__init__.py:642
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "შეიყვანეთ სწორი თარიღი და დრო YYYY-MM-DD HH:MM ფორმატში."
 
-#: core/validators.py:170 newforms/fields.py:402
+#: core/validators.py:170 newforms/fields.py:408
 msgid "Enter a valid e-mail address."
 msgstr "შეიყვანეთ სწორი ელ. ფოსტის მისამართი."
 
-#: core/validators.py:182 core/validators.py:474 newforms/fields.py:432
-#: oldforms/__init__.py:687
+#: core/validators.py:182 core/validators.py:474 newforms/fields.py:426
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 "ფაილი არ იყო გამოგზავნილი. შეამოწმეთ კოდირების ტიპი მოცემული ფორმისათვის."
 
-#: core/validators.py:193 newforms/fields.py:458
+#: core/validators.py:193 newforms/fields.py:468
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -3878,9 +3889,9 @@ msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] ""
-"გთხოვთ, შეიყვანოთ სწორი, არაუმეტეს %s თანრიგისაგან შემდგარი ათობითი რიცხვი"
+"გთხოვთ, შეიყვანოთ სწორი, არაუმეტეს %s თანრიგისაგან შემდგარი ათობითი რიცხვი."
 msgstr[1] ""
-"გთხოვთ, შეიყვანოთ სწორი, არაუმეტეს %s თანრიგისაგან შემდგარი ათობითი რიცხვი"
+"გთხოვთ, შეიყვანოთ სწორი, არაუმეტეს %s თანრიგისაგან შემდგარი ათობითი რიცხვი."
 
 #: core/validators.py:447
 #, python-format
@@ -4009,53 +4020,53 @@ msgstr "%(object)s მოცემული %(type)s-ით უკვე არ�
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "%(optname)s მოცემული %(fieldname)s-ით უკვე არსებობს."
 
-#: db/models/fields/__init__.py:161 db/models/fields/__init__.py:318
-#: db/models/fields/__init__.py:750 db/models/fields/__init__.py:761
-#: newforms/fields.py:45 oldforms/__init__.py:374
+#: db/models/fields/__init__.py:184 db/models/fields/__init__.py:356
+#: db/models/fields/__init__.py:799 db/models/fields/__init__.py:810
+#: newforms/fields.py:51 oldforms/__init__.py:374
 msgid "This field is required."
 msgstr "ეს ველი აუცილებელია."
 
-#: db/models/fields/__init__.py:418
+#: db/models/fields/__init__.py:465
 msgid "This value must be an integer."
 msgstr "ეს მნიშვნელობა უნდა იყოს მთელი."
 
-#: db/models/fields/__init__.py:457
+#: db/models/fields/__init__.py:504
 msgid "This value must be either True or False."
 msgstr "ეს მნიშვნელობა უნდა იყოს True ან False."
 
-#: db/models/fields/__init__.py:481
+#: db/models/fields/__init__.py:528
 msgid "This field cannot be null."
 msgstr "ეს მნიშვნელობა არ შეიძლება იყოს null."
 
-#: db/models/fields/__init__.py:659
+#: db/models/fields/__init__.py:706
 msgid "This value must be a decimal number."
 msgstr "ეს მნიშვნელობა უნდა იყოს ათობითი რიცხვი."
 
-#: db/models/fields/__init__.py:770
+#: db/models/fields/__init__.py:819
 msgid "Enter a valid filename."
 msgstr "შეიყვანეთ სწორი ფაილის სახელი."
 
-#: db/models/fields/__init__.py:941
+#: db/models/fields/__init__.py:1013
 msgid "This value must be either None, True or False."
 msgstr "ეს მნიშვნელობა უნდა იყოს None, True ან False."
 
-#: db/models/fields/related.py:55
+#: db/models/fields/related.py:94
 #, python-format
 msgid "Please enter a valid %s."
 msgstr "გთხოვთ, შეიყვანოთ სწორი %s."
 
-#: db/models/fields/related.py:658
+#: db/models/fields/related.py:756
 msgid "Separate multiple IDs with commas."
 msgstr "გამოყავით ID-ები მძიმეებით."
 
-#: db/models/fields/related.py:660
+#: db/models/fields/related.py:758
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "დააჭირეთ \"Control\", ან \"Command\" Mac-ზე, ერთზე მეტი მნიშვნელობის "
 "ასარჩევად."
 
-#: db/models/fields/related.py:707
+#: db/models/fields/related.py:805
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -4065,99 +4076,99 @@ msgstr[0] ""
 msgstr[1] ""
 "გთხოვთ, შეიყვანოთ სწორი %(self)s ID-ები. მნიშვნელობები %(value)r არასწორია."
 
-#: newforms/fields.py:46
+#: newforms/fields.py:52
 msgid "Enter a valid value."
 msgstr "შეიყვანეთ სწორი მნიშვნელობა."
 
-#: newforms/fields.py:123
+#: newforms/fields.py:129
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "დარწმუნდით, რომ მნიშვნელობა შედგება არაუმეტეს %(max)d სიმბოლოსაგან (ახლა "
 "მისი სიგრძეა %(length)d)."
 
-#: newforms/fields.py:124
+#: newforms/fields.py:130
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 "დარწმუნდით, რომ მნიშვნელობა შედგება არანაკლებ %(min)d სიმბოლოსაგან (ახლა "
 "მისი სიგრძეა %(length)d)."
 
-#: newforms/fields.py:152 newforms/fields.py:181 newforms/fields.py:210
+#: newforms/fields.py:158 newforms/fields.py:187 newforms/fields.py:216
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "დარწმუნდით, რომ მნიშვნელობა ნაკლებია ან ტოლია %s-ზე."
 
-#: newforms/fields.py:153 newforms/fields.py:182 newforms/fields.py:211
+#: newforms/fields.py:159 newforms/fields.py:188 newforms/fields.py:217
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "დარწმუნდით, რომ მნიშვნელობა მეტია ან ტოლია %s-ზე."
 
-#: newforms/fields.py:180 newforms/fields.py:209
+#: newforms/fields.py:186 newforms/fields.py:215
 msgid "Enter a number."
 msgstr "შეიყვანეთ რიცხვი."
 
-#: newforms/fields.py:212
+#: newforms/fields.py:218
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "დარწმუნდით, რომ მნიშვნელობა %s თანრიგს არ აღემატება."
 
-#: newforms/fields.py:213
+#: newforms/fields.py:219
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "დარწმუნდით, რომ წილადი ნაწილი %s თანრიგს არ აღემატება."
 
-#: newforms/fields.py:214
+#: newforms/fields.py:220
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "დარწმუნდით, რომ მთელი ნაწილი %s თანრიგს არ აღემატება."
 
-#: newforms/fields.py:262 newforms/fields.py:723
+#: newforms/fields.py:268 newforms/fields.py:781
 msgid "Enter a valid date."
 msgstr "შეიყვანეთ სწორი თარიღი."
 
-#: newforms/fields.py:295 newforms/fields.py:724
+#: newforms/fields.py:301 newforms/fields.py:782
 msgid "Enter a valid time."
 msgstr "შეიყვანეთ სწორი დრო."
 
-#: newforms/fields.py:334
+#: newforms/fields.py:340
 msgid "Enter a valid date/time."
 msgstr "შეიყვანეთ სწორი თარიღი და დრო."
 
-#: newforms/fields.py:433
+#: newforms/fields.py:427
 msgid "No file was submitted."
 msgstr "ფაილი არ იყო გამოგზავნილი."
 
-#: newforms/fields.py:434 oldforms/__init__.py:689
+#: newforms/fields.py:428 oldforms/__init__.py:693
 msgid "The submitted file is empty."
 msgstr "გამოგზავნილი ფაილი ცარიელია."
 
-#: newforms/fields.py:496
+#: newforms/fields.py:524
 msgid "Enter a valid URL."
 msgstr "შეიყვანეთ სწორი URL."
 
-#: newforms/fields.py:497
+#: newforms/fields.py:525
 msgid "This URL appears to be a broken link."
 msgstr "როგორც ჩანს, URL არის გაწყვეტილი ბმული."
 
-#: newforms/fields.py:559 newforms/models.py:300
+#: newforms/fields.py:590 newforms/models.py:306
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. ეს არჩევანი დასაშვები არ არის."
 
-#: newforms/fields.py:598
+#: newforms/fields.py:629
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. %(value)s დასაშვები არ არის."
 
-#: newforms/fields.py:599 newforms/fields.py:661 newforms/models.py:360
+#: newforms/fields.py:630 newforms/fields.py:692 newforms/models.py:373
 msgid "Enter a list of values."
 msgstr "შეიყვანეთ მნიშვნელობების სია."
 
-#: newforms/fields.py:752
+#: newforms/fields.py:810
 msgid "Enter a valid IPv4 address."
 msgstr "შეიყვანეთ სწორი IPv4 მისამართი."
 
-#: newforms/models.py:361
+#: newforms/models.py:374
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. %s დასაშვები არ არის."
@@ -4180,40 +4191,40 @@ msgstr ""
 "აირჩიეთ დასაშვები მნიშვნელობა; '%(data)s' არ არის %(choices)s მნიშვნელობების "
 "სიაში."
 
-#: oldforms/__init__.py:745
+#: oldforms/__init__.py:754
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "შეიყვანეთ მთელი რიცხვი -32,768-დან 32,767-მდე."
 
-#: oldforms/__init__.py:755
+#: oldforms/__init__.py:764
 msgid "Enter a positive number."
 msgstr "შეიყვანეთ დადებითი რიცხვი."
 
-#: oldforms/__init__.py:765
+#: oldforms/__init__.py:774
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "შეიყვანეთ მთელი რიცხვი 0-დან 32,767-მდე."
 
-#: template/defaultfilters.py:691
+#: template/defaultfilters.py:698
 msgid "yes,no,maybe"
 msgstr "კი,არა,შესაძლოა"
 
-#: template/defaultfilters.py:722
+#: template/defaultfilters.py:729
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d ბაიტი"
 msgstr[1] "%(size)d ბაიტი"
 
-#: template/defaultfilters.py:724
+#: template/defaultfilters.py:731
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f კბაიტი"
 
-#: template/defaultfilters.py:726
+#: template/defaultfilters.py:733
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f მბაიტი"
 
-#: template/defaultfilters.py:727
+#: template/defaultfilters.py:734
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f გბაიტი"
@@ -4422,7 +4433,7 @@ msgstr "ნოემ."
 msgid "Dec."
 msgstr "დეკ."
 
-#: utils/text.py:127
+#: utils/text.py:128
 msgid "or"
 msgstr "ან"
 
@@ -4476,23 +4487,23 @@ msgstr ""
 msgid ", %(number)d %(type)s"
 msgstr ""
 
-#: utils/translation/trans_real.py:404
+#: utils/translation/trans_real.py:412
 msgid "DATE_FORMAT"
 msgstr "d.m.Y"
 
-#: utils/translation/trans_real.py:405
+#: utils/translation/trans_real.py:413
 msgid "DATETIME_FORMAT"
 msgstr "d.m.Y H:i"
 
-#: utils/translation/trans_real.py:406
+#: utils/translation/trans_real.py:414
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: utils/translation/trans_real.py:422
+#: utils/translation/trans_real.py:430
 msgid "YEAR_MONTH_FORMAT"
 msgstr "d.m.Y"
 
-#: utils/translation/trans_real.py:423
+#: utils/translation/trans_real.py:431
 msgid "MONTH_DAY_FORMAT"
 msgstr "d.m.Y"
 
@@ -4510,3 +4521,6 @@ msgstr "%(verbose_name)s წარმატებით შეიცვალა
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s წაიშალა."
+
+#~ msgid "Brazilian"
+#~ msgstr "ბრაზილიური"

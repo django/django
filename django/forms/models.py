@@ -8,7 +8,6 @@ from warnings import warn
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from django.utils.datastructures import SortedDict
-from django.core.exceptions import ImproperlyConfigured
 
 from util import ValidationError, ErrorList
 from forms import BaseForm, get_declared_fields
@@ -260,8 +259,8 @@ class BaseModelForm(BaseForm):
         # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)
-        BaseForm.__init__(self, data, files, auto_id, prefix, object_data,
-                          error_class, label_suffix, empty_permitted)
+        super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
+                                            error_class, label_suffix, empty_permitted)
 
     def save(self, commit=True):
         """
@@ -306,8 +305,8 @@ class BaseModelFormSet(BaseFormSet):
                  queryset=None, **kwargs):
         self.queryset = queryset
         defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
-        if self._max_form_count > 0:
-            qs = self.get_queryset()[:self._max_form_count]
+        if self.max_num > 0:
+            qs = self.get_queryset()[:self.max_num]
         else:
             qs = self.get_queryset()
         defaults['initial'] = [model_to_dict(obj) for obj in qs]
@@ -379,8 +378,9 @@ class BaseModelFormSet(BaseFormSet):
 
     def add_fields(self, form, index):
         """Add a hidden field for the object's primary key."""
-        self._pk_field_name = self.model._meta.pk.attname
-        form.fields[self._pk_field_name] = IntegerField(required=False, widget=HiddenInput)
+        if self.model._meta.has_auto_field:
+            self._pk_field_name = self.model._meta.pk.attname
+            form.fields[self._pk_field_name] = IntegerField(required=False, widget=HiddenInput)
         super(BaseModelFormSet, self).add_fields(form, index)
 
 def modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.formfield(),
@@ -402,13 +402,14 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.f
 
 class BaseInlineFormset(BaseModelFormSet):
     """A formset for child objects related to a parent."""
-    def __init__(self, data=None, files=None, instance=None, save_as_new=False):
+    def __init__(self, data=None, files=None, instance=None,
+                 save_as_new=False, prefix=None):
         from django.db.models.fields.related import RelatedObject
         self.instance = instance
         self.save_as_new = save_as_new
         # is there a better way to get the object descriptor?
         self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
-        super(BaseInlineFormset, self).__init__(data, files, prefix=self.rel_name)
+        super(BaseInlineFormset, self).__init__(data, files, prefix=prefix or self.rel_name)
     
     def _construct_forms(self):
         if self.save_as_new:
@@ -441,13 +442,20 @@ def _get_foreign_key(parent_model, model, fk_name=None):
         fks_to_parent = [f for f in opts.fields if f.name == fk_name]
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
-            if not isinstance(fk, ForeignKey) or fk.rel.to != parent_model:
+            if not isinstance(fk, ForeignKey) or \
+                    (fk.rel.to != parent_model and 
+                     fk.rel.to not in parent_model._meta.parents.keys()):
                 raise Exception("fk_name '%s' is not a ForeignKey to %s" % (fk_name, parent_model))
         elif len(fks_to_parent) == 0:
             raise Exception("%s has no field named '%s'" % (model, fk_name))
     else:
         # Try to discover what the ForeignKey from model to parent_model is
-        fks_to_parent = [f for f in opts.fields if isinstance(f, ForeignKey) and f.rel.to == parent_model]
+        fks_to_parent = [
+            f for f in opts.fields 
+            if isinstance(f, ForeignKey) 
+            and (f.rel.to == parent_model 
+                or f.rel.to in parent_model._meta.parents.keys())
+        ]
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
         elif len(fks_to_parent) == 0:

@@ -95,7 +95,7 @@ class GenericForeignKey(object):
         setattr(instance, self.cache_attr, value)
 
 class GenericRelation(RelatedField, Field):
-    """Provides an accessor to generic related objects (i.e. comments)"""
+    """Provides an accessor to generic related objects (e.g. comments)"""
 
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
@@ -103,6 +103,9 @@ class GenericRelation(RelatedField, Field):
                             related_name=kwargs.pop('related_name', None),
                             limit_choices_to=kwargs.pop('limit_choices_to', None),
                             symmetrical=kwargs.pop('symmetrical', True))
+
+        # By its very nature, a GenericRelation doesn't create a table.
+        self.creates_table = False
 
         # Override content-type/object-id field names on the related class
         self.object_id_field_name = kwargs.pop("object_id_field", "object_id")

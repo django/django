@@ -1,4 +1,3 @@
-simplejson 1.5
 Copyright (c) 2006 Bob Ippolito
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of

@@ -17,7 +17,7 @@ Basic file uploads
 
 Consider a simple form containing a ``FileField``::
 
-    from django import newforms as forms
+    from django import forms
 
     class UploadFileForm(forms.Form):
         title = forms.CharField(max_length=50)
@@ -48,7 +48,7 @@ something like::
             form = UploadFileForm()
         return render_to_response('upload.html', {'form': form})
 
-.. _binding uploaded files to a form: ../newforms/#binding-uploaded-files-to-a- form
+.. _binding uploaded files to a form: ../forms/#binding-uploaded-files-to-a- form
 
 Notice that we have to pass ``request.FILES`` into the form's constructor; this
 is how file data gets bound into a form.
@@ -79,10 +79,10 @@ methods to access the uploaded content:
         In practice, it's often easiest simply to use ``chunks()`` all the time;
         see the example below.
 
-    ``UploadedFile.file_name``
+    ``UploadedFile.name``
         The name of the uploaded file (e.g. ``my_file.txt``).
 
-    ``UploadedFile.file_size``
+    ``UploadedFile.size``
         The size, in bytes, of the uploaded file.
 
 There are a few other methods and attributes available on ``UploadedFile``
@@ -169,10 +169,10 @@ All ``UploadedFile`` objects define the following methods/attributes:
         Returns ``True`` if you can expect more than one chunk when calling
         ``UploadedFile.chunks(self, chunk_size)``.
 
-    ``UploadedFile.file_size``
+    ``UploadedFile.size``
         The size, in bytes, of the uploaded file.
 
-    ``UploadedFile.file_name``
+    ``UploadedFile.name``
         The name of the uploaded file as provided by the user.
 
     ``UploadedFile.content_type``

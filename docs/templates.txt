@@ -703,9 +703,9 @@ You can loop over a list in reverse by using ``{% for obj in list reversed %}``.
 
 **New in Django development version**
 If you need to loop over a list of lists, you can unpack the values
-in eachs sub-list into a set of known names. For example, if your context contains
-a list of (x,y) coordinates called ``points``, you could use the following
-to output the list of points::
+in each sub-list into individual variables. For example, if your context
+contains a list of (x,y) coordinates called ``points``, you could use the
+following to output the list of points::
 
     {% for x, y in points %}
         There is a point at {{ x }},{{ y }}
@@ -827,6 +827,19 @@ The 'ifchanged' block tag is used within a loop. It has two possible uses.
                 {{ date.hour }}
             {% endifchanged %}
         {% endfor %}
+
+The ``ifchanged`` tag also takes an optional ``{% else %}`` clause that will
+be displayed if the value has not changed::
+
+    {% for match in matches %}
+        <div style="background-color:
+            {% ifchanged match.ballot_id %}
+                {% cycle red,blue %}
+            {% else %}
+                grey
+            {% endifchanged %}
+        ">{{ match }}</div>
+    {% endfor %}
 
 ifequal
 ~~~~~~~
@@ -1550,7 +1563,7 @@ For example::
 
     {{ value|linebreaks }}
 
-If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joe<br>is a
+If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joel<br>is a
 slug</p>``.
 
 linebreaksbr
@@ -1592,9 +1605,9 @@ For example::
 
     {{ value|make_list }}
 
-If ``value`` is the string ``"Joe"``, the output would be the list
-``[u'J', u'o', u'e']``. If ``value`` is ``123``, the output will be the list
-``[1, 2, 3]``.
+If ``value`` is the string ``"Joel"``, the output would be the list
+``[u'J', u'o', u'e', u'l']``. If ``value`` is ``123``, the output will be the
+list ``[1, 2, 3]``.
 
 phone2numeric
 ~~~~~~~~~~~~~
@@ -1945,7 +1958,7 @@ information.
 django.contrib.webdesign
 ------------------------
 
-A collection of template tags that can be useful while designing a website,
+A collection of template tags that can be useful while designing a Web site,
 such as a generator of Lorem Ipsum text. See the `webdesign documentation`_.
 
 .. _webdesign documentation: ../webdesign/

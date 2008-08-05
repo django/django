@@ -1,9 +1,7 @@
 import types
 import urllib
 import datetime
-
 from django.utils.functional import Promise
-from django.utils.safestring import SafeData, mark_safe
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):

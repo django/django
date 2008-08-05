@@ -1,18 +1,21 @@
 """
 Iterator based sre token scanner
 """
-import sre_parse, sre_compile, sre_constants
-from sre_constants import BRANCH, SUBPATTERN
-from re import VERBOSE, MULTILINE, DOTALL
 import re
+from re import VERBOSE, MULTILINE, DOTALL
+import sre_parse
+import sre_compile
+import sre_constants
+from sre_constants import BRANCH, SUBPATTERN
 
 __all__ = ['Scanner', 'pattern']
 
 FLAGS = (VERBOSE | MULTILINE | DOTALL)
+
 class Scanner(object):
     def __init__(self, lexicon, flags=FLAGS):
         self.actions = [None]
-        # combine phrases into a compound pattern
+        # Combine phrases into a compound pattern
         s = sre_parse.Pattern()
         s.flags = flags
         p = []
@@ -26,9 +29,9 @@ class Scanner(object):
             p.append(subpattern)
             self.actions.append(token)
 
+        s.groups = len(p) + 1 # NOTE(guido): Added to make SRE validation work
         p = sre_parse.SubPattern(s, [(BRANCH, (None, p))])
         self.scanner = sre_compile.compile(p)
-
 
     def iterscan(self, string, idx=0, context=None):
         """
@@ -54,7 +57,8 @@ class Scanner(object):
                     match = self.scanner.scanner(string, matchend).match
                 yield rval, matchend
             lastend = matchend
-            
+
+
 def pattern(pattern, flags=FLAGS):
     def decorator(fn):
         fn.pattern = pattern

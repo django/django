@@ -1,6 +1,7 @@
 import datetime
-import md5
 from time import time
+
+from django.utils.hashcompat import md5_constructor
 
 try:
     import decimal
@@ -114,6 +115,13 @@ def truncate_name(name, length=None):
     if length is None or len(name) <= length:
         return name
 
-    hash = md5.md5(name).hexdigest()[:4]
+    hash = md5_constructor(name).hexdigest()[:4]
 
     return '%s%s' % (name[:length-4], hash)
+
+def format_number(value, max_digits, decimal_places):
+    """
+    Formats a number into a string with the requisite number of digits and
+    decimal places.
+    """
+    return u"%.*f" % (decimal_places, value)

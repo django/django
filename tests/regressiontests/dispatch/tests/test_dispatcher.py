@@ -2,6 +2,18 @@ from django.dispatch.dispatcher import *
 from django.dispatch import dispatcher, robust
 import unittest
 import copy
+import sys
+import gc
+
+if sys.platform.startswith('java'):
+    def garbage_collect():
+        """Run the garbage collector and wait a bit to let it do his work"""
+        import time
+        gc.collect()
+        time.sleep(0.1)
+else:
+    def garbage_collect():
+        gc.collect()
 
 def x(a):
     return a
@@ -21,6 +33,7 @@ class DispatcherTests(unittest.TestCase):
     
     def setUp(self):
         # track the initial state, since it's possible that others have bleed receivers in
+        garbage_collect()
         self.sendersBack = copy.copy(dispatcher.sendersBack)
         self.connections = copy.copy(dispatcher.connections)
         self.senders = copy.copy(dispatcher.senders)
@@ -86,6 +99,7 @@ class DispatcherTests(unittest.TestCase):
         connect(a.a, signal, b)
         expected = []
         del a
+        garbage_collect()
         result = send('this',b, a=b)
         self.assertEqual(result, expected)
         self.assertEqual(list(getAllReceivers(b,signal)), [])
@@ -101,6 +115,7 @@ class DispatcherTests(unittest.TestCase):
         connect(a, signal, b)
         expected = []
         del a
+        garbage_collect()
         result = send('this',b, a=b)
         self.assertEqual(result, expected)
         self.assertEqual(list(getAllReceivers(b,signal)), [])
@@ -123,6 +138,7 @@ class DispatcherTests(unittest.TestCase):
         del a
         del b
         del result
+        garbage_collect()
         self._testIsClean()
     
     def testRobust(self):
@@ -141,4 +157,4 @@ def getSuite():
     return unittest.makeSuite(DispatcherTests,'test')
 
 if __name__ == "__main__":
-    unittest.main ()
+    unittest.main()

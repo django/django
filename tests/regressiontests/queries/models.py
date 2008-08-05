@@ -190,6 +190,32 @@ class CustomPk(models.Model):
 class Related(models.Model):
     custom = models.ForeignKey(CustomPk)
 
+# An inter-related setup with a model subclass that has a nullable
+# path to another model, and a return path from that model.
+
+class Celebrity(models.Model):
+    name = models.CharField("Name", max_length=20)
+    greatest_fan = models.ForeignKey("Fan", null=True, unique=True)
+
+class TvChef(Celebrity):
+    pass
+
+class Fan(models.Model):
+    fan_of = models.ForeignKey(Celebrity)
+
+# Multiple foreign keys
+class LeafA(models.Model):
+    data = models.CharField(max_length=10)
+
+    def __unicode__(self):
+        return self.data
+
+class LeafB(models.Model):
+    data = models.CharField(max_length=10)
+
+class Join(models.Model):
+    a = models.ForeignKey(LeafA)
+    b = models.ForeignKey(LeafB)
 
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag.objects.create(name='t1')
@@ -321,6 +347,16 @@ constraints.
 >>> Number.objects.filter(Q(num__gt=7) & Q(num__lt=12) | Q(num__lt=4))
 [<Number: 8>]
 
+Bug #7872
+Another variation on the disjunctive filtering theme.
+
+# For the purposes of this regression test, it's important that there is no
+# Join object releated to the LeafA we create.
+>>> LeafA.objects.create(data='first')
+<LeafA: first>
+>>> LeafA.objects.filter(Q(data='first')|Q(join__b__data='second'))
+[<LeafA: first>]
+
 Bug #6074
 Merging two empty result sets shouldn't leave a queryset with no constraints
 (which would match everything).
@@ -417,9 +453,9 @@ Bug #5324, #6704
 >>> query.LOUTER not in [x[2] for x in query.alias_map.values()]
 True
 
-Similarly, when one of the joins cannot possibly, ever, involve NULL values (Author -> ExtraInfo, in the following), it should never be promoted to a left outer join. So hte following query should only involve one "left outer" join (Author -> Item is 0-to-many).
+Similarly, when one of the joins cannot possibly, ever, involve NULL values (Author -> ExtraInfo, in the following), it should never be promoted to a left outer join. So the following query should only involve one "left outer" join (Author -> Item is 0-to-many).
 >>> qs = Author.objects.filter(id=a1.id).filter(Q(extra__note=n1)|Q(item__note=n3))
->>> len([x[2] for x in qs.query.alias_map.values() if x[2] == query.LOUTER])
+>>> len([x[2] for x in qs.query.alias_map.values() if x[2] == query.LOUTER and qs.query.alias_refcount[x[1]]])
 1
 
 The previous changes shouldn't affect nullable foreign key joins.
@@ -785,6 +821,15 @@ Bug #7204, #7506 -- make sure querysets with related fields can be pickled. If
 this doesn't crash, it's a Good Thing.
 >>> out = pickle.dumps(Item.objects.all())
 
+We should also be able to pickle things that use select_related(). The only
+tricky thing here is to ensure that we do the related selections properly after
+unpickling.
+>>> qs = Item.objects.select_related()
+>>> query = qs.query.as_sql()[0]
+>>> query2 = pickle.loads(pickle.dumps(qs.query))
+>>> query2.as_sql()[0] == query
+True
+
 Bug #7277
 >>> ann1 = Annotation.objects.create(name='a1', tag=t1)
 >>> ann1.notes.add(n1)
@@ -820,6 +865,26 @@ Bug #7759 -- count should work with a partially read result set.
 >>> for obj in qs:
 ...     qs.count() == count
 ...     break
+True
+
+Bug #7791 -- there were "issues" when ordering and distinct-ing on fields
+related via ForeignKeys.
+>>> len(Note.objects.order_by('extrainfo__info').distinct())
+3
+
+Bug #7778 - Model subclasses could not be deleted if a nullable foreign key
+relates to a model that relates back.
+
+>>> num_celebs = Celebrity.objects.count()
+>>> tvc = TvChef.objects.create(name="Huey")
+>>> Celebrity.objects.count() == num_celebs + 1
+True
+>>> f1 = Fan.objects.create(fan_of=tvc)
+>>> f2 = Fan.objects.create(fan_of=tvc)
+>>> tvc.delete()
+
+# The parent object should have been deleted as well.
+>>> Celebrity.objects.count() == num_celebs
 True
 
 """}

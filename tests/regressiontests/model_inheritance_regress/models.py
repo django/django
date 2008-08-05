@@ -43,11 +43,21 @@ class ParkingLot(Place):
     def __unicode__(self):
         return u"%s the parking lot" % self.name
 
+class Supplier(models.Model):
+    restaurant = models.ForeignKey(Restaurant)
+
 class Parent(models.Model):
     created = models.DateTimeField(default=datetime.datetime.now)
 
 class Child(Parent):
     name = models.CharField(max_length=10)
+
+class SelfRefParent(models.Model):
+    parent_data = models.IntegerField()
+    self_data = models.ForeignKey('self', null=True)
+
+class SelfRefChild(SelfRefParent):
+    child_data = models.IntegerField()
 
 __test__ = {'API_TESTS':"""
 # Regression for #7350, #7202
@@ -158,5 +168,30 @@ DoesNotExist: Place matching query does not exist.
 Traceback (most recent call last):
 ...
 DoesNotExist: ItalianRestaurant matching query does not exist.
+
+# Regression test for #6755
+>>> r = Restaurant(serves_pizza=False)
+>>> r.save()
+>>> r.id == r.place_ptr_id
+True
+>>> orig_id = r.id
+>>> r = Restaurant(place_ptr_id=orig_id, serves_pizza=True)
+>>> r.save()
+>>> r.id == orig_id
+True
+>>> r.id == r.place_ptr_id
+True
+
+# Regression test for #7488. This looks a little crazy, but it's the equivalent
+# of what the admin interface has to do for the edit-inline case.
+>>> Supplier.objects.filter(restaurant=Restaurant(name='xx', address='yy'))
+[]
+
+# Regression test for #7853
+# If the parent class has a self-referential link, make sure that any updates
+# to that link via the child update the right table.
+
+>>> obj = SelfRefChild.objects.create(child_data=37, parent_data=42)
+>>> obj.delete()
 
 """}

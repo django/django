@@ -31,23 +31,13 @@ class HttpRequest(object):
     def __init__(self):
         self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
         self.path = ''
+        self.path_info = ''
         self.method = None
 
     def __repr__(self):
         return '<HttpRequest\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
             (pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
             pformat(self.META))
-
-    def __getitem__(self, key):
-        for d in (self.POST, self.GET):
-            if key in d:
-                return d[key]
-        raise KeyError, "%s not found in either POST or GET" % key
-
-    def has_key(self, key):
-        return key in self.GET or key in self.POST
-
-    __contains__ = has_key
 
     def get_host(self):
         """Returns the HTTP host using the environment or request headers."""
@@ -442,3 +432,4 @@ def str_to_unicode(s, encoding):
         return unicode(s, encoding, 'replace')
     else:
         return s
+

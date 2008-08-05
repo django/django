@@ -188,6 +188,9 @@ APPEND_SLASH = True
 # Whether to prepend the "www." subdomain to URLs that don't have it.
 PREPEND_WWW = False
 
+# Override the server-derived value of SCRIPT_NAME
+FORCE_SCRIPT_NAME = None
+
 # List of compiled regular expression objects representing User-Agent strings
 # that are not allowed to visit any page, systemwide. Use this for bad
 # robots/crawlers. Here are a few examples:
@@ -362,6 +365,9 @@ LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/accounts/logout/'
 
 LOGIN_REDIRECT_URL = '/accounts/profile/'
+
+# The number of days a password reset link is valid for
+PASSWORD_RESET_TIMEOUT_DAYS = 3
 
 ###########
 # TESTING #

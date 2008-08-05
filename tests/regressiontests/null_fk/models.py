@@ -1,8 +1,5 @@
 """
-Regression tests for proper working of ForeignKey(null=True). Tests these bugs:
-
-    * #7369: FK non-null after null relationship on select_related() generates an invalid query
-
+Regression tests for proper working of ForeignKey(null=True).
 """
 
 from django.db import models
@@ -38,7 +35,8 @@ __test__ = {'API_TESTS':"""
 
 # Starting from comment, make sure that a .select_related(...) with a specified
 # set of fields will properly LEFT JOIN multiple levels of NULLs (and the things
-# that come after the NULLs, or else data that should exist won't).
+# that come after the NULLs, or else data that should exist won't). Regression
+# test for #7369.
 >>> c = Comment.objects.select_related().get(id=1)
 >>> c.post
 <Post: First Post>
@@ -47,9 +45,11 @@ __test__ = {'API_TESTS':"""
 None
 
 >>> comments = Comment.objects.select_related('post__forum__system_info').all()
->>> [(c.id, c.post.id) for c in comments]
-[(1, 1), (2, None)]
->>> [(c.comment_text, c.post.title) for c in comments]
-[(u'My first comment', u'First Post'), (u'My second comment', None)]
+>>> [(c.id, c.comment_text, c.post) for c in comments]
+[(1, u'My first comment', <Post: First Post>), (2, u'My second comment', None)]
+
+# Regression test for #7530, #7716.
+>>> Comment.objects.select_related('post').filter(post__isnull=True)[0].post is None
+True
 
 """}

@@ -1,4 +1,4 @@
-from django.core import urlresolvers
+from django.core import urlresolvers, paginator
 import urllib
 
 PING_URL = "http://www.google.com/webmasters/tools/ping"
@@ -34,6 +34,10 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     urllib.urlopen("%s?%s" % (ping_url, params))
 
 class Sitemap:
+    # This limit is defined by Google. See the index documentation at
+    # http://sitemaps.org/protocol.php#index.
+    limit = 50000
+
     def __get(self, name, obj, default=None):
         try:
             attr = getattr(self, name)
@@ -49,11 +53,17 @@ class Sitemap:
     def location(self, obj):
         return obj.get_absolute_url()
 
-    def get_urls(self):
+    def _get_paginator(self):
+        if not hasattr(self, "paginator"):
+            self.paginator = paginator.Paginator(self.items(), self.limit)
+        return self.paginator
+    paginator = property(_get_paginator)
+
+    def get_urls(self, page=1):
         from django.contrib.sites.models import Site
         current_site = Site.objects.get_current()
         urls = []
-        for item in self.items():
+        for item in self.paginator.page(page).object_list:
             loc = "http://%s%s" % (current_site.domain, self.__get('location', item))
             url_info = {
                 'location':   loc,

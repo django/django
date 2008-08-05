@@ -87,9 +87,11 @@ def query_class(QueryClass, Database):
             If 'with_limits' is False, any limit/offset information is not
             included in the query.
             """
+
             # The `do_offset` flag indicates whether we need to construct
             # the SQL needed to use limit/offset w/Oracle.
-            do_offset = with_limits and (self.high_mark or self.low_mark)
+            do_offset = with_limits and (self.high_mark is not None
+                                         or self.low_mark)
 
             # If no offsets, just return the result of the base class
             # `as_sql`.
@@ -117,7 +119,7 @@ def query_class(QueryClass, Database):
             # Getting the selection SQL and the params, which has the `rn`
             # extra selection SQL.
             self.extra_select['rn'] = 'ROW_NUMBER() OVER (ORDER BY %s )' % rn_orderby
-            sql, params= super(OracleQuery, self).as_sql(with_limits=False,
+            sql, params = super(OracleQuery, self).as_sql(with_limits=False,
                     with_col_aliases=True)
 
             # Constructing the result SQL, using the initial select SQL
@@ -126,7 +128,7 @@ def query_class(QueryClass, Database):
 
             # Place WHERE condition on `rn` for the desired range.
             result.append('WHERE rn > %d' % self.low_mark)
-            if self.high_mark:
+            if self.high_mark is not None:
                 result.append('AND rn <= %d' % self.high_mark)
 
             # Returning the SQL w/params.
@@ -148,4 +150,3 @@ def query_class(QueryClass, Database):
 
     _classes[QueryClass] = OracleQuery
     return OracleQuery
-

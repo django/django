@@ -29,8 +29,8 @@ class CommentManager(models.Manager):
         'pa,ra') and target (something like 'lcom.eventtimes:5157'). Used to
         validate that submitted form options have not been tampered-with.
         """
-        import md5
-        return md5.new(options + photo_options + rating_options + target + settings.SECRET_KEY).hexdigest()
+        from django.utils.hashcompat import md5_constructor
+        return md5_constructor(options + photo_options + rating_options + target + settings.SECRET_KEY).hexdigest()
 
     def get_rating_options(self, rating_string):
         """

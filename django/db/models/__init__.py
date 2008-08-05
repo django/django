@@ -10,8 +10,6 @@ from django.db.models.fields import *
 from django.db.models.fields.subclassing import SubfieldBase
 from django.db.models.fields.related import ForeignKey, OneToOneField, ManyToManyField, ManyToOneRel, ManyToManyRel, OneToOneRel, TABULAR, STACKED
 from django.db.models import signals
-from django.utils.functional import curry
-from django.utils.text import capfirst
 
 # Admin stages.
 ADD, CHANGE, BOTH = 1, 2, 3
