@@ -239,7 +239,14 @@ class ReverseSingleRelatedObjectDescriptor(object):
                 params = {'%s__pk' % self.field.rel.field_name: val}
             else:
                 params = {'%s__exact' % self.field.rel.field_name: val}
-            rel_obj = QuerySet(self.field.rel.to).get(**params)
+
+            # If the related manager indicates that it should be used for
+            # related fields, respect that.
+            rel_mgr = self.field.rel.to._default_manager
+            if getattr(rel_mgr, 'use_for_related_fields', False):
+                rel_obj = rel_mgr.get(**params)
+            else:
+                rel_obj = QuerySet(self.field.rel.to).get(**params)
             setattr(instance, cache_name, rel_obj)
             return rel_obj
 

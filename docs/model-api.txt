@@ -1507,6 +1507,17 @@ good idea to be careful in your choice of default manager, in order to
 avoid a situation where overriding of ``get_query_set()`` results in
 an inability to retrieve objects you'd like to work with.
 
+Using managers for related object access
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, Django uses a "bare" (i.e. default) manager when accessing related
+objects (i.e. ``choice.poll``). If this default isn't appropriate for your default manager, you can force Django to use a custom manager for related object attributes by giving it a ``use_for_related_fields`` property::
+
+    class MyManager(models.Manager)::
+        use_for_related_fields = True
+        
+        ...
+
 Model methods
 =============
 

@@ -26,7 +26,7 @@ __test__ = {'API_TESTS':"""
 >>> private_source = Source.objects.create(is_public=False)
 >>> private_item = Item.objects.create(source=private_source)
 
-Only one source is available via all() due to the custom default manager.
+# Only one source is available via all() due to the custom default manager.
 
 >>> Source.objects.all()
 [<Source: Source object>]
@@ -34,10 +34,21 @@ Only one source is available via all() due to the custom default manager.
 >>> public_item.source
 <Source: Source object>
 
-Make sure that an item can still access its related source even if the default
-manager doesn't normally allow it.
+# Make sure that an item can still access its related source even if the default
+# manager doesn't normally allow it.
 
 >>> private_item.source
 <Source: Source object>
+
+# If the manager is marked "use_for_related_fields", it'll get used instead
+# of the "bare" queryset. Usually you'd define this as a property on the class,
+# but this approximates that in a way that's easier in tests.
+
+>>> Source.objects.use_for_related_fields = True
+>>> private_item = Item.objects.get(pk=private_item.pk)
+>>> private_item.source
+Traceback (most recent call last):
+    ...
+DoesNotExist: Source matching query does not exist.
 
 """}
