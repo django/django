@@ -141,9 +141,10 @@ class Feed(object):
                 tzDifference = (now - utcnow)
 
             # Round the timezone offset to the nearest half hour.
-            tzOffsetMinutes = sign * ((tzDifference.seconds / 60 + 15) / 30) * 30
-            tzOffset = timedelta(minutes=tzOffsetMinutes)
-            pubdate = pubdate.replace(tzinfo=FixedOffset(tzOffset))
+            if pubdate:
+                tzOffsetMinutes = sign * ((tzDifference.seconds / 60 + 15) / 30) * 30
+                tzOffset = timedelta(minutes=tzOffsetMinutes)
+                pubdate = pubdate.replace(tzinfo=FixedOffset(tzOffset))
 
             feed.add_item(
                 title = title_tmp.render(RequestContext(self.request, {'obj': item, 'site': current_site})),
