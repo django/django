@@ -1,5 +1,4 @@
 from django.contrib.gis import forms
-from django.db import connection
 # Getting the SpatialBackend container and the geographic quoting method.
 from django.contrib.gis.db.backend import SpatialBackend, gqn
 # GeometryProxy, GEOS, Distance, and oldforms imports.
@@ -21,7 +20,7 @@ class GeometryField(SpatialBackend.Field):
     # Geodetic units.
     geodetic_units = ('Decimal Degree', 'degree')
 
-    def __init__(self, srid=4326, spatial_index=True, dim=2, **kwargs):
+    def __init__(self, verbose_name=None, srid=4326, spatial_index=True, dim=2, **kwargs):
         """
         The initialization function for geometry fields.  Takes the following
         as keyword arguments:
@@ -49,7 +48,11 @@ class GeometryField(SpatialBackend.Field):
 
         # Setting the dimension of the geometry field.
         self._dim = dim
-
+        
+        # Setting the verbose_name keyword argument with the positional 
+        # first parameter, so this works like normal fields.
+        kwargs['verbose_name'] = verbose_name
+       
         super(GeometryField, self).__init__(**kwargs) # Calling the parent initializtion function
 
     ### Routines specific to GeometryField ###
