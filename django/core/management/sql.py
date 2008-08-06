@@ -492,6 +492,6 @@ def emit_post_sync_signal(created_models, verbosity, interactive):
         app_name = app.__name__.split('.')[-2]
         if verbosity >= 2:
             print "Running post-sync handlers for application", app_name
-        dispatcher.send(signal=models.signals.post_syncdb, sender=app,
-            app=app, created_models=created_models,
-            verbosity=verbosity, interactive=interactive)
+        models.signals.post_syncdb.send(sender=app, app=app,
+            created_models=created_models, verbosity=verbosity,
+            interactive=interactive)

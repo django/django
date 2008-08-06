@@ -1,4 +1,10 @@
-"""Refactored "safe reference" from dispatcher.py"""
+"""
+"Safe weakrefs", originally from pyDispatcher.
+
+Provides a way to safely weakref any function, including bound methods (which
+aren't handled by the core weakref module).
+"""
+
 import weakref, traceback
 
 def safeRef(target, onDelete = None):
@@ -60,7 +66,9 @@ class BoundMethodWeakref(object):
             same BoundMethodWeakref instance.
 
     """
+    
     _allInstances = weakref.WeakValueDictionary()
+    
     def __new__( cls, target, onDelete=None, *arguments,**named ):
         """Create new instance or return current instance
 
@@ -83,6 +91,7 @@ class BoundMethodWeakref(object):
             cls._allInstances[key] = base
             base.__init__( target, onDelete, *arguments,**named)
             return base
+    
     def __init__(self, target, onDelete=None):
         """Return a weak-reference-like instance for a bound method
 
@@ -122,6 +131,7 @@ class BoundMethodWeakref(object):
         self.weakFunc = weakref.ref(target.im_func, remove)
         self.selfName = str(target.im_self)
         self.funcName = str(target.im_func.__name__)
+    
     def calculateKey( cls, target ):
         """Calculate the reference key for this reference
 
@@ -130,6 +140,7 @@ class BoundMethodWeakref(object):
         """
         return (id(target.im_self),id(target.im_func))
     calculateKey = classmethod( calculateKey )
+    
     def __str__(self):
         """Give a friendly representation of the object"""
         return """%s( %s.%s )"""%(
@@ -137,15 +148,19 @@ class BoundMethodWeakref(object):
             self.selfName,
             self.funcName,
         )
+    
     __repr__ = __str__
+    
     def __nonzero__( self ):
         """Whether we are still a valid reference"""
         return self() is not None
+    
     def __cmp__( self, other ):
         """Compare with another reference"""
         if not isinstance (other,self.__class__):
             return cmp( self.__class__, type(other) )
         return cmp( self.key, other.key)
+    
     def __call__(self):
         """Return a strong reference to the bound method
 
@@ -224,7 +239,6 @@ class BoundNonDescriptorMethodWeakref(BoundMethodWeakref):
                 return getattr(target, function.__name__)
         return None
 
-
 def get_bound_method_weakref(target, onDelete):
     """Instantiates the appropiate BoundMethodWeakRef, depending on the details of
     the underlying class method implementation"""
@@ -234,4 +248,3 @@ def get_bound_method_weakref(target, onDelete):
     else:
         # no luck, use the alternative implementation:
         return BoundNonDescriptorMethodWeakref(target=target, onDelete=onDelete)
-

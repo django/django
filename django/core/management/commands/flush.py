@@ -15,7 +15,6 @@ class Command(NoArgsCommand):
     def handle_noargs(self, **options):
         from django.conf import settings
         from django.db import connection, transaction, models
-        from django.dispatch import dispatcher
         from django.core.management.sql import sql_flush, emit_post_sync_signal
 
         verbosity = int(options.get('verbosity', 1))

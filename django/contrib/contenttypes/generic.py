@@ -8,7 +8,6 @@ from django.db import connection
 from django.db.models import signals
 from django.db.models.fields.related import RelatedField, Field, ManyToManyRel
 from django.db.models.loading import get_model
-from django.dispatch import dispatcher
 from django.utils.functional import curry
 
 class GenericForeignKey(object):
@@ -29,12 +28,12 @@ class GenericForeignKey(object):
         self.cache_attr = "_%s_cache" % name
 
         # For some reason I don't totally understand, using weakrefs here doesn't work.
-        dispatcher.connect(self.instance_pre_init, signal=signals.pre_init, sender=cls, weak=False)
+        signals.pre_init.connect(self.instance_pre_init, sender=cls, weak=False)
 
         # Connect myself as the descriptor for this field
         setattr(cls, name, self)
 
-    def instance_pre_init(self, signal, sender, args, kwargs):
+    def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
         """
         Handles initializing an object with the generic FK instaed of
         content-type/object-id fields.

@@ -1,6 +1,9 @@
 """Multi-consumer multi-producer dispatching mechanism
-"""
-__version__ = "1.0.0"
-__author__ = "Patrick K. O'Brien"
-__license__ = "BSD-style, see license.txt for details"
 
+Originally based on pydispatch (BSD) http://pypi.python.org/pypi/PyDispatcher/2.0.1
+See license.txt for original license.
+
+Heavily modified for Django's purposes.
+"""
+
+from django.dispatch.dispatcher import Signal

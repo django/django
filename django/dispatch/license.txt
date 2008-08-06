@@ -1,4 +1,6 @@
-PyDispatcher License
+django.dispatch was originally forked from PyDispatcher.
+
+PyDispatcher License:
 
     Copyright (c) 2001-2003, Patrick K. O'Brien and Contributors
     All rights reserved.

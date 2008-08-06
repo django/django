@@ -2,7 +2,6 @@ import os
 from django.conf import settings
 from django.core import signals
 from django.core.exceptions import ImproperlyConfigured
-from django.dispatch import dispatcher
 from django.utils.functional import curry
 
 __all__ = ('backend', 'connection', 'DatabaseError', 'IntegrityError')
@@ -58,17 +57,19 @@ IntegrityError = backend.IntegrityError
 
 # Register an event that closes the database connection
 # when a Django request is finished.
-dispatcher.connect(connection.close, signal=signals.request_finished)
+def close_connection(**kwargs):
+    connection.close()
+signals.request_finished.connect(close_connection)
 
 # Register an event that resets connection.queries
 # when a Django request is started.
-def reset_queries():
+def reset_queries(**kwargs):
     connection.queries = []
-dispatcher.connect(reset_queries, signal=signals.request_started)
+signals.request_started.connect(reset_queries)
 
 # Register an event that rolls back the connection
 # when a Django request has an exception.
-def _rollback_on_exception():
+def _rollback_on_exception(**kwargs):
     from django.db import transaction
     transaction.rollback_unless_managed()
-dispatcher.connect(_rollback_on_exception, signal=signals.got_request_exception)
+signals.got_request_exception.connect(_rollback_on_exception)

@@ -3,7 +3,6 @@ from django.conf import settings
 from django.db import connection, get_creation_module
 from django.core import mail
 from django.core.management import call_command
-from django.dispatch import dispatcher
 from django.test import signals
 from django.template import Template
 from django.utils.translation import deactivate
@@ -17,7 +16,7 @@ def instrumented_test_render(self, context):
     An instrumented Template render method, providing a signal
     that can be intercepted by the test system Client
     """
-    dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
+    signals.template_rendered.send(sender=self, template=self, context=context)
     return self.nodelist.render(context)
 
 class TestSMTPConnection(object):

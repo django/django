@@ -5,7 +5,6 @@ from django import http
 from django.core import signals
 from django.core.handlers.base import BaseHandler
 from django.core.urlresolvers import set_script_prefix
-from django.dispatch import dispatcher
 from django.utils import datastructures
 from django.utils.encoding import force_unicode, smart_str
 
@@ -174,7 +173,7 @@ class ModPythonHandler(BaseHandler):
             self.load_middleware()
 
         set_script_prefix(req.get_options().get('django.root', ''))
-        dispatcher.send(signal=signals.request_started)
+        signals.request_started.send(sender=self.__class__)
         try:
             try:
                 request = self.request_class(req)
@@ -188,7 +187,7 @@ class ModPythonHandler(BaseHandler):
                     response = middleware_method(request, response)
                 response = self.apply_response_fixes(request, response)
         finally:
-            dispatcher.send(signal=signals.request_finished)
+            signals.request_finished.send(sender=self.__class__)
 
         # Convert our custom HttpResponse object back into the mod_python req.
         req.content_type = response['Content-Type']

@@ -1,495 +1,243 @@
-"""Multiple-producer-multiple-consumer signal-dispatching
-
-dispatcher is the core of the PyDispatcher system,
-providing the primary API and the core logic for the
-system.
-
-Module attributes of note:
-
-    Any -- Singleton used to signal either "Any Sender" or
-        "Any Signal".  See documentation of the _Any class.
-    Anonymous -- Singleton used to signal "Anonymous Sender"
-        See documentation of the _Anonymous class.
-
-Internal attributes:
-    WEAKREF_TYPES -- tuple of types/classes which represent
-        weak references to receivers, and thus must be de-
-        referenced on retrieval to retrieve the callable
-        object
-    connections -- { senderkey (id) : { signal : [receivers...]}}
-    senders -- { senderkey (id) : weakref(sender) }
-        used for cleaning up sender references on sender
-        deletion
-    sendersBack -- { receiverkey (id) : [senderkey (id)...] }
-        used for cleaning up receiver references on receiver
-        deletion, (considerably speeds up the cleanup process
-        vs. the original code.)
-"""
 import weakref
-from django.dispatch import saferef, robustapply, errors
+import warnings
+try:
+    set
+except NameError:
+    from sets import Set as set # Python 2.3 fallback
 
-__author__ = "Patrick K. O'Brien <pobrien@orbtech.com>"
-__cvsid__ = "$Id: dispatcher.py,v 1.9 2005/09/17 04:55:57 mcfletch Exp $"
-__version__ = "$Revision: 1.9 $"[11:-2]
-
-
-class _Parameter:
-    """Used to represent default parameter values."""
-    def __repr__(self):
-        return self.__class__.__name__
-
-class _Any(_Parameter):
-    """Singleton used to signal either "Any Sender" or "Any Signal"
-
-    The Any object can be used with connect, disconnect,
-    send, or sendExact to signal that the parameter given
-    Any should react to all senders/signals, not just
-    a particular sender/signal.
-    """
-Any = _Any()
-
-class _Anonymous(_Parameter):
-    """Singleton used to signal "Anonymous Sender"
-
-    The Anonymous object is used to signal that the sender
-    of a message is not specified (as distinct from being
-    "any sender").  Registering callbacks for Anonymous
-    will only receive messages sent without senders.  Sending
-    with anonymous will only send messages to those receivers
-    registered for Any or Anonymous.
-
-    Note:
-        The default sender for connect is Any, while the
-        default sender for send is Anonymous.  This has
-        the effect that if you do not specify any senders
-        in either function then all messages are routed
-        as though there was a single sender (Anonymous)
-        being used everywhere.
-    """
-Anonymous = _Anonymous()
+from django.dispatch import saferef
 
 WEAKREF_TYPES = (weakref.ReferenceType, saferef.BoundMethodWeakref)
 
-connections = {}
-senders = {}
-sendersBack = {}
+def _make_id(target):
+    if hasattr(target, 'im_func'):
+        return (id(target.im_self), id(target.im_func))
+    return id(target)
 
-
-def connect(receiver, signal=Any, sender=Any, weak=True):
-    """Connect receiver to sender for signal
-
-    receiver -- a callable Python object which is to receive
-        messages/signals/events.  Receivers must be hashable
-        objects.
-
-        if weak is True, then receiver must be weak-referencable
-        (more precisely saferef.safeRef() must be able to create
-        a reference to the receiver).
+class Signal(object):
+    """Base class for all signals
     
-        Receivers are fairly flexible in their specification,
-        as the machinery in the robustApply module takes care
-        of most of the details regarding figuring out appropriate
-        subsets of the sent arguments to apply to a given
-        receiver.
-
-        Note:
-            if receiver is itself a weak reference (a callable),
-            it will be de-referenced by the system's machinery,
-            so *generally* weak references are not suitable as
-            receivers, though some use might be found for the
-            facility whereby a higher-level library passes in
-            pre-weakrefed receiver references.
-
-    signal -- the signal to which the receiver should respond
+    Internal attributes:
+        receivers -- { receriverkey (id) : weakref(receiver) }
+    """
     
-        if Any, receiver will receive any signal from the
-        indicated sender (which might also be Any, but is not
-        necessarily Any).
-        
-        Otherwise must be a hashable Python object other than
-        None (DispatcherError raised on None).
-        
-    sender -- the sender to which the receiver should respond
+    def __init__(self, providing_args=None):
+        """providing_args -- A list of the arguments this signal can pass along in
+                       a send() call.
+        """
+        self.receivers = []
+        if providing_args is None:
+            providing_args = []
+        self.providing_args = set(providing_args)
+
+    def connect(self, receiver, sender=None, weak=True, dispatch_uid=None):
+        """Connect receiver to sender for signal
     
-        if Any, receiver will receive the indicated signals
-        from any sender.
+        receiver -- a function or an instance method which is to
+            receive signals.  Receivers must be
+            hashable objects.
+
+            if weak is True, then receiver must be weak-referencable
+            (more precisely saferef.safeRef() must be able to create
+            a reference to the receiver).
         
-        if Anonymous, receiver will only receive indicated
-        signals from send/sendExact which do not specify a
-        sender, or specify Anonymous explicitly as the sender.
+            Receivers must be able to accept keyword arguments.
 
-        Otherwise can be any python object.
+            If receivers have a dispatch_uid attribute, the receiver will
+              not be added if another receiver already exists with that
+              dispatch_uid.
+
+        sender -- the sender to which the receiver should respond
+            Must either be of type Signal, or None to receive events
+            from any sender.
+
+        weak -- whether to use weak references to the receiver
+            By default, the module will attempt to use weak
+            references to the receiver objects.  If this parameter
+            is false, then strong references will be used.
         
-    weak -- whether to use weak references to the receiver
-        By default, the module will attempt to use weak
-        references to the receiver objects.  If this parameter
-        is false, then strong references will be used.
+        dispatch_uid -- an identifier used to uniquely identify a particular
+            instance of a receiver. This will usually be a string, though it
+            may be anything hashable.
 
-    returns None, may raise DispatcherTypeError
-    """
-    if signal is None:
-        raise errors.DispatcherTypeError(
-            'Signal cannot be None (receiver=%r sender=%r)' % (receiver, sender)
-        )
-    if weak:
-        receiver = saferef.safeRef(receiver, onDelete=_removeReceiver)
-    senderkey = id(sender)
-
-    signals = connections.setdefault(senderkey, {})
-
-    # Keep track of senders for cleanup.
-    # Is Anonymous something we want to clean up?
-    if sender not in (None, Anonymous, Any):
-        def remove(object, senderkey=senderkey):
-            _removeSender(senderkey=senderkey)
-        # Skip objects that can not be weakly referenced, which means
-        # they won't be automatically cleaned up, but that's too bad.
-        try:
-            weakSender = weakref.ref(sender, remove)
-            senders[senderkey] = weakSender
-        except:
-            pass
+        returns None
+        """
+        from django.conf import settings
         
-    receiverID = id(receiver)
-    # get current set, remove any current references to
-    # this receiver in the set, including back-references
-    if signals.has_key(signal):
-        receivers = signals[signal]
-        _removeOldBackRefs(senderkey, signal, receiver, receivers)
-    else:
-        receivers = signals[signal] = []
-    try:
-        current = sendersBack.get(receiverID)
-        if current is None:
-            sendersBack[ receiverID ] = current = []
-        if senderkey not in current:
-            current.append(senderkey)
-    except:
-        pass
-
-    receivers.append(receiver)
-
-
-
-def disconnect(receiver, signal=Any, sender=Any, weak=True):
-    """Disconnect receiver from sender for signal
-
-    receiver -- the registered receiver to disconnect
-    signal -- the registered signal to disconnect
-    sender -- the registered sender to disconnect
-    weak -- the weakref state to disconnect
-
-    disconnect reverses the process of connect,
-    the semantics for the individual elements are
-    logically equivalent to a tuple of
-    (receiver, signal, sender, weak) used as a key
-    to be deleted from the internal routing tables.
-    (The actual process is slightly more complex
-    but the semantics are basically the same).
-
-    Note:
-        Using disconnect is not required to cleanup
-        routing when an object is deleted, the framework
-        will remove routes for deleted objects
-        automatically.  It's only necessary to disconnect
-        if you want to stop routing to a live object.
+        if settings.DEBUG:
+            import inspect
+            assert inspect.getargspec(receiver)[2] is not None, \
+                "Signal receivers must accept keyword arguments (**kwargs)."
         
-    returns None, may raise DispatcherTypeError or
-        DispatcherKeyError
-    """
-    if signal is None:
-        raise errors.DispatcherTypeError(
-            'Signal cannot be None (receiver=%r sender=%r)' % (receiver, sender)
-        )
-    if weak: receiver = saferef.safeRef(receiver)
-    senderkey = id(sender)
-    try:
-        signals = connections[senderkey]
-        receivers = signals[signal]
-    except KeyError:
-        raise errors.DispatcherKeyError(
-            """No receivers found for signal %r from sender %r""" %(
-                signal,
-                sender
-            )
-        )
-    try:
-        # also removes from receivers
-        _removeOldBackRefs(senderkey, signal, receiver, receivers)
-    except ValueError:
-        raise errors.DispatcherKeyError(
-            """No connection to receiver %s for signal %s from sender %s""" %(
-                receiver,
-                signal,
-                sender
-            )
-        )
-    _cleanupConnections(senderkey, signal)
-
-def getReceivers(sender=Any, signal=Any):
-    """Get list of receivers from global tables
-
-    This utility function allows you to retrieve the
-    raw list of receivers from the connections table
-    for the given sender and signal pair.
-
-    Note:
-        there is no guarantee that this is the actual list
-        stored in the connections table, so the value
-        should be treated as a simple iterable/truth value
-        rather than, for instance a list to which you
-        might append new records.
-
-    Normally you would use liveReceivers(getReceivers(...))
-    to retrieve the actual receiver objects as an iterable
-    object.
-    """
-    existing = connections.get(id(sender))
-    if existing is not None:
-        return existing.get(signal, [])
-    return []
-
-def liveReceivers(receivers):
-    """Filter sequence of receivers to get resolved, live receivers
-
-    This is a generator which will iterate over
-    the passed sequence, checking for weak references
-    and resolving them, then returning all live
-    receivers.
-    """
-    for receiver in receivers:
-        if isinstance(receiver, WEAKREF_TYPES):
-            # Dereference the weak reference.
-            receiver = receiver()
-            if receiver is not None:
-                yield receiver
+        if dispatch_uid:
+            lookup_key = (dispatch_uid, _make_id(sender))
         else:
-            yield receiver
+            lookup_key = (_make_id(receiver), _make_id(sender))
 
+        if weak:
+            receiver = saferef.safeRef(receiver, onDelete=self._remove_receiver)
 
-
-def getAllReceivers(sender=Any, signal=Any):
-    """Get list of all receivers from global tables
-
-    This gets all dereferenced receivers which should receive
-    the given signal from sender, each receiver should
-    be produced only once by the resulting generator
-    """
-    receivers = {}
-    # Get receivers that receive *this* signal from *this* sender.
-    # Add receivers that receive *any* signal from *this* sender.
-    # Add receivers that receive *this* signal from *any* sender.
-    # Add receivers that receive *any* signal from *any* sender.
-    l = []
-    i = id(sender)
-    if i in connections:
-        sender_receivers = connections[i]
-        if signal in sender_receivers:
-            l.extend(sender_receivers[signal])
-        if signal is not Any and Any in sender_receivers:
-            l.extend(sender_receivers[Any])
-
-    if sender is not Any:
-        i = id(Any)
-        if i in connections:
-            sender_receivers = connections[i]
-            if sender_receivers is not None:
-                if signal in sender_receivers:
-                    l.extend(sender_receivers[signal])
-                if signal is not Any and Any in sender_receivers:
-                    l.extend(sender_receivers[Any])
-
-    for receiver in l:
-        try:
-            if not receiver in receivers:
-                if isinstance(receiver, WEAKREF_TYPES):
-                    receiver = receiver()
-                    # this should only (rough guess) be possible if somehow, deref'ing
-                    # triggered a wipe.
-                    if receiver is None:
-                        continue
-                receivers[receiver] = 1
-                yield receiver
-        except TypeError:
-            # dead weakrefs raise TypeError on hash...
-            pass
-
-def send(signal=Any, sender=Anonymous, *arguments, **named):
-    """Send signal from sender to all connected receivers.
-    
-    signal -- (hashable) signal value, see connect for details
-
-    sender -- the sender of the signal
-    
-        if Any, only receivers registered for Any will receive
-        the message.
-
-        if Anonymous, only receivers registered to receive
-        messages from Anonymous or Any will receive the message
-
-        Otherwise can be any python object (normally one
-        registered with a connect if you actually want
-        something to occur).
-
-    arguments -- positional arguments which will be passed to
-        *all* receivers. Note that this may raise TypeErrors
-        if the receivers do not allow the particular arguments.
-        Note also that arguments are applied before named
-        arguments, so they should be used with care.
-
-    named -- named arguments which will be filtered according
-        to the parameters of the receivers to only provide those
-        acceptable to the receiver.
-
-    Return a list of tuple pairs [(receiver, response), ... ]
-
-    if any receiver raises an error, the error propagates back
-    through send, terminating the dispatch loop, so it is quite
-    possible to not have all receivers called if a raises an
-    error.
-    """
-    # Call each receiver with whatever arguments it can accept.
-    # Return a list of tuple pairs [(receiver, response), ... ].
-    responses = []
-    for receiver in getAllReceivers(sender, signal):
-        response = robustapply.robustApply(
-            receiver,
-            signal=signal,
-            sender=sender,
-            *arguments,
-            **named
-        )
-        responses.append((receiver, response))
-    return responses
-
-
-def sendExact(signal=Any, sender=Anonymous, *arguments, **named ):
-    """Send signal only to those receivers registered for exact message
-
-    sendExact allows for avoiding Any/Anonymous registered
-    handlers, sending only to those receivers explicitly
-    registered for a particular signal on a particular
-    sender.
-    """
-    responses = []
-    for receiver in liveReceivers(getReceivers(sender, signal)):
-        response = robustapply.robustApply(
-            receiver,
-            signal=signal,
-            sender=sender,
-            *arguments,
-            **named
-        )
-        responses.append((receiver, response))
-    return responses
-    
-
-def _removeReceiver(receiver):
-    """Remove receiver from connections."""
-    if not sendersBack:
-        # During module cleanup the mapping will be replaced with None
-        return False
-    backKey = id(receiver)
-    for senderkey in sendersBack.get(backKey,()):
-        try:
-            signals = connections[senderkey].keys()
-        except KeyError,err:
-            pass
+        for r_key, _ in self.receivers:
+            if r_key == lookup_key:
+                break
         else:
-            for signal in signals:
-                try:
-                    receivers = connections[senderkey][signal]
-                except KeyError:
-                    pass
-                else:
-                    try:
-                        receivers.remove(receiver)
-                    except Exception, err:
-                        pass
-                _cleanupConnections(senderkey, signal)
-    try:
-        del sendersBack[ backKey ]
-    except KeyError:
-        pass
-            
-def _cleanupConnections(senderkey, signal):
-    """Delete any empty signals for senderkey. Delete senderkey if empty."""
-    try:
-        receivers = connections[senderkey][signal]
-    except:
-        pass
-    else:
-        if not receivers:
-            # No more connected receivers. Therefore, remove the signal.
+            self.receivers.append((lookup_key, receiver))
+
+    def disconnect(self, receiver=None, sender=None, weak=True, dispatch_uid=None):
+        """Disconnect receiver from sender for signal
+    
+        receiver -- the registered receiver to disconnect. May be none if
+            dispatch_uid is specified.
+        sender -- the registered sender to disconnect
+        weak -- the weakref state to disconnect
+        dispatch_uid -- the unique identifier of the receiver to disconnect
+    
+        disconnect reverses the process of connect.
+
+        If weak references are used, disconnect need not be called.
+          The receiver will be remove from dispatch automatically.
+
+        returns None
+        """
+
+        if dispatch_uid:
+            lookup_key = (dispatch_uid, _make_id(sender))
+        else:
+            lookup_key = (_make_id(receiver), _make_id(sender))
+
+        for idx, (r_key, _) in enumerate(self.receivers):
+            if r_key == lookup_key:
+                del self.receivers[idx]
+
+    def send(self, sender, **named):
+        """Send signal from sender to all connected receivers.
+
+        sender -- the sender of the signal
+            Either a specific object or None.
+    
+        named -- named arguments which will be passed to receivers.
+
+        Returns a list of tuple pairs [(receiver, response), ... ].
+
+        If any receiver raises an error, the error propagates back
+        through send, terminating the dispatch loop, so it is quite
+        possible to not have all receivers called if a raises an
+        error.
+        """
+
+        responses = []
+        if not self.receivers:
+            return responses
+
+        for receiver in self._live_receivers(_make_id(sender)):
+            response = receiver(signal=self, sender=sender, **named)
+            responses.append((receiver, response))
+        return responses
+
+    def send_robust(self, sender, **named):
+        """Send signal from sender to all connected receivers catching errors
+
+        sender -- the sender of the signal
+            Can be any python object (normally one registered with
+            a connect if you actually want something to occur).
+
+        named -- named arguments which will be passed to receivers.
+            These arguments must be a subset of the argument names
+            defined in providing_args.
+
+        Return a list of tuple pairs [(receiver, response), ... ],
+        may raise DispatcherKeyError
+
+        if any receiver raises an error (specifically any subclass of Exception),
+        the error instance is returned as the result for that receiver.
+        """
+
+        responses = []
+        if not self.receivers:
+            return responses
+
+        # Call each receiver with whatever arguments it can accept.
+        # Return a list of tuple pairs [(receiver, response), ... ].
+        for receiver in self._live_receivers(_make_id(sender)):
             try:
-                signals = connections[senderkey]
-            except KeyError:
-                pass
+                response = receiver(signal=self, sender=sender, **named)
+            except Exception, err:
+                responses.append((receiver, err))
             else:
-                del signals[signal]
-                if not signals:
-                    # No more signal connections. Therefore, remove the sender.
-                    _removeSender(senderkey)
+                responses.append((receiver, response))
+        return responses
 
-def _removeSender(senderkey):
-    """Remove senderkey from connections."""
-    _removeBackrefs(senderkey)
+    def _live_receivers(self, senderkey):
+        """Filter sequence of receivers to get resolved, live receivers
 
-    connections.pop(senderkey, None)
-    senders.pop(senderkey, None)
+        This checks for weak references
+        and resolves them, then returning only live
+        receivers.
+        """
+        none_senderkey = _make_id(None)
 
+        for (receiverkey, r_senderkey), receiver in self.receivers:
+            if r_senderkey == none_senderkey or r_senderkey == senderkey:
+                if isinstance(receiver, WEAKREF_TYPES):
+                    # Dereference the weak reference.
+                    receiver = receiver()
+                    if receiver is not None:
+                        yield receiver
+                else:
+                    yield receiver
 
-def _removeBackrefs(senderkey):
-    """Remove all back-references to this senderkey"""
-    for receiver_list in connections.pop(senderkey, {}).values():
-        for receiver in receiver_list:
-            _killBackref(receiver, senderkey)
+    def _remove_receiver(self, receiver):
+        """Remove dead receivers from connections."""
 
+        to_remove = []
+        for key, connected_receiver in self.receivers:
+            if connected_receiver == receiver:
+                to_remove.append(key)
+        for key in to_remove:
+            for idx, (r_key, _) in enumerate(self.receivers):
+                if r_key == key:
+                    del self.receivers[idx]
 
-def _removeOldBackRefs(senderkey, signal, receiver, receivers):
-    """Kill old sendersBack references from receiver
-
-    This guards against multiple registration of the same
-    receiver for a given signal and sender leaking memory
-    as old back reference records build up.
-
-    Also removes old receiver instance from receivers
+def connect(receiver, signal, sender=None, weak=True):
     """
-    try:
-        index = receivers.index(receiver)
-        # need to scan back references here and remove senderkey
-    except ValueError:
-        return False
-    else:
-        oldReceiver = receivers[index]
-        del receivers[index]
-        found = 0
-        signals = connections.get(signal)
-        if signals is not None:
-            for sig,recs in connections.get(signal,{}).iteritems():
-                if sig != signal:
-                    for rec in recs:
-                        if rec is oldReceiver:
-                            found = 1
-                            break
-        if not found:
-            _killBackref(oldReceiver, senderkey)
-            return True
-        return False
-        
-        
-def _killBackref(receiver, senderkey):
-    """Do the actual removal of back reference from receiver to senderkey"""
-    receiverkey = id(receiver)
-    receivers_list = sendersBack.get(receiverkey, ())
-    while senderkey in receivers_list:
-        try:
-            receivers_list.remove(senderkey)
-        except:
-            break
-    if not receivers_list:
-        try:
-            del sendersBack[ receiverkey ]
-        except KeyError:
-            pass
-    return True
+    For backward compatibility only. See Signal.connect()
+    """
+    warnings.warn(
+        category   = DeprecationWarning,
+        message    = "dispatcher.connect() is deprecated; use Signal.connect() instead.",
+        stacklevel = 2
+    )
+    return signal.connect(receiver, sender, weak)
+
+def disconnect(receiver, signal, sender=None, weak=True):
+    """
+    For backward compatibility only. See Signal.disconnect()
+    """
+    warnings.warn(
+        category   = DeprecationWarning,
+        message    = "dispatcher.disconnect() is deprecated; use Signal.disconnect() instead.",
+        stacklevel = 2
+    )
+    signal.disconnect(receiver, sender, weak)
+
+def send(signal, sender=None, **named):
+    """
+    For backward compatibility only. See Signal.send()
+    """
+    warnings.warn(
+        category   = DeprecationWarning,
+        message    = "dispatcher.send() is deprecated; use Signal.send() instead.",
+        stacklevel = 2
+    )
+    return signal.send(sender=sender, **named)
+
+def sendExact(signal, sender, **named ):
+    """
+    This function is deprecated, as it now has the same meaning as send.
+    """
+    warnings.warn(
+        category   = DeprecationWarning,
+        message    = "dispatcher.sendExact() is deprecated; use Signal.send() instead.",
+        stacklevel = 2
+    )
+    return signal.send(sender=sender, **named)

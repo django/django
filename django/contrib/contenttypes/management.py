@@ -1,9 +1,8 @@
 from django.contrib.contenttypes.models import ContentType
-from django.dispatch import dispatcher
 from django.db.models import get_apps, get_models, signals
 from django.utils.encoding import smart_unicode
 
-def update_contenttypes(app, created_models, verbosity=2):
+def update_contenttypes(app, created_models, verbosity=2, **kwargs):
     """
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
@@ -37,7 +36,7 @@ def update_all_contenttypes(verbosity=2):
     for app in get_apps():
         update_contenttypes(app, None, verbosity)
 
-dispatcher.connect(update_contenttypes, signal=signals.post_syncdb)
+signals.post_syncdb.connect(update_contenttypes)
 
 if __name__ == "__main__":
     update_all_contenttypes()

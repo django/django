@@ -11,7 +11,6 @@ from copy import deepcopy
 
 from django.utils.tree import Node
 from django.utils.datastructures import SortedDict
-from django.dispatch import dispatcher
 from django.db import connection
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
@@ -1670,7 +1669,7 @@ def order_modified_iter(cursor, trim, sentinel):
             sentinel):
         yield [r[:-trim] for r in rows]
 
-def setup_join_cache(sender):
+def setup_join_cache(sender, **kwargs):
     """
     The information needed to join between model fields is something that is
     invariant over the life of the model, so we cache it in the model's Options
@@ -1680,5 +1679,5 @@ def setup_join_cache(sender):
     """
     sender._meta._join_cache = {}
 
-dispatcher.connect(setup_join_cache, signal=signals.class_prepared)
+signals.class_prepared.connect(setup_join_cache)
 

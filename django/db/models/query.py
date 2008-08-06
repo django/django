@@ -7,7 +7,6 @@ from django.db import connection, transaction, IntegrityError
 from django.db.models.fields import DateField
 from django.db.models.query_utils import Q, select_related_descend
 from django.db.models import signals, sql
-from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 
 
@@ -810,8 +809,7 @@ def delete_objects(seen_objs):
 
         # Pre-notify all instances to be deleted.
         for pk_val, instance in items:
-            dispatcher.send(signal=signals.pre_delete, sender=cls,
-                    instance=instance)
+            signals.pre_delete.send(sender=cls, instance=instance)
 
         pk_list = [pk for pk,instance in items]
         del_query = sql.DeleteQuery(cls, connection)
@@ -845,8 +843,7 @@ def delete_objects(seen_objs):
                 if field.rel and field.null and field.rel.to in seen_objs:
                     setattr(instance, field.attname, None)
 
-            dispatcher.send(signal=signals.post_delete, sender=cls,
-                    instance=instance)
+            signals.post_delete.send(sender=cls, instance=instance)
             setattr(instance, cls._meta.pk.attname, None)
 
     transaction.commit_unless_managed()

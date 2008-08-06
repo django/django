@@ -2,7 +2,6 @@
 Creates permissions for all installed apps that need permissions.
 """
 
-from django.dispatch import dispatcher
 from django.db.models import get_models, signals
 from django.contrib.auth import models as auth_app
 
@@ -16,7 +15,7 @@ def _get_all_permissions(opts):
         perms.append((_get_permission_codename(action, opts), u'Can %s %s' % (action, opts.verbose_name_raw)))
     return perms + list(opts.permissions)
 
-def create_permissions(app, created_models, verbosity):
+def create_permissions(app, created_models, verbosity, **kwargs):
     from django.contrib.contenttypes.models import ContentType
     from django.contrib.auth.models import Permission
     app_models = get_models(app)
@@ -45,7 +44,7 @@ def create_superuser(app, created_models, verbosity, **kwargs):
                 call_command("createsuperuser", interactive=True)
             break
 
-if 'create_permissions' not in [i.__name__ for i in dispatcher.getAllReceivers(signal=signals.post_syncdb)]:
-    dispatcher.connect(create_permissions, signal=signals.post_syncdb)
-if 'create_superuser' not in [i.__name__ for i in dispatcher.getAllReceivers(signal=signals.post_syncdb, sender=auth_app)]:
-    dispatcher.connect(create_superuser, sender=auth_app, signal=signals.post_syncdb)
+signals.post_syncdb.connect(create_permissions,
+    dispatch_uid = "django.contrib.auth.management.create_permissions")
+signals.post_syncdb.connect(create_superuser,
+    sender=auth_app, dispatch_uid = "django.contrib.auth.management.create_superuser")

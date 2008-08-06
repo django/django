@@ -2,7 +2,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django import oldforms
 from django.core import validators
 from django.db.models.fields import FileField, AutoField
-from django.dispatch import dispatcher
 from django.db.models import signals
 from django.utils.functional import curry
 from django.utils.datastructures import DotExpandedDict
@@ -11,12 +10,12 @@ from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 from django.utils import datetime_safe
 
-def add_manipulators(sender):
+def add_manipulators(sender, **kwargs):
     cls = sender
     cls.add_to_class('AddManipulator', AutomaticAddManipulator)
     cls.add_to_class('ChangeManipulator', AutomaticChangeManipulator)
 
-dispatcher.connect(add_manipulators, signal=signals.class_prepared)
+signals.class_prepared.connect(add_manipulators)
 
 class ManipulatorDescriptor(object):
     # This class provides the functionality that makes the default model

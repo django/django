@@ -1,11 +1,10 @@
 import copy
 
 from django.db.models.query import QuerySet, EmptyQuerySet, insert_query
-from django.dispatch import dispatcher
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 
-def ensure_default_manager(sender):
+def ensure_default_manager(sender, **kwargs):
     cls = sender
     if not getattr(cls, '_default_manager', None) and not cls._meta.abstract:
         # Create the default manager, if needed.
@@ -16,7 +15,7 @@ def ensure_default_manager(sender):
             pass
         cls.add_to_class('objects', Manager())
 
-dispatcher.connect(ensure_default_manager, signal=signals.class_prepared)
+signals.class_prepared.connect(ensure_default_manager)
 
 class Manager(object):
     # Tracks each time a Manager instance is created. Used to retain order.

@@ -9,7 +9,6 @@ from django import http
 from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
-from django.dispatch import dispatcher
 from django.utils import datastructures
 from django.utils.encoding import force_unicode
 
@@ -207,7 +206,7 @@ class WSGIHandler(base.BaseHandler):
             self.initLock.release()
 
         set_script_prefix(base.get_script_name(environ))
-        dispatcher.send(signal=signals.request_started)
+        signals.request_started.send(sender=self.__class__)
         try:
             try:
                 request = self.request_class(environ)
@@ -221,7 +220,7 @@ class WSGIHandler(base.BaseHandler):
                     response = middleware_method(request, response)
                 response = self.apply_response_fixes(request, response)
         finally:
-            dispatcher.send(signal=signals.request_finished)
+            signals.request_finished.send(sender=self.__class__)
 
         try:
             status_text = STATUS_CODE_TEXT[response.status_code]

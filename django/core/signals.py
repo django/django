@@ -1,3 +1,5 @@
-request_started = object()
-request_finished = object()
-got_request_exception = object()
+from django.dispatch import Signal
+
+request_started = Signal()
+request_finished = Signal()
+got_request_exception = Signal(providing_args=["request"])

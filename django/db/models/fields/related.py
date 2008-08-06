@@ -9,7 +9,6 @@ from django.utils.functional import curry
 from django.core import validators
 from django import oldforms
 from django import forms
-from django.dispatch import dispatcher
 
 try:
     set
@@ -74,7 +73,7 @@ def add_lazy_relation(cls, field, relation, operation):
         value = (cls, field, operation)
         pending_lookups.setdefault(key, []).append(value)
 
-def do_pending_lookups(sender):
+def do_pending_lookups(sender, **kwargs):
     """
     Handle any pending relations to the sending model. Sent from class_prepared.
     """
@@ -82,7 +81,7 @@ def do_pending_lookups(sender):
     for cls, field, operation in pending_lookups.pop(key, []):
         operation(field, sender, cls)
 
-dispatcher.connect(do_pending_lookups, signal=signals.class_prepared)
+signals.class_prepared.connect(do_pending_lookups)
 
 def manipulator_valid_rel_key(f, self, field_data, all_data):
     "Validates that the value is a valid foreign key"

@@ -10,7 +10,6 @@ except ImportError:
 from django.db import connection, get_creation_module
 from django.db.models import signals
 from django.db.models.query_utils import QueryWrapper
-from django.dispatch import dispatcher
 from django.conf import settings
 from django.core import validators
 from django import oldforms
@@ -819,9 +818,9 @@ class FileField(Field):
         setattr(cls, 'get_%s_url' % self.name, curry(cls._get_FIELD_url, field=self))
         setattr(cls, 'get_%s_size' % self.name, curry(cls._get_FIELD_size, field=self))
         setattr(cls, 'save_%s_file' % self.name, lambda instance, filename, raw_field, save=True: instance._save_FIELD_file(self, filename, raw_field, save))
-        dispatcher.connect(self.delete_file, signal=signals.post_delete, sender=cls)
+        signals.post_delete.connect(self.delete_file, sender=cls)
 
-    def delete_file(self, instance):
+    def delete_file(self, instance, **kwargs):
         if getattr(instance, self.attname):
             file_name = getattr(instance, 'get_%s_filename' % self.name)()
             # If the file exists and no other object of this type references it,

@@ -19,7 +19,6 @@ from django.db.models.options import Options
 from django.db import connection, transaction
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
-from django.dispatch import dispatcher
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.core.files.move import file_move_safe
@@ -161,14 +160,14 @@ class ModelBase(type):
         if hasattr(cls, 'get_absolute_url'):
             cls.get_absolute_url = curry(get_absolute_url, opts, cls.get_absolute_url)
 
-        dispatcher.send(signal=signals.class_prepared, sender=cls)
+        signals.class_prepared.send(sender=cls)
 
 
 class Model(object):
     __metaclass__ = ModelBase
 
     def __init__(self, *args, **kwargs):
-        dispatcher.send(signal=signals.pre_init, sender=self.__class__, args=args, kwargs=kwargs)
+        signals.pre_init.send(sender=self.__class__, args=args, kwargs=kwargs)
 
         # There is a rather weird disparity here; if kwargs, it's set, then args
         # overrides it. It should be one or the other; don't duplicate the work
@@ -239,7 +238,7 @@ class Model(object):
                     pass
             if kwargs:
                 raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
-        dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
+        signals.post_init.send(sender=self.__class__, instance=self)
 
     def __repr__(self):
         return smart_str(u'<%s: %s>' % (self.__class__.__name__, unicode(self)))
@@ -288,8 +287,7 @@ class Model(object):
             cls = self.__class__
             meta = self._meta
             signal = True
-            dispatcher.send(signal=signals.pre_save, sender=self.__class__,
-                    instance=self, raw=raw)
+            signals.pre_save.send(sender=self.__class__, instance=self, raw=raw)
         else:
             meta = cls._meta
             signal = False
@@ -351,8 +349,8 @@ class Model(object):
         transaction.commit_unless_managed()
 
         if signal:
-            dispatcher.send(signal=signals.post_save, sender=self.__class__,
-                    instance=self, created=(not record_exists), raw=raw)
+            signals.post_save.send(sender=self.__class__, instance=self,
+                created=(not record_exists), raw=raw)
 
     save_base.alters_data = True
 
