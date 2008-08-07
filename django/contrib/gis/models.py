@@ -6,7 +6,7 @@ import re
 from django.conf import settings
 
 # Checking for the presence of GDAL (needed for the SpatialReference object)
-from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.gdal import HAS_GDAL, PYTHON23
 if HAS_GDAL:
     from django.contrib.gis.gdal import SpatialReference
 
@@ -28,7 +28,6 @@ class SpatialRefSysMixin(object):
     # distance queries.
     units_regex = re.compile(r'.+UNIT ?\["(?P<unit_name>[\w \'\(\)]+)", ?(?P<unit>[\d\.]+)(,AUTHORITY\["(?P<unit_auth_name>[\w \'\(\)]+)","(?P<unit_auth_val>\d+)"\])?\]([\w ]+)?(,AUTHORITY\["(?P<auth_name>[\w \'\(\)]+)","(?P<auth_val>\d+)"\])?\]$')
     
-    @property
     def srs(self):
         """
         Returns a GDAL SpatialReference object, if GDAL is installed.
@@ -50,8 +49,8 @@ class SpatialRefSysMixin(object):
                 raise Exception('Could not get OSR SpatialReference from WKT: %s\nError:\n%s' % (self.wkt, msg))
         else:
             raise Exception('GDAL is not installed.')
+    srs = property(srs)
 
-    @property
     def ellipsoid(self):
         """
         Returns a tuple of the ellipsoid parameters:
@@ -63,47 +62,47 @@ class SpatialRefSysMixin(object):
             m = self.spheroid_regex.match(self.wkt)
             if m: return (float(m.group('major')), float(m.group('flattening')))
             else: return None
+    ellipsoid = property(ellipsoid)
 
-    @property
     def name(self):
         "Returns the projection name."
         return self.srs.name
+    name = property(name)
 
-    @property
     def spheroid(self):
         "Returns the spheroid name for this spatial reference."
         return self.srs['spheroid']
+    spheroid = property(spheroid)
 
-    @property
     def datum(self):
         "Returns the datum for this spatial reference."
         return self.srs['datum']
+    datum = property(datum)
 
-    @property
     def projected(self):
         "Is this Spatial Reference projected?"
         if HAS_GDAL:
             return self.srs.projected
         else:
             return self.wkt.startswith('PROJCS')
+    projected = property(projected)
 
-    @property
     def local(self):
         "Is this Spatial Reference local?"
         if HAS_GDAL:
             return self.srs.local
         else:
             return self.wkt.startswith('LOCAL_CS')
+    local = property(local)
 
-    @property
     def geographic(self):
         "Is this Spatial Reference geographic?"
         if HAS_GDAL:
             return self.srs.geographic
         else:
             return self.wkt.startswith('GEOGCS')
+    geographic = property(geographic)
 
-    @property
     def linear_name(self):
         "Returns the linear units name."
         if HAS_GDAL:
@@ -113,8 +112,8 @@ class SpatialRefSysMixin(object):
         else:
             m = self.units_regex.match(self.wkt)
             return m.group('unit_name')
-                
-    @property
+    linear_name = property(linear_name)
+
     def linear_units(self):
         "Returns the linear units."
         if HAS_GDAL:
@@ -124,8 +123,8 @@ class SpatialRefSysMixin(object):
         else:
             m = self.units_regex.match(self.wkt)
             return m.group('unit')
+    linear_units = property(linear_units)
 
-    @property
     def angular_name(self):
         "Returns the name of the angular units."
         if HAS_GDAL:
@@ -135,8 +134,8 @@ class SpatialRefSysMixin(object):
         else:
             m = self.units_regex.match(self.wkt)
             return m.group('unit_name')
+    angular_name = property(angular_name)
 
-    @property
     def angular_units(self):
         "Returns the angular units."
         if HAS_GDAL:
@@ -146,8 +145,8 @@ class SpatialRefSysMixin(object):
         else:
             m = self.units_regex.match(self.wkt)
             return m.group('unit')
+    angular_units = property(angular_units)
 
-    @property
     def units(self):
         "Returns a tuple of the units and the name."
         if self.projected or self.local:
@@ -156,8 +155,8 @@ class SpatialRefSysMixin(object):
             return (self.angular_units, self.angular_name)
         else:
             return (None, None)
+    units = property(units)
 
-    @classmethod
     def get_units(cls, wkt):
         """
         Class method used by GeometryField on initialization to
@@ -169,8 +168,8 @@ class SpatialRefSysMixin(object):
         else:
             m = cls.units_regex.match(wkt)
             return m.group('unit'), m.group('unit_name')
+    get_units = classmethod(get_units)
 
-    @classmethod
     def get_spheroid(cls, wkt, string=True):
         """
         Class method used by GeometryField on initialization to
@@ -197,6 +196,7 @@ class SpatialRefSysMixin(object):
             else:
                 radius, flattening = sphere_params
             return 'SPHEROID["%s",%s,%s]' % (sphere_name, radius, flattening) 
+    get_spheroid = classmethod(get_spheroid)
 
     def __unicode__(self):
         """
@@ -210,7 +210,7 @@ class SpatialRefSysMixin(object):
 
 # The SpatialRefSys and GeometryColumns models
 _srid_info = True
-if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
+if not PYTHON23 and settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     # Because the PostGIS version is checked when initializing the spatial 
     # backend a `ProgrammingError` will be raised if the PostGIS tables 
     # and functions are not installed.  We catch here so it won't be raised when 
@@ -220,7 +220,7 @@ if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
         from django.contrib.gis.db.backend.postgis.models import GeometryColumns, SpatialRefSys
     except ProgrammingError:
         _srid_info = False
-elif settings.DATABASE_ENGINE == 'oracle':
+elif not PYTHON23 and settings.DATABASE_ENGINE == 'oracle':
     # Same thing as above, except the GEOS library is attempted to be loaded for
     # `BaseSpatialBackend`, and an exception will be raised during the
     # Django test suite if it doesn't exist.

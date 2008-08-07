@@ -31,6 +31,8 @@
  to a non-existant file location (e.g., `GDAL_LIBRARY_PATH='/null/path'`; 
  setting to None/False/'' will not work as a string must be given).
 """
+import sys
+
 # Attempting to import objects that depend on the GDAL library.  The
 # HAS_GDAL flag will be set to True if the library is present on
 # the system.
@@ -46,6 +48,8 @@ except:
 
 # The envelope, error, and geomtype modules do not actually require the
 #  GDAL library.
-from django.contrib.gis.gdal.envelope import Envelope
-from django.contrib.gis.gdal.error import check_err, OGRException, OGRIndexError, SRSException
-from django.contrib.gis.gdal.geomtype import OGRGeomType
+PYTHON23 = sys.version_info[0] == 2 and sys.version_info[1] == 3
+if not PYTHON23:
+    from django.contrib.gis.gdal.envelope import Envelope
+    from django.contrib.gis.gdal.error import check_err, OGRException, OGRIndexError, SRSException
+    from django.contrib.gis.gdal.geomtype import OGRGeomType

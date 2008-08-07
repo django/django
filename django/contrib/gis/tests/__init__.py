@@ -1,48 +1,9 @@
 import sys
 from copy import copy
 from unittest import TestSuite, TextTestRunner
-from django.contrib.gis.gdal import HAS_GDAL
-try:
-    from django.contrib.gis.tests.utils import mysql, oracle, postgis
-except:
-    mysql, oracle, postgis = (False, False, False)
-from django.contrib.gis.utils import HAS_GEOIP
+
 from django.conf import settings
 if not settings._target: settings.configure()
-
-# Tests that require use of a spatial database (e.g., creation of models)
-test_models = ['geoapp',]
-
-# Tests that do not require setting up and tearing down a spatial database.
-test_suite_names = [
-    'test_geos',
-    'test_measure',
-]
-if HAS_GDAL:
-    if oracle:
-        # TODO: There's a problem with `select_related` and GeoQuerySet on
-        # Oracle -- e.g., GeoModel.objects.distance(geom, field_name='fk__point')
-        # doesn't work so we don't test `relatedapp`.
-        test_models += ['distapp', 'layermap']
-    elif postgis:
-        test_models += ['distapp', 'layermap', 'relatedapp']
-    elif mysql:
-        test_models += ['relatedapp']
-
-    test_suite_names += [
-        'test_gdal_driver',
-        'test_gdal_ds',
-        'test_gdal_envelope',
-        'test_gdal_geom',
-        'test_gdal_srs',
-        'test_spatialrefsys',
-        ]
-else:
-    print >>sys.stderr, "GDAL not available - no GDAL tests will be run."
-
-if HAS_GEOIP:
-    if hasattr(settings, 'GEOIP_PATH'):
-        test_suite_names.append('test_geoip')
 
 def geo_suite():
     """
@@ -51,11 +12,48 @@ def geo_suite():
     spatial database tables are required to execute these tests on
     some backends).
     """
+    from django.contrib.gis.tests.utils import mysql, oracle, postgis
+    from django.contrib.gis.gdal import HAS_GDAL
+    from django.contrib.gis.utils import HAS_GEOIP
+
+    # Tests that require use of a spatial database (e.g., creation of models)
+    test_models = ['geoapp',]
+
+    # Tests that do not require setting up and tearing down a spatial database.
+    test_suite_names = [
+        'test_geos',
+        'test_measure',
+        ]
+    if HAS_GDAL:
+        if oracle:
+            # TODO: There's a problem with `select_related` and GeoQuerySet on
+            # Oracle -- e.g., GeoModel.objects.distance(geom, field_name='fk__point')
+            # doesn't work so we don't test `relatedapp`.
+            test_models += ['distapp', 'layermap']
+        elif postgis:
+            test_models += ['distapp', 'layermap', 'relatedapp']
+        elif mysql:
+            test_models += ['relatedapp']
+
+        test_suite_names += [
+            'test_gdal_driver',
+            'test_gdal_ds',
+            'test_gdal_envelope',
+            'test_gdal_geom',
+            'test_gdal_srs',
+            'test_spatialrefsys',
+            ]
+    else:
+        print >>sys.stderr, "GDAL not available - no GDAL tests will be run."
+
+    if HAS_GEOIP and hasattr(settings, 'GEOIP_PATH'):
+        test_suite_names.append('test_geoip')
+
     s = TestSuite()
     for test_suite in test_suite_names:
         tsuite = getattr(__import__('django.contrib.gis.tests', globals(), locals(), [test_suite]),test_suite)
         s.addTest(tsuite.suite())
-    return s
+    return s, test_models
 
 def run(verbosity=1):
     "Runs the tests that do not require geographic (GEOS, GDAL, etc.) models."
@@ -94,6 +92,7 @@ def run_tests(module_list, verbosity=1, interactive=True):
     Finally, the tests may be run by invoking `./manage.py test`.
     """
     from django.contrib.gis.db.backend import create_spatial_db
+    from django.contrib.gis.tests.utils import mysql
     from django.db import connection
     from django.test.utils import destroy_test_db
 
@@ -110,7 +109,7 @@ def run_tests(module_list, verbosity=1, interactive=True):
 
     # Creating the test suite, adding the test models to INSTALLED_APPS, and
     #  adding the model test suites to our suite package.
-    test_suite = geo_suite()
+    test_suite, test_models = geo_suite()
     for test_model in test_models:
         module_name = 'django.contrib.gis.tests.%s' % test_model
         if mysql:
