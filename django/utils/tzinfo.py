@@ -37,7 +37,7 @@ class FixedOffset(tzinfo):
 class LocalTimezone(tzinfo):
     "Proxy timezone information from time module."
     def __init__(self, dt):
-        tzinfo.__init__(self, dt)
+        tzinfo.__init__(self)
         self._tzname = self.tzname(dt)
 
     def __repr__(self):
