@@ -35,6 +35,12 @@ class DatabaseOperations(BaseDatabaseOperations):
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
+    def lookup_cast(self, lookup_type):
+        if lookup_type in ('iexact', 'contains', 'icontains', 'startswith', 'istartswith',
+                             'endswith', 'iendswith'):
+            return "%s::text"
+        return "%s"
+
     def field_cast_sql(self, db_type):
         if db_type == 'inet':
             return 'HOST(%s)'

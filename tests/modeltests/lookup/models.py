@@ -34,6 +34,12 @@ __test__ = {'API_TESTS':r"""
 >>> a7 = Article(headline='Article 7', pub_date=datetime(2005, 7, 27))
 >>> a7.save()
 
+# text matching tests for PostgreSQL 8.3
+>>> Article.objects.filter(id__iexact='1')
+[<Article: Article 1>]
+>>> Article.objects.filter(pub_date__startswith='2005')
+[<Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
+
 # Each QuerySet gets iterator(), which is a generator that "lazily" returns
 # results using database-level iteration.
 >>> for a in Article.objects.iterator():
