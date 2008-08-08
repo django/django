@@ -104,7 +104,7 @@ class AdminField(object):
         classes = []
         if self.is_checkbox:
             classes.append(u'vCheckboxLabel')
-            contents = escape(self.field.label)
+            contents = force_unicode(escape(self.field.label))
         else:
             contents = force_unicode(escape(self.field.label)) + u':'
         if self.field.field.required:
