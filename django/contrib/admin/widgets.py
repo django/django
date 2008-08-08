@@ -208,3 +208,19 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     def id_for_label(self, id_):
         return self.widget.id_for_label(id_)
+
+class AdminTextareaWidget(forms.Textarea):
+    def __init__(self, attrs={}):
+        super(AdminTextareaWidget, self).__init__(attrs={'class': 'vLargeTextField'})
+
+class AdminTextInputWidget(forms.TextInput):
+    def __init__(self, attrs={}):
+        super(AdminTextInputWidget, self).__init__(attrs={'class': 'vTextField'})
+
+class AdminURLFieldWidget(forms.TextInput):
+    def __init__(self, attrs={}):
+        super(AdminURLFieldWidget, self).__init__(attrs={'class': 'vURLField'})
+
+class AdminIntegerFieldWidget(forms.TextInput):
+    def __init__(self, attrs={}):
+        super(AdminIntegerFieldWidget, self).__init__(attrs={'class': 'vIntegerField'})

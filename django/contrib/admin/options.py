@@ -145,6 +145,7 @@ class BaseModelAdmin(object):
                         'class': get_ul_class(self.radio_fields[db_field.name]),
                     }
                 )
+                return db_field.formfield(**kwargs)
             else:
                 # Otherwise, use the default select widget.
                 return db_field.formfield(**kwargs)
@@ -164,7 +165,27 @@ class BaseModelAdmin(object):
         if isinstance(db_field, models.TimeField):
             kwargs['widget'] = widgets.AdminTimeWidget
             return db_field.formfield(**kwargs)
+        
+        # For TextFields, add a custom CSS class.
+        if isinstance(db_field, models.TextField):
+            kwargs['widget'] = widgets.AdminTextareaWidget
+            return db_field.formfield(**kwargs)
+        
+        # For URLFields, add a custom CSS class.
+        if isinstance(db_field, models.URLField):
+            kwargs['widget'] = widgets.AdminURLFieldWidget
+            return db_field.formfield(**kwargs)
+        
+        # For IntegerFields, add a custom CSS class.
+        if isinstance(db_field, models.IntegerField):
+            kwargs['widget'] = widgets.AdminIntegerFieldWidget
+            return db_field.formfield(**kwargs)
 
+        # For TextInputs, add a custom CSS class.
+        if isinstance(db_field, models.CharField):
+            kwargs['widget'] = widgets.AdminTextInputWidget
+            return db_field.formfield(**kwargs)
+    
         # For FileFields and ImageFields add a link to the current file.
         if isinstance(db_field, models.ImageField) or isinstance(db_field, models.FileField):
             kwargs['widget'] = widgets.AdminFileWidget

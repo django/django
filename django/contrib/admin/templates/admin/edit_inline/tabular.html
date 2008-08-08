@@ -19,7 +19,8 @@
                    
         <tr class="{% cycle row1,row2 %} {% if inline_admin_form.original or inline_admin_form.show_url %}has_original{% endif %}">
 
-        <td class="original">{% if inline_admin_form.original or inline_admin_form.show_url %}<p>
+        <td class="original">
+          {% if inline_admin_form.original or inline_admin_form.show_url %}<p>
           {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
           {% if inline_admin_form.show_url %}<a href="/r/{{ inline_admin_form.original.content_type_id }}/{{ inline_admin_form.original.id }}/">View on site</a>{% endif %}
             </p>{% endif %}
@@ -46,7 +47,9 @@
           {% endfor %}
         {% endfor %}
                 
-        {% if inline_admin_formset.formset.can_delete %}<td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>{% endif %}
+        {% if inline_admin_formset.formset.can_delete %}
+          <td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
+        {% endif %}
         
         </tr>
 
