@@ -358,7 +358,7 @@ class ModelAdmin(BaseModelAdmin):
 
         pk_value = new_object._get_pk_val()
         LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, pk_value, force_unicode(new_object), ADDITION)
-        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object}
+        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)}
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
         if request.POST.has_key("_continue"):
@@ -428,7 +428,7 @@ class ModelAdmin(BaseModelAdmin):
             change_message = _('No fields changed.')
         LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, pk_value, force_unicode(new_object), CHANGE, change_message)
 
-        msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object}
+        msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)}
         if request.POST.has_key("_continue"):
             request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
             if request.REQUEST.has_key('_popup'):
