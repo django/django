@@ -4,7 +4,6 @@ Utility functions for handling images.
 Requires PIL, as you might imagine.
 """
 
-from PIL import ImageFile as PIL
 from django.core.files import File
 
 class ImageFile(File):
@@ -27,7 +26,8 @@ class ImageFile(File):
 
 def get_image_dimensions(file_or_path):
     """Returns the (width, height) of an image, given an open file or a path."""
-    p = PIL.Parser()
+    from PIL import ImageFile as PILImageFile
+    p = PILImageFile.Parser()
     if hasattr(file_or_path, 'read'):
         file = file_or_path
     else:
