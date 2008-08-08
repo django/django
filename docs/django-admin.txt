@@ -412,6 +412,20 @@ Example usage::
 
     django-admin.py makemessages --all
 
+--extension
+~~~~~~~~~~~
+
+Use the ``--extension`` or ``-e`` option to specify a list of file extensions
+to examine (default: ".html").
+
+Example usage::
+
+    django-admin.py makemessages --locale=de --extension xhtml
+
+Separate multiple extensions with commas or use -e or --extension multiple times::
+
+    django-admin.py makemessages --locale=de --extension=html,txt --extension xml
+
 --locale
 ~~~~~~~~
 

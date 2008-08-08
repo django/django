@@ -426,6 +426,21 @@ If run over your project source tree or your application source tree, it will
 do the same, but the location of the locale directory is ``locale/LANG/LC_MESSAGES``
 (note the missing ``conf`` prefix).
 
+By default ``django-admin.py makemessages`` examines every file that has the
+``.html`` file extension. In case you want to override that default, use the
+``--extension`` or ``-e`` option to specify the file extensions to examine::
+
+    django-admin.py makemessages -l de -e txt
+
+Separate multiple extensions with commas and/or use ``-e`` or ``--extension`` multiple times::
+
+    django-admin.py makemessages -l=de -e=html,txt -e xml
+
+When `creating JavaScript translation catalogs`_ you need to use the special
+'djangojs' domain, **not** ``-e js``.
+
+.. _create a JavaScript translation catalog: #creating-javascript-translation-catalogs
+
 .. admonition:: No gettext?
 
     If you don't have the ``gettext`` utilities installed,

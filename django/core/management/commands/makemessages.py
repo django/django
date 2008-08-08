@@ -5,9 +5,39 @@ from itertools import dropwhile
 from optparse import make_option
 from django.core.management.base import CommandError, BaseCommand
 
+try:
+    set
+except NameError:
+    from sets import Set as set     # For Python 2.3
+
 pythonize_re = re.compile(r'\n\s*//')
 
-def make_messages(locale=None, domain='django', verbosity='1', all=False):
+def handle_extensions(extensions=('html',)):
+    """
+    organizes multiple extensions that are separated with commas or passed by
+    using --extension/-e multiple times.
+
+    for example: running 'django-admin makemessages -e js,txt -e xhtml -a'
+    would result in a extension list: ['.js', '.txt', '.xhtml']
+
+    >>> handle_extensions(['.html', 'html,js,py,py,py,.py', 'py,.py'])
+    ['.html', '.js']
+    >>> handle_extensions(['.html, txt,.tpl'])
+    ['.html', '.tpl', '.txt']
+    """
+    ext_list = []
+    for ext in extensions:
+        ext_list.extend(ext.replace(' ','').split(','))
+    for i, ext in enumerate(ext_list):
+        if not ext.startswith('.'):
+            ext_list[i] = '.%s' % ext_list[i]
+
+    # we don't want *.py files here because of the way non-*.py files
+    # are handled in make_messages() (they are copied to file.ext.py files to
+    # trick xgettext to parse them as Python files)
+    return set([x for x in ext_list if x != '.py'])
+
+def make_messages(locale=None, domain='django', verbosity='1', all=False, extensions=None):
     """
     Uses the locale directory from the Django SVN tree or an application/
     project to process all
@@ -63,7 +93,8 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False):
             all_files.extend([(dirpath, f) for f in filenames])
         all_files.sort()
         for dirpath, file in all_files:
-            if domain == 'djangojs' and file.endswith('.js'):
+            file_base, file_ext = os.path.splitext(file)
+            if domain == 'djangojs' and file_ext == '.js':
                 if verbosity > 1:
                     sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
                 src = open(os.path.join(dirpath, file), "rb").read()
@@ -87,9 +118,9 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False):
                 if msgs:
                     open(potfile, 'ab').write(msgs)
                 os.unlink(os.path.join(dirpath, thefile))
-            elif domain == 'django' and (file.endswith('.py') or file.endswith('.html')):
+            elif domain == 'django' and (file_ext == '.py' or file_ext in extensions):
                 thefile = file
-                if file.endswith('.html'):
+                if file_ext in extensions:
                     src = open(os.path.join(dirpath, file), "rb").read()
                     thefile = '%s.py' % file
                     open(os.path.join(dirpath, thefile), "wb").write(templatize(src))
@@ -144,6 +175,9 @@ class Command(BaseCommand):
             help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
         make_option('--all', '-a', action='store_true', dest='all',
             default=False, help='Reexamines all source code and templates for new translation strings and updates all message files for all available languages.'),
+        make_option('--extension', '-e', dest='extensions',
+            help='The file extension(s) to examine (default: ".html", separate multiple extensions with commas, or use -e multiple times)',
+            action='append'),
     )
     help = "Runs over the entire source tree of the current directory and pulls out all strings marked for translation. It creates (or updates) a message file in the conf/locale (in the django tree) or locale (for project and application) directory."
 
@@ -158,5 +192,14 @@ class Command(BaseCommand):
         domain = options.get('domain')
         verbosity = int(options.get('verbosity'))
         process_all = options.get('all')
+        extensions = options.get('extensions') or ['html']
 
-        make_messages(locale, domain, verbosity, process_all)
+        if domain == 'djangojs':
+            extensions = []
+        else:
+            extensions = handle_extensions(extensions)
+
+        if '.js' in extensions:
+            raise CommandError("JavaScript files should be examined by using the special 'djangojs' domain only.")
+
+        make_messages(locale, domain, verbosity, process_all, extensions)

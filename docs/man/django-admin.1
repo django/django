@@ -49,7 +49,7 @@ Executes
 .B sqlall
 for the given app(s) in the current database.
 .TP
-.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-all" "]"
+.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "]"
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
 conf/locale (in the django tree) or locale (for project and application) directory.
@@ -153,6 +153,10 @@ The locale to process when using makemessages or compilemessages.
 .TP
 .I \-d, \-\-domain=DOMAIN
 The domain of the message files (default: "django") when using makemessages.
+.TP
+.I \-e, \-\-extension=EXTENSION
+The file extension(s) to examine (default: ".html", separate multiple
+extensions with commas, or use -e multiple times).
 .TP
 .I \-a, \-\-all
 Process all available locales when using makemessages.
