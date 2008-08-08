@@ -226,6 +226,9 @@ SECRET_KEY = ''
 # Path to the "jing" executable -- needed to validate XMLFields
 JING_PATH = "/usr/bin/jing"
 
+# Default file storage mechanism that holds media.
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = ''

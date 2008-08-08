@@ -224,26 +224,64 @@ set to 75 by default, but you can specify it to override default behavior.
 ``FileField``
 ~~~~~~~~~~~~~
 
-A file-upload field. Has one **required** argument:
+A file-upload field. Has two special arguments, of which the first is
+**required**:
 
     ======================  ===================================================
     Argument                Description
     ======================  ===================================================
-    ``upload_to``           A local filesystem path that will be appended to
-                            your ``MEDIA_ROOT`` setting to determine the
-                            output of the ``get_<fieldname>_url()`` helper
-                            function.
+    ``upload_to``           Required. A filesystem-style path that will be
+                            prepended to the filename before being committed to
+                            the final storage destination.
+
+                            **New in Django development version**
+
+                            This may also be a callable, such as a function,
+                            which will be called to obtain the upload path,
+                            including the filename. See below for details.
+
+    ``storage``             **New in Django development version**
+
+                            Optional. A storage object, which handles the
+                            storage and retrieval of your files. See `managing
+                            files`_ for details on how to provide this object.
     ======================  ===================================================
 
-This path may contain `strftime formatting`_, which will be replaced by the
-date/time of the file upload (so that uploaded files don't fill up the given
-directory).
+.. _managing files: ../files/
+
+The ``upload_to`` path may contain `strftime formatting`_, which will be
+replaced by the date/time of the file upload (so that uploaded files don't fill
+up the given directory).
+
+**New in Django development version**
+
+If a callable is provided for the ``upload_to`` argument, that callable must be
+able to accept two arguments, and return a Unix-style path (with forward
+slashes) to be passed along to the storage system. The two arguments that will
+be passed are:
+
+    ======================  ===================================================
+    Argument                Description
+    ======================  ===================================================
+    ``instance``            An instance of the model where the ``FileField`` is
+                            defined. More specifically, this is the particular
+                            instance where the current file is being attached.
+
+                            **Note**: In most cases, this object will not have
+                            been saved to the database yet, so if it uses the
+                            default ``AutoField``, *it might not yet have a
+                            value for its primary key field*.
+
+    ``filename``            The filename that was originally given to the file.
+                            This may or may not be taken into account when
+                            determining the final destination path.
+    ======================  ===================================================
 
 The admin represents this field as an ``<input type="file">`` (a file-upload
 widget).
 
-Using a ``FileField`` or an ``ImageField`` (see below) in a model takes a few
-steps:
+Using a ``FileField`` or an ``ImageField`` (see below) in a model without a
+specified storage system takes a few steps:
 
     1. In your settings file, you'll need to define ``MEDIA_ROOT`` as the
        full path to a directory where you'd like Django to store uploaded

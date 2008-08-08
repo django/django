@@ -1,7 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django import oldforms
 from django.core import validators
-from django.db.models.fields import FileField, AutoField
+from django.db.models.fields import AutoField
+from django.db.models.fields.files import FileField
 from django.db.models import signals
 from django.utils.functional import curry
 from django.utils.datastructures import DotExpandedDict

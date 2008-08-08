@@ -2298,53 +2298,34 @@ For a full example, see the `lookup API sample model`_.
 get_FOO_filename()
 ------------------
 
-For every ``FileField``, the object will have a ``get_FOO_filename()`` method,
-where ``FOO`` is the name of the field. This returns the full filesystem path
-to the file, according to your ``MEDIA_ROOT`` setting.
-
-.. note::
-    It is only valid to call this method **after** saving the model when the
-    field has been set. Prior to saving, the value returned will not contain
-    the upload directory (the `upload_to` parameter) in the path.
-
-Note that ``ImageField`` is technically a subclass of ``FileField``, so every
-model with an ``ImageField`` will also get this method.
+**Deprecated in Django development version**; use ``object.FOO.name`` instead.
+See `managing files`_ for details.
 
 get_FOO_url()
 -------------
 
-For every ``FileField``, the object will have a ``get_FOO_url()`` method,
-where ``FOO`` is the name of the field. This returns the full URL to the file,
-according to your ``MEDIA_URL`` setting. If the value is blank, this method
-returns an empty string.
-
-.. note::
-    As with ``get_FOO_filename()``, it is only valid to call this method
-    **after** saving the model, otherwise an incorrect result will be
-    returned.
+**Deprecated in Django development version**; use ``object.FOO.url`` instead.
+See `managing files`_ for details.
 
 get_FOO_size()
 --------------
 
-For every ``FileField``, the object will have a ``get_FOO_size()`` method,
-where ``FOO`` is the name of the field. This returns the size of the file, in
-bytes. (Behind the scenes, it uses ``os.path.getsize``.)
+**Deprecated in Django development version**; use ``object.FOO.size`` instead.
+See `managing files`_ for details.
 
 save_FOO_file(filename, raw_contents)
 -------------------------------------
 
-For every ``FileField``, the object will have a ``save_FOO_file()`` method,
-where ``FOO`` is the name of the field. This saves the given file to the
-filesystem, using the given filename. If a file with the given filename already
-exists, Django adds an underscore to the end of the filename (but before the
-extension) until the filename is available.
+**Deprecated in Django development version**; use ``object.FOO.save()`` instead.
+See `managing files`_ for details.
 
 get_FOO_height() and get_FOO_width()
 ------------------------------------
 
-For every ``ImageField``, the object will have ``get_FOO_height()`` and
-``get_FOO_width()`` methods, where ``FOO`` is the name of the field. This
-returns the height (or width) of the image, as an integer, in pixels.
+**Deprecated in Django development version**; use ``object.FOO.width`` and
+``object.FOO.height`` instead. See `managing files`_ for details.
+
+.. _`managing files`: ../files/
 
 Shortcuts
 =========

@@ -3,6 +3,7 @@ import types
 import sys
 import os
 from itertools import izip
+from warnings import warn
 try:
     set
 except NameError:
@@ -12,7 +13,7 @@ import django.db.models.manipulators    # Imported to register signal handler.
 import django.db.models.manager         # Ditto.
 from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
-from django.db.models.fields import AutoField, ImageField
+from django.db.models.fields import AutoField
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
 from django.db.models.query import delete_objects, Q, CollectedObjects
 from django.db.models.options import Options
@@ -463,110 +464,42 @@ class Model(object):
         return getattr(self, cachename)
 
     def _get_FIELD_filename(self, field):
-        if getattr(self, field.attname): # Value is not blank.
-            return os.path.normpath(os.path.join(settings.MEDIA_ROOT, getattr(self, field.attname)))
-        return ''
+        warn("instance.get_%s_filename() is deprecated. Use instance.%s.path instead." % \
+            (field.attname, field.attname), DeprecationWarning, stacklevel=3)
+        try:
+            return getattr(self, field.attname).path
+        except ValueError:
+            return ''
 
     def _get_FIELD_url(self, field):
-        if getattr(self, field.attname): # Value is not blank.
-            import urlparse
-            return urlparse.urljoin(settings.MEDIA_URL, getattr(self, field.attname)).replace('\\', '/')
-        return ''
+        warn("instance.get_%s_url() is deprecated. Use instance.%s.url instead." % \
+            (field.attname, field.attname), DeprecationWarning, stacklevel=3)
+        try:
+            return getattr(self, field.attname).url
+        except ValueError:
+            return ''
 
     def _get_FIELD_size(self, field):
-        return os.path.getsize(self._get_FIELD_filename(field))
+        warn("instance.get_%s_size() is deprecated. Use instance.%s.size instead." % \
+            (field.attname, field.attname), DeprecationWarning, stacklevel=3)
+        return getattr(self, field.attname).size
 
-    def _save_FIELD_file(self, field, filename, raw_field, save=True):
-        # Create the upload directory if it doesn't already exist
-        directory = os.path.join(settings.MEDIA_ROOT, field.get_directory_name())
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        elif not os.path.isdir(directory):
-            raise IOError('%s exists and is not a directory' % directory)        
-
-        # Check for old-style usage (files-as-dictionaries). Warn here first
-        # since there are multiple locations where we need to support both new
-        # and old usage.
-        if isinstance(raw_field, dict):
-            import warnings
-            warnings.warn(
-                message = "Representing uploaded files as dictionaries is deprecated. Use django.core.files.uploadedfile.SimpleUploadedFile instead.",
-                category = DeprecationWarning,
-                stacklevel = 2
-            )
-            from django.core.files.uploadedfile import SimpleUploadedFile
-            raw_field = SimpleUploadedFile.from_dict(raw_field)
-
-        elif isinstance(raw_field, basestring):
-            import warnings
-            warnings.warn(
-                message = "Representing uploaded files as strings is deprecated. Use django.core.files.uploadedfile.SimpleUploadedFile instead.",
-                category = DeprecationWarning,
-                stacklevel = 2
-            )
-            from django.core.files.uploadedfile import SimpleUploadedFile
-            raw_field = SimpleUploadedFile(filename, raw_field)
-
-        if filename is None:
-            filename = raw_field.file_name
-
-        filename = field.get_filename(filename)
-
-        # If the filename already exists, keep adding an underscore to the name
-        # of the file until the filename doesn't exist.
-        while os.path.exists(os.path.join(settings.MEDIA_ROOT, filename)):
-            try:
-                dot_index = filename.rindex('.')
-            except ValueError: # filename has no dot.
-                filename += '_'
-            else:
-                filename = filename[:dot_index] + '_' + filename[dot_index:]
-
-        # Save the file name on the object and write the file to disk.
-        setattr(self, field.attname, filename)
-        full_filename = self._get_FIELD_filename(field)
-        if hasattr(raw_field, 'temporary_file_path'):
-            # This file has a file path that we can move.
-            file_move_safe(raw_field.temporary_file_path(), full_filename)
-            raw_field.close()
-        else:
-            # This is a normal uploadedfile that we can stream.
-            fp = open(full_filename, 'wb')
-            locks.lock(fp, locks.LOCK_EX)
-            for chunk in raw_field.chunks():
-                fp.write(chunk)
-            locks.unlock(fp)
-            fp.close()
-
-        # Save the width and/or height, if applicable.
-        if isinstance(field, ImageField) and \
-                (field.width_field or field.height_field):
-            from django.utils.images import get_image_dimensions
-            width, height = get_image_dimensions(full_filename)
-            if field.width_field:
-                setattr(self, field.width_field, width)
-            if field.height_field:
-                setattr(self, field.height_field, height)
-
-        # Save the object because it has changed, unless save is False.
-        if save:
-            self.save()
+    def _save_FIELD_file(self, field, filename, content, save=True):
+        warn("instance.save_%s_file() is deprecated. Use instance.%s.save() instead." % \
+            (field.attname, field.attname), DeprecationWarning, stacklevel=3)
+        return getattr(self, field.attname).save(filename, content, save)
 
     _save_FIELD_file.alters_data = True
 
     def _get_FIELD_width(self, field):
-        return self._get_image_dimensions(field)[0]
+        warn("instance.get_%s_width() is deprecated. Use instance.%s.width instead." % \
+            (field.attname, field.attname), DeprecationWarning, stacklevel=3)
+        return getattr(self, field.attname).width()
 
     def _get_FIELD_height(self, field):
-        return self._get_image_dimensions(field)[1]
-
-    def _get_image_dimensions(self, field):
-        cachename = "__%s_dimensions_cache" % field.name
-        if not hasattr(self, cachename):
-            from django.utils.images import get_image_dimensions
-            filename = self._get_FIELD_filename(field)
-            setattr(self, cachename, get_image_dimensions(filename))
-        return getattr(self, cachename)
+        warn("instance.get_%s_height() is deprecated. Use instance.%s.height instead." % \
+            (field.attname, field.attname), DeprecationWarning, stacklevel=3)
+        return getattr(self, field.attname).height()
 
 
 ############################################

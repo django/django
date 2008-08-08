@@ -1,6 +1,7 @@
 
 from django.conf import settings
 from django.db import models
+from django.core.files.storage import default_storage
 
 class Member(models.Model):
     name = models.CharField(max_length=100)
@@ -18,6 +19,7 @@ class Band(models.Model):
 class Album(models.Model):
     band = models.ForeignKey(Band)
     name = models.CharField(max_length=100)
+    cover_art = models.ImageField(upload_to='albums')
     
     def __unicode__(self):
         return self.name
@@ -46,12 +48,12 @@ HTML escaped.
 >>> print conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30)))
 <p class="datetime">Date: <input value="2007-12-01" type="text" class="vDateField" name="test_0" size="10" /><br />Time: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>
 
->>> w = AdminFileWidget()
->>> print conditional_escape(w.render('test', 'test'))
-Currently: <a target="_blank" href="%(MEDIA_URL)stest">test</a> <br />Change: <input type="file" name="test" />
-
 >>> band = Band.objects.create(pk=1, name='Linkin Park')
->>> album = band.album_set.create(name='Hybrid Theory')
+>>> album = band.album_set.create(name='Hybrid Theory', cover_art=r'albums\hybrid_theory.jpg')
+
+>>> w = AdminFileWidget()
+>>> print conditional_escape(w.render('test', album.cover_art))
+Currently: <a target="_blank" href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <br />Change: <input type="file" name="test" />
 
 >>> rel = Album._meta.get_field('band').rel
 >>> w = ForeignKeyRawIdWidget(rel)
@@ -81,5 +83,5 @@ True
 
 """ % {
     'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX,
-    'MEDIA_URL': settings.MEDIA_URL,
+    'STORAGE_URL': default_storage.url(''),
 }}

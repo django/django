@@ -10,6 +10,7 @@ except ImportError:
 from django.db import connection, get_creation_module
 from django.db.models import signals
 from django.db.models.query_utils import QueryWrapper
+from django.dispatch import dispatcher
 from django.conf import settings
 from django.core import validators
 from django import oldforms
@@ -757,131 +758,6 @@ class EmailField(CharField):
         defaults.update(kwargs)
         return super(EmailField, self).formfield(**defaults)
 
-class FileField(Field):
-    def __init__(self, verbose_name=None, name=None, upload_to='', **kwargs):
-        self.upload_to = upload_to
-        kwargs['max_length'] = kwargs.get('max_length', 100)
-        Field.__init__(self, verbose_name, name, **kwargs)
-
-    def get_internal_type(self):
-        return "FileField"
-
-    def get_db_prep_value(self, value):
-        "Returns field's value prepared for saving into a database."
-        # Need to convert UploadedFile objects provided via a form to unicode for database insertion
-        if hasattr(value, 'name'):
-            return value.name
-        elif value is None:
-            return None
-        else:
-            return unicode(value)
-
-    def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
-        field_list = Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel, follow)
-        if not self.blank:
-            if rel:
-                # This validator makes sure FileFields work in a related context.
-                class RequiredFileField(object):
-                    def __init__(self, other_field_names, other_file_field_name):
-                        self.other_field_names = other_field_names
-                        self.other_file_field_name = other_file_field_name
-                        self.always_test = True
-                    def __call__(self, field_data, all_data):
-                        if not all_data.get(self.other_file_field_name, False):
-                            c = validators.RequiredIfOtherFieldsGiven(self.other_field_names, ugettext_lazy("This field is required."))
-                            c(field_data, all_data)
-                # First, get the core fields, if any.
-                core_field_names = []
-                for f in opts.fields:
-                    if f.core and f != self:
-                        core_field_names.extend(f.get_manipulator_field_names(name_prefix))
-                # Now, if there are any, add the validator to this FormField.
-                if core_field_names:
-                    field_list[0].validator_list.append(RequiredFileField(core_field_names, field_list[1].field_name))
-            else:
-                v = validators.RequiredIfOtherFieldNotGiven(field_list[1].field_name, ugettext_lazy("This field is required."))
-                v.always_test = True
-                field_list[0].validator_list.append(v)
-                field_list[0].is_required = field_list[1].is_required = False
-
-        # If the raw path is passed in, validate it's under the MEDIA_ROOT.
-        def isWithinMediaRoot(field_data, all_data):
-            f = os.path.abspath(os.path.join(settings.MEDIA_ROOT, field_data))
-            if not f.startswith(os.path.abspath(os.path.normpath(settings.MEDIA_ROOT))):
-                raise validators.ValidationError, _("Enter a valid filename.")
-        field_list[1].validator_list.append(isWithinMediaRoot)
-        return field_list
-
-    def contribute_to_class(self, cls, name):
-        super(FileField, self).contribute_to_class(cls, name)
-        setattr(cls, 'get_%s_filename' % self.name, curry(cls._get_FIELD_filename, field=self))
-        setattr(cls, 'get_%s_url' % self.name, curry(cls._get_FIELD_url, field=self))
-        setattr(cls, 'get_%s_size' % self.name, curry(cls._get_FIELD_size, field=self))
-        setattr(cls, 'save_%s_file' % self.name, lambda instance, filename, raw_field, save=True: instance._save_FIELD_file(self, filename, raw_field, save))
-        signals.post_delete.connect(self.delete_file, sender=cls)
-
-    def delete_file(self, instance, **kwargs):
-        if getattr(instance, self.attname):
-            file_name = getattr(instance, 'get_%s_filename' % self.name)()
-            # If the file exists and no other object of this type references it,
-            # delete it from the filesystem.
-            if os.path.exists(file_name) and \
-                not instance.__class__._default_manager.filter(**{'%s__exact' % self.name: getattr(instance, self.attname)}):
-                os.remove(file_name)
-
-    def get_manipulator_field_objs(self):
-        return [oldforms.FileUploadField, oldforms.HiddenField]
-
-    def get_manipulator_field_names(self, name_prefix):
-        return [name_prefix + self.name + '_file', name_prefix + self.name]
-
-    def save_file(self, new_data, new_object, original_object, change, rel, save=True):
-        upload_field_name = self.get_manipulator_field_names('')[0]
-        if new_data.get(upload_field_name, False):
-            if rel:
-                file = new_data[upload_field_name][0]
-            else:
-                file = new_data[upload_field_name]
-
-            if not file:
-                return
-
-            # Backwards-compatible support for files-as-dictionaries.
-            # We don't need to raise a warning because Model._save_FIELD_file will
-            # do so for us.
-            try:
-                file_name = file.name
-            except AttributeError:
-                file_name = file['filename']
-
-            func = getattr(new_object, 'save_%s_file' % self.name)
-            func(file_name, file, save)
-
-    def get_directory_name(self):
-        return os.path.normpath(force_unicode(datetime.datetime.now().strftime(smart_str(self.upload_to))))
-
-    def get_filename(self, filename):
-        from django.utils.text import get_valid_filename
-        f = os.path.join(self.get_directory_name(), get_valid_filename(os.path.basename(filename)))
-        return os.path.normpath(f)
-
-    def save_form_data(self, instance, data):
-        from django.core.files.uploadedfile import UploadedFile
-        if data and isinstance(data, UploadedFile):
-            getattr(instance, "save_%s_file" % self.name)(data.name, data, save=False)
-
-    def formfield(self, **kwargs):
-        defaults = {'form_class': forms.FileField}
-        # If a file has been provided previously, then the form doesn't require
-        # that a new file is provided this time.
-        # The code to mark the form field as not required is used by
-        # form_for_instance, but can probably be removed once form_for_instance
-        # is gone. ModelForm uses a different method to check for an existing file.
-        if 'initial' in kwargs:
-            defaults['required'] = False
-        defaults.update(kwargs)
-        return super(FileField, self).formfield(**defaults)
-
 class FilePathField(Field):
     def __init__(self, verbose_name=None, name=None, path='', match=None, recursive=False, **kwargs):
         self.path, self.match, self.recursive = path, match, recursive
@@ -922,40 +798,6 @@ class FloatField(Field):
         defaults = {'form_class': forms.FloatField}
         defaults.update(kwargs)
         return super(FloatField, self).formfield(**defaults)
-
-class ImageField(FileField):
-    def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
-        self.width_field, self.height_field = width_field, height_field
-        FileField.__init__(self, verbose_name, name, **kwargs)
-
-    def get_manipulator_field_objs(self):
-        return [oldforms.ImageUploadField, oldforms.HiddenField]
-
-    def contribute_to_class(self, cls, name):
-        super(ImageField, self).contribute_to_class(cls, name)
-        # Add get_BLAH_width and get_BLAH_height methods, but only if the
-        # image field doesn't have width and height cache fields.
-        if not self.width_field:
-            setattr(cls, 'get_%s_width' % self.name, curry(cls._get_FIELD_width, field=self))
-        if not self.height_field:
-            setattr(cls, 'get_%s_height' % self.name, curry(cls._get_FIELD_height, field=self))
-
-    def save_file(self, new_data, new_object, original_object, change, rel, save=True):
-        FileField.save_file(self, new_data, new_object, original_object, change, rel, save)
-        # If the image has height and/or width field(s) and they haven't
-        # changed, set the width and/or height field(s) back to their original
-        # values.
-        if change and (self.width_field or self.height_field) and save:
-            if self.width_field:
-                setattr(new_object, self.width_field, getattr(original_object, self.width_field))
-            if self.height_field:
-                setattr(new_object, self.height_field, getattr(original_object, self.height_field))
-            new_object.save()
-
-    def formfield(self, **kwargs):
-        defaults = {'form_class': forms.ImageField}
-        defaults.update(kwargs)
-        return super(ImageField, self).formfield(**defaults)
 
 class IntegerField(Field):
     empty_strings_allowed = False

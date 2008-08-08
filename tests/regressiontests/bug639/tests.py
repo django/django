@@ -36,4 +36,4 @@ class Bug639Test(unittest.TestCase):
         Make sure to delete the "uploaded" file to avoid clogging /tmp.
         """
         p = Photo.objects.get()
-        os.unlink(p.get_image_filename())
+        p.image.delete(save=False)

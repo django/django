@@ -8,6 +8,7 @@ from django.db.models.manager import Manager
 from django.db.models.base import Model
 from django.db.models.fields import *
 from django.db.models.fields.subclassing import SubfieldBase
+from django.db.models.fields.files import FileField, ImageField
 from django.db.models.fields.related import ForeignKey, OneToOneField, ManyToManyField, ManyToOneRel, ManyToManyRel, OneToOneRel, TABULAR, STACKED
 from django.db.models import signals
 

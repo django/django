@@ -157,8 +157,8 @@ class DecimalPKData(models.Model):
 class EmailPKData(models.Model):
     data = models.EmailField(primary_key=True)
 
-class FilePKData(models.Model):
-    data = models.FileField(primary_key=True, upload_to='/foo/bar')
+# class FilePKData(models.Model):
+#    data = models.FileField(primary_key=True, upload_to='/foo/bar')
 
 class FilePathPKData(models.Model):
     data = models.FilePathField(primary_key=True)

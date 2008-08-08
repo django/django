@@ -426,6 +426,16 @@ Default content type to use for all ``HttpResponse`` objects, if a MIME type
 isn't manually specified. Used with ``DEFAULT_CHARSET`` to construct the
 ``Content-Type`` header.
 
+DEFAULT_FILE_STORAGE
+--------------------
+
+Default: ``'django.core.filestorage.filesystem.FileSystemStorage'``
+
+Default file storage class to be used for any file-related operations that don't
+specify a particular storage system. See the `file documentation`_ for details.
+
+.. _file documentation: ../files/
+
 DEFAULT_FROM_EMAIL
 ------------------
 

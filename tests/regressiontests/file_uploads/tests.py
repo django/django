@@ -9,7 +9,7 @@ from django.test import TestCase, client
 from django.utils import simplejson
 from django.utils.hashcompat import sha_constructor
 
-from models import FileModel, UPLOAD_ROOT, UPLOAD_TO
+from models import FileModel, temp_storage, UPLOAD_TO
 
 class FileUploadTests(TestCase):
     def test_simple_upload(self):
@@ -194,22 +194,22 @@ class DirectoryCreationTests(unittest.TestCase):
     """
     def setUp(self):
         self.obj = FileModel()
-        if not os.path.isdir(UPLOAD_ROOT):
-            os.makedirs(UPLOAD_ROOT)
+        if not os.path.isdir(temp_storage.location):
+            os.makedirs(temp_storage.location)
 
     def tearDown(self):
-        os.chmod(UPLOAD_ROOT, 0700)
-        shutil.rmtree(UPLOAD_ROOT)
+        os.chmod(temp_storage.location, 0700)
+        shutil.rmtree(temp_storage.location)
 
     def test_readonly_root(self):
         """Permission errors are not swallowed"""
-        os.chmod(UPLOAD_ROOT, 0500)
+        os.chmod(temp_storage.location, 0500)
         try:
-            self.obj.save_testfile_file('foo.txt', SimpleUploadedFile('foo.txt', 'x'))
+            self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', 'x'))
         except OSError, err:
             self.assertEquals(err.errno, errno.EACCES)
-        except:
-            self.fail("OSError [Errno %s] not raised" % errno.EACCES)
+        except Exception, err:
+            self.fail("OSError [Errno %s] not raised." % errno.EACCES)
 
     def test_not_a_directory(self):
         """The correct IOError is raised when the upload directory name exists but isn't a directory"""
@@ -217,11 +217,11 @@ class DirectoryCreationTests(unittest.TestCase):
         fd = open(UPLOAD_TO, 'w')
         fd.close()
         try:
-            self.obj.save_testfile_file('foo.txt', SimpleUploadedFile('foo.txt', 'x'))
+            self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', 'x'))
         except IOError, err:
             # The test needs to be done on a specific string as IOError
             # is raised even without the patch (just not early enough)
             self.assertEquals(err.args[0],
-                              "%s exists and is not a directory" % UPLOAD_TO)
+                              "%s exists and is not a directory." % UPLOAD_TO)
         except:
             self.fail("IOError not raised")

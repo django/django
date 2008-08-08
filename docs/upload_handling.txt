@@ -155,25 +155,8 @@ Three `settings`_ control Django's file upload behavior:
 ``UploadedFile`` objects
 ========================
 
-All ``UploadedFile`` objects define the following methods/attributes:
-
-    ``UploadedFile.read(self, num_bytes=None)``
-        Returns a byte string of length ``num_bytes``, or the complete file if
-        ``num_bytes`` is ``None``.
-
-    ``UploadedFile.chunks(self, chunk_size=None)``
-        A generator yielding small chunks from the file. If ``chunk_size`` isn't
-        given, chunks will be 64 KB.
-
-    ``UploadedFile.multiple_chunks(self, chunk_size=None)``
-        Returns ``True`` if you can expect more than one chunk when calling
-        ``UploadedFile.chunks(self, chunk_size)``.
-
-    ``UploadedFile.size``
-        The size, in bytes, of the uploaded file.
-
-    ``UploadedFile.name``
-        The name of the uploaded file as provided by the user.
+In addition to those inherited from `File`_, all ``UploadedFile`` objects define
+the following methods/attributes:
 
     ``UploadedFile.content_type``
         The content-type header uploaded with the file (e.g. ``text/plain`` or
@@ -186,13 +169,11 @@ All ``UploadedFile`` objects define the following methods/attributes:
         For ``text/*`` content-types, the character set (i.e. ``utf8``) supplied
         by the browser. Again, "trust but verify" is the best policy here.
 
-    ``UploadedFile.__iter__()``
-        Iterates over the lines in the file.
-
     ``UploadedFile.temporary_file_path()``
         Only files uploaded onto disk will have this method; it returns the full
         path to the temporary uploaded file.
 
+.. _File: ../files/
 
 Upload Handlers
 ===============
