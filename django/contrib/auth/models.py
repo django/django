@@ -78,7 +78,7 @@ class Permission(models.Model):
         verbose_name = _('permission')
         verbose_name_plural = _('permissions')
         unique_together = (('content_type', 'codename'),)
-        ordering = ('content_type', 'codename')
+        ordering = ('content_type__app_label', 'codename')
 
     def __unicode__(self):
         return u"%s | %s | %s" % (self.content_type.app_label, self.content_type, self.name)
