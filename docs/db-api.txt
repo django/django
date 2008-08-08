@@ -1708,8 +1708,8 @@ When you are filtering an object based on a ``ManyToManyField`` or a reverse
 interested in. Consider the ``Blog``/``Entry`` relationship (``Blog`` to
 ``Entry`` is a one-to-many relation). We might be interested in finding blogs
 that have an entry which has both *"Lennon"* in the headline and was published
-today. Or we might want to find blogs that have an entry with *"Lennon"* in
-the headline as well as an entry that was published today. Since there are
+in 2008. Or we might want to find blogs that have an entry with *"Lennon"* in
+the headline as well as an entry that was published in 2008. Since there are
 multiple entries associated with a single ``Blog``, both of these queries are
 possible and make sense in some situations.
 
@@ -1728,16 +1728,16 @@ earlier ``filter()`` call.
 
 That may sound a bit confusing, so hopefully an example will clarify. To
 select all blogs that contains entries with *"Lennon"* in the headline and
-were published today, we would write::
+were published in 2008, we would write::
 
     Blog.objects.filter(entry__headline__contains='Lennon',
-            entry__pub_date=datetime.date.today())
+            entry__pub_date__year=2008)
 
 To select all blogs that contain an entry with *"Lennon"* in the headline
-**as well as** an entry that was published today, we would write::
+**as well as** an entry that was published in 2008, we would write::
 
     Blog.objects.filter(entry__headline__contains='Lennon').filter(
-            entry__pub_date=datetime.date.today())
+            entry__pub_date__year=2008)
 
 In this second example, the first filter restricted the queryset to all those
 blogs linked to that particular type of entry. The second filter restricted
