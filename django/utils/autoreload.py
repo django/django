@@ -45,24 +45,32 @@ except ImportError:
 
 RUN_RELOADER = True
 
+_mtimes = {}
+_win = (sys.platform == "win32")
+
+def code_changed():
+    global _mtimes, _win
+    for filename in filter(lambda v: v, map(lambda m: getattr(m, "__file__", None), sys.modules.values())):
+        if filename.endswith(".pyc") or filename.endswith(".pyo"):
+            filename = filename[:-1]
+        if not os.path.exists(filename):
+            continue # File might be in an egg, so it can't be reloaded.
+        stat = os.stat(filename)
+        mtime = stat.st_mtime
+        if _win:
+            mtime -= stat.st_ctime
+        if filename not in _mtimes:
+            _mtimes[filename] = mtime
+            continue
+        if mtime != _mtimes[filename]:
+            _mtimes = {}
+            return True
+    return False
+
 def reloader_thread():
-    mtimes = {}
-    win = (sys.platform == "win32")
     while RUN_RELOADER:
-        for filename in filter(lambda v: v, map(lambda m: getattr(m, "__file__", None), sys.modules.values())):
-            if filename.endswith(".pyc") or filename.endswith("*.pyo"):
-                filename = filename[:-1]
-            if not os.path.exists(filename):
-                continue # File might be in an egg, so it can't be reloaded.
-            stat = os.stat(filename)
-            mtime = stat.st_mtime
-            if win:
-                mtime -= stat.st_ctime
-            if filename not in mtimes:
-                mtimes[filename] = mtime
-                continue
-            if mtime != mtimes[filename]:
-                sys.exit(3) # force reload
+        if code_changed():
+            sys.exit(3) # force reload
         time.sleep(1)
 
 def restart_with_reloader():
@@ -76,12 +84,8 @@ def restart_with_reloader():
         if exit_code != 3:
             return exit_code
 
-def main(main_func, args=None, kwargs=None):
+def python_reloader(main_func, args, kwargs):
     if os.environ.get("RUN_MAIN") == "true":
-        if args is None:
-            args = ()
-        if kwargs is None:
-            kwargs = {}
         thread.start_new_thread(main_func, args, kwargs)
         try:
             reloader_thread()
@@ -92,3 +96,24 @@ def main(main_func, args=None, kwargs=None):
             sys.exit(restart_with_reloader())
         except KeyboardInterrupt:
             pass
+
+def jython_reloader(main_func, args, kwargs):
+    from _systemrestart import SystemRestart
+    thread.start_new_thread(main_func, args)
+    while True:
+        if code_changed():
+            raise SystemRestart
+        time.sleep(1)
+
+
+def main(main_func, args=None, kwargs=None):
+    if args is None:
+        args = ()
+    if kwargs is None:
+        kwargs = {}
+    if sys.platform.startswith('java'):
+        reloader = jython_reloader
+    else:
+        reloader = python_reloader
+    reloader(main_func, args, kwargs)
+
