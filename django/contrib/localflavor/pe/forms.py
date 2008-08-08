@@ -7,13 +7,13 @@ from django.forms import ValidationError
 from django.forms.fields import RegexField, CharField, Select, EMPTY_VALUES
 from django.utils.translation import ugettext_lazy as _
 
-class PEDepartmentSelect(Select):
+class PERegionSelect(Select):
     """
-    A Select widget that uses a list of Peruvian Departments as its choices.
+    A Select widget that uses a list of Peruvian Regions as its choices.
     """
     def __init__(self, attrs=None):
-        from pe_department import DEPARTMENT_CHOICES
-        super(PEDepartmentSelect, self).__init__(attrs, choices=DEPARTMENT_CHOICES)
+        from pe_region import REGION_CHOICES
+        super(PERegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class PEDNIField(CharField):
     """

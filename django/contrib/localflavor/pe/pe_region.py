@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-A list of Peru departaments as `choices` in a
-formfield.
+A list of Peru regions as `choices` in a formfield.
 
 This exists in this standalone file so that it's only imported into memory
 when explicitly needed.
 """
 
-DEPARTMENT_CHOICES = (
+REGION_CHOICES = (
     ('AMA', u'Amazonas'),
     ('ANC', u'Ancash'),
     ('APU', u'Apurímac'),
     ('ARE', u'Arequipa'),
     ('AYA', u'Ayacucho'),
     ('CAJ', u'Cajamarca'),
+    ('CAL', u'Callao'),
     ('CUS', u'Cusco'),
     ('HUV', u'Huancavelica'),
     ('HUC', u'Huánuco'),
