@@ -214,7 +214,7 @@ class AdminTextareaWidget(forms.Textarea):
         final_attrs = {'class': 'vLargeTextField'}
         if attrs is not None:
             final_attrs.update(attrs)
-        super(AdminTextareaWidget, self).__init__(attrs=final_attrs})
+        super(AdminTextareaWidget, self).__init__(attrs=final_attrs)
 
 class AdminTextInputWidget(forms.TextInput):
     def __init__(self, attrs=None):
