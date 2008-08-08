@@ -210,17 +210,29 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         return self.widget.id_for_label(id_)
 
 class AdminTextareaWidget(forms.Textarea):
-    def __init__(self, attrs={}):
-        super(AdminTextareaWidget, self).__init__(attrs={'class': 'vLargeTextField'})
+    def __init__(self, attrs=None):
+        final_attrs = {'class': 'vLargeTextField'}
+        if attrs is not None:
+            final_attrs.update(attrs)
+        super(AdminTextareaWidget, self).__init__(attrs=final_attrs})
 
 class AdminTextInputWidget(forms.TextInput):
-    def __init__(self, attrs={}):
-        super(AdminTextInputWidget, self).__init__(attrs={'class': 'vTextField'})
+    def __init__(self, attrs=None):
+        final_attrs = {'class': 'vTextField'}
+        if attrs is not None:
+            final_attrs.update(attrs)
+        super(AdminTextInputWidget, self).__init__(attrs=final_attrs)
 
 class AdminURLFieldWidget(forms.TextInput):
-    def __init__(self, attrs={}):
-        super(AdminURLFieldWidget, self).__init__(attrs={'class': 'vURLField'})
+    def __init__(self, attrs=None):
+        final_attrs = {'class': 'vURLField'}
+        if attrs is not None:
+            final_attrs.update(attrs)
+        super(AdminURLFieldWidget, self).__init__(attrs=final_attrs)
 
 class AdminIntegerFieldWidget(forms.TextInput):
-    def __init__(self, attrs={}):
-        super(AdminIntegerFieldWidget, self).__init__(attrs={'class': 'vIntegerField'})
+    def __init__(self, attrs=None):
+        final_attrs = {'class': 'vIntegerField'}
+        if attrs is not None:
+            final_attrs.update(attrs)
+        super(AdminIntegerFieldWidget, self).__init__(attrs=final_attrs)
