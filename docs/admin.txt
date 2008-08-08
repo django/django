@@ -633,7 +633,7 @@ to the initial forms. See the `formsets documentation`_ for more information.
 ~~~~~~~~~~~
 
 This controls the maximum number of forms to show in the inline. This doesn't
-directly corrolate to the number of objects, but can if the value is small
+directly correlate to the number of objects, but can if the value is small
 enough. See `max_num in formsets`_ for more information.
 
 .. _max_num in formsets: ../modelforms/#limiting-the-number-of-objects-editable
