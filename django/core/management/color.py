@@ -11,8 +11,7 @@ def supports_color():
     Returns True if the running system's terminal supports color, and False
     otherwise.
     """
-    unsupported_platform = (sys.platform in ('win32', 'Pocket PC')
-                            or sys.platform.startswith('java'))
+    unsupported_platform = (sys.platform in ('win32', 'Pocket PC'))
     # isatty is not always implemented, #6223.
     is_a_tty = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
     if unsupported_platform or not is_a_tty:
