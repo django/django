@@ -608,7 +608,7 @@ more than one foreign key to the same parent model.
 ``formset``
 ~~~~~~~~~~~
 
-This defaults to ``BaseInlineFormset``. Using your own formset can give you
+This defaults to ``BaseInlineFormSet``. Using your own formset can give you
 many possibilities of customization. Inlines are built around
 `model formsets`_.
 

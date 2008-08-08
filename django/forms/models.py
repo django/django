@@ -400,7 +400,7 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.f
 
 # InlineFormSets #############################################################
 
-class BaseInlineFormset(BaseModelFormSet):
+class BaseInlineFormSet(BaseModelFormSet):
     """A formset for child objects related to a parent."""
     def __init__(self, data=None, files=None, instance=None,
                  save_as_new=False, prefix=None):
@@ -409,13 +409,13 @@ class BaseInlineFormset(BaseModelFormSet):
         self.save_as_new = save_as_new
         # is there a better way to get the object descriptor?
         self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
-        super(BaseInlineFormset, self).__init__(data, files, prefix=prefix or self.rel_name)
+        super(BaseInlineFormSet, self).__init__(data, files, prefix=prefix or self.rel_name)
     
     def _construct_forms(self):
         if self.save_as_new:
             self._total_form_count = self._initial_form_count
             self._initial_form_count = 0
-        super(BaseInlineFormset, self)._construct_forms()
+        super(BaseInlineFormSet, self)._construct_forms()
 
     def get_queryset(self):
         """
@@ -466,12 +466,12 @@ def _get_foreign_key(parent_model, model, fk_name=None):
 
 
 def inlineformset_factory(parent_model, model, form=ModelForm,
-                          formset=BaseInlineFormset, fk_name=None,
+                          formset=BaseInlineFormSet, fk_name=None,
                           fields=None, exclude=None,
                           extra=3, can_order=False, can_delete=True, max_num=0,
                           formfield_callback=lambda f: f.formfield()):
     """
-    Returns an ``InlineFormset`` for the given kwargs.
+    Returns an ``InlineFormSet`` for the given kwargs.
 
     You must provide ``fk_name`` if ``model`` has more than one ``ForeignKey``
     to ``parent_model``.

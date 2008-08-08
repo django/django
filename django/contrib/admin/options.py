@@ -1,7 +1,7 @@
 from django import forms, template
 from django.forms.formsets import all_valid
 from django.forms.models import modelform_factory, inlineformset_factory
-from django.forms.models import BaseInlineFormset
+from django.forms.models import BaseInlineFormSet
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets
 from django.contrib.admin.util import quote, unquote, get_deleted_objects
@@ -735,7 +735,7 @@ class InlineModelAdmin(BaseModelAdmin):
     """
     model = None
     fk_name = None
-    formset = BaseInlineFormset
+    formset = BaseInlineFormSet
     extra = 3
     max_num = 0
     template = None
