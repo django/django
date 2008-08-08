@@ -67,10 +67,22 @@ class AdminScriptTestCase(unittest.TestCase):
         else:
             return sys.executable
 
+    def _ext_backend_path(self):
+        """
+        Returns the path for the external backend package, or None if no
+        external backend is detected.
+        """
+        first_package_re = re.compile(r'(^[^\.]+)\.')
+        result = first_package_re.findall(settings.DATABASE_ENGINE)
+        if result:
+            backend_pkg = __import__(result[0])
+            backend_dir = os.path.dirname(backend_pkg.__file__)
+            return os.path.dirname(backend_dir)
     def run_test(self, script, args, settings_file=None, apps=None):
         test_dir = os.path.dirname(os.path.dirname(__file__))
         project_dir = os.path.dirname(test_dir)
         base_dir = os.path.dirname(project_dir)
+        ext_backend_base_dir = self._ext_backend_path()
 
         # Remember the old environment
         old_django_settings_module = os.environ.get('DJANGO_SETTINGS_MODULE', None)
@@ -82,11 +94,11 @@ class AdminScriptTestCase(unittest.TestCase):
             os.environ['DJANGO_SETTINGS_MODULE'] = settings_file
         elif 'DJANGO_SETTINGS_MODULE' in os.environ:
             del os.environ['DJANGO_SETTINGS_MODULE']
-            
-        if old_python_path:
-            os.environ['PYTHONPATH'] = os.pathsep.join([test_dir, base_dir, old_python_path])
-        else:
-            os.environ['PYTHONPATH'] = os.pathsep.join([test_dir, base_dir])
+        python_path = [test_dir, base_dir]
+        if ext_backend_base_dir:
+            python_path.append(ext_backend_base_dir)
+        os.environ['PYTHONPATH'] = os.pathsep.join(python_path)
+
 
         # Build the command line
         cmd = '%s "%s"' % (self._sys_executable(), script)
