@@ -19,7 +19,7 @@ class Band(models.Model):
 class Album(models.Model):
     band = models.ForeignKey(Band)
     name = models.CharField(max_length=100)
-    cover_art = models.ImageField(upload_to='albums')
+    cover_art = models.FileField(upload_to='albums')
     
     def __unicode__(self):
         return self.name
