@@ -37,7 +37,21 @@ def find_management_module(app_name):
     parts = app_name.split('.')
     parts.append('management')
     parts.reverse()
+    part = parts.pop()
     path = None
+    
+    # When using manage.py, the project module is added to the path,
+    # loaded, then removed from the path. This means that 
+    # testproject.testapp.models can be loaded in future, even if
+    # testproject isn't in the path. When looking for the management
+    # module, we need look for the case where the project name is part
+    # of the app_name but the project directory itself isn't on the path.
+    try:
+        f, path, descr = find_module(part,path) 
+    except ImportError,e:
+        if os.path.basename(os.getcwd()) != part:
+            raise e
+        
     while parts:
         part = parts.pop()
         f, path, descr = find_module(part, path and [path] or None)
