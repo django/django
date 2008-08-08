@@ -630,7 +630,7 @@ class DateTimeField(DateField):
                 value, usecs = value.split('.')
                 usecs = int(usecs)
             except ValueError:
-                raise validators.ValidationError, _('Enter a valid date/time in YYYY-MM-DD HH:MM[ss[.uuuuuu]] format.')
+                raise validators.ValidationError, _('Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format.')
         else:
             usecs = 0
         kwargs = {'microsecond': usecs}
@@ -647,7 +647,7 @@ class DateTimeField(DateField):
                     return datetime.datetime(*time.strptime(value, '%Y-%m-%d')[:3],
                                              **kwargs)
                 except ValueError:
-                    raise validators.ValidationError, _('Enter a valid date/time in YYYY-MM-DD HH:MM[ss[.uuuuuu]] format.')
+                    raise validators.ValidationError, _('Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format.')
 
     def get_db_prep_value(self, value):
         # Casts dates into the format expected by the backend
