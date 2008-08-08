@@ -187,8 +187,8 @@ Writing your own middleware
 Writing your own middleware is easy. Each middleware component is a single
 Python class that defines one or more of the following methods:
 
-process_request
----------------
+``process_request``
+-------------------
 
 Interface: ``process_request(self, request)``
 
@@ -202,8 +202,8 @@ an ``HttpResponse`` object, Django won't bother calling ANY other request,
 view or exception middleware, or the appropriate view; it'll return that
 ``HttpResponse``. Response middleware is always called on every response.
 
-process_view
-------------
+``process_view``
+----------------
 
 Interface: ``process_view(self, request, view_func, view_args, view_kwargs)``
 
@@ -222,8 +222,8 @@ Django will continue processing this request, executing any other
 or exception middleware, or the appropriate view; it'll return that
 ``HttpResponse``. Response middleware is always called on every response.
 
-process_response
-----------------
+``process_response``
+--------------------
 
 Interface: ``process_response(self, request, response)``
 
@@ -234,8 +234,8 @@ object returned by a Django view.
 the given ``response``, or it could create and return a brand-new
 ``HttpResponse``.
 
-process_exception
------------------
+``process_exception``
+---------------------
 
 Interface: ``process_exception(self, request, exception)``
 
@@ -246,6 +246,28 @@ Django calls ``process_exception()`` when a view raises an exception.
 ``process_exception()`` should return either ``None`` or an ``HttpResponse``
 object. If it returns an ``HttpResponse`` object, the response will be returned
 to the browser. Otherwise, default exception handling kicks in.
+
+``__init__``
+------------
+
+Most middleware classes won't need an initializer since middleware classes are
+essentially placeholders for the ``process_*`` methods. If you do need some
+global state you may use ``__init__`` to set up. However, keep in mind a couple
+of caveats:
+
+    * Django initializes your middleware without any arguments, so you can't
+      define ``__init__`` as requiring any arguments.
+      
+    * Unlike the ``process_*`` methods which get called once per request,
+      ``__init__`` gets called only *once*, when the web server starts up.
+
+Marking middleware as unused
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's sometimes useful to determine at run-time whether a piece of middleware
+should be used. In these cases, your middleware's ``__init__`` method may raise
+``django.core.exceptions.MiddlewareNotUsed``. Django will then remove that piece
+of middleware from the middleware process.
 
 Guidelines
 ----------
