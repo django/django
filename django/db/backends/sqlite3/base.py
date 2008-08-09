@@ -37,6 +37,13 @@ Database.register_converter("timestamp", util.typecast_timestamp)
 Database.register_converter("TIMESTAMP", util.typecast_timestamp)
 Database.register_converter("decimal", util.typecast_decimal)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
+if Database.version_info >= (2,4,1):
+    # Starting in 2.4.1, the str type is not accepted anymore, therefore,
+    # we convert all str objects to Unicode
+    # As registering a adapter for a primitive type causes a small
+    # slow-down, this adapter is only registered for sqlite3 versions
+    # needing it.
+    Database.register_adapter(str, lambda s:s.decode('utf-8'))
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     supports_constraints = False
