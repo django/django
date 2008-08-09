@@ -24,20 +24,21 @@ class RelatedPoint(models.Model):
 __test__ = {'API_TESTS': """
 >>> DataPoint(name="d0", value="apple").save()
 >>> DataPoint(name="d2", value="banana").save()
->>> d3 = DataPoint(name="d3", value="banana")
->>> d3.save()
+>>> d3 = DataPoint.objects.create(name="d3", value="banana")
 >>> RelatedPoint(name="r1", data=d3).save()
 
 Objects are updated by first filtering the candidates into a queryset and then
 calling the update() method. It executes immediately and returns nothing.
 
 >>> DataPoint.objects.filter(value="apple").update(name="d1")
+1
 >>> DataPoint.objects.filter(value="apple")
 [<DataPoint: d1>]
 
 We can update multiple objects at once.
 
 >>> DataPoint.objects.filter(value="banana").update(value="pineapple")
+2
 >>> DataPoint.objects.get(name="d2").value
 u'pineapple'
 
@@ -46,12 +47,14 @@ referred to, not anything inside the related object.
 
 >>> d = DataPoint.objects.get(name="d1")
 >>> RelatedPoint.objects.filter(name="r1").update(data=d)
+1
 >>> RelatedPoint.objects.filter(data__name="d1")
 [<RelatedPoint: r1>]
 
 Multiple fields can be updated at once
 
 >>> DataPoint.objects.filter(value="pineapple").update(value="fruit", another_value="peaches")
+2
 >>> d = DataPoint.objects.get(name="d2")
 >>> d.value, d.another_value
 (u'fruit', u'peaches')
@@ -60,6 +63,7 @@ In the rare case you want to update every instance of a model, update() is also
 a manager method.
 
 >>> DataPoint.objects.update(value='thing')
+3
 >>> DataPoint.objects.values('value').distinct()
 [{'value': u'thing'}]
 

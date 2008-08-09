@@ -767,6 +767,7 @@ Updates that are filtered on the model being updated are somewhat tricky to get
 in MySQL. This exercises that case.
 >>> mm = ManagedModel.objects.create(data='mm1', tag=t1, public=True)
 >>> ManagedModel.objects.update(data='mm')
+1
 
 A values() or values_list() query across joined models must use outer joins
 appropriately.
