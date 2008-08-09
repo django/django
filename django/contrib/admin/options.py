@@ -452,102 +452,18 @@ class ModelAdmin(BaseModelAdmin):
         """
         request.user.message_set.create(message=message)
 
-    def save_model(self, request, form, change):
+    def save_form(self, request, form, change):
         """
-        Save and return a model given a ModelForm. ``change`` is True if the
-        object is being changed, and False if it's being added.
+        Given a ModelForm return an unsaved instance. ``change`` is True if
+        the object is being changed, and False if it's being added.
         """
-        return form.save(commit=True)
+        return form.save(commit=False)
 
     def save_formset(self, request, form, formset, change):
         """
-        Save an inline formset attached to the object.
+        Given an inline formset return unsaved instances.
         """
-        formset.save()
-
-    def save_add(self, request, form, formsets, post_url_continue):
-        """
-        Saves the object in the "add" stage and returns an HttpResponseRedirect.
-
-        `form` is a bound Form instance that's verified to be valid.
-        """
-        opts = self.model._meta
-        
-        new_object = self.save_model(request, form, change=False)
-        if formsets:
-            for formset in formsets:
-                formset.instance = new_object
-                self.save_formset(request, form, formset, change=False)
-
-        pk_value = new_object._get_pk_val()
-        self.log_addition(request, new_object)
-                
-        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)}
-        # Here, we distinguish between different save types by checking for
-        # the presence of keys in request.POST.
-        if request.POST.has_key("_continue"):
-            self.message_user(request, msg + ' ' + _("You may edit it again below."))
-            if request.POST.has_key("_popup"):
-                post_url_continue += "?_popup=1"
-            return HttpResponseRedirect(post_url_continue % pk_value)
-
-        if request.POST.has_key("_popup"):
-            return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % \
-                # escape() calls force_unicode.
-                (escape(pk_value), escape(new_object)))
-        elif request.POST.has_key("_addanother"):
-            self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
-            return HttpResponseRedirect(request.path)
-        else:
-            self.message_user(request, msg)
-
-            # Figure out where to redirect. If the user has change permission,
-            # redirect to the change-list page for this object. Otherwise,
-            # redirect to the admin index.
-            if self.has_change_permission(request, None):
-                post_url = '../'
-            else:
-                post_url = '../../../'
-            return HttpResponseRedirect(post_url)
-    save_add = transaction.commit_on_success(save_add)
-
-    def save_change(self, request, form, formsets=None):
-        """
-        Saves the object in the "change" stage and returns an HttpResponseRedirect.
-
-        `form` is a bound Form instance that's verified to be valid.
-
-        `formsets` is a sequence of InlineFormSet instances that are verified to be valid.
-        """
-        opts = self.model._meta
-        new_object = self.save_model(request, form, change=True)
-        pk_value = new_object._get_pk_val()
-
-        if formsets:
-            for formset in formsets:
-                self.save_formset(request, form, formset, change=True)
-        
-        change_message = self.construct_change_message(request, form, formsets)
-        self.log_change(request, new_object, change_message)        
-
-        msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)}
-        if request.POST.has_key("_continue"):
-            self.message_user(request, msg + ' ' + _("You may edit it again below."))
-            if request.REQUEST.has_key('_popup'):
-                return HttpResponseRedirect(request.path + "?_popup=1")
-            else:
-                return HttpResponseRedirect(request.path)
-        elif request.POST.has_key("_saveasnew"):
-            msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object}
-            self.message_user(request, msg)
-            return HttpResponseRedirect("../%s/" % pk_value)
-        elif request.POST.has_key("_addanother"):
-            self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
-            return HttpResponseRedirect("../add/")
-        else:
-            self.message_user(request, msg)
-            return HttpResponseRedirect("../")
-    save_change = transaction.commit_on_success(save_change)
+        return formset.save(commit=False)
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         opts = self.model._meta
@@ -574,6 +490,66 @@ class ModelAdmin(BaseModelAdmin):
             "admin/%s/change_form.html" % app_label,
             "admin/change_form.html"
         ], context, context_instance=template.RequestContext(request))
+    
+    def response_add(self, request, obj, post_url_continue='../%s/'):
+        """
+        Determines the HttpResponse for the add_view stage.
+        """
+        opts = obj._meta
+        pk_value = obj._get_pk_val()
+        
+        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj)}
+        # Here, we distinguish between different save types by checking for
+        # the presence of keys in request.POST.
+        if request.POST.has_key("_continue"):
+            self.message_user(request, msg + ' ' + _("You may edit it again below."))
+            if request.POST.has_key("_popup"):
+                post_url_continue += "?_popup=1"
+            return HttpResponseRedirect(post_url_continue % pk_value)
+        
+        if request.POST.has_key("_popup"):
+            return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % \
+                # escape() calls force_unicode.
+                (escape(pk_value), escape(obj)))
+        elif request.POST.has_key("_addanother"):
+            self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
+            return HttpResponseRedirect(request.path)
+        else:
+            self.message_user(request, msg)
+
+            # Figure out where to redirect. If the user has change permission,
+            # redirect to the change-list page for this object. Otherwise,
+            # redirect to the admin index.
+            if self.has_change_permission(request, None):
+                post_url = '../'
+            else:
+                post_url = '../../../'
+            return HttpResponseRedirect(post_url)
+    
+    def response_change(self, request, obj):
+        """
+        Determines the HttpResponse for the change_view stage.
+        """
+        opts = obj._meta
+        pk_value = obj._get_pk_val()
+        
+        msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj)}
+        if request.POST.has_key("_continue"):
+            self.message_user(request, msg + ' ' + _("You may edit it again below."))
+            if request.REQUEST.has_key('_popup'):
+                return HttpResponseRedirect(request.path + "?_popup=1")
+            else:
+                return HttpResponseRedirect(request.path)
+        elif request.POST.has_key("_saveasnew"):
+            msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(opts.verbose_name), 'obj': obj}
+            self.message_user(request, msg)
+            return HttpResponseRedirect("../%s/" % pk_value)
+        elif request.POST.has_key("_addanother"):
+            self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
+            return HttpResponseRedirect("../add/")
+        else:
+            self.message_user(request, msg)
+            return HttpResponseRedirect("../")
 
     def add_view(self, request, form_url='', extra_context=None):
         "The 'add' admin view for this model."
@@ -592,29 +568,44 @@ class ModelAdmin(BaseModelAdmin):
             post_url = '../../../'
 
         ModelForm = self.get_form(request)
-        inline_formsets = []
-        obj = self.model()
+        formsets = []
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES)
+            if form.is_valid():
+                form_validated = True
+                new_object = self.save_form(request, form, change=False)
+            else:
+                form_validated = False
+                new_object = self.model()
             for FormSet in self.get_formsets(request):
-                inline_formset = FormSet(data=request.POST, files=request.FILES,
-                    instance=obj, save_as_new=request.POST.has_key("_saveasnew"))
-                inline_formsets.append(inline_formset)
-            if all_valid(inline_formsets) and form.is_valid():
-                return self.save_add(request, form, inline_formsets, '../%s/')
+                formset = FormSet(data=request.POST, files=request.FILES,
+                                  instance=new_object,
+                                  save_as_new=request.POST.has_key("_saveasnew"))
+                formsets.append(formset)
+            if all_valid(formsets) and form_validated:
+                new_object.save()
+                form.save_m2m()
+                for formset in formsets:
+                    instances = self.save_formset(request, form, formset, change=False)
+                    for instance in instances:
+                        instance.save()
+                    formset.save_m2m()
+                
+                self.log_addition(request, new_object)
+                return self.response_add(request, new_object)
         else:
             form = ModelForm(initial=dict(request.GET.items()))
             for FormSet in self.get_formsets(request):
-                inline_formset = FormSet(instance=obj)
-                inline_formsets.append(inline_formset)
+                formset = FormSet(instance=self.model())
+                formsets.append(formset)
 
         adminForm = AdminForm(form, list(self.get_fieldsets(request)), self.prepopulated_fields)
         media = self.media + adminForm.media
-        for fs in inline_formsets:
-            media = media + fs.media
+        for formset in formsets:
+            media = media + formset.media
 
         inline_admin_formsets = []
-        for inline, formset in zip(self.inline_instances, inline_formsets):
+        for inline, formset in zip(self.inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request))
             inline_admin_formset = InlineAdminFormSet(inline, formset, fieldsets)
             inline_admin_formsets.append(inline_admin_formset)
@@ -626,11 +617,12 @@ class ModelAdmin(BaseModelAdmin):
             'show_delete': False,
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
-            'errors': AdminErrorList(form, inline_formsets),
+            'errors': AdminErrorList(form, formsets),
             'root_path': self.admin_site.root_path,
         }
         context.update(extra_context or {})
         return self.render_change_form(request, context, add=True)
+    add_view = transaction.commit_on_success(add_view)
 
     def change_view(self, request, object_id, extra_context=None):
         "The 'change' admin view for this model."
@@ -656,26 +648,43 @@ class ModelAdmin(BaseModelAdmin):
             return self.add_view(request, form_url='../../add/')
 
         ModelForm = self.get_form(request, obj)
-        inline_formsets = []
+        formsets = []
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES, instance=obj)
-            for FormSet in self.get_formsets(request, obj):
-                inline_formset = FormSet(request.POST, request.FILES, instance=obj)
-                inline_formsets.append(inline_formset)
+            if form.is_valid():
+                form_validated = True
+                new_object = self.save_form(request, form, change=True)
+            else:
+                form_validated = False
+                new_object = obj
+            for FormSet in self.get_formsets(request, new_object):
+                formset = FormSet(request.POST, request.FILES,
+                                  instance=new_object)
+                formsets.append(formset)
 
-            if all_valid(inline_formsets) and form.is_valid():
-                return self.save_change(request, form, inline_formsets)
+            if all_valid(formsets) and form_validated:
+                new_object.save()
+                form.save_m2m()
+                for formset in formsets:
+                    instances = self.save_formset(request, form, formset, change=True)
+                    for instance in instances:
+                        instance.save()
+                    formset.save_m2m()
+                
+                change_message = self.construct_change_message(request, form, formsets)
+                self.log_change(request, new_object, change_message)
+                return self.response_change(request, new_object)
         else:
             form = ModelForm(instance=obj)
             for FormSet in self.get_formsets(request, obj):
-                inline_formset = FormSet(instance=obj)
-                inline_formsets.append(inline_formset)
+                formset = FormSet(instance=obj)
+                formsets.append(formset)
 
         adminForm = AdminForm(form, self.get_fieldsets(request, obj), self.prepopulated_fields)
         media = self.media + adminForm.media
 
         inline_admin_formsets = []
-        for inline, formset in zip(self.inline_instances, inline_formsets):
+        for inline, formset in zip(self.inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request, obj))
             inline_admin_formset = InlineAdminFormSet(inline, formset, fieldsets)
             inline_admin_formsets.append(inline_admin_formset)
@@ -689,11 +698,12 @@ class ModelAdmin(BaseModelAdmin):
             'is_popup': request.REQUEST.has_key('_popup'),
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
-            'errors': AdminErrorList(form, inline_formsets),
+            'errors': AdminErrorList(form, formsets),
             'root_path': self.admin_site.root_path,
         }
         context.update(extra_context or {})
         return self.render_change_form(request, context, change=True, obj=obj)
+    change_view = transaction.commit_on_success(change_view)
 
     def changelist_view(self, request, extra_context=None):
         "The 'change list' admin view for this model."

@@ -11,10 +11,90 @@ from django.utils.html import escape
 # local test models
 from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey
 
+class AdminViewBasicTest(TestCase):
+    fixtures = ['admin-views-users.xml']
+    
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+    
+    def tearDown(self):
+        self.client.logout()
+    
+    def testTrailingSlashRequired(self):
+        """
+        If you leave off the trailing slash, app should redirect and add it.
+        """
+        request = self.client.get('/test_admin/admin/admin_views/article/add')
+        self.assertRedirects(request,
+            '/test_admin/admin/admin_views/article/add/'
+        )
+    
+    def testBasicAddGet(self):
+        """
+        A smoke test to ensure GET on the add_view works.
+        """
+        response = self.client.get('/test_admin/admin/admin_views/section/add/')
+        self.failUnlessEqual(response.status_code, 200)
+    
+    def testBasicEditGet(self):
+        """
+        A smoke test to ensureGET on the change_view works.
+        """
+        response = self.client.get('/test_admin/admin/admin_views/section/1/')
+        self.failUnlessEqual(response.status_code, 200)
+    
+    def testBasicAddPost(self):
+        """
+        A smoke test to ensure POST on add_view works.
+        """
+        post_data = {
+            "name": u"Another Section",
+            # inline data
+            "article_set-TOTAL_FORMS": u"3",
+            "article_set-INITIAL_FORMS": u"0",
+        }
+        response = self.client.post('/test_admin/admin/admin_views/section/add/', post_data)
+        self.failUnlessEqual(response.status_code, 302) # redirect somewhere
+    
+    def testBasicEditPost(self):
+        """
+        A smoke test to ensure POST on edit_view works.
+        """
+        post_data = {
+            "name": u"Test section",
+            # inline data
+            "article_set-TOTAL_FORMS": u"4",
+            "article_set-INITIAL_FORMS": u"1",
+            "article_set-0-id": u"1",
+            # there is no title in database, give one here or formset
+            # will fail.
+            "article_set-0-title": u"Need a title.",
+            "article_set-0-content": u"&lt;p&gt;test content&lt;/p&gt;",
+            "article_set-0-date_0": u"2008-03-18",
+            "article_set-0-date_1": u"11:54:58",
+            "article_set-1-id": u"",
+            "article_set-1-title": u"",
+            "article_set-1-content": u"",
+            "article_set-1-date_0": u"",
+            "article_set-1-date_1": u"",
+            "article_set-2-id": u"",
+            "article_set-2-title": u"",
+            "article_set-2-content": u"",
+            "article_set-2-date_0": u"",
+            "article_set-2-date_1": u"",
+            "article_set-3-id": u"",
+            "article_set-3-title": u"",
+            "article_set-3-content": u"",
+            "article_set-3-date_0": u"",
+            "article_set-3-date_1": u"",
+        }
+        response = self.client.post('/test_admin/admin/admin_views/section/1/', post_data)
+        self.failUnlessEqual(response.status_code, 302) # redirect somewhere
+
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
     ct = ContentType.objects.get_for_model(Model)
-    return Permission.objects.get(content_type=ct,codename=perm)
+    return Permission.objects.get(content_type=ct, codename=perm)
 
 class AdminViewPermissionsTest(TestCase):
     """Tests for Admin Views Permissions."""
@@ -76,19 +156,6 @@ class AdminViewPermissionsTest(TestCase):
                      LOGIN_FORM_KEY: 1,
                      'username': 'joepublic',
                      'password': 'secret'}
-
-    def testTrailingSlashRequired(self):
-        """
-        If you leave off the trailing slash, app should redirect and add it.
-        """
-        self.client.post('/test_admin/admin/', self.super_login)
-
-        request = self.client.get(
-            '/test_admin/admin/admin_views/article/add'
-        )
-        self.assertRedirects(request,
-            '/test_admin/admin/admin_views/article/add/'
-        )
 
     def testLogin(self):
         """

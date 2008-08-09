@@ -20,6 +20,9 @@ class Article(models.Model):
     def __unicode__(self):
         return self.title
 
+class ArticleInline(admin.TabularInline):
+    model = Article
+
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('content', 'date')
     list_filter = ('date',)
@@ -61,5 +64,5 @@ class ModelWithStringPrimaryKey(models.Model):
 
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
-admin.site.register(Section)
+admin.site.register(Section, inlines=[ArticleInline])
 admin.site.register(ModelWithStringPrimaryKey)

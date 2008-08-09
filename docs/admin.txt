@@ -521,6 +521,44 @@ with an operator:
     Performs a full-text match. This is like the default search method but uses
     an index. Currently this is only available for MySQL.
 
+``ModelAdmin`` methods
+----------------------
+
+``save_form(self, request, form, change)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``save_form`` method is given the ``HttpRequest``, a ``ModelForm``
+instance and a boolean value based on whether it is adding or changing the
+object.
+
+This method should return an unsaved instance. For example to attach
+``request.user`` to the object prior to saving::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        def save_form(self, request, form, change):
+            instance = form.save(commit=False)
+            instance.user = request.user
+            return instance
+
+``save_formset(self, request, form, formset, change)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``save_formset`` method is given the ``HttpRequest``, the parent
+``ModelForm`` instance and a boolean value baesed on whether it is adding or
+changing the parent object.
+
+This method should return unsaved instances. These instances will later be
+saved to the database. By default the formset will only return instances that
+have changed. For example to attach ``request.user`` to each changed formset
+model instance::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        def save_formset(self, request, form, formset, change):
+            instances = formset.save(commit=False)
+            for instance in instances:
+                instance.user = request.user
+            return instances
+
 ``ModelAdmin`` media definitions
 --------------------------------
 
