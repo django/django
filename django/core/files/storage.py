@@ -3,10 +3,11 @@ import urlparse
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
-from django.utils.encoding import force_unicode, smart_str
-from django.utils.text import force_unicode, get_valid_filename
+from django.utils.encoding import force_unicode
+from django.utils.text import get_valid_filename
 from django.utils._os import safe_join
 from django.core.files import locks, File
+from django.core.files.move import file_move_safe
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
 
