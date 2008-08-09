@@ -452,6 +452,19 @@ class ModelAdmin(BaseModelAdmin):
         """
         request.user.message_set.create(message=message)
 
+    def save_model(self, request, form, change):
+        """
+        Save and return a model given a ModelForm. ``change`` is True if the
+        object is being changed, and False if it's being added.
+        """
+        return form.save(commit=True)
+
+    def save_formset(self, request, form, formset, change):
+        """
+        Save an inline formset attached to the object.
+        """
+        formset.save()
+
     def save_add(self, request, form, formsets, post_url_continue):
         """
         Saves the object in the "add" stage and returns an HttpResponseRedirect.
@@ -459,14 +472,12 @@ class ModelAdmin(BaseModelAdmin):
         `form` is a bound Form instance that's verified to be valid.
         """
         opts = self.model._meta
-        new_object = form.save(commit=True)
-
+        
+        new_object = self.save_model(request, form, change=False)
         if formsets:
             for formset in formsets:
-                # HACK: it seems like the parent obejct should be passed into
-                # a method of something, not just set as an attribute
                 formset.instance = new_object
-                formset.save()
+                self.save_formset(request, form, formset, change=False)
 
         pk_value = new_object._get_pk_val()
         self.log_addition(request, new_object)
@@ -509,12 +520,12 @@ class ModelAdmin(BaseModelAdmin):
         `formsets` is a sequence of InlineFormSet instances that are verified to be valid.
         """
         opts = self.model._meta
-        new_object = form.save(commit=True)
+        new_object = self.save_model(request, form, change=True)
         pk_value = new_object._get_pk_val()
 
         if formsets:
             for formset in formsets:
-                formset.save()
+                self.save_formset(request, form, formset, change=True)
         
         change_message = self.construct_change_message(request, form, formsets)
         self.log_change(request, new_object, change_message)        
