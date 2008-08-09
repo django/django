@@ -262,16 +262,9 @@ class ModelAdmin(BaseModelAdmin):
         super(ModelAdmin, self).__init__()
 
     def __call__(self, request, url):
-        # Check that LogEntry, ContentType and the auth context processor are installed.
         from django.conf import settings
         if settings.DEBUG:
-            from django.contrib.admin.models import LogEntry
-            if not LogEntry._meta.installed:
-                raise ImproperlyConfigured("Put 'django.contrib.admin' in your INSTALLED_APPS setting in order to use the admin application.")
-            if not ContentType._meta.installed:
-                raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in your INSTALLED_APPS setting in order to use the admin application.")
-            if 'django.core.context_processors.auth' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
-                raise ImproperlyConfigured("Put 'django.core.context_processors.auth' in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
+            self.check_dependancies()
 
         # Delegate to the appropriate method, based on the URL.
         if url is None:
@@ -284,6 +277,23 @@ class ModelAdmin(BaseModelAdmin):
             return self.delete_view(request, unquote(url[:-7]))
         else:
             return self.change_view(request, unquote(url))
+
+    def check_dependancies(self):
+        """
+        Check that all things needed to run the admin have been correctly installed.
+        
+        The default implementation checks that LogEntry, ContentType and the
+        auth context processor are installed.
+        """
+        from django.conf import settings
+        from django.contrib.admin.models import LogEntry
+        
+        if not LogEntry._meta.installed:
+            raise ImproperlyConfigured("Put 'django.contrib.admin' in your INSTALLED_APPS setting in order to use the admin application.")
+        if not ContentType._meta.installed:
+            raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in your INSTALLED_APPS setting in order to use the admin application.")
+        if 'django.core.context_processors.auth' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
+            raise ImproperlyConfigured("Put 'django.core.context_processors.auth' in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
 
     def _media(self):
         from django.conf import settings
@@ -359,72 +369,60 @@ class ModelAdmin(BaseModelAdmin):
     def get_formsets(self, request, obj=None):
         for inline in self.inline_instances:
             yield inline.get_formset(request, obj)
-
-    def save_add(self, request, form, formsets, post_url_continue):
+            
+    def log_addition(self, request, object):
         """
-        Saves the object in the "add" stage and returns an HttpResponseRedirect.
-
-        `form` is a bound Form instance that's verified to be valid.
+        Log that an object has been successfully added. 
+        
+        The default implementation creates an admin LogEntry object.
         """
         from django.contrib.admin.models import LogEntry, ADDITION
-        opts = self.model._meta
-        new_object = form.save(commit=True)
-
-        if formsets:
-            for formset in formsets:
-                # HACK: it seems like the parent obejct should be passed into
-                # a method of something, not just set as an attribute
-                formset.instance = new_object
-                formset.save()
-
-        pk_value = new_object._get_pk_val()
-        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, pk_value, force_unicode(new_object), ADDITION)
-        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)}
-        # Here, we distinguish between different save types by checking for
-        # the presence of keys in request.POST.
-        if request.POST.has_key("_continue"):
-            request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
-            if request.POST.has_key("_popup"):
-                post_url_continue += "?_popup=1"
-            return HttpResponseRedirect(post_url_continue % pk_value)
-
-        if request.POST.has_key("_popup"):
-            return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % \
-                # escape() calls force_unicode.
-                (escape(pk_value), escape(new_object)))
-        elif request.POST.has_key("_addanother"):
-            request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
-            return HttpResponseRedirect(request.path)
-        else:
-            request.user.message_set.create(message=msg)
-            # Figure out where to redirect. If the user has change permission,
-            # redirect to the change-list page for this object. Otherwise,
-            # redirect to the admin index.
-            if self.has_change_permission(request, None):
-                post_url = '../'
-            else:
-                post_url = '../../../'
-            return HttpResponseRedirect(post_url)
-    save_add = transaction.commit_on_success(save_add)
-
-    def save_change(self, request, form, formsets=None):
+        LogEntry.objects.log_action(
+            user_id         = request.user.pk, 
+            content_type_id = ContentType.objects.get_for_model(object).pk,
+            object_id       = object.pk,
+            object_repr     = force_unicode(object), 
+            action_flag     = ADDITION
+        )
+        
+    def log_change(self, request, object, message):
         """
-        Saves the object in the "change" stage and returns an HttpResponseRedirect.
-
-        `form` is a bound Form instance that's verified to be valid.
-
-        `formsets` is a sequence of InlineFormSet instances that are verified to be valid.
+        Log that an object has been successfully changed. 
+        
+        The default implementation creates an admin LogEntry object.
         """
         from django.contrib.admin.models import LogEntry, CHANGE
-        opts = self.model._meta
-        new_object = form.save(commit=True)
-        pk_value = new_object._get_pk_val()
-
-        if formsets:
-            for formset in formsets:
-                formset.save()
-
-        # Construct the change message.
+        LogEntry.objects.log_action(
+            user_id         = request.user.pk, 
+            content_type_id = ContentType.objects.get_for_model(object).pk, 
+            object_id       = object.pk, 
+            object_repr     = force_unicode(object), 
+            action_flag     = CHANGE, 
+            change_message  = message
+        )
+        
+    def log_deletion(self, request, object, object_repr):
+        """
+        Log that an object has been successfully deleted. Note that since the
+        object is deleted, it might no longer be safe to call *any* methods
+        on the object, hence this method getting object_repr.
+        
+        The default implementation creates an admin LogEntry object.
+        """
+        from django.contrib.admin.models import LogEntry, DELETION
+        LogEntry.objects.log_action(
+            user_id         = request.user.id, 
+            content_type_id = ContentType.objects.get_for_model(self.model).pk, 
+            object_id       = object.pk, 
+            object_repr     = object_repr,
+            action_flag     = DELETION
+        )
+        
+    
+    def construct_change_message(self, request, form, formsets):
+        """
+        Construct a change message from a changed object.
+        """
         change_message = []
         if form.changed_data:
             change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
@@ -445,25 +443,98 @@ class ModelAdmin(BaseModelAdmin):
                                           % {'name': deleted_object._meta.verbose_name,
                                              'object': deleted_object})
         change_message = ' '.join(change_message)
-        if not change_message:
-            change_message = _('No fields changed.')
-        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, pk_value, force_unicode(new_object), CHANGE, change_message)
+        return change_message or _('No fields changed.')
+    
+    def message_user(self, request, message):
+        """
+        Send a message to the user. The default implementation 
+        posts a message using the auth Message object.
+        """
+        request.user.message_set.create(message=message)
+
+    def save_add(self, request, form, formsets, post_url_continue):
+        """
+        Saves the object in the "add" stage and returns an HttpResponseRedirect.
+
+        `form` is a bound Form instance that's verified to be valid.
+        """
+        opts = self.model._meta
+        new_object = form.save(commit=True)
+
+        if formsets:
+            for formset in formsets:
+                # HACK: it seems like the parent obejct should be passed into
+                # a method of something, not just set as an attribute
+                formset.instance = new_object
+                formset.save()
+
+        pk_value = new_object._get_pk_val()
+        self.log_addition(request, new_object)
+                
+        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)}
+        # Here, we distinguish between different save types by checking for
+        # the presence of keys in request.POST.
+        if request.POST.has_key("_continue"):
+            self.message_user(request, msg + ' ' + _("You may edit it again below."))
+            if request.POST.has_key("_popup"):
+                post_url_continue += "?_popup=1"
+            return HttpResponseRedirect(post_url_continue % pk_value)
+
+        if request.POST.has_key("_popup"):
+            return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % \
+                # escape() calls force_unicode.
+                (escape(pk_value), escape(new_object)))
+        elif request.POST.has_key("_addanother"):
+            self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
+            return HttpResponseRedirect(request.path)
+        else:
+            self.message_user(request, msg)
+
+            # Figure out where to redirect. If the user has change permission,
+            # redirect to the change-list page for this object. Otherwise,
+            # redirect to the admin index.
+            if self.has_change_permission(request, None):
+                post_url = '../'
+            else:
+                post_url = '../../../'
+            return HttpResponseRedirect(post_url)
+    save_add = transaction.commit_on_success(save_add)
+
+    def save_change(self, request, form, formsets=None):
+        """
+        Saves the object in the "change" stage and returns an HttpResponseRedirect.
+
+        `form` is a bound Form instance that's verified to be valid.
+
+        `formsets` is a sequence of InlineFormSet instances that are verified to be valid.
+        """
+        opts = self.model._meta
+        new_object = form.save(commit=True)
+        pk_value = new_object._get_pk_val()
+
+        if formsets:
+            for formset in formsets:
+                formset.save()
+        
+        change_message = self.construct_change_message(request, form, formsets)
+        self.log_change(request, new_object, change_message)        
 
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)}
         if request.POST.has_key("_continue"):
-            request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
+            self.message_user(request, msg + ' ' + _("You may edit it again below."))
             if request.REQUEST.has_key('_popup'):
                 return HttpResponseRedirect(request.path + "?_popup=1")
             else:
                 return HttpResponseRedirect(request.path)
         elif request.POST.has_key("_saveasnew"):
-            request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object})
+            msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object}
+            self.message_user(request, msg)
             return HttpResponseRedirect("../%s/" % pk_value)
         elif request.POST.has_key("_addanother"):
-            request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
+            self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
             return HttpResponseRedirect("../add/")
         else:
-            request.user.message_set.create(message=msg)
+            self.message_user(request, msg)
             return HttpResponseRedirect("../")
     save_change = transaction.commit_on_success(save_change)
 
@@ -649,7 +720,6 @@ class ModelAdmin(BaseModelAdmin):
 
     def delete_view(self, request, object_id, extra_context=None):
         "The 'delete' admin view for this model."
-        from django.contrib.admin.models import LogEntry, DELETION
         opts = self.model._meta
         app_label = opts.app_label
 
@@ -678,8 +748,10 @@ class ModelAdmin(BaseModelAdmin):
                 raise PermissionDenied
             obj_display = str(obj)
             obj.delete()
-            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, object_id, obj_display, DELETION)
-            request.user.message_set.create(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
+            
+            self.log_deletion(request, obj, obj_display)
+            self.message_user(request, _('The %(name)s "%(obj)s" was deleted successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
+            
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect("../../../../")
             return HttpResponseRedirect("../../")
