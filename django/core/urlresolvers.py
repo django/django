@@ -285,10 +285,10 @@ class RegexURLResolver(object):
         try:
             lookup_view = get_callable(lookup_view, True)
         except (ImportError, AttributeError):
-            raise NoReverseMatch
+            raise NoReverseMatch("'%s' is not a callable." % lookup_view)
         if lookup_view in self.reverse_dict:
             return u''.join([reverse_helper(part.regex, *args, **kwargs) for part in self.reverse_dict[lookup_view]])
-        raise NoReverseMatch
+        raise NoReverseMatch("Reverse for '%s' not found." % lookup_view)
 
     def reverse_helper(self, lookup_view, *args, **kwargs):
         sub_match = self.reverse(lookup_view, *args, **kwargs)
