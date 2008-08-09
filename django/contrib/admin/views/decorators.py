@@ -28,7 +28,7 @@ def _display_login_form(request, error_message=''):
         post_data = _encode_post_data({})
     return render_to_response('admin/login.html', {
         'title': _('Log in'),
-        'app_path': request.path,
+        'app_path': request.get_full_path(),
         'post_data': post_data,
         'error_message': error_message
     }, context_instance=template.RequestContext(request))
@@ -84,7 +84,7 @@ def staff_member_required(view_func):
             if '@' in username:
                 # Mistakenly entered e-mail address instead of username? Look it up.
                 users = list(User.objects.filter(email=username))
-                if len(users) == 1:
+                if len(users) == 1 and users[0].check_password(password):
                     message = _("Your e-mail address is not your username. Try '%s' instead.") % users[0].username
                 else:
                     # Either we cannot find the user, or if more than 1
@@ -106,7 +106,7 @@ def staff_member_required(view_func):
                         return view_func(request, *args, **kwargs)
                     else:
                         request.session.delete_test_cookie()
-                        return http.HttpResponseRedirect(request.path)
+                        return http.HttpResponseRedirect(request.get_full_path())
             else:
                 return _display_login_form(request, ERROR_MESSAGE)
 

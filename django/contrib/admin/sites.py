@@ -269,7 +269,7 @@ class AdminSite(object):
                         return self.root(request, request.path.split(self.root_path)[-1])
                     else:
                         request.session.delete_test_cookie()
-                        return http.HttpResponseRedirect(request.path)
+                        return http.HttpResponseRedirect(request.get_full_path())
             else:
                 return self.display_login_form(request, ERROR_MESSAGE)
     login = never_cache(login)
@@ -341,7 +341,7 @@ class AdminSite(object):
 
         context = {
             'title': _('Log in'),
-            'app_path': request.path,
+            'app_path': request.get_full_path(),
             'post_data': post_data,
             'error_message': error_message,
             'root_path': self.root_path,

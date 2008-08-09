@@ -152,6 +152,13 @@ class AdminViewPermissionsTest(TestCase):
         # Login.context is a list of context dicts we just need to check the first one.
         self.assert_(login.context[0].get('error_message'))
 
+    def testLoginSuccessfullyRedirectsToOriginalUrl(self):
+        request = self.client.get('/test_admin/admin/')
+        self.failUnlessEqual(request.status_code, 200)
+        query_string = "the-answer=42"
+        login = self.client.post('/test_admin/admin/', self.super_login, QUERY_STRING = query_string )
+        self.assertRedirects(login, '/test_admin/admin/?%s' % query_string)
+
     def testAddView(self):
         """Test add view restricts access and actually adds items."""
 
@@ -363,3 +370,114 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/delete/' % quote(self.pk))
         should_contain = """<a href="../../%s/">%s</a>""" % (quote(self.pk), escape(self.pk))
         self.assertContains(response, should_contain)
+
+class SecureViewTest(TestCase):
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        # login POST dicts
+        self.super_login = {'post_data': _encode_post_data({}),
+                     LOGIN_FORM_KEY: 1,
+                     'username': 'super',
+                     'password': 'secret'}
+        self.super_email_login = {'post_data': _encode_post_data({}),
+                     LOGIN_FORM_KEY: 1,
+                     'username': 'super@example.com',
+                     'password': 'secret'}
+        self.super_email_bad_login = {'post_data': _encode_post_data({}),
+                      LOGIN_FORM_KEY: 1,
+                      'username': 'super@example.com',
+                      'password': 'notsecret'}
+        self.adduser_login = {'post_data': _encode_post_data({}),
+                     LOGIN_FORM_KEY: 1,
+                     'username': 'adduser',
+                     'password': 'secret'}
+        self.changeuser_login = {'post_data': _encode_post_data({}),
+                     LOGIN_FORM_KEY: 1,
+                     'username': 'changeuser',
+                     'password': 'secret'}
+        self.deleteuser_login = {'post_data': _encode_post_data({}),
+                     LOGIN_FORM_KEY: 1,
+                     'username': 'deleteuser',
+                     'password': 'secret'}
+        self.joepublic_login = {'post_data': _encode_post_data({}),
+                     LOGIN_FORM_KEY: 1,
+                     'username': 'joepublic',
+                     'password': 'secret'}
+    
+    def tearDown(self):
+        self.client.logout()
+    
+    def test_secure_view_shows_login_if_not_logged_in(self):
+        "Ensure that we see the login form"
+        response = self.client.get('/test_admin/admin/secure-view/' )
+        self.assertTemplateUsed(response, 'admin/login.html')
+    
+    def test_secure_view_login_successfully_redirects_to_original_url(self):
+        request = self.client.get('/test_admin/admin/secure-view/')
+        self.failUnlessEqual(request.status_code, 200)
+        query_string = "the-answer=42"
+        login = self.client.post('/test_admin/admin/secure-view/', self.super_login, QUERY_STRING = query_string )
+        self.assertRedirects(login, '/test_admin/admin/secure-view/?%s' % query_string)
+    
+    def test_staff_member_required_decorator_works_as_per_admin_login(self):
+        """
+        Make sure only staff members can log in.
+
+        Successful posts to the login page will redirect to the orignal url.
+        Unsuccessfull attempts will continue to render the login page with 
+        a 200 status code.
+        """
+        # Super User
+        request = self.client.get('/test_admin/admin/secure-view/')
+        self.failUnlessEqual(request.status_code, 200)
+        login = self.client.post('/test_admin/admin/secure-view/', self.super_login)
+        self.assertRedirects(login, '/test_admin/admin/secure-view/')
+        self.assertFalse(login.context)
+        self.client.get('/test_admin/admin/logout/')
+
+        # Test if user enters e-mail address
+        request = self.client.get('/test_admin/admin/secure-view/')
+        self.failUnlessEqual(request.status_code, 200)
+        login = self.client.post('/test_admin/admin/secure-view/', self.super_email_login)
+        self.assertContains(login, "Your e-mail address is not your username")
+        # only correct passwords get a username hint
+        login = self.client.post('/test_admin/admin/secure-view/', self.super_email_bad_login)
+        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")
+        new_user = User(username='jondoe', password='secret', email='super@example.com')
+        new_user.save()
+        # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
+        login = self.client.post('/test_admin/admin/secure-view/', self.super_email_login)
+        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")
+
+        # Add User
+        request = self.client.get('/test_admin/admin/secure-view/')
+        self.failUnlessEqual(request.status_code, 200)
+        login = self.client.post('/test_admin/admin/secure-view/', self.adduser_login)
+        self.assertRedirects(login, '/test_admin/admin/secure-view/')
+        self.assertFalse(login.context)
+        self.client.get('/test_admin/admin/logout/')
+
+        # Change User
+        request = self.client.get('/test_admin/admin/secure-view/')
+        self.failUnlessEqual(request.status_code, 200)
+        login = self.client.post('/test_admin/admin/secure-view/', self.changeuser_login)
+        self.assertRedirects(login, '/test_admin/admin/secure-view/')
+        self.assertFalse(login.context)
+        self.client.get('/test_admin/admin/logout/')
+
+        # Delete User
+        request = self.client.get('/test_admin/admin/secure-view/')
+        self.failUnlessEqual(request.status_code, 200)
+        login = self.client.post('/test_admin/admin/secure-view/', self.deleteuser_login)
+        self.assertRedirects(login, '/test_admin/admin/secure-view/')
+        self.assertFalse(login.context)
+        self.client.get('/test_admin/admin/logout/')
+
+        # Regular User should not be able to login.
+        request = self.client.get('/test_admin/admin/secure-view/')
+        self.failUnlessEqual(request.status_code, 200)
+        login = self.client.post('/test_admin/admin/secure-view/', self.joepublic_login)
+        self.failUnlessEqual(login.status_code, 200)
+        # Login.context is a list of context dicts we just need to check the first one.
+        self.assert_(login.context[0].get('error_message'))
