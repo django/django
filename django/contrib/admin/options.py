@@ -5,7 +5,7 @@ from django.forms.models import BaseInlineFormSet
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets
 from django.contrib.admin.util import quote, unquote, get_deleted_objects
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.core.exceptions import PermissionDenied
 from django.db import models, transaction
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
@@ -262,10 +262,6 @@ class ModelAdmin(BaseModelAdmin):
         super(ModelAdmin, self).__init__()
 
     def __call__(self, request, url):
-        from django.conf import settings
-        if settings.DEBUG:
-            self.check_dependancies()
-
         # Delegate to the appropriate method, based on the URL.
         if url is None:
             return self.changelist_view(request)
@@ -277,23 +273,6 @@ class ModelAdmin(BaseModelAdmin):
             return self.delete_view(request, unquote(url[:-7]))
         else:
             return self.change_view(request, unquote(url))
-
-    def check_dependancies(self):
-        """
-        Check that all things needed to run the admin have been correctly installed.
-        
-        The default implementation checks that LogEntry, ContentType and the
-        auth context processor are installed.
-        """
-        from django.conf import settings
-        from django.contrib.admin.models import LogEntry
-        
-        if not LogEntry._meta.installed:
-            raise ImproperlyConfigured("Put 'django.contrib.admin' in your INSTALLED_APPS setting in order to use the admin application.")
-        if not ContentType._meta.installed:
-            raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in your INSTALLED_APPS setting in order to use the admin application.")
-        if 'django.core.context_processors.auth' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
-            raise ImproperlyConfigured("Put 'django.core.context_processors.auth' in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
 
     def _media(self):
         from django.conf import settings

@@ -6,6 +6,7 @@ from django import http, template
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth import authenticate, login
 from django.db.models.base import ModelBase
+from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import render_to_response
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
@@ -112,6 +113,23 @@ class AdminSite(object):
         *at least one* page in the admin site.
         """
         return request.user.is_authenticated() and request.user.is_staff
+    
+    def check_dependancies(self):
+        """
+        Check that all things needed to run the admin have been correctly installed.
+
+        The default implementation checks that LogEntry, ContentType and the
+        auth context processor are installed.
+        """
+        from django.conf import settings
+        from django.contrib.admin.models import LogEntry
+
+        if not LogEntry._meta.installed:
+            raise ImproperlyConfigured("Put 'django.contrib.admin' in your INSTALLED_APPS setting in order to use the admin application.")
+        if not ContentType._meta.installed:
+            raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in your INSTALLED_APPS setting in order to use the admin application.")
+        if 'django.core.context_processors.auth' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
+            raise ImproperlyConfigured("Put 'django.core.context_processors.auth' in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
 
     def root(self, request, url):
         """
@@ -121,6 +139,9 @@ class AdminSite(object):
         """
         if request.method == 'GET' and not request.path.endswith('/'):
             return http.HttpResponseRedirect(request.path + '/')
+        
+        if settings.DEBUG:
+            self.check_dependancies()
 
         # Figure out the admin base URL path and stash it for later use
         self.root_path = re.sub(re.escape(url) + '$', '', request.path)
