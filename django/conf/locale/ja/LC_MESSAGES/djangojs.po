@@ -1,7 +1,4 @@
 # Japanese translation for js.
-# Copyright (C) 2005 makoto tsuyuki
-# This file is distributed under the same license as the PACKAGE package.
-# makoto tsuyuki <mtsuyuki@gmail.com>, 2005.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
