@@ -231,17 +231,25 @@ arguments.
 The per-site cache
 ==================
 
+**New in Django development version** (previous versions of Django only provided a single ``CacheMiddleware`` instead of the two pieces described below).
+
 Once the cache is set up, the simplest way to use caching is to cache your
-entire site. Just add ``'django.middleware.cache.CacheMiddleware'`` to your
+entire site. You'll need to add
+``'django.middleware.cache.UpdateCacheMiddleware'`` and
+``'django.middleware.cache.FetchFromCacheMiddleware' to your
 ``MIDDLEWARE_CLASSES`` setting, as in this example::
 
     MIDDLEWARE_CLASSES = (
-        'django.middleware.cache.CacheMiddleware',
+        'django.middleware.cache.UpdateCacheMiddleware',
         'django.middleware.common.CommonMiddleware',
+        'django.middleware.cache.FetchFromCacheMiddleware',
     )
 
-(The order of ``MIDDLEWARE_CLASSES`` matters. See `Order of MIDDLEWARE_CLASSES`_
-below.)
+.. note::
+
+    No, that's not a typo: the "update" middleware must be first in the list,
+    and the "fetch" middleware must be last. The details are a bit obscure, but
+    see `Order of MIDDLEWARE_CLASSES`_ below if you'd like the full story.
 
 Then, add the following required settings to your Django settings file:
 
@@ -258,10 +266,9 @@ parameters. Optionally, if the ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting is
 will be cached. This is a simple and effective way of disabling caching for any
 user-specific pages (include Django's admin interface). Note that if you use
 ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY``, you should make sure you've activated
-``AuthenticationMiddleware`` and that ``AuthenticationMiddleware`` appears
-before ``CacheMiddleware`` in your ``MIDDLEWARE_CLASSES``.
+``AuthenticationMiddleware``.
 
-Additionally, ``CacheMiddleware`` automatically sets a few headers in each
+Additionally, the cache middleware automatically sets a few headers in each
 ``HttpResponse``:
 
 * Sets the ``Last-Modified`` header to the current date/time when a fresh
@@ -627,16 +634,24 @@ apps' performance:
 Order of MIDDLEWARE_CLASSES
 ===========================
 
-If you use ``CacheMiddleware``, it's important to put it in the right place
-within the ``MIDDLEWARE_CLASSES`` setting, because the cache middleware needs
-to know which headers by which to vary the cache storage. Middleware always
-adds something to the ``Vary`` response header when it can.
+If you use caching middlewaare, it's important to put each half in the right
+place within the ``MIDDLEWARE_CLASSES`` setting. That's because the cache
+middleware needs to know which headers by which to vary the cache storage.
+Middleware always adds something to the ``Vary`` response header when it can.
 
-Put the ``CacheMiddleware`` *before* any other middleware that might add
-something to the ``Vary`` header (response middleware is applied in reverse
-order). The following middleware modules do so:
+``UpdateCacheMiddleware`` runs during the response phase, where middleware is
+run in reverse order, so an item at the top of the list runs *last* during the
+response phase. Thus, you need to make sure that ``UpdateCacheMiddleware``
+appears *before* any other middleware that might add something to the ``Vary``
+header. The following middleware modules do so:
 
     * ``SessionMiddleware`` adds ``Cookie``
     * ``GZipMiddleware`` adds ``Accept-Encoding``
     * ``LocaleMiddleware`` adds ``Accept-Language``
+    
+``FetchFromCacheMiddleware``, on the other hand, runs during the request phase,
+where middleware is applied first-to-last, so an item at the top of the list
+runs *first* during the request phase. The ``FetchFromCacheMiddleware`` also
+needs to run after other middleware updates the ``Vary`` header, so
+``FetchFromCacheMiddleware`` must be *after* any item that does so.
 
