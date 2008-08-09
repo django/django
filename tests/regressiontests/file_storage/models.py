@@ -12,7 +12,7 @@ temp_storage = FileSystemStorage(tempfile.gettempdir())
 try:
     # Checking for the existence of Image is enough for CPython, but
     # for PyPy, you need to check for the underlying modules
-    import Image, _imaging
+    from PIL import Image, _imaging
 except ImportError:
     Image = None
 

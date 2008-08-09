@@ -75,7 +75,7 @@ class ImageFile(models.Model):
         # Checking for the existence of Image is enough for CPython, but
         # for PyPy, you need to check for the underlying modules
         # If PIL is not available, this test is equivalent to TextFile above.
-        import Image, _imaging
+        from PIL import Image, _imaging
         image = models.ImageField(storage=temp_storage, upload_to='tests')
     except ImportError:
         image = models.FileField(storage=temp_storage, upload_to='tests')
