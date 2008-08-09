@@ -109,9 +109,17 @@ class UpdateQuery(Query):
                 related_updates=self.related_updates.copy, **kwargs)
 
     def execute_sql(self, result_type=None):
-        super(UpdateQuery, self).execute_sql(result_type)
+        """
+        Execute the specified update. Returns the number of rows affected by
+        the primary update query (there could be other updates on related
+        tables, but their rowcounts are not returned).
+        """
+        cursor = super(UpdateQuery, self).execute_sql(result_type)
+        rows = cursor.rowcount
+        del cursor
         for query in self.get_related_updates():
             query.execute_sql(result_type)
+        return rows
 
     def as_sql(self):
         """

@@ -399,9 +399,10 @@ class QuerySet(object):
                 "Cannot update a query once a slice has been taken."
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
-        query.execute_sql(None)
+        rows = query.execute_sql(None)
         transaction.commit_unless_managed()
         self._result_cache = None
+        return rows
     update.alters_data = True
 
     def _update(self, values):
@@ -415,8 +416,8 @@ class QuerySet(object):
                 "Cannot update a query once a slice has been taken."
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_fields(values)
-        query.execute_sql(None)
         self._result_cache = None
+        return query.execute_sql(None)
     _update.alters_data = True
 
     ##################################################
