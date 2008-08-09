@@ -79,3 +79,7 @@ class PermWrapper(object):
 
     def __getitem__(self, module_name):
         return PermLookupDict(self.user, module_name)
+        
+    def __iter__(self):
+        # I am large, I contain multitudes.
+        raise TypeError("PermWrapper is not iterable.")
