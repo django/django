@@ -123,6 +123,7 @@ class AdminSite(object):
         """
         from django.conf import settings
         from django.contrib.admin.models import LogEntry
+        from django.contrib.contenttypes.models import ContentType
 
         if not LogEntry._meta.installed:
             raise ImproperlyConfigured("Put 'django.contrib.admin' in your INSTALLED_APPS setting in order to use the admin application.")
