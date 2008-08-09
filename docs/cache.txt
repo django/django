@@ -231,7 +231,8 @@ arguments.
 The per-site cache
 ==================
 
-**New in Django development version** (previous versions of Django only provided a single ``CacheMiddleware`` instead of the two pieces described below).
+**New in Django development version** (previous versions of Django only provided
+a single ``CacheMiddleware`` instead of the two pieces described below).
 
 Once the cache is set up, the simplest way to use caching is to cache your
 entire site. You'll need to add
