@@ -226,7 +226,7 @@ For example, the following code will store uploaded files under
     from django.db import models
     from django.core.files.storage import FileSystemStorage
 
-    fs = FileSystemStorage(base_url='/media/photos')
+    fs = FileSystemStorage(location='/media/photos')
 
     class Car(models.Model):
         ...
