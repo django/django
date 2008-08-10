@@ -112,7 +112,7 @@ class AdminSite(object):
         """
         return request.user.is_authenticated() and request.user.is_staff
     
-    def check_dependancies(self):
+    def check_dependencies(self):
         """
         Check that all things needed to run the admin have been correctly installed.
 
@@ -140,7 +140,7 @@ class AdminSite(object):
             return http.HttpResponseRedirect(request.path + '/')
         
         if settings.DEBUG:
-            self.check_dependancies()
+            self.check_dependencies()
 
         # Figure out the admin base URL path and stash it for later use
         self.root_path = re.sub(re.escape(url) + '$', '', request.path)
