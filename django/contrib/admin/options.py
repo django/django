@@ -132,7 +132,7 @@ class BaseModelAdmin(object):
 
         If kwargs are given, they're passed to the form Field's constructor.
         """
-
+        
         # If the field specifies choices, we don't need to look for special
         # admin widgets - we just need to use a select widget of some kind.
         if db_field.choices:

@@ -191,4 +191,24 @@ __test__ = {'API_TESTS':"""
 >>> cheetah.delete()
 >>> Comparison.objects.all()
 [<Comparison: tiger is stronger than None>]
+
+# GenericInlineFormSet tests ##################################################
+
+>>> from django.contrib.contenttypes.generic import generic_inlineformset_factory
+
+>>> GenericFormSet = generic_inlineformset_factory(TaggedItem, extra=1)
+>>> formset = GenericFormSet(instance=Animal())
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag" type="text" name="generic_relations-taggeditem-content_type-object_id-0-tag" maxlength="50" /></p>
+<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label> <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE" id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" /><input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id" id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>
+
+>>> formset = GenericFormSet(instance=platypus)
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag" type="text" name="generic_relations-taggeditem-content_type-object_id-0-tag" value="shiny" maxlength="50" /></p>
+<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label> <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE" id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" /><input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id" value="5" id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>
+<p><label for="id_generic_relations-taggeditem-content_type-object_id-1-tag">Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-1-tag" type="text" name="generic_relations-taggeditem-content_type-object_id-1-tag" maxlength="50" /></p>
+<p><label for="id_generic_relations-taggeditem-content_type-object_id-1-DELETE">Delete:</label> <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-1-DELETE" id="id_generic_relations-taggeditem-content_type-object_id-1-DELETE" /><input type="hidden" name="generic_relations-taggeditem-content_type-object_id-1-id" id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>
+
 """}

@@ -785,6 +785,47 @@ Finally, register your ``Person`` and ``Group`` models with the admin site::
 Now your admin site is set up to edit ``Membership`` objects inline from
 either the ``Person`` or the ``Group`` detail pages.
 
+Using generic relations as an inline
+------------------------------------
+
+It is possible to use an inline with generically related objects. Let's say
+you have the following models::
+
+    class Image(models.Model):
+        image = models.ImageField(upload_to="images")
+        content_type = models.ForeignKey(ContentType)
+        object_id = models.PositiveIntegerField()
+        content_object = generic.GenericForeignKey("content_type", "object_id")
+    
+    class Product(models.Model):
+        name = models.CharField(max_length=100)
+
+If you want to allow editing and creating ``Image`` instance on the ``Product``
+add/change views you can simply use ``GenericInlineModelAdmin`` provided by
+``django.contrib.contenttypes.generic``. In your ``admin.py`` for this
+example app::
+
+    from django.contrib import admin
+    from django.contrib.contenttypes import generic
+    
+    from myproject.myapp.models import Image, Product
+    
+    class ImageInline(generic.GenericTabularInline):
+        model = Image
+    
+    class ProductAdmin(admin.ModelAdmin):
+        inlines = [
+            ImageInline,
+        ]
+    
+    admin.site.register(Product, ProductAdmin)
+
+``django.contrib.contenttypes.generic`` provides both a ``GenericTabularInline``
+and ``GenericStackedInline`` and behave just like any other inline. See the
+`contenttypes documentation`_ for more specific information.
+
+.. _contenttypes documentation: ../contenttypes/
+
 ``AdminSite`` objects
 =====================
 

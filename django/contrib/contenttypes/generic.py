@@ -6,9 +6,14 @@ from django import oldforms
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import signals
+from django.db import models
 from django.db.models.fields.related import RelatedField, Field, ManyToManyRel
 from django.db.models.loading import get_model
 from django.utils.functional import curry
+
+from django.forms import ModelForm
+from django.forms.models import BaseModelFormSet, modelformset_factory, save_instance
+from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 
 class GenericForeignKey(object):
     """
@@ -273,13 +278,111 @@ def create_generic_related_manager(superclass):
 class GenericRel(ManyToManyRel):
     def __init__(self, to, related_name=None, limit_choices_to=None, symmetrical=True):
         self.to = to
-        self.num_in_admin = 0
         self.related_name = related_name
-        self.filter_interface = None
         self.limit_choices_to = limit_choices_to or {}
         self.edit_inline = False
-        self.raw_id_admin = False
         self.symmetrical = symmetrical
         self.multiple = True
-        assert not (self.raw_id_admin and self.filter_interface), \
-            "Generic relations may not use both raw_id_admin and filter_interface"
+
+class BaseGenericInlineFormSet(BaseModelFormSet):
+    """
+    A formset for generic inline objects to a parent.
+    """
+    ct_field_name = "content_type"
+    ct_fk_field_name = "object_id"
+    
+    def __init__(self, data=None, files=None, instance=None, save_as_new=None):
+        opts = self.model._meta
+        self.instance = instance
+        self.rel_name = '-'.join((
+            opts.app_label, opts.object_name.lower(),
+            self.ct_field.name, self.ct_fk_field.name,
+        ))
+        super(BaseGenericInlineFormSet, self).__init__(
+            queryset=self.get_queryset(), data=data, files=files,
+            prefix=self.rel_name
+        )
+
+    def get_queryset(self):
+        # Avoid a circular import.
+        from django.contrib.contenttypes.models import ContentType
+        if self.instance is None:
+            return self.model._default_manager.empty()
+        return self.model._default_manager.filter(**{
+            self.ct_field.name: ContentType.objects.get_for_model(self.instance),
+            self.ct_fk_field.name: self.instance.pk,
+        })
+
+    def save_new(self, form, commit=True):
+        # Avoid a circular import.
+        from django.contrib.contenttypes.models import ContentType
+        kwargs = {
+            self.ct_field.get_attname(): ContentType.objects.get_for_model(self.instance).pk,
+            self.ct_fk_field.get_attname(): self.instance.pk,
+        }
+        new_obj = self.model(**kwargs)
+        return save_instance(form, new_obj, commit=commit)
+
+def generic_inlineformset_factory(model, form=ModelForm,
+                                  formset=BaseGenericInlineFormSet,
+                                  ct_field="content_type", fk_field="object_id",
+                                  fields=None, exclude=None,
+                                  extra=3, can_order=False, can_delete=True,
+                                  max_num=0,
+                                  formfield_callback=lambda f: f.formfield()):
+    """
+    Returns an ``GenericInlineFormSet`` for the given kwargs.
+
+    You must provide ``ct_field`` and ``object_id`` if they different from the
+    defaults ``content_type`` and ``object_id`` respectively.
+    """
+    opts = model._meta
+    # Avoid a circular import.
+    from django.contrib.contenttypes.models import ContentType
+    # if there is no field called `ct_field` let the exception propagate
+    ct_field = opts.get_field(ct_field)
+    if not isinstance(ct_field, models.ForeignKey) or ct_field.rel.to != ContentType:
+        raise Exception("fk_name '%s' is not a ForeignKey to ContentType" % ct_field)
+    fk_field = opts.get_field(fk_field) # let the exception propagate
+    if exclude is not None:
+        exclude.extend([ct_field.name, fk_field.name])
+    else:
+        exclude = [ct_field.name, fk_field.name]
+    FormSet = modelformset_factory(model, form=form,
+                                   formfield_callback=formfield_callback,
+                                   formset=formset,
+                                   extra=extra, can_delete=can_delete, can_order=can_order,
+                                   fields=fields, exclude=exclude, max_num=max_num)
+    FormSet.ct_field = ct_field
+    FormSet.ct_fk_field = fk_field
+    return FormSet
+
+class GenericInlineModelAdmin(InlineModelAdmin):
+    ct_field = "content_type"
+    ct_fk_field = "object_id"
+    formset = BaseGenericInlineFormSet
+
+    def get_formset(self, request, obj=None):
+        if self.declared_fieldsets:
+            fields = flatten_fieldsets(self.declared_fieldsets)
+        else:
+            fields = None
+        defaults = {
+            "ct_field": self.ct_field,
+            "fk_field": self.ct_fk_field,
+            "form": self.form,
+            "formfield_callback": self.formfield_for_dbfield,
+            "formset": self.formset,
+            "extra": self.extra,
+            "can_delete": True,
+            "can_order": False,
+            "fields": fields,
+        }
+        return generic_inlineformset_factory(self.model, **defaults)
+
+class GenericStackedInline(GenericInlineModelAdmin):
+    template = 'admin/edit_inline/stacked.html'
+
+class GenericTabularInline(GenericInlineModelAdmin):
+    template = 'admin/edit_inline/tabular.html'
+

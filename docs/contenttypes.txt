@@ -72,11 +72,11 @@ together, uniquely describe an installed model:
         `the verbose_name attribute`_ of the model.
 
 Let's look at an example to see how this works. If you already have
-the contenttypes application installed, and then add `the sites
-application`_ to your ``INSTALLED_APPS`` setting and run ``manage.py
-syncdb`` to install it, the model ``django.contrib.sites.models.Site``
-will be installed into your database. Along with it a new instance
-of ``ContentType`` will be created with the following values:
+the contenttypes application installed, and then add `the sites application`_
+to your ``INSTALLED_APPS`` setting and run ``manage.py syncdb`` to install it,
+the model ``django.contrib.sites.models.Site`` will be installed into your
+database. Along with it a new instance of ``ContentType`` will be created with
+the following values:
 
     * ``app_label`` will be set to ``'sites'`` (the last part of the Python
       path "django.contrib.sites").
@@ -261,3 +261,27 @@ Note that if you delete an object that has a ``GenericRelation``, any objects
 which have a ``GenericForeignKey`` pointing at it will be deleted as well. In
 the example above, this means that if a ``Bookmark`` object were deleted, any
 ``TaggedItem`` objects pointing at it would be deleted at the same time.
+
+Generic relations in forms and admin
+------------------------------------
+
+``django.contrib.contenttypes.genric`` provides both a ``GenericInlineFormSet``
+and ``GenericInlineModelAdmin``. This enables the use of generic relations in
+forms and the admin. See the `model formset`_ and `admin`_ documentation for
+more information.
+
+``GenericInlineModelAdmin`` options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``GenericInlineModelAdmin`` class inherits all properties from an
+``InlineModelAdmin`` class. However, it adds a couple of its own for working
+with the generic relation:
+
+    * ``ct_field`` - The name of the ``ContentType`` foreign key field on the
+      model. Defaults to ``content_type``.
+    
+    * ``ct_fk_field`` - The name of the integer field that represents the ID
+      of the related object. Defaults to ``object_id``.
+
+.. _model formset: ../modelforms/
+.. _admin: ../admin/
