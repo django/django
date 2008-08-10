@@ -50,7 +50,7 @@ class Media(StrAndUnicode):
         return self.render()
         
     def render(self):
-        return u'\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES]))
+        return mark_safe(u'\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES])))
         
     def render_js(self):
         return [u'<script type="text/javascript" src="%s"></script>' % self.absolute_path(path) for path in self._js]
