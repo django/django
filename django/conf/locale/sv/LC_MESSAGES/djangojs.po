@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-01 15:31+0100\n"
+"POT-Creation-Date: 2008-08-10 15:01+0200\n"
 "PO-Revision-Date: 2008-02-01 15:32+0100\n"
-"Last-Translator: Mikko Hellsing <mikko@sorl.net>\n"
+"Last-Translator: Ludvig Ericson <ludvig.ericson@gmail.com>\n"
 "Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +24,7 @@ msgstr "Tillgängliga %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
-msgstr "Välj alla"
+msgstr "Markera alla"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
@@ -92,7 +92,7 @@ msgstr "Midnatt"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
-msgstr "06.00"
+msgstr "06:00"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
@@ -106,7 +106,7 @@ msgstr "Avbryt"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
 msgid "Today"
-msgstr "Idag"
+msgstr "I dag"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
 msgid "Calendar"
@@ -114,8 +114,8 @@ msgstr "Kalender"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
 msgid "Yesterday"
-msgstr "Igår"
+msgstr "I går"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
-msgstr "Imorgon"
+msgstr "I morgon"
