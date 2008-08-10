@@ -261,7 +261,7 @@ See the `syndication documentation`_.
 webdesign
 =========
 
-Helpers and utilties targeted primarily at Web *designers* rather than
+Helpers and utilities targeted primarily at Web *designers* rather than
 Web *developers*.
 
 See the `Web design helpers documentation`_.
