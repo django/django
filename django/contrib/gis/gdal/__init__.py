@@ -47,9 +47,13 @@ except:
     HAS_GDAL, GEOJSON = False, False
 
 # The envelope, error, and geomtype modules do not actually require the
-#  GDAL library.
+# GDAL library, but still nead at least Python 2.4 and ctypes.
 PYTHON23 = sys.version_info[0] == 2 and sys.version_info[1] == 3
 if not PYTHON23:
-    from django.contrib.gis.gdal.envelope import Envelope
-    from django.contrib.gis.gdal.error import check_err, OGRException, OGRIndexError, SRSException
-    from django.contrib.gis.gdal.geomtype import OGRGeomType
+    try:
+        from django.contrib.gis.gdal.envelope import Envelope
+        from django.contrib.gis.gdal.error import check_err, OGRException, OGRIndexError, SRSException
+        from django.contrib.gis.gdal.geomtype import OGRGeomType
+    except ImportError:
+        # No ctypes, but don't raise an exception.
+        pass

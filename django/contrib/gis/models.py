@@ -214,11 +214,10 @@ if not PYTHON23 and settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     # Because the PostGIS version is checked when initializing the spatial 
     # backend a `ProgrammingError` will be raised if the PostGIS tables 
     # and functions are not installed.  We catch here so it won't be raised when 
-    # running the Django test suite.
-    from psycopg2 import ProgrammingError
+    # running the Django test suite.  `ImportError` is also possible if no ctypes.
     try:
         from django.contrib.gis.db.backend.postgis.models import GeometryColumns, SpatialRefSys
-    except ProgrammingError:
+    except:
         _srid_info = False
 elif not PYTHON23 and settings.DATABASE_ENGINE == 'oracle':
     # Same thing as above, except the GEOS library is attempted to be loaded for
