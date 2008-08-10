@@ -84,7 +84,7 @@ class AdminFileWidget(forms.FileInput):
         
     def render(self, name, value, attrs=None):
         output = []
-        if value:
+        if value and hasattr(value, "url"):
             output.append('%s <a target="_blank" href="%s">%s</a> <br />%s ' % \
                 (_('Currently:'), value.url, value, _('Change:')))
         output.append(super(AdminFileWidget, self).render(name, value, attrs))

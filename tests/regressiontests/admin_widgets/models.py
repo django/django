@@ -27,6 +27,7 @@ class Album(models.Model):
 __test__ = {'WIDGETS_TESTS': """
 >>> from datetime import datetime
 >>> from django.utils.html import escape, conditional_escape
+>>> from django.core.files.uploadedfile import SimpleUploadedFile
 >>> from django.contrib.admin.widgets import FilteredSelectMultiple, AdminSplitDateTime
 >>> from django.contrib.admin.widgets import AdminFileWidget, ForeignKeyRawIdWidget, ManyToManyRawIdWidget
 >>> from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
@@ -54,6 +55,8 @@ HTML escaped.
 >>> w = AdminFileWidget()
 >>> print conditional_escape(w.render('test', album.cover_art))
 Currently: <a target="_blank" href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <br />Change: <input type="file" name="test" />
+>>> print conditional_escape(w.render('test', SimpleUploadedFile('test', 'content')))
+<input type="file" name="test" />
 
 >>> rel = Album._meta.get_field('band').rel
 >>> w = ForeignKeyRawIdWidget(rel)
