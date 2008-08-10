@@ -223,25 +223,25 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_custom_command(self):
-        "default: django-admin can't execute user commands"
+        "default: django-admin can't execute user commands if it isn't provided settings"
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
-        "default: django-admin can't execute user commands, even if settings are provided as argument"
+        "default: django-admin can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=settings']
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(out)
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
     def test_custom_command_with_environment(self):
-        "default: django-admin can't execute user commands, even if settings are provided in environment"
+        "default: django-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_django_admin(args,'settings')
-        self.assertNoOutput(out)
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
 class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
     """A series of tests for django-admin.py when using a settings.py file that
@@ -261,18 +261,18 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         self.assertOutput(err, 'environment variable DJANGO_SETTINGS_MODULE is undefined')
 
     def test_builtin_with_settings(self):
-        "fulldefault: django-admin builtin commands fail if user app isn't on path"
+        "fulldefault: django-admin builtin commands succeed if a settings file is provided"
         args = ['sqlall','--settings=settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(out)
-        self.assertOutput(err, 'ImportError: No module named regressiontests')
+        self.assertNoOutput(err)
+        self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_environment(self):
-        "fulldefault: django-admin builtin commands fail if user app isn't on path"
+        "fulldefault: django-admin builtin commands succeed if the environment contains settings"
         args = ['sqlall','admin_scripts']
         out, err = self.run_django_admin(args,'settings')
-        self.assertNoOutput(out)
-        self.assertOutput(err, 'ImportError: No module named regressiontests')
+        self.assertNoOutput(err)
+        self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_bad_settings(self):
         "fulldefault: django-admin builtin commands fail if settings file (from argument) doesn't exist"
@@ -289,25 +289,25 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_custom_command(self):
-        "fulldefault: django-admin can't execute user commands"
+        "fulldefault: django-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
-        "fulldefault: django-admin can't execute user commands, even if settings are provided as argument"
+        "fulldefault: django-admin can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=settings']
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(out)
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
     def test_custom_command_with_environment(self):
-        "fulldefault: django-admin can't execute user commands, even if settings are provided in environment"
+        "fulldefault: django-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_django_admin(args,'settings')
-        self.assertNoOutput(out)
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
 class DjangoAdminMinimalSettings(AdminScriptTestCase):
     """A series of tests for django-admin.py when using a settings.py file that
@@ -355,7 +355,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_custom_command(self):
-        "minimal: django-admin can't execute user commands"
+        "minimal: django-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
@@ -420,26 +420,26 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
-    def test_custom_command(self):
-        "alternate: django-admin can't execute user commands"
+    def test_custom_command(self): 
+        "alternate: django-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
-        "alternate: django-admin can't execute user commands, even if settings are provided as argument"
+        "alternate: django-admin can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=alternate_settings']
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(out)
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
     def test_custom_command_with_environment(self):
-        "alternate: django-admin can't execute user commands, even if settings are provided in environment"
+        "alternate: django-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_django_admin(args,'alternate_settings')
-        self.assertNoOutput(out)
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
 
 class DjangoAdminMultipleSettings(AdminScriptTestCase):
@@ -490,8 +490,8 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
-    def test_custom_command(self):
-        "alternate: django-admin can't execute user commands"
+    def test_custom_command(self): 
+        "alternate: django-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
@@ -501,15 +501,15 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         "alternate: django-admin can't execute user commands, even if settings are provided as argument"
         args = ['noargs_command', '--settings=alternate_settings']
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(out)
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
     def test_custom_command_with_environment(self):
         "alternate: django-admin can't execute user commands, even if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_django_admin(args,'alternate_settings')
-        self.assertNoOutput(out)
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
 ##########################################################################
 # MANAGE.PY TESTS

@@ -82,9 +82,14 @@ class BaseCommand(object):
         # But only do this if we can assume we have a working settings file,
         # because django.utils.translation requires settings.
         if self.can_import_settings:
-            from django.utils import translation
-            translation.activate('en-us')
-
+            try:
+                from django.utils import translation
+                translation.activate('en-us')
+            except ImportError, e:
+                # If settings should be available, but aren't, 
+                # raise the error and quit.
+                sys.stderr.write(self.style.ERROR(str('Error: %s\n' % e)))
+                sys.exit(1)
         try:
             if self.requires_model_validation:
                 self.validate()
