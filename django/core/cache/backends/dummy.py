@@ -7,7 +7,7 @@ class CacheClass(BaseCache):
         pass
 
     def add(self, *args, **kwargs):
-        pass
+        return True
 
     def get(self, key, default=None):
         return default

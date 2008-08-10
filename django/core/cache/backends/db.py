@@ -38,7 +38,7 @@ class CacheClass(BaseCache):
         return pickle.loads(base64.decodestring(row[1]))
 
     def set(self, key, value, timeout=None):
-        return self._base_set('set', key, value, timeout)
+        self._base_set('set', key, value, timeout)
 
     def add(self, key, value, timeout=None):
         return self._base_set('add', key, value, timeout)
@@ -62,9 +62,10 @@ class CacheClass(BaseCache):
                 cursor.execute("INSERT INTO %s (cache_key, value, expires) VALUES (%%s, %%s, %%s)" % self._table, [key, encoded, str(exp)])
         except DatabaseError:
             # To be threadsafe, updates/inserts are allowed to fail silently
-            pass
+            return False
         else:
             transaction.commit_unless_managed()
+            return True
 
     def delete(self, key):
         cursor = connection.cursor()

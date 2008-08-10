@@ -19,6 +19,8 @@ class BaseCache(object):
         Set a value in the cache if the key does not already exist. If
         timeout is given, that timeout will be used for the key; otherwise
         the default cache timeout will be used.
+
+        Returns True if the value was stored, False otherwise.
         """
         raise NotImplementedError
 

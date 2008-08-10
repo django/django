@@ -36,8 +36,10 @@ class CacheClass(BaseCache):
             if exp is None or exp <= time.time():
                 try:
                     self._set(key, pickle.dumps(value), timeout)
+                    return True
                 except pickle.PickleError:
                     pass
+            return False
         finally:
             self._lock.writer_leaves()
 

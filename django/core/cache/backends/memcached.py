@@ -17,7 +17,7 @@ class CacheClass(BaseCache):
         self._cache = memcache.Client(server.split(';'))
 
     def add(self, key, value, timeout=0):
-        self._cache.add(key.encode('ascii', 'ignore'), value, timeout or self.default_timeout)
+        return self._cache.add(key.encode('ascii', 'ignore'), value, timeout or self.default_timeout)
 
     def get(self, key, default=None):
         val = self._cache.get(smart_str(key))

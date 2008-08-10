@@ -410,9 +410,13 @@ it will not attempt to update the cache if the key specified is already present:
     >>> cache.get('add_key')
     'Initial value'
 
-There's also a ``get_many()`` interface that only hits the cache once. ``get_many()``
-returns a dictionary with all the keys you asked for that actually exist in the
-cache (and haven't expired)::
+If you need to know whether ``add()`` stored a value in the cache, you can
+check the return value. It will return ``True`` if the value was stored,
+``False`` otherwise.
+
+There's also a ``get_many()`` interface that only hits the cache once.
+``get_many()`` returns a dictionary with all the keys you asked for that
+actually exist in the cache (and haven't expired)::
 
     >>> cache.set('a', 1)
     >>> cache.set('b', 2)

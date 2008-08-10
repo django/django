@@ -31,7 +31,8 @@ class Cache(unittest.TestCase):
     def test_add(self):
         # test add (only add if key isn't already in cache)
         cache.add("addkey1", "value")
-        cache.add("addkey1", "newvalue")
+        result = cache.add("addkey1", "newvalue")
+        self.assertEqual(result, False)
         self.assertEqual(cache.get("addkey1"), "value")
 
     def test_non_existent(self):

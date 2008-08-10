@@ -32,9 +32,10 @@ class CacheClass(BaseCache):
 
     def add(self, key, value, timeout=None):
         if self.has_key(key):
-            return None
+            return False
 
         self.set(key, value, timeout)
+        return True
 
     def get(self, key, default=None):
         fname = self._key_to_file(key)
