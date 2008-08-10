@@ -3,7 +3,6 @@ import types
 import sys
 import os
 from itertools import izip
-from warnings import warn
 try:
     set
 except NameError:
@@ -477,43 +476,6 @@ class Model(object):
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
-    def _get_FIELD_filename(self, field):
-        warn("instance.get_%s_filename() is deprecated. Use instance.%s.path instead." % \
-            (field.attname, field.attname), DeprecationWarning, stacklevel=3)
-        try:
-            return getattr(self, field.attname).path
-        except ValueError:
-            return ''
-
-    def _get_FIELD_url(self, field):
-        warn("instance.get_%s_url() is deprecated. Use instance.%s.url instead." % \
-            (field.attname, field.attname), DeprecationWarning, stacklevel=3)
-        try:
-            return getattr(self, field.attname).url
-        except ValueError:
-            return ''
-
-    def _get_FIELD_size(self, field):
-        warn("instance.get_%s_size() is deprecated. Use instance.%s.size instead." % \
-            (field.attname, field.attname), DeprecationWarning, stacklevel=3)
-        return getattr(self, field.attname).size
-
-    def _save_FIELD_file(self, field, filename, content, save=True):
-        warn("instance.save_%s_file() is deprecated. Use instance.%s.save() instead." % \
-            (field.attname, field.attname), DeprecationWarning, stacklevel=3)
-        return getattr(self, field.attname).save(filename, content, save)
-
-    _save_FIELD_file.alters_data = True
-
-    def _get_FIELD_width(self, field):
-        warn("instance.get_%s_width() is deprecated. Use instance.%s.width instead." % \
-            (field.attname, field.attname), DeprecationWarning, stacklevel=3)
-        return getattr(self, field.attname).width()
-
-    def _get_FIELD_height(self, field):
-        warn("instance.get_%s_height() is deprecated. Use instance.%s.height instead." % \
-            (field.attname, field.attname), DeprecationWarning, stacklevel=3)
-        return getattr(self, field.attname).height()
 
 
 ############################################

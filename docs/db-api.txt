@@ -1418,7 +1418,7 @@ SQL equivalent::
 
 You can also use a queryset to dynamically evaluate the list of values
 instead of providing a list of literal values. The queryset must be
-reduced to a list of individual values using the ``values()`` method, 
+reduced to a list of individual values using the ``values()`` method,
 and then converted into a query using the ``query`` attribute::
 
     Entry.objects.filter(blog__in=Blog.objects.filter(name__contains='Cheddar').values('pk').query)
@@ -2106,7 +2106,7 @@ One-to-one relationships
 ------------------------
 
 One-to-one relationships are very similar to many-to-one relationships.
-If you define a OneToOneField on your model, instances of that model will have 
+If you define a OneToOneField on your model, instances of that model will have
 access to the related object via a simple attribute of the model.
 
 For example::
@@ -2128,9 +2128,9 @@ represents a single object, rather than a collection of objects::
 If no object has been assigned to this relationship, Django will raise
 a ``DoesNotExist`` exception.
 
-Instances can be assigned to the reverse relationship in the same way as 
+Instances can be assigned to the reverse relationship in the same way as
 you would assign the forward relationship::
-    
+
     e.entrydetail = ed
 
 Many-to-many relationships
@@ -2313,37 +2313,6 @@ For a full example, see the `lookup API sample model`_.
 
 .. _lookup API sample model: ../models/lookup/
 
-get_FOO_filename()
-------------------
-
-**Deprecated in Django development version**; use ``object.FOO.name`` instead.
-See `managing files`_ for details.
-
-get_FOO_url()
--------------
-
-**Deprecated in Django development version**; use ``object.FOO.url`` instead.
-See `managing files`_ for details.
-
-get_FOO_size()
---------------
-
-**Deprecated in Django development version**; use ``object.FOO.size`` instead.
-See `managing files`_ for details.
-
-save_FOO_file(filename, raw_contents)
--------------------------------------
-
-**Deprecated in Django development version**; use ``object.FOO.save()`` instead.
-See `managing files`_ for details.
-
-get_FOO_height() and get_FOO_width()
-------------------------------------
-
-**Deprecated in Django development version**; use ``object.FOO.width`` and
-``object.FOO.height`` instead. See `managing files`_ for details.
-
-.. _`managing files`: ../files/
 
 Shortcuts
 =========

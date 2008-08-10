@@ -3,7 +3,6 @@ Classes representing uploaded files.
 """
 
 import os
-import warnings
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -11,34 +10,10 @@ except ImportError:
 
 from django.conf import settings
 from django.core.files.base import File
-
 from django.core.files import temp as tempfile
 
-__all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile', 'SimpleUploadedFile')
-
-# Because we fooled around with it a bunch, UploadedFile has a bunch
-# of deprecated properties. This little shortcut helps define 'em
-# without too much code duplication.
-def deprecated_property(old, new, readonly=False):
-    def issue_warning():
-        warnings.warn(
-            message = "UploadedFile.%s is deprecated; use UploadedFile.%s instead." % (old, new),
-            category = DeprecationWarning,
-            stacklevel = 3
-        )
-    
-    def getter(self):
-        issue_warning()
-        return getattr(self, new)
-        
-    def setter(self, value):
-        issue_warning()
-        setattr(self, new, value)
-        
-    if readonly:
-        return property(getter)
-    else:
-        return property(getter, setter)
+__all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',
+           'SimpleUploadedFile')
 
 class UploadedFile(File):
     """
@@ -77,21 +52,6 @@ class UploadedFile(File):
 
     name = property(_get_name, _set_name)
 
-    # Deprecated properties
-    filename = deprecated_property(old="filename", new="name")
-    file_name = deprecated_property(old="file_name", new="name")
-    file_size = deprecated_property(old="file_size", new="size")
-    chunk = deprecated_property(old="chunk", new="chunks", readonly=True)
-
-    def _get_data(self):
-        warnings.warn(
-            message = "UploadedFile.data is deprecated; use UploadedFile.read() instead.",
-            category = DeprecationWarning,
-            stacklevel = 2
-        )
-        return self.read()
-    data = property(_get_data)
-
     # Abstract methods; subclasses *must* define read() and probably should
     # define open/close.
     def read(self, num_bytes=None):
@@ -102,27 +62,6 @@ class UploadedFile(File):
 
     def close(self):
         pass
-
-    # Backwards-compatible support for uploaded-files-as-dictionaries.
-    def __getitem__(self, key):
-        warnings.warn(
-            message = "The dictionary access of uploaded file objects is deprecated. Use the new object interface instead.",
-            category = DeprecationWarning,
-            stacklevel = 2
-        )
-        backwards_translate = {
-            'filename': 'name',
-            'content-type': 'content_type',
-        }
-
-        if key == 'content':
-            return self.read()
-        elif key == 'filename':
-            return self.name
-        elif key == 'content-type':
-            return self.content_type
-        else:
-            return getattr(self, key)
 
 class TemporaryUploadedFile(UploadedFile):
     """
@@ -140,7 +79,7 @@ class TemporaryUploadedFile(UploadedFile):
         Returns the full path of this file.
         """
         return self._file.name
-    
+
     # Most methods on this object get proxied to NamedTemporaryFile.
     # We can't directly subclass because NamedTemporaryFile is actually a
     # factory function
@@ -159,9 +98,9 @@ class TemporaryUploadedFile(UploadedFile):
                 # Still sets self._file.close_called and calls self._file.file.close()
                 # before the exception
                 return
-            else: 
+            else:
                 raise e
-        
+
 class InMemoryUploadedFile(UploadedFile):
     """
     A file uploaded into memory (i.e. stream-to-memory).

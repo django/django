@@ -25,7 +25,7 @@ class FileForm(django_forms.Form):
     file1 = django_forms.FileField()
 
 __test__ = {'API_TESTS': """
->>> from django.forms import form_for_model, form_for_instance
+>>> from django.forms.models import ModelForm
 >>> from django.core.files.uploadedfile import SimpleUploadedFile
 
 # FileModel with unicode filename and data #########################
@@ -37,21 +37,25 @@ True
 >>> m = FileModel.objects.create(file=f.cleaned_data['file1'])
 
 # Boundary conditions on a PostitiveIntegerField #########################
->>> BoundaryForm = form_for_model(BoundaryModel)
->>> f = BoundaryForm({'positive_integer':100})
+>>> class BoundaryForm(ModelForm):
+...     class Meta:
+...         model = BoundaryModel
+>>> f = BoundaryForm({'positive_integer': 100})
 >>> f.is_valid()
 True
->>> f = BoundaryForm({'positive_integer':0})
+>>> f = BoundaryForm({'positive_integer': 0})
 >>> f.is_valid()
 True
->>> f = BoundaryForm({'positive_integer':-100})
+>>> f = BoundaryForm({'positive_integer': -100})
 >>> f.is_valid()
 False
 
 # Formfield initial values ########
 If the model has default values for some fields, they are used as the formfield
 initial values.
->>> DefaultsForm = form_for_model(Defaults)
+>>> class DefaultsForm(ModelForm):
+...     class Meta:
+...         model = Defaults
 >>> DefaultsForm().fields['name'].initial
 u'class default value'
 >>> DefaultsForm().fields['def_date'].initial
@@ -59,14 +63,14 @@ datetime.date(1980, 1, 1)
 >>> DefaultsForm().fields['value'].initial
 42
 
-In form_for_instance(), the initial values come from the instance's values, not
-the model's defaults.
->>> foo_instance = Defaults(name=u'instance value', def_date = datetime.date(1969, 4, 4), value = 12)
->>> InstanceForm = form_for_instance(foo_instance)
->>> InstanceForm().fields['name'].initial
+In a ModelForm that is passed an instance, the initial values come from the
+instance's values, not the model's defaults.
+>>> foo_instance = Defaults(name=u'instance value', def_date=datetime.date(1969, 4, 4), value=12)
+>>> instance_form = DefaultsForm(instance=foo_instance)
+>>> instance_form.initial['name']
 u'instance value'
->>> InstanceForm().fields['def_date'].initial
+>>> instance_form.initial['def_date']
 datetime.date(1969, 4, 4)
->>> InstanceForm().fields['value'].initial
+>>> instance_form.initial['value']
 12
 """}

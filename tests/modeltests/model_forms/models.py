@@ -363,9 +363,8 @@ from the form can't provide a value for that field!
 <tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>
 
-Use form_for_instance to create a Form from a model instance. The difference
-between this Form and one created via form_for_model is that the object's
-current values are inserted as 'initial' data in each Field.
+When the ModelForm is passed an instance, that instance's current values are
+inserted as 'initial' data in each Field.
 >>> w = Writer.objects.get(name='Mike Royko')
 >>> class RoykoForm(ModelForm):
 ...     class Meta:

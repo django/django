@@ -442,16 +442,7 @@ class FileField(Field):
         elif not data and initial:
             return initial
 
-        if isinstance(data, dict):
-            # We warn once, then support both ways below.
-            import warnings
-            warnings.warn(
-                message = "Representing uploaded files as dictionaries is deprecated. Use django.core.files.uploadedfile.SimpleUploadedFile instead.",
-                category = DeprecationWarning,
-                stacklevel = 2
-            )
-            data = UploadedFile(data['filename'], data['content'])
-
+        # UploadedFile objects should have name and size attributes.
         try:
             file_name = data.name
             file_size = data.size
@@ -507,10 +498,10 @@ class ImageField(FileField):
             #  but it must be called immediately after the constructor
             trial_image = Image.open(file)
             trial_image.verify()
-        except ImportError: 
+        except ImportError:
             # Under PyPy, it is possible to import PIL. However, the underlying
-            # _imaging C module isn't available, so an ImportError will be 
-            # raised. Catch and re-raise. 
+            # _imaging C module isn't available, so an ImportError will be
+            # raised. Catch and re-raise.
             raise
         except Exception: # Python Imaging Library doesn't recognize it as an image
             raise ValidationError(self.error_messages['invalid_image'])
@@ -643,7 +634,7 @@ class ChoiceField(Field):
                 if value == smart_unicode(k):
                     return True
         return False
-        
+
 class MultipleChoiceField(ChoiceField):
     hidden_widget = MultipleHiddenInput
     widget = SelectMultiple

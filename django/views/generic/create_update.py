@@ -7,19 +7,6 @@ from django.utils.translation import ugettext
 from django.contrib.auth.views import redirect_to_login
 from django.views.generic import GenericViewError
 
-def deprecate_follow(follow):
-    """
-    Issues a DeprecationWarning if follow is anything but None.
-
-    The old Manipulator-based forms used a follow argument that is no longer
-    needed for newforms-based forms.
-    """
-    if follow is not None:
-        import warnings
-        msg = ("Generic views have been changed to use newforms, and the"
-               " 'follow' argument is no longer used.  Please update your code"
-               " to not use the 'follow' argument.")
-        warnings.warn(msg, DeprecationWarning, stacklevel=3)
 
 def apply_extra_context(extra_context, context):
     """
@@ -105,8 +92,7 @@ def lookup_object(model, object_id, slug, slug_field):
 
 def create_object(request, model=None, template_name=None,
         template_loader=loader, extra_context=None, post_save_redirect=None,
-        login_required=False, follow=None, context_processors=None,
-        form_class=None):
+        login_required=False, context_processors=None, form_class=None):
     """
     Generic object-creation function.
 
@@ -115,7 +101,6 @@ def create_object(request, model=None, template_name=None,
         form
             the form for the object
     """
-    deprecate_follow(follow)
     if extra_context is None: extra_context = {}
     if login_required and not request.user.is_authenticated():
         return redirect_to_login(request.path)
@@ -143,9 +128,9 @@ def create_object(request, model=None, template_name=None,
 
 def update_object(request, model=None, object_id=None, slug=None,
         slug_field='slug', template_name=None, template_loader=loader,
-        extra_context=None, post_save_redirect=None,
-        login_required=False, follow=None, context_processors=None,
-        template_object_name='object', form_class=None):
+        extra_context=None, post_save_redirect=None, login_required=False,
+        context_processors=None, template_object_name='object',
+        form_class=None):
     """
     Generic object-update function.
 
@@ -156,7 +141,6 @@ def update_object(request, model=None, object_id=None, slug=None,
         object
             the original object being edited
     """
-    deprecate_follow(follow)
     if extra_context is None: extra_context = {}
     if login_required and not request.user.is_authenticated():
         return redirect_to_login(request.path)

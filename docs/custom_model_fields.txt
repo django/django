@@ -483,8 +483,7 @@ accepted lookup types to ``exact`` and ``in``::
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the default form field to use when this field is displayed
-in a model. This method is called by the `helper functions`_
-``form_for_model()`` and ``form_for_instance()``.
+in a model.
 
 All of the ``kwargs`` dictionary is passed directly to the form field's
 ``__init__()`` method. Normally, all you need to do is set up a good default

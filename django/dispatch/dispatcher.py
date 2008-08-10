@@ -1,5 +1,4 @@
 import weakref
-import warnings
 try:
     set
 except NameError:
@@ -197,47 +196,3 @@ class Signal(object):
             for idx, (r_key, _) in enumerate(self.receivers):
                 if r_key == key:
                     del self.receivers[idx]
-
-def connect(receiver, signal, sender=None, weak=True):
-    """
-    For backward compatibility only. See Signal.connect()
-    """
-    warnings.warn(
-        category   = DeprecationWarning,
-        message    = "dispatcher.connect() is deprecated; use Signal.connect() instead.",
-        stacklevel = 2
-    )
-    return signal.connect(receiver, sender, weak)
-
-def disconnect(receiver, signal, sender=None, weak=True):
-    """
-    For backward compatibility only. See Signal.disconnect()
-    """
-    warnings.warn(
-        category   = DeprecationWarning,
-        message    = "dispatcher.disconnect() is deprecated; use Signal.disconnect() instead.",
-        stacklevel = 2
-    )
-    signal.disconnect(receiver, sender, weak)
-
-def send(signal, sender=None, **named):
-    """
-    For backward compatibility only. See Signal.send()
-    """
-    warnings.warn(
-        category   = DeprecationWarning,
-        message    = "dispatcher.send() is deprecated; use Signal.send() instead.",
-        stacklevel = 2
-    )
-    return signal.send(sender=sender, **named)
-
-def sendExact(signal, sender, **named ):
-    """
-    This function is deprecated, as it now has the same meaning as send.
-    """
-    warnings.warn(
-        category   = DeprecationWarning,
-        message    = "dispatcher.sendExact() is deprecated; use Signal.send() instead.",
-        stacklevel = 2
-    )
-    return signal.send(sender=sender, **named)

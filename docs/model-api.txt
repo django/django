@@ -308,12 +308,11 @@ For example, say your ``MEDIA_ROOT`` is set to ``'/home/media'``, and
 upload a file on Jan. 15, 2007, it will be saved in the directory
 ``/home/media/photos/2007/01/15``.
 
-If you want to retrieve the upload file's on-disk filename, or a URL that
-refers to that file, or the file's size, you can use the
-``get_FOO_filename()``, ``get_FOO_url()`` and ``get_FOO_size()`` methods.
-They are all documented here__.
+Information about the uploaded ``File`` object, such as its on-disk filename,
+its size, or its URL, is available via attributes on the object itself. See the
+`managing files`__ documentation for more information about ``File`` objects.
 
-__ ../db-api/#get-foo-filename
+__ ../files/
 
 Note that whenever you deal with uploaded files, you should pay close attention
 to where you're uploading them and what type of files they are, to avoid
@@ -392,19 +391,17 @@ image. Has two extra optional arguments, ``height_field`` and
 ``width_field``, which, if set, will be auto-populated with the height and
 width of the image each time a model instance is saved.
 
-In addition to the special ``get_FOO_*`` methods that are available for
-``FileField``, an ``ImageField`` also has ``get_FOO_height()`` and
-``get_FOO_width()`` methods. These are documented elsewhere_.
+In addition to the `standard attributes and methods`_ that are available for
+``FileField``, an ``ImageField`` also has ``width`` and ``height`` attributes.
 
 Requires the `Python Imaging Library`_.
-
-.. _Python Imaging Library: http://www.pythonware.com/products/pil/
-.. _elsewhere: ../db-api/#get-foo-height-and-get-foo-width
 
 **New in development version:**  By default, ``ImageField`` instances are
 created as ``varchar(100)`` columns in your database. As with other fields, you
 can change the maximum length using the ``max_length`` argument.
 
+.. _standard attributes and methods: ../files/#file-attributes-and-methods
+.. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
@@ -605,10 +602,10 @@ be used for organizational purposes::
         ('unknown', 'Unknown'),
     )
 
-The first element in each tuple is the name to apply to the group. The 
+The first element in each tuple is the name to apply to the group. The
 second element is an iterable of 2-tuples, with each 2-tuple containing
-a value and a human-readable name for an option. Grouped options may be 
-combined with ungrouped options within a single list (such as the 
+a value and a human-readable name for an option. Grouped options may be
+combined with ungrouped options within a single list (such as the
 `unknown` option in this example).
 
 For each model field that has ``choices`` set, Django will add a method to
@@ -981,12 +978,12 @@ the relationship should work. All are optional:
 Extra fields on many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**New in Django development version** 
+**New in Django development version**
 
 When you're only dealing with simple many-to-many relationships such as
 mixing and matching pizzas and toppings, a standard ``ManyToManyField``
 is all you need. However, sometimes you may need to associate data with the
-relationship between two models. 
+relationship between two models.
 
 For example, consider the case of an application tracking the musical groups
 which musicians belong to. There is a many-to-many relationship between a person
@@ -1021,7 +1018,7 @@ something like this::
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
-When you set up the intermediary model, you explicitly specify foreign 
+When you set up the intermediary model, you explicitly specify foreign
 keys to the models that are involved in the ManyToMany relation. This
 explicit declaration defines how the two models are related.
 
@@ -1030,8 +1027,8 @@ There are a few restrictions on the intermediate model:
     * Your intermediate model must contain one - and *only* one - foreign key
       on the target model (this would be ``Person`` in our example). If you
       have more than one foreign key, a validation error will be raised.
-  
-    * Your intermediate model must contain one - and *only* one - foreign key 
+
+    * Your intermediate model must contain one - and *only* one - foreign key
       on the source model (this would be ``Group`` in our example). If you
       have more than one foreign key, a validation error will be raised.
 
@@ -1040,22 +1037,22 @@ There are a few restrictions on the intermediate model:
       case, two foreign keys to the same model are permitted, but they
       will be treated as the two (different) sides of the many-to-many
       relation.
-    
+
     * When defining a many-to-many relationship from a model to
       itself, using an intermediary model, you *must* use
       ``symmetrical=False`` (see the documentation for
       ``ManyToManyField`` above).
 
-Now that you have set up your ``ManyToManyField`` to use your intermediary 
+Now that you have set up your ``ManyToManyField`` to use your intermediary
 model (Membership, in this case), you're ready to start creating some
 many-to-many relationships. You do this by creating instances of the
 intermediate model::
-    
+
     >>> ringo = Person.objects.create(name="Ringo Starr")
     >>> paul = Person.objects.create(name="Paul McCartney")
     >>> beatles = Group.objects.create(name="The Beatles")
     >>> m1 = Membership(person=ringo, group=beatles,
-    ...     date_joined=date(1962, 8, 16), 
+    ...     date_joined=date(1962, 8, 16),
     ...     invite_reason= "Needed a new drummer.")
     >>> m1.save()
     >>> beatles.members.all()
@@ -1063,7 +1060,7 @@ intermediate model::
     >>> ringo.group_set.all()
     [<Group: The Beatles>]
     >>> m2 = Membership.objects.create(person=paul, group=beatles,
-    ...     date_joined=date(1960, 8, 1), 
+    ...     date_joined=date(1960, 8, 1),
     ...     invite_reason= "Wanted to form a band.")
     >>> beatles.members.all()
     [<Person: Ringo Starr>, <Person: Paul McCartney>]
@@ -1077,7 +1074,7 @@ or assignment (i.e., ``beatles.members = [...]``) to create relationships::
     >>> beatles.members.create(name="George Harrison")
     # AND NEITHER WILL THIS
     >>> beatles.members = [john, paul, ringo, george]
-    
+
 Why? You can't just create a relationship between a Person and a Group - you
 need to specify all the detail for the relationship required by the
 Membership table. The simple ``add``, ``create`` and assignment calls
@@ -1094,15 +1091,15 @@ for an instance::
     >>> beatles.members.clear()
 
 Once you have established the many-to-many relationships by creating instances
-of your intermediate model, you can issue queries. Just as with normal 
-many-to-many relationships, you can query using the attributes of the 
+of your intermediate model, you can issue queries. Just as with normal
+many-to-many relationships, you can query using the attributes of the
 many-to-many-related model::
 
     # Find all the groups with a member whose name starts with 'Paul'
     >>> Groups.objects.filter(person__name__startswith='Paul')
     [<Group: The Beatles>]
 
-As you are using an intermediate table, you can also query on the attributes 
+As you are using an intermediate table, you can also query on the attributes
 of the intermediate model::
 
     # Find all the members of the Beatles that joined after 1 Jan 1961
@@ -1110,7 +1107,7 @@ of the intermediate model::
     ...     group__name='The Beatles',
     ...     membership__date_joined__gt=date(1961,1,1))
     [<Person: Ringo Starr]
-    
+
 One-to-one relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1555,7 +1552,7 @@ attributes by giving it a ``use_for_related_fields`` property::
 
     class MyManager(models.Manager)::
         use_for_related_fields = True
-        
+
         ...
 
 Model methods

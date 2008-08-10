@@ -1828,11 +1828,7 @@ Generating forms for models
 The prefered way of generating forms that work with models is explained in the
 `ModelForms documentation`_.
 
-Looking for the ``form_for_model`` and ``form_for_instance`` documentation?
-They've been deprecated, but you can still `view the documentation`_.
-
 .. _ModelForms documentation: ../modelforms/
-.. _view the documentation: ../form_for_model/
 
 Media
 =====

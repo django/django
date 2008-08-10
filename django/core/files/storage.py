@@ -36,19 +36,6 @@ class Storage(object):
         Saves new content to the file specified by name. The content should be a
         proper File object, ready to be read from the beginning.
         """
-        # Check for old-style usage. Warn here first since there are multiple
-        # locations where we need to support both new and old usage.
-        if isinstance(content, basestring):
-            import warnings
-            warnings.warn(
-                message = "Representing files as strings is deprecated." \
-                          "Use django.core.files.base.ContentFile instead.",
-                category = DeprecationWarning,
-                stacklevel = 2
-            )
-            from django.core.files.base import ContentFile
-            content = ContentFile(content)
-
         # Get the proper name for the file, as it will actually be saved.
         if name is None:
             name = content.name

@@ -192,10 +192,6 @@ class FileField(Field):
     def contribute_to_class(self, cls, name):
         super(FileField, self).contribute_to_class(cls, name)
         setattr(cls, self.name, FileDescriptor(self))
-        setattr(cls, 'get_%s_filename' % self.name, curry(cls._get_FIELD_filename, field=self))
-        setattr(cls, 'get_%s_url' % self.name, curry(cls._get_FIELD_url, field=self))
-        setattr(cls, 'get_%s_size' % self.name, curry(cls._get_FIELD_size, field=self))
-        setattr(cls, 'save_%s_file' % self.name, lambda instance, name, content, save=True: instance._save_FIELD_file(self, name, content, save))
         signals.post_delete.connect(self.delete_file, sender=cls)
 
     def delete_file(self, instance, sender, **kwargs):
@@ -262,26 +258,15 @@ class FileField(Field):
 
 class ImageFieldFile(ImageFile, FieldFile):
     def save(self, name, content, save=True):
-
-        if not hasattr(content, 'read'):
-            import warnings
-            warnings.warn(
-                message = "Representing files as strings is deprecated." \
-                          "Use django.core.files.base.ContentFile instead.",
-                category = DeprecationWarning,
-                stacklevel = 2
-            )
-            content = ContentFile(content)
-
         # Repopulate the image dimension cache.
         self._dimensions_cache = get_image_dimensions(content)
-        
+
         # Update width/height fields, if needed
         if self.field.width_field:
             setattr(self.instance, self.field.width_field, self.width)
         if self.field.height_field:
             setattr(self.instance, self.field.height_field, self.height)
-        
+
         super(ImageFieldFile, self).save(name, content, save)
 
     def delete(self, save=True):
@@ -299,15 +284,6 @@ class ImageField(FileField):
 
     def get_manipulator_field_objs(self):
         return [oldforms.ImageUploadField, oldforms.HiddenField]
-
-    def contribute_to_class(self, cls, name):
-        super(ImageField, self).contribute_to_class(cls, name)
-        # Add get_BLAH_width and get_BLAH_height methods, but only if the
-        # image field doesn't have width and height cache fields.
-        if not self.width_field:
-            setattr(cls, 'get_%s_width' % self.name, curry(cls._get_FIELD_width, field=self))
-        if not self.height_field:
-            setattr(cls, 'get_%s_height' % self.name, curry(cls._get_FIELD_height, field=self))
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.ImageField}
