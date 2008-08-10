@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-02-26 20:46+0100\n"
+"POT-Creation-Date: 2008-08-10 16:19+0200\n"
 "PO-Revision-Date: 2007-02-26 20:55+0100\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "MIME-Version: 1.0\n"
@@ -15,23 +15,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 "X-Generator: KBabel 1.11.2\n"
-
-#: contrib/admin/media/js/calendar.js:24
-#: contrib/admin/media/js/dateparse.js:32
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Gennaio Febbraio Marzo Aprile Maggio Giugno Luglio Agosto Settembre Ottobre "
-"Novembre Dicembre"
-
-#: contrib/admin/media/js/calendar.js:25
-msgid "S M T W T F S"
-msgstr "D L M M G V S"
-
-#: contrib/admin/media/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Domenica Lunedì Martedì Mercoledì Giovedì Venerdì Sabato"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -62,6 +45,32 @@ msgstr "Fai le tue scelte e clicca "
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
 msgstr "Cancella tutto"
+
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Gennaio Febbraio Marzo Aprile Maggio Giugno Luglio Agosto Settembre Ottobre "
+"Novembre Dicembre"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "D L M M G V S"
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Domenica Lunedì Martedì Mercoledì Giovedì Venerdì Sabato"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "Mostra"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "Nascondi"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
@@ -109,13 +118,3 @@ msgstr "Ieri"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "Domani"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
-msgid "Show"
-msgstr "Mostra"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
-msgid "Hide"
-msgstr "Nascondi"
-
