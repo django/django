@@ -18,8 +18,6 @@ from django.utils.hashcompat import md5_constructor
 ERROR_MESSAGE = ugettext_lazy("Please enter a correct username and password. Note that both fields are case-sensitive.")
 LOGIN_FORM_KEY = 'this_is_the_login_form'
 
-USER_CHANGE_PASSWORD_URL_RE = re.compile('auth/user/(\d+)/password')
-
 class AlreadyRegistered(Exception):
     pass
 
@@ -170,10 +168,6 @@ class AdminSite(object):
             from django.views.defaults import shortcut
             return shortcut(request, *url.split('/')[1:])
         else:
-            match = USER_CHANGE_PASSWORD_URL_RE.match(url)
-            if match:
-                return self.user_change_password(request, match.group(1))
-
             if '/' in url:
                 return self.model_page(request, *url.split('/', 2))
 
@@ -208,13 +202,6 @@ class AdminSite(object):
         """
         from django.contrib.auth.views import password_change_done
         return password_change_done(request)
-
-    def user_change_password(self, request, id):
-        """
-        Handles the "user change password" task
-        """
-        from django.contrib.auth.views import user_change_password
-        return user_change_password(request, id)
 
     def i18n_javascript(self, request):
         """
