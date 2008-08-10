@@ -268,7 +268,7 @@ Storage objects define the following methods:
 ``True`` if a file exists given some ``name``.
 
 ``Storage.path(name)``
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 The local filesystem path where the file can be opened using Python's standard
 ``open()``. For storage systems that aren't accessible from the local
