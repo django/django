@@ -909,8 +909,15 @@ Traceback (most recent call last):
 ...
 FieldError: Infinite loop caused by ordering.
 
+# Note that this doesn't cause an infinite loop, since the default ordering on
+# the Tag model is empty (and thus defaults to using "id" for the related
+# field).
+>>> len(Tag.objects.order_by('parent'))
+5
+
 # ... but you can still order in a non-recursive fashion amongst linked fields
 # (the previous test failed because the default ordering was recursive).
 >>> LoopX.objects.all().order_by('y__x__y__x__id')
 []
+
 """
