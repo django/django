@@ -64,3 +64,38 @@ u'custom_storage.2'
 >>> custom_storage.delete(first)
 >>> custom_storage.delete(second)
 """
+
+# Tests for a race condition on file saving (#4948).
+# This is written in such a way that it'll always pass on platforms 
+# without threading.
+
+import time
+from unittest import TestCase
+from django.core.files.base import ContentFile
+from models import temp_storage
+try:
+    import threading
+except ImportError:
+    import dummy_threading as threading
+
+class SlowFile(ContentFile):
+    def chunks(self):
+        time.sleep(1)
+        return super(ContentFile, self).chunks()
+
+class FileSaveRaceConditionTest(TestCase):
+    def setUp(self):
+        self.thread = threading.Thread(target=self.save_file, args=['conflict'])
+    
+    def save_file(self, name):
+        name = temp_storage.save(name, SlowFile("Data"))
+    
+    def test_race_condition(self):
+        self.thread.start()
+        name = self.save_file('conflict')
+        self.thread.join()
+        self.assert_(temp_storage.exists('conflict'))
+        self.assert_(temp_storage.exists('conflict_'))
+        temp_storage.delete('conflict')
+        temp_storage.delete('conflict_')
+

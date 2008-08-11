@@ -39,9 +39,9 @@ class Storage(object):
         # Get the proper name for the file, as it will actually be saved.
         if name is None:
             name = content.name
+        
         name = self.get_available_name(name)
-
-        self._save(name, content)
+        name = self._save(name, content)
 
         # Store filenames with forward slashes, even on Windows
         return force_unicode(name.replace('\\', '/'))
@@ -135,19 +135,41 @@ class FileSystemStorage(Storage):
             os.makedirs(directory)
         elif not os.path.isdir(directory):
             raise IOError("%s exists and is not a directory." % directory)
-            
-        if hasattr(content, 'temporary_file_path'):
-            # This file has a file path that we can move.
-            file_move_safe(content.temporary_file_path(), full_path)
-            content.close()
-        else:
-            # This is a normal uploadedfile that we can stream.
-            fp = open(full_path, 'wb')
-            locks.lock(fp, locks.LOCK_EX)
-            for chunk in content.chunks():
-                fp.write(chunk)
-            locks.unlock(fp)
-            fp.close()
+
+        # There's a potential race condition between get_available_name and
+        # saving the file; it's possible that two threads might return the
+        # same name, at which point all sorts of fun happens. So we need to
+        # try to create the file, but if it already exists we have to go back
+        # to get_available_name() and try again.
+
+        while True:
+            try:
+                # This file has a file path that we can move.
+                if hasattr(content, 'temporary_file_path'):
+                    file_move_safe(content.temporary_file_path(), full_path)
+                    content.close()
+
+                # This is a normal uploadedfile that we can stream.
+                else:
+                    # This fun binary flag incantation makes os.open throw an
+                    # OSError if the file already exists before we open it.
+                    fd = os.open(full_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_BINARY', 0))
+                    try:
+                        locks.lock(fd, locks.LOCK_EX)
+                        for chunk in content.chunks():
+                            os.write(fd, chunk)
+                    finally:
+                        locks.unlock(fd)
+                        os.close(fd)
+            except OSError:
+                # Ooops, we need a new file name.
+                name = self.get_available_name(name)
+                full_path = self.path(name)
+            else:
+                # OK, the file save worked. Break out of the loop.
+                break
+                
+        return name
 
     def delete(self, name):
         name = self.path(name)

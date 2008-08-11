@@ -44,16 +44,17 @@ def file_move_safe(old_file_name, new_file_name, chunk_size = 1024*64, allow_ove
         pass
 
     # If the built-in didn't work, do it the hard way.
-    new_file = open(new_file_name, 'wb')
-    locks.lock(new_file, locks.LOCK_EX)
-    old_file = open(old_file_name, 'rb')
-    current_chunk = None
-
-    while current_chunk != '':
-        current_chunk = old_file.read(chunk_size)
-        new_file.write(current_chunk)
-
-    new_file.close()
-    old_file.close()
+    fd = os.open(new_file_name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_BINARY', 0))
+    try:
+        locks.lock(fd, locks.LOCK_EX)
+        old_file = open(old_file_name, 'rb')
+        current_chunk = None
+        while current_chunk != '':
+            current_chunk = old_file.read(chunk_size)
+            os.write(fd, current_chunk)
+    finally:
+        locks.unlock(fd)
+        os.close(fd)
+        old_file.close()
 
     os.remove(old_file_name)
