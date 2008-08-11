@@ -131,7 +131,7 @@ class User(models.Model):
 
     Username and password are required. Other fields are optional.
     """
-    username = models.CharField(_('username'), max_length=30, unique=True, validator_list=[validators.isAlphaNumeric], help_text=_("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."))
+    username = models.CharField(_('username'), max_length=30, unique=True, help_text=_("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."))
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     email = models.EmailField(_('e-mail address'), blank=True)
