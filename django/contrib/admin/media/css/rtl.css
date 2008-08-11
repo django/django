@@ -32,10 +32,11 @@ div.breadcrumbs { text-align:right; }
 .change-list .filtered table, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull { margin-right:0px !important; margin-left:160px !important; }
 #changelist-filter li.selected { border-left:0px none; padding-left:0px; margin-left:0; border-right:5px solid #ccc; padding-right:5px;margin-right:-10px; }
 
-/* fomrs styles */
+/* form styles */
 .aligned label { padding:0 0 3px 1em;  float:right; }
 .submit-row { text-align: left }
 .vDateField, .vTimeField { margin-left:2px; }
+form ul.inline li { float:right; padding-right:0; padding-left:7px; }
 
 /* widget styles */
 .calendarnav-previous { top:0; left:auto; right:0; }
