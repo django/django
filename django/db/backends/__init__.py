@@ -4,7 +4,12 @@ try:
 except ImportError:
     # Import copy of _thread_local.py from Python 2.4
     from django.utils._threading_local import local
-
+try:
+    set
+except NameError
+    # Python 2.3 compat
+    from sets import Set as set
+    
 from django.db.backends import util
 from django.utils import datetime_safe
 
