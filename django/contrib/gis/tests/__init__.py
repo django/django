@@ -94,7 +94,6 @@ def run_tests(module_list, verbosity=1, interactive=True):
     from django.contrib.gis.db.backend import create_spatial_db
     from django.contrib.gis.tests.utils import mysql
     from django.db import connection
-    from django.test.utils import destroy_test_db
 
     # Getting initial values.
     old_debug = settings.DEBUG
@@ -136,7 +135,7 @@ def run_tests(module_list, verbosity=1, interactive=True):
     result = TextTestRunner(verbosity=verbosity).run(test_suite)
 
     # Cleaning up, destroying the test spatial database and resetting the INSTALLED_APPS.
-    destroy_test_db(old_name, verbosity)
+    connection.creation.destroy_test_db(old_name, verbosity)
     settings.DEBUG = old_debug
     settings.INSTALLED_APPS = old_installed
     

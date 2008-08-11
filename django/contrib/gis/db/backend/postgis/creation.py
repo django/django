@@ -40,7 +40,7 @@ def _create_with_cursor(db_name, verbosity=1, autoclobber=False):
         create_sql += ' OWNER %s' % settings.DATABASE_USER
 
     cursor = connection.cursor()
-    connection.creation.set_autocommit(connection)
+    connection.creation.set_autocommit()
 
     try:
         # Trying to create the database first.
