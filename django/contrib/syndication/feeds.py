@@ -81,7 +81,7 @@ class Feed(object):
             current_site = Site.objects.get_current()
         else:
             current_site = RequestSite(self.request)
-
+        
         link = self.__get_dynamic_attr('link', obj)
         link = add_domain(current_site.domain, link)
 

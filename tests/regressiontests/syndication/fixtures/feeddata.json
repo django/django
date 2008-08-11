@@ -1,0 +1,26 @@
+[
+  {
+    "model": "syndication.entry",
+    "pk": 1,
+    "fields": {
+      "title": "My first entry",
+      "date": "2008-01-01 12:30:00"
+    }
+  },
+  {
+    "model": "syndication.entry",
+    "pk": 2,
+    "fields": {
+      "title": "My second entry",
+      "date": "2008-01-02 12:30:00"
+    }
+  },
+  {
+    "model": "syndication.entry",
+    "pk": 3,
+    "fields": {
+      "title": "My third entry",
+      "date": "2008-01-02 13:30:00"
+    }
+  }
+]
