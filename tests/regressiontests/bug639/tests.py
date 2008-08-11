@@ -1,36 +1,36 @@
 """
-Tests for file field behavior, and specifically #639, in which Model.save() gets
-called *again* for each FileField. This test will fail if calling an
-auto-manipulator's save() method causes Model.save() to be called more than once.
+Tests for file field behavior, and specifically #639, in which Model.save()
+gets called *again* for each FileField. This test will fail if calling a
+ModelForm's save() method causes Model.save() to be called more than once.
 """
 
 import os
 import unittest
-from regressiontests.bug639.models import Photo
-from django.http import QueryDict
-from django.utils.datastructures import MultiValueDict
+
 from django.core.files.uploadedfile import SimpleUploadedFile
+from regressiontests.bug639.models import Photo, PhotoForm
 
 class Bug639Test(unittest.TestCase):
-        
+
     def testBug639(self):
         """
-        Simulate a file upload and check how many times Model.save() gets called.
+        Simulate a file upload and check how many times Model.save() gets
+        called.
         """
-        # Grab an image for testing
-        img = open(os.path.join(os.path.dirname(__file__), "test.jpg"), "rb").read()
-        
-        # Fake a request query dict with the file
-        qd = QueryDict("title=Testing&image=", mutable=True)
-        qd["image_file"] = SimpleUploadedFile('test.jpg', img, 'image/jpeg')
+        # Grab an image for testing.
+        filename = os.path.join(os.path.dirname(__file__), "test.jpg")
+        img = open(filename, "rb").read()
 
-        manip = Photo.AddManipulator()
-        manip.do_html2python(qd)
-        p = manip.save(qd)
-        
-        # Check the savecount stored on the object (see the model)
+        # Fake a POST QueryDict and FILES MultiValueDict.
+        data = {'title': 'Testing'}
+        files = {"image": SimpleUploadedFile('test.jpg', img, 'image/jpeg')}
+
+        form = PhotoForm(data=data, files=files)
+        p = form.save()
+
+        # Check the savecount stored on the object (see the model).
         self.assertEqual(p._savecount, 1)
-        
+
     def tearDown(self):
         """
         Make sure to delete the "uploaded" file to avoid clogging /tmp.
