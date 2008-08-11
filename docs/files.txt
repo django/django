@@ -44,7 +44,7 @@ the details of the attached photo::
     u'/media/cars/chevy.jpg'
     >>> car.photo.url
     u'http://media.example.com/cars/chevy.jpg'
-    
+
 This object -- ``car.photo`` in the example -- is a ``File`` object, which means
 it has all the methods and attributes described below.
 
@@ -61,9 +61,9 @@ Creating ``File`` instances
 ---------------------------
 
 Most of the time you'll simply use a ``File`` that Django's given you (i.e. a
-file attached to an model as above, or perhaps an `uploaded file`_).
+file attached to a model as above, or perhaps an `uploaded file`_).
 
-.. _uploaded file: ../uploading_files/
+.. _uploaded file: ../upload_handling/
 
 If you need to construct a ``File`` yourself, the easiest way is to create one
 using a Python built-in ``file`` object::
@@ -73,9 +73,9 @@ using a Python built-in ``file`` object::
     # Create a Python file object using open()
     >>> f = open('/tmp/hello.world', 'w')
     >>> myfile = File(f)
-    
+
 Now you can use any of the ``File`` attributes and methods defined below.
-    
+
 ``File`` attributes and methods
 -------------------------------
 
@@ -84,7 +84,7 @@ Django's ``File`` has the following attributes and methods:
 ``File.path``
 ~~~~~~~~~~~~~
 
-The absolute path to the file's location on a local filesystem. 
+The absolute path to the file's location on a local filesystem.
 
 Custom `file storage systems`_ may not store files locally; files stored on
 these systems will have a ``path`` of ``None``.
@@ -160,7 +160,7 @@ Additional ``ImageField`` attributes
 ``File.width`` and ``File.height``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-These attributes provide the dimensions of the image. 
+These attributes provide the dimensions of the image.
 
 Additional methods on files attached to objects
 -----------------------------------------------
@@ -198,7 +198,7 @@ like file systems, opening and reading files, etc.
 
 Django's default file storage is given by the `DEFAULT_FILE_STORAGE setting`_;
 if you don't explicitly provide a storage system, this is the one that will be
-used. 
+used.
 
 .. _default_file_storage setting: ../settings/#default-file-storage
 
@@ -314,17 +314,17 @@ If you need to provide custom file storage -- a common example is storing files
 on some remote system -- you can do so by defining a custom storage class.
 You'll need to follow these steps:
 
-#. Your custom storage system must be a subclass of 
+#. Your custom storage system must be a subclass of
    ``django.core.files.storage.Storage``::
 
         from django.core.files.storage import Storage
-    
+
         class MyStorage(Storage):
             ...
-        
-#. Django must be able to instantiate your storage system without any arguments. 
+
+#. Django must be able to instantiate your storage system without any arguments.
    This means that any settings should be taken from ``django.conf.settings``::
-   
+
         from django.conf import settings
         from django.core.files.storage import Storage
 
@@ -336,11 +336,11 @@ You'll need to follow these steps:
 
 #. Your storage class must implement the ``_open()`` and ``_save()`` methods,
    along with any other methods appropriate to your storage class. See below for
-   more on these methods. 
-   
+   more on these methods.
+
    In addition, if your class provides local file storage, it must override
    the ``path()`` method.
-   
+
 Custom storage system methods
 -----------------------------
 
