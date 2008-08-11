@@ -6,7 +6,7 @@ except ImportError:
     from django.utils._threading_local import local
 try:
     set
-except NameError
+except NameError:
     # Python 2.3 compat
     from sets import Set as set
     
