@@ -801,7 +801,12 @@ Behind the scenes, the high-level RSS framework uses a lower-level framework
 for generating feeds' XML. This framework lives in a single module:
 `django/utils/feedgenerator.py`_.
 
-Feel free to use this framework on your own, for lower-level tasks.
+You use this framework on your own, for lower-level feed generation. You can
+also create custom feed generator subclasses for use with the ``feed_type``
+``Feed`` option.
+
+``SyndicationFeed`` classes
+---------------------------
 
 The ``feedgenerator`` module contains a base class ``SyndicationFeed`` and
 several subclasses:
@@ -813,38 +818,71 @@ several subclasses:
 Each of these three classes knows how to render a certain type of feed as XML.
 They share this interface:
 
-``__init__(title, link, description, language=None, author_email=None,``
-``author_name=None, author_link=None, subtitle=None, categories=None,``
-``feed_url=None)``
+``SyndicationFeed.__init__(**kwargs)``
+    Initialize the feed with the given dictionary of metadata, which applies to
+    the entire feed. Required keyword arguments are:
+    
+        * ``title``
+        * ``link``
+        * ``description``
+        
+    There's also a bunch of other optional keywords:
+    
+        * ``language``
+        * ``author_email``
+        * ``author_name``
+        * ``author_link``
+        * ``subtitle``
+        * ``categories``
+        * ``feed_url``
+        * ``feed_copyright``
+        * ``feed_guid``
+        * ``ttl``
+        
+    Any extra keyword arguments you pass to ``__init__`` will be stored in
+    ``self.feed`` for use with `custom feed generators`_.
 
-Initializes the feed with the given metadata, which applies to the entire feed
-(i.e., not just to a specific item in the feed).
+    All parameters should be Unicode objects, except ``categories``, which
+    should be a sequence of Unicode objects.
 
-All parameters, if given, should be Unicode objects, except ``categories``,
-which should be a sequence of Unicode objects.
+``SyndicationFeed.add_item(**kwargs)``
+    Add an item to the feed with the given parameters. 
 
-``add_item(title, link, description, author_email=None, author_name=None,``
-``pubdate=None, comments=None, unique_id=None, enclosure=None, categories=())``
+    Required keyword arguments are:
+    
+        * ``title``
+        * ``link``
+        * ``description``
 
-Add an item to the feed with the given parameters. All parameters, if given,
-should be Unicode objects, except:
+    Optional keyword arguments are:
 
-    * ``pubdate`` should be a `Python datetime object`_.
-    * ``enclosure`` should be an instance of ``feedgenerator.Enclosure``.
-    * ``categories`` should be a sequence of Unicode objects.
+        * ``author_email``
+        * ``author_name``
+        * ``author_link``
+        * ``pubdate``
+        * ``comments``
+        * ``unique_id``
+        * ``enclosure``
+        * ``categories``
+        * ``item_copyright``
+        * ``ttl``
 
-``write(outfile, encoding)``
+    Extra keyword arguments will be stored for `custom feed generators`_.
 
-Outputs the feed in the given encoding to outfile, which is a file-like object.
+    All parameters, if given, should be Unicode objects, except:
 
-``writeString(encoding)``
+        * ``pubdate`` should be a `Python datetime object`_.
+        * ``enclosure`` should be an instance of ``feedgenerator.Enclosure``.
+        * ``categories`` should be a sequence of Unicode objects.
+        
+``SyndicationFeed.write(outfile, encoding)``
+    Outputs the feed in the given ``encoding`` to ``outfile``, which must be a
+    file-like object.
 
-Returns the feed as a string in the given encoding.
+``SyndicationFeed.writeString(encoding)``
+    Returns the feed as a string in the given ``encoding``.
 
-Example usage
--------------
-
-This example creates an Atom 1.0 feed and prints it to standard output::
+For example, to create an Atom 1.0 feed and print it to standard output::
 
     >>> from django.utils import feedgenerator
     >>> f = feedgenerator.Atom1Feed(
@@ -857,12 +895,69 @@ This example creates an Atom 1.0 feed and prints it to standard output::
     ...     description=u"<p>Today I had a Vienna Beef hot dog. It was pink, plump and perfect.</p>")
     >>> print f.writeString('utf8')
     <?xml version="1.0" encoding="utf8"?>
-    <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><title>My Weblog</title>
-    <link href="http://www.example.com/"></link><id>http://www.example.com/</id>
-    <updated>Sat, 12 Nov 2005 00:28:43 -0000</updated><entry><title>Hot dog today</title>
-    <link>http://www.example.com/entries/1/</link><id>tag:www.example.com/entries/1/</id>
-    <summary type="html">&lt;p&gt;Today I had a Vienna Beef hot dog. It was pink, plump and perfect.&lt;/p&gt;</summary>
-    </entry></feed>
+    <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    ...
+    </feed>
 
 .. _django/utils/feedgenerator.py: http://code.djangoproject.com/browser/django/trunk/django/utils/feedgenerator.py
 .. _Python datetime object: http://www.python.org/doc/current/lib/module-datetime.html
+
+Custom feed generators
+----------------------
+
+If you need to produce a custom feed format, you've got a couple of options.
+    
+If the feed format is totally custom, you'll want to subclass
+``SyndicationFeed`` and completely replace the ``write()`` and
+``writeString()`` methods.
+
+However, if the feed format is a spin-off of RSS or Atom (i.e. GeoRSS_, Apple's
+`iTunes podcast format`_, etc.), you've got a better choice. These types of
+feeds typically add extra elements and/or attributes to the underlying format,
+and there are a set of methods that ``SyndicationFeed`` calls to get these extra
+attributes. Thus, you can subclass the appropriate feed generator class
+(``Atom1Feed`` or ``Rss201rev2Feed``) and extend these callbacks. They are:
+      
+.. _georss: http://georss.org/
+.. _itunes podcast format: http://www.apple.com/itunes/store/podcaststechspecs.html
+
+``SyndicationFeed.root_attributes(self, )``
+    Return a ``dict`` of attributes to add to the root feed element
+    (``feed``/``channel``).
+    
+``SyndicationFeed.add_root_elements(self, handler)``
+    Callback to add elements inside the root feed element
+    (``feed``/``channel``). ``handler`` is an `XMLGenerator`_ from Python's
+    built-in SAX library; you'll call methods on it to add to the XML
+    document in process.
+    
+``SyndicationFeed.item_attributes(self, item)``
+    Return a ``dict`` of attributes to add to each item (``item``/``entry``)
+    element. The argument, ``item``, is a dictionary of all the data passed to
+    ``SyndicationFeed.add_item()``.
+    
+``SyndicationFeed.add_item_elements(self, handler, item)``
+    Callback to add elements to each item (``item``/``entry``) element.
+    ``handler`` and ``item`` are as above.
+
+.. warning::
+
+    If you override any of these methods, be sure to call the superclass methods
+    since they add the required elements for each feed format.
+
+For example, you might start implementing an iTunes RSS feed generator like so::
+
+    class iTunesFeed(Rss201rev2Feed):
+        def root_attibutes(self):
+            attrs = super(iTunesFeed, self).root_attibutes()
+            attrs['xmlns:itunes'] = 'http://www.itunes.com/dtds/podcast-1.0.dtd
+            return attrs
+            
+        def add_root_elements(self, handler):
+            super(iTunesFeed, self).add_root_elements(handler)
+            handler.addQuickElement('itunes:explicit', 'clean')
+
+Obviously there's a lot more work to be done for a complete custom feed class,
+but the above example should demonstrate the basic idea.
+
+.. _XMLGenerator: http://docs.python.org/dev/library/xml.sax.utils.html#xml.sax.saxutils.XMLGenerator
