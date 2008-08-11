@@ -81,7 +81,10 @@ class Permission(models.Model):
         ordering = ('content_type__app_label', 'codename')
 
     def __unicode__(self):
-        return u"%s | %s | %s" % (self.content_type.app_label, self.content_type, self.name)
+        return u"%s | %s | %s" % (
+            unicode(self.content_type.app_label),
+            unicode(self.content_type),
+            unicode(self.name))
 
 class Group(models.Model):
     """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.
@@ -96,7 +99,7 @@ class Group(models.Model):
     class Meta:
         verbose_name = _('group')
         verbose_name_plural = _('groups')
-        
+
     def __unicode__(self):
         return self.name
 
@@ -149,7 +152,7 @@ class User(models.Model):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-        
+
     def __unicode__(self):
         return self.username
 
