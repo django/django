@@ -106,7 +106,12 @@ class AdminScriptTestCase(unittest.TestCase):
 
         # Move to the test directory and run
         os.chdir(test_dir)
-        stdin, stdout, stderr = os.popen3(cmd)
+        try:
+            from subprocess import Popen, PIPE
+            p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+            stdin, stdout, stderr = (p.stdin, p.stdout, p.stderr)
+        except ImportError:
+            stdin, stdout, stderr = os.popen3(cmd)
         out, err = stdout.read(), stderr.read()
 
         # Restore the old environment
