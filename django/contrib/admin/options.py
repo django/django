@@ -437,12 +437,18 @@ class ModelAdmin(BaseModelAdmin):
         the object is being changed, and False if it's being added.
         """
         return form.save(commit=False)
+    
+    def save_model(self, request, obj, form, change):
+        """
+        Given a model instance save it to the database.
+        """
+        obj.save()
 
     def save_formset(self, request, form, formset, change):
         """
-        Given an inline formset return unsaved instances.
+        Given an inline formset save it to the database.
         """
-        return formset.save(commit=False)
+        formset.save()
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         opts = self.model._meta
@@ -562,13 +568,10 @@ class ModelAdmin(BaseModelAdmin):
                                   save_as_new=request.POST.has_key("_saveasnew"))
                 formsets.append(formset)
             if all_valid(formsets) and form_validated:
-                new_object.save()
+                self.save_model(request, new_object, form, change=False)
                 form.save_m2m()
                 for formset in formsets:
-                    instances = self.save_formset(request, form, formset, change=False)
-                    for instance in instances:
-                        instance.save()
-                    formset.save_m2m()
+                    self.save_formset(request, form, formset, change=False)
                 
                 self.log_addition(request, new_object)
                 return self.response_add(request, new_object)
@@ -642,13 +645,10 @@ class ModelAdmin(BaseModelAdmin):
                 formsets.append(formset)
 
             if all_valid(formsets) and form_validated:
-                new_object.save()
+                self.save_model(request, new_object, form, change=True)
                 form.save_m2m()
                 for formset in formsets:
-                    instances = self.save_formset(request, form, formset, change=True)
-                    for instance in instances:
-                        instance.save()
-                    formset.save_m2m()
+                    self.save_formset(request, form, formset, change=True)
                 
                 change_message = self.construct_change_message(request, form, formsets)
                 self.log_change(request, new_object, change_message)
