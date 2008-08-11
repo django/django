@@ -4,7 +4,12 @@ MySQL database backend for Django.
 Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 """
 
-from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
+from django.db.backends import *
+from django.db.backends.mysql.client import DatabaseClient
+from django.db.backends.mysql.creation import DatabaseCreation
+from django.db.backends.mysql.introspection import DatabaseIntrospection
+from django.db.backends.mysql.validation import DatabaseValidation
+
 try:
     import MySQLdb as Database
 except ImportError, e:
@@ -60,7 +65,6 @@ server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 # TRADITIONAL will automatically cause most warnings to be treated as errors.
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    inline_fk_references = False
     empty_fetchmany_value = ()
     update_can_self_select = False
 
@@ -142,8 +146,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return [first % value, second % value]
 
 class DatabaseWrapper(BaseDatabaseWrapper):
-    features = DatabaseFeatures()
-    ops = DatabaseOperations()
+    
     operators = {
         'exact': '= BINARY %s',
         'iexact': 'LIKE %s',
@@ -164,6 +167,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, **kwargs):
         super(DatabaseWrapper, self).__init__(**kwargs)
         self.server_version = None
+        
+        self.features = DatabaseFeatures()
+        self.ops = DatabaseOperations()
+        self.client = DatabaseClient()
+        self.creation = DatabaseCreation(self)
+        self.introspection = DatabaseIntrospection(self)
+        self.validation = DatabaseValidation()
 
     def _valid_connection(self):
         if self.connection is not None:

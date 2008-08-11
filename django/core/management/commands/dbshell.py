@@ -6,5 +6,5 @@ class Command(NoArgsCommand):
     requires_model_validation = False
 
     def handle_noargs(self, **options):
-        from django.db import runshell
-        runshell()
+        from django.db import connection
+        connection.client.runshell()

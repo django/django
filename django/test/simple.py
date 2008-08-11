@@ -3,7 +3,6 @@ from django.conf import settings
 from django.db.models import get_app, get_apps
 from django.test import _doctest as doctest
 from django.test.utils import setup_test_environment, teardown_test_environment
-from django.test.utils import create_test_db, destroy_test_db
 from django.test.testcases import OutputChecker, DocTestRunner
 
 # The module name for tests outside models.py
@@ -139,9 +138,10 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
         suite.addTest(test)
 
     old_name = settings.DATABASE_NAME
-    create_test_db(verbosity, autoclobber=not interactive)
+    from django.db import connection
+    connection.creation.create_test_db(verbosity, autoclobber=not interactive)
     result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
-    destroy_test_db(old_name, verbosity)
+    connection.creation.destroy_test_db(old_name, verbosity)
     
     teardown_test_environment()
     

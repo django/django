@@ -14,14 +14,12 @@ try:
     # backends that ships with Django, so look there first.
     _import_path = 'django.db.backends.'
     backend = __import__('%s%s.base' % (_import_path, settings.DATABASE_ENGINE), {}, {}, [''])
-    creation = __import__('%s%s.creation' % (_import_path, settings.DATABASE_ENGINE), {}, {}, [''])
 except ImportError, e:
     # If the import failed, we might be looking for a database backend
     # distributed external to Django. So we'll try that next.
     try:
         _import_path = ''
         backend = __import__('%s.base' % settings.DATABASE_ENGINE, {}, {}, [''])
-        creation = __import__('%s.creation' % settings.DATABASE_ENGINE, {}, {}, [''])
     except ImportError, e_user:
         # The database backend wasn't found. Display a helpful error message
         # listing all possible (built-in) database backends.
@@ -29,26 +27,10 @@ except ImportError, e:
         available_backends = [f for f in os.listdir(backend_dir) if not f.startswith('_') and not f.startswith('.') and not f.endswith('.py') and not f.endswith('.pyc')]
         available_backends.sort()
         if settings.DATABASE_ENGINE not in available_backends:
-            raise ImproperlyConfigured, "%r isn't an available database backend. Available options are: %s" % \
-                (settings.DATABASE_ENGINE, ", ".join(map(repr, available_backends)))
+            raise ImproperlyConfigured, "%r isn't an available database backend. Available options are: %s\nError was: %s" % \
+                (settings.DATABASE_ENGINE, ", ".join(map(repr, available_backends, e_user)))
         else:
             raise # If there's some other error, this must be an error in Django itself.
-
-def _import_database_module(import_path='', module_name=''):
-    """Lazily import a database module when requested."""
-    return __import__('%s%s.%s' % (import_path, settings.DATABASE_ENGINE, module_name), {}, {}, [''])
-
-# We don't want to import the introspect module unless someone asks for it, so
-# lazily load it on demmand.
-get_introspection_module = curry(_import_database_module, _import_path, 'introspection')
-
-def get_creation_module():
-    return creation
-
-# We want runshell() to work the same way, but we have to treat it a
-# little differently (since it just runs instead of returning a module like
-# the above) and wrap the lazily-loaded runshell() method.
-runshell = lambda: _import_database_module(_import_path, "client").runshell()
 
 # Convenient aliases for backend bits.
 connection = backend.DatabaseWrapper(**settings.DATABASE_OPTIONS)

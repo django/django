@@ -1026,6 +1026,9 @@ a number of utility methods in the ``django.test.utils`` module.
     black magic hooks into the template system and restoring normal e-mail
     services.
 
+The creation module of the database backend (``connection.creation``) also
+provides some utilities that can be useful during testing.
+
 ``create_test_db(verbosity=1, autoclobber=False)``
     Creates a new test database and runs ``syncdb`` against it.
 
@@ -1044,7 +1047,7 @@ a number of utility methods in the ``django.test.utils`` module.
     ``create_test_db()`` has the side effect of modifying
     ``settings.DATABASE_NAME`` to match the name of the test database.
 
-    New in the Django development version, this function returns the name of
+    **New in Django development version:** This function returns the name of
     the test database that it created.
 
 ``destroy_test_db(old_database_name, verbosity=1)``

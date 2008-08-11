@@ -7,7 +7,7 @@ try:
 except ImportError:
     from django.utils import _decimal as decimal    # for Python 2.3
 
-from django.db import connection, get_creation_module
+from django.db import connection
 from django.db.models import signals
 from django.db.models.query_utils import QueryWrapper
 from django.dispatch import dispatcher
@@ -145,14 +145,14 @@ class Field(object):
         # as the TextField Django field type, which means XMLField's
         # get_internal_type() returns 'TextField'.
         #
-        # But the limitation of the get_internal_type() / DATA_TYPES approach
+        # But the limitation of the get_internal_type() / data_types approach
         # is that it cannot handle database column types that aren't already
         # mapped to one of the built-in Django field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
         data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         try:
-            return get_creation_module().DATA_TYPES[self.get_internal_type()] % data
+            return connection.creation.data_types[self.get_internal_type()] % data
         except KeyError:
             return None
 

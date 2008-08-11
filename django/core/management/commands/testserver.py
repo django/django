@@ -18,13 +18,13 @@ class Command(BaseCommand):
 
     def handle(self, *fixture_labels, **options):
         from django.core.management import call_command
-        from django.test.utils import create_test_db
+        from django.db import connection
 
         verbosity = int(options.get('verbosity', 1))
         addrport = options.get('addrport')
 
         # Create a test database.
-        db_name = create_test_db(verbosity=verbosity)
+        db_name = connection.creation.create_test_db(verbosity=verbosity)
 
         # Import the fixture data into the test database.
         call_command('loaddata', *fixture_labels, **{'verbosity': verbosity})

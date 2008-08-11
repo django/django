@@ -42,14 +42,9 @@ class BaseDatabaseWrapper(local):
         return util.CursorDebugWrapper(cursor, self)
 
 class BaseDatabaseFeatures(object):
-    allows_group_by_ordinal = True
-    inline_fk_references = True
     # True if django.db.backend.utils.typecast_timestamp is used on values
     # returned from dates() calls.
     needs_datetime_string_cast = True
-    supports_constraints = True
-    supports_tablespaces = False
-    uses_case_insensitive_names = False
     uses_custom_query_class = False
     empty_fetchmany_value = []
     update_can_self_select = True
@@ -253,13 +248,13 @@ class BaseDatabaseOperations(object):
         """
         return "BEGIN;"
 
-    def tablespace_sql(self, tablespace, inline=False):
+    def sql_for_tablespace(self, tablespace, inline=False):
         """
-        Returns the tablespace SQL, or None if the backend doesn't use
-        tablespaces.
+        Returns the SQL that will be appended to tables or rows to define
+        a tablespace. Returns '' if the backend doesn't use tablespaces.
         """
-        return None
-
+        return ''
+            
     def prep_for_like_query(self, x):
         """Prepares a value for use in a LIKE query."""
         from django.utils.encoding import smart_unicode
@@ -324,4 +319,90 @@ class BaseDatabaseOperations(object):
         which include a time part.
         """
         return self.year_lookup_bounds(value)
+
+class BaseDatabaseIntrospection(object):
+    """
+    This class encapsulates all backend-specific introspection utilities
+    """
+    data_types_reverse = {}
+
+    def __init__(self, connection):
+        self.connection = connection
+
+    def table_name_converter(self, name):
+        """Apply a conversion to the name for the purposes of comparison.
+        
+        The default table name converter is for case sensitive comparison.
+        """
+        return name
+        
+    def table_names(self):
+        "Returns a list of names of all tables that exist in the database."
+        cursor = self.connection.cursor()
+        return self.get_table_list(cursor)
+
+    def django_table_names(self, only_existing=False):
+        """
+        Returns a list of all table names that have associated Django models and
+        are in INSTALLED_APPS.
+
+        If only_existing is True, the resulting list will only include the tables
+        that actually exist in the database.
+        """
+        from django.db import models
+        tables = set()
+        for app in models.get_apps():
+            for model in models.get_models(app):
+                tables.add(model._meta.db_table)
+                tables.update([f.m2m_db_table() for f in model._meta.local_many_to_many])
+        if only_existing:
+            tables = [t for t in tables if t in self.table_names()]
+        return tables
+
+    def installed_models(self, tables):
+        "Returns a set of all models represented by the provided list of table names."
+        from django.db import models
+        all_models = []
+        for app in models.get_apps():
+            for model in models.get_models(app):
+                all_models.append(model)
+        return set([m for m in all_models 
+            if self.table_name_converter(m._meta.db_table) in map(self.table_name_converter, tables)
+        ])
+        
+    def sequence_list(self):
+        "Returns a list of information about all DB sequences for all models in all apps."
+        from django.db import models
+
+        apps = models.get_apps()
+        sequence_list = []
+
+        for app in apps:
+            for model in models.get_models(app):
+                for f in model._meta.local_fields:
+                    if isinstance(f, models.AutoField):
+                        sequence_list.append({'table': model._meta.db_table, 'column': f.column})
+                        break # Only one AutoField is allowed per model, so don't bother continuing.
+
+                for f in model._meta.local_many_to_many:
+                    sequence_list.append({'table': f.m2m_db_table(), 'column': None})
+
+        return sequence_list
+        
+        
+class BaseDatabaseClient(object):
+    """
+    This class encapsualtes all backend-specific methods for opening a
+    client shell
+    """
+    def runshell(self):
+        raise NotImplementedError()
+
+class BaseDatabaseValidation(object):
+    """
+    This class encapsualtes all backend-specific model validation.
+    """
+    def validate_field(self, errors, opts, f):
+        "By default, there is no backend-specific validation"
+        pass
 

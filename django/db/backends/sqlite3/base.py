@@ -6,7 +6,11 @@ Python 2.3 and 2.4 require pysqlite2 (http://pysqlite.org/).
 Python 2.5 and later use the sqlite3 module in the standard library.
 """
 
-from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
+from django.db.backends import *
+from django.db.backends.sqlite3.client import DatabaseClient
+from django.db.backends.sqlite3.creation import DatabaseCreation
+from django.db.backends.sqlite3.introspection import DatabaseIntrospection
+
 try:
     try:
         from sqlite3 import dbapi2 as Database
@@ -46,7 +50,6 @@ if Database.version_info >= (2,4,1):
     Database.register_adapter(str, lambda s:s.decode('utf-8'))
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    supports_constraints = False
     # SQLite cannot handle us only partially reading from a cursor's result set
     # and then writing the same rows to the database in another cursor. This
     # setting ensures we always read result sets fully into memory all in one
@@ -96,11 +99,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         second = '%s-12-31 23:59:59.999999'
         return [first % value, second % value]
 
-
 class DatabaseWrapper(BaseDatabaseWrapper):
-    features = DatabaseFeatures()
-    ops = DatabaseOperations()
-
+    
     # SQLite requires LIKE statements to include an ESCAPE clause if the value
     # being escaped has a percent or underscore in it.
     # See http://www.sqlite.org/lang_expr.html for an explanation.
@@ -120,6 +120,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'istartswith': "LIKE %s ESCAPE '\\'",
         'iendswith': "LIKE %s ESCAPE '\\'",
     }
+
+    def __init__(self, *args, **kwargs):
+        super(DatabaseWrapper, self).__init__(*args, **kwargs)
+        
+        self.features = DatabaseFeatures()
+        self.ops = DatabaseOperations()
+        self.client = DatabaseClient()
+        self.creation = DatabaseCreation(self)
+        self.introspection = DatabaseIntrospection(self)
+        self.validation = BaseDatabaseValidation()
 
     def _cursor(self, settings):
         if self.connection is None:

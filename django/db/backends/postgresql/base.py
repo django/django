@@ -4,9 +4,13 @@ PostgreSQL database backend for Django.
 Requires psycopg 1: http://initd.org/projects/psycopg1
 """
 
-from django.utils.encoding import smart_str, smart_unicode
-from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, util
+from django.db.backends import *
+from django.db.backends.postgresql.client import DatabaseClient
+from django.db.backends.postgresql.creation import DatabaseCreation
+from django.db.backends.postgresql.introspection import DatabaseIntrospection
 from django.db.backends.postgresql.operations import DatabaseOperations
+from django.utils.encoding import smart_str, smart_unicode
+
 try:
     import psycopg as Database
 except ImportError, e:
@@ -59,12 +63,7 @@ class UnicodeCursorWrapper(object):
     def __iter__(self):
         return iter(self.cursor)
 
-class DatabaseFeatures(BaseDatabaseFeatures):
-    pass # This backend uses all the defaults.
-
 class DatabaseWrapper(BaseDatabaseWrapper):
-    features = DatabaseFeatures()
-    ops = DatabaseOperations()
     operators = {
         'exact': '= %s',
         'iexact': 'ILIKE %s',
@@ -81,6 +80,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'istartswith': 'ILIKE %s',
         'iendswith': 'ILIKE %s',
     }
+
+    def __init__(self, *args, **kwargs):
+        super(DatabaseWrapper, self).__init__(*args, **kwargs)
+        
+        self.features = BaseDatabaseFeatures()
+        self.ops = DatabaseOperations()
+        self.client = DatabaseClient()
+        self.creation = DatabaseCreation(self)
+        self.introspection = DatabaseIntrospection(self)
+        self.validation = BaseDatabaseValidation()
 
     def _cursor(self, settings):
         set_tz = False

@@ -8,8 +8,11 @@ import os
 import datetime
 import time
 
-from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
+from django.db.backends import *
 from django.db.backends.oracle import query
+from django.db.backends.oracle.client import DatabaseClient
+from django.db.backends.oracle.creation import DatabaseCreation
+from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.utils.encoding import smart_str, force_unicode
 
 # Oracle takes client-side character set encoding from the environment.
@@ -24,11 +27,8 @@ DatabaseError = Database.Error
 IntegrityError = Database.IntegrityError
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    allows_group_by_ordinal = False
     empty_fetchmany_value = ()
     needs_datetime_string_cast = False
-    supports_tablespaces = True
-    uses_case_insensitive_names = True
     uses_custom_query_class = True
     interprets_empty_strings_as_nulls = True
 
@@ -194,10 +194,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         return [first % value, second % value]
 
 
-
 class DatabaseWrapper(BaseDatabaseWrapper):
-    features = DatabaseFeatures()
-    ops = DatabaseOperations()
+    
     operators = {
         'exact': '= %s',
         'iexact': '= UPPER(%s)',
@@ -213,6 +211,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKEC UPPER(%s) ESCAPE '\\'",
     }
     oracle_version = None
+
+    def __init__(self, *args, **kwargs):        
+        super(DatabaseWrapper, self).__init__(*args, **kwargs)
+
+        self.features = DatabaseFeatures()
+        self.ops = DatabaseOperations()
+        self.client = DatabaseClient()
+        self.creation = DatabaseCreation(self)
+        self.introspection = DatabaseIntrospection(self)
+        self.validation = BaseDatabaseValidation()
 
     def _valid_connection(self):
         return self.connection is not None

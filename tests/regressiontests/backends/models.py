@@ -15,10 +15,6 @@ class Person(models.Model):
     def __unicode__(self):
         return u'%s %s' % (self.first_name, self.last_name)
 
-if connection.features.uses_case_insensitive_names:
-    t_convert = lambda x: x.upper()
-else:
-    t_convert = lambda x: x
 qn = connection.ops.quote_name
 
 __test__ = {'API_TESTS': """
@@ -29,7 +25,7 @@ __test__ = {'API_TESTS': """
 >>> opts = Square._meta
 >>> f1, f2 = opts.get_field('root'), opts.get_field('square')
 >>> query = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)'
-...         % (t_convert(opts.db_table), qn(f1.column), qn(f2.column)))
+...         % (connection.introspection.table_name_converter(opts.db_table), qn(f1.column), qn(f2.column)))
 >>> cursor.executemany(query, [(i, i**2) for i in range(-5, 6)]) and None or None
 >>> Square.objects.order_by('root')
 [<Square: -5 ** 2 == 25>, <Square: -4 ** 2 == 16>, <Square: -3 ** 2 == 9>, <Square: -2 ** 2 == 4>, <Square: -1 ** 2 == 1>, <Square: 0 ** 2 == 0>, <Square: 1 ** 2 == 1>, <Square: 2 ** 2 == 4>, <Square: 3 ** 2 == 9>, <Square: 4 ** 2 == 16>, <Square: 5 ** 2 == 25>]
@@ -48,7 +44,7 @@ __test__ = {'API_TESTS': """
 >>> opts2 = Person._meta
 >>> f3, f4 = opts2.get_field('first_name'), opts2.get_field('last_name')
 >>> query2 = ('SELECT %s, %s FROM %s ORDER BY %s'
-...          % (qn(f3.column), qn(f4.column), t_convert(opts2.db_table),
+...          % (qn(f3.column), qn(f4.column), connection.introspection.table_name_converter(opts2.db_table),
 ...             qn(f3.column)))
 >>> cursor.execute(query2) and None or None
 >>> cursor.fetchone()

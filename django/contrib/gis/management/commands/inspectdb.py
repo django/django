@@ -7,7 +7,7 @@ from django.core.management.commands.inspectdb import Command as InspectCommand
 from django.contrib.gis.db.backend import SpatialBackend
 
 class Command(InspectCommand):
-    
+
     # Mapping from lower-case OGC type to the corresponding GeoDjango field.
     geofield_mapping = {'point' : 'PointField',
                         'linestring' : 'LineStringField',
@@ -21,11 +21,11 @@ class Command(InspectCommand):
 
     def geometry_columns(self):
         """
-        Returns a datastructure of metadata information associated with the 
+        Returns a datastructure of metadata information associated with the
         `geometry_columns` (or equivalent) table.
         """
         # The `geo_cols` is a dictionary data structure that holds information
-        # about any geographic columns in the database. 
+        # about any geographic columns in the database.
         geo_cols = {}
         def add_col(table, column, coldata):
             if table in geo_cols:
@@ -47,7 +47,7 @@ class Command(InspectCommand):
         elif SpatialBackend.name == 'mysql':
             # On MySQL have to get all table metadata before hand; this means walking through
             # each table and seeing if any column types are spatial.  Can't detect this with
-            # `cursor.description` (what the introspection module does) because all spatial types 
+            # `cursor.description` (what the introspection module does) because all spatial types
             # have the same integer type (255 for GEOMETRY).
             from django.db import connection
             cursor = connection.cursor()
@@ -67,13 +67,11 @@ class Command(InspectCommand):
 
     def handle_inspection(self):
         "Overloaded from Django's version to handle geographic database tables."
-        from django.db import connection, get_introspection_module
+        from django.db import connection
         import keyword
 
-        introspection_module = get_introspection_module()
-
         geo_cols = self.geometry_columns()
-       
+
         table2model = lambda table_name: table_name.title().replace('_', '')
 
         cursor = connection.cursor()
@@ -88,20 +86,20 @@ class Command(InspectCommand):
         yield ''
         yield 'from django.contrib.gis.db import models'
         yield ''
-        for table_name in introspection_module.get_table_list(cursor):
+        for table_name in connection.introspection.get_table_list(cursor):
             # Getting the geographic table dictionary.
             geo_table = geo_cols.get(table_name, {})
 
             yield 'class %s(models.Model):' % table2model(table_name)
             try:
-                relations = introspection_module.get_relations(cursor, table_name)
+                relations = connection.introspection.get_relations(cursor, table_name)
             except NotImplementedError:
                 relations = {}
             try:
-                indexes = introspection_module.get_indexes(cursor, table_name)
+                indexes = connection.introspection.get_indexes(cursor, table_name)
             except NotImplementedError:
                 indexes = {}
-            for i, row in enumerate(introspection_module.get_table_description(cursor, table_name)):
+            for i, row in enumerate(connection.introspection.get_table_description(cursor, table_name)):
                 att_name, iatt_name = row[0].lower(), row[0]
                 comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
                 extra_params = {}  # Holds Field parameters such as 'db_column'.
@@ -133,12 +131,12 @@ class Command(InspectCommand):
                         if srid != 4326: extra_params['srid'] = srid
                     else:
                         try:
-                            field_type = introspection_module.DATA_TYPES_REVERSE[row[1]]
+                            field_type = connection.introspection.data_types_reverse[row[1]]
                         except KeyError:
                             field_type = 'TextField'
                             comment_notes.append('This field type is a guess.')
 
-                    # This is a hook for DATA_TYPES_REVERSE to return a tuple of
+                    # This is a hook for data_types_reverse to return a tuple of
                     # (field_type, extra_params_dict).
                     if type(field_type) is tuple:
                         field_type, new_params = field_type
