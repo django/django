@@ -1,11 +1,9 @@
 from django.contrib.gis import forms
 # Getting the SpatialBackend container and the geographic quoting method.
 from django.contrib.gis.db.backend import SpatialBackend, gqn
-# GeometryProxy, GEOS, Distance, and oldforms imports.
+# GeometryProxy, GEOS, and Distance imports.
 from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.measure import Distance
-from django.contrib.gis.oldforms import WKTField
-
 # The `get_srid_info` function gets SRID information from the spatial
 # reference system table w/o using the ORM.
 from django.contrib.gis.models import get_srid_info
@@ -189,10 +187,6 @@ class GeometryField(SpatialBackend.Field):
             return None
         else:
             return SpatialBackend.Adaptor(self.get_geometry(value))
-
-    def get_manipulator_field_objs(self):
-        "Using the WKTField (oldforms) to be our manipulator."
-        return [WKTField]
 
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
