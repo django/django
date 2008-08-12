@@ -11,7 +11,7 @@ query the database.
 
 If you need to use a table name for a many-to-many relationship that differs
 from the default generated name, use the ``db_table`` parameter on the
-``ManyToMany`` field. This has no effect on the API for querying the database.
+``ManyToManyField``. This has no effect on the API for querying the database.
 
 """
 
