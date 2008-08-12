@@ -1181,7 +1181,7 @@ For example, suppose you have a view, ``app_views.client``, whose URLconf
 takes a client ID (here, ``client()`` is a method inside the views file
 ``app_views.py``). The URLconf line might look like this::
 
-    ('^client/(\d+)/$', 'app_views.client')
+    ('^client/(\d+)/$', 'project_name.app_name.app_views.client')
 
 If this app's URLconf is included into the project's URLconf under a path
 such as this::
@@ -1190,7 +1190,7 @@ such as this::
 
 ...then, in a template, you can create a link to this view like this::
 
-    {% url app_views.client client.id %}
+    {% url project_name.app_name.app_views.client client.id %}
 
 The template tag will output the string ``/clients/client/123/``.
 
