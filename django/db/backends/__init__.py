@@ -9,7 +9,7 @@ try:
 except NameError:
     # Python 2.3 compat
     from sets import Set as set
-    
+
 from django.db.backends import util
 from django.utils import datetime_safe
 
@@ -30,6 +30,21 @@ class BaseDatabaseWrapper(local):
     def _rollback(self):
         if self.connection is not None:
             return self.connection.rollback()
+
+    def _savepoint(self, sid):
+        if not self.features.uses_savepoints:
+            return
+        self.connection.cursor().execute(self.ops.savepoint_create_sql(sid))
+
+    def _savepoint_rollback(self, sid):
+        if not self.features.uses_savepoints:
+            return
+        self.connection.cursor().execute(self.ops.savepoint_rollback_sql(sid))
+
+    def _savepoint_commit(self, sid):
+        if not self.features.uses_savepoints:
+            return
+        self.connection.cursor().execute(self.ops.savepoint_commit_sql(sid))
 
     def close(self):
         if self.connection is not None:
@@ -55,6 +70,7 @@ class BaseDatabaseFeatures(object):
     update_can_self_select = True
     interprets_empty_strings_as_nulls = False
     can_use_chunked_reads = True
+    uses_savepoints = False
 
 class BaseDatabaseOperations(object):
     """
@@ -226,6 +242,26 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError
 
+    def savepoint_create_sql(self, sid):
+        """
+        Returns the SQL for starting a new savepoint. Only required if the
+        "uses_savepoints" feature is True. The "sid" parameter is a string
+        for the savepoint id.
+        """
+        raise NotImplementedError
+
+    def savepoint_commit_sql(self, sid):
+        """
+        Returns the SQL for committing the given savepoint.
+        """
+        raise NotImplementedError
+
+    def savepoint_rollback_sql(self, sid):
+        """
+        Returns the SQL for rolling back the given savepoint.
+        """
+        raise NotImplementedError
+
     def sql_flush(self, style, tables, sequences):
         """
         Returns a list of SQL statements required to remove all data from
@@ -259,7 +295,7 @@ class BaseDatabaseOperations(object):
         a tablespace. Returns '' if the backend doesn't use tablespaces.
         """
         return ''
-            
+
     def prep_for_like_query(self, x):
         """Prepares a value for use in a LIKE query."""
         from django.utils.encoding import smart_unicode
@@ -336,11 +372,11 @@ class BaseDatabaseIntrospection(object):
 
     def table_name_converter(self, name):
         """Apply a conversion to the name for the purposes of comparison.
-        
+
         The default table name converter is for case sensitive comparison.
         """
         return name
-        
+
     def table_names(self):
         "Returns a list of names of all tables that exist in the database."
         cursor = self.connection.cursor()
@@ -371,10 +407,10 @@ class BaseDatabaseIntrospection(object):
         for app in models.get_apps():
             for model in models.get_models(app):
                 all_models.append(model)
-        return set([m for m in all_models 
+        return set([m for m in all_models
             if self.table_name_converter(m._meta.db_table) in map(self.table_name_converter, tables)
         ])
-        
+
     def sequence_list(self):
         "Returns a list of information about all DB sequences for all models in all apps."
         from django.db import models
@@ -393,8 +429,7 @@ class BaseDatabaseIntrospection(object):
                     sequence_list.append({'table': f.m2m_db_table(), 'column': None})
 
         return sequence_list
-        
-        
+
 class BaseDatabaseClient(object):
     """
     This class encapsualtes all backend-specific methods for opening a

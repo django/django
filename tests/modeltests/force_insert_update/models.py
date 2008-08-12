@@ -2,7 +2,7 @@
 Tests for forcing insert and update queries (instead of Django's normal
 automatic behaviour).
 """
-from django.db import models
+from django.db import models, transaction
 
 class Counter(models.Model):
     name = models.CharField(max_length = 10)
@@ -40,15 +40,13 @@ ValueError: Cannot force an update in save() with no primary key.
 >>> c1.save(force_insert=True)
 
 # Won't work because we can't insert a pk of the same value.
+>>> sid = transaction.savepoint()
 >>> c.value = 5
 >>> c.save(force_insert=True)
 Traceback (most recent call last):
 ...
 IntegrityError: ...
-
-# Work around transaction failure cleaning up for PostgreSQL.
->>> from django.db import connection
->>> connection.close()
+>>> transaction.savepoint_rollback(sid)
 
 # Trying to update should still fail, even with manual primary keys, if the
 # data isn't in the database already.

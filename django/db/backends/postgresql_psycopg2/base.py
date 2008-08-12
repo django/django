@@ -26,6 +26,7 @@ psycopg2.extensions.register_adapter(SafeUnicode, psycopg2.extensions.QuotedStri
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
+    uses_savepoints = True
 
 class DatabaseOperations(PostgresqlDatabaseOperations):
     def last_executed_query(self, cursor, sql, params):

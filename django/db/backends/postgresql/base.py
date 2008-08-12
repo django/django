@@ -63,6 +63,9 @@ class UnicodeCursorWrapper(object):
     def __iter__(self):
         return iter(self.cursor)
 
+class DatabaseFeatures(BaseDatabaseFeatures):
+    uses_savepoints = True
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     operators = {
         'exact': '= %s',
@@ -83,8 +86,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
-        
-        self.features = BaseDatabaseFeatures()
+
+        self.features = DatabaseFeatures()
         self.ops = DatabaseOperations()
         self.client = DatabaseClient()
         self.creation = DatabaseCreation(self)
