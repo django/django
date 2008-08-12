@@ -40,8 +40,10 @@ class DatabaseCreation(BaseDatabaseCreation):
         'URLField':                     'VARCHAR2(%(max_length)s)',
         'USStateField':                 'CHAR(2)',
     }
-    
-    def _create_test_db(self, verbosity, autoclobber):
+
+    remember = {}
+
+    def _create_test_db(self, verbosity=1, autoclobber=False):
         TEST_DATABASE_NAME = self._test_database_name(settings)
         TEST_DATABASE_USER = self._test_database_user(settings)
         TEST_DATABASE_PASSWD = self._test_database_passwd(settings)
@@ -54,7 +56,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             'password': TEST_DATABASE_PASSWD,
             'tblspace': TEST_DATABASE_TBLSPACE,
             'tblspace_temp': TEST_DATABASE_TBLSPACE_TMP,
-     	}
+        }
 
         self.remember['user'] = settings.DATABASE_USER
         self.remember['passwd'] = settings.DATABASE_PASSWORD
@@ -111,8 +113,8 @@ class DatabaseCreation(BaseDatabaseCreation):
         settings.DATABASE_USER = TEST_DATABASE_USER
         settings.DATABASE_PASSWORD = TEST_DATABASE_PASSWD
 
-        return TEST_DATABASE_NAME
-        
+        return settings.DATABASE_NAME
+
     def _destroy_test_db(self, test_database_name, verbosity=1):
         """
         Destroy a test database, prompting the user for confirmation if the
@@ -133,7 +135,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             'password': TEST_DATABASE_PASSWD,
             'tblspace': TEST_DATABASE_TBLSPACE,
             'tblspace_temp': TEST_DATABASE_TBLSPACE_TMP,
-     	}
+        }
 
         self.remember['user'] = settings.DATABASE_USER
         self.remember['passwd'] = settings.DATABASE_PASSWORD
@@ -150,7 +152,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             self._execute_test_db_destruction(cursor, parameters, verbosity)
         self.connection.close()
 
-    def _execute_test_db_creation(cursor, parameters, verbosity):
+    def _execute_test_db_creation(self, cursor, parameters, verbosity):
         if verbosity >= 2:
             print "_create_test_db(): dbname = %s" % parameters['dbname']
         statements = [
@@ -163,9 +165,9 @@ class DatabaseCreation(BaseDatabaseCreation):
                REUSE AUTOEXTEND ON NEXT 10M MAXSIZE 100M
             """,
         ]
-        _execute_statements(cursor, statements, parameters, verbosity)
+        self._execute_statements(cursor, statements, parameters, verbosity)
 
-    def _create_test_user(cursor, parameters, verbosity):
+    def _create_test_user(self, cursor, parameters, verbosity):
         if verbosity >= 2:
             print "_create_test_user(): username = %s" % parameters['user']
         statements = [
@@ -176,27 +178,27 @@ class DatabaseCreation(BaseDatabaseCreation):
             """,
             """GRANT CONNECT, RESOURCE TO %(user)s""",
         ]
-        _execute_statements(cursor, statements, parameters, verbosity)
+        self._execute_statements(cursor, statements, parameters, verbosity)
 
-    def _execute_test_db_destruction(cursor, parameters, verbosity):
+    def _execute_test_db_destruction(self, cursor, parameters, verbosity):
         if verbosity >= 2:
             print "_execute_test_db_destruction(): dbname=%s" % parameters['dbname']
         statements = [
             'DROP TABLESPACE %(tblspace)s INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS',
             'DROP TABLESPACE %(tblspace_temp)s INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS',
             ]
-        _execute_statements(cursor, statements, parameters, verbosity)
+        self._execute_statements(cursor, statements, parameters, verbosity)
 
-    def _destroy_test_user(cursor, parameters, verbosity):
+    def _destroy_test_user(self, cursor, parameters, verbosity):
         if verbosity >= 2:
             print "_destroy_test_user(): user=%s" % parameters['user']
             print "Be patient.  This can take some time..."
         statements = [
             'DROP USER %(user)s CASCADE',
         ]
-        _execute_statements(cursor, statements, parameters, verbosity)
+        self._execute_statements(cursor, statements, parameters, verbosity)
 
-    def _execute_statements(cursor, statements, parameters, verbosity):
+    def _execute_statements(self, cursor, statements, parameters, verbosity):
         for template in statements:
             stmt = template % parameters
             if verbosity >= 2:
@@ -207,7 +209,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 sys.stderr.write("Failed (%s)\n" % (err))
                 raise
 
-    def _test_database_name(settings):
+    def _test_database_name(self, settings):
         name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
         try:
             if settings.TEST_DATABASE_NAME:
@@ -218,7 +220,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             raise
         return name
 
-    def _test_database_create(settings):
+    def _test_database_create(self, settings):
         name = True
         try:
             if settings.TEST_DATABASE_CREATE:
@@ -231,7 +233,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             raise
         return name
 
-    def _test_user_create(settings):
+    def _test_user_create(self, settings):
         name = True
         try:
             if settings.TEST_USER_CREATE:
@@ -244,7 +246,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             raise
         return name
 
-    def _test_database_user(settings):
+    def _test_database_user(self, ettings):
         name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
         try:
             if settings.TEST_DATABASE_USER:
@@ -255,7 +257,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             raise
         return name
 
-    def _test_database_passwd(settings):
+    def _test_database_passwd(self, settings):
         name = PASSWORD
         try:
             if settings.TEST_DATABASE_PASSWD:
@@ -266,7 +268,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             raise
         return name
 
-    def _test_database_tblspace(settings):
+    def _test_database_tblspace(self, settings):
         name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
         try:
             if settings.TEST_DATABASE_TBLSPACE:
@@ -277,7 +279,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             raise
         return name
 
-    def _test_database_tblspace_tmp(settings):
+    def _test_database_tblspace_tmp(self, settings):
         name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME + '_temp'
         try:
             if settings.TEST_DATABASE_TBLSPACE_TMP:
