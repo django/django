@@ -4,6 +4,8 @@ MySQL database backend for Django.
 Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 """
 
+import re
+
 from django.db.backends import *
 from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
@@ -26,8 +28,7 @@ if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
 from MySQLdb.converters import conversions
-from MySQLdb.constants import FIELD_TYPE
-import re
+from MySQLdb.constants import FIELD_TYPE, FLAG
 
 # Raise exceptions for database warnings if DEBUG is on
 from django.conf import settings
@@ -49,6 +50,12 @@ django_conversions.update({
     FIELD_TYPE.TIME: util.typecast_time,
     FIELD_TYPE.DECIMAL: util.typecast_decimal,
     FIELD_TYPE.NEWDECIMAL: util.typecast_decimal,
+    # By default, mysqldb will return VARCHAR BINARY fields as type str.
+    # This is a bad idea, as BINARY doesn't indicate that it's arbitrary
+    # binary data, but that collation uses the binary representation.
+    # Replacing the list makes it return unicode. MySQLdb later adds
+    # another list entry for non-binary fields.
+    FIELD_TYPE.VARCHAR: [(FLAG.BINARY, lambda s: s.decode('utf-8'))],
 })
 
 # This should match the numerical portion of the version numbers (we can treat
@@ -167,7 +174,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, **kwargs):
         super(DatabaseWrapper, self).__init__(**kwargs)
         self.server_version = None
-        
+
         self.features = DatabaseFeatures()
         self.ops = DatabaseOperations()
         self.client = DatabaseClient()
