@@ -1,12 +1,13 @@
-from django.db import models
 from datetime import datetime
 from django.contrib.auth.models import User
+from django.core import management
+from django.db import models
 
 # Forward declared intermediate model
 class Membership(models.Model):
     person = models.ForeignKey('Person')
     group = models.ForeignKey('Group')
-    date_joined = models.DateTimeField(default=datetime.now)
+    price = models.IntegerField(default=100)
     
     def __unicode__(self):
         return "%s is a member of %s" % (self.person.name, self.group.name)
@@ -14,7 +15,7 @@ class Membership(models.Model):
 class UserMembership(models.Model):
     user = models.ForeignKey(User)
     group = models.ForeignKey('Group')
-    date_joined = models.DateTimeField(default=datetime.now)
+    price = models.IntegerField(default=100)
     
     def __unicode__(self):
         return "%s is a user and member of %s" % (self.user.username, self.group.name)
@@ -98,5 +99,142 @@ AttributeError: Cannot use create() on a ManyToManyField which specifies an inte
 
 >>> roll.user_members.all()
 [<User: frank>]
+
+# Regression test for #8134 -- 
+# m2m-through models shouldn't be serialized as m2m fields on the model.
+# Dump the current contents of the database as a JSON fixture
+>>> management.call_command('dumpdata', 'm2m_through_regress', format='json', indent=2)
+[
+  {
+    "pk": 1, 
+    "model": "m2m_through_regress.membership", 
+    "fields": {
+      "person": 1, 
+      "price": 100, 
+      "group": 1
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "m2m_through_regress.membership", 
+    "fields": {
+      "person": 1, 
+      "price": 100, 
+      "group": 2
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "m2m_through_regress.membership", 
+    "fields": {
+      "person": 2, 
+      "price": 100, 
+      "group": 1
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "m2m_through_regress.usermembership", 
+    "fields": {
+      "price": 100, 
+      "group": 1, 
+      "user": 1
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "m2m_through_regress.usermembership", 
+    "fields": {
+      "price": 100, 
+      "group": 2, 
+      "user": 1
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "m2m_through_regress.usermembership", 
+    "fields": {
+      "price": 100, 
+      "group": 1, 
+      "user": 2
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "m2m_through_regress.person", 
+    "fields": {
+      "name": "Bob"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "m2m_through_regress.person", 
+    "fields": {
+      "name": "Jim"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "m2m_through_regress.group", 
+    "fields": {
+      "name": "Rock"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "m2m_through_regress.group", 
+    "fields": {
+      "name": "Roll"
+    }
+  }
+]
+
+# Check the XML serializer too, since it doesn't use the common implementation
+>>> management.call_command('dumpdata', 'm2m_through_regress', format='xml', indent=2)
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+  <object pk="1" model="m2m_through_regress.membership">
+    <field to="m2m_through_regress.person" name="person" rel="ManyToOneRel">1</field>
+    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="price">100</field>
+  </object>
+  <object pk="2" model="m2m_through_regress.membership">
+    <field to="m2m_through_regress.person" name="person" rel="ManyToOneRel">1</field>
+    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">2</field>
+    <field type="IntegerField" name="price">100</field>
+  </object>
+  <object pk="3" model="m2m_through_regress.membership">
+    <field to="m2m_through_regress.person" name="person" rel="ManyToOneRel">2</field>
+    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="price">100</field>
+  </object>
+  <object pk="1" model="m2m_through_regress.usermembership">
+    <field to="auth.user" name="user" rel="ManyToOneRel">1</field>
+    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="price">100</field>
+  </object>
+  <object pk="2" model="m2m_through_regress.usermembership">
+    <field to="auth.user" name="user" rel="ManyToOneRel">1</field>
+    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">2</field>
+    <field type="IntegerField" name="price">100</field>
+  </object>
+  <object pk="3" model="m2m_through_regress.usermembership">
+    <field to="auth.user" name="user" rel="ManyToOneRel">2</field>
+    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="price">100</field>
+  </object>
+  <object pk="1" model="m2m_through_regress.person">
+    <field type="CharField" name="name">Bob</field>
+  </object>
+  <object pk="2" model="m2m_through_regress.person">
+    <field type="CharField" name="name">Jim</field>
+  </object>
+  <object pk="1" model="m2m_through_regress.group">
+    <field type="CharField" name="name">Rock</field>
+  </object>
+  <object pk="2" model="m2m_through_regress.group">
+    <field type="CharField" name="name">Roll</field>
+  </object>
+</django-objects>
 
 """}

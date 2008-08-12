@@ -132,6 +132,14 @@ class FKDataToField(models.Model):
 class FKDataToO2O(models.Model):
     data = models.ForeignKey(O2OData, null=True)
 
+class M2MIntermediateData(models.Model):
+    data = models.ManyToManyField(Anchor, null=True, through='Intermediate')
+    
+class Intermediate(models.Model):
+    left = models.ForeignKey(M2MIntermediateData)
+    right = models.ForeignKey(Anchor)
+    extra = models.CharField(max_length=30, blank=True, default="doesn't matter")
+
 # The following test classes are for validating the
 # deserialization of objects that use a user-defined
 # field as the primary key.
@@ -243,3 +251,4 @@ class InheritBaseModel(BaseModel):
 class ExplicitInheritBaseModel(BaseModel):
     parent = models.OneToOneField(BaseModel)
     child_data = models.IntegerField()
+    

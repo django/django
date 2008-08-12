@@ -54,6 +54,20 @@ def m2m_create(pk, klass, data):
     instance.data = data
     return [instance]
 
+def im2m_create(pk, klass, data):
+    instance = klass(id=pk)
+    models.Model.save_base(instance, raw=True)
+    return [instance]
+
+def im_create(pk, klass, data):
+    instance = klass(id=pk)
+    setattr(instance, 'right_id', data['right'])
+    setattr(instance, 'left_id', data['left'])
+    if 'extra' in data:
+        setattr(instance, 'extra', data['extra'])
+    models.Model.save_base(instance, raw=True)
+    return [instance]
+
 def o2o_create(pk, klass, data):
     instance = klass()
     instance.data_id = data
@@ -99,6 +113,19 @@ def m2m_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
     testcase.assertEqual(data, [obj.id for obj in instance.data.all()])
 
+def im2m_compare(testcase, pk, klass, data):
+    instance = klass.objects.get(id=pk)
+    #actually nothing else to check, the instance just should exist
+
+def im_compare(testcase, pk, klass, data):
+    instance = klass.objects.get(id=pk)
+    testcase.assertEqual(data['left'], instance.left_id)
+    testcase.assertEqual(data['right'], instance.right_id)
+    if 'extra' in data:
+        testcase.assertEqual(data['extra'], instance.extra)
+    else:
+        testcase.assertEqual("doesn't matter", instance.extra)
+
 def o2o_compare(testcase, pk, klass, data):
     instance = klass.objects.get(data=data)
     testcase.assertEqual(data, instance.data_id)
@@ -119,6 +146,8 @@ data_obj = (data_create, data_compare)
 generic_obj = (generic_create, generic_compare)
 fk_obj = (fk_create, fk_compare)
 m2m_obj = (m2m_create, m2m_compare)
+im2m_obj = (im2m_create, im2m_compare)
+im_obj = (im_create, im_compare)
 o2o_obj = (o2o_create, o2o_compare)
 pk_obj = (pk_create, pk_compare)
 inherited_obj = (inherited_create, inherited_compare)
@@ -231,6 +260,20 @@ The end."""),
     (fk_obj, 452, FKDataToField, None),
 
     (fk_obj, 460, FKDataToO2O, 300),
+    
+    (im2m_obj, 470, M2MIntermediateData, None),
+    
+    #testing post- and prereferences and extra fields
+    (im_obj, 480, Intermediate, {'right': 300, 'left': 470}),
+    (im_obj, 481, Intermediate, {'right': 300, 'left': 490}), 
+    (im_obj, 482, Intermediate, {'right': 500, 'left': 470}), 
+    (im_obj, 483, Intermediate, {'right': 500, 'left': 490}), 
+    (im_obj, 484, Intermediate, {'right': 300, 'left': 470, 'extra': "extra"}), 
+    (im_obj, 485, Intermediate, {'right': 300, 'left': 490, 'extra': "extra"}), 
+    (im_obj, 486, Intermediate, {'right': 500, 'left': 470, 'extra': "extra"}), 
+    (im_obj, 487, Intermediate, {'right': 500, 'left': 490, 'extra': "extra"}), 
+    
+    (im2m_obj, 490, M2MIntermediateData, []),
 
     (data_obj, 500, Anchor, "Anchor 3"),
     (data_obj, 501, Anchor, "Anchor 4"),

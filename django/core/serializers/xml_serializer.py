@@ -100,10 +100,11 @@ class Serializer(base.Serializer):
         serialized as references to the object's PK (i.e. the related *data*
         is not dumped, just the relation).
         """
-        self._start_relational_field(field)
-        for relobj in getattr(obj, field.name).iterator():
-            self.xml.addQuickElement("object", attrs={"pk" : smart_unicode(relobj._get_pk_val())})
-        self.xml.endElement("field")
+        if field.creates_table:
+            self._start_relational_field(field)
+            for relobj in getattr(obj, field.name).iterator():
+                self.xml.addQuickElement("object", attrs={"pk" : smart_unicode(relobj._get_pk_val())})
+            self.xml.endElement("field")
 
     def _start_relational_field(self, field):
         """
