@@ -50,13 +50,19 @@ django_conversions.update({
     FIELD_TYPE.TIME: util.typecast_time,
     FIELD_TYPE.DECIMAL: util.typecast_decimal,
     FIELD_TYPE.NEWDECIMAL: util.typecast_decimal,
-    # By default, mysqldb will return VARCHAR BINARY fields as type str.
+})
+if hasattr(FIELD_TYPE, "VARCHAR"):
+    # By default, MySQLdb will return VARCHAR BINARY fields as type str.
     # This is a bad idea, as BINARY doesn't indicate that it's arbitrary
     # binary data, but that collation uses the binary representation.
     # Replacing the list makes it return unicode. MySQLdb later adds
     # another list entry for non-binary fields.
-    FIELD_TYPE.VARCHAR: [(FLAG.BINARY, lambda s: s.decode('utf-8'))],
-})
+    #
+    # MySQLdb 1.2.1p2 doesn't have the VARCHAR attribute, but it also returns
+    # unicode for VARCHAR BINARY columns automatically, so we don't need it
+    # there.
+    django_conversions[FIELD_TYPE.VARCHAR] = [(FLAG.BINARY,
+            lambda s: s.decode('utf-8'))]
 
 # This should match the numerical portion of the version numbers (we can treat
 # versions like 5.0.24 and 5.0.24a as the same). Based on the list of version
