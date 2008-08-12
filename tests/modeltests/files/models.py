@@ -1,8 +1,8 @@
 """
 42. Storing files according to a custom storage system
 
-FileField and its variations can take a "storage" argument to specify how and
-where files should be stored.
+``FileField`` and its variations can take a ``storage`` argument to specify how
+and where files should be stored.
 """
 
 import tempfile

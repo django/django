@@ -1,7 +1,7 @@
 """
 4. Many-to-one relationships
 
-To define a many-to-one relationship, use ``ForeignKey()`` .
+To define a many-to-one relationship, use ``ForeignKey()``.
 """
 
 from django.db import models

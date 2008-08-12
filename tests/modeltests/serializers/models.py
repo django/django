@@ -2,8 +2,8 @@
 """
 42. Serialization
 
-``django.core.serializers`` provides interfaces to converting Django querysets
-to and from "flat" data (i.e. strings).
+``django.core.serializers`` provides interfaces to converting Django
+``QuerySet`` objects to and from "flat" data (i.e. strings).
 """
 
 from django.db import models

@@ -1,8 +1,9 @@
 """
 33. get_or_create()
 
-get_or_create() does what it says: it tries to look up an object with the given
-parameters. If an object isn't found, it creates one with the given parameters.
+``get_or_create()`` does what it says: it tries to look up an object with the
+given parameters. If an object isn't found, it creates one with the given
+parameters.
 """
 
 from django.db import models

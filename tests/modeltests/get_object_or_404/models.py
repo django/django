@@ -1,13 +1,13 @@
 """
 35. DB-API Shortcuts
 
-get_object_or_404 is a shortcut function to be used in view functions for
-performing a get() lookup and raising a Http404 exception if a DoesNotExist
-exception was raised during the get() call.
+``get_object_or_404()`` is a shortcut function to be used in view functions for
+performing a ``get()`` lookup and raising a ``Http404`` exception if a
+``DoesNotExist`` exception was raised during the ``get()`` call.
 
-get_list_or_404 is a shortcut function to be used in view functions for
-performing a filter() lookup and raising a Http404 exception if a DoesNotExist
-exception was raised during the filter() call.
+``get_list_or_404()`` is a shortcut function to be used in view functions for
+performing a ``filter()`` lookup and raising a ``Http404`` exception if a
+``DoesNotExist`` exception was raised during the ``filter()`` call.
 """
 
 from django.db import models
@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404, get_list_or_404
 
 class Author(models.Model):
     name = models.CharField(max_length=50)
-    
+
     def __unicode__(self):
         return self.name
 
@@ -29,7 +29,7 @@ class Article(models.Model):
     title = models.CharField(max_length=50)
     objects = models.Manager()
     by_a_sir = ArticleManager()
-    
+
     def __unicode__(self):
         return self.title
 

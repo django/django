@@ -2,8 +2,8 @@
 34. Generic relations
 
 Generic relations let an object have a foreign key to any object through a
-content-type/object-id field. A generic foreign key can point to any object,
-be it animal, vegetable, or mineral.
+content-type/object-id field. A ``GenericForeignKey`` field can point to any
+object, be it animal, vegetable, or mineral.
 
 The canonical example is tags (although this example implementation is *far*
 from complete).
@@ -32,7 +32,7 @@ class Comparison(models.Model):
     A model that tests having multiple GenericForeignKeys
     """
     comparative = models.CharField(max_length=50)
-    
+
     content_type1 = models.ForeignKey(ContentType, related_name="comparative1_set")
     object_id1 = models.PositiveIntegerField()
 
@@ -50,7 +50,7 @@ class Animal(models.Model):
     latin_name = models.CharField(max_length=150)
 
     tags = generic.GenericRelation(TaggedItem)
-    comparisons = generic.GenericRelation(Comparison, 
+    comparisons = generic.GenericRelation(Comparison,
                                           object_id_field="object_id1",
                                           content_type_field="content_type1")
 

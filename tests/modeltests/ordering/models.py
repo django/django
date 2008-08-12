@@ -3,7 +3,7 @@
 
 Specify default ordering for a model using the ``ordering`` attribute, which
 should be a list or tuple of field names. This tells Django how to order
-queryset results.
+``QuerySet`` results.
 
 If a field name in ``ordering`` starts with a hyphen, that field will be
 ordered in descending order. Otherwise, it'll be ordered in ascending order.

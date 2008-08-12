@@ -11,7 +11,7 @@ query the database.
 
 If you need to use a table name for a many-to-many relationship that differs
 from the default generated name, use the ``db_table`` parameter on the
-ManyToMany field. This has no effect on the API for querying the database.
+``ManyToMany`` field. This has no effect on the API for querying the database.
 
 """
 
@@ -87,7 +87,7 @@ Traceback (most recent call last):
     ...
 AttributeError: 'Author' object has no attribute 'last'
 
-# Although the Article table uses a custom m2m table, 
+# Although the Article table uses a custom m2m table,
 # nothing about using the m2m relationship has changed...
 
 # Get all the authors for an article

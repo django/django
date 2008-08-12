@@ -2,7 +2,7 @@
 """
 27. Default manipulators
 
-Each model gets an AddManipulator and ChangeManipulator by default.
+Each model gets an ``AddManipulator`` and ``ChangeManipulator`` by default.
 """
 
 from django.db import models

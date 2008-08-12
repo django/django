@@ -2,10 +2,10 @@
 8. get_latest_by
 
 Models can have a ``get_latest_by`` attribute, which should be set to the name
-of a DateField or DateTimeField. If ``get_latest_by`` exists, the model's
-manager will get a ``latest()`` method, which will return the latest object in
-the database according to that field. "Latest" means "having the date farthest
-into the future."
+of a ``DateField`` or ``DateTimeField``. If ``get_latest_by`` exists, the
+model's manager will get a ``latest()`` method, which will return the latest
+object in the database according to that field. "Latest" means "having the date
+farthest into the future."
 """
 
 from django.db import models

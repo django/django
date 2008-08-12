@@ -1,8 +1,8 @@
 """
 20. Multiple many-to-many relationships between the same two tables
 
-In this example, an Article can have many Categories (as "primary") and many
-Categories (as "secondary").
+In this example, an ``Article`` can have many "primary" ``Category`` objects
+and many "secondary" ``Category`` objects.
 
 Set ``related_name`` to designate what the reverse relationship is called.
 """

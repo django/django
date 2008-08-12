@@ -11,10 +11,10 @@ The server Response objects are annotated with the details
 of the contexts and templates that were rendered during the
 process of serving the request.
 
-Client objects are stateful - they will retain cookie (and
-thus session) details for the lifetime of the Client instance.
+``Client`` objects are stateful - they will retain cookie (and
+thus session) details for the lifetime of the ``Client`` instance.
 
-This is not intended as a replacement for Twill,Selenium, or
+This is not intended as a replacement for Twill, Selenium, or
 other browser automation frameworks - it is here to allow
 testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.

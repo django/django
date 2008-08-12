@@ -1,15 +1,19 @@
 """
 28. Many-to-many relationships between the same two tables
 
-In this example, A Person can have many friends, who are also people. Friendship is a
-symmetrical relationship - if I am your friend, you are my friend.
+In this example, a ``Person`` can have many friends, who are also ``Person``
+objects. Friendship is a symmetrical relationship - if I am your friend, you
+are my friend. Here, ``friends`` is an example of a symmetrical
+``ManyToManyField``.
 
-A person can also have many idols - but while I may idolize you, you may not think
-the same of me. 'Idols' is an example of a non-symmetrical m2m field. Only recursive
-m2m fields may be non-symmetrical, and they are symmetrical by default.
+A ``Person`` can also have many idols - but while I may idolize you, you may
+not think the same of me. Here, ``idols`` is an example of a non-symmetrical
+``ManyToManyField``. Only recursive ``ManyToManyField`` fields may be
+non-symmetrical, and they are symmetrical by default.
 
-This test validates that the m2m table will create a mangled name for the m2m table if
-there will be a clash, and tests that symmetry is preserved where appropriate.
+This test validates that the many-to-many table is created using a mangled name
+if there is a name clash, and tests that symmetry is preserved where
+appropriate.
 """
 
 from django.db import models
