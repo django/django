@@ -17,14 +17,14 @@ class BaseDatabaseCreation(object):
     """
     This class encapsulates all backend-specific differences that pertain to
     database *creation*, such as the column types to use for particular Django
-    Fields, the SQL used to create and destroy tables, and the creation and 
+    Fields, the SQL used to create and destroy tables, and the creation and
     destruction of test databases.
     """
     data_types = {}
-    
+
     def __init__(self, connection):
         self.connection = connection
-        
+
     def sql_create_model(self, model, style, known_models=set()):
         """
         Returns the SQL required to create a single model, as a tuple of:
@@ -89,7 +89,7 @@ class BaseDatabaseCreation(object):
                     final_output.append(stmt)
 
         return final_output, pending_references
-        
+
     def sql_for_inline_foreign_key_references(self, field, known_models, style):
         "Return the SQL snippet defining the foreign key reference for a field"
         qn = self.connection.ops.quote_name
@@ -105,9 +105,9 @@ class BaseDatabaseCreation(object):
             # is related, so save it for later.
             output = []
             pending = True
-        
-        return output, pending 
-        
+
+        return output, pending
+
     def sql_for_pending_references(self, model, style, pending_references):
         "Returns any ALTER TABLE statements to add constraints after the fact."
         from django.db.backends.util import truncate_name
@@ -131,7 +131,7 @@ class BaseDatabaseCreation(object):
                     self.connection.ops.deferrable_sql()))
             del pending_references[model]
         return final_output
-    
+
     def sql_for_many_to_many(self, model, style):
         "Return the CREATE TABLE statments for all the many-to-many tables defined on a model"
         output = []
@@ -149,7 +149,7 @@ class BaseDatabaseCreation(object):
             opts = model._meta
             qn = self.connection.ops.quote_name
             tablespace = f.db_tablespace or opts.db_tablespace
-            if tablespace: 
+            if tablespace:
                 sql = self.connection.ops.tablespace_sql(tablespace, inline=True)
                 if sql:
                     tablespace_sql = ' ' + sql
@@ -184,7 +184,7 @@ class BaseDatabaseCreation(object):
             for r_table, r_col, table, col in deferred:
                 r_name = '%s_refs_%s_%x' % (r_col, col,
                         abs(hash((r_table, table))))
-                output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s;' % 
+                output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s;' %
                 (qn(r_table),
                 truncate_name(r_name, self.connection.ops.max_name_length()),
                 qn(r_col), qn(table), qn(col),
@@ -195,7 +195,7 @@ class BaseDatabaseCreation(object):
             if autoinc_sql:
                 for stmt in autoinc_sql:
                     output.append(stmt)
-        return output        
+        return output
 
     def sql_for_inline_many_to_many_references(self, model, field, style):
         "Create the references to other tables required by a many-to-many table"
@@ -222,14 +222,14 @@ class BaseDatabaseCreation(object):
         deferred = []
 
         return table_output, deferred
-        
+
     def sql_indexes_for_model(self, model, style):
         "Returns the CREATE INDEX SQL statements for a single model"
         output = []
         for f in model._meta.local_fields:
             output.extend(self.sql_indexes_for_field(model, f, style))
         return output
-        
+
     def sql_indexes_for_field(self, model, f, style):
         "Return the CREATE INDEX SQL statements for a single model field"
         if f.db_index and not f.unique:
@@ -260,16 +260,19 @@ class BaseDatabaseCreation(object):
         output = ['%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
                               style.SQL_TABLE(qn(model._meta.db_table)))]
         if model in references_to_delete:
-            output.extend(self.sql_remove_table_constraints(model, references_to_delete))
-            
+            output.extend(self.sql_remove_table_constraints(model, references_to_delete, style))
+
         if model._meta.has_auto_field:
             ds = self.connection.ops.drop_sequence_sql(model._meta.db_table)
             if ds:
                 output.append(ds)
         return output
 
-    def sql_remove_table_constraints(self, model, references_to_delete):
+    def sql_remove_table_constraints(self, model, references_to_delete, style):
+        from django.db.backends.util import truncate_name
+
         output = []
+        qn = self.connection.ops.quote_name
         for rel_class, f in references_to_delete[model]:
             table = rel_class._meta.db_table
             col = f.column
@@ -283,7 +286,7 @@ class BaseDatabaseCreation(object):
                 style.SQL_FIELD(truncate_name(r_name, self.connection.ops.max_name_length()))))
         del references_to_delete[model]
         return output
-        
+
     def sql_destroy_many_to_many(self, model, f, style):
         "Returns the DROP TABLE statements for a single m2m field"
         qn = self.connection.ops.quote_name
@@ -295,7 +298,7 @@ class BaseDatabaseCreation(object):
             if ds:
                 output.append(ds)
         return output
-        
+
     def create_test_db(self, verbosity=1, autoclobber=False):
         """
         Creates a test database, prompting the user for confirmation if the
@@ -303,7 +306,7 @@ class BaseDatabaseCreation(object):
         """
         if verbosity >= 1:
             print "Creating test database..."
-            
+
         test_database_name = self._create_test_db(verbosity, autoclobber)
 
         self.connection.close()
@@ -324,7 +327,7 @@ class BaseDatabaseCreation(object):
     def _create_test_db(self, verbosity, autoclobber):
         "Internal implementation - creates the test db tables."
         suffix = self.sql_table_creation_suffix()
-        
+
         if settings.TEST_DATABASE_NAME:
             test_database_name = settings.TEST_DATABASE_NAME
         else:
@@ -357,9 +360,9 @@ class BaseDatabaseCreation(object):
             else:
                 print "Tests cancelled."
                 sys.exit(1)
-                
+
         return test_database_name
-        
+
     def destroy_test_db(self, old_database_name, verbosity=1):
         """
         Destroy a test database, prompting the user for confirmation if the
@@ -370,9 +373,9 @@ class BaseDatabaseCreation(object):
         self.connection.close()
         test_database_name = settings.DATABASE_NAME
         settings.DATABASE_NAME = old_database_name
-        
+
         self._destroy_test_db(test_database_name, verbosity)
-        
+
     def _destroy_test_db(self, test_database_name, verbosity):
         "Internal implementation - remove the test db tables."
         # Remove the test database to clean up after
@@ -398,4 +401,4 @@ class BaseDatabaseCreation(object):
     def sql_table_creation_suffix(self):
         "SQL to append to the end of the test table creation statements"
         return ''
-        
+
