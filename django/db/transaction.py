@@ -105,6 +105,12 @@ def set_clean():
         dirty[thread_ident] = False
     else:
         raise TransactionManagementError("This code isn't under transaction management")
+    clean_savepoints()
+
+def clean_savepoints():
+    thread_ident = thread.get_ident()
+    if thread_ident in savepoint_state:
+        del savepoint_state[thread_ident]
 
 def is_managed():
     """
@@ -139,6 +145,7 @@ def commit_unless_managed():
     """
     if not is_managed():
         connection._commit()
+        clean_savepoints()
     else:
         set_dirty()
 
@@ -186,14 +193,16 @@ def savepoint_rollback(sid):
     Rolls back the most recent savepoint (if one exists). Does nothing if
     savepoints are not supported.
     """
-    connection._savepoint_rollback(sid)
+    if thread.get_ident() in savepoint_state:
+        connection._savepoint_rollback(sid)
 
 def savepoint_commit(sid):
     """
     Commits the most recent savepoint (if one exists). Does nothing if
     savepoints are not supported.
     """
-    connection._savepoint_commit(sid)
+    if thread.get_ident() in savepoint_state:
+        connection._savepoint_commit(sid)
 
 ##############
 # DECORATORS #

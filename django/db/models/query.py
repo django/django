@@ -326,9 +326,12 @@ class QuerySet(object):
                 params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
                 params.update(defaults)
                 obj = self.model(**params)
+                sid = transaction.savepoint()
                 obj.save()
+                transaction.savepoint_commit(sid)
                 return obj, True
             except IntegrityError, e:
+                transaction.savepoint_rollback(sid)
                 return self.get(**kwargs), False
 
     def latest(self, field_name=None):
