@@ -8,6 +8,7 @@ from django.db.backends import *
 from django.db.backends.postgresql.operations import DatabaseOperations as PostgresqlDatabaseOperations
 from django.db.backends.postgresql.client import DatabaseClient
 from django.db.backends.postgresql.creation import DatabaseCreation
+from django.db.backends.postgresql.version import get_version
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
 
 from django.utils.safestring import SafeUnicode
@@ -86,4 +87,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor.tzinfo_factory = None
         if set_tz:
             cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
+            if not hasattr(self, '_version'):
+                version = get_version(cursor)
+                self.__class__._version = version
+                if version < (8, 0):
+                    # No savepoint support for earlier version of PostgreSQL.
+                    self.features.uses_savepoints = False
         return cursor
