@@ -1327,6 +1327,19 @@ changed in the development version. Previously, it was (intentionally)
 converted to ``WHERE id = NULL`` at the SQL level, which would never match
 anything. It has now been changed to behave the same as ``id__isnull=True``.
 
+.. admonition:: MySQL comparisons
+
+    In MySQL, whether or not ``exact`` comparisons are case-sensitive depends
+    upon the collation setting of the table involved. The default is usually
+    ``latin1_swedish_ci`` or ``utf8_swedish_ci``, which results in
+    case-insensitive comparisons. Change the collation to
+    ``latin1_swedish_cs`` or ``utf8_bin`` for case sensitive comparisons.
+
+    For more details, refer to the MySQL manual section about `character sets
+    and collations`_.
+
+.. _character sets and collations: http://dev.mysql.com/doc/refman/5.0/en/charset.html
+
 iexact
 ~~~~~~
 

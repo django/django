@@ -97,12 +97,6 @@ __test__ = {'API_TESTS': ur"""
 >>> Article.objects.get(text__exact='The quick brown fox jumps over the lazy dog.')
 <Article: Article Test>
 
-# Regression tests for #2170: test case sensitiveness
->>> Article.objects.filter(text__exact='tHe qUick bRown fOx jUmps over tHe lazy dog.')
-[]
->>> Article.objects.filter(text__iexact='tHe qUick bRown fOx jUmps over tHe lazy dog.')
-[<Article: Article Test>]
-
 >>> Article.objects.get(text__contains='quick brown fox')
 <Article: Article Test>
 

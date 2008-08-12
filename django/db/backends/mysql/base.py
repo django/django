@@ -153,9 +153,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         return [first % value, second % value]
 
 class DatabaseWrapper(BaseDatabaseWrapper):
-    
+
     operators = {
-        'exact': '= BINARY %s',
+        'exact': '= %s',
         'iexact': 'LIKE %s',
         'contains': 'LIKE BINARY %s',
         'icontains': 'LIKE %s',
