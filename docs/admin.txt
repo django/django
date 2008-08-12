@@ -525,7 +525,7 @@ with an operator:
 ----------------------
 
 ``save_model(self, request, obj, form, change)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``save_model`` method is given the ``HttpRequest``, a model instance,
 a ``ModelForm`` instance and a boolean value based on whether it is adding or
