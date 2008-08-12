@@ -20,9 +20,19 @@ class SyndicationFeedTest(TestCase):
     def test_rss_feed(self):
         response = self.client.get('/syndication/feeds/rss/')
         doc = minidom.parseString(response.content)
-        self.assertEqual(len(doc.getElementsByTagName('channel')), 1)
-
-        chan = doc.getElementsByTagName('channel')[0]
+        
+        # Making sure there's only 1 `rss` element and that the correct
+        # RSS version was specified.
+        feed_elem = doc.getElementsByTagName('rss')
+        self.assertEqual(len(feed_elem), 1)
+        feed = feed_elem[0]
+        self.assertEqual(feed.getAttribute('version'), '2.0')
+        
+        # Making sure there's only one `channel` element w/in the
+        # `rss` element.
+        chan_elem = feed.getElementsByTagName('channel')
+        self.assertEqual(len(chan_elem), 1)
+        chan = chan_elem[0]
         self.assertChildNodes(chan, ['title', 'link', 'description', 'language', 'lastBuildDate', 'item'])
     
         items = chan.getElementsByTagName('item')
@@ -36,6 +46,7 @@ class SyndicationFeedTest(TestCase):
         
         feed = doc.firstChild
         self.assertEqual(feed.nodeName, 'feed')
+        self.assertEqual(feed.getAttribute('xmlns'), 'http://www.w3.org/2005/Atom') 
         self.assertChildNodes(feed, ['title', 'link', 'id', 'updated', 'entry'])        
         
         entries = feed.getElementsByTagName('entry')

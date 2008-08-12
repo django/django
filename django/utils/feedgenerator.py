@@ -178,12 +178,15 @@ class RssFeed(SyndicationFeed):
     def write(self, outfile, encoding):
         handler = SimplerXMLGenerator(outfile, encoding)
         handler.startDocument()
-        handler.startElement(u"rss", {u"version": self._version})
+        handler.startElement(u"rss", self.rss_attributes())
         handler.startElement(u"channel", self.root_attributes())
         self.add_root_elements(handler)
         self.write_items(handler)
         self.endChannelElement(handler)
         handler.endElement(u"rss")
+
+    def rss_attributes(self):
+        return {u"version": self._version}
 
     def write_items(self, handler):
         for item in self.items:
@@ -266,7 +269,7 @@ class Atom1Feed(SyndicationFeed):
         self.write_items(handler)
         handler.endElement(u"feed")
 
-    def root_element_attributes(self):
+    def root_attributes(self):
         if self.feed['language'] is not None:
             return {u"xmlns": self.ns, u"xml:lang": self.feed['language']}
         else:
