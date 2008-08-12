@@ -4173,7 +4173,7 @@ msgstr ""
 #: forms/models.py:590
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "Sceglie un'opzione valida. '%s non compare tra quelle disponibili."
+msgstr "Scegli un'opzione valida. %s non compare tra quelle disponibili."
 
 #: oldforms/__init__.py:405
 #, python-format
