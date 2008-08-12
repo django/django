@@ -35,6 +35,8 @@ Reference
    templates_python
    forms
    modelforms
+   files
+   upload_handling
    testing
    sessions
    cache
@@ -58,6 +60,7 @@ Reference
 .. toctree::
    :maxdepth: 1
    
+   admin
    add_ons
    contenttypes
    csrf
@@ -104,6 +107,7 @@ Et cetera
    contributing
    admin_css
    api_stability
+   distributions
 
 Release notes
 -------------
@@ -113,6 +117,8 @@ Release notes
 
    release_notes_0.96
    release_notes_0.95
+   release_notes_1.0_alpha
+   release_notes_1.0_alpha_2
 
 Also see the list of `backwards-incompatible changes`__ for changes made between
 releases.
