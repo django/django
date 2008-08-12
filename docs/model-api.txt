@@ -295,11 +295,10 @@ specified storage system takes a few steps:
        subdirectory of ``MEDIA_ROOT`` it should upload files.
 
     3. All that will be stored in your database is a path to the file
-       (relative to ``MEDIA_ROOT``). You'll most likely want to use the
-       convenience ``get_<fieldname>_url`` function provided by Django. For
-       example, if your ``ImageField`` is called ``mug_shot``, you can get
-       the absolute URL to your image in a template with ``{{
-       object.get_mug_shot_url }}``.
+       (relative to ``MEDIA_ROOT``). You'll most likely want to use
+       ``object.<field>.url`` to get the actual URL. For example, if your
+       ``ImageField`` is called ``mug_shot``, you can get the absolute URL to
+       your image in a template with ``{{ object.mug_shot.url }}``.
 
 For example, say your ``MEDIA_ROOT`` is set to ``'/home/media'``, and
 ``upload_to`` is set to ``'photos/%Y/%m/%d'``. The ``'%Y/%m/%d'`` part of
