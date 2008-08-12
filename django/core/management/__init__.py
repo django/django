@@ -104,7 +104,12 @@ def get_commands():
         # Find the project directory
         try:
             from django.conf import settings
-            project_directory = setup_environ(__import__(settings.SETTINGS_MODULE))
+            project_directory = setup_environ(
+                __import__(
+                    settings.SETTINGS_MODULE, {}, {}, 
+                    (settings.SETTINGS_MODULE.split(".")[-1],)
+                )
+            )
         except (AttributeError, EnvironmentError, ImportError):
             project_directory = None
 
@@ -310,6 +315,7 @@ def setup_environ(settings_mod):
 
     # Set DJANGO_SETTINGS_MODULE appropriately.
     os.environ['DJANGO_SETTINGS_MODULE'] = '%s.%s' % (project_name, settings_name)
+    return project_directory
 
 def execute_from_command_line(argv=None):
     """
