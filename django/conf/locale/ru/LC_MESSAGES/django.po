@@ -3023,3 +3023,7 @@ msgstr "%.1f Гб"
 
 #~ msgid "Use '[algo]$[salt]$[hexdigest]'"
 #~ msgstr "Используйте '[algo]$[salt]$[hexdigest]'"
+
+#: contrib/auth/forms.py:18
+msgid "Password confirmation"
+msgstr "Подтверждение пароля"
