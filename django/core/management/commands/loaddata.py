@@ -28,7 +28,15 @@ class Command(BaseCommand):
 
         verbosity = int(options.get('verbosity', 1))
         show_traceback = options.get('traceback', False)
-
+        
+        # commit is a stealth option - it isn't really useful as 
+        # a command line option, but it can be useful when invoking
+        # loaddata from within another script. 
+        # If commit=True, loaddata will use its own transaction;
+        # if commit=False, the data load SQL will become part of
+        # the transaction in place when loaddata was invoked.
+        commit = options.get('commit', True)
+        
         # Keep a count of the installed objects and fixtures
         fixture_count = 0
         object_count = 0
@@ -44,9 +52,10 @@ class Command(BaseCommand):
 
         # Start transaction management. All fixtures are installed in a
         # single transaction to ensure that all references are resolved.
-        transaction.commit_unless_managed()
-        transaction.enter_transaction_management()
-        transaction.managed(True)
+        if commit:
+            transaction.commit_unless_managed()
+            transaction.enter_transaction_management()
+            transaction.managed(True)
 
         app_fixtures = [os.path.join(os.path.dirname(app.__file__), 'fixtures') for app in get_apps()]
         for fixture_label in fixture_labels:
@@ -133,7 +142,7 @@ class Command(BaseCommand):
                                 (format, fixture_name, humanize(fixture_dir))
 
 
-        # If any of the fixtures we loaded contain 0 objects, assume that an 
+        # If any of the fixtures we loaded contain 0 objects, assume that an
         # error was encountered during fixture loading.
         if 0 in objects_per_fixture:
             sys.stderr.write(
@@ -143,7 +152,7 @@ class Command(BaseCommand):
             transaction.leave_transaction_management()
             return
             
-        # If we found even one object in a fixture, we need to reset the 
+        # If we found even one object in a fixture, we need to reset the
         # database sequences.
         if object_count > 0:
             sequence_sql = connection.ops.sequence_reset_sql(self.style, models)
@@ -152,9 +161,10 @@ class Command(BaseCommand):
                     print "Resetting sequences"
                 for line in sequence_sql:
                     cursor.execute(line)
-            
-        transaction.commit()
-        transaction.leave_transaction_management()
+        
+        if commit:
+            transaction.commit()
+            transaction.leave_transaction_management()
 
         if object_count == 0:
             if verbosity > 1:
@@ -167,4 +177,5 @@ class Command(BaseCommand):
         # edge case in MySQL: if the same connection is used to
         # create tables, load data, and query, the query can return
         # incorrect results. See Django #7572, MySQL #37735.
-        connection.close()
+        if commit:
+            connection.close()
