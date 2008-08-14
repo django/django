@@ -102,18 +102,20 @@ AttributeError: Cannot use create() on a ManyToManyField which specifies an inte
 
 # Regression test for #8134 -- 
 # m2m-through models shouldn't be serialized as m2m fields on the model.
+
+# First, clean up a lot of objects we don't need. 
+# The serialization test only requires three objects to work - 
+# one for each end of the m2m, plus the through model.
+
+>>> User.objects.all().delete()
+>>> UserMembership.objects.all().delete()
+>>> frank.delete()
+>>> rock.delete()
+>>> jim.delete()
+
 # Dump the current contents of the database as a JSON fixture
 >>> management.call_command('dumpdata', 'm2m_through_regress', format='json', indent=2)
 [
-  {
-    "pk": 1, 
-    "model": "m2m_through_regress.membership", 
-    "fields": {
-      "person": 1, 
-      "price": 100, 
-      "group": 1
-    }
-  }, 
   {
     "pk": 2, 
     "model": "m2m_through_regress.membership", 
@@ -124,60 +126,10 @@ AttributeError: Cannot use create() on a ManyToManyField which specifies an inte
     }
   }, 
   {
-    "pk": 3, 
-    "model": "m2m_through_regress.membership", 
-    "fields": {
-      "person": 2, 
-      "price": 100, 
-      "group": 1
-    }
-  }, 
-  {
-    "pk": 1, 
-    "model": "m2m_through_regress.usermembership", 
-    "fields": {
-      "price": 100, 
-      "group": 1, 
-      "user": 1
-    }
-  }, 
-  {
-    "pk": 2, 
-    "model": "m2m_through_regress.usermembership", 
-    "fields": {
-      "price": 100, 
-      "group": 2, 
-      "user": 1
-    }
-  }, 
-  {
-    "pk": 3, 
-    "model": "m2m_through_regress.usermembership", 
-    "fields": {
-      "price": 100, 
-      "group": 1, 
-      "user": 2
-    }
-  }, 
-  {
     "pk": 1, 
     "model": "m2m_through_regress.person", 
     "fields": {
       "name": "Bob"
-    }
-  }, 
-  {
-    "pk": 2, 
-    "model": "m2m_through_regress.person", 
-    "fields": {
-      "name": "Jim"
-    }
-  }, 
-  {
-    "pk": 1, 
-    "model": "m2m_through_regress.group", 
-    "fields": {
-      "name": "Rock"
     }
   }, 
   {
@@ -193,44 +145,13 @@ AttributeError: Cannot use create() on a ManyToManyField which specifies an inte
 >>> management.call_command('dumpdata', 'm2m_through_regress', format='xml', indent=2)
 <?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0">
-  <object pk="1" model="m2m_through_regress.membership">
-    <field to="m2m_through_regress.person" name="person" rel="ManyToOneRel">1</field>
-    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">1</field>
-    <field type="IntegerField" name="price">100</field>
-  </object>
   <object pk="2" model="m2m_through_regress.membership">
     <field to="m2m_through_regress.person" name="person" rel="ManyToOneRel">1</field>
     <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">2</field>
     <field type="IntegerField" name="price">100</field>
   </object>
-  <object pk="3" model="m2m_through_regress.membership">
-    <field to="m2m_through_regress.person" name="person" rel="ManyToOneRel">2</field>
-    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">1</field>
-    <field type="IntegerField" name="price">100</field>
-  </object>
-  <object pk="1" model="m2m_through_regress.usermembership">
-    <field to="auth.user" name="user" rel="ManyToOneRel">1</field>
-    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">1</field>
-    <field type="IntegerField" name="price">100</field>
-  </object>
-  <object pk="2" model="m2m_through_regress.usermembership">
-    <field to="auth.user" name="user" rel="ManyToOneRel">1</field>
-    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">2</field>
-    <field type="IntegerField" name="price">100</field>
-  </object>
-  <object pk="3" model="m2m_through_regress.usermembership">
-    <field to="auth.user" name="user" rel="ManyToOneRel">2</field>
-    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">1</field>
-    <field type="IntegerField" name="price">100</field>
-  </object>
   <object pk="1" model="m2m_through_regress.person">
     <field type="CharField" name="name">Bob</field>
-  </object>
-  <object pk="2" model="m2m_through_regress.person">
-    <field type="CharField" name="name">Jim</field>
-  </object>
-  <object pk="1" model="m2m_through_regress.group">
-    <field type="CharField" name="name">Rock</field>
   </object>
   <object pk="2" model="m2m_through_regress.group">
     <field type="CharField" name="name">Roll</field>
