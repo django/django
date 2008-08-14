@@ -84,14 +84,30 @@ def result_headers(cl):
             elif field_name == '__str__':
                 header = smart_str(lookup_opts.verbose_name)
             else:
-                attr = getattr(cl.model, field_name) # Let AttributeErrors propagate.
+                if callable(field_name):
+                    attr = field_name # field_name can be a callable
+                else:
+                    try:
+                        attr = getattr(cl.model_admin, field_name)
+                    except AttributeError:
+                        try:
+                            attr = getattr(cl.model, field_name)
+                        except AttributeError:
+                            raise AttributeError, \
+                                "'%s' model or '%s' objects have no attribute '%s'" % \
+                                    (lookup_opts.object_name, cl.model_admin.__class__, field_name)
+                
                 try:
                     header = attr.short_description
                 except AttributeError:
-                    header = field_name.replace('_', ' ')
+                    if callable(field_name):
+                        header = field_name.__name__
+                    else:
+                        header = field_name
+                    header = header.replace('_', ' ')
 
             # It is a non-field, but perhaps one that is sortable
-            admin_order_field = getattr(getattr(cl.model, field_name), "admin_order_field", None)
+            admin_order_field = getattr(attr, "admin_order_field", None)
             if not admin_order_field:
                 yield {"text": header}
                 continue
@@ -128,19 +144,28 @@ def items_for_result(cl, result):
         try:
             f = cl.lookup_opts.get_field(field_name)
         except models.FieldDoesNotExist:
-            # For non-field list_display values, the value is either a method
-            # or a property.
+            # For non-field list_display values, the value is either a method,
+            # property or returned via a callable.
             try:
-                attr = getattr(result, field_name)
+                if callable(field_name):
+                    attr = field_name
+                    value = attr(result)
+                elif hasattr(cl.model_admin, field_name):
+                    attr = getattr(cl.model_admin, field_name)
+                    value = attr(result)
+                else:
+                    attr = getattr(result, field_name)
+                    if callable(attr):
+                        value = attr()
+                    else:
+                        value = attr
                 allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
-                if callable(attr):
-                    attr = attr()
                 if boolean:
                     allow_tags = True
-                    result_repr = _boolean_icon(attr)
+                    result_repr = _boolean_icon(value)
                 else:
-                    result_repr = smart_unicode(attr)
+                    result_repr = smart_unicode(value)
             except (AttributeError, ObjectDoesNotExist):
                 result_repr = EMPTY_CHANGELIST_VALUE
             else:

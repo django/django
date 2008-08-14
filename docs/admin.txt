@@ -201,6 +201,48 @@ Example::
 If you don't set ``list_display``, the admin site will display a single column
 that displays the ``__unicode__()`` representation of each object.
 
+You have four possible values that can be used in ``list_display``:
+
+    * A field of the model. For example::
+    
+          class PersonAdmin(admin.ModelAdmin):
+              list_display = ('first_name', 'last_name')
+    
+    * A callable that accepts one parameter for the model instance. For
+      example::
+    
+          def upper_case_name(obj):
+              return "%s %s" % (obj.first_name, obj.last_name).upper()
+          upper_case_name.short_description = 'Name'
+        
+          class PersonAdmin(admin.ModelAdmin):
+              list_display = (upper_case_name,)
+    
+    * A string representating an attribute on the ``ModelAdmin``. This behaves
+      the same as the callable. For example::
+      
+          class PersonAdmin(admin.ModelAdmin):
+              list_display = ('upper_case_name',)
+              
+              def upper_case_name(self, obj):
+                return "%s %s" % (obj.first_name, obj.last_name).upper()
+              upper_case_name.short_description = 'Name'
+    
+    * A string representating an attribute on the model. This behaves almost
+      the same as the callable, but ``self`` in this context is the model
+      instance. Here's a full model example::
+
+          class Person(models.Model):
+              name = models.CharField(max_length=50)
+              birthday = models.DateField()
+
+              def decade_born_in(self):
+                  return self.birthday.strftime('%Y')[:3] + "0's"
+              decade_born_in.short_description = 'Birth decade'
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display = ('name', 'decade_born_in')
+
 A few special cases to note about ``list_display``:
 
     * If the field is a ``ForeignKey``, Django will display the
@@ -215,27 +257,11 @@ A few special cases to note about ``list_display``:
     * If the field is a ``BooleanField`` or ``NullBooleanField``, Django will
       display a pretty "on" or "off" icon instead of ``True`` or ``False``.
 
-    * If the string given is a method of the model, Django will call it and
-      display the output. This method should have a ``short_description``
-      function attribute, for use as the header for the field.
-
-      Here's a full example model::
-
-          class Person(models.Model):
-              name = models.CharField(max_length=50)
-              birthday = models.DateField()
-
-              def decade_born_in(self):
-                  return self.birthday.strftime('%Y')[:3] + "0's"
-              decade_born_in.short_description = 'Birth decade'
-
-          class PersonAdmin(admin.ModelAdmin):
-              list_display = ('name', 'decade_born_in')
-
-    * If the string given is a method of the model, Django will HTML-escape the
-      output by default. If you'd rather not escape the output of the method,
-      give the method an ``allow_tags`` attribute whose value is ``True``.
-
+    * If the string given is a method of the model, ``ModelAdmin`` or a
+      callable, Django will HTML-escape the output by default. If you'd rather
+      not escape the output of the method, give the method an ``allow_tags``
+      attribute whose value is ``True``.
+      
       Here's a full example model::
 
           class Person(models.Model):
@@ -250,9 +276,10 @@ A few special cases to note about ``list_display``:
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name', 'colored_name')
 
-    * If the string given is a method of the model that returns True or False
-      Django will display a pretty "on" or "off" icon if you give the method a
-      ``boolean`` attribute whose value is ``True``.
+    * If the string given is a method of the model, ``ModelAdmin`` or a
+      callable that returns True or False Django will display a pretty "on" or
+      "off" icon if you give the method a ``boolean`` attribute whose value is
+      ``True``.
 
       Here's a full example model::
 

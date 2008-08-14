@@ -35,11 +35,20 @@ def validate(cls, model):
     if hasattr(cls, 'list_display'):
         _check_istuplew('list_display', cls.list_display)
         for idx, field in enumerate(cls.list_display):
-            f = _check_attr_existsw("list_display[%d]" % idx, field)
-            if isinstance(f, models.ManyToManyField):
-                raise ImproperlyConfigured("`%s.list_display[%d]`, `%s` is a "
-                        "ManyToManyField which is not supported."
-                        % (cls.__name__, idx, field))
+            if not callable(field):
+                if not hasattr(cls, field):
+                    if not hasattr(model, field):
+                        try:
+                            return opts.get_field(field)
+                        except models.FieldDoesNotExist:
+                            raise ImproperlyConfigured("%s.list_display[%d], %r is "
+                                "not a callable or an attribute of %r or found in the model %r."
+                                % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))
+                        f = _check_attr_existsw("list_display[%d]" % idx, field)
+                        if isinstance(f, models.ManyToManyField):
+                            raise ImproperlyConfigured("`%s.list_display[%d]`, `%s` is a "
+                                "ManyToManyField which is not supported."
+                                % (cls.__name__, idx, field))
 
     # list_display_links
     if hasattr(cls, 'list_display_links'):
