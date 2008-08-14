@@ -70,8 +70,9 @@ pagination = register.inclusion_tag('admin/pagination.html')(pagination)
 
 def result_headers(cl):
     lookup_opts = cl.lookup_opts
-
+    
     for i, field_name in enumerate(cl.list_display):
+        attr = None
         try:
             f = lookup_opts.get_field(field_name)
             admin_order_field = None
@@ -150,7 +151,8 @@ def items_for_result(cl, result):
                 if callable(field_name):
                     attr = field_name
                     value = attr(result)
-                elif hasattr(cl.model_admin, field_name):
+                elif hasattr(cl.model_admin, field_name) and \
+                   not field_name == '__str__' and not field_name == '__unicode__':
                     attr = getattr(cl.model_admin, field_name)
                     value = attr(result)
                 else:
