@@ -13,6 +13,19 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils.hashcompat import md5_constructor
 
+# Use the system (hardware-based) random number generator if it exists.
+if hasattr(random, 'SystemRandom'):
+    randint = random.SystemRandom().randint
+else:
+    randint = random.randint
+MAX_SESSION_KEY = 18446744073709551616L     # 2 << 63
+
+class CreateError(Exception):
+    """
+    Used internally as a consistent exception type to catch from save (see the
+    docstring for SessionBase.save() for details).
+    """
+    pass
 
 class SessionBase(object):
     """
@@ -117,8 +130,9 @@ class SessionBase(object):
             # No getpid() in Jython, for example
             pid = 1
         while 1:
-            session_key = md5_constructor("%s%s%s%s" % (random.randint(0, sys.maxint - 1),
-                                          pid, time.time(), settings.SECRET_KEY)).hexdigest()
+            session_key = md5_constructor("%s%s%s%s"
+                    % (random.randrange(0, MAX_SESSION_KEY), pid, time.time(),
+                       settings.SECRET_KEY)).hexdigest()
             if not self.exists(session_key):
                 break
         return session_key
@@ -213,9 +227,19 @@ class SessionBase(object):
         """
         raise NotImplementedError
 
-    def save(self):
+    def create(self):
         """
-        Saves the session data.
+        Creates a new session instance. Guaranteed to create a new object with
+        a unique key and will have saved the result once (with empty data)
+        before the method returns.
+        """
+        raise NotImplementedError
+
+    def save(self, must_create=False):
+        """
+        Saves the session data. If 'must_create' is True, a new session object
+        is created (otherwise a CreateError exception is raised). Otherwise,
+        save() can update an existing object with the same key.
         """
         raise NotImplementedError
 

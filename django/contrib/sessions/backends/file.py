@@ -2,7 +2,7 @@ import os
 import tempfile
 
 from django.conf import settings
-from django.contrib.sessions.backends.base import SessionBase
+from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 
 
@@ -48,26 +48,40 @@ class SessionStore(SessionBase):
             try:
                 try:
                     session_data = self.decode(session_file.read())
-                except(EOFError, SuspiciousOperation):
-                    self._session_key = self._get_new_session_key()
-                    self._session_cache = {}
-                    self.save()
-                    # Ensure the user is notified via a new cookie.
-                    self.modified = True
+                except (EOFError, SuspiciousOperation):
+                    self.create()
             finally:
                 session_file.close()
-        except(IOError):
+        except IOError:
             pass
         return session_data
 
-    def save(self):
-        try:
-            f = open(self._key_to_file(self.session_key), "wb")
+    def create(self):
+        while True:
+            self._session_key = self._get_new_session_key()
             try:
-                f.write(self.encode(self._session))
+                self.save(must_create=True)
+            except CreateError:
+                continue
+            self.modified = True
+            self._session_cache = {}
+            return
+
+    def save(self, must_create=False):
+        flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, 'O_BINARY', 0)
+        if must_create:
+            flags |= os.O_EXCL
+        try:
+            fd = os.open(self._key_to_file(self.session_key), flags)
+            try:
+                os.write(fd, self.encode(self._session))
             finally:
-                f.close()
-        except(IOError, EOFError):
+                os.close(fd)
+        except OSError, e:
+            if must_create and e.errno == errno.EEXIST:
+                raise CreateError
+            raise
+        except (IOError, EOFError):
             pass
 
     def exists(self, session_key):

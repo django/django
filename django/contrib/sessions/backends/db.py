@@ -1,15 +1,13 @@
 import datetime
 from django.contrib.sessions.models import Session
-from django.contrib.sessions.backends.base import SessionBase
+from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation
+from django.db import IntegrityError, transaction
 
 class SessionStore(SessionBase):
     """
     Implements database session store.
     """
-    def __init__(self, session_key=None):
-        super(SessionStore, self).__init__(session_key)
-
     def load(self):
         try:
             s = Session.objects.get(
@@ -18,15 +16,7 @@ class SessionStore(SessionBase):
             )
             return self.decode(s.session_data)
         except (Session.DoesNotExist, SuspiciousOperation):
-
-            # Create a new session_key for extra security.
-            self.session_key = self._get_new_session_key()
-            self._session_cache = {}
-
-            # Save immediately to minimize collision
-            self.save()
-            # Ensure the user is notified via a new cookie.
-            self.modified = True
+            self.create()
             return {}
 
     def exists(self, session_key):
@@ -36,12 +26,40 @@ class SessionStore(SessionBase):
             return False
         return True
 
-    def save(self):
-        Session.objects.create(
+    def create(self):
+        while True:
+            self.session_key = self._get_new_session_key()
+            try:
+                # Save immediately to ensure we have a unique entry in the
+                # database.
+                self.save(must_create=True)
+            except CreateError:
+                # Key wasn't unique. Try again.
+                continue
+            self.modified = True
+            self._session_cache = {}
+            return
+
+    def save(self, must_create=False):
+        """
+        Saves the current session data to the database. If 'must_create' is
+        True, a database error will be raised if the saving operation doesn't
+        create a *new* entry (as opposed to possibly updating an existing
+        entry).
+        """
+        obj = Session(
             session_key = self.session_key,
             session_data = self.encode(self._session),
             expire_date = self.get_expiry_date()
         )
+        sid = transaction.savepoint()
+        try:
+            obj.save(force_insert=must_create)
+        except IntegrityError:
+            if must_create:
+                transaction.savepoint_rollback(sid)
+                raise CreateError
+            raise
 
     def delete(self, session_key):
         try:

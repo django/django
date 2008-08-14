@@ -1,4 +1,4 @@
-from django.contrib.sessions.backends.base import SessionBase
+from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.cache import cache
 
 class SessionStore(SessionBase):
@@ -11,10 +11,28 @@ class SessionStore(SessionBase):
 
     def load(self):
         session_data = self._cache.get(self.session_key)
-        return session_data or {}
+        if session_data is not None:
+            return session_data
+        self.create()
 
-    def save(self):
-        self._cache.set(self.session_key, self._session, self.get_expiry_age())
+    def create(self):
+        while True:
+            self.session_key = self._get_new_session_key()
+            try:
+                self.save(must_create=True)
+            except CreateError:
+                continue
+            self.modified = True
+            return
+
+    def save(self, must_create=False):
+        if must_create:
+            func = self._cache.add
+        else:
+            func = self._cache.set
+        result = func(self.session_key, self._session, self.get_expiry_age())
+        if must_create and not result:
+            raise CreateError
 
     def exists(self, session_key):
         if self._cache.get(session_key):
@@ -23,3 +41,4 @@ class SessionStore(SessionBase):
 
     def delete(self, session_key):
         self._cache.delete(session_key)
+
