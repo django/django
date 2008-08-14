@@ -71,10 +71,13 @@ class SessionStore(SessionBase):
         flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, 'O_BINARY', 0)
         if must_create:
             flags |= os.O_EXCL
+        # Because this may trigger a load from storage, we must do it before
+        # truncating the file to save.
+        session_data = self._session
         try:
             fd = os.open(self._key_to_file(self.session_key), flags)
             try:
-                os.write(fd, self.encode(self._session))
+                os.write(fd, self.encode(session_data))
             finally:
                 os.close(fd)
         except OSError, e:
