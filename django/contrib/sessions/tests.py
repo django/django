@@ -147,7 +147,15 @@ True
 >>> list(i)
 [('x', 1)]
 
- 
+# test .clear()
+>>> s.modified = s.accessed = False
+>>> s.items()
+[('x', 1)]
+>>> s.clear()
+>>> s.items()
+[]
+>>> s.accessed, s.modified
+(True, True)
 
 #########################
 # Custom session expiry #

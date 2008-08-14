@@ -120,6 +120,10 @@ class SessionBase(object):
     def iteritems(self):
         return self._session.iteritems()
 
+    def clear(self):
+        self._session.clear()
+        self.modified = True
+
     def _get_new_session_key(self):
         "Returns session key that isn't being used."
         # The random module is seeded when this Apache child is created.
