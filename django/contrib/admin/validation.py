@@ -39,7 +39,7 @@ def validate(cls, model):
                 if not hasattr(cls, field):
                     if not hasattr(model, field):
                         try:
-                            return opts.get_field(field)
+                            opts.get_field(field)
                         except models.FieldDoesNotExist:
                             raise ImproperlyConfigured("%s.list_display[%d], %r is "
                                 "not a callable or an attribute of %r or found in the model %r."

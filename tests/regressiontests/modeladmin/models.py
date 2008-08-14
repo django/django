@@ -559,7 +559,8 @@ ImproperlyConfigured: `ValidationTestModelAdmin.list_display` must be a list or 
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.list_display[0]` refers to `non_existent_field` that is neither a field, method or property of model `ValidationTestModel`.
+ImproperlyConfigured: ValidationTestModelAdmin.list_display[0], 'non_existent_field' is not a callable or an attribute of 'ValidationTestModelAdmin' or found in the model 'ValidationTestModel'.
+
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     list_display = ('users',)
