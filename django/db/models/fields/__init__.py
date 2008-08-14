@@ -160,29 +160,6 @@ class Field(object):
         return self._unique or self.primary_key
     unique = property(unique)
 
-    def validate_full(self, field_data, all_data):
-        """
-        Returns a list of errors for this field. This is the main interface,
-        as it encapsulates some basic validation logic used by all fields.
-        Subclasses should implement validate(), not validate_full().
-        """
-        if not self.blank and not field_data:
-            return [_('This field is required.')]
-        try:
-            self.validate(field_data, all_data)
-        except validators.ValidationError, e:
-            return e.messages
-        return []
-
-    def validate(self, field_data, all_data):
-        """
-        Raises validators.ValidationError if field_data has any errors.
-        Subclasses should override this to specify field-specific validation
-        logic. This method should assume field_data has already been converted
-        into the appropriate data type by Field.to_python().
-        """
-        pass
-
     def set_attributes_from_name(self, name):
         self.name = name
         self.attname, self.column = self.get_attname_column()
@@ -750,9 +727,6 @@ class EmailField(CharField):
     def get_manipulator_field_objs(self):
         return [oldforms.EmailField]
 
-    def validate(self, field_data, all_data):
-        validators.isValidEmail(field_data, all_data)
-
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.EmailField}
         defaults.update(kwargs)
@@ -829,9 +803,6 @@ class IPAddressField(Field):
     def get_internal_type(self):
         return "IPAddressField"
 
-    def validate(self, field_data, all_data):
-        validators.isValidIPAddress4(field_data, None)
-
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.IPAddressField}
         defaults.update(kwargs)
@@ -876,9 +847,6 @@ class PhoneNumberField(Field):
 
     def get_internal_type(self):
         return "PhoneNumberField"
-
-    def validate(self, field_data, all_data):
-        validators.isValidPhone(field_data, all_data)
 
     def formfield(self, **kwargs):
         from django.contrib.localflavor.us.forms import USPhoneNumberField

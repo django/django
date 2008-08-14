@@ -368,28 +368,6 @@ class Model(object):
 
     save_base.alters_data = True
 
-    def validate(self):
-        """
-        First coerces all fields on this instance to their proper Python types.
-        Then runs validation on every field. Returns a dictionary of
-        field_name -> error_list.
-        """
-        error_dict = {}
-        invalid_python = {}
-        for f in self._meta.fields:
-            try:
-                setattr(self, f.attname, f.to_python(getattr(self, f.attname, f.get_default())))
-            except validators.ValidationError, e:
-                error_dict[f.name] = e.messages
-                invalid_python[f.name] = 1
-        for f in self._meta.fields:
-            if f.name in invalid_python:
-                continue
-            errors = f.validate_full(getattr(self, f.attname, f.get_default()), self.__dict__)
-            if errors:
-                error_dict[f.name] = errors
-        return error_dict
-
     def _collect_sub_objects(self, seen_objs, parent=None, nullable=False):
         """
         Recursively populates seen_objs with all objects related to this

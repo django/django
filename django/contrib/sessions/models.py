@@ -65,3 +65,7 @@ class Session(models.Model):
         # just return an empty dictionary (an empty session).
         except:
             return {}
+
+from django.contrib import admin
+class SessionAdmin(admin.ModelAdmin):
+    pass
