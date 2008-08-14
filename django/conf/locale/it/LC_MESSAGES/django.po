@@ -1,14 +1,13 @@
 # translation of django.po to Italiano
-# Nicola Larosa <nico@tekNico.net>, 2008.
 # Italian translation of Django.
 # Copyright (C) 2006 the Lawrence Journal-World
 # This file is distributed under the same license as the Django package.
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django vSVN\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-08-10 16:19+0200\n"
-"PO-Revision-Date: 2008-08-10 16:37+0200\n"
+"PO-Revision-Date: 2008-08-14 18:37+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "Language-Team: Italiano\n"
 "MIME-Version: 1.0\n"
@@ -19,199 +18,199 @@ msgstr ""
 
 #: conf/global_settings.py:44
 msgid "Arabic"
-msgstr "Arabo"
+msgstr "arabo"
 
 #: conf/global_settings.py:45
 msgid "Bengali"
-msgstr "Bengali"
+msgstr "bengali"
 
 #: conf/global_settings.py:46
 msgid "Bulgarian"
-msgstr "Bulgaro"
+msgstr "bulgaro"
 
 #: conf/global_settings.py:47
 msgid "Catalan"
-msgstr "Catalano"
+msgstr "catalano"
 
 #: conf/global_settings.py:48
 msgid "Czech"
-msgstr "Ceco"
+msgstr "ceco"
 
 #: conf/global_settings.py:49
 msgid "Welsh"
-msgstr "Gallese"
+msgstr "gallese"
 
 #: conf/global_settings.py:50
 msgid "Danish"
-msgstr "Danese"
+msgstr "danese"
 
 #: conf/global_settings.py:51
 msgid "German"
-msgstr "Tedesco"
+msgstr "tedesco"
 
 #: conf/global_settings.py:52
 msgid "Greek"
-msgstr "Greco"
+msgstr "greco"
 
 #: conf/global_settings.py:53
 msgid "English"
-msgstr "Inglese"
+msgstr "inglese"
 
 #: conf/global_settings.py:54
 msgid "Spanish"
-msgstr "Spagnolo"
+msgstr "spagnolo"
 
 #: conf/global_settings.py:55
 msgid "Estonian"
-msgstr "Estone"
+msgstr "estone"
 
 #: conf/global_settings.py:56
 msgid "Argentinean Spanish"
-msgstr "Spagnolo argentino"
+msgstr "spagnolo argentino"
 
 #: conf/global_settings.py:57
 msgid "Basque"
-msgstr "Basco"
+msgstr "basco"
 
 #: conf/global_settings.py:58
 msgid "Persian"
-msgstr "Persiano"
+msgstr "persiano"
 
 #: conf/global_settings.py:59
 msgid "Finnish"
-msgstr "Finlandese"
+msgstr "finlandese"
 
 #: conf/global_settings.py:60
 msgid "French"
-msgstr "Francese"
+msgstr "francese"
 
 #: conf/global_settings.py:61
 msgid "Irish"
-msgstr "Irlandese"
+msgstr "irlandese"
 
 #: conf/global_settings.py:62
 msgid "Galician"
-msgstr "Galiziano"
+msgstr "galiziano"
 
 #: conf/global_settings.py:63
 msgid "Hungarian"
-msgstr "Ungherese"
+msgstr "ungherese"
 
 #: conf/global_settings.py:64
 msgid "Hebrew"
-msgstr "Ebraico"
+msgstr "ebraico"
 
 #: conf/global_settings.py:65
 msgid "Croatian"
-msgstr "Croato"
+msgstr "croato"
 
 #: conf/global_settings.py:66
 msgid "Icelandic"
-msgstr "Islandese"
+msgstr "islandese"
 
 #: conf/global_settings.py:67
 msgid "Italian"
-msgstr "Italiano"
+msgstr "italiano"
 
 #: conf/global_settings.py:68
 msgid "Japanese"
-msgstr "Giapponese"
+msgstr "giapponese"
 
 #: conf/global_settings.py:69
 msgid "Georgian"
-msgstr "Georgiano"
+msgstr "georgiano"
 
 #: conf/global_settings.py:70
 msgid "Korean"
-msgstr "Coreano"
+msgstr "coreano"
 
 #: conf/global_settings.py:71
 msgid "Khmer"
-msgstr "Khmer"
+msgstr "khmer"
 
 #: conf/global_settings.py:72
 msgid "Kannada"
-msgstr "Kannada"
+msgstr "kannada"
 
 #: conf/global_settings.py:73
 msgid "Latvian"
-msgstr "Lettone"
+msgstr "lettone"
 
 #: conf/global_settings.py:74
 msgid "Lithuanian"
-msgstr "Lituano"
+msgstr "lituano"
 
 #: conf/global_settings.py:75
 msgid "Macedonian"
-msgstr "Macedone"
+msgstr "macedone"
 
 #: conf/global_settings.py:76
 msgid "Dutch"
-msgstr "Olandese"
+msgstr "olandese"
 
 #: conf/global_settings.py:77
 msgid "Norwegian"
-msgstr "Norvegese"
+msgstr "norvegese"
 
 #: conf/global_settings.py:78
 msgid "Polish"
-msgstr "Polacco"
+msgstr "polacco"
 
 #: conf/global_settings.py:79
 msgid "Portugese"
-msgstr "Portoghese"
+msgstr "portoghese"
 
 #: conf/global_settings.py:80
 msgid "Brazilian Portuguese"
-msgstr "Brasiliano Portoghese"
+msgstr "brasiliano portoghese"
 
 #: conf/global_settings.py:81
 msgid "Romanian"
-msgstr "Rumeno"
+msgstr "rumeno"
 
 #: conf/global_settings.py:82
 msgid "Russian"
-msgstr "Russo"
+msgstr "russo"
 
 #: conf/global_settings.py:83
 msgid "Slovak"
-msgstr "Slovacco"
+msgstr "slovacco"
 
 #: conf/global_settings.py:84
 msgid "Slovenian"
-msgstr "Sloveno"
+msgstr "sloveno"
 
 #: conf/global_settings.py:85
 msgid "Serbian"
-msgstr "Serbo"
+msgstr "serbo"
 
 #: conf/global_settings.py:86
 msgid "Swedish"
-msgstr "Svedese"
+msgstr "svedese"
 
 #: conf/global_settings.py:87
 msgid "Tamil"
-msgstr "Tamil"
+msgstr "tamil"
 
 #: conf/global_settings.py:88
 msgid "Telugu"
-msgstr "Telugu"
+msgstr "telugu"
 
 #: conf/global_settings.py:89
 msgid "Turkish"
-msgstr "Turco"
+msgstr "turco"
 
 #: conf/global_settings.py:90
 msgid "Ukrainian"
-msgstr "Ucraino"
+msgstr "ucraino"
 
 #: conf/global_settings.py:91
 msgid "Simplified Chinese"
-msgstr "Cinese semplificato"
+msgstr "cinese semplificato"
 
 #: conf/global_settings.py:92
 msgid "Traditional Chinese"
-msgstr "Cinese tradizionale"
+msgstr "cinese tradizionale"
 
 #: contrib/admin/filterspecs.py:44
 #, python-format
@@ -4255,107 +4254,107 @@ msgstr "mezzogiorno"
 
 #: utils/dates.py:6
 msgid "Monday"
-msgstr "Lunedì"
+msgstr "lunedì"
 
 #: utils/dates.py:6
 msgid "Tuesday"
-msgstr "Martedì"
+msgstr "martedì"
 
 #: utils/dates.py:6
 msgid "Wednesday"
-msgstr "Mercoledì"
+msgstr "mercoledì"
 
 #: utils/dates.py:6
 msgid "Thursday"
-msgstr "Giovedì"
+msgstr "giovedì"
 
 #: utils/dates.py:6
 msgid "Friday"
-msgstr "Venerdì"
+msgstr "venerdì"
 
 #: utils/dates.py:7
 msgid "Saturday"
-msgstr "Sabato"
+msgstr "sabato"
 
 #: utils/dates.py:7
 msgid "Sunday"
-msgstr "Domenica"
+msgstr "domenica"
 
 #: utils/dates.py:10
 msgid "Mon"
-msgstr "Lun"
+msgstr "lun"
 
 #: utils/dates.py:10
 msgid "Tue"
-msgstr "Mar"
+msgstr "mar"
 
 #: utils/dates.py:10
 msgid "Wed"
-msgstr "Mer"
+msgstr "mer"
 
 #: utils/dates.py:10
 msgid "Thu"
-msgstr "Gio"
+msgstr "gio"
 
 #: utils/dates.py:10
 msgid "Fri"
-msgstr "Ven"
+msgstr "ven"
 
 #: utils/dates.py:11
 msgid "Sat"
-msgstr "Sab"
+msgstr "sab"
 
 #: utils/dates.py:11
 msgid "Sun"
-msgstr "Dom"
+msgstr "dom"
 
 #: utils/dates.py:18
 msgid "January"
-msgstr "Gennaio"
+msgstr "gennaio"
 
 #: utils/dates.py:18
 msgid "February"
-msgstr "Febbraio"
+msgstr "febbraio"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "April"
-msgstr "Aprile"
+msgstr "aprile"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "May"
-msgstr "Maggio"
+msgstr "maggio"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "June"
-msgstr "Giugno"
+msgstr "giugno"
 
 #: utils/dates.py:19 utils/dates.py:31
 msgid "July"
-msgstr "Luglio"
+msgstr "luglio"
 
 #: utils/dates.py:19
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 #: utils/dates.py:19
 msgid "September"
-msgstr "Settembre"
+msgstr "settembre"
 
 #: utils/dates.py:19
 msgid "October"
-msgstr "Ottobre"
+msgstr "ottobre"
 
 #: utils/dates.py:19
 msgid "November"
-msgstr "Novembre"
+msgstr "novembre"
 
 #: utils/dates.py:20
 msgid "December"
-msgstr "Dicembre"
+msgstr "dicembre"
 
 #: utils/dates.py:23
 msgid "jan"
@@ -4407,31 +4406,31 @@ msgstr "dic"
 
 #: utils/dates.py:31
 msgid "Jan."
-msgstr "Gen."
+msgstr "gen."
 
 #: utils/dates.py:31
 msgid "Feb."
-msgstr "Feb."
+msgstr "feb."
 
 #: utils/dates.py:32
 msgid "Aug."
-msgstr "Ago."
+msgstr "ago."
 
 #: utils/dates.py:32
 msgid "Sept."
-msgstr "Set."
+msgstr "set."
 
 #: utils/dates.py:32
 msgid "Oct."
-msgstr "Ott."
+msgstr "ott."
 
 #: utils/dates.py:32
 msgid "Nov."
-msgstr "Nov."
+msgstr "nov."
 
 #: utils/dates.py:32
 msgid "Dec."
-msgstr "Dic."
+msgstr "dic."
 
 #: utils/text.py:128
 msgid "or"
