@@ -53,6 +53,10 @@ def login(request, user):
     # TODO: It would be nice to support different login methods, like signed cookies.
     user.last_login = datetime.datetime.now()
     user.save()
+    if request.session.get('SESSION_KEY', user.id) != user.id:
+        # To avoid reusing another user's session, create a new, empty session
+        # if the existing session corresponds to a different authenticated user.
+        request.session.flush()
     request.session[SESSION_KEY] = user.id
     request.session[BACKEND_SESSION_KEY] = user.backend
     if hasattr(request, 'user'):
@@ -60,16 +64,10 @@ def login(request, user):
 
 def logout(request):
     """
-    Remove the authenticated user's ID from the request.
+    Removes the authenticated user's ID from the request and flushes their
+    session data.
     """
-    try:
-        del request.session[SESSION_KEY]
-    except KeyError:
-        pass
-    try:
-        del request.session[BACKEND_SESSION_KEY]
-    except KeyError:
-        pass
+    request.session.flush()
     if hasattr(request, 'user'):
         from django.contrib.auth.models import AnonymousUser
         request.user = AnonymousUser()

@@ -426,6 +426,13 @@ use ``django.contrib.auth.logout()`` within your view. It takes an
 
 Note that ``logout()`` doesn't throw any errors if the user wasn't logged in.
 
+**New in Django development version:** When you call ``logout()``, the session
+data for the current request is completely cleaned out. All existing data is
+removed. This is to prevent another person from using the same web browser to
+log in and have access to the previous user's session data. If you want to put
+anything into the session that will be available to the user immediately after
+logging out, do that *after* calling ``django.contrib.auth.logout()``.
+
 Limiting access to logged-in users
 ----------------------------------
 

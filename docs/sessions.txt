@@ -117,8 +117,8 @@ It also has these methods:
       Delete the current session data from the database and regenerate the
       session key value that is sent back to the user in the cookie. This is
       used if you want to ensure that the previous session data can't be
-      accessed again from the user's browser (for example, the standard
-      ``logout()`` method calls it).
+      accessed again from the user's browser (for example, the
+      ``django.contrib.auth.logout()`` method calls it).
 
     * ``set_test_cookie()``
 
@@ -229,6 +229,11 @@ This simplistic view logs in a "member" of the site::
         except KeyError:
             pass
         return HttpResponse("You're logged out.")
+
+The standard ``django.contrib.auth.logout()`` function actually does a bit
+more than this to prevent inadvertent data leakage. It calls
+``request.session.flush()``. We are using this example as a demonstration of
+how to work with session objects, not as a full ``logout()`` implementation.
 
 Setting test cookies
 ====================
