@@ -110,6 +110,16 @@ A session object has the following standard dictionary methods:
 
 It also has these methods:
 
+    * ``flush()``
+
+      **New in Django development version**
+
+      Delete the current session data from the database and regenerate the
+      session key value that is sent back to the user in the cookie. This is
+      used if you want to ensure that the previous session data can't be
+      accessed again from the user's browser (for example, the standard
+      ``logout()`` method calls it).
+
     * ``set_test_cookie()``
 
       Sets a test cookie to determine whether the user's browser supports

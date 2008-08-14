@@ -23,6 +23,19 @@ True
 >>> db_session.exists(db_session.session_key)
 False
 
+>>> db_session['foo'] = 'bar'
+>>> db_session.save()
+>>> db_session.exists(db_session.session_key)
+True
+>>> prev_key = db_session.session_key
+>>> db_session.flush()
+>>> db_session.exists(prev_key)
+False
+>>> db_session.session_key == prev_key
+False
+>>> db_session.modified, db_session.accessed
+(True, True)
+
 >>> file_session = FileSession()
 >>> file_session.modified
 False
@@ -39,6 +52,19 @@ True
 >>> file_session.delete(file_session.session_key)
 >>> file_session.exists(file_session.session_key)
 False
+
+>>> file_session['foo'] = 'bar'
+>>> file_session.save()
+>>> file_session.exists(file_session.session_key)
+True
+>>> prev_key = file_session.session_key
+>>> file_session.flush()
+>>> file_session.exists(prev_key)
+False
+>>> file_session.session_key == prev_key
+False
+>>> file_session.modified, file_session.accessed
+(True, True)
 
 # Make sure the file backend checks for a good storage dir
 >>> settings.SESSION_FILE_PATH = "/if/this/directory/exists/you/have/a/weird/computer"
@@ -61,6 +87,18 @@ True
 >>> cache_session.delete(cache_session.session_key)
 >>> cache_session.exists(cache_session.session_key)
 False
+>>> cache_session['foo'] = 'bar'
+>>> cache_session.save()
+>>> cache_session.exists(cache_session.session_key)
+True
+>>> prev_key = cache_session.session_key
+>>> cache_session.flush()
+>>> cache_session.exists(prev_key)
+False
+>>> cache_session.session_key == prev_key
+False
+>>> cache_session.modified, cache_session.accessed
+(True, True)
 
 >>> s = SessionBase()
 >>> s._session['some key'] = 'exists' # Pre-populate the session with some data

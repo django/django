@@ -223,6 +223,15 @@ class SessionBase(object):
             return settings.SESSION_EXPIRE_AT_BROWSER_CLOSE
         return self.get('_session_expiry') == 0
 
+    def flush(self):
+        """
+        Removes the current session data from the database and regenerates the
+        key.
+        """
+        self.clear()
+        self.delete()
+        self.create()
+
     # Methods that child classes must implement.
 
     def exists(self, session_key):
@@ -247,9 +256,10 @@ class SessionBase(object):
         """
         raise NotImplementedError
 
-    def delete(self, session_key):
+    def delete(self, session_key=None):
         """
-        Clears out the session data under this key.
+        Deletes the session data under this key. If the key is None, the
+        current session key value is used.
         """
         raise NotImplementedError
 

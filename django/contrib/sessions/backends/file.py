@@ -89,7 +89,9 @@ class SessionStore(SessionBase):
             return True
         return False
 
-    def delete(self, session_key):
+    def delete(self, session_key=None):
+        if session_key is None:
+            session_key = self._session_key
         try:
             os.unlink(self._key_to_file(session_key))
         except OSError:
