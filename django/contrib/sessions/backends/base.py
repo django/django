@@ -153,13 +153,16 @@ class SessionBase(object):
 
     session_key = property(_get_session_key, _set_session_key)
 
-    def _get_session(self):
-        # Lazily loads session from storage.
+    def _get_session(self, no_load=False):
+        """
+        Lazily loads session from storage (unless "no_load" is True, when only
+        an empty dict is stored) and stores it in the current instance.
+        """
         self.accessed = True
         try:
             return self._session_cache
         except AttributeError:
-            if self._session_key is None:
+            if self._session_key is None or no_load:
                 self._session_cache = {}
             else:
                 self._session_cache = self.load()

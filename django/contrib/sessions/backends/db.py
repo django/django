@@ -49,7 +49,7 @@ class SessionStore(SessionBase):
         """
         obj = Session(
             session_key = self.session_key,
-            session_data = self.encode(self._session),
+            session_data = self.encode(self._get_session(no_load=must_create)),
             expire_date = self.get_expiry_date()
         )
         sid = transaction.savepoint()

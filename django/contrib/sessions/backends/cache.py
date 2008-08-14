@@ -30,7 +30,8 @@ class SessionStore(SessionBase):
             func = self._cache.add
         else:
             func = self._cache.set
-        result = func(self.session_key, self._session, self.get_expiry_age())
+        result = func(self.session_key, self._get_session(no_load=must_create),
+                self.get_expiry_age())
         if must_create and not result:
             raise CreateError
 

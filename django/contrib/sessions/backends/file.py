@@ -73,7 +73,7 @@ class SessionStore(SessionBase):
             flags |= os.O_EXCL
         # Because this may trigger a load from storage, we must do it before
         # truncating the file to save.
-        session_data = self._session
+        session_data = self._get_session(no_load=must_create)
         try:
             fd = os.open(self._key_to_file(self.session_key), flags)
             try:

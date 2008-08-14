@@ -5,6 +5,7 @@ r"""
 >>> from django.contrib.sessions.backends.cache import SessionStore as CacheSession
 >>> from django.contrib.sessions.backends.file import SessionStore as FileSession
 >>> from django.contrib.sessions.backends.base import SessionBase
+>>> from django.contrib.sessions.models import Session
 
 >>> db_session = DatabaseSession()
 >>> db_session.modified
@@ -36,6 +37,12 @@ False
 >>> db_session.modified, db_session.accessed
 (True, True)
 
+# Submitting an invalid session key (either by guessing, or if the db has
+# removed the key) results in a new key being generated.
+>>> Session.objects.filter(pk=db_session.session_key).delete()
+>>> db_session = DatabaseSession(db_session.session_key)
+>>> db_session.save()
+
 >>> file_session = FileSession()
 >>> file_session.modified
 False
@@ -65,6 +72,9 @@ False
 False
 >>> file_session.modified, file_session.accessed
 (True, True)
+>>> Session.objects.filter(pk=file_session.session_key).delete()
+>>> file_session = FileSession(file_session.session_key)
+>>> file_session.save()
 
 # Make sure the file backend checks for a good storage dir
 >>> settings.SESSION_FILE_PATH = "/if/this/directory/exists/you/have/a/weird/computer"
@@ -99,6 +109,9 @@ False
 False
 >>> cache_session.modified, cache_session.accessed
 (True, True)
+>>> Session.objects.filter(pk=cache_session.session_key).delete()
+>>> cache_session = CacheSession(cache_session.session_key)
+>>> cache_session.save()
 
 >>> s = SessionBase()
 >>> s._session['some key'] = 'exists' # Pre-populate the session with some data
