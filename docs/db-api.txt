@@ -621,6 +621,15 @@ penultimate item and so on. If we had a Python sequence and looked at
 that mode of access (slicing from the end), because it's not possible to do it
 efficiently in SQL.
 
+Also, note that ``reverse()`` should generally only be called on a
+``QuerySet`` which has a defined ordering (e.g., when querying against
+a model which defines a default ordering, or when using
+``order_by()``). If no such ordering is defined for a given
+``QuerySet``, calling ``reverse()`` on it has no real effect (the
+ordering was undefined prior to calling ``reverse()``, and will remain
+undefined afterward).
+
+
 ``distinct()``
 ~~~~~~~~~~~~~~
 
