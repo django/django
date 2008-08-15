@@ -583,14 +583,13 @@ class ModelAdmin(BaseModelAdmin):
 
         adminForm = AdminForm(form, list(self.get_fieldsets(request)), self.prepopulated_fields)
         media = self.media + adminForm.media
-        for formset in formsets:
-            media = media + formset.media
 
         inline_admin_formsets = []
         for inline, formset in zip(self.inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request))
             inline_admin_formset = InlineAdminFormSet(inline, formset, fieldsets)
             inline_admin_formsets.append(inline_admin_formset)
+            media = media + inline_admin_formset.media
 
         context = {
             'title': _('Add %s') % force_unicode(opts.verbose_name),
