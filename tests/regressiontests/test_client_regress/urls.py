@@ -6,5 +6,7 @@ urlpatterns = patterns('',
     (r'^staff_only/$', views.staff_only_view),
     (r'^get_view/$', views.get_view),
     url(r'^arg_view/(?P<name>.+)/$', views.view_with_argument, name='arg_view'),
-    (r'^login_protected_redirect_view/$', views.login_protected_redirect_view)
+    (r'^login_protected_redirect_view/$', views.login_protected_redirect_view),
+    (r'^set_session/$', views.set_session_view),
+    (r'^check_session/$', views.check_session_view),
 )

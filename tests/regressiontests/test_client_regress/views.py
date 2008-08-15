@@ -34,3 +34,12 @@ def login_protected_redirect_view(request):
     "A view that redirects all requests to the GET view"
     return HttpResponseRedirect('/test_client_regress/get_view/')
 login_protected_redirect_view = login_required(login_protected_redirect_view)
+
+def set_session_view(request):
+    "A view that sets a session variable"
+    request.session['session_var'] = 'YES'
+    return HttpResponse('set_session')
+
+def check_session_view(request):
+    "A view that reads a session variable"
+    return HttpResponse(request.session.get('session_var', 'NO'))

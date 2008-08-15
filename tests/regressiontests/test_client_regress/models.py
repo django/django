@@ -325,3 +325,33 @@ class zzUrlconfSubstitutionTests(TestCase):
         "URLconf is reverted to original value after modification in a TestCase"
         url = reverse('arg_view', args=['somename'])
         self.assertEquals(url, '/test_client_regress/arg_view/somename/')
+
+class SessionTests(TestCase):
+    fixtures = ['testdata.json']
+
+    def test_session(self):
+        "The session isn't lost if a user logs in"
+        # The session doesn't exist to start.
+        response = self.client.get('/test_client_regress/check_session/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'NO')
+
+        # This request sets a session variable.
+        response = self.client.get('/test_client_regress/set_session/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'set_session')
+
+        # Check that the session has been modified
+        response = self.client.get('/test_client_regress/check_session/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'YES')
+
+        # Log in
+        login = self.client.login(username='testclient',password='password')
+        self.failUnless(login, 'Could not log in')
+
+        # Session should still contain the modified value
+        response = self.client.get('/test_client_regress/check_session/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'YES')
+        
