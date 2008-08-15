@@ -689,7 +689,7 @@ class ValuesListQuerySet(ValuesQuerySet):
                 yield row[0]
         elif not self.query.extra_select:
             for row in self.query.results_iter():
-                yield row
+                yield tuple(row)
         else:
             # When extra(select=...) is involved, the extra cols come are
             # always at the start of the row, so we need to reorder the fields
