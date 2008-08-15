@@ -80,7 +80,7 @@ been improved and the method by which Django generates unique session
 identifiers has been made much more robust.
 
 .. _the 1.0 alpha 1 release notes: ../release_notes_1.0_alpha/
-.. _the 1.0 alpha 1 release notes: ../release_notes_1.0_alpha_2/
+.. _the 1.0 alpha 2 release notes: ../release_notes_1.0_alpha_2/
 .. _the documentation for generic relations: ../contenttypes/#generic-relations
 .. _the admin documentation: ../admin/#modeladmin-methods
 .. _the database API documentation: ../db-api/#forcing-an-insert-or-update
