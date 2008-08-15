@@ -265,7 +265,7 @@ the example above, this means that if a ``Bookmark`` object were deleted, any
 Generic relations in forms and admin
 ------------------------------------
 
-``django.contrib.contenttypes.genric`` provides both a ``GenericInlineFormSet``
+``django.contrib.contenttypes.generic`` provides both a ``GenericInlineFormSet``
 and ``GenericInlineModelAdmin``. This enables the use of generic relations in
 forms and the admin. See the `model formset`_ and `admin`_ documentation for
 more information.
