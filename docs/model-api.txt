@@ -2113,9 +2113,9 @@ in an app called ``myapp``, you could add arbitrary SQL to the file
     INSERT INTO myapp_person (first_name, last_name) VALUES ('John', 'Lennon');
     INSERT INTO myapp_person (first_name, last_name) VALUES ('Paul', 'McCartney');
 
-Each SQL file, if given, is expected to contain valid SQL. The SQL files are
-piped directly into the database after all of the models' table-creation
-statements have been executed.
+Each SQL file, if given, is expected to contain valid SQL statements
+which will insert the desired data (e.g., properly-formatted
+``INSERT`` statements separated by semicolons).
 
 The SQL files are read by the ``sqlcustom``, ``sqlreset``, ``sqlall`` and
 ``reset`` commands in ``manage.py``. Refer to the `manage.py documentation`_
