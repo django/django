@@ -20,6 +20,9 @@ class Tag(models.Model):
     parent = models.ForeignKey('self', blank=True, null=True,
             related_name='children')
 
+    class Meta:
+        ordering = ['name']
+
     def __unicode__(self):
         return self.name
 
