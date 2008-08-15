@@ -129,7 +129,7 @@ What you can do to help
 
 In order to provide a high-quality 1.0 release, we need your
 help. Although this beta release is, again, *not* intended for
-production use, you can help the Django team by trying out the alpha
+production use, you can help the Django team by trying out the beta
 codebase in a safe test environment and reporting any bugs or issues
 you encounter. The Django ticket tracker is the central place to
 search for open issues:
