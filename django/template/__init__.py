@@ -485,9 +485,14 @@ class FilterExpression(object):
                                            (token[:upto], token[upto:start], token[start:]))
             if var == None:
                 var, constant, i18n_constant = match.group("var", "constant", "i18n_constant")
-                if i18n_constant:
-                    var = '"%s"' %  _(i18n_constant.replace(r'\"', '"'))
-                elif constant:
+                if i18n_constant is not None:
+                    # Don't pass the empty string to gettext, because the empty
+                    # string translates to meta information.
+                    if i18n_constant == "":
+                        var = '""'
+                    else:
+                        var = '"%s"' %  _(i18n_constant.replace(r'\"', '"'))
+                elif constant is not None:
                     var = '"%s"' % constant.replace(r'\"', '"')
                 upto = match.end()
                 if var == None:
