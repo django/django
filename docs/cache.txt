@@ -639,7 +639,7 @@ apps' performance:
 Order of MIDDLEWARE_CLASSES
 ===========================
 
-If you use caching middlewaare, it's important to put each half in the right
+If you use caching middleware, it's important to put each half in the right
 place within the ``MIDDLEWARE_CLASSES`` setting. That's because the cache
 middleware needs to know which headers by which to vary the cache storage.
 Middleware always adds something to the ``Vary`` response header when it can.
