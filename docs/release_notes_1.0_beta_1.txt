@@ -77,7 +77,7 @@ A number of other improvements and bugfixes have also been included:
 some tricky cases involving case-sensitivity in differing MySQL
 collations have been resolved, Windows packaging and installation has
 been improved and the method by which Django generates unique session
-identiiers has been made much more robust.
+identifiers has been made much more robust.
 
 .. _the 1.0 alpha 1 release notes: ../release_notes_1.0_alpha/
 .. _the 1.0 alpha 1 release notes: ../release_notes_1.0_alpha_2/
