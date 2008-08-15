@@ -81,7 +81,7 @@ class SyndicationFeed(object):
 
     def add_item(self, title, link, description, author_email=None,
         author_name=None, author_link=None, pubdate=None, comments=None,
-        unique_id=None, enclosure=None, categories=(), item_copyright=None, 
+        unique_id=None, enclosure=None, categories=(), item_copyright=None,
         ttl=None, **kwargs):
         """
         Adds an item to the feed. All args are expected to be Python Unicode
@@ -118,26 +118,26 @@ class SyndicationFeed(object):
         Called from write().
         """
         return {}
-        
+
     def add_root_elements(self, handler):
         """
-        Add elements in the the root (i.e. feed/channel) element. Called 
+        Add elements in the the root (i.e. feed/channel) element. Called
         from write().
         """
         pass
-        
+
     def item_attributes(self, item):
         """
         Return extra attributes to place on each item (i.e. item/entry) element.
         """
         return {}
-        
+
     def add_item_elements(self, handler, item):
         """
         Add elements on each item (i.e. item/entry) element.
         """
         pass
-        
+
     def write(self, outfile, encoding):
         """
         Outputs the feed in the given encoding to outfile, which is a file-like
@@ -204,7 +204,7 @@ class RssFeed(SyndicationFeed):
             handler.addQuickElement(u"category", cat)
         if self.feed['feed_copyright'] is not None:
             handler.addQuickElement(u"copyright", self.feed['feed_copyright'])
-        handler.addQuickElement(u"lastBuildDate", rfc2822_date(self.latest_post_date()).decode('ascii'))
+        handler.addQuickElement(u"lastBuildDate", rfc2822_date(self.latest_post_date()).decode('utf-8'))
         if self.feed['ttl'] is not None:
             handler.addQuickElement(u"ttl", self.feed['ttl'])
 
@@ -238,7 +238,7 @@ class Rss201rev2Feed(RssFeed):
             handler.addQuickElement(u"dc:creator", item["author_name"], {"xmlns:dc": u"http://purl.org/dc/elements/1.1/"})
 
         if item['pubdate'] is not None:
-            handler.addQuickElement(u"pubDate", rfc2822_date(item['pubdate']).decode('ascii'))
+            handler.addQuickElement(u"pubDate", rfc2822_date(item['pubdate']).decode('utf-8'))
         if item['comments'] is not None:
             handler.addQuickElement(u"comments", item['comments'])
         if item['unique_id'] is not None:
@@ -281,7 +281,7 @@ class Atom1Feed(SyndicationFeed):
         if self.feed['feed_url'] is not None:
             handler.addQuickElement(u"link", "", {u"rel": u"self", u"href": self.feed['feed_url']})
         handler.addQuickElement(u"id", self.feed['id'])
-        handler.addQuickElement(u"updated", rfc3339_date(self.latest_post_date()).decode('ascii'))
+        handler.addQuickElement(u"updated", rfc3339_date(self.latest_post_date()).decode('utf-8'))
         if self.feed['author_name'] is not None:
             handler.startElement(u"author", {})
             handler.addQuickElement(u"name", self.feed['author_name'])
@@ -296,18 +296,18 @@ class Atom1Feed(SyndicationFeed):
             handler.addQuickElement(u"category", "", {u"term": cat})
         if self.feed['feed_copyright'] is not None:
             handler.addQuickElement(u"rights", self.feed['feed_copyright'])
-        
+
     def write_items(self, handler):
         for item in self.items:
             handler.startElement(u"entry", self.item_attributes(item))
             self.add_item_elements(handler, item)
             handler.endElement(u"entry")
-            
+
     def add_item_elements(self, handler, item):
         handler.addQuickElement(u"title", item['title'])
         handler.addQuickElement(u"link", u"", {u"href": item['link'], u"rel": u"alternate"})
         if item['pubdate'] is not None:
-            handler.addQuickElement(u"updated", rfc3339_date(item['pubdate']).decode('ascii'))
+            handler.addQuickElement(u"updated", rfc3339_date(item['pubdate']).decode('utf-8'))
 
         # Author information.
         if item['author_name'] is not None:
