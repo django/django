@@ -403,6 +403,33 @@ True
 >>> f.clean('00.50') == Decimal("0.50")
 True
 
+
+>>> f = DecimalField(decimal_places=2)
+>>> f.clean('0.00000001')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 2 decimal places.']
+
+
+>>> f = DecimalField(max_digits=3)
+
+# Leading whole zeros "collapse" to one digit.
+>>> f.clean('0000000.10') == Decimal("0.1")
+True
+>>> f.clean('0000000.100')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 3 digits in total.']
+
+# Only leading whole zeros "collapse" to one digit.
+>>> f.clean('000000.02') == Decimal('0.02')
+True
+>>> f.clean('000000.002')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 3 digits in total.']
+
+
 # DateField ###################################################################
 
 >>> import datetime

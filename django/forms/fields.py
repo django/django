@@ -244,18 +244,28 @@ class DecimalField(Field):
             value = Decimal(value)
         except DecimalException:
             raise ValidationError(self.error_messages['invalid'])
-        pieces = str(value).lstrip("-").split('.')
-        decimals = (len(pieces) == 2) and len(pieces[1]) or 0
-        digits = len(pieces[0])
+
+        sign, digittuple, exponent = value.as_tuple()
+        decimals = abs(exponent)
+        # digittuple doesn't include any leading zeros.
+        digits = len(digittuple)
+        if decimals >= digits:
+            # We have leading zeros up to or past the decimal point.  Count
+            # everything past the decimal point as a digit.  We also add one
+            # for leading zeros before the decimal point (any number of leading
+            # whole zeros collapse to one digit).
+            digits = decimals + 1
+        whole_digits = digits - decimals
+
         if self.max_value is not None and value > self.max_value:
             raise ValidationError(self.error_messages['max_value'] % self.max_value)
         if self.min_value is not None and value < self.min_value:
             raise ValidationError(self.error_messages['min_value'] % self.min_value)
-        if self.max_digits is not None and (digits + decimals) > self.max_digits:
+        if self.max_digits is not None and digits > self.max_digits:
             raise ValidationError(self.error_messages['max_digits'] % self.max_digits)
         if self.decimal_places is not None and decimals > self.decimal_places:
             raise ValidationError(self.error_messages['max_decimal_places'] % self.decimal_places)
-        if self.max_digits is not None and self.decimal_places is not None and digits > (self.max_digits - self.decimal_places):
+        if self.max_digits is not None and self.decimal_places is not None and whole_digits > (self.max_digits - self.decimal_places):
             raise ValidationError(self.error_messages['max_whole_digits'] % (self.max_digits - self.decimal_places))
         return value
 
