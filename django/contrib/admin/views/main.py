@@ -68,7 +68,7 @@ class ChangeList(object):
 
     def get_filters(self, request):
         filter_specs = []
-        if self.list_filter and not self.opts.one_to_one_field:
+        if self.list_filter:
             filter_fields = [self.lookup_opts.get_field(field_name) for field_name in self.list_filter]
             for f in filter_fields:
                 spec = FilterSpec.create(f, request, self.params, self.model, self.model_admin)

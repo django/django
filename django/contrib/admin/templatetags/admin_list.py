@@ -302,7 +302,7 @@ date_hierarchy = register.inclusion_tag('admin/date_hierarchy.html')(date_hierar
 def search_form(cl):
     return {
         'cl': cl,
-        'show_result_count': cl.result_count != cl.full_result_count and not cl.opts.one_to_one_field,
+        'show_result_count': cl.result_count != cl.full_result_count,
         'search_var': SEARCH_VAR
     }
 search_form = register.inclusion_tag('admin/search_form.html')(search_form)
