@@ -126,8 +126,8 @@ Manual transaction management looks like this::
 .. admonition:: An important note to users of earlier Django releases:
 
     The database ``connection.commit()`` and ``connection.rollback()`` methods
-    (called ``db.commit()`` and ``db.rollback()`` in 0.91 and earlier) no longer
-    exist. They've been replaced by ``transaction.commit()`` and
+    (called ``db.commit()`` and ``db.rollback()`` in 0.91 and earlier) no
+    longer exist. They've been replaced by ``transaction.commit()`` and
     ``transaction.rollback()``.
 
 How to globally deactivate transaction management
@@ -160,4 +160,4 @@ in auto-commit mode: Statements will be executed and committed as soon as
 they're called. If your MySQL setup *does* support transactions, Django will
 handle transactions as explained in this document.
 
-.. _information on MySQL transactions: http://dev.mysql.com/books/mysqlpress/mysql-tutorial/ch10.html
+.. _information on MySQL transactions: http://dev.mysql.com/doc/refman/5.0/en/sql-syntax-transactions.html
