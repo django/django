@@ -332,7 +332,10 @@ class QuerySet(object):
                 return obj, True
             except IntegrityError, e:
                 transaction.savepoint_rollback(sid)
-                return self.get(**kwargs), False
+                try:
+                    return self.get(**kwargs), False
+                except self.model.DoesNotExist:
+                    raise e
 
     def latest(self, field_name=None):
         """

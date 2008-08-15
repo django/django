@@ -50,4 +50,11 @@ True
 False
 >>> Person.objects.count()
 2
+
+# If you don't specify a value or default value for all required fields, you
+# will get an error.
+>>> p, created = Person.objects.get_or_create(first_name='Tom', last_name='Smith')
+Traceback (most recent call last):
+...
+IntegrityError:...
 """}
