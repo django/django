@@ -36,7 +36,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         "SQLite3 doesn't support constraints"
         return []
 
-    def sql_remove_table_constraints(self, model, references_to_delete):
+    def sql_remove_table_constraints(self, model, references_to_delete, style):
         "SQLite3 doesn't support constraints"
         return []
         
