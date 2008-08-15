@@ -1,0 +1,11 @@
+<script type="text/javascript">
+{% for field in prepopulated_fields %}
+    document.getElementById("{{ field.field.auto_id }}").onchange = function() { this._changed = true; };
+    {% for dependency in field.dependencies %}
+    document.getElementById("{{ dependency.auto_id }}").onkeyup = function() {
+        var e = document.getElementById("{{ field.field.auto_id }}");
+        if (!e._changed) { e.value = URLify({% for innerdep in field.dependencies %}document.getElementById("{{ innerdep.auto_id }}").value{% if not forloop.last %} + ' ' + {% endif %}{% endfor %}, {{ field.field.field.max_length }}); }
+    }
+    {% endfor %}
+{% endfor %}
+</script>

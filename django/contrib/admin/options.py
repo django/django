@@ -822,6 +822,14 @@ class InlineModelAdmin(BaseModelAdmin):
             self.verbose_name = self.model._meta.verbose_name
         if self.verbose_name_plural is None:
             self.verbose_name_plural = self.model._meta.verbose_name_plural
+    
+    def _media(self):
+        from django.conf import settings
+        js = []
+        if self.prepopulated_fields:
+            js.append('js/urlify.js')
+        return forms.Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
+    media = property(_media)
 
     def get_formset(self, request, obj=None):
         """Returns a BaseInlineFormSet class for use in admin add/change views."""
@@ -866,7 +874,7 @@ class InlineAdminFormSet(object):
             yield self.formset.form.base_fields[field_name]
 
     def _media(self):
-        media = self.formset.media
+        media = self.opts.media + self.formset.media
         for fs in self:
             media = media + fs.media
         return media
