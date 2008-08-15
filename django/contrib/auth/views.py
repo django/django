@@ -14,6 +14,7 @@ from django.utils.http import urlquote, base36_to_int
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
+from django.views.decorators.cache import never_cache
 import re
 
 def login(request, template_name='registration/login.html', redirect_field_name=REDIRECT_FIELD_NAME):
@@ -43,6 +44,7 @@ def login(request, template_name='registration/login.html', redirect_field_name=
         redirect_field_name: redirect_to,
         'site_name': current_site.name,
     }, context_instance=RequestContext(request))
+login = never_cache(login)
 
 def logout(request, next_page=None, template_name='registration/logged_out.html'):
     "Logs out the user and displays 'You are logged out' message."
