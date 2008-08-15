@@ -3,7 +3,7 @@ Django 1.0 beta 1 release notes
 ===============================
 
 
-Welcome to Django 1.0 alpha 2!
+Welcome to Django 1.0 beta 1!
 
 This is the third in a series of preview/development releases leading
 up to the eventual release of Django 1.0, currently scheduled to take
