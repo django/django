@@ -1,6 +1,6 @@
 """
 Cache middleware. If enabled, each Django-powered page will be cached based on
-URL. The cannonical way to enable cache middleware is to set
+URL. The canonical way to enable cache middleware is to set
 ``UpdateCacheMiddleware`` as your first piece of middleware, and
 ``FetchFromCacheMiddleware`` as the last::
 
@@ -15,10 +15,11 @@ last during the response phase, which processes middleware bottom-up;
 ``FetchFromCacheMiddleware`` needs to run last during the request phase, which
 processes middleware top-down.
 
-The single-class ``CacheMiddleware`` can be used for some simple sites. However,
-if any other peice of middleware needs to affect the cache key, you'll need to
-use the two-part UpdateCacheMiddleware and FetchFromCacheMiddleware. This'll
-most often happen when you're using Django's LocaleMiddleware.
+The single-class ``CacheMiddleware`` can be used for some simple sites.
+However, if any other piece of middleware needs to affect the cache key, you'll
+need to use the two-part ``UpdateCacheMiddleware`` and
+``FetchFromCacheMiddleware``. This'll most often happen when you're using
+Django's ``LocaleMiddleware``.
 
 More details about how the caching works:
 
@@ -55,7 +56,7 @@ class UpdateCacheMiddleware(object):
     """
     Response-phase cache middleware that updates the cache if the response is
     cacheable.
-    
+
     Must be used as part of the two-part update/fetch cache middleware.
     UpdateCacheMiddleware must be the first piece of middleware in
     MIDDLEWARE_CLASSES so that it'll get called last during the response phase.
@@ -95,7 +96,7 @@ class UpdateCacheMiddleware(object):
 class FetchFromCacheMiddleware(object):
     """
     Request-phase cache middleware that fetches a page from the cache.
-    
+
     Must be used as part of the two-part update/fetch cache middleware.
     FetchFromCacheMiddleware must be the last piece of middleware in
     MIDDLEWARE_CLASSES so that it'll get called last during the request phase.
@@ -104,7 +105,7 @@ class FetchFromCacheMiddleware(object):
         self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
-    
+
     def process_request(self, request):
         """
         Checks whether the page is already cached and returns the cached
@@ -137,7 +138,7 @@ class FetchFromCacheMiddleware(object):
 class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
     """
     Cache middleware that provides basic behavior for many simple sites.
-    
+
     Also used as the hook point for the cache decorator, which is generated
     using the decorator-from-middleware utility.
     """
@@ -152,4 +153,3 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
             self.cache_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
         else:
             self.cache_anonymous_only = cache_anonymous_only
-
