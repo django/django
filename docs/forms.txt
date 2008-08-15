@@ -2153,7 +2153,7 @@ form::
     ...     pub_date = forms.DateField()
 
 You might want to allow the user to create several articles at once. To create
-a formset of out of an ``ArticleForm`` you would do::
+a formset out of an ``ArticleForm`` you would do::
 
     >>> from django.forms.formsets import formset_factory
     >>> ArticleFormSet = formset_factory(ArticleForm)
