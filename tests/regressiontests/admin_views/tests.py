@@ -500,7 +500,7 @@ class SecureViewTest(TestCase):
         self.failUnlessEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/secure-view/', self.super_login)
         self.assertRedirects(login, '/test_admin/admin/secure-view/')
-        self.assertFalse(login.context)
+        self.failIf(login.context)
         self.client.get('/test_admin/admin/logout/')
 
         # Test if user enters e-mail address
@@ -522,7 +522,7 @@ class SecureViewTest(TestCase):
         self.failUnlessEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/secure-view/', self.adduser_login)
         self.assertRedirects(login, '/test_admin/admin/secure-view/')
-        self.assertFalse(login.context)
+        self.failIf(login.context)
         self.client.get('/test_admin/admin/logout/')
 
         # Change User
@@ -530,7 +530,7 @@ class SecureViewTest(TestCase):
         self.failUnlessEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/secure-view/', self.changeuser_login)
         self.assertRedirects(login, '/test_admin/admin/secure-view/')
-        self.assertFalse(login.context)
+        self.failIf(login.context)
         self.client.get('/test_admin/admin/logout/')
 
         # Delete User
@@ -538,7 +538,7 @@ class SecureViewTest(TestCase):
         self.failUnlessEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/secure-view/', self.deleteuser_login)
         self.assertRedirects(login, '/test_admin/admin/secure-view/')
-        self.assertFalse(login.context)
+        self.failIf(login.context)
         self.client.get('/test_admin/admin/logout/')
 
         # Regular User should not be able to login.
