@@ -236,7 +236,7 @@ var DateTimeShortcuts = {
         DateTimeShortcuts.calendars[num].drawNextMonth();
     },
     handleCalendarCallback: function(num) {
-        return "function(y, m, d) { DateTimeShortcuts.calendarInputs["+num+"].value = y+'-'+m+'-'+d; document.getElementById(DateTimeShortcuts.calendarDivName1+"+num+").style.display='none';}";
+        return "function(y, m, d) { DateTimeShortcuts.calendarInputs["+num+"].value = y+'-'+(m<10?'0':'')+m+'-'+(d<10?'0':'')+d; document.getElementById(DateTimeShortcuts.calendarDivName1+"+num+").style.display='none';}";
     },
     handleCalendarQuickLink: function(num, offset) {
        var d = new Date();
