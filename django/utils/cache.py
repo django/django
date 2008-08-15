@@ -64,7 +64,7 @@ def patch_cache_control(response, **kwargs):
         cc = {}
 
     # If there's already a max-age header but we're being asked to set a new
-    # max-age, use the minumum of the two ages. In practice this happens when
+    # max-age, use the minimum of the two ages. In practice this happens when
     # a decorator and a piece of middleware both operate on a given view.
     if 'max-age' in cc and 'max_age' in kwargs:
         kwargs['max_age'] = min(cc['max-age'], kwargs['max_age'])
