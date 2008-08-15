@@ -145,8 +145,12 @@ database's connection parameters:
 
     * ``DATABASE_ENGINE`` -- Either 'postgresql_psycopg2', 'mysql' or 'sqlite3'.
       Other backends are `also available`_.
-    * ``DATABASE_NAME`` -- The name of your database, or the full (absolute)
-      path to the database file if you're using SQLite. 
+    * ``DATABASE_NAME`` -- The name of your database. If you're using
+      SQLite, the database will be a file on your computer; in that
+      case, ``DATABASE_NAME`` should be the full absolute path,
+      including filename, of that file. If the file doesn't exist, it
+      will automatically be created when you synchronize the database
+      for the first time (see below).
     * ``DATABASE_USER`` -- Your database username (not used for SQLite).
     * ``DATABASE_PASSWORD`` -- Your database password (not used for SQLite).
     * ``DATABASE_HOST`` -- The host your database is on. Leave this as an
