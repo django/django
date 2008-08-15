@@ -334,7 +334,7 @@ class ModelAdmin(BaseModelAdmin):
         form = self.get_form(request)
         return [(None, {'fields': form.base_fields.keys()})]
 
-    def get_form(self, request, obj=None):
+    def get_form(self, request, obj=None, **kwargs):
         """
         Returns a Form class for use in the admin add view. This is used by
         add_view and change_view.
@@ -343,7 +343,13 @@ class ModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
-        return modelform_factory(self.model, form=self.form, fields=fields, formfield_callback=self.formfield_for_dbfield)
+        defaults = {
+            "form": self.form,
+            "fields": fields,
+            "formfield_callback": self.formfield_for_dbfield,
+        }
+        defaults.update(kwargs)
+        return modelform_factory(self.model, **defaults)
 
     def get_formsets(self, request, obj=None):
         for inline in self.inline_instances:
@@ -833,16 +839,23 @@ class InlineModelAdmin(BaseModelAdmin):
         return forms.Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
     media = property(_media)
 
-    def get_formset(self, request, obj=None):
+    def get_formset(self, request, obj=None, **kwargs):
         """Returns a BaseInlineFormSet class for use in admin add/change views."""
         if self.declared_fieldsets:
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
-        return inlineformset_factory(self.parent_model, self.model,
-            form=self.form, formset=self.formset, fk_name=self.fk_name,
-            fields=fields, formfield_callback=self.formfield_for_dbfield,
-            extra=self.extra, max_num=self.max_num)
+        defaults = {
+            "form": self.form,
+            "formset": self.formset,
+            "fk_name": self.fk_name,
+            "fields": fields,
+            "formfield_callback": self.formfield_for_dbfield,
+            "extra": self.extra,
+            "max_num": self.max_num,
+        }
+        defaults.update(kwargs)
+        return inlineformset_factory(self.parent_model, self.model, **defaults)
 
     def get_fieldsets(self, request, obj=None):
         if self.declared_fieldsets:
