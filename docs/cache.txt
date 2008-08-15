@@ -231,13 +231,14 @@ arguments.
 The per-site cache
 ==================
 
-**New in Django development version** (previous versions of Django only provided
-a single ``CacheMiddleware`` instead of the two pieces described below).
+**New in Django development version** (previous versions of Django only
+provided a single ``CacheMiddleware`` instead of the two pieces described
+below).
 
 Once the cache is set up, the simplest way to use caching is to cache your
 entire site. You'll need to add
 ``'django.middleware.cache.UpdateCacheMiddleware'`` and
-``'django.middleware.cache.FetchFromCacheMiddleware' to your
+``'django.middleware.cache.FetchFromCacheMiddleware'`` to your
 ``MIDDLEWARE_CLASSES`` setting, as in this example::
 
     MIDDLEWARE_CLASSES = (
@@ -653,7 +654,7 @@ header. The following middleware modules do so:
     * ``SessionMiddleware`` adds ``Cookie``
     * ``GZipMiddleware`` adds ``Accept-Encoding``
     * ``LocaleMiddleware`` adds ``Accept-Language``
-    
+
 ``FetchFromCacheMiddleware``, on the other hand, runs during the request phase,
 where middleware is applied first-to-last, so an item at the top of the list
 runs *first* during the request phase. The ``FetchFromCacheMiddleware`` also
