@@ -72,9 +72,14 @@ Example::
 ``form``
 ~~~~~~~~
 
-The default ``forms.ModelForm`` class used to generate the form on the
-add/change pages for models. You can easily change this to your own
-``ModelForm`` to override the default form behavior of the add/change pages.
+By default a ``ModelForm`` is dynamically created for your model. It is used
+to create the form presented on both the add/change pages. You can easily
+provide your own ``ModelForm`` to override any default form behavior on the
+add/change pages.
+
+For an example see the section `Adding custom validation to the admin`_.
+
+.. _Adding custom validation to the admin: #adding-custom-validation-to-the-admin
 
 ``fieldsets``
 ~~~~~~~~~~~~~
@@ -617,6 +622,9 @@ needed. Now within your form you can add your own custom validation for
 any field::
     
     class MyArticleAdminForm(forms.ModelForm):
+        class Meta:
+            model = Article
+        
         def clean_name(self):
             # do something that validates your data
             return self.cleaned_data["name"]
