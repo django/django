@@ -94,6 +94,8 @@ class SessionStore(SessionBase):
 
     def delete(self, session_key=None):
         if session_key is None:
+            if self._session_key is None:
+                return
             session_key = self._session_key
         try:
             os.unlink(self._key_to_file(session_key))
