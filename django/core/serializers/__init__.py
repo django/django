@@ -34,13 +34,27 @@ except ImportError:
 
 _serializers = {}
 
-def register_serializer(format, serializer_module):
-    """Register a new serializer by passing in a module name."""
+def register_serializer(format, serializer_module, serializers=None):
+    """"Register a new serializer. 
+    
+    ``serializer_module`` should be the fully qualified module name
+    for the serializer.
+    
+    If ``serializers`` is provided, the registration will be added
+    to the provided dictionary.
+    
+    If ``serializers`` is not provided, the registration will be made
+    directly into the global register of serializers. Adding serializers
+    directly is not a thread-safe operation.
+    """
     module = __import__(serializer_module, {}, {}, [''])
-    _serializers[format] = module
-
+    if serializers is None:
+        _serializers[format] = module
+    else:
+        serializers[format] = module
+        
 def unregister_serializer(format):
-    """Unregister a given serializer"""
+    "Unregister a given serializer. This is not a thread-safe operation."
     del _serializers[format]
 
 def get_serializer(format):
@@ -88,8 +102,11 @@ def _load_serializers():
     that user code has a chance to (e.g.) set up custom settings without
     needing to be careful of import order.
     """
+    global _serializers
+    serializers = {}
     for format in BUILTIN_SERIALIZERS:
-        register_serializer(format, BUILTIN_SERIALIZERS[format])
+        register_serializer(format, BUILTIN_SERIALIZERS[format], serializers)
     if hasattr(settings, "SERIALIZATION_MODULES"):
         for format in settings.SERIALIZATION_MODULES:
-            register_serializer(format, settings.SERIALIZATION_MODULES[format])
+            register_serializer(format, settings.SERIALIZATION_MODULES[format], serializers)
+    _serializers = serializers
