@@ -7,13 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-06-23 20:52+0200\n"
+"POT-Creation-Date: 2008-08-15 14:38+0200\n"
 "PO-Revision-Date: 2008-06-23 21:02+0100\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language-Team: \n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -47,8 +47,12 @@ msgstr "Alles abwählen"
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
-msgid "January February March April May June July August September October November December"
-msgstr "Januar Februar März April Mai Juni Juli August September Oktober November Dezember"
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Januar Februar März April Mai Juni Juli August September Oktober November "
+"Dezember"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
@@ -113,4 +117,3 @@ msgstr "Gestern"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "Morgen"
-
