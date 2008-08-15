@@ -1290,7 +1290,7 @@ Server errors
 -------------
 
 When ``DEBUG`` is ``False``, Django will e-mail the users listed in the
-``ADMIN`` setting whenever your code raises an unhandled exception and results
+``ADMINS`` setting whenever your code raises an unhandled exception and results
 in an internal server error (HTTP status code 500). This gives the
 administrators immediate notification of any errors.
 
