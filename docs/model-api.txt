@@ -869,7 +869,8 @@ relationship should work. All are optional:
                              (an object with a ``get_sql()`` method) for more complex
                              queries.
 
-                             Not compatible with ``edit_inline``.
+                             ``limit_choices_to`` has no effect the inline FormSets that 
+                             are created to display related objects in the admin.
 
     ``related_name``         The name to use for the relation from the related
                              object back to this one. See the
@@ -948,6 +949,9 @@ the relationship should work. All are optional:
     ``related_name``         See the description under ``ForeignKey`` above.
 
     ``limit_choices_to``     See the description under ``ForeignKey`` above.
+    
+                             ``limit_choices_to`` has no effect when used on a
+                             ``ManyToManyField`` with an intermediate table.
 
     ``symmetrical``          Only used in the definition of ManyToManyFields on self.
                              Consider the following model::
