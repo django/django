@@ -5,7 +5,12 @@ Tests for the file storage mechanism
 >>> from django.core.files.storage import FileSystemStorage
 >>> from django.core.files.base import ContentFile
 
->>> temp_storage = FileSystemStorage(location=tempfile.gettempdir())
+# Set up a unique temporary directory
+>>> import os
+>>> temp_dir = tempfile.mktemp()
+>>> os.makedirs(temp_dir)
+
+>>> temp_storage = FileSystemStorage(location=temp_dir)
 
 # Standard file access options are available, and work as expected.
 
@@ -52,7 +57,7 @@ SuspiciousOperation: Attempted access to '/etc/passwd' denied.
 ...             number += 1
 ...
 ...         return name
->>> custom_storage = CustomStorage(tempfile.gettempdir())
+>>> custom_storage = CustomStorage(temp_dir)
 
 >>> first = custom_storage.save('custom_storage', ContentFile('custom contents'))
 >>> first
@@ -63,6 +68,10 @@ u'custom_storage.2'
 
 >>> custom_storage.delete(first)
 >>> custom_storage.delete(second)
+
+# Cleanup the temp dir
+>>> os.rmdir(temp_dir)
+
 """
 
 # Tests for a race condition on file saving (#4948).
