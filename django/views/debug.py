@@ -328,6 +328,7 @@ TECHNICAL_500_TEMPLATE = """
     .specific { color:#cc3300; font-weight:bold; }
     h2 span.commands { font-size:.7em;}
     span.commands a:link {color:#5E5694;}
+    pre.exception_value { font-family: sans-serif; color: #666; font-size: 1.5em; margin: 10px 0 10px 0; }
   </style>
   <script type="text/javascript">
   //<!--
@@ -388,7 +389,7 @@ TECHNICAL_500_TEMPLATE = """
 <body>
 <div id="summary">
   <h1>{{ exception_type }} at {{ request.path|escape }}</h1>
-  <h2>{{ exception_value|escape }}</h2>
+  <pre class="exception_value">{{ exception_value|escape }}</pre>
   <table class="meta">
     <tr>
       <th>Request Method:</th>
