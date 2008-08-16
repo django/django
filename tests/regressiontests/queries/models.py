@@ -891,6 +891,12 @@ True
 >>> Celebrity.objects.count() == num_celebs
 True
 
+Bug #8283 -- Checking that applying filters after a disjunction works correctly.
+>>> (ExtraInfo.objects.filter(note=n1)|ExtraInfo.objects.filter(info='e2')).filter(note=n1)
+[<ExtraInfo: e1>]
+>>> (ExtraInfo.objects.filter(info='e2')|ExtraInfo.objects.filter(note=n1)).filter(note=n1)
+[<ExtraInfo: e1>]
+
 """}
 
 # In Python 2.3, exceptions raised in __len__ are swallowed (Python issue

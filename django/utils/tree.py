@@ -87,7 +87,7 @@ class Node(object):
         Otherwise, the whole tree is pushed down one level and a new root
         connector is created, connecting the existing tree and the new node.
         """
-        if node in self.children:
+        if node in self.children and conn_type == self.connector:
             return
         if len(self.children) < 2:
             self.connector = conn_type
