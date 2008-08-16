@@ -17,6 +17,7 @@ See docs/cache.txt for information on the public API.
 
 from cgi import parse_qsl
 from django.conf import settings
+from django.core import signals
 from django.core.cache.backends.base import InvalidCacheBackendError
 
 # Name for use in settings file --> name of module in "backends" directory.
@@ -54,3 +55,10 @@ def get_cache(backend_uri):
     return getattr(module, 'CacheClass')(host, params)
 
 cache = get_cache(settings.CACHE_BACKEND)
+
+# Some caches -- pythont-memcached in particular -- need to do a cleanup at the
+# end of a request cycle. If the cache provides a close() method, wire it up
+# here.
+if hasattr(cache, 'close'):
+    signals.request_finished.connect(cache.close)
+

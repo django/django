@@ -39,3 +39,7 @@ class CacheClass(BaseCache):
 
     def get_many(self, keys):
         return self._cache.get_multi(map(smart_str,keys))
+
+    def close(self, **kwargs):
+        self._cache.disconnect_all()
+
