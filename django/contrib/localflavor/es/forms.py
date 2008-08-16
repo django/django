@@ -108,7 +108,7 @@ class ESIdentityCardNumberField(RegexField):
             if not letter2:
                 number, letter2 = number[:-1], int(number[-1])
             checksum = cif_get_checksum(number)
-            if letter2 in [checksum, self.cif_control[checksum]]:
+            if letter2 in (checksum, self.cif_control[checksum]):
                 return value
             else:
                 raise ValidationError, self.error_messages['invalid_cif']
@@ -180,5 +180,5 @@ class ESProvinceSelect(Select):
 def cif_get_checksum(number):
     s1 = sum([int(digit) for pos, digit in enumerate(number) if int(pos) % 2])
     s2 = sum([sum([int(unit) for unit in str(int(digit) * 2)]) for pos, digit in enumerate(number) if not int(pos) % 2])
-    return 10 - ((s1 + s2) % 10)
+    return (10 - ((s1 + s2) % 10)) % 10
 

@@ -167,6 +167,8 @@ Traceback (most recent call last):
 ValidationError: [u'Invalid checksum for NIE.']
 >>> f.clean('B38790911')
 'B38790911'
+>>> f.clean('B31234560')
+'B31234560'
 >>> f.clean('B-3879091A')
 'B3879091A'
 >>> f.clean('B 38790917')
