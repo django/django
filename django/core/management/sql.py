@@ -104,8 +104,6 @@ def sql_delete(app, style):
             if cursor and connection.introspection.table_name_converter(f.m2m_db_table()) in table_names:
                 output.extend(connection.creation.sql_destroy_many_to_many(model, f, style))
 
-    app_label = app_models[0]._meta.app_label
-
     # Close database connection explicitly, in case this output is being piped
     # directly into a database client, to avoid locking issues.
     if cursor:
