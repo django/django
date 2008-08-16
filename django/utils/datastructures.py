@@ -266,6 +266,14 @@ class MultiValueDict(dict):
         """
         return [(key, self[key]) for key in self.keys()]
 
+    def iteritems(self):
+        """
+        Yields (key, value) pairs, where value is the last item in the list
+        associated with the key.
+        """
+        for key in self.keys():
+            yield (key, self[key])
+
     def lists(self):
         """Returns a list of (key, list) pairs."""
         return super(MultiValueDict, self).items()

@@ -42,6 +42,8 @@ MergeDict can merge MultiValueDicts
 'Simon'
 >>> d.getlist('name')
 ['Adrian', 'Simon']
+>>> list(d.iteritems())
+[('position', 'Developer'), ('name', 'Simon')]
 >>> d['lastname']
 Traceback (most recent call last):
 ...
