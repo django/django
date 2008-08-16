@@ -14,6 +14,7 @@ class SessionStore(SessionBase):
         if session_data is not None:
             return session_data
         self.create()
+        return {}
 
     def create(self):
         while True:

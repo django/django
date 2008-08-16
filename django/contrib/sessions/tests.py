@@ -10,6 +10,7 @@ r"""
 >>> db_session = DatabaseSession()
 >>> db_session.modified
 False
+>>> db_session.get('cat')
 >>> db_session['cat'] = "dog"
 >>> db_session.modified
 True
@@ -42,6 +43,7 @@ False
 >>> Session.objects.filter(pk=db_session.session_key).delete()
 >>> db_session = DatabaseSession(db_session.session_key)
 >>> db_session.save()
+>>> DatabaseSession('1').get('cat')
 
 >>> file_session = FileSession()
 >>> file_session.modified
@@ -59,6 +61,7 @@ True
 >>> file_session.delete(file_session.session_key)
 >>> file_session.exists(file_session.session_key)
 False
+>>> FileSession('1').get('cat')
 
 >>> file_session['foo'] = 'bar'
 >>> file_session.save()
@@ -112,6 +115,7 @@ False
 >>> Session.objects.filter(pk=cache_session.session_key).delete()
 >>> cache_session = CacheSession(cache_session.session_key)
 >>> cache_session.save()
+>>> CacheSession('1').get('cat')
 
 >>> s = SessionBase()
 >>> s._session['some key'] = 'exists' # Pre-populate the session with some data
