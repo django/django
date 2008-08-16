@@ -2229,6 +2229,15 @@ For example, this deletes all ``Entry`` objects with a ``pub_date`` year of
 
     Entry.objects.filter(pub_date__year=2005).delete()
 
+Keep in mind that this will, whenever possible, be executed purely in
+SQL, and so the ``delete()`` methods of individual object instances
+will not necessarily be called during the process. If you've provided
+a custom ``delete()`` method on a model class and want to ensure that
+it is called, you will need to "manually" delete instances of that
+model (e.g., by iterating over a ``QuerySet`` and calling ``delete()``
+on each object individually) rather than using the bulk ``delete()``
+method of a ``QuerySet``.
+
 When Django deletes an object, it emulates the behavior of the SQL
 constraint ``ON DELETE CASCADE`` -- in other words, any objects which
 had foreign keys pointing at the object to be deleted will be deleted
