@@ -435,18 +435,17 @@ Customize the admin index page
 On a similar note, you might want to customize the look and feel of the Django
 admin index page.
 
-By default, it displays all available apps, according to your ``INSTALLED_APPS``
-setting. But the order in which it displays things is random, and you may want
-to make significant changes to the layout. After all, the index is probably the
-most important page of the admin, and it should be easy to use.
+By default, it displays all the apps in your ``INSTALLED_APPS`` setting that
+have been registered with the admin application, in alphabetical order. You
+may want to make significant changes to the layout. After all, the index is
+probably the most important page of the admin, and it should be easy to use.
 
 The template to customize is ``admin/index.html``. (Do the same as with
 ``admin/base_site.html`` in the previous section -- copy it from the default
 directory to your custom template directory.) Edit the file, and you'll see it
-uses a template tag called ``{% get_admin_app_list as app_list %}``. That's the
-magic that retrieves every installed Django app. Instead of using that, you can
-hard-code links to object-specific admin pages in whatever way you think is
-best.
+uses a template variable called ``app_list``. That variable contains every
+installed Django app. Instead of using that, you can hard-code links to
+object-specific admin pages in whatever way you think is best.
 
 Django offers another shortcut in this department. Run the command
 ``python manage.py adminindex polls`` to get a chunk of template code for
