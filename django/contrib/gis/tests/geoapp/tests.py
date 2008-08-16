@@ -372,8 +372,8 @@ class GeoModelTest(unittest.TestCase):
         for c in qs: self.assertEqual(True, c.name in cities)
 
     def test14_equals(self):
-        if DISABLE: return
         "Testing the 'same_as' and 'equals' lookup types."
+        if DISABLE: return
         pnt = fromstr('POINT (-95.363151 29.763374)', srid=4326)
         c1 = City.objects.get(point=pnt)
         c2 = City.objects.get(point__same_as=pnt)
@@ -558,7 +558,9 @@ class GeoModelTest(unittest.TestCase):
             self.assertEqual(c.mpoly.sym_difference(geom), c.sym_difference)
             self.assertEqual(c.mpoly.union(geom), c.union)
 
+from test_feeds import GeoFeedTest
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(GeoModelTest))
+    s.addTest(unittest.makeSuite(GeoFeedTest))
     return s

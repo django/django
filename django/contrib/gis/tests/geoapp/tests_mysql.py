@@ -173,7 +173,9 @@ class GeoModelTest(unittest.TestCase):
         self.assertRaises(ImproperlyConfigured, State.objects.all().kml, field_name='poly')
         self.assertRaises(ImproperlyConfigured, Country.objects.all().gml, field_name='mpoly')
 
+from test_feeds import GeoFeedTest
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(GeoModelTest))
+    s.addTest(unittest.makeSuite(GeoFeedTest))
     return s

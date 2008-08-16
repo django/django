@@ -59,6 +59,20 @@ class Feed(object):
                 return attr()
         return attr
 
+    def feed_extra_kwargs(self, obj):
+        """
+        Returns an extra keyword arguments dictionary that is used when
+        initializing the feed generator.
+        """
+        return {}
+
+    def item_extra_kwargs(self, item):
+        """
+        Returns an extra keyword arguments dictionary that is used with
+        the `add_item` call of the feed generator.
+        """
+        return {}
+
     def get_object(self, bits):
         return None
 
@@ -100,6 +114,7 @@ class Feed(object):
             feed_copyright = self.__get_dynamic_attr('feed_copyright', obj),
             feed_guid = self.__get_dynamic_attr('feed_guid', obj),
             ttl = self.__get_dynamic_attr('ttl', obj),
+            **self.feed_extra_kwargs(obj)
         )
 
         try:
@@ -158,5 +173,6 @@ class Feed(object):
                 author_link = author_link,
                 categories = self.__get_dynamic_attr('item_categories', item),
                 item_copyright = self.__get_dynamic_attr('item_copyright', item),
+                **self.item_extra_kwargs(item)
             )
         return feed

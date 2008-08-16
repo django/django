@@ -1,5 +1,4 @@
 import sys
-from copy import copy
 from unittest import TestSuite, TextTestRunner
 
 from django.conf import settings
@@ -94,20 +93,36 @@ def run_tests(module_list, verbosity=1, interactive=True):
     from django.contrib.gis.db.backend import create_spatial_db
     from django.contrib.gis.tests.utils import mysql
     from django.db import connection
+    from django.db.models import loading
 
     # Getting initial values.
     old_debug = settings.DEBUG
-    old_name = copy(settings.DATABASE_NAME)
-    old_installed = copy(settings.INSTALLED_APPS)
-    new_installed = copy(settings.INSTALLED_APPS)
+    old_name = settings.DATABASE_NAME
+    old_installed = settings.INSTALLED_APPS
+    old_root_urlconf = settings.ROOT_URLCONF
+
+    # Based on ALWAYS_INSTALLED_APPS from django test suite --
+    # this prevents us from creating tables in our test database
+    # from locally installed apps.
+    new_installed =  ['django.contrib.contenttypes',
+                      'django.contrib.auth',
+                      'django.contrib.sites',
+                      'django.contrib.flatpages',
+                      'django.contrib.gis',
+                      'django.contrib.redirects',
+                      'django.contrib.sessions',
+                      'django.contrib.comments',
+                      'django.contrib.admin',
+                      ]
+
+    # Setting the URLs.
+    settings.ROOT_URLCONF = 'django.contrib.gis.tests.urls'
 
     # Want DEBUG to be set to False.
     settings.DEBUG = False
 
-    from django.db.models import loading
-
     # Creating the test suite, adding the test models to INSTALLED_APPS, and
-    #  adding the model test suites to our suite package.
+    # adding the model test suites to our suite package.
     test_suite, test_models = geo_suite()
     for test_model in test_models:
         module_name = 'django.contrib.gis.tests.%s' % test_model
@@ -117,8 +132,9 @@ def run_tests(module_list, verbosity=1, interactive=True):
             test_module_name = 'tests'
         new_installed.append(module_name)
 
-        # Getting the test suite
-        tsuite = getattr(__import__('django.contrib.gis.tests.%s' % test_model, globals(), locals(), [test_module_name]), test_module_name)
+        # Getting the model test suite
+        tsuite = getattr(__import__('django.contrib.gis.tests.%s' % test_model, globals(), locals(), [test_module_name]), 
+                         test_module_name)
         test_suite.addTest(tsuite.suite())
     
     # Resetting the loaded flag to take into account what we appended to 
@@ -138,7 +154,8 @@ def run_tests(module_list, verbosity=1, interactive=True):
     connection.creation.destroy_test_db(old_name, verbosity)
     settings.DEBUG = old_debug
     settings.INSTALLED_APPS = old_installed
-    
+    settings.ROOT_URLCONF = old_root_urlconf
+
     # Returning the total failures and errors
     return len(result.failures) + len(result.errors)
 
