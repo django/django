@@ -69,5 +69,4 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _destroy_test_db(self, test_database_name, verbosity):
         if test_database_name and test_database_name != ":memory:":
             # Remove the SQLite database file
-            os.remove(test_database_name)        
-                    
+            os.remove(test_database_name)
