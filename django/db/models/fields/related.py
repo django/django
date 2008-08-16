@@ -311,6 +311,13 @@ class ForeignRelatedObjectsDescriptor(object):
                 return new_obj
             create.alters_data = True
 
+            def get_or_create(self, **kwargs):
+                # Update kwargs with the related object that this
+                # ForeignRelatedObjectsDescriptor knows about.
+                kwargs.update({rel_field.name: instance})
+                return super(RelatedManager, self).get_or_create(**kwargs)
+            get_or_create.alters_data = True
+
             # remove() and clear() are only provided if the ForeignKey can have a value of null.
             if rel_field.null:
                 def remove(self, *objs):
@@ -408,6 +415,16 @@ def create_many_related_manager(superclass, through=False):
             self.add(new_obj)
             return new_obj
         create.alters_data = True
+
+        def get_or_create(self, **kwargs):
+            obj, created = \
+                    super(ManyRelatedManager, self).get_or_create(**kwargs)
+            # We only need to add() if created because if we got an object back
+            # from get() then the relationship already exists.
+            if created:
+                self.add(obj)
+            return obj, created
+        get_or_create.alters_data = True
 
         def _add_items(self, source_col_name, target_col_name, *objs):
             # join_table: name of the m2m link table
