@@ -16,7 +16,7 @@ class Command(NoArgsCommand):
         from django.db import connection
         import keyword
 
-        table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '')
+        table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '').replace('-', '')
 
         cursor = connection.cursor()
         yield "# This is an auto-generated Django model module."
@@ -45,12 +45,19 @@ class Command(NoArgsCommand):
                 comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
                 extra_params = {}  # Holds Field parameters such as 'db_column'.
 
+                # If we need to do field name modifiations, 
+                # remember the original field name
+                if ' ' in att_name or '-' in att_name or keyword.iskeyword(att_name):
+                    extra_params['db_column'] = att_name
+                  
+                # Now modify the field name to make it python compatible.  
                 if ' ' in att_name:
-                    extra_params['db_column'] = att_name
-                    att_name = att_name.replace(' ', '')
+                    att_name = att_name.replace(' ', '_')
                     comment_notes.append('Field renamed to remove spaces.')
+                if '-' in att_name:
+                    att_name = att_name.replace('-', '_')
+                    comment_notes.append('Field renamed to remove dashes.')
                 if keyword.iskeyword(att_name):
-                    extra_params['db_column'] = att_name
                     att_name += '_field'
                     comment_notes.append('Field renamed because it was a Python reserved word.')
 
