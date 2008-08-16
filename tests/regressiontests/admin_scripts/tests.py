@@ -42,7 +42,7 @@ class AdminScriptTestCase(unittest.TestCase):
         test_dir = os.path.dirname(os.path.dirname(__file__))
         full_name = os.path.join(test_dir, filename)
         os.remove(full_name)
-        
+
         # Also try to remove the compiled file; if it exists, it could
         # mess up later tests that depend upon the .py file not existing
         try:
@@ -54,18 +54,6 @@ class AdminScriptTestCase(unittest.TestCase):
                 os.remove(full_name + 'c')
         except OSError:
             pass
-        
-    def _sys_executable(self):
-        """
-        Returns the command line needed to run a python interpreter, including
-        the options for setting sys.path on Jython, which doesn't recognize
-        PYTHONPATH.
-        """
-        if sys.platform.startswith('java'):
-            return "%s -J-Dpython.path=%s" % \
-                   (sys.executable, os.environ['PYTHONPATH'])
-        else:
-            return sys.executable
 
     def _ext_backend_path(self):
         """
@@ -78,6 +66,7 @@ class AdminScriptTestCase(unittest.TestCase):
             backend_pkg = __import__(result[0])
             backend_dir = os.path.dirname(backend_pkg.__file__)
             return os.path.dirname(backend_dir)
+
     def run_test(self, script, args, settings_file=None, apps=None):
         test_dir = os.path.dirname(os.path.dirname(__file__))
         project_dir = os.path.dirname(test_dir)
@@ -86,7 +75,12 @@ class AdminScriptTestCase(unittest.TestCase):
 
         # Remember the old environment
         old_django_settings_module = os.environ.get('DJANGO_SETTINGS_MODULE', None)
-        old_python_path = os.environ.get('PYTHONPATH', None)
+        if sys.platform.startswith('java'):
+            python_path_var_name = 'JYTHONPATH'
+        else:
+            python_path_var_name = 'PYTHONPATH'
+
+        old_python_path = os.environ.get(python_path_var_name, None)
         old_cwd = os.getcwd()
 
         # Set the test environment
@@ -97,11 +91,10 @@ class AdminScriptTestCase(unittest.TestCase):
         python_path = [test_dir, base_dir]
         if ext_backend_base_dir:
             python_path.append(ext_backend_base_dir)
-        os.environ['PYTHONPATH'] = os.pathsep.join(python_path)
-
+        os.environ[python_path_var_name] = os.pathsep.join(python_path)
 
         # Build the command line
-        cmd = '%s "%s"' % (self._sys_executable(), script)
+        cmd = '%s "%s"' % (sys.executable, script)
         cmd += ''.join([' %s' % arg for arg in args])
 
         # Move to the test directory and run
@@ -118,7 +111,7 @@ class AdminScriptTestCase(unittest.TestCase):
         if old_django_settings_module:
             os.environ['DJANGO_SETTINGS_MODULE'] = old_django_settings_module
         if old_python_path:
-            os.environ['PYTHONPATH'] = old_python_path
+            os.environ[python_path_var_name] = old_python_path
         # Move back to the old working directory
         os.chdir(old_cwd)
 
@@ -425,7 +418,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
-    def test_custom_command(self): 
+    def test_custom_command(self):
         "alternate: django-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
@@ -495,7 +488,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
-    def test_custom_command(self): 
+    def test_custom_command(self):
         "alternate: django-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
