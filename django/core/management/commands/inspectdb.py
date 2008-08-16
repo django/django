@@ -16,7 +16,7 @@ class Command(NoArgsCommand):
         from django.db import connection
         import keyword
 
-        table2model = lambda table_name: table_name.title().replace('_', '')
+        table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '')
 
         cursor = connection.cursor()
         yield "# This is an auto-generated Django model module."
