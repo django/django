@@ -227,6 +227,16 @@ creating a ``TaggedItem``::
     >>> t.content_object
     <User: Guido>
 
+Due to the way ``GenericForeignKey`` is implemeneted, you cannot use such
+fields directly with filters (``filter()`` and ``exclude()``, for example) via
+the database API. They aren't normal field objects. These examples will *not*
+work::
+
+	# This will fail
+	>>> TaggedItem.objects.filter(content_object=guido)
+	# This will also fail
+	>>> TaggedItem.objects.get(content_object=guido)
+
 Reverse generic relations
 -------------------------
 
