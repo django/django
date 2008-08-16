@@ -53,5 +53,8 @@ signals.request_started.connect(reset_queries)
 # when a Django request has an exception.
 def _rollback_on_exception(**kwargs):
     from django.db import transaction
-    transaction.rollback_unless_managed()
+    try:
+        transaction.rollback_unless_managed()
+    except DatabaseError:
+        pass
 signals.got_request_exception.connect(_rollback_on_exception)
