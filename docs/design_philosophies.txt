@@ -83,8 +83,10 @@ Include all relevant domain logic
 Models should encapsulate every aspect of an "object," following Martin
 Fowler's `Active Record`_ design pattern.
 
-This is why model-specific admin options are included in the model itself; data
-related to a model should be stored *in* the model.
+This is why both the data represented by a model and information about
+it (its human-readable name, options like default ordering, etc.) are
+defined in the model class; all the information needed to understand a
+given model should be stored *in* the model.
 
 .. _`Active Record`: http://www.martinfowler.com/eaaCatalog/activeRecord.html
 
