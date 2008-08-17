@@ -79,4 +79,12 @@ True
 >>> list(User.objects.extra(select={"alpha": "%s"}, select_params=(-6,)).filter(id=u.id).values_list('id', flat=True)) == [u.id]
 True
 
+# Regression test for #8063: limiting a query shouldn't discard any extra()
+# bits.
+>>> qs = User.objects.all().extra(where=['id=%s'], params=[u.id])
+>>> qs
+[<User: fred>]
+>>> qs[:1]
+[<User: fred>]
+
 """}
