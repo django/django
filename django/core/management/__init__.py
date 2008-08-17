@@ -1,7 +1,7 @@
 import os
 import sys
 from optparse import OptionParser
-from imp import find_module
+import imp
 
 import django
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
@@ -47,14 +47,14 @@ def find_management_module(app_name):
     # module, we need look for the case where the project name is part
     # of the app_name but the project directory itself isn't on the path.
     try:
-        f, path, descr = find_module(part,path) 
+        f, path, descr = imp.find_module(part,path)
     except ImportError,e:
         if os.path.basename(os.getcwd()) != part:
             raise e
         
     while parts:
         part = parts.pop()
-        f, path, descr = find_module(part, path and [path] or None)
+        f, path, descr = imp.find_module(part, path and [path] or None)
     return path
 
 def load_command_class(app_name, name):
