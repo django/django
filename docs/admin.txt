@@ -79,8 +79,6 @@ add/change pages.
 
 For an example see the section `Adding custom validation to the admin`_.
 
-.. _Adding custom validation to the admin: #adding-custom-validation-to-the-admin
-
 ``fieldsets``
 ~~~~~~~~~~~~~
 
