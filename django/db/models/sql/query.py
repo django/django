@@ -542,7 +542,10 @@ class Query(object):
             first = False
         for t in self.extra_tables:
             alias, unused = self.table_alias(t)
-            if alias not in self.alias_map:
+            # Only add the alias if it's not already present (the table_alias()
+            # calls increments the refcount, so an alias refcount of one means
+            # this is the only reference.
+            if alias not in self.alias_map or self.alias_refcount[alias] == 1:
                 connector = not first and ', ' or ''
                 result.append('%s%s' % (connector, qn(alias)))
                 first = False

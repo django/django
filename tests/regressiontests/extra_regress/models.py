@@ -24,6 +24,10 @@ class RevisionableModel(models.Model):
         new_revision.pk = None
         return new_revision
 
+class Order(models.Model):
+    created_by = models.ForeignKey(User)
+    text = models.TextField()
+
 __test__ = {"API_TESTS": """
 # Regression tests for #7314 and #7372
 
@@ -86,5 +90,12 @@ True
 [<User: fred>]
 >>> qs[:1]
 [<User: fred>]
+
+# Regression test for #8039: Ordering sometimes removed relevant tables from
+# extra(). This test is the critical case: ordering uses a table, but then
+# removes the reference because of an optimisation. The table should still be
+# present because of the extra() call.
+>>> Order.objects.extra(where=["username=%s"], params=["fred"], tables=["auth_user"]).order_by('created_by')
+[]
 
 """}
