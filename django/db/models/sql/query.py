@@ -11,6 +11,7 @@ from copy import deepcopy
 
 from django.utils.tree import Node
 from django.utils.datastructures import SortedDict
+from django.utils.encoding import force_unicode
 from django.db import connection
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
@@ -77,8 +78,7 @@ class Query(object):
 
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.
-        self.extra_select = {}  # Maps col_alias -> col_sql.
-        self.extra_select_params = ()
+        self.extra_select = SortedDict()  # Maps col_alias -> col_sql.
         self.extra_tables = ()
         self.extra_where = ()
         self.extra_params = ()
@@ -181,7 +181,6 @@ class Query(object):
         obj.related_select_cols = []
         obj.max_depth = self.max_depth
         obj.extra_select = self.extra_select.copy()
-        obj.extra_select_params = self.extra_select_params
         obj.extra_tables = self.extra_tables
         obj.extra_where = self.extra_where
         obj.extra_params = self.extra_params
@@ -226,7 +225,7 @@ class Query(object):
             obj = self.clone(CountQuery, _query=obj, where=self.where_class(),
                     distinct=False)
             obj.select = []
-            obj.extra_select = {}
+            obj.extra_select = SortedDict()
         obj.add_count_column()
         data = obj.execute_sql(SINGLE)
         if not data:
@@ -259,7 +258,9 @@ class Query(object):
         from_, f_params = self.get_from_clause()
 
         where, w_params = self.where.as_sql(qn=self.quote_name_unless_alias)
-        params = list(self.extra_select_params)
+        params = []
+        for val in self.extra_select.itervalues():
+            params.extend(val[1])
 
         result = ['SELECT']
         if self.distinct:
@@ -413,7 +414,7 @@ class Query(object):
         """
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
-        result = ['(%s) AS %s' % (col, qn2(alias)) for alias, col in self.extra_select.iteritems()]
+        result = ['(%s) AS %s' % (col[0], qn2(alias)) for alias, col in self.extra_select.iteritems()]
         aliases = set(self.extra_select.keys())
         if with_aliases:
             col_aliases = aliases.copy()
@@ -1510,7 +1511,6 @@ class Query(object):
         self.select = [select]
         self.select_fields = [None]
         self.extra_select = {}
-        self.extra_select_params = ()
 
     def add_select_related(self, fields):
         """
@@ -1533,14 +1533,25 @@ class Query(object):
         to the query.
         """
         if select:
-            # The extra select might be ordered (because it will be accepting
-            # parameters).
-            if (isinstance(select, SortedDict) and
-                    not isinstance(self.extra_select, SortedDict)):
-                self.extra_select = SortedDict(self.extra_select)
-            self.extra_select.update(select)
-        if select_params:
-            self.extra_select_params += tuple(select_params)
+            # We need to pair any placeholder markers in the 'select'
+            # dictionary with their parameters in 'select_params' so that
+            # subsequent updates to the select dictionary also adjust the
+            # parameters appropriately.
+            select_pairs = SortedDict()
+            if select_params:
+                param_iter = iter(select_params)
+            else:
+                param_iter = iter([])
+            for name, entry in select.items():
+                entry = force_unicode(entry)
+                entry_params = []
+                pos = entry.find("%s")
+                while pos != -1:
+                    entry_params.append(param_iter.next())
+                    pos = entry.find("%s", pos + 2)
+                select_pairs[name] = (entry, entry_params)
+            # This is order preserving, since self.extra_select is a SortedDict.
+            self.extra_select.update(select_pairs)
         if where:
             self.extra_where += tuple(where)
         if params:

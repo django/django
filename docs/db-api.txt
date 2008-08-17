@@ -1014,6 +1014,12 @@ of the arguments is required, but you should use at least one of them.
             select=SortedDict(('a', '%s'), ('b', '%s')),
             select_params=('one', 'two'))
 
+    The only thing to be careful about when using select parameters in
+    ``extra()`` is to avoid using the substring ``"%%s"`` (that's *two*
+    percent characters before the ``s``) in the select strings. Django's
+    tracking of parameters looks for ``%s`` and an escaped ``%`` character
+    like this isn't detected. That will lead to incorrect results.
+
 ``where`` / ``tables``
     You can define explicit SQL ``WHERE`` clauses -- perhaps to perform
     non-explicit joins -- by using ``where``. You can manually add tables to

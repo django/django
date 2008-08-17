@@ -1,7 +1,9 @@
 import copy
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.query import Q
+from django.utils.datastructures import SortedDict
 
 
 class RevisionableModel(models.Model):
@@ -23,7 +25,7 @@ class RevisionableModel(models.Model):
         return new_revision
 
 __test__ = {"API_TESTS": """
-### Regression tests for #7314 and #7372
+# Regression tests for #7314 and #7372
 
 >>> rm = RevisionableModel.objects.create(title='First Revision')
 >>> rm.pk, rm.base.pk
@@ -51,5 +53,30 @@ Queryset to search for string in title:
 Following queryset should return the most recent revision:
 >>> qs & qs2
 [<RevisionableModel: Second Revision (2, 1)>]
+
+>>> u = User.objects.create_user(username="fred", password="secret", email="fred@example.com")
+
+# General regression tests: extra select parameters should stay tied to their
+# corresponding select portions. Applies when portions are updated or otherwise
+# moved around.
+>>> qs = User.objects.extra(select=SortedDict((("alpha", "%s"), ("beta", "2"), ("gamma", "%s"))), select_params=(1, 3))
+>>> qs = qs.extra(select={"beta": 4})
+>>> qs = qs.extra(select={"alpha": "%s"}, select_params=[5])
+>>> result = {'alpha': 5, 'beta': 4, 'gamma': 3}
+>>> list(qs.filter(id=u.id).values('alpha', 'beta', 'gamma')) == [result]
+True
+
+# Regression test for #7957: Combining extra() calls should leave the
+# corresponding parameters associated with the right extra() bit. I.e. internal
+# dictionary must remain sorted.
+>>> User.objects.extra(select={"alpha": "%s"}, select_params=(1,)).extra(select={"beta": "%s"}, select_params=(2,))[0].alpha
+1
+>>> User.objects.extra(select={"beta": "%s"}, select_params=(1,)).extra(select={"alpha": "%s"}, select_params=(2,))[0].alpha
+2
+
+# Regression test for #7961: When not using a portion of an extra(...) in a
+# query, remove any corresponding parameters from the query as well.
+>>> list(User.objects.extra(select={"alpha": "%s"}, select_params=(-6,)).filter(id=u.id).values_list('id', flat=True)) == [u.id]
+True
 
 """}
