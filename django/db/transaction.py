@@ -236,10 +236,8 @@ def commit_on_success(func):
             managed(True)
             try:
                 res = func(*args, **kw)
-            except (Exception, KeyboardInterrupt, SystemExit):
-                # (We handle KeyboardInterrupt and SystemExit specially, since
-                # they don't inherit from Exception in Python 2.5, but we
-                # should treat them uniformly here.)
+            except:
+                # All exceptions must be handled here (even string ones).
                 if is_dirty():
                     rollback()
                 raise
