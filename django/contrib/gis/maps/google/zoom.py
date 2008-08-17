@@ -6,25 +6,14 @@ from math import pi, sin, cos, log, exp, atan
 DTOR = pi / 180.
 RTOD = 180. / pi
 
-def get_width_height(envelope):
-    # Getting the lower-left, upper-left, and upper-right
-    #  coordinates of the envelope.
-    ll = Point(envelope[0][0])
-    ul = Point(envelope[0][1])
-    ur = Point(envelope[0][2])
-    
-    height = ll.distance(ul)
-    width  = ul.distance(ur)
-    return width, height
-
 class GoogleZoom(object):
     """
     GoogleZoom is a utility for performing operations related to the zoom
-     levels on Google Maps.
+    levels on Google Maps.
 
     This class is inspired by the OpenStreetMap Mapnik tile generation routine
-     `generate_tiles.py`, and the article "How Big Is the World" (Hack #16) in
-     "Google Maps Hacks" by Rich Gibson and Schuyler Erle.
+    `generate_tiles.py`, and the article "How Big Is the World" (Hack #16) in
+    "Google Maps Hacks" by Rich Gibson and Schuyler Erle.
 
     `generate_tiles.py` may be found at:
       http://trac.openstreetmap.org/browser/applications/rendering/mapnik/generate_tiles.py
@@ -34,25 +23,23 @@ class GoogleZoom(object):
     
     def __init__(self, num_zoom=19, tilesize=256):
         "Initializes the Google Zoom object."
-
         # Google's tilesize is 256x256, square tiles are assumed.
         self._tilesize = tilesize
         
         # The number of zoom levels
         self._nzoom = num_zoom
 
-        # Initializing arrays to hold the parameters for each
-        #  one of the zoom levels.
+        # Initializing arrays to hold the parameters for each one of the 
+        # zoom levels.
         self._degpp = [] # Degrees per pixel
         self._radpp = [] # Radians per pixel
         self._npix  = [] # 1/2 the number of pixels for a tile at the given zoom level
         
-        # Incrementing through the zoom levels and populating the
-        #  parameter arrays.
+        # Incrementing through the zoom levels and populating the parameter arrays.
         z = tilesize # The number of pixels per zoom level.
         for i in xrange(num_zoom):
             # Getting the degrees and radians per pixel, and the 1/2 the number of
-            #  for every zoom level.
+            # for every zoom level.
             self._degpp.append(z / 360.) # degrees per pixel
             self._radpp.append(z / (2 * pi)) # radians per pixl
             self._npix.append(z / 2) # number of pixels to center of tile
@@ -75,19 +62,18 @@ class GoogleZoom(object):
     def lonlat_to_pixel(self, lonlat, zoom):
         "Converts a longitude, latitude coordinate pair for the given zoom level."
         # Setting up, unpacking the longitude, latitude values and getting the
-        #  number of pixels for the given zoom level.
+        # number of pixels for the given zoom level.
         lon, lat = self.get_lon_lat(lonlat)
         npix = self._npix[zoom]
 
-        # Calculating the pixel x coordinate by multiplying the longitude
-        #  value with with the number of degrees/pixel at the given
-        #  zoom level.
+        # Calculating the pixel x coordinate by multiplying the longitude value
+        # with with the number of degrees/pixel at the given zoom level.
         px_x = round(npix + (lon * self._degpp[zoom]))
 
         # Creating the factor, and ensuring that 1 or -1 is not passed in as the 
-        #  base to the logarithm.  Here's why:
-        #   if fac = -1, we'll get log(0) which is undefined; 
-        #   if fac =  1, our logarithm base will be divided by 0, also undefined.
+        # base to the logarithm.  Here's why:
+        #  if fac = -1, we'll get log(0) which is undefined; 
+        #  if fac =  1, our logarithm base will be divided by 0, also undefined.
         fac = min(max(sin(DTOR * lat), -0.9999), 0.9999)
 
         # Calculating the pixel y coordinate.
@@ -116,18 +102,18 @@ class GoogleZoom(object):
     def tile(self, lonlat, zoom):
         """
         Returns a Polygon  corresponding to the region represented by a fictional
-         Google Tile for the given longitude/latitude pair and zoom level. This
-         tile is used to determine the size of a tile at the given point.
+        Google Tile for the given longitude/latitude pair and zoom level. This
+        tile is used to determine the size of a tile at the given point.
         """
         # The given lonlat is the center of the tile.
         delta = self._tilesize / 2
 
         # Getting the pixel coordinates corresponding to the
-        #  the longitude/latitude.
+        # the longitude/latitude.
         px = self.lonlat_to_pixel(lonlat, zoom)
 
         # Getting the lower-left and upper-right lat/lon coordinates
-        #  for the bounding box of the tile.
+        # for the bounding box of the tile.
         ll = self.pixel_to_lonlat((px[0]-delta, px[1]-delta), zoom)
         ur = self.pixel_to_lonlat((px[0]+delta, px[1]+delta), zoom)
 
@@ -136,24 +122,22 @@ class GoogleZoom(object):
         
     def get_zoom(self, geom):
         "Returns the optimal Zoom level for the given geometry."
-
         # Checking the input type.
         if not isinstance(geom, GEOSGeometry) or geom.srid != 4326:
             raise TypeError('get_zoom() expects a GEOS Geometry with an SRID of 4326.')
 
         # Getting the envelope for the geometry, and its associated width, height
-        #  and centroid.
+        # and centroid.
         env = geom.envelope
-        env_w, env_h = get_width_height(env)
+        env_w, env_h = self.get_width_height(env.extent)
         center = env.centroid
 
         for z in xrange(self._nzoom):
             # Getting the tile at the zoom level.
-            tile = self.tile(center, z)
-            tile_w, tile_h = get_width_height(tile)
+            tile_w, tile_h = self.get_width_height(self.tile(center, z).extent)
 
             # When we span more than one tile, this is an approximately good
-            #  zoom level.
+            # zoom level.
             if (env_w > tile_w) or (env_h > tile_h):
                 if z == 0: 
                     raise GoogleMapException('Geometry width and height should not exceed that of the Earth.')
@@ -162,3 +146,16 @@ class GoogleZoom(object):
         # Otherwise, we've zoomed in to the max.
         return self._nzoom-1
 
+    def get_width_height(self, extent):
+        """
+        Returns the width and height for the given extent.
+        """
+        # Getting the lower-left, upper-left, and upper-right
+        # coordinates from the extent.
+        ll = Point(extent[:2])
+        ul = Point(extent[0], extent[3])
+        ur = Point(extent[2:])
+        # Calculating the width and height.
+        height = ll.distance(ul)
+        width  = ul.distance(ur)
+        return width, height
