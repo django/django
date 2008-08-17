@@ -405,7 +405,7 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
     <tr>
       <th>Exception Value:</th>
-      <td>{{ exception_value|escape }}</td>
+      <td><pre>{{ exception_value|escape }}<pre></td>
     </tr>
     <tr>
       <th>Exception Location:</th>
