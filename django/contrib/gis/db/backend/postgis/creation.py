@@ -1,8 +1,9 @@
+import os, re, sys
+
 from django.conf import settings
 from django.core.management import call_command
 from django.db import connection
 from django.db.backends.creation import TEST_DATABASE_PREFIX
-import os, re, sys
 
 def getstatusoutput(cmd):
     "A simpler version of getstatusoutput that works on win32 platforms."
@@ -57,7 +58,6 @@ def _create_with_cursor(db_name, verbosity=1, autoclobber=False):
             cursor.execute(create_sql)
         else:
             raise Exception('Spatial Database Creation canceled.')
-foo = _create_with_cursor
 
 created_regex = re.compile(r'^createdb: database creation failed: ERROR:  database ".+" already exists')
 def _create_with_shell(db_name, verbosity=1, autoclobber=False):
