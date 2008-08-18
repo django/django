@@ -55,7 +55,7 @@ class GeoQuery(sql.Query):
         """
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
-        result = ['(%s) AS %s' % (self.get_extra_select_format(alias) % col, qn2(alias)) 
+        result = ['(%s) AS %s' % (self.get_extra_select_format(alias) % col[0], qn2(alias)) 
                   for alias, col in self.extra_select.iteritems()]
         aliases = set(self.extra_select.keys())
         if with_aliases:
