@@ -43,6 +43,18 @@ def unquote(s):
             myappend('_' + item)
     return "".join(res)
 
+def flatten_fieldsets(fieldsets):
+    """Returns a list of field names from an admin fieldsets structure."""
+    field_names = []
+    for name, opts in fieldsets:
+        for field in opts['fields']:
+            # type checking feels dirty, but it seems like the best way here
+            if type(field) == tuple:
+                field_names.extend(field)
+            else:
+                field_names.append(field)
+    return field_names
+
 def _nest_help(obj, depth, val):
     current = obj
     for i in range(depth):
