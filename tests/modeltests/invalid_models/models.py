@@ -5,7 +5,7 @@ This example exists purely to point out errors in models.
 """
 
 from django.db import models
-model_errors = ""
+
 class FieldErrors(models.Model):
     charfield = models.CharField()
     decimalfield = models.DecimalField()
@@ -168,6 +168,15 @@ class RelationshipDoubleFK(models.Model):
     third = models.ForeignKey(Group, related_name="rel_to_set")
     date_added = models.DateTimeField()
 
+class AbstractModel(models.Model):
+    name = models.CharField(max_length=10)
+    class Meta:
+        abstract = True
+
+class AbstractRelationModel(models.Model):
+    fk1 = models.ForeignKey('AbstractModel')
+    fk2 = models.ManyToManyField('AbstractModel')
+    
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute.
 invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute.
 invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute.
@@ -250,8 +259,8 @@ invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with related
 invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_4'.
 invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
 invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
-invalid_models.missingrelations: 'rel2' has m2m relation with model Rel2, which has not been installed
-invalid_models.missingrelations: 'rel1' has relation with model Rel1, which has not been installed
+invalid_models.missingrelations: 'rel1' has a relation with model Rel1, which has either not been installed or is abstract.
+invalid_models.missingrelations: 'rel2' has an m2m relation with model Rel2, which has either not been installed or is abstract.
 invalid_models.grouptwo: 'primary' has a manually-defined m2m relation through model Membership, which does not have foreign keys to Person and GroupTwo
 invalid_models.grouptwo: 'secondary' has a manually-defined m2m relation through model MembershipMissingFK, which does not have foreign keys to Group and GroupTwo
 invalid_models.missingmanualm2mmodel: 'missing_m2m' specifies an m2m relation through model MissingM2MModel, which has not been installed
@@ -260,4 +269,6 @@ invalid_models.group: Intermediary model RelationshipDoubleFK has more than one 
 invalid_models.personselfrefm2m: Many-to-many fields with intermediate tables cannot be symmetrical.
 invalid_models.personselfrefm2m: Intermediary model RelationshipTripleFK has more than two foreign keys to PersonSelfRefM2M, which is ambiguous and is not permitted.
 invalid_models.personselfrefm2mexplicit: Many-to-many fields with intermediate tables cannot be symmetrical.
+invalid_models.abstractrelationmodel: 'fk1' has a relation with model AbstractModel, which has either not been installed or is abstract.
+invalid_models.abstractrelationmodel: 'fk2' has an m2m relation with model AbstractModel, which has either not been installed or is abstract.
 """

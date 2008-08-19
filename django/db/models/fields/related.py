@@ -646,6 +646,7 @@ class ForeignKey(RelatedField, Field):
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert isinstance(to, basestring), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
         else:
+            assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
             to_field = to_field or to._meta.pk.name
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
 
@@ -756,6 +757,11 @@ class OneToOneField(ForeignKey):
 
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
+        try:
+            assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
+        except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
+            assert isinstance(to, basestring), "%s(%r) is invalid. First parameter to ManyToManyField must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
+
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
         kwargs['rel'] = ManyToManyRel(to,
             num_in_admin=kwargs.pop('num_in_admin', 0),

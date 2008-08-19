@@ -68,7 +68,7 @@ def get_validation_errors(outfile, app=None):
             # fields, m2m fields, m2m related objects or related objects
             if f.rel:
                 if f.rel.to not in models.get_models():
-                    e.add(opts, "'%s' has relation with model %s, which has not been installed" % (f.name, f.rel.to))
+                    e.add(opts, "'%s' has a relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
                 # it is a string and we could not find the model it refers to
                 # so skip the next section
                 if isinstance(f.rel.to, (str, unicode)):
@@ -105,7 +105,7 @@ def get_validation_errors(outfile, app=None):
             # existing fields, m2m fields, m2m related objects or related
             # objects
             if f.rel.to not in models.get_models():
-                e.add(opts, "'%s' has m2m relation with model %s, which has not been installed" % (f.name, f.rel.to))
+                e.add(opts, "'%s' has an m2m relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
                 # it is a string and we could not find the model it refers to
                 # so skip the next section
                 if isinstance(f.rel.to, (str, unicode)):
