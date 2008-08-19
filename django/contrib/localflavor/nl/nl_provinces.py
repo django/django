@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 
 PROVINCE_CHOICES = (
-    ('DR', _('Drente')),
+    ('DR', _('Drenthe')),
     ('FL', _('Flevoland')),
     ('FR', _('Friesland')),
     ('GL', _('Gelderland')),
