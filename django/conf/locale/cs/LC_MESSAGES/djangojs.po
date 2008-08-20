@@ -7,25 +7,12 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-18 11:26+0200\n"
+"POT-Creation-Date: 2008-08-20 12:52+0200\n"
 "Language-Team: Czech\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n>1 && n<5 ? 1 : 2;\n"
-
-#: contrib/admin/media/js/dateparse.js:32
-#: contrib/admin/media/js/calendar.js:24
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Leden Únor Březen Duben Květen Červen Červenec Srpen Září Říjen Listopad "
-"Prosinec"
-
-#: contrib/admin/media/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Neděle Pondělí Úterý Středa Čtvrtek Pátek Sobota"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -57,9 +44,22 @@ msgstr "Vyberte si a klikněte "
 msgid "Clear all"
 msgstr "Vymazat vše"
 
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Leden Únor Březen Duben Květen Červen Červenec Srpen Září Říjen Listopad "
+"Prosinec"
+
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
 msgstr "N P U S C P S"
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Neděle Pondělí Úterý Středa Čtvrtek Pátek Sobota"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
