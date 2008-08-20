@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-18 00:39+0200\n"
+"POT-Creation-Date: 2008-08-20 10:24+0200\n"
 "PO-Revision-Date: 2008-08-17 23:58+0100\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: \n"
@@ -292,60 +292,60 @@ msgstr "Logeintrag"
 msgid "log entries"
 msgstr "Logeinträge"
 
-#: contrib/admin/options.py:143 contrib/admin/options.py:202
+#: contrib/admin/options.py:56 contrib/admin/options.py:115
 msgid "None"
 msgstr "-"
 
-#: contrib/admin/options.py:413
+#: contrib/admin/options.py:326
 #, python-format
 msgid "Changed %s."
 msgstr "%s geändert."
 
-#: contrib/admin/options.py:413 contrib/admin/options.py:423
+#: contrib/admin/options.py:326 contrib/admin/options.py:336
 #: core/validators.py:279 db/models/manipulators.py:305
 msgid "and"
 msgstr "und"
 
-#: contrib/admin/options.py:418
+#: contrib/admin/options.py:331
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" hinzugefügt."
 
-#: contrib/admin/options.py:422
+#: contrib/admin/options.py:335
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(list)s von %(name)s \"%(object)s\" geändert."
 
-#: contrib/admin/options.py:427
+#: contrib/admin/options.py:340
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" gelöscht."
 
-#: contrib/admin/options.py:431
+#: contrib/admin/options.py:344
 msgid "No fields changed."
 msgstr "Keine Felder geändert."
 
-#: contrib/admin/options.py:492 contrib/auth/admin.py:50
+#: contrib/admin/options.py:405 contrib/auth/admin.py:50
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" wurde erfolgreich hinzugefügt."
 
-#: contrib/admin/options.py:496 contrib/admin/options.py:529
+#: contrib/admin/options.py:409 contrib/admin/options.py:442
 #: contrib/auth/admin.py:55
 msgid "You may edit it again below."
 msgstr "Das Element kann jetzt weiter bearbeitet werden."
 
-#: contrib/admin/options.py:506 contrib/admin/options.py:539
+#: contrib/admin/options.py:419 contrib/admin/options.py:452
 #, python-format
 msgid "You may add another %s below."
 msgstr "Jetzt kann ein weiteres Element des Typs %s angelegt werden."
 
-#: contrib/admin/options.py:527
+#: contrib/admin/options.py:440
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" wurde erfolgreich geändert."
 
-#: contrib/admin/options.py:535
+#: contrib/admin/options.py:448
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -353,30 +353,30 @@ msgstr ""
 "%(name)s \"%(obj)s\" wurde erfolgreich hinzugefügt. Das Element kann jetzt "
 "geändert werden."
 
-#: contrib/admin/options.py:601
+#: contrib/admin/options.py:514
 #, python-format
 msgid "Add %s"
 msgstr "%s hinzufügen"
 
-#: contrib/admin/options.py:678
+#: contrib/admin/options.py:591
 #, python-format
 msgid "Change %s"
 msgstr "%s ändern"
 
-#: contrib/admin/options.py:709
+#: contrib/admin/options.py:622
 msgid "Database error"
 msgstr "Datenbankfehler"
 
-#: contrib/admin/options.py:758
+#: contrib/admin/options.py:671
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" wurde erfolgreich gelöscht."
 
-#: contrib/admin/options.py:765
+#: contrib/admin/options.py:678
 msgid "Are you sure?"
 msgstr "Sind Sie ganz sicher?"
 
-#: contrib/admin/options.py:792
+#: contrib/admin/options.py:705
 #, python-format
 msgid "Change history: %s"
 msgstr "Änderungsgeschichte: %s"
@@ -428,12 +428,12 @@ msgstr "Seitenverwaltung"
 msgid "Log in"
 msgstr "Anmelden"
 
-#: contrib/admin/util.py:126
+#: contrib/admin/util.py:138
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Ein oder mehrere %(fieldname)s in %(name)s: %(obj)s"
 
-#: contrib/admin/util.py:131
+#: contrib/admin/util.py:143
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Ein oder mehrere %(fieldname)s in %(name)s:"
@@ -2816,7 +2816,7 @@ msgid "Enter a valid SoFi number"
 msgstr "Bitte eine gültige SoFi-Nummer eingeben."
 
 #: contrib/localflavor/nl/nl_provinces.py:4
-msgid "Drente"
+msgid "Drenthe"
 msgstr "Drente"
 
 #: contrib/localflavor/nl/nl_provinces.py:5
@@ -4115,14 +4115,14 @@ msgstr "Bitte einen gültigen Dateinamen eingeben."
 msgid "Please enter a valid %s."
 msgstr "Bitte ein gültiges '%s' eingeben."
 
-#: db/models/fields/related.py:776
+#: db/models/fields/related.py:782
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Um mehr als eine Selektion zu treffen, \"Strg\", oder auf dem Mac \"Command"
 "\", beim Klicken gedrückt halten."
 
-#: db/models/fields/related.py:856
+#: db/models/fields/related.py:862
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -4577,30 +4577,3 @@ msgstr "%(verbose_name)s wurde erfolgreich aktualisiert."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s wurde gelöscht."
-
-#~ msgid "Ordering"
-#~ msgstr "Sortierung"
-
-#~ msgid "Order:"
-#~ msgstr "Reihenfolge:"
-
-#~ msgid "Your new password is: %(new_password)s"
-#~ msgstr "Ihr neues Passwort lautet: %(new_password)s"
-
-#~ msgid "Feel free to change this password by going to this page:"
-#~ msgstr "Sie können das Passwort auf folgender Seite ändern:"
-
-#~ msgid "Added %s."
-#~ msgstr "%s hinzugefügt."
-
-#~ msgid "Deleted %s."
-#~ msgstr "%s gelöscht."
-
-#~ msgid "The two 'new password' fields didn't match."
-#~ msgstr "Die beiden neuen Passwörter sind nicht identisch."
-
-#~ msgid "Year must be 1900 or later."
-#~ msgstr "Das Jahr muss 1900 oder später sein."
-
-#~ msgid "Separate multiple IDs with commas."
-#~ msgstr "Mehrere IDs können mit Komma getrennt werden."
