@@ -6,7 +6,7 @@ given parameters. If an object isn't found, it creates one with the given
 parameters.
 """
 
-from django.db import models
+from django.db import models, IntegrityError
 
 class Person(models.Model):
     first_name = models.CharField(max_length=100)
@@ -53,8 +53,12 @@ False
 
 # If you don't specify a value or default value for all required fields, you
 # will get an error.
->>> p, created = Person.objects.get_or_create(first_name='Tom', last_name='Smith')
-Traceback (most recent call last):
-...
-IntegrityError:...
+>>> try:
+...     p, created = Person.objects.get_or_create(first_name='Tom', last_name='Smith')
+... except Exception, e:
+...     if isinstance(e, IntegrityError):
+...         print "Pass"
+...     else:
+...         print "Fail with %s" % type(e)
+Pass
 """}

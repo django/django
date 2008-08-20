@@ -6,7 +6,7 @@ To define a one-to-one relationship, use ``OneToOneField()``.
 In this example, a ``Place`` optionally can be a ``Restaurant``.
 """
 
-from django.db import models, transaction
+from django.db import models, transaction, IntegrityError
 
 class Place(models.Model):
     name = models.CharField(max_length=50)
@@ -179,10 +179,14 @@ DoesNotExist: Restaurant matching query does not exist.
 # This will fail because each one-to-one field must be unique (and link2=o1 was
 # used for x1, above).
 >>> sid = transaction.savepoint()
->>> MultiModel(link1=p2, link2=o1, name="x1").save()
-Traceback (most recent call last):
-    ...
-IntegrityError: ...
+>>> try:
+...     MultiModel(link1=p2, link2=o1, name="x1").save()
+... except Exception, e:
+...     if isinstance(e, IntegrityError):
+...         print "Pass"
+...     else:
+...         print "Fail with %s" % type(e)
+Pass
 >>> transaction.savepoint_rollback(sid)
 
 """}
