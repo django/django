@@ -68,5 +68,5 @@ ValidationError: [u'Enter a valid SoFi number']
 >>> from django.contrib.localflavor.nl.forms import NLProvinceSelect
 >>> s = NLProvinceSelect()
 >>> s.render('provinces', 'OV')
-u'<select name="provinces">\n<option value="DR">Drente</option>\n<option value="FL">Flevoland</option>\n<option value="FR">Friesland</option>\n<option value="GL">Gelderland</option>\n<option value="GR">Groningen</option>\n<option value="LB">Limburg</option>\n<option value="NB">Noord-Brabant</option>\n<option value="NH">Noord-Holland</option>\n<option value="OV" selected="selected">Overijssel</option>\n<option value="UT">Utrecht</option>\n<option value="ZE">Zeeland</option>\n<option value="ZH">Zuid-Holland</option>\n</select>'
+u'<select name="provinces">\n<option value="DR">Drenthe</option>\n<option value="FL">Flevoland</option>\n<option value="FR">Friesland</option>\n<option value="GL">Gelderland</option>\n<option value="GR">Groningen</option>\n<option value="LB">Limburg</option>\n<option value="NB">Noord-Brabant</option>\n<option value="NH">Noord-Holland</option>\n<option value="OV" selected="selected">Overijssel</option>\n<option value="UT">Utrecht</option>\n<option value="ZE">Zeeland</option>\n<option value="ZH">Zuid-Holland</option>\n</select>'
 """
