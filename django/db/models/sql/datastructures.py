@@ -85,7 +85,7 @@ class Date(object):
     def __init__(self, col, lookup_type, date_sql_func):
         self.col = col
         self.lookup_type = lookup_type
-        self.date_sql_func= date_sql_func
+        self.date_sql_func = date_sql_func
 
     def relabel_aliases(self, change_map):
         c = self.col

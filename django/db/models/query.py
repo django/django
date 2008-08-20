@@ -452,12 +452,8 @@ class QuerySet(object):
                 "'kind' must be one of 'year', 'month' or 'day'."
         assert order in ('ASC', 'DESC'), \
                 "'order' must be either 'ASC' or 'DESC'."
-        # Let the FieldDoesNotExist exception propagate.
-        field = self.model._meta.get_field(field_name, many_to_many=False)
-        assert isinstance(field, DateField), "%r isn't a DateField." \
-                % field_name
-        return self._clone(klass=DateQuerySet, setup=True, _field=field,
-                _kind=kind, _order=order)
+        return self._clone(klass=DateQuerySet, setup=True,
+                _field_name=field_name, _kind=kind, _order=order)
 
     def none(self):
         """
@@ -721,13 +717,16 @@ class DateQuerySet(QuerySet):
         """
         self.query = self.query.clone(klass=sql.DateQuery, setup=True)
         self.query.select = []
-        self.query.add_date_select(self._field, self._kind, self._order)
-        if self._field.null:
-            self.query.add_filter(('%s__isnull' % self._field.name, False))
+        field = self.model._meta.get_field(self._field_name, many_to_many=False)
+        assert isinstance(field, DateField), "%r isn't a DateField." \
+                % field_name
+        self.query.add_date_select(field, self._kind, self._order)
+        if field.null:
+            self.query.add_filter(('%s__isnull' % field.name, False))
 
     def _clone(self, klass=None, setup=False, **kwargs):
         c = super(DateQuerySet, self)._clone(klass, False, **kwargs)
-        c._field = self._field
+        c._field_name = self._field_name
         c._kind = self._kind
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()

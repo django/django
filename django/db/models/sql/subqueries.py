@@ -343,6 +343,23 @@ class DateQuery(Query):
     date field. This requires some special handling when converting the results
     back to Python objects, so we put it in a separate class.
     """
+    def __getstate__(self):
+        """
+        Special DateQuery-specific pickle handling.
+        """
+        for elt in self.select:
+            if isinstance(elt, Date):
+                # Eliminate a method reference that can't be pickled. The
+                # __setstate__ method restores this.
+                elt.date_sql_func = None
+        return super(DateQuery, self).__getstate__()
+
+    def __setstate__(self, obj_dict):
+        super(DateQuery, self).__setstate__(obj_dict)
+        for elt in self.select:
+            if isinstance(elt, Date):
+                self.date_sql_func = self.connection.ops.date_trunc_sql
+
     def results_iter(self):
         """
         Returns an iterator over the results from executing this query.

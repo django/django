@@ -897,6 +897,10 @@ Bug #8283 -- Checking that applying filters after a disjunction works correctly.
 >>> (ExtraInfo.objects.filter(info='e2')|ExtraInfo.objects.filter(note=n1)).filter(note=n1)
 [<ExtraInfo: e1>]
 
+Pickling of DateQuerySets used to fail
+>>> qs = Item.objects.dates('created', 'month')
+>>> _ = pickle.loads(pickle.dumps(qs))
+
 """}
 
 # In Python 2.3, exceptions raised in __len__ are swallowed (Python issue
