@@ -48,7 +48,9 @@ msgstr "Puhasta kõik"
 msgid ""
 "January February March April May June July August September October November "
 "December"
-msgstr "Jaanuar Veebruar Märts Aprill Mai Juuni Juuli August September Oktoober November Detsember"
+msgstr ""
+"Jaanuar Veebruar Märts Aprill Mai Juuni Juuli August September Oktoober "
+"November Detsember"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
