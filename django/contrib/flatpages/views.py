@@ -20,7 +20,7 @@ def flatpage(request, url):
             `flatpages.flatpages` object
     """
     if not url.endswith('/') and settings.APPEND_SLASH:
-        return HttpResponseRedirect(url + "/")
+        return HttpResponseRedirect("%s/" % request.path)
     if not url.startswith('/'):
         url = "/" + url
     f = get_object_or_404(FlatPage, url__exact=url, sites__id__exact=settings.SITE_ID)
