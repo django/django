@@ -54,7 +54,7 @@ class CommonMiddleware(object):
         # trailing slash and there is no pattern for the current path
         if settings.APPEND_SLASH and (not old_url[1].endswith('/')):
             try:
-                urlresolvers.resolve(request.path)
+                urlresolvers.resolve(request.path_info)
             except urlresolvers.Resolver404:
                 new_url[1] = new_url[1] + '/'
                 if settings.DEBUG and request.method == 'POST':
@@ -69,7 +69,7 @@ class CommonMiddleware(object):
         if new_url != old_url:
             # Redirect if the target url exists
             try:
-                urlresolvers.resolve(new_url[1])
+                urlresolvers.resolve("%s/" % request.path_info)
             except urlresolvers.Resolver404:
                 pass
             else:

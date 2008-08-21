@@ -12,7 +12,7 @@ class CommonMiddlewareTest(TestCase):
             'SERVER_NAME': 'testserver',
             'SERVER_PORT': 80,
         }
-        request.path = "/middleware/%s" % path
+        request.path = request.path_info = "/middleware/%s" % path
         return request
 
     def test_append_slash_have_slash(self):
