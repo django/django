@@ -53,10 +53,15 @@ def login(request, user):
     # TODO: It would be nice to support different login methods, like signed cookies.
     user.last_login = datetime.datetime.now()
     user.save()
-    if request.session.get('SESSION_KEY', user.id) != user.id:
-        # To avoid reusing another user's session, create a new, empty session
-        # if the existing session corresponds to a different authenticated user.
-        request.session.flush()
+
+    if SESSION_KEY in request.session:
+        if request.session[SESSION_KEY] != user.id:
+            # To avoid reusing another user's session, create a new, empty
+            # session if the existing session corresponds to a different
+            # authenticated user.
+            request.session.flush()
+    else:
+        request.session.cycle_key()
     request.session[SESSION_KEY] = user.id
     request.session[BACKEND_SESSION_KEY] = user.backend
     if hasattr(request, 'user'):

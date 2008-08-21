@@ -37,6 +37,15 @@ False
 False
 >>> db_session.modified, db_session.accessed
 (True, True)
+>>> db_session['a'], db_session['b'] = 'c', 'd'
+>>> db_session.save()
+>>> prev_key = db_session.session_key
+>>> prev_data = db_session.items()
+>>> db_session.cycle_key()
+>>> db_session.session_key == prev_key
+False
+>>> db_session.items() == prev_data
+True
 
 # Submitting an invalid session key (either by guessing, or if the db has
 # removed the key) results in a new key being generated.
@@ -75,6 +84,16 @@ False
 False
 >>> file_session.modified, file_session.accessed
 (True, True)
+>>> file_session['a'], file_session['b'] = 'c', 'd'
+>>> file_session.save()
+>>> prev_key = file_session.session_key
+>>> prev_data = file_session.items()
+>>> file_session.cycle_key()
+>>> file_session.session_key == prev_key
+False
+>>> file_session.items() == prev_data
+True
+
 >>> Session.objects.filter(pk=file_session.session_key).delete()
 >>> file_session = FileSession(file_session.session_key)
 >>> file_session.save()
@@ -112,6 +131,16 @@ False
 False
 >>> cache_session.modified, cache_session.accessed
 (True, True)
+>>> cache_session['a'], cache_session['b'] = 'c', 'd'
+>>> cache_session.save()
+>>> prev_key = cache_session.session_key
+>>> prev_data = cache_session.items()
+>>> cache_session.cycle_key()
+>>> cache_session.session_key == prev_key
+False
+>>> cache_session.items() == prev_data
+True
+
 >>> Session.objects.filter(pk=cache_session.session_key).delete()
 >>> cache_session = CacheSession(cache_session.session_key)
 >>> cache_session.save()

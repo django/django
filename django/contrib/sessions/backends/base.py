@@ -239,6 +239,16 @@ class SessionBase(object):
         self.delete()
         self.create()
 
+    def cycle_key(self):
+        """
+        Creates a new session key, whilst retaining the current session data.
+        """
+        data = self._session_cache
+        key = self.session_key
+        self.create()
+        self._session_cache = data
+        self.delete(key)
+
     # Methods that child classes must implement.
 
     def exists(self, session_key):
