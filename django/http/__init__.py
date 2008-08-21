@@ -128,6 +128,11 @@ class QueryDict(MultiValueDict):
     Values retrieved from this class are converted from the given encoding
     (DEFAULT_CHARSET by default) to unicode.
     """
+    # These are both reset in __init__, but is specified here at the class
+    # level so that unpickling will have valid values
+    _mutable = True
+    _encoding = None
+
     def __init__(self, query_string, mutable=False, encoding=None):
         MultiValueDict.__init__(self)
         if not encoding:
@@ -136,11 +141,23 @@ class QueryDict(MultiValueDict):
             from django.conf import settings
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
-        self._mutable = True
         for key, value in parse_qsl((query_string or ''), True): # keep_blank_values=True
             self.appendlist(force_unicode(key, encoding, errors='replace'),
                             force_unicode(value, encoding, errors='replace'))
         self._mutable = mutable
+
+    def _get_encoding(self):
+        if self._encoding is None:
+            # *Important*: do not import settings at the module level because
+            # of the note in core.handlers.modpython.
+            from django.conf import settings
+            self._encoding = settings.DEFAULT_CHARSET
+        return self._encoding
+
+    def _set_encoding(self, value):
+        self._encoding = value
+
+    encoding = property(_get_encoding, _set_encoding)
 
     def _assert_mutable(self):
         if not self._mutable:

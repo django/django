@@ -392,17 +392,26 @@ u'\ufffd'
 [u'bar', u'\ufffd']
 
 
-###################################### 
-# HttpResponse with Unicode headers  # 
-###################################### 
- 
->>> r = HttpResponse() 
- 
+########################
+# Pickling a QueryDict #
+########################
+>>> import pickle
+>>> q = QueryDict('a=b&c=d')
+>>> q1 = pickle.loads(pickle.dumps(q))
+>>> q == q1
+True
+
+######################################
+# HttpResponse with Unicode headers  #
+######################################
+
+>>> r = HttpResponse()
+
 If we insert a unicode value it will be converted to an ascii
 string. This makes sure we comply with the HTTP specifications.
- 
->>> r['value'] = u'test value' 
->>> isinstance(r['value'], str) 
+
+>>> r['value'] = u'test value'
+>>> isinstance(r['value'], str)
 True
 
 An error is raised When a unicode object with non-ascii is assigned.
@@ -411,10 +420,10 @@ An error is raised When a unicode object with non-ascii is assigned.
 Traceback (most recent call last):
 ...
 UnicodeEncodeError: ..., HTTP response headers must be in US-ASCII format
- 
-The response also converts unicode keys to strings. 
- 
->>> r[u'test'] = 'testing key' 
+
+The response also converts unicode keys to strings.
+
+>>> r[u'test'] = 'testing key'
 >>> l = list(r.items())
 >>> l.sort()
 >>> l[1]
@@ -426,7 +435,7 @@ It will also raise errors for keys with non-ascii data.
 Traceback (most recent call last):
 ...
 UnicodeEncodeError: ..., HTTP response headers must be in US-ASCII format
- 
+
 """
 
 from django.http import QueryDict, HttpResponse
