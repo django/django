@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-03-16 15:42+0100\n"
-"PO-Revision-Date: 2008-03-17 00:00+0100\n"
+"PO-Revision-Date: 2008-08-20 16:40+0300\n"
 "Last-Translator: Baptiste <baptiste.goupil_at_google_email.com>\n"
 "Language-Team: français <fr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -4077,11 +4077,11 @@ msgstr "matin"
 
 #: utils/dateformat.py:47
 msgid "PM"
-msgstr "Matin"
+msgstr "Après-midi"
 
 #: utils/dateformat.py:48
 msgid "AM"
-msgstr "Après-midi"
+msgstr "Matin"
 
 #: utils/dateformat.py:97
 msgid "midnight"
