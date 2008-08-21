@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-15 21:17+0400\n"
+"POT-Creation-Date: 2008-08-20 21:33+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: David Avsajanishvili <avsd05@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -244,48 +244,207 @@ msgstr "მიმდინარე თვე"
 msgid "This year"
 msgstr "მიმდინარე წელი"
 
-#: contrib/admin/filterspecs.py:147 newforms/widgets.py:231
-#: oldforms/__init__.py:592
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:379
+#: oldforms/__init__.py:588
 msgid "Yes"
 msgstr "კი"
 
-#: contrib/admin/filterspecs.py:147 newforms/widgets.py:231
-#: oldforms/__init__.py:592
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:379
+#: oldforms/__init__.py:588
 msgid "No"
 msgstr "არა"
 
-#: contrib/admin/filterspecs.py:154 newforms/widgets.py:231
-#: oldforms/__init__.py:592
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:379
+#: oldforms/__init__.py:588
 msgid "Unknown"
 msgstr "გაურკვეველი"
 
-#: contrib/admin/models.py:18
+#: contrib/admin/models.py:19
 msgid "action time"
 msgstr "მოქმედების დრო"
 
-#: contrib/admin/models.py:21
+#: contrib/admin/models.py:22
 msgid "object id"
 msgstr "ობიექტის id"
 
-#: contrib/admin/models.py:22
+#: contrib/admin/models.py:23
 msgid "object repr"
 msgstr "ობიექტის წარმ."
 
-#: contrib/admin/models.py:23
+#: contrib/admin/models.py:24
 msgid "action flag"
 msgstr "მოქმედების დროშა"
 
-#: contrib/admin/models.py:24
+#: contrib/admin/models.py:25
 msgid "change message"
 msgstr "შეცვლის შეტყობინება"
 
-#: contrib/admin/models.py:27
+#: contrib/admin/models.py:28
 msgid "log entry"
 msgstr "ლოგის ერთეული"
 
-#: contrib/admin/models.py:28
+#: contrib/admin/models.py:29
 msgid "log entries"
 msgstr "ლოგის ერთეულები"
+
+#: contrib/admin/options.py:56 contrib/admin/options.py:115
+msgid "None"
+msgstr "არცერთი"
+
+#: contrib/admin/options.py:326
+#, python-format
+msgid "Changed %s."
+msgstr "%s შეცვლილია."
+
+#: contrib/admin/options.py:326 contrib/admin/options.py:336
+#: core/validators.py:279 db/models/manipulators.py:305
+msgid "and"
+msgstr "და"
+
+#: contrib/admin/options.py:331
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "დამატებულია %(name)s \"%(object)s\"."
+
+#: contrib/admin/options.py:335
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "შეცვლილია %(list)s for %(name)s \"%(object)s\"."
+
+#: contrib/admin/options.py:340
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "წაშლილია %(name)s \"%(object)s\"."
+
+#: contrib/admin/options.py:344
+msgid "No fields changed."
+msgstr "არცერთი ველი არ შეცვლილა."
+
+#: contrib/admin/options.py:405 contrib/auth/admin.py:50
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" წარმატებით დაემატა."
+
+#: contrib/admin/options.py:409 contrib/admin/options.py:442
+#: contrib/auth/admin.py:55
+msgid "You may edit it again below."
+msgstr "თქვენ შეგიძლიათ შეცვალოთ იგი."
+
+#: contrib/admin/options.py:419 contrib/admin/options.py:452
+#, python-format
+msgid "You may add another %s below."
+msgstr "შეგიძლიათ დაამატოთ კიდევ ერთი %s."
+
+#: contrib/admin/options.py:440
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" წარმატებით შეიცვალა."
+
+#: contrib/admin/options.py:448
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"%(name)s \"%(obj)s\" წარმატებით დაემატა. შეგიძლიათ განაგრძოთ მისი "
+"რედაქტირება."
+
+#: contrib/admin/options.py:514
+#, python-format
+msgid "Add %s"
+msgstr "დავამატოთ %s"
+
+#: contrib/admin/options.py:591
+#, python-format
+msgid "Change %s"
+msgstr "შევცვალოთ %s"
+
+#: contrib/admin/options.py:622
+msgid "Database error"
+msgstr "მონაცემთა ბაზის შეცდომა"
+
+#: contrib/admin/options.py:671
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" წარმატებით წაიშალა."
+
+#: contrib/admin/options.py:678
+msgid "Are you sure?"
+msgstr "დარწმუნებული ხართ?"
+
+#: contrib/admin/options.py:705
+#, python-format
+msgid "Change history: %s"
+msgstr "ცვლილებების ისტორია: %s"
+
+#: contrib/admin/sites.py:18 contrib/admin/views/decorators.py:16
+#: contrib/auth/forms.py:72 contrib/comments/views/comments.py:56
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"გთხოვთ, შეიყვანოთ სწორი მომხმარებლის სახელი და პაროლი. გაითვალისწინეთ, რომ "
+"ორივე ველი დამოკიდებულია რეგისტრზე."
+
+#: contrib/admin/sites.py:238 contrib/admin/views/decorators.py:68
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr ""
+"გთხოვთ, შეხვიდეთ კიდევ ერთხელ, რადგანაც თქვენი სესიის დრო ამოიწურა. ნუ "
+"ღელავთ: თქვენს მიერ შეტანილი ცვლილებები შენახულია."
+
+#: contrib/admin/sites.py:245 contrib/admin/views/decorators.py:75
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+"როგორც ჩანს, თქვენი ბროუზერი არ ღებულობს cookie-ებს. გთხოვთ, ჩართოთ cookie-"
+"ების მიღების ფუნქცია, განაახლეთ ეს გვერდი და სცადეთ კიდევ ერთხელ."
+
+#: contrib/admin/sites.py:259 contrib/admin/sites.py:265
+#: contrib/admin/views/decorators.py:92
+msgid "Usernames cannot contain the '@' character."
+msgstr "მომხმარებლის სახელი არ უნდა შეიცავდეს სიმბოლოს '@'."
+
+#: contrib/admin/sites.py:262 contrib/admin/views/decorators.py:88
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr ""
+"ელ-ფოსტის მისამართი არ არის თქვენი მომხმარებლის სახელი. სცადეთ '%s' მის "
+"ნაცვლად."
+
+#: contrib/admin/sites.py:330
+msgid "Site administration"
+msgstr "საიტის ადმინისტრირება"
+
+#: contrib/admin/sites.py:352 contrib/admin/templates/admin/login.html:27
+#: contrib/admin/templates/registration/password_reset_complete.html:14
+#: contrib/admin/views/decorators.py:30
+msgid "Log in"
+msgstr "შესვლა"
+
+#: contrib/admin/util.py:138
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "ერთი ან რამდენიმე %(fieldname)s ობიექტში %(name)s: %(obj)s"
+
+#: contrib/admin/util.py:143
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "ერთი ან რამდენიმე %(fieldname)s ობიექტში %(name)s:"
+
+#: contrib/admin/widgets.py:65
+msgid "Date:"
+msgstr "თარიღი;"
+
+#: contrib/admin/widgets.py:65
+msgid "Time:"
+msgstr "დრო:"
+
+#: contrib/admin/widgets.py:89
+msgid "Currently:"
+msgstr "მიმდინარე:"
+
+#: contrib/admin/widgets.py:89
+msgid "Change:"
+msgstr "შეცვლა:"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -297,19 +456,21 @@ msgid "We're sorry, but the requested page could not be found."
 msgstr "უკაცრავად, მოთხოვნილი გვერდი ვერ მოიძებნა."
 
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/base.html:37
-#: contrib/admin/templates/admin/change_form.html:12
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/delete_confirmation.html:5
+#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/change_form.html:17
+#: contrib/admin/templates/admin/change_list.html:8
+#: contrib/admin/templates/admin/delete_confirmation.html:6
 #: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/admin/object_history.html:4
-#: contrib/admin/templates/admin/auth/user/change_password.html:11
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/auth/user/change_password.html:10
 #: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_reset_complete.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Home"
 msgstr "საწყისი გვერდი"
 
@@ -330,25 +491,31 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"სისტემაში მოხდა შეცდომა. იგი გადაგზავნილია საიტის ადმინისტრატორის ელექტრონულ ფოსტაზე "
-"და მალე გამოსწორდება. გმადლობთ მოთმინებისათვის."
+"სისტემაში მოხდა შეცდომა. იგი გადაგზავნილია საიტის ადმინისტრატორის ელექტრონულ "
+"ფოსტაზე და მალე გამოსწორდება. გმადლობთ მოთმინებისათვის."
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:25
 msgid "Welcome,"
 msgstr "კეთილი იყოს თქვენი მობრძანება,"
 
-#: contrib/admin/templates/admin/base.html:28
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "დოკუმენტაცია"
 
-#: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin/auth/user/change_password.html:14
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/auth/user/change_password.html:13
+#: contrib/admin/templates/admin/auth/user/change_password.html:46
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Change password"
 msgstr "პაროლის შეცვლა"
 
-#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/comments/templates/comments/form.html:6
 msgid "Log out"
 msgstr "გამოსვლა"
@@ -361,46 +528,43 @@ msgstr "Django-ს ადმინისტრირების საიტი
 msgid "Django administration"
 msgstr "Django-ს ადმინისტრირება"
 
-#: contrib/admin/templates/admin/change_form.html:14
-#: contrib/admin/templates/admin/index.html:28
+#: contrib/admin/templates/admin/change_form.html:19
+#: contrib/admin/templates/admin/index.html:29
 msgid "Add"
 msgstr "დამატება"
 
-#: contrib/admin/templates/admin/change_form.html:20
-#: contrib/admin/templates/admin/object_history.html:4
+#: contrib/admin/templates/admin/change_form.html:26
+#: contrib/admin/templates/admin/object_history.html:5
 msgid "History"
 msgstr "ისტორია"
 
-#: contrib/admin/templates/admin/change_form.html:21
+#: contrib/admin/templates/admin/change_form.html:27
 msgid "View on site"
 msgstr "წარმოდგენა საიტზე"
 
-#: contrib/admin/templates/admin/change_form.html:31
-#: contrib/admin/templates/admin/auth/user/change_password.html:23
+#: contrib/admin/templates/admin/change_form.html:37
+#: contrib/admin/templates/admin/auth/user/change_password.html:22
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "გთხოვთ, გაასწორეთ ქვემოთ მოყვანილი შეცდომა."
 msgstr[1] "გთხოვთ, გაასწორეთ ქვემოთ მოყვანილი შეცდომები."
 
-#: contrib/admin/templates/admin/change_form.html:49
-msgid "Ordering"
-msgstr "დალაგება"
-
-#: contrib/admin/templates/admin/change_form.html:52
-msgid "Order:"
-msgstr "დალაგება:"
-
-#: contrib/admin/templates/admin/change_list.html:11
+#: contrib/admin/templates/admin/change_list.html:16
 #, python-format
 msgid "Add %(name)s"
 msgstr "დავამატოთ %(name)s"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:8
+#: contrib/admin/templates/admin/change_list.html:26
+msgid "Filter"
+msgstr "ფილტრი"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:9
 #: contrib/admin/templates/admin/submit_line.html:3
+#: contrib/admin/templates/admin/edit_inline/tabular.html:15
 msgid "Delete"
 msgstr "წავშალოთ"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:13
+#: contrib/admin/templates/admin/delete_confirmation.html:15
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -411,7 +575,7 @@ msgstr ""
 "დაკავშირებული ობიექტების წაშლას, მაგრამ თქვენ არა გაქვთ შემდეგი ტიპების "
 "ობიექტების წაშლის უფლება:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:20
+#: contrib/admin/templates/admin/delete_confirmation.html:22
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -420,7 +584,7 @@ msgstr ""
 "ნამდვილად გსურთ, წაშალოთ %(object_name)s \"%(escaped_object)s\"? ყველა "
 "ქვემოთ მოყვანილი დაკავშირებული ობიექტი წაშლილი იქნება:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:25
+#: contrib/admin/templates/admin/delete_confirmation.html:27
 msgid "Yes, I'm sure"
 msgstr "კი, ნამდვილად"
 
@@ -429,41 +593,37 @@ msgstr "კი, ნამდვილად"
 msgid " By %(filter_title)s "
 msgstr " %(filter_title)s მიხედვით "
 
-#: contrib/admin/templates/admin/filters.html:4
-msgid "Filter"
-msgstr "ფილტრი"
-
-#: contrib/admin/templates/admin/index.html:17
+#: contrib/admin/templates/admin/index.html:18
 #, python-format
 msgid "Models available in the %(name)s application."
 msgstr "%(name)s აპლიკაციაში არსებული მოდელები."
 
-#: contrib/admin/templates/admin/index.html:18
+#: contrib/admin/templates/admin/index.html:19
 #, python-format
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/index.html:34
+#: contrib/admin/templates/admin/index.html:35
 msgid "Change"
 msgstr "შეცვლა"
 
-#: contrib/admin/templates/admin/index.html:44
+#: contrib/admin/templates/admin/index.html:45
 msgid "You don't have permission to edit anything."
 msgstr "თქვენ არა გაქვთ რედაქტირების უფლება."
 
-#: contrib/admin/templates/admin/index.html:52
+#: contrib/admin/templates/admin/index.html:53
 msgid "Recent Actions"
 msgstr "ბოლო მოქმედებები"
 
-#: contrib/admin/templates/admin/index.html:53
+#: contrib/admin/templates/admin/index.html:54
 msgid "My Actions"
 msgstr "ჩემი მოქმედებები"
 
-#: contrib/admin/templates/admin/index.html:57
+#: contrib/admin/templates/admin/index.html:58
 msgid "None available"
 msgstr "არ არის მისაწვდომი"
 
-#: contrib/admin/templates/admin/invalid_setup.html:8
+#: contrib/admin/templates/admin/invalid_setup.html:7
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -473,39 +633,34 @@ msgstr ""
 "ბაზის შესაბამისი ცხრილები შექმნილია, და მონაცემთა ბაზის წაკითხვა შეუძლია "
 "შესაბამის მომხმარებელს."
 
-#: contrib/admin/templates/admin/login.html:17
+#: contrib/admin/templates/admin/login.html:19
 #: contrib/comments/templates/comments/form.html:6
 #: contrib/comments/templates/comments/form.html:8
 msgid "Username:"
 msgstr "მომხმარებლის სახელი:"
 
-#: contrib/admin/templates/admin/login.html:20
+#: contrib/admin/templates/admin/login.html:22
 #: contrib/comments/templates/comments/form.html:8
 msgid "Password:"
 msgstr "პაროლი:"
 
-#: contrib/admin/templates/admin/login.html:25
-#: contrib/admin/views/decorators.py:31
-msgid "Log in"
-msgstr "შესვლა"
-
-#: contrib/admin/templates/admin/object_history.html:17
+#: contrib/admin/templates/admin/object_history.html:16
 msgid "Date/time"
 msgstr "თარიღი/დრო"
 
-#: contrib/admin/templates/admin/object_history.html:18
+#: contrib/admin/templates/admin/object_history.html:17
 msgid "User"
 msgstr "მომხმარებელი"
 
-#: contrib/admin/templates/admin/object_history.html:19
+#: contrib/admin/templates/admin/object_history.html:18
 msgid "Action"
 msgstr "მოქმედება"
 
-#: contrib/admin/templates/admin/object_history.html:25
+#: contrib/admin/templates/admin/object_history.html:24
 msgid "DATE_WITH_TIME_FULL"
 msgstr "N j, Y, P"
 
-#: contrib/admin/templates/admin/object_history.html:35
+#: contrib/admin/templates/admin/object_history.html:32
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -557,40 +712,355 @@ msgstr ""
 "ჯერ შეიყვანეთ მომხმარებლის სახელი და პაროლი. ამის შემდეგ თქვენ გექნებათ "
 "მომხმარებლის სხვა ოპციების რედაქტირების შესაძლებლობა."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:12
+#: contrib/admin/templates/admin/auth/user/add_form.html:13
+#: contrib/auth/forms.py:14 contrib/auth/forms.py:51
 msgid "Username"
 msgstr "მომხმარებელი"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:18
+#: contrib/admin/templates/admin/auth/user/add_form.html:20
 #: contrib/admin/templates/admin/auth/user/change_password.html:33
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:52 contrib/auth/forms.py:176
 msgid "Password"
 msgstr "პაროლი"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:23
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
+#: contrib/admin/templates/admin/auth/user/add_form.html:26
+#: contrib/admin/templates/admin/auth/user/change_password.html:39
+#: contrib/auth/forms.py:177
 msgid "Password (again)"
 msgstr "პაროლი (განმეორებით)"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:24
-#: contrib/admin/templates/admin/auth/user/change_password.html:39
+#: contrib/admin/templates/admin/auth/user/add_form.html:27
+#: contrib/admin/templates/admin/auth/user/change_password.html:40
 msgid "Enter the same password as above, for verification."
 msgstr "შეიყვანეთ იგივე პაროლი, დამოწმებისათვის."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
+#: contrib/admin/templates/admin/auth/user/change_password.html:26
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "შეიყვანეთ ახალი პაროლი მომხმარებლისათვის <strong>%(username)s</strong>."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "გმადლობთ, რომ დღეს ამ საიტთან მუშაობას დაუთმეთ დრო."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "ხელახლა შესვლა"
+
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr "პაროლის შეცვლა"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "პაროლი წარმატებით შეიცვალა"
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "თქვენი პაროლი შეიცვალა."
+
+#: contrib/admin/templates/registration/password_change_form.html:12
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"გთხოვთ, უსაფრთხოების დაცვის მიზნით, შეიყვანოთ თქვენი ძველი პაროლი, შემდეგ კი "
+"ახალი პაროლი ორჯერ, რათა დარწმუნდეთ, რომ იგი შეყვანილია სწორად."
+
+#: contrib/admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr "ძველი პაროლი:"
+
+#: contrib/admin/templates/registration/password_change_form.html:19
+#: contrib/admin/templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "ახალი პაროლი:"
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+#: contrib/admin/templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "პაროლის დამოწმება:"
+
+#: contrib/admin/templates/registration/password_change_form.html:23
+#: contrib/admin/templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr "შევცვალოთ ჩემი პაროლი"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "პაროლის აღდგენა"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:6
+#: contrib/admin/templates/registration/password_reset_complete.html:10
+msgid "Password reset complete"
+msgstr "პაროლის აღდგენა დასრულებულია"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "თქვენი პაროლი დაყენებულია. ახლა შეგიძლიათ გადახვიდეთ შემდეგ გვერდზე და შეხვიდეთ სისტემაში."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
+msgid "Password reset confirmation"
+msgstr "პაროლი შეცვლის დამოწმება"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:12
+msgid "Enter new password"
+msgstr "შეიყვანეთ ახალი პაროლი:"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:14
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"გთხოვთ, შეიყვანეთ თქვენი ახალი პაროლი ორჯერ, რათა დავრწმუნდეთ, "
+"რომ იგი სწორად ჩაბეჭდეთ."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:26
+msgid "Password reset unsuccessful"
+msgstr "პაროლის აღდგენა წარუმატებლად დასრულდა"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:28
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"პაროლის აღდგენის ბმული არასწორი იყო, შესაძლოა იმის გამო, რომ "
+"იგი უკვე ყოფილა გამოყენებული. გთხოვთ, კიდევ ერთხელ სცადოთ პაროლის აღდგენა."
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "პაროლის აღდგენა წარმატებით დასრულდა"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed you instructions for setting your password to the e-mail "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+"თქვენს მიერ მითითებულ საფოსტო ყუთზე გამოგიგზავნეთ ინსტრუქციები, "
+"თუ როგორ უნდა დააყენოთ თქვენი პაროლი. წერილი მალე უნდა მიიღოთ."
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "თქვენ მიიღეთ ეს წერილი, რადგანაც მოითხოვეთ პაროლის აღდგენა"
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "თქვენი მომხმარებლის ანგარიშისათვის %(site_name)s-საიტზე"
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr "გთხოვთ, გადახვიდეთ შემდეგ გვერდზე და აირჩიოთ ახალი პაროლი:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr "თქვენი მომხმარებლის სახელი (თუ დაგავიწყდათ):"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr "გმადლობთ, რომ იყენებთ ჩვენს საიტს!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s საიტის გუნდი"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"instructions for setting a new one."
+msgstr ""
+"დაგავიწყდათ პაროლი? შეიყვანეთ თქვენი ელექტრონული ფოსტის მისამართი ამ ველში, "
+"ჩვენ გამოგიგზავნით ინსტრუქციებს, როგორ დააყენოთ ახალი."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "ელ. ფოსტა:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "აღვადგინოთ ჩემი პაროლი"
+
+#: contrib/admin/templatetags/admin_list.py:284
+msgid "All dates"
+msgstr "ყველა თარიღი"
+
+#: contrib/admin/views/main.py:65
+#, python-format
+msgid "Select %s"
+msgstr "ავირჩიოთ %s"
+
+#: contrib/admin/views/main.py:65
+#, python-format
+msgid "Select %s to change"
+msgstr "აირჩიეთ %s შესაცვლელად"
+
+#: contrib/admin/views/template.py:36 contrib/sites/models.py:38
+msgid "site"
+msgstr "საიტი"
+
+#: contrib/admin/views/template.py:38
+msgid "template"
+msgstr "შაბლონი"
+
+#: contrib/admindocs/views.py:53 contrib/admindocs/views.py:55
+#: contrib/admindocs/views.py:57
+msgid "tag:"
+msgstr "ტეგი:"
+
+#: contrib/admindocs/views.py:87 contrib/admindocs/views.py:89
+#: contrib/admindocs/views.py:91
+msgid "filter:"
+msgstr "ფილტრი:"
+
+#: contrib/admindocs/views.py:153 contrib/admindocs/views.py:155
+#: contrib/admindocs/views.py:157
+msgid "view:"
+msgstr "წარმოდგენა:"
+
+#: contrib/admindocs/views.py:187
+#, python-format
+msgid "App %r not found"
+msgstr "აპლიკაცია %r ვერ მოიძებნა"
+
+#: contrib/admindocs/views.py:194
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "მოდელი %(model_name)r ვერ მოიძებნა აპლიკაციაში %(app_label)r"
+
+#: contrib/admindocs/views.py:206
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "`%(app_label)s.%(data_type)s` დაკავშირებული ობიექტი"
+
+#: contrib/admindocs/views.py:206 contrib/admindocs/views.py:228
+#: contrib/admindocs/views.py:242 contrib/admindocs/views.py:247
+msgid "model:"
+msgstr "მოდელი:"
+
+#: contrib/admindocs/views.py:237
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "`%(app_label)s.%(object_name)s` დაკავშირებული ობიექტები"
+
+#: contrib/admindocs/views.py:242
+#, python-format
+msgid "all %s"
+msgstr "ყველა %s"
+
+#: contrib/admindocs/views.py:247
+#, python-format
+msgid "number of %s"
+msgstr "%s - რაოდენობა"
+
+#: contrib/admindocs/views.py:253
+#, python-format
+msgid "Fields on %s objects"
+msgstr "%s ობიექტების ველები"
+
+#: contrib/admindocs/views.py:317 contrib/admindocs/views.py:328
+#: contrib/admindocs/views.py:330 contrib/admindocs/views.py:336
+#: contrib/admindocs/views.py:337 contrib/admindocs/views.py:339
+msgid "Integer"
+msgstr "მთელი"
+
+#: contrib/admindocs/views.py:318
+msgid "Boolean (Either True or False)"
+msgstr "ლოგიკური (True ან False)"
+
+#: contrib/admindocs/views.py:319 contrib/admindocs/views.py:338
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "სტრიქონი (%(max_length)s სიმბოლომდე)"
+
+#: contrib/admindocs/views.py:320
+msgid "Comma-separated integers"
+msgstr "მძიმით გამოყოფილი მთელი რიცხვები"
+
+#: contrib/admindocs/views.py:321
+msgid "Date (without time)"
+msgstr "თარიღი (დროის გარეშე)"
+
+#: contrib/admindocs/views.py:322
+msgid "Date (with time)"
+msgstr "თარიღი (დროსთან ერთად)"
+
+#: contrib/admindocs/views.py:323
+msgid "Decimal number"
+msgstr "ათობითი რიცხვი"
+
+#: contrib/admindocs/views.py:324
+msgid "E-mail address"
+msgstr "ელ. ფოსტის მისამართი"
+
+#: contrib/admindocs/views.py:325 contrib/admindocs/views.py:326
+#: contrib/admindocs/views.py:329
+msgid "File path"
+msgstr "გზა ფაილისაკენ"
+
+#: contrib/admindocs/views.py:327
+msgid "Floating point number"
+msgstr "რიცხვი მცოცავი წერტილით"
+
+#: contrib/admindocs/views.py:331 contrib/comments/models.py:89
+msgid "IP address"
+msgstr "IP-მისამართი"
+
+#: contrib/admindocs/views.py:333
+msgid "Boolean (Either True, False or None)"
+msgstr "ლოგიკური (True, False ან None)"
+
+#: contrib/admindocs/views.py:334
+msgid "Relation to parent model"
+msgstr "მშობელ მოდელთან დამოკიდებულება"
+
+#: contrib/admindocs/views.py:335
+msgid "Phone number"
+msgstr "ტელეფონის ნომერი"
+
+#: contrib/admindocs/views.py:340
+msgid "Text"
+msgstr "ტექსტი"
+
+#: contrib/admindocs/views.py:341
+msgid "Time"
+msgstr "დრო"
+
+#: contrib/admindocs/views.py:342 contrib/flatpages/admin.py:8
+#: contrib/flatpages/models.py:8
+msgid "URL"
+msgstr "URL"
+
+#: contrib/admindocs/views.py:343
+msgid "U.S. state (two uppercase letters)"
+msgstr "აშშ შტატი (ორი ასომთავრული)"
+
+#: contrib/admindocs/views.py:344
+msgid "XML text"
+msgstr "XML ტექსტი"
+
+#: contrib/admindocs/views.py:370
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s არ არის urlpattern-ის შესაბამისი ობიექტი"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
 msgstr "სანიშნები"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:4
 msgid "Documentation bookmarklets"
 msgstr "დოკუმენტაციის სანიშნები"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:8
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -610,11 +1080,11 @@ msgstr ""
 "ადმინისტრატორს, თუ არ ხართ დარწმუნებული, რომ თქვენი კომპიუტერი არის\n"
 "\"შიდა\" კომპიუტერი).</p>\n"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:18
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
 msgstr "ამ გვერდის დოკუმენტაცია"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:19
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
@@ -622,481 +1092,105 @@ msgstr ""
 "გადასვლა ნებისმიერი გვერდიდან იმ წარმოდგენის დოკუმენტაციაზე, რომელიც ამ "
 "გვერდს აგენერირებს."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:21
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
 msgstr "ობიექტის ID-ის ჩვენება"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:22
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
 "ერთი ობიექტის ამსახველი გვერდის content-type-ის და უნიკალური ID-ის ჩვენება."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:24
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
 msgstr "შევცვალოთ ეს ობიექტი (იმავე ფანჯარაში)"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "ერთი ობიექტის ამსახველი გვერდების ადმინისტრირებაზე გადასვლა."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:27
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
 msgstr "შევცვალოთ ეს ობიექტი (ახალ ფანჯარაში)"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
 msgstr "იგივე, ოღონდ ხსნის ადმინისტრირების გვერდს ახალ ფანჯარაში."
 
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "გმადლობთ, რომ დღეს ამ საიტთან მუშაობას დაუთმეთ დრო."
+#: contrib/auth/admin.py:21
+msgid "Personal info"
+msgstr "პირადი ინფორმაცია"
 
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "ხელახლა შესვლა"
+#: contrib/auth/admin.py:22
+msgid "Permissions"
+msgstr "უფლებები"
 
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_form.html:5
-#: contrib/admin/templates/registration/password_change_form.html:9
-msgid "Password change"
-msgstr "პაროლის შეცვლა"
+#: contrib/auth/admin.py:23
+msgid "Important dates"
+msgstr "მნიშვნელოვანი თარიღები"
 
-#: contrib/admin/templates/registration/password_change_done.html:5
-#: contrib/admin/templates/registration/password_change_done.html:9
-msgid "Password change successful"
-msgstr "პაროლი წარმატებით შეიცვალა"
+#: contrib/auth/admin.py:24
+msgid "Groups"
+msgstr "ჯგუფები"
 
-#: contrib/admin/templates/registration/password_change_done.html:11
-msgid "Your password was changed."
-msgstr "თქვენი პაროლი შეიცვალა."
-
-#: contrib/admin/templates/registration/password_change_form.html:11
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"გთხოვთ, უსაფრთხოების დაცვის მიზნით, შეიყვანოთ თქვენი ძველი პაროლი, შემდეგ კი "
-"ახალი პაროლი ორჯერ, რათა დარწმუნდეთ, რომ იგი შეყვანილია სწორად."
-
-#: contrib/admin/templates/registration/password_change_form.html:16
-msgid "Old password:"
-msgstr "ძველი პაროლი:"
-
-#: contrib/admin/templates/registration/password_change_form.html:18
-msgid "New password:"
-msgstr "ახალი პაროლი:"
-
-#: contrib/admin/templates/registration/password_change_form.html:20
-msgid "Confirm password:"
-msgstr "პაროლის დამოწმება:"
-
-#: contrib/admin/templates/registration/password_change_form.html:22
-msgid "Change my password"
-msgstr "შევცვალოთ ჩემი პაროლი"
-
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-msgid "Password reset"
-msgstr "პაროლის აღდგენა"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "პაროლის აღდგენა წარმატებით დასრულდა"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"ახალი პაროლი გაიგზავნა თქვენს მიერ მითითებულ ელექტრონულ ფოსტაზე. თქვენ "
-"მიიღებთ მას უახლოეს დროში."
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "თქვენ მიიღეთ ეს წერილი, რადგანაც მოითხოვეთ პაროლის აღდგენა"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "თქვენი მომხმარებლის ანგარიშისათვის %(site_name)s-საიტზე"
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "თქვენი ახალი პაროლია: %(new_password)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "თქვენ შეგიძლიათ შეცვალოთ იგი შემდეგი გვერდიდან:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "თქვენი მომხმარებლის სახელი (თუ დაგავიწყდათ):"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-msgid "Thanks for using our site!"
-msgstr "გმადლობთ, რომ იყენებთ ჩვენს საიტს!"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "%(site_name)s საიტის გუნდი"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"დაგავიწყდათ პაროლი? შეიყვანეთ თქვენი ელექტრონული ფოსტის მისამართი ამ ველში, "
-"ჩვენ დავაგენერირებთ და გამოგიგზავნით ახალ პაროლს."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "ელ. ფოსტა:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "აღვადგინოთ ჩემი პაროლი"
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "თარიღი;"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "დრო:"
-
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr "მიმდინარე:"
-
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "შეცვლა:"
-
-#: contrib/admin/templatetags/admin_list.py:257
-msgid "All dates"
-msgstr "ყველა თარიღი"
-
-#: contrib/admin/views/auth.py:20 contrib/admin/views/main.py:267
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" წარმატებით დაემატა."
-
-#: contrib/admin/views/auth.py:25 contrib/admin/views/main.py:271
-#: contrib/admin/views/main.py:356
-msgid "You may edit it again below."
-msgstr "თქვენ შეგიძლიათ შეცვალოთ იგი."
-
-#: contrib/admin/views/auth.py:31
+#: contrib/auth/admin.py:60
 msgid "Add user"
 msgstr "მომხმარებლის დამატება"
 
-#: contrib/admin/views/auth.py:58
+#: contrib/auth/admin.py:85
 msgid "Password changed successfully."
 msgstr "პაროლი წარმატებით შეიცვალა."
 
-#: contrib/admin/views/auth.py:65
+#: contrib/auth/admin.py:91
 #, python-format
 msgid "Change password: %s"
 msgstr "შევცვალოთ პაროლი: %s"
 
-#: contrib/admin/views/decorators.py:17 contrib/auth/forms.py:60
+#: contrib/auth/forms.py:15 contrib/auth/models.py:137
 msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
+"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
+"digits and underscores)."
 msgstr ""
-"გთხოვთ, შეიყვანოთ სწორი მომხმარებლის სახელი და პაროლი. გაითვალისწინეთ, რომ "
-"ორივე ველი დამოკიდებულია რეგისტრზე."
+"აუცილებელია. 30 ან ნაკლები სიმბოლო. მხოლოდ ლათინური ასოები, ციფრები და "
+"ხაზგასმა."
 
-#: contrib/admin/views/decorators.py:69
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
+#: contrib/auth/forms.py:16 core/validators.py:72
+msgid "This value must contain only letters, numbers and underscores."
 msgstr ""
-"გთხოვთ, შეხვიდეთ კიდევ ერთხელ, რადგანაც თქვენი სესიის დრო ამოიწურა. ნუ "
-"ღელავთ: თქვენს მიერ შეტანილი ცვლილებები შენახულია."
+"ეს მნიშვნელობა შეიძლება შეიცავდეს მხოლოდ ასოებს, ციფრებს და ხაზგასმის "
+"ნიშნებს."
 
-#: contrib/admin/views/decorators.py:76
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"როგორც ჩანს, თქვენი ბროუზერი არ ღებულობს cookie-ებს. გთხოვთ, ჩართოთ cookie-"
-"ების მიღების ფუნქცია, განაახლეთ ეს გვერდი და სცადეთ კიდევ ერთხელ."
+#: contrib/auth/forms.py:18
+msgid "Password confirmation"
+msgstr "პაროლის დამოწმება"
 
-#: contrib/admin/views/decorators.py:89
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-"ელ-ფოსტის მისამართი არ არის თქვენი მომხმარებლის სახელი. სცადეთ '%s' მის "
-"ნაცვლად."
-
-#: contrib/admin/views/decorators.py:93
-msgid "Usernames cannot contain the '@' character."
-msgstr "მომხმარებლის სახელი არ უნდა შეიცავდეს სიმბოლოს '@'."
-
-#: contrib/admin/views/doc.py:48 contrib/admin/views/doc.py:50
-#: contrib/admin/views/doc.py:52
-msgid "tag:"
-msgstr "ტეგი:"
-
-#: contrib/admin/views/doc.py:79 contrib/admin/views/doc.py:81
-#: contrib/admin/views/doc.py:83
-msgid "filter:"
-msgstr "ფილტრი:"
-
-#: contrib/admin/views/doc.py:137 contrib/admin/views/doc.py:139
-#: contrib/admin/views/doc.py:141
-msgid "view:"
-msgstr "წარმოდგენა:"
-
-#: contrib/admin/views/doc.py:166
-#, python-format
-msgid "App %r not found"
-msgstr "აპლიკაცია %r ვერ მოიძებნა"
-
-#: contrib/admin/views/doc.py:173
-#, python-format
-msgid "Model %(name)r not found in app %(label)r"
-msgstr "მოდელი %(name)r ვერ მოიძებნა აპლიკაციაში %(label)r"
-
-#: contrib/admin/views/doc.py:185
-#, python-format
-msgid "the related `%(label)s.%(type)s` object"
-msgstr "`%(label)s.%(type)s` დაკავშირებული ობიექტი"
-
-#: contrib/admin/views/doc.py:185 contrib/admin/views/doc.py:207
-#: contrib/admin/views/doc.py:221 contrib/admin/views/doc.py:226
-msgid "model:"
-msgstr "მოდელი:"
-
-#: contrib/admin/views/doc.py:216
-#, python-format
-msgid "related `%(label)s.%(name)s` objects"
-msgstr "`%(label)s.%(name)s` დაკავშირებული ობიექტები"
-
-#: contrib/admin/views/doc.py:221
-#, python-format
-msgid "all %s"
-msgstr "ყველა %s"
-
-#: contrib/admin/views/doc.py:226
-#, python-format
-msgid "number of %s"
-msgstr "%s - რაოდენობა"
-
-#: contrib/admin/views/doc.py:231
-#, python-format
-msgid "Fields on %s objects"
-msgstr "%s ობიექტების ველები"
-
-#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:304
-#: contrib/admin/views/doc.py:306 contrib/admin/views/doc.py:312
-#: contrib/admin/views/doc.py:313 contrib/admin/views/doc.py:315
-msgid "Integer"
-msgstr "მთელი"
-
-#: contrib/admin/views/doc.py:294
-msgid "Boolean (Either True or False)"
-msgstr "ლოგიკური (True ან False)"
-
-#: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:314
-#, python-format
-msgid "String (up to %(max_length)s)"
-msgstr "სტრიქონი (%(max_length)s სიმბოლომდე)"
-
-#: contrib/admin/views/doc.py:296
-msgid "Comma-separated integers"
-msgstr "მძიმით გამოყოფილი მთელი რიცხვები"
-
-#: contrib/admin/views/doc.py:297
-msgid "Date (without time)"
-msgstr "თარიღი (დროის გარეშე)"
-
-#: contrib/admin/views/doc.py:298
-msgid "Date (with time)"
-msgstr "თარიღი (დროსთან ერთად)"
-
-#: contrib/admin/views/doc.py:299
-msgid "Decimal number"
-msgstr "ათობითი რიცხვი"
-
-#: contrib/admin/views/doc.py:300
-msgid "E-mail address"
-msgstr "ელ. ფოსტის მისამართი"
-
-#: contrib/admin/views/doc.py:301 contrib/admin/views/doc.py:302
-#: contrib/admin/views/doc.py:305
-msgid "File path"
-msgstr "გზა ფაილისაკენ"
-
-#: contrib/admin/views/doc.py:303
-msgid "Floating point number"
-msgstr "რიცხვი მცოცავი წერტილით"
-
-#: contrib/admin/views/doc.py:307 contrib/comments/models.py:89
-msgid "IP address"
-msgstr "IP-მისამართი"
-
-#: contrib/admin/views/doc.py:309
-msgid "Boolean (Either True, False or None)"
-msgstr "ლოგიკური (True, False ან None)"
-
-#: contrib/admin/views/doc.py:310
-msgid "Relation to parent model"
-msgstr "მშობელ მოდელთან დამოკიდებულება"
-
-#: contrib/admin/views/doc.py:311
-msgid "Phone number"
-msgstr "ტელეფონის ნომერი"
-
-#: contrib/admin/views/doc.py:316
-msgid "Text"
-msgstr "ტექსტი"
-
-#: contrib/admin/views/doc.py:317
-msgid "Time"
-msgstr "დრო"
-
-#: contrib/admin/views/doc.py:318 contrib/flatpages/models.py:8
-msgid "URL"
-msgstr ""
-
-#: contrib/admin/views/doc.py:319
-msgid "U.S. state (two uppercase letters)"
-msgstr "აშშ შტატი (ორი ასომთავრული)"
-
-#: contrib/admin/views/doc.py:320
-msgid "XML text"
-msgstr "XML ტექსტი"
-
-#: contrib/admin/views/doc.py:346
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s არ არის urlpattern-ის შესაბამისი ობიექტი"
-
-#: contrib/admin/views/main.py:233
-msgid "Site administration"
-msgstr "საიტის ადმინისტრირება"
-
-#: contrib/admin/views/main.py:280 contrib/admin/views/main.py:365
-#, python-format
-msgid "You may add another %s below."
-msgstr "შეგიძლიათ დაამატოთ კიდევ ერთი %s."
-
-#: contrib/admin/views/main.py:298
-#, python-format
-msgid "Add %s"
-msgstr "დავამატოთ %s"
-
-#: contrib/admin/views/main.py:344
-#, python-format
-msgid "Added %s."
-msgstr "%s დამატებულია."
-
-#: contrib/admin/views/main.py:344 contrib/admin/views/main.py:346
-#: contrib/admin/views/main.py:348 core/validators.py:283
-#: db/models/manipulators.py:309
-msgid "and"
-msgstr "და"
-
-#: contrib/admin/views/main.py:346
-#, python-format
-msgid "Changed %s."
-msgstr "%s შეცვლილია."
-
-#: contrib/admin/views/main.py:348
-#, python-format
-msgid "Deleted %s."
-msgstr "%s წაშლილია."
-
-#: contrib/admin/views/main.py:351
-msgid "No fields changed."
-msgstr "არცერთი ველი არ შეცვლილა."
-
-#: contrib/admin/views/main.py:354
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" წარმატებით შეიცვალა."
-
-#: contrib/admin/views/main.py:362
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"%(name)s \"%(obj)s\" წარმატებით დაემატა. შეგიძლიათ განაგრძოთ მისი "
-"რედაქტირება."
-
-#: contrib/admin/views/main.py:400
-#, python-format
-msgid "Change %s"
-msgstr "შევცვალოთ %s"
-
-#: contrib/admin/views/main.py:487
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "ერთი ან რამდენიმე %(fieldname)s ობიექტში %(name)s: %(obj)s"
-
-#: contrib/admin/views/main.py:492
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "ერთი ან რამდენიმე %(fieldname)s ობიექტში %(name)s:"
-
-#: contrib/admin/views/main.py:524
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" წარმატებით წაიშალა."
-
-#: contrib/admin/views/main.py:527
-msgid "Are you sure?"
-msgstr "დარწმუნებული ხართ?"
-
-#: contrib/admin/views/main.py:549
-#, python-format
-msgid "Change history: %s"
-msgstr "ცვლილებების ისტორია: %s"
-
-#: contrib/admin/views/main.py:583
-#, python-format
-msgid "Select %s"
-msgstr "ავირჩიოთ %s"
-
-#: contrib/admin/views/main.py:583
-#, python-format
-msgid "Select %s to change"
-msgstr "აირჩიეთ %s შესაცვლელად"
-
-#: contrib/admin/views/main.py:765
-msgid "Database error"
-msgstr "მონაცემთა ბაზის შეცდომა"
-
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:138
-msgid "The two password fields didn't match."
-msgstr "პაროლის ორი ველი ერთმანეთს არ ემთხვევა."
-
-#: contrib/auth/forms.py:25
+#: contrib/auth/forms.py:30
 msgid "A user with that username already exists."
 msgstr "მომხმარებელი ამ სახელით უკვე არსებობს."
 
-#: contrib/auth/forms.py:53
+#: contrib/auth/forms.py:36 contrib/auth/forms.py:146
+#: contrib/auth/forms.py:188
+msgid "The two password fields didn't match."
+msgstr "პაროლის ორი ველი ერთმანეთს არ ემთხვევა."
+
+#: contrib/auth/forms.py:74 contrib/comments/views/comments.py:58
+msgid "This account is inactive."
+msgstr "თქვენი ანგარიში არააქტიურია."
+
+#: contrib/auth/forms.py:79 contrib/comments/views/comments.py:49
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
 "თქვენი ბროუზერი არ ღებულობს cookie-ებს. Cookie საჭიროა საიტზე შესასვლელად."
 
-#: contrib/auth/forms.py:62
-msgid "This account is inactive."
-msgstr "თქვენი ანგარიში არააქტიურია."
+#: contrib/auth/forms.py:92
+msgid "E-mail"
+msgstr "ელ. ფოსტა"
 
-#: contrib/auth/forms.py:84
+#: contrib/auth/forms.py:101
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -1104,20 +1198,28 @@ msgstr ""
 "ელ.ფოსტის ეს მისამართი არ შეესაბამება არცერთ მომხმარებელს. ნამდვილად ხართ "
 "დარეგისტრირებული?"
 
-#: contrib/auth/forms.py:107
+#: contrib/auth/forms.py:126
 #, python-format
 msgid "Password reset on %s"
 msgstr "პაროლი შეცვლილია: %s"
 
-#: contrib/auth/forms.py:117
-msgid "The two 'new password' fields didn't match."
-msgstr "'ახალი პაროლის' ორი ველი ერთმანეთს არ ემთხვევა."
+#: contrib/auth/forms.py:134
+msgid "New password"
+msgstr "ახალი პაროლი"
 
-#: contrib/auth/forms.py:124
+#: contrib/auth/forms.py:135
+msgid "New password confirmation"
+msgstr "ახალი პაროლის დამოწმება"
+
+#: contrib/auth/forms.py:160
+msgid "Old password"
+msgstr "ძველი პაროლი"
+
+#: contrib/auth/forms.py:168
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "თქვენი ძველი პაროლი შეყვანილია არასწორად. გთხოვთ, შეიყვანოთ ხელახლა."
 
-#: contrib/auth/models.py:73 contrib/auth/models.py:93
+#: contrib/auth/models.py:73 contrib/auth/models.py:96
 msgid "name"
 msgstr "სახელი"
 
@@ -1129,47 +1231,39 @@ msgstr "კოდური სახელი"
 msgid "permission"
 msgstr "უფლება"
 
-#: contrib/auth/models.py:79 contrib/auth/models.py:94
+#: contrib/auth/models.py:79 contrib/auth/models.py:97
 msgid "permissions"
 msgstr "უფლებები"
 
-#: contrib/auth/models.py:97
+#: contrib/auth/models.py:100
 msgid "group"
 msgstr "ჯგუფი"
 
-#: contrib/auth/models.py:98 contrib/auth/models.py:148
+#: contrib/auth/models.py:101 contrib/auth/models.py:147
 msgid "groups"
 msgstr "ჯგუფები"
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:137
 msgid "username"
 msgstr "მომხმარებლის სახელი"
 
 #: contrib/auth/models.py:138
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
-msgstr ""
-"აუცილებელია. 30 ან ნაკლები სიმბოლო. მხოლოდ ლათინური ასოები, ციფრები და "
-"ხაზგასმა."
-
-#: contrib/auth/models.py:139
 msgid "first name"
 msgstr "სახელი"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:139
 msgid "last name"
 msgstr "გვარი"
 
-#: contrib/auth/models.py:141
+#: contrib/auth/models.py:140
 msgid "e-mail address"
 msgstr "ელ. ფოსტა"
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:141
 msgid "password"
 msgstr "პაროლი"
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:141
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
@@ -1177,46 +1271,46 @@ msgstr ""
 "გამოიყენეთ '[algo]$[salt]$[hexdigest]' ან <a href=\"password/\">პაროლის "
 "შეცვლის ფორმა</a>."
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:142
 msgid "staff status"
 msgstr "თანამშრომლობის სტატუსი"
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:142
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 "განსაზღვრავს, აქვს თუ არა მომხმარებელს ადმინისტრირების საიტზე შესვლის უფლება."
 
-#: contrib/auth/models.py:144
+#: contrib/auth/models.py:143
 msgid "active"
 msgstr "აქტიურია"
 
-#: contrib/auth/models.py:144
+#: contrib/auth/models.py:143
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"განსაზღვრავს, რომ მომხმარებელი გააქტიურებულია. "
-"მომხმარებლის წაშლის მაგივრად გადანიშნეთ ეს დროშა."
+"განსაზღვრავს, რომ მომხმარებელი გააქტიურებულია. მომხმარებლის წაშლის მაგივრად "
+"გადანიშნეთ ეს დროშა."
 
-#: contrib/auth/models.py:145
+#: contrib/auth/models.py:144
 msgid "superuser status"
 msgstr "სუპერმომხმარებლის სტატუსი"
 
-#: contrib/auth/models.py:145
+#: contrib/auth/models.py:144
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "განსაზღვრავს, რომ ამ მომხმარებელს აქვს ყველა უფლება."
 
-#: contrib/auth/models.py:146
+#: contrib/auth/models.py:145
 msgid "last login"
 msgstr "ბოლო შესვლა"
 
-#: contrib/auth/models.py:147
+#: contrib/auth/models.py:146
 msgid "date joined"
 msgstr "გაწევრიანების თარიღი"
 
-#: contrib/auth/models.py:149
+#: contrib/auth/models.py:148
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
@@ -1224,43 +1318,27 @@ msgstr ""
 "ინდივიდუალურად მითითებული უფლებების გარდა, ეს მომხმარებელი მიიღებს აგრეთვე "
 "ყველა იმ ჯგუფის უფლებას, რომელშიც იგი გაწევრიანებულია."
 
-#: contrib/auth/models.py:150
+#: contrib/auth/models.py:149
 msgid "user permissions"
 msgstr "მომხმარებლის უფლებები"
 
-#: contrib/auth/models.py:154
+#: contrib/auth/models.py:153
 msgid "user"
 msgstr "მომხმარებელი"
 
-#: contrib/auth/models.py:155
+#: contrib/auth/models.py:154
 msgid "users"
 msgstr "მომხმარებლები"
 
-#: contrib/auth/models.py:160
-msgid "Personal info"
-msgstr "პირადი ინფორმაცია"
-
-#: contrib/auth/models.py:161
-msgid "Permissions"
-msgstr "უფლებები"
-
-#: contrib/auth/models.py:162
-msgid "Important dates"
-msgstr "მნიშვნელოვანი თარიღები"
-
-#: contrib/auth/models.py:163
-msgid "Groups"
-msgstr "ჯგუფები"
-
-#: contrib/auth/models.py:323
+#: contrib/auth/models.py:309
 msgid "message"
 msgstr "შეტყობინება"
 
-#: contrib/auth/views.py:49
+#: contrib/auth/views.py:50
 msgid "Logged out"
 msgstr "გამოსული ხართ"
 
-#: contrib/comments/models.py:71 contrib/comments/models.py:176
+#: contrib/comments/models.py:71 contrib/comments/models.py:164
 msgid "object ID"
 msgstr "ობიექტის ID"
 
@@ -1269,7 +1347,7 @@ msgid "headline"
 msgstr "ჰედლაინი"
 
 #: contrib/comments/models.py:73 contrib/comments/models.py:95
-#: contrib/comments/models.py:177
+#: contrib/comments/models.py:165
 msgid "comment"
 msgstr "კომენტარი"
 
@@ -1309,11 +1387,11 @@ msgstr "რეიტინგი #8"
 msgid "is valid rating"
 msgstr "დასაშვები რეიტინგია"
 
-#: contrib/comments/models.py:87 contrib/comments/models.py:179
+#: contrib/comments/models.py:87 contrib/comments/models.py:167
 msgid "date/time submitted"
 msgstr "გაგზავნის თარიღი და დრო"
 
-#: contrib/comments/models.py:88 contrib/comments/models.py:180
+#: contrib/comments/models.py:88 contrib/comments/models.py:168
 msgid "is public"
 msgstr "საყოველთაოა"
 
@@ -1333,11 +1411,11 @@ msgstr ""
 msgid "comments"
 msgstr "კომენტარები"
 
-#: contrib/comments/models.py:140 contrib/comments/models.py:222
+#: contrib/comments/models.py:128 contrib/comments/models.py:199
 msgid "Content object"
 msgstr "კონტენტის ობიექტი"
 
-#: contrib/comments/models.py:168
+#: contrib/comments/models.py:156
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -1352,48 +1430,48 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: contrib/comments/models.py:178
+#: contrib/comments/models.py:166
 msgid "person's name"
 msgstr "პიროვნების სახელი"
 
-#: contrib/comments/models.py:181
+#: contrib/comments/models.py:169
 msgid "ip address"
 msgstr "ip-მისამართი"
 
-#: contrib/comments/models.py:183
+#: contrib/comments/models.py:171
 msgid "approved by staff"
 msgstr "მოწონებულია პერსონალის მიერ"
 
-#: contrib/comments/models.py:187
+#: contrib/comments/models.py:175
 msgid "free comment"
 msgstr "თავისუფალი კომენტარი"
 
-#: contrib/comments/models.py:188
+#: contrib/comments/models.py:176
 msgid "free comments"
 msgstr "თავისუფალი კომენტარები"
 
-#: contrib/comments/models.py:250
+#: contrib/comments/models.py:227
 msgid "score"
 msgstr "შეფასება"
 
-#: contrib/comments/models.py:251
+#: contrib/comments/models.py:228
 msgid "score date"
 msgstr "შეფასების თარიღი"
 
-#: contrib/comments/models.py:255
+#: contrib/comments/models.py:232
 msgid "karma score"
 msgstr "კარმა-შეფასება"
 
-#: contrib/comments/models.py:256
+#: contrib/comments/models.py:233
 msgid "karma scores"
 msgstr "კარმა-შეფასებები"
 
-#: contrib/comments/models.py:260
+#: contrib/comments/models.py:237
 #, python-format
 msgid "%(score)d rating by %(user)s"
 msgstr "%(score)d შეფასებულია %(user)s-ის მიერ"
 
-#: contrib/comments/models.py:277
+#: contrib/comments/models.py:254
 #, python-format
 msgid ""
 "This comment was flagged by %(user)s:\n"
@@ -1404,36 +1482,36 @@ msgstr ""
 "\n"
 "%(text)s"
 
-#: contrib/comments/models.py:285
+#: contrib/comments/models.py:262
 msgid "flag date"
 msgstr "მონიშვნის თარიღი"
 
-#: contrib/comments/models.py:289
+#: contrib/comments/models.py:266
 msgid "user flag"
 msgstr "მომხმარებლის მონიშვნა"
 
-#: contrib/comments/models.py:290
+#: contrib/comments/models.py:267
 msgid "user flags"
 msgstr "მომხმარებლის მონიშვნები"
 
-#: contrib/comments/models.py:294
+#: contrib/comments/models.py:271
 #, python-format
 msgid "Flag by %r"
 msgstr "%r-ის მონიშვნები"
 
-#: contrib/comments/models.py:300
+#: contrib/comments/models.py:277
 msgid "deletion date"
 msgstr "წაშლის თარიღი"
 
-#: contrib/comments/models.py:303
+#: contrib/comments/models.py:280
 msgid "moderator deletion"
 msgstr "მოდერატორის წაშლა"
 
-#: contrib/comments/models.py:304
+#: contrib/comments/models.py:281
 msgid "moderator deletions"
 msgstr "მოდერატორის წაშლები"
 
-#: contrib/comments/models.py:308
+#: contrib/comments/models.py:285
 #, python-format
 msgid "Moderator deletion by %r"
 msgstr "მოდერატორის წაშლა %r-ის მიერ"
@@ -1474,12 +1552,12 @@ msgstr "კომენტარის წინასწარი ნახვ�
 msgid "Your name:"
 msgstr "თქვენი სახელი:"
 
-#: contrib/comments/views/comments.py:28
+#: contrib/comments/views/comments.py:76
 msgid ""
 "This rating is required because you've entered at least one other rating."
 msgstr "ეს რეიტინგი აუცილებელია, რადგანაც თქვენ შესულხართ სხვა რეიტინგებში."
 
-#: contrib/comments/views/comments.py:112
+#: contrib/comments/views/comments.py:160
 #, python-format
 msgid ""
 "This comment was posted by a user who has posted fewer than %(count)s "
@@ -1502,7 +1580,7 @@ msgstr[1] ""
 "\n"
 "%(text)s"
 
-#: contrib/comments/views/comments.py:117
+#: contrib/comments/views/comments.py:165
 #, python-format
 msgid ""
 "This comment was posted by a sketchy user:\n"
@@ -1513,23 +1591,23 @@ msgstr ""
 "\n"
 "%(text)s"
 
-#: contrib/comments/views/comments.py:190
-#: contrib/comments/views/comments.py:283
+#: contrib/comments/views/comments.py:238
+#: contrib/comments/views/comments.py:331
 msgid "Only POSTs are allowed"
 msgstr "დაშვებულია მხოლოდ POST-ები"
 
-#: contrib/comments/views/comments.py:194
-#: contrib/comments/views/comments.py:287
+#: contrib/comments/views/comments.py:242
+#: contrib/comments/views/comments.py:335
 msgid "One or more of the required fields wasn't submitted"
 msgstr "ერთი ან რამდენიმე აუცილებელი ველი არ იყო მითითებული"
 
-#: contrib/comments/views/comments.py:198
-#: contrib/comments/views/comments.py:289
+#: contrib/comments/views/comments.py:246
+#: contrib/comments/views/comments.py:337
 msgid "Somebody tampered with the comment form (security violation)"
 msgstr "ვიღაცა ჩაერია კომენტარის ფორმაში (უსაფრთხოების დარღვევა)"
 
-#: contrib/comments/views/comments.py:208
-#: contrib/comments/views/comments.py:295
+#: contrib/comments/views/comments.py:256
+#: contrib/comments/views/comments.py:343
 msgid ""
 "The comment form had an invalid 'target' parameter -- the object ID was "
 "invalid"
@@ -1537,8 +1615,8 @@ msgstr ""
 "კომენტარის ფორმას აქვს არასწორი პარამეტრი 'target' -- ობიექტის ID არ იყო "
 "სწორი"
 
-#: contrib/comments/views/comments.py:259
-#: contrib/comments/views/comments.py:324
+#: contrib/comments/views/comments.py:307
+#: contrib/comments/views/comments.py:372
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr "კომენტარის ფორმას არა აქვს 'წინასწარი ხედვის' ან 'გაგზავნის' საშუალება"
 
@@ -1566,30 +1644,42 @@ msgstr "კონტენტის ტიპი"
 msgid "content types"
 msgstr "კონტენტის ტიპები"
 
-#: contrib/flatpages/models.py:9
+#: contrib/flatpages/admin.py:9
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "მაგალითი: '/about/contact/'. ყურადღება მიაქციეთ დახრილ ხაზებს თავში და "
 "ბოლოში."
 
-#: contrib/flatpages/models.py:10
+#: contrib/flatpages/admin.py:11 core/validators.py:76
+msgid ""
+"This value must contain only letters, numbers, underscores, dashes or "
+"slashes."
+msgstr ""
+"ეს მნიშვნელობა შეიძლება შეიცავდეს მხოლოდ ასოებს, ციფრებს, ხაზგასმის ნიშნებს, "
+"ტირეებს და დახრილ ხაზებს."
+
+#: contrib/flatpages/admin.py:22
+msgid "Advanced options"
+msgstr "დამატებითი პარამეტრები"
+
+#: contrib/flatpages/models.py:9
 msgid "title"
 msgstr "სათაური"
 
-#: contrib/flatpages/models.py:11
+#: contrib/flatpages/models.py:10
 msgid "content"
 msgstr "კონტენტი"
 
-#: contrib/flatpages/models.py:12
+#: contrib/flatpages/models.py:11
 msgid "enable comments"
 msgstr "ჩავრთოთ კომენტარები"
 
-#: contrib/flatpages/models.py:13
+#: contrib/flatpages/models.py:12
 msgid "template name"
 msgstr "შაბლონის სახელი"
 
-#: contrib/flatpages/models.py:14
+#: contrib/flatpages/models.py:13
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -1597,43 +1687,51 @@ msgstr ""
 "მაგალითი: 'flatpages/contact_page.html'. თუ იგი მითითებული არ არის, "
 "გამოყენებული იქნება 'flatpages/default.html'."
 
-#: contrib/flatpages/models.py:15
+#: contrib/flatpages/models.py:14
 msgid "registration required"
 msgstr "რეგისტრაცია აუცილებელია"
 
-#: contrib/flatpages/models.py:15
+#: contrib/flatpages/models.py:14
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "თუ ეს დროშა ჩართულია, მხოლო შემოსულ მომხმარებლებს ექნებათ გვერდის "
 "დათვალიერების საშუალება."
 
-#: contrib/flatpages/models.py:20
+#: contrib/flatpages/models.py:19
 msgid "flat page"
 msgstr "უბრალო გვერდი"
 
-#: contrib/flatpages/models.py:21
+#: contrib/flatpages/models.py:20
 msgid "flat pages"
 msgstr "უბრალო გვერდები"
 
-#: contrib/flatpages/models.py:27
-msgid "Advanced options"
-msgstr "დამატებითი პარამეტრები"
+#: contrib/gis/forms/fields.py:10
+msgid "No geometry value provided."
+msgstr "გეომეტრიის მნიშვნელობა მოცემული არ არის."
+
+#: contrib/gis/forms/fields.py:11
+msgid "Invalid Geometry value."
+msgstr "გეომეტრიის მნიშვნელობა არასწორია."
+
+#: contrib/gis/forms/fields.py:12
+msgid "Invalid Geometry type."
+msgstr "გეომეტრიის ტიპი არასწორია."
 
 #: contrib/humanize/templatetags/humanize.py:19
 msgid "th"
-msgstr ""
+msgstr "-ე"
 
 #: contrib/humanize/templatetags/humanize.py:19
 msgid "st"
-msgstr ""
+msgstr "-ლი"
 
 #: contrib/humanize/templatetags/humanize.py:19
 msgid "nd"
-msgstr ""
+msgstr "-ე"
 
 #: contrib/humanize/templatetags/humanize.py:19
 msgid "rd"
-msgstr ""
+msgstr "-ე"
 
 #: contrib/humanize/templatetags/humanize.py:51
 #, python-format
@@ -1705,7 +1803,6 @@ msgid "yesterday"
 msgstr "გუშინ"
 
 #: contrib/localflavor/ar/forms.py:27
-#, fuzzy
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
 msgstr "შეიყვანეთ საფოსტო კოდი ერთ-ერთ ფორმატში: NNNN ან ANNNNAAA."
 
@@ -1716,38 +1813,77 @@ msgid "This field requires only numbers."
 msgstr "ამ ველში შეიძლება იყოს მხოლოდ ციფრები."
 
 #: contrib/localflavor/ar/forms.py:50
-#, fuzzy
 msgid "This field requires 7 or 8 digits."
-msgstr "ამ ველში შეიძლება იყოს მხოლოდ 7 ან 8 თანრიგი."
+msgstr "ამ ველში შეიძლება იყოს 7 ან 8 თანრიგი."
 
 #: contrib/localflavor/ar/forms.py:79
-#, fuzzy
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
 msgstr ""
 "შეიყვანეთ დასაშვები CUIT ერთ-ერთ ფორმატში: XX-XXXXXXXX-X ან XXXXXXXXXXXX."
 
 #: contrib/localflavor/ar/forms.py:80
-#, fuzzy
 msgid "Invalid CUIT."
 msgstr "არასწორი CUIT."
 
+#: contrib/localflavor/at/at_states.py:5
+msgid "Burgenland"
+msgstr "ბურგლენდი"
+
+#: contrib/localflavor/at/at_states.py:6
+msgid "Carinthia"
+msgstr "კარინტია"
+
+#: contrib/localflavor/at/at_states.py:7
+msgid "Lower Austria"
+msgstr "ქვემო ავსტრია"
+
+#: contrib/localflavor/at/at_states.py:8
+msgid "Upper Austria"
+msgstr "ზემო ავსტრია"
+
+#: contrib/localflavor/at/at_states.py:9
+msgid "Salzburg"
+msgstr "ზალცბურგი"
+
+#: contrib/localflavor/at/at_states.py:10
+msgid "Styria"
+msgstr "სტირია"
+
+#: contrib/localflavor/at/at_states.py:11
+msgid "Tyrol"
+msgstr "ტიროლი"
+
+#: contrib/localflavor/at/at_states.py:12
+msgid "Vorarlberg"
+msgstr "ფორარლბერგი"
+
+#: contrib/localflavor/at/at_states.py:13
+msgid "Vienna"
+msgstr "ვენა"
+
+#: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:16
+#: contrib/localflavor/no/forms.py:12
+msgid "Enter a zip code in the format XXXX."
+msgstr "შეიყვანეთ zip-კოდი ფორმატში XXXX."
+
+#: contrib/localflavor/at/forms.py:48
+msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
+msgstr ""
+"შეიყვანეთ კანადაში დასაშვები პირადი ნომერი ფორმატში: XXX-XXX-XXX"
+
 #: contrib/localflavor/au/forms.py:16
-#, fuzzy
 msgid "Enter a 4 digit post code."
 msgstr "შეიყვანეთ ოთხთანრიგიანი საფოსტო კოდი"
 
 #: contrib/localflavor/br/forms.py:21
-#, fuzzy
 msgid "Enter a zip code in the format XXXXX-XXX."
 msgstr "შეიყვანეთ zip-კოდი ფორმატში: XXXXX-XXX."
 
 #: contrib/localflavor/br/forms.py:30
-#, fuzzy
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
 msgstr "ტელეფონის ნომრები უნდა იყოს XX-XXXX-XXXX ფორმატში."
 
 #: contrib/localflavor/br/forms.py:58
-#, fuzzy
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
@@ -1755,173 +1891,135 @@ msgstr ""
 "შეიყვანეთ დასაშვები ბრაზილიური შტატი. მოცემული შტატი არ არის დასაშვები."
 
 #: contrib/localflavor/br/forms.py:94
-#, fuzzy
 msgid "Invalid CPF number."
 msgstr "არასწორი CPF ნომერი."
 
 #: contrib/localflavor/br/forms.py:95
-#, fuzzy
 msgid "This field requires at most 11 digits or 14 characters."
 msgstr "ეს ველი უნდა შეიცავდეს 11 ციფრს ან 14 სიმბოლოს, ან ნაკლებს."
 
 #: contrib/localflavor/br/forms.py:134
-#, fuzzy
 msgid "Invalid CNPJ number."
 msgstr "არასწორი CNPJ ნომერი."
 
 #: contrib/localflavor/br/forms.py:136
-#, fuzzy
 msgid "This field requires at least 14 digits"
 msgstr "ეს ველი მოითხოვს არაუმეტეს 14 თანრიგისა"
 
 #: contrib/localflavor/ca/forms.py:17
-#, fuzzy
 msgid "Enter a postal code in the format XXX XXX."
 msgstr "შეიყვანეთ საფოსტო კოდი ფორმატში: XXX XXX."
 
 #: contrib/localflavor/ca/forms.py:88
-#, fuzzy
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
 msgstr ""
 "შეიყვანეთ კანადაში დასაშვები სოციალური დაზღვევის ნომერი ფორმატში: XXX-XXX-XXX"
 
 #: contrib/localflavor/ch/ch_states.py:5
-#, fuzzy
 msgid "Aargau"
 msgstr "აარგაუ"
 
 #: contrib/localflavor/ch/ch_states.py:6
-#, fuzzy
 msgid "Appenzell Innerrhoden"
 msgstr "აპენცელ ინერჰოდენ"
 
 #: contrib/localflavor/ch/ch_states.py:7
-#, fuzzy
 msgid "Appenzell Ausserrhoden"
 msgstr "აპენცელ აუსერჰოდენ"
 
 #: contrib/localflavor/ch/ch_states.py:8
-#, fuzzy
 msgid "Basel-Stadt"
-msgstr "ბაზელ-შტადტ"
+msgstr "ბაზელ-შტადტი"
 
 #: contrib/localflavor/ch/ch_states.py:9
-#, fuzzy
 msgid "Basel-Land"
-msgstr "ბაზელ-ლანდ"
+msgstr "ბაზელ-ლანდი"
 
 #: contrib/localflavor/ch/ch_states.py:10
-#, fuzzy
 msgid "Berne"
 msgstr "ბერნი"
 
 #: contrib/localflavor/ch/ch_states.py:11
-#, fuzzy
 msgid "Fribourg"
 msgstr "ფრაიბურგი"
 
 #: contrib/localflavor/ch/ch_states.py:12
-#, fuzzy
 msgid "Geneva"
 msgstr "ჟენევა"
 
 #: contrib/localflavor/ch/ch_states.py:13
-#, fuzzy
 msgid "Glarus"
 msgstr "გლარუსი"
 
 #: contrib/localflavor/ch/ch_states.py:14
-#, fuzzy
 msgid "Graubuenden"
 msgstr "გრაუბუენდენ"
 
 #: contrib/localflavor/ch/ch_states.py:15
-#, fuzzy
 msgid "Jura"
 msgstr "ჯურა"
 
 #: contrib/localflavor/ch/ch_states.py:16
-#, fuzzy
 msgid "Lucerne"
 msgstr "ლეცერნი"
 
 #: contrib/localflavor/ch/ch_states.py:17
-#, fuzzy
 msgid "Neuchatel"
 msgstr "ნოიხატლი"
 
 #: contrib/localflavor/ch/ch_states.py:18
-#, fuzzy
 msgid "Nidwalden"
 msgstr "ნიდვალდენი"
 
 #: contrib/localflavor/ch/ch_states.py:19
-#, fuzzy
 msgid "Obwalden"
 msgstr "ობვალდენი"
 
 #: contrib/localflavor/ch/ch_states.py:20
-#, fuzzy
 msgid "Schaffhausen"
 msgstr "შაფჰაუზენი"
 
 #: contrib/localflavor/ch/ch_states.py:21
-#, fuzzy
 msgid "Schwyz"
 msgstr "შვიცი"
 
 #: contrib/localflavor/ch/ch_states.py:22
-#, fuzzy
 msgid "Solothurn"
 msgstr "სოლოთურნი"
 
 #: contrib/localflavor/ch/ch_states.py:23
-#, fuzzy
 msgid "St. Gallen"
 msgstr "სენტ-გალენი"
 
 #: contrib/localflavor/ch/ch_states.py:24
-#, fuzzy
 msgid "Thurgau"
 msgstr "თურგაუ"
 
 #: contrib/localflavor/ch/ch_states.py:25
-#, fuzzy
 msgid "Ticino"
 msgstr "ტიჯინო"
 
 #: contrib/localflavor/ch/ch_states.py:26
-#, fuzzy
 msgid "Uri"
 msgstr "ური"
 
 #: contrib/localflavor/ch/ch_states.py:27
-#, fuzzy
 msgid "Valais"
 msgstr "ვალაისი"
 
 #: contrib/localflavor/ch/ch_states.py:28
-#, fuzzy
 msgid "Vaud"
 msgstr "ვაუდი"
 
 #: contrib/localflavor/ch/ch_states.py:29
-#, fuzzy
 msgid "Zug"
 msgstr "ცუგი"
 
 #: contrib/localflavor/ch/ch_states.py:30
-#, fuzzy
 msgid "Zurich"
 msgstr "ციურიხი"
 
-#: contrib/localflavor/ch/forms.py:16 contrib/localflavor/no/forms.py:12
-#, fuzzy
-msgid "Enter a zip code in the format XXXX."
-msgstr "შეიყვანეთ zip-კოდი ფორმატში XXXX."
-
 #: contrib/localflavor/ch/forms.py:64
-#, fuzzy
 msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
 "1234567890 format."
@@ -1930,108 +2028,87 @@ msgstr ""
 "X1234567<0 ან 1234567890."
 
 #: contrib/localflavor/cl/forms.py:29
-#, fuzzy
 msgid "Enter a valid Chilean RUT."
 msgstr "შეიყვანეთ დასაშვები ჩილიური RUT."
 
 #: contrib/localflavor/cl/forms.py:30
-#, fuzzy
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
 msgstr "შეიყვანეთ დასაშვები ჩილიური RUT. ფორმატი: XX.XXX.XXX-X."
 
 #: contrib/localflavor/cl/forms.py:31
-#, fuzzy
 msgid "The Chilean RUT is not valid."
 msgstr "ჩილიური RUT არასწორია."
 
 #: contrib/localflavor/de/de_states.py:5
-#, fuzzy
 msgid "Baden-Wuerttemberg"
 msgstr "ბადენ-ვურტემბერგი"
 
 #: contrib/localflavor/de/de_states.py:6
-#, fuzzy
 msgid "Bavaria"
 msgstr "ბავარია"
 
 #: contrib/localflavor/de/de_states.py:7
-#, fuzzy
 msgid "Berlin"
 msgstr "ბერლინი"
 
 #: contrib/localflavor/de/de_states.py:8
-#, fuzzy
 msgid "Brandenburg"
 msgstr "ბრანდენბურგი"
 
 #: contrib/localflavor/de/de_states.py:9
-#, fuzzy
 msgid "Bremen"
 msgstr "ბრემენი"
 
 #: contrib/localflavor/de/de_states.py:10
-#, fuzzy
 msgid "Hamburg"
 msgstr "ჰამბურგი"
 
 #: contrib/localflavor/de/de_states.py:11
-#, fuzzy
 msgid "Hessen"
 msgstr "ჰესენი"
 
 #: contrib/localflavor/de/de_states.py:12
-#, fuzzy
 msgid "Mecklenburg-Western Pomerania"
 msgstr "მეკლენბურგ-ვესტერნ პომერანია"
 
 #: contrib/localflavor/de/de_states.py:13
-#, fuzzy
 msgid "Lower Saxony"
 msgstr "ქვემო საქსონია"
 
 #: contrib/localflavor/de/de_states.py:14
-#, fuzzy
 msgid "North Rhine-Westphalia"
 msgstr "ჩრდილოეთ რაინ-ვესტფალია"
 
 #: contrib/localflavor/de/de_states.py:15
-#, fuzzy
 msgid "Rhineland-Palatinate"
 msgstr "რაინლანდ-პალატინატა"
 
 #: contrib/localflavor/de/de_states.py:16
-#, fuzzy
 msgid "Saarland"
 msgstr "ზაარლანდი"
 
 #: contrib/localflavor/de/de_states.py:17
-#, fuzzy
 msgid "Saxony"
 msgstr "საქსონია"
 
 #: contrib/localflavor/de/de_states.py:18
-#, fuzzy
 msgid "Saxony-Anhalt"
 msgstr "საქსონია-ანჰალტ"
 
 #: contrib/localflavor/de/de_states.py:19
-#, fuzzy
 msgid "Schleswig-Holstein"
 msgstr "შლეზვიგ-ჰოლშტაინი"
 
 #: contrib/localflavor/de/de_states.py:20
-#, fuzzy
 msgid "Thuringia"
 msgstr "თურინგია"
 
 #: contrib/localflavor/de/forms.py:14 contrib/localflavor/fi/forms.py:12
 #: contrib/localflavor/fr/forms.py:15
-#, fuzzy
 msgid "Enter a zip code in the format XXXXX."
 msgstr "შეიყვანეთ zip-კოდი ფორმატში XXXXX."
 
 #: contrib/localflavor/de/forms.py:41
-#, fuzzy
 msgid ""
 "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
 "format."
@@ -2040,1578 +2117,1538 @@ msgstr ""
 "XXXXXXXXXXX-XXXXXXX-XXXXXXX-X."
 
 #: contrib/localflavor/es/es_provinces.py:5
-#, fuzzy
 msgid "Arava"
 msgstr "არავა"
 
 #: contrib/localflavor/es/es_provinces.py:6
-#, fuzzy
 msgid "Albacete"
 msgstr "ალბასეტე"
 
 #: contrib/localflavor/es/es_provinces.py:7
-#, fuzzy
 msgid "Alacant"
 msgstr "ალასანტი"
 
 #: contrib/localflavor/es/es_provinces.py:8
-#, fuzzy
 msgid "Almeria"
 msgstr "ალმერია"
 
 #: contrib/localflavor/es/es_provinces.py:9
-#, fuzzy
 msgid "Avila"
 msgstr "ავილა"
 
 #: contrib/localflavor/es/es_provinces.py:10
-#, fuzzy
 msgid "Badajoz"
-msgstr "ბადაჰოს"
+msgstr "ბადაჰოსი"
 
 #: contrib/localflavor/es/es_provinces.py:11
-#, fuzzy
 msgid "Illes Balears"
 msgstr "ილეს ბალეარს"
 
 #: contrib/localflavor/es/es_provinces.py:12
-#, fuzzy
 msgid "Barcelona"
 msgstr "ბარსელონა"
 
 #: contrib/localflavor/es/es_provinces.py:13
-#, fuzzy
 msgid "Burgos"
-msgstr "ბურგოს"
+msgstr "ბურგოსი"
 
 #: contrib/localflavor/es/es_provinces.py:14
-#, fuzzy
 msgid "Caceres"
-msgstr "კასერეს"
+msgstr "კასერესი"
 
 #: contrib/localflavor/es/es_provinces.py:15
-#, fuzzy
 msgid "Cadiz"
-msgstr "კადიზ"
+msgstr "კადიზი"
 
 #: contrib/localflavor/es/es_provinces.py:16
-#, fuzzy
 msgid "Castello"
 msgstr "კასტელო"
 
 #: contrib/localflavor/es/es_provinces.py:17
-#, fuzzy
 msgid "Ciudad Real"
-msgstr "სიუდად რეალ"
+msgstr "სიუდად რეალი"
 
 #: contrib/localflavor/es/es_provinces.py:18
-#, fuzzy
 msgid "Cordoba"
 msgstr "კორდობა"
 
 #: contrib/localflavor/es/es_provinces.py:19
-#, fuzzy
 msgid "A Coruna"
 msgstr "ა კორუნია"
 
 #: contrib/localflavor/es/es_provinces.py:20
-#, fuzzy
 msgid "Cuenca"
 msgstr "კუენსა"
 
 #: contrib/localflavor/es/es_provinces.py:21
-#, fuzzy
 msgid "Girona"
 msgstr "გირონა"
 
 #: contrib/localflavor/es/es_provinces.py:22
-#, fuzzy
 msgid "Granada"
 msgstr "გრანადა"
 
 #: contrib/localflavor/es/es_provinces.py:23
-#, fuzzy
 msgid "Guadalajara"
 msgstr "გუადალაჯარა"
 
 #: contrib/localflavor/es/es_provinces.py:24
-#, fuzzy
 msgid "Guipuzkoa"
 msgstr "გუიპუზკოა"
 
 #: contrib/localflavor/es/es_provinces.py:25
-#, fuzzy
 msgid "Huelva"
 msgstr "ჰუელვა"
 
 #: contrib/localflavor/es/es_provinces.py:26
-#, fuzzy
 msgid "Huesca"
 msgstr "ჰუესკა"
 
 #: contrib/localflavor/es/es_provinces.py:27
-#, fuzzy
 msgid "Jaen"
 msgstr "ჯეინი"
 
 #: contrib/localflavor/es/es_provinces.py:28
-#, fuzzy
 msgid "Leon"
 msgstr "ლეონი"
 
 #: contrib/localflavor/es/es_provinces.py:29
-#, fuzzy
 msgid "Lleida"
 msgstr "ლეიდა"
 
 #: contrib/localflavor/es/es_provinces.py:30
 #: contrib/localflavor/es/es_regions.py:17
-#, fuzzy
 msgid "La Rioja"
 msgstr "ლა რიოხა"
 
 #: contrib/localflavor/es/es_provinces.py:31
-#, fuzzy
 msgid "Lugo"
 msgstr "ლუგო"
 
 #: contrib/localflavor/es/es_provinces.py:32
 #: contrib/localflavor/es/es_regions.py:18
-#, fuzzy
 msgid "Madrid"
 msgstr "მადრიდი"
 
 #: contrib/localflavor/es/es_provinces.py:33
-#, fuzzy
 msgid "Malaga"
 msgstr "მალაგა"
 
 #: contrib/localflavor/es/es_provinces.py:34
-#, fuzzy
 msgid "Murcia"
 msgstr "მურსია"
 
 #: contrib/localflavor/es/es_provinces.py:35
-#, fuzzy
 msgid "Navarre"
 msgstr "ნავარე"
 
 #: contrib/localflavor/es/es_provinces.py:36
-#, fuzzy
 msgid "Ourense"
 msgstr "ოურენსი"
 
 #: contrib/localflavor/es/es_provinces.py:37
-#, fuzzy
 msgid "Asturias"
 msgstr "ასტურია"
 
 #: contrib/localflavor/es/es_provinces.py:38
-#, fuzzy
 msgid "Palencia"
 msgstr "პალენსია"
 
 #: contrib/localflavor/es/es_provinces.py:39
-#, fuzzy
 msgid "Las Palmas"
 msgstr "ლას პალმას"
 
 #: contrib/localflavor/es/es_provinces.py:40
-#, fuzzy
 msgid "Pontevedra"
 msgstr "პონტევედრა"
 
 #: contrib/localflavor/es/es_provinces.py:41
-#, fuzzy
 msgid "Salamanca"
 msgstr "სალამანსა"
 
 #: contrib/localflavor/es/es_provinces.py:42
-#, fuzzy
 msgid "Santa Cruz de Tenerife"
 msgstr "სანტა კრუზ დე ტენერიფე"
 
 #: contrib/localflavor/es/es_provinces.py:43
 #: contrib/localflavor/es/es_regions.py:11
-#, fuzzy
 msgid "Cantabria"
 msgstr "კანტაბრია"
 
 #: contrib/localflavor/es/es_provinces.py:44
-#, fuzzy
 msgid "Segovia"
 msgstr "სეგოვია"
 
 #: contrib/localflavor/es/es_provinces.py:45
-#, fuzzy
 msgid "Seville"
 msgstr "სევილი"
 
 #: contrib/localflavor/es/es_provinces.py:46
-#, fuzzy
 msgid "Soria"
 msgstr "სორია"
 
 #: contrib/localflavor/es/es_provinces.py:47
-#, fuzzy
 msgid "Tarragona"
 msgstr "ტარაგონა"
 
 #: contrib/localflavor/es/es_provinces.py:48
-#, fuzzy
 msgid "Teruel"
 msgstr "ტერუელი"
 
 #: contrib/localflavor/es/es_provinces.py:49
-#, fuzzy
 msgid "Toledo"
 msgstr "ტოლედო"
 
 #: contrib/localflavor/es/es_provinces.py:50
-#, fuzzy
 msgid "Valencia"
 msgstr "ვალენსია"
 
 #: contrib/localflavor/es/es_provinces.py:51
-#, fuzzy
 msgid "Valladolid"
 msgstr "ვალადოლიდი"
 
 #: contrib/localflavor/es/es_provinces.py:52
-#, fuzzy
 msgid "Bizkaia"
 msgstr "ბიზკაია"
 
 #: contrib/localflavor/es/es_provinces.py:53
-#, fuzzy
 msgid "Zamora"
 msgstr "სამორა"
 
 #: contrib/localflavor/es/es_provinces.py:54
-#, fuzzy
 msgid "Zaragoza"
 msgstr "სარაგოსა"
 
 #: contrib/localflavor/es/es_provinces.py:55
-#, fuzzy
 msgid "Ceuta"
 msgstr "კეუტა"
 
 #: contrib/localflavor/es/es_provinces.py:56
-#, fuzzy
 msgid "Melilla"
 msgstr "მელილა"
 
 #: contrib/localflavor/es/es_regions.py:5
-#, fuzzy
 msgid "Andalusia"
 msgstr "ანდალუზია"
 
 #: contrib/localflavor/es/es_regions.py:6
-#, fuzzy
 msgid "Aragon"
 msgstr "არაგონ"
 
 #: contrib/localflavor/es/es_regions.py:7
-#, fuzzy
 msgid "Principality of Asturias"
 msgstr "ასტურიის პრინციპატი"
 
 #: contrib/localflavor/es/es_regions.py:8
-#, fuzzy
 msgid "Balearic Islands"
 msgstr "ბალეარის კუნძულები"
 
 #: contrib/localflavor/es/es_regions.py:9
-#, fuzzy
 msgid "Basque Country"
 msgstr "ბასკების ქვეყანა"
 
 #: contrib/localflavor/es/es_regions.py:10
-#, fuzzy
 msgid "Canary Islands"
 msgstr "კანარის კუნძuლები"
 
 #: contrib/localflavor/es/es_regions.py:12
-#, fuzzy
 msgid "Castile-La Mancha"
 msgstr "კასტილია ლა მანჩა"
 
 #: contrib/localflavor/es/es_regions.py:13
-#, fuzzy
 msgid "Castile and Leon"
 msgstr "კასტილია და ლეონი"
 
 #: contrib/localflavor/es/es_regions.py:14
-#, fuzzy
 msgid "Catalonia"
 msgstr "კატალონია"
 
 #: contrib/localflavor/es/es_regions.py:15
-#, fuzzy
 msgid "Extremadura"
 msgstr "ექსტრემადურა"
 
 #: contrib/localflavor/es/es_regions.py:16
-#, fuzzy
 msgid "Galicia"
 msgstr "გალიცია"
 
 #: contrib/localflavor/es/es_regions.py:19
-#, fuzzy
 msgid "Region of Murcia"
 msgstr "მურსიის რეგიონი"
 
 #: contrib/localflavor/es/es_regions.py:20
-#, fuzzy
 msgid "Foral Community of Navarre"
 msgstr "ნავარის ფორალური თემი"
 
 #: contrib/localflavor/es/es_regions.py:21
-#, fuzzy
 msgid "Valencian Community"
 msgstr "ვალენსიის თემი"
 
 #: contrib/localflavor/es/forms.py:19
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr ""
+msgstr "შეიყვანეთ სწორი საფოსტო კოდი შემდეგ ინტერვალში და ფორმატში: 01XXX - 52XXX."
 
 #: contrib/localflavor/es/forms.py:39
 msgid ""
 "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
 "9XXXXXXXX."
 msgstr ""
+"შეიყვანეთ სწორი სატელეფონო ნომერი ერთ-ერთ ფორმატში: 6XXXXXXXX, 8XXXXXXXX ან "
+"9XXXXXXXX."
 
 #: contrib/localflavor/es/forms.py:66
 msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr ""
+msgstr "გთხოვთ, შეიყვანოთ სწორი NIF, NIE, ან CIF."
 
 #: contrib/localflavor/es/forms.py:67
 msgid "Please enter a valid NIF or NIE."
-msgstr ""
+msgstr "გთხოვთ, შეიყვანოთ სწორი NIF ან NIE."
 
 #: contrib/localflavor/es/forms.py:68
 msgid "Invalid checksum for NIF."
-msgstr ""
+msgstr "NIF-ის საკონტროლო ჯამი არასწორია."
 
 #: contrib/localflavor/es/forms.py:69
 msgid "Invalid checksum for NIE."
-msgstr ""
+msgstr "NIE-ს საკონტროლო ჯამი არასწორია."
 
 #: contrib/localflavor/es/forms.py:70
 msgid "Invalid checksum for CIF."
-msgstr ""
+msgstr "CIF-ის საკონტროლო ჯამი არასწორია."
 
 #: contrib/localflavor/es/forms.py:142
 msgid ""
 "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr ""
+"გთხოვთ, შეიყვანოთ სწორი საბანკო ანგარიშის ნომერი ფორმატში: XXXX-XXXX-XX-XXXXXXXXXX."
 
 #: contrib/localflavor/es/forms.py:143
 msgid "Invalid checksum for bank account number."
-msgstr ""
+msgstr "არასწორი საკონტროლო ჯამი საბანკო ანგარიშის ნომრისათვის."
 
 #: contrib/localflavor/fi/forms.py:28
 msgid "Enter a valid Finnish social security number."
-msgstr ""
+msgstr "შეიყვანეთ სწორი ფინური პირადი ნომერი."
 
 #: contrib/localflavor/in_/forms.py:14
 msgid "Enter a zip code in the format XXXXXXX."
-msgstr ""
+msgstr "შეიყვანეთ zip-კოდი ფორმატში: XXXXXXX."
 
 #: contrib/localflavor/is_/forms.py:17
 msgid ""
 "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
 msgstr ""
+"შეიყვანეთ სწორი ისლანდიური საიდენტიფიკაციო ნომერი. ფორმატია XXXXXX-XXXX."
 
 #: contrib/localflavor/is_/forms.py:18
 msgid "The Icelandic identification number is not valid."
-msgstr ""
+msgstr "ისლანდიური საიდენტიფიკაციო ნომერი არასწორია."
 
 #: contrib/localflavor/it/forms.py:14
 msgid "Enter a valid zip code."
-msgstr ""
+msgstr "შეიყვანეთ სწორი zip-კოდი."
 
 #: contrib/localflavor/it/forms.py:43
 msgid "Enter a valid Social Security number."
-msgstr ""
+msgstr "შეიყვანეთ სწორი პირადი ნომერი."
 
 #: contrib/localflavor/it/forms.py:68
 msgid "Enter a valid VAT number."
-msgstr ""
+msgstr "შეიყვანეთ სწორი დღგ-ს ნომერი."
 
 #: contrib/localflavor/jp/forms.py:17
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr ""
+msgstr "შეიყვანეთ საფოსტო კოდი ფორმატში XXXXXXX ან XXX-XXXX."
 
 #: contrib/localflavor/jp/jp_prefectures.py:4
 msgid "Hokkaido"
-msgstr ""
+msgstr "ჰოკაიდო"
 
 #: contrib/localflavor/jp/jp_prefectures.py:5
 msgid "Aomori"
-msgstr ""
+msgstr "აომორი"
 
 #: contrib/localflavor/jp/jp_prefectures.py:6
 msgid "Iwate"
-msgstr ""
+msgstr "იუატე"
 
 #: contrib/localflavor/jp/jp_prefectures.py:7
 msgid "Miyagi"
-msgstr ""
+msgstr "მიიაგი"
 
 #: contrib/localflavor/jp/jp_prefectures.py:8
 msgid "Akita"
-msgstr ""
+msgstr "აკიტა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:9
 msgid "Yamagata"
-msgstr ""
+msgstr "იამაგატა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:10
 msgid "Fukushima"
-msgstr ""
+msgstr "ფუკუსიმა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:11
 msgid "Ibaraki"
-msgstr ""
+msgstr "იბარაკი"
 
 #: contrib/localflavor/jp/jp_prefectures.py:12
 msgid "Tochigi"
-msgstr ""
+msgstr "ტოჩიგი"
 
 #: contrib/localflavor/jp/jp_prefectures.py:13
 msgid "Gunma"
-msgstr ""
+msgstr "გუნმა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:14
 msgid "Saitama"
-msgstr ""
+msgstr "საიტამა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:15
 msgid "Chiba"
-msgstr ""
+msgstr "ჩიბა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:16
 msgid "Tokyo"
-msgstr ""
+msgstr "ტოკიო"
 
 #: contrib/localflavor/jp/jp_prefectures.py:17
 msgid "Kanagawa"
-msgstr ""
+msgstr "კანაგავა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:18
 msgid "Yamanashi"
-msgstr ""
+msgstr "იამანაში"
 
 #: contrib/localflavor/jp/jp_prefectures.py:19
 msgid "Nagano"
-msgstr ""
+msgstr "ნაგანო"
 
 #: contrib/localflavor/jp/jp_prefectures.py:20
 msgid "Niigata"
-msgstr ""
+msgstr "ნიიგატა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:21
 msgid "Toyama"
-msgstr ""
+msgstr "ტოიამა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:22
 msgid "Ishikawa"
-msgstr ""
+msgstr "იშიკავა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:23
 msgid "Fukui"
-msgstr ""
+msgstr "ფუკუი"
 
 #: contrib/localflavor/jp/jp_prefectures.py:24
 msgid "Gifu"
-msgstr ""
+msgstr "გიფუ"
 
 #: contrib/localflavor/jp/jp_prefectures.py:25
 msgid "Shizuoka"
-msgstr ""
+msgstr "შიზუოკა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:26
 msgid "Aichi"
-msgstr ""
+msgstr "აიჩი"
 
 #: contrib/localflavor/jp/jp_prefectures.py:27
 msgid "Mie"
-msgstr ""
+msgstr "მიე"
 
 #: contrib/localflavor/jp/jp_prefectures.py:28
 msgid "Shiga"
-msgstr ""
+msgstr "შიგა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:29
 msgid "Kyoto"
-msgstr ""
+msgstr "კიოტო"
 
 #: contrib/localflavor/jp/jp_prefectures.py:30
 msgid "Osaka"
-msgstr ""
+msgstr "ოსაკა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:31
 msgid "Hyogo"
-msgstr ""
+msgstr "ჰიოგო"
 
 #: contrib/localflavor/jp/jp_prefectures.py:32
 msgid "Nara"
-msgstr ""
+msgstr "ნარა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:33
 msgid "Wakayama"
-msgstr ""
+msgstr "უაკაიამა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:34
 msgid "Tottori"
-msgstr ""
+msgstr "ტოტორი"
 
 #: contrib/localflavor/jp/jp_prefectures.py:35
 msgid "Shimane"
-msgstr ""
+msgstr "შიმანე"
 
 #: contrib/localflavor/jp/jp_prefectures.py:36
 msgid "Okayama"
-msgstr ""
+msgstr "ოკაიამა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:37
 msgid "Hiroshima"
-msgstr ""
+msgstr "ჰიროსიმა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:38
 msgid "Yamaguchi"
-msgstr ""
+msgstr "იამაგუჩი"
 
 #: contrib/localflavor/jp/jp_prefectures.py:39
 msgid "Tokushima"
-msgstr ""
+msgstr "ტოკუშიმა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:40
 msgid "Kagawa"
-msgstr ""
+msgstr "კაგავა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:41
 msgid "Ehime"
-msgstr ""
+msgstr "ეჰიმე"
 
 #: contrib/localflavor/jp/jp_prefectures.py:42
 msgid "Kochi"
-msgstr ""
+msgstr "კოჩი"
 
 #: contrib/localflavor/jp/jp_prefectures.py:43
 msgid "Fukuoka"
-msgstr ""
+msgstr "ფუკუოკა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:44
 msgid "Saga"
-msgstr ""
+msgstr "საგა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:45
 msgid "Nagasaki"
-msgstr ""
+msgstr "ნაგასაკი"
 
 #: contrib/localflavor/jp/jp_prefectures.py:46
 msgid "Kumamoto"
-msgstr ""
+msgstr "კუმამოტო"
 
 #: contrib/localflavor/jp/jp_prefectures.py:47
 msgid "Oita"
-msgstr ""
+msgstr "ოიტა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:48
 msgid "Miyazaki"
-msgstr ""
+msgstr "მიაზაკი"
 
 #: contrib/localflavor/jp/jp_prefectures.py:49
 msgid "Kagoshima"
-msgstr ""
+msgstr "კაგოსიმა"
 
 #: contrib/localflavor/jp/jp_prefectures.py:50
 msgid "Okinawa"
-msgstr ""
+msgstr "ოკინავა"
 
 #: contrib/localflavor/mx/mx_states.py:12
 msgid "Aguascalientes"
-msgstr ""
+msgstr "აგუასკალიენტესი"
 
 #: contrib/localflavor/mx/mx_states.py:13
 msgid "Baja California"
-msgstr ""
+msgstr "ქვემო კალიფორნია"
 
 #: contrib/localflavor/mx/mx_states.py:14
 msgid "Baja California Sur"
-msgstr ""
+msgstr "ქვემო სამხრეთ კალიფორნია"
 
 #: contrib/localflavor/mx/mx_states.py:15
 msgid "Campeche"
-msgstr ""
+msgstr "კამპეჩე"
 
 #: contrib/localflavor/mx/mx_states.py:16
 msgid "Chihuahua"
-msgstr ""
+msgstr "ჩიჰუაჰუა"
 
 #: contrib/localflavor/mx/mx_states.py:17
 msgid "Chiapas"
-msgstr ""
+msgstr "ჩიაპასი"
 
 #: contrib/localflavor/mx/mx_states.py:18
 msgid "Coahuila"
-msgstr ""
+msgstr "კოაჰუილა"
 
 #: contrib/localflavor/mx/mx_states.py:19
 msgid "Colima"
-msgstr ""
+msgstr "კოლიმა"
 
 #: contrib/localflavor/mx/mx_states.py:20
 msgid "Distrito Federal"
-msgstr ""
+msgstr "ფედერალური ოლქი"
 
 #: contrib/localflavor/mx/mx_states.py:21
 msgid "Durango"
-msgstr ""
+msgstr "დურანგო"
 
 #: contrib/localflavor/mx/mx_states.py:22
 msgid "Guerrero"
-msgstr ""
+msgstr "გერერო"
 
 #: contrib/localflavor/mx/mx_states.py:23
 msgid "Guanajuato"
-msgstr ""
+msgstr "გუანაჰუატო"
 
 #: contrib/localflavor/mx/mx_states.py:24
 msgid "Hidalgo"
-msgstr ""
+msgstr "იდალგო"
 
 #: contrib/localflavor/mx/mx_states.py:25
 msgid "Jalisco"
-msgstr ""
+msgstr "ჰალისკო"
 
 #: contrib/localflavor/mx/mx_states.py:26
 msgid "Estado de México"
-msgstr ""
+msgstr "მეხიკოს შტატი"
 
 #: contrib/localflavor/mx/mx_states.py:27
 msgid "Michoacán"
-msgstr ""
+msgstr "მიჩოაკანი"
 
 #: contrib/localflavor/mx/mx_states.py:28
 msgid "Morelos"
-msgstr ""
+msgstr "მორელოსი"
 
 #: contrib/localflavor/mx/mx_states.py:29
 msgid "Nayarit"
-msgstr ""
+msgstr "ნაიარიტი"
 
 #: contrib/localflavor/mx/mx_states.py:30
 msgid "Nuevo León"
-msgstr ""
+msgstr "ნუევო-ლეონი"
 
 #: contrib/localflavor/mx/mx_states.py:31
 msgid "Oaxaca"
-msgstr ""
+msgstr "ოახაკა"
 
 #: contrib/localflavor/mx/mx_states.py:32
 msgid "Puebla"
-msgstr ""
+msgstr "პუებლა"
 
 #: contrib/localflavor/mx/mx_states.py:33
 msgid "Querétaro"
-msgstr ""
+msgstr "კერეტარო"
 
 #: contrib/localflavor/mx/mx_states.py:34
 msgid "Quintana Roo"
-msgstr ""
+msgstr "კინტანა-როო"
 
 #: contrib/localflavor/mx/mx_states.py:35
 msgid "Sinaloa"
-msgstr ""
+msgstr "სინალოა"
 
 #: contrib/localflavor/mx/mx_states.py:36
 msgid "San Luis Potosí"
-msgstr ""
+msgstr "სან-ლუის-პოტოსი"
 
 #: contrib/localflavor/mx/mx_states.py:37
 msgid "Sonora"
-msgstr ""
+msgstr "sონორა"
 
 #: contrib/localflavor/mx/mx_states.py:38
 msgid "Tabasco"
-msgstr ""
+msgstr "ტაბასკო"
 
 #: contrib/localflavor/mx/mx_states.py:39
 msgid "Tamaulipas"
-msgstr ""
+msgstr "ტამაულიპასი"
 
 #: contrib/localflavor/mx/mx_states.py:40
 msgid "Tlaxcala"
-msgstr ""
+msgstr "ტლასკალა"
 
 #: contrib/localflavor/mx/mx_states.py:41
 msgid "Veracruz"
-msgstr ""
+msgstr "ვერაკრუსი"
 
 #: contrib/localflavor/mx/mx_states.py:42
 msgid "Yucatán"
-msgstr ""
+msgstr "იუკატანი"
 
 #: contrib/localflavor/mx/mx_states.py:43
 msgid "Zacatecas"
-msgstr ""
+msgstr "საკატეკასი"
 
 #: contrib/localflavor/nl/forms.py:21
 msgid "Enter a valid postal code"
-msgstr ""
+msgstr "შეიყვანეთ სწორი საფოსტო კოდი"
 
 #: contrib/localflavor/nl/forms.py:52
 msgid "Enter a valid phone number"
-msgstr ""
+msgstr "შეიყვანეთ სწორი ტელეფონის ნომერი"
 
 #: contrib/localflavor/nl/forms.py:78
 msgid "Enter a valid SoFi number"
-msgstr ""
+msgstr "შეიყვანეთ სწორი SoFi ნომერი"
 
 #: contrib/localflavor/nl/nl_provinces.py:4
-msgid "Drente"
-msgstr ""
+msgid "Drenthe"
+msgstr "დრენტე"
 
 #: contrib/localflavor/nl/nl_provinces.py:5
 msgid "Flevoland"
-msgstr ""
+msgstr "ფლევოლანდი"
 
 #: contrib/localflavor/nl/nl_provinces.py:6
 msgid "Friesland"
-msgstr ""
+msgstr "ფრისლანდია"
 
 #: contrib/localflavor/nl/nl_provinces.py:7
 msgid "Gelderland"
-msgstr ""
+msgstr "გელდერლანდი"
 
 #: contrib/localflavor/nl/nl_provinces.py:8
 msgid "Groningen"
-msgstr ""
+msgstr "გრონიგენი"
 
 #: contrib/localflavor/nl/nl_provinces.py:9
 msgid "Limburg"
-msgstr ""
+msgstr "ლიმბურგი"
 
 #: contrib/localflavor/nl/nl_provinces.py:10
 msgid "Noord-Brabant"
-msgstr ""
+msgstr "ჩრდილოეთ ბრაბანტი"
 
 #: contrib/localflavor/nl/nl_provinces.py:11
 msgid "Noord-Holland"
-msgstr ""
+msgstr "ჩრდილოეთ ჰოლანდია"
 
 #: contrib/localflavor/nl/nl_provinces.py:12
 msgid "Overijssel"
-msgstr ""
+msgstr "ოვერეისელი"
 
 #: contrib/localflavor/nl/nl_provinces.py:13
 msgid "Utrecht"
-msgstr ""
+msgstr "უტრეხტი"
 
 #: contrib/localflavor/nl/nl_provinces.py:14
 msgid "Zeeland"
-msgstr ""
+msgstr "ზელანდია"
 
 #: contrib/localflavor/nl/nl_provinces.py:15
 msgid "Zuid-Holland"
-msgstr ""
+msgstr "სამხრეთ ჰოლანდია"
 
 #: contrib/localflavor/no/forms.py:33
 msgid "Enter a valid Norwegian social security number."
-msgstr ""
+msgstr "შეიყვანეთ სწორი ნორვეგიული პირადი ნომერი."
 
 #: contrib/localflavor/pe/forms.py:24
 msgid "This field requires 8 digits."
-msgstr ""
+msgstr "ეს ველი შედგება 8 თანრიგისაგან."
 
 #: contrib/localflavor/pe/forms.py:52
 msgid "This field requires 11 digits."
-msgstr ""
+msgstr "ეს ველი სედგება 11 თანრიგისაგან."
+
+#: contrib/localflavor/pl/forms.py:38
+msgid "National Identification Number consists of 11 digits."
+msgstr "ეროვნული საიდენტიფიკაციო ნომერი შედგება 11 თანრიგისაგან."
 
 #: contrib/localflavor/pl/forms.py:39
-msgid "National Identification Number consists of 11 digits."
-msgstr ""
-
-#: contrib/localflavor/pl/forms.py:40
 msgid "Wrong checksum for the National Identification Number."
-msgstr ""
+msgstr "არასწორი საკონტროლო ჯამი ეროვნულ საიდენტიფიკაციო ნომერში."
 
-#: contrib/localflavor/pl/forms.py:72
+#: contrib/localflavor/pl/forms.py:71
 msgid ""
 "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgstr ""
+"შეიყვანეთ საგადასახადოს ნომერი (NIP) ფორმატში: XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 
-#: contrib/localflavor/pl/forms.py:73
+#: contrib/localflavor/pl/forms.py:72
 msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr ""
+msgstr "არასწორი საკონტროლო ჯამი საგადასახადო ნომრისათვის (NIP)."
+
+#: contrib/localflavor/pl/forms.py:111
+msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
+msgstr "საწარმოოს ეროვნული სარეგისტრაციო ნომერი (REGON) შედგება 7 ან 9 თანრიგისაგან."
 
 #: contrib/localflavor/pl/forms.py:112
-msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
-msgstr ""
-
-#: contrib/localflavor/pl/forms.py:113
 msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr ""
+msgstr "არასწორი საკონტროლო ჯამი საწარმოოს ეროვნულ სარეგისტრაციო ნომერში (REGON)."
 
-#: contrib/localflavor/pl/forms.py:156
+#: contrib/localflavor/pl/forms.py:155
 msgid "Enter a postal code in the format XX-XXX."
-msgstr ""
+msgstr "შეიყვანეთ საფოსტო კოდი ფორმატში XX-XXX."
 
 #: contrib/localflavor/pl/pl_voivodeships.py:8
 msgid "Lower Silesia"
-msgstr ""
+msgstr "ქვემო სილეზია"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:9
 msgid "Kuyavia-Pomerania"
-msgstr ""
+msgstr "კუიავია-პომერანია"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:10
 msgid "Lublin"
-msgstr ""
+msgstr "ლუბლინი"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:11
 msgid "Lubusz"
-msgstr ""
+msgstr "ლუბუში"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:12
 msgid "Lodz"
-msgstr ""
+msgstr "ლოძი"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:13
 msgid "Lesser Poland"
-msgstr ""
+msgstr "მცირე პოლონეთი"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:14
 msgid "Masovia"
-msgstr ""
+msgstr "მაზოვია"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:15
 msgid "Opole"
-msgstr ""
+msgstr "ოპოლე"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:16
 msgid "Subcarpatia"
-msgstr ""
+msgstr "სუბკარპატია"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:17
 msgid "Podlasie"
-msgstr ""
+msgstr "პოდლასიე"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:18
 msgid "Pomerania"
-msgstr ""
+msgstr "პომერანია"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:19
 msgid "Silesia"
-msgstr ""
+msgstr "სილეზია"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:20
 msgid "Swietokrzyskie"
-msgstr ""
+msgstr "სვენტოკშისკე"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:21
 msgid "Warmia-Masuria"
-msgstr ""
+msgstr "ვარმია-მაზურია"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:22
 msgid "Greater Poland"
-msgstr ""
+msgstr "დიდი პოლონეთი"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:23
 msgid "West Pomerania"
+msgstr "დასავლეთ პომერანია"
+
+#: contrib/localflavor/ro/forms.py:19
+msgid "Enter a valid CIF."
+msgstr "შეიყვანეთ სწორი URL."
+
+#: contrib/localflavor/ro/forms.py:56
+msgid "Enter a valid CNP."
+msgstr "შეიყვანეთ სწორი URL."
+
+#: contrib/localflavor/ro/forms.py:141
+msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
 msgstr ""
+"შეიყვანეთ დასაშვები CUIT ერთ-ერთ ფორმატში: XX-XXXXXXXX-X ან XXXXXXXXXXXX."
+
+#: contrib/localflavor/ro/forms.py:171
+msgid "Phone numbers must be in XXXX-XXXXXX format."
+msgstr "ტელეფონის ნომრები უნდა იყოს XX-XXXX-XXXX ფორმატში."
+
+#: contrib/localflavor/ro/forms.py:194
+msgid "Enter a valid postal code in the format XXXXXX"
+msgstr "შეიყვანეთ საფოსტო კოდი ფორმატში: XXX XXX."
 
 #: contrib/localflavor/sk/forms.py:30
 msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr ""
+msgstr "შეიყვანეთ საფოსტო კოდი ფორმატში XXXXX or XXX XX."
 
 #: contrib/localflavor/sk/sk_districts.py:8
 msgid "Banska Bystrica"
-msgstr ""
+msgstr "ბანსკა ბისტრიცა"
 
 #: contrib/localflavor/sk/sk_districts.py:9
 msgid "Banska Stiavnica"
-msgstr ""
+msgstr "ბანსკა შტიავნიცა"
 
 #: contrib/localflavor/sk/sk_districts.py:10
 msgid "Bardejov"
-msgstr ""
+msgstr "ბარდეიოვი"
 
 #: contrib/localflavor/sk/sk_districts.py:11
 msgid "Banovce nad Bebravou"
-msgstr ""
+msgstr "ბანოვცე-ნად-ბებრავოუ"
 
 #: contrib/localflavor/sk/sk_districts.py:12
 msgid "Brezno"
-msgstr ""
+msgstr "ბრეზნო"
 
 #: contrib/localflavor/sk/sk_districts.py:13
 msgid "Bratislava I"
-msgstr ""
+msgstr "ბრატისლავა I"
 
 #: contrib/localflavor/sk/sk_districts.py:14
 msgid "Bratislava II"
-msgstr ""
+msgstr "ბრატისლავა II"
 
 #: contrib/localflavor/sk/sk_districts.py:15
 msgid "Bratislava III"
-msgstr ""
+msgstr "ბრატისლავა III"
 
 #: contrib/localflavor/sk/sk_districts.py:16
 msgid "Bratislava IV"
-msgstr ""
+msgstr "ბრატისლავა IV"
 
 #: contrib/localflavor/sk/sk_districts.py:17
 msgid "Bratislava V"
-msgstr ""
+msgstr "ბრატისლავა V"
 
 #: contrib/localflavor/sk/sk_districts.py:18
 msgid "Bytca"
-msgstr ""
+msgstr "ბიტჩა"
 
 #: contrib/localflavor/sk/sk_districts.py:19
 msgid "Cadca"
-msgstr ""
+msgstr "ჩადცა"
 
 #: contrib/localflavor/sk/sk_districts.py:20
 msgid "Detva"
-msgstr ""
+msgstr "დეტვა"
 
 #: contrib/localflavor/sk/sk_districts.py:21
 msgid "Dolny Kubin"
-msgstr ""
+msgstr "დოლნი კუბინი"
 
 #: contrib/localflavor/sk/sk_districts.py:22
 msgid "Dunajska Streda"
-msgstr ""
+msgstr "დუნაისკა სტრედა"
 
 #: contrib/localflavor/sk/sk_districts.py:23
 msgid "Galanta"
-msgstr ""
+msgstr "გალანტა"
 
 #: contrib/localflavor/sk/sk_districts.py:24
 msgid "Gelnica"
-msgstr ""
+msgstr "გელნიცა"
 
 #: contrib/localflavor/sk/sk_districts.py:25
 msgid "Hlohovec"
-msgstr ""
+msgstr "ჰლოჰოვეცი"
 
 #: contrib/localflavor/sk/sk_districts.py:26
 msgid "Humenne"
-msgstr ""
+msgstr "ჰუმენე"
 
 #: contrib/localflavor/sk/sk_districts.py:27
 msgid "Ilava"
-msgstr ""
+msgstr "ილავა"
 
 #: contrib/localflavor/sk/sk_districts.py:28
 msgid "Kezmarok"
-msgstr ""
+msgstr "კეზმაროკი"
 
 #: contrib/localflavor/sk/sk_districts.py:29
 msgid "Komarno"
-msgstr ""
+msgstr "კომარნო"
 
 #: contrib/localflavor/sk/sk_districts.py:30
 msgid "Kosice I"
-msgstr ""
+msgstr "კოშიცე I"
 
 #: contrib/localflavor/sk/sk_districts.py:31
 msgid "Kosice II"
-msgstr ""
+msgstr "კოშიცე II"
 
 #: contrib/localflavor/sk/sk_districts.py:32
 msgid "Kosice III"
-msgstr ""
+msgstr "კოშიცე III"
 
 #: contrib/localflavor/sk/sk_districts.py:33
 msgid "Kosice IV"
-msgstr ""
+msgstr "კოშიცე IV"
 
 #: contrib/localflavor/sk/sk_districts.py:34
 msgid "Kosice - okolie"
-msgstr ""
+msgstr "კოშიცე - ოკოლიე"
 
 #: contrib/localflavor/sk/sk_districts.py:35
 msgid "Krupina"
-msgstr ""
+msgstr "კრუპინა"
 
 #: contrib/localflavor/sk/sk_districts.py:36
 msgid "Kysucke Nove Mesto"
-msgstr ""
+msgstr "კისუცკე ნოვე მესტო"
 
 #: contrib/localflavor/sk/sk_districts.py:37
 msgid "Levice"
-msgstr ""
+msgstr "ლევიცე"
 
 #: contrib/localflavor/sk/sk_districts.py:38
 msgid "Levoca"
-msgstr ""
+msgstr "ლევოჩა"
 
 #: contrib/localflavor/sk/sk_districts.py:39
 msgid "Liptovsky Mikulas"
-msgstr ""
+msgstr "ლიპტოვსკი მიკულაში"
 
 #: contrib/localflavor/sk/sk_districts.py:40
 msgid "Lucenec"
-msgstr ""
+msgstr "ლუჩენეცი"
 
 #: contrib/localflavor/sk/sk_districts.py:41
 msgid "Malacky"
-msgstr ""
+msgstr "მალაცკი"
 
 #: contrib/localflavor/sk/sk_districts.py:42
 msgid "Martin"
-msgstr ""
+msgstr "მარტინი"
 
 #: contrib/localflavor/sk/sk_districts.py:43
 msgid "Medzilaborce"
-msgstr ""
+msgstr "მეძილაბორცე"
 
 #: contrib/localflavor/sk/sk_districts.py:44
 msgid "Michalovce"
-msgstr ""
+msgstr "მიხალოვცე"
 
 #: contrib/localflavor/sk/sk_districts.py:45
 msgid "Myjava"
-msgstr ""
+msgstr "მიავა"
 
 #: contrib/localflavor/sk/sk_districts.py:46
 msgid "Namestovo"
-msgstr ""
+msgstr "ნამესტოვო"
 
 #: contrib/localflavor/sk/sk_districts.py:47
 msgid "Nitra"
-msgstr ""
+msgstr "ნიტრა"
 
 #: contrib/localflavor/sk/sk_districts.py:48
 msgid "Nove Mesto nad Vahom"
-msgstr ""
+msgstr "ნოვე-მესტო-ნად-ვაჰომ"
 
 #: contrib/localflavor/sk/sk_districts.py:49
 msgid "Nove Zamky"
-msgstr ""
+msgstr "ნოვე ზამკი"
 
 #: contrib/localflavor/sk/sk_districts.py:50
 msgid "Partizanske"
-msgstr ""
+msgstr "პარტიზანსკე"
 
 #: contrib/localflavor/sk/sk_districts.py:51
 msgid "Pezinok"
-msgstr ""
+msgstr "პეზინოკი"
 
 #: contrib/localflavor/sk/sk_districts.py:52
 msgid "Piestany"
-msgstr ""
+msgstr "პიესტანი"
 
 #: contrib/localflavor/sk/sk_districts.py:53
 msgid "Poltar"
-msgstr ""
+msgstr "პოლტარი"
 
 #: contrib/localflavor/sk/sk_districts.py:54
 msgid "Poprad"
-msgstr ""
+msgstr "პოპრადი"
 
 #: contrib/localflavor/sk/sk_districts.py:55
 msgid "Povazska Bystrica"
-msgstr ""
+msgstr "პოვაჟსკა ბისტრიცა"
 
 #: contrib/localflavor/sk/sk_districts.py:56
 msgid "Presov"
-msgstr ""
+msgstr "პრესოვი"
 
 #: contrib/localflavor/sk/sk_districts.py:57
 msgid "Prievidza"
-msgstr ""
+msgstr "პრიევიძა"
 
 #: contrib/localflavor/sk/sk_districts.py:58
 msgid "Puchov"
-msgstr ""
+msgstr "პუხოვი"
 
 #: contrib/localflavor/sk/sk_districts.py:59
 msgid "Revuca"
-msgstr ""
+msgstr "რევუცა"
 
 #: contrib/localflavor/sk/sk_districts.py:60
 msgid "Rimavska Sobota"
-msgstr ""
+msgstr "რიმავსკა სობოტა"
 
 #: contrib/localflavor/sk/sk_districts.py:61
 msgid "Roznava"
-msgstr ""
+msgstr "როზნავა"
 
 #: contrib/localflavor/sk/sk_districts.py:62
 msgid "Ruzomberok"
-msgstr ""
+msgstr "რუზომბეროკი"
 
 #: contrib/localflavor/sk/sk_districts.py:63
 msgid "Sabinov"
-msgstr ""
+msgstr "საბინოვი"
 
 #: contrib/localflavor/sk/sk_districts.py:64
 msgid "Senec"
-msgstr ""
+msgstr "სენეცი"
 
 #: contrib/localflavor/sk/sk_districts.py:65
 msgid "Senica"
-msgstr ""
+msgstr "სენიცა"
 
 #: contrib/localflavor/sk/sk_districts.py:66
 msgid "Skalica"
-msgstr ""
+msgstr "სკალიცა"
 
 #: contrib/localflavor/sk/sk_districts.py:67
 msgid "Snina"
-msgstr ""
+msgstr "სნინა"
 
 #: contrib/localflavor/sk/sk_districts.py:68
 msgid "Sobrance"
-msgstr ""
+msgstr "სობრანცე"
 
 #: contrib/localflavor/sk/sk_districts.py:69
 msgid "Spisska Nova Ves"
-msgstr ""
+msgstr "სპისკა-ნოვა-ვესი"
 
 #: contrib/localflavor/sk/sk_districts.py:70
 msgid "Stara Lubovna"
-msgstr ""
+msgstr "სტარა-ლუბოვნა"
 
 #: contrib/localflavor/sk/sk_districts.py:71
 msgid "Stropkov"
-msgstr ""
+msgstr "სტროპკოვი"
 
 #: contrib/localflavor/sk/sk_districts.py:72
 msgid "Svidnik"
-msgstr ""
+msgstr "სვიდნიკი"
 
 #: contrib/localflavor/sk/sk_districts.py:73
 msgid "Sala"
-msgstr ""
+msgstr "სალა"
 
 #: contrib/localflavor/sk/sk_districts.py:74
 msgid "Topolcany"
-msgstr ""
+msgstr "ტოპოლჩანი"
 
 #: contrib/localflavor/sk/sk_districts.py:75
 msgid "Trebisov"
-msgstr ""
+msgstr "ტრებისოვი"
 
 #: contrib/localflavor/sk/sk_districts.py:76
 msgid "Trencin"
-msgstr ""
+msgstr "ტრენჩინი"
 
 #: contrib/localflavor/sk/sk_districts.py:77
 msgid "Trnava"
-msgstr ""
+msgstr "ტრნავა"
 
 #: contrib/localflavor/sk/sk_districts.py:78
 msgid "Turcianske Teplice"
-msgstr ""
+msgstr "ტურჩანსკე ტეპლიცე"
 
 #: contrib/localflavor/sk/sk_districts.py:79
 msgid "Tvrdosin"
-msgstr ""
+msgstr "ტვრდოშინი"
 
 #: contrib/localflavor/sk/sk_districts.py:80
 msgid "Velky Krtis"
-msgstr ""
+msgstr "ველკი კრტიში"
 
 #: contrib/localflavor/sk/sk_districts.py:81
 msgid "Vranov nad Toplou"
-msgstr ""
+msgstr "ვრანოვ-ნად-ტოპლოუ"
 
 #: contrib/localflavor/sk/sk_districts.py:82
 msgid "Zlate Moravce"
-msgstr ""
+msgstr "ზლატე მორავცე"
 
 #: contrib/localflavor/sk/sk_districts.py:83
 msgid "Zvolen"
-msgstr ""
+msgstr "ზვოლენი"
 
 #: contrib/localflavor/sk/sk_districts.py:84
 msgid "Zarnovica"
-msgstr ""
+msgstr "ზარნოვიცა"
 
 #: contrib/localflavor/sk/sk_districts.py:85
 msgid "Ziar nad Hronom"
-msgstr ""
+msgstr "ზიარ-ნად-ჰრონომი"
 
 #: contrib/localflavor/sk/sk_districts.py:86
 msgid "Zilina"
-msgstr ""
+msgstr "ზილინა"
 
 #: contrib/localflavor/sk/sk_regions.py:8
 msgid "Banska Bystrica region"
-msgstr ""
+msgstr "ბანსკა-ბისტრიცის რაიონი"
 
 #: contrib/localflavor/sk/sk_regions.py:9
 msgid "Bratislava region"
-msgstr ""
+msgstr "ბრატისლავას რაიონი"
 
 #: contrib/localflavor/sk/sk_regions.py:10
 msgid "Kosice region"
-msgstr ""
+msgstr "კოშიცეს რაიონი"
 
 #: contrib/localflavor/sk/sk_regions.py:11
 msgid "Nitra region"
-msgstr ""
+msgstr "ნიტრას რაიონი"
 
 #: contrib/localflavor/sk/sk_regions.py:12
 msgid "Presov region"
-msgstr ""
+msgstr "პრესოვის რაიონი"
 
 #: contrib/localflavor/sk/sk_regions.py:13
 msgid "Trencin region"
-msgstr ""
+msgstr "ტრენჩინის რაიონი"
 
 #: contrib/localflavor/sk/sk_regions.py:14
 msgid "Trnava region"
-msgstr ""
+msgstr "ტრნავას რაიონი"
 
 #: contrib/localflavor/sk/sk_regions.py:15
 msgid "Zilina region"
-msgstr ""
+msgstr "ზილინას რაიონი"
 
 #: contrib/localflavor/uk/forms.py:21
 msgid "Enter a valid postcode."
-msgstr ""
+msgstr "შეიყვანეთ სწორი საფოსტო კოდი."
 
 #: contrib/localflavor/uk/uk_regions.py:11
 msgid "Bedfordshire"
-msgstr ""
+msgstr "ბედფორდშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:12
 msgid "Buckinghamshire"
-msgstr ""
+msgstr "ბუკინჰემშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:14
 msgid "Cheshire"
-msgstr ""
+msgstr "ჩეშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:15
 msgid "Cornwall and Isles of Scilly"
-msgstr ""
+msgstr "კორნუოლი და სილის კუნძულები"
 
 #: contrib/localflavor/uk/uk_regions.py:16
 msgid "Cumbria"
-msgstr ""
+msgstr "კამბრია"
 
 #: contrib/localflavor/uk/uk_regions.py:17
 msgid "Derbyshire"
-msgstr ""
+msgstr "დერბიშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:18
 msgid "Devon"
-msgstr ""
+msgstr "დევონი"
 
 #: contrib/localflavor/uk/uk_regions.py:19
 msgid "Dorset"
-msgstr ""
+msgstr "დორსეტი"
 
 #: contrib/localflavor/uk/uk_regions.py:20
 msgid "Durham"
-msgstr ""
+msgstr "დარემი"
 
 #: contrib/localflavor/uk/uk_regions.py:21
 msgid "East Sussex"
-msgstr ""
+msgstr "აღმოსავლეთ სასექსი"
 
 #: contrib/localflavor/uk/uk_regions.py:22
 msgid "Essex"
-msgstr ""
+msgstr "ესექსი"
 
 #: contrib/localflavor/uk/uk_regions.py:23
 msgid "Gloucestershire"
-msgstr ""
+msgstr "გლოსტეშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:24
 msgid "Greater London"
-msgstr ""
+msgstr "დიდი ლონდონი"
 
 #: contrib/localflavor/uk/uk_regions.py:25
 msgid "Greater Manchester"
-msgstr ""
+msgstr "დიდი მანჩესტერი"
 
 #: contrib/localflavor/uk/uk_regions.py:26
 msgid "Hampshire"
-msgstr ""
+msgstr "ჰემპშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:27
 msgid "Hertfordshire"
-msgstr ""
+msgstr "ჰარტფორდშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:28
 msgid "Kent"
-msgstr ""
+msgstr "კენტი"
 
 #: contrib/localflavor/uk/uk_regions.py:29
 msgid "Lancashire"
-msgstr ""
+msgstr "ლანკაშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:30
 msgid "Leicestershire"
-msgstr ""
+msgstr "ლაიჩესტეშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:31
 msgid "Lincolnshire"
-msgstr ""
+msgstr "ლინკოლნშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:32
 msgid "Merseyside"
-msgstr ""
+msgstr "მერსისაიდი"
 
 #: contrib/localflavor/uk/uk_regions.py:33
 msgid "Norfolk"
-msgstr ""
+msgstr "ნორფოლკი"
 
 #: contrib/localflavor/uk/uk_regions.py:34
 msgid "North Yorkshire"
-msgstr ""
+msgstr "ჩრდილოეთ იოკშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:35
 msgid "Northamptonshire"
-msgstr ""
+msgstr "ნორტჰემპტონშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:36
 msgid "Northumberland"
-msgstr ""
+msgstr "ნორტუმბერლანდი"
 
 #: contrib/localflavor/uk/uk_regions.py:37
 msgid "Nottinghamshire"
-msgstr ""
+msgstr "ნოტინგემშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:38
 msgid "Oxfordshire"
-msgstr ""
+msgstr "ოქსფორდშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:39
 msgid "Shropshire"
-msgstr ""
+msgstr "შროპშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:40
 msgid "Somerset"
-msgstr ""
+msgstr "სომერსეტი"
 
 #: contrib/localflavor/uk/uk_regions.py:41
 msgid "South Yorkshire"
-msgstr ""
+msgstr "სამხრეთ იოკშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:42
 msgid "Staffordshire"
-msgstr ""
+msgstr "სტაფორდშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:43
 msgid "Suffolk"
-msgstr ""
+msgstr "საფოლკი"
 
 #: contrib/localflavor/uk/uk_regions.py:44
 msgid "Surrey"
-msgstr ""
+msgstr "სურეი"
 
 #: contrib/localflavor/uk/uk_regions.py:45
 msgid "Tyne and Wear"
-msgstr ""
+msgstr "თაინ და უირი"
 
 #: contrib/localflavor/uk/uk_regions.py:46
 msgid "Warwickshire"
-msgstr ""
+msgstr "უარვიკშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:47
 msgid "West Midlands"
-msgstr ""
+msgstr "დასავლეთ მიდლენდსი"
 
 #: contrib/localflavor/uk/uk_regions.py:48
 msgid "West Sussex"
-msgstr ""
+msgstr "დასავლეთ სასექსი"
 
 #: contrib/localflavor/uk/uk_regions.py:49
 msgid "West Yorkshire"
-msgstr ""
+msgstr "დასავლეთ იოკშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:50
 msgid "Wiltshire"
-msgstr ""
+msgstr "უილტშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:51
 msgid "Worcestershire"
-msgstr ""
+msgstr "უორსესტერშირი"
 
 #: contrib/localflavor/uk/uk_regions.py:55
 msgid "County Antrim"
-msgstr ""
+msgstr "ანტრიმის ქვეყანა"
 
 #: contrib/localflavor/uk/uk_regions.py:56
 msgid "County Armagh"
-msgstr ""
+msgstr "არმაგის ქვეყანა"
 
 #: contrib/localflavor/uk/uk_regions.py:57
 msgid "County Down"
-msgstr ""
+msgstr "დაუნის ქვეყანა"
 
 #: contrib/localflavor/uk/uk_regions.py:58
 msgid "County Fermanagh"
-msgstr ""
+msgstr "ფერმანაგის ქვეყანა"
 
 #: contrib/localflavor/uk/uk_regions.py:59
 msgid "County Londonderry"
-msgstr ""
+msgstr "ლონდონდერის ქვეყანა"
 
 #: contrib/localflavor/uk/uk_regions.py:60
 msgid "County Tyrone"
-msgstr ""
+msgstr "ტაირონის ქვეყანა"
 
 #: contrib/localflavor/uk/uk_regions.py:64
 msgid "Clwyd"
-msgstr ""
+msgstr "კლოუიდი"
 
 #: contrib/localflavor/uk/uk_regions.py:65
 msgid "Dyfed"
-msgstr ""
+msgstr "დაიფიდი"
 
 #: contrib/localflavor/uk/uk_regions.py:66
 msgid "Gwent"
-msgstr ""
+msgstr "გვენტი"
 
 #: contrib/localflavor/uk/uk_regions.py:67
 msgid "Gwynedd"
-msgstr ""
+msgstr "გუაინიდი"
 
 #: contrib/localflavor/uk/uk_regions.py:68
 msgid "Mid Glamorgan"
-msgstr ""
+msgstr "შუა გლემორგენი"
 
 #: contrib/localflavor/uk/uk_regions.py:69
 msgid "Powys"
-msgstr ""
+msgstr "პოუისი"
 
 #: contrib/localflavor/uk/uk_regions.py:70
 msgid "South Glamorgan"
-msgstr ""
+msgstr "სამხრეთ გლემორგენი"
 
 #: contrib/localflavor/uk/uk_regions.py:71
 msgid "West Glamorgan"
-msgstr ""
+msgstr "დასავლეთ გლემორგენი"
 
 #: contrib/localflavor/uk/uk_regions.py:75
 msgid "Borders"
-msgstr ""
+msgstr "საზღვრები"
 
 #: contrib/localflavor/uk/uk_regions.py:76
 msgid "Central Scotland"
-msgstr ""
+msgstr "ცენტრალური შოტლანდია"
 
 #: contrib/localflavor/uk/uk_regions.py:77
 msgid "Dumfries and Galloway"
-msgstr ""
+msgstr "დამფრაის და გელოუეი"
 
 #: contrib/localflavor/uk/uk_regions.py:78
 msgid "Fife"
-msgstr ""
+msgstr "ფაიფი"
 
 #: contrib/localflavor/uk/uk_regions.py:79
 msgid "Grampian"
-msgstr ""
+msgstr "გრემპაინი"
 
 #: contrib/localflavor/uk/uk_regions.py:80
 msgid "Highland"
-msgstr ""
+msgstr "ჰაილენდი"
 
 #: contrib/localflavor/uk/uk_regions.py:81
 msgid "Lothian"
-msgstr ""
+msgstr "ლოთიენი"
 
 #: contrib/localflavor/uk/uk_regions.py:82
 msgid "Orkney Islands"
-msgstr ""
+msgstr "ორკნის კუნძულები"
 
 #: contrib/localflavor/uk/uk_regions.py:83
 msgid "Shetland Islands"
-msgstr ""
+msgstr "შიტლენდის კუნძულები"
 
 #: contrib/localflavor/uk/uk_regions.py:84
 msgid "Strathclyde"
-msgstr ""
+msgstr "სტრესკლაიდი"
 
 #: contrib/localflavor/uk/uk_regions.py:85
 msgid "Tayside"
-msgstr ""
+msgstr "თეისაიდი"
 
 #: contrib/localflavor/uk/uk_regions.py:86
 msgid "Western Isles"
-msgstr ""
+msgstr "დასავლეთ კუნძულები"
 
 #: contrib/localflavor/uk/uk_regions.py:90
 msgid "England"
-msgstr ""
+msgstr "ინგლისი"
 
 #: contrib/localflavor/uk/uk_regions.py:91
 msgid "Northern Ireland"
-msgstr ""
+msgstr "ჩრდილოეთ ირლანდია"
 
 #: contrib/localflavor/uk/uk_regions.py:92
 msgid "Scotland"
-msgstr ""
+msgstr "შოტლანდია"
 
 #: contrib/localflavor/uk/uk_regions.py:93
 msgid "Wales"
-msgstr ""
+msgstr "უელსი"
 
 #: contrib/localflavor/us/forms.py:16
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr ""
+msgstr "შეიყვანეთ zip-კოდი ფორმატში XXXXX ან XXXXX-XXXX."
 
 #: contrib/localflavor/us/forms.py:54
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
-msgstr ""
+msgstr "შეიყვანეთ სწორი აშშ-ს პირადი ნომერი ფორმატში XXX-XX-XXXX."
 
 #: contrib/localflavor/za/forms.py:20
 msgid "Enter a valid South African ID number"
-msgstr ""
+msgstr "შეიყვანეთ სწორი სამხრეთ-აფრიკული ID ნომერი"
 
 #: contrib/localflavor/za/forms.py:54
 msgid "Enter a valid South African postal code"
-msgstr ""
+msgstr "შეიყვანეთ სწორი სამხრეთ-აფრიკული საფოსტო კოდი"
 
 #: contrib/localflavor/za/za_provinces.py:4
 msgid "Eastern Cape"
-msgstr ""
+msgstr "აღმოსავლეთ კაპი"
 
 #: contrib/localflavor/za/za_provinces.py:5
 msgid "Free State"
-msgstr ""
+msgstr "თავისუფალი სახელმწიფო"
 
 #: contrib/localflavor/za/za_provinces.py:6
 msgid "Gauteng"
-msgstr ""
+msgstr "გაუტენგი"
 
 #: contrib/localflavor/za/za_provinces.py:7
 msgid "KwaZulu-Natal"
-msgstr ""
+msgstr "კვაზულუ-ნატალი"
 
 #: contrib/localflavor/za/za_provinces.py:8
 msgid "Limpopo"
-msgstr ""
+msgstr "ლიმპოპო"
 
 #: contrib/localflavor/za/za_provinces.py:9
 msgid "Mpumalanga"
-msgstr ""
+msgstr "მპუმალანგა"
 
 #: contrib/localflavor/za/za_provinces.py:10
 msgid "Northern Cape"
-msgstr ""
+msgstr "ჩრდილოეთ კაპი"
 
 #: contrib/localflavor/za/za_provinces.py:11
 msgid "North West"
-msgstr ""
+msgstr "ჩრდილო-დასავლეთი"
 
 #: contrib/localflavor/za/za_provinces.py:12
 msgid "Western Cape"
-msgstr ""
+msgstr "დასავლეთ კაპი"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
@@ -3672,27 +3709,9 @@ msgstr "დომენის სახელი"
 msgid "display name"
 msgstr "საჩვენებელი სახელი"
 
-#: contrib/sites/models.py:37
-msgid "site"
-msgstr "საიტი"
-
-#: contrib/sites/models.py:38
+#: contrib/sites/models.py:39
 msgid "sites"
 msgstr "საიტები"
-
-#: core/validators.py:72
-msgid "This value must contain only letters, numbers and underscores."
-msgstr ""
-"ეს მნიშვნელობა შეიძლება შეიცავდეს მხოლოდ ასოებს, ციფრებს და ხაზგასმის "
-"ნიშნებს."
-
-#: core/validators.py:76
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr ""
-"ეს მნიშვნელობა შეიძლება შეიცავდეს მხოლოდ ასოებს, ციფრებს, ხაზგასმის ნიშნებს, "
-"ტირეებს და დახრილ ხაზებს."
 
 #: core/validators.py:80
 msgid "This value must contain only letters, numbers, underscores or hyphens."
@@ -3732,7 +3751,7 @@ msgstr "არაციფრული სიმბოლოები აქ დ
 msgid "This value can't be comprised solely of digits."
 msgstr "ეს მნიშვნელობა არ უნდა შედგებოდეს მხოლოდ ციფრებისაგან."
 
-#: core/validators.py:128 newforms/fields.py:157
+#: core/validators.py:128 forms/fields.py:161
 msgid "Enter a whole number."
 msgstr "შეიყვანეთ მთელი რიცხვი"
 
@@ -3741,36 +3760,32 @@ msgid "Only alphabetical characters are allowed here."
 msgstr "მხოლოდ ლათინური ასოებია დასაშვები."
 
 #: core/validators.py:147
-msgid "Year must be 1900 or later."
-msgstr "წელი უნდა იყოს 1900 ან მეტი."
-
-#: core/validators.py:151
 #, python-format
 msgid "Invalid date: %s"
 msgstr "არასწორი თარიღი: %s"
 
-#: core/validators.py:156 db/models/fields/__init__.py:565
+#: core/validators.py:152 db/models/fields/__init__.py:556
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "შეიყვანეთ სწორი თარიღი YYYY-MM-DD ფორმატში."
 
-#: core/validators.py:161
+#: core/validators.py:157
 msgid "Enter a valid time in HH:MM format."
 msgstr "შეიყვანეთ სწორი დრო HH:MM ფორმატში."
 
-#: core/validators.py:165 db/models/fields/__init__.py:642
+#: core/validators.py:161
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "შეიყვანეთ სწორი თარიღი და დრო YYYY-MM-DD HH:MM ფორმატში."
 
-#: core/validators.py:170 newforms/fields.py:408
+#: core/validators.py:166 forms/fields.py:422
 msgid "Enter a valid e-mail address."
 msgstr "შეიყვანეთ სწორი ელ. ფოსტის მისამართი."
 
-#: core/validators.py:182 core/validators.py:474 newforms/fields.py:426
+#: core/validators.py:178 core/validators.py:470 forms/fields.py:440
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 "ფაილი არ იყო გამოგზავნილი. შეამოწმეთ კოდირების ტიპი მოცემული ფორმისათვის."
 
-#: core/validators.py:193 newforms/fields.py:468
+#: core/validators.py:189 forms/fields.py:471
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -3778,26 +3793,26 @@ msgstr ""
 "ატვირთეთ დასაშვები გამოსახულება. თქვენს მიერ გამოგზავნილი ფაილი ან არ არის "
 "გამოსახულება, ან დაზიანებულია."
 
-#: core/validators.py:200
+#: core/validators.py:196
 #, python-format
 msgid "The URL %s does not point to a valid image."
 msgstr "URL %s არ მიუთითებს დასაშვებ გამოსახულებას."
 
-#: core/validators.py:204
+#: core/validators.py:200
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr "ტელეფონის ნომრები უნდა იყოს XXX-XXX-XXXX ფორმატში. \"%s\" არასწორია."
 
-#: core/validators.py:212
+#: core/validators.py:208
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
 msgstr "URL %s არ მიუთითებს დასაშვებ QuickTime ვიდეოფაილს."
 
-#: core/validators.py:216
+#: core/validators.py:212
 msgid "A valid URL is required."
 msgstr "საჭიროა სწორი URL"
 
-#: core/validators.py:230
+#: core/validators.py:226
 #, python-format
 msgid ""
 "Valid HTML is required. Specific errors are:\n"
@@ -3806,84 +3821,84 @@ msgstr ""
 "საჭიროა სწორი HTML. ტიპიური შეცდომებია:\n"
 "%s"
 
-#: core/validators.py:237
+#: core/validators.py:233
 #, python-format
 msgid "Badly formed XML: %s"
 msgstr "ცუდად დაფორმირებული XML-ია: %s"
 
-#: core/validators.py:254
+#: core/validators.py:250
 #, python-format
 msgid "Invalid URL: %s"
 msgstr "არასწორი URL: %s"
 
-#: core/validators.py:259 core/validators.py:261
+#: core/validators.py:255 core/validators.py:257
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "URL %s არის გაწყვეტილი ბმული."
 
-#: core/validators.py:267
+#: core/validators.py:263
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "შეიყვანეთ სწორი აშშ შტატის აბრევიატურა."
 
-#: core/validators.py:281
+#: core/validators.py:277
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "ყურადღება მიაქციეთ ლექსიკას! სიტყვა %s აქ დაუშვებელია."
 msgstr[1] "ყურადღება მიაქციეთ ლექსიკას! სიტყვები %s აქ დაუშვებელია."
 
-#: core/validators.py:288
+#: core/validators.py:284
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "ველი უნდა ემთხვეოდეს '%s' ველს."
 
-#: core/validators.py:307
+#: core/validators.py:303
 msgid "Please enter something for at least one field."
 msgstr "გთხოვთ, შეიყვანოთ რაიმე მნიშვნელობა სულ მცირე ერთ ველში."
 
-#: core/validators.py:316 core/validators.py:327
+#: core/validators.py:312 core/validators.py:323
 msgid "Please enter both fields or leave them both empty."
 msgstr "გთხოვთ, შეავსოთ ორივე ველი, ან ორივე დატოვოთ ცარიელი."
 
-#: core/validators.py:335
+#: core/validators.py:331
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "ეს ველი უნდა იყოს მითითებული, თუ %(field)s არის %(value)s"
 
-#: core/validators.py:348
+#: core/validators.py:344
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "ეს ველი უნდა იყოს მითითებული, თუ %(field)s არ არის %(value)s"
 
-#: core/validators.py:367
+#: core/validators.py:363
 msgid "Duplicate values are not allowed."
 msgstr "განმეორებითი მნიშვნელობები დაუშვებელია."
 
-#: core/validators.py:382
+#: core/validators.py:378
 #, python-format
 msgid "This value must be between %(lower)s and %(upper)s."
 msgstr "მნიშვნელობა უნდა იყოს %(lower)s და %(upper)s შორის."
 
-#: core/validators.py:384
+#: core/validators.py:380
 #, python-format
 msgid "This value must be at least %s."
 msgstr "მნიშვნელობა უნდა იყოს სულ მცირე %s."
 
-#: core/validators.py:386
+#: core/validators.py:382
 #, python-format
 msgid "This value must be no more than %s."
 msgstr "მნიშვნელობა არ უნდა აღემატებოდეს %s-ს."
 
-#: core/validators.py:427
+#: core/validators.py:423
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "მნიშვნელობა უნდა იყოს %s-ის ხარისხი."
 
-#: core/validators.py:437
+#: core/validators.py:433
 msgid "Please enter a valid decimal number."
 msgstr "გთხოვთ, შეიყვანოთ სწორი ათობითი რიცხვი."
 
-#: core/validators.py:444
+#: core/validators.py:440
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -3893,7 +3908,7 @@ msgstr[0] ""
 msgstr[1] ""
 "გთხოვთ, შეიყვანოთ სწორი, არაუმეტეს %s თანრიგისაგან შემდგარი ათობითი რიცხვი."
 
-#: core/validators.py:447
+#: core/validators.py:443
 #, python-format
 msgid ""
 "Please enter a valid decimal number with a whole part of at most %s digit."
@@ -3906,7 +3921,7 @@ msgstr[1] ""
 "გთხოვთ, შეიყვანოთ სწორი ათობითი რიცხვი, რომლის მთელი ნაწილის სიგრძე არ "
 "აღემატება %s თანრიგს."
 
-#: core/validators.py:450
+#: core/validators.py:446
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -3918,37 +3933,37 @@ msgstr[1] ""
 "გთხოვთ, შეიყვანოთ სწორი ათობითი რიცხვი, რომლის წილადი ნაწილის სიგრძე არ "
 "აღემატება %s ციფრს."
 
-#: core/validators.py:458
+#: core/validators.py:454
 msgid "Please enter a valid floating point number."
 msgstr "გთხოვთ, შეიყვანოთ სწორი რიცხვი მცოცავი ათობითი წერტილით."
 
-#: core/validators.py:467
+#: core/validators.py:463
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr ""
 "დარწმუნდით, რომ თქვენს მიერ ატვირთული ფაილის სიგრძე არ არის %s ბაიტზე "
 "ნაკლები."
 
-#: core/validators.py:468
+#: core/validators.py:464
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr ""
 "დარწმუნდით, რომ თქვენს მიერ ატვირთული ფაილის სიგრძე არ აღემატება %s ბაიტს."
 
-#: core/validators.py:485
+#: core/validators.py:481
 msgid "The format for this field is wrong."
 msgstr "ამ ველის ფორმატი არასწორია."
 
-#: core/validators.py:500
+#: core/validators.py:496
 msgid "This field is invalid."
 msgstr "ველი არასწორია."
 
-#: core/validators.py:536
+#: core/validators.py:532
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "%s-დან მნიშვნელობის ამოღება შეუძლებელია."
 
-#: core/validators.py:539
+#: core/validators.py:535
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
@@ -3956,7 +3971,7 @@ msgstr ""
 "URL %(url)s მისამართმა დააბრუნა არასწორი Content-Type სათაური '%(contenttype)"
 "s'."
 
-#: core/validators.py:572
+#: core/validators.py:568
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -3965,7 +3980,7 @@ msgstr ""
 "გთხოვთ, დახუროთ დაუხურავი %(tag)s ტეგი, ხაზის ნომერია %(line)s. (სტრიქონი "
 "იწყება ტექსტით: \"%(start)s\".)"
 
-#: core/validators.py:576
+#: core/validators.py:572
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -3974,7 +3989,7 @@ msgstr ""
 "ტექსტის ნაწილი, რომელიც %(line)s ხაზზე იწყება, დაუშვებელია მიმდინარე "
 "კონტექსტში. (სტრიქონი იწყება ტექსტით: \"%(start)s\".)"
 
-#: core/validators.py:581
+#: core/validators.py:577
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -3983,7 +3998,7 @@ msgstr ""
 "\"%(attr)s\" ატრიბუტი არასწორია %(line)s ხაზზე. (სტრიქონი იწყება ტექსტით: \"%"
 "(start)s\".)"
 
-#: core/validators.py:586
+#: core/validators.py:582
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -3992,7 +4007,7 @@ msgstr ""
 "\"<%(tag)s>\" ტეგი არასწორია %(line)s ხაზზე. (სტრიქონი იწყება ტექსტით: \"%"
 "(start)s\".)"
 
-#: core/validators.py:590
+#: core/validators.py:586
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -4001,7 +4016,7 @@ msgstr ""
 "ტეგში %(line)s ხაზზე ერთი ან რამდენიმე ატრიბუტი გამოტოვებულია. (სტრიქონი "
 "იწყება ტექსტით: \"%(start)s\".)"
 
-#: core/validators.py:595
+#: core/validators.py:591
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
@@ -4010,63 +4025,66 @@ msgstr ""
 "\"%(attr)s\" ატრიბუტს %(line)s ხაზზე აქვს არასწორი მნიშვნელობა. (სტრიქონი "
 "იწყება ტექსტით: \"%(start)s\".)"
 
-#: db/models/manipulators.py:308
+#: db/models/manipulators.py:304
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "%(object)s მოცემული %(type)s-ით უკვე არსებობს მოცემული %(field)s-თვის."
 
-#: db/models/fields/__init__.py:52
+#: db/models/fields/__init__.py:46
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "%(optname)s მოცემული %(fieldname)s-ით უკვე არსებობს."
 
-#: db/models/fields/__init__.py:184 db/models/fields/__init__.py:356
-#: db/models/fields/__init__.py:799 db/models/fields/__init__.py:810
-#: newforms/fields.py:51 oldforms/__init__.py:374
+#: db/models/fields/__init__.py:321 db/models/fields/files.py:168
+#: db/models/fields/files.py:179 forms/fields.py:52 oldforms/__init__.py:370
 msgid "This field is required."
 msgstr "ეს ველი აუცილებელია."
 
-#: db/models/fields/__init__.py:465
+#: db/models/fields/__init__.py:444
 msgid "This value must be an integer."
 msgstr "ეს მნიშვნელობა უნდა იყოს მთელი."
 
-#: db/models/fields/__init__.py:504
+#: db/models/fields/__init__.py:490
 msgid "This value must be either True or False."
 msgstr "ეს მნიშვნელობა უნდა იყოს True ან False."
 
-#: db/models/fields/__init__.py:528
+#: db/models/fields/__init__.py:519
 msgid "This field cannot be null."
 msgstr "ეს მნიშვნელობა არ შეიძლება იყოს null."
 
-#: db/models/fields/__init__.py:706
+#: db/models/fields/__init__.py:621 db/models/fields/__init__.py:638
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr "შეიყვანეთ სწორი თარიღი და დრო YYYY-MM-DD HH:MM ფორმატში."
+
+#: db/models/fields/__init__.py:694
 msgid "This value must be a decimal number."
 msgstr "ეს მნიშვნელობა უნდა იყოს ათობითი რიცხვი."
 
-#: db/models/fields/__init__.py:819
-msgid "Enter a valid filename."
-msgstr "შეიყვანეთ სწორი ფაილის სახელი."
-
-#: db/models/fields/__init__.py:1013
+#: db/models/fields/__init__.py:835
 msgid "This value must be either None, True or False."
 msgstr "ეს მნიშვნელობა უნდა იყოს None, True ან False."
 
-#: db/models/fields/related.py:94
+#: db/models/fields/__init__.py:947 db/models/fields/__init__.py:960
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "შეიყვანეთ სწორი დრო HH:MM ფორმატში."
+
+#: db/models/fields/files.py:188
+msgid "Enter a valid filename."
+msgstr "შეიყვანეთ სწორი ფაილის სახელი."
+
+#: db/models/fields/related.py:92
 #, python-format
 msgid "Please enter a valid %s."
 msgstr "გთხოვთ, შეიყვანოთ სწორი %s."
 
-#: db/models/fields/related.py:756
-msgid "Separate multiple IDs with commas."
-msgstr "გამოყავით ID-ები მძიმეებით."
-
-#: db/models/fields/related.py:758
+#: db/models/fields/related.py:782
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "დააჭირეთ \"Control\", ან \"Command\" Mac-ზე, ერთზე მეტი მნიშვნელობის "
 "ასარჩევად."
 
-#: db/models/fields/related.py:805
+#: db/models/fields/related.py:862
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -4076,174 +4094,174 @@ msgstr[0] ""
 msgstr[1] ""
 "გთხოვთ, შეიყვანოთ სწორი %(self)s ID-ები. მნიშვნელობები %(value)r არასწორია."
 
-#: newforms/fields.py:52
+#: forms/fields.py:53
 msgid "Enter a valid value."
 msgstr "შეიყვანეთ სწორი მნიშვნელობა."
 
-#: newforms/fields.py:129
+#: forms/fields.py:133
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "დარწმუნდით, რომ მნიშვნელობა შედგება არაუმეტეს %(max)d სიმბოლოსაგან (ახლა "
 "მისი სიგრძეა %(length)d)."
 
-#: newforms/fields.py:130
+#: forms/fields.py:134
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 "დარწმუნდით, რომ მნიშვნელობა შედგება არანაკლებ %(min)d სიმბოლოსაგან (ახლა "
 "მისი სიგრძეა %(length)d)."
 
-#: newforms/fields.py:158 newforms/fields.py:187 newforms/fields.py:216
+#: forms/fields.py:162 forms/fields.py:191 forms/fields.py:220
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "დარწმუნდით, რომ მნიშვნელობა ნაკლებია ან ტოლია %s-ზე."
 
-#: newforms/fields.py:159 newforms/fields.py:188 newforms/fields.py:217
+#: forms/fields.py:163 forms/fields.py:192 forms/fields.py:221
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "დარწმუნდით, რომ მნიშვნელობა მეტია ან ტოლია %s-ზე."
 
-#: newforms/fields.py:186 newforms/fields.py:215
+#: forms/fields.py:190 forms/fields.py:219
 msgid "Enter a number."
 msgstr "შეიყვანეთ რიცხვი."
 
-#: newforms/fields.py:218
+#: forms/fields.py:222
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "დარწმუნდით, რომ მნიშვნელობა %s თანრიგს არ აღემატება."
 
-#: newforms/fields.py:219
+#: forms/fields.py:223
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "დარწმუნდით, რომ წილადი ნაწილი %s თანრიგს არ აღემატება."
 
-#: newforms/fields.py:220
+#: forms/fields.py:224
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "დარწმუნდით, რომ მთელი ნაწილი %s თანრიგს არ აღემატება."
 
-#: newforms/fields.py:268 newforms/fields.py:781
+#: forms/fields.py:282 forms/fields.py:803
 msgid "Enter a valid date."
 msgstr "შეიყვანეთ სწორი თარიღი."
 
-#: newforms/fields.py:301 newforms/fields.py:782
+#: forms/fields.py:315 forms/fields.py:804
 msgid "Enter a valid time."
 msgstr "შეიყვანეთ სწორი დრო."
 
-#: newforms/fields.py:340
+#: forms/fields.py:354
 msgid "Enter a valid date/time."
 msgstr "შეიყვანეთ სწორი თარიღი და დრო."
 
-#: newforms/fields.py:427
+#: forms/fields.py:441
 msgid "No file was submitted."
 msgstr "ფაილი არ იყო გამოგზავნილი."
 
-#: newforms/fields.py:428 oldforms/__init__.py:693
+#: forms/fields.py:442 oldforms/__init__.py:689
 msgid "The submitted file is empty."
 msgstr "გამოგზავნილი ფაილი ცარიელია."
 
-#: newforms/fields.py:524
+#: forms/fields.py:532
 msgid "Enter a valid URL."
 msgstr "შეიყვანეთ სწორი URL."
 
-#: newforms/fields.py:525
+#: forms/fields.py:533
 msgid "This URL appears to be a broken link."
 msgstr "როგორც ჩანს, URL არის გაწყვეტილი ბმული."
 
-#: newforms/fields.py:590 newforms/models.py:306
-msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "აირჩიეთ დასაშვები მნიშვნელობა. ეს არჩევანი დასაშვები არ არის."
-
-#: newforms/fields.py:629
+#: forms/fields.py:601 forms/fields.py:652
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. %(value)s დასაშვები არ არის."
 
-#: newforms/fields.py:630 newforms/fields.py:692 newforms/models.py:373
+#: forms/fields.py:653 forms/fields.py:714 forms/models.py:528
 msgid "Enter a list of values."
 msgstr "შეიყვანეთ მნიშვნელობების სია."
 
-#: newforms/fields.py:810
+#: forms/fields.py:832
 msgid "Enter a valid IPv4 address."
 msgstr "შეიყვანეთ სწორი IPv4 მისამართი."
 
-#: newforms/models.py:374
+#: forms/models.py:461
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "აირჩიეთ დასაშვები მნიშვნელობა. ეს არჩევანი დასაშვები არ არის."
+
+#: forms/models.py:529
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. %s დასაშვები არ არის."
 
-#: oldforms/__init__.py:409
+#: oldforms/__init__.py:405
 #, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] "დარწმუნდით, რომ თქვენს მიერ შეყვანილი ტექსტი %s სიმბოლოზე ნაკლებია."
 msgstr[1] "დარწმუნდით, რომ თქვენს მიერ შეყვანილი ტექსტი %s სიმბოლოზე ნაკლებია."
 
-#: oldforms/__init__.py:414
+#: oldforms/__init__.py:410
 msgid "Line breaks are not allowed here."
 msgstr "ახალ ხაზზე გადასვლა აქ დაუშვებელია."
 
-#: oldforms/__init__.py:512 oldforms/__init__.py:586 oldforms/__init__.py:625
+#: oldforms/__init__.py:508 oldforms/__init__.py:582 oldforms/__init__.py:621
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr ""
 "აირჩიეთ დასაშვები მნიშვნელობა; '%(data)s' არ არის %(choices)s მნიშვნელობების "
 "სიაში."
 
-#: oldforms/__init__.py:754
+#: oldforms/__init__.py:750
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "შეიყვანეთ მთელი რიცხვი -32,768-დან 32,767-მდე."
 
-#: oldforms/__init__.py:764
+#: oldforms/__init__.py:760
 msgid "Enter a positive number."
 msgstr "შეიყვანეთ დადებითი რიცხვი."
 
-#: oldforms/__init__.py:774
+#: oldforms/__init__.py:770
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "შეიყვანეთ მთელი რიცხვი 0-დან 32,767-მდე."
 
-#: template/defaultfilters.py:698
+#: template/defaultfilters.py:707
 msgid "yes,no,maybe"
 msgstr "კი,არა,შესაძლოა"
 
-#: template/defaultfilters.py:729
+#: template/defaultfilters.py:738
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d ბაიტი"
 msgstr[1] "%(size)d ბაიტი"
 
-#: template/defaultfilters.py:731
+#: template/defaultfilters.py:740
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f კბაიტი"
 
-#: template/defaultfilters.py:733
+#: template/defaultfilters.py:742
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f მბაიტი"
 
-#: template/defaultfilters.py:734
+#: template/defaultfilters.py:743
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f გბაიტი"
 
 #: utils/dateformat.py:41
 msgid "p.m."
-msgstr ""
+msgstr "p.m."
 
 #: utils/dateformat.py:42
 msgid "a.m."
-msgstr ""
+msgstr "a.m."
 
 #: utils/dateformat.py:47
 msgid "PM"
-msgstr ""
+msgstr "PM"
 
 #: utils/dateformat.py:48
 msgid "AM"
-msgstr ""
+msgstr "AM"
 
 #: utils/dateformat.py:97
 msgid "midnight"
@@ -4480,47 +4498,74 @@ msgstr "წუთი"
 #: utils/timesince.py:51
 #, python-format
 msgid "%(number)d %(type)s"
-msgstr ""
+msgstr "%(number)d %(type)s"
 
 #: utils/timesince.py:57
 #, python-format
 msgid ", %(number)d %(type)s"
-msgstr ""
+msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:412
+#: utils/translation/trans_real.py:401
 msgid "DATE_FORMAT"
 msgstr "d.m.Y"
 
-#: utils/translation/trans_real.py:413
+#: utils/translation/trans_real.py:402
 msgid "DATETIME_FORMAT"
 msgstr "d.m.Y H:i"
 
-#: utils/translation/trans_real.py:414
+#: utils/translation/trans_real.py:403
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: utils/translation/trans_real.py:430
+#: utils/translation/trans_real.py:419
 msgid "YEAR_MONTH_FORMAT"
 msgstr "d.m.Y"
 
-#: utils/translation/trans_real.py:431
+#: utils/translation/trans_real.py:420
 msgid "MONTH_DAY_FORMAT"
 msgstr "d.m.Y"
 
-#: views/generic/create_update.py:43
+#: views/generic/create_update.py:114
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "%(verbose_name)s წარმატებით შეიქმნა."
 
-#: views/generic/create_update.py:117
+#: views/generic/create_update.py:156
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "%(verbose_name)s წარმატებით შეიცვალა."
 
-#: views/generic/create_update.py:184
+#: views/generic/create_update.py:198
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s წაიშალა."
+
+#~ msgid "Ordering"
+#~ msgstr "დალაგება"
+
+#~ msgid "Order:"
+#~ msgstr "დალაგება:"
+
+#~ msgid "Your new password is: %(new_password)s"
+#~ msgstr "თქვენი ახალი პაროლია: %(new_password)s"
+
+#~ msgid "Feel free to change this password by going to this page:"
+#~ msgstr "თქვენ შეგიძლიათ შეცვალოთ იგი შემდეგი გვერდიდან:"
+
+#~ msgid "Added %s."
+#~ msgstr "%s დამატებულია."
+
+#~ msgid "Deleted %s."
+#~ msgstr "%s წაშლილია."
+
+#~ msgid "The two 'new password' fields didn't match."
+#~ msgstr "'ახალი პაროლის' ორი ველი ერთმანეთს არ ემთხვევა."
+
+#~ msgid "Year must be 1900 or later."
+#~ msgstr "წელი უნდა იყოს 1900 ან მეტი."
+
+#~ msgid "Separate multiple IDs with commas."
+#~ msgstr "გამოყავით ID-ები მძიმეებით."
 
 #~ msgid "Brazilian"
 #~ msgstr "ბრაზილიური"
