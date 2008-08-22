@@ -1,10 +1,13 @@
 """
 Regression tests for the Test Client, especially the customized assertions.
 """
+import os
+from django.conf import settings
 
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.core.exceptions import SuspiciousOperation
+from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
 class AssertContainsTests(TestCase):
     def test_contains(self):
@@ -306,7 +309,32 @@ class ExceptionTests(TestCase):
             self.client.get("/test_client_regress/staff_only/")
         except SuspiciousOperation:
             self.fail("Staff should be able to visit this page")
+    
+class TemplateExceptionTests(TestCase):
+    def setUp(self):
+        self.old_templates = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = ()
+        
+    def tearDown(self):
+        settings.TEMPLATE_DIRS = self.old_templates
+        
+    def test_no_404_template(self):
+        "Missing templates are correctly reported by test client"    
+        try:
+            response = self.client.get("/no_such_view/")
+            self.fail("Should get error about missing template")
+        except TemplateDoesNotExist:
+            pass
 
+    def test_bad_404_template(self):
+        "Errors found when rendering 404 error templates are re-raised"
+        settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'bad_templates'),)
+        try:
+            response = self.client.get("/no_such_view/")
+            self.fail("Should get error about syntax error in template")
+        except TemplateSyntaxError:
+            pass
+        
 # We need two different tests to check URLconf substitution -  one to check
 # it was changed, and another one (without self.urls) to check it was reverted on
 # teardown. This pair of tests relies upon the alphabetical ordering of test execution.

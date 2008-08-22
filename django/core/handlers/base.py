@@ -112,7 +112,10 @@ class BaseHandler(object):
                     callback, param_dict = resolver.resolve404()
                     return callback(request, **param_dict)
                 except:
-                    return self.handle_uncaught_exception(request, resolver, sys.exc_info())
+                    try:
+                        return self.handle_uncaught_exception(request, resolver, sys.exc_info())
+                    finally:
+                        receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
         except exceptions.PermissionDenied:
             return http.HttpResponseForbidden('<h1>Permission denied</h1>')
         except SystemExit:
