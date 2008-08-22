@@ -82,55 +82,64 @@ def query_class(QueryClass, Database):
             """
             Creates the SQL for this query. Returns the SQL string and list
             of parameters.  This is overriden from the original Query class
-            to accommodate Oracle's limit/offset SQL.
+            to handle the additional SQL Oracle requires to emulate LIMIT
+            and OFFSET.
 
             If 'with_limits' is False, any limit/offset information is not
             included in the query.
             """
 
             # The `do_offset` flag indicates whether we need to construct
-            # the SQL needed to use limit/offset w/Oracle.
+            # the SQL needed to use limit/offset with Oracle.
             do_offset = with_limits and (self.high_mark is not None
                                          or self.low_mark)
-            sql, params = super(OracleQuery, self).as_sql(with_limits=False,
-                                with_col_aliases=with_col_aliases or do_offset)
-            if do_offset:
-                # Get the "ORDER BY" SQL for the ROW_NUMBER() result.
+            if not do_offset:
+                sql, params = super(OracleQuery, self).as_sql(with_limits=False,
+                        with_col_aliases=with_col_aliases)
+            else:
+                # `get_columns` needs to be called before `get_ordering` to
+                # populate `_select_alias`.
+                self.pre_sql_setup()
+                self.get_columns()
                 ordering = self.get_ordering()
+
+                # Oracle's ROW_NUMBER() function requires an ORDER BY clause.
                 if ordering:
                     rn_orderby = ', '.join(ordering)
                 else:
-                    # Oracle's ROW_NUMBER() function always requires an
-                    # order-by clause.  So we need to define a default
-                    # order-by, since none was provided.
+                    # Create a default ORDER BY since none was specified.
                     qn = self.quote_name_unless_alias
                     opts = self.model._meta
                     rn_orderby = '%s.%s' % (qn(opts.db_table),
                         qn(opts.fields[0].db_column or opts.fields[0].column))
 
-                # Collect all the selected column names or aliases.
-                outer_cols = []
-                for col in self.get_columns(True):
-                    if ' AS ' in col:
-                        outer_cols.append(col.split(' AS ', 1)[1])
-                    else:
-                        outer_cols.append(col.rsplit('.', 1)[1])
+                # Ensure the base query SELECTs our special "_RN" column
+                self.extra_select['_RN'] = ('ROW_NUMBER() OVER (ORDER BY %s)'
+                                            % rn_orderby, '')
+                sql, params = super(OracleQuery, self).as_sql(with_limits=False,
+                                                        with_col_aliases=True)
 
-                # Rewrite the original SQL query to select ROW_NUMBER() and involve
-                # it in the WHERE clause, then wrap everything in an outer SELECT
-                # statement that omits the "rn" column.  This is the canonical way
-                # to emulate LIMIT and OFFSET on Oracle.
-                sql = 'SELECT ROW_NUMBER() OVER (ORDER BY %s) rn, %s' % (rn_orderby, sql[7:])
-                result = ['SELECT %s FROM (%s)' % (', '.join(outer_cols), sql)]
-
-                # Place WHERE condition on `rn` for the desired range.
-                result.append('WHERE rn > %d' % self.low_mark)
+                # Wrap the base query in an outer SELECT * with boundaries on
+                # the "_RN" column.  This is the canonical way to emulate LIMIT
+                # and OFFSET on Oracle.
+                sql = 'SELECT * FROM (%s) WHERE "_RN" > %d' % (sql, self.low_mark)
                 if self.high_mark is not None:
-                    result.append('AND rn <= %d' % self.high_mark)
-
-                sql = ' '.join(result)
+                    sql = '%s AND "_RN" <= %d' % (sql, self.high_mark)
 
             return sql, params
+
+        def set_limits(self, low=None, high=None):
+            super(OracleQuery, self).set_limits(low, high)
+            # We need to select the row number for the LIMIT/OFFSET sql.
+            # A placeholder is added to extra_select now, because as_sql is
+            # too late to be modifying extra_select.  However, the actual sql
+            # depends on the ordering, so that is generated in as_sql.
+            self.extra_select['_RN'] = ('1', '')
+
+        def clear_limits(self):
+            super(OracleQuery, self).clear_limits()
+            if '_RN' in self.extra_select:
+                del self.extra_select['_RN']
 
     _classes[QueryClass] = OracleQuery
     return OracleQuery
