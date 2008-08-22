@@ -54,6 +54,12 @@ class Article(models.Model):
     def __unicode__(self):
         return self.headline
 
+class ImprovedArticle(models.Model):
+    article = models.OneToOneField(Article)
+
+class ImprovedArticleWithParentLink(models.Model):
+    article = models.OneToOneField(Article, parent_link=True)
+
 class PhoneNumber(models.Model):
     phone = models.PhoneNumberField()
     description = models.CharField(max_length=20)
@@ -772,6 +778,20 @@ ValidationError: [u'Select a valid choice. 4 is not one of the available choices
 >>> f.label_from_instance = lambda obj: "multicategory " + str(obj)
 >>> list(f.choices)
 [(1L, 'multicategory Entertainment'), (2L, "multicategory It's a test"), (3L, 'multicategory Third'), (4L, 'multicategory Fourth')]
+
+# OneToOneField ###############################################################
+
+>>> class ImprovedArticleForm(ModelForm):
+...     class Meta:
+...         model = ImprovedArticle
+>>> ImprovedArticleForm.base_fields.keys()
+['article']
+
+>>> class ImprovedArticleWithParentLinkForm(ModelForm):
+...     class Meta:
+...         model = ImprovedArticleWithParentLink
+>>> ImprovedArticleWithParentLinkForm.base_fields.keys()
+[]
 
 # PhoneNumberField ############################################################
 

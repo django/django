@@ -744,7 +744,6 @@ class OneToOneField(ForeignKey):
     """
     def __init__(self, to, to_field=None, **kwargs):
         kwargs['unique'] = True
-        kwargs['editable'] = False
         if 'num_in_admin' not in kwargs:
             kwargs['num_in_admin'] = 0
         super(OneToOneField, self).__init__(to, to_field, OneToOneRel, **kwargs)
@@ -754,6 +753,11 @@ class OneToOneField(ForeignKey):
                 SingleRelatedObjectDescriptor(related))
         if not cls._meta.one_to_one_field:
             cls._meta.one_to_one_field = self
+    
+    def formfield(self, **kwargs):
+        if self.rel.parent_link:
+            return None
+        return super(OneToOneField, self).formfield(**kwargs)
 
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):

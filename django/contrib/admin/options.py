@@ -128,7 +128,10 @@ class BaseModelAdmin(object):
             formfield = db_field.formfield(**kwargs)
             # Don't wrap raw_id fields. Their add function is in the popup window.
             if not db_field.name in self.raw_id_fields:
-                formfield.widget = widgets.RelatedFieldWidgetWrapper(formfield.widget, db_field.rel, self.admin_site)
+                # formfield can be None if it came from a OneToOneField with
+                # parent_link=True
+                if formfield is not None:
+                    formfield.widget = widgets.RelatedFieldWidgetWrapper(formfield.widget, db_field.rel, self.admin_site)
             return formfield
 
         # For any other type of field, just call its formfield() method.
