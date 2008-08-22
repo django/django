@@ -8,13 +8,6 @@ import os
 import datetime
 import time
 
-from django.db.backends import *
-from django.db.backends.oracle import query
-from django.db.backends.oracle.client import DatabaseClient
-from django.db.backends.oracle.creation import DatabaseCreation
-from django.db.backends.oracle.introspection import DatabaseIntrospection
-from django.utils.encoding import smart_str, force_unicode
-
 # Oracle takes client-side character set encoding from the environment.
 os.environ['NLS_LANG'] = '.UTF8'
 try:
@@ -22,6 +15,13 @@ try:
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
+
+from django.db.backends import *
+from django.db.backends.oracle import query
+from django.db.backends.oracle.client import DatabaseClient
+from django.db.backends.oracle.creation import DatabaseCreation
+from django.db.backends.oracle.introspection import DatabaseIntrospection
+from django.utils.encoding import smart_str, force_unicode
 
 DatabaseError = Database.Error
 IntegrityError = Database.IntegrityError

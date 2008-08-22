@@ -6,12 +6,6 @@ Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 
 import re
 
-from django.db.backends import *
-from django.db.backends.mysql.client import DatabaseClient
-from django.db.backends.mysql.creation import DatabaseCreation
-from django.db.backends.mysql.introspection import DatabaseIntrospection
-from django.db.backends.mysql.validation import DatabaseValidation
-
 try:
     import MySQLdb as Database
 except ImportError, e:
@@ -29,6 +23,12 @@ if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
 
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE, FLAG
+
+from django.db.backends import *
+from django.db.backends.mysql.client import DatabaseClient
+from django.db.backends.mysql.creation import DatabaseCreation
+from django.db.backends.mysql.introspection import DatabaseIntrospection
+from django.db.backends.mysql.validation import DatabaseValidation
 
 # Raise exceptions for database warnings if DEBUG is on
 from django.conf import settings
