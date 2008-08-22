@@ -18,10 +18,17 @@
         }
     },
     {
-        "pk": 1, 
-        "model": "views.article", 
+        "pk": 1,
+        "model": "views.author",
         "fields": {
-            "author": 1, 
+            "name": "Boris"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "views.article",
+        "fields": {
+            "author": 1,
             "title": "Old Article",
             "slug": "old_article",
             "date_created": "2001-01-01 21:22:23"
@@ -58,17 +65,10 @@
         }
     },
     {
-        "pk": 1, 
-        "model": "views.author", 
+        "pk": 1,
+        "model": "sites.site",
         "fields": {
-            "name": "Boris"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "sites.site", 
-        "fields": {
-            "domain": "testserver", 
+            "domain": "testserver",
             "name": "testserver"
         }
     }
