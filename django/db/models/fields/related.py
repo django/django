@@ -376,7 +376,7 @@ def create_many_related_manager(superclass, through=False):
                 raise ValueError("%r instance needs to have a primary key value before a many-to-many relationship can be used." % instance.__class__.__name__)
 
         def get_query_set(self):
-            return superclass.get_query_set(self).filter(**(self.core_filters))
+            return superclass.get_query_set(self)._next_is_sticky().filter(**(self.core_filters))
 
         # If the ManyToMany relation has an intermediary model, 
         # the add and remove methods do not exist.

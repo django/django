@@ -8,7 +8,7 @@ class Membership(models.Model):
     person = models.ForeignKey('Person')
     group = models.ForeignKey('Group')
     price = models.IntegerField(default=100)
-    
+
     def __unicode__(self):
         return "%s is a member of %s" % (self.person.name, self.group.name)
 
@@ -16,7 +16,7 @@ class UserMembership(models.Model):
     user = models.ForeignKey(User)
     group = models.ForeignKey('Group')
     price = models.IntegerField(default=100)
-    
+
     def __unicode__(self):
         return "%s is a user and member of %s" % (self.user.username, self.group.name)
 
@@ -31,10 +31,10 @@ class Group(models.Model):
     # Membership object defined as a class
     members = models.ManyToManyField(Person, through=Membership)
     user_members = models.ManyToManyField(User, through='UserMembership')
-    
+
     def __unicode__(self):
         return self.name
-        
+
 __test__ = {'API_TESTS':"""
 # Create some dummy data
 >>> bob = Person.objects.create(name='Bob')
@@ -46,7 +46,7 @@ __test__ = {'API_TESTS':"""
 >>> frank = User.objects.create_user('frank','frank@example.com','password')
 >>> jane = User.objects.create_user('jane','jane@example.com','password')
 
-# Now test that the forward declared Membership works 
+# Now test that the forward declared Membership works
 >>> Membership.objects.create(person=bob, group=rock)
 <Membership: Bob is a member of Rock>
 
@@ -83,7 +83,7 @@ Traceback (most recent call last):
 ...
 AttributeError: Cannot use create() on a ManyToManyField which specifies an intermediary model.  Use Membership's Manager instead.
 
-# Now test that the intermediate with a relationship outside 
+# Now test that the intermediate with a relationship outside
 # the current app (i.e., UserMembership) workds
 >>> UserMembership.objects.create(user=frank, group=rock)
 <UserMembership: frank is a user and member of Rock>
@@ -100,11 +100,11 @@ AttributeError: Cannot use create() on a ManyToManyField which specifies an inte
 >>> roll.user_members.all()
 [<User: frank>]
 
-# Regression test for #8134 -- 
+# Regression test for #8134 --
 # m2m-through models shouldn't be serialized as m2m fields on the model.
 
-# First, clean up a lot of objects we don't need. 
-# The serialization test only requires three objects to work - 
+# First, clean up a lot of objects we don't need.
+# The serialization test only requires three objects to work -
 # one for each end of the m2m, plus the through model.
 
 >>> User.objects.all().delete()
@@ -117,24 +117,24 @@ AttributeError: Cannot use create() on a ManyToManyField which specifies an inte
 >>> management.call_command('dumpdata', 'm2m_through_regress', format='json', indent=2)
 [
   {
-    "pk": 2, 
-    "model": "m2m_through_regress.membership", 
+    "pk": 2,
+    "model": "m2m_through_regress.membership",
     "fields": {
-      "person": 1, 
-      "price": 100, 
+      "person": 1,
+      "price": 100,
       "group": 2
     }
-  }, 
+  },
   {
-    "pk": 1, 
-    "model": "m2m_through_regress.person", 
+    "pk": 1,
+    "model": "m2m_through_regress.person",
     "fields": {
       "name": "Bob"
     }
-  }, 
+  },
   {
-    "pk": 2, 
-    "model": "m2m_through_regress.group", 
+    "pk": 2,
+    "model": "m2m_through_regress.group",
     "fields": {
       "name": "Roll"
     }
@@ -157,5 +157,19 @@ AttributeError: Cannot use create() on a ManyToManyField which specifies an inte
     <field type="CharField" name="name">Roll</field>
   </object>
 </django-objects>
+
+## Regression test for #8046:
+Check that we don't involve too many copies of the intermediate table when
+doing a join.
+
+>>> bob = Person.objects.create(name='Bob')
+>>> jim = Person.objects.create(name='Jim')
+>>> rock = Group.objects.create(name='Rock')
+>>> roll = Group.objects.create(name='Roll')
+>>> _ = Membership.objects.create(person=bob, group=rock)
+>>> _ = Membership.objects.create(person=jim, group=rock, price=50)
+>>> _ = Membership.objects.create(person=bob, group=roll, price=50)
+>>> rock.members.filter(membership__price=50)
+[<Person: Jim>]
 
 """}

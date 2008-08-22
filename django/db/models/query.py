@@ -121,6 +121,7 @@ class QuerySet(object):
         self.query = query or sql.Query(self.model, connection)
         self._result_cache = None
         self._iter = None
+        self._sticky_filter = False
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -589,7 +590,10 @@ class QuerySet(object):
     def _clone(self, klass=None, setup=False, **kwargs):
         if klass is None:
             klass = self.__class__
-        c = klass(model=self.model, query=self.query.clone())
+        query = self.query.clone()
+        if self._sticky_filter:
+            query.filter_is_sticky = True
+        c = klass(model=self.model, query=query)
         c.__dict__.update(kwargs)
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
@@ -606,6 +610,17 @@ class QuerySet(object):
                     self._result_cache.append(self._iter.next())
             except StopIteration:
                 self._iter = None
+
+    def _next_is_sticky(self):
+        """
+        Indicates that the next filter call and the one following that should
+        be treated as a single filter. This is only important when it comes to
+        determining when to reuse tables for many-to-many filters. Required so
+        that we can filter naturally on the results of related managers.
+        """
+        obj = self._clone()
+        obj._sticky_filter = True
+        return obj
 
     def _merge_sanity_check(self, other):
         """

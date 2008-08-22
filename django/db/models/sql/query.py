@@ -58,6 +58,8 @@ class Query(object):
         self.select_fields = []
         self.related_select_fields = []
         self.dupe_avoidance = {}
+        self.used_aliases = set()
+        self.filter_is_sticky = False
 
         # SQL-related attributes
         self.select = []
@@ -78,7 +80,7 @@ class Query(object):
 
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.
-        self.extra_select = SortedDict()  # Maps col_alias -> col_sql.
+        self.extra_select = SortedDict()  # Maps col_alias -> (col_sql, params).
         self.extra_tables = ()
         self.extra_where = ()
         self.extra_params = ()
@@ -185,6 +187,11 @@ class Query(object):
         obj.extra_where = self.extra_where
         obj.extra_params = self.extra_params
         obj.extra_order_by = self.extra_order_by
+        if self.filter_is_sticky and self.used_aliases:
+            obj.used_aliases = self.used_aliases.copy()
+        else:
+            obj.used_aliases = set()
+        obj.filter_is_sticky = False
         obj.__dict__.update(kwargs)
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
@@ -1148,31 +1155,32 @@ class Query(object):
         Can also be used to add anything that has an 'add_to_query()' method.
         """
         if used_aliases is None:
-            used_aliases = set()
+            used_aliases = self.used_aliases
         if hasattr(q_object, 'add_to_query'):
             # Complex custom objects are responsible for adding themselves.
             q_object.add_to_query(self, used_aliases)
-            return
-
-        if self.where and q_object.connector != AND and len(q_object) > 1:
-            self.where.start_subtree(AND)
-            subtree = True
         else:
-            subtree = False
-        connector = AND
-        for child in q_object.children:
-            if isinstance(child, Node):
-                self.where.start_subtree(connector)
-                self.add_q(child, used_aliases)
-                self.where.end_subtree()
+            if self.where and q_object.connector != AND and len(q_object) > 1:
+                self.where.start_subtree(AND)
+                subtree = True
             else:
-                self.add_filter(child, connector, q_object.negated,
-                        can_reuse=used_aliases)
-            connector = q_object.connector
-        if q_object.negated:
-            self.where.negate()
-        if subtree:
-            self.where.end_subtree()
+                subtree = False
+            connector = AND
+            for child in q_object.children:
+                if isinstance(child, Node):
+                    self.where.start_subtree(connector)
+                    self.add_q(child, used_aliases)
+                    self.where.end_subtree()
+                else:
+                    self.add_filter(child, connector, q_object.negated,
+                            can_reuse=used_aliases)
+                connector = q_object.connector
+            if q_object.negated:
+                self.where.negate()
+            if subtree:
+                self.where.end_subtree()
+        if self.filter_is_sticky:
+            self.used_aliases = used_aliases
 
     def setup_joins(self, names, opts, alias, dupe_multis, allow_many=True,
             allow_explicit_fk=False, can_reuse=None):
