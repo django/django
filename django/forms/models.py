@@ -463,7 +463,7 @@ class ModelChoiceField(ChoiceField):
     }
 
     def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
-                 required=True, widget=Select, label=None, initial=None,
+                 required=True, widget=None, label=None, initial=None,
                  help_text=None, *args, **kwargs):
         self.empty_label = empty_label
         self.cache_choices = cache_choices
@@ -523,6 +523,7 @@ class ModelChoiceField(ChoiceField):
 
 class ModelMultipleChoiceField(ModelChoiceField):
     """A MultipleChoiceField whose choices are a model QuerySet."""
+    widget = SelectMultiple
     hidden_widget = MultipleHiddenInput
     default_error_messages = {
         'list': _(u'Enter a list of values.'),
@@ -531,7 +532,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
     }
 
     def __init__(self, queryset, cache_choices=False, required=True,
-                 widget=SelectMultiple, label=None, initial=None,
+                 widget=None, label=None, initial=None,
                  help_text=None, *args, **kwargs):
         super(ModelMultipleChoiceField, self).__init__(queryset, None,
             cache_choices, required, widget, label, initial, help_text,
