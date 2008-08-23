@@ -237,6 +237,8 @@ class AdminViewPermissionsTest(TestCase):
         # Change User should not have access to add articles
         self.client.get('/test_admin/admin/')
         self.client.post('/test_admin/admin/', self.changeuser_login)
+        # make sure the view removes test cookie
+        self.failUnlessEqual(self.client.session.test_cookie_worked(), False)
         request = self.client.get('/test_admin/admin/admin_views/article/add/')
         self.failUnlessEqual(request.status_code, 403)
         # Try POST just to make sure
@@ -266,6 +268,8 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(post, 'Please log in again, because your session has expired.')
         self.super_login['post_data'] = _encode_post_data(add_dict)
         post = self.client.post('/test_admin/admin/admin_views/article/add/', self.super_login)
+        # make sure the view removes test cookie
+        self.failUnlessEqual(self.client.session.test_cookie_worked(), False)
         self.assertRedirects(post, '/test_admin/admin/admin_views/article/')
         self.failUnlessEqual(Article.objects.all().count(), 4)
         self.client.get('/test_admin/admin/logout/')

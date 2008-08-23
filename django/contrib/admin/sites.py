@@ -274,13 +274,13 @@ class AdminSite(object):
                 login(request, user)
                 if request.POST.has_key('post_data'):
                     post_data = _decode_post_data(request.POST['post_data'])
+                    request.session.delete_test_cookie()
                     if post_data and not post_data.has_key(LOGIN_FORM_KEY):
                         # overwrite request.POST with the saved post_data, and continue
                         request.POST = post_data
                         request.user = user
                         return self.root(request, request.path.split(self.root_path)[-1])
                     else:
-                        request.session.delete_test_cookie()
                         return http.HttpResponseRedirect(request.get_full_path())
             else:
                 return self.display_login_form(request, ERROR_MESSAGE)
