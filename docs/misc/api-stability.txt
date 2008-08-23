@@ -1,0 +1,95 @@
+.. _misc-api-stability:
+
+=============
+API stability
+=============
+
+Although Django has not reached a 1.0 release, the bulk of Django's public APIs are
+stable as of the 0.95 release. This document explains which APIs will and will not
+change before the 1.0 release.
+
+What "stable" means
+===================
+
+In this context, stable means:
+
+   - All the public APIs -- everything documented in the linked documents, and
+     all methods that don't begin with an underscore -- will not be moved or
+     renamed without providing backwards-compatible aliases.
+     
+   - If new features are added to these APIs -- which is quite possible --
+     they will not break or change the meaning of existing methods. In other
+     words, "stable" does not (necessarily) mean "complete."
+     
+   - If, for some reason, an API declared stable must be removed or replaced, it
+     will be declared deprecated but will remain in the API until at least
+     version 1.1. Warnings will be issued when the deprecated method is
+     called.
+     
+   - We'll only break backwards compatibility of these APIs if a bug or
+     security hole makes it completely unavoidable.
+
+Stable APIs
+===========
+
+These APIs are stable:
+
+   - :ref:`Caching <topics-cache>`.
+   
+   - :ref:`Custom template tags and libraries <howto-custom-template-tags>`.
+     
+   - :ref:`Database lookup <topics-db-queries>` (with the exception of validation; see below).
+    
+   - :ref:`django-admin utility <ref-django-admin>`.
+   
+   - :ref:`FastCGI and mod_python integration <howto-deployment-index>`.
+   
+   - :ref:`Flatpages <ref-contrib-flatpages>`.
+   
+   - :ref:`Generic views <topics-http-generic-views>`.
+   
+   - :ref:`Internationalization <topics-i18n>`.
+   
+   - :ref:`Legacy database integration <howto-legacy-databases>`.
+   
+   - :ref:`Model definition <topics-db-models>` (with the exception of generic relations; see below).
+      
+   - :ref:`Redirects <ref-contrib-redirects>`.
+   
+   - :ref:`Request/response objects <ref-request-response>`.
+   
+   - :ref:`Sending e-mail <topics-email>`.
+   
+   - :ref:`Sessions <topics-http-sessions>`.
+   
+   - :ref:`Settings <topics-settings>`.
+   
+   - :ref:`Syndication <ref-contrib-syndication>`.
+   
+   - :ref:`Template language <topics-templates>` (with the exception of some
+     possible disambiguation of how tag arguments are passed to tags and
+     filters).
+   
+   - :ref:`Transactions <topics-db-transactions>`.
+   
+   - :ref:`URL dispatch <topics-http-urls>`.
+   
+You'll notice that this list comprises the bulk of Django's APIs. That's right
+-- most of the changes planned between now and Django 1.0 are either under the
+hood, feature additions, or changes to a few select bits. A good estimate is
+that 90% of Django can be considered forwards-compatible at this point.
+
+That said, these APIs should *not* be considered stable, and are likely to
+change:
+
+   - :ref:`Serialization <topics-serialization>` is under development; changes
+     are possible.
+
+   - Generic relations will most likely be moved out of core and into the
+     content-types contrib package to avoid core dependencies on optional
+     components.
+     
+     **New in development version**: this has now been done.
+
+   - The comments framework, which is yet undocumented, will get a complete
+     rewrite before Django 1.0.

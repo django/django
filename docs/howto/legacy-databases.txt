@@ -1,0 +1,67 @@
+.. _howto-legacy-databases:
+
+=========================================
+Integrating Django with a legacy database
+=========================================
+
+While Django is best suited for developing new applications, it's quite
+possible to integrate it into legacy databases. Django includes a couple of
+utilities to automate as much of this process as possible.
+
+This document assumes you know the Django basics, as covered in the
+:ref:`tutorial <intro-tutorial01>`.
+
+Once you've got Django set up, you'll follow this general process to integrate
+with an existing database.
+
+Give Django your database parameters
+====================================
+
+You'll need to tell Django what your database connection parameters are, and
+what the name of the database is. Do that by editing these settings in your
+:ref:`settings file <topics-settings>`:
+
+    * :setting:`DATABASE_NAME`
+    * :setting:`DATABASE_ENGINE`
+    * :setting:`DATABASE_USER`
+    * :setting:`DATABASE_PASSWORD`
+    * :setting:`DATABASE_HOST`
+    * :setting:`DATABASE_PORT`
+
+Auto-generate the models
+========================
+
+.. highlight:: bash
+
+Django comes with a utility called :djadmin:`inspectdb` that can create models
+by introspecting an existing database. You can view the output by running this
+command::
+
+    python manage.py inspectdb
+
+Save this as a file by using standard Unix output redirection::
+
+    python manage.py inspectdb > models.py
+
+This feature is meant as a shortcut, not as definitive model generation. See the
+:djadmin:`documentation of inspectdb <inspectdb>` for more information.
+
+Once you've cleaned up your models, name the file ``models.py`` and put it in
+the Python package that holds your app. Then add the app to your
+:setting:`INSTALLED_APPS` setting.
+
+Install the core Django tables
+==============================
+
+Next, run the :djadmin:`syncdb` command to install any extra needed database
+records such as admin permissions and content types::
+
+    python manage.py syncdb
+
+Test and tweak
+==============
+
+Those are the basic steps -- from here you'll want to tweak the models Django
+generated until they work the way you'd like. Try accessing your data via the
+Django database API, and try editing objects via Django's admin site, and edit
+the models file accordingly.

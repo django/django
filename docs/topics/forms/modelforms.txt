@@ -1,0 +1,504 @@
+.. _topics-forms-modelforms:
+
+==========================
+Creating forms from models
+==========================
+
+``ModelForm``
+=============
+
+If you're building a database-driven app, chances are you'll have forms that
+map closely to Django models. For instance, you might have a ``BlogComment``
+model, and you want to create a form that lets people submit comments. In this
+case, it would be redundant to define the field types in your form, because
+you've already defined the fields in your model.
+
+For this reason, Django provides a helper class that let you create a ``Form``
+class from a Django model.
+
+For example::
+
+    >>> from django.forms import ModelForm
+
+    # Create the form class.
+    >>> class ArticleForm(ModelForm):
+    ...     class Meta:
+    ...         model = Article
+
+    # Creating a form to add an article.
+    >>> form = ArticleForm()
+
+    # Creating a form to change an existing article.
+    >>> article = Article.objects.get(pk=1)
+    >>> form = ArticleForm(instance=article)
+
+Field types
+-----------
+
+The generated ``Form`` class will have a form field for every model field. Each
+model field has a corresponding default form field. For example, a
+``CharField`` on a model is represented as a ``CharField`` on a form. A
+model ``ManyToManyField`` is represented as a ``MultipleChoiceField``. Here is
+the full list of conversions:
+
+    ===============================  ========================================
+    Model field                      Form field
+    ===============================  ========================================
+    ``AutoField``                    Not represented in the form
+    ``BooleanField``                 ``BooleanField``
+    ``CharField``                    ``CharField`` with ``max_length`` set to
+                                     the model field's ``max_length``
+    ``CommaSeparatedIntegerField``   ``CharField``
+    ``DateField``                    ``DateField``
+    ``DateTimeField``                ``DateTimeField``
+    ``DecimalField``                 ``DecimalField``
+    ``EmailField``                   ``EmailField``
+    ``FileField``                    ``FileField``
+    ``FilePathField``                ``CharField``
+    ``FloatField``                   ``FloatField``
+    ``ForeignKey``                   ``ModelChoiceField`` (see below)
+    ``ImageField``                   ``ImageField``
+    ``IntegerField``                 ``IntegerField``
+    ``IPAddressField``               ``IPAddressField``
+    ``ManyToManyField``              ``ModelMultipleChoiceField`` (see
+                                     below)
+    ``NullBooleanField``             ``CharField``
+    ``PhoneNumberField``             ``USPhoneNumberField``
+                                     (from ``django.contrib.localflavor.us``)
+    ``PositiveIntegerField``         ``IntegerField``
+    ``PositiveSmallIntegerField``    ``IntegerField``
+    ``SlugField``                    ``RegexField`` accepting only letters,
+                                     numbers, underscores and hyphens
+    ``SmallIntegerField``            ``IntegerField``
+    ``TextField``                    ``CharField`` with ``widget=Textarea``
+    ``TimeField``                    ``TimeField``
+    ``URLField``                     ``URLField`` with ``verify_exists`` set
+                                     to the model field's ``verify_exists``
+    ``USStateField``                 ``CharField`` with
+                                     ``widget=USStateSelect``
+                                     (``USStateSelect`` is from
+                                     ``django.contrib.localflavor.us``)
+    ``XMLField``                     ``CharField`` with ``widget=Textarea``
+    ===============================  ========================================
+
+
+.. note::
+    The ``FloatField`` form field and ``DecimalField`` model and form fields
+    are new in the development version.
+
+As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
+types are special cases:
+
+    * ``ForeignKey`` is represented by ``django.forms.ModelChoiceField``,
+      which is a ``ChoiceField`` whose choices are a model ``QuerySet``.
+
+    * ``ManyToManyField`` is represented by
+      ``django.forms.ModelMultipleChoiceField``, which is a
+      ``MultipleChoiceField`` whose choices are a model ``QuerySet``.
+
+In addition, each generated form field has attributes set as follows:
+
+    * If the model field has ``blank=True``, then ``required`` is set to
+      ``False`` on the form field. Otherwise, ``required=True``.
+
+    * The form field's ``label`` is set to the ``verbose_name`` of the model
+      field, with the first character capitalized.
+
+    * The form field's ``help_text`` is set to the ``help_text`` of the model
+      field.
+
+    * If the model field has ``choices`` set, then the form field's ``widget``
+      will be set to ``Select``, with choices coming from the model field's
+      ``choices``. The choices will normally include the blank choice which is
+      selected by default. If the field is required, this forces the user to
+      make a selection. The blank choice will not be included if the model
+      field has ``blank=False`` and an explicit ``default`` value (the
+      ``default`` value will be initially selected instead).
+
+Finally, note that you can override the form field used for a given model
+field. See `Overriding the default field types`_ below.
+
+A full example
+--------------
+
+Consider this set of models::
+
+    from django.db import models
+    from django.forms import ModelForm
+
+    TITLE_CHOICES = (
+        ('MR', 'Mr.'),
+        ('MRS', 'Mrs.'),
+        ('MS', 'Ms.'),
+    )
+
+    class Author(models.Model):
+        name = models.CharField(max_length=100)
+        title = models.CharField(max_length=3, choices=TITLE_CHOICES)
+        birth_date = models.DateField(blank=True, null=True)
+
+        def __unicode__(self):
+            return self.name
+
+    class Book(models.Model):
+        name = models.CharField(max_length=100)
+        authors = models.ManyToManyField(Author)
+
+    class AuthorForm(ModelForm):
+        class Meta:
+            model = Author
+
+    class BookForm(ModelForm):
+        class Meta:
+            model = Book
+
+With these models, the ``ModelForm`` subclasses above would be roughly
+equivalent to this (the only difference being the ``save()`` method, which
+we'll discuss in a moment.)::
+
+    class AuthorForm(forms.Form):
+        name = forms.CharField(max_length=100)
+        title = forms.CharField(max_length=3,
+                    widget=forms.Select(choices=TITLE_CHOICES))
+        birth_date = forms.DateField(required=False)
+
+    class BookForm(forms.Form):
+        name = forms.CharField(max_length=100)
+        authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
+
+The ``save()`` method
+---------------------
+
+Every form produced by ``ModelForm`` also has a ``save()``
+method. This method creates and saves a database object from the data
+bound to the form. A subclass of ``ModelForm`` can accept an existing
+model instance as the keyword argument ``instance``; if this is
+supplied, ``save()`` will update that instance. If it's not supplied,
+``save()`` will create a new instance of the specified model::
+
+    # Create a form instance from POST data.
+    >>> f = ArticleForm(request.POST)
+
+    # Save a new Article object from the form's data.
+    >>> new_article = f.save()
+
+    # Create a form to edit an existing Article.
+    >>> a = Article.objects.get(pk=1)
+    >>> f = ArticleForm(instance=a)
+    >>> f.save()
+
+    # Create a form to edit an existing Article, but use
+    # POST data to populate the form.
+    >>> a = Article.objects.get(pk=1)
+    >>> f = ArticleForm(request.POST, instance=a)
+    >>> f.save()
+
+Note that ``save()`` will raise a ``ValueError`` if the data in the form
+doesn't validate -- i.e., ``if form.errors``.
+
+This ``save()`` method accepts an optional ``commit`` keyword argument, which
+accepts either ``True`` or ``False``. If you call ``save()`` with
+``commit=False``, then it will return an object that hasn't yet been saved to
+the database. In this case, it's up to you to call ``save()`` on the resulting
+model instance. This is useful if you want to do custom processing on the
+object before saving it. ``commit`` is ``True`` by default.
+
+Another side effect of using ``commit=False`` is seen when your model has
+a many-to-many relation with another model. If your model has a many-to-many
+relation and you specify ``commit=False`` when you save a form, Django cannot
+immediately save the form data for the many-to-many relation. This is because
+it isn't possible to save many-to-many data for an instance until the instance
+exists in the database.
+
+To work around this problem, every time you save a form using ``commit=False``,
+Django adds a ``save_m2m()`` method to your ``ModelForm`` subclass. After
+you've manually saved the instance produced by the form, you can invoke
+``save_m2m()`` to save the many-to-many form data. For example::
+
+    # Create a form instance with POST data.
+    >>> f = AuthorForm(request.POST)
+
+    # Create, but don't save the new author instance.
+    >>> new_author = f.save(commit=False)
+
+    # Modify the author in some way.
+    >>> new_author.some_field = 'some_value'
+
+    # Save the new instance.
+    >>> new_author.save()
+
+    # Now, save the many-to-many data for the form.
+    >>> f.save_m2m()
+
+Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
+When you use a simple ``save()`` on a form, all data -- including
+many-to-many data -- is saved without the need for any additional method calls.
+For example::
+
+    # Create a form instance with POST data.
+    >>> a = Author()
+    >>> f = AuthorForm(request.POST, instance=a)
+
+    # Create and save the new author instance. There's no need to do anything else.
+    >>> new_author = f.save()
+
+Other than the ``save()`` and ``save_m2m()`` methods, a ``ModelForm`` works
+exactly the same way as any other ``forms`` form. For example, the
+``is_valid()`` method is used to check for validity, the ``is_multipart()``
+method is used to determine whether a form requires multipart file upload (and
+hence whether ``request.FILES`` must be passed to the form), etc. See
+:ref:`topics-forms-index` for more information.
+
+Using a subset of fields on the form
+------------------------------------
+
+In some cases, you may not want all the model fields to appear on the generated
+form. There are three ways of telling ``ModelForm`` to use only a subset of the
+model fields:
+
+1. Set ``editable=False`` on the model field. As a result, *any* form
+   created from the model via ``ModelForm`` will not include that
+   field.
+
+2. Use the ``fields`` attribute of the ``ModelForm``'s inner ``Meta``
+   class.  This attribute, if given, should be a list of field names
+   to include in the form.
+
+3. Use the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta``
+   class.  This attribute, if given, should be a list of field names
+   to exclude from the form.
+
+For example, if you want a form for the ``Author`` model (defined
+above) that includes only the ``name`` and ``title`` fields, you would
+specify ``fields`` or ``exclude`` like this::
+
+    class PartialAuthorForm(ModelForm):
+        class Meta:
+            model = Author
+            fields = ('name', 'title')
+    
+    class PartialAuthorForm(ModelForm):
+        class Meta:
+            model = Author
+            exclude = ('birth_date',)
+
+Since the Author model has only 3 fields, 'name', 'title', and
+'birth_date', the forms above will contain exactly the same fields.
+
+.. note::
+
+    If you specify ``fields`` or ``exclude`` when creating a form with
+    ``ModelForm``, then the fields that are not in the resulting form will not
+    be set by the form's ``save()`` method. Django will prevent any attempt to
+    save an incomplete model, so if the model does not allow the missing fields
+    to be empty, and does not provide a default value for the missing fields,
+    any attempt to ``save()`` a ``ModelForm`` with missing fields will fail.
+    To avoid this failure, you must instantiate your model with initial values
+    for the missing, but required fields, or use ``save(commit=False)`` and
+    manually set any extra required fields::
+
+        instance = Instance(required_field='value')
+        form = InstanceForm(request.POST, instance=instance)
+        new_instance = form.save()
+
+        instance = form.save(commit=False)
+        instance.required_field = 'new value'
+        new_instance = instance.save()
+
+    See the `section on saving forms`_ for more details on using
+    ``save(commit=False)``.
+
+.. _section on saving forms: `The save() method`_
+
+Overriding the default field types
+----------------------------------
+
+The default field types, as described in the `Field types`_ table above, are
+sensible defaults. If you have a ``DateField`` in your model, chances are you'd
+want that to be represented as a ``DateField`` in your form. But
+``ModelForm`` gives you the flexibility of changing the form field type
+for a given model field. You do this by declaratively specifying fields like
+you would in a regular ``Form``. Declared fields will override the default
+ones generated by using the ``model`` attribute.
+
+For example, if you wanted to use ``MyDateFormField`` for the ``pub_date``
+field, you could do the following::
+
+    >>> class ArticleForm(ModelForm):
+    ...     pub_date = MyDateFormField()
+    ...
+    ...     class Meta:
+    ...         model = Article
+
+If you want to override a field's default widget, then specify the ``widget``
+parameter when declaring the form field::
+
+   >>> class ArticleForm(ModelForm):
+   ...     pub_date = DateField(widget=MyDateWidget())
+   ...
+   ...     class Meta:
+   ...         model = Article
+
+Form inheritance
+----------------
+
+As with basic forms, you can extend and reuse ``ModelForms`` by inheriting
+them. This is useful if you need to declare extra fields or extra methods on a
+parent class for use in a number of forms derived from models. For example,
+using the previous ``ArticleForm`` class::
+
+    >>> class EnhancedArticleForm(ArticleForm):
+    ...     def clean_pub_date(self):
+    ...         ...
+
+This creates a form that behaves identically to ``ArticleForm``, except there's
+some extra validation and cleaning for the ``pub_date`` field.
+
+You can also subclass the parent's ``Meta`` inner class if you want to change
+the ``Meta.fields`` or ``Meta.excludes`` lists::
+
+    >>> class RestrictedArticleForm(EnhancedArticleForm):
+    ...     class Meta(ArticleForm.Meta):
+    ...         exclude = ['body']
+
+This adds the extra method from the ``EnhancedArticleForm`` and modifies
+the original ``ArticleForm.Meta`` to remove one field.
+
+There are a couple of things to note, however.
+
+ * Normal Python name resolution rules apply. If you have multiple base
+   classes that declare a ``Meta`` inner class, only the first one will be
+   used. This means the child's ``Meta``, if it exists, otherwise the
+   ``Meta`` of the first parent, etc.
+
+ * For technical reasons, a subclass cannot inherit from both a ``ModelForm``
+   and a ``Form`` simultaneously.
+
+Chances are these notes won't affect you unless you're trying to do something
+tricky with subclassing.
+
+.. _model-formsets:
+
+Model Formsets
+==============
+
+Similar to regular formsets there are a couple enhanced formset classes that
+provide all the right things to work with your models. Lets reuse the
+``Author`` model from above::
+
+    >>> from django.forms.models import modelformset_factory
+    >>> AuthorFormSet = modelformset_factory(Author)
+
+This will create a formset that is capable of working with the data associated
+to the ``Author`` model. It works just like a regular formset::
+
+    >>> formset = AuthorFormSet()
+    >>> print formset
+    <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS" />
+    <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" maxlength="100" /></td></tr>
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><select name="form-0-title" id="id_form-0-title">
+    <option value="" selected="selected">---------</option>
+    <option value="MR">Mr.</option>
+    <option value="MRS">Mrs.</option>
+    <option value="MS">Ms.</option>
+    </select></td></tr>
+    <tr><th><label for="id_form-0-birth_date">Birth date:</label></th><td><input type="text" name="form-0-birth_date" id="id_form-0-birth_date" /><input type="hidden" name="form-0-id" id="id_form-0-id" /></td></tr>
+
+.. note::
+    One thing to note is that ``modelformset_factory`` uses ``formset_factory``
+    and by default uses ``can_delete=True``.
+
+Changing the queryset
+---------------------
+
+By default when you create a formset from a model the queryset will be all
+objects in the model. This is best shown as ``Author.objects.all()``. This is
+configurable::
+
+    >>> formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
+
+Alternatively, you can use a subclassing based approach::
+
+    from django.forms.models import BaseModelFormSet
+    
+    class BaseAuthorFormSet(BaseModelFormSet):
+        def get_queryset(self):
+            return super(BaseAuthorFormSet, self).get_queryset().filter(name__startswith='O')
+
+Then your ``BaseAuthorFormSet`` would be passed into the factory function to
+be used as a base::
+
+    >>> AuthorFormSet = modelformset_factory(Author, formset=BaseAuthorFormSet)
+
+Saving objects in the formset
+-----------------------------
+
+Similar to a ``ModelForm`` you can save the data into the model. This is done
+with the ``save()`` method on the formset::
+
+    # create a formset instance with POST data.
+    >>> formset = AuthorFormSet(request.POST)
+    
+    # assuming all is valid, save the data
+    >>> instances = formset.save()
+
+The ``save()`` method will return the instances that have been saved to the
+database. If an instance did not change in the bound data it will not be
+saved to the database and not found in ``instances`` in the above example.
+
+You can optionally pass in ``commit=False`` to ``save()`` to only return the
+model instances without any database interaction::
+
+    # don't save to the database
+    >>> instances = formset.save(commit=False)
+    >>> for instance in instances:
+    ...     # do something with instance
+    ...     instance.save()
+
+This gives you the ability to attach data to the instances before saving them
+to the database. If your formset contains a ``ManyToManyField`` you will also
+need to make a call to ``formset.save_m2m()`` to ensure the many-to-many
+relationships are saved properly.
+
+.. _model-formsets-max-num:
+
+Limiting the number of objects editable
+---------------------------------------
+
+Similar to regular formsets you can use the ``max_num`` parameter to
+``modelformset_factory`` to limit the number of forms displayed. With
+model formsets this will properly limit the query to only select the maximum
+number of objects needed::
+
+    >>> Author.objects.order_by('name')
+    [<Author: Charles Baudelaire>, <Author: Paul Verlaine>, <Author: Walt Whitman>]
+    
+    >>> AuthorFormSet = modelformset_factory(Author, max_num=2, extra=1)
+    >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
+    >>> formset.initial
+    [{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}]
+
+If the value of ``max_num`` is less than the total objects returned it will
+fill the rest with extra forms::
+
+    >>> AuthorFormSet = modelformset_factory(Author, max_num=4, extra=1)
+    >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" value="Charles Baudelaire" maxlength="100" /><input type="hidden" name="form-0-id" value="1" id="id_form-0-id" /></td></tr>
+    <tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100" /><input type="hidden" name="form-1-id" value="3" id="id_form-1-id" /></td></tr>
+    <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
+    <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
+
+Using ``inlineformset_factory``
+-------------------------------
+
+The ``inlineformset_factory`` is a helper to a common usage pattern of working
+with related objects through a foreign key. Suppose you have two models
+``Author`` and ``Book``. You want to create a formset that works with the
+books of a specific author. Here is how you could accomplish this::
+
+    >>> from django.forms.models import inlineformset_factory
+    >>> BookFormSet = inlineformset_factory(Author, Book)
+    >>> author = Author.objects.get(name=u'Orson Scott Card')
+    >>> formset = BookFormSet(instance=author)

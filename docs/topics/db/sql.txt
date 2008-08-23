@@ -1,0 +1,35 @@
+.. _topics-db-sql:
+
+Performing raw SQL queries
+==========================
+
+Feel free to write custom SQL statements in custom model methods and
+module-level methods. The object ``django.db.connection`` represents the
+current database connection. To use it, call ``connection.cursor()`` to get a
+cursor object. Then, call ``cursor.execute(sql, [params])`` to execute the SQL
+and ``cursor.fetchone()`` or ``cursor.fetchall()`` to return the resulting
+rows. Example::
+
+    def my_custom_sql(self):
+        from django.db import connection
+        cursor = connection.cursor()
+        cursor.execute("SELECT foo FROM bar WHERE baz = %s", [self.baz])
+        row = cursor.fetchone()
+        return row
+
+``connection`` and ``cursor`` mostly implement the standard `Python DB-API`_
+(except when it comes to :ref:`transaction handling <topics-db-transactions>`).
+If you're not familiar with the Python DB-API, note that the SQL statement in
+``cursor.execute()`` uses placeholders, ``"%s"``, rather than adding parameters
+directly within the SQL. If you use this technique, the underlying database
+library will automatically add quotes and escaping to your parameter(s) as
+necessary. (Also note that Django expects the ``"%s"`` placeholder, *not* the
+``"?"`` placeholder, which is used by the SQLite Python bindings. This is for
+the sake of consistency and sanity.)
+
+A final note: If all you want to do is a custom ``WHERE`` clause, you can just
+use the ``where``, ``tables`` and ``params`` arguments to the standard lookup
+API. 
+
+.. _Python DB-API: http://www.python.org/peps/pep-0249.html
+

@@ -1,0 +1,644 @@
+.. _topics-templates:
+
+============================
+The Django template language
+============================
+
+.. admonition:: About this document
+
+    This document explains the language syntax of the Django template system. If
+    you're looking for a more technical perspective on how it works and how to
+    extend it, see :ref:`ref-templates-api`.
+
+Django's template language is designed to strike a balance between power and
+ease. It's designed to feel comfortable to those used to working with HTML. If
+you have any exposure to other text-based template languages, such as Smarty_
+or CheetahTemplate_, you should feel right at home with Django's templates.
+
+.. admonition:: Philosophy
+
+    If you have a background in programming, or if you're used to languages
+    like PHP which mix programming code directly into HTML, you'll want to
+    bear in mind that the Django template system is not simply Python embedded
+    into HTML. This is by design: the template system is meant to express
+    presentation, not program logic.
+
+    The Django template system provides tags which function similarly to some
+    programming constructs -- an :ttag:`if` tag for boolean tests, a :ttag:`for`
+    tag for looping, etc. -- but these are not simply executed as the
+    corresponding Python code, and the template system will not execute
+    arbitrary Python expressions. Only the tags, filters and syntax listed below
+    are supported by default (although you can add :ref:`your own extensions
+    <howto-custom-template-tags>` to the template language as needed).
+
+.. _`The Django template language: For Python programmers`: ../templates_python/
+.. _Smarty: http://smarty.php.net/
+.. _CheetahTemplate: http://www.cheetahtemplate.org/
+
+Templates
+=========
+
+A template is simply a text file. It can generate any text-based format (HTML,
+XML, CSV, etc.).
+
+A template contains **variables**, which get replaced with values when the
+template is evaluated, and **tags**, which control the logic of the template.
+
+Below is a minimal template that illustrates a few basics. Each element will be
+explained later in this document.::
+
+    {% extends "base_generic.html" %}
+
+    {% block title %}{{ section.title }}{% endblock %}
+
+    {% block content %}
+    <h1>{{ section.title }}</h1>
+
+    {% for story in story_list %}
+    <h2>
+      <a href="{{ story.get_absolute_url }}">
+        {{ story.headline|upper }}
+      </a>
+    </h2>
+    <p>{{ story.tease|truncatewords:"100" }}</p>
+    {% endfor %}
+    {% endblock %}
+
+.. admonition:: Philosophy
+
+    Why use a text-based template instead of an XML-based one (like Zope's
+    TAL)? We wanted Django's template language to be usable for more than
+    just XML/HTML templates. At World Online, we use it for e-mails,
+    JavaScript and CSV. You can use the template language for any text-based
+    format.
+
+    Oh, and one more thing: Making humans edit XML is sadistic!
+
+Variables
+=========
+
+Variables look like this: ``{{ variable }}``. When the template engine
+encounters a variable, it evaluates that variable and replaces it with the
+result.
+
+Use a dot (``.``) to access attributes of a variable.
+
+.. admonition:: Behind the scenes
+
+    Technically, when the template system encounters a dot, it tries the
+    following lookups, in this order:
+
+        * Dictionary lookup
+        * Attribute lookup
+        * Method call
+        * List-index lookup
+
+In the above example, ``{{ section.title }}`` will be replaced with the
+``title`` attribute of the ``section`` object.
+
+If you use a variable that doesn't exist, the template system will insert
+the value of the ``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''``
+(the empty string) by default.
+
+See `Using the built-in reference`_, below, for help on finding what variables
+are available in a given template.
+
+Filters
+=======
+
+You can modify variables for display by using **filters**.
+
+Filters look like this: ``{{ name|lower }}``. This displays the value of the
+``{{ name }}`` variable after being filtered through the ``lower`` filter,
+which converts text to lowercase. Use a pipe (``|``) to apply a filter.
+
+Filters can be "chained." The output of one filter is applied to the next.
+``{{ text|escape|linebreaks }}`` is a common idiom for escaping text contents,
+then converting line breaks to ``<p>`` tags.
+
+Some filters take arguments. A filter argument looks like this: ``{{
+bio|truncatewords:30 }}``. This will display the first 30 words of the ``bio``
+variable.
+
+Filter arguments that contain spaces must be quoted; for example, to join a list
+with commas and spaced you'd use ``{{ list|join:", " }}``.
+
+Django provides about thirty built-in template filters. You can read all about
+them in the :ref:`built-in filter reference <ref-templates-builtins-filters>`.
+To give you a taste of what's available, here are some of the more commonly used
+template filters:
+
+    :tfilter:`default`
+        If a variable is false or empty, use given default. Otherwise, use the
+        value of the variable
+
+        For example::
+
+            {{ value|default:"nothing" }}
+
+        If ``value`` isn't provided or is empty, the above will display
+        "``nothing``".
+        
+    :tfilter:`length`
+        Returns the length of the value. This works for both strings and lists;
+        for example::
+
+            {{ value|length }}
+
+        If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``4``.
+    
+    :tfilter:`striptags`
+        Strips all [X]HTML tags. For example::
+
+            {{ value|striptags }}
+
+        If ``value`` is ``"<b>Joel</b> <button>is</button> a
+        <span>slug</span>"``, the output will be ``"Joel is a slug"``.
+
+Again, these are just a few examples; see the :ref:`built-in filter reference
+<ref-templates-builtins-filters>` for the complete list.
+
+You can also create your own custom template filters; see
+:ref:`howto-custom-template-tags`.
+
+Tags
+====
+
+Tags look like this: ``{% tag %}``. Tags are more complex than variables: Some
+create text in the output, some control flow by performing loops or logic, and
+some load external information into the template to be used by later variables.
+
+Some tags require beginning and ending tags (i.e. ``{% tag %} ... tag contents
+... {% endtag %}``).
+
+Django ships with about two dozen built-in template tags. You can read all about
+them in the :ref:`built-in tag reference <ref-templates-builtins-tags>`. To give
+you a taste of what's available, here are some of the more commonly used
+tags:
+
+    :ttag:`for`
+        Loop over each item in an array.  For example, to display a list of athletes
+        provided in ``athlete_list``::
+
+            <ul>
+            {% for athlete in athlete_list %}
+                <li>{{ athlete.name }}</li>
+            {% endfor %}
+            </ul>
+        
+    :ttag:`if` and :ttag:`else`
+        Evaluates a variable, and if that variable is "true" the contents of the
+        block are displayed::
+
+            {% if athlete_list %}
+                Number of athletes: {{ athlete_list|length }}
+            {% else %}
+                No athletes.
+            {% endif %}
+
+        In the above, if ``athlete_list`` is not empty, the number of athletes
+        will be displayed by the ``{{ athlete_list|length }}`` variable.
+        
+    :ttag:`ifequal` and :ttag:`ifnotequal`
+        Display some contents if two arguments are or are not equal. For example::
+
+            {% ifequal athlete.name coach.name %}
+                ...
+            {% endifequal %}
+
+        Or::
+
+            {% ifnotequal athlete.name "Joe" %}
+                ...
+            {% endifequal %}
+    
+    :ttag:`block` and :ttag:`extends`
+        Set up `template inheritance`_ (see below), a powerful way
+        of cutting down on "boilerplate" in templates.
+
+Again, the above is only a selection of the whole list; see the :ref:`built-in
+tag reference <ref-templates-builtins-tags>` for the complete list.
+
+You can also create your own custom template tags; see
+:ref:`howto-custom-template-tags`.
+
+Comments
+========
+
+To comment-out part of a line in a template, use the comment syntax: ``{# #}``.
+
+For example, this template would render as ``'hello'``::
+
+    {# greeting #}hello
+
+A comment can contain any template code, invalid or not. For example::
+
+    {# {% if foo %}bar{% else %} #}
+
+This syntax can only be used for single-line comments (no newlines are permitted
+between the ``{#`` and ``#}`` delimiters). If you need to comment out a
+multiline portion of the template, see the :ttag:`comment` tag.
+
+.. _template-inheritance:
+
+Template inheritance
+====================
+
+The most powerful -- and thus the most complex -- part of Django's template
+engine is template inheritance. Template inheritance allows you to build a base
+"skeleton" template that contains all the common elements of your site and
+defines **blocks** that child templates can override.
+
+It's easiest to understand template inheritance by starting with an example::
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <link rel="stylesheet" href="style.css" />
+        <title>{% block title %}My amazing site{% endblock %}</title>
+    </head>
+
+    <body>
+        <div id="sidebar">
+            {% block sidebar %}
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/blog/">Blog</a></li>
+            </ul>
+            {% endblock %}
+        </div>
+
+        <div id="content">
+            {% block content %}{% endblock %}
+        </div>
+    </body>
+    </html>
+
+This template, which we'll call ``base.html``, defines a simple HTML skeleton
+document that you might use for a simple two-column page. It's the job of
+"child" templates to fill the empty blocks with content.
+
+In this example, the ``{% block %}`` tag defines three blocks that child
+templates can fill in. All the ``block`` tag does is to tell the template
+engine that a child template may override those portions of the template.
+
+A child template might look like this::
+
+    {% extends "base.html" %}
+
+    {% block title %}My amazing blog{% endblock %}
+
+    {% block content %}
+    {% for entry in blog_entries %}
+        <h2>{{ entry.title }}</h2>
+        <p>{{ entry.body }}</p>
+    {% endfor %}
+    {% endblock %}
+
+The ``{% extends %}`` tag is the key here. It tells the template engine that
+this template "extends" another template. When the template system evaluates
+this template, first it locates the parent -- in this case, "base.html".
+
+At that point, the template engine will notice the three ``{% block %}`` tags
+in ``base.html`` and replace those blocks with the contents of the child
+template. Depending on the value of ``blog_entries``, the output might look
+like::
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <link rel="stylesheet" href="style.css" />
+        <title>My amazing blog</title>
+    </head>
+
+    <body>
+        <div id="sidebar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/blog/">Blog</a></li>
+            </ul>
+        </div>
+
+        <div id="content">
+            <h2>Entry one</h2>
+            <p>This is my first entry.</p>
+
+            <h2>Entry two</h2>
+            <p>This is my second entry.</p>
+        </div>
+    </body>
+    </html>
+
+Note that since the child template didn't define the ``sidebar`` block, the
+value from the parent template is used instead. Content within a ``{% block %}``
+tag in a parent template is always used as a fallback.
+
+You can use as many levels of inheritance as needed. One common way of using
+inheritance is the following three-level approach:
+
+    * Create a ``base.html`` template that holds the main look-and-feel of your
+      site.
+    * Create a ``base_SECTIONNAME.html`` template for each "section" of your
+      site. For example, ``base_news.html``, ``base_sports.html``. These
+      templates all extend ``base.html`` and include section-specific
+      styles/design.
+    * Create individual templates for each type of page, such as a news
+      article or blog entry. These templates extend the appropriate section
+      template.
+
+This approach maximizes code reuse and makes it easy to add items to shared
+content areas, such as section-wide navigation.
+
+Here are some tips for working with inheritance:
+
+    * If you use ``{% extends %}`` in a template, it must be the first template
+      tag in that template. Template inheritance won't work, otherwise.
+
+    * More ``{% block %}`` tags in your base templates are better. Remember,
+      child templates don't have to define all parent blocks, so you can fill
+      in reasonable defaults in a number of blocks, then only define the ones
+      you need later. It's better to have more hooks than fewer hooks.
+
+    * If you find yourself duplicating content in a number of templates, it
+      probably means you should move that content to a ``{% block %}`` in a
+      parent template.
+
+    * If you need to get the content of the block from the parent template,
+      the ``{{ block.super }}`` variable will do the trick. This is useful
+      if you want to add to the contents of a parent block instead of
+      completely overriding it. Data inserted using ``{{ block.super }}`` will
+      not be automatically escaped (see the `next section`_), since it was
+      already escaped, if necessary, in the parent template.
+
+    * For extra readability, you can optionally give a *name* to your
+      ``{% endblock %}`` tag. For example::
+
+          {% block content %}
+          ...
+          {% endblock content %}
+
+      In larger templates, this technique helps you see which ``{% block %}``
+      tags are being closed.
+
+Finally, note that you can't define multiple ``{% block %}`` tags with the same
+name in the same template. This limitation exists because a block tag works in
+"both" directions. That is, a block tag doesn't just provide a hole to fill --
+it also defines the content that fills the hole in the *parent*. If there were
+two similarly-named ``{% block %}`` tags in a template, that template's parent
+wouldn't know which one of the blocks' content to use.
+
+.. _next section: #automatic-html-escaping
+.. _automatic-html-escaping:
+
+Automatic HTML escaping
+=======================
+
+**New in Django development version**
+
+When generating HTML from templates, there's always a risk that a variable will
+include characters that affect the resulting HTML. For example, consider this
+template fragment::
+
+    Hello, {{ name }}.
+
+At first, this seems like a harmless way to display a user's name, but consider
+what would happen if the user entered his name as this::
+
+    <script>alert('hello')</script>
+
+With this name value, the template would be rendered as::
+
+    Hello, <script>alert('hello')</script>
+
+...which means the browser would pop-up a JavaScript alert box!
+
+Similarly, what if the name contained a ``'<'`` symbol, like this?
+
+    <b>username
+
+That would result in a rendered template like this::
+
+    Hello, <b>username
+
+...which, in turn, would result in the remainder of the Web page being bolded!
+
+Clearly, user-submitted data shouldn't be trusted blindly and inserted directly
+into your Web pages, because a malicious user could use this kind of hole to
+do potentially bad things. This type of security exploit is called a
+`Cross Site Scripting`_ (XSS) attack.
+
+To avoid this problem, you have two options:
+
+    * One, you can make sure to run each untrusted variable through the
+      ``escape`` filter (documented below), which converts potentially harmful
+      HTML characters to unharmful ones. This was the default solution
+      in Django for its first few years, but the problem is that it puts the
+      onus on *you*, the developer / template author, to ensure you're escaping
+      everything. It's easy to forget to escape data.
+
+    * Two, you can take advantage of Django's automatic HTML escaping. The
+      remainder of this section describes how auto-escaping works.
+
+By default in the Django development version, every template automatically
+escapes the output of every variable tag. Specifically, these five characters
+are escaped:
+
+    * ``<`` is converted to ``&lt;``
+    * ``>`` is converted to ``&gt;``
+    * ``'`` (single quote) is converted to ``&#39;``
+    * ``"`` (double quote) is converted to ``&quot;``
+    * ``&`` is converted to ``&amp;``
+
+Again, we stress that this behavior is on by default. If you're using Django's
+template system, you're protected.
+
+.. _Cross Site Scripting: http://en.wikipedia.org/wiki/Cross-site_scripting
+
+How to turn it off
+------------------
+
+If you don't want data to be auto-escaped, on a per-site, per-template level or
+per-variable level, you can turn it off in several ways.
+
+Why would you want to turn it off? Because sometimes, template variables
+contain data that you *intend* to be rendered as raw HTML, in which case you
+don't want their contents to be escaped. For example, you might store a blob of
+HTML in your database and want to embed that directly into your template. Or,
+you might be using Django's template system to produce text that is *not* HTML
+-- like an e-mail message, for instance.
+
+For individual variables
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+To disable auto-escaping for an individual variable, use the ``safe`` filter::
+
+    This will be escaped: {{ data }}
+    This will not be escaped: {{ data|safe }}
+
+Think of *safe* as shorthand for *safe from further escaping* or *can be
+safely interpreted as HTML*. In this example, if ``data`` contains ``'<b>'``,
+the output will be::
+
+    This will be escaped: &lt;b&gt;
+    This will not be escaped: <b>
+
+For template blocks
+~~~~~~~~~~~~~~~~~~~
+
+To control auto-escaping for a template, wrap the template (or just a
+particular section of the template) in the ``autoescape`` tag, like so::
+
+    {% autoescape off %}
+        Hello {{ name }}
+    {% endautoescape %}
+
+The ``autoescape`` tag takes either ``on`` or ``off`` as its argument. At
+times, you might want to force auto-escaping when it would otherwise be
+disabled. Here is an example template::
+
+    Auto-escaping is on by default. Hello {{ name }}
+
+    {% autoescape off %}
+        This will not be auto-escaped: {{ data }}.
+
+        Nor this: {{ other_data }}
+        {% autoescape on %}
+            Auto-escaping applies again: {{ name }}
+        {% endautoescape %}
+    {% endautoescape %}
+
+The auto-escaping tag passes its effect onto templates that extend the
+current one as well as templates included via the ``include`` tag, just like
+all block tags. For example::
+
+    # base.html
+
+    {% autoescape off %}
+    <h1>{% block title %}{% endblock %}</h1>
+    {% block content %}
+    {% endblock %}
+    {% endautoescape %}
+
+
+    # child.html
+
+    {% extends "base.html" %}
+    {% block title %}This & that{% endblock %}
+    {% block content %}{{ greeting }}{% endblock %}
+
+Because auto-escaping is turned off in the base template, it will also be
+turned off in the child template, resulting in the following rendered
+HTML when the ``greeting`` variable contains the string ``<b>Hello!</b>``::
+
+    <h1>This & that</h1>
+    <b>Hello!</b>
+
+Notes
+-----
+
+Generally, template authors don't need to worry about auto-escaping very much.
+Developers on the Python side (people writing views and custom filters) need to
+think about the cases in which data shouldn't be escaped, and mark data
+appropriately, so things Just Work in the template.
+
+If you're creating a template that might be used in situations where you're
+not sure whether auto-escaping is enabled, then add an ``escape`` filter to any
+variable that needs escaping. When auto-escaping is on, there's no danger of
+the ``escape`` filter *double-escaping* data -- the ``escape`` filter does not
+affect auto-escaped variables.
+
+String literals and automatic escaping
+--------------------------------------
+
+As we mentioned earlier, filter arguments can be strings::
+
+    {{ data|default:"This is a string literal." }}
+
+All string literals are inserted **without** any automatic escaping into the
+template -- they act as if they were all passed through the ``safe`` filter.
+The reasoning behind this is that the template author is in control of what
+goes into the string literal, so they can make sure the text is correctly
+escaped when the template is written.
+
+This means you would write ::
+
+    {{ data|default:"3 &lt; 2" }}
+
+...rather than ::
+
+    {{ data|default:"3 < 2" }}  <-- Bad! Don't do this.
+
+This doesn't affect what happens to data coming from the variable itself.
+The variable's contents are still automatically escaped, if necessary, because
+they're beyond the control of the template author.
+
+.. _template-built-in-reference:
+
+Using the built-in reference
+============================
+
+Django's admin interface includes a complete reference of all template tags and
+filters available for a given site. To see it, go to your admin interface and
+click the "Documentation" link in the upper right of the page.
+
+The reference is divided into 4 sections: tags, filters, models, and views.
+
+The **tags** and **filters** sections describe all the built-in tags (in fact,
+the tag and filter references below come directly from those pages) as well as
+any custom tag or filter libraries available.
+
+The **views** page is the most valuable. Each URL in your site has a separate
+entry here, and clicking on a URL will show you:
+
+    * The name of the view function that generates that view.
+    * A short description of what the view does.
+    * The **context**, or a list of variables available in the view's template.
+    * The name of the template or templates that are used for that view.
+
+Each view documentation page also has a bookmarklet that you can use to jump
+from any page to the documentation page for that view.
+
+Because Django-powered sites usually use database objects, the **models**
+section of the documentation page describes each type of object in the system
+along with all the fields available on that object.
+
+Taken together, the documentation pages should tell you every tag, filter,
+variable and object available to you in a given template.
+
+Custom tag and filter libraries
+===============================
+
+Certain applications provide custom tag and filter libraries. To access them in
+a template, use the ``{% load %}`` tag::
+
+    {% load comments %}
+
+    {% comment_form for blogs.entries entry.id with is_public yes %}
+
+In the above, the ``load`` tag loads the ``comments`` tag library, which then
+makes the ``comment_form`` tag available for use. Consult the documentation
+area in your admin to find the list of custom libraries in your installation.
+
+The ``{% load %}`` tag can take multiple library names, separated by spaces.
+Example::
+
+    {% load comments i18n %}
+    
+See :ref:`howto-custom-template-tags` for information on writing your own custom
+template libraries.
+
+Custom libraries and template inheritance
+-----------------------------------------
+
+When you load a custom tag or filter library, the tags/filters are only made
+available to the current template -- not any parent or child templates along
+the template-inheritance path.
+
+For example, if a template ``foo.html`` has ``{% load comments %}``, a child
+template (e.g., one that has ``{% extends "foo.html" %}``) will *not* have
+access to the comments template tags and filters. The child template is
+responsible for its own ``{% load comments %}``.
+
+This is a feature for the sake of maintainability and sanity.

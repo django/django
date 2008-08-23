@@ -1,0 +1,140 @@
+.. _howto-initial-data:
+
+=================================
+Providing initial data for models
+=================================
+
+It's sometimes useful to pre-populate your database with hard-coded data when
+you're first setting up an app. There's a couple of ways you can have Django
+automatically create this data: you can provide `initial data via fixtures`_, or
+you can provide `initial data as SQL`_.
+
+In general, using a fixture is a cleaner method since it's database-agnostic,
+but initial SQL is also quite a bit more flexible.
+
+.. _initial data as sql: `providing initial sql data`_
+.. _initial data via fixtures: `providing initial data with fixtures`_
+
+Providing initial data with fixtures
+====================================
+
+A fixture is a collection of data that Django knows how to import into a
+database. The most straightforward way of creating a fixture if you've already
+got some data is to use the :djadmin:`manage.py dumpdata` command. Or, you can
+write fixtures by hand; fixtures can be written as XML, YAML, or JSON documents.
+The :ref:`serialization documentation <topics-serialization>` has more details
+about each of these supported :ref:`serialization formats
+<serialization-formats>`.
+
+As an example, though, here's what a fixture for a simple ``Person`` model might
+look like in JSON:
+
+.. code-block:: js
+
+    [
+      {
+        "model": "myapp.person",  
+        "pk": 1,
+        "fields": {
+          "first_name": "John",
+          "last_name": "Lennon",
+        }
+      },
+      {
+        "model": "myapp.person",  
+        "pk": 2,
+        "fields": {
+          "first_name": "Paul",
+          "last_name": "McCartney",
+        }
+      },
+    ]
+    
+And here's that same fixture as YAML:
+
+.. code-block:: none
+
+    - model: myapp.person
+      pk: 1
+      fields:
+        first_name: John
+        last_name: Lennon
+    - model: myapp.person
+      pk: 1
+      fields:
+        first_name: Paul
+        last_name: McCartney
+        
+You'll store this data in a ``fixtures`` directory inside you app.
+
+Loading data is easy: just call :djadmin:`manage.py loaddata fixturename
+<loaddata>`, where *fixturename* is the name of the fixture file you've created.
+Every time you run :djadmin:`loaddata` the data will be read from the fixture
+and re-loaded into the database. Note that this means that if you change one of
+the rows created by a fixture and the run :djadmin:`loaddata` again you'll wipe
+out any changes you've made.
+
+Automatically loading initial data fixtures
+-------------------------------------------
+
+If you create a fixture named ``initial_data.[xml/yml/json]``, that fixture will
+be loaded every time you run :djadmin:`syncdb`. This is extremely convenient,
+but be careful: remember that the data will be refreshed *every time* you run
+:djadmin:`syncdb`. So don't use ``initial_data`` for data you'll want to edit.
+
+.. seealso::
+
+    Fixtures are also used by the :ref:`testing framework
+    <topics-testing-fixtures>` to help set up a consistent test environment.
+
+.. _initial-sql:
+
+Providing initial SQL data
+==========================
+
+Django provides a hook for passing the database arbitrary SQL that's executed
+just after the CREATE TABLE statements when you run :djadmin:`syncdb`. You can
+use this hook to populate default records, or you could also create SQL
+functions, views, triggers, etc.
+
+The hook is simple: Django just looks for a file called ``sql/<modelname>.sql``,
+in your app directory, where ``<modelname>`` is the model's name in lowercase.
+
+So, if you had a ``Person`` model in an app called ``myapp``, you could add
+arbitrary SQL to the file ``sql/person.sql`` inside your ``myapp`` directory.
+Here's an example of what the file might contain:
+
+.. code-block:: sql
+
+    INSERT INTO myapp_person (first_name, last_name) VALUES ('John', 'Lennon');
+    INSERT INTO myapp_person (first_name, last_name) VALUES ('Paul', 'McCartney');
+
+Each SQL file, if given, is expected to contain valid SQL statements
+which will insert the desired data (e.g., properly-formatted
+``INSERT`` statements separated by semicolons).
+
+The SQL files are read by the :djadmin:`sqlcustom`, :djadmin:`sqlreset`,
+:djadmin:`sqlall` and :djadmin:`reset` commands in :ref:`manage.py
+<ref-django-admin>`. Refer to the :ref:`manage.py documentation
+<ref-django-admin>` for more information.
+
+Note that if you have multiple SQL data files, there's no guarantee of the order
+in which they're executed. The only thing you can assume is that, by the time
+your custom data files are executed, all the database tables already will have
+been created.
+
+Database-backend-specific SQL data
+----------------------------------
+
+There's also a hook for backend-specific SQL data. For example, you can have
+separate initial-data files for PostgreSQL and MySQL. For each app, Django
+looks for a file called ``<appname>/sql/<modelname>.<backend>.sql``, where
+``<appname>`` is your app directory, ``<modelname>`` is the model's name in
+lowercase and ``<backend>`` is the value of :setting:`DATABASE_ENGINE` in your
+settings file (e.g., ``postgresql``, ``mysql``).
+
+Backend-specific SQL data is executed before non-backend-specific SQL data. For
+example, if your app contains the files ``sql/person.sql`` and
+``sql/person.postgresql.sql`` and you're installing the app on PostgreSQL,
+Django will execute the contents of ``sql/person.postgresql.sql`` first, then
+``sql/person.sql``.

@@ -1,0 +1,401 @@
+.. _ref-contrib-sites:
+
+=====================
+The "sites" framework
+=====================
+
+.. module:: django.contrib.sites
+   :synopsis: Lets you operate multiple web sites from the same database and
+              Django project
+
+Django comes with an optional "sites" framework. It's a hook for associating
+objects and functionality to particular Web sites, and it's a holding place for
+the domain names and "verbose" names of your Django-powered sites.
+
+Use it if your single Django installation powers more than one site and you
+need to differentiate between those sites in some way.
+
+The whole sites framework is based on a simple model:
+
+.. class:: django.contrib.sites.models.Site
+
+This model has :attr:`~django.contrib.sites.models.Site.domain` and
+:attr:`~django.contrib.sites.models.Site.name` fields. The :setting:`SITE_ID`
+setting specifies the database ID of the
+:class:`~django.contrib.sites.models.Site` object associated with that
+particular settings file.
+
+How you use this is up to you, but Django uses it in a couple of ways
+automatically via simple conventions.
+
+Example usage
+=============
+
+Why would you use sites? It's best explained through examples.
+
+Associating content with multiple sites
+---------------------------------------
+
+The Django-powered sites LJWorld.com_ and Lawrence.com_ are operated by the
+same news organization -- the Lawrence Journal-World newspaper in Lawrence,
+Kansas. LJWorld.com focuses on news, while Lawrence.com focuses on local
+entertainment. But sometimes editors want to publish an article on *both*
+sites.
+
+The brain-dead way of solving the problem would be to require site producers to
+publish the same story twice: once for LJWorld.com and again for Lawrence.com.
+But that's inefficient for site producers, and it's redundant to store
+multiple copies of the same story in the database.
+
+The better solution is simple: Both sites use the same article database, and an
+article is associated with one or more sites. In Django model terminology,
+that's represented by a :class:`~django.db.models.ManyToManyField` in the
+``Article`` model::
+
+    from django.db import models
+    from django.contrib.sites.models import Site
+
+    class Article(models.Model):
+        headline = models.CharField(max_length=200)
+        # ...
+        sites = models.ManyToManyField(Site)
+
+This accomplishes several things quite nicely:
+
+    * It lets the site producers edit all content -- on both sites -- in a
+      single interface (the Django admin).
+
+    * It means the same story doesn't have to be published twice in the
+      database; it only has a single record in the database.
+
+    * It lets the site developers use the same Django view code for both sites.
+      The view code that displays a given story just checks to make sure the
+      requested story is on the current site. It looks something like this::
+
+          from django.conf import settings
+
+          def article_detail(request, article_id):
+              try:
+                  a = Article.objects.get(id=article_id, sites__id__exact=settings.SITE_ID)
+              except Article.DoesNotExist:
+                  raise Http404
+              # ...
+
+.. _ljworld.com: http://www.ljworld.com/
+.. _lawrence.com: http://www.lawrence.com/
+
+Associating content with a single site
+--------------------------------------
+
+Similarly, you can associate a model to the :class:`~django.contrib.sites.models.Site`
+model in a many-to-one relationship, using
+:class:`~django.db.models.fields.related.ForeignKey`.
+
+For example, if an article is only allowed on a single site, you'd use a model
+like this::
+
+    from django.db import models
+    from django.contrib.sites.models import Site
+
+    class Article(models.Model):
+        headline = models.CharField(max_length=200)
+        # ...
+        site = models.ForeignKey(Site)
+
+This has the same benefits as described in the last section.
+
+Hooking into the current site from views
+----------------------------------------
+
+On a lower level, you can use the sites framework in your Django views to do
+particular things based on the site in which the view is being called.
+For example::
+
+    from django.conf import settings
+
+    def my_view(request):
+        if settings.SITE_ID == 3:
+            # Do something.
+        else:
+            # Do something else.
+
+Of course, it's ugly to hard-code the site IDs like that. This sort of
+hard-coding is best for hackish fixes that you need done quickly. A slightly
+cleaner way of accomplishing the same thing is to check the current site's
+domain::
+
+    from django.conf import settings
+    from django.contrib.sites.models import Site
+
+    def my_view(request):
+        current_site = Site.objects.get(id=settings.SITE_ID)
+        if current_site.domain == 'foo.com':
+            # Do something
+        else:
+            # Do something else.
+
+The idiom of retrieving the :class:`~django.contrib.sites.models.Site` object
+for the value of :setting:`settings.SITE_ID <SITE_ID>` is quite common, so
+the :class:`~django.contrib.sites.models.Site` model's manager has a
+``get_current()`` method. This example is equivalent to the previous one::
+
+    from django.contrib.sites.models import Site
+
+    def my_view(request):
+        current_site = Site.objects.get_current()
+        if current_site.domain == 'foo.com':
+            # Do something
+        else:
+            # Do something else.
+
+Getting the current domain for display
+--------------------------------------
+
+LJWorld.com and Lawrence.com both have e-mail alert functionality, which lets
+readers sign up to get notifications when news happens. It's pretty basic: A
+reader signs up on a Web form, and he immediately gets an e-mail saying,
+"Thanks for your subscription."
+
+It'd be inefficient and redundant to implement this signup-processing code
+twice, so the sites use the same code behind the scenes. But the "thank you for
+signing up" notice needs to be different for each site. By using
+:class:`~django.contrib.sites.models.Site`
+objects, we can abstract the "thank you" notice to use the values of the
+current site's :attr:`~django.contrib.sites.models.Site.name` and
+:attr:`~django.contrib.sites.models.Site.domain`.
+
+Here's an example of what the form-handling view looks like::
+
+    from django.contrib.sites.models import Site
+    from django.core.mail import send_mail
+
+    def register_for_newsletter(request):
+        # Check form values, etc., and subscribe the user.
+        # ...
+
+        current_site = Site.objects.get_current()
+        send_mail('Thanks for subscribing to %s alerts' % current_site.name,
+            'Thanks for your subscription. We appreciate it.\n\n-The %s team.' % current_site.name,
+            'editor@%s' % current_site.domain,
+            [user.email])
+
+        # ...
+
+On Lawrence.com, this e-mail has the subject line "Thanks for subscribing to
+lawrence.com alerts." On LJWorld.com, the e-mail has the subject "Thanks for
+subscribing to LJWorld.com alerts." Same goes for the e-mail's message body.
+
+Note that an even more flexible (but more heavyweight) way of doing this would
+be to use Django's template system. Assuming Lawrence.com and LJWorld.com have
+different template directories (:setting:`TEMPLATE_DIRS`), you could simply farm out
+to the template system like so::
+
+    from django.core.mail import send_mail
+    from django.template import loader, Context
+
+    def register_for_newsletter(request):
+        # Check form values, etc., and subscribe the user.
+        # ...
+
+        subject = loader.get_template('alerts/subject.txt').render(Context({}))
+        message = loader.get_template('alerts/message.txt').render(Context({}))
+        send_mail(subject, message, 'editor@ljworld.com', [user.email])
+
+        # ...
+
+In this case, you'd have to create :file:`subject.txt` and :file:`message.txt` template
+files for both the LJWorld.com and Lawrence.com template directories. That
+gives you more flexibility, but it's also more complex.
+
+It's a good idea to exploit the :class:`~django.contrib.sites.models.Site``
+objects as much as possible, to remove unneeded complexity and redundancy.
+
+Getting the current domain for full URLs
+----------------------------------------
+
+Django's ``get_absolute_url()`` convention is nice for getting your objects'
+URL without the domain name, but in some cases you might want to display the
+full URL -- with ``http://`` and the domain and everything -- for an object.
+To do this, you can use the sites framework. A simple example::
+
+    >>> from django.contrib.sites.models import Site
+    >>> obj = MyModel.objects.get(id=3)
+    >>> obj.get_absolute_url()
+    '/mymodel/objects/3/'
+    >>> Site.objects.get_current().domain
+    'example.com'
+    >>> 'http://%s%s' % (Site.objects.get_current().domain, obj.get_absolute_url())
+    'http://example.com/mymodel/objects/3/'
+
+Caching the current ``Site`` object
+===================================
+
+**New in Django development version**
+
+As the current site is stored in the database, each call to
+``Site.objects.get_current()`` could result in a database query. But Django is a
+little cleverer than that: on the first request, the current site is cached, and
+any subsequent call returns the cached data instead of hitting the database.
+
+If for any reason you want to force a database query, you can tell Django to
+clear the cache using ``Site.objects.clear_cache()``::
+
+    # First call; current site fetched from database.
+    current_site = Site.objects.get_current()
+    # ...
+
+    # Second call; current site fetched from cache.
+    current_site = Site.objects.get_current()
+    # ...
+
+    # Force a database query for the third call.
+    Site.objects.clear_cache()
+    current_site = Site.objects.get_current()
+
+The ``CurrentSiteManager``
+==========================
+
+.. class:: django.contrib.sites.managers.CurrentSiteManager
+
+If :class:`~django.contrib.sites.models.Site`\s play a key role in your application,
+consider using the helpful
+:class:`~django.contrib.sites.managers.CurrentSiteManager` in your model(s).
+It's a model :ref:`manager <topics-db-managers>` that automatically filters
+its queries to include only objects associated with the current
+:class:`~django.contrib.sites.models.Site`.
+
+Use :class:`~django.contrib.sites.managers.CurrentSiteManager` by adding it to
+your model explicitly. For example::
+
+    from django.db import models
+    from django.contrib.sites.models import Site
+    from django.contrib.sites.managers import CurrentSiteManager
+
+    class Photo(models.Model):
+        photo = models.FileField(upload_to='/home/photos')
+        photographer_name = models.CharField(max_length=100)
+        pub_date = models.DateField()
+        site = models.ForeignKey(Site)
+        objects = models.Manager()
+        on_site = CurrentSiteManager()
+
+With this model, ``Photo.objects.all()`` will return all ``Photo`` objects in
+the database, but ``Photo.on_site.all()`` will return only the ``Photo`` objects
+associated with the current site, according to the :setting:`SITE_ID` setting.
+
+Put another way, these two statements are equivalent::
+
+    Photo.objects.filter(site=settings.SITE_ID)
+    Photo.on_site.all()
+
+How did :class:`~django.contrib.sites.managers.CurrentSiteManager` know which
+field of ``Photo`` was the :class:`~django.contrib.sites.models.Site`? It
+defaults to looking for a field called
+:class:`~django.contrib.sites.models.Site`. If your model has a
+:class:`~django.db.models.fields.related.ForeignKey` or
+:class:`~django.db.models.fields.related.ManyToManyField` called something
+*other* than :class:`~django.contrib.sites.models.Site`, you need to explicitly
+pass that as the parameter to
+:class:`~django.contrib.sites.managers.CurrentSiteManager`. The following model,
+which has a field called ``publish_on``, demonstrates this::
+
+    from django.db import models
+    from django.contrib.sites.models import Site
+    from django.contrib.sites.managers import CurrentSiteManager
+
+    class Photo(models.Model):
+        photo = models.FileField(upload_to='/home/photos')
+        photographer_name = models.CharField(max_length=100)
+        pub_date = models.DateField()
+        publish_on = models.ForeignKey(Site)
+        objects = models.Manager()
+        on_site = CurrentSiteManager('publish_on')
+
+If you attempt to use :class:`~django.contrib.sites.managers.CurrentSiteManager`
+and pass a field name that doesn't exist, Django will raise a :exc:`ValueError`.
+
+Finally, note that you'll probably want to keep a normal (non-site-specific)
+``Manager`` on your model, even if you use
+:class:`~django.contrib.sites.managers.CurrentSiteManager`. As explained
+in the :ref:`manager documentation <topics-db-managers>`, if you define a manager
+manually, then Django won't create the automatic ``objects = models.Manager()``
+manager for you.Also, note that certain parts of Django -- namely, the Django admin site and
+generic views -- use whichever manager is defined *first* in the model, so if
+you want your admin site to have access to all objects (not just site-specific
+ones), put ``objects = models.Manager()`` in your model, before you define
+:class:`~django.contrib.sites.managers.CurrentSiteManager`.
+
+How Django uses the sites framework
+===================================
+
+Although it's not required that you use the sites framework, it's strongly
+encouraged, because Django takes advantage of it in a few places. Even if your
+Django installation is powering only a single site, you should take the two
+seconds to create the site object with your ``domain`` and ``name``, and point
+to its ID in your :setting:`SITE_ID` setting.
+
+Here's how Django uses the sites framework:
+
+* In the :mod:`redirects framework <django.contrib.redirects>`, each
+  redirect object is associated with a particular site. When Django searches
+  for a redirect, it takes into account the current :setting:`SITE_ID`.
+
+* In the comments framework, each comment is associated with a particular
+  site. When a comment is posted, its
+  :class:`~django.contrib.sites.models.Site` is set to the current
+  :setting:`SITE_ID`, and when comments are listed via the appropriate
+  template tag, only the comments for the current site are displayed.
+  
+* In the :mod:`flatpages framework <django.contrib.flatpages>`, each
+  flatpage is associated with a particular site. When a flatpage is created,
+  you specify its :class:`~django.contrib.sites.models.Site`, and the
+  :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
+  checks the current :setting:`SITE_ID` in retrieving flatpages to display.
+
+* In the :mod:`syndication framework <django.contrib.syndication>`, the
+  templates for ``title`` and ``description`` automatically have access to a
+  variable ``{{ site }}``, which is the
+  :class:`~django.contrib.sites.models.Site` object representing the current
+  site. Also, the hook for providing item URLs will use the ``domain`` from
+  the current :class:`~django.contrib.sites.models.Site` object if you don't
+  specify a fully-qualified domain.
+
+* In the :mod:`authentication framework <django.contrib.auth>`, the
+  :func:`django.contrib.auth.views.login` view passes the current
+  :class:`~django.contrib.sites.models.Site` name to the template as
+  ``{{ site_name }}``.
+
+* The shortcut view (:func:`django.views.defaults.shortcut`) uses the domain
+  of the current :class:`~django.contrib.sites.models.Site` object when
+  calculating an object's URL.
+
+* In the admin framework, the "view on site" link uses the current
+  :class:`~django.contrib.sites.models.Site` to work out the domain for the
+  site that it will redirect to.
+
+
+``RequestSite`` objects
+=======================
+
+.. _requestsite-objects:
+
+**New in Django development version**
+
+Some :ref:`django.contrib <ref-contrib-index>` applications take advantage of
+the sites framework but are architected in a way that doesn't *require* the
+sites framework to be installed in your database. (Some people don't want to, or
+just aren't *able* to install the extra database table that the sites framework
+requires.) For those cases, the framework provides a
+:class:`~django.contrib.sites.models.RequestSite` class, which can be used as a
+fallback when the database-backed sites framework is not available.
+
+A :class:`~django.contrib.sites.models.RequestSite` object has a similar
+interface to a normal :class:`~django.contrib.sites.models.Site` object, except
+its :meth:`~django.contrib.sites.models.RequestSite.__init__()` method takes an
+:class:`~django.http.HttpRequest` object. It's able to deduce the
+:attr:`~django.contrib.sites.models.RequestSite.domain` and
+:attr:`~django.contrib.sites.models.RequestSite.name` by looking at the
+request's domain. It has :meth:`~django.contrib.sites.models.RequestSite.save()`
+and :meth:`~django.contrib.sites.models.RequestSite.delete()` methods to match
+the interface of :class:`~django.contrib.sites.models.Site`, but the methods
+raise :exc:`NotImplementedError`.

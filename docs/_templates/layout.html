@@ -1,0 +1,87 @@
+{% extends "!layout.html" %}
+
+{%- macro secondnav %}
+  {%- if prev %}
+    &laquo; <a href="{{ prev.link|e }}" title="{{ prev.title|e }}">previous</a> 
+    {{ reldelim2 }}
+  {%- endif %}
+  {%- if parents %}
+    <a href="{{ parents.0.link|e }}" title="{{ parents.0.title|e }}" accesskey="U">up</a> 
+  {%- else %}
+    <a title="{{ docstitle }}" href="{{ pathto('index') }}" accesskey="U">up</a> 
+  {%- endif %}
+  {%- if next %}
+  {{ reldelim2 }}
+    <a href="{{ next.link|e }}" title="{{ next.title|e }}">next</a> &raquo;
+  {%- endif %}
+{%- endmacro %}
+
+{% block document %}
+  <div id="custom-doc" class="{% block bodyclass %}{{ 'yui-t6' if pagename != 'index' else '' }}{% endblock %}">
+    <div id="hd">
+      <h1><a href="{{ pathto('index') }}">{{ docstitle }}</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="{{ pathto('index') }}">Home</a> {{ reldelim2 }}
+        <a title="Table of contents" href="{{ pathto('contents') }}">Table of contents</a> {{ reldelim2 }}
+        <a title="Global index" href="{{ pathto('genindex') }}">Index</a> {{ reldelim2 }}
+        <a title="Search" href="{{ pathto('modindex') }}">Modules</a>
+      </div>
+      <div class="nav">{{ secondnav() }}</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="{{ pagename|replace('/', '-') }}">
+            {% block body %}{% endblock %}
+          </div>         
+        </div>
+      </div>
+      {% block sidebarwrapper %}
+        {% if pagename != 'index' %}
+          <div class="yui-b" id="sidebar">
+            {{ sidebar() }}
+            {%- if last_updated %}
+              <h3>Last update:</h3>
+              <p class="topless">{{ last_updated }}</p>
+            {%- endif %}
+          </div> 
+        {% endif %}
+      {% endblock %}
+    </div>
+    
+    <div id="ft">
+      <div class="nav">{{ secondnav() }}</div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block sidebarrel %}
+  <h3>Browse</h3>
+  <ul>
+    {% if prev %}
+      <li>Prev: <a href="{{ prev.link }}">{{ prev.title }}</a></li>
+    {% endif %}
+    {% if next %}
+      <li>Next: <a href="{{ next.link }}">{{ next.title }}</a></li>
+    {% endif %}
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="{{ pathto('index') }}">{{ docstitle }}</a>
+        {% for p in parents %}
+          <ul><li><a href="{{ p.link }}">{{ p.title }}</a>
+        {% endfor %}
+        <ul><li>{{ title }}</li></ul>
+        {% for p in parents %}</li></ul>{% endfor %}
+      </li>
+  </ul>  
+{% endblock %}
+
+{# Empty some default blocks out #}
+{% block relbar1 %}{% endblock %}
+{% block relbar2 %}{% endblock %}
+{% block sidebar1 %}{% endblock %}
+{% block sidebar2 %}{% endblock %}
+{% block footer %}{% endblock %}

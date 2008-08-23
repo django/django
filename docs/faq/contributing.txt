@@ -1,0 +1,30 @@
+.. _faq-contributing:
+
+FAQ: Contributing code
+======================
+
+How can I get started contributing code to Django?
+--------------------------------------------------
+
+Thanks for asking! We've written an entire document devoted to this question.
+It's titled :ref:`Contributing to Django <internals-contributing>`.
+
+I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?
+--------------------------------------------------------------------------------------------
+
+Don't worry: We're not ignoring you!
+
+It's important to understand there is a difference between "a ticket is being
+ignored" and "a ticket has not been attended to yet." Django's ticket system
+contains hundreds of open tickets, of various degrees of impact on end-user
+functionality, and Django's developers have to review and prioritize.
+
+On top of that: the people who work on Django are all volunteers. As a result,
+the amount of time that we have to work on the framework is limited and will
+vary from week to week depending on our spare time. If we're busy, we may not
+be able to spend as much time on Django as we might want.
+
+Besides, if your feature request stands no chance of inclusion in Django, we
+won't ignore it -- we'll just close the ticket. So if your ticket is still
+open, it doesn't mean we're ignoring you; it just means we haven't had time to
+look at it yet.

@@ -1,0 +1,305 @@
+.. _ref-databases:
+
+===============================
+Notes about supported databases
+===============================
+
+Django attempts to support as many features as possible on all database
+backends. However, not all database backends are alike, and we've had to make
+design decisions on which features to support and which assumptions we can make
+safely.
+
+This file describes some of the features that might be relevant to Django
+usage. Of course, it is not intended as a replacement for server-specific
+documentation or reference manuals.
+
+MySQL notes
+===========
+
+Django expects the database to support transactions, referential integrity,
+and Unicode support (UTF-8 encoding). Fortunately, MySQL_ has all these
+features as available as far back as 3.23. While it may be possible to use
+3.23 or 4.0, you'll probably have less trouble if you use 4.1 or 5.0.
+
+MySQL 4.1
+---------
+
+`MySQL 4.1`_ has greatly improved support for character sets. It is possible to
+set different default character sets on the database, table, and column.
+Previous versions have only a server-wide character set setting. It's also the
+first version where the character set can be changed on the fly. 4.1 also has
+support for views, but Django currently doesn't use views.
+
+MySQL 5.0
+---------
+
+`MySQL 5.0`_ adds the ``information_schema`` database, which contains detailed
+data on all database schema. Django's ``inspectdb`` feature uses this
+``information_schema`` if it's available. 5.0 also has support for stored
+procedures, but Django currently doesn't use stored procedures.
+
+.. _MySQL: http://www.mysql.com/
+.. _MySQL 4.1: http://dev.mysql.com/doc/refman/4.1/en/index.html
+.. _MySQL 5.0: http://dev.mysql.com/doc/refman/5.0/en/index.html
+
+Storage engines
+---------------
+
+MySQL has several `storage engines`_ (previously called table types). You can
+change the default storage engine in the server configuration.
+
+The default engine is MyISAM_. The main drawback of MyISAM is that it doesn't
+currently support transactions or foreign keys. On the plus side, it's
+currently the only engine that supports full-text indexing and searching.
+
+The InnoDB_ engine is fully transactional and supports foreign key references.
+
+The BDB_ engine, like InnoDB, is also fully transactional and supports foreign
+key references. However, its use seems to be deprecated.
+
+`Other storage engines`_, including SolidDB_ and Falcon_, are on the horizon.
+For now, InnoDB is probably your best choice.
+
+.. _storage engines: http://dev.mysql.com/doc/refman/5.0/en/storage-engines.html
+.. _MyISAM: http://dev.mysql.com/doc/refman/5.0/en/myisam-storage-engine.html
+.. _BDB: http://dev.mysql.com/doc/refman/5.0/en/bdb-storage-engine.html
+.. _InnoDB: http://dev.mysql.com/doc/refman/5.0/en/innodb.html
+.. _Other storage engines: http://dev.mysql.com/doc/refman/5.1/en/storage-engines-other.html
+.. _SolidDB: http://forge.mysql.com/projects/view.php?id=139
+.. _Falcon: http://dev.mysql.com/doc/falcon/en/index.html
+
+MySQLdb
+-------
+
+`MySQLdb`_ is the Python interface to MySQL. Version 1.2.1p2 or later is
+required for full MySQL support in Django. Earlier versions will not work with
+the ``mysql`` backend.
+
+If you are trying to use an older version of MySQL and the ``mysql_old``
+backend, then 1.2.0 *might* work for you.
+
+.. note::
+    If you see ``ImportError: cannot import name ImmutableSet`` when trying to
+    use Django, your MySQLdb installation may contain an outdated ``sets.py``
+    file that conflicts with the built-in module of the same name from Python
+    2.4 and later. To fix this, verify that you have installed MySQLdb version
+    1.2.1p2 or newer, then delete the ``sets.py`` file in the MySQLdb
+    directory that was left by an earlier version.
+
+.. _MySQLdb: http://sourceforge.net/projects/mysql-python
+
+Creating your database
+----------------------
+
+You can `create your database`_ using the command-line tools and this SQL::
+
+  CREATE DATABASE <dbname> CHARACTER SET utf8;
+
+This ensures all tables and columns will use UTF-8 by default.
+
+.. _create your database: http://dev.mysql.com/doc/refman/5.0/en/create-database.html
+
+Connecting to the database
+--------------------------
+
+Refer to the :ref:`settings documentation <ref-settings>`. 
+
+Connection settings are used in this order:
+
+    1. :setting:`DATABASE_OPTIONS`.
+    2. :setting:`DATABASE_NAME`, :setting:`DATABASE_USER`,
+       :setting:`DATABASE_PASSWORD`, :setting:`DATABASE_HOST`,
+       :setting:`DATABASE_PORT`
+    3. MySQL option files.
+
+In other words, if you set the name of the database in ``DATABASE_OPTIONS``,
+this will take precedence over ``DATABASE_NAME``, which would override
+anything in a `MySQL option file`_.
+
+Here's a sample configuration which uses a MySQL option file::
+
+  # settings.py
+  DATABASE_ENGINE = "mysql"
+  DATABASE_OPTIONS = {
+      'read_default_file': '/path/to/my.cnf',
+      }
+
+  # my.cnf
+  [client]
+  database = DATABASE_NAME
+  user = DATABASE_USER
+  password = DATABASE_PASSWORD
+  default-character-set = utf8
+
+Several other MySQLdb connection options may be useful, such as ``ssl``,
+``use_unicode``, ``init_command``, and ``sql_mode``. Consult the
+`MySQLdb documentation`_ for more details.
+
+.. _MySQL option file: http://dev.mysql.com/doc/refman/5.0/en/option-files.html
+.. _MySQLdb documentation: http://mysql-python.sourceforge.net/
+
+Creating your tables
+--------------------
+
+When Django generates the schema, it doesn't specify a storage engine, so
+tables will be created with whatever default storage engine your database
+server is configured for. The easiest solution is to set your database server's
+default storage engine to the desired engine.
+
+If you're using a hosting service and can't change your server's default
+storage engine, you have a couple of options.
+
+    * After the tables are created, execute an ``ALTER TABLE`` statement to
+      convert a table to a new storage engine (such as InnoDB)::
+
+          ALTER TABLE <tablename> ENGINE=INNODB;
+
+      This can be tedious if you have a lot of tables.
+
+    * Another option is to use the ``init_command`` option for MySQLdb prior to
+      creating your tables::
+
+          DATABASE_OPTIONS = {
+              # ...
+             "init_command": "SET storage_engine=INNODB",
+              # ...
+          }
+
+      This sets the default storage engine upon connecting to the database.
+      After your tables have been created, you should remove this option.
+
+    * Another method for changing the storage engine is described in
+      AlterModelOnSyncDB_.
+
+.. _AlterModelOnSyncDB: http://code.djangoproject.com/wiki/AlterModelOnSyncDB
+
+
+.. _oracle-notes:
+
+Oracle notes
+============
+
+Django supports `Oracle Database Server`_ versions 9i and higher. Oracle
+version 10g or later is required to use Django's ``regex`` and ``iregex`` query
+operators. You will also need the `cx_Oracle`_ driver, version 4.3.1 or newer.
+
+.. _`Oracle Database Server`: http://www.oracle.com/
+.. _`cx_Oracle`: http://cx-oracle.sourceforge.net/
+
+In order for the ``python manage.py syncdb`` command to work, your Oracle
+database user must have privileges to run the following commands:
+
+    * CREATE TABLE
+    * CREATE SEQUENCE
+    * CREATE PROCEDURE
+    * CREATE TRIGGER
+    
+To run Django's test suite, the user needs these *additional* privileges:
+
+    * CREATE USER
+    * DROP USER
+    * CREATE TABLESPACE
+    * DROP TABLESPACE
+    
+Connecting to the database
+--------------------------
+
+Your Django settings.py file should look something like this for Oracle::
+
+    DATABASE_ENGINE = 'oracle'
+    DATABASE_NAME = 'xe'
+    DATABASE_USER = 'a_user'
+    DATABASE_PASSWORD = 'a_password'
+    DATABASE_HOST = ''
+    DATABASE_PORT = ''
+
+If you don't use a ``tnsnames.ora`` file or a similar naming method that
+recognizes the SID ("xe" in this example), then fill in both
+:setting:`DATABASE_HOST` and :setting:`DATABASE_PORT` like so::
+
+    DATABASE_ENGINE = 'oracle'
+    DATABASE_NAME = 'xe'
+    DATABASE_USER = 'a_user'
+    DATABASE_PASSWORD = 'a_password'
+    DATABASE_HOST = 'dbprod01ned.mycompany.com'
+    DATABASE_PORT = '1540'
+
+You should supply both :setting:`DATABASE_HOST` and :setting:`DATABASE_PORT`, or leave both
+as empty strings.
+
+Tablespace options
+------------------
+
+A common paradigm for optimizing performance in Oracle-based systems is the
+use of `tablespaces`_ to organize disk layout. The Oracle backend supports
+this use case by adding ``db_tablespace`` options to the ``Meta`` and
+``Field`` classes.  (When you use a backend that lacks support for tablespaces,
+Django ignores these options.)
+
+.. _`tablespaces`: http://en.wikipedia.org/wiki/Tablespace
+
+A tablespace can be specified for the table(s) generated by a model by
+supplying the ``db_tablespace`` option inside the model's ``class Meta``.
+Additionally, you can pass the ``db_tablespace`` option to a ``Field``
+constructor to specify an alternate tablespace for the ``Field``'s column
+index. If no index would be created for the column, the ``db_tablespace``
+option is ignored::
+
+    class TablespaceExample(models.Model):
+        name = models.CharField(max_length=30, db_index=True, db_tablespace="indexes")
+        data = models.CharField(max_length=255, db_index=True)
+        edges = models.ManyToManyField(to="self", db_tablespace="indexes")
+
+        class Meta:
+            db_tablespace = "tables"
+
+In this example, the tables generated by the ``TablespaceExample`` model
+(i.e., the model table and the many-to-many table) would be stored in the
+``tables`` tablespace. The index for the name field and the indexes on the
+many-to-many table would be stored in the ``indexes`` tablespace. The ``data``
+field would also generate an index, but no tablespace for it is specified, so
+it would be stored in the model tablespace ``tables`` by default.
+
+**New in the Django development version:** Use the :setting:`DEFAULT_TABLESPACE`
+and :setting:`DEFAULT_INDEX_TABLESPACE` settings to specify default values for
+the db_tablespace options. These are useful for setting a tablespace for the
+built-in Django apps and other applications whose code you cannot control.
+
+Django does not create the tablespaces for you. Please refer to `Oracle's
+documentation`_ for details on creating and managing tablespaces.
+
+.. _`Oracle's documentation`: http://download.oracle.com/docs/cd/B19306_01/server.102/b14200/statements_7003.htm#SQLRF01403
+
+Naming issues
+-------------
+
+Oracle imposes a name length limit of 30 characters. To accommodate this, the
+backend truncates database identifiers to fit, replacing the final four
+characters of the truncated name with a repeatable MD5 hash value.
+
+NULL and empty strings
+----------------------
+
+Django generally prefers to use the empty string ('') rather than NULL, but
+Oracle treats both identically. To get around this, the Oracle backend
+coerces the ``null=True`` option on fields that permit the empty string as a
+value. When fetching from the database, it is assumed that a NULL value in
+one of these fields really means the empty string, and the data is silently
+converted to reflect this assumption.
+
+``TextField`` limitations
+-------------------------
+
+The Oracle backend stores ``TextFields`` as ``NCLOB`` columns. Oracle imposes
+some limitations on the usage of such LOB columns in general:
+
+  * LOB columns may not be used as primary keys.
+
+  * LOB columns may not be used in indexes.
+
+  * LOB columns may not be used in a ``SELECT DISTINCT`` list. This means that
+    attempting to use the ``QuerySet.distinct`` method on a model that
+    includes ``TextField`` columns will result in an error when run against
+    Oracle. A workaround to this is to keep ``TextField`` columns out of any
+    models that you foresee performing ``distinct()`` queries on, and to
+    include the ``TextField`` in a related model instead.

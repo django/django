@@ -1,0 +1,902 @@
+.. _ref-models-fields:
+
+=====================
+Model field reference
+=====================
+
+.. module:: django.db.models.fields
+   :synopsis: Built-in field types.
+
+This document contains all the gory details about all the `field options`_ and
+`field types`_ Django's got to offer.
+
+.. seealso:: 
+
+    If the built-in fields don't do the trick, you can easily :ref:`write your
+    own custom model fields <howto-custom-model-fields>`.
+
+.. note::
+
+    Technically, these models are defined in :mod:`django.db.models.fields`, but
+    for convenience they're imported into :mod:`django.db.models`; the standard
+    convention is to use ``from django.db import models`` and refer to fields as
+    ``models.<Foo>Field``.
+
+.. _common-model-field-options:
+
+Field options
+=============
+
+The following arguments are available to all field types. All are optional.
+
+``null``
+--------
+
+.. attribute:: Field.null
+
+If ``True``, Django will store empty values as ``NULL`` in the database. Default
+is ``False``.
+
+Note that empty string values will always get stored as empty strings, not as
+``NULL``. Only use ``null=True`` for non-string fields such as integers,
+booleans and dates. For both types of fields, you will also need to set
+``blank=True`` if you wish to permit empty values in forms, as the
+:attr:`~Field.null` parameter only affects database storage (see
+:attr:`~Field.blank`).
+
+Avoid using :attr:`~Field.null` on string-based fields such as
+:class:`CharField` and :class:`TextField` unless you have an excellent reason.
+If a string-based field has ``null=True``, that means it has two possible values
+for "no data": ``NULL``, and the empty string. In most cases, it's redundant to
+have two possible values for "no data;" Django convention is to use the empty
+string, not ``NULL``.
+
+.. note::
+
+    When using the Oracle database backend, the ``null=True`` option will be
+    coerced for string-based fields that can blank, and the value ``NULL`` will
+    be stored to denote the empty string.
+
+``blank``
+---------
+
+.. attribute:: Field.blank
+
+If ``True``, the field is allowed to be blank. Default is ``False``.
+
+Note that this is different than :attr:`~Field.null`. :attr:`~Field.null` is
+purely database-related, whereas :attr:`~Field.blank` is validation-related. If
+a field has ``blank=True``, validation on Django's admin site will allow entry
+of an empty value. If a field has ``blank=False``, the field will be required.
+
+``choices``
+-----------
+
+.. attribute:: Field.choices
+
+An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
+field.
+
+If this is given, Django's admin will use a select box instead of the standard
+text field and will limit choices to the choices given.
+
+A choices list looks like this::
+
+    YEAR_IN_SCHOOL_CHOICES = (
+        ('FR', 'Freshman'),
+        ('SO', 'Sophomore'),
+        ('JR', 'Junior'),
+        ('SR', 'Senior'),
+        ('GR', 'Graduate'),
+    )
+
+The first element in each tuple is the actual value to be stored. The second
+element is the human-readable name for the option.
+
+The choices list can be defined either as part of your model class::
+
+    class Foo(models.Model):
+        GENDER_CHOICES = (
+            ('M', 'Male'),
+            ('F', 'Female'),
+        )
+        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+
+or outside your model class altogether::
+
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+    class Foo(models.Model):
+        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+
+You can also collect your available choices into named groups that can
+be used for organizational purposes::
+
+    MEDIA_CHOICES = (
+        ('Audio', (
+                ('vinyl', 'Vinyl'),
+                ('cd', 'CD'),
+            )
+        ),
+        ('Video', (
+                ('vhs', 'VHS Tape'),
+                ('dvd', 'DVD'),
+            )
+        ),
+        ('unknown', 'Unknown'),
+    )
+
+The first element in each tuple is the name to apply to the group. The 
+second element is an iterable of 2-tuples, with each 2-tuple containing
+a value and a human-readable name for an option. Grouped options may be 
+combined with ungrouped options within a single list (such as the 
+`unknown` option in this example).
+
+For each model field that has :attr:`~Field.choices` set, Django will add a
+method to retrieve the human-readable name for the field's current value. See
+:meth:`~django.db.models.Model.get_FOO_display` in the database API
+documentation.
+
+Finally, note that choices can be any iterable object -- not necessarily a list
+or tuple. This lets you construct choices dynamically. But if you find yourself
+hacking :attr:`~Field.choices` to be dynamic, you're probably better off using a
+proper database table with a :class:`ForeignKey`. :attr:`~Field.choices` is
+meant for static data that doesn't change much, if ever.
+
+``core``
+--------
+
+.. attribute:: Field.core
+
+For objects that are edited inline to a related object.
+
+In the Django admin, if all "core" fields in an inline-edited object are
+cleared, the object will be deleted.
+
+It is an error to have an inline-editable relation without at least one
+``core=True`` field.
+
+Please note that each field marked "core" is treated as a required field by the
+Django admin site. Essentially, this means you should put ``core=True`` on all
+required fields in your related object that is being edited inline.
+
+``db_column``
+-------------
+
+.. attribute:: Field.db_column
+
+The name of the database column to use for this field. If this isn't given,
+Django will use the field's name.
+
+If your database column name is an SQL reserved word, or contains
+characters that aren't allowed in Python variable names -- notably, the
+hyphen -- that's OK. Django quotes column and table names behind the
+scenes.
+
+``db_index``
+------------
+
+.. attribute:: Field.db_index
+
+If ``True``, djadmin:`django-admin.py sqlindexes <sqlindexes>` will output a
+``CREATE INDEX`` statement for this field.
+
+``db_tablespace``
+-----------------
+
+.. attribute:: Field.db_tablespace
+
+**New in Django development version**
+
+The name of the database tablespace to use for this field's index, if this field
+is indexed. The default is the project's :setting:`DEFAULT_INDEX_TABLESPACE`
+setting, if set, or the :attr:`~Field.db_tablespace` of the model, if any. If
+the backend doesn't support tablespaces, this option is ignored.
+
+``default``
+-----------
+
+.. attribute:: Field.default
+
+The default value for the field. This can be a value or a callable object. If
+callable it will be called every time a new object is created.
+
+``editable``
+------------
+
+.. attribute:: Field.editable
+
+If ``False``, the field will not be editable in the admin or via forms
+automatically generated from the model class. Default is ``True``.
+
+``help_text``
+-------------
+
+.. attribute:: Field.help_text
+
+Extra "help" text to be displayed under the field on the object's admin form.
+It's useful for documentation even if your object doesn't have an admin form.
+
+Note that this value is *not* HTML-escaped when it's displayed in the admin
+interface. This lets you include HTML in :attr:`~Field.help_text` if you so
+desire. For example::
+
+    help_text="Please use the following format: <em>YYYY-MM-DD</em>."
+
+Alternatively you can use plain text and
+``django.utils.html.escape()`` to escape any HTML special characters.
+
+``primary_key``
+---------------
+
+.. attribute:: Field.primary_key
+
+If ``True``, this field is the primary key for the model.
+
+If you don't specify ``primary_key=True`` for any fields in your model, Django
+will automatically add an :class:`IntegerField` to hold the primary key, so you
+don't need to set ``primary_key=True`` on any of your fields unless you want to
+override the default primary-key behavior. For more, see
+:ref:`automatic-primary-key-fields`.
+
+``primary_key=True`` implies :attr:`null=False <Field.null>` and :attr:`unique=True <Field.unique>`. 
+Only one primary key is allowed on an object.
+
+``unique``
+----------
+
+.. attribute:: Field.unique
+
+If ``True``, this field must be unique throughout the table.
+
+This is enforced at the database level and at the Django admin-form level. If
+you try to save a model with a duplicate value in a :attr:`~Field.unique`
+field, a :exc:`django.db.IntegrityError` will be raised by the model's
+:meth:`~django.db.models.Model.save` method.
+
+This options is valid on all field types except :class:`ManyToManyField`.
+
+``unique_for_date``
+-------------------
+
+.. attribute:: Field.unique_for_date
+
+Set this to the name of a :class:`DateField` or :class:`DateTimeField` to
+require that this field be unique for the value of the date field.
+
+For example, if you have a field ``title`` that has
+``unique_for_date="pub_date"``, then Django wouldn't allow the entry of two
+records with the same ``title`` and ``pub_date``.
+
+This is enforced at the Django admin-form level but not at the database level.
+
+``unique_for_month``
+--------------------
+
+.. attribute:: Field.unique_for_month
+
+Like :attr:`~Field.unique_for_date`, but requires the field to be unique with
+respect to the month.
+
+``unique_for_year``
+-------------------
+
+.. attribute:: Field.unique_for_year
+
+Like :attr:`~Field.unique_for_date` and :attr:`~Field.unique_for_month`.
+
+``validator_list``
+------------------
+
+.. attribute:: Field.validator_list
+
+A list of extra validators to apply to the field. Each should be a callable that
+takes the parameters ``field_data, all_data`` and raises
+:exc:`django.core.validators.ValidationError` for errors.
+
+.. _model-field-types:
+
+Field types
+===========
+   
+.. currentmodule:: django.db.models
+   
+``AutoField``
+-------------
+
+.. class:: AutoField(**options)
+
+An :class:`IntegerField` that automatically increments
+according to available IDs. You usually won't need to use this directly; a
+primary key field will automatically be added to your model if you don't specify
+otherwise. See :ref:`automatic-primary-key-fields`.
+
+``BooleanField``
+----------------
+
+.. class:: BooleanField(**options)
+
+A true/false field.
+
+The admin represents this as a checkbox.
+
+``CharField``
+-------------
+
+.. class:: CharField(max_length=None, [**options])
+
+A string field, for small- to large-sized strings.
+
+For large amounts of text, use :class:`~django.db.models.TextField`.
+
+The admin represents this as an ``<input type="text">`` (a single-line input).
+
+:class:`CharField` has one extra required argument:
+
+.. attribute:: CharField.max_length
+
+    The maximum length (in characters) of the field. The max_length is enforced
+    at the database level and in Django's validation.
+
+``CommaSeparatedIntegerField``
+------------------------------
+
+.. class:: CommaSeparatedIntegerField(max_length=None, [**options])
+
+A field of integers separated by commas. As in :class:`CharField`, the
+:attr:`~CharField.max_length` argument is required.
+
+``DateField``
+-------------
+
+.. class:: DateField([auto_now=False, auto_now_add=False, **options])
+
+A date field. Has a few extra optional arguments:
+
+.. attribute:: DateField.auto_now
+
+    Automatically set the field to now every time the object is saved. Useful
+    for "last-modified" timestamps. Note that the current date is *always* used;
+    it's not just a default value that you can override.
+
+.. attribute:: DateField.auto_now_add
+
+    Automatically set the field to now when the object is first created. Useful
+    for creation of timestamps. Note that the current date is *always* used;
+    it's not just a default value that you can override.
+
+The admin represents this as an ``<input type="text">`` with a JavaScript
+calendar, and a shortcut for "Today".  The JavaScript calendar will always start
+the week on a Sunday.
+
+``DateTimeField``
+-----------------
+
+.. class:: DateTimeField([auto_now=False, auto_now_add=False, **options])
+
+A date and time field. Takes the same extra options as :class:`DateField`.
+
+The admin represents this as two ``<input type="text">`` fields, with JavaScript
+shortcuts.
+
+``DecimalField``
+----------------
+
+**New in Django development version**
+
+.. class:: DecimalField(max_digits=None, decimal_places=None, [**options])
+
+A fixed-precision decimal number, represented in Python by a
+:class:`~decimal.Decimal` instance. Has two **required** arguments:
+
+.. attribute:: DecimalField.max_digits
+
+    The maximum number of digits allowed in the number
+
+.. attribute:: DecimalField.decimal_places
+
+    The number of decimal places to store with the number
+
+For example, to store numbers up to 999 with a resolution of 2 decimal places,
+you'd use::
+
+    models.DecimalField(..., max_digits=5, decimal_places=2)
+
+And to store numbers up to approximately one billion with a resolution of 10
+decimal places::
+
+    models.DecimalField(..., max_digits=19, decimal_places=10)
+
+The admin represents this as an ``<input type="text">`` (a single-line input).
+
+``EmailField``
+--------------
+
+.. class:: EmailField([max_length=75, **options])
+
+A :class:`CharField` that checks that the value is a valid e-mail address.
+
+In Django 0.96, this doesn't accept :attr:`~CharField.max_length`; its
+:class:`~CharField.max_length` is automatically set to 75. In the Django
+development version, :class:`~CharField.max_length` is set to 75 by default, but
+you can specify it to override default behavior.
+
+``FileField``
+-------------
+
+.. class:: FileField(upload_to=None, [max_length=100, **options])
+
+A file-upload field. Has one **required** argument:
+
+.. attribute:: FileField.upload_to
+    
+    A local filesystem path that will be appended to your :setting:`MEDIA_ROOT`
+    setting to determine the output of the ``get_<fieldname>_url()`` helper
+    function.
+
+    This path may contain `strftime formatting`_, which will be replaced by the
+    date/time of the file upload (so that uploaded files don't fill up the given
+    directory).
+    
+    **New in Django development version**
+
+    This may also be a callable, such as a function, which will be called to
+    obtain the upload path, including the filename. This callable must be
+    able to accept two arguments, and return a Unix-style path (with forward
+    slashes) to be passed along to the storage system. The two arguments that will
+    be passed are:
+    
+        ======================  ===============================================
+        Argument                Description                                    
+        ======================  ===============================================
+        ``instance``            An instance of the model where the 
+                                ``FileField`` is defined. More specifically,
+                                this is the particular instance where the
+                                current file is being attached.
+                                
+                                In most cases, this object will not have been
+                                saved to the database yet, so if it uses the
+                                default ``AutoField``, *it might not yet have a
+                                value for its primary key field*.
+    
+        ``filename``            The filename that was originally given to the 
+                                file. This may or may not be taken into account
+                                when determining the final destination path.
+        ======================  ===============================================
+    
+Also has one optional argument:
+
+.. attribute:: FileField.storage
+
+    **New in Django development version.**
+    
+    Optional. A storage object, which handles the storage and retrieval of your
+    files. See :ref:`topics-files` for details on how to provide this object.
+
+The admin represents this field as an ``<input type="file">`` (a file-upload
+widget).
+
+Using a :class:`FileField` or an :class:`ImageField` (see below) in a model
+takes a few steps:
+
+    1. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as the
+       full path to a directory where you'd like Django to store uploaded files.
+       (For performance, these files are not stored in the database.) Define
+       :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
+       that this directory is writable by the Web server's user account.
+
+    2. Add the :class:`FileField` or :class:`ImageField` to your model, making
+       sure to define the :attr:`~FileField.upload_to` option to tell Django to
+       which subdirectory of :setting:`MEDIA_ROOT` it should upload files.
+
+    3. All that will be stored in your database is a path to the file
+       (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
+       convenience ``get_<fieldname>_url`` function provided by Django. For
+       example, if your :class:`ImageField` is called ``mug_shot``, you can get
+       the absolute URL to your image in a template with ``{{
+       object.get_mug_shot_url }}``.
+
+For example, say your :setting:`MEDIA_ROOT` is set to ``'/home/media'``, and
+:attr:`~FileField.upload_to` is set to ``'photos/%Y/%m/%d'``. The ``'%Y/%m/%d'``
+part of :attr:`~FileField.upload_to` is `strftime formatting`_; ``'%Y'`` is the
+four-digit year, ``'%m'`` is the two-digit month and ``'%d'`` is the two-digit
+day. If you upload a file on Jan. 15, 2007, it will be saved in the directory
+``/home/media/photos/2007/01/15``.
+
+If you want to retrieve the upload file's on-disk filename, or a URL that refers
+to that file, or the file's size, you can use the ``File.name``, ``File.url``
+and ``File.size`` attributes; see :ref:`topics-files`.
+
+Note that whenever you deal with uploaded files, you should pay close attention
+to where you're uploading them and what type of files they are, to avoid
+security holes. *Validate all uploaded files* so that you're sure the files are
+what you think they are. For example, if you blindly let somebody upload files,
+without validation, to a directory that's within your Web server's document
+root, then somebody could upload a CGI or PHP script and execute that script by
+visiting its URL on your site. Don't allow that.
+
+**New in development version:** By default, :class:`FileField` instances are
+created as ``varchar(100)`` columns in your database. As with other fields, you
+can change the maximum length using the :attr:`~CharField.max_length` argument.
+
+.. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
+
+``FilePathField``
+-----------------
+
+.. class:: FilePathField(path=None, [match=None, recursive=False, max_length=100, **options])
+
+A :class:`CharField` whose choices are limited to the filenames in a certain
+directory on the filesystem. Has three special arguments, of which the first is
+**required**:
+
+.. attribute:: FilePathField.path
+
+    Required. The absolute filesystem path to a directory from which this
+    :class:`FilePathField` should get its choices. Example: ``"/home/images"``.
+
+.. attribute:: FilePathField.match
+
+    Optional. A regular expression, as a string, that :class:`FilePathField`
+    will use to filter filenames. Note that the regex will be applied to the
+    base filename, not the full path. Example: ``"foo.*\.txt$"``, which will
+    match a file called ``foo23.txt`` but not ``bar.txt`` or ``foo23.gif``.
+
+.. attribute:: FilePathField.recursive
+    
+    Optional. Either ``True`` or ``False``. Default is ``False``. Specifies
+    whether all subdirectories of :attr:`~FilePathField.path` should be included
+
+Of course, these arguments can be used together.
+
+The one potential gotcha is that :attr:`~FilePathField.match` applies to the
+base filename, not the full path. So, this example::
+
+    FilePathField(path="/home/images", match="foo.*", recursive=True)
+
+...will match ``/home/images/foo.gif`` but not ``/home/images/foo/bar.gif``
+because the :attr:`~FilePathField.match` applies to the base filename
+(``foo.gif`` and ``bar.gif``).
+
+**New in development version:** By default, :class:`FilePathField` instances are
+created as ``varchar(100)`` columns in your database. As with other fields, you
+can change the maximum length using the :attr:`~CharField.max_length` argument.
+
+``FloatField``
+--------------
+
+.. class:: FloatField([**options])
+
+**Changed in Django development version**
+
+A floating-point number represented in Python by a ``float`` instance.
+
+The admin represents this as an ``<input type="text">`` (a single-line input).
+
+**NOTE:** The semantics of :class:`FloatField` have changed in the Django
+development version. See the `Django 0.96 documentation`_ for the old behavior.
+
+.. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
+
+``ImageField``
+--------------
+
+.. class:: ImageField(upload_to-None, [height_field=None, width_field=None, max_length=100, **options])
+
+Like :class:`FileField`, but validates that the uploaded object is a valid
+image. Has two extra optional arguments:
+
+.. attribute:: ImageField.height_field
+
+    Name of a model field which will be auto-populated with the height of the
+    image each time the model instance is saved.
+
+.. attribute:: ImageField.width_field`
+
+    Name of a model field which will be auto-populated with the width of the
+    image each time the model instance is saved.
+    
+In addition to the special attributes that are available for :class:`FileField`,
+an :class:`ImageField` also has ``File.height`` and ``File.width`` attributes.
+See :ref:`topics-files`.
+
+Requires the `Python Imaging Library`_.
+
+.. _Python Imaging Library: http://www.pythonware.com/products/pil/
+
+**New in development version:** By default, :class:`ImageField` instances are
+created as ``varchar(100)`` columns in your database. As with other fields, you
+can change the maximum length using the :attr:`~CharField.max_length` argument.
+
+``IntegerField``
+----------------
+
+.. class:: IntegerField([**options])
+
+An integer. The admin represents this as an ``<input type="text">`` (a
+single-line input).
+
+``IPAddressField``
+------------------
+
+.. class:: IPAddressField([**options])
+
+An IP address, in string format (e.g. "192.0.2.30"). The admin represents this
+as an ``<input type="text">`` (a single-line input).
+
+``NullBooleanField``
+--------------------
+
+.. class:: NullBooleanField([**options])
+
+Like a :class:`BooleanField`, but allows ``NULL`` as one of the options. Use
+this instead of a :class:`BooleanField` with ``null=True``. The admin represents
+this as a ``<select>`` box with "Unknown", "Yes" and "No" choices.
+
+``PhoneNumberField``
+--------------------
+
+.. class:: PhoneNumberField([**options])
+
+A :class:`CharField` that checks that the value is a valid U.S.A.-style phone
+number (in the format ``XXX-XXX-XXXX``).
+
+``PositiveIntegerField``
+------------------------
+
+.. class:: PositiveIntegerField([**options])
+
+Like an :class:`IntegerField`, but must be positive.
+
+``PositiveSmallIntegerField``
+-----------------------------
+
+.. class:: PositiveIntegerField([**options])
+
+Like a :class:`PositiveIntegerField`, but only allows values under a certain
+(database-dependent) point.
+
+``SlugField``
+-------------
+
+.. class:: SlugField([max_length=50, **options])
+
+:term:`Slug` is a newspaper term. A slug is a short label for something,
+containing only letters, numbers, underscores or hyphens. They're generally used
+in URLs.
+
+Like a CharField, you can specify :attr:`~CharField.max_length`. If
+:attr:`~CharField.max_length` is not specified, Django will use a default length
+of 50.
+
+Implies setting :attr:`Field.db_index` to ``True``.
+
+``SmallIntegerField``
+---------------------
+
+.. class:: SmallIntegerField([**options])
+
+Like an :class:`IntegerField`, but only allows values under a certain
+(database-dependent) point.
+
+``TextField``
+-------------
+
+.. class:: TextField([**options])
+
+A large text field. The admin represents this as a ``<textarea>`` (a multi-line
+input).
+
+``TimeField``
+-------------
+
+.. class:: TimeField([auto_now=False, auto_now_add=False, **options])
+
+A time. Accepts the same auto-population options as :class:`DateField` and
+:class:`DateTimeField`. The admin represents this as an ``<input type="text">``
+with some JavaScript shortcuts.
+
+``URLField``
+------------
+
+.. class:: URLField([verify_exists=True, max_length=200, **options])
+
+A :class:`CharField` for a URL. Has one extra optional argument:
+
+.. attribute:: URLField.verify_exists
+
+    If ``True`` (the default), the URL given will be checked for existence
+    (i.e., the URL actually loads and doesn't give a 404 response).
+
+The admin represents this as an ``<input type="text">`` (a single-line input).
+
+Like all ::class:`CharField` subclasses, :class:`URLField` takes the optional
+:attr:`~CharField.max_length`argument. If you don't specify
+:attr:`~CharField.max_length`, a default of 200 is used.
+
+``USStateField``
+----------------
+
+.. class:: USStateField([**options])
+
+A two-letter U.S. state abbreviation. The admin represents this as an ``<input
+type="text">`` (a single-line input).
+
+``XMLField``
+------------
+
+.. class:: XMLField(schema_path=None, [**options])
+
+A :class:`TextField` that checks that the value is valid XML that matches a
+given schema. Takes one required argument:
+
+.. attribute:: schema_path
+
+    The filesystem path to a RelaxNG_ schema against which to validate the
+    field.
+
+.. _RelaxNG: http://www.relaxng.org/
+
+Relationship fields
+===================
+
+.. module:: django.db.models.fields.related
+   :synopsis: Related field types
+   
+.. currentmodule:: django.db.models
+
+Django also defines a set of fields that represent relations.
+
+.. _ref-foreignkey:
+
+``ForeignKey``
+--------------
+
+.. class:: ForeignKey(othermodel, [**options])
+
+A many-to-one relationship. Requires a positional argument: the class to which
+the model is related. 
+
+.. _recursive-relationships:
+
+To create a recursive relationship -- an object that has a many-to-one
+relationship with itself -- use ``models.ForeignKey('self')``.
+
+.. _lazy-relationships:
+
+If you need to create a relationship on a model that has not yet been defined,
+you can use the name of the model, rather than the model object itself::
+
+    class Car(models.Model):
+        manufacturer = models.ForeignKey('Manufacturer')
+        # ...
+
+    class Manufacturer(models.Model):
+        # ...
+
+Note, however, that this only refers to models in the same ``models.py`` file --
+you cannot use a string to reference a model defined in another application or
+imported from elsewhere.
+
+**New in Django development version:** To refer to models defined in another
+application, you must instead explicitly specify the application label. For
+example, if the ``Manufacturer`` model above is defined in another application
+called ``production``, you'd need to use::
+
+    class Car(models.Model):
+        manufacturer = models.ForeignKey('production.Manufacturer')
+
+Behind the scenes, Django appends ``"_id"`` to the field name to create its
+database column name. In the above example, the database table for the ``Car``
+model will have a ``manufacturer_id`` column. (You can change this explicitly by
+specifying :attr:`~Field.db_column`) However, your code should never have to
+deal with the database column name, unless you write custom SQL. You'll always
+deal with the field names of your model object.
+
+.. _foreign-key-arguments:
+
+:class:`ForeignKey` accepts an extra set of arguments -- all optional -- that
+define the details of how the relation works.
+
+.. attribute:: ForeignKey.limit_choices_to
+
+    A dictionary of lookup arguments and values (see :ref:`topics-db-queries`)
+    that limit the available admin choices for this object. Use this with
+    functions from the Python ``datetime`` module to limit choices of objects by
+    date. For example::
+
+        limit_choices_to = {'pub_date__lte': datetime.now}
+
+    only allows the choice of related objects with a ``pub_date`` before the
+    current date/time to be chosen.
+     
+    Instead of a dictionary this can also be a :class:`~django.db.models.Q`
+    object (an object with a :meth:`get_sql` method) for more complex queries.
+   
+    ``limit_choices_to`` has no effect on the inline FormSets that are created
+    to display related objects in the admin.
+   
+.. attribute:: ForeignKey.related_name
+
+    The name to use for the relation from the related object back to this one.
+    See the :ref:`related objects documentation <backwards-related-objects>` for
+    a full explanation and example.
+
+.. attribute:: ForeignKey.to_field
+
+    The field on the related object that the relation is to. By default, Django
+    uses the primary key of the related object.
+
+.. _ref-manytomany:
+
+``ManyToManyField``
+-------------------
+
+.. class:: ManyToManyField(othermodel, [**options])
+
+A many-to-many relationship. Requires a positional argument: the class to which
+the model is related. This works exactly the same as it does for
+:class:`ForeignKey`, including all the options regarding :ref:`recursive
+<recursive-relationships>` and :ref:`lazy <lazy-relationships>` relationships.
+
+Behind the scenes, Django creates an intermediary join table to represent the
+many-to-many relationship. By default, this table name is generated using the
+names of the two tables being joined. Since some databases don't support table
+names above a certain length (often 32 characters), these table names will be
+automatically truncated to 32 characters and a uniqueness hash will be used.
+This means you might see table names like ``author_books_9cdf4``; this is
+perfectly normal. You can manually provide the name of the join table using
+the :attr:`~ManyToManyField.db_table` option.
+
+.. _manytomany-arguments:
+
+:class:`ManyToManyField` accepts an extra set of arguments -- all optional --
+that control how the relationship functions.
+
+.. attribute:: ManyToManyField.related_name
+
+    Same as :attr:`ForeignKey.related_name`.
+    
+.. attribute:: ManyToManyFields.limit_choices_to
+
+    Same as :attr:`ForeignKey.limit_choices_to`.
+    
+    ``limit_choices_to`` has no effect when used on a ``ManyToManyField`` with
+    an intermediate table.
+
+.. attribute:: ManyToManyFields.symmetrical
+
+    Only used in the definition of ManyToManyFields on self. Consider the
+    following model::
+
+        class Person(models.Model):
+            friends = models.ManyToManyField("self")
+         
+    When Django processes this model, it identifies that it has a
+    :class:`ManyToManyField` on itself, and as a result, it doesn't add a
+    ``person_set`` attribute to the ``Person`` class. Instead, the
+    :class:`ManyToManyField` is assumed to be symmetrical -- that is, if I am
+    your friend, then you are my friend.
+    
+    If you do not want symmetry in many-to-many relationships with ``self``, set
+    :attr:`~ManyToManyField.symmetrical` to ``False``. This will force Django to
+    add the descriptor for the reverse relationship, allowing
+    :class:`ManyToManyField` relationships to be non-symmetrical.
+    
+.. attribute:: ManyToManyField.db_table
+
+    The name of the table to create for storing the many-to-many data. If this
+    is not provided, Django will assume a default name based upon the names of
+    the two tables being joined.
+
+``OneToOneField``
+-----------------
+
+.. class:: OneToOneField(othermodel, [**options])
+
+The semantics of one-to-one relationships will be changing soon, so we don't
+recommend you use them. If that doesn't scare you away, however,
+:class:`OneToOneField` takes the same options that :class:`ForeignKey` does,
+except for the various :attr:`~ForeignKey.edit_inline`-related options.

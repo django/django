@@ -1,0 +1,430 @@
+.. _ref-models-instances:
+
+========================
+Model instance reference
+========================
+
+.. currentmodule:: django.db.models
+   
+This document describes the details of the ``Model`` API. It builds on the
+material presented in the :ref:`model <topics-db-models>` and `database query
+<topics-db-queries>` guides, so you'll probably want to read and understand
+those documents before reading this one.
+
+Throughout this reference we'll use the :ref:`example weblog models
+<queryset-model-example>` presented in the :ref:`database query guide
+<topics-db-queries>`.
+
+Creating objects
+================
+
+To create a new instance of a model, just instantiate it like any other Python class:
+
+.. class:: Model(**kwargs)
+
+The keyword arguments to are simply the names of the fields you've defined on
+your model. Note that instantiating a model in no way touches your database; for
+that, you need to ``save()``.
+
+Saving objects
+==============
+
+To save an object back to the database, call ``save()``:
+
+.. method:: Model.save([raw=False])
+
+Of course, there's some subtleties; see the sections below.
+
+Auto-incrementing primary keys
+------------------------------
+
+If a model has an ``AutoField`` -- an auto-incrementing primary key -- then
+that auto-incremented value will be calculated and saved as an attribute on
+your object the first time you call ``save()``::
+
+    >>> b2 = Blog(name='Cheddar Talk', tagline='Thoughts on cheese.')
+    >>> b2.id     # Returns None, because b doesn't have an ID yet.
+    >>> b2.save()
+    >>> b2.id     # Returns the ID of your new object.
+
+There's no way to tell what the value of an ID will be before you call
+``save()``, because that value is calculated by your database, not by Django.
+
+(For convenience, each model has an ``AutoField`` named ``id`` by default
+unless you explicitly specify ``primary_key=True`` on a field. See the
+documentation for ``AutoField`` for more details.
+
+The ``pk`` property
+~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+.. attribute:: Model.pk
+
+Regardless of whether you define a primary key field yourself, or let Django
+supply one for you, each model will have a property called ``pk``. It behaves
+like a normal attribute on the model, but is actually an alias for whichever
+attribute is the primary key field for the model. You can read and set this
+value, just as you would for any other attribute, and it will update the
+correct field in the model.
+
+Explicitly specifying auto-primary-key values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If a model has an ``AutoField`` but you want to define a new object's ID
+explicitly when saving, just define it explicitly before saving, rather than
+relying on the auto-assignment of the ID::
+
+    >>> b3 = Blog(id=3, name='Cheddar Talk', tagline='Thoughts on cheese.')
+    >>> b3.id     # Returns 3.
+    >>> b3.save()
+    >>> b3.id     # Returns 3.
+
+If you assign auto-primary-key values manually, make sure not to use an
+already-existing primary-key value! If you create a new object with an explicit
+primary-key value that already exists in the database, Django will assume you're
+changing the existing record rather than creating a new one.
+
+Given the above ``'Cheddar Talk'`` blog example, this example would override the
+previous record in the database::
+
+    b4 = Blog(id=3, name='Not Cheddar', tagline='Anything but cheese.')
+    b4.save()  # Overrides the previous blog with ID=3!
+
+See `How Django knows to UPDATE vs. INSERT`_, below, for the reason this
+happens.
+
+Explicitly specifying auto-primary-key values is mostly useful for bulk-saving
+objects, when you're confident you won't have primary-key collision.
+
+What happens when you save?
+---------------------------
+
+When you save an object, Django performs the following steps:
+
+    1. **Emit a ``pre_save`` signal.** This provides a notification that
+       an object is about to be saved. You can register a listener that
+       will be invoked whenever this signal is emitted. (These signals are
+       not yet documented.)
+
+    2. **Pre-process the data.** Each field on the object is asked to
+       perform any automated data modification that the field may need
+       to perform.
+
+       Most fields do *no* pre-processing -- the field data is kept as-is.
+       Pre-processing is only used on fields that have special behavior.
+       For example, if your model has a ``DateField`` with ``auto_now=True``,
+       the pre-save phase will alter the data in the object to ensure that
+       the date field contains the current date stamp. (Our documentation
+       doesn't yet include a list of all the fields with this "special
+       behavior.")
+
+    3. **Prepare the data for the database.** Each field is asked to provide
+       its current value in a data type that can be written to the database.
+
+       Most fields require *no* data preparation. Simple data types, such as
+       integers and strings, are 'ready to write' as a Python object. However,
+       more complex data types often require some modification.
+
+       For example, ``DateFields`` use a Python ``datetime`` object to store
+       data. Databases don't store ``datetime`` objects, so the field value
+       must be converted into an ISO-compliant date string for insertion
+       into the database.
+
+    4. **Insert the data into the database.** The pre-processed, prepared
+       data is then composed into an SQL statement for insertion into the
+       database.
+
+    5. **Emit a ``post_save`` signal.** As with the ``pre_save`` signal, this
+       is used to provide notification that an object has been successfully
+       saved. (These signals are not yet documented.)
+
+Raw saves
+~~~~~~~~~
+
+**New in Django development version**
+
+The pre-processing step (#2 in the previous section) is useful, but it modifies
+the data stored in a field. This can cause problems if you're relying upon the
+data you provide being used as-is.
+
+For example, if you're setting up conditions for a test, you'll want the test
+conditions to be repeatable. If pre-processing is performed, the data used
+to specify test conditions may be modified, changing the conditions for the
+test each time the test is run.
+
+In cases such as this, you need to prevent pre-processing from being performed
+when you save an object. To do this, you can invoke a **raw save** by passing
+``raw=True`` as an argument to the ``save()`` method::
+
+    b4.save(raw=True) # Save object, but do no pre-processing
+
+A raw save skips the usual data pre-processing that is performed during the
+save. All other steps in the save (pre-save signal, data preparation, data
+insertion, and post-save signal) are performed as normal.
+
+.. admonition:: When to use a raw save
+
+    Generally speaking, you shouldn't need to use a raw save. Disabling field
+    pre-processing is an extraordinary measure that should only be required
+    in extraordinary circumstances, such as setting up reliable test
+    conditions.
+
+
+How Django knows to UPDATE vs. INSERT
+-------------------------------------
+
+You may have noticed Django database objects use the same ``save()`` method
+for creating and changing objects. Django abstracts the need to use ``INSERT``
+or ``UPDATE`` SQL statements. Specifically, when you call ``save()``, Django
+follows this algorithm:
+
+    * If the object's primary key attribute is set to a value that evaluates to
+      ``True`` (i.e., a value other than ``None`` or the empty string), Django
+      executes a ``SELECT`` query to determine whether a record with the given
+      primary key already exists.
+    * If the record with the given primary key does already exist, Django
+      executes an ``UPDATE`` query.
+    * If the object's primary key attribute is *not* set, or if it's set but a
+      record doesn't exist, Django executes an ``INSERT``.
+
+The one gotcha here is that you should be careful not to specify a primary-key
+value explicitly when saving new objects, if you cannot guarantee the
+primary-key value is unused. For more on this nuance, see `Explicitly specifying
+auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
+
+Forcing an INSERT or UPDATE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+In some rare circumstances, it's necessary to be able to force the ``save()``
+method to perform an SQL ``INSERT`` and not fall back to doing an ``UPDATE``.
+Or vice-versa: update, if possible, but not insert a new row. In these cases
+you can pass the ``force_insert=True`` or ``force_update=True`` parameters to
+the ``save()`` method. Passing both parameters is an error, since you cannot
+both insert *and* update at the same time.
+
+It should be very rare that you'll need to use these parameters. Django will
+almost always do the right thing and trying to override that will lead to
+errors that are difficult to track down. This feature is for advanced use
+only.
+
+.. _model-instance-methods:
+
+Other model instance methods
+============================
+
+A few object methods have special purposes.
+
+``__str__``
+-----------
+
+.. method:: Model.__str__()
+
+``__str__()`` is a Python "magic method" that defines what should be returned
+if you call ``str()`` on the object. Django uses ``str(obj)`` (or the related
+function, ``unicode(obj)`` -- see below) in a number of places, most notably
+as the value displayed to render an object in the Django admin site and as the
+value inserted into a template when it displays an object. Thus, you should
+always return a nice, human-readable string for the object's ``__str__``.
+Although this isn't required, it's strongly encouraged (see the description of
+``__unicode__``, below, before putting ``__str__`` methods everywhere).
+
+For example::
+
+    class Person(models.Model):
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
+
+        def __str__(self):
+            # Note use of django.utils.encoding.smart_str() here because
+            # first_name and last_name will be unicode strings.
+            return smart_str('%s %s' % (self.first_name, self.last_name))
+
+``__unicode__``
+---------------
+
+.. method:: Model.__unicode__()
+
+The ``__unicode__()`` method is called whenever you call ``unicode()`` on an
+object. Since Django's database backends will return Unicode strings in your
+model's attributes, you would normally want to write a ``__unicode__()``
+method for your model. The example in the previous section could be written
+more simply as::
+
+    class Person(models.Model):
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
+
+        def __unicode__(self):
+            return u'%s %s' % (self.first_name, self.last_name)
+
+If you define a ``__unicode__()`` method on your model and not a ``__str__()``
+method, Django will automatically provide you with a ``__str__()`` that calls
+``__unicode__()`` and then converts the result correctly to a UTF-8 encoded
+string object. This is recommended development practice: define only
+``__unicode__()`` and let Django take care of the conversion to string objects
+when required.
+
+``get_absolute_url``
+--------------------
+
+.. method:: Model.get_absolute_url()
+
+Define a ``get_absolute_url()`` method to tell Django how to calculate the
+URL for an object. For example::
+
+    def get_absolute_url(self):
+        return "/people/%i/" % self.id
+
+Django uses this in its admin interface. If an object defines
+``get_absolute_url()``, the object-editing page will have a "View on site"
+link that will jump you directly to the object's public view, according to
+``get_absolute_url()``.
+
+Also, a couple of other bits of Django, such as the :ref:`syndication feed
+framework <ref-contrib-syndication>`, use ``get_absolute_url()`` as a
+convenience to reward people who've defined the method.
+
+It's good practice to use ``get_absolute_url()`` in templates, instead of
+hard-coding your objects' URLs. For example, this template code is bad::
+
+    <a href="/people/{{ object.id }}/">{{ object.name }}</a>
+
+But this template code is good::
+
+    <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
+
+.. note::
+    The string you return from ``get_absolute_url()`` must contain only ASCII
+    characters (required by the URI spec, `RFC 2396`_) that have been
+    URL-encoded, if necessary. Code and templates using ``get_absolute_url()``
+    should be able to use the result directly without needing to do any
+    further processing. You may wish to use the
+    ``django.utils.encoding.iri_to_uri()`` function to help with this if you
+    are using unicode strings a lot.
+
+.. _RFC 2396: http://www.ietf.org/rfc/rfc2396.txt
+
+The ``permalink`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The problem with the way we wrote ``get_absolute_url()`` above is that it
+slightly violates the DRY principle: the URL for this object is defined both
+in the URLConf file and in the model.
+
+You can further decouple your models from the URLconf using the ``permalink``
+decorator:
+
+.. function:: django.db.models.permalink()
+
+This decorator is passed the view function, a list of positional parameters and
+(optionally) a dictionary of named parameters. Django then works out the correct
+full URL path using the URLconf, substituting the parameters you have given into
+the URL. For example, if your URLconf contained a line such as::
+
+    (r'^people/(\d+)/$', 'people.views.details'),
+
+...your model could have a ``get_absolute_url`` method that looked like this::
+
+    from django.db import models
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('people.views.details', [str(self.id)])
+
+Similarly, if you had a URLconf entry that looked like::
+
+    (r'/archive/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', archive_view)
+
+...you could reference this using ``permalink()`` as follows::
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('archive_view', (), {
+            'year': self.created.year,
+            'month': self.created.month,
+            'day': self.created.day})
+
+Notice that we specify an empty sequence for the second parameter in this case,
+because we only want to pass keyword parameters, not positional ones.
+
+In this way, you're tying the model's absolute URL to the view that is used
+to display it, without repeating the URL information anywhere. You can still
+use the ``get_absolute_url`` method in templates, as before.
+
+In some cases, such as the use of generic views or the re-use of
+custom views for multiple models, specifying the view function may
+confuse the reverse URL matcher (because multiple patterns point to
+the same view).
+
+For that problem, Django has **named URL patterns**. Using a named
+URL pattern, it's possible to give a name to a pattern, and then
+reference the name rather than the view function. A named URL
+pattern is defined by replacing the pattern tuple by a call to
+the ``url`` function)::
+
+    from django.conf.urls.defaults import *
+
+    url(r'^people/(\d+)/$',
+        'django.views.generic.list_detail.object_detail',
+        name='people_view'),
+
+...and then using that name to perform the reverse URL resolution instead
+of the view name::
+
+    from django.db.models import permalink
+
+    def get_absolute_url(self):
+        return ('people_view', [str(self.id)])
+    get_absolute_url = permalink(get_absolute_url)
+
+More details on named URL patterns are in the :ref:`URL dispatch documentation
+<topics-http-urls>`.
+
+Extra instance methods
+======================
+
+In addition to ``save()``, ``delete()``, a model object might get any or all
+of the following methods:
+
+get_FOO_display()
+-----------------
+
+For every field that has ``choices`` set, the object will have a
+``get_FOO_display()`` method, where ``FOO`` is the name of the field. This
+method returns the "human-readable" value of the field. For example, in the
+following model::
+
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+    class Person(models.Model):
+        name = models.CharField(max_length=20)
+        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+
+...each ``Person`` instance will have a ``get_gender_display()`` method. Example::
+
+    >>> p = Person(name='John', gender='M')
+    >>> p.save()
+    >>> p.gender
+    'M'
+    >>> p.get_gender_display()
+    'Male'
+
+get_next_by_FOO(\**kwargs) and get_previous_by_FOO(\**kwargs)
+-------------------------------------------------------------
+
+For every ``DateField`` and ``DateTimeField`` that does not have ``null=True``,
+the object will have ``get_next_by_FOO()`` and ``get_previous_by_FOO()``
+methods, where ``FOO`` is the name of the field. This returns the next and
+previous object with respect to the date field, raising the appropriate
+``DoesNotExist`` exception when appropriate.
+
+Both methods accept optional keyword arguments, which should be in the format
+described in :ref:`Field lookups <field-lookups>`.
+
+Note that in the case of identical date values, these methods will use the ID
+as a fallback check. This guarantees that no records are skipped or duplicated.

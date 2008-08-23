@@ -1,0 +1,259 @@
+.. _topics-install:
+
+=====================
+How to install Django
+=====================
+
+This document will get you up and running with Django.
+
+Install Python
+==============
+
+Being a Python Web framework, Django requires Python.
+
+It works with any Python version 2.3 and higher.
+
+Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
+probably already have it installed.
+
+Install Apache and mod_python
+=============================
+
+If you just want to experiment with Django, skip ahead to the next
+section; Django includes a lightweight web server you can use for
+testing, so you won't need to set up Apache until you're ready to
+deploy Django in production.
+
+If you want to use Django on a production site, use Apache with `mod_python`_.
+mod_python is similar to mod_perl -- it embeds Python within Apache and loads
+Python code into memory when the server starts. Code stays in memory throughout
+the life of an Apache process, which leads to significant performance gains
+over other server arrangements. Make sure you have Apache installed, with the
+mod_python module activated. Django requires Apache 2.x and mod_python 3.x.
+
+See :ref:`How to use Django with mod_python <howto-deployment-modpython>` for
+information on how to configure mod_python once you have it installed.
+
+If you can't use mod_python for some reason, fear not: Django follows the WSGI_
+spec, which allows it to run on a variety of server platforms. See the
+`server-arrangements wiki page`_ for specific installation instructions for
+each platform.
+
+.. _Apache: http://httpd.apache.org/
+.. _mod_python: http://www.modpython.org/
+.. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
+
+.. _database-installation:
+
+Get your database running
+=========================
+
+If you plan to use Django's database API functionality, you'll need to
+make sure a database server is running. Django works with PostgreSQL_,
+MySQL_, Oracle_ and SQLite_ (although SQLite doesn't require a separate server
+to be running).
+
+Additionally, you'll need to make sure your Python database bindings are
+installed.
+
+* If you're using PostgreSQL, you'll need the psycopg_ package. Django supports
+  both version 1 and 2. (When you configure Django's database layer, specify
+  either ``postgresql`` [for version 1] or ``postgresql_psycopg2`` [for version 2].)
+
+  If you're on Windows, check out the unofficial `compiled Windows version`_.
+
+* If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher. You
+  will also want to read the database-specific notes for the :ref:`MySQL
+  backend <ref-databases>`.
+
+* If you're using SQLite and either Python 2.3 or Python 2.4, you'll need
+  pysqlite_. Use version 2.0.3 or higher. Python 2.5 ships with an SQLite
+  wrapper in the standard library, so you don't need to install anything extra
+  in that case.
+
+* If you're using Oracle, you'll need cx_Oracle_, version 4.3.1 or higher. You
+  will also want to read the database-specific notes for the :ref:`Oracle
+  backend <oracle-notes>`.
+
+If you plan to use Django's ``manage.py syncdb`` command to
+automatically create database tables for your models, you'll need to
+ensure that Django has permission to create and alter tables in the
+database you're using; if you plan to manually create the tables, you
+can simply grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
+``DELETE`` permissions. On some databases, Django will need
+``ALTER TABLE`` privileges during ``syncdb`` but won't issue
+``ALTER TABLE`` statements on a table once ``syncdb`` has created it.
+
+If you're using Django's :ref:`testing framework<topics-testing>` to test database queries,
+Django will need permission to create a test database.
+
+.. _PostgreSQL: http://www.postgresql.org/
+.. _MySQL: http://www.mysql.com/
+.. _Django's ticket system: http://code.djangoproject.com/report/1
+.. _psycopg: http://initd.org/tracker/psycopg
+.. _compiled Windows version: http://stickpeople.com/projects/python/win-psycopg/
+.. _MySQLdb: http://sourceforge.net/projects/mysql-python
+.. _SQLite: http://www.sqlite.org/
+.. _pysqlite: http://initd.org/tracker/pysqlite
+.. _cx_Oracle: http://cx-oracle.sourceforge.net/
+.. _Oracle: http://www.oracle.com/
+
+.. _removing-old-versions-of-django:
+
+Remove any old versions of Django
+=================================
+
+If you are upgrading your installation of Django from a previous version,
+you will need to uninstall the old Django version before installing the
+new version.
+
+If you installed Django using ``setup.py install``, uninstalling
+is as simple as deleting the ``django`` directory from your Python
+``site-packages``.
+
+If you installed Django from a Python egg, remove the Django ``.egg`` file,
+and remove the reference to the egg in the file named ``easy-install.pth``.
+This file should also be located in your ``site-packages`` directory.
+
+.. admonition:: Where are my ``site-packages`` stored?
+
+    The location of the ``site-packages`` directory depends on the operating
+    system, and the location in which Python was installed. To find out your
+    system's ``site-packages`` location, execute the following:
+    
+    .. code-block:: bash
+
+        python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
+
+    (Note that this should be run from a shell prompt, not a Python interactive
+    prompt.)
+
+Install the Django code
+=======================
+
+Installation instructions are slightly different depending on whether you're
+installing a distribution-specific package, downloading the latest official
+release, or fetching the latest development version.
+
+It's easy, no matter which way you choose.
+
+Installing a distribution-specific package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Check the :ref:`distribution specific notes <misc-distributions>` to see if your
+platform/distribution provides official Django packages/installers.
+Distribution-provided packages will typically allow for automatic installation
+of dependencies and easy upgrade paths.
+
+.. _installing-official-release:
+
+Installing an official release
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    1. Download the latest release from our `download page`_.
+
+    2. Untar the downloaded file (e.g. ``tar xzvf Django-NNN.tar.gz``,
+       where ``NNN`` is the version number of the latest release).
+       If you're using Windows, you can download the command-line tool
+       bsdtar_ to do this, or you can use a GUI-based tool such as 7-zip_.
+
+    3. Change into the directory created in step 2 (e.g. ``cd Django-NNN``).
+
+    4. If you're using Linux, Mac OS X or some other flavor of Unix, enter
+       the command ``sudo python setup.py install`` at the shell prompt.
+       If you're using Windows, start up a command shell with administrator
+       privileges and run the command ``setup.py install``.
+
+These commands will install Django in your Python installation's
+``site-packages`` directory.
+
+.. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
+.. _7-zip: http://www.7-zip.org/
+
+.. _installing-development-version:
+
+Installing the development version
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. admonition:: Tracking Django development
+    
+    If you decide to use the latest development version of Django,
+    you'll want to pay close attention to `the development timeline`_,
+    and you'll want to keep an eye on `the list of
+    backwards-incompatible changes`_. This will help you stay on top
+    of any new features you might want to use, as well as any changes
+    you'll need to make to your code when updating your copy of Django.
+    (For stable releases, any necessary changes are documented in the
+    release notes.)
+
+.. _the development timeline: http://code.djangoproject.com/timeline
+.. _the list of backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+
+If you'd like to be able to update your Django code occasionally with the
+latest bug fixes and improvements, follow these instructions:
+
+1. Make sure that you have Subversion_ installed, and that you can run its
+   commands from a shell. (Enter ``svn help`` at a shell prompt to test
+   this.)
+
+2. Check out Django's main development branch (the 'trunk') like so:
+
+   .. code-block:: bash
+
+       svn co http://code.djangoproject.com/svn/django/trunk/ django-trunk
+
+3. Next, make sure that the Python interpreter can load Django's code. There
+   are various ways of accomplishing this.  One of the most convenient, on
+   Linux, Mac OSX or other Unix-like systems, is to use a symbolic link:
+   
+   .. code-block:: bash
+
+       ln -s `pwd`/django-trunk/django SITE-PACKAGES-DIR/django
+
+   (In the above line, change ``SITE-PACKAGES-DIR`` to match the location of
+   your system's ``site-packages`` directory, as explained in the
+   "Where are my ``site-packages`` stored?" section above.)
+
+   Alternatively, you can define your ``PYTHONPATH`` environment variable
+   so that it includes the ``django-trunk`` directory. This is perhaps the
+   most convenient solution on Windows systems, which don't support symbolic
+   links. (Environment variables can be defined on Windows systems `from the
+   Control Panel`_.)
+
+   .. admonition:: What about Apache and mod_python?
+
+      If you take the approach of setting ``PYTHONPATH``, you'll need to
+      remember to do the same thing in your Apache configuration once you
+      deploy your production site. Do this by setting ``PythonPath`` in your
+      Apache configuration file.
+
+      More information about deployment is available, of course, in our
+      :ref:`How to use Django with mod_python <howto-deployment-modpython>`
+      documentation.
+
+4. On Unix-like systems, create a symbolic link to the file
+   ``django-trunk/django/bin/django-admin.py`` in a directory on your system
+   path, such as ``/usr/local/bin``. For example:
+   
+   .. code-block:: bash
+
+       ln -s `pwd`/django-trunk/django/bin/django-admin.py /usr/local/bin
+
+   This simply lets you type ``django-admin.py`` from within any directory,
+   rather than having to qualify the command with the full path to the file.
+
+   On Windows systems, the same result can be achieved by copying the file
+   ``django-trunk/django/bin/django-admin.py`` to somewhere on your system
+   path, for example ``C:\Python24\Scripts``.
+
+You *don't* have to run ``python setup.py install``, because you've already
+carried out the equivalent actions in steps 3 and 4.
+
+When you want to update your copy of the Django source code, just run the
+command ``svn update`` from within the ``django-trunk`` directory. When you do
+this, Subversion will automatically download any changes.
+
+.. _`download page`: http://www.djangoproject.com/download/
+.. _Subversion: http://subversion.tigris.org/
+.. _from the Control Panel: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/en-us/sysdm_advancd_environmnt_addchange_variable.mspx

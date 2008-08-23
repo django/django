@@ -1,0 +1,1177 @@
+.. _ref-settings:
+
+Available settings
+==================
+
+Here's a full list of all available settings, in alphabetical order, and their
+default values.
+
+.. setting:: ABSOLUTE_URL_OVERRIDES
+
+ABSOLUTE_URL_OVERRIDES
+----------------------
+
+Default: ``{}`` (Empty dictionary)
+
+A dictionary mapping ``"app_label.model_name"`` strings to functions that take
+a model object and return its URL. This is a way of overriding
+``get_absolute_url()`` methods on a per-installation basis. Example::
+
+    ABSOLUTE_URL_OVERRIDES = {
+        'blogs.weblog': lambda o: "/blogs/%s/" % o.slug,
+        'news.story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
+    }
+
+Note that the model name used in this setting should be all lower-case, regardless
+of the case of the actual model class name.
+
+.. setting:: ADMIN_FOR
+
+ADMIN_FOR
+---------
+
+Default: ``()`` (Empty tuple)
+
+Used for admin-site settings modules, this should be a tuple of settings
+modules (in the format ``'foo.bar.baz'``) for which this site is an admin.
+
+The admin site uses this in its automatically-introspected documentation of
+models, views and template tags.
+
+.. setting:: ADMIN_MEDIA_PREFIX
+
+ADMIN_MEDIA_PREFIX
+------------------
+
+Default: ``'/media/'``
+
+The URL prefix for admin media -- CSS, JavaScript and images used by
+the Django administrative interface. Make sure to use a trailing
+slash, and to have this be different from the ``MEDIA_URL`` setting
+(since the same URL cannot be mapped onto two different sets of
+files).
+
+.. setting:: ADMINS
+
+ADMINS
+------
+
+Default: ``()`` (Empty tuple)
+
+A tuple that lists people who get code error notifications. When
+``DEBUG=False`` and a view raises an exception, Django will e-mail these people
+with the full exception information. Each member of the tuple should be a tuple
+of (Full name, e-mail address). Example::
+
+    (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
+
+Note that Django will e-mail *all* of these people whenever an error happens.
+See :ref:`howto-error-reporting` for more information.
+
+.. setting:: ALLOWED_INCLUDE_ROOTS
+
+ALLOWED_INCLUDE_ROOTS
+---------------------
+
+Default: ``()`` (Empty tuple)
+
+A tuple of strings representing allowed prefixes for the ``{% ssi %}`` template
+tag. This is a security measure, so that template authors can't access files
+that they shouldn't be accessing.
+
+For example, if ``ALLOWED_INCLUDE_ROOTS`` is ``('/home/html', '/var/www')``,
+then ``{% ssi /home/html/foo.txt %}`` would work, but ``{% ssi /etc/passwd %}``
+wouldn't.
+
+.. setting:: APPEND_SLASH
+
+APPEND_SLASH
+------------
+
+Default: ``True``
+
+Whether to append trailing slashes to URLs. This is only used if
+``CommonMiddleware`` is installed (see :ref:`topics-http-middleware`). See also
+``PREPEND_WWW``.
+
+.. setting:: AUTHENTICATION_BACKENDS
+
+AUTHENTICATION_BACKENDS
+-----------------------
+
+Default: ``('django.contrib.auth.backends.ModelBackend',)``
+
+A tuple of authentication backend classes (as strings) to use when attempting to
+authenticate a user. See the :ref:`authentication backends documentation
+<authentication-backends>` for details.
+
+.. setting:: AUTH_PROFILE_MODULE
+
+AUTH_PROFILE_MODULE
+-------------------
+
+Default: Not defined
+
+The site-specific user profile model used by this site. See
+:ref:`auth-profiles`.
+
+.. setting:: CACHE_BACKEND
+
+CACHE_BACKEND
+-------------
+
+Default: ``'locmem://'``
+
+The cache backend to use. See :ref:`topics-cache`.
+
+.. setting:: CACHE_MIDDLEWARE_KEY_PREFIX
+
+CACHE_MIDDLEWARE_KEY_PREFIX
+---------------------------
+
+Default: ``''`` (Empty string)
+
+The cache key prefix that the cache middleware should use. See
+:ref:`topics-cache`.
+
+.. setting:: CACHE_MIDDLEWARE_SECONDS
+
+CACHE_MIDDLEWARE_SECONDS
+------------------------
+
+Default: ``600``
+
+The default number of seconds to cache a page when the caching middleware or
+``cache_page()`` decorator is used.
+
+.. setting:: DATABASE_ENGINE
+
+DATABASE_ENGINE
+---------------
+
+Default: ``''`` (Empty string)
+
+The database backend to use. The build-in database backends are
+``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'sqlite3'``, and
+``'oracle'``.
+
+In the Django development version, you can use a database backend that doesn't
+ship with Django by setting ``DATABASE_ENGINE`` to a fully-qualified path (i.e.
+``mypackage.backends.whatever``). Writing a whole new database backend from
+scratch is left as an exercise to the reader; see the other backends for
+examples.
+
+.. setting:: DATABASE_HOST
+
+DATABASE_HOST
+-------------
+
+Default: ``''`` (Empty string)
+
+Which host to use when connecting to the database. An empty string means
+localhost. Not used with SQLite.
+
+If this value starts with a forward slash (``'/'``) and you're using MySQL,
+MySQL will connect via a Unix socket to the specified socket. For example::
+
+    DATABASE_HOST = '/var/run/mysql'
+
+If you're using MySQL and this value *doesn't* start with a forward slash, then
+this value is assumed to be the host.
+
+If you're using PostgreSQL, an empty string means to use a Unix domain socket
+for the connection, rather than a network connection to localhost. If you
+explicitly need to use a TCP/IP connection on the local machine with
+PostgreSQL, specify ``localhost`` here.
+
+.. setting:: DATABASE_NAME
+
+DATABASE_NAME
+-------------
+
+Default: ``''`` (Empty string)
+
+The name of the database to use. For SQLite, it's the full path to the database
+file.
+
+.. setting:: DATABASE_OPTIONS
+
+DATABASE_OPTIONS
+----------------
+
+Default: ``{}`` (Empty dictionary)
+
+Extra parameters to use when connecting to the database. Consult backend
+module's document for available keywords.
+
+.. setting:: DATABASE_PASSWORD
+
+DATABASE_PASSWORD
+-----------------
+
+Default: ``''`` (Empty string)
+
+The password to use when connecting to the database. Not used with SQLite.
+
+.. setting:: DATABASE_PORT
+
+DATABASE_PORT
+-------------
+
+Default: ``''`` (Empty string)
+
+The port to use when connecting to the database. An empty string means the
+default port. Not used with SQLite.
+
+.. setting:: DATABASE_USER
+   
+DATABASE_USER
+-------------
+
+Default: ``''`` (Empty string)
+
+The username to use when connecting to the database. Not used with SQLite.
+
+.. setting:: DATE_FORMAT
+
+DATE_FORMAT
+-----------
+
+Default: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
+
+The default formatting to use for date fields on Django admin change-list
+pages -- and, possibly, by other parts of the system. See
+:ttag:`allowed date format strings <now>`.
+
+See also ``DATETIME_FORMAT``, ``TIME_FORMAT``, ``YEAR_MONTH_FORMAT``
+and ``MONTH_DAY_FORMAT``.
+
+.. setting:: DATETIME_FORMAT
+   
+DATETIME_FORMAT
+---------------
+
+Default: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
+
+The default formatting to use for datetime fields on Django admin change-list
+pages -- and, possibly, by other parts of the system. See
+:ttag:`allowed date format strings <now>`.
+
+See also ``DATE_FORMAT``, ``DATETIME_FORMAT``, ``TIME_FORMAT``,
+``YEAR_MONTH_FORMAT`` and ``MONTH_DAY_FORMAT``.
+
+.. setting:: DEBUG
+
+DEBUG
+-----
+
+Default: ``False``
+
+A boolean that turns on/off debug mode.
+
+If you define custom settings, django/views/debug.py has a ``HIDDEN_SETTINGS``
+regular expression which will hide from the DEBUG view anything that contains
+``'SECRET'``, ``'PASSWORD'``, or ``'PROFANITIES'``. This allows untrusted users to
+be able to give backtraces without seeing sensitive (or offensive) settings.
+
+Still, note that there are always going to be sections of your debug output that
+are inappropriate for public consumption. File paths, configuration options, and
+the like all give attackers extra information about your server.
+
+It is also important to remember that when running with ``DEBUG`` turned on, Django
+will remember every SQL query it executes. This is useful when you are debugging,
+but on a production server, it will rapidly consume memory.
+
+Never deploy a site into production with ``DEBUG`` turned on.
+
+DEBUG_PROPAGATE_EXCEPTIONS
+--------------------------
+
+**New in Django development version**
+
+Default: ``False``
+
+If set to True, Django's normal exception handling of view functions
+will be suppressed, and exceptions will propagate upwards.  This can
+be useful for some test setups, and should never be used on a live
+site.
+
+
+.. setting:: DEFAULT_CHARSET
+
+DEFAULT_CHARSET
+---------------
+
+Default: ``'utf-8'``
+
+Default charset to use for all ``HttpResponse`` objects, if a MIME type isn't
+manually specified. Used with ``DEFAULT_CONTENT_TYPE`` to construct the
+``Content-Type`` header.
+
+.. setting:: DEFAULT_CONTENT_TYPE
+
+DEFAULT_CONTENT_TYPE
+--------------------
+
+Default: ``'text/html'``
+
+Default content type to use for all ``HttpResponse`` objects, if a MIME type
+isn't manually specified. Used with ``DEFAULT_CHARSET`` to construct the
+``Content-Type`` header.
+
+.. setting:: DEFAULT_FROM_EMAIL
+
+DEFAULT_FILE_STORAGE
+--------------------
+
+Default: ``django.core.files.storage.FileSystemStorage``
+
+Default file storage class to be used for any file-related operations that don't
+specify a particular storage system. See :ref:`topics-files`.
+
+DEFAULT_FROM_EMAIL
+------------------
+
+Default: ``'webmaster@localhost'``
+
+Default e-mail address to use for various automated correspondence from the
+site manager(s).
+
+.. setting:: DEFAULT_TABLESPACE
+
+DEFAULT_TABLESPACE
+------------------
+
+**New in Django development version**
+
+Default: ``''`` (Empty string)
+
+Default tablespace to use for models that don't specify one, if the
+backend supports it.
+
+.. setting:: DEFAULT_INDEX_TABLESPACE
+
+DEFAULT_INDEX_TABLESPACE
+------------------------
+
+**New in Django development version**
+
+Default: ``''`` (Empty string)
+
+Default tablespace to use for indexes on fields that don't specify
+one, if the backend supports it.
+
+.. setting:: DISALLOWED_USER_AGENTS
+
+DISALLOWED_USER_AGENTS
+----------------------
+
+Default: ``()`` (Empty tuple)
+
+List of compiled regular expression objects representing User-Agent strings that
+are not allowed to visit any page, systemwide. Use this for bad robots/crawlers.
+This is only used if ``CommonMiddleware`` is installed (see
+:ref:`topics-http-middleware`).
+
+.. setting:: EMAIL_HOST
+
+EMAIL_HOST
+----------
+
+Default: ``'localhost'``
+
+The host to use for sending e-mail.
+
+See also ``EMAIL_PORT``.
+
+.. setting:: EMAIL_HOST_PASSWORD
+
+EMAIL_HOST_PASSWORD
+-------------------
+
+Default: ``''`` (Empty string)
+
+Password to use for the SMTP server defined in ``EMAIL_HOST``. This setting is
+used in conjunction with ``EMAIL_HOST_USER`` when authenticating to the SMTP
+server. If either of these settings is empty, Django won't attempt
+authentication.
+
+See also ``EMAIL_HOST_USER``.
+
+.. setting:: EMAIL_HOST_USER
+
+EMAIL_HOST_USER
+---------------
+
+Default: ``''`` (Empty string)
+
+Username to use for the SMTP server defined in ``EMAIL_HOST``. If empty,
+Django won't attempt authentication.
+
+See also ``EMAIL_HOST_PASSWORD``.
+
+.. setting:: EMAIL_PORT
+
+EMAIL_PORT
+----------
+
+Default: ``25``
+
+Port to use for the SMTP server defined in ``EMAIL_HOST``.
+
+.. setting:: EMAIL_SUBJECT_PREFIX
+
+EMAIL_SUBJECT_PREFIX
+--------------------
+
+Default: ``'[Django] '``
+
+Subject-line prefix for e-mail messages sent with ``django.core.mail.mail_admins``
+or ``django.core.mail.mail_managers``. You'll probably want to include the
+trailing space.
+
+.. setting:: EMAIL_USE_TLS
+
+EMAIL_USE_TLS
+-------------
+
+**New in Django development version**
+
+Default: ``False``
+
+Whether to use a TLS (secure) connection when talking to the SMTP server.
+
+.. setting:: FILE_CHARSET
+
+FILE_CHARSET
+------------
+
+**New in Django development version**
+
+Default: ``'utf-8'``
+
+The character encoding used to decode any files read from disk. This includes
+template files and initial SQL data files.
+
+FILE_UPLOAD_HANDLERS
+--------------------
+
+**New in Django development version**
+
+Default::
+
+    ("django.core.files.uploadhandler.MemoryFileUploadHandler",
+     "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
+
+A tuple of handlers to use for uploading. See :ref:`topics-files` for details.
+
+FILE_UPLOAD_MAX_MEMORY_SIZE
+---------------------------
+
+**New in Django development version**
+
+Default: ``2621440`` (i.e. 2.5 MB).
+
+The maximum size (in bytes) that an upload will be before it gets streamed to
+the file system. See :ref:`topics-files` for details.
+
+FILE_UPLOAD_TEMP_DIR
+--------------------
+
+**New in Django development version**
+
+Default: ``None``
+
+The directory to store data temporarily while uploading files. If ``None``,
+Django will use the standard temporary directory for the operating system. For
+example, this will default to '/tmp' on \*nix-style operating systems.
+
+See :ref:`topics-files` for details.
+
+.. setting:: FIXTURE_DIRS
+
+FIXTURE_DIRS
+-------------
+
+Default: ``()`` (Empty tuple)
+
+List of locations of the fixture data files, in search order. Note that
+these paths should use Unix-style forward slashes, even on Windows. See
+:ref:`topics-testing`.
+
+FORCE_SCRIPT_NAME
+------------------
+
+Default: ``None``
+
+If not ``None``, this will be used as the value of the ``SCRIPT_NAME``
+environment variable in any HTTP request. This setting can be used to override
+the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
+of the preferred value or not supplied at all.
+
+.. setting:: IGNORABLE_404_ENDS
+
+IGNORABLE_404_ENDS
+------------------
+
+Default: ``('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'favicon.ico', '.php')``
+
+See also ``IGNORABLE_404_STARTS`` and ``Error reporting via e-mail``.
+
+.. setting:: IGNORABLE_404_STARTS
+
+IGNORABLE_404_STARTS
+--------------------
+
+Default: ``('/cgi-bin/', '/_vti_bin', '/_vti_inf')``
+
+A tuple of strings that specify beginnings of URLs that should be ignored by
+the 404 e-mailer. See ``SEND_BROKEN_LINK_EMAILS``, ``IGNORABLE_404_ENDS`` and
+the :ref:`howto-error-reporting`.
+
+.. setting:: INSTALLED_APPS
+
+INSTALLED_APPS
+--------------
+
+Default: ``()`` (Empty tuple)
+
+A tuple of strings designating all applications that are enabled in this Django
+installation. Each string should be a full Python path to a Python package that
+contains a Django application, as created by :djadmin:`django-admin.py startapp
+<startapp>`.
+
+.. setting:: INTERNAL_IPS
+
+INTERNAL_IPS
+------------
+
+Default: ``()`` (Empty tuple)
+
+A tuple of IP addresses, as strings, that:
+
+    * See debug comments, when ``DEBUG`` is ``True``
+    * Receive X headers if the ``XViewMiddleware`` is installed (see
+      :ref:`topics-http-middleware`)
+
+.. setting:: JING_PATH
+
+JING_PATH
+---------
+
+Default: ``'/usr/bin/jing'``
+
+Path to the "Jing" executable. Jing is a RELAX NG validator, and Django uses it
+to validate each ``XMLField`` in your models.
+See http://www.thaiopensource.com/relaxng/jing.html .
+
+.. setting:: LANGUAGE_CODE
+
+LANGUAGE_CODE
+-------------
+
+Default: ``'en-us'``
+
+A string representing the language code for this installation. This should be in
+standard language format. For example, U.S. English is ``"en-us"``. See
+:ref:`topics-i18n`.
+
+.. setting:: LANGUAGE_COOKIE_NAME
+
+LANGUAGE_COOKIE_NAME
+--------------------
+
+**New in Django development version**
+
+Default: ``'django_language'``
+
+The name of the cookie to use for the language cookie. This can be whatever you
+want (but should be different from ``SESSION_COOKIE_NAME``). See
+:ref:`topics-i18n`.
+
+.. setting:: LANGUAGES
+
+LANGUAGES
+---------
+
+Default: A tuple of all available languages. This list is continually growing
+and including a copy here would inevitably become rapidly out of date. You can
+see the current list of translated languages by looking in
+``django/conf/global_settings.py`` (or view the `online source`_).
+
+.. _online source: http://code.djangoproject.com/browser/django/trunk/django/conf/global_settings.py
+
+The list is a tuple of two-tuples in the format (language code, language
+name) -- for example, ``('ja', 'Japanese')``. This specifies which languages
+are available for language selection. See :ref:`topics-i18n`.
+
+Generally, the default value should suffice. Only set this setting if you want
+to restrict language selection to a subset of the Django-provided languages.
+
+If you define a custom ``LANGUAGES`` setting, it's OK to mark the languages as
+translation strings (as in the default value displayed above) -- but use a
+"dummy" ``gettext()`` function, not the one in ``django.utils.translation``.
+You should *never* import ``django.utils.translation`` from within your
+settings file, because that module in itself depends on the settings, and that
+would cause a circular import.
+
+The solution is to use a "dummy" ``gettext()`` function. Here's a sample
+settings file::
+
+    gettext = lambda s: s
+
+    LANGUAGES = (
+        ('de', gettext('German')),
+        ('en', gettext('English')),
+    )
+
+With this arrangement, ``django-admin.py makemessages`` will still find and
+mark these strings for translation, but the translation won't happen at
+runtime -- so you'll have to remember to wrap the languages in the *real*
+``gettext()`` in any code that uses ``LANGUAGES`` at runtime.
+
+.. setting:: LOCALE_PATHS
+
+LOCALE_PATHS
+------------
+
+Default: ``()`` (Empty tuple)
+
+A tuple of directories where Django looks for translation files.
+See :ref:`translations-in-your-own-projects`.
+
+.. setting:: LOGIN_REDIRECT_URL
+
+LOGIN_REDIRECT_URL
+------------------
+
+**New in Django development version**
+
+Default: ``'/accounts/profile/'``
+
+The URL where requests are redirected after login when the
+``contrib.auth.login`` view gets no ``next`` parameter.
+
+This is used by the :func:`~django.contrib.auth.decorators.login_required`
+decorator, for example.
+
+.. setting:: LOGIN_URL
+
+LOGIN_URL
+---------
+
+**New in Django development version**
+
+Default: ``'/accounts/login/'``
+
+The URL where requests are redirected for login, specially when using the
+:func:`~django.contrib.auth.decorators.login_required` decorator.
+
+.. setting:: LOGOUT_URL
+
+LOGOUT_URL
+----------
+
+**New in Django development version**
+
+Default: ``'/accounts/logout/'``
+
+LOGIN_URL counterpart.
+
+.. setting:: MANAGERS
+
+MANAGERS
+--------
+
+Default: ``()`` (Empty tuple)
+
+A tuple in the same format as ``ADMINS`` that specifies who should get
+broken-link notifications when ``SEND_BROKEN_LINK_EMAILS=True``.
+
+.. setting:: MEDIA_ROOT
+
+MEDIA_ROOT
+----------
+
+Default: ``''`` (Empty string)
+
+Absolute path to the directory that holds media for this installation.
+Example: ``"/home/media/media.lawrence.com/"`` See also ``MEDIA_URL``.
+
+.. setting:: MEDIA_URL
+
+MEDIA_URL
+---------
+
+Default: ``''`` (Empty string)
+
+URL that handles the media served from ``MEDIA_ROOT``.
+Example: ``"http://media.lawrence.com"``
+
+Note that this should have a trailing slash if it has a path component.
+
+Good: ``"http://www.example.com/static/"``
+Bad: ``"http://www.example.com/static"``
+
+.. setting:: MIDDLEWARE_CLASSES
+
+MIDDLEWARE_CLASSES
+------------------
+
+Default::
+
+    ("django.contrib.sessions.middleware.SessionMiddleware",
+     "django.contrib.auth.middleware.AuthenticationMiddleware",
+     "django.middleware.common.CommonMiddleware",
+     "django.middleware.doc.XViewMiddleware")
+
+A tuple of middleware classes to use. See :ref:`topics-http-middleware`.
+
+.. setting:: MONTH_DAY_FORMAT
+
+MONTH_DAY_FORMAT
+----------------
+
+Default: ``'F j'``
+
+The default formatting to use for date fields on Django admin change-list
+pages -- and, possibly, by other parts of the system -- in cases when only the
+month and day are displayed.
+
+For example, when a Django admin change-list page is being filtered by a date
+drilldown, the header for a given day displays the day and month. Different
+locales have different formats. For example, U.S. English would say
+"January 1," whereas Spanish might say "1 Enero."
+
+See :ttag:`allowed date format strings <now>`. See also ``DATE_FORMAT``,
+``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``YEAR_MONTH_FORMAT``.
+
+.. setting:: PREPEND_WWW
+
+PREPEND_WWW
+-----------
+
+Default: ``False``
+
+Whether to prepend the "www." subdomain to URLs that don't have it. This is only
+used if ``CommonMiddleware`` is installed (see :ref:`topics-http-middleware`).
+See also ``APPEND_SLASH``.
+
+.. setting:: PROFANITIES_LIST
+
+PROFANITIES_LIST
+----------------
+
+A tuple of profanities, as strings, that will trigger a validation error when
+the ``hasNoProfanities`` validator is called.
+
+We don't list the default values here, because that would be profane. To see
+the default values, see the file ``django/conf/global_settings.py``.
+
+.. setting:: ROOT_URLCONF
+
+ROOT_URLCONF
+------------
+
+Default: Not defined
+
+A string representing the full Python import path to your root URLconf. For example:
+``"mydjangoapps.urls"``. Can be overridden on a per-request basis by
+setting the attribute ``urlconf`` on the incoming ``HttpRequest``
+object. See :ref:`how-django-processes-a-request` for details.
+
+.. setting:: SECRET_KEY
+
+SECRET_KEY
+----------
+
+Default: ``''`` (Empty string)
+
+A secret key for this particular Django installation. Used to provide a seed in
+secret-key hashing algorithms. Set this to a random string -- the longer, the
+better. ``django-admin.py startproject`` creates one automatically.
+
+.. setting:: SEND_BROKEN_LINK_EMAILS
+
+SEND_BROKEN_LINK_EMAILS
+-----------------------
+
+Default: ``False``
+
+Whether to send an e-mail to the ``MANAGERS`` each time somebody visits a
+Django-powered page that is 404ed with a non-empty referer (i.e., a broken
+link). This is only used if ``CommonMiddleware`` is installed (see
+:ref:`topics-http-middleware`. See also ``IGNORABLE_404_STARTS``,
+``IGNORABLE_404_ENDS`` and :ref:`howto-error-reporting`.
+
+.. setting:: SERIALIZATION_MODULES
+
+SERIALIZATION_MODULES
+---------------------
+
+Default: Not defined.
+
+A dictionary of modules containing serializer definitions (provided as
+strings), keyed by a string identifier for that serialization type. For
+example, to define a YAML serializer, use::
+
+    SERIALIZATION_MODULES = { 'yaml' : 'path.to.yaml_serializer' }
+
+.. setting:: SERVER_EMAIL
+
+SERVER_EMAIL
+------------
+
+Default: ``'root@localhost'``
+
+The e-mail address that error messages come from, such as those sent to
+``ADMINS`` and ``MANAGERS``.
+
+.. setting:: SESSION_ENGINE
+
+SESSION_ENGINE
+--------------
+
+**New in Django development version**
+
+Default: ``django.contrib.sessions.backends.db``
+
+Controls where Django stores session data. Valid values are:
+
+    * ``'django.contrib.sessions.backends.db'``
+    * ``'django.contrib.sessions.backends.file'``
+    * ``'django.contrib.sessions.backends.cache'``
+
+See :ref:`topics-http-sessions`.
+
+.. setting:: SESSION_COOKIE_AGE
+
+SESSION_COOKIE_AGE
+------------------
+
+Default: ``1209600`` (2 weeks, in seconds)
+
+The age of session cookies, in seconds. See :ref:`topics-http-sessions`.
+
+.. setting:: SESSION_COOKIE_DOMAIN
+
+SESSION_COOKIE_DOMAIN
+---------------------
+
+Default: ``None``
+
+The domain to use for session cookies. Set this to a string such as
+``".lawrence.com"`` for cross-domain cookies, or use ``None`` for a standard
+domain cookie. See the :ref:`topics-http-sessions`.
+
+.. setting:: SESSION_COOKIE_NAME
+
+SESSION_COOKIE_NAME
+-------------------
+
+Default: ``'sessionid'``
+
+The name of the cookie to use for sessions. This can be whatever you want (but
+should be different from ``LANGUAGE_COOKIE_NAME``). See the :ref:`topics-http-sessions`.
+
+.. setting:: SESSION_COOKIE_PATH
+
+SESSION_COOKIE_PATH
+-------------------
+
+**New in Django development version**
+
+Default: ``'/'``
+
+The path set on the session cookie. This should either match the URL path of your
+Django installation or be parent of that path.
+
+This is useful if you have multiple Django instances running under the same
+hostname. They can use different cookie paths, and each instance will only see
+its own session cookie.
+
+.. setting:: SESSION_COOKIE_SECURE
+
+SESSION_COOKIE_SECURE
+---------------------
+
+Default: ``False``
+
+Whether to use a secure cookie for the session cookie. If this is set to
+``True``, the cookie will be marked as "secure," which means browsers may
+ensure that the cookie is only sent under an HTTPS connection.
+See the :ref:`topics-http-sessions`.
+
+.. setting:: SESSION_EXPIRE_AT_BROWSER_CLOSE
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE
+-------------------------------
+
+Default: ``False``
+
+Whether to expire the session when the user closes his or her browser.
+See the :ref:`topics-http-sessions`.
+
+.. setting:: SESSION_FILE_PATH
+
+SESSION_FILE_PATH
+-----------------
+
+**New in Django development version**
+
+Default: ``/tmp/``
+
+If you're using file-based session storage, this sets the directory in
+which Django will store session data. See :ref:`topics-http-sessions`.
+
+.. setting:: SESSION_SAVE_EVERY_REQUEST
+
+SESSION_SAVE_EVERY_REQUEST
+--------------------------
+
+Default: ``False``
+
+Whether to save the session data on every request. See
+:ref:`topics-http-sessions`.
+
+.. setting:: SITE_ID
+
+SITE_ID
+-------
+
+Default: Not defined
+
+The ID, as an integer, of the current site in the ``django_site`` database
+table. This is used so that application data can hook into specific site(s)
+and a single database can manage content for multiple sites.
+
+See :ref:`ref-contrib-sites`.
+
+.. _site framework docs: ../sites/
+
+.. setting:: TEMPLATE_CONTEXT_PROCESSORS
+
+TEMPLATE_CONTEXT_PROCESSORS
+---------------------------
+
+Default::
+
+    ("django.core.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media")
+
+A tuple of callables that are used to populate the context in ``RequestContext``.
+These callables take a request object as their argument and return a dictionary
+of items to be merged into the context.
+
+.. setting:: TEMPLATE_DEBUG
+
+TEMPLATE_DEBUG
+--------------
+
+Default: ``False``
+
+A boolean that turns on/off template debug mode. If this is ``True``, the fancy
+error page will display a detailed report for any ``TemplateSyntaxError``. This
+report contains the relevant snippet of the template, with the appropriate line
+highlighted.
+
+Note that Django only displays fancy error pages if ``DEBUG`` is ``True``, so
+you'll want to set that to take advantage of this setting.
+
+See also ``DEBUG``.
+
+.. setting:: TEMPLATE_DIRS
+
+TEMPLATE_DIRS
+-------------
+
+Default: ``()`` (Empty tuple)
+
+List of locations of the template source files, in search order. Note that
+these paths should use Unix-style forward slashes, even on Windows.
+
+See :ref:`topics-templates`..
+
+.. setting:: TEMPLATE_LOADERS
+
+TEMPLATE_LOADERS
+----------------
+
+Default:
+
+     ('django.template.loaders.filesystem.load_template_source',
+      'django.template.loaders.app_directories.load_template_source')
+
+A tuple of callables (as strings) that know how to import templates from
+various sources. See :ref:`ref-templates-api`.
+
+.. setting:: TEMPLATE_STRING_IF_INVALID
+
+TEMPLATE_STRING_IF_INVALID
+--------------------------
+
+Default: ``''`` (Empty string)
+
+Output, as a string, that the template system should use for invalid (e.g.
+misspelled) variables. See :ref:`invalid-template-variables`..
+
+.. setting:: TEST_DATABASE_CHARSET
+
+TEST_DATABASE_CHARSET
+---------------------
+
+**New in Django development version**
+
+Default: ``None``
+
+The character set encoding used to create the test database. The value of this
+string is passed directly through to the database, so its format is
+backend-specific.
+
+Supported for the PostgreSQL_ (``postgresql``, ``postgresql_psycopg2``) and MySQL_ (``mysql``) backends.
+
+.. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
+.. _MySQL: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
+
+.. setting:: TEST_DATABASE_COLLATION
+
+TEST_DATABASE_COLLATION
+------------------------
+
+**New in Django development version**
+
+Default: ``None``
+
+The collation order to use when creating the test database. This value is
+passed directly to the backend, so its format is backend-specific.
+
+Only supported for the ``mysql`` backend (see `section 10.3.2`_ of the MySQL
+manual for details).
+
+.. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
+
+.. setting:: TEST_DATABASE_NAME
+
+TEST_DATABASE_NAME
+------------------
+
+Default: ``None``
+
+The name of database to use when running the test suite.
+
+If the default value (``None``) is used with the SQLite database engine, the
+tests will use a memory resident database. For all other database engines the
+test database will use the name ``'test_' + settings.DATABASE_NAME``.
+
+See :ref:`topics-testing`.
+
+.. setting:: TEST_RUNNER
+
+TEST_RUNNER
+-----------
+
+Default: ``'django.test.simple.run_tests'``
+
+The name of the method to use for starting the test suite. See
+:ref:`topics-testing`.
+
+.. _Testing Django Applications: ../testing/
+
+.. setting:: TIME_FORMAT
+
+TIME_FORMAT
+-----------
+
+Default: ``'P'`` (e.g. ``4 p.m.``)
+
+The default formatting to use for time fields on Django admin change-list
+pages -- and, possibly, by other parts of the system. See
+:ttag:`allowed date format strings <now>`.
+
+See also ``DATE_FORMAT``, ``DATETIME_FORMAT``, ``TIME_FORMAT``,
+``YEAR_MONTH_FORMAT`` and ``MONTH_DAY_FORMAT``.
+
+.. setting:: TIME_ZONE
+
+TIME_ZONE
+---------
+
+Default: ``'America/Chicago'``
+
+A string representing the time zone for this installation. `See available choices`_.
+(Note that list of available choices lists more than one on the same line;
+you'll want to use just one of the choices for a given time zone. For instance,
+one line says ``'Europe/London GB GB-Eire'``, but you should use the first bit
+of that -- ``'Europe/London'`` -- as your ``TIME_ZONE`` setting.)
+
+Note that this is the time zone to which Django will convert all dates/times --
+not necessarily the timezone of the server. For example, one server may serve
+multiple Django-powered sites, each with a separate time-zone setting.
+
+Normally, Django sets the ``os.environ['TZ']`` variable to the time zone you
+specify in the ``TIME_ZONE`` setting. Thus, all your views and models will
+automatically operate in the correct time zone. However, if you're using the
+manual configuration option (see below), Django will *not* touch the ``TZ``
+environment variable, and it'll be up to you to ensure your processes are
+running in the correct environment.
+
+.. note::
+    Django cannot reliably use alternate time zones in a Windows environment.
+    If you're running Django on Windows, this variable must be set to match the
+    system timezone.
+    
+.. _See available choices: http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
+
+.. setting:: URL_VALIDATOR_USER_AGENT
+
+URL_VALIDATOR_USER_AGENT
+------------------------
+
+Default: ``Django/<version> (http://www.djangoproject.com/)``
+
+The string to use as the ``User-Agent`` header when checking to see if URLs
+exist (see the ``verify_exists`` option on :class:`~django.db.models.URLField`).
+
+.. setting:: USE_ETAGS
+
+USE_ETAGS
+---------
+
+Default: ``False``
+
+A boolean that specifies whether to output the "Etag" header. This saves
+bandwidth but slows down performance. This is only used if ``CommonMiddleware``
+is installed (see :ref:`topics-http-middleware`).
+
+.. setting:: USE_I18N
+
+USE_I18N
+--------
+
+Default: ``True``
+
+A boolean that specifies whether Django's internationalization system should be
+enabled. This provides an easy way to turn it off, for performance. If this is
+set to ``False``, Django will make some optimizations so as not to load the
+internationalization machinery.
+
+.. setting:: YEAR_MONTH_FORMAT
+
+YEAR_MONTH_FORMAT
+-----------------
+
+Default: ``'F Y'``
+
+The default formatting to use for date fields on Django admin change-list
+pages -- and, possibly, by other parts of the system -- in cases when only the
+year and month are displayed.
+
+For example, when a Django admin change-list page is being filtered by a date
+drilldown, the header for a given month displays the month and the year.
+Different locales have different formats. For example, U.S. English would say
+"January 2006," whereas another locale might say "2006/January."
+
+See :ttag:`allowed date format strings <now>`. See also ``DATE_FORMAT``,
+``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``MONTH_DAY_FORMAT``.

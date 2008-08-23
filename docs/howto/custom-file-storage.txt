@@ -1,0 +1,78 @@
+.. _howto-custom-file-storage:
+
+Writing a custom storage system
+===============================
+
+If you need to provide custom file storage -- a common example is storing files
+on some remote system -- you can do so by defining a custom storage class.
+You'll need to follow these steps:
+
+#. Your custom storage system must be a subclass of
+   ``django.core.files.storage.Storage``::
+
+        from django.core.files.storage import Storage
+
+        class MyStorage(Storage):
+            ...
+
+#. Django must be able to instantiate your storage system without any arguments.
+   This means that any settings should be taken from ``django.conf.settings``::
+
+        from django.conf import settings
+        from django.core.files.storage import Storage
+
+        class MyStorage(Storage):
+            def __init__(self, option=None):
+                if not option:
+                    option = settings.CUSTOM_STORAGE_OPTIONS
+                ...
+
+#. Your storage class must implement the ``_open()`` and ``_save()`` methods,
+   along with any other methods appropriate to your storage class. See below for
+   more on these methods.
+
+   In addition, if your class provides local file storage, it must override
+   the ``path()`` method.
+
+Your custom storage system may override any of the storage methods explained in
+:ref:`ref-files-storage`. However, it's usually better to use the hooks
+specifically designed for custom storage objects. These are:
+
+``_open(name, mode='rb')``
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Required**.
+
+Called by ``Storage.open()``, this is the actual mechanism the storage class
+uses to open the file. This must return a ``File`` object, though in most cases,
+you'll want to return some subclass here that implements logic specific to the
+backend storage system.
+
+``_save(name, content)``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Called by ``Storage.save()``. The ``name`` will already have gone through
+``get_valid_name()`` and ``get_available_name()``, and the ``content`` will be a
+``File`` object itself. No return value is expected.
+
+``get_valid_name(name)``
+------------------------
+
+Returns a filename suitable for use with the underlying storage system. The
+``name`` argument passed to this method is the original filename sent to the
+server, after having any path information removed. Override this to customize
+how non-standard characters are converted to safe filenames.
+
+The code provided on ``Storage`` retains only alpha-numeric characters, periods
+and underscores from the original filename, removing everything else.
+
+``get_available_name(name)``
+----------------------------
+
+Returns a filename that is available in the storage mechanism, possibly taking
+the provided filename into account. The ``name`` argument passed to this method
+will have already cleaned to a filename valid for the storage system, according
+to the ``get_valid_name()`` method described above.
+
+The code provided on ``Storage`` simply appends underscores to the filename
+until it finds one that's available in the destination directory.

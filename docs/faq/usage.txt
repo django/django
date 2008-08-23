@@ -1,0 +1,65 @@
+.. _faq-usage:
+
+FAQ: Using Django
+=================
+
+Why do I get an error about importing DJANGO_SETTINGS_MODULE?
+-------------------------------------------------------------
+
+Make sure that:
+
+    * The environment variable DJANGO_SETTINGS_MODULE is set to a fully-qualified
+      Python module (i.e. "mysite.settings").
+
+    * Said module is on ``sys.path`` (``import mysite.settings`` should work).
+
+    * The module doesn't contain syntax errors (of course).
+
+    * If you're using mod_python but *not* using Django's request handler,
+      you'll need to work around a mod_python bug related to the use of
+      ``SetEnv``; before you import anything from Django you'll need to do
+      the following::
+
+            os.environ.update(req.subprocess_env)
+
+      (where ``req`` is the mod_python request object).
+
+I can't stand your template language. Do I have to use it?
+----------------------------------------------------------
+
+We happen to think our template engine is the best thing since chunky bacon,
+but we recognize that choosing a template language runs close to religion.
+There's nothing about Django that requires using the template language, so
+if you're attached to ZPT, Cheetah, or whatever, feel free to use those.
+
+Do I have to use your model/database layer?
+-------------------------------------------
+
+Nope. Just like the template system, the model/database layer is decoupled from
+the rest of the framework.
+
+The one exception is: If you use a different database library, you won't get to
+use Django's automatically-generated admin site. That app is coupled to the
+Django database layer.
+
+How do I use image and file fields?
+-----------------------------------
+
+Using a ``FileField`` or an ``ImageField`` in a model takes a few steps:
+
+    #. In your settings file, define ``MEDIA_ROOT`` as the full path to
+       a directory where you'd like Django to store uploaded files. (For
+       performance, these files are not stored in the database.) Define
+       ``MEDIA_URL`` as the base public URL of that directory. Make sure that
+       this directory is writable by the Web server's user account.
+
+    #. Add the ``FileField`` or ``ImageField`` to your model, making sure
+       to define the ``upload_to`` option to tell Django to which subdirectory
+       of ``MEDIA_ROOT`` it should upload files.
+
+    #. All that will be stored in your database is a path to the file
+       (relative to ``MEDIA_ROOT``). You'll most likely want to use the
+       convenience ``get_<fieldname>_url`` function provided by Django. For
+       example, if your ``ImageField`` is called ``mug_shot``, you can get the
+       absolute URL to your image in a template with
+       ``{{ object.get_mug_shot_url }}``.

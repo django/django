@@ -11,12 +11,12 @@ PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d _build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html web htmlhelp latex changes linkcheck
+.PHONY: help clean html web pickle htmlhelp latex changes linkcheck
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  html      to make standalone HTML files"
-	@echo "  web       to make files usable by Sphinx.web"
+	@echo "  pickle    to make pickle files (usable by e.g. sphinx-web)"
 	@echo "  htmlhelp  to make HTML files and a HTML help project"
 	@echo "  latex     to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
 	@echo "  changes   to make an overview over all changed/added/deprecated items"
@@ -31,13 +31,15 @@ html:
 	@echo
 	@echo "Build finished. The HTML pages are in _build/html."
 
-web:
-	mkdir -p _build/web _build/doctrees
-	$(SPHINXBUILD) -b web $(ALLSPHINXOPTS) _build/web
+pickle:
+	mkdir -p _build/pickle _build/doctrees
+	$(SPHINXBUILD) -b pickle $(ALLSPHINXOPTS) _build/pickle
 	@echo
-	@echo "Build finished; now you can run"
-	@echo "  python -m sphinx.web _build/web"
-	@echo "to start the server."
+	@echo "Build finished; now you can process the pickle files or run"
+	@echo "  sphinx-web _build/pickle"
+	@echo "to start the sphinx-web server."
+
+web: pickle
 
 htmlhelp:
 	mkdir -p _build/htmlhelp _build/doctrees

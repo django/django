@@ -1,0 +1,48 @@
+.. _howto-newforms-migration:
+
+Migrating from "oldforms" to "newforms"
+=======================================
+
+:mod:`django.newforms` is new in Django's 0.96 release, but, as it won't be new
+forever. We plan to rename it to ``django.forms`` in next official release. The
+current ``django.forms`` package will be available as ``django.oldforms`` until
+Django 1.0, when we plan to remove it for good.
+
+If you're using "old" forms -- and if you started using Django after 0.96 you're
+probably not -- you need to read this document and understand this migration
+plan.
+
+    * The old forms framework (the current ``django.forms``) has been copied to
+      ``django.oldforms``. Thus, you can start upgrading your code *now*,
+      rather than waiting for the future backwards-incompatible change, by
+      changing your import statements like this::
+
+          from django import forms             # old
+          from django import oldforms as forms # new
+
+    * In the next Django release, we will move the current ``django.newforms``
+      to ``django.forms``. This will be a backwards-incompatible change, and
+      anybody who is still using the old version of ``django.forms`` at that
+      time will need to change their import statements, as described in the
+      previous bullet.
+
+    * We will remove ``django.oldforms`` in Django 1.0. It will continue to be
+      available from older tags in our SVN repository, but it will not be
+      consider part of Django, and will not be supported..
+
+With this in mind, we recommend you use the following import statement when
+using ``django.newforms``::
+
+    from django import newforms as forms
+
+This way, your code can refer to the ``forms`` module, and when
+``django.newforms`` is renamed to ``django.forms``, you'll only have to change
+your ``import`` statements.
+
+If you prefer "``import *``" syntax, you can do the following::
+
+    from django.newforms import *
+
+This will import all fields, widgets, form classes and other various utilities
+into your local namespace. Some people find this convenient; others find it
+too messy. The choice is yours.

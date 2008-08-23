@@ -1,0 +1,103 @@
+.. _faq-admin:
+
+FAQ: The admin
+==============
+
+I can't log in. When I enter a valid username and password, it just brings up the login page again, with no error messages.
+---------------------------------------------------------------------------------------------------------------------------
+
+The login cookie isn't being set correctly, because the domain of the cookie
+sent out by Django doesn't match the domain in your browser. Try these two
+things:
+
+    * Set the ``SESSION_COOKIE_DOMAIN`` setting in your admin config file
+      to match your domain. For example, if you're going to
+      "http://www.example.com/admin/" in your browser, in
+      "myproject.settings" you should set ``SESSION_COOKIE_DOMAIN = 'www.example.com'``.
+
+    * Some browsers (Firefox?) don't like to accept cookies from domains that
+      don't have dots in them. If you're running the admin site on "localhost"
+      or another domain that doesn't have a dot in it, try going to
+      "localhost.localdomain" or "127.0.0.1". And set
+      ``SESSION_COOKIE_DOMAIN`` accordingly.
+
+I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+If you're sure your username and password are correct, make sure your user
+account has ``is_active`` and ``is_staff`` set to True. The admin site only
+allows access to users with those two fields both set to True.
+
+How can I prevent the cache middleware from caching the admin site?
+-------------------------------------------------------------------
+
+Set the :setting:``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting to ``True``. See the
+:ref:`cache documentation <topics-cache>` for more information.
+
+How do I automatically set a field's value to the user who last edited the object in the admin?
+-----------------------------------------------------------------------------------------------
+
+At this point, Django doesn't have an official way to do this. But it's an oft-requested
+feature, so we're discussing how it can be implemented. The problem is we don't want to couple
+the model layer with the admin layer with the request layer (to get the current user). It's a
+tricky problem.
+
+One person hacked up a `solution that doesn't require patching Django`_, but note that it's an
+unofficial solution, and there's no guarantee it won't break at some point.
+
+.. _solution that doesn't require patching Django: http://lukeplant.me.uk/blog.php?id=1107301634
+
+How do I limit admin access so that objects can only be edited by the users who created them?
+---------------------------------------------------------------------------------------------
+
+See the answer to the previous question.
+
+My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_python.
+---------------------------------------------------------------------------------------------------------------------------
+
+See :ref:`serving the admin files <howto-deployment-modpython-serving-the-admin-files`
+in the "How to use Django with mod_python" documentation.
+
+My "list_filter" contains a ManyToManyField, but the filter doesn't display.
+----------------------------------------------------------------------------
+
+Django won't bother displaying the filter for a ``ManyToManyField`` if there
+are fewer than two related objects.
+
+For example, if your ``list_filter`` includes ``sites``, and there's only one
+site in your database, it won't display a "Site" filter. In that case,
+filtering by site would be meaningless.
+
+How can I customize the functionality of the admin interface?
+-------------------------------------------------------------
+
+You've got several options. If you want to piggyback on top of an add/change
+form that Django automatically generates, you can attach arbitrary JavaScript
+modules to the page via the model's ``class Admin`` ``js`` parameter. That
+parameter is a list of URLs, as strings, pointing to JavaScript modules that
+will be included within the admin form via a ``<script>`` tag.
+
+If you want more flexibility than simply tweaking the auto-generated forms,
+feel free to write custom views for the admin. The admin is powered by Django
+itself, and you can write custom views that hook into the authentication
+system, check permissions and do whatever else they need to do.
+
+If you want to customize the look-and-feel of the admin interface, read the
+next question.
+
+The dynamically-generated admin site is ugly! How can I change it?
+------------------------------------------------------------------
+
+We like it, but if you don't agree, you can modify the admin site's
+presentation by editing the CSS stylesheet and/or associated image files. The
+site is built using semantic HTML and plenty of CSS hooks, so any changes you'd
+like to make should be possible by editing the stylesheet. We've got a
+:ref:`guide to the CSS used in the admin <obsolete-admin-css>` to get you started.
+
+How do I create users without having to edit password hashes?
+-------------------------------------------------------------
+
+If you'd like to use the admin site to create users, upgrade to the Django
+development version, where this problem was fixed on Aug. 4, 2006.
+
+You can also use the Python API. See :ref:`creating users <topics-auth-creating-users>` for full info.

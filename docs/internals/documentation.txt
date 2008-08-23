@@ -1,0 +1,204 @@
+.. _internals-documentation:
+
+How the Django documentation works
+==================================
+
+\... and how to contribute.
+
+Django's documentation uses the Sphinx__ documentation system, which in turn is
+based on docutils__. The basic idea is that lightly-formatted plain-text
+documentation is transformed into HTML, PDF, and any other output format.
+
+__ http://sphinx.pocoo.org/
+__ http://docutils.sf.net/
+
+To actually build the documentation locally, you'll currently need to install
+Sphinx -- ``easy_install Sphinx`` should do the trick.
+
+Then, building the html is easy; just ``make html`` from the ``docs`` directory.
+
+To get started contributing, you'll want to read the `ReStructuredText
+Primer`__. After that, you'll want to read about the `Sphinx-specific markup`__
+that's used to manage metadata, indexing, and cross-references.
+
+__ http://sphinx.pocoo.org/rest.html
+__ http://sphinx.pocoo.org/markup/
+
+The main thing to keep in mind as you write and edit docs is that the more
+semantic markup you can add the better. So::
+
+    Add ``django.contrib.auth`` to your ``INSTALLED_APPS``...
+    
+Isn't nearly as helpful as::
+
+    Add :mod:`django.contrib.auth` to your :setting:`INSTALLED_APPS`...
+    
+This is because Sphinx will generate proper links for the later, which greatly
+helps readers. There's basically no limit to the amount of useful markup you can
+add.
+
+Django-specific markup
+----------------------
+
+Besides the `Sphinx built-in markup`__, Django's docs defines some extra description units:
+
+__ http://sphinx.pocoo.org/markup/desc.html
+
+    * Settings::
+    
+            .. setting:: INSTALLED_APPS
+                
+      To link to a setting, use ``:setting:`INSTALLED_APPS```.
+      
+    * Template tags::
+   
+            .. templatetag:: regroup
+    
+      To link, use ``:ttag:`regroup```.
+     
+    * Template filters::
+   
+            .. templatefilter:: linebreaksbr
+       
+      To link, use ``:tfilter:`linebreaksbr```.
+      
+    * Field lookups (i.e. ``Foo.objects.filter(bar__exact=whatever)``)::
+    
+            .. fieldlookup:: exact
+            
+      To link, use ``:lookup:`exact```.
+      
+    * ``django-admin`` commands::
+    
+            .. django-admin:: syncdb
+            
+      To link, use ``:djadmin:`syncdb```.
+      
+    * ``django-admin`` command-line options::
+    
+            .. django-admin-option:: --traceback
+            
+      To link, use ``:djadminopt:`--traceback```.
+
+An example
+----------
+
+For a quick example of how it all fits together, check this out:
+
+    * First, the ``ref/settings.txt`` document starts out like this::
+    
+        .. _ref-settings:
+
+        Available settings
+        ==================
+        
+        ...
+        
+    * Next, if you look at the ``topics/settings.txt`` document, you can see how
+      a link to ``ref/settings`` works::
+     
+        Available settings
+        ==================
+
+        For a full list of available settings, see the :ref:`settings reference
+        <ref-settings>`.
+        
+    * Next, notice how the settings (right now just the top few) are annotated::
+   
+        .. setting:: ADMIN_FOR
+
+        ADMIN_FOR
+        ---------
+
+        Default: ``()`` (Empty tuple)
+
+        Used for admin-site settings modules, this should be a tuple of settings
+        modules (in the format ``'foo.bar.baz'``) for which this site is an
+        admin.
+        
+        The admin site uses this in its automatically-introspected
+        documentation of models, views and template tags.
+        
+      This marks up the following header as the "canonical" target for the
+      setting ``ADMIN_FOR`` This means any time I talk about ``ADMIN_FOR``, I
+      can reference it using ``:setting:`ADMIN_FOR```.
+     
+That's basically how everything fits together.
+
+TODO
+----
+
+The work is mostly done, but here's what's left, in rough order of priority.
+
+    * Fix up generic view docs: adapt Chapter 9 of the Django Book (consider
+      this TODO item my permission and license) into
+      ``topics/generic-views.txt``; remove the intro material from
+      ``ref/generic-views.txt`` and just leave the function reference.
+    
+    * Change the "Added/changed in development version" callouts to proper
+      Sphinx ``.. versionadded::`` or ``.. versionchanged::`` directives.
+    
+    * Check for and fix malformed links. Do this by running ``make linkcheck``
+      and fix all of the 300+ errors/warnings.
+      
+      In particular, look at all the relative links; these need to be 
+      changed to proper references.
+      
+    * Most of the various ``index.txt`` documents have *very* short or even
+      non-existent intro text. Each of those documents needs a good short intro
+      the content below that point.
+
+    * The glossary is very perfunctory. It needs to be filled out.
+    
+    * Add more metadata targets: there's lots of places that look like::
+    
+            ``File.close()``
+            ~~~~~~~~~~~~~~~~
+        
+      \... these should be::
+      
+            .. method:: File.close()
+            
+      That is, use metadata instead of titles.
+      
+    * Add more links -- nearly everything that's an inline code literal
+      right now can probably be turned into a xref. 
+      
+      See the ``literals_to_xrefs.py`` file in ``_ext`` -- it's a shell script
+      to help do this work.
+
+      This will probably be a continuing, never-ending project.
+
+    * Add `info field lists`__ where appropriate.
+    
+      __ http://sphinx.pocoo.org/markup/desc.html#info-field-lists
+      
+    * Add ``.. code-block:: <lang>`` to literal blocks so that they get
+      highlighted.
+
+Hints
+-----
+
+Some hints for making things look/read better:
+
+    * Whenever possible, use links. So, use ``:setting:`ADMIN_FOR``` instead of
+      ````ADMIN_FOR````.
+
+    * Some directives (``.. setting::``, for one) are prefix-style directives;
+      they go *before* the unit they're describing. These are known as
+      "crossref" directives. Others (``.. class::``, e.g.) generate their own
+      markup; these should go inside the section they're describing. These are
+      called "description units".
+      
+      You can tell which are which by looking at in :file:`_ext/djangodocs.py`;
+      it registers roles as one of the other.
+      
+    * When referring to classes/functions/modules, etc., you'll want to use the
+      fully-qualified name of the target
+      (``:class:`django.contrib.contenttypes.models.ContentType```). 
+      
+      Since this doesn't look all that awesome in the output -- it shows the
+      entire path to the object -- you can prefix the target with a ``~``
+      (that's a tilde) to get just the "last bit" of that path. So
+      ``:class:`~django.contrib.contenttypes.models.ContentType``` will just
+      display a link with the title "ContentType".

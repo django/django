@@ -12,35 +12,36 @@
 # serve to show the default value.
 
 import sys
+import os
 
 # If your extensions are in another directory, add it here.
-#sys.path.append('some/directory')
+sys.path.append(os.path.join(os.path.dirname(__file__), "_ext"))
 
 # General configuration
 # ---------------------
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-#extensions = []
+extensions = ["djangodocs"]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = []
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
 source_suffix = '.txt'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = 'contents'
 
 # General substitutions.
 project = 'Django'
-copyright = '2008, Django Software Foundation'
+copyright = 'Django Software Foundation and contributors'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = 'SVN'
+version = '1.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -65,7 +66,7 @@ add_module_names = False
 show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'trac'
 
 
 # Options for HTML output
@@ -79,7 +80,7 @@ html_style = 'default.css'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+html_static_path = ["_static"]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -89,6 +90,9 @@ html_last_updated_fmt = '%b %d, %Y'
 # typographically correct entities.
 html_use_smartypants = True
 
+# HTML translator class for the builder
+html_translator_class = "djangodocs.DjangoHTMLTranslator"
+
 # Content template for the index page.
 #html_index = ''
 
@@ -97,7 +101,7 @@ html_use_smartypants = True
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
-#html_additional_pages = {}
+html_additional_pages = {}
 
 # If false, no module index is generated.
 #html_use_modindex = True
@@ -121,6 +125,9 @@ htmlhelp_basename = 'Djangodoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 #latex_documents = []
+latex_documents = [
+  ('index', 'django.tex', 'Django Documentation', 'Django Software Foundation', 'manual'),
+]
 
 # Additional stuff for the LaTeX preamble.
 #latex_preamble = ''
@@ -130,3 +137,9 @@ htmlhelp_basename = 'Djangodoc'
 
 # If false, no module index is generated.
 #latex_use_modindex = True
+
+# For "manual" documents, if this is true, then toplevel headings are parts,
+# not chapters.
+# If this isn't set to True, the LaTex writer can only handle six levels of headers.
+latex_use_parts = True
+

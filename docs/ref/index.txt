@@ -1,0 +1,21 @@
+.. _ref-index:
+
+API Reference
+=============
+
+.. toctree::
+   :maxdepth: 1
+   
+   contrib/index
+   databases
+   django-admin
+   forms/index
+   generic-views
+   middleware
+   models/index
+   request-response
+   settings
+   templates/index
+   unicode
+   files/index
+   

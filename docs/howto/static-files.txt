@@ -1,0 +1,131 @@
+.. _howto-static-files:
+
+=========================
+How to serve static files
+=========================
+
+.. module:: django.views.static
+   :synopsis: Serving of static files during development.
+ 
+Django itself doesn't serve static (media) files, such as images, style sheets,
+or video. It leaves that job to whichever Web server you choose.
+
+The reasoning here is that standard Web servers, such as Apache_ and lighttpd_,
+are much more fine-tuned at serving static files than a Web application
+framework.
+
+With that said, Django does support static files **during development**. You can
+use the :func:`django.views.static.serve` view to serve media files.
+
+.. _Apache: http://httpd.apache.org/
+.. _lighttpd: http://www.lighttpd.net/
+
+The big, fat disclaimer
+=======================
+
+Using this method is **inefficient** and **insecure**. Do not use this in a
+production setting. Use this only for development.
+
+For information on serving static files in an Apache production environment,
+see the :ref:`Django mod_python documentation <serving-media-files>`.
+
+How to do it
+============
+
+Here's the formal definition of the :func:`~django.views.static.serve` view:
+
+.. function:: def serve(request, path, document_root, show_indexes=False):
+
+To use it, just put this in your :ref:`URLconf <topics-http-urls>`::
+
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
+
+...where ``site_media`` is the URL where your media will be rooted, and
+``/path/to/media`` is the filesystem root for your media. This will call the
+:func:`~django.views.static.serve` view, passing in the path from the URLconf
+and the (required) ``document_root`` parameter.
+
+Given the above URLconf:
+
+    * The file ``/path/to/media/foo.jpg`` will be made available at the URL
+      ``/site_media/foo.jpg``.
+
+    * The file ``/path/to/media/css/mystyles.css`` will be made available
+      at the URL ``/site_media/css/mystyles.css``.
+
+    * The file ``/path/bar.jpg`` will not be accessible, because it doesn't
+      fall under the document root.
+
+
+Directory listings
+==================
+
+Optionally, you can pass the ``show_indexes`` parameter to the
+:func:`~django.views.static.serve` view. This is ``False`` by default. If it's
+``True``, Django will display file listings for directories.
+
+For example::
+
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media', 'show_indexes': True}),
+
+You can customize the index view by creating a template called
+``static/directory_index.html``. That template gets two objects in its context:
+
+    * ``directory`` -- the directory name (a string)
+    * ``file_list`` -- a list of file names (as strings) in the directory
+
+Here's the default ``static/directory_index`` template:
+
+.. code-block:: html+django
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <meta http-equiv="Content-Language" content="en-us" />
+        <meta name="robots" content="NONE,NOARCHIVE" />
+        <title>Index of {{ directory }}</title>
+    </head>
+    <body>
+        <h1>Index of {{ directory }}</h1>
+        <ul>
+        {% for f in file_list %}
+        <li><a href="{{ f }}">{{ f }}</a></li>
+        {% endfor %}
+        </ul>
+    </body>
+    </html>
+
+Limiting use to DEBUG=True
+==========================
+
+Because URLconfs are just plain Python modules, you can use Python logic to
+make the static-media view available only in development mode. This is a handy
+trick to make sure the static-serving view doesn't slip into a production
+setting by mistake.
+
+Do this by wrapping an ``if DEBUG`` statement around the
+:func:`django.views.static.serve` inclusion. Here's a full example URLconf::
+
+    from django.conf.urls.defaults import *
+    from django.conf import settings
+
+    urlpatterns = patterns('',
+        (r'^articles/2003/$', 'news.views.special_case_2003'),
+        (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
+    )
+
+    if settings.DEBUG:
+        urlpatterns += patterns('',
+            (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
+        )
+
+This code is straightforward. It imports the settings and checks the value of
+the :setting:`DEBUG` setting. If it evaluates to ``True``, then ``site_media``
+will be associated with the ``django.views.static.serve`` view. If not, then the
+view won't be made available.
+
+Of course, the catch here is that you'll have to remember to set ``DEBUG=False``
+in your production settings file. But you should be doing that anyway.

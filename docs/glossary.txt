@@ -1,0 +1,80 @@
+.. _glossary:
+
+========
+Glossary
+========
+
+.. glossary::
+
+    field
+        An attribute on a :term:`model`; a given field usually maps directly to
+        a single database column.
+        
+        See :ref:`topics-db-models`.
+
+    generic view
+        A higher-order :term:`view` function that abstracts common idioms and patterns
+        found in view development and abstracts them.
+        
+        See :ref:`ref-generic-views`.
+
+    model
+        Models store your application's data.
+        
+        See :ref:`topics-db-models`.
+
+    MTV
+        See :ref:`mtv`.
+
+    MVC
+        `Model-view-controller`__; a software pattern. Django :ref:`follows MVC
+        to some extent <mtv>`.
+
+        __ http://en.wikipedia.org/wiki/Model-view-controller
+
+    project
+        A Python package -- i.e. a directory of code -- that contains all the
+        settings for an instance of Django. This would include database
+        configuration, Django-specific options and application-specific
+        settings.
+
+    property
+        Also known as "managed attributes", and a feature of Python since
+        version 2.2. From `the property documentation`__:
+        
+            Properties are a neat way to implement attributes whose usage
+            resembles attribute access, but whose implementation uses method
+            calls. [...] You
+            could only do this by overriding ``__getattr__`` and
+            ``__setattr__``; but overriding ``__setattr__`` slows down all
+            attribute assignments considerably, and overriding ``__getattr__``
+            is always a bit tricky to get right. Properties let you do this
+            painlessly, without having to override ``__getattr__`` or
+            ``__setattr__``.
+
+        __ http://www.python.org/download/releases/2.2/descrintro/#property
+
+    queryset
+        An object representing some set of rows to be fetched from the database.
+        
+        See :ref:`topics-db-queries`.
+
+    slug
+        A short label for something, containing only letters, numbers,
+        underscores or hyphens. They're generally used in URLs. For
+        example, in a typical blog entry URL:
+        
+        .. parsed-literal::
+        
+            http://www.djangoproject.com/weblog/2008/apr/12/**spring**/
+            
+        the last bit (``spring``) is the slug.
+
+    template
+        A chunk of text that separates the presentation of a document from its
+        data.
+        
+        See :ref:`topics-templates`.
+        
+    view
+        A function responsible for rending a page.

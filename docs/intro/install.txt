@@ -1,0 +1,75 @@
+.. _intro-install:
+
+Quick install guide
+===================
+
+Before you can use Django, you'll need to get it installed. We have a
+:ref:`complete installation guide <topics-install>` that covers all the
+possibilities; this guide will guide you to a simple, minimal installation
+that'll work while you walk through the introduction.
+
+Install Python
+--------------
+
+Being a Python Web framework, Django requires Python. It works with any Python
+version 2.3 and higher, but we recommend installing Python 2.5 or later. If you do so, you won't need to set up a database just yet: Python 2.5 or later includes a lightweight database called SQLite_.
+
+.. _sqlite: http://sqlite.org/
+
+Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
+probably already have it installed.
+
+You can verify that Python's installed py typing ``python`` from your shell; you should see something like::
+
+    Python 2.5.1 (r251:54863, Jan 17 2008, 19:35:17) 
+    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>>
+    
+Set up a database
+-----------------
+
+If you installed Python 2.5 or later, you can skip this step for now.
+
+If not, or if you'd like to work with a "large" database engine like PostgreSQL,
+MySQL, or Oracle, consult the :ref:`database installation information
+<database-installation>`.
+
+Remove any old versions of Django
+---------------------------------
+
+If you are upgrading your installation of Django from a previous version, you
+will need to :ref:`uninstall the old Django version before installing the new
+version <removing-old-versions-of-django>`.
+
+Install Django
+--------------
+
+You've got three easy options to install Django:
+
+    * Install a version of Django :ref:`provided by your operating system
+      distribution <misc-distributions>`. This is the quickest option for those
+      who have operating systems that distribute Django.
+
+    * :ref:`Install an official release <installing-official-release>`. This
+      is the best approach for users who want a stable version number and aren't
+      concerned about running a slightly older version of Django.
+      
+    * :ref:`Install the latest development version
+      <installing-development-version>`. This is best for users who want the
+      latest-and-greatest features and aren't afraid of running brand-new code.
+      
+.. warning::
+
+    If do either of the first two steps, keep an eye out for parts of the
+    documentation marked **new in development version**. That phrase flags
+    features that are only available in development versions of Django; if you
+    try to use them with an official release they won't work.
+    
+That's it!
+----------
+
+That's it -- you can now :ref:`move onto the tutorial <intro-tutorial01>`.
+
+
+

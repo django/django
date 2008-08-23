@@ -1,0 +1,199 @@
+.. _ref-contrib-index:
+
+============================
+The "django.contrib" add-ons
+============================
+
+Django aims to follow Python's `"batteries included" philosophy`_. It ships
+with a variety of extra, optional tools that solve common Web-development
+problems.
+
+This code lives in ``django/contrib`` in the Django distribution. This document
+gives a rundown of the packages in ``contrib``, along with any dependencies
+those packages have.
+
+.. admonition:: Note
+
+    For most of these add-ons -- specifically, the add-ons that include either
+    models or template tags -- you'll need to add the package name (e.g.,
+    ``'django.contrib.admin'``) to your ``INSTALLED_APPS`` setting and re-run
+    ``manage.py syncdb``.
+
+.. _"batteries included" philosophy: http://docs.python.org/tut/node12.html#batteries-included
+
+.. toctree::
+   :maxdepth: 1
+
+   admin
+   auth
+   contenttypes
+   csrf
+   databrowse
+   flatpages
+   formtools/index
+   humanize
+   localflavor
+   redirects
+   sitemaps
+   sites
+   syndication
+   webdesign
+
+admin
+=====
+
+The automatic Django administrative interface. For more information, see
+:ref:`Tutorial 2 <intro-tutorial02>` and the
+:ref:`admin documentation <ref-contrib-admin>`.
+
+Requires the auth_ and contenttypes_ contrib packages to be installed.
+
+auth
+====
+
+Django's authentication framework.
+
+See :ref:`topics-auth`.
+
+comments
+========
+
+A simple yet flexible comments system. This is not yet documented.
+
+contenttypes
+============
+
+A light framework for hooking into "types" of content, where each installed
+Django model is a separate content type.
+
+See the :ref:`contenttypes documentation <ref-contrib-contenttypes>`.
+
+csrf
+====
+
+A middleware for preventing Cross Site Request Forgeries
+
+See the :ref:`csrf documentation <ref-contrib-csrf>`.
+
+flatpages
+=========
+
+A framework for managing simple "flat" HTML content in a database.
+
+See the :ref:`flatpages documentation <ref-contrib-flatpages>`.
+
+Requires the sites_ contrib package to be installed as well.
+
+formtools
+=========
+
+A set of high-level abstractions for Django forms (django.forms).
+
+django.contrib.formtools.preview
+--------------------------------
+
+An abstraction of the following workflow:
+
+"Display an HTML form, force a preview, then do something with the submission."
+
+See the :ref:`form preview documentation <ref-contrib-formtools-form-preview>`.
+
+django.contrib.formtools.wizard
+--------------------------------
+
+Splits forms across multiple Web pages.
+
+See the :ref:`form wizard documentation <ref-contrib-formtools-form-wizard>`.
+
+humanize
+========
+
+A set of Django template filters useful for adding a "human touch" to data.
+
+See the :ref:`humanize documentation <ref-contrib-humanize>`.
+
+localflavor
+===========
+
+A collection of various Django snippets that are useful only for a particular
+country or culture. For example, ``django.contrib.localflavor.us.forms``
+contains a ``USZipCodeField`` that you can use to validate U.S. zip codes.
+
+See the :ref:`localflavor documentation <ref-contrib-localflavor>`.
+
+.. _ref-contrib-markup:
+
+markup
+======
+
+A collection of template filters that implement common markup languages:
+
+    * ``textile`` -- implements `Textile`_
+    * ``markdown`` -- implements `Markdown`_
+    * ``restructuredtext`` -- implements `ReST (ReStructured Text)`_
+
+In each case, the filter expects formatted markup as a string and returns a
+string representing the marked-up text. For example, the ``textile`` filter
+converts text that is marked-up in Textile format to HTML.
+
+To activate these filters, add ``'django.contrib.markup'`` to your
+:setting:`INSTALLED_APPS` setting. Once you've done that, use ``{% load markup %}`` in
+a template, and you'll have access to these filters. For more documentation,
+read the source code in django/contrib/markup/templatetags/markup.py.
+
+.. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
+.. _Markdown: http://en.wikipedia.org/wiki/Markdown
+.. _ReST (ReStructured Text): http://en.wikipedia.org/wiki/ReStructuredText
+
+redirects
+=========
+
+A framework for managing redirects.
+
+See the :ref:`redirects documentation <ref-contrib-redirects>`.
+
+sessions
+========
+
+A framework for storing data in anonymous sessions.
+
+See the :ref:`sessions documentation <topics-http-sessions>`.
+
+sites
+=====
+
+A light framework that lets you operate multiple Web sites off of the same
+database and Django installation. It gives you hooks for associating objects to
+one or more sites.
+
+See the :ref:`sites documentation <ref-contrib-sites>`.
+
+sitemaps
+========
+
+A framework for generating Google sitemap XML files.
+
+See the :ref:`sitemaps documentation <ref-contrib-sitemaps>`.
+
+syndication
+===========
+
+A framework for generating syndication feeds, in RSS and Atom, quite easily.
+
+See the :ref:`syndication documentation <ref-contrib-syndication>`.
+
+webdesign
+=========
+
+Helpers and utilities targeted primarily at Web *designers* rather than
+Web *developers*.
+
+See the :ref:`Web design helpers documentation <ref-contrib-webdesign>`.
+
+Other add-ons
+=============
+
+If you have an idea for functionality to include in ``contrib``, let us know!
+Code it up, and post it to the `django-users mailing list`_.
+
+.. _django-users mailing list: http://groups.google.com/group/django-users

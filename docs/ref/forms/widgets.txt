@@ -1,0 +1,156 @@
+.. _ref-forms-widgets:
+
+=======
+Widgets
+=======
+
+.. module:: django.forms.widgets
+   :synopsis: Django's built-in form widgets.
+   
+.. currentmodule:: django.forms
+
+A widget is Django's representation of a HTML input element. The widget
+handles the rendering of the HTML, and the extraction of data from a GET/POST
+dictionary that corresponds to the widget.
+
+Django provides a representation of all the basic HTML widgets, plus some
+commonly used groups of widgets:
+
+.. class:: TextInput
+    Text input: ``<input type='text' ...>``
+
+.. class:: PasswordInput
+    Password input: ``<input type='password' ...>``
+
+.. class:: HiddenInput
+    Hidden input: ``<input type='hidden' ...>``
+
+.. class:: MultipleHiddenInput
+    Multiple ``<input type='hidden' ...>`` widgets.
+
+.. class:: FileInput
+    File upload input: ``<input type='file' ...>``
+
+.. class:: DateTimeInput
+    Date/time input as a simple text box: ``<input type='text' ...>``
+
+    **New in Django development version:**
+
+.. class:: Textarea
+    Text area: ``<textarea>...</textarea>``
+
+.. class:: CheckboxInput
+    Checkbox: ``<input type='checkbox' ...>``
+
+.. class:: Select
+    Select widget: ``<select><option ...>...</select>``
+
+.. class:: NullBooleanSelect
+    Select widget with options 'Unknown', 'Yes' and 'No'
+
+.. class:: SelectMultiple
+    Select widget allowing multiple selection: ``<select
+    multiple='multiple'>...</select>``
+
+.. class:: RadioSelect
+    A list of radio buttons:
+    
+    .. code-block:: html
+    
+        <ul>
+          <li><input type='radio' ...></li>
+          ...
+        </ul>
+
+.. class:: CheckboxSelectMultiple
+    A list of checkboxes:
+    
+    .. code-block:: html
+    
+        <ul>
+          <li><input type='checkbox' ...></li>
+          ...
+        </ul>
+
+.. class:: MultiWidget
+    Wrapper around multiple other widgets
+
+.. class:: SplitDateTimeWidget
+    Wrapper around two ``TextInput`` widgets: one for the date, and one for the
+    time.
+
+Specifying widgets
+------------------
+
+.. attribute:: Form.widget
+
+Whenever you specify a field on a form, Django will use a default widget
+that is appropriate to the type of data that is to be displayed. To find
+which widget is used on which field, see the documentation for the
+built-in Field classes.
+
+However, if you want to use a different widget for a field, you can -
+just use the 'widget' argument on the field definition. For example::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField(widget=forms.Textarea)
+
+This would specify a form with a comment that uses a larger Textarea widget,
+rather than the default TextInput widget.
+
+Customizing widget instances
+----------------------------
+
+When Django renders a widget as HTML, it only renders the bare minimum
+HTML - Django doesn't add a class definition, or any other widget-specific
+attributes. This means that all 'TextInput' widgets will appear the same
+on your web page.
+
+If you want to make one widget look different to another, you need to
+specify additional attributes for each widget. When you specify a
+widget, you can provide a list of attributes that will be added to the
+rendered HTML for the widget.
+
+For example, take the following simple form::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField()
+
+This form will include three default TextInput widgets, with default rendering -
+no CSS class, no extra attributes. This means that the input boxes provided for
+each widget will be rendered exactly the same::
+
+    >>> f = CommentForm(auto_id=False)
+    >>> f.as_table()
+    <tr><th>Name:</th><td><input type="text" name="name" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+
+On a real web page, you probably don't want every widget to look the same. You
+might want a larger input element for the comment, and you might want the 'name'
+widget to have some special CSS class. To do this, you use the ``attrs``
+argument when creating the widget:
+
+.. attribute:: Widget.attrs
+
+For example::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField(
+                    widget=forms.TextInput(attrs={'class':'special'}))
+        url = forms.URLField()
+        comment = forms.CharField(
+                   widget=forms.TextInput(attrs={'size':'40'}))
+
+Django will then include the extra attributes in the rendered output::
+
+    >>> f = CommentForm(auto_id=False)
+    >>> f.as_table()
+    <tr><th>Name:</th><td><input type="text" name="name" class="special"/></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>

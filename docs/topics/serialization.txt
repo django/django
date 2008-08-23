@@ -1,0 +1,182 @@
+.. _topics-serialization:
+
+==========================
+Serializing Django objects
+==========================
+
+Django's serialization framework provides a mechanism for "translating" Django
+objects into other formats. Usually these other formats will be text-based and
+used for sending Django objects over a wire, but it's possible for a
+serializer to handle any format (text-based or not).
+
+Serializing data
+----------------
+
+At the highest level, serializing data is a very simple operation::
+
+    from django.core import serializers
+    data = serializers.serialize("xml", SomeModel.objects.all())
+
+The arguments to the ``serialize`` function are the format to serialize the data
+to (see `Serialization formats`_) and a :class:`~django.db.models.QuerySet` to
+serialize. (Actually, the second argument can be any iterator that yields Django
+objects, but it'll almost always be a QuerySet).
+
+You can also use a serializer object directly::
+
+    XMLSerializer = serializers.get_serializer("xml")
+    xml_serializer = XMLSerializer()
+    xml_serializer.serialize(queryset)
+    data = xml_serializer.getvalue()
+
+This is useful if you want to serialize data directly to a file-like object
+(which includes an :class:`~django.http.HttpResponse` ::
+
+    out = open("file.xml", "w")
+    xml_serializer.serialize(SomeModel.objects.all(), stream=out)
+
+Subset of fields
+~~~~~~~~~~~~~~~~
+
+If you only want a subset of fields to be serialized, you can
+specify a ``fields`` argument to the serializer::
+
+    from django.core import serializers
+    data = serializers.serialize('xml', SomeModel.objects.all(), fields=('name','size'))
+
+In this example, only the ``name`` and ``size`` attributes of each model will
+be serialized.
+
+.. note::
+
+    Depending on your model, you may find that it is not possible to
+    deserialize a model that only serializes a subset of its fields. If a
+    serialized object doesn't specify all the fields that are required by a
+    model, the deserializer will not be able to save deserialized instances.
+
+Inherited Models
+~~~~~~~~~~~~~~~~
+
+If you have a model that is defined using an `abstract base class`_, you don't
+have to do anything special to serialize that model. Just call the serializer
+on the object (or objects) that you want to serialize, and the output will be
+a complete representation of the serialized object.
+
+However, if you have a model that uses `multi-table inheritance`_, you also
+need to serialize all of the base classes for the model. This is because only
+the fields that are locally defined on the model will be serialized. For
+example, consider the following models::
+
+	class Place(models.Model):
+		name = models.CharField(max_length=50)
+
+	class Restaurant(Place):
+		serves_hot_dogs = models.BooleanField()
+
+If you only serialize the Restaurant model::
+
+	data = serializers.serialize('xml', Restaurant.objects.all())
+
+the fields on the serialized output will only contain the `serves_hot_dogs`
+attribute. The `name` attribute of the base class will be ignored.
+
+In order to fully serialize your Restaurant instances, you will need to
+serialize the Place models as well::
+
+	all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
+	data = serializers.serialize('xml', all_objects)
+
+.. _abstract base class: http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
+.. _multi-table inheritance: http://www.djangoproject.com/documentation/model-api/#multi-table-inheritance
+
+Deserializing data
+------------------
+
+Deserializing data is also a fairly simple operation::
+
+    for obj in serializers.deserialize("xml", data):
+        do_something_with(obj)
+
+As you can see, the ``deserialize`` function takes the same format argument as
+``serialize``, a string or stream of data, and returns an iterator.
+
+However, here it gets slightly complicated. The objects returned by the
+``deserialize`` iterator *aren't* simple Django objects. Instead, they are
+special ``DeserializedObject`` instances that wrap a created -- but unsaved --
+object and any associated relationship data.
+
+Calling ``DeserializedObject.save()`` saves the object to the database.
+
+This ensures that deserializing is a non-destructive operation even if the
+data in your serialized representation doesn't match what's currently in the
+database. Usually, working with these ``DeserializedObject`` instances looks
+something like::
+
+    for deserialized_object in serializers.deserialize("xml", data):
+        if object_should_be_saved(deserialized_object):
+            deserialized_object.save()
+
+In other words, the usual use is to examine the deserialized objects to make
+sure that they are "appropriate" for saving before doing so.  Of course, if you
+trust your data source you could just save the object and move on.
+
+The Django object itself can be inspected as ``deserialized_object.object``.
+
+.. _serialization-formats:
+
+Serialization formats
+---------------------
+
+Django "ships" with a few included serializers:
+
+    ==========  ==============================================================
+    Identifier  Information
+    ==========  ==============================================================
+    ``xml``     Serializes to and from a simple XML dialect.
+
+    ``json``    Serializes to and from JSON_ (using a version of simplejson_
+                bundled with Django).
+
+    ``python``  Translates to and from "simple" Python objects (lists, dicts,
+                strings, etc.).  Not really all that useful on its own, but
+                used as a base for other serializers.
+
+    ``yaml``    Serializes to YAML (YAML Ain't a Markup Language). This
+                serializer is only available if PyYAML_ is installed.
+    ==========  ==============================================================
+
+.. _json: http://json.org/
+.. _simplejson: http://undefined.org/python/#simplejson
+.. _PyYAML: http://www.pyyaml.org/
+
+Notes for specific serialization formats
+----------------------------------------
+
+json
+~~~~
+
+If you're using UTF-8 (or any other non-ASCII encoding) data with the JSON
+serializer, you must pass ``ensure_ascii=False`` as a parameter to the
+``serialize()`` call. Otherwise, the output won't be encoded correctly.
+
+For example::
+
+    json_serializer = serializers.get_serializer("json")()
+    json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
+
+The Django source code includes the simplejson_ module. Be aware that if you're
+serializing using that module directly, not all Django output can be passed
+unmodified to simplejson. In particular, :ref:`lazy translation objects
+<lazy-translations>` need a `special encoder`_ written for them. Something like
+this will work::
+
+    from django.utils.functional import Promise
+    from django.utils.encoding import force_unicode
+
+    class LazyEncoder(simplejson.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, Promise):
+                return force_unicode(obj)
+            return obj
+
+.. _special encoder: http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7/docs/index.html

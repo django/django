@@ -1,0 +1,574 @@
+.. _ref-request-response:
+
+============================
+Request and response objects
+============================
+
+.. module:: django.http
+   :synopsis: Classes dealing with HTTP requests and responses.
+
+Quick overview
+==============
+
+Django uses request and response objects to pass state through the system.
+
+When a page is requested, Django creates an :class:`HttpRequest` object that
+contains metadata about the request. Then Django loads the appropriate view,
+passing the :class:`HttpRequest` as the first argument to the view function. Each
+view is responsible for returning an :class:`HttpResponse` object.
+
+This document explains the APIs for :class:`HttpRequest` and :class:`HttpResponse`
+objects.
+
+HttpRequest objects
+===================
+
+.. class:: HttpRequest
+
+Attributes
+----------
+
+All attributes except ``session`` should be considered read-only.
+
+.. attribute:: HttpRequest.path
+
+   A string representing the full path to the requested page, not including
+   the domain.
+
+   Example: ``"/music/bands/the_beatles/"``
+
+.. attribute:: HttpRequest.method
+
+    A string representing the HTTP method used in the request. This is
+    guaranteed to be uppercase. Example::
+
+        if request.method == 'GET':
+            do_something()
+        elif request.method == 'POST':
+            do_something_else()
+
+.. attribute:: HttpRequest.encoding
+
+    **New in Django development version**
+
+    A string representing the current encoding used to decode form submission
+    data (or ``None``, which means the ``DEFAULT_CHARSET`` setting is used).
+    You can write to this attribute to change the encoding used when accessing
+    the form data. Any subsequent attribute accesses (such as reading from
+    ``GET`` or ``POST``) will use the new ``encoding`` value.  Useful if you
+    know the form data is not in the ``DEFAULT_CHARSET`` encoding.
+
+.. attribute:: HttpRequest.GET
+
+    A dictionary-like object containing all given HTTP GET parameters. See the
+    ``QueryDict`` documentation below.
+
+.. attribute:: HttpRequest.POST
+
+    A dictionary-like object containing all given HTTP POST parameters. See the
+    ``QueryDict`` documentation below.
+
+    It's possible that a request can come in via POST with an empty ``POST``
+    dictionary -- if, say, a form is requested via the POST HTTP method but
+    does not include form data. Therefore, you shouldn't use ``if request.POST``
+    to check for use of the POST method; instead, use ``if request.method ==
+    "POST"`` (see above).
+
+    Note: ``POST`` does *not* include file-upload information. See ``FILES``.
+
+.. attribute:: HttpRequest.REQUEST
+
+    For convenience, a dictionary-like object that searches ``POST`` first,
+    then ``GET``. Inspired by PHP's ``$_REQUEST``.
+
+    For example, if ``GET = {"name": "john"}`` and ``POST = {"age": '34'}``,
+    ``REQUEST["name"]`` would be ``"john"``, and ``REQUEST["age"]`` would be
+    ``"34"``.
+
+    It's strongly suggested that you use ``GET`` and ``POST`` instead of
+    ``REQUEST``, because the former are more explicit.
+
+.. attribute:: HttpRequest.COOKIES
+
+    A standard Python dictionary containing all cookies. Keys and values are
+    strings.
+
+.. attribute:: HttpRequest.FILES 
+
+    .. admonition:: Changed in Django development version
+        
+        In previous versions of Django, ``request.FILES`` contained
+        simple ``dict`` objects representing uploaded files. This is
+        no longer true -- files are represented by ``UploadedFile``
+        objects as described below.
+        
+        These ``UploadedFile`` objects will emulate the old-style ``dict``
+        interface, but this is deprecated and will be removed in the next
+        release of Django.
+
+    A dictionary-like object containing all uploaded files. Each key in
+    ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
+    value in ``FILES`` is an ``UploadedFile`` object containing the following
+    attributes:
+
+        * ``read(num_bytes=None)`` -- Read a number of bytes from the file.
+        * ``file_name`` -- The name of the uploaded file.
+        * ``file_size`` -- The size, in bytes, of the uploaded file.
+        * ``chunk()`` -- A generator that yields sequential chunks of data.
+
+    See :ref:`topics-files` for more information.
+
+    Note that ``FILES`` will only contain data if the request method was POST
+    and the ``<form>`` that posted to the request had
+    ``enctype="multipart/form-data"``. Otherwise, ``FILES`` will be a blank
+    dictionary-like object.
+
+.. attribute:: HttpRequest.META
+
+    A standard Python dictionary containing all available HTTP headers.
+    Available headers depend on the client and server, but here are some
+    examples:
+
+        * ``CONTENT_LENGTH``
+        * ``CONTENT_TYPE``
+        * ``HTTP_ACCEPT_ENCODING``
+        * ``HTTP_ACCEPT_LANGUAGE``
+        * ``HTTP_HOST`` -- The HTTP Host header sent by the client.
+        * ``HTTP_REFERER`` -- The referring page, if any.
+        * ``HTTP_USER_AGENT`` -- The client's user-agent string.
+        * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.
+        * ``REMOTE_ADDR`` -- The IP address of the client.
+        * ``REMOTE_HOST`` -- The hostname of the client.
+        * ``REQUEST_METHOD`` -- A string such as ``"GET"`` or ``"POST"``.
+        * ``SERVER_NAME`` -- The hostname of the server.
+        * ``SERVER_PORT`` -- The port of the server.
+
+.. attribute:: HttpRequest.user
+
+    A ``django.contrib.auth.models.User`` object representing the currently
+    logged-in user. If the user isn't currently logged in, ``user`` will be set
+    to an instance of ``django.contrib.auth.models.AnonymousUser``. You
+    can tell them apart with ``is_authenticated()``, like so::
+
+        if request.user.is_authenticated():
+            # Do something for logged-in users.
+        else:
+            # Do something for anonymous users.
+
+    ``user`` is only available if your Django installation has the
+    ``AuthenticationMiddleware`` activated. For more, see
+    :ref:`topics-auth`.
+
+.. attribute:: HttpRequest.session
+
+    A readable-and-writable, dictionary-like object that represents the current
+    session. This is only available if your Django installation has session
+    support activated. See the :ref:`session documentation
+    <topics-http-sessions>` for full details.
+
+.. attribute:: HttpRequest.row_post_data
+
+    The raw HTTP POST data. This is only useful for advanced processing. Use
+    ``POST`` instead.
+
+.. attribute:: HttpRequest.urlconf
+
+    Not defined by Django itself, but will be read if other code (e.g., a custom
+    middleware class) sets it. When present, this will be used as the root
+    URLconf for the current request, overriding the ``ROOT_URLCONF`` setting.
+    See :ref:`how-django-processes-a-request` for details.
+
+Methods
+-------
+
+.. method:: HttpRequest.get_host()
+
+   **New in Django development version**
+
+   Returns the originating host of the request using information from the
+   ``HTTP_X_FORWARDED_HOST`` and ``HTTP_HOST`` headers (in that order). If
+   they don't provide a value, the method uses a combination of
+   ``SERVER_NAME`` and ``SERVER_PORT`` as detailed in `PEP 333`_.
+
+   .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
+
+   Example: ``"127.0.0.1:8000"``
+
+.. method:: HttpRequest.get_full_path()
+
+   Returns the ``path``, plus an appended query string, if applicable.
+
+   Example: ``"/music/bands/the_beatles/?print=true"``
+
+.. method:: HttpRequest.build_absolute_uri(location)
+
+   **New in Django development version**
+
+   Returns the absolute URI form of ``location``. If no location is provided,
+   the location will be set to ``request.get_full_path()``.
+
+   If the location is already an absolute URI, it will not be altered.
+   Otherwise the absolute URI is built using the server variables available in
+   this request.
+
+   Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
+
+.. method:: HttpRequest.is_secure()
+
+   Returns ``True`` if the request is secure; that is, if it was made with
+   HTTPS.
+
+.. method:: HttpRequest.is_ajax()
+
+   **New in Django development version**
+
+   Returns ``True`` if the request was made via an ``XMLHttpRequest``, by checking
+   the ``HTTP_X_REQUESTED_WITH`` header for the string ``'XMLHttpRequest'``. The
+   following major JavaScript libraries all send this header:
+
+       * jQuery
+       * Dojo
+       * MochiKit
+       * MooTools
+       * Prototype
+       * YUI
+
+   If you write your own XMLHttpRequest call (on the browser side), you'll
+   have to set this header manually if you want ``is_ajax()`` to work.
+
+
+QueryDict objects
+-----------------
+
+.. class:: QueryDict
+
+In an :class:`HttpRequest` object, the ``GET`` and ``POST`` attributes are instances
+of ``django.http.QueryDict``. :class:`QueryDict` is a dictionary-like
+class customized to deal with multiple values for the same key. This is
+necessary because some HTML form elements, notably
+``<select multiple="multiple">``, pass multiple values for the same key.
+
+``QueryDict`` instances are immutable, unless you create a ``copy()`` of them.
+That means you can't change attributes of ``request.POST`` and ``request.GET``
+directly.
+
+Methods
+-------
+
+:class:`QueryDict` implements all the standard dictionary methods, because it's
+a subclass of dictionary. Exceptions are outlined here:
+
+.. method:: QueryDict.__getitem__(key)
+
+    Returns the value for the given key. If the key has more than one value,
+    ``__getitem__()`` returns the last value. Raises
+    ``django.utils.datastructure.MultiValueDictKeyError`` if the key does not
+    exist. (This is a subclass of Python's standard ``KeyError``, so you can
+    stick to catching ``KeyError``.)
+
+.. method:: QueryDict.__setitem__(key, value)
+
+    Sets the given key to ``[value]`` (a Python list whose single element is
+    ``value``). Note that this, as other dictionary functions that have side
+    effects, can only be called on a mutable ``QueryDict`` (one that was created
+    via ``copy()``).
+
+.. method:: QueryDict.__contains__(key)
+
+    Returns ``True`` if the given key is set. This lets you do, e.g., ``if "foo"
+    in request.GET``.
+
+.. method:: QueryDict.get(key, default)
+
+    Uses the same logic as ``__getitem__()`` above, with a hook for returning a
+    default value if the key doesn't exist.
+
+.. method:: QueryDict.setdefault(key, default)
+
+    Just like the standard dictionary ``setdefault()`` method, except it uses
+    ``__setitem__`` internally.
+
+.. method:: QueryDict.update(other_dict) 
+
+    Takes either a ``QueryDict`` or standard dictionary. Just like the standard
+    dictionary ``update()`` method, except it *appends* to the current
+    dictionary items rather than replacing them. For example::
+
+          >>> q = QueryDict('a=1')
+          >>> q = q.copy() # to make it mutable
+          >>> q.update({'a': '2'})
+          >>> q.getlist('a')
+          ['1', '2']
+          >>> q['a'] # returns the last
+          ['2']
+
+.. method:: QueryDict.items()
+
+    Just like the standard dictionary ``items()`` method, except this uses the
+    same last-value logic as ``__getitem()__``. For example::
+
+           >>> q = QueryDict('a=1&a=2&a=3')
+           >>> q.items()
+           [('a', '3')]
+
+.. method:: QueryDict.values()
+
+    Just like the standard dictionary ``values()`` method, except this uses the
+    same last-value logic as ``__getitem()__``. For example::
+
+           >>> q = QueryDict('a=1&a=2&a=3')
+           >>> q.values()
+           ['3']
+
+In addition, ``QueryDict`` has the following methods:
+
+.. method:: QueryDict.copy()
+
+    Returns a copy of the object, using ``copy.deepcopy()`` from the Python
+    standard library. The copy will be mutable -- that is, you can change its
+    values.
+
+.. method:: QueryDict.getlist(key)
+
+    Returns the data with the requested key, as a Python list. Returns an
+    empty list if the key doesn't exist. It's guaranteed to return a list of
+    some sort.
+
+.. method:: QueryDict.setlist(key, list_)
+
+    Sets the given key to ``list_`` (unlike ``__setitem__()``).
+
+.. method:: QueryDict.appendlist(key, item)
+
+    Appends an item to the internal list associated with key.
+
+.. method:: QueryDict.setlistdefault(key, default_list)
+
+    Just like ``setdefault``, except it takes a list of values instead of a
+    single value.
+
+.. method:: QueryDict.lists()
+
+    Like :method:items(), except it includes all values, as a list, for each
+    member of the dictionary. For example::
+    
+         >>> q = QueryDict('a=1&a=2&a=3')
+         >>> q.lists()
+         [('a', ['1', '2', '3'])]
+    
+.. method:: QueryDict.urlencode()
+
+    Returns a string of the data in query-string format.
+    Example: ``"a=2&b=3&b=5"``.
+
+HttpResponse objects
+====================
+
+.. class:: HttpResponse
+
+In contrast to :class:`HttpRequest` objects, which are created automatically by
+Django, :class:`HttpResponse` objects are your responsibility. Each view you
+write is responsible for instantiating, populating and returning an
+:class:`HttpResponse`.
+
+The :class:`HttpResponse` class lives in the ``django.http`` module.
+
+Usage
+-----
+
+Passing strings
+~~~~~~~~~~~~~~~
+
+Typical usage is to pass the contents of the page, as a string, to the
+:class:`HttpResponse` constructor::
+
+    >>> response = HttpResponse("Here's the text of the Web page.")
+    >>> response = HttpResponse("Text only, please.", mimetype="text/plain")
+
+But if you want to add content incrementally, you can use ``response`` as a
+file-like object::
+
+    >>> response = HttpResponse()
+    >>> response.write("<p>Here's the text of the Web page.</p>")
+    >>> response.write("<p>Here's another paragraph.</p>")
+
+You can add and delete headers using dictionary syntax::
+
+    >>> response = HttpResponse()
+    >>> response['X-DJANGO'] = "It's the best."
+    >>> del response['X-PHP']
+    >>> response['X-DJANGO']
+    "It's the best."
+
+Note that ``del`` doesn't raise ``KeyError`` if the header doesn't exist.
+
+Passing iterators
+~~~~~~~~~~~~~~~~~
+
+Finally, you can pass ``HttpResponse`` an iterator rather than passing it
+hard-coded strings. If you use this technique, follow these guidelines:
+
+    * The iterator should return strings.
+    * If an :class:`HttpResponse` has been initialized with an iterator as its
+      content, you can't use the class:`HttpResponse` instance as a file-like
+      object. Doing so will raise ``Exception``.
+
+Setting headers
+~~~~~~~~~~~~~~~
+
+To set a header in your response, just treat it like a dictionary::
+
+    >>> response = HttpResponse()
+    >>> response['Pragma'] = 'no-cache'
+
+Telling the browser to treat the response as a file attachment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To tell the browser to treat the response as a file attachment, use the
+``mimetype`` argument and set the ``Content-Disposition`` header. For example,
+this is how you might return a Microsoft Excel spreadsheet::
+
+    >>> response = HttpResponse(my_data, mimetype='application/vnd.ms-excel')
+    >>> response['Content-Disposition'] = 'attachment; filename=foo.xls'
+
+There's nothing Django-specific about the ``Content-Disposition`` header, but
+it's easy to forget the syntax, so we've included it here.
+
+Methods
+-------
+
+.. method:: HttpResponse.__init__(content='', mimetype=None, status=200, content_type=DEFAULT_CONTENT_TYPE)
+    
+    Instantiates an ``HttpResponse`` object with the given page content (a
+    string) and MIME type. The ``DEFAULT_CONTENT_TYPE`` is ``'text/html'``.
+
+    ``content`` can be an iterator or a string. If it's an iterator, it should
+    return strings, and those strings will be joined together to form the
+    content of the response.
+
+    ``status`` is the `HTTP Status code`_ for the response.
+
+    **(New in Django development version)** ``content_type`` is an alias for
+    ``mimetype``. Historically, the parameter was only called ``mimetype``,
+    but since this is actually the value included in the HTTP ``Content-Type``
+    header, it can also include the character set encoding, which makes it
+    more than just a MIME type specification. If ``mimetype`` is specified
+    (not ``None``), that value is used. Otherwise, ``content_type`` is used. If
+    neither is given, the ``DEFAULT_CONTENT_TYPE`` setting is used.
+
+.. method:: HttpResponse.__setitem__(header, value)
+
+    Sets the given header name to the given value. Both ``header`` and
+    ``value`` should be strings.
+
+.. method:: HttpResponse.__delitem__(header)
+
+    Deletes the header with the given name. Fails silently if the header
+    doesn't exist. Case-sensitive.
+
+.. method:: HttpResponse.__getitem__(header)
+
+    Returns the value for the given header name. Case-sensitive.
+
+.. method:: HttpResponse.has_header(header)
+
+    Returns ``True`` or ``False`` based on a case-insensitive check for a
+    header with the given name.
+
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None)
+
+    Sets a cookie. The parameters are the same as in the `cookie Morsel`_
+    object in the Python standard library.
+
+        * ``max_age`` should be a number of seconds, or ``None`` (default) if
+          the cookie should last only as long as the client's browser session.
+        * ``expires`` should be a string in the format
+          ``"Wdy, DD-Mon-YY HH:MM:SS GMT"``.
+        * Use ``domain`` if you want to set a cross-domain cookie. For example,
+          ``domain=".lawrence.com"`` will set a cookie that is readable by
+          the domains www.lawrence.com, blogs.lawrence.com and
+          calendars.lawrence.com. Otherwise, a cookie will only be readable by
+          the domain that set it.
+
+    .. _`cookie Morsel`: http://www.python.org/doc/current/lib/morsel-objects.html
+
+.. method:: HttpResponse.delete_cookie(key, path='/', domain=None)
+
+    Deletes the cookie with the given key. Fails silently if the key doesn't
+    exist.
+
+    Due to the way cookies work, ``path`` and ``domain`` should be the same
+    values you used in ``set_cookie()`` -- otherwise the cookie may not be
+    deleted.
+
+.. method:: HttpResponse.content()
+
+    Returns the content as a Python string, encoding it from a Unicode object
+    if necessary. Note this is a property, not a method, so use ``r.content``
+    instead of ``r.content()``.
+
+.. method:: HttpResponse.write(content)
+
+    This method makes an :class:`HttpResponse` instance a file-like object.
+
+.. method:: HttpResponse.flush()
+
+    This method makes an :class:`HttpResponse` instance a file-like object.
+
+.. method:: HttpResponse.tell()
+
+    This method makes an :class:`HttpResponse` instance a file-like object.
+
+.. _HTTP Status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
+
+
+HttpResponse subclasses
+-----------------------
+
+Django includes a number of ``HttpResponse`` subclasses that handle different
+types of HTTP responses. Like ``HttpResponse``, these subclasses live in
+:mod:`django.http`.
+
+.. class:: HttpResponseRedirect
+
+    The constructor takes a single argument -- the path to redirect to. This
+    can be a fully qualified URL (e.g. ``'http://www.yahoo.com/search/'``) or an
+    absolute URL with no domain (e.g. ``'/search/'``). Note that this returns
+    an HTTP status code 302.
+
+.. class:: HttpResponsePermanentRedirect
+
+    Like :class:`HttpResponseRedirect`, but it returns a permanent redirect
+    (HTTP status code 301) instead of a "found" redirect (status code 302).
+
+.. class:: HttpResponseNotModified
+
+    The constructor doesn't take any arguments. Use this to designate that a
+    page hasn't been modified since the user's last request (status code 304).
+
+.. class:: HttpResponseBadRequest
+
+    **New in Django development version.** Acts just like :class:`HttpResponse`
+    but uses a 400 status code.
+
+.. class:: HttpResponseNotFound
+
+    Acts just like :class:`HttpResponse` but uses a 404 status code.
+
+.. class:: HttpResponseForbidden
+
+    Acts just like :class:`HttpResponse` but uses a 403 status code.
+
+.. class:: HttpResponseNotAllowed
+
+    Like :class:`HttpResponse`, but uses a 405 status code. Takes a single,
+    required argument: a list of permitted methods (e.g. ``['GET', 'POST']``).
+
+.. class:: HttpResponseGone
+
+    Acts just like :class:`HttpResponse` but uses a 410 status code.
+
+.. class:: HttpResponseServerError
+
+    Acts just like :class:`HttpResponse` but uses a 500 status code.
+

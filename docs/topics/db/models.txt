@@ -1,0 +1,746 @@
+.. _topics-db-models:
+
+==============
+Writing models
+==============
+
+.. module:: django.db.models
+
+A model is the single, definitive source of data about your data. It contains
+the essential fields and behaviors of the data you're storing. Generally, each
+model maps to a single database table.
+
+The basics:
+
+    * Each model is a Python class that subclasses
+      :class:`django.db.models.Model`.
+    
+    * Each attribute of the model represents a database field.
+
+    * With all of this, Django gives you an automatically-generated
+      database-access API; see :ref:`topics-db-queries`.
+
+.. seealso::
+
+    A companion to this document is the `official repository of model
+    examples`_. (In the Django source distribution, these examples are in the
+    ``tests/modeltests`` directory.)
+
+    .. _official repository of model examples: http://www.djangoproject.com/documentation/models/
+
+Quick example
+=============
+
+This example model defines a ``Person``, which has a ``first_name`` and
+``last_name``::
+
+    from django.db import models
+
+    class Person(models.Model):
+        first_name = models.CharField(max_length=30)
+        last_name = models.CharField(max_length=30)
+
+``first_name`` and ``last_name`` are :term:`fields <field>` of the model. Each
+field is specified as a class attribute, and each attribute maps to a database
+column.
+
+The above ``Person`` model would create a database table like this:
+
+.. code-block:: sql
+
+    CREATE TABLE myapp_person (
+        "id" serial NOT NULL PRIMARY KEY,
+        "first_name" varchar(30) NOT NULL,
+        "last_name" varchar(30) NOT NULL
+    );
+
+Some technical notes:
+
+    * The name of the table, ``myapp_person``, is automatically derived from
+      some model metadata but can be overridden. See :ref:`table-names` for more
+      details..
+      
+    * An ``id`` field is added automatically, but this behavior can be
+      overridden. See :ref:`automatic-primary-key-fields`.
+            
+    * The ``CREATE TABLE`` SQL in this example is formatted using PostgreSQL
+      syntax, but it's worth noting Django uses SQL tailored to the database
+      backend specified in your :ref:`settings file <topics-settings>`.
+
+Using models
+============
+
+Once you have defined your models, you need to tell Django you're going to *use*
+those models. Do this by editing your settings file and changing the
+:setting:`INSTALLED_APPS` setting to add the name of the module that contains
+your ``models.py``.
+
+For example, if the models for your application live in the module
+``mysite.myapp.models`` (the package structure that is created for an
+application by the :djadmin:`manage.py startapp <startapp>` script),
+:setting:`INSTALLED_APPS` should read, in part::
+
+    INSTALLED_APPS = (
+        #...
+        'mysite.myapp',
+        #...
+    )
+
+When you add new apps to :setting:`INSTALLED_APPS`, be sure to run
+:djadmin:`manage.py syncdb <syncdb>`.
+
+Fields
+======
+
+The most important part of a model -- and the only required part of a model --
+is the list of database fields it defines. Fields are specified by class
+attributes.
+
+Example::
+
+    class Musician(models.Model):
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
+        instrument = models.CharField(max_length=100)
+
+    class Album(models.Model):
+        artist = models.ForeignKey(Musician)
+        name = models.CharField(max_length=100)
+        release_date = models.DateField()
+        num_stars = models.IntegerField()
+
+Field types
+-----------
+
+Each field in your model should be an instance of the appropriate
+:class:`~django.db.models.Field` class. Django uses the field class types to
+determine a few things:
+
+    * The database column type (e.g. ``INTEGER``, ``VARCHAR``).
+
+    * The widget to use in Django's admin interface, if you care to use it
+      (e.g. ``<input type="text">``, ``<select>``).
+
+    * The minimal validation requirements, used in Django's admin and in
+      automatically-generated forms.
+
+Django ships with dozens of built-in field types; you can find the complete list
+in the :ref:`model field reference <model-field-types>`. You can easily write
+your own fields if Django's built-in ones don't do the trick; see
+:ref:`howto-custom-model-fields`.
+
+Field options
+-------------
+
+Each field takes a certain set of field-specific arguments (documented in the
+:ref:`model field reference <model-field-types>`). For example,
+:class:`~django.db.models.CharField` (and its subclasses) require a
+:attr:`~django.db.models.CharField.max_length` argument which specifies the size
+of the ``VARCHAR`` database field used to store the data.
+
+There's also a set of common arguments available to all field types. All are
+optional. They're fully explained in the :ref:`reference
+<common-model-field-options>`, but here's a quick summary of the most often-used
+ones:
+
+    :attr:`~Field.null`
+        If ``True``, Django will store empty values as ``NULL`` in the database.
+        Default is ``False``.
+
+    :attr:`~ieldblank`
+
+        If ``True``, the field is allowed to be blank. Default is ``False``.
+    
+        Note that this is different than :attr:`~Field.null`.
+        :attr:`~Field.null` is purely database-related, whereas
+        :attr:`~Field.blank` is validation-related. If a field has
+        :attr:`blank=True <Field.blank>`, validation on Django's admin site will
+        allow entry of an empty value. If a field has :attr:`blank=False
+        <Field.blank>`, the field will be required.
+
+    :attr:`~Field.choices`
+
+        An iterable (e.g., a list or tuple) of 2-tuples to use as choices for
+        this field. If this is given, Django's admin will use a select box
+        instead of the standard text field and will limit choices to the choices
+        given.
+
+        A choices list looks like this::
+
+            YEAR_IN_SCHOOL_CHOICES = (
+                ('FR', 'Freshman'),
+                ('SO', 'Sophomore'),
+                ('JR', 'Junior'),
+                ('SR', 'Senior'),
+                ('GR', 'Graduate'),
+            )
+            
+    :attr:`~Field.default`
+
+        The default value for the field. This can be a value or a callable
+        object. If callable it will be called every time a new object is
+        created.
+    
+    :attr:`~Field.help_text`
+
+        Extra "help" text to be displayed under the field on the object's admin
+        form. It's useful for documentation even if your object doesn't have an
+        admin form.
+
+    :attr:`~Field.primary_key``
+
+        If ``True``, this field is the primary key for the model.
+
+        If you don't specify :attr:`primary_key=True <Field.primary_key>` for
+        any fields in your model, Django will automatically add an
+        :class:`IntegerField` to hold the primary key, so you don't need to set
+        :attr:`primary_key=True <Field.primary_key>` on any of your fields
+        unless you want to override the default primary-key behavior. For more,
+        see :ref:`automatic-primary-key-fields`.
+
+    :attr:`~Field.unique`
+
+        If ``True``, this field must be unique throughout the table.
+
+Again, these are just short descriptions of the most common field options. Full
+details can be found in the :ref:`common model field option reference
+<common-model-field-options>`.
+
+.. _automatic-primary-key-fields:
+
+Automatic primary key fields
+----------------------------
+
+By default, Django gives each model the following field::
+
+    id = models.AutoField(primary_key=True)
+
+This is an auto-incrementing primary key.
+
+If you'd like to specify a custom primary key, just specify
+:attr:`primary_key=True <Field.primary_key>` on one of your fields. If Django
+sees you've explicitly set :attr:`Field.primary_key`, it won't add the automatic
+``id`` column.
+
+Each model requires exactly one field to have :attr:`primary_key=True
+<Field.primary_key>`.
+
+Verbose field names
+-------------------
+
+Each field type, except for :class:`~django.db.models.ForeignKey`,
+:class:`~django.db.models.ManyToManyField` and
+:class:`~django.db.models.OneToOneField`, takes an optional first positional
+argument -- a verbose name. If the verbose name isn't given, Django will
+automatically create it using the field's attribute name, converting underscores
+to spaces.
+
+In this example, the verbose name is ``"Person's first name"``::
+
+    first_name = models.CharField("Person's first name", max_length=30)
+
+In this example, the verbose name is ``"first name"``::
+
+    first_name = models.CharField(max_length=30)
+
+:class:`~django.db.models.ForeignKey`,
+:class:`~django.db.models.ManyToManyField` and
+:class:`~django.db.models.OneToOneField` require the first argument to be a
+model class, so use the :attr:`~Field.verbose_name` keyword argument::
+
+    poll = models.ForeignKey(Poll, verbose_name="the related poll")
+    sites = models.ManyToManyField(Site, verbose_name="list of sites")
+    place = models.OneToOneField(Place, verbose_name="related place")
+
+The convention is not to capitalize the first letter of the
+:attr:`~Field.verbose_name`. Django will automatically capitalize the first
+letter where it needs to.
+
+Relationships
+-------------
+
+Clearly, the power of relational databases lies in relating tables to each
+other. Django offers ways to define the three most common types of database
+relationships: Many-to-one, many-to-many and one-to-one.
+
+Many-to-one relationships
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
+You use it just like any other :class:`~django.db.models.Field` type: by
+including it as a class attribute of your model.
+
+:class:`~django.db.models.ForeignKey` requires a positional argument: the class
+to which the model is related.
+
+For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
+``Manufacturer`` makes multiple cars but each ``Car`` only has one
+``Manufacturer`` -- use the following definitions::
+
+    class Manufacturer(models.Model):
+        # ...
+
+    class Car(models.Model):
+        manufacturer = models.ForeignKey(Manufacturer)
+        # ...
+        
+You can also create :ref:`recursive relationships <recursive-relationships>` (an
+object with a many-to-one relationship to itself) and :ref:`relationsips to
+models not yet defined <lazy-relationships>`; see :ref:`the model field
+reference <ref-foreignkey>` for details.`
+
+It's suggested, but not required, that the name of a
+:class:`~django.db.models.ForeignKey` field (``manufacturer`` in the example
+above) be the name of the model, lowercase. You can, of course, call the field
+whatever you want. For example::
+
+    class Car(models.Model):
+        company_that_makes_it = models.ForeignKey(Manufacturer)
+        # ...
+
+.. seealso::
+
+    See the `Many-to-one relationship model example`_ for a full example.
+
+.. _Many-to-one relationship model example: http://www.djangoproject.com/models/many_to_one/
+
+:class:`~django.db.models.ForeignKey` fields also accept a number of extra
+arguments which are explained in :ref:`the model field reference
+<foreign-key-arguments>`. These options help define how the relationship should
+work; all are optional.
+
+Many-to-many relationships
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To define a many-to-many relationship, use
+:class:`~django.db.models.ManyToManyField`. You use it just like any other
+:class:`~django.db.models.Field` type: by including it as a class attribute of
+your model.
+
+:class:`~django.db.models.ManyToManyField` requires a positional argument: the
+class to which the model is related.
+
+For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
+``Topping`` can be on multiple pizzas and each ``Pizza`` has multiple toppings
+-- here's how you'd represent that::
+
+    class Topping(models.Model):
+        # ...
+
+    class Pizza(models.Model):
+        # ...
+        toppings = models.ManyToManyField(Topping)
+
+As with :class:`~django.db.models.ForeignKey`, you can also create
+:ref:`recursive relationships <recursive-relationships>` (an object with a
+many-to-one relationship to itself) and :ref:`relationships to models not yet
+defined <lazy-relationships>`; see :ref:`the model field reference
+<ref-manytomany>` for details.`
+
+It's suggested, but not required, that the name of a
+:class:`~django.db.models.ManyToManyField` (``toppings`` in the example above)
+be a plural describing the set of related model objects.
+
+It doesn't matter which model gets the
+:class:`~django.db.models.ManyToManyField`, but you only need it in one of the
+models -- not in both.
+
+Generally, :class:`~django.db.models.ManyToManyField` instances should go in the
+object that's going to be edited in the admin interface, if you're using
+Django's admin. In the above example, ``toppings`` is in ``Pizza`` (rather than
+``Topping`` having a ``pizzas`` :class:`~django.db.models.ManyToManyField` )
+because it's more natural to think about a ``Pizza`` having toppings than a
+topping being on multiple pizzas. The way it's set up above, the ``Pizza`` admin
+form would let users select the toppings.
+
+.. seealso:: 
+
+    See the `Many-to-many relationship model example`_ for a full example.
+
+.. _Many-to-many relationship model example: http://www.djangoproject.com/models/many_to_many/
+
+:class:`~django.db.models.ManyToManyField` fields also accept a number of extra
+arguments which are explained in :ref:`the model field reference
+<manytomany-arguments>`. These options help define how the relationship should
+work; all are optional.
+
+Extra fields on many-to-many relationships
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version** 
+
+When you're only dealing with simple many-to-many relationships such as
+mixing and matching pizzas and toppings, a standard ``ManyToManyField``
+is all you need. However, sometimes you may need to associate data with the
+relationship between two models. 
+
+For example, consider the case of an application tracking the musical groups
+which musicians belong to. There is a many-to-many relationship between a person
+and the groups of which they are a member, so you could use a ManyToManyField
+to represent this relationship. However, there is a lot of detail about the
+membership that you might want to collect, such as the date at which the person
+joined the group.
+
+For these situations, Django allows you to specify the model that will be used
+to govern the many-to-many relationship. You can then put extra fields on the
+intermediate model. The intermediate model is associated with the
+``ManyToManyField`` using the ``through`` argument to point to the model
+that will act as an intermediary. For our musician example, the code would look
+something like this::
+
+    class Person(models.Model):
+        name = models.CharField(max_length=128)
+
+        def __unicode__(self):
+            return self.name
+
+    class Group(models.Model):
+        name = models.CharField(max_length=128)
+        members = models.ManyToManyField(Person, through='Membership')
+
+        def __unicode__(self):
+            return self.name
+
+    class Membership(models.Model):
+        person = models.ForeignKey(Person)
+        group = models.ForeignKey(Group)
+        date_joined = models.DateField()
+        invite_reason = models.CharField(max_length=64)
+
+When you set up the intermediary model, you explicitly specify foreign 
+keys to the models that are involved in the ManyToMany relation. This
+explicit declaration defines how the two models are related.
+
+There are a few restrictions on the intermediate model:
+
+    * Your intermediate model must contain one - and *only* one - foreign key
+      on the target model (this would be ``Person`` in our example). If you
+      have more than one foreign key, a validation error will be raised.
+  
+    * Your intermediate model must contain one - and *only* one - foreign key 
+      on the source model (this would be ``Group`` in our example). If you
+      have more than one foreign key, a validation error will be raised.
+
+    * The only exception to this is a model which has a many-to-many
+      relationship to itself, through an intermediary model. In this
+      case, two foreign keys to the same model are permitted, but they
+      will be treated as the two (different) sides of the many-to-many
+      relation.
+    
+    * When defining a many-to-many relationship from a model to
+      itself, using an intermediary model, you *must* use
+      ``symmetrical=False`` (see the documentation for
+      ``ManyToManyField`` above).
+
+Now that you have set up your ``ManyToManyField`` to use your intermediary 
+model (Membership, in this case), you're ready to start creating some
+many-to-many relationships. You do this by creating instances of the
+intermediate model::
+    
+    >>> ringo = Person.objects.create(name="Ringo Starr")
+    >>> paul = Person.objects.create(name="Paul McCartney")
+    >>> beatles = Group.objects.create(name="The Beatles")
+    >>> m1 = Membership(person=ringo, group=beatles,
+    ...     date_joined=date(1962, 8, 16), 
+    ...     invite_reason= "Needed a new drummer.")
+    >>> m1.save()
+    >>> beatles.members.all()
+    [<Person: Ringo Starr>]
+    >>> ringo.group_set.all()
+    [<Group: The Beatles>]
+    >>> m2 = Membership.objects.create(person=paul, group=beatles,
+    ...     date_joined=date(1960, 8, 1), 
+    ...     invite_reason= "Wanted to form a band.")
+    >>> beatles.members.all()
+    [<Person: Ringo Starr>, <Person: Paul McCartney>]
+
+Unlike normal many-to-many fields, you *can't* use ``add``, ``create``,
+or assignment (i.e., ``beatles.members = [...]``) to create relationships::
+
+    # THIS WILL NOT WORK
+    >>> beatles.members.add(john)
+    # NEITHER WILL THIS
+    >>> beatles.members.create(name="George Harrison")
+    # AND NEITHER WILL THIS
+    >>> beatles.members = [john, paul, ringo, george]
+    
+Why? You can't just create a relationship between a Person and a Group - you
+need to specify all the detail for the relationship required by the
+Membership table. The simple ``add``, ``create`` and assignment calls
+don't provide a way to specify this extra detail. As a result, they are
+disabled for many-to-many relationships that use an intermediate model.
+The only way to create a many-to-many relationship with an intermediate table
+is to create instances of the intermediate model.
+
+The ``remove`` method is disabled for similar reasons. However, the
+``clear()`` method can be used to remove all many-to-many relationships
+for an instance::
+
+    # Beatles have broken up
+    >>> beatles.members.clear()
+
+Once you have established the many-to-many relationships by creating instances
+of your intermediate model, you can issue queries. Just as with normal 
+many-to-many relationships, you can query using the attributes of the 
+many-to-many-related model::
+
+    # Find all the groups with a member whose name starts with 'Paul'
+    >>> Groups.objects.filter(person__name__startswith='Paul')
+    [<Group: The Beatles>]
+
+As you are using an intermediate table, you can also query on the attributes 
+of the intermediate model::
+
+    # Find all the members of the Beatles that joined after 1 Jan 1961
+    >>> Person.objects.filter(
+    ...     group__name='The Beatles',
+    ...     membership__date_joined__gt=date(1961,1,1))
+    [<Person: Ringo Starr]
+    
+
+One-to-one relationships
+------------------------
+
+One-to-one relationships are very similar to many-to-one relationships. If you
+define a ``OneToOneField`` on your model, instances of that model will have
+access to the related object via a simple attribute of the model.
+
+For example::
+
+    class EntryDetail(models.Model):
+        entry = models.OneToOneField(Entry)
+        details = models.TextField()
+
+    ed = EntryDetail.objects.get(id=2)
+    ed.entry # Returns the related Entry object.
+
+The difference comes in "reverse" queries. The related model in a one-to-one
+relationship also has access to a ``Manager`` object, but that ``Manager``
+represents a single object, rather than a collection of objects::
+
+    e = Entry.objects.get(id=2)
+    e.entrydetail # returns the related EntryDetail object
+
+If no object has been assigned to this relationship, Django will raise
+a ``DoesNotExist`` exception.
+
+Instances can be assigned to the reverse relationship in the same way as
+you would assign the forward relationship::
+
+    e.entrydetail = ed
+
+Models across files
+~~~~~~~~~~~~~~~~~~~
+
+It's perfectly OK to relate a model to one from another app. To do this, just
+import the related model at the top of the model that holds your model. Then,
+just refer to the other model class wherever needed. For example::
+
+    from mysite.geography.models import ZipCode
+
+    class Restaurant(models.Model):
+        # ...
+        zip_code = models.ForeignKey(ZipCode)
+
+Field name restrictions
+-----------------------
+
+Django places only two restrictions on model field names:
+
+    1. A field name cannot be a Python reserved word, because that would result
+       in a Python syntax error. For example::
+
+           class Example(models.Model):
+               pass = models.IntegerField() # 'pass' is a reserved word!
+
+    2. A field name cannot contain more than one underscore in a row, due to
+       the way Django's query lookup syntax works. For example::
+
+           class Example(models.Model):
+               foo__bar = models.IntegerField() # 'foo__bar' has two underscores!
+
+These limitations can be worked around, though, because your field name doesn't
+necessarily have to match your database column name. See the
+:attr:`~Field.db_column` option.
+
+SQL reserved words, such as ``join``, ``where`` or ``select``, *are* allowed as
+model field names, because Django escapes all database table names and column
+names in every underlying SQL query. It uses the quoting syntax of your
+particular database engine.
+
+Custom field types
+------------------
+
+**New in Django development version**
+
+If one of the existing model fields cannot be used to fit your purposes, or if
+you wish to take advantage of some less common database column types, you can
+create your own field class. Full coverage of creating your own fields is
+provided in :ref:`howto-custom-model-fields`.
+
+.. _meta-options:
+
+Meta options
+============
+
+Give your model metadata by using an inner ``class Meta``, like so::
+
+    class Ox(models.Model):
+        horn_length = models.IntegerField()
+
+        class Meta:
+            ordering = ["horn_length"]
+            verbose_name_plural = "oxen"
+
+Model metadata is "anything that's not a field", such as ordering options
+(:attr:`~Options.ordering`), database table name (:attr:`~Options.db_table`), or
+human-readable singular and plural names (:attr:`~Options.verbose_name` and
+:attr:`~Options.verbose_name_plural`). None are required, and adding ``class
+Meta`` to a model is completely optional.
+
+A complete list of all possible ``Meta`` options can be found in the :ref:`model
+option reference <ref-models-options>`.
+
+.. _model-methods:
+
+Model methods
+=============
+
+Define custom methods on a model to add custom "row-level" functionality to your
+objects. Whereas :class:`~django.db.models.Manager` methods are intended to do
+"table-wide" things, model methods should act on a particular model instance.
+
+This is a valuable technique for keeping business logic in one place -- the
+model.
+
+For example, this model has a few custom methods::
+
+    class Person(models.Model):
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
+        birth_date = models.DateField()
+        address = models.CharField(max_length=100)
+        city = models.CharField(max_length=50)
+        state = models.USStateField() # Yes, this is America-centric...
+
+        def baby_boomer_status(self):
+            "Returns the person's baby-boomer status."
+            import datetime
+            if datetime.date(1945, 8, 1) <= self.birth_date <= datetime.date(1964, 12, 31):
+                return "Baby boomer"
+            if self.birth_date < datetime.date(1945, 8, 1):
+                return "Pre-boomer"
+            return "Post-boomer"
+
+        def is_midwestern(self):
+            "Returns True if this person is from the Midwest."
+            return self.state in ('IL', 'WI', 'MI', 'IN', 'OH', 'IA', 'MO')
+
+        def _get_full_name(self):
+            "Returns the person's full name."
+            return '%s %s' % (self.first_name, self.last_name)
+        full_name = property(_get_full_name)
+
+The last method in this example is a :term:`property`. `Read more about
+properties`_.
+
+.. _Read more about properties: http://www.python.org/download/releases/2.2/descrintro/#property
+
+The :ref:`model instance reference <ref-models-instances>` has a complete list
+of `methods automatically given to each model <model-instance-methods>`. You can
+override most of these -- see `overriding predefined model methods`_, below --
+but there are a couple that you'll almost always want to define:
+
+    :meth:`~Model.__unicode__`
+        A Python "magic method" that returns a unicode "representation" of any
+        object. This is what Python and Django will use whenever a model
+        instance needs to be coerced and displayed as a plain string. Most
+        notably, this happens when you display an object in an interactive
+        console or in the admin.
+        
+        You'll always want to define this method; the default isn't very helpful
+        at all.
+        
+    :meth:`~Model.get_absolute_url`
+        This tells Django how to calculate the URL for an object. Django uses
+        this in its admin interface, and any time it needs to figure out a URL
+        for an object.
+        
+        Any object that has a URL that uniquely identifies it should define this
+        method.
+
+Overriding predefined model methods
+-----------------------------------
+
+There's another set of :ref:`model methods <model-instance-methods>` that
+encapsulate a bunch of database behavior that you'll want to customize. In
+particular you'll often want to change the way :meth:`~Model.save` and
+:meth:`~Model.delete` work.
+
+You're free to override these methods (and any other model method) to alter
+behavior.
+
+A classic use-case for overriding the built-in methods is if you want something
+to happen whenever you save an object. For example::
+
+    class Blog(models.Model):
+        name = models.CharField(max_length=100)
+        tagline = models.TextField()
+
+        def save(self):
+            do_something()
+            super(Blog, self).save() # Call the "real" save() method.
+            do_something_else()
+
+You can also prevent saving::
+
+    class Blog(models.Model):
+        name = models.CharField(max_length=100)
+        tagline = models.TextField()
+
+        def save(self):
+            if self.name == "Yoko Ono's blog":
+                return # Yoko shall never have her own blog!
+            else:
+                super(Blog, self).save() # Call the "real" save() method.
+
+It's important to remember to call the superclass method -- that's that
+``super(Blog, self).save()`` business -- to ensure that the object still gets
+saved into the database. If you forget to call the superclass method, the
+default behavior won't happen and the database won't get touched.
+
+Executing custom SQL
+--------------------
+
+Another common pattern is writing custom SQL statements in model methods and
+module-level methods. The object :class:`django.db.connection
+<django.db.backends.DatabaseWrapper>` represents the current database
+connection. To use it, call :meth:`connection.cursor()
+<django.db.backends.DatabaseWrapper.cursor>` to get a cursor object. Then, call
+``cursor.execute(sql, [params])`` to execute the SQL and
+:meth:`cursor.fetchone() <django.db.backends.CursorWrapper.fetchone>` or
+:meth:`cursor.fetchall() <django.db.backends.CursorWrapper.fetchall>` to return
+the resulting rows. For example::
+
+    def my_custom_sql(self):
+        from django.db import connection
+        cursor = connection.cursor()
+        cursor.execute("SELECT foo FROM bar WHERE baz = %s", [self.baz])
+        row = cursor.fetchone()
+        return row
+
+:class:`connection <django.db.backends.DatabaseWrapper>` and
+:class:`<django.db.backends.CursorWrapper>` mostly implement the standard Python
+DB-API -- see :pep:249 -- with the addition of Django's :ref:`transaction
+handling <topics-db-transactions>`. If you're not familiar with the Python
+DB-API, note that the SQL statement in :meth:`cursor.execute()
+<django.db.backends.CursorWrapper.execute>` uses placeholders, ``"%s"``, rather
+than adding parameters directly within the SQL. If you use this technique, the
+underlying database library will automatically add quotes and escaping to your
+parameter(s) as necessary. (Also note that Django expects the ``"%s"``
+placeholder, *not* the ``"?"`` placeholder, which is used by the SQLite Python
+bindings. This is for the sake of consistency and sanity.)
+
+A final note: If all you want to do is a custom ``WHERE`` clause, you can use
+the :meth:`~QuerySet.extra` lookup method, which lets you add custom SQL to a
+query.

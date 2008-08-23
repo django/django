@@ -1,0 +1,153 @@
+.. _ref-contrib-flatpages:
+
+=================
+The flatpages app
+=================
+
+.. module:: django.contrib.flatpages
+   :synopsis: A framework for managing simple ?flat? HTML content in a database.
+
+Django comes with an optional "flatpages" application. It lets you store simple
+"flat" HTML content in a database and handles the management for you via
+Django's admin interface and a Python API.
+
+A flatpage is a simple object with a URL, title and content. Use it for
+one-off, special-case pages, such as "About" or "Privacy Policy" pages, that
+you want to store in a database but for which you don't want to develop a
+custom Django application.
+
+A flatpage can use a custom template or a default, systemwide flatpage
+template. It can be associated with one, or multiple, sites.
+
+**New in Django development version**
+
+The content field may optionally be left blank if you prefer to put your 
+content in a custom template.
+
+Here are some examples of flatpages on Django-powered sites:
+
+    * http://www.chicagocrime.org/about/
+    * http://www.everyblock.com/about/
+    * http://www.lawrence.com/about/contact/
+
+Installation
+============
+
+To install the flatpages app, follow these steps:
+
+    1. Install the :mod:`sites framework <django.contrib.sites>` by adding
+       ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS` setting,
+       if it's not already in there.
+       
+    2. Add ``'django.contrib.flatpages'`` to your :setting:`INSTALLED_APPS`
+       setting.
+       
+    3. Add ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
+       to your :setting:`MIDDLEWARE_CLASSES` setting.
+       
+    4. Run the command :djadmin:`manage.py syncdb <syncdb>`.
+ 
+How it works
+============
+
+``manage.py syncdb`` creates two tables in your database: ``django_flatpage``
+and ``django_flatpage_sites``. ``django_flatpage`` is a simple lookup table
+that simply maps a URL to a title and bunch of text content.
+``django_flatpage_sites`` associates a flatpage with a site.
+
+The :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
+does all of the work. Each time any Django application raises a 404 error, this
+middleware checks the flatpages database for the requested URL as a last resort.
+Specifically, it checks for a flatpage with the given URL with a site ID that
+corresponds to the :setting:`SITE_ID` setting.
+
+If it finds a match, it follows this algorithm:
+
+    * If the flatpage has a custom template, it loads that template. Otherwise,
+      it loads the template :file:`flatpages/default.html`.
+    
+    * It passes that template a single context variable, :data:`flatpage`, which
+      is the flatpage object. It uses
+      :class:`~django.template.context.RequestContext` in rendering the
+      template.
+
+If it doesn't find a match, the request continues to be processed as usual.
+
+The middleware only gets activated for 404s -- not for 500s or responses of any
+other status code.
+
+Note that the order of :setting:`MIDDLEWARE_CLASSES` matters. Generally, you can
+put :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` at
+the end of the list, because it's a last resort.
+
+For more on middleware, read the :ref:`middleware docs
+<topics-http-middleware>`.
+
+.. admonition:: Ensure that your 404 template works
+    
+    Note that the
+    :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
+    only steps in once another view has successfully produced a 404 response.
+    If another view or middleware class attempts to produce a 404 but ends up
+    raising an exception instead (such as a ``TemplateDoesNotExist``
+    exception if your site does not have an appropriate template to
+    use for HTTP 404 responses), the response will become an HTTP 500
+    ("Internal Server Error") and the
+    :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
+    will not attempt to serve a flat page.
+
+How to add, change and delete flatpages
+=======================================
+
+Via the admin interface
+-----------------------
+
+If you've activated the automatic Django admin interface, you should see a
+"Flatpages" section on the admin index page. Edit flatpages as you edit any
+other object in the system.
+
+Via the Python API
+------------------
+
+.. class:: models.FlatPage
+
+    Flatpages are represented by a standard
+    :ref:`Django model <topics-db-models>`,
+    which lives in `django/contrib/flatpages/models.py`_. You can access
+    flatpage objects via the :ref:`Django database API <topics-db-queries>`.
+
+.. _django/contrib/flatpages/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/flatpages/models.py
+
+Flatpage templates
+==================
+
+By default, flatpages are rendered via the template
+:file:`flatpages/default.html`, but you can override that for a particular
+flatpage.
+
+Creating the :file:`flatpages/default.html` template is your responsibility;
+in your template directory, just create a :file:`flatpages` directory
+containing a file :file:`default.html`.
+
+Flatpage templates are passed a single context variable, :data:`flatpage`,
+which is the flatpage object.
+
+Here's a sample :file:`flatpages/default.html` template:
+
+.. code-block:: html+django
+
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+        "http://www.w3.org/TR/REC-html40/loose.dtd">
+    <html>
+    <head>
+    <title>{{ flatpage.title }}</title>
+    </head>
+    <body>
+    {{ flatpage.content }}
+    </body>
+    </html>
+
+Since you're already entering raw HTML into the admin page for a flatpage,
+both ``flatpage.title`` and ``flatpage.content`` are marked as **not**
+requiring :ref:`automatic HTML escaping <automatic-html-escaping>` in the
+template.

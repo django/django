@@ -1,0 +1,200 @@
+.. _ref-middleware:
+
+=============================
+Built-in middleware reference
+=============================
+
+.. module:: django.middleware
+   :synopsis: Django's built-in middleware classes.
+
+This document explains all middleware components that come with Django. For
+information on how how to use them and how to write your own middleware, see the
+:ref:`middleware usage guide <topics-http-middleware>`.
+
+Available middleware
+====================
+
+Cache middleware
+----------------
+
+.. module:: django.middleware.cache
+   :synopsis: Middleware for the site-wide cache
+   
+.. class:: django.middleware.cache.CacheMiddleware
+
+Enables the site-wide cache. If this is enabled, each Django-powered page will
+be cached for as long as the :setting:`CACHE_MIDDLEWARE_SECONDS` setting
+defines. See the :ref:`cache documentation <topics-cache>`.
+
+"Common" middleware
+-------------------
+
+.. module:: django.middleware.common
+   :synopsis: Middleware adding "common" conveniences for perfectionists.
+   
+.. class:: django.middleware.common.CommonMiddleware
+
+Adds a few conveniences for perfectionists:
+
+    * Forbids access to user agents in the :setting:`DISALLOWED_USER_AGENTS`
+      setting, which should be a list of strings.
+
+    * Performs URL rewriting based on the :setting:`APPEND_SLASH` and
+      :setting:`PREPEND_WWW` settings.
+
+      If :setting:`APPEND_SLASH` is ``True`` and the initial URL doesn't end
+      with a slash, and it is not found in the URLconf, then a new URL is formed
+      by appending a slash at the end. If this new URL is found in the URLconf,
+      then Django redirects the request to this new URL. Otherwise, the initial
+      URL is processed as usual.
+
+      For example, ``foo.com/bar`` will be redirected to ``foo.com/bar/`` if you
+      don't have a valid URL pattern for ``foo.com/bar`` but *do* have a valid
+      pattern for ``foo.com/bar/``.
+
+      **New in Django development version:** The behavior of
+      :setting:`APPEND_SLASH` has changed slightly in the development version.
+      It didn't used to check whether the pattern was matched in the URLconf.
+
+      If :setting:`PREPEND_WWW` is ``True``, URLs that lack a leading "www."
+      will be redirected to the same URL with a leading "www."
+
+      Both of these options are meant to normalize URLs. The philosophy is that
+      each URL should exist in one, and only one, place. Technically a URL
+      ``foo.com/bar`` is distinct from ``foo.com/bar/`` -- a search-engine
+      indexer would treat them as separate URLs -- so it's best practice to
+      normalize URLs.
+
+    * Handles ETags based on the :setting:`USE_ETAGS` setting. If
+      :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag for
+      each request by MD5-hashing the page content, and it'll take care of
+      sending ``Not Modified`` responses, if appropriate.
+
+View metadata middleware
+------------------------
+
+.. module:: django.middleware.doc
+   :synopsis: Middleware to help your app self-document.
+
+.. class:: django.middleware.doc.XViewMiddleware
+
+Sends custom ``X-View`` HTTP headers to HEAD requests that come from IP
+addresses defined in the :setting:`INTERNAL_IPS` setting. This is used by
+Django's automatic documentation system.
+
+GZIP middleware
+---------------
+
+.. module:: django.middleware.gzip
+   :synopsis: Middleware to serve gziped content for performance.
+   
+.. class:: django.middleware.gzip.GZipMiddleware
+
+Compresses content for browsers that understand gzip compression (all modern
+browsers).
+
+It is suggested to place this first in the middleware list, so that the
+compression of the response content is the last thing that happens. Will not
+compress content bodies less than 200 bytes long, when the response code is
+something other than 200, JavaScript files (for IE compatibility), or
+responses that have the ``Content-Encoding`` header already specified.
+
+Conditional GET middleware
+--------------------------
+
+.. module:: django.middleware.http
+   :synopsis: Middleware handling advanced HTTP features.
+
+.. class:: django.middleware.http.ConditionalGetMiddleware
+
+Handles conditional GET operations. If the response has a ``ETag`` or
+``Last-Modified`` header, and the request has ``If-None-Match`` or
+``If-Modified-Since``, the response is replaced by an
+:class:`~django.http.HttpNotModified`.
+
+Also sets the ``Date`` and ``Content-Length`` response-headers.
+
+Reverse proxy middleware
+------------------------
+
+.. class:: django.middleware.http.SetRemoteAddrFromForwardedFor
+
+Sets ``request.META['REMOTE_ADDR']`` based on
+``request.META['HTTP_X_FORWARDED_FOR']``, if the latter is set. This is useful
+if you're sitting behind a reverse proxy that causes each request's
+``REMOTE_ADDR`` to be set to ``127.0.0.1``.
+
+**Important note:** This does NOT validate ``HTTP_X_FORWARDED_FOR``. If you're
+not behind a reverse proxy that sets ``HTTP_X_FORWARDED_FOR`` automatically, do
+not use this middleware. Anybody can spoof the value of
+``HTTP_X_FORWARDED_FOR``, and because this sets ``REMOTE_ADDR`` based on
+``HTTP_X_FORWARDED_FOR``, that means anybody can "fake" their IP address. Only
+use this when you can absolutely trust the value of ``HTTP_X_FORWARDED_FOR``.
+
+Locale middleware
+-----------------
+
+.. module:: django.middleware.locale
+   :synopsis: Middleware to enable language selection based on the request.
+   
+.. class:: django.middleware.locale.LocaleMiddleware
+
+Enables language selection based on data from the request. It customizes content
+for each user. See the :ref:`internationalization documentation <topics-i18n>`.
+
+Session middleware
+------------------
+
+.. module:: django.contrib.sessions.middleware
+   :synopsis: Session middleware.
+
+.. class:: django.contrib.sessions.middleware.SessionMiddleware
+
+Enables session support. See the :ref:`session documentation
+<topics-http-sessions>`.
+
+Authentication middleware
+-------------------------
+
+.. module:: django.contrib.auth.middleware
+  :synopsis: Authentication middleware
+  
+.. class:: django.contrib.auth.middleware.AuthenticationMiddleware
+
+Adds the ``user`` attribute, representing the currently-logged-in user, to every
+incoming ``HttpRequest`` object. See :ref:` Authentication in Web requests
+<topics-http-auth>`.
+
+CSRF protection middleware
+--------------------------
+
+.. module:: django.contrib.csrf.middleware
+   :synopsis: Middleware adding protection against Cross Site Request Forgeries.
+
+.. class:: django.contrib.csrf.middleware.CsrfMiddleware
+
+**New in Django development version**
+
+Adds protection against Cross Site Request Forgeries by adding hidden form
+fields to POST forms and checking requests for the correct value. See the
+:ref:`Cross Site Request Forgery protection documentation <ref-contrib-csrf>`.
+
+Transaction middleware
+----------------------
+
+.. module:: django.middleware.transaction
+   :synopsis: Middleware binding a database transaction to each web request.
+
+.. class:: django.middleware.transaction.TransactionMiddleware
+
+Binds commit and rollback to the request/response phase. If a view function runs
+successfully, a commit is done. If it fails with an exception, a rollback is
+done.
+
+The order of this middleware in the stack is important: middleware modules
+running outside of it run with commit-on-save - the default Django behavior.
+Middleware modules running inside it (coming later in the stack) will be under
+the same transaction control as the view functions.
+
+See the :ref:`transaction management documentation <topics-db-transactions>`.
+

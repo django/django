@@ -1,0 +1,26 @@
+.. _releases-index:
+
+Release notes
+=============
+
+Releases notes for the official Django releases. Each release note will tell you
+what's new in each version, and will also describe any backwards-incompatible
+changes made in that version.
+
+.. toctree::
+   :maxdepth: 1
+   
+   0.95
+   0.96
+   1.0-alpha-1
+   1.0-alpha-2
+   1.0-beta
+
+.. seealso::
+
+    The list of `backwards-incompatible changes`_ made in the current
+    development "trunk". If you're running versions of Django newer than an
+    official release, you should keep track of new pieces pointed there. It's
+    also fun reading if you're looking forward to new versions of Django.
+    
+.. _backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges

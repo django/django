@@ -1,0 +1,33 @@
+.. _howto-custom-management-commands:
+
+Writing custom django-admin commands
+====================================
+
+**New in Django development version**
+
+Applications can register their own actions with ``manage.py``. For example,
+you might want to add a ``manage.py`` action for a Django app that you're
+distributing.
+
+To do this, just add a ``management/commands`` directory to your application.
+Each Python module in that directory will be auto-discovered and registered as
+a command that can be executed as an action when you run ``manage.py``::
+
+    blog/
+        __init__.py
+        models.py
+        management/
+            __init__.py
+            commands/
+                __init__.py
+                explode.py
+        views.py
+
+In this example, the ``explode`` command will be made available to any project
+that includes the ``blog`` application in ``settings.INSTALLED_APPS``.
+
+The ``explode.py`` module has only one requirement -- it must define a class
+called ``Command`` that extends ``django.core.management.base.BaseCommand``.
+
+For more details on how to define your own commands, look at the code for the
+existing ``django-admin.py`` commands, in ``/django/core/management/commands``.

@@ -1,0 +1,329 @@
+.. _topics-forms-formsets:
+.. _formsets:
+
+Formsets
+========
+
+A formset is a layer of abstraction to working with multiple forms on the same
+page. It can be best compared to a data grid. Let's say you have the following
+form::
+
+    >>> from django import forms
+    >>> class ArticleForm(forms.Form):
+    ...     title = forms.CharField()
+    ...     pub_date = forms.DateField()
+
+You might want to allow the user to create several articles at once. To create
+a formset out of an ``ArticleForm`` you would do::
+
+    >>> from django.forms.formsets import formset_factory
+    >>> ArticleFormSet = formset_factory(ArticleForm)
+
+You now have created a formset named ``ArticleFormSet``. The formset gives you
+the ability to iterate over the forms in the formset and display them as you
+would with a regular form::
+
+    >>> formset = ArticleFormSet()
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
+
+As you can see it only displayed one form. This is because by default the
+``formset_factory`` defines one extra form. This can be controlled with the
+``extra`` parameter::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
+
+Using initial data with a formset
+---------------------------------
+
+Initial data is what drives the main usability of a formset. As shown above
+you can define the number of extra forms. What this means is that you are
+telling the formset how many additional forms to show in addition to the
+number of forms it generates from the initial data. Lets take a look at an
+example::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
+    >>> formset = ArticleFormSet(initial=[
+    ...     {'title': u'Django is now open source',
+    ...      'pub_date': datetime.date.today()},
+    ... ])
+
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Django is now open source" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-12" id="id_form-0-pub_date" /></td></tr>
+    <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" id="id_form-1-title" /></td></tr>
+    <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" id="id_form-1-pub_date" /></td></tr>
+    <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title" /></td></tr>
+    <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
+
+There are now a total of three forms showing above. One for the initial data
+that was passed in and two extra forms. Also note that we are passing in a
+list of dictionaries as the initial data.
+
+Limiting the maximum number of forms
+------------------------------------
+
+The ``max_num`` parameter to ``formset_factory`` gives you the ability to
+force the maximum number of forms the formset will display::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
+    >>> formset = ArticleFormset()
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
+
+The default value of ``max_num`` is ``0`` which is the same as saying put no
+limit on the number forms displayed.
+
+Formset validation
+------------------
+
+Validation with a formset is about identical to a regular ``Form``. There is
+an ``is_valid`` method on the formset to provide a convenient way to validate
+each form in the formset::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm)
+    >>> formset = ArticleFormSet({})
+    >>> formset.is_valid()
+    True
+
+We passed in no data to the formset which is resulting in a valid form. The
+formset is smart enough to ignore extra forms that were not changed. If we
+attempt to provide an article, but fail to do so::
+
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'1',
+    ...     'form-INITIAL_FORMS': u'1',
+    ...     'form-0-title': u'Test',
+    ...     'form-0-pub_date': u'',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    >>> formset.is_valid()
+    False
+    >>> formset.errors
+    [{'pub_date': [u'This field is required.']}]
+
+As we can see the formset properly performed validation and gave us the
+expected errors.
+
+Understanding the ManagementForm
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You may have noticed the additional data that was required in the formset's
+data above. This data is coming from the ``ManagementForm``. This form is
+dealt with internally to the formset. If you don't use it, it will result in
+an exception::
+
+    >>> data = {
+    ...     'form-0-title': u'Test',
+    ...     'form-0-pub_date': u'',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    Traceback (most recent call last):
+    ...
+    django.forms.util.ValidationError: [u'ManagementForm data is missing or has been tampered with']
+
+It is used to keep track of how many form instances are being displayed. If
+you are adding new forms via JavaScript, you should increment the count fields
+in this form as well.
+
+Custom formset validation
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A formset has a ``clean`` method similar to the one on a ``Form`` class. This
+is where you define your own validation that deals at the formset level::
+
+    >>> from django.forms.formsets import BaseFormSet
+
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     def clean(self):
+    ...         raise forms.ValidationError, u'An error occured.'
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
+    >>> formset = ArticleFormSet({})
+    >>> formset.is_valid()
+    False
+    >>> formset.non_form_errors()
+    [u'An error occured.']
+
+The formset ``clean`` method is called after all the ``Form.clean`` methods
+have been called. The errors will be found using the ``non_form_errors()``
+method on the formset.
+
+Dealing with ordering and deletion of forms
+-------------------------------------------
+
+Common use cases with a formset is dealing with ordering and deletion of the
+form instances. This has been dealt with for you. The ``formset_factory``
+provides two optional parameters ``can_order`` and ``can_delete`` that will do
+the extra work of adding the extra fields and providing simpler ways of
+getting to that data.
+
+``can_order``
+~~~~~~~~~~~~~
+
+Default: ``False``
+
+Lets create a formset with the ability to order::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, can_order=True)
+    >>> formset = ArticleFormSet(initial=[
+    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ... ])
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
+    <tr><th><label for="id_form-0-ORDER">Order:</label></th><td><input type="text" name="form-0-ORDER" value="1" id="id_form-0-ORDER" /></td></tr>
+    <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" value="Article #2" id="id_form-1-title" /></td></tr>
+    <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" value="2008-05-11" id="id_form-1-pub_date" /></td></tr>
+    <tr><th><label for="id_form-1-ORDER">Order:</label></th><td><input type="text" name="form-1-ORDER" value="2" id="id_form-1-ORDER" /></td></tr>
+    <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title" /></td></tr>
+    <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
+    <tr><th><label for="id_form-2-ORDER">Order:</label></th><td><input type="text" name="form-2-ORDER" id="id_form-2-ORDER" /></td></tr>
+
+This adds an additional field to each form. This new field is named ``ORDER``
+and is an ``forms.IntegerField``. For the forms that came from the initial
+data it automatically assigned them a numeric value. Lets look at what will
+happen when the user changes these values::
+
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'3',
+    ...     'form-INITIAL_FORMS': u'2',
+    ...     'form-0-title': u'Article #1',
+    ...     'form-0-pub_date': u'2008-05-10',
+    ...     'form-0-ORDER': u'2',
+    ...     'form-1-title': u'Article #2',
+    ...     'form-1-pub_date': u'2008-05-11',
+    ...     'form-1-ORDER': u'1',
+    ...     'form-2-title': u'Article #3',
+    ...     'form-2-pub_date': u'2008-05-01',
+    ...     'form-2-ORDER': u'0',
+    ... }
+
+    >>> formset = ArticleFormSet(data, initial=[
+    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ... ])
+    >>> formset.is_valid()
+    True
+    >>> for form in formset.ordered_forms:
+    ...     print form.cleaned_data
+    {'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0, 'title': u'Article #3'}
+    {'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1, 'title': u'Article #2'}
+    {'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2, 'title': u'Article #1'}
+
+``can_delete``
+~~~~~~~~~~~~~~
+
+Default: ``False``
+
+Lets create a formset with the ability to delete::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, can_delete=True)
+    >>> formset = ArticleFormSet(initial=[
+    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ... ])
+    >>> for form in formset.forms:
+    ....    print form.as_table()
+    <input type="hidden" name="form-TOTAL_FORMS" value="3" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="2" id="id_form-INITIAL_FORMS" />
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
+    <tr><th><label for="id_form-0-DELETE">Delete:</label></th><td><input type="checkbox" name="form-0-DELETE" id="id_form-0-DELETE" /></td></tr>
+    <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" value="Article #2" id="id_form-1-title" /></td></tr>
+    <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" value="2008-05-11" id="id_form-1-pub_date" /></td></tr>
+    <tr><th><label for="id_form-1-DELETE">Delete:</label></th><td><input type="checkbox" name="form-1-DELETE" id="id_form-1-DELETE" /></td></tr>
+    <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title" /></td></tr>
+    <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
+    <tr><th><label for="id_form-2-DELETE">Delete:</label></th><td><input type="checkbox" name="form-2-DELETE" id="id_form-2-DELETE" /></td></tr>
+
+Similar to ``can_order`` this adds a new field to each form named ``DELETE``
+and is a ``forms.BooleanField``. When data comes through marking any of the
+delete fields you can access them with ``deleted_forms``::
+
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'3',
+    ...     'form-INITIAL_FORMS': u'2',
+    ...     'form-0-title': u'Article #1',
+    ...     'form-0-pub_date': u'2008-05-10',
+    ...     'form-0-DELETE': u'on',
+    ...     'form-1-title': u'Article #2',
+    ...     'form-1-pub_date': u'2008-05-11',
+    ...     'form-1-DELETE': u'',
+    ...     'form-2-title': u'',
+    ...     'form-2-pub_date': u'',
+    ...     'form-2-DELETE': u'',
+    ... }
+
+    >>> formset = ArticleFormSet(data, initial=[
+    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ... ])
+    >>> [form.cleaned_data for form in formset.deleted_forms]
+    [{'DELETE': True, 'pub_date': datetime.date(2008, 5, 10), 'title': u'Article #1'}]
+
+Adding additional fields to a formset
+-------------------------------------
+
+If you need to add additional fields to the formset this can be easily
+accomplished. The formset base class provides an ``add_fields`` method. You
+can simply override this method to add your own fields or even redefine the
+default fields/attributes of the order and deletion fields::
+
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     def add_fields(self, form, index):
+    ...         super(BaseArticleFormSet, self).add_fields(form, index)
+    ...         form.fields["my_field"] = forms.CharField()
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
+    >>> formset = ArticleFormSet()
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
+    <tr><th><label for="id_form-0-my_field">My field:</label></th><td><input type="text" name="form-0-my_field" id="id_form-0-my_field" /></td></tr>
+
+Using a formset in views and templates
+--------------------------------------
+
+Using a formset inside a view is as easy as using a regular ``Form`` class.
+The only thing you will want to be aware of is making sure to use the
+management form inside the template. Lets look at a sample view::
+
+    def manage_articles(request):
+        ArticleFormSet = formset_factory(ArticleForm)
+        if request.method == 'POST':
+            formset = ArticleFormSet(request.POST, request.FILES)
+            if formset.is_valid():
+                # do something with the formset.cleaned_data
+        else:
+            formset = ArticleFormSet()
+        return render_to_response('manage_articles.html', {'formset': formset})
+
+The ``manage_articles.html`` template might look like this::
+
+    <form method="POST" action="">
+        {{ formset.management_form }}
+        <table>
+            {% for form in formset.forms %}
+            {{ form }}
+            {% endfor %}
+        </table>
+    </form>
+
+However the above can be slightly shortcutted and let the formset itself deal
+with the management form::
+
+    <form method="POST" action="">
+        <table>
+            {{ formset }}
+        </table>
+    </form>
+
+The above ends up calling the ``as_table`` method on the formset class.

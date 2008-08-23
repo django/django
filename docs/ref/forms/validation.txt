@@ -1,0 +1,109 @@
+.. _ref-forms-validation:
+
+F and field validation
+======================
+
+Form validation happens when the data is cleaned. If you want to customize
+this process, there are various places you can change, each one serving a
+different purpose. Three types of cleaning methods are run during form
+processing. These are normally executed when you call the ``is_valid()``
+method on a form. There are other things that can trigger cleaning and
+validation (accessing the ``errors`` attribute or calling ``full_clean()``
+directly), but normally they won't be needed.
+
+In general, any cleaning method can raise ``ValidationError`` if there is a
+problem with the data it is processing, passing the relevant error message to
+the ``ValidationError`` constructor. If no ``ValidationError`` is raised, the
+method should return the cleaned (normalized) data as a Python object.
+
+If you detect multiple errors during a cleaning method and wish to signal all
+of them to the form submitter, it is possible to pass a list of errors to the
+``ValidationError`` constructor.
+
+The three types of cleaning methods are:
+
+    * The ``clean()`` method on a Field subclass. This is responsible
+      for cleaning the data in a way that is generic for that type of field.
+      For example, a FloatField will turn the data into a Python ``float`` or
+      raise a ``ValidationError``.
+
+    * The ``clean_<fieldname>()`` method in a form subclass -- where
+      ``<fieldname>`` is replaced with the name of the form field attribute.
+      This method does any cleaning that is specific to that particular
+      attribute, unrelated to the type of field that it is. This method is not
+      passed any parameters. You will need to look up the value of the field
+      in ``self.cleaned_data`` and remember that it will be a Python object
+      at this point, not the original string submitted in the form (it will be
+      in ``cleaned_data`` because the general field ``clean()`` method, above,
+      has already cleaned the data once).
+
+      For example, if you wanted to validate that the contents of a
+      ``CharField`` called ``serialnumber`` was unique,
+      ``clean_serialnumber()`` would be the right place to do this. You don't
+      need a specific field (it's just a ``CharField``), but you want a
+      formfield-specific piece of validation and, possibly,
+      cleaning/normalizing the data.
+
+    * The Form subclass's ``clean()`` method. This method can perform
+      any validation that requires access to multiple fields from the form at
+      once. This is where you might put in things to check that if field ``A``
+      is supplied, field ``B`` must contain a valid e-mail address and the
+      like. The data that this method returns is the final ``cleaned_data``
+      attribute for the form, so don't forget to return the full list of
+      cleaned data if you override this method (by default, ``Form.clean()``
+      just returns ``self.cleaned_data``).
+
+      Note that any errors raised by your ``Form.clean()`` override will not
+      be associated with any field in particular. They go into a special
+      "field" (called ``__all__``), which you can access via the
+      ``non_field_errors()`` method if you need to.
+
+These methods are run in the order given above, one field at a time.  That is,
+for each field in the form (in the order they are declared in the form
+definition), the ``Field.clean()`` method (or its override) is run, then
+``clean_<fieldname>()``. Finally, once those two methods are run for every
+field, the ``Form.clean()`` method, or its override, is executed.
+
+As mentioned above, any of these methods can raise a ``ValidationError``. For
+any field, if the ``Field.clean()`` method raises a ``ValidationError``, any
+field-specific cleaning method is not called. However, the cleaning methods
+for all remaining fields are still executed.
+
+The ``clean()`` method for the ``Form`` class or subclass is always run. If
+that method raises a ``ValidationError``, ``cleaned_data`` will be an empty
+dictionary.
+
+The previous paragraph means that if you are overriding ``Form.clean()``, you
+should iterate through ``self.cleaned_data.items()``, possibly considering the
+``_errors`` dictionary attribute on the form as well. In this way, you will
+already know which fields have passed their individual validation requirements.
+
+A simple example
+~~~~~~~~~~~~~~~~
+
+Here's a simple example of a custom field that validates its input is a string
+containing comma-separated e-mail addresses, with at least one address. We'll
+keep it simple and assume e-mail validation is contained in a function called
+``is_valid_email()``. The full class::
+
+    from django import forms
+
+    class MultiEmailField(forms.Field):
+        def clean(self, value):
+            if not value:
+                raise forms.ValidationError('Enter at least one e-mail address.')
+            emails = value.split(',')
+            for email in emails:
+                if not is_valid_email(email):
+                    raise forms.ValidationError('%s is not a valid e-mail address.' % email)
+            return emails
+
+Let's alter the ongoing ``ContactForm`` example to demonstrate how you'd use
+this in a form. Simply use ``MultiEmailField`` instead of ``forms.EmailField``,
+like so::
+
+    class ContactForm(forms.Form):
+        subject = forms.CharField(max_length=100)
+        message = forms.CharField()
+        senders = MultiEmailField()
+        cc_myself = forms.BooleanField(required=False)

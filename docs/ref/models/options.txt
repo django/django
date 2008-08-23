@@ -1,0 +1,175 @@
+.. _ref-models-options:
+
+======================
+Model ``Meta`` options
+======================
+
+This document explains all the possible :ref:`metadata options <meta-options>` that you can give your model in its internal ``class Meta``.
+
+Available ``Meta`` options
+==========================
+
+.. currentmodule:: django.db.models
+
+``db_table``
+------------
+
+.. attribute:: Options.db_table
+
+The name of the database table to use for the model::
+
+    db_table = 'music_album'
+
+.. _table-names:
+
+Table names
+~~~~~~~~~~~
+
+To save you time, Django automatically derives the name of the database table
+from the name of your model class and the app that contains it. A model's
+database table name is constructed by joining the model's "app label" -- the
+name you used in ``manage.py startapp`` -- to the model's class name, with an
+underscore between them.
+
+For example, if you have an app ``bookstore`` (as created by
+``manage.py startapp bookstore``), a model defined as ``class Book`` will have
+a database table named ``bookstore_book``.
+
+To override the database table name, use the ``db_table`` parameter in
+``class Meta``.
+
+If your database table name is an SQL reserved word, or contains characters that
+aren't allowed in Python variable names -- notably, the hyphen -- that's OK.
+Django quotes column and table names behind the scenes.
+
+``db_tablespace``
+-----------------
+
+.. attribute:: Options.db_tablespace
+
+**New in Django development version**
+
+The name of the database tablespace to use for the model. If the backend doesn't
+support tablespaces, this option is ignored.
+
+``get_latest_by``
+-----------------
+
+.. attribute:: Options.get_latest_by
+
+The name of a :class:`DateField` or :class:`DateTimeField` in the model. This
+specifies the default field to use in your model :class:`Manager`'s
+:class:`~QuerySet.latest` method.
+
+Example::
+
+    get_latest_by = "order_date"
+
+See the docs for :meth:`~django.db.models.QuerySet.latest` for more.
+
+``order_with_respect_to``
+-------------------------
+
+.. attribute:: Options.order_with_respect_to
+
+Marks this object as "orderable" with respect to the given field. This is almost
+always used with related objects to allow them to be ordered with respect to a
+parent object. For example, if an ``Answer`` relates to a ``Question`` object,
+and a question has more than one answer, and the order of answers matters, you'd
+do this::
+
+    class Answer(models.Model):
+        question = models.ForeignKey(Question)
+        # ...
+
+        class Meta:
+            order_with_respect_to = 'question'
+
+``ordering``
+------------
+
+.. attribute:: Options.ordering
+
+The default ordering for the object, for use when obtaining lists of objects::
+
+    ordering = ['-order_date']
+
+This is a tuple or list of strings. Each string is a field name with an optional
+"-" prefix, which indicates descending order. Fields without a leading "-" will
+be ordered ascending. Use the string "?" to order randomly.
+
+.. note:: 
+
+    Regardless of how many fields are in :attr:`~Options.ordering`, the admin
+    site uses only the first field.
+
+For example, to order by a ``pub_date`` field ascending, use this::
+
+    ordering = ['pub_date']
+
+To order by ``pub_date`` descending, use this::
+
+    ordering = ['-pub_date']
+
+To order by ``pub_date`` descending, then by ``author`` ascending, use this::
+
+    ordering = ['-pub_date', 'author']
+
+``permissions``
+---------------
+
+.. attribute:: Options.permissions
+
+Extra permissions to enter into the permissions table when creating this object.
+Add, delete and change permissions are automatically created for each object
+that has ``admin`` set. This example specifies an extra permission,
+``can_deliver_pizzas``::
+
+    permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
+
+This is a list or tuple of 2-tuples in the format ``(permission_code,
+human_readable_permission_name)``.
+
+``unique_together``
+-------------------
+
+.. attribute:: Options.unique_together
+
+Sets of field names that, taken together, must be unique::
+
+    unique_together = (("driver", "restaurant"),)
+
+This is a list of lists of fields that must be unique when considered together.
+It's used in the Django admin and is enforced at the database level (i.e., the
+appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
+statement).
+
+**New in Django development version**
+
+For convenience, unique_together can be a single list when dealing with a single
+set of fields::
+
+    unique_together = ("driver", "restaurant")
+
+``verbose_name``
+----------------
+
+.. attribute:: Options.verbose_name
+
+A human-readable name for the object, singular::
+
+    verbose_name = "pizza"
+
+If this isn't given, Django will use a munged version of the class name:
+``CamelCase`` becomes ``camel case``.
+
+``verbose_name_plural``
+-----------------------
+
+.. attribute:: Options.verbose_name_plural
+
+The plural name for the object::
+
+    verbose_name_plural = "stories"
+
+If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.

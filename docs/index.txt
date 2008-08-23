@@ -1,134 +1,162 @@
+.. _index:
+
 ====================
-Django Documentation
+Django documentation
 ====================
 
-The essential documentation
-===========================
+.. rubric:: Everything you need to know about Django (and then some).
 
-If you're new to Django, make sure to read the following documentation in
-order.. The rest (in the "reference" section below) can be ready in any order as
-you need various functionality.
+Getting help
+============
 
-.. toctree::
-   :maxdepth: 1
-   
-   overview
-   install
-   tutorial01
-   tutorial02
-   tutorial03
-   tutorial04
-   faq
-   documentation
-   
+Having trouble? We'd like to help!
+
+* Try the :ref:`FAQ <faq-index>` -- it's got answers to many common questions.
+
+* Looking for specific information? Try the :ref:`genindex`, :ref:`modindex` or
+  the :ref:`detailed table of contents <contents>`.
+
+* Search for information in the `archives of the django-users mailing list`_, or
+  `post a question`_
+  
+* Ask a question in the `#django IRC channel`_, or search the `IRC logs`_ to see
+  if its been asked before
+
+* Report bugs with Django in our `ticket tracker`_.
+
+.. _archives of the django-users mailing list: http://groups.google.com/group/django-users/
+.. _post a question: http://groups.google.com/group/django-users/
+.. _#django IRC channel: irc://irc.freenode.net/django
+.. _IRC logs: http://oebfare.com/logger/django/
+.. _ticket tracker: http://code.djangoproject.com/
+
+First steps
+===========
+
+:ref:`Overview <intro-overview>`
+    See what writing a database-driven application with Django looks like.
+    
+:ref:`Installation <intro-install>`
+    Get Django installed on your computer.
+    
+Tutorial: Writing your first Django application
+===============================================
+
+:ref:`Part 1 <intro-tutorial01>`
+    Get set up, create models, and play with the database API.
+    
+:ref:`Part 2 <intro-tutorial02>`
+    Explore the automatically-generated admin site.
+    
+:ref:`Part 3 <intro-tutorial03>`
+    Write the public interface views.
+    
+:ref:`Part 4 <intro-tutorial04>`
+    Learn how to process forms.
+        
+Using Django
+============
+
+:ref:`Models <topics-db-index>`
+    Design a single, definitive source of data about your data.
+    
+:ref:`Handling web requests <topics-http-index>`
+    Handle web requests, map them to views, and return pages.
+    
+:ref:`Forms <topics-forms-index>`
+    Build and handle HTML forms.
+    
+:ref:`Templates <topics-templates>`
+    Develop the visual design of your site.
+    
+And more:
+---------
+
+:ref:`topics-auth` ... :ref:`topics-cache` ... :ref:`topics-email` ...
+:ref:`topics-files` ... :ref:`topics-i18n` ... :ref:`topics-install` ...
+:ref:`topics-pagination` ... :ref:`topics-serialization` ...
+:ref:`topics-settings` ... :ref:`topics-testing`
+    
+Add-on ("contrib") applications
+===============================
+
+:ref:`Django's automatic admin site <ref-contrib-admin>`
+    Get a clean interface to your data with no effort at all.
+    
+:ref:`Form tools <ref-contrib-formtools-index>`
+    Easily handle complex form workflows.
+    
+:ref:`Syndication feeds <ref-contrib-syndication>`
+    Generate RSS and Atom feeds of your data.
+    
+:ref:`"Local flavor" <ref-contrib-localflavor>`
+    Give your site that special local touch.
+    
+And more:
+---------
+
+:ref:`ref-contrib-contenttypes` ... :ref:`ref-contrib-csrf` ...
+:ref:`ref-contrib-databrowse` ... :ref:`ref-contrib-flatpages` ...
+:ref:`ref-contrib-humanize` ... :ref:`ref-contrib-redirects` ...
+:ref:`ref-contrib-sitemaps` ... :ref:`ref-contrib-sites` ...
+:ref:`ref-contrib-webdesign`
+
+Solving specific problems
+=========================
+
+:ref:`Deployment <howto-deployment-index>`
+    Release your project to the world.
+    
+:ref:`Importing data from legacy databases <howto-legacy-databases>`
+    Use Django with an existing database or alongside other web development
+    toolkits.
+
+:ref:`Custom template tags <howto-custom-template-tags>`
+    Add your own extensions to Django's template language.
+    
+:ref:`Generating CSV <howto-outputting-csv>` & :ref:`PDF <howto-outputting-PDF>`
+    Produce non-HTML content with Django.
+    
+And more:
+---------
+
+:ref:`Authenticating in Apache <howto-apache-auth>` ...
+:ref:`howto-custom-file-storage` ... :ref:`howto-custom-management-commands` ...
+:ref:`howto-custom-model-fields` ... :ref:`howto-error-reporting` ...
+:ref:`howto-initial-data` ... :ref:`howto-static-files`
+    
 Reference
 =========
 
-.. toctree::
-   :maxdepth: 1
-   
-   django-admin
-   model-api
-   db-api
-   transactions
-   templates
-   templates_python
-   forms
-   modelforms
-   files
-   upload_handling
-   testing
-   sessions
-   cache
-   settings
-   url_dispatch
-   request_response
-   generic_views
-   authentication
-   shortcuts
-   unicode
-   pagination
-   serialization
-   i18n
-   middleware
-   custom_model_fields
-   databases
-   
-``django.contrib`` add-ons
---------------------------
-
-.. toctree::
-   :maxdepth: 1
-   
-   admin
-   add_ons
-   contenttypes
-   csrf
-   databrowse
-   flatpages
-   form_preview
-   form_wizard
-   localflavor
-   redirects
-   sites
-   sitemaps
-   syndication_feeds
-   webdesign
-   
-Deployment
-----------
-
-.. toctree::
-   :maxdepth: 1
-
-   modpython
-   fastcgi
+:ref:`Settings <ref-settings>`
+    See all of Django's settings and what they do.
     
-Solving specific problems
--------------------------
+:ref:`Request & response objects <ref-request-response>`
+    Understand the classes Django uses to represent HTTP requests and responses.
 
-.. toctree::
-   :maxdepth: 1
-
-   apache_auth
-   static_files
-   email
-   legacy_databases
-   outputting_pdf
-   outputting_csv
+:ref:`Model API reference <ref-models-index>`
+    Revel in the gory details of Django's model system.
+        
+:ref:`Form API reference <ref-forms-index>`
+    Learn the details of forms, fields, and widgets.
     
-Et cetera
+And more:
 ---------
 
-.. toctree::
-   :maxdepth: 1
+:ref:`ref-databases` ... :ref:`ref-django-admin` ... :ref:`ref-files-index` ...
+:ref:`ref-generic-views` ... :ref:`ref-middleware` ...
+:ref:`ref-templates-index` ... :ref:`ref-unicode`
+    
+And all the rest
+================
 
-   design_philosophies
-   contributing
-   admin_css
-   api_stability
-   distributions
+:ref:`Internals <internals-index>`
+    Learn how Django works under the hood, and how you can contribute to the
+    project.
 
-Release notes
--------------
+:ref:`Release notes <releases-index>`
+    See what is and was new in each release of Django.
 
-.. toctree::
-   :maxdepth: 1
-
-   release_notes_0.96
-   release_notes_0.95
-   release_notes_1.0_alpha
-   release_notes_1.0_alpha_2
-
-Also see the list of `backwards-incompatible changes`__ for changes made between
-releases.
-
-__ http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+:ref:`Miscellany <misc-index>`
+    Stuff we can't find a more organized place for. Like that drawer in your
+    kitchen with the scissors, batteries, and duct tape.

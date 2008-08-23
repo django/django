@@ -1,0 +1,1549 @@
+.. _ref-templates-builtins:
+
+==================================
+Built-in template tags and filters
+==================================
+
+This document describes Django's built-in template tags and filters. It is
+recommended that you use the :ref:`automatic documentation
+<template-built-in-reference>`, if available, as this will also include
+documentation for any custom tags or filters installed.
+
+.. _ref-templates-builtins-tags:
+
+Built-in tag reference
+----------------------
+
+.. templatetag:: autoescape
+
+autoescape
+~~~~~~~~~~
+
+**New in Django development version**
+
+Control the current auto-escaping behavior. This tag takes either ``on`` or
+``off`` as an argument and that determines whether auto-escaping is in effect
+inside the block.
+
+When auto-escaping is in effect, all variable content has HTML escaping applied
+to it before placing the result into the output (but after any filters have
+been applied). This is equivalent to manually applying the ``escape`` filter
+to each variable.
+
+The only exceptions are variables that are already marked as "safe" from
+escaping, either by the code that populated the variable, or because it has had
+the ``safe`` or ``escape`` filters applied.
+
+.. templatetag:: block
+
+block
+~~~~~
+
+Define a block that can be overridden by child templates. See
+:ref:`Template inheritance <template-inheritance>` for more information.
+
+.. templatetag:: comment
+
+comment
+~~~~~~~
+
+Ignore everything between ``{% comment %}`` and ``{% endcomment %}``
+
+.. templatetag:: cycle
+
+cycle
+~~~~~
+
+**Changed in Django development version**
+Cycle among the given strings or variables each time this tag is encountered.
+
+Within a loop, cycles among the given strings/variables each time through the
+loop::
+
+    {% for o in some_list %}
+        <tr class="{% cycle 'row1' 'row2' rowvar %}">
+            ...
+        </tr>
+    {% endfor %}
+
+Outside of a loop, give the values a unique name the first time you call it,
+then use that name each successive time through::
+
+        <tr class="{% cycle 'row1' 'row2' rowvar as rowcolors %}">...</tr>
+        <tr class="{% cycle rowcolors %}">...</tr>
+        <tr class="{% cycle rowcolors %}">...</tr>
+
+You can use any number of values, separated by spaces. Values enclosed in
+single (') or double quotes (") are treated as string literals, while values
+without quotes are assumed to refer to context variables.
+
+You can also separate values with commas::
+
+    {% cycle row1,row2,row3 %}
+
+In this syntax, each value will be interpreted as literal text. The
+comma-based syntax exists for backwards-compatibility, and should not be
+used for new projects.
+
+.. templatetag:: debug
+
+debug
+~~~~~
+
+Output a whole load of debugging information, including the current context and
+imported modules.
+
+.. templatetag:: extends
+
+extends
+~~~~~~~
+
+Signal that this template extends a parent template.
+
+This tag can be used in two ways:
+
+   * ``{% extends "base.html" %}`` (with quotes) uses the literal value
+     ``"base.html"`` as the name of the parent template to extend.
+
+   * ``{% extends variable %}`` uses the value of ``variable``. If the variable
+     evaluates to a string, Django will use that string as the name of the
+     parent template. If the variable evaluates to a ``Template`` object,
+     Django will use that object as the parent template.
+
+See :ref:`template-inheritance` for more information.
+
+.. templatetag:: filter
+
+filter
+~~~~~~
+
+Filter the contents of the variable through variable filters.
+
+Filters can also be piped through each other, and they can have arguments --
+just like in variable syntax.
+
+Sample usage::
+
+    {% filter force_escape|lower %}
+        This text will be HTML-escaped, and will appear in all lowercase.
+    {% endfilter %}
+
+.. templatetag:: firstof
+
+firstof
+~~~~~~~
+
+Outputs the first variable passed that is not False.  Outputs nothing if all the
+passed variables are False.
+
+Sample usage::
+
+    {% firstof var1 var2 var3 %}
+
+This is equivalent to::
+
+    {% if var1 %}
+        {{ var1 }}
+    {% else %}{% if var2 %}
+        {{ var2 }}
+    {% else %}{% if var3 %}
+        {{ var3 }}
+    {% endif %}{% endif %}{% endif %}
+
+You can also use a literal string as a fallback value in case all
+passed variables are False::
+
+    {% firstof var1 var2 var3 "fallback value" %}
+
+.. templatetag:: for
+
+for
+~~~
+
+Loop over each item in an array.  For example, to display a list of athletes
+provided in ``athlete_list``::
+
+    <ul>
+    {% for athlete in athlete_list %}
+        <li>{{ athlete.name }}</li>
+    {% endfor %}
+    </ul>
+
+You can loop over a list in reverse by using ``{% for obj in list reversed %}``.
+
+**New in Django development version**
+If you need to loop over a list of lists, you can unpack the values
+in each sub-list into individual variables. For example, if your context
+contains a list of (x,y) coordinates called ``points``, you could use the
+following to output the list of points::
+
+    {% for x, y in points %}
+        There is a point at {{ x }},{{ y }}
+    {% endfor %}
+
+This can also be useful if you need to access the items in a dictionary.
+For example, if your context contained a dictionary ``data``, the following
+would display the keys and values of the dictionary::
+
+    {% for key, value in data.items %}
+        {{ key }}: {{ value }}
+    {% endfor %}
+
+The for loop sets a number of variables available within the loop:
+
+    ==========================  ================================================
+    Variable                    Description
+    ==========================  ================================================
+    ``forloop.counter``         The current iteration of the loop (1-indexed)
+    ``forloop.counter0``        The current iteration of the loop (0-indexed)
+    ``forloop.revcounter``      The number of iterations from the end of the
+                                loop (1-indexed)
+    ``forloop.revcounter0``     The number of iterations from the end of the
+                                loop (0-indexed)
+    ``forloop.first``           True if this is the first time through the loop
+    ``forloop.last``            True if this is the last time through the loop
+    ``forloop.parentloop``      For nested loops, this is the loop "above" the
+                                current one
+    ==========================  ================================================
+
+.. templatetag:: if
+
+if
+~~
+
+The ``{% if %}`` tag evaluates a variable, and if that variable is "true" (i.e.
+exists, is not empty, and is not a false boolean value) the contents of the
+block are output::
+
+    {% if athlete_list %}
+        Number of athletes: {{ athlete_list|length }}
+    {% else %}
+        No athletes.
+    {% endif %}
+
+In the above, if ``athlete_list`` is not empty, the number of athletes will be
+displayed by the ``{{ athlete_list|length }}`` variable.
+
+As you can see, the ``if`` tag can take an optional ``{% else %}`` clause that
+will be displayed if the test fails.
+
+``if`` tags may use ``and``, ``or`` or ``not`` to test a number of variables or
+to negate a given variable::
+
+    {% if athlete_list and coach_list %}
+        Both athletes and coaches are available.
+    {% endif %}
+
+    {% if not athlete_list %}
+        There are no athletes.
+    {% endif %}
+
+    {% if athlete_list or coach_list %}
+        There are some athletes or some coaches.
+    {% endif %}
+
+    {% if not athlete_list or coach_list %}
+        There are no athletes or there are some coaches (OK, so
+        writing English translations of boolean logic sounds
+        stupid; it's not our fault).
+    {% endif %}
+
+    {% if athlete_list and not coach_list %}
+        There are some athletes and absolutely no coaches.
+    {% endif %}
+
+``if`` tags don't allow ``and`` and ``or`` clauses within the same tag, because
+the order of logic would be ambiguous. For example, this is invalid::
+
+    {% if athlete_list and coach_list or cheerleader_list %}
+
+If you need to combine ``and`` and ``or`` to do advanced logic, just use nested
+``if`` tags. For example::
+
+    {% if athlete_list %}
+        {% if coach_list or cheerleader_list %}
+            We have athletes, and either coaches or cheerleaders!
+        {% endif %}
+    {% endif %}
+
+Multiple uses of the same logical operator are fine, as long as you use the
+same operator. For example, this is valid::
+
+    {% if athlete_list or coach_list or parent_list or teacher_list %}
+
+.. templatetag:: ifchanged
+
+ifchanged
+~~~~~~~~~
+
+Check if a value has changed from the last iteration of a loop.
+
+The 'ifchanged' block tag is used within a loop. It has two possible uses.
+
+1. Checks its own rendered contents against its previous state and only
+   displays the content if it has changed. For example, this displays a list of
+   days, only displaying the month if it changes::
+
+        <h1>Archive for {{ year }}</h1>
+
+        {% for date in days %}
+            {% ifchanged %}<h3>{{ date|date:"F" }}</h3>{% endifchanged %}
+            <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
+        {% endfor %}
+
+2. If given a variable, check whether that variable has changed. For
+   example, the following shows the date every time it changes, but
+   only shows the hour if both the hour and the date has changed::
+
+        {% for date in days %}
+            {% ifchanged date.date %} {{ date.date }} {% endifchanged %}
+            {% ifchanged date.hour date.date %}
+                {{ date.hour }}
+            {% endifchanged %}
+        {% endfor %}
+
+.. templatetag:: ifequal
+
+ifequal
+~~~~~~~
+
+Output the contents of the block if the two arguments equal each other.
+
+Example::
+
+    {% ifequal user.id comment.user_id %}
+        ...
+    {% endifequal %}
+
+As in the ``{% if %}`` tag, an ``{% else %}`` clause is optional.
+
+The arguments can be hard-coded strings, so the following is valid::
+
+    {% ifequal user.username "adrian" %}
+        ...
+    {% endifequal %}
+
+It is only possible to compare an argument to template variables or strings.
+You cannot check for equality with Python objects such as ``True`` or
+``False``.  If you need to test if something is true or false, use the ``if``
+tag instead.
+
+.. templatetag:: ifnotequal
+
+ifnotequal
+~~~~~~~~~~
+
+Just like ``ifequal``, except it tests that the two arguments are not equal.
+
+.. templatetag:: include
+
+include
+~~~~~~~
+
+Loads a template and renders it with the current context. This is a way of
+"including" other templates within a template.
+
+The template name can either be a variable or a hard-coded (quoted) string,
+in either single or double quotes.
+
+This example includes the contents of the template ``"foo/bar.html"``::
+
+    {% include "foo/bar.html" %}
+
+This example includes the contents of the template whose name is contained in
+the variable ``template_name``::
+
+    {% include template_name %}
+
+An included template is rendered with the context of the template that's
+including it. This example produces the output ``"Hello, John"``:
+
+    * Context: variable ``person`` is set to ``"john"``.
+    * Template::
+
+        {% include "name_snippet.html" %}
+
+    * The ``name_snippet.html`` template::
+
+        Hello, {{ person }}
+
+See also: ``{% ssi %}``.
+
+.. templatetag:: load
+
+load
+~~~~
+
+Load a custom template tag set.
+
+See :ref:`Custom tag and filter libraries <howto-custom-template-tags>` for more information.
+
+.. templatetag:: now
+
+now
+~~~
+
+Display the date, formatted according to the given string.
+
+Uses the same format as PHP's ``date()`` function (http://php.net/date)
+with some custom extensions.
+
+Available format strings:
+
+    ================  ========================================  =====================
+    Format character  Description                               Example output
+    ================  ========================================  =====================
+    a                 ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
+                      this is slightly different than PHP's
+                      output, because this includes periods
+                      to match Associated Press style.)
+    A                 ``'AM'`` or ``'PM'``.                     ``'AM'``
+    b                 Month, textual, 3 letters, lowercase.     ``'jan'``
+    B                 Not implemented.
+    d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
+                      leading zeros.
+    D                 Day of the week, textual, 3 letters.      ``'Fri'``
+    f                 Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
+                      with minutes left off if they're zero.
+                      Proprietary extension.
+    F                 Month, textual, long.                     ``'January'``
+    g                 Hour, 12-hour format without leading      ``'1'`` to ``'12'``
+                      zeros.
+    G                 Hour, 24-hour format without leading      ``'0'`` to ``'23'``
+                      zeros.
+    h                 Hour, 12-hour format.                     ``'01'`` to ``'12'``
+    H                 Hour, 24-hour format.                     ``'00'`` to ``'23'``
+    i                 Minutes.                                  ``'00'`` to ``'59'``
+    I                 Not implemented.
+    j                 Day of the month without leading          ``'1'`` to ``'31'``
+                      zeros.
+    l                 Day of the week, textual, long.           ``'Friday'``
+    L                 Boolean for whether it's a leap year.     ``True`` or ``False``
+    m                 Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
+    M                 Month, textual, 3 letters.                ``'Jan'``
+    n                 Month without leading zeros.              ``'1'`` to ``'12'``
+    N                 Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
+                      style. Proprietary extension.
+    O                 Difference to Greenwich time in hours.    ``'+0200'``
+    P                 Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
+                      'a.m.'/'p.m.', with minutes left off
+                      if they're zero and the special-case
+                      strings 'midnight' and 'noon' if
+                      appropriate. Proprietary extension.
+    r                 RFC 2822 formatted date.                  ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+    s                 Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
+    S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
+                      month, 2 characters.
+    t                 Number of days in the given month.        ``28`` to ``31``
+    T                 Time zone of this machine.                ``'EST'``, ``'MDT'``
+    U                 Not implemented.
+    w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
+                      leading zeros.
+    W                 ISO-8601 week number of year, with        ``1``, ``53``
+                      weeks starting on Monday.
+    y                 Year, 2 digits.                           ``'99'``
+    Y                 Year, 4 digits.                           ``'1999'``
+    z                 Day of the year.                          ``0`` to ``365``
+    Z                 Time zone offset in seconds. The          ``-43200`` to ``43200``
+                      offset for timezones west of UTC is
+                      always negative, and for those east of
+                      UTC is always positive.
+    ================  ========================================  =====================
+
+Example::
+
+    It is {% now "jS F Y H:i" %}
+
+Note that you can backslash-escape a format string if you want to use the
+"raw" value. In this example, "f" is backslash-escaped, because otherwise
+"f" is a format string that displays the time. The "o" doesn't need to be
+escaped, because it's not a format character::
+
+    It is the {% now "jS o\f F" %}
+
+This would display as "It is the 4th of September".
+
+.. templatetag:: regroup
+
+regroup
+~~~~~~~
+
+Regroup a list of alike objects by a common attribute.
+
+This complex tag is best illustrated by use of an example: say that ``people``
+is a list of people represented by dictionaries with ``first_name``,
+``last_name``, and ``gender`` keys::
+
+    people = [
+        {'first_name': 'George', 'last_name': 'Bush', 'gender': 'Male'},
+        {'first_name': 'Bill', 'last_name': 'Clinton', 'gender': 'Male'},
+        {'first_name': 'Margaret', 'last_name': 'Thatcher', 'gender': 'Female'},
+        {'first_name': 'Condoleezza', 'last_name': 'Rice', 'gender': 'Female'},
+        {'first_name': 'Pat', 'last_name': 'Smith', 'gender': 'Unknown'},
+    ]
+
+...and you'd like to display a hierarchical list that is ordered by gender,
+like this:
+
+    * Male:
+        * George Bush
+        * Bill Clinton
+    * Female:
+        * Margaret Thatcher
+        * Condoleezza Rice
+    * Unknown:
+        * Pat Smith
+
+You can use the ``{% regroup %}`` tag to group the list of people by gender.
+The following snippet of template code would accomplish this::
+
+    {% regroup people by gender as gender_list %}
+
+    <ul>
+    {% for gender in gender_list %}
+        <li>{{ gender.grouper }}
+        <ul>
+            {% for item in gender.list %}
+            <li>{{ item.first_name }} {{ item.last_name }}</li>
+            {% endfor %}
+        </ul>
+        </li>
+    {% endfor %}
+    </ul>
+
+Let's walk through this example. ``{% regroup %}`` takes three arguments: the
+list you want to regroup, the attribute to group by, and the name of the
+resulting list. Here, we're regrouping the ``people`` list by the ``gender``
+attribute and calling the result ``gender_list``.
+
+``{% regroup %}`` produces a list (in this case, ``gender_list``) of
+**group objects**. Each group object has two attributes:
+
+    * ``grouper`` -- the item that was grouped by (e.g., the string "Male" or
+      "Female").
+    * ``list`` -- a list of all items in this group (e.g., a list of all people
+      with gender='Male').
+
+Note that ``{% regroup %}`` does not order its input! Our example relies on
+the fact that the ``people`` list was ordered by ``gender`` in the first place.
+If the ``people`` list did *not* order its members by ``gender``, the regrouping
+would naively display more than one group for a single gender. For example,
+say the ``people`` list was set to this (note that the males are not grouped
+together)::
+
+    people = [
+        {'first_name': 'Bill', 'last_name': 'Clinton', 'gender': 'Male'},
+        {'first_name': 'Pat', 'last_name': 'Smith', 'gender': 'Unknown'},
+        {'first_name': 'Margaret', 'last_name': 'Thatcher', 'gender': 'Female'},
+        {'first_name': 'George', 'last_name': 'Bush', 'gender': 'Male'},
+        {'first_name': 'Condoleezza', 'last_name': 'Rice', 'gender': 'Female'},
+    ]
+
+With this input for ``people``, the example ``{% regroup %}`` template code
+above would result in the following output:
+
+    * Male:
+        * Bill Clinton
+    * Unknown:
+        * Pat Smith
+    * Female:
+        * Margaret Thatcher
+    * Male:
+        * George Bush
+    * Female:
+        * Condoleezza Rice
+
+The easiest solution to this gotcha is to make sure in your view code that the
+data is ordered according to how you want to display it.
+
+Another solution is to sort the data in the template using the ``dictsort``
+filter, if your data is in a list of dictionaries::
+
+    {% regroup people|dictsort:"gender" by gender as gender_list %}
+
+.. templatetag:: spaceless
+
+spaceless
+~~~~~~~~~
+
+Removes whitespace between HTML tags. This includes tab
+characters and newlines.
+
+Example usage::
+
+    {% spaceless %}
+        <p>
+            <a href="foo/">Foo</a>
+        </p>
+    {% endspaceless %}
+
+This example would return this HTML::
+
+    <p><a href="foo/">Foo</a></p>
+
+Only space between *tags* is removed -- not space between tags and text. In
+this example, the space around ``Hello`` won't be stripped::
+
+    {% spaceless %}
+        <strong>
+            Hello
+        </strong>
+    {% endspaceless %}
+
+.. templatetag:: ssi
+
+ssi
+~~~
+
+Output the contents of a given file into the page.
+
+Like a simple "include" tag, ``{% ssi %}`` includes the contents of another
+file -- which must be specified using an absolute path -- in the current
+page::
+
+    {% ssi /home/html/ljworld.com/includes/right_generic.html %}
+
+If the optional "parsed" parameter is given, the contents of the included
+file are evaluated as template code, within the current context::
+
+    {% ssi /home/html/ljworld.com/includes/right_generic.html parsed %}
+
+Note that if you use ``{% ssi %}``, you'll need to define
+:setting:`ALLOWED_INCLUDE_ROOTS` in your Django settings, as a security measure.
+
+See also: ``{% include %}``.
+
+.. templatetag:: templatetag
+
+templatetag
+~~~~~~~~~~~
+
+Output one of the syntax characters used to compose template tags.
+
+Since the template system has no concept of "escaping", to display one of the
+bits used in template tags, you must use the ``{% templatetag %}`` tag.
+
+The argument tells which template bit to output:
+
+    ==================  =======
+    Argument            Outputs
+    ==================  =======
+    ``openblock``       ``{%``
+    ``closeblock``      ``%}``
+    ``openvariable``    ``{{``
+    ``closevariable``   ``}}``
+    ``openbrace``       ``{``
+    ``closebrace``      ``}``
+    ``opencomment``     ``{#``
+    ``closecomment``    ``#}``
+    ==================  =======
+
+.. templatetag:: url
+
+url
+~~~
+
+**Note that the syntax for this tag may change in the future, as we make it more robust.**
+
+Returns an absolute URL (i.e., a URL without the domain name) matching a given
+view function and optional parameters. This is a way to output links without
+violating the DRY principle by having to hard-code URLs in your templates::
+
+    {% url path.to.some_view arg1,arg2,name1=value1 %}
+
+The first argument is a path to a view function in the format
+``package.package.module.function``. Additional arguments are optional and
+should be comma-separated values that will be used as positional and keyword
+arguments in the URL. All arguments required by the URLconf should be present.
+
+For example, suppose you have a view, ``app_views.client``, whose URLconf
+takes a client ID (here, ``client()`` is a method inside the views file
+``app_views.py``). The URLconf line might look like this::
+
+    ('^client/(\d+)/$', 'app_views.client')
+
+If this app's URLconf is included into the project's URLconf under a path
+such as this::
+
+    ('^clients/', include('project_name.app_name.urls'))
+
+...then, in a template, you can create a link to this view like this::
+
+    {% url app_views.client client.id %}
+
+The template tag will output the string ``/clients/client/123/``.
+
+**New in development version:** If you're using :ref:`named URL patterns
+<naming-url-patterns>`, you can refer to the name of the pattern in the ``url``
+tag instead of using the path to the view.
+
+.. templatetag:: widthratio
+
+widthratio
+~~~~~~~~~~
+
+For creating bar charts and such, this tag calculates the ratio of a given value
+to a maximum value, and then applies that ratio to a constant.
+
+For example::
+
+    <img src="bar.gif" height="10" width="{% widthratio this_value max_value 100 %}" />
+
+Above, if ``this_value`` is 175 and ``max_value`` is 200, the image in the
+above example will be 88 pixels wide (because 175/200 = .875; .875 * 100 = 87.5
+which is rounded up to 88).
+
+.. templatetag:: with
+
+with
+~~~~
+
+**New in Django development version**
+
+Caches a complex variable under a simpler name. This is useful when accessing
+an "expensive" method (e.g., one that hits the database) multiple times.
+
+For example::
+
+    {% with business.employees.count as total %}
+        {{ total }} employee{{ total|pluralize }}
+    {% endwith %}
+
+The populated variable (in the example above, ``total``) is only available
+between the ``{% with %}`` and ``{% endwith %}`` tags.
+
+.. _ref-templates-builtins-filters:
+
+Built-in filter reference
+-------------------------
+
+.. templatefilter:: add
+
+add
+~~~
+
+Adds the argument to the value.
+
+For example::
+
+    {{ value|add:"2" }}
+
+If ``value`` is ``4``, then the output will be ``6``.
+
+.. templatefilter:: addslashes
+
+addslashes
+~~~~~~~~~~
+
+Adds slashes before quotes. Useful for escaping strings in CSV, for example.
+
+**New in Django development version**: For escaping data in JavaScript strings,
+use the `escapejs`_ filter instead.
+
+.. templatefilter:: capfirst
+
+capfirst
+~~~~~~~~
+
+Capitalizes the first character of the value.
+
+.. templatefilter:: center
+
+center
+~~~~~~
+
+Centers the value in a field of a given width.
+
+.. templatefilter:: cut
+
+cut
+~~~
+
+Removes all values of arg from the given string.
+
+For example::
+
+    {{ value|cut:" "}}
+
+If ``value`` is ``"String with spaces"``, the output will be ``"Stringwithspaces"``.
+
+.. templatefilter:: date
+
+date
+~~~~
+
+Formats a date according to the given format (same as the `now`_ tag).
+
+For example::
+
+    {{ value|date:"D d M Y" }}
+
+If ``value`` is a ``datetime`` object (e.g., the result of
+``datetime.datetime.now()``), the output will be the string
+``'Wed 09 Jan 2008'``.
+
+.. templatefilter:: default
+
+default
+~~~~~~~
+
+If value evaluates to ``False``, use given default. Otherwise, use the value.
+
+For example::
+
+    {{ value|default:"nothing" }}
+
+If ``value`` is ``""`` (the empty string), the output will be ``nothing``.
+
+.. templatefilter:: default_if_none
+
+default_if_none
+~~~~~~~~~~~~~~~
+
+If (and only if) value is ``None``, use given default. Otherwise, use the
+value.
+
+Note that if an empty string is given, the default value will *not* be used.
+Use the ``default`` filter if you want to fallback for empty strings.
+
+For example::
+
+    {{ value|default_if_none:"nothing" }}
+
+If ``value`` is ``None``, the output will be the string ``"nothing"``.
+
+.. templatefilter:: dictsort
+
+dictsort
+~~~~~~~~
+
+Takes a list of dictionaries and returns that list sorted by the key given in
+the argument.
+
+For example::
+
+    {{ value|dictsort:"name" }}
+
+If ``value`` is::
+
+    [
+        {'name': 'zed', 'age': 19},
+        {'name': 'amy', 'age': 22},
+        {'name': 'joe', 'age': 31},
+    ]
+
+then the output would be::
+
+    [
+        {'name': 'amy', 'age': 22},
+        {'name': 'joe', 'age': 31},
+        {'name': 'zed', 'age': 19},
+    ]
+
+.. templatefilter:: dictsortreversed
+
+dictsortreversed
+~~~~~~~~~~~~~~~~
+
+Takes a list of dictionaries and returns that list sorted in reverse order by
+the key given in the argument. This works exactly the same as the above filter,
+but the returned value will be in reverse order.
+
+.. templatefilter:: divisibleby
+
+divisibleby
+~~~~~~~~~~~
+
+Returns ``True`` if the value is divisible by the argument.
+
+For example::
+
+    {{ value|divisibleby:"3" }}
+
+If ``value`` is ``21``, the output would be ``True``.
+
+.. templatefilter:: escape
+
+escape
+~~~~~~
+
+Escapes a string's HTML. Specifically, it makes these replacements:
+
+    * ``<`` is converted to ``&lt;``
+    * ``>`` is converted to ``&gt;``
+    * ``'`` (single quote) is converted to ``&#39;``
+    * ``"`` (double quote) is converted to ``&quot;``
+    * ``&`` is converted to ``&amp;``
+
+The escaping is only applied when the string is output, so it does not matter
+where in a chained sequence of filters you put ``escape``: it will always be
+applied as though it were the last filter. If you want escaping to be applied
+immediately, use the ``force_escape`` filter.
+
+Applying ``escape`` to a variable that would normally have auto-escaping
+applied to the result will only result in one round of escaping being done. So
+it is safe to use this function even in auto-escaping environments. If you want
+multiple escaping passes to be applied, use the ``force_escape`` filter.
+
+**New in Django development version:** Due to auto-escaping, the behavior of
+this filter has changed slightly. The replacements are only made once, after
+all other filters are applied -- including filters before and after it.
+
+.. templatefilter:: escapejs
+
+escapejs
+~~~~~~~~
+
+**New in Django development version**
+
+Escapes characters for use in JavaScript strings. This does *not* make the
+string safe for use in HTML, but does protect you from syntax errors when using
+templates to generate JavaScript/JSON.
+
+.. templatefilter:: filesizeformat
+
+filesizeformat
+~~~~~~~~~~~~~~
+
+Format the value like a 'human-readable' file size (i.e. ``'13 KB'``,
+``'4.1 MB'``, ``'102 bytes'``, etc).
+
+For example::
+
+    {{ value|filesizeformat }}
+
+If ``value`` is 123456789, the output would be ``117.7 MB``.
+
+.. templatefilter:: first
+
+first
+~~~~~
+
+Returns the first item in a list.
+
+For example::
+
+    {{ value|first }}
+
+If ``value`` is the list ``['a', 'b', 'c']``, the output will be ``'a'``.
+
+.. templatefilter:: fix_ampersands
+
+fix_ampersands
+~~~~~~~~~~~~~~
+
+Replaces ampersands with ``&amp;`` entities.
+
+For example::
+
+    {{ value|fix_ampersands }}
+
+If ``value`` is ``Tom & Jerry``, the output will be ``Tom &amp; Jerry``.
+
+**New in Django development version**: This filter generally is no longer
+useful, because ampersands are automatically escaped in templates. See escape_
+for more on how auto-escaping works.
+
+.. templatefilter:: floatformat
+
+floatformat
+~~~~~~~~~~~
+
+When used without an argument, rounds a floating-point number to one decimal
+place -- but only if there's a decimal part to be displayed. For example:
+
+============  ===========================  ========
+``value``     Template                     Output
+============  ===========================  ========
+``34.23234``  ``{{ value|floatformat }}``  ``34.2``
+``34.00000``  ``{{ value|floatformat }}``  ``34``
+``34.26000``  ``{{ value|floatformat }}``  ``34.3``
+============  ===========================  ========
+
+If used with a numeric integer argument, ``floatformat`` rounds a number to
+that many decimal places. For example:
+
+============  =============================  ==========
+``value``     Template                       Output
+============  =============================  ==========
+``34.23234``  ``{{ value|floatformat:3 }}``  ``34.232``
+``34.00000``  ``{{ value|floatformat:3 }}``  ``34.000``
+``34.26000``  ``{{ value|floatformat:3 }}``  ``34.260``
+============  =============================  ==========
+
+If the argument passed to ``floatformat`` is negative, it will round a number
+to that many decimal places -- but only if there's a decimal part to be
+displayed. For example:
+
+============  ================================  ==========
+``value``     Template                          Output
+============  ================================  ==========
+``34.23234``  ``{{ value|floatformat:"-3" }}``  ``34.232``
+``34.00000``  ``{{ value|floatformat:"-3" }}``  ``34``
+``34.26000``  ``{{ value|floatformat:"-3" }}``  ``34.260``
+============  ================================  ==========
+
+Using ``floatformat`` with no argument is equivalent to using ``floatformat``
+with an argument of ``-1``.
+
+.. templatefilter:: force_escape
+
+force_escape
+~~~~~~~~~~~~
+
+**New in Django development version**
+
+Applies HTML escaping to a string (see the ``escape`` filter for details).
+This filter is applied *immediately* and returns a new, escaped string. This
+is useful in the rare cases where you need multiple escaping or want to apply
+other filters to the escaped results. Normally, you want to use the ``escape``
+filter.
+
+.. templatefilter:: get_digit
+
+get_digit
+~~~~~~~~~
+
+Given a whole number, returns the requested digit, where 1 is the right-most
+digit, 2 is the second-right-most digit, etc. Returns the original value for
+invalid input (if input or argument is not an integer, or if argument is less
+than 1). Otherwise, output is always an integer.
+
+For example::
+
+    {{ value|get_digit:"2" }}
+
+If ``value`` is ``123456789``, the output will be ``8``.
+
+.. templatefilter:: iriendcode
+
+iriencode
+~~~~~~~~~
+
+Converts an IRI (Internationalized Resource Identifier) to a string that is
+suitable for including in a URL. This is necessary if you're trying to use
+strings containing non-ASCII characters in a URL.
+
+It's safe to use this filter on a string that has already gone through the
+``urlencode`` filter.
+
+.. templatefilter:: join
+
+join
+~~~~
+
+Joins a list with a string, like Python's ``str.join(list)``
+
+For example::
+
+    {{ value|join:" // " }}
+
+If ``value`` is the list ``['a', 'b', 'c']``, the output will be the string
+``"a // b // c"``.
+
+.. templatefilter:: last
+
+last
+~~~~
+
+**New in Django development version.**
+
+Returns the last item in a list.
+
+For example::
+
+    {{ value|last }}
+
+If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output will be the string
+``"d"``.
+
+.. templatefilter:: length
+
+length
+~~~~~~
+
+Returns the length of the value. This works for both strings and lists.
+
+For example::
+
+    {{ value|length }}
+
+If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``4``.
+
+.. templatefilter:: length_is
+
+length_is
+~~~~~~~~~
+
+Returns ``True`` if the value's length is the argument, or ``False`` otherwise.
+
+For example::
+
+    {{ value|length_is:"4" }}
+
+If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``True``.
+
+.. templatefilter:: linebreaks
+
+linebreaks
+~~~~~~~~~~
+
+Replaces line breaks in plain text with appropriate HTML; a single
+newline becomes an HTML line break (``<br />``) and a new line
+followed by a blank line becomes a paragraph break (``</p>``).
+
+For example::
+
+    {{ value|linebreaks }}
+
+If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joel<br>is a
+slug</p>``.
+
+.. templatefilter:: linebreaksbr
+
+linebreaksbr
+~~~~~~~~~~~~
+
+Converts all newlines in a piece of plain text to HTML line breaks
+(``<br />``).
+
+.. templatefilter:: linenumbers
+
+linenumbers
+~~~~~~~~~~~
+
+Displays text with line numbers.
+
+.. templatefilter:: ljust
+
+ljust
+~~~~~
+
+Left-aligns the value in a field of a given width.
+
+**Argument:** field size
+
+.. templatefilter:: lower
+
+lower
+~~~~~
+
+Converts a string into all lowercase.
+
+For example::
+
+    {{ value|lower }}
+
+If ``value`` is ``Still MAD At Yoko``, the output will be ``still mad at yoko``.
+
+.. templatefilter:: make_list
+
+make_list
+~~~~~~~~~
+
+Returns the value turned into a list. For an integer, it's a list of
+digits. For a string, it's a list of characters.
+
+For example::
+
+    {{ value|make_list }}
+
+If ``value`` is the string ``"Joel"``, the output would be the list
+``[u'J', u'o', u'e', u'l']``. If ``value`` is ``123``, the output will be the
+list ``[1, 2, 3]``.
+
+.. templatefilter:: phone2numeric
+
+phone2numeric
+~~~~~~~~~~~~~
+
+Converts a phone number (possibly containing letters) to its numerical
+equivalent. For example, ``'800-COLLECT'`` will be converted to
+``'800-2655328'``.
+
+The input doesn't have to be a valid phone number. This will happily convert
+any string.
+
+.. templatefilter:: pluralize
+
+pluralize
+~~~~~~~~~
+
+Returns a plural suffix if the value is not 1. By default, this suffix is ``'s'``.
+
+Example::
+
+    You have {{ num_messages }} message{{ num_messages|pluralize }}.
+
+For words that require a suffix other than ``'s'``, you can provide an alternate
+suffix as a parameter to the filter.
+
+Example::
+
+    You have {{ num_walruses }} walrus{{ num_walrus|pluralize:"es" }}.
+
+For words that don't pluralize by simple suffix, you can specify both a
+singular and plural suffix, separated by a comma.
+
+Example::
+
+    You have {{ num_cherries }} cherr{{ num_cherries|pluralize:"y,ies" }}.
+    
+.. templatefilter:: pprint
+
+pprint
+~~~~~~
+
+A wrapper around `pprint.pprint`__ -- for debugging, really.
+
+__ http://www.python.org/doc/2.5/lib/module-pprint.html
+
+.. templatefilter:: random
+
+random
+~~~~~~
+
+Returns a random item from the given list.
+
+For example::
+
+    {{ value|random }}
+
+If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output could be ``"b"``.
+
+.. templatefilter:: removetags
+
+removetags
+~~~~~~~~~~
+
+Removes a space-separated list of [X]HTML tags from the output.
+
+For example::
+
+    {{ value|removetags:"b span"|safe }}
+
+If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
+output will be ``"Joel <button>is</button> a slug"``.
+
+.. templatefilter:: rjust
+
+rjust
+~~~~~
+
+Right-aligns the value in a field of a given width.
+
+**Argument:** field size
+
+.. templatefilter:: safe
+
+safe
+~~~~
+
+Marks a string as not requiring further HTML escaping prior to output. When
+autoescaping is off, this filter has no effect.
+
+.. templatefilter:: slice
+
+slice
+~~~~~
+
+Returns a slice of the list.
+
+Uses the same syntax as Python's list slicing. See
+http://diveintopython.org/native_data_types/lists.html#odbchelper.list.slice
+for an introduction.
+
+Example: ``{{ some_list|slice:":2" }}``
+
+.. templatefilter:: slugify
+
+slugify
+~~~~~~~
+
+Converts to lowercase, removes non-word characters (alphanumerics and
+underscores) and converts spaces to hyphens. Also strips leading and trailing
+whitespace.
+
+For example::
+
+    {{ value|slugify }}
+
+If ``value`` is ``"Joel is a slug"``, the output will be ``"joel-is-a-slug"``.
+
+.. templatefilter:: stringformat
+
+stringformat
+~~~~~~~~~~~~
+
+Formats the variable according to the argument, a string formatting specifier.
+This specifier uses Python string formatting syntax, with the exception that
+the leading "%" is dropped.
+
+See http://docs.python.org/lib/typesseq-strings.html for documentation of
+Python string formatting
+
+For example::
+
+    {{ value|stringformat:"s" }}
+
+If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is a slug"``.
+
+.. templatefilter:: striptags
+
+striptags
+~~~~~~~~~
+
+Strips all [X]HTML tags.
+
+For example::
+
+    {{ value|striptags }}
+
+If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``, the
+output will be ``"Joel is a slug"``.
+
+.. templatefilter:: time
+
+time
+~~~~
+
+Formats a time according to the given format (same as the `now`_ tag).
+The time filter will only accept parameters in the format string that relate
+to the time of day, not the date (for obvious reasons). If you need to
+format a date, use the `date`_ filter.
+
+For example::
+
+    {{ value|time:"H:i" }}
+
+If ``value`` is equivalent to ``datetime.datetime.now()``, the output will be
+the string ``"01:23"``.
+
+.. templatefilter:: timesince
+
+timesince
+~~~~~~~~~
+
+Formats a date as the time since that date (e.g., "4 days, 6 hours").
+
+Takes an optional argument that is a variable containing the date to use as
+the comparison point (without the argument, the comparison point is *now*).
+For example, if ``blog_date`` is a date instance representing midnight on 1
+June 2006, and ``comment_date`` is a date instance for 08:00 on 1 June 2006,
+then ``{{ comment_date|timesince:blog_date }}`` would return "8 hours".
+
+Minutes is the smallest unit used, and "0 minutes" will be returned for any
+date that is in the future relative to the comparison point.
+
+.. templatefilter:: timeuntil
+
+timeuntil
+~~~~~~~~~
+
+Similar to ``timesince``, except that it measures the time from now until the
+given date or datetime. For example, if today is 1 June 2006 and
+``conference_date`` is a date instance holding 29 June 2006, then
+``{{ conference_date|timeuntil }}`` will return "4 weeks".
+
+Takes an optional argument that is a variable containing the date to use as
+the comparison point (instead of *now*). If ``from_date`` contains 22 June
+2006, then ``{{ conference_date|timeuntil:from_date }}`` will return "1 week".
+
+Minutes is the smallest unit used, and "0 minutes" will be returned for any
+date that is in the past relative to the comparison point.
+
+.. templatefilter:: title
+
+title
+~~~~~
+
+Converts a string into titlecase.
+
+.. templatefilter:: truncatewords
+
+truncatewords
+~~~~~~~~~~~~~
+
+Truncates a string after a certain number of words.
+
+**Argument:** Number of words to truncate after
+
+For example::
+
+    {{ value|truncatewords:2 }}
+
+If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is ..."``.
+
+.. templatefilter:: truncatewords_html
+
+truncatewords_html
+~~~~~~~~~~~~~~~~~~
+
+Similar to ``truncatewords``, except that it is aware of HTML tags. Any tags
+that are opened in the string and not closed before the truncation point, are
+closed immediately after the truncation.
+
+This is less efficient than ``truncatewords``, so should only be used when it
+is being passed HTML text.
+
+.. templatefilter:: unordered_list
+
+unordered_list
+~~~~~~~~~~~~~~
+
+Recursively takes a self-nested list and returns an HTML unordered list --
+WITHOUT opening and closing <ul> tags.
+
+**New in Django development version:** The format accepted by
+``unordered_list`` has changed to be easier to understand.
+
+The list is assumed to be in the proper format. For example, if ``var`` contains
+``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
+``{{ var|unordered_list }}`` would return::
+
+    <li>States
+    <ul>
+            <li>Kansas
+            <ul>
+                    <li>Lawrence</li>
+                    <li>Topeka</li>
+            </ul>
+            </li>
+            <li>Illinois</li>
+    </ul>
+    </li>
+
+Note: the previous more restrictive and verbose format is still supported:
+``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``,
+
+.. templatefilter:: upper
+
+upper
+~~~~~
+
+Converts a string into all uppercase.
+
+For example::
+
+    {{ value|upper }}
+
+If ``value`` is ``"Joel is a slug"``, the output will be ``"JOEL IS A SLUG"``.
+
+.. templatefilter:: urlencode
+
+urlencode
+~~~~~~~~~
+
+Escapes a value for use in a URL.
+
+.. templatefilter:: urlize
+
+urlize
+~~~~~~
+
+Converts URLs in plain text into clickable links.
+
+Note that if ``urlize`` is applied to text that already contains HTML markup,
+things won't work as expected. Apply this filter only to *plain* text.
+
+For example::
+
+    {{ value|urlize }}
+
+If ``value`` is ``"Check out www.djangoproject.com"``, the output will be
+``"Check out <a
+href="http://www.djangoproject.com">www.djangoproject.com</a>"``.
+
+.. templatefilter:: urlizetrunc
+
+urlizetrunc
+~~~~~~~~~~~
+
+Converts URLs into clickable links, truncating URLs longer than the given
+character limit.
+
+As with urlize_, this filter should only be applied to *plain* text.
+
+**Argument:** Length to truncate URLs to
+
+For example::
+
+    {{ value|urlizetrunc:15 }}
+
+If ``value`` is ``"Check out www.djangoproject.com"``, the output would be
+``'Check out <a
+href="http://www.djangoproject.com">www.djangopr...</a>'``.
+
+.. templatefilter:: wordcount
+
+wordcount
+~~~~~~~~~
+
+Returns the number of words.
+
+.. templatefilter:: wordwrap
+
+wordwrap
+~~~~~~~~
+
+Wraps words at specified line length.
+
+**Argument:** number of characters at which to wrap the text
+
+For example::
+
+    {{ value|wordwrap:5 }}
+
+If ``value`` is ``Joel is a slug``, the output would be::
+
+    Joel
+    is a
+    slug
+
+.. templatefilter:: yesno
+
+yesno
+~~~~~
+
+Given a string mapping values for true, false and (optionally) None,
+returns one of those strings according to the value:
+
+==========  ======================  ==================================
+Value       Argument                Outputs
+==========  ======================  ==================================
+``True``    ``"yeah,no,maybe"``     ``yeah``
+``False``   ``"yeah,no,maybe"``     ``no``
+``None``    ``"yeah,no,maybe"``     ``maybe``
+``None``    ``"yeah,no"``           ``"no"`` (converts None to False
+                                    if no mapping for None is given)
+==========  ======================  ==================================
+
+Other tags and filter libraries
+===============================
+
+Django comes with a couple of other template-tag libraries that you have to
+enable explicitly in your ``INSTALLED_APPS`` setting and enable in your
+template with the ``{% load %}`` tag.
+
+django.contrib.humanize
+-----------------------
+
+A set of Django template filters useful for adding a "human touch" to data. See
+:ref:`ref-contrib-humanize`.
+
+django.contrib.markup
+---------------------
+
+A collection of template filters that implement these common markup languages:
+
+    * Textile
+    * Markdown
+    * ReST (ReStructured Text)
+
+See :ref:`ref-contrib-markup`.
+
+django.contrib.webdesign
+------------------------
+
+A collection of template tags that can be useful while designing a website,
+such as a generator of Lorem Ipsum text. See :ref:`ref-contrib-webdesign`.

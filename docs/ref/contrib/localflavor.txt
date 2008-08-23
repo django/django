@@ -1,0 +1,651 @@
+.. _ref-contrib-localflavor:
+
+==========================
+The "local flavor" add-ons
+==========================
+
+.. module:: django.contrib.localflavor
+    :synopsis: A collection of various Django snippets that are useful only for
+               a particular country or culture.
+
+Following its "batteries included" philosophy, Django comes with assorted
+pieces of code that are useful for particular countries or cultures. These are
+called the "local flavor" add-ons and live in the
+:mod:`django.contrib.localflavor` package.
+
+Inside that package, country- or culture-specific code is organized into
+subpackages, named using `ISO 3166 country codes`_.
+
+Most of the ``localflavor`` add-ons are localized form components deriving
+from the :ref:`forms <topics-forms-index>` framework -- for example, a
+:class:`~django.contrib.localflavor.us.forms.USStateField` that knows how to
+validate U.S. state abbreviations, and a
+:class:`~django.contrib.localflavor.fi.forms.FISocialSecurityNumber` that
+knows how to validate Finnish social security numbers.
+
+To use one of these localized components, just import the relevant subpackage.
+For example, here's how you can create a form with a field representing a
+French telephone number::
+
+    from django import forms
+    from django.contrib.localflavor import fr
+
+    class MyForm(forms.Form):
+        my_french_phone_no = fr.forms.FRPhoneNumberField()
+
+Supported countries
+===================
+
+Countries currently supported by :mod:`~django.contrib.localflavor` are:
+
+    * Argentina_
+    * Australia_
+    * Austria_
+    * Brazil_
+    * Canada_
+    * Chile_
+    * Finland_
+    * France_
+    * Germany_
+    * Holland_
+    * Iceland_
+    * India_
+    * Italy_
+    * Japan_
+    * Mexico_
+    * Norway_
+    * Peru_
+    * Poland_
+    * Romania_
+    * Slovakia_
+    * `South Africa`_
+    * Spain_
+    * Switzerland_
+    * `United Kingdom`_
+    * `United States of America`_
+
+The ``django.contrib.localflavor`` package also includes a ``generic`` subpackage,
+containing useful code that is not specific to one particular country or
+culture. Currently, it defines date and datetime input fields based on those
+from :ref:`forms <topics-forms-index>`, but with non-US default formats.
+Here's an example of how to use them::
+
+    from django import forms
+    from django.contrib.localflavor import generic
+
+    class MyForm(forms.Form):
+        my_date_field = generic.forms.DateField()
+
+.. _ISO 3166 country codes: http://www.iso.org/iso/country_codes/iso_3166_code_lists/english_country_names_and_code_elements.htm
+.. _Argentina: `Argentina (ar)`_
+.. _Australia: `Australia (au)`_
+.. _Austria: `Austria (at)`_
+.. _Brazil: `Brazil (br)`_
+.. _Canada: `Canada (ca)`_
+.. _Chile: `Chile (cl)`_
+.. _Finland: `Finland (fi)`_
+.. _France: `France (fr)`_
+.. _Germany: `Germany (de)`_
+.. _Holland: `Holland (nl)`_
+.. _Iceland: `Iceland (is\_)`_
+.. _India: `India (in\_)`_
+.. _Italy: `Italy (it)`_
+.. _Japan: `Japan (jp)`_
+.. _Mexico: `Mexico (mx)`_
+.. _Norway: `Norway (no)`_
+.. _Peru: `Peru (pe)`_
+.. _Poland: `Poland (pl)`_
+.. _Romania: `Romania (ro)`_
+.. _Slovakia: `Slovakia (sk)`_
+.. _South Africa: `South Africa (za)`_
+.. _Spain: `Spain (es)`_
+.. _Switzerland: `Switzerland (ch)`_
+.. _United Kingdom: `United Kingdom (uk)`_
+.. _United States of America: `United States of America (us)`_
+
+Adding flavors
+==============
+
+We'd love to add more of these to Django, so please `create a ticket`_ with
+any code you'd like to contribute. One thing we ask is that you please use
+Unicode objects (``u'mystring'``) for strings, rather than setting the encoding
+in the file. See any of the existing flavors for examples.
+
+.. _create a ticket: http://code.djangoproject.com/simpleticket
+
+Argentina (``ar``)
+=============================================
+
+.. class:: ar.forms.ARPostalCodeField
+
+    A form field that validates input as either a classic four-digit Argentinian
+    postal code or a CPA_.
+
+.. _CPA: http://www.correoargentino.com.ar/consulta_cpa/home.php
+
+.. class:: ar.forms.ARDNIField
+
+    A form field that validates input as a Documento Nacional de Identidad (DNI)
+    number.
+
+.. class:: ar.forms.ARCUITField
+
+    A form field that validates input as a Codigo Unico de Identificacion
+    Tributaria (CUIT) number.
+
+.. class:: ar.forms.ARProvinceSelect
+
+    A ``Select`` widget that uses a list of Argentina's provinces and autonomous
+    cities as its choices.
+
+Australia (``au``)
+=============================================
+
+.. class:: au.forms.AUPostCodeField
+
+    A form field that validates input as an Australian postcode.
+
+.. class:: au.forms.AUPhoneNumberField
+
+    A form field that validates input as an Australian phone number. Valid numbers
+    have ten digits.
+
+.. class:: au.forms.AUStateSelect
+
+    A ``Select`` widget that uses a list of Australian states/territories as its
+    choices.
+
+Austria (``at``)
+================
+
+.. class:: at.forms.ATZipCodeField
+
+    A form field that validates its input as an Austrian zip code.
+
+.. class:: at.forms.ATStateSelect
+
+    A ``Select`` widget that uses a list of Austrian states as its choices. 
+
+.. class:: at.forms.ATSocialSecurityNumberField
+
+    A form field that validates its input as an Austrian social security number.
+
+Brazil (``br``)
+===============
+
+.. class:: br.forms.BRPhoneNumberField
+
+    A form field that validates input as a Brazilian phone number, with the format
+    XX-XXXX-XXXX.
+
+.. class:: br.forms.BRZipCodeField
+
+    A form field that validates input as a Brazilian zip code, with the format
+    XXXXX-XXX.
+
+.. class:: br.forms.BRStateSelect
+
+    A ``Select`` widget that uses a list of Brazilian states/territories as its
+    choices.
+
+Canada (``ca``)
+===============
+
+.. class:: ca.forms.CAPhoneNumberField
+
+    A form field that validates input as a Canadian phone number, with the format
+    XXX-XXX-XXXX.
+
+.. class:: ca.forms.CAPostalCodeField
+
+    A form field that validates input as a Canadian postal code, with the format
+    XXX XXX.
+
+.. class:: ca.forms.CAProvinceField
+
+    A form field that validates input as a Canadian province name or abbreviation.
+
+.. class:: ca.forms.CASocialInsuranceNumberField
+
+    A form field that validates input as a Canadian Social Insurance Number (SIN).
+    A valid number must have the format XXX-XXX-XXX and pass a `Luhn mod-10
+    checksum`_.
+
+.. _Luhn mod-10 checksum: http://en.wikipedia.org/wiki/Luhn_algorithm
+
+.. class:: ca.forms.CAProvinceSelect
+
+    A ``Select`` widget that uses a list of Canadian provinces and territories as
+    its choices.
+
+Chile (``cl``)
+==============
+
+.. class:: cl.forms.CLRutField
+
+    A form field that validates input as a Chilean national identification number
+    ('Rol Unico Tributario' or RUT). The valid format is XX.XXX.XXX-X.
+
+.. class:: cl.forms.CLRegionSelect
+
+    A ``Select`` widget that uses a list of Chilean regions (Regiones) as its
+    choices.
+
+Finland (``fi``)
+================
+
+.. class:: fi.forms.FISocialSecurityNumber
+
+    A form field that validates input as a Finnish social security number.
+
+.. class:: fi.forms.FIZipCodeField
+
+    A form field that validates input as a Finnish zip code. Valid codes
+    consist of five digits.
+
+.. class:: fi.forms.FIMunicipalitySelect
+
+    A ``Select`` widget that uses a list of Finnish municipalities as its
+    choices.
+
+France (``fr``)
+===============
+
+.. class:: fr.forms.FRPhoneNumberField
+
+    A form field that validates input as a French local phone number. The
+    correct format is 0X XX XX XX XX. 0X.XX.XX.XX.XX and 0XXXXXXXXX validate
+    but are corrected to 0X XX XX XX XX.
+
+.. class:: fr.forms.FRZipCodeField
+
+    A form field that validates input as a French zip code. Valid codes
+    consist of five digits.
+
+.. class:: fr.forms.FRDepartmentSelect
+
+    A ``Select`` widget that uses a list of French departments as its choices.
+
+Germany (``de``)
+================
+
+.. class:: de.forms.DEIdentityCardNumberField
+
+    A form field that validates input as a German identity card number
+    (Personalausweis_). Valid numbers have the format
+    XXXXXXXXXXX-XXXXXXX-XXXXXXX-X, with no group consisting entirely of zeroes.
+
+.. _Personalausweis: http://de.wikipedia.org/wiki/Personalausweis
+
+.. class:: de.forms.DEZipCodeField
+
+    A form field that validates input as a German zip code. Valid codes
+    consist of five digits.
+
+.. class:: de.forms.DEStateSelect
+
+    A ``Select`` widget that uses a list of German states as its choices.
+
+Holland (``nl``)
+================
+
+.. class:: nl.forms.NLPhoneNumberField
+
+    A form field that validates input as a Dutch telephone number.
+
+.. class:: nl.forms.NLSofiNumberField
+
+    A form field that validates input as a Dutch social security number
+    (SoFI/BSN).
+
+.. class:: nl.forms.NLZipCodeField
+
+    A form field that validates input as a Dutch zip code.
+
+.. class:: nl.forms.NLProvinceSelect
+
+    A ``Select`` widget that uses a list of Dutch provinces as its list of
+    choices.
+
+Iceland (``is_``)
+=================
+
+.. class:: is_.forms.ISIdNumberField
+
+    A form field that validates input as an Icelandic identification number
+    (kennitala). The format is XXXXXX-XXXX.
+
+.. class:: is_.forms.ISPhoneNumberField
+
+    A form field that validates input as an Icelandtic phone number (seven
+    digits with an optional hyphen or space after the first three digits).
+
+.. class:: is_.forms.ISPostalCodeSelect
+
+    A ``Select`` widget that uses a list of Icelandic postal codes as its
+    choices.
+
+India (``in_``)
+===============
+
+.. class:: in.forms.INStateField
+
+    A form field that validates input as an Indian state/territory name or
+    abbreviation. Input is normalized to the standard two-letter vehicle
+    registration abbreviation for the given state or territory.
+
+.. class:: in.forms.INZipCodeField
+
+    A form field that validates input as an Indian zip code, with the
+    format XXXXXXX.
+
+.. class:: in.forms.INStateSelect
+
+    A ``Select`` widget that uses a list of Indian states/territories as its
+    choices.
+
+Italy (``it``)
+==============
+
+.. class:: it.forms.ITSocialSecurityNumberField
+
+    A form field that validates input as an Italian social security number
+    (`codice fiscale`_).
+
+.. _codice fiscale: http://www.agenziaentrate.it/ilwwcm/connect/Nsi/Servizi/Codice+fiscale+-+tessera+sanitaria/Codice+fiscale/NSI+Informazioni+sulla+codificazione+delle+persone+fisiche
+
+.. class:: it.forms.ITVatNumberField
+
+    A form field that validates Italian VAT numbers (partita IVA).
+
+.. class:: it.forms.ITZipCodeField
+
+    A form field that validates input as an Italian zip code. Valid codes
+    must have five digits.
+
+.. class:: it.forms.ITProvinceSelect
+
+    A ``Select`` widget that uses a list of Italian provinces as its choices.
+
+.. class:: it.forms.ITRegionSelect
+
+    A ``Select`` widget that uses a list of Italian regions as its choices.
+
+Japan (``jp``)
+==============
+
+.. class:: jp.forms.JPPostalCodeField
+
+    A form field that validates input as a Japanese postcode. It accepts seven
+    digits, with or without a hyphen.
+
+.. class:: jp.forms.JPPrefectureSelect
+
+    A ``Select`` widget that uses a list of Japanese prefectures as its choices.
+
+Mexico (``mx``)
+===============
+
+.. class:: mx.forms.MXStateSelect
+
+    A ``Select`` widget that uses a list of Mexican states as its choices.
+
+Norway (``no``)
+===============
+
+.. class:: no.forms.NOSocialSecurityNumber
+
+    A form field that validates input as a Norwegian social security number
+    (personnummer_).
+
+.. _personnummer: http://no.wikipedia.org/wiki/Personnummer
+
+.. class:: no.forms.NOZipCodeField
+
+    A form field that validates input as a Norwegian zip code. Valid codes
+    have four digits.
+
+.. class:: no.forms.NOMunicipalitySelect
+
+    A ``Select`` widget that uses a list of Norwegian municipalities (fylker) as
+    its choices.
+
+Peru (``pe``)
+=============
+
+.. class:: pt.forms.PEDNIField
+
+    A form field that validates input as a DNI (Peruvian national identity)
+    number.
+
+.. class:: pt.forms.PERUCField
+
+    A form field that validates input as an RUC (Registro Unico de
+    Contribuyentes) number. Valid RUC numbers have 11 digits.
+
+.. class:: pt.forms.PEDepartmentSelect
+
+    A ``Select`` widget that uses a list of Peruvian Departments as its choices.
+
+Poland (``pl``)
+===============
+
+.. class:: pl.forms.PLNationalIdentificationNumberField
+
+    A form field that validates input as a Polish national identification number
+    (PESEL_).
+
+.. _PESEL: http://en.wikipedia.org/wiki/PESEL
+
+.. class:: pl.forms.PLNationalBusinessRegisterField
+
+    A form field that validates input as a Polish National Official Business
+    Register Number (REGON_), having either seven or nine digits. The checksum
+    algorithm used for REGONs is documented at
+    http://wipos.p.lodz.pl/zylla/ut/nip-rego.html.
+
+.. _REGON: http://www.stat.gov.pl/bip/regon_ENG_HTML.htm
+
+.. class:: pl.forms.PLPostalCodeField
+
+    A form field that validates input as a Polish postal code. The valid format
+    is XX-XXX, where X is a digit.
+
+.. class:: pl.forms.PLTaxNumberField
+
+    A form field that validates input as a Polish Tax Number (NIP). Valid
+    formats are XXX-XXX-XX-XX or XX-XX-XXX-XXX. The checksum algorithm used
+    for NIPs is documented at http://wipos.p.lodz.pl/zylla/ut/nip-rego.html.
+
+.. class:: pl.forms.PLAdministrativeUnitSelect
+
+    A ``Select`` widget that uses a list of Polish administrative units as its
+    choices.
+
+.. class:: pl.forms.PLVoivodeshipSelect
+
+    A ``Select`` widget that uses a list of Polish voivodeships (administrative
+    provinces) as its choices.
+
+Romania (``ro``)
+================
+
+.. class:: ro.forms.ROCIFField
+
+    A form field that validates Romanian fiscal identification codes (CIF). The
+    return value strips the leading RO, if given.
+
+.. class:: ro.forms.ROCNPField
+
+    A form field that validates Romanian personal numeric codes (CNP).
+
+.. class:: ro.forms.ROCountyField
+
+    A form field that validates its input as a Romanian county (judet) name or
+    abbreviation. It normalizes the input to the standard vehicle registration
+    abbreviation for the given county. This field will only accept names written
+    with diacritics; consider using ROCountySelect as an alternative.
+
+.. class:: ro.forms.ROCountySelect
+
+    A ``Select`` widget that uses a list of Romanian counties (judete) as its
+    choices.
+
+.. class:: ro.forms.ROIBANField
+
+    A form field that validates its input as a Romanian International Bank 
+    Account Number (IBAN). The valid format is ROXX-XXXX-XXXX-XXXX-XXXX-XXXX,
+    with or without hyphens.
+
+.. class:: ro.forms.ROPhoneNumberField
+
+    A form field that validates Romanian phone numbers, short special numbers
+    excluded.
+
+.. class:: ro.forms.ROPostalCodeField
+
+    A form field that validates Romanian postal codes.
+
+Slovakia (``sk``)
+=================
+
+.. class:: sk.forms.SKPostalCodeField
+
+    A form field that validates input as a Slovak postal code. Valid formats
+    are XXXXX or XXX XX, where X is a digit.
+
+.. class:: sk.forms.SKDistrictSelect
+
+    A ``Select`` widget that uses a list of Slovak districts as its choices.
+
+.. class:: sk.forms.SKRegionSelect
+
+    A ``Select`` widget that uses a list of Slovak regions as its choices.
+
+South Africa (``za``)
+=====================
+
+.. class:: za.forms.ZAIDField
+
+    A form field that validates input as a South African ID number. Validation
+    uses the Luhn checksum and a simplistic (i.e., not entirely accurate) check
+    for birth date.
+
+.. class:: za.forms.ZAPostCodeField
+
+    A form field that validates input as a South African postcode. Valid
+    postcodes must have four digits.
+
+Spain (``es``)
+==============
+
+.. class:: es.forms.ESIdentityCardNumberField
+
+    A form field that validates input as a Spanish NIF/NIE/CIF (Fiscal
+    Identification Number) code.
+
+.. class:: es.forms.ESCCCField
+
+    A form field that validates input as a Spanish bank account number (Codigo
+    Cuenta Cliente or CCC). A valid CCC number has the format
+    EEEE-OOOO-CC-AAAAAAAAAA, where the E, O, C and A digits denote the entity,
+    office, checksum and account, respectively. The first checksum digit
+    validates the entity and office. The second checksum digit validates the
+    account. It is also valid to use a space as a delimiter, or to use no
+    delimiter.
+
+.. class:: es.forms.ESPhoneNumberField
+
+    A form field that validates input as a Spanish phone number. Valid numbers
+    have nine digits, the first of which is 6, 8 or 9.
+
+.. class:: es.forms.ESPostalCodeField
+
+    A form field that validates input as a Spanish postal code. Valid codes
+    have five digits, the first two being in the range 01 to 52, representing
+    the province.
+
+.. class:: es.forms.ESProvinceSelect
+
+    A ``Select`` widget that uses a list of Spanish provinces as its choices.
+
+.. class:: es.forms.ESRegionSelect
+
+    A ``Select`` widget that uses a list of Spanish regions as its choices.
+
+Switzerland (``ch``)
+====================
+
+.. class:: ch.forms.CHIdentityCardNumberField
+
+    A form field that validates input as a Swiss identity card number.
+    A valid number must confirm to the X1234567<0 or 1234567890 format and
+    have the correct checksums -- see http://adi.kousz.ch/artikel/IDCHE.htm.
+
+.. class:: ch.forms.CHPhoneNumberField
+
+    A form field that validates input as a Swiss phone number. The correct
+    format is 0XX XXX XX XX. 0XX.XXX.XX.XX and 0XXXXXXXXX validate but are
+    corrected to 0XX XXX XX XX.
+
+.. class:: ch.forms.CHZipCodeField
+
+    A form field that validates input as a Swiss zip code. Valid codes
+    consist of four digits.
+
+.. class:: ch.forms.CHStateSelect
+
+    A ``Select`` widget that uses a list of Swiss states as its choices.
+
+United Kingdom (``uk``)
+=======================
+
+.. class:: uk.forms.UKPostcodeField
+
+    A form field that validates input as a UK postcode. The regular
+    expression used is sourced from the schema for British Standard BS7666
+    address types at http://www.govtalk.gov.uk/gdsc/schemas/bs7666-v2-0.xsd.
+
+.. class:: ch.forms.UKCountySelect
+
+    A ``Select`` widget that uses a list of UK counties/regions as its choices.
+
+.. class:: ch.forms.UKNationSelect
+
+    A ``Select`` widget that uses a list of UK nations as its choices.
+
+United States of America (``us``)
+=================================
+
+.. class:: us.forms.USPhoneNumberField
+
+    A form field that validates input as a U.S. phone number.
+
+.. class:: us.forms.USSocialSecurityNumberField
+
+    A form field that validates input as a U.S. Social Security Number (SSN).
+    A valid SSN must obey the following rules:
+
+        * Format of XXX-XX-XXXX
+        * No group of digits consisting entirely of zeroes
+        * Leading group of digits cannot be 666
+        * Number not in promotional block 987-65-4320 through 987-65-4329
+        * Number not one known to be invalid due to widespread promotional
+          use or distribution (e.g., the Woolworth's number or the 1962
+          promotional number)
+
+.. class:: us.forms.USStateField
+
+    A form field that validates input as a U.S. state name or abbreviation. It
+    normalizes the input to the standard two-letter postal service abbreviation
+    for the given state.
+
+.. class:: us.forms.USZipCodeField
+
+    A form field that validates input as a U.S. ZIP code. Valid formats are
+    XXXXX or XXXXX-XXXX.
+
+.. class:: us.forms.USStateSelect
+
+    A form ``Select`` widget that uses a list of U.S. states/territories as its
+    choices.

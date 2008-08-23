@@ -1,0 +1,108 @@
+.. _faq-install:
+
+FAQ: Installation
+=================
+
+How do I get started?
+---------------------
+
+    #. `Download the code`_.
+    #. Install Django (read the :ref:`installation guide <intro-install>`).
+    #. Walk through the :ref:`tutorial <intro-tutorial01>`.
+    #. Check out the rest of the :ref:`documentation <index>`, and `ask questions`_ if you
+       run into trouble.
+
+.. _`Download the code`: http://www.djangoproject.com/download/
+.. _ask questions: http://www.djangoproject.com/community/
+
+How do I fix the "install a later version of setuptools" error?
+---------------------------------------------------------------
+
+Just run the ``ez_setup.py`` script in the Django distribution.
+
+What are Django's prerequisites?
+--------------------------------
+
+Django requires Python_ 2.3 or later. No other Python libraries are required
+for basic Django usage.
+
+For a development environment -- if you just want to experiment with Django --
+you don't need to have a separate Web server installed; Django comes with its
+own lightweight development server. For a production environment, we recommend
+`Apache 2`_ and mod_python_, although Django follows the WSGI_ spec, which
+means it can run on a variety of server platforms.
+
+If you want to use Django with a database, which is probably the case, you'll
+also need a database engine. PostgreSQL_ is recommended, because we're
+PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
+
+.. _Python: http://www.python.org/
+.. _Apache 2: http://httpd.apache.org/
+.. _mod_python: http://www.modpython.org/
+.. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _PostgreSQL: http://www.postgresql.org/
+.. _MySQL: http://www.mysql.com/
+.. _`SQLite 3`: http://www.sqlite.org/
+.. _Oracle: http://www.oracle.com/
+
+Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?
+----------------------------------------------------------------------------------------
+
+No. Django itself is guaranteed to work with any version of Python from 2.3
+and higher.
+
+If you use a Python version newer than 2.3, you will, of course, be able to
+take advantage of newer Python features in your own code, along with the speed
+improvements and other optimizations that have been made to the Python language
+itself. But the Django framework itself should work equally well on 2.3 as it
+does on 2.4 or 2.5.
+
+Do I have to use mod_python?
+----------------------------
+
+Although we recommend mod_python for production use, you don't have to use it,
+thanks to the fact that Django uses an arrangement called WSGI_. Django can
+talk to any WSGI-enabled server. Other non-mod_python deployment setups are
+FastCGI, SCGI or AJP. See
+:ref:`How to use Django with FastCGI, SCGI or AJP <howto-deployment-fastcgi>`
+for full information.
+
+Also, see the `server arrangements wiki page`_ for other deployment strategies.
+
+If you just want to play around and develop things on your local computer, use
+the development Web server that comes with Django. Things should Just Work.
+
+.. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
+
+How do I install mod_python on Windows?
+---------------------------------------
+
+    * For Python 2.4, grab mod_python from `win32 build of mod_python for
+      Python 2.4`_.
+    * For Python 2.4, check out this `Django on Windows howto`_.
+    * For Python 2.3, grab mod_python from http://www.modpython.org/ and read
+      `Running mod_python on Apache on Windows2000`_.
+    * Also, try this (not Windows-specific) `guide to getting mod_python
+      working`_.
+
+.. _`win32 build of mod_python for Python 2.4`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
+.. _`Django on Windows howto`: http://thinkhole.org/wp/django-on-windows/
+.. _`Running mod_python on Apache on Windows2000`: http://groups-beta.google.com/group/comp.lang.python/msg/139af8c83a5a9d4f
+.. _`guide to getting mod_python working`: http://www.dscpl.com.au/articles/modpython-001.html
+
+Will Django run under shared hosting (like TextDrive or Dreamhost)?
+-------------------------------------------------------------------
+
+See our `Django-friendly Web hosts`_ page.
+
+.. _`Django-friendly Web hosts`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
+
+Should I use the official version or development version?
+---------------------------------------------------------
+
+The Django developers improve Django every day and are pretty good about not
+checking in broken code. We use the development code (from the Subversion
+repository) directly on our servers, so we consider it stable. With that in
+mind, we recommend that you use the latest development code, because it
+generally contains more features and fewer bugs than the "official" releases.

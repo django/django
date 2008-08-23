@@ -1,0 +1,50 @@
+.. _ref-files-storage:
+
+File storage API
+================
+
+``Storage.exists(name)``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+``True`` if a file exists given some ``name``.
+
+``Storage.path(name)``
+~~~~~~~~~~~~~~~~~~~~~~
+
+The local filesystem path where the file can be opened using Python's standard
+``open()``. For storage systems that aren't accessible from the local
+filesystem, this will raise ``NotImplementedError`` instead.
+
+``Storage.size(name)``
+~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the total size, in bytes, of the file referenced by ``name``.
+
+``Storage.url(name)``
+~~~~~~~~~~~~~~~~~~~~~
+
+Returns the URL where the contents of the file referenced by ``name`` can be
+accessed.
+
+``Storage.open(name, mode='rb')``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Opens the file given by ``name``. Note that although the returned file is
+guaranteed to be a ``File`` object, it might actually be some subclass. In the
+case of remote file storage this means that reading/writing could be quite slow,
+so be warned.
+
+``Storage.save(name, content)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Saves a new file using the storage system, preferably with the name specified.
+If there already exists a file with this name ``name``, the storage system may
+modify the filename as necessary to get a unique name. The actual name of the
+stored file will be returned.
+
+``Storage.delete(name)``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Deletes the file referenced by ``name``. This method won't raise an exception if
+the file doesn't exist.
+

@@ -1,0 +1,690 @@
+.. _intro-tutorial01:
+
+=====================================
+Writing your first Django app, part 1
+=====================================
+
+Let's learn by example.
+
+Throughout this tutorial, we'll walk you through the creation of a basic
+poll application.
+
+It'll consist of two parts:
+
+    * A public site that lets people view polls and vote in them.
+    * An admin site that lets you add, change and delete polls.
+
+We'll assume you have :ref:`Django installed <intro-install>` already. You can
+tell Django is installed by running the Python interactive interpreter and
+typing ``import django``. If that command runs successfully, with no errors,
+Django is installed.
+
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please post a message
+    to `django-users`__ or drop by `#django on irc.freenode.net`__ to chat
+    with other Django users who might be able to help.
+
+__ http://groups.google.com/group/django-users
+__ irc://irc.freenode.net/django
+
+Creating a project
+==================
+
+If this is your first time using Django, you'll have to take care of some
+initial setup. Namely, you'll need to auto-generate some code that establishes a
+Django :term:`project` -- a collection of settings for an instance of Django,
+including database configuration, Django-specific options and
+application-specific settings.
+
+From the command line, ``cd`` into a directory where you'd like to store your
+code, then run the command ``django-admin.py startproject mysite``. This will
+create a ``mysite`` directory in your current directory.
+
+.. admonition:: Mac OS X permissions
+   
+   If you're using Mac OS X, you may see the message "permission denied" when
+   you try to run ``django-admin.py startproject``. This is because, on
+   Unix-based systems like OS X, a file must be marked as "executable" before it
+   can be run as a program. To do this, open Terminal.app and navigate (using
+   the ``cd`` command) to the directory where :ref:`django-admin.py
+   <ref-django-admin>` is installed, then run the command 
+   ``chmod +x django-admin.py``.
+
+.. note::
+
+    You'll need to avoid naming projects after built-in Python or Django
+    components. In particular, this means you should avoid using names like
+    ``django`` (which will conflict with Django itself) or ``test`` (which
+    conflicts with a built-in Python package).
+
+:ref:`django-admin.py <ref-django-admin>` should be on your system path if you
+installed Django via ``python setup.py``. If it's not on your path, you can find
+it in ``site-packages/django/bin``, where ```site-packages``` is a directory
+within your Python installation. Consider symlinking to :ref:`django-admin.py
+<ref-django-admin>` from some place on your path, such as
+:file:`/usr/local/bin`.
+
+.. admonition:: Where should this code live?
+
+    If your background is in PHP, you're probably used to putting code under the
+    Web server's document root (in a place such as ``/var/www``). With Django,
+    you don't do that. It's not a good idea to put any of this Python code
+    within your Web server's document root, because it risks the possibility
+    that people may be able to view your code over the Web. That's not good for
+    security.
+
+    Put your code in some directory **outside** of the document root, such as
+    :file:`/home/mycode`.
+
+Let's look at what :djadmin:`startproject` created::
+
+    mysite/
+        __init__.py
+        manage.py
+        settings.py
+        urls.py
+
+These files are:
+
+    * :file:`__init__.py`: An empty file that tells Python that this directory
+      should be considered a Python package. (Read `more about packages`_ in the
+      official Python docs if you're a Python beginner.)
+      
+    * :file:`manage.py`: A command-line utility that lets you interact with this
+      Django project in various ways. You can read all the details about
+      :file:`manage.py` in :ref:`ref-django-admin`.
+      
+    * :file:`settings.py`: Settings/configuration for this Django project.
+      :ref:`topics-settings` will tell you all about how settings work.
+    
+    * :file:`urls.py`: The URL declarations for this Django project; a "table of
+      contents" of your Django-powered site. You can read more about URLs in
+      :ref:`topics-http-urls`.
+
+.. _more about packages: http://docs.python.org/tut/node8.html#packages
+
+The development server
+----------------------
+
+Let's verify this worked. Change into the :file:`mysite` directory, if you
+haven't already, and run the command ``python manage.py runserver``. You'll see
+the following output on the command line::
+
+    Validating models...
+    0 errors found.
+
+    Django version 0.96, using settings 'mysite.settings'
+    Development server is running at http://127.0.0.1:8000/
+    Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows).
+
+You've started the Django development server, a lightweight Web server written
+purely in Python. We've included this with Django so you can develop things
+rapidly, without having to deal with configuring a production server -- such as
+Apache -- until you're ready for production.
+
+Now's a good time to note: DON'T use this server in anything resembling a
+production environment. It's intended only for use while developing. (We're in
+the business of making Web frameworks, not Web servers.)
+
+Now that the server's running, visit http://127.0.0.1:8000/ with your Web
+browser. You'll see a "Welcome to Django" page, in pleasant, light-blue pastel.
+It worked!
+
+.. admonition:: Changing the port
+
+    By default, the :djadmin:`runserver` command starts the development server
+    on port 8000. If you want to change the server's port, pass it as a
+    command-line argument. For instance, this command starts the server on port
+    8080:
+    
+    .. code-block:: bash
+
+        python manage.py runserver 8080
+
+    Full docs for the development server can be found in the
+    :djadmin:`runserver` reference.
+
+
+Database setup
+--------------
+
+Now, edit :file:`settings.py`. It's a normal Python module with module-level
+variables representing Django settings. Change these settings to match your
+database's connection parameters:
+
+    * :setting:`DATABASE_ENGINE` -- Either 'postgresql_psycopg2', 'mysql' or
+      'sqlite3'. Other backends are :setting:`also available <DATABASE_ENGINE>`.
+      
+    * :setting:`DATABASE_NAME` -- The name of your database. If you're using
+      SQLite, the database will be a file on your computer; in that case,
+      ``DATABASE_NAME`` should be the full absolute path, including filename, of
+      that file. If the file doesn't exist, it will automatically be created
+      when you synchronize the database for the first time (see below).
+      
+    * :setting:`DATABASE_USER` -- Your database username (not used for SQLite).
+    
+    * :setting:`DATABASE_PASSWORD` -- Your database password (not used for
+      SQLite).
+    
+    * :setting:`DATABASE_HOST` -- The host your database is on. Leave this as an
+      empty string if your database server is on the same physical machine (not
+      used for SQLite).
+
+If you're new to databases, we recommend simply using SQLite (by setting
+:setting:`DATABASE_ENGINE` to ``'sqlite3'``). SQLite is included as part of
+Python 2.5 and later, so you won't need to install anything else.
+
+.. note::
+
+    If you're using PostgreSQL or MySQL, make sure you've created a database by
+    this point. Do that with "``CREATE DATABASE database_name;``" within your
+    database's interactive prompt.
+
+    If you're using SQLite, you don't need to create anything beforehand - the
+    database file will be created automatically when it is needed.
+
+While you're editing :file:`settings.py`, take note of the
+:setting:`INSTALLED_APPS` setting towards the bottom of the file. That variable
+holds the names of all Django applications that are activated in this Django
+instance. Apps can be used in multiple projects, and you can package and
+distribute them for use by others in their projects.
+
+By default, :setting:`INSTALLED_APPS` contains the following apps, all of which
+come with Django:
+
+    * :mod:`django.contrib.auth` -- An authentication system.
+
+    * :mod:`django.contrib.contenttypes` -- A framework for content types.
+
+    * :mod:`django.contrib.sessions` -- A session framework.
+
+    * :mod:`django.contrib.sites` -- A framework for managing multiple sites
+      with one Django installation.
+
+These applications are included by default as a convenience for the common case.
+
+Each of these applications makes use of at least one database table, though,
+so we need to create the tables in the database before we can use them. To do
+that, run the following command:
+
+.. code-block:: bash
+
+    python manage.py syncdb
+
+The :djadmin:`syncdb` command looks at the :setting:`INSTALLED_APPS` setting and
+creates any necessary database tables according to the database settings in your
+:file:`settings.py` file. You'll see a message for each database table it
+creates, and you'll get a prompt asking you if you'd like to create a superuser
+account for the authentication system. Go ahead and do that.
+
+If you're interested, run the command-line client for your database and type
+``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or ``.schema`` (SQLite) to
+display the tables Django created.
+
+.. admonition:: For the minimalists
+
+    Like we said above, the default applications are included for the common
+    case, but not everybody needs them. If you don't need any or all of them,
+    feel free to comment-out or delete the appropriate line(s) from
+    :setting:`INSTALLED_APPS` before running :djadmin:`syncdb`. The
+    :djadmin:`syncdb` command will only create tables for apps in
+    :setting:`INSTALLED_APPS`.
+
+.. _creating-models:
+
+Creating models
+===============
+
+Now that your environment -- a "project" -- is set up, you're set to start
+doing work.
+
+Each application you write in Django consists of a Python package, somewhere
+on your `Python path`_, that follows a certain convention. Django comes with a
+utility that automatically generates the basic directory structure of an app,
+so you can focus on writing code rather than creating directories.
+
+.. admonition:: Projects vs. apps
+
+    What's the difference between a project and an app? An app is a Web
+    application that does something -- e.g., a weblog system, a database of
+    public records or a simple poll app. A project is a collection of
+    configuration and apps for a particular Web site. A project can contain
+    multiple apps. An app can be in multiple projects.
+
+In this tutorial, we'll create our poll app in the :file:`mysite` directory,
+for simplicity. As a consequence, the app will be coupled to the project --
+that is, Python code within the poll app will refer to ``mysite.polls``.
+Later in this tutorial, we'll discuss decoupling your apps for distribution.
+
+To create your app, make sure you're in the :file:`mysite` directory and type
+this command:
+
+.. code-block:: bash
+
+    python manage.py startapp polls
+
+That'll create a directory :file:`polls`, which is laid out like this::
+
+    polls/
+        __init__.py
+        models.py
+        views.py
+
+This directory structure will house the poll application.
+
+The first step in writing a database Web app in Django is to define your models
+-- essentially, your database layout, with additional metadata.
+
+.. admonition:: Philosophy
+
+   A model is the single, definitive source of data about your data. It contains
+   the essential fields and behaviors of the data you're storing. Django follows
+   the :ref:`DRY Principle <dry>`. The goal is to define your data model in one
+   place and automatically derive things from it.
+
+In our simple poll app, we'll create two models: polls and choices. A poll has
+a question and a publication date. A choice has two fields: the text of the
+choice and a vote tally. Each choice is associated with a poll.
+
+These concepts are represented by simple Python classes. Edit the
+:file:`polls/models.py` file so it looks like this::
+
+    from django.db import models
+
+    class Poll(models.Model):
+        question = models.CharField(max_length=200)
+        pub_date = models.DateTimeField('date published')
+
+    class Choice(models.Model):
+        poll = models.ForeignKey(Poll)
+        choice = models.CharField(max_length=200)
+        votes = models.IntegerField()
+
+.. admonition:: Errors about :attr:`~django.db.models.Field.max_length`
+
+   If Django gives you an error message saying that
+   :attr:`~django.db.models.Field.max_length` is not a valid argument, you're
+   most likely using an old version of Django. (This version of the tutorial is
+   written for the latest development version of Django.) If you're using a
+   Subversion checkout of Django's development version (see :ref:`the
+   installation docs <topics-install>` for more information), you shouldn't have
+   any problems.
+
+   If you want to stick with an older version of Django, you'll want to switch
+   to `the Django 0.96 tutorial`_, because this tutorial covers several features
+   that only exist in the Django development version.
+
+.. _the Django 0.96 tutorial: http://www.djangoproject.com/documentation/0.96/tutorial01/
+
+The code is straightforward. Each model is represented by a class that
+subclasses :class:`django.db.models.Model`. Each model has a number of class
+variables, each of which represents a database field in the model.
+
+Each field is represented by an instance of a :class:`~django.db.models.Field`
+class -- e.g., :class:`~django.db.models.CharField` for character fields and
+:class:`~django.db.models.DateTimeField` for datetimes. This tells Django what
+type of data each field holds.
+
+The name of each :class:`~django.db.models.Field` instance (e.g. ``question`` or
+``pub_date`` ) is the field's name, in machine-friendly format. You'll use this
+value in your Python code, and your database will use it as the column name.
+
+You can use an optional first positional argument to a
+:class:`~django.db.models.Field` to designate a human-readable name. That's used
+in a couple of introspective parts of Django, and it doubles as documentation.
+If this field isn't provided, Django will use the machine-readable name. In this
+example, we've only defined a human-readable name for ``Poll.pub_date``. For all
+other fields in this model, the field's machine-readable name will suffice as
+its human-readable name.
+
+Some :class:`~django.db.models.Field` classes have required elements.
+:class:`~django.db.models.CharField`, for example, requires that you give it a
+:attr:`~django.db.models.Field.max_length`. That's used not only in the database
+schema, but in validation, as we'll soon see.
+
+Finally, note a relationship is defined, using
+:class:`~django.db.models.ForeignKey`. That tells Django each Choice is related
+to a single Poll. Django supports all the common database relationships:
+many-to-ones, many-to-manys and one-to-ones.
+
+.. _`Python path`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
+
+Activating models
+=================
+
+That small bit of model code gives Django a lot of information. With it, Django
+is able to:
+
+    * Create a database schema (``CREATE TABLE`` statements) for this app.
+    * Create a Python database-access API for accessing Poll and Choice objects.
+
+But first we need to tell our project that the ``polls`` app is installed.
+
+.. admonition:: Philosophy
+
+    Django apps are "pluggable": You can use an app in multiple projects, and
+    you can distribute apps, because they don't have to be tied to a given
+    Django installation.
+
+Edit the :file:`settings.py` file again, and change the
+:setting:`INSTALLED_APPS` setting to include the string ``'mysite.polls'``. So
+it'll look like this::
+
+    INSTALLED_APPS = (
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.sites',
+        'mysite.polls'
+    )
+
+Now Django knows ``mysite`` includes the ``polls`` app. Let's run another
+command:
+
+.. code-block:: bash
+
+    python manage.py sql polls
+
+You should see something similar to the following (the ``CREATE TABLE`` SQL
+statements for the polls app):
+
+.. code-block:: sql
+
+    BEGIN;
+    CREATE TABLE "polls_poll" (
+        "id" serial NOT NULL PRIMARY KEY,
+        "question" varchar(200) NOT NULL,
+        "pub_date" timestamp with time zone NOT NULL
+    );
+    CREATE TABLE "polls_choice" (
+        "id" serial NOT NULL PRIMARY KEY,
+        "poll_id" integer NOT NULL REFERENCES "polls_poll" ("id"),
+        "choice" varchar(200) NOT NULL,
+        "votes" integer NOT NULL
+    );
+    COMMIT;
+
+Note the following:
+
+    * The exact output will vary depending on the database you are using.
+
+    * Table names are automatically generated by combining the name of the app
+      (``polls``) and the lowercase name of the model -- ``poll`` and
+      ``choice``. (You can override this behavior.)
+
+    * Primary keys (IDs) are added automatically. (You can override this, too.)
+
+    * By convention, Django appends ``"_id"`` to the foreign key field name.
+      Yes, you can override this, as well.
+
+    * The foreign key relationship is made explicit by a ``REFERENCES``
+      statement.
+
+    * It's tailored to the database you're using, so database-specific field
+      types such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or
+      ``integer primary key`` (SQLite) are handled for you automatically. Same
+      goes for quoting of field names -- e.g., using double quotes or single
+      quotes. The author of this tutorial runs PostgreSQL, so the example
+      output is in PostgreSQL syntax.
+
+    * The :djadmin:`sql` command doesn't actually run the SQL in your database -
+      it just prints it to the screen so that you can see what SQL Django thinks
+      is required. If you wanted to, you could copy and paste this SQL into your
+      database prompt. However, as we will see shortly, Django provides an
+      easier way of committing the SQL to the database.
+
+If you're interested, also run the following commands:
+
+    * :djadmin:`python manage.py validate <validate>` -- Checks for any errors
+      in the construction of your models.
+
+    * :djadmin:`python manage.py sqlcustom polls <sqlcustom>` -- Outputs any
+      :ref:`custom SQL statements <initial-sql>` (such as table modifications or
+      constraints) that are defined for the application.
+
+    * :djadmin:`python manage.py sqlclear polls <sqlclear>` -- Outputs the
+      necessary ``DROP TABLE`` statements for this app, according to which
+      tables already exist in your database (if any).
+
+    * :djadmin:`python manage.py sqlindexes polls <sqlindexes>` -- Outputs the
+      ``CREATE INDEX`` statements for this app.
+
+    * :djadmin:`python manage.py sqlall polls <sqlall>` -- A combination of all
+      the SQL from the :djadmin:`sql`, :djadmin:`sqlcustom`, and
+      :djadmin:`sqlindexes` commands.
+
+Looking at the output of those commands can help you understand what's actually
+happening under the hood.
+
+Now, run :djadmin:`syncdb` again to create those model tables in your database:
+
+.. code-block:: bash
+
+    python manage.py syncdb
+
+The :djadmin:`syncdb` command runs the sql from 'sqlall' on your database for
+all apps in :setting:`INSTALLED_APPS` that don't already exist in your database.
+This creates all the tables, initial data and indexes for any apps you have
+added to your project since the last time you ran syncdb. :djadmin:`syncdb` can
+be called as often as you like, and it will only ever create the tables that
+don't exist.
+
+Read the :ref:`django-admin.py documentation <ref-django-admin>` for full
+information on what the ``manage.py`` utility can do.
+
+Playing with the API
+====================
+
+Now, let's hop into the interactive Python shell and play around with the free
+API Django gives you. To invoke the Python shell, use this command:
+
+.. code-block:: bash
+
+    python manage.py shell
+
+We're using this instead of simply typing "python", because ``manage.py`` sets
+up the project's environment for you. "Setting up the environment" involves two
+things:
+
+    * Putting ``mysite`` on ``sys.path``. For flexibility, several pieces of
+      Django refer to projects in Python dotted-path notation (e.g.
+      ``'mysite.polls.models'``). In order for this to work, the ``mysite``
+      package has to be on ``sys.path``.
+
+      We've already seen one example of this: the :setting:`INSTALLED_APPS`
+      setting is a list of packages in dotted-path notation.
+
+    * Setting the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives
+      Django the path to your ``settings.py`` file.
+
+.. admonition:: Bypassing manage.py
+
+    If you'd rather not use ``manage.py``, no problem. Just make sure ``mysite``
+    is at the root level on the Python path (i.e., ``import mysite`` works) and
+    set the ``DJANGO_SETTINGS_MODULE`` environment variable to
+    ``mysite.settings``.
+
+    For more information on all of this, see the :ref:`django-admin.py
+    documentation <ref-django-admin>`.
+
+Once you're in the shell, explore the :ref:`database API <topics-db-queries>`::
+
+    >>> from mysite.polls.models import Poll, Choice # Import the model classes we just wrote.
+
+    # No polls are in the system yet.
+    >>> Poll.objects.all()
+    []
+
+    # Create a new Poll.
+    >>> import datetime
+    >>> p = Poll(question="What's up?", pub_date=datetime.datetime.now())
+
+    # Save the object into the database. You have to call save() explicitly.
+    >>> p.save()
+
+    # Now it has an ID. Note that this might say "1L" instead of "1", depending
+    # on which database you're using. That's no biggie; it just means your
+    # database backend prefers to return integers as Python long integer
+    # objects.
+    >>> p.id
+    1
+
+    # Access database columns via Python attributes.
+    >>> p.question
+    "What's up?"
+    >>> p.pub_date
+    datetime.datetime(2007, 7, 15, 12, 00, 53)
+
+    # Change values by changing the attributes, then calling save().
+    >>> p.pub_date = datetime.datetime(2007, 4, 1, 0, 0)
+    >>> p.save()
+
+    # objects.all() displays all the polls in the database.
+    >>> Poll.objects.all()
+    [<Poll: Poll object>]
+
+
+Wait a minute. ``<Poll: Poll object>`` is, utterly, an unhelpful representation
+of this object. Let's fix that by editing the polls model (in the
+``polls/models.py`` file) and adding a
+:meth:`~django.db.models.Model.__unicode__` method to both ``Poll`` and
+``Choice``::
+
+    class Poll(models.Model):
+        # ...
+        def __unicode__(self):
+            return self.question
+
+    class Choice(models.Model):
+        # ...
+        def __unicode__(self):
+            return self.choice
+
+.. admonition:: If :meth:`~django.db.models.Model.__unicode__` doesn't seem to work
+
+   If you add the :meth:`~django.db.models.Model.__unicode__` method to your
+   models and don't see any change in how they're represented, you're most
+   likely using an old version of Django. (This version of the tutorial is
+   written for the latest development version of Django.) If you're using a
+   Subversion checkout of of Django's development version (see :ref:`the
+   installation docs <topics-install>` for more information), you shouldn't have
+   any problems.
+
+   If you want to stick with an older version of Django, you'll want to switch
+   to `the Django 0.96 tutorial`_, because this tutorial covers several features
+   that only exist in the Django development version.
+
+.. _the Django 0.96 tutorial: http://www.djangoproject.com/documentation/0.96/tutorial01/
+
+It's important to add :meth:`~django.db.models.Model.__unicode__` methods to
+your models, not only for your own sanity when dealing with the interactive
+prompt, but also because objects' representations are used throughout Django's
+automatically-generated admin.
+
+.. admonition:: Why :meth:`~django.db.models.Model.__unicode__` and not 
+                :meth:`django.db.models.Model.__str__`?
+
+    If you're familiar with Python, you might be in the habit of adding
+    :meth:`django.db.models.Model.__str__` methods to your classes, not
+    :meth:`~django.db.models.Model.__unicode__` methods. We use
+    :meth:`~django.db.models.Model.__unicode__` here because Django models deal
+    with Unicode by default. All data stored in your database is converted to
+    Unicode when it's returned.
+
+    Django models have a default :meth:`django.db.models.Model.__str__` method
+    that calls :meth:`~django.db.models.Model.__unicode__` and converts the
+    result to a UTF-8 bytestring. This means that ``unicode(p)`` will return a
+    Unicode string, and ``str(p)`` will return a normal string, with characters
+    encoded as UTF-8.
+
+    If all of this is jibberish to you, just remember to add
+    :meth:`~django.db.models.Model.__unicode__` methods to your models. With any
+    luck, things should Just Work for you.
+
+Note these are normal Python methods. Let's add a custom method, just for
+demonstration::
+
+    import datetime
+    # ...
+    class Poll(models.Model):
+        # ...
+        def was_published_today(self):
+            return self.pub_date.date() == datetime.date.today()
+
+Note the addition of ``import datetime`` to reference Python's standard
+``datetime`` module.
+
+Let's jump back into the Python interactive shell by running
+``python manage.py shell`` again::
+
+    >>> from mysite.polls.models import Poll, Choice
+
+    # Make sure our __unicode__() addition worked.
+    >>> Poll.objects.all()
+    [<Poll: What's up?>]
+
+    # Django provides a rich database lookup API that's entirely driven by
+    # keyword arguments.
+    >>> Poll.objects.filter(id=1)
+    [<Poll: What's up?>]
+    >>> Poll.objects.filter(question__startswith='What')
+    [<Poll: What's up?>]
+
+    # Get the poll whose year is 2007. Of course, if you're going through this
+    # tutorial in another year, change as appropriate.
+    >>> Poll.objects.get(pub_date__year=2007)
+    <Poll: What's up?>
+
+    >>> Poll.objects.get(id=2)
+    Traceback (most recent call last):
+        ...
+    DoesNotExist: Poll matching query does not exist.
+
+    # Lookup by a primary key is the most common case, so Django provides a
+    # shortcut for primary-key exact lookups.
+    # The following is identical to Poll.objects.get(id=1).
+    >>> Poll.objects.get(pk=1)
+    <Poll: What's up?>
+
+    # Make sure our custom method worked.
+    >>> p = Poll.objects.get(pk=1)
+    >>> p.was_published_today()
+    False
+
+    # Give the Poll a couple of Choices. The create call constructs a new
+    # choice object, does the INSERT statement, adds the choice to the set
+    # of available choices and returns the new Choice object.
+    >>> p = Poll.objects.get(pk=1)
+    >>> p.choice_set.create(choice='Not much', votes=0)
+    <Choice: Not much>
+    >>> p.choice_set.create(choice='The sky', votes=0)
+    <Choice: The sky>
+    >>> c = p.choice_set.create(choice='Just hacking again', votes=0)
+
+    # Choice objects have API access to their related Poll objects.
+    >>> c.poll
+    <Poll: What's up?>
+
+    # And vice versa: Poll objects get access to Choice objects.
+    >>> p.choice_set.all()
+    [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
+    >>> p.choice_set.count()
+    3
+
+    # The API automatically follows relationships as far as you need.
+    # Use double underscores to separate relationships.
+    # This works as many levels deep as you want; there's no limit.
+    # Find all Choices for any poll whose pub_date is in 2007.
+    >>> Choice.objects.filter(poll__pub_date__year=2007)
+    [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
+
+    # Let's delete one of the choices. Use delete() for that.
+    >>> c = p.choice_set.filter(choice__startswith='Just hacking')
+    >>> c.delete()
+
+For full details on the database API, see our :ref:`Database API reference
+<topics-db-queries>`.
+
+When you're comfortable with the API, read :ref:`part 2 of this tutorial
+<intro-tutorial02>` to get Django's automatic admin working.

@@ -1,0 +1,12 @@
+.. _ref-contrib-formtools-index:
+
+django.contrib.formtools
+========================
+
+A set of high-level abstractions for Django forms (:mod:`django.forms`).
+
+.. toctree::
+   :maxdepth: 1
+
+   form-preview
+   form-wizard

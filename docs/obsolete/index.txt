@@ -1,0 +1,16 @@
+.. _obsolete-index:
+
+Deprecated/obsolete documentation
+=================================
+
+These documents cover features that have been deprecated or that have been
+replaced in newer versions of Django. They're preserved here for folks using old
+versions of Django or those still using deprecated APIs. No new code based on
+these APIs should be written.
+
+.. toctree::
+   :maxdepth: 1
+   
+   admin-css
+   forms
+   newforms-migration

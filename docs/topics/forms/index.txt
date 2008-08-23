@@ -1,0 +1,260 @@
+.. _topics-forms-index:
+
+==================
+Working with forms
+==================
+
+.. admonition:: About this document
+
+    This document provides an introduction to Django's form handling features.
+    For a more detailed look at the forms API, see :ref:`ref-forms-api`. For
+    documentation of the available field types, see :ref:`ref-forms-fields`.
+
+``django.forms`` is Django's form-handling library.
+
+While it is possible to process form submissions just using Django's
+:class:`~django.http.HttpRequest` class, using the form library takes care of a
+number of common form-related tasks. Using it, you can:
+
+    1. Display an HTML form with automatically generated form widgets.
+    2. Checking submitted data against a set of validation rules.
+    3. Redisplaying a form in the case of validation errors.
+    4. Converting submitted form data to the relevant Python data types.
+
+Overview
+========
+
+The library deals with these concepts:
+
+.. glossary::
+
+    Widget
+        A class that corresponds to an HTML form widget, e.g.
+        ``<input type="text">`` or ``<textarea>``. This handles rendering of the
+        widget as HTML.
+
+    Field
+        A class that is responsible for doing validation, e.g.
+        an ``EmailField`` that makes sure its data is a valid e-mail address.
+
+    Form
+        A collection of fields that knows how to validate itself and
+        display itself as HTML.
+
+    Form Media
+        The CSS and JavaScript resources that are required to render a form.
+            
+The library is decoupled from the other Django components, such as the database
+layer, views and templates. It relies only on Django settings, a couple of
+``django.utils`` helper functions and Django's internationalization hooks (but
+you're not required to be using internationalization features to use this
+library).
+
+Form objects
+============
+
+A Form object encapsulates a sequence of form fields and a collection of
+validation rules that must be fulfilled in order for the form to be accepted.
+Form classes are created as subclasses of ``django.forms.Form`` and are
+make use of a declarative style that you'll be familiar with if you've used
+Django's database models.
+
+For example, consider a form used to implement "contact me" functionality on a
+personal Web site::
+
+    from django import forms
+
+    class ContactForm(forms.Form):
+        subject = forms.CharField(max_length=100)
+        message = forms.CharField()
+        sender = forms.EmailField()
+        cc_myself = forms.BooleanField(required=False)
+
+A form is composed of ``Field`` objects. In this case, our form has four
+fields: ``subject``, ``message``, ``sender`` and ``cc_myself``. ``CharField``,
+``EmailField`` and ``BooleanField`` are just three of the available field types;
+a full list can be found in :ref:`ref-forms-fields`.
+
+If your form is going to be used to directly add or edit a Django model, you can
+use a :ref:`ModelForm <topics-forms-modelforms>` to avoid duplicating your model
+description.
+
+Using a form in a view
+----------------------
+
+The standard pattern for processing a form in a view looks like this::
+
+   def contact(request):
+       if request.method == 'POST': # If the form has been submitted...
+           form = ContactForm(request.POST) # A form bound to the POST data
+           if form.is_valid(): # All validation rules pass
+               # Process the data in form.cleaned_data
+               # ...
+               return HttpResponseRedirect('/thanks/') # Redirect after POST
+       else:
+           form = ContactForm() # An unbound form
+   
+       return render_to_response('contact.html', {
+           'form': form,
+       })
+
+
+There are three code paths here:
+
+    1. If the form has not been submitted, an unbound instance of ContactForm is
+       created and passed to the template.
+    2. If the form has been submitted, a bound instance of the form is created
+       using ``request.POST``. If the submitted data is valid, it is processed
+       and the user is re-directed to a "thanks" page.
+    3. If the form has been submitted but is invalid, the bound form instance is
+       passed on to the template.
+
+.. note::
+    **New in Django development version** The ``cleaned_data`` attribute was
+    called ``clean_data`` in earlier releases.
+
+The distinction between **bound** and **unbound** forms is important. An unbound
+form does not have any data associated with it; when rendered to the user, it
+will be empty or will contain default values. A bound form does have submitted
+data, and hence can be used to tell if that data is valid. If an invalid bound
+form is rendered it can include inline error messages telling the user where
+they went wrong.
+
+See :ref:`ref-forms-api-bound-unbound` for further information on the
+differences between bound and unbound forms.
+
+Processing the data from a form
+-------------------------------
+
+Once ``is_valid()`` returns ``True``, you can process the form submission safe
+in the knowledge that it conforms to the validation rules defined by your form.
+While you could access ``request.POST`` directly at this point, it is better to
+access ``form.cleaned_data``. This data has not only been validated but will
+also be converted in to the relevant Python types for you. In the above example,
+``cc_myself`` will be a boolean value. Likewise, fields such as ``IntegerField``
+and ``FloatField`` convert values to a Python int and float respectively.
+
+Extending the above example, here's how the form data could be processed::
+
+    if form.is_valid():
+        subject = form.cleaned_data['subject']
+        message = form.cleaned_data['message']
+        sender = form.cleaned_data['sender']
+        cc_myself = form.cleaned_data['cc_myself']
+    
+        recipients = ['info@example.com']
+        if cc_myself:
+            recipients.append(sender)
+    
+        from django.core.mail import send_mail
+        send_mail(subject, message, sender, recipients)
+        return HttpResponseRedirect('/thanks/') # Redirect after POST
+
+For more on sending e-mail from Django, see :ref:`topics-email`.
+
+Displaying a form using a template
+----------------------------------
+
+Forms are designed to work with the Django template language. In the above
+example, we passed our ``ContactForm`` instance to the template using the
+context variable ``form``. Here's a simple example template::
+
+    <form action="/contact/" method="POST">
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+    </form>
+
+The form only outputs its own fields; it is up to you to provide the surrounding
+``<form>`` tags and the submit button.
+
+``form.as_p`` will output the form with each form field and accompanying label
+wrapped in a paragraph. Here's the output for our example template::
+
+   <form action="/contact/" method="POST">
+   <p><label for="id_subject">Subject:</label>
+       <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
+   <p><label for="id_message">Message:</label>
+       <input type="text" name="message" id="id_message" /></p>
+   <p><label for="id_sender">Sender:</label>
+       <input type="text" name="sender" id="id_sender" /></p>
+   <p><label for="id_cc_myself">Cc myself:</label>
+       <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
+   <input type="submit" value="Submit">
+   </form>
+   
+Note that each form field has an ID attribute set to ``id_<field-name>``, which
+is referenced by the accompanying label tag. This is important for ensuring
+forms are accessible to assistive technology such as screen reader software. You
+can also :ref:`customize the way in which labels and ids are generated
+<ref-forms-api-configuring-label>`.
+
+You can also use ``form.as_table`` to output table rows (you'll need to provide
+your own ``<table>`` tags) and ``form.as_li`` to output list items.
+
+Customizing the form template
+-----------------------------
+
+If the default generated HTML is not to your taste, you can completely customize
+the way a form is presented using the Django template language. Extending the
+above example::
+
+    <form action="/contact/" method="POST">
+        <div class="fieldWrapper">
+            {{ form.subject.errors }}
+            <label for="id_subject">E-mail subject:</label>
+            {{ form.subject }}
+        </div>
+        <div class="fieldWrapper">
+            {{ form.message.errors }}
+            <label for="id_message">Your message:</label>
+            {{ form.message }}
+        </div>
+        <div class="fieldWrapper">
+            {{ form.sender.errors }}
+            <label for="id_sender">Your email address:</label>
+            {{ form.sender }}
+        </div>
+        <div class="fieldWrapper">
+            {{ form.cc_myself.errors }}
+            <label for="id_cc_myself">CC yourself?</label>
+            {{ form.cc_myself }}
+        </div>
+        <p><input type="submit" value="Send message"></p>
+    </form>
+
+Each named form-field can be output to the template using
+``{{ form.name_of_field }}``, which will produce the HTML needed to display the
+form widget. Using ``{{ form.name_of_field.errors }}`` displays a list of form
+errors, rendered as an unordered list. This might look like::
+
+   <ul class="errorlist">
+       <li>Sender is required.</li>
+   </ul>
+
+The list has a CSS class of ``errorlist`` to allow you to style its appearance.
+If you wish to further customize the display of errors you can do so by looping
+over them::
+
+    {% if form.subject.errors %}
+        <ol>
+        {% for error in form.message.errors %}
+            <li><strong>{{ error|escape }}</strong></li>
+        {% endfor %}
+        </ol>
+    {% endif %}
+    
+Further topics
+==============
+
+This covers the basics, but forms can do a whole lot more:
+
+.. toctree::
+   :maxdepth: 1
+
+   modelforms
+   formsets
+   media
+   
+.. seealso::
+
+    The :ref:`form API reference <ref-forms-index>`.

@@ -1,0 +1,122 @@
+.. _howto-apache-auth:
+
+=========================================================
+Authenticating against Django's user database from Apache
+=========================================================
+
+Since keeping multiple authentication databases in sync is a common problem when
+dealing with Apache, you can configuring Apache to authenticate against Django's
+:ref:`authentication system <topics-auth>` directly. For example, you
+could:
+
+    * Serve static/media files directly from Apache only to authenticated users.
+
+    * Authenticate access to a Subversion_ repository against Django users with
+      a certain permission.
+
+    * Allow certain users to connect to a WebDAV share created with mod_dav_.
+
+.. _Subversion: http://subversion.tigris.org/
+.. _mod_dav: http://httpd.apache.org/docs/2.0/mod/mod_dav.html
+
+Configuring Apache
+==================
+
+To check against Django's authorization database from a Apache configuration
+file, you'll need to use mod_python's ``PythonAuthenHandler`` directive along
+with the standard ``Auth*`` and ``Require`` directives:
+
+.. code-block:: apache
+
+    <Location /example/>
+        AuthType Basic
+        AuthName "example.com"
+        Require valid-user
+
+        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+        PythonAuthenHandler django.contrib.auth.handlers.modpython
+    </Location>
+
+.. admonition:: Using the authentication handler with Apache 2.2
+
+    If you're using Apache 2.2, you'll need to take a couple extra steps.
+
+    You'll need to ensure that ``mod_auth_basic`` and ``mod_authz_user``
+    are loaded. These might be compiled statically into Apache, or you might
+    need to use ``LoadModule`` to load them dynamically (as shown in the
+    example at the bottom of this note).
+
+    You'll also need to insert configuration directives that prevent Apache
+    from trying to use other authentication modules, as well as specifying
+    the ``AuthUserFile`` directive and pointing it to ``/dev/null``. Depending
+    on which other authentication modules you have loaded, you might need one
+    or more of the following directives::
+    
+    .. code-block:: apache
+
+        AuthBasicAuthoritative Off
+        AuthDefaultAuthoritative Off
+        AuthzLDAPAuthoritative Off
+        AuthzDBMAuthoritative Off
+        AuthzDefaultAuthoritative Off
+        AuthzGroupFileAuthoritative Off
+        AuthzOwnerAuthoritative Off
+        AuthzUserAuthoritative Off
+
+    A complete configuration, with differences between Apache 2.0 and
+    Apache 2.2 marked in bold, would look something like:
+
+    .. parsed-literal::
+
+        **LoadModule auth_basic_module modules/mod_auth_basic.so**
+        **LoadModule authz_user_module modules/mod_authz_user.so**
+
+        ...
+
+        <Location /example/>
+            AuthType Basic
+            AuthName "example.com"
+            **AuthUserFile /dev/null**
+            **AuthBasicAuthoritative Off**
+            Require valid-user
+
+            SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+            PythonAuthenHandler django.contrib.auth.handlers.modpython
+        </Location>
+
+By default, the authentication handler will limit access to the ``/example/``
+location to users marked as staff members.  You can use a set of
+``PythonOption`` directives to modify this behavior:
+
+    ================================  =========================================
+    ``PythonOption``                  Explanation
+    ================================  =========================================
+    ``DjangoRequireStaffStatus``      If set to ``on`` only "staff" users (i.e.
+                                      those with the ``is_staff`` flag set)
+                                      will be allowed.
+
+                                      Defaults to ``on``.
+
+    ``DjangoRequireSuperuserStatus``  If set to ``on`` only superusers (i.e.
+                                      those with the ``is_superuser`` flag set)
+                                      will be allowed.
+
+                                      Defaults to ``off``.
+
+    ``DjangoPermissionName``          The name of a permission to require for
+                                      access. See :ref:`custom permissions
+                                      <custom-permissions>` for more
+                                      information.
+
+                                      By default no specific permission will be
+                                      required.
+    ================================  =========================================
+
+Note that sometimes ``SetEnv`` doesn't play well in this mod_python
+configuration, for reasons unknown. If you're having problems getting
+mod_python to recognize your ``DJANGO_SETTINGS_MODULE``, you can set it using
+``PythonOption`` instead of ``SetEnv``. Therefore, these two Apache directives
+are equivalent::
+
+    SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+    PythonOption DJANGO_SETTINGS_MODULE mysite.settings
