@@ -522,6 +522,7 @@ class ModelAdmin(BaseModelAdmin):
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
             'root_path': self.admin_site.root_path,
+            'app_label': app_label,
         }
         context.update(extra_context or {})
         return self.render_change_form(request, context, add=True)
@@ -600,6 +601,7 @@ class ModelAdmin(BaseModelAdmin):
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
             'root_path': self.admin_site.root_path,
+            'app_label': app_label,
         }
         context.update(extra_context or {})
         return self.render_change_form(request, context, change=True, obj=obj)
@@ -631,6 +633,7 @@ class ModelAdmin(BaseModelAdmin):
             'cl': cl,
             'has_add_permission': self.has_add_permission(request),
             'root_path': self.admin_site.root_path,
+            'app_label': app_label,
         }
         context.update(extra_context or {})
         return render_to_response(self.change_list_template or [
@@ -685,6 +688,7 @@ class ModelAdmin(BaseModelAdmin):
             "perms_lacking": perms_needed,
             "opts": opts,
             "root_path": self.admin_site.root_path,
+            "app_label": app_label,
         }
         context.update(extra_context or {})
         return render_to_response(self.delete_confirmation_template or [

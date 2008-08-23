@@ -170,6 +170,8 @@ class AdminSite(object):
         else:
             if '/' in url:
                 return self.model_page(request, *url.split('/', 2))
+            else:
+                return self.app_index(request, url)
 
         raise http.Http404('The requested admin page does not exist.')
 
@@ -315,6 +317,7 @@ class AdminSite(object):
                     else:
                         app_dict[app_label] = {
                             'name': app_label.title(),
+                            'app_url': app_label,
                             'has_module_perms': has_module_perms,
                             'models': [model_dict],
                         }
@@ -360,7 +363,44 @@ class AdminSite(object):
         return render_to_response(self.login_template or 'admin/login.html', context,
             context_instance=template.RequestContext(request)
         )
-
+        
+    def app_index(self, request, app_label):
+        user = request.user
+        has_module_perms = user.has_module_perms(app_label)
+        app_dict = {}
+        for model, model_admin in self._registry.items():
+            if app_label == model._meta.app_label:
+                if has_module_perms:
+                    perms = {
+                        'add': user.has_perm("%s.%s" % (app_label, model._meta.get_add_permission())),
+                        'change': user.has_perm("%s.%s" % (app_label, model._meta.get_change_permission())),
+                        'delete': user.has_perm("%s.%s" % (app_label, model._meta.get_delete_permission())),
+                    }
+                    # Check whether user has any perm for this module.
+                    # If so, add the module to the model_list.
+                    if True in perms.values():
+                        model_dict = {
+                            'name': capfirst(model._meta.verbose_name_plural),
+                            'admin_url': '%s/' % model.__name__.lower(),
+                            'perms': perms,
+                        }
+                    if app_dict:
+                        app_dict['models'].append(model_dict),
+                    else:
+                        app_dict = {
+                            'name': app_label.title(),
+                            'app_url': '',
+                            'has_module_perms': has_module_perms,
+                            'models': [model_dict],
+                        }
+                    if not app_dict:
+                        raise http.Http404('The requested admin page does not exist.')
+        # Sort the models alphabetically within each app.
+        app_dict['models'].sort(lambda x, y: cmp(x['name'], y['name']))
+        return render_to_response('admin/app_index.html', {
+            'title': _('%s administration' % capfirst(app_label)),
+            'app_list': [app_dict]
+        }, context_instance=template.RequestContext(request))
 
 # This global object represents the default admin site, for the common case.
 # You can instantiate AdminSite in your own code to create a custom admin site.
