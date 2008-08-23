@@ -890,6 +890,13 @@ class SlugField(CharField):
     def get_internal_type(self):
         return "SlugField"
 
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.RegexField, 'regex': r'^[a-zA-Z0-9_-]+$',
+            'error_messages': {'invalid': _(u"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.")},
+        }
+        defaults.update(kwargs)
+        return super(SlugField, self).formfield(**defaults)
+
 class SmallIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
         return [oldforms.SmallIntegerField]

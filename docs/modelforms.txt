@@ -65,7 +65,8 @@ the full list of conversions:
                                      (from ``django.contrib.localflavor.us``)
     ``PositiveIntegerField``         ``IntegerField``
     ``PositiveSmallIntegerField``    ``IntegerField``
-    ``SlugField``                    ``CharField``
+    ``SlugField``                    ``RegexField`` accepting only letters,
+                                     numbers, underscores and hyphens
     ``SmallIntegerField``            ``IntegerField``
     ``TextField``                    ``CharField`` with ``widget=Textarea``
     ``TimeField``                    ``TimeField``

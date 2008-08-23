@@ -301,11 +301,11 @@ u'third-test'
 [<Category: Entertainment>, <Category: It's a test>, <Category: Third test>]
 
 If you call save() with invalid data, you'll get a ValueError.
->>> f = CategoryForm({'name': '', 'slug': '', 'url': 'foo'})
+>>> f = CategoryForm({'name': '', 'slug': 'not a slug!', 'url': 'foo'})
 >>> f.errors['name']
 [u'This field is required.']
 >>> f.errors['slug']
-[u'This field is required.']
+[u"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."]
 >>> f.cleaned_data
 Traceback (most recent call last):
 ...
