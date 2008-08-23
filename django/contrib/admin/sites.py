@@ -47,6 +47,7 @@ class AdminSite(object):
 
     index_template = None
     login_template = None
+    app_index_template = None
 
     def __init__(self):
         self._registry = {} # model_class class -> admin_class instance
@@ -397,7 +398,7 @@ class AdminSite(object):
                         raise http.Http404('The requested admin page does not exist.')
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(lambda x, y: cmp(x['name'], y['name']))
-        return render_to_response('admin/app_index.html', {
+        return render_to_response(self.app_index_template or 'admin/app_index.html', {
             'title': _('%s administration' % capfirst(app_label)),
             'app_list': [app_dict]
         }, context_instance=template.RequestContext(request))
