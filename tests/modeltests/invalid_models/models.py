@@ -110,11 +110,11 @@ class Car(models.Model):
 class MissingRelations(models.Model):
     rel1 = models.ForeignKey("Rel1")
     rel2 = models.ManyToManyField("Rel2")
-    
+
 class MissingManualM2MModel(models.Model):
     name = models.CharField(max_length=5)
     missing_m2m = models.ManyToManyField(Model, through="MissingM2MModel")
-    
+
 class Person(models.Model):
     name = models.CharField(max_length=5)
 
@@ -176,7 +176,11 @@ class AbstractModel(models.Model):
 class AbstractRelationModel(models.Model):
     fk1 = models.ForeignKey('AbstractModel')
     fk2 = models.ManyToManyField('AbstractModel')
-    
+
+class UniqueM2M(models.Model):
+    """ Model to test for unique ManyToManyFields, which are invalid. """
+    unique_people = models.ManyToManyField( Person, unique=True )
+
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute.
 invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute.
 invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute.
@@ -271,4 +275,5 @@ invalid_models.personselfrefm2m: Intermediary model RelationshipTripleFK has mor
 invalid_models.personselfrefm2mexplicit: Many-to-many fields with intermediate tables cannot be symmetrical.
 invalid_models.abstractrelationmodel: 'fk1' has a relation with model AbstractModel, which has either not been installed or is abstract.
 invalid_models.abstractrelationmodel: 'fk2' has an m2m relation with model AbstractModel, which has either not been installed or is abstract.
+invalid_models.uniquem2m: ManyToManyFields cannot be unique.  Remove the unique argument on 'unique_people'.
 """
