@@ -194,7 +194,8 @@ class AdminSite(object):
         Handles the "change password" task -- both form display and validation.
         """
         from django.contrib.auth.views import password_change
-        return password_change(request)
+        return password_change(request,
+            post_save_redirect='%spassword_change/done/' % self.root_path)
 
     def password_change_done(self, request):
         """
