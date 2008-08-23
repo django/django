@@ -1011,7 +1011,7 @@ of the arguments is required, but you should use at least one of them.
     This will work, for example::
 
         Blog.objects.extra(
-            select=SortedDict(('a', '%s'), ('b', '%s')),
+            select=SortedDict([('a', '%s'), ('b', '%s')]),
             select_params=('one', 'two'))
 
     The only thing to be careful about when using select parameters in
