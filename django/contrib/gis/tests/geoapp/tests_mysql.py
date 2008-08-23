@@ -174,8 +174,10 @@ class GeoModelTest(unittest.TestCase):
         self.assertRaises(ImproperlyConfigured, Country.objects.all().gml, field_name='mpoly')
 
 from test_feeds import GeoFeedTest
+from test_sitemaps import GeoSitemapTest
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(GeoModelTest))
     s.addTest(unittest.makeSuite(GeoFeedTest))
+    s.addTest(unittest.makeSuite(GeoSitemapTest))
     return s

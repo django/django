@@ -559,8 +559,10 @@ class GeoModelTest(unittest.TestCase):
             self.assertEqual(c.mpoly.union(geom), c.union)
 
 from test_feeds import GeoFeedTest
+from test_sitemaps import GeoSitemapTest
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(GeoModelTest))
     s.addTest(unittest.makeSuite(GeoFeedTest))
+    s.addTest(unittest.makeSuite(GeoSitemapTest))
     return s

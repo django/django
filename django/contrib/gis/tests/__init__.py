@@ -74,6 +74,7 @@ def run_gis_tests(test_labels, **kwargs):
     new_installed =  ['django.contrib.contenttypes',
                       'django.contrib.auth',
                       'django.contrib.sites',
+                      'django.contrib.sitemaps',
                       'django.contrib.flatpages',
                       'django.contrib.gis',
                       'django.contrib.redirects',
