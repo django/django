@@ -22,7 +22,7 @@ from urlparse import urljoin
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'PasswordInput',
     'HiddenInput', 'MultipleHiddenInput',
-    'FileInput', 'DateTimeInput', 'Textarea', 'CheckboxInput',
+    'FileInput', 'DateTimeInput', 'TimeInput', 'Textarea', 'CheckboxInput',
     'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
     'CheckboxSelectMultiple', 'MultiWidget', 'SplitDateTimeWidget',
 )
@@ -300,6 +300,16 @@ class DateTimeInput(Input):
             value = datetime_safe.new_datetime(value)
             value = value.strftime(self.format)
         return super(DateTimeInput, self).render(name, value, attrs)
+
+class TimeInput(Input):
+    input_type = 'text'
+
+    def render(self, name, value, attrs=None):
+        if value is None:
+            value = ''
+        elif hasattr(value, 'replace'):
+            value = value.replace(microsecond=0)
+        return super(TimeInput, self).render(name, value, attrs)
 
 class CheckboxInput(Widget):
     def __init__(self, attrs=None, check_test=bool):

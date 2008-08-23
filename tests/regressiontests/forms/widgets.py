@@ -1087,4 +1087,22 @@ u'<input type="text" name="date" value="2007-09-17 12:51:34" />'
 u'<input type="text" name="date" value="2007-09-17 12:51:34" />'
 >>> w.render('date', datetime.datetime(2007, 9, 17, 12, 51))
 u'<input type="text" name="date" value="2007-09-17 12:51:00" />'
+
+# TimeInput ###############################################################
+
+>>> w = TimeInput()
+>>> w.render('time', None)
+u'<input type="text" name="time" />'
+>>> t = datetime.time(12, 51, 34, 482548)
+>>> print t
+12:51:34.482548
+
+The microseconds are trimmed on display, by default.
+>>> w.render('time', t)
+u'<input type="text" name="time" value="12:51:34" />'
+>>> w.render('time', datetime.time(12, 51, 34))
+u'<input type="text" name="time" value="12:51:34" />'
+>>> w.render('time', datetime.time(12, 51))
+u'<input type="text" name="time" value="12:51:00" />'
 """
+
