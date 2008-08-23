@@ -10,6 +10,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         FIELD_TYPE.BLOB: 'TextField',
         FIELD_TYPE.CHAR: 'CharField',
         FIELD_TYPE.DECIMAL: 'DecimalField',
+        FIELD_TYPE.NEWDECIMAL: 'DecimalField',
         FIELD_TYPE.DATE: 'DateField',
         FIELD_TYPE.DATETIME: 'DateTimeField',
         FIELD_TYPE.DOUBLE: 'FloatField',
