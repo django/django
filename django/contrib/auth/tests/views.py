@@ -1,5 +1,8 @@
 
+import os
 import re
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.core import mail
@@ -7,7 +10,7 @@ from django.core import mail
 class PasswordResetTest(TestCase):
     fixtures = ['authtestdata.json']
     urls = 'django.contrib.auth.urls'
-    
+
     def test_email_not_found(self):
         "Error is raised if the provided email address isn't currently registered"
         response = self.client.get('/password_reset/')
@@ -15,7 +18,7 @@ class PasswordResetTest(TestCase):
         response = self.client.post('/password_reset/', {'email': 'not_a_real_email@email.com'})
         self.assertContains(response, "That e-mail address doesn't have an associated user account")
         self.assertEquals(len(mail.outbox), 0)
-    
+
     def test_email_found(self):
         "Email is sent if a valid email address is provided for password reset"
         response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
@@ -39,7 +42,7 @@ class PasswordResetTest(TestCase):
         url, path = self._test_confirm_start()
         response = self.client.get(path)
         # redirect to a 'complete' page:
-        self.assertEquals(response.status_code, 200) 
+        self.assertEquals(response.status_code, 200)
         self.assert_("Please enter your new password" in response.content)
 
     def test_confirm_invalid(self):
@@ -49,7 +52,7 @@ class PasswordResetTest(TestCase):
         path = path[:-5] + ("0"*4) + path[-1]
 
         response = self.client.get(path)
-        self.assertEquals(response.status_code, 200) 
+        self.assertEquals(response.status_code, 200)
         self.assert_("The password reset link was invalid" in response.content)
 
     def test_confirm_invalid_post(self):
@@ -60,7 +63,7 @@ class PasswordResetTest(TestCase):
 
         response = self.client.post(path, {'new_password1': 'anewpassword',
                                            'new_password2':' anewpassword'})
-        # Check the password has not been changed 
+        # Check the password has not been changed
         u = User.objects.get(email='staffmember@example.com')
         self.assert_(not u.check_password("anewpassword"))
 
@@ -69,14 +72,14 @@ class PasswordResetTest(TestCase):
         response = self.client.post(path, {'new_password1': 'anewpassword',
                                            'new_password2': 'anewpassword'})
         # It redirects us to a 'complete' page:
-        self.assertEquals(response.status_code, 302) 
-        # Check the password has been changed 
+        self.assertEquals(response.status_code, 302)
+        # Check the password has been changed
         u = User.objects.get(email='staffmember@example.com')
         self.assert_(u.check_password("anewpassword"))
 
         # Check we can't use the link again
         response = self.client.get(path)
-        self.assertEquals(response.status_code, 200) 
+        self.assertEquals(response.status_code, 200)
         self.assert_("The password reset link was invalid" in response.content)
 
     def test_confirm_different_passwords(self):
@@ -85,4 +88,77 @@ class PasswordResetTest(TestCase):
                                            'new_password2':' x'})
         self.assertEquals(response.status_code, 200)
         self.assert_("The two password fields didn't match" in response.content)
+
+
+class ChangePasswordTest(TestCase):
+    fixtures = ['authtestdata.json']
+    urls = 'django.contrib.auth.urls'
+
+    def setUp(self):
+        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = (
+            os.path.join(
+                os.path.dirname(__file__),
+                'templates'
+            )
+        ,)
+
+    def tearDown(self):
+        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+
+    def login(self, password='password'):
+        response = self.client.post('/login/', {
+            'username': 'testclient',
+            'password': password
+            }
+        )
+        self.assertEquals(response.status_code, 302)
+        self.assert_(response['Location'].endswith('/accounts/profile/'))
+
+    def fail_login(self, password='password'):
+        response = self.client.post('/login/', {
+            'username': 'testclient',
+            'password': password
+            }
+        )
+        self.assertEquals(response.status_code, 200)
+        self.assert_("Please enter a correct username and password. Note that both fields are case-sensitive." in response.content)
+
+    def logout(self):
+        response = self.client.get('/logout/')
+
+    def test_password_change_fails_with_invalid_old_password(self):
+        self.login()
+        response = self.client.post('/password_change/', {
+            'old_password': 'donuts',
+            'new_password1': 'password1',
+            'new_password2': 'password1',
+            }
+        )
+        self.assertEquals(response.status_code, 200)
+        self.assert_("Your old password was entered incorrectly. Please enter it again." in response.content)
+
+    def test_password_change_fails_with_mismatched_passwords(self):
+        self.login()
+        response = self.client.post('/password_change/', {
+            'old_password': 'password',
+            'new_password1': 'password1',
+            'new_password2': 'donuts',
+            }
+        )
+        self.assertEquals(response.status_code, 200)
+        self.assert_("The two password fields didn't match." in response.content)
+
+    def test_password_change_succeeds(self):
+        self.login()
+        response = self.client.post('/password_change/', {
+            'old_password': 'password',
+            'new_password1': 'password1',
+            'new_password2': 'password1',
+            }
+        )
+        self.assertEquals(response.status_code, 302)
+        self.assert_(response['Location'].endswith('/password_change/done/'))
+        self.fail_login()
+        self.login(password='password1')
 
