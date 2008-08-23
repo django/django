@@ -247,7 +247,7 @@ class ModelAdmin(BaseModelAdmin):
         "Hook for specifying fieldsets for the add form."
         if self.declared_fieldsets:
             return self.declared_fieldsets
-        form = self.get_form(request)
+        form = self.get_form(request, obj)
         return [(None, {'fields': form.base_fields.keys()})]
 
     def get_form(self, request, obj=None, **kwargs):
