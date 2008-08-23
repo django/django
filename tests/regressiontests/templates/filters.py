@@ -59,7 +59,7 @@ def get_filter_tests():
         'filter-timeuntil06': ('{{ earlier|timeuntil }}', { 'earlier': now - timedelta(days=7) }, '0 minutes'),
         'filter-timeuntil07': ('{{ earlier|timeuntil:now }}', { 'now': now, 'earlier': now - timedelta(days=7) }, '0 minutes'),
         'filter-timeuntil08': ('{{ later|timeuntil }}', { 'later': now + timedelta(days=7) }, '1 week'),
-        'filter-timeuntil09': ('{{ later|timeuntil:now }}', { 'now': now, 'earlier': now - timedelta(days=7) }, '1 week'),
+        'filter-timeuntil09': ('{{ later|timeuntil:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '1 week'),
 
 
         'filter-addslash01': ("{% autoescape off %}{{ a|addslashes }} {{ b|addslashes }}{% endautoescape %}", {"a": "<a>'", "b": mark_safe("<a>'")}, ur"<a>\' <a>\'"),
