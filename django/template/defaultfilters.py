@@ -643,7 +643,7 @@ def timesince(value, arg=None):
     if not value:
         return u''
     if arg:
-        return timesince(value, arg)
+        return timesince(arg, value)
     return timesince(value)
 timesince.is_safe = False
 
