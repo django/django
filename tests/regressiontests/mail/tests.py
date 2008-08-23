@@ -10,6 +10,8 @@ r"""
 >>> email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
 >>> message = email.message()
 >>> message['Subject']
+<email.header.Header instance...>
+>>> message['Subject'].encode()
 'Subject'
 >>> message.get_payload()
 'Content'
@@ -23,6 +25,8 @@ r"""
 >>> email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com','other@example.com'])
 >>> message = email.message()
 >>> message['Subject']
+<email.header.Header instance...>
+>>> message['Subject'].encode()
 'Subject'
 >>> message.get_payload()
 'Content'
@@ -44,5 +48,12 @@ BadHeaderError: Header values can't contain newlines (got u'Subject\nInjection T
 Traceback (most recent call last):
     ...
 BadHeaderError: Header values can't contain newlines (got u'Subject\nInjection Test' for header 'Subject')
+
+# Test for space continuation character in long (ascii) subject headers (#7747)
+
+>>> email = EmailMessage('Long subject lines that get wrapped should use a space continuation character to get expected behaviour in Outlook and Thunderbird', 'Content', 'from@example.com', ['to@example.com'])
+>>> message = email.message()
+>>> message.as_string()
+'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: Long subject lines that get wrapped should use a space continuation\n character to get expected behaviour in Outlook and Thunderbird\nFrom: from@example.com\nTo: to@example.com\nDate: ...\nMessage-ID: <...>\n\nContent'
 
 """

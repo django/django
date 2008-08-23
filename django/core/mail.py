@@ -86,6 +86,9 @@ def forbid_multi_line_headers(name, val):
             val = ', '.join(result)
         else:
             val = Header(val, settings.DEFAULT_CHARSET)
+    else:
+        if name.lower() == 'subject':
+            val = Header(val)
     return name, val
 
 class SafeMIMEText(MIMEText):
