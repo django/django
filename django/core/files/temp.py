@@ -25,31 +25,35 @@ if os.name == 'nt':
             fd, name = tempfile.mkstemp(suffix=suffix, prefix=prefix,
                                           dir=dir)
             self.name = name
-            self._file = os.fdopen(fd, mode, bufsize)
+            self.file = os.fdopen(fd, mode, bufsize)
+            self.close_called = False
+
+        # Because close can be called during shutdown
+        # we need to cache os.unlink and access it
+        # as self.unlink only
+        unlink = os.unlink
+
+        def close(self):
+            if not self.close_called:
+                self.close_called = True
+                try:
+                    self.file.close()
+                except (OSError, IOError):
+                    pass
+                try:
+                    self.unlink(self.name)
+                except (OSError):
+                    pass
 
         def __del__(self):
-            try:
-                self._file.close()
-            except (OSError, IOError):
-                pass
-            try:
-                os.unlink(self.name)
-            except (OSError):
-                pass
+            self.close()
 
-            try:
-                super(TemporaryFile, self).__del__()
-            except AttributeError:
-                pass
-
-
-        def read(self, *args):          return self._file.read(*args)
-        def seek(self, offset):         return self._file.seek(offset)
-        def write(self, s):             return self._file.write(s)
-        def close(self):                return self._file.close()
-        def __iter__(self):             return iter(self._file)
-        def readlines(self, size=None): return self._file.readlines(size)
-        def xreadlines(self):           return self._file.xreadlines()
+        def read(self, *args):          return self.file.read(*args)
+        def seek(self, offset):         return self.file.seek(offset)
+        def write(self, s):             return self.file.write(s)
+        def __iter__(self):             return iter(self.file)
+        def readlines(self, size=None): return self.file.readlines(size)
+        def xreadlines(self):           return self.file.xreadlines()
 
     NamedTemporaryFile = TemporaryFile
 else:

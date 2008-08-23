@@ -2,6 +2,7 @@ import os
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError
 from django.utils import simplejson
+from models import FileModel
 from uploadhandler import QuotaUploadHandler
 from django.utils.hashcompat import sha_constructor
 
@@ -44,6 +45,11 @@ def file_upload_view_verify(request):
             new_hash = sha_constructor(value).hexdigest()
         if new_hash != submitted_hash:
             return HttpResponseServerError()
+
+    # Adding large file to the database should succeed
+    largefile = request.FILES['file_field2']
+    obj = FileModel()
+    obj.testfile.save(largefile.name, largefile)
 
     return HttpResponse('')
 
