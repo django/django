@@ -20,6 +20,7 @@ date_based_info_dict = {
     'date_field': 'date_created',
     'month_format': '%m',
 }
+date_based_datefield_info_dict = dict(date_based_info_dict, queryset=DateArticle.objects.all())
 
 urlpatterns = patterns('',
     (r'^$', views.index_page),
@@ -48,6 +49,9 @@ urlpatterns += patterns('django.views.generic.date_based',
     (r'^date_based/archive_month/(?P<year>\d{4})/(?P<month>\d{1,2})/$',
         'archive_month',
         date_based_info_dict),
+    (r'^date_based/datefield/archive_month/(?P<year>\d{4})/(?P<month>\d{1,2})/$',
+        'archive_month',
+        date_based_datefield_info_dict),
 )
 
 # crud generic views.

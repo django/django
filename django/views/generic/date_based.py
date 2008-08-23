@@ -129,7 +129,10 @@ def archive_month(request, year, month, queryset, date_field,
         last_day = first_day.replace(year=first_day.year + 1, month=1)
     else:
         last_day = first_day.replace(month=first_day.month + 1)
-    lookup_kwargs = {'%s__range' % date_field: (first_day, last_day)}
+    lookup_kwargs = {
+        '%s__gte' % date_field: first_day,
+        '%s__lt' % date_field: last_day,
+    }
 
     # Only bother to check current date if the month isn't in the past and future objects are requested.
     if last_day >= now.date() and not allow_future:
@@ -188,7 +191,10 @@ def archive_week(request, year, week, queryset, date_field,
     # Calculate first and last day of week, for use in a date-range lookup.
     first_day = date
     last_day = date + datetime.timedelta(days=7)
-    lookup_kwargs = {'%s__range' % date_field: (first_day, last_day)}
+    lookup_kwargs = {
+        '%s__gte' % date_field: first_day,
+        '%s__lt' % date_field: last_day,
+    }
 
     # Only bother to check current date if the week isn't in the past and future objects aren't requested.
     if last_day >= now.date() and not allow_future:

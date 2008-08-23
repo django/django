@@ -21,7 +21,6 @@ class BaseArticle(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField()
     author = models.ForeignKey(Author)
-    date_created = models.DateTimeField()
 
     class Meta:
         abstract = True
@@ -30,11 +29,20 @@ class BaseArticle(models.Model):
         return self.title
 
 class Article(BaseArticle):
-    pass
+    date_created = models.DateTimeField()
 
 class UrlArticle(BaseArticle):
     """
     An Article class with a get_absolute_url defined.
     """
+    date_created = models.DateTimeField()
+
     def get_absolute_url(self):
         return '/urlarticles/%s/' % self.slug
+
+class DateArticle(BaseArticle):
+    """
+    An article Model with a DateField instead of DateTimeField,
+    for testing #7602
+    """
+    date_created = models.DateField()
