@@ -617,10 +617,13 @@ class QuerySet(object):
         be treated as a single filter. This is only important when it comes to
         determining when to reuse tables for many-to-many filters. Required so
         that we can filter naturally on the results of related managers.
+
+        This doesn't return a clone of the current QuerySet (it returns
+        "self"). The method is only used internally and should be immediately
+        followed by a filter() that does create a clone.
         """
-        obj = self._clone()
-        obj._sticky_filter = True
-        return obj
+        self._sticky_filter = True
+        return self
 
     def _merge_sanity_check(self, other):
         """
