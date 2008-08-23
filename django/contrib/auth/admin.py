@@ -30,7 +30,7 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
     filter_horizontal = ('user_permissions',)
-    
+
     def __call__(self, request, url):
         # this should not be here, but must be due to the way __call__ routes
         # in ModelAdmin.
@@ -39,7 +39,7 @@ class UserAdmin(admin.ModelAdmin):
         if url.endswith('password'):
             return self.user_change_password(request, url.split('/')[0])
         return super(UserAdmin, self).__call__(request, url)
-    
+
     def add_view(self, request):
         if not self.has_change_permission(request):
             raise PermissionDenied
@@ -48,6 +48,7 @@ class UserAdmin(admin.ModelAdmin):
             if form.is_valid():
                 new_user = form.save()
                 msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': 'user', 'obj': new_user}
+                self.log_addition(request, new_user)
                 if "_addanother" in request.POST:
                     request.user.message_set.create(message=msg)
                     return HttpResponseRedirect(request.path)
@@ -73,7 +74,7 @@ class UserAdmin(admin.ModelAdmin):
             'username_help_text': self.model._meta.get_field('username').help_text,
             'root_path': self.admin_site.root_path,
         }, context_instance=template.RequestContext(request))
-    
+
     def user_change_password(self, request, id):
         if not request.user.has_perm('auth.change_user'):
             raise PermissionDenied
