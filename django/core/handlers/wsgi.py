@@ -173,7 +173,10 @@ class WSGIRequest(http.HttpRequest):
             try:
                 # CONTENT_LENGTH might be absent if POST doesn't have content at all (lighttpd)
                 content_length = int(self.environ.get('CONTENT_LENGTH', 0))
-            except ValueError: # if CONTENT_LENGTH was empty string or not an integer
+            except (ValueError, TypeError):
+                # If CONTENT_LENGTH was empty string or not an integer, don't
+                # error out. We've also seen None passed in here (against all
+                # specs, but see ticket #8259), so we handle TypeError as well.
                 content_length = 0
             if content_length > 0:
                 safe_copyfileobj(self.environ['wsgi.input'], buf,
