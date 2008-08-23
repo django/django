@@ -311,7 +311,7 @@ DEFAULT_TIME_INPUT_FORMATS = (
 )
 
 class TimeField(Field):
-    widget = TimeInput()
+    widget = TimeInput
     default_error_messages = {
         'invalid': _(u'Enter a valid time.')
     }
