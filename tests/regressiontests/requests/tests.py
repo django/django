@@ -36,4 +36,12 @@ META:{}>
 >>> from django.http import parse_cookie
 >>> parse_cookie('invalid:key=true')
 {}
+
+>>> request = HttpRequest()
+>>> print request.build_absolute_uri(location="https://www.example.com/asdf")
+https://www.example.com/asdf
+>>> request.get_host = lambda: 'www.example.com'
+>>> request.path = ''
+>>> print request.build_absolute_uri(location="/path/with:colons")
+http://www.example.com/path/with:colons
 """

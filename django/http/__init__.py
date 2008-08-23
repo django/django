@@ -1,4 +1,5 @@
 import os
+import re
 from Cookie import SimpleCookie, CookieError
 from pprint import pformat
 from urllib import urlencode
@@ -17,6 +18,8 @@ from django.core.files import uploadhandler
 from utils import *
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
+
+absolute_http_url_re = re.compile(r"^https?://", re.I)
 
 class Http404(Exception):
     pass
@@ -65,7 +68,7 @@ class HttpRequest(object):
         """
         if not location:
             location = self.get_full_path()
-        if not ':' in location:
+        if not absolute_http_url_re.match(location):
             current_uri = '%s://%s%s' % (self.is_secure() and 'https' or 'http',
                                          self.get_host(), self.path)
             location = urljoin(current_uri, location)
