@@ -37,6 +37,7 @@ div.breadcrumbs { text-align:right; }
 .submit-row { text-align: left }
 .vDateField, .vTimeField { margin-left:2px; }
 form ul.inline li { float:right; padding-right:0; padding-left:7px; }
+input[type=submit].default, .submit-row input.default { float:left; }
 
 /* widget styles */
 .calendarnav-previous { top:0; left:auto; right:0; }
