@@ -26,11 +26,13 @@ from django.utils.encoding import smart_str, force_unicode
 DatabaseError = Database.Error
 IntegrityError = Database.IntegrityError
 
+
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
     needs_datetime_string_cast = False
     uses_custom_query_class = True
     interprets_empty_strings_as_nulls = True
+
 
 class DatabaseOperations(BaseDatabaseOperations):
     def autoinc_sql(self, table, column):
@@ -40,7 +42,17 @@ class DatabaseOperations(BaseDatabaseOperations):
         tr_name = get_trigger_name(table)
         tbl_name = self.quote_name(table)
         col_name = self.quote_name(column)
-        sequence_sql = 'CREATE SEQUENCE %s;' % sq_name
+        sequence_sql = """
+            DECLARE
+                i INTEGER;
+            BEGIN
+                SELECT COUNT(*) INTO i FROM USER_CATALOG
+                    WHERE TABLE_NAME = '%(sq_name)s' AND TABLE_TYPE = 'SEQUENCE';
+                IF i = 0 THEN
+                    EXECUTE IMMEDIATE 'CREATE SEQUENCE %(sq_name)s';
+                END IF;
+            END;
+            /""" % locals()
         trigger_sql = """
             CREATE OR REPLACE TRIGGER %(tr_name)s
             BEFORE INSERT ON %(tbl_name)s
@@ -195,7 +207,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
-    
+
     operators = {
         'exact': '= %s',
         'iexact': '= UPPER(%s)',
@@ -212,7 +224,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
     oracle_version = None
 
-    def __init__(self, *args, **kwargs):        
+    def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
         self.features = DatabaseFeatures()
@@ -265,6 +277,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor.arraysize = 100
         return cursor
 
+
 class OracleParam(object):
     """
     Wrapper object for formatting parameters for Oracle. If the string
@@ -284,6 +297,7 @@ class OracleParam(object):
             self.input_size = Database.NCLOB
         else:
             self.input_size = None
+
 
 class FormatStylePlaceholderCursor(Database.Cursor):
     """
