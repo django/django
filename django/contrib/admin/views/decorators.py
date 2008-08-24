@@ -74,6 +74,8 @@ def staff_member_required(view_func):
         if not request.session.test_cookie_worked():
             message = _("Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again.")
             return _display_login_form(request, message)
+        else:
+            request.session.delete_test_cookie()
 
         # Check the password.
         username = request.POST.get('username', None)
@@ -105,7 +107,6 @@ def staff_member_required(view_func):
                         request.user = user
                         return view_func(request, *args, **kwargs)
                     else:
-                        request.session.delete_test_cookie()
                         return http.HttpResponseRedirect(request.get_full_path())
             else:
                 return _display_login_form(request, ERROR_MESSAGE)
