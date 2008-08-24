@@ -655,10 +655,12 @@ A test client has two attributes that store persistent state information. You
 can access these properties as part of a test condition.
 
 .. attribute:: Client.cookies
+
     A Python ``SimpleCookie`` object, containing the current values of all the
     client cookies. See the `Cookie module documentation`_ for more.
 
 .. attribute:: Client.session
+
     A dictionary-like object containing session information. See the :ref:`session
     documentation<topics-http-sessions>` for full details.
 
@@ -863,15 +865,18 @@ methods such as ``assertTrue`` and ``assertEquals``, Django's custom
 useful for testing Web applications:
 
 .. method:: TestCase.assertContains(response, text, count=None, status_code=200)
+
     Asserts that a ``Response`` instance produced the given ``status_code`` and
     that ``text`` appears in the content of the response. If ``count`` is
     provided, ``text`` must occur exactly ``count`` times in the response.
 
 .. method:: TestCase.assertNotContains(response, text, status_code=200)
+
     Asserts that a ``Response`` instance produced the given ``status_code`` and
     that ``text`` does not appears in the content of the response.
 
 .. method:: assertFormError(response, form, field, errors)
+
     Asserts that a field on a form raises the provided list of errors when
     rendered on the form.
 
@@ -887,16 +892,19 @@ useful for testing Web applications:
     expected as a result of form validation.
 
 .. method:: assertTemplateUsed(response, template_name)
+
     Asserts that the template with the given name was used in rendering the
     response.
 
     The name is a string such as ``'admin/index.html'``.
 
 .. method:: assertTemplateNotUsed(response, template_name)
+
     Asserts that the template with the given name was *not* used in rendering
     the response.
 
 .. method:: assertRedirects(response, expected_url, status_code=302, target_status_code=200)
+
     Asserts that the response return a ``status_code`` redirect status,
     it redirected to ``expected_url`` (including any GET data), and the subsequent
     page was received with ``target_status_code``.
@@ -1003,6 +1011,7 @@ By convention, a test runner should be called ``run_tests``. The only strict
 requirement is that it has the same arguments as the Django test runner:
 
 .. function:: run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[])
+
     ``test_labels`` is a list of strings describing the tests to be run. A test
     label can take one of three forms:
 
@@ -1040,11 +1049,13 @@ To assist in the creation of your own test runner, Django provides
 a number of utility methods in the ``django.test.utils`` module.
 
 .. function:: setup_test_environment()
+
     Performs any global pre-test setup, such as the installing the
     instrumentation of the template rendering system and setting up
     the dummy ``SMTPConnection``.
 
 .. function:: teardown_test_environment()
+
     Performs any global post-test teardown, such as removing the
     black magic hooks into the template system and restoring normal e-mail
     services.
@@ -1053,6 +1064,7 @@ The creation module of the database backend (``connection.creation``) also
 provides some utilities that can be useful during testing.
 
 .. function:: create_test_db(verbosity=1, autoclobber=False)
+
     Creates a new test database and runs ``syncdb`` against it.
 
     ``verbosity`` has the same behavior as in ``run_tests()``.
@@ -1074,6 +1086,7 @@ provides some utilities that can be useful during testing.
     the test database that it created.
 
 .. function:: destroy_test_db(old_database_name, verbosity=1)
+
     Destroys the database whose name is in the :setting:`DATABASE_NAME` setting
     and restores the value of :setting:`DATABASE_NAME` to the provided name.
 
