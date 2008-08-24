@@ -1,7 +1,7 @@
 .. _ref-forms-validation:
 
-F and field validation
-======================
+Form and field validation
+=========================
 
 Form validation happens when the data is cleaned. If you want to customize
 this process, there are various places you can change, each one serving a
