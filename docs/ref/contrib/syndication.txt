@@ -979,7 +979,7 @@ For example, you might start implementing an iTunes RSS feed generator like so::
     class iTunesFeed(Rss201rev2Feed):
         def root_attibutes(self):
             attrs = super(iTunesFeed, self).root_attibutes()
-            attrs['xmlns:itunes'] = 'http://www.itunes.com/dtds/podcast-1.0.dtd
+            attrs['xmlns:itunes'] = 'http://www.itunes.com/dtds/podcast-1.0.dtd'
             return attrs
             
         def add_root_elements(self, handler):
