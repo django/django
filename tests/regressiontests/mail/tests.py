@@ -9,8 +9,6 @@ r"""
 
 >>> email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
 >>> message = email.message()
->>> message['Subject']
-<email.header.Header instance...>
 >>> message['Subject'].encode()
 'Subject'
 >>> message.get_payload()
@@ -24,8 +22,6 @@ r"""
 
 >>> email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com','other@example.com'])
 >>> message = email.message()
->>> message['Subject']
-<email.header.Header instance...>
 >>> message['Subject'].encode()
 'Subject'
 >>> message.get_payload()
