@@ -112,9 +112,9 @@ All attributes except ``session`` should be considered read-only.
     attributes:
 
         * ``read(num_bytes=None)`` -- Read a number of bytes from the file.
-        * ``file_name`` -- The name of the uploaded file.
-        * ``file_size`` -- The size, in bytes, of the uploaded file.
-        * ``chunk()`` -- A generator that yields sequential chunks of data.
+        * ``name`` -- The name of the uploaded file.
+        * ``size`` -- The size, in bytes, of the uploaded file.
+        * ``chunks(chunk_size=None)`` -- A generator that yields sequential chunks of data.
 
     See :ref:`topics-files` for more information.
 
