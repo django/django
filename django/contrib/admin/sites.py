@@ -198,7 +198,7 @@ class AdminSite(object):
         """
         from django.contrib.auth.views import password_change
         return password_change(request,
-            post_save_redirect='%spassword_change/done/' % self.root_path)
+            post_change_redirect='%spassword_change/done/' % self.root_path)
 
     def password_change_done(self, request):
         """
