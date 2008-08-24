@@ -296,8 +296,8 @@ Pinging Google
 ==============
 
 You may want to "ping" Google when your sitemap changes, to let it know to
-reindex your site. The framework provides a function to do just that:
-:func:`django.contrib.sitemaps.ping_google()`.
+reindex your site. The sitemaps framework provides a function to do just 
+that: :func:`django.contrib.sitemaps.ping_google()`.
 
 .. function:: ping_google
 
@@ -311,6 +311,13 @@ reindex your site. The framework provides a function to do just that:
     :exc:`django.contrib.sitemaps.SitemapNotFound` if it cannot determine your
     sitemap URL.
 
+.. admonition:: Register with Google first!
+
+    The :func:`ping_google` command only works if you have registered your
+    site with `Google Webmaster Tools`_.
+        
+.. _`Google Webmaster Tools`: http://www.google.com/webmasters/tools/
+        
 One useful way to call :func:`ping_google` is from a model's ``save()``
 method::
 
