@@ -172,4 +172,8 @@ doing a join.
 >>> rock.members.filter(membership__price=50)
 [<Person: Jim>]
 
+## Regression test for #8254
+>>> bob.group_set.filter(membership__price=50)
+[<Group: Roll>]
+
 """}
