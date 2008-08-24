@@ -300,6 +300,14 @@ use the :setting:`TEST_DATABASE_COLLATION` setting to control the particular
 collation used by the test database. See the :ref:`settings documentation
 <ref-settings>` for details of these advanced settings.
 
+Other test conditions
+---------------------
+
+Regardless of the value of the :setting:`DEBUG` setting in your configuration
+file, all Django tests run with :setting:`DEBUG=False`. This is to ensure that
+the observed output of your code matches what will be seen in a production
+setting.
+
 Understanding the test output
 -----------------------------
 
