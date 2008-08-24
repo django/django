@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+  <object pk="10" model="fixtures_regress.animal">
+      <field type="CharField" name="name">Emu</field>
+      <field type="CharField" name="latin_name">Dromaius novaehollandiae</field>
+      <field type="IntegerField" name="count">42</field>
+  </object>
+</django-objects>

@@ -786,6 +786,14 @@ class IntegerField(Field):
     def get_internal_type(self):
         return "IntegerField"
 
+    def to_python(self, value):
+        if value is None:
+            return value
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            raise validators.ValidationError, _("This value must be an integer.")
+                
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.IntegerField}
         defaults.update(kwargs)

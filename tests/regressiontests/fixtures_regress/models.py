@@ -6,9 +6,14 @@ import os
 class Animal(models.Model):
     name = models.CharField(max_length=150)
     latin_name = models.CharField(max_length=150)
-
+    count = models.IntegerField()
+    
     def __unicode__(self):
         return self.common_name
+
+def animal_pre_save_check(signal, sender, instance, **kwargs):
+    "A signal that is used to check the type of data loaded from fixtures"
+    print 'Count = %s (%s)' % (instance.count, type(instance.count))
 
 class Plant(models.Model):
     name = models.CharField(max_length=150)
@@ -64,7 +69,7 @@ __test__ = {'API_TESTS':"""
 # Create a new animal. Without a sequence reset, this new object
 # will take a PK of 1 (on Postgres), and the save will fail.
 # This is a regression test for ticket #3790.
->>> animal = Animal(name='Platypus', latin_name='Ornithorhynchus anatinus')
+>>> animal = Animal(name='Platypus', latin_name='Ornithorhynchus anatinus', count=2)
 >>> animal.save()
 
 ###############################################
@@ -133,5 +138,15 @@ No fixture data found for 'bad_fixture2'. (File format may be invalid.)
 # ticket #7572, this will give a different result to the previous call.
 >>> articles.values_list('id', flat=True)
 [1, 2, 3, 4, 5, 6, 7, 8]
+
+###############################################
+# Test for ticket #8298 - Field values should be coerced into the correct type
+# by the deserializer, not as part of the database write.
+
+>>> models.signals.pre_save.connect(animal_pre_save_check)
+>>> management.call_command('loaddata', 'animal.xml', verbosity=0)
+Count = 42 (<type 'int'>)
+
+>>> models.signals.pre_save.disconnect(animal_pre_save_check)
 
 """}
