@@ -2,6 +2,7 @@ from django.template import Library, Node, TemplateSyntaxError, Variable, Variab
 from django.template import resolve_variable
 from django.core.cache import cache
 from django.utils.encoding import force_unicode
+from django.utils.http import urlquote
 
 register = Library()
 
@@ -22,7 +23,7 @@ class CacheNode(Node):
         except (ValueError, TypeError):
             raise TemplateSyntaxError('"cache" tag got a non-integer timeout value: %r' % expire_time)
         # Build a unicode key for this fragment and all vary-on's.
-        cache_key = u':'.join([self.fragment_name] + [force_unicode(resolve_variable(var, context)) for var in self.vary_on])
+        cache_key = u':'.join([self.fragment_name] + [urlquote(resolve_variable(var, context)) for var in self.vary_on])
         value = cache.get(cache_key)
         if value is None:
             value = self.nodelist.render(context)
