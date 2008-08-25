@@ -43,6 +43,14 @@ class UserCreationForm(forms.ModelForm):
             user.save()
         return user
 
+class UserChangeForm(forms.ModelForm):
+    username = forms.RegexField(label=_("Username"), max_length=30, regex=r'^\w+$',
+        help_text = _("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."),
+        error_message = _("This value must contain only letters, numbers and underscores."))
+    
+    class Meta:
+        model = User
+
 class AuthenticationForm(forms.Form):
     """
     Base class for authenticating users. Extend this to get a form that accepts

@@ -181,4 +181,13 @@ True
 >>> PasswordChangeForm(user, {}).fields.keys()
 ['old_password', 'new_password1', 'new_password2']
 
+### UserChangeForm
+
+>>> from django.contrib.auth.forms import UserChangeForm
+>>> data = {'username': 'not valid'}
+>>> form = UserChangeForm(data, instance=user)
+>>> form.is_valid()
+False
+>>> form['username'].errors
+[u'This value must contain only letters, numbers and underscores.']
 """

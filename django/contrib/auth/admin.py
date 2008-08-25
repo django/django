@@ -7,7 +7,7 @@ from django.template import RequestContext
 from django.utils.html import escape
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext, ugettext_lazy as _
-from django.contrib.auth.forms import UserCreationForm, AdminPasswordChangeForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AdminPasswordChangeForm
 from django.contrib import admin
 
 class GroupAdmin(admin.ModelAdmin):
@@ -23,6 +23,7 @@ class UserAdmin(admin.ModelAdmin):
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
         (_('Groups'), {'fields': ('groups',)}),
     )
+    form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
