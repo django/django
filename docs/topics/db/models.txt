@@ -40,7 +40,7 @@ This example model defines a ``Person``, which has a ``first_name`` and
         first_name = models.CharField(max_length=30)
         last_name = models.CharField(max_length=30)
 
-``first_name`` and ``last_name`` are :term:`fields <field>` of the model. Each
+``first_name`` and ``last_name`` are :ref:`fields` of the model. Each
 field is specified as a class attribute, and each attribute maps to a database
 column.
 
@@ -147,7 +147,7 @@ ones:
         If ``True``, Django will store empty values as ``NULL`` in the database.
         Default is ``False``.
 
-    :attr:`~ieldblank`
+    :attr:`~Field.blank`
 
         If ``True``, the field is allowed to be blank. Default is ``False``.
     
@@ -187,7 +187,7 @@ ones:
         form. It's useful for documentation even if your object doesn't have an
         admin form.
 
-    :attr:`~Field.primary_key``
+    :attr:`~Field.primary_key`
 
         If ``True``, this field is the primary key for the model.
 
@@ -261,7 +261,7 @@ Relationships
 
 Clearly, the power of relational databases lies in relating tables to each
 other. Django offers ways to define the three most common types of database
-relationships: Many-to-one, many-to-many and one-to-one.
+relationships: many-to-one, many-to-many and one-to-one.
 
 Many-to-one relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -285,9 +285,9 @@ For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
         # ...
         
 You can also create :ref:`recursive relationships <recursive-relationships>` (an
-object with a many-to-one relationship to itself) and :ref:`relationsips to
+object with a many-to-one relationship to itself) and :ref:`relationships to
 models not yet defined <lazy-relationships>`; see :ref:`the model field
-reference <ref-foreignkey>` for details.`
+reference <ref-foreignkey>` for details.
 
 It's suggested, but not required, that the name of a
 :class:`~django.db.models.ForeignKey` field (``manufacturer`` in the example
@@ -302,7 +302,7 @@ whatever you want. For example::
 
     See the `Many-to-one relationship model example`_ for a full example.
 
-.. _Many-to-one relationship model example: http://www.djangoproject.com/models/many_to_one/
+.. _Many-to-one relationship model example: http://www.djangoproject.com/documentation/models/many_to_one/
 
 :class:`~django.db.models.ForeignKey` fields also accept a number of extra
 arguments which are explained in :ref:`the model field reference
@@ -335,7 +335,7 @@ As with :class:`~django.db.models.ForeignKey`, you can also create
 :ref:`recursive relationships <recursive-relationships>` (an object with a
 many-to-one relationship to itself) and :ref:`relationships to models not yet
 defined <lazy-relationships>`; see :ref:`the model field reference
-<ref-manytomany>` for details.`
+<ref-manytomany>` for details.
 
 It's suggested, but not required, that the name of a
 :class:`~django.db.models.ManyToManyField` (``toppings`` in the example above)
@@ -357,7 +357,7 @@ form would let users select the toppings.
 
     See the `Many-to-many relationship model example`_ for a full example.
 
-.. _Many-to-many relationship model example: http://www.djangoproject.com/models/many_to_many/
+.. _Many-to-many relationship model example: http://www.djangoproject.com/documentation/models/many_to_many/
 
 :class:`~django.db.models.ManyToManyField` fields also accept a number of extra
 arguments which are explained in :ref:`the model field reference
@@ -370,21 +370,21 @@ Extra fields on many-to-many relationships
 **New in Django development version** 
 
 When you're only dealing with simple many-to-many relationships such as
-mixing and matching pizzas and toppings, a standard ``ManyToManyField``
-is all you need. However, sometimes you may need to associate data with the
-relationship between two models. 
+mixing and matching pizzas and toppings, a standard :class:`~django.db.models.ManyToManyField` is all you need. However, sometimes
+you may need to associate data with the relationship between two models.
 
 For example, consider the case of an application tracking the musical groups
 which musicians belong to. There is a many-to-many relationship between a person
-and the groups of which they are a member, so you could use a ManyToManyField
-to represent this relationship. However, there is a lot of detail about the
-membership that you might want to collect, such as the date at which the person
-joined the group.
+and the groups of which they are a member, so you could use a
+:class:`~django.db.models.ManyToManyField` to represent this relationship.
+However, there is a lot of detail about the membership that you might want to 
+collect, such as the date at which the person joined the group.
 
 For these situations, Django allows you to specify the model that will be used
 to govern the many-to-many relationship. You can then put extra fields on the
 intermediate model. The intermediate model is associated with the
-``ManyToManyField`` using the ``through`` argument to point to the model
+:class:`~django.db.models.ManyToManyField` using the 
+:attr:`through <ManyToManyFields.through>` argument to point to the model
 that will act as an intermediary. For our musician example, the code would look
 something like this::
 
@@ -429,13 +429,13 @@ There are a few restrictions on the intermediate model:
     
     * When defining a many-to-many relationship from a model to
       itself, using an intermediary model, you *must* use
-      ``symmetrical=False`` (see the documentation for
-      ``ManyToManyField`` above).
+      :attr:`symmetrical=False <ManyToManyFields.symmetrical>` (see 
+      :ref:`the model field reference <manytomany-arguments>`).
 
-Now that you have set up your ``ManyToManyField`` to use your intermediary 
-model (Membership, in this case), you're ready to start creating some
-many-to-many relationships. You do this by creating instances of the
-intermediate model::
+Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
+your intermediary model (Membership, in this case), you're ready to start
+creating some many-to-many relationships. You do this by creating instances of
+the intermediate model::
     
     >>> ringo = Person.objects.create(name="Ringo Starr")
     >>> paul = Person.objects.create(name="Paul McCartney")
@@ -502,8 +502,9 @@ One-to-one relationships
 ------------------------
 
 One-to-one relationships are very similar to many-to-one relationships. If you
-define a ``OneToOneField`` on your model, instances of that model will have
-access to the related object via a simple attribute of the model.
+define a :class:`~django.db.models.OneToOneField` on your model, instances of
+that model will have access to the related object via a simple attribute of the
+model.
 
 For example::
 
@@ -515,8 +516,9 @@ For example::
     ed.entry # Returns the related Entry object.
 
 The difference comes in "reverse" queries. The related model in a one-to-one
-relationship also has access to a ``Manager`` object, but that ``Manager``
-represents a single object, rather than a collection of objects::
+relationship also has access to a :class:`~django.db.models.Manager` object, but
+that :class:`~django.db.models.Manager` represents a single object, rather than
+a collection of objects::
 
     e = Entry.objects.get(id=2)
     e.entrydetail # returns the related EntryDetail object
@@ -647,9 +649,9 @@ properties`_.
 .. _Read more about properties: http://www.python.org/download/releases/2.2/descrintro/#property
 
 The :ref:`model instance reference <ref-models-instances>` has a complete list
-of `methods automatically given to each model <model-instance-methods>`. You can
-override most of these -- see `overriding predefined model methods`_, below --
-but there are a couple that you'll almost always want to define:
+of :ref:`methods automatically given to each model <model-instance-methods>`.
+You can override most of these -- see `overriding predefined model methods`_,
+below -- but there are a couple that you'll almost always want to define:
 
     :meth:`~Model.__unicode__`
         A Python "magic method" that returns a unicode "representation" of any
