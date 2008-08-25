@@ -110,7 +110,9 @@ class Settings(object):
         for app in self.INSTALLED_APPS:
             if app.endswith('.*'):
                 appdir = os.path.dirname(__import__(app[:-2], {}, {}, ['']).__file__)
-                for d in os.listdir(appdir):
+                app_subdirs = os.listdir(appdir)
+                app_subdirs.sort()
+                for d in app_subdirs:
                     if d.isalpha() and os.path.isdir(os.path.join(appdir, d)):
                         new_installed_apps.append('%s.%s' % (app[:-2], d))
             else:
