@@ -568,6 +568,13 @@ class DateField(Field):
         else:
             return self.editable or self.auto_now or self.auto_now_add
 
+    def get_db_prep_lookup(self, lookup_type, value):
+        # For "__month" and "__day" lookups, convert the value to a string so
+        # the database backend always sees a consistent type.
+        if lookup_type in ('month', 'day'):
+            return [force_unicode(value)]
+        return super(DateField, self).get_db_prep_lookup(lookup_type, value)
+
     def get_db_prep_value(self, value):
         # Casts dates into the format expected by the backend
         return connection.ops.value_to_db_date(self.to_python(value))

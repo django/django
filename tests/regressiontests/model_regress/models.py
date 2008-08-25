@@ -57,18 +57,26 @@ u''
 >>> len(a4.article_text)
 5000
 
-# #659 regression test
+# Regression test for #659
 >>> import datetime
 >>> p = Party.objects.create(when = datetime.datetime(1999, 12, 31))
 >>> p = Party.objects.create(when = datetime.datetime(1998, 12, 31))
 >>> p = Party.objects.create(when = datetime.datetime(1999, 1, 1))
->>> [p.when for p in Party.objects.filter(when__month = 2)]
+>>> [p.when for p in Party.objects.filter(when__month=2)]
 []
->>> [p.when for p in Party.objects.filter(when__month = 1)]
+>>> [p.when for p in Party.objects.filter(when__month=1)]
 [datetime.date(1999, 1, 1)]
->>> [p.when for p in Party.objects.filter(when__month = 12)]
+>>> [p.when for p in Party.objects.filter(when__month=12)]
 [datetime.date(1999, 12, 31), datetime.date(1998, 12, 31)]
->>> [p.when for p in Party.objects.filter(when__year = 1998)]
+>>> [p.when for p in Party.objects.filter(when__year=1998)]
+[datetime.date(1998, 12, 31)]
+
+# Regression test for #8510
+>>> [p.when for p in Party.objects.filter(when__day='31')]
+[datetime.date(1999, 12, 31), datetime.date(1998, 12, 31)]
+>>> [p.when for p in Party.objects.filter(when__month='12')]
+[datetime.date(1999, 12, 31), datetime.date(1998, 12, 31)]
+>>> [p.when for p in Party.objects.filter(when__year='1998')]
 [datetime.date(1998, 12, 31)]
 
 # Check that get_next_by_FIELD and get_previous_by_FIELD don't crash when we
