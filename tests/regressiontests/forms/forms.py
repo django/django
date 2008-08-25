@@ -540,8 +540,9 @@ zero-based index.
 <li><label for="composers_id_1"><input type="checkbox" name="composers" value="P" id="composers_id_1" /> Paul McCartney</label></li>
 </ul>
 
-Data for a MultipleChoiceField should be a list. QueryDict and MultiValueDict
-conveniently work with this.
+Data for a MultipleChoiceField should be a list. QueryDict, MultiValueDict and
+MergeDict (when created as a merge of MultiValueDicts) conveniently work with
+this.
 >>> data = {'name': 'Yesterday', 'composers': ['J', 'P']}
 >>> f = SongForm(data)
 >>> f.errors
@@ -553,6 +554,11 @@ conveniently work with this.
 {}
 >>> from django.utils.datastructures import MultiValueDict
 >>> data = MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P']))
+>>> f = SongForm(data)
+>>> f.errors
+{}
+>>> from django.utils.datastructures import MergeDict
+>>> data = MergeDict(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])))
 >>> f = SongForm(data)
 >>> f.errors
 {}
