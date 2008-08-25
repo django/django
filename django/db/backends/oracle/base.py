@@ -354,7 +354,13 @@ class FormatStylePlaceholderCursor(Database.Cursor):
             query = query[:-1]
         query = smart_str(query, self.charset) % tuple(args)
         self._guess_input_sizes([params])
-        return Database.Cursor.execute(self, query, self._param_generator(params))
+        try:
+            return Database.Cursor.execute(self, query, self._param_generator(params))
+        except DatabaseError, e:
+            # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
+            if e.message.code == 1400 and type(e) != IntegrityError:
+                e = IntegrityError(e.message)
+            raise e
 
     def executemany(self, query, params=None):
         try:
@@ -371,7 +377,13 @@ class FormatStylePlaceholderCursor(Database.Cursor):
         query = smart_str(query, self.charset) % tuple(args)
         formatted = [self._format_params(i) for i in params]
         self._guess_input_sizes(formatted)
-        return Database.Cursor.executemany(self, query, [self._param_generator(p) for p in formatted])
+        try:
+            return Database.Cursor.executemany(self, query, [self._param_generator(p) for p in formatted])
+        except DatabaseError, e:
+            # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
+            if e.message.code == 1400 and type(e) != IntegrityError:
+                e = IntegrityError(e.message)
+            raise e
 
     def fetchone(self):
         row = Database.Cursor.fetchone(self)
