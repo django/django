@@ -286,7 +286,7 @@ class User(models.Model):
         """
         if not hasattr(self, '_profile_cache'):
             from django.conf import settings
-            if not settings.AUTH_PROFILE_MODULE:
+            if not getattr(settings, 'AUTH_PROFILE_MODULE', False):
                 raise SiteProfileNotAvailable
             try:
                 app_label, model_name = settings.AUTH_PROFILE_MODULE.split('.')
