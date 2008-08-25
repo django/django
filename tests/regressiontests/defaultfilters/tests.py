@@ -373,6 +373,15 @@ u'12'
 >>> timesince(datetime.datetime.now() - datetime.timedelta(1))
 u'1 day'
 
+>>> timesince(datetime.datetime(2005, 12, 29), datetime.datetime(2005, 12, 30))
+u'1 day'
+
+>>> timeuntil(datetime.datetime.now() + datetime.timedelta(1))
+u'1 day'
+
+>>> timeuntil(datetime.datetime(2005, 12, 30), datetime.datetime(2005, 12, 29))
+u'1 day'
+
 >>> default(u"val", u"default")
 u'val'
 

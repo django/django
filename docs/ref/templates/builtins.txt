@@ -1330,7 +1330,7 @@ Takes an optional argument that is a variable containing the date to use as
 the comparison point (without the argument, the comparison point is *now*).
 For example, if ``blog_date`` is a date instance representing midnight on 1
 June 2006, and ``comment_date`` is a date instance for 08:00 on 1 June 2006,
-then ``{{ comment_date|timesince:blog_date }}`` would return "8 hours".
+then ``{{ blog_date|timesince:comment_date }}`` would return "8 hours".
 
 Minutes is the smallest unit used, and "0 minutes" will be returned for any
 date that is in the future relative to the comparison point.
