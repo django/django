@@ -195,7 +195,6 @@ as its choices.
 <option value="CT">Connecticut</option>
 <option value="DE">Delaware</option>
 <option value="DC">District of Columbia</option>
-<option value="FM">Federated States of Micronesia</option>
 <option value="FL">Florida</option>
 <option value="GA">Georgia</option>
 <option value="GU">Guam</option>
@@ -208,7 +207,6 @@ as its choices.
 <option value="KY">Kentucky</option>
 <option value="LA">Louisiana</option>
 <option value="ME">Maine</option>
-<option value="MH">Marshall Islands</option>
 <option value="MD">Maryland</option>
 <option value="MA">Massachusetts</option>
 <option value="MI">Michigan</option>
@@ -228,7 +226,6 @@ as its choices.
 <option value="OH">Ohio</option>
 <option value="OK">Oklahoma</option>
 <option value="OR">Oregon</option>
-<option value="PW">Palau</option>
 <option value="PA">Pennsylvania</option>
 <option value="PR">Puerto Rico</option>
 <option value="RI">Rhode Island</option>
