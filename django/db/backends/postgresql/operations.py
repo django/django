@@ -36,10 +36,18 @@ class DatabaseOperations(BaseDatabaseOperations):
         return " DEFERRABLE INITIALLY DEFERRED"
 
     def lookup_cast(self, lookup_type):
-        if lookup_type in ('iexact', 'contains', 'icontains', 'startswith', 'istartswith',
-                             'endswith', 'iendswith'):
-            return "%s::text"
-        return "%s"
+        lookup = '%s'
+
+        # Cast text lookups to text to allow things like filter(x__contains=4)
+        if lookup_type in ('iexact', 'contains', 'icontains', 'startswith',
+                           'istartswith', 'endswith', 'iendswith'):
+            lookup = "%s::text"
+
+        # Use UPPER(x) for case-insensitive lookups; it's faster.
+        if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith'):
+            lookup = 'UPPER(%s)' % lookup
+
+        return lookup
 
     def field_cast_sql(self, db_type):
         if db_type == 'inet':

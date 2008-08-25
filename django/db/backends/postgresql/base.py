@@ -70,9 +70,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 class DatabaseWrapper(BaseDatabaseWrapper):
     operators = {
         'exact': '= %s',
-        'iexact': 'ILIKE %s',
+        'iexact': '= UPPER(%s)',
         'contains': 'LIKE %s',
-        'icontains': 'ILIKE %s',
+        'icontains': 'LIKE UPPER(%s)',
         'regex': '~ %s',
         'iregex': '~* %s',
         'gt': '> %s',
@@ -81,8 +81,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'lte': '<= %s',
         'startswith': 'LIKE %s',
         'endswith': 'LIKE %s',
-        'istartswith': 'ILIKE %s',
-        'iendswith': 'ILIKE %s',
+        'istartswith': 'LIKE UPPER(%s)',
+        'iendswith': 'LIKE UPPER(%s)',
     }
 
     def __init__(self, *args, **kwargs):
