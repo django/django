@@ -366,7 +366,7 @@ class AdminSite(object):
             context_instance=template.RequestContext(request)
         )
         
-    def app_index(self, request, app_label):
+    def app_index(self, request, app_label, extra_context=None):
         user = request.user
         has_module_perms = user.has_module_perms(app_label)
         app_dict = {}
@@ -399,10 +399,14 @@ class AdminSite(object):
                         raise http.Http404('The requested admin page does not exist.')
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(lambda x, y: cmp(x['name'], y['name']))
-        return render_to_response(self.app_index_template or 'admin/app_index.html', {
+        context = {
             'title': _('%s administration' % capfirst(app_label)),
             'app_list': [app_dict]
-        }, context_instance=template.RequestContext(request))
+        }
+        context.update(extra_context or {})
+        return render_to_response(self.app_index_template or 'admin/app_index.html', context,
+            context_instance=template.RequestContext(request)
+        )
 
 # This global object represents the default admin site, for the common case.
 # You can instantiate AdminSite in your own code to create a custom admin site.
