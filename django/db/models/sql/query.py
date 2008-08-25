@@ -913,7 +913,7 @@ class Query(object):
 
     def fill_related_selections(self, opts=None, root_alias=None, cur_depth=1,
             used=None, requested=None, restricted=None, nullable=None,
-            dupe_set=None):
+            dupe_set=None, avoid_set=None):
         """
         Fill in the information needed for a select_related query. The current
         depth is measured as the number of connections away from the root model
@@ -933,8 +933,9 @@ class Query(object):
             used = set()
         if dupe_set is None:
             dupe_set = set()
+        if avoid_set is None:
+            avoid_set = set()
         orig_dupe_set = dupe_set
-        orig_used = used
 
         # Setup for the case when only particular related fields should be
         # included in the related selection.
@@ -948,8 +949,12 @@ class Query(object):
         for f, model in opts.get_fields_with_model():
             if not select_related_descend(f, restricted, requested):
                 continue
+            # The "avoid" set is aliases we want to avoid just for this
+            # particular branch of the recursion. They aren't permanently
+            # forbidden from reuse in the related selection tables (which is
+            # what "used" specifies).
+            avoid = avoid_set.copy()
             dupe_set = orig_dupe_set.copy()
-            used = orig_used.copy()
             table = f.rel.to._meta.db_table
             if nullable or f.null:
                 promote = True
@@ -962,7 +967,7 @@ class Query(object):
                     lhs_col = int_opts.parents[int_model].column
                     dedupe = lhs_col in opts.duplicate_targets
                     if dedupe:
-                        used.update(self.dupe_avoidance.get(id(opts), lhs_col),
+                        avoid.update(self.dupe_avoidance.get(id(opts), lhs_col),
                                 ())
                         dupe_set.add((opts, lhs_col))
                     int_opts = int_model._meta
@@ -976,13 +981,13 @@ class Query(object):
 
             dedupe = f.column in opts.duplicate_targets
             if dupe_set or dedupe:
-                used.update(self.dupe_avoidance.get((id(opts), f.column), ()))
+                avoid.update(self.dupe_avoidance.get((id(opts), f.column), ()))
                 if dedupe:
                     dupe_set.add((opts, f.column))
 
             alias = self.join((alias, table, f.column,
-                    f.rel.get_related_field().column), exclusions=used,
-                    promote=promote)
+                    f.rel.get_related_field().column),
+                    exclusions=used.union(avoid), promote=promote)
             used.add(alias)
             self.related_select_cols.extend(self.get_default_columns(
                 start_alias=alias, opts=f.rel.to._meta, as_pairs=True)[0])
@@ -998,7 +1003,7 @@ class Query(object):
             for dupe_opts, dupe_col in dupe_set:
                 self.update_dupe_avoidance(dupe_opts, dupe_col, alias)
             self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
-                    used, next, restricted, new_nullable, dupe_set)
+                    used, next, restricted, new_nullable, dupe_set, avoid)
 
     def add_filter(self, filter_expr, connector=AND, negate=False, trim=False,
             can_reuse=None):
