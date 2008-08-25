@@ -219,21 +219,23 @@ Translations in :ref:`Django templates <topics-templates>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
 access to these tags, put ``{% load i18n %}`` toward the top of your template.
 
-The ``{% trans %}`` template tag translates a constant string or a variable
-content::
+The ``{% trans %}`` template tag translates either a constant string 
+(enclosed in single or double quotes) or variable content::
 
     <title>{% trans "This is the title." %}</title>
+    <title>{% trans myvar %}</title>
 
-If you only want to mark a value for translation, but translate it later from a
-variable, use the ``noop`` option::
+If the ``noop`` option is present, variable lookup still takes place but the
+translation is skipped. This is useful when "stubbing out" content that will
+require translation in the future::
 
-    <title>{% trans "value" noop %}</title>
+    <title>{% trans "myvar" noop %}</title>
 
-It's not possible to use template variables in ``{% trans %}`` -- only constant
-strings, in single or double quotes, are allowed. If your translations require
-variables (placeholders), use ``{% blocktrans %}``. Example::
+It's not possible to mix a template variable inside a string within
+``{% trans %}``. If your translations require strings with variables (placeholders),
+use ``{% blocktrans %}``. Example::
 
-    {% blocktrans %}This will have {{ value }} inside.{% endblocktrans %}
+    {% blocktrans %}This string will have {{ value }} inside.{% endblocktrans %}
 
 To translate a template expression -- say, using template filters -- you need
 to bind the expression to a local variable for use within the translation
