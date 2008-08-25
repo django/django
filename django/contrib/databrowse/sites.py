@@ -89,7 +89,7 @@ class DatabrowseSite(object):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model in self.registry:
-                raise AlreadyRegistered('The model %s is already registered' % model.__class__.__name__)
+                raise AlreadyRegistered('The model %s is already registered' % model.__name__)
             self.registry[model] = databrowse_class
 
     def unregister(self, model_or_iterable):
@@ -102,7 +102,7 @@ class DatabrowseSite(object):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model not in self.registry:
-                raise NotRegistered('The model %s is not registered' % model.__class__.__name__)
+                raise NotRegistered('The model %s is not registered' % model.__name__)
             del self.registry[model]
 
     def root(self, request, url):
