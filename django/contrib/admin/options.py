@@ -702,6 +702,7 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import LogEntry
         model = self.model
         opts = model._meta
+        app_label = opts.app_label
         action_list = LogEntry.objects.filter(
             object_id = object_id,
             content_type__id__exact = ContentType.objects.get_for_model(model).id
@@ -714,6 +715,7 @@ class ModelAdmin(BaseModelAdmin):
             'module_name': capfirst(force_unicode(opts.verbose_name_plural)),
             'object': obj,
             'root_path': self.admin_site.root_path,
+            'app_label': app_label,
         }
         context.update(extra_context or {})
         return render_to_response(self.object_history_template or [

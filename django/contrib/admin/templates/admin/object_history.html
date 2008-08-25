@@ -2,7 +2,13 @@
 {% load i18n %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs"><a href="../../../../">{% trans 'Home' %}</a> &rsaquo; <a href="../../">{{ module_name }}</a> &rsaquo; <a href="../">{{ object|truncatewords:"18" }}</a> &rsaquo; {% trans 'History' %}</div>
+<div class="breadcrumbs">
+    <a href="../../../../">{% trans 'Home' %}</a> &rsaquo; 
+    <a href="../../../">{{ app_label|capfirst|escape }}</a> &rsaquo; 
+    <a href="../../">{{ module_name }}</a> &rsaquo; 
+    <a href="../">{{ object|truncatewords:"18" }}</a> &rsaquo; 
+    {% trans 'History' %}
+</div>
 {% endblock %}
 
 {% block content %}
