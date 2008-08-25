@@ -24,10 +24,10 @@ COMMENT_MAX_LENGTH
 The maximum length of the comment field, in characters. Comments longer than
 this will be rejected. Defaults to 3000.
 
-.. setting:: COMENTS_APP
+.. setting:: COMMENTS_APP
 
-COMENTS_APP
------------
+COMMENTS_APP
+------------
 
 The app (i.e. entry in ``INSTALLED_APPS``) responsible for all "business logic."
 You can change this to provide custom comment models and forms, though this is
