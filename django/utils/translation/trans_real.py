@@ -381,7 +381,7 @@ def get_language_from_request(request):
 
         for lang, dirname in ((accept_lang, normalized),
                 (accept_lang.split('-')[0], normalized.split('_')[0])):
-            if lang not in supported:
+            if lang.lower() not in supported:
                 continue
             langfile = os.path.join(globalpath, dirname, 'LC_MESSAGES',
                     'django.mo')
