@@ -397,7 +397,7 @@ u'\ufffd'
 ########################
 >>> import pickle
 >>> q = QueryDict('a=b&c=d')
->>> q1 = pickle.loads(pickle.dumps(q))
+>>> q1 = pickle.loads(pickle.dumps(q, 2))
 >>> q == q1
 True
 
