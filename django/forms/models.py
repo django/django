@@ -96,7 +96,7 @@ def model_to_dict(instance, fields=None, exclude=None):
     the ``fields`` argument.
     """
     # avoid a circular import
-    from django.db.models.fields.related import ManyToManyField
+    from django.db.models.fields.related import ManyToManyField, OneToOneField
     opts = instance._meta
     data = {}
     for f in opts.fields + opts.many_to_many:
@@ -115,6 +115,8 @@ def model_to_dict(instance, fields=None, exclude=None):
             else:
                 # MultipleChoiceWidget needs a list of pks, not object instances.
                 data[f.name] = [obj.pk for obj in f.value_from_object(instance)]
+        elif isinstance(f, OneToOneField):
+            data[f.attname] = f.value_from_object(instance)
         else:
             data[f.name] = f.value_from_object(instance)
     return data
@@ -317,7 +319,7 @@ class BaseModelFormSet(BaseFormSet):
 
     def add_fields(self, form, index):
         """Add a hidden field for the object's primary key."""
-        if self.model._meta.has_auto_field:
+        if self.model._meta.pk.auto_created:
             self._pk_field_name = self.model._meta.pk.attname
             form.fields[self._pk_field_name] = IntegerField(required=False, widget=HiddenInput)
         super(BaseModelFormSet, self).add_fields(form, index)

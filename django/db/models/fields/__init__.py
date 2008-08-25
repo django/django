@@ -97,6 +97,7 @@ class Field(object):
         self.help_text = help_text
         self.db_column = db_column
         self.db_tablespace = db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
+        self.auto_created = auto_created
 
         # Set db_index to True if the field has a relationship and doesn't explicitly set db_index.
         self.db_index = db_index
