@@ -4,7 +4,7 @@ FORM_TESTS = """
 >>> from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 >>> from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 
-The user already exists.
+# The user already exists.
 
 >>> user = User.objects.create_user("jsmith", "jsmith@example.com", "test123")
 >>> data = {
@@ -18,7 +18,7 @@ False
 >>> form["username"].errors
 [u'A user with that username already exists.']
 
-The username contains invalid data.
+# The username contains invalid data.
 
 >>> data = {
 ...     'username': 'jsmith@example.com',
@@ -31,7 +31,7 @@ False
 >>> form["username"].errors
 [u'This value must contain only letters, numbers and underscores.']
 
-The verification password is incorrect.
+# The verification password is incorrect.
 
 >>> data = {
 ...     'username': 'jsmith2',
@@ -44,7 +44,25 @@ False
 >>> form["password2"].errors
 [u"The two password fields didn't match."]
 
-The success case.
+# One (or both) passwords weren't given
+
+>>> data = {'username': 'jsmith2'}
+>>> form = UserCreationForm(data)
+>>> form.is_valid()
+False
+>>> form['password1'].errors
+[u'This field is required.']
+>>> form['password2'].errors
+[u'This field is required.']
+
+>>> data['password2'] = 'test123'
+>>> form = UserCreationForm(data)
+>>> form.is_valid()
+False
+>>> form['password1'].errors
+[u'This field is required.']
+
+# The success case.
 
 >>> data = {
 ...     'username': 'jsmith2',
@@ -57,7 +75,7 @@ True
 >>> form.save()
 <User: jsmith2>
 
-The user submits an invalid username.
+# The user submits an invalid username.
 
 >>> data = {
 ...     'username': 'jsmith_does_not_exist',
@@ -70,7 +88,7 @@ False
 >>> form.non_field_errors()
 [u'Please enter a correct username and password. Note that both fields are case-sensitive.']
 
-The user is inactive.
+# The user is inactive.
 
 >>> data = {
 ...     'username': 'jsmith',
@@ -87,7 +105,7 @@ False
 >>> user.is_active = True
 >>> user.save()
 
-The success case
+# The success case
 
 >>> form = AuthenticationForm(None, data)
 >>> form.is_valid()
@@ -95,9 +113,9 @@ True
 >>> form.non_field_errors()
 []
 
-SetPasswordForm:
+### SetPasswordForm:
 
-The two new passwords do not match.
+# The two new passwords do not match.
 
 >>> data = {
 ...     'new_password1': 'abc123',
@@ -109,7 +127,7 @@ False
 >>> form["new_password2"].errors
 [u"The two password fields didn't match."]
 
-The success case.
+# The success case.
 
 >>> data = {
 ...     'new_password1': 'abc123',
@@ -119,7 +137,7 @@ The success case.
 >>> form.is_valid()
 True
 
-PasswordChangeForm:
+### PasswordChangeForm:
 
 The old password is incorrect.
 
@@ -134,7 +152,7 @@ False
 >>> form["old_password"].errors
 [u'Your old password was entered incorrectly. Please enter it again.']
 
-The two new passwords do not match.
+# The two new passwords do not match.
 
 >>> data = {
 ...     'old_password': 'test123',
@@ -147,7 +165,7 @@ False
 >>> form["new_password2"].errors
 [u"The two password fields didn't match."]
 
-The success case.
+# The success case.
 
 >>> data = {
 ...     'old_password': 'test123',
@@ -158,7 +176,7 @@ The success case.
 >>> form.is_valid()
 True
 
-Regression test - check the order of fields:
+# Regression test - check the order of fields:
 
 >>> PasswordChangeForm(user, {}).fields.keys()
 ['old_password', 'new_password1', 'new_password2']
