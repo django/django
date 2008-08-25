@@ -1,30 +1,24 @@
 from django.contrib import admin
-from django.contrib.comments.models import Comment, FreeComment
+from django.conf import settings
+from django.contrib.comments.models import Comment
+from django.utils.translation import ugettext_lazy as _
 
-
-class CommentAdmin(admin.ModelAdmin):
+class CommentsAdmin(admin.ModelAdmin):
     fieldsets = (
-        (None, {'fields': ('content_type', 'object_id', 'site')}),
-        ('Content', {'fields': ('user', 'headline', 'comment')}),
-        ('Ratings', {'fields': ('rating1', 'rating2', 'rating3', 'rating4', 'rating5', 'rating6', 'rating7', 'rating8', 'valid_rating')}),
-        ('Meta', {'fields': ('is_public', 'is_removed', 'ip_address')}),
-    )
-    list_display = ('user', 'submit_date', 'content_type', 'get_content_object')
-    list_filter = ('submit_date',)
-    date_hierarchy = 'submit_date'
-    search_fields = ('comment', 'user__username')
-    raw_id_fields = ('user',)
+        (None,
+           {'fields': ('content_type', 'object_pk', 'site')}
+        ),
+        (_('Content'),
+           {'fields': ('user', 'user_name', 'user_email', 'user_url', 'comment')}
+        ),
+        (_('Metadata'),
+           {'fields': ('submit_date', 'ip_address', 'is_public', 'is_removed')}
+        ),
+     )
 
-class FreeCommentAdmin(admin.ModelAdmin):
-    fieldsets = (
-        (None, {'fields': ('content_type', 'object_id', 'site')}),
-        ('Content', {'fields': ('person_name', 'comment')}),
-        ('Meta', {'fields': ('is_public', 'ip_address', 'approved')}),
-    )
-    list_display = ('person_name', 'submit_date', 'content_type', 'get_content_object')
-    list_filter = ('submit_date',)
+    list_display = ('name', 'content_type', 'object_pk', 'ip_address', 'is_public', 'is_removed')
+    list_filter = ('submit_date', 'site', 'is_public', 'is_removed')
     date_hierarchy = 'submit_date'
-    search_fields = ('comment', 'person_name')
+    search_fields = ('comment', 'user__username', 'user_name', 'user_email', 'user_url', 'ip_address')
 
-admin.site.register(Comment, CommentAdmin)
-admin.site.register(FreeComment, FreeCommentAdmin)
+admin.site.register(Comment, CommentsAdmin)

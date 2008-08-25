@@ -26,6 +26,7 @@ those packages have.
 
    admin
    auth
+   comments/index
    contenttypes
    csrf
    databrowse
@@ -58,7 +59,9 @@ See :ref:`topics-auth`.
 comments
 ========
 
-A simple yet flexible comments system. This is not yet documented.
+**New in Django development version.**
+
+A simple yet flexible comments system. See :ref:`ref-contrib-comments-index`.
 
 contenttypes
 ============

@@ -1,0 +1,75 @@
+{% extends "admin/change_list.html" %}
+{% load adminmedia %}
+
+{% block title %}Comment moderation queue{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <style type="text/css" media="screen">
+    p#nocomments { font-size: 200%; text-align: center; border: 1px #ccc dashed; padding: 4em; }
+    td.actions { width: 11em; }
+    td.actions form { display: inline; }
+    td.actions form input.submit { width: 5em; padding: 2px 4px; margin-right: 4px;}
+    td.actions form input.approve { background: green; color: white; }
+    td.actions form input.remove { background: red; color: white; }
+  </style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">Comment moderation queue</h1>
+{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+{% if empty %}
+  <p id="nocomments">No comments to moderate.</div>
+{% else %}
+<div id="content-main">
+  <div class="module" id="changelist">
+    <table cellspacing="0">
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Name</th>
+          <th>Comment</th>
+          <th>Email</th>
+          <th>URL</th>
+          <th>Authenticated?</th>
+          <th>IP Address</th>
+          <th class="sorted desc">Date posted</th>
+        </tr>
+    </thead>
+    <tbody>
+      {% for comment in comments %}
+        <tr class="{% cycle 'row1' 'row2' %}">
+          <td class="actions">
+            <form action="{% url comments-approve comment.pk %}" method="POST">
+              <input type="hidden" name="next" value="{% url comments-moderation-queue %}">
+              <input class="approve submit" type="submit" name="submit" value="Approve">
+            </form>
+            <form action="{% url comments-delete comment.pk %}" method="POST">
+              <input type="hidden" name="next" value="{% url comments-moderation-queue %}">
+              <input class="remove submit" type="submit" name="submit" value="Remove">
+            </form>
+          </td>
+          <td>{{ comment.name|escape }}</td>
+          <td>{{ comment.comment|truncatewords:"50"|escape }}</td>
+          <td>{{ comment.email|escape }}</td>
+          <td>{{ comment.url|escape }}</td>
+          <td>
+            <img
+              src="{% admin_media_prefix %}img/admin/icon-{% if comment.user %}yes{% else %}no{% endif %}.gif"
+              alt="{% if comment.user %}yes{% else %}no{% endif %}"
+            />
+          </td>
+          <td>{{ comment.ip_address|escape }}</td>
+          <td>{{ comment.submit_date|date:"F j, P" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

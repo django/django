@@ -607,6 +607,8 @@ along with all the fields available on that object.
 Taken together, the documentation pages should tell you every tag, filter,
 variable and object available to you in a given template.
 
+.. _loading-custom-template-libraries:
+
 Custom tag and filter libraries
 ===============================
 

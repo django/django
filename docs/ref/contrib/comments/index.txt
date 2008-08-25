@@ -1,0 +1,212 @@
+.. _ref-contrib-comments-index:
+
+===========================
+Django's comments framework
+===========================
+
+.. module:: django.contrib.comments
+   :synopsis: Django's comment framework
+
+Django includes a simple, yet customizable comments framework. The built-in
+comments framework can be used to attach comments to any model, so you can use
+it for comments on blog entries, photos, book chapters, or anything else.
+
+.. note::
+
+    If you used to use Django's older (undocumented) comments framework, you'll
+    need to upgrade. See the :ref:`upgrade guide <ref-contrib-comments-upgrade>`
+    for instructions.
+
+Quick start guide
+=================
+
+To get started using the ``comments`` app, follow these steps:
+
+    #. Install the comments framework by adding ``'django.contrib.comments'`` to    
+       :setting:`INSTALLED_APPS`.
+
+    #. Run ``manage.py syncdb`` so that Django will create the comment tables.
+
+    #. Add the comment app's URLs to your project's ``urls.py``:
+   
+       .. code-block:: python
+
+            urlpatterns = patterns('',
+                ...
+                (r'^comments/', include('django.contrib.comments.urls')),
+                ...
+            )
+
+    #. Use the `comment template tags`_ below to embed comments in your
+       templates.
+    
+You might also want to examine the :ref:`ref-contrib-comments-settings`
+    
+Comment template tags
+=====================
+
+You'll primarily interact with the comment system through a series of template
+tags that let you embed comments and generate forms for your users to post them.
+
+Like all custom template tag libraries, you'll need to :ref:`load the custom
+tags <loading-custom-template-libraries>` before you can use them::
+
+    {% load comments %}
+
+Once loaded you can use the template tags below.
+
+Specifying which object comments are attached to
+------------------------------------------------
+
+Django's comments are all "attached" to some parent object. This can be any
+instance of a Django model. Each of the tags below gives you a couple of
+different ways you can specify which object to attach to:
+
+    #. Refer to the object directly -- the more common method. Most of the
+       time, you'll have some object in the template's context you want
+       to attach the comment to; you can simply use that object.
+       
+       For example, in a blog entry page that has a variable named ``entry``, 
+       you could use the following to load the number of comments::
+       
+            {% get_comment_count for entry as comment_count %}.
+            
+    #. Refer to the object by content-type and object id. You'd use this method
+       if you, for some reason, don't actually have direct access to the object.
+       
+       Following the above example, if you knew the object ID was ``14`` but
+       didn't have access to the actual object, you could do something like::
+       
+            {% get_comment_count for blog.entry 14 as comment_count %}
+            
+       In the above, ``blog.entry`` is the app label and (lower-cased) model
+       name of the model class.
+
+.. templatetag:: get_comment_list
+
+Displaying comments
+-------------------
+
+To get a the list of comments for some object, use :ttag:`get_comment_list`::
+
+    {% get_comment_list for [object] as [varname] %}
+
+For example::
+
+    {% get_comment_list for event as comment_list %}
+    {% for comment in comment_list %}
+        ...
+    {% endfor %}
+
+.. templatetag:: get_comment_count
+
+Counting comments
+-----------------
+
+To count comments attached to an object, use :ttag:`get_comment_count`::
+
+    {% get_comment_count for [object] as [varname]  %}
+
+For example::
+
+        {% get_comment_count for event as comment_count %}
+        
+        <p>This event has {{ comment_count }} comments.</p>
+        
+
+Displaying the comment post form
+--------------------------------
+
+To show the form that users will use to post a comment, you can use
+:ttag:`render_comment_form` or :ttag:`get_comment_form`
+
+.. templatetag:: render_comment_form
+
+Quickly rendering the comment form
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The easiest way to display a comment form is by using
+:ttag:`render_comment_form`::
+
+    {% render_comment_form for [object] %}
+
+For example::
+
+    {% render_comment_form for event %}
+
+This will render comments using a template named ``comments/form.html``, a
+default version of which is included with Django.
+
+.. templatetag:: get_comment_form
+
+Rendering a custom comment form
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want more control over the look and feel of the comment form, you use use
+:ttag:`get_comment_form` to get a :ref:`form object <topics-forms-index>` that
+you can use in the template::
+
+    {% get_comment_form for [object] %}
+    
+A complete form might look like::
+
+    {% get_comment_form for event %}
+    <form action="{% comment_form_target %}" method="POST">
+      {{ form }}
+      <p class="submit">
+        <input type="submit" name="submit" class="submit-post" value="Preview">
+      </p>
+    </form>
+    
+Be sure to read the `notes on the comment form`_, below, for some special
+considerations you'll need to make if you're using this aproach.
+
+.. templatetag:: comment_form_target
+
+Getting the comment form target
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You may have noticed that the above example uses another template tag --
+:ttag:`comment_form_target` -- to actually get the ``action`` attribute of the
+form. This will always return the correct URL that comments should be posted to;
+you'll always want to use it like above::
+
+    <form action="{% comment_form_target %}" method="POST">
+
+Notes on the comment form
+-------------------------
+
+The form used by the comment system has a few important anti-spam attributes you
+should know about:
+
+    * It contains a number of hidden fields that contain timestamps, information
+      about the object the comment should be attached to, and a "security hash"
+      used to validate this information. If someone tampers with this data -- 
+      something comment spammers will try -- the comment submission will fail.
+      
+      If you're rendering a custom comment form, you'll need to make sure to
+      pass these values through unchanged.
+      
+    * The timestamp is used to ensure that "reply attacks" can't continue very
+      long. Users who wait too long between requesting the form and posting a
+      comment will have their submissions refused.
+      
+    * The comment form includes a "honeypot_" field. It's a trap: if any data is
+      entered in that field, the comment will be considered spam (spammers often
+      automatically fill in all fields in an attempt to make valid submissions).
+      
+      The default form hides this field with a piece of CSS and further labels
+      it with a warning field; if you use the comment form with a custom
+      template you should be sure to do the same.
+    
+.. _honeypot: http://en.wikipedia.org/wiki/Honeypot_(computing)
+
+More information
+================
+
+.. toctree::
+   :maxdepth: 1
+
+   settings
+   upgrade
+

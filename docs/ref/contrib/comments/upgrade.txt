@@ -1,0 +1,63 @@
+.. _ref-contrib-comments-upgrade:
+
+===============================================
+Upgrading from Django's previous comment system
+===============================================
+
+Prior versions of Django included an outdated, undocumented comment system. Users who reverse-engineered this framework will need to upgrade to use the
+new comment system; this guide explains how.
+
+The main changes from the old system are:
+
+    * This new system is documented.
+    
+    * It uses modern Django features like :ref:`forms <topics-forms-index>` and
+      :ref:`modelforms <topics-forms-modelforms>`.
+
+    * It has a single ``Comment`` model instead of separate ``FreeComment`` and
+      ``Comment`` models.
+
+    * Comments have "email" and "URL" fields.
+
+    * No ratings, photos and karma. This should only effect World Online.
+
+    * The ``{% comment_form %}`` tag no longer exists. Instead, there's now two
+      functions: ``{% get_comment_form %}``, which returns a form for posting a
+      new comment, and ``{% render_comment_form %}``, which renders said form
+      using the ``comments/form.html`` template.
+
+Upgrading data
+--------------
+
+The data models have changed, as have the table names. To transfer your data into the new system, you'll need to directly run the following SQL:
+
+.. code-block:: sql
+
+    BEGIN;
+
+    INSERT INTO django_comments 
+        (content_type_id, object_pk, site_id, user_name, user_email, user_url,
+        comment, submit_date, ip_address, is_public, is_removed)
+    SELECT
+        content_type_id, object_id, site_id, person_name, '', '', comment,
+        submit_date, ip_address, is_public, approved
+    FROM comments_freecomment;
+
+    INSERT INTO django_comments 
+        (content_type_id, object_pk, site_id, user_id, comment, submit_date,
+        ip_address, is_public, is_removed) 
+    SELECT 
+        content_type_id, object_id, site_id, user_id, comment, submit_date,
+        ip_address, is_public, is_removed
+    FROM comments_comment;
+
+    UPDATE django_comments SET user_name = (
+        SELECT username FROM auth_user 
+        WHERE django_comments.user_id = auth_user.id
+    );
+    UPDATE django_comments SET user_email = (
+        SELECT email FROM auth_user 
+        WHERE django_comments.user_id = auth_user.id
+    );
+    
+    COMMIT;

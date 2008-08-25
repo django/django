@@ -1,332 +1,251 @@
-from django.contrib.comments.models import Comment, FreeComment
-from django.contrib.comments.models import PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
-from django.contrib.comments.models import MIN_PHOTO_DIMENSION, MAX_PHOTO_DIMENSION
 from django import template
-from django.template import loader
-from django.core.exceptions import ObjectDoesNotExist
+from django.template.loader import render_to_string
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import smart_str
-import re
+from django.contrib import comments
 
 register = template.Library()
 
-COMMENT_FORM = 'comments/form.html'
-FREE_COMMENT_FORM = 'comments/freeform.html'
+class BaseCommentNode(template.Node):
+    """
+    Base helper class (abstract) for handling the get_comment_* template tags.
+    Looks a bit strange, but the subclasses below should make this a bit more
+    obvious.
+    """
 
-class CommentFormNode(template.Node):
-    def __init__(self, content_type, obj_id_lookup_var, obj_id, free,
-        photos_optional=False, photos_required=False, photo_options='',
-        ratings_optional=False, ratings_required=False, rating_options='',
-        is_public=True):
-        self.content_type = content_type
-        if obj_id_lookup_var is not None:
-            obj_id_lookup_var = template.Variable(obj_id_lookup_var)
-        self.obj_id_lookup_var, self.obj_id, self.free = obj_id_lookup_var, obj_id, free
-        self.photos_optional, self.photos_required = photos_optional, photos_required
-        self.ratings_optional, self.ratings_required = ratings_optional, ratings_required
-        self.photo_options, self.rating_options = photo_options, rating_options
-        self.is_public = is_public
+    #@classmethod
+    def handle_token(cls, parser, token):
+        """Class method to parse get_comment_list/count/form and return a Node."""
+        tokens = token.contents.split()
+        if tokens[1] != 'for':
+            raise template.TemplateSyntaxError("Second argument in %r tag must be 'for'" % tokens[0])
+
+        # {% get_whatever for obj as varname %}
+        if len(tokens) == 5:
+            if tokens[3] != 'as':
+                raise template.TemplateSyntaxError("Third argument in %r must be 'as'" % tokens[0])
+            return cls(
+                object_expr = parser.compile_filter(tokens[2]),
+                as_varname = tokens[4],
+            )
+
+        # {% get_whatever for app.model pk as varname %}
+        elif len(tokens) == 6:
+            if tokens[4] != 'as':
+                raise template.TemplateSyntaxError("Fourth argument in %r must be 'as'" % tokens[0])
+            return cls(
+                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
+                object_pk_expr = parser.compile_filter(tokens[3]),
+                as_varname = tokens[5]
+            )
+
+        else:
+            raise template.TemplateSyntaxError("%r tag requires 4 or 5 arguments" % tokens[0])
+
+    handle_token = classmethod(handle_token)
+
+    #@staticmethod
+    def lookup_content_type(token, tagname):
+        try:
+            app, model = token.split('.')
+            return ContentType.objects.get(app_label=app, model=model)
+        except ValueError:
+            raise template.TemplateSyntaxError("Third argument in %r must be in the format 'app.model'" % tagname)
+        except ContentType.DoesNotExist:
+            raise template.TemplateSyntaxError("%r tag has non-existant content-type: '%s.%s'" % (tagname, app, model))
+    lookup_content_type = staticmethod(lookup_content_type)
+
+    def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, as_varname=None, comment=None):
+        if ctype is None and object_expr is None:
+            raise template.TemplateSyntaxError("Comment nodes must be given either a literal object or a ctype and object pk.")
+        self.comment_model = comments.get_model()
+        self.as_varname = as_varname
+        self.ctype = ctype
+        self.object_pk_expr = object_pk_expr
+        self.object_expr = object_expr
+        self.comment = comment
 
     def render(self, context):
-        from django.conf import settings
-        from django.utils.text import normalize_newlines
-        import base64
-        context.push()
-        if self.obj_id_lookup_var is not None:
-            try:
-                self.obj_id = self.obj_id_lookup_var.resolve(context)
-            except template.VariableDoesNotExist:
-                return ''
-            # Validate that this object ID is valid for this content-type.
-            # We only have to do this validation if obj_id_lookup_var is provided,
-            # because do_comment_form() validates hard-coded object IDs.
-            try:
-                self.content_type.get_object_for_this_type(pk=self.obj_id)
-            except ObjectDoesNotExist:
-                context['display_form'] = False
-            else:
-                context['display_form'] = True
-        else:
-            context['display_form'] = True
-        context['target'] = '%s:%s' % (self.content_type.id, self.obj_id)
-        options = []
-        for var, abbr in (('photos_required', PHOTOS_REQUIRED),
-                          ('photos_optional', PHOTOS_OPTIONAL),
-                          ('ratings_required', RATINGS_REQUIRED),
-                          ('ratings_optional', RATINGS_OPTIONAL),
-                          ('is_public', IS_PUBLIC)):
-            context[var] = getattr(self, var)
-            if getattr(self, var):
-                options.append(abbr)
-        context['options'] = ','.join(options)
-        if self.free:
-            context['hash'] = Comment.objects.get_security_hash(context['options'], '', '', context['target'])
-            default_form = loader.get_template(FREE_COMMENT_FORM)
-        else:
-            context['photo_options'] = self.photo_options
-            context['rating_options'] = normalize_newlines(base64.encodestring(self.rating_options).strip())
-            if self.rating_options:
-                context['rating_range'], context['rating_choices'] = Comment.objects.get_rating_options(self.rating_options)
-            context['hash'] = Comment.objects.get_security_hash(context['options'], context['photo_options'], context['rating_options'], context['target'])
-            context['logout_url'] = settings.LOGOUT_URL
-            default_form = loader.get_template(COMMENT_FORM)
-        output = default_form.render(context)
-        context.pop()
-        return output
-
-class CommentCountNode(template.Node):
-    def __init__(self, package, module, context_var_name, obj_id, var_name, free):
-        self.package, self.module = package, module
-        if context_var_name is not None:
-            context_var_name = template.Variable(context_var_name)
-        self.context_var_name, self.obj_id = context_var_name, obj_id
-        self.var_name, self.free = var_name, free
-
-    def render(self, context):
-        from django.conf import settings
-        manager = self.free and FreeComment.objects or Comment.objects
-        if self.context_var_name is not None:
-            self.obj_id = self.context_var_name.resolve(context)
-        comment_count = manager.filter(object_id__exact=self.obj_id,
-            content_type__app_label__exact=self.package,
-            content_type__model__exact=self.module, site__id__exact=settings.SITE_ID).count()
-        context[self.var_name] = comment_count
+        qs = self.get_query_set(context)
+        context[self.as_varname] = self.get_context_value_from_queryset(context, qs)
         return ''
 
-class CommentListNode(template.Node):
-    def __init__(self, package, module, context_var_name, obj_id, var_name, free, ordering, extra_kwargs=None):
-        self.package, self.module = package, module
-        if context_var_name is not None:
-            context_var_name = template.Variable(context_var_name)
-        self.context_var_name, self.obj_id = context_var_name, obj_id
-        self.var_name, self.free = var_name, free
-        self.ordering = ordering
-        self.extra_kwargs = extra_kwargs or {}
+    def get_query_set(self, context):
+        ctype, object_pk = self.get_target_ctype_pk(context)
+        if not object_pk:
+            return self.comment_model.objects.none()
+
+        qs = self.comment_model.objects.filter(
+            content_type = ctype,
+            object_pk    = object_pk,
+            site__pk     = settings.SITE_ID,
+            is_public    = True,
+        )
+        if settings.COMMENTS_HIDE_REMOVED:
+            qs = qs.filter(is_removed=False)
+
+        return qs
+
+    def get_target_ctype_pk(self, context):
+        if self.object_expr:
+            try:
+                obj = self.object_expr.resolve(context)
+            except template.VariableDoesNotExist:
+                return None, None
+            return ContentType.objects.get_for_model(obj), obj.pk
+        else:
+            return self.ctype, self.object_pk_expr.resolve(context, ignore_failures=True)
+
+    def get_context_value_from_queryset(self, context, qs):
+        """Subclasses should override this."""
+        raise NotImplementedError
+
+class CommentListNode(BaseCommentNode):
+    """Insert a list of comments into the context."""
+    def get_context_value_from_queryset(self, context, qs):
+        return list(qs)
+
+class CommentCountNode(BaseCommentNode):
+    """Insert a count of comments into the context."""
+    def get_context_value_from_queryset(self, context, qs):
+        return qs.count()
+
+class CommentFormNode(BaseCommentNode):
+    """Insert a form for the comment model into the context."""
+
+    def get_form(self, context):
+        ctype, object_pk = self.get_target_ctype_pk(context)
+        if object_pk:
+            return comments.get_form()(ctype.get_object_for_this_type(pk=object_pk))
+        else:
+            return None
 
     def render(self, context):
-        from django.conf import settings
-        get_list_function = self.free and FreeComment.objects.filter or Comment.objects.get_list_with_karma
-        if self.context_var_name is not None:
-            try:
-                self.obj_id = self.context_var_name.resolve(context)
-            except template.VariableDoesNotExist:
-                return ''
-        kwargs = {
-            'object_id__exact': self.obj_id,
-            'content_type__app_label__exact': self.package,
-            'content_type__model__exact': self.module,
-            'site__id__exact': settings.SITE_ID,
-        }
-        kwargs.update(self.extra_kwargs)
-        comment_list = get_list_function(**kwargs).order_by(self.ordering + 'submit_date').select_related()
-        if not self.free and settings.COMMENTS_BANNED_USERS_GROUP:
-            comment_list = comment_list.extra(select={'is_hidden': 'user_id IN (SELECT user_id FROM auth_user_groups WHERE group_id = %s)' % settings.COMMENTS_BANNED_USERS_GROUP})
-
-        if not self.free:
-            if 'user' in context and context['user'].is_authenticated():
-                user_id = context['user'].id
-                context['user_can_moderate_comments'] = Comment.objects.user_is_moderator(context['user'])
-            else:
-                user_id = None
-                context['user_can_moderate_comments'] = False
-            # Only display comments by banned users to those users themselves.
-            if settings.COMMENTS_BANNED_USERS_GROUP:
-                comment_list = [c for c in comment_list if not c.is_hidden or (user_id == c.user_id)]
-
-        context[self.var_name] = comment_list
+        context[self.as_varname] = self.get_form(context)
         return ''
 
-class DoCommentForm:
+class RenderCommentFormNode(CommentFormNode):
+    """Render the comment form directly"""
+
+    #@classmethod
+    def handle_token(cls, parser, token):
+        """Class method to parse render_comment_form and return a Node."""
+        tokens = token.contents.split()
+        if tokens[1] != 'for':
+            raise template.TemplateSyntaxError("Second argument in %r tag must be 'for'" % tokens[0])
+
+        # {% render_comment_form for obj %}
+        if len(tokens) == 3:
+            return cls(object_expr=parser.compile_filter(tokens[2]))
+
+        # {% render_comment_form for app.models pk %}
+        elif len(tokens) == 4:
+            return cls(
+                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
+                object_pk_expr = parser.compile_filter(tokens[3])
+            )
+    handle_token = classmethod(handle_token)
+
+    def render(self, context):
+        ctype, object_pk = self.get_target_ctype_pk(context)
+        if object_pk:
+            template_search_list = [
+                "comments/%s/%s/form.html" % (ctype.app_label, ctype.model),
+                "comments/%s/form.html" % ctype.app_label,
+                "comments/form.html"
+            ]
+            context.push()
+            formstr = render_to_string(template_search_list, {"form" : self.get_form(context)}, context)
+            context.pop()
+            return formstr
+        else:
+            return ''
+
+# We could just register each classmethod directly, but then we'd lose out on
+# the automagic docstrings-into-admin-docs tricks. So each node gets a cute
+# wrapper function that just exists to hold the docstring.
+
+#@register.tag
+def get_comment_count(parser, token):
     """
-    Displays a comment form for the given params.
+    Gets the comment count for the given params and populates the template
+    context with a variable containing that value, whose name is defined by the
+    'as' clause.
 
     Syntax::
 
-        {% comment_form for [pkg].[py_module_name] [context_var_containing_obj_id] with [list of options] %}
+        {% get_comment_count for [object] as [varname]  %}
+        {% get_comment_count for [app].[model] [object_id] as [varname]  %}
 
     Example usage::
 
-        {% comment_form for lcom.eventtimes event.id with is_public yes photos_optional thumbs,200,400 ratings_optional scale:1-5|first_option|second_option %}
+        {% get_comment_count for event as comment_count %}
+        {% get_comment_count for calendar.event event.id as comment_count %}
+        {% get_comment_count for calendar.event 17 as comment_count %}
 
-    ``[context_var_containing_obj_id]`` can be a hard-coded integer or a variable containing the ID.
     """
-    def __init__(self, free):
-        self.free = free
+    return CommentCountNode.handle_token(parser, token)
 
-    def __call__(self, parser, token):
-        tokens = token.contents.split()
-        if len(tokens) < 4:
-            raise template.TemplateSyntaxError, "%r tag requires at least 3 arguments" % tokens[0]
-        if tokens[1] != 'for':
-            raise template.TemplateSyntaxError, "Second argument in %r tag must be 'for'" % tokens[0]
-        try:
-            package, module = tokens[2].split('.')
-        except ValueError: # unpack list of wrong size
-            raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
-        try:
-            content_type = ContentType.objects.get(app_label__exact=package, model__exact=module)
-        except ContentType.DoesNotExist:
-            raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
-        obj_id_lookup_var, obj_id = None, None
-        if tokens[3].isdigit():
-            obj_id = tokens[3]
-            try: # ensure the object ID is valid
-                content_type.get_object_for_this_type(pk=obj_id)
-            except ObjectDoesNotExist:
-                raise template.TemplateSyntaxError, "%r tag refers to %s object with ID %s, which doesn't exist" % (tokens[0], content_type.name, obj_id)
-        else:
-            obj_id_lookup_var = tokens[3]
-        kwargs = {}
-        if len(tokens) > 4:
-            if tokens[4] != 'with':
-                raise template.TemplateSyntaxError, "Fourth argument in %r tag must be 'with'" % tokens[0]
-            for option, args in zip(tokens[5::2], tokens[6::2]):
-                option = smart_str(option)
-                if option in ('photos_optional', 'photos_required') and not self.free:
-                    # VALIDATION ##############################################
-                    option_list = args.split(',')
-                    if len(option_list) % 3 != 0:
-                        raise template.TemplateSyntaxError, "Incorrect number of comma-separated arguments to %r tag" % tokens[0]
-                    for opt in option_list[::3]:
-                        if not opt.isalnum():
-                            raise template.TemplateSyntaxError, "Invalid photo directory name in %r tag: '%s'" % (tokens[0], opt)
-                    for opt in option_list[1::3] + option_list[2::3]:
-                        if not opt.isdigit() or not (MIN_PHOTO_DIMENSION <= int(opt) <= MAX_PHOTO_DIMENSION):
-                            raise template.TemplateSyntaxError, "Invalid photo dimension in %r tag: '%s'. Only values between %s and %s are allowed." % (tokens[0], opt, MIN_PHOTO_DIMENSION, MAX_PHOTO_DIMENSION)
-                    # VALIDATION ENDS #########################################
-                    kwargs[option] = True
-                    kwargs['photo_options'] = args
-                elif option in ('ratings_optional', 'ratings_required') and not self.free:
-                    # VALIDATION ##############################################
-                    if 2 < len(args.split('|')) > 9:
-                        raise template.TemplateSyntaxError, "Incorrect number of '%s' options in %r tag. Use between 2 and 8." % (option, tokens[0])
-                    if re.match('^scale:\d+\-\d+\:$', args.split('|')[0]):
-                        raise template.TemplateSyntaxError, "Invalid 'scale' in %r tag's '%s' options" % (tokens[0], option)
-                    # VALIDATION ENDS #########################################
-                    kwargs[option] = True
-                    kwargs['rating_options'] = args
-                elif option in ('is_public'):
-                    kwargs[option] = (args == 'true')
-                else:
-                    raise template.TemplateSyntaxError, "%r tag got invalid parameter '%s'" % (tokens[0], option)
-        return CommentFormNode(content_type, obj_id_lookup_var, obj_id, self.free, **kwargs)
-
-class DoCommentCount:
+#@register.tag
+def get_comment_list(parser, token):
     """
-    Gets comment count for the given params and populates the template context
-    with a variable containing that value, whose name is defined by the 'as'
-    clause.
+    Gets the list of comments for the given params and populates the template
+    context with a variable containing that value, whose name is defined by the
+    'as' clause.
 
     Syntax::
 
-        {% get_comment_count for [pkg].[py_module_name] [context_var_containing_obj_id] as [varname]  %}
+        {% get_comment_list for [object] as [varname]  %}
+        {% get_comment_list for [app].[model] [object_id] as [varname]  %}
 
     Example usage::
 
-        {% get_comment_count for lcom.eventtimes event.id as comment_count %}
+        {% get_comment_list for event as comment_list %}
+        {% for comment in comment_list %}
+            ...
+        {% endfor %}
 
-    Note: ``[context_var_containing_obj_id]`` can also be a hard-coded integer, like this::
-
-        {% get_comment_count for lcom.eventtimes 23 as comment_count %}
     """
-    def __init__(self, free):
-        self.free = free
+    return CommentListNode.handle_token(parser, token)
 
-    def __call__(self, parser, token):
-        tokens = token.contents.split()
-        # Now tokens is a list like this:
-        # ['get_comment_list', 'for', 'lcom.eventtimes', 'event.id', 'as', 'comment_list']
-        if len(tokens) != 6:
-            raise template.TemplateSyntaxError, "%r tag requires 5 arguments" % tokens[0]
-        if tokens[1] != 'for':
-            raise template.TemplateSyntaxError, "Second argument in %r tag must be 'for'" % tokens[0]
-        try:
-            package, module = tokens[2].split('.')
-        except ValueError: # unpack list of wrong size
-            raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
-        try:
-            content_type = ContentType.objects.get(app_label__exact=package, model__exact=module)
-        except ContentType.DoesNotExist:
-            raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
-        var_name, obj_id = None, None
-        if tokens[3].isdigit():
-            obj_id = tokens[3]
-            try: # ensure the object ID is valid
-                content_type.get_object_for_this_type(pk=obj_id)
-            except ObjectDoesNotExist:
-                raise template.TemplateSyntaxError, "%r tag refers to %s object with ID %s, which doesn't exist" % (tokens[0], content_type.name, obj_id)
-        else:
-            var_name = tokens[3]
-        if tokens[4] != 'as':
-            raise template.TemplateSyntaxError, "Fourth argument in %r must be 'as'" % tokens[0]
-        return CommentCountNode(package, module, var_name, obj_id, tokens[5], self.free)
-
-class DoGetCommentList:
+#@register.tag
+def get_comment_form(parser, token):
     """
-    Gets comments for the given params and populates the template context with a
-    special comment_package variable, whose name is defined by the ``as``
-    clause.
+    Get a (new) form object to post a new comment.
 
     Syntax::
 
-        {% get_comment_list for [pkg].[py_module_name] [context_var_containing_obj_id] as [varname] (reversed) %}
-
-    Example usage::
-
-        {% get_comment_list for lcom.eventtimes event.id as comment_list %}
-
-    Note: ``[context_var_containing_obj_id]`` can also be a hard-coded integer, like this::
-
-        {% get_comment_list for lcom.eventtimes 23 as comment_list %}
-
-    To get a list of comments in reverse order -- that is, most recent first --
-    pass ``reversed`` as the last param::
-
-        {% get_comment_list for lcom.eventtimes event.id as comment_list reversed %}
+        {% get_comment_form for [object] as [varname] %}
+        {% get_comment_form for [app].[model] [object_id] as [varname] %}
     """
-    def __init__(self, free):
-        self.free = free
+    return CommentFormNode.handle_token(parser, token)
 
-    def __call__(self, parser, token):
-        tokens = token.contents.split()
-        # Now tokens is a list like this:
-        # ['get_comment_list', 'for', 'lcom.eventtimes', 'event.id', 'as', 'comment_list']
-        if not len(tokens) in (6, 7):
-            raise template.TemplateSyntaxError, "%r tag requires 5 or 6 arguments" % tokens[0]
-        if tokens[1] != 'for':
-            raise template.TemplateSyntaxError, "Second argument in %r tag must be 'for'" % tokens[0]
-        try:
-            package, module = tokens[2].split('.')
-        except ValueError: # unpack list of wrong size
-            raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
-        try:
-            content_type = ContentType.objects.get(app_label__exact=package,model__exact=module)
-        except ContentType.DoesNotExist:
-            raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
-        var_name, obj_id = None, None
-        if tokens[3].isdigit():
-            obj_id = tokens[3]
-            try: # ensure the object ID is valid
-                content_type.get_object_for_this_type(pk=obj_id)
-            except ObjectDoesNotExist:
-                raise template.TemplateSyntaxError, "%r tag refers to %s object with ID %s, which doesn't exist" % (tokens[0], content_type.name, obj_id)
-        else:
-            var_name = tokens[3]
-        if tokens[4] != 'as':
-            raise template.TemplateSyntaxError, "Fourth argument in %r must be 'as'" % tokens[0]
-        if len(tokens) == 7:
-            if tokens[6] != 'reversed':
-                raise template.TemplateSyntaxError, "Final argument in %r must be 'reversed' if given" % tokens[0]
-            ordering = "-"
-        else:
-            ordering = ""
-        return CommentListNode(package, module, var_name, obj_id, tokens[5], self.free, ordering)
+#@register.tag
+def render_comment_form(parser, token):
+    """
+    Render the comment form (as returned by ``{% render_comment_form %}``) through
+    the ``comments/form.html`` template.
 
-# registration comments
-register.tag('get_comment_list', DoGetCommentList(False))
-register.tag('comment_form', DoCommentForm(False))
-register.tag('get_comment_count', DoCommentCount(False))
-# free comments
-register.tag('get_free_comment_list', DoGetCommentList(True))
-register.tag('free_comment_form', DoCommentForm(True))
-register.tag('get_free_comment_count', DoCommentCount(True))
+    Syntax::
+
+        {% render_comment_form for [object] %}
+        {% render_comment_form for [app].[model] [object_id] %}
+    """
+    return RenderCommentFormNode.handle_token(parser, token)
+
+#@register.simple_tag
+def comment_form_target():
+    """
+    Get the target URL for the comment form.
+
+    Example::
+
+        <form action="{% comment_form_target %}" method="POST">
+    """
+    return comments.get_form_target()
+
+register.tag(get_comment_count)
+register.tag(get_comment_list)
+register.tag(get_comment_form)
+register.tag(render_comment_form)
+register.simple_tag(comment_form_target)

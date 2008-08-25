@@ -1,0 +1,14 @@
+{% extends "comments/base.html" %}
+
+{% block title %}Remove a comment{% endblock %}
+
+{% block content %}
+  <h1>Really remove this comment?</h1>
+  <blockquote>{{ comment|escape|linebreaks }}</blockquote>
+  <form action="." method="POST">
+    <input type="hidden" name="next" value="{{ next|escape }}" id="next">
+    <p class="submit">
+      <input type="submit" name="submit" value="Remove"> or <a href="{{ comment.permalink }}">cancel</a>
+    </p>
+  </form>
+{% endblock %}

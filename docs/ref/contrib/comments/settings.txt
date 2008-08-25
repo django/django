@@ -1,0 +1,34 @@
+.. _ref-contrib-comments-settings:
+
+================
+Comment settings
+================
+
+These settings configure the behavior of the comments framework:
+
+.. setting:: COMMENTS_HIDE_REMOVED
+
+COMMENTS_HIDE_REMOVED
+---------------------
+
+If ``True`` (default), removed comments will be excluded from comment
+lists/counts (as taken from template tags). Otherwise, the template author is
+responsible for some sort of a "this comment has been removed by the site staff"
+message.
+
+.. setting:: COMMENT_MAX_LENGTH
+
+COMMENT_MAX_LENGTH
+------------------
+
+The maximum length of the comment field, in characters. Comments longer than
+this will be rejected. Defaults to 3000.
+
+.. setting:: COMENTS_APP
+
+COMENTS_APP
+-----------
+
+The app (i.e. entry in ``INSTALLED_APPS``) responsible for all "business logic."
+You can change this to provide custom comment models and forms, though this is
+currently undocumented.

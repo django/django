@@ -72,10 +72,16 @@ Using Django
 And more:
 ---------
 
-:ref:`topics-auth` ... :ref:`topics-cache` ... :ref:`topics-email` ...
-:ref:`topics-files` ... :ref:`topics-i18n` ... :ref:`topics-install` ...
-:ref:`topics-pagination` ... :ref:`topics-serialization` ...
-:ref:`topics-settings` ... :ref:`topics-testing`
+    * :ref:`topics-auth`
+    * :ref:`topics-cache`
+    * :ref:`topics-email`
+    * :ref:`topics-files`
+    * :ref:`topics-i18n`
+    * :ref:`topics-install`
+    * :ref:`topics-pagination`
+    * :ref:`topics-serialization`
+    * :ref:`topics-settings`
+    * :ref:`topics-testing`
     
 Add-on ("contrib") applications
 ===============================
@@ -95,11 +101,16 @@ Add-on ("contrib") applications
 And more:
 ---------
 
-:ref:`ref-contrib-contenttypes` ... :ref:`ref-contrib-csrf` ...
-:ref:`ref-contrib-databrowse` ... :ref:`ref-contrib-flatpages` ...
-:ref:`ref-contrib-humanize` ... :ref:`ref-contrib-redirects` ...
-:ref:`ref-contrib-sitemaps` ... :ref:`ref-contrib-sites` ...
-:ref:`ref-contrib-webdesign`
+    * :ref:`ref-contrib-comments-index`
+    * :ref:`ref-contrib-contenttypes`
+    * :ref:`ref-contrib-csrf`
+    * :ref:`ref-contrib-databrowse`
+    * :ref:`ref-contrib-flatpages`
+    * :ref:`ref-contrib-humanize`
+    * :ref:`ref-contrib-redirects`
+    * :ref:`ref-contrib-sitemaps`
+    * :ref:`ref-contrib-sites`
+    * :ref:`ref-contrib-webdesign`
 
 Solving specific problems
 =========================
@@ -120,11 +131,14 @@ Solving specific problems
 And more:
 ---------
 
-:ref:`Authenticating in Apache <howto-apache-auth>` ...
-:ref:`howto-custom-file-storage` ... :ref:`howto-custom-management-commands` ...
-:ref:`howto-custom-model-fields` ... :ref:`howto-error-reporting` ...
-:ref:`howto-initial-data` ... :ref:`howto-static-files`
-    
+    * :ref:`Authenticating in Apache <howto-apache-auth>`
+    * :ref:`howto-custom-file-storage`
+    * :ref:`howto-custom-management-commands`
+    * :ref:`howto-custom-model-fields`
+    * :ref:`howto-error-reporting`
+    * :ref:`howto-initial-data`
+    * :ref:`howto-static-files`
+
 Reference
 =========
 
@@ -143,9 +157,13 @@ Reference
 And more:
 ---------
 
-:ref:`ref-databases` ... :ref:`ref-django-admin` ... :ref:`ref-files-index` ...
-:ref:`ref-generic-views` ... :ref:`ref-middleware` ...
-:ref:`ref-templates-index` ... :ref:`ref-unicode`
+    * :ref:`ref-databases`
+    * :ref:`ref-django-admin`
+    * :ref:`ref-files-index`
+    * :ref:`ref-generic-views`
+    * :ref:`ref-middleware`
+    * :ref:`ref-templates-index`
+    * :ref:`ref-unicode`
     
 And all the rest
 ================

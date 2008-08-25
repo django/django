@@ -62,7 +62,7 @@ ins { font-weight: bold; text-decoration: none; }
 /*** lists ***/
 ul { padding-left:30px; }
 ol { padding-left:30px; }
-ol.arabic { list-style-type: decimal; }
+ol.arabic li { list-style-type: decimal; }
 ul li { list-style-type:square; margin-bottom:.4em; }
 ol li { margin-bottom: .4em; }
 ul ul { padding-left:1.2em; }
