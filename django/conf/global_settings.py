@@ -300,7 +300,6 @@ MIDDLEWARE_CLASSES = (
 #     'django.middleware.http.ConditionalGetMiddleware',
 #     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.doc.XViewMiddleware',
 )
 
 ############
