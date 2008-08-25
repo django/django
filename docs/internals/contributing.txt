@@ -411,7 +411,7 @@ Coding style
 
 Please follow these coding standards when writing code for inclusion in Django:
 
-    * Unless otherwise specified, follow :pep:8.
+    * Unless otherwise specified, follow :pep:`8`.
 
       You could use a tool like `pep8.py`_ to check for some problems in this
       area, but remember that PEP 8 is only a guide, so respect the style of

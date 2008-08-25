@@ -733,7 +733,7 @@ the resulting rows. For example::
 
 :class:`connection <django.db.backends.DatabaseWrapper>` and
 :class:`<django.db.backends.CursorWrapper>` mostly implement the standard Python
-DB-API -- see :pep:249 -- with the addition of Django's :ref:`transaction
+DB-API -- see :pep:`249` -- with the addition of Django's :ref:`transaction
 handling <topics-db-transactions>`. If you're not familiar with the Python
 DB-API, note that the SQL statement in :meth:`cursor.execute()
 <django.db.backends.CursorWrapper.execute>` uses placeholders, ``"%s"``, rather
