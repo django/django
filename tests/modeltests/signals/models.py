@@ -30,9 +30,13 @@ def pre_delete_test(signal, sender, instance, **kwargs):
     print 'pre_delete signal,', instance
     print 'instance.id is not None: %s' % (instance.id != None)
 
-def post_delete_test(signal, sender, instance, **kwargs):
-    print 'post_delete signal,', instance
-    print 'instance.id is None: %s' % (instance.id == None)
+# #8285: signals can be any callable
+class PostDeleteHandler(object):
+    def __call__(self, signal, sender, instance, **kwargs):
+        print 'post_delete signal,', instance
+        print 'instance.id is None: %s' % (instance.id == None)
+
+post_delete_test = PostDeleteHandler()
 
 __test__ = {'API_TESTS':"""
 >>> models.signals.pre_save.connect(pre_save_test)
