@@ -95,17 +95,6 @@ that ``django-admin.py`` should print to the console.
 Available subcommands
 =====================
 
-adminindex
-----------
-
-.. django-admin:: adminindex <appname appname ...>
-
-Prints the admin-index template snippet for the given app name(s).
-
-Use admin-index template snippets if you want to customize the look and feel of
-your admin's index page. See :ref:`Tutorial 2 <intro-tutorial02>` for more
-information.
-
 cleanup 
 -------
 

@@ -449,9 +449,5 @@ uses a template variable called ``app_list``. That variable contains every
 installed Django app. Instead of using that, you can hard-code links to
 object-specific admin pages in whatever way you think is best.
 
-Django offers another shortcut in this department. Run the command ``python
-manage.py adminindex polls`` to get a chunk of template code for inclusion in
-the admin index template. It's a useful starting point.
-
 When you're comfortable with the admin site, read :ref:`part 3 of this tutorial
 <intro-tutorial03>` to start working on public poll views.

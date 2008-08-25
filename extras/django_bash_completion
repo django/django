@@ -44,7 +44,7 @@ _django_completion()
     # Standalone options
     opts="--help --settings --pythonpath --noinput --noreload --format --indent --verbosity --adminmedia --version --locale --domain"
     # Actions
-    actions="adminindex createcachetable createsuperuser compilemessages \
+    actions="createcachetable createsuperuser compilemessages \
              dbshell diffsettings dumpdata flush inspectdb loaddata \
              makemessages reset runfcgi runserver shell sql sqlall sqlclear \
              sqlcustom sqlflush sqlindexes sqlreset sqlsequencereset startapp \
@@ -90,7 +90,7 @@ _django_completion()
         esac
     else
         case ${prev} in
-            adminindex|dumpdata|reset| \
+            dumpdata|reset| \
             sql|sqlall|sqlclear|sqlcustom|sqlindexes| \
             sqlreset|sqlsequencereset|test)
                 # App completion
