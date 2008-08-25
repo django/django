@@ -40,9 +40,8 @@ This example model defines a ``Person``, which has a ``first_name`` and
         first_name = models.CharField(max_length=30)
         last_name = models.CharField(max_length=30)
 
-``first_name`` and ``last_name`` are :ref:`fields` of the model. Each
-field is specified as a class attribute, and each attribute maps to a database
-column.
+``first_name`` and ``last_name`` are fields_ of the model. Each field is
+specified as a class attribute, and each attribute maps to a database column.
 
 The above ``Person`` model would create a database table like this:
 
