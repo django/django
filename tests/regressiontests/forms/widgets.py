@@ -1104,5 +1104,9 @@ u'<input type="text" name="time" value="12:51:34" />'
 u'<input type="text" name="time" value="12:51:34" />'
 >>> w.render('time', datetime.time(12, 51))
 u'<input type="text" name="time" value="12:51:00" />'
+
+We should be able to initialize from a unicode value.
+>>> w.render('time', u'13:12:11')
+u'<input type="text" name="time" value="13:12:11" />'
 """
 

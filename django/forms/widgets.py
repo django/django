@@ -16,6 +16,7 @@ from django.utils.translation import ugettext
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
 from django.utils import datetime_safe
+from datetime import time
 from util import flatatt
 from urlparse import urljoin
 
@@ -307,7 +308,7 @@ class TimeInput(Input):
     def render(self, name, value, attrs=None):
         if value is None:
             value = ''
-        elif hasattr(value, 'replace'):
+        elif isinstance(value, time):
             value = value.replace(microsecond=0)
         return super(TimeInput, self).render(name, value, attrs)
 
