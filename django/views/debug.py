@@ -7,7 +7,7 @@ from django.conf import settings
 from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotFound
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_unicode, smart_str
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST')
 
@@ -256,7 +256,7 @@ def technical_404_response(request, exception):
         'root_urlconf': settings.ROOT_URLCONF,
         'request_path': request.path[1:], # Trim leading slash
         'urlpatterns': tried,
-        'reason': str(exception),
+        'reason': smart_str(exception, errors='replace'),
         'request': request,
         'request_protocol': request.is_secure() and "https" or "http",
         'settings': get_safe_settings(),
