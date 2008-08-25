@@ -10,8 +10,8 @@ from django.db.backends.postgresql.client import DatabaseClient
 from django.db.backends.postgresql.creation import DatabaseCreation
 from django.db.backends.postgresql.version import get_version
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
+from django.utils.safestring import SafeUnicode, SafeString
 
-from django.utils.safestring import SafeUnicode
 try:
     import psycopg2 as Database
     import psycopg2.extensions
@@ -23,6 +23,7 @@ DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
+psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedString)
 psycopg2.extensions.register_adapter(SafeUnicode, psycopg2.extensions.QuotedString)
 
 class DatabaseFeatures(BaseDatabaseFeatures):

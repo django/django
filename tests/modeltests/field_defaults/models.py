@@ -49,8 +49,10 @@ u'Default headline'
 >>> d.seconds < 5
 True
 
-# make sure that SafeUnicode fields work
->>> from django.utils.safestring import SafeUnicode
+# make sure that SafeString/SafeUnicode fields work
+>>> from django.utils.safestring import SafeUnicode, SafeString
 >>> a.headline = SafeUnicode(u'SafeUnicode Headline')
+>>> a.save()
+>>> a.headline = SafeString(u'SafeString Headline')
 >>> a.save()
 """}
