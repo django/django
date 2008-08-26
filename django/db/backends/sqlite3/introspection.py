@@ -11,9 +11,13 @@ class FlexibleFieldLookupDict:
         'bool': 'BooleanField',
         'boolean': 'BooleanField',
         'smallint': 'SmallIntegerField',
+        'smallint unsigned': 'PositiveSmallIntegerField',
         'smallinteger': 'SmallIntegerField',
         'int': 'IntegerField',
         'integer': 'IntegerField',
+        'integer unsigned': 'PositiveIntegerField',
+        'decimal': 'DecimalField',
+        'real': 'FloatField',
         'text': 'TextField',
         'char': 'CharField',
         'date': 'DateField',
@@ -34,7 +38,7 @@ class FlexibleFieldLookupDict:
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = FlexibleFieldLookupDict()
-        
+
     def get_table_list(self, cursor):
         "Returns a list of table names in the current database."
         # Skip the sqlite_sequence system table used for autoincrement key
