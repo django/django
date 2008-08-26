@@ -97,10 +97,10 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
             if domain == 'djangojs' and file_ext == '.js':
                 if verbosity > 1:
                     sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
-                src = open(os.path.join(dirpath, file), "rb").read()
+                src = open(os.path.join(dirpath, file), "rU").read()
                 src = pythonize_re.sub('\n#', src)
-                open(os.path.join(dirpath, '%s.py' % file), "wb").write(src)
                 thefile = '%s.py' % file
+                open(os.path.join(dirpath, thefile), "w").write(src)
                 cmd = 'xgettext -d %s -L Perl --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (domain, os.path.join(dirpath, thefile))
                 (stdin, stdout, stderr) = os.popen3(cmd, 't')
                 msgs = stdout.read()
@@ -121,9 +121,9 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
             elif domain == 'django' and (file_ext == '.py' or file_ext in extensions):
                 thefile = file
                 if file_ext in extensions:
-                    src = open(os.path.join(dirpath, file), "rb").read()
+                    src = open(os.path.join(dirpath, file), "rU").read()
                     thefile = '%s.py' % file
-                    open(os.path.join(dirpath, thefile), "wb").write(templatize(src))
+                    open(os.path.join(dirpath, thefile), "w").write(templatize(src))
                 if verbosity > 1:
                     sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
                 cmd = 'xgettext -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --keyword=ugettext_noop --keyword=ugettext_lazy --keyword=ungettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (
@@ -148,14 +148,14 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
                     os.unlink(os.path.join(dirpath, thefile))
 
         if os.path.exists(potfile):
-            (stdin, stdout, stderr) = os.popen3('msguniq --to-code=utf-8 "%s"' % potfile, 'b')
+            (stdin, stdout, stderr) = os.popen3('msguniq --to-code=utf-8 "%s"' % potfile, 't')
             msgs = stdout.read()
             errors = stderr.read()
             if errors:
                 raise CommandError("errors happened while running msguniq\n%s" % errors)
             open(potfile, 'w').write(msgs)
             if os.path.exists(pofile):
-                (stdin, stdout, stderr) = os.popen3('msgmerge -q "%s" "%s"' % (pofile, potfile), 'b')
+                (stdin, stdout, stderr) = os.popen3('msgmerge -q "%s" "%s"' % (pofile, potfile), 't')
                 msgs = stdout.read()
                 errors = stderr.read()
                 if errors:
