@@ -133,7 +133,11 @@ A dynamic admin interface: it's not just scaffolding -- it's the whole house
 Once your models are defined, Django can automatically create a professional,
 production ready :ref:`administrative interface <ref-contrib-admin>` -- a Web
 site that lets authenticated users add, change and delete objects. It's as easy
-as adding a line of code to your model classes::
+as registering your model in the admin site::
+
+    # In models.py...
+
+    from django.db import models
 
     class Article(models.Model):
         pub_date = models.DateTimeField()
@@ -141,7 +145,13 @@ as adding a line of code to your model classes::
         content = models.TextField()
         reporter = models.ForeignKey(Reporter)
         
-        class Admin: pass
+
+    # In admin.py in the same directory...
+    
+    import models
+    from django.contrib import admin
+
+    admin.site.register(models.Article)
 
 The philosophy here is that your site is edited by a staff, or a client, or
 maybe just you -- and you don't want to have to deal with creating backend
