@@ -72,11 +72,7 @@ MySQLdb
 -------
 
 `MySQLdb`_ is the Python interface to MySQL. Version 1.2.1p2 or later is
-required for full MySQL support in Django. Earlier versions will not work with
-the ``mysql`` backend.
-
-If you are trying to use an older version of MySQL and the ``mysql_old``
-backend, then 1.2.0 *might* work for you.
+required for full MySQL support in Django.
 
 .. note::
     If you see ``ImportError: cannot import name ImmutableSet`` when trying to
