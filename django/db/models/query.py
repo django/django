@@ -794,8 +794,9 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
     fields = row[index_start:index_end]
     if not [x for x in fields if x is not None]:
         # If we only have a list of Nones, there was not related object.
-        return None, index_end
-    obj = klass(*fields)
+        obj = None
+    else:
+        obj = klass(*fields)
     for f in klass._meta.fields:
         if not select_related_descend(f, restricted, requested):
             continue
@@ -807,7 +808,8 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
                 cur_depth+1, next)
         if cached_row:
             rel_obj, index_end = cached_row
-            setattr(obj, f.get_cache_name(), rel_obj)
+            if obj is not None:
+                setattr(obj, f.get_cache_name(), rel_obj)
     return obj, index_end
 
 

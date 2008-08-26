@@ -49,6 +49,22 @@ class Enrollment(models.Model):
     std = models.ForeignKey(Student)
     cls = models.ForeignKey(Class)
 
+# Models for testing bug #8036.
+class Country(models.Model):
+    name = models.CharField(max_length=50)
+
+class State(models.Model):
+    name = models.CharField(max_length=50)
+    country = models.ForeignKey(Country)
+
+class ClientStatus(models.Model):
+    name = models.CharField(max_length=50)
+
+class Client(models.Model):
+    name = models.CharField(max_length=50)
+    state = models.ForeignKey(State, null=True)
+    status = models.ForeignKey(ClientStatus)
+
 __test__ = {'API_TESTS': """
 Regression test for bug #7110. When using select_related(), we must query the
 Device and Building tables using two different aliases (each) in order to
@@ -100,4 +116,28 @@ separate).
 u"std"
 >>> e_related.cls.org.person.user.name
 u"org"
+
+Regression test for bug #8036: the first related model in the tests below
+("state") is empty and we try to select the more remotely related
+state__country. The regression here was not skipping the empty column results
+for country before getting status.
+
+>>> australia = Country.objects.create(name='Australia')
+>>> active = ClientStatus.objects.create(name='active')
+>>> client = Client.objects.create(name='client', status=active)
+
+>>> client.status
+<ClientStatus: ClientStatus object>
+>>> Client.objects.select_related()[0].status
+<ClientStatus: ClientStatus object>
+>>> Client.objects.select_related('state')[0].status
+<ClientStatus: ClientStatus object>
+>>> Client.objects.select_related('state', 'status')[0].status
+<ClientStatus: ClientStatus object>
+>>> Client.objects.select_related('state__country')[0].status
+<ClientStatus: ClientStatus object>
+>>> Client.objects.select_related('state__country', 'status')[0].status
+<ClientStatus: ClientStatus object>
+>>> Client.objects.select_related('status')[0].status
+<ClientStatus: ClientStatus object>
 """}
