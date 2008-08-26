@@ -12,7 +12,7 @@
          <th {% if forloop.first %}colspan="2"{% endif %}>{{ field.label|capfirst|escape }}</th>
         {% endif %}
      {% endfor %}
-     {% if inline_admin_formset.formset.can_delete %}<th>{% trans "Delete" %}?</th>{% endif %}
+     {% if inline_admin_formset.formset.can_delete %}<th>{% trans "Delete?" %}</th>{% endif %}
      </tr></thead>
    
      {% for inline_admin_form in inline_admin_formset %}
@@ -22,7 +22,7 @@
         <td class="original">
           {% if inline_admin_form.original or inline_admin_form.show_url %}<p>
           {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
-          {% if inline_admin_form.show_url %}<a href="../../../r/{{ inline_admin_form.original.content_type_id }}/{{ inline_admin_form.original.id }}/">View on site</a>{% endif %}
+          {% if inline_admin_form.show_url %}<a href="../../../r/{{ inline_admin_form.original.content_type_id }}/{{ inline_admin_form.original.id }}/">{% trans "View on site" %}</a>{% endif %}
             </p>{% endif %}
           {{ inline_admin_form.pk_field.field }}
           {% spaceless %}
