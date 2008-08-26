@@ -102,10 +102,8 @@ class CommentViewTests(CommentTestCase):
 
         # callback
         def receive(sender, **kwargs):
-            self.assertEqual(sender.comment, "This is my comment")
-            # TODO: Get the two commented tests below to work.
-#            self.assertEqual(form_data["comment"], "This is my comment")
-#            self.assertEqual(request.method, "POST")
+            self.assertEqual(kwargs['comment'].comment, "This is my comment")
+            self.assert_('request' in kwargs)
             received_signals.append(kwargs.get('signal'))
 
         # Connect signals and keep track of handled ones
@@ -117,7 +115,7 @@ class CommentViewTests(CommentTestCase):
         # Post a comment and check the signals
         self.testCreateValidComment()
         self.assertEqual(received_signals, excepted_signals)
-
+        
     def testWillBePostedSignal(self):
         """
         Test that the comment_will_be_posted signal can prevent the comment from
@@ -137,7 +135,8 @@ class CommentViewTests(CommentTestCase):
         it gets posted
         """
         def receive(sender, **kwargs):
-            sender.is_public = False # a bad but effective spam filter :)...
+             # a bad but effective spam filter :)...
+            kwargs['comment'].is_public = False
 
         signals.comment_will_be_posted.connect(receive)
         self.testCreateValidComment()

@@ -96,7 +96,11 @@ def post_comment(request, next=None):
         comment.user = request.user
 
     # Signal that the comment is about to be saved
-    responses = signals.comment_will_be_posted.send(comment)
+    responses = signals.comment_will_be_posted.send(
+        sender  = comment.__class__,
+        comment = comment,
+        request = request
+    )
 
     for (receiver, response) in responses:
         if response == False:
@@ -105,7 +109,11 @@ def post_comment(request, next=None):
 
     # Save the comment and signal that it was saved
     comment.save()
-    signals.comment_was_posted.send(comment)
+    signals.comment_was_posted.send(
+        sender  = comment.__class__,
+        comment = comment,
+        request = request
+    )
 
     return next_redirect(data, next, comment_done, c=comment._get_pk_val())
 

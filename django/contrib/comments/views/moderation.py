@@ -27,7 +27,13 @@ def flag(request, comment_id, next=None):
             user    = request.user,
             flag    = comments.models.CommentFlag.SUGGEST_REMOVAL
         )
-        signals.comment_was_flagged.send(comment)
+        signals.comment_was_flagged.send(
+            sender  = comment.__class__,
+            comment = comment,
+            flag    = flag,
+            created = created,
+            request = request,
+        )
         return next_redirect(request.POST.copy(), next, flag_done, c=comment.pk)
 
     # Render a form on GET
@@ -61,7 +67,13 @@ def delete(request, comment_id, next=None):
         )
         comment.is_removed = True
         comment.save()
-        signals.comment_was_flagged.send(comment)
+        signals.comment_was_flagged.send(
+            sender  = comment.__class__,
+            comment = comment,
+            flag    = flag,
+            created = created,
+            request = request,
+        )
         return next_redirect(request.POST.copy(), next, delete_done, c=comment.pk)
 
     # Render a form on GET
@@ -98,7 +110,13 @@ def approve(request, comment_id, next=None):
         comment.is_public = True
         comment.save()
 
-        signals.comment_was_flagged.send(comment)
+        signals.comment_was_flagged.send(
+            sender  = comment.__class__,
+            comment = comment,
+            flag    = flag,
+            created = created,
+            request = request,
+        )
         return next_redirect(request.POST.copy(), next, approve_done, c=comment.pk)
 
     # Render a form on GET

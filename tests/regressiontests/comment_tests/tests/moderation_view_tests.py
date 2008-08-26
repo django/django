@@ -48,9 +48,8 @@ class FlagViewTests(CommentTestCase):
 
         # callback
         def receive(sender, **kwargs):
-            flag = sender.flags.get(id=1)
-            self.assertEqual(flag.flag, CommentFlag.SUGGEST_REMOVAL)
-            self.assertEqual(flag.user.username, "normaluser")
+            self.assertEqual(kwargs['flag'].flag, CommentFlag.SUGGEST_REMOVAL)
+            self.assertEqual(kwargs['request'].user.username, "normaluser")
             received_signals.append(kwargs.get('signal'))
 
         # Connect signals and keep track of handled ones
