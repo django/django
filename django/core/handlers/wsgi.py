@@ -76,11 +76,14 @@ class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         script_name = base.get_script_name(environ)
         path_info = force_unicode(environ.get('PATH_INFO', u'/'))
-        if not path_info:
+        if not path_info or path_info == script_name:
             # Sometimes PATH_INFO exists, but is empty (e.g. accessing
             # the SCRIPT_NAME URL without a trailing slash). We really need to
             # operate as if they'd requested '/'. Not amazingly nice to force
             # the path like this, but should be harmless.
+            #
+            # (The comparison of path_info to script_name is to work around an
+            # apparent bug in flup 1.0.1. Se Django ticket #8490).
             path_info = u'/'
         self.environ = environ
         self.path_info = path_info
