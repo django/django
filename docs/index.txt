@@ -137,6 +137,7 @@ And more:
     * :ref:`howto-custom-model-fields`
     * :ref:`howto-error-reporting`
     * :ref:`howto-initial-data`
+    * :ref:`howto-jython`
     * :ref:`howto-static-files`
 
 Reference

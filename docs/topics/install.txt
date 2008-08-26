@@ -16,6 +16,13 @@ It works with any Python version 2.3 and higher.
 Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
 probably already have it installed.
 
+.. admonition:: Django on Jython
+
+    If you use Jython_ (a Python implementation for the Java platform), you'll
+    need to follow a few additional steps. See :ref:`howto-jython` for details.
+
+.. _jython: http://jython.org/
+
 Install Apache and mod_python
 =============================
 
@@ -128,6 +135,8 @@ This file should also be located in your ``site-packages`` directory.
 
     (Note that this should be run from a shell prompt, not a Python interactive
     prompt.)
+    
+.. _install-django-code:
 
 Install the Django code
 =======================

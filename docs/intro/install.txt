@@ -19,6 +19,13 @@ version 2.3 and higher, but we recommend installing Python 2.5 or later. If you 
 Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
 probably already have it installed.
 
+.. admonition:: Django on Jython
+
+    If you use Jython_ (a Python implementation for the Java platform), you'll
+    need to follow a few additional steps. See :ref:`howto-jython` for details.
+
+.. _jython: http://jython.org/
+
 You can verify that Python's installed py typing ``python`` from your shell; you should see something like::
 
     Python 2.5.1 (r251:54863, Jan 17 2008, 19:35:17) 
