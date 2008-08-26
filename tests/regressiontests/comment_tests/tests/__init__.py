@@ -12,9 +12,7 @@ CT = ContentType.objects.get_for_model
 # Helper base class for comment tests that need data.
 class CommentTestCase(TestCase):
     fixtures = ["comment_tests"]
-
-    def setUp(self):
-        settings.ROOT_URLCONF = "django.contrib.comments.urls"
+    urls = 'django.contrib.comments.urls'
 
     def createSomeComments(self):
         # Two anonymous comments on two different objects
