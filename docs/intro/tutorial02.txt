@@ -264,7 +264,6 @@ Poll object. Let's make that happen.
 Remove the ``register()`` call for the Choice model. Then, edit the ``Poll``
 registration code to read::
 
-    poll = models.ForeignKey(Poll, edit_inline=models.STACKED, num_in_admin=3)
     class ChoiceInline(admin.StackedInline):
         model = Choice
         extra = 3
