@@ -646,20 +646,24 @@ def timesince(value, arg=None):
     from django.utils.timesince import timesince
     if not value:
         return u''
-    if arg:
-        return timesince(value, arg)
-    return timesince(value)
+    try:
+        if arg:
+            return timesince(value, arg)
+        return timesince(value)
+    except (ValueError, TypeError):
+        return u''
 timesince.is_safe = False
 
 def timeuntil(value, arg=None):
     """Formats a date as the time until that date (i.e. "4 days, 6 hours")."""
-    from django.utils.timesince import timesince
+    from django.utils.timesince import timeuntil
     from datetime import datetime
     if not value:
         return u''
-    if arg:
-        return timesince(arg, value)
-    return timesince(datetime.now(), value)
+    try:
+        return timeuntil(value, arg)
+    except (ValueError, TypeError):
+        return u''
 timeuntil.is_safe = False
 
 ###################

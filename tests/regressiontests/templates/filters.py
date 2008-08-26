@@ -9,7 +9,7 @@ consistent.
 
 from datetime import datetime, timedelta
 
-from django.utils.tzinfo import LocalTimezone
+from django.utils.tzinfo import LocalTimezone, FixedOffset
 from django.utils.safestring import mark_safe
 
 # These two classes are used to test auto-escaping of __unicode__ output.
@@ -27,6 +27,7 @@ class SafeClass:
 def get_filter_tests():
     now = datetime.now()
     now_tz = datetime.now(LocalTimezone(now))
+    now_tz_i = datetime.now(FixedOffset((3 * 60) + 15)) # imaginary time zone
     return {
         # Default compare with datetime.now()
         'filter-timesince01' : ('{{ a|timesince }}', {'a': datetime.now() + timedelta(minutes=-1, seconds = -10)}, '1 minute'),
@@ -46,6 +47,14 @@ def get_filter_tests():
         'filter-timesince09': ('{{ later|timesince }}', { 'later': now + timedelta(days=7) }, '0 minutes'),
         'filter-timesince10': ('{{ later|timesince:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '0 minutes'),
 
+        # Ensures that differing timezones are calculated correctly
+        'filter-timesince11' : ('{{ a|timesince }}', {'a': now}, '0 minutes'),
+        'filter-timesince12' : ('{{ a|timesince }}', {'a': now_tz}, '0 minutes'),
+        'filter-timesince13' : ('{{ a|timesince }}', {'a': now_tz_i}, '0 minutes'),
+        'filter-timesince14' : ('{{ a|timesince:b }}', {'a': now_tz, 'b': now_tz_i}, '0 minutes'),
+        'filter-timesince15' : ('{{ a|timesince:b }}', {'a': now, 'b': now_tz_i}, ''),
+        'filter-timesince16' : ('{{ a|timesince:b }}', {'a': now_tz_i, 'b': now}, ''),
+
         # Default compare with datetime.now()
         'filter-timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now() + timedelta(minutes=2, seconds = 10)}, '2 minutes'),
         'filter-timeuntil02' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(days=1, seconds = 10))}, '1 day'),
@@ -61,6 +70,9 @@ def get_filter_tests():
         'filter-timeuntil08': ('{{ later|timeuntil }}', { 'later': now + timedelta(days=7, hours=1) }, '1 week'),
         'filter-timeuntil09': ('{{ later|timeuntil:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '1 week'),
 
+        # Ensures that differing timezones are calculated correctly
+        'filter-timeuntil10' : ('{{ a|timeuntil }}', {'a': now_tz_i}, '0 minutes'),
+        'filter-timeuntil11' : ('{{ a|timeuntil:b }}', {'a': now_tz_i, 'b': now_tz}, '0 minutes'),
 
         'filter-addslash01': ("{% autoescape off %}{{ a|addslashes }} {{ b|addslashes }}{% endautoescape %}", {"a": "<a>'", "b": mark_safe("<a>'")}, ur"<a>\' <a>\'"),
         'filter-addslash02': ("{{ a|addslashes }} {{ b|addslashes }}", {"a": "<a>'", "b": mark_safe("<a>'")}, ur"&lt;a&gt;\&#39; <a>\'"),

@@ -1332,6 +1332,8 @@ For example, if ``blog_date`` is a date instance representing midnight on 1
 June 2006, and ``comment_date`` is a date instance for 08:00 on 1 June 2006,
 then ``{{ blog_date|timesince:comment_date }}`` would return "8 hours".
 
+Comparing offset-naive and offset-aware datetimes will return an empty string.
+
 Minutes is the smallest unit used, and "0 minutes" will be returned for any
 date that is in the future relative to the comparison point.
 
@@ -1348,6 +1350,8 @@ given date or datetime. For example, if today is 1 June 2006 and
 Takes an optional argument that is a variable containing the date to use as
 the comparison point (instead of *now*). If ``from_date`` contains 22 June
 2006, then ``{{ conference_date|timeuntil:from_date }}`` will return "1 week".
+
+Comparing offset-naive and offset-aware datetimes will return an empty string.
 
 Minutes is the smallest unit used, and "0 minutes" will be returned for any
 date that is in the past relative to the comparison point.

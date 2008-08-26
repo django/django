@@ -28,15 +28,12 @@ def timesince(d, now=None):
     # Convert datetime.date to datetime.datetime for comparison
     if d.__class__ is not datetime.datetime:
         d = datetime.datetime(d.year, d.month, d.day)
-    if now:
-        t = now.timetuple()
-    else:
-        t = time.localtime()
-    if d.tzinfo:
-        tz = LocalTimezone(d)
-    else:
-        tz = None
-    now = datetime.datetime(t[0], t[1], t[2], t[3], t[4], t[5], tzinfo=tz)
+
+    if not now:
+        if d.tzinfo:
+            now = datetime.datetime.now(LocalTimezone(d))
+        else:
+            now = datetime.datetime.now()
 
     # ignore microsecond part of 'd' since we removed it from 'now'
     delta = now - (d - datetime.timedelta(0, 0, d.microsecond))
@@ -62,6 +59,9 @@ def timeuntil(d, now=None):
     Like timesince, but returns a string measuring the time until
     the given time.
     """
-    if now == None:
-        now = datetime.datetime.now()
+    if not now:
+        if d.tzinfo:
+            now = datetime.datetime.now(LocalTimezone(d))
+        else:
+            now = datetime.datetime.now()
     return timesince(now, d)

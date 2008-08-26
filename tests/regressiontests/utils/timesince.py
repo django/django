@@ -1,6 +1,7 @@
 """
 >>> from datetime import datetime, timedelta
->>> from django.utils.timesince import timesince
+>>> from django.utils.timesince import timesince, timeuntil
+>>> from django.utils.tzinfo import LocalTimezone, FixedOffset
 
 >>> t = datetime(2007, 8, 14, 13, 46, 0)
 
@@ -73,5 +74,16 @@ u'0 minutes'
 >>> timesince(t, t-2*oneweek-3*onehour-4*oneminute)
 u'0 minutes'
 >>> timesince(t, t-4*oneday-5*oneminute)
+u'0 minutes'
+
+# When using two different timezones.
+>>> now = datetime.now()
+>>> now_tz = datetime.now(LocalTimezone(now))
+>>> now_tz_i = datetime.now(FixedOffset((3 * 60) + 15))
+>>> timesince(now)
+u'0 minutes'
+>>> timesince(now_tz)
+u'0 minutes'
+>>> timeuntil(now_tz, now_tz_i)
 u'0 minutes'
 """
