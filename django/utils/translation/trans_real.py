@@ -403,6 +403,7 @@ def get_date_formats():
     date_format = ugettext('DATE_FORMAT')
     datetime_format = ugettext('DATETIME_FORMAT')
     time_format = ugettext('TIME_FORMAT')
+    datetime_full_format = ugettext('DATE_WITH_TIME_FULL')
     if date_format == 'DATE_FORMAT':
         date_format = settings.DATE_FORMAT
     if datetime_format == 'DATETIME_FORMAT':

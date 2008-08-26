@@ -50,6 +50,11 @@ u'<input type="text" class="fun" value="foo@example.com" name="email" />'
 >>> w.render('email', '', attrs={'class': 'special'})
 u'<input type="text" class="special" name="email" />'
 
+'attrs' can be safe-strings if needed
+>>> w = TextInput(attrs={'onBlur': mark_safe("function('foo')")})
+>>> print w.render('email', '')
+<input onBlur="function('foo')" type="text" name="email" />
+
 # PasswordInput Widget ############################################################
 
 >>> w = PasswordInput()

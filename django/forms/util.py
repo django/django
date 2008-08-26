@@ -1,4 +1,4 @@
-from django.utils.html import escape
+from django.utils.html import conditional_escape
 from django.utils.encoding import smart_unicode, StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
 
@@ -9,7 +9,7 @@ def flatatt(attrs):
     XML-style pairs.  It is assumed that the keys do not need to be XML-escaped.
     If the passed dictionary is empty, then return an empty string.
     """
-    return u''.join([u' %s="%s"' % (k, escape(v)) for k, v in attrs.items()])
+    return u''.join([u' %s="%s"' % (k, conditional_escape(v)) for k, v in attrs.items()])
 
 class ErrorDict(dict, StrAndUnicode):
     """
