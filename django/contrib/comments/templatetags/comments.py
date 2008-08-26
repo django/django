@@ -81,7 +81,7 @@ class BaseCommentNode(template.Node):
             site__pk     = settings.SITE_ID,
             is_public    = True,
         )
-        if settings.COMMENTS_HIDE_REMOVED:
+        if getattr(settings, 'COMMENTS_HIDE_REMOVED', True):
             qs = qs.filter(is_removed=False)
 
         return qs
