@@ -81,6 +81,7 @@ And more:
     * :ref:`topics-pagination`
     * :ref:`topics-serialization`
     * :ref:`topics-settings`
+    * :ref:`topics-signals`
     * :ref:`topics-testing`
     
 Add-on ("contrib") applications
