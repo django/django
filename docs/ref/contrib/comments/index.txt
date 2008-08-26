@@ -146,11 +146,11 @@ If you want more control over the look and feel of the comment form, you use use
 :ttag:`get_comment_form` to get a :ref:`form object <topics-forms-index>` that
 you can use in the template::
 
-    {% get_comment_form for [object] %}
+    {% get_comment_form for [object] as [varname] %}
     
 A complete form might look like::
 
-    {% get_comment_form for event %}
+    {% get_comment_form for event as form %}
     <form action="{% comment_form_target %}" method="POST">
       {{ form }}
       <p class="submit">
