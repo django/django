@@ -254,7 +254,7 @@ blank=True for the model field.  Finally, the widget should have the
 >>> site.register(ValidationTestModel, ValidationTestModelAdmin)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.raw_id_fields` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestModelAdmin.raw_id_fields' must be a list or tuple.
 
 >>> settings.DEBUG = False
 
@@ -270,21 +270,21 @@ ImproperlyConfigured: `ValidationTestModelAdmin.raw_id_fields` must be a list or
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.raw_id_fields` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestModelAdmin.raw_id_fields' must be a list or tuple.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     raw_id_fields = ('non_existent_field',)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.raw_id_fields` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+ImproperlyConfigured: 'ValidationTestModelAdmin.raw_id_fields' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     raw_id_fields = ('name',)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.raw_id_fields[0]`, `name` must be either a ForeignKey or ManyToManyField.
+ImproperlyConfigured: 'ValidationTestModelAdmin.raw_id_fields[0]', 'name' must be either a ForeignKey or ManyToManyField.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     raw_id_fields = ('users',)
@@ -297,42 +297,42 @@ ImproperlyConfigured: `ValidationTestModelAdmin.raw_id_fields[0]`, `name` must b
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestModelAdmin.fieldsets' must be a list or tuple.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     fieldsets = ({},)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets[0]` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestModelAdmin.fieldsets[0]' must be a list or tuple.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     fieldsets = ((),)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets[0]` does not have exactly two elements.
+ImproperlyConfigured: 'ValidationTestModelAdmin.fieldsets[0]' does not have exactly two elements.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     fieldsets = (("General", ()),)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets[0][1]` must be a dictionary.
+ImproperlyConfigured: 'ValidationTestModelAdmin.fieldsets[0][1]' must be a dictionary.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     fieldsets = (("General", {}),)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `fields` key is required in ValidationTestModelAdmin.fieldsets[0][1] field options dict.
+ImproperlyConfigured: 'fields' key is required in ValidationTestModelAdmin.fieldsets[0][1] field options dict.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     fieldsets = (("General", {"fields": ("non_existent_field",)}),)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.fieldsets[0][1]['fields']` refers to field `non_existent_field` that is missing from the form.
+ImproperlyConfigured: 'ValidationTestModelAdmin.fieldsets[0][1]['fields']' refers to field 'non_existent_field' that is missing from the form.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     fieldsets = (("General", {"fields": ("name",)}),)
@@ -382,7 +382,7 @@ ImproperlyConfigured: ValidationTestModelAdmin.form does not inherit from BaseMo
 >>> validate(BandAdmin, Band)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `BandAdmin.fieldsets[0][1]['fields']` refers to field `non_existent_field` that is missing from the form.
+ImproperlyConfigured: 'BandAdmin.fieldsets[0][1]['fields']' refers to field 'non_existent_field' that is missing from the form.
 
 >>> class BandAdmin(ModelAdmin):
 ...     fieldsets = (
@@ -406,7 +406,7 @@ ImproperlyConfigured: `BandAdmin.fieldsets[0][1]['fields']` refers to field `non
 >>> validate(BandAdmin, Band)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `BandAdmin.fieldsets[0][1]['fields']` refers to field `non_existent_field` that is missing from the form.
+ImproperlyConfigured: 'BandAdmin.fieldsets[0][1]['fields']' refers to field 'non_existent_field' that is missing from the form.
 
 >>> class AdminBandForm(forms.ModelForm):
 ...     delete = forms.BooleanField()
@@ -430,21 +430,21 @@ ImproperlyConfigured: `BandAdmin.fieldsets[0][1]['fields']` refers to field `non
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.filter_vertical` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestModelAdmin.filter_vertical' must be a list or tuple.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     filter_vertical = ("non_existent_field",)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.filter_vertical` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+ImproperlyConfigured: 'ValidationTestModelAdmin.filter_vertical' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     filter_vertical = ("name",)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.filter_vertical[0]` must be a ManyToManyField.
+ImproperlyConfigured: 'ValidationTestModelAdmin.filter_vertical[0]' must be a ManyToManyField.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     filter_vertical = ("users",)
@@ -457,21 +457,21 @@ ImproperlyConfigured: `ValidationTestModelAdmin.filter_vertical[0]` must be a Ma
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.filter_horizontal` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestModelAdmin.filter_horizontal' must be a list or tuple.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     filter_horizontal = ("non_existent_field",)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.filter_horizontal` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+ImproperlyConfigured: 'ValidationTestModelAdmin.filter_horizontal' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     filter_horizontal = ("name",)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.filter_horizontal[0]` must be a ManyToManyField.
+ImproperlyConfigured: 'ValidationTestModelAdmin.filter_horizontal[0]' must be a ManyToManyField.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     filter_horizontal = ("users",)
@@ -484,28 +484,28 @@ ImproperlyConfigured: `ValidationTestModelAdmin.filter_horizontal[0]` must be a 
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.radio_fields` must be a dictionary.
+ImproperlyConfigured: 'ValidationTestModelAdmin.radio_fields' must be a dictionary.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     radio_fields = {"non_existent_field": None}
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.radio_fields` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+ImproperlyConfigured: 'ValidationTestModelAdmin.radio_fields' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     radio_fields = {"name": None}
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.radio_fields['name']` is neither an instance of ForeignKey nor does have choices set.
+ImproperlyConfigured: 'ValidationTestModelAdmin.radio_fields['name']' is neither an instance of ForeignKey nor does have choices set.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     radio_fields = {"state": None}
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.radio_fields['state']` is neither admin.HORIZONTAL nor admin.VERTICAL.
+ImproperlyConfigured: 'ValidationTestModelAdmin.radio_fields['state']' is neither admin.HORIZONTAL nor admin.VERTICAL.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     radio_fields = {"state": VERTICAL}
@@ -518,28 +518,28 @@ ImproperlyConfigured: `ValidationTestModelAdmin.radio_fields['state']` is neithe
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.prepopulated_fields` must be a dictionary.
+ImproperlyConfigured: 'ValidationTestModelAdmin.prepopulated_fields' must be a dictionary.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     prepopulated_fields = {"non_existent_field": None}
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.prepopulated_fields` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+ImproperlyConfigured: 'ValidationTestModelAdmin.prepopulated_fields' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     prepopulated_fields = {"slug": ("non_existent_field",)}
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.prepopulated_fields['non_existent_field'][0]` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+ImproperlyConfigured: 'ValidationTestModelAdmin.prepopulated_fields['non_existent_field'][0]' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     prepopulated_fields = {"users": ("name",)}
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.prepopulated_fields['users']` is either a DateTimeField, ForeignKey or ManyToManyField. This isn't allowed.
+ImproperlyConfigured: 'ValidationTestModelAdmin.prepopulated_fields['users']' is either a DateTimeField, ForeignKey or ManyToManyField. This isn't allowed.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     prepopulated_fields = {"slug": ("name",)}
@@ -552,7 +552,7 @@ ImproperlyConfigured: `ValidationTestModelAdmin.prepopulated_fields['users']` is
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.list_display` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestModelAdmin.list_display' must be a list or tuple.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     list_display = ('non_existent_field',)
@@ -567,7 +567,7 @@ ImproperlyConfigured: ValidationTestModelAdmin.list_display[0], 'non_existent_fi
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.list_display[0]`, `users` is a ManyToManyField which is not supported.
+ImproperlyConfigured: 'ValidationTestModelAdmin.list_display[0]', 'users' is a ManyToManyField which is not supported.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     list_display = ('name',)
@@ -580,21 +580,21 @@ ImproperlyConfigured: `ValidationTestModelAdmin.list_display[0]`, `users` is a M
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.list_display_links` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestModelAdmin.list_display_links' must be a list or tuple.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     list_display_links = ('non_existent_field',)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.list_display_links[0]` refers to `non_existent_field` that is neither a field, method or property of model `ValidationTestModel`.
+ImproperlyConfigured: 'ValidationTestModelAdmin.list_display_links[0]' refers to 'non_existent_field' that is neither a field, method or property of model 'ValidationTestModel'.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     list_display_links = ('name',)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.list_display_links[0]`refers to `name` which is not defined in `list_display`.
+ImproperlyConfigured: 'ValidationTestModelAdmin.list_display_links[0]'refers to 'name' which is not defined in 'list_display'.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     list_display = ('name',)
@@ -608,14 +608,14 @@ ImproperlyConfigured: `ValidationTestModelAdmin.list_display_links[0]`refers to 
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.list_filter` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestModelAdmin.list_filter' must be a list or tuple.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     list_filter = ('non_existent_field',)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.list_filter[0]` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+ImproperlyConfigured: 'ValidationTestModelAdmin.list_filter[0]' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     list_filter = ('is_active',)
@@ -628,7 +628,7 @@ ImproperlyConfigured: `ValidationTestModelAdmin.list_filter[0]` refers to field 
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.list_per_page` should be a integer.
+ImproperlyConfigured: 'ValidationTestModelAdmin.list_per_page' should be a integer.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     list_per_page = 100
@@ -641,7 +641,7 @@ ImproperlyConfigured: `ValidationTestModelAdmin.list_per_page` should be a integ
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.search_fields` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestModelAdmin.search_fields' must be a list or tuple.
 
 # date_hierarchy
 
@@ -650,14 +650,14 @@ ImproperlyConfigured: `ValidationTestModelAdmin.search_fields` must be a list or
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.date_hierarchy` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+ImproperlyConfigured: 'ValidationTestModelAdmin.date_hierarchy' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     date_hierarchy = 'name'
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.date_hierarchy is neither an instance of DateField nor DateTimeField.
+ImproperlyConfigured: 'ValidationTestModelAdmin.date_hierarchy is neither an instance of DateField nor DateTimeField.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     date_hierarchy = 'pub_date'
@@ -670,21 +670,21 @@ ImproperlyConfigured: `ValidationTestModelAdmin.date_hierarchy is neither an ins
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.ordering` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestModelAdmin.ordering' must be a list or tuple.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     ordering = ('non_existent_field',)
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.ordering[0]` refers to field `non_existent_field` that is missing from model `ValidationTestModel`.
+ImproperlyConfigured: 'ValidationTestModelAdmin.ordering[0]' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     ordering = ('?', 'name')
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.ordering` has the random ordering marker `?`, but contains other fields as well. Please either remove `?` or the other fields.
+ImproperlyConfigured: 'ValidationTestModelAdmin.ordering' has the random ordering marker '?', but contains other fields as well. Please either remove '?' or the other fields.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     ordering = ('?',)
@@ -705,7 +705,7 @@ ImproperlyConfigured: `ValidationTestModelAdmin.ordering` has the random orderin
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.list_select_related` should be a boolean.
+ImproperlyConfigured: 'ValidationTestModelAdmin.list_select_related' should be a boolean.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     list_select_related = False
@@ -718,7 +718,7 @@ ImproperlyConfigured: `ValidationTestModelAdmin.list_select_related` should be a
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.save_as` should be a boolean.
+ImproperlyConfigured: 'ValidationTestModelAdmin.save_as' should be a boolean.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     save_as = True
@@ -731,7 +731,7 @@ ImproperlyConfigured: `ValidationTestModelAdmin.save_as` should be a boolean.
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.save_on_top` should be a boolean.
+ImproperlyConfigured: 'ValidationTestModelAdmin.save_on_top' should be a boolean.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     save_on_top = True
@@ -746,7 +746,7 @@ ImproperlyConfigured: `ValidationTestModelAdmin.save_on_top` should be a boolean
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.inlines` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestModelAdmin.inlines' must be a list or tuple.
 
 >>> class ValidationTestInline(object):
 ...     pass
@@ -755,7 +755,7 @@ ImproperlyConfigured: `ValidationTestModelAdmin.inlines` must be a list or tuple
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.inlines[0]` does not inherit from BaseModelAdmin.
+ImproperlyConfigured: 'ValidationTestModelAdmin.inlines[0]' does not inherit from BaseModelAdmin.
 
 >>> class ValidationTestInline(TabularInline):
 ...     pass
@@ -764,7 +764,7 @@ ImproperlyConfigured: `ValidationTestModelAdmin.inlines[0]` does not inherit fro
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `model` is a required attribute of `ValidationTestModelAdmin.inlines[0]`.
+ImproperlyConfigured: 'model' is a required attribute of 'ValidationTestModelAdmin.inlines[0]'.
 
 >>> class SomethingBad(object):
 ...     pass
@@ -775,7 +775,7 @@ ImproperlyConfigured: `model` is a required attribute of `ValidationTestModelAdm
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestModelAdmin.inlines[0].model` does not inherit from models.Model.
+ImproperlyConfigured: 'ValidationTestModelAdmin.inlines[0].model' does not inherit from models.Model.
 
 >>> class ValidationTestInline(TabularInline):
 ...     model = ValidationTestInlineModel
@@ -793,7 +793,7 @@ ImproperlyConfigured: `ValidationTestModelAdmin.inlines[0].model` does not inher
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestInline.fields` must be a list or tuple.
+ImproperlyConfigured: 'ValidationTestInline.fields' must be a list or tuple.
 
 >>> class ValidationTestInline(TabularInline):
 ...     model = ValidationTestInlineModel
@@ -803,7 +803,7 @@ ImproperlyConfigured: `ValidationTestInline.fields` must be a list or tuple.
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestInline.fields` refers to field `non_existent_field` that is missing from the form.
+ImproperlyConfigured: 'ValidationTestInline.fields' refers to field 'non_existent_field' that is missing from the form.
 
 # fk_name
 
@@ -815,7 +815,7 @@ ImproperlyConfigured: `ValidationTestInline.fields` refers to field `non_existen
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestInline.fk_name` refers to field `non_existent_field` that is missing from model `ValidationTestInlineModel`.
+ImproperlyConfigured: 'ValidationTestInline.fk_name' refers to field 'non_existent_field' that is missing from model 'ValidationTestInlineModel'.
 
 >>> class ValidationTestInline(TabularInline):
 ...     model = ValidationTestInlineModel
@@ -834,7 +834,7 @@ ImproperlyConfigured: `ValidationTestInline.fk_name` refers to field `non_existe
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestInline.extra` should be a integer.
+ImproperlyConfigured: 'ValidationTestInline.extra' should be a integer.
 
 >>> class ValidationTestInline(TabularInline):
 ...     model = ValidationTestInlineModel
@@ -853,7 +853,7 @@ ImproperlyConfigured: `ValidationTestInline.extra` should be a integer.
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestInline.max_num` should be a integer.
+ImproperlyConfigured: 'ValidationTestInline.max_num' should be a integer.
 
 >>> class ValidationTestInline(TabularInline):
 ...     model = ValidationTestInlineModel
@@ -876,7 +876,7 @@ ImproperlyConfigured: `ValidationTestInline.max_num` should be a integer.
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: `ValidationTestInline.formset` does not inherit from BaseModelFormSet.
+ImproperlyConfigured: 'ValidationTestInline.formset' does not inherit from BaseModelFormSet.
 
 >>> class RealModelFormSet(BaseModelFormSet):
 ...     pass
