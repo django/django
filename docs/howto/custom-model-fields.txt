@@ -200,14 +200,12 @@ parameters:
     * :attr:`~django.db.models.Field.db_index`
     * :attr:`~django.db.models.Field.core`
     * :attr:`~django.db.models.Field.rel`: Used for related fields (like
-      :attr:`~django.db.models.Field.ForeignKey`). For advanced use only.
+      :class:`ForeignKey`). For advanced use only.
     * :attr:`~django.db.models.Field.default`
     * :attr:`~django.db.models.Field.editable`
-    * :attr:`~django.db.models.Field.serialize`: If
-      :attr:`~django.db.models.Field.False`, the field will not be serialized
-      when the model is passed to Django's :ref:`serializers
-      <topics-serialization>`. Defaults to
-      :attr:`~django.db.models.Field.True`.
+    * :attr:`~django.db.models.Field.serialize`: If ``False``, the field will 
+      not be serialized when the model is passed to Django's :ref:`serializers
+      <topics-serialization>`. Defaults to ``True``.
     * :attr:`~django.db.models.Field.prepopulate_from`
     * :attr:`~django.db.models.Field.unique_for_date`
     * :attr:`~django.db.models.Field.unique_for_month`
