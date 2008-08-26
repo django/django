@@ -4,20 +4,16 @@ from django import http
 from django.test import TestCase
 
 success_string = "Done was called!"
-test_data = {'field1': u'foo',
-             'field1_': u'asdf'}
-
 
 class TestFormPreview(preview.FormPreview):
 
     def done(self, request, cleaned_data):
         return http.HttpResponse(success_string)
 
-
 class TestForm(forms.Form):
     field1 = forms.CharField()
     field1_ = forms.CharField()
-
+    bool1 = forms.BooleanField(required=False)
 
 class PreviewTests(TestCase):
     urls = 'django.contrib.formtools.test_urls'
@@ -27,6 +23,7 @@ class PreviewTests(TestCase):
         self.preview = preview.FormPreview(TestForm)
         input_template = '<input type="hidden" name="%s" value="%s" />'
         self.input = input_template % (self.preview.unused_name('stage'), "%d")
+        self.test_data = {'field1':u'foo', 'field1_':u'asdf'}
 
     def test_unused_name(self):
         """
@@ -59,8 +56,8 @@ class PreviewTests(TestCase):
         """
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
-        test_data.update({'stage': 1})
-        response = self.client.post('/test1/', test_data)
+        self.test_data.update({'stage': 1})
+        response = self.client.post('/test1/', self.test_data)
         # Check to confirm stage is set to 2 in output form.
         stage = self.input % 2
         self.assertContains(response, stage, 1)
@@ -77,11 +74,30 @@ class PreviewTests(TestCase):
         """
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
-        test_data.update({'stage': 2})
-        response = self.client.post('/test1/', test_data)
+        self.test_data.update({'stage':2})
+        response = self.client.post('/test1/', self.test_data)
         self.failIfEqual(response.content, success_string)
-        hash = self.preview.security_hash(None, TestForm(test_data))
-        test_data.update({'hash': hash})
-        response = self.client.post('/test1/', test_data)
+        hash = self.preview.security_hash(None, TestForm(self.test_data))
+        self.test_data.update({'hash': hash})
+        response = self.client.post('/test1/', self.test_data)
+        self.assertEqual(response.content, success_string)
+
+    def test_bool_submit(self):
+        """
+        Test contrib.formtools.preview form submittal when form contains:
+        BooleanField(required=False)
+
+        Ticket: #6209 - When an unchecked BooleanField is previewed, the preview
+        form's hash would be computed with no value for ``bool1``. However, when
+        the preview form is rendered, the unchecked hidden BooleanField would be
+        rendered with the string value 'False'. So when the preview form is
+        resubmitted, the hash would be computed with the value 'False' for
+        ``bool1``. We need to make sure the hashes are the same in both cases.
+
+        """
+        self.test_data.update({'stage':2})
+        hash = self.preview.security_hash(None, TestForm(self.test_data))
+        self.test_data.update({'hash':hash, 'bool1':u'False'})
+        response = self.client.post('/test1/', self.test_data)
         self.assertEqual(response.content, success_string)
 

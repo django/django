@@ -9,6 +9,7 @@ from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils.hashcompat import md5_constructor
+from django.contrib.formtools.utils import security_hash
 
 AUTO_ID = 'formtools_%s' # Each form here uses this as its auto_id parameter.
 
@@ -97,20 +98,12 @@ class FormPreview(object):
 
     def security_hash(self, request, form):
         """
-        Calculates the security hash for the given Form instance.
+        Calculates the security hash for the given HttpRequest and Form instances.
 
-        This creates a list of the form field names/values in a deterministic
-        order, pickles the result with the SECRET_KEY setting and takes an md5
-        hash of that.
-
-        Subclasses may want to take into account request-specific information
+        Subclasses may want to take into account request-specific information,
         such as the IP address.
         """
-        data = [(bf.name, bf.data or '') for bf in form] + [settings.SECRET_KEY]
-        # Use HIGHEST_PROTOCOL because it's the most efficient. It requires
-        # Python 2.3, but Django requires 2.3 anyway, so that's OK.
-        pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
-        return md5_constructor(pickled).hexdigest()
+        return security_hash(request, form)
 
     def failed_hash(self, request):
         "Returns an HttpResponse in the case of an invalid security hash."
