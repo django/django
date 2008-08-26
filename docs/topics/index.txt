@@ -23,3 +23,4 @@ Introductions to all the key parts of Django you'll need to know:
    pagination
    serialization
    settings
+   signals

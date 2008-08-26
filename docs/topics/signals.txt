@@ -1,0 +1,176 @@
+.. _topics-signals:
+
+=======
+Signals
+=======
+
+.. module:: django.dispatch
+   :synopsis: Signal dispatch
+
+Django includes a "signal dispatcher" which helps allow decoupled applications
+get notified when actions occur elsewhere in the framework. In a nutshell,
+signals allow certain *senders* to notify a set of *receivers* that some action
+has taken place. They're especially useful when many pieces of code may be
+interested in the same events.
+
+Django provides a :ref:`set of built-in signals <ref-signals>` that let user
+code get notified by Django itself of certain actions. These include some useful
+notifications:
+
+    * :data:`django.db.models.signals.pre_save` &
+      :data:`django.db.models.signals.post_save`
+
+      Sent before or after a model's :meth:`~django.db.models.Model.save` method
+      is called.
+
+    * :data:`django.db.models.signals.pre_delete` &
+      :data:`django.db.models.signals.post_delete`
+
+      Sent before or after a model's :meth:`~django.db.models.Model.delete`
+      method is called.
+
+
+    * :data:`django.core.signals.request_started` &
+      :data:`django.core.signals.request_finished`
+
+      Sent when Django starts or finishes an HTTP request.
+
+See the :ref:`built-in signal documentation <ref-signals>` for a complete list,
+and a complete explanation of each signal.
+
+You can also `define and send your own custom signals`_; see below.
+
+.. _define and send your own custom signals: `defining and sending signals`_
+
+Listening to signals
+====================
+
+To receive a signal, you need to register a *receiver* function that gets called
+when the signal is sent. Let's see how this works by registering a signal that
+gets called after each HTTP request is finished. We'll be connecting to the
+:data:`~django.core.signals.request_finished` signal.
+
+Receiver functions
+------------------
+
+First, we need to define a receiver function. A receiver can be any Python function or method:
+
+.. code-block:: python
+
+    def my_callback(sender, **kwargs):
+        print "Request finished!"
+
+Notice that the function takes a ``sender`` argument, along with wildcard
+keyword arguments (``**kwargs``); all signal handlers must take these arguments.
+
+We'll look at senders `a bit later`_, but right now look at the ``**kwargs``
+argument. All signals send keyword arguments, and may change those keyword
+arguments at any time. In the case of
+:data:`~django.core.signals.request_finished`, it's documented as sending no
+arguments, which means we might be tempted to write our signal handling as
+``my_callback(sender)``.
+
+.. _a bit later: `connecting to signals sent by specific senders`_
+
+This would be wrong -- in fact, Django will throw an error if you do so. That's
+because at any point arguments could get added to the signal and your receiver
+must be able to handle those new arguments.
+
+Connecting receiver functions
+-----------------------------
+
+Next, we'll need to connect our receiver to the signal:
+
+.. code-block:: python
+
+    from django.core.signals import request_finished
+
+    request_finished.connect(my_callback)
+
+Now, our ``my_callback`` function will be called each time a request finishes.
+
+.. admonition:: Where should this code live?
+
+    You can put signal handling and registration code anywhere you like.
+    However, you'll need to make sure that the module it's in gets imported
+    early on so that the signal handling gets registered before any signals need
+    to be sent. This makes your app's ``models.py`` a good place to put
+    registration of signal handlers.
+
+Connecting to signals sent by specific senders
+----------------------------------------------
+
+Some signals get sent many times, but you'll only be interested in recieving a
+certain subset of those signals. For example, consider the
+:data:`django.db.models.signals.pre_save` signal sent before a model gets saved.
+Most of the time, you don't need to know when *any* model gets saved -- just
+when one *specific* model is saved.
+
+In these cases, you can register to receive signals sent only by particular
+senders. In the case of :data:`django.db.models.signals.pre_save`, the sender
+will be the model class being saved, so you can indicate that you only want
+signals sent by some model:
+
+.. code-block:: python
+
+    from django.db.models.signals import pre_save
+    from myapp.models import MyModel
+
+    def my_handler(sender, **kwargs):
+        ...
+
+    pre_save.connect(my_handler, sender=MyModel)
+
+The ``my_handler`` function will only be called when an instance of ``MyModel``
+is saved.
+
+Different signals use different objects as their senders; you'll need to consult
+the :ref:`built-in signal documentation <ref-signals>` for details of each
+particular signal.
+
+Defining and sending signals
+============================
+
+Your applications can take advantage of the signal infrastructure and provide its own signals.
+
+Defining signals
+----------------
+
+.. class:: Signal([providing_args=list])
+
+All signals are :class:`django.dispatch.Signal` instances. The
+``providing_args`` is a list of the names of arguments the signal will provide
+to listeners.
+
+For example:
+
+.. code-block:: python
+
+    import django.dispatch
+
+    pizza_done = django.dispatch.Signal(providing_args=["toppings", "size"])
+
+This declares a ``pizza_done`` signal that will provide receivers with
+``toppings`` and ``size`` arguments.
+
+Remember that you're allowed to change this list of arguments at any time, so getting the API right on the first try isn't necessary.
+
+Sending signals
+---------------
+
+.. method:: Signal.send(sender, **kwargs)
+
+To send a signal, call :meth:`Signal.send`. You must provide the ``sender`` argument, and may provide as many other keyword arguments as you like.
+
+For example, here's how sending our ``pizza_done`` signal might look:
+
+.. code-block:: python
+
+    class PizzaStore(object):
+        ...
+
+        def send_pizza(self, toppings, size):
+            pizza_done.send(sender=self, toppings=toppings, size=size)
+            ...
+
+

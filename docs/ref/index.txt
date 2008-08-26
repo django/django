@@ -9,13 +9,14 @@ API Reference
    contrib/index
    databases
    django-admin
+   files/index
    forms/index
    generic-views
    middleware
    models/index
    request-response
    settings
+   signals
    templates/index
    unicode
-   files/index
    

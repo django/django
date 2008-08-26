@@ -208,5 +208,6 @@ More information
    :maxdepth: 1
 
    settings
+   signals
    upgrade
 

@@ -1,0 +1,294 @@
+.. _ref-signals:
+
+=========================
+Built-in signal reference
+=========================
+
+A list of all the signals that Django sends.
+
+.. seealso::
+
+    The :ref:`comment framework <ref-contrib-comments-index>` sends a :ref:`set
+    of comment-related signals <ref-contrib-comments-signals>`.
+
+Model signals
+=============
+
+.. module:: django.db.models.signals
+   :synopsis: Signals sent by the model system.
+
+The :mod:`django.db.models.signals` module defines a set of signals sent by the
+module system.
+
+.. warning::
+
+    Many of these signals are sent by various model methods like
+    :meth:`~django.db.models.Model.__init__` or
+    :meth:`~django.db.models.Model.save` that you can overwrite in your own
+    code.
+
+    If you override these methods on your model, you must call the parent class'
+    methods for this signals to be sent.
+
+pre_init
+--------
+
+.. data:: django.db.models.signals.pre_init
+
+Whenever you instantiate a Django model,, this signal is sent at the beginning
+of the model's :meth:`~django.db.models.Model.__init__` method.
+
+Arguments sent with this signal:
+
+    ``sender``
+        The model class that just had an instance created.
+
+    ``args``
+        A list of positional arguments passed to
+        :meth:`~django.db.models.Model.__init__`:
+
+    ``kwargs``
+        A dictionary of keyword arguments passed to
+        :meth:`~django.db.models.Model.__init__`:.
+
+For example, the :ref:`tutorial <intro-tutorial01>` has this line:
+
+.. code-block:: python
+
+    p = Poll(question="What's up?", pub_date=datetime.now())
+
+The arguments sent to a :data:`pre_init` handler would be:
+
+    ==========  ===============================================================
+    Argument    Value
+    ==========  ===============================================================
+    ``sender``  ``Poll`` (the class itself)
+
+    ``args``    ``[]`` (an empty list because there were no positional
+                arguments passed to ``__init__``.)
+
+    ``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
+    ==========  ===============================================================
+
+post_init
+---------
+
+.. data:: django.db.models.signals.post_init
+
+Like pre_init, but this one is sent when the :meth:`~django.db.models.Model.__init__`: method finishes.
+
+Arguments sent with this signal:
+
+    ``sender``
+        As above: rhe model class that just had an instance created.
+
+    ``instance``
+        The actual instance of the model that's just been created.
+
+pre_save
+--------
+
+.. data:: django.db.models.signals.pre_save
+
+This is sent at the beginning of a model's :meth:`~django.db.models.Model.save`
+method.
+
+Arguments sent with this signal:
+
+    ``sender``
+        The model class.
+
+    ``instance``
+        The actual instance being saved.
+
+post_save
+---------
+
+.. data:: django.db.models.signals.post_save
+
+Like :data:`pre_save`, but sent at the end of the
+:meth:`~django.db.models.Model.save` method.
+
+Arguments sent with this signal:
+
+    ``sender``
+        The model class.
+
+    ``instance``
+        The actual instance being saved.
+
+    ``created``
+        A boolean; ``True`` if a new record was create.
+
+pre_delete
+----------
+
+.. data:: django.db.models.signals.pre_delete
+
+Sent at the beginning of a model's :meth:`~django.db.models.Model.delete`
+method.
+
+Arguments sent with this signal:
+
+    ``sender``
+        The model class.
+
+    ``instance``
+        The actual instance being saved.
+
+post_delete
+-----------
+
+.. data:: django.db.models.signals.post_delete
+
+Like :data:`pre_delete`, but sent at the end of the
+:meth:`~django.db.models.Model.delete` method.
+
+Arguments sent with this signal:
+
+    ``sender``
+        The model class.
+
+    ``instance``
+        The actual instance being saved.
+
+        Note that the object will no longer be in the database, so be very
+        careful what you do with this instance
+
+class_prepared
+--------------
+
+.. data:: django.db.models.signals.class_prepared
+
+Sent whenever a model class has been "prepared" -- that is, once model has
+been defined and registered with Django's model system. Django uses this
+signal internally; it's not generally used in third-party applications.
+
+Arguments that are sent with this signal:
+
+``sender``
+    The model class which was just prepared.
+
+Management signals
+==================
+
+Signals sent by :ref:`django-admin <ref-django-admin>`.
+
+post_syncdb
+-----------
+
+.. data:: django.db.models.signals.post_syncdb
+
+Sent by :djadmin:`syncdb` after it installs an application.
+
+Any handlers that listen to this signal need to be written in a particular
+place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
+handlers are registered anywhere else they may not be loaded by
+:djadmin:`syncdb`.
+
+Arguments sent with this signal:
+
+    ``sender``
+        The ``models`` module that was just installed. That is, if
+        :djadmin:`syncdb` just installed an app called ``"foo.bar.myapp"``,
+        ``sender`` will be the ``foo.bar.myapp.models`` module.
+
+    ``app``
+        Same as ``sender``.
+
+    ``created_models``
+        A list of the model classes from any app which :djadmin:`syncdb` has
+        created so far.
+
+    ``verbosity``
+        Indicates how much information manage.py is printing on screen. See
+        the :djadminopt:`--verbosity`` flag for details.
+
+        Functions which listen for :data:`post_syncdb` should adjust what they
+        output to the screen based on the value of this argument.
+
+    ``interactive``
+        If ``interactive`` is ``True``, it's safe to prompt the user to input
+        things on the command line. If ``interactive`` is ``False``, functions
+        which listen for this signal should not try to prompt for anything.
+
+        For example, the :mod:`django.contrib.auth` app only prompts to create a
+        superuser when ``interactive`` is ``True``.
+
+Request/response signals
+========================
+
+.. module:: django.core.signals
+   :synopsis: Core signals sent by the request/response system.
+
+Signals sent by the core framework when processing a request.
+
+request_started
+---------------
+
+.. data:: django.core.signals.request_started
+
+Sent when Django begins processing an HTTP request.
+
+Arguments sent with this signal:
+
+    ``sender``
+        The handler class -- i.e.
+        :class:`django.core.handlers.modpython.ModPythonHandler` or
+        :class:`django.core.handlers.wsgi.WsgiHandler` -- that handled
+        the request.
+
+request_finished
+----------------
+
+.. data:: django.core.signals.request_finished
+
+Sent when Django finishes processing an HTTP request.
+
+Arguments sent with this signal:
+
+    ``sender``
+        The handler class, as above.
+
+got_request_exception
+---------------------
+
+.. data:: django.core.signals.got_request_exception
+
+This signal is sent whenever Django encounters an exception while processing an incoming HTTP request.
+
+Arguments sent with this signal:
+
+    ``sender``
+        The handler class, as above.
+
+    ``request``
+        The :class:`~django.http.HttpRequest` object.
+
+Test signals
+============
+
+.. module:: django.test.signals
+   :synopsis: Signals sent during testing.
+
+Signals only sent when :ref:`running tests <topics-testing>`.
+
+template_rendered
+-----------------
+
+.. data:: django.test.signals.template_rendered
+
+Sent when the test system renders a template. This signal is not emitted during
+normal operation of a Django server -- it is only available during testing.
+
+Arguments sent with this signal:
+
+    sender
+        The :class:`~django.template.Template` object which was rendered.
+
+    template
+        Same as sender
+
+    context
+        The :class:`~django.template.Context` with which the template was
+        rendered.
