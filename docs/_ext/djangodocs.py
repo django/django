@@ -79,7 +79,16 @@ class DjangoHTMLTranslator(sphinx.htmlwriter.SmartyPantsHTMLTranslator):
     # Don't use border=1, which docutils does by default.
     def visit_table(self, node):
         self.body.append(self.starttag(node, 'table', CLASS='docutils'))
-        
+    
+    # <big>? Really?
+    def visit_desc_parameterlist(self, node):
+        self.body.append('(')
+        self.first_param = 1
+    
+    def depart_desc_parameterlist(self, node):
+        self.body.append(')')
+        pass
+    
     # Give each section a unique ID -- nice for custom CSS hooks
     # This is different on docutils 0.5 vs. 0.4...
     
