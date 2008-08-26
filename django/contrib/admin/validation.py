@@ -17,6 +17,10 @@ def validate(cls, model):
     classmethod in the end if it is provided in cls. The signature of the
     custom validation classmethod should be: def validate(cls, model).
     """
+    # Before we can introspect models, they need to be fully loaded so that
+    # inter-relations are set up correctly. We force that here.
+    models.get_apps()
+
     opts = model._meta
     validate_base(cls, model)
 
