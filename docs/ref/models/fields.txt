@@ -340,6 +340,14 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
     The maximum length (in characters) of the field. The max_length is enforced
     at the database level and in Django's validation.
 
+.. admonition:: MySQL users
+
+    If you are using this field with MySQLdb 1.2.2 and the ``utf8_bin``
+    collation (which is *not* the default), there are some issues to be aware
+    of. Refer to the :ref:`MySQL database notes <mysql-collation>` for
+    details.
+
+
 ``CommaSeparatedIntegerField``
 ------------------------------
 
@@ -688,6 +696,13 @@ Like an :class:`IntegerField`, but only allows values under a certain
 
 A large text field. The admin represents this as a ``<textarea>`` (a multi-line
 input).
+
+.. admonition:: MySQL users
+
+    If you are using this field with MySQLdb 1.2.1p2 and the ``utf8_bin``
+    collation (which is *not* the default), there are some issues to be aware
+    of. Refer to the :ref:`MySQL database notes <mysql-collation>` for
+    details.
 
 ``TimeField``
 -------------

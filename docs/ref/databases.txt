@@ -95,6 +95,65 @@ This ensures all tables and columns will use UTF-8 by default.
 
 .. _create your database: http://dev.mysql.com/doc/refman/5.0/en/create-database.html
 
+.. _mysql-collation:
+
+Collation settings
+~~~~~~~~~~~~~~~~~~
+
+The collation setting for a column controls the order in which data is sorted
+as well as what strings compare as equal. It can be set on a database-wide
+level and also per-table and per-column. This is `documented thoroughly`_ in
+the MySQL documentation. In all cases, you set the collation by directly
+manipulating the database tables; Django doesn't provide a way to set this on
+the model definition.
+
+.. _documented thoroughly: http://dev.mysql.com/doc/refman/5.0/en/charset.html
+
+By default, with a UTF-8 database, MySQL will use the
+``utf8_general_ci_swedish`` collation. This results in all string equality
+comparisons being done in a *case-insensitive* manner. That is, ``"Fred"`` and
+``"freD"`` are considered equal at the database level. If you have a unique
+constraint on a field, it would be illegal to try to insert both ``"aa"`` and
+``"AA"`` into the same column, since they compare as equal (and, hence,
+non-unique) with the default collation.
+
+In many cases, this default will not be a problem. However, if you really want
+case-sensitive comparisons on a particular column or table, you would change
+the column or table to use the ``utf8_bin`` collation. The main thing to be
+aware of in this case is that if you are using MySQLdb 1.2.2, the database backend in Django will then return
+bytestrings (instead of unicode strings) for any character fields it returns
+receive from the database. This is a strong variation from Django's normal
+practice of *always* returning unicode strings. It is up to you, the
+developer, to handle the fact that you will receive bytestrings if you
+configure your table(s) to use ``utf8_bin`` collation. Django itself should work
+smoothly with such columns, but if your code must be prepared to call
+``django.utils.encoding.smart_unicode()`` at times if it really wants to work
+with consistent data -- Django will not do this for you (the database backend
+layer and the model population layer are separated internally so the database
+layer doesn't know it needs to make this conversion in this one particular
+case).
+
+If you're using MySQLdb 1.2.1p2, Django's standard
+:class:`~django.db.models.CharField` class will return unicode strings even
+with ``utf8_bin`` collation. However, :class:`~django.db.models.TextField`
+fields will be returned as an ``array.array`` instance (from Python's standard
+``array`` module). There isn't a lot Django can do about that, since, again,
+the information needed to make the necessary conversions isn't available when
+the data is read in from the database. This problem was `fixed in MySQLdb
+1.2.2`_, so if you want to use :class:`~django.db.models.TextField` with
+``utf8_bin`` collation, upgrading to version 1.2.2 and then dealing with the
+bytestrings (which shouldn't be too difficult) is the recommended solution.
+
+Should you decide to use ``utf8_bin`` collation for some of your tables with
+MySQLdb 1.2.1p2, you should still use ``utf8_collation_ci_swedish`` (the
+default) collation for the :class:`django.contrib.sessions.models.Session`
+table (usually called ``django_session`` and the table
+:class:`django.contrib.admin.models.LogEntry` table (usually called
+``django_admin_log``). Those are the two standard tables that use
+:class:`~django.db.model.TextField` internally.
+
+.. _fixed in MySQLdb 1.2.2: http://sourceforge.net/tracker/index.php?func=detail&aid=1495765&group_id=22307&atid=374932
+
 Connecting to the database
 --------------------------
 
