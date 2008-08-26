@@ -5,12 +5,10 @@ from django.contrib.sites.models import Site
 from django.core import urlresolvers
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.db.models import get_model
+from django.contrib.gis.db.models.fields import GeometryField
 from django.utils.encoding import smart_str
 
 from django.contrib.gis.shortcuts import render_to_kml, render_to_kmz
-
-class KMLNotFound(Exception):
-    pass
 
 def index(request, sitemaps):
     """
@@ -71,7 +69,15 @@ def kml(request, label, model, field_name=None, compress=False):
     placemarks = []
     klass = get_model(label, model)
     if not klass:
-        raise KMLNotFound("You must supply a valid app.model label.  Got %s.%s" % (label, model))
+        raise Http404('You must supply a valid app label and module name.  Got "%s.%s"' % (label, model))
+
+    if field_name:
+        try:
+            info = klass._meta.get_field_by_name(field_name)
+            if not isinstance(info[0], GeometryField):
+                raise Exception
+        except:
+            raise Http404('Invalid geometry field.')
 
     if SpatialBackend.postgis:
         # PostGIS will take care of transformation.

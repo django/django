@@ -41,7 +41,7 @@ class GeoRSSSitemap(Sitemap):
         This method is overrridden so the appropriate `geo_format` attribute
         is placed on each URL element.
         """
-        urls = Sitemap.get_urls(self)
+        urls = Sitemap.get_urls(self, page=page)
         for url in urls: url['geo_format'] = 'georss'
         return urls
 
