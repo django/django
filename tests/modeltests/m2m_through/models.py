@@ -7,7 +7,7 @@ class Person(models.Model):
 
     class Meta:
         ordering = ('name',)
-        
+
     def __unicode__(self):
         return self.name
 
@@ -19,7 +19,7 @@ class Group(models.Model):
 
     class Meta:
         ordering = ('name',)
-            
+
     def __unicode__(self):
         return self.name
 
@@ -31,7 +31,7 @@ class Membership(models.Model):
 
     class Meta:
         ordering = ('date_joined', 'invite_reason', 'group')
-    
+
     def __unicode__(self):
         return "%s is a member of %s" % (self.person.name, self.group.name)
 
@@ -40,10 +40,10 @@ class CustomMembership(models.Model):
     group = models.ForeignKey(Group)
     weird_fk = models.ForeignKey(Membership, null=True)
     date_joined = models.DateTimeField(default=datetime.now)
-    
+
     def __unicode__(self):
         return "%s is a member of %s" % (self.person.name, self.group.name)
-    
+
     class Meta:
         db_table = "test_table"
 
@@ -55,7 +55,7 @@ class TestNoDefaultsOrNulls(models.Model):
 class PersonSelfRefM2M(models.Model):
     name = models.CharField(max_length=5)
     friends = models.ManyToManyField('self', through="Friendship", symmetrical=False)
-    
+
     def __unicode__(self):
         return self.name
 
@@ -98,7 +98,7 @@ __test__ = {'API_TESTS':"""
 >>> jim.group_set.all()
 [<Group: Rock>, <Group: Roll>]
 
-# Querying the intermediary model works like normal.  
+# Querying the intermediary model works like normal.
 # In this case we get Jane's membership to Rock.
 >>> m = Membership.objects.get(person=jane, group=rock)
 >>> m
@@ -122,7 +122,7 @@ __test__ = {'API_TESTS':"""
 
 ### Forward Descriptors Tests ###
 
-# Due to complications with adding via an intermediary model, 
+# Due to complications with adding via an intermediary model,
 # the add method is not provided.
 >>> rock.members.add(bob)
 Traceback (most recent call last):
@@ -173,7 +173,7 @@ AttributeError: Cannot set values on a ManyToManyField which specifies an interm
 
 ### Reverse Descriptors Tests ###
 
-# Due to complications with adding via an intermediary model, 
+# Due to complications with adding via an intermediary model,
 # the add method is not provided.
 >>> bob.group_set.add(rock)
 Traceback (most recent call last):
@@ -287,7 +287,7 @@ AttributeError: Cannot set values on a ManyToManyField which specifies an interm
 
 ### QUERY TESTS ###
 
-# We can query for the related model by using its attribute name (members, in 
+# We can query for the related model by using its attribute name (members, in
 # this case).
 >>> Group.objects.filter(members__name='Bob')
 [<Group: Roll>]
@@ -315,19 +315,19 @@ AttributeError: Cannot set values on a ManyToManyField which specifies an interm
 >>> Group.objects.filter(membership__date_joined__gt=datetime(2005, 1, 1), membership__person =jane)
 [<Group: Rock>]
 
-# Queries also work in the reverse direction: Now let's see all of the people 
+# Queries also work in the reverse direction: Now let's see all of the people
 # that have joined Rock since 1 Jan 2005:
 >>> Person.objects.filter(membership__date_joined__gt=datetime(2005, 1, 1), membership__group=rock)
 [<Person: Jane>, <Person: Jim>]
 
 # Conceivably, queries through membership could return correct, but non-unique
-# querysets.  To demonstrate this, we query for all people who have joined a 
+# querysets.  To demonstrate this, we query for all people who have joined a
 # group after 2004:
 >>> Person.objects.filter(membership__date_joined__gt=datetime(2004, 1, 1))
 [<Person: Jane>, <Person: Jim>, <Person: Jim>]
 
 # Jim showed up twice, because he joined two groups ('Rock', and 'Roll'):
->>> [(m.person.name, m.group.name) for m in 
+>>> [(m.person.name, m.group.name) for m in
 ... Membership.objects.filter(date_joined__gt=datetime(2004, 1, 1))]
 [(u'Jane', u'Rock'), (u'Jim', u'Rock'), (u'Jim', u'Roll')]
 

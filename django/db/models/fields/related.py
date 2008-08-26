@@ -44,7 +44,7 @@ def add_lazy_relation(cls, field, relation, operation):
     If the other model hasn't yet been loaded -- almost a given if you're using
     lazy relationships -- then the relation won't be set up until the
     class_prepared signal fires at the end of model initialization.
-    
+
     operation is the work that must be performed once the relation can be resolved.
     """
     # Check for recursive relations
@@ -378,7 +378,7 @@ def create_many_related_manager(superclass, through=False):
         def get_query_set(self):
             return superclass.get_query_set(self)._next_is_sticky().filter(**(self.core_filters))
 
-        # If the ManyToMany relation has an intermediary model, 
+        # If the ManyToMany relation has an intermediary model,
         # the add and remove methods do not exist.
         if through is None:
             def add(self, *objs):
@@ -773,7 +773,7 @@ class ManyToManyField(RelatedField, Field):
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             symmetrical=kwargs.pop('symmetrical', True),
             through=kwargs.pop('through', None))
-            
+
         self.db_table = kwargs.pop('db_table', None)
         if kwargs['rel'].through is not None:
             self.creates_table = False
@@ -817,7 +817,7 @@ class ManyToManyField(RelatedField, Field):
                 self._m2m_column_name_cache = 'from_' + related.model._meta.object_name.lower() + '_id'
             else:
                 self._m2m_column_name_cache = related.model._meta.object_name.lower() + '_id'
-                
+
             # Return the newly cached value
             return self._m2m_column_name_cache
 
@@ -831,8 +831,8 @@ class ManyToManyField(RelatedField, Field):
                 for f in self.rel.through_model._meta.fields:
                     if hasattr(f,'rel') and f.rel and f.rel.to == related.parent_model:
                         if related.model == related.parent_model:
-                            # If this is an m2m-intermediate to self, 
-                            # the first foreign key you find will be 
+                            # If this is an m2m-intermediate to self,
+                            # the first foreign key you find will be
                             # the source column. Keep searching for
                             # the second foreign key.
                             if found:
@@ -884,13 +884,13 @@ class ManyToManyField(RelatedField, Field):
         return new_data
 
     def contribute_to_class(self, cls, name):
-        super(ManyToManyField, self).contribute_to_class(cls, name)        
+        super(ManyToManyField, self).contribute_to_class(cls, name)
         # Add the descriptor for the m2m relation
         setattr(cls, self.name, ReverseManyRelatedObjectsDescriptor(self))
 
         # Set up the accessor for the m2m table name for the relation
         self.m2m_db_table = curry(self._get_m2m_db_table, cls._meta)
-        
+
         # Populate some necessary rel arguments so that cross-app relations
         # work correctly.
         if isinstance(self.rel.through, basestring):
@@ -900,7 +900,7 @@ class ManyToManyField(RelatedField, Field):
         elif self.rel.through:
             self.rel.through_model = self.rel.through
             self.rel.through = self.rel.through._meta.object_name
-            
+
         if isinstance(self.rel.to, basestring):
             target = self.rel.to
         else:

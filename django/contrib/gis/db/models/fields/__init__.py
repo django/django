@@ -31,7 +31,7 @@ class GeometryField(SpatialBackend.Field):
          Indicates whether to create a spatial index.  Defaults to True.
          Set this instead of 'db_index' for geographic fields since index
          creation is different for geometry columns.
-                  
+
         dim:
          The number of dimensions for this geometry.  Defaults to 2.
         """
@@ -39,18 +39,18 @@ class GeometryField(SpatialBackend.Field):
         # Setting the index flag with the value of the `spatial_index` keyword.
         self._index = spatial_index
 
-        # Setting the SRID and getting the units.  Unit information must be 
+        # Setting the SRID and getting the units.  Unit information must be
         # easily available in the field instance for distance queries.
         self._srid = srid
         self._unit, self._unit_name, self._spheroid = get_srid_info(srid)
 
         # Setting the dimension of the geometry field.
         self._dim = dim
-        
-        # Setting the verbose_name keyword argument with the positional 
+
+        # Setting the verbose_name keyword argument with the positional
         # first parameter, so this works like normal fields.
         kwargs['verbose_name'] = verbose_name
-       
+
         super(GeometryField, self).__init__(**kwargs) # Calling the parent initializtion function
 
     ### Routines specific to GeometryField ###
@@ -64,7 +64,7 @@ class GeometryField(SpatialBackend.Field):
 
     def get_distance(self, dist_val, lookup_type):
         """
-        Returns a distance number in units of the field.  For example, if 
+        Returns a distance number in units of the field.  For example, if
         `D(km=1)` was passed in and the units of the field were in meters,
         then 1000 would be returned.
         """
@@ -84,10 +84,10 @@ class GeometryField(SpatialBackend.Field):
         else:
             # Assuming the distance is in the units of the field.
             dist_param = dist
-       
+
         if SpatialBackend.postgis and self.geodetic and lookup_type != 'dwithin' and option == 'spheroid':
-            # On PostGIS, by default `ST_distance_sphere` is used; but if the 
-            # accuracy of `ST_distance_spheroid` is needed than the spheroid 
+            # On PostGIS, by default `ST_distance_sphere` is used; but if the
+            # accuracy of `ST_distance_spheroid` is needed than the spheroid
             # needs to be passed to the SQL stored procedure.
             return [gqn(self._spheroid), dist_param]
         else:
@@ -98,7 +98,7 @@ class GeometryField(SpatialBackend.Field):
         Retrieves the geometry, setting the default SRID from the given
         lookup parameters.
         """
-        if isinstance(value, (tuple, list)): 
+        if isinstance(value, (tuple, list)):
             geom = value[0]
         else:
             geom = value
@@ -117,7 +117,7 @@ class GeometryField(SpatialBackend.Field):
 
         # Assigning the SRID value.
         geom.srid = self.get_srid(geom)
-        
+
         return geom
 
     def get_srid(self, geom):
@@ -135,12 +135,12 @@ class GeometryField(SpatialBackend.Field):
     ### Routines overloaded from Field ###
     def contribute_to_class(self, cls, name):
         super(GeometryField, self).contribute_to_class(cls, name)
-        
+
         # Setup for lazy-instantiated Geometry object.
         setattr(cls, self.attname, GeometryProxy(SpatialBackend.Geometry, self))
 
     def formfield(self, **kwargs):
-        defaults = {'form_class' : forms.GeometryField, 
+        defaults = {'form_class' : forms.GeometryField,
                     'geom_type' : self._geom,
                     'null' : self.null,
                     }
@@ -161,8 +161,8 @@ class GeometryField(SpatialBackend.Field):
             # if it is None.
             geom = self.get_geometry(value)
 
-            # Getting the WHERE clause list and the associated params list. The params 
-            # list is populated with the Adaptor wrapping the Geometry for the 
+            # Getting the WHERE clause list and the associated params list. The params
+            # list is populated with the Adaptor wrapping the Geometry for the
             # backend.  The WHERE clause list contains the placeholder for the adaptor
             # (e.g. any transformation SQL).
             where = [self.get_placeholder(geom)]
