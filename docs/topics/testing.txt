@@ -131,21 +131,20 @@ Here is an example model doctest::
         def speak(self):
             return 'The %s says "%s"' % (self.name, self.sound)
 
-When you :ref:`run your tests <running-tests>`, the test runner will find this docstring, notice
-that portions of it look like an interactive Python session, and execute those
-lines while checking that the results match.
+When you :ref:`run your tests <running-tests>`, the test runner will find this
+docstring, notice that portions of it look like an interactive Python session,
+and execute those lines while checking that the results match.
 
-In the case of model tests, note that the test runner takes care of
-creating its own test database. That is, any test that accesses a
-database -- by creating and saving model instances, for example --
-will not affect your production database. Each doctest begins with a
-"blank slate" -- a fresh database containing an empty table for each
-model. (See the section on fixtures, below, for more on this.) Note
-that to use this feature, the database user Django is connecting as
-must have ``CREATE DATABASE`` rights.
+In the case of model tests, note that the test runner takes care of creating
+its own test database. That is, any test that accesses a database -- by
+creating and saving model instances, for example -- will not affect your
+production database. Each doctest begins with a "blank slate" -- a fresh
+database containing an empty table for each model. (See the section on
+fixtures, below, for more on this.) Note that to use this feature, the database
+user Django is connecting as must have ``CREATE DATABASE`` rights.
 
 For more details about how doctest works, see the `standard library
-documentation for doctest`_
+documentation for doctest`_.
 
 .. _doctest: http://docs.python.org/lib/module-doctest.html
 .. _standard library documentation for doctest: doctest_
@@ -182,17 +181,17 @@ in the doctest section above::
             self.assertEquals(self.lion.speak(), 'The lion says "roar"')
             self.assertEquals(self.cat.speak(), 'The cat says "meow"')
 
-When you :ref:`run your tests <running-tests>`, the default behavior of the test utility is
-to find all the test cases (that is, subclasses of ``unittest.TestCase``)
-in ``models.py`` and ``tests.py``, automatically build a test suite out of
-those test cases, and run that suite.
+When you :ref:`run your tests <running-tests>`, the default behavior of the
+test utility is to find all the test cases (that is, subclasses of
+``unittest.TestCase``) in ``models.py`` and ``tests.py``, automatically build a
+test suite out of those test cases, and run that suite.
 
 In the Django development version, there is a second way to define the test
 suite for a module: if you define a function called ``suite()`` in either
 ``models.py`` or ``tests.py``, the Django test runner will use that function
-to construct the test suite for that module. This follows the
-`suggested organization`_ for unit tests. See the Python documentation for
-more details on how to construct a complex test suite.
+to construct the test suite for that module. This follows the `suggested
+organization`_ for unit tests. See the Python documentation for more details on
+how to construct a complex test suite.
 
 For more details about ``unittest``, see the `standard library unittest
 documentation`_.
@@ -242,7 +241,8 @@ in different circumstances.
 Running tests
 =============
 
-Once you've written tests, run them using your project's ``manage.py`` utility::
+Once you've written tests, run them using your project's ``manage.py``
+utility::
 
     $ ./manage.py test
 
@@ -273,18 +273,18 @@ a test case, add the name of the test method to the label::
 The test database
 -----------------
 
-Tests that require a database (namely, model tests) will not use
-your "real" (production) database. A separate, blank database is created
-for the tests.
+Tests that require a database (namely, model tests) will not use your "real"
+(production) database. A separate, blank database is created for the tests.
 
 Regardless of whether the tests pass or fail, the test database is destroyed
 when all the tests have been executed.
 
-By default this test database gets its name by prepending ``test_`` to the value
-of the :setting:`DATABASE_NAME` setting. When using the SQLite database engine
-the tests will by default use an in-memory database (i.e., the database will be
-created in memory, bypassing the filesystem entirely!). If you want to use a
-different database name, specify the :setting:`TEST_DATABASE_NAME` setting.
+By default this test database gets its name by prepending ``test_`` to the
+value of the :setting:`DATABASE_NAME` setting. When using the SQLite database
+engine the tests will by default use an in-memory database (i.e., the database
+will be created in memory, bypassing the filesystem entirely!). If you want to
+use a different database name, specify the :setting:`TEST_DATABASE_NAME`
+setting.
 
 Aside from using a separate database, the test runner will otherwise use all of
 the same database settings you have in your settings file:
@@ -466,126 +466,130 @@ Making requests
 ~~~~~~~~~~~~~~~
 
 Use the ``django.test.client.Client`` class to make requests. It requires no
-arguments at time of construction::
+arguments at time of construction:
 
 .. class:: Client()
 
-Once you have a ``Client`` instance, you can call any of the following methods:
+    Once you have a ``Client`` instance, you can call any of the following
+    methods:
 
-.. method:: Client.get(path, data={})
+    .. method:: Client.get(path, data={})
 
-    Makes a GET request on the provided ``path`` and returns a ``Response``
-    object, which is documented below.
+        Makes a GET request on the provided ``path`` and returns a ``Response``
+        object, which is documented below.
 
-    The key-value pairs in the ``data`` dictionary are used to create a GET
-    data payload. For example::
+        The key-value pairs in the ``data`` dictionary are used to create a GET
+        data payload. For example::
 
-        >>> c = Client()
-        >>> c.get('/customers/details/', {'name': 'fred', 'age': 7})
+            >>> c = Client()
+            >>> c.get('/customers/details/', {'name': 'fred', 'age': 7})
 
-    ...will result in the evaluation of a GET request equivalent to::
+        ...will result in the evaluation of a GET request equivalent to::
 
-        /customers/details/?name=fred&age=7
+            /customers/details/?name=fred&age=7
 
-.. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT)
+    .. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT)
 
-    Makes a POST request on the provided ``path`` and returns a ``Response``
-    object, which is documented below.
+        Makes a POST request on the provided ``path`` and returns a
+        ``Response`` object, which is documented below.
 
-    The key-value pairs in the ``data`` dictionary are used to submit POST
-    data. For example::
+        The key-value pairs in the ``data`` dictionary are used to submit POST
+        data. For example::
 
-        >>> c = Client()
-        >>> c.post('/login/', {'name': 'fred', 'passwd': 'secret'})
+            >>> c = Client()
+            >>> c.post('/login/', {'name': 'fred', 'passwd': 'secret'})
 
-    ...will result in the evaluation of a POST request to this URL::
+        ...will result in the evaluation of a POST request to this URL::
 
-        /login/
+            /login/
 
-    ...with this POST data::
+        ...with this POST data::
 
-        name=fred&passwd=secret
+            name=fred&passwd=secret
 
-    If you provide ``content_type`` (e.g., ``text/xml`` for an XML payload),
-    the contents of ``data`` will be sent as-is in the POST request, using
-    ``content_type`` in the HTTP ``Content-Type`` header.
+        If you provide ``content_type`` (e.g., ``text/xml`` for an XML
+        payload), the contents of ``data`` will be sent as-is in the POST
+        request, using ``content_type`` in the HTTP ``Content-Type`` header.
 
-    If you don't provide a value for ``content_type``, the values in
-    ``data`` will be transmitted with a content type of ``multipart/form-data``.
-    In this case, the key-value pairs in ``data`` will be encoded as a
-    multipart message and used to create the POST data payload.
+        If you don't provide a value for ``content_type``, the values in
+        ``data`` will be transmitted with a content type of
+        ``multipart/form-data``. In this case, the key-value pairs in ``data``
+        will be encoded as a multipart message and used to create the POST data
+        payload.
 
-    To submit multiple values for a given key -- for example, to specify
-    the selections for a ``<select multiple>`` -- provide the values as a
-    list or tuple for the required key. For example, this value of ``data``
-    would submit three selected values for the field named ``choices``::
+        To submit multiple values for a given key -- for example, to specify
+        the selections for a ``<select multiple>`` -- provide the values as a
+        list or tuple for the required key. For example, this value of ``data``
+        would submit three selected values for the field named ``choices``::
 
-        {'choices': ('a', 'b', 'd')}
+            {'choices': ('a', 'b', 'd')}
 
-    Submitting files is a special case. To POST a file, you need only provide
-    the file field name as a key, and a file handle to the file you wish to
-    upload as a value. For example::
+        Submitting files is a special case. To POST a file, you need only
+        provide the file field name as a key, and a file handle to the file you
+        wish to upload as a value. For example::
 
-        >>> c = Client()
-        >>> f = open('wishlist.doc')
-        >>> c.post('/customers/wishes/', {'name': 'fred', 'attachment': f})
-        >>> f.close()
+            >>> c = Client()
+            >>> f = open('wishlist.doc')
+            >>> c.post('/customers/wishes/', {'name': 'fred', 'attachment': f})
+            >>> f.close()
 
-    (The name ``attachment`` here is not relevant; use whatever name your
-    file-processing code expects.)
+        (The name ``attachment`` here is not relevant; use whatever name your
+        file-processing code expects.)
 
-    Note that you should manually close the file after it has been provided to
-    ``post()``.
+        Note that you should manually close the file after it has been provided
+        to ``post()``.
 
-.. method:: Client.login(**credentials)
+    .. method:: Client.login(**credentials)
 
-    **New in Django development version**
+        **New in Django development version**
 
-    If your site uses Django's :ref:`authentication system<topics-auth>` and you deal with
-    logging in users, you can use the test client's ``login()`` method to
-    simulate the effect of a user logging into the site.
+        If your site uses Django's :ref:`authentication system<topics-auth>`
+        and you deal with logging in users, you can use the test client's
+        ``login()`` method to simulate the effect of a user logging into the
+        site.
 
-    After you call this method, the test client will have all the cookies and
-    session data required to pass any login-based tests that may form part of
-    a view.
+        After you call this method, the test client will have all the cookies
+        and session data required to pass any login-based tests that may form
+        part of a view.
 
-    The format of the ``credentials`` argument depends on which
-    :ref:`authentication backend <authentication-backends>` you're using (which is configured by your
-    :setting:`AUTHENTICATION_BACKENDS` setting). If you're using the standard
-    authentication backend provided by Django (``ModelBackend``),
-    ``credentials`` should be the user's username and password, provided as
-    keyword arguments::
+        The format of the ``credentials`` argument depends on which
+        :ref:`authentication backend <authentication-backends>` you're using
+        (which is configured by your :setting:`AUTHENTICATION_BACKENDS`
+        setting). If you're using the standard authentication backend provided
+        by Django (``ModelBackend``), ``credentials`` should be the user's
+        username and password, provided as keyword arguments::
 
-        >>> c = Client()
-        >>> c.login(username='fred', password='secret')
-        
-        # Now you can access a view that's only available to logged-in users.
+            >>> c = Client()
+            >>> c.login(username='fred', password='secret')
 
-    If you're using a different authentication backend, this method may require
-    different credentials. It requires whichever credentials are required by
-    your backend's ``authenticate()`` method.
+            # Now you can access a view that's only available to logged-in users.
 
-    ``login()`` returns ``True`` if it the credentials were accepted and login
-    was successful.
+        If you're using a different authentication backend, this method may
+        require different credentials. It requires whichever credentials are
+        required by your backend's ``authenticate()`` method.
 
-    Finally, you'll need to remember to create user accounts before you can use
-    this method. As we explained above, the test runner is executed using a
-    test database, which contains no users by default. As a result, user
-    accounts that are valid on your production site will not work under test
-    conditions. You'll need to create users as part of the test suite -- either
-    manually (using the Django model API) or with a test fixture.
+        ``login()`` returns ``True`` if it the credentials were accepted and
+        login was successful.
 
-.. method:: Client.logout()
+        Finally, you'll need to remember to create user accounts before you can
+        use this method. As we explained above, the test runner is executed
+        using a test database, which contains no users by default. As a result,
+        user accounts that are valid on your production site will not work
+        under test conditions. You'll need to create users as part of the test
+        suite -- either manually (using the Django model API) or with a test
+        fixture.
 
-    **New in Django development version**
+    .. method:: Client.logout()
 
-    If your site uses Django's :ref:`authentication system<topics-auth>`, the ``logout()``
-    method can be used to simulate the effect of a user logging out of
-    your site.
+        **New in Django development version**
 
-    After you call this method, the test client will have all the cookies and
-    session data cleared to defaults. Subsequent requests will appear to
-    come from an AnonymousUser.
+        If your site uses Django's :ref:`authentication system<topics-auth>`,
+        the ``logout()`` method can be used to simulate the effect of a user
+        logging out of your site.
+
+        After you call this method, the test client will have all the cookies
+        and session data cleared to defaults. Subsequent requests will appear
+        to come from an AnonymousUser.
 
 Testing responses
 ~~~~~~~~~~~~~~~~~
@@ -599,36 +603,42 @@ Specifically, a ``Response`` object has the following attributes:
 
 .. class:: Response()
 
-.. attribute:: Response.client``       
-    The test client that was used to make the request that resulted in the
-    response.
+    .. attribute:: client
 
-.. attribute:: Response.content
-    The body of the response, as a string. This is the final page content as
-    rendered by the view, or any error message.
+        The test client that was used to make the request that resulted in the
+        response.
 
-.. attribute:: Response.context
-    The template ``Context`` instance that was used to render the template that
-    produced the response content.
+    .. attribute:: content
 
-    If the rendered page used multiple templates, then ``context`` will be a
-    list of ``Context`` objects, in the order in which they were rendered.
+        The body of the response, as a string. This is the final page content as
+        rendered by the view, or any error message.
 
-.. attribute:: Response.request``      
-    The request data that stimulated the response.
+    .. attribute:: context
 
-.. attribute:: Response.status_code 
-    The HTTP status of the response, as an integer. See RFC2616_ for a full list
-    of HTTP status codes.
+        The template ``Context`` instance that was used to render the template that
+        produced the response content.
 
-.. attribute:: template
-    The ``Template`` instance that was used to render the final content. Use
-    ``template.name`` to get the template's file name, if the template was
-    loaded from a file. (The name is a string such as ``'admin/index.html'``.)
-    
-    If the rendered page used multiple templates -- e.g., using :ref:`template
-    inheritance<template-inheritance>` -- then ``template`` will be a list of ``Template`` instances,
-    in the order in which they were rendered.
+        If the rendered page used multiple templates, then ``context`` will be a
+        list of ``Context`` objects, in the order in which they were rendered.
+
+    .. attribute:: request
+
+        The request data that stimulated the response.
+
+    .. attribute:: status_code
+
+        The HTTP status of the response, as an integer. See RFC2616_ for a full
+        list of HTTP status codes.
+
+    .. attribute:: template
+
+        The ``Template`` instance that was used to render the final content. Use
+        ``template.name`` to get the template's file name, if the template was
+        loaded from a file. (The name is a string such as ``'admin/index.html'``.)
+
+        If the rendered page used multiple templates -- e.g., using :ref:`template
+        inheritance<template-inheritance>` -- then ``template`` will be a list of
+        ``Template`` instances, in the order in which they were rendered.
 
 You can also use dictionary syntax on the response object to query the value
 of any settings in the HTTP headers. For example, you could determine the
@@ -669,8 +679,8 @@ can access these properties as part of a test condition.
 
 .. attribute:: Client.session
 
-    A dictionary-like object containing session information. See the :ref:`session
-    documentation<topics-http-sessions>` for full details.
+    A dictionary-like object containing session information. See the
+    :ref:`session documentation<topics-http-sessions>` for full details.
 
 .. _Cookie module documentation: http://docs.python.org/lib/module-Cookie.html
 
@@ -772,9 +782,9 @@ A fixture is a collection of data that Django knows how to import into a
 database. For example, if your site has user accounts, you might set up a
 fixture of fake user accounts in order to populate your database during tests.
 
-The most straightforward way of creating a fixture is to use the
-``manage.py dumpdata`` command. This assumes you already have some data in
-your database. See the :djadmin:`dumpdata documentation<dumpdata>` for more details.
+The most straightforward way of creating a fixture is to use the ``manage.py
+dumpdata`` command. This assumes you already have some data in your database.
+See the :djadmin:`dumpdata documentation<dumpdata>` for more details.
 
 .. note::
     If you've ever run ``manage.py syncdb``, you've already used a fixture
@@ -810,12 +820,12 @@ Here's specifically what will happen:
 
     * Then, all the named fixtures are installed. In this example, Django will
       install any JSON fixture named ``mammals``, followed by any fixture named
-      ``birds``. See the :djadmin:`loaddata documentation<loaddata>` for more details on defining
-      and installing fixtures.
+      ``birds``. See the :djadmin:`loaddata documentation<loaddata>` for more
+      details on defining and installing fixtures.
 
 This flush/load procedure is repeated for each test in the test case, so you
-can be certain that the outcome of a test will not be affected by
-another test, or by the order of test execution.
+can be certain that the outcome of a test will not be affected by another test,
+or by the order of test execution.
 
 URLconf configuration
 ~~~~~~~~~~~~~~~~~~~~~
@@ -824,23 +834,23 @@ URLconf configuration
 
 .. attribute:: TestCase.urls
 
-If your application provides views, you may want to include tests that
-use the test client to exercise those views. However, an end user is free
-to deploy the views in your application at any URL of their choosing.
-This means that your tests can't rely upon the fact that your views will
-be available at a particular URL.
+If your application provides views, you may want to include tests that use the
+test client to exercise those views. However, an end user is free to deploy the
+views in your application at any URL of their choosing. This means that your
+tests can't rely upon the fact that your views will be available at a
+particular URL.
 
 In order to provide a reliable URL space for your test,
 ``django.test.TestCase`` provides the ability to customize the URLconf
-configuration for the duration of the execution of a test suite.
-If your ``TestCase`` instance defines an ``urls`` attribute, the
-``TestCase`` will use the value of that attribute as the ``ROOT_URLCONF``
-for the duration of that test. 
+configuration for the duration of the execution of a test suite. If your
+``TestCase`` instance defines an ``urls`` attribute, the ``TestCase`` will use
+the value of that attribute as the ``ROOT_URLCONF`` for the duration of that
+test.
 
 For example::
 
     from django.test import TestCase
-    
+
     class TestMyViews(TestCase):
         urls = 'myapp.test_urls'
 
@@ -867,10 +877,10 @@ Assertions
 
 **New in Django development version**
 
-As Python's normal ``unittest.TestCase`` class implements assertion
-methods such as ``assertTrue`` and ``assertEquals``, Django's custom
-``TestCase`` class provides a number of custom assertion methods that are
-useful for testing Web applications:
+As Python's normal ``unittest.TestCase`` class implements assertion methods
+such as ``assertTrue`` and ``assertEquals``, Django's custom ``TestCase`` class
+provides a number of custom assertion methods that are useful for testing Web
+applications:
 
 .. method:: TestCase.assertContains(response, text, count=None, status_code=200)
 
@@ -913,8 +923,8 @@ useful for testing Web applications:
 
 .. method:: assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
-    Asserts that the response return a ``status_code`` redirect status,
-    it redirected to ``expected_url`` (including any GET data), and the subsequent
+    Asserts that the response return a ``status_code`` redirect status, it
+    redirected to ``expected_url`` (including any GET data), and the subsequent
     page was received with ``target_status_code``.
 
 E-mail services
@@ -930,21 +940,22 @@ test every aspect of sending e-mail -- from the number of messages sent to the
 contents of each message -- without actually sending the messages.
 
 The test runner accomplishes this by transparently replacing the normal
-:class:`~django.core.mail.SMTPConnection` class with a different version. (Don't
-worry -- this has no effect on any other e-mail senders outside of Django, such
-as your machine's mail server, if you're running one.)
+:class:`~django.core.mail.SMTPConnection` class with a different version.
+(Don't worry -- this has no effect on any other e-mail senders outside of
+Django, such as your machine's mail server, if you're running one.)
 
 .. currentmodule:: django.core.mail
 
 .. data:: django.core.mail.output
 
 During test running, each outgoing e-mail is saved in
-``django.core.mail.outbox``. This is a simple list of all :class:`<~django.core.mail.EmailMessage>`
-instances that have been sent. It does not exist under normal execution
-conditions, i.e., when you're not running unit tests. The outbox is created
-during test setup, along with the dummy :class:`<~django.core.mail.SMTPConnection>`. When the test
-framework is torn down, the standard :class:`<~django.core.mail.SMTPConnection>` class is restored, and
-the test outbox is destroyed.
+``django.core.mail.outbox``. This is a simple list of all
+:class:`<~django.core.mail.EmailMessage>` instances that have been sent.
+It does not exist under normal execution conditions, i.e., when you're not
+running unit tests. The outbox is created during test setup, along with the
+dummy :class:`<~django.core.mail.SMTPConnection>`. When the test framework is
+torn down, the standard :class:`<~django.core.mail.SMTPConnection>` class is
+restored, and the test outbox is destroyed.
 
 Here's an example test that examines ``django.core.mail.outbox`` for length
 and contents::
@@ -965,9 +976,9 @@ and contents::
             # Verify that the subject of the first message is correct.
             self.assertEqual(mail.outbox[0].subject, 'Subject here')
 
-As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied at the start of every
-test in a Django ``TestCase``. To empty the outbox manually, assign the
-empty list to ``mail.outbox``::
+As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
+at the start of every test in a Django ``TestCase``. To empty the outbox
+manually, assign the empty list to ``mail.outbox``::
 
     from django.core import mail
 
@@ -1004,9 +1015,9 @@ testing behavior. This behavior involves:
     #. Performing global post-test teardown.
 
 If you define your own test runner method and point :setting:`TEST_RUNNER` at
-that method, Django will execute your test runner whenever you run ``./manage.py
-test``. In this way, it is possible to use any test framework that can be
-executed from Python code.
+that method, Django will execute your test runner whenever you run
+``./manage.py test``. In this way, it is possible to use any test framework
+that can be executed from Python code.
 
 Defining a test runner
 ----------------------
@@ -1053,20 +1064,19 @@ Testing utilities
 .. module:: django.test.utils
    :synopsis: Helpers to write custom test runners.
 
-To assist in the creation of your own test runner, Django provides
-a number of utility methods in the ``django.test.utils`` module.
+To assist in the creation of your own test runner, Django provides a number of
+utility methods in the ``django.test.utils`` module.
 
 .. function:: setup_test_environment()
 
     Performs any global pre-test setup, such as the installing the
-    instrumentation of the template rendering system and setting up
-    the dummy ``SMTPConnection``.
+    instrumentation of the template rendering system and setting up the dummy
+    ``SMTPConnection``.
 
 .. function:: teardown_test_environment()
 
-    Performs any global post-test teardown, such as removing the
-    black magic hooks into the template system and restoring normal e-mail
-    services.
+    Performs any global post-test teardown, such as removing the black magic
+    hooks into the template system and restoring normal e-mail services.
 
 The creation module of the database backend (``connection.creation``) also
 provides some utilities that can be useful during testing.
