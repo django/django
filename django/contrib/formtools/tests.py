@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.formtools import preview
+from django.contrib.formtools import preview, wizard
 from django import http
 from django.test import TestCase
 
@@ -100,4 +100,45 @@ class PreviewTests(TestCase):
         self.test_data.update({'hash':hash, 'bool1':u'False'})
         response = self.client.post('/test1/', self.test_data)
         self.assertEqual(response.content, success_string)
+
+#
+# FormWizard tests
+#
+
+class WizardPageOneForm(forms.Form):
+    field = forms.CharField()
+
+class WizardPageTwoForm(forms.Form):
+    field = forms.CharField()
+
+class WizardClass(wizard.FormWizard):
+    def render_template(self, *args, **kw):
+        return ""
+
+    def done(self, request, cleaned_data):
+        return http.HttpResponse(success_string)
+
+class DummyRequest(object):
+    def __init__(self, POST=None):
+        self.method = POST and "POST" or "GET"
+        self.POST = POST
+
+class WizardTests(TestCase):
+    def test_step_starts_at_zero(self):
+        """
+        step should be zero for the first form
+        """
+        wizard = WizardClass([WizardPageOneForm, WizardPageTwoForm])
+        request = DummyRequest()
+        wizard(request)
+        self.assertEquals(0, wizard.step)
+
+    def test_step_increments(self):
+        """
+        step should be incremented when we go to the next page
+        """
+        wizard = WizardClass([WizardPageOneForm, WizardPageTwoForm])
+        request = DummyRequest(POST={"0-field":"test", "wizard_step":"0"})
+        response = wizard(request)
+        self.assertEquals(1, wizard.step)
 

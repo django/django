@@ -92,7 +92,7 @@ class FormWizard(object):
             # Otherwise, move along to the next step.
             else:
                 form = self.get_form(next_step)
-                current_step = next_step
+                self.step = current_step = next_step
 
         return self.render(form, request, current_step)
 
@@ -203,7 +203,7 @@ class FormWizard(object):
         """
         context = context or {}
         context.update(self.extra_context)
-        return render_to_response(self.get_template(self.step), dict(context,
+        return render_to_response(self.get_template(step), dict(context,
             step_field=self.step_field_name,
             step0=step,
             step=step + 1,
