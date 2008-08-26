@@ -5,6 +5,7 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_unicode
 from django.contrib.admin.util import flatten_fieldsets
+from django.contrib.contenttypes.models import ContentType
 
 class AdminForm(object):
     def __init__(self, form, fieldsets, prepopulated_fields):
@@ -114,6 +115,8 @@ class InlineAdminForm(AdminForm):
     def __init__(self, formset, form, fieldsets, prepopulated_fields, original):
         self.formset = formset
         self.original = original
+        if original is not None:
+            self.original.content_type_id = ContentType.objects.get_for_model(original).pk
         self.show_url = original and hasattr(original, 'get_absolute_url')
         super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields)
 
