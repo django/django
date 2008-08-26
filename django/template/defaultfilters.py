@@ -62,20 +62,24 @@ def capfirst(value):
 capfirst.is_safe=True
 capfirst = stringfilter(capfirst)
 
-_js_escapes = (
-    ('\\', '\\\\'),
-    ('"', '\\"'),
-    ("'", "\\'"),
-    ('\n', '\\n'),
-    ('\r', '\\r'),
-    ('\b', '\\b'),
-    ('\f', '\\f'),
-    ('\t', '\\t'),
-    ('\v', '\\v'),
-    ('</', '<\\/'),
+_base_js_escapes = (
+    ('\\', r'\x5C'),
+    ('\'', r'\x27'),
+    ('"', r'\x22'),
+    ('>', r'\x3E'),
+    ('<', r'\x3C'),
+    ('&', r'\x26'),
+    ('=', r'\x3D'),
+    ('-', r'\x2D'),
+    (';', r'\x3B')
 )
+
+# Escape every ASCII character with a value less than 32.
+_js_escapes = (_base_js_escapes +
+               tuple([('%c' % z, '\\x%02X' % z) for z in range(32)]))
+
 def escapejs(value):
-    """Backslash-escapes characters for use in JavaScript strings."""
+    """Hex encodes characters for use in JavaScript strings."""
     for bad, good in _js_escapes:
         value = value.replace(bad, good)
     return value
