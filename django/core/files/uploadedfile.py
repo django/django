@@ -84,8 +84,9 @@ class TemporaryUploadedFile(UploadedFile):
     # We can't directly subclass because NamedTemporaryFile is actually a
     # factory function
     def read(self, *args):          return self._file.read(*args)
-    def seek(self, offset):         return self._file.seek(offset)
+    def seek(self, *args):          return self._file.seek(*args)
     def write(self, s):             return self._file.write(s)
+    def tell(self, *args):          return self._file.tell(*args)
     def __iter__(self):             return iter(self._file)
     def readlines(self, size=None): return self._file.readlines(size)
     def xreadlines(self):           return self._file.xreadlines()
@@ -107,39 +108,39 @@ class InMemoryUploadedFile(UploadedFile):
     """
     def __init__(self, file, field_name, name, content_type, size, charset):
         super(InMemoryUploadedFile, self).__init__(name, content_type, size, charset)
-        self.file = file
+        self._file = file
         self.field_name = field_name
-        self.file.seek(0)
-
-    def seek(self, *args, **kwargs):
-        self.file.seek(*args, **kwargs)
+        self._file.seek(0)
 
     def open(self):
-        self.seek(0)
-
-    def read(self, *args, **kwargs):
-        return self.file.read(*args, **kwargs)
+        self._file.seek(0)
 
     def chunks(self, chunk_size=None):
-        self.file.seek(0)
+        self._file.seek(0)
         yield self.read()
 
     def multiple_chunks(self, chunk_size=None):
         # Since it's in memory, we'll never have multiple chunks.
         return False
 
+    # proxy methods to StringIO
+    def read(self, *args): return self._file.read(*args)
+    def seek(self, *args): return self._file.seek(*args)
+    def tell(self, *args): return self._file.tell(*args)
+    def close(self):       return self._file.close()
+
 class SimpleUploadedFile(InMemoryUploadedFile):
     """
     A simple representation of a file, which just has content, size, and a name.
     """
     def __init__(self, name, content, content_type='text/plain'):
-        self.file = StringIO(content or '')
+        self._file = StringIO(content or '')
         self.name = name
         self.field_name = None
         self.size = len(content or '')
         self.content_type = content_type
         self.charset = None
-        self.file.seek(0)
+        self._file.seek(0)
 
     def from_dict(cls, file_dict):
         """
