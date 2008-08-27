@@ -396,28 +396,6 @@ class Options(object):
             self._related_many_to_many_cache = cache
         return cache
 
-    def get_followed_related_objects(self, follow=None):
-        if follow == None:
-            follow = self.get_follow()
-        return [f for f in self.get_all_related_objects() if follow.get(f.name, None)]
-
-    def get_data_holders(self, follow=None):
-        if follow == None:
-            follow = self.get_follow()
-        return [f for f in self.fields + self.many_to_many + self.get_all_related_objects() if follow.get(f.name, None)]
-
-    def get_follow(self, override=None):
-        follow = {}
-        for f in self.fields + self.many_to_many + self.get_all_related_objects():
-            if override and f.name in override:
-                child_override = override[f.name]
-            else:
-                child_override = None
-            fol = f.get_follow(child_override)
-            if fol != None:
-                follow[f.name] = fol
-        return follow
-
     def get_base_chain(self, model):
         """
         Returns a list of parent classes leading to 'model' (order from closet
@@ -459,28 +437,3 @@ class Options(object):
             #        objects.append(opts)
             self._ordered_objects = objects
         return self._ordered_objects
-
-    def has_field_type(self, field_type, follow=None):
-        """
-        Returns True if this object's admin form has at least one of the given
-        field_type (e.g. FileField).
-        """
-        # TODO: follow
-        if not hasattr(self, '_field_types'):
-            self._field_types = {}
-        if field_type not in self._field_types:
-            try:
-                # First check self.fields.
-                for f in self.fields:
-                    if isinstance(f, field_type):
-                        raise StopIteration
-                # Failing that, check related fields.
-                for related in self.get_followed_related_objects(follow):
-                    for f in related.opts.fields:
-                        if isinstance(f, field_type):
-                            raise StopIteration
-            except StopIteration:
-                self._field_types[field_type] = True
-            else:
-                self._field_types[field_type] = False
-        return self._field_types[field_type]

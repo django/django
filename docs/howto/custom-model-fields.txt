@@ -108,11 +108,11 @@ What does a field class do?
 All of Django's fields (and when we say *fields* in this document, we always
 mean model fields and not :ref:`form fields <ref-forms-fields>`) are subclasses
 of :class:`django.db.models.Field`. Most of the information that Django records
-about a field is common to all fields -- name, help text, validator lists,
-uniqueness and so forth. Storing all that information is handled by ``Field``.
-We'll get into the precise details of what ``Field`` can do later on; for now,
-suffice it to say that everything descends from ``Field`` and then customizes
-key pieces of the class behavior.
+about a field is common to all fields -- name, help text, uniqueness and so
+forth. Storing all that information is handled by ``Field``. We'll get into the
+precise details of what ``Field`` can do later on; for now, suffice it to say
+that everything descends from ``Field`` and then customizes key pieces of the
+class behavior.
 
 It's important to realize that a Django field class is not what is stored in
 your model attributes. The model attributes contain normal Python objects. The
@@ -210,7 +210,6 @@ parameters:
     * :attr:`~django.db.models.Field.unique_for_date`
     * :attr:`~django.db.models.Field.unique_for_month`
     * :attr:`~django.db.models.Field.unique_for_year`
-    * :attr:`~django.db.models.Field.validator_list`
     * :attr:`~django.db.models.Field.choices`
     * :attr:`~django.db.models.Field.help_text`
     * :attr:`~django.db.models.Field.db_column`
@@ -567,33 +566,19 @@ output in some other place, outside of Django.
 Converting field data for serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: flatten_data(self, follow, obj=None)
-
-.. admonition:: Subject to change
-
-    Although implementing this method is necessary to allow field
-    serialization, the API might change in the future.
-
-Returns a dictionary, mapping the field's attribute name to a flattened string
-version of the data. This method has some internal uses that aren't of interest
-to use here (mostly having to do with forms). For our purposes, it's sufficient
-to return a one item dictionary that maps the attribute name to a string.
+.. method:: value_to_string(self, obj)
 
 This method is used by the serializers to convert the field into a string for
-output. You can ignore the input parameters for serialization purposes, although
-calling :meth:`Field._get_val_from_obj(obj)
-<django.db.models.Field._get_val_from_obj>` is the best way to get the value to
-serialize.
-
-For example, since our ``HandField`` uses strings for its data storage anyway,
-we can reuse some existing conversion code::
+output. Calling :meth:``Field._get_val_from_obj(obj)`` is the best way to get the
+value to serialize. For example, since our ``HandField`` uses strings for its
+data storage anyway, we can reuse some existing conversion code::
 
     class HandField(models.Field):
         # ...
 
-        def flatten_data(self, follow, obj=None):
+        def value_to_string(self, obj):
             value = self._get_val_from_obj(obj)
-            return {self.attname: self.get_db_prep_value(value)}
+            return self.get_db_prep_value(value)
 
 Some general advice
 --------------------

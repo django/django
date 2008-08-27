@@ -33,11 +33,6 @@ exception or returns the clean value::
     ...
     ValidationError: [u'Enter a valid e-mail address.']
 
-If you've used Django's old forms/validation framework, take care in noticing
-this ``ValidationError`` is different than the previous ``ValidationError``.
-This one lives at ``django.forms.ValidationError`` rather than
-``django.core.validators.ValidationError``.
-
 Core field arguments
 --------------------
 

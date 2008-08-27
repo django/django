@@ -38,7 +38,7 @@ __all__ = (
     'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
-    'SplitDateTimeField', 'IPAddressField', 'FilePathField',
+    'SplitDateTimeField', 'IPAddressField', 'FilePathField', 'SlugField',
 )
 
 # These values, if given to to_python(), will trigger the self.required check.
@@ -835,3 +835,14 @@ class IPAddressField(RegexField):
 
     def __init__(self, *args, **kwargs):
         super(IPAddressField, self).__init__(ipv4_re, *args, **kwargs)
+
+slug_re = re.compile(r'^[-\w]+$')
+
+class SlugField(RegexField):
+    default_error_messages = {
+        'invalid': _(u"Enter a valid 'slug' consisting of letters, numbers,"
+                     u" underscores or hyphens."),
+    }
+
+    def __init__(self, *args, **kwargs):
+        super(SlugField, self).__init__(slug_re, *args, **kwargs)

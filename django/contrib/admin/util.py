@@ -85,7 +85,7 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
                         perms_needed.add(related.opts.verbose_name)
                         # We don't care about populating deleted_objects now.
                         continue
-                if related.field.rel.edit_inline or not has_admin:
+                if not has_admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
                     nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), sub_obj), []])
@@ -101,7 +101,7 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
             has_related_objs = False
             for sub_obj in getattr(obj, rel_opts_name).all():
                 has_related_objs = True
-                if related.field.rel.edit_inline or not has_admin:
+                if not has_admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
                     nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), sub_obj), []])
@@ -132,7 +132,7 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
 
         if has_related_objs:
             for sub_obj in rel_objs.all():
-                if related.field.rel.edit_inline or not has_admin:
+                if not has_admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
                     nh(deleted_objects, current_depth, [_('One or more %(fieldname)s in %(name)s: %(obj)s') % \

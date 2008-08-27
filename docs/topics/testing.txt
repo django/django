@@ -899,8 +899,7 @@ applications:
     rendered on the form.
 
     ``form`` is the name the ``Form`` instance was given in the template
-    context. Note that this works only for ``forms.Form`` instances, not
-    ``oldforms.Form`` instances.
+    context.
 
     ``field`` is the name of the field on the form to check. If ``field``
     has a value of ``None``, non-field errors (errors you can access via

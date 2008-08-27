@@ -23,13 +23,13 @@ class Target(models.Model):
     clash1_set = models.CharField(max_length=10)
 
 class Clash1(models.Model):
-    src_safe = models.CharField(max_length=10, core=True)
+    src_safe = models.CharField(max_length=10)
 
     foreign = models.ForeignKey(Target)
     m2m = models.ManyToManyField(Target)
 
 class Clash2(models.Model):
-    src_safe = models.CharField(max_length=10, core=True)
+    src_safe = models.CharField(max_length=10)
 
     foreign_1 = models.ForeignKey(Target, related_name='id')
     foreign_2 = models.ForeignKey(Target, related_name='src_safe')
@@ -46,7 +46,7 @@ class Target2(models.Model):
     clashm2m_set = models.ManyToManyField(Target)
 
 class Clash3(models.Model):
-    src_safe = models.CharField(max_length=10, core=True)
+    src_safe = models.CharField(max_length=10)
 
     foreign_1 = models.ForeignKey(Target2, related_name='foreign_tgt')
     foreign_2 = models.ForeignKey(Target2, related_name='m2m_tgt')
@@ -61,7 +61,7 @@ class ClashM2M(models.Model):
     m2m = models.ManyToManyField(Target2)
 
 class SelfClashForeign(models.Model):
-    src_safe = models.CharField(max_length=10, core=True)
+    src_safe = models.CharField(max_length=10)
     selfclashforeign = models.CharField(max_length=10)
 
     selfclashforeign_set = models.ForeignKey("SelfClashForeign")

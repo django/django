@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
-from django.core import validators
 from django.db import connection
 from django.db.models.loading import get_apps, get_app, get_models, get_model, register_models
 from django.db.models.query import Q
@@ -9,7 +8,7 @@ from django.db.models.base import Model
 from django.db.models.fields import *
 from django.db.models.fields.subclassing import SubfieldBase
 from django.db.models.fields.files import FileField, ImageField
-from django.db.models.fields.related import ForeignKey, OneToOneField, ManyToManyField, ManyToOneRel, ManyToManyRel, OneToOneRel, TABULAR, STACKED
+from django.db.models.fields.related import ForeignKey, OneToOneField, ManyToManyField, ManyToOneRel, ManyToManyRel, OneToOneRel
 from django.db.models import signals
 
 # Admin stages.

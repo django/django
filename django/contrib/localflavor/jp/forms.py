@@ -2,7 +2,6 @@
 JP-specific Form helpers
 """
 
-from django.core import validators
 from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.forms.fields import RegexField, Select

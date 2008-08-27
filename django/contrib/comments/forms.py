@@ -117,9 +117,6 @@ class CommentForm(forms.Form):
         """
         comment = self.cleaned_data["comment"]
         if settings.COMMENTS_ALLOW_PROFANITIES == False:
-            # Logic adapted from django.core.validators; it's not clear if they
-            # should be used in newforms or will be deprecated along with the
-            # rest of oldforms
             bad_words = [w for w in settings.PROFANITIES_LIST if w in comment.lower()]
             if bad_words:
                 plural = len(bad_words) > 1

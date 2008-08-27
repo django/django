@@ -11,9 +11,7 @@ from django.utils.functional import curry
 from django.db.models import signals
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext_lazy, ugettext as _
-from django import oldforms
 from django import forms
-from django.core import validators
 from django.db.models.loading import cache
 
 class FieldFile(File):
@@ -126,7 +124,7 @@ class FileField(Field):
     attr_class = FieldFile
 
     def __init__(self, verbose_name=None, name=None, upload_to='', storage=None, **kwargs):
-        for arg in ('core', 'primary_key', 'unique'):
+        for arg in ('primary_key', 'unique'):
             if arg in kwargs:
                 raise TypeError("'%s' is not a valid argument for %s." % (arg, self.__class__))
 
@@ -153,42 +151,6 @@ class FileField(Field):
             return None
         return unicode(value)
 
-    def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
-        field_list = Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel, follow)
-        if not self.blank:
-            if rel:
-                # This validator makes sure FileFields work in a related context.
-                class RequiredFileField(object):
-                    def __init__(self, other_field_names, other_file_field_name):
-                        self.other_field_names = other_field_names
-                        self.other_file_field_name = other_file_field_name
-                        self.always_test = True
-                    def __call__(self, field_data, all_data):
-                        if not all_data.get(self.other_file_field_name, False):
-                            c = validators.RequiredIfOtherFieldsGiven(self.other_field_names, ugettext_lazy("This field is required."))
-                            c(field_data, all_data)
-                # First, get the core fields, if any.
-                core_field_names = []
-                for f in opts.fields:
-                    if f.core and f != self:
-                        core_field_names.extend(f.get_manipulator_field_names(name_prefix))
-                # Now, if there are any, add the validator to this FormField.
-                if core_field_names:
-                    field_list[0].validator_list.append(RequiredFileField(core_field_names, field_list[1].field_name))
-            else:
-                v = validators.RequiredIfOtherFieldNotGiven(field_list[1].field_name, ugettext_lazy("This field is required."))
-                v.always_test = True
-                field_list[0].validator_list.append(v)
-                field_list[0].is_required = field_list[1].is_required = False
-
-        # If the raw path is passed in, validate it's under the MEDIA_ROOT.
-        def isWithinMediaRoot(field_data, all_data):
-            f = os.path.abspath(os.path.join(settings.MEDIA_ROOT, field_data))
-            if not f.startswith(os.path.abspath(os.path.normpath(settings.MEDIA_ROOT))):
-                raise validators.ValidationError(_("Enter a valid filename."))
-        field_list[1].validator_list.append(isWithinMediaRoot)
-        return field_list
-
     def contribute_to_class(self, cls, name):
         super(FileField, self).contribute_to_class(cls, name)
         setattr(cls, self.name, FileDescriptor(self))
@@ -206,14 +168,9 @@ class FileField(Field):
             # Otherwise, just close the file, so it doesn't tie up resources.
             file.close()
 
-    def get_manipulator_field_objs(self):
-        return [oldforms.FileUploadField, oldforms.HiddenField]
-
-    def get_manipulator_field_names(self, name_prefix):
-        return [name_prefix + self.name + '_file', name_prefix + self.name]
-
-    def save_file(self, new_data, new_object, original_object, change, rel, save=True):
-        upload_field_name = self.get_manipulator_field_names('')[0]
+    def save_file(self, new_data, new_object, original_object, change, rel,
+                  save=True):
+        upload_field_name = self.name + '_file'
         if new_data.get(upload_field_name, False):
             if rel:
                 file = new_data[upload_field_name][0]
@@ -281,9 +238,6 @@ class ImageField(FileField):
     def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
         self.width_field, self.height_field = width_field, height_field
         FileField.__init__(self, verbose_name, name, **kwargs)
-
-    def get_manipulator_field_objs(self):
-        return [oldforms.ImageUploadField, oldforms.HiddenField]
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.ImageField}

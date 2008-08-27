@@ -4,19 +4,16 @@ from django.db.models.fields import AutoField, Field, IntegerField, PositiveInte
 from django.db.models.related import RelatedObject
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import QueryWrapper
+from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy, string_concat, ungettext, ugettext as _
 from django.utils.functional import curry
-from django.core import validators
-from django import oldforms
+from django.core import exceptions
 from django import forms
 
 try:
     set
 except NameError:
     from sets import Set as set   # Python 2.3 fallback
-
-# Values for Relation.edit_inline.
-TABULAR, STACKED = 1, 2
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
@@ -82,14 +79,6 @@ def do_pending_lookups(sender, **kwargs):
         operation(field, sender, cls)
 
 signals.class_prepared.connect(do_pending_lookups)
-
-def manipulator_valid_rel_key(f, self, field_data, all_data):
-    "Validates that the value is a valid foreign key"
-    klass = f.rel.to
-    try:
-        klass._default_manager.get(**{f.rel.field_name: field_data})
-    except klass.DoesNotExist:
-        raise validators.ValidationError, _("Please enter a valid %s.") % f.verbose_name
 
 #HACK
 class RelatedField(object):
@@ -580,18 +569,14 @@ class ReverseManyRelatedObjectsDescriptor(object):
         manager.add(*value)
 
 class ManyToOneRel(object):
-    def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
-            max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
-            related_name=None, limit_choices_to=None, lookup_overrides=None,
-            parent_link=False):
+    def __init__(self, to, field_name, related_name=None,
+            limit_choices_to=None, lookup_overrides=None, parent_link=False):
         try:
             to._meta
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert isinstance(to, basestring), "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
         self.to, self.field_name = to, field_name
-        self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
-        self.min_num_in_admin, self.max_num_in_admin = min_num_in_admin, max_num_in_admin
-        self.num_extra_on_change, self.related_name = num_extra_on_change, related_name
+        self.related_name = related_name
         if limit_choices_to is None:
             limit_choices_to = {}
         self.limit_choices_to = limit_choices_to
@@ -611,29 +596,21 @@ class ManyToOneRel(object):
         return data[0]
 
 class OneToOneRel(ManyToOneRel):
-    def __init__(self, to, field_name, num_in_admin=0, min_num_in_admin=None,
-            max_num_in_admin=None, num_extra_on_change=None, edit_inline=False,
-            related_name=None, limit_choices_to=None, lookup_overrides=None,
-            parent_link=False):
-        # NOTE: *_num_in_admin and num_extra_on_change are intentionally
-        # ignored here. We accept them as parameters only to match the calling
-        # signature of ManyToOneRel.__init__().
-        super(OneToOneRel, self).__init__(to, field_name, num_in_admin,
-                edit_inline=edit_inline, related_name=related_name,
-                limit_choices_to=limit_choices_to,
+    def __init__(self, to, field_name, related_name=None,
+            limit_choices_to=None, lookup_overrides=None, parent_link=False):
+        super(OneToOneRel, self).__init__(to, field_name,
+                related_name=related_name, limit_choices_to=limit_choices_to,
                 lookup_overrides=lookup_overrides, parent_link=parent_link)
         self.multiple = False
 
 class ManyToManyRel(object):
-    def __init__(self, to, num_in_admin=0, related_name=None,
-        limit_choices_to=None, symmetrical=True, through=None):
+    def __init__(self, to, related_name=None, limit_choices_to=None,
+            symmetrical=True, through=None):
         self.to = to
-        self.num_in_admin = num_in_admin
         self.related_name = related_name
         if limit_choices_to is None:
             limit_choices_to = {}
         self.limit_choices_to = limit_choices_to
-        self.edit_inline = False
         self.symmetrical = symmetrical
         self.multiple = True
         self.through = through
@@ -651,11 +628,6 @@ class ForeignKey(RelatedField, Field):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
 
         kwargs['rel'] = rel_class(to, to_field,
-            num_in_admin=kwargs.pop('num_in_admin', 3),
-            min_num_in_admin=kwargs.pop('min_num_in_admin', None),
-            max_num_in_admin=kwargs.pop('max_num_in_admin', None),
-            num_extra_on_change=kwargs.pop('num_extra_on_change', 1),
-            edit_inline=kwargs.pop('edit_inline', False),
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             lookup_overrides=kwargs.pop('lookup_overrides', None),
@@ -670,15 +642,6 @@ class ForeignKey(RelatedField, Field):
     def get_validator_unique_lookup_type(self):
         return '%s__%s__exact' % (self.name, self.rel.get_related_field().name)
 
-    def prepare_field_objs_and_params(self, manipulator, name_prefix):
-        params = {'validator_list': self.validator_list[:], 'member_name': name_prefix + self.attname}
-        if self.null:
-            field_objs = [oldforms.NullSelectField]
-        else:
-            field_objs = [oldforms.SelectField]
-        params['choices'] = self.get_choices_default()
-        return field_objs, params
-
     def get_default(self):
         "Here we check if the default value is an object and return the to_field if so."
         field_default = super(ForeignKey, self).get_default()
@@ -686,17 +649,13 @@ class ForeignKey(RelatedField, Field):
             return getattr(field_default, self.rel.get_related_field().attname)
         return field_default
 
-    def get_manipulator_field_objs(self):
-        rel_field = self.rel.get_related_field()
-        return [oldforms.IntegerField]
-
     def get_db_prep_save(self, value):
         if value == '' or value == None:
             return None
         else:
             return self.rel.get_related_field().get_db_prep_save(value)
 
-    def flatten_data(self, follow, obj=None):
+    def value_to_string(self, obj):
         if not obj:
             # In required many-to-one fields with only one available choice,
             # select that one available choice. Note: For SelectFields
@@ -705,8 +664,8 @@ class ForeignKey(RelatedField, Field):
             if not self.blank and self.choices:
                 choice_list = self.get_choices_default()
                 if len(choice_list) == 2:
-                    return {self.attname: choice_list[1][0]}
-        return Field.flatten_data(self, follow, obj)
+                    return smart_unicode(choice_list[1][0])
+        return Field.value_to_string(self, obj)
 
     def contribute_to_class(self, cls, name):
         super(ForeignKey, self).contribute_to_class(cls, name)
@@ -744,8 +703,6 @@ class OneToOneField(ForeignKey):
     """
     def __init__(self, to, to_field=None, **kwargs):
         kwargs['unique'] = True
-        if 'num_in_admin' not in kwargs:
-            kwargs['num_in_admin'] = 0
         super(OneToOneField, self).__init__(to, to_field, OneToOneRel, **kwargs)
 
     def contribute_to_related_class(self, cls, related):
@@ -768,7 +725,6 @@ class ManyToManyField(RelatedField, Field):
 
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
         kwargs['rel'] = ManyToManyRel(to,
-            num_in_admin=kwargs.pop('num_in_admin', 0),
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             symmetrical=kwargs.pop('symmetrical', True),
@@ -785,10 +741,6 @@ class ManyToManyField(RelatedField, Field):
 
         msg = ugettext_lazy('Hold down "Control", or "Command" on a Mac, to select more than one.')
         self.help_text = string_concat(self.help_text, ' ', msg)
-
-    def get_manipulator_field_objs(self):
-        choices = self.get_choices_default()
-        return [curry(oldforms.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
 
     def get_choices_default(self):
         return Field.get_choices(self, include_blank=False)
@@ -863,25 +815,27 @@ class ManyToManyField(RelatedField, Field):
         objects = mod._default_manager.in_bulk(pks)
         if len(objects) != len(pks):
             badkeys = [k for k in pks if k not in objects]
-            raise validators.ValidationError, ungettext("Please enter valid %(self)s IDs. The value %(value)r is invalid.",
-                    "Please enter valid %(self)s IDs. The values %(value)r are invalid.", len(badkeys)) % {
+            raise exceptions.ValidationError(
+                ungettext("Please enter valid %(self)s IDs. The value %(value)r is invalid.",
+                          "Please enter valid %(self)s IDs. The values %(value)r are invalid.",
+                          len(badkeys)) % {
                 'self': self.verbose_name,
                 'value': len(badkeys) == 1 and badkeys[0] or tuple(badkeys),
-            }
+            })
 
-    def flatten_data(self, follow, obj = None):
-        new_data = {}
+    def value_to_string(self, obj):
+        data = ''
         if obj:
-            instance_ids = [instance._get_pk_val() for instance in getattr(obj, self.name).all()]
-            new_data[self.name] = instance_ids
+            qs = getattr(obj, self.name).all()
+            data = [instance._get_pk_val() for instance in qs]
         else:
             # In required many-to-many fields with only one available choice,
             # select that one available choice.
-            if not self.blank and not self.rel.edit_inline:
+            if not self.blank:
                 choices_list = self.get_choices_default()
                 if len(choices_list) == 1:
-                    new_data[self.name] = [choices_list[0][0]]
-        return new_data
+                    data = [choices_list[0][0]]
+        return smart_unicode(data)
 
     def contribute_to_class(self, cls, name):
         super(ManyToManyField, self).contribute_to_class(cls, name)

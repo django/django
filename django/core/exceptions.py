@@ -32,3 +32,6 @@ class FieldError(Exception):
     """Some kind of problem with a model field."""
     pass
 
+class ValidationError(Exception):
+    """An error while validating data."""
+    pass

@@ -8,10 +8,19 @@ import re
 import sys
 from optparse import make_option
 from django.contrib.auth.models import User
-from django.core import validators
+from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.translation import ugettext as _
 
 RE_VALID_USERNAME = re.compile('\w+$')
+EMAIL_RE = re.compile(
+    r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
+    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"' # quoted-string
+    r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
+
+def is_valid_email(value):
+    if not EMAIL_RE.search(value):
+        raise exceptions.ValidationError(_('Enter a valid e-mail address.'))
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
@@ -39,8 +48,8 @@ class Command(BaseCommand):
             if not RE_VALID_USERNAME.match(username):
                 raise CommandError("Invalid username. Use only letters, digits, and underscores")
             try:
-                validators.isValidEmail(email, None)
-            except validators.ValidationError:
+                is_valid_email(email)
+            except exceptions.ValidationError:
                 raise CommandError("Invalid email address.")
 
         password = ''
@@ -94,8 +103,8 @@ class Command(BaseCommand):
                     if not email:
                         email = raw_input('E-mail address: ')
                     try:
-                        validators.isValidEmail(email, None)
-                    except validators.ValidationError:
+                        is_valid_email(email)
+                    except exceptions.ValidationError:
                         sys.stderr.write("Error: That e-mail address is invalid.\n")
                         email = None
                     else:

@@ -154,12 +154,12 @@ shell command:
 
 One low-tech way of taking advantage of the text documentation is by using the
 Unix ``grep`` utility to search for a phrase in all of the documentation. For
-example, this will show you each mention of the phrase "edit_inline" in any
+example, this will show you each mention of the phrase "max_length" in any
 Django document:
 
 .. code-block:: bash
 
-    $ grep edit_inline /path/to/django/docs/*.txt
+    $ grep max_length /path/to/django/docs/*.txt
     
 As HTML, locally
 ----------------

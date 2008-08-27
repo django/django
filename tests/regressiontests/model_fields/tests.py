@@ -18,7 +18,7 @@ True
 >>> f.to_python("abc")
 Traceback (most recent call last):
 ...
-ValidationError: [u'This value must be a decimal number.']
+ValidationError: This value must be a decimal number.
 
 >>> f = DecimalField(max_digits=5, decimal_places=1)
 >>> x = f.to_python(2)

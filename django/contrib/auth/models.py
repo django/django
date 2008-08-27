@@ -1,5 +1,4 @@
 from django.contrib import auth
-from django.core import validators
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.manager import EmptyManager

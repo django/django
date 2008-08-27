@@ -145,23 +145,6 @@ hacking :attr:`~Field.choices` to be dynamic, you're probably better off using a
 proper database table with a :class:`ForeignKey`. :attr:`~Field.choices` is
 meant for static data that doesn't change much, if ever.
 
-``core``
---------
-
-.. attribute:: Field.core
-
-For objects that are edited inline to a related object.
-
-In the Django admin, if all "core" fields in an inline-edited object are
-cleared, the object will be deleted.
-
-It is an error to have an inline-editable relation without at least one
-``core=True`` field.
-
-Please note that each field marked "core" is treated as a required field by the
-Django admin site. Essentially, this means you should put ``core=True`` on all
-required fields in your related object that is being edited inline.
-
 ``db_column``
 -------------
 
@@ -286,15 +269,6 @@ respect to the month.
 .. attribute:: Field.unique_for_year
 
 Like :attr:`~Field.unique_for_date` and :attr:`~Field.unique_for_month`.
-
-``validator_list``
-------------------
-
-.. attribute:: Field.validator_list
-
-A list of extra validators to apply to the field. Each should be a callable that
-takes the parameters ``field_data, all_data`` and raises
-:exc:`django.core.validators.ValidationError` for errors.
 
 .. _model-field-types:
 
@@ -913,5 +887,4 @@ that control how the relationship functions.
 
 The semantics of one-to-one relationships will be changing soon, so we don't
 recommend you use them. If that doesn't scare you away, however,
-:class:`OneToOneField` takes the same options that :class:`ForeignKey` does,
-except for the various :attr:`~ForeignKey.edit_inline`-related options.
+:class:`OneToOneField` takes the same options that :class:`ForeignKey` does.

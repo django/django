@@ -8,9 +8,7 @@ try:
 except NameError:
     from sets import Set as set     # Python 2.3 fallback.
 
-import django.db.models.manipulators    # Imported to register signal handler.
-import django.db.models.manager         # Ditto.
-from django.core import validators
+import django.db.models.manager     # Imported to register signal handler.
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
 from django.db.models.fields import AutoField
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
@@ -320,9 +318,7 @@ class Model(object):
 
         # First, try an UPDATE. If that doesn't update anything, do an INSERT.
         pk_val = self._get_pk_val(meta)
-        # Note: the comparison with '' is required for compatibility with
-        # oldforms-style model creation.
-        pk_set = pk_val is not None and smart_unicode(pk_val) != u''
+        pk_set = pk_val is not None
         record_exists = True
         manager = cls._default_manager
         if pk_set:

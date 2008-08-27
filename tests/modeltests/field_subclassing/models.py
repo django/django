@@ -53,9 +53,6 @@ class SmallField(models.Field):
             return []
         raise FieldError('Invalid lookup type: %r' % lookup_type)
 
-    def flatten_data(self, follow, obj=None):
-        return {self.attname: force_unicode(self._get_val_from_obj(obj))}
-
 class MyModel(models.Model):
     name = models.CharField(max_length=10)
     data = SmallField('small field')
