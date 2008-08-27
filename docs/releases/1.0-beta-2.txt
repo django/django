@@ -1,8 +1,8 @@
 .. _releases-1.0-beta-2:
 
-=================================
-Django 1.0 beta 1 2 release notes
-=================================
+===============================
+Django 1.0 beta 2 release notes
+===============================
 
 Welcome to Django 1.0 beta 2!
 
