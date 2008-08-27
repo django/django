@@ -119,7 +119,7 @@ class BaseFormSet(StrAndUnicode):
     def _get_deleted_forms(self):
         """
         Returns a list of forms that have been marked for deletion. Raises an 
-        AttributeError is deletion is not allowed.
+        AttributeError if deletion is not allowed.
         """
         if not self.is_valid() or not self.can_delete:
             raise AttributeError("'%s' object has no attribute 'deleted_forms'" % self.__class__.__name__)
@@ -140,7 +140,7 @@ class BaseFormSet(StrAndUnicode):
     def _get_ordered_forms(self):
         """
         Returns a list of form in the order specified by the incoming data.
-        Raises an AttributeError is deletion is not allowed.
+        Raises an AttributeError if deletion is not allowed.
         """
         if not self.is_valid() or not self.can_order:
             raise AttributeError("'%s' object has no attribute 'ordered_forms'" % self.__class__.__name__)
