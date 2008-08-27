@@ -22,5 +22,13 @@
       "title": "My third entry",
       "date": "2008-01-02 13:30:00"
     }
+  },
+  {
+    "model": "syndication.entry",
+    "pk": 4,
+    "fields": {
+      "title": "A & B < C > D",
+      "date": "2008-01-03 13:30:00"
+    }
   }
 ]

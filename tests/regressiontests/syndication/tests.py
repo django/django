@@ -81,4 +81,14 @@ class SyndicationFeedTest(TestCase):
         response = self.client.get('/syndication/feeds/complex/')
         self.assertEquals(response.status_code, 404)
 
-
+    def test_title_escaping(self):
+        """
+        Tests that titles are escaped correctly in RSS feeds.
+        """
+        response = self.client.get('/syndication/feeds/rss/')
+        doc = minidom.parseString(response.content)
+        for item in doc.getElementsByTagName('item'):
+            link = item.getElementsByTagName('link')[0]
+            if link.firstChild.wholeText == 'http://example.com/blog/4/':
+                title = item.getElementsByTagName('title')[0]
+                self.assertEquals(title.firstChild.wholeText, u'A &amp; B &lt; C &gt; D')
