@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-06-20 12:36+0200\n"
-"PO-Revision-Date: 2008-06-20 12:48+0200\n"
+"POT-Creation-Date: 2008-08-27 14:54+0200\n"
+"PO-Revision-Date: 2008-08-27 15:07+0200\n"
 "Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
 "Language-Team: Catalan <ca@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -123,7 +123,7 @@ msgid "Korean"
 msgstr "coreà"
 
 #: conf/global_settings.py:71
-msgid "khmer"
+msgid "Khmer"
 msgstr "khmer"
 
 #: conf/global_settings.py:72
@@ -244,48 +244,212 @@ msgstr "Aquest mes"
 msgid "This year"
 msgstr "Aquest any"
 
-#: contrib/admin/filterspecs.py:147 newforms/widgets.py:231
-#: oldforms/__init__.py:592
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
 msgid "Yes"
 msgstr "Si"
 
-#: contrib/admin/filterspecs.py:147 newforms/widgets.py:231
-#: oldforms/__init__.py:592
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
 msgid "No"
 msgstr "No"
 
-#: contrib/admin/filterspecs.py:154 newforms/widgets.py:231
-#: oldforms/__init__.py:592
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:390
 msgid "Unknown"
 msgstr "Desconegut"
 
-#: contrib/admin/models.py:18
+#: contrib/admin/models.py:19
 msgid "action time"
 msgstr "moment de l'acció"
 
-#: contrib/admin/models.py:21
+#: contrib/admin/models.py:22
 msgid "object id"
 msgstr "id del objecte"
 
-#: contrib/admin/models.py:22
+#: contrib/admin/models.py:23
 msgid "object repr"
 msgstr "'repr' de l'objecte"
 
-#: contrib/admin/models.py:23
+#: contrib/admin/models.py:24
 msgid "action flag"
 msgstr "marca de l'acció"
 
-#: contrib/admin/models.py:24
+#: contrib/admin/models.py:25
 msgid "change message"
 msgstr "missatge del canvi"
 
-#: contrib/admin/models.py:27
+#: contrib/admin/models.py:28
 msgid "log entry"
 msgstr "entrada del registre"
 
-#: contrib/admin/models.py:28
+#: contrib/admin/models.py:29
 msgid "log entries"
 msgstr "entrades del registre"
+
+#: contrib/admin/options.py:56 contrib/admin/options.py:115
+msgid "None"
+msgstr "cap"
+
+#: contrib/admin/options.py:329
+#, python-format
+msgid "Changed %s."
+msgstr "Modificat %s."
+
+#: contrib/admin/options.py:329 contrib/admin/options.py:339
+msgid "and"
+msgstr "i"
+
+#: contrib/admin/options.py:334
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "Afegit %(name)s \"%(object)s\""
+
+#: contrib/admin/options.py:338
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "Modificat %(list)s per a %(name)s \"%(object)s\"."
+
+#: contrib/admin/options.py:343
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "Eliminat %(name)s \"%(object)s\"."
+
+#: contrib/admin/options.py:347
+msgid "No fields changed."
+msgstr "Cap camp canviat."
+
+#: contrib/admin/options.py:408 contrib/auth/admin.py:51
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "El/la %(name)s \"%(obj)s\".ha estat afegit/da amb èxit."
+
+#: contrib/admin/options.py:412 contrib/admin/options.py:445
+#: contrib/auth/admin.py:57
+msgid "You may edit it again below."
+msgstr "Podeu editar-lo de nou a baix."
+
+#: contrib/admin/options.py:422 contrib/admin/options.py:455
+#, python-format
+msgid "You may add another %s below."
+msgstr "Podeu afegir un altre %s a baix."
+
+#: contrib/admin/options.py:443
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "S'ha modificat amb èxit el/la %(name)s \"%(obj)s."
+
+#: contrib/admin/options.py:451
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"S'ha afegit exitosament el/la %(name)s \"%(obj)s\". Pot editar-lo de nou "
+"abaix."
+
+#: contrib/admin/options.py:517
+#, python-format
+msgid "Add %s"
+msgstr "Afegir %s"
+
+#: contrib/admin/options.py:595
+#, python-format
+msgid "Change %s"
+msgstr "Modificar %s"
+
+#: contrib/admin/options.py:627
+msgid "Database error"
+msgstr "Error de base de dades"
+
+#: contrib/admin/options.py:677
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "El/la %(name)s \"%(obj)s\" ha estat eliminat amb èxit."
+
+#: contrib/admin/options.py:684
+msgid "Are you sure?"
+msgstr "Esteu segurs?"
+
+#: contrib/admin/options.py:713
+#, python-format
+msgid "Change history: %s"
+msgstr "Modificar històric: %s"
+
+#: contrib/admin/sites.py:18 contrib/admin/views/decorators.py:16
+#: contrib/auth/forms.py:80
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Si us plau, introduïu un nom d'usuari i contrasenya vàlids. Tingueu en "
+"compte que tots dos camps son sensibles a majúscules i minúscules."
+
+#: contrib/admin/sites.py:242 contrib/admin/views/decorators.py:68
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr ""
+"Si us plau, identifiqueu-vos de nou doncs la vostra sessió ha expirat. No us "
+"preocupeu, el seu enviament està emmagatzemat."
+
+#: contrib/admin/sites.py:249 contrib/admin/views/decorators.py:75
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+"Sembla ser que el vostre navegador no està configurat per acceptar "
+"'cookies' (galetes). Si us plau, habiliteu les 'cookies', recarregueu "
+"aquesta pàgina i proveu-ho de nou. "
+
+#: contrib/admin/sites.py:265 contrib/admin/sites.py:271
+#: contrib/admin/views/decorators.py:94
+msgid "Usernames cannot contain the '@' character."
+msgstr "Els noms d'usuari no poden contenir el caracter '@'."
+
+#: contrib/admin/sites.py:268 contrib/admin/views/decorators.py:90
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr ""
+"La vostra adreça de correu no és el vostre nom d'usuari. Provi '%s' en tot "
+"cas."
+
+#: contrib/admin/sites.py:336
+msgid "Site administration"
+msgstr "Lloc administratiu"
+
+#: contrib/admin/sites.py:358 contrib/admin/templates/admin/login.html:27
+#: contrib/admin/templates/registration/password_reset_complete.html:14
+#: contrib/admin/views/decorators.py:30
+msgid "Log in"
+msgstr "Iniciar sessió"
+
+#: contrib/admin/sites.py:406
+#, python-format
+msgid "%s administration"
+msgstr "Administració de %s"
+
+#: contrib/admin/util.py:138
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "Un o més %(fieldname)s en %(name)s: %(obj)s"
+
+#: contrib/admin/util.py:143
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "Un o més %(fieldname)s en %(name)s:"
+
+#: contrib/admin/widgets.py:65
+msgid "Date:"
+msgstr "Data:"
+
+#: contrib/admin/widgets.py:65
+msgid "Time:"
+msgstr "Hora:"
+
+#: contrib/admin/widgets.py:89
+msgid "Currently:"
+msgstr "Actualment:"
+
+#: contrib/admin/widgets.py:89
+msgid "Change:"
+msgstr "Modificar:"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -297,19 +461,22 @@ msgid "We're sorry, but the requested page could not be found."
 msgstr "Ho sentim, però no s'ha pogut trobar la pàgina sol·licitada"
 
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/base.html:37
-#: contrib/admin/templates/admin/change_form.html:12
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/delete_confirmation.html:5
+#: contrib/admin/templates/admin/app_index.html:8
+#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/change_form.html:17
+#: contrib/admin/templates/admin/change_list.html:8
+#: contrib/admin/templates/admin/delete_confirmation.html:6
 #: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/admin/object_history.html:4
-#: contrib/admin/templates/admin/auth/user/change_password.html:11
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/admin/object_history.html:6
+#: contrib/admin/templates/admin/auth/user/change_password.html:10
 #: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_reset_complete.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Home"
 msgstr "Inici"
 
@@ -333,23 +500,34 @@ msgstr ""
 "Ha ocorregut un error. S'ha informat als administradors del lloc per correu "
 "electrònic y hauria d'arreglar-se en breu. Gràcies per la vostra paciència."
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/app_index.html:10
+#: contrib/admin/templates/admin/index.html:19
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: contrib/admin/templates/admin/base.html:25
 msgid "Welcome,"
 msgstr "Benvingut/da,"
 
-#: contrib/admin/templates/admin/base.html:28
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Documentació"
 
-#: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin/auth/user/change_password.html:14
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/auth/user/change_password.html:13
+#: contrib/admin/templates/admin/auth/user/change_password.html:46
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Change password"
 msgstr "Canviar contrasenya"
 
-#: contrib/admin/templates/admin/base.html:30
-#: contrib/comments/templates/comments/form.html:6
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
 msgstr "Finalitzar sessió"
 
@@ -361,46 +539,44 @@ msgstr "Lloc administratiu de Django"
 msgid "Django administration"
 msgstr "Administració de Django"
 
-#: contrib/admin/templates/admin/change_form.html:14
-#: contrib/admin/templates/admin/index.html:28
+#: contrib/admin/templates/admin/change_form.html:20
+#: contrib/admin/templates/admin/index.html:29
 msgid "Add"
 msgstr "Afegir"
 
-#: contrib/admin/templates/admin/change_form.html:20
-#: contrib/admin/templates/admin/object_history.html:4
+#: contrib/admin/templates/admin/change_form.html:27
+#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Històric"
 
-#: contrib/admin/templates/admin/change_form.html:21
+#: contrib/admin/templates/admin/change_form.html:28
+#: contrib/admin/templates/admin/edit_inline/stacked.html:13
+#: contrib/admin/templates/admin/edit_inline/tabular.html:25
 msgid "View on site"
 msgstr "Veure al lloc"
 
-#: contrib/admin/templates/admin/change_form.html:31
-#: contrib/admin/templates/admin/auth/user/change_password.html:23
+#: contrib/admin/templates/admin/change_form.html:38
+#: contrib/admin/templates/admin/auth/user/change_password.html:22
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Si us plau, corregiu l'error mostrat a baix."
 msgstr[1] "Si us plau, corregiu els errors mostrats a baix."
 
-#: contrib/admin/templates/admin/change_form.html:49
-msgid "Ordering"
-msgstr "Ordre"
-
-#: contrib/admin/templates/admin/change_form.html:52
-msgid "Order:"
-msgstr "Ordre:"
-
-#: contrib/admin/templates/admin/change_list.html:11
+#: contrib/admin/templates/admin/change_list.html:16
 #, python-format
 msgid "Add %(name)s"
 msgstr "Afegir %(name)s"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/submit_line.html:3
+#: contrib/admin/templates/admin/change_list.html:26
+msgid "Filter"
+msgstr "Filtre"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:10
+#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:246
 msgid "Delete"
 msgstr "Eliminar"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:13
+#: contrib/admin/templates/admin/delete_confirmation.html:16
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -411,7 +587,7 @@ msgstr ""
 "d'objectes relacionats, però el vostre compte no te permissos per a esborrar "
 "els tipus d'objecte següents:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:20
+#: contrib/admin/templates/admin/delete_confirmation.html:23
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -420,7 +596,7 @@ msgstr ""
 "Esteu segurs de voler esborrar els/les %(object_name)s \"%(escaped_object)s"
 "\"? S'esborraran els següents elements relacionats:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:25
+#: contrib/admin/templates/admin/delete_confirmation.html:28
 msgid "Yes, I'm sure"
 msgstr "Si, estic segur"
 
@@ -429,41 +605,32 @@ msgstr "Si, estic segur"
 msgid " By %(filter_title)s "
 msgstr "Per %(filter_title)s "
 
-#: contrib/admin/templates/admin/filters.html:4
-msgid "Filter"
-msgstr "Filtre"
-
-#: contrib/admin/templates/admin/index.html:17
+#: contrib/admin/templates/admin/index.html:18
 #, python-format
 msgid "Models available in the %(name)s application."
 msgstr "Models disponibles a l'aplicació %(name)s."
 
-#: contrib/admin/templates/admin/index.html:18
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
-
-#: contrib/admin/templates/admin/index.html:34
+#: contrib/admin/templates/admin/index.html:35
 msgid "Change"
 msgstr "Modificar"
 
-#: contrib/admin/templates/admin/index.html:44
+#: contrib/admin/templates/admin/index.html:45
 msgid "You don't have permission to edit anything."
 msgstr "No teniu permís per editar res."
 
-#: contrib/admin/templates/admin/index.html:52
+#: contrib/admin/templates/admin/index.html:53
 msgid "Recent Actions"
 msgstr "Accions recents"
 
-#: contrib/admin/templates/admin/index.html:53
+#: contrib/admin/templates/admin/index.html:54
 msgid "My Actions"
 msgstr "Les meves accions"
 
-#: contrib/admin/templates/admin/index.html:57
+#: contrib/admin/templates/admin/index.html:58
 msgid "None available"
 msgstr "Cap disponible"
 
-#: contrib/admin/templates/admin/invalid_setup.html:8
+#: contrib/admin/templates/admin/invalid_setup.html:7
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -473,39 +640,32 @@ msgstr ""
 "Assegureu-vos de que s'han creat les taules, i de que la base de dades és "
 "llegible per l'usuari apropiat."
 
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:19
 msgid "Username:"
 msgstr "Usuari:"
 
-#: contrib/admin/templates/admin/login.html:20
-#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:22
 msgid "Password:"
 msgstr "Contrasenya:"
 
-#: contrib/admin/templates/admin/login.html:25
-#: contrib/admin/views/decorators.py:31
-msgid "Log in"
-msgstr "Iniciar sessió"
-
-#: contrib/admin/templates/admin/object_history.html:17
+#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Data/hora"
 
-#: contrib/admin/templates/admin/object_history.html:18
+#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Usuari"
 
-#: contrib/admin/templates/admin/object_history.html:19
+#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Acció"
 
-#: contrib/admin/templates/admin/object_history.html:25
-msgid "DATE_WITH_TIME_FULL"
-msgstr "F j, Y, H:i "
+#: contrib/admin/templates/admin/object_history.html:30
+#: utils/translation/trans_real.py:404
+msgid "DATETIME_FORMAT"
+msgstr "F j, Y, H:i"
 
-#: contrib/admin/templates/admin/object_history.html:35
+#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -533,21 +693,21 @@ msgstr[1] "%(counter)s resultats"
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s en total"
 
-#: contrib/admin/templates/admin/submit_line.html:4
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Desar"
+
+#: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save as new"
 msgstr "Desar com a nou"
 
-#: contrib/admin/templates/admin/submit_line.html:5
+#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and add another"
 msgstr "Desar i afegir-ne un de nou"
 
-#: contrib/admin/templates/admin/submit_line.html:6
+#: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save and continue editing"
 msgstr "Desar i continuar editant"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr "Desar"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
@@ -557,39 +717,362 @@ msgstr ""
 "Primer, entreu un usuari i una contrasenya. Després podreu editar més "
 "opcions de l'usuari."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:12
+#: contrib/admin/templates/admin/auth/user/add_form.html:13
+#: contrib/auth/forms.py:14 contrib/auth/forms.py:47 contrib/auth/forms.py:59
 msgid "Username"
 msgstr "Usuari"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:18
+#: contrib/admin/templates/admin/auth/user/add_form.html:20
 #: contrib/admin/templates/admin/auth/user/change_password.html:33
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:60 contrib/auth/forms.py:184
 msgid "Password"
 msgstr "Contrasenya"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:23
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
+#: contrib/admin/templates/admin/auth/user/add_form.html:26
+#: contrib/admin/templates/admin/auth/user/change_password.html:39
+#: contrib/auth/forms.py:185
 msgid "Password (again)"
 msgstr "Contrasenya (de nou)"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:24
-#: contrib/admin/templates/admin/auth/user/change_password.html:39
+#: contrib/admin/templates/admin/auth/user/add_form.html:27
+#: contrib/admin/templates/admin/auth/user/change_password.html:40
 msgid "Enter the same password as above, for verification."
 msgstr "Introduïu la mateixa contrasenya de dalt, per fer-ne la verificació."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
+#: contrib/admin/templates/admin/auth/user/change_password.html:26
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Introduïu una contrasenya per l'usuari <strong>%(username)s</strong>"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/admin/edit_inline/tabular.html:15
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Gràcies per destinar el vostre temps en el web durant el dia d'avui."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Iniciar sessió de nou"
+
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr "Canvi de contrasenya"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "Contrasenya canviada amb èxit"
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "La seva contrasenya ha estat canviada."
+
+#: contrib/admin/templates/registration/password_change_form.html:12
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Si us plau, introduïu la vostra contrasenya antiga, per seguretat, i tot "
+"seguit introduïu la vostra contrasenya nova dues vegades per verificar que "
+"l'heu escrit correctament."
+
+#: contrib/admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr "Contrasenya antiga:"
+
+#: contrib/admin/templates/registration/password_change_form.html:19
+#: contrib/admin/templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "Contrasenya nova:"
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+#: contrib/admin/templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "Confirmar contrasenya:"
+
+#: contrib/admin/templates/registration/password_change_form.html:23
+#: contrib/admin/templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr "Canviar la meva clau:"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "Restablir contrasenya"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:6
+#: contrib/admin/templates/registration/password_reset_complete.html:10
+msgid "Password reset complete"
+msgstr "Contrasenya restablerta"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "La seva contrasenya ha estat canviada. Ara pot continuar i iniciar sessió."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
+msgid "Password reset confirmation"
+msgstr "Confirmació de reestabliment de contrasenya"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:12
+msgid "Enter new password"
+msgstr "Introdueixi la nova contrasenya"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:14
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Si us plau, introduïu la vostra nova contrasenya dues vegades, per verificar "
+"que l'heu escrit correctament."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:26
+msgid "Password reset unsuccessful"
+msgstr "Restabliment de contrasenya fallit"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:28
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"L'enllaç de restabliment de contrasenya era invàlid, segurament ja deu haver "
+"estat utilitzat. Per favor, soliciti un nou reestabliment de contrasenya."
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Restabliment de contrasenya exitós"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed you instructions for setting your password to the e-mail "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+"Us hem enviat les instruccions per canviar la vostra contrasenya a l'adreça "
+"de correu electrònic que ens heu indicat. L'haurieu de rebre en breu."
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr ""
+"Esteu rebent aquest missatge degut a que veu solicitar un restabliment de "
+"contrasenya."
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "del vostre compte d'usuari a %(site_name)s."
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr "Si us plau, adrecis a la pàgina següen i esculli una nova contrasenya:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr "El vostre nom d'usuari, en cas d'haver-lo oblidat:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr "Gràcies per fer us del nostre lloc!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "L'equip de %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"instructions for setting a new one."
+msgstr ""
+"Heu oblidat la vostra contrasenya? Introduïu la vostra adreça de correu "
+"electrònic i li enviarem instruccions per canviar-la."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "Adreça de correu electrònic:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Restablir la meva contrasenya"
+
+#: contrib/admin/templatetags/admin_list.py:284
+msgid "All dates"
+msgstr "Totes les dates"
+
+#: contrib/admin/views/main.py:65
+#, python-format
+msgid "Select %s"
+msgstr "Seleccioneu %s"
+
+#: contrib/admin/views/main.py:65
+#, python-format
+msgid "Select %s to change"
+msgstr "Seleccioneu %s per modificar"
+
+#: contrib/admin/views/template.py:36 contrib/sites/models.py:38
+msgid "site"
+msgstr "lloc"
+
+#: contrib/admin/views/template.py:38
+msgid "template"
+msgstr "plantilla"
+
+#: contrib/admindocs/views.py:53 contrib/admindocs/views.py:55
+#: contrib/admindocs/views.py:57
+msgid "tag:"
+msgstr "etiqueta:"
+
+#: contrib/admindocs/views.py:87 contrib/admindocs/views.py:89
+#: contrib/admindocs/views.py:91
+msgid "filter:"
+msgstr "filtre:"
+
+#: contrib/admindocs/views.py:153 contrib/admindocs/views.py:155
+#: contrib/admindocs/views.py:157
+msgid "view:"
+msgstr "vista:"
+
+#: contrib/admindocs/views.py:187
+#, python-format
+msgid "App %r not found"
+msgstr "No s'ha pogut trobar l'aplicació %r"
+
+#: contrib/admindocs/views.py:194
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "El model %(model_name)r no s'ha trobat en l'aplicació %(app_label)r"
+
+#: contrib/admindocs/views.py:206
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "l'objecte relacionat `%(app_label)s.%(data_type)s`"
+
+#: contrib/admindocs/views.py:206 contrib/admindocs/views.py:228
+#: contrib/admindocs/views.py:242 contrib/admindocs/views.py:247
+msgid "model:"
+msgstr "model:"
+
+#: contrib/admindocs/views.py:237
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "objectes relacionats `%(app_label)s.%(object_name)s`"
+
+#: contrib/admindocs/views.py:242
+#, python-format
+msgid "all %s"
+msgstr "tots %s"
+
+#: contrib/admindocs/views.py:247
+#, python-format
+msgid "number of %s"
+msgstr "nombre de %s"
+
+#: contrib/admindocs/views.py:253
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Camps en objectes %s"
+
+#: contrib/admindocs/views.py:317 contrib/admindocs/views.py:328
+#: contrib/admindocs/views.py:330 contrib/admindocs/views.py:336
+#: contrib/admindocs/views.py:337 contrib/admindocs/views.py:339
+msgid "Integer"
+msgstr "Enter"
+
+#: contrib/admindocs/views.py:318
+msgid "Boolean (Either True or False)"
+msgstr "Booleà (Verdader o Fals)"
+
+#: contrib/admindocs/views.py:319 contrib/admindocs/views.py:338
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Cadena (de fins a %(max_length)s)"
+
+#: contrib/admindocs/views.py:320
+msgid "Comma-separated integers"
+msgstr "Enters separats per comes"
+
+#: contrib/admindocs/views.py:321
+msgid "Date (without time)"
+msgstr "Data (sense hora)"
+
+#: contrib/admindocs/views.py:322
+msgid "Date (with time)"
+msgstr "Data (amb hora)"
+
+#: contrib/admindocs/views.py:323
+msgid "Decimal number"
+msgstr "Número decimal"
+
+#: contrib/admindocs/views.py:324
+msgid "E-mail address"
+msgstr "Adreça de correu electrònic"
+
+#: contrib/admindocs/views.py:325 contrib/admindocs/views.py:326
+#: contrib/admindocs/views.py:329
+msgid "File path"
+msgstr "Ruta del fitxer"
+
+#: contrib/admindocs/views.py:327
+msgid "Floating point number"
+msgstr "Número amb punt de coma flotant"
+
+#: contrib/admindocs/views.py:331 contrib/comments/models.py:57
+msgid "IP address"
+msgstr "Adreça IP"
+
+#: contrib/admindocs/views.py:333
+msgid "Boolean (Either True, False or None)"
+msgstr "Booleà (Verdader, Fals o 'None' (cap))"
+
+#: contrib/admindocs/views.py:334
+msgid "Relation to parent model"
+msgstr "Relació amb el model pare"
+
+#: contrib/admindocs/views.py:335
+msgid "Phone number"
+msgstr "Número de telèfon"
+
+#: contrib/admindocs/views.py:340
+msgid "Text"
+msgstr "Text"
+
+#: contrib/admindocs/views.py:341
+msgid "Time"
+msgstr "Hora"
+
+#: contrib/admindocs/views.py:342 contrib/comments/forms.py:20
+#: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
+msgid "URL"
+msgstr "URL"
+
+#: contrib/admindocs/views.py:343
+msgid "U.S. state (two uppercase letters)"
+msgstr "Estat dels E.U.A. (dues lletres majúscules)"
+
+#: contrib/admindocs/views.py:344
+msgid "XML text"
+msgstr "Text XML"
+
+#: contrib/admindocs/views.py:370
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s no sembla ser un objecte 'urlpattern'"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
 msgstr "'Bookmarklets'"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:4
 msgid "Documentation bookmarklets"
 msgstr "'Bookmarklets' de documentació"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:8
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -610,22 +1093,22 @@ msgstr ""
 "amb el vostre administrador de sistemes si no esteu segurs de la condició "
 "del vostre).</p>\n"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:18
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
 msgstr "Documentació d'aquesta pàgina"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:19
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
 "Us porta des de qualsevol pàgina de la documentació a la vista que la genera."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:21
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
 msgstr "Mostra el ID de l'objecte"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:22
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
@@ -633,527 +1116,55 @@ msgstr ""
 "Mostra el 'content-type' (tipus de contingut) i el ID inequívoc de les "
 "pàgines que representen un únic objecte."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:24
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
 msgstr "Editar aquest objecte (finestra actual)"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
 "El porta a la pàgina d'administració de pàgines que representen un únic "
 "objecte."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:27
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
 msgstr "Editar aquest objecte (nova finestra)"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
 msgstr "Com abans, però obre la pàgina d'administració en una nova finestra."
 
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Gràcies per destinar el vostre temps en el web durant el dia d'avui."
+#: contrib/auth/admin.py:21
+msgid "Personal info"
+msgstr "Informació personal"
 
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Iniciar sessió de nou"
+#: contrib/auth/admin.py:22
+msgid "Permissions"
+msgstr "permisos"
 
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_form.html:5
-#: contrib/admin/templates/registration/password_change_form.html:9
-msgid "Password change"
-msgstr "Canvi de contrasenya"
+#: contrib/auth/admin.py:23
+msgid "Important dates"
+msgstr "Dates importants"
 
-#: contrib/admin/templates/registration/password_change_done.html:5
-#: contrib/admin/templates/registration/password_change_done.html:9
-msgid "Password change successful"
-msgstr "Contrasenya canviada amb èxit"
+#: contrib/auth/admin.py:24
+msgid "Groups"
+msgstr "Grups"
 
-#: contrib/admin/templates/registration/password_change_done.html:11
-msgid "Your password was changed."
-msgstr "La seva contrasenya ha estat canviada."
-
-#: contrib/admin/templates/registration/password_change_form.html:11
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Si us plau, introduïu la vostra contrasenya antiga, per seguretat, i tot "
-"seguit introduïu la vostra contrasenya nova dues vegades per verificar que "
-"l'heu escrit correctament."
-
-#: contrib/admin/templates/registration/password_change_form.html:16
-msgid "Old password:"
-msgstr "Contrasenya antiga:"
-
-#: contrib/admin/templates/registration/password_change_form.html:18
-msgid "New password:"
-msgstr "Contrasenya nova:"
-
-#: contrib/admin/templates/registration/password_change_form.html:20
-msgid "Confirm password:"
-msgstr "Confirmar contrasenya:"
-
-#: contrib/admin/templates/registration/password_change_form.html:22
-msgid "Change my password"
-msgstr "Canviar la meva clau:"
-
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-msgid "Password reset"
-msgstr "Restablir contrasenya"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Restabliment de contrasenya exitós"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Us hem enviat una contrasenya nova a l'adreça de correu electrònic que ens "
-"heu indicat. L'haurieu de rebre en breu."
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr ""
-"Esteu rebent aquest missatge degut a que veu solicitar un restabliment de "
-"contrasenya."
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "del vostre compte d'usuari a %(site_name)s."
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "La vostra nova contrasenya és: %(new_password)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "Sentiu-vos lliures de canviar-la en aquesta pàgina:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "El vostre nom d'usuari, en cas d'haver-lo oblidat:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-msgid "Thanks for using our site!"
-msgstr "Gràcies per fer us del nostre lloc!"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "L'equip de %(site_name)s"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Heu oblidat la vostra contrasenya? Introduïu la vostra adreça de correu "
-"electrònic i en crearem una de nova que us enviarem per correu."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "Adreça de correu electrònic:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Restablir la meva contrasenya"
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "Data:"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "Hora:"
-
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr "Actualment:"
-
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "Modificar:"
-
-#: contrib/admin/templatetags/admin_list.py:257
-msgid "All dates"
-msgstr "Totes les dates"
-
-#: contrib/admin/views/auth.py:20 contrib/admin/views/main.py:267
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "El/la %(name)s \"%(obj)s\".ha estat afegit/da amb èxit."
-
-#: contrib/admin/views/auth.py:25 contrib/admin/views/main.py:271
-#: contrib/admin/views/main.py:356
-msgid "You may edit it again below."
-msgstr "Podeu editar-lo de nou a baix."
-
-#: contrib/admin/views/auth.py:31
+#: contrib/auth/admin.py:62
 msgid "Add user"
 msgstr "Afegir usuari"
 
-#: contrib/admin/views/auth.py:58
+#: contrib/auth/admin.py:88
 msgid "Password changed successfully."
 msgstr "Contrasenya cambiada amb èxit"
 
-#: contrib/admin/views/auth.py:65
+#: contrib/auth/admin.py:94
 #, python-format
 msgid "Change password: %s"
 msgstr "Canviar contrasenya: %s"
 
-#: contrib/admin/views/decorators.py:17 contrib/auth/forms.py:60
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr ""
-"Si us plau, introduïu un nom d'usuari i contrasenya vàlids. Tingueu en "
-"compte que tots dos camps son sensibles a majúscules i minúscules."
-
-#: contrib/admin/views/decorators.py:69
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr ""
-"Si us plau, identifiqueu-vos de nou doncs la vostra sessió ha expirat. No us "
-"preocupeu, el seu enviament està emmagatzemat."
-
-#: contrib/admin/views/decorators.py:76
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"Sembla ser que el vostre navegador no està configurat per acceptar "
-"'cookies' (galetes). Si us plau, habiliteu les 'cookies', recarregueu "
-"aquesta pàgina i proveu-ho de nou. "
-
-#: contrib/admin/views/decorators.py:89
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-"La vostra adreça de correu no és el vostre nom d'usuari. Provi '%s' en tot "
-"cas."
-
-#: contrib/admin/views/decorators.py:93
-msgid "Usernames cannot contain the '@' character."
-msgstr "Els noms d'usuari no poden contenir el caracter '@'."
-
-#: contrib/admin/views/doc.py:48 contrib/admin/views/doc.py:50
-#: contrib/admin/views/doc.py:52
-msgid "tag:"
-msgstr "etiqueta:"
-
-#: contrib/admin/views/doc.py:79 contrib/admin/views/doc.py:81
-#: contrib/admin/views/doc.py:83
-msgid "filter:"
-msgstr "filtre:"
-
-#: contrib/admin/views/doc.py:137 contrib/admin/views/doc.py:139
-#: contrib/admin/views/doc.py:141
-msgid "view:"
-msgstr "vista:"
-
-#: contrib/admin/views/doc.py:166
-#, python-format
-msgid "App %r not found"
-msgstr "No s'ha pogut trobar l'aplicació %r"
-
-#: contrib/admin/views/doc.py:173
-#, python-format
-msgid "Model %(name)r not found in app %(label)r"
-msgstr "El model %(name)r no s'ha trobat en l'aplicació %(label)r"
-
-#: contrib/admin/views/doc.py:185
-#, python-format
-msgid "the related `%(label)s.%(type)s` object"
-msgstr "l'objecte relacionat `%(label)s.%(type)s`"
-
-#: contrib/admin/views/doc.py:185 contrib/admin/views/doc.py:207
-#: contrib/admin/views/doc.py:221 contrib/admin/views/doc.py:226
-msgid "model:"
-msgstr "model:"
-
-#: contrib/admin/views/doc.py:216
-#, python-format
-msgid "related `%(label)s.%(name)s` objects"
-msgstr "objectes relacionats `%(label)s.%(name)s`"
-
-#: contrib/admin/views/doc.py:221
-#, python-format
-msgid "all %s"
-msgstr "tots %s"
-
-#: contrib/admin/views/doc.py:226
-#, python-format
-msgid "number of %s"
-msgstr "nombre de %s"
-
-#: contrib/admin/views/doc.py:231
-#, python-format
-msgid "Fields on %s objects"
-msgstr "Camps en objectes %s"
-
-#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:304
-#: contrib/admin/views/doc.py:306 contrib/admin/views/doc.py:312
-#: contrib/admin/views/doc.py:313 contrib/admin/views/doc.py:315
-msgid "Integer"
-msgstr "Enter"
-
-#: contrib/admin/views/doc.py:294
-msgid "Boolean (Either True or False)"
-msgstr "Booleà (Verdader o Fals)"
-
-#: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:314
-#, python-format
-msgid "String (up to %(max_length)s)"
-msgstr "Cadena (de fins a %(max_length)s)"
-
-#: contrib/admin/views/doc.py:296
-msgid "Comma-separated integers"
-msgstr "Enters separats per comes"
-
-#: contrib/admin/views/doc.py:297
-msgid "Date (without time)"
-msgstr "Data (sense hora)"
-
-#: contrib/admin/views/doc.py:298
-msgid "Date (with time)"
-msgstr "Data (amb hora)"
-
-#: contrib/admin/views/doc.py:299
-msgid "Decimal number"
-msgstr "Número decimal"
-
-#: contrib/admin/views/doc.py:300
-msgid "E-mail address"
-msgstr "Adreça de correu electrònic"
-
-#: contrib/admin/views/doc.py:301 contrib/admin/views/doc.py:302
-#: contrib/admin/views/doc.py:305
-msgid "File path"
-msgstr "Ruta del fitxer"
-
-#: contrib/admin/views/doc.py:303
-msgid "Floating point number"
-msgstr "Número amb punt de coma flotant"
-
-#: contrib/admin/views/doc.py:307 contrib/comments/models.py:89
-msgid "IP address"
-msgstr "Adreça IP"
-
-#: contrib/admin/views/doc.py:309
-msgid "Boolean (Either True, False or None)"
-msgstr "Booleà (Verdader, Fals o 'None' (cap))"
-
-#: contrib/admin/views/doc.py:310
-msgid "Relation to parent model"
-msgstr "Relació amb el model pare"
-
-#: contrib/admin/views/doc.py:311
-msgid "Phone number"
-msgstr "Número de telèfon"
-
-#: contrib/admin/views/doc.py:316
-msgid "Text"
-msgstr "Text"
-
-#: contrib/admin/views/doc.py:317
-msgid "Time"
-msgstr "Hora"
-
-#: contrib/admin/views/doc.py:318 contrib/flatpages/models.py:8
-msgid "URL"
-msgstr "URL"
-
-#: contrib/admin/views/doc.py:319
-msgid "U.S. state (two uppercase letters)"
-msgstr "Estat dels E.U.A. (dues lletres majúscules)"
-
-#: contrib/admin/views/doc.py:320
-msgid "XML text"
-msgstr "Text XML"
-
-#: contrib/admin/views/doc.py:346
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s no sembla ser un objecte 'urlpattern'"
-
-#: contrib/admin/views/main.py:233
-msgid "Site administration"
-msgstr "Lloc administratiu"
-
-#: contrib/admin/views/main.py:280 contrib/admin/views/main.py:365
-#, python-format
-msgid "You may add another %s below."
-msgstr "Podeu afegir un altre %s a baix."
-
-#: contrib/admin/views/main.py:298
-#, python-format
-msgid "Add %s"
-msgstr "Afegir %s"
-
-#: contrib/admin/views/main.py:344
-#, python-format
-msgid "Added %s."
-msgstr "Afegit %s."
-
-#: contrib/admin/views/main.py:344 contrib/admin/views/main.py:346
-#: contrib/admin/views/main.py:348 core/validators.py:283
-#: db/models/manipulators.py:309
-msgid "and"
-msgstr "i"
-
-#: contrib/admin/views/main.py:346
-#, python-format
-msgid "Changed %s."
-msgstr "Modificat %s."
-
-#: contrib/admin/views/main.py:348
-#, python-format
-msgid "Deleted %s."
-msgstr "Eliminat %s."
-
-#: contrib/admin/views/main.py:351
-msgid "No fields changed."
-msgstr "Cap camp canviat."
-
-#: contrib/admin/views/main.py:354
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "S'ha modificat amb èxit el/la %(name)s \"%(obj)s."
-
-#: contrib/admin/views/main.py:362
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"S'ha afegit exitosament el/la %(name)s \"%(obj)s\". Pot editar-lo de nou "
-"abaix."
-
-#: contrib/admin/views/main.py:400
-#, python-format
-msgid "Change %s"
-msgstr "Modificar %s"
-
-#: contrib/admin/views/main.py:487
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Un o més %(fieldname)s en %(name)s: %(obj)s"
-
-#: contrib/admin/views/main.py:492
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Un o més %(fieldname)s en %(name)s:"
-
-#: contrib/admin/views/main.py:524
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "El/la %(name)s \"%(obj)s\" ha estat eliminat amb èxit."
-
-#: contrib/admin/views/main.py:527
-msgid "Are you sure?"
-msgstr "Esteu segurs?"
-
-#: contrib/admin/views/main.py:549
-#, python-format
-msgid "Change history: %s"
-msgstr "Modificar històric: %s"
-
-#: contrib/admin/views/main.py:583
-#, python-format
-msgid "Select %s"
-msgstr "Seleccioneu %s"
-
-#: contrib/admin/views/main.py:583
-#, python-format
-msgid "Select %s to change"
-msgstr "Seleccioneu %s per modificar"
-
-#: contrib/admin/views/main.py:765
-msgid "Database error"
-msgstr "Error de base de dades"
-
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:138
-msgid "The two password fields didn't match."
-msgstr "Els dos camps de contrasenya no coincideixen."
-
-#: contrib/auth/forms.py:25
-msgid "A user with that username already exists."
-msgstr "Ja existeix un usuari amb aquest nom."
-
-#: contrib/auth/forms.py:53
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"El seu navegador no sembla tenir les 'cookies' (galetes) activades. Aquestes "
-"són necessàries per iniciar la sessió."
-
-#: contrib/auth/forms.py:62
-msgid "This account is inactive."
-msgstr "Aquest compte està inactiu"
-
-#: contrib/auth/forms.py:84
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Aquesta adreça de correu no té associada cap compte d'usuari. Esteu segurs "
-"de que s'ha registrat?"
-
-#: contrib/auth/forms.py:107
-#, python-format
-msgid "Password reset on %s"
-msgstr "Restablir contrasenya en %s"
-
-#: contrib/auth/forms.py:117
-msgid "The two 'new password' fields didn't match."
-msgstr "Els dos camps de nova contrasenya no coincideixen."
-
-#: contrib/auth/forms.py:124
-msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr ""
-"La seva antiga contrasenya no és correcte. Si el plau, introduïu-la de nou."
-
-#: contrib/auth/models.py:73 contrib/auth/models.py:93
-msgid "name"
-msgstr "nom"
-
-#: contrib/auth/models.py:75
-msgid "codename"
-msgstr "nom en clau"
-
-#: contrib/auth/models.py:78
-msgid "permission"
-msgstr "permís"
-
-#: contrib/auth/models.py:79 contrib/auth/models.py:94
-msgid "permissions"
-msgstr "permisos"
-
-#: contrib/auth/models.py:97
-msgid "group"
-msgstr "grup"
-
-#: contrib/auth/models.py:98 contrib/auth/models.py:148
-msgid "groups"
-msgstr "grups"
-
-#: contrib/auth/models.py:138
-msgid "username"
-msgstr "nom d'usuari"
-
-#: contrib/auth/models.py:138
+#: contrib/auth/forms.py:15 contrib/auth/forms.py:48
+#: contrib/auth/models.py:136
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
@@ -1161,23 +1172,114 @@ msgstr ""
 "Obligatori. 30 o menys caràcters. Només caràcters alfanumèrics (lletres, "
 "dígits i el guió baix)."
 
-#: contrib/auth/models.py:139
+#: contrib/auth/forms.py:16 contrib/auth/forms.py:49
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "Aquest valor ha de contenir només lletres, números i guions baixos."
+
+#: contrib/auth/forms.py:18
+msgid "Password confirmation"
+msgstr "Confirmació de contrasenya"
+
+#: contrib/auth/forms.py:30
+msgid "A user with that username already exists."
+msgstr "Ja existeix un usuari amb aquest nom."
+
+#: contrib/auth/forms.py:36 contrib/auth/forms.py:154
+#: contrib/auth/forms.py:196
+msgid "The two password fields didn't match."
+msgstr "Els dos camps de contrasenya no coincideixen."
+
+#: contrib/auth/forms.py:82
+msgid "This account is inactive."
+msgstr "Aquest compte està inactiu"
+
+#: contrib/auth/forms.py:87
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"El seu navegador no sembla tenir les 'cookies' (galetes) activades. Aquestes "
+"són necessàries per iniciar la sessió."
+
+#: contrib/auth/forms.py:100
+msgid "E-mail"
+msgstr "Correu electrònic"
+
+#: contrib/auth/forms.py:109
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Aquesta adreça de correu no té associada cap compte d'usuari. Esteu segurs "
+"de que s'ha registrat?"
+
+#: contrib/auth/forms.py:134
+#, python-format
+msgid "Password reset on %s"
+msgstr "Restablir contrasenya en %s"
+
+#: contrib/auth/forms.py:142
+msgid "New password"
+msgstr "Contrasenya nova"
+
+#: contrib/auth/forms.py:143
+msgid "New password confirmation"
+msgstr "Contrasenya nova confirmada"
+
+#: contrib/auth/forms.py:168
+msgid "Old password"
+msgstr "Contrasenya antiga"
+
+#: contrib/auth/forms.py:176
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"La seva antiga contrasenya no és correcte. Si el plau, introduïu-la de nou."
+
+#: contrib/auth/models.py:72 contrib/auth/models.py:95
+msgid "name"
+msgstr "nom"
+
+#: contrib/auth/models.py:74
+msgid "codename"
+msgstr "nom en clau"
+
+#: contrib/auth/models.py:77
+msgid "permission"
+msgstr "permís"
+
+#: contrib/auth/models.py:78 contrib/auth/models.py:96
+msgid "permissions"
+msgstr "permisos"
+
+#: contrib/auth/models.py:99
+msgid "group"
+msgstr "grup"
+
+#: contrib/auth/models.py:100 contrib/auth/models.py:146
+msgid "groups"
+msgstr "grups"
+
+#: contrib/auth/models.py:136
+msgid "username"
+msgstr "nom d'usuari"
+
+#: contrib/auth/models.py:137
 msgid "first name"
 msgstr "nom propi"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:138
 msgid "last name"
 msgstr "cognoms"
 
-#: contrib/auth/models.py:141
+#: contrib/auth/models.py:139
 msgid "e-mail address"
 msgstr "adreça de correu electrònic"
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:140
 msgid "password"
 msgstr "contrasenya"
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:140
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
@@ -1185,19 +1287,19 @@ msgstr ""
 "Utilitzeu '[algo]$[salt]$[hexdigest]' o el <a href=\"password/\">formulari "
 "de canvi de contrasenya</a>."
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:141
 msgid "staff status"
 msgstr "membre del personal"
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:141
 msgid "Designates whether the user can log into this admin site."
 msgstr "Indica si l'usuari pot entrar en el lloc administratiu."
 
-#: contrib/auth/models.py:144
+#: contrib/auth/models.py:142
 msgid "active"
 msgstr "actiu"
 
-#: contrib/auth/models.py:144
+#: contrib/auth/models.py:142
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -1205,11 +1307,11 @@ msgstr ""
 "Designa si aquest usuari ha de ser tractat com a actiu. Deseleccioneu-ho "
 "enlloc d'esborrar comptes d'usuari."
 
-#: contrib/auth/models.py:145
+#: contrib/auth/models.py:143
 msgid "superuser status"
 msgstr "estat de superusuari"
 
-#: contrib/auth/models.py:145
+#: contrib/auth/models.py:143
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -1217,15 +1319,15 @@ msgstr ""
 "Designa que aquest usuari té tots els permissos sense assignar-los "
 "explícitament."
 
-#: contrib/auth/models.py:146
+#: contrib/auth/models.py:144
 msgid "last login"
 msgstr "últim inici de sessió"
 
-#: contrib/auth/models.py:147
+#: contrib/auth/models.py:145
 msgid "date joined"
 msgstr "data de creació"
 
-#: contrib/auth/models.py:149
+#: contrib/auth/models.py:147
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
@@ -1233,104 +1335,103 @@ msgstr ""
 "Junt amb els permissos asignats manualment, aquest usuari tindrà, també, els "
 "permissos dels grups dels que sigui membre."
 
-#: contrib/auth/models.py:150
+#: contrib/auth/models.py:148
 msgid "user permissions"
 msgstr "permissos de l'usuari"
 
-#: contrib/auth/models.py:154
+#: contrib/auth/models.py:152
 msgid "user"
 msgstr "usuari"
 
-#: contrib/auth/models.py:155
+#: contrib/auth/models.py:153
 msgid "users"
 msgstr "usuaris"
 
-#: contrib/auth/models.py:161
-msgid "Personal info"
-msgstr "Informació personal"
-
-#: contrib/auth/models.py:162
-msgid "Permissions"
-msgstr "permisos"
-
-#: contrib/auth/models.py:163
-msgid "Important dates"
-msgstr "Dates importants"
-
-#: contrib/auth/models.py:164
-msgid "Groups"
-msgstr "Grups"
-
-#: contrib/auth/models.py:323
+#: contrib/auth/models.py:308
 msgid "message"
 msgstr "missatge"
 
-#: contrib/auth/views.py:48
+#: contrib/auth/views.py:50
 msgid "Logged out"
 msgstr "Sessió finalitzada"
 
-#: contrib/comments/models.py:71 contrib/comments/models.py:176
+#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:423
+msgid "Enter a valid e-mail address."
+msgstr "Introduïu una adreça de correu vàlida."
+
+#: contrib/comments/admin.py:11
+msgid "Content"
+msgstr "contingut"
+
+#: contrib/comments/admin.py:14
+msgid "Metadata"
+msgstr "metadades"
+
+#: contrib/comments/forms.py:18
+msgid "Name"
+msgstr "nom"
+
+#: contrib/comments/forms.py:19
+msgid "Email address"
+msgstr "Adreça de correu electrònic"
+
+#: contrib/comments/forms.py:21
+msgid "Comment"
+msgstr "Comentari"
+
+#: contrib/comments/forms.py:24
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+"Si entreu cualsevol cosa en aquest camp el vostre comentari es tractarà com a spam"
+
+#: contrib/comments/forms.py:124
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Vigileu amb el vostre llenguatge! Aquí no s'admet la paraula: %s."
+msgstr[1] ""
+"Vigileu amb el vostre llenguatge! Aquí no s'admeten les paraules: %s."
+
+#: contrib/comments/models.py:22
 msgid "object ID"
 msgstr "ID de l'objecte"
 
-#: contrib/comments/models.py:72
-msgid "headline"
-msgstr "encapçalament"
+#: contrib/comments/models.py:49
+msgid "user's name"
+msgstr "nom d'usuari"
 
-#: contrib/comments/models.py:73 contrib/comments/models.py:95
-#: contrib/comments/models.py:177
+#: contrib/comments/models.py:50
+msgid "user's email address"
+msgstr "adreça de correu electrònic del usuari"
+
+#: contrib/comments/models.py:51
+msgid "user's URL"
+msgstr "URL del usuari"
+
+#: contrib/comments/models.py:53
 msgid "comment"
 msgstr "comentari"
 
-#: contrib/comments/models.py:74
-msgid "rating #1"
-msgstr "qualificació #1"
-
-#: contrib/comments/models.py:75
-msgid "rating #2"
-msgstr "qualificació #2"
-
-#: contrib/comments/models.py:76
-msgid "rating #3"
-msgstr "qualificació #3"
-
-#: contrib/comments/models.py:77
-msgid "rating #4"
-msgstr "qualificació #4"
-
-#: contrib/comments/models.py:78
-msgid "rating #5"
-msgstr "qualificació #5"
-
-#: contrib/comments/models.py:79
-msgid "rating #6"
-msgstr "qualificació #6"
-
-#: contrib/comments/models.py:80
-msgid "rating #7"
-msgstr "qualificació #7"
-
-#: contrib/comments/models.py:81
-msgid "rating #8"
-msgstr "qualificació #8"
-
-#: contrib/comments/models.py:86
-msgid "is valid rating"
-msgstr "és qualificació vàlida"
-
-#: contrib/comments/models.py:87 contrib/comments/models.py:179
+#: contrib/comments/models.py:56
 msgid "date/time submitted"
 msgstr "data/hora d'enviament"
 
-#: contrib/comments/models.py:88 contrib/comments/models.py:180
+#: contrib/comments/models.py:58
 msgid "is public"
 msgstr "és públic"
 
-#: contrib/comments/models.py:90
+#: contrib/comments/models.py:59
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"Desmarqui aquesta casella per fer desaparèixar aquest comentari del lloc web de forma efectiva."
+
+#: contrib/comments/models.py:61
 msgid "is removed"
 msgstr "està eliminat"
 
-#: contrib/comments/models.py:90
+#: contrib/comments/models.py:62
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -1338,15 +1439,23 @@ msgstr ""
 "Marqueu aquesta caixa si el comentari no és apropiat. En lloc seu es "
 "mostrarà \"Aquest comentari ha estat eliminat\" "
 
-#: contrib/comments/models.py:96
-msgid "comments"
-msgstr "comentaris"
+#: contrib/comments/models.py:114
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Aquest comentari va ser publicat per un usuari autentificat, per això "
+"el seu nom no es modificable."
 
-#: contrib/comments/models.py:140 contrib/comments/models.py:222
-msgid "Content object"
-msgstr "Objecte Contingut"
+#: contrib/comments/models.py:123
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Aquest comentari va ser publicat per un usuari autentificat, per això "
+"la seva adreça de correu electrònic no es pot modificar."
 
-#: contrib/comments/models.py:168
+#: contrib/comments/models.py:148
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -1361,209 +1470,6 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: contrib/comments/models.py:178
-msgid "person's name"
-msgstr "nom de la persona"
-
-#: contrib/comments/models.py:181
-msgid "ip address"
-msgstr "adreça ip"
-
-#: contrib/comments/models.py:183
-msgid "approved by staff"
-msgstr "aprovat pels membres del personal"
-
-#: contrib/comments/models.py:187
-msgid "free comment"
-msgstr "comentari lliure"
-
-#: contrib/comments/models.py:188
-msgid "free comments"
-msgstr "comentaris lliures"
-
-#: contrib/comments/models.py:250
-msgid "score"
-msgstr "puntuació"
-
-#: contrib/comments/models.py:251
-msgid "score date"
-msgstr "data de la puntuació"
-
-#: contrib/comments/models.py:255
-msgid "karma score"
-msgstr "puntuació de karma"
-
-#: contrib/comments/models.py:256
-msgid "karma scores"
-msgstr "punts de karma"
-
-#: contrib/comments/models.py:260
-#, python-format
-msgid "%(score)d rating by %(user)s"
-msgstr "%(score)d punt/s per %(user)s"
-
-#: contrib/comments/models.py:277
-#, python-format
-msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"Aquest comentari va ser marcat per %(user)s:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/models.py:285
-msgid "flag date"
-msgstr "data de la marca"
-
-#: contrib/comments/models.py:289
-msgid "user flag"
-msgstr "marca d'usuari"
-
-#: contrib/comments/models.py:290
-msgid "user flags"
-msgstr "marques d'usuari"
-
-#: contrib/comments/models.py:294
-#, python-format
-msgid "Flag by %r"
-msgstr "Marca de %r"
-
-#: contrib/comments/models.py:300
-msgid "deletion date"
-msgstr "data d'eliminació"
-
-#: contrib/comments/models.py:303
-msgid "moderator deletion"
-msgstr "eliminació del moderador"
-
-#: contrib/comments/models.py:304
-msgid "moderator deletions"
-msgstr "eliminacions del moderador"
-
-#: contrib/comments/models.py:308
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "eliminació del moderador per %r"
-
-#: contrib/comments/templates/comments/form.html:8
-msgid "Forgotten your password?"
-msgstr "Contrasenya oblidada?"
-
-#: contrib/comments/templates/comments/form.html:12
-msgid "Ratings"
-msgstr "Qualificacions"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr "Obligatori"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr "Opcional"
-
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr "Enviar una fotografia"
-
-#: contrib/comments/templates/comments/form.html:28
-#: contrib/comments/templates/comments/freeform.html:5
-msgid "Comment:"
-msgstr "Comentari:"
-
-#: contrib/comments/templates/comments/form.html:35
-#: contrib/comments/templates/comments/freeform.html:10
-msgid "Preview comment"
-msgstr "Previsualitzar comentari"
-
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "El seu nom:"
-
-#: contrib/comments/views/comments.py:28
-msgid ""
-"This rating is required because you've entered at least one other rating."
-msgstr "Es precisa aquesta puntuació perquè n'heu introduït almenys una altra."
-
-#: contrib/comments/views/comments.py:112
-#, python-format
-msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-"Aquest comentari va ser enviat per un usuari que ha enviat menys de %(count)"
-"s comentari:\n"
-"\n"
-"%(text)s"
-msgstr[1] ""
-"Aquest comentari va ser enviat per un usuari que ha enviat menys de %(count)"
-"s comentaris:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:117
-#, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"Aquest comentari va ser publicat per un usuari incomplet\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:190
-#: contrib/comments/views/comments.py:283
-msgid "Only POSTs are allowed"
-msgstr "Només s'admet POST"
-
-#: contrib/comments/views/comments.py:194
-#: contrib/comments/views/comments.py:287
-msgid "One or more of the required fields wasn't submitted"
-msgstr "Un o més dels camps obligatoris no ha estat enviat"
-
-#: contrib/comments/views/comments.py:198
-#: contrib/comments/views/comments.py:289
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Algú ha manipulat el formulari de comentaris (violació de seguretat)"
-
-#: contrib/comments/views/comments.py:208
-#: contrib/comments/views/comments.py:295
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr ""
-"El formulari de comentaris tenia un paràmetre 'target' invàlid -- el ID del "
-"objecte era invàlid"
-
-#: contrib/comments/views/comments.py:259
-#: contrib/comments/views/comments.py:324
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr ""
-"El formulari del comentari no ha proveït ni 'previsualitzar' ni 'enviar'"
-
-#: contrib/comments/views/karma.py:21
-msgid "Anonymous users cannot vote"
-msgstr "Els usuaris anònims no poden votar"
-
-#: contrib/comments/views/karma.py:25
-msgid "Invalid comment ID"
-msgstr "ID del comentari invàlid"
-
-#: contrib/comments/views/karma.py:27
-msgid "No voting for yourself"
-msgstr "No podeu votar-vos a vosaltres mateixos"
-
 #: contrib/contenttypes/models.py:67
 msgid "python model class name"
 msgstr "nom de la classe del model en python"
@@ -1576,30 +1482,42 @@ msgstr "tipus de contingut"
 msgid "content types"
 msgstr "tipus de continguts"
 
-#: contrib/flatpages/models.py:9
+#: contrib/flatpages/admin.py:9
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "Exemple: '/about/contact/'. Assegureu-vos de posar les barres al principi i "
 "al final."
 
-#: contrib/flatpages/models.py:10
+#: contrib/flatpages/admin.py:11
+msgid ""
+"This value must contain only letters, numbers, underscores, dashes or "
+"slashes."
+msgstr ""
+"Aquest valor ha de contenir només lletres, números, guions baixos, guions i "
+"barres (/)."
+
+#: contrib/flatpages/admin.py:22
+msgid "Advanced options"
+msgstr "Opcions avançades"
+
+#: contrib/flatpages/models.py:8
 msgid "title"
 msgstr "títol"
 
-#: contrib/flatpages/models.py:11
+#: contrib/flatpages/models.py:9
 msgid "content"
 msgstr "contingut"
 
-#: contrib/flatpages/models.py:12
+#: contrib/flatpages/models.py:10
 msgid "enable comments"
 msgstr "habilitar comentaris"
 
-#: contrib/flatpages/models.py:13
+#: contrib/flatpages/models.py:11
 msgid "template name"
 msgstr "nom de la plantilla"
 
-#: contrib/flatpages/models.py:14
+#: contrib/flatpages/models.py:12
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -1607,25 +1525,33 @@ msgstr ""
 "Exemple: 'flatpages/contact_page.html'. Si no es proporciona, el sistema "
 "utilitzarà 'flatpages/default.htmlt'."
 
-#: contrib/flatpages/models.py:15
+#: contrib/flatpages/models.py:13
 msgid "registration required"
 msgstr "cal estar registrat"
 
-#: contrib/flatpages/models.py:15
+#: contrib/flatpages/models.py:13
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "Si està marcat, només els usuaris registrats podran veure la pàgina."
 
-#: contrib/flatpages/models.py:20
+#: contrib/flatpages/models.py:18
 msgid "flat page"
 msgstr "pàgina estàtica"
 
-#: contrib/flatpages/models.py:21
+#: contrib/flatpages/models.py:19
 msgid "flat pages"
 msgstr "pàgines estàtiques"
 
-#: contrib/flatpages/models.py:27
-msgid "Advanced options"
-msgstr "Opcions avançades"
+#: contrib/gis/forms/fields.py:14
+msgid "No geometry value provided."
+msgstr "No s'ha indicat cap valor de geometria."
+
+#: contrib/gis/forms/fields.py:15
+msgid "Invalid geometry value."
+msgstr "Valor de geometria invàlid."
+
+#: contrib/gis/forms/fields.py:16
+msgid "Invalid geometry type."
+msgstr "Tipus de geometria invàlid."
 
 #: contrib/humanize/templatetags/humanize.py:19
 msgid "th"
@@ -1734,6 +1660,53 @@ msgstr ""
 #: contrib/localflavor/ar/forms.py:80
 msgid "Invalid CUIT."
 msgstr "Invàlid CUIT."
+
+#: contrib/localflavor/at/at_states.py:5
+msgid "Burgenland"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:6
+msgid "Carinthia"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:7
+msgid "Lower Austria"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:8
+msgid "Upper Austria"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:9
+msgid "Salzburg"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:10
+msgid "Styria"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:11
+msgid "Tyrol"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:12
+msgid "Vorarlberg"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:13
+msgid "Vienna"
+msgstr ""
+
+#: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:16
+#: contrib/localflavor/no/forms.py:12
+msgid "Enter a zip code in the format XXXX."
+msgstr "Introduïu un codi zip en el format XXXX."
+
+#: contrib/localflavor/at/forms.py:48
+msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
+msgstr ""
+"Introduïu un número vàlid de la Seguretat Social Austriaca en el format "
+"XXXX XXXXXX."
 
 #: contrib/localflavor/au/forms.py:16
 msgid "Enter a 4 digit post code."
@@ -1884,10 +1857,6 @@ msgstr "Zug"
 #: contrib/localflavor/ch/ch_states.py:30
 msgid "Zurich"
 msgstr "Zuric"
-
-#: contrib/localflavor/ch/forms.py:16 contrib/localflavor/no/forms.py:12
-msgid "Enter a zip code in the format XXXX."
-msgstr "Introduïu un codi zip en el format XXXX."
 
 #: contrib/localflavor/ch/forms.py:64
 msgid ""
@@ -2326,7 +2295,7 @@ msgstr "Introduïu un número valid de la Seguretat Social."
 msgid "Enter a valid VAT number."
 msgstr "Introduïu un número de IVA (VAT) vàlid."
 
-#: contrib/localflavor/jp/forms.py:17
+#: contrib/localflavor/jp/forms.py:16
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
 msgstr "Introduïu un codi postal en el format XXXXXXX o XX-XXXX."
 
@@ -2659,8 +2628,8 @@ msgid "Enter a valid SoFi number"
 msgstr "Introduïu un número SoFi vàlid."
 
 #: contrib/localflavor/nl/nl_provinces.py:4
-msgid "Drente"
-msgstr "Drente"
+msgid "Drenthe"
+msgstr "Drenthe"
 
 #: contrib/localflavor/nl/nl_provinces.py:5
 msgid "Flevoland"
@@ -2718,33 +2687,33 @@ msgstr "Aquest camp precisa 8 dígits."
 msgid "This field requires 11 digits."
 msgstr "Aquest camp precisa 11 dígits."
 
-#: contrib/localflavor/pl/forms.py:39
+#: contrib/localflavor/pl/forms.py:38
 msgid "National Identification Number consists of 11 digits."
 msgstr "El número d'identidicació nacional està compost de 11 digits."
 
-#: contrib/localflavor/pl/forms.py:40
+#: contrib/localflavor/pl/forms.py:39
 msgid "Wrong checksum for the National Identification Number."
 msgstr "Validació invàlida del número d'identificació nacional."
 
-#: contrib/localflavor/pl/forms.py:72
+#: contrib/localflavor/pl/forms.py:71
 msgid ""
 "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgstr "Introduïu un número NIP en el format XXX-XXX-XX-XX o XX-XX-XXX-XXX."
 
-#: contrib/localflavor/pl/forms.py:73
+#: contrib/localflavor/pl/forms.py:72
 msgid "Wrong checksum for the Tax Number (NIP)."
 msgstr "Validació invàlida del número tributari (NIP)."
 
-#: contrib/localflavor/pl/forms.py:112
+#: contrib/localflavor/pl/forms.py:111
 msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
 msgstr ""
 "El número nacional de registre de negocis (REGON) consisteix en 7 o 9 dígits."
 
-#: contrib/localflavor/pl/forms.py:113
+#: contrib/localflavor/pl/forms.py:112
 msgid "Wrong checksum for the National Business Register Number (REGON)."
 msgstr "Validació invàlida del número nacional de registre de negocis."
 
-#: contrib/localflavor/pl/forms.py:156
+#: contrib/localflavor/pl/forms.py:155
 msgid "Enter a postal code in the format XX-XXX."
 msgstr "Introduïu un codi postal en el format XX-XXX."
 
@@ -2811,6 +2780,27 @@ msgstr "Greater Poland"
 #: contrib/localflavor/pl/pl_voivodeships.py:23
 msgid "West Pomerania"
 msgstr "West Pomerania"
+
+#: contrib/localflavor/ro/forms.py:19
+msgid "Enter a valid CIF."
+msgstr "Introduïu un CIF vàlid."
+
+#: contrib/localflavor/ro/forms.py:56
+msgid "Enter a valid CNP."
+msgstr "Introduïu un CNP vàlid."
+
+#: contrib/localflavor/ro/forms.py:141
+msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
+msgstr ""
+"Introduïu un IBAN vàlid en el format ROXX-XXXX-XXXX-XXXX-XXXX-XXXX."
+
+#: contrib/localflavor/ro/forms.py:171
+msgid "Phone numbers must be in XXXX-XXXXXX format."
+msgstr "El número de telèfon ha de estar en el format XXXX-XXXXXX."
+
+#: contrib/localflavor/ro/forms.py:194
+msgid "Enter a valid postal code in the format XXXXXX"
+msgstr "Introduïu un codi postal vàlid en el format XXXXXX."
 
 #: contrib/localflavor/sk/forms.py:30
 msgid "Enter a postal code in the format XXXXX or XXX XX."
@@ -3534,23 +3524,23 @@ msgstr "redreçament"
 msgid "redirects"
 msgstr "redreçaments"
 
-#: contrib/sessions/models.py:41
+#: contrib/sessions/models.py:45
 msgid "session key"
 msgstr "clau de la sessió"
 
-#: contrib/sessions/models.py:42
+#: contrib/sessions/models.py:47
 msgid "session data"
 msgstr "dades de la sessió"
 
-#: contrib/sessions/models.py:43
+#: contrib/sessions/models.py:48
 msgid "expire date"
 msgstr "data de caducitat"
 
-#: contrib/sessions/models.py:48
+#: contrib/sessions/models.py:53
 msgid "session"
 msgstr "sessió"
 
-#: contrib/sessions/models.py:49
+#: contrib/sessions/models.py:54
 msgid "sessions"
 msgstr "sessions"
 
@@ -3562,401 +3552,55 @@ msgstr "nom del domini"
 msgid "display name"
 msgstr "nom per mostrar"
 
-#: contrib/sites/models.py:37
-msgid "site"
-msgstr "lloc"
-
-#: contrib/sites/models.py:38
+#: contrib/sites/models.py:39
 msgid "sites"
 msgstr "llocs"
 
-#: core/validators.py:72
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "Aquest valor ha de contenir només lletres, números i guions baixos."
+#: db/models/fields/__init__.py:332 db/models/fields/__init__.py:648
+msgid "This value must be an integer."
+msgstr "Aquest valor ha de ser un enter."
 
-#: core/validators.py:76
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr ""
-"Aquest valor ha de contenir només lletres, números, guions baixos, guions i "
-"barres (/)."
+#: db/models/fields/__init__.py:363
+msgid "This value must be either True or False."
+msgstr "Aquest valor ha de ser True (Veritat) o False (Fals)"
 
-#: core/validators.py:80
-msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr ""
-"Aquest valor ha de contenir només lletres, números, guions o guions baixos"
+#: db/models/fields/__init__.py:387
+msgid "This field cannot be null."
+msgstr "Aquest camp no pot ser nul."
 
-#: core/validators.py:84
-msgid "Uppercase letters are not allowed here."
-msgstr "No es permeten majúscules aquí."
+#: db/models/fields/__init__.py:424
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Introduïu una data vàlida en el forma AAAA-MM-DD."
 
-#: core/validators.py:88
-msgid "Lowercase letters are not allowed here."
-msgstr "No es permeten minúscules aquí."
-
-#: core/validators.py:95
-msgid "Enter only digits separated by commas."
-msgstr "Introduïu només dígits separats per comes."
-
-#: core/validators.py:107
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Introduïu adreces de correu electrònic vàlides separades per comes."
-
-#: core/validators.py:111
-msgid "Please enter a valid IP address."
-msgstr "Si el plau, introduïu una adreça IP vàlida."
-
-#: core/validators.py:115
-msgid "Empty values are not allowed here."
-msgstr "No s'admeten valor buits."
-
-#: core/validators.py:119
-msgid "Non-numeric characters aren't allowed here."
-msgstr "No s'admeten caràcters no numèrics."
-
-#: core/validators.py:123
-msgid "This value can't be comprised solely of digits."
-msgstr "Aquest valor no pot contenir només dígits."
-
-#: core/validators.py:128 newforms/fields.py:152
-msgid "Enter a whole number."
-msgstr "Introduïu un número sencer."
-
-#: core/validators.py:132
-msgid "Only alphabetical characters are allowed here."
-msgstr "Només s'admeten caracters alfabètics aquí."
-
-#: core/validators.py:147
-msgid "Year must be 1900 or later."
-msgstr "L'any ha de ser posterior al 1900"
-
-#: core/validators.py:151
+#: db/models/fields/__init__.py:433
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Data invàlida: %s"
 
-#: core/validators.py:156 db/models/fields/__init__.py:548
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Introduïu una data vàlida en el forma AAAA-MM-DD."
+#: db/models/fields/__init__.py:497 db/models/fields/__init__.py:515
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr "Introduïu un data/hora vàlida en format YYYY-MM-DD HH:MM[:ss[.uuuuuu]]."
 
-#: core/validators.py:161
-msgid "Enter a valid time in HH:MM format."
-msgstr "Introduïu una hora vàlida en el format HH:MM."
-
-#: core/validators.py:165 db/models/fields/__init__.py:625
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "Introduïu un data/hora vàlida en format YYYY-MM-DD HH:MM."
-
-#: core/validators.py:170 newforms/fields.py:403
-msgid "Enter a valid e-mail address."
-msgstr "Introduïu una adreça de correu vàlida."
-
-#: core/validators.py:182 core/validators.py:474 newforms/fields.py:433
-#: oldforms/__init__.py:687
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
-"No s'ha enviat cap fitxer. Comprovi el tipus de codificació del formulari."
-
-#: core/validators.py:193 newforms/fields.py:459
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
-msgstr ""
-"Envieu una imatge vàlida. El fitxer que heu enviat no era una imatge o "
-"estava corrupte."
-
-#: core/validators.py:200
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "La URL %s no apunta a una imatge vàlida."
-
-#: core/validators.py:204
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr ""
-"Els números de telèfon han de guardar-se en el format XXX-XXX-XXXX. \"%s\" "
-"no és vàlid."
-
-#: core/validators.py:212
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "La URL %s no apunta a un video QuickTime vàlid."
-
-#: core/validators.py:216
-msgid "A valid URL is required."
-msgstr "Es precisa una URL vàlida."
-
-#: core/validators.py:230
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-"Es precisa HTML vàlid. Els errors específics són:\n"
-"%s"
-
-#: core/validators.py:237
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr "XML incorrectament format: %s"
-
-#: core/validators.py:254
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "URL invàlida: %s"
-
-#: core/validators.py:259 core/validators.py:261
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "La URL %s és un enllaç trencat."
-
-#: core/validators.py:267
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "Introdueixi una abreviatura vàlida d'estat dels E.U.A.."
-
-#: core/validators.py:281
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Vigileu amb el vostre llenguatge! Aquí no s'admet la paraula: %s."
-msgstr[1] ""
-"Vigileu amb el vostre llenguatge! Aquí no s'admeten les paraules: %s."
-
-#: core/validators.py:288
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "Aquest camp ha de concordar amb el camp '%s'."
-
-#: core/validators.py:307
-msgid "Please enter something for at least one field."
-msgstr "Si us plau, introduïu alguna cosa almenys en un camp."
-
-#: core/validators.py:316 core/validators.py:327
-msgid "Please enter both fields or leave them both empty."
-msgstr "Si us plau, ompliu els dos camps o deixeu-los tots dos en blanc."
-
-#: core/validators.py:335
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "S'ha de proporcionar aquest camp si %(field)s és %(value)s"
-
-#: core/validators.py:348
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "S'ha de proporcionar aquest camp si %(field)s no és %(value)s"
-
-#: core/validators.py:367
-msgid "Duplicate values are not allowed."
-msgstr "No s'admeten valors duplicats."
-
-#: core/validators.py:382
-#, python-format
-msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "Aquest valor ha d'estar comprès entre %(lower)s i %(upper)s."
-
-#: core/validators.py:384
-#, python-format
-msgid "This value must be at least %s."
-msgstr "Aquest valor ha de ser com a mínim %s."
-
-#: core/validators.py:386
-#, python-format
-msgid "This value must be no more than %s."
-msgstr "Aquest valor ha de ser com a màxim %s."
-
-#: core/validators.py:427
-#, python-format
-msgid "This value must be a power of %s."
-msgstr "Aquest valor ha de ser una potència de %s."
-
-#: core/validators.py:437
-msgid "Please enter a valid decimal number."
-msgstr "Si us plau, introduïu un número decimal vàlid."
-
-#: core/validators.py:444
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
-msgstr[0] ""
-"Si us plau, introduïu un número decimal vàlid de com a màxim %s digit."
-msgstr[1] ""
-"Si us plau, introduïu un número decimal vàlid de com a màxim %s digits."
-
-#: core/validators.py:447
-#, python-format
-msgid ""
-"Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural ""
-"Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] ""
-"Si us plau, introduïu un número decimal vàlid que la seva part sencera sigui "
-"de com a màxim %s digit."
-msgstr[1] ""
-"Si us plau, introduïu un número decimal vàlid que la seva part sencera sigui "
-"de com a màxim %s digits."
-
-#: core/validators.py:450
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] ""
-"Si us plau, introduïu un número decimal vàlid de com a màxim %s posició "
-"decimal."
-msgstr[1] ""
-"Si us plau, introduïu un número decimal vàlid de com a màxim %s posicions "
-"decimals."
-
-#: core/validators.py:458
-msgid "Please enter a valid floating point number."
-msgstr "Si us plau, introduïu un número amb punt de coma flotant vàlid."
-
-#: core/validators.py:467
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr ""
-"Assegureu-vos de que el fitxer que heu enviat té, com a mínim, %s bytes."
-
-#: core/validators.py:468
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr ""
-"Assegureu-vos de que el fitxer que heu enviat té, com a màxim %s bytes."
-
-#: core/validators.py:485
-msgid "The format for this field is wrong."
-msgstr "El format per aquest camp és incorrecte."
-
-#: core/validators.py:500
-msgid "This field is invalid."
-msgstr "El camp no és vàlid."
-
-#: core/validators.py:536
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "No s'ha pogut obtenir res de %s."
-
-#: core/validators.py:539
-#, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr ""
-"La URL %(url)s ha va tornar la capcelera Content-Type '%(contenttype)s', que "
-"no és vàlida."
-
-#: core/validators.py:572
-#, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-"Si us plau, tanqueu l'etiqueta %(tag)s des de la línia %(line)s. (La línia "
-"comença amb \"%(start)s\".)"
-
-#: core/validators.py:576
-#, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Part del text que comença en la línia %(line)s no està permès en aquest "
-"context. (La línia comença per \"%(start)s\".)"
-
-#: core/validators.py:581
-#, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"El \"%(attr)s\" de la línia %(line)s no és un atribut vàlid. (La línia "
-"comença per \"%(start)s\".)"
-
-#: core/validators.py:586
-#, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"La \"<%(tag)s>\" de la línia %(line)s no és una etiqueta vàlida. (La línia "
-"comença per \"%(start)s\".)"
-
-#: core/validators.py:590
-#, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Una etiqueta de la línia %(line)s li falta un o més atributs requerits.(La "
-"línia comença per \"%(start)s\".)"
-
-#: core/validators.py:595
-#, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"L'atribut \"%(attr)s\" de la línia %(line)s té un valor que no és vàlid. (La "
-"línia comença per \"%(start)s\".)"
-
-#: db/models/manipulators.py:308
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "Ja existeix un %(object)s del tipus %(type)s amb aquest %(field)s."
-
-#: db/models/fields/__init__.py:51
-#, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "Ja existeix %(optname)s amb aquest %(fieldname)s."
-
-#: db/models/fields/__init__.py:176 db/models/fields/__init__.py:348
-#: db/models/fields/__init__.py:780 db/models/fields/__init__.py:791
-#: newforms/fields.py:46 oldforms/__init__.py:374
-msgid "This field is required."
-msgstr "Aquest camp és obligatori."
-
-#: db/models/fields/__init__.py:448
-msgid "This value must be an integer."
-msgstr "Aquest valor ha de ser un enter."
-
-#: db/models/fields/__init__.py:487
-msgid "This value must be either True or False."
-msgstr "Aquest valor ha de ser True (Veritat) o False (Fals)"
-
-#: db/models/fields/__init__.py:511
-msgid "This field cannot be null."
-msgstr "Aquest camp no pot ser nul."
-
-#: db/models/fields/__init__.py:689
+#: db/models/fields/__init__.py:551
 msgid "This value must be a decimal number."
 msgstr "Aquest valor ha de ser un número decimal."
 
-#: db/models/fields/__init__.py:800
-msgid "Enter a valid filename."
-msgstr "Introduïu un nom de fitxer vàlid."
-
-#: db/models/fields/__init__.py:981
+#: db/models/fields/__init__.py:684
 msgid "This value must be either None, True or False."
 msgstr "Aquest valor ha de ser None (Cap), True (Veritat) o False (Fals)"
 
-#: db/models/fields/related.py:94
-#, python-format
-msgid "Please enter a valid %s."
-msgstr "Si us plau, introduïu un %s vàlid."
+#: db/models/fields/__init__.py:783 db/models/fields/__init__.py:797
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "Introduïu una hora vàlida en el format HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:746
-msgid "Separate multiple IDs with commas."
-msgstr "Separi múltiples IDs amb comes."
-
-#: db/models/fields/related.py:748
+#: db/models/fields/related.py:742
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Premeu la tecla \"Control\" -o \"Command\" en un Mac- per seleccionar més "
 "d'un valor."
 
-#: db/models/fields/related.py:795
+#: db/models/fields/related.py:819
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3968,154 +3612,157 @@ msgstr[1] ""
 "Si us plau, introduïu IDs de %(self)s vàlids. Els valors %(value)r són "
 "invàlids."
 
-#: newforms/fields.py:47
+#: forms/fields.py:52
+msgid "This field is required."
+msgstr "Aquest camp és obligatori."
+
+#: forms/fields.py:53
 msgid "Enter a valid value."
 msgstr "Introduïu un valor vàlid."
 
-#: newforms/fields.py:124
+#: forms/fields.py:133
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Assegureu-vos de que el valor té com a màxim %(max)d caràcters (en té %"
 "(length)d)."
 
-#: newforms/fields.py:125
+#: forms/fields.py:134
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 "Assegureu-vos de que el valor té com a mínim %(min)d caràcters (en té %"
 "(length)d)."
 
-#: newforms/fields.py:153 newforms/fields.py:182 newforms/fields.py:211
+#: forms/fields.py:161
+msgid "Enter a whole number."
+msgstr "Introduïu un número sencer."
+
+#: forms/fields.py:162 forms/fields.py:191 forms/fields.py:220
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Aquest valor ha de ser menor o igual a %s."
 
-#: newforms/fields.py:154 newforms/fields.py:183 newforms/fields.py:212
+#: forms/fields.py:163 forms/fields.py:192 forms/fields.py:221
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Assegureu-vos de que aquest valor sigui superior o igual a %s."
 
-#: newforms/fields.py:181 newforms/fields.py:210
+#: forms/fields.py:190 forms/fields.py:219
 msgid "Enter a number."
 msgstr "Introduïu un número."
 
-#: newforms/fields.py:213
+#: forms/fields.py:222
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Assegureu-vos de que no hi ha més de %s dígits en total."
 
-#: newforms/fields.py:214
+#: forms/fields.py:223
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Assegureu-vos de que no hi ha més de %s decimals."
 
-#: newforms/fields.py:215
+#: forms/fields.py:224
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Assegureu-vos de que no hi ha més de %s dígits decimals."
 
-#: newforms/fields.py:263 newforms/fields.py:750
+#: forms/fields.py:282 forms/fields.py:804
 msgid "Enter a valid date."
 msgstr "Introduïu una data vàlida."
 
-#: newforms/fields.py:296 newforms/fields.py:751
+#: forms/fields.py:316 forms/fields.py:805
 msgid "Enter a valid time."
 msgstr "Introduïu una hora vàlida."
 
-#: newforms/fields.py:335
+#: forms/fields.py:355
 msgid "Enter a valid date/time."
 msgstr "Introduïu una data/hora vàlides."
 
-#: newforms/fields.py:434
+#: forms/fields.py:441
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+"No s'ha enviat cap fitxer. Comprovi el tipus de codificació del formulari."
+
+#: forms/fields.py:442
 msgid "No file was submitted."
 msgstr "No s'ha enviat cap fitxer."
 
-#: newforms/fields.py:435 oldforms/__init__.py:689
+#: forms/fields.py:443
 msgid "The submitted file is empty."
 msgstr "El fitxer enviat està buit."
 
-#: newforms/fields.py:497
+#: forms/fields.py:472
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Envieu una imatge vàlida. El fitxer que heu enviat no era una imatge o "
+"estava corrupte."
+
+#: forms/fields.py:533
 msgid "Enter a valid URL."
 msgstr "Introduïu una URL vàlida."
 
-#: newforms/fields.py:498
+#: forms/fields.py:534
 msgid "This URL appears to be a broken link."
 msgstr "Aquesta URL sembla ser un enllaç trencat."
 
-#: newforms/fields.py:559 newforms/models.py:305
-msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr ""
-"Escolli una opció vàlida; Aquesta opció no és una de les opcions disponibles."
-
-#: newforms/fields.py:598
+#: forms/fields.py:602 forms/fields.py:653
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Esculliu una opció vàlida. %(value)s no és una de les opcions vàlides."
 
-#: newforms/fields.py:599 newforms/fields.py:661 newforms/models.py:372
+#: forms/fields.py:654 forms/fields.py:715 forms/models.py:531
 msgid "Enter a list of values."
 msgstr "Introduïu una llista de valors."
 
-#: newforms/fields.py:779
+#: forms/fields.py:833
 msgid "Enter a valid IPv4 address."
 msgstr "Introduïu una adreça IPv4 vàlida."
 
-#: newforms/models.py:373
+#: forms/fields.py:843
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Introduïu un 'slug' vàlid, consistent en lletres, números, guions o guions baixos."
+
+#: forms/formsets.py:242 forms/formsets.py:244
+msgid "Order"
+msgstr "Ordre"
+
+#: forms/models.py:463
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+"Escolli una opció vàlida; Aquesta opció no és una de les opcions disponibles."
+
+#: forms/models.py:532
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Escolliu una opció vàlida; %s' no és una de les opcions vàlides."
 
-#: oldforms/__init__.py:409
-#, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Assegureu-vos de que el seu text té menys de %s caràcter."
-msgstr[1] "Assegureu-vos de que el seu text té menys de %s caràcters."
-
-#: oldforms/__init__.py:414
-msgid "Line breaks are not allowed here."
-msgstr "No es permeten salts de línia."
-
-#: oldforms/__init__.py:512 oldforms/__init__.py:586 oldforms/__init__.py:625
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "Escolliu una opció vàlida; %(data)s' no està dintre de %(choices)s."
-
-#: oldforms/__init__.py:745
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Introduïu un enter entre -32,768 i 32,767."
-
-#: oldforms/__init__.py:755
-msgid "Enter a positive number."
-msgstr "Introduïu un número positiu."
-
-#: oldforms/__init__.py:765
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "Introduïu un número entre 0 i 32,767."
-
-#: template/defaultfilters.py:698
+#: template/defaultfilters.py:706
 msgid "yes,no,maybe"
 msgstr "si,no,potser"
 
-#: template/defaultfilters.py:729
+#: template/defaultfilters.py:737
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
 
-#: template/defaultfilters.py:731
+#: template/defaultfilters.py:739
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:733
+#: template/defaultfilters.py:741
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:734
+#: template/defaultfilters.py:742
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
@@ -4324,7 +3971,7 @@ msgstr "nov."
 msgid "Dec."
 msgstr "des."
 
-#: utils/text.py:127
+#: utils/text.py:128
 msgid "or"
 msgstr "o"
 
@@ -4364,16 +4011,16 @@ msgid_plural "minutes"
 msgstr[0] "minut"
 msgstr[1] "minuts"
 
-#: utils/timesince.py:46
+#: utils/timesince.py:43
 msgid "minutes"
 msgstr "minuts"
 
-#: utils/timesince.py:51
+#: utils/timesince.py:48
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: utils/timesince.py:57
+#: utils/timesince.py:54
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
@@ -4381,10 +4028,6 @@ msgstr ", %(number)d %(type)s"
 #: utils/translation/trans_real.py:403
 msgid "DATE_FORMAT"
 msgstr "F j, Y"
-
-#: utils/translation/trans_real.py:404
-msgid "DATETIME_FORMAT"
-msgstr "F j, Y, H:i"
 
 #: utils/translation/trans_real.py:405
 msgid "TIME_FORMAT"
@@ -4398,20 +4041,456 @@ msgstr "j de/d' F del Y"
 msgid "MONTH_DAY_FORMAT"
 msgstr "j de/d' F del Y"
 
-#: views/generic/create_update.py:43
+#: views/generic/create_update.py:114
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "El/la %(verbose_name)s s'ha creat amb èxit."
 
-#: views/generic/create_update.py:117
+#: views/generic/create_update.py:156
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "El/la %(verbose_name)s s'ha actualtzat amb èxit."
 
-#: views/generic/create_update.py:184
+#: views/generic/create_update.py:198
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "El %(verbose_name)s s'ha eliminat."
+
+#~ msgid ""
+#~ "This value must contain only letters, numbers, underscores or hyphens."
+#~ msgstr ""
+#~ "Aquest valor ha de contenir només lletres, números, guions o guions baixos"
+
+#~ msgid "Uppercase letters are not allowed here."
+#~ msgstr "No es permeten majúscules aquí."
+
+#~ msgid "Lowercase letters are not allowed here."
+#~ msgstr "No es permeten minúscules aquí."
+
+#~ msgid "Enter only digits separated by commas."
+#~ msgstr "Introduïu només dígits separats per comes."
+
+#~ msgid "Enter valid e-mail addresses separated by commas."
+#~ msgstr "Introduïu adreces de correu electrònic vàlides separades per comes."
+
+#~ msgid "Please enter a valid IP address."
+#~ msgstr "Si el plau, introduïu una adreça IP vàlida."
+
+#~ msgid "Empty values are not allowed here."
+#~ msgstr "No s'admeten valor buits."
+
+#~ msgid "Non-numeric characters aren't allowed here."
+#~ msgstr "No s'admeten caràcters no numèrics."
+
+#~ msgid "This value can't be comprised solely of digits."
+#~ msgstr "Aquest valor no pot contenir només dígits."
+
+#~ msgid "Only alphabetical characters are allowed here."
+#~ msgstr "Només s'admeten caracters alfabètics aquí."
+
+#~ msgid "Enter a valid time in HH:MM format."
+#~ msgstr "Introduïu una hora vàlida en el format HH:MM."
+
+#~ msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+#~ msgstr "Introduïu un data/hora vàlida en format YYYY-MM-DD HH:MM."
+
+#~ msgid "The URL %s does not point to a valid image."
+#~ msgstr "La URL %s no apunta a una imatge vàlida."
+
+#~ msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+#~ msgstr ""
+#~ "Els números de telèfon han de guardar-se en el format XXX-XXX-XXXX. \"%s"
+#~ "\" no és vàlid."
+
+#~ msgid "The URL %s does not point to a valid QuickTime video."
+#~ msgstr "La URL %s no apunta a un video QuickTime vàlid."
+
+#~ msgid "A valid URL is required."
+#~ msgstr "Es precisa una URL vàlida."
+
+#~ msgid ""
+#~ "Valid HTML is required. Specific errors are:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Es precisa HTML vàlid. Els errors específics són:\n"
+#~ "%s"
+
+#~ msgid "Badly formed XML: %s"
+#~ msgstr "XML incorrectament format: %s"
+
+#~ msgid "Invalid URL: %s"
+#~ msgstr "URL invàlida: %s"
+
+#~ msgid "The URL %s is a broken link."
+#~ msgstr "La URL %s és un enllaç trencat."
+
+#~ msgid "Enter a valid U.S. state abbreviation."
+#~ msgstr "Introdueixi una abreviatura vàlida d'estat dels E.U.A.."
+
+#~ msgid "This field must match the '%s' field."
+#~ msgstr "Aquest camp ha de concordar amb el camp '%s'."
+
+#~ msgid "Please enter something for at least one field."
+#~ msgstr "Si us plau, introduïu alguna cosa almenys en un camp."
+
+#~ msgid "Please enter both fields or leave them both empty."
+#~ msgstr "Si us plau, ompliu els dos camps o deixeu-los tots dos en blanc."
+
+#~ msgid "This field must be given if %(field)s is %(value)s"
+#~ msgstr "S'ha de proporcionar aquest camp si %(field)s és %(value)s"
+
+#~ msgid "This field must be given if %(field)s is not %(value)s"
+#~ msgstr "S'ha de proporcionar aquest camp si %(field)s no és %(value)s"
+
+#~ msgid "Duplicate values are not allowed."
+#~ msgstr "No s'admeten valors duplicats."
+
+#~ msgid "This value must be between %(lower)s and %(upper)s."
+#~ msgstr "Aquest valor ha d'estar comprès entre %(lower)s i %(upper)s."
+
+#~ msgid "This value must be at least %s."
+#~ msgstr "Aquest valor ha de ser com a mínim %s."
+
+#~ msgid "This value must be no more than %s."
+#~ msgstr "Aquest valor ha de ser com a màxim %s."
+
+#~ msgid "This value must be a power of %s."
+#~ msgstr "Aquest valor ha de ser una potència de %s."
+
+#~ msgid "Please enter a valid decimal number."
+#~ msgstr "Si us plau, introduïu un número decimal vàlid."
+
+#~ msgid "Please enter a valid decimal number with at most %s total digit."
+#~ msgid_plural ""
+#~ "Please enter a valid decimal number with at most %s total digits."
+#~ msgstr[0] ""
+#~ "Si us plau, introduïu un número decimal vàlid de com a màxim %s digit."
+#~ msgstr[1] ""
+#~ "Si us plau, introduïu un número decimal vàlid de com a màxim %s digits."
+
+#~ msgid ""
+#~ "Please enter a valid decimal number with a whole part of at most %s digit."
+#~ msgid_plural ""
+#~ "Please enter a valid decimal number with a whole part of at most %s "
+#~ "digits."
+#~ msgstr[0] ""
+#~ "Si us plau, introduïu un número decimal vàlid que la seva part sencera "
+#~ "sigui de com a màxim %s digit."
+#~ msgstr[1] ""
+#~ "Si us plau, introduïu un número decimal vàlid que la seva part sencera "
+#~ "sigui de com a màxim %s digits."
+
+#~ msgid "Please enter a valid decimal number with at most %s decimal place."
+#~ msgid_plural ""
+#~ "Please enter a valid decimal number with at most %s decimal places."
+#~ msgstr[0] ""
+#~ "Si us plau, introduïu un número decimal vàlid de com a màxim %s posició "
+#~ "decimal."
+#~ msgstr[1] ""
+#~ "Si us plau, introduïu un número decimal vàlid de com a màxim %s posicions "
+#~ "decimals."
+
+#~ msgid "Please enter a valid floating point number."
+#~ msgstr "Si us plau, introduïu un número amb punt de coma flotant vàlid."
+
+#~ msgid "Make sure your uploaded file is at least %s bytes big."
+#~ msgstr ""
+#~ "Assegureu-vos de que el fitxer que heu enviat té, com a mínim, %s bytes."
+
+#~ msgid "Make sure your uploaded file is at most %s bytes big."
+#~ msgstr ""
+#~ "Assegureu-vos de que el fitxer que heu enviat té, com a màxim %s bytes."
+
+#~ msgid "The format for this field is wrong."
+#~ msgstr "El format per aquest camp és incorrecte."
+
+#~ msgid "This field is invalid."
+#~ msgstr "El camp no és vàlid."
+
+#~ msgid "Could not retrieve anything from %s."
+#~ msgstr "No s'ha pogut obtenir res de %s."
+
+#~ msgid ""
+#~ "The URL %(url)s returned the invalid Content-Type header '%(contenttype)"
+#~ "s'."
+#~ msgstr ""
+#~ "La URL %(url)s ha va tornar la capcelera Content-Type '%(contenttype)s', "
+#~ "que no és vàlida."
+
+#~ msgid ""
+#~ "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts "
+#~ "with \"%(start)s\".)"
+#~ msgstr ""
+#~ "Si us plau, tanqueu l'etiqueta %(tag)s des de la línia %(line)s. (La "
+#~ "línia comença amb \"%(start)s\".)"
+
+#~ msgid ""
+#~ "Some text starting on line %(line)s is not allowed in that context. (Line "
+#~ "starts with \"%(start)s\".)"
+#~ msgstr ""
+#~ "Part del text que comença en la línia %(line)s no està permès en aquest "
+#~ "context. (La línia comença per \"%(start)s\".)"
+
+#~ msgid ""
+#~ "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with "
+#~ "\"%(start)s\".)"
+#~ msgstr ""
+#~ "El \"%(attr)s\" de la línia %(line)s no és un atribut vàlid. (La línia "
+#~ "comença per \"%(start)s\".)"
+
+#~ msgid ""
+#~ "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
+#~ "(start)s\".)"
+#~ msgstr ""
+#~ "La \"<%(tag)s>\" de la línia %(line)s no és una etiqueta vàlida. (La "
+#~ "línia comença per \"%(start)s\".)"
+
+#~ msgid ""
+#~ "A tag on line %(line)s is missing one or more required attributes. (Line "
+#~ "starts with \"%(start)s\".)"
+#~ msgstr ""
+#~ "Una etiqueta de la línia %(line)s li falta un o més atributs requerits."
+#~ "(La línia comença per \"%(start)s\".)"
+
+#~ msgid ""
+#~ "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
+#~ "starts with \"%(start)s\".)"
+#~ msgstr ""
+#~ "L'atribut \"%(attr)s\" de la línia %(line)s té un valor que no és vàlid. "
+#~ "(La línia comença per \"%(start)s\".)"
+
+#~ msgid ""
+#~ "%(object)s with this %(type)s already exists for the given %(field)s."
+#~ msgstr "Ja existeix un %(object)s del tipus %(type)s amb aquest %(field)s."
+
+#~ msgid "%(optname)s with this %(fieldname)s already exists."
+#~ msgstr "Ja existeix %(optname)s amb aquest %(fieldname)s."
+
+#~ msgid "Enter a valid filename."
+#~ msgstr "Introduïu un nom de fitxer vàlid."
+
+#~ msgid "Please enter a valid %s."
+#~ msgstr "Si us plau, introduïu un %s vàlid."
+
+#~ msgid "Ensure your text is less than %s character."
+#~ msgid_plural "Ensure your text is less than %s characters."
+#~ msgstr[0] "Assegureu-vos de que el seu text té menys de %s caràcter."
+#~ msgstr[1] "Assegureu-vos de que el seu text té menys de %s caràcters."
+
+#~ msgid "Line breaks are not allowed here."
+#~ msgstr "No es permeten salts de línia."
+
+#~ msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+#~ msgstr "Escolliu una opció vàlida; %(data)s' no està dintre de %(choices)s."
+
+#~ msgid "Enter a whole number between -32,768 and 32,767."
+#~ msgstr "Introduïu un enter entre -32,768 i 32,767."
+
+#~ msgid "Enter a positive number."
+#~ msgstr "Introduïu un número positiu."
+
+#~ msgid "Enter a whole number between 0 and 32,767."
+#~ msgstr "Introduïu un número entre 0 i 32,767."
+
+#~ msgid "Ordering"
+#~ msgstr "Ordre"
+
+#~ msgid "DATE_WITH_TIME_FULL"
+#~ msgstr "F j, Y, H:i "
+
+#~ msgid "Your new password is: %(new_password)s"
+#~ msgstr "La vostra nova contrasenya és: %(new_password)s"
+
+#~ msgid "Feel free to change this password by going to this page:"
+#~ msgstr "Sentiu-vos lliures de canviar-la en aquesta pàgina:"
+
+#~ msgid "Added %s."
+#~ msgstr "Afegit %s."
+
+#~ msgid "Deleted %s."
+#~ msgstr "Eliminat %s."
+
+#~ msgid "The two 'new password' fields didn't match."
+#~ msgstr "Els dos camps de nova contrasenya no coincideixen."
+
+#~ msgid "headline"
+#~ msgstr "encapçalament"
+
+#~ msgid "rating #1"
+#~ msgstr "qualificació #1"
+
+#~ msgid "rating #2"
+#~ msgstr "qualificació #2"
+
+#~ msgid "rating #3"
+#~ msgstr "qualificació #3"
+
+#~ msgid "rating #4"
+#~ msgstr "qualificació #4"
+
+#~ msgid "rating #5"
+#~ msgstr "qualificació #5"
+
+#~ msgid "rating #6"
+#~ msgstr "qualificació #6"
+
+#~ msgid "rating #7"
+#~ msgstr "qualificació #7"
+
+#~ msgid "rating #8"
+#~ msgstr "qualificació #8"
+
+#~ msgid "is valid rating"
+#~ msgstr "és qualificació vàlida"
+
+#~ msgid "comments"
+#~ msgstr "comentaris"
+
+#~ msgid "Content object"
+#~ msgstr "Objecte Contingut"
+
+#~ msgid "person's name"
+#~ msgstr "nom de la persona"
+
+#~ msgid "ip address"
+#~ msgstr "adreça ip"
+
+#~ msgid "approved by staff"
+#~ msgstr "aprovat pels membres del personal"
+
+#~ msgid "free comment"
+#~ msgstr "comentari lliure"
+
+#~ msgid "free comments"
+#~ msgstr "comentaris lliures"
+
+#~ msgid "score"
+#~ msgstr "puntuació"
+
+#~ msgid "score date"
+#~ msgstr "data de la puntuació"
+
+#~ msgid "karma score"
+#~ msgstr "puntuació de karma"
+
+#~ msgid "karma scores"
+#~ msgstr "punts de karma"
+
+#~ msgid "%(score)d rating by %(user)s"
+#~ msgstr "%(score)d punt/s per %(user)s"
+
+#~ msgid ""
+#~ "This comment was flagged by %(user)s:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgstr ""
+#~ "Aquest comentari va ser marcat per %(user)s:\n"
+#~ "\n"
+#~ "%(text)s"
+
+#~ msgid "flag date"
+#~ msgstr "data de la marca"
+
+#~ msgid "user flag"
+#~ msgstr "marca d'usuari"
+
+#~ msgid "user flags"
+#~ msgstr "marques d'usuari"
+
+#~ msgid "Flag by %r"
+#~ msgstr "Marca de %r"
+
+#~ msgid "deletion date"
+#~ msgstr "data d'eliminació"
+
+#~ msgid "moderator deletion"
+#~ msgstr "eliminació del moderador"
+
+#~ msgid "moderator deletions"
+#~ msgstr "eliminacions del moderador"
+
+#~ msgid "Moderator deletion by %r"
+#~ msgstr "eliminació del moderador per %r"
+
+#~ msgid "Forgotten your password?"
+#~ msgstr "Contrasenya oblidada?"
+
+#~ msgid "Ratings"
+#~ msgstr "Qualificacions"
+
+#~ msgid "Required"
+#~ msgstr "Obligatori"
+
+#~ msgid "Optional"
+#~ msgstr "Opcional"
+
+#~ msgid "Post a photo"
+#~ msgstr "Enviar una fotografia"
+
+#~ msgid "Preview comment"
+#~ msgstr "Previsualitzar comentari"
+
+#~ msgid "Your name:"
+#~ msgstr "El seu nom:"
+
+#~ msgid ""
+#~ "This rating is required because you've entered at least one other rating."
+#~ msgstr ""
+#~ "Es precisa aquesta puntuació perquè n'heu introduït almenys una altra."
+
+#~ msgid ""
+#~ "This comment was posted by a user who has posted fewer than %(count)s "
+#~ "comment:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgid_plural ""
+#~ "This comment was posted by a user who has posted fewer than %(count)s "
+#~ "comments:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgstr[0] ""
+#~ "Aquest comentari va ser enviat per un usuari que ha enviat menys de %"
+#~ "(count)s comentari:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgstr[1] ""
+#~ "Aquest comentari va ser enviat per un usuari que ha enviat menys de %"
+#~ "(count)s comentaris:\n"
+#~ "\n"
+#~ "%(text)s"
+
+#~ msgid "Only POSTs are allowed"
+#~ msgstr "Només s'admet POST"
+
+#~ msgid "One or more of the required fields wasn't submitted"
+#~ msgstr "Un o més dels camps obligatoris no ha estat enviat"
+
+#~ msgid "Somebody tampered with the comment form (security violation)"
+#~ msgstr ""
+#~ "Algú ha manipulat el formulari de comentaris (violació de seguretat)"
+
+#~ msgid ""
+#~ "The comment form had an invalid 'target' parameter -- the object ID was "
+#~ "invalid"
+#~ msgstr ""
+#~ "El formulari de comentaris tenia un paràmetre 'target' invàlid -- el ID "
+#~ "del objecte era invàlid"
+
+#~ msgid "The comment form didn't provide either 'preview' or 'post'"
+#~ msgstr ""
+#~ "El formulari del comentari no ha proveït ni 'previsualitzar' ni 'enviar'"
+
+#~ msgid "Anonymous users cannot vote"
+#~ msgstr "Els usuaris anònims no poden votar"
+
+#~ msgid "No voting for yourself"
+#~ msgstr "No podeu votar-vos a vosaltres mateixos"
+
+#~ msgid "Year must be 1900 or later."
+#~ msgstr "L'any ha de ser posterior al 1900"
+
+#~ msgid "Separate multiple IDs with commas."
+#~ msgstr "Separi múltiples IDs amb comes."
 
 #~ msgid "Brazilian"
 #~ msgstr "Brasileny"
