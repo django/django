@@ -324,6 +324,7 @@ For each field, we describe the default widget used if you don't specify
 instead of ``None`` in the development version.
 
 .. note::
+
     Since all ``Field`` subclasses have ``required=True`` by default, the
     validation condition here is important. If you want to include a checkbox
     in your form that can be either checked or unchecked, you must remember to
@@ -345,6 +346,7 @@ Has two optional arguments for validation:
 
 .. attribute:: CharField.max_length
 .. attribute:: CharField.min_length
+
     If provided, these arguments ensure that the string is at most or at least
     the given length.
 
@@ -362,6 +364,7 @@ Has two optional arguments for validation:
 Takes one extra required argument:
 
 .. attribute:: ChoiceField.choices
+
     An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
     field.
 
@@ -380,6 +383,7 @@ Takes one extra required argument:
 Takes one optional argument:
 
 .. attribute:: DateField.input_formats
+
     A list of formats used to attempt to convert a string to a valid
     ``datetime.date`` object.
 
@@ -406,6 +410,7 @@ If no ``input_formats`` argument is provided, the default input formats are::
 Takes one optional argument:
 
 .. attribute:: DateTimeField.input_formats
+
     A list of formats used to attempt to convert a string to a valid
     ``datetime.datetime`` object.
 
@@ -444,14 +449,17 @@ Takes four optional arguments:
 
 .. attribute:: DecimalField.max_value
 .. attribute:: DecimalField.min_value
+
     These attributes define the limits for the fields value.
 
 .. attribute:: DecimalField.max_digits
+
     The maximum number of digits (those before the decimal point plus those
     after the decimal point, with leading zeros stripped) permitted in the
     value.
     
 .. attribute:: DecimalField.decimal_places
+
     The maximum number of decimal places permitted.
 
 ``EmailField``
@@ -507,15 +515,18 @@ The field allows choosing from files inside a certain directory. It takes three
 extra arguments; only ``path`` is required:
 
 .. attribute:: FilePathField.path
+
     The absolute path to the directory whose contents you want listed. This
     directory must exist.
 
 .. attribute:: FilePathField.recursive
+
     If ``False`` (the default) only the direct contents of ``path`` will be
     offered as choices. If ``True``, the directory will be descended into
     recursively and all descendants will be listed as choices.
 
 .. attribute:: FilePathField.match
+
     A regular expression pattern; only files with names matching this expression
     will be allowed as choices.
 
@@ -573,6 +584,7 @@ Takes two optional arguments for validation:
 
 .. attribute:: IntegerField.max_value
 .. attribute:: IntegerField.min_value
+
     These control the range of values permitted in the field.
 
 ``IPAddressField``
@@ -625,7 +637,8 @@ Takes one extra argument, ``choices``, as for ``ChoiceField``.
 
 Takes one required argument:
 
-.. attribute:: RegexField.regex``
+.. attribute:: RegexField.regex
+
     A regular expression specified either as a string or a compiled regular
     expression object.
 
@@ -652,6 +665,7 @@ and the error message as the value.
 Takes one optional argument:
 
 .. attribute:: TimeField.input_formats
+
     A list of formats used to attempt to convert a string to a valid
     ``datetime.time`` object.
 
@@ -676,13 +690,16 @@ Takes the following optional arguments:
 
 .. attribute:: URLField.max_length
 .. attribute:: URLField.min_length
+
     Same as ``CharField.max_length`` and ``CharField.min_length``.
 
 .. attribute:: URLField.verify_exists
+
     If ``True``, the validator will attempt to load the given URL, raising
     ``ValidationError`` if the page gives a 404. Defaults to ``False``.
 
 .. attribute:: URLField.validator_user_agent
+
     String used as the user-agent used when checking for a URL's existence.
     Defaults to the value of the ``URL_VALIDATOR_USER_AGENT`` setting.
 
@@ -711,6 +728,7 @@ dictionary of forms in which they're used. Both of these fields have an
 additional required argument:
 
 .. attribute:: ModelChoiceField.queryset
+
     A ``QuerySet`` of model objects from which the choices for the
     field will be derived, and which will be used to validate the
     user's selection.
