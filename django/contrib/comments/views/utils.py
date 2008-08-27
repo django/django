@@ -53,6 +53,6 @@ def confirmation_view(template, doc="Display a confirmation view."):
         Context:
             comment
                 The posted comment
-        """ % (help, template)
+        """ % (doc, template)
     )
     return confirmed
