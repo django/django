@@ -453,6 +453,8 @@ Default: ``'utf-8'``
 The character encoding used to decode any files read from disk. This includes
 template files and initial SQL data files.
 
+.. setting:: FILE_UPLOAD_HANDLERS
+
 FILE_UPLOAD_HANDLERS
 --------------------
 
@@ -465,6 +467,8 @@ Default::
 
 A tuple of handlers to use for uploading. See :ref:`topics-files` for details.
 
+.. setting:: FILE_UPLOAD_MAX_MEMORY_SIZE
+
 FILE_UPLOAD_MAX_MEMORY_SIZE
 ---------------------------
 
@@ -474,6 +478,8 @@ Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size (in bytes) that an upload will be before it gets streamed to
 the file system. See :ref:`topics-files` for details.
+
+.. setting:: FILE_UPLOAD_TEMP_DIR
 
 FILE_UPLOAD_TEMP_DIR
 --------------------
@@ -487,6 +493,34 @@ Django will use the standard temporary directory for the operating system. For
 example, this will default to '/tmp' on \*nix-style operating systems.
 
 See :ref:`topics-files` for details.
+
+.. setting:: FILE_UPLOAD_PERMISSIONS
+
+FILE_UPLOAD_PERMISSIONS
+-----------------------
+
+Default: ``None``
+
+The numeric mode (i.e. ``0644``) to set newly uploaded files to. For
+more information about what these modes mean, see the `documentation for
+os.chmod`_
+
+If this isn't given or is ``None``, you'll get operating-system
+dependent behavior. On most platforms, temporary files will have a mode
+of ``0600``, and files saved from memory will be saved using the
+system's standard umask.
+
+.. warning::
+
+    **Always prefix the mode with a 0.**
+    
+    If you're not familiar with file modes, please note that the leading
+    ``0`` is very important: it indicates an octal number, which is the
+    way that modes must be specified. If you try to use ``644``, you'll
+    get totally incorrect behavior.
+    
+
+.. _documentation for os.chmod: http://docs.python.org/lib/os-file-dir.html 
 
 .. setting:: FIXTURE_DIRS
 

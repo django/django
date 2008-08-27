@@ -172,7 +172,10 @@ class FileSystemStorage(Storage):
             else:
                 # OK, the file save worked. Break out of the loop.
                 break
-                
+        
+        if settings.FILE_UPLOAD_PERMISSIONS is not None:
+            os.chmod(full_path, settings.FILE_UPLOAD_PERMISSIONS)
+        
         return name
 
     def delete(self, name):

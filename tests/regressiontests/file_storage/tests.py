@@ -86,9 +86,10 @@ u'custom_storage.2'
 # Tests for a race condition on file saving (#4948).
 # This is written in such a way that it'll always pass on platforms 
 # without threading.
-
+import os
 import time
 from unittest import TestCase
+from django.conf import settings
 from django.core.files.base import ContentFile
 from models import temp_storage
 try:
@@ -117,3 +118,15 @@ class FileSaveRaceConditionTest(TestCase):
         temp_storage.delete('conflict')
         temp_storage.delete('conflict_')
 
+class FileStoragePermissions(TestCase):
+    def setUp(self):
+        self.old_perms = settings.FILE_UPLOAD_PERMISSIONS
+        settings.FILE_UPLOAD_PERMISSIONS = 0666
+        
+    def test_file_upload_permissions(self):
+        name = temp_storage.save("the_file", ContentFile("data"))
+        actual_mode = os.stat(temp_storage.path(name))[0] & 0777
+        self.assertEqual(actual_mode, 0666)
+        
+    def tearDown(self):
+        settings.FILE_UPLOAD_PERMISSIONS = self.old_perms
