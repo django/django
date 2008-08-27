@@ -113,7 +113,7 @@ class ChangePasswordTest(TestCase):
             }
         )
         self.assertEquals(response.status_code, 302)
-        self.assert_(response['Location'].endswith('/accounts/profile/'))
+        self.assert_(response['Location'].endswith(settings.LOGIN_REDIRECT_URL))
 
     def fail_login(self, password='password'):
         response = self.client.post('/login/', {
