@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import comments
+from django.utils.encoding import smart_unicode
 
 register = template.Library()
 
@@ -77,7 +78,7 @@ class BaseCommentNode(template.Node):
 
         qs = self.comment_model.objects.filter(
             content_type = ctype,
-            object_pk    = object_pk,
+            object_pk    = smart_unicode(object_pk),
             site__pk     = settings.SITE_ID,
             is_public    = True,
         )
