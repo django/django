@@ -163,6 +163,7 @@ class ModelFormMetaclass(type):
         except NameError:
             # We are defining ModelForm itself.
             parents = None
+        declared_fields = get_declared_fields(bases, attrs, False)
         new_class = super(ModelFormMetaclass, cls).__new__(cls, name, bases,
                 attrs)
         if not parents:
@@ -170,7 +171,6 @@ class ModelFormMetaclass(type):
 
         if 'media' not in attrs:
             new_class.media = media_property(new_class)
-        declared_fields = get_declared_fields(bases, attrs, False)
         opts = new_class._meta = ModelFormOptions(getattr(new_class, 'Meta', None))
         if opts.model:
             # If a model is defined, extract form fields from it.
