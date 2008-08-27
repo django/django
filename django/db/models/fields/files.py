@@ -54,6 +54,11 @@ class FieldFile(File):
         return self.storage.url(self.name)
     url = property(_get_url)
 
+    def _get_size(self):
+        self._require_file()
+        return self.storage.size(self.name)
+    size = property(_get_size)
+
     def open(self, mode='rb'):
         self._require_file()
         return super(FieldFile, self).open(mode)

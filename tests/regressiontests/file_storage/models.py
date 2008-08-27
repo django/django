@@ -46,5 +46,23 @@ if Image:
 >>> p2.mugshot.save("shot", ContentFile(image_data))
 >>> os.remove(p2.mugshot.path)
 >>> p2.delete()
+
+# Bug #8534: FileField.size should not leave the file open.
+>>> p3 = Person(name="Joan")
+>>> p3.mugshot.save("shot", ContentFile(image_data))
+
+# Get a "clean" model instance
+>>> p3 = Person.objects.get(name="Joan")
+
+# It won't have an opened file. This is a bit brittle since it depends on the
+# the internals of FieldFile, but there's no other way of telling if the
+# file's been opened or not.
+>>> hasattr(p3.mugshot, '_file')
+False
+
+# After asking for the size, the file should still be closed.
+>>> _ = p3.mugshot.size
+>>> hasattr(p3.mugshot, '_file')
+False
 """}
     
