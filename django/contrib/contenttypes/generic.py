@@ -166,6 +166,16 @@ class GenericRelation(RelatedField, Field):
         # same db_type as well.
         return None
 
+    def extra_filters(self, pieces, pos):
+        """
+        Return an extra filter to the queryset so that the results are filtered
+        on the appropriate content type.
+        """
+        ContentType = get_model("contenttypes", "contenttype")
+        content_type = ContentType.objects.get_for_model(self.model)
+        prefix = "__".join(pieces[:pos + 1])
+        return "%s__%s" % (prefix, self.content_type_field_name), content_type
+
 class ReverseGenericRelatedObjectsDescriptor(object):
     """
     This class provides the functionality that makes the related-object

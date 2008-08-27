@@ -82,7 +82,7 @@ __test__ = {'API_TESTS':"""
 >>> eggplant = Vegetable(name="Eggplant", is_yucky=True)
 >>> bacon = Vegetable(name="Bacon", is_yucky=False)
 >>> quartz = Mineral(name="Quartz", hardness=7)
->>> for o in (lion, platypus, eggplant, bacon, quartz):
+>>> for o in (platypus, lion, eggplant, bacon, quartz):
 ...     o.save()
 
 # Objects with declared GenericRelations can be tagged directly -- the API
@@ -95,6 +95,8 @@ __test__ = {'API_TESTS':"""
 <TaggedItem: yellow>
 >>> lion.tags.create(tag="hairy")
 <TaggedItem: hairy>
+>>> platypus.tags.create(tag="fatty")
+<TaggedItem: fatty>
 
 >>> lion.tags.all()
 [<TaggedItem: hairy>, <TaggedItem: yellow>]
@@ -124,25 +126,29 @@ __test__ = {'API_TESTS':"""
 >>> tag1.content_object = platypus
 >>> tag1.save()
 >>> platypus.tags.all()
-[<TaggedItem: shiny>]
+[<TaggedItem: fatty>, <TaggedItem: shiny>]
 >>> TaggedItem.objects.filter(content_type__pk=ctype.id, object_id=quartz.id)
 [<TaggedItem: clearish>]
+
+# Queries across generic relations respect the content types. Even though there are two TaggedItems with a tag of "fatty", this query only pulls out the one with the content type related to Animals.
+>>> Animal.objects.filter(tags__tag='fatty')
+[<Animal: Platypus>]
 
 # If you delete an object with an explicit Generic relation, the related
 # objects are deleted when the source object is deleted.
 # Original list of tags:
 >>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
-[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'hairy', <ContentType: animal>, 1), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2), (u'yellow', <ContentType: animal>, 1)]
+[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'fatty', <ContentType: animal>, 1), (u'hairy', <ContentType: animal>, 2), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 1), (u'yellow', <ContentType: animal>, 2)]
 
 >>> lion.delete()
 >>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
-[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2)]
+[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'fatty', <ContentType: animal>, 1), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 1)]
 
 # If Generic Relation is not explicitly defined, any related objects
 # remain after deletion of the source object.
 >>> quartz.delete()
 >>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
-[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2)]
+[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'fatty', <ContentType: animal>, 1), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 1)]
 
 # If you delete a tag, the objects using the tag are unaffected
 # (other than losing a tag)
@@ -151,7 +157,9 @@ __test__ = {'API_TESTS':"""
 >>> bacon.tags.all()
 [<TaggedItem: salty>]
 >>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
-[(u'clearish', <ContentType: mineral>, 1), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2)]
+[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: animal>, 1), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 1)]
+
+>>> TaggedItem.objects.filter(tag='fatty').delete()
 
 >>> ctype = ContentType.objects.get_for_model(lion)
 >>> Animal.objects.filter(tags__content_type=ctype)
@@ -192,6 +200,7 @@ __test__ = {'API_TESTS':"""
 >>> Comparison.objects.all()
 [<Comparison: tiger is stronger than None>]
 
+
 # GenericInlineFormSet tests ##################################################
 
 >>> from django.contrib.contenttypes.generic import generic_inlineformset_factory
@@ -207,7 +216,7 @@ __test__ = {'API_TESTS':"""
 >>> for form in formset.forms:
 ...     print form.as_p()
 <p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag" type="text" name="generic_relations-taggeditem-content_type-object_id-0-tag" value="shiny" maxlength="50" /></p>
-<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label> <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE" id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" /><input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id" value="5" id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>
+<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label> <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE" id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" /><input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id" value="..." id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>
 <p><label for="id_generic_relations-taggeditem-content_type-object_id-1-tag">Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-1-tag" type="text" name="generic_relations-taggeditem-content_type-object_id-1-tag" maxlength="50" /></p>
 <p><label for="id_generic_relations-taggeditem-content_type-object_id-1-DELETE">Delete:</label> <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-1-DELETE" id="id_generic_relations-taggeditem-content_type-object_id-1-DELETE" /><input type="hidden" name="generic_relations-taggeditem-content_type-object_id-1-id" id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>
 

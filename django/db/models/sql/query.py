@@ -647,8 +647,8 @@ class Query(object):
         pieces = name.split(LOOKUP_SEP)
         if not alias:
             alias = self.get_initial_alias()
-        field, target, opts, joins, last = self.setup_joins(pieces, opts,
-                alias, False)
+        field, target, opts, joins, last, extra = self.setup_joins(pieces,
+                opts, alias, False)
         alias = joins[-1]
         col = target.column
         if not field.rel:
@@ -1006,7 +1006,7 @@ class Query(object):
                     used, next, restricted, new_nullable, dupe_set, avoid)
 
     def add_filter(self, filter_expr, connector=AND, negate=False, trim=False,
-            can_reuse=None):
+            can_reuse=None, process_extras=True):
         """
         Add a single filter to the query. The 'filter_expr' is a pair:
         (filter_string, value). E.g. ('name__contains', 'fred')
@@ -1026,6 +1026,10 @@ class Query(object):
         will be a set of table aliases that can be reused in this filter, even
         if we would otherwise force the creation of new aliases for a join
         (needed for nested Q-filters). The set is updated by this method.
+
+        If 'process_extras' is set, any extra filters returned from the table
+        joining process will be processed. This parameter is set to False
+        during the processing of extra filters to avoid infinite recursion.
         """
         arg, value = filter_expr
         parts = arg.split(LOOKUP_SEP)
@@ -1053,8 +1057,8 @@ class Query(object):
         allow_many = trim or not negate
 
         try:
-            field, target, opts, join_list, last = self.setup_joins(parts, opts,
-                    alias, True, allow_many, can_reuse=can_reuse)
+            field, target, opts, join_list, last, extra_filters = self.setup_joins(
+                    parts, opts, alias, True, allow_many, can_reuse=can_reuse)
         except MultiJoin, e:
             self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]))
             return
@@ -1152,6 +1156,10 @@ class Query(object):
 
         if can_reuse is not None:
             can_reuse.update(join_list)
+        if process_extras:
+            for filter in extra_filters:
+                self.add_filter(filter, negate=negate, can_reuse=can_reuse,
+                        process_extras=False)
 
     def add_q(self, q_object, used_aliases=None):
         """
@@ -1207,6 +1215,7 @@ class Query(object):
         last = [0]
         dupe_set = set()
         exclusions = set()
+        extra_filters = []
         for pos, name in enumerate(names):
             try:
                 exclusions.add(int_alias)
@@ -1262,6 +1271,8 @@ class Query(object):
                 exclusions.update(self.dupe_avoidance.get((id(opts), dupe_col),
                         ()))
 
+            if hasattr(field, 'extra_filters'):
+                extra_filters.append(field.extra_filters(names, pos))
             if direct:
                 if m2m:
                     # Many-to-many field defined on the current model.
@@ -1365,7 +1376,7 @@ class Query(object):
         if pos != len(names) - 1:
             raise FieldError("Join on field %r not permitted." % name)
 
-        return field, target, opts, joins, last
+        return field, target, opts, joins, last, extra_filters
 
     def update_dupe_avoidance(self, opts, col, alias):
         """
@@ -1437,7 +1448,7 @@ class Query(object):
         opts = self.get_meta()
         try:
             for name in field_names:
-                field, target, u2, joins, u3 = self.setup_joins(
+                field, target, u2, joins, u3, u4 = self.setup_joins(
                         name.split(LOOKUP_SEP), opts, alias, False, allow_m2m,
                         True)
                 final_alias = joins[-1]
@@ -1601,7 +1612,7 @@ class Query(object):
         """
         opts = self.model._meta
         alias = self.get_initial_alias()
-        field, col, opts, joins, last = self.setup_joins(
+        field, col, opts, joins, last, extra = self.setup_joins(
                 start.split(LOOKUP_SEP), opts, alias, False)
         alias = joins[last[-1]]
         self.select = [(alias, self.alias_map[alias][RHS_JOIN_COL])]
