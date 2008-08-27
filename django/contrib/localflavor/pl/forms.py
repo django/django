@@ -16,13 +16,13 @@ class PLProvinceSelect(Select):
         from pl_voivodeships import VOIVODESHIP_CHOICES
         super(PLProvinceSelect, self).__init__(attrs, choices=VOIVODESHIP_CHOICES)
 
-class PLCountiesSelect(Select):
+class PLCountySelect(Select):
     """
     A select widget with list of Polish administrative units as choices.
     """
     def __init__(self, attrs=None):
         from pl_administrativeunits import ADMINISTRATIVE_UNIT_CHOICES
-        super(PLCountiesSelect, self).__init__(attrs, choices=ADMINISTRATIVE_UNIT_CHOICES)
+        super(PLCountySelect, self).__init__(attrs, choices=ADMINISTRATIVE_UNIT_CHOICES)
 
 class PLPESELField(RegexField):
     """
