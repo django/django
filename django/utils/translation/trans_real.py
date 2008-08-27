@@ -389,7 +389,7 @@ def get_language_from_request(request):
                     'django.mo')
             if os.path.exists(langfile):
                 _accepted[normalized] = lang
-            return lang
+                return lang
 
     return settings.LANGUAGE_CODE
 
