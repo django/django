@@ -17,7 +17,12 @@ class SessionStore(SessionBase):
         return {}
 
     def create(self):
-        while True:
+        # Because a cache can fail silently (e.g. memcache), we don't know if
+        # we are failing to create a new session because of a key collision or
+        # because the cache is missing. So we try for a (large) number of times
+        # and then raise an exception. That's the risk you shoulder if using
+        # cache backing.
+        for i in xrange(10000):
             self.session_key = self._get_new_session_key()
             try:
                 self.save(must_create=True)
@@ -25,6 +30,7 @@ class SessionStore(SessionBase):
                 continue
             self.modified = True
             return
+        raise RuntimeError("Unable to create a new session key.")
 
     def save(self, must_create=False):
         if must_create:
