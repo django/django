@@ -919,10 +919,12 @@ SESSION_FILE_PATH
 
 **New in Django development version**
 
-Default: ``/tmp/``
+Default: ``None``
 
 If you're using file-based session storage, this sets the directory in
-which Django will store session data. See :ref:`topics-http-sessions`.
+which Django will store session data. See :ref:`topics-http-sessions`. When
+the default value (``None``) is used, Django will use the standard temporary
+directory for the system.
 
 .. setting:: SESSION_SAVE_EVERY_REQUEST
 
