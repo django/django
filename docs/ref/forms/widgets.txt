@@ -17,42 +17,54 @@ Django provides a representation of all the basic HTML widgets, plus some
 commonly used groups of widgets:
 
 .. class:: TextInput
+
     Text input: ``<input type='text' ...>``
 
 .. class:: PasswordInput
+
     Password input: ``<input type='password' ...>``
 
 .. class:: HiddenInput
+
     Hidden input: ``<input type='hidden' ...>``
 
 .. class:: MultipleHiddenInput
+
     Multiple ``<input type='hidden' ...>`` widgets.
 
 .. class:: FileInput
+
     File upload input: ``<input type='file' ...>``
 
 .. class:: DateTimeInput
+
     Date/time input as a simple text box: ``<input type='text' ...>``
 
     **New in Django development version:**
 
 .. class:: Textarea
+
     Text area: ``<textarea>...</textarea>``
 
 .. class:: CheckboxInput
+
     Checkbox: ``<input type='checkbox' ...>``
 
 .. class:: Select
+
     Select widget: ``<select><option ...>...</select>``
 
 .. class:: NullBooleanSelect
+
     Select widget with options 'Unknown', 'Yes' and 'No'
 
 .. class:: SelectMultiple
+
     Select widget allowing multiple selection: ``<select
     multiple='multiple'>...</select>``
 
 .. class:: RadioSelect
+
     A list of radio buttons:
     
     .. code-block:: html
@@ -63,6 +75,7 @@ commonly used groups of widgets:
         </ul>
 
 .. class:: CheckboxSelectMultiple
+
     A list of checkboxes:
     
     .. code-block:: html
@@ -73,9 +86,11 @@ commonly used groups of widgets:
         </ul>
 
 .. class:: MultiWidget
+
     Wrapper around multiple other widgets
 
 .. class:: SplitDateTimeWidget
+
     Wrapper around two ``TextInput`` widgets: one for the date, and one for the
     time.
 
