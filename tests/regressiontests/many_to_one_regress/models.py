@@ -151,4 +151,9 @@ True
 >>> Category.objects.filter(record__left_set__right__category__name='Second').order_by('name')
 [<Category: First>, <Category: Second>]
 
+>>> c2 = Child.objects.create(name="Grandchild", parent=c)
+Traceback (most recent call last):
+    ...
+ValueError: Cannot assign "<Child: Child object>": "Child.parent" must be a "Parent" instance.
+
 """}
