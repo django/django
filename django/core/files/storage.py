@@ -1,4 +1,5 @@
 import os
+import errno
 import urlparse
 
 from django.conf import settings
@@ -161,10 +162,13 @@ class FileSystemStorage(Storage):
                     finally:
                         locks.unlock(fd)
                         os.close(fd)
-            except OSError:
-                # Ooops, we need a new file name.
-                name = self.get_available_name(name)
-                full_path = self.path(name)
+            except OSError, e:
+                if e.errno == errno.EEXIST:
+                    # Ooops, the file exists. We need a new file name.
+                    name = self.get_available_name(name)
+                    full_path = self.path(name)
+                else:
+                    raise
             else:
                 # OK, the file save worked. Break out of the loop.
                 break
