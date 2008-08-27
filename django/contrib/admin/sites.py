@@ -404,7 +404,8 @@ class AdminSite(object):
         app_dict['models'].sort(lambda x, y: cmp(x['name'], y['name']))
         context = {
             'title': _('%s administration' % capfirst(app_label)),
-            'app_list': [app_dict]
+            'app_list': [app_dict],
+            'root_path': self.root_path,
         }
         context.update(extra_context or {})
         return render_to_response(self.app_index_template or 'admin/app_index.html', context,
