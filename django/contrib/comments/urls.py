@@ -13,3 +13,7 @@ urlpatterns = patterns('django.contrib.comments.views',
     url(r'^approved/$',      'moderation.approve_done',     name='comments-approve-done'),
 )
 
+urlpatterns += patterns('',
+    url(r'^cr/(\d+)/(\w+)/$', 'django.views.defaults.shortcut', name='comments-url-redirect'),
+)
+

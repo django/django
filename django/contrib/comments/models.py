@@ -30,11 +30,10 @@ class BaseCommentAbstractModel(models.Model):
 
     def get_content_object_url(self):
         """
-        Get a URL suitable for redirecting to the content object. Uses the
-        ``django.views.defaults.shortcut`` view, which thus must be installed.
+        Get a URL suitable for redirecting to the content object.
         """
         return urlresolvers.reverse(
-            "django.views.defaults.shortcut",
+            "comments-url-redirect",
             args=(self.content_type_id, self.object_pk)
         )
 
