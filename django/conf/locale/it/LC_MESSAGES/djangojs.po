@@ -6,15 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django vSVN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-10 16:19+0200\n"
+"POT-Creation-Date: 2008-08-27 10:34+0200\n"
 "PO-Revision-Date: 2008-08-14 18:36+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
+"Language-Team: Italiano\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 "X-Generator: KBabel 1.11.4\n"
-"Language-Team: Italiano\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -118,4 +118,3 @@ msgstr "Ieri"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "Domani"
-
