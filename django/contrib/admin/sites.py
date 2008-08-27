@@ -112,7 +112,7 @@ class AdminSite(object):
         *at least one* page in the admin site.
         """
         return request.user.is_authenticated() and request.user.is_staff
-    
+
     def check_dependencies(self):
         """
         Check that all things needed to run the admin have been correctly installed.
@@ -139,7 +139,7 @@ class AdminSite(object):
         """
         if request.method == 'GET' and not request.path.endswith('/'):
             return http.HttpResponseRedirect(request.path + '/')
-        
+
         if settings.DEBUG:
             self.check_dependencies()
 
@@ -365,7 +365,7 @@ class AdminSite(object):
         return render_to_response(self.login_template or 'admin/login.html', context,
             context_instance=template.RequestContext(request)
         )
-        
+
     def app_index(self, request, app_label, extra_context=None):
         user = request.user
         has_module_perms = user.has_module_perms(app_label)
@@ -386,17 +386,20 @@ class AdminSite(object):
                             'admin_url': '%s/' % model.__name__.lower(),
                             'perms': perms,
                         }
-                    if app_dict:
-                        app_dict['models'].append(model_dict),
-                    else:
-                        app_dict = {
-                            'name': app_label.title(),
-                            'app_url': '',
-                            'has_module_perms': has_module_perms,
-                            'models': [model_dict],
-                        }
-                    if not app_dict:
-                        raise http.Http404('The requested admin page does not exist.')
+                        if app_dict:
+                            app_dict['models'].append(model_dict),
+                        else:
+                            # First time around, now that we know there's
+                            # something to display, add in the necessary meta
+                            # information.
+                            app_dict = {
+                                'name': app_label.title(),
+                                'app_url': '',
+                                'has_module_perms': has_module_perms,
+                                'models': [model_dict],
+                            }
+        if not app_dict:
+            raise http.Http404('The requested admin page does not exist.')
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(lambda x, y: cmp(x['name'], y['name']))
         context = {
