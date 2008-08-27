@@ -327,3 +327,32 @@ with the management form::
     </form>
 
 The above ends up calling the ``as_table`` method on the formset class.
+
+Using more than one formset in a view
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You are able to use more than one formset in a view if you like. Formsets
+borrow much of its behavior from forms. With that said you are able to use
+``prefix`` to prefix formset form field names with a given value to allow
+more than one formset to be sent to a view without name clashing. Lets take
+a look at how this might be accomplished::
+
+    def manage_articles(request):
+        ArticleFormSet = formset_factory(ArticleForm)
+        BookFormSet = formset_factory(BookForm)
+        if request.method == 'POST':
+            article_formset = ArticleFormSet(request.POST, request.FILES, prefix='articles')
+            book_formset = BookFormSet(request.POST, request.FILES, prefix='books')
+            if article_formset.is_valid() and book_formset.is_valid():
+                # do something with the cleaned_data on the formsets.
+        else:
+            article_formset = ArticleFormSet(prefix='articles')
+            book_formset = BookFormSet(prefix='books')
+        return render_to_response('manage_articles.html', {
+            'article_formset': article_formset,
+            'book_formset': book_formset,
+        })
+
+You would then render the formsets as normal. It is important to point out
+that you need to pass ``prefix`` on both the POST and non-POST cases so that
+it is rendered and processed correctly.
