@@ -40,5 +40,11 @@ if Image:
 >>> p.mug_width
 16
 
+# Bug #8175: correctly delete files that have been removed off the file system.
+>>> import os
+>>> p2 = Person(name="Fred")
+>>> p2.mugshot.save("shot", ContentFile(image_data))
+>>> os.remove(p2.mugshot.path)
+>>> p2.delete()
 """}
     
