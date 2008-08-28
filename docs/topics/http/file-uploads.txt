@@ -192,6 +192,21 @@ define the following methods/attributes:
     ``UploadedFile.temporary_file_path()``
         Only files uploaded onto disk will have this method; it returns the full
         path to the temporary uploaded file.
+        
+.. note::
+
+    Like regular Python files, you can read the file line-by-line simply by
+    iterating over the uploaded file:
+    
+    .. code-block:: python
+        
+        for line in uploadedfile:
+            do_something_with(line)
+            
+    However, *unlike* standard Python files, :class:`UploadedFile` only
+    understands ``\n`` (also known as "Unix-style") line endings. If you know
+    that you need to handle uploaded files with different line endings, you'll
+    need to do so in your view.
 
 Upload Handlers
 ===============
