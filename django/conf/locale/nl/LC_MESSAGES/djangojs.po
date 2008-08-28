@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-27 10:34+0100\n"
+"POT-Creation-Date: 2008-08-27 03:54+0200\n"
 "PO-Revision-Date: 2008-02-27 11:22+0100\n"
-"Last-Translator: jdetaeye <jdetaeye@frepple.com>\n"
-"Language-Team: nl <LL@li.org>\n"
+"Last-Translator: Rudolph Froger <rudolphfroger@estrate.nl>\n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -46,8 +46,12 @@ msgstr "Allemaal verwijderen"
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
-msgid "January February March April May June July August September October November December"
-msgstr "januari februari maart april mei juni juli augustus september oktober november december"
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"januari februari maart april mei juni juli augustus september oktober "
+"november december"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
@@ -85,11 +89,11 @@ msgstr "Middernacht"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
-msgstr "6 uur"
+msgstr "Zes uur 's ochtends"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
-msgstr "12 uur"
+msgstr "Twaalf uur 's middags"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
@@ -112,4 +116,3 @@ msgstr "Gisteren"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "Morgen"
-
