@@ -394,7 +394,17 @@ class CharField(Field):
 
 # TODO: Maybe move this into contrib, because it's specialized.
 class CommaSeparatedIntegerField(CharField):
-    pass
+    def formfield(self, **kwargs):
+        defaults = {
+            'form_class': forms.RegexField,
+            'regex': '^[\d,]+$',
+            'max_length': self.max_length,
+            'error_messages': {
+                'invalid': _(u'Enter only digits separated by commas.'),
+            }
+        }
+        defaults.update(kwargs)
+        return super(CommaSeparatedIntegerField, self).formfield(**defaults)
 
 ansi_date_re = re.compile(r'^\d{4}-\d{1,2}-\d{1,2}$')
 

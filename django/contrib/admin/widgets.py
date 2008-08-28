@@ -236,3 +236,10 @@ class AdminIntegerFieldWidget(forms.TextInput):
         if attrs is not None:
             final_attrs.update(attrs)
         super(AdminIntegerFieldWidget, self).__init__(attrs=final_attrs)
+
+class AdminCommaSeparatedIntegerFieldWidget(forms.TextInput):
+    def __init__(self, attrs=None):
+        final_attrs = {'class': 'vCommaSeparatedIntegerField'}
+        if attrs is not None:
+            final_attrs.update(attrs)
+        super(AdminCommaSeparatedIntegerFieldWidget, self).__init__(attrs=final_attrs)

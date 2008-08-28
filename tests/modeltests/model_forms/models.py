@@ -98,6 +98,12 @@ class ImageFile(models.Model):
     def __unicode__(self):
         return self.description
 
+class CommaSeparatedInteger(models.Model):
+    field = models.CommaSeparatedIntegerField(max_length=20)
+
+    def __unicode__(self):
+        return self.field
+
 __test__ = {'API_TESTS': """
 >>> from django import forms
 >>> from django.forms.models import ModelForm, model_to_dict
@@ -1049,5 +1055,31 @@ True
 >>> print f.media
 <link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />
 <script type="text/javascript" src="/some/form/javascript"></script>
+
+>>> class CommaSeparatedIntegerForm(ModelForm):
+...    class Meta:
+...        model = CommaSeparatedInteger
+
+>>> f = CommaSeparatedIntegerForm().fields['field']
+>>> f.clean('1,2,3')
+u'1,2,3'
+>>> f.clean('1a,2')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter only digits separated by commas.']
+>>> f.clean(',,,,') 
+u',,,,'
+>>> f.clean('1.2')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter only digits separated by commas.']
+>>> f.clean('1,a,2')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter only digits separated by commas.']
+>>> f.clean('1,,2')
+u'1,,2'
+>>> f.clean('1')
+u'1'
 
 """}

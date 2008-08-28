@@ -94,6 +94,11 @@ class BaseModelAdmin(object):
             kwargs['widget'] = widgets.AdminIntegerFieldWidget
             return db_field.formfield(**kwargs)
 
+        # For CommaSeparatedIntegerFields, add a custom CSS class.
+        if isinstance(db_field, models.CommaSeparatedIntegerField):
+            kwargs['widget'] = widgets.AdminCommaSeparatedIntegerFieldWidget
+            return db_field.formfield(**kwargs)
+
         # For TextInputs, add a custom CSS class.
         if isinstance(db_field, models.CharField):
             kwargs['widget'] = widgets.AdminTextInputWidget
