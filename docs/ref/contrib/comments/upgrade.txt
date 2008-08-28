@@ -62,10 +62,10 @@ run the following SQL:
     UPDATE django_comments SET user_name = (
         SELECT username FROM auth_user 
         WHERE django_comments.user_id = auth_user.id
-    );
+    ) WHERE django_comments.user_id is not NULL;
     UPDATE django_comments SET user_email = (
         SELECT email FROM auth_user 
         WHERE django_comments.user_id = auth_user.id
-    );
+    ) WHERE django_comments.user_id is not NULL;
     
     COMMIT;
