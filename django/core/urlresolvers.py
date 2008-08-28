@@ -52,6 +52,8 @@ def get_callable(lookup_view, can_fail=False):
             mod_name, func_name = get_mod_func(lookup_view)
             if func_name != '':
                 lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+                if not callable(lookup_view):
+                    raise AttributeError("'%s.%s' is not a callable." % (mod_name, func_name))
         except (ImportError, AttributeError):
             if not can_fail:
                 raise
@@ -196,10 +198,12 @@ class RegexURLPattern(object):
         mod_name, func_name = get_mod_func(viewname)
         try:
             lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
-        except (ImportError, AttributeError):
-            raise NoReverseMatch
+        except ImportError, e:
+            raise NoReverseMatch("Could not import '%s': %s" % (mod_name, e))
+        except AttributeError, e:
+            raise NoReverseMatch("'%s' has no attribute '%s'" % (mod_name, func_name))
         if lookup_view != self.callback:
-            raise NoReverseMatch
+            raise NoReverseMatch("Reversed view '%s' doesn't match the expected callback ('%s')." % (viewname, self.callback))
         return self.reverse_helper(*args, **kwargs)
 
     def reverse_helper(self, *args, **kwargs):
@@ -279,11 +283,12 @@ class RegexURLResolver(object):
     def reverse(self, lookup_view, *args, **kwargs):
         try:
             lookup_view = get_callable(lookup_view, True)
-        except (ImportError, AttributeError):
-            raise NoReverseMatch("'%s' is not a callable." % lookup_view)
+        except (ImportError, AttributeError), e:
+            raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
         if lookup_view in self.reverse_dict:
             return u''.join([reverse_helper(part.regex, *args, **kwargs) for part in self.reverse_dict[lookup_view]])
-        raise NoReverseMatch("Reverse for '%s' not found." % lookup_view)
+        raise NoReverseMatch("Reverse for '%s' with arguments '%s' and keyword "
+                "arguments '%s' not found." % (lookup_view, args, kwargs))
 
     def reverse_helper(self, lookup_view, *args, **kwargs):
         sub_match = self.reverse(lookup_view, *args, **kwargs)
