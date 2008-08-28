@@ -12,5 +12,3 @@ these APIs should be written.
    :maxdepth: 1
    
    admin-css
-   forms
-   newforms-migration
