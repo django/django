@@ -84,7 +84,7 @@ def Deserializer(object_list, **options):
 
             # Handle FK fields
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
-                if field_value:
+                if field_value is not None:
                     data[field.attname] = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
                 else:
                     data[field.attname] = None

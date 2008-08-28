@@ -261,6 +261,10 @@ The end."""),
 
     (fk_obj, 460, FKDataToO2O, 300),
     
+    # Regression test for #8651 -- FK = 0
+    (data_obj, 0, Anchor, "Anchor 0"),
+    (fk_obj, 465, FKData, 0),
+    
     (im2m_obj, 470, M2MIntermediateData, None),
     
     #testing post- and prereferences and extra fields
