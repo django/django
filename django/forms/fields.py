@@ -594,7 +594,18 @@ class NullBooleanField(BooleanField):
     widget = NullBooleanSelect
 
     def clean(self, value):
-        return {True: True, False: False}.get(value, None)
+        """
+        Explicitly checks for the string 'True' and 'False', which is what a
+        hidden field will submit for True and False. Unlike the
+        Booleanfield we also need to check for True, because we are not using
+        the bool() function
+        """
+        if value in (True, 'True'):
+            return True
+        elif value in (False, 'False'):
+            return False
+        else:
+            return None
 
 class ChoiceField(Field):
     widget = Select
