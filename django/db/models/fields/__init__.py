@@ -205,7 +205,7 @@ class Field(object):
         elif lookup_type in ('contains', 'icontains'):
             return ["%%%s%%" % connection.ops.prep_for_like_query(value)]
         elif lookup_type == 'iexact':
-            return [connection.ops.prep_for_like_query(value)]
+            return [connection.ops.prep_for_iexact_query(value)]
         elif lookup_type in ('startswith', 'istartswith'):
             return ["%s%%" % connection.ops.prep_for_like_query(value)]
         elif lookup_type in ('endswith', 'iendswith'):

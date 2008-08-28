@@ -142,3 +142,5 @@ class DatabaseOperations(BaseDatabaseOperations):
     def savepoint_rollback_sql(self, sid):
         return "ROLLBACK TO SAVEPOINT %s" % sid
 
+    def prep_for_iexact_query(self, x):
+        return x

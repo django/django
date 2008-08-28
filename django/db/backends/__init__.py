@@ -301,6 +301,10 @@ class BaseDatabaseOperations(object):
         from django.utils.encoding import smart_unicode
         return smart_unicode(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
 
+    # Same as prep_for_like_query(), but called for "iexact" matches, which
+    # need not necessarily be implemented using "LIKE" in the backend.
+    prep_for_iexact_query = prep_for_like_query
+
     def value_to_db_date(self, value):
         """
         Transform a date value to an object compatible with what is expected

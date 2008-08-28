@@ -901,6 +901,18 @@ Pickling of DateQuerySets used to fail
 >>> qs = Item.objects.dates('created', 'month')
 >>> _ = pickle.loads(pickle.dumps(qs))
 
+Bug #8597: regression tests for case-insensitive comparisons
+>>> _ = Item.objects.create(name="a_b", created=datetime.datetime.now(), creator=a2, note=n1)
+>>> _ = Item.objects.create(name="x%y", created=datetime.datetime.now(), creator=a2, note=n1)
+>>> Item.objects.filter(name__iexact="A_b")
+[<Item: a_b>]
+>>> Item.objects.filter(name__iexact="x%Y")
+[<Item: x%y>]
+>>> Item.objects.filter(name__istartswith="A_b")
+[<Item: a_b>]
+>>> Item.objects.filter(name__iendswith="A_b")
+[<Item: a_b>]
+
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
