@@ -16,8 +16,8 @@ class Photo(models.Model):
         super(Photo, self).__init__(*args, **kwargs)
         self._savecount = 0
 
-    def save(self):
-        super(Photo, self).save()
+    def save(self, force_insert=False, force_update=False):
+        super(Photo, self).save(force_insert, force_update)
         self._savecount += 1
 
 class PhotoForm(ModelForm):

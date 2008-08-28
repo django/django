@@ -64,7 +64,7 @@ class RequestSite(object):
     def __unicode__(self):
         return self.domain
 
-    def save(self):
+    def save(self, force_insert=False, force_update=False):
         raise NotImplementedError('RequestSite cannot be saved.')
 
     def delete(self):

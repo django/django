@@ -14,9 +14,10 @@ class Person(models.Model):
     def __unicode__(self):
         return u"%s %s" % (self.first_name, self.last_name)
 
-    def save(self):
+    def save(self, force_insert=False, force_update=False):
         print "Before save"
-        super(Person, self).save() # Call the "real" save() method
+         # Call the "real" save() method
+        super(Person, self).save(force_insert, force_update)
         print "After save"
 
     def delete(self):

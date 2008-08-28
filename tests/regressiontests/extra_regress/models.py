@@ -13,8 +13,8 @@ class RevisionableModel(models.Model):
     def __unicode__(self):
         return u"%s (%s, %s)" % (self.title, self.id, self.base.id)
 
-    def save(self):
-        super(RevisionableModel, self).save()
+    def save(self, force_insert=False, force_update=False):
+        super(RevisionableModel, self).save(force_insert, force_update)
         if not self.base:
             self.base = self
             super(RevisionableModel, self).save()
