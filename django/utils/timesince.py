@@ -60,7 +60,7 @@ def timeuntil(d, now=None):
     the given time.
     """
     if not now:
-        if d.tzinfo:
+        if getattr(d, 'tzinfo', None):
             now = datetime.datetime.now(LocalTimezone(d))
         else:
             now = datetime.datetime.now()
