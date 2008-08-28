@@ -308,7 +308,7 @@ class QuerySet(object):
         and returning the created object.
         """
         obj = self.model(**kwargs)
-        obj.save()
+        obj.save(force_insert=True)
         return obj
 
     def get_or_create(self, **kwargs):
@@ -328,7 +328,7 @@ class QuerySet(object):
                 params.update(defaults)
                 obj = self.model(**params)
                 sid = transaction.savepoint()
-                obj.save()
+                obj.save(force_insert=True)
                 transaction.savepoint_commit(sid)
                 return obj, True
             except IntegrityError, e:

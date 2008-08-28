@@ -556,9 +556,17 @@ A convenience method for creating an object and saving it all in one step.  Thus
 and::
 
     p = Person(first_name="Bruce", last_name="Springsteen")
-    p.save()
+    p.save(force_insert=True)
 
 are equivalent.
+
+The :ref:`force_insert <ref-models-force-insert>` parameter is documented
+elsewhere, but all it means is that a new object will always be created.
+Normally you won't need to worry about this. However, if your model contains a
+manual primary key value that you set and if that value already exists in the
+database, a call to ``create()`` will fail with an ``IntegrityError`` since
+primary keys must be unique. So remember to be prepared to handle the
+exception if you are using manual primary keys.
 
 ``get_or_create(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -590,7 +598,7 @@ called ``defaults`` -- will be used in a ``get()`` call. If an object is found,
 ``get_or_create()`` returns a tuple of that object and ``False``. If an object
 is *not* found, ``get_or_create()`` will instantiate and save a new object,
 returning a tuple of the new object and ``True``. The new object will be
-created according to this algorithm::
+created roughly according to this algorithm::
 
     defaults = kwargs.pop('defaults', {})
     params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
@@ -601,12 +609,22 @@ created according to this algorithm::
 In English, that means start with any non-``'defaults'`` keyword argument that
 doesn't contain a double underscore (which would indicate a non-exact lookup).
 Then add the contents of ``defaults``, overriding any keys if necessary, and
-use the result as the keyword arguments to the model class.
+use the result as the keyword arguments to the model class. As hinted at
+above, this is a simplification of the algorithm that is used, but it contains
+all the pertinent details. The internal implementation has some more
+error-checking than this and handles some extra edge-conditions; if you're
+interested, read the code.
 
 If you have a field named ``defaults`` and want to use it as an exact lookup in
 ``get_or_create()``, just use ``'defaults__exact'``, like so::
 
     Foo.objects.get_or_create(defaults__exact='bar', defaults={'defaults': 'baz'})
+
+
+The ``get_or_create()`` method has similar error behaviour to ``create()``
+when you are using manually specified primary keys. If an object needs to be
+created and the key already exists in the database, an ``IntegrityError`` will
+be raised.
 
 Finally, a word on using ``get_or_create()`` in Django views. As mentioned
 earlier, ``get_or_create()`` is mostly useful in scripts that need to parse

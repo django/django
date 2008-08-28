@@ -193,6 +193,8 @@ value explicitly when saving new objects, if you cannot guarantee the
 primary-key value is unused. For more on this nuance, see `Explicitly specifying
 auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
 
+.. _ref-models-force-insert:
+
 Forcing an INSERT or UPDATE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
