@@ -178,26 +178,6 @@ class FileField(Field):
             # Otherwise, just close the file, so it doesn't tie up resources.
             file.close()
 
-    def save_file(self, new_data, new_object, original_object, change, rel,
-                  save=True):
-        upload_field_name = self.name + '_file'
-        if new_data.get(upload_field_name, False):
-            if rel:
-                file = new_data[upload_field_name][0]
-            else:
-                file = new_data[upload_field_name]
-
-            # Backwards-compatible support for files-as-dictionaries.
-            # We don't need to raise a warning because the storage backend will
-            # do so for us.
-            try:
-                filename = file.name
-            except AttributeError:
-                filename = file['filename']
-            filename = self.get_filename(filename)
-
-            getattr(new_object, self.attname).save(filename, file, save)
-
     def get_directory_name(self):
         return os.path.normpath(force_unicode(datetime.datetime.now().strftime(smart_str(self.upload_to))))
 
