@@ -89,9 +89,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if set_tz:
             cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
             if not hasattr(self, '_version'):
-                version = get_version(cursor)
-                self.__class__._version = version
-                if version < (8, 0):
-                    # No savepoint support for earlier version of PostgreSQL.
-                    self.features.uses_savepoints = False
+                self.__class__._version = get_version(cursor)
+            if self._version < (8, 0):
+                # No savepoint support for earlier version of PostgreSQL.
+                self.features.uses_savepoints = False
         return cursor
