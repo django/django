@@ -251,7 +251,7 @@ def get_field(cls, model, opts, label, field):
                 % (cls.__name__, label, field, model.__name__))
 
 def check_formfield(cls, model, opts, label, field):
-    if hasattr(cls.form, 'base_fields'):
+    if getattr(cls.form, 'base_fields', None):
         try:
             cls.form.base_fields[field]
         except KeyError:
