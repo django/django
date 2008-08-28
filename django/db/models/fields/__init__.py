@@ -687,7 +687,7 @@ class NullBooleanField(Field):
 
     def to_python(self, value):
         if value in (None, True, False): return value
-        if value in ('None'): return None
+        if value in ('None',): return None
         if value in ('t', 'True', '1'): return True
         if value in ('f', 'False', '0'): return False
         raise exceptions.ValidationError(
