@@ -77,7 +77,7 @@ access your data. The API is created on the fly, no code generation necessary::
 
     # Now the new reporter is in the database.
     >>> Reporter.objects.all()
-    [John Smith]
+    [<Reporter: John Smith>]
 
     # Fields are represented as attributes on the Python object.
     >>> r.full_name
@@ -85,15 +85,15 @@ access your data. The API is created on the fly, no code generation necessary::
 
     # Django provides a rich database lookup API.
     >>> Reporter.objects.get(id=1)
-    John Smith
+    <Reporter: John Smith>
     >>> Reporter.objects.get(full_name__startswith='John')
-    John Smith
+    <Reporter: John Smith>
     >>> Reporter.objects.get(full_name__contains='mith')
-    John Smith
+    <Reporter: John Smith>
     >>> Reporter.objects.get(id=2)
     Traceback (most recent call last):
         ...
-    DoesNotExist: Reporter does not exist for {'id__exact': 2}
+    DoesNotExist: Reporter matching query does not exist.
 
     # Create an article.
     >>> from datetime import datetime
@@ -103,7 +103,7 @@ access your data. The API is created on the fly, no code generation necessary::
 
     # Now the article is in the database.
     >>> Article.objects.all()
-    [Django is cool]
+    [<Article: Django is cool>]
 
     # Article objects get API access to related Reporter objects.
     >>> r = a.reporter
@@ -112,13 +112,13 @@ access your data. The API is created on the fly, no code generation necessary::
 
     # And vice versa: Reporter objects get API access to Article objects.
     >>> r.article_set.all()
-    [Django is cool]
+    [<Article: Django is cool>]
 
     # The API follows relationships as far as you need, performing efficient
     # JOINs for you behind the scenes.
     # This finds all articles by a reporter whose name starts with "John".
     >>> Article.objects.filter(reporter__full_name__startswith="John")
-    [Django is cool]
+    [<Article: Django is cool>]
 
     # Change an object by altering its attributes and calling save().
     >>> r.full_name = 'Billy Goat'

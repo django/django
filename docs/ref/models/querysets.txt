@@ -190,7 +190,7 @@ objects::
 
     # This list contains a Blog object.
     >>> Blog.objects.filter(name__startswith='Beatles')
-    [Beatles Blog]
+    [<Blog: Beatles Blog>]
 
     # This list contains a dictionary.
     >>> Blog.objects.filter(name__startswith='Beatles').values()
@@ -650,9 +650,9 @@ primary-key value to an instance of the object with the given ID.
 Example::
 
     >>> Blog.objects.in_bulk([1])
-    {1: Beatles Blog}
+    {1: <Blog: Beatles Blog>}
     >>> Blog.objects.in_bulk([1, 2])
-    {1: Beatles Blog, 2: Cheddar Talk}
+    {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>}
     >>> Blog.objects.in_bulk([])
     {}
 
