@@ -11,7 +11,7 @@ Pagination
 
 Django provides a few classes that help you manage paginated data -- that is,
 data that's split across several pages, with "Previous/Next" links. These
-classes live in the module :file:`django/core/paginator.py`.
+classes live in :file:`django/core/paginator.py`.
 
 Example
 =======
@@ -58,11 +58,13 @@ page::
     >>> p.page(0)
     Traceback (most recent call last):
     ...
-    InvalidPage
+    EmptyPage: That page number is less than 1
     >>> p.page(3)
     Traceback (most recent call last):
     ...
-    InvalidPage
+    EmptyPage: That page contains no results
+
+.. note::
 
     Note that you can give ``Paginator`` a list/tuple, a Django ``QuerySet``, or
     any other object with a ``count()`` or ``__len__()`` method. When
@@ -105,7 +107,7 @@ Optional arguments
 
 ``allow_empty_first_page``
     Whether or not the first page is allowed to be empty.  If ``False`` and
-    ``object_list`` is  empty, then a ``EmptyPage`` error will be raised.
+    ``object_list`` is  empty, then an ``EmptyPage`` error will be raised.
 
 Methods
 -------
