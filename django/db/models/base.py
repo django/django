@@ -19,8 +19,6 @@ from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
-from django.core.files.move import file_move_safe
-from django.core.files import locks
 from django.conf import settings
 
 
