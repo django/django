@@ -382,7 +382,7 @@ number of other URLconfs::
     urlpatterns = patterns('',
         (r'^weblog/',        include('django_website.apps.blog.urls.blog')),
         (r'^documentation/', include('django_website.apps.docs.urls.docs')),
-        (r'^comments/',      include('django.contrib.comments.urls.comments')),
+        (r'^comments/',      include('django.contrib.comments.urls')),
     )
 
 Note that the regular expressions in this example don't have a ``$``
