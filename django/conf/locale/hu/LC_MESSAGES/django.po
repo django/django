@@ -1,6 +1,5 @@
 # translation of django.po to Hungarian
 # This file is distributed under the same license as the django package.
-# Copyright (C) 2008, The Django Software Foundation
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
