@@ -60,7 +60,7 @@ And here's that same fixture as YAML:
         first_name: John
         last_name: Lennon
     - model: myapp.person
-      pk: 1
+      pk: 2
       fields:
         first_name: Paul
         last_name: McCartney
