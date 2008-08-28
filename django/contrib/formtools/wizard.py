@@ -12,6 +12,7 @@ from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils.hashcompat import md5_constructor
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.formtools.utils import security_hash
 
 class FormWizard(object):
@@ -126,7 +127,7 @@ class FormWizard(object):
         This default implementation simply renders the form for the given step,
         but subclasses may want to display an error message, etc.
         """
-        return self.render(self.get_form(step), request, step, context={'wizard_error': 'We apologize, but your form has expired. Please continue filling out the form from this page.'})
+        return self.render(self.get_form(step), request, step, context={'wizard_error': _('We apologize, but your form has expired. Please continue filling out the form from this page.')})
 
     def render_revalidation_failure(self, request, step, form):
         """

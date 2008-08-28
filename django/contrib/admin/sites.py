@@ -403,7 +403,7 @@ class AdminSite(object):
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(lambda x, y: cmp(x['name'], y['name']))
         context = {
-            'title': _('%s administration' % capfirst(app_label)),
+            'title': _('%s administration') % capfirst(app_label),
             'app_list': [app_dict],
             'root_path': self.root_path,
         }
