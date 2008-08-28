@@ -1058,9 +1058,11 @@ class Query(object):
 
         try:
             field, target, opts, join_list, last, extra_filters = self.setup_joins(
-                    parts, opts, alias, True, allow_many, can_reuse=can_reuse)
+                    parts, opts, alias, True, allow_many, can_reuse=can_reuse,
+                    negate=negate, process_extras=process_extras)
         except MultiJoin, e:
-            self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]))
+            self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
+                    can_reuse)
             return
         final = len(join_list)
         penultimate = last.pop()
@@ -1196,7 +1198,8 @@ class Query(object):
             self.used_aliases = used_aliases
 
     def setup_joins(self, names, opts, alias, dupe_multis, allow_many=True,
-            allow_explicit_fk=False, can_reuse=None):
+            allow_explicit_fk=False, can_reuse=None, negate=False,
+            process_extras=True):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -1205,7 +1208,10 @@ class Query(object):
         many-to-one joins will always create a new alias (necessary for
         disjunctive filters). If can_reuse is not None, it's a list of aliases
         that can be reused in these joins (nothing else can be reused in this
-        case).
+        case). Finally, 'negate' is used in the same sense as for add_filter()
+        -- it indicates an exclude() filter, or something similar. It is only
+        passed in here so that it can be passed to a field's extra_filter() for
+        customised behaviour.
 
         Returns the final field involved in the join, the target database
         column (used for any 'where' constraint), the final 'opts' value and the
@@ -1271,8 +1277,8 @@ class Query(object):
                 exclusions.update(self.dupe_avoidance.get((id(opts), dupe_col),
                         ()))
 
-            if hasattr(field, 'extra_filters'):
-                extra_filters.append(field.extra_filters(names, pos))
+            if process_extras and hasattr(field, 'extra_filters'):
+                extra_filters.extend(field.extra_filters(names, pos, negate))
             if direct:
                 if m2m:
                     # Many-to-many field defined on the current model.
@@ -1295,10 +1301,15 @@ class Query(object):
                     int_alias = self.join((alias, table1, from_col1, to_col1),
                             dupe_multis, exclusions, nullable=True,
                             reuse=can_reuse)
-                    alias = self.join((int_alias, table2, from_col2, to_col2),
-                            dupe_multis, exclusions, nullable=True,
-                            reuse=can_reuse)
-                    joins.extend([int_alias, alias])
+                    if int_alias == table2 and from_col2 == to_col2:
+                        joins.append(int_alias)
+                        alias = int_alias
+                    else:
+                        alias = self.join(
+                                (int_alias, table2, from_col2, to_col2),
+                                dupe_multis, exclusions, nullable=True,
+                                reuse=can_reuse)
+                        joins.extend([int_alias, alias])
                 elif field.rel:
                     # One-to-one or many-to-one field
                     if cached_data:
@@ -1391,7 +1402,7 @@ class Query(object):
             except KeyError:
                 self.dupe_avoidance[ident, name] = set([alias])
 
-    def split_exclude(self, filter_expr, prefix):
+    def split_exclude(self, filter_expr, prefix, can_reuse):
         """
         When doing an exclude against any kind of N-to-many relation, we need
         to use a subquery. This method constructs the nested query, given the
@@ -1399,10 +1410,11 @@ class Query(object):
         N-to-many relation field.
         """
         query = Query(self.model, self.connection)
-        query.add_filter(filter_expr)
+        query.add_filter(filter_expr, can_reuse=can_reuse)
         query.set_start(prefix)
         query.clear_ordering(True)
-        self.add_filter(('%s__in' % prefix, query), negate=True, trim=True)
+        self.add_filter(('%s__in' % prefix, query), negate=True, trim=True,
+                can_reuse=can_reuse)
 
     def set_limits(self, low=None, high=None):
         """
@@ -1614,6 +1626,7 @@ class Query(object):
         alias = self.get_initial_alias()
         field, col, opts, joins, last, extra = self.setup_joins(
                 start.split(LOOKUP_SEP), opts, alias, False)
+        self.unref_alias(alias)
         alias = joins[last[-1]]
         self.select = [(alias, self.alias_map[alias][RHS_JOIN_COL])]
         self.select_fields = [field]

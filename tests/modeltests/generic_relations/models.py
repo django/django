@@ -131,8 +131,12 @@ __test__ = {'API_TESTS':"""
 [<TaggedItem: clearish>]
 
 # Queries across generic relations respect the content types. Even though there are two TaggedItems with a tag of "fatty", this query only pulls out the one with the content type related to Animals.
+>>> Animal.objects.order_by('common_name')
+[<Animal: Lion>, <Animal: Platypus>]
 >>> Animal.objects.filter(tags__tag='fatty')
 [<Animal: Platypus>]
+>>> Animal.objects.exclude(tags__tag='fatty')
+[<Animal: Lion>]
 
 # If you delete an object with an explicit Generic relation, the related
 # objects are deleted when the source object is deleted.
