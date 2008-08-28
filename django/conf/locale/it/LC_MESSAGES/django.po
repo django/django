@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django vSVN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-27 10:33+0200\n"
+"POT-Creation-Date: 2008-08-28 07:53+0200\n"
 "PO-Revision-Date: 2008-08-27 10:47+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "Language-Team: Italiano\n"
@@ -340,8 +340,11 @@ msgstr "%(name)s \"%(obj)s\" modificato correttamente."
 
 #: contrib/admin/options.py:451
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" aggiunto correttamente. Puoi modificarlo ancora qui sotto."
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"%(name)s \"%(obj)s\" aggiunto correttamente. Puoi modificarlo ancora qui "
+"sotto."
 
 #: contrib/admin/options.py:517
 #, python-format
@@ -492,7 +495,9 @@ msgstr "Errore del server <em>(500)</em>"
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
-msgstr "Si è verificato un errore. È stato riportato agli amministratori del sito via e-mail e verrà corretto a breve. Grazie per la tua pazienza."
+msgstr ""
+"Si è verificato un errore. È stato riportato agli amministratori del sito "
+"via e-mail e verrà corretto a breve. Grazie per la tua pazienza."
 
 #: contrib/admin/templates/admin/app_index.html:10
 #: contrib/admin/templates/admin/index.html:19
@@ -586,7 +591,9 @@ msgstr ""
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
-msgstr "Sicuro di voler cancellare %(object_name)s \"%(escaped_object)s\"? Tutti gli oggetti collegati seguenti saranno cancellati:"
+msgstr ""
+"Sicuro di voler cancellare %(object_name)s \"%(escaped_object)s\"? Tutti gli "
+"oggetti collegati seguenti saranno cancellati:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:28
 msgid "Yes, I'm sure"
@@ -661,7 +668,9 @@ msgstr "j F Y, H:i"
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
-msgstr "Questo oggetto non ha cambiamenti registrati. Probabilmente non è stato creato con questo sito di amministrazione."
+msgstr ""
+"Questo oggetto non ha cambiamenti registrati. Probabilmente non è stato "
+"creato con questo sito di amministrazione."
 
 #: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
@@ -732,7 +741,8 @@ msgstr "Inserisci la stessa password inserita sopra, come verifica."
 #: contrib/admin/templates/admin/auth/user/change_password.html:26
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Inserisci una nuova password per l'utente <strong>%(username)s</strong>."
+msgstr ""
+"Inserisci una nuova password per l'utente <strong>%(username)s</strong>."
 
 #: contrib/admin/templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
@@ -831,7 +841,9 @@ msgstr "Password NON reimpostata"
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr "Il link per la reimpostazione della password non era valido, forse perché era già stato usato. Richiedi una nuova reimpostazione della password."
+msgstr ""
+"Il link per la reimpostazione della password non era valido, forse perché "
+"era già stato usato. Richiedi una nuova reimpostazione della password."
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
@@ -848,7 +860,8 @@ msgstr ""
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Hai ricevuto questa e-mail perché hai chiesto di reimpostare la password"
+msgstr ""
+"Hai ricevuto questa e-mail perché hai chiesto di reimpostare la password"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -1120,7 +1133,8 @@ msgstr "Modifica quest'oggetto (in una nuova finestra)"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
-msgstr "Come sopra, ma apre la pagina di amministrazione in una nuova finestra."
+msgstr ""
+"Come sopra, ma apre la pagina di amministrazione in una nuova finestra."
 
 #: contrib/auth/admin.py:21
 msgid "Personal info"
@@ -1197,7 +1211,9 @@ msgstr "E-mail"
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
-msgstr "Questo indirizzo email non è associato ad alcun account utente. Sei sicuro di esserti registrato?"
+msgstr ""
+"Questo indirizzo email non è associato ad alcun account utente. Sei sicuro "
+"di esserti registrato?"
 
 #: contrib/auth/forms.py:134
 #, python-format
@@ -1218,7 +1234,8 @@ msgstr "Password attuale"
 
 #: contrib/auth/forms.py:176
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "La password attuale non è stata inserita correttamente: va inserita di nuovo."
+msgstr ""
+"La password attuale non è stata inserita correttamente: va inserita di nuovo."
 
 #: contrib/auth/models.py:72 contrib/auth/models.py:95
 msgid "name"
@@ -1365,8 +1382,10 @@ msgid "Comment"
 msgstr "Commento"
 
 #: contrib/comments/forms.py:24
-msgid "If you enter anything in this field your comment will be treated as spam"
-msgstr "Se inserisci qualcosa in questo campo il tuo commento verrà considerato spam"
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+"Se inserisci qualcosa in questo campo il tuo commento verrà considerato spam"
 
 #: contrib/comments/forms.py:124
 #, python-format
@@ -1404,8 +1423,10 @@ msgid "is public"
 msgstr "è pubblico"
 
 #: contrib/comments/models.py:59
-msgid "Uncheck this box to make the comment effectively disappear from the site."
-msgstr "Deseleziona questa casella per far sparire del tutto il commento dal sito."
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"Deseleziona questa casella per far sparire del tutto il commento dal sito."
 
 #: contrib/comments/models.py:61
 msgid "is removed"
@@ -1415,19 +1436,25 @@ msgstr "è rimosso"
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
-msgstr "Spunta la casella se il commento è inappropriato. Verrà sostituito dal messaggio \"Questo commento è stato rimosso\"."
+msgstr ""
+"Spunta la casella se il commento è inappropriato. Verrà sostituito dal "
+"messaggio \"Questo commento è stato rimosso\"."
 
 #: contrib/comments/models.py:114
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
-msgstr "Questo commento è stato inserito da un utente autenticato e quindi il nome non è modificabile."
+msgstr ""
+"Questo commento è stato inserito da un utente autenticato e quindi il nome "
+"non è modificabile."
 
 #: contrib/comments/models.py:123
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
-msgstr "Questo commento è stato inserito da un utente autenticato e quindi l'email non è modificabile."
+msgstr ""
+"Questo commento è stato inserito da un utente autenticato e quindi l'email "
+"non è modificabile."
 
 #: contrib/comments/models.py:148
 #, python-format
@@ -1457,7 +1484,8 @@ msgid "content types"
 msgstr "content type"
 
 #: contrib/flatpages/admin.py:9
-msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "Esempio: '/about/contact/'. Assicurati di inserire le barre diagonali "
 "iniziali e finali."
@@ -1698,7 +1726,9 @@ msgstr "I numeri di telefono devono essere in formato XX-XXXX-XXXX ."
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
-msgstr "Scegliere uno stato brasiliano valido. Questo stato non è uno di quelli disponibili."
+msgstr ""
+"Scegliere uno stato brasiliano valido. Questo stato non è uno di quelli "
+"disponibili."
 
 #: contrib/localflavor/br/forms.py:94
 msgid "Invalid CPF number."
@@ -2196,7 +2226,8 @@ msgstr "Comunità di Valenza"
 
 #: contrib/localflavor/es/forms.py:19
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "Inserisci un codice postale valido nell'intervallo e formato 01XXX - 52XXX."
+msgstr ""
+"Inserisci un codice postale valido nell'intervallo e formato 01XXX - 52XXX."
 
 #: contrib/localflavor/es/forms.py:39
 msgid ""
@@ -2227,7 +2258,8 @@ msgid "Invalid checksum for CIF."
 msgstr "Checksum non valido per il CIF."
 
 #: contrib/localflavor/es/forms.py:142
-msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
+msgid ""
+"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr ""
 "Inserisci un numero di conto corrente bancario valido nel formato XXXX-XXXX-"
 "XX-XXXXXXXXXX."
@@ -2245,7 +2277,8 @@ msgid "Enter a zip code in the format XXXXXXX."
 msgstr "Inserisci un codice postale nel formato XXXXXXX."
 
 #: contrib/localflavor/is_/forms.py:17
-msgid "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+msgid ""
+"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
 msgstr ""
 "Inserisci un numero di identificazione islandese valido. Il formato è XXXXXX-"
 "XXXX ."
@@ -2667,7 +2700,8 @@ msgid "Wrong checksum for the National Identification Number."
 msgstr "Checksum errato per il Numero Identificativo Nazionale."
 
 #: contrib/localflavor/pl/forms.py:71
-msgid "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
+msgid ""
+"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgstr ""
 "Inserisci un campo di numero d'imposta (NIP) nel formato XXX-XXX-XX-XX o XX-"
 "XX-XXX-XXX."
@@ -2764,7 +2798,8 @@ msgstr "Inserisci un codice CNP valido."
 
 #: contrib/localflavor/ro/forms.py:141
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr "Inserisci un codice IBAN valido nel formato ROXX-XXXX-XXXX-XXXX-XXXX-XXXX."
+msgstr ""
+"Inserisci un codice IBAN valido nel formato ROXX-XXXX-XXXX-XXXX-XXXX-XXXX."
 
 #: contrib/localflavor/ro/forms.py:171
 msgid "Phone numbers must be in XXXX-XXXXXX format."
@@ -3551,7 +3586,8 @@ msgstr "Data non valida: %s"
 
 #: db/models/fields/__init__.py:497 db/models/fields/__init__.py:515
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr "Inserisci una data/ora valida nel formato AAAA-MM-GG OO:MM[ss[.uuuuuu]]."
+msgstr ""
+"Inserisci una data/ora valida nel formato AAAA-MM-GG OO:MM[ss[.uuuuuu]]."
 
 #: db/models/fields/__init__.py:551
 msgid "This value must be a decimal number."
@@ -3566,15 +3602,20 @@ msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Inserisci un ora valida nel formato OO:MM[ss[.uuuuuu]]."
 
 #: db/models/fields/related.py:742
-msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "Tieni premuto \"Control\", o \"Command\" su Mac, per selezionarne più di uno."
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Tieni premuto \"Control\", o \"Command\" su Mac, per selezionarne più di uno."
 
 #: db/models/fields/related.py:819
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "Inserisci un ID valido per %(self)s. Il valore %(value)r non è valido."
-msgstr[1] "Inserisci ID validi per %(self)s. I valori %(value)r non sono validi."
+msgid_plural ""
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] ""
+"Inserisci un ID valido per %(self)s. Il valore %(value)r non è valido."
+msgstr[1] ""
+"Inserisci ID validi per %(self)s. I valori %(value)r non sono validi."
 
 #: forms/fields.py:52
 msgid "This field is required."
@@ -3645,7 +3686,8 @@ msgstr "Inserisci una coppia data/ora valida."
 
 #: forms/fields.py:441
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Non è stato inviato alcun file. Verifica il tipo di codifica della form."
+msgstr ""
+"Non è stato inviato alcun file. Verifica il tipo di codifica della form."
 
 #: forms/fields.py:442
 msgid "No file was submitted."
@@ -3659,7 +3701,8 @@ msgstr "Il file inviato è vuoto."
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
-msgstr "Carica un'immagine valida. Il file caricato non è un'immagine o è corrotto."
+msgstr ""
+"Carica un'immagine valida. Il file caricato non è un'immagine o è corrotto."
 
 #: forms/fields.py:533
 msgid "Enter a valid URL."
@@ -3672,7 +3715,8 @@ msgstr "Questa URL non sembra funzionare."
 #: forms/fields.py:602 forms/fields.py:653
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "Scegli un'opzione valida. '%(value)s non compare tra quelle disponibili."
+msgstr ""
+"Scegli un'opzione valida. '%(value)s non compare tra quelle disponibili."
 
 #: forms/fields.py:654 forms/fields.py:715 forms/models.py:531
 msgid "Enter a list of values."
@@ -3683,8 +3727,11 @@ msgid "Enter a valid IPv4 address."
 msgstr "Inserisci un indirizzo IPv4 valido."
 
 #: forms/fields.py:843
-msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "Inserisci uno 'slug' valido contenente lettere, cifre, sottolineati o trattini."
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Inserisci uno 'slug' valido contenente lettere, cifre, sottolineati o "
+"trattini."
 
 #: forms/formsets.py:242 forms/formsets.py:244
 msgid "Order"
@@ -4015,4 +4062,3 @@ msgstr "%(verbose_name)s aggiornato correttamente."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s è stato cancellato."
-
