@@ -33,7 +33,7 @@ The data models for Django's comment system have changed, as have the
 table names. Before you transfer your existing data into the new comments
 system, make sure that you have installed the new comments system as
 explained in the
-:ref:`quick start guide <ref-contrib-comments-index-quick-start-guide>`.
+:ref:`quick start guide <ref-contrib-comments-index>`.
 This will ensure that the new tables have been properly created.
 
 To transfer your data into the new comments system, you'll need to directly
