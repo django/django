@@ -29,7 +29,15 @@ The main changes from the old system are:
 Upgrading data
 --------------
 
-The data models have changed, as have the table names. To transfer your data into the new system, you'll need to directly run the following SQL:
+The data models for Django's comment system have changed, as have the
+table names. Before you transfer your existing data into the new comments
+system, make sure that you have installed the new comments system as
+explained in the
+:ref:`quick start guide <ref-contrib-comments-index-quick-start-guide>`.
+This will ensure that the new tables have been properly created.
+
+To transfer your data into the new comments system, you'll need to directly
+run the following SQL:
 
 .. code-block:: sql
 
