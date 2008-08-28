@@ -54,10 +54,10 @@ if system_type == 'nt':
         win32file.UnlockFileEx(hfile, 0, -0x10000, __overlapped)
 elif system_type == 'posix':
     def lock(file, flags):
-        fcntl.flock(fd(file), flags)
+        fcntl.lockf(fd(file), flags)
 
     def unlock(file):
-        fcntl.flock(fd(file), fcntl.LOCK_UN)
+        fcntl.lockf(fd(file), fcntl.LOCK_UN)
 else:
     # File locking is not supported.
     LOCK_EX = LOCK_SH = LOCK_NB = None
