@@ -253,7 +253,7 @@ application, add the application name to the command line. For example, if your
 ``'myproject.animals'``, you can run the ``myproject.animals`` unit tests alone
 with this command::
 
-    # ./manage.py test animals
+    $ ./manage.py test animals
 
 Note that we used ``animals``, not ``myproject.animals``.
 
