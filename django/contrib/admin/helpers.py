@@ -20,8 +20,10 @@ class AdminForm(object):
             yield Fieldset(self.form, name, **options)
 
     def first_field(self):
-        for bf in self.form:
-            return bf
+        if self.form._meta.fields is not None:
+            name = self.form._meta.fields[0]
+            return forms.BoundField(self.form, self.form.fields[name], name)
+        return iter(self.form).next()
 
     def _media(self):
         media = self.form.media
