@@ -37,6 +37,29 @@ class CustomPrimaryKey(models.Model):
     some_field = models.CharField(max_length=100)
 
 
+# models for inheritance tests.
+
+class Place(models.Model):
+    name = models.CharField(max_length=50)
+    city = models.CharField(max_length=50)
+    
+    def __unicode__(self):
+        return self.name
+
+class Owner(models.Model):
+    name = models.CharField(max_length=100)
+    place = models.ForeignKey(Place)
+
+class Restaurant(Place):
+    serves_pizza = models.BooleanField()
+    
+    def __unicode__(self):
+        return self.name
+
+class MexicanRestaurant(Restaurant):
+    serves_tacos = models.BooleanField()
+
+
 __test__ = {'API_TESTS': """
 
 >>> from datetime import date
@@ -395,5 +418,14 @@ We need to ensure that it is displayed
 ...     print form.as_p()
 <p><label for="id_form-0-my_pk">My pk:</label> <input id="id_form-0-my_pk" type="text" name="form-0-my_pk" maxlength="10" /></p>
 <p><label for="id_form-0-some_field">Some field:</label> <input id="id_form-0-some_field" type="text" name="form-0-some_field" maxlength="100" /></p>
+
+# Foreign keys in parents ########################################
+
+>>> from django.forms.models import _get_foreign_key
+
+>>> type(_get_foreign_key(Restaurant, Owner))
+<class 'django.db.models.fields.related.ForeignKey'>
+>>> type(_get_foreign_key(MexicanRestaurant, Owner))
+<class 'django.db.models.fields.related.ForeignKey'>
 
 """}
