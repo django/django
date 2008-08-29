@@ -22,7 +22,7 @@
         {% block branding %}{% endblock %}
         </div>
         {% if user.is_authenticated and user.is_staff %}
-        <div id="user-tools">{% trans 'Welcome,' %} <strong>{% if user.first_name %}{{ user.first_name|escape }}{% else %}{{ user.username }}{% endif %}</strong>. {% block userlinks %}<a href="{{ root_path }}doc/">{% trans 'Documentation' %}</a> / <a href="{{ root_path }}password_change/">{% trans 'Change password' %}</a> / <a href="{{ root_path }}logout/">{% trans 'Log out' %}</a>{% endblock %}</div>
+        <div id="user-tools">{% trans 'Welcome,' %} <strong>{% if user.first_name %}{{ user.first_name|escape }}{% else %}{{ user.username }}{% endif %}</strong>. {% block userlinks %}{% url django-admindocs-docroot as docsroot %}{% if docsroot %}<a href="{{ docsroot }}">{% trans 'Documentation' %}</a> / {% endif %}<a href="{{ root_path }}password_change/">{% trans 'Change password' %}</a> / <a href="{{ root_path }}logout/">{% trans 'Log out' %}</a>{% endblock %}</div>
         {% endif %}
         {% block nav-global %}{% endblock %}
     </div>
