@@ -11,6 +11,7 @@ from django.core.files import locks
 try:
     from shutil import copystat
 except ImportError:
+    import stat
     def copystat(src, dst):
         """Copy all stat info (mode bits, atime and mtime) from src to dst"""
         st = os.stat(src)
