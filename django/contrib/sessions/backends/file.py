@@ -5,7 +5,9 @@ import tempfile
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
+from django.core.files import locks
 
+IO_LOCK_SUFFIX = "_iolock"
 
 class SessionStore(SessionBase):
     """
@@ -42,17 +44,35 @@ class SessionStore(SessionBase):
 
         return os.path.join(self.storage_path, self.file_prefix + session_key)
 
+    def _key_to_io_lock_file(self, session_key=None):
+        """
+        Get the I/O lock file associated with this session key.
+        """
+        return self._key_to_file(session_key) + IO_LOCK_SUFFIX
+
     def load(self):
         session_data = {}
         try:
-            session_file = open(self._key_to_file(), "rb")
+            # Open and acquire a shared lock on the I/O lock file before
+            # attempting to read the session file.  This makes us wait to read
+            # the session file until another thread or process is finished
+            # writing it.
+            lock_path = self._key_to_io_lock_file()
+            io_lock_file = open(lock_path, "rb")
+            locks.lock(io_lock_file, locks.LOCK_SH)
             try:
+                session_file = open(self._key_to_file(), "rb")
                 try:
-                    session_data = self.decode(session_file.read())
-                except (EOFError, SuspiciousOperation):
-                    self.create()
+                    try:
+                        session_data = self.decode(session_file.read())
+                    except (EOFError, SuspiciousOperation):
+                        self.create()
+                finally:
+                    session_file.close()
             finally:
-                session_file.close()
+                locks.unlock(io_lock_file)
+                io_lock_file.close()
+                os.unlink(lock_path)
         except IOError:
             pass
         return session_data
@@ -76,11 +96,23 @@ class SessionStore(SessionBase):
         # truncating the file to save.
         session_data = self._get_session(no_load=must_create)
         try:
-            fd = os.open(self._key_to_file(self.session_key), flags)
+            # Open and acquire an exclusive lock on the I/O lock file before
+            # attempting to write the session file.  This makes other threads
+            # or processes wait to read or write the session file until we are
+            # finished writing it.
+            lock_path = self._key_to_io_lock_file()
+            io_lock_file = open(lock_path, "wb")
+            locks.lock(io_lock_file, locks.LOCK_EX)
             try:
-                os.write(fd, self.encode(session_data))
+                fd = os.open(self._key_to_file(self.session_key), flags)
+                try:
+                    os.write(fd, self.encode(session_data))
+                finally:
+                    os.close(fd)
             finally:
-                os.close(fd)
+                locks.unlock(io_lock_file)
+                io_lock_file.close()
+                os.unlink(lock_path)
         except OSError, e:
             if must_create and e.errno == errno.EEXIST:
                 raise CreateError
