@@ -716,7 +716,7 @@ class OneToOneField(ForeignKey):
                 SingleRelatedObjectDescriptor(related))
         if not cls._meta.one_to_one_field:
             cls._meta.one_to_one_field = self
-    
+
     def formfield(self, **kwargs):
         if self.rel.parent_link:
             return None
@@ -844,6 +844,15 @@ class ManyToManyField(RelatedField, Field):
         return smart_unicode(data)
 
     def contribute_to_class(self, cls, name):
+        # To support multiple relations to self, it's useful to have a non-None
+        # related name on symmetrical relations for internal reasons. The
+        # concept doesn't make a lot of sense externally ("you want me to
+        # specify *what* on my non-reversible relation?!"), so we set it up
+        # automatically. The funky name reduces the chance of an accidental
+        # clash.
+        if self.rel.symmetrical and self.rel.related_name is None:
+            self.rel.related_name = "%s_rel_+" % name
+
         super(ManyToManyField, self).contribute_to_class(cls, name)
         # Add the descriptor for the m2m relation
         setattr(cls, self.name, ReverseManyRelatedObjectsDescriptor(self))
