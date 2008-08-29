@@ -901,6 +901,12 @@ Pickling of DateQuerySets used to fail
 >>> qs = Item.objects.dates('created', 'month')
 >>> _ = pickle.loads(pickle.dumps(qs))
 
+Bug #8683 -- raise proper error when a DateQuerySet gets passed a wrong type of field
+>>> Item.objects.dates('name', 'month')
+Traceback (most recent call last):
+...
+AssertionError: 'name' isn't a DateField.
+
 Bug #8597: regression tests for case-insensitive comparisons
 >>> _ = Item.objects.create(name="a_b", created=datetime.datetime.now(), creator=a2, note=n1)
 >>> _ = Item.objects.create(name="x%y", created=datetime.datetime.now(), creator=a2, note=n1)

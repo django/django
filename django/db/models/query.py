@@ -737,7 +737,7 @@ class DateQuerySet(QuerySet):
         self.query.select = []
         field = self.model._meta.get_field(self._field_name, many_to_many=False)
         assert isinstance(field, DateField), "%r isn't a DateField." \
-                % field_name
+                % field.name
         self.query.add_date_select(field, self._kind, self._order)
         if field.null:
             self.query.add_filter(('%s__isnull' % field.name, False))
