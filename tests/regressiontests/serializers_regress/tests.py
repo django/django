@@ -260,11 +260,7 @@ The end."""),
     (fk_obj, 452, FKDataToField, None),
 
     (fk_obj, 460, FKDataToO2O, 300),
-    
-    # Regression test for #8651 -- FK = 0
-    (data_obj, 0, Anchor, "Anchor 0"),
-    (fk_obj, 465, FKData, 0),
-    
+        
     (im2m_obj, 470, M2MIntermediateData, None),
     
     #testing post- and prereferences and extra fields
@@ -335,6 +331,15 @@ if settings.DATABASE_ENGINE == 'oracle':
                  if not (data[0] == data_obj and
                          data[2]._meta.get_field('data').empty_strings_allowed and
                          data[3] is None)]
+
+# Regression test for #8651 -- a FK to an object iwth PK of 0
+# This won't work on MySQL since it won't let you create an object
+# with a primary key of 0,
+if settings.DATABASE_ENGINE != 'mysql':
+    test_data.extend([
+        (data_obj, 0, Anchor, "Anchor 0"),
+        (fk_obj, 465, FKData, 0),
+    ])
 
 # Dynamically create serializer tests to ensure that all
 # registered serializers are automatically tested.
