@@ -458,6 +458,31 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/delete/' % quote(self.pk))
         should_contain = """<a href="../../%s/">%s</a>""" % (quote(self.pk), escape(self.pk))
         self.assertContains(response, should_contain)
+    
+    def test_url_conflicts_with_add(self):
+        "A model with a primary key that ends with add should be visible"
+        add_model = ModelWithStringPrimaryKey(id="i have something to add")
+        add_model.save()
+        response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(add_model.pk))
+        should_contain = """<h1>Change model with string primary key</h1>"""
+        self.assertContains(response, should_contain)
+    
+    def test_url_conflicts_with_delete(self):
+        "A model with a primary key that ends with delete should be visible"
+        delete_model = ModelWithStringPrimaryKey(id="delete")
+        delete_model.save()
+        response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(delete_model.pk))
+        should_contain = """<h1>Change model with string primary key</h1>"""
+        self.assertContains(response, should_contain)
+    
+    def test_url_conflicts_with_history(self):
+        "A model with a primary key that ends with history should be visible"
+        history_model = ModelWithStringPrimaryKey(id="history")
+        history_model.save()
+        response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(history_model.pk))
+        should_contain = """<h1>Change model with string primary key</h1>"""
+        self.assertContains(response, should_contain)
+        
 
 class SecureViewTest(TestCase):
     fixtures = ['admin-views-users.xml']

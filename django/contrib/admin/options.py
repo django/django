@@ -186,11 +186,11 @@ class ModelAdmin(BaseModelAdmin):
         # Delegate to the appropriate method, based on the URL.
         if url is None:
             return self.changelist_view(request)
-        elif url.endswith('add'):
+        elif url == "add":
             return self.add_view(request)
-        elif url.endswith('history'):
+        elif url.endswith('/history'):
             return self.history_view(request, unquote(url[:-8]))
-        elif url.endswith('delete'):
+        elif url.endswith('/delete'):
             return self.delete_view(request, unquote(url[:-7]))
         else:
             return self.change_view(request, unquote(url))
