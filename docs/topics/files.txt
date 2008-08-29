@@ -39,7 +39,7 @@ the details of the attached photo::
     >>> car.photo
     <ImageFieldFile: chevy.jpg>
     >>> car.photo.name
-    u'chevy.jpg'
+    u'cars/chevy.jpg'
     >>> car.photo.path
     u'/media/cars/chevy.jpg'
     >>> car.photo.url
