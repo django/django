@@ -436,6 +436,14 @@ Traceback (most recent call last):
 ...
 UnicodeEncodeError: ..., HTTP response headers must be in US-ASCII format
 
+#
+# Regression test for #8278: QueryDict.update(QueryDict)
+#
+>>> x = QueryDict("a=1&a=2", mutable=True)
+>>> y = QueryDict("a=3&a=4")
+>>> x.update(y)
+>>> x.getlist('a')
+[u'1', u'2', u'3', u'4']
 """
 
 from django.http import QueryDict, HttpResponse
