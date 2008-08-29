@@ -20,21 +20,25 @@ class GenericSite(object):
     domain = 'example.com'
     name = 'my site'
 
+def get_root_path():
+    from django.contrib import admin
+    try:
+        return urlresolvers.reverse(admin.site.root, args=[''])
+    except urlresolvers.NoReverseMatch:
+        return getattr(settings, "ADMIN_SITE_ROOT_URL", "/admin/")
+
 def doc_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
-    root_path = re.sub(re.escape('doc/') + '$', '', request.path)
     return render_to_response('admin_doc/index.html', {
-        'root_path': root_path,
+        'root_path': get_root_path(),
     }, context_instance=RequestContext(request))
 doc_index = staff_member_required(doc_index)
 
 def bookmarklets(request):
-    # Hack! This couples this view to the URL it lives at.
-    admin_root = request.path[:-len('doc/bookmarklets/')]
-    root_path = re.sub(re.escape('doc/bookmarklets/') + '$', '', request.path)
+    admin_root = get_root_path()
     return render_to_response('admin_doc/bookmarklets.html', {
-        'root_path': root_path,
+        'root_path': admin_root,
         'admin_url': mark_safe("%s://%s%s" % (request.is_secure() and 'https' or 'http', request.get_host(), admin_root)),
     }, context_instance=RequestContext(request))
 bookmarklets = staff_member_required(bookmarklets)
@@ -66,9 +70,8 @@ def template_tag_index(request):
                 'meta': metadata,
                 'library': tag_library,
             })
-    root_path = re.sub(re.escape('doc/tags/') + '$', '', request.path)
     return render_to_response('admin_doc/template_tag_index.html', {
-        'root_path': root_path,
+        'root_path': get_root_path(),
         'tags': tags
     }, context_instance=RequestContext(request))
 template_tag_index = staff_member_required(template_tag_index)
@@ -100,9 +103,8 @@ def template_filter_index(request):
                 'meta': metadata,
                 'library': tag_library,
             })
-    root_path = re.sub(re.escape('doc/filters/') + '$', '', request.path)
     return render_to_response('admin_doc/template_filter_index.html', {
-        'root_path': root_path,
+        'root_path': get_root_path(),
         'filters': filters
     }, context_instance=RequestContext(request))
 template_filter_index = staff_member_required(template_filter_index)
@@ -132,9 +134,8 @@ def view_index(request):
                 'site': site_obj,
                 'url': simplify_regex(regex),
             })
-    root_path = re.sub(re.escape('doc/views/') + '$', '', request.path)
     return render_to_response('admin_doc/view_index.html', {
-        'root_path': root_path,
+        'root_path': get_root_path(),
         'views': views
     }, context_instance=RequestContext(request))
 view_index = staff_member_required(view_index)
@@ -155,9 +156,8 @@ def view_detail(request, view):
         body = utils.parse_rst(body, 'view', _('view:') + view)
     for key in metadata:
         metadata[key] = utils.parse_rst(metadata[key], 'model', _('view:') + view)
-    root_path = re.sub(re.escape('doc/views/%s/' % view) + '$', '', request.path)
     return render_to_response('admin_doc/view_detail.html', {
-        'root_path': root_path,
+        'root_path': get_root_path(),
         'name': view,
         'summary': title,
         'body': body,
@@ -169,9 +169,8 @@ def model_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
     m_list = [m._meta for m in models.get_models()]
-    root_path = re.sub(re.escape('doc/models/') + '$', '', request.path)
     return render_to_response('admin_doc/model_index.html', {
-        'root_path': root_path,
+        'root_path': get_root_path(),
         'models': m_list
     }, context_instance=RequestContext(request))
 model_index = staff_member_required(model_index)
@@ -246,9 +245,8 @@ def model_detail(request, app_label, model_name):
             'data_type' : 'Integer',
             'verbose'   : utils.parse_rst(_("number of %s") % verbose , 'model', _('model:') + opts.module_name),
         })
-    root_path = re.sub(re.escape('doc/models/%s.%s/' % (app_label, model_name)) + '$', '', request.path)
     return render_to_response('admin_doc/model_detail.html', {
-        'root_path': root_path,
+        'root_path': get_root_path(),
         'name': '%s.%s' % (opts.app_label, opts.object_name),
         'summary': _("Fields on %s objects") % opts.object_name,
         'description': model.__doc__,
@@ -274,9 +272,8 @@ def template_detail(request, template):
                 'site': site_obj,
                 'order': list(settings_mod.TEMPLATE_DIRS).index(dir),
             })
-    root_path = re.sub(re.escape('doc/templates/%s/' % template) + '$', '', request.path)
     return render_to_response('admin_doc/template_detail.html', {
-        'root_path': root_path,
+        'root_path': get_root_path(),
         'name': template,
         'templates': templates,
     }, context_instance=RequestContext(request))
