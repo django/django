@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-29 23:30+0200\n"
+"POT-Creation-Date: 2008-08-29 15:35-0700\n"
 "PO-Revision-Date: 2008-08-29 02:31+0100\n"
 "Last-Translator: David Larlet <http://david.larlet.fr>\n"
 "Language-Team: français <fr@li.org>\n"
@@ -2599,12 +2599,12 @@ msgstr "Jalisco"
 
 #: contrib/localflavor/mx/mx_states.py:26
 #, fuzzy
-msgid "Estado de MÃ©xico"
+msgid "Estado de México"
 msgstr "État de Mexico"
 
 #: contrib/localflavor/mx/mx_states.py:27
 #, fuzzy
-msgid "MichoacÃ¡n"
+msgid "Michoacán"
 msgstr "Michoacán"
 
 #: contrib/localflavor/mx/mx_states.py:28
@@ -2617,7 +2617,7 @@ msgstr "Nayarit"
 
 #: contrib/localflavor/mx/mx_states.py:30
 #, fuzzy
-msgid "Nuevo LeÃ³n"
+msgid "Nuevo León"
 msgstr "Nuevo León"
 
 #: contrib/localflavor/mx/mx_states.py:31
@@ -2630,7 +2630,7 @@ msgstr "Puebla"
 
 #: contrib/localflavor/mx/mx_states.py:33
 #, fuzzy
-msgid "QuerÃ©taro"
+msgid "Querétaro"
 msgstr "Querétaro"
 
 #: contrib/localflavor/mx/mx_states.py:34
@@ -2643,7 +2643,7 @@ msgstr "Sinaloa"
 
 #: contrib/localflavor/mx/mx_states.py:36
 #, fuzzy
-msgid "San Luis PotosÃ­"
+msgid "San Luis Potosí"
 msgstr "San Luis Potosí"
 
 #: contrib/localflavor/mx/mx_states.py:37
@@ -2668,7 +2668,7 @@ msgstr "Veracruz"
 
 #: contrib/localflavor/mx/mx_states.py:42
 #, fuzzy
-msgid "YucatÃ¡n"
+msgid "Yucatán"
 msgstr "Yucatán"
 
 #: contrib/localflavor/mx/mx_states.py:43
@@ -2772,7 +2772,8 @@ msgstr ""
 
 #: contrib/localflavor/pl/forms.py:112
 msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr "Mauvais checksum pour le \"National Business Register Number\" (REGON)."
+msgstr ""
+"Mauvais checksum pour le \"National Business Register Number\" (REGON)."
 
 #: contrib/localflavor/pl/forms.py:155
 msgid "Enter a postal code in the format XX-XXX."
@@ -3668,8 +3669,8 @@ msgstr "Entrez une heure valide au format HH:MM[:ss[.uuuuuu]]."
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-"Maintenez appuyé \"Contrôle (ctrl)\", ou \"Commande (touche pomme)\" sur un Mac, "
-"pour en sélectionner plusieurs."
+"Maintenez appuyé \"Contrôle (ctrl)\", ou \"Commande (touche pomme)\" sur un "
+"Mac, pour en sélectionner plusieurs."
 
 #: db/models/fields/related.py:825
 #, fuzzy, python-format
