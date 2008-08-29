@@ -36,6 +36,14 @@ class AdminViewBasicTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/section/add/')
         self.failUnlessEqual(response.status_code, 200)
     
+    def testAddWithGETArgs(self):
+        response = self.client.get('/test_admin/admin/admin_views/section/add/', {'name': 'My Section'})
+        self.failUnlessEqual(response.status_code, 200)
+        self.failUnless(
+            'value="My Section"' in response.content, 
+            "Couldn't find an input with the right value in the response."
+        )
+    
     def testBasicEditGet(self):
         """
         A smoke test to ensureGET on the change_view works.

@@ -503,7 +503,17 @@ class ModelAdmin(BaseModelAdmin):
                 self.log_addition(request, new_object)
                 return self.response_add(request, new_object)
         else:
-            form = ModelForm(initial=dict(request.GET.items()))
+            # Prepare the dict of initial data from the request.
+            # We have to special-case M2Ms as a list of comma-separated PKs.
+            initial = dict(request.GET.items())
+            for k in initial:
+                try:
+                    f = opts.get_field(k)
+                except FieldDoesNotExist:
+                    pass
+                if isinstance(f, models.ManyToManyField):
+                    initial[k] = initial[k].split(",")
+            form = ModelForm(initial=initial)
             for FormSet in self.get_formsets(request):
                 formset = FormSet(instance=self.model())
                 formsets.append(formset)
