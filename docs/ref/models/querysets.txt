@@ -145,10 +145,45 @@ like so::
 Note: ``order_by('?')`` queries may be expensive and slow, depending on the
 database backend you're using.
 
-To order by a field in a different table, add the other table's name and a dot,
-like so::
+To order by a field in a different model, use the same syntax as when you are
+querying across model relations. That is, the name of the field, followed by a
+double underscore (``__``), followed by the name of the field in the new model,
+and so on for as many models as you want to join. For example::
 
-    Entry.objects.order_by('blogs_blog.name', 'headline')
+    Entry.objects.order_by('blog__name', 'headline')
+
+If you try to order by a field that is a relation to another model, Django will
+use the default ordering on the related model (or order by the related model's
+primary key if there is no ``Meta.ordering`` specified. For example::
+
+    Entry.objects.order_by('blog')
+
+...is identical to::
+
+    Entry.objects.order_by('blog__id')
+
+...since the ``Blog`` model has no default ordering specified.
+
+Be cautious when ordering by fields in related models if you are also using
+``distinct()``. See the note in the `distinct()`_ section for an explanation
+of how related model ordering can change the expected results.
+
+It is permissible to specify a multi-valued field to order the results by (for
+example, a ``ManyToMany`` field). Normally this won't be a sensible thing to
+do and it's really an advanced usage feature. However, if you know that your
+queryset's filtering or available data implies that there will only be one
+ordering piece of data for each of the main items you are selecting, the
+ordering may well be exactly what you want to do. Use ordering on multi-valued
+fields with care and make sure the results are what you expect.
+
+**New in Django development version:** If you don't want any ordering to be
+applied to a query, not even the default ordering, call ``order_by()`` with no
+parameters.
+
+**New in Django development version:** The syntax for ordering across related
+models has changed. See the `Django 0.96 documentation`_ for the old behaviour.
+
+.. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
 
 There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
@@ -171,10 +206,29 @@ eliminates duplicate rows from the query results.
 
 By default, a ``QuerySet`` will not eliminate duplicate rows. In practice, this
 is rarely a problem, because simple queries such as ``Blog.objects.all()``
-don't introduce the possibility of duplicate result rows.
+don't introduce the possibility of duplicate result rows. However, if your
+query spans multiple tables, it's possible to get duplicate results when a
+``QuerySet`` is evaluated. That's when you'd use ``distinct()``.
 
-However, if your query spans multiple tables, it's possible to get duplicate
-results when a ``QuerySet`` is evaluated. That's when you'd use ``distinct()``.
+.. note::
+    Any fields used in an `order_by(*fields)`_ call are included in the SQL
+    ``SELECT`` columns. This can sometimes lead to unexpected results when
+    used in conjunction with ``distinct()``. If you order by fields from a
+    related model, those fields will be added to the selected columns and they
+    may make otherwise duplicate rows appear to be distinct. Since the extra
+    columns don't appear in the returned results (they are only there to
+    support ordering), it sometimes looks like non-distinct results are being
+    returned.
+
+    Similarly, if you use a ``values()`` query to restrict the columns
+    selected, the columns used in any ``order_by()`` (or default model
+    ordering) will still be involved and may affect uniqueness of the results.
+
+    The moral here is that if you are using ``distinct()`` be careful about
+    ordering by related models. Similarly, when using ``distinct()`` and
+    ``values()`` together, be careful when ordering by fields not in the
+    ``values()`` call.
+
 
 ``values(*fields)``
 ~~~~~~~~~~~~~~~~~~~
@@ -209,6 +263,37 @@ Example::
     >>> Blog.objects.values('id', 'name')
     [{'id': 1, 'name': 'Beatles Blog'}]
 
+A couple of subtleties that are worth mentioning:
+
+    * The ``values()`` method does not return anything for
+      :class:`~django.db.models.ManyToManyField` attributes and will raise an
+      error if you try to pass in this type of field to it.
+    * If you have a field called ``foo`` that is a
+      :class:`~django.db.models.ForeignKey`, the default ``values()`` call
+      will return a dictionary key called ``foo_id``, since this is the name
+      of the hidden model attribute that stores the actual value (the ``foo``
+      attribute refers to the related model). When you are calling
+      ``values()`` and passing in field names, you can pass in either ``foo``
+      or ``foo_id`` and you will get back the same thing (the dictionary key
+      will match the field name you passed in).
+
+      For example::
+
+        >>> Entry.objects.values()
+        [{'blog_id: 1, 'headline': u'First Entry', ...}, ...]
+
+        >>> Entry.objects.values('blog')
+        [{'blog': 1}, ...]
+
+        >>> Entry.objects.values('blog_id')
+        [{'blog_id': 1}, ...]
+    * When using ``values()`` together with ``distinct()``, be aware that
+      ordering can affect the results. See the note in the `distinct()`_
+      section, above, for details.
+
+**New in Django development version:** Previously, it was not possible to pass
+``blog_id`` to ``values()`` in the above example, only ``blog``.
+
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
 from a small number of the available fields and you won't need the
 functionality of a model instance object. It's more efficient to select only
@@ -225,6 +310,34 @@ The people who made Django prefer to put all the SQL-affecting methods first,
 followed (optionally) by any output-affecting methods (such as ``values()``),
 but it doesn't really matter. This is your chance to really flaunt your
 individualism.
+
+``values_list(*fields)``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+This is similar to ``values()`` except that instead of returning a list of
+dictionaries, it returns a list of tuples. Each tuple contains the value from
+the respective field passed into the ``values_list()`` call -- so the first
+item is the first field, etc. For example::
+
+    >>> Entry.objects.values_list('id', 'headline')
+    [(1, u'First entry'), ...]
+
+If you only pass in a single field, you can also pass in the ``flat``
+parameter. If ``True``, this will mean the returned results are single values,
+rather than one-tuples. An example should make the difference clearer::
+
+    >>> Entry.objects.values_list('id').order_by('id')
+    [(1,), (2,), (3,), ...]
+
+    >>> Entry.objects.values_list('id', flat=True).order_by('id')
+    [1, 2, 3, ...]
+
+It is an error to pass in ``flat`` when there is more than one field.
+
+If you don't pass any values to ``values_list()``, it will return all the
+fields in the model, in the order they were declared.
 
 ``dates(field, kind, order='ASC')``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
