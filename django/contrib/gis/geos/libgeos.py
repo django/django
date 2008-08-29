@@ -35,7 +35,7 @@ elif os.name == 'posix':
     # *NIX libraries
     lib_names = ['geos_c']
 else:
-    raise RuntimeError('Unsupported OS "%s"' % os.name)
+    raise ImportError('Unsupported OS "%s"' % os.name)
 
 # Using the ctypes `find_library` utility to find the the path to the GEOS 
 # shared library.  This is better than manually specifiying each library name 
@@ -47,7 +47,7 @@ if lib_names:
 
 # No GEOS library could be found.
 if lib_path is None: 
-    raise RuntimeError('Could not find the GEOS library (tried "%s"). '
+    raise ImportError('Could not find the GEOS library (tried "%s"). '
                         'Try setting GEOS_LIBRARY_PATH in your settings.' % 
                         '", "'.join(lib_names))
 
