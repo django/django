@@ -1,11 +1,10 @@
 # translation of django.po to Italiano
-# Nicola Larosa <nico@tekNico.net>, 2008.
 # Italian translation of Django.
 # Copyright (C) 2006 the Lawrence Journal-World
 # This file is distributed under the same license as the Django package.
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django vSVN\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-08-29 18:26+0200\n"
 "PO-Revision-Date: 2008-08-29 18:25+0200\n"
