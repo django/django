@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-09 11:51+0100\n"
-"PO-Revision-Date: 2008-08-19 20:12+0200\n"
+"PO-Revision-Date: 2008-08-29 16:12+0200\n"
 "Last-Translator: Christian Mikalsen and Jon Lønne\n"
 "Language-Team: Norsk <no@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "%s er tilgjengelige"
+msgstr "Tilgjengelige %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
@@ -38,11 +38,11 @@ msgstr "Valgte %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "Velg ditt svaralternativ(er) og klikk "
+msgstr "Velg ditt valg og klikk "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr "Tøm"
+msgstr "Fjern alle"
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
