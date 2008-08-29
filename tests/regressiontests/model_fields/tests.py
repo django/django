@@ -45,5 +45,31 @@ datetime.time(1, 2, 3, 4)
 >>> f.to_python('01:02:03.999999')
 datetime.time(1, 2, 3, 999999)
 
+# Boolean and null boolean fields
+>>> f = BooleanField()
+>>> for val in (True, '1', 1):
+...     f.get_db_prep_lookup('exact', val)
+[True]
+[True]
+[True]
+>>> for val in (False, '0', 0):
+...     f.get_db_prep_lookup('exact', val)
+[False]
+[False]
+[False]
+
+>>> f = NullBooleanField()
+>>> for val in (True, '1', 1):
+...     f.get_db_prep_lookup('exact', val)
+[True]
+[True]
+[True]
+>>> for val in (False, '0', 0):
+...     f.get_db_prep_lookup('exact', val)
+[False]
+[False]
+[False]
+>>> f.get_db_prep_lookup('exact', None)
+[None]
 
 """

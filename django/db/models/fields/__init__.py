@@ -362,6 +362,15 @@ class BooleanField(Field):
         raise exceptions.ValidationError(
             _("This value must be either True or False."))
 
+    def get_db_prep_lookup(self, lookup_type, value):
+        # Special-case handling for filters coming from a web request (e.g. the
+        # admin interface). Only works for scalar values (not lists). If you're
+        # passing in a list, you might as well make things the right type when
+        # constructing the list.
+        if value in ('1', '0'):
+            value = bool(int(value))
+        return super(BooleanField, self).get_db_prep_lookup(lookup_type, value)
+
     def get_db_prep_value(self, value):
         if value is None:
             return None
@@ -692,6 +701,15 @@ class NullBooleanField(Field):
         if value in ('f', 'False', '0'): return False
         raise exceptions.ValidationError(
             _("This value must be either None, True or False."))
+
+    def get_db_prep_lookup(self, lookup_type, value):
+        # Special-case handling for filters coming from a web request (e.g. the
+        # admin interface). Only works for scalar values (not lists). If you're
+        # passing in a list, you might as well make things the right type when
+        # constructing the list.
+        if value in ('1', '0'):
+            value = bool(int(value))
+        return super(NullBooleanField, self).get_db_prep_lookup(lookup_type, value)
 
     def get_db_prep_value(self, value):
         if value is None:
