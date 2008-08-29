@@ -510,7 +510,7 @@ class ModelAdmin(BaseModelAdmin):
                 try:
                     f = opts.get_field(k)
                 except FieldDoesNotExist:
-                    pass
+                    continue
                 if isinstance(f, models.ManyToManyField):
                     initial[k] = initial[k].split(",")
             form = ModelForm(initial=initial)
