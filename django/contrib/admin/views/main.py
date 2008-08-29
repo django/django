@@ -179,6 +179,10 @@ class ChangeList(object):
                 del lookup_params[key]
                 lookup_params[smart_str(key)] = value
 
+            # if key ends with __in, split parameter into separate values
+            if key.endswith('__in'):
+                lookup_params[key] = value.split(',')
+
         # Apply lookup parameters from the query string.
         qs = qs.filter(**lookup_params)
 

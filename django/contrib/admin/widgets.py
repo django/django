@@ -102,7 +102,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     def render(self, name, value, attrs=None):
         related_url = '../../../%s/%s/' % (self.rel.to._meta.app_label, self.rel.to._meta.object_name.lower())
         if self.rel.limit_choices_to:
-            url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in self.rel.limit_choices_to.items()])
+            url = '?' + '&amp;'.join(['%s=%s' % (k, ','.join(v)) for k, v in self.rel.limit_choices_to.items()])
         else:
             url = ''
         if not attrs.has_key('class'):
