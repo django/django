@@ -125,12 +125,18 @@ class RelatedField(object):
             # that object. In certain conditions (especially one-to-one relations),
             # the primary key may itself be an object - so we need to keep drilling
             # down until we hit a value that can be used for a comparison.
-            v = value
+            v, field = value, None
             try:
                 while True:
-                    v = getattr(v, v._meta.pk.name)
+                    v, field = getattr(v, v._meta.pk.name), v._meta.pk
             except AttributeError:
                 pass
+            if field:
+                if lookup_type in ('range', 'in'):
+                    v = [v]
+                v = field.get_db_prep_lookup(lookup_type, v)
+                if isinstance(v, list):
+                    v = v[0]
             return v
 
         if hasattr(value, 'as_sql'):
@@ -138,7 +144,7 @@ class RelatedField(object):
             return QueryWrapper(('(%s)' % sql), params)
         if lookup_type == 'exact':
             return [pk_trace(value)]
-        if lookup_type == 'in':
+        if lookup_type in ('range', 'in'):
             return [pk_trace(v) for v in value]
         elif lookup_type == 'isnull':
             return []
