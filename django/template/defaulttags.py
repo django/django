@@ -351,22 +351,40 @@ class TemplateTagNode(Node):
         return self.mapping.get(self.tagtype, '')
 
 class URLNode(Node):
-    def __init__(self, view_name, args, kwargs):
+    def __init__(self, view_name, args, kwargs, asvar):
         self.view_name = view_name
         self.args = args
         self.kwargs = kwargs
+        self.asvar = asvar
 
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
         kwargs = dict([(smart_str(k,'ascii'), v.resolve(context))
                        for k, v in self.kwargs.items()])
+        
+        
+        # Try to look up the URL twice: once given the view name, and again
+        # relative to what we guess is the "main" app. If they both fail, 
+        # re-raise the NoReverseMatch unless we're using the 
+        # {% url ... as var %} construct in which cause return nothing.
+        url = ''
         try:
-            return reverse(self.view_name, args=args, kwargs=kwargs)
+            url = reverse(self.view_name, args=args, kwargs=kwargs)
         except NoReverseMatch:
             project_name = settings.SETTINGS_MODULE.split('.')[0]
-            return reverse(project_name + '.' + self.view_name,
-                           args=args, kwargs=kwargs)
+            try:
+                url = reverse(project_name + '.' + self.view_name,
+                              args=args, kwargs=kwargs)
+            except NoReverseMatch:
+                if self.asvar is None:
+                    raise
+                    
+        if self.asvar:
+            context[self.asvar] = url
+            return ''
+        else:
+            return url
 
 class WidthRatioNode(Node):
     def __init__(self, val_expr, max_expr, max_width):
@@ -1041,21 +1059,30 @@ def url(parser, token):
 
     The URL will look like ``/clients/client/123/``.
     """
-    bits = token.contents.split(' ', 2)
+    bits = token.contents.split(' ')
     if len(bits) < 2:
         raise TemplateSyntaxError("'%s' takes at least one argument"
                                   " (path to a view)" % bits[0])
+    viewname = bits[1]
     args = []
     kwargs = {}
+    asvar = None
+        
     if len(bits) > 2:
-        for arg in bits[2].split(','):
-            if '=' in arg:
-                k, v = arg.split('=', 1)
-                k = k.strip()
-                kwargs[k] = parser.compile_filter(v)
+        bits = iter(bits[2:])
+        for bit in bits:
+            if bit == 'as':
+                asvar = bits.next()
+                break
             else:
-                args.append(parser.compile_filter(arg))
-    return URLNode(bits[1], args, kwargs)
+                for arg in bit.split(","):
+                    if '=' in arg:
+                        k, v = arg.split('=', 1)
+                        k = k.strip()
+                        kwargs[k] = parser.compile_filter(v)
+                    elif arg:
+                        args.append(parser.compile_filter(arg))
+    return URLNode(viewname, args, kwargs, asvar)
 url = register.tag(url)
 
 #@register.tag

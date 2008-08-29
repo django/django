@@ -896,6 +896,11 @@ class Templates(unittest.TestCase):
             'url-fail02': ('{% url no_such_view %}', {}, urlresolvers.NoReverseMatch),
             'url-fail03': ('{% url regressiontests.templates.views.client %}', {}, urlresolvers.NoReverseMatch),
 
+            # {% url ... as var %}
+            'url-asvar01': ('{% url regressiontests.templates.views.index as url %}', {}, ''),
+            'url-asvar02': ('{% url regressiontests.templates.views.index as url %}{{ url }}', {}, '/url_tag/'),
+            'url-asvar03': ('{% url no_such_view as url %}{{ url }}', {}, ''),
+
             ### CACHE TAG ######################################################
             'cache01': ('{% load cache %}{% cache -1 test %}cache01{% endcache %}', {}, 'cache01'),
             'cache02': ('{% load cache %}{% cache -1 test %}cache02{% endcache %}', {}, 'cache02'),

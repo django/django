@@ -675,6 +675,29 @@ The template tag will output the string ``/clients/client/123/``.
 <naming-url-patterns>`, you can refer to the name of the pattern in the ``url``
 tag instead of using the path to the view.
 
+Note that if the URL you're reversing doesn't exist, you'll get an
+:exc:`NoReverseMatch` exception raised, which will cause your site to display an
+error page.
+
+**New in development verson:** If you'd like to retrieve a URL without displaying it,
+you can use a slightly different call:
+
+.. code-block:: html+django
+
+    {% url path.to.view arg, arg2 as the_url %}
+    
+    <a href="{{ the_url }}">I'm linking to {{ the_url }}</a>
+    
+This ``{% url ... as var %}`` syntax will *not* cause an error if the view is
+missing. In practice you'll use this to link to views that are optional:
+
+.. code-block:: html+django
+
+    {% url path.to.view as the_url %}
+    {% if the_url %}
+      <a href="{{ the_url }}">Link to optional stuff</a>
+    {% endif %}
+
 .. templatetag:: widthratio
 
 widthratio
