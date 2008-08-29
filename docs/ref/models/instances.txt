@@ -31,9 +31,14 @@ Saving objects
 
 To save an object back to the database, call ``save()``:
 
-.. method:: Model.save([raw=False])
+.. method:: Model.save([force_insert=False, force_update=False])
 
 Of course, there's some subtleties; see the sections below.
+
+**New in Django development version:** The signature of the ``save()`` method
+has changed from earlier versions (``force_insert`` and ``force_update`` have
+been added). If you are overriding these methods, be sure to use the correct
+signature.
 
 Auto-incrementing primary keys
 ------------------------------
