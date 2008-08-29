@@ -118,46 +118,48 @@ in the same order as the fields are defined in the model.
 
 The ``field_options`` dictionary can have the following keys:
 
-``fields``
-    A tuple of field names to display in this fieldset. This key is required.
+    * ``fields``
+        A tuple of field names to display in this fieldset. This key is
+        required.
+        
+        Example::
+        
+            {
+            'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
+            }
+            
+        To display multiple fields on the same line, wrap those fields in
+        their own tuple. In this example, the ``first_name`` and ``last_name``
+        fields will display on the same line::
 
-    Example::
+            {
+            'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
+            }
 
-        {
-        'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
-        }
+    * ``classes``
+        A list containing extra CSS classes to apply to the fieldset.
+        
+        Example::
+        
+            {
+            'classes': ['wide', 'extrapretty'],
+            }
 
-    To display multiple fields on the same line, wrap those fields in their own
-    tuple. In this example, the ``first_name`` and ``last_name`` fields will
-    display on the same line::
+        Two useful classes defined by the default admin-site stylesheet are
+        ``collapse`` and ``wide``. Fieldsets with the ``collapse`` style will
+        be initially collapsed in the admin and replaced with a small
+        "click to expand" link. Fieldsets with the ``wide`` style will be
+        given extra horizontal space.
 
-        {
-        'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
-        }
+    * ``description``
+        A string of optional extra text to be displayed at the top of each
+        fieldset, under the heading of the fieldset.
 
-``classes``
-    A list containing extra CSS classes to apply to the fieldset.
-
-    Example::
-
-        {
-        'classes': ['wide', 'extrapretty'],
-        }
-
-    Two useful classes defined by the default admin-site stylesheet are
-    ``collapse`` and ``wide``. Fieldsets with the ``collapse`` style will be
-    initially collapsed in the admin and replaced with a small "click to expand"
-    link. Fieldsets with the ``wide`` style will be given extra horizontal space.
-
-``description``
-    A string of optional extra text to be displayed at the top of each fieldset,
-    under the heading of the fieldset.
-
-    Note that this value is *not* HTML-escaped when it's displayed in
-    the admin interface. This lets you include HTML if you so desire.
-    Alternatively you can use plain text and
-    ``django.utils.html.escape()`` to escape any HTML special
-    characters.
+        Note that this value is *not* HTML-escaped when it's displayed in
+        the admin interface. This lets you include HTML if you so desire.
+        Alternatively you can use plain text and
+        ``django.utils.html.escape()`` to escape any HTML special
+        characters.
 
 ``fields``
 ~~~~~~~~~~
