@@ -509,7 +509,7 @@ class ModelAdmin(BaseModelAdmin):
             for k in initial:
                 try:
                     f = opts.get_field(k)
-                except FieldDoesNotExist:
+                except models.FieldDoesNotExist:
                     continue
                 if isinstance(f, models.ManyToManyField):
                     initial[k] = initial[k].split(",")
