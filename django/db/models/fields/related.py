@@ -850,7 +850,7 @@ class ManyToManyField(RelatedField, Field):
         # specify *what* on my non-reversible relation?!"), so we set it up
         # automatically. The funky name reduces the chance of an accidental
         # clash.
-        if self.rel.symmetrical and self.rel.related_name is None:
+        if self.rel.symmetrical and self.rel.to == "self" and self.rel.related_name is None:
             self.rel.related_name = "%s_rel_+" % name
 
         super(ManyToManyField, self).contribute_to_class(cls, name)
