@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-30 10:43-0700\n"
+"POT-Creation-Date: 2008-08-30 13:08+0200\n"
 "PO-Revision-Date: 2008-08-30 13:10+0200\n"
 "Last-Translator: Georgi Stanojevski <glisha@gmail.com>\n"
 "Language-Team: macedonian <ossm-members@hedona.on.net.mk>\n"
@@ -338,8 +338,7 @@ msgstr "%(name)s \"%(obj)s\" беше успешно изменета."
 
 #: contrib/admin/options.py:456
 #, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" беше успешно додадена.Подолу можете повторно да ја "
 "уредите."
@@ -755,8 +754,7 @@ msgstr "Избриши?"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
-"Ви благодариме што денеска поминавте квалитетно време со интернет страницава."
+msgstr "Ви благодариме што денеска поминавте квалитетно време со интернет страницава."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
@@ -866,8 +864,7 @@ msgstr ""
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr ""
-"Ја добивата оваа порака бидејќи побаравте да се ресетира вашата лозинка"
+msgstr "Ја добивата оваа порака бидејќи побаравте да се ресетира вашата лозинка"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -1129,8 +1126,7 @@ msgstr "Уреди го овој објект (во овој прозорец)"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Скокнува до админ страницата за страници кои претставуваат единечен објект."
+msgstr "Скокнува до админ страницата за страници кои претставуваат единечен објект."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
@@ -1238,8 +1234,7 @@ msgstr "Стара лозинка"
 
 #: contrib/auth/forms.py:176
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr ""
-"Не ја внесовте точно вашата стара лозинка. Ве молам внесете ја повторно."
+msgstr "Не ја внесовте точно вашата стара лозинка. Ве молам внесете ја повторно."
 
 #: contrib/auth/models.py:72 contrib/auth/models.py:95
 msgid "name"
@@ -1299,8 +1294,7 @@ msgstr "статус на администраторите"
 
 #: contrib/auth/models.py:141
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
-"Означува дали корисникот може да се логира во сајтот за администрација."
+msgstr "Означува дали корисникот може да се логира во сајтот за администрација."
 
 #: contrib/auth/models.py:142
 msgid "active"
@@ -1387,10 +1381,8 @@ msgid "Comment"
 msgstr "Коментар"
 
 #: contrib/comments/forms.py:24
-msgid ""
-"If you enter anything in this field your comment will be treated as spam"
-msgstr ""
-"Ако внесете нешто во ова поле вашиот коментар ќе биде означен како спам"
+msgid "If you enter anything in this field your comment will be treated as spam"
+msgstr "Ако внесете нешто во ова поле вашиот коментар ќе биде означен како спам"
 
 #: contrib/comments/forms.py:124
 #, python-format
@@ -1428,10 +1420,8 @@ msgid "is public"
 msgstr "е јавен"
 
 #: contrib/comments/models.py:59
-msgid ""
-"Uncheck this box to make the comment effectively disappear from the site."
-msgstr ""
-"Одштиклирајте го ова за да направите коментаров да исчезне од овој сајт."
+msgid "Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Одштиклирајте го ова за да направите коментаров да исчезне од овој сајт."
 
 #: contrib/comments/models.py:61
 msgid "is removed"
@@ -1489,8 +1479,7 @@ msgid "content types"
 msgstr "content types"
 
 #: contrib/flatpages/admin.py:9
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "На пр. „/za/kontakt/“. Осигурајте се да имате коса црта и на крајот и на "
 "почетокот."
@@ -1499,8 +1488,7 @@ msgstr ""
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
-msgstr ""
-"Оваа вредност смее да има само букви, бројки, долни црти, црти или коси црти."
+msgstr "Оваа вредност смее да има само букви, бројки, долни црти, црти или коси црти."
 
 #: contrib/flatpages/admin.py:22
 msgid "Advanced options"
@@ -1552,9 +1540,7 @@ msgstr "статични страници"
 msgid ""
 "We apologize, but your form has expired. Please continue filling out the "
 "form from this page."
-msgstr ""
-"Се извинуваме но вашата форма истече. Ве молам продолжете пополнувајќи ја "
-"формата од оваа страница."
+msgstr "Се извинуваме но вашата форма истече. Ве молам продолжете пополнувајќи ја формата од оваа страница."
 
 #: contrib/gis/forms/fields.py:14
 msgid "No geometry value provided."
@@ -1738,8 +1724,7 @@ msgstr "Телефонските броеви мора да бидат во XX-X
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
-msgstr ""
-"Изберете правилна бразилска држава. Оваа држава не е од достапните држави."
+msgstr "Изберете правилна бразилска држава. Оваа држава не е од достапните држави."
 
 #: contrib/localflavor/br/forms.py:94
 msgid "Invalid CPF number."
@@ -2266,8 +2251,7 @@ msgid "Invalid checksum for CIF."
 msgstr "Неправилна контролна сум за CIF."
 
 #: contrib/localflavor/es/forms.py:142
-msgid ""
-"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
+msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr "Внесете правилна банкарска сметка во формат XXXX-XXXX-XX-XXXXXXXXXX."
 
 #: contrib/localflavor/es/forms.py:143
@@ -2283,10 +2267,8 @@ msgid "Enter a zip code in the format XXXXXXX."
 msgstr "Внесете правилен поштенски број во форматот  XXXXXXXX."
 
 #: contrib/localflavor/is_/forms.py:17
-msgid ""
-"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
-msgstr ""
-"Внесете валиден идентификационен број од Исланд. Форматот е XXXXXX-XXXX."
+msgid "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+msgstr "Внесете валиден идентификационен број од Исланд. Форматот е XXXXXX-XXXX."
 
 #: contrib/localflavor/is_/forms.py:18
 msgid "The Icelandic identification number is not valid."
@@ -2705,10 +2687,8 @@ msgid "Wrong checksum for the National Identification Number."
 msgstr "Погрешна проверка за Националниот идентификационен број."
 
 #: contrib/localflavor/pl/forms.py:71
-msgid ""
-"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
-msgstr ""
-"Внесете даночен број (NIP) во форматот XXX-XXX-XX-XX или XX-XX-XXX-XXX."
+msgid "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
+msgstr "Внесете даночен број (NIP) во форматот XXX-XXX-XX-XX или XX-XX-XXX-XXX."
 
 #: contrib/localflavor/pl/forms.py:72
 msgid "Wrong checksum for the Tax Number (NIP)."
@@ -2716,13 +2696,11 @@ msgstr "Даночниот број (NIP) е погрешен."
 
 #: contrib/localflavor/pl/forms.py:111
 msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
-msgstr ""
-"Националниот бизнис регистрациски број (REGON) се состои од 7 или 9 цифри."
+msgstr "Националниот бизнис регистрациски број (REGON) се состои од 7 или 9 цифри."
 
 #: contrib/localflavor/pl/forms.py:112
 msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr ""
-"Неправилна контролна сум за Националниот бизнис регистрационен број (REGON)."
+msgstr "Неправилна контролна сум за Националниот бизнис регистрационен број (REGON)."
 
 #: contrib/localflavor/pl/forms.py:155
 msgid "Enter a postal code in the format XX-XXX."
@@ -3606,16 +3584,13 @@ msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Внесете правилно време во HH:MM[:ss[.uuuuuu]] формат."
 
 #: db/models/fields/related.py:748
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"Држете го „Control“ или „Command“ на Мекинтош за да изберете повеќе од едно."
+msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "Држете го „Control“ или „Command“ на Мекинтош за да изберете повеќе од едно."
 
 #: db/models/fields/related.py:825
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] ""
 "Ве молам внесете правилен %(self)s идентификацион број. Оваа вредност %"
 "(value)r е неправилна."
@@ -3634,14 +3609,12 @@ msgstr "Внесете правилна вредност."
 #: forms/fields.py:133
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
-msgstr ""
-"Осигурајте се дека оваа вредност има најмногу %(max)d знаци (има %(length)d)."
+msgstr "Осигурајте се дека оваа вредност има најмногу %(max)d знаци (има %(length)d)."
 
 #: forms/fields.py:134
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
-msgstr ""
-"Осигурајте се дека оваа вредност има најмалку %(min)d знаци (има %(length)d)."
+msgstr "Осигурајте се дека оваа вредност има најмалку %(min)d знаци (има %(length)d)."
 
 #: forms/fields.py:161
 msgid "Enter a whole number."
@@ -3730,8 +3703,7 @@ msgid "Enter a valid IPv4 address."
 msgstr "Внесeте правилна IPv4 адреса."
 
 #: forms/fields.py:854
-msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Внесете правилно кратко име (slug) кое се соддржи од букви, цифри, долна "
 "црта или тире."
@@ -4063,3 +4035,4 @@ msgstr "%(verbose_name)s беше успешно ажуриран."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s беше избришан."
+
