@@ -280,7 +280,9 @@ class Options(object):
     def get_all_field_names(self):
         """
         Returns a list of all field names that are possible for this model
-        (including reverse relation names).
+        (including reverse relation names). This is used for pretty printing
+        debugging output (a list of choices), so any internal-only field names
+        are not included.
         """
         try:
             cache = self._name_map
@@ -288,7 +290,9 @@ class Options(object):
             cache = self.init_name_map()
         names = cache.keys()
         names.sort()
-        return names
+        # Internal-only names end with "+" (symmetrical m2m related names being
+        # the main example). Trim them.
+        return [val for val in names if not val.endswith('+')]
 
     def init_name_map(self):
         """

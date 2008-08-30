@@ -52,5 +52,12 @@ __test__ = {"regressions": """
 >>> e1.related.all()
 [<Tag: t2>]
 
+# The secret internal related names for self-referential many-to-many fields
+# shouldn't appear in the list when an error is made.
+>>> SelfRefer.objects.filter(porcupine='fred')
+Traceback (most recent call last):
+...
+FieldError: Cannot resolve keyword 'porcupine' into field. Choices are: id, name, references, related
+
 """
 }
