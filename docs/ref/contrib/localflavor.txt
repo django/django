@@ -606,11 +606,11 @@ United Kingdom (``uk``)
     expression used is sourced from the schema for British Standard BS7666
     address types at http://www.govtalk.gov.uk/gdsc/schemas/bs7666-v2-0.xsd.
 
-.. class:: ch.forms.UKCountySelect
+.. class:: uk.forms.UKCountySelect
 
     A ``Select`` widget that uses a list of UK counties/regions as its choices.
 
-.. class:: ch.forms.UKNationSelect
+.. class:: uk.forms.UKNationSelect
 
     A ``Select`` widget that uses a list of UK nations as its choices.
 
