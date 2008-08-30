@@ -166,7 +166,7 @@ All attributes except ``session`` should be considered read-only.
     support activated. See the :ref:`session documentation
     <topics-http-sessions>` for full details.
 
-.. attribute:: HttpRequest.row_post_data
+.. attribute:: HttpRequest.raw_post_data
 
     The raw HTTP POST data. This is only useful for advanced processing. Use
     ``POST`` instead.
