@@ -143,6 +143,7 @@ optional. They're fully explained in the :ref:`reference
 ones:
 
     :attr:`~Field.null`
+
         If ``True``, Django will store empty values as ``NULL`` in the database.
         Default is ``False``.
 
