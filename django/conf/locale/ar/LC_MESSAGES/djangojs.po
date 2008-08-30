@@ -1,22 +1,21 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# translation of djangojs.po to Arabic
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: djangojs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-09 11:51+0100\n"
-"PO-Revision-Date: 2006-07-06 23:50+0300\n"
-"Last-Translator: Ahmad Alhashemi <ahmad@ahmadh.com>\n"
-"Language-Team: Ahmad Alhashemi <trans@ahmadh.com>\n"
+"PO-Revision-Date: 2008-08-30 16:19+0300\n"
+"Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
+"Language-Team: Arabic <support@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Arabic\n"
 "X-Poedit-Country: Kuwait\n"
 "X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=4; plural=(n == 1? 0 : (n == 2? 1 : (n <= 10? 2 : 3)))\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -25,15 +24,15 @@ msgstr "%s متوفرة"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
-msgstr "اختيار الكل"
+msgstr "اختر الكل"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
-msgstr "إضافة"
+msgstr "أضف"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr "حذف"
+msgstr "احذف"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
@@ -46,7 +45,7 @@ msgstr "حدد خيارك أو خياراتك واضغط"
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr "مسح الكل"
+msgstr "امسح الكل"
 
 #: contrib/admin/media/js/dateparse.js:26
 #: contrib/admin/media/js/calendar.js:24
@@ -59,7 +58,7 @@ msgstr "الأحد الأثنين الثلاثاء الأربعاء الخميس
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
-msgstr "أ أ ث أ خ ج س"
+msgstr "أ إ ث أ خ ج س"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
@@ -89,7 +88,7 @@ msgstr "الظهر"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
 msgid "Cancel"
-msgstr "الغاء"
+msgstr "إلغاء"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
@@ -102,9 +101,9 @@ msgstr "التقويم"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
 msgid "Yesterday"
-msgstr "يوم أمس"
+msgstr "أمس"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
 msgid "Tomorrow"
-msgstr "الغد"
+msgstr "غداً"
 
