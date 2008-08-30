@@ -159,7 +159,7 @@ Django document:
 
 .. code-block:: bash
 
-    $ grep -r max_length /path/to/django/docs/*.txt
+    $ grep -r max_length /path/to/django/docs/
     
 As HTML, locally
 ----------------
