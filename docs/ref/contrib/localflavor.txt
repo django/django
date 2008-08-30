@@ -28,10 +28,10 @@ For example, here's how you can create a form with a field representing a
 French telephone number::
 
     from django import forms
-    from django.contrib.localflavor import fr
+    from django.contrib.localflavor.fr.forms import FRPhoneNumberField
 
     class MyForm(forms.Form):
-        my_french_phone_no = fr.forms.FRPhoneNumberField()
+        my_french_phone_no = FRPhoneNumberField()
 
 Supported countries
 ===================
