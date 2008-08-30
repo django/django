@@ -47,10 +47,14 @@ class SessionStore(SessionBase):
         try:
             session_file = open(self._key_to_file(), "rb")
             try:
-                try:
-                    session_data = self.decode(session_file.read())
-                except (EOFError, SuspiciousOperation):
-                    self.create()
+                file_data = session_file.read()
+                # Don't fail if there is no data in the session file.
+                # We may have opened the empty placeholder file.
+                if file_data:
+                    try:
+                        session_data = self.decode(file_data)
+                    except (EOFError, SuspiciousOperation):
+                        self.create()
             finally:
                 session_file.close()
         except IOError:
@@ -69,23 +73,59 @@ class SessionStore(SessionBase):
             return
 
     def save(self, must_create=False):
-        flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, 'O_BINARY', 0)
-        if must_create:
-            flags |= os.O_EXCL
-        # Because this may trigger a load from storage, we must do it before
-        # truncating the file to save.
+        # Get the session data now, before we start messing
+        # with the file it is stored within.
         session_data = self._get_session(no_load=must_create)
+
+        session_file_name = self._key_to_file()
+
         try:
-            fd = os.open(self._key_to_file(self.session_key), flags)
-            try:
-                os.write(fd, self.encode(session_data))
-            finally:
-                os.close(fd)
+            # Make sure the file exists.  If it does not already exist, an
+            # empty placeholder file is created.
+            flags = os.O_WRONLY | os.O_CREAT | getattr(os, 'O_BINARY', 0)
+            if must_create:
+                flags |= os.O_EXCL
+            fd = os.open(session_file_name, flags)
+            os.close(fd)
+
         except OSError, e:
             if must_create and e.errno == errno.EEXIST:
                 raise CreateError
             raise
-        except (IOError, EOFError):
+
+        # Write the session file without interfering with other threads
+        # or processes.  By writing to an atomically generated temporary
+        # file and then using the atomic os.rename() to make the complete
+        # file visible, we avoid having to lock the session file, while
+        # still maintaining its integrity.
+        #
+        # Note: Locking the session file was explored, but rejected in part
+        # because in order to be atomic and cross-platform, it required a
+        # long-lived lock file for each session, doubling the number of
+        # files in the session storage directory at any given time.  This
+        # rename solution is cleaner and avoids any additional overhead
+        # when reading the session data, which is the more common case
+        # unless SESSION_SAVE_EVERY_REQUEST = True.
+        #
+        # See ticket #8616.
+        dir, prefix = os.path.split(session_file_name)
+
+        try:
+            output_file_fd, output_file_name = tempfile.mkstemp(dir=dir,
+                prefix=prefix + '_out_')
+            try:
+                try:
+                    os.write(output_file_fd, self.encode(session_data))
+                finally:
+                    os.close(output_file_fd)
+                renamed = False
+                os.rename(output_file_name, session_file_name)
+                renamed = True
+            finally:
+                if not renamed:
+                    os.unlink(output_file_name)
+
+        except (OSError, IOError, EOFError):
             pass
 
     def exists(self, session_key):
