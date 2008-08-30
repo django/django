@@ -43,11 +43,18 @@ class Command(BaseCommand):
 
         def inner_run():
             from django.conf import settings
+            from django.utils import translation
             print "Validating models..."
             self.validate(display_num_errors=True)
             print "\nDjango version %s, using settings %r" % (django.get_version(), settings.SETTINGS_MODULE)
             print "Development server is running at http://%s:%s/" % (addr, port)
             print "Quit the server with %s." % quit_command
+
+            # django.core.management.base forces the locale to en-us. We should
+            # set it up correctly for the first request (particularly important
+            # in the "--noreload" case).
+            translation.activate(settings.LANGUAGE_CODE)
+
             try:
                 path = admin_media_path or django.__path__[0] + '/contrib/admin/media'
                 handler = AdminMediaHandler(WSGIHandler(), path)
@@ -70,6 +77,7 @@ class Command(BaseCommand):
                 if shutdown_message:
                     print shutdown_message
                 sys.exit(0)
+
         if use_reloader:
             from django.utils import autoreload
             autoreload.main(inner_run)
