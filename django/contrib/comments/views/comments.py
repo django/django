@@ -36,9 +36,9 @@ def post_comment(request, next=None):
     # Fill out some initial data fields from an authenticated user, if present
     data = request.POST.copy()
     if request.user.is_authenticated():
-        if "name" not in data:
+        if not data.get('name', ''):
             data["name"] = request.user.get_full_name()
-        if "email" not in data:
+        if not data.get('email', ''):
             data["email"] = request.user.email
 
     # Look up the object we're trying to comment about
