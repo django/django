@@ -645,6 +645,12 @@ startproject <projectname>
 Creates a Django project directory structure for the given project name in the
 current directory.
 
+This command is disabled when the ``--settings`` option to
+``django-admin.py`` is used, or when the environment variable
+``DJANGO_SETTINGS_MODULE`` has been set. To re-enable it in these
+situations, either omit the ``--settings`` option or unset
+``DJANGO_SETTINGS_MODULE``.
+
 syncdb
 ------
 
