@@ -226,7 +226,7 @@ You have four possible values that can be used in ``list_display``:
               list_display = (upper_case_name,)
     
     * A string representing an attribute on the ``ModelAdmin``. This behaves
- same as the callable. For example::
+      same as the callable. For example::
       
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('upper_case_name',)
