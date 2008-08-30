@@ -10,6 +10,7 @@ from django.utils import simplejson
 from django.utils.hashcompat import sha_constructor
 
 from models import FileModel, temp_storage, UPLOAD_TO
+import uploadhandler
 
 class FileUploadTests(TestCase):
     def test_simple_upload(self):
@@ -186,6 +187,47 @@ class FileUploadTests(TestCase):
 
         self.assertEqual(got.get('file1'), 1)
         self.assertEqual(got.get('file2'), 2)
+
+    def test_file_error_blocking(self):
+        """
+        The server should not block when there are upload errors (bug #8622).
+        This can happen if something -- i.e. an exception handler -- tries to
+        access POST while handling an error in parsing POST. This shouldn't
+        cause an infinite loop!
+        """
+        class POSTAccessingHandler(client.ClientHandler):
+            """A handler that'll access POST during an exception."""
+            def handle_uncaught_exception(self, request, resolver, exc_info):
+                ret = super(POSTAccessingHandler, self).handle_uncaught_exception(request, resolver, exc_info)
+                p = request.POST
+                return ret
+        
+        post_data = {
+            'name': 'Ringo',
+            'file_field': open(__file__),
+        }
+        # Maybe this is a little more complicated that it needs to be; but if
+        # the django.test.client.FakePayload.read() implementation changes then
+        # this test would fail.  So we need to know exactly what kind of error
+        # it raises when there is an attempt to read more than the available bytes:
+        try:
+            client.FakePayload('a').read(2)
+        except Exception, reference_error:
+            pass
+
+        # install the custom handler that tries to access request.POST
+        self.client.handler = POSTAccessingHandler()
+
+        try:
+            response = self.client.post('/file_uploads/upload_errors/', post_data)
+        except reference_error.__class__, err:
+            self.failIf(
+                str(err) == str(reference_error), 
+                "Caught a repeated exception that'll cause an infinite loop in file uploads."
+            )
+        except Exception, err:
+            # CustomUploadError is the error that should have been raised
+            self.assertEqual(err.__class__, uploadhandler.CustomUploadError)
 
 class DirectoryCreationTests(unittest.TestCase):
     """

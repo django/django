@@ -35,6 +35,7 @@ class ModPythonRequest(http.HttpRequest):
             # a common start character for URL patterns. So this is a little
             # naughty, but also pretty harmless.
             self.path_info = u'/'
+        self._post_parse_error = False
 
     def __repr__(self):
         # Since this is called as part of error handling, we need to be very
@@ -43,10 +44,13 @@ class ModPythonRequest(http.HttpRequest):
             get = pformat(self.GET)
         except:
             get = '<could not parse>'
-        try:
-            post = pformat(self.POST)
-        except:
+        if self._post_parse_error:
             post = '<could not parse>'
+        else:
+            try:
+                post = pformat(self.POST)
+            except:
+                post = '<could not parse>'
         try:
             cookies = pformat(self.COOKIES)
         except:
@@ -73,7 +77,15 @@ class ModPythonRequest(http.HttpRequest):
         "Populates self._post and self._files"
         if 'content-type' in self._req.headers_in and self._req.headers_in['content-type'].startswith('multipart'):
             self._raw_post_data = ''
-            self._post, self._files = self.parse_file_upload(self.META, self._req)
+            try:
+                self._post, self._files = self.parse_file_upload(self.META, self._req)
+            except:
+                # See django.core.handlers.wsgi.WSGIHandler for an explanation
+                # of what's going on here.
+                self._post = http.QueryDict('')
+                self._files = datastructures.MultiValueDict()
+                self._post_parse_error = True
+                raise
         else:
             self._post, self._files = http.QueryDict(self.raw_post_data, encoding=self._encoding), datastructures.MultiValueDict()
 

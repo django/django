@@ -8,4 +8,5 @@ urlpatterns = patterns('',
     (r'^quota/$',           views.file_upload_quota),
     (r'^quota/broken/$',    views.file_upload_quota_broken),
     (r'^getlist_count/$',   views.file_upload_getlist_count),
+    (r'^upload_errors/$',   views.file_upload_errors),
 )
