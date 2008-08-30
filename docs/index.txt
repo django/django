@@ -126,7 +126,7 @@ Solving specific problems
 :ref:`Custom template tags <howto-custom-template-tags>`
     Add your own extensions to Django's template language.
     
-:ref:`Generating CSV <howto-outputting-csv>` & :ref:`PDF <howto-outputting-PDF>`
+:ref:`Generating CSV <howto-outputting-csv>` & :ref:`PDF <howto-outputting-pdf>`
     Produce non-HTML content with Django.
     
 And more:
