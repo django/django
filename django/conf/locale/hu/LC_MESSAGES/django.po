@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-27 15:41+0200\n"
-"PO-Revision-Date: 2008-08-28 09:17+0200\n"
+"POT-Creation-Date: 2008-08-30 01:08+0200\n"
+"PO-Revision-Date: 2008-08-30 01:11+0200\n"
 "Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -287,90 +287,90 @@ msgstr "naplóbejegyzés"
 msgid "log entries"
 msgstr "naplóbejegyzések"
 
-#: contrib/admin/options.py:56 contrib/admin/options.py:115
+#: contrib/admin/options.py:56 contrib/admin/options.py:120
 msgid "None"
 msgstr "Egyik sem"
 
-#: contrib/admin/options.py:329
+#: contrib/admin/options.py:334
 #, python-format
 msgid "Changed %s."
 msgstr "%s módosítva."
 
-#: contrib/admin/options.py:329 contrib/admin/options.py:339
+#: contrib/admin/options.py:334 contrib/admin/options.py:344
 #: core/validators.py:283 db/models/manipulators.py:309
 msgid "and"
 msgstr "és"
 
-#: contrib/admin/options.py:334
+#: contrib/admin/options.py:339
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "\"%(object)s\" %(name)s létrehozva."
 
-#: contrib/admin/options.py:338
+#: contrib/admin/options.py:343
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "\"%(object)s\" %(name)s tulajdonságai (%(list)s) megváltoztak."
 
-#: contrib/admin/options.py:343
+#: contrib/admin/options.py:348
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "\"%(object)s\" %(name)s törlésre került."
 
-#: contrib/admin/options.py:347
+#: contrib/admin/options.py:352
 msgid "No fields changed."
 msgstr "Egy mező sem változott."
 
 # TODO
-#: contrib/admin/options.py:408 contrib/admin/views/auth.py:20
+#: contrib/admin/options.py:413 contrib/admin/views/auth.py:20
 #: contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "\"%(obj)s\" %(name)s sikeresen létrehozva."
 
-#: contrib/admin/options.py:412 contrib/admin/options.py:445
+#: contrib/admin/options.py:417 contrib/admin/options.py:450
 #: contrib/admin/views/auth.py:25 contrib/auth/admin.py:57
 msgid "You may edit it again below."
 msgstr "Alább ismét szerkesztheti."
 
-#: contrib/admin/options.py:422 contrib/admin/options.py:455
+#: contrib/admin/options.py:427 contrib/admin/options.py:460
 #, python-format
 msgid "You may add another %s below."
 msgstr "Alább hozzáadhat egy másikat ebből: %s."
 
-#: contrib/admin/options.py:443
+#: contrib/admin/options.py:448
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "\"%(obj)s\" %(name)s sikeresen módosítva."
 
-#: contrib/admin/options.py:451
+#: contrib/admin/options.py:456
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "\"%(obj)s\" %(name)s sikeresen létrehozva. Alább ismét szerkesztheted."
 
-#: contrib/admin/options.py:517
+#: contrib/admin/options.py:532
 #, python-format
 msgid "Add %s"
 msgstr "Új %s"
 
-#: contrib/admin/options.py:595
+#: contrib/admin/options.py:610
 #, python-format
 msgid "Change %s"
 msgstr "%s módosítása"
 
-#: contrib/admin/options.py:627
+#: contrib/admin/options.py:642
 msgid "Database error"
 msgstr "Adatbázis hiba"
 
-#: contrib/admin/options.py:677
+#: contrib/admin/options.py:692
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "\"%(obj)s\" %(name)s sikeresen törölve."
 
-#: contrib/admin/options.py:684
+#: contrib/admin/options.py:699
 msgid "Are you sure?"
 msgstr "Biztos benne?"
 
-#: contrib/admin/options.py:713
+#: contrib/admin/options.py:728
 #, python-format
 msgid "Change history: %s"
 msgstr "Változások története: %s"
@@ -452,6 +452,14 @@ msgstr "Éppen:"
 #: contrib/admin/widgets.py:89 contrib/admin/templates/widget/file.html:3
 msgid "Change:"
 msgstr "Változás:"
+
+#: contrib/admin/widgets.py:115
+msgid "Lookup"
+msgstr "Keresés"
+
+#: contrib/admin/widgets.py:195
+msgid "Add Another"
+msgstr "Újabb hozzáadása"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -911,7 +919,9 @@ msgstr "Írja be az új jelszavát"
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr "Írja be az új jelszavát kétszer, hogy megbizonyosodhassunk annak helyességéről."
+msgstr ""
+"Írja be az új jelszavát kétszer, hogy megbizonyosodhassunk annak "
+"helyességéről."
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
@@ -921,7 +931,9 @@ msgstr "Sikeres jelszó beállítás"
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr "A jelszó beállító link érvénytelen. Ennek egyik oka az lehet, hogy már felhasználták.  Kérem igényeljen új jelszó beállítást."
+msgstr ""
+"A jelszó beállító link érvénytelen. Ennek egyik oka az lehet, hogy már "
+"felhasználták.  Kérem igényeljen új jelszó beállítást."
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
@@ -966,7 +978,9 @@ msgstr "%(site_name)s csapat"
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr "Elfelejtette a jelszavát? Írja be az e-mail címét, és küldünk egy levelet a teendőkről."
+msgstr ""
+"Elfelejtette a jelszavát? Írja be az e-mail címét, és küldünk egy levelet a "
+"teendőkről."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -994,24 +1008,24 @@ msgid "Change password: %s"
 msgstr "Jelszó megváltoztatása: %s"
 
 #: contrib/admin/views/doc.py:48 contrib/admin/views/doc.py:50
-#: contrib/admin/views/doc.py:52 contrib/admindocs/views.py:53
-#: contrib/admindocs/views.py:55 contrib/admindocs/views.py:57
+#: contrib/admin/views/doc.py:52 contrib/admindocs/views.py:57
+#: contrib/admindocs/views.py:59 contrib/admindocs/views.py:61
 msgid "tag:"
 msgstr "címke:"
 
 #: contrib/admin/views/doc.py:79 contrib/admin/views/doc.py:81
-#: contrib/admin/views/doc.py:83 contrib/admindocs/views.py:87
-#: contrib/admindocs/views.py:89 contrib/admindocs/views.py:91
+#: contrib/admin/views/doc.py:83 contrib/admindocs/views.py:90
+#: contrib/admindocs/views.py:92 contrib/admindocs/views.py:94
 msgid "filter:"
 msgstr "szűrő:"
 
 #: contrib/admin/views/doc.py:137 contrib/admin/views/doc.py:139
-#: contrib/admin/views/doc.py:141 contrib/admindocs/views.py:153
-#: contrib/admindocs/views.py:155 contrib/admindocs/views.py:157
+#: contrib/admin/views/doc.py:141 contrib/admindocs/views.py:154
+#: contrib/admindocs/views.py:156 contrib/admindocs/views.py:158
 msgid "view:"
 msgstr "nézet:"
 
-#: contrib/admin/views/doc.py:166 contrib/admindocs/views.py:187
+#: contrib/admin/views/doc.py:166 contrib/admindocs/views.py:186
 #, python-format
 msgid "App %r not found"
 msgstr "%r alkalmazás nem található"
@@ -1028,8 +1042,8 @@ msgstr "a kapcsolódó '%(label)s.%(type)s' objektum"
 
 #: contrib/admin/views/doc.py:185 contrib/admin/views/doc.py:207
 #: contrib/admin/views/doc.py:221 contrib/admin/views/doc.py:226
-#: contrib/admindocs/views.py:206 contrib/admindocs/views.py:228
-#: contrib/admindocs/views.py:242 contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:205 contrib/admindocs/views.py:227
+#: contrib/admindocs/views.py:241 contrib/admindocs/views.py:246
 msgid "model:"
 msgstr "modell:"
 
@@ -1038,17 +1052,17 @@ msgstr "modell:"
 msgid "related `%(label)s.%(name)s` objects"
 msgstr "kapcsolódó '%(label)s.%(name)sí' objektumok"
 
-#: contrib/admin/views/doc.py:221 contrib/admindocs/views.py:242
+#: contrib/admin/views/doc.py:221 contrib/admindocs/views.py:241
 #, python-format
 msgid "all %s"
 msgstr "minden %s"
 
-#: contrib/admin/views/doc.py:226 contrib/admindocs/views.py:247
+#: contrib/admin/views/doc.py:226 contrib/admindocs/views.py:246
 #, python-format
 msgid "number of %s"
 msgstr "%s mennyisége"
 
-#: contrib/admin/views/doc.py:231 contrib/admindocs/views.py:253
+#: contrib/admin/views/doc.py:231 contrib/admindocs/views.py:251
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Mezők %s objektumokban"
@@ -1056,92 +1070,92 @@ msgstr "Mezők %s objektumokban"
 #: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:304
 #: contrib/admin/views/doc.py:306 contrib/admin/views/doc.py:312
 #: contrib/admin/views/doc.py:313 contrib/admin/views/doc.py:315
-#: contrib/admindocs/views.py:317 contrib/admindocs/views.py:328
-#: contrib/admindocs/views.py:330 contrib/admindocs/views.py:336
-#: contrib/admindocs/views.py:337 contrib/admindocs/views.py:339
+#: contrib/admindocs/views.py:314 contrib/admindocs/views.py:325
+#: contrib/admindocs/views.py:327 contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:336
 msgid "Integer"
 msgstr "Egész"
 
-#: contrib/admin/views/doc.py:294 contrib/admindocs/views.py:318
+#: contrib/admin/views/doc.py:294 contrib/admindocs/views.py:315
 msgid "Boolean (Either True or False)"
 msgstr "Logikai (True vagy False)"
 
 #: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:314
-#: contrib/admindocs/views.py:319 contrib/admindocs/views.py:338
+#: contrib/admindocs/views.py:316 contrib/admindocs/views.py:335
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Karakterlánc (%(max_length)s hosszig)"
 
-#: contrib/admin/views/doc.py:296 contrib/admindocs/views.py:320
+#: contrib/admin/views/doc.py:296 contrib/admindocs/views.py:317
 msgid "Comma-separated integers"
 msgstr "Vesszővel elválasztott egészek"
 
-#: contrib/admin/views/doc.py:297 contrib/admindocs/views.py:321
+#: contrib/admin/views/doc.py:297 contrib/admindocs/views.py:318
 msgid "Date (without time)"
 msgstr "Dátum (idő nélkül)"
 
-#: contrib/admin/views/doc.py:298 contrib/admindocs/views.py:322
+#: contrib/admin/views/doc.py:298 contrib/admindocs/views.py:319
 msgid "Date (with time)"
 msgstr "Dátum (idővel)"
 
-#: contrib/admin/views/doc.py:299 contrib/admindocs/views.py:323
+#: contrib/admin/views/doc.py:299 contrib/admindocs/views.py:320
 msgid "Decimal number"
 msgstr "Tizes számrendszerű (decimális) szám"
 
-#: contrib/admin/views/doc.py:300 contrib/admindocs/views.py:324
+#: contrib/admin/views/doc.py:300 contrib/admindocs/views.py:321
 msgid "E-mail address"
 msgstr "E-mail cím"
 
 #: contrib/admin/views/doc.py:301 contrib/admin/views/doc.py:302
-#: contrib/admin/views/doc.py:305 contrib/admindocs/views.py:325
-#: contrib/admindocs/views.py:326 contrib/admindocs/views.py:329
+#: contrib/admin/views/doc.py:305 contrib/admindocs/views.py:322
+#: contrib/admindocs/views.py:323 contrib/admindocs/views.py:326
 msgid "File path"
 msgstr "Elérési út"
 
-#: contrib/admin/views/doc.py:303 contrib/admindocs/views.py:327
+#: contrib/admin/views/doc.py:303 contrib/admindocs/views.py:324
 msgid "Floating point number"
 msgstr "Lebegőpontos szám"
 
-#: contrib/admin/views/doc.py:307 contrib/admindocs/views.py:331
+#: contrib/admin/views/doc.py:307 contrib/admindocs/views.py:328
 #: contrib/comments/models.py:57
 msgid "IP address"
 msgstr "IP cím"
 
-#: contrib/admin/views/doc.py:309 contrib/admindocs/views.py:333
+#: contrib/admin/views/doc.py:309 contrib/admindocs/views.py:330
 msgid "Boolean (Either True, False or None)"
 msgstr "Logikai (True, False vagy None)"
 
-#: contrib/admin/views/doc.py:310 contrib/admindocs/views.py:334
+#: contrib/admin/views/doc.py:310 contrib/admindocs/views.py:331
 msgid "Relation to parent model"
 msgstr "Szülőkapcsolat"
 
-#: contrib/admin/views/doc.py:311 contrib/admindocs/views.py:335
+#: contrib/admin/views/doc.py:311 contrib/admindocs/views.py:332
 msgid "Phone number"
 msgstr "Telefonszám"
 
-#: contrib/admin/views/doc.py:316 contrib/admindocs/views.py:340
+#: contrib/admin/views/doc.py:316 contrib/admindocs/views.py:337
 msgid "Text"
 msgstr "Szöveg"
 
-#: contrib/admin/views/doc.py:317 contrib/admindocs/views.py:341
+#: contrib/admin/views/doc.py:317 contrib/admindocs/views.py:338
 msgid "Time"
 msgstr "Idő"
 
-#: contrib/admin/views/doc.py:318 contrib/admindocs/views.py:342
+#: contrib/admin/views/doc.py:318 contrib/admindocs/views.py:339
 #: contrib/comments/forms.py:20 contrib/flatpages/admin.py:8
 #: contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admin/views/doc.py:319 contrib/admindocs/views.py:343
+#: contrib/admin/views/doc.py:319 contrib/admindocs/views.py:340
 msgid "U.S. state (two uppercase letters)"
 msgstr "USA állam (két nagybetű)"
 
-#: contrib/admin/views/doc.py:320 contrib/admindocs/views.py:344
+#: contrib/admin/views/doc.py:320 contrib/admindocs/views.py:341
 msgid "XML text"
 msgstr "XML szöveg"
 
-#: contrib/admin/views/doc.py:346 contrib/admindocs/views.py:370
+#: contrib/admin/views/doc.py:346 contrib/admindocs/views.py:367
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s nem tűnik egy urlpattern objektumnak."
@@ -1164,17 +1178,17 @@ msgstr "honlap"
 msgid "template"
 msgstr "sablon"
 
-#: contrib/admindocs/views.py:194
+#: contrib/admindocs/views.py:193
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "%(model_name)r modell nem található a következő alkalmazásban: %(app_label)r"
 
-#: contrib/admindocs/views.py:206
+#: contrib/admindocs/views.py:205
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "a kapcsolódó '%(app_label)s.%(data_type)s' objektum"
 
-#: contrib/admindocs/views.py:237
+#: contrib/admindocs/views.py:236
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "kapcsolódó '%(app_label)s.%(object_name)s' objektumok"
@@ -1334,7 +1348,9 @@ msgstr "aktív"
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "Megadja, hogy a felhasználó aktív-e. Állítsa át ezt az értéket a fiók törlése helyett."
+msgstr ""
+"Megadja, hogy a felhasználó aktív-e. Állítsa át ezt az értéket a fiók "
+"törlése helyett."
 
 #: contrib/auth/models.py:143
 msgid "superuser status"
@@ -1411,7 +1427,9 @@ msgstr "Hozzászólás"
 
 #: contrib/comments/forms.py:24
 msgid "If you enter anything in this field your comment will be treated as spam"
-msgstr "Ha bármit begépel ebbe a mezőbe, akkor azt szemétként fogja kezelni a rendszer"
+msgstr ""
+"Ha bármit begépel ebbe a mezőbe, akkor azt szemétként fogja kezelni a "
+"rendszer"
 
 #: contrib/comments/forms.py:124 core/validators.py:281
 #, python-format
@@ -1450,7 +1468,9 @@ msgstr "publikus"
 
 #: contrib/comments/models.py:59
 msgid "Uncheck this box to make the comment effectively disappear from the site."
-msgstr "Vegye ki a pipát a jelölőnégyzetből, hogy eltűntesse a hozzászólást az oldalról."
+msgstr ""
+"Vegye ki a pipát a jelölőnégyzetből, hogy eltűntesse a hozzászólást az "
+"oldalról."
 
 #: contrib/comments/models.py:61
 msgid "is removed"
@@ -1468,13 +1488,17 @@ msgstr ""
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
-msgstr "Ezt a hozzászólást egy hitelesített felhasználó küldte be, ezért a név csak olvasható."
+msgstr ""
+"Ezt a hozzászólást egy hitelesített felhasználó küldte be, ezért a név csak "
+"olvasható."
 
 #: contrib/comments/models.py:123
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
-msgstr "Ezt a hozzászólást egy hitelesített felhasználó küldte be, ezért az e-mail csak olvasható."
+msgstr ""
+"Ezt a hozzászólást egy hitelesített felhasználó küldte be, ezért az e-mail "
+"csak olvasható."
 
 #: contrib/comments/models.py:148
 #, python-format
@@ -1582,6 +1606,12 @@ msgstr "egyszerű oldal"
 #: contrib/flatpages/models.py:19
 msgid "flat pages"
 msgstr "egyszerű oldalak"
+
+#: contrib/formtools/wizard.py:130
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr "Elnézést kérünk, de az űrlap érvényessége lejárt. Kérjük folytassa a kitöltést ettől az oldaltól."
 
 #: contrib/gis/forms/fields.py:14
 msgid "No geometry value provided."
@@ -1745,7 +1775,9 @@ msgstr "Írjon be egy irányítószámot 'XXXX' alakban."
 
 #: contrib/localflavor/at/forms.py:48
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr "Írjon be egy érvényes ausztriai társadalombiztosítási azonosítót 'XXXX XXXXXX' alakban."
+msgstr ""
+"Írjon be egy érvényes ausztriai társadalombiztosítási azonosítót 'XXXX "
+"XXXXXX' alakban."
 
 #: contrib/localflavor/au/forms.py:16
 msgid "Enter a 4 digit post code."
@@ -1764,8 +1796,8 @@ msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
 msgstr ""
-"Válasszon ki egy érvényes brazil államot. Az Ön választása nincs az elérhető lehetőségek "
-"között."
+"Válasszon ki egy érvényes brazil államot. Az Ön választása nincs az elérhető "
+"lehetőségek között."
 
 #: contrib/localflavor/br/forms.py:94
 msgid "Invalid CPF number."
@@ -1789,7 +1821,9 @@ msgstr "Írjon be egy irányítószámot 'XXX XXX' alakban."
 
 #: contrib/localflavor/ca/forms.py:88
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr "Írjon be egy érvényes kanadai egészségbiztosítási számot 'XXX-XXX-XXX' alakban."
+msgstr ""
+"Írjon be egy érvényes kanadai egészségbiztosítási számot 'XXX-XXX-XXX' "
+"alakban."
 
 #: contrib/localflavor/ch/ch_states.py:5
 msgid "Aargau"
@@ -2822,8 +2856,8 @@ msgstr "Adjon meg egy érvényes CNP-t."
 #: contrib/localflavor/ro/forms.py:141
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
 msgstr ""
-"Írjon be egy érvényes nemzetközi bankszámlaszámot 'ROXX-XXXX-XXXX-XXXX-"
-"XXXX-XXXX-XXXX' alakban."
+"Írjon be egy érvényes nemzetközi bankszámlaszámot 'ROXX-XXXX-XXXX-XXXX-XXXX-"
+"XXXX-XXXX' alakban."
 
 #: contrib/localflavor/ro/forms.py:171
 msgid "Phone numbers must be in XXXX-XXXXXX format."
@@ -3597,7 +3631,7 @@ msgstr "Nagybetűk itt nem megengedettek."
 msgid "Lowercase letters are not allowed here."
 msgstr "Kisbetűk itt nem megengedettek."
 
-#: core/validators.py:95
+#: core/validators.py:95 db/models/fields/__init__.py:412
 msgid "Enter only digits separated by commas."
 msgstr "Csak számokat adjon meg, vesszővel elválasztva."
 
@@ -3633,12 +3667,12 @@ msgstr "Itt csak betűk megengedettek."
 msgid "Year must be 1900 or later."
 msgstr "Az évnek 1900-nak vagy későbbinek kell lennie."
 
-#: core/validators.py:151 db/models/fields/__init__.py:433
+#: core/validators.py:151 db/models/fields/__init__.py:452
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Érvénytelen dátum: %s"
 
-#: core/validators.py:156 db/models/fields/__init__.py:424
+#: core/validators.py:156 db/models/fields/__init__.py:443
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Írjon be egy érvényes dátumot 'ÉÉÉÉ-HH-NN' alakban."
 
@@ -3878,7 +3912,7 @@ msgstr ""
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "A megadott %(field)s mezőhöz már létezik %(type)s típusú %(object)s elem."
 
-#: db/models/fields/__init__.py:332 db/models/fields/__init__.py:648
+#: db/models/fields/__init__.py:332 db/models/fields/__init__.py:667
 msgid "This value must be an integer."
 msgstr "Az értéknek egész számnak kell lennie."
 
@@ -3886,35 +3920,35 @@ msgstr "Az értéknek egész számnak kell lennie."
 msgid "This value must be either True or False."
 msgstr "Az értéknek igaznak (True) vagy hamisnak (False) kell lennie."
 
-#: db/models/fields/__init__.py:387
+#: db/models/fields/__init__.py:396
 msgid "This field cannot be null."
 msgstr "Ez a mező nem lehet nulla."
 
-#: db/models/fields/__init__.py:497 db/models/fields/__init__.py:515
+#: db/models/fields/__init__.py:516 db/models/fields/__init__.py:534
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "Írjon be egy érvényes dátumot/időt 'ÉÉÉÉ-HH-NN ÓÓ-PP[:MP[.MILLIS]] alakban."
 
-#: db/models/fields/__init__.py:551
+#: db/models/fields/__init__.py:570
 msgid "This value must be a decimal number."
 msgstr "Az értéknek decimálisnak kell lennie."
 
-#: db/models/fields/__init__.py:684
+#: db/models/fields/__init__.py:703
 msgid "This value must be either None, True or False."
 msgstr ""
 "Az értéknek semminek (None), igaznak (True), vagy hamisnak (False) kell "
 "lennie."
 
-#: db/models/fields/__init__.py:783 db/models/fields/__init__.py:797
+#: db/models/fields/__init__.py:811 db/models/fields/__init__.py:825
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Írjon be egy érvényes időt 'ÓÓ:PP[:MP[:MILLIS]]' alakban."
 
-#: db/models/fields/related.py:742
+#: db/models/fields/related.py:748
 msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Tartsa lenyomva a \"Control\"-t (vagy Mac-en a \"Command\"-ot) több elem "
 "kiválasztásához."
 
-#: db/models/fields/related.py:819
+#: db/models/fields/related.py:825
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
@@ -3979,12 +4013,12 @@ msgstr ""
 "Bizonyosodjon meg arról, hogy nincs ennél több számjegy a tizedesvessző "
 "előtt: %s."
 
-#: forms/fields.py:282 forms/fields.py:804 newforms/fields.py:263
+#: forms/fields.py:282 forms/fields.py:815 newforms/fields.py:263
 #: newforms/fields.py:750
 msgid "Enter a valid date."
 msgstr "Adjon meg egy érvényes dátumot."
 
-#: forms/fields.py:316 forms/fields.py:805 newforms/fields.py:296
+#: forms/fields.py:316 forms/fields.py:816 newforms/fields.py:296
 #: newforms/fields.py:751
 msgid "Enter a valid time."
 msgstr "Adjon meg egy érvényes időt."
@@ -4009,23 +4043,25 @@ msgstr "Adjon meg egy érvényes URL-t."
 msgid "This URL appears to be a broken link."
 msgstr "Ez a hivatkozás törött linknek tűnik."
 
-#: forms/fields.py:602 forms/fields.py:653 newforms/fields.py:598
+#: forms/fields.py:613 forms/fields.py:664 newforms/fields.py:598
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Válasszon érvényes elemet. '%(value)s' nincs az elérhető lehetőségek között."
 
-#: forms/fields.py:654 forms/fields.py:715 forms/models.py:531
+#: forms/fields.py:665 forms/fields.py:726 forms/models.py:531
 #: newforms/fields.py:599 newforms/fields.py:661 newforms/models.py:372
 msgid "Enter a list of values."
 msgstr "Adja meg értékek egy listáját."
 
-#: forms/fields.py:833 newforms/fields.py:779
+#: forms/fields.py:844 newforms/fields.py:779
 msgid "Enter a valid IPv4 address."
 msgstr "Írjon be egy érvényes IPv4 címet."
 
-#: forms/fields.py:843
+#: forms/fields.py:854
 msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "Az URL barát cím csak betűket, számokat, aláhúzásokat és kötőjeleket tartalmazhat."
+msgstr ""
+"Az URL barát cím csak betűket, számokat, aláhúzásokat és kötőjeleket "
+"tartalmazhat."
 
 #: forms/formsets.py:242 forms/formsets.py:244
 msgid "Order"
