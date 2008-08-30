@@ -90,7 +90,7 @@ def django_tests(verbosity, interactive, test_labels):
 
     old_installed_apps = settings.INSTALLED_APPS
     old_test_database_name = settings.TEST_DATABASE_NAME
-    old_root_urlconf = settings.ROOT_URLCONF
+    old_root_urlconf = getattr(settings, "ROOT_URLCONF", "")
     old_template_dirs = settings.TEMPLATE_DIRS
     old_use_i18n = settings.USE_I18N
     old_login_url = settings.LOGIN_URL
