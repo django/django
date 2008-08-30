@@ -226,7 +226,7 @@ You have four possible values that can be used in ``list_display``:
               list_display = (upper_case_name,)
     
     * A string representing an attribute on the ``ModelAdmin``. This behaves
-      the same as the callable. For example::
+ same as the callable. For example::
       
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('upper_case_name',)
@@ -851,6 +851,19 @@ information.
 
 ``AdminSite`` objects
 =====================
+
+A Django administrative site is represented by an instance of
+``django.contrib.admin.sites.AdminSite``; by default, an instance of
+this class is created as ``django.contrib.admin.site`` and you can
+register your models and ``ModelAdmin`` instances with it.
+
+If you'd like to set up your own administrative site with custom
+behavior, however, you're free to subclass ``AdminSite`` and override
+or add anything you like. Then, simply create an instance of your
+``AdminSite`` subclass (the same way you'd instantiate any other
+Python class), and register your models and ``ModelAdmin`` subclasses
+with it instead of using the default.
+
 
 Hooking ``AdminSite`` instances into your URLconf
 -------------------------------------------------
