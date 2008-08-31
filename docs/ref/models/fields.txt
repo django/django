@@ -811,7 +811,10 @@ define the details of how the relation works.
 
     The name to use for the relation from the related object back to this one.
     See the :ref:`related objects documentation <backwards-related-objects>` for
-    a full explanation and example.
+    a full explanation and example. Note that you must set this value
+    when defining relations on :ref:`abstract models
+    <abstract-base-classes>`; and when you do so
+    :ref:`some special syntax <abstract-related-name>` is available.
 
 .. attribute:: ForeignKey.to_field
 
@@ -883,8 +886,27 @@ that control how the relationship functions.
 ``OneToOneField``
 -----------------
 
-.. class:: OneToOneField(othermodel, [**options])
+.. class:: OneToOneField(othermodel, [parent_link=False, **options])
 
-The semantics of one-to-one relationships will be changing soon, so we don't
-recommend you use them. If that doesn't scare you away, however,
-:class:`OneToOneField` takes the same options that :class:`ForeignKey` does.
+A one-to-one relationship. Conceptually, this is similar to a
+:class:`ForeignKey` with :attr:`unique=True <Field.unique>`, but the
+"reverse" side of the relation will directly return a single object.
+
+This is most useful as the primary key of a model which "extends"
+another model in some way; :ref:`multi-table-inheritance` is
+implemented by adding an implicit one-to-one relation from the child
+model to the parent model, for example.
+
+One positional argument is required: the class to which the model will
+be related.
+
+Additionally, ``OneToOneField`` accepts all of the extra arguments
+accepted by :class:`ForeignKey`, plus one extra argument:
+
+.. attribute: OneToOneField.parent_link
+
+    When ``True`` and used in a model which inherits from another
+    (concrete) model, indicates that this field should be used as the
+    link back to the parent class, rather than the extra
+    ``OneToOneField`` which would normally be implicitly created by
+    subclassing.

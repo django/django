@@ -747,3 +747,252 @@ bindings. This is for the sake of consistency and sanity.)
 A final note: If all you want to do is a custom ``WHERE`` clause, you can use
 the :meth:`~QuerySet.extra` lookup method, which lets you add custom SQL to a
 query.
+
+.. _model-inheritance:
+
+Model inheritance
+=================
+
+**New in Django development version**
+
+Model inheritance in Django works almost identically to the way normal
+class inheritance works in Python. The only decision you have to make
+is whether you want the parent models to be models in their own right
+(with their own database tables), or if the parents are just holders
+of common information that will only be visible through the child
+models.
+
+Often, you will just want to use the parent class to hold information
+that you don't want to have to type out for each child model. This
+class isn't going to ever be used in isolation, so
+:ref:`abstract-base-classes` are what you're after. However, if you're
+subclassing an existing model (perhaps something from another
+application entirely), or want each model to have its own database
+table, :ref:`multi-table-inheritance` is the way to go.
+
+.. _abstract-base-classes:
+
+Abstract base classes
+---------------------
+
+Abstract base classes are useful when you want to put some common
+information into a number of other models. You write your base class
+and put ``abstract=True`` in the :ref:`Meta <meta-options>`
+class. This model will then not be used to create any database
+table. Instead, when it is used as a base class for other models, its
+fields will be added to those of the child class. It is an error to
+have fields in the abstract base class with the same name as those in
+the child (and Django will raise an exception).
+
+An example::
+
+    class CommonInfo(models.Model):
+        name = models.CharField(max_length=100)
+        age = models.PositiveIntegerField()
+
+        class Meta:
+            abstract = True
+
+    class Student(CommonInfo):
+        home_group = models.CharField(max_length=5)
+
+The ``Student`` model will have three fields: ``name``, ``age`` and
+``home_group``. The ``CommonInfo`` model cannot be used as a normal Django
+model, since it is an abstract base class. It does not generate a database
+table or have a manager, and cannot be instantiated or saved directly.
+
+For many uses, this type of model inheritance will be exactly what you want.
+It provides a way to factor out common information at the Python level, whilst
+still only creating one database table per child model at the database level.
+
+``Meta`` inheritance
+~~~~~~~~~~~~~~~~~~~~
+
+When an abstract base class is created, Django makes any :ref:`Meta <meta-options>`
+inner class you declared on the base class available as an
+attribute. If a child class does not declared its own :ref:`Meta <meta-options>`
+class, it will inherit the parent's :ref:`Meta <meta-options>`. If the child wants to
+extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For example::
+
+    class CommonInfo(models.Model):
+        ...
+        class Meta:
+            abstract = True
+            ordering = ['name']
+
+    class Student(CommonInfo):
+        ...
+        class Meta(CommonInfo.Meta):
+            db_table = 'student_info'
+
+Django does make one adjustment to the :ref:`Meta <meta-options>` class of an abstract base
+class: before installing the :ref:`Meta <meta-options>` attribute, it sets ``abstract=False``.
+This means that children of abstract base classes don't automatically become
+abstract classes themselves. Of course, you can make an abstract base class
+that inherits from another abstract base class. You just need to remember to
+explicitly set ``abstract=True`` each time.
+
+Some attributes won't make sense to include in the :ref:`Meta <meta-options>` class of an
+abstract base class. For example, including ``db_table`` would mean that all
+the child classes (the ones that don't specify their own :ref:`Meta <meta-options>`) would use
+the same database table, which is almost certainly not what you want.
+
+.. _abstract-related-name:
+
+Be careful with ``related_name``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are using the :attr:`~django.db.models.ForeignKey.related_name` attribute on a ``ForeignKey`` or
+``ManyToManyField``, you must always specify a *unique* reverse name for the
+field. This would normally cause a problem in abstract base classes, since the
+fields on this class are included into each of the child classes, with exactly
+the same values for the attributes (including :attr:`~django.db.models.ForeignKey.related_name`) each time.
+
+To work around this problem, when you are using :attr:`~django.db.models.ForeignKey.related_name` in an
+abstract base class (only), part of the name should be the string
+``'%(class)s'``. This is replaced by the lower-cased name of the child class
+that the field is used in. Since each class has a different name, each related
+name will end up being different. For example::
+
+    class Base(models.Model):
+        m2m = models.ManyToMany(OtherModel, related_name="%(class)s_related")
+
+        class Meta:
+            abstract = True
+
+    class ChildA(Base):
+        pass
+
+    class ChildB(Base):
+        pass
+
+The reverse name of the ``ChildA.m2m`` field will be ``childa_related``,
+whilst the reverse name of the ``ChildB.m2m`` field will be
+``childb_related``. It is up to you how you use the ``'%(class)s'`` portion to
+construct your related name, but if you forget to use it, Django will raise
+errors when you validate your models (or run :djadmin:`syncdb`).
+
+If you don't specify a :attr:`~django.db.models.ForeignKey.related_name` attribute for a field in an
+abstract base class, the default reverse name will be the name of the
+child class followed by ``'_set'``, just as it normally would be if
+you'd declared the field directly on the child class. For example, in
+the above code, if the :attr:`~django.db.models.ForeignKey.related_name` attribute was omitted, the
+reverse name for the ``m2m`` field would be ``childa_set`` in the
+``ChildA`` case and ``childb_set`` for the ``ChildB`` field.
+
+.. _multi-table-inheritance:
+
+Multi-table inheritance
+-----------------------
+
+The second type of model inheritance supported by Django is when each model in
+the hierarchy is a model all by itself. Each model corresponds to its own
+database table and can be queried and created indvidually. The inheritance
+relationship introduces links between the child model and each of its parents
+(via an automatically-created :class`~django.db.models.fields.OneToOneField`).
+For example::
+
+    class Place(models.Model):
+        name = models.CharField(max_length=50)
+        address = models.CharField(max_length=80)
+
+    class Restaurant(Place):
+        serves_hot_dogs = models.BooleanField()
+        serves_pizza = models.BooleanField()
+
+All of the fields of ``Place`` will also be available in ``Restaurant``,
+although the data will reside in a different database table. So these are both
+possible::
+
+    >>> Place.objects.filter(name="Bob's Cafe")
+    >>> Restaurant.objects.filter(name="Bob's Cafe")
+
+If you have a ``Place`` that is also a ``Restaurant``, you can get from the
+``Place`` object to the ``Restaurant`` object by using the lower-case version
+of the model name::
+
+    >>> p = Place.objects.filter(name="Bob's Cafe")
+    # If Bob's Cafe is a Restaurant object, this will give the child class:
+    >>> p.restaurant
+    <Restaurant: ...>
+
+However, if ``p`` in the above example was *not* a ``Restaurant`` (it had been
+created directly as a ``Place`` object or was the parent of some other class),
+referring to ``p.restaurant`` would give an error.
+
+``Meta`` and multi-table inheritance
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the multi-table inheritance situation, it doesn't make sense for a child
+class to inherit from its parent's :ref:`Meta <meta-options>` class. All the :ref:`Meta <meta-options>` options
+have already been applied to the parent class and applying them again would
+normally only lead to contradictory behaviour (this is in contrast with the
+abstract base class case, where the base class doesn't exist in its own
+right).
+
+So a child model does not have access to its parent's :ref:`Meta <meta-options>` class. However,
+there are a few limited cases where the child inherits behaviour from the
+parent: if the child does not specify an :attr:`django.db.models.Options.ordering` attribute or a
+:attr:`django.db.models.Options.get_latest_by` attribute, it will inherit these from its parent.
+
+If the parent has an ordering and you don't want the child to have any natural
+ordering, you can explicity set it to be empty::
+
+    class ChildModel(ParentModel):
+        ...
+        class Meta:
+            # Remove parent's ordering effect
+            ordering = []
+
+Inheritance and reverse relations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Because multi-table inheritance uses an implicit
+:class:`~django.db.models.fields.OneToOneField` to link the child and
+the parent, it's possible to move from the parent down to the child,
+as in the above example. However, this uses up the name that is the
+default :attr:`~django.db.models.ForeignKey.related_name` value for
+:class:`django.db.models.fields.ForeignKey` and
+:class:`django.db.models.fields.ManyToManyField` relations.  If you
+are putting those types of relations on a subclass of another model,
+you **must** specify the
+:attr:`~django.db.models.ForeignKey.related_name` attribute on each
+such field. If you forget, Django will raise an error when you run
+:djadmin:`validate` or :djadmin:`syncdb`.
+
+For example, using the above ``Place`` class again, let's create another
+subclass with a :class:`~django.db.models.fields.ManyToManyField`::
+
+    class Supplier(Place):
+        # Must specify related_name on all relations.
+        customers = models.ManyToManyField(Restaurant,
+                related_name='provider')
+
+
+Specifying the parent link field
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As mentioned, Django will automatically create a
+:class:`~django.db.models.fields.OneToOneField` linking your child
+class back any non-abstract parent models. If you want to control the
+name of the attribute linking back to the parent, you can create your
+own :class:`~django.db.models.fields.OneToOneField` and set
+:attr:`parent_link=True <django.db.models.fields.OneToOneField.parent_link>` 
+to indicate that your field is the link back to the parent class.
+
+Multiple inheritance
+--------------------
+
+Just as with Python's subclassing, it's possible for a Django model to inherit
+from multiple parent models. Keep in mind that normal Python name resolution
+rules apply. The first base class that a particular name appears in (e.g.
+:ref:`Meta <meta-options>`) will be the one that is used; for example,
+his means that if multiple parents contain a :ref:`Meta <meta-options>` class, only
+the first one is going to be used, and all others will be ignored.
+
+Generally, you won't need to inherit from multiple parents. The main use-case
+where this is useful is for "mix-in" classes: adding a particular extra
+field or method to every class that inherits the mix-in. Try to keep your
+inheritance hierarchies as simple and straightforward as possible so that you
+won't have to struggle to work out where a particular piece of information is
+coming from.

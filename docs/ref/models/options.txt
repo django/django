@@ -4,12 +4,20 @@
 Model ``Meta`` options
 ======================
 
-This document explains all the possible :ref:`metadata options <meta-options>` that you can give your model in its internal ``class Meta``.
+This document explains all the possible :ref:`metadata options <meta-options>`  that you can give your model in its internal
+``class Meta``.
 
 Available ``Meta`` options
 ==========================
 
 .. currentmodule:: django.db.models
+
+``abstract``
+------------
+
+.. attribute:: Options.abstract
+
+If ``True``, this model will be an :ref:`abstract base class <abstract-base-classes>`.
 
 ``db_table``
 ------------
