@@ -254,10 +254,12 @@ list::
 
 .. note::
 
-    You can only modify upload handlers *before* accessing ``request.FILES`` --
-    it doesn't make sense to change upload handlers after upload handling has
-    already started. If you try to modify ``request.upload_handlers`` after
-    reading from ``request.FILES`` Django will throw an error.
+    You can only modify upload handlers *before* accessing
+    ``request.POST`` or ``request.FILES`` -- it doesn't make sense to
+    change upload handlers after upload handling has already
+    started. If you try to modify ``request.upload_handlers`` after
+    reading from ``request.POST`` or ``request.FILES`` Django will
+    throw an error.
 
     Thus, you should always modify uploading handlers as early in your view as
     possible.
