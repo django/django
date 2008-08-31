@@ -54,6 +54,12 @@ class Owner(models.Model):
     def __unicode__(self):
         return "%s at %s" % (self.name, self.place)
 
+class Location(models.Model):
+    place = models.ForeignKey(Place, unique=True)
+    # this is purely for testing the data doesn't matter here :)
+    lat = models.CharField(max_length=100)
+    lon = models.CharField(max_length=100)
+
 class OwnerProfile(models.Model):
     owner = models.OneToOneField(Owner, primary_key=True)
     age = models.PositiveIntegerField()
@@ -528,6 +534,15 @@ True
 True
 >>> formset.save()
 [<OwnerProfile: Joe Perry is 55>]
+
+# ForeignKey with unique=True should enforce max_num=1 
+
+>>> FormSet = inlineformset_factory(Place, Location, can_delete=False)
+>>> formset = FormSet(instance=place)
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_location_set-0-lat">Lat:</label> <input id="id_location_set-0-lat" type="text" name="location_set-0-lat" maxlength="100" /></p>
+<p><label for="id_location_set-0-lon">Lon:</label> <input id="id_location_set-0-lon" type="text" name="location_set-0-lon" maxlength="100" /><input type="hidden" name="location_set-0-id" id="id_location_set-0-id" /></p>
 
 # Foreign keys in parents ########################################
 

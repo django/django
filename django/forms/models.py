@@ -424,17 +424,25 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
     to ``parent_model``.
     """
     fk = _get_foreign_key(parent_model, model, fk_name=fk_name)
-    # let the formset handle object deletion by default
-
+    # enforce a max_num=1 when the foreign key to the parent model is unique.
+    if fk.unique:
+        max_num = 1
     if exclude is not None:
         exclude.append(fk.name)
     else:
         exclude = [fk.name]
-    FormSet = modelformset_factory(model, form=form,
-                                    formfield_callback=formfield_callback,
-                                    formset=formset,
-                                    extra=extra, can_delete=can_delete, can_order=can_order,
-                                    fields=fields, exclude=exclude, max_num=max_num)
+    kwargs = {
+        'form': form,
+        'formfield_callback': formfield_callback,
+        'formset': formset,
+        'extra': extra,
+        'can_delete': can_delete,
+        'can_order': can_order,
+        'fields': fields,
+        'exclude': exclude,
+        'max_num': max_num,
+    }
+    FormSet = modelformset_factory(model, **kwargs)
     FormSet.fk = fk
     return FormSet
 
