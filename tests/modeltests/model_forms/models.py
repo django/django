@@ -69,6 +69,13 @@ class ImprovedArticleWithParentLink(models.Model):
 class BetterWriter(Writer):
     pass
 
+class WriterProfile(models.Model):
+    writer = models.OneToOneField(Writer, primary_key=True)
+    age = models.PositiveIntegerField()
+    
+    def __unicode__(self):
+        return "%s is %s" % (self.writer, self.age)
+
 class PhoneNumber(models.Model):
     phone = models.PhoneNumberField()
     description = models.CharField(max_length=20)
@@ -811,7 +818,41 @@ ValidationError: [u'Select a valid choice. 4 is not one of the available choices
 >>> bw = BetterWriter(name=u'Joe Better')
 >>> bw.save()
 >>> sorted(model_to_dict(bw).keys())
-['id', 'name', 'writer_ptr_id']
+['id', 'name', 'writer_ptr']
+
+>>> class WriterProfileForm(ModelForm):
+...     class Meta:
+...         model = WriterProfile
+>>> form = WriterProfileForm()
+>>> print form.as_p()
+<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
+<option value="" selected="selected">---------</option>
+<option value="1">Mike Royko</option>
+<option value="2">Bob Woodward</option>
+<option value="3">Carl Bernstein</option>
+<option value="4">Joe Better</option>
+</select></p>
+<p><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>
+
+>>> data = {
+...     'writer': u'2',
+...     'age': u'65',
+... }
+>>> form = WriterProfileForm(data)
+>>> instance = form.save()
+>>> instance
+<WriterProfile: Bob Woodward is 65>
+
+>>> form = WriterProfileForm(instance=instance)
+>>> print form.as_p()
+<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
+<option value="">---------</option>
+<option value="1">Mike Royko</option>
+<option value="2" selected="selected">Bob Woodward</option>
+<option value="3">Carl Bernstein</option>
+<option value="4">Joe Better</option>
+</select></p>
+<p><label for="id_age">Age:</label> <input type="text" name="age" value="65" id="id_age" /></p>
 
 # PhoneNumberField ############################################################
 

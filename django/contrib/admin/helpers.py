@@ -126,7 +126,7 @@ class InlineAdminForm(AdminForm):
         super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields)
 
     def pk_field(self):
-        return AdminField(self.form, self.formset._pk_field_name, False)
+        return AdminField(self.form, self.formset._pk_field.name, False)
 
     def deletion_field(self):
         from django.forms.formsets import DELETION_FIELD_NAME

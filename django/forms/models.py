@@ -21,7 +21,7 @@ __all__ = (
 )
 
 def save_instance(form, instance, fields=None, fail_message='saved',
-                  commit=True):
+                  commit=True, exclude=None):
     """
     Saves bound Form ``form``'s cleaned_data into model instance ``instance``.
 
@@ -39,6 +39,8 @@ def save_instance(form, instance, fields=None, fail_message='saved',
                 or not f.name in cleaned_data:
             continue
         if fields and f.name not in fields:
+            continue
+        if exclude and f.name in exclude:
             continue
         f.save_form_data(instance, cleaned_data[f.name])
     # Wrap up the saving of m2m data as a function.
@@ -115,8 +117,6 @@ def model_to_dict(instance, fields=None, exclude=None):
             else:
                 # MultipleChoiceWidget needs a list of pks, not object instances.
                 data[f.name] = [obj.pk for obj in f.value_from_object(instance)]
-        elif isinstance(f, OneToOneField):
-            data[f.attname] = f.value_from_object(instance)
         else:
             data[f.name] = f.value_from_object(instance)
     return data
@@ -261,11 +261,11 @@ class BaseModelFormSet(BaseFormSet):
 
     def save_new(self, form, commit=True):
         """Saves and returns a new model instance for the given form."""
-        return save_instance(form, self.model(), commit=commit)
+        return save_instance(form, self.model(), exclude=[self._pk_field.name], commit=commit)
 
     def save_existing(self, form, instance, commit=True):
         """Saves and returns an existing model instance for the given form."""
-        return save_instance(form, instance, commit=commit)
+        return save_instance(form, instance, exclude=[self._pk_field.name], commit=commit)
 
     def save(self, commit=True):
         """Saves model instances for every form, adding and changing instances
@@ -291,7 +291,7 @@ class BaseModelFormSet(BaseFormSet):
             existing_objects[obj.pk] = obj
         saved_instances = []
         for form in self.initial_forms:
-            obj = existing_objects[form.cleaned_data[self.model._meta.pk.attname]]
+            obj = existing_objects[form.cleaned_data[self._pk_field.name]]
             if self.can_delete and form.cleaned_data[DELETION_FIELD_NAME]:
                 self.deleted_objects.append(obj)
                 obj.delete()
@@ -319,9 +319,10 @@ class BaseModelFormSet(BaseFormSet):
 
     def add_fields(self, form, index):
         """Add a hidden field for the object's primary key."""
-        if self.model._meta.pk.auto_created:
-            self._pk_field_name = self.model._meta.pk.attname
-            form.fields[self._pk_field_name] = IntegerField(required=False, widget=HiddenInput)
+        from django.db.models import AutoField
+        self._pk_field = pk = self.model._meta.pk
+        if pk.auto_created or isinstance(pk, AutoField):
+            form.fields[self._pk_field.name] = IntegerField(required=False, widget=HiddenInput)
         super(BaseModelFormSet, self).add_fields(form, index)
 
 def modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.formfield(),
@@ -369,7 +370,12 @@ class BaseInlineFormSet(BaseModelFormSet):
     def save_new(self, form, commit=True):
         kwargs = {self.fk.get_attname(): self.instance.pk}
         new_obj = self.model(**kwargs)
-        return save_instance(form, new_obj, commit=commit)
+        return save_instance(form, new_obj, exclude=[self._pk_field.name], commit=commit)
+    
+    def add_fields(self, form, index):
+        super(BaseInlineFormSet, self).add_fields(form, index)
+        if self._pk_field == self.fk:
+            form.fields[self._pk_field.name] = IntegerField(required=False, widget=HiddenInput)
 
 def _get_foreign_key(parent_model, model, fk_name=None):
     """

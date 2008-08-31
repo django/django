@@ -47,8 +47,19 @@ class Place(models.Model):
         return self.name
 
 class Owner(models.Model):
+    auto_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     place = models.ForeignKey(Place)
+    
+    def __unicode__(self):
+        return "%s at %s" % (self.name, self.place)
+
+class OwnerProfile(models.Model):
+    owner = models.OneToOneField(Owner, primary_key=True)
+    age = models.PositiveIntegerField()
+    
+    def __unicode__(self):
+        return "%s is %d" % (self.owner.name, self.age)
 
 class Restaurant(Place):
     serves_pizza = models.BooleanField()
@@ -262,12 +273,12 @@ used.
 >>> for form in formset.forms:
 ...     print form.as_p()
 <p><label for="id_form-0-name">Name:</label> <input id="id_form-0-name" type="text" name="form-0-name" maxlength="100" /></p>
-<p><label for="id_form-0-write_speed">Write speed:</label> <input type="text" name="form-0-write_speed" id="id_form-0-write_speed" /><input type="hidden" name="form-0-author_ptr_id" id="id_form-0-author_ptr_id" /></p>
+<p><label for="id_form-0-write_speed">Write speed:</label> <input type="text" name="form-0-write_speed" id="id_form-0-write_speed" /><input type="hidden" name="form-0-author_ptr" id="id_form-0-author_ptr" /></p>
 
 >>> data = {
 ...     'form-TOTAL_FORMS': '1', # the number of forms rendered
 ...     'form-INITIAL_FORMS': '0', # the number of forms with initial data
-...     'form-0-author_ptr_id': '',
+...     'form-0-author_ptr': '',
 ...     'form-0-name': 'Ernest Hemingway',
 ...     'form-0-write_speed': '10',
 ... }
@@ -283,17 +294,17 @@ True
 >>> for form in formset.forms:
 ...     print form.as_p()
 <p><label for="id_form-0-name">Name:</label> <input id="id_form-0-name" type="text" name="form-0-name" value="Ernest Hemingway" maxlength="100" /></p>
-<p><label for="id_form-0-write_speed">Write speed:</label> <input type="text" name="form-0-write_speed" value="10" id="id_form-0-write_speed" /><input type="hidden" name="form-0-author_ptr_id" value="..." id="id_form-0-author_ptr_id" /></p>
+<p><label for="id_form-0-write_speed">Write speed:</label> <input type="text" name="form-0-write_speed" value="10" id="id_form-0-write_speed" /><input type="hidden" name="form-0-author_ptr" value="..." id="id_form-0-author_ptr" /></p>
 <p><label for="id_form-1-name">Name:</label> <input id="id_form-1-name" type="text" name="form-1-name" maxlength="100" /></p>
-<p><label for="id_form-1-write_speed">Write speed:</label> <input type="text" name="form-1-write_speed" id="id_form-1-write_speed" /><input type="hidden" name="form-1-author_ptr_id" id="id_form-1-author_ptr_id" /></p>
+<p><label for="id_form-1-write_speed">Write speed:</label> <input type="text" name="form-1-write_speed" id="id_form-1-write_speed" /><input type="hidden" name="form-1-author_ptr" id="id_form-1-author_ptr" /></p>
 
 >>> data = {
 ...     'form-TOTAL_FORMS': '2', # the number of forms rendered
 ...     'form-INITIAL_FORMS': '1', # the number of forms with initial data
-...     'form-0-author_ptr_id': hemingway_id,
+...     'form-0-author_ptr': hemingway_id,
 ...     'form-0-name': 'Ernest Hemingway',
 ...     'form-0-write_speed': '10',
-...     'form-1-author_ptr_id': '',
+...     'form-1-author_ptr': '',
 ...     'form-1-name': '',
 ...     'form-1-write_speed': '',
 ... }
@@ -418,6 +429,105 @@ We need to ensure that it is displayed
 ...     print form.as_p()
 <p><label for="id_form-0-my_pk">My pk:</label> <input id="id_form-0-my_pk" type="text" name="form-0-my_pk" maxlength="10" /></p>
 <p><label for="id_form-0-some_field">Some field:</label> <input id="id_form-0-some_field" type="text" name="form-0-some_field" maxlength="100" /></p>
+
+# Custom primary keys with ForeignKey, OneToOneField and AutoField ############
+
+>>> place = Place(name=u'Giordanos', city=u'Chicago')
+>>> place.save()
+
+>>> FormSet = inlineformset_factory(Place, Owner, extra=2, can_delete=False)
+>>> formset = FormSet(instance=place)
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_owner_set-0-name">Name:</label> <input id="id_owner_set-0-name" type="text" name="owner_set-0-name" maxlength="100" /><input type="hidden" name="owner_set-0-auto_id" id="id_owner_set-0-auto_id" /></p>
+<p><label for="id_owner_set-1-name">Name:</label> <input id="id_owner_set-1-name" type="text" name="owner_set-1-name" maxlength="100" /><input type="hidden" name="owner_set-1-auto_id" id="id_owner_set-1-auto_id" /></p>
+
+>>> data = {
+...     'owner_set-TOTAL_FORMS': '2',
+...     'owner_set-INITIAL_FORMS': '0',
+...     'owner_set-0-auto_id': '',
+...     'owner_set-0-name': u'Joe Perry',
+...     'owner_set-1-auto_id': '',
+...     'owner_set-1-name': '',
+... }
+>>> formset = FormSet(data, instance=place)
+>>> formset.is_valid()
+True
+>>> formset.save()
+[<Owner: Joe Perry at Giordanos>]
+
+>>> formset = FormSet(instance=place)
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_owner_set-0-name">Name:</label> <input id="id_owner_set-0-name" type="text" name="owner_set-0-name" value="Joe Perry" maxlength="100" /><input type="hidden" name="owner_set-0-auto_id" value="1" id="id_owner_set-0-auto_id" /></p>
+<p><label for="id_owner_set-1-name">Name:</label> <input id="id_owner_set-1-name" type="text" name="owner_set-1-name" maxlength="100" /><input type="hidden" name="owner_set-1-auto_id" id="id_owner_set-1-auto_id" /></p>
+<p><label for="id_owner_set-2-name">Name:</label> <input id="id_owner_set-2-name" type="text" name="owner_set-2-name" maxlength="100" /><input type="hidden" name="owner_set-2-auto_id" id="id_owner_set-2-auto_id" /></p>
+
+>>> data = {
+...     'owner_set-TOTAL_FORMS': '3',
+...     'owner_set-INITIAL_FORMS': '1',
+...     'owner_set-0-auto_id': u'1',
+...     'owner_set-0-name': u'Joe Perry',
+...     'owner_set-1-auto_id': '',
+...     'owner_set-1-name': u'Jack Berry',
+...     'owner_set-2-auto_id': '',
+...     'owner_set-2-name': '',
+... }
+>>> formset = FormSet(data, instance=place)
+>>> formset.is_valid()
+True
+>>> formset.save()
+[<Owner: Jack Berry at Giordanos>]
+
+# Ensure a custom primary key that is a ForeignKey or OneToOneField get rendered for the user to choose.
+
+>>> FormSet = modelformset_factory(OwnerProfile)
+>>> formset = FormSet()
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_form-0-owner">Owner:</label> <select name="form-0-owner" id="id_form-0-owner">
+<option value="" selected="selected">---------</option>
+<option value="1">Joe Perry at Giordanos</option>
+<option value="2">Jack Berry at Giordanos</option>
+</select></p>
+<p><label for="id_form-0-age">Age:</label> <input type="text" name="form-0-age" id="id_form-0-age" /></p>
+
+>>> owner = Owner.objects.get(name=u'Joe Perry')
+>>> FormSet = inlineformset_factory(Owner, OwnerProfile, max_num=1, can_delete=False)
+
+>>> formset = FormSet(instance=owner)
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_ownerprofile-0-age">Age:</label> <input type="text" name="ownerprofile-0-age" id="id_ownerprofile-0-age" /><input type="hidden" name="ownerprofile-0-owner" id="id_ownerprofile-0-owner" /></p>
+
+>>> data = {
+...     'ownerprofile-TOTAL_FORMS': '1',
+...     'ownerprofile-INITIAL_FORMS': '0',
+...     'ownerprofile-0-owner': '',
+...     'ownerprofile-0-age': u'54',
+... }
+>>> formset = FormSet(data, instance=owner)
+>>> formset.is_valid()
+True
+>>> formset.save()
+[<OwnerProfile: Joe Perry is 54>]
+
+>>> formset = FormSet(instance=owner)
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_ownerprofile-0-age">Age:</label> <input type="text" name="ownerprofile-0-age" value="54" id="id_ownerprofile-0-age" /><input type="hidden" name="ownerprofile-0-owner" value="1" id="id_ownerprofile-0-owner" /></p>
+
+>>> data = {
+...     'ownerprofile-TOTAL_FORMS': '1',
+...     'ownerprofile-INITIAL_FORMS': '1',
+...     'ownerprofile-0-owner': u'1',
+...     'ownerprofile-0-age': u'55',
+... }
+>>> formset = FormSet(data, instance=owner)
+>>> formset.is_valid()
+True
+>>> formset.save()
+[<OwnerProfile: Joe Perry is 55>]
 
 # Foreign keys in parents ########################################
 
