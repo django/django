@@ -33,6 +33,7 @@ def submit_row(context):
         'show_save_and_add_another': context['has_add_permission'] and 
                             not is_popup and (not save_as or context['add']),
         'show_save_and_continue': not is_popup and context['has_change_permission'],
+        'is_popup': is_popup,
         'show_save': True
     }
 submit_row = register.inclusion_tag('admin/submit_line.html', takes_context=True)(submit_row)
