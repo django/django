@@ -40,6 +40,7 @@ urlpatterns = patterns('',
     url(r'^(?i)test/2/?$', empty_view, name="test2"),
     url(r'^outer/(?P<outer>\d+)/',
             include('regressiontests.urlpatterns_reverse.included_urls')),
+    url('', include('regressiontests.urlpatterns_reverse.extra_urls')),
 
     # This is non-reversible, but we shouldn't blow up when parsing it.
     url(r'^(?:foo|bar)(\w+)/$', empty_view, name="disjunction"),

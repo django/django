@@ -61,6 +61,9 @@ test_data = (
     ('inner-extra', NoReverseMatch, ['fred', 'inner'], {}),
     ('disjunction', NoReverseMatch, ['foo'], {}),
     ('inner-disjunction', NoReverseMatch, ['10', '11'], {}),
+    ('extra-places', '/e-places/10/', ['10'], {}),
+    ('extra-people', '/e-people/fred/', ['fred'], {}),
+    ('extra-people', '/e-people/fred/', [], {'name': 'fred'}),
 )
 
 class URLPatternReverse(TestCase):

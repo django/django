@@ -74,7 +74,11 @@ def normalize(pattern):
     # A "while" loop is used here because later on we need to be able to peek
     # at the next character and possibly go around without consuming another
     # one at the top of the loop.
-    ch, escaped = pattern_iter.next()
+    try:
+        ch, escaped = pattern_iter.next()
+    except StopIteration:
+        return zip([''],  [[]])
+
     try:
         while True:
             if escaped:
