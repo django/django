@@ -374,7 +374,7 @@ class BoundField(StrAndUnicode):
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
             attrs = attrs and flatatt(attrs) or ''
-            contents = '<label for="%s"%s>%s</label>' % (widget.id_for_label(id_), attrs, contents)
+            contents = u'<label for="%s"%s>%s</label>' % (widget.id_for_label(id_), attrs, unicode(contents))
         return mark_safe(contents)
 
     def _is_hidden(self):

@@ -34,6 +34,16 @@ early and still send back the right translation.
 u'<p><label for="id_username">Nazwa u\u017cytkownika:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>'
 >>> deactivate()
 
+There was some problems with form translations in #5216
+>>> class SomeForm(Form):
+...     field_1 = CharField(max_length=10, label=ugettext_lazy('field_1'))
+...     field_2 = CharField(max_length=10, label=ugettext_lazy('field_2'), widget=TextInput(attrs={'id': 'field_2_id'}))
+>>> f = SomeForm()
+>>> print f['field_1'].label_tag()
+<label for="id_field_1">field_1</label>
+>>> print f['field_2'].label_tag()
+<label for="field_2_id">field_2</label>
+
 Unicode decoding problems...
 >>> GENDERS = ((u'\xc5', u'En tied\xe4'), (u'\xf8', u'Mies'), (u'\xdf', u'Nainen'))
 >>> class SomeForm(Form):
