@@ -305,7 +305,13 @@ class Field(object):
         "Returns a django.forms.Field instance for this database Field."
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         if self.choices:
-            defaults['widget'] = forms.Select(choices=self.get_choices(include_blank=self.blank or not (self.has_default() or 'initial' in kwargs)))
+            form_class = forms.TypedChoiceField
+            include_blank = self.blank or not (self.has_default() or 'initial' in kwargs)
+            defaults['choices'] = self.get_choices(include_blank=include_blank)
+            defaults['coerce'] = self.to_python
+            if self.null:
+                defaults['empty_value'] = None
+            kwargs.pop('max_length', None)
         if self.has_default():
             defaults['initial'] = self.get_default()
         defaults.update(kwargs)
