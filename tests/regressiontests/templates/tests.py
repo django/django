@@ -130,6 +130,12 @@ class Templates(unittest.TestCase):
             test_template_sources('/DIR1/index.HTML', template_dirs,
                                   ['/dir1/index.html'])
 
+    def test_token_smart_split(self):
+        # Regression test for #7027
+        token = template.Token(template.TOKEN_BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
+        split = token.split_contents()
+        self.assertEqual(split, ["sometag", '_("Page not found")', 'value|yesno:_("yes,no")'])
+
     def test_templates(self):
         template_tests = self.get_template_tests()
         filter_tests = filters.get_filter_tests()
