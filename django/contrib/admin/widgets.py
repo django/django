@@ -17,9 +17,14 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     """
     A SelectMultiple with a JavaScript filter interface.
 
-    Note that the resulting JavaScript assumes that the SelectFilter2.js
-    library and its dependencies have been loaded in the HTML page.
+    Note that the resulting JavaScript assumes that the jsi18n
+    catalog has been loaded in the page
     """
+    class Media:
+        js = (settings.ADMIN_MEDIA_PREFIX + "js/core.js",
+              settings.ADMIN_MEDIA_PREFIX + "js/SelectBox.js",
+              settings.ADMIN_MEDIA_PREFIX + "js/SelectFilter2.js")
+
     def __init__(self, verbose_name, is_stacked, attrs=None, choices=()):
         self.verbose_name = verbose_name
         self.is_stacked = is_stacked
@@ -181,6 +186,10 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         obj.attrs = self.widget.attrs
         memo[id(self)] = obj
         return obj
+
+    def _media(self):
+        return self.widget.media
+    media = property(_media)
 
     def render(self, name, value, *args, **kwargs):
         rel_to = self.rel.to
