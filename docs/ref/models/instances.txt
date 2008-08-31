@@ -107,10 +107,10 @@ What happens when you save?
 
 When you save an object, Django performs the following steps:
 
-    1. **Emit a ``pre_save`` signal.** This provides a notification that
-       an object is about to be saved. You can register a listener that
-       will be invoked whenever this signal is emitted. (These signals are
-       not yet documented.)
+    1. **Emit a pre-save signal.** The :ref:`signal <ref-signals>`
+       :attr:`django.db.models.signals.pre_save` is sent, allowing any
+       functions listening for that signal to take some customized
+       action.
 
     2. **Pre-process the data.** Each field on the object is asked to
        perform any automated data modification that the field may need
@@ -140,9 +140,10 @@ When you save an object, Django performs the following steps:
        data is then composed into an SQL statement for insertion into the
        database.
 
-    5. **Emit a ``post_save`` signal.** As with the ``pre_save`` signal, this
-       is used to provide notification that an object has been successfully
-       saved. (These signals are not yet documented.)
+    5. **Emit a post-save signal.** The signal
+       :attr:`django.db.models.signals.post_save` is sent, allowing
+       any functions listening for that signal to take some customized
+       action.
 
 How Django knows to UPDATE vs. INSERT
 -------------------------------------
