@@ -39,9 +39,9 @@ def find_management_module(app_name):
     parts.reverse()
     part = parts.pop()
     path = None
-    
+
     # When using manage.py, the project module is added to the path,
-    # loaded, then removed from the path. This means that 
+    # loaded, then removed from the path. This means that
     # testproject.testapp.models can be loaded in future, even if
     # testproject isn't in the path. When looking for the management
     # module, we need look for the case where the project name is part
@@ -51,7 +51,7 @@ def find_management_module(app_name):
     except ImportError,e:
         if os.path.basename(os.getcwd()) != part:
             raise e
-        
+
     while parts:
         part = parts.pop()
         f, path, descr = imp.find_module(part, path and [path] or None)
@@ -106,9 +106,9 @@ def get_commands():
             from django.conf import settings
             project_directory = setup_environ(
                 __import__(
-                    settings.SETTINGS_MODULE, {}, {}, 
+                    settings.SETTINGS_MODULE, {}, {},
                     (settings.SETTINGS_MODULE.split(".")[-1],)
-                )
+                ), settings.SETTINGS_MODULE
             )
         except (AttributeError, EnvironmentError, ImportError):
             project_directory = None
@@ -166,28 +166,28 @@ class LaxOptionParser(OptionParser):
     """
     def error(self, msg):
         pass
-    
+
     def print_help(self):
         """Output nothing.
-        
+
         The lax options are included in the normal option parser, so under
         normal usage, we don't need to print the lax options.
         """
         pass
-    
+
     def print_lax_help(self):
         """Output the basic options available to every command.
-        
+
         This just redirects to the default print_help() behaviour.
         """
         OptionParser.print_help(self)
-        
+
     def _process_args(self, largs, rargs, values):
         """
         Overrides OptionParser._process_args to exclusively handle default
-        options and ignore args and other options. 
-        
-        This overrides the behavior of the super class, which stop parsing 
+        options and ignore args and other options.
+
+        This overrides the behavior of the super class, which stop parsing
         at the first unrecognized option.
         """
         while rargs:
@@ -262,7 +262,7 @@ class ManagementUtility(object):
         # These options could affect the commands that are available, so they
         # must be processed early.
         parser = LaxOptionParser(usage="%prog subcommand [options] [args]",
-                                 version=get_version(), 
+                                 version=get_version(),
                                  option_list=BaseCommand.option_list)
         try:
             options, args = parser.parse_args(self.argv)
@@ -294,12 +294,15 @@ class ManagementUtility(object):
         else:
             self.fetch_command(subcommand).run_from_argv(self.argv)
 
-def setup_environ(settings_mod):
+def setup_environ(settings_mod, original_settings_path=None):
     """
     Configures the runtime environment. This can also be used by external
     scripts wanting to set up a similar environment to manage.py.
     Returns the project directory (assuming the passed settings module is
     directly in the project directory).
+
+    The "original_settings_path" parameter is optional, but recommended, since
+    trying to work out the original path from the module can be problematic.
     """
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory
@@ -314,7 +317,10 @@ def setup_environ(settings_mod):
     sys.path.pop()
 
     # Set DJANGO_SETTINGS_MODULE appropriately.
-    os.environ['DJANGO_SETTINGS_MODULE'] = '%s.%s' % (project_name, settings_name)
+    if original_settings_path:
+        os.environ['DJANGO_SETTINGS_MODULE'] = original_settings_path
+    else:
+        os.environ['DJANGO_SETTINGS_MODULE'] = '%s.%s' % (project_name, settings_name)
     return project_directory
 
 def execute_from_command_line(argv=None):
