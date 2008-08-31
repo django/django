@@ -20,9 +20,14 @@ class AdminForm(object):
             yield Fieldset(self.form, name, **options)
 
     def first_field(self):
-        if self.form._meta.fields is not None:
-            name = self.form._meta.fields[0]
-            return forms.BoundField(self.form, self.form.fields[name], name)
+        try:
+            fieldset_name, fieldset_options = self.fieldsets[0]
+            field_name = fieldset_options['fields'][0]
+            if not isinstance(field_name, basestring):
+                field_name = field_name[0]
+            return self.form[field_name]
+        except (KeyError, IndexError):
+            pass
         try:
             return iter(self.form).next()
         except StopIteration:
