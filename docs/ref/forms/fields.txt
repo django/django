@@ -362,6 +362,33 @@ Takes one extra required argument:
 
     An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
     field.
+    
+``TypedChoiceField``
+~~~~~~~~~~~~~~~~~~~~
+
+.. class:: TypedChoiceField(**kwargs)
+
+Just like a :class:`ChoiceField`, except :class:`TypedChoiceField` takes an
+extra ``coerce`` argument.
+
+    * Default widget: ``Select``
+    * Empty value: Whatever you've given as ``empty_value``
+    * Normalizes to: the value returned by the ``coerce`` argument.
+    * Validates that the given value exists in the list of choices.
+    * Error message keys: ``required``, ``invalid_choice``
+
+Takes extra arguments:
+
+.. attribute:: TypedChoiceField.coerce
+
+    A function that takes one argument and returns a coerced value. Examples
+    include the built-in ``int``, ``float``, ``bool`` and other types. Defaults
+    to an identity function.
+
+.. attribute:: TypedChoiceField.empty_value
+
+    The value to use to represent "empty." Defaults to the empty string;
+    ``None`` is another common choice here.
 
 ``DateField``
 ~~~~~~~~~~~~~

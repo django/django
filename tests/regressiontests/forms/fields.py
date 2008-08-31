@@ -1077,6 +1077,53 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 6 is not one of the available choices.']
 
+# TypedChoiceField ############################################################
+
+# TypedChoiceField is just like ChoiceField, except that coerced types will 
+# be returned:
+>>> f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int)
+>>> f.clean('1')
+1
+>>> f.clean('2')
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 2 is not one of the available choices.']
+
+# Different coercion, same validation.
+>>> f.coerce = float
+>>> f.clean('1')
+1.0
+
+
+# This can also cause weirdness: be careful (bool(-1) == True, remember)
+>>> f.coerce = bool
+>>> f.clean('-1') 
+True
+
+# Even more weirdness: if you have a valid choice but your coercion function
+# can't coerce, you'll still get a validation error. Don't do this!
+>>> f = TypedChoiceField(choices=[('A', 'A'), ('B', 'B')], coerce=int)
+>>> f.clean('B')
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. B is not one of the available choices.']
+
+# Required fields require values
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+# Non-required fields aren't required
+>>> f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=False)
+>>> f.clean('')
+''
+
+# If you want cleaning an empty value to return a different type, tell the field
+>>> f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=False, empty_value=None)
+>>> print f.clean('')
+None
+
 # NullBooleanField ############################################################
 
 >>> f = NullBooleanField()

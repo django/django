@@ -23,6 +23,7 @@ try:
 except NameError:
     from sets import Set as set
 
+import django.core.exceptions
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
 
@@ -39,6 +40,7 @@ __all__ = (
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
     'SplitDateTimeField', 'IPAddressField', 'FilePathField', 'SlugField',
+    'TypedChoiceField'
 )
 
 # These values, if given to to_python(), will trigger the self.required check.
@@ -656,6 +658,33 @@ class ChoiceField(Field):
                 if value == smart_unicode(k):
                     return True
         return False
+
+class TypedChoiceField(ChoiceField):
+    def __init__(self, *args, **kwargs):
+        self.coerce = kwargs.pop('coerce', lambda val: val)
+        self.empty_value = kwargs.pop('empty_value', '')
+        super(TypedChoiceField, self).__init__(*args, **kwargs)
+        
+    def clean(self, value):
+        """
+        Validate that the value is in self.choices and can be coerced to the
+        right type.
+        """
+        value = super(TypedChoiceField, self).clean(value)
+        if value == self.empty_value or value in EMPTY_VALUES:
+            return self.empty_value
+        
+        # Hack alert: This field is purpose-made to use with Field.to_python as
+        # a coercion function so that ModelForms with choices work. However,
+        # Django's Field.to_python raises django.core.exceptions.ValidationError,
+        # which is a *different* exception than
+        # django.forms.utils.ValidationError. So unfortunatly we need to catch
+        # both.
+        try:
+            value = self.coerce(value)
+        except (ValueError, TypeError, django.core.exceptions.ValidationError):
+            raise ValidationError(self.error_messages['invalid_choice'] % {'value': value})
+        return value
 
 class MultipleChoiceField(ChoiceField):
     hidden_widget = MultipleHiddenInput
