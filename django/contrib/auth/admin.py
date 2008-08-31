@@ -53,6 +53,8 @@ class UserAdmin(admin.ModelAdmin):
                 if "_addanother" in request.POST:
                     request.user.message_set.create(message=msg)
                     return HttpResponseRedirect(request.path)
+                elif '_popup' in request.REQUEST:
+                    return self.response_add(request, new_user)
                 else:
                     request.user.message_set.create(message=msg + ' ' + ugettext("You may edit it again below."))
                     return HttpResponseRedirect('../%s/' % new_user.id)
