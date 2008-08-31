@@ -228,12 +228,14 @@ class RegexURLResolver(object):
             if args:
                 if len(args) != len(params):
                     continue
-                candidate =  result % dict(zip(params, args))
+                unicode_args = [force_unicode(val) for val in args]
+                candidate =  result % dict(zip(params, unicode_args))
             else:
                 if set(kwargs.keys()) != set(params):
                     continue
-                candidate = result % kwargs
-            if re.search('^%s' % pattern, candidate, re.UNICODE):
+                unicode_kwargs = dict([(k, force_unicode(v)) for (k, v) in kwargs.items()])
+                candidate = result % unicode_kwargs
+            if re.search(u'^%s' % pattern, candidate, re.UNICODE):
                 return candidate
         raise NoReverseMatch("Reverse for '%s' with arguments '%s' and keyword "
                 "arguments '%s' not found." % (lookup_view, args, kwargs))
