@@ -8,3 +8,6 @@ def client(request, id):
 
 def client_action(request, id, action):
     pass
+
+def client2(request, tag):
+    pass
