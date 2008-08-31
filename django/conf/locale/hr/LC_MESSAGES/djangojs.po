@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-13 11:13+1000\n"
+"POT-Creation-Date: 2008-09-01 01:22+0200\n"
 "PO-Revision-Date: 2008-06-17 23:45+0100\n"
 "Last-Translator: Aljosa Mohorovic <aljosa.mohorovic@gmail.com>\n"
 "Language-Team: Hrvatski jezik\n"
@@ -44,20 +44,31 @@ msgstr "Odaberi iz izbora i klikni "
 msgid "Clear all"
 msgstr "Očisti sve"
 
-#: contrib/admin/media/js/dateparse.js:32
 #: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
 msgid ""
 "January February March April May June July August September October November "
 "December"
-msgstr "Siječanj Veljača Ožujak Travanj Svibanj Lipanj Srpanj Kolovoz Rujan Listopad Studeni Prosinac"
+msgstr ""
+"Siječanj Veljača Ožujak Travanj Svibanj Lipanj Srpanj Kolovoz Rujan Listopad "
+"Studeni Prosinac"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "N P U S Č P S"
 
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
 msgstr "Nedjelja Ponedjeljak Utorak Srijeda Četvrtak Petak Subota"
 
-#: contrib/admin/media/js/calendar.js:25
-msgid "S M T W T F S"
-msgstr "N P U S Č P S"
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "Prikaži"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "Sakri"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
@@ -105,13 +116,3 @@ msgstr "Jučer"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "Sutra"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
-msgid "Show"
-msgstr "Prikaži"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
-msgid "Hide"
-msgstr "Sakri"
-
