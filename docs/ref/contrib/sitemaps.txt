@@ -325,8 +325,8 @@ method::
   
     class Entry(models.Model):
         # ...
-        def save(self):
-            super(Entry, self).save()
+        def save(self, force_insert=False, force_update=False):
+            super(Entry, self).save(force_insert, force_update)
             try:
                 ping_google()
             except Exception:

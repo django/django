@@ -683,15 +683,16 @@ You're free to override these methods (and any other model method) to alter
 behavior.
 
 A classic use-case for overriding the built-in methods is if you want something
-to happen whenever you save an object. For example::
+to happen whenever you save an object. For example (see
+:meth:`~Model.save` for documentation of the parameters it accepts)::
 
     class Blog(models.Model):
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
-        def save(self):
+        def save(self, force_insert=False, force_update=False):
             do_something()
-            super(Blog, self).save() # Call the "real" save() method.
+            super(Blog, self).save(force_inset, force_update) # Call the "real" save() method.
             do_something_else()
 
 You can also prevent saving::
@@ -700,11 +701,11 @@ You can also prevent saving::
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
-        def save(self):
+        def save(self, force_insert=False, force_update=False):
             if self.name == "Yoko Ono's blog":
                 return # Yoko shall never have her own blog!
             else:
-                super(Blog, self).save() # Call the "real" save() method.
+                super(Blog, self).save(force_inset, force_update) # Call the "real" save() method.
 
 It's important to remember to call the superclass method -- that's that
 ``super(Blog, self).save()`` business -- to ensure that the object still gets
