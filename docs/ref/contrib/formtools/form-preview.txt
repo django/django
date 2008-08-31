@@ -75,7 +75,7 @@ How to use ``FormPreview``
        :class:`~django.contrib.formtools.FormPreview` subclass::
 
            from myapp.preview import SomeModelFormPreview
-           from myapp.models import SomeModel
+           from myapp.forms import SomeModelForm
            from django import forms
 
        ...and add the following line to the appropriate model in your URLconf::
@@ -102,7 +102,7 @@ anywhere in your codebase.
 =========================
 
 By default, the form is rendered via the template :file:`formtools/form.html`,
-and the preview page is rendered via the template :file:`formtools.preview.html`.
+and the preview page is rendered via the template :file:`formtools/preview.html`.
 These values can be overridden for a particular form preview by setting
 :attr:`~django.contrib.formtools.FormPreview.preview_template` and
 :attr:`~django.contrib.formtools.FormPreview.form_template` attributes on the
