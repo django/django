@@ -110,6 +110,9 @@ are the same as this one line::
 
     >>> car.photo.save('myphoto.jpg', contents, save=True)
 
+Note that the ``content`` argument must be an instance of
+:class:`File` or of a subclass of :class:`File`.
+
 ``File.delete(save=True)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

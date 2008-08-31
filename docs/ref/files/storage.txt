@@ -42,6 +42,10 @@ If there already exists a file with this name ``name``, the storage system may
 modify the filename as necessary to get a unique name. The actual name of the
 stored file will be returned.
 
+The ``content`` argument must be an instance of
+:class:`django.db.files.File` or of a subclass of
+:class:`~django.db.files.File`.
+
 ``Storage.delete(name)``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

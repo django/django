@@ -96,8 +96,9 @@ You can create an instance of some custom file storage class, or -- often more
 useful -- you can use the global default storage system::
 
     >>> from django.core.files.storage import default_storage
+    >>> from django.core.files.base import ContentFile
 
-    >>> path = default_storage.save('/path/to/file', 'new content')
+    >>> path = default_storage.save('/path/to/file', ContentFile('new content'))
     >>> path
     u'/path/to/file'
 
