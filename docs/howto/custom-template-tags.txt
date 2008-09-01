@@ -719,7 +719,7 @@ like:
     Jump directly to <a href="{{ link }}">{{ title }}</a>.
 
 Then, any time you want to use that custom tag, load its library and call it
-without any arguments, like so::
+without any arguments, like so:
 
 .. code-block:: html+django
 
