@@ -255,16 +255,18 @@ class BaseModelForm(BaseForm):
                     field_label = self.fields[field_name].label
                     # Insert the error into the error dict, very sneaky
                     self._errors[field_name] = ErrorList([
-                        _("%(model_name)s with this %(field_label)s already exists.") % \
-                        {'model_name': model_name, 'field_label': field_label}
+                        _(u"%(model_name)s with this %(field_label)s already exists.") % \
+                        {'model_name': unicode(model_name),
+                         'field_label': unicode(field_label)}
                     ])
                 # unique_together
                 else:
                     field_labels = [self.fields[field_name].label for field_name in unique_check]
                     field_labels = get_text_list(field_labels, _('and'))
                     form_errors.append(
-                        _("%(model_name)s with this %(field_label)s already exists.") % \
-                        {'model_name': model_name, 'field_label': field_labels}
+                        _(u"%(model_name)s with this %(field_label)s already exists.") % \
+                        {'model_name': unicode(model_name),
+                         'field_label': unicode(field_labels)}
                     )
                 
                 # Remove the data from the cleaned_data dict since it was invalid
