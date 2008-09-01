@@ -95,6 +95,8 @@ class CollectedObjects(object):
         while len(dealt_with) < len(models):
             found = False
             for model in models:
+                if model in dealt_with:
+                    continue
                 children = self.children.setdefault(model, [])
                 if len([c for c in children if c not in dealt_with]) == 0:
                     dealt_with[model] = None
