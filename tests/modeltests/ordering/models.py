@@ -77,4 +77,13 @@ __test__ = {'API_TESTS':"""
 # take the first two).
 >>> Article.objects.all().reverse()[:2]
 [<Article: Article 1>, <Article: Article 3>]
+
+# Ordering can be based on fields included from an 'extra' clause
+>>> Article.objects.extra(select={'foo': 'pub_date'}, order_by=['foo', 'headline'])
+[<Article: Article 1>, <Article: Article 2>, <Article: Article 3>, <Article: Article 4>]
+
+# If the extra clause uses an SQL keyword for a name, it will be protected by quoting.
+>>> Article.objects.extra(select={'order': 'pub_date'}, order_by=['order', 'headline'])
+[<Article: Article 1>, <Article: Article 2>, <Article: Article 3>, <Article: Article 4>]
+
 """}

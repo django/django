@@ -220,6 +220,13 @@ class Join(models.Model):
     a = models.ForeignKey(LeafA)
     b = models.ForeignKey(LeafB)
 
+class ReservedName(models.Model):
+    name = models.CharField(max_length=20)
+    order = models.IntegerField()
+    
+    def __unicode__(self):
+        return self.name
+        
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag.objects.create(name='t1')
 >>> t2 = Tag.objects.create(name='t2', parent=t1)
@@ -919,6 +926,15 @@ Bug #8597: regression tests for case-insensitive comparisons
 >>> Item.objects.filter(name__iendswith="A_b")
 [<Item: a_b>]
 
+Bug #7302: reserved names are appropriately escaped
+>>> _ = ReservedName.objects.create(name='a',order=42)
+>>> _ = ReservedName.objects.create(name='b',order=37)
+>>> ReservedName.objects.all().order_by('order')
+[<ReservedName: b>, <ReservedName: a>]
+
+>>> ReservedName.objects.extra(select={'stuff':'name'}, order_by=('order','stuff'))
+[<ReservedName: b>, <ReservedName: a>]
+ 
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__

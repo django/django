@@ -629,7 +629,7 @@ class Query(object):
                     result.append('%s %s' % (elt, order))
             else:
                 col, order = get_order_dir(field, asc)
-                elt = qn(col)
+                elt = qn2(col)
                 if distinct and elt not in select_aliases:
                     ordering_aliases.append(elt)
                 result.append('%s %s' % (elt, order))
