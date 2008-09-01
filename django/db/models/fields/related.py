@@ -684,7 +684,7 @@ class ForeignKey(RelatedField, Field):
 
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
-        
+
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.ModelChoiceField, 'queryset': self.rel.to._default_manager.complex_filter(self.rel.limit_choices_to)}
         defaults.update(kwargs)
@@ -695,8 +695,13 @@ class ForeignKey(RelatedField, Field):
         # of the field to which it points. An exception is if the ForeignKey
         # points to an AutoField/PositiveIntegerField/PositiveSmallIntegerField,
         # in which case the column type is simply that of an IntegerField.
+        # If the database needs similar types for key fields however, the only
+        # thing we can do is making AutoField an IntegerField.
         rel_field = self.rel.get_related_field()
-        if isinstance(rel_field, (AutoField, PositiveIntegerField, PositiveSmallIntegerField)):
+        if (isinstance(rel_field, AutoField) or
+                (not connection.features.related_fields_match_type and
+                isinstance(rel_field, (PositiveIntegerField,
+                                       PositiveSmallIntegerField)))):
             return IntegerField().db_type()
         return rel_field.db_type()
 

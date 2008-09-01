@@ -32,6 +32,20 @@ class Party(models.Model):
 class Event(models.Model):
     when = models.DateTimeField()
 
+class Department(models.Model):
+    id = models.PositiveIntegerField(primary_key=True)
+    name = models.CharField(max_length=200)
+
+    def __unicode__(self):
+        return self.name
+
+class Worker(models.Model):
+    department = models.ForeignKey(Department)
+    name = models.CharField(max_length=200)
+
+    def __unicode__(self):
+        return self.name
+
 __test__ = {'API_TESTS': """
 (NOTE: Part of the regression test here is merely parsing the model
 declaration. The verbose_name, in particular, did not always work.)
@@ -95,5 +109,14 @@ u''
 datetime.datetime(2000, 1, 1, 13, 1, 1)
 >>> e.get_previous_by_when().when
 datetime.datetime(2000, 1, 1, 6, 1, 1)
+
+# Check Department and Worker
+>>> d = Department(id=10, name='IT')
+>>> d.save()
+>>> w = Worker(department=d, name='Full-time')
+>>> w.save()
+>>> w
+<Worker: Full-time>
+
 """
 }

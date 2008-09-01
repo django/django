@@ -71,6 +71,9 @@ class BaseDatabaseFeatures(object):
     interprets_empty_strings_as_nulls = False
     can_use_chunked_reads = True
     uses_savepoints = False
+    # If True, don't use integer foreign keys referring to, e.g., positive
+    # integer primary keys.
+    related_fields_match_type = False
 
 class BaseDatabaseOperations(object):
     """

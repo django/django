@@ -110,6 +110,7 @@ class CursorWrapper(object):
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
     update_can_self_select = False
+    related_fields_match_type = True
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
