@@ -5,7 +5,7 @@ and database field objects.
 
 from django.utils.encoding import smart_unicode
 from django.utils.datastructures import SortedDict
-from django.utils.text import get_text_list
+from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _
 
 from util import ValidationError, ErrorList
@@ -247,7 +247,7 @@ class BaseModelForm(BaseForm):
             # This cute trick with extra/values is the most efficiant way to
             # tell if a particular query returns any results.
             if qs.extra(select={'a': 1}).values('a').order_by():
-                model_name = self.instance._meta.verbose_name.title()
+                model_name = capfirst(self.instance._meta.verbose_name)
                 
                 # A unique field
                 if len(unique_check) == 1:
