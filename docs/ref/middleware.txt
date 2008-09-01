@@ -20,9 +20,11 @@ Cache middleware
 .. module:: django.middleware.cache
    :synopsis: Middleware for the site-wide cache
    
-.. class:: django.middleware.cache.CacheMiddleware
+.. class:: django.middleware.cache.UpdateCacheMiddleware
 
-Enables the site-wide cache. If this is enabled, each Django-powered page will
+.. class:: django.middleware.cache.FetchFromCacheMiddleware
+
+Enable the site-wide cache. If these are enabled, each Django-powered page will
 be cached for as long as the :setting:`CACHE_MIDDLEWARE_SECONDS` setting
 defines. See the :ref:`cache documentation <topics-cache>`.
 
