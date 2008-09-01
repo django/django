@@ -1050,6 +1050,10 @@ class Query(object):
                 raise ValueError("Cannot use None as a query value")
             lookup_type = 'isnull'
             value = True
+        elif (value == '' and lookup_type == 'exact' and
+              connection.features.interprets_empty_strings_as_nulls):
+            lookup_type = 'isnull'
+            value = True
         elif callable(value):
             value = value()
 
