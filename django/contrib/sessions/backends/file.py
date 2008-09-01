@@ -113,12 +113,12 @@ class SessionStore(SessionBase):
         try:
             output_file_fd, output_file_name = tempfile.mkstemp(dir=dir,
                 prefix=prefix + '_out_')
+            renamed = False
             try:
                 try:
                     os.write(output_file_fd, self.encode(session_data))
                 finally:
                     os.close(output_file_fd)
-                renamed = False
                 os.rename(output_file_name, session_file_name)
                 renamed = True
             finally:
