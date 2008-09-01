@@ -4,9 +4,9 @@
 # This file is distributed under the same license as the Django package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Django vSVN\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-27 10:34+0200\n"
+"POT-Creation-Date: 2008-09-01 07:16+0200\n"
 "PO-Revision-Date: 2008-08-14 18:36+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "Language-Team: Italiano\n"
