@@ -82,4 +82,11 @@ datetime.datetime(2007, 4, 20, 16, 19, 59)
 >>> Donut.objects.filter(consumed_at__year=2008)
 []
 
+# TZ-aware datetimes (#8354).
+>>> from django.utils import tzinfo
+>>> dt = datetime.datetime(2008, 8, 31, 16, 20, tzinfo=tzinfo.FixedOffset(0))
+>>> d = Donut(name='Bear claw', consumed_at=dt)
+>>> d.save()
+>>> Donut.objects.filter(consumed_at=dt)
+[<Donut: Bear claw>]
 """}
