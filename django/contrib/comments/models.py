@@ -16,9 +16,10 @@ class BaseCommentAbstractModel(models.Model):
     An abstract base class that any custom comment models probably should
     subclass.
     """
-    
+
     # Content-object field
-    content_type   = models.ForeignKey(ContentType)
+    content_type   = models.ForeignKey(ContentType,
+            related_name="content_type_set_for_%(class)s")
     object_pk      = models.TextField(_('object ID'))
     content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
 
