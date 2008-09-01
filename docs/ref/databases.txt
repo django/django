@@ -65,7 +65,7 @@ For now, InnoDB is probably your best choice.
 .. _BDB: http://dev.mysql.com/doc/refman/5.0/en/bdb-storage-engine.html
 .. _InnoDB: http://dev.mysql.com/doc/refman/5.0/en/innodb.html
 .. _Other storage engines: http://dev.mysql.com/doc/refman/5.1/en/storage-engines-other.html
-.. _SolidDB: http://forge.mysql.com/projects/view.php?id=139
+.. _SolidDB: http://forge.mysql.com/projects/project.php?id=139
 .. _Falcon: http://dev.mysql.com/doc/falcon/en/index.html
 
 MySQLdb

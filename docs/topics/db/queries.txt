@@ -639,9 +639,10 @@ precede the definition of any keyword arguments. For example::
 
 .. seealso::
 
-    The `OR lookups examples`_ show some possible uses of ``Q``.
+    The `OR lookups examples`_ in the Django unit tests show some possible uses
+    of ``Q``.
 
-    .. _OR lookups examples: http://www.djangoproject.com/models/or_lookups/
+    .. _OR lookups examples: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/or_lookups/models.py
 
 Comparing objects
 =================

@@ -174,7 +174,7 @@ from the request's POST data, sends that to admin@example.com and redirects to
             # to get proper validation errors.
             return HttpResponse('Make sure all fields are entered and valid.')
 
-.. _Header injection: http://securephp.damonkohler.com/index.php/Email_Injection
+.. _Header injection: http://www.nyphp.org/phundamentals/email_header_injection.php
 
 .. _emailmessage-and-smtpconnection:
 
