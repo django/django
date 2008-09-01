@@ -1,3 +1,7 @@
+
+import datetime
+
+from django import forms
 from django.db import models
 
 try:
@@ -92,6 +96,16 @@ class Price(models.Model):
 class MexicanRestaurant(Restaurant):
     serves_tacos = models.BooleanField()
 
+# models for testing callable defaults (see bug #7975). If you define a model
+# with a callable default value, you cannot rely on the initial value in a
+# form.
+class Person(models.Model):
+    name = models.CharField(max_length=128)
+
+class Membership(models.Model):
+    person = models.ForeignKey(Person)
+    date_joined = models.DateTimeField(default=datetime.datetime.now)
+    karma = models.IntegerField()
 
 __test__ = {'API_TESTS': """
 
@@ -620,5 +634,72 @@ True
 False
 >>> formset.errors
 [{'__all__': [u'Price with this Price and Quantity already exists.']}]
+
+# Use of callable defaults (see bug #7975).
+
+>>> person = Person.objects.create(name='Ringo')
+>>> FormSet = inlineformset_factory(Person, Membership, can_delete=False, extra=1)
+>>> formset = FormSet(instance=person)
+
+# Django will render a hidden field for model fields that have a callable
+# default. This is required to ensure the value is tested for change correctly
+# when determine what extra forms have changed to save.
+
+>>> form = formset.forms[0] # this formset only has one form
+>>> now = form.fields['date_joined'].initial
+>>> print form.as_p()
+<p><label for="id_membership_set-0-date_joined">Date joined:</label> <input type="text" name="membership_set-0-date_joined" value="..." id="id_membership_set-0-date_joined" /><input type="hidden" name="initial-membership_set-0-date_joined" value="..." id="id_membership_set-0-date_joined" /></p>
+<p><label for="id_membership_set-0-karma">Karma:</label> <input type="text" name="membership_set-0-karma" id="id_membership_set-0-karma" /><input type="hidden" name="membership_set-0-id" id="id_membership_set-0-id" /></p>
+
+# test for validation with callable defaults. Validations rely on hidden fields
+
+>>> data = {
+...     'membership_set-TOTAL_FORMS': '1',
+...     'membership_set-INITIAL_FORMS': '0',
+...     'membership_set-0-date_joined': unicode(now.strftime('%Y-%m-%d %H:%M:%S')),
+...     'initial-membership_set-0-date_joined': unicode(now.strftime('%Y-%m-%d %H:%M:%S')),
+...     'membership_set-0-karma': '',
+... }
+>>> formset = FormSet(data, instance=person)
+>>> formset.is_valid()
+True
+
+# now test for when the data changes
+
+>>> one_day_later = now + datetime.timedelta(days=1)
+>>> filled_data = {
+...     'membership_set-TOTAL_FORMS': '1',
+...     'membership_set-INITIAL_FORMS': '0',
+...     'membership_set-0-date_joined': unicode(one_day_later.strftime('%Y-%m-%d %H:%M:%S')),
+...     'initial-membership_set-0-date_joined': unicode(now.strftime('%Y-%m-%d %H:%M:%S')),
+...     'membership_set-0-karma': '',
+... }
+>>> formset = FormSet(filled_data, instance=person)
+>>> formset.is_valid()
+False
+
+# now test with split datetime fields
+
+>>> class MembershipForm(forms.ModelForm):
+...     date_joined = forms.SplitDateTimeField(initial=now)
+...     class Meta:
+...         model = Membership
+...     def __init__(self, **kwargs):
+...         super(MembershipForm, self).__init__(**kwargs)
+...         self.fields['date_joined'].widget = forms.SplitDateTimeWidget()
+
+>>> FormSet = inlineformset_factory(Person, Membership, form=MembershipForm, can_delete=False, extra=1)
+>>> data = {
+...     'membership_set-TOTAL_FORMS': '1',
+...     'membership_set-INITIAL_FORMS': '0',
+...     'membership_set-0-date_joined_0': unicode(now.strftime('%Y-%m-%d')),
+...     'membership_set-0-date_joined_1': unicode(now.strftime('%H:%M:%S')),
+...     'initial-membership_set-0-date_joined': unicode(now.strftime('%Y-%m-%d %H:%M:%S')),
+...     'membership_set-0-karma': '',
+... }
+>>> formset = FormSet(data, instance=person)
+>>> formset.is_valid()
+True
+
 
 """}

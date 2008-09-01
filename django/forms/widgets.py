@@ -25,7 +25,8 @@ __all__ = (
     'HiddenInput', 'MultipleHiddenInput',
     'FileInput', 'DateTimeInput', 'TimeInput', 'Textarea', 'CheckboxInput',
     'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
-    'CheckboxSelectMultiple', 'MultiWidget', 'SplitDateTimeWidget',
+    'CheckboxSelectMultiple', 'MultiWidget',
+    'SplitDateTimeWidget',
 )
 
 MEDIA_TYPES = ('css','js')
@@ -617,7 +618,8 @@ class MultiWidget(Widget):
         if initial is None:
             initial = [u'' for x in range(0, len(data))]
         else:
-            initial = self.decompress(initial)
+            if not isinstance(initial, list):
+                initial = self.decompress(initial)
         for widget, initial, data in zip(self.widgets, initial, data):
             if widget._has_changed(initial, data):
                 return True
@@ -662,3 +664,11 @@ class SplitDateTimeWidget(MultiWidget):
             return [value.date(), value.time().replace(microsecond=0)]
         return [None, None]
 
+class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
+    """
+    A Widget that splits datetime input into two <input type="hidden"> inputs.
+    """
+    def __init__(self, attrs=None):
+        widgets = (HiddenInput(attrs=attrs), HiddenInput(attrs=attrs))
+        super(SplitDateTimeWidget, self).__init__(widgets, attrs)
+        

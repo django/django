@@ -231,7 +231,7 @@ class Field(object):
 
     def get_default(self):
         "Returns the default value for this field."
-        if self.default is not NOT_PROVIDED:
+        if self.has_default():
             if callable(self.default):
                 return self.default()
             return force_unicode(self.default, strings_only=True)
@@ -306,7 +306,8 @@ class Field(object):
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         if self.has_default():
             defaults['initial'] = self.get_default()
-
+            if callable(self.default):
+                defaults['show_hidden_initial'] = True
         if self.choices:
             # Fields with choices get special treatment. 
             include_blank = self.blank or not (self.has_default() or 'initial' in kwargs)
@@ -314,9 +315,7 @@ class Field(object):
             defaults['coerce'] = self.to_python
             if self.null:
                 defaults['empty_value'] = None
-            
             form_class = forms.TypedChoiceField
-            
             # Many of the subclass-specific formfield arguments (min_value,
             # max_value) don't apply for choice fields, so be sure to only pass
             # the values that TypedChoiceField will understand.
@@ -325,7 +324,6 @@ class Field(object):
                              'widget', 'label', 'initial', 'help_text',
                              'error_messages'):
                     del kwargs[k]
-        
         defaults.update(kwargs)
         return form_class(**defaults)
 

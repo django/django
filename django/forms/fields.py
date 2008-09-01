@@ -28,7 +28,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
 
 from util import ErrorList, ValidationError
-from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateTimeInput, TimeInput
+from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateTimeInput, TimeInput, SplitHiddenDateTimeWidget
 from django.core.files.uploadedfile import SimpleUploadedFile as UploadedFile
 
 __all__ = (
@@ -59,7 +59,7 @@ class Field(object):
     creation_counter = 0
 
     def __init__(self, required=True, widget=None, label=None, initial=None,
-                 help_text=None, error_messages=None):
+                 help_text=None, error_messages=None, show_hidden_initial=False):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
         # widget -- A Widget class, or instance of a Widget class, that should
@@ -73,9 +73,12 @@ class Field(object):
         # initial -- A value to use in this Field's initial display. This value
         #            is *not* used as a fallback if data isn't given.
         # help_text -- An optional string to use as "help text" for this Field.
+        # show_hidden_initial -- Boolean that specifies if it is needed to render a
+        #                        hidden widget with initial value after widget.
         if label is not None:
             label = smart_unicode(label)
         self.required, self.label, self.initial = required, label, initial
+        self.show_hidden_initial = show_hidden_initial
         if help_text is None:
             self.help_text = u''
         else:
@@ -840,6 +843,7 @@ class FilePathField(ChoiceField):
         self.widget.choices = self.choices
 
 class SplitDateTimeField(MultiValueField):
+    hidden_widget = SplitHiddenDateTimeWidget
     default_error_messages = {
         'invalid_date': _(u'Enter a valid date.'),
         'invalid_time': _(u'Enter a valid time.'),

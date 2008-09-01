@@ -128,6 +128,12 @@ class BaseForm(StrAndUnicode):
         """
         return self.prefix and ('%s-%s' % (self.prefix, field_name)) or field_name
 
+    def add_initial_prefix(self, field_name):
+        """
+        Add a 'initial' prefix for checking dynamic initial values
+        """
+        return u'initial-%s' % self.add_prefix(field_name)
+
     def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row):
         "Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."
         top_errors = self.non_field_errors() # Errors that should be displayed above all fields.
@@ -245,7 +251,7 @@ class BaseForm(StrAndUnicode):
         Returns True if data differs from initial.
         """
         return bool(self.changed_data)
-    
+
     def _get_changed_data(self):
         if self._changed_data is None:
             self._changed_data = []
@@ -258,7 +264,13 @@ class BaseForm(StrAndUnicode):
             for name, field in self.fields.items():
                 prefixed_name = self.add_prefix(name)
                 data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
-                initial_value = self.initial.get(name, field.initial)
+                if not field.show_hidden_initial:
+                    initial_value = self.initial.get(name, field.initial)
+                else:
+                    initial_prefixed_name = self.add_initial_prefix(name)
+                    hidden_widget = field.hidden_widget()
+                    initial_value = hidden_widget.value_from_datadict(
+                        self.data, self.files, initial_prefixed_name)
                 if field.widget._has_changed(initial_value, data_value):
                     self._changed_data.append(name)
         return self._changed_data
@@ -300,6 +312,7 @@ class BoundField(StrAndUnicode):
         self.field = field
         self.name = name
         self.html_name = form.add_prefix(name)
+        self.html_initial_name = form.add_initial_prefix(name)
         if self.field.label is None:
             self.label = pretty_name(name)
         else:
@@ -308,6 +321,8 @@ class BoundField(StrAndUnicode):
 
     def __unicode__(self):
         """Renders this field as an HTML widget."""
+        if self.field.show_hidden_initial:
+            return self.as_widget() + self.as_hidden(only_initial=True)
         return self.as_widget()
 
     def _errors(self):
@@ -318,7 +333,7 @@ class BoundField(StrAndUnicode):
         return self.form.errors.get(self.name, self.form.error_class())
     errors = property(_errors)
 
-    def as_widget(self, widget=None, attrs=None):
+    def as_widget(self, widget=None, attrs=None, only_initial=False):
         """
         Renders the field by rendering the passed widget, adding any HTML
         attributes passed as attrs.  If no widget is specified, then the
@@ -330,29 +345,33 @@ class BoundField(StrAndUnicode):
         auto_id = self.auto_id
         if auto_id and 'id' not in attrs and 'id' not in widget.attrs:
             attrs['id'] = auto_id
-        if not self.form.is_bound:
+        if not self.form.is_bound or only_initial:
             data = self.form.initial.get(self.name, self.field.initial)
             if callable(data):
                 data = data()
         else:
             data = self.data
-        return widget.render(self.html_name, data, attrs=attrs)
-
-    def as_text(self, attrs=None):
+        if not only_initial:
+            name = self.html_name
+        else:
+            name = self.html_initial_name
+        return widget.render(name, data, attrs=attrs)
+        
+    def as_text(self, attrs=None, **kwargs):
         """
         Returns a string of HTML for representing this as an <input type="text">.
         """
-        return self.as_widget(TextInput(), attrs)
+        return self.as_widget(TextInput(), attrs, **kwargs)
 
-    def as_textarea(self, attrs=None):
+    def as_textarea(self, attrs=None, **kwargs):
         "Returns a string of HTML for representing this as a <textarea>."
-        return self.as_widget(Textarea(), attrs)
+        return self.as_widget(Textarea(), attrs, **kwargs)
 
-    def as_hidden(self, attrs=None):
+    def as_hidden(self, attrs=None, **kwargs):
         """
         Returns a string of HTML for representing this as an <input type="hidden">.
         """
-        return self.as_widget(self.field.hidden_widget(), attrs)
+        return self.as_widget(self.field.hidden_widget(), attrs, **kwargs)
 
     def _data(self):
         """
