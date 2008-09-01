@@ -142,7 +142,12 @@ class RelatedField(object):
         if hasattr(value, 'as_sql'):
             sql, params = value.as_sql()
             return QueryWrapper(('(%s)' % sql), params)
-        if lookup_type == 'exact':
+
+        # FIXME: lt and gt are explicitally allowed to make
+        # get_(next/prev)_by_date work; other lookups are not allowed since that
+        # gets messy pretty quick. This is a good candidate for some refactoring
+        # in the future.
+        if lookup_type in ['exact', 'gt', 'lt']:
             return [pk_trace(value)]
         if lookup_type in ('range', 'in'):
             return [pk_trace(v) for v in value]

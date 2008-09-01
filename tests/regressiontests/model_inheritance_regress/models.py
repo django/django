@@ -59,6 +59,18 @@ class SelfRefParent(models.Model):
 class SelfRefChild(SelfRefParent):
     child_data = models.IntegerField()
 
+class Article(models.Model):
+    headline = models.CharField(max_length=100)
+    pub_date = models.DateTimeField()
+    class Meta:
+        ordering = ('-pub_date', 'headline')
+
+    def __unicode__(self):
+        return self.headline
+
+class ArticleWithAuthor(Article):
+    author = models.CharField(max_length=100) 
+
 __test__ = {'API_TESTS':"""
 # Regression for #7350, #7202
 # Check that when you create a Parent object with a specific reference to an
@@ -193,5 +205,30 @@ True
 
 >>> obj = SelfRefChild.objects.create(child_data=37, parent_data=42)
 >>> obj.delete()
+
+# Regression tests for #8076 - get_(next/previous)_by_date should 
+>>> c1 = ArticleWithAuthor(headline='ArticleWithAuthor 1', author="Person 1", pub_date=datetime.datetime(2005, 8, 1, 3, 0))
+>>> c1.save()
+>>> c2 = ArticleWithAuthor(headline='ArticleWithAuthor 2', author="Person 2", pub_date=datetime.datetime(2005, 8, 1, 10, 0))
+>>> c2.save()
+>>> c3 = ArticleWithAuthor(headline='ArticleWithAuthor 3', author="Person 3", pub_date=datetime.datetime(2005, 8, 2))
+>>> c3.save()
+
+>>> c1.get_next_by_pub_date()
+<ArticleWithAuthor: ArticleWithAuthor 2>
+>>> c2.get_next_by_pub_date()
+<ArticleWithAuthor: ArticleWithAuthor 3>
+>>> c3.get_next_by_pub_date()
+Traceback (most recent call last):
+    ...
+DoesNotExist: ArticleWithAuthor matching query does not exist.
+>>> c3.get_previous_by_pub_date()
+<ArticleWithAuthor: ArticleWithAuthor 2>
+>>> c2.get_previous_by_pub_date()
+<ArticleWithAuthor: ArticleWithAuthor 1>
+>>> c1.get_previous_by_pub_date()
+Traceback (most recent call last):
+    ...
+DoesNotExist: ArticleWithAuthor matching query does not exist.
 
 """}
