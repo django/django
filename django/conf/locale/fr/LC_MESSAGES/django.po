@@ -4069,8 +4069,8 @@ msgstr[1] "semaines"
 #: utils/timesince.py:24
 msgid "day"
 msgid_plural "days"
-msgstr[0] "journée"
-msgstr[1] "journées"
+msgstr[0] "jour"
+msgstr[1] "jours"
 
 #: utils/timesince.py:25
 msgid "hour"
