@@ -78,7 +78,7 @@ class BetterWriter(Writer):
 class WriterProfile(models.Model):
     writer = models.OneToOneField(Writer, primary_key=True)
     age = models.PositiveIntegerField()
-    
+
     def __unicode__(self):
         return "%s is %s" % (self.writer, self.age)
 
@@ -137,7 +137,14 @@ class Price(models.Model):
 class ArticleStatus(models.Model):
     status = models.CharField(max_length=2, choices=ARTICLE_STATUS_CHAR, blank=True, null=True)
 
+class Inventory(models.Model):
+   barcode = models.PositiveIntegerField(unique=True)
+   parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
+   name = models.CharField(blank=False, max_length=20)
 
+   def __unicode__(self):
+      return self.name
+      
 __test__ = {'API_TESTS': """
 >>> from django import forms
 >>> from django.forms.models import ModelForm, model_to_dict
@@ -1135,7 +1142,7 @@ u'1,2,3'
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter only digits separated by commas.']
->>> f.clean(',,,,') 
+>>> f.clean(',,,,')
 u',,,,'
 >>> f.clean('1.2')
 Traceback (most recent call last):
@@ -1204,4 +1211,36 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. z is not one of the available choices.']
 
+# Foreign keys which use to_field #############################################
+
+>>> apple = Inventory.objects.create(barcode=86, name='Apple')
+>>> pear = Inventory.objects.create(barcode=22, name='Pear')
+>>> core = Inventory.objects.create(barcode=87, name='Core', parent=apple)
+
+>>> field = ModelChoiceField(Inventory.objects.all(), to_field_name='barcode')
+>>> for choice in field.choices:
+...     print choice
+(u'', u'---------')
+(86, u'Apple')
+(22, u'Pear')
+(87, u'Core')
+
+>>> class InventoryForm(ModelForm):
+...     class Meta:
+...         model = Inventory
+>>> form = InventoryForm(instance=core)
+>>> print form['parent']
+<select name="parent" id="id_parent">
+<option value="">---------</option>
+<option value="86" selected="selected">Apple</option>
+<option value="22">Pear</option>
+<option value="87">Core</option>
+</select>
+
+>>> data = model_to_dict(core)
+>>> data['parent'] = '22'
+>>> form = InventoryForm(data=data, instance=core)
+>>> core = form.save()
+>>> core.parent
+<Inventory: Pear>
 """}

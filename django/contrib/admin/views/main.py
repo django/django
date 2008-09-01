@@ -24,6 +24,7 @@ ORDER_VAR = 'o'
 ORDER_TYPE_VAR = 'ot'
 PAGE_VAR = 'p'
 SEARCH_VAR = 'q'
+TO_FIELD_VAR = 't'
 IS_POPUP_VAR = 'pop'
 ERROR_FLAG = 'e'
 
@@ -52,9 +53,12 @@ class ChangeList(object):
             self.page_num = 0
         self.show_all = ALL_VAR in request.GET
         self.is_popup = IS_POPUP_VAR in request.GET
+        self.to_field = request.GET.get(TO_FIELD_VAR)
         self.params = dict(request.GET.items())
         if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
+        if TO_FIELD_VAR in self.params:
+            del self.params[TO_FIELD_VAR]
         if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
 

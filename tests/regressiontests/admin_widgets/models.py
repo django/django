@@ -5,14 +5,14 @@ from django.core.files.storage import default_storage
 
 class Member(models.Model):
     name = models.CharField(max_length=100)
-    
+
     def __unicode__(self):
         return self.name
 
 class Band(models.Model):
     name = models.CharField(max_length=100)
     members = models.ManyToManyField(Member)
-    
+
     def __unicode__(self):
         return self.name
 
@@ -20,9 +20,17 @@ class Album(models.Model):
     band = models.ForeignKey(Band)
     name = models.CharField(max_length=100)
     cover_art = models.FileField(upload_to='albums')
-    
+
     def __unicode__(self):
         return self.name
+
+class Inventory(models.Model):
+   barcode = models.PositiveIntegerField(unique=True)
+   parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
+   name = models.CharField(blank=False, max_length=20)
+
+   def __unicode__(self):
+      return self.name
 
 __test__ = {'WIDGETS_TESTS': """
 >>> from datetime import datetime
@@ -84,6 +92,15 @@ True
 >>> w._has_changed([1, 2], [u'1', u'3'])
 True
 
+# Check that ForeignKeyRawIdWidget works with fields which aren't related to
+# the model's primary key.
+>>> apple = Inventory.objects.create(barcode=86, name='Apple')
+>>> pear = Inventory.objects.create(barcode=22, name='Pear')
+>>> core = Inventory.objects.create(barcode=87, name='Core', parent=apple)
+>>> rel = Inventory._meta.get_field('parent').rel
+>>> w = ForeignKeyRawIdWidget(rel)
+>>> print w.render('test', core.parent_id, attrs={})
+<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="../../../admin_widgets/inventory/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/admin_media/img/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>
 """ % {
     'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX,
     'STORAGE_URL': default_storage.url(''),

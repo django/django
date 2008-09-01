@@ -41,20 +41,20 @@ class FilteredSelectMultiple(forms.SelectMultiple):
 
 class AdminDateWidget(forms.TextInput):
     class Media:
-        js = (settings.ADMIN_MEDIA_PREFIX + "js/calendar.js", 
+        js = (settings.ADMIN_MEDIA_PREFIX + "js/calendar.js",
               settings.ADMIN_MEDIA_PREFIX + "js/admin/DateTimeShortcuts.js")
-        
+
     def __init__(self, attrs={}):
         super(AdminDateWidget, self).__init__(attrs={'class': 'vDateField', 'size': '10'})
 
 class AdminTimeWidget(forms.TextInput):
     class Media:
-        js = (settings.ADMIN_MEDIA_PREFIX + "js/calendar.js", 
+        js = (settings.ADMIN_MEDIA_PREFIX + "js/calendar.js",
               settings.ADMIN_MEDIA_PREFIX + "js/admin/DateTimeShortcuts.js")
 
     def __init__(self, attrs={}):
         super(AdminTimeWidget, self).__init__(attrs={'class': 'vTimeField', 'size': '8'})
-    
+
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
     """
     A SplitDateTime Widget that has some admin-specific styling.
@@ -86,7 +86,7 @@ class AdminFileWidget(forms.FileInput):
     """
     def __init__(self, attrs={}):
         super(AdminFileWidget, self).__init__(attrs)
-        
+
     def render(self, name, value, attrs=None):
         output = []
         if value and hasattr(value, "url"):
@@ -105,11 +105,13 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         super(ForeignKeyRawIdWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
+        from django.contrib.admin.views.main import TO_FIELD_VAR
         related_url = '../../../%s/%s/' % (self.rel.to._meta.app_label, self.rel.to._meta.object_name.lower())
+        params = {}
         if self.rel.limit_choices_to:
-            url = '?' + '&amp;'.join(['%s=%s' % (k, ','.join(v)) for k, v in self.rel.limit_choices_to.items()])
-        else:
-            url = ''
+            params.update(dict([(k, ','.join(v)) for k, v in self.rel.limit_choices_to.items()]))
+        params.update({TO_FIELD_VAR: self.rel.get_related_field().name})
+        url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
         if not attrs.has_key('class'):
           attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript looks for this hook.
         output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)]
@@ -121,11 +123,12 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         if value:
             output.append(self.label_for_value(value))
         return mark_safe(u''.join(output))
-    
+
     def label_for_value(self, value):
-        return '&nbsp;<strong>%s</strong>' % \
-            truncate_words(self.rel.to.objects.get(pk=value), 14)
-            
+        key = self.rel.get_related_field().name
+        obj = self.rel.to.objects.get(**{key: value})
+        return '&nbsp;<strong>%s</strong>' % truncate_words(obj, 14)
+
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """
     A Widget for displaying ManyToMany ids in the "raw_id" interface rather than
@@ -133,7 +136,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """
     def __init__(self, rel, attrs=None):
         super(ManyToManyRawIdWidget, self).__init__(rel, attrs)
-    
+
     def render(self, name, value, attrs=None):
         attrs['class'] = 'vManyToManyRawIdAdminField'
         if value:
@@ -141,7 +144,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         else:
             value = ''
         return super(ManyToManyRawIdWidget, self).render(name, value, attrs)
-    
+
     def label_for_value(self, value):
         return ''
 
@@ -152,7 +155,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         if value:
             return [value]
         return None
-    
+
     def _has_changed(self, initial, data):
         if initial is None:
             initial = []

@@ -222,7 +222,11 @@ def items_for_result(cl, result):
             url = cl.url_for_result(result)
             # Convert the pk to something that can be used in Javascript.
             # Problem cases are long ints (23L) and non-ASCII strings.
-            result_id = repr(force_unicode(getattr(result, pk)))[1:]
+            if cl.to_field:
+                attr = str(cl.to_field)
+            else:
+                attr = pk
+            result_id = repr(force_unicode(getattr(result, attr)))[1:]
             yield mark_safe(u'<%s%s><a href="%s"%s>%s</a></%s>' % \
                 (table_tag, row_class, url, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %s); return false;"' % result_id or ''), conditional_escape(result_repr), table_tag))
         else:

@@ -550,14 +550,21 @@ class ModelChoiceIterator(object):
         if self.field.cache_choices:
             if self.field.choice_cache is None:
                 self.field.choice_cache = [
-                    (obj.pk, self.field.label_from_instance(obj))
-                    for obj in self.queryset.all()
+                    self.choice(obj) for obj in self.queryset.all()
                 ]
             for choice in self.field.choice_cache:
                 yield choice
         else:
             for obj in self.queryset.all():
-                yield (obj.pk, self.field.label_from_instance(obj))
+                yield self.choice(obj)
+
+    def choice(self, obj):
+        if self.field.to_field_name:
+            key = getattr(obj, self.field.to_field_name)
+        else:
+            key = obj.pk
+        return (key, self.field.label_from_instance(obj))
+
 
 class ModelChoiceField(ChoiceField):
     """A ChoiceField whose choices are a model QuerySet."""
@@ -570,7 +577,7 @@ class ModelChoiceField(ChoiceField):
 
     def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
                  required=True, widget=None, label=None, initial=None,
-                 help_text=None, *args, **kwargs):
+                 help_text=None, to_field_name=None, *args, **kwargs):
         self.empty_label = empty_label
         self.cache_choices = cache_choices
 
@@ -580,6 +587,7 @@ class ModelChoiceField(ChoiceField):
                        *args, **kwargs)
         self.queryset = queryset
         self.choice_cache = None
+        self.to_field_name = to_field_name
 
     def _get_queryset(self):
         return self._queryset
@@ -622,7 +630,8 @@ class ModelChoiceField(ChoiceField):
         if value in EMPTY_VALUES:
             return None
         try:
-            value = self.queryset.get(pk=value)
+            key = self.to_field_name or 'pk'
+            value = self.queryset.get(**{key: value})
         except self.queryset.model.DoesNotExist:
             raise ValidationError(self.error_messages['invalid_choice'])
         return value
