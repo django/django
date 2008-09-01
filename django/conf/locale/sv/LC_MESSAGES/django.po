@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-28 21:44+0200\n"
+"POT-Creation-Date: 2008-09-01 08:07+0200\n"
 "PO-Revision-Date: 2008-05-26 11:15+0200\n"
 "Last-Translator: Ludvig Ericson <ludvig.ericson@gmail.com>\n"
 "Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
@@ -287,89 +287,89 @@ msgstr "loggpost"
 msgid "log entries"
 msgstr "loggposter"
 
-#: contrib/admin/options.py:56 contrib/admin/options.py:115
+#: contrib/admin/options.py:59 contrib/admin/options.py:120
 msgid "None"
 msgstr "Inget"
 
-#: contrib/admin/options.py:329
+#: contrib/admin/options.py:332
 #, python-format
 msgid "Changed %s."
 msgstr "Ändrade %s."
 
-#: contrib/admin/options.py:329 contrib/admin/options.py:339
+#: contrib/admin/options.py:332 contrib/admin/options.py:342
 msgid "and"
 msgstr "och"
 
-#: contrib/admin/options.py:334
+#: contrib/admin/options.py:337
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Lade till %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:338
+#: contrib/admin/options.py:341
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Ändrade %(list)s på %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:343
+#: contrib/admin/options.py:346
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Tog bort %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:347
+#: contrib/admin/options.py:350
 msgid "No fields changed."
 msgstr "Inga fält ändrade."
 
-#: contrib/admin/options.py:408 contrib/auth/admin.py:51
+#: contrib/admin/options.py:411 contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" lades till."
 
-#: contrib/admin/options.py:412 contrib/admin/options.py:445
-#: contrib/auth/admin.py:57
+#: contrib/admin/options.py:415 contrib/admin/options.py:448
+#: contrib/auth/admin.py:59
 msgid "You may edit it again below."
 msgstr "Du kan ändra det igen nedanför."
 
-#: contrib/admin/options.py:422 contrib/admin/options.py:455
+#: contrib/admin/options.py:425 contrib/admin/options.py:458
 #, python-format
 msgid "You may add another %s below."
 msgstr "Du kan lägga till ytterligare %s nedanför."
 
-#: contrib/admin/options.py:443
+#: contrib/admin/options.py:446
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ändrades."
 
-#: contrib/admin/options.py:451
+#: contrib/admin/options.py:454
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" lades till. Du kan redigera objektet igen nedanför."
 
-#: contrib/admin/options.py:517
+#: contrib/admin/options.py:530
 #, python-format
 msgid "Add %s"
 msgstr "Lägg till %s"
 
-#: contrib/admin/options.py:595
+#: contrib/admin/options.py:608
 #, python-format
 msgid "Change %s"
 msgstr "Ändra %s"
 
-#: contrib/admin/options.py:627
+#: contrib/admin/options.py:640
 msgid "Database error"
 msgstr "Databasfel"
 
-#: contrib/admin/options.py:677
+#: contrib/admin/options.py:690
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" togs bort."
 
-#: contrib/admin/options.py:684
+#: contrib/admin/options.py:697
 msgid "Are you sure?"
 msgstr "Är du säker?"
 
-#: contrib/admin/options.py:713
+#: contrib/admin/options.py:726
 #, python-format
 msgid "Change history: %s"
 msgstr "Ändringshistorik: %s"
@@ -420,6 +420,7 @@ msgid "Log in"
 msgstr "Logga in"
 
 #: contrib/admin/sites.py:406
+#, python-format
 msgid "%s administration"
 msgstr "Administration av %s"
 
@@ -433,21 +434,29 @@ msgstr "Ett eller flera %(fieldname)s i %(name)s: %(obj)s"
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Ett eller flera %(fieldname)s i %(name)s:"
 
-#: contrib/admin/widgets.py:65
+#: contrib/admin/widgets.py:70
 msgid "Date:"
 msgstr "Datum:"
 
-#: contrib/admin/widgets.py:65
+#: contrib/admin/widgets.py:70
 msgid "Time:"
 msgstr "Tid:"
 
-#: contrib/admin/widgets.py:89
+#: contrib/admin/widgets.py:94
 msgid "Currently:"
 msgstr "Aktuell:"
 
-#: contrib/admin/widgets.py:89
+#: contrib/admin/widgets.py:94
 msgid "Change:"
 msgstr "Ändra:"
+
+#: contrib/admin/widgets.py:120
+msgid "Lookup"
+msgstr "Uppslag"
+
+#: contrib/admin/widgets.py:204
+msgid "Add Another"
+msgstr "Lägg till ytterligare"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -572,7 +581,7 @@ msgstr "Filter"
 #: contrib/admin/templates/admin/delete_confirmation.html:10
 #: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:246
 msgid "Delete"
-msgstr "Ta bort"
+msgstr "Radera"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:16
 #, python-format
@@ -743,7 +752,7 @@ msgstr "Ange nytt lösenord för användare <strong>%(username)s</strong>."
 
 #: contrib/admin/templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
-msgstr "Ta bort?"
+msgstr "Radera?"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -920,143 +929,143 @@ msgstr "webbplats"
 msgid "template"
 msgstr "mall"
 
-#: contrib/admindocs/views.py:53 contrib/admindocs/views.py:55
-#: contrib/admindocs/views.py:57
+#: contrib/admindocs/views.py:57 contrib/admindocs/views.py:59
+#: contrib/admindocs/views.py:61
 msgid "tag:"
 msgstr "tagg:"
 
-#: contrib/admindocs/views.py:87 contrib/admindocs/views.py:89
-#: contrib/admindocs/views.py:91
+#: contrib/admindocs/views.py:90 contrib/admindocs/views.py:92
+#: contrib/admindocs/views.py:94
 msgid "filter:"
 msgstr "filter:"
 
-#: contrib/admindocs/views.py:153 contrib/admindocs/views.py:155
-#: contrib/admindocs/views.py:157
+#: contrib/admindocs/views.py:154 contrib/admindocs/views.py:156
+#: contrib/admindocs/views.py:158
 msgid "view:"
 msgstr "vy:"
 
-#: contrib/admindocs/views.py:187
+#: contrib/admindocs/views.py:186
 #, python-format
 msgid "App %r not found"
 msgstr "Applikation %r hittades inte"
 
-#: contrib/admindocs/views.py:194
+#: contrib/admindocs/views.py:193
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Modell %(model_name)r hittades inte i applikation %(app_label)r"
 
-#: contrib/admindocs/views.py:206
+#: contrib/admindocs/views.py:205
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "det relaterade `%(app_label)s.%(data_type)s`-objektet"
 
-#: contrib/admindocs/views.py:206 contrib/admindocs/views.py:228
-#: contrib/admindocs/views.py:242 contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:205 contrib/admindocs/views.py:227
+#: contrib/admindocs/views.py:241 contrib/admindocs/views.py:246
 msgid "model:"
 msgstr "modell:"
 
-#: contrib/admindocs/views.py:237
+#: contrib/admindocs/views.py:236
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "relaterade `%(app_label)s.%(object_name)s`-objekt"
 
-#: contrib/admindocs/views.py:242
+#: contrib/admindocs/views.py:241
 #, python-format
 msgid "all %s"
 msgstr "alla %s"
 
-#: contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:246
 #, python-format
 msgid "number of %s"
 msgstr "antal %s"
 
-#: contrib/admindocs/views.py:253
+#: contrib/admindocs/views.py:251
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Fält på %s objekt"
 
-#: contrib/admindocs/views.py:317 contrib/admindocs/views.py:328
-#: contrib/admindocs/views.py:330 contrib/admindocs/views.py:336
-#: contrib/admindocs/views.py:337 contrib/admindocs/views.py:339
+#: contrib/admindocs/views.py:314 contrib/admindocs/views.py:325
+#: contrib/admindocs/views.py:327 contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:336
 msgid "Integer"
 msgstr "Heltal"
 
-#: contrib/admindocs/views.py:318
+#: contrib/admindocs/views.py:315
 msgid "Boolean (Either True or False)"
 msgstr "Boolesk (antingen True eller False)"
 
-#: contrib/admindocs/views.py:319 contrib/admindocs/views.py:338
+#: contrib/admindocs/views.py:316 contrib/admindocs/views.py:335
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Sträng (upp till %(max_length)s)"
 
-#: contrib/admindocs/views.py:320
+#: contrib/admindocs/views.py:317
 msgid "Comma-separated integers"
 msgstr "Komma-separerade heltal"
 
-#: contrib/admindocs/views.py:321
+#: contrib/admindocs/views.py:318
 msgid "Date (without time)"
 msgstr "Datum (utan tid)"
 
-#: contrib/admindocs/views.py:322
+#: contrib/admindocs/views.py:319
 msgid "Date (with time)"
 msgstr "Datum (med tid)"
 
-#: contrib/admindocs/views.py:323
+#: contrib/admindocs/views.py:320
 msgid "Decimal number"
 msgstr "Decimaltal"
 
-#: contrib/admindocs/views.py:324
+#: contrib/admindocs/views.py:321
 msgid "E-mail address"
 msgstr "E-postadress"
 
-#: contrib/admindocs/views.py:325 contrib/admindocs/views.py:326
-#: contrib/admindocs/views.py:329
+#: contrib/admindocs/views.py:322 contrib/admindocs/views.py:323
+#: contrib/admindocs/views.py:326
 msgid "File path"
 msgstr "Sökväg till fil"
 
-#: contrib/admindocs/views.py:327
+#: contrib/admindocs/views.py:324
 msgid "Floating point number"
 msgstr "Flyttal"
 
-#: contrib/admindocs/views.py:331 contrib/comments/models.py:57
+#: contrib/admindocs/views.py:328 contrib/comments/models.py:57
 msgid "IP address"
 msgstr "IP-adress"
 
-#: contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:330
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolesk (antingen True, False eller None)"
 
-#: contrib/admindocs/views.py:334
+#: contrib/admindocs/views.py:331
 msgid "Relation to parent model"
 msgstr "Relation till förälder-modell"
 
-#: contrib/admindocs/views.py:335
+#: contrib/admindocs/views.py:332
 msgid "Phone number"
 msgstr "Telefonnummer"
 
-#: contrib/admindocs/views.py:340
+#: contrib/admindocs/views.py:337
 msgid "Text"
 msgstr "Text"
 
-#: contrib/admindocs/views.py:341
+#: contrib/admindocs/views.py:338
 msgid "Time"
 msgstr "Tid"
 
-#: contrib/admindocs/views.py:342 contrib/comments/forms.py:20
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:20
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admindocs/views.py:343
+#: contrib/admindocs/views.py:340
 msgid "U.S. state (two uppercase letters)"
 msgstr "Delstat i USA (två versaler)"
 
-#: contrib/admindocs/views.py:344
+#: contrib/admindocs/views.py:341
 msgid "XML text"
 msgstr "XML-text"
 
-#: contrib/admindocs/views.py:370
+#: contrib/admindocs/views.py:367
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s verkar inte vara ett urlpattern-objekt"
@@ -1146,15 +1155,15 @@ msgstr "Viktiga datum"
 msgid "Groups"
 msgstr "Grupper"
 
-#: contrib/auth/admin.py:62
+#: contrib/auth/admin.py:64
 msgid "Add user"
 msgstr "Lägg till användare"
 
-#: contrib/auth/admin.py:88
+#: contrib/auth/admin.py:90
 msgid "Password changed successfully."
 msgstr "Lösenordet ändrades."
 
-#: contrib/auth/admin.py:94
+#: contrib/auth/admin.py:96
 #, python-format
 msgid "Change password: %s"
 msgstr "Ändra lösenord: %s"
@@ -1350,7 +1359,7 @@ msgstr "meddelande"
 msgid "Logged out"
 msgstr "Utloggad"
 
-#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:423
+#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:425
 msgid "Enter a valid e-mail address."
 msgstr "Fyll i en giltig e-postadress."
 
@@ -1444,8 +1453,8 @@ msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"Denna kommentar postades av en autentiserad användare och därför är "
-"e-postadressen skrivskyddad."
+"Denna kommentar postades av en autentiserad användare och därför är e-"
+"postadressen skrivskyddad."
 
 #: contrib/comments/models.py:148
 #, python-format
@@ -1531,6 +1540,14 @@ msgstr "statisk sida"
 #: contrib/flatpages/models.py:19
 msgid "flat pages"
 msgstr "statiska sidor"
+
+#: contrib/formtools/wizard.py:130
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr ""
+"Vi beklagar, men formuläret har förfallit. Var god fortsätt fylla i det "
+"från denna sida."
 
 #: contrib/gis/forms/fields.py:14
 msgid "No geometry value provided."
@@ -3540,50 +3557,54 @@ msgstr "visningsnamn"
 msgid "sites"
 msgstr "webbplatser"
 
-#: db/models/fields/__init__.py:332 db/models/fields/__init__.py:648
+#: db/models/fields/__init__.py:338 db/models/fields/__init__.py:673
 msgid "This value must be an integer."
 msgstr "Detta värde måste vara ett heltal."
 
-#: db/models/fields/__init__.py:363
+#: db/models/fields/__init__.py:369
 msgid "This value must be either True or False."
 msgstr "Detta värde måste vara antingen True eller False."
 
-#: db/models/fields/__init__.py:387
+#: db/models/fields/__init__.py:402
 msgid "This field cannot be null."
 msgstr "Detta fält får inte vara null."
 
-#: db/models/fields/__init__.py:424
+#: db/models/fields/__init__.py:418
+msgid "Enter only digits separated by commas."
+msgstr "Fyll enbart i siffror separerade med kommatecken."
+
+#: db/models/fields/__init__.py:449
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Fyll i ett giltigt datum med formatet ÅÅÅÅ-MM-DD."
 
-#: db/models/fields/__init__.py:433
+#: db/models/fields/__init__.py:458
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Ogiltigt datum: %s"
 
-#: db/models/fields/__init__.py:497 db/models/fields/__init__.py:515
+#: db/models/fields/__init__.py:522 db/models/fields/__init__.py:540
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "Fyll i en giltig tidpunkt med formatet ÅÅÅÅ-MM-DD TT:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:551
+#: db/models/fields/__init__.py:576
 msgid "This value must be a decimal number."
 msgstr "Detta värde måste vara ett decimaltal."
 
-#: db/models/fields/__init__.py:684
+#: db/models/fields/__init__.py:709
 msgid "This value must be either None, True or False."
 msgstr "Detta värde måste vara antingen None, True eller False."
 
-#: db/models/fields/__init__.py:783 db/models/fields/__init__.py:797
+#: db/models/fields/__init__.py:817 db/models/fields/__init__.py:831
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Fyll i ett giltigt klockslag med formatet TT:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:742
+#: db/models/fields/related.py:753
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Håll ner \"Control\" eller \"Command\" på en Mac för att välja fler än en."
 
-#: db/models/fields/related.py:819
+#: db/models/fields/related.py:830
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3593,84 +3614,84 @@ msgstr[0] ""
 msgstr[1] ""
 "Var god och fyll giltiga %(self)s ID-nummer. Värdena %(value)r är ogiltiga."
 
-#: forms/fields.py:52
+#: forms/fields.py:54
 msgid "This field is required."
 msgstr "Detta fält måste fyllas i."
 
-#: forms/fields.py:53
+#: forms/fields.py:55
 msgid "Enter a valid value."
 msgstr "Fyll i ett giltigt värde."
 
-#: forms/fields.py:133
+#: forms/fields.py:135
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Kontrollera att detta värde har högst %(max)d tecken (det har %(length)d)."
 
-#: forms/fields.py:134
+#: forms/fields.py:136
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 "Kontrollera att detta värde har minst %(min)d tecken (det har %(length)d)."
 
-#: forms/fields.py:161
+#: forms/fields.py:163
 msgid "Enter a whole number."
 msgstr "Fyll i ett heltal."
 
-#: forms/fields.py:162 forms/fields.py:191 forms/fields.py:220
+#: forms/fields.py:164 forms/fields.py:193 forms/fields.py:222
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Kontrollera att detta värde är mindre eller lika med %s."
 
-#: forms/fields.py:163 forms/fields.py:192 forms/fields.py:221
+#: forms/fields.py:165 forms/fields.py:194 forms/fields.py:223
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Kontrollera att detta värde är mer eller lika med %s."
 
-#: forms/fields.py:190 forms/fields.py:219
+#: forms/fields.py:192 forms/fields.py:221
 msgid "Enter a number."
 msgstr "Fyll i ett tal."
 
-#: forms/fields.py:222
+#: forms/fields.py:224
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Kontrollera att det inte finns mer än totalt %s siffror."
 
-#: forms/fields.py:223
+#: forms/fields.py:225
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Kontrollera att det inte finns mer än %s decimaler."
 
-#: forms/fields.py:224
+#: forms/fields.py:226
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Kontrollera att det inte finns mer än %s siffror före decimaltecknet."
 
-#: forms/fields.py:282 forms/fields.py:815
+#: forms/fields.py:284 forms/fields.py:844
 msgid "Enter a valid date."
 msgstr "Fyll i ett giltigt datum."
 
-#: forms/fields.py:316 forms/fields.py:816
+#: forms/fields.py:318 forms/fields.py:845
 msgid "Enter a valid time."
 msgstr "Fyll i en giltig tid."
 
-#: forms/fields.py:355
+#: forms/fields.py:357
 msgid "Enter a valid date/time."
 msgstr "Fyll i ett giltigt datum/tid."
 
-#: forms/fields.py:441
+#: forms/fields.py:443
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ingen fil skickades. Kontrollera kodningnstypen i formuläret."
 
-#: forms/fields.py:442
+#: forms/fields.py:444
 msgid "No file was submitted."
 msgstr "Ingen fil skickades."
 
-#: forms/fields.py:443
+#: forms/fields.py:445
 msgid "The submitted file is empty."
 msgstr "Den skickade filen är tom."
 
-#: forms/fields.py:472
+#: forms/fields.py:474
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -3678,30 +3699,30 @@ msgstr ""
 "Ladda upp en giltig bild. Filen du laddade upp var antingen ingen bild eller "
 "en korrupt bild."
 
-#: forms/fields.py:533
+#: forms/fields.py:535
 msgid "Enter a valid URL."
 msgstr "Fyll i en giltig URL."
 
-#: forms/fields.py:534
+#: forms/fields.py:536
 msgid "This URL appears to be a broken link."
 msgstr "Denna URL verkar vara en trasig länk."
 
-#: forms/fields.py:613 forms/fields.py:664
+#: forms/fields.py:615 forms/fields.py:693
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Välj ett giltigt alternativ. %(value)s finns inte bland tillgängliga "
 "alternativ."
 
-#: forms/fields.py:665 forms/fields.py:726 forms/models.py:531
+#: forms/fields.py:694 forms/fields.py:755 forms/models.py:545
 msgid "Enter a list of values."
 msgstr "Fyll i en lista med värden."
 
-#: forms/fields.py:844
+#: forms/fields.py:873
 msgid "Enter a valid IPv4 address."
 msgstr "Fyll i en giltig IPv4 adress."
 
-#: forms/fields.py:854
+#: forms/fields.py:883
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -3712,13 +3733,13 @@ msgstr ""
 msgid "Order"
 msgstr "Sortering"
 
-#: forms/models.py:463
+#: forms/models.py:477
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Välj ett giltigt alternativ. Det valet finns inte bland tillgängliga "
 "alternativ."
 
-#: forms/models.py:532
+#: forms/models.py:546
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr ""
@@ -4221,9 +4242,6 @@ msgstr "%(verbose_name)s togs bort."
 
 #~ msgid "Lowercase letters are not allowed here."
 #~ msgstr "Gemener är inte tillåtna här."
-
-#~ msgid "Enter only digits separated by commas."
-#~ msgstr "Fyll enbart i siffror separerade med kommatecken."
 
 #~ msgid "Enter valid e-mail addresses separated by commas."
 #~ msgstr "Fyll i giltiga e-postadresser separerade med kommatecken."
