@@ -377,7 +377,7 @@ class DateQuery(Query):
             for row in rows:
                 date = row[offset]
                 if resolve_columns:
-                    date = self.resolve_columns([date], fields)[0]
+                    date = self.resolve_columns(row, fields)[offset]
                 elif needs_string_cast:
                     date = typecast_timestamp(str(date))
                 yield date
