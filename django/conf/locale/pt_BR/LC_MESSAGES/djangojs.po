@@ -1,13 +1,11 @@
 # Português do Brasil translation of django.
-# Copyright (C) 2006 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-#
+# This file is distributed under the same license as the django package.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-09 11:51+0100\n"
-"PO-Revision-Date: 2008-08-01 12:27-0300\n"
+"PO-Revision-Date: 2008-09-01 11:39+0200\n"
 "Last-Translator: Rafael Jamur <rjamur@gmail.com>\n"
 "Language-Team: Grupo de Localização para o Português <django-l10n-portuguese@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +15,7 @@ msgstr ""
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "%s Disponíveis"
+msgstr "%s disponíveis"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
