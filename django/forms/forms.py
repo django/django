@@ -345,7 +345,7 @@ class BoundField(StrAndUnicode):
         auto_id = self.auto_id
         if auto_id and 'id' not in attrs and 'id' not in widget.attrs:
             attrs['id'] = auto_id
-        if not self.form.is_bound or only_initial:
+        if not self.form.is_bound:
             data = self.form.initial.get(self.name, self.field.initial)
             if callable(data):
                 data = data()
