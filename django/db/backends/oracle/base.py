@@ -23,7 +23,7 @@ from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.utils.encoding import smart_str, force_unicode
 
-DatabaseError = Database.Error
+DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 
