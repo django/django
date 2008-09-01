@@ -98,12 +98,12 @@ __test__ = {'API_TESTS':"""
 [<Place: Guido's House of Pasta the place>, <Place: Main St the place>]
 
 >>> dicts = Restaurant.objects.values('name','serves_hot_dogs')
->>> [sorted(d.items()) for d in dicts]
-[[('name', u"Guido's House of Pasta"), ('serves_hot_dogs', True)]]
+>>> [sorted(d.items()) for d in dicts] == [[('name', u"Guido's House of Pasta"), ('serves_hot_dogs', True)]]
+True
 
 >>> dicts = ItalianRestaurant.objects.values('name','serves_hot_dogs','serves_gnocchi')
->>> [sorted(d.items()) for d in dicts]
-[[('name', u"Guido's House of Pasta"), ('serves_gnocchi', True), ('serves_hot_dogs', True)]]
+>>> [sorted(d.items()) for d in dicts] == [[('name', u"Guido's House of Pasta"), ('serves_gnocchi', True), ('serves_hot_dogs', True)]]
+True
 
 >>> dicts = ParkingLot.objects.values('name','capacity')
 >>> [sorted(d.items()) for d in dicts]
@@ -130,12 +130,12 @@ __test__ = {'API_TESTS':"""
 [<Place: Derelict lot the place>, <Place: Guido's All New House of Pasta the place>]
 
 >>> dicts = Restaurant.objects.values('name','serves_hot_dogs')
->>> [sorted(d.items()) for d in dicts]
-[[('name', u"Guido's All New House of Pasta"), ('serves_hot_dogs', False)]]
+>>> [sorted(d.items()) for d in dicts] == [[('name', u"Guido's All New House of Pasta"), ('serves_hot_dogs', False)]]
+True
 
 >>> dicts = ItalianRestaurant.objects.values('name','serves_hot_dogs','serves_gnocchi')
->>> [sorted(d.items()) for d in dicts]
-[[('name', u"Guido's All New House of Pasta"), ('serves_gnocchi', False), ('serves_hot_dogs', False)]]
+>>> [sorted(d.items()) for d in dicts] == [[('name', u"Guido's All New House of Pasta"), ('serves_gnocchi', False), ('serves_hot_dogs', False)]]
+True
 
 >>> dicts = ParkingLot.objects.values('name','capacity')
 >>> [sorted(d.items()) for d in dicts]
@@ -150,8 +150,8 @@ __test__ = {'API_TESTS':"""
 # Note that the name has not changed
 # - name is an attribute of Place, not ItalianRestaurant
 >>> dicts = ItalianRestaurant.objects.values('name','serves_hot_dogs','serves_gnocchi')
->>> [sorted(d.items()) for d in dicts]
-[[('name', u"Guido's All New House of Pasta"), ('serves_gnocchi', False), ('serves_hot_dogs', False)]]
+>>> [sorted(d.items()) for d in dicts] == [[('name', u"Guido's All New House of Pasta"), ('serves_gnocchi', False), ('serves_hot_dogs', False)]]
+True
 
 # Regressions tests for #7105: dates() queries should be able to use fields
 # from the parent model as easily as the child.
