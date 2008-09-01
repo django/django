@@ -73,6 +73,22 @@ class Restaurant(Place):
     def __unicode__(self):
         return self.name
 
+class Product(models.Model):
+    slug = models.SlugField(unique=True)
+
+    def __unicode__(self):
+        return self.slug
+
+class Price(models.Model):
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField()
+
+    def __unicode__(self):
+        return u"%s for %s" % (self.quantity, self.price)
+
+    class Meta:
+        unique_together = (('price', 'quantity'),)
+
 class MexicanRestaurant(Restaurant):
     serves_tacos = models.BooleanField()
 
@@ -552,5 +568,57 @@ True
 <class 'django.db.models.fields.related.ForeignKey'>
 >>> type(_get_foreign_key(MexicanRestaurant, Owner))
 <class 'django.db.models.fields.related.ForeignKey'>
+
+# unique/unique_together validation ###########################################
+
+>>> FormSet = modelformset_factory(Product, extra=1)
+>>> data = {
+...     'form-TOTAL_FORMS': '1',
+...     'form-INITIAL_FORMS': '0',
+...     'form-0-slug': 'car-red',
+... }
+>>> formset = FormSet(data)
+>>> formset.is_valid()
+True
+>>> formset.save()
+[<Product: car-red>]
+
+>>> data = {
+...     'form-TOTAL_FORMS': '1',
+...     'form-INITIAL_FORMS': '0',
+...     'form-0-slug': 'car-red',
+... }
+>>> formset = FormSet(data)
+>>> formset.is_valid()
+False
+>>> formset.errors
+[{'slug': [u'Product with this Slug already exists.']}]
+
+# unique_together
+
+>>> FormSet = modelformset_factory(Price, extra=1)
+>>> data = {
+...     'form-TOTAL_FORMS': '1',
+...     'form-INITIAL_FORMS': '0',
+...     'form-0-price': u'12.00',
+...     'form-0-quantity': '1',
+... }
+>>> formset = FormSet(data)
+>>> formset.is_valid()
+True
+>>> formset.save()
+[<Price: 1 for 12.00>]
+
+>>> data = {
+...     'form-TOTAL_FORMS': '1',
+...     'form-INITIAL_FORMS': '0',
+...     'form-0-price': u'12.00',
+...     'form-0-quantity': '1',
+... }
+>>> formset = FormSet(data)
+>>> formset.is_valid()
+False
+>>> formset.errors
+[{'__all__': [u'Price with this Price and Quantity already exists.']}]
 
 """}

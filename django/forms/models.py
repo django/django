@@ -3,9 +3,10 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from django.utils.datastructures import SortedDict
+from django.utils.text import get_text_list
+from django.utils.translation import ugettext_lazy as _
 
 from util import ValidationError, ErrorList
 from forms import BaseForm, get_declared_fields
@@ -19,6 +20,7 @@ __all__ = (
     'save_instance', 'form_for_fields', 'ModelChoiceField',
     'ModelMultipleChoiceField',
 )
+
 
 def save_instance(form, instance, fields=None, fail_message='saved',
                   commit=True, exclude=None):
@@ -202,6 +204,76 @@ class BaseModelForm(BaseForm):
             object_data.update(initial)
         super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
                                             error_class, label_suffix, empty_permitted)
+    def clean(self):
+        self.validate_unique()
+        return self.cleaned_data
+
+    def validate_unique(self):
+        from django.db.models.fields import FieldDoesNotExist
+        unique_checks = list(self.instance._meta.unique_together[:])
+        form_errors = []
+        
+        # Make sure the unique checks apply to actual fields on the ModelForm
+        for name, field in self.fields.items():
+            try:
+                f = self.instance._meta.get_field_by_name(name)[0]
+            except FieldDoesNotExist:
+                # This is an extra field that's not on the ModelForm, ignore it
+                continue
+            # MySQL can't handle ... WHERE pk IS NULL, so make sure we don't 
+            # don't generate queries of that form.
+            is_null_pk = f.primary_key and self.cleaned_data[name] is None
+            if name in self.cleaned_data and f.unique and not is_null_pk:
+                unique_checks.append((name,))
+                
+        # Don't run unique checks on fields that already have an error.
+        unique_checks = [check for check in unique_checks if not [x in self._errors for x in check if x in self._errors]]
+        
+        for unique_check in unique_checks:
+            # Try to look up an existing object with the same values as this
+            # object's values for all the unique field.
+            
+            lookup_kwargs = {}
+            for field_name in unique_check:
+                lookup_kwargs[field_name] = self.cleaned_data[field_name]
+            
+            qs = self.instance.__class__._default_manager.filter(**lookup_kwargs)
+
+            # Exclude the current object from the query if we are editing an 
+            # instance (as opposed to creating a new one)
+            if self.instance.pk is not None:
+                qs = qs.exclude(pk=self.instance.pk)
+                
+            # This cute trick with extra/values is the most efficiant way to
+            # tell if a particular query returns any results.
+            if qs.extra(select={'a': 1}).values('a').order_by():
+                model_name = self.instance._meta.verbose_name.title()
+                
+                # A unique field
+                if len(unique_check) == 1:
+                    field_name = unique_check[0]
+                    field_label = self.fields[field_name].label
+                    # Insert the error into the error dict, very sneaky
+                    self._errors[field_name] = ErrorList([
+                        _("%(model_name)s with this %(field_label)s already exists.") % \
+                        {'model_name': model_name, 'field_label': field_label}
+                    ])
+                # unique_together
+                else:
+                    field_labels = [self.fields[field_name].label for field_name in unique_check]
+                    field_labels = get_text_list(field_labels, _('and'))
+                    form_errors.append(
+                        _("%(model_name)s with this %(field_label)s already exists.") % \
+                        {'model_name': model_name, 'field_label': field_labels}
+                    )
+                
+                # Remove the data from the cleaned_data dict since it was invalid
+                for field_name in unique_check:
+                    del self.cleaned_data[field_name]
+        
+        if form_errors:
+            # Raise the unique together errors since they are considered form-wide.
+            raise ValidationError(form_errors)
 
     def save(self, commit=True):
         """
@@ -246,18 +318,26 @@ class BaseModelFormSet(BaseFormSet):
                  queryset=None, **kwargs):
         self.queryset = queryset
         defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
-        if self.max_num > 0:
-            qs = self.get_queryset()[:self.max_num]
-        else:
-            qs = self.get_queryset()
-        defaults['initial'] = [model_to_dict(obj) for obj in qs]
+        defaults['initial'] = [model_to_dict(obj) for obj in self.get_queryset()]
         defaults.update(kwargs)
         super(BaseModelFormSet, self).__init__(**defaults)
 
+    def _construct_form(self, i, **kwargs):
+        if i < self._initial_form_count:
+            kwargs['instance'] = self.get_queryset()[i]
+        return super(BaseModelFormSet, self)._construct_form(i, **kwargs)
+
     def get_queryset(self):
-        if self.queryset is not None:
-            return self.queryset
-        return self.model._default_manager.get_query_set()
+        if not hasattr(self, '_queryset'):
+            if self.queryset is not None:
+                qs = self.queryset
+            else:
+                qs = self.model._default_manager.get_query_set()
+            if self.max_num > 0:
+                self._queryset = qs[:self.max_num]
+            else:
+                self._queryset = qs
+        return self._queryset
 
     def save_new(self, form, commit=True):
         """Saves and returns a new model instance for the given form."""
@@ -358,6 +438,14 @@ class BaseInlineFormSet(BaseModelFormSet):
             self._total_form_count = self._initial_form_count
             self._initial_form_count = 0
         super(BaseInlineFormSet, self)._construct_forms()
+
+    def _construct_form(self, i, **kwargs):
+        form = super(BaseInlineFormSet, self)._construct_form(i, **kwargs)
+        if self.save_as_new:
+            # Remove the primary key from the form's data, we are only
+            # creating new instances
+            form.data[form.add_prefix(self._pk_field.name)] = None
+        return form
 
     def get_queryset(self):
         """

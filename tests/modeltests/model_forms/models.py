@@ -117,8 +117,25 @@ class CommaSeparatedInteger(models.Model):
     def __unicode__(self):
         return self.field
 
+class Product(models.Model):
+    slug = models.SlugField(unique=True)
+
+    def __unicode__(self):
+        return self.slug
+
+class Price(models.Model):
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField()
+
+    def __unicode__(self):
+        return u"%s for %s" % (self.quantity, self.price)
+
+    class Meta:
+        unique_together = (('price', 'quantity'),)
+
 class ArticleStatus(models.Model):
     status = models.CharField(max_length=2, choices=ARTICLE_STATUS_CHAR, blank=True, null=True)
+
 
 __test__ = {'API_TESTS': """
 >>> from django import forms
@@ -1132,8 +1149,42 @@ u'1,,2'
 >>> f.clean('1')
 u'1'
 
-# Choices on CharField and IntegerField
+# unique/unique_together validation
 
+>>> class ProductForm(ModelForm):
+...     class Meta:
+...         model = Product
+>>> form = ProductForm({'slug': 'teddy-bear-blue'})
+>>> form.is_valid()
+True
+>>> obj = form.save()
+>>> obj
+<Product: teddy-bear-blue>
+>>> form = ProductForm({'slug': 'teddy-bear-blue'})
+>>> form.is_valid()
+False
+>>> form._errors
+{'slug': [u'Product with this Slug already exists.']}
+>>> form = ProductForm({'slug': 'teddy-bear-blue'}, instance=obj)
+>>> form.is_valid()
+True
+
+# ModelForm test of unique_together constraint
+>>> class PriceForm(ModelForm):
+...     class Meta:
+...         model = Price
+>>> form = PriceForm({'price': '6.00', 'quantity': '1'})
+>>> form.is_valid()
+True
+>>> form.save()
+<Price: 1 for 6.00>
+>>> form = PriceForm({'price': '6.00', 'quantity': '1'})
+>>> form.is_valid()
+False
+>>> form._errors
+{'__all__': [u'Price with this Price and Quantity already exists.']}
+
+# Choices on CharField and IntegerField
 >>> class ArticleForm(ModelForm):
 ...     class Meta:
 ...         model = Article
