@@ -8,6 +8,7 @@ from django.conf import settings
 from django.http import Http404
 from django.contrib.contenttypes.models import ContentType
 from models import Comment
+from django.utils.encoding import force_unicode
 from django.utils.text import get_text_list
 from django.utils.translation import ngettext
 from django.utils.translation import ugettext_lazy as _
@@ -49,7 +50,7 @@ class CommentForm(forms.Form):
 
         new = Comment(
             content_type = ContentType.objects.get_for_model(self.target_object),
-            object_pk    = str(self.target_object._get_pk_val()),
+            object_pk    = force_unicode(self.target_object._get_pk_val()),
             user_name    = self.cleaned_data["name"],
             user_email   = self.cleaned_data["email"],
             user_url     = self.cleaned_data["url"],

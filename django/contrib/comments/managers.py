@@ -1,6 +1,7 @@
 from django.db import models
 from django.dispatch import dispatcher
 from django.contrib.contenttypes.models import ContentType
+from django.utils.encoding import force_unicode
 
 class CommentManager(models.Manager):
 
@@ -18,5 +19,5 @@ class CommentManager(models.Manager):
         ct = ContentType.objects.get_for_model(model)
         qs = self.get_query_set().filter(content_type=ct)
         if isinstance(model, models.Model):
-            qs = qs.filter(object_pk=model._get_pk_val())
+            qs = qs.filter(object_pk=force_unicode(model._get_pk_val()))
         return qs
