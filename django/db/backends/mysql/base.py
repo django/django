@@ -172,15 +172,25 @@ class DatabaseOperations(BaseDatabaseOperations):
             return []
 
     def value_to_db_datetime(self, value):
-        # MySQL doesn't support microseconds
         if value is None:
             return None
+        
+        # MySQL doesn't support tz-aware datetimes
+        if value.tzinfo is not None:
+            raise ValueError("MySQL backend does not support timezone-aware datetimes.")
+
+        # MySQL doesn't support microseconds
         return unicode(value.replace(microsecond=0))
 
     def value_to_db_time(self, value):
-        # MySQL doesn't support microseconds
         if value is None:
             return None
+            
+        # MySQL doesn't support tz-aware datetimes
+        if value.tzinfo is not None:
+            raise ValueError("MySQL backend does not support timezone-aware datetimes.")
+        
+        # MySQL doesn't support microseconds
         return unicode(value.replace(microsecond=0))
 
     def year_lookup_bounds(self, value):

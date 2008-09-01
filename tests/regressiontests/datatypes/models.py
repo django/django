@@ -83,3 +83,16 @@ datetime.datetime(2007, 4, 20, 16, 19, 59)
 []
 
 """}
+
+# Regression test for #8354: the MySQL backend should raise an error if given
+# a timezone-aware datetime object.
+if settings.DATABASE_ENGINE == 'mysql':
+    __test__['API_TESTS'] += """
+>>> from django.utils import tzinfo 
+>>> dt = datetime.datetime(2008, 8, 31, 16, 20, tzinfo=tzinfo.FixedOffset(0)) 
+>>> d = Donut(name='Bear claw', consumed_at=dt) 
+>>> d.save()
+Traceback (most recent call last):
+    ....
+ValueError: MySQL backend does not support timezone-aware datetimes.
+"""
