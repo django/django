@@ -883,6 +883,8 @@ that control how the relationship functions.
     is not provided, Django will assume a default name based upon the names of
     the two tables being joined.
 
+.. _ref-onetoone:
+
 ``OneToOneField``
 -----------------
 
@@ -897,13 +899,17 @@ another model in some way; :ref:`multi-table-inheritance` is
 implemented by adding an implicit one-to-one relation from the child
 model to the parent model, for example.
 
-One positional argument is required: the class to which the model will
-be related.
+One positional argument is required: the class to which the model will be
+related. This works exactly the same as it does for :class:`ForeignKey`,
+including all the options regarding :ref:`recursive <recursive-relationships>`
+and :ref:`lazy <lazy-relationships>` relationships.
+
+.. _onetoone-arguments:
 
 Additionally, ``OneToOneField`` accepts all of the extra arguments
 accepted by :class:`ForeignKey`, plus one extra argument:
 
-.. attribute: OneToOneField.parent_link
+.. attribute:: OneToOneField.parent_link
 
     When ``True`` and used in a model which inherits from another
     (concrete) model, indicates that this field should be used as the

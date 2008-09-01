@@ -916,8 +916,35 @@ above example, if the ``ManyToManyField`` in ``Entry`` had specified
 One-to-one relationships
 ------------------------
 
-The semantics of one-to-one relationships will be changing soon, so we don't
-recommend you use them.
+One-to-one relationships are very similar to many-to-one relationships. If you
+define a :class:`~django.db.models.OneToOneField` on your model, instances of
+that model will have access to the related object via a simple attribute of the
+model.
+
+For example::
+
+    class EntryDetail(models.Model):
+        entry = models.OneToOneField(Entry)
+        details = models.TextField()
+
+    ed = EntryDetail.objects.get(id=2)
+    ed.entry # Returns the related Entry object.
+
+The difference comes in "reverse" queries. The related model in a one-to-one
+relationship also has access to a :class:`~django.db.models.Manager` object, but
+that :class:`~django.db.models.Manager` represents a single object, rather than
+a collection of objects::
+
+    e = Entry.objects.get(id=2)
+    e.entrydetail # returns the related EntryDetail object
+
+If no object has been assigned to this relationship, Django will raise
+a ``DoesNotExist`` exception.
+
+Instances can be assigned to the reverse relationship in the same way as
+you would assign the forward relationship::
+
+    e.entrydetail = ed
 
 How are the backward relationships possible?
 --------------------------------------------
