@@ -649,3 +649,8 @@ United States of America (``us``)
 
     A form ``Select`` widget that uses a list of U.S. states/territories as its
     choices.
+
+.. class:: us.models.USStateField
+
+    A model field that forms represent as a ``forms.USStateField`` field and
+    stores the two-letter U.S. state abbreviation in the database.

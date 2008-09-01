@@ -741,16 +741,6 @@ class NullBooleanField(Field):
         defaults.update(kwargs)
         return super(NullBooleanField, self).formfield(**defaults)
 
-class PhoneNumberField(Field):
-    def get_internal_type(self):
-        return "PhoneNumberField"
-
-    def formfield(self, **kwargs):
-        from django.contrib.localflavor.us.forms import USPhoneNumberField
-        defaults = {'form_class': USPhoneNumberField}
-        defaults.update(kwargs)
-        return super(PhoneNumberField, self).formfield(**defaults)
-
 class PositiveIntegerField(IntegerField):
     def get_internal_type(self):
         return "PositiveIntegerField"
@@ -875,16 +865,6 @@ class URLField(CharField):
         defaults = {'form_class': forms.URLField, 'verify_exists': self.verify_exists}
         defaults.update(kwargs)
         return super(URLField, self).formfield(**defaults)
-
-class USStateField(Field):
-    def get_internal_type(self):
-        return "USStateField"
-
-    def formfield(self, **kwargs):
-        from django.contrib.localflavor.us.forms import USStateSelect
-        defaults = {'widget': USStateSelect}
-        defaults.update(kwargs)
-        return super(USStateField, self).formfield(**defaults)
 
 class XMLField(TextField):
     def __init__(self, verbose_name=None, name=None, schema_path=None, **kwargs):

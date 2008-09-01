@@ -118,6 +118,7 @@ from django.contrib.gis.gdal.field import \
     OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime
 from django.contrib.gis.models import GeometryColumns, SpatialRefSys
 from django.db import models, transaction
+from django.contrib.localflavor.us.models import USStateField
 
 # LayerMapping exceptions.
 class LayerMapError(Exception): pass
@@ -150,7 +151,7 @@ class LayerMapping(object):
         models.SlugField : OFTString,
         models.TextField : OFTString,
         models.URLField : OFTString,
-        models.USStateField : OFTString,
+        USStateField : OFTString,
         models.XMLField : OFTString,
         models.SmallIntegerField : (OFTInteger, OFTReal, OFTString),
         models.PositiveSmallIntegerField : (OFTInteger, OFTReal, OFTString),

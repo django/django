@@ -625,13 +625,14 @@ model.
 
 For example, this model has a few custom methods::
 
+    from django.contrib.localflavor.us.models import USStateField
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
         birth_date = models.DateField()
         address = models.CharField(max_length=100)
         city = models.CharField(max_length=50)
-        state = models.USStateField() # Yes, this is America-centric...
+        state = USStateField() # Yes, this is America-centric...
 
         def baby_boomer_status(self):
             "Returns the person's baby-boomer status."

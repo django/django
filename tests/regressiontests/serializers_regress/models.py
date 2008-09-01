@@ -8,6 +8,7 @@ This class sets up a model for each model field type
 from django.db import models
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.localflavor.us.models import USStateField, PhoneNumberField
 
 # The following classes are for testing basic data
 # marshalling, including NULL values.
@@ -52,7 +53,7 @@ class NullBooleanData(models.Model):
     data = models.NullBooleanField(null=True)
 
 class PhoneData(models.Model):
-    data = models.PhoneNumberField(null=True)
+    data = PhoneNumberField(null=True)
 
 class PositiveIntegerData(models.Model):
     data = models.PositiveIntegerField(null=True)
@@ -73,7 +74,7 @@ class TimeData(models.Model):
     data = models.TimeField(null=True)
 
 class USStateData(models.Model):
-    data = models.USStateField(null=True)
+    data = USStateField(null=True)
 
 class XMLData(models.Model):
     data = models.XMLField(null=True)
@@ -188,7 +189,7 @@ class IPAddressPKData(models.Model):
 #     data = models.NullBooleanField(primary_key=True)
 
 class PhonePKData(models.Model):
-    data = models.PhoneNumberField(primary_key=True)
+    data = PhoneNumberField(primary_key=True)
 
 class PositiveIntegerPKData(models.Model):
     data = models.PositiveIntegerField(primary_key=True)
@@ -209,7 +210,7 @@ class SmallPKData(models.Model):
 #    data = models.TimeField(primary_key=True)
 
 class USStatePKData(models.Model):
-    data = models.USStateField(primary_key=True)
+    data = USStateField(primary_key=True)
 
 # class XMLPKData(models.Model):
 #     data = models.XMLField(primary_key=True)

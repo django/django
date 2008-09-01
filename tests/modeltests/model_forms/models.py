@@ -82,8 +82,9 @@ class WriterProfile(models.Model):
     def __unicode__(self):
         return "%s is %s" % (self.writer, self.age)
 
+from django.contrib.localflavor.us.models import PhoneNumberField
 class PhoneNumber(models.Model):
-    phone = models.PhoneNumberField()
+    phone = PhoneNumberField()
     description = models.CharField(max_length=20)
 
     def __unicode__(self):

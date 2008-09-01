@@ -73,10 +73,6 @@ the full list of conversions:
     ``TimeField``                    ``TimeField``
     ``URLField``                     ``URLField`` with ``verify_exists`` set
                                      to the model field's ``verify_exists``
-    ``USStateField``                 ``CharField`` with
-                                     ``widget=USStateSelect``
-                                     (``USStateSelect`` is from
-                                     ``django.contrib.localflavor.us``)
     ``XMLField``                     ``CharField`` with ``widget=Textarea``
     ===============================  ========================================
 

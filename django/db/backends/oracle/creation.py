@@ -30,7 +30,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         'IPAddressField':               'VARCHAR2(15)',
         'NullBooleanField':             'NUMBER(1) CHECK ((%(qn_column)s IN (0,1)) OR (%(qn_column)s IS NULL))',
         'OneToOneField':                'NUMBER(11)',
-        'PhoneNumberField':             'VARCHAR2(20)',
         'PositiveIntegerField':         'NUMBER(11) CHECK (%(qn_column)s >= 0)',
         'PositiveSmallIntegerField':    'NUMBER(11) CHECK (%(qn_column)s >= 0)',
         'SlugField':                    'NVARCHAR2(50)',
@@ -38,7 +37,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         'TextField':                    'NCLOB',
         'TimeField':                    'TIMESTAMP',
         'URLField':                     'VARCHAR2(%(max_length)s)',
-        'USStateField':                 'CHAR(2)',
     }
 
     remember = {}

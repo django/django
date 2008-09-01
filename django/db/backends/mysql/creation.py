@@ -21,14 +21,12 @@ class DatabaseCreation(BaseDatabaseCreation):
         'IPAddressField':    'char(15)',
         'NullBooleanField':  'bool',
         'OneToOneField':     'integer',
-        'PhoneNumberField':  'varchar(20)',
         'PositiveIntegerField': 'integer UNSIGNED',
         'PositiveSmallIntegerField': 'smallint UNSIGNED',
         'SlugField':         'varchar(%(max_length)s)',
         'SmallIntegerField': 'smallint',
         'TextField':         'longtext',
         'TimeField':         'time',
-        'USStateField':      'varchar(2)',
     }
 
     def sql_table_creation_suffix(self):

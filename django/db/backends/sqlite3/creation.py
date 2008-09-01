@@ -22,14 +22,12 @@ class DatabaseCreation(BaseDatabaseCreation):
         'IPAddressField':               'char(15)',
         'NullBooleanField':             'bool',
         'OneToOneField':                'integer',
-        'PhoneNumberField':             'varchar(20)',
         'PositiveIntegerField':         'integer unsigned',
         'PositiveSmallIntegerField':    'smallint unsigned',
         'SlugField':                    'varchar(%(max_length)s)',
         'SmallIntegerField':            'smallint',
         'TextField':                    'text',
         'TimeField':                    'time',
-        'USStateField':                 'varchar(2)',
     }
     
     def sql_for_pending_references(self, model, style, pending_references):
