@@ -1,60 +1,71 @@
 # translation of django.po to Turkish
 # This file is distributed under the same license as the Django package.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-03-14 01:38+0200\n"
-"PO-Revision-Date: 2008-07-02 23:37+0200\n"
-"Last-Translator: Can Burak Çilingir <canburak@cs.bilgi.edu.tr>\n"
+"PO-Revision-Date: 2008-09-01 13:37+0200\n"
+"Last-Translator: Metin Amiroff <amiroff@gmail.com>\n"
 "Language-Team: Turkish <bahadir@pardus.org.tr>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: oldforms/__init__.py:357 db/models/fields/__init__.py:116
-#: db/models/fields/__init__.py:273 db/models/fields/__init__.py:609
-#: db/models/fields/__init__.py:620 newforms/models.py:177
-#: newforms/fields.py:78 newforms/fields.py:374 newforms/fields.py:450
+#: oldforms/__init__.py:357
+#: db/models/fields/__init__.py:116
+#: db/models/fields/__init__.py:273
+#: db/models/fields/__init__.py:609
+#: db/models/fields/__init__.py:620
+#: newforms/models.py:177
+#: newforms/fields.py:78
+#: newforms/fields.py:374
+#: newforms/fields.py:450
 #: newforms/fields.py:461
 msgid "This field is required."
-msgstr "Bu alan gerekli."
+msgstr "Bu alan zorunludur."
 
 #: oldforms/__init__.py:392
 #, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Metnin %s karakterden az olmasına dikkat edin."
-msgstr[1] "Metnin %s karakterden az olmasına dikkat edin."
+msgstr[0] "Metnin %s karakterden az olduğundan emin olun."
 
 #: oldforms/__init__.py:397
 msgid "Line breaks are not allowed here."
-msgstr "Burada birden fazla satır olamaz."
+msgstr "Burada birden fazla satır kullanılamaz."
 
-#: oldforms/__init__.py:498 oldforms/__init__.py:571 oldforms/__init__.py:610
+#: oldforms/__init__.py:498
+#: oldforms/__init__.py:571
+#: oldforms/__init__.py:610
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr ""
-"Geçerli bir seçimde bulunun; %(choices)s değerleri içinde '%(data)s' yok."
+msgstr "Geçerli bir seçimde bulunun; %(choices)s değerleri içinde '%(data)s' yok."
 
-#: oldforms/__init__.py:577 newforms/widgets.py:170
+#: oldforms/__init__.py:577
+#: newforms/widgets.py:170
 #: contrib/admin/filterspecs.py:150
 msgid "Unknown"
 msgstr "Bilinmiyor"
 
-#: oldforms/__init__.py:577 newforms/widgets.py:170
+#: oldforms/__init__.py:577
+#: newforms/widgets.py:170
 #: contrib/admin/filterspecs.py:143
 msgid "Yes"
 msgstr "Evet"
 
-#: oldforms/__init__.py:577 newforms/widgets.py:170
+#: oldforms/__init__.py:577
+#: newforms/widgets.py:170
 #: contrib/admin/filterspecs.py:143
 msgid "No"
 msgstr "Hayır"
 
-#: oldforms/__init__.py:672 core/validators.py:174 core/validators.py:445
+#: oldforms/__init__.py:672
+#: core/validators.py:174
+#: core/validators.py:445
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Dosya gönderilmedi. Formdaki kodlama türünü kontrol edin."
 
@@ -64,7 +75,7 @@ msgstr "Gönderilen dosya boş."
 
 #: oldforms/__init__.py:730
 msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "-32,768 ve 32,767 arası bir sayı girin."
+msgstr "-32,768 ve 32,767 arası bir tamsayı girin."
 
 #: oldforms/__init__.py:740
 msgid "Enter a positive number."
@@ -79,8 +90,10 @@ msgstr "0 ve 32,767 arası bir sayı girin."
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "%(type)s ve %(field)s değerine sahip %(object)s kaydı zaten var."
 
-#: db/models/manipulators.py:308 contrib/admin/views/main.py:335
-#: contrib/admin/views/main.py:337 contrib/admin/views/main.py:339
+#: db/models/manipulators.py:308
+#: contrib/admin/views/main.py:335
+#: contrib/admin/views/main.py:337
+#: contrib/admin/views/main.py:339
 msgid "and"
 msgstr "ve"
 
@@ -101,11 +114,13 @@ msgstr "Bu değer True ya da False olabilir."
 msgid "This field cannot be null."
 msgstr "Bu alan boş bırakılamaz."
 
-#: db/models/fields/__init__.py:456 core/validators.py:148
+#: db/models/fields/__init__.py:456
+#: core/validators.py:148
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "YYYY-AA-GG formatında tarih girin."
 
-#: db/models/fields/__init__.py:525 core/validators.py:157
+#: db/models/fields/__init__.py:525
+#: core/validators.py:157
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "YYYY-AA-GG SS:DD formatında tarih girin."
 
@@ -127,21 +142,15 @@ msgid "Separate multiple IDs with commas."
 msgstr "Birden fazla numarayı virgül ile ayırın."
 
 #: db/models/fields/related.py:644
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"\"Ctrl\" ve Mac'de \"Command\" tuşunu basılı tutarak birden fazla seçimde "
-"bulunabilirsiniz."
+msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "\"Ctrl\" ve Mac'de \"Command\" tuşunu basılı tutarak birden fazla seçimde bulunabilirsiniz."
 
 #: db/models/fields/related.py:691
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] ""
-"Lütfen geçerli bir %(self)s numarası girin. %(value)r değeri geçersiz."
-msgstr[1] ""
-"Lütfen geçerli %(self)s numaraları girin. %(value)r değerleri geçersiz."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "Lütfen geçerli bir %(self)s numarası girin. %(value)r değeri geçersiz."
+msgstr[1] "Lütfen geçerli %(self)s numaraları girin. %(value)r değerleri geçersiz."
 
 #: conf/global_settings.py:39
 msgid "Arabic"
@@ -293,18 +302,15 @@ msgstr "Basiteştirilmiş Çince"
 
 #: conf/global_settings.py:76
 msgid "Traditional Chinese"
-msgstr "Gelenelsek Çince"
+msgstr "Geleneksel Çince"
 
 #: core/validators.py:64
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "Bu değer sadece karakter, rakam ve altçizgiden oluşabilir."
 
 #: core/validators.py:68
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr ""
-"Bu değer sadece harf, rakam, altçizgi, bölü ve ters bölüden oluşabilir."
+msgid "This value must contain only letters, numbers, underscores, dashes or slashes."
+msgstr "Bu değer sadece harf, rakam, altçizgi, bölü ve ters bölüden oluşabilir."
 
 #: core/validators.py:72
 msgid "This value must contain only letters, numbers, underscores or hyphens."
@@ -342,9 +348,10 @@ msgstr "Burada numerik olmayan karakterler kullanılamaz."
 msgid "This value can't be comprised solely of digits."
 msgstr "Bu alanda sadece rakam kullanılamaz."
 
-#: core/validators.py:120 newforms/fields.py:126
+#: core/validators.py:120
+#: newforms/fields.py:126
 msgid "Enter a whole number."
-msgstr "Sayı girin."
+msgstr "Tam sayı girin."
 
 #: core/validators.py:124
 msgid "Only alphabetical characters are allowed here."
@@ -352,7 +359,7 @@ msgstr "Burada sadece alfabetik karakterler kullanılabilir."
 
 #: core/validators.py:139
 msgid "Year must be 1900 or later."
-msgstr "Yıl 1900 ya da sonrası olabilir."
+msgstr "Yıl 1900 ya da sonrası olmalıdır."
 
 #: core/validators.py:143
 #, python-format
@@ -363,17 +370,14 @@ msgstr "Geçersiz tarih: %s"
 msgid "Enter a valid time in HH:MM format."
 msgstr "SS:DD formatında geçerli bir saat girin."
 
-#: core/validators.py:162 newforms/fields.py:269
+#: core/validators.py:162
+#: newforms/fields.py:269
 msgid "Enter a valid e-mail address."
 msgstr "Geçerli bir e-posta adresi girin."
 
 #: core/validators.py:178
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
-msgstr ""
-"Geçerli bir resim girin. Gönderdiğiniz dosya resim değil, ya da bozuk bir "
-"dosya."
+msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+msgstr "Geçerli bir resim girin. Gönderdiğiniz dosya resim değil, ya da bozuk bir dosya."
 
 #: core/validators.py:185
 #, python-format
@@ -411,34 +415,35 @@ msgstr "Geçersiz XML kodu: %s"
 #: core/validators.py:239
 #, python-format
 msgid "Invalid URL: %s"
-msgstr "Geçersiz adres: %s"
+msgstr "Geçersiz URL: %s"
 
-#: core/validators.py:244 core/validators.py:246
+#: core/validators.py:244
+#: core/validators.py:246
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "%s kırık bir link."
 
 #: core/validators.py:252
 msgid "Enter a valid U.S. state abbreviation."
-msgstr "Geçerli bir şehir kodu girin."
+msgstr "Geçerli bir A.B.D. şehir kodu girin."
 
 #: core/validators.py:266
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Söylediğinize dikkat edin! %s kelimesi burada kullanılamaz."
-msgstr[1] "Söylediğinize dikkat edin! %s kelimeleri burada kullanılamaz."
+msgstr[0] "Söylediğinize dikkat edin! %s kelimeleri burada kullanılamaz."
 
 #: core/validators.py:273
 #, python-format
 msgid "This field must match the '%s' field."
-msgstr "Bu alan '%s' ile alanı ile uyuşmalı."
+msgstr "Bu alan '%s' alanı ile uyuşmalı."
 
 #: core/validators.py:292
 msgid "Please enter something for at least one field."
 msgstr "Lütfen en az bir alana giriş yapın."
 
-#: core/validators.py:301 core/validators.py:312
+#: core/validators.py:301
+#: core/validators.py:312
 msgid "Please enter both fields or leave them both empty."
 msgstr "Lütfen tüm alanları doldurun ya da hepsini boş bırakın."
 
@@ -469,7 +474,7 @@ msgstr "Bu değer en az %s olabilir."
 #: core/validators.py:371
 #, python-format
 msgid "This value must be no more than %s."
-msgstr ""
+msgstr "Bu değer %s 'den daha fazla olmalıdır."
 
 #: core/validators.py:407
 #, python-format
@@ -483,29 +488,23 @@ msgstr "Lütfen geçerli bir ondalık sayı girin."
 #: core/validators.py:422
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
+msgid_plural "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] "Lütfen en fazla %s basamaklı bir ondalık sayı girin."
 msgstr[1] "Lütfen en fazla %s basamaklı bir ondalık sayı girin."
 
 #: core/validators.py:425
 #, python-format
-msgid ""
-"Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural ""
-"Please enter a valid decimal number with a whole part of at most %s digits."
+msgid "Please enter a valid decimal number with a whole part of at most %s digit."
+msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
 msgstr[0] "Lütfen tamsayı kısmı en fazla %s basamaklı bir ondalık sayı girin."
 msgstr[1] "Lütfen tamsayı kısmı en fazla %s basamaklı bir ondalık sayı girin."
 
 #: core/validators.py:428
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] ""
-"Lütfen ondalıklı kısmı en fazla %s basamaklı bir ondalık sayı girin."
-msgstr[1] ""
-"Lütfen ondalıklı kısmı en fazla %s basamaklı bir ondalık sayı girin."
+msgid_plural "Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] "Lütfen ondalıklı kısmı en fazla %s basamaklı bir ondalık sayı girin."
+msgstr[1] "Lütfen ondalıklı kısmı en fazla %s basamaklı bir ondalık sayı girin."
 
 #: core/validators.py:438
 #, python-format
@@ -523,7 +522,7 @@ msgstr "Bu alandaki veri formatı hatalı."
 
 #: core/validators.py:471
 msgid "This field is invalid."
-msgstr "Alan geçersiz."
+msgstr "Bu alan geçersiz."
 
 #: core/validators.py:507
 #, python-format
@@ -532,63 +531,38 @@ msgstr "%s içinden hiçbirşey aktarılamıyor."
 
 #: core/validators.py:510
 #, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr "%(url)s adresi geçersiz içerik türü (%(contenttype)s) gönderdi."
 
 #: core/validators.py:543
 #, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-"Lütfen %(line)s. satırdaki kapatılmayan %(tag)s etiketini kapatın. (Satır, "
-"\"%(start)s\" ile başlıyor.)"
+msgid "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with \"%(start)s\".)"
+msgstr "Lütfen %(line)s. satırdaki kapatılmayan %(tag)s etiketini kapatın. (Satır, \"%(start)s\" ile başlıyor.)"
 
 #: core/validators.py:547
 #, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"%(line)s. satırda başlayan bazı kelimeler içerik olarak kabul edilmiyor. "
-"(Satır, \"%(start)s\" ile başlıyor.)"
+msgid "Some text starting on line %(line)s is not allowed in that context. (Line starts with \"%(start)s\".)"
+msgstr "%(line)s. satırda başlayan bazı kelimeler içerik olarak kabul edilmiyor. (Satır, \"%(start)s\" ile başlıyor.)"
 
 #: core/validators.py:552
 #, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"%(line)s. satırdaki \"%(attr)s\" özelliği geçersiz. (Satır, \"%(start)s\" "
-"ile başlıyor.)"
+msgid "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%(start)s\".)"
+msgstr "%(line)s. satırdaki \"%(attr)s\" özelliği geçersiz. (Satır, \"%(start)s\" ile başlıyor.)"
 
 #: core/validators.py:557
 #, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"%(line)s. satırdaki \"<%(tag)s>\" etiketi geçersiz. (Satır, \"%(start)s\" "
-"ile başlıyor.)"
+msgid "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%(start)s\".)"
+msgstr "%(line)s. satırdaki \"<%(tag)s>\" etiketi geçersiz. (Satır, \"%(start)s\" ile başlıyor.)"
 
 #: core/validators.py:561
 #, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"%(line)s. satırdaki bir etiket eksik ya da eklenmesi gereken özellikleri "
-"var. (Satır, \"%(start)s\" ile başlıyor.)"
+msgid "A tag on line %(line)s is missing one or more required attributes. (Line starts with \"%(start)s\".)"
+msgstr "%(line)s. satırdaki bir etiket eksik ya da eklenmesi gereken özellikleri var. (Satır, \"%(start)s\" ile başlıyor.)"
 
 #: core/validators.py:566
 #, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"%(line)s. satırdaki \"%(attr)s\" özelliği geçersiz bir değere sahip. (Satır, "
-"\"%(start)s\" ile başlıyor.)"
+msgid "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line starts with \"%(start)s\".)"
+msgstr "%(line)s. satırdaki \"%(attr)s\" özelliği geçersiz bir değere sahip. (Satır, \"%(start)s\" ile başlıyor.)"
 
 #: views/generic/create_update.py:43
 #, python-format
@@ -605,25 +579,31 @@ msgstr "%(verbose_name)s başarıyla güncellendi."
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s silindi."
 
-#: newforms/models.py:164 newforms/fields.py:360
+#: newforms/models.py:164
+#: newforms/fields.py:360
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Geçerli bir seçimde bulunun; seçiminiz mevcut değerlerden birisi değil."
 
-#: newforms/models.py:181 newforms/fields.py:378 newforms/fields.py:454
+#: newforms/models.py:181
+#: newforms/fields.py:378
+#: newforms/fields.py:454
 msgid "Enter a list of values."
 msgstr "Değer listesi giriniz."
 
-#: newforms/models.py:187 newforms/fields.py:387
+#: newforms/models.py:187
+#: newforms/fields.py:387
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Geçerli bir seçimde bulunun; %s mevcut değerlerden biri değil."
 
-#: newforms/fields.py:101 newforms/fields.py:254
+#: newforms/fields.py:101
+#: newforms/fields.py:254
 #, python-format
 msgid "Ensure this value has at most %d characters."
 msgstr "Bu değer en fazla %d karakter olabilir."
 
-#: newforms/fields.py:103 newforms/fields.py:256
+#: newforms/fields.py:103
+#: newforms/fields.py:256
 #, python-format
 msgid "Ensure this value has at least %d characters."
 msgstr "Bu değer en az %d arakter olabilir."
@@ -631,12 +611,12 @@ msgstr "Bu değer en az %d arakter olabilir."
 #: newforms/fields.py:128
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
-msgstr ""
+msgstr "Bu değerin %s karakterden az veya eşit olduğundan emin ol."
 
 #: newforms/fields.py:130
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
-msgstr ""
+msgstr "Bu değerin %s karakterden çok veya eşit olduğundan emin ol."
 
 #: newforms/fields.py:163
 msgid "Enter a valid date."
@@ -644,23 +624,24 @@ msgstr "Geçerli bir tarih girin."
 
 #: newforms/fields.py:190
 msgid "Enter a valid time."
-msgstr "Geçerli bir zaman giriniz."
+msgstr "Geçerli bir zaman girin."
 
 #: newforms/fields.py:226
 msgid "Enter a valid date/time."
-msgstr "Geçerli bir tarih/zaman giriniz."
+msgstr "Geçerli bir tarih/zaman girin."
 
 #: newforms/fields.py:240
 msgid "Enter a valid value."
 msgstr "Geçerli bir değer girin."
 
-#: newforms/fields.py:287 newforms/fields.py:309
+#: newforms/fields.py:287
+#: newforms/fields.py:309
 msgid "Enter a valid URL."
 msgstr "Geçerli bir URL girin."
 
 #: newforms/fields.py:311
 msgid "This URL appears to be a broken link."
-msgstr "Bu URL kırık bir link gibi duruyor."
+msgstr "Bu URL geçersiz bir link gibi duruyor."
 
 #: contrib/humanize/templatetags/humanize.py:17
 msgid "th"
@@ -740,24 +721,16 @@ msgid "redirect from"
 msgstr "eski adres"
 
 #: contrib/redirects/models.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Buraya tam dosya yolu, alan adı kullanılmadan yazılmalı. Örnek: '/events/"
-"search/'."
+msgid "This should be an absolute path, excluding the domain name. Example: '/events/search/'."
+msgstr "Buraya tam dosya yolu, alan adı kullanılmadan yazılmalı. Örnek: '/events/search/'."
 
 #: contrib/redirects/models.py:9
 msgid "redirect to"
 msgstr "yeni adres"
 
 #: contrib/redirects/models.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Buraya tam dosya yolu (yukarıdaki gibi), ya da 'http://' ile başlayan tam "
-"adres yazılmalı."
+msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
+msgstr "Buraya tam dosya yolu (yukarıdaki gibi), ya da 'http://' ile başlayan tam adres yazılmalı."
 
 #: contrib/redirects/models.py:13
 msgid "redirect"
@@ -767,7 +740,8 @@ msgstr "yönlendirme"
 msgid "redirects"
 msgstr "yönlendirmeler"
 
-#: contrib/comments/models.py:67 contrib/comments/models.py:166
+#: contrib/comments/models.py:67
+#: contrib/comments/models.py:166
 msgid "object ID"
 msgstr "nesne no"
 
@@ -775,7 +749,8 @@ msgstr "nesne no"
 msgid "headline"
 msgstr "başlık"
 
-#: contrib/comments/models.py:69 contrib/comments/models.py:90
+#: contrib/comments/models.py:69
+#: contrib/comments/models.py:90
 #: contrib/comments/models.py:167
 msgid "comment"
 msgstr "yorum"
@@ -816,15 +791,18 @@ msgstr "reyting 8"
 msgid "is valid rating"
 msgstr "geçerli reyting"
 
-#: contrib/comments/models.py:83 contrib/comments/models.py:169
+#: contrib/comments/models.py:83
+#: contrib/comments/models.py:169
 msgid "date/time submitted"
 msgstr "gönderim tarihi/saati"
 
-#: contrib/comments/models.py:84 contrib/comments/models.py:170
+#: contrib/comments/models.py:84
+#: contrib/comments/models.py:170
 msgid "is public"
 msgstr "görünürlük"
 
-#: contrib/comments/models.py:85 contrib/admin/views/doc.py:304
+#: contrib/comments/models.py:85
+#: contrib/admin/views/doc.py:304
 msgid "IP address"
 msgstr "IP adresi"
 
@@ -833,18 +811,15 @@ msgid "is removed"
 msgstr "silinmiş"
 
 #: contrib/comments/models.py:86
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr ""
-"Yorum uygunsuz ise bu işareti kaldırın. \"Yorum silindi\" uyarısı "
-"görüntülenecek."
+msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
+msgstr "Yorum uygunsuz ise bu işareti kaldırın. \"Yorum silindi\" uyarısı görüntülenecek."
 
 #: contrib/comments/models.py:91
 msgid "comments"
 msgstr "yorumlar"
 
-#: contrib/comments/models.py:131 contrib/comments/models.py:207
+#: contrib/comments/models.py:131
+#: contrib/comments/models.py:207
 msgid "Content object"
 msgstr "İçerik nesnesi"
 
@@ -962,30 +937,25 @@ msgid "No voting for yourself"
 msgstr "Kendinize oy veremezsiniz"
 
 #: contrib/comments/views/comments.py:27
-msgid ""
-"This rating is required because you've entered at least one other rating."
+msgid "This rating is required because you've entered at least one other rating."
 msgstr "Reyting gerekli, çünkü en az bir reyting tanımladınız."
 
 #: contrib/comments/views/comments.py:111
 #, python-format
 msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
+"This comment was posted by a user who has posted fewer than %(count)s comment:\n"
 "\n"
 "%(text)s"
 msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
+"This comment was posted by a user who has posted fewer than %(count)s comments:\n"
 "\n"
 "%(text)s"
 msgstr[0] ""
-"Bu yorum, %(count)s yorumdan daha az gönderide bulunmuş bir kullanıcıya "
-"ait:\n"
+"Bu yorum, %(count)s yorumdan daha az gönderide bulunmuş bir kullanıcıya ait:\n"
 "\n"
 "%(text)s"
 msgstr[1] ""
-"Bu yorum, %(count)s yorumdan daha az gönderide bulunmuş bir kullanıcıya "
-"ait:\n"
+"Bu yorum, %(count)s yorumdan daha az gönderide bulunmuş bir kullanıcıya ait:\n"
 "\n"
 "%(text)s"
 
@@ -1013,16 +983,12 @@ msgstr "Bir ya da daha fazla gerekli alan doldurulmadı"
 #: contrib/comments/views/comments.py:196
 #: contrib/comments/views/comments.py:286
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr ""
-"Birisi yorum gönderme formunu kötüye kullanmaya çalıştı (güvenlik ihlali)"
+msgstr "Birisi yorum gönderme formunu kötüye kullanmaya çalıştı (güvenlik ihlali)"
 
 #: contrib/comments/views/comments.py:206
 #: contrib/comments/views/comments.py:292
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr ""
-"Bu yorumun geçersiz bir 'hedef' parametresi var -- nesne narası geçersiz"
+msgid "The comment form had an invalid 'target' parameter -- the object ID was invalid"
+msgstr "Bu yorumun geçersiz bir 'hedef' parametresi var -- nesne narası geçersiz"
 
 #: contrib/comments/views/comments.py:257
 #: contrib/comments/views/comments.py:321
@@ -1033,7 +999,7 @@ msgstr "Yorum görüntülememe mi yoksa gönderme amaçlı mı belirsiz"
 #: contrib/comments/templates/comments/form.html:8
 #: contrib/admin/templates/admin/login.html:17
 msgid "Username:"
-msgstr "Kullanıcı:"
+msgstr "Kullanıcı adı:"
 
 #: contrib/comments/templates/comments/form.html:6
 #: contrib/admin/templates/admin/change_list.html:5
@@ -1073,7 +1039,7 @@ msgstr "Reytingler"
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Required"
-msgstr "Gerekli"
+msgstr "Zorunlu"
 
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
@@ -1104,7 +1070,7 @@ msgstr "alan adı"
 
 #: contrib/sites/models.py:11
 msgid "display name"
-msgstr "görülen isim"
+msgstr "görünen isim"
 
 #: contrib/sites/models.py:15
 msgid "site"
@@ -1123,8 +1089,10 @@ msgstr ""
 "<h3>%s nesnesine göre:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143 contrib/admin/filterspecs.py:169
+#: contrib/admin/filterspecs.py:70
+#: contrib/admin/filterspecs.py:88
+#: contrib/admin/filterspecs.py:143
+#: contrib/admin/filterspecs.py:169
 msgid "All"
 msgstr "Tümü"
 
@@ -1180,12 +1148,14 @@ msgstr "girişleri kaydet"
 msgid "All dates"
 msgstr "Tüm tarihler"
 
-#: contrib/admin/views/auth.py:19 contrib/admin/views/main.py:257
+#: contrib/admin/views/auth.py:19
+#: contrib/admin/views/main.py:257
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "\"%(obj)s\" isimli %(name)s eklendi."
 
-#: contrib/admin/views/auth.py:24 contrib/admin/views/main.py:261
+#: contrib/admin/views/auth.py:24
+#: contrib/admin/views/main.py:261
 #: contrib/admin/views/main.py:347
 msgid "You may edit it again below."
 msgstr "Tekrar düzenleyebilirsiniz."
@@ -1207,7 +1177,8 @@ msgstr "Parola değiştir: %s"
 msgid "Site administration"
 msgstr "Site yönetimi"
 
-#: contrib/admin/views/main.py:271 contrib/admin/views/main.py:356
+#: contrib/admin/views/main.py:271
+#: contrib/admin/views/main.py:356
 #, python-format
 msgid "You may add another %s below."
 msgstr "Yeni bir %s ekleyebilirsiniz."
@@ -1243,10 +1214,8 @@ msgstr "\"%(obj)s\" isimli %(name)s değiştirildi."
 
 #: contrib/admin/views/main.py:353
 #, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"\"%(obj)s\" isimli %(name)s eklendi. Aşağıda tekrar düzenleyebilirsiniz."
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "\"%(obj)s\" isimli %(name)s eklendi. Aşağıda tekrar düzenleyebilirsiniz."
 
 #: contrib/admin/views/main.py:391
 #, python-format
@@ -1291,13 +1260,10 @@ msgstr "Değiştirilecek %s nesnesini seçin"
 msgid "Database error"
 msgstr "Veritabanı hatası"
 
-#: contrib/admin/views/decorators.py:10 contrib/auth/forms.py:60
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr ""
-"Lütfen geçerli bir kullanıcı adı ve parola girin. Tüm alanlar büyük/küçük "
-"harf duyarlıdır."
+#: contrib/admin/views/decorators.py:10
+#: contrib/auth/forms.py:60
+msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
+msgstr "Lütfen geçerli bir kullanıcı adı ve parola girin. Tüm alanlar büyük/küçük harf duyarlıdır."
 
 #: contrib/admin/views/decorators.py:24
 #: contrib/admin/templates/admin/login.html:25
@@ -1305,20 +1271,12 @@ msgid "Log in"
 msgstr "Giriş yap"
 
 #: contrib/admin/views/decorators.py:62
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr ""
-"Oturumunuzun süresi geçti. Lütfen tekrar giriş yapın. Endişe etmeyin, "
-"gönderiniz kayıt edildi."
+msgid "Please log in again, because your session has expired. Don't worry: Your submission has been saved."
+msgstr "Oturumunuzun süresi geçti. Lütfen tekrar giriş yapın. Endişe etmeyin, gönderiniz kayıt edildi."
 
 #: contrib/admin/views/decorators.py:69
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"Görünüşe göre tarayıcınız çerezleri kabul etmiyor. Çerez kullanımını aktif "
-"hale getirin ve sayfayı yeniden yükleyin."
+msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
+msgstr "Görünüşe göre tarayıcınız çerezleri kabul etmiyor. Çerez kullanımını aktif hale getirin ve sayfayı yeniden yükleyin."
 
 #: contrib/admin/views/decorators.py:83
 msgid "Usernames cannot contain the '@' character."
@@ -1329,17 +1287,20 @@ msgstr "Kullanıcı isminde '@' karakteri bulunamaz."
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "E-posta adresiniz kullanıcı adınız değil. '%s' kullanın."
 
-#: contrib/admin/views/doc.py:46 contrib/admin/views/doc.py:48
+#: contrib/admin/views/doc.py:46
+#: contrib/admin/views/doc.py:48
 #: contrib/admin/views/doc.py:50
 msgid "tag:"
 msgstr "etiket:"
 
-#: contrib/admin/views/doc.py:77 contrib/admin/views/doc.py:79
+#: contrib/admin/views/doc.py:77
+#: contrib/admin/views/doc.py:79
 #: contrib/admin/views/doc.py:81
 msgid "filter:"
 msgstr "filtre:"
 
-#: contrib/admin/views/doc.py:135 contrib/admin/views/doc.py:137
+#: contrib/admin/views/doc.py:135
+#: contrib/admin/views/doc.py:137
 #: contrib/admin/views/doc.py:139
 msgid "view:"
 msgstr "view:"
@@ -1359,8 +1320,10 @@ msgstr "%(name)r modeli %(label)r uygulamasında bulunamadı"
 msgid "the related `%(label)s.%(type)s` object"
 msgstr "ilgili `%(label)s.%(type)s` nesnesi"
 
-#: contrib/admin/views/doc.py:183 contrib/admin/views/doc.py:205
-#: contrib/admin/views/doc.py:219 contrib/admin/views/doc.py:224
+#: contrib/admin/views/doc.py:183
+#: contrib/admin/views/doc.py:205
+#: contrib/admin/views/doc.py:219
+#: contrib/admin/views/doc.py:224
 msgid "model:"
 msgstr "model:"
 
@@ -1384,9 +1347,12 @@ msgstr "%s sayısı"
 msgid "Fields on %s objects"
 msgstr "%s nesnesindeki alanlar"
 
-#: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:301
-#: contrib/admin/views/doc.py:303 contrib/admin/views/doc.py:309
-#: contrib/admin/views/doc.py:310 contrib/admin/views/doc.py:312
+#: contrib/admin/views/doc.py:291
+#: contrib/admin/views/doc.py:301
+#: contrib/admin/views/doc.py:303
+#: contrib/admin/views/doc.py:309
+#: contrib/admin/views/doc.py:310
+#: contrib/admin/views/doc.py:312
 msgid "Integer"
 msgstr "Tamsayı"
 
@@ -1394,7 +1360,8 @@ msgstr "Tamsayı"
 msgid "Boolean (Either True or False)"
 msgstr "Mantıksal (True ya da False)"
 
-#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:311
+#: contrib/admin/views/doc.py:293
+#: contrib/admin/views/doc.py:311
 #, python-format
 msgid "String (up to %(maxlength)s)"
 msgstr "Karakter disizi (en fazla %(maxlength)s)"
@@ -1415,7 +1382,8 @@ msgstr "Tarih (saat var)"
 msgid "E-mail address"
 msgstr "E-posta adresi"
 
-#: contrib/admin/views/doc.py:298 contrib/admin/views/doc.py:299
+#: contrib/admin/views/doc.py:298
+#: contrib/admin/views/doc.py:299
 #: contrib/admin/views/doc.py:302
 msgid "File path"
 msgstr "Dosya yolu"
@@ -1444,7 +1412,8 @@ msgstr "Metin"
 msgid "Time"
 msgstr "Saat"
 
-#: contrib/admin/views/doc.py:315 contrib/flatpages/models.py:7
+#: contrib/admin/views/doc.py:315
+#: contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
 
@@ -1561,12 +1530,8 @@ msgid "DATE_WITH_TIME_FULL"
 msgstr "DATE_WITH_TIME_FULL"
 
 #: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Bu nesnenin işlem geçmişi yok. Muhtemelen yönetici sayfası dışında bir "
-"yerden eklendi."
+msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
+msgstr "Bu nesnenin işlem geçmişi yok. Muhtemelen yönetici sayfası dışında bir yerden eklendi."
 
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
@@ -1609,22 +1574,12 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Sunucu Hatası <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Bir hata oluştu. Hata, e-psota ile site yöneticisine bildirildi ve kısa süre "
-"içinde çözülecktir. Sabrınız için teşekkürler."
+msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
+msgstr "Bir hata oluştu. Hata, e-psota ile site yöneticisine bildirildi ve kısa süre içinde çözülecktir. Sabrınız için teşekkürler."
 
 #: contrib/admin/templates/admin/invalid_setup.html:8
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr ""
-"Veritabanı kurulumu ile ilgili bir problem var. İlgili veritabanı "
-"tablolarının kurulu olduğundan ve veritabanının ilgili kullanıcı tarafından "
-"okunabilir olduğundan emin olun."
+msgid "Something's wrong with your database installation. Make sure the appropriate database tables have been created, and make sure the database is readable by the appropriate user."
+msgstr "Veritabanı kurulumu ile ilgili bir problem var. İlgili veritabanı tablolarının kurulu olduğundan ve veritabanının ilgili kullanıcı tarafından okunabilir olduğundan emin olun."
 
 #: contrib/admin/templates/admin/index.html:17
 #, python-format
@@ -1639,15 +1594,15 @@ msgstr "%(name)s"
 #: contrib/admin/templates/admin/index.html:28
 #: contrib/admin/templates/admin/change_form.html:15
 msgid "Add"
-msgstr "Ekle"
+msgstr "Ekleme"
 
 #: contrib/admin/templates/admin/index.html:34
 msgid "Change"
-msgstr "Değiştir"
+msgstr "Değiştirme"
 
 #: contrib/admin/templates/admin/index.html:44
 msgid "You don't have permission to edit anything."
-msgstr "İşlem yapmaya yetkiniz yok."
+msgstr "Düzenleme yapmaya yetkiniz yok."
 
 #: contrib/admin/templates/admin/index.html:52
 msgid "Recent Actions"
@@ -1668,7 +1623,7 @@ msgstr "Sayfa bulunamadı"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Üzgünüm, aradığınız sayfa bulunamadı."
+msgstr "Üzgünüz, aradığınız sayfa bulunamadı."
 
 #: contrib/admin/templates/admin/filters.html:4
 msgid "Filter"
@@ -1700,23 +1655,13 @@ msgstr "Sil"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr ""
-"'%(escaped_object)s' isimli %(object_name)s nesnesini silmek, bağlantılı "
-"nesnelerin silinmesini gerektiriyor, ancak aşağıdaki nesneleri silme "
-"yetkiniz yok."
+msgid "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
+msgstr "'%(escaped_object)s' isimli %(object_name)s nesnesini silmek, bağlantılı nesnelerin silinmesini gerektiriyor, ancak aşağıdaki nesneleri silme yetkiniz yok."
 
 #: contrib/admin/templates/admin/delete_confirmation.html:21
 #, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr ""
-"\"%(escaped_object)s\" isimli %(object_name)s nesnesini silmek "
-"istediğinizdenemin misiniz? Aşağıdaki bağlantılı öğeler silinecek:"
+msgid "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? All of the following related items will be deleted:"
+msgstr "\"%(escaped_object)s\" isimli %(object_name)s nesnesini silmek istediğinizden emin misiniz? Aşağıdaki bağlantılı öğeler silinecek:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:26
 msgid "Yes, I'm sure"
@@ -1724,7 +1669,7 @@ msgstr "Evet, eminim"
 
 #: contrib/admin/templates/admin/base.html:25
 msgid "Welcome,"
-msgstr "Hoşgeldin,"
+msgstr "Hoşgeldiniz,"
 
 #: contrib/admin/templates/admin/submit_line.html:4
 msgid "Save as new"
@@ -1732,7 +1677,7 @@ msgstr "Yeni olarak kaydet"
 
 #: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save and add another"
-msgstr "Kaydet ve yeni bir tane ekle"
+msgstr "Kaydet ve yenisini ekle"
 
 #: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and continue editing"
@@ -1763,16 +1708,12 @@ msgid "Enter the same password as above, for verification."
 msgstr "Onaylamak için, yukarıdaki parolanın aynısını girin."
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:6
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr ""
-"Önce bir kullanıcı adı ve parola girin. Daha sonra daha fazla bilgi "
-"girebilirsiniz."
+msgid "First, enter a username and password. Then, you'll be able to edit more user options."
+msgstr "Önce bir kullanıcı adı ve parola girin. Daha sonra daha fazla bilgi girebilirsiniz."
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:12
 msgid "Username"
-msgstr "Kullanıcı"
+msgstr "Kullanıcı adı"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -1798,12 +1739,8 @@ msgid "Password reset"
 msgstr "Parolayı sıfırla"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Parolanızı mı unuttunuz? E-posta adresinizi aşağıya girin, parolanızı "
-"sıfırlayalım ve e-posta adresinize gönderelim."
+msgid "Forgotten your password? Enter your e-mail address below, and we'll reset your password and e-mail the new one to you."
+msgstr "Parolanızı mı unuttunuz? E-posta adresinizi aşağıya girin, parolanızı sıfırlayalım ve e-posta adresinize gönderelim."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -1815,7 +1752,7 @@ msgstr "Parolamı sıfırla"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Web sitesinde zaman geçirdiğiniz için teşekkür ederiz."
+msgstr "Web sitesinde bugün geçirdiğiniz zaman için teşekkür ederiz."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
@@ -1824,23 +1761,15 @@ msgstr "Tekrar giriş yap"
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "Parola sıfırlandı."
+msgstr "Parola başarıyla sıfırlandı"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Yeni şifreniz, e-posta adresinize gönderildi, kısa süre içinde size "
-"ulaşacaktır."
+msgid "We've e-mailed a new password to the e-mail address you submitted. You should be receiving it shortly."
+msgstr "Yeni parolanız, e-posta adresinize gönderilmiştir, kısa süre içinde size ulaşacaktır."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Güvenliğiniz için, lütfen eski parolanızı girin, sonra da yeni şifrenizi iki "
-"kere girin ve böylece doğru yazdığınızdan emin olun."
+msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
+msgstr "Güvenliğiniz için, lütfen eski parolanızı girin, sonra da yeni parolanızı iki kere girin ve böylece doğru yazdığınızdan emin olun."
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
@@ -1860,14 +1789,12 @@ msgstr "Parolamı değiştir"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Bu e-postayı aldınız çünkü "
+msgstr "Bu e-postayı alıyorsunuz, çünkü"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
 msgid "for your user account at %(site_name)s"
-msgstr ""
-"%(site_name)s adresindeki kullanıcı hesabınız için parola sıfırlama "
-"talebinde bulundunuz."
+msgstr "%(site_name)s adresindeki kullanıcı hesabınız için parola sıfırlama talebinde bulundunuz."
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 #, python-format
@@ -1884,7 +1811,7 @@ msgstr "Unutma ihtimaline karşı, kullanıcı adınız:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
 msgid "Thanks for using our site!"
-msgstr "Teşekkürler!"
+msgstr "Sitemizi kullandığınız için teşekkürler!"
 
 #: contrib/admin/templates/registration/password_reset_email.html:15
 #, python-format
@@ -1897,7 +1824,7 @@ msgstr "Kısayollar"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:5
 msgid "Documentation bookmarklets"
-msgstr "Doküman kısayolları"
+msgstr "Dokümantasyon kısayolları"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:9
 msgid ""
@@ -1910,19 +1837,17 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Kısayolları kullanabilmek için, bağlantıyı tarayıcınızdaki "
-"araç çubuğuna sürükleyin, ya da sağ tıklayıp sık kullanılan adresler "
-"listenize ekleyin. Bazı kısayollar, uygulamayı çalıştıran sunucu ile aynı "
-"adreste bulunan istemciler tarafından kullanılabilir.</p>\n"
+"<p class=\"help\">Kısayolları kullanabilmek için, bağlantıyı tarayıcınızdaki araç\n"
+"çubuğuna sürükleyin, ya da sağ tıklayıp sık kullanılan adresler listenize ekleyin. \n"
+"Bazı kısayollar, uygulamayı çalıştıran sunucu ile aynı adreste bulunan istemciler \n"
+"tarafından kullanılabilir.</p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
 msgid "Documentation for this page"
 msgstr "Bu sayfa için dokümantasyon"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:20
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
+msgid "Jumps you from any page to the documentation for the view that generates that page."
 msgstr "Sizi, bu sayfayı üreten betiğin dokümantasyonuna yönlendirir."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:22
@@ -1930,11 +1855,8 @@ msgid "Show object ID"
 msgstr "Nesne numarasını göster"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:23
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Tek bir nesneyi temsil eden sayfaların içerik türünü ve numarasını gösterir."
+msgid "Shows the content-type and unique ID for pages that represent a single object."
+msgstr "Tek bir nesneyi temsil eden sayfaların içerik türünü ve numarasını gösterir."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Edit this object (current window)"
@@ -1954,7 +1876,7 @@ msgstr "Yukarıdaki gibi, ancak yönetim sayfasını yeni bir pencerede açar."
 
 #: contrib/contenttypes/models.py:36
 msgid "python model class name"
-msgstr "python model sınıfı"
+msgstr "python model sınıf adı"
 
 #: contrib/contenttypes/models.py:39
 msgid "content type"
@@ -1968,7 +1890,8 @@ msgstr "içerik türleri"
 msgid "Logged out"
 msgstr "Çıkış yapıldı"
 
-#: contrib/auth/models.py:38 contrib/auth/models.py:57
+#: contrib/auth/models.py:38
+#: contrib/auth/models.py:57
 msgid "name"
 msgstr "isim"
 
@@ -1980,7 +1903,8 @@ msgstr "takma ad"
 msgid "permission"
 msgstr "izin"
 
-#: contrib/auth/models.py:43 contrib/auth/models.py:58
+#: contrib/auth/models.py:43
+#: contrib/auth/models.py:58
 msgid "permissions"
 msgstr "izinler"
 
@@ -1988,7 +1912,8 @@ msgstr "izinler"
 msgid "group"
 msgstr "grup"
 
-#: contrib/auth/models.py:61 contrib/auth/models.py:100
+#: contrib/auth/models.py:61
+#: contrib/auth/models.py:100
 msgid "groups"
 msgstr "gruplar"
 
@@ -1997,12 +1922,8 @@ msgid "username"
 msgstr "kullanıcı adı"
 
 #: contrib/auth/models.py:90
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
-msgstr ""
-"Gerekli. 30 karakter ya da da az olmalı. Alfanumerik (harf, rakam ve alt "
-"çizgi) karakterler kullanılabilir."
+msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
+msgstr "Zorunlu alan. 30 karakter ya da da az olmalı. Alfanumerik (harf, rakam ve alt çizgi) karakterler kullanılabilir."
 
 #: contrib/auth/models.py:91
 msgid "first name"
@@ -2021,9 +1942,7 @@ msgid "password"
 msgstr "parola"
 
 #: contrib/auth/models.py:94
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
+msgid "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
 msgstr ""
 "'[algo]$[salt]$[hexdigest]' yazın ya da <a href=\"password/\">parola\n"
 "değiştir formunu kullanın</a>."
@@ -2041,24 +1960,16 @@ msgid "active"
 msgstr "aktif"
 
 #: contrib/auth/models.py:96
-msgid ""
-"Designates whether this user can log into the Django admin. Unselect this "
-"instead of deleting accounts."
-msgstr ""
-"Kullanıcının Django yönetim sayfasına girip giremeyeceğini belirler. "
-"Kullanıcı hesabı silmek yerine işareti kaldırın."
+msgid "Designates whether this user can log into the Django admin. Unselect this instead of deleting accounts."
+msgstr "Kullanıcının Django yönetim sayfasına girip giremeyeceğini belirler. Kullanıcı hesabı silmek yerine işareti kaldırın."
 
 #: contrib/auth/models.py:97
 msgid "superuser status"
 msgstr "süper kullanıcı modu"
 
 #: contrib/auth/models.py:97
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
-msgstr ""
-"Kullanıcının tek tek hak atamasına gerek kalmadan tüm haklara sahip olup "
-"olamayacağını belirler."
+msgid "Designates that this user has all permissions without explicitly assigning them."
+msgstr "Kullanıcının tek tek hak atamasına gerek kalmadan tüm haklara sahip olup olamayacağını belirler."
 
 #: contrib/auth/models.py:98
 msgid "last login"
@@ -2069,12 +1980,8 @@ msgid "date joined"
 msgstr "kayıt tarihi"
 
 #: contrib/auth/models.py:101
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr ""
-"Özel olarak atanmış hakların yanı sıra, kullanıcının üyesi olduğu grupların "
-"hakları alır."
+msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
+msgstr "Özel olarak atanmış hakların yanı sıra, kullanıcının üyesi olduğu grupların hakları alır."
 
 #: contrib/auth/models.py:102
 msgid "user permissions"
@@ -2108,33 +2015,26 @@ msgstr "Gruplar"
 msgid "message"
 msgstr "mesaj"
 
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:138
+#: contrib/auth/forms.py:17
+#: contrib/auth/forms.py:138
 msgid "The two password fields didn't match."
 msgstr "İki parola alanı uyuşmuyor."
 
 #: contrib/auth/forms.py:25
 msgid "A user with that username already exists."
-msgstr "Bu isimde bir kullanıcı zaten var."
+msgstr "Bu isimde bir kullanıcı zaten mevcuttur."
 
 #: contrib/auth/forms.py:53
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Web tarayıcınızın çerezleri desteklemediği görülüyor. Çerezler giriş için "
-"gerekli."
+msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
+msgstr "Web tarayıcınızın çerezleri desteklemediği görülüyor. Çerezler giriş için gerekli."
 
 #: contrib/auth/forms.py:62
 msgid "This account is inactive."
 msgstr "Bu hesap aktif değil."
 
 #: contrib/auth/forms.py:85
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Bu e-posta hesabıyla ilişkili kullanıcı bulunmuyor. Kayıtlı olduğunuzdan "
-"emin misiniz?"
+msgid "That e-mail address doesn't have an associated user account. Are you sure you've registered?"
+msgstr "Bu e-posta hesabıyla ilişkili kullanıcı bulunmuyor. Kayıtlı olduğunuzdan emin misiniz?"
 
 #: contrib/auth/forms.py:117
 msgid "The two 'new password' fields didn't match."
@@ -2173,11 +2073,8 @@ msgid "sessions"
 msgstr "oturumlar"
 
 #: contrib/flatpages/models.py:8
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Örnek: '/about/contact/'. Başında ve sonunda bölü işareti olduğundan emin "
-"olun."
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "Örnek: '/about/contact/'. Başında ve sonunda bölü işareti olduğundan emin olun."
 
 #: contrib/flatpages/models.py:9
 msgid "title"
@@ -2196,12 +2093,8 @@ msgid "template name"
 msgstr "şablon adı"
 
 #: contrib/flatpages/models.py:13
-msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
-msgstr ""
-"Örnek: 'flatpages/contact_page.html'. Eğer birşey yazılmazsa, sistem "
-"otomatik olarak 'flatpages/default.html' kullanacak."
+msgid "Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use 'flatpages/default.html'."
+msgstr "Örnek: 'flatpages/contact_page.html'. Eğer birşey yazılmazsa, sistem otomatik olarak 'flatpages/default.html' kullanacak."
 
 #: contrib/flatpages/models.py:14
 msgid "registration required"
@@ -2255,23 +2148,28 @@ msgstr "Ocak"
 msgid "February"
 msgstr "Şubat"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:14
+#: utils/dates.py:27
 msgid "March"
 msgstr "Mart"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:14
+#: utils/dates.py:27
 msgid "April"
 msgstr "Nisan"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:14
+#: utils/dates.py:27
 msgid "May"
 msgstr "Mayıs"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:14
+#: utils/dates.py:27
 msgid "June"
 msgstr "Haziran"
 
-#: utils/dates.py:15 utils/dates.py:27
+#: utils/dates.py:15
+#: utils/dates.py:27
 msgid "July"
 msgstr "Temmuz"
 
@@ -2455,19 +2353,18 @@ msgstr "MONTH_DAY_FORMAT"
 msgid "yes,no,maybe"
 msgstr "evet,hayır,olabilir"
 
+#: contrib/auth/forms.py:107
+#, python-format
+msgid "Password reset on %s"
+msgstr "%s sitesindeki hesabınızın parolasının sıfırlanması"
+
 #~ msgid ""
 #~ "Please enter a different %s. The one you entered is already being used "
 #~ "for %s."
 #~ msgstr ""
 #~ "Lütfen farklı bir %s girin. Girdiğiniz, %s tarihinde bir kez kullanılmış."
-
 #~ msgid "Use '[algo]$[salt]$[hexdigest]'"
 #~ msgstr "'[algo]$[salt]$[hexdigest]' formatında"
-
 #~ msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 #~ msgstr "<a href=\"/password_reset/\">Şifrenizi mi unuttunuz?</a>"
 
-#: contrib/auth/forms.py:107
-#, python-format
-msgid "Password reset on %s"
-msgstr "%s sitesindeki hesabınızın parolasının sıfırlanması"
