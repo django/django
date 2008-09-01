@@ -50,6 +50,7 @@ test_data = (
     ('mixed', '/john/0/', [], {'name': 'john'}),
     ('repeats', '/repeats/a/', [], {}),
     ('repeats2', '/repeats/aa/', [], {}),
+    ('repeats3', '/repeats/aa/', [], {}),
     ('insensitive', '/CaseInsensitive/fred', ['fred'], {}),
     ('test', '/test/1', [], {}),
     ('test2', '/test/2', [], {}),

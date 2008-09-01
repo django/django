@@ -248,6 +248,7 @@ def get_quantifier(ch, input_iter):
     while ch != '}':
         ch, escaped = input_iter.next()
         quant.append(ch)
+    quant = quant[:-1]
     values = ''.join(quant).split(',')
 
     # Consume the trailing '?', if necessary.
