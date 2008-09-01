@@ -304,16 +304,28 @@ class Field(object):
     def formfield(self, form_class=forms.CharField, **kwargs):
         "Returns a django.forms.Field instance for this database Field."
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        if self.has_default():
+            defaults['initial'] = self.get_default()
+
         if self.choices:
-            form_class = forms.TypedChoiceField
+            # Fields with choices get special treatment. 
             include_blank = self.blank or not (self.has_default() or 'initial' in kwargs)
             defaults['choices'] = self.get_choices(include_blank=include_blank)
             defaults['coerce'] = self.to_python
             if self.null:
                 defaults['empty_value'] = None
-            kwargs.pop('max_length', None)
-        if self.has_default():
-            defaults['initial'] = self.get_default()
+            
+            form_class = forms.TypedChoiceField
+            
+            # Many of the subclass-specific formfield arguments (min_value,
+            # max_value) don't apply for choice fields, so be sure to only pass
+            # the values that TypedChoiceField will understand.
+            for k in kwargs.keys():
+                if k not in ('coerce', 'empty_value', 'choices', 'required',
+                             'widget', 'label', 'initial', 'help_text',
+                             'error_messages'):
+                    del kwargs[k]
+        
         defaults.update(kwargs)
         return form_class(**defaults)
 

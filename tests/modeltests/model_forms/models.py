@@ -55,7 +55,7 @@ class Article(models.Model):
     writer = models.ForeignKey(Writer)
     article = models.TextField()
     categories = models.ManyToManyField(Category, blank=True)
-    status = models.IntegerField(choices=ARTICLE_STATUS, blank=True, null=True)
+    status = models.PositiveIntegerField(choices=ARTICLE_STATUS, blank=True, null=True)
 
     def save(self):
         import datetime
