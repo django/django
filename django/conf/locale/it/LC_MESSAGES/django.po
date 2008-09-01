@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-01 07:17+0200\n"
+"POT-Creation-Date: 2008-09-01 21:33+0200\n"
 "PO-Revision-Date: 2008-08-29 18:25+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "Language-Team: Italiano\n"
@@ -296,6 +296,7 @@ msgid "Changed %s."
 msgstr "%s modificato."
 
 #: contrib/admin/options.py:332 contrib/admin/options.py:342
+#: forms/models.py:264
 msgid "and"
 msgstr "e"
 
@@ -1030,7 +1031,7 @@ msgstr "Percorso di file"
 msgid "Floating point number"
 msgstr "Numero decimale"
 
-#: contrib/admindocs/views.py:328 contrib/comments/models.py:57
+#: contrib/admindocs/views.py:328 contrib/comments/models.py:58
 msgid "IP address"
 msgstr "indirizzo IP"
 
@@ -1054,7 +1055,7 @@ msgstr "Testo"
 msgid "Time"
 msgstr "Ora"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:20
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:21
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
@@ -1377,70 +1378,70 @@ msgstr "Contenuto"
 msgid "Metadata"
 msgstr "Metadati"
 
-#: contrib/comments/forms.py:18
+#: contrib/comments/forms.py:19
 msgid "Name"
 msgstr "Nome"
 
-#: contrib/comments/forms.py:19
+#: contrib/comments/forms.py:20
 msgid "Email address"
 msgstr "Indirizzo email"
 
-#: contrib/comments/forms.py:21
+#: contrib/comments/forms.py:22
 msgid "Comment"
 msgstr "Commento"
 
-#: contrib/comments/forms.py:24
+#: contrib/comments/forms.py:25
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
 "Se inserisci qualcosa in questo campo il tuo commento verrà considerato spam"
 
-#: contrib/comments/forms.py:124
+#: contrib/comments/forms.py:125
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Modera i termini: la parola %s non è ammessa."
 msgstr[1] "Modera i termini: le parole %s non sono ammesse."
 
-#: contrib/comments/models.py:22
+#: contrib/comments/models.py:23
 msgid "object ID"
 msgstr "ID dell'oggetto"
 
-#: contrib/comments/models.py:49
+#: contrib/comments/models.py:50
 msgid "user's name"
 msgstr "nome utente"
 
-#: contrib/comments/models.py:50
+#: contrib/comments/models.py:51
 msgid "user's email address"
 msgstr "indirizzo email utente"
 
-#: contrib/comments/models.py:51
+#: contrib/comments/models.py:52
 msgid "user's URL"
 msgstr "URL utente"
 
-#: contrib/comments/models.py:53
+#: contrib/comments/models.py:54
 msgid "comment"
 msgstr "commento"
 
-#: contrib/comments/models.py:56
+#: contrib/comments/models.py:57
 msgid "date/time submitted"
 msgstr "data/ora di inserimento"
 
-#: contrib/comments/models.py:58
+#: contrib/comments/models.py:59
 msgid "is public"
 msgstr "è pubblico"
 
-#: contrib/comments/models.py:59
+#: contrib/comments/models.py:60
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr ""
 "Deseleziona questa casella per far sparire del tutto il commento dal sito."
 
-#: contrib/comments/models.py:61
+#: contrib/comments/models.py:62
 msgid "is removed"
 msgstr "è rimosso"
 
-#: contrib/comments/models.py:62
+#: contrib/comments/models.py:63
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -1448,7 +1449,7 @@ msgstr ""
 "Spunta la casella se il commento è inappropriato. Verrà sostituito dal "
 "messaggio \"Questo commento è stato rimosso\"."
 
-#: contrib/comments/models.py:114
+#: contrib/comments/models.py:115
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
@@ -1456,7 +1457,7 @@ msgstr ""
 "Questo commento è stato inserito da un utente autenticato e quindi il nome "
 "non è modificabile."
 
-#: contrib/comments/models.py:123
+#: contrib/comments/models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -1464,7 +1465,7 @@ msgstr ""
 "Questo commento è stato inserito da un utente autenticato e quindi l'email "
 "non è modificabile."
 
-#: contrib/comments/models.py:148
+#: contrib/comments/models.py:149
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -3579,45 +3580,45 @@ msgstr "nome visualizzato"
 msgid "sites"
 msgstr "siti"
 
-#: db/models/fields/__init__.py:338 db/models/fields/__init__.py:673
+#: db/models/fields/__init__.py:350 db/models/fields/__init__.py:685
 msgid "This value must be an integer."
 msgstr "Questo valore deve essere un intero."
 
-#: db/models/fields/__init__.py:369
+#: db/models/fields/__init__.py:381
 msgid "This value must be either True or False."
 msgstr "Questo valore deve essere True o False."
 
-#: db/models/fields/__init__.py:402
+#: db/models/fields/__init__.py:414
 msgid "This field cannot be null."
 msgstr "Questo campo non può essere nullo."
 
-#: db/models/fields/__init__.py:418
+#: db/models/fields/__init__.py:430
 msgid "Enter only digits separated by commas."
 msgstr "Inserisci solo cifre separate da virgole."
 
-#: db/models/fields/__init__.py:449
+#: db/models/fields/__init__.py:461
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Inserisci una data valida in formato AAAA-MM-GG."
 
-#: db/models/fields/__init__.py:458
+#: db/models/fields/__init__.py:470
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Data non valida: %s"
 
-#: db/models/fields/__init__.py:522 db/models/fields/__init__.py:540
+#: db/models/fields/__init__.py:534 db/models/fields/__init__.py:552
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr ""
 "Inserisci una data/ora valida nel formato AAAA-MM-GG OO:MM[ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:576
+#: db/models/fields/__init__.py:588
 msgid "This value must be a decimal number."
 msgstr "Questo valore deve essere un numero decimale."
 
-#: db/models/fields/__init__.py:709
+#: db/models/fields/__init__.py:721
 msgid "This value must be either None, True or False."
 msgstr "Questo valore deve essere None, True o False."
 
-#: db/models/fields/__init__.py:817 db/models/fields/__init__.py:831
+#: db/models/fields/__init__.py:829 db/models/fields/__init__.py:843
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Inserisci un ora valida nel formato OO:MM[ss[.uuuuuu]]."
 
@@ -3738,7 +3739,7 @@ msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Scegli un'opzione valida. '%(value)s non compare tra quelle disponibili."
 
-#: forms/fields.py:694 forms/fields.py:755 forms/models.py:545
+#: forms/fields.py:694 forms/fields.py:755 forms/models.py:633
 msgid "Enter a list of values."
 msgstr "Inserisci una lista di valori."
 
@@ -3757,13 +3758,18 @@ msgstr ""
 msgid "Order"
 msgstr "Ordine"
 
-#: forms/models.py:477
+#: forms/models.py:258 forms/models.py:266
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s con questo %(field_label)s esiste già."
+
+#: forms/models.py:565
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Scegli un'opzione valida. La scelta effettuata non compare tra quelle "
 "disponibili."
 
-#: forms/models.py:546
+#: forms/models.py:634
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Scegli un'opzione valida. %s non compare tra quelle disponibili."
