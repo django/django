@@ -4,17 +4,17 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-04-01 19:21+0200\n"
-"PO-Revision-Date: 2007-04-03 21:48+0200\n"
-"Last-Translator:  <>\n"
+"PO-Revision-Date: 2008-08-09 21:19+0100\n"
+"Last-Translator: Frantisek Malina <vizualbod@vizualbod.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit"
+"Content-Transfer-Encoding: 8bit\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "Možný %s"
+msgstr "Dostupné %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
@@ -35,7 +35,7 @@ msgstr "Vybrané %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "Vyberte položku a kliknite"
+msgstr "Vyberte svoje voľby a kliknite"
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
@@ -43,12 +43,8 @@ msgstr "Odstrániť vybrané"
 
 #: contrib/admin/media/js/dateparse.js:32
 #: contrib/admin/media/js/calendar.js:24
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Január Február Marec Apríl Máj Jún Júl August September Október November "
-"December"
+msgid "January February March April May June July August September October November December"
+msgstr "Január Február Marec Apríl Máj Jún Júl August September Október November December"
 
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
@@ -61,11 +57,11 @@ msgstr "N P U S Š P S"
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
 msgid "Show"
-msgstr "Zobraziť"
+msgstr "Ukáž!"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
 msgid "Hide"
-msgstr "Skryť"
+msgstr "Skry!"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
@@ -95,7 +91,7 @@ msgstr "Poludnie"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
 msgid "Cancel"
-msgstr "Zrušiť"
+msgstr "Zruš"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
