@@ -34,7 +34,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
 
 setup(
     name = "Django",
-    version = "0.96.2",
+    version = "0.96.3",
     url = 'http://www.djangoproject.com/',
     author = 'Lawrence Journal-World',
     author_email = 'holovaty@gmail.com',
