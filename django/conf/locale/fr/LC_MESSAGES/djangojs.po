@@ -2,108 +2,117 @@
 # Copyright (C) 2005 Mikaël Barbero 
 # This file is distributed under the same license as the PACKAGE package. 
 # 
-msgid "" 
-msgstr "" 
+msgid ""
+msgstr ""
 "Project-Id-Version: Django\n"
-"Report-Msgid-Bugs-To: \n" 
-"POT-Creation-Date: 2005-12-24 16:39+0100\n" 
-"PO-Revision-Date: 2005-12-24 16:39+0100\n" 
-"Last-Translator: Mikaël Barbero <mikael.barbero nospam at nospam free.fr>\n" 
-"Language-Team: French <fr@li.org>\n" 
-"MIME-Version: 1.0\n" 
-"Content-Type: text/plain; charset=UTF-8\n" 
-"Content-Transfer-Encoding: 8bit\n" 
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-09-02 01:08+0200\n"
+"PO-Revision-Date: 2005-12-24 16:39+0100\n"
+"Last-Translator: David Larlet <http://david.larlet.fr>\n"
+"Language-Team: français <http://django-fr.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 
-#: contrib/admin/media/js/calendar.js:24 
-#: contrib/admin/media/js/dateparse.js:26 
-msgid "" 
-"January February March April May June July August September October November " 
-"December" 
-msgstr "" 
-"Janvier Février Mars Avril Mai Juin Juillet Août Septembre Octobre Novembre " 
-"Décembre" 
+#: contrib/admin/media/js/SelectFilter2.js:33
+#, perl-format
+msgid "Available %s"
+msgstr "%s disponible(s)"
 
-#: contrib/admin/media/js/calendar.js:25 
-msgid "S M T W T F S" 
-msgstr "D L M M J V S" 
+#: contrib/admin/media/js/SelectFilter2.js:41
+msgid "Choose all"
+msgstr "Tout choisir"
 
-#: contrib/admin/media/js/dateparse.js:27 
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday" 
-msgstr "Dimanche Lundi Mardi Mercredi Jeudi Vendredi Samedi" 
+#: contrib/admin/media/js/SelectFilter2.js:46
+msgid "Add"
+msgstr "Ajouter"
 
-#: contrib/admin/media/js/SelectFilter2.js:33 
-#, perl-format 
-msgid "Available %s" 
-msgstr "%s disponible(s)" 
+#: contrib/admin/media/js/SelectFilter2.js:48
+msgid "Remove"
+msgstr "Enlever"
 
-#: contrib/admin/media/js/SelectFilter2.js:41 
-msgid "Choose all" 
-msgstr "Tout choisir" 
+#: contrib/admin/media/js/SelectFilter2.js:53
+#, perl-format
+msgid "Chosen %s"
+msgstr "%s choisi(es)"
 
-#: contrib/admin/media/js/SelectFilter2.js:46 
-msgid "Add" 
-msgstr "Ajouter" 
+#: contrib/admin/media/js/SelectFilter2.js:54
+msgid "Select your choice(s) and click "
+msgstr "Sélectionnez un ou plusieurs choix et cliquez "
 
-#: contrib/admin/media/js/SelectFilter2.js:48 
-msgid "Remove" 
-msgstr "Enlever" 
+#: contrib/admin/media/js/SelectFilter2.js:59
+msgid "Clear all"
+msgstr "Tout enlever"
 
-#: contrib/admin/media/js/SelectFilter2.js:53 
-#, perl-format 
-msgid "Chosen %s" 
-msgstr "%s choisi(es)" 
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Janvier Février Mars Avril Mai Juin Juillet Août Septembre Octobre Novembre "
+"Décembre"
 
-#: contrib/admin/media/js/SelectFilter2.js:54 
-msgid "Select your choice(s) and click " 
-msgstr "Sélectionnez un ou plusieurs choix et cliquez " 
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "D L M M J V S"
 
-#: contrib/admin/media/js/SelectFilter2.js:59 
-msgid "Clear all" 
-msgstr "Tout enlever" 
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Dimanche Lundi Mardi Mercredi Jeudi Vendredi Samedi"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:45 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80 
-msgid "Now" 
-msgstr "Maintenant" 
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "Montrer"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:48 
-msgid "Clock" 
-msgstr "Horloge" 
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "Masquer"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:77 
-msgid "Choose a time" 
-msgstr "Choisir une heure" 
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+msgid "Now"
+msgstr "Maintenant"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81 
-msgid "Midnight" 
-msgstr "Minuit" 
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
+msgid "Clock"
+msgstr "Horloge"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82 
-msgid "6 a.m." 
-msgstr "6:00" 
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
+msgid "Choose a time"
+msgstr "Choisir une heure"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83 
-msgid "Noon" 
-msgstr "Midi" 
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+msgid "Midnight"
+msgstr "Minuit"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:168 
-msgid "Cancel" 
-msgstr "Annuler" 
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+msgid "6 a.m."
+msgstr "6:00"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:111 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:162 
-msgid "Today" 
-msgstr "Aujourd'hui" 
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+msgid "Noon"
+msgstr "Midi"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:114 
-msgid "Calendar" 
-msgstr "Calendrier" 
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
+msgid "Cancel"
+msgstr "Annuler"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:160 
-msgid "Yesterday" 
-msgstr "Hier" 
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
+msgid "Today"
+msgstr "Aujourd'hui"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:164 
-msgid "Tomorrow" 
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
+msgid "Calendar"
+msgstr "Calendrier"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
+msgid "Yesterday"
+msgstr "Hier"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
+msgid "Tomorrow"
 msgstr "Demain"
