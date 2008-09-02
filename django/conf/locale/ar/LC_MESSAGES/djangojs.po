@@ -1,26 +1,24 @@
 # translation of djangojs.po to Arabic
+# This file is distributed under the same license as the django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: djangojs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-09 11:51+0100\n"
-"PO-Revision-Date: 2008-08-30 16:19+0300\n"
+"POT-Creation-Date: 2007-11-29 10:58-0600\n"
+"PO-Revision-Date: 2008-09-02 00:53+0300\n"
 "Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
 "Language-Team: Arabic <support@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Arabic\n"
-"X-Poedit-Country: Kuwait\n"
-"X-Poedit-SourceCharset: utf-8\n"
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms: nplurals=4; plural=(n == 1? 0 : (n == 2? 1 : (n <= 10? 2 : 3)))\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "%s متوفرة"
+msgstr "%s المتوفرة"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
@@ -37,73 +35,84 @@ msgstr "احذف"
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr "%s اختيرت"
+msgstr "%s المُختارة"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "حدد خيارك أو خياراتك واضغط"
+msgstr "حدد خياراتك واضغط"
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
 msgstr "امسح الكل"
 
-#: contrib/admin/media/js/dateparse.js:26
 #: contrib/admin/media/js/calendar.js:24
-msgid "January February March April May June July August September October November December"
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
 msgstr "يناير فبراير مارس إبريل مايو يونيو يوليو أغسطس سبتمبر أكتوبر نوفمبر ديسمبر"
-
-#: contrib/admin/media/js/dateparse.js:27
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "الأحد الأثنين الثلاثاء الأربعاء الخميس الجمعة السبت"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
 msgstr "أ إ ث أ خ ج س"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "الأحد الإثنين الثلاثاء الأربعاء الخميس الجمعة السبت"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "أظهر"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "اخف"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Now"
 msgstr "الآن"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:48
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
 msgid "Clock"
 msgstr "الساعة"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
 msgid "Choose a time"
-msgstr "اختر وقتا ما"
+msgstr "اختر وقتاً"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "Midnight"
 msgstr "منتصف الليل"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
 msgstr "6 ص."
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
 msgstr "الظهر"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
 msgid "Cancel"
-msgstr "إلغاء"
+msgstr "ألغ"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
 msgid "Today"
 msgstr "اليوم"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:114
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
 msgid "Calendar"
 msgstr "التقويم"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
 msgid "Yesterday"
 msgstr "أمس"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "غداً"
 
