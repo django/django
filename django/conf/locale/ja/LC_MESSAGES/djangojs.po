@@ -3,28 +3,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-03-26 23:41+0900\n"
+"POT-Creation-Date: 2008-09-02 08:25+0900\n"
 "PO-Revision-Date: 2006-05-08 13:39+0900\n"
 "Last-Translator: makoto tsuyuki <mtsuyuki@gmail.com>\n"
 "Language-Team: Japanese <django-ja@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: contrib/admin/media/js/calendar.js:24
-#: contrib/admin/media/js/dateparse.js:32
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr "1月 2月 3月 4月 5月 6月 7月 8月 9月 10月 11月 12月"
-
-#: contrib/admin/media/js/calendar.js:25
-msgid "S M T W T F S"
-msgstr "日 月 火 水 木 金 土"
-
-#: contrib/admin/media/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "日曜 月曜 火曜 水曜 木曜 金曜 土曜"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -55,6 +40,21 @@ msgstr "選択してクリック"
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
 msgstr "全てクリア"
+
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr "1月 2月 3月 4月 5月 6月 7月 8月 9月 10月 11月 12月"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "日 月 火 水 木 金 土"
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "日曜 月曜 火曜 水曜 木曜 金曜 土曜"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
