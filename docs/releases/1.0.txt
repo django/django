@@ -6,8 +6,18 @@ Django 1.0 release notes
 
 Welcome to Django 1.0!
 
+Stability and forwards-compatibility
+====================================
+
+:ref:`The release of Django 1.0 <releases-1.0>` comes with a promise of API
+stability and forwards-compatibility. In a nutshell, this means that code you
+develop against Django 1.0 will continue to work against 1.1 unchanged, and you
+should need to make only minor changes for any 1.X release.
+
+See the :ref:`API stability guide <misc-api-stability>` for full details.
+
 Porting guide
--------------
+=============
 
 You can find detailed instructions on porting apps from Django 0.96 to Django
 1.0 in our porting guide:

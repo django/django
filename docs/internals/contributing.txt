@@ -935,6 +935,8 @@ file. Then copy the branch's version of the ``django`` directory into
 
 .. _path file: http://docs.python.org/lib/module-site.html
 
+.. _official-releases:
+
 Official releases
 =================
 
