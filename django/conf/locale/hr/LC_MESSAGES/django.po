@@ -5,16 +5,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-01 01:19+0200\n"
-"PO-Revision-Date: 2008-09-01 01:23+0200\n"
+"POT-Creation-Date: 2008-09-02 10:32+0200\n"
+"PO-Revision-Date: 2008-09-02 10:30+0200\n"
 "Last-Translator: Aljosa Mohorovic <aljosa.mohorovic@gmail.com>\n"
-"Language-Team: Hrvatski jezik\n"
+"Language-Team: Hrvatski Jezik <Django-i18n <django-i18n@googlegroups.com>>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: KBabel 1.11.4\n"
+"X-Generator: Vim 7.2\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -246,15 +246,15 @@ msgstr "Ovaj mjesec"
 msgid "This year"
 msgstr "Ova godina"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
 msgid "Yes"
 msgstr "Da"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
 msgid "No"
 msgstr "Ne"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:391
 msgid "Unknown"
 msgstr "Nepoznat pojam"
 
@@ -280,11 +280,11 @@ msgstr "promijeni poruku"
 
 #: contrib/admin/models.py:28
 msgid "log entry"
-msgstr "log entry"
+msgstr "log unos"
 
 #: contrib/admin/models.py:29
 msgid "log entries"
-msgstr "log entries"
+msgstr "log unos"
 
 #: contrib/admin/options.py:59 contrib/admin/options.py:120
 msgid "None"
@@ -296,6 +296,7 @@ msgid "Changed %s."
 msgstr "Promijenjeno %s."
 
 #: contrib/admin/options.py:332 contrib/admin/options.py:342
+#: forms/models.py:265
 msgid "and"
 msgstr "i"
 
@@ -448,11 +449,11 @@ msgstr "Trenutno:"
 msgid "Change:"
 msgstr "Promijeni:"
 
-#: contrib/admin/widgets.py:120
+#: contrib/admin/widgets.py:121
 msgid "Lookup"
 msgstr "Potraži"
 
-#: contrib/admin/widgets.py:204
+#: contrib/admin/widgets.py:221
 msgid "Add Another"
 msgstr "Dodaj još"
 
@@ -903,16 +904,16 @@ msgstr "E-mail adresa:"
 msgid "Reset my password"
 msgstr "Resetiraj moju lozinku"
 
-#: contrib/admin/templatetags/admin_list.py:284
+#: contrib/admin/templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Svi datumi"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:69
 #, python-format
 msgid "Select %s"
 msgstr "Odaberi %s"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:69
 #, python-format
 msgid "Select %s to change"
 msgstr "Odaberi %s za promjenu"
@@ -1024,7 +1025,7 @@ msgstr "Put do datoteke"
 msgid "Floating point number"
 msgstr "Broj s pomičnim zarezom (floating point number)"
 
-#: contrib/admindocs/views.py:328 contrib/comments/models.py:57
+#: contrib/admindocs/views.py:328 contrib/comments/models.py:58
 msgid "IP address"
 msgstr "IP adresa"
 
@@ -1048,7 +1049,7 @@ msgstr "Tekst"
 msgid "Time"
 msgstr "Vrijeme"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:20
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:22
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
@@ -1356,7 +1357,7 @@ msgstr "poruka"
 msgid "Logged out"
 msgstr "Niste logirani"
 
-#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:425
+#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:428
 msgid "Enter a valid e-mail address."
 msgstr "Unesite ispravnu e-mail adresu."
 
@@ -1368,68 +1369,68 @@ msgstr "Sadržaj"
 msgid "Metadata"
 msgstr "Metadata"
 
-#: contrib/comments/forms.py:18
+#: contrib/comments/forms.py:20
 msgid "Name"
 msgstr "Ime"
 
-#: contrib/comments/forms.py:19
+#: contrib/comments/forms.py:21
 msgid "Email address"
 msgstr "E-mail adresa"
 
-#: contrib/comments/forms.py:21
+#: contrib/comments/forms.py:23
 msgid "Comment"
 msgstr "Komentar"
 
-#: contrib/comments/forms.py:24
+#: contrib/comments/forms.py:26
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "Ako unesete nešto u ovo polje vaš komentar biti će tretiran kao spam"
 
-#: contrib/comments/forms.py:124
+#: contrib/comments/forms.py:126
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Pazite na izražavanje! Riječ %s nije dopuštena."
 msgstr[1] "Pazite na izražavanje! Riječi %s nisu dopuštene."
 
-#: contrib/comments/models.py:22
+#: contrib/comments/models.py:23
 msgid "object ID"
 msgstr "ID objekta"
 
-#: contrib/comments/models.py:49
+#: contrib/comments/models.py:50
 msgid "user's name"
 msgstr "korisničko ime"
 
-#: contrib/comments/models.py:50
+#: contrib/comments/models.py:51
 msgid "user's email address"
 msgstr "e-mail adresa korisnika"
 
-#: contrib/comments/models.py:51
+#: contrib/comments/models.py:52
 msgid "user's URL"
 msgstr "korisnikov URL"
 
-#: contrib/comments/models.py:53
+#: contrib/comments/models.py:54
 msgid "comment"
 msgstr "komentar"
 
-#: contrib/comments/models.py:56
+#: contrib/comments/models.py:57
 msgid "date/time submitted"
 msgstr "datum/vrijeme unosa"
 
-#: contrib/comments/models.py:58
+#: contrib/comments/models.py:59
 msgid "is public"
 msgstr "javno dostupno"
 
-#: contrib/comments/models.py:59
+#: contrib/comments/models.py:60
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "Uklonite oznaku da bi komentar nestao sa stranica."
 
-#: contrib/comments/models.py:61
+#: contrib/comments/models.py:62
 msgid "is removed"
 msgstr "uklonjeno"
 
-#: contrib/comments/models.py:62
+#: contrib/comments/models.py:63
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -1437,7 +1438,7 @@ msgstr ""
 "Uključite ako je komentar neprikladan. Umjesto komentara biti će prikazana "
 "poruka \"Komentar je uklonjen.\"."
 
-#: contrib/comments/models.py:114
+#: contrib/comments/models.py:115
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
@@ -1446,7 +1447,7 @@ msgstr ""
 "\n"
 "%(text)s"
 
-#: contrib/comments/models.py:123
+#: contrib/comments/models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -1456,7 +1457,7 @@ msgstr ""
 "\n"
 "%(text)s"
 
-#: contrib/comments/models.py:148
+#: contrib/comments/models.py:149
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -1680,11 +1681,11 @@ msgstr "Carinthia"
 
 #: contrib/localflavor/at/at_states.py:7
 msgid "Lower Austria"
-msgstr "Lower Austria"
+msgstr "Donja Austrija"
 
 #: contrib/localflavor/at/at_states.py:8
 msgid "Upper Austria"
-msgstr "Upper Austria"
+msgstr "Gornja Austrija"
 
 #: contrib/localflavor/at/at_states.py:9
 msgid "Salzburg"
@@ -1692,11 +1693,11 @@ msgstr "Salzburg"
 
 #: contrib/localflavor/at/at_states.py:10
 msgid "Styria"
-msgstr "Styria"
+msgstr "Štajerska"
 
 #: contrib/localflavor/at/at_states.py:11
 msgid "Tyrol"
-msgstr "Tyrol"
+msgstr "Tirol"
 
 #: contrib/localflavor/at/at_states.py:12
 msgid "Vorarlberg"
@@ -1790,7 +1791,7 @@ msgstr "Fribourg"
 
 #: contrib/localflavor/ch/ch_states.py:12
 msgid "Geneva"
-msgstr "Geneva"
+msgstr "Ženeva"
 
 #: contrib/localflavor/ch/ch_states.py:13
 msgid "Glarus"
@@ -1918,11 +1919,11 @@ msgstr "Mecklenburg-Western Pomerania"
 
 #: contrib/localflavor/de/de_states.py:13
 msgid "Lower Saxony"
-msgstr "Lower Saxony"
+msgstr "Donja Saska"
 
 #: contrib/localflavor/de/de_states.py:14
 msgid "North Rhine-Westphalia"
-msgstr "North Rhine-Westphalia"
+msgstr "Sjeverno Porajnje-Zapadna Falačka"
 
 #: contrib/localflavor/de/de_states.py:15
 msgid "Rhineland-Palatinate"
@@ -1934,7 +1935,7 @@ msgstr "Saarland"
 
 #: contrib/localflavor/de/de_states.py:17
 msgid "Saxony"
-msgstr "Saxony"
+msgstr "Saska"
 
 #: contrib/localflavor/de/de_states.py:18
 msgid "Saxony-Anhalt"
@@ -2182,31 +2183,31 @@ msgstr "Aragon"
 
 #: contrib/localflavor/es/es_regions.py:7
 msgid "Principality of Asturias"
-msgstr "Principality of Asturias"
+msgstr "Kneževina Asturija"
 
 #: contrib/localflavor/es/es_regions.py:8
 msgid "Balearic Islands"
-msgstr "Balearic Islands"
+msgstr "Balearsko otočje"
 
 #: contrib/localflavor/es/es_regions.py:9
 msgid "Basque Country"
-msgstr "Basque Country"
+msgstr "Baskija"
 
 #: contrib/localflavor/es/es_regions.py:10
 msgid "Canary Islands"
-msgstr "Canary Islands"
+msgstr "Kanarski Otoci"
 
 #: contrib/localflavor/es/es_regions.py:12
 msgid "Castile-La Mancha"
-msgstr "Castile-La Mancha"
+msgstr "Kastilja-La Mancha"
 
 #: contrib/localflavor/es/es_regions.py:13
 msgid "Castile and Leon"
-msgstr "Castile and Leon"
+msgstr "Kastilja i Leon"
 
 #: contrib/localflavor/es/es_regions.py:14
 msgid "Catalonia"
-msgstr "Catalonia"
+msgstr "Katalonija"
 
 #: contrib/localflavor/es/es_regions.py:15
 msgid "Extremadura"
@@ -2218,7 +2219,7 @@ msgstr "Galicia"
 
 #: contrib/localflavor/es/es_regions.py:19
 msgid "Region of Murcia"
-msgstr "Region of Murcia"
+msgstr "Regija Murcia"
 
 #: contrib/localflavor/es/es_regions.py:20
 msgid "Foral Community of Navarre"
@@ -2353,7 +2354,7 @@ msgstr "Chiba"
 
 #: contrib/localflavor/jp/jp_prefectures.py:16
 msgid "Tokyo"
-msgstr "Tokyo"
+msgstr "Tokio"
 
 #: contrib/localflavor/jp/jp_prefectures.py:17
 msgid "Kanagawa"
@@ -2549,7 +2550,7 @@ msgstr "Jalisco"
 
 #: contrib/localflavor/mx/mx_states.py:26
 msgid "Estado de México"
-msgstr "Estado de México"
+msgstr "Država Meksiko"
 
 #: contrib/localflavor/mx/mx_states.py:27
 msgid "Michoacán"
@@ -2725,7 +2726,7 @@ msgstr "Unesi poštanski broj formata XX-XXX."
 
 #: contrib/localflavor/pl/pl_voivodeships.py:8
 msgid "Lower Silesia"
-msgstr "Lower Silesia"
+msgstr "Donja Šleska"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:9
 msgid "Kuyavia-Pomerania"
@@ -2745,7 +2746,7 @@ msgstr "Lodz"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:13
 msgid "Lesser Poland"
-msgstr "Lesser Poland"
+msgstr "Mala Poljska"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:14
 msgid "Masovia"
@@ -2769,7 +2770,7 @@ msgstr "Pomerania"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:19
 msgid "Silesia"
-msgstr "Silesia"
+msgstr "Šleska"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:20
 msgid "Swietokrzyskie"
@@ -3129,35 +3130,35 @@ msgstr "Zilina"
 
 #: contrib/localflavor/sk/sk_regions.py:8
 msgid "Banska Bystrica region"
-msgstr "Banska Bystrica regija"
+msgstr "Regija Banska Bystrica"
 
 #: contrib/localflavor/sk/sk_regions.py:9
 msgid "Bratislava region"
-msgstr "Bratislava regija"
+msgstr "Regija Bratislava"
 
 #: contrib/localflavor/sk/sk_regions.py:10
 msgid "Kosice region"
-msgstr "Kosice regija"
+msgstr "Regija Kosice"
 
 #: contrib/localflavor/sk/sk_regions.py:11
 msgid "Nitra region"
-msgstr "Nitra regija"
+msgstr "Regija Nitra"
 
 #: contrib/localflavor/sk/sk_regions.py:12
 msgid "Presov region"
-msgstr "Presov regija"
+msgstr "Regija Presov"
 
 #: contrib/localflavor/sk/sk_regions.py:13
 msgid "Trencin region"
-msgstr "Trencin regija"
+msgstr "Regija Trencin"
 
 #: contrib/localflavor/sk/sk_regions.py:14
 msgid "Trnava region"
-msgstr "Trnava regija"
+msgstr "Regija Trnava"
 
 #: contrib/localflavor/sk/sk_regions.py:15
 msgid "Zilina region"
-msgstr "Zilina regija"
+msgstr "Regija Zilina"
 
 #: contrib/localflavor/uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -3177,7 +3178,7 @@ msgstr "Cheshire"
 
 #: contrib/localflavor/uk/uk_regions.py:15
 msgid "Cornwall and Isles of Scilly"
-msgstr "Cornwall and Isles of Scilly"
+msgstr "Cornwall i Otoci Scilly"
 
 #: contrib/localflavor/uk/uk_regions.py:16
 msgid "Cumbria"
@@ -3325,27 +3326,27 @@ msgstr "Worcestershire"
 
 #: contrib/localflavor/uk/uk_regions.py:55
 msgid "County Antrim"
-msgstr "County Antrim"
+msgstr "Županija Antrim"
 
 #: contrib/localflavor/uk/uk_regions.py:56
 msgid "County Armagh"
-msgstr "County Armagh"
+msgstr "Županija Armagh"
 
 #: contrib/localflavor/uk/uk_regions.py:57
 msgid "County Down"
-msgstr "County Down"
+msgstr "Županija Down"
 
 #: contrib/localflavor/uk/uk_regions.py:58
 msgid "County Fermanagh"
-msgstr "County Fermanagh"
+msgstr "Županija Fermanagh"
 
 #: contrib/localflavor/uk/uk_regions.py:59
 msgid "County Londonderry"
-msgstr "County Londonderry"
+msgstr "Županija Londonderry"
 
 #: contrib/localflavor/uk/uk_regions.py:60
 msgid "County Tyrone"
-msgstr "Country Tyrone"
+msgstr "Županija Tyrone"
 
 #: contrib/localflavor/uk/uk_regions.py:64
 msgid "Clwyd"
@@ -3373,11 +3374,11 @@ msgstr "Powys"
 
 #: contrib/localflavor/uk/uk_regions.py:70
 msgid "South Glamorgan"
-msgstr "South Glamorgan"
+msgstr "Južni Glamorgan"
 
 #: contrib/localflavor/uk/uk_regions.py:71
 msgid "West Glamorgan"
-msgstr "West Glamorgan"
+msgstr "Zapadni Glamorgan"
 
 #: contrib/localflavor/uk/uk_regions.py:75
 msgid "Borders"
@@ -3385,7 +3386,7 @@ msgstr "Borders"
 
 #: contrib/localflavor/uk/uk_regions.py:76
 msgid "Central Scotland"
-msgstr "Central Scotland"
+msgstr "Centralna Škotska"
 
 #: contrib/localflavor/uk/uk_regions.py:77
 msgid "Dumfries and Galloway"
@@ -3425,7 +3426,7 @@ msgstr "Tayside"
 
 #: contrib/localflavor/uk/uk_regions.py:86
 msgid "Western Isles"
-msgstr "Western Isles"
+msgstr "Zapadno Otočje"
 
 #: contrib/localflavor/uk/uk_regions.py:90
 msgid "England"
@@ -3560,41 +3561,41 @@ msgstr "ime za prikaz"
 msgid "sites"
 msgstr "stranice"
 
-#: db/models/fields/__init__.py:338 db/models/fields/__init__.py:673
+#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:683
 msgid "This value must be an integer."
 msgstr "Vrijednost mora biti cijeli broj."
 
-#: db/models/fields/__init__.py:369
+#: db/models/fields/__init__.py:379
 msgid "This value must be either True or False."
 msgstr "Vrijednost mora biti True ili False."
 
-#: db/models/fields/__init__.py:402
+#: db/models/fields/__init__.py:412
 msgid "This field cannot be null."
 msgstr "Ovo polje ne može biti null."
 
-#: db/models/fields/__init__.py:418
+#: db/models/fields/__init__.py:428
 msgid "Enter only digits separated by commas."
 msgstr "Unesite samo brojeve razdvojene zarezom."
 
-#: db/models/fields/__init__.py:449
+#: db/models/fields/__init__.py:459
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Unesite ispravan datum u formatu YYYY-MM-DD."
 
-#: db/models/fields/__init__.py:458
+#: db/models/fields/__init__.py:468
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Neispravan datum: %s"
 
-#: db/models/fields/__init__.py:522 db/models/fields/__init__.py:540
+#: db/models/fields/__init__.py:532 db/models/fields/__init__.py:550
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr ""
 "Unesite ispravan datum/vrijeme u formatu YYYY-MM-DD HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:576
+#: db/models/fields/__init__.py:586
 msgid "This value must be a decimal number."
 msgstr "Vrijednost mora biti decimalan broj."
 
-#: db/models/fields/__init__.py:709
+#: db/models/fields/__init__.py:719
 msgid "This value must be either None, True or False."
 msgstr "Vrijednost mora biti None, True ili False."
 
@@ -3602,14 +3603,14 @@ msgstr "Vrijednost mora biti None, True ili False."
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Unesite ispravno vrijeme formata HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:748
+#: db/models/fields/related.py:763
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Držite \"Control\", ili \"Command\" na Mac-u, da bi odabrali više od jednog "
 "objekta."
 
-#: db/models/fields/related.py:825
+#: db/models/fields/related.py:840
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3621,84 +3622,84 @@ msgstr[1] ""
 
 #: forms/fields.py:54
 msgid "This field is required."
-msgstr "Unos za ovo polje je obavezno."
+msgstr "Unos za ovo polje je obavezan."
 
 #: forms/fields.py:55
 msgid "Enter a valid value."
 msgstr "Unesite ispravnu vrijednost."
 
-#: forms/fields.py:135
+#: forms/fields.py:138
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Osigurajte da ova vrijednost ima najviše %(max)d znakova (ima %(length)d)."
 
-#: forms/fields.py:136
+#: forms/fields.py:139
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 "Osigurajte da ova vrijednost ima najmanje %(min)d znakova (ima %(length)d)."
 
-#: forms/fields.py:163
+#: forms/fields.py:166
 msgid "Enter a whole number."
 msgstr "Unesite cijeli broj."
 
-#: forms/fields.py:164 forms/fields.py:193 forms/fields.py:222
+#: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Osigurajte da je ova vrijednost manja ili jednaka %s."
 
-#: forms/fields.py:165 forms/fields.py:194 forms/fields.py:223
+#: forms/fields.py:168 forms/fields.py:197 forms/fields.py:226
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Osigurajte da je ova vrijednost veća ili jednaka %s."
 
-#: forms/fields.py:192 forms/fields.py:221
+#: forms/fields.py:195 forms/fields.py:224
 msgid "Enter a number."
 msgstr "Unesite broj."
 
-#: forms/fields.py:224
+#: forms/fields.py:227
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Osigurajte da ukupno nema više od %s numeričkih znakova."
 
-#: forms/fields.py:225
+#: forms/fields.py:228
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Osigurajte da ukupno nema više od %s decimalnih mjesta."
 
-#: forms/fields.py:226
+#: forms/fields.py:229
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr ""
 "Osigurajte da ukupno nema više od %s numeričkih znakova prije decimalne "
 "točke."
 
-#: forms/fields.py:284 forms/fields.py:844
+#: forms/fields.py:287 forms/fields.py:848
 msgid "Enter a valid date."
 msgstr "Unesite ispravan datum."
 
-#: forms/fields.py:318 forms/fields.py:845
+#: forms/fields.py:321 forms/fields.py:849
 msgid "Enter a valid time."
 msgstr "Unesite ispravno vrijeme."
 
-#: forms/fields.py:357
+#: forms/fields.py:360
 msgid "Enter a valid date/time."
 msgstr "Unesite ispravan datum/vrijeme."
 
-#: forms/fields.py:443
+#: forms/fields.py:446
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Datoteka nije poslana. Provjerite 'encoding type' forme."
 
-#: forms/fields.py:444
+#: forms/fields.py:447
 msgid "No file was submitted."
 msgstr "Datoteka nije poslana."
 
-#: forms/fields.py:445
+#: forms/fields.py:448
 msgid "The submitted file is empty."
 msgstr "Poslana datoteka je prazna."
 
-#: forms/fields.py:474
+#: forms/fields.py:477
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -3706,28 +3707,28 @@ msgstr ""
 "Upload-ajte ispravnu sliku. Datoteka koju ste upload-ali ili nije slika ili "
 "je oštečena."
 
-#: forms/fields.py:535
+#: forms/fields.py:538
 msgid "Enter a valid URL."
 msgstr "Unesite ispravan URL."
 
-#: forms/fields.py:536
+#: forms/fields.py:539
 msgid "This URL appears to be a broken link."
 msgstr "Izgleda da je URL neispravan."
 
-#: forms/fields.py:615 forms/fields.py:693
+#: forms/fields.py:618 forms/fields.py:696
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Odaberite iz ponuđenog. %(value)s nije ponuđen kao opcija."
 
-#: forms/fields.py:694 forms/fields.py:755 forms/models.py:545
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:644
 msgid "Enter a list of values."
 msgstr "Unesite listu vrijednosti."
 
-#: forms/fields.py:873
+#: forms/fields.py:877
 msgid "Enter a valid IPv4 address."
 msgstr "Unesite ispravnu IPv4 adresu."
 
-#: forms/fields.py:883
+#: forms/fields.py:887
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -3738,11 +3739,16 @@ msgstr ""
 msgid "Order"
 msgstr "Redoslijed:"
 
-#: forms/models.py:477
+#: forms/models.py:258 forms/models.py:267
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s sa navedenim %(field_label)s već postoji."
+
+#: forms/models.py:574
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Izaberite ispravnu opciju. Ta opcija nije jedna od dostupnih opcija."
 
-#: forms/models.py:546
+#: forms/models.py:645
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Odaberite iz ponuđenog. %s nije ponuđen kao opcija."
@@ -4450,9 +4456,6 @@ msgstr "%(verbose_name)s je izbrisano."
 #~ msgid ""
 #~ "%(object)s with this %(type)s already exists for the given %(field)s."
 #~ msgstr "%(object)s sa %(type)s već postoji za navedeno %(field)s."
-
-#~ msgid "%(optname)s with this %(fieldname)s already exists."
-#~ msgstr "%(optname)s sa navedenim %(fieldname)s već postoji."
 
 #~ msgid "Enter a valid filename."
 #~ msgstr "Unesite ime datoteke koja postoji."
