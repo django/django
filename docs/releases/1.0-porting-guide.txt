@@ -206,7 +206,7 @@ New (1.0)::
 
     __ http://code.djangoproject.com/wiki/NewformsAdminBranch
 
-URLS
+URLs
 ----
 
 Update your root ``urls.py``
