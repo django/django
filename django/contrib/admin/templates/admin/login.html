@@ -19,7 +19,6 @@
   <div class="form-row">
     <label for="id_password">{% trans 'Password:' %}</label> <input type="password" name="password" id="id_password" />
     <input type="hidden" name="this_is_the_login_form" value="1" />
-    <input type="hidden" name="post_data" value="{{ post_data }}" /> {#<span class="help">{% trans 'Have you <a href="/password_reset/">forgotten your password</a>?' %}</span>#}
   </div>
   <div class="submit-row">
     <label>&nbsp;</label><input type="submit" value="{% trans 'Log in' %}" />
