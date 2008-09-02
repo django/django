@@ -632,6 +632,8 @@ It is important you use a ``ModelForm`` here otherwise things can break. See the
 :ref:`forms <ref-forms-index>` documentation on :ref:`custom validation
 <ref-forms-validation>` for more information.
 
+.. _admin-inlines:
+
 ``InlineModelAdmin`` objects
 ============================
 

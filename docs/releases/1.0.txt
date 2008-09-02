@@ -1,0 +1,19 @@
+.. _releases-1.0:
+
+========================
+Django 1.0 release notes
+========================
+
+Welcome to Django 1.0!
+
+Porting guide
+-------------
+
+You can find detailed instructions on porting apps from Django 0.96 to Django
+1.0 in our porting guide:
+
+.. toctree::
+   :maxdepth: 1
+
+   1.0-porting-guide
+

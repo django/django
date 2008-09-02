@@ -9,13 +9,14 @@ changes made in that version.
 
 .. toctree::
    :maxdepth: 1
-   
+
    0.95
    0.96
    1.0-alpha-1
    1.0-alpha-2
    1.0-beta
    1.0-beta-2
+   1.0
 
 .. seealso::
 
@@ -23,5 +24,5 @@ changes made in that version.
     development "trunk". If you're running versions of Django newer than an
     official release, you should keep track of new pieces pointed there. It's
     also fun reading if you're looking forward to new versions of Django.
-    
+
 .. _backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
