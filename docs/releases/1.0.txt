@@ -67,7 +67,7 @@ You'll know that you're looking at something new or changed.
 The other major highlights of Django 1.0 are:
 
 Re-factored admin application
-----------------------------
+-----------------------------
 
 The Django administrative interface (``django.contrib.admin``) has been
 completely refactored; admin definitions are now completely decoupled from model
