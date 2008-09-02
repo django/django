@@ -210,10 +210,20 @@ class BaseModelForm(BaseForm):
 
     def validate_unique(self):
         from django.db.models.fields import FieldDoesNotExist
-        unique_checks = list(self.instance._meta.unique_together[:])
+
+        # Gather a list of checks to perform. Since this is a ModelForm, some
+        # fields may have been excluded; we can't perform a unique check on a
+        # form that is missing fields involved in that check.
+        unique_checks = []
+        for check in self.instance._meta.unique_together[:]:
+            fields_on_form = [field for field in check if field in self.fields]
+            if len(fields_on_form) == len(check):
+                unique_checks.append(check)
+            
         form_errors = []
         
-        # Make sure the unique checks apply to actual fields on the ModelForm
+        # Gather a list of checks for fields declared as unique and add them to
+        # the list of checks. Again, skip fields not on the form.
         for name, field in self.fields.items():
             try:
                 f = self.instance._meta.get_field_by_name(name)[0]

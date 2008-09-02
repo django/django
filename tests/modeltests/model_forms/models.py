@@ -1192,6 +1192,14 @@ False
 >>> form._errors
 {'__all__': [u'Price with this Price and Quantity already exists.']}
 
+>>> class PriceForm(ModelForm):
+...     class Meta:
+...         model = Price
+...         exclude = ('quantity',)
+>>> form = PriceForm({'price': '6.00'})
+>>> form.is_valid()
+True
+
 # Choices on CharField and IntegerField
 >>> class ArticleForm(ModelForm):
 ...     class Meta:
