@@ -1,1 +1,1 @@
-VERSION = (0, 95.3, None)
+VERSION = (0, 95.4, None)
