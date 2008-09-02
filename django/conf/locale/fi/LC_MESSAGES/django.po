@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-30 20:28+0300\n"
+"POT-Creation-Date: 2008-09-02 01:23+0300\n"
 "PO-Revision-Date: 2007-09-15 00:34+0300\n"
 "Last-Translator: Ville Säävuori <ville@unessa.net>\n"
 "Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
@@ -247,15 +247,15 @@ msgstr "Tässä kuussa"
 msgid "This year"
 msgstr "Tänä vuonna"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
 msgid "Yes"
 msgstr "Kyllä"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
 msgid "No"
 msgstr "Ei"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:391
 msgid "Unknown"
 msgstr "Tuntematon"
 
@@ -287,88 +287,89 @@ msgstr "lokimerkintä"
 msgid "log entries"
 msgstr "lokimerkinnät"
 
-#: contrib/admin/options.py:56 contrib/admin/options.py:120
+#: contrib/admin/options.py:59 contrib/admin/options.py:120
 msgid "None"
 msgstr "Ei arvoa"
 
-#: contrib/admin/options.py:334
+#: contrib/admin/options.py:332
 #, python-format
 msgid "Changed %s."
 msgstr "Muokattu: %s."
 
-#: contrib/admin/options.py:334 contrib/admin/options.py:344
+#: contrib/admin/options.py:332 contrib/admin/options.py:342
+#: forms/models.py:264
 msgid "and"
 msgstr "ja"
 
-#: contrib/admin/options.py:339
+#: contrib/admin/options.py:337
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Lisätty %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:343
+#: contrib/admin/options.py:341
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Muutettu %(list)s kohteelle %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:348
+#: contrib/admin/options.py:346
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Poistettu %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:352
+#: contrib/admin/options.py:350
 msgid "No fields changed."
 msgstr "Ei muutoksia kenttiin."
 
-#: contrib/admin/options.py:413 contrib/auth/admin.py:51
+#: contrib/admin/options.py:411 contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" on lisätty."
 
-#: contrib/admin/options.py:417 contrib/admin/options.py:450
-#: contrib/auth/admin.py:57
+#: contrib/admin/options.py:415 contrib/admin/options.py:448
+#: contrib/auth/admin.py:59
 msgid "You may edit it again below."
 msgstr "Voit muokata sitä uudelleen alla."
 
-#: contrib/admin/options.py:427 contrib/admin/options.py:460
+#: contrib/admin/options.py:425 contrib/admin/options.py:458
 #, python-format
 msgid "You may add another %s below."
 msgstr "Uusi %s on lisättävissä alla."
 
-#: contrib/admin/options.py:448
+#: contrib/admin/options.py:446
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" on muutettu."
 
-#: contrib/admin/options.py:456
+#: contrib/admin/options.py:454
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" on lisätty. Voit muokata sitä uudelleen alla."
 
-#: contrib/admin/options.py:532
+#: contrib/admin/options.py:530
 #, python-format
 msgid "Add %s"
 msgstr "Lisää %s"
 
-#: contrib/admin/options.py:610
+#: contrib/admin/options.py:608
 #, python-format
 msgid "Change %s"
 msgstr "Muokkaa %s"
 
-#: contrib/admin/options.py:642
+#: contrib/admin/options.py:640
 msgid "Database error"
 msgstr "Tietokantavirhe"
 
-#: contrib/admin/options.py:692
+#: contrib/admin/options.py:690
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" on poistettu."
 
-#: contrib/admin/options.py:699
+#: contrib/admin/options.py:697
 msgid "Are you sure?"
 msgstr "Oletko varma?"
 
-#: contrib/admin/options.py:728
+#: contrib/admin/options.py:726
 #, python-format
 msgid "Change history: %s"
 msgstr "Muokkaushistoria: %s"
@@ -433,27 +434,27 @@ msgstr "Yksi tai useampi %(fieldname)s kohteessa %(name)s: %(obj)s"
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Yksi tai useampi %(fieldname)s kohteessa %(name)s:"
 
-#: contrib/admin/widgets.py:65
+#: contrib/admin/widgets.py:70
 msgid "Date:"
 msgstr "Pvm:"
 
-#: contrib/admin/widgets.py:65
+#: contrib/admin/widgets.py:70
 msgid "Time:"
 msgstr "Klo:"
 
-#: contrib/admin/widgets.py:89
+#: contrib/admin/widgets.py:94
 msgid "Currently:"
 msgstr "Tällä hetkellä:"
 
-#: contrib/admin/widgets.py:89
+#: contrib/admin/widgets.py:94
 msgid "Change:"
 msgstr "Muokkaa:"
 
-#: contrib/admin/widgets.py:115
+#: contrib/admin/widgets.py:120
 msgid "Lookup"
 msgstr "Etsi"
 
-#: contrib/admin/widgets.py:195
+#: contrib/admin/widgets.py:204
 msgid "Add Another"
 msgstr "Lisää uusi"
 
@@ -642,7 +643,7 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Tietokanta-asennuksessasi on jotain vialla. Varmistu, että sopivat taulut on "
+"Tietokanta-asennuksessa on jotain vialla. Varmista, että sopivat taulut on "
 "luotu ja että oikea käyttäjä voi lukea tietokantaa."
 
 #: contrib/admin/templates/admin/login.html:19
@@ -690,7 +691,7 @@ msgstr "Etsi"
 #, python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
-msgstr[0] "1 hakutulas"
+msgstr[0] "1 hakutulos"
 msgstr[1] "%(counter)s hakutulosta"
 
 #: contrib/admin/templates/admin/search_form.html:10
@@ -766,24 +767,24 @@ msgstr "Kirjaudu uudelleen sisään"
 #: contrib/admin/templates/registration/password_change_form.html:6
 #: contrib/admin/templates/registration/password_change_form.html:10
 msgid "Password change"
-msgstr "Salasanan muuttaminen"
+msgstr "Salasanan vaihtaminen"
 
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
 msgid "Password change successful"
-msgstr "Salasanan muuttaminen onnistui"
+msgstr "Salasanan vaihtaminen onnistui"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
-msgstr "Salasanasi on muutettu."
+msgstr "Salasanasi on vaihdettu."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Syötä vanha salasanasi varmistukseksi, ja syötä sitten uusi salasanasi\n"
-"kaksi kertaa, jotta se tulee varmasti oikein."
+"Syötä vanha salasanasi varmistukseksi, ja syötä sitten uusi salasanasi kaksi "
+"kertaa, jotta se tulee varmasti oikein."
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
@@ -835,8 +836,8 @@ msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
-"Syötä vanha salasanasi varmistukseksi, ja syötä sitten uusi salasanasi\n"
-"kaksi kertaa, jotta se tulee varmasti oikein."
+"Syötä uusi salasanasi kaksi kertaa, jotta voimme varmistaa että syötit sen "
+"oikein."
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
@@ -860,8 +861,8 @@ msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-"Uusi salasanasi on lähetetty antamaasi sähköpostiosoitteeseen.\n"
-"Se saapuu tuota pikaa."
+"Uusi salasanasi on lähetetty antamaasi sähköpostiosoitteeseen. Se saapuu "
+"tuota pikaa."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -874,7 +875,7 @@ msgstr "sivuston %(site_name)s käyttäjätilillesi"
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 msgid "Please go to the following page and choose a new password:"
-msgstr "Ole hyvä ja mene oheiselle sivulle valitsemaan uusi salasana:"
+msgstr "Määrittele uusi salasanasi oheisella sivulla:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:9
 msgid "Your username, in case you've forgotten:"
@@ -882,12 +883,12 @@ msgstr "Käyttäjätunnuksesi siltä varalta, että olet unohtanut sen:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Thanks for using our site!"
-msgstr "Kiitos vierailustasi sivuillemme!"
+msgstr "Kiitos vierailustasi sivuillamme!"
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "%(site_name)s ylläpitäjät"
+msgstr "%(site_name)s -sivuston ylläpitäjät"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
 msgid ""
@@ -1026,7 +1027,7 @@ msgstr "Tiedostopolku"
 msgid "Floating point number"
 msgstr "Liukuluku"
 
-#: contrib/admindocs/views.py:328 contrib/comments/models.py:57
+#: contrib/admindocs/views.py:328 contrib/comments/models.py:58
 msgid "IP address"
 msgstr "IP-osoite"
 
@@ -1050,14 +1051,14 @@ msgstr "Tekstiä"
 msgid "Time"
 msgstr "Kellonaika"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:20
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:21
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL-osoite"
 
 #: contrib/admindocs/views.py:340
 msgid "U.S. state (two uppercase letters)"
-msgstr "USA:n osavaltio (kaksikirjaiminen versaalein)"
+msgstr "USA:n osavaltio (suuraakkosin, kaksi kirjainta)"
 
 #: contrib/admindocs/views.py:341
 msgid "XML text"
@@ -1066,7 +1067,7 @@ msgstr "XML-teksti"
 #: contrib/admindocs/views.py:367
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
-msgstr "%s ei näytä olevan urlpattern-objekti"
+msgstr "%s ei näytä olevan urlpattern-olio"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
@@ -1103,7 +1104,7 @@ msgstr "Tämän sivun ohjeita"
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
-msgstr "Vie avoinna olevan sivun luoneen näkymän ohjeisiin."
+msgstr "Näyttää ohjeet, jotka koskevat ko. sivun luonutta näkymää."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
@@ -1150,15 +1151,15 @@ msgstr "Tärkeät päivämäärät"
 msgid "Groups"
 msgstr "Ryhmät"
 
-#: contrib/auth/admin.py:62
+#: contrib/auth/admin.py:64
 msgid "Add user"
 msgstr "Uusi käyttäjä"
 
-#: contrib/auth/admin.py:88
+#: contrib/auth/admin.py:90
 msgid "Password changed successfully."
 msgstr "Salasana muutettu onnistuneesti."
 
-#: contrib/auth/admin.py:94
+#: contrib/auth/admin.py:96
 #, python-format
 msgid "Change password: %s"
 msgstr "Vaihda salasana: %s"
@@ -1219,15 +1220,15 @@ msgstr "Salasanan nollaus sivustolla %s"
 
 #: contrib/auth/forms.py:142
 msgid "New password"
-msgstr "Uusi salasana:"
+msgstr "Uusi salasana"
 
 #: contrib/auth/forms.py:143
 msgid "New password confirmation"
-msgstr "Uusi salasana uudelleen:"
+msgstr "Uusi salasana uudelleen"
 
 #: contrib/auth/forms.py:168
 msgid "Old password"
-msgstr "Vanha salasana:"
+msgstr "Vanha salasana"
 
 #: contrib/auth/forms.py:176
 msgid "Your old password was entered incorrectly. Please enter it again."
@@ -1239,7 +1240,7 @@ msgstr "nimi"
 
 #: contrib/auth/models.py:74
 msgid "codename"
-msgstr "koodinimi"
+msgstr "tunniste"
 
 #: contrib/auth/models.py:77
 msgid "permission"
@@ -1259,7 +1260,7 @@ msgstr "ryhmät"
 
 #: contrib/auth/models.py:136
 msgid "username"
-msgstr "tunnus"
+msgstr "käyttäjätunnus"
 
 #: contrib/auth/models.py:137
 msgid "first name"
@@ -1291,7 +1292,7 @@ msgstr "ylläpitäjä"
 
 #: contrib/auth/models.py:141
 msgid "Designates whether the user can log into this admin site."
-msgstr "Ylläpitäjillä on pääsy tähän sivuston ylläpito-osioon."
+msgstr "Määrää, pääseekö käyttäjä tähän sivuston ylläpito-osioon."
 
 #: contrib/auth/models.py:142
 msgid "active"
@@ -1352,7 +1353,7 @@ msgstr "viesti"
 msgid "Logged out"
 msgstr "Kirjautunut ulos"
 
-#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:423
+#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:428
 msgid "Enter a valid e-mail address."
 msgstr "Syötä kelvollinen sähköpostiosoite."
 
@@ -1364,68 +1365,69 @@ msgstr "Sisältö"
 msgid "Metadata"
 msgstr "Metatieto"
 
-#: contrib/comments/forms.py:18
+#: contrib/comments/forms.py:19
 msgid "Name"
 msgstr "Nimi"
 
-#: contrib/comments/forms.py:19
+#: contrib/comments/forms.py:20
 msgid "Email address"
 msgstr "Sähköpostiosoite"
 
-#: contrib/comments/forms.py:21
+#: contrib/comments/forms.py:22
 msgid "Comment"
-msgstr "Kommentti:"
+msgstr "Kommentti"
 
-#: contrib/comments/forms.py:24
+#: contrib/comments/forms.py:25
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
+"Jos syötät tähän kenttään jotain, kommenttisi luokitellaan roskapostiksi"
 
-#: contrib/comments/forms.py:124
+#: contrib/comments/forms.py:125
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Siivoa suusi! Sanaa \"%s\" ei saa käyttää tässä."
 msgstr[1] "Siivoa suusi! Sanoja \"%s\" ei saa käyttää tässä."
 
-#: contrib/comments/models.py:22
+#: contrib/comments/models.py:23
 msgid "object ID"
 msgstr "kohteen tunniste"
 
-#: contrib/comments/models.py:49
+#: contrib/comments/models.py:50
 msgid "user's name"
 msgstr "käyttäjän nimi"
 
-#: contrib/comments/models.py:50
+#: contrib/comments/models.py:51
 msgid "user's email address"
 msgstr "käyttäjän sähköpostiosoite"
 
-#: contrib/comments/models.py:51
+#: contrib/comments/models.py:52
 msgid "user's URL"
 msgstr "käyttäjän URL"
 
-#: contrib/comments/models.py:53
+#: contrib/comments/models.py:54
 msgid "comment"
 msgstr "kommentti"
 
-#: contrib/comments/models.py:56
+#: contrib/comments/models.py:57
 msgid "date/time submitted"
-msgstr "lähetyshetki"
+msgstr "lähettämishetki"
 
-#: contrib/comments/models.py:58
+#: contrib/comments/models.py:59
 msgid "is public"
 msgstr "on julkinen"
 
-#: contrib/comments/models.py:59
+#: contrib/comments/models.py:60
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
-msgstr ""
+msgstr "Piilottaaksesi kommentin näkymästä sivustolta, poista tämä ruksi."
 
-#: contrib/comments/models.py:61
+#: contrib/comments/models.py:62
 msgid "is removed"
 msgstr "on poistettu"
 
-#: contrib/comments/models.py:62
+#: contrib/comments/models.py:63
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -1433,23 +1435,24 @@ msgstr ""
 "Rastita jos kommentti on asiaankuulumaton. Kommentin tilalla näytetään\n"
 "viesti \"Tämä kommentti on poistettu\"."
 
-#: contrib/comments/models.py:114
+#: contrib/comments/models.py:115
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
-"Tämän kommentin lähetti kirjautunut käyttäjä joten nimi on kirjoitussuojattu."
+"Kommentin lähettäjän nimeä ei voi muuttaa, koska lähettäjä on kirjautunut "
+"käyttäjä."
 
 # Mitä "sketchy user" tarkoittaa?
-#: contrib/comments/models.py:123
+#: contrib/comments/models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"Tämän kommentin lähetti kirjautunut käyttäjä joten sähköposti on "
-"kirjoitussuojattu."
+"Kommentin lähettäjän sähköpostiosoitetta ei voi muuttaa, koska lähettäjä on "
+"kirjautunut käyttäjä."
 
-#: contrib/comments/models.py:148
+#: contrib/comments/models.py:149
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -1541,6 +1544,8 @@ msgid ""
 "We apologize, but your form has expired. Please continue filling out the "
 "form from this page."
 msgstr ""
+"Pahoittelumme, mutta sessiosi on vanhentunut. Ole hyvä ja jatka lomakkeen "
+"täyttämistä tältä sivulta."
 
 #: contrib/gis/forms/fields.py:14
 msgid "No geometry value provided."
@@ -1588,8 +1593,8 @@ msgstr[1] "%(value).1f miljardia"
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f triljoona"
-msgstr[1] "%(value).1f triljoonaa"
+msgstr[0] "%(value).1f biljoona"
+msgstr[1] "%(value).1f biljoonaa"
 
 #: contrib/humanize/templatetags/humanize.py:73
 msgid "one"
@@ -2790,11 +2795,11 @@ msgstr "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
 
 #: contrib/localflavor/ro/forms.py:171
 msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "Puhelinnumeron tulee olla muodossa XX-XXXX-XXXX."
+msgstr "Puhelinnumeron tulee olla muodossa XXXX-XXXXXX."
 
 #: contrib/localflavor/ro/forms.py:194
 msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "Syötä postinumero muodossa XXX XXX."
+msgstr "Syötä postinumero muodossa XXXXXX."
 
 #: contrib/localflavor/sk/forms.py:30
 msgid "Enter a postal code in the format XXXXX or XXX XX."
@@ -3118,7 +3123,7 @@ msgstr "Zilina"
 
 #: contrib/localflavor/sk/sk_regions.py:8
 msgid "Banska Bystrica region"
-msgstr "Banská Bystrican aule"
+msgstr "Banská Bystrican alue"
 
 #: contrib/localflavor/sk/sk_regions.py:9
 msgid "Bratislava region"
@@ -3493,9 +3498,8 @@ msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
-"Tässä on käytettävä absoluuttista polkua ilman verkkotunnusta. Esimerkki: "
-"'\\\n"
-"events/search/'"
+"Tässä on käytettävä absoluuttista polkua ilman verkkotunnusta. Esimerkki: '/"
+"tapahtumat/haku/'."
 
 #: contrib/redirects/models.py:9
 msgid "redirect to"
@@ -3549,55 +3553,55 @@ msgstr "näyttönimi"
 msgid "sites"
 msgstr "sivustot"
 
-#: db/models/fields/__init__.py:332 db/models/fields/__init__.py:667
+#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:683
 msgid "This value must be an integer."
 msgstr "Tarvitaan kokonaisluku."
 
-#: db/models/fields/__init__.py:363
+#: db/models/fields/__init__.py:379
 msgid "This value must be either True or False."
 msgstr "Tarvitaan tosi (True) tai epätosi (False)."
 
-#: db/models/fields/__init__.py:396
+#: db/models/fields/__init__.py:412
 msgid "This field cannot be null."
 msgstr "Tämän kentän arvo ei voi olla \"null\"."
 
-#: db/models/fields/__init__.py:412
+#: db/models/fields/__init__.py:428
 msgid "Enter only digits separated by commas."
-msgstr "Vain pilkulla erotetut luvut kelpaavat tässä."
+msgstr "Vain pilkulla erotetut kokonaisluvut kelpaavat tässä."
 
-#: db/models/fields/__init__.py:443
+#: db/models/fields/__init__.py:459
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Päivämäärän pitää olla muodossa VVVV-KK-PP."
 
-#: db/models/fields/__init__.py:452
+#: db/models/fields/__init__.py:468
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Päivämäärä %s ei kelpaa"
 
-#: db/models/fields/__init__.py:516 db/models/fields/__init__.py:534
+#: db/models/fields/__init__.py:532 db/models/fields/__init__.py:550
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "Ajankohdan pitää olla muodossa VVVV-KK-PP TT:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:570
+#: db/models/fields/__init__.py:586
 msgid "This value must be a decimal number."
 msgstr "Tähän tarvitaan desimaaliluku."
 
-#: db/models/fields/__init__.py:703
+#: db/models/fields/__init__.py:719
 msgid "This value must be either None, True or False."
 msgstr "Tähän tarvitaan tyhjä (None), tosi (True) tai epätosi (False)."
 
-#: db/models/fields/__init__.py:811 db/models/fields/__init__.py:825
+#: db/models/fields/__init__.py:817 db/models/fields/__init__.py:831
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Ajan täytyy olla muodossa TT:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:748
+#: db/models/fields/related.py:758
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 " Pidä \"Ctrl\"-näppäin (tai Macin \"Command\") pohjassa valitaksesi useita "
 "vaihtoehtoja."
 
-#: db/models/fields/related.py:825
+#: db/models/fields/related.py:835
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3605,110 +3609,110 @@ msgid_plural ""
 msgstr[0] "Syöttämäsi %(self)s-tunniste %(value)r ei kelpaa."
 msgstr[1] "Syöttämäsi %(self)s-tunnisteet %(value)r eivät kelpaa."
 
-#: forms/fields.py:52
+#: forms/fields.py:54
 msgid "This field is required."
 msgstr "Tämä kenttä vaaditaan."
 
-#: forms/fields.py:53
+#: forms/fields.py:55
 msgid "Enter a valid value."
 msgstr "Syötä oikea arvo."
 
-#: forms/fields.py:133
+#: forms/fields.py:138
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr "Tähän kelpaa enintään %(max)d merkkiä (nyt niitä on %(length)d)."
 
-#: forms/fields.py:134
+#: forms/fields.py:139
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr "Tähän tarvitaan vähintään %(min)d merkkiä (nyt on vain %(length)d)."
 
-#: forms/fields.py:161
+#: forms/fields.py:166
 msgid "Enter a whole number."
 msgstr "Syötä kokonaisluku."
 
-#: forms/fields.py:162 forms/fields.py:191 forms/fields.py:220
+#: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Tämän luvun on oltava enintään %s."
 
-#: forms/fields.py:163 forms/fields.py:192 forms/fields.py:221
+#: forms/fields.py:168 forms/fields.py:197 forms/fields.py:226
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Tämän luvun on oltava vähintään %s."
 
-#: forms/fields.py:190 forms/fields.py:219
+#: forms/fields.py:195 forms/fields.py:224
 msgid "Enter a number."
 msgstr "Syötä kokonaisluku."
 
-#: forms/fields.py:222
+#: forms/fields.py:227
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Tässä luvussa voi olla yhteensä enintään %s numeroa."
 
-#: forms/fields.py:223
+#: forms/fields.py:228
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Tässä luvussa saa olla enintään %s desimaalia."
 
-#: forms/fields.py:224
+#: forms/fields.py:229
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Tässä luvussa saa olla enintään %s numeroa ennen desimaalipilkkua."
 
-#: forms/fields.py:282 forms/fields.py:815
+#: forms/fields.py:287 forms/fields.py:848
 msgid "Enter a valid date."
 msgstr "Syötä oikea päivämäärä."
 
-#: forms/fields.py:316 forms/fields.py:816
+#: forms/fields.py:321 forms/fields.py:849
 msgid "Enter a valid time."
 msgstr "Syötä oikea kellonaika."
 
-#: forms/fields.py:355
+#: forms/fields.py:360
 msgid "Enter a valid date/time."
 msgstr "Syötä oikea pvm/kellonaika."
 
-#: forms/fields.py:441
+#: forms/fields.py:446
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tiedostoa ei lähetetty. Tarkista lomakkeen koodaus (encoding)."
 
-#: forms/fields.py:442
+#: forms/fields.py:447
 msgid "No file was submitted."
 msgstr "Yhtään tiedostoa ei ole lähetetty."
 
-#: forms/fields.py:443
+#: forms/fields.py:448
 msgid "The submitted file is empty."
 msgstr "Lähetetty tiedosto on tyhjä."
 
-#: forms/fields.py:472
+#: forms/fields.py:477
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
 "Kuva ei kelpaa. Lähettämäsi tiedosto ei ole kuva, tai tiedosto on vioittunut."
 
-#: forms/fields.py:533
+#: forms/fields.py:538
 msgid "Enter a valid URL."
 msgstr "Syötä oikea URL-osoite."
 
-#: forms/fields.py:534
+#: forms/fields.py:539
 msgid "This URL appears to be a broken link."
 msgstr "Tämä URL-osoite on rikkinäinen linkki."
 
-#: forms/fields.py:613 forms/fields.py:664
+#: forms/fields.py:618 forms/fields.py:696
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Valitse oikea vaihtoehto. %(value)s ei ole vaihtoehtojen joukossa."
 
-#: forms/fields.py:665 forms/fields.py:726 forms/models.py:531
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:633
 msgid "Enter a list of values."
 msgstr "Syötä lista."
 
-#: forms/fields.py:844
+#: forms/fields.py:877
 msgid "Enter a valid IPv4 address."
 msgstr "Syötä kelvollinen IPv4-osoite."
 
-#: forms/fields.py:854
+#: forms/fields.py:887
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -3719,11 +3723,16 @@ msgstr ""
 msgid "Order"
 msgstr "Järjestys"
 
-#: forms/models.py:463
+#: forms/models.py:258 forms/models.py:266
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s jolla on tämä %(field_label)s, on jo olemassa."
+
+#: forms/models.py:565
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Valitse oikea vaihtoehto. Valintasi ei löydy vaihtoehtojen joukosta."
 
-#: forms/models.py:532
+#: forms/models.py:634
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Valitse oikea vaihtoehto. %s ei löydy vaihtoehtojen joukosta."
@@ -4000,7 +4009,7 @@ msgstr[1] "minuuttia"
 
 #: utils/timesince.py:43
 msgid "minutes"
-msgstr "minuutti"
+msgstr "minuuttia"
 
 #: utils/timesince.py:48
 #, python-format
@@ -4117,9 +4126,9 @@ msgstr "%(verbose_name)s on poistettu."
 #~ "\n"
 #~ "%(text)s"
 #~ msgstr ""
-#~ " %(user)s on merkinnyt tämän kommentin:\\n\n"
-#~ " \\n\n"
-#~ " %(text)s"
+#~ "%(user)s on merkinnyt tämän kommentin:\n"
+#~ "\n"
+#~ "%(text)s"
 
 #~ msgid "flag date"
 #~ msgstr "merkintäpäivä"
@@ -4416,9 +4425,6 @@ msgstr "%(verbose_name)s on poistettu."
 #~ msgid ""
 #~ "%(object)s with this %(type)s already exists for the given %(field)s."
 #~ msgstr "%(field)s omaa jo kohteen %(object)s, joka on tyyppiä %(type)s."
-
-#~ msgid "%(optname)s with this %(fieldname)s already exists."
-#~ msgstr "%(optname)s, jolla on tämä %(fieldname)s, on jo olemassa."
 
 #~ msgid "Enter a valid filename."
 #~ msgstr "Tiedostonimi ei kelpaa."
