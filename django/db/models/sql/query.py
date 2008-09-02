@@ -716,7 +716,6 @@ class Query(object):
             alias = table_name
             self.table_map[alias] = [alias]
         self.alias_refcount[alias] = 1
-        #self.alias_map[alias] = None
         self.tables.append(alias)
         return alias, True
 
@@ -1188,6 +1187,8 @@ class Query(object):
                 subtree = False
             connector = AND
             for child in q_object.children:
+                if connector == OR:
+                    refcounts_before = self.alias_refcount.copy()
                 if isinstance(child, Node):
                     self.where.start_subtree(connector)
                     self.add_q(child, used_aliases)
@@ -1195,6 +1196,27 @@ class Query(object):
                 else:
                     self.add_filter(child, connector, q_object.negated,
                             can_reuse=used_aliases)
+                if connector == OR:
+                    # Aliases that were newly added or not used at all need to
+                    # be promoted to outer joins if they are nullable relations.
+                    # (they shouldn't turn the whole conditional into the empty
+                    # set just because they don't match anything).
+                    # FIXME: There's some (a lot of!) overlap with the similar
+                    # OR promotion in add_filter(). It's not quite identical,
+                    # but is very similar. So pulling out the common bits is
+                    # something for later (code smell: too much indentation
+                    # here)
+                    considered = {}
+                    for alias in self.tables:
+                        if alias not in used_aliases:
+                            continue
+                        if (alias not in refcounts_before or
+                                self.alias_refcount[alias] ==
+                                refcounts_before[alias]):
+                            parent = self.alias_map[alias][LHS_ALIAS]
+                            must_promote = considered.get(parent, False)
+                            promoted = self.promote_alias(alias, must_promote)
+                            considered[alias] = must_promote or promoted
                 connector = q_object.connector
             if q_object.negated:
                 self.where.negate()
