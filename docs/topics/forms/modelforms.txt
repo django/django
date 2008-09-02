@@ -495,6 +495,29 @@ fill the rest with extra forms::
     <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
     <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
 
+Using a model formset in a view
+-------------------------------
+
+Model formsets are very similar to formsets. Lets say we want to present a
+formset to a user to edit ``Author`` model instances::
+
+    def manage_authors(request):
+        AuthorFormSet = modelformset_factory(Author)
+        if request.POST == 'POST':
+            formset = AuthorFormSet(request.POST, request.FILES)
+            if formset.is_valid():
+                formset.save()
+                # do something.
+        else:
+            formset = AuthorFormSet()
+        render_to_response("manage_authors.html", {
+            "formset": formset,
+        })
+
+As you can see the view is not drastically different than how to use a formset
+in a view. The only difference is that we call ``formset.save()`` to save the
+data into the database. This was describe above in :ref:`ref-saving-objects-in-the-formset`.
+
 Using ``inlineformset_factory``
 -------------------------------
 
