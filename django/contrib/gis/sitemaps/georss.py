@@ -32,7 +32,7 @@ class GeoRSSSitemap(Sitemap):
         for section in feed_dict.keys():
             if slug_dict.get(section, False):
                 for slug in slug_dict[section]:
-                    self.locations.append(('%s/%s' % (section, slug)))
+                    self.locations.append('%s/%s' % (section, slug))
             else:
                 self.locations.append(section)
  
@@ -49,5 +49,5 @@ class GeoRSSSitemap(Sitemap):
         return self.locations
 
     def location(self, obj):
-        return urlresolvers.reverse('django.contrib.syndication.views.feed',
-                                    args=(obj,), kwargs={'feed_dict' : self.feed_dict})
+        return urlresolvers.reverse('django.contrib.syndication.views.feed', args=(obj,))
+
