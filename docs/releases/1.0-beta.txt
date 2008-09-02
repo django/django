@@ -148,7 +148,7 @@ to join the discussions there.
 Django's online documentation also includes pointers on how to
 contribute to Django:
 
-    http://www.djangoproject.com/documentation/contributing/
+    :ref:`contributing to Django <internals-contributing>`
 
 Contributions on any level -- developing code, writing
 documentation or simply triaging tickets and helping to test proposed

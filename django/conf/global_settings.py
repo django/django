@@ -257,25 +257,25 @@ FILE_UPLOAD_TEMP_DIR = None
 FILE_UPLOAD_PERMISSIONS = None
 
 # Default formatting for date objects. See all available format strings here:
-# http://www.djangoproject.com/documentation/templates/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 DATE_FORMAT = 'N j, Y'
 
 # Default formatting for datetime objects. See all available format strings here:
-# http://www.djangoproject.com/documentation/templates/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 DATETIME_FORMAT = 'N j, Y, P'
 
 # Default formatting for time objects. See all available format strings here:
-# http://www.djangoproject.com/documentation/templates/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 TIME_FORMAT = 'P'
 
 # Default formatting for date objects when only the year and month are relevant.
 # See all available format strings here:
-# http://www.djangoproject.com/documentation/templates/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 YEAR_MONTH_FORMAT = 'F Y'
 
 # Default formatting for date objects when only the month and day are relevant.
 # See all available format strings here:
-# http://www.djangoproject.com/documentation/templates/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 MONTH_DAY_FORMAT = 'F j'
 
 # Do you want to manage transactions manually?

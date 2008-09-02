@@ -33,8 +33,8 @@ Refactored admin application (newforms-admin)
     and redesigned with extensibility and customization in mind. Full
     documentation for the admin application is available online in the
     official Django documentation:
-    
-         http://www.djangoproject.com/documentation/admin/
+
+        :ref:`admin reference <ref-contrib-admin>`
 
 Improved Unicode handling
     Django's internals have been refactored to use Unicode throughout;
@@ -44,8 +44,8 @@ Improved Unicode handling
     third-party libraries and systems which may or may not handle
     Unicode gracefully. Details are available in Django's
     Unicode-handling documentation:
-    
-         http://www.djangoproject.com/documentation/unicode/
+
+         :ref:`unicode reference <ref-unicode>`
 
 An improved Django ORM
     Django's object-relational mapper -- the component which provides
@@ -68,9 +68,7 @@ Automatic escaping of template variables
     and allows both variables and larger template constructs to be
     marked as safe (requiring no escaping) or unsafe (requiring
     escaping). A full guide to this feature is in the documentation
-    for the Django template system:
-    
-        http://www.djangoproject.com/documentation/templates/#automatic-html-escaping
+    for the :ttag:`autoescape` tag.
 
 There are many more new features, many bugfixes and many enhancements
 to existing features from previous releases. The ``newforms`` library,
@@ -87,7 +85,7 @@ complete guide to these changes will be available as part of the final
 Django 1.0 release, and a comprehensive list of backwards-incompatible
 changes is also available on the Django wiki for those who want to
 begin developing and testing their upgrade process:
-    
+
     http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
 
 
@@ -158,7 +156,7 @@ to join the discussions there.
 Django's online documentation also includes pointers on how to
 contribute to Django:
 
-    http://www.djangoproject.com/documentation/contributing/
+    :ref:`contributing to Django <internals-contributing>`
 
 Contributions on any level -- developing code, writing
 documentation or simply triaging tickets and helping to test proposed

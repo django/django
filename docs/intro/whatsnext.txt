@@ -110,7 +110,7 @@ On the Web
 ----------
 
 The most recent version of the Django documentation lives at
-http://www.djangoproject.com/documentation/ . These HTML pages are generated
+http://docs.djangoproject.com/en/dev/. These HTML pages are generated
 automatically from the text files in source control. That means they reflect the
 "latest and greatest" in Django -- they include the very latest corrections and
 additions, and they discuss the latest Django features, which may only be
@@ -231,4 +231,4 @@ We follow this policy:
     * The `main documentation Web page`_ includes links to documentation for
       all previous versions.
 
-.. _main documentation Web page: http://www.djangoproject.com/documentation/
+.. _main documentation Web page: http://docs.djangoproject.com/en/dev/
