@@ -158,8 +158,8 @@ New (1.0)::
     
 See :ref:`admin-inlines` for more details.
 
-Simplify `fields``, or use ``fieldsets``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Simplify ``fields``, or use ``fieldsets``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The old ``fields`` syntax was quite confusing, and has been simplified. The old
 syntax still works, but you'll need to use ``fieldsets`` instead.
