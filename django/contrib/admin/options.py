@@ -31,6 +31,7 @@ class BaseModelAdmin(object):
     """Functionality common to both ModelAdmin and InlineAdmin."""
     raw_id_fields = ()
     fields = None
+    exclude = None
     fieldsets = None
     form = forms.ModelForm
     filter_vertical = ()
@@ -262,9 +263,14 @@ class ModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
+        if self.exclude is None:
+            exclude = []
+        else:
+            exclude = self.exclude
         defaults = {
             "form": self.form,
             "fields": fields,
+            "exclude": exclude + kwargs.get("exclude", []),
             "formfield_callback": self.formfield_for_dbfield,
         }
         defaults.update(kwargs)
@@ -780,11 +786,16 @@ class InlineModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
+        if self.exclude is None:
+            exclude = []
+        else:
+            exclude = self.exclude
         defaults = {
             "form": self.form,
             "formset": self.formset,
             "fk_name": self.fk_name,
             "fields": fields,
+            "exclude": exclude + kwargs.get("exclude", []),
             "formfield_callback": self.formfield_for_dbfield,
             "extra": self.extra,
             "max_num": self.max_num,

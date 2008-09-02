@@ -181,6 +181,32 @@ displayed, sequentially, in the form.
     dictionary key that is within the ``fieldsets`` option, as described in
     the previous section.
 
+``exclude``
+~~~~~~~~~~~
+
+This attribute, if given, should be a list of field names to exclude from the
+form.
+
+For example, let's consider the following model::
+
+    class Author(models.Model):
+        name = models.CharField(max_length=100)
+        title = models.CharField(max_length=3)
+        birth_date = models.DateField(blank=True, null=True)
+
+If you want a form for the ``Author`` model that includes only the ``name``
+and ``title`` fields, you would specify ``fields`` or ``exclude`` like this::
+    
+    class AuthorAdmin(admin.ModelAdmin):
+        fields = ('name', 'title')
+    
+    class AuthorAdmin(admin.ModelAdmin):
+        exclude = ('birth_date',)
+
+Since the Author model only has three fields, ``name``, ``title``, and
+``birth_date``, the forms resulting from the above declarations will contain
+exactly the same fields.
+
 ``filter_horizontal``
 ~~~~~~~~~~~~~~~~~~~~~
 

@@ -116,6 +116,23 @@ displayed because you forgot to add it to fields/fielsets
 ['name']
 
 
+# Using `exclude`.
+
+>>> class BandAdmin(ModelAdmin): 
+...     exclude = ['bio'] 
+>>> ma = BandAdmin(Band, site) 
+>>> ma.get_form(request).base_fields.keys() 
+['name', 'sign_date']
+ 
+# Using `fields` and `exclude`.
+
+>>> class BandAdmin(ModelAdmin): 
+...     fields = ['name', 'bio'] 
+...     exclude = ['bio'] 
+>>> ma = BandAdmin(Band, site) 
+>>> ma.get_form(request).base_fields.keys() 
+['name']
+
 If we specify a form, it should use it allowing custom validation to work
 properly. This won't, however, break any of the admin widgets or media.
 

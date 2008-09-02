@@ -701,5 +701,4 @@ False
 >>> formset.is_valid()
 True
 
-
 """}
