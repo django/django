@@ -1030,7 +1030,7 @@ True
 <class 'django.core.files.uploadedfile.SimpleUploadedFile'>
 >>> instance = f.save()
 >>> instance.image
-<ImageFieldFile: tests/test.png>
+<...FieldFile: tests/test.png>
 
 # Delete the current file since this is not done by Django.
 >>> instance.image.delete()
@@ -1042,7 +1042,7 @@ True
 <class 'django.core.files.uploadedfile.SimpleUploadedFile'>
 >>> instance = f.save()
 >>> instance.image
-<ImageFieldFile: tests/test.png>
+<...FieldFile: tests/test.png>
 
 # Edit an instance that already has the image defined in the model. This will not
 # save the image again, but leave it exactly as it is.
@@ -1051,10 +1051,10 @@ True
 >>> f.is_valid()
 True
 >>> f.cleaned_data['image']
-<ImageFieldFile: tests/test.png>
+<...FieldFile: tests/test.png>
 >>> instance = f.save()
 >>> instance.image
-<ImageFieldFile: tests/test.png>
+<...FieldFile: tests/test.png>
 
 # Delete the current image since this is not done by Django.
 
@@ -1067,7 +1067,7 @@ True
 True
 >>> instance = f.save()
 >>> instance.image
-<ImageFieldFile: tests/test2.png>
+<...FieldFile: tests/test2.png>
 
 # Delete the current file since this is not done by Django.
 >>> instance.image.delete()
@@ -1078,7 +1078,7 @@ True
 True
 >>> instance = f.save()
 >>> instance.image
-<ImageFieldFile: tests/test2.png>
+<...FieldFile: tests/test2.png>
 
 # Delete the current file since this is not done by Django.
 >>> instance.image.delete()
@@ -1092,14 +1092,14 @@ True
 True
 >>> instance = f.save()
 >>> instance.image
-<ImageFieldFile: None>
+<...FieldFile: None>
 
 >>> f = ImageFileForm(data={'description': u'And a final one'}, files={'image': SimpleUploadedFile('test3.png', image_data)}, instance=instance)
 >>> f.is_valid()
 True
 >>> instance = f.save()
 >>> instance.image
-<ImageFieldFile: tests/test3.png>
+<...FieldFile: tests/test3.png>
 
 # Delete the current file since this is not done by Django.
 >>> instance.image.delete()
@@ -1110,7 +1110,7 @@ True
 True
 >>> instance = f.save()
 >>> instance.image
-<ImageFieldFile: tests/test3.png>
+<...FieldFile: tests/test3.png>
 >>> instance.delete()
 
 # Media on a ModelForm ########################################################
