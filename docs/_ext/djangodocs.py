@@ -90,6 +90,17 @@ class DjangoHTMLTranslator(sphinx.htmlwriter.SmartyPantsHTMLTranslator):
         pass
         
     #
+    # Don't apply smartypants to literal blocks
+    #
+    def visit_literal_block(self, node):
+        self.no_smarty += 1
+        sphinx.htmlwriter.SmartyPantsHTMLTranslator.visit_literal_block(self, node)
+        
+    def depart_literal_block(self, node):
+        sphinx.htmlwriter.SmartyPantsHTMLTranslator.depart_literal_block(self, node) 
+        self.no_smarty -= 1
+        
+    #
     # Turn the "new in version" stuff (versoinadded/versionchanged) into a
     # better callout -- the Sphinx default is just a little span,
     # which is a bit less obvious that I'd like.
