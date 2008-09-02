@@ -80,6 +80,9 @@ Old (0.96) ``models.py``::
         class Admin:
             list_display = ['first_name', 'last_name']
 
+        def __str__(self):
+            return '%s %s' % (self.first_name, self.last_name)
+
 New (1.0) ``models.py``::
 
     class Author(models.Model):
@@ -87,13 +90,16 @@ New (1.0) ``models.py``::
         last_name = models.CharField(max_length=30)
         slug = models.CharField(max_length=60)
 
+        def __unicode__(self):
+            return u'%s %s' % (self.first_name, self.last_name)
+
 New (1.0) ``admin.py``::
 
     from django.contrib import admin
     from models import Author
     
     class AuthorAdmin(admin.ModelAdmin):
-        list_display=['first_name', 'last_name']
+        list_display = ['first_name', 'last_name']
         prepopulated_fields = {
             'slug': ('first_name', 'last_name')
         }
@@ -109,7 +115,7 @@ definitions are now completely decoupled from model definitions, the framework
 as been rewritten to use Django's new form-handling library and redesigned with
 extensibility and customization in mind.
 
-Practially, this means you'll need to rewrite all of your ``class Admin``
+Practically, this means you'll need to rewrite all of your ``class Admin``
 declarations. You've already seen in `models`_ above how to replace your ``class
 Admin`` with a ``admin.site.register()`` call in an ``admin.py`` file. Below are
 some more details on how to rewrite that ``Admin`` declaration into the new
