@@ -738,7 +738,7 @@ class Query(object):
         Returns True if the join was promoted.
         """
         if ((unconditional or self.alias_map[alias][NULLABLE]) and
-                self.alias_map[alias] != self.LOUTER):
+                self.alias_map[alias][JOIN_TYPE] != self.LOUTER):
             data = list(self.alias_map[alias])
             data[JOIN_TYPE] = self.LOUTER
             self.alias_map[alias] = tuple(data)
