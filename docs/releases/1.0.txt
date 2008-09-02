@@ -89,7 +89,7 @@ interoperability with third-party libraries and systems which may or may not
 handle Unicode gracefully. Details are available in Django's Unicode-handling
 documentation.
 
-See :ref:`<ref-unicode>`.
+See :ref:`ref-unicode`.
 
 An improved ORM
 ---------------
