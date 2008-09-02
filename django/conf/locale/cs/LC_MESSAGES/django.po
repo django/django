@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-01 07:43+0200\n"
+"POT-Creation-Date: 2008-09-01 19:39-0700\n"
 "Language-Team: Czech\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -244,15 +244,15 @@ msgstr "Tento měsíc"
 msgid "This year"
 msgstr "Tento rok"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
 msgid "Yes"
 msgstr "Ano"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
 msgid "No"
 msgstr "Ne"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:391
 msgid "Unknown"
 msgstr "Neznámé"
 
@@ -294,6 +294,7 @@ msgid "Changed %s."
 msgstr "Záznam %s změněn."
 
 #: contrib/admin/options.py:332 contrib/admin/options.py:342
+#: forms/models.py:265
 msgid "and"
 msgstr "a"
 
@@ -450,11 +451,11 @@ msgstr "Momentálně:"
 msgid "Change:"
 msgstr "Změna:"
 
-#: contrib/admin/widgets.py:120
+#: contrib/admin/widgets.py:122
 msgid "Lookup"
 msgstr "Hledat"
 
-#: contrib/admin/widgets.py:204
+#: contrib/admin/widgets.py:207
 msgid "Add Another"
 msgstr "Přidat další"
 
@@ -908,16 +909,16 @@ msgstr "E-mailová adresa:"
 msgid "Reset my password"
 msgstr "Obnovit heslo"
 
-#: contrib/admin/templatetags/admin_list.py:284
+#: contrib/admin/templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Všechna data"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:69
 #, python-format
 msgid "Select %s"
 msgstr "%s: vybrat"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:69
 #, python-format
 msgid "Select %s to change"
 msgstr "%s: vybrat pro změnu"
@@ -1029,7 +1030,7 @@ msgstr "Cesta k souboru"
 msgid "Floating point number"
 msgstr "Desetinné číslo"
 
-#: contrib/admindocs/views.py:328 contrib/comments/models.py:57
+#: contrib/admindocs/views.py:328 contrib/comments/models.py:58
 msgid "IP address"
 msgstr "IP adresa"
 
@@ -1053,7 +1054,7 @@ msgstr "Text"
 msgid "Time"
 msgstr "Čas"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:20
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:21
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
@@ -1360,7 +1361,7 @@ msgstr "zpráva"
 msgid "Logged out"
 msgstr "Odhlášeno"
 
-#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:425
+#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:428
 msgid "Enter a valid e-mail address."
 msgstr "Vložte platnou e-mailovou adresu."
 
@@ -1372,25 +1373,25 @@ msgstr "Obsah"
 msgid "Metadata"
 msgstr "Metadata"
 
-#: contrib/comments/forms.py:18
+#: contrib/comments/forms.py:19
 msgid "Name"
 msgstr "Jméno"
 
-#: contrib/comments/forms.py:19
+#: contrib/comments/forms.py:20
 msgid "Email address"
 msgstr "E-mailová adresa"
 
-#: contrib/comments/forms.py:21
+#: contrib/comments/forms.py:22
 msgid "Comment"
 msgstr "Komentář"
 
-#: contrib/comments/forms.py:24
+#: contrib/comments/forms.py:25
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
 "Jestliže do tohoto pole něco vyplníte, Váš komentář bude považován za spam"
 
-#: contrib/comments/forms.py:124
+#: contrib/comments/forms.py:125
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -1398,45 +1399,45 @@ msgstr[0] "Mluvte slušně! Slovo %s zde není přípustné."
 msgstr[1] "Mluvte slušně! Slova %s zde nejsou přípustná."
 msgstr[2] "Mluvte slušně! Slova %s zde nejsou přípustná."
 
-#: contrib/comments/models.py:22
+#: contrib/comments/models.py:23
 msgid "object ID"
 msgstr "ID objektu"
 
-#: contrib/comments/models.py:49
+#: contrib/comments/models.py:50
 msgid "user's name"
 msgstr "jméno uživatele"
 
-#: contrib/comments/models.py:50
+#: contrib/comments/models.py:51
 msgid "user's email address"
 msgstr "e-mailová adresa uživatele"
 
-#: contrib/comments/models.py:51
+#: contrib/comments/models.py:52
 msgid "user's URL"
 msgstr "URL uživatele"
 
-#: contrib/comments/models.py:53
+#: contrib/comments/models.py:54
 msgid "comment"
 msgstr "komentář"
 
-#: contrib/comments/models.py:56
+#: contrib/comments/models.py:57
 msgid "date/time submitted"
 msgstr "datum/čas byl zaslán"
 
-#: contrib/comments/models.py:58
+#: contrib/comments/models.py:59
 msgid "is public"
 msgstr "je veřejné"
 
-#: contrib/comments/models.py:59
+#: contrib/comments/models.py:60
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr ""
 "Pokud zrušíte zaškrtnutí tohoto boxu, komentář se na stránce nezobrazí."
 
-#: contrib/comments/models.py:61
+#: contrib/comments/models.py:62
 msgid "is removed"
 msgstr "je odstraněno"
 
-#: contrib/comments/models.py:62
+#: contrib/comments/models.py:63
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -1444,21 +1445,21 @@ msgstr ""
 "Zaškrtněte tento box, pokud komentář není vhodný. Místo něj bude zobrazena "
 "zpráva \"Tento komentář byl smazán\"."
 
-#: contrib/comments/models.py:114
+#: contrib/comments/models.py:115
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
 "Tento komentář zaslal přihlášený uživatel, a tak jméno není možné změnit."
 
-#: contrib/comments/models.py:123
+#: contrib/comments/models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
 "Tento komentář zaslal přihlášený uživatel, a tak e-mail není možné změnit."
 
-#: contrib/comments/models.py:148
+#: contrib/comments/models.py:149
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -3550,40 +3551,40 @@ msgstr "zobrazené jméno"
 msgid "sites"
 msgstr "weby"
 
-#: db/models/fields/__init__.py:338 db/models/fields/__init__.py:673
+#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:683
 msgid "This value must be an integer."
 msgstr "Tato hodnota musí být celé číslo."
 
-#: db/models/fields/__init__.py:369
+#: db/models/fields/__init__.py:379
 msgid "This value must be either True or False."
 msgstr "Tato hodnota musí být buď Ano (True), nebo Ne (False)."
 
-#: db/models/fields/__init__.py:402
+#: db/models/fields/__init__.py:412
 msgid "This field cannot be null."
 msgstr "Toto pole nemůže být prázdné (null)."
 
-#: db/models/fields/__init__.py:418
+#: db/models/fields/__init__.py:428
 msgid "Enter only digits separated by commas."
 msgstr "Vložte pouze cifry oddělené čárkami."
 
-#: db/models/fields/__init__.py:449
+#: db/models/fields/__init__.py:459
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Vložte platné datum ve formátu RRRR-MM-DD."
 
-#: db/models/fields/__init__.py:458
+#: db/models/fields/__init__.py:468
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Neplatné datum: %s"
 
-#: db/models/fields/__init__.py:522 db/models/fields/__init__.py:540
+#: db/models/fields/__init__.py:532 db/models/fields/__init__.py:550
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "Vložte platné datum a čas ve formátu RRRR-MM-DD HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:576
+#: db/models/fields/__init__.py:586
 msgid "This value must be a decimal number."
 msgstr "Tato hodnota musí být celé číslo."
 
-#: db/models/fields/__init__.py:709
+#: db/models/fields/__init__.py:719
 msgid "This value must be either None, True or False."
 msgstr "Tato hodnota musí být buď Nic (None), Ano (True) nebo Ne (False)."
 
@@ -3591,14 +3592,14 @@ msgstr "Tato hodnota musí být buď Nic (None), Ano (True) nebo Ne (False)."
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Vložte platný čas ve formátu HH:MM[:ss[.uuuuuu]]"
 
-#: db/models/fields/related.py:753
+#: db/models/fields/related.py:763
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Podržte  \"Control\" (nebo \"Command\" na Macu) pro vybrání více jak jedné "
 "položky."
 
-#: db/models/fields/related.py:830
+#: db/models/fields/related.py:840
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3617,74 +3618,74 @@ msgstr "Toto pole je povinné."
 msgid "Enter a valid value."
 msgstr "Vložte platnou hodnotu."
 
-#: forms/fields.py:135
+#: forms/fields.py:138
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr "Tato hodnota musí mít nejvíce %(max)d znaků (nyní jich má %(length)d)."
 
-#: forms/fields.py:136
+#: forms/fields.py:139
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr "Tato hodnota musí mít nejméně %(min)d znaků (nyní jich má %(length)d)."
 
-#: forms/fields.py:163
+#: forms/fields.py:166
 msgid "Enter a whole number."
 msgstr "Vložte celé číslo."
 
-#: forms/fields.py:164 forms/fields.py:193 forms/fields.py:222
+#: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Tato hodnota musí být menší nebo rovná %s."
 
-#: forms/fields.py:165 forms/fields.py:194 forms/fields.py:223
+#: forms/fields.py:168 forms/fields.py:197 forms/fields.py:226
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Tato hodnota musí být větší nebo rovná %s."
 
-#: forms/fields.py:192 forms/fields.py:221
+#: forms/fields.py:195 forms/fields.py:224
 msgid "Enter a number."
 msgstr "Vložte číslo."
 
-#: forms/fields.py:224
+#: forms/fields.py:227
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Tato hodnota nesmí mít celkem více než %s cifer."
 
-#: forms/fields.py:225
+#: forms/fields.py:228
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Tato hodnota nesmí mít za desetinou čárkou více než %s cifer."
 
-#: forms/fields.py:226
+#: forms/fields.py:229
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Tato hodnota nesmí mít před desetinnou čárkou více než %s cifer."
 
-#: forms/fields.py:284 forms/fields.py:844
+#: forms/fields.py:287 forms/fields.py:848
 msgid "Enter a valid date."
 msgstr "Vložte platné datum."
 
-#: forms/fields.py:318 forms/fields.py:845
+#: forms/fields.py:321 forms/fields.py:849
 msgid "Enter a valid time."
 msgstr "Vložte platný čas."
 
-#: forms/fields.py:357
+#: forms/fields.py:360
 msgid "Enter a valid date/time."
 msgstr "Vložte platný datum a čas."
 
-#: forms/fields.py:443
+#: forms/fields.py:446
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Soubor nebyl odeslán. Zkontrolujte \"encoding type\" formuláře."
 
-#: forms/fields.py:444
+#: forms/fields.py:447
 msgid "No file was submitted."
 msgstr "Žádný soubor nebyl poslán."
 
-#: forms/fields.py:445
+#: forms/fields.py:448
 msgid "The submitted file is empty."
 msgstr "Poslaný soubor je prázdný."
 
-#: forms/fields.py:474
+#: forms/fields.py:477
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -3692,28 +3693,28 @@ msgstr ""
 "Nahrajte na server platný obrázek. Poslaný soubor nebyl obrázkem nebo byl "
 "poškozen."
 
-#: forms/fields.py:535
+#: forms/fields.py:538
 msgid "Enter a valid URL."
 msgstr "Vložte platnou URL."
 
-#: forms/fields.py:536
+#: forms/fields.py:539
 msgid "This URL appears to be a broken link."
 msgstr "Tento odkaz nefunguje."
 
-#: forms/fields.py:615 forms/fields.py:693
+#: forms/fields.py:618 forms/fields.py:696
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Vyberte platnou možnost. Volba %(value)s není dostupná."
 
-#: forms/fields.py:694 forms/fields.py:755 forms/models.py:545
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:644
 msgid "Enter a list of values."
 msgstr "Vložte seznam hodnot."
 
-#: forms/fields.py:873
+#: forms/fields.py:877
 msgid "Enter a valid IPv4 address."
 msgstr "Vložte platnou IPv4 adresu."
 
-#: forms/fields.py:883
+#: forms/fields.py:887
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -3723,11 +3724,17 @@ msgstr ""
 msgid "Order"
 msgstr "Pořadí"
 
-#: forms/models.py:477
+#: forms/models.py:258 forms/models.py:267
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr ""
+"%(model_name)s s touto hodnotou v poli \"%(field_label)s\" již existuje."
+
+#: forms/models.py:574
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Vyberte platnou možnost. Tato není dostupná."
 
-#: forms/models.py:546
+#: forms/models.py:645
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Vyberte platnou možnost. Volba %s není dostupná."
@@ -4053,3 +4060,8 @@ msgstr "Záznam typu \"%(verbose_name)s\" byl úspěšně změněn."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "Záznam typu \"%(verbose_name)s\" byl smazán."
+
+#~ msgid "%(model_name)s with this %(field_labels)s already exists."
+#~ msgstr ""
+#~ "%(model_name)s s těmito hodnotami v polích \"%(field_labels)s\" již "
+#~ "existuje."
