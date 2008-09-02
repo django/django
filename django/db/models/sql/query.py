@@ -660,7 +660,8 @@ class Query(object):
         # Must use left outer joins for nullable fields.
         must_promote = False
         for join in joins:
-            must_promote = self.promote_alias(join, must_promote)
+            if self.promote_alias(join, must_promote):
+                must_promote = True
 
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model.
