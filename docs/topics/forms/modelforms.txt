@@ -387,15 +387,16 @@ tricky with subclassing.
 Model Formsets
 ==============
 
-Similar to regular formsets there are a couple enhanced formset classes that
-provide all the right things to work with your models. Lets reuse the
-``Author`` model from above::
+Similar to :ref:`regular formsets <topics-forms-formsets>` there are a couple
+enhanced formset classes that provide all the right things to work with your
+models. Lets reuse the ``Author`` model from above::
 
     >>> from django.forms.models import modelformset_factory
     >>> AuthorFormSet = modelformset_factory(Author)
 
 This will create a formset that is capable of working with the data associated
-to the ``Author`` model. It works just like a regular formset::
+to the ``Author`` model. It works just like a regular formset just that we are
+working with ``ModelForm`` instances instead of ``Form`` instances::
 
     >>> formset = AuthorFormSet()
     >>> print formset
@@ -434,6 +435,23 @@ Then your ``BaseAuthorFormSet`` would be passed into the factory function to
 be used as a base::
 
     >>> AuthorFormSet = modelformset_factory(Author, formset=BaseAuthorFormSet)
+
+Controlling which fields are used with ``fields`` and ``exclude``
+-----------------------------------------------------------------
+
+By default a model formset will use all fields in the model that are not marked
+with ``editable=False``. However, this can be overidden at the formset level::
+
+    >>> AuthorFormSet = modelformset_factory(Author, fields=('name', 'title'))
+
+Using ``fields`` will restrict the formset to use just the given fields. Or if
+you need to go the other way::
+
+    >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
+
+Using ``exclude`` will prevent the given fields from being used in the formset.
+
+.. _saving-objects-in-the-formset:
 
 Saving objects in the formset
 -----------------------------
@@ -516,17 +534,43 @@ formset to a user to edit ``Author`` model instances::
 
 As you can see the view is not drastically different than how to use a formset
 in a view. The only difference is that we call ``formset.save()`` to save the
-data into the database. This was describe above in :ref:`ref-saving-objects-in-the-formset`.
+data into the database. This is described above in
+:ref:`saving-objects-in-the-formset`.
 
 Using ``inlineformset_factory``
 -------------------------------
 
 The ``inlineformset_factory`` is a helper to a common usage pattern of working
-with related objects through a foreign key. Suppose you have two models
-``Author`` and ``Book``. You want to create a formset that works with the
-books of a specific author. Here is how you could accomplish this::
+with related objects through a foreign key. It takes all the same options as
+a ``modelformset_factory``. Suppose you have these two models::
+
+    class Author(models.Model):
+        name = models.CharField(max_length=100)
+    
+    class Book(models.Model):
+        author = models.ForeignKey(Author)
+        title = models.CharField(max_length=100)
+
+If you want to create a formset that allows you to edit books belonging to
+some author you would do::
 
     >>> from django.forms.models import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book)
     >>> author = Author.objects.get(name=u'Orson Scott Card')
     >>> formset = BookFormSet(instance=author)
+
+More than one foriegn key to the same model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If your model contains more than one foreign key to the same model you will
+need to resolve the ambiguity manually using ``fk_name``. Given the following
+model::
+
+    class Friendship(models.Model):
+        from_friend = models.ForeignKey(Friend)
+        to_friend = models.ForeignKey(Friend)
+        length_in_months = models.IntegerField()
+
+To resolve this you can simply use ``fk_name`` to ``inlineformset_factory``::
+
+    >>> FrienshipFormSet = inlineformset_factory(Friend, Friendship, fk_name="from_friend")
