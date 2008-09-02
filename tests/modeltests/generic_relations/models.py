@@ -27,6 +27,9 @@ class TaggedItem(models.Model):
     def __unicode__(self):
         return self.tag
 
+class ValuableTaggedItem(TaggedItem):
+    value = models.PositiveIntegerField()
+
 class Comparison(models.Model):
     """
     A model that tests having multiple GenericForeignKeys
@@ -204,6 +207,12 @@ __test__ = {'API_TESTS':"""
 >>> Comparison.objects.all()
 [<Comparison: tiger is stronger than None>]
 
+# GenericForeignKey should work with subclasses (see #8309)
+>>> quartz = Mineral.objects.create(name="Quartz", hardness=7)
+>>> valuedtag = ValuableTaggedItem(content_object=quartz, tag="shiny", value=10)
+>>> valuedtag.save()
+>>> valuedtag.content_object
+<Mineral: Quartz>
 
 # GenericInlineFormSet tests ##################################################
 

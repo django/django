@@ -24,11 +24,10 @@ class GenericForeignKey(object):
         self.fk_field = fk_field
 
     def contribute_to_class(self, cls, name):
-        # Make sure the fields exist (these raise FieldDoesNotExist,
-        # which is a fine error to raise here)
         self.name = name
         self.model = cls
         self.cache_attr = "_%s_cache" % name
+        cls._meta.add_virtual_field(self)
 
         # For some reason I don't totally understand, using weakrefs here doesn't work.
         signals.pre_init.connect(self.instance_pre_init, sender=cls, weak=False)

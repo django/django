@@ -26,6 +26,7 @@ DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
 class Options(object):
     def __init__(self, meta, app_label=None):
         self.local_fields, self.local_many_to_many = [], []
+        self.virtual_fields = []
         self.module_name, self.verbose_name = None, None
         self.verbose_name_plural = None
         self.db_table = ''
@@ -154,6 +155,9 @@ class Options(object):
 
         if hasattr(self, '_name_map'):
             del self._name_map
+
+    def add_virtual_field(self, field):
+        self.virtual_fields.append(field)
 
     def setup_pk(self, field):
         if not self.pk and field.primary_key:
