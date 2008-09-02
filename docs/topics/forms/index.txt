@@ -109,9 +109,8 @@ There are three code paths here:
     3. If the form has been submitted but is invalid, the bound form instance is
        passed on to the template.
 
-.. note::
-    **New in Django development version** The ``cleaned_data`` attribute was
-    called ``clean_data`` in earlier releases.
+.. versionchanged:: 1.0
+    The ``cleaned_data`` attribute was called ``clean_data`` in earlier releases.
 
 The distinction between **bound** and **unbound** forms is important. An unbound
 form does not have any data associated with it; when rendered to the user, it

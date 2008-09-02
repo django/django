@@ -315,10 +315,12 @@ many-to-many table would be stored in the ``indexes`` tablespace. The ``data``
 field would also generate an index, but no tablespace for it is specified, so
 it would be stored in the model tablespace ``tables`` by default.
 
-**New in the Django development version:** Use the :setting:`DEFAULT_TABLESPACE`
-and :setting:`DEFAULT_INDEX_TABLESPACE` settings to specify default values for
-the db_tablespace options. These are useful for setting a tablespace for the
-built-in Django apps and other applications whose code you cannot control.
+.. versionadded:: 1.0
+
+Use the :setting:`DEFAULT_TABLESPACE` and :setting:`DEFAULT_INDEX_TABLESPACE`
+settings to specify default values for the db_tablespace options.
+These are useful for setting a tablespace for the built-in Django apps and
+other applications whose code you cannot control.
 
 Django does not create the tablespaces for you. Please refer to `Oracle's
 documentation`_ for details on creating and managing tablespaces.

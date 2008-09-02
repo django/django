@@ -6,7 +6,7 @@ File Uploads
 
 .. currentmodule:: django.core.files
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Most Web sites wouldn't be complete without a way to upload files. When Django
 handles a file upload, the file data ends up placed in ``request.FILES`` (for

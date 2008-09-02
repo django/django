@@ -42,9 +42,11 @@ Optional arguments
                                   context_instance=RequestContext(request))
 
 ``mimetype``
-    **New in Django development version:** The MIME type to use for the
-    resulting document. Defaults to the value of the ``DEFAULT_CONTENT_TYPE``
-    setting.
+
+    .. versionadded:: 1.0
+
+    The MIME type to use for the resulting document. Defaults to the value of
+    the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
 Example
 -------

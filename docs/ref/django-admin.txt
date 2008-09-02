@@ -98,7 +98,7 @@ Available subcommands
 cleanup 
 -------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Can be run as a cronjob or directly to clean out old data from the database
 (only expired sessions at the moment).
@@ -106,7 +106,8 @@ Can be run as a cronjob or directly to clean out old data from the database
 compilemessages
 ---------------
 
-**New in Django development version**
+.. versionchanged:: 1.0
+   Before 1.0 this was the "bin/compile-messages.py" command.
 
 Compiles .po files created with ``makemessages`` to .mo files for use with
 the builtin gettext support. See :ref:`topics-i18n`.
@@ -134,7 +135,7 @@ createsuperuser
 
 .. django-admin:: createsuperuser 
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Creates a superuser account (a user who has all permissions). This is
 useful if you need to create an initial superuser account but did not
@@ -209,7 +210,7 @@ objects will be dumped.
 
 .. django-admin-option:: --exclude
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Exclude a specific application from the applications whose contents is
 output. For example, to specifically exclude the `auth` application from
@@ -383,7 +384,8 @@ Example usage::
 makemessages
 ------------
 
-**New in Django development version**
+.. versionchanged:: 1.0
+   Before 1.0 this was the "bin/make-messages.py" command.
 
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
@@ -734,7 +736,7 @@ Example usage::
 testserver <fixture fixture ...>
 --------------------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Runs a Django development server (as in ``runserver``) using data from the
 given fixture(s).

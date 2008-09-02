@@ -167,7 +167,8 @@ Methods
 
     .. method:: models.User.set_unusable_password()
 
-        **New in Django development version.**
+        .. versionadded:: 1.0
+
         Marks the user as having no password set.  This isn't the same as having
         a blank string for a password.
         :meth:`~django.contrib.auth.models.User.check_password()` for this user
@@ -179,7 +180,8 @@ Methods
 
     .. method:: models.User.has_usable_password()
 
-        **New in Django development version.**
+        .. versionadded:: 1.0
+
         Returns ``False`` if
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
         been called for this user.
@@ -363,12 +365,13 @@ they're used by Web requests, as explained in the next section.
 Creating superusers
 -------------------
 
+.. versionadded:: 1.0
+   The ``manage.py createsuperuser`` command is new.
+
 :djadmin:`manage.py syncdb <syncdb>` prompts you to create a superuser the first time
 you run it after adding ``'django.contrib.auth'`` to your
 :setting:`INSTALLED_APPS`. If you need to create a superuser at a later date,
 you can use a command line utility.
-
-**New in Django development version.**::
 
     manage.py createsuperuser --username=joe --email=joe@example.com
 
@@ -557,8 +560,10 @@ How to log a user out
     Note that :func:`~django.contrib.auth.logout()` doesn't throw any errors
     if the user wasn't logged in.
 
-    **New in Django development version:** When you call
-    :func:`~django.contrib.auth.logout()`, the session
+    .. versionchanged:: 1.0
+       Calling ``logout()`` now cleans session data.
+
+    When you call :func:`~django.contrib.auth.logout()`, the session
     data for the current request is completely cleaned out. All existing data
     is removed. This is to prevent another person from using the same web
     browser to log in and have access to the previous user's session data.

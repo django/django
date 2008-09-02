@@ -38,9 +38,9 @@ commonly used groups of widgets:
 
 .. class:: DateTimeInput
 
-    Date/time input as a simple text box: ``<input type='text' ...>``
+    .. versionadded:: 1.0
 
-    **New in Django development version:**
+    Date/time input as a simple text box: ``<input type='text' ...>``
 
 .. class:: Textarea
 

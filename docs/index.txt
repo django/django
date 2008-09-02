@@ -83,6 +83,7 @@ And more:
     * :ref:`topics-settings`
     * :ref:`topics-signals`
     * :ref:`topics-testing`
+    * :ref:`topics-http-sessions`
     
 Add-on ("contrib") applications
 ===============================

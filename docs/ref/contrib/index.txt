@@ -59,7 +59,9 @@ See :ref:`topics-auth`.
 comments
 ========
 
-**New in Django development version.**
+.. versionchanged:: 1.0
+   The comments application has been rewriten. See :ref:`ref-contrib-comments-upgrade`
+   for information on howto upgrade.
 
 A simple yet flexible comments system. See :ref:`ref-contrib-comments-index`.
 

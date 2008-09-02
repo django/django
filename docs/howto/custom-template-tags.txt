@@ -157,7 +157,7 @@ will use the function's name as the filter name.
 Filters and auto-escaping
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 When writing a custom filter, give some thought to how the filter will interact
 with Django's auto-escaping behavior. Note that three types of strings can be
@@ -422,7 +422,7 @@ without having to be parsed multiple times.
 Auto-escaping considerations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 The output from template tags is **not** automatically run through the
 auto-escaping filters. However, there are still a couple of things you should
@@ -547,7 +547,7 @@ current context, available in the ``render`` method::
 ``resolve_variable`` will try to resolve ``blog_entry.date_updated`` and then
 format it accordingly.
 
-.. admonition:: New in development version:
+.. versionadded:: 1.0
 
     Variable resolution has changed in the development version of Django.
     ``template.resolve_variable()`` is still available, but has been deprecated

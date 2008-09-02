@@ -220,7 +220,7 @@ The remaining arguments should be tuples in this format::
 url
 ---
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 You can use the ``url()`` function, instead of a tuple, as an argument to
 ``patterns()``. This is convenient if you want to specify a name without the
@@ -532,7 +532,7 @@ the view prefix (as explained in "The view prefix" above) will have no effect.
 Naming URL patterns
 ===================
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 It's fairly common to use the same view function in multiple URL patterns in
 your URLconf. For example, these two URL patterns both point to the ``archive``

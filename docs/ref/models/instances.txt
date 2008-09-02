@@ -62,7 +62,7 @@ documentation for ``AutoField`` for more details.
 The ``pk`` property
 ~~~~~~~~~~~~~~~~~~~
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 .. attribute:: Model.pk
 
@@ -172,7 +172,7 @@ auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
 Forcing an INSERT or UPDATE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 In some rare circumstances, it's necessary to be able to force the ``save()``
 method to perform an SQL ``INSERT`` and not fall back to doing an ``UPDATE``.

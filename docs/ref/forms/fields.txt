@@ -219,9 +219,10 @@ fields. We've specified ``auto_id=False`` to simplify the output::
 ``error_messages``
 ~~~~~~~~~~~~~~~~~~
 
+.. versionadded:: 1.0
+
 .. attribute:: Field.error_messages
 
-**New in Django development version**
 
 The ``error_messages`` argument lets you override the default messages that the
 field will raise. Pass in a dictionary with keys matching the error messages you
@@ -314,9 +315,9 @@ For each field, we describe the default widget used if you don't specify
       the field has ``required=True``.
     * Error message keys: ``required``
 
-**New in Django development version:** The empty value for a ``CheckboxInput``
-(and hence the standard ``BooleanField``) has changed to return ``False``
-instead of ``None`` in the development version.
+.. versionchanged:: 1.0
+   The empty value for a ``CheckboxInput`` (and hence the standard ``BooleanField``)
+   has changed to return ``False`` instead of ``None`` in the development version.
 
 .. note::
 
@@ -448,15 +449,15 @@ If no ``input_formats`` argument is provided, the default input formats are::
     '%m/%d/%y %H:%M',        # '10/25/06 14:30'
     '%m/%d/%y',              # '10/25/06'
 
-**New in Django development version:** The ``DateTimeField`` used to use a
-``TextInput`` widget by default. This has now changed.
+.. versionchanged:: 1.0
+   The ``DateTimeField`` used to use a ``TextInput`` widget by default. This has now changed.
 
 ``DecimalField``
 ~~~~~~~~~~~~~~~~
 
-.. class:: DecimalField(**kwargs)
+.. versionadded:: 1.0
 
-**New in Django development version**
+.. class:: DecimalField(**kwargs)
 
     * Default widget: ``TextInput``
     * Empty value: ``None``
@@ -503,9 +504,9 @@ given length.
 ``FileField``
 ~~~~~~~~~~~~~
 
-.. class:: FileField(**kwargs)
+.. versionadded:: 1.0
 
-**New in Django development version**
+.. class:: FileField(**kwargs)
 
     * Default widget: ``FileInput``
     * Empty value: ``None``
@@ -523,9 +524,9 @@ When you use a ``FileField`` in a form, you must also remember to
 ``FilePathField``
 ~~~~~~~~~~~~~~~~~
 
-.. class:: FilePathField(**kwargs)
+.. versionadded:: 1.0
 
-**New in Django development version**
+.. class:: FilePathField(**kwargs)
 
     * Default widget: ``Select``
     * Empty value: ``None``
@@ -569,9 +570,9 @@ These control the range of values permitted in the field.
 ``ImageField``
 ~~~~~~~~~~~~~~
 
-.. class:: ImageField(**kwargs)
+.. versionadded:: 1.0
 
-**New in Django development version**
+.. class:: ImageField(**kwargs)
 
     * Default widget: ``FileInput``
     * Empty value: ``None``

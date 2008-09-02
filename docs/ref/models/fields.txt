@@ -171,7 +171,7 @@ If ``True``, djadmin:`django-admin.py sqlindexes <sqlindexes>` will output a
 
 .. attribute:: Field.db_tablespace
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 The name of the database tablespace to use for this field's index, if this field
 is indexed. The default is the project's :setting:`DEFAULT_INDEX_TABLESPACE`
@@ -366,7 +366,7 @@ shortcuts.
 ``DecimalField``
 ----------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 .. class:: DecimalField(max_digits=None, decimal_places=None, [**options])
 
@@ -422,7 +422,7 @@ A file-upload field. Has one **required** argument:
     date/time of the file upload (so that uploaded files don't fill up the given
     directory).
     
-    **New in Django development version**
+    .. versionadded:: 1.0
 
     This may also be a callable, such as a function, which will be called to
     obtain the upload path, including the filename. This callable must be
@@ -452,7 +452,7 @@ Also has one optional argument:
 
 .. attribute:: FileField.storage
 
-    **New in Django development version.**
+    .. versionadded:: 1.0
     
     Optional. A storage object, which handles the storage and retrieval of your
     files. See :ref:`topics-files` for details on how to provide this object.
@@ -499,7 +499,10 @@ without validation, to a directory that's within your Web server's document
 root, then somebody could upload a CGI or PHP script and execute that script by
 visiting its URL on your site. Don't allow that.
 
-**New in development version:** By default, :class:`FileField` instances are
+.. versionadded:: 1.0
+   The ``max_length`` argument was added in this version.
+
+By default, :class:`FileField` instances are
 created as ``varchar(100)`` columns in your database. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
 
@@ -542,7 +545,10 @@ base filename, not the full path. So, this example::
 because the :attr:`~FilePathField.match` applies to the base filename
 (``foo.gif`` and ``bar.gif``).
 
-**New in development version:** By default, :class:`FilePathField` instances are
+.. versionadded:: 1.0
+   The ``max_length`` argument was added in this version.
+
+By default, :class:`FilePathField` instances are
 created as ``varchar(100)`` columns in your database. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
 
@@ -588,7 +594,10 @@ Requires the `Python Imaging Library`_.
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
-**New in development version:** By default, :class:`ImageField` instances are
+.. versionadded:: 1.0
+   The ``max_length`` argument was added in this version.
+
+By default, :class:`ImageField` instances are
 created as ``varchar(100)`` columns in your database. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
 
@@ -753,7 +762,10 @@ Note, however, that this only refers to models in the same ``models.py`` file --
 you cannot use a string to reference a model defined in another application or
 imported from elsewhere.
 
-**New in Django development version:** To refer to models defined in another
+.. versionchanged:: 1.0
+   Refering models in other applications must include the application label.
+
+To refer to models defined in another
 application, you must instead explicitly specify the application label. For
 example, if the ``Manufacturer`` model above is defined in another application
 called ``production``, you'd need to use::

@@ -114,9 +114,9 @@ the following output on the command line::
     Validating models...
     0 errors found.
 
-    Django version 0.96, using settings 'mysite.settings'
+    Django version 1.0, using settings 'mysite.settings'
     Development server is running at http://127.0.0.1:8000/
-    Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows).
+    Quit the server with CONTROL-C.
 
 You've started the Django development server, a lightweight Web server written
 purely in Python. We've included this with Django so you can develop things

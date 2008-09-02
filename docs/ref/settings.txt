@@ -287,7 +287,7 @@ Never deploy a site into production with ``DEBUG`` turned on.
 DEBUG_PROPAGATE_EXCEPTIONS
 --------------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``False``
 
@@ -342,7 +342,7 @@ site manager(s).
 DEFAULT_TABLESPACE
 ------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``''`` (Empty string)
 
@@ -354,7 +354,7 @@ backend supports it.
 DEFAULT_INDEX_TABLESPACE
 ------------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``''`` (Empty string)
 
@@ -435,7 +435,7 @@ trailing space.
 EMAIL_USE_TLS
 -------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``False``
 
@@ -446,7 +446,7 @@ Whether to use a TLS (secure) connection when talking to the SMTP server.
 FILE_CHARSET
 ------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``'utf-8'``
 
@@ -458,7 +458,7 @@ template files and initial SQL data files.
 FILE_UPLOAD_HANDLERS
 --------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default::
 
@@ -472,7 +472,7 @@ A tuple of handlers to use for uploading. See :ref:`topics-files` for details.
 FILE_UPLOAD_MAX_MEMORY_SIZE
 ---------------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``2621440`` (i.e. 2.5 MB).
 
@@ -484,7 +484,7 @@ the file system. See :ref:`topics-files` for details.
 FILE_UPLOAD_TEMP_DIR
 --------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``None``
 
@@ -615,7 +615,7 @@ standard language format. For example, U.S. English is ``"en-us"``. See
 LANGUAGE_COOKIE_NAME
 --------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``'django_language'``
 
@@ -679,7 +679,7 @@ See :ref:`translations-in-your-own-projects`.
 LOGIN_REDIRECT_URL
 ------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``'/accounts/profile/'``
 
@@ -694,7 +694,7 @@ decorator, for example.
 LOGIN_URL
 ---------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``'/accounts/login/'``
 
@@ -706,7 +706,7 @@ The URL where requests are redirected for login, specially when using the
 LOGOUT_URL
 ----------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``'/accounts/logout/'``
 
@@ -866,7 +866,7 @@ The e-mail address that error messages come from, such as those sent to
 SESSION_ENGINE
 --------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``django.contrib.sessions.backends.db``
 
@@ -913,7 +913,7 @@ should be different from ``LANGUAGE_COOKIE_NAME``). See the :ref:`topics-http-se
 SESSION_COOKIE_PATH
 -------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``'/'``
 
@@ -951,7 +951,7 @@ See the :ref:`topics-http-sessions`.
 SESSION_FILE_PATH
 -----------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``None``
 
@@ -1058,7 +1058,7 @@ misspelled) variables. See :ref:`invalid-template-variables`..
 TEST_DATABASE_CHARSET
 ---------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``None``
 
@@ -1076,7 +1076,7 @@ Supported for the PostgreSQL_ (``postgresql``, ``postgresql_psycopg2``) and MySQ
 TEST_DATABASE_COLLATION
 ------------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``None``
 

@@ -3,7 +3,7 @@
 Writing custom django-admin commands
 ====================================
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Applications can register their own actions with ``manage.py``. For example,
 you might want to add a ``manage.py`` action for a Django app that you're

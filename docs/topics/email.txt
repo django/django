@@ -181,7 +181,7 @@ from the request's POST data, sends that to admin@example.com and redirects to
 The EmailMessage and SMTPConnection classes
 ===========================================
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Django's ``send_mail()`` and ``send_mass_mail()`` functions are actually thin
 wrappers that make use of the ``EmailMessage`` and ``SMTPConnection`` classes

@@ -376,7 +376,7 @@ Examples::
 ``none()``
 ~~~~~~~~~~
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Returns an ``EmptyQuerySet`` -- a ``QuerySet`` that always evaluates to
 an empty list. This can be used in cases where you know that you should
@@ -458,7 +458,8 @@ follow::
     p = b.author         # Doesn't hit the database.
     c = p.hometown       # Requires a database call.
 
-The ``depth`` argument is new in the Django development version.
+.. versionadded:: 1.0
+   The ``depth`` argument is new in the Django development version.
 
 ``extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -518,7 +519,8 @@ of the arguments is required, but you should use at least one of them.
     some database backends, such as some MySQL versions, don't support
     subqueries.
 
-    **New in Django development version**
+    .. versionadded:: 1.0
+
     In some rare cases, you might wish to pass parameters to the SQL fragments
     in ``extra(select=...)```. For this purpose, use the ``select_params``
     parameter. Since ``select_params`` is a sequence and the ``select``
@@ -618,10 +620,6 @@ of the arguments is required, but you should use at least one of them.
     Good::
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
-
-**New in Django development version** The ``select_params`` argument to
-``extra()`` is new. Previously, you could attempt to pass parameters for
-``select`` in the ``params`` argument, but it worked very unreliably.
 
 QuerySet methods that do not return QuerySets
 ---------------------------------------------
@@ -853,10 +851,11 @@ SQL equivalents::
     SELECT ... WHERE id = 14;
     SELECT ... WHERE id IS NULL;
 
-**New in Django development version:** The semantics of ``id__exact=None`` have
-changed in the development version. Previously, it was (intentionally)
-converted to ``WHERE id = NULL`` at the SQL level, which would never match
-anything. It has now been changed to behave the same as ``id__isnull=True``.
+.. versionchanged:: 1.0
+   The semantics of ``id__exact=None`` have
+   changed in the development version. Previously, it was (intentionally)
+   converted to ``WHERE id = NULL`` at the SQL level, which would never match
+   anything. It has now been changed to behave the same as ``id__isnull=True``.
 
 .. admonition:: MySQL comparisons
 
@@ -1140,7 +1139,7 @@ database to add the full-text index.
 regex
 ~~~~~
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Case-sensitive regular expression match.
 
@@ -1168,7 +1167,7 @@ regular expression syntax is recommended.
 iregex
 ~~~~~~
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Case-insensitive regular expression match.
 

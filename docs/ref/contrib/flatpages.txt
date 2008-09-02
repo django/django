@@ -19,7 +19,7 @@ custom Django application.
 A flatpage can use a custom template or a default, systemwide flatpage
 template. It can be associated with one, or multiple, sites.
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 The content field may optionally be left blank if you prefer to put your 
 content in a custom template.

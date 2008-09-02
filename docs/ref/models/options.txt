@@ -55,7 +55,7 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.db_tablespace
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 The name of the database tablespace to use for the model. If the backend doesn't
 support tablespaces, this option is ignored.
@@ -152,7 +152,7 @@ It's used in the Django admin and is enforced at the database level (i.e., the
 appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
 statement).
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 For convenience, unique_together can be a single list when dealing with a single
 set of fields::

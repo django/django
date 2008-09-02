@@ -88,6 +88,34 @@ class DjangoHTMLTranslator(sphinx.htmlwriter.SmartyPantsHTMLTranslator):
     def depart_desc_parameterlist(self, node):
         self.body.append(')')
         pass
+        
+    #
+    # Turn the "new in version" stuff (versoinadded/versionchanged) into a
+    # better callout -- the Sphinx default is just a little span,
+    # which is a bit less obvious that I'd like.
+    #
+    # FIXME: these messages are all hardcoded in English. We need to chanage 
+    # that to accomodate other language docs, but I can't work out how to make
+    # that work and I think it'll require Sphinx 0.5 anyway.
+    #
+    version_text = {
+        'deprecated':       'Deprecated in Django %s',
+        'versionchanged':   'Changed in Django %s',
+        'versionadded':     'New in Django %s',
+    }
+    
+    def visit_versionmodified(self, node):
+        self.body.append(
+            self.starttag(node, 'div', CLASS=node['type'])
+        )
+        title = "%s%s" % (
+            self.version_text[node['type']] % node['version'],
+            len(node) and ":" or "."
+        )
+        self.body.append('<span class="title">%s</span> ' % title)
+    
+    def depart_versionmodified(self, node):
+        self.body.append("</div>\n")
     
     # Give each section a unique ID -- nice for custom CSS hooks
     # This is different on docutils 0.5 vs. 0.4...

@@ -216,10 +216,9 @@ We follow this policy:
     * As we add features to Django's development version, we try to update the
       documentation in the same Subversion commit transaction.
 
-    * To distinguish feature changes/additions in the docs, we use the phrase
-      **New in Django development version**. In practice, this means that the
-      current documentation on djangoproject.com can be used by users of either
-      the latest release *or* the development version.
+    * To distinguish feature changes/additions in the docs, we use the phrase:
+      "New in version X.Y", being X.Y the next release version (hence, the one
+      being developed).
 
     * Documentation for a particular Django release is frozen once the version
       has been released officially. It remains a snapshot of the docs as of the

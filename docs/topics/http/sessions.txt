@@ -25,8 +25,9 @@ To enable session functionality, do the following:
       and run ``manage.py syncdb`` to install the single database table
       that stores session data.
 
-      **New in development version**: this step is optional if you're not using
-      the database session backend; see `configuring the session engine`_.
+.. versionchanged:: 1.0
+   This step is optional if you're not using the database session backend;
+   see `configuring the session engine`_.
 
 If you don't want to use sessions, you might as well remove the
 ``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES`` and ``'django.contrib.sessions'``
@@ -35,7 +36,7 @@ from your ``INSTALLED_APPS``. It'll save you a small bit of overhead.
 Configuring the session engine
 ==============================
 
-**New in development version**.
+.. versionadded:: 1.0.
 
 By default, Django stores sessions in your database (using the model
 ``django.contrib.sessions.models.Session``). Though this is convenient, in
@@ -104,15 +105,18 @@ A session object has the following standard dictionary methods:
 
     * ``items()``
 
-    * ``setdefault()`` (**New in Django development version**)
+    * ``setdefault()``
 
-    * ``clear()`` (**New in Django development version**)
+    * ``clear()``
+
+.. versionadded:: 1.0
+   ``setdefault()`` and ``clear()`` are new in this version.
 
 It also has these methods:
 
     * ``flush()``
 
-      **New in Django development version**
+      .. versionadded:: 1.0
 
       Delete the current session data from the database and regenerate the
       session key value that is sent back to the user in the cookie. This is
@@ -140,7 +144,7 @@ It also has these methods:
 
     * ``set_expiry(value)``
 
-      **New in Django development version**
+      .. versionadded:: 1.0
 
       Sets the expiration time for the session. You can pass a number of
       different values:
@@ -161,7 +165,7 @@ It also has these methods:
 
     * ``get_expiry_age()``
 
-      **New in Django development version**
+      .. versionadded:: 1.0
 
       Returns the number of seconds until this session expires. For sessions
       with no custom expiration (or those set to expire at browser close), this
@@ -169,7 +173,7 @@ It also has these methods:
 
     * ``get_expiry_date()``
 
-      **New in Django development version**
+      .. versionadded:: 1.0
 
       Returns the date this session will expire. For sessions with no custom
       expiration (or those set to expire at browser close), this will equal the
@@ -177,7 +181,7 @@ It also has these methods:
 
     * ``get_expire_at_browser_close()``
 
-      **New in Django development version**
+      .. versionadded:: 1.0
 
       Returns either ``True`` or ``False``, depending on whether the user's
       session cookie will expire when the user's Web browser is closed.
@@ -265,7 +269,7 @@ Here's a typical usage example::
 Using sessions out of views
 ===========================
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 An API is available to manipulate session data outside of a view::
 
@@ -347,7 +351,7 @@ browser-length cookies -- cookies that expire as soon as the user closes his or
 her browser. Use this if you want people to have to log in every time they open
 a browser.
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 This setting is a global default and can be overwritten at a per-session level
 by explicitly calling ``request.session.set_expiry()`` as described above in
@@ -378,7 +382,7 @@ A few :ref:`Django settings <ref-settings>` give you control over session behavi
 SESSION_ENGINE
 --------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``django.contrib.sessions.backends.db``
 
@@ -393,7 +397,7 @@ See `configuring the session engine`_ for more details.
 SESSION_FILE_PATH
 -----------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Default: ``/tmp/``
 

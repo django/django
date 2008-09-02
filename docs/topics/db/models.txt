@@ -360,7 +360,7 @@ work; all are optional.
 Extra fields on many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**New in Django development version** 
+.. versionadded:: 1.0
 
 When you're only dealing with simple many-to-many relationships such as
 mixing and matching pizzas and toppings, a standard :class:`~django.db.models.ManyToManyField` is all you need. However, sometimes
@@ -581,7 +581,7 @@ particular database engine.
 Custom field types
 ------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 If one of the existing model fields cannot be used to fit your purposes, or if
 you wish to take advantage of some less common database column types, you can
@@ -762,7 +762,7 @@ query.
 Model inheritance
 =================
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Model inheritance in Django works almost identically to the way normal
 class inheritance works in Python. The only decision you have to make

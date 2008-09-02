@@ -434,7 +434,7 @@ those latter objects, you could write::
 Spanning multi-valued relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 When you are filtering an object based on a ``ManyToManyField`` or a reverse
 ``ForeignKeyField``, there are two different sorts of filter you may be
@@ -708,7 +708,7 @@ complete query set::
 Updating multiple objects at once
 =================================
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Sometimes you want to set a field to a particular value for all the objects in
 a ``QuerySet``. You can do this with the ``update()`` method. For example::

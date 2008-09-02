@@ -157,9 +157,8 @@ object::
     >>> f.cleaned_data
     {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
 
-.. note::
-    **New in Django development version** The ``cleaned_data`` attribute was
-    called ``clean_data`` in earlier releases.
+.. versionchanged:: 1.0
+    The ``cleaned_data`` attribute was called ``clean_data`` in earlier releases.
 
 Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
 always cleans the input into a Unicode string. We'll cover the encoding
@@ -564,7 +563,7 @@ when printed::
 Binding uploaded files to a form
 --------------------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Dealing with forms that have ``FileField`` and ``ImageField`` fields
 is a little more complicated than a normal form.

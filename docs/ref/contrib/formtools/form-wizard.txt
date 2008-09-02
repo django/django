@@ -7,7 +7,7 @@ Form wizard
 .. module:: django.contrib.formtools.wizard
     :synopsis: Splits forms across multiple Web pages.
 
-**New in Django development version.**
+.. versionadded:: 1.0
 
 Django comes with an optional "form wizard" application that splits
 :ref:`forms <topics-forms-index>` across multiple Web pages. It maintains

@@ -395,7 +395,7 @@ wouldn't know which one of the blocks' content to use.
 Automatic HTML escaping
 =======================
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 When generating HTML from templates, there's always a risk that a variable will
 include characters that affect the resulting HTML. For example, consider this

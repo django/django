@@ -198,9 +198,10 @@ a date in the *future* are not included unless you set ``allow_future`` to
       specified in ``date_field`` is greater than the current date/time. By
       default, this is ``False``.
 
-    * **New in Django development version:** ``template_object_name``:
-      Designates the name of the template variable to use in the template
-      context. By default, this is ``'latest'``.
+    .. versionadded:: 1.0
+
+    * ``template_object_name``: Designates the name of the template variable
+      to use in the template context. By default, this is ``'latest'``.
 
 **Template name:**
 
@@ -223,14 +224,16 @@ In addition to ``extra_context``, the template's context will be:
       ordered in reverse. This is equivalent to
       ``queryset.dates(date_field, 'year')[::-1]``.
 
+    .. versionchanged:: 1.0
+       The behaviour depending on ``template_object_name`` is new in this version.
+
     * ``latest``: The ``num_latest`` objects in the system, ordered descending
       by ``date_field``. For example, if ``num_latest`` is ``10``, then
       ``latest`` will be a list of the latest 10 objects in ``queryset``.
 
-      **New in Django development version:** This variable's name depends on
-      the ``template_object_name`` parameter, which is ``'latest'`` by default.
-      If ``template_object_name`` is ``'foo'``, this variable's name will be
-      ``foo``.
+      This variable's name depends on the ``template_object_name`` parameter,
+      which is ``'latest'`` by default. If ``template_object_name`` is
+      ``'foo'``, this variable's name will be ``foo``.
 
 ``django.views.generic.date_based.archive_year``
 ------------------------------------------------
@@ -733,6 +736,9 @@ If ``template_name`` isn't specified, this view will use the template
 
 **Template context:**
 
+.. versionadded:: 1.0
+   The ``paginator`` and ``page_obj`` context variables are new.
+
 In addition to ``extra_context``, the template's context will be:
 
     * ``object_list``: The list of objects. This variable's name depends on the
@@ -746,11 +752,9 @@ In addition to ``extra_context``, the template's context will be:
 
 If the results are paginated, the context will contain these extra variables:
 
-    * **New in Django development version:** ``paginator``: An instance of
-      ``django.core.paginator.Paginator``.
+    * ``paginator``: An instance of ``django.core.paginator.Paginator``.
 
-    * **New in Django development version:** ``page_obj``: An instance of
-      ``django.core.paginator.Page``.
+    * ``page_obj``: An instance of ``django.core.paginator.Page``.
 
 Notes on pagination
 ~~~~~~~~~~~~~~~~~~~
@@ -778,7 +782,7 @@ represented as page ``1``.
 For more on pagination, read the :ref:`pagination documentation
 <topics-pagination>`.
 
-**New in Django development version:** 
+.. versionadded:: 1.0
 
 As a special case, you are also permitted to use ``last`` as a value for
 ``page``::

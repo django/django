@@ -265,10 +265,13 @@ request to the URL :file:`/rss/beats/0613/`:
       :exc:`ObjectDoesNotExist` in :meth:`get_object()` tells Django to produce
       a 404 error for that request.
 
-      **New in Django development version:** The :meth:`get_object()` method
-      also has a chance to handle the :file:`/rss/beats/` url. In this case,
-      :data:`bits` will be an empty list. In our example, ``len(bits) != 1`` and
-      an :exc:`ObjectDoesNotExist` exception will be raised, so
+      .. versionadded:: 1.0
+         meth:`get_object()` can handle the :file:`/rss/beats/` url.
+
+      The :meth:`get_object()` method also has a chance to handle the
+      :file:`/rss/beats/` url. In this case, :data:`bits` will be an
+      empty list. In our example, ``len(bits) != 1`` and an
+      :exc:`ObjectDoesNotExist` exception will be raised, so
       :file:`/rss/beats/` will generate a 404 page. But you can handle this case
       however you like. For example, you could generate a combined feed for all
       beats.
@@ -476,8 +479,6 @@ This example illustrates all possible attributes and methods for a
         # for them in this order. This property is only used for Atom feeds
         # (where it is the feed-level ID element). If not provided, the feed
         # link is used as the ID.
-        #
-        # (New in Django development version)
 
         def feed_guid(self, obj):
             """
@@ -652,8 +653,6 @@ This example illustrates all possible attributes and methods for a
         # ITEM_GUID -- The following method is optional. This property is
         # only used for Atom feeds (it is the ID element for an item in an
         # Atom feed). If not provided, the item's link is used by default.
-        #
-        # (New in Django development version)
 
         def item_guid(self, obj):
             """

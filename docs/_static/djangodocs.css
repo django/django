@@ -107,6 +107,10 @@ dt .literal, table .literal { background:none; }
 div.admonition-philosophy { padding-left:65px; background:url(docicons-philosophy.gif) .8em .8em no-repeat;}
 div.admonition-behind-the-scenes { padding-left:65px; background:url(docicons-behindscenes.gif) .8em .8em no-repeat;}
 
+/*** versoinadded/changes ***/
+div.versionadded, div.versionchanged {  }
+div.versionadded span.title, div.versionchanged span.title { font-weight: bold; }
+
 /*** p-links ***/
 a.headerlink { color: #c60f0f; font-size: 0.8em; padding: 0 4px 0 4px; text-decoration: none; visibility: hidden; }
 h1:hover > a.headerlink, h2:hover > a.headerlink, h3:hover > a.headerlink, h4:hover > a.headerlink, h5:hover > a.headerlink, h6:hover > a.headerlink, dt:hover > a.headerlink { visibility: visible; }

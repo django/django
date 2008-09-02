@@ -4,7 +4,7 @@
 Managing files
 ==============
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 This document describes Django's file access APIs.
 

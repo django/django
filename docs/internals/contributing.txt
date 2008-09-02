@@ -572,28 +572,20 @@ Documentation changes come in two forms:
     * New features -- Documentation of features that have been added to the
       framework since the last release.
 
-Our philosophy is that "general improvements" are something that *all* current
-Django users should benefit from, including users of trunk *and* users of the
-latest release. Hence, the documentation section on djangoproject.com points
-people by default to the newest versions of the docs, because they have the
-latest and greatest content. (In fact, the Web site pulls directly from the
-Subversion repository, converting to HTML on the fly.)
-
-But this decision to feature bleeding-edge documentation has one large caveat:
-any documentation of *new* features will be seen by Django users who don't
-necessarily have access to those features yet, because they're only using the
-latest release. Thus, our policy is:
+Our policy is:
 
     **All documentation of new features should be written in a way that clearly
     designates the features are only available in the Django development
     version. Assume documentation readers are using the latest release, not the
     development version.**
 
-Our traditional way of marking new features is by prefacing the features'
-documentation with: "New in Django development version." Changes aren't
-*required* to include this exact text, but all documentation of new features
-should include the phrase "development version," so we can find and remove
-those phrases for the next release.
+Our prefered way for marking new features is by prefacing the features'
+documentation with: ".. versionadded:: X.Y", followed by an optional one line
+comment and a mandatory blank line.
+
+General improvements, or other changes to the APIs that should be emphasised
+should use the ".. versionchanged:: X.Y" directive (with the same format as the
+``versionadded`` mentioned above.
 
 Guidelines for ReST files
 -------------------------

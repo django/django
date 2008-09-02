@@ -54,9 +54,10 @@ Adds a few conveniences for perfectionists:
       don't have a valid URL pattern for ``foo.com/bar`` but *do* have a valid
       pattern for ``foo.com/bar/``.
 
-      **New in Django development version:** The behavior of
-      :setting:`APPEND_SLASH` has changed slightly in the development version.
-      It didn't used to check whether the pattern was matched in the URLconf.
+      .. versionchanged:: 1.0
+         The behavior of :setting:`APPEND_SLASH` has changed slightly in this
+         version. It didn't used to check whether the pattern was matched in
+         the URLconf.
 
       If :setting:`PREPEND_WWW` is ``True``, URLs that lack a leading "www."
       will be redirected to the same URL with a leading "www."
@@ -175,7 +176,7 @@ CSRF protection middleware
 
 .. class:: django.contrib.csrf.middleware.CsrfMiddleware
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Adds protection against Cross Site Request Forgeries by adding hidden form
 fields to POST forms and checking requests for the correct value. See the

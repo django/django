@@ -342,7 +342,7 @@ each time you call ``save()``.
 Pinging Google via `manage.py`
 ------------------------------
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 Once the sitemaps application is added to your project, you may also
 ping the Google server's through the command line manage.py interface::

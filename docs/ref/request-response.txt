@@ -49,7 +49,7 @@ All attributes except ``session`` should be considered read-only.
 
 .. attribute:: HttpRequest.encoding
 
-    **New in Django development version**
+    .. versionadded:: 1.0
 
     A string representing the current encoding used to decode form submission
     data (or ``None``, which means the ``DEFAULT_CHARSET`` setting is used).
@@ -183,7 +183,7 @@ Methods
 
 .. method:: HttpRequest.get_host()
 
-   **New in Django development version**
+   .. versionadded:: 1.0
 
    Returns the originating host of the request using information from the
    ``HTTP_X_FORWARDED_HOST`` and ``HTTP_HOST`` headers (in that order). If
@@ -202,7 +202,7 @@ Methods
 
 .. method:: HttpRequest.build_absolute_uri(location)
 
-   **New in Django development version**
+   .. versionadded:: 1.0
 
    Returns the absolute URI form of ``location``. If no location is provided,
    the location will be set to ``request.get_full_path()``.
@@ -220,7 +220,7 @@ Methods
 
 .. method:: HttpRequest.is_ajax()
 
-   **New in Django development version**
+   .. versionadded:: 1.0
 
    Returns ``True`` if the request was made via an ``XMLHttpRequest``, by checking
    the ``HTTP_X_REQUESTED_WITH`` header for the string ``'XMLHttpRequest'``. The
@@ -448,13 +448,15 @@ Methods
 
     ``status`` is the `HTTP Status code`_ for the response.
 
-    **(New in Django development version)** ``content_type`` is an alias for
-    ``mimetype``. Historically, the parameter was only called ``mimetype``,
-    but since this is actually the value included in the HTTP ``Content-Type``
-    header, it can also include the character set encoding, which makes it
-    more than just a MIME type specification. If ``mimetype`` is specified
-    (not ``None``), that value is used. Otherwise, ``content_type`` is used. If
-    neither is given, the ``DEFAULT_CONTENT_TYPE`` setting is used.
+    .. versionadded:: 1.0
+
+    ``content_type`` is an alias for ``mimetype``. Historically, this parameter
+    was only called ``mimetype``, but since this is actually the value included
+    in the HTTP ``Content-Type`` header, it can also include the character set
+    encoding, which makes it more than just a MIME type specification.
+    If ``mimetype`` is specified (not ``None``), that value is used.
+    Otherwise, ``content_type`` is used. If neither is given, the
+    ``DEFAULT_CONTENT_TYPE`` setting is used.
 
 .. method:: HttpResponse.__setitem__(header, value)
 
@@ -548,8 +550,9 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 .. class:: HttpResponseBadRequest
 
-    **New in Django development version.** Acts just like :class:`HttpResponse`
-    but uses a 400 status code.
+    .. versionadded:: 1.0
+
+    Acts just like :class:`HttpResponse` but uses a 400 status code.
 
 .. class:: HttpResponseNotFound
 
