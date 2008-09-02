@@ -851,6 +851,104 @@ and ``GenericStackedInline`` and behave just like any other inline. See the
 :ref:`contenttypes documentation <ref-contrib-contenttypes>` for more specific
 information.
 
+Overriding Admin Templates
+==========================
+
+It is relatively easy to override many of the templates which the admin module
+uses to generate the various pages of an admin site. You can even override a few
+of these templates for a specific app, or a specific model.
+
+Set up your projects admin template directories
+-----------------------------------------------
+
+The admin template files are located in the ``contrib/admin/templates/admin``
+directory.
+
+In order to override one or more of them, first create an ``admin`` directory in
+your project's ``templates`` directory. This can be any of the directories you
+specified in ``TEMPLATE_DIRS``.
+
+Within this ``admin`` directory, create sub-directories named after your app.
+Within these app subdirectories create sub-directories named after your models.
+Note, that the admin app will lowercase the model name when looking for the
+directory, so make sure you name the directory in all lowercase if you are going
+to run your app on a case-sensitive filesystem.
+
+To override an admin template for a specific app, copy and edit the template
+from the ``django/contrib/admin/templates/admin`` directory, and save it to one
+of the directories you just created.
+
+For example, if we wanted to add a tool to the change list view for all the
+models in an app named ``my_app``, we would copy
+``contrib/admin/templates/admin/change_list.html`` to the
+``templates/admin/my_app/`` directory of our project, and make any necessary
+changes.
+
+If we wanted to add a tool to the change list view for only a specific model
+named 'Page', we would copy that same file to the
+``templates/admin/my_app/page`` directory of our project.
+
+Overriding vs. replacing an admin template
+------------------------------------------
+
+Because of the modular design of the admin templates, it is usually neither
+necessary nor advisable to replace an entire template. It is almost always
+better to override only the section of the template which you need to change.
+
+To continue the example above, we want to add a new link next to the ``History``
+tool for the ``Page`` model. After looking at ``change_form.html`` we determine
+that we only need to override the ``object-tools`` block. Therefore here is our
+new ``change_form.html`` ::
+
+    {% extends "admin/change_form.html" %}
+    {% load i18n %}
+    {% block object-tools %}
+    {% if change %}{% if not is_popup %}
+      <ul class="object-tools">
+        <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+        <li><a href="mylink/" class="historylink">My Link</a></li>
+        {% if has_absolute_url %}
+            <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">
+                {% trans "View on site" %}</a>
+            </li>
+        {% endif%}
+      </ul>
+    {% endif %}{% endif %}
+    {% endblock %}
+
+And that's it! If we placed this file in the ``templates/admin/my_app``
+directory, our link would appear on every model's change form.
+
+Templates which may be overridden per app or model
+--------------------------------------------------
+
+Not every template in ``contrib\admin\templates\admin`` may be overridden per
+app or per model. The following can:
+
+    * ``change_form.html``
+    * ``change_list.html``
+    * ``delete_confirmation.html``
+    * ``object_history.html``
+
+For those templates that cannot be overridden in this way, you may still
+override them for your entire project. Just place the new version in your
+``templates/admin`` directory. This is particularly useful to create custom 404
+and 500 pages.
+
+.. note::
+
+    Some of the admin templates, such as ``change_list_request.html`` are used
+    to render custom inclusion tags. These may be overridden, but in such cases
+    you are probably better off creating your own version of the tag in question
+    and giving it a different name. That way you can use it selectively.
+
+Root and login templates
+------------------------
+
+If you wish to change the index or login templates, you are better off creating
+your own ``AdminSite`` instance (see below), and changing the ``index_template``
+or ``login_template`` properties.
+
 ``AdminSite`` objects
 =====================
 
