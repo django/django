@@ -1,7 +1,5 @@
 import base64
-import cPickle as pickle
 import re
-
 from django import http, template
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth import authenticate, login
@@ -23,19 +21,6 @@ class AlreadyRegistered(Exception):
 
 class NotRegistered(Exception):
     pass
-
-def _encode_post_data(post_data):
-    pickled = pickle.dumps(post_data)
-    pickled_md5 = md5_constructor(pickled + settings.SECRET_KEY).hexdigest()
-    return base64.encodestring(pickled + pickled_md5)
-
-def _decode_post_data(encoded_data):
-    encoded_data = base64.decodestring(encoded_data)
-    pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
-    if md5_constructor(pickled + settings.SECRET_KEY).hexdigest() != tamper_check:
-        from django.core.exceptions import SuspiciousOperation
-        raise SuspiciousOperation, "User may have tampered with session cookie."
-    return pickle.loads(pickled)
 
 class AdminSite(object):
     """
@@ -239,7 +224,7 @@ class AdminSite(object):
         # If this isn't already the login page, display it.
         if not request.POST.has_key(LOGIN_FORM_KEY):
             if request.POST:
-                message = _("Please log in again, because your session has expired. Don't worry: Your submission has been saved.")
+                message = _("Please log in again, because your session has expired.")
             else:
                 message = ""
             return self.display_login_form(request, message)
@@ -275,15 +260,7 @@ class AdminSite(object):
         else:
             if user.is_active and user.is_staff:
                 login(request, user)
-                if request.POST.has_key('post_data'):
-                    post_data = _decode_post_data(request.POST['post_data'])
-                    if post_data and not post_data.has_key(LOGIN_FORM_KEY):
-                        # overwrite request.POST with the saved post_data, and continue
-                        request.POST = post_data
-                        request.user = user
-                        return self.root(request, request.path.split(self.root_path)[-1])
-                    else:
-                        return http.HttpResponseRedirect(request.get_full_path())
+                return http.HttpResponseRedirect(request.get_full_path())
             else:
                 return self.display_login_form(request, ERROR_MESSAGE)
     login = never_cache(login)
@@ -345,19 +322,9 @@ class AdminSite(object):
 
     def display_login_form(self, request, error_message='', extra_context=None):
         request.session.set_test_cookie()
-        if request.POST and request.POST.has_key('post_data'):
-            # User has failed login BUT has previously saved post data.
-            post_data = request.POST['post_data']
-        elif request.POST:
-            # User's session must have expired; save their post data.
-            post_data = _encode_post_data(request.POST)
-        else:
-            post_data = _encode_post_data({})
-
         context = {
             'title': _('Log in'),
             'app_path': request.get_full_path(),
-            'post_data': post_data,
             'error_message': error_message,
             'root_path': self.root_path,
         }

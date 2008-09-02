@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.models import LogEntry
-from django.contrib.admin.sites import LOGIN_FORM_KEY, _encode_post_data
+from django.contrib.admin.sites import LOGIN_FORM_KEY
 from django.contrib.admin.util import quote
 from django.utils.html import escape
 
@@ -136,31 +136,31 @@ class AdminViewPermissionsTest(TestCase):
             Section._meta.get_delete_permission()))
 
         # login POST dicts
-        self.super_login = {'post_data': _encode_post_data({}),
+        self.super_login = {
                      LOGIN_FORM_KEY: 1,
                      'username': 'super',
                      'password': 'secret'}
-        self.super_email_login = {'post_data': _encode_post_data({}),
+        self.super_email_login = {
                      LOGIN_FORM_KEY: 1,
                      'username': 'super@example.com',
                      'password': 'secret'}
-        self.super_email_bad_login = {'post_data': _encode_post_data({}),
+        self.super_email_bad_login = {
                       LOGIN_FORM_KEY: 1,
                       'username': 'super@example.com',
                       'password': 'notsecret'}
-        self.adduser_login = {'post_data': _encode_post_data({}),
+        self.adduser_login = {
                      LOGIN_FORM_KEY: 1,
                      'username': 'adduser',
                      'password': 'secret'}
-        self.changeuser_login = {'post_data': _encode_post_data({}),
+        self.changeuser_login = {
                      LOGIN_FORM_KEY: 1,
                      'username': 'changeuser',
                      'password': 'secret'}
-        self.deleteuser_login = {'post_data': _encode_post_data({}),
+        self.deleteuser_login = {
                      LOGIN_FORM_KEY: 1,
                      'username': 'deleteuser',
                      'password': 'secret'}
-        self.joepublic_login = {'post_data': _encode_post_data({}),
+        self.joepublic_login = {
                      LOGIN_FORM_KEY: 1,
                      'username': 'joepublic',
                      'password': 'secret'}
@@ -269,17 +269,6 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
         self.assertRedirects(post, '/test_admin/admin/admin_views/article/')
         self.failUnlessEqual(Article.objects.all().count(), 3)
-        self.client.get('/test_admin/admin/logout/')
-
-        # Check and make sure that if user expires, data still persists
-        post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
-        self.assertContains(post, 'Please log in again, because your session has expired.')
-        self.super_login['post_data'] = _encode_post_data(add_dict)
-        post = self.client.post('/test_admin/admin/admin_views/article/add/', self.super_login)
-        # make sure the view removes test cookie
-        self.failUnlessEqual(self.client.session.test_cookie_worked(), False)
-        self.assertRedirects(post, '/test_admin/admin/admin_views/article/')
-        self.failUnlessEqual(Article.objects.all().count(), 4)
         self.client.get('/test_admin/admin/logout/')
 
         # 8509 - if a normal user is already logged in, it is possible
@@ -489,31 +478,31 @@ class SecureViewTest(TestCase):
 
     def setUp(self):
         # login POST dicts
-        self.super_login = {'post_data': _encode_post_data({}),
+        self.super_login = {
                      LOGIN_FORM_KEY: 1,
                      'username': 'super',
                      'password': 'secret'}
-        self.super_email_login = {'post_data': _encode_post_data({}),
+        self.super_email_login = {
                      LOGIN_FORM_KEY: 1,
                      'username': 'super@example.com',
                      'password': 'secret'}
-        self.super_email_bad_login = {'post_data': _encode_post_data({}),
+        self.super_email_bad_login = {
                       LOGIN_FORM_KEY: 1,
                       'username': 'super@example.com',
                       'password': 'notsecret'}
-        self.adduser_login = {'post_data': _encode_post_data({}),
+        self.adduser_login = {
                      LOGIN_FORM_KEY: 1,
                      'username': 'adduser',
                      'password': 'secret'}
-        self.changeuser_login = {'post_data': _encode_post_data({}),
+        self.changeuser_login = {
                      LOGIN_FORM_KEY: 1,
                      'username': 'changeuser',
                      'password': 'secret'}
-        self.deleteuser_login = {'post_data': _encode_post_data({}),
+        self.deleteuser_login = {
                      LOGIN_FORM_KEY: 1,
                      'username': 'deleteuser',
                      'password': 'secret'}
-        self.joepublic_login = {'post_data': _encode_post_data({}),
+        self.joepublic_login = {
                      LOGIN_FORM_KEY: 1,
                      'username': 'joepublic',
                      'password': 'secret'}
@@ -597,17 +586,6 @@ class SecureViewTest(TestCase):
         # Login.context is a list of context dicts we just need to check the first one.
         self.assert_(login.context[0].get('error_message'))
 
-        # Check and make sure that if user expires, data still persists
-        data = {'foo': 'bar'}
-        post = self.client.post('/test_admin/admin/secure-view/', data)
-        self.assertContains(post, 'Please log in again, because your session has expired.')
-        self.super_login['post_data'] = _encode_post_data(data)
-        post = self.client.post('/test_admin/admin/secure-view/', self.super_login)
-        # make sure the view removes test cookie
-        self.failUnlessEqual(self.client.session.test_cookie_worked(), False)
-        self.assertContains(post, "{'foo': 'bar'}")
-        self.client.get('/test_admin/admin/logout/')
-                
         # 8509 - if a normal user is already logged in, it is possible
         # to change user into the superuser without error
         login = self.client.login(username='joepublic', password='secret')
