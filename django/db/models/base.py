@@ -67,11 +67,7 @@ class ModelBase(type):
                 if not hasattr(meta, 'get_latest_by'):
                     new_class._meta.get_latest_by = base_meta.get_latest_by
 
-        old_default_mgr = None
         if getattr(new_class, '_default_manager', None):
-            # We have a parent who set the default manager.
-            if new_class._default_manager.model._meta.abstract:
-                old_default_mgr = new_class._default_manager
             new_class._default_manager = None
 
         # Bail out early if we have already created this class.
@@ -111,6 +107,14 @@ class ModelBase(type):
                                 % (field.name, name, base.__name__))
                     new_class.add_to_class(field.name, copy.deepcopy(field))
 
+            # Inherit managers from the abstract base classes.
+            base_managers = base._meta.abstract_managers
+            base_managers.sort()
+            for _, mgr_name, manager in base_managers:
+                val = getattr(new_class, mgr_name, None)
+                if not val or val is manager:
+                    new_manager = manager._copy_to_model(new_class)
+                    new_class.add_to_class(mgr_name, new_manager)
         if abstract:
             # Abstract base models can't be instantiated and don't appear in
             # the list of models for an app. We do the final setup for them a
@@ -119,8 +123,6 @@ class ModelBase(type):
             new_class.Meta = attr_meta
             return new_class
 
-        if old_default_mgr and not new_class._default_manager:
-            new_class._default_manager = old_default_mgr._copy_to_model(new_class)
         new_class._prepare()
         register_models(new_class._meta.app_label, new_class)
 

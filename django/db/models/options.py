@@ -44,6 +44,9 @@ class Options(object):
         self.abstract = False
         self.parents = SortedDict()
         self.duplicate_targets = {}
+        # Managers that have been inherited from abstract base classes. These
+        # are passed onto any children.
+        self.abstract_managers = []
 
     def contribute_to_class(self, cls, name):
         from django.db import connection

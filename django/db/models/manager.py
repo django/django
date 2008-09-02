@@ -23,10 +23,9 @@ class Manager(object):
 
     def __init__(self):
         super(Manager, self).__init__()
-        # Increase the creation counter, and save our local copy.
-        self.creation_counter = Manager.creation_counter
-        Manager.creation_counter += 1
+        self._set_creation_counter()
         self.model = None
+        self._inherited = False
 
     def contribute_to_class(self, model, name):
         # TODO: Use weakref because of possible memory leak / circular reference.
@@ -34,6 +33,17 @@ class Manager(object):
         setattr(model, name, ManagerDescriptor(self))
         if not getattr(model, '_default_manager', None) or self.creation_counter < model._default_manager.creation_counter:
             model._default_manager = self
+        if model._meta.abstract or self._inherited:
+            model._meta.abstract_managers.append((self.creation_counter, name,
+                    self))
+
+    def _set_creation_counter(self):
+        """
+        Sets the creation counter value for this instance and increments the
+        class-level copy.
+        """
+        self.creation_counter = Manager.creation_counter
+        Manager.creation_counter += 1
 
     def _copy_to_model(self, model):
         """
@@ -43,7 +53,9 @@ class Manager(object):
         """
         assert issubclass(model, self.model)
         mgr = copy.copy(self)
+        mgr._set_creation_counter()
         mgr.model = model
+        mgr._inherited = True
         return mgr
 
     #######################
