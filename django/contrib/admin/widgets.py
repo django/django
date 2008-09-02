@@ -126,7 +126,14 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     def base_url_parameters(self):
         params = {}
         if self.rel.limit_choices_to:
-            params.update(dict([(k, ','.join(v)) for k, v in self.rel.limit_choices_to.items()]))
+            items = []
+            for k, v in self.rel.limit_choices_to.items():
+                if isinstance(v, list):
+                    v = [str(x) for x in v]
+                else:
+                    v = str(v)
+                items.append((k, ','.join(v)))
+            params.update(dict(items))
         return params    
     
     def url_parameters(self):
