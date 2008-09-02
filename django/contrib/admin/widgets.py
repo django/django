@@ -105,13 +105,12 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         super(ForeignKeyRawIdWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
-        from django.contrib.admin.views.main import TO_FIELD_VAR
         related_url = '../../../%s/%s/' % (self.rel.to._meta.app_label, self.rel.to._meta.object_name.lower())
-        params = {}
-        if self.rel.limit_choices_to:
-            params.update(dict([(k, ','.join(v)) for k, v in self.rel.limit_choices_to.items()]))
-        params.update({TO_FIELD_VAR: self.rel.get_related_field().name})
-        url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
+        params = self.url_parameters()
+        if params:
+            url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
+        else:
+            url = ''
         if not attrs.has_key('class'):
           attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript looks for this hook.
         output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)]
@@ -123,7 +122,19 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         if value:
             output.append(self.label_for_value(value))
         return mark_safe(u''.join(output))
-
+    
+    def base_url_parameters(self):
+        params = {}
+        if self.rel.limit_choices_to:
+            params.update(dict([(k, ','.join(v)) for k, v in self.rel.limit_choices_to.items()]))
+        return params    
+    
+    def url_parameters(self):
+        from django.contrib.admin.views.main import TO_FIELD_VAR
+        params = self.base_url_parameters()
+        params.update({TO_FIELD_VAR: self.rel.get_related_field().name})
+        return params
+            
     def label_for_value(self, value):
         key = self.rel.get_related_field().name
         obj = self.rel.to.objects.get(**{key: value})
@@ -144,7 +155,10 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         else:
             value = ''
         return super(ManyToManyRawIdWidget, self).render(name, value, attrs)
-
+    
+    def url_parameters(self):
+        return self.base_url_parameters()
+    
     def label_for_value(self, value):
         return ''
 
