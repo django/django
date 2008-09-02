@@ -230,7 +230,7 @@ class BaseModelForm(BaseForm):
             except FieldDoesNotExist:
                 # This is an extra field that's not on the ModelForm, ignore it
                 continue
-            # MySQL can't handle ... WHERE pk IS NULL, so make sure we don't 
+            # MySQL can't handle ... WHERE pk IS NULL, so make sure we
             # don't generate queries of that form.
             is_null_pk = f.primary_key and self.cleaned_data[name] is None
             if name in self.cleaned_data and f.unique and not is_null_pk:
@@ -254,7 +254,7 @@ class BaseModelForm(BaseForm):
             if self.instance.pk is not None:
                 qs = qs.exclude(pk=self.instance.pk)
                 
-            # This cute trick with extra/values is the most efficiant way to
+            # This cute trick with extra/values is the most efficient way to
             # tell if a particular query returns any results.
             if qs.extra(select={'a': 1}).values('a').order_by():
                 model_name = capfirst(self.instance._meta.verbose_name)

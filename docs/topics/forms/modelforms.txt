@@ -337,11 +337,11 @@ parameter when declaring the form field::
 Overriding the clean() method
 -----------------------------
 
-You can overide the ``clean()`` method on a model form to provide additional
-validation in the same way you can on a normal form.  However, by default the
+You can override the ``clean()`` method on a model form to provide additional
+validation in the same way you can on a normal form. However, by default the
 ``clean()`` method validates the uniqueness of fields that are marked as unique
-on the model, and those marked as unque_together, if you would like to overide
-the ``clean()`` method and maintain the default validation you must call the
+or unique_together on the model. Therefore, if you would like to override
+the ``clean()`` method and maintain the default validation, you must call the
 parent class's ``clean()`` method.
 
 Form inheritance
