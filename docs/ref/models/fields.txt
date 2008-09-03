@@ -571,7 +571,7 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 .. class:: FloatField([**options])
 
-**Changed in Django development version**
+.. versionchanged:: 1.0
 
 A floating-point number represented in Python by a ``float`` instance.
 

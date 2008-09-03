@@ -176,12 +176,15 @@ ordering piece of data for each of the main items you are selecting, the
 ordering may well be exactly what you want to do. Use ordering on multi-valued
 fields with care and make sure the results are what you expect.
 
-**New in Django development version:** If you don't want any ordering to be
-applied to a query, not even the default ordering, call ``order_by()`` with no
-parameters.
+.. versionadded:: 1.0
 
-**New in Django development version:** The syntax for ordering across related
-models has changed. See the `Django 0.96 documentation`_ for the old behaviour.
+If you don't want any ordering to be applied to a query, not even the default
+ordering, call ``order_by()`` with no parameters.
+
+.. versionadded:: 1.0
+
+The syntax for ordering across related models has changed. See the `Django 0.96
+documentation`_ for the old behaviour.
 
 .. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
 
@@ -291,8 +294,10 @@ A couple of subtleties that are worth mentioning:
       ordering can affect the results. See the note in the `distinct()`_
       section, above, for details.
 
-**New in Django development version:** Previously, it was not possible to pass
-``blog_id`` to ``values()`` in the above example, only ``blog``.
+.. versionadded:: 1.0
+
+Previously, it was not possible to pass ``blog_id`` to ``values()`` in the above
+example, only ``blog``.
 
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
 from a small number of the available fields and you won't need the
@@ -314,7 +319,7 @@ individualism.
 ``values_list(*fields)``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 This is similar to ``values()`` except that instead of returning a list of
 dictionaries, it returns a list of tuples. Each tuple contains the value from
@@ -459,7 +464,8 @@ follow::
     c = p.hometown       # Requires a database call.
 
 .. versionadded:: 1.0
-   The ``depth`` argument is new in the Django development version.
+
+The ``depth`` argument is new in Django version 1.0.
 
 ``extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -528,7 +528,7 @@ for details.
 
 .. _One-to-one relationship model example: http://www.djangoproject.com/documentation/models/one_to_one/
 
-**New in Django development version**
+.. versionadded:: 1.0
 
 :class:`~django.db.models.OneToOneField` fields also accept one optional argument
 described in the :ref:`model field reference <ref-onetoone>`.

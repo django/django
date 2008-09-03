@@ -35,10 +35,11 @@ To save an object back to the database, call ``save()``:
 
 Of course, there are some subtleties; see the sections below.
 
-**New in Django development version:** The signature of the ``save()`` method
-has changed from earlier versions (``force_insert`` and ``force_update`` have
-been added). If you are overriding these methods, be sure to use the correct
-signature.
+.. versionadded:: 1.0
+
+The signature of the ``save()`` method has changed from earlier versions
+(``force_insert`` and ``force_update`` have been added). If you are overriding
+these methods, be sure to use the correct signature.
 
 Auto-incrementing primary keys
 ------------------------------

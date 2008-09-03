@@ -868,7 +868,7 @@ Create/update/delete generic views
 The ``django.views.generic.create_update`` module contains a set of functions
 for creating, editing and deleting objects.
 
-**Changed in Django development version:**
+.. versionchanged:: 1.0
 
 ``django.views.generic.create_update.create_object`` and
 ``django.views.generic.create_update.update_object`` now use the new :ref:`forms
