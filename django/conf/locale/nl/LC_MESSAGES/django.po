@@ -285,94 +285,94 @@ msgstr "logregistratie"
 msgid "log entries"
 msgstr "logregistraties"
 
-#: contrib/admin/options.py:59 contrib/admin/options.py:120
+#: contrib/admin/options.py:60 contrib/admin/options.py:121
 msgid "None"
 msgstr "Geen"
 
-#: contrib/admin/options.py:332
+#: contrib/admin/options.py:338
 #, python-format
 msgid "Changed %s."
 msgstr "%s gewijzigd."
 
-#: contrib/admin/options.py:332 contrib/admin/options.py:342
-#: forms/models.py:264
+#: contrib/admin/options.py:338 contrib/admin/options.py:348
+#: forms/models.py:275
 msgid "and"
 msgstr "en"
 
-#: contrib/admin/options.py:337
+#: contrib/admin/options.py:343
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" toegevoegd."
 
-#: contrib/admin/options.py:341
+#: contrib/admin/options.py:347
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(list)s aangepast voor %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:346
+#: contrib/admin/options.py:352
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" verwijderd."
 
-#: contrib/admin/options.py:350
+#: contrib/admin/options.py:356
 msgid "No fields changed."
 msgstr "Geen velden gewijzigd."
 
-#: contrib/admin/options.py:411 contrib/auth/admin.py:51
+#: contrib/admin/options.py:417 contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "De %(name)s \"%(obj)s\" is toegevoegd."
 
-#: contrib/admin/options.py:415 contrib/admin/options.py:448
+#: contrib/admin/options.py:421 contrib/admin/options.py:454
 #: contrib/auth/admin.py:59
 msgid "You may edit it again below."
 msgstr "U kunt dit hieronder weer bewerken."
 
-#: contrib/admin/options.py:425 contrib/admin/options.py:458
+#: contrib/admin/options.py:431 contrib/admin/options.py:464
 #, python-format
 msgid "You may add another %s below."
 msgstr "U kunt hieronder de volgende %s toevoegen."
 
-#: contrib/admin/options.py:446
+#: contrib/admin/options.py:452
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Het wijzigen van %(name)s \"%(obj)s\" is geslaagd."
 
-#: contrib/admin/options.py:454
+#: contrib/admin/options.py:460
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "De %(name)s \"%(obj)s\" was toegevoegd. U kunt het hieronder wijzigen."
 
-#: contrib/admin/options.py:530
+#: contrib/admin/options.py:536
 #, python-format
 msgid "Add %s"
 msgstr "Toevoegen %s"
 
-#: contrib/admin/options.py:608
+#: contrib/admin/options.py:614
 #, python-format
 msgid "Change %s"
 msgstr "Wijzig %s"
 
-#: contrib/admin/options.py:640
+#: contrib/admin/options.py:646
 msgid "Database error"
 msgstr "Databasefout"
 
-#: contrib/admin/options.py:690
+#: contrib/admin/options.py:696
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "De verwijdering van %(name)s \"%(obj)s\" is geslaagd."
 
-#: contrib/admin/options.py:697
+#: contrib/admin/options.py:703
 msgid "Are you sure?"
 msgstr "Weet u het zeker?"
 
-#: contrib/admin/options.py:726
+#: contrib/admin/options.py:732
 #, python-format
 msgid "Change history: %s"
 msgstr "Wijzigingsgeschiedenis: %s"
 
-#: contrib/admin/sites.py:18 contrib/admin/views/decorators.py:16
+#: contrib/admin/sites.py:16 contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:80
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -381,15 +381,11 @@ msgstr ""
 "Voer een correcte gebruikersnaam en wachtwoord in. Let op, de velden zijn "
 "hoofdletter-gevoelig."
 
-#: contrib/admin/sites.py:242 contrib/admin/views/decorators.py:68
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr ""
-"Uw sessie is verlopen, meld u opnieuw aan. Maakt u zich geen zorgen: Uw "
-"bijdrage is opgeslagen."
+#: contrib/admin/sites.py:227 contrib/admin/views/decorators.py:40
+msgid "Please log in again, because your session has expired."
+msgstr "Uw sessie is verlopen, meld u opnieuw aan."
 
-#: contrib/admin/sites.py:249 contrib/admin/views/decorators.py:75
+#: contrib/admin/sites.py:234 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -397,27 +393,27 @@ msgstr ""
 "Het lijkt erop dat uw browser geen cookies accepteert. Zet het gebruik van "
 "cookies aan in uw browser, laad deze pagina nogmaals en probeer het opnieuw."
 
-#: contrib/admin/sites.py:265 contrib/admin/sites.py:271
-#: contrib/admin/views/decorators.py:94
+#: contrib/admin/sites.py:250 contrib/admin/sites.py:256
+#: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Gebruikersnamen mogen geen '@' teken bevatten."
 
-#: contrib/admin/sites.py:268 contrib/admin/views/decorators.py:90
+#: contrib/admin/sites.py:253 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Uw e-mailadres is niet uw gebruikersnaam. Probeer '%s' eens."
 
-#: contrib/admin/sites.py:336
+#: contrib/admin/sites.py:313
 msgid "Site administration"
 msgstr "Sitebeheer"
 
-#: contrib/admin/sites.py:358 contrib/admin/templates/admin/login.html:27
+#: contrib/admin/sites.py:326 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
-#: contrib/admin/views/decorators.py:30
+#: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Inloggen"
 
-#: contrib/admin/sites.py:406
+#: contrib/admin/sites.py:373
 #, python-format
 msgid "%s administration"
 msgstr "%s beheer"
@@ -448,11 +444,11 @@ msgstr "Huidige:"
 msgid "Change:"
 msgstr "Wijziging:"
 
-#: contrib/admin/widgets.py:120
+#: contrib/admin/widgets.py:121
 msgid "Lookup"
 msgstr "Opzoeken"
 
-#: contrib/admin/widgets.py:204
+#: contrib/admin/widgets.py:228
 msgid "Add Another"
 msgstr "Nog één toevoegen"
 
@@ -904,16 +900,16 @@ msgstr "E-mailadres:"
 msgid "Reset my password"
 msgstr "Herstel mijn wachtwoord"
 
-#: contrib/admin/templatetags/admin_list.py:284
+#: contrib/admin/templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Alle data"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:69
 #, python-format
 msgid "Select %s"
 msgstr "Selecteer %s"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:69
 #, python-format
 msgid "Select %s to change"
 msgstr "Selecteer %s om te wijzigen"
@@ -1049,7 +1045,7 @@ msgstr "Tekst"
 msgid "Time"
 msgstr "Tijd"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:21
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:22
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
@@ -1372,24 +1368,24 @@ msgstr "Inhoud"
 msgid "Metadata"
 msgstr "Metadata"
 
-#: contrib/comments/forms.py:19
+#: contrib/comments/forms.py:20
 msgid "Name"
 msgstr "Naam"
 
-#: contrib/comments/forms.py:20
+#: contrib/comments/forms.py:21
 msgid "Email address"
 msgstr "E-mailadres"
 
-#: contrib/comments/forms.py:22
+#: contrib/comments/forms.py:23
 msgid "Comment"
 msgstr "Opmerking"
 
-#: contrib/comments/forms.py:25
+#: contrib/comments/forms.py:26
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "Indien u hier iets invuld dan wordt uw opmerking behandeld als spam"
 
-#: contrib/comments/forms.py:125
+#: contrib/comments/forms.py:126
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -3601,18 +3597,18 @@ msgstr "De waarde moet een getal zijn."
 msgid "This value must be either None, True or False."
 msgstr "De waarde moet of None (leeg), True (Waar) of False (Onwaar) zijn."
 
-#: db/models/fields/__init__.py:827 db/models/fields/__init__.py:841
+#: db/models/fields/__init__.py:817 db/models/fields/__init__.py:831
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Geef een geldige tijd in UU:MM[:ss[.uuuuuu]] formaat."
 
-#: db/models/fields/related.py:758
+#: db/models/fields/related.py:761
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Houd \"Control\", of \"Command\" op een Mac, ingedrukt om meerdere te "
 "selecteren."
 
-#: db/models/fields/related.py:835
+#: db/models/fields/related.py:838
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3722,7 +3718,7 @@ msgstr "Deze URL lijkt niet te werken."
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Selecteer een geldige keuze. %(value)s is geen beschikbare keuze."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:633
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:654
 msgid "Enter a list of values."
 msgstr "Geef een lijst op met waardes."
 
@@ -3741,16 +3737,16 @@ msgstr ""
 msgid "Order"
 msgstr "Volgorde"
 
-#: forms/models.py:258 forms/models.py:266
+#: forms/models.py:268 forms/models.py:277
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Er bestaat al een %(model_name)s met eenzelfde %(field_label)s."
 
-#: forms/models.py:565
+#: forms/models.py:584
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Selecteer een geldige keuze. Deze keuze is niet beschikbaar."
 
-#: forms/models.py:634
+#: forms/models.py:655
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Selecteer een geldige keuze. %s is geen beschikbare keuze."
