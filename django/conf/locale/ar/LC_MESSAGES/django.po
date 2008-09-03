@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-09-03 08:49+0300\n"
-"PO-Revision-Date: 2008-09-03 11:00+0300\n"
+"PO-Revision-Date: 2008-09-03 15:10+0300\n"
 "Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
 "Language-Team: Arabic <support@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
@@ -664,7 +664,7 @@ msgstr "العملية"
 #: contrib/admin/templates/admin/object_history.html:30
 #: utils/translation/trans_real.py:404
 msgid "DATETIME_FORMAT"
-msgstr "DATETIME_FORMAT"
+msgstr "j F Y، G:i"
 
 #: contrib/admin/templates/admin/object_history.html:38
 msgid ""
