@@ -1,13 +1,12 @@
 # Translation of django.po to russian.
-# Copyright (C) 2005 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-29 17:39+0400\n"
-"PO-Revision-Date: 2008-08-29 20:03+0300\n"
+"POT-Creation-Date: 2008-09-03 16:36+0400\n"
+"PO-Revision-Date: 2008-09-03 17:34+0300\n"
 "Last-Translator: Grigory Fateyev <greg@dial.com.ru>\n"
 "Language-Team: Dialcom Services <greg@dial.com.ru>\n"
 "MIME-Version: 1.0\n"
@@ -252,17 +251,17 @@ msgid "This year"
 msgstr "В этом году"
 
 #: contrib/admin/filterspecs.py:147
-#: forms/widgets.py:390
+#: forms/widgets.py:391
 msgid "Yes"
 msgstr "Да"
 
 #: contrib/admin/filterspecs.py:147
-#: forms/widgets.py:390
+#: forms/widgets.py:391
 msgid "No"
 msgstr "Нет"
 
 #: contrib/admin/filterspecs.py:154
-#: forms/widgets.py:390
+#: forms/widgets.py:391
 msgid "Unknown"
 msgstr "Неизвестно"
 
@@ -294,136 +293,137 @@ msgstr "Журнальная запись"
 msgid "log entries"
 msgstr "Журнальные записи"
 
-#: contrib/admin/options.py:56
-#: contrib/admin/options.py:120
+#: contrib/admin/options.py:60
+#: contrib/admin/options.py:121
 msgid "None"
 msgstr "Нет"
 
-#: contrib/admin/options.py:334
+#: contrib/admin/options.py:338
 #, python-format
 msgid "Changed %s."
 msgstr "Изменен %s."
 
-#: contrib/admin/options.py:334
-#: contrib/admin/options.py:344
+#: contrib/admin/options.py:338
+#: contrib/admin/options.py:348
+#: forms/models.py:275
 msgid "and"
 msgstr "и"
 
-#: contrib/admin/options.py:339
+#: contrib/admin/options.py:343
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Добавить %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:343
+#: contrib/admin/options.py:347
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Изменённые %(list)s для %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:348
+#: contrib/admin/options.py:352
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Удалённые %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:352
+#: contrib/admin/options.py:356
 msgid "No fields changed."
 msgstr "Ни одно поле не изменено."
 
-#: contrib/admin/options.py:413
+#: contrib/admin/options.py:417
 #: contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" был успешно добавлен."
 
-#: contrib/admin/options.py:417
-#: contrib/admin/options.py:450
-#: contrib/auth/admin.py:57
+#: contrib/admin/options.py:421
+#: contrib/admin/options.py:454
+#: contrib/auth/admin.py:59
 msgid "You may edit it again below."
 msgstr "Ниже можно снова редактировать его"
 
-#: contrib/admin/options.py:427
-#: contrib/admin/options.py:460
+#: contrib/admin/options.py:431
+#: contrib/admin/options.py:464
 #, python-format
 msgid "You may add another %s below."
 msgstr "Вы можете добавить %s внизу."
 
-#: contrib/admin/options.py:448
+#: contrib/admin/options.py:452
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" был успешно изменен."
 
-#: contrib/admin/options.py:456
+#: contrib/admin/options.py:460
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" был успешно добавлен. Ниже можно снова редактировать его."
 
-#: contrib/admin/options.py:522
+#: contrib/admin/options.py:536
 #, python-format
 msgid "Add %s"
 msgstr "Добавить %s"
 
-#: contrib/admin/options.py:600
+#: contrib/admin/options.py:614
 #, python-format
 msgid "Change %s"
 msgstr "Изменить %s"
 
-#: contrib/admin/options.py:632
+#: contrib/admin/options.py:646
 msgid "Database error"
 msgstr "Ошибка базы данных"
 
-#: contrib/admin/options.py:682
+#: contrib/admin/options.py:696
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" был успешно удален."
 
-#: contrib/admin/options.py:689
+#: contrib/admin/options.py:703
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: contrib/admin/options.py:718
+#: contrib/admin/options.py:732
 #, python-format
 msgid "Change history: %s"
 msgstr "История изменений: %s"
 
-#: contrib/admin/sites.py:18
-#: contrib/admin/views/decorators.py:16
+#: contrib/admin/sites.py:16
+#: contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:80
 msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
 msgstr "Пожалуйста, введите верные имя пользователя и пароль. Помните, оба поля чувствительны к регистру."
 
-#: contrib/admin/sites.py:242
-#: contrib/admin/views/decorators.py:68
-msgid "Please log in again, because your session has expired. Don't worry: Your submission has been saved."
-msgstr "Пожалуйста, войдите снова, поскольку ваша сессия устарела. Не беспокойтесь: введенные вами данные сохранены."
+#: contrib/admin/sites.py:227
+#: contrib/admin/views/decorators.py:40
+msgid "Please log in again, because your session has expired."
+msgstr "Пожалуйста, войдите снова, поскольку ваша сессия устарела."
 
-#: contrib/admin/sites.py:249
-#: contrib/admin/views/decorators.py:75
+#: contrib/admin/sites.py:234
+#: contrib/admin/views/decorators.py:47
 msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
 msgstr "Похоже, ваш броузер не настроен на прием cookies. Пожалуйства, включите cookie, перезагрузите страницу и попытайтесь снова."
 
-#: contrib/admin/sites.py:265
-#: contrib/admin/sites.py:271
-#: contrib/admin/views/decorators.py:94
+#: contrib/admin/sites.py:250
+#: contrib/admin/sites.py:256
+#: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Имя пользователя не может включать символ '@'."
 
-#: contrib/admin/sites.py:268
-#: contrib/admin/views/decorators.py:90
+#: contrib/admin/sites.py:253
+#: contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Ваш адрес электронной почты не является вашим именем пользователя. Попробуйте '%s' взамен."
 
-#: contrib/admin/sites.py:336
+#: contrib/admin/sites.py:313
 msgid "Site administration"
 msgstr "Администрирование сайта"
 
-#: contrib/admin/sites.py:358
-#: contrib/admin/templates/admin/login.html:27
+#: contrib/admin/sites.py:326
+#: contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
-#: contrib/admin/views/decorators.py:30
+#: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Вход"
 
-#: contrib/admin/sites.py:406
+#: contrib/admin/sites.py:373
 #, python-format
 msgid "%s administration"
 msgstr "%s администрирование"
@@ -438,27 +438,27 @@ msgstr "Один или более  %(fieldname)s в %(name)s: %(obj)s"
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Один или более %(fieldname)s в %(name)s:"
 
-#: contrib/admin/widgets.py:65
+#: contrib/admin/widgets.py:70
 msgid "Date:"
 msgstr "Дата:"
 
-#: contrib/admin/widgets.py:65
+#: contrib/admin/widgets.py:70
 msgid "Time:"
 msgstr "Время:"
 
-#: contrib/admin/widgets.py:89
+#: contrib/admin/widgets.py:94
 msgid "Currently:"
 msgstr "Современно:"
 
-#: contrib/admin/widgets.py:89
+#: contrib/admin/widgets.py:94
 msgid "Change:"
 msgstr "Изменить:"
 
-#: contrib/admin/widgets.py:115
+#: contrib/admin/widgets.py:121
 msgid "Lookup"
 msgstr "Поиск"
 
-#: contrib/admin/widgets.py:195
+#: contrib/admin/widgets.py:228
 msgid "Add Another"
 msgstr "Добавить ещё"
 
@@ -870,16 +870,16 @@ msgstr "Адрес электронной почты:"
 msgid "Reset my password"
 msgstr "Очистка пароля"
 
-#: contrib/admin/templatetags/admin_list.py:284
+#: contrib/admin/templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Все даты"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:69
 #, python-format
 msgid "Select %s"
 msgstr "Выберите %s"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:69
 #, python-format
 msgid "Select %s to change"
 msgstr "Выберите %s для изменения"
@@ -893,156 +893,156 @@ msgstr "Сайт"
 msgid "template"
 msgstr "шаблон"
 
-#: contrib/admindocs/views.py:53
-#: contrib/admindocs/views.py:55
 #: contrib/admindocs/views.py:57
+#: contrib/admindocs/views.py:59
+#: contrib/admindocs/views.py:61
 msgid "tag:"
 msgstr "Тэг:"
 
-#: contrib/admindocs/views.py:87
-#: contrib/admindocs/views.py:89
-#: contrib/admindocs/views.py:91
+#: contrib/admindocs/views.py:90
+#: contrib/admindocs/views.py:92
+#: contrib/admindocs/views.py:94
 msgid "filter:"
 msgstr "Фильтр:"
 
-#: contrib/admindocs/views.py:153
-#: contrib/admindocs/views.py:155
-#: contrib/admindocs/views.py:157
+#: contrib/admindocs/views.py:154
+#: contrib/admindocs/views.py:156
+#: contrib/admindocs/views.py:158
 msgid "view:"
 msgstr "view:"
 
-#: contrib/admindocs/views.py:187
+#: contrib/admindocs/views.py:186
 #, python-format
 msgid "App %r not found"
 msgstr "Приложение %r не найдено"
 
-#: contrib/admindocs/views.py:194
+#: contrib/admindocs/views.py:193
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Модель %(model_name)r не найдена в приложении %(app_label)r"
 
-#: contrib/admindocs/views.py:206
+#: contrib/admindocs/views.py:205
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "зависимый `%(app_label)s.%(data_type)s` объект"
 
-#: contrib/admindocs/views.py:206
-#: contrib/admindocs/views.py:228
-#: contrib/admindocs/views.py:242
-#: contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:205
+#: contrib/admindocs/views.py:227
+#: contrib/admindocs/views.py:241
+#: contrib/admindocs/views.py:246
 msgid "model:"
 msgstr "модель:"
 
-#: contrib/admindocs/views.py:237
+#: contrib/admindocs/views.py:236
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "зависимые `%(app_label)s.%(object_name)s` объекты"
 
-#: contrib/admindocs/views.py:242
+#: contrib/admindocs/views.py:241
 #, python-format
 msgid "all %s"
 msgstr "все %s"
 
-#: contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:246
 #, python-format
 msgid "number of %s"
 msgstr "количество %s"
 
-#: contrib/admindocs/views.py:253
+#: contrib/admindocs/views.py:251
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Поля для %s объектов"
 
-#: contrib/admindocs/views.py:317
-#: contrib/admindocs/views.py:328
-#: contrib/admindocs/views.py:330
+#: contrib/admindocs/views.py:314
+#: contrib/admindocs/views.py:325
+#: contrib/admindocs/views.py:327
+#: contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:334
 #: contrib/admindocs/views.py:336
-#: contrib/admindocs/views.py:337
-#: contrib/admindocs/views.py:339
 msgid "Integer"
 msgstr "Целое"
 
-#: contrib/admindocs/views.py:318
+#: contrib/admindocs/views.py:315
 msgid "Boolean (Either True or False)"
 msgstr "Логическое (True или False)"
 
-#: contrib/admindocs/views.py:319
-#: contrib/admindocs/views.py:338
+#: contrib/admindocs/views.py:316
+#: contrib/admindocs/views.py:335
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Строка (до %(max_length)s)"
 
-#: contrib/admindocs/views.py:320
+#: contrib/admindocs/views.py:317
 msgid "Comma-separated integers"
 msgstr "Целые, разделенные запятыми"
 
-#: contrib/admindocs/views.py:321
+#: contrib/admindocs/views.py:318
 msgid "Date (without time)"
 msgstr "Дата (без указания времени)"
 
-#: contrib/admindocs/views.py:322
+#: contrib/admindocs/views.py:319
 msgid "Date (with time)"
 msgstr "Дата (с указанием времени)"
 
-#: contrib/admindocs/views.py:323
+#: contrib/admindocs/views.py:320
 msgid "Decimal number"
 msgstr "Десятичное число"
 
-#: contrib/admindocs/views.py:324
+#: contrib/admindocs/views.py:321
 msgid "E-mail address"
 msgstr "Адрес электронной почты"
 
-#: contrib/admindocs/views.py:325
+#: contrib/admindocs/views.py:322
+#: contrib/admindocs/views.py:323
 #: contrib/admindocs/views.py:326
-#: contrib/admindocs/views.py:329
 msgid "File path"
 msgstr "Путь к файлу"
 
-#: contrib/admindocs/views.py:327
+#: contrib/admindocs/views.py:324
 msgid "Floating point number"
 msgstr "Число с плавающей точкой"
 
-#: contrib/admindocs/views.py:331
-#: contrib/comments/models.py:57
+#: contrib/admindocs/views.py:328
+#: contrib/comments/models.py:58
 msgid "IP address"
 msgstr "IP-адрес"
 
-#: contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:330
 msgid "Boolean (Either True, False or None)"
 msgstr "Логическое (True, False или None)"
 
-#: contrib/admindocs/views.py:334
+#: contrib/admindocs/views.py:331
 msgid "Relation to parent model"
 msgstr "Связь с родительской моделью"
 
-#: contrib/admindocs/views.py:335
+#: contrib/admindocs/views.py:332
 msgid "Phone number"
 msgstr "Номер телефона"
 
-#: contrib/admindocs/views.py:340
+#: contrib/admindocs/views.py:337
 msgid "Text"
 msgstr "Текст"
 
-#: contrib/admindocs/views.py:341
+#: contrib/admindocs/views.py:338
 msgid "Time"
 msgstr "Время"
 
-#: contrib/admindocs/views.py:342
-#: contrib/comments/forms.py:20
+#: contrib/admindocs/views.py:339
+#: contrib/comments/forms.py:22
 #: contrib/flatpages/admin.py:8
 #: contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admindocs/views.py:343
+#: contrib/admindocs/views.py:340
 msgid "U.S. state (two uppercase letters)"
 msgstr "Штат США (две заглавные буквы)"
 
-#: contrib/admindocs/views.py:344
+#: contrib/admindocs/views.py:341
 msgid "XML text"
 msgstr "Текст XML"
 
-#: contrib/admindocs/views.py:370
+#: contrib/admindocs/views.py:367
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s не похож на объект urlpattern"
@@ -1121,15 +1121,15 @@ msgstr "Важные даты"
 msgid "Groups"
 msgstr "Группы"
 
-#: contrib/auth/admin.py:62
+#: contrib/auth/admin.py:64
 msgid "Add user"
 msgstr "Добавить пользователя"
 
-#: contrib/auth/admin.py:88
+#: contrib/auth/admin.py:90
 msgid "Password changed successfully."
 msgstr "Пароль успешно обновлен"
 
-#: contrib/auth/admin.py:94
+#: contrib/auth/admin.py:96
 #, python-format
 msgid "Change password: %s"
 msgstr "Изменение пароля: %s"
@@ -1304,7 +1304,7 @@ msgid "Logged out"
 msgstr "Не авторизован"
 
 #: contrib/auth/management/commands/createsuperuser.py:23
-#: forms/fields.py:423
+#: forms/fields.py:428
 msgid "Enter a valid e-mail address."
 msgstr "Укажите правильный адрес электронной почты."
 
@@ -1316,23 +1316,23 @@ msgstr "Содержание"
 msgid "Metadata"
 msgstr "Метадата"
 
-#: contrib/comments/forms.py:18
+#: contrib/comments/forms.py:20
 msgid "Name"
 msgstr "Имя"
 
-#: contrib/comments/forms.py:19
+#: contrib/comments/forms.py:21
 msgid "Email address"
 msgstr "Адрес электронной почты"
 
-#: contrib/comments/forms.py:21
+#: contrib/comments/forms.py:23
 msgid "Comment"
 msgstr "комментарий"
 
-#: contrib/comments/forms.py:24
+#: contrib/comments/forms.py:26
 msgid "If you enter anything in this field your comment will be treated as spam"
 msgstr "Если введёте что либо в это поле, ваш комментарий будет признан спамом"
 
-#: contrib/comments/forms.py:124
+#: contrib/comments/forms.py:126
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -1340,55 +1340,55 @@ msgstr[0] "Следите за своими словами! Слово %s зде
 msgstr[1] "Следите за своими словами! Слова %s здесь запрещены."
 msgstr[2] "Следите за своими словами! Слова %s здесь запрещены."
 
-#: contrib/comments/models.py:22
+#: contrib/comments/models.py:23
 msgid "object ID"
 msgstr "ID объекта"
 
-#: contrib/comments/models.py:49
+#: contrib/comments/models.py:50
 msgid "user's name"
 msgstr "имя пользователя"
 
-#: contrib/comments/models.py:50
+#: contrib/comments/models.py:51
 msgid "user's email address"
 msgstr "адрес электронной почты пользователя"
 
-#: contrib/comments/models.py:51
+#: contrib/comments/models.py:52
 msgid "user's URL"
 msgstr "URL пользователя"
 
-#: contrib/comments/models.py:53
+#: contrib/comments/models.py:54
 msgid "comment"
 msgstr "Комментарий"
 
-#: contrib/comments/models.py:56
+#: contrib/comments/models.py:57
 msgid "date/time submitted"
 msgstr "Дата/время добавления"
 
-#: contrib/comments/models.py:58
+#: contrib/comments/models.py:59
 msgid "is public"
 msgstr "Публичный"
 
-#: contrib/comments/models.py:59
+#: contrib/comments/models.py:60
 msgid "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "Снимите выделение чтоб удалить комментарии с сайта."
 
-#: contrib/comments/models.py:61
+#: contrib/comments/models.py:62
 msgid "is removed"
 msgstr "Удален"
 
-#: contrib/comments/models.py:62
+#: contrib/comments/models.py:63
 msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
 msgstr "Отметьте, если комментарий нежелателен. Сообщение \"Этот комментарий был удалён\" будет показано взамен."
 
-#: contrib/comments/models.py:114
+#: contrib/comments/models.py:115
 msgid "This comment was posted by an authenticated user and thus the name is read-only."
 msgstr "Комментарий был добавлен регистрированным пользователем и его статус только для чтения."
 
-#: contrib/comments/models.py:123
+#: contrib/comments/models.py:124
 msgid "This comment was posted by an authenticated user and thus the email is read-only."
 msgstr "Комментарий был добавлен регистрированным пользователем и его email имеет статус только для чтения."
 
-#: contrib/comments/models.py:148
+#: contrib/comments/models.py:149
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -1593,11 +1593,11 @@ msgstr "Неверный CUIT."
 
 #: contrib/localflavor/at/at_states.py:5
 msgid "Burgenland"
-msgstr ""
+msgstr "Бюргенланд"
 
 #: contrib/localflavor/at/at_states.py:6
 msgid "Carinthia"
-msgstr ""
+msgstr "Каринтия"
 
 #: contrib/localflavor/at/at_states.py:7
 msgid "Lower Austria"
@@ -1612,9 +1612,8 @@ msgid "Salzburg"
 msgstr "Зальсбург"
 
 #: contrib/localflavor/at/at_states.py:10
-#, fuzzy
 msgid "Styria"
-msgstr "Сербский"
+msgstr "Стирия"
 
 #: contrib/localflavor/at/at_states.py:11
 msgid "Tyrol"
@@ -1622,7 +1621,7 @@ msgstr "Тироль"
 
 #: contrib/localflavor/at/at_states.py:12
 msgid "Vorarlberg"
-msgstr ""
+msgstr "Ворарлберг"
 
 #: contrib/localflavor/at/at_states.py:13
 msgid "Vienna"
@@ -1680,7 +1679,7 @@ msgstr "Укажите правильный номер Социального С
 
 #: contrib/localflavor/ch/ch_states.py:5
 msgid "Aargau"
-msgstr ""
+msgstr "Ааргуа"
 
 #: contrib/localflavor/ch/ch_states.py:6
 msgid "Appenzell Innerrhoden"
@@ -1696,7 +1695,7 @@ msgstr ""
 
 #: contrib/localflavor/ch/ch_states.py:9
 msgid "Basel-Land"
-msgstr ""
+msgstr "Базел-Ланд"
 
 #: contrib/localflavor/ch/ch_states.py:10
 msgid "Berne"
@@ -1704,7 +1703,7 @@ msgstr "Берн"
 
 #: contrib/localflavor/ch/ch_states.py:11
 msgid "Fribourg"
-msgstr ""
+msgstr "Фрибург"
 
 #: contrib/localflavor/ch/ch_states.py:12
 msgid "Geneva"
@@ -1728,23 +1727,23 @@ msgstr "Люцерн"
 
 #: contrib/localflavor/ch/ch_states.py:17
 msgid "Neuchatel"
-msgstr ""
+msgstr "Нахатель"
 
 #: contrib/localflavor/ch/ch_states.py:18
 msgid "Nidwalden"
-msgstr ""
+msgstr "Нидвалген"
 
 #: contrib/localflavor/ch/ch_states.py:19
 msgid "Obwalden"
-msgstr ""
+msgstr "Обвалген"
 
 #: contrib/localflavor/ch/ch_states.py:20
 msgid "Schaffhausen"
-msgstr ""
+msgstr "Шаффхаусен"
 
 #: contrib/localflavor/ch/ch_states.py:21
 msgid "Schwyz"
-msgstr ""
+msgstr "Швитц"
 
 #: contrib/localflavor/ch/ch_states.py:22
 msgid "Solothurn"
@@ -1885,14 +1884,12 @@ msgid "Alacant"
 msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:8
-#, fuzzy
 msgid "Almeria"
-msgstr "Аомори"
+msgstr "Альмерия"
 
 #: contrib/localflavor/es/es_provinces.py:9
-#, fuzzy
 msgid "Avila"
-msgstr "Апрель"
+msgstr "Авила"
 
 #: contrib/localflavor/es/es_provinces.py:10
 msgid "Badajoz"
@@ -1959,14 +1956,12 @@ msgid "Huelva"
 msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:26
-#, fuzzy
 msgid "Huesca"
-msgstr "Вторник"
+msgstr "Хуеска"
 
 #: contrib/localflavor/es/es_provinces.py:27
-#, fuzzy
 msgid "Jaen"
-msgstr "янв."
+msgstr "Джин"
 
 #: contrib/localflavor/es/es_provinces.py:28
 msgid "Leon"
@@ -1991,9 +1986,8 @@ msgid "Madrid"
 msgstr "Мадрид"
 
 #: contrib/localflavor/es/es_provinces.py:33
-#, fuzzy
 msgid "Malaga"
-msgstr "Сага"
+msgstr "Малага"
 
 #: contrib/localflavor/es/es_provinces.py:34
 msgid "Murcia"
@@ -2012,9 +2006,8 @@ msgid "Asturias"
 msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:38
-#, fuzzy
 msgid "Palencia"
-msgstr "Галльский"
+msgstr "Паленьсия"
 
 #: contrib/localflavor/es/es_provinces.py:39
 msgid "Las Palmas"
@@ -2025,9 +2018,8 @@ msgid "Pontevedra"
 msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:41
-#, fuzzy
 msgid "Salamanca"
-msgstr "Сайтама"
+msgstr "Саламанка"
 
 #: contrib/localflavor/es/es_provinces.py:42
 msgid "Santa Cruz de Tenerife"
@@ -2035,23 +2027,20 @@ msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:43
 #: contrib/localflavor/es/es_regions.py:11
-#, fuzzy
 msgid "Cantabria"
-msgstr "Каталанский"
+msgstr "Кантабрина"
 
 #: contrib/localflavor/es/es_provinces.py:44
-#, fuzzy
 msgid "Segovia"
-msgstr "Словенский"
+msgstr "Сеговия"
 
 #: contrib/localflavor/es/es_provinces.py:45
 msgid "Seville"
 msgstr "Севилья"
 
 #: contrib/localflavor/es/es_provinces.py:46
-#, fuzzy
 msgid "Soria"
-msgstr "Сербский"
+msgstr "Сория"
 
 #: contrib/localflavor/es/es_provinces.py:47
 msgid "Tarragona"
@@ -2078,9 +2067,8 @@ msgid "Bizkaia"
 msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:53
-#, fuzzy
 msgid "Zamora"
-msgstr "Нара"
+msgstr "Замора"
 
 #: contrib/localflavor/es/es_provinces.py:54
 msgid "Zaragoza"
@@ -2399,9 +2387,8 @@ msgid "Miyazaki"
 msgstr "Миязаки"
 
 #: contrib/localflavor/jp/jp_prefectures.py:49
-#, fuzzy
 msgid "Kagoshima"
-msgstr "Токушима"
+msgstr "Кагошина"
 
 #: contrib/localflavor/jp/jp_prefectures.py:50
 msgid "Okinawa"
@@ -2420,23 +2407,20 @@ msgid "Baja California Sur"
 msgstr ""
 
 #: contrib/localflavor/mx/mx_states.py:15
-#, fuzzy
 msgid "Campeche"
-msgstr "Чешский"
+msgstr "Кампече"
 
 #: contrib/localflavor/mx/mx_states.py:16
 msgid "Chihuahua"
 msgstr ""
 
 #: contrib/localflavor/mx/mx_states.py:17
-#, fuzzy
 msgid "Chiapas"
-msgstr "Чиба"
+msgstr "Чиакпас"
 
 #: contrib/localflavor/mx/mx_states.py:18
-#, fuzzy
 msgid "Coahuila"
-msgstr "Чиба"
+msgstr "Коахулия"
 
 #: contrib/localflavor/mx/mx_states.py:19
 msgid "Colima"
@@ -2451,9 +2435,8 @@ msgid "Durango"
 msgstr ""
 
 #: contrib/localflavor/mx/mx_states.py:22
-#, fuzzy
 msgid "Guerrero"
-msgstr "Ошибка сервера"
+msgstr "Гуерреро"
 
 #: contrib/localflavor/mx/mx_states.py:23
 msgid "Guanajuato"
@@ -2488,9 +2471,8 @@ msgid "Nuevo LeÃ³n"
 msgstr ""
 
 #: contrib/localflavor/mx/mx_states.py:31
-#, fuzzy
 msgid "Oaxaca"
-msgstr "Окаяма"
+msgstr "Оаксака"
 
 #: contrib/localflavor/mx/mx_states.py:32
 msgid "Puebla"
@@ -2505,9 +2487,8 @@ msgid "Quintana Roo"
 msgstr ""
 
 #: contrib/localflavor/mx/mx_states.py:35
-#, fuzzy
 msgid "Sinaloa"
-msgstr "Словацкий"
+msgstr "Синалоа"
 
 #: contrib/localflavor/mx/mx_states.py:36
 msgid "San Luis PotosÃ­"
@@ -2554,9 +2535,8 @@ msgid "Enter a valid SoFi number"
 msgstr "Укажите правильный SoFi номер."
 
 #: contrib/localflavor/nl/nl_provinces.py:4
-#, fuzzy
 msgid "Drenthe"
-msgstr "Французский"
+msgstr "Дрент"
 
 #: contrib/localflavor/nl/nl_provinces.py:5
 msgid "Flevoland"
@@ -2567,19 +2547,16 @@ msgid "Friesland"
 msgstr ""
 
 #: contrib/localflavor/nl/nl_provinces.py:7
-#, fuzzy
 msgid "Gelderland"
-msgstr "Немецкий"
+msgstr "Гельдерланд"
 
 #: contrib/localflavor/nl/nl_provinces.py:8
-#, fuzzy
 msgid "Groningen"
-msgstr "девять"
+msgstr "Гронинген"
 
 #: contrib/localflavor/nl/nl_provinces.py:9
-#, fuzzy
 msgid "Limburg"
-msgstr "Гамбург"
+msgstr "Лимбург"
 
 #: contrib/localflavor/nl/nl_provinces.py:10
 msgid "Noord-Brabant"
@@ -2594,14 +2571,12 @@ msgid "Overijssel"
 msgstr ""
 
 #: contrib/localflavor/nl/nl_provinces.py:13
-#, fuzzy
 msgid "Utrecht"
-msgstr "Французский"
+msgstr "Утрехт"
 
 #: contrib/localflavor/nl/nl_provinces.py:14
-#, fuzzy
 msgid "Zeeland"
-msgstr "Исландский"
+msgstr "Зиланд"
 
 #: contrib/localflavor/nl/nl_provinces.py:15
 msgid "Zuid-Holland"
@@ -2648,9 +2623,8 @@ msgid "Enter a postal code in the format XX-XXX."
 msgstr "Укажите почтовый индекс код в формате XX-XXX."
 
 #: contrib/localflavor/pl/pl_voivodeships.py:8
-#, fuzzy
 msgid "Lower Silesia"
-msgstr "Нижняя Саксония"
+msgstr "Нижняя Силесия"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:9
 msgid "Kuyavia-Pomerania"
@@ -2677,9 +2651,8 @@ msgid "Masovia"
 msgstr ""
 
 #: contrib/localflavor/pl/pl_voivodeships.py:15
-#, fuzzy
 msgid "Opole"
-msgstr "Необязательное"
+msgstr "Ополе"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:16
 msgid "Subcarpatia"
@@ -2690,14 +2663,12 @@ msgid "Podlasie"
 msgstr ""
 
 #: contrib/localflavor/pl/pl_voivodeships.py:18
-#, fuzzy
 msgid "Pomerania"
-msgstr "Румынский"
+msgstr "Померания"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:19
-#, fuzzy
 msgid "Silesia"
-msgstr "Словенский"
+msgstr "Силесия"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:20
 msgid "Swietokrzyskie"
@@ -2712,9 +2683,8 @@ msgid "Greater Poland"
 msgstr ""
 
 #: contrib/localflavor/pl/pl_voivodeships.py:23
-#, fuzzy
 msgid "West Pomerania"
-msgstr "Мекленбург-Западная Померания"
+msgstr "Западная Померания"
 
 #: contrib/localflavor/ro/forms.py:19
 msgid "Enter a valid CIF."
@@ -2757,9 +2727,8 @@ msgid "Banovce nad Bebravou"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:12
-#, fuzzy
 msgid "Brezno"
-msgstr "Бремен"
+msgstr "Брензо"
 
 #: contrib/localflavor/sk/sk_districts.py:13
 msgid "Bratislava I"
@@ -2802,14 +2771,12 @@ msgid "Dunajska Streda"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:23
-#, fuzzy
 msgid "Galanta"
-msgstr "Галльский"
+msgstr "Галанта"
 
 #: contrib/localflavor/sk/sk_districts.py:24
-#, fuzzy
 msgid "Gelnica"
-msgstr "Галльский"
+msgstr "Гельника"
 
 #: contrib/localflavor/sk/sk_districts.py:25
 msgid "Hlohovec"
@@ -2828,9 +2795,8 @@ msgid "Kezmarok"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:29
-#, fuzzy
 msgid "Komarno"
-msgstr "Корейский"
+msgstr "Комарно"
 
 #: contrib/localflavor/sk/sk_districts.py:30
 msgid "Kosice I"
@@ -2873,19 +2839,16 @@ msgid "Liptovsky Mikulas"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:40
-#, fuzzy
 msgid "Lucenec"
-msgstr "Люцерн"
+msgstr "Люценик"
 
 #: contrib/localflavor/sk/sk_districts.py:41
-#, fuzzy
 msgid "Malacky"
-msgstr "Май"
+msgstr "Малаки"
 
 #: contrib/localflavor/sk/sk_districts.py:42
-#, fuzzy
 msgid "Martin"
-msgstr "Латвийский"
+msgstr "Мартин"
 
 #: contrib/localflavor/sk/sk_districts.py:43
 msgid "Medzilaborce"
@@ -2904,9 +2867,8 @@ msgid "Namestovo"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:47
-#, fuzzy
 msgid "Nitra"
-msgstr "Нара"
+msgstr "Нитра"
 
 #: contrib/localflavor/sk/sk_districts.py:48
 msgid "Nove Mesto nad Vahom"
@@ -2969,29 +2931,24 @@ msgid "Ruzomberok"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:63
-#, fuzzy
 msgid "Sabinov"
-msgstr "нояб"
+msgstr "Сабинов"
 
 #: contrib/localflavor/sk/sk_districts.py:64
-#, fuzzy
 msgid "Senec"
-msgstr "Берн"
+msgstr "Сеник"
 
 #: contrib/localflavor/sk/sk_districts.py:65
-#, fuzzy
 msgid "Senica"
-msgstr "Словенский"
+msgstr "Сеника"
 
 #: contrib/localflavor/sk/sk_districts.py:66
-#, fuzzy
 msgid "Skalica"
-msgstr "Галльский"
+msgstr "Скалиция"
 
 #: contrib/localflavor/sk/sk_districts.py:67
-#, fuzzy
 msgid "Snina"
-msgstr "девять"
+msgstr "Снина"
 
 #: contrib/localflavor/sk/sk_districts.py:68
 msgid "Sobrance"
@@ -3014,9 +2971,8 @@ msgid "Svidnik"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:73
-#, fuzzy
 msgid "Sala"
-msgstr "Сага"
+msgstr "Сала"
 
 #: contrib/localflavor/sk/sk_districts.py:74
 msgid "Topolcany"
@@ -3027,9 +2983,8 @@ msgid "Trebisov"
 msgstr ""
 
 #: contrib/localflavor/sk/sk_districts.py:76
-#, fuzzy
 msgid "Trencin"
-msgstr "Французский"
+msgstr "Тренцин"
 
 #: contrib/localflavor/sk/sk_districts.py:77
 msgid "Trnava"
@@ -3109,15 +3064,15 @@ msgstr "Укажите правильный код почтового отдел
 
 #: contrib/localflavor/uk/uk_regions.py:11
 msgid "Bedfordshire"
-msgstr ""
+msgstr "Бедфордшир"
 
 #: contrib/localflavor/uk/uk_regions.py:12
 msgid "Buckinghamshire"
-msgstr ""
+msgstr "Букингемшир"
 
 #: contrib/localflavor/uk/uk_regions.py:14
 msgid "Cheshire"
-msgstr ""
+msgstr "Чешир"
 
 #: contrib/localflavor/uk/uk_regions.py:15
 msgid "Cornwall and Isles of Scilly"
@@ -3125,70 +3080,67 @@ msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:16
 msgid "Cumbria"
-msgstr ""
+msgstr "Камбрия"
 
 #: contrib/localflavor/uk/uk_regions.py:17
 msgid "Derbyshire"
-msgstr ""
+msgstr "Дербишир"
 
 #: contrib/localflavor/uk/uk_regions.py:18
-#, fuzzy
 msgid "Devon"
-msgstr "семь"
+msgstr "Девон"
 
 #: contrib/localflavor/uk/uk_regions.py:19
 msgid "Dorset"
-msgstr ""
+msgstr "Дорсет"
 
 #: contrib/localflavor/uk/uk_regions.py:20
 msgid "Durham"
-msgstr ""
+msgstr "Дурхам"
 
 #: contrib/localflavor/uk/uk_regions.py:21
 msgid "East Sussex"
-msgstr ""
+msgstr "Восточный Сассекс"
 
 #: contrib/localflavor/uk/uk_regions.py:22
 msgid "Essex"
-msgstr ""
+msgstr "Эссекс"
 
 #: contrib/localflavor/uk/uk_regions.py:23
 msgid "Gloucestershire"
-msgstr ""
+msgstr "Глостершир"
 
 #: contrib/localflavor/uk/uk_regions.py:24
 msgid "Greater London"
-msgstr ""
+msgstr "Грейте Лондон"
 
 #: contrib/localflavor/uk/uk_regions.py:25
 msgid "Greater Manchester"
-msgstr ""
+msgstr "Грейтер Манчестер"
 
 #: contrib/localflavor/uk/uk_regions.py:26
 msgid "Hampshire"
-msgstr ""
+msgstr "Хэмшир"
 
 #: contrib/localflavor/uk/uk_regions.py:27
 msgid "Hertfordshire"
-msgstr ""
+msgstr "Хертфордшир"
 
 #: contrib/localflavor/uk/uk_regions.py:28
-#, fuzzy
 msgid "Kent"
-msgstr "Корейский"
+msgstr "Кент"
 
 #: contrib/localflavor/uk/uk_regions.py:29
-#, fuzzy
 msgid "Lancashire"
-msgstr "Яманаши"
+msgstr "Ланкашир"
 
 #: contrib/localflavor/uk/uk_regions.py:30
 msgid "Leicestershire"
-msgstr ""
+msgstr "Лицестершир"
 
 #: contrib/localflavor/uk/uk_regions.py:31
 msgid "Lincolnshire"
-msgstr ""
+msgstr "Линкольншир"
 
 #: contrib/localflavor/uk/uk_regions.py:32
 msgid "Merseyside"
@@ -3196,15 +3148,15 @@ msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:33
 msgid "Norfolk"
-msgstr ""
+msgstr "Норфолк"
 
 #: contrib/localflavor/uk/uk_regions.py:34
 msgid "North Yorkshire"
-msgstr ""
+msgstr "Северный Йоркшир"
 
 #: contrib/localflavor/uk/uk_regions.py:35
 msgid "Northamptonshire"
-msgstr ""
+msgstr "Нортамптошир"
 
 #: contrib/localflavor/uk/uk_regions.py:36
 msgid "Northumberland"
@@ -3212,36 +3164,35 @@ msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:37
 msgid "Nottinghamshire"
-msgstr ""
+msgstr "Нотингемшир"
 
 #: contrib/localflavor/uk/uk_regions.py:38
 msgid "Oxfordshire"
-msgstr ""
+msgstr "Оксфордшир"
 
 #: contrib/localflavor/uk/uk_regions.py:39
 msgid "Shropshire"
-msgstr ""
+msgstr "Шропшир"
 
 #: contrib/localflavor/uk/uk_regions.py:40
 msgid "Somerset"
-msgstr ""
+msgstr "Сомерсет"
 
 #: contrib/localflavor/uk/uk_regions.py:41
 msgid "South Yorkshire"
-msgstr ""
+msgstr "Южный Йоркшир"
 
 #: contrib/localflavor/uk/uk_regions.py:42
 msgid "Staffordshire"
-msgstr ""
+msgstr "Стаффордшир"
 
 #: contrib/localflavor/uk/uk_regions.py:43
 msgid "Suffolk"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:44
-#, fuzzy
 msgid "Surrey"
-msgstr "Современно:"
+msgstr "Сюррэй:"
 
 #: contrib/localflavor/uk/uk_regions.py:45
 msgid "Tyne and Wear"
@@ -3253,19 +3204,19 @@ msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:47
 msgid "West Midlands"
-msgstr ""
+msgstr "Западный Мидландс"
 
 #: contrib/localflavor/uk/uk_regions.py:48
 msgid "West Sussex"
-msgstr ""
+msgstr "Западный Сассекс"
 
 #: contrib/localflavor/uk/uk_regions.py:49
 msgid "West Yorkshire"
-msgstr ""
+msgstr "Западный Йоркшир"
 
 #: contrib/localflavor/uk/uk_regions.py:50
 msgid "Wiltshire"
-msgstr ""
+msgstr "Вильтшир"
 
 #: contrib/localflavor/uk/uk_regions.py:51
 msgid "Worcestershire"
@@ -3328,9 +3279,8 @@ msgid "West Glamorgan"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:75
-#, fuzzy
 msgid "Borders"
-msgstr "Порядок:"
+msgstr "Бордерс"
 
 #: contrib/localflavor/uk/uk_regions.py:76
 msgid "Central Scotland"
@@ -3341,23 +3291,20 @@ msgid "Dumfries and Galloway"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:78
-#, fuzzy
 msgid "Fife"
-msgstr "Фильтр"
+msgstr "Файф"
 
 #: contrib/localflavor/uk/uk_regions.py:79
-#, fuzzy
 msgid "Grampian"
-msgstr "Немецкий"
+msgstr "Грампиан"
 
 #: contrib/localflavor/uk/uk_regions.py:80
 msgid "Highland"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:81
-#, fuzzy
 msgid "Lothian"
-msgstr "Латвийский"
+msgstr "Лотиан"
 
 #: contrib/localflavor/uk/uk_regions.py:82
 msgid "Orkney Islands"
@@ -3377,7 +3324,7 @@ msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:86
 msgid "Western Isles"
-msgstr ""
+msgstr "Западный Ислес"
 
 #: contrib/localflavor/uk/uk_regions.py:90
 msgid "England"
@@ -3385,11 +3332,11 @@ msgstr "Англия"
 
 #: contrib/localflavor/uk/uk_regions.py:91
 msgid "Northern Ireland"
-msgstr ""
+msgstr "Северная Ирландия"
 
 #: contrib/localflavor/uk/uk_regions.py:92
 msgid "Scotland"
-msgstr ""
+msgstr "Шотландия"
 
 #: contrib/localflavor/uk/uk_regions.py:93
 msgid "Wales"
@@ -3412,44 +3359,40 @@ msgid "Enter a valid South African postal code"
 msgstr "Укажите правильный zip код в Южной Африке"
 
 #: contrib/localflavor/za/za_provinces.py:4
-#, fuzzy
 msgid "Eastern Cape"
-msgstr "Имя пользователя"
+msgstr "Восточный Кейп"
 
 #: contrib/localflavor/za/za_provinces.py:5
-#, fuzzy
 msgid "Free State"
-msgstr "Время счёта"
+msgstr "Свободный штат"
 
 #: contrib/localflavor/za/za_provinces.py:6
-#, fuzzy
 msgid "Gauteng"
-msgstr "авг"
+msgstr "Гаутенг"
 
 #: contrib/localflavor/za/za_provinces.py:7
 msgid "KwaZulu-Natal"
-msgstr ""
+msgstr "КваЗулу-Наталь"
 
 #: contrib/localflavor/za/za_provinces.py:8
 msgid "Limpopo"
-msgstr ""
+msgstr "Лимпопо"
 
 #: contrib/localflavor/za/za_provinces.py:9
 msgid "Mpumalanga"
-msgstr ""
+msgstr "Мпумаланга"
 
 #: contrib/localflavor/za/za_provinces.py:10
 msgid "Northern Cape"
-msgstr ""
+msgstr "Северный Кейп"
 
 #: contrib/localflavor/za/za_provinces.py:11
 msgid "North West"
 msgstr "Северо-запад"
 
 #: contrib/localflavor/za/za_provinces.py:12
-#, fuzzy
 msgid "Western Cape"
-msgstr "Имя пользователя"
+msgstr "Западный Кейп"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
@@ -3507,55 +3450,55 @@ msgstr "Выводимое имя"
 msgid "sites"
 msgstr "Сайты"
 
-#: db/models/fields/__init__.py:332
-#: db/models/fields/__init__.py:667
+#: db/models/fields/__init__.py:348
+#: db/models/fields/__init__.py:683
 msgid "This value must be an integer."
 msgstr "Это значение должно быть целым числом."
 
-#: db/models/fields/__init__.py:363
+#: db/models/fields/__init__.py:379
 msgid "This value must be either True or False."
 msgstr "Значение должно либо True, либо False."
 
-#: db/models/fields/__init__.py:396
+#: db/models/fields/__init__.py:412
 msgid "This field cannot be null."
 msgstr "Это поле не может быть нулевым."
 
-#: db/models/fields/__init__.py:412
+#: db/models/fields/__init__.py:428
 msgid "Enter only digits separated by commas."
 msgstr "Введите цифры, разделённые запятыми."
 
-#: db/models/fields/__init__.py:443
+#: db/models/fields/__init__.py:459
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Вводите правильную дату в формате YYYY-MM-DD."
 
-#: db/models/fields/__init__.py:452
+#: db/models/fields/__init__.py:468
 #, python-format
 msgid "Invalid date: %s"
 msgstr "неправильная дата: %s"
 
-#: db/models/fields/__init__.py:516
-#: db/models/fields/__init__.py:534
+#: db/models/fields/__init__.py:532
+#: db/models/fields/__init__.py:550
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "Введите правильные дату/время в формате  YYYY-MM-DD HH:MM[:ss[.uuuuuu]."
 
-#: db/models/fields/__init__.py:570
+#: db/models/fields/__init__.py:586
 msgid "This value must be a decimal number."
 msgstr "Это значение должно быть целым числом."
 
-#: db/models/fields/__init__.py:703
+#: db/models/fields/__init__.py:719
 msgid "This value must be either None, True or False."
 msgstr "Значение должно либо True, либо False."
 
-#: db/models/fields/__init__.py:811
-#: db/models/fields/__init__.py:825
+#: db/models/fields/__init__.py:817
+#: db/models/fields/__init__.py:831
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Введите правильное время в формате HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:748
+#: db/models/fields/related.py:761
 msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "Удерживайте \"Control\" (или \"Command\" на Mac) для выбора нескольких."
 
-#: db/models/fields/related.py:825
+#: db/models/fields/related.py:838
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
@@ -3563,117 +3506,117 @@ msgstr[0] "Пожалуйста, введите корректный ID для %
 msgstr[1] "Пожалуйста, введите корректные ID для %(self)s. Значения %(value)r недопустимы."
 msgstr[2] "Пожалуйста, введите корректные ID для %(self)s. Значения %(value)r недопустимы."
 
-#: forms/fields.py:52
+#: forms/fields.py:54
 msgid "This field is required."
 msgstr "Обязательное поле."
 
-#: forms/fields.py:53
+#: forms/fields.py:55
 msgid "Enter a valid value."
 msgstr "Укажите значение правильно"
 
-#: forms/fields.py:133
+#: forms/fields.py:138
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr "Убедитесь, что значение содержит не больше %(max)d символов (сейчас %(length)d)."
 
-#: forms/fields.py:134
+#: forms/fields.py:139
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr "Убедитесь, что значение содержит не менее %(min)d символов (сейчас %(length)d)."
 
-#: forms/fields.py:161
+#: forms/fields.py:166
 msgid "Enter a whole number."
 msgstr "Введите целое число."
 
-#: forms/fields.py:162
-#: forms/fields.py:191
-#: forms/fields.py:220
+#: forms/fields.py:167
+#: forms/fields.py:196
+#: forms/fields.py:225
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Убедитесь что это значение меньше или равно %s."
 
-#: forms/fields.py:163
-#: forms/fields.py:192
-#: forms/fields.py:221
+#: forms/fields.py:168
+#: forms/fields.py:197
+#: forms/fields.py:226
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Убедитесь что это значение больше или равно %s"
 
-#: forms/fields.py:190
-#: forms/fields.py:219
+#: forms/fields.py:195
+#: forms/fields.py:224
 msgid "Enter a number."
 msgstr "Введите номер."
 
-#: forms/fields.py:222
+#: forms/fields.py:227
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Будьте уверены, что не будет цифр больше %s в итоге."
 
-#: forms/fields.py:223
+#: forms/fields.py:228
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Будьте уверены, что не будет цифр после запятой больше чем %s."
 
-#: forms/fields.py:224
+#: forms/fields.py:229
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Будьте уверены, что не будет цифр до запятой больше чем %s."
 
-#: forms/fields.py:282
-#: forms/fields.py:815
+#: forms/fields.py:287
+#: forms/fields.py:848
 msgid "Enter a valid date."
 msgstr "Укажите дату  правильно."
 
-#: forms/fields.py:316
-#: forms/fields.py:816
+#: forms/fields.py:321
+#: forms/fields.py:849
 msgid "Enter a valid time."
 msgstr "Укажите время  правильно."
 
-#: forms/fields.py:355
+#: forms/fields.py:360
 msgid "Enter a valid date/time."
 msgstr "Укажите дату и время  правильно."
 
-#: forms/fields.py:441
+#: forms/fields.py:446
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Не получен файл. Проверьте кодирование формы (encoding)."
 
-#: forms/fields.py:442
+#: forms/fields.py:447
 msgid "No file was submitted."
 msgstr "Ни одного файла не было добавлено."
 
-#: forms/fields.py:443
+#: forms/fields.py:448
 msgid "The submitted file is empty."
 msgstr "Указанный файл пуст."
 
-#: forms/fields.py:472
+#: forms/fields.py:477
 msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
 msgstr "Загрузите реальное изображение. Файл, который вы загрузили, не является изображением или был поврежден."
 
-#: forms/fields.py:533
+#: forms/fields.py:538
 msgid "Enter a valid URL."
 msgstr "Укажите правильный URL"
 
-#: forms/fields.py:534
+#: forms/fields.py:539
 msgid "This URL appears to be a broken link."
 msgstr "Этот URL похоже сломанная ссылка."
 
-#: forms/fields.py:613
-#: forms/fields.py:664
+#: forms/fields.py:618
+#: forms/fields.py:696
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Выберите корректный вариант.  %(value)s нет среди допустимых значений."
 
-#: forms/fields.py:665
-#: forms/fields.py:726
-#: forms/models.py:531
+#: forms/fields.py:697
+#: forms/fields.py:758
+#: forms/models.py:654
 msgid "Enter a list of values."
 msgstr "Укажите список занчений."
 
-#: forms/fields.py:844
+#: forms/fields.py:877
 msgid "Enter a valid IPv4 address."
 msgstr "Укажите действительный IPv4 адрес."
 
-#: forms/fields.py:854
+#: forms/fields.py:887
 msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "Значение должно состоять только из букв, цифр, знаков подчеркивания или тире."
 
@@ -3682,11 +3625,17 @@ msgstr "Значение должно состоять только из бук�
 msgid "Order"
 msgstr "Порядок"
 
-#: forms/models.py:463
+#: forms/models.py:268
+#: forms/models.py:277
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s с этим %(field_label)s уже существует."
+
+#: forms/models.py:584
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Выберите корректный вариант. Вашего варианта нет среди допустимых"
 
-#: forms/models.py:532
+#: forms/models.py:655
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Выберите корректный вариант.  %s нет среди допустимых значений."
@@ -3720,19 +3669,19 @@ msgstr "%.1f Гб"
 
 #: utils/dateformat.py:41
 msgid "p.m."
-msgstr ""
+msgstr "п.п."
 
 #: utils/dateformat.py:42
 msgid "a.m."
-msgstr ""
+msgstr "д.п."
 
 #: utils/dateformat.py:47
 msgid "PM"
-msgstr ""
+msgstr "ПП"
 
 #: utils/dateformat.py:48
 msgid "AM"
-msgstr ""
+msgstr "ДП"
 
 #: utils/dateformat.py:97
 msgid "midnight"
@@ -3980,12 +3929,12 @@ msgstr "минут"
 #: utils/timesince.py:48
 #, python-format
 msgid "%(number)d %(type)s"
-msgstr ""
+msgstr "%(number)d %(type)s"
 
 #: utils/timesince.py:54
 #, python-format
 msgid ", %(number)d %(type)s"
-msgstr ""
+msgstr ", %(number)d %(type)s"
 
 #: utils/translation/trans_real.py:403
 msgid "DATE_FORMAT"
@@ -4036,8 +3985,6 @@ msgstr "Объект %(verbose_name)s был успешно удален."
 #~ msgid ""
 #~ "%(object)s with this %(type)s already exists for the given %(field)s."
 #~ msgstr "%(object)s с типом %(type)s уже существует для данного %(field)s."
-#~ msgid "%(optname)s with this %(fieldname)s already exists."
-#~ msgstr "%(optname)s с %(fieldname)s уже существует."
 #~ msgid "Enter a valid filename."
 #~ msgstr "Укажите правильное имя файла."
 #~ msgid "Separate multiple IDs with commas."
