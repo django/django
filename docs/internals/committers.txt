@@ -75,7 +75,7 @@ Core developers
 These are the folks who have a long history of contributions, a solid track
 record of being helpful on the mailing lists, and a proven desire to dedicate
 serious time to Django. In return, they've been granted the coveted commit bit,
-and have free reign to hack on all parts of Django.
+and have free rein to hack on all parts of Django.
 
 `Malcolm Tredinnick`_
     Malcolm originally wanted to be a mathematician, somehow ended up a software
@@ -137,7 +137,7 @@ Joseph Kocherhans
 .. _this week in django: http://thisweekindjango.com/
 
 Gary Wilson
-    In early 2007, Gary start contributing a lot of cleanup fixes and fixing
+    In early 2007, Gary started contributing a lot of cleanup fixes and fixing
     broken windows. He's continued to do that necessary tidying up work
     throughout the code base since then.
     
