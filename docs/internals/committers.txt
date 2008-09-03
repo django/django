@@ -185,5 +185,5 @@ Georg "Hugo" Bauer
     
 Robert Wittams
      Robert was responsible for the *first* refactoring of Django's admin
-     siteadmin application to allow for easier reuse and has made a ton of
+     application to allow for easier reuse and has made a ton of
      excellent tweaks, feature additions and bug fixes.
