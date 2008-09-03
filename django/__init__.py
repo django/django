@@ -1,4 +1,4 @@
-VERSION = (1, 0, 'rc_1')
+VERSION = (1, 0, 'final')
 
 def get_version():
     "Returns the version as a human-format string."
