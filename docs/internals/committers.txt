@@ -147,10 +147,11 @@ Specialists
 `James Bennett`_
     James is Django's release manager; he also contributes to the documentation.
     
-    James came to web development from philosophy when he discovered that
-    programmers get to argue just as much while collecting much better pay. He
-    where he works for the Journal-World developing Ellington. He `keeps a
-    blog`_, has written a `book on Django`_, and enjoys fine port and talking to
+    James came to web development from philosophy when he discovered
+    that programmers get to argue just as much while collecting much
+    better pay. He lives in Lawrence, Kansas, where he works for the
+    Journal-World developing Ellington. He `keeps a blog`_, has
+    written a `book on Django`_, and enjoys fine port and talking to
     his car.
 
     James lives in Lawrence, Kansas, USA.
