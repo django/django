@@ -98,4 +98,13 @@ True
 >>> Order.objects.extra(where=["username=%s"], params=["fred"], tables=["auth_user"]).order_by('created_by')
 []
 
+# Regression test for #8819: Fields in the extra(select=...) list should be
+# available to extra(order_by=...).
+>>> User.objects.extra(select={'extra_field': 1}).distinct()
+[<User: fred>]
+>>> User.objects.extra(select={'extra_field': 1}, order_by=['extra_field'])
+[<User: fred>]
+>>> User.objects.extra(select={'extra_field': 1}, order_by=['extra_field']).distinct()
+[<User: fred>]
+
 """}
