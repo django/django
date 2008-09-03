@@ -41,6 +41,8 @@ div.breadcrumbs { text-align:right; }
 form ul.inline li { float:right; padding-right:0; padding-left:7px; }
 input[type=submit].default, .submit-row input.default { float:left; }
 fieldset .field-box { float:right; margin-left: 20px; }
+.errorlist li {background-position: 100% .3em; padding: 4px 25px 4px 5px; }
+.errornote {background-position: 100% .3em; padding: 4px 25px 4px 5px;
 
 /* widget styles */
 .calendarnav-previous { top:0; left:auto; right:0; }
