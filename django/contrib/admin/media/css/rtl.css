@@ -35,6 +35,8 @@ div.breadcrumbs { text-align:right; }
 /* form styles */
 .aligned label { padding:0 0 3px 1em;  float:right; }
 .submit-row { text-align: left }
+.submit-row p.deletelink-box { float: right;}
+.submit-row .deletelink { background:url(../img/admin/icon_deletelink.gif) 0 50% no-repeat; padding-right:14px; }
 .vDateField, .vTimeField { margin-left:2px; }
 form ul.inline li { float:right; padding-right:0; padding-left:7px; }
 input[type=submit].default, .submit-row input.default { float:left; }
