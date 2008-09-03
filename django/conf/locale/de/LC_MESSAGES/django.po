@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-03 10:04+0200\n"
+"POT-Creation-Date: 2008-09-03 20:01+0200\n"
 "PO-Revision-Date: 2008-08-28 22:58+0100\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: \n"
@@ -330,12 +330,12 @@ msgstr "%(name)s \"%(obj)s\" wurde erfolgreich hinzugefügt."
 #: contrib/admin/options.py:421 contrib/admin/options.py:454
 #: contrib/auth/admin.py:59
 msgid "You may edit it again below."
-msgstr "Das Element kann jetzt weiter bearbeitet werden."
+msgstr "Das Element kann jetzt erneut bearbeitet werden."
 
 #: contrib/admin/options.py:431 contrib/admin/options.py:464
 #, python-format
 msgid "You may add another %s below."
-msgstr "Jetzt kann ein weiteres Element des Typs %s angelegt werden."
+msgstr "Es kann ein weiteres Element des Typs %s angelegt werden."
 
 #: contrib/admin/options.py:452
 #, python-format
@@ -371,7 +371,7 @@ msgstr "%(name)s \"%(obj)s\" wurde erfolgreich gelöscht."
 
 #: contrib/admin/options.py:703
 msgid "Are you sure?"
-msgstr "Sind Sie ganz sicher?"
+msgstr "Sind Sie sicher?"
 
 #: contrib/admin/options.py:732
 #, python-format
@@ -389,7 +389,7 @@ msgstr ""
 
 #: contrib/admin/sites.py:227 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
-msgstr "Bitte erneut anmelden, da Ihre Sitzung abgelaufen ist."
+msgstr "Bitte melden Sie sich erneut an, da Ihre Sitzung abgelaufen ist."
 
 #: contrib/admin/sites.py:234 contrib/admin/views/decorators.py:47
 msgid ""
@@ -696,7 +696,7 @@ msgstr "Los"
 #, python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
-msgstr[0] "Ein Ergebnis"
+msgstr[0] "1 Ergebnis"
 msgstr[1] "%(counter)s Ergebnisse"
 
 #: contrib/admin/templates/admin/search_form.html:10
@@ -880,7 +880,7 @@ msgstr "Sie erhalten diese E-Mail, weil Sie ein neues Passwort"
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
 msgid "for your user account at %(site_name)s"
-msgstr "für Ihren Benutzer bei %(site_name)s angefordert haben."
+msgstr "für Ihren Benutzer bei %(site_name)s angefordert haben"
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 msgid "Please go to the following page and choose a new password:"
@@ -892,7 +892,7 @@ msgstr "Ihr Benutzername, falls Sie ihn vergessen haben:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Thanks for using our site!"
-msgstr "Vielen Dank, dass Sie unsere Seiten benutzen!"
+msgstr "Vielen Dank, dass Sie unsere Seite benutzen!"
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
 #, python-format
@@ -931,7 +931,7 @@ msgstr "%s zur Änderung auswählen"
 
 #: contrib/admin/views/template.py:36 contrib/sites/models.py:38
 msgid "site"
-msgstr "Website"
+msgstr "Webseite"
 
 #: contrib/admin/views/template.py:38
 msgid "template"
@@ -1000,7 +1000,7 @@ msgstr "Ganzzahl"
 
 #: contrib/admindocs/views.py:315
 msgid "Boolean (Either True or False)"
-msgstr "Boolscher Wert (True oder False)"
+msgstr "Boolescher Wert (True oder False)"
 
 #: contrib/admindocs/views.py:316 contrib/admindocs/views.py:335
 #, python-format
@@ -1042,7 +1042,7 @@ msgstr "IP-Adresse"
 
 #: contrib/admindocs/views.py:330
 msgid "Boolean (Either True, False or None)"
-msgstr "Boolscher Wert (True, False oder None)"
+msgstr "Boolescher Wert (True, False oder None)"
 
 #: contrib/admindocs/views.py:331
 msgid "Relation to parent model"
@@ -1406,8 +1406,8 @@ msgstr ""
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Keine Schimpfworte! Das Wort %s ist hier nicht gern gesehen!"
-msgstr[1] "Keine Schimpfworte! Die Wörter %s sind hier nicht gern gesehen!"
+msgstr[0] "Keine Schimpfworte! Das Wort %s ist hier nicht erlaubt!"
+msgstr[1] "Keine Schimpfworte! Die Wörter %s sind hier nicht erlaubt!"
 
 #: contrib/comments/models.py:23
 msgid "object ID"
@@ -1491,7 +1491,7 @@ msgstr ""
 
 #: contrib/contenttypes/models.py:67
 msgid "python model class name"
-msgstr "Python Model-Klassenname"
+msgstr "Python Modell-Klassenname"
 
 #: contrib/contenttypes/models.py:71
 msgid "content type"
@@ -1533,7 +1533,7 @@ msgstr "Kommentare aktivieren"
 
 #: contrib/flatpages/models.py:11
 msgid "template name"
-msgstr "Name der Vorlage"
+msgstr "Name des Template"
 
 #: contrib/flatpages/models.py:12
 msgid ""
@@ -1555,11 +1555,11 @@ msgstr ""
 
 #: contrib/flatpages/models.py:18
 msgid "flat page"
-msgstr "Webseite"
+msgstr "Seite"
 
 #: contrib/flatpages/models.py:19
 msgid "flat pages"
-msgstr "Webseiten"
+msgstr "Seiten"
 
 #: contrib/formtools/wizard.py:130
 msgid ""
@@ -1768,7 +1768,7 @@ msgstr "Ungültige CNPJ-Nummer."
 
 #: contrib/localflavor/br/forms.py:136
 msgid "This field requires at least 14 digits"
-msgstr "Dieses Feld benötigt mindestens 14 Ziffern."
+msgstr "Dieses Feld benötigt mindestens 14 Ziffern"
 
 #: contrib/localflavor/ca/forms.py:17
 msgid "Enter a postal code in the format XXX XXX."
@@ -2644,15 +2644,15 @@ msgstr "Zacatecas"
 
 #: contrib/localflavor/nl/forms.py:21
 msgid "Enter a valid postal code"
-msgstr "Bitte eine gültige Postleitzahl eingeben."
+msgstr "Bitte eine gültige Postleitzahl eingeben"
 
 #: contrib/localflavor/nl/forms.py:52
 msgid "Enter a valid phone number"
-msgstr "Bitte eine gültige Telefonnummer eingeben."
+msgstr "Bitte eine gültige Telefonnummer eingeben"
 
 #: contrib/localflavor/nl/forms.py:78
 msgid "Enter a valid SoFi number"
-msgstr "Bitte eine gültige SoFi-Nummer eingeben."
+msgstr "Bitte eine gültige SoFi-Nummer eingeben"
 
 #: contrib/localflavor/nl/nl_provinces.py:4
 msgid "Drenthe"
@@ -3481,11 +3481,11 @@ msgstr ""
 
 #: contrib/localflavor/za/forms.py:20
 msgid "Enter a valid South African ID number"
-msgstr "Bitte eine gültige südafrikanische Identifikationsnummer eingeben."
+msgstr "Bitte eine gültige südafrikanische Identifikationsnummer eingeben"
 
 #: contrib/localflavor/za/forms.py:54
 msgid "Enter a valid South African postal code"
-msgstr "Bitte eine gültige südafrikanische Postleitzahl eingeben."
+msgstr "Bitte eine gültige südafrikanische Postleitzahl eingeben"
 
 #: contrib/localflavor/za/za_provinces.py:4
 msgid "Eastern Cape"
@@ -3585,7 +3585,7 @@ msgstr "Anzeigename"
 
 #: contrib/sites/models.py:39
 msgid "sites"
-msgstr "Websites"
+msgstr "Webseiten"
 
 #: db/models/fields/__init__.py:348 db/models/fields/__init__.py:683
 msgid "This value must be an integer."
@@ -3593,7 +3593,7 @@ msgstr "Dieser Wert muss eine Ganzzahl sein."
 
 #: db/models/fields/__init__.py:379
 msgid "This value must be either True or False."
-msgstr "Dieser Wert muss wahr oder falsch sein."
+msgstr "Dieser Wert muss True oder False sein."
 
 #: db/models/fields/__init__.py:412
 msgid "This field cannot be null."
@@ -3676,7 +3676,7 @@ msgstr "Bitte eine ganze Zahl eingeben."
 #: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
-msgstr "Dieser Wert darf maximal %s sein."
+msgstr "Dieser Wert muss kleiner oder gleich %s sein."
 
 #: forms/fields.py:168 forms/fields.py:197 forms/fields.py:226
 #, python-format
@@ -3775,7 +3775,7 @@ msgstr "%(model_name)s mit diesem %(field_label)s existiert bereits."
 
 #: forms/models.py:584
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Bitte eine gültige Auswahl treffen."
+msgstr "Bitte eine gültige Auswahl treffen. Dies ist keine gültige Auswahl."
 
 #: forms/models.py:655
 #, python-format
