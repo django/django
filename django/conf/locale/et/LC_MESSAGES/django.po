@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-30 15:51+0300\n"
-"PO-Revision-Date: 2008-06-17 12:29+0300\n"
+"POT-Creation-Date: 2008-09-03 00:34+0200\n"
+"PO-Revision-Date: 2008-09-03 00:35+0200\n"
 "Last-Translator: Erik Allik <removethis-eallik_at_gmail-com>\n"
 "Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -243,15 +243,15 @@ msgstr "Käesolev kuu"
 msgid "This year"
 msgstr "Käesolev aasta"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
 msgid "Yes"
 msgstr "Jah"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
 msgid "No"
 msgstr "Ei"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:391
 msgid "Unknown"
 msgstr "Tundmatu"
 
@@ -283,93 +283,94 @@ msgstr "logisissekanne"
 msgid "log entries"
 msgstr "logisissekanded"
 
-#: contrib/admin/options.py:56 contrib/admin/options.py:120
+#: contrib/admin/options.py:60 contrib/admin/options.py:121
 msgid "None"
 msgstr "puudub"
 
-#: contrib/admin/options.py:334
+#: contrib/admin/options.py:338
 #, python-format
 msgid "Changed %s."
 msgstr "Muutsin %s."
 
-#: contrib/admin/options.py:334 contrib/admin/options.py:344
+#: contrib/admin/options.py:338 contrib/admin/options.py:348
+#: forms/models.py:275
 msgid "and"
 msgstr "ja"
 
-#: contrib/admin/options.py:339
+#: contrib/admin/options.py:343
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Lisatud %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:343
+#: contrib/admin/options.py:347
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Muudetud %(list)s objektil %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:348
+#: contrib/admin/options.py:352
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Kustutatud %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:352
+#: contrib/admin/options.py:356
 msgid "No fields changed."
 msgstr "Ühtegi välja ei muudetud."
 
-#: contrib/admin/options.py:413 contrib/auth/admin.py:51
+#: contrib/admin/options.py:417 contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" lisamine õnnestus."
 
-#: contrib/admin/options.py:417 contrib/admin/options.py:450
-#: contrib/auth/admin.py:57
+#: contrib/admin/options.py:421 contrib/admin/options.py:454
+#: contrib/auth/admin.py:59
 msgid "You may edit it again below."
 msgstr "Te võite selle muutmist jätkata."
 
-#: contrib/admin/options.py:427 contrib/admin/options.py:460
+#: contrib/admin/options.py:431 contrib/admin/options.py:464
 #, python-format
 msgid "You may add another %s below."
 msgstr "Te võite lisada uue objekti %s"
 
-#: contrib/admin/options.py:448
+#: contrib/admin/options.py:452
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Objekti %(name)s \"%(obj)s\" muutmine õnnestus."
 
-#: contrib/admin/options.py:456
+#: contrib/admin/options.py:460
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "Objekti %(name)s \"%(obj)s\" lisamine õnnestus. Te võite seda muuta."
 
-#: contrib/admin/options.py:532
+#: contrib/admin/options.py:536
 #, python-format
 msgid "Add %s"
 msgstr "Lisa %s"
 
-#: contrib/admin/options.py:610
+#: contrib/admin/options.py:614
 #, python-format
 msgid "Change %s"
 msgstr "Muuda %s"
 
-#: contrib/admin/options.py:642
+#: contrib/admin/options.py:646
 msgid "Database error"
 msgstr "Andmebaasi viga"
 
-#: contrib/admin/options.py:692
+#: contrib/admin/options.py:696
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Objekti %(name)s \"%(obj)s\" kustutamine õnnestus."
 
-#: contrib/admin/options.py:699
+#: contrib/admin/options.py:703
 msgid "Are you sure?"
 msgstr "Kas olete kindel?"
 
-#: contrib/admin/options.py:728
+#: contrib/admin/options.py:732
 #, python-format
 msgid "Change history: %s"
 msgstr "Muudatuste ajalugu: %s"
 
-#: contrib/admin/sites.py:18 contrib/admin/views/decorators.py:16
+#: contrib/admin/sites.py:16 contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:80
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -378,15 +379,12 @@ msgstr ""
 "Palun sisestage korrektne kasutajatunnus ja salasõna. Mõlemad väljad on "
 "tõstutundlikud."
 
-#: contrib/admin/sites.py:242 contrib/admin/views/decorators.py:68
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
+#: contrib/admin/sites.py:227 contrib/admin/views/decorators.py:40
+msgid "Please log in again, because your session has expired."
 msgstr ""
-"Teie sessioon on aegunud. Palun logige uuesti sisse. Olge mureta: sisestatud "
-"andmed on salvestatud."
+"Teie sessioon on aegunud. Palun logige uuesti sisse."
 
-#: contrib/admin/sites.py:249 contrib/admin/views/decorators.py:75
+#: contrib/admin/sites.py:234 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -394,28 +392,28 @@ msgstr ""
 "Paistab, et Teie brauser ei aktsepteeri küpsiseid. Palun võimaldage küpsised "
 "ning seejärel laadige see leht uuesti."
 
-#: contrib/admin/sites.py:265 contrib/admin/sites.py:271
-#: contrib/admin/views/decorators.py:94
+#: contrib/admin/sites.py:250 contrib/admin/sites.py:256
+#: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Kasutajatunnused ei tohi sisaldada '@' märki."
 
-#: contrib/admin/sites.py:268 contrib/admin/views/decorators.py:90
+#: contrib/admin/sites.py:253 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
 "Teie e-posti aadress ei ole sama asi, mis Teie kasutajatunnus. Proovige '%s'."
 
-#: contrib/admin/sites.py:336
+#: contrib/admin/sites.py:313
 msgid "Site administration"
 msgstr "Saidi administreerimine"
 
-#: contrib/admin/sites.py:358 contrib/admin/templates/admin/login.html:27
+#: contrib/admin/sites.py:326 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
-#: contrib/admin/views/decorators.py:30
+#: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Sisene"
 
-#: contrib/admin/sites.py:406
+#: contrib/admin/sites.py:373
 #, python-format
 msgid "%s administration"
 msgstr "%s - administreerimine"
@@ -430,29 +428,27 @@ msgstr ""
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr ""
 
-#: contrib/admin/widgets.py:65
+#: contrib/admin/widgets.py:70
 msgid "Date:"
 msgstr "Kuupäev:"
 
-#: contrib/admin/widgets.py:65
+#: contrib/admin/widgets.py:70
 msgid "Time:"
 msgstr "Aeg:"
 
-#: contrib/admin/widgets.py:89
+#: contrib/admin/widgets.py:94
 msgid "Currently:"
 msgstr "Hetkel:"
 
-#: contrib/admin/widgets.py:89
+#: contrib/admin/widgets.py:94
 msgid "Change:"
 msgstr "Muuda:"
 
-#: contrib/admin/widgets.py:115
-#,
+#: contrib/admin/widgets.py:121
 msgid "Lookup"
 msgstr "Otsi"
 
-#: contrib/admin/widgets.py:195
-#,
+#: contrib/admin/widgets.py:228
 msgid "Add Another"
 msgstr "Lisa Uus"
 
@@ -753,7 +749,6 @@ msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Sisestage uus salasõna kasutajale <strong>%(username)s</strong>"
 
 #: contrib/admin/templates/admin/edit_inline/tabular.html:15
-#,
 msgid "Delete?"
 msgstr "Kustutan?"
 
@@ -879,7 +874,7 @@ msgstr "teie kasutajakontole lehel %(site_name)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "Palun minge järmisele lehele ning sisestage uus salasõna"
 
 #: contrib/admin/templates/registration/password_reset_email.html:9
 msgid "Your username, in case you've forgotten:"
@@ -910,16 +905,16 @@ msgstr "E-posti aadress:"
 msgid "Reset my password"
 msgstr "Reseti parool"
 
-#: contrib/admin/templatetags/admin_list.py:284
+#: contrib/admin/templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Kõik kuupäevad"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:69
 #, python-format
 msgid "Select %s"
 msgstr "Vali %s"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:69
 #, python-format
 msgid "Select %s to change"
 msgstr "Vali %s mida muuta"
@@ -929,7 +924,6 @@ msgid "site"
 msgstr "sait"
 
 #: contrib/admin/views/template.py:38
-#,
 msgid "template"
 msgstr "mall"
 
@@ -1032,7 +1026,7 @@ msgstr "Faili asukoht"
 msgid "Floating point number"
 msgstr "Ujukomaarv"
 
-#: contrib/admindocs/views.py:328 contrib/comments/models.py:57
+#: contrib/admindocs/views.py:328 contrib/comments/models.py:58
 msgid "IP address"
 msgstr "IP aadress"
 
@@ -1056,7 +1050,7 @@ msgstr "Tekst"
 msgid "Time"
 msgstr "Aeg"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:20
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:22
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
@@ -1076,11 +1070,11 @@ msgstr "%s ei tundu olevat urlpattern objekt"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
-msgstr "Järjehoidjad"
+msgstr "Järjehoidjandid"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:4
 msgid "Documentation bookmarklets"
-msgstr "Dokumentatsiooni järjehoidjad"
+msgstr "Dokumentatsiooni järjehoidjandid"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
 msgid ""
@@ -1092,6 +1086,15 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
+"\n"
+"<p class=\"help\">Järjehoidjandite paigaldamiseks lisa link "
+"järjehoidjatesse.\n"
+"Seejärel võite järjehoidjandi aktiveerida suvaliselt lehelt saidil. Mõned "
+"järgnevatest\n"
+"järjehoidjanditest eeldavad, et külastate saiti arvutist, mis kuulub "
+"\"sisemiste\" arvutite nimekirja.\n"
+"(konsulteerige süsteemiadministraatoriga, kui te ei tea, mida tähendab "
+"\"sisemine\")</p>\n"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
@@ -1102,6 +1105,8 @@ msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
+"Suunab teid suvalisel lehel asudes selle vaate dokumentatsioonile, mis antud "
+"lehe genereerib."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
@@ -1112,6 +1117,8 @@ msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
+"Näitab sisutüüpi ning unikaalset ID'd lehtedel, mis esitavad mingit kindlat "
+"objekti."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
@@ -1120,6 +1127,7 @@ msgstr "Muuda seda objekti (samas aknas)"
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
+"Suunab administreeimislehele lehtedelt, mis esitavad mingit kindlat objekti."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
@@ -1145,15 +1153,15 @@ msgstr "Tähtsad kuupäevad"
 msgid "Groups"
 msgstr "Grupid"
 
-#: contrib/auth/admin.py:62
+#: contrib/auth/admin.py:64
 msgid "Add user"
 msgstr "Lisa kasutaja"
 
-#: contrib/auth/admin.py:88
+#: contrib/auth/admin.py:90
 msgid "Password changed successfully."
 msgstr "Salasõna edukalt muudetud."
 
-#: contrib/auth/admin.py:94
+#: contrib/auth/admin.py:96
 #, python-format
 msgid "Change password: %s"
 msgstr "Muuda salasõna: %s"
@@ -1209,7 +1217,7 @@ msgstr ""
 #: contrib/auth/forms.py:134
 #, python-format
 msgid "Password reset on %s"
-msgstr ""
+msgstr "Salasõna vahetatud saidil %s"
 
 #: contrib/auth/forms.py:142
 msgid "New password"
@@ -1276,6 +1284,8 @@ msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
 msgstr ""
+"Formaat '[algoritm]$[sool]$[kuueteistkümnendtulend]' või kasutage <a href="
+"\"password/\">salasõna muutmise vormi</a>."
 
 #: contrib/auth/models.py:141
 msgid "staff status"
@@ -1344,12 +1354,11 @@ msgstr "sõnum"
 msgid "Logged out"
 msgstr "Välja logitud"
 
-#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:423
+#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:428
 msgid "Enter a valid e-mail address."
 msgstr "Sisestage korrektne e-posti aadress:"
 
 #: contrib/comments/admin.py:11
-#,
 msgid "Content"
 msgstr "Sisu"
 
@@ -1357,74 +1366,68 @@ msgstr "Sisu"
 msgid "Metadata"
 msgstr "Meta-andmed"
 
-#: contrib/comments/forms.py:18
-#,
+#: contrib/comments/forms.py:20
 msgid "Name"
 msgstr "Nimi"
 
-#: contrib/comments/forms.py:19
-#,
+#: contrib/comments/forms.py:21
 msgid "Email address"
 msgstr "E-posti aadress"
 
-#: contrib/comments/forms.py:21
-#,
+#: contrib/comments/forms.py:23
 msgid "Comment"
 msgstr "Kommentaar"
 
-#: contrib/comments/forms.py:24
+#: contrib/comments/forms.py:26
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
-msgstr ""
+msgstr "Kui sisestate sellesse lahtrisse midagi, loetakse kommentaar rämpsuks"
 
-#: contrib/comments/forms.py:124
+#: contrib/comments/forms.py:126
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Jälgige oma keelekasutust. Sõna %s ei ole lubatud."
 msgstr[1] "Jälgige oma keelekasutust. Sõnad %s ei ole lubatud."
 
-#: contrib/comments/models.py:22
+#: contrib/comments/models.py:23
 msgid "object ID"
 msgstr "objekti ID"
 
-#: contrib/comments/models.py:49
-#,
+#: contrib/comments/models.py:50
 msgid "user's name"
 msgstr "kasutaja pärisnimi"
 
-#: contrib/comments/models.py:50
-#,
+#: contrib/comments/models.py:51
 msgid "user's email address"
 msgstr "kasutaja e-posti aadress"
 
-#: contrib/comments/models.py:51
-#,
+#: contrib/comments/models.py:52
 msgid "user's URL"
 msgstr "kasutaja URL"
 
-#: contrib/comments/models.py:53
+#: contrib/comments/models.py:54
 msgid "comment"
 msgstr "kommentaar"
 
-#: contrib/comments/models.py:56
+#: contrib/comments/models.py:57
 msgid "date/time submitted"
 msgstr "loomise kuupäev/kellaaeg"
 
-#: contrib/comments/models.py:58
+#: contrib/comments/models.py:59
 msgid "is public"
 msgstr "on avalik"
 
-#: contrib/comments/models.py:59
+#: contrib/comments/models.py:60
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
-msgstr ""
+msgstr "Eemaldage siit linnuke, et varjata kommentaar saidilt."
 
-#: contrib/comments/models.py:61
+#: contrib/comments/models.py:62
 msgid "is removed"
 msgstr "on eemaldatud"
 
-#: contrib/comments/models.py:62
+#: contrib/comments/models.py:63
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -1432,23 +1435,23 @@ msgstr ""
 "Märkige siia linnuke, kui see kommentaar on ebasobiv. Kommentaari asemel "
 "kuvatakse kirja \"Kommentaar on kustutatud\"."
 
-#: contrib/comments/models.py:114
-#,
+#: contrib/comments/models.py:115
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
-"Selle kommentaari postitas sisselogitud kasutaja, mistõttu ei ole nimetus muudetav."
+"Selle kommentaari postitas sisselogitud kasutaja, mistõttu ei ole nimetus "
+"muudetav."
 
-#: contrib/comments/models.py:123
-#,
+#: contrib/comments/models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"Selle kommentaari postitas sisselogitud kasutaja, mistõttu ei ole e-posti aadress muudetav."
+"Selle kommentaari postitas sisselogitud kasutaja, mistõttu ei ole e-posti "
+"aadress muudetav."
 
-#: contrib/comments/models.py:148
+#: contrib/comments/models.py:149
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -1538,18 +1541,18 @@ msgid ""
 "We apologize, but your form has expired. Please continue filling out the "
 "form from this page."
 msgstr ""
+"Vabandame, kuid vorm on aegunud. Palun jätkake vormi täitmist käesolevalt "
+"lehelt."
 
 #: contrib/gis/forms/fields.py:14
 msgid "No geometry value provided."
-msgstr ""
+msgstr "Geomeetriline väärtus puudub."
 
 #: contrib/gis/forms/fields.py:15
-#,
 msgid "Invalid geometry value."
 msgstr "Vigane geomeetriline väärtus."
 
 #: contrib/gis/forms/fields.py:16
-#,
 msgid "Invalid geometry type."
 msgstr "Vigane geomeetriline tüüp."
 
@@ -2617,7 +2620,6 @@ msgid "Enter a valid SoFi number"
 msgstr "Sisesta kehtiv SoFi number"
 
 #: contrib/localflavor/nl/nl_provinces.py:4
-#,
 msgid "Drenthe"
 msgstr "Drenthe"
 
@@ -3543,54 +3545,54 @@ msgstr "hüüdnimi"
 msgid "sites"
 msgstr "saidid"
 
-#: db/models/fields/__init__.py:332 db/models/fields/__init__.py:667
+#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:683
 msgid "This value must be an integer."
 msgstr "See väärtus peab olema täisarv."
 
-#: db/models/fields/__init__.py:363
+#: db/models/fields/__init__.py:379
 msgid "This value must be either True or False."
 msgstr "See väärtus peab olema kas tõene või väär"
 
-#: db/models/fields/__init__.py:396
+#: db/models/fields/__init__.py:412
 msgid "This field cannot be null."
 msgstr "See lahter ei tohi olla tühi."
 
-#: db/models/fields/__init__.py:412
+#: db/models/fields/__init__.py:428
 msgid "Enter only digits separated by commas."
 msgstr "Sisestage ainult komaga eraldatud numbreid."
 
-#: db/models/fields/__init__.py:443
+#: db/models/fields/__init__.py:459
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Sisestage korrektne kuupäev formaadis AAAA-KK-PP."
 
-#: db/models/fields/__init__.py:452
+#: db/models/fields/__init__.py:468
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Ebakorrektne kuupäev: %s"
 
-#: db/models/fields/__init__.py:516 db/models/fields/__init__.py:534
+#: db/models/fields/__init__.py:532 db/models/fields/__init__.py:550
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr ""
 "Sisestage korrektne kuupäev ja kellaaeg kujul AAAA-KK-PP TT:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:570
+#: db/models/fields/__init__.py:586
 msgid "This value must be a decimal number."
 msgstr "See väärtus peab olema kümnendarv."
 
-#: db/models/fields/__init__.py:703
+#: db/models/fields/__init__.py:719
 msgid "This value must be either None, True or False."
 msgstr "See väärtus peab olema kas tühi, tõene või väär."
 
-#: db/models/fields/__init__.py:811 db/models/fields/__init__.py:825
+#: db/models/fields/__init__.py:817 db/models/fields/__init__.py:831
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Sisestage korrektne kellaaeg formaadis TT:MM[:ss[.uuuuuu]]"
 
-#: db/models/fields/related.py:748
+#: db/models/fields/related.py:763
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "Et valida mitu, hoidke all \"Control\"-nuppu (Maci puhul \"Command\")."
 
-#: db/models/fields/related.py:825
+#: db/models/fields/related.py:840
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3599,86 +3601,86 @@ msgstr[0] "Palun sisestage korrektne %(self)s ID. Väärtus %(value)r on vigane.
 msgstr[1] ""
 "Palun sisestage korrektne %(self)s ID. Väärtused %(value)r on vigased."
 
-#: forms/fields.py:52
+#: forms/fields.py:54
 msgid "This field is required."
 msgstr "See lahter on nõutav."
 
-#: forms/fields.py:53
+#: forms/fields.py:55
 msgid "Enter a valid value."
 msgstr "Sisestage korrektne väärtus."
 
-#: forms/fields.py:133
+#: forms/fields.py:138
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Veenduge, et see väärtus sisaldab kõige rohkem %(max)d tähemärki (hetkel on %"
 "(length)d)."
 
-#: forms/fields.py:134
+#: forms/fields.py:139
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 "Veenduge, et see väärtus sisaldab vähemalt %(min)d märki (hetkel on %(length)"
 "d)."
 
-#: forms/fields.py:161
+#: forms/fields.py:166
 msgid "Enter a whole number."
 msgstr "Sisestage täisarv."
 
-#: forms/fields.py:162 forms/fields.py:191 forms/fields.py:220
+#: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Veenduge, et see väärtus on väiksem või võrdne kui %s."
 
-#: forms/fields.py:163 forms/fields.py:192 forms/fields.py:221
+#: forms/fields.py:168 forms/fields.py:197 forms/fields.py:226
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Veenduge, et see väärtus on suurem või võrdne kui %s."
 
-#: forms/fields.py:190 forms/fields.py:219
+#: forms/fields.py:195 forms/fields.py:224
 msgid "Enter a number."
 msgstr "Sisestage arv."
 
-#: forms/fields.py:222
+#: forms/fields.py:227
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Veenduge, et kogu numbrikohtade arv ei ületaks %s."
 
-#: forms/fields.py:223
+#: forms/fields.py:228
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Veenduge, et komakohtade arv ei ületaks %s."
 
-#: forms/fields.py:224
+#: forms/fields.py:229
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Veenduge, et komast vasakul olevaid numbreid ei oleks rohkem kui %s."
 
-#: forms/fields.py:282 forms/fields.py:815
+#: forms/fields.py:287 forms/fields.py:848
 msgid "Enter a valid date."
 msgstr "Sisestage korrektne kuupäev."
 
-#: forms/fields.py:316 forms/fields.py:816
+#: forms/fields.py:321 forms/fields.py:849
 msgid "Enter a valid time."
 msgstr "Sisestage korrektne kellaaeg."
 
-#: forms/fields.py:355
+#: forms/fields.py:360
 msgid "Enter a valid date/time."
 msgstr "Sisestage korrektne kuupäev ja kellaaeg."
 
-#: forms/fields.py:441
+#: forms/fields.py:446
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ühtegi faili ei saadetud. Kontrollige vormi kodeeringutüüpi."
 
-#: forms/fields.py:442
+#: forms/fields.py:447
 msgid "No file was submitted."
 msgstr "Ühtegi faili ei saadetud."
 
-#: forms/fields.py:443
+#: forms/fields.py:448
 msgid "The submitted file is empty."
 msgstr "Saadetud fail on tühi."
 
-#: forms/fields.py:472
+#: forms/fields.py:477
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -3686,44 +3688,47 @@ msgstr ""
 "Laadige korrektne pilt. Fail, mille laadisite, ei olnud kas pilt või oli "
 "fail vigane."
 
-#: forms/fields.py:533
+#: forms/fields.py:538
 msgid "Enter a valid URL."
 msgstr "Sisestage korrektne URL."
 
-#: forms/fields.py:534
+#: forms/fields.py:539
 msgid "This URL appears to be a broken link."
 msgstr "See URL näib olevat katkine."
 
-#: forms/fields.py:613 forms/fields.py:664
+#: forms/fields.py:618 forms/fields.py:696
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Valige korrektne väärtus. %(value)s ei ole valitav."
 
-#: forms/fields.py:665 forms/fields.py:726 forms/models.py:531
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:654
 msgid "Enter a list of values."
 msgstr "Sisestage väärtuste nimekiri."
 
-#: forms/fields.py:844
+#: forms/fields.py:877
 msgid "Enter a valid IPv4 address."
 msgstr "Sisestage korrektne IPv4 aadress."
 
-#: forms/fields.py:854
-#,
+#: forms/fields.py:887
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "See väärtus võib sisaldada ainult tähti, nubmreid, alljooni ja sidekriipse."
 
 #: forms/formsets.py:242 forms/formsets.py:244
-#,
 msgid "Order"
 msgstr "Järjestus"
 
-#: forms/models.py:463
+#: forms/models.py:268 forms/models.py:277
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "Sellise %(field_label)s-väljaga %(model_name)s on juba olemas."
+
+#: forms/models.py:584
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Valige korrektne väärtus. Valitud väärtus ei ole valitav."
 
-#: forms/models.py:532
+#: forms/models.py:655
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Valige korrektne väärtus. %s ei ole valitav."
