@@ -1,14 +1,15 @@
 # Português do Brasil translation of django.
-# Copyright (c) 2006, 2007, 2008 Django Software Foundation and individual contributors.
 # This file is distributed under the same license as the django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-30 22:54-0300\n"
-"PO-Revision-Date: 2008-08-31 13:38-0300\n"
+"POT-Creation-Date: 2008-09-02 11:25-0300\n"
+"PO-Revision-Date: 2008-09-02 11:43-0300\n"
 "Last-Translator: Guilherme Mesquita Gondim <semente@taurinus.org>\n"
-"Language-Team: Grupo de Localização para o Português <django-l10n-portuguese@googlegroups.com>\n"
+"Language-Team: Grupo de Localização para o Português <django-l10n-"
+"portuguese@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16,7 +17,7 @@ msgstr ""
 
 #: conf/global_settings.py:44
 msgid "Arabic"
-msgstr "Arábico"
+msgstr "Árabe"
 
 #: conf/global_settings.py:45
 msgid "Bengali"
@@ -116,7 +117,7 @@ msgstr "Japonês"
 
 #: conf/global_settings.py:69
 msgid "Georgian"
-msgstr "Georgiana"
+msgstr "Georgiano"
 
 #: conf/global_settings.py:70
 msgid "Korean"
@@ -152,7 +153,7 @@ msgstr "Norueguês"
 
 #: conf/global_settings.py:78
 msgid "Polish"
-msgstr "Polaco"
+msgstr "Polonês"
 
 #: conf/global_settings.py:79
 msgid "Portugese"
@@ -244,18 +245,15 @@ msgstr "Este mês"
 msgid "This year"
 msgstr "Este ano"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:389
-#: oldforms/__init__.py:588
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
 msgid "Yes"
 msgstr "Sim"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:389
-#: oldforms/__init__.py:588
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
 msgid "No"
 msgstr "Não"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:389
-#: oldforms/__init__.py:588
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:391
 msgid "Unknown"
 msgstr "Desconhecido"
 
@@ -287,60 +285,60 @@ msgstr "entrada de log"
 msgid "log entries"
 msgstr "entradas de log"
 
-#: contrib/admin/options.py:56 contrib/admin/options.py:115
+#: contrib/admin/options.py:59 contrib/admin/options.py:120
 msgid "None"
 msgstr "Nenhum"
 
-#: contrib/admin/options.py:329
+#: contrib/admin/options.py:332
 #, python-format
 msgid "Changed %s."
 msgstr "Modificado %s."
 
-#: contrib/admin/options.py:329 contrib/admin/options.py:339
-#: core/validators.py:279 db/models/manipulators.py:305
+#: contrib/admin/options.py:332 contrib/admin/options.py:342
+#: forms/models.py:265
 msgid "and"
 msgstr "e"
 
-#: contrib/admin/options.py:334
+#: contrib/admin/options.py:337
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Adicionado %(name)s \"%(object)s\""
 
-#: contrib/admin/options.py:338
+#: contrib/admin/options.py:341
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Modificado %(list)s para %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:343
+#: contrib/admin/options.py:346
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Deletado %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:347
+#: contrib/admin/options.py:350
 msgid "No fields changed."
 msgstr "Nenhum campo modificado."
 
-#: contrib/admin/options.py:408 contrib/auth/admin.py:51
+#: contrib/admin/options.py:411 contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "O(A) %(name)s \"%(obj)s\" foi adicionado com sucesso."
 
-#: contrib/admin/options.py:412 contrib/admin/options.py:445
-#: contrib/auth/admin.py:57
+#: contrib/admin/options.py:415 contrib/admin/options.py:448
+#: contrib/auth/admin.py:59
 msgid "You may edit it again below."
 msgstr "Você pode editá-lo(a) de novo abaixo."
 
-#: contrib/admin/options.py:422 contrib/admin/options.py:455
+#: contrib/admin/options.py:425 contrib/admin/options.py:458
 #, python-format
 msgid "You may add another %s below."
 msgstr "Você pode adicionar outro(a) %s abaixo."
 
-#: contrib/admin/options.py:443
+#: contrib/admin/options.py:446
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "O(A) %(name)s \"%(obj)s\" foi modificado com sucesso."
 
-#: contrib/admin/options.py:451
+#: contrib/admin/options.py:454
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -348,36 +346,36 @@ msgstr ""
 "O(A) %(name)s \"%(obj)s\" foi adicionado com sucesso. Você pode editá-lo(a) "
 "abaixo."
 
-#: contrib/admin/options.py:517
+#: contrib/admin/options.py:530
 #, python-format
 msgid "Add %s"
 msgstr "Adicionar %s"
 
-#: contrib/admin/options.py:595
+#: contrib/admin/options.py:608
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
 
-#: contrib/admin/options.py:627
+#: contrib/admin/options.py:640
 msgid "Database error"
 msgstr "Erro no banco de dados"
 
-#: contrib/admin/options.py:677
+#: contrib/admin/options.py:690
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "O(A) %(name)s \"%(obj)s\" foi excluído com sucesso."
 
-#: contrib/admin/options.py:684
+#: contrib/admin/options.py:697
 msgid "Are you sure?"
-msgstr "Você tem certeza?"
+msgstr "Tem certeza?"
 
-#: contrib/admin/options.py:712
+#: contrib/admin/options.py:726
 #, python-format
 msgid "Change history: %s"
 msgstr "Histórico de modificações: %s"
 
 #: contrib/admin/sites.py:18 contrib/admin/views/decorators.py:16
-#: contrib/auth/forms.py:80 contrib/comments/views/comments.py:56
+#: contrib/auth/forms.py:80
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -421,7 +419,7 @@ msgstr "Administração do Site"
 msgid "Log in"
 msgstr "Acessar"
 
-#: contrib/admin/sites.py:403
+#: contrib/admin/sites.py:406
 #, python-format
 msgid "%s administration"
 msgstr "Administração de %s"
@@ -436,21 +434,29 @@ msgstr "Um(a) ou mais %(fieldname)s em %(name)s: %(obj)s"
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Um(a) ou mais %(fieldname)s em %(name)s:"
 
-#: contrib/admin/widgets.py:65
+#: contrib/admin/widgets.py:70
 msgid "Date:"
 msgstr "Data:"
 
-#: contrib/admin/widgets.py:65
+#: contrib/admin/widgets.py:70
 msgid "Time:"
 msgstr "Hora:"
 
-#: contrib/admin/widgets.py:89
+#: contrib/admin/widgets.py:94
 msgid "Currently:"
 msgstr "Atualmente:"
 
-#: contrib/admin/widgets.py:89
+#: contrib/admin/widgets.py:94
 msgid "Change:"
 msgstr "Modificar:"
+
+#: contrib/admin/widgets.py:121
+msgid "Lookup"
+msgstr "Olhar"
+
+#: contrib/admin/widgets.py:221
+msgid "Add Another"
+msgstr "Adicionar outro"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -468,7 +474,7 @@ msgstr "Desculpe, mas a página requisitada não pode ser encontrada."
 #: contrib/admin/templates/admin/change_list.html:8
 #: contrib/admin/templates/admin/delete_confirmation.html:6
 #: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/object_history.html:6
 #: contrib/admin/templates/admin/auth/user/change_password.html:10
 #: contrib/admin/templates/registration/logged_out.html:4
 #: contrib/admin/templates/registration/password_change_done.html:4
@@ -529,7 +535,6 @@ msgstr "Alterar senha"
 #: contrib/admin/templates/admin/base.html:25
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/comments/templates/comments/form.html:6
 msgid "Log out"
 msgstr "Encerrar sessão"
 
@@ -547,11 +552,13 @@ msgid "Add"
 msgstr "Adicionar"
 
 #: contrib/admin/templates/admin/change_form.html:27
-#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Histórico"
 
 #: contrib/admin/templates/admin/change_form.html:28
+#: contrib/admin/templates/admin/edit_inline/stacked.html:13
+#: contrib/admin/templates/admin/edit_inline/tabular.html:25
 msgid "View on site"
 msgstr "Ver no site"
 
@@ -572,8 +579,7 @@ msgid "Filter"
 msgstr "Filtro"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:10
-#: contrib/admin/templates/admin/submit_line.html:4
-#: contrib/admin/templates/admin/edit_inline/tabular.html:15
+#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:246
 msgid "Delete"
 msgstr "Apagar"
 
@@ -594,7 +600,7 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Você tem certeza que quer remover o %(object_name)s \"%(escaped_object)s\"? "
+"Você tem certeza que quer remover %(object_name)s \"%(escaped_object)s\"? "
 "Todos os seguintes itens relacionados serão removidos:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:28
@@ -637,39 +643,36 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Alguma coisa errada com a instalação do banco de dados. Certifique-se que as "
-"tabelas necessárias foram criadas e que o banco de dados pode ser acessado "
-"pelo usuário."
+"Alguma coisa está errada com a instalação do banco de dados. Certifique-se "
+"que as tabelas necessárias foram criadas e que o banco de dados pode ser "
+"acessado pelo usuário apropriado."
 
 #: contrib/admin/templates/admin/login.html:19
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
 msgid "Username:"
 msgstr "Usuário:"
 
 #: contrib/admin/templates/admin/login.html:22
-#: contrib/comments/templates/comments/form.html:8
 msgid "Password:"
 msgstr "Senha:"
 
-#: contrib/admin/templates/admin/object_history.html:16
+#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Data/hora"
 
-#: contrib/admin/templates/admin/object_history.html:17
+#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Usuário"
 
-#: contrib/admin/templates/admin/object_history.html:18
+#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Ação"
 
-#: contrib/admin/templates/admin/object_history.html:24
-#: utils/translation/trans_real.py:402
+#: contrib/admin/templates/admin/object_history.html:30
+#: utils/translation/trans_real.py:404
 msgid "DATETIME_FORMAT"
-msgstr ""
+msgstr "j \\de N \\de Y à\\s H:i"
 
-#: contrib/admin/templates/admin/object_history.html:32
+#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -718,7 +721,7 @@ msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
-"Primeiro, informe um nome de usuário e senha. Então, você será capaz de "
+"Primeiro, informe um nome de usuário e senha. Depois você será capaz de "
 "editar mais opções do usuário."
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:13
@@ -747,6 +750,10 @@ msgstr "Informe a mesma senha digitada acima, para verificação."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Informe uma nova senha para o usuário <strong>%(username)s</strong>."
+
+#: contrib/admin/templates/admin/edit_inline/tabular.html:15
+msgid "Delete?"
+msgstr "Apagar?"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -829,7 +836,9 @@ msgstr "Insira a nova senha"
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr "Por favor, informe sua nova senha duas vezes para que possamos verificar se você a digitou corretamente."
+msgstr ""
+"Por favor, informe sua nova senha duas vezes para que possamos verificar se "
+"você a digitou corretamente."
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
@@ -839,7 +848,9 @@ msgstr "Recuperação de senha sem sucesso"
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr "O link para a recuperação de senha era inválido, possivelmente porque jã foi utilizado. Por favor, solicite uma nova recuperação de senha."
+msgstr ""
+"O link para a recuperação de senha era inválido, possivelmente porque jã foi "
+"utilizado. Por favor, solicite uma nova recuperação de senha."
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
@@ -850,11 +861,13 @@ msgstr "Senha recuperada com sucesso"
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr "Nós enviamos as instruções de como definir sua nova senha para o e-mail que você informou. Você deverá recebê-las em breve."
+msgstr ""
+"Enviamos as instruções de como definir sua nova senha para o e-mail que você "
+"informou. Você deverá recebê-las em breve."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Você está recebendo este e-mail porque você pediu uma nova senha"
+msgstr "Você está recebendo este e-mail porque pediu uma nova senha"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -863,7 +876,7 @@ msgstr "para sua conta em %(site_name)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 msgid "Please go to the following page and choose a new password:"
-msgstr "Por favor, vá para a seguinte página e escolha uma nova senha:"
+msgstr "Por favor, acesse a seguinte página e escolha uma nova senha:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:9
 msgid "Your username, in case you've forgotten:"
@@ -876,13 +889,15 @@ msgstr "Obrigado por usar nosso site!"
 #: contrib/admin/templates/registration/password_reset_email.html:13
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "Equipe do %(site_name)s"
+msgstr "Equipe %(site_name)s"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr "Esqueceu sua senha? Digite seu e-mail abaixo e nós iremos lhe enviar as instruções de como definir uma nova."
+msgstr ""
+"Esqueceu sua senha? Digite seu e-mail abaixo e receberá instruções para "
+"definir uma nova."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -892,16 +907,16 @@ msgstr "Endereço de e-mail:"
 msgid "Reset my password"
 msgstr "Reinicializar minha senha"
 
-#: contrib/admin/templatetags/admin_list.py:284
+#: contrib/admin/templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Todas as datas"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:69
 #, python-format
 msgid "Select %s"
 msgstr "Selecione %s"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:69
 #, python-format
 msgid "Select %s to change"
 msgstr "Selecione %s para modificar"
@@ -914,143 +929,143 @@ msgstr "site"
 msgid "template"
 msgstr "template"
 
-#: contrib/admindocs/views.py:53 contrib/admindocs/views.py:55
-#: contrib/admindocs/views.py:57
+#: contrib/admindocs/views.py:57 contrib/admindocs/views.py:59
+#: contrib/admindocs/views.py:61
 msgid "tag:"
 msgstr "tag:"
 
-#: contrib/admindocs/views.py:87 contrib/admindocs/views.py:89
-#: contrib/admindocs/views.py:91
+#: contrib/admindocs/views.py:90 contrib/admindocs/views.py:92
+#: contrib/admindocs/views.py:94
 msgid "filter:"
 msgstr "filtro:"
 
-#: contrib/admindocs/views.py:153 contrib/admindocs/views.py:155
-#: contrib/admindocs/views.py:157
+#: contrib/admindocs/views.py:154 contrib/admindocs/views.py:156
+#: contrib/admindocs/views.py:158
 msgid "view:"
 msgstr "view:"
 
-#: contrib/admindocs/views.py:187
+#: contrib/admindocs/views.py:186
 #, python-format
 msgid "App %r not found"
 msgstr "Aplicação %r não encontrada"
 
-#: contrib/admindocs/views.py:194
+#: contrib/admindocs/views.py:193
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Model %(model_name)r não encontrado na aplicação %(app_label)r"
 
-#: contrib/admindocs/views.py:206
+#: contrib/admindocs/views.py:205
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "o objeto `%(app_label)s.%(data_type)s` relacionado"
 
-#: contrib/admindocs/views.py:206 contrib/admindocs/views.py:228
-#: contrib/admindocs/views.py:242 contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:205 contrib/admindocs/views.py:227
+#: contrib/admindocs/views.py:241 contrib/admindocs/views.py:246
 msgid "model:"
 msgstr "model:"
 
-#: contrib/admindocs/views.py:237
+#: contrib/admindocs/views.py:236
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "objetos `%(app_label)s.%(object_name)s` relacionados"
 
-#: contrib/admindocs/views.py:242
+#: contrib/admindocs/views.py:241
 #, python-format
 msgid "all %s"
 msgstr "todos %s"
 
-#: contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:246
 #, python-format
 msgid "number of %s"
 msgstr "número de %s"
 
-#: contrib/admindocs/views.py:253
+#: contrib/admindocs/views.py:251
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Campos nos objetos %s"
 
-#: contrib/admindocs/views.py:317 contrib/admindocs/views.py:328
-#: contrib/admindocs/views.py:330 contrib/admindocs/views.py:336
-#: contrib/admindocs/views.py:337 contrib/admindocs/views.py:339
+#: contrib/admindocs/views.py:314 contrib/admindocs/views.py:325
+#: contrib/admindocs/views.py:327 contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:336
 msgid "Integer"
 msgstr "Inteiro"
 
-#: contrib/admindocs/views.py:318
+#: contrib/admindocs/views.py:315
 msgid "Boolean (Either True or False)"
-msgstr "Lógico (Verdadeiro ou Falso)"
+msgstr "Booleano (Verdadeiro ou Falso)"
 
-#: contrib/admindocs/views.py:319 contrib/admindocs/views.py:338
+#: contrib/admindocs/views.py:316 contrib/admindocs/views.py:335
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "String (até %(max_length)s)"
 
-#: contrib/admindocs/views.py:320
+#: contrib/admindocs/views.py:317
 msgid "Comma-separated integers"
 msgstr "Inteiros separados por vírgula"
 
-#: contrib/admindocs/views.py:321
+#: contrib/admindocs/views.py:318
 msgid "Date (without time)"
 msgstr "Data (sem hora)"
 
-#: contrib/admindocs/views.py:322
+#: contrib/admindocs/views.py:319
 msgid "Date (with time)"
-msgstr "Data/hora"
+msgstr "Data e hora"
 
-#: contrib/admindocs/views.py:323
+#: contrib/admindocs/views.py:320
 msgid "Decimal number"
 msgstr "Número decimal"
 
-#: contrib/admindocs/views.py:324
+#: contrib/admindocs/views.py:321
 msgid "E-mail address"
 msgstr "Endereço de e-mail"
 
-#: contrib/admindocs/views.py:325 contrib/admindocs/views.py:326
-#: contrib/admindocs/views.py:329
+#: contrib/admindocs/views.py:322 contrib/admindocs/views.py:323
+#: contrib/admindocs/views.py:326
 msgid "File path"
-msgstr "Caminho do Arquivo"
+msgstr "Caminho de arquivo"
 
-#: contrib/admindocs/views.py:327
+#: contrib/admindocs/views.py:324
 msgid "Floating point number"
 msgstr "Número de ponto flutuante"
 
-#: contrib/admindocs/views.py:331 contrib/comments/models.py:89
+#: contrib/admindocs/views.py:328 contrib/comments/models.py:58
 msgid "IP address"
 msgstr "Endereço IP:"
 
-#: contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:330
 msgid "Boolean (Either True, False or None)"
-msgstr "Lógico (Verdadeiro, Falso ou Nada)"
+msgstr "Booleano (Verdadeiro, Falso ou Nada)"
 
-#: contrib/admindocs/views.py:334
+#: contrib/admindocs/views.py:331
 msgid "Relation to parent model"
 msgstr "Relação com o modelo pai"
 
-#: contrib/admindocs/views.py:335
+#: contrib/admindocs/views.py:332
 msgid "Phone number"
 msgstr "Número de telefone"
 
-#: contrib/admindocs/views.py:340
+#: contrib/admindocs/views.py:337
 msgid "Text"
 msgstr "Texto"
 
-#: contrib/admindocs/views.py:341
+#: contrib/admindocs/views.py:338
 msgid "Time"
 msgstr "Hora"
 
-#: contrib/admindocs/views.py:342 contrib/flatpages/admin.py:8
-#: contrib/flatpages/models.py:8
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:22
+#: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admindocs/views.py:343
+#: contrib/admindocs/views.py:340
 msgid "U.S. state (two uppercase letters)"
 msgstr "Estado dos EUA (duas letras maiúsculas)"
 
-#: contrib/admindocs/views.py:344
+#: contrib/admindocs/views.py:341
 msgid "XML text"
 msgstr "Texto XML"
 
-#: contrib/admindocs/views.py:370
+#: contrib/admindocs/views.py:367
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s não aparenta ser um objeto urlpattern"
@@ -1091,7 +1106,7 @@ msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
-"Leva você de qualquer página da documentação para a view que gera tal página."
+"Leva você de qualquer página para a documentação da view que gera tal página."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
@@ -1102,8 +1117,7 @@ msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
-"Mostra o tipo de conteúdo e ID único para páginas que representam um objeto "
-"único."
+"Mostra o tipo de conteúdo e ID único para páginas que representam um objeto."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
@@ -1111,7 +1125,7 @@ msgstr "Editar este objeto (janela atual)"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Vai para a página de administração que representam um objeto único."
+msgstr "Vai para a página de administração que representa um objeto."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
@@ -1137,21 +1151,21 @@ msgstr "Datas importantes"
 msgid "Groups"
 msgstr "Grupos"
 
-#: contrib/auth/admin.py:62
+#: contrib/auth/admin.py:64
 msgid "Add user"
 msgstr "Adicionar usuário"
 
-#: contrib/auth/admin.py:88
+#: contrib/auth/admin.py:90
 msgid "Password changed successfully."
 msgstr "Senha modificada com sucesso."
 
-#: contrib/auth/admin.py:94
+#: contrib/auth/admin.py:96
 #, python-format
 msgid "Change password: %s"
 msgstr "Alterar senha: %s"
 
 #: contrib/auth/forms.py:15 contrib/auth/forms.py:48
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:136
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
@@ -1159,7 +1173,7 @@ msgstr ""
 "Obrigatório. 30 caracteres ou menos. Apenas caracteres alfanuméricos(letras, "
 "dígitos e sublinhados (_) )"
 
-#: contrib/auth/forms.py:16 contrib/auth/forms.py:49 core/validators.py:72
+#: contrib/auth/forms.py:16 contrib/auth/forms.py:49
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "Este valor deve conter apenas letras, números e sublinhados (_)."
 
@@ -1176,11 +1190,11 @@ msgstr "Um usuário com este nome de usuário já existe."
 msgid "The two password fields didn't match."
 msgstr "Os dois campos de senha não combinam."
 
-#: contrib/auth/forms.py:82 contrib/comments/views/comments.py:58
+#: contrib/auth/forms.py:82
 msgid "This account is inactive."
 msgstr "Esta conta está inativa."
 
-#: contrib/auth/forms.py:87 contrib/comments/views/comments.py:49
+#: contrib/auth/forms.py:87
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -1223,70 +1237,70 @@ msgstr ""
 "A senha antiga foi digitada incorretamente. Por favor, informe a senha "
 "novamente."
 
-#: contrib/auth/models.py:73 contrib/auth/models.py:96
+#: contrib/auth/models.py:72 contrib/auth/models.py:95
 msgid "name"
 msgstr "nome"
 
-#: contrib/auth/models.py:75
+#: contrib/auth/models.py:74
 msgid "codename"
 msgstr "apelido"
 
-#: contrib/auth/models.py:78
+#: contrib/auth/models.py:77
 msgid "permission"
 msgstr "permissão"
 
-#: contrib/auth/models.py:79 contrib/auth/models.py:97
+#: contrib/auth/models.py:78 contrib/auth/models.py:96
 msgid "permissions"
 msgstr "permissões"
 
-#: contrib/auth/models.py:100
+#: contrib/auth/models.py:99
 msgid "group"
 msgstr "grupo"
 
-#: contrib/auth/models.py:101 contrib/auth/models.py:147
+#: contrib/auth/models.py:100 contrib/auth/models.py:146
 msgid "groups"
 msgstr "grupos"
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:136
 msgid "username"
 msgstr "usuário"
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:137
 msgid "first name"
 msgstr "primeiro nome"
 
-#: contrib/auth/models.py:139
+#: contrib/auth/models.py:138
 msgid "last name"
 msgstr "último nome"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:139
 msgid "e-mail address"
 msgstr "endereço de e-mail"
 
-#: contrib/auth/models.py:141
+#: contrib/auth/models.py:140
 msgid "password"
 msgstr "senha"
 
-#: contrib/auth/models.py:141
+#: contrib/auth/models.py:140
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
 msgstr ""
 "Use '[algo]$[salt]$[hexdigest]' ou <a href=\"password/\"> Altere a senha</a>."
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:141
 msgid "staff status"
-msgstr "status da equipe"
+msgstr "membro da equipe"
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:141
 msgid "Designates whether the user can log into this admin site."
 msgstr "Indica que usuário consegue acessar este site de administração."
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:142
 msgid "active"
-msgstr "ativar"
+msgstr "ativo"
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:142
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -1294,11 +1308,11 @@ msgstr ""
 "Indica que o usuário será tratado como ativo. Ao invés de excluir contas de "
 "usuário, desmarque isso."
 
-#: contrib/auth/models.py:144
+#: contrib/auth/models.py:143
 msgid "superuser status"
 msgstr "status de superusuário"
 
-#: contrib/auth/models.py:144
+#: contrib/auth/models.py:143
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -1306,15 +1320,15 @@ msgstr ""
 "Indica que este usuário tem todas as permissões sem atribuí-las "
 "explicitamente."
 
-#: contrib/auth/models.py:145
+#: contrib/auth/models.py:144
 msgid "last login"
 msgstr "último login"
 
-#: contrib/auth/models.py:146
+#: contrib/auth/models.py:145
 msgid "date joined"
 msgstr "data de registro"
 
-#: contrib/auth/models.py:148
+#: contrib/auth/models.py:147
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
@@ -1322,19 +1336,19 @@ msgstr ""
 "Em adição às permissões atribuídas manualmente, este usuário também terá "
 "todas as permissões dadas a cada grupo que participar."
 
-#: contrib/auth/models.py:149
+#: contrib/auth/models.py:148
 msgid "user permissions"
 msgstr "permissões do usuário"
 
-#: contrib/auth/models.py:153
+#: contrib/auth/models.py:152
 msgid "user"
 msgstr "usuário"
 
-#: contrib/auth/models.py:154
+#: contrib/auth/models.py:153
 msgid "users"
 msgstr "usuários"
 
-#: contrib/auth/models.py:309
+#: contrib/auth/models.py:308
 msgid "message"
 msgstr "mensagem"
 
@@ -1342,68 +1356,80 @@ msgstr "mensagem"
 msgid "Logged out"
 msgstr "Sessão encerrada"
 
-#: contrib/comments/models.py:71 contrib/comments/models.py:164
+#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:428
+msgid "Enter a valid e-mail address."
+msgstr "Informe um endereço de email válido."
+
+#: contrib/comments/admin.py:11
+msgid "Content"
+msgstr "Conteúdo"
+
+#: contrib/comments/admin.py:14
+msgid "Metadata"
+msgstr "Meta-dados"
+
+#: contrib/comments/forms.py:20
+msgid "Name"
+msgstr "Nome"
+
+#: contrib/comments/forms.py:21
+msgid "Email address"
+msgstr "Endereço de e-mail"
+
+#: contrib/comments/forms.py:23
+msgid "Comment"
+msgstr "Comentário"
+
+#: contrib/comments/forms.py:26
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "Se você inserir qualquer coisa neste campo, seu comentário será tratado como spam"
+
+#: contrib/comments/forms.py:126
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Olha sua boca! A palavra %s não é permitida aqui."
+msgstr[1] "Olha sua boca! As palavras %s não são permitidas aqui."
+
+#: contrib/comments/models.py:23
 msgid "object ID"
 msgstr "id do objeto"
 
-#: contrib/comments/models.py:72
-msgid "headline"
-msgstr "título"
+#: contrib/comments/models.py:50
+msgid "user's name"
+msgstr "nome do usuário"
 
-#: contrib/comments/models.py:73 contrib/comments/models.py:95
-#: contrib/comments/models.py:165
+#: contrib/comments/models.py:51
+msgid "user's email address"
+msgstr "endereço de e-mail do usuário"
+
+#: contrib/comments/models.py:52
+msgid "user's URL"
+msgstr "URL do usuário"
+
+#: contrib/comments/models.py:54
 msgid "comment"
 msgstr "comentário"
 
-#: contrib/comments/models.py:74
-msgid "rating #1"
-msgstr "avaliação #1"
-
-#: contrib/comments/models.py:75
-msgid "rating #2"
-msgstr "avaliação #2"
-
-#: contrib/comments/models.py:76
-msgid "rating #3"
-msgstr "avaliação #3"
-
-#: contrib/comments/models.py:77
-msgid "rating #4"
-msgstr "avaliação #4"
-
-#: contrib/comments/models.py:78
-msgid "rating #5"
-msgstr "avaliação #5"
-
-#: contrib/comments/models.py:79
-msgid "rating #6"
-msgstr "avaliação #6"
-
-#: contrib/comments/models.py:80
-msgid "rating #7"
-msgstr "avaliação #7"
-
-#: contrib/comments/models.py:81
-msgid "rating #8"
-msgstr "avaliação #8"
-
-#: contrib/comments/models.py:86
-msgid "is valid rating"
-msgstr "é uma avaliação válida"
-
-#: contrib/comments/models.py:87 contrib/comments/models.py:167
+#: contrib/comments/models.py:57
 msgid "date/time submitted"
 msgstr "data/hora de envio"
 
-#: contrib/comments/models.py:88 contrib/comments/models.py:168
+#: contrib/comments/models.py:59
 msgid "is public"
 msgstr "é público"
 
-#: contrib/comments/models.py:90
+#: contrib/comments/models.py:60
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Desmarque esta caixa para fazer o comentário desaparecer efetivamente deste site."
+
+#: contrib/comments/models.py:62
 msgid "is removed"
 msgstr "foi removido"
 
-#: contrib/comments/models.py:90
+#: contrib/comments/models.py:63
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -1411,15 +1437,19 @@ msgstr ""
 "Selecione esta opção se o comentário é inapropriado. A mensagem \"Este "
 "comentário foi removido\" será mostrada no lugar."
 
-#: contrib/comments/models.py:96
-msgid "comments"
-msgstr "comentários"
+#: contrib/comments/models.py:115
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr "Este comentário foi feito por um usuário autenticado e portanto seu nome é apenas para leitura."
 
-#: contrib/comments/models.py:128 contrib/comments/models.py:199
-msgid "Content object"
-msgstr "Objeto de conteúdo"
+#: contrib/comments/models.py:124
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr "Este comentário foi feito por um usuário autenticado e portanto seu e-mail é apenas para leitura."
 
-#: contrib/comments/models.py:156
+#: contrib/comments/models.py:149
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -1434,212 +1464,9 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: contrib/comments/models.py:166
-msgid "person's name"
-msgstr "nome da pessoa"
-
-#: contrib/comments/models.py:169
-msgid "ip address"
-msgstr "endereço ip"
-
-#: contrib/comments/models.py:171
-msgid "approved by staff"
-msgstr "aprovado pela equipe"
-
-#: contrib/comments/models.py:175
-msgid "free comment"
-msgstr "comentário livre"
-
-#: contrib/comments/models.py:176
-msgid "free comments"
-msgstr "comentários livres"
-
-#: contrib/comments/models.py:227
-msgid "score"
-msgstr "pontuação"
-
-#: contrib/comments/models.py:228
-msgid "score date"
-msgstr "data de pontuação"
-
-#: contrib/comments/models.py:232
-msgid "karma score"
-msgstr "pontuação de karma"
-
-#: contrib/comments/models.py:233
-msgid "karma scores"
-msgstr "pontuações de karma"
-
-#: contrib/comments/models.py:237
-#, python-format
-msgid "%(score)d rating by %(user)s"
-msgstr "Availação %(score)d por %(user)s"
-
-#: contrib/comments/models.py:254
-#, python-format
-msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"O usuário %(user)s colocou flags neste comentário:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/models.py:262
-msgid "flag date"
-msgstr "flag de data"
-
-#: contrib/comments/models.py:266
-msgid "user flag"
-msgstr "flag de usuário"
-
-#: contrib/comments/models.py:267
-msgid "user flags"
-msgstr "flags de usuário"
-
-#: contrib/comments/models.py:271
-#, python-format
-msgid "Flag by %r"
-msgstr "Flag por %r"
-
-#: contrib/comments/models.py:277
-msgid "deletion date"
-msgstr "data de exclusão"
-
-#: contrib/comments/models.py:280
-msgid "moderator deletion"
-msgstr "Exclusão feita pelo moderador"
-
-#: contrib/comments/models.py:281
-msgid "moderator deletions"
-msgstr "Exclusões feitas pelo moderador"
-
-#: contrib/comments/models.py:285
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "Exclusao feita pelo moderador %r"
-
-#: contrib/comments/templates/comments/form.html:8
-msgid "Forgotten your password?"
-msgstr "Esqueceu sua senha?"
-
-#: contrib/comments/templates/comments/form.html:12
-msgid "Ratings"
-msgstr "Avaliações"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr "Requerido"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr "Opcional"
-
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr "Postar uma foto"
-
-#: contrib/comments/templates/comments/form.html:28
-#: contrib/comments/templates/comments/freeform.html:5
-msgid "Comment:"
-msgstr "Comentário:"
-
-#: contrib/comments/templates/comments/form.html:35
-#: contrib/comments/templates/comments/freeform.html:10
-msgid "Preview comment"
-msgstr "Pré-visualizar comentário"
-
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "Seu nome:"
-
-#: contrib/comments/views/comments.py:76
-msgid ""
-"This rating is required because you've entered at least one other rating."
-msgstr ""
-"Esta avaliação é requerida porque você entrou com ao menos uma avaliação"
-
-#: contrib/comments/views/comments.py:160
-#, python-format
-msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-"Este comentário foi feito por um usuário que postou menos de %(count)s "
-"comentário:\n"
-"\n"
-"%(text)s"
-msgstr[1] ""
-"Este comentário foi feito por um usuário que postou menos de %(count)s "
-"comentários:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:165
-#, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"Este comentário foi feito por um usuário incompleto:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:238
-#: contrib/comments/views/comments.py:331
-msgid "Only POSTs are allowed"
-msgstr "Somente POSTs são permitidos"
-
-#: contrib/comments/views/comments.py:242
-#: contrib/comments/views/comments.py:335
-msgid "One or more of the required fields wasn't submitted"
-msgstr "Um ou mais dos campos requeridos não foram enviados"
-
-#: contrib/comments/views/comments.py:246
-#: contrib/comments/views/comments.py:337
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Alguém modificou o formulário de comentários (violação de segurança)"
-
-#: contrib/comments/views/comments.py:256
-#: contrib/comments/views/comments.py:343
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr ""
-"O formulário de comentários teve um parâmetro 'target' inválido -- o ID do "
-"objeto é inválido"
-
-#: contrib/comments/views/comments.py:307
-#: contrib/comments/views/comments.py:372
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "O formulário de comentário não forneceu nem 'preview' nem 'post'"
-
-#: contrib/comments/views/karma.py:21
-msgid "Anonymous users cannot vote"
-msgstr "Usuários anônimos não podem votar"
-
-#: contrib/comments/views/karma.py:25
-msgid "Invalid comment ID"
-msgstr "ID de comentário inválido"
-
-#: contrib/comments/views/karma.py:27
-msgid "No voting for yourself"
-msgstr "Você não pode votar em si mesmo"
-
 #: contrib/contenttypes/models.py:67
 msgid "python model class name"
-msgstr "nome da classe model no python"
+msgstr "nome da classe model em python"
 
 #: contrib/contenttypes/models.py:71
 msgid "content type"
@@ -1654,7 +1481,7 @@ msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr "Exemplo: '/sobre/contato/'. Lembre-se das barras no começo e no final."
 
-#: contrib/flatpages/admin.py:11 core/validators.py:76
+#: contrib/flatpages/admin.py:11
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
@@ -1666,23 +1493,23 @@ msgstr ""
 msgid "Advanced options"
 msgstr "Opções avançadas"
 
-#: contrib/flatpages/models.py:9
+#: contrib/flatpages/models.py:8
 msgid "title"
 msgstr "título"
 
-#: contrib/flatpages/models.py:10
+#: contrib/flatpages/models.py:9
 msgid "content"
 msgstr "conteúdo"
 
-#: contrib/flatpages/models.py:11
+#: contrib/flatpages/models.py:10
 msgid "enable comments"
 msgstr "habilitar comentários"
 
-#: contrib/flatpages/models.py:12
+#: contrib/flatpages/models.py:11
 msgid "template name"
 msgstr "nome do modelo"
 
-#: contrib/flatpages/models.py:13
+#: contrib/flatpages/models.py:12
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -1690,32 +1517,39 @@ msgstr ""
 "Exemplo: 'flatpages/contact_page.html'. Se não for informado, será utilizado "
 "'flatpages/default.html'."
 
-#: contrib/flatpages/models.py:14
+#: contrib/flatpages/models.py:13
 msgid "registration required"
 msgstr "registro obrigatório"
 
-#: contrib/flatpages/models.py:14
+#: contrib/flatpages/models.py:13
 msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "Se estiver marcado, apenas usuários autenticados poderão ver a página."
+msgstr ""
+"Se estiver assinalado, apenas usuários autenticados poderão ver a página."
 
-#: contrib/flatpages/models.py:19
+#: contrib/flatpages/models.py:18
 msgid "flat page"
 msgstr "página plana"
 
-#: contrib/flatpages/models.py:20
+#: contrib/flatpages/models.py:19
 msgid "flat pages"
 msgstr "páginas planas"
 
-#: contrib/gis/forms/fields.py:10
+#: contrib/formtools/wizard.py:130
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr "Desculpe, mas seu formulário expirou. Por favor, continue preenchendo o formulário desta página."
+
+#: contrib/gis/forms/fields.py:14
 msgid "No geometry value provided."
 msgstr "Nenhum valor geométrico fornecido."
 
-#: contrib/gis/forms/fields.py:11
-msgid "Invalid Geometry value."
+#: contrib/gis/forms/fields.py:15
+msgid "Invalid geometry value."
 msgstr "Valor geométrico inválido."
 
-#: contrib/gis/forms/fields.py:12
-msgid "Invalid Geometry type."
+#: contrib/gis/forms/fields.py:16
+msgid "Invalid geometry type."
 msgstr "Tipo geométrico inválido."
 
 #: contrib/humanize/templatetags/humanize.py:19
@@ -1918,107 +1752,107 @@ msgstr ""
 
 #: contrib/localflavor/ch/ch_states.py:5
 msgid "Aargau"
-msgstr ""
+msgstr "Argóvia"
 
 #: contrib/localflavor/ch/ch_states.py:6
 msgid "Appenzell Innerrhoden"
-msgstr ""
+msgstr "Appenzell Interior"
 
 #: contrib/localflavor/ch/ch_states.py:7
 msgid "Appenzell Ausserrhoden"
-msgstr ""
+msgstr "Appenzell Exterior"
 
 #: contrib/localflavor/ch/ch_states.py:8
 msgid "Basel-Stadt"
-msgstr ""
+msgstr "Basiléia-Cidade"
 
 #: contrib/localflavor/ch/ch_states.py:9
 msgid "Basel-Land"
-msgstr ""
+msgstr "Basiléia-Campo"
 
 #: contrib/localflavor/ch/ch_states.py:10
 msgid "Berne"
-msgstr ""
+msgstr "Berna"
 
 #: contrib/localflavor/ch/ch_states.py:11
 msgid "Fribourg"
-msgstr ""
+msgstr "Friburgo"
 
 #: contrib/localflavor/ch/ch_states.py:12
 msgid "Geneva"
-msgstr ""
+msgstr "Genebra"
 
 #: contrib/localflavor/ch/ch_states.py:13
 msgid "Glarus"
-msgstr ""
+msgstr "Glaris"
 
 #: contrib/localflavor/ch/ch_states.py:14
 msgid "Graubuenden"
-msgstr ""
+msgstr "Grisões"
 
 #: contrib/localflavor/ch/ch_states.py:15
 msgid "Jura"
-msgstr ""
+msgstr "Jura"
 
 #: contrib/localflavor/ch/ch_states.py:16
 msgid "Lucerne"
-msgstr ""
+msgstr "Lucerna"
 
 #: contrib/localflavor/ch/ch_states.py:17
 msgid "Neuchatel"
-msgstr ""
+msgstr "Neuchâtel"
 
 #: contrib/localflavor/ch/ch_states.py:18
 msgid "Nidwalden"
-msgstr ""
+msgstr "Nidwald"
 
 #: contrib/localflavor/ch/ch_states.py:19
 msgid "Obwalden"
-msgstr ""
+msgstr "Obwald"
 
 #: contrib/localflavor/ch/ch_states.py:20
 msgid "Schaffhausen"
-msgstr ""
+msgstr "Schaffhausen"
 
 #: contrib/localflavor/ch/ch_states.py:21
 msgid "Schwyz"
-msgstr ""
+msgstr "Schwyz"
 
 #: contrib/localflavor/ch/ch_states.py:22
 msgid "Solothurn"
-msgstr ""
+msgstr "Soleura"
 
 #: contrib/localflavor/ch/ch_states.py:23
 msgid "St. Gallen"
-msgstr ""
+msgstr "São Galo"
 
 #: contrib/localflavor/ch/ch_states.py:24
 msgid "Thurgau"
-msgstr ""
+msgstr "Turgóvia"
 
 #: contrib/localflavor/ch/ch_states.py:25
 msgid "Ticino"
-msgstr ""
+msgstr "Tessino"
 
 #: contrib/localflavor/ch/ch_states.py:26
 msgid "Uri"
-msgstr ""
+msgstr "Uri"
 
 #: contrib/localflavor/ch/ch_states.py:27
 msgid "Valais"
-msgstr ""
+msgstr "Valais"
 
 #: contrib/localflavor/ch/ch_states.py:28
 msgid "Vaud"
-msgstr ""
+msgstr "Vaud"
 
 #: contrib/localflavor/ch/ch_states.py:29
 msgid "Zug"
-msgstr ""
+msgstr "Zug"
 
 #: contrib/localflavor/ch/ch_states.py:30
 msgid "Zurich"
-msgstr ""
+msgstr "Zurique"
 
 #: contrib/localflavor/ch/forms.py:64
 msgid ""
@@ -2425,11 +2259,11 @@ msgstr ""
 
 #: contrib/localflavor/es/forms.py:143
 msgid "Invalid checksum for bank account number."
-msgstr "Número de conta bancária incorreto."
+msgstr "Número de verificação de conta bancária incorreto."
 
 #: contrib/localflavor/fi/forms.py:28
 msgid "Enter a valid Finnish social security number."
-msgstr "Informe um número de seguro social Finlandês válido."
+msgstr "Informe um número de seguro social finlandês válido."
 
 #: contrib/localflavor/in_/forms.py:14
 msgid "Enter a zip code in the format XXXXXXX."
@@ -2456,7 +2290,7 @@ msgstr "Informe um número de Segurança Social válido."
 msgid "Enter a valid VAT number."
 msgstr "Informe um número IVA válido."
 
-#: contrib/localflavor/jp/forms.py:17
+#: contrib/localflavor/jp/forms.py:16
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
 msgstr "Informe um código postal no formato XXXXXXX ou XXX-XXXX."
 
@@ -3480,27 +3314,27 @@ msgid "Worcestershire"
 msgstr "Worcestershire"
 
 #: contrib/localflavor/uk/uk_regions.py:55
-msgid "Condado de Antrim"
+msgid "County Antrim"
 msgstr "Condado de Antrim"
 
 #: contrib/localflavor/uk/uk_regions.py:56
-msgid "Condado de Armagh"
+msgid "County Armagh"
 msgstr "Condado de Armagh"
 
 #: contrib/localflavor/uk/uk_regions.py:57
-msgid "Condado de Down"
+msgid "County Down"
 msgstr "Condado de Down"
 
 #: contrib/localflavor/uk/uk_regions.py:58
-msgid "Condado de Fermanagh"
+msgid "County Fermanagh"
 msgstr "Condado de Fermanagh"
 
 #: contrib/localflavor/uk/uk_regions.py:59
-msgid "Condado de Londonderry"
+msgid "County Londonderry"
 msgstr "Condado de Derry"
 
 #: contrib/localflavor/uk/uk_regions.py:60
-msgid "Condado de Tyrone"
+msgid "County Tyrone"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:64
@@ -3673,8 +3507,8 @@ msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"Isto pode ser um caminho absoluto (como acima) ou uma URL completa, "
-"começando com 'http://'."
+"Pode ser um caminho absoluto (como acima) ou uma URL completa, começando com "
+"'http://'."
 
 #: contrib/redirects/models.py:13
 msgid "redirect"
@@ -3716,374 +3550,56 @@ msgstr "nome para exibição"
 msgid "sites"
 msgstr "sites"
 
-#: core/validators.py:80
-msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr ""
-"Este valor deve conter apenas letras, números, sublinhados (_) ou hífens."
+#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:683
+msgid "This value must be an integer."
+msgstr "Este valor deve ser um inteiro."
 
-#: core/validators.py:84
-msgid "Uppercase letters are not allowed here."
-msgstr "Letras em maiúsculo não são permitidas aqui."
+#: db/models/fields/__init__.py:379
+msgid "This value must be either True or False."
+msgstr "Este valor deve ser True ou False."
 
-#: core/validators.py:88
-msgid "Lowercase letters are not allowed here."
-msgstr "Letras em minúsculo não são permitidas aqui."
+#: db/models/fields/__init__.py:412
+msgid "This field cannot be null."
+msgstr "Este campo não pode ser nulo."
 
-#: core/validators.py:95
+#: db/models/fields/__init__.py:428
 msgid "Enter only digits separated by commas."
 msgstr "Informe apenas dígitos separados por vírgulas."
 
-#: core/validators.py:107
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Informe endereços de email válidos separados por vírgulas."
+#: db/models/fields/__init__.py:459
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Informe uma data válida no formato AAAA-MM-DD."
 
-#: core/validators.py:111
-msgid "Please enter a valid IP address."
-msgstr "Informe um endereço IP válido."
-
-#: core/validators.py:115
-msgid "Empty values are not allowed here."
-msgstr "Valores em branco não são permitidos."
-
-#: core/validators.py:119
-msgid "Non-numeric characters aren't allowed here."
-msgstr "Caracteres não numéricos não são permitidos."
-
-#: core/validators.py:123
-msgid "This value can't be comprised solely of digits."
-msgstr "Este valor não pode conter apenas dígitos."
-
-#: core/validators.py:128 forms/fields.py:161
-msgid "Enter a whole number."
-msgstr "Informe um número completo."
-
-#: core/validators.py:132
-msgid "Only alphabetical characters are allowed here."
-msgstr "Apenas caracteres do alfabeto são permitidos aqui."
-
-#: core/validators.py:147
+#: db/models/fields/__init__.py:468
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Data inválida: %s"
 
-#: core/validators.py:152 db/models/fields/__init__.py:547
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Informe uma data válida no formato AAAA-MM-DD."
-
-#: core/validators.py:157
-msgid "Enter a valid time in HH:MM format."
-msgstr "Informe uma hora válida no formato HH:MM."
-
-#: core/validators.py:161
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "Informe uma data/hora válida no formato AAAA-MM-DD HH:MM."
-
-#: core/validators.py:166 forms/fields.py:423
-msgid "Enter a valid e-mail address."
-msgstr "Informe um endereço de email válido."
-
-#: core/validators.py:178 core/validators.py:470 forms/fields.py:441
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Nenhum arquivo enviado. Verifique o tipo de codificação do formulário."
-
-#: core/validators.py:189 forms/fields.py:472
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
-msgstr ""
-"Envie uma imagem válida. O arquivo enviado não é uma imagem ou está "
-"corrompido."
-
-#: core/validators.py:196
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "A URL %s não aponta para uma imagem válida."
-
-#: core/validators.py:200
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr ""
-"Números de telefone devem estar no formato XXX-XXX-XXXX.\"%s\" é inválido."
-
-#: core/validators.py:208
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "A URL %s não aponta para um vídeo QuickTime válido."
-
-#: core/validators.py:212
-msgid "A valid URL is required."
-msgstr "Uma URL válida é exigida."
-
-#: core/validators.py:226
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-"HTML válido é exigido. Os erros específicos são:\n"
-"%s"
-
-#: core/validators.py:233
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr "XML mal formado: %s"
-
-#: core/validators.py:250
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "URL inválida: %s"
-
-#: core/validators.py:255 core/validators.py:257
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "A URL %s é um link quebrado."
-
-#: core/validators.py:263
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "Informe uma abreviação válida de estado dos E.U.A."
-
-#: core/validators.py:277
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Olha sua boca! A palavra %s não é permitida aqui."
-msgstr[1] "Olha sua boca! As palavras %s não são permitidas aqui."
-
-#: core/validators.py:284
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "Este campo deve casar com o campo '%s'."
-
-#: core/validators.py:303
-msgid "Please enter something for at least one field."
-msgstr "Informe algo em pelo menos um campo."
-
-#: core/validators.py:312 core/validators.py:323
-msgid "Please enter both fields or leave them both empty."
-msgstr "Informe ambos os campos ou deixe ambos vazios."
-
-#: core/validators.py:331
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "Este campo deve ser informado se o campo %(field)s for %(value)s."
-
-#: core/validators.py:344
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "Este campo deve ser dado se o campo %(field)s não for %(value)s."
-
-#: core/validators.py:363
-msgid "Duplicate values are not allowed."
-msgstr "Valores duplicados não são permitidos."
-
-#: core/validators.py:378
-#, python-format
-msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "Este valor deve estar entre %(lower)s e %(upper)s."
-
-#: core/validators.py:380
-#, python-format
-msgid "This value must be at least %s."
-msgstr "Este valor deve ser no mínimo %s."
-
-#: core/validators.py:382
-#, python-format
-msgid "This value must be no more than %s."
-msgstr "Este valor não deve ser maior que %s."
-
-#: core/validators.py:423
-#, python-format
-msgid "This value must be a power of %s."
-msgstr "Este valor deve ser uma potência de %s."
-
-#: core/validators.py:433
-msgid "Please enter a valid decimal number."
-msgstr "Informe um número decimal válido."
-
-#: core/validators.py:440
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Por favor entre com um número decimal com no máximo %s dígito."
-msgstr[1] "Por favor entre com um número decimal com no máximo %s dígitos."
-
-#: core/validators.py:443
-#, python-format
-msgid ""
-"Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural ""
-"Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] ""
-"Por favor informe um número decimal com a parte inteira de no máximo %s "
-"digito."
-msgstr[1] ""
-"Por favor informe um número decimal com a parte inteira de no máximo %s "
-"digitos."
-
-#: core/validators.py:446
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Por favor informe um número decimal com no máximo %s casa decimal."
-msgstr[1] ""
-"Por favor informe um número decimal com no máximo %s casas decimais."
-
-#: core/validators.py:454
-msgid "Please enter a valid floating point number."
-msgstr "Informe um número de ponto flutuante válido."
-
-#: core/validators.py:463
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Verifique se o arquivo enviado tem pelo menos %s bytes."
-
-#: core/validators.py:464
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "Verifique se o arquivo enviado tem no máximo %s bytes."
-
-#: core/validators.py:481
-msgid "The format for this field is wrong."
-msgstr "O formato deste campo está errado."
-
-#: core/validators.py:496
-msgid "This field is invalid."
-msgstr "Este campo é inválido."
-
-#: core/validators.py:532
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "Não foi possível receber dados de %s."
-
-#: core/validators.py:535
-#, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr ""
-"A URL %(url)s retornou um cabeçalho '%(contenttype)s' de Content-Type "
-"inválido."
-
-#: core/validators.py:568
-#, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-"Por favor, feche a tag %(tag)s na linha %(line)s. (A linha começa com \"%"
-"(start)s\".)"
-
-#: core/validators.py:572
-#, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Algum texto começando na linha %(line)s não é permitido no contexto. (Linha "
-"começa com \"%(start)s\".)"
-
-#: core/validators.py:577
-#, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"\"%(attr)s\" na linha %(line)s não é um atributo válido. (Linha começa com "
-"\"%(start)s\".)"
-
-#: core/validators.py:582
-#, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"\"<%(tag)s>\" na linha %(line)s é uma tag inválida. (Linha começa com \"%"
-"(start)s\".)"
-
-#: core/validators.py:586
-#, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Uma tag na linha %(line)s não apresenta um ou mais atributos exigidos.(Linha "
-"começa com \"%(start)s\".)"
-
-#: core/validators.py:591
-#, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"O atributo \"%(attr)s\" na linha %(line)s tem um valor inválido. (Linha "
-"começa com \"%(start)s\".)"
-
-#: db/models/manipulators.py:304
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(object)s com este %(type)s já existe para o %(field)s dado."
-
-#: db/models/fields/__init__.py:46
-#, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s com este %(fieldname)s já existe."
-
-#: db/models/fields/__init__.py:321 db/models/fields/files.py:168
-#: db/models/fields/files.py:179 forms/fields.py:52 oldforms/__init__.py:370
-msgid "This field is required."
-msgstr "Este campo é requerido."
-
-#: db/models/fields/__init__.py:435 db/models/fields/__init__.py:803
-msgid "This value must be an integer."
-msgstr "Este valor deve ser um inteiro."
-
-#: db/models/fields/__init__.py:481
-msgid "This value must be either True or False."
-msgstr "Este valor deve ser True ou False."
-
-#: db/models/fields/__init__.py:510
-msgid "This field cannot be null."
-msgstr "Este campo não pode ser nulo."
-
-#: db/models/fields/__init__.py:619 db/models/fields/__init__.py:636
+#: db/models/fields/__init__.py:532 db/models/fields/__init__.py:550
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr "Informe uma data/hora válida no formato YYYY-MM-DD HH:MM[:ss[.uuuuuu]]."
+msgstr ""
+"Informe uma data/hora válida no formato YYYY-MM-DD HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:692
+#: db/models/fields/__init__.py:586
 msgid "This value must be a decimal number."
 msgstr "Este valor deve ser um número decimal."
 
-#: db/models/fields/__init__.py:841
+#: db/models/fields/__init__.py:719
 msgid "This value must be either None, True or False."
 msgstr "Este valor deve ser None, True ou False."
 
-#: db/models/fields/__init__.py:911
-msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "Insira um \"slug\" válido consistindo de letras, números, sublinhados (_) ou hífens."
-
-#: db/models/fields/__init__.py:960 db/models/fields/__init__.py:973
+#: db/models/fields/__init__.py:817 db/models/fields/__init__.py:831
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Informe uma hora válida no formato HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/files.py:188
-msgid "Enter a valid filename."
-msgstr "Informe um nome de arquivo válido."
-
-#: db/models/fields/related.py:92
-#, python-format
-msgid "Please enter a valid %s."
-msgstr "Por favor informe um %s válido."
-
-#: db/models/fields/related.py:786
+#: db/models/fields/related.py:763
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-" Mantenha pressionado \"Control\", ou \"Command\" no Mac para selecionar "
+"Mantenha pressionado \"Control\" (ou \"Command\" no Mac) para selecionar "
 "mais de uma opção."
 
-#: db/models/fields/related.py:866
+#: db/models/fields/related.py:840
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -4094,154 +3610,162 @@ msgstr[1] ""
 "Por favor, informe IDs válidos para %(self)s. Os valores %(value)r são "
 "inválidos."
 
-#: forms/fields.py:53
+#: forms/fields.py:54
+msgid "This field is required."
+msgstr "Este campo é obrigatório."
+
+#: forms/fields.py:55
 msgid "Enter a valid value."
 msgstr "Informe um valor válido."
 
-#: forms/fields.py:133
+#: forms/fields.py:138
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Certifique-se de que o valor tenha no máximo %(max)d caracteres (ele possui %"
 "(length)d)."
 
-#: forms/fields.py:134
+#: forms/fields.py:139
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 "Certifique-se de que o valor tenha no mínimo %(min)d caracteres (ele possui %"
 "(length)d)."
 
-#: forms/fields.py:162 forms/fields.py:191 forms/fields.py:220
+#: forms/fields.py:166
+msgid "Enter a whole number."
+msgstr "Informe um número inteiro."
+
+#: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Certifique-se que este valor seja menor ou igual a %s."
 
-#: forms/fields.py:163 forms/fields.py:192 forms/fields.py:221
+#: forms/fields.py:168 forms/fields.py:197 forms/fields.py:226
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Certifique-se que este valor seja maior ou igual a %s."
 
-#: forms/fields.py:190 forms/fields.py:219
+#: forms/fields.py:195 forms/fields.py:224
 msgid "Enter a number."
 msgstr "Informe um número."
 
-#: forms/fields.py:222
+#: forms/fields.py:227
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Certifique-se de que não tenha mais de %s dígitos no total."
 
-#: forms/fields.py:223
+#: forms/fields.py:228
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Certifique-se de que não tenha mais de %s casa decimais."
 
-#: forms/fields.py:224
+#: forms/fields.py:229
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr ""
 "Certifique-se de que não tenha mais de %s dígitos antes do ponto decimal."
 
-#: forms/fields.py:282 forms/fields.py:804
+#: forms/fields.py:287 forms/fields.py:848
 msgid "Enter a valid date."
 msgstr "Informe uma data válida."
 
-#: forms/fields.py:316 forms/fields.py:805
+#: forms/fields.py:321 forms/fields.py:849
 msgid "Enter a valid time."
 msgstr "Informe uma hora válida."
 
-#: forms/fields.py:355
+#: forms/fields.py:360
 msgid "Enter a valid date/time."
 msgstr "Informe uma data/hora válida."
 
-#: forms/fields.py:442
+#: forms/fields.py:446
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Nenhum arquivo enviado. Verifique o tipo de codificação do formulário."
+
+#: forms/fields.py:447
 msgid "No file was submitted."
 msgstr "Não foi enviado nenhum arquivo."
 
-#: forms/fields.py:443 oldforms/__init__.py:689
+#: forms/fields.py:448
 msgid "The submitted file is empty."
 msgstr "O arquivo enviado está vazio."
 
-#: forms/fields.py:533
+#: forms/fields.py:477
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Envie uma imagem válida. O arquivo enviado não é uma imagem ou está "
+"corrompido."
+
+#: forms/fields.py:538
 msgid "Enter a valid URL."
 msgstr "Informe uma URL válida."
 
-#: forms/fields.py:534
+#: forms/fields.py:539
 msgid "This URL appears to be a broken link."
 msgstr "A URL %s aparenta ser um link quebrado."
 
-#: forms/fields.py:602 forms/fields.py:653
+#: forms/fields.py:618 forms/fields.py:696
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Faça uma escolha válida. %(value)s não está disponível."
 
-#: forms/fields.py:654 forms/fields.py:715 forms/models.py:531
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:644
 msgid "Enter a list of values."
 msgstr "Informe uma lista de valores."
 
-#: forms/fields.py:833
+#: forms/fields.py:877
 msgid "Enter a valid IPv4 address."
 msgstr "Informe um endereço IPv4 válido."
 
-#: forms/models.py:463
+#: forms/fields.py:887
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Insira um \"slug\" válido consistindo de letras, números, sublinhados (_) ou "
+"hífens."
+
+#: forms/formsets.py:242 forms/formsets.py:244
+msgid "Order"
+msgstr "Ordem"
+
+#: forms/models.py:258 forms/models.py:267
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s com este %(field_label)s já existe."
+
+#: forms/models.py:574
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Faça uma escolha válida. Sua escolha não é uma das disponíveis."
 
-#: forms/models.py:532
+#: forms/models.py:645
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Faça uma escolha válida. %s não está disponível."
 
-#: oldforms/__init__.py:405
-#, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Certifique-se de que seu texto tenha menos que %s caractere."
-msgstr[1] "Certifique-se de que seu texto tenha menos que %s caracteres."
-
-#: oldforms/__init__.py:410
-msgid "Line breaks are not allowed here."
-msgstr "Não são permitidas quebras de linha aqui."
-
-#: oldforms/__init__.py:508 oldforms/__init__.py:582 oldforms/__init__.py:621
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "Selecione uma escolha válida; '%(data)s' não está em %(choices)s."
-
-#: oldforms/__init__.py:750
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Informe um número inteiro entre -32.768 e 32.767"
-
-#: oldforms/__init__.py:760
-msgid "Enter a positive number."
-msgstr "Informe um número positivo"
-
-#: oldforms/__init__.py:770
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "Informe um número inteiro entre 0 e 32.767."
-
-#: template/defaultfilters.py:698
+#: template/defaultfilters.py:706
 msgid "yes,no,maybe"
 msgstr "sim,não,talvez"
 
-#: template/defaultfilters.py:729
+#: template/defaultfilters.py:737
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
 
-#: template/defaultfilters.py:731
+#: template/defaultfilters.py:739
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:733
+#: template/defaultfilters.py:741
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:734
+#: template/defaultfilters.py:742
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
@@ -4490,35 +4014,35 @@ msgid_plural "minutes"
 msgstr[0] "minuto"
 msgstr[1] "minutos"
 
-#: utils/timesince.py:46
+#: utils/timesince.py:43
 msgid "minutes"
 msgstr "minutos"
 
-#: utils/timesince.py:51
+#: utils/timesince.py:48
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: utils/timesince.py:57
+#: utils/timesince.py:54
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:401
-msgid "DATE_FORMAT"
-msgstr ""
-
 #: utils/translation/trans_real.py:403
+msgid "DATE_FORMAT"
+msgstr "j \\de N \\de Y"
+
+#: utils/translation/trans_real.py:405
 msgid "TIME_FORMAT"
-msgstr ""
+msgstr "H:i"
 
-#: utils/translation/trans_real.py:419
+#: utils/translation/trans_real.py:421
 msgid "YEAR_MONTH_FORMAT"
-msgstr ""
+msgstr "F \\de Y"
 
-#: utils/translation/trans_real.py:420
+#: utils/translation/trans_real.py:422
 msgid "MONTH_DAY_FORMAT"
-msgstr ""
+msgstr "j \\de F"
 
 #: views/generic/create_update.py:114
 #, python-format
@@ -4534,12 +4058,3 @@ msgstr "O(A) %(verbose_name)s foi atualizado com sucesso."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "O(A) %(verbose_name)s foi excluído."
-
-#~ msgid "DATE_WITH_TIME_FULL"
-#~ msgstr "j. N Y, H:i"
-
-#~ msgid "Your new password is: %(new_password)s"
-#~ msgstr "Sua nova senha é: %(new_password)s"
-
-#~ msgid "Feel free to change this password by going to this page:"
-#~ msgstr "Sinta-se a vontade para alterar esta senha visitando esta página:"
