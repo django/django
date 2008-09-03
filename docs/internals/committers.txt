@@ -25,7 +25,7 @@ Journal-World`_ of Lawrence, Kansas, USA.
     internship at World Online, during which time he and Adrian developed Django
     from scratch. The most enthusiastic Brit you'll ever meet, he's passionate
     about best practices in web development has maintains a well-read
-    `web-development blog`_. He works for `The Guardian`_.
+    `web-development blog`_.
     
     Simon lives in Brighton, England.
 
@@ -50,7 +50,6 @@ Journal-World`_ of Lawrence, Kansas, USA.
 .. _everyblock: http://everyblock.com/
 .. _simon willison: http://simonwillison.net/
 .. _web-development blog: `simon willison`_
-.. _the guardian: http://www.guardian.co.uk/
 .. _jacob kaplan-moss: http://jacobian.org/
 .. _whiskey media: http://whiskeymedia.com/
 .. _wilson miner: http://wilsonminer.com/
