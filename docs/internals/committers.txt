@@ -154,8 +154,6 @@ Specialists
     written a `book on Django`_, and enjoys fine port and talking to
     his car.
 
-    James lives in Lawrence, Kansas, USA.
-
 .. _james bennett: http://b-list.org/
 .. _keeps a blog: `james bennett`_
 .. _book on Django: http://www.amazon.com/dp/1590599969/?tag=djangoproject-20
