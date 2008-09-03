@@ -130,6 +130,8 @@ Joseph Kocherhans
     Brian helped immensely in getting Django's "newforms-admin" branch finished
     in time for Django 1.0; he's now a full committer, continuing to improve on
     the admin and forms system.
+    
+    Brian lives in Denver, USA.
 
 .. _brian rosner: http://oebfare.com/
 .. _this week in django: http://thisweekindjango.com/
