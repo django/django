@@ -228,6 +228,16 @@ storage engine, you have a couple of options.
 
 .. _AlterModelOnSyncDB: http://code.djangoproject.com/wiki/AlterModelOnSyncDB
 
+Boolean fields in Django
+-------------------------
+
+Since MySQL doesn't have a direct ``BOOLEAN`` column type, Django uses a
+``TINYINT`` column with values of ``1`` and ``0`` to store values for the
+:class:`~django.db.models.BooleanField` model field. Refer to the documentation
+of that field for more details, but usually this won't be something that will
+matter unless you're printing out the field values and are expecting to see
+``True`` and ``False.``.
+
 
 .. _oracle-notes:
 
