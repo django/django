@@ -238,6 +238,40 @@ of that field for more details, but usually this won't be something that will
 matter unless you're printing out the field values and are expecting to see
 ``True`` and ``False.``.
 
+.. _sqlite-notes:
+
+
+SQLite notes 
+============ 
+ 
+Versions of SQLite 3.3.5 and older `contain a bug`_ when handling ``ORDER BY``
+parameters. This can cause problems when you use the ``select`` parameter for
+the ``extra()`` QuerySet method. The bug can be identified by the error message
+``OperationalError: ORDER BY terms must not be non-integer constants``. The
+problem can be solved updating SQLite to version 3.3.6 or newer, possibly also
+updating the ``pysqlite2`` Python module in the process.
+ 
+.. _contain a bug: http://www.sqlite.org/cvstrac/tktview?tn=1768 
+ 
+This has a very low impact because 3.3.6 was released in April 2006, so most 
+current binary distributions for different platforms include newer version of 
+SQLite usable from Python through either the ``pysqlite2`` or the ``sqlite3`` 
+modules. 
+ 
+However, in the case of Windows, the official binary distribution of the stable 
+release of Python 2.5 (2.5.2 as of now) includes SQLite 3.3.4 so the bug can 
+make itself evident in that platform. There are (as of Django 1.0) even three 
+tests in the Django test suite that will fail when run under this setup.  As 
+described above, this can be solved by downloading and installing a newer 
+version of ``pysqlite2`` (``pysqlite-2.x.x.win32-py2.5.exe``) that includes and 
+uses a newer version of SQLite. Python 2.6 will ship with a newer version of 
+SQLite and so will no be affected by this issue. 
+ 
+If you are in such platform and find yourself in the need to update 
+``pysqlite``/SQLite, you will also need to manually modify the 
+``django/db/backends/sqlite3/base.py`` file in the Django source tree so it 
+attempts to import ``pysqlite2`` before that ``sqlite3`` and so it can take 
+advantage of the new ``pysqlite2``/SQLite versions.
 
 .. _oracle-notes:
 
