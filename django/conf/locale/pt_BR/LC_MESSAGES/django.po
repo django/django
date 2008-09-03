@@ -321,30 +321,29 @@ msgstr "Nenhum campo modificado."
 #: contrib/admin/options.py:411 contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "O(A) %(name)s \"%(obj)s\" foi adicionado com sucesso."
+msgstr "%(name)s \"%(obj)s\": adicionado com sucesso."
 
 #: contrib/admin/options.py:415 contrib/admin/options.py:448
 #: contrib/auth/admin.py:59
 msgid "You may edit it again below."
-msgstr "Você pode editá-lo(a) de novo abaixo."
+msgstr "Pode editar novamente abaixo."
 
 #: contrib/admin/options.py:425 contrib/admin/options.py:458
 #, python-format
 msgid "You may add another %s below."
-msgstr "Você pode adicionar outro(a) %s abaixo."
+msgstr "Pode adicionar %s abaixo."
 
 #: contrib/admin/options.py:446
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "O(A) %(name)s \"%(obj)s\" foi modificado com sucesso."
+msgstr "%(name)s \"%(obj)s\": modificado com sucesso."
 
 #: contrib/admin/options.py:454
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
-"O(A) %(name)s \"%(obj)s\" foi adicionado com sucesso. Você pode editá-lo(a) "
-"abaixo."
+"%(name)s \"%(obj)s\": adicionado com sucesso, e pode ser editado abaixo."
 
 #: contrib/admin/options.py:530
 #, python-format
@@ -363,7 +362,7 @@ msgstr "Erro no banco de dados"
 #: contrib/admin/options.py:690
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "O(A) %(name)s \"%(obj)s\" foi excluído com sucesso."
+msgstr "%(name)s \"%(obj)s\": excluído com sucesso."
 
 #: contrib/admin/options.py:697
 msgid "Are you sure?"
@@ -427,12 +426,12 @@ msgstr "Administração de %s"
 #: contrib/admin/util.py:138
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Um(a) ou mais %(fieldname)s em %(name)s: %(obj)s"
+msgstr "1 ou mais %(fieldname)s em %(name)s: %(obj)s"
 
 #: contrib/admin/util.py:143
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Um(a) ou mais %(fieldname)s em %(name)s:"
+msgstr "1 ou mais %(fieldname)s em %(name)s:"
 
 #: contrib/admin/widgets.py:70
 msgid "Date:"
@@ -2719,7 +2718,7 @@ msgstr "Baixa Silésia"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:9
 msgid "Kuyavia-Pomerania"
-msgstr ""
+msgstr "Kuyavia-Pomerania"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:10
 msgid "Lublin"
@@ -2751,7 +2750,7 @@ msgstr "Subcarpácia"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:17
 msgid "Podlasie"
-msgstr ""
+msgstr "Podlasie"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:18
 msgid "Pomerania"
@@ -3223,7 +3222,7 @@ msgstr "Kent"
 
 #: contrib/localflavor/uk/uk_regions.py:29
 msgid "Lancashire"
-msgstr ""
+msgstr "Lancashire"
 
 #: contrib/localflavor/uk/uk_regions.py:30
 msgid "Leicestershire"
@@ -3243,7 +3242,7 @@ msgstr "Norfolk"
 
 #: contrib/localflavor/uk/uk_regions.py:34
 msgid "North Yorkshire"
-msgstr ""
+msgstr "North Yorkshire"
 
 #: contrib/localflavor/uk/uk_regions.py:35
 msgid "Northamptonshire"
@@ -3271,7 +3270,7 @@ msgstr "Somerset"
 
 #: contrib/localflavor/uk/uk_regions.py:41
 msgid "South Yorkshire"
-msgstr ""
+msgstr "South Yorkshire"
 
 #: contrib/localflavor/uk/uk_regions.py:42
 msgid "Staffordshire"
@@ -3287,7 +3286,7 @@ msgstr "Surrey"
 
 #: contrib/localflavor/uk/uk_regions.py:45
 msgid "Tyne and Wear"
-msgstr ""
+msgstr "Tyne and Wear"
 
 #: contrib/localflavor/uk/uk_regions.py:46
 msgid "Warwickshire"
@@ -3303,7 +3302,7 @@ msgstr "Sussex Oriental"
 
 #: contrib/localflavor/uk/uk_regions.py:49
 msgid "West Yorkshire"
-msgstr ""
+msgstr "West Yorkshire"
 
 #: contrib/localflavor/uk/uk_regions.py:50
 msgid "Wiltshire"
@@ -3335,7 +3334,7 @@ msgstr "Condado de Derry"
 
 #: contrib/localflavor/uk/uk_regions.py:60
 msgid "County Tyrone"
-msgstr ""
+msgstr "Condado de Tyrone"
 
 #: contrib/localflavor/uk/uk_regions.py:64
 msgid "Clwyd"
@@ -3379,7 +3378,7 @@ msgstr "Central"
 
 #: contrib/localflavor/uk/uk_regions.py:77
 msgid "Dumfries and Galloway"
-msgstr ""
+msgstr "Dumfries and Galloway"
 
 #: contrib/localflavor/uk/uk_regions.py:78
 msgid "Fife"
@@ -3403,7 +3402,7 @@ msgstr "Órcades"
 
 #: contrib/localflavor/uk/uk_regions.py:83
 msgid "Shetland Islands"
-msgstr ""
+msgstr "Ilhas Shetland"
 
 #: contrib/localflavor/uk/uk_regions.py:84
 msgid "Strathclyde"
@@ -4047,14 +4046,14 @@ msgstr "j \\de F"
 #: views/generic/create_update.py:114
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
-msgstr "O(A) %(verbose_name)s foi criado com sucesso."
+msgstr "%(verbose_name)s: criado com sucesso."
 
 #: views/generic/create_update.py:156
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
-msgstr "O(A) %(verbose_name)s foi atualizado com sucesso."
+msgstr "%(verbose_name)s: atualizado com sucesso."
 
 #: views/generic/create_update.py:198
 #, python-format
 msgid "The %(verbose_name)s was deleted."
-msgstr "O(A) %(verbose_name)s foi excluído."
+msgstr "%(verbose_name)s: excluído."
