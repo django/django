@@ -105,6 +105,8 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         super(ForeignKeyRawIdWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
+        if attrs is None:
+            attrs = {}
         related_url = '../../../%s/%s/' % (self.rel.to._meta.app_label, self.rel.to._meta.object_name.lower())
         params = self.url_parameters()
         if params:
