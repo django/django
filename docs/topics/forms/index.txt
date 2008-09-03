@@ -188,7 +188,7 @@ can also :ref:`customize the way in which labels and ids are generated
 <ref-forms-api-configuring-label>`.
 
 You can also use ``form.as_table`` to output table rows (you'll need to provide
-your own ``<table>`` tags) and ``form.as_li`` to output list items.
+your own ``<table>`` tags) and ``form.as_ul`` to output list items.
 
 Customizing the form template
 -----------------------------
