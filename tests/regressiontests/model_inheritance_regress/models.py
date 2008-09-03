@@ -69,7 +69,13 @@ class Article(models.Model):
         return self.headline
 
 class ArticleWithAuthor(Article):
-    author = models.CharField(max_length=100) 
+    author = models.CharField(max_length=100)
+
+class M2MBase(models.Model):
+    articles = models.ManyToManyField(Article)
+
+class M2MChild(M2MBase):
+    name = models.CharField(max_length=50)
 
 __test__ = {'API_TESTS':"""
 # Regression for #7350, #7202
@@ -230,5 +236,10 @@ DoesNotExist: ArticleWithAuthor matching query does not exist.
 Traceback (most recent call last):
     ...
 DoesNotExist: ArticleWithAuthor matching query does not exist.
+
+# Regression test for #8825: Make sure all inherited fields (esp. m2m fields, in
+# this case) appear on the child class.
+>>> M2MChild.objects.filter(articles__isnull=False)
+[]
 
 """}
