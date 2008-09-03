@@ -13,6 +13,8 @@ This file describes some of the features that might be relevant to Django
 usage. Of course, it is not intended as a replacement for server-specific
 documentation or reference manuals.
 
+.. _mysql-notes:
+
 MySQL notes
 ===========
 
@@ -239,7 +241,6 @@ matter unless you're printing out the field values and are expecting to see
 ``True`` and ``False.``.
 
 .. _sqlite-notes:
-
 
 SQLite notes 
 ============ 

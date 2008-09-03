@@ -212,7 +212,37 @@ replaced by ``ModelForm``) and a number of deprecated features which were
 replaced by the dispatcher, file-uploading and file-storage refactorings
 introduced in the Django 1.0 alpha releases.
 
-Thanks
-======
+Known issues
+============
 
-So many people. Really.
+We've done our best to make Django 1.0 as solid as possible, but unfortunately
+there are a couple of issues that we know about in the release.
+
+Multi-table model inheritance with ``to_field``
+-----------------------------------------------
+
+If you're using :ref:`multiple table model inheritance
+<multi-table-inheritance>`, be aware of this caveat: child models using a custom
+``parent_link`` and ``to_field`` will cause database integrity errors. A set of
+models like the following are **not valid**::
+
+    class Parent(models.Model):
+        name = models.CharField(max_length=10)
+        other_value = models.IntegerField(unique=True)
+
+    class Child(Parent):
+        father = models.OneToOneField(Parent, primary_key=True, to_field="other_value", parent_link=True)
+        value = models.IntegerField()
+
+This bug will be fixed in the next release of Django.
+
+Caveats with support of certain databases
+-----------------------------------------
+
+Django attempts to support as many features as possible on all database
+backends. However, not all database backends are alike, and in particular many of the supported database differ greatly from version to version. It's a good idea to checkout our :ref:`notes on supported database <ref-databases>`:
+
+    - :ref:`mysql-notes`
+    - :ref:`sqlite-notes`
+    - :ref:`oracle-notes`
+
