@@ -50,7 +50,7 @@ activate the admin site for your installation, do these three things:
 
           urlpatterns = patterns('',
               # Example:
-              # (r'^{{ project_name }}/', include('{{ project_name }}.foo.urls')),
+              # (r'^mysite/', include('mysite.foo.urls')),
 
               # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
               # to INSTALLED_APPS to enable admin documentation:
