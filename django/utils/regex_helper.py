@@ -85,7 +85,7 @@ def normalize(pattern):
                 result.append(ch)
             elif ch == '.':
                 # Replace "any character" with an arbitrary representative.
-                result.append(u"x")
+                result.append(u".")
             elif ch == '|':
                 # FIXME: One day we'll should do this, but not in 1.0.
                 raise NotImplementedError
