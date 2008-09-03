@@ -671,4 +671,4 @@ class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     def __init__(self, attrs=None):
         widgets = (HiddenInput(attrs=attrs), HiddenInput(attrs=attrs))
         super(SplitDateTimeWidget, self).__init__(widgets, attrs)
-        
+
