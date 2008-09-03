@@ -68,7 +68,10 @@ of 1.0. This includes these APIs:
     
     - :ref:`Templates <topics-templates>`, including the language, Python-level
       :ref:`template APIs <ref-templates-index>`, and :ref:`custom template tags
-      and libraries <howto-custom-template-tags>`.
+      and libraries <howto-custom-template-tags>`. We may add new template
+      tags in the future and the names may inadvertently clash with
+      external template tags. Before adding any such tags, we'll ensure that
+      Django raises an error if it tries to load tags with duplicate names.
       
     - :ref:`Testing <topics-testing>`
 
