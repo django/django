@@ -87,6 +87,8 @@ convention to import this as a shorter alias, ``_``, to save typing.
          global ``_()`` function causes interference. Explicitly importing
          ``ugettext()`` as ``_()`` avoids this problem.
 
+.. highlightlang:: python
+
 In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
@@ -128,16 +130,16 @@ examples, is that Django's translation-string-detecting utility,
 The strings you pass to ``_()`` or ``ugettext()`` can take placeholders,
 specified with Python's standard named-string interpolation syntax. Example::
 
-    def my_view(request, n):
-        output = _('%(name)s is my name.') % {'name': n}
+    def my_view(request, m, d):
+        output = _('Today is %(month)s, %s(day)s.') % {'month': m, 'day': d}
         return HttpResponse(output)
 
 This technique lets language-specific translations reorder the placeholder
-text. For example, an English translation may be ``"Adrian is my name."``,
-while a Spanish translation may be ``"Me llamo Adrian."`` -- with the
-placeholder (the name) placed after the translated text instead of before it.
+text. For example, an English translation may be ``"Today is November, 26."``,
+while a Spanish translation may be ``"Hoy es 26 de Noviembre."`` -- with the
+placeholders (the month and the day) with their positions swapped.
 
-For this reason, you should use named-string interpolation (e.g., ``%(name)s``)
+For this reason, you should use named-string interpolation (e.g., ``%(day)s``)
 instead of positional interpolation (e.g., ``%s`` or ``%d``) whenever you
 have more than a single parameter. If you used positional interpolation,
 translations wouldn't be able to reorder placeholder text.
@@ -215,11 +217,13 @@ translation languages as the ``count`` variable).
 In template code
 ----------------
 
+.. highlightlang:: html+django
+
 Translations in :ref:`Django templates <topics-templates>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
 access to these tags, put ``{% load i18n %}`` toward the top of your template.
 
-The ``{% trans %}`` template tag translates either a constant string 
+The ``{% trans %}`` template tag translates either a constant string
 (enclosed in single or double quotes) or variable content::
 
     <title>{% trans "This is the title." %}</title>
@@ -231,9 +235,9 @@ require translation in the future::
 
     <title>{% trans "myvar" noop %}</title>
 
-It's not possible to mix a template variable inside a string within
-``{% trans %}``. If your translations require strings with variables (placeholders),
-use ``{% blocktrans %}``. Example::
+It's not possible to mix a template variable inside a string within ``{% trans
+%}``. If your translations require strings with variables (placeholders), use
+``{% blocktrans %}``::
 
     {% blocktrans %}This string will have {{ value }} inside.{% endblocktrans %}
 
@@ -273,6 +277,7 @@ Each ``RequestContext`` has access to three translation-specific variables:
 
     * ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
       Example: ``en-us``. (See "How language preference is discovered", below.)
+      
     * ``LANGUAGE_BIDI`` is the current locale's direction. If True, it's a
       right-to-left language, e.g.: Hebrew, Arabic. If False it's a
       left-to-right language, e.g.: English, French, German etc.
@@ -289,7 +294,7 @@ These tags also require a ``{% load i18n %}``.
 
 Translation hooks are also available within any template block tag that accepts
 constant strings. In those cases, just use ``_()`` syntax to specify a
-translation string. Example::
+translation string::
 
     {% some_special_tag _("Page not found") value|yesno:_("yes,no") %}
 
@@ -308,6 +313,8 @@ string, so they don't need to be aware of translations.
 
 Working with lazy translation objects
 -------------------------------------
+
+.. highlightlang:: python
 
 Using ``ugettext_lazy()`` and ``ungettext_lazy()`` to mark strings in models
 and utility functions is a common operation. When you're working with these
@@ -388,7 +395,8 @@ obtain) the language translations themselves. Here's how that works.
     application) and English strings (from Django itself). If you want to
     support a locale for your application that is not already part of
     Django, you'll need to make at least a minimal translation of the Django
-    core.
+    core. See the relevant :ref:LocaleMiddleware note`<locale-middleware-notes>`
+    for more details.
 
 Message files
 -------------
@@ -416,20 +424,17 @@ The language code, in this case, is in locale format. For example, it's
 
 The script should be run from one of three places:
 
-    * The root ``django`` directory (not a Subversion checkout, but the one
-      that is linked-to via ``$PYTHONPATH`` or is located somewhere on that
-      path).
     * The root directory of your Django project.
     * The root directory of your Django app.
+    * The root ``django`` directory (not a Subversion checkout, but the one
+      that is linked-to via ``$PYTHONPATH`` or is located somewhere on that
+      path). This is only relevant when you are creating a translation for
+      Django itself, see :ref:`contributing-translations`.
 
-The script runs over the entire Django source tree and pulls out all strings
-marked for translation. It creates (or updates) a message file in the directory
-``conf/locale``. In the ``de`` example, the file will be
-``conf/locale/de/LC_MESSAGES/django.po``.
-
-If run over your project source tree or your application source tree, it will
-do the same, but the location of the locale directory is ``locale/LANG/LC_MESSAGES``
-(note the missing ``conf`` prefix).
+Th script runs over your project source tree or your application source tree and
+pulls out all strings marked for translation. It creates (or updates) a message
+file in the directory ``locale/LANG/LC_MESSAGES``. In the ``de`` example, the
+file will be ``locale/de/LC_MESSAGES/django.po``.
 
 By default ``django-admin.py makemessages`` examines every file that has the
 ``.html`` file extension. In case you want to override that default, use the
@@ -437,22 +442,23 @@ By default ``django-admin.py makemessages`` examines every file that has the
 
     django-admin.py makemessages -l de -e txt
 
-Separate multiple extensions with commas and/or use ``-e`` or ``--extension`` multiple times::
+Separate multiple extensions with commas and/or use ``-e`` or ``--extension``
+multiple times::
 
     django-admin.py makemessages -l=de -e=html,txt -e xml
 
 When `creating JavaScript translation catalogs`_ you need to use the special
 'djangojs' domain, **not** ``-e js``.
 
-.. _create a JavaScript translation catalog: #creating-javascript-translation-catalogs
+.. _create a JavaScript translation catalog: `Creating JavaScript translation catalogs`_
 
 .. admonition:: No gettext?
 
-    If you don't have the ``gettext`` utilities installed,
-    ``django-admin.py makemessages`` will create empty files. If that's the
-    case, either install the ``gettext`` utilities or just copy the English
-    message file (``conf/locale/en/LC_MESSAGES/django.po``) and use it as a
-    starting point; it's just an empty translation file.
+    If you don't have the ``gettext`` utilities installed, ``django-admin.py
+    makemessages`` will create empty files. If that's the case, either install
+    the ``gettext`` utilities or just copy the English message file
+    (``locale/en/LC_MESSAGES/django.po``) if available and use it as a starting
+    point; it's just an empty translation file.
 
 .. admonition:: Working on Windows?
 
@@ -485,8 +491,9 @@ A quick explanation:
     * ``msgstr`` is where you put the language-specific translation. It starts
       out empty, so it's your responsibility to change it. Make sure you keep
       the quotes around your translation.
-    * As a convenience, each message includes the filename and line number
-      from which the translation string was gleaned.
+    * As a convenience, each message includes, in the form of a comment line
+      prefixed with ``#`` and locted above the ``msgid`` line, the filename and
+      line number from which the translation string was gleaned.
 
 Long messages are a special case. There, the first string directly after the
 ``msgstr`` (or ``msgid``) is an empty string. Then the content itself will be
@@ -516,11 +523,10 @@ After you create your message file -- and each time you make changes to it --
 you'll need to compile it into a more efficient form, for use by ``gettext``.
 Do this with the ``django-admin.py compilemessages`` utility.
 
-This tool runs over all available ``.po`` files and creates ``.mo`` files,
-which are binary files optimized for use by ``gettext``. In the same directory
-
-from which you ran ``django-admin.py makemessages``, run
-``django-admin.py compilemessages`` like this::
+This tool runs over all available ``.po`` files and creates ``.mo`` files, which
+are binary files optimized for use by ``gettext``. In the same directory from
+which you ran ``django-admin.py makemessages``, run ``django-admin.py
+compilemessages`` like this::
 
    django-admin.py compilemessages
 
@@ -531,12 +537,6 @@ That's it. Your translations are ready for use.
     The old tool ``bin/compile-messages.py`` has been moved to the command
     ``django-admin.py compilemessages`` to provide consistency throughout
     Django.
-
-.. admonition:: A note to translators
-
-    If you've created a translation in a language Django doesn't yet support,
-    please let us know! See :ref:`contributing-translations` for the steps to
-    take.
 
 .. admonition:: Working on Windows?
 
@@ -591,24 +591,38 @@ following this algorithm:
 
     * First, it looks for a ``django_language`` key in the current user's
       session.
-    * Failing that, it looks for a cookie that is named according to your ``LANGUAGE_COOKIE_NAME`` setting. (The default name is ``django_language``, and this setting is new in the Django development version. In Django version 0.96 and before, the cookie's name is hard-coded to ``django_language``.)
+    
+    * Failing that, it looks for a cookie.
+    
+      .. versionchanged:: 1.0
+    
+      In Django version 0.96 and before, the cookie's name is hard-coded to
+      ``django_language``. In Django 1,0, The cookie name is set by the
+      ``LANGUAGE_COOKIE_NAME`` setting. (The default name is
+      ``django_language``.)
+    
     * Failing that, it looks at the ``Accept-Language`` HTTP header. This
       header is sent by your browser and tells the server which language(s) you
       prefer, in order by priority. Django tries each language in the header
       until it finds one with available translations.
+    
     * Failing that, it uses the global ``LANGUAGE_CODE`` setting.
+
+.. _locale-middleware-notes:
 
 Notes:
 
     * In each of these places, the language preference is expected to be in the
       standard language format, as a string. For example, Brazilian Portuguese
       is ``pt-br``.
+    
     * If a base language is available but the sublanguage specified is not,
       Django uses the base language. For example, if a user specifies ``de-at``
       (Austrian German) but Django only has ``de`` available, Django uses
       ``de``.
-    * Only languages listed in the :setting:`LANGUAGES` setting can be selected. If
-      you want to restrict the language selection to a subset of provided
+    
+    * Only languages listed in the :setting:`LANGUAGES` setting can be selected.
+      If you want to restrict the language selection to a subset of provided
       languages (because your application doesn't provide all those languages),
       set ``LANGUAGES`` to a list of languages. For example::
 
@@ -643,8 +657,8 @@ Notes:
 
       With this arrangement, ``django-admin.py makemessages`` will still find
       and mark these strings for translation, but the translation won't happen
-      at runtime -- so you'll have to remember to wrap the languages in the *real*
-      ``ugettext()`` in any code that uses ``LANGUAGES`` at runtime.
+      at runtime -- so you'll have to remember to wrap the languages in the
+      *real* ``ugettext()`` in any code that uses ``LANGUAGES`` at runtime.
 
     * The ``LocaleMiddleware`` can only select languages for which there is a
       Django-provided base translation. If you want to provide translations
@@ -655,7 +669,7 @@ Notes:
       need at least those translations for the system to work correctly.
 
       A good starting point is to copy the English ``.po`` file and to
-      translate at least the technical messages -- maybe the validator
+      translate at least the technical messages -- maybe the validation
       messages, too.
 
       Technical message IDs are easily recognized; they're all upper case. You
@@ -697,7 +711,8 @@ Django looks for translations by following this algorithm:
       selected language, the translation will be installed.
     * Next, it looks for a ``locale`` directory in the project directory. If it
       finds a translation, the translation will be installed.
-    * Finally, it checks the base translation in ``django/conf/locale``.
+    * Finally, it checks the Django-provided base translation in
+      ``django/conf/locale``.
 
 This way, you can write applications that include their own translations, and
 you can override base translations in your project path. Or, you can just build
@@ -779,7 +794,9 @@ algorithm:
     * If that's empty -- say, if a user's browser suppresses that header --
       then the user will be redirected to ``/`` (the site root) as a fallback.
 
-Here's example HTML template code::
+Here's example HTML template code:
+
+.. code-block:: html+django
 
     <form action="/i18n/setlang/" method="post">
     <input name="next" type="hidden" value="/next/page/" />
@@ -933,21 +950,24 @@ does translation:
 ``gettext`` on Windows
 ======================
 
-This is only needed for people who either want to extract message IDs or
-compile ``.po`` files. Translation work itself just involves editing existing
-``.po`` files, but if you want to create your own .po files, or want to test
-or compile a changed ``.po`` file, you will need the ``gettext`` utilities:
+This is only needed for people who either want to extract message IDs or compile
+message files (``.po``). Translation work itself just involves editing existing
+files of this type, but if you want to create your own message files, or want to
+test or compile a changed message file, you will need the ``gettext`` utilities:
 
-    * Download the following zip files from http://sourceforge.net/projects/gettext
+    * Download the following zip files from
+      http://sourceforge.net/projects/gettext
 
       * ``gettext-runtime-X.bin.woe32.zip``
       * ``gettext-tools-X.bin.woe32.zip``
       * ``libiconv-X.bin.woe32.zip``
 
-    * Extract the 3 files in the same folder (i.e. ``C:\Program Files\gettext-utils``)
+    * Extract the 3 files in the same folder (i.e. ``C:\Program
+      Files\gettext-utils``)
 
     * Update the system PATH:
 
       * ``Control Panel > System > Advanced > Environment Variables``
       * In the ``System variables`` list, click ``Path``, click ``Edit``
-      * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the ``Variable value``
+      * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
+        ``Variable value`` field
