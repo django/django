@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-09-03 10:02+0200\n"
-"PO-Revision-Date: 2008-09-03 11:07+0200\n"
+"PO-Revision-Date: 2008-09-03 15:21+0200\n"
 "Last-Translator: Gasper Zejn <zejn@kiberpipa.org>\n"
 "Language-Team:  <sl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -61,9 +61,8 @@ msgid "Spanish"
 msgstr "Španščina"
 
 #: conf/global_settings.py:55
-#, fuzzy
 msgid "Estonian"
-msgstr "Romunski jezik"
+msgstr "Estonščina"
 
 #: conf/global_settings.py:56
 msgid "Argentinean Spanish"
@@ -86,9 +85,8 @@ msgid "French"
 msgstr "Francoščina"
 
 #: conf/global_settings.py:61
-#, fuzzy
 msgid "Irish"
-msgstr "Turščina"
+msgstr "Irščina"
 
 #: conf/global_settings.py:62
 msgid "Galician"
@@ -103,9 +101,8 @@ msgid "Hebrew"
 msgstr "Hebrejski jezik"
 
 #: conf/global_settings.py:65
-#, fuzzy
 msgid "Croatian"
-msgstr "Katalonščina"
+msgstr "Hrvaščina"
 
 #: conf/global_settings.py:66
 msgid "Icelandic"
@@ -309,9 +306,9 @@ msgid "Added %(name)s \"%(object)s\"."
 msgstr "Dodal %(name)s \"%(object)s\"."
 
 #: contrib/admin/options.py:347
-#, fuzzy, python-format
+#, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "povezani `%(label)s.%(name)s` objekti"
+msgstr "Spremenjeno %(list)s za %(name)s \"%(object)s\"."
 
 #: contrib/admin/options.py:352
 #, python-format
@@ -1542,22 +1539,18 @@ msgid "Invalid geometry type."
 msgstr "Neveljaven tip geometrije."
 
 #: contrib/humanize/templatetags/humanize.py:19
-#, fuzzy
 msgid "th"
 msgstr "th"
 
 #: contrib/humanize/templatetags/humanize.py:19
-#, fuzzy
 msgid "st"
 msgstr "st"
 
 #: contrib/humanize/templatetags/humanize.py:19
-#, fuzzy
 msgid "nd"
 msgstr "nd"
 
 #: contrib/humanize/templatetags/humanize.py:19
-#, fuzzy
 msgid "rd"
 msgstr "rd"
 
@@ -1858,12 +1851,10 @@ msgstr ""
 "zapisu X1234567<0 ali 1234567890."
 
 #: contrib/localflavor/cl/forms.py:29
-#, fuzzy
 msgid "Enter a valid Chilean RUT."
-msgstr "Vnesite veljaven čilski RUT"
+msgstr "Vnesite veljaven čilski RUT."
 
 #: contrib/localflavor/cl/forms.py:30
-#, fuzzy
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
 msgstr "Vpišite veljaven čilenski RUT v zapisu XX.XXX.XXX-X."
 
