@@ -1,547 +1,2330 @@
-# zh_TW translation for Django.
-# Copyright (C) 2005-2007
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-16 10:13+0200\n"
+"POT-Creation-Date: 2008-09-03 14:31+0800\n"
 "PO-Revision-Date: 2007-04-05 01:32+1000\n"
-"Last-Translator: terryh <terryh.tp@gmail.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Last-Translator: Terry Huang <terryh.tp@gmail.com>\n"
+"Language-Team: Terry Huang <terryh.tp@gmail.com>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: db/models/manipulators.py:307
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "含有 %(type)s 的 %(object)s 對給予的 %(field)s 已經存在了。"
-
-#: db/models/manipulators.py:308 contrib/admin/views/main.py:335
-#: contrib/admin/views/main.py:337 contrib/admin/views/main.py:339
-msgid "and"
-msgstr "和"
-
-#: db/models/fields/related.py:53
-#, python-format
-msgid "Please enter a valid %s."
-msgstr "請輸入正確的 %s。"
-
-#: db/models/fields/related.py:642
-msgid "Separate multiple IDs with commas."
-msgstr "用逗點分隔IDs"
-
-#: db/models/fields/related.py:644
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "按住 \"Control\", 或者在 Mac 上按 \"Command\", 以選取更多值"
-
-#: db/models/fields/related.py:691
-#, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "請輸入有效的 %(self)s ID。輸入值 %(value)r 是錯誤的。"
-msgstr[1] ""
-
-#: db/models/fields/__init__.py:42
-#, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s 有 %(fieldname)s 已經存在。"
-
-#: db/models/fields/__init__.py:117 db/models/fields/__init__.py:274
-#: db/models/fields/__init__.py:610 db/models/fields/__init__.py:621
-#: oldforms/__init__.py:357 newforms/fields.py:80 newforms/fields.py:376
-#: newforms/fields.py:452 newforms/fields.py:463 newforms/models.py:178
-msgid "This field is required."
-msgstr "這個欄位是必須的。"
-
-#: db/models/fields/__init__.py:367
-msgid "This value must be an integer."
-msgstr "這個值必須是整數。"
-
-#: db/models/fields/__init__.py:402
-msgid "This value must be either True or False."
-msgstr "這個值必須是 True 或 False。"
-
-#: db/models/fields/__init__.py:423
-msgid "This field cannot be null."
-msgstr "這個值不能是 null。"
-
-#: db/models/fields/__init__.py:457 core/validators.py:148
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "輸入一個 YYYY-MM-DD 格式的有效日期。"
-
-#: db/models/fields/__init__.py:526 core/validators.py:157
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "輸入一個 YYYY-MM-DD HH:MM 格式的有效日期/時間。"
-
-#: db/models/fields/__init__.py:630
-msgid "Enter a valid filename."
-msgstr "輸入一個有效的檔名。"
-
-#: db/models/fields/__init__.py:751
-msgid "This value must be either None, True or False."
-msgstr "這個值必須是 None, True 或 False。"
-
-#: conf/global_settings.py:39
+#: conf/global_settings.py:44
 msgid "Arabic"
 msgstr "阿拉伯語"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:45
 msgid "Bengali"
 msgstr "孟加拉語"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:46
+#, fuzzy
+msgid "Bulgarian"
+msgstr "保加利亞語"
+
+#: conf/global_settings.py:47
 msgid "Catalan"
 msgstr "嘉泰羅尼亞語"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:48
 msgid "Czech"
 msgstr "捷克語"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:49
 msgid "Welsh"
 msgstr "威爾斯語"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:50
 msgid "Danish"
 msgstr "丹麥語"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:51
 msgid "German"
 msgstr "德語"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:52
 msgid "Greek"
 msgstr "希臘語"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:53
 msgid "English"
 msgstr "英語"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:54
 msgid "Spanish"
 msgstr "西班牙語"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:55
+#, fuzzy
+msgid "Estonian"
+msgstr "羅馬尼亞語"
+
+#: conf/global_settings.py:56
 msgid "Argentinean Spanish"
 msgstr "阿根廷的西班牙語"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:57
+msgid "Basque"
+msgstr "巴斯克語"
+
+#: conf/global_settings.py:58
+#, fuzzy
+msgid "Persian"
+msgstr "波斯語"
+
+#: conf/global_settings.py:59
 msgid "Finnish"
 msgstr "芬蘭語"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:60
 msgid "French"
 msgstr "法語"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:61
+#, fuzzy
+msgid "Irish"
+msgstr "愛爾蘭語"
+
+#: conf/global_settings.py:62
 msgid "Galician"
 msgstr "加里西亞語"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:63
 msgid "Hungarian"
 msgstr "匈牙利語"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:64
 msgid "Hebrew"
 msgstr "希伯來語"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:65
+#, fuzzy
+msgid "Croatian"
+msgstr "嘉泰羅尼亞語"
+
+#: conf/global_settings.py:66
 msgid "Icelandic"
 msgstr "冰島語"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:67
 msgid "Italian"
 msgstr "義大利語"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:68
 msgid "Japanese"
 msgstr "日語"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:69
+#, fuzzy
+msgid "Georgian"
+msgstr "德語"
+
+#: conf/global_settings.py:70
+#, fuzzy
+msgid "Korean"
+msgstr "挪威語"
+
+#: conf/global_settings.py:71
+#, fuzzy
+msgid "Khmer"
+msgstr "高棉語"
+
+#: conf/global_settings.py:72
 msgid "Kannada"
 msgstr "坎那達語"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:73
 msgid "Latvian"
 msgstr "拉脫維亞語"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:74
+msgid "Lithuanian"
+msgstr "立陶宛語"
+
+#: conf/global_settings.py:75
 msgid "Macedonian"
 msgstr "馬其頓語"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:76
 msgid "Dutch"
 msgstr "荷蘭語"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:77
 msgid "Norwegian"
 msgstr "挪威語"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:78
 msgid "Polish"
 msgstr "波蘭嶼"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:79
 msgid "Portugese"
 msgstr "葡萄牙語"
 
-#: conf/global_settings.py:65
-msgid "Brazilian"
-msgstr "巴西語"
+#: conf/global_settings.py:80
+#, fuzzy
+msgid "Brazilian Portuguese"
+msgstr "巴西葡萄牙語"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:81
 msgid "Romanian"
 msgstr "羅馬尼亞語"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:82
 msgid "Russian"
 msgstr "俄語"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:83
 msgid "Slovak"
 msgstr "斯洛伐克語"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:84
 msgid "Slovenian"
 msgstr "斯洛維尼亞語"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:85
 msgid "Serbian"
 msgstr "塞爾維亞語"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:86
 msgid "Swedish"
 msgstr "瑞典語"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:87
 msgid "Tamil"
 msgstr "坦米爾語"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:88
 msgid "Telugu"
 msgstr "泰盧固語"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:89
 msgid "Turkish"
 msgstr "土耳其語"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:90
 msgid "Ukrainian"
 msgstr "烏克蘭語"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:91
 msgid "Simplified Chinese"
 msgstr "簡體中文"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:92
 msgid "Traditional Chinese"
 msgstr "繁體中文"
 
-#: utils/timesince.py:12
-msgid "year"
-msgid_plural "years"
-msgstr[0] "年"
-msgstr[1] ""
-
-#: utils/timesince.py:13
-msgid "month"
-msgid_plural "months"
-msgstr[0] "月"
-msgstr[1] ""
-
-#: utils/timesince.py:14
-msgid "week"
-msgid_plural "weeks"
-msgstr[0] "週"
-msgstr[1] ""
-
-#: utils/timesince.py:15
-msgid "day"
-msgid_plural "days"
-msgstr[0] "天"
-msgstr[1] ""
-
-#: utils/timesince.py:16
-msgid "hour"
-msgid_plural "hours"
-msgstr[0] "小時"
-msgstr[1] ""
-
-#: utils/timesince.py:17
-msgid "minute"
-msgid_plural "minutes"
-msgstr[0] "分鐘"
-msgstr[1] ""
-
-#: utils/dates.py:6
-msgid "Monday"
-msgstr "星期一"
-
-#: utils/dates.py:6
-msgid "Tuesday"
-msgstr "星期二"
-
-#: utils/dates.py:6
-msgid "Wednesday"
-msgstr "星期三"
-
-#: utils/dates.py:6
-msgid "Thursday"
-msgstr "星期四"
-
-#: utils/dates.py:6
-msgid "Friday"
-msgstr "星期五"
-
-#: utils/dates.py:7
-msgid "Saturday"
-msgstr "星期六"
-
-#: utils/dates.py:7
-msgid "Sunday"
-msgstr "星期日"
-
-#: utils/dates.py:14
-msgid "January"
-msgstr "一月"
-
-#: utils/dates.py:14
-msgid "February"
-msgstr "二月"
-
-#: utils/dates.py:14 utils/dates.py:27
-msgid "March"
-msgstr "三月"
-
-#: utils/dates.py:14 utils/dates.py:27
-msgid "April"
-msgstr "四月"
-
-#: utils/dates.py:14 utils/dates.py:27
-msgid "May"
-msgstr "五月"
-
-#: utils/dates.py:14 utils/dates.py:27
-msgid "June"
-msgstr "六月"
-
-#: utils/dates.py:15 utils/dates.py:27
-msgid "July"
-msgstr "七月"
-
-#: utils/dates.py:15
-msgid "August"
-msgstr "八月"
-
-#: utils/dates.py:15
-msgid "September"
-msgstr "九月"
-
-#: utils/dates.py:15
-msgid "October"
-msgstr "十月"
-
-#: utils/dates.py:15
-msgid "November"
-msgstr "十一月"
-
-#: utils/dates.py:16
-msgid "December"
-msgstr "十二月"
-
-#: utils/dates.py:19
-msgid "jan"
-msgstr "一月"
-
-#: utils/dates.py:19
-msgid "feb"
-msgstr "二月"
-
-#: utils/dates.py:19
-msgid "mar"
-msgstr "三月"
-
-#: utils/dates.py:19
-msgid "apr"
-msgstr "四月"
-
-#: utils/dates.py:19
-msgid "may"
-msgstr "五月"
-
-#: utils/dates.py:19
-msgid "jun"
-msgstr "六月"
-
-#: utils/dates.py:20
-msgid "jul"
-msgstr "七月"
-
-#: utils/dates.py:20
-msgid "aug"
-msgstr "八月"
-
-#: utils/dates.py:20
-msgid "sep"
-msgstr "九月"
-
-#: utils/dates.py:20
-msgid "oct"
-msgstr "十月"
-
-#: utils/dates.py:20
-msgid "nov"
-msgstr "十一月"
-
-#: utils/dates.py:20
-msgid "dec"
-msgstr "十二月"
-
-#: utils/dates.py:27
-msgid "Jan."
-msgstr "一月"
-
-#: utils/dates.py:27
-msgid "Feb."
-msgstr "二月"
-
-#: utils/dates.py:28
-msgid "Aug."
-msgstr "八月"
-
-#: utils/dates.py:28
-msgid "Sept."
-msgstr "九月"
-
-#: utils/dates.py:28
-msgid "Oct."
-msgstr "十月"
-
-#: utils/dates.py:28
-msgid "Nov."
-msgstr "十一月"
-
-#: utils/dates.py:28
-msgid "Dec."
-msgstr "十二月"
-
-#: utils/dateformat.py:40
-msgid "p.m."
-msgstr ""
-
-#: utils/dateformat.py:41
-msgid "a.m."
-msgstr ""
-
-#: utils/dateformat.py:46
-msgid "PM"
-msgstr ""
-
-
-#: utils/dateformat.py:47
-msgid "AM"
-msgstr ""
-
-#: utils/dateformat.py:95
-msgid "midnight"
-msgstr "午夜"
-
-#: utils/dateformat.py:97
-msgid "noon"
-msgstr "中午"
-
-#: utils/translation/trans_real.py:358
-msgid "DATE_FORMAT"
-msgstr "N j, Y"
-
-#: utils/translation/trans_real.py:359
-msgid "DATETIME_FORMAT"
-msgstr "N j, Y, P"
-
-#: utils/translation/trans_real.py:360
-msgid "TIME_FORMAT"
-msgstr "P"
-
-
-#: utils/translation/trans_real.py:376
-msgid "YEAR_MONTH_FORMAT"
-msgstr "F Y"
-
-#: utils/translation/trans_real.py:377
-msgid "MONTH_DAY_FORMAT"
-
-msgstr "F j"
-
-#: oldforms/__init__.py:392
+#: contrib/admin/filterspecs.py:44
 #, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "確定你輸入的文字少於 %s 個字。"
-msgstr[1] ""
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>以 %s:</h3>\n"
+"<ul>\n"
 
-#: oldforms/__init__.py:397
-msgid "Line breaks are not allowed here."
-msgstr "這裡不允許斷行"
+#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:92
+#: contrib/admin/filterspecs.py:147 contrib/admin/filterspecs.py:173
+msgid "All"
+msgstr "全部"
 
-#: oldforms/__init__.py:498 oldforms/__init__.py:571 oldforms/__init__.py:610
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "選擇一個有效的選項: '%(data)s' 不在 %(choices)s 中。"
+#: contrib/admin/filterspecs.py:113
+msgid "Any date"
+msgstr "任何日期"
 
-#: oldforms/__init__.py:577 contrib/admin/filterspecs.py:150
-#: newforms/widgets.py:174
-msgid "Unknown"
-msgstr "未知"
+#: contrib/admin/filterspecs.py:114
+msgid "Today"
+msgstr "今天"
 
-#: oldforms/__init__.py:577 contrib/admin/filterspecs.py:143
-#: newforms/widgets.py:174
+#: contrib/admin/filterspecs.py:117
+msgid "Past 7 days"
+msgstr "過去 7 天"
+
+#: contrib/admin/filterspecs.py:119
+msgid "This month"
+msgstr "本月"
+
+#: contrib/admin/filterspecs.py:121
+msgid "This year"
+msgstr "今年"
+
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
 msgid "Yes"
 msgstr "是"
 
-#: oldforms/__init__.py:577 contrib/admin/filterspecs.py:143
-#: newforms/widgets.py:174
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
 msgid "No"
 msgstr "否"
 
-#: oldforms/__init__.py:672 core/validators.py:174 core/validators.py:445
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr "没有檔案被提交。請檢查表單的編碼類型。"
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:391
+msgid "Unknown"
+msgstr "未知"
 
-#: oldforms/__init__.py:674
-msgid "The submitted file is empty."
-msgstr "提交的檔案是空的。"
+#: contrib/admin/models.py:19
+msgid "action time"
+msgstr "動作時間"
 
-#: oldforms/__init__.py:730
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "輸入 -32,768 到 32,768 之間的一個整數。"
+#: contrib/admin/models.py:22
+msgid "object id"
+msgstr "物件 id"
 
-#: oldforms/__init__.py:740
-msgid "Enter a positive number."
-msgstr "輸入正整數。"
+#: contrib/admin/models.py:23
+msgid "object repr"
+msgstr "物件 repr"
 
-#: oldforms/__init__.py:750
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "輸入 0 到 32,768 之間的一個整數。"
+#: contrib/admin/models.py:24
+msgid "action flag"
+msgstr "動作旗標"
 
-#: contrib/localflavor/no/forms.py:15
+#: contrib/admin/models.py:25
+msgid "change message"
+msgstr "變更訊息"
+
+#: contrib/admin/models.py:28
+msgid "log entry"
+msgstr "紀錄項目"
+
+#: contrib/admin/models.py:29
+msgid "log entries"
+msgstr "紀錄項目"
+
+#: contrib/admin/options.py:60 contrib/admin/options.py:121
+#, fuzzy
+msgid "None"
+msgstr "無"
+
+#: contrib/admin/options.py:338
+#, python-format
+msgid "Changed %s."
+msgstr "%s 已變更。"
+
+#: contrib/admin/options.py:338 contrib/admin/options.py:348
+#: forms/models.py:275
+msgid "and"
+msgstr "和"
+
+#: contrib/admin/options.py:343
+#, fuzzy, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "新增 %(name)s"
+
+#: contrib/admin/options.py:347
+#, fuzzy, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "已變更 %(list)s for %(name)s \"%(object)s\"."
+
+#: contrib/admin/options.py:352
+#, fuzzy, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "已删除 %(name)s \"%(object)s\"."
+
+#: contrib/admin/options.py:356
+msgid "No fields changed."
+msgstr "沒有欄位被變更。"
+
+#: contrib/admin/options.py:417 contrib/auth/admin.py:51
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" 已成功新增。"
+
+#: contrib/admin/options.py:421 contrib/admin/options.py:454
+#: contrib/auth/admin.py:59
+msgid "You may edit it again below."
+msgstr "你可以在下面再次編輯。"
+
+#: contrib/admin/options.py:431 contrib/admin/options.py:464
+#, python-format
+msgid "You may add another %s below."
+msgstr "你可以在下面新增另一個 %s。"
+
+#: contrib/admin/options.py:452
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" 已成功變更。"
+
+#: contrib/admin/options.py:460
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "%(name)s \"%(obj)s\" 新增成功。你可以在下面再次编輯它。"
+
+#: contrib/admin/options.py:536
+#, python-format
+msgid "Add %s"
+msgstr "新增 %s"
+
+#: contrib/admin/options.py:614
+#, python-format
+msgid "Change %s"
+msgstr "變更 %s"
+
+#: contrib/admin/options.py:646
+msgid "Database error"
+msgstr "資料庫錯誤"
+
+#: contrib/admin/options.py:696
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" 已成功刪除。"
+
+#: contrib/admin/options.py:703
+msgid "Are you sure?"
+msgstr "你確定嗎？"
+
+#: contrib/admin/options.py:732
+#, python-format
+msgid "Change history: %s"
+msgstr "變更歷史: %s"
+
+#: contrib/admin/sites.py:16 contrib/admin/views/decorators.py:14
+#: contrib/auth/forms.py:80
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr "請輸入有效的使用者名稱與密碼。請注意兩個欄位都有分大小寫"
+
+#: contrib/admin/sites.py:227 contrib/admin/views/decorators.py:40
+#, fuzzy
+msgid "Please log in again, because your session has expired."
+msgstr "請再登入一次，因為你的 session 已經到期。不必擔心: 你的提交已被儲存。"
+
+#: contrib/admin/sites.py:234 contrib/admin/views/decorators.py:47
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+"看起來你的瀏覽器沒有設定成允許 cookie。請啟用 cookie、重新載入此頁，然後再試"
+"一次"
+
+#: contrib/admin/sites.py:250 contrib/admin/sites.py:256
+#: contrib/admin/views/decorators.py:66
+msgid "Usernames cannot contain the '@' character."
+msgstr "使用者名稱不能包含 '@' 字元。"
+
+#: contrib/admin/sites.py:253 contrib/admin/views/decorators.py:62
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "你的電子郵件地址不是你的使用者名稱。試著改用 '%s'。"
+
+#: contrib/admin/sites.py:313
+msgid "Site administration"
+msgstr "網站管理"
+
+#: contrib/admin/sites.py:326 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/templates/registration/password_reset_complete.html:14
+#: contrib/admin/views/decorators.py:20
+msgid "Log in"
+msgstr "登入"
+
+#: contrib/admin/sites.py:373
+#, fuzzy, python-format
+msgid "%s administration"
+msgstr "%s 管理"
+
+#: contrib/admin/util.py:138
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "在 %(name)s: 裡的一個或多個 %(fieldname)s %(obj)s"
+
+#: contrib/admin/util.py:143
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "在 %(name)s 裡的一個或多個 %(fieldname)s:"
+
+#: contrib/admin/widgets.py:70
+msgid "Date:"
+msgstr "日期"
+
+#: contrib/admin/widgets.py:70
+msgid "Time:"
+msgstr "時間"
+
+#: contrib/admin/widgets.py:94
+msgid "Currently:"
+msgstr "目前"
+
+#: contrib/admin/widgets.py:94
+msgid "Change:"
+msgstr "修改"
+
+#: contrib/admin/widgets.py:121
+#, fuzzy
+msgid "Lookup"
+msgstr "查詢"
+
+#: contrib/admin/widgets.py:228
+#, fuzzy
+msgid "Add Another"
+msgstr "增加另一個"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "頁面沒有找到"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "很抱歉，請求頁面無法找到。"
+
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/app_index.html:8
+#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/change_form.html:17
+#: contrib/admin/templates/admin/change_list.html:8
+#: contrib/admin/templates/admin/delete_confirmation.html:6
+#: contrib/admin/templates/admin/invalid_setup.html:4
+#: contrib/admin/templates/admin/object_history.html:6
+#: contrib/admin/templates/admin/auth/user/change_password.html:10
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_reset_complete.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "首頁"
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "伺服器錯誤"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "伺服器錯誤 (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "伺服器錯誤 <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"存在一個錯誤。它已經透過電子郵件回報給網站管理員了，並且應該很快被改正。謝謝"
+"你的關心。"
+
+#: contrib/admin/templates/admin/app_index.html:10
+#: contrib/admin/templates/admin/index.html:19
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: contrib/admin/templates/admin/base.html:25
+msgid "Welcome,"
+msgstr "歡迎，"
+
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "文件"
+
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/auth/user/change_password.html:13
+#: contrib/admin/templates/admin/auth/user/change_password.html:46
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+msgid "Change password"
+msgstr "變更密碼"
+
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+msgid "Log out"
+msgstr "登出"
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django 網站管理"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django 管理"
+
+#: contrib/admin/templates/admin/change_form.html:20
+#: contrib/admin/templates/admin/index.html:29
+msgid "Add"
+msgstr "新增"
+
+#: contrib/admin/templates/admin/change_form.html:27
+#: contrib/admin/templates/admin/object_history.html:10
+msgid "History"
+msgstr "歷史"
+
+#: contrib/admin/templates/admin/change_form.html:28
+#: contrib/admin/templates/admin/edit_inline/stacked.html:13
+#: contrib/admin/templates/admin/edit_inline/tabular.html:25
+msgid "View on site"
+msgstr "在網站上檢視"
+
+#: contrib/admin/templates/admin/change_form.html:38
+#: contrib/admin/templates/admin/auth/user/change_password.html:22
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "请更正下面的錯誤。"
+
+#: contrib/admin/templates/admin/change_list.html:16
+#, python-format
+msgid "Add %(name)s"
+msgstr "新增 %(name)s"
+
+#: contrib/admin/templates/admin/change_list.html:26
+msgid "Filter"
+msgstr "過濾器"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:10
+#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:246
+msgid "Delete"
+msgstr "刪除"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:16
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"刪除 %(object_name)s '%(escaped_object)s' 會把相關的物件也刪除，不過你的帳號"
+"並沒有刪除以下型態物件的權限:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"你確定想要刪除 %(object_name)s \"%(escaped_object)s\"？以下所有的相關項目都會"
+"被刪除:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:28
+msgid "Yes, I'm sure"
+msgstr "是的，我確定"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " 以 %(filter_title)s"
+
+#: contrib/admin/templates/admin/index.html:18
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "模型在 %(name)s 應用中可用。"
+
+#: contrib/admin/templates/admin/index.html:35
+msgid "Change"
+msgstr "變更"
+
+#: contrib/admin/templates/admin/index.html:45
+msgid "You don't have permission to edit anything."
+msgstr "你沒有編輯任何東西的權限。"
+
+#: contrib/admin/templates/admin/index.html:53
+msgid "Recent Actions"
+msgstr "最近的動作"
+
+#: contrib/admin/templates/admin/index.html:54
+msgid "My Actions"
+msgstr "我的動作"
+
+#: contrib/admin/templates/admin/index.html:58
+msgid "None available"
+msgstr "無可用的"
+
+#: contrib/admin/templates/admin/invalid_setup.html:7
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"你的資料庫安裝有錯誤。確定資料庫表格已經建立，並確定資料庫可被合適的使用者讀"
+"取。"
+
+#: contrib/admin/templates/admin/login.html:19
+msgid "Username:"
+msgstr "使用者名稱："
+
+#: contrib/admin/templates/admin/login.html:22
+msgid "Password:"
+msgstr "密碼："
+
+#: contrib/admin/templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr "日期/時間"
+
+#: contrib/admin/templates/admin/object_history.html:23
+msgid "User"
+msgstr "使用者"
+
+#: contrib/admin/templates/admin/object_history.html:24
+msgid "Action"
+msgstr "動作"
+
+#: contrib/admin/templates/admin/object_history.html:30
+#: utils/translation/trans_real.py:404
+msgid "DATETIME_FORMAT"
+msgstr "Y-m-d H:i:s"
+
+#: contrib/admin/templates/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr "這個物件沒有變更的歷史。它可能不是透過這個管理網站新增的。"
+
+#: contrib/admin/templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "顯示全部"
+
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Go"
+msgstr "去"
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "1 result"
+msgid_plural "%(counter)s results"
+msgstr[0] "1 則结果"
+msgstr[1] "%(counter)s 則结果"
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "總共 %(full_result_count)s"
+
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "儲存"
+
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "儲存為新的"
+
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "儲存並新增另一個"
+
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "儲存並繼續編輯"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr "首先，輸入一個使用者名稱和密碼。然後你可以編輯更多使用者選項。"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:13
+#: contrib/auth/forms.py:14 contrib/auth/forms.py:47 contrib/auth/forms.py:59
+msgid "Username"
+msgstr "使用者名稱"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:20
+#: contrib/admin/templates/admin/auth/user/change_password.html:33
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:60 contrib/auth/forms.py:184
+msgid "Password"
+msgstr "密碼"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:26
+#: contrib/admin/templates/admin/auth/user/change_password.html:39
+#: contrib/auth/forms.py:185
+msgid "Password (again)"
+msgstr "密碼(重複)"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:27
+#: contrib/admin/templates/admin/auth/user/change_password.html:40
+msgid "Enter the same password as above, for verification."
+msgstr "為檢查用，請輸入與上面相同的密碼。"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:26
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "為使用者<strong>%(username)s</strong>输入一個新的密碼。"
+
+#: contrib/admin/templates/admin/edit_inline/tabular.html:15
+#, fuzzy
+msgid "Delete?"
+msgstr "刪除？"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "感謝你今天花了重要的時間停留在本網站。"
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "重新登入"
+
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr "密碼變更"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "密碼成功地變更"
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "你的密碼已變更。"
+
+#: contrib/admin/templates/registration/password_change_form.html:12
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"為了安全上的考慮，請輸入你的舊密碼，再輸入新密碼兩次，讓我們核驗你已正確地輸"
+"入。"
+
+#: contrib/admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr "舊密碼："
+
+#: contrib/admin/templates/registration/password_change_form.html:19
+#: contrib/admin/templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "新密碼："
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+#: contrib/admin/templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "確認密碼："
+
+#: contrib/admin/templates/registration/password_change_form.html:23
+#: contrib/admin/templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr "變更我的密碼"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "密碼重設"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:6
+#: contrib/admin/templates/registration/password_reset_complete.html:10
+#, fuzzy
+msgid "Password reset complete"
+msgstr "完成密碼重設"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "你的密碼已設置，現在可以繼續登入。"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
+#, fuzzy
+msgid "Password reset confirmation"
+msgstr "密碼重設確認"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:12
+#, fuzzy
+msgid "Enter new password"
+msgstr "輸入新密碼"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:14
+#, fuzzy
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"請輸入你的舊密碼，再輸入新密碼兩次，讓我們核驗你已正確地輸入。"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:26
+#, fuzzy
+msgid "Password reset unsuccessful"
+msgstr "密碼重設失敗"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:28
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr "密碼重設連結無效，可能因為他已使用。請重新請求密碼重設。"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "密碼成功地重設"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+#, fuzzy
+msgid ""
+"We've e-mailed you instructions for setting your password to the e-mail "
+"address you submitted. You should be receiving it shortly."
+msgstr "我們已經把新的密碼寄到你送出的電子郵件地址。你應該不久就能收到。"
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "因為你要求重設密碼，所以收到了這封電子郵件"
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "你在 %(site_name)s 裡的使用者帳號"
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr "請到該頁面選擇一個新的密碼："
+
+#: contrib/admin/templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr "你的使用者名稱，萬一你已經忘記的話:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr "感謝使用本網站！"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s 團隊"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+#, fuzzy
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"instructions for setting a new one."
+msgstr ""
+"忘記你的密碼了？在下面輸入你的電子郵件地址，我們就會重設你的密碼並把新的用電"
+"子郵件寄給你。"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "電子郵件地址:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "重設我的密碼"
+
+#: contrib/admin/templatetags/admin_list.py:288
+msgid "All dates"
+msgstr "所有日期"
+
+#: contrib/admin/views/main.py:69
+#, python-format
+msgid "Select %s"
+msgstr "選擇 %s"
+
+#: contrib/admin/views/main.py:69
+#, python-format
+msgid "Select %s to change"
+msgstr "選擇 %s 來變更"
+
+#: contrib/admin/views/template.py:36 contrib/sites/models.py:38
+msgid "site"
+msgstr "網站"
+
+#: contrib/admin/views/template.py:38
+#, fuzzy
+msgid "template"
+msgstr "模板名稱"
+
+#: contrib/admindocs/views.py:57 contrib/admindocs/views.py:59
+#: contrib/admindocs/views.py:61
+msgid "tag:"
+msgstr "標籤："
+
+#: contrib/admindocs/views.py:90 contrib/admindocs/views.py:92
+#: contrib/admindocs/views.py:94
+msgid "filter:"
+msgstr "過濾器："
+
+#: contrib/admindocs/views.py:154 contrib/admindocs/views.py:156
+#: contrib/admindocs/views.py:158
+msgid "view:"
+msgstr "視圖："
+
+#: contrib/admindocs/views.py:186
+#, python-format
+msgid "App %r not found"
+msgstr "應用程式 %r 没有找到"
+
+#: contrib/admindocs/views.py:193
+#, fuzzy, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "在應用程式 %(label)r 裡找不到模型 %(name)r"
+
+#: contrib/admindocs/views.py:205
+#, fuzzy, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "相關的 `%(app_label)s.%(data_type)s` 物件"
+
+#: contrib/admindocs/views.py:205 contrib/admindocs/views.py:227
+#: contrib/admindocs/views.py:241 contrib/admindocs/views.py:246
+msgid "model:"
+msgstr "模型："
+
+#: contrib/admindocs/views.py:236
+#, fuzzy, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "相關的 `%(app_label)s.%(object_name)s` 物件"
+
+#: contrib/admindocs/views.py:241
+#, python-format
+msgid "all %s"
+msgstr "所有 %s"
+
+#: contrib/admindocs/views.py:246
+#, python-format
+msgid "number of %s"
+msgstr "%s 的数量"
+
+#: contrib/admindocs/views.py:251
+#, python-format
+msgid "Fields on %s objects"
+msgstr "%s 物件的欄位"
+
+#: contrib/admindocs/views.py:314 contrib/admindocs/views.py:325
+#: contrib/admindocs/views.py:327 contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:336
+msgid "Integer"
+msgstr "整數"
+
+#: contrib/admindocs/views.py:315
+msgid "Boolean (Either True or False)"
+msgstr "布林值 (True 或 False)"
+
+#: contrib/admindocs/views.py:316 contrib/admindocs/views.py:335
+#, fuzzy, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "字串(最長 %(max_length)s)"
+
+#: contrib/admindocs/views.py:317
+msgid "Comma-separated integers"
+msgstr "逗號分隔的整數"
+
+#: contrib/admindocs/views.py:318
+msgid "Date (without time)"
+msgstr "日期 (不包括時間)"
+
+#: contrib/admindocs/views.py:319
+msgid "Date (with time)"
+msgstr "日期 (包括時間)"
+
+#: contrib/admindocs/views.py:320
+msgid "Decimal number"
+msgstr "小數"
+
+#: contrib/admindocs/views.py:321
+msgid "E-mail address"
+msgstr "電子郵件地址"
+
+#: contrib/admindocs/views.py:322 contrib/admindocs/views.py:323
+#: contrib/admindocs/views.py:326
+msgid "File path"
+msgstr "檔案路徑"
+
+#: contrib/admindocs/views.py:324
+msgid "Floating point number"
+msgstr "浮點數"
+
+#: contrib/admindocs/views.py:328 contrib/comments/models.py:58
+msgid "IP address"
+msgstr "IP 位址"
+
+#: contrib/admindocs/views.py:330
+msgid "Boolean (Either True, False or None)"
+msgstr "布林值 (True, False 或 None)"
+
+#: contrib/admindocs/views.py:331
+msgid "Relation to parent model"
+msgstr "與父模型的關係"
+
+#: contrib/admindocs/views.py:332
+msgid "Phone number"
+msgstr "電話號碼"
+
+#: contrib/admindocs/views.py:337
+msgid "Text"
+msgstr "文字"
+
+#: contrib/admindocs/views.py:338
+msgid "Time"
+msgstr "時間"
+
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:22
+#: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
+msgid "URL"
+msgstr "URL"
+
+#: contrib/admindocs/views.py:340
+msgid "U.S. state (two uppercase letters)"
+msgstr "美國州名 (兩個大寫字母)"
+
+#: contrib/admindocs/views.py:341
+msgid "XML text"
+msgstr "XML 文件"
+
+#: contrib/admindocs/views.py:367
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s 似乎不是一個 urlpattern 物件"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "書籤"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "文件 bookmarklets"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">要安裝 bookmarklet，把連結拖進你的書籤工具列，或右擊該連結"
+"後新增到你的書籤裡。現在你可以從網站的任何頁面來選擇 bookmarklet。注意其中某"
+"些 bookmarklet 要求你必須是從被稱為 \"內部\" 的電腦來檢視網站的 (如果你不確定"
+"你的電腦是否在 \"內部\"，那就和你的系統管理員談談)。</p>\n"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "本頁面的文件"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr "讓你跳到用來產生該頁面之檢視的任何一頁文件。"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "顯示物件 ID"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr "顯示用來表示單一物件的頁面 content-type 與唯一 ID。"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "編輯此物件 (目前視窗)"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "跳到用來表示單一物件的管理頁面。"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "編輯此物件 (新視窗)"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "同上，但在新視窗裡開啟管理頁面。"
+
+#: contrib/auth/admin.py:21
+msgid "Personal info"
+msgstr "個人資訊"
+
+#: contrib/auth/admin.py:22
+msgid "Permissions"
+msgstr "權限"
+
+#: contrib/auth/admin.py:23
+msgid "Important dates"
+msgstr "重要日期"
+
+#: contrib/auth/admin.py:24
+msgid "Groups"
+msgstr "群組"
+
+#: contrib/auth/admin.py:64
+msgid "Add user"
+msgstr "增加使用者"
+
+#: contrib/auth/admin.py:90
+msgid "Password changed successfully."
+msgstr "密碼修改成功"
+
+#: contrib/auth/admin.py:96
+#, python-format
+msgid "Change password: %s"
+msgstr "密碼變更: %s"
+
+#: contrib/auth/forms.py:15 contrib/auth/forms.py:48
+#: contrib/auth/models.py:136
+msgid ""
+"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
+"digits and underscores)."
+msgstr "必須。不超過30字。只能用能字母數字與底線(字母、數字和底線)。"
+
+#: contrib/auth/forms.py:16 contrib/auth/forms.py:49
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "此值僅能包含字母、數字與底線。"
+
+#: contrib/auth/forms.py:18
+#, fuzzy
+msgid "Password confirmation"
+msgstr "密碼確認"
+
+#: contrib/auth/forms.py:30
+msgid "A user with that username already exists."
+msgstr "一個相同名稱的使用者已經存在。"
+
+#: contrib/auth/forms.py:36 contrib/auth/forms.py:154
+#: contrib/auth/forms.py:196
+msgid "The two password fields didn't match."
+msgstr "兩個密碼欄位不同。"
+
+#: contrib/auth/forms.py:82
+msgid "This account is inactive."
+msgstr "這個帳戶未啟用"
+
+#: contrib/auth/forms.py:87
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr "你的Web瀏覽器好像不允許使用cookie。登入時需要使用cookie。"
+
+#: contrib/auth/forms.py:100
+#, fuzzy
+msgid "E-mail"
+msgstr "電子郵件地址"
+
+#: contrib/auth/forms.py:109
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr "這個電子郵件地址没有和任何用户帳號有關聯。你確定你已經註冊了？"
+
+#: contrib/auth/forms.py:134
+#, fuzzy, python-format
+msgid "Password reset on %s"
+msgstr "為 %s 密碼重設"
+
+#: contrib/auth/forms.py:142
+#, fuzzy
+msgid "New password"
+msgstr "新密碼"
+
+#: contrib/auth/forms.py:143
+#, fuzzy
+msgid "New password confirmation"
+msgstr "新密碼確認"
+
+#: contrib/auth/forms.py:168
+#, fuzzy
+msgid "Old password"
+msgstr "舊密碼"
+
+#: contrib/auth/forms.py:176
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "你的舊密碼不正確。請重新輸入。"
+
+#: contrib/auth/models.py:72 contrib/auth/models.py:95
+msgid "name"
+msgstr "名稱"
+
+#: contrib/auth/models.py:74
+msgid "codename"
+msgstr "代碼"
+
+#: contrib/auth/models.py:77
+msgid "permission"
+msgstr "權限"
+
+#: contrib/auth/models.py:78 contrib/auth/models.py:96
+msgid "permissions"
+msgstr "權限"
+
+#: contrib/auth/models.py:99
+msgid "group"
+msgstr "群組"
+
+#: contrib/auth/models.py:100 contrib/auth/models.py:146
+msgid "groups"
+msgstr "群組"
+
+#: contrib/auth/models.py:136
+msgid "username"
+msgstr "使用者名稱"
+
+#: contrib/auth/models.py:137
+msgid "first name"
+msgstr "名字"
+
+#: contrib/auth/models.py:138
+msgid "last name"
+msgstr "姓氏"
+
+#: contrib/auth/models.py:139
+msgid "e-mail address"
+msgstr "電子郵件地址"
+
+#: contrib/auth/models.py:140
+msgid "password"
+msgstr "密碼"
+
+#: contrib/auth/models.py:140
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"使用 '[algo]$[salt]$[hexdigest]' 或是 <a href=\"password/\">修改密碼表單</a>."
+
+#: contrib/auth/models.py:141
+msgid "staff status"
+msgstr "工作人員狀態"
+
+#: contrib/auth/models.py:141
+msgid "Designates whether the user can log into this admin site."
+msgstr "指定是否使用者可以登入此管理網站。"
+
+#: contrib/auth/models.py:142
+msgid "active"
+msgstr "有效"
+
+#: contrib/auth/models.py:142
+#, fuzzy
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr "指定是否使用者可以登入此管理網站。用取消選擇來取代刪除帳號。"
+
+#: contrib/auth/models.py:143
+msgid "superuser status"
+msgstr "超級使用者狀態"
+
+#: contrib/auth/models.py:143
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "指定是否使用者可以登入到這個管理網站"
+
+#: contrib/auth/models.py:144
+msgid "last login"
+msgstr "上次登入"
+
+#: contrib/auth/models.py:145
+msgid "date joined"
+msgstr "加入日期"
+
+#: contrib/auth/models.py:147
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr "除了手動指定的權限之外，這個使用者也會得到其群組擁有的所有權限。"
+
+#: contrib/auth/models.py:148
+msgid "user permissions"
+msgstr "使用者權限"
+
+#: contrib/auth/models.py:152
+msgid "user"
+msgstr "使用者"
+
+#: contrib/auth/models.py:153
+msgid "users"
+msgstr "使用者"
+
+#: contrib/auth/models.py:308
+msgid "message"
+msgstr "訊息"
+
+#: contrib/auth/views.py:50
+msgid "Logged out"
+msgstr "登出"
+
+#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:428
+msgid "Enter a valid e-mail address."
+msgstr "輸入有效的電子郵件地址。"
+
+#: contrib/comments/admin.py:11
+#, fuzzy
+msgid "Content"
+msgstr "內容"
+
+#: contrib/comments/admin.py:14
+msgid "Metadata"
+msgstr "元資料"
+
+#: contrib/comments/forms.py:20
+#, fuzzy
+msgid "Name"
+msgstr "名稱"
+
+#: contrib/comments/forms.py:21
+#, fuzzy
+msgid "Email address"
+msgstr "電子郵件地址"
+
+#: contrib/comments/forms.py:23
+#, fuzzy
+msgid "Comment"
+msgstr "評論"
+
+#: contrib/comments/forms.py:26
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "如果你在這一個欄位輸入任何內容，會被視為是垃圾評論"
+
+#: contrib/comments/forms.py:126
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "看住你的嘴！此處不允許 %s 這樣的字眼。"
+msgstr[1] ""
+
+#: contrib/comments/models.py:23
+msgid "object ID"
+msgstr "物件 ID"
+
+#: contrib/comments/models.py:50
+#, fuzzy
+msgid "user's name"
+msgstr "使用者名稱"
+
+#: contrib/comments/models.py:51
+#, fuzzy
+msgid "user's email address"
+msgstr "使用者電子郵件地址"
+
+#: contrib/comments/models.py:52
+#, fuzzy
+msgid "user's URL"
+msgstr "使用者的網址"
+
+#: contrib/comments/models.py:54
+msgid "comment"
+msgstr "評論"
+
+#: contrib/comments/models.py:57
+msgid "date/time submitted"
+msgstr "日期/時間已送出"
+
+#: contrib/comments/models.py:59
+msgid "is public"
+msgstr "公開"
+
+#: contrib/comments/models.py:60
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+
+#: contrib/comments/models.py:62
+msgid "is removed"
+msgstr "已刪除"
+
+#: contrib/comments/models.py:63
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr "如果此評論不恰當則選取這個檢查框，其將以 \"此評論已被移除\" 訊息取代。"
+
+#: contrib/comments/models.py:115
+#, fuzzy
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr "此評論由一位已驗證的使用者發佈，該名稱是唯讀的。"
+
+#: contrib/comments/models.py:124
+#, fuzzy
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr "此評論由一位已驗證的使用者發佈，該 email 是唯讀的。"
+
+#: contrib/comments/models.py:149
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"由 %(user)s 在 %(date)s 張貼\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: contrib/contenttypes/models.py:67
+msgid "python model class name"
+msgstr "python 模組名稱"
+
+#: contrib/contenttypes/models.py:71
+msgid "content type"
+msgstr "內容類型"
+
+#: contrib/contenttypes/models.py:72
+msgid "content types"
+msgstr "內容類型"
+
+#: contrib/flatpages/admin.py:9
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "例如： '/about/contact/'。開頭與結束的斜線。"
+
+#: contrib/flatpages/admin.py:11
+msgid ""
+"This value must contain only letters, numbers, underscores, dashes or "
+"slashes."
+msgstr "此值僅能包含字母、數字、底線與斜線。"
+
+#: contrib/flatpages/admin.py:22
+msgid "Advanced options"
+msgstr "進階選項"
+
+#: contrib/flatpages/models.py:8
+msgid "title"
+msgstr "標題"
+
+#: contrib/flatpages/models.py:9
+msgid "content"
+msgstr "內容"
+
+#: contrib/flatpages/models.py:10
+msgid "enable comments"
+msgstr "啟用評論"
+
+#: contrib/flatpages/models.py:11
+msgid "template name"
+msgstr "模板名稱"
+
+#: contrib/flatpages/models.py:12
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"例如： 'flatpages/contact_page'。如果沒有提供它，系統會使用 'flatpages/"
+"default.html'。"
+
+#: contrib/flatpages/models.py:13
+msgid "registration required"
+msgstr "請先註冊"
+
+#: contrib/flatpages/models.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "如果此項被選取，則只有登入的使用者可以檢視頁面。"
+
+#: contrib/flatpages/models.py:18
+msgid "flat page"
+msgstr "簡平頁面"
+
+#: contrib/flatpages/models.py:19
+msgid "flat pages"
+msgstr "簡平頁面"
+
+#: contrib/formtools/wizard.py:130
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr "很抱歉，但你的表單已過期。請繼續填寫本頁的表單。"
+
+#: contrib/gis/forms/fields.py:14
+msgid "No geometry value provided."
+msgstr "沒有幾何資訊。"
+
+#: contrib/gis/forms/fields.py:15
+#, fuzzy
+msgid "Invalid geometry value."
+msgstr "無效的幾何資訊。"
+
+#: contrib/gis/forms/fields.py:16
+#, fuzzy
+msgid "Invalid geometry type."
+msgstr "無效的幾何類型"
+
+#: contrib/humanize/templatetags/humanize.py:19
+msgid "th"
+msgstr "th"
+
+#: contrib/humanize/templatetags/humanize.py:19
+msgid "st"
+msgstr "st"
+
+#: contrib/humanize/templatetags/humanize.py:19
+msgid "nd"
+msgstr "nd"
+
+#: contrib/humanize/templatetags/humanize.py:19
+msgid "rd"
+msgstr "rd"
+
+#: contrib/humanize/templatetags/humanize.py:51
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f 百萬"
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f 十億"
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f 兆"
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "one"
+msgstr "一"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "two"
+msgstr "二"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "three"
+msgstr "三"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "four"
+msgstr "四"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "five"
+msgstr "五"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "six"
+msgstr "六"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "seven"
+msgstr "七"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "eight"
+msgstr "八"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "nine"
+msgstr "九"
+
+#: contrib/humanize/templatetags/humanize.py:93
+#, fuzzy
+msgid "today"
+msgstr "今天"
+
+#: contrib/humanize/templatetags/humanize.py:95
+msgid "tomorrow"
+msgstr "明天"
+
+#: contrib/humanize/templatetags/humanize.py:97
+#, fuzzy
+msgid "yesterday"
+msgstr "昨天"
+
+#: contrib/localflavor/ar/forms.py:27
+#, fuzzy
+msgid "Enter a postal code in the format NNNN or ANNNNAAA."
+msgstr "用 NNNN 或 ANNNNAAA 的格式輸入郵遞區號。"
+
+#: contrib/localflavor/ar/forms.py:49 contrib/localflavor/br/forms.py:96
+#: contrib/localflavor/br/forms.py:135 contrib/localflavor/pe/forms.py:23
+#: contrib/localflavor/pe/forms.py:51
+#, fuzzy
+msgid "This field requires only numbers."
+msgstr "這個欄位只能輸入數字。"
+
+#: contrib/localflavor/ar/forms.py:50
+#, fuzzy
+msgid "This field requires 7 or 8 digits."
+msgstr "這個欄位必須是 7 或 8 位數字。"
+
+#: contrib/localflavor/ar/forms.py:79
+#, fuzzy
+msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
+msgstr "以 XX-XXXXXXXX-X 或 XXXXXXXXXXXX 的格式输入一個有效的 CUIT。"
+
+#: contrib/localflavor/ar/forms.py:80
+msgid "Invalid CUIT."
+msgstr "無效的 CUIT"
+
+#: contrib/localflavor/at/at_states.py:5
+msgid "Burgenland"
+msgstr "布爾根蘭"
+
+#: contrib/localflavor/at/at_states.py:6
+msgid "Carinthia"
+msgstr "凱恩藤州"
+
+#: contrib/localflavor/at/at_states.py:7
+msgid "Lower Austria"
+msgstr "下奧地利州"
+
+#: contrib/localflavor/at/at_states.py:8
+msgid "Upper Austria"
+msgstr "上奧地利州"
+
+#: contrib/localflavor/at/at_states.py:9
+#, fuzzy
+msgid "Salzburg"
+msgstr "薩爾茨堡州"
+
+#: contrib/localflavor/at/at_states.py:10
+#, fuzzy
+msgid "Styria"
+msgstr "施泰爾馬克州"
+
+#: contrib/localflavor/at/at_states.py:11
+#, fuzzy
+msgid "Tyrol"
+msgstr "蒂羅爾州"
+
+#: contrib/localflavor/at/at_states.py:12
+msgid "Vorarlberg"
+msgstr "福拉爾貝格州"
+
+#: contrib/localflavor/at/at_states.py:13
+msgid "Vienna"
+msgstr "維也納州"
+
+#: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:16
+#: contrib/localflavor/no/forms.py:12
 msgid "Enter a zip code in the format XXXX."
 msgstr "用 XXXX 的格式輸入郵遞區號。"
 
-#: contrib/localflavor/no/forms.py:36
-msgid "Enter a valid Norwegian social security number."
-msgstr "請輸入一個有效的挪威身份證號碼。"
+#: contrib/localflavor/at/forms.py:48
+#, fuzzy
+msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
+msgstr "以 XXXX XXXXXX 的格式輸入一有效的奧地利社會保險號碼。"
 
-#: contrib/localflavor/it/forms.py:14 contrib/localflavor/fr/forms.py:17
-#: contrib/localflavor/fi/forms.py:14 contrib/localflavor/de/forms.py:16
+#: contrib/localflavor/au/forms.py:16
+#, fuzzy
+msgid "Enter a 4 digit post code."
+msgstr "輸入 4 個數字的郵遞區號"
+
+#: contrib/localflavor/br/forms.py:21
+msgid "Enter a zip code in the format XXXXX-XXX."
+msgstr "用 XXXXX-XXX 的格式輸入郵遞區號。"
+
+#: contrib/localflavor/br/forms.py:30
+msgid "Phone numbers must be in XX-XXXX-XXXX format."
+msgstr "電話號碼必須是 XX-XXXX-XXXX 格式。"
+
+#: contrib/localflavor/br/forms.py:58
+#, fuzzy
+msgid ""
+"Select a valid brazilian state. That state is not one of the available "
+"states."
+msgstr "選擇有效的巴西州，此選擇不在可用的选项中。"
+
+#: contrib/localflavor/br/forms.py:94
+msgid "Invalid CPF number."
+msgstr "無效的 CPF 號碼。"
+
+#: contrib/localflavor/br/forms.py:95
+#, fuzzy
+msgid "This field requires at most 11 digits or 14 characters."
+msgstr "確定你輸入的值最多 11 位數字或 14 個字符。"
+
+#: contrib/localflavor/br/forms.py:134
+msgid "Invalid CNPJ number."
+msgstr "無效的 CNPJ 號碼。"
+
+#: contrib/localflavor/br/forms.py:136
+#, fuzzy
+msgid "This field requires at least 14 digits"
+msgstr "這個欄位要求至少 14 位數字。"
+
+#: contrib/localflavor/ca/forms.py:17
+#, fuzzy
+msgid "Enter a postal code in the format XXX XXX."
+msgstr "用 XXX XXX 的格式輸入郵遞區號。"
+
+#: contrib/localflavor/ca/forms.py:88
+#, fuzzy
+msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
+msgstr "以 XXX-XXX-XXX 的格式輸入一有效的加拿大社會保險號碼。"
+
+#: contrib/localflavor/ch/ch_states.py:5
+#, fuzzy
+msgid "Aargau"
+msgstr "阿爾高"
+
+#: contrib/localflavor/ch/ch_states.py:6
+msgid "Appenzell Innerrhoden"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:7
+msgid "Appenzell Ausserrhoden"
+msgstr "外阿彭策爾"
+
+#: contrib/localflavor/ch/ch_states.py:8
+msgid "Basel-Stadt"
+msgstr "巴澤爾城市"
+
+#: contrib/localflavor/ch/ch_states.py:9
+msgid "Basel-Land"
+msgstr "巴澤爾鄉村"
+
+#: contrib/localflavor/ch/ch_states.py:10
+#, fuzzy
+msgid "Berne"
+msgstr "伯恩"
+
+#: contrib/localflavor/ch/ch_states.py:11
+msgid "Fribourg"
+msgstr "弗里堡"
+
+#: contrib/localflavor/ch/ch_states.py:12
+msgid "Geneva"
+msgstr "日內瓦"
+
+#: contrib/localflavor/ch/ch_states.py:13
+#, fuzzy
+msgid "Glarus"
+msgstr "格拉魯斯"
+
+#: contrib/localflavor/ch/ch_states.py:14
+msgid "Graubuenden"
+msgstr "格勞賓登"
+
+#: contrib/localflavor/ch/ch_states.py:15
+msgid "Jura"
+msgstr "汝拉"
+
+#: contrib/localflavor/ch/ch_states.py:16
+#, fuzzy
+msgid "Lucerne"
+msgstr "盧塞恩"
+
+#: contrib/localflavor/ch/ch_states.py:17
+msgid "Neuchatel"
+msgstr "納沙泰爾"
+
+#: contrib/localflavor/ch/ch_states.py:18
+msgid "Nidwalden"
+msgstr "下瓦爾登"
+
+#: contrib/localflavor/ch/ch_states.py:19
+msgid "Obwalden"
+msgstr "上瓦爾登"
+
+#: contrib/localflavor/ch/ch_states.py:20
+msgid "Schaffhausen"
+msgstr "沙夫豪森"
+
+#: contrib/localflavor/ch/ch_states.py:21
+msgid "Schwyz"
+msgstr "施維茨"
+
+#: contrib/localflavor/ch/ch_states.py:22
+msgid "Solothurn"
+msgstr "索洛圖恩"
+
+#: contrib/localflavor/ch/ch_states.py:23
+msgid "St. Gallen"
+msgstr "聖加侖"
+
+#: contrib/localflavor/ch/ch_states.py:24
+#, fuzzy
+msgid "Thurgau"
+msgstr "圖爾高"
+
+#: contrib/localflavor/ch/ch_states.py:25
+msgid "Ticino"
+msgstr "提契諾"
+
+#: contrib/localflavor/ch/ch_states.py:26
+msgid "Uri"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:27
+msgid "Valais"
+msgstr "瓦萊"
+
+#: contrib/localflavor/ch/ch_states.py:28
+msgid "Vaud"
+msgstr "沃"
+
+#: contrib/localflavor/ch/ch_states.py:29
+#, fuzzy
+msgid "Zug"
+msgstr "楚格"
+
+#: contrib/localflavor/ch/ch_states.py:30
+#, fuzzy
+msgid "Zurich"
+msgstr "蘇黎世"
+
+#: contrib/localflavor/ch/forms.py:64
+msgid ""
+"Enter a valid Swiss identity or passport card number in X1234567<0 or "
+"1234567890 format."
+msgstr "以格式為 X1234567<0 或 1234567890 輸入一個有效的瑞士身份證號碼或者或是護照號碼。"
+
+#: contrib/localflavor/cl/forms.py:29
+#, fuzzy
+msgid "Enter a valid Chilean RUT."
+msgstr "輸入一個有效的 Chilean RUT。"
+
+#: contrib/localflavor/cl/forms.py:30
+#, fuzzy
+msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
+msgstr "用 XX.XXX.XXX-X 的格式輸入 Chilean RUT。"
+
+#: contrib/localflavor/cl/forms.py:31
+#, fuzzy
+msgid "The Chilean RUT is not valid."
+msgstr "Chilean RUT 無效"
+
+#: contrib/localflavor/de/de_states.py:5
+msgid "Baden-Wuerttemberg"
+msgstr "巴登符騰堡"
+
+#: contrib/localflavor/de/de_states.py:6
+msgid "Bavaria"
+msgstr "巴伐利亞"
+
+#: contrib/localflavor/de/de_states.py:7
+msgid "Berlin"
+msgstr "柏林"
+
+#: contrib/localflavor/de/de_states.py:8
+msgid "Brandenburg"
+msgstr "勃蘭登堡"
+
+#: contrib/localflavor/de/de_states.py:9
+msgid "Bremen"
+msgstr "布萊梅"
+
+#: contrib/localflavor/de/de_states.py:10
+msgid "Hamburg"
+msgstr "漢堡"
+
+#: contrib/localflavor/de/de_states.py:11
+msgid "Hessen"
+msgstr "黑森"
+
+#: contrib/localflavor/de/de_states.py:12
+msgid "Mecklenburg-Western Pomerania"
+msgstr "梅克倫堡-前波莫瑞"
+
+#: contrib/localflavor/de/de_states.py:13
+msgid "Lower Saxony"
+msgstr "下薩克森"
+
+#: contrib/localflavor/de/de_states.py:14
+msgid "North Rhine-Westphalia"
+msgstr "北萊茵-威斯特法倫"
+
+#: contrib/localflavor/de/de_states.py:15
+msgid "Rhineland-Palatinate"
+msgstr "萊茵蘭-普法爾茨"
+
+#: contrib/localflavor/de/de_states.py:16
+msgid "Saarland"
+msgstr "薩爾蘭"
+
+#: contrib/localflavor/de/de_states.py:17
+msgid "Saxony"
+msgstr "薩克森"
+
+#: contrib/localflavor/de/de_states.py:18
+msgid "Saxony-Anhalt"
+msgstr "薩克森-安哈爾特"
+
+#: contrib/localflavor/de/de_states.py:19
+msgid "Schleswig-Holstein"
+msgstr "石勒蘇益格-荷爾斯泰因"
+
+#: contrib/localflavor/de/de_states.py:20
+msgid "Thuringia"
+msgstr "圖林根"
+
+#: contrib/localflavor/de/forms.py:14 contrib/localflavor/fi/forms.py:12
+#: contrib/localflavor/fr/forms.py:15
 msgid "Enter a zip code in the format XXXXX."
 msgstr "用 XXXXX 的格式輸入郵遞區號。"
 
-#: contrib/localflavor/jp/forms.py:21
+#: contrib/localflavor/de/forms.py:41
+#, fuzzy
+msgid ""
+"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
+"format."
+msgstr "以 XXXXXXXXXXX-XXXXXXX-XXXXXXX-X 的格式輸入一個有效的德國身份證號碼。"
+
+#: contrib/localflavor/es/es_provinces.py:5
+msgid "Arava"
+msgstr "阿拉瓦"
+
+#: contrib/localflavor/es/es_provinces.py:6
+msgid "Albacete"
+msgstr "阿爾瓦塞特"
+
+#: contrib/localflavor/es/es_provinces.py:7
+msgid "Alacant"
+msgstr "阿利坎特"
+
+#: contrib/localflavor/es/es_provinces.py:8
+#, fuzzy
+msgid "Almeria"
+msgstr "阿爾梅里亞"
+
+#: contrib/localflavor/es/es_provinces.py:9
+#, fuzzy
+msgid "Avila"
+msgstr "阿維拉"
+
+#: contrib/localflavor/es/es_provinces.py:10
+msgid "Badajoz"
+msgstr "巴達霍斯"
+
+#: contrib/localflavor/es/es_provinces.py:11
+msgid "Illes Balears"
+msgstr "巴利阿里群島"
+
+#: contrib/localflavor/es/es_provinces.py:12
+#, fuzzy
+msgid "Barcelona"
+msgstr "巴塞隆納"
+
+#: contrib/localflavor/es/es_provinces.py:13
+msgid "Burgos"
+msgstr "布爾戈斯"
+
+#: contrib/localflavor/es/es_provinces.py:14
+msgid "Caceres"
+msgstr "卡塞雷斯"
+
+#: contrib/localflavor/es/es_provinces.py:15
+msgid "Cadiz"
+msgstr "加迪斯"
+
+#: contrib/localflavor/es/es_provinces.py:16
+msgid "Castello"
+msgstr "城堡"
+
+#: contrib/localflavor/es/es_provinces.py:17
+msgid "Ciudad Real"
+msgstr "雷亞爾"
+
+#: contrib/localflavor/es/es_provinces.py:18
+msgid "Cordoba"
+msgstr "科多巴"
+
+#: contrib/localflavor/es/es_provinces.py:19
+msgid "A Coruna"
+msgstr "拉科魯納"
+
+#: contrib/localflavor/es/es_provinces.py:20
+msgid "Cuenca"
+msgstr "昆卡"
+
+#: contrib/localflavor/es/es_provinces.py:21
+msgid "Girona"
+msgstr "赫羅納"
+
+#: contrib/localflavor/es/es_provinces.py:22
+#, fuzzy
+msgid "Granada"
+msgstr "格拉納達"
+
+#: contrib/localflavor/es/es_provinces.py:23
+msgid "Guadalajara"
+msgstr "瓜達拉哈拉"
+
+#: contrib/localflavor/es/es_provinces.py:24
+msgid "Guipuzkoa"
+msgstr "吉普斯夸"
+
+#: contrib/localflavor/es/es_provinces.py:25
+msgid "Huelva"
+msgstr "韋爾瓦"
+
+#: contrib/localflavor/es/es_provinces.py:26
+#, fuzzy
+msgid "Huesca"
+msgstr "威斯卡"
+
+#: contrib/localflavor/es/es_provinces.py:27
+#, fuzzy
+msgid "Jaen"
+msgstr "哈恩"
+
+#: contrib/localflavor/es/es_provinces.py:28
+#, fuzzy
+msgid "Leon"
+msgstr "里昂"
+
+#: contrib/localflavor/es/es_provinces.py:29
+msgid "Lleida"
+msgstr "萊里達"
+
+#: contrib/localflavor/es/es_provinces.py:30
+#: contrib/localflavor/es/es_regions.py:17
+msgid "La Rioja"
+msgstr "里奧夏"
+
+#: contrib/localflavor/es/es_provinces.py:31
+msgid "Lugo"
+msgstr "盧戈"
+
+#: contrib/localflavor/es/es_provinces.py:32
+#: contrib/localflavor/es/es_regions.py:18
+msgid "Madrid"
+msgstr "馬德里"
+
+#: contrib/localflavor/es/es_provinces.py:33
+#, fuzzy
+msgid "Malaga"
+msgstr "左賀"
+
+#: contrib/localflavor/es/es_provinces.py:34
+msgid "Murcia"
+msgstr "穆爾西亞"
+
+#: contrib/localflavor/es/es_provinces.py:35
+msgid "Navarre"
+msgstr "納瓦拉"
+
+#: contrib/localflavor/es/es_provinces.py:36
+msgid "Ourense"
+msgstr "奥倫斯"
+
+#: contrib/localflavor/es/es_provinces.py:37
+msgid "Asturias"
+msgstr "阿斯杜里亞斯"
+
+#: contrib/localflavor/es/es_provinces.py:38
+#, fuzzy
+msgid "Palencia"
+msgstr "帕倫西亞"
+
+#: contrib/localflavor/es/es_provinces.py:39
+msgid "Las Palmas"
+msgstr "洛斯卡布斯"
+
+#: contrib/localflavor/es/es_provinces.py:40
+msgid "Pontevedra"
+msgstr "蓬特韋德拉"
+
+#: contrib/localflavor/es/es_provinces.py:41
+#, fuzzy
+msgid "Salamanca"
+msgstr "薩拉曼卡"
+
+#: contrib/localflavor/es/es_provinces.py:42
+msgid "Santa Cruz de Tenerife"
+msgstr "聖克魯斯-德特內裡費"
+
+#: contrib/localflavor/es/es_provinces.py:43
+#: contrib/localflavor/es/es_regions.py:11
+#, fuzzy
+msgid "Cantabria"
+msgstr "坎塔布里亞"
+
+#: contrib/localflavor/es/es_provinces.py:44
+#, fuzzy
+msgid "Segovia"
+msgstr "塞戈維亞"
+
+#: contrib/localflavor/es/es_provinces.py:45
+msgid "Seville"
+msgstr "塞維利亞"
+
+#: contrib/localflavor/es/es_provinces.py:46
+#, fuzzy
+msgid "Soria"
+msgstr "索利亞"
+
+#: contrib/localflavor/es/es_provinces.py:47
+msgid "Tarragona"
+msgstr "塔拉戈納"
+
+#: contrib/localflavor/es/es_provinces.py:48
+msgid "Teruel"
+msgstr "特魯埃爾"
+
+#: contrib/localflavor/es/es_provinces.py:49
+msgid "Toledo"
+msgstr "托萊多"
+
+#: contrib/localflavor/es/es_provinces.py:50
+#, fuzzy
+msgid "Valencia"
+msgstr "瓦倫西亞"
+
+#: contrib/localflavor/es/es_provinces.py:51
+msgid "Valladolid"
+msgstr "瓦利阿多里德"
+
+#: contrib/localflavor/es/es_provinces.py:52
+msgid "Bizkaia"
+msgstr "巴斯克"
+
+#: contrib/localflavor/es/es_provinces.py:53
+#, fuzzy
+msgid "Zamora"
+msgstr "扎莫拉"
+
+#: contrib/localflavor/es/es_provinces.py:54
+msgid "Zaragoza"
+msgstr "薩拉戈薩"
+
+#: contrib/localflavor/es/es_provinces.py:55
+msgid "Ceuta"
+msgstr "休達"
+
+#: contrib/localflavor/es/es_provinces.py:56
+msgid "Melilla"
+msgstr "梅利利亞"
+
+#: contrib/localflavor/es/es_regions.py:5
+msgid "Andalusia"
+msgstr "安達魯西亞"
+
+#: contrib/localflavor/es/es_regions.py:6
+msgid "Aragon"
+msgstr "阿拉貢"
+
+#: contrib/localflavor/es/es_regions.py:7
+msgid "Principality of Asturias"
+msgstr "Principality of Asturias"
+
+#: contrib/localflavor/es/es_regions.py:8
+msgid "Balearic Islands"
+msgstr "巴利阿里群島"
+
+#: contrib/localflavor/es/es_regions.py:9
+msgid "Basque Country"
+msgstr "巴斯克地區"
+
+#: contrib/localflavor/es/es_regions.py:10
+#, fuzzy
+msgid "Canary Islands"
+msgstr "加那利群島"
+
+#: contrib/localflavor/es/es_regions.py:12
+msgid "Castile-La Mancha"
+msgstr "卡斯提爾-拉曼查"
+
+#: contrib/localflavor/es/es_regions.py:13
+msgid "Castile and Leon"
+msgstr "卡斯蒂利亞和里昂"
+
+#: contrib/localflavor/es/es_regions.py:14
+#, fuzzy
+msgid "Catalonia"
+msgstr "加泰隆尼亞"
+
+#: contrib/localflavor/es/es_regions.py:15
+msgid "Extremadura"
+msgstr "艾司德雷馬度"
+
+#: contrib/localflavor/es/es_regions.py:16
+#, fuzzy
+msgid "Galicia"
+msgstr "加利西亞"
+
+#: contrib/localflavor/es/es_regions.py:19
+msgid "Region of Murcia"
+msgstr "穆爾西亞地區"
+
+#: contrib/localflavor/es/es_regions.py:20
+msgid "Foral Community of Navarre"
+msgstr "Foral Community of Navarre"
+
+#: contrib/localflavor/es/es_regions.py:21
+msgid "Valencian Community"
+msgstr "瓦倫西亞自治區"
+
+#: contrib/localflavor/es/forms.py:19
+#, fuzzy
+msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
+msgstr "以 01XXX - 52XXX 的格式输入一個有效範圍內的郵遞區號。"
+
+#: contrib/localflavor/es/forms.py:39
+#, fuzzy
+msgid ""
+"Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
+"9XXXXXXXX."
+msgstr "以 6XXXXXXXX, 8XXXXXXXX 或 9XXXXXXXX 的格式輸入一個有效的電話號碼。"
+
+#: contrib/localflavor/es/forms.py:66
+#, fuzzy
+msgid "Please enter a valid NIF, NIE, or CIF."
+msgstr "請輸入有效的 NIF，NIE，或 CIF。"
+
+#: contrib/localflavor/es/forms.py:67
+#, fuzzy
+msgid "Please enter a valid NIF or NIE."
+msgstr "請輸入有效的 NIF 或 NIE。"
+
+#: contrib/localflavor/es/forms.py:68
+msgid "Invalid checksum for NIF."
+msgstr "無效的 NIF 校驗和。"
+
+#: contrib/localflavor/es/forms.py:69
+msgid "Invalid checksum for NIE."
+msgstr "無效的 NIE 校驗和。"
+
+#: contrib/localflavor/es/forms.py:70
+msgid "Invalid checksum for CIF."
+msgstr "無效的 CIF 校驗和。"
+
+#: contrib/localflavor/es/forms.py:142
+msgid ""
+"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
+msgstr "請輸入一個有效的銀行值帳號，格式為 XXXX-XXXX-XX-XXXXXXXXXX。"
+
+#: contrib/localflavor/es/forms.py:143
+msgid "Invalid checksum for bank account number."
+msgstr "無效的銀行帳號校驗和。"
+
+#: contrib/localflavor/fi/forms.py:28
+msgid "Enter a valid Finnish social security number."
+msgstr "請輸入一個有效的芬蘭社會保險號碼。"
+
+#: contrib/localflavor/in_/forms.py:14
+#, fuzzy
+msgid "Enter a zip code in the format XXXXXXX."
+msgstr "用 XXXXXXX 的格式輸入郵遞區號。"
+
+#: contrib/localflavor/is_/forms.py:17
+msgid ""
+"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+msgstr "用 XXXXXX-XXXX 的格式輸入冰島身份證號碼。"
+
+#: contrib/localflavor/is_/forms.py:18
+msgid "The Icelandic identification number is not valid."
+msgstr "無效的冰島身份證號碼。"
+
+#: contrib/localflavor/it/forms.py:14
+#, fuzzy
+msgid "Enter a valid zip code."
+msgstr "輸入有效的郵遞區號。"
+
+#: contrib/localflavor/it/forms.py:43
+#, fuzzy
+msgid "Enter a valid Social Security number."
+msgstr "請輸入一個有效的社會保險號碼。"
+
+#: contrib/localflavor/it/forms.py:68
+#, fuzzy
+msgid "Enter a valid VAT number."
+msgstr "輸入有效的 VAT 號碼。"
+
+#: contrib/localflavor/jp/forms.py:16
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
 msgstr "用 XXXXXXX 或 XXX-XXXX 的格式輸入郵遞區號。"
 
@@ -733,378 +2516,1067 @@ msgstr "鹿兒島"
 msgid "Okinawa"
 msgstr "琉球"
 
-#: contrib/localflavor/br/forms.py:18
-msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "用 XXXXX-XXX 的格式輸入郵遞區號。"
+#: contrib/localflavor/mx/mx_states.py:12
+msgid "Aguascalientes"
+msgstr "阿瓜斯卡連特斯"
 
-#: contrib/localflavor/br/forms.py:30
-msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "電話號碼必須是 XX-XXXX-XXXX 格式。"
+#: contrib/localflavor/mx/mx_states.py:13
+msgid "Baja California"
+msgstr "下加利福尼亞州"
 
-#: contrib/localflavor/fi/forms.py:40 contrib/localflavor/fi/forms.py:46
-msgid "Enter a valid Finnish social security number."
-msgstr "請輸入一個有效的芬蘭身份證號碼。"
+#: contrib/localflavor/mx/mx_states.py:14
+msgid "Baja California Sur"
+msgstr "南下加利福尼亞州"
 
-#: contrib/localflavor/uk/forms.py:18
-msgid "Enter a postcode. A space is required between the two postcode parts."
-msgstr "輸入郵政區號。兩組的必須要有空格"
+#: contrib/localflavor/mx/mx_states.py:15
+#, fuzzy
+msgid "Campeche"
+msgstr "坎佩切"
 
-#: contrib/localflavor/de/forms.py:63
+#: contrib/localflavor/mx/mx_states.py:16
+msgid "Chihuahua"
+msgstr "奇瓦瓦"
+
+#: contrib/localflavor/mx/mx_states.py:17
+#, fuzzy
+msgid "Chiapas"
+msgstr "恰帕斯"
+
+#: contrib/localflavor/mx/mx_states.py:18
+#, fuzzy
+msgid "Coahuila"
+msgstr "科阿韋拉"
+
+#: contrib/localflavor/mx/mx_states.py:19
+msgid "Colima"
+msgstr "科利馬"
+
+#: contrib/localflavor/mx/mx_states.py:20
+msgid "Distrito Federal"
+msgstr "聯邦區"
+
+#: contrib/localflavor/mx/mx_states.py:21
+msgid "Durango"
+msgstr "杜蘭戈"
+
+#: contrib/localflavor/mx/mx_states.py:22
+#, fuzzy
+msgid "Guerrero"
+msgstr "格雷羅"
+
+#: contrib/localflavor/mx/mx_states.py:23
+msgid "Guanajuato"
+msgstr "瓜納華托"
+
+#: contrib/localflavor/mx/mx_states.py:24
+msgid "Hidalgo"
+msgstr "伊達爾戈"
+
+#: contrib/localflavor/mx/mx_states.py:25
+msgid "Jalisco"
+msgstr "哈利斯科"
+
+#: contrib/localflavor/mx/mx_states.py:26
+msgid "Estado de México"
+msgstr "Estado de México"
+
+#: contrib/localflavor/mx/mx_states.py:27
+msgid "Michoacán"
+msgstr "米却肯"
+
+#: contrib/localflavor/mx/mx_states.py:28
+msgid "Morelos"
+msgstr "莫雷洛斯"
+
+#: contrib/localflavor/mx/mx_states.py:29
+msgid "Nayarit"
+msgstr "納亞里特"
+
+#: contrib/localflavor/mx/mx_states.py:30
+msgid "Nuevo León"
+msgstr "新萊昂"
+
+#: contrib/localflavor/mx/mx_states.py:31
+#, fuzzy
+msgid "Oaxaca"
+msgstr "瓦哈卡"
+
+#: contrib/localflavor/mx/mx_states.py:32
+msgid "Puebla"
+msgstr "普埃布拉"
+
+#: contrib/localflavor/mx/mx_states.py:33
+msgid "Querétaro"
+msgstr "克雷塔羅"
+
+#: contrib/localflavor/mx/mx_states.py:34
+msgid "Quintana Roo"
+msgstr "金塔納羅奧"
+
+#: contrib/localflavor/mx/mx_states.py:35
+#, fuzzy
+msgid "Sinaloa"
+msgstr "錫那羅亞"
+
+#: contrib/localflavor/mx/mx_states.py:36
+msgid "San Luis Potosí"
+msgstr "聖路易斯波托西"
+
+#: contrib/localflavor/mx/mx_states.py:37
+msgid "Sonora"
+msgstr "索諾拉"
+
+#: contrib/localflavor/mx/mx_states.py:38
+msgid "Tabasco"
+msgstr "塔巴斯科"
+
+#: contrib/localflavor/mx/mx_states.py:39
+msgid "Tamaulipas"
+msgstr "塔毛利帕斯"
+
+#: contrib/localflavor/mx/mx_states.py:40
+msgid "Tlaxcala"
+msgstr "特拉斯卡拉"
+
+#: contrib/localflavor/mx/mx_states.py:41
+msgid "Veracruz"
+msgstr "韋拉克魯斯"
+
+#: contrib/localflavor/mx/mx_states.py:42
+msgid "Yucatán"
+msgstr "尤卡坦"
+
+#: contrib/localflavor/mx/mx_states.py:43
+msgid "Zacatecas"
+msgstr "薩卡特卡斯"
+
+#: contrib/localflavor/nl/forms.py:21
+#, fuzzy
+msgid "Enter a valid postal code"
+msgstr "輸入有效的郵遞區號"
+
+#: contrib/localflavor/nl/forms.py:52
+#, fuzzy
+msgid "Enter a valid phone number"
+msgstr "輸入有效的電話號碼"
+
+#: contrib/localflavor/nl/forms.py:78
+#, fuzzy
+msgid "Enter a valid SoFi number"
+msgstr "輸入有效的 SoFi 號碼"
+
+#: contrib/localflavor/nl/nl_provinces.py:4
+#, fuzzy
+msgid "Drenthe"
+msgstr "德蘭特"
+
+#: contrib/localflavor/nl/nl_provinces.py:5
+msgid "Flevoland"
+msgstr "弗萊福蘭"
+
+#: contrib/localflavor/nl/nl_provinces.py:6
+msgid "Friesland"
+msgstr "弗里斯蘭"
+
+#: contrib/localflavor/nl/nl_provinces.py:7
+#, fuzzy
+msgid "Gelderland"
+msgstr "海爾德蘭"
+
+#: contrib/localflavor/nl/nl_provinces.py:8
+#, fuzzy
+msgid "Groningen"
+msgstr "格羅寧根"
+
+#: contrib/localflavor/nl/nl_provinces.py:9
+#, fuzzy
+msgid "Limburg"
+msgstr "林堡"
+
+#: contrib/localflavor/nl/nl_provinces.py:10
+msgid "Noord-Brabant"
+msgstr "北布拉班特"
+
+#: contrib/localflavor/nl/nl_provinces.py:11
+msgid "Noord-Holland"
+msgstr "北荷蘭"
+
+#: contrib/localflavor/nl/nl_provinces.py:12
+msgid "Overijssel"
+msgstr "上艾瑟爾"
+
+#: contrib/localflavor/nl/nl_provinces.py:13
+#, fuzzy
+msgid "Utrecht"
+msgstr "烏特勒支"
+
+#: contrib/localflavor/nl/nl_provinces.py:14
+#, fuzzy
+msgid "Zeeland"
+msgstr "澤蘭"
+
+#: contrib/localflavor/nl/nl_provinces.py:15
+msgid "Zuid-Holland"
+msgstr "南荷蘭"
+
+#: contrib/localflavor/no/forms.py:33
+msgid "Enter a valid Norwegian social security number."
+msgstr "請輸入一個有效的挪威社會保險號碼。"
+
+#: contrib/localflavor/pe/forms.py:24
+#, fuzzy
+msgid "This field requires 8 digits."
+msgstr "這個欄位是必須是 8 位數字。"
+
+#: contrib/localflavor/pe/forms.py:52
+#, fuzzy
+msgid "This field requires 11 digits."
+msgstr "這個欄位是必須是 11 位數字。"
+
+#: contrib/localflavor/pl/forms.py:38
+msgid "National Identification Number consists of 11 digits."
+msgstr "國家身份證號碼由 11 位數字值組成。"
+
+#: contrib/localflavor/pl/forms.py:39
+msgid "Wrong checksum for the National Identification Number."
+msgstr "國家身份證號碼校驗和錯誤。"
+
+#: contrib/localflavor/pl/forms.py:71
+#, fuzzy
 msgid ""
-"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"format"
+"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
+msgstr "輸入一個税號（NIP），格式為 XXX-XXX-XX-XX 或 XX-XX-XXX-XXX。"
+
+#: contrib/localflavor/pl/forms.py:72
+msgid "Wrong checksum for the Tax Number (NIP)."
+msgstr "税號（NIP）校驗和錯誤。"
+
+#: contrib/localflavor/pl/forms.py:111
+msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
 msgstr ""
-"以 XXXXXXXXXXX-XXXXXXX-XXXXXXX-X 的格式輸入一個有效的德國身份證號碼。"
 
+#: contrib/localflavor/pl/forms.py:112
+msgid "Wrong checksum for the National Business Register Number (REGON)."
+msgstr "國家商標註冊號碼（REGON）由 7 位或 9 位数字組成。"
 
-#: contrib/localflavor/de/de_states.py:5
-msgid "Baden-Wuerttemberg"
-msgstr "巴登符騰堡"
+#: contrib/localflavor/pl/forms.py:155
+#, fuzzy
+msgid "Enter a postal code in the format XX-XXX."
+msgstr "用 XX-XXX 的格式輸入郵遞區號。"
 
-#: contrib/localflavor/de/de_states.py:6
-msgid "Bavaria"
-msgstr "巴伐利亞"
+#: contrib/localflavor/pl/pl_voivodeships.py:8
+#, fuzzy
+msgid "Lower Silesia"
+msgstr "下西里西亞"
 
-#: contrib/localflavor/de/de_states.py:7
-msgid "Berlin"
-msgstr "柏林"
+#: contrib/localflavor/pl/pl_voivodeships.py:9
+msgid "Kuyavia-Pomerania"
+msgstr ""
 
-#: contrib/localflavor/de/de_states.py:8
-msgid "Brandenburg"
-msgstr "勃蘭登堡"
+#: contrib/localflavor/pl/pl_voivodeships.py:10
+msgid "Lublin"
+msgstr "盧布林"
 
-#: contrib/localflavor/de/de_states.py:9
-msgid "Bremen"
-msgstr "布萊梅"
+#: contrib/localflavor/pl/pl_voivodeships.py:11
+msgid "Lubusz"
+msgstr ""
 
-#: contrib/localflavor/de/de_states.py:10
-msgid "Hamburg"
-msgstr "漢堡"
+#: contrib/localflavor/pl/pl_voivodeships.py:12
+msgid "Lodz"
+msgstr "洛次"
 
-#: contrib/localflavor/de/de_states.py:11
-msgid "Hessen"
-msgstr "黑森"
+#: contrib/localflavor/pl/pl_voivodeships.py:13
+msgid "Lesser Poland"
+msgstr ""
 
-#: contrib/localflavor/de/de_states.py:12
-msgid "Mecklenburg-Western Pomerania"
-msgstr "梅克倫堡-前波莫瑞"
+#: contrib/localflavor/pl/pl_voivodeships.py:14
+msgid "Masovia"
+msgstr "瑪佐維亞"
 
-#: contrib/localflavor/de/de_states.py:13
-msgid "Lower Saxony"
-msgstr "下薩克森"
+#: contrib/localflavor/pl/pl_voivodeships.py:15
+#, fuzzy
+msgid "Opole"
+msgstr "奧波萊"
 
-#: contrib/localflavor/de/de_states.py:14
-msgid "North Rhine-Westphalia"
-msgstr "北萊茵-威斯特法倫"
+#: contrib/localflavor/pl/pl_voivodeships.py:16
+msgid "Subcarpatia"
+msgstr ""
 
-#: contrib/localflavor/de/de_states.py:15
-msgid "Rhineland-Palatinate"
-msgstr "萊茵蘭-普法爾茨"
+#: contrib/localflavor/pl/pl_voivodeships.py:17
+msgid "Podlasie"
+msgstr "波德拉謝"
 
-#: contrib/localflavor/de/de_states.py:16
-msgid "Saarland"
-msgstr "薩爾蘭"
+#: contrib/localflavor/pl/pl_voivodeships.py:18
+#, fuzzy
+msgid "Pomerania"
+msgstr "波美拉尼亞"
 
-#: contrib/localflavor/de/de_states.py:17
-msgid "Saxony"
-msgstr "薩克森"
+#: contrib/localflavor/pl/pl_voivodeships.py:19
+#, fuzzy
+msgid "Silesia"
+msgstr "西里西亞"
 
-#: contrib/localflavor/de/de_states.py:18
-msgid "Saxony-Anhalt"
-msgstr "薩克森-安哈爾特"
+#: contrib/localflavor/pl/pl_voivodeships.py:20
+msgid "Swietokrzyskie"
+msgstr "聖十字省"
 
-#: contrib/localflavor/de/de_states.py:19
-msgid "Schleswig-Holstein"
-msgstr "石勒蘇益格-荷爾斯泰因"
+#: contrib/localflavor/pl/pl_voivodeships.py:21
+msgid "Warmia-Masuria"
+msgstr "瓦爾米亞-馬祖里"
 
-#: contrib/localflavor/de/de_states.py:20
-msgid "Thuringia"
-msgstr "圖林根"
+#: contrib/localflavor/pl/pl_voivodeships.py:22
+msgid "Greater Poland"
+msgstr ""
 
-#: contrib/localflavor/usa/forms.py:18
+#: contrib/localflavor/pl/pl_voivodeships.py:23
+#, fuzzy
+msgid "West Pomerania"
+msgstr "西波美拉尼亞"
+
+#: contrib/localflavor/ro/forms.py:19
+#, fuzzy
+msgid "Enter a valid CIF."
+msgstr "輸入有效的 CIF。"
+
+#: contrib/localflavor/ro/forms.py:56
+#, fuzzy
+msgid "Enter a valid CNP."
+msgstr "輸入有效的 CNP。"
+
+#: contrib/localflavor/ro/forms.py:141
+#, fuzzy
+msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
+msgstr "以 ROXX-XXXX-XXXX-XXXX-XXXX-XXXX 的格式輸入一個有效的 IBAN。"
+
+#: contrib/localflavor/ro/forms.py:171
+#, fuzzy
+msgid "Phone numbers must be in XXXX-XXXXXX format."
+msgstr "電話號碼必須是 XXXX-XXXXXX 格式。"
+
+#: contrib/localflavor/ro/forms.py:194
+#, fuzzy
+msgid "Enter a valid postal code in the format XXXXXX"
+msgstr "用 XXXXXX 的格式輸入郵遞區號。"
+
+#: contrib/localflavor/sk/forms.py:30
+#, fuzzy
+msgid "Enter a postal code in the format XXXXX or XXX XX."
+msgstr "用 XXXXX 或 XXXX XX 的格式輸入郵遞區號。"
+
+#: contrib/localflavor/sk/sk_districts.py:8
+msgid "Banska Bystrica"
+msgstr "班斯卡·比斯特理察"
+
+#: contrib/localflavor/sk/sk_districts.py:9
+msgid "Banska Stiavnica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:10
+msgid "Bardejov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:11
+msgid "Banovce nad Bebravou"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:12
+#, fuzzy
+msgid "Brezno"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:13
+msgid "Bratislava I"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:14
+msgid "Bratislava II"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:15
+msgid "Bratislava III"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:16
+msgid "Bratislava IV"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:17
+msgid "Bratislava V"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:18
+msgid "Bytca"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:19
+msgid "Cadca"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:20
+msgid "Detva"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:21
+msgid "Dolny Kubin"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:22
+msgid "Dunajska Streda"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:23
+#, fuzzy
+msgid "Galanta"
+msgstr "戈蘭塔"
+
+#: contrib/localflavor/sk/sk_districts.py:24
+#, fuzzy
+msgid "Gelnica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:25
+msgid "Hlohovec"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:26
+msgid "Humenne"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:27
+msgid "Ilava"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:28
+msgid "Kezmarok"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:29
+#, fuzzy
+msgid "Komarno"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:30
+msgid "Kosice I"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:31
+msgid "Kosice II"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:32
+msgid "Kosice III"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:33
+msgid "Kosice IV"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:34
+msgid "Kosice - okolie"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:35
+msgid "Krupina"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:36
+msgid "Kysucke Nove Mesto"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:37
+msgid "Levice"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:38
+msgid "Levoca"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:39
+msgid "Liptovsky Mikulas"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:40
+msgid "Lucenec"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:41
+#, fuzzy
+msgid "Malacky"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:42
+#, fuzzy
+msgid "Martin"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:43
+msgid "Medzilaborce"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:44
+msgid "Michalovce"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:45
+msgid "Myjava"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:46
+msgid "Namestovo"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:47
+#, fuzzy
+msgid "Nitra"
+msgstr "尼特拉"
+
+#: contrib/localflavor/sk/sk_districts.py:48
+msgid "Nove Mesto nad Vahom"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:49
+msgid "Nove Zamky"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:50
+msgid "Partizanske"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:51
+msgid "Pezinok"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:52
+msgid "Piestany"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:53
+msgid "Poltar"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:54
+msgid "Poprad"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:55
+msgid "Povazska Bystrica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:56
+msgid "Presov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:57
+msgid "Prievidza"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:58
+msgid "Puchov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:59
+msgid "Revuca"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:60
+msgid "Rimavska Sobota"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:61
+msgid "Roznava"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:62
+msgid "Ruzomberok"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:63
+#, fuzzy
+msgid "Sabinov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:64
+msgid "Senec"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:65
+#, fuzzy
+msgid "Senica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:66
+#, fuzzy
+msgid "Skalica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:67
+#, fuzzy
+msgid "Snina"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:68
+msgid "Sobrance"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:69
+msgid "Spisska Nova Ves"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:70
+msgid "Stara Lubovna"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:71
+msgid "Stropkov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:72
+msgid "Svidnik"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:73
+#, fuzzy
+msgid "Sala"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:74
+msgid "Topolcany"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:75
+msgid "Trebisov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:76
+#, fuzzy
+msgid "Trencin"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:77
+msgid "Trnava"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:78
+msgid "Turcianske Teplice"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:79
+msgid "Tvrdosin"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:80
+msgid "Velky Krtis"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:81
+msgid "Vranov nad Toplou"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:82
+msgid "Zlate Moravce"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:83
+msgid "Zvolen"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:84
+msgid "Zarnovica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:85
+msgid "Ziar nad Hronom"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:86
+msgid "Zilina"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:8
+msgid "Banska Bystrica region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:9
+msgid "Bratislava region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:10
+msgid "Kosice region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:11
+msgid "Nitra region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:12
+msgid "Presov region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:13
+msgid "Trencin region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:14
+msgid "Trnava region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:15
+msgid "Zilina region"
+msgstr ""
+
+#: contrib/localflavor/uk/forms.py:21
+#, fuzzy
+msgid "Enter a valid postcode."
+msgstr "輸入有效的郵遞區號"
+
+#: contrib/localflavor/uk/uk_regions.py:11
+msgid "Bedfordshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:12
+msgid "Buckinghamshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:14
+msgid "Cheshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:15
+msgid "Cornwall and Isles of Scilly"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:16
+msgid "Cumbria"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:17
+msgid "Derbyshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:18
+#, fuzzy
+msgid "Devon"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:19
+msgid "Dorset"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:20
+msgid "Durham"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:21
+msgid "East Sussex"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:22
+msgid "Essex"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:23
+msgid "Gloucestershire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:24
+msgid "Greater London"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:25
+msgid "Greater Manchester"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:26
+msgid "Hampshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:27
+msgid "Hertfordshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:28
+msgid "Kent"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:29
+#, fuzzy
+msgid "Lancashire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:30
+msgid "Leicestershire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:31
+msgid "Lincolnshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:32
+msgid "Merseyside"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:33
+msgid "Norfolk"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:34
+msgid "North Yorkshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:35
+msgid "Northamptonshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:36
+msgid "Northumberland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:37
+msgid "Nottinghamshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:38
+msgid "Oxfordshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:39
+msgid "Shropshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:40
+msgid "Somerset"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:41
+msgid "South Yorkshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:42
+msgid "Staffordshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:43
+msgid "Suffolk"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:44
+#, fuzzy
+msgid "Surrey"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:45
+msgid "Tyne and Wear"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:46
+msgid "Warwickshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:47
+msgid "West Midlands"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:48
+msgid "West Sussex"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:49
+msgid "West Yorkshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:50
+msgid "Wiltshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:51
+msgid "Worcestershire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:55
+msgid "County Antrim"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:56
+msgid "County Armagh"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:57
+msgid "County Down"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:58
+msgid "County Fermanagh"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:59
+msgid "County Londonderry"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:60
+msgid "County Tyrone"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:64
+msgid "Clwyd"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:65
+msgid "Dyfed"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:66
+msgid "Gwent"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:67
+msgid "Gwynedd"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:68
+msgid "Mid Glamorgan"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:69
+msgid "Powys"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:70
+msgid "South Glamorgan"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:71
+msgid "West Glamorgan"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:75
+#, fuzzy
+msgid "Borders"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:76
+msgid "Central Scotland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:77
+msgid "Dumfries and Galloway"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:78
+#, fuzzy
+msgid "Fife"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:79
+#, fuzzy
+msgid "Grampian"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:80
+msgid "Highland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:81
+#, fuzzy
+msgid "Lothian"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:82
+msgid "Orkney Islands"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:83
+msgid "Shetland Islands"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:84
+msgid "Strathclyde"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:85
+msgid "Tayside"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:86
+msgid "Western Isles"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:90
+#, fuzzy
+msgid "England"
+msgstr "英格蘭"
+
+#: contrib/localflavor/uk/uk_regions.py:91
+msgid "Northern Ireland"
+msgstr "北愛爾蘭"
+
+#: contrib/localflavor/uk/uk_regions.py:92
+#, fuzzy
+msgid "Scotland"
+msgstr "蘇格蘭"
+
+#: contrib/localflavor/uk/uk_regions.py:93
+#, fuzzy
+msgid "Wales"
+msgstr ""
+
+#: contrib/localflavor/us/forms.py:16
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr "以 XXXXX 或 XXXXX-XXX 的格式輸入一個郵遞區號。"
+msgstr "以 XXXXX 或 XXXXX-XXXX 的格式輸入一個郵遞區號。"
 
-#: contrib/localflavor/usa/forms.py:51
+#: contrib/localflavor/us/forms.py:54
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr "以 XXX-XX-XXXX 的格式輸入一有效的美国身份證字號。"
 
-#: contrib/sessions/models.py:68
-msgid "session key"
-msgstr "session 鍵值"
+#: contrib/localflavor/za/forms.py:20
+#, fuzzy
+msgid "Enter a valid South African ID number"
+msgstr "請輸入一個有效的南非身份證號碼。"
 
-#: contrib/sessions/models.py:69
-msgid "session data"
-msgstr "session 資料"
+#: contrib/localflavor/za/forms.py:54
+#, fuzzy
+msgid "Enter a valid South African postal code"
+msgstr "輸入一個有效的南非郵遞區號。"
 
-#: contrib/sessions/models.py:70
-msgid "expire date"
-msgstr "到期日期"
+#: contrib/localflavor/za/za_provinces.py:4
+#, fuzzy
+msgid "Eastern Cape"
+msgstr "東開普省"
 
-#: contrib/sessions/models.py:74
-msgid "session"
-msgstr "session"
+#: contrib/localflavor/za/za_provinces.py:5
+#, fuzzy
+msgid "Free State"
+msgstr "自由邦"
 
-#: contrib/sessions/models.py:75
-msgid "sessions"
-msgstr "sessions"
+#: contrib/localflavor/za/za_provinces.py:6
+#, fuzzy
+msgid "Gauteng"
+msgstr "豪登省"
 
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:138
-msgid "The two password fields didn't match."
-msgstr "兩個密碼欄位不同。"
+#: contrib/localflavor/za/za_provinces.py:7
+msgid "KwaZulu-Natal"
+msgstr "誇祖魯-納塔爾省"
 
-#: contrib/auth/forms.py:25
-msgid "A user with that username already exists."
-msgstr "一個相同名稱的使用者已經存在。"
+#: contrib/localflavor/za/za_provinces.py:8
+msgid "Limpopo"
+msgstr "林波波省"
 
-#: contrib/auth/forms.py:53
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr "你的Web瀏覽器好象不允許使用cookie。登入時需要使用cookie。"
+#: contrib/localflavor/za/za_provinces.py:9
+msgid "Mpumalanga"
+msgstr "普馬蘭加省"
 
-#: contrib/auth/forms.py:60 contrib/admin/views/decorators.py:10
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr "請輸入有效的使用者名稱與密碼。請注意兩個欄位都有分大小寫"
+#: contrib/localflavor/za/za_provinces.py:10
+msgid "Northern Cape"
+msgstr "北開普省"
 
-#: contrib/auth/forms.py:62
-msgid "This account is inactive."
-msgstr "這個帳戶未啟用"
+#: contrib/localflavor/za/za_provinces.py:11
+#, fuzzy
+msgid "North West"
+msgstr "西北省"
 
-#: contrib/auth/forms.py:85
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr "這個電子郵件地址没有和任何用户帳號有關聯。你確定你已經註冊了？"
-
-#: contrib/auth/forms.py:117
-msgid "The two 'new password' fields didn't match."
-msgstr "兩個'新密碼'欄位不一致"
-
-#: contrib/auth/forms.py:124
-msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "你的舊密碼不正確。請重新輸入。"
-
-#: contrib/auth/views.py:39
-msgid "Logged out"
-msgstr "登出"
-
-#: contrib/auth/models.py:38 contrib/auth/models.py:57
-msgid "name"
-msgstr "名稱"
-
-#: contrib/auth/models.py:40
-msgid "codename"
-msgstr "代碼"
-
-#: contrib/auth/models.py:42
-msgid "permission"
-msgstr "權限"
-
-#: contrib/auth/models.py:43 contrib/auth/models.py:58
-msgid "permissions"
-msgstr "權限"
-
-#: contrib/auth/models.py:60
-msgid "group"
-msgstr "群組"
-
-#: contrib/auth/models.py:61 contrib/auth/models.py:100
-msgid "groups"
-msgstr "群組"
-
-#: contrib/auth/models.py:90
-msgid "username"
-msgstr "使用者名稱"
-
-#: contrib/auth/models.py:90
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
-msgstr "必須。不超過30。只能用能字母數字與底線(字母、數字和底線)。"
-
-#: contrib/auth/models.py:91
-msgid "first name"
-msgstr "名字"
-
-#: contrib/auth/models.py:92
-msgid "last name"
-msgstr "姓氏"
-
-#: contrib/auth/models.py:93
-msgid "e-mail address"
-msgstr "電子郵件地址"
-
-#: contrib/auth/models.py:94
-msgid "password"
-msgstr "密碼"
-
-#: contrib/auth/models.py:94
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr "使用 '[algo]$[salt]$[hexdigest]' 或是 <a href=\"password/\">修改密碼表單</a>."
-
-#: contrib/auth/models.py:95
-msgid "staff status"
-msgstr "工作人員狀態"
-
-#: contrib/auth/models.py:95
-msgid "Designates whether the user can log into this admin site."
-msgstr "指定是否使用者可以登入此管理網站。"
-
-#: contrib/auth/models.py:96
-msgid "active"
-msgstr "活動中"
-
-#: contrib/auth/models.py:96
-msgid ""
-"Designates whether this user can log into the Django admin. Unselect this "
-"instead of deleting accounts."
-msgstr "指定是否使用者可以登入此管理網站。用取消選擇來取代刪除帳號。"
-
-#: contrib/auth/models.py:97
-msgid "superuser status"
-msgstr "超級使用者狀態"
-
-#: contrib/auth/models.py:97
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
-msgstr "指定是否使用者可以登入到這個管理網站"
-
-#: contrib/auth/models.py:98
-msgid "last login"
-msgstr "上次登入"
-
-#: contrib/auth/models.py:99
-msgid "date joined"
-msgstr "加入日期"
-
-#: contrib/auth/models.py:101
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr "除了手動指定的權限之外，這個使用者也會得到其群組擁有的所有權限。"
-
-#: contrib/auth/models.py:102
-msgid "user permissions"
-msgstr "使用者權限"
-
-#: contrib/auth/models.py:105
-msgid "user"
-msgstr "使用者"
-
-#: contrib/auth/models.py:106
-msgid "users"
-msgstr "使用者"
-
-#: contrib/auth/models.py:111
-msgid "Personal info"
-msgstr "個人資訊"
-
-#: contrib/auth/models.py:112
-msgid "Permissions"
-msgstr "權限"
-
-#: contrib/auth/models.py:113
-msgid "Important dates"
-msgstr "重要日期"
-
-#: contrib/auth/models.py:114
-msgid "Groups"
-msgstr "群組"
-
-#: contrib/auth/models.py:258
-msgid "message"
-msgstr "訊息"
-
-#: contrib/humanize/templatetags/humanize.py:17
-msgid "th"
-msgstr ""
-
-#: contrib/humanize/templatetags/humanize.py:17
-msgid "st"
-msgstr ""
-
-#: contrib/humanize/templatetags/humanize.py:17
-msgid "nd"
-msgstr ""
-
-#: contrib/humanize/templatetags/humanize.py:17
-msgid "rd"
-msgstr ""
-
-#: contrib/humanize/templatetags/humanize.py:47
-#, python-format
-msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f 百萬"
-msgstr[1] ""
-
-#: contrib/humanize/templatetags/humanize.py:50
-#, python-format
-msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f 十億"
-msgstr[1] ""
-
-#: contrib/humanize/templatetags/humanize.py:53
-#, python-format
-msgid "%(value).1f trillion"
-msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f 兆"
-msgstr[1] ""
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "one"
-msgstr "一"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "two"
-msgstr "二"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "three"
-msgstr "三"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "four"
-msgstr "四"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "five"
-msgstr "五"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "six"
-msgstr "六"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "seven"
-msgstr "七"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "eight"
-msgstr "八"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "nine"
-msgstr "九"
-
-#: contrib/contenttypes/models.py:36
-msgid "python model class name"
-msgstr "python模組名稱"
-
-#: contrib/contenttypes/models.py:39
-msgid "content type"
-msgstr "內容類型"
-
-#: contrib/contenttypes/models.py:40
-msgid "content types"
-msgstr "內容類型"
+#: contrib/localflavor/za/za_provinces.py:12
+#, fuzzy
+msgid "Western Cape"
+msgstr "西開普省"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
@@ -1134,1557 +3606,542 @@ msgstr "重導向"
 msgid "redirects"
 msgstr "重導向"
 
-#: contrib/flatpages/models.py:7 contrib/admin/views/doc.py:315
-msgid "URL"
-msgstr "URL"
-
-#: contrib/flatpages/models.py:8
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "例如： '/about/contact/'。開頭與結束都一定要有斜線。"
-
-#: contrib/flatpages/models.py:9
-msgid "title"
-msgstr "標題"
-
-#: contrib/flatpages/models.py:10
-msgid "content"
-msgstr "內容"
-
-#: contrib/flatpages/models.py:11
-msgid "enable comments"
-msgstr "啟用評論"
-
-#: contrib/flatpages/models.py:12
-msgid "template name"
-msgstr "模板名稱"
-
-#: contrib/flatpages/models.py:13
-msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
-msgstr "例如： 'flatpages/contact_page'。如果沒有提供它，系統會使用 'flatpages/default.html'。"
-
-#: contrib/flatpages/models.py:14
-msgid "registration required"
-msgstr "需要註冊"
-
-#: contrib/flatpages/models.py:14
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "如果此項被選取，則只有登入的使用者可以檢視頁面。"
-
-#: contrib/flatpages/models.py:18
-msgid "flat page"
-msgstr "簡平頁面"
-
-#: contrib/flatpages/models.py:19
-msgid "flat pages"
-msgstr "簡平頁面"
-
-#: contrib/comments/models.py:67 contrib/comments/models.py:166
-msgid "object ID"
-msgstr "物件 ID"
-
-#: contrib/comments/models.py:68
-msgid "headline"
-msgstr "頭條"
-
-#: contrib/comments/models.py:69 contrib/comments/models.py:90
-#: contrib/comments/models.py:167
-msgid "comment"
-msgstr "評論"
-
-#: contrib/comments/models.py:70
-msgid "rating #1"
-msgstr "等級 #1"
-
-#: contrib/comments/models.py:71
-msgid "rating #2"
-msgstr "等級 #2"
-
-#: contrib/comments/models.py:72
-msgid "rating #3"
-msgstr "等級 #3"
-
-#: contrib/comments/models.py:73
-msgid "rating #4"
-msgstr "等級 #4"
-
-#: contrib/comments/models.py:74
-msgid "rating #5"
-msgstr "等級 #5"
-
-#: contrib/comments/models.py:75
-msgid "rating #6"
-msgstr "等級 #6"
-
-#: contrib/comments/models.py:76
-msgid "rating #7"
-msgstr "等級 #7"
-
-#: contrib/comments/models.py:77
-msgid "rating #8"
-msgstr "等級 #8"
-
-#: contrib/comments/models.py:82
-msgid "is valid rating"
-msgstr "是有效的等級"
-
-#: contrib/comments/models.py:83 contrib/comments/models.py:169
-msgid "date/time submitted"
-msgstr "日期/時間已發送"
-
-#: contrib/comments/models.py:84 contrib/comments/models.py:170
-msgid "is public"
-msgstr "是公開的"
-
-#: contrib/comments/models.py:85 contrib/admin/views/doc.py:289
-msgid "IP address"
-msgstr "IP 位址"
-
-#: contrib/comments/models.py:86
-msgid "is removed"
-msgstr "已移除"
-
-#: contrib/comments/models.py:86
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr "如果此評論不恰當則選取這個方塊，其將以 \"此評論已被移除\" 訊息取代。"
-
-#: contrib/comments/models.py:91
-msgid "comments"
-msgstr "評論"
-
-#: contrib/comments/models.py:131 contrib/comments/models.py:207
-msgid "Content object"
-msgstr "內容物件"
-
-#: contrib/comments/models.py:159
-#, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
-"由 %(user)s 在 %(date)s 張貼\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-
-#: contrib/comments/models.py:168
-msgid "person's name"
-msgstr "人名"
-
-#: contrib/comments/models.py:171
-msgid "ip address"
-msgstr "ip 位址"
-
-#: contrib/comments/models.py:173
-msgid "approved by staff"
-msgstr "由工作人員核准"
-
-#: contrib/comments/models.py:176
-msgid "free comment"
-msgstr "自由評論"
-
-#: contrib/comments/models.py:177
-msgid "free comments"
-msgstr "自由評論"
-
-#: contrib/comments/models.py:233
-msgid "score"
-msgstr "分數"
-
-#: contrib/comments/models.py:234
-msgid "score date"
-msgstr "分數日期"
-
-#: contrib/comments/models.py:237
-msgid "karma score"
-msgstr "Karma 分數"
-
-#: contrib/comments/models.py:238
-msgid "karma scores"
-msgstr "Karma 分數"
-
-#: contrib/comments/models.py:242
-#, python-format
-msgid "%(score)d rating by %(user)s"
-msgstr "被 %(user)s 定級為 %(score)d "
-
-#: contrib/comments/models.py:258
-#, python-format
-msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"此評論被 %(user)s 標識:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/models.py:265
-msgid "flag date"
-msgstr "標識日期"
-
-#: contrib/comments/models.py:268
-msgid "user flag"
-msgstr "使用者旗標"
-
-#: contrib/comments/models.py:269
-msgid "user flags"
-msgstr "使用者旗標"
-
-#: contrib/comments/models.py:273
-#, python-format
-msgid "Flag by %r"
-msgstr "被 %r 標識"
-
-#: contrib/comments/models.py:278
-msgid "deletion date"
-msgstr "刪除日期"
-
-#: contrib/comments/models.py:280
-msgid "moderator deletion"
-msgstr "仲裁刪除"
-
-#: contrib/comments/models.py:281
-msgid "moderator deletions"
-msgstr "仲裁刪除"
-
-#: contrib/comments/models.py:285
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "由 %r 仲裁刪除"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:17
-msgid "Username:"
-msgstr ""
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/auth/user/change_password.html:9
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-msgid "Log out"
-msgstr "登出"
-
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:20
-msgid "Password:"
-msgstr "密碼"
-
-#: contrib/comments/templates/comments/form.html:8
-msgid "Forgotten your password?"
-msgstr "忘記密碼"
-
-#: contrib/comments/templates/comments/form.html:12
-msgid "Ratings"
-msgstr "等級"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr "必須的"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr "可選的"
-
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr "上傳一張照片"
-
-#: contrib/comments/templates/comments/form.html:28
-#: contrib/comments/templates/comments/freeform.html:5
-msgid "Comment:"
-msgstr "評論:"
-
-#: contrib/comments/templates/comments/form.html:35
-#: contrib/comments/templates/comments/freeform.html:10
-msgid "Preview comment"
-msgstr "評論預覽"
-
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "你的名字:"
-
-#: contrib/comments/views/karma.py:19
-msgid "Anonymous users cannot vote"
-msgstr "匿名使用者不可投票"
-
-#: contrib/comments/views/karma.py:23
-msgid "Invalid comment ID"
-msgstr "無效的評論 ID"
-
-#: contrib/comments/views/karma.py:25
-msgid "No voting for yourself"
-msgstr "不能投票給你自己"
-
-#: contrib/comments/views/comments.py:27
-msgid ""
-"This rating is required because you've entered at least one other rating."
-msgstr "此等級被要求是因為你至少輸入了一個其它的等級。"
-
-#: contrib/comments/views/comments.py:112
-#, python-format
-msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-"此評論由一個發表數少於 %(count)s 則評論的使用者張貼:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:116
-#, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"此評論由一個膚淺的使用者張貼：\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:188
-#: contrib/comments/views/comments.py:280
-msgid "Only POSTs are allowed"
-msgstr "只允許張貼"
-
-#: contrib/comments/views/comments.py:192
-#: contrib/comments/views/comments.py:284
-msgid "One or more of the required fields wasn't submitted"
-msgstr "一個或多個所需的欄位沒有送出"
-
-#: contrib/comments/views/comments.py:196
-#: contrib/comments/views/comments.py:286
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr "有人篡改了評論表單 (違反保全)"
-
-#: contrib/comments/views/comments.py:206
-#: contrib/comments/views/comments.py:292
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr "此評論表單有一個無效的 'target' 參數 -- 物件 ID 是無效的"
-
-#: contrib/comments/views/comments.py:257
-#: contrib/comments/views/comments.py:321
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "評論表格無法提供 '預覽' 或 '張貼' 功能"
-
-#: contrib/sites/models.py:10
+#: contrib/sessions/models.py:45
+msgid "session key"
+msgstr "session 鍵值"
+
+#: contrib/sessions/models.py:47
+msgid "session data"
+msgstr "session 資料"
+
+#: contrib/sessions/models.py:48
+msgid "expire date"
+msgstr "到期日期"
+
+#: contrib/sessions/models.py:53
+msgid "session"
+msgstr "session"
+
+#: contrib/sessions/models.py:54
+msgid "sessions"
+msgstr "sessions"
+
+#: contrib/sites/models.py:32
 msgid "domain name"
 msgstr "網域名稱"
 
-#: contrib/sites/models.py:11
+#: contrib/sites/models.py:33
 msgid "display name"
 msgstr "顯示名稱"
 
-#: contrib/sites/models.py:15
-msgid "site"
-msgstr "網站"
-
-#: contrib/sites/models.py:16
+#: contrib/sites/models.py:39
 msgid "sites"
 msgstr "網站"
 
-#: contrib/admin/filterspecs.py:40
+#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:683
+msgid "This value must be an integer."
+msgstr "這個值必須是整數。"
+
+#: db/models/fields/__init__.py:379
+msgid "This value must be either True or False."
+msgstr "這個值必須是 True 或 False。"
+
+#: db/models/fields/__init__.py:412
+msgid "This field cannot be null."
+msgstr "這個值不能是 null。"
+
+#: db/models/fields/__init__.py:428
+msgid "Enter only digits separated by commas."
+msgstr "輸入以逗號分隔的數字。"
+
+#: db/models/fields/__init__.py:459
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "輸入一個 YYYY-MM-DD 格式的有效日期。"
+
+#: db/models/fields/__init__.py:468
 #, python-format
+msgid "Invalid date: %s"
+msgstr "無效的日期: %s"
+
+#: db/models/fields/__init__.py:532 db/models/fields/__init__.py:550
+#, fuzzy
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr "輸入一個 YYYY-MM-DD HH:MM[:ss[.uuuuuu]] 格式的有效日期/時間。"
+
+#: db/models/fields/__init__.py:586
+#, fuzzy
+msgid "This value must be a decimal number."
+msgstr "這個值必須是小數。"
+
+#: db/models/fields/__init__.py:719
+msgid "This value must be either None, True or False."
+msgstr "這個值必須是 None, True 或 False。"
+
+#: db/models/fields/__init__.py:817 db/models/fields/__init__.py:831
+#, fuzzy
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "輸入 HH:MM[:ss[.uuuuuu]] 格式的有效時間格式。"
+
+#: db/models/fields/related.py:761
 msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>由 %s:</h3>\n"
-"<ul>\n"
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "按住 \"Control\", 或者在 Mac 上按 \"Command\", 以選取更多值"
 
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143 contrib/admin/filterspecs.py:169
-msgid "All"
-msgstr "全部"
-
-#: contrib/admin/filterspecs.py:109
-msgid "Any date"
-msgstr "任何日期"
-
-#: contrib/admin/filterspecs.py:110
-msgid "Today"
-msgstr "今天"
-
-#: contrib/admin/filterspecs.py:113
-msgid "Past 7 days"
-msgstr "過去 7 天"
-
-#: contrib/admin/filterspecs.py:115
-msgid "This month"
-msgstr "本月"
-
-#: contrib/admin/filterspecs.py:117
-msgid "This year"
-msgstr "今年"
-
-#: contrib/admin/models.py:16
-msgid "action time"
-msgstr "動作時間"
-
-#: contrib/admin/models.py:19
-msgid "object id"
-msgstr "物件 id"
-
-#: contrib/admin/models.py:20
-msgid "object repr"
-msgstr "物件 repr"
-
-#: contrib/admin/models.py:21
-msgid "action flag"
-msgstr "動作旗標"
-
-#: contrib/admin/models.py:22
-msgid "change message"
-msgstr "變更訊息"
-
-#: contrib/admin/models.py:25
-msgid "log entry"
-msgstr "紀錄項目"
-
-#: contrib/admin/models.py:26
-msgid "log entries"
-msgstr "紀錄項目"
-
-#: contrib/admin/templatetags/admin_list.py:247
-msgid "All dates"
-msgstr "所有日期"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/change_list.html:6
-#: contrib/admin/templates/admin/change_form.html:13
-#: contrib/admin/templates/admin/base.html:30
-#: contrib/admin/templates/admin/auth/user/change_password.html:12
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-msgid "Home"
-msgstr "首頁"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/auth/user/change_password.html:9
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-msgid "Documentation"
-msgstr "文件"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Bookmarklets"
-msgstr "書籤"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/auth/user/change_password.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:15
-#: contrib/admin/templates/admin/auth/user/change_password.html:46
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-msgid "Change password"
-msgstr "變更密碼"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:5
-msgid "Documentation bookmarklets"
-msgstr "文件 bookmarklets"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:9
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
-msgstr ""
-"\n"
-"<p class=\"help\">要安裝 bookmarklet，把連結拖進你的書籤工具列，或右擊該連結"
-"後新增到你的書籤裡。現在你可以從網站的任何頁面來選擇 bookmarklet。注意其中某"
-"些 bookmarklet 要求你必須是從被稱為 \"內部\" 的電腦來檢視網站的 (如果你不確定"
-"你的電腦是否在 \"內部\"，那就和你的系統管理員談談)。</p>\n"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
-msgid "Documentation for this page"
-msgstr "本頁面的文件"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:20
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr "讓你跳到用來產生該頁面之檢視的任何一頁文件。"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
-msgid "Show object ID"
-msgstr "顯示物件 ID"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:23
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr "顯示用來表示單一物件的頁面 content-type 與唯一 ID。"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
-msgid "Edit this object (current window)"
-msgstr "編輯此物件 (目前視窗)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:26
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "跳到用來表示單一物件的管理頁面。"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
-msgid "Edit this object (new window)"
-msgstr "編輯此物件 (新視窗)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:29
-msgid "As above, but opens the admin page in a new window."
-msgstr "如上，但在新視窗裡開啟管理頁面。"
-
-#: contrib/admin/templates/admin/submit_line.html:3
-#: contrib/admin/templates/admin/delete_confirmation.html:9
-msgid "Delete"
-msgstr "刪除"
-
-#: contrib/admin/templates/admin/submit_line.html:4
-msgid "Save as new"
-msgstr "儲存為新的"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save and add another"
-msgstr "儲存並新增另一個"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and continue editing"
-msgstr "儲存並繼續編輯"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr "儲存"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "伺服器錯誤"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "伺服器錯誤 (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "伺服器錯誤 <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr "存在一個錯誤。它已經透過電子郵件回報給網站管理員了，並且應該很快被改正。謝謝你的關心。"
-
-#: contrib/admin/templates/admin/filter.html:2
+#: db/models/fields/related.py:838
 #, python-format
-msgid " By %(filter_title)s "
-msgstr " 由 %(filter_title)s"
-
-#: contrib/admin/templates/admin/filters.html:4
-msgid "Filter"
-msgstr "過濾器"
-
-#: contrib/admin/templates/admin/invalid_setup.html:8
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr "你的資料庫安裝有錯誤。確定資料庫表格已經建立，並確定資料庫可被合適的使用者讀取。"
-
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "去"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "1 則结果"
-msgstr[1] "%(counter)s 則结果"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr "總共 %(full_result_count)s"
-
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:21
-
-msgid "History"
-msgstr "歷史"
-
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "日期/時間"
-
-
-#: contrib/admin/templates/admin/object_history.html:19
-msgid "User"
-msgstr "使用者"
-
-#: contrib/admin/templates/admin/object_history.html:20
-
-msgid "Action"
-msgstr "動作"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
-msgstr "N j, Y, P"
-
-
-#: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr "這個物件沒有變更的歷史。它可能不是透過這個管理網站新增的。"
-
-
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-
-"following types of objects:"
-msgstr ""
-"刪除 %(object_name)s '%(escaped_object)s' 會把相關的物件也刪除，不過你的帳號並沒有刪"
-"除以下型態物件的權限:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:21
-#, python-format
-msgid ""
-
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr ""
-"你確定想要刪除 %(object_name)s \"%(escaped_object)s\"？以下所有的相關項目都會被刪除:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:26
-msgid "Yes, I'm sure"
-msgstr "是的，我確定"
-
-#: contrib/admin/templates/admin/pagination.html:10
-msgid "Show all"
-msgstr "顯示全部"
-
-#: contrib/admin/templates/admin/change_list.html:12
-#, python-format
-msgid "Add %(name)s"
-msgstr "新增 %(name)s"
-
-#: contrib/admin/templates/admin/change_form.html:15
-#: contrib/admin/templates/admin/index.html:28
-msgid "Add"
-msgstr "新增"
-
-#: contrib/admin/templates/admin/change_form.html:22
-msgid "View on site"
-msgstr "在網站上檢視"
-
-#: contrib/admin/templates/admin/change_form.html:32
-#: contrib/admin/templates/admin/auth/user/change_password.html:24
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "请更正下面的錯誤。"
-
-#: contrib/admin/templates/admin/change_form.html:50
-msgid "Ordering"
-msgstr "排序中"
-
-#: contrib/admin/templates/admin/change_form.html:53
-msgid "Order:"
-msgstr "排序："
-
-#: contrib/admin/templates/admin/base.html:25
-msgid "Welcome,"
-msgstr "歡迎"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "頁面沒有找到"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "很抱歉，請求的頁面無法找到。"
-
-#: contrib/admin/templates/admin/login.html:25
-#: contrib/admin/views/decorators.py:24
-msgid "Log in"
-msgstr "登入"
-
-#: contrib/admin/templates/admin/index.html:17
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr "在 %(name)s 應用中模形可用。"
-
-#: contrib/admin/templates/admin/index.html:18
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
-
-#: contrib/admin/templates/admin/index.html:34
-msgid "Change"
-msgstr "變更"
-
-#: contrib/admin/templates/admin/index.html:44
-msgid "You don't have permission to edit anything."
-msgstr "你沒有編輯任何東西的權限。"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "Recent Actions"
-msgstr "最近的動作"
-
-#: contrib/admin/templates/admin/index.html:53
-msgid "My Actions"
-msgstr "我的動作"
-
-#: contrib/admin/templates/admin/index.html:57
-msgid "None available"
-msgstr "沒有可用的"
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django 網站管理"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Django 管理"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr "首先，輸入一個使用者名稱和密碼。然後你可以編輯更多使用者選項。"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:12
-msgid "Username"
-msgstr "使用者名稱"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:18
-#: contrib/admin/templates/admin/auth/user/change_password.html:34
-msgid "Password"
-msgstr "密碼"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:23
-#: contrib/admin/templates/admin/auth/user/change_password.html:39
-msgid "Password (again)"
-msgstr "密碼(重複)"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:24
-#: contrib/admin/templates/admin/auth/user/change_password.html:40
-msgid "Enter the same password as above, for verification."
-msgstr ""
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:28
-#, python-format
-msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr ""
-
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr "目前"
-
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "修改"
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "日期"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "時間"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "感謝你今天花了重要的時間留在本網站。"
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "再次登入"
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "因為你要求重設密碼，所以收到了這封電子郵件"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "你在 %(site_name)s 裡的使用者帳號"
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "你的新密碼是: %(new_password)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "放心地到此頁面變更密碼:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "你的使用者名稱，萬一你已經忘記的話:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-msgid "Thanks for using our site!"
-msgstr "感謝使用本網站！"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "%(site_name)s 團隊"
-
-
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-msgid "Password reset"
-msgstr "密碼重設"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "密碼成功地重設"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr "我們已經把新的密碼寄到你送出的電子郵件地址。你應該不久就能收到。"
-
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:4
-msgid "Password change"
-msgstr "密碼變更"
-
-#: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr "為了安全上的考慮，請輸入你的舊密碼，再輸入新密碼兩次，讓我們核驗你已正確地輸入。"
-
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "舊密碼"
-
-#: contrib/admin/templates/registration/password_change_form.html:19
-msgid "New password:"
-msgstr "新密碼"
-
-#: contrib/admin/templates/registration/password_change_form.html:21
-msgid "Confirm password:"
-msgstr "確認密碼"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
-msgid "Change my password"
-msgstr "變更我的密碼"
-
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "密碼成功地變更"
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "你的密碼已變更。"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr "忘記你的密碼了？在下面輸入你的電子郵件地址，我們就會重設你的密碼並把新的用電"
-"子郵件寄給你。"
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "電子郵件地址:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "重設我的密碼"
-
-#: contrib/admin/views/main.py:223
-msgid "Site administration"
-msgstr "網站管理"
-
-#: contrib/admin/views/main.py:257 contrib/admin/views/auth.py:19
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" 已成功變更。"
-
-#: contrib/admin/views/main.py:261 contrib/admin/views/main.py:347
-#: contrib/admin/views/auth.py:24
-msgid "You may edit it again below."
-msgstr "你可以在下面再編輯一次。"
-
-#: contrib/admin/views/main.py:271 contrib/admin/views/main.py:356
-#, python-format
-msgid "You may add another %s below."
-msgstr "你可以在下面新增另一個 %s。"
-
-#: contrib/admin/views/main.py:289
-#, python-format
-msgid "Add %s"
-msgstr "新增 %s"
-
-#: contrib/admin/views/main.py:335
-#, python-format
-msgid "Added %s."
-msgstr "%s 已新增。"
-
-#: contrib/admin/views/main.py:337
-#, python-format
-msgid "Changed %s."
-msgstr "%s 已變更。"
-
-#: contrib/admin/views/main.py:339
-#, python-format
-msgid "Deleted %s."
-msgstr "%s 已删除。"
-
-#: contrib/admin/views/main.py:342
-msgid "No fields changed."
-msgstr "沒有欄位被變更。"
-
-#: contrib/admin/views/main.py:345
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
-
-#: contrib/admin/views/main.py:353
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" 已成功變更。"
-
-#: contrib/admin/views/main.py:391
-#, python-format
-msgid "Change %s"
-msgstr "變更 %s"
-
-#: contrib/admin/views/main.py:476
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "在 %(name)s: 裡的一個或多個 %(fieldname)s %(obj)s"
-
-#: contrib/admin/views/main.py:481
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "在 %(name)s 裡的一個或多個 %(fieldname)s:"
-
-#: contrib/admin/views/main.py:514
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" 已成功刪除。"
-
-#: contrib/admin/views/main.py:517
-msgid "Are you sure?"
-msgstr "你確定？"
-
-#: contrib/admin/views/main.py:539
-#, python-format
-msgid "Change history: %s"
-msgstr "變更歷史: %s"
-
-#: contrib/admin/views/main.py:573
-#, python-format
-msgid "Select %s"
-msgstr "選擇 %s"
-
-#: contrib/admin/views/main.py:573
-#, python-format
-msgid "Select %s to change"
-msgstr "選擇 %s 來變更"
-
-#: contrib/admin/views/main.py:768
-msgid "Database error"
-msgstr "資料庫錯誤"
-
-#: contrib/admin/views/decorators.py:62
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr "請再登入一次，因為你的 session 已經到期。不必擔心: 你的提交已被儲存。"
-
-#: contrib/admin/views/decorators.py:69
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr "看起來你的瀏覽器沒有設定成允許 cookie。請啟用 cookie、重新載入此頁，然後再試一次"
-
-#: contrib/admin/views/decorators.py:83
-msgid "Usernames cannot contain the '@' character."
-msgstr "使用者名稱不能包含 '@' 字元。"
-
-#: contrib/admin/views/decorators.py:85
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "你的電子郵件地址不是你的使用者名稱。試著改用 '%s'。"
-
-#: contrib/admin/views/doc.py:46 contrib/admin/views/doc.py:48
-#: contrib/admin/views/doc.py:50
-msgid "tag:"
-msgstr "標籤："
-
-#: contrib/admin/views/doc.py:77 contrib/admin/views/doc.py:79
-#: contrib/admin/views/doc.py:81
-msgid "filter:"
-msgstr "過濾器："
-
-#: contrib/admin/views/doc.py:135 contrib/admin/views/doc.py:137
-#: contrib/admin/views/doc.py:139
-msgid "view:"
-msgstr "視圖："
-
-#: contrib/admin/views/doc.py:164
-#, python-format
-msgid "App %r not found"
-msgstr "應用程式 %r 没有找到"
-
-#: contrib/admin/views/doc.py:171
-#, python-format
-msgid "Model %(name)r not found in app %(label)r"
-msgstr "在應用程式 %(label)r 裡找不到模型 %(name)r"
-
-#: contrib/admin/views/doc.py:183
-#, python-format
-msgid "the related `%(label)s.%(type)s` object"
-msgstr "相關的 `%(label)s.%(type)s` 物件"
-
-#: contrib/admin/views/doc.py:183 contrib/admin/views/doc.py:205
-#: contrib/admin/views/doc.py:219 contrib/admin/views/doc.py:224
-msgid "model:"
-msgstr "模型："
-
-#: contrib/admin/views/doc.py:214
-#, python-format
-msgid "related `%(label)s.%(name)s` objects"
-msgstr "相關的 `%(label)s.%(name)s` 物件"
-
-#: contrib/admin/views/doc.py:219
-#, python-format
-msgid "all %s"
-msgstr "所有 %s"
-
-#: contrib/admin/views/doc.py:224
-#, python-format
-msgid "number of %s"
-msgstr "%s 的数量"
-
-#: contrib/admin/views/doc.py:229
-#, python-format
-msgid "Fields on %s objects"
-msgstr "%s 物件的欄位"
-
-#: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:301
-#: contrib/admin/views/doc.py:303 contrib/admin/views/doc.py:309
-#: contrib/admin/views/doc.py:310 contrib/admin/views/doc.py:312
-msgid "Integer"
-msgstr "整數"
-
-#: contrib/admin/views/doc.py:292
-msgid "Boolean (Either True or False)"
-msgstr "布林值 (True 或 False)"
-
-#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:311
-#, python-format
-msgid "String (up to %(maxlength)s)"
-msgstr "字串(最長 %(maxlength)s)"
-
-#: contrib/admin/views/doc.py:294
-msgid "Comma-separated integers"
-msgstr "逗號分隔的整數"
-
-#: contrib/admin/views/doc.py:295
-msgid "Date (without time)"
-msgstr "日期 (不包括時間)"
-
-#: contrib/admin/views/doc.py:296
-msgid "Date (with time)"
-msgstr "日期 (包括時間)"
-
-#: contrib/admin/views/doc.py:297
-msgid "E-mail address"
-msgstr "電子郵件地址"
-
-#: contrib/admin/views/doc.py:298 contrib/admin/views/doc.py:299
-#: contrib/admin/views/doc.py:302
-msgid "File path"
-msgstr "檔案路徑"
-
-#: contrib/admin/views/doc.py:300
-msgid "Decimal number"
-msgstr "小數"
-
-#: contrib/admin/views/doc.py:306
-msgid "Boolean (Either True, False or None)"
-msgstr "布林值 (True, False 或 None)"
-
-#: contrib/admin/views/doc.py:307
-msgid "Relation to parent model"
-msgstr "與父模型的關係"
-
-#: contrib/admin/views/doc.py:308
-msgid "Phone number"
-msgstr "電話號碼"
-
-#: contrib/admin/views/doc.py:313
-msgid "Text"
-msgstr "文字"
-
-#: contrib/admin/views/doc.py:314
-msgid "Time"
-msgstr "時間"
-
-#: contrib/admin/views/doc.py:316
-msgid "U.S. state (two uppercase letters)"
-msgstr "美國州名 (兩個大寫字母)"
-
-#: contrib/admin/views/doc.py:317
-msgid "XML text"
-msgstr "XML 文件"
-
-#: contrib/admin/views/doc.py:343
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s 似乎不是一個 urlpattern 物件"
-
-#: contrib/admin/views/auth.py:30
-msgid "Add user"
-msgstr "增加使用者"
-
-#: contrib/admin/views/auth.py:57
-msgid "Password changed successfully."
-msgstr ""
-
-#: contrib/admin/views/auth.py:64
-#, python-format
-msgid "Change password: %s"
-msgstr "密碼變更: %s"
-
-#: newforms/fields.py:103 newforms/fields.py:256
-#, python-format
-msgid "Ensure this value has at most %d characters."
-msgstr "確定你輸入的值最多有 %d 字。"
-
-#: newforms/fields.py:105 newforms/fields.py:258
-#, python-format
-msgid "Ensure this value has at least %d characters."
-msgstr "確定你輸入的值最少有 %d 字。"
-
-#: newforms/fields.py:128 core/validators.py:120
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural ""
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "請輸入有效的 %(self)s ID。輸入值 %(value)r 是錯誤的。"
+msgstr[1] ""
+
+#: forms/fields.py:54
+msgid "This field is required."
+msgstr "這個欄位是必須的。"
+
+#: forms/fields.py:55
+msgid "Enter a valid value."
+msgstr "輸入有效的值"
+
+#: forms/fields.py:138
+#, fuzzy, python-format
+msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
+msgstr "確定你輸入的值最多為 %(max)d 個字(其長度為 %(length)d)。"
+
+#: forms/fields.py:139
+#, fuzzy, python-format
+msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
+msgstr "確定你輸入的值最少為 %(min)d 個字(其長度為 %(length)d)。"
+
+#: forms/fields.py:166
 msgid "Enter a whole number."
 msgstr "輸入整數"
 
-#: newforms/fields.py:130
+#: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "這個值必须小於或等於 %s。"
 
-#: newforms/fields.py:132
+#: forms/fields.py:168 forms/fields.py:197 forms/fields.py:226
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "這個值必须大於或等於 %s。"
 
-#: newforms/fields.py:165
+#: forms/fields.py:195 forms/fields.py:224
+#, fuzzy
+msgid "Enter a number."
+msgstr "輸入一個數字"
+
+#: forms/fields.py:227
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr "確認數字全長不超過 %s 位。"
+
+#: forms/fields.py:228
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr "確認想小數不超過 %s 位。"
+
+#: forms/fields.py:229
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr "確認想小數點前不超過 %s 位。"
+
+#: forms/fields.py:287 forms/fields.py:848
 msgid "Enter a valid date."
 msgstr "輸入有效的日期"
 
-#: newforms/fields.py:192
+#: forms/fields.py:321 forms/fields.py:849
 msgid "Enter a valid time."
 msgstr "輸入有效的時間"
 
-#: newforms/fields.py:228
+#: forms/fields.py:360
 msgid "Enter a valid date/time."
 msgstr "輸入有效的日期/時間"
 
-#: newforms/fields.py:242
-msgid "Enter a valid value."
-msgstr "輸入有效的值"
+#: forms/fields.py:446
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "没有檔案被送出。請檢查表單的編碼類型。"
 
-#: newforms/fields.py:271 core/validators.py:162
-msgid "Enter a valid e-mail address."
-msgstr "輸入有效的電子郵件地址。"
+#: forms/fields.py:447
+msgid "No file was submitted."
+msgstr "沒有檔案送出"
 
-#: newforms/fields.py:289 newforms/fields.py:311
+#: forms/fields.py:448
+msgid "The submitted file is empty."
+msgstr "送出的檔案是空的。"
+
+#: forms/fields.py:477
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr "上傳一個有效的圖片。你上傳的檔案不是圖片，否則就是壞掉的圖。"
+
+#: forms/fields.py:538
 msgid "Enter a valid URL."
 msgstr "輸入有效的URL"
 
-#: newforms/fields.py:313
+#: forms/fields.py:539
 msgid "This URL appears to be a broken link."
-msgstr "URL似乎是是斷掉的連結。"
+msgstr "URL %s 似乎是是斷掉的連結。"
 
-#: newforms/fields.py:362 newforms/models.py:165
-msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "選擇有效的選項： 此選擇不在可用的选项中。"
+#: forms/fields.py:618 forms/fields.py:696
+#, fuzzy, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "選擇一個有效的選項： '%(value)s' 不在可用的選項中。"
 
-#: newforms/fields.py:380 newforms/fields.py:456 newforms/models.py:182
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:654
 msgid "Enter a list of values."
 msgstr "輸入一個列表的值"
 
-#: newforms/fields.py:389 newforms/models.py:188
+#: forms/fields.py:877
+#, fuzzy
+msgid "Enter a valid IPv4 address."
+msgstr "輸入有效的 IPv4 地址。"
+
+#: forms/fields.py:887
+#, fuzzy
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr "輸入一個有效的 'slug'，由字母、數字、底線與連字號組成。"
+
+#: forms/formsets.py:242 forms/formsets.py:244
+#, fuzzy
+msgid "Order"
+msgstr "排序"
+
+#: forms/models.py:268 forms/models.py:277
+#, fuzzy, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s 有 %(field_label)s 已經存在。"
+
+#: forms/models.py:584
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "選擇有效的選項： 此選擇不在可用的选项中。"
+
+#: forms/models.py:655
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "選擇一個有效的選項： '%s' 不在可用的選項中。"
 
-#: template/defaultfilters.py:491
+#: template/defaultfilters.py:706
 msgid "yes,no,maybe"
 msgstr "是、否、也許"
 
-#: views/generic/create_update.py:43
+#: template/defaultfilters.py:737
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] ""
+
+#: template/defaultfilters.py:739
+#, python-format
+msgid "%.1f KB"
+msgstr ""
+
+#: template/defaultfilters.py:741
+#, python-format
+msgid "%.1f MB"
+msgstr ""
+
+#: template/defaultfilters.py:742
+#, python-format
+msgid "%.1f GB"
+msgstr ""
+
+#: utils/dateformat.py:41
+msgid "p.m."
+msgstr ""
+
+#: utils/dateformat.py:42
+msgid "a.m."
+msgstr ""
+
+#: utils/dateformat.py:47
+msgid "PM"
+msgstr ""
+
+#: utils/dateformat.py:48
+msgid "AM"
+msgstr ""
+
+#: utils/dateformat.py:97
+msgid "midnight"
+msgstr "午夜"
+
+#: utils/dateformat.py:99
+msgid "noon"
+msgstr "中午"
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "星期一"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "星期二"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "星期三"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "星期四"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "星期五"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "星期六"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "星期日"
+
+#: utils/dates.py:10
+#, fuzzy
+msgid "Mon"
+msgstr "星期一"
+
+#: utils/dates.py:10
+#, fuzzy
+msgid "Tue"
+msgstr "星期二"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr "星期三"
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr "星期四"
+
+#: utils/dates.py:10
+#, fuzzy
+msgid "Fri"
+msgstr "星期五"
+
+#: utils/dates.py:11
+#, fuzzy
+msgid "Sat"
+msgstr "星期六"
+
+#: utils/dates.py:11
+#, fuzzy
+msgid "Sun"
+msgstr "星期日"
+
+#: utils/dates.py:18
+msgid "January"
+msgstr "一月"
+
+#: utils/dates.py:18
+msgid "February"
+msgstr "二月"
+
+#: utils/dates.py:18 utils/dates.py:31
+msgid "March"
+msgstr "三月"
+
+#: utils/dates.py:18 utils/dates.py:31
+msgid "April"
+msgstr "四月"
+
+#: utils/dates.py:18 utils/dates.py:31
+msgid "May"
+msgstr "五月"
+
+#: utils/dates.py:18 utils/dates.py:31
+msgid "June"
+msgstr "六月"
+
+#: utils/dates.py:19 utils/dates.py:31
+msgid "July"
+msgstr "七月"
+
+#: utils/dates.py:19
+msgid "August"
+msgstr "八月"
+
+#: utils/dates.py:19
+msgid "September"
+msgstr "九月"
+
+#: utils/dates.py:19
+msgid "October"
+msgstr "十月"
+
+#: utils/dates.py:19
+msgid "November"
+msgstr "十一月"
+
+#: utils/dates.py:20
+msgid "December"
+msgstr "十二月"
+
+#: utils/dates.py:23
+msgid "jan"
+msgstr "一月"
+
+#: utils/dates.py:23
+msgid "feb"
+msgstr "二月"
+
+#: utils/dates.py:23
+msgid "mar"
+msgstr "三月"
+
+#: utils/dates.py:23
+msgid "apr"
+msgstr "四月"
+
+#: utils/dates.py:23
+msgid "may"
+msgstr "五月"
+
+#: utils/dates.py:23
+msgid "jun"
+msgstr "六月"
+
+#: utils/dates.py:24
+msgid "jul"
+msgstr "七月"
+
+#: utils/dates.py:24
+msgid "aug"
+msgstr "八月"
+
+#: utils/dates.py:24
+msgid "sep"
+msgstr "九月"
+
+#: utils/dates.py:24
+msgid "oct"
+msgstr "十月"
+
+#: utils/dates.py:24
+msgid "nov"
+msgstr "十一月"
+
+#: utils/dates.py:24
+msgid "dec"
+msgstr "十二月"
+
+#: utils/dates.py:31
+msgid "Jan."
+msgstr "一月"
+
+#: utils/dates.py:31
+msgid "Feb."
+msgstr "二月"
+
+#: utils/dates.py:32
+msgid "Aug."
+msgstr "八月"
+
+#: utils/dates.py:32
+msgid "Sept."
+msgstr "九月"
+
+#: utils/dates.py:32
+msgid "Oct."
+msgstr "十月"
+
+#: utils/dates.py:32
+msgid "Nov."
+msgstr "十一月"
+
+#: utils/dates.py:32
+msgid "Dec."
+msgstr "十二月"
+
+#: utils/text.py:128
+#, fuzzy
+msgid "or"
+msgstr "或"
+
+#: utils/timesince.py:21
+msgid "year"
+msgid_plural "years"
+msgstr[0] "年"
+msgstr[1] "年"
+
+#: utils/timesince.py:22
+msgid "month"
+msgid_plural "months"
+msgstr[0] "月"
+msgstr[1] "月"
+
+#: utils/timesince.py:23
+msgid "week"
+msgid_plural "weeks"
+msgstr[0] "週"
+msgstr[1] "週"
+
+#: utils/timesince.py:24
+msgid "day"
+msgid_plural "days"
+msgstr[0] "天"
+msgstr[1] "天"
+
+#: utils/timesince.py:25
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] "小時"
+msgstr[1] "小時"
+
+#: utils/timesince.py:26
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "分鐘"
+msgstr[1] "分鐘"
+
+#: utils/timesince.py:43
+#, fuzzy
+msgid "minutes"
+msgstr "分鐘"
+
+#: utils/timesince.py:48
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr "%(number)d %(type)s"
+
+#: utils/timesince.py:54
+#, python-format
+msgid ", %(number)d %(type)s"
+msgstr ", %(number)d %(type)s"
+
+#: utils/translation/trans_real.py:403
+msgid "DATE_FORMAT"
+msgstr "Y-m-d"
+
+#: utils/translation/trans_real.py:405
+msgid "TIME_FORMAT"
+msgstr "H:i:s"
+
+#: utils/translation/trans_real.py:421
+msgid "YEAR_MONTH_FORMAT"
+msgstr "Y-m"
+
+#: utils/translation/trans_real.py:422
+msgid "MONTH_DAY_FORMAT"
+msgstr "m-d"
+
+#: views/generic/create_update.py:114
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "%(verbose_name)s 新增成功。"
 
-#: views/generic/create_update.py:117
+#: views/generic/create_update.py:156
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "%(verbose_name)s 變更成功。"
 
-#: views/generic/create_update.py:184
+#: views/generic/create_update.py:198
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s 已被删除。"
 
-#: core/validators.py:64
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "此值僅能包含字母、數字與底線。"
-
-#: core/validators.py:68
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr "此值僅能包含字母、數字、底線與斜線。"
-
-#: core/validators.py:72
-msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr "此值僅能包含字母、數字、底線與連字號"
-
-#: core/validators.py:76
-msgid "Uppercase letters are not allowed here."
-msgstr "此處不允許大寫字母。"
-
-#: core/validators.py:80
-msgid "Lowercase letters are not allowed here."
-msgstr "此處不允許小寫字母。"
-
-#: core/validators.py:87
-msgid "Enter only digits separated by commas."
-msgstr "輸入以逗號分隔的數字。"
-
-#: core/validators.py:99
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "輸入以逗號分隔的有效電子郵件地址。"
-
-#: core/validators.py:103
-msgid "Please enter a valid IP address."
-msgstr "請輸入有效的 IP 位址。"
-
-#: core/validators.py:107
-msgid "Empty values are not allowed here."
-msgstr "此處不允許空值。"
-
-#: core/validators.py:111
-msgid "Non-numeric characters aren't allowed here."
-msgstr "此處不允許非數字字元。"
-
-#: core/validators.py:115
-msgid "This value can't be comprised solely of digits."
-msgstr "此值不能只以數字組成。"
-
-#: core/validators.py:124
-msgid "Only alphabetical characters are allowed here."
-msgstr "此處只允許字母。"
-
-#: core/validators.py:139
-msgid "Year must be 1900 or later."
-msgstr "年份必須是1900或之後"
-
-#: core/validators.py:143
-#, python-format
-msgid "Invalid date: %s"
-msgstr ""
-
-#: core/validators.py:153
-msgid "Enter a valid time in HH:MM format."
-
-msgstr "輸入 HH:MM 有效的時間格式。"
-
-#: core/validators.py:178
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
-msgstr "上傳一個有效的影像。你上傳的檔案不是影像，否則就是壞掉的圖。"
-
-#: core/validators.py:185
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "URL %s 不是指向一個有效的圖片。"
-
-#: core/validators.py:189
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr "電話號碼必須是 XXX-XXX-XXXX 格式。\"%s\" 無效。"
-
-#: core/validators.py:197
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-
-msgstr "URL %s 未指向有效的 QuickTime 視像。"
-
-#: core/validators.py:201
-msgid "A valid URL is required."
-msgstr "必須是有效的 URL。"
-
-
-#: core/validators.py:215
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-"必須是有效的 HTML。具體的錯誤是:\n"
-"%s"
-
-#: core/validators.py:222
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr "排列錯誤的 XML: %s"
-
-#: core/validators.py:239
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "無效的 URL: %s"
-
-#: core/validators.py:244 core/validators.py:246
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "URL %s 是斷掉的連結。"
-
-#: core/validators.py:252
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "輸入有效的 U.S. 州名簡稱。"
-
-#: core/validators.py:266
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "看住你的嘴！此處不允許 %s 這樣的字眼。"
-msgstr[1] ""
-
-#: core/validators.py:273
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "此欄位必須符合 '%s' 欄位。"
-
-#: core/validators.py:292
-msgid "Please enter something for at least one field."
-msgstr "請在至少一個欄位裡進行輸入。"
-
-#: core/validators.py:301 core/validators.py:312
-msgid "Please enter both fields or leave them both empty."
-msgstr "請輸入兩個欄位或全部留空。"
-
-#: core/validators.py:320
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "如果 %(field)s 是 %(value)s 則此欄位必須給定。"
-
-#: core/validators.py:333
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "如果 %(field)s 不是 %(value)s 則此欄位必須給定。"
-
-#: core/validators.py:352
-msgid "Duplicate values are not allowed."
-msgstr "不允許重複值。"
-
-#: core/validators.py:367
-#, python-format
-msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "這個值必須介於 %(lower)s 和 %(upper)s 之間。"
-
-#: core/validators.py:369
-#, python-format
-msgid "This value must be at least %s."
-msgstr "這個值需要至少為 %s 。"
-
-#: core/validators.py:371
-#, python-format
-
-msgid "This value must be no more than %s."
-msgstr "這個值不能大於 %s 。"
-
-#: core/validators.py:407
-#, python-format
-msgid "This value must be a power of %s."
-msgstr "此值必須是 %s 的乘方。"
-
-#: core/validators.py:418
-msgid "Please enter a valid decimal number."
-msgstr "請輸入有效的小數。"
-
-#: core/validators.py:422
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "請輸入最長 %s 位的有效小數。"
-msgstr[1] "請輸入最長 %s 位的有效小數。"
-
-#: core/validators.py:425
-#, python-format
-msgid ""
-"Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural ""
-"Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] "請輸入最長 %s 位的有效小數。"
-msgstr[1] "請輸入最長 %s 位的有效小數。"
-
-
-#: core/validators.py:428
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "請輸入小數最長 %s 位的有效小數。"
-msgstr[1] "請輸入小數最長 %s 位的有效小數。"
-
-#: core/validators.py:438
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "確定你上傳的檔案至少有 %s 位元組。"
-
-#: core/validators.py:439
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "確定你上傳的檔案最多是 %s 位元組。"
-
-#: core/validators.py:456
-msgid "The format for this field is wrong."
-msgstr "此欄位的格式錯誤。"
-
-#: core/validators.py:471
-msgid "This field is invalid."
-msgstr "此欄位錯誤"
-
-#: core/validators.py:507
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "無法從 %s 取得任何東西。"
-
-#: core/validators.py:510
-#, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr "URL %(url)s 傳回了無效的 Content-Type 標頭 '%(contenttype)s'。"
-
-#: core/validators.py:543
-#, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-"請將第 %(line)s 行開始未封閉的 %(tag)s 標籤封閉起來 (行開始於 \"%(start)s"
-"\")。"
-
-#: core/validators.py:547
-#, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr "該內容不允許某些從第 %(line)s 開始的文字 (行開始於 \"%(start)s\")。"
-
-#: core/validators.py:552
-#, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"第 \"%(line)s\" 的 \"%(attr)s\" 是無效的屬性 (行開始於 \"%(start)s\")。"
-
-#: core/validators.py:557
-#, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr "第 %(line)s 行的 \"<%(tag)s>\" 是無效的標籤 (行開始於 \"%(start)s\")。"
-
-#: core/validators.py:561
-#, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"第 %(line)s 有一個標籤缺少了一個或更多必需的屬性 (行開始於 \"%(start)s\")。"
-
-#: core/validators.py:566
-#, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr "第 \"%(line)s\" 的 \"%(attr)s\" 屬性是無效的值 (行開始於 \"%(start)s\")。"
