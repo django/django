@@ -121,10 +121,18 @@ Joseph Kocherhans
 
 .. _luke plant: http://lukeplant.me.uk/
 
-Brian Rosner
+`Brian Rosner`_
+    Brian is currently a web developer working on an e-commerce system in
+    Django. He spends his free time contributing to Django and enjoys to learn
+    more about programming languages and system architectures. Brian is the
+    co-host of the weekly podcast, `This Week in Django`_.
+    
     Brian helped immensely in getting Django's "newforms-admin" branch finished
     in time for Django 1.0; he's now a full committer, continuing to improve on
     the admin and forms system.
+
+.. _brian rosner: http://oebfare.com/
+.. _this week in django: http://thisweekindjango.com/
 
 Gary Wilson
     In early 2007, Gary start contributing a lot of cleanup fixes and fixing
