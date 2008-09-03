@@ -34,30 +34,38 @@ See the :ref:`API stability guide <misc-api-stability>` for full details.
 Backwards-incompatible changes
 ==============================
 
-Django 1.0 has a number of backwards-incompatible changes from Django 0.96. If you have apps written against Django 0.96 that you need to port, see our detailed porting guide:
+Django 1.0 has a number of backwards-incompatible changes from Django 0.96. If
+you have apps written against Django 0.96 that you need to port, see our
+detailed porting guide:
 
 .. toctree::
    :maxdepth: 1
 
    1.0-porting-guide
    
-A complete list of backwards-incompatible changes can be found at http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges.
+A complete list of backwards-incompatible changes can be found at
+http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges.
 
 What's new in Django 1.0
 ========================
 
 A *lot*!
 
-Since Django 0.96, we've made over 4,000 code commits, fixed more than 2,000 bugs, and edited, added, or removed around 350,000 lines of code. We've also added 40,000 lines of new documentation, and greatly improved what was already there.
+Since Django 0.96, we've made over 4,000 code commits, fixed more than 2,000
+bugs, and edited, added, or removed around 350,000 lines of code. We've also
+added 40,000 lines of new documentation, and greatly improved what was already
+there.
 
-In fact, new documentation is one of our favorite features of Django 1.0, so we might as well start there. First, there's a new documentation site:
+In fact, new documentation is one of our favorite features of Django 1.0, so we
+might as well start there. First, there's a new documentation site:
 
     http://docs.djangoproject.com/
     
 The documentation has been greatly improved, cleaned up, and generally made
 awesome. There's now dedicated search, indexes, and more. 
 
-We can't possibly document everything that's new in 1.0, but the documentation will be your definitive guide. Anywhere you see something like:
+We can't possibly document everything that's new in 1.0, but the documentation
+will be your definitive guide. Anywhere you see something like:
 
 .. versionadded:: 1.0
    This feature is new in Django 1.0
@@ -167,7 +175,7 @@ SQL level is suitable for the majority of cases, there are occasional situations
 where forcing one or the other is useful. As a result, models can now support an
 additional parameter to ``save()`` which can force a specific operation.
 
-See XXX for details.
+See :ref:`ref-models-force-insert` for details.
 
 Split ``CacheMiddleware``
 -------------------------
@@ -190,7 +198,7 @@ major rewrite and refactoring of Django's bundled comment system, greatly
 increasing its flexibility and customizability. :ref:`Full documentation
 <ref-contrib-comments-index>` is available, as well as :ref:`an upgrade guide
 <ref-contrib-comments-upgrade>` if you were using the previous incarnation of
-the comments application..
+the comments application.
 
 Removal of deprecated features
 ------------------------------
@@ -203,8 +211,6 @@ present in Django. These include imports of the form library from
 replaced by ``ModelForm``) and a number of deprecated features which were
 replaced by the dispatcher, file-uploading and file-storage refactorings
 introduced in the Django 1.0 alpha releases.
-
-XXX more features?
 
 Thanks
 ======

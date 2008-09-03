@@ -339,6 +339,13 @@ Old (0.96)                                         New (1.0)
 ``dispatcher.connect(callback, sig, sender=Any)``  ``sig.connect(callback, sender=None)``
 =================================================  ======================================
 
+Comments
+--------
+
+If you were using Django 0.96's ``django.contrib.comments`` app, you'll need to
+upgrade to the new comments app introduced in 1.0. See
+:ref:`ref-contrib-comments-upgrade` for details.
+
 Template tags
 -------------
 
