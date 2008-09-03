@@ -20,3 +20,4 @@ the hood".
    
    contributing
    documentation
+   committers

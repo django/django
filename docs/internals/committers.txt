@@ -1,0 +1,189 @@
+.. _internals-committers:
+
+Django committers
+=================
+
+The original team
+=================
+
+Django originally started at World Online, the Web department of the `Lawrence
+Journal-World`_ of Lawrence, Kansas, USA.
+
+`Adrian Holovaty`_
+    Adrian is a Web developer with a background in journalism. He's known in
+    journalism circles as one of the pioneers of "journalism via computer
+    programming", and in technical circles as "the guy who invented Django."
+    
+    He was lead developer at World Online for 2.5 years, during which time
+    Django was developed and implemented on World Online's sites. He's now the
+    leader and founder of EveryBlock_, a "news feed for your block".
+    
+    Adrian lives in Chicago, USA.
+
+`Simon Willison`_
+    Simon is a well-respected web developer from England. He had a one-year
+    internship at World Online, during which time he and Adrian developed Django
+    from scratch. The most enthusiastic Brit you'll ever meet, he's passionate
+    about best practices in web development has maintains a well-read
+    `web-development blog`_. He works for `The Guardian`_.
+    
+    Simon lives in Brighton, England.
+
+`Jacob Kaplan-Moss`_
+    Jacob is a software architect at `Whiskey Media`_, one of those newfangled
+    Web 1.0 companies you've read so much about. A good deal of Jacob's work
+    time is devoted to working on Django. Jacob previous worked for the Lawrence
+    Journal-World, where he was the lead developer of Ellington, a commercial
+    web publishing platform for media companies.
+    
+    Jacob lives in Lawrence, Kansas, USA.
+    
+`Wilson Miner`_
+    Wilson's design-fu is what makes Django look so nice. He designed the
+    website you're looking at right now, as well as Django's acclaimed admin
+    interface. Wilson is the designer for EveryBlock_.
+    
+    Wilson lives in San Francisco, USA.
+
+.. _lawrence journal-world: http://ljworld.com/
+.. _adrian holovaty: http://holovaty.com/
+.. _everyblock: http://everyblock.com/
+.. _simon willison: http://simonwillison.net/
+.. _web-development blog: `simon willison`_
+.. _the guardian: http://www.guardian.co.uk/
+.. _jacob kaplan-moss: http://jacobian.org/
+.. _whiskey media: http://whiskeymedia.com/
+.. _wilson miner: http://wilsonminer.com/
+
+Current developers
+==================
+
+Currently, Django is led by a team of volunteers from around the globe.
+
+BDFLs
+-----
+
+Adrian and Jacob are the Co-`Benevolent Dictators for Life`_ of Django. When
+"rough consensus and working code" fails, they're the ones who make the tough
+decisions.
+
+.. _Benevolent Dictators for Life: http://en.wikipedia.org/wiki/Benevolent_Dictator_For_Life
+
+Core developers
+---------------
+
+These are the folks who have a long history of contributions, a solid track
+record of being helpful on the mailing lists, and a proven desire to dedicate
+serious time to Django. In return, they've been granted the coveted commit bit,
+and have free reign to hack on all parts of Django.
+
+`Malcolm Tredinnick`_
+    Malcolm originally wanted to be a mathematician, somehow ended up a software
+    developer. He's contributed to many Open Source projects, has served on the
+    board of the GNOME foundation, and will kick your ass at chess.
+        
+    When he's not busy being an International Man of Mystery, Malcolm lives in
+    Sydney, Australia.
+
+.. _malcolm tredinnick: http://www.pointy-stick.com/
+
+Russell Keith-Magee
+    Russell studied physics as an undergraduate, and studied neural networks for
+    my PhD. His first job was with a startup in the defense industry developing
+    simulation frameworks. Over time, mostly through work with Django, he's
+    become more involved in web development.
+
+    Russell has helped with several major aspects of Django, including a a
+    couple major internal refactorings, creation of the test system, and more.
+    
+    Russell lives in the most isolated capital city in the world — Perth,
+    Australia.
+    
+Joseph Kocherhans
+    Joseph is currently a developer at EveryBlock_, and previously worked for
+    the Lawrence Journal-World where he built most of the backend for the their
+    Marketplace site. He often disappears for several days into the woods,
+    attempts to teach himself computational linguistics, and annoys his
+    neighbors with his Charango_ playing.
+    
+    Joseph's first contribution to Django was a series of improvements to the
+    authorization system leading up to support for pluggable authorization.
+    Since then, he's worked on the new forms system, its use in the admin, and
+    many other smaller improvements.
+    
+    Joseph lives in Chicago, USA.
+
+.. _charango: http://en.wikipedia.org/wiki/Charango
+
+`Luke Plant`_
+    Like has contributed many excellent improvements, including database-level
+    improvements, the CSRF middleware and many unit tests.
+
+.. _luke plant: http://lukeplant.me.uk/
+
+Brian Rosner
+    Brian helped immensely in getting Django's "newforms-admin" branch finished
+    in time for Django 1.0; he's now a full committer, continuing to improve on
+    the admin and forms system.
+
+Gary Wilson
+    In early 2007, Gary start contributing a lot of cleanup fixes and fixing
+    broken windows. He's continued to do that necessary tidying up work
+    throughout the code base since then.
+    
+Specialists
+-----------
+
+`James Bennett`_
+    James is Django's release manager; he also contributes to the documentation.
+    
+    James came to web development from philosophy when he discovered that
+    programmers get to argue just as much while collecting much better pay. He
+    where he works for the Journal-World developing Ellington. He `keeps a
+    blog`_, has written a `book on Django`_, and enjoys fine port and talking to
+    his car.
+
+    James lives in Lawrence, Kansas, USA.
+
+.. _james bennett: http://b-list.org/
+.. _keeps a blog: `james bennett`_
+.. _book on Django: http://www.amazon.com/dp/1590599969/?tag=djangoproject-20
+
+Ian Kelly
+    Ian is responsible for Django's support for Oracle.
+    
+Matt Boersma
+    Matt is also responsible for Django's Oracle support.
+    
+Justin Bronn
+    Justin Bronn is a computer scientist and third-year law student at the
+    University of Houston who enjoys studying legal topics related to
+    intellectual property and spatial law.
+    
+    Justin is the primary developer of ``django.contrib.gis``, a.k.a.
+    GeoDjango_.
+    
+.. _GeoDjango: http://geodjango.org/
+
+Jeremy Dunck
+    Jeremy the lead developer of Pegasus News, a personalized local site based
+    in Dallas, Texas. An early contributor to Greasemonkey and Django, he sees
+    technology as a tool for communication and access to knowledge.
+    
+    Jeremy helped kick off GeoDjango development, and is mostly responsible for
+    the serious speed improvements that signals received in Django 1.0.
+    
+    Jeremy lives in Dallas, Texas, USA.
+    
+Developers Emeritus
+===================
+
+Georg "Hugo" Bauer
+    Georg created Django's internationalization system, managed i18n
+    contributions and made a ton of excellent tweaks, feature additions and bug
+    fixes.
+    
+Robert Wittams
+     Robert was responsible for the *first* refactoring of Django's admin
+     siteadmin application to allow for easier reuse and has made a ton of
+     excellent tweaks, feature additions and bug fixes.
