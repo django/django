@@ -271,9 +271,7 @@ def create_generic_related_manager(superclass):
         def create(self, **kwargs):
             kwargs[self.content_type_field_name] = self.content_type
             kwargs[self.object_id_field_name] = self.pk_val
-            obj = self.model(**kwargs)
-            obj.save()
-            return obj
+            return super(GenericRelatedObjectManager, self).create(**kwargs)
         create.alters_data = True
 
     return GenericRelatedObjectManager

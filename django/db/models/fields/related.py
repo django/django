@@ -306,9 +306,8 @@ class ForeignRelatedObjectsDescriptor(object):
             add.alters_data = True
 
             def create(self, **kwargs):
-                new_obj = self.model(**kwargs)
-                self.add(new_obj)
-                return new_obj
+                kwargs.update({rel_field.name: instance})
+                return super(RelatedManager, self).create(**kwargs)
             create.alters_data = True
 
             def get_or_create(self, **kwargs):
@@ -410,8 +409,7 @@ def create_many_related_manager(superclass, through=False):
             # from the method lookup table, as we do with add and remove.
             if through is not None:
                 raise AttributeError, "Cannot use create() on a ManyToManyField which specifies an intermediary model. Use %s's Manager instead." % through
-            new_obj = self.model(**kwargs)
-            new_obj.save()
+            new_obj = super(ManyRelatedManager, self).create(**kwargs)
             self.add(new_obj)
             return new_obj
         create.alters_data = True

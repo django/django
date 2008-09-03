@@ -16,6 +16,10 @@ class Person(models.Model):
     def __unicode__(self):
         return u'%s %s' % (self.first_name, self.last_name)
 
+class ManualPrimaryKeyTest(models.Model):
+    id = models.IntegerField(primary_key=True)
+    data = models.CharField(max_length=100)
+
 __test__ = {'API_TESTS':"""
 # Acting as a divine being, create an Person.
 >>> from datetime import date
@@ -61,4 +65,19 @@ False
 ...     else:
 ...         print "Fail with %s" % type(e)
 Pass
+
+# If you specify an existing primary key, but different other fields, then you
+# will get an error and data will not be updated.
+>>> m = ManualPrimaryKeyTest(id=1, data='Original')
+>>> m.save()
+>>> try:
+...    m, created = ManualPrimaryKeyTest.objects.get_or_create(id=1, data='Different')
+... except Exception, e:
+...    if isinstance(e, IntegrityError):
+...        print "Pass"
+...    else:
+...        print "Fail with %s" % type(e)
+Pass
+>>> ManualPrimaryKeyTest.objects.get(id=1).data == 'Original'
+True
 """}

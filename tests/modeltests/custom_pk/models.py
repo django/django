@@ -6,11 +6,11 @@ By default, Django adds an ``"id"`` field to each model. But you can override
 this behavior by explicitly adding ``primary_key=True`` to a field.
 """
 
-from django.db import models
+from django.conf import settings
+from django.db import models, transaction, IntegrityError
 
 class Employee(models.Model):
-    employee_code = models.CharField(max_length=10, primary_key=True,
-            db_column = 'code')
+    employee_code = models.IntegerField(primary_key=True, db_column = 'code')
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
     class Meta:
@@ -29,50 +29,50 @@ class Business(models.Model):
         return self.name
 
 __test__ = {'API_TESTS':"""
->>> dan = Employee(employee_code='ABC123', first_name='Dan', last_name='Jones')
+>>> dan = Employee(employee_code=123, first_name='Dan', last_name='Jones')
 >>> dan.save()
 >>> Employee.objects.all()
 [<Employee: Dan Jones>]
 
->>> fran = Employee(employee_code='XYZ456', first_name='Fran', last_name='Bones')
+>>> fran = Employee(employee_code=456, first_name='Fran', last_name='Bones')
 >>> fran.save()
 >>> Employee.objects.all()
 [<Employee: Fran Bones>, <Employee: Dan Jones>]
 
->>> Employee.objects.get(pk='ABC123')
+>>> Employee.objects.get(pk=123)
 <Employee: Dan Jones>
->>> Employee.objects.get(pk='XYZ456')
+>>> Employee.objects.get(pk=456)
 <Employee: Fran Bones>
->>> Employee.objects.get(pk='foo')
+>>> Employee.objects.get(pk=42)
 Traceback (most recent call last):
     ...
 DoesNotExist: Employee matching query does not exist.
 
 # Use the name of the primary key, rather than pk.
->>> Employee.objects.get(employee_code__exact='ABC123')
+>>> Employee.objects.get(employee_code__exact=123)
 <Employee: Dan Jones>
 
 # pk can be used as a substitute for the primary key.
->>> Employee.objects.filter(pk__in=['ABC123','XYZ456'])
+>>> Employee.objects.filter(pk__in=[123, 456])
 [<Employee: Fran Bones>, <Employee: Dan Jones>]
 
 # The primary key can be accessed via the pk property on the model.
->>> e = Employee.objects.get(pk='ABC123')
+>>> e = Employee.objects.get(pk=123)
 >>> e.pk
-u'ABC123'
+123
 
 # Or we can use the real attribute name for the primary key:
 >>> e.employee_code
-u'ABC123'
+123
 
 # Fran got married and changed her last name.
->>> fran = Employee.objects.get(pk='XYZ456')
+>>> fran = Employee.objects.get(pk=456)
 >>> fran.last_name = 'Jones'
 >>> fran.save()
 >>> Employee.objects.filter(last_name__exact='Jones')
 [<Employee: Dan Jones>, <Employee: Fran Jones>]
->>> emps = Employee.objects.in_bulk(['ABC123', 'XYZ456'])
->>> emps['ABC123']
+>>> emps = Employee.objects.in_bulk([123, 456])
+>>> emps[123]
 <Employee: Dan Jones>
 
 >>> b = Business(name='Sears')
@@ -96,15 +96,52 @@ u'ABC123'
 >>> Employee.objects.filter(business__pk='Sears')
 [<Employee: Dan Jones>, <Employee: Fran Jones>]
 
->>> Business.objects.filter(employees__employee_code__exact='ABC123')
+>>> Business.objects.filter(employees__employee_code__exact=123)
 [<Business: Sears>]
->>> Business.objects.filter(employees__pk='ABC123')
+>>> Business.objects.filter(employees__pk=123)
 [<Business: Sears>]
 >>> Business.objects.filter(employees__first_name__startswith='Fran')
 [<Business: Sears>]
 
 # Primary key may be unicode string
->>> emp = Employee(employee_code='jaźń')
->>> emp.save()
+>>> bus = Business(name=u'jaźń')
+>>> bus.save()
+
+# The primary key must also obviously be unique, so trying to create a new
+# object with the same primary key will fail.
+>>> try:
+...    sid = transaction.savepoint()
+...    Employee.objects.create(employee_code=123, first_name='Fred', last_name='Jones')
+...    transaction.savepoint_commit(sid)
+... except Exception, e:
+...    if isinstance(e, IntegrityError):
+...        transaction.savepoint_rollback(sid)
+...        print "Pass"
+...    else:
+...        print "Fail with %s" % type(e)
+Pass
 
 """}
+
+# SQLite lets objects be saved with an empty primary key, even though an
+# integer is expected. So we can't check for an error being raised in that case
+# for SQLite. Remove it from the suite for this next bit.
+if settings.DATABASE_ENGINE != 'sqlite3':
+    __test__["API_TESTS"] += """
+# The primary key must be specified, so an error is raised if you try to create
+# an object without it.
+>>> try:
+...     sid = transaction.savepoint()
+...     Employee.objects.create(first_name='Tom', last_name='Smith')
+...     print 'hello'
+...     transaction.savepoint_commit(sid)
+...     print 'hello2'
+... except Exception, e:
+...     if isinstance(e, IntegrityError):
+...         transaction.savepoint_rollback(sid)
+...         print "Pass"
+...     else:
+...         print "Fail with %s" % type(e)
+Pass
+
+"""
