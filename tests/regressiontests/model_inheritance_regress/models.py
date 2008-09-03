@@ -77,6 +77,16 @@ class M2MBase(models.Model):
 class M2MChild(M2MBase):
     name = models.CharField(max_length=50)
 
+class Evaluation(Article):
+    quality = models.IntegerField()
+
+    class Meta:
+        abstract = True
+
+class QualityControl(Evaluation):
+    assignee = models.CharField(max_length=50)
+
+
 __test__ = {'API_TESTS':"""
 # Regression for #7350, #7202
 # Check that when you create a Parent object with a specific reference to an
@@ -241,5 +251,10 @@ DoesNotExist: ArticleWithAuthor matching query does not exist.
 # this case) appear on the child class.
 >>> M2MChild.objects.filter(articles__isnull=False)
 []
+
+# All fields from an ABC, including those inherited non-abstractly should be
+# available on child classes (#7588). Creating this instance should work
+# without error.
+>>> _ = QualityControl.objects.create(headline="Problems in Django", pub_date=datetime.datetime.now(), quality=10, assignee="adrian")
 
 """}

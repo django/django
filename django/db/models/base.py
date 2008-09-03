@@ -94,8 +94,8 @@ class ModelBase(type):
                          new_class._meta.virtual_fields
             field_names = set([f.name for f in new_fields])
 
-            # Concrete classes...
             if not base._meta.abstract:
+                # Concrete classes...
                 if base in o2o_map:
                     field = o2o_map[base]
                     field.primary_key = True
@@ -107,9 +107,11 @@ class ModelBase(type):
                     new_class.add_to_class(attr_name, field)
                 new_class._meta.parents[base] = field
 
-            # .. and abstract ones.
             else:
-                # Check for clashes between locally declared fields and those on the ABC.
+                # .. and abstract ones.
+
+                # Check for clashes between locally declared fields and those
+                # on the ABC.
                 parent_fields = base._meta.local_fields + base._meta.local_many_to_many
                 for field in parent_fields:
                     if field.name in field_names:
@@ -118,6 +120,9 @@ class ModelBase(type):
                                          'abstract base class %r' % \
                                             (field.name, name, base.__name__))
                     new_class.add_to_class(field.name, copy.deepcopy(field))
+
+                # Pass any non-abstract parent classes onto child.
+                new_class._meta.parents.update(base._meta.parents)
 
             # Inherit managers from the abstract base classes.
             base_managers = base._meta.abstract_managers
