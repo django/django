@@ -570,7 +570,13 @@ class ModelChoiceIterator(object):
 
     def choice(self, obj):
         if self.field.to_field_name:
-            key = getattr(obj, self.field.to_field_name)
+            # FIXME: The try..except shouldn't be necessary here. But this is
+            # going in just before 1.0, so I want to be careful. Will check it
+            # out later.
+            try:
+                key = getattr(obj, self.field.to_field_name).pk
+            except AttributeError:
+                key = getattr(obj, self.field.to_field_name)
         else:
             key = obj.pk
         return (key, self.field.label_from_instance(obj))
