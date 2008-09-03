@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-05-16 10:12+0200\n"
-"PO-Revision-Date: 2008-09-02 01:34+0200\n"
+"PO-Revision-Date: 2008-09-03 13:19+0200\n"
 "Last-Translator: Christian Mikalsen and Jon Lønne\n"
 "Language-Team: Norsk <no@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -284,94 +284,94 @@ msgstr "logginnlegg"
 msgid "log entries"
 msgstr "logginnlegg"
 
-#: contrib/admin/options.py:59 contrib/admin/options.py:120
+#: contrib/admin/options.py:60 contrib/admin/options.py:121
 msgid "None"
 msgstr "Ingen"
 
-#: contrib/admin/options.py:332
+#: contrib/admin/options.py:338
 #, python-format
 msgid "Changed %s."
 msgstr "Endret %s."
 
-#: contrib/admin/options.py:332 contrib/admin/options.py:342
-#: forms/models.py:265
+#: contrib/admin/options.py:338 contrib/admin/options.py:348
+#: forms/models.py:275
 msgid "and"
 msgstr "og"
 
-#: contrib/admin/options.py:337
+#: contrib/admin/options.py:343
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Opprettet %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:341
+#: contrib/admin/options.py:347
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Endret %(list)s for %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:346
+#: contrib/admin/options.py:352
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Slettet %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:350
+#: contrib/admin/options.py:356
 msgid "No fields changed."
 msgstr "Ingen felt endret."
 
-#: contrib/admin/options.py:411 contrib/auth/admin.py:51
+#: contrib/admin/options.py:417 contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" ble opprettet."
 
-#: contrib/admin/options.py:415 contrib/admin/options.py:448
+#: contrib/admin/options.py:421 contrib/admin/options.py:454
 #: contrib/auth/admin.py:59
 msgid "You may edit it again below."
 msgstr "Du kan redigere videre nedenfor."
 
-#: contrib/admin/options.py:425 contrib/admin/options.py:458
+#: contrib/admin/options.py:431 contrib/admin/options.py:464
 #, python-format
 msgid "You may add another %s below."
 msgstr "Du kan opprette ny %s nedenfor."
 
-#: contrib/admin/options.py:446
+#: contrib/admin/options.py:452
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ble endret."
 
-#: contrib/admin/options.py:454
+#: contrib/admin/options.py:460
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" ble endret. Du kan redigere videre nedenfor."
 
-#: contrib/admin/options.py:530
+#: contrib/admin/options.py:536
 #, python-format
 msgid "Add %s"
 msgstr "Opprett %s"
 
-#: contrib/admin/options.py:608
+#: contrib/admin/options.py:614
 #, python-format
 msgid "Change %s"
 msgstr "Rediger %s"
 
-#: contrib/admin/options.py:640
+#: contrib/admin/options.py:646
 msgid "Database error"
 msgstr "Databasefeil"
 
-#: contrib/admin/options.py:690
+#: contrib/admin/options.py:696
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ble slettet."
 
-#: contrib/admin/options.py:697
+#: contrib/admin/options.py:703
 msgid "Are you sure?"
 msgstr "Er du sikker?"
 
-#: contrib/admin/options.py:726
+#: contrib/admin/options.py:732
 #, python-format
 msgid "Change history: %s"
 msgstr "Endringshistorikk: %s"
 
-#: contrib/admin/sites.py:18 contrib/admin/views/decorators.py:16
+#: contrib/admin/sites.py:16 contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:80
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -380,15 +380,11 @@ msgstr ""
 "Vennligst angi korrekt brukernavn og passord. Merk at det er forskjell på "
 "små og store bokstaver."
 
-#: contrib/admin/sites.py:242 contrib/admin/views/decorators.py:68
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr ""
-"Du må logge inn igjen, fordi økten din har blitt tidsavbrutt. Slapp av, "
-"innlegget ditt ble lagret."
+#: contrib/admin/sites.py:227 contrib/admin/views/decorators.py:40
+msgid "Please log in again, because your session has expired."
+msgstr "Økten din har tidsavbrutt, vennligst logg inn igjen."
 
-#: contrib/admin/sites.py:249 contrib/admin/views/decorators.py:75
+#: contrib/admin/sites.py:234 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -396,27 +392,27 @@ msgstr ""
 "Det ser ut som om nettleseren din ikke støtter informasjonskapsler "
 "(cookies). Vennligst konfigurer nettleseren din og prøv igjen."
 
-#: contrib/admin/sites.py:265 contrib/admin/sites.py:271
-#: contrib/admin/views/decorators.py:94
+#: contrib/admin/sites.py:250 contrib/admin/sites.py:256
+#: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Brukernavnet kan ikke inneholde tegnet '@'."
 
-#: contrib/admin/sites.py:268 contrib/admin/views/decorators.py:90
+#: contrib/admin/sites.py:253 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "E-postadressen er ikke brukernavnet ditt, prøv '%s' isteden."
 
-#: contrib/admin/sites.py:336
+#: contrib/admin/sites.py:313
 msgid "Site administration"
 msgstr "Nettstedsadministrasjon"
 
-#: contrib/admin/sites.py:358 contrib/admin/templates/admin/login.html:27
+#: contrib/admin/sites.py:326 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
-#: contrib/admin/views/decorators.py:30
+#: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Logg inn"
 
-#: contrib/admin/sites.py:406
+#: contrib/admin/sites.py:373
 #, python-format
 msgid "%s administration"
 msgstr "%s-administrasjon"
@@ -447,11 +443,11 @@ msgstr "Nå:"
 msgid "Change:"
 msgstr "Endre:"
 
-#: contrib/admin/widgets.py:122
+#: contrib/admin/widgets.py:121
 msgid "Lookup"
 msgstr "Oppslag"
 
-#: contrib/admin/widgets.py:207
+#: contrib/admin/widgets.py:228
 msgid "Add Another"
 msgstr "Legg til ny"
 
@@ -1050,7 +1046,7 @@ msgstr "Tekst"
 msgid "Time"
 msgstr "Tid"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:21
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:22
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "Nettadresse"
@@ -1365,25 +1361,25 @@ msgstr "Innhold"
 msgid "Metadata"
 msgstr "Metadata"
 
-#: contrib/comments/forms.py:19
+#: contrib/comments/forms.py:20
 msgid "Name"
 msgstr "Navn"
 
-#: contrib/comments/forms.py:20
+#: contrib/comments/forms.py:21
 msgid "Email address"
 msgstr "E-postadresse"
 
-#: contrib/comments/forms.py:22
+#: contrib/comments/forms.py:23
 msgid "Comment"
 msgstr "Kommentar"
 
-#: contrib/comments/forms.py:25
+#: contrib/comments/forms.py:26
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
 "Hvis du oppgir noe i dette feltet, vil kommentaren bli behandlet som spam"
 
-#: contrib/comments/forms.py:125
+#: contrib/comments/forms.py:126
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -3590,13 +3586,13 @@ msgstr "Verdien må være None, True eller False."
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Oppgi tiden på formen TT:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:763
+#: db/models/fields/related.py:761
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Hold nede \"Control\", eller \"Command\" på en Mac, for å velge mer enn en."
 
-#: db/models/fields/related.py:840
+#: db/models/fields/related.py:838
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3700,7 +3696,7 @@ msgstr "Nettadressen fører til en side som ikke eksisterer."
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Velg et gyldig valg. %(value)s er ikke et av de tilgjengelige valgene."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:644
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:654
 msgid "Enter a list of values."
 msgstr "Oppgi en liste med verdier."
 
@@ -3719,16 +3715,16 @@ msgstr ""
 msgid "Order"
 msgstr "Rekkefølge"
 
-#: forms/models.py:258 forms/models.py:267
+#: forms/models.py:268 forms/models.py:277
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s med %(field_label)s finnes allerede."
 
-#: forms/models.py:574
+#: forms/models.py:584
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Velg et gyldig valg. Valget er ikke et av de tilgjengelige valgene."
 
-#: forms/models.py:645
+#: forms/models.py:655
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Velg et gyldig valg. %s er ikke et av de tilgjengelige valgene."
