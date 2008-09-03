@@ -192,6 +192,6 @@ Georg "Hugo" Bauer
     fixes.
     
 Robert Wittams
-     Robert was responsible for the *first* refactoring of Django's admin
-     application to allow for easier reuse and has made a ton of
-     excellent tweaks, feature additions and bug fixes.
+    Robert was responsible for the *first* refactoring of Django's admin
+    application to allow for easier reuse and has made a ton of
+    excellent tweaks, feature additions and bug fixes.
