@@ -89,11 +89,11 @@ and have free reign to hack on all parts of Django.
 
 Russell Keith-Magee
     Russell studied physics as an undergraduate, and studied neural networks for
-    my PhD. His first job was with a startup in the defense industry developing
+    his PhD. His first job was with a startup in the defense industry developing
     simulation frameworks. Over time, mostly through work with Django, he's
     become more involved in web development.
 
-    Russell has helped with several major aspects of Django, including a a
+    Russell has helped with several major aspects of Django, including a
     couple major internal refactorings, creation of the test system, and more.
     
     Russell lives in the most isolated capital city in the world — Perth,
