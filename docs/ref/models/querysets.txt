@@ -939,7 +939,14 @@ instead of providing a list of literal values. The queryset must be
 reduced to a list of individual values using the ``values()`` method,
 and then converted into a query using the ``query`` attribute::
 
-    Entry.objects.filter(blog__in=Blog.objects.filter(name__contains='Cheddar').values('pk').query)
+    q = Blog.objects.filter(name__contains='Cheddar').values('pk').query
+    e = Entry.objects.filter(blog__in=q)
+
+.. warning::
+
+    This ``query`` attribute should be considered an opaque internal attribute.
+    It's fine to use it like above, but its API may change between Django
+    versions.
 
 This queryset will be evaluated as subselect statement::
 
@@ -972,19 +979,6 @@ lte
 ~~~
 
 Less than or equal to.
-
-in
-~~
-
-In a given list.
-
-Example::
-
-    Entry.objects.filter(id__in=[1, 3, 4])
-
-SQL equivalent::
-
-    SELECT ... WHERE id IN (1, 3, 4);
 
 startswith
 ~~~~~~~~~~
