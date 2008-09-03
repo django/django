@@ -284,60 +284,60 @@ msgstr "entrada del registre"
 msgid "log entries"
 msgstr "entrades del registre"
 
-#: contrib/admin/options.py:59 contrib/admin/options.py:120
+#: contrib/admin/options.py:60 contrib/admin/options.py:121
 msgid "None"
 msgstr "cap"
 
-#: contrib/admin/options.py:332
+#: contrib/admin/options.py:338
 #, python-format
 msgid "Changed %s."
 msgstr "Modificat %s."
 
-#: contrib/admin/options.py:332 contrib/admin/options.py:342
-#: forms/models.py:265
+#: contrib/admin/options.py:338 contrib/admin/options.py:348
+#: forms/models.py:275
 msgid "and"
 msgstr "i"
 
-#: contrib/admin/options.py:337
+#: contrib/admin/options.py:343
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Afegit %(name)s \"%(object)s\""
 
-#: contrib/admin/options.py:341
+#: contrib/admin/options.py:347
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Modificat %(list)s per a %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:346
+#: contrib/admin/options.py:352
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Eliminat %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:350
+#: contrib/admin/options.py:356
 msgid "No fields changed."
 msgstr "Cap camp canviat."
 
-#: contrib/admin/options.py:411 contrib/auth/admin.py:51
+#: contrib/admin/options.py:417 contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "El/la %(name)s \"%(obj)s\".ha estat afegit/da amb èxit."
 
-#: contrib/admin/options.py:415 contrib/admin/options.py:448
+#: contrib/admin/options.py:421 contrib/admin/options.py:454
 #: contrib/auth/admin.py:59
 msgid "You may edit it again below."
 msgstr "Podeu editar-lo de nou a baix."
 
-#: contrib/admin/options.py:425 contrib/admin/options.py:458
+#: contrib/admin/options.py:431 contrib/admin/options.py:464
 #, python-format
 msgid "You may add another %s below."
 msgstr "Podeu afegir un altre %s a baix."
 
-#: contrib/admin/options.py:446
+#: contrib/admin/options.py:452
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "S'ha modificat amb èxit el/la %(name)s \"%(obj)s."
 
-#: contrib/admin/options.py:454
+#: contrib/admin/options.py:460
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -345,35 +345,35 @@ msgstr ""
 "S'ha afegit exitosament el/la %(name)s \"%(obj)s\". Pot editar-lo de nou "
 "abaix."
 
-#: contrib/admin/options.py:530
+#: contrib/admin/options.py:536
 #, python-format
 msgid "Add %s"
 msgstr "Afegir %s"
 
-#: contrib/admin/options.py:608
+#: contrib/admin/options.py:614
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
 
-#: contrib/admin/options.py:640
+#: contrib/admin/options.py:646
 msgid "Database error"
 msgstr "Error de base de dades"
 
-#: contrib/admin/options.py:690
+#: contrib/admin/options.py:696
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "El/la %(name)s \"%(obj)s\" ha estat eliminat amb èxit."
 
-#: contrib/admin/options.py:697
+#: contrib/admin/options.py:703
 msgid "Are you sure?"
 msgstr "Esteu segurs?"
 
-#: contrib/admin/options.py:726
+#: contrib/admin/options.py:732
 #, python-format
 msgid "Change history: %s"
 msgstr "Modificar històric: %s"
 
-#: contrib/admin/sites.py:18 contrib/admin/views/decorators.py:16
+#: contrib/admin/sites.py:16 contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:80
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -382,15 +382,11 @@ msgstr ""
 "Si us plau, introduïu un nom d'usuari i contrasenya vàlids. Tingueu en "
 "compte que tots dos camps son sensibles a majúscules i minúscules."
 
-#: contrib/admin/sites.py:242 contrib/admin/views/decorators.py:68
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr ""
-"Si us plau, identifiqueu-vos de nou doncs la vostra sessió ha expirat. No us "
-"preocupeu, el seu enviament està emmagatzemat."
+#: contrib/admin/sites.py:227 contrib/admin/views/decorators.py:40
+msgid "Please log in again, because your session has expired."
+msgstr "Si us plau, identifiqueu-vos de nou doncs la vostra sessió ha expirat."
 
-#: contrib/admin/sites.py:249 contrib/admin/views/decorators.py:75
+#: contrib/admin/sites.py:234 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -399,29 +395,29 @@ msgstr ""
 "'cookies' (galetes). Si us plau, habiliteu les 'cookies', recarregueu "
 "aquesta pàgina i proveu-ho de nou. "
 
-#: contrib/admin/sites.py:265 contrib/admin/sites.py:271
-#: contrib/admin/views/decorators.py:94
+#: contrib/admin/sites.py:250 contrib/admin/sites.py:256
+#: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Els noms d'usuari no poden contenir el caracter '@'."
 
-#: contrib/admin/sites.py:268 contrib/admin/views/decorators.py:90
+#: contrib/admin/sites.py:253 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
 "La vostra adreça de correu no és el vostre nom d'usuari. Provi '%s' en tot "
 "cas."
 
-#: contrib/admin/sites.py:336
+#: contrib/admin/sites.py:313
 msgid "Site administration"
 msgstr "Lloc administratiu"
 
-#: contrib/admin/sites.py:358 contrib/admin/templates/admin/login.html:27
+#: contrib/admin/sites.py:326 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
-#: contrib/admin/views/decorators.py:30
+#: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Iniciar sessió"
 
-#: contrib/admin/sites.py:406
+#: contrib/admin/sites.py:373
 #, python-format
 msgid "%s administration"
 msgstr "Administració de %s"
@@ -456,7 +452,7 @@ msgstr "Modificar:"
 msgid "Lookup"
 msgstr "Cercar"
 
-#: contrib/admin/widgets.py:221
+#: contrib/admin/widgets.py:228
 msgid "Add Another"
 msgstr "Afegir un altre"
 
@@ -3619,14 +3615,14 @@ msgstr "Aquest valor ha de ser None (Cap), True (Veritat) o False (Fals)"
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Introduïu una hora vàlida en el format HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:763
+#: db/models/fields/related.py:761
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Premeu la tecla \"Control\" -o \"Command\" en un Mac- per seleccionar més "
 "d'un valor."
 
-#: db/models/fields/related.py:840
+#: db/models/fields/related.py:838
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3739,7 +3735,7 @@ msgstr "Aquesta URL sembla ser un enllaç trencat."
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Esculliu una opció vàlida. %(value)s no és una de les opcions vàlides."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:644
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:654
 msgid "Enter a list of values."
 msgstr "Introduïu una llista de valors."
 
@@ -3758,17 +3754,17 @@ msgstr ""
 msgid "Order"
 msgstr "Ordre"
 
-#: forms/models.py:258 forms/models.py:267
+#: forms/models.py:268 forms/models.py:277
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Ja existeix %(model_name)s amb aquest %(field_label)s."
 
-#: forms/models.py:574
+#: forms/models.py:584
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Escolli una opció vàlida; Aquesta opció no és una de les opcions disponibles."
 
-#: forms/models.py:645
+#: forms/models.py:655
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Escolliu una opció vàlida; %s' no és una de les opcions vàlides."
