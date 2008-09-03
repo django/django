@@ -585,7 +585,7 @@ development version. See the `Django 0.96 documentation`_ for the old behavior.
 ``ImageField``
 --------------
 
-.. class:: ImageField(upload_to-None, [height_field=None, width_field=None, max_length=100, **options])
+.. class:: ImageField(upload_to=None, [height_field=None, width_field=None, max_length=100, **options])
 
 Like :class:`FileField`, but validates that the uploaded object is a valid
 image. Has two extra optional arguments:
@@ -650,7 +650,7 @@ Like an :class:`IntegerField`, but must be positive.
 ``PositiveSmallIntegerField``
 -----------------------------
 
-.. class:: PositiveIntegerField([**options])
+.. class:: PositiveSmallIntegerField([**options])
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
 (database-dependent) point.
