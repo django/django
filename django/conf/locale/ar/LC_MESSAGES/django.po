@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-03 00:59+0300\n"
-"PO-Revision-Date: 2008-09-03 01:32+0300\n"
+"POT-Creation-Date: 2008-09-03 08:49+0300\n"
+"PO-Revision-Date: 2008-09-03 09:46+0300\n"
 "Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
 "Language-Team: Arabic <support@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
@@ -622,7 +622,7 @@ msgstr "ليست لديك الصلاحية لتعديل أي شيء."
 
 #: contrib/admin/templates/admin/index.html:53
 msgid "Recent Actions"
-msgstr "العمليات الأخيرة"
+msgstr "آخر العمليّات"
 
 #: contrib/admin/templates/admin/index.html:54
 msgid "My Actions"
@@ -840,7 +840,9 @@ msgstr "تم إعادة تعيين كلمة المرور بنجاح"
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr "رابط استعادة كلمة المرور غير صالح، ربما لأنه استُخدم من قبل. رجاءً اطلب استعادة كلمة المرور مرة أخرى."
+msgstr ""
+"رابط استعادة كلمة المرور غير صالح، ربما لأنه استُخدم من قبل. رجاءً اطلب "
+"استعادة كلمة المرور مرة أخرى."
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
@@ -851,7 +853,9 @@ msgstr "تم إعادة ضبط كلمة المرور بنجاح"
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr "لقد قمنا بإرسال تعليمات تعيين كلمة مرورك إلى عنوان البريد الإلكتروني الذي كتبته. يجب أن تصلك رسالتنا قريباً."
+msgstr ""
+"لقد قمنا بإرسال تعليمات تعيين كلمة مرورك إلى عنوان البريد الإلكتروني الذي "
+"كتبته. يجب أن تصلك رسالتنا قريباً."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -883,7 +887,9 @@ msgstr "فريق %(site_name)s"
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr "نسيت كلمة مرورك؟ أدخل عنوان بريدك الإلكتروني بالأسفل وسنقوم بإرسال تعليمات تعيين كلمة مرور جديدة."
+msgstr ""
+"نسيت كلمة مرورك؟ أدخل عنوان بريدك الإلكتروني بالأسفل وسنقوم بإرسال تعليمات "
+"تعيين كلمة مرور جديدة."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -1174,7 +1180,7 @@ msgstr "حقلا كلمتي المرور غير متطابقين."
 
 #: contrib/auth/forms.py:82
 msgid "This account is inactive."
-msgstr "هذا الحساب غير فعال."
+msgstr "هذا الحساب غير نشط."
 
 #: contrib/auth/forms.py:87
 msgid ""
@@ -1237,7 +1243,7 @@ msgstr "مجموعة"
 
 #: contrib/auth/models.py:100 contrib/auth/models.py:146
 msgid "groups"
-msgstr "المجموعات"
+msgstr "مجموعات"
 
 #: contrib/auth/models.py:136
 msgid "username"
@@ -1277,13 +1283,15 @@ msgstr "يحدد ما إذا كان المستخدم يستطيع الدخول �
 
 #: contrib/auth/models.py:142
 msgid "active"
-msgstr "فعال"
+msgstr "نشط"
 
 #: contrib/auth/models.py:142
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "يحدد ما إذا كان المستخدم سيُعامل على أنّه نشط. أزل تحديد ها الخيار بدلاً من حذف الحسابات."
+msgstr ""
+"يحدد ما إذا كان المستخدم سيُعامل على أنّه نشط. أزل تحديد ها الخيار بدلاً من حذف "
+"الحسابات."
 
 #: contrib/auth/models.py:143
 msgid "superuser status"
@@ -1416,17 +1424,13 @@ msgstr ""
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
-msgstr ""
-"كتب هذا التعليق مستخدم مُسجّل ولذا كان اسمه"
-"للقراءة فقط."
+msgstr "كتب هذا التعليق مستخدم مُسجّل ولذا كان اسمهللقراءة فقط."
 
 #: contrib/comments/models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
-msgstr ""
-"كتب هذا التعليق مستخدم مُسجّل ولذا كان عنوان "
-"بريده الالكتروني للقراءة فقط."
+msgstr "كتب هذا التعليق مستخدم مُسجّل ولذا كان عنوان بريده الالكتروني للقراءة فقط."
 
 #: contrib/comments/models.py:149
 #, python-format
@@ -3556,13 +3560,13 @@ msgstr "يجب أن تكون هذه القيمة None، أو True أو False."
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "أدخل توقيتاً صالحاً بالنسق HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:763
+#: db/models/fields/related.py:761
 msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "اضغط زر التحكم \"Control\", أو \"Command\" على أجهزة Mac لاختيار أكثر من "
 "واحد."
 
-#: db/models/fields/related.py:840
+#: db/models/fields/related.py:838
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
