@@ -389,11 +389,9 @@ msgstr ""
 
 #: contrib/admin/sites.py:242 contrib/admin/views/decorators.py:68
 msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
+"Please log in again, because your session has expired."
 msgstr ""
-"Bitte neu anmelden, da die Session ausgelaufen ist. Keine Angst, die "
-"Beiträge wurden gesichert."
+"Bitte neu anmelden, da die Session ausgelaufen ist."
 
 #: contrib/admin/sites.py:249 contrib/admin/views/decorators.py:75
 msgid ""
