@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-09-03 08:49+0300\n"
-"PO-Revision-Date: 2008-09-03 09:46+0300\n"
+"PO-Revision-Date: 2008-09-03 11:00+0300\n"
 "Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
 "Language-Team: Arabic <support@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
@@ -4001,19 +4001,19 @@ msgstr "، %(number)d %(type)s"
 
 #: utils/translation/trans_real.py:403
 msgid "DATE_FORMAT"
-msgstr "DATE_FORMAT"
+msgstr "j F Y"
 
 #: utils/translation/trans_real.py:405
 msgid "TIME_FORMAT"
-msgstr "TIME_FORMAT"
+msgstr "G:i:s"
 
 #: utils/translation/trans_real.py:421
 msgid "YEAR_MONTH_FORMAT"
-msgstr "YEAR_MONTH_FORMAT"
+msgstr "F Y"
 
 #: utils/translation/trans_real.py:422
 msgid "MONTH_DAY_FORMAT"
-msgstr "MONTH_DAY_FORMAT"
+msgstr "j F"
 
 #: views/generic/create_update.py:114
 #, python-format
