@@ -44,7 +44,7 @@ class Comment(BaseCommentAbstractModel):
     """
 
     # Who posted this comment? If ``user`` is set then it was an authenticated
-    # user; otherwise at least person_name should have been set and the comment
+    # user; otherwise at least user_name should have been set and the comment
     # was posted by a non-authenticated user.
     user        = models.ForeignKey(User, blank=True, null=True, related_name="%(class)s_comments")
     user_name   = models.CharField(_("user's name"), max_length=50, blank=True)
