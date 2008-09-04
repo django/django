@@ -165,8 +165,7 @@ Authentication middleware
 .. class:: django.contrib.auth.middleware.AuthenticationMiddleware
 
 Adds the ``user`` attribute, representing the currently-logged-in user, to every
-incoming ``HttpRequest`` object. See :ref:` Authentication in Web requests
-<topics-http-auth>`.
+incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests <topics-auth>`.
 
 CSRF protection middleware
 --------------------------
