@@ -17,7 +17,7 @@ continent and in every kind of job.
 
 An interesting historical note: when Django was first released in July 2005, the
 initial released version of Django came from an internal repository at revision
-number 8825. Django 1.0 represents revision 88XX of our public repository. It
+number 8825. Django 1.0 represents revision 8961 of our public repository. It
 seems fitting that our 1.0 release comes at the moment where community
 contributions overtake those made privately.
 
