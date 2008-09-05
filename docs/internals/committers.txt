@@ -24,7 +24,7 @@ Journal-World`_ of Lawrence, Kansas, USA.
     Simon is a well-respected web developer from England. He had a one-year
     internship at World Online, during which time he and Adrian developed Django
     from scratch. The most enthusiastic Brit you'll ever meet, he's passionate
-    about best practices in web development has maintains a well-read
+    about best practices in web development and maintains a well-read
     `web-development blog`_.
     
     Simon lives in Brighton, England.
