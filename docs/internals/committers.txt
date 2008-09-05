@@ -115,10 +115,21 @@ Joseph Kocherhans
 .. _charango: http://en.wikipedia.org/wiki/Charango
 
 `Luke Plant`_
-    Luke has contributed many excellent improvements, including database-level
-    improvements, the CSRF middleware and many unit tests.
+    At University Luke studied physics and Materials Science and also
+    met `Michael Meeks`_ who introduced him to Linux and Open Source,
+    re-igniting an interest in programming.  Since then he has
+    contributed to a number of Open Source projects and worked
+    professionally as a developer.
+    
+    Luke has contributed many excellent improvements to Django,
+    including database-level improvements, the CSRF middleware and
+    many unit tests.
+    
+    Luke currently works for a church in Bradford, UK, and part-time
+    as a freelance developer.
 
 .. _luke plant: http://lukeplant.me.uk/
+.. _michael meeks: http://en.wikipedia.org/wiki/Michael_Meeks_(software)
 
 `Brian Rosner`_
     Brian is currently a web developer working on an e-commerce system in
