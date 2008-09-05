@@ -115,7 +115,7 @@ Joseph Kocherhans
 .. _charango: http://en.wikipedia.org/wiki/Charango
 
 `Luke Plant`_
-    Like has contributed many excellent improvements, including database-level
+    Luke has contributed many excellent improvements, including database-level
     improvements, the CSRF middleware and many unit tests.
 
 .. _luke plant: http://lukeplant.me.uk/
