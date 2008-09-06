@@ -559,7 +559,7 @@ some author you would do::
     >>> author = Author.objects.get(name=u'Orson Scott Card')
     >>> formset = BookFormSet(instance=author)
 
-More than one foriegn key to the same model
+More than one foreign key to the same model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If your model contains more than one foreign key to the same model you will
