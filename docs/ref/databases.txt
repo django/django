@@ -260,13 +260,13 @@ SQLite usable from Python through either the ``pysqlite2`` or the ``sqlite3``
 modules. 
  
 However, in the case of Windows, the official binary distribution of the stable 
-release of Python 2.5 (2.5.2 as of now) includes SQLite 3.3.4 so the bug can 
+release of Python 2.5 (2.5.2, as of this writing) includes SQLite 3.3.4, so the bug can 
 make itself evident in that platform. There are (as of Django 1.0) even three 
 tests in the Django test suite that will fail when run under this setup.  As 
 described above, this can be solved by downloading and installing a newer 
 version of ``pysqlite2`` (``pysqlite-2.x.x.win32-py2.5.exe``) that includes and 
-uses a newer version of SQLite. Python 2.6 will ship with a newer version of 
-SQLite and so will no be affected by this issue. 
+uses a newer version of SQLite. Python 2.6 ships with a newer version of 
+SQLite and is not be affected by this issue.
  
 If you are in such platform and find yourself in the need to update 
 ``pysqlite``/SQLite, you will also need to manually modify the 
