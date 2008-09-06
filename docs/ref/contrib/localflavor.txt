@@ -352,7 +352,7 @@ Italy (``it``)
     A form field that validates input as an Italian social security number
     (`codice fiscale`_).
 
-.. _codice fiscale: http://www.agenziaentrate.it/ilwwcm/connect/Nsi/Servizi/Codice+fiscale+-+tessera+sanitaria/Codice+fiscale/NSI+Informazioni+sulla+codificazione+delle+persone+fisiche
+.. _codice fiscale: http://www.agenziaentrate.it/ilwwcm/connect/Nsi/Servizi/Codice+fiscale+-+tessera+sanitaria/NSI+Informazioni+sulla+codificazione+delle+persone+fisiche
 
 .. class:: it.forms.ITVatNumberField
 
