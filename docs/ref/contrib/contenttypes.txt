@@ -305,7 +305,7 @@ be used to retrieve their associated ``TaggedItems``::
 
 If you don't add the reverse relationship, you can do the lookup manually::
 
-    >>> b = Bookmark.objects.get(url='http://www.djangoproject.com/)
+    >>> b = Bookmark.objects.get(url='http://www.djangoproject.com/')
     >>> bookmark_type = ContentType.objects.get_for_model(b)
     >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id,
     ...                           object_id=b.id)
