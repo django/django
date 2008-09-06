@@ -342,7 +342,7 @@ Generally, :class:`~django.db.models.ManyToManyField` instances should go in the
 object that's going to be edited in the admin interface, if you're using
 Django's admin. In the above example, ``toppings`` is in ``Pizza`` (rather than
 ``Topping`` having a ``pizzas`` :class:`~django.db.models.ManyToManyField` )
-because it's more natural to think about a ``Pizza`` having toppings than a
+because it's more natural to think about a pizza having toppings than a
 topping being on multiple pizzas. The way it's set up above, the ``Pizza`` admin
 form would let users select the toppings.
 
@@ -407,11 +407,11 @@ explicit declaration defines how the two models are related.
 There are a few restrictions on the intermediate model:
 
     * Your intermediate model must contain one - and *only* one - foreign key
-      on the target model (this would be ``Person`` in our example). If you
+      to the target model (this would be ``Person`` in our example). If you
       have more than one foreign key, a validation error will be raised.
   
     * Your intermediate model must contain one - and *only* one - foreign key 
-      on the source model (this would be ``Group`` in our example). If you
+      to the source model (this would be ``Group`` in our example). If you
       have more than one foreign key, a validation error will be raised.
 
     * The only exception to this is a model which has a many-to-many
@@ -426,7 +426,7 @@ There are a few restrictions on the intermediate model:
       :ref:`the model field reference <manytomany-arguments>`).
 
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
-your intermediary model (Membership, in this case), you're ready to start
+your intermediary model (``Membership``, in this case), you're ready to start
 creating some many-to-many relationships. You do this by creating instances of
 the intermediate model::
     
@@ -457,13 +457,13 @@ or assignment (i.e., ``beatles.members = [...]``) to create relationships::
     # AND NEITHER WILL THIS
     >>> beatles.members = [john, paul, ringo, george]
     
-Why? You can't just create a relationship between a Person and a Group - you
-need to specify all the detail for the relationship required by the
-Membership table. The simple ``add``, ``create`` and assignment calls
+Why? You can't just create a relationship between a ``Person`` and a ``Group``
+- you need to specify all the detail for the relationship required by the
+``Membership`` model. The simple ``add``, ``create`` and assignment calls
 don't provide a way to specify this extra detail. As a result, they are
 disabled for many-to-many relationships that use an intermediate model.
-The only way to create a many-to-many relationship with an intermediate table
-is to create instances of the intermediate model.
+The only way to create this type of relationship is to create instances of the
+intermediate model.
 
 The ``remove`` method is disabled for similar reasons. However, the
 ``clear()`` method can be used to remove all many-to-many relationships
@@ -481,8 +481,7 @@ many-to-many-related model::
     >>> Groups.objects.filter(person__name__startswith='Paul')
     [<Group: The Beatles>]
 
-As you are using an intermediate table, you can also query on the attributes 
-of the intermediate model::
+As you are using an intermediate model, you can also query on its attributes::
 
     # Find all the members of the Beatles that joined after 1 Jan 1961
     >>> Person.objects.filter(
@@ -518,9 +517,7 @@ As with :class:`~django.db.models.ForeignKey`, a
 :ref:`recursive relationship <recursive-relationships>`
 can be defined and
 :ref:`references to as-yet undefined models <lazy-relationships>`
-can be made; see
-:class:`the model field reference <django.db.models.fields.OneToOneField>`
-for details.
+can be made; see :ref:`the model field reference <ref-onetoone>` for details.
 
 .. seealso::
 
@@ -542,7 +539,7 @@ Thus, it's now possible to have multiple fields of type
 Models across files
 -------------------
 
-It's perfectly OK to relate a model to one from another app. To do this, just
+It's perfectly OK to relate a model to one from another app. To do this,
 import the related model at the top of the model that holds your model. Then,
 just refer to the other model class wherever needed. For example::
 
@@ -626,6 +623,7 @@ model.
 For example, this model has a few custom methods::
 
     from django.contrib.localflavor.us.models import USStateField
+
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
@@ -741,8 +739,8 @@ the resulting rows. For example::
         row = cursor.fetchone()
         return row
 
-:class:`connection <django.db.backends.DatabaseWrapper>` and
-:class:`<django.db.backends.CursorWrapper>` mostly implement the standard Python
+:class:`connection <django.db.backends.DatabaseWrapper>` and :class:`cursor
+<django.db.backends.CursorWrapper>` mostly implement the standard Python
 DB-API -- see :pep:`249` -- with the addition of Django's :ref:`transaction
 handling <topics-db-transactions>`. If you're not familiar with the Python
 DB-API, note that the SQL statement in :meth:`cursor.execute()
@@ -818,8 +816,8 @@ still only creating one database table per child model at the database level.
 ~~~~~~~~~~~~~~~~~~~~
 
 When an abstract base class is created, Django makes any :ref:`Meta <meta-options>`
-inner class you declared on the base class available as an
-attribute. If a child class does not declared its own :ref:`Meta <meta-options>`
+inner class you declared in the base class available as an
+attribute. If a child class does not declare its own :ref:`Meta <meta-options>`
 class, it will inherit the parent's :ref:`Meta <meta-options>`. If the child wants to
 extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For example::
 
@@ -896,9 +894,9 @@ Multi-table inheritance
 
 The second type of model inheritance supported by Django is when each model in
 the hierarchy is a model all by itself. Each model corresponds to its own
-database table and can be queried and created indvidually. The inheritance
+database table and can be queried and created individually. The inheritance
 relationship introduces links between the child model and each of its parents
-(via an automatically-created :class`~django.db.models.fields.OneToOneField`).
+(via an automatically-created :class:`~django.db.models.fields.OneToOneField`).
 For example::
 
     class Place(models.Model):
@@ -945,7 +943,7 @@ parent: if the child does not specify an :attr:`django.db.models.Options.orderin
 :attr:`django.db.models.Options.get_latest_by` attribute, it will inherit these from its parent.
 
 If the parent has an ordering and you don't want the child to have any natural
-ordering, you can explicity set it to be empty::
+ordering, you can explicitly disable it::
 
     class ChildModel(ParentModel):
         ...
@@ -974,8 +972,7 @@ subclass with a :class:`~django.db.models.fields.ManyToManyField`::
 
     class Supplier(Place):
         # Must specify related_name on all relations.
-        customers = models.ManyToManyField(Restaurant,
-                related_name='provider')
+        customers = models.ManyToManyField(Restaurant, related_name='provider')
 
 
 Specifying the parent link field
@@ -994,10 +991,10 @@ Multiple inheritance
 
 Just as with Python's subclassing, it's possible for a Django model to inherit
 from multiple parent models. Keep in mind that normal Python name resolution
-rules apply. The first base class that a particular name appears in (e.g.
-:ref:`Meta <meta-options>`) will be the one that is used; for example,
-his means that if multiple parents contain a :ref:`Meta <meta-options>` class, only
-the first one is going to be used, and all others will be ignored.
+rules apply. The first base class that a particular name (e.g. :ref:`Meta
+<meta-options>`) appears in will be the one that is used; for example, this
+means that if multiple parents contain a :ref:`Meta <meta-options>` class,
+only the first one is going to be used, and all others will be ignored.
 
 Generally, you won't need to inherit from multiple parents. The main use-case
 where this is useful is for "mix-in" classes: adding a particular extra
