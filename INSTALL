@@ -19,4 +19,4 @@ lives. Some places you might check are:
 This second solution does not require a working Internet connection; it
 bypasses "setuptools" entirely.
 
-For more detailed instructions, see docs/install.txt.
+For more detailed instructions, see docs/intro/install.txt.
