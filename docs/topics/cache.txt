@@ -186,10 +186,9 @@ Using a custom cache backend
 .. versionadded:: 1.0
 
 While Django includes support for a number of cache backends out-of-the-box,
-sometimes you will want to use a customised version or your own backend.  To
-use an external cache backend with Django, use a Python import path as the
-scheme portion (the part before the initial colon) of the ``CACHE_BACKEND``
-URI, like so::
+sometimes you might want to use a customized cache backend. To use an external
+cache backend with Django, use a Python import path as the scheme portion (the
+part before the initial colon) of the ``CACHE_BACKEND`` URI, like so::
 
     CACHE_BACKEND = 'path.to.backend://'
 
@@ -197,10 +196,9 @@ If you're building your own backend, you can use the standard cache backends
 as reference implementations. You'll find the code in the
 ``django/core/cache/backends/`` directory of the Django source.
 
-Note: Without a really compelling reason, like a host that doesn't support the
-them, you should stick to the cache backends included with Django. They've
-been really well-tested and are quite easy to use.
-
+Note: Without a really compelling reason, such as a host that doesn't support
+the them, you should stick to the cache backends included with Django. They've
+been well-tested and are easy to use.
 
 CACHE_BACKEND arguments
 -----------------------
