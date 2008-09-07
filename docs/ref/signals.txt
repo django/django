@@ -84,7 +84,7 @@ Like pre_init, but this one is sent when the :meth:`~django.db.models.Model.__in
 Arguments sent with this signal:
 
     ``sender``
-        As above: rhe model class that just had an instance created.
+        As above: the model class that just had an instance created.
 
     ``instance``
         The actual instance of the model that's just been created.
