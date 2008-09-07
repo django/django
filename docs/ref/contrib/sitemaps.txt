@@ -278,7 +278,7 @@ references individual sitemap files, one per each section defined in your
     * The :func:`django.contrib.sitemaps.views.sitemap` view should take a
       :data:`section` keyword argument.
 
-Here is what the relevant URLconf lines would look like for the example above::
+Here's what the relevant URLconf lines would look like for the example above::
 
    (r'^sitemap.xml$', 'django.contrib.sitemaps.views.index', {'sitemaps': sitemaps})
    (r'^sitemap-(?P<section>.+)\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
@@ -288,9 +288,9 @@ This will automatically generate a :file:`sitemap.xml` file that references both
 :class:`~django.contrib.sitemaps.Sitemap` classes and the :data:`sitemaps` dict
 don't change at all.
 
-If one of your sitemaps is going to have more than 50,000 URLs you should 
-create an index file. Your sitemap will be paginated and the index will 
-reflect that.
+You should create an index file if one of your sitemaps has more than 50,000
+URLs. In this case, Django will automatically paginate the sitemap, and the
+index will reflect that.
 
 Pinging Google
 ==============
