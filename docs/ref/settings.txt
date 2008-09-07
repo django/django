@@ -269,7 +269,7 @@ Default: ``False``
 
 A boolean that turns on/off debug mode.
 
-If you define custom settings, django/views/debug.py has a ``HIDDEN_SETTINGS``
+If you define custom settings, `django/views/debug.py`_ has a ``HIDDEN_SETTINGS``
 regular expression which will hide from the DEBUG view anything that contains
 ``'SECRET'``, ``'PASSWORD'``, or ``'PROFANITIES'``. This allows untrusted users to
 be able to give backtraces without seeing sensitive (or offensive) settings.
@@ -283,6 +283,8 @@ will remember every SQL query it executes. This is useful when you are debugging
 but on a production server, it will rapidly consume memory.
 
 Never deploy a site into production with ``DEBUG`` turned on.
+
+.. _django/views/debug.py: http://code.djangoproject.com/browser/django/trunk/django/views/debug.py
 
 DEBUG_PROPAGATE_EXCEPTIONS
 --------------------------
@@ -800,9 +802,10 @@ A tuple of profanities, as strings, that will trigger a validation error when
 the ``hasNoProfanities`` validator is called.
 
 We don't list the default values here, because that would be profane. To see
-the default values, see the file ``django/conf/global_settings.py``.
+the default values, see the file `django/conf/global_settings.py`_.
 
 .. setting:: ROOT_URLCONF
+.. _django/conf/global_settings.py: http://code.djangoproject.com/browser/django/trunk/django/conf/global_settings.py
 
 ROOT_URLCONF
 ------------
