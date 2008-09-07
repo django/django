@@ -336,7 +336,7 @@ you'll probably use:
         
             >>> Entry.objects.get(headline__exact="Man bites dog")
 
-        World generate SQL along these lines:
+        Would generate SQL along these lines:
         
         .. code-block:: sql
 
@@ -428,7 +428,7 @@ will return ``Blog`` objects that have an empty ``name`` on the ``author`` and
 also those which have an empty ``author`` on the ``entry``. If you don't want
 those latter objects, you could write::
 
-    Blog.objetcs.filter(entry__author__isnull=False,
+    Blog.objects.filter(entry__author__isnull=False,
             entry__author__name__isnull=True)
 
 Spanning multi-valued relationships
