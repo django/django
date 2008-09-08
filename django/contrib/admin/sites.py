@@ -105,7 +105,6 @@ class AdminSite(object):
         The default implementation checks that LogEntry, ContentType and the
         auth context processor are installed.
         """
-        from django.conf import settings
         from django.contrib.admin.models import LogEntry
         from django.contrib.contenttypes.models import ContentType
 

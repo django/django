@@ -114,7 +114,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         else:
             url = ''
         if not attrs.has_key('class'):
-          attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript looks for this hook.
+            attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript looks for this hook.
         output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)]
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.

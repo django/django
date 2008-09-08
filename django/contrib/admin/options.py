@@ -471,17 +471,9 @@ class ModelAdmin(BaseModelAdmin):
         "The 'add' admin view for this model."
         model = self.model
         opts = model._meta
-        app_label = opts.app_label
 
         if not self.has_add_permission(request):
             raise PermissionDenied
-
-        if self.has_change_permission(request, None):
-            # redirect to list view
-            post_url = '../'
-        else:
-            # Object list will give 'Permission Denied', so go back to admin home
-            post_url = '../../../'
 
         ModelForm = self.get_form(request)
         formsets = []
@@ -541,7 +533,7 @@ class ModelAdmin(BaseModelAdmin):
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
             'root_path': self.admin_site.root_path,
-            'app_label': app_label,
+            'app_label': opts.app_label,
         }
         context.update(extra_context or {})
         return self.render_change_form(request, context, add=True)
@@ -551,7 +543,6 @@ class ModelAdmin(BaseModelAdmin):
         "The 'change' admin view for this model."
         model = self.model
         opts = model._meta
-        app_label = opts.app_label
 
         try:
             obj = model._default_manager.get(pk=object_id)
@@ -620,7 +611,7 @@ class ModelAdmin(BaseModelAdmin):
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
             'root_path': self.admin_site.root_path,
-            'app_label': app_label,
+            'app_label': opts.app_label,
         }
         context.update(extra_context or {})
         return self.render_change_form(request, context, change=True, obj=obj)
@@ -738,8 +729,8 @@ class ModelAdmin(BaseModelAdmin):
         }
         context.update(extra_context or {})
         return render_to_response(self.object_history_template or [
-            "admin/%s/%s/object_history.html" % (opts.app_label, opts.object_name.lower()),
-            "admin/%s/object_history.html" % opts.app_label,
+            "admin/%s/%s/object_history.html" % (app_label, opts.object_name.lower()),
+            "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
         ], context, context_instance=template.RequestContext(request))
 
