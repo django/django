@@ -5,7 +5,7 @@
 
 {% block bodyclass %}change-list{% endblock %}
 
-{% if not is_popup %}{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">{% trans "Home" %}</a> &rsaquo; <a href="../">{{ app_label|capfirst|escape }}</a> &rsaquo; {{ cl.opts.verbose_name_plural|capfirst|escape }}</div>{% endblock %}{% endif %}
+{% if not is_popup %}{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">{% trans "Home" %}</a> &rsaquo; <a href="../">{{ app_label|capfirst }}</a> &rsaquo; {{ cl.opts.verbose_name_plural|capfirst }}</div>{% endblock %}{% endif %}
 
 {% block coltype %}flex{% endblock %}
 
@@ -13,7 +13,7 @@
 <div id="content-main">
 {% block object-tools %}
 {% if has_add_permission %}
-<ul class="object-tools"><li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name|escape as name %}Add {{ name }}{% endblocktrans %}</a></li></ul>
+<ul class="object-tools"><li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li></ul>
 {% endif %}
 {% endblock %}
 <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">

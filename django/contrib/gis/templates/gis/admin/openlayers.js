@@ -2,11 +2,11 @@
 {% block vars %}var {{ module }} = {};
 {{ module }}.map = null; {{ module }}.controls = null; {{ module }}.panel = null; {{ module }}.re = new RegExp("^SRID=\d+;(.+)", "i"); {{ module }}.layers = {}; 
 {{ module }}.wkt_f = new OpenLayers.Format.WKT();
-{{ module }}.is_collection = {% if is_collection %}true{% else %}false{% endif %};
+{{ module }}.is_collection = {{ is_collection|yesno:"true,false" }};
 {{ module }}.collection_type = '{{ collection_type }}';
-{{ module }}.is_linestring = {% if is_linestring %}true{% else %}false{% endif %};
-{{ module }}.is_polygon = {% if is_polygon %}true{% else %}false{% endif %};
-{{ module }}.is_point = {% if is_point %}true{% else %}false{% endif %};
+{{ module }}.is_linestring = {{ is_linestring|yesno:"true,false" }};
+{{ module }}.is_polygon = {{ is_polygon|yesno:"true,false" }};
+{{ module }}.is_point = {{ is_point|yesno:"true,false" }};
 {% endblock %}
 {{ module }}.get_ewkt = function(feat){return 'SRID={{ srid }};' + {{ module }}.wkt_f.write(feat);}
 {{ module }}.read_wkt = function(wkt){
@@ -147,7 +147,7 @@
     {% if scale_text %}{{ module }}.map.addControl(new OpenLayers.Control.Scale());{% endif %}
     {% if layerswitcher %}{{ module }}.map.addControl(new OpenLayers.Control.LayerSwitcher());{% endif %}
     // Then add optional behavior controls
-    {% if scrollable %}{% else %}{{ module }}.map.getControlsByClass('OpenLayers.Control.Navigation')[0].disableZoomWheel();{% endif %}
+    {% if not scrollable %}{{ module }}.map.getControlsByClass('OpenLayers.Control.Navigation')[0].disableZoomWheel();{% endif %}
     {% endblock %}
     if (wkt){
       {{ module }}.enableEditing();

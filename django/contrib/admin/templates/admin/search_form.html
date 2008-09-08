@@ -4,13 +4,13 @@
 <div id="toolbar"><form id="changelist-search" action="" method="get">
 <div><!-- DIV needed for valid HTML -->
 <label for="searchbar"><img src="{% admin_media_prefix %}img/admin/icon_searchbox.png" alt="Search" /></label>
-<input type="text" size="40" name="{{ search_var }}" value="{{ cl.query|escape }}" id="searchbar" />
+<input type="text" size="40" name="{{ search_var }}" value="{{ cl.query }}" id="searchbar" />
 <input type="submit" value="{% trans 'Go' %}" />
 {% if show_result_count %}
     <span class="small quiet">{% blocktrans count cl.result_count as counter %}1 result{% plural %}{{ counter }} results{% endblocktrans %} (<a href="?{% if cl.is_popup %}pop=1{% endif %}">{% blocktrans with cl.full_result_count as full_result_count %}{{ full_result_count }} total{% endblocktrans %}</a>)</span>
 {% endif %}
 {% for pair in cl.params.items %}
-    {% ifnotequal pair.0 search_var %}<input type="hidden" name="{{ pair.0|escape }}" value="{{ pair.1|escape }}"/>{% endifnotequal %}
+    {% ifnotequal pair.0 search_var %}<input type="hidden" name="{{ pair.0 }}" value="{{ pair.1 }}"/>{% endifnotequal %}
 {% endfor %}
 </div>
 </form></div>

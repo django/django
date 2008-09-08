@@ -6,11 +6,11 @@
 
 <div id="breadcrumbs"><a href="{{ root_url }}">Home</a> / <a href="{{ model.url }}">{{ model.verbose_name_plural|capfirst }}</a> / <a href="../../../">Calendars</a> / <a href="../../">By {{ field.verbose_name }}</a> / <a href="../">{{ month.year }}</a> / {{ month|date:"F" }}</div>
 
-<h1>{{ object_list.count }} {% if object_list.count|pluralize %}{{ model.verbose_name_plural|escape }}{% else %}{{ model.verbose_name|escape }}{% endif %} with {{ field.verbose_name }} on {{ day|date:"F Y" }}</h1>
+<h1>{{ object_list.count }} {% if object_list.count|pluralize %}{{ model.verbose_name_plural }}{% else %}{{ model.verbose_name }}{% endif %} with {{ field.verbose_name }} on {{ day|date:"F Y" }}</h1>
 
 <ul class="objectlist">
 {% for object in object_list %}
-<li class="{% cycle 'odd' 'even' %}"><a href="{{ object.url }}">{{ object|escape }}</a></li>
+<li class="{% cycle 'odd' 'even' %}"><a href="{{ object.url }}">{{ object }}</a></li>
 {% endfor %}
 </ul>
 

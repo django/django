@@ -1,8 +1,8 @@
 {% load i18n %}
-<h3>{% blocktrans with title|escape as filter_title %} By {{ filter_title }} {% endblocktrans %}</h3>
+<h3>{% blocktrans with title as filter_title %} By {{ filter_title }} {% endblocktrans %}</h3>
 <ul>
 {% for choice in choices %}
     <li{% if choice.selected %} class="selected"{% endif %}>
-    <a href="{{ choice.query_string|iriencode }}">{{ choice.display|escape }}</a></li>
+    <a href="{{ choice.query_string|iriencode }}">{{ choice.display }}</a></li>
 {% endfor %}
 </ul>

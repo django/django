@@ -29,7 +29,7 @@
 
 {% for view in site_views.list|dictsort:"url" %}
 {% ifchanged %}
-<h3><a href="{{ view.module }}.{{ view.name }}/">{{ view.url|escape }}</a></h3>
+<h3><a href="{{ view.module }}.{{ view.name }}/">{{ view.url }}</a></h3>
 <p class="small quiet">View function: {{ view.module }}.{{ view.name }}</p>
 <p>{{ view.title }}</p>
 <hr />

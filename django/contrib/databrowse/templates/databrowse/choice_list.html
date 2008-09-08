@@ -10,7 +10,7 @@
 
 <ul class="objectlist">
 {% for choice in field.choices %}
-<li class="{% cycle 'odd' 'even' %}"><a href="{{ choice.url }}">{{ choice.label|escape }}</a></li>
+<li class="{% cycle 'odd' 'even' %}"><a href="{{ choice.url }}">{{ choice.label }}</a></li>
 {% endfor %}
 </ul>
 

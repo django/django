@@ -3,13 +3,13 @@
   <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
 {{ inline_admin_formset.formset.management_form }}
 <fieldset class="module">
-   <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst|escape }}</h2>
+   <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
    {{ inline_admin_formset.formset.non_form_errors }}
    <table>
      <thead><tr>
      {% for field in inline_admin_formset.fields %}
        {% if not field.is_hidden %}
-         <th {% if forloop.first %}colspan="2"{% endif %}>{{ field.label|capfirst|escape }}</th>
+         <th {% if forloop.first %}colspan="2"{% endif %}>{{ field.label|capfirst }}</th>
         {% endif %}
      {% endfor %}
      {% if inline_admin_formset.formset.can_delete %}<th>{% trans "Delete?" %}</th>{% endif %}

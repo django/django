@@ -1,16 +1,16 @@
 {% extends "databrowse/base_site.html" %}
 
-{% block title %}{{ model.verbose_name_plural|capfirst|escape }} with {{ field.field.verbose_name|escape }} {{ value|escape }}{% endblock %}
+{% block title %}{{ model.verbose_name_plural|capfirst }} with {{ field.field.verbose_name }} {{ value }}{% endblock %}
 
 {% block content %}
 
-<div id="breadcrumbs"><a href="{{ root_url }}">Home</a> / <a href="{{ model.url }}">{{ model.verbose_name_plural|capfirst }}</a> / <a href="../../">Fields</a> / <a href="../">By {{ field.field.verbose_name|escape }}</a> / {{ value|escape }}</div>
+<div id="breadcrumbs"><a href="{{ root_url }}">Home</a> / <a href="{{ model.url }}">{{ model.verbose_name_plural|capfirst }}</a> / <a href="../../">Fields</a> / <a href="../">By {{ field.field.verbose_name }}</a> / {{ value }}</div>
 
-<h1>{{ object_list.count }} {% if object_list.count|pluralize %}{{ model.verbose_name_plural|escape }}{% else %}{{ model.verbose_name|escape }}{% endif %} with {{ field.field.verbose_name|escape }} {{ value|escape }}</h1>
+<h1>{{ object_list.count }} {% if object_list.count|pluralize %}{{ model.verbose_name_plural }}{% else %}{{ model.verbose_name }}{% endif %} with {{ field.field.verbose_name }} {{ value }}</h1>
 
 <ul class="objectlist">
 {% for object in object_list %}
-<li class="{% cycle 'odd' 'even' %}"><a href="{{ object.url }}">{{ object|escape }}</a></li>
+<li class="{% cycle 'odd' 'even' %}"><a href="{{ object.url }}">{{ object }}</a></li>
 {% endfor %}
 </ul>
 

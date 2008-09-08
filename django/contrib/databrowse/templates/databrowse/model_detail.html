@@ -12,7 +12,7 @@
 
 <ul class="objectlist">
 {% for object in model.objects %}
-    <li class="{% cycle 'odd' 'even' %}"><a href="{{ object.url }}">{{ object|escape }}</a></li>
+    <li class="{% cycle 'odd' 'even' %}"><a href="{{ object.url }}">{{ object }}</a></li>
 {% endfor %}
 </ul>
 

@@ -4,9 +4,9 @@
 
 {% block content %}
 
-<div id="breadcrumbs"><a href="{{ root_url }}">Home</a> / <a href="{{ object.model.url }}">{{ object.model.verbose_name_plural|capfirst }}</a> / {{ object|escape }}</div>
+<div id="breadcrumbs"><a href="{{ root_url }}">Home</a> / <a href="{{ object.model.url }}">{{ object.model.verbose_name_plural|capfirst }}</a> / {{ object }}</div>
 
-<h1>{{ object.model.verbose_name|capfirst }}: {{ object|escape }}</h1>
+<h1>{{ object.model.verbose_name|capfirst }}: {{ object }}</h1>
 
 <table class="objectinfo">
 {% for field in object.fields %}
@@ -15,7 +15,7 @@
 <td>
 {% if field.urls %}
 {% for value, url in field.urls %}
-{% if url %}<a href="{{ url }}">{% endif %}{{ value|escape }}{% if url %}</a>{% endif %}{% if not forloop.last %}, {% endif %}
+{% if url %}<a href="{{ url }}">{% endif %}{{ value }}{% if url %}</a>{% endif %}{% if not forloop.last %}, {% endif %}
 {% endfor %}
 {% else %}None{% endif %}
 </td>
@@ -29,7 +29,7 @@
   {% if related_object.object_list %}
   <ul class="objectlist">
     {% for object in related_object.object_list %}
-    <li class="{% cycle 'odd' 'even' %}"><a href="{{ object.url }}">{{ object|escape }}</a></li>
+    <li class="{% cycle 'odd' 'even' %}"><a href="{{ object.url }}">{{ object }}</a></li>
     {% endfor %}
   </ul>
   {% else %}

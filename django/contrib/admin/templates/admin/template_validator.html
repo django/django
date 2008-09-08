@@ -12,11 +12,11 @@
 
 <fieldset class="module aligned">
 <div class="form-row{% if form.errors.site %} error{% endif %} required">
-    {% if form.errors.site %}{{ form.errors.site }}{% endif %}
+    {{ form.errors.site }}
     <h4><label for="id_site">{{ form.site.label }}:</label> {{ form.site }}</h4>
 </div>
 <div class="form-row{% if form.errors.template %} error{% endif %} required">
-    {% if form.errors.template %}{{ form.errors.template }}{% endif %}
+    {{ form.errors.template }}
     <h4><label for="id_template">{{ form.template.label }}:</label> {{ form.template }}</h4>
 </div>
 </fieldset>
