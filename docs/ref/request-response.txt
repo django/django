@@ -93,18 +93,7 @@ All attributes except ``session`` should be considered read-only.
     A standard Python dictionary containing all cookies. Keys and values are
     strings.
 
-.. attribute:: HttpRequest.FILES 
-
-    .. admonition:: Changed in Django development version
-        
-        In previous versions of Django, ``request.FILES`` contained
-        simple ``dict`` objects representing uploaded files. This is
-        no longer true -- files are represented by ``UploadedFile``
-        objects as described below.
-        
-        These ``UploadedFile`` objects will emulate the old-style ``dict``
-        interface, but this is deprecated and will be removed in the next
-        release of Django.
+.. attribute:: HttpRequest.FILES
 
     A dictionary-like object containing all uploaded files. Each key in
     ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
@@ -122,6 +111,16 @@ All attributes except ``session`` should be considered read-only.
     and the ``<form>`` that posted to the request had
     ``enctype="multipart/form-data"``. Otherwise, ``FILES`` will be a blank
     dictionary-like object.
+
+    .. versionchanged:: 1.0
+
+    In previous versions of Django, ``request.FILES`` contained simple ``dict``
+    objects representing uploaded files. This is no longer true -- files are
+    represented by ``UploadedFile`` objects as described below.
+
+    These ``UploadedFile`` objects will emulate the old-style ``dict``
+    interface, but this is deprecated and will be removed in the next release of
+    Django.
 
 .. attribute:: HttpRequest.META
 

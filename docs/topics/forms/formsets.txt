@@ -306,7 +306,9 @@ management form inside the template. Lets look at a sample view::
             formset = ArticleFormSet()
         return render_to_response('manage_articles.html', {'formset': formset})
 
-The ``manage_articles.html`` template might look like this::
+The ``manage_articles.html`` template might look like this:
+
+.. code-block:: html+django
 
     <form method="POST" action="">
         {{ formset.management_form }}
@@ -318,7 +320,9 @@ The ``manage_articles.html`` template might look like this::
     </form>
 
 However the above can be slightly shortcutted and let the formset itself deal
-with the management form::
+with the management form:
+
+.. code-block:: html+django
 
     <form method="POST" action="">
         <table>

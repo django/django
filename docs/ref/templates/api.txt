@@ -29,7 +29,9 @@ content from a database or enable access to other template tags.
 
 Block tags are surrounded by ``"{%"`` and ``"%}"``.
 
-Example template with block tags::
+Example template with block tags:
+
+.. code-block:: html+django
 
     {% if is_logged_in %}Thanks for logging in!{% else %}Please log in.{% endif %}
 
@@ -37,7 +39,9 @@ A **variable** is a symbol within a template that outputs a value.
 
 Variable tags are surrounded by ``"{{"`` and ``"}}"``.
 
-Example template with variables::
+Example template with variables:
+
+.. code-block:: html+django
 
     My first name is {{ first_name }}. My last name is {{ last_name }}.
 
@@ -566,7 +570,7 @@ returns the resulting string::
 
 The ``render_to_string`` shortcut takes one required argument --
 ``template_name``, which should be the name of the template to load
-and render -- and two optional arguments::
+and render -- and two optional arguments:
 
     dictionary
         A dictionary to be used as variables and values for the

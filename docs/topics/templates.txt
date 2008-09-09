@@ -38,6 +38,8 @@ or CheetahTemplate_, you should feel right at home with Django's templates.
 Templates
 =========
 
+.. highlightlang:: html+django
+
 A template is simply a text file. It can generate any text-based format (HTML,
 XML, CSV, etc.).
 

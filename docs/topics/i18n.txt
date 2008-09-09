@@ -395,7 +395,7 @@ obtain) the language translations themselves. Here's how that works.
     application) and English strings (from Django itself). If you want to
     support a locale for your application that is not already part of
     Django, you'll need to make at least a minimal translation of the Django
-    core. See the relevant :ref:LocaleMiddleware note`<locale-middleware-notes>`
+    core. See the relevant :ref:`LocaleMiddleware note<locale-middleware-notes>`
     for more details.
 
 Message files

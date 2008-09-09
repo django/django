@@ -36,7 +36,7 @@ from your ``INSTALLED_APPS``. It'll save you a small bit of overhead.
 Configuring the session engine
 ==============================
 
-.. versionadded:: 1.0.
+.. versionadded:: 1.0
 
 By default, Django stores sessions in your database (using the model
 ``django.contrib.sessions.models.Session``). Though this is convenient, in

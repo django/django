@@ -385,7 +385,7 @@ makemessages
 ------------
 
 .. versionchanged:: 1.0
-   Before 1.0 this was the "bin/make-messages.py" command.
+   Before 1.0 this was the ``bin/make-messages.py`` command.
 
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the

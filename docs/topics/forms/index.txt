@@ -10,6 +10,8 @@ Working with forms
     For a more detailed look at the forms API, see :ref:`ref-forms-api`. For
     documentation of the available field types, see :ref:`ref-forms-fields`.
 
+.. highlightlang:: html+django
+
 ``django.forms`` is Django's form-handling library.
 
 While it is possible to process form submissions just using Django's
@@ -60,7 +62,9 @@ make use of a declarative style that you'll be familiar with if you've used
 Django's database models.
 
 For example, consider a form used to implement "contact me" functionality on a
-personal Web site::
+personal Web site:
+
+.. code-block:: python
 
     from django import forms
 
@@ -82,7 +86,9 @@ description.
 Using a form in a view
 ----------------------
 
-The standard pattern for processing a form in a view looks like this::
+The standard pattern for processing a form in a view looks like this:
+
+.. code-block:: python
 
    def contact(request):
        if request.method == 'POST': # If the form has been submitted...
@@ -133,7 +139,9 @@ also be converted in to the relevant Python types for you. In the above example,
 ``cc_myself`` will be a boolean value. Likewise, fields such as ``IntegerField``
 and ``FloatField`` convert values to a Python int and float respectively.
 
-Extending the above example, here's how the form data could be processed::
+Extending the above example, here's how the form data could be processed:
+
+.. code-block:: python
 
     if form.is_valid():
         subject = form.cleaned_data['subject']

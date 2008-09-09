@@ -169,8 +169,10 @@ You can specify it in two ways:
     * Pass :attr:`~django.contrib.formtools.wizard.FormWizard.extra_context`
       as extra parameters in the URLconf.
 
-Here's a full example template::
-  
+Here's a full example template:
+
+.. code-block:: html+django
+
     {% extends "base.html" %}
 
     {% block content %}

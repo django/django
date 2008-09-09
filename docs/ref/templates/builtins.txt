@@ -14,6 +14,8 @@ documentation for any custom tags or filters installed.
 Built-in tag reference
 ----------------------
 
+.. highlightlang:: html+django
+
 .. templatetag:: autoescape
 
 autoescape
@@ -473,7 +475,9 @@ Regroup a list of alike objects by a common attribute.
 
 This complex tag is best illustrated by use of an example: say that ``people``
 is a list of people represented by dictionaries with ``first_name``,
-``last_name``, and ``gender`` keys::
+``last_name``, and ``gender`` keys:
+
+.. code-block:: python
 
     people = [
         {'first_name': 'George', 'last_name': 'Bush', 'gender': 'Male'},
@@ -530,7 +534,9 @@ the fact that the ``people`` list was ordered by ``gender`` in the first place.
 If the ``people`` list did *not* order its members by ``gender``, the regrouping
 would naively display more than one group for a single gender. For example,
 say the ``people`` list was set to this (note that the males are not grouped
-together)::
+together):
+
+.. code-block:: python
 
     people = [
         {'first_name': 'Bill', 'last_name': 'Clinton', 'gender': 'Male'},
@@ -657,12 +663,16 @@ arguments in the URL. All arguments required by the URLconf should be present.
 
 For example, suppose you have a view, ``app_views.client``, whose URLconf
 takes a client ID (here, ``client()`` is a method inside the views file
-``app_views.py``). The URLconf line might look like this::
+``app_views.py``). The URLconf line might look like this:
+
+.. code-block:: python
 
     ('^client/(\d+)/$', 'app_views.client')
 
 If this app's URLconf is included into the project's URLconf under a path
-such as this::
+such as this:
+
+.. code-block:: python
 
     ('^clients/', include('project_name.app_name.urls'))
 
@@ -682,19 +692,18 @@ Note that if the URL you're reversing doesn't exist, you'll get an
 :exc:`NoReverseMatch` exception raised, which will cause your site to display an
 error page.
 
-**New in development verson:** If you'd like to retrieve a URL without displaying it,
-you can use a slightly different call:
+.. versionadded:: 1.0
 
-.. code-block:: html+django
+If you'd like to retrieve a URL without displaying it, you can use a slightly
+different call::
+
 
     {% url path.to.view arg, arg2 as the_url %}
     
     <a href="{{ the_url }}">I'm linking to {{ the_url }}</a>
     
 This ``{% url ... as var %}`` syntax will *not* cause an error if the view is
-missing. In practice you'll use this to link to views that are optional:
-
-.. code-block:: html+django
+missing. In practice you'll use this to link to views that are optional::
 
     {% url path.to.view as the_url %}
     {% if the_url %}
@@ -845,7 +854,9 @@ For example::
 
     {{ value|dictsort:"name" }}
 
-If ``value`` is::
+If ``value`` is:
+
+.. code-block:: python
 
     [
         {'name': 'zed', 'age': 19},
@@ -853,7 +864,9 @@ If ``value`` is::
         {'name': 'joe', 'age': 31},
     ]
 
-then the output would be::
+then the output would be:
+
+.. code-block:: python
 
     [
         {'name': 'amy', 'age': 22},
@@ -1274,7 +1287,9 @@ Uses the same syntax as Python's list slicing. See
 http://diveintopython.org/native_data_types/lists.html#odbchelper.list.slice
 for an introduction.
 
-Example: ``{{ some_list|slice:":2" }}``
+Example::
+
+    {{ some_list|slice:":2" }}
 
 .. templatefilter:: slugify
 

@@ -924,7 +924,9 @@ better to override only the section of the template which you need to change.
 To continue the example above, we want to add a new link next to the ``History``
 tool for the ``Page`` model. After looking at ``change_form.html`` we determine
 that we only need to override the ``object-tools`` block. Therefore here is our
-new ``change_form.html`` ::
+new ``change_form.html`` :
+
+.. code-block:: html+django
 
     {% extends "admin/change_form.html" %}
     {% load i18n %}

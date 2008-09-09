@@ -7,6 +7,8 @@ Django's comments framework
 .. module:: django.contrib.comments
    :synopsis: Django's comment framework
 
+.. highlightlang:: html+django
+
 Django includes a simple, yet customizable comments framework. The built-in
 comments framework can be used to attach comments to any model, so you can use
 it for comments on blog entries, photos, book chapters, or anything else.
