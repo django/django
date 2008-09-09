@@ -3,6 +3,8 @@ from django.conf import settings
 import os
 
 class DatabaseClient(BaseDatabaseClient):
+    executable_name = 'mysql'
+
     def runshell(self):
         args = ['']
         db = settings.DATABASE_OPTIONS.get('db', settings.DATABASE_NAME)
@@ -11,7 +13,7 @@ class DatabaseClient(BaseDatabaseClient):
         host = settings.DATABASE_OPTIONS.get('host', settings.DATABASE_HOST)
         port = settings.DATABASE_OPTIONS.get('port', settings.DATABASE_PORT)
         defaults_file = settings.DATABASE_OPTIONS.get('read_default_file')
-        # Seems to be no good way to set sql_mode with CLI
+        # Seems to be no good way to set sql_mode with CLI.
     
         if defaults_file:
             args += ["--defaults-file=%s" % defaults_file]
@@ -26,4 +28,4 @@ class DatabaseClient(BaseDatabaseClient):
         if db:
             args += [db]
 
-        os.execvp('mysql', args)
+        os.execvp(self.executable_name, args)
