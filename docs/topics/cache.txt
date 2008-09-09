@@ -197,7 +197,7 @@ as reference implementations. You'll find the code in the
 ``django/core/cache/backends/`` directory of the Django source.
 
 Note: Without a really compelling reason, such as a host that doesn't support
-the them, you should stick to the cache backends included with Django. They've
+them, you should stick to the cache backends included with Django. They've
 been well-tested and are easy to use.
 
 CACHE_BACKEND arguments
