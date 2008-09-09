@@ -46,7 +46,7 @@ different needs:
       individual parts of Django. There are complete guides to Django's
       :ref:`model system <topics-db-index>`, :ref:`template engine
       <topics-templates>`, :ref:`forms framework <topics-forms-index>`, and much
-      more.`
+      more.
       
       This is probably where you'll want to spent most of your time; if you work
       your way through these guides you should come out knowing pretty much
