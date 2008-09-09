@@ -6,339 +6,213 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-25 15:43+0200\n"
-"PO-Revision-Date: 2007-05-19 12:44+0530\n"
-"Last-Translator: pavithran <pavithran.s@gmail.com>\n"
+"POT-Creation-Date: 2008-09-03 07:54+0530\n"
+"PO-Revision-Date: 2008-09-09 21:24+0530\n"
+"Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
 "Language-Team: Telugu <indlinux-telugu@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=2; plural=n>1;"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
 
-#: contrib/comments/models.py:67 contrib/comments/models.py:166
-msgid "object ID"
-msgstr "వస్తువు ఐడి"
+#: conf/global_settings.py:44
+msgid "Arabic"
+msgstr "ఆరబిక్"
 
-#: contrib/comments/models.py:68
-msgid "headline"
-msgstr "ముఖ్య అంశం"
+#: conf/global_settings.py:45
+msgid "Bengali"
+msgstr "బెంగాలి"
 
-#: contrib/comments/models.py:69 contrib/comments/models.py:90
-#: contrib/comments/models.py:167
-msgid "comment"
-msgstr "వ్యాఖ్యానము"
+#: conf/global_settings.py:46
+msgid "Bulgarian"
+msgstr "బల్గెరియన్"
 
-#: contrib/comments/models.py:70
-msgid "rating #1"
-msgstr "రేటింగ్ #1"
+#: conf/global_settings.py:47
+msgid "Catalan"
+msgstr "కటలాన్"
 
-#: contrib/comments/models.py:71
-msgid "rating #2"
-msgstr "రేటింగ్ #2"
+#: conf/global_settings.py:48
+msgid "Czech"
+msgstr "క్జెఖ్"
 
-#: contrib/comments/models.py:72
-msgid "rating #3"
-msgstr "రేటింగ్ #3"
+#: conf/global_settings.py:49
+msgid "Welsh"
+msgstr "వెల్ష్"
 
-#: contrib/comments/models.py:73
-msgid "rating #4"
-msgstr "రేటింగ్ #4"
+#: conf/global_settings.py:50
+msgid "Danish"
+msgstr "డానిశ్"
 
-#: contrib/comments/models.py:74
-msgid "rating #5"
-msgstr "రేటింగ్ #5"
+#: conf/global_settings.py:51
+msgid "German"
+msgstr "జెర్మన్"
 
-#: contrib/comments/models.py:75
-msgid "rating #6"
-msgstr "రేటింగ్ #6"
+#: conf/global_settings.py:52
+msgid "Greek"
+msgstr "గ్రీక్"
 
-#: contrib/comments/models.py:76
-msgid "rating #7"
-msgstr "రేటింగ్ #7"
+#: conf/global_settings.py:53
+msgid "English"
+msgstr "ఆంగ్లము"
 
-#: contrib/comments/models.py:77
-msgid "rating #8"
-msgstr "రేటింగ్ #8"
+#: conf/global_settings.py:54
+msgid "Spanish"
+msgstr "స్పానిష్"
 
-#: contrib/comments/models.py:82
-msgid "is valid rating"
-msgstr "సరైన  రేటింగ్"
+#: conf/global_settings.py:55
+msgid "Estonian"
+msgstr "ఎస్టొనియన్"
 
-#: contrib/comments/models.py:83 contrib/comments/models.py:169
-msgid "date/time submitted"
-msgstr "తేది /వేళ సమర్పించినది"
+#: conf/global_settings.py:56
+msgid "Argentinean Spanish"
+msgstr "అర్జంటీనా స్పానిష్"
 
-#: contrib/comments/models.py:84 contrib/comments/models.py:170
-msgid "is public"
-msgstr "బహిరంగమయినది"
+#: conf/global_settings.py:57
+msgid "Basque"
+msgstr "బాస్క"
 
-#: contrib/comments/models.py:85 contrib/admin/views/doc.py:304
-msgid "IP address"
-msgstr "ఐపి అడ్రస్"
+#: conf/global_settings.py:58
+msgid "Persian"
+msgstr "పారసీ"
 
-#: contrib/comments/models.py:86
-msgid "is removed"
-msgstr "తీసివేయబడినది"
+#: conf/global_settings.py:59
+msgid "Finnish"
+msgstr "ఫీన్నిష్"
 
-#: contrib/comments/models.py:86
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr " ఈ వ్యాఖ్యానము సరిగ్గా లేదని తోచినచో ఈ  డబ్బా ని చెక్ చేయండి "
+#: conf/global_settings.py:60
+msgid "French"
+msgstr "ఫ్రెంచ్"
 
-#: contrib/comments/models.py:91
-msgid "comments"
-msgstr "వ్యాఖ్యానములు"
+#: conf/global_settings.py:61
+msgid "Irish"
+msgstr "ఐరిష్"
 
-#: contrib/comments/models.py:131 contrib/comments/models.py:207
-msgid "Content object"
-msgstr "వస్తువు లోనిది"
+#: conf/global_settings.py:62
+msgid "Galician"
+msgstr "గలిసియన్"
 
-#: contrib/comments/models.py:159
-#, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
+#: conf/global_settings.py:63
+msgid "Hungarian"
+msgstr "హంగారియన్"
 
-#: contrib/comments/models.py:168
-msgid "person's name"
-msgstr "వ్యక్తి పేరు"
+#: conf/global_settings.py:64
+msgid "Hebrew"
+msgstr "హెబ్రివ్"
 
-#: contrib/comments/models.py:171
-msgid "ip address"
-msgstr "ఐపి అడ్రస్"
+#: conf/global_settings.py:65
+msgid "Croatian"
+msgstr "క్రొయెటియన్"
 
-#: contrib/comments/models.py:173
-msgid "approved by staff"
-msgstr " అధికారుల చేత ఆమోదించబడినది"
+#: conf/global_settings.py:66
+msgid "Icelandic"
+msgstr "ఐస్ లాండిక్"
 
-#: contrib/comments/models.py:176
-msgid "free comment"
-msgstr "నిరాటంకమైన వ్యాఖ్యానము"
+#: conf/global_settings.py:67
+msgid "Italian"
+msgstr "ఇటాలియవ్"
 
-#: contrib/comments/models.py:177
-msgid "free comments"
-msgstr "నిరాటంకము గావ్యాఖ్యానములు"
+#: conf/global_settings.py:68
+msgid "Japanese"
+msgstr "జపనీస్"
 
-#: contrib/comments/models.py:233
-msgid "score"
-msgstr "స్కొర్"
+#: conf/global_settings.py:69
+msgid "Georgian"
+msgstr "జ్యొర్జీన్"
 
-#: contrib/comments/models.py:234
-msgid "score date"
-msgstr "స్కొర్  తేది"
+#: conf/global_settings.py:70
+msgid "Korean"
+msgstr "కొరియన్"
 
-#: contrib/comments/models.py:237
-msgid "karma score"
-msgstr "కర్మ  స్కొర్"
+#: conf/global_settings.py:71
+msgid "Khmer"
+msgstr "ఖ్మెర్"
 
-#: contrib/comments/models.py:238
-msgid "karma scores"
-msgstr "కర్మ  స్కొరులు"
+#: conf/global_settings.py:72
+msgid "Kannada"
+msgstr "కన్నడ"
 
-#: contrib/comments/models.py:242
-#, python-format
-msgid "%(score)d rating by %(user)s"
-msgstr "%(score)d కి     %(user)s  రేటింగ్"
+#: conf/global_settings.py:73
+msgid "Latvian"
+msgstr "లాట్వీను"
 
-#: contrib/comments/models.py:258
-#, python-format
-msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"%(user)s చేత చేయబడ్డ  వ్యాఖ్యానములు:\n"
-"\n"
-"%(text)s"
+#: conf/global_settings.py:74
+msgid "Lithuanian"
+msgstr "లిత్ఠువెనీను"
 
-#: contrib/comments/models.py:265
-msgid "flag date"
-msgstr "ఫ్లాగ్ తేది "
+#: conf/global_settings.py:75
+msgid "Macedonian"
+msgstr "మెసిడొనియన్"
 
-#: contrib/comments/models.py:268
-msgid "user flag"
-msgstr "యూజర్ ఫ్లాగ్"
+#: conf/global_settings.py:76
+msgid "Dutch"
+msgstr "డచ్చ"
 
-#: contrib/comments/models.py:269
-msgid "user flags"
-msgstr "యూజర్ ఫ్లాగులు"
+#: conf/global_settings.py:77
+msgid "Norwegian"
+msgstr "నార్వీజియన్"
 
-#: contrib/comments/models.py:273
-#, python-format
-msgid "Flag by %r"
-msgstr "%r యొక్క ఫ్లాగ్"
+#: conf/global_settings.py:78
+msgid "Polish"
+msgstr "పొలిష్"
 
-#: contrib/comments/models.py:278
-msgid "deletion date"
-msgstr "తీసివేసిన  తారీఖు"
+#: conf/global_settings.py:79
+msgid "Portugese"
+msgstr "పుర్తగాలి"
 
-#: contrib/comments/models.py:280
-msgid "moderator deletion"
-msgstr "మొదరేటర్  చేత తీసివేయబడినది "
+#: conf/global_settings.py:80
+msgid "Brazilian Portuguese"
+msgstr "బ్రజీలియన్  పుర్తగాలి"
 
-#: contrib/comments/models.py:281
-msgid "moderator deletions"
-msgstr "మొదరేటర్  చేత తీసివేయబడినవి"
+#: conf/global_settings.py:81
+msgid "Romanian"
+msgstr "రొమానియన్"
 
-#: contrib/comments/models.py:285
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "మొదరేటర్ తీసివేసిన %r"
+#: conf/global_settings.py:82
+msgid "Russian"
+msgstr "రషియన్"
 
-#: contrib/comments/views/karma.py:19
-msgid "Anonymous users cannot vote"
-msgstr "అపరిచిత  యూజర్లు వోటు వేయలేరు"
+#: conf/global_settings.py:83
+msgid "Slovak"
+msgstr "స్లొవాక్"
 
-#: contrib/comments/views/karma.py:23
-msgid "Invalid comment ID"
-msgstr "సరికాని  వ్యాఖ్యానము ఐడి"
+#: conf/global_settings.py:84
+msgid "Slovenian"
+msgstr "స్లొవానియన్"
 
-#: contrib/comments/views/karma.py:25
-msgid "No voting for yourself"
-msgstr "మీకు వోటు హక్కు లేదు"
+#: conf/global_settings.py:85
+msgid "Serbian"
+msgstr "సర్బియన్"
 
-#: contrib/comments/views/comments.py:27
-msgid "This rating is required because you've entered at least one other rating."
-msgstr "ఈ రేటింగ్ అవసరం  ఎం దుకంటే మీరు ఒక్కసారైన రేటింగ్ ఇచ్చారు"
+#: conf/global_settings.py:86
+msgid "Swedish"
+msgstr "స్వీడిష్"
 
-#: contrib/comments/views/comments.py:111
-#, python-format
-msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-"ఈ  వ్యాఖ్యానము చేసిన యూజర్  %(count)s లు కన్న తక్కువ  సమర్పించాడు  "
-"వ్యాఖ్యానము:\n"
-"\n"
-"%(text)s"
-msgstr[1] ""
-"ఈ  వ్యాఖ్యానము చేసిన యూజర్  %(count)s లు కన్న తక్కువ  సమర్పించాడు"
-"వ్యాఖ్యానములు:\n"
-"\n"
-"%(text)s"
+#: conf/global_settings.py:87
+msgid "Tamil"
+msgstr "తమిళ్"
 
-#: contrib/comments/views/comments.py:116
-#, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"ఈ  వ్యాఖ్యానము స్కెచి  యూజర్ చేసాడు  :\n"
-"\n"
-"%(text)s"
+#: conf/global_settings.py:88
+msgid "Telugu"
+msgstr "తెలుగు"
 
-#: contrib/comments/views/comments.py:188
-#: contrib/comments/views/comments.py:280
-msgid "Only POSTs are allowed"
-msgstr "ఇక్కడ సమర్పణలు మాత్రమే అంగీకరిస్తాము"
+#: conf/global_settings.py:89
+msgid "Turkish"
+msgstr "టర్కిశ్"
 
-#: contrib/comments/views/comments.py:192
-#: contrib/comments/views/comments.py:284
-msgid "One or more of the required fields wasn't submitted"
-msgstr "ఒకటి కాని ,అంత కన్నఎక్కువ ఫీల్డస్  సమర్పించలేదు"
+#: conf/global_settings.py:90
+msgid "Ukrainian"
+msgstr "యుక్రానియన్"
 
-#: contrib/comments/views/comments.py:196
-#: contrib/comments/views/comments.py:286
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr "ఎవరో వ్యాఖ్యానము ఫార్మ్ ని గెలికారు (భద్రత కి భంగం) "
+#: conf/global_settings.py:91
+msgid "Simplified Chinese"
+msgstr "వాడుక చైనీస్"
 
-#: contrib/comments/views/comments.py:206
-#: contrib/comments/views/comments.py:292
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr ""
-"వ్యాఖ్యానము ఫార్మ్ లో  చెల్లని  'టార్గెట్ ' పారామీటర్ , ఆ వస్తువు ఐడి "
-"చెల్లదు"
+#: conf/global_settings.py:92
+msgid "Traditional Chinese"
+msgstr "గ్రాంధిక  చైనీస్"
 
-#: contrib/comments/views/comments.py:257
-#: contrib/comments/views/comments.py:321
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "వ్యాఖ్యానము ఫార్మ్ లో 'ప్రివ్యీవ్'  కాని 'పోస్ట్'  ఇవ్వలేదు "
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:17
-msgid "Username:"
-msgstr "యూజర్ పేరు"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Log out"
-msgstr "లాగ్ ఔట్"
-
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:20
-msgid "Password:"
-msgstr "పాస్ వర్డ్"
-
-#: contrib/comments/templates/comments/form.html:8
-msgid "Forgotten your password?"
-msgstr "పాస్ వర్డ్ మర్చిపోయారా?"
-
-#: contrib/comments/templates/comments/form.html:12
-msgid "Ratings"
-msgstr "రేటింగులు"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr "అవసరము"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr "మీ ఇష్టం"
-
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr "ఫొటొ  పెట్టండి"
-
-#: contrib/comments/templates/comments/form.html:28
-#: contrib/comments/templates/comments/freeform.html:5
-msgid "Comment:"
-msgstr "వ్యాఖ్యానము"
-
-#: contrib/comments/templates/comments/form.html:35
-#: contrib/comments/templates/comments/freeform.html:10
-msgid "Preview comment"
-msgstr "వ్యాఖ్యానము ని ప్రివ్యీవ్ చేయండి"
-
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "మీ పేరు"
-
-#: contrib/admin/filterspecs.py:40
+#: contrib/admin/filterspecs.py:44
 #, python-format
 msgid ""
 "<h3>By %s:</h3>\n"
@@ -347,417 +221,320 @@ msgstr ""
 "<h3> %s తో:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143 contrib/admin/filterspecs.py:169
+#: contrib/admin/filterspecs.py:74
+#: contrib/admin/filterspecs.py:92
+#: contrib/admin/filterspecs.py:147
+#: contrib/admin/filterspecs.py:173
 msgid "All"
 msgstr "అన్నీ"
 
-#: contrib/admin/filterspecs.py:109
+#: contrib/admin/filterspecs.py:113
 msgid "Any date"
 msgstr "ఏ రోజైన"
 
-#: contrib/admin/filterspecs.py:110
+#: contrib/admin/filterspecs.py:114
 msgid "Today"
 msgstr "ఈ రోజు"
 
-#: contrib/admin/filterspecs.py:113
+#: contrib/admin/filterspecs.py:117
 msgid "Past 7 days"
 msgstr "గత  7 రోజుల గా"
 
-#: contrib/admin/filterspecs.py:115
+#: contrib/admin/filterspecs.py:119
 msgid "This month"
 msgstr "ఈ నెల"
 
-#: contrib/admin/filterspecs.py:117
+#: contrib/admin/filterspecs.py:121
 msgid "This year"
 msgstr "ఈ  సంవత్సరము"
 
-#: contrib/admin/filterspecs.py:143
+#: contrib/admin/filterspecs.py:147
+#: forms/widgets.py:391
 msgid "Yes"
 msgstr "అవును"
 
-#: contrib/admin/filterspecs.py:143
+#: contrib/admin/filterspecs.py:147
+#: forms/widgets.py:391
 msgid "No"
 msgstr "కాదు"
 
-#: contrib/admin/filterspecs.py:150
+#: contrib/admin/filterspecs.py:154
+#: forms/widgets.py:391
 msgid "Unknown"
 msgstr "తెలియనది"
 
-#: contrib/admin/models.py:16
+#: contrib/admin/models.py:19
 msgid "action time"
 msgstr "పని సమయము "
 
-#: contrib/admin/models.py:19
+#: contrib/admin/models.py:22
 msgid "object id"
 msgstr "వస్తువు"
 
-#: contrib/admin/models.py:20
+#: contrib/admin/models.py:23
 msgid "object repr"
 msgstr "వస్తువు"
 
-#: contrib/admin/models.py:21
+#: contrib/admin/models.py:24
 msgid "action flag"
 msgstr "పని ఫ్లాగ్"
 
-#: contrib/admin/models.py:22
+#: contrib/admin/models.py:25
 msgid "change message"
 msgstr "సందేశము ని మార్చంది"
 
-#: contrib/admin/models.py:25
+#: contrib/admin/models.py:28
 msgid "log entry"
 msgstr "లాగ్ ఎంట్రీ"
 
-#: contrib/admin/models.py:26
+#: contrib/admin/models.py:29
 msgid "log entries"
 msgstr "లాగ్ ఎంట్రీలు"
 
-#: contrib/admin/templatetags/admin_list.py:230
-msgid "All dates"
-msgstr "అన్నీ  రోజులు"
+#: contrib/admin/options.py:60
+#: contrib/admin/options.py:121
+msgid "None"
+msgstr "వొకటీ లేదు"
 
-#: contrib/admin/views/decorators.py:10 contrib/auth/forms.py:59
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr "దయచేసి సరైన  యూజర్ పేరు పాస్ వర్డ్ ఇవ్వండి"
-
-#: contrib/admin/views/decorators.py:24
-#: contrib/admin/templates/admin/login.html:25
-msgid "Log in"
-msgstr "లాగ్ ఇన్"
-
-#: contrib/admin/views/decorators.py:62
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr "దయచేసి మళ్ళీ  లాగ్ ఇన్ అవ్వండి ఎందుకంటే మీ సేస్సన్  ముగిసింది . బాధపడకండి మీ సమర్పన దాచిపెట్టాము"
-
-#: contrib/admin/views/decorators.py:69
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr "మీ  బ్రౌజర్ పై కుకీస్ అంగీకరించేటట్లు చేయలేదు . దయ చేసి  కుకీస్ ఎనేబల్ చేసి ,మళ్ళీ ట్రై చేయండి"
-
-#: contrib/admin/views/decorators.py:83
-msgid "Usernames cannot contain the '@' character."
-msgstr "యూజర్ పేరు లో  '@' అక్షరము ఉందకూడడు"
-
-#: contrib/admin/views/decorators.py:85
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "మీ ఈ మెయిల్ అడ్రస్   మీ యూజర్ పేరు కాదు . '%s' ఇచ్చి చూడండి "
-
-#: contrib/admin/views/main.py:223
-msgid "Site administration"
-msgstr "సైట్ నిర్వాహన"
-
-#: contrib/admin/views/main.py:257 contrib/admin/views/auth.py:17
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\"జయప్రదంగా కలపబడ్డడి"
-
-#: contrib/admin/views/main.py:261 contrib/admin/views/main.py:347
-#: contrib/admin/views/auth.py:22
-msgid "You may edit it again below."
-msgstr "మీరు  మళ్ళీ దీనినీ  క్రింద మార్చవచ్చు"
-
-#: contrib/admin/views/main.py:271 contrib/admin/views/main.py:356
-#, python-format
-msgid "You may add another %s below."
-msgstr "మీరు ఇంకొక   %s ని  క్రింద జత చేయొచ్చు"
-
-#: contrib/admin/views/main.py:289
-#, python-format
-msgid "Add %s"
-msgstr "%s ని జత చేయండి "
-
-#: contrib/admin/views/main.py:335
-#, python-format
-msgid "Added %s."
-msgstr "%s కలపబడ్డడి"
-
-#: contrib/admin/views/main.py:335 contrib/admin/views/main.py:337
-#: contrib/admin/views/main.py:339
-msgid "and"
-msgstr "ఇంకా"
-
-#: contrib/admin/views/main.py:337
+#: contrib/admin/options.py:338
 #, python-format
 msgid "Changed %s."
 msgstr " %s మార్చబడిండి"
 
-#: contrib/admin/views/main.py:339
+#: contrib/admin/options.py:338
+#: contrib/admin/options.py:348
+#: forms/models.py:275
+msgid "and"
+msgstr "మరియు"
+
+#: contrib/admin/options.py:343
 #, python-format
-msgid "Deleted %s."
-msgstr "%s తీసివేయబడ్డడి"
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" జతచేయబడినధి"
 
-#: contrib/admin/views/main.py:342
+#: contrib/admin/options.py:347
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr ""
+
+#: contrib/admin/options.py:352
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" తొలగిబడినది"
+
+#: contrib/admin/options.py:356
 msgid "No fields changed."
-msgstr "ఫీల్డ్స్  ఏమి మార్చబడలేదు"
+msgstr "క్షేత్రములు  ఏమి మార్చబడలేదు"
 
-#: contrib/admin/views/main.py:345
+#: contrib/admin/options.py:417
+#: contrib/auth/admin.py:51
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\"జయప్రదంగా కలపబడ్డడి"
+
+#: contrib/admin/options.py:421
+#: contrib/admin/options.py:454
+#: contrib/auth/admin.py:59
+msgid "You may edit it again below."
+msgstr "మీరు  మళ్ళీ దీనినీ  క్రింద మార్చవచ్చు"
+
+#: contrib/admin/options.py:431
+#: contrib/admin/options.py:464
+#, python-format
+msgid "You may add another %s below."
+msgstr "మీరు ఇంకొక   %s ని  క్రింద జత చేయొచ్చు"
+
+#: contrib/admin/options.py:452
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" జయప్రదంగా మార్చబడిండి"
 
-#: contrib/admin/views/main.py:353
+#: contrib/admin/options.py:460
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" జయప్రదంగా కలపబడ్డడి  .మీరు  మళ్ళీ దీనినీ  క్రింద మార్చవచ్చు"
 
-#: contrib/admin/views/main.py:391
+#: contrib/admin/options.py:536
+#, python-format
+msgid "Add %s"
+msgstr "%sని జత చేయండి "
+
+#: contrib/admin/options.py:614
 #, python-format
 msgid "Change %s"
-msgstr "%s ని మార్చంది"
+msgstr "%sని  మార్చంది"
 
-#: contrib/admin/views/main.py:473
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "ఒకటి కాని ,అంత కన్నఎక్కువ  %(name)s లో  %(fieldname)s  : %(obj)s "
+#: contrib/admin/options.py:646
+msgid "Database error"
+msgstr "దత్తాంశస్థానము పొరబాటు "
 
-#: contrib/admin/views/main.py:478
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "ఒకటి కాని ,అంత కన్నఎక్కువ   %(name)s లో  %(fieldname)s"
-
-#: contrib/admin/views/main.py:511
+#: contrib/admin/options.py:696
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\"జయప్రదంగా తీసివేయబడ్డడి"
 
-#: contrib/admin/views/main.py:514
+#: contrib/admin/options.py:703
 msgid "Are you sure?"
 msgstr "మీరు కచ్చితంగా ఉన్నారా?"
 
-#: contrib/admin/views/main.py:536
+#: contrib/admin/options.py:732
 #, python-format
 msgid "Change history: %s"
-msgstr "మార్చబడిన పురాణము: %s"
+msgstr "చరిత్రం మార్చు: %s"
 
-#: contrib/admin/views/main.py:570
+#: contrib/admin/sites.py:16
+#: contrib/admin/views/decorators.py:14
+#: contrib/auth/forms.py:80
+msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
+msgstr "దయచేసి సరైన  వినియొగదారి నామము అనుమతి పదం ఇవ్వండి"
+
+#: contrib/admin/sites.py:227
+#: contrib/admin/views/decorators.py:40
+msgid "Please log in again, because your session has expired."
+msgstr "దయచేసి మళ్ళీ  లాగ్ ఇన్ అవ్వండి ఎందుకంటే మీ భాగము  ముగిసింది ."
+
+#: contrib/admin/sites.py:234
+#: contrib/admin/views/decorators.py:47
+msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
+msgstr "మీ  అన్వేషి పై కుకీస్ అంగీకరించేటట్లు చేయలేదు . దయ చేసి  కుకీస్ చెతనపరిచి ,మళ్ళీ ప్రయత్నించండి"
+
+#: contrib/admin/sites.py:250
+#: contrib/admin/sites.py:256
+#: contrib/admin/views/decorators.py:66
+msgid "Usernames cannot contain the '@' character."
+msgstr "వినియొగదారి నామములొ  '@' అక్షరము ఉందకూడడు"
+
+#: contrib/admin/sites.py:253
+#: contrib/admin/views/decorators.py:62
 #, python-format
-msgid "Select %s"
-msgstr "%s ని ఎన్నుకోండి"
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "మీ ఇటపా   మీ వినియొగదారి నామము కాదు . '%s' ఇచ్చి చూడండి "
 
-#: contrib/admin/views/main.py:570
+#: contrib/admin/sites.py:313
+msgid "Site administration"
+msgstr "సైట్ నిర్వాహన"
+
+#: contrib/admin/sites.py:326
+#: contrib/admin/templates/admin/login.html:26
+#: contrib/admin/templates/registration/password_reset_complete.html:14
+#: contrib/admin/views/decorators.py:20
+msgid "Log in"
+msgstr "లాగ్ ఇన్"
+
+#: contrib/admin/sites.py:373
 #, python-format
-msgid "Select %s to change"
-msgstr "%s ని మార్చటానికి  ఎన్నుకోండి"
+msgid "%s administration"
+msgstr "%s నిర్వాహన"
 
-#: contrib/admin/views/main.py:758
-msgid "Database error"
-msgstr "డాటాబేస్ ఎర్రర్ "
-
-#: contrib/admin/views/doc.py:46 contrib/admin/views/doc.py:48
-#: contrib/admin/views/doc.py:50
-msgid "tag:"
-msgstr "టాగ్"
-
-#: contrib/admin/views/doc.py:77 contrib/admin/views/doc.py:79
-#: contrib/admin/views/doc.py:81
-msgid "filter:"
-msgstr "ఫిల్టర్"
-
-#: contrib/admin/views/doc.py:135 contrib/admin/views/doc.py:137
-#: contrib/admin/views/doc.py:139
-msgid "view:"
-msgstr "చూడు:"
-
-#: contrib/admin/views/doc.py:164
+#: contrib/admin/util.py:138
 #, python-format
-msgid "App %r not found"
-msgstr "%rఎప్ప్ దొరకలేడు"
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "ఒకటి కాని ,అంత కన్నఎక్కువ  %(name)s లో  %(fieldname)s  : %(obj)s "
 
-#: contrib/admin/views/doc.py:171
+#: contrib/admin/util.py:143
 #, python-format
-msgid "Model %r not found in app %r"
-msgstr "%r ఎప్ప్  లో %r మొడల్ దొరకలేడు"
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "ఒకటి కాని ,అంత కన్నఎక్కువ   %(name)s లో  %(fieldname)s"
 
-#: contrib/admin/views/doc.py:183
-#, python-format
-msgid "the related `%s.%s` object"
-msgstr "సంబంధించిన `%s.%s` వస్తువు "
+#: contrib/admin/widgets.py:70
+msgid "Date:"
+msgstr "తారీఖు:"
 
-#: contrib/admin/views/doc.py:183 contrib/admin/views/doc.py:205
-#: contrib/admin/views/doc.py:219 contrib/admin/views/doc.py:224
-msgid "model:"
-msgstr "మొడల్:"
+#: contrib/admin/widgets.py:70
+msgid "Time:"
+msgstr "సమయం:"
 
-#: contrib/admin/views/doc.py:214
-#, python-format
-msgid "related `%s.%s` objects"
-msgstr "సంబంధించిన  `%s.%s` వస్తువులు"
+#: contrib/admin/widgets.py:94
+msgid "Currently:"
+msgstr "ప్రస్తుతం:"
 
-#: contrib/admin/views/doc.py:219
-#, python-format
-msgid "all %s"
-msgstr "ఆన్నీ  %s"
+#: contrib/admin/widgets.py:94
+msgid "Change:"
+msgstr "మార్చు:"
 
-#: contrib/admin/views/doc.py:224
-#, python-format
-msgid "number of %s"
+#: contrib/admin/widgets.py:121
+msgid "Lookup"
 msgstr ""
 
-#: contrib/admin/views/doc.py:229
+#: contrib/admin/widgets.py:228
+msgid "Add Another"
+msgstr "మరివొక కలుపు"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "పుట  దొరకలేదు"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "క్షమించండి మీరు కోరిన పుట దొరకలేడు"
+
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/app_index.html:8
+#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/change_form.html:17
+#: contrib/admin/templates/admin/change_list.html:8
+#: contrib/admin/templates/admin/delete_confirmation.html:6
+#: contrib/admin/templates/admin/invalid_setup.html:4
+#: contrib/admin/templates/admin/object_history.html:6
+#: contrib/admin/templates/admin/auth/user/change_password.html:10
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_reset_complete.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "నివాసము"
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "సర్వర్ పొరబాటు"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "సర్వర్ పొరబాటు (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "సర్వర్ పొరబాటు <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
+msgstr "పొరబాటు  జరిగింది . దానిని  నిర్వాహనాధికారులు కి ఈ మెయిల్  చేయబడ్డడి,మీ ఓపిక కి ధన్యవాదములు"
+
+#: contrib/admin/templates/admin/app_index.html:10
+#: contrib/admin/templates/admin/index.html:19
 #, python-format
-msgid "Fields on %s objects"
-msgstr "%s వస్తువులలో ఫీల్డ్స్   "
+msgid "%(name)s"
+msgstr "%(name)s"
 
-#: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:301
-#: contrib/admin/views/doc.py:303 contrib/admin/views/doc.py:309
-#: contrib/admin/views/doc.py:310 contrib/admin/views/doc.py:312
-msgid "Integer"
-msgstr "అంకె"
-
-#: contrib/admin/views/doc.py:292
-msgid "Boolean (Either True or False)"
-msgstr ""
-
-#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:311
-#, python-format
-msgid "String (up to %(maxlength)s)"
-msgstr ""
-
-#: contrib/admin/views/doc.py:294
-msgid "Comma-separated integers"
-msgstr "కామా  తో విడడీసిన  సంఖ్య"
-
-#: contrib/admin/views/doc.py:295
-msgid "Date (without time)"
-msgstr "తేది (సమయం లేకుండా)"
-
-#: contrib/admin/views/doc.py:296
-msgid "Date (with time)"
-msgstr "తేది (సమయం తో)"
-
-#: contrib/admin/views/doc.py:297
-msgid "E-mail address"
-msgstr "ఈ మెయిల్  అడ్రస్  "
-
-#: contrib/admin/views/doc.py:298 contrib/admin/views/doc.py:299
-#: contrib/admin/views/doc.py:302
-msgid "File path"
-msgstr "ఫైల్   పాత్"
-
-#: contrib/admin/views/doc.py:300
-msgid "Decimal number"
-msgstr ""
-
-#: contrib/admin/views/doc.py:306
-msgid "Boolean (Either True, False or None)"
-msgstr ""
-
-#: contrib/admin/views/doc.py:307
-msgid "Relation to parent model"
-msgstr "పేరంట్ మొడల్ యొక్క రిలేషన్ "
-
-#: contrib/admin/views/doc.py:308
-msgid "Phone number"
-msgstr "ఫోన్ నంబరు"
-
-#: contrib/admin/views/doc.py:313
-msgid "Text"
-msgstr "టెక్స్ట"
-
-#: contrib/admin/views/doc.py:314
-msgid "Time"
-msgstr "వేళ"
-
-#: contrib/admin/views/doc.py:315 contrib/flatpages/models.py:7
-msgid "URL"
-msgstr ""
-
-#: contrib/admin/views/doc.py:316
-msgid "U.S. state (two uppercase letters)"
-msgstr "అమెరికా రాజ్యము"
-
-#: contrib/admin/views/doc.py:317
-msgid "XML text"
-msgstr "ఎక్స్  ఎమ్   ఎల్"
-
-#: contrib/admin/views/doc.py:343
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr ""
-
-#: contrib/admin/views/auth.py:28
-msgid "Add user"
-msgstr "యూజర్ ని జత చేయండి"
-
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
+msgid "Welcome,"
+msgstr "సుస్వాగతం"
+
+#: contrib/admin/templates/admin/base.html:25
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
-msgstr ""
+msgstr "పత్రికీకరణ"
 
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/auth/user/change_password.html:13
+#: contrib/admin/templates/admin/auth/user/change_password.html:46
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
 msgid "Change password"
 msgstr "పాస్ వర్డ్ మార్చుకోండి"
 
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_list.html:6
-#: contrib/admin/templates/admin/base.html:30
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/change_form.html:13
-#: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Home"
-msgstr "ఇల్లు"
-
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "History"
-msgstr "పురాణము"
-
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "తేది/వేళ"
-
-#: contrib/admin/templates/admin/object_history.html:19
-msgid "User"
-msgstr "యూజర్"
-
-#: contrib/admin/templates/admin/object_history.html:20
-msgid "Action"
-msgstr "పని"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
-msgstr ""
-
-#: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+msgid "Log out"
+msgstr "లాగ్ ఔట్"
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
@@ -767,102 +544,55 @@ msgstr "డ్జాంగొ యొక్క నిర్వాహనదార�
 msgid "Django administration"
 msgstr "డ్జాంగొ నిర్వాహన"
 
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "సర్వర్ తప్పు"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "సర్వర్ తప్పు (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "సర్వర్ తప్పు <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr "తప్పు  జరిగిండి .  దానిని  నిర్వాహనాధికారులు కి ఈ మెయిల్  చేయబడ్డడి,మీ ఓపిక కి ధన్యవాదములు"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "పేజి  దొరకలేదు"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "క్షమించండి మీరు కోరిన పేజి దొరకలేడు"
-
-#: contrib/admin/templates/admin/index.html:17
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr "మొడల్ లు %(name)s లో  దొరికే అప్ప్లికేషన్"
-
-#: contrib/admin/templates/admin/index.html:18
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
-
-#: contrib/admin/templates/admin/index.html:28
-#: contrib/admin/templates/admin/change_form.html:15
+#: contrib/admin/templates/admin/change_form.html:20
+#: contrib/admin/templates/admin/index.html:29
 msgid "Add"
 msgstr "జత చేయి"
 
-#: contrib/admin/templates/admin/index.html:34
-msgid "Change"
-msgstr "మార్చు"
+#: contrib/admin/templates/admin/change_form.html:27
+#: contrib/admin/templates/admin/object_history.html:10
+msgid "History"
+msgstr "చరిత్ర"
 
-#: contrib/admin/templates/admin/index.html:44
-msgid "You don't have permission to edit anything."
-msgstr "మీకు ఏది మార్చటానికి అధికారము లేదు"
+#: contrib/admin/templates/admin/change_form.html:28
+#: contrib/admin/templates/admin/edit_inline/stacked.html:13
+#: contrib/admin/templates/admin/edit_inline/tabular.html:25
+msgid "View on site"
+msgstr "సైట్ లో చూడండి"
 
-#: contrib/admin/templates/admin/index.html:52
-msgid "Recent Actions"
-msgstr "ఈ మధ్య చేసిన పనులు"
+#: contrib/admin/templates/admin/change_form.html:38
+#: contrib/admin/templates/admin/auth/user/change_password.html:22
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "క్రింద ఉన్న తప్పు  సరిదిద్దుకోండి"
+msgstr[1] "క్రింద ఉన్న తప్పులు  సరిదిద్దుకోండి"
 
-#: contrib/admin/templates/admin/index.html:53
-msgid "My Actions"
-msgstr "నా పనులు"
-
-#: contrib/admin/templates/admin/index.html:57
-msgid "None available"
-msgstr "ఏమి  దొరకలేదు"
-
-#: contrib/admin/templates/admin/change_list.html:11
+#: contrib/admin/templates/admin/change_list.html:16
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s జత చేయు"
 
-#: contrib/admin/templates/admin/login.html:22
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "మీరు<a href=\"/password_reset/\">పాస్ వర్డ మర్చిపోయారా? "
+#: contrib/admin/templates/admin/change_list.html:26
+msgid "Filter"
+msgstr "వడపోత"
 
-#: contrib/admin/templates/admin/base.html:25
-msgid "Welcome,"
-msgstr "సుస్వాగతం"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:9
-#: contrib/admin/templates/admin/submit_line.html:3
+#: contrib/admin/templates/admin/delete_confirmation.html:10
+#: contrib/admin/templates/admin/submit_line.html:4
+#: forms/formsets.py:246
 msgid "Delete"
-msgstr "తీసివేయి"
+msgstr "తొలగించు"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
+#: contrib/admin/templates/admin/delete_confirmation.html:16
 #, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
+msgid "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
 msgstr ""
 
-#: contrib/admin/templates/admin/delete_confirmation.html:21
+#: contrib/admin/templates/admin/delete_confirmation.html:23
 #, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
+msgid "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? All of the following related items will be deleted:"
 msgstr ""
 
-#: contrib/admin/templates/admin/delete_confirmation.html:26
+#: contrib/admin/templates/admin/delete_confirmation.html:28
 msgid "Yes, I'm sure"
 msgstr "అవును "
 
@@ -870,6 +600,68 @@ msgstr "అవును "
 #, python-format
 msgid " By %(filter_title)s "
 msgstr ""
+
+#: contrib/admin/templates/admin/index.html:18
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "మొడల్ లు %(name)s లో  దొరికే అప్ప్లికేషన్"
+
+#: contrib/admin/templates/admin/index.html:35
+msgid "Change"
+msgstr "మార్చు"
+
+#: contrib/admin/templates/admin/index.html:45
+msgid "You don't have permission to edit anything."
+msgstr "మీకు ఏది మార్చటానికి అధికారము లేదు"
+
+#: contrib/admin/templates/admin/index.html:53
+msgid "Recent Actions"
+msgstr "ఈ మధ్య చేసిన పనులు"
+
+#: contrib/admin/templates/admin/index.html:54
+msgid "My Actions"
+msgstr "నా పనులు"
+
+#: contrib/admin/templates/admin/index.html:58
+msgid "None available"
+msgstr "ఏమి  దొరకలేదు"
+
+#: contrib/admin/templates/admin/invalid_setup.html:7
+msgid "Something's wrong with your database installation. Make sure the appropriate database tables have been created, and make sure the database is readable by the appropriate user."
+msgstr ""
+
+#: contrib/admin/templates/admin/login.html:19
+msgid "Username:"
+msgstr "వినియొగదారి నామము:"
+
+#: contrib/admin/templates/admin/login.html:22
+msgid "Password:"
+msgstr "అనుమతి పదం:"
+
+#: contrib/admin/templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr "తేది/సమయం"
+
+#: contrib/admin/templates/admin/object_history.html:23
+msgid "User"
+msgstr "వినియొగదారి"
+
+#: contrib/admin/templates/admin/object_history.html:24
+msgid "Action"
+msgstr "క్రియ"
+
+#: contrib/admin/templates/admin/object_history.html:30
+#: utils/translation/trans_real.py:404
+msgid "DATETIME_FORMAT"
+msgstr "తెదిసమయం_రూపలావన్యం"
+
+#: contrib/admin/templates/admin/object_history.html:38
+msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
+msgstr ""
+
+#: contrib/admin/templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "అన్నీ చూపి"
 
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
@@ -879,121 +671,68 @@ msgstr "వెళ్లు"
 #, python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 ఫలమొ"
+msgstr[1] "%(counter)s ఫలితాలు"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
 msgid "%(full_result_count)s total"
-msgstr ""
+msgstr "%(full_result_count)s మొత్తము"
 
-#: contrib/admin/templates/admin/pagination.html:10
-msgid "Show all"
-msgstr "అన్నీ చూడండి"
-
-#: contrib/admin/templates/admin/filters.html:4
-msgid "Filter"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:21
-msgid "View on site"
-msgstr "సైట్ లో చూడండి"
-
-#: contrib/admin/templates/admin/change_form.html:30
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "క్రింద ఉన్న తప్పు  సరిదిద్దుకోండి"
-msgstr[1] "క్రింద ఉన్న తప్పులు  సరిదిద్దుకోండి"
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Ordering"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:51
-msgid "Order:"
-msgstr ""
-
-#: contrib/admin/templates/admin/submit_line.html:4
-msgid "Save as new"
-msgstr "కొత్త దాని లా దాచు"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save and add another"
-msgstr "దాచి కొత్త దానిని కలపండి"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and continue editing"
-msgstr "దాచి  మార్చుటా ఉందండి"
-
-#: contrib/admin/templates/admin/submit_line.html:7
+#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "దాచు"
 
-#: contrib/admin/templates/admin/invalid_setup.html:8
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr ""
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "కొత్త దాని లా దాచు"
+
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "దాచి కొత్త దానిని కలపండి"
+
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "దాచి  మార్చుటా ఉందండి"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:6
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
+msgid "First, enter a username and password. Then, you'll be able to edit more user options."
 msgstr ""
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:12
+#: contrib/admin/templates/admin/auth/user/add_form.html:13
+#: contrib/auth/forms.py:14
+#: contrib/auth/forms.py:47
+#: contrib/auth/forms.py:59
 msgid "Username"
-msgstr "యూజర్ పేరు"
+msgstr "వినియొగదారి నామము"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:18
+#: contrib/admin/templates/admin/auth/user/add_form.html:20
+#: contrib/admin/templates/admin/auth/user/change_password.html:33
+#: contrib/auth/forms.py:17
+#: contrib/auth/forms.py:60
+#: contrib/auth/forms.py:184
 msgid "Password"
-msgstr "పాస్ వర్డ్"
+msgstr "అనుమతిపదం"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:23
+#: contrib/admin/templates/admin/auth/user/add_form.html:26
+#: contrib/admin/templates/admin/auth/user/change_password.html:39
+#: contrib/auth/forms.py:185
 msgid "Password (again)"
-msgstr "పాస్ వర్డ్ (మళ్ళీ)"
+msgstr "అనుమతిపదం(మళ్ళీ)"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:24
+#: contrib/admin/templates/admin/auth/user/add_form.html:27
+#: contrib/admin/templates/admin/auth/user/change_password.html:40
 msgid "Enter the same password as above, for verification."
-msgstr "ఇందాక పాస్ వర్డ్ మళ్ళీ ఇవ్వండి పరిశీలన కోసము"
+msgstr "ఇందాక ఇచ్చిన అనుమతిపదం మళ్ళీ ఇవ్వండి పరిశీలన కోసము"
 
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
-msgid "Password change"
-msgstr "పాస్ వర్డ్ మార్పు"
+#: contrib/admin/templates/admin/auth/user/change_password.html:26
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
 
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "పాస్ వర్డ్ మార్పు జయప్రదమైండి "
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "మీ    పాస్ వర్డ్  మార్చబడిండి"
-
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-#: contrib/admin/templates/registration/password_reset_done.html:4
-msgid "Password reset"
-msgstr "పాస్ వర్డ్ రీసెట్"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr "పాస్ వర్డ్ మర్చిపోయారా? మీ ఈ మెయిల్ అడ్రస్ ఇవ్వండి , మీ  పాస్ వర్డ్ రీసెట్ చేసి మీకు  కొత్తది ఈ మెయిల్ చేస్తాము "
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "ఈ మెయిల్ అడ్రస్"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "నా పాస్ వర్డ్ రీసెట్ చేయండి"
+#: contrib/admin/templates/admin/edit_inline/tabular.html:15
+msgid "Delete?"
+msgstr "తొలగించు?"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -1003,42 +742,95 @@ msgstr ""
 msgid "Log in again"
 msgstr "మళ్ళీ లాగ్ ఇన్ అవ్వండి"
 
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "పాస్ వర్డ్ రీసెట్  జయప్రదమైండి"
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr "అనుమతి పదం మార్పు"
 
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr "మీరు ఇచ్చిన ఈ మెయిల్ అడ్రస్  కి  కొత్త  పాస్ వర్డ్ ఈ మెయిల్ చేసాము.మీరు తొందర లో దానిని అందుకుంటారు ."
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "అనుమతి పదం  మార్పు జయప్రదమైండి "
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "మీ    అనుమతి పదం మార్చబడిండి"
 
 #: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr "దయచేసి  రక్షన కోసము, మీ పాత  పాస్ వర్డ్  ఇవ్వండి  ,  కొత్త పాస్ వర్డ్  రెండు సార్లు ఇవ్వండి , ఎం దుకంటే మీరు తప్పు ఇస్తే  సరిచేయటానికి "
+msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
+msgstr "దయచేసి  రక్షన కోసము, మీ పాత  అనుమతి పదం ఇవ్వండి  ,  కొత్త అనుమతి పదం రెండు సార్లు ఇవ్వండి , ఎం దుకంటే మీరు తప్పు ఇస్తే  సరిచేయటానికి "
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
-msgstr "పాత  పాస్ వర్డ్ "
+msgstr "పాత  అనుమతి పదం"
 
 #: contrib/admin/templates/registration/password_change_form.html:19
+#: contrib/admin/templates/registration/password_reset_confirm.html:18
 msgid "New password:"
-msgstr "కొత్త పాస్ వర్డ్"
+msgstr "కొత్త అనుమతి పదం"
 
 #: contrib/admin/templates/registration/password_change_form.html:21
+#: contrib/admin/templates/registration/password_reset_confirm.html:20
 msgid "Confirm password:"
-msgstr "పాస్ వర్డ్ పక్కా చేయండి"
+msgstr "అనుమతి పదం పక్కా చేయండి"
 
 #: contrib/admin/templates/registration/password_change_form.html:23
+#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "Change my password"
-msgstr "నా పాస్ వర్డ్ మార్చండి"
+msgstr "నా అనుమతి పదం మర్చు"
 
-#: contrib/admin/templates/registration/password_reset_.html:2
+#: contrib/admin/templates/registration/password_reset_complete.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "అనుమతి పదం తిరిగి అమర్చు"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:6
+#: contrib/admin/templates/registration/password_reset_complete.html:10
+msgid "Password reset complete"
+msgstr "అనుమతి పదం తిరిగి మార్చు సంపూర్ణమైనది"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "మీ అనుమతి పదం మర్చుబడినది. మీరు ఇప్పుదు లాగ్ ఇన్ అవ్వచ్చు."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
+msgid "Password reset confirmation"
+msgstr "అనుమతి పదం తిరిగి మార్చు ఖాయం చెయండి"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:12
+msgid "Enter new password"
+msgstr "కొత్త అనుమతి పదం ప్రవేశపెటండి"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:14
+msgid "Please enter your new password twice so we can verify you typed it in correctly."
+msgstr "దయచేసి  రక్షన కోసము, మీ పాత  అనుమతి పదం ఇవ్వండి  ,  కొత్త  అనుమతి పదం  రెండు సార్లు ఇవ్వండి , ఎం దుకంటే మీరు తప్పు ఇస్తే  సరిచేయటానికి "
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:26
+msgid "Password reset unsuccessful"
+msgstr "అనుమతి పదం పునఃఅమర్పు అజయప్రదమైనది"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:28
+msgid "The password reset link was invalid, possibly because it has already been used.  Please request a new password reset."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "అనుమతి పదం తిరిగి అమర్చు జయప్రదమైండి"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid "We've e-mailed you instructions for setting your password to the e-mail address you submitted. You should be receiving it shortly."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "మీరు ఈ ఈ మెయిల్ అందుకున్నారు,   ఎందుకంటే పాస్ వర్డ్ రీసెట్ కోసము కోరారు"
+msgstr "మీరు ఈ ఇటపా అందుకుంటునారు, ఎందుకంటే  మీరు అనుమతి పదం తిరిగి అమర్చుకి మనవి చెసారు "
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -1046,36 +838,220 @@ msgid "for your user account at %(site_name)s"
 msgstr ""
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "మీ  కొత్త పాస్ వర్డ్ : %(new_password)s "
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "నిస్సందేహము గా ఈ పేజి క్ కి వెళ్ళి పాస్ వర్డ్  మార్చుకోండి "
+#: contrib/admin/templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr "మీ వినియొగదారి నామము ఒక వేల మర్చిపొయుంటే"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "మీ యూజర్ పేరు, ఒక వేళ మర్చిపోయి ఉంటే "
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
 msgid "Thanks for using our site!"
 msgstr "మా సైట్  వాడినందుకు ధన్యవాదములు!"
 
-#: contrib/admin/templates/registration/password_reset_email.html:15
+#: contrib/admin/templates/registration/password_reset_email.html:13
 #, python-format
 msgid "The %(site_name)s team"
+msgstr "%(site_name)s జట్టు"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid "Forgotten your password? Enter your e-mail address below, and we'll e-mail instructions for setting a new one."
 msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "ఇటపా:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "అనుమతిపదం తిరిగి అమర్చు"
+
+#: contrib/admin/templatetags/admin_list.py:288
+msgid "All dates"
+msgstr "అన్నీ  తరీఖులు"
+
+#: contrib/admin/views/main.py:69
+#, python-format
+msgid "Select %s"
+msgstr "%s ని ఎన్నుకోండి"
+
+#: contrib/admin/views/main.py:69
+#, python-format
+msgid "Select %s to change"
+msgstr "%s ని మార్చటానికి  ఎన్నుకోండి"
+
+#: contrib/admin/views/template.py:36
+#: contrib/sites/models.py:38
+msgid "site"
+msgstr "సైట్"
+
+#: contrib/admin/views/template.py:38
+msgid "template"
+msgstr ""
+
+#: contrib/admindocs/views.py:57
+#: contrib/admindocs/views.py:59
+#: contrib/admindocs/views.py:61
+msgid "tag:"
+msgstr "టాగ్:"
+
+#: contrib/admindocs/views.py:90
+#: contrib/admindocs/views.py:92
+#: contrib/admindocs/views.py:94
+msgid "filter:"
+msgstr "వడపోత:"
+
+#: contrib/admindocs/views.py:154
+#: contrib/admindocs/views.py:156
+#: contrib/admindocs/views.py:158
+msgid "view:"
+msgstr "దర్శనం:"
+
+#: contrib/admindocs/views.py:186
+#, python-format
+msgid "App %r not found"
+msgstr "%rఎప్ప్ దొరకలేడు"
+
+#: contrib/admindocs/views.py:193
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr ""
+
+#: contrib/admindocs/views.py:205
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr ""
+
+#: contrib/admindocs/views.py:205
+#: contrib/admindocs/views.py:227
+#: contrib/admindocs/views.py:241
+#: contrib/admindocs/views.py:246
+msgid "model:"
+msgstr "మొడల్:"
+
+#: contrib/admindocs/views.py:236
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "సంబంధించిన  `%(app_label)s.%(object_name)s` వస్తువులు"
+
+#: contrib/admindocs/views.py:241
+#, python-format
+msgid "all %s"
+msgstr "ఆన్నీ  %s"
+
+#: contrib/admindocs/views.py:246
+#, python-format
+msgid "number of %s"
+msgstr "%s సంఖ్య"
+
+#: contrib/admindocs/views.py:251
+#, python-format
+msgid "Fields on %s objects"
+msgstr "%s వస్తువులలో ఫీల్డ్స్   "
+
+#: contrib/admindocs/views.py:314
+#: contrib/admindocs/views.py:325
+#: contrib/admindocs/views.py:327
+#: contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:334
+#: contrib/admindocs/views.py:336
+msgid "Integer"
+msgstr "అంకె"
+
+#: contrib/admindocs/views.py:315
+msgid "Boolean (Either True or False)"
+msgstr "బూలియన్ (అవునా లెక కాదా)"
+
+#: contrib/admindocs/views.py:316
+#: contrib/admindocs/views.py:335
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr ""
+
+#: contrib/admindocs/views.py:317
+msgid "Comma-separated integers"
+msgstr "కామా  తో విడడీసిన  సంఖ్య"
+
+#: contrib/admindocs/views.py:318
+msgid "Date (without time)"
+msgstr "తేది (సమయం లేకుండా)"
+
+#: contrib/admindocs/views.py:319
+msgid "Date (with time)"
+msgstr "తేది (సమయం తో)"
+
+#: contrib/admindocs/views.py:320
+msgid "Decimal number"
+msgstr "దశగణసంఖ్య"
+
+#: contrib/admindocs/views.py:321
+msgid "E-mail address"
+msgstr "ఇటపా"
+
+#: contrib/admindocs/views.py:322
+#: contrib/admindocs/views.py:323
+#: contrib/admindocs/views.py:326
+msgid "File path"
+msgstr "ఫైల్   పాత్"
+
+#: contrib/admindocs/views.py:324
+msgid "Floating point number"
+msgstr ""
+
+#: contrib/admindocs/views.py:328
+#: contrib/comments/models.py:58
+msgid "IP address"
+msgstr "ఐపి అడ్రస్"
+
+#: contrib/admindocs/views.py:330
+msgid "Boolean (Either True, False or None)"
+msgstr ""
+
+#: contrib/admindocs/views.py:331
+msgid "Relation to parent model"
+msgstr "పేరంట్ మొడల్ యొక్క రిలేషన్ "
+
+#: contrib/admindocs/views.py:332
+msgid "Phone number"
+msgstr "ఫోన్ నంబరు"
+
+#: contrib/admindocs/views.py:337
+msgid "Text"
+msgstr "వ్యాఖ్యానము"
+
+#: contrib/admindocs/views.py:338
+msgid "Time"
+msgstr "సమయం"
+
+#: contrib/admindocs/views.py:339
+#: contrib/comments/forms.py:22
+#: contrib/flatpages/admin.py:8
+#: contrib/flatpages/models.py:7
+msgid "URL"
+msgstr "URL"
+
+#: contrib/admindocs/views.py:340
+msgid "U.S. state (two uppercase letters)"
+msgstr "అమెరికా రాజ్యము"
+
+#: contrib/admindocs/views.py:341
+msgid "XML text"
+msgstr "ఎక్స్  ఎమ్   ఎల్"
+
+#: contrib/admindocs/views.py:367
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
 msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:5
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:4
 msgid "Documentation bookmarklets"
 msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:9
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -1086,117 +1062,379 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
+msgstr "ఈ పొరటుకు పత్రికీకరణ"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:19
+msgid "Jumps you from any page to the documentation for the view that generates that page."
 msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:20
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr ""
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
 msgstr "వస్తువు ఇడి చూడండి"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:23
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:22
+msgid "Shows the content-type and unique ID for pages that represent a single object."
 msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
 msgstr "వస్తువు ని మార్చండి (ప్రస్తుత విండొ)"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:26
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
 msgstr "వస్తువు ని మార్చండి(కొత్త విండొ) "
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:29
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
 msgstr ""
 
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "తారీఖు"
+#: contrib/auth/admin.py:21
+msgid "Personal info"
+msgstr "పర్సనల్ సమాచారం  "
 
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "వేళ:"
+#: contrib/auth/admin.py:22
+msgid "Permissions"
+msgstr "అనుమతులు"
 
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr "ఇప్పుడు"
+#: contrib/auth/admin.py:23
+msgid "Important dates"
+msgstr "ముఖ్యమైన తారీఖులు"
 
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "మార్చు"
+#: contrib/auth/admin.py:24
+msgid "Groups"
+msgstr "గుంపులు"
 
-#: contrib/redirects/models.py:7
-msgid "redirect from"
+#: contrib/auth/admin.py:64
+msgid "Add user"
+msgstr "వినియొగదారి ని జత చేయండి"
+
+#: contrib/auth/admin.py:90
+msgid "Password changed successfully."
+msgstr "అనుమతి పదం మార్పు జయప్రదమైంది "
+
+#: contrib/auth/admin.py:96
+#, python-format
+msgid "Change password: %s"
+msgstr "అనుమతి  పదం మార్చుకోండి: %s"
+
+#: contrib/auth/forms.py:15
+#: contrib/auth/forms.py:48
+#: contrib/auth/models.py:136
+msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
 msgstr ""
 
-#: contrib/redirects/models.py:8
+#: contrib/auth/forms.py:16
+#: contrib/auth/forms.py:49
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "ఈ విలువ   లో అక్షరాలు, అంకెలు ఇంకా అండర్ స్కోర్లు ఉందాలి"
+
+#: contrib/auth/forms.py:18
+msgid "Password confirmation"
+msgstr "అనుమతి పదం ఖాయం"
+
+#: contrib/auth/forms.py:30
+msgid "A user with that username already exists."
+msgstr "ఈ నామముతొ ఇంకొ వినియొగదారి ఉన్నరు"
+
+#: contrib/auth/forms.py:36
+#: contrib/auth/forms.py:154
+#: contrib/auth/forms.py:196
+msgid "The two password fields didn't match."
+msgstr "ఈ రెండు అనుమతి పదాలు అసమానమైనంగ ఉన్నాయి"
+
+#: contrib/auth/forms.py:82
+msgid "This account is inactive."
+msgstr ""
+
+#: contrib/auth/forms.py:87
+msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
+msgstr ""
+
+#: contrib/auth/forms.py:100
+msgid "E-mail"
+msgstr "ఇటపా అడ్రస్  "
+
+#: contrib/auth/forms.py:109
+msgid "That e-mail address doesn't have an associated user account. Are you sure you've registered?"
+msgstr ""
+
+#: contrib/auth/forms.py:134
+#, python-format
+msgid "Password reset on %s"
+msgstr "%sపై అనుమతి పదం తిరిగి మార్చు "
+
+#: contrib/auth/forms.py:142
+msgid "New password"
+msgstr "కొత్త అనుమతి పదం"
+
+#: contrib/auth/forms.py:143
+msgid "New password confirmation"
+msgstr "కొత్త అనుమతి పదం ఖాయం"
+
+#: contrib/auth/forms.py:168
+msgid "Old password"
+msgstr "పాత  అనుమతి పదం"
+
+#: contrib/auth/forms.py:176
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+
+#: contrib/auth/models.py:72
+#: contrib/auth/models.py:95
+msgid "name"
+msgstr "నామము"
+
+#: contrib/auth/models.py:74
+msgid "codename"
+msgstr "సంహితనామము"
+
+#: contrib/auth/models.py:77
+msgid "permission"
+msgstr "అనుమతి"
+
+#: contrib/auth/models.py:78
+#: contrib/auth/models.py:96
+msgid "permissions"
+msgstr "అనుమతులు"
+
+#: contrib/auth/models.py:99
+msgid "group"
+msgstr "గుంపు"
+
+#: contrib/auth/models.py:100
+#: contrib/auth/models.py:146
+msgid "groups"
+msgstr "గుంపులు"
+
+#: contrib/auth/models.py:136
+msgid "username"
+msgstr "వినియొగదారుని నామము"
+
+#: contrib/auth/models.py:137
+msgid "first name"
+msgstr "పేరు"
+
+#: contrib/auth/models.py:138
+msgid "last name"
+msgstr "ఇంటి పేరు"
+
+#: contrib/auth/models.py:139
+msgid "e-mail address"
+msgstr "ఇటపా"
+
+#: contrib/auth/models.py:140
+msgid "password"
+msgstr "అనుమతిపదం"
+
+#: contrib/auth/models.py:140
+msgid "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
+msgstr ""
+
+#: contrib/auth/models.py:141
+msgid "staff status"
+msgstr "ఉద్యోగస్తుల  స్థితి"
+
+#: contrib/auth/models.py:141
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+#: contrib/auth/models.py:142
+msgid "active"
+msgstr "చురుకు గా"
+
+#: contrib/auth/models.py:142
+msgid "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
+msgstr ""
+
+#: contrib/auth/models.py:143
+msgid "superuser status"
+msgstr ""
+
+#: contrib/auth/models.py:143
+msgid "Designates that this user has all permissions without explicitly assigning them."
+msgstr ""
+
+#: contrib/auth/models.py:144
+msgid "last login"
+msgstr "గత లాగిన్"
+
+#: contrib/auth/models.py:145
+msgid "date joined"
+msgstr "చేరిన తారీఖు"
+
+#: contrib/auth/models.py:147
+msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
+msgstr ""
+
+#: contrib/auth/models.py:148
+msgid "user permissions"
+msgstr "వినియొగదారి  అనుమతులు"
+
+#: contrib/auth/models.py:152
+msgid "user"
+msgstr "వినియొగదారి"
+
+#: contrib/auth/models.py:153
+msgid "users"
+msgstr "వినియొగదారులు"
+
+#: contrib/auth/models.py:308
+msgid "message"
+msgstr "సందేశం"
+
+#: contrib/auth/views.py:50
+msgid "Logged out"
+msgstr "లాగ్గడ్ ఔట్"
+
+#: contrib/auth/management/commands/createsuperuser.py:23
+#: forms/fields.py:428
+msgid "Enter a valid e-mail address."
+msgstr "సరైన ఇటపా ఇవ్వండి"
+
+#: contrib/comments/admin.py:11
+msgid "Content"
+msgstr ""
+
+#: contrib/comments/admin.py:14
+msgid "Metadata"
+msgstr ""
+
+#: contrib/comments/forms.py:20
+msgid "Name"
+msgstr "నామము"
+
+#: contrib/comments/forms.py:21
+msgid "Email address"
+msgstr "ఇటపా "
+
+#: contrib/comments/forms.py:23
+msgid "Comment"
+msgstr "వ్యాఖ్యానము"
+
+#: contrib/comments/forms.py:26
+msgid "If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+
+#: contrib/comments/forms.py:126
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/comments/models.py:23
+msgid "object ID"
+msgstr "వస్తువు ఐడి"
+
+#: contrib/comments/models.py:50
+msgid "user's name"
+msgstr "వినియొగదారి నామము"
+
+#: contrib/comments/models.py:51
+msgid "user's email address"
+msgstr "వినియోగదారుని ఇటపా "
+
+#: contrib/comments/models.py:52
+msgid "user's URL"
+msgstr "వినియొగదారి URL"
+
+#: contrib/comments/models.py:54
+msgid "comment"
+msgstr "వ్యాఖ్యానము"
+
+#: contrib/comments/models.py:57
+msgid "date/time submitted"
+msgstr "తేది /వేళ సమర్పించినది"
+
+#: contrib/comments/models.py:59
+msgid "is public"
+msgstr "బహిరంగమయినది"
+
+#: contrib/comments/models.py:60
+msgid "Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+
+#: contrib/comments/models.py:62
+msgid "is removed"
+msgstr "తీసివేయబడినది"
+
+#: contrib/comments/models.py:63
+msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
+msgstr " ఈ వ్యాఖ్యానము సరిగ్గా లేదని తోచినచో ఈ  డబ్బా ని చెక్ చేయండి "
+
+#: contrib/comments/models.py:115
+msgid "This comment was posted by an authenticated user and thus the name is read-only."
+msgstr ""
+
+#: contrib/comments/models.py:124
+msgid "This comment was posted by an authenticated user and thus the email is read-only."
+msgstr ""
+
+#: contrib/comments/models.py:149
+#, python-format
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
 msgstr ""
 
-#: contrib/redirects/models.py:9
-msgid "redirect to"
-msgstr ""
+#: contrib/contenttypes/models.py:67
+msgid "python model class name"
+msgstr "పైతాన్ మొడల్ క్లాస్  పేరు"
 
-#: contrib/redirects/models.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
+#: contrib/contenttypes/models.py:71
+msgid "content type"
+msgstr "సూచన రకం"
 
-#: contrib/redirects/models.py:13
-msgid "redirect"
-msgstr ""
+#: contrib/contenttypes/models.py:72
+msgid "content types"
+msgstr "సూచన రకాలు"
 
-#: contrib/redirects/models.py:14
-msgid "redirects"
-msgstr ""
-
-#: contrib/flatpages/models.py:8
+#: contrib/flatpages/admin.py:9
 msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 
-#: contrib/flatpages/models.py:9
+#: contrib/flatpages/admin.py:11
+msgid "This value must contain only letters, numbers, underscores, dashes or slashes."
+msgstr "ఈ విలువ   లో అక్షరాలు, అంకెలు , అండర్ స్కోర్లు ,డాష్ లు లేక స్లాష్ లు ఉందాలి"
+
+#: contrib/flatpages/admin.py:22
+msgid "Advanced options"
+msgstr ""
+
+#: contrib/flatpages/models.py:8
 msgid "title"
 msgstr "పట్టము"
 
-#: contrib/flatpages/models.py:10
+#: contrib/flatpages/models.py:9
 msgid "content"
-msgstr ""
+msgstr "సూచన "
 
-#: contrib/flatpages/models.py:11
+#: contrib/flatpages/models.py:10
 msgid "enable comments"
 msgstr ""
 
-#: contrib/flatpages/models.py:12
+#: contrib/flatpages/models.py:11
 msgid "template name"
 msgstr ""
 
-#: contrib/flatpages/models.py:13
-msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
-msgstr "Example: 'flatpages/contact_page.html'.ఇది ఇవ్వకపోతే సిస్టం " " 'flatpages/default.html' ని వాడుకుంటడి"
+#: contrib/flatpages/models.py:12
+msgid "Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use 'flatpages/default.html'."
+msgstr "ఉదాహరణ: 'flatpages/contact_page.html'.ఇది ఇవ్వకపోతే సిస్టం  'flatpages/default.html' ని వాడుకుంటడి"
 
-#: contrib/flatpages/models.py:14
+#: contrib/flatpages/models.py:13
 msgid "registration required"
 msgstr "నమొదు చేయటము అవసరం"
 
-#: contrib/flatpages/models.py:14
+#: contrib/flatpages/models.py:13
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "ఇది చెక్ చేసి ఉంటే కేవలం లాగ్గడ్ ఇన్ యూజర్లు పేజి చూడలేస్తారు"
 
@@ -1208,195 +1446,2228 @@ msgstr ""
 msgid "flat pages"
 msgstr ""
 
-#: contrib/auth/views.py:39
-msgid "Logged out"
-msgstr "లాగ్గడ్ ఔట్"
-
-#: contrib/auth/models.py:38 contrib/auth/models.py:57
-msgid "name"
-msgstr "పేరు"
-
-#: contrib/auth/models.py:40
-msgid "codename"
+#: contrib/formtools/wizard.py:130
+msgid "We apologize, but your form has expired. Please continue filling out the form from this page."
 msgstr ""
 
-#: contrib/auth/models.py:42
-msgid "permission"
-msgstr "అనుమతి"
+#: contrib/gis/forms/fields.py:14
+msgid "No geometry value provided."
+msgstr "క్షెత్రగనిత మూల్యము ఇవ్వలెదు."
 
-#: contrib/auth/models.py:43 contrib/auth/models.py:58
-msgid "permissions"
-msgstr "అనుమతులు"
+#: contrib/gis/forms/fields.py:15
+msgid "Invalid geometry value."
+msgstr "సరికాని  క్షేత్రగణిత మూల్యము."
 
-#: contrib/auth/models.py:60
-msgid "group"
-msgstr "గుంపు"
+#: contrib/gis/forms/fields.py:16
+msgid "Invalid geometry type."
+msgstr "సరికాని  క్షేత్రగణిత రకం."
 
-#: contrib/auth/models.py:61 contrib/auth/models.py:100
-msgid "groups"
-msgstr "గుంపులు"
+#: contrib/humanize/templatetags/humanize.py:19
+msgid "th"
+msgstr "వ"
 
-#: contrib/auth/models.py:90
-msgid "username"
-msgstr "యూజర్ పేరు"
+#: contrib/humanize/templatetags/humanize.py:19
+msgid "st"
+msgstr "వ"
 
-#: contrib/auth/models.py:90
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
+#: contrib/humanize/templatetags/humanize.py:19
+msgid "nd"
+msgstr "వ"
+
+#: contrib/humanize/templatetags/humanize.py:19
+msgid "rd"
+msgstr "వ"
+
+#: contrib/humanize/templatetags/humanize.py:51
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "one"
+msgstr "ఒక్కటి"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "two"
+msgstr "రెండు"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "three"
+msgstr "మూడు"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "four"
+msgstr "నాలుగు"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "five"
+msgstr "ఐదు"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "six"
+msgstr "ఆరు"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "seven"
+msgstr "ఏడు"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "eight"
+msgstr "యెనిమిధి"
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "nine"
+msgstr "తొమ్మిది"
+
+#: contrib/humanize/templatetags/humanize.py:93
+msgid "today"
+msgstr "ఈ రోజు"
+
+#: contrib/humanize/templatetags/humanize.py:95
+msgid "tomorrow"
+msgstr "రెపు"
+
+#: contrib/humanize/templatetags/humanize.py:97
+msgid "yesterday"
+msgstr "నిన్న"
+
+#: contrib/localflavor/ar/forms.py:27
+msgid "Enter a postal code in the format NNNN or ANNNNAAA."
+msgstr "దయచెసి తపాలు సంహిత  NNNN లెక ANNNNAAA రూపలవన్యములొ ఇవ్వండి"
+
+#: contrib/localflavor/ar/forms.py:49
+#: contrib/localflavor/br/forms.py:96
+#: contrib/localflavor/br/forms.py:135
+#: contrib/localflavor/pe/forms.py:23
+#: contrib/localflavor/pe/forms.py:51
+msgid "This field requires only numbers."
 msgstr ""
 
-#: contrib/auth/models.py:91
-msgid "first name"
-msgstr "పేరు"
-
-#: contrib/auth/models.py:92
-msgid "last name"
-msgstr "ఇంటి పేరు"
-
-#: contrib/auth/models.py:93
-msgid "e-mail address"
-msgstr "ఈ మెయిల్  అడ్రస్"
-
-#: contrib/auth/models.py:94
-msgid "password"
-msgstr "పాస్ వర్డ్"
-
-#: contrib/auth/models.py:94
-msgid "Use '[algo]$[salt]$[hexdigest]'"
+#: contrib/localflavor/ar/forms.py:50
+msgid "This field requires 7 or 8 digits."
 msgstr ""
 
-#: contrib/auth/models.py:95
-msgid "staff status"
-msgstr "ఉద్యోగస్తుల  స్థితి"
+#: contrib/localflavor/ar/forms.py:79
+msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
+msgstr "దయచేసి సరైన CUIT(XX-XXXXXXXX-X లెక XXXXXXXXXXXX రూపలవన్యం) ఇవ్వండి."
 
-#: contrib/auth/models.py:95
-msgid "Designates whether the user can log into this admin site."
+#: contrib/localflavor/ar/forms.py:80
+msgid "Invalid CUIT."
+msgstr "సరికాని  CUIT."
+
+#: contrib/localflavor/at/at_states.py:5
+msgid "Burgenland"
+msgstr "బుర్గెన్లాండ్"
+
+#: contrib/localflavor/at/at_states.py:6
+msgid "Carinthia"
+msgstr "కారింథియా"
+
+#: contrib/localflavor/at/at_states.py:7
+msgid "Lower Austria"
+msgstr "లొవర్ ఆస్ట్రియ"
+
+#: contrib/localflavor/at/at_states.py:8
+msgid "Upper Austria"
+msgstr "అప్పర్ ఆస్ట్రియ"
+
+#: contrib/localflavor/at/at_states.py:9
+msgid "Salzburg"
+msgstr "సాల్సబర్గ్"
+
+#: contrib/localflavor/at/at_states.py:10
+msgid "Styria"
+msgstr "స్టైరియా"
+
+#: contrib/localflavor/at/at_states.py:11
+msgid "Tyrol"
+msgstr "టైరొల్"
+
+#: contrib/localflavor/at/at_states.py:12
+msgid "Vorarlberg"
+msgstr "వొరార్లబెర్గ్"
+
+#: contrib/localflavor/at/at_states.py:13
+msgid "Vienna"
+msgstr "వియెన్నా"
+
+#: contrib/localflavor/at/forms.py:20
+#: contrib/localflavor/ch/forms.py:16
+#: contrib/localflavor/no/forms.py:12
+msgid "Enter a zip code in the format XXXX."
+msgstr "దయచేసి తపాలు సంహిత XXXX రూపలవన్యములొ ఇవ్వండి."
+
+#: contrib/localflavor/at/forms.py:48
+msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
+msgstr "దయచేసి సరైన ఆస్ట్రేలియన్ సొషల్ సెక్యురిటి (XXXX XXXXXX రూపలవన్యము) సంఖ్య ఇవ్వండి."
+
+#: contrib/localflavor/au/forms.py:16
+msgid "Enter a 4 digit post code."
+msgstr "దయచేసి 4 ఆంసము తపాలు సంఖ్య ఇవ్వండి"
+
+#: contrib/localflavor/br/forms.py:21
+msgid "Enter a zip code in the format XXXXX-XXX."
+msgstr "దయచేసి తపాలు సంహిత XXXXX-XXX రూపలవన్యములొ ఇవ్వండి."
+
+#: contrib/localflavor/br/forms.py:30
+msgid "Phone numbers must be in XX-XXXX-XXXX format."
+msgstr "దూరవాణి సంఖ్య XX-XXXX-XXXX రూపలావన్యములొ ఉండాలి."
+
+#: contrib/localflavor/br/forms.py:58
+msgid "Select a valid brazilian state. That state is not one of the available states."
+msgstr "సరైన బ్రజిలియన్ రజ్యము ఏర్పర్చండి. ఈ రజ్యం లభ్యమైన రజ్యాలొ లెదు."
+
+#: contrib/localflavor/br/forms.py:94
+msgid "Invalid CPF number."
+msgstr "చెల్లని CPF సంఖ్య"
+
+#: contrib/localflavor/br/forms.py:95
+msgid "This field requires at most 11 digits or 14 characters."
 msgstr ""
 
-#: contrib/auth/models.py:96
-msgid "active"
-msgstr "చురుకు గా"
+#: contrib/localflavor/br/forms.py:134
+msgid "Invalid CNPJ number."
+msgstr "చెల్లని CNPJ సంఖ్య"
 
-#: contrib/auth/models.py:96
-msgid ""
-"Designates whether this user can log into the Django admin. Unselect this "
-"instead of deleting accounts."
+#: contrib/localflavor/br/forms.py:136
+msgid "This field requires at least 14 digits"
 msgstr ""
 
-#: contrib/auth/models.py:97
-msgid "superuser status"
+#: contrib/localflavor/ca/forms.py:17
+msgid "Enter a postal code in the format XXX XXX."
+msgstr "దయచేసి తపాలు సంహిత XXX XXX రూపలవన్యములొ ఇవ్వండి."
+
+#: contrib/localflavor/ca/forms.py:88
+msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
+msgstr "దయచేసి సరైన కనెడియన్ సొషల్ ఇన్షురన్స్ (XXX-XXX-XXX రూపలవన్యము) సంఖ్య ఇవ్వండి."
+
+#: contrib/localflavor/ch/ch_states.py:5
+msgid "Aargau"
+msgstr "ఆర్గౌ"
+
+#: contrib/localflavor/ch/ch_states.py:6
+msgid "Appenzell Innerrhoden"
+msgstr "ఆప్పెంజెల్ ఈన్నెర్హొడెన్"
+
+#: contrib/localflavor/ch/ch_states.py:7
+msgid "Appenzell Ausserrhoden"
+msgstr "ఆప్పెంజెల్ ఆఉస్సెర్హొడెన్"
+
+#: contrib/localflavor/ch/ch_states.py:8
+msgid "Basel-Stadt"
+msgstr "బసెల్-స్టద్ట్"
+
+#: contrib/localflavor/ch/ch_states.py:9
+msgid "Basel-Land"
+msgstr "బసెల్-లాండ్"
+
+#: contrib/localflavor/ch/ch_states.py:10
+msgid "Berne"
+msgstr "బర్న్"
+
+#: contrib/localflavor/ch/ch_states.py:11
+msgid "Fribourg"
+msgstr "ఫ్రిబౌర్గ్"
+
+#: contrib/localflavor/ch/ch_states.py:12
+msgid "Geneva"
+msgstr "జెనీవా"
+
+#: contrib/localflavor/ch/ch_states.py:13
+msgid "Glarus"
+msgstr "గ్లారస్"
+
+#: contrib/localflavor/ch/ch_states.py:14
+msgid "Graubuenden"
+msgstr "గ్రౌబెండెన్"
+
+#: contrib/localflavor/ch/ch_states.py:15
+msgid "Jura"
+msgstr "జుర"
+
+#: contrib/localflavor/ch/ch_states.py:16
+msgid "Lucerne"
+msgstr "లుకర్న్"
+
+#: contrib/localflavor/ch/ch_states.py:17
+msgid "Neuchatel"
+msgstr "న్యుకటెల్"
+
+#: contrib/localflavor/ch/ch_states.py:18
+msgid "Nidwalden"
+msgstr "నిడ్వాల్డెన్"
+
+#: contrib/localflavor/ch/ch_states.py:19
+msgid "Obwalden"
+msgstr "ఒబ్వాల్డెన్"
+
+#: contrib/localflavor/ch/ch_states.py:20
+msgid "Schaffhausen"
+msgstr "షఫౌసెన్"
+
+#: contrib/localflavor/ch/ch_states.py:21
+msgid "Schwyz"
+msgstr "ష్విజ్"
+
+#: contrib/localflavor/ch/ch_states.py:22
+msgid "Solothurn"
+msgstr "సొలొథర్న్"
+
+#: contrib/localflavor/ch/ch_states.py:23
+msgid "St. Gallen"
+msgstr "స్త్.గాలెన్"
+
+#: contrib/localflavor/ch/ch_states.py:24
+msgid "Thurgau"
+msgstr "తర్గౌ"
+
+#: contrib/localflavor/ch/ch_states.py:25
+msgid "Ticino"
+msgstr "తికినొ"
+
+#: contrib/localflavor/ch/ch_states.py:26
+msgid "Uri"
+msgstr "ఉరి"
+
+#: contrib/localflavor/ch/ch_states.py:27
+msgid "Valais"
+msgstr "వలె"
+
+#: contrib/localflavor/ch/ch_states.py:28
+msgid "Vaud"
+msgstr "వౌడ్"
+
+#: contrib/localflavor/ch/ch_states.py:29
+msgid "Zug"
+msgstr "జుగ్గ"
+
+#: contrib/localflavor/ch/ch_states.py:30
+msgid "Zurich"
+msgstr "జురిక్"
+
+#: contrib/localflavor/ch/forms.py:64
+msgid "Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format."
+msgstr "దయచేసి సరైన స్విస్సు గుర్తు లెక పాస్పొర్టు సంఖ్య ఇవ్వండి (X1234567<0 లెక 1234567890 రూపలావన్యము)"
+
+#: contrib/localflavor/cl/forms.py:29
+msgid "Enter a valid Chilean RUT."
+msgstr "దయచేసి సరైన  చిలి RUT ఇవ్వండి."
+
+#: contrib/localflavor/cl/forms.py:30
+msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
+msgstr "సరైన చిలి RUT (XX.XXX.XXX-X రూపలవన్యము) సంఖ్య ఇవ్వండి."
+
+#: contrib/localflavor/cl/forms.py:31
+msgid "The Chilean RUT is not valid."
+msgstr "మీరు ఇచ్చిన చిలి RUT చెల్లదు."
+
+#: contrib/localflavor/de/de_states.py:5
+msgid "Baden-Wuerttemberg"
+msgstr "భాడెన్-వెర్తెంబెర్గ్"
+
+#: contrib/localflavor/de/de_states.py:6
+msgid "Bavaria"
+msgstr "బవారియా"
+
+#: contrib/localflavor/de/de_states.py:7
+msgid "Berlin"
+msgstr "బెర్లిన్"
+
+#: contrib/localflavor/de/de_states.py:8
+msgid "Brandenburg"
+msgstr "బ్రాండెంబర్గ్"
+
+#: contrib/localflavor/de/de_states.py:9
+msgid "Bremen"
+msgstr "బ్రెమెన్"
+
+#: contrib/localflavor/de/de_states.py:10
+msgid "Hamburg"
+msgstr "హంబర్గ్"
+
+#: contrib/localflavor/de/de_states.py:11
+msgid "Hessen"
+msgstr "హెస్సెన్"
+
+#: contrib/localflavor/de/de_states.py:12
+msgid "Mecklenburg-Western Pomerania"
+msgstr "మెక్లెంబర్గ్-పశ్చిమ ఫొమెరనియా"
+
+#: contrib/localflavor/de/de_states.py:13
+msgid "Lower Saxony"
+msgstr "లౌఎర్ సాక్సొని"
+
+#: contrib/localflavor/de/de_states.py:14
+msgid "North Rhine-Westphalia"
+msgstr "ఉత్తర రైన్-వెస్టఫలియా"
+
+#: contrib/localflavor/de/de_states.py:15
+msgid "Rhineland-Palatinate"
+msgstr "రైనెలాండ్-ఫలాటినట్"
+
+#: contrib/localflavor/de/de_states.py:16
+msgid "Saarland"
+msgstr "సార్లాండ్"
+
+#: contrib/localflavor/de/de_states.py:17
+msgid "Saxony"
+msgstr "సాక్సొని"
+
+#: contrib/localflavor/de/de_states.py:18
+msgid "Saxony-Anhalt"
+msgstr "సాక్సొని-అనాట్"
+
+#: contrib/localflavor/de/de_states.py:19
+msgid "Schleswig-Holstein"
+msgstr "శ్లెజ్విగ్-హొల్సటైన్"
+
+#: contrib/localflavor/de/de_states.py:20
+msgid "Thuringia"
+msgstr "థురింగియా"
+
+#: contrib/localflavor/de/forms.py:14
+#: contrib/localflavor/fi/forms.py:12
+#: contrib/localflavor/fr/forms.py:15
+msgid "Enter a zip code in the format XXXXX."
+msgstr "దయచేసి తపాలు సంహిత XXXXX రూపలవన్యములొ ఇవ్వండి."
+
+#: contrib/localflavor/de/forms.py:41
+msgid "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format."
+msgstr "దయచేసి సరైన జర్మన్ గుర్తు చీట్లు (XXXXXXXXXXX-XXXXXXX-XXXXXXX-X రూపలవన్యము) సంఖ్య ఇవ్వండి."
+
+#: contrib/localflavor/es/es_provinces.py:5
+msgid "Arava"
+msgstr "అరవ"
+
+#: contrib/localflavor/es/es_provinces.py:6
+msgid "Albacete"
+msgstr "అల్బాసెట్"
+
+#: contrib/localflavor/es/es_provinces.py:7
+msgid "Alacant"
+msgstr "అలకంట్"
+
+#: contrib/localflavor/es/es_provinces.py:8
+msgid "Almeria"
+msgstr "అల్మిరియా"
+
+#: contrib/localflavor/es/es_provinces.py:9
+msgid "Avila"
+msgstr "అవిల"
+
+#: contrib/localflavor/es/es_provinces.py:10
+msgid "Badajoz"
+msgstr "బడాజొజ్జ్"
+
+#: contrib/localflavor/es/es_provinces.py:11
+msgid "Illes Balears"
+msgstr "ఇల్లెస్ బలేర్స్"
+
+#: contrib/localflavor/es/es_provinces.py:12
+msgid "Barcelona"
+msgstr "బార్సిలొనా"
+
+#: contrib/localflavor/es/es_provinces.py:13
+msgid "Burgos"
+msgstr "బర్గొస్"
+
+#: contrib/localflavor/es/es_provinces.py:14
+msgid "Caceres"
+msgstr "కసిరెస్"
+
+#: contrib/localflavor/es/es_provinces.py:15
+msgid "Cadiz"
+msgstr "కడిజ్"
+
+#: contrib/localflavor/es/es_provinces.py:16
+msgid "Castello"
+msgstr "kasTello"
+
+#: contrib/localflavor/es/es_provinces.py:17
+msgid "Ciudad Real"
+msgstr "సియుడాడ్ రియాల్"
+
+#: contrib/localflavor/es/es_provinces.py:18
+msgid "Cordoba"
+msgstr "కొర్డొబా"
+
+#: contrib/localflavor/es/es_provinces.py:19
+msgid "A Coruna"
+msgstr "ఆ కొరున్యా"
+
+#: contrib/localflavor/es/es_provinces.py:20
+msgid "Cuenca"
+msgstr "కువెంకా"
+
+#: contrib/localflavor/es/es_provinces.py:21
+msgid "Girona"
+msgstr "గిరొనా"
+
+#: contrib/localflavor/es/es_provinces.py:22
+msgid "Granada"
+msgstr "గ్రనడా"
+
+#: contrib/localflavor/es/es_provinces.py:23
+msgid "Guadalajara"
+msgstr "గువడలజర"
+
+#: contrib/localflavor/es/es_provinces.py:24
+msgid "Guipuzkoa"
+msgstr "గువిపుజకొవ"
+
+#: contrib/localflavor/es/es_provinces.py:25
+msgid "Huelva"
+msgstr "హువెల్వ"
+
+#: contrib/localflavor/es/es_provinces.py:26
+msgid "Huesca"
+msgstr "హుఎస్కా"
+
+#: contrib/localflavor/es/es_provinces.py:27
+msgid "Jaen"
+msgstr "జేన్"
+
+#: contrib/localflavor/es/es_provinces.py:28
+msgid "Leon"
+msgstr "లియొన్"
+
+#: contrib/localflavor/es/es_provinces.py:29
+msgid "Lleida"
+msgstr "లైడ"
+
+#: contrib/localflavor/es/es_provinces.py:30
+#: contrib/localflavor/es/es_regions.py:17
+msgid "La Rioja"
+msgstr "ల రిఒజ"
+
+#: contrib/localflavor/es/es_provinces.py:31
+msgid "Lugo"
+msgstr "లుగొ"
+
+#: contrib/localflavor/es/es_provinces.py:32
+#: contrib/localflavor/es/es_regions.py:18
+msgid "Madrid"
+msgstr "మాడ్రిడ్"
+
+#: contrib/localflavor/es/es_provinces.py:33
+msgid "Malaga"
+msgstr "మలగా"
+
+#: contrib/localflavor/es/es_provinces.py:34
+msgid "Murcia"
+msgstr "మర్కియ"
+
+#: contrib/localflavor/es/es_provinces.py:35
+msgid "Navarre"
+msgstr "నవర్రె"
+
+#: contrib/localflavor/es/es_provinces.py:36
+msgid "Ourense"
+msgstr "ఔరెన్సె"
+
+#: contrib/localflavor/es/es_provinces.py:37
+msgid "Asturias"
+msgstr "అస్టురియాస్"
+
+#: contrib/localflavor/es/es_provinces.py:38
+msgid "Palencia"
+msgstr "పలెన్శియా"
+
+#: contrib/localflavor/es/es_provinces.py:39
+msgid "Las Palmas"
+msgstr "లా పామాస్"
+
+#: contrib/localflavor/es/es_provinces.py:40
+msgid "Pontevedra"
+msgstr "పొంటెవెడెర"
+
+#: contrib/localflavor/es/es_provinces.py:41
+msgid "Salamanca"
+msgstr "సలమంక"
+
+#: contrib/localflavor/es/es_provinces.py:42
+msgid "Santa Cruz de Tenerife"
+msgstr "సాంట క్రుజ్ ద టెనెరిఫె"
+
+#: contrib/localflavor/es/es_provinces.py:43
+#: contrib/localflavor/es/es_regions.py:11
+msgid "Cantabria"
+msgstr "కంటబ్రియా"
+
+#: contrib/localflavor/es/es_provinces.py:44
+msgid "Segovia"
+msgstr "సెగొవియా"
+
+#: contrib/localflavor/es/es_provinces.py:45
+msgid "Seville"
+msgstr "సెవియా"
+
+#: contrib/localflavor/es/es_provinces.py:46
+msgid "Soria"
+msgstr "సొరియా"
+
+#: contrib/localflavor/es/es_provinces.py:47
+msgid "Tarragona"
+msgstr "టర్రగొన"
+
+#: contrib/localflavor/es/es_provinces.py:48
+msgid "Teruel"
+msgstr "టెరువెల్"
+
+#: contrib/localflavor/es/es_provinces.py:49
+msgid "Toledo"
+msgstr "టొలిడొ"
+
+#: contrib/localflavor/es/es_provinces.py:50
+msgid "Valencia"
+msgstr "వెలెన్షియా"
+
+#: contrib/localflavor/es/es_provinces.py:51
+msgid "Valladolid"
+msgstr "వల్లడొలిడ్"
+
+#: contrib/localflavor/es/es_provinces.py:52
+msgid "Bizkaia"
+msgstr "బిజ్కైయా"
+
+#: contrib/localflavor/es/es_provinces.py:53
+msgid "Zamora"
+msgstr "జమొర"
+
+#: contrib/localflavor/es/es_provinces.py:54
+msgid "Zaragoza"
+msgstr "జరగొసా"
+
+#: contrib/localflavor/es/es_provinces.py:55
+msgid "Ceuta"
+msgstr "క్యుట"
+
+#: contrib/localflavor/es/es_provinces.py:56
+msgid "Melilla"
+msgstr "మెలిల్ల్యా"
+
+#: contrib/localflavor/es/es_regions.py:5
+msgid "Andalusia"
+msgstr "అండలుసియా"
+
+#: contrib/localflavor/es/es_regions.py:6
+msgid "Aragon"
+msgstr "ఎరొగొన్"
+
+#: contrib/localflavor/es/es_regions.py:7
+msgid "Principality of Asturias"
+msgstr "ప్రిన్సిపాలిటి ఒఫ్ ఆస్టురియాస్"
+
+#: contrib/localflavor/es/es_regions.py:8
+msgid "Balearic Islands"
+msgstr "బలెయారిక్ ద్వీపాలు"
+
+#: contrib/localflavor/es/es_regions.py:9
+msgid "Basque Country"
+msgstr "బాస్క్ దెశం"
+
+#: contrib/localflavor/es/es_regions.py:10
+msgid "Canary Islands"
+msgstr "కనరి ద్వీపాలు"
+
+#: contrib/localflavor/es/es_regions.py:12
+msgid "Castile-La Mancha"
+msgstr "కస్తిల్-ల మంక"
+
+#: contrib/localflavor/es/es_regions.py:13
+msgid "Castile and Leon"
+msgstr "కస్టిల్ మరియు లియొన్"
+
+#: contrib/localflavor/es/es_regions.py:14
+msgid "Catalonia"
+msgstr "కటలొనియా"
+
+#: contrib/localflavor/es/es_regions.py:15
+msgid "Extremadura"
+msgstr "ఎక్స్ట్రీమదుర"
+
+#: contrib/localflavor/es/es_regions.py:16
+msgid "Galicia"
+msgstr "గలిషియా"
+
+#: contrib/localflavor/es/es_regions.py:19
+msgid "Region of Murcia"
+msgstr "మర్కియ రాజ్యము"
+
+#: contrib/localflavor/es/es_regions.py:20
+msgid "Foral Community of Navarre"
+msgstr "ఫొరల్  కమ్యునిటి ఒఫ్ నావర్రె"
+
+#: contrib/localflavor/es/es_regions.py:21
+msgid "Valencian Community"
+msgstr "వాలెన్షియన్ కమ్యునిటి"
+
+#: contrib/localflavor/es/forms.py:19
+msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
 msgstr ""
 
-#: contrib/auth/models.py:97
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
+#: contrib/localflavor/es/forms.py:39
+msgid "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or 9XXXXXXXX."
+msgstr "దయచేసి సరైన దూరవాణి సంఖ్య ఇవ్వండి (6XXXXXXXX, 8XXXXXXXX లెక 9XXXXXXXX రూపలావన్యము)"
+
+#: contrib/localflavor/es/forms.py:66
+msgid "Please enter a valid NIF, NIE, or CIF."
+msgstr "దయచేసి సరైన NIF, NIE లెక CIF ఇవ్వండి ."
+
+#: contrib/localflavor/es/forms.py:67
+msgid "Please enter a valid NIF or NIE."
+msgstr "దయచేసి సరైన NIF లెక NIEఇవ్వండి."
+
+#: contrib/localflavor/es/forms.py:68
+msgid "Invalid checksum for NIF."
+msgstr "చెల్లని  NIF నియంతృలెక్యం."
+
+#: contrib/localflavor/es/forms.py:69
+msgid "Invalid checksum for NIE."
+msgstr "చెల్లని  NIE నియంతృలెక్యం."
+
+#: contrib/localflavor/es/forms.py:70
+msgid "Invalid checksum for CIF."
+msgstr "చెల్లని  CIF నియంతృలెక్యం."
+
+#: contrib/localflavor/es/forms.py:142
+msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
+msgstr "దయచేసి సరైన  కొఠీ లెక్య సంఖ్య ఇవ్వండి (XXXX-XXXX-XX-XXXXXXXXXX రూపలావన్యము)"
+
+#: contrib/localflavor/es/forms.py:143
+msgid "Invalid checksum for bank account number."
+msgstr "చెల్లని  కొఠీ లెక్క సంఖ్య నియంతృలెక్యం."
+
+#: contrib/localflavor/fi/forms.py:28
+msgid "Enter a valid Finnish social security number."
+msgstr "దయచెసి సరైన ఫిన్నిష్ సొషల్ సెక్యురిటి సంఖ్య ఇవ్వండి."
+
+#: contrib/localflavor/in_/forms.py:14
+msgid "Enter a zip code in the format XXXXXXX."
+msgstr "దయచేసి తపాలు సంహిత XXXXXXX రూపలవన్యములొ ఇవ్వండి."
+
+#: contrib/localflavor/is_/forms.py:17
+msgid "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+msgstr "దయచేసి సరైన ఐస్లాండిక్ గుర్తు(XXXXXX-XXXX రూపలవన్యము) సంఖ్య ఇవ్వండి."
+
+#: contrib/localflavor/is_/forms.py:18
+msgid "The Icelandic identification number is not valid."
+msgstr "చెల్లని ఐస్లాండిక్ గుర్తు సంఖ్య."
+
+#: contrib/localflavor/it/forms.py:14
+msgid "Enter a valid zip code."
+msgstr "దయచేసి సరైన తపాలు సంహిత ఇవ్వండి."
+
+#: contrib/localflavor/it/forms.py:43
+msgid "Enter a valid Social Security number."
+msgstr "దయచేసి సరైన సొషల్ సెక్యురిటి సంఖ్య ఇవ్వండి."
+
+#: contrib/localflavor/it/forms.py:68
+msgid "Enter a valid VAT number."
+msgstr "దయచేసి సరైన VAT సంఖ్య  ఇవ్వండి."
+
+#: contrib/localflavor/jp/forms.py:16
+msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
+msgstr "దయచేసి తపాలు సంహిత  (XXXXX-XXX లెక XXX-XXXX రూపలవన్యము ) ఇవ్వండి."
+
+#: contrib/localflavor/jp/jp_prefectures.py:4
+msgid "Hokkaido"
+msgstr "హొకైడొ"
+
+#: contrib/localflavor/jp/jp_prefectures.py:5
+msgid "Aomori"
+msgstr "ఒమొరి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:6
+msgid "Iwate"
+msgstr "ఇవాటె"
+
+#: contrib/localflavor/jp/jp_prefectures.py:7
+msgid "Miyagi"
+msgstr "మియాగి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:8
+msgid "Akita"
+msgstr "అకిట"
+
+#: contrib/localflavor/jp/jp_prefectures.py:9
+msgid "Yamagata"
+msgstr "యమగాట"
+
+#: contrib/localflavor/jp/jp_prefectures.py:10
+msgid "Fukushima"
+msgstr "ఫుకుషిమ"
+
+#: contrib/localflavor/jp/jp_prefectures.py:11
+msgid "Ibaraki"
+msgstr "ఇబరాకి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:12
+msgid "Tochigi"
+msgstr "టొచిగి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:13
+msgid "Gunma"
+msgstr "గున్మ"
+
+#: contrib/localflavor/jp/jp_prefectures.py:14
+msgid "Saitama"
+msgstr "సైతమా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:15
+msgid "Chiba"
+msgstr "చిబ"
+
+#: contrib/localflavor/jp/jp_prefectures.py:16
+msgid "Tokyo"
+msgstr "టొకియొ"
+
+#: contrib/localflavor/jp/jp_prefectures.py:17
+msgid "Kanagawa"
+msgstr "కనగావా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:18
+msgid "Yamanashi"
+msgstr "యమనాషి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:19
+msgid "Nagano"
+msgstr "నగానొ"
+
+#: contrib/localflavor/jp/jp_prefectures.py:20
+msgid "Niigata"
+msgstr "నీగాట"
+
+#: contrib/localflavor/jp/jp_prefectures.py:21
+msgid "Toyama"
+msgstr "టొయామా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:22
+msgid "Ishikawa"
+msgstr "ఇషికావా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:23
+msgid "Fukui"
+msgstr "ఫుకుయి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:24
+msgid "Gifu"
+msgstr "గిఫు"
+
+#: contrib/localflavor/jp/jp_prefectures.py:25
+msgid "Shizuoka"
+msgstr "షిజుఒక"
+
+#: contrib/localflavor/jp/jp_prefectures.py:26
+msgid "Aichi"
+msgstr "ఐచి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:27
+msgid "Mie"
+msgstr "మి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:28
+msgid "Shiga"
+msgstr "షిగ"
+
+#: contrib/localflavor/jp/jp_prefectures.py:29
+msgid "Kyoto"
+msgstr "క్యొటొ"
+
+#: contrib/localflavor/jp/jp_prefectures.py:30
+msgid "Osaka"
+msgstr "ఒసాకా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:31
+msgid "Hyogo"
+msgstr "హ్యొగొ"
+
+#: contrib/localflavor/jp/jp_prefectures.py:32
+msgid "Nara"
+msgstr "నారా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:33
+msgid "Wakayama"
+msgstr "వకయామా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:34
+msgid "Tottori"
+msgstr "టొట్టొరి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:35
+msgid "Shimane"
+msgstr "షిమానె"
+
+#: contrib/localflavor/jp/jp_prefectures.py:36
+msgid "Okayama"
+msgstr "ఒకయామా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:37
+msgid "Hiroshima"
+msgstr "హిరొషిమా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:38
+msgid "Yamaguchi"
+msgstr "యామాగుచ్చి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:39
+msgid "Tokushima"
+msgstr "టొకుషిమా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:40
+msgid "Kagawa"
+msgstr "కగావా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:41
+msgid "Ehime"
+msgstr "ఎహిమె"
+
+#: contrib/localflavor/jp/jp_prefectures.py:42
+msgid "Kochi"
+msgstr "కొచి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:43
+msgid "Fukuoka"
+msgstr "ఫుకొకు"
+
+#: contrib/localflavor/jp/jp_prefectures.py:44
+msgid "Saga"
+msgstr "సగా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:45
+msgid "Nagasaki"
+msgstr "నాగాసాకి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:46
+msgid "Kumamoto"
+msgstr "కుమమొటొ"
+
+#: contrib/localflavor/jp/jp_prefectures.py:47
+msgid "Oita"
+msgstr "ఒయిటొ"
+
+#: contrib/localflavor/jp/jp_prefectures.py:48
+msgid "Miyazaki"
+msgstr "మియజాకి"
+
+#: contrib/localflavor/jp/jp_prefectures.py:49
+msgid "Kagoshima"
+msgstr "కాగొషిమా"
+
+#: contrib/localflavor/jp/jp_prefectures.py:50
+msgid "Okinawa"
+msgstr "ఒకినావా"
+
+#: contrib/localflavor/mx/mx_states.py:12
+msgid "Aguascalientes"
+msgstr "అగూస్కలియెంటెస్"
+
+#: contrib/localflavor/mx/mx_states.py:13
+msgid "Baja California"
+msgstr "బాహా కాలిఫొర్నియ"
+
+#: contrib/localflavor/mx/mx_states.py:14
+msgid "Baja California Sur"
+msgstr "బాహా కాలిఫొర్నియ సుర్"
+
+#: contrib/localflavor/mx/mx_states.py:15
+msgid "Campeche"
+msgstr "కంపెచె"
+
+#: contrib/localflavor/mx/mx_states.py:16
+msgid "Chihuahua"
+msgstr "చిహువహువ"
+
+#: contrib/localflavor/mx/mx_states.py:17
+msgid "Chiapas"
+msgstr "చియపస్"
+
+#: contrib/localflavor/mx/mx_states.py:18
+msgid "Coahuila"
+msgstr "కోహుయిల"
+
+#: contrib/localflavor/mx/mx_states.py:19
+msgid "Colima"
+msgstr "కొలిమ"
+
+#: contrib/localflavor/mx/mx_states.py:20
+msgid "Distrito Federal"
+msgstr "డిస్ట్రిటొ ఫెడ్రల్"
+
+#: contrib/localflavor/mx/mx_states.py:21
+msgid "Durango"
+msgstr "డురంగొ"
+
+#: contrib/localflavor/mx/mx_states.py:22
+msgid "Guerrero"
+msgstr "గువెర్రెరొ"
+
+#: contrib/localflavor/mx/mx_states.py:23
+msgid "Guanajuato"
+msgstr "గువనజువటొ"
+
+#: contrib/localflavor/mx/mx_states.py:24
+msgid "Hidalgo"
+msgstr "హిడల్గొ"
+
+#: contrib/localflavor/mx/mx_states.py:25
+msgid "Jalisco"
+msgstr "జలిస్కొ"
+
+#: contrib/localflavor/mx/mx_states.py:26
+msgid "Estado de México"
+msgstr "ఏస్తడొ డ మెక్సికొ"
+
+#: contrib/localflavor/mx/mx_states.py:27
+msgid "Michoacán"
+msgstr "మికోకన్"
+
+#: contrib/localflavor/mx/mx_states.py:28
+msgid "Morelos"
+msgstr "మొరెలొస్"
+
+#: contrib/localflavor/mx/mx_states.py:29
+msgid "Nayarit"
+msgstr "నయరిట్"
+
+#: contrib/localflavor/mx/mx_states.py:30
+msgid "Nuevo León"
+msgstr "నుఎవొ లియొన్"
+
+#: contrib/localflavor/mx/mx_states.py:31
+msgid "Oaxaca"
+msgstr "ఓక్సక"
+
+#: contrib/localflavor/mx/mx_states.py:32
+msgid "Puebla"
+msgstr "పువెబ్ల"
+
+#: contrib/localflavor/mx/mx_states.py:33
+msgid "Querétaro"
+msgstr "కువెరెటరొ"
+
+#: contrib/localflavor/mx/mx_states.py:34
+msgid "Quintana Roo"
+msgstr "క్వింటన రూ"
+
+#: contrib/localflavor/mx/mx_states.py:35
+msgid "Sinaloa"
+msgstr "సినలో"
+
+#: contrib/localflavor/mx/mx_states.py:36
+msgid "San Luis Potosí"
+msgstr "సన్ లువిస్ పొటొసి"
+
+#: contrib/localflavor/mx/mx_states.py:37
+msgid "Sonora"
+msgstr "సొనొర"
+
+#: contrib/localflavor/mx/mx_states.py:38
+msgid "Tabasco"
+msgstr "టబస్కొ"
+
+#: contrib/localflavor/mx/mx_states.py:39
+msgid "Tamaulipas"
+msgstr "టమౌలిపాస్"
+
+#: contrib/localflavor/mx/mx_states.py:40
+msgid "Tlaxcala"
+msgstr "లక్స్కాలా"
+
+#: contrib/localflavor/mx/mx_states.py:41
+msgid "Veracruz"
+msgstr "వెరక్రుజ్"
+
+#: contrib/localflavor/mx/mx_states.py:42
+msgid "Yucatán"
+msgstr "యుకటన్"
+
+#: contrib/localflavor/mx/mx_states.py:43
+msgid "Zacatecas"
+msgstr "జకటెకాస్"
+
+#: contrib/localflavor/nl/forms.py:21
+msgid "Enter a valid postal code"
+msgstr "దయచేసి సరైన  తపాలు సంహిత ఇవ్వండి"
+
+#: contrib/localflavor/nl/forms.py:52
+msgid "Enter a valid phone number"
+msgstr "దయచెసి సరైన దూరవాణి సంఖ్య ఇవ్వండి"
+
+#: contrib/localflavor/nl/forms.py:78
+msgid "Enter a valid SoFi number"
+msgstr "దయచేసి సరైన SoFi సంఖ్య  ఇవ్వండి."
+
+#: contrib/localflavor/nl/nl_provinces.py:4
+msgid "Drenthe"
+msgstr "డ్రెంత్"
+
+#: contrib/localflavor/nl/nl_provinces.py:5
+msgid "Flevoland"
+msgstr "ఫ్లెవొలాండ్"
+
+#: contrib/localflavor/nl/nl_provinces.py:6
+msgid "Friesland"
+msgstr "ఫ్రియెస్లాండ్"
+
+#: contrib/localflavor/nl/nl_provinces.py:7
+msgid "Gelderland"
+msgstr "జెల్దెర్లాండ్"
+
+#: contrib/localflavor/nl/nl_provinces.py:8
+msgid "Groningen"
+msgstr "గ్రొనింజెన్"
+
+#: contrib/localflavor/nl/nl_provinces.py:9
+msgid "Limburg"
+msgstr "లింబర్గ్"
+
+#: contrib/localflavor/nl/nl_provinces.py:10
+msgid "Noord-Brabant"
+msgstr "నొర్డ్-బ్రబంట్"
+
+#: contrib/localflavor/nl/nl_provinces.py:11
+msgid "Noord-Holland"
+msgstr "నొర్డ్-హలాండ్"
+
+#: contrib/localflavor/nl/nl_provinces.py:12
+msgid "Overijssel"
+msgstr "ఒవెరిస్సెల్"
+
+#: contrib/localflavor/nl/nl_provinces.py:13
+msgid "Utrecht"
+msgstr "యూట్రెక్"
+
+#: contrib/localflavor/nl/nl_provinces.py:14
+msgid "Zeeland"
+msgstr "జీలాండ్"
+
+#: contrib/localflavor/nl/nl_provinces.py:15
+msgid "Zuid-Holland"
+msgstr "జుఇడ్-హాలాండ్"
+
+#: contrib/localflavor/no/forms.py:33
+msgid "Enter a valid Norwegian social security number."
+msgstr "దయచెసి సరైన నార్వెజియన్ సొషల్ సెక్యురిటి సంఖ్య ఇవ్వండి."
+
+#: contrib/localflavor/pe/forms.py:24
+msgid "This field requires 8 digits."
 msgstr ""
 
-#: contrib/auth/models.py:98
-msgid "last login"
-msgstr "గత లాగిన్"
-
-#: contrib/auth/models.py:99
-msgid "date joined"
-msgstr "చేరిన తారీఖు"
-
-#: contrib/auth/models.py:101
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
+#: contrib/localflavor/pe/forms.py:52
+msgid "This field requires 11 digits."
 msgstr ""
 
-#: contrib/auth/models.py:102
-msgid "user permissions"
-msgstr "యూజర్  అనుమతులు"
-
-#: contrib/auth/models.py:105
-msgid "user"
-msgstr "యూజర్"
-
-#: contrib/auth/models.py:106
-msgid "users"
-msgstr "యూజర్లు"
-
-#: contrib/auth/models.py:111
-msgid "Personal info"
-msgstr "పర్సనల్ సమాచారం  "
-
-#: contrib/auth/models.py:112
-msgid "Permissions"
-msgstr "అనుమతులు"
-
-#: contrib/auth/models.py:113
-msgid "Important dates"
-msgstr "ముఖ్యమైన తారీఖులు"
-
-#: contrib/auth/models.py:114
-msgid "Groups"
-msgstr "గుంపులు"
-
-#: contrib/auth/models.py:256
-msgid "message"
-msgstr "సమాచారం"
-
-#: contrib/auth/forms.py:52
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
+#: contrib/localflavor/pl/forms.py:38
+msgid "National Identification Number consists of 11 digits."
 msgstr ""
 
-#: contrib/auth/forms.py:61
-msgid "This account is inactive."
+#: contrib/localflavor/pl/forms.py:39
+msgid "Wrong checksum for the National Identification Number."
+msgstr "చెల్లని రష్ట్ర గుర్తు సంఖ్య నియంతృలెక్యము"
+
+#: contrib/localflavor/pl/forms.py:71
+msgid "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
+msgstr "దయచేసి పన్ను సంఖ్యను (ణీఫ్) XXX-XXX-XX-XX లెక XX-XX-XXX-XXX రూపలవన్యములొ ఇవ్వండి ."
+
+#: contrib/localflavor/pl/forms.py:72
+msgid "Wrong checksum for the Tax Number (NIP)."
+msgstr "చెల్లని పన్ను సంఖ్య (ణీఫ్)నియంతృలెక్యము"
+
+#: contrib/localflavor/pl/forms.py:111
+msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
 msgstr ""
 
-#: contrib/contenttypes/models.py:20
-msgid "python model class name"
-msgstr "పైతాన్ మొడల్ క్లాస్  పేరు"
+#: contrib/localflavor/pl/forms.py:112
+msgid "Wrong checksum for the National Business Register Number (REGON)."
+msgstr "చెల్లని రష్ట్ర వ్వవహార లెక్క పట్టి సంఖ్య నియంతృలెక్యము (REGON)."
 
-#: contrib/contenttypes/models.py:23
-msgid "content type"
+#: contrib/localflavor/pl/forms.py:155
+msgid "Enter a postal code in the format XX-XXX."
+msgstr "దయచేసి తపాలు సంహిత  XX-XXX రూపలవన్యములొ ఇవ్వండి."
+
+#: contrib/localflavor/pl/pl_voivodeships.py:8
+msgid "Lower Silesia"
+msgstr "లౌఎర్ సిలెసియ"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:9
+msgid "Kuyavia-Pomerania"
+msgstr "కుయవియ-పొమెరానియ"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:10
+msgid "Lublin"
+msgstr "లబ్లిన్"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:11
+msgid "Lubusz"
+msgstr "లుబుస్"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:12
+msgid "Lodz"
+msgstr "లొడ్జ్"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:13
+msgid "Lesser Poland"
+msgstr "లెస్సెర్ పొలాండ్"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:14
+msgid "Masovia"
+msgstr "మసొవియ"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:15
+msgid "Opole"
+msgstr "ఒపొల్"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:16
+msgid "Subcarpatia"
+msgstr "సుబ్కర్పతియ"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:17
+msgid "Podlasie"
+msgstr "పొడ్లసి"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:18
+msgid "Pomerania"
+msgstr "పొమెరానియా"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:19
+msgid "Silesia"
+msgstr "సిలెసియా"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:20
+msgid "Swietokrzyskie"
+msgstr "స్విటొక్ర్జిస్కియె"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:21
+msgid "Warmia-Masuria"
+msgstr "వర్మియ-మాసురియా"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:22
+msgid "Greater Poland"
+msgstr "గ్రేటెర్ పొలాండ్"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:23
+msgid "West Pomerania"
+msgstr "పశ్చిమ పొమెరనియా"
+
+#: contrib/localflavor/ro/forms.py:19
+msgid "Enter a valid CIF."
+msgstr "దయచేసి సరైన CIF ఇవ్వండి."
+
+#: contrib/localflavor/ro/forms.py:56
+msgid "Enter a valid CNP."
+msgstr "దయచేసి సరైన CNP ఇవ్వండి."
+
+#: contrib/localflavor/ro/forms.py:141
+msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
+msgstr "దయచేసి సరైన IBAN (ROXX-XXXX-XXXX-XXXX-XXXX రూపలవన్యము) ఇవ్వండి."
+
+#: contrib/localflavor/ro/forms.py:171
+msgid "Phone numbers must be in XXXX-XXXXXX format."
+msgstr "దూరవాణి సంఖ్య XXXX-XXXXXX రూపలవన్యములొ ఇవ్వాలి."
+
+#: contrib/localflavor/ro/forms.py:194
+msgid "Enter a valid postal code in the format XXXXXX"
+msgstr "దయచేసి సరైన తపాలు సంహిత  XXXXXX రూపలవన్యములొ ఇవ్వండి."
+
+#: contrib/localflavor/sk/forms.py:30
+msgid "Enter a postal code in the format XXXXX or XXX XX."
+msgstr "దయచేసి తపాలు సంహిత  (XXXXX లెక XXX XX రూపలవన్యములొ )ఇవ్వండి."
+
+#: contrib/localflavor/sk/sk_districts.py:8
+msgid "Banska Bystrica"
+msgstr "బన్స్క బైస్ట్రిక"
+
+#: contrib/localflavor/sk/sk_districts.py:9
+msgid "Banska Stiavnica"
+msgstr "బన్స్క స్టీవ్నిక"
+
+#: contrib/localflavor/sk/sk_districts.py:10
+msgid "Bardejov"
+msgstr "భర్డెజొవ్"
+
+#: contrib/localflavor/sk/sk_districts.py:11
+msgid "Banovce nad Bebravou"
+msgstr "బనొవ్స నడ్ బెబ్రవౌ"
+
+#: contrib/localflavor/sk/sk_districts.py:12
+msgid "Brezno"
+msgstr "బ్రెజ్నొ"
+
+#: contrib/localflavor/sk/sk_districts.py:13
+msgid "Bratislava I"
+msgstr "బ్రాటిస్లావా I"
+
+#: contrib/localflavor/sk/sk_districts.py:14
+msgid "Bratislava II"
+msgstr "బ్రాటిస్లావా II "
+
+#: contrib/localflavor/sk/sk_districts.py:15
+msgid "Bratislava III"
+msgstr "బ్రాటిస్లావా III"
+
+#: contrib/localflavor/sk/sk_districts.py:16
+msgid "Bratislava IV"
+msgstr "బ్రాటిస్లావా IV"
+
+#: contrib/localflavor/sk/sk_districts.py:17
+msgid "Bratislava V"
+msgstr "బ్రాటిస్లావా V"
+
+#: contrib/localflavor/sk/sk_districts.py:18
+msgid "Bytca"
+msgstr "బిట్స"
+
+#: contrib/localflavor/sk/sk_districts.py:19
+msgid "Cadca"
+msgstr "కడ్క"
+
+#: contrib/localflavor/sk/sk_districts.py:20
+msgid "Detva"
+msgstr "దెట్వ"
+
+#: contrib/localflavor/sk/sk_districts.py:21
+msgid "Dolny Kubin"
+msgstr "డొల్ని కుబిన్"
+
+#: contrib/localflavor/sk/sk_districts.py:22
+msgid "Dunajska Streda"
+msgstr "డునజస్క స్ట్రెడ"
+
+#: contrib/localflavor/sk/sk_districts.py:23
+msgid "Galanta"
+msgstr "గలంటా"
+
+#: contrib/localflavor/sk/sk_districts.py:24
+msgid "Gelnica"
+msgstr "గెల్నికా"
+
+#: contrib/localflavor/sk/sk_districts.py:25
+msgid "Hlohovec"
+msgstr "లొహొవెక్"
+
+#: contrib/localflavor/sk/sk_districts.py:26
+msgid "Humenne"
+msgstr "హుమీనె"
+
+#: contrib/localflavor/sk/sk_districts.py:27
+msgid "Ilava"
+msgstr "ఇలావ"
+
+#: contrib/localflavor/sk/sk_districts.py:28
+msgid "Kezmarok"
+msgstr "కెజ్మరొక్"
+
+#: contrib/localflavor/sk/sk_districts.py:29
+msgid "Komarno"
+msgstr "కొమార్నొ"
+
+#: contrib/localflavor/sk/sk_districts.py:30
+msgid "Kosice I"
+msgstr "కొసైస్ I"
+
+#: contrib/localflavor/sk/sk_districts.py:31
+msgid "Kosice II"
+msgstr "కొసైస్ II"
+
+#: contrib/localflavor/sk/sk_districts.py:32
+msgid "Kosice III"
+msgstr "కొసైస్ III"
+
+#: contrib/localflavor/sk/sk_districts.py:33
+msgid "Kosice IV"
+msgstr "కొసైస్ IV"
+
+#: contrib/localflavor/sk/sk_districts.py:34
+msgid "Kosice - okolie"
+msgstr "కొసైస్ - ఒకొలి"
+
+#: contrib/localflavor/sk/sk_districts.py:35
+msgid "Krupina"
+msgstr "క్రుపిన"
+
+#: contrib/localflavor/sk/sk_districts.py:36
+msgid "Kysucke Nove Mesto"
+msgstr "kysuke nove mesto"
+
+#: contrib/localflavor/sk/sk_districts.py:37
+msgid "Levice"
+msgstr "లెవిస్"
+
+#: contrib/localflavor/sk/sk_districts.py:38
+msgid "Levoca"
+msgstr "లెవొక"
+
+#: contrib/localflavor/sk/sk_districts.py:39
+msgid "Liptovsky Mikulas"
+msgstr "లిప్టొవ్స్కి మికులాస్"
+
+#: contrib/localflavor/sk/sk_districts.py:40
+msgid "Lucenec"
+msgstr "లుసెనెక్"
+
+#: contrib/localflavor/sk/sk_districts.py:41
+msgid "Malacky"
+msgstr "మలకీ"
+
+#: contrib/localflavor/sk/sk_districts.py:42
+msgid "Martin"
+msgstr "మార్టిన్"
+
+#: contrib/localflavor/sk/sk_districts.py:43
+msgid "Medzilaborce"
+msgstr "మెద్జిలబొర్స్"
+
+#: contrib/localflavor/sk/sk_districts.py:44
+msgid "Michalovce"
+msgstr "మిషాలొవ్సె"
+
+#: contrib/localflavor/sk/sk_districts.py:45
+msgid "Myjava"
+msgstr "మైజావా"
+
+#: contrib/localflavor/sk/sk_districts.py:46
+msgid "Namestovo"
+msgstr "నేంస్తొవొ"
+
+#: contrib/localflavor/sk/sk_districts.py:47
+msgid "Nitra"
+msgstr "నిట్రా"
+
+#: contrib/localflavor/sk/sk_districts.py:48
+msgid "Nove Mesto nad Vahom"
+msgstr "నొవె మెస్టొ నడ్ వాహొం"
+
+#: contrib/localflavor/sk/sk_districts.py:49
+msgid "Nove Zamky"
+msgstr "నొవె జంకి"
+
+#: contrib/localflavor/sk/sk_districts.py:50
+msgid "Partizanske"
+msgstr "పర్తిజన్స్కె"
+
+#: contrib/localflavor/sk/sk_districts.py:51
+msgid "Pezinok"
+msgstr "పెజినొక్"
+
+#: contrib/localflavor/sk/sk_districts.py:52
+msgid "Piestany"
+msgstr "పిఎస్టాని"
+
+#: contrib/localflavor/sk/sk_districts.py:53
+msgid "Poltar"
+msgstr "పొల్టర్"
+
+#: contrib/localflavor/sk/sk_districts.py:54
+msgid "Poprad"
+msgstr "పొప్రడ్"
+
+#: contrib/localflavor/sk/sk_districts.py:55
+msgid "Povazska Bystrica"
+msgstr "పొవజ్స్క బ్య్స్ట్రిక"
+
+#: contrib/localflavor/sk/sk_districts.py:56
+msgid "Presov"
+msgstr "ప్రెసొవ్"
+
+#: contrib/localflavor/sk/sk_districts.py:57
+msgid "Prievidza"
+msgstr "ప్రిఎవిద్జ"
+
+#: contrib/localflavor/sk/sk_districts.py:58
+msgid "Puchov"
+msgstr "పుచొవ్"
+
+#: contrib/localflavor/sk/sk_districts.py:59
+msgid "Revuca"
+msgstr "రెవుక"
+
+#: contrib/localflavor/sk/sk_districts.py:60
+msgid "Rimavska Sobota"
+msgstr "రిమవ్స్క సొబొట"
+
+#: contrib/localflavor/sk/sk_districts.py:61
+msgid "Roznava"
+msgstr "రొజ్నవ"
+
+#: contrib/localflavor/sk/sk_districts.py:62
+msgid "Ruzomberok"
+msgstr "రుజొంబెరొక్"
+
+#: contrib/localflavor/sk/sk_districts.py:63
+msgid "Sabinov"
+msgstr "సబినొవ్"
+
+#: contrib/localflavor/sk/sk_districts.py:64
+msgid "Senec"
+msgstr "సెనెక్"
+
+#: contrib/localflavor/sk/sk_districts.py:65
+msgid "Senica"
+msgstr "సెనికా"
+
+#: contrib/localflavor/sk/sk_districts.py:66
+msgid "Skalica"
+msgstr "స్కాలికా"
+
+#: contrib/localflavor/sk/sk_districts.py:67
+msgid "Snina"
+msgstr "స్నిన"
+
+#: contrib/localflavor/sk/sk_districts.py:68
+msgid "Sobrance"
+msgstr "సొబ్రన్సె"
+
+#: contrib/localflavor/sk/sk_districts.py:69
+msgid "Spisska Nova Ves"
+msgstr "స్పిస్స్కా నొవ వెస్"
+
+#: contrib/localflavor/sk/sk_districts.py:70
+msgid "Stara Lubovna"
+msgstr "స్టరలుబ్నొవ"
+
+#: contrib/localflavor/sk/sk_districts.py:71
+msgid "Stropkov"
+msgstr "స్ట్రొప్కొవ్"
+
+#: contrib/localflavor/sk/sk_districts.py:72
+msgid "Svidnik"
+msgstr "స్విడ్నిక్"
+
+#: contrib/localflavor/sk/sk_districts.py:73
+msgid "Sala"
+msgstr "సాలా"
+
+#: contrib/localflavor/sk/sk_districts.py:74
+msgid "Topolcany"
+msgstr "టొపొల్కొని"
+
+#: contrib/localflavor/sk/sk_districts.py:75
+msgid "Trebisov"
+msgstr "ట్రెబిసొవ్"
+
+#: contrib/localflavor/sk/sk_districts.py:76
+msgid "Trencin"
+msgstr "త్రెంకిన్"
+
+#: contrib/localflavor/sk/sk_districts.py:77
+msgid "Trnava"
+msgstr "నావా"
+
+#: contrib/localflavor/sk/sk_districts.py:78
+msgid "Turcianske Teplice"
+msgstr "టుర్చీన్స్కె టెప్లిచె"
+
+#: contrib/localflavor/sk/sk_districts.py:79
+msgid "Tvrdosin"
+msgstr "దొసిన్"
+
+#: contrib/localflavor/sk/sk_districts.py:80
+msgid "Velky Krtis"
+msgstr "వెల్కై రిటిస్"
+
+#: contrib/localflavor/sk/sk_districts.py:81
+msgid "Vranov nad Toplou"
+msgstr "వ్రనొవ్ నాడ్ టొప్లౌ"
+
+#: contrib/localflavor/sk/sk_districts.py:82
+msgid "Zlate Moravce"
+msgstr "జ్లటె మొరావ్సె"
+
+#: contrib/localflavor/sk/sk_districts.py:83
+msgid "Zvolen"
+msgstr "జ్వొలెన్"
+
+#: contrib/localflavor/sk/sk_districts.py:84
+msgid "Zarnovica"
+msgstr "జార్నొవిక"
+
+#: contrib/localflavor/sk/sk_districts.py:85
+msgid "Ziar nad Hronom"
+msgstr "జీర్ నాడ్ రొనొం"
+
+#: contrib/localflavor/sk/sk_districts.py:86
+msgid "Zilina"
+msgstr "జిలిన"
+
+#: contrib/localflavor/sk/sk_regions.py:8
+msgid "Banska Bystrica region"
+msgstr "భన్స్క భైస్త్రిక రాజ్యం"
+
+#: contrib/localflavor/sk/sk_regions.py:9
+msgid "Bratislava region"
+msgstr "బ్రాటిస్లావ రాజ్యము"
+
+#: contrib/localflavor/sk/sk_regions.py:10
+msgid "Kosice region"
+msgstr "కొసైస్ రాజ్యము"
+
+#: contrib/localflavor/sk/sk_regions.py:11
+msgid "Nitra region"
+msgstr "నిట్రా రాజ్యము"
+
+#: contrib/localflavor/sk/sk_regions.py:12
+msgid "Presov region"
+msgstr "ప్రెసావు రాజ్యము"
+
+#: contrib/localflavor/sk/sk_regions.py:13
+msgid "Trencin region"
+msgstr "ట్రెంకిన్ రాజ్యము"
+
+#: contrib/localflavor/sk/sk_regions.py:14
+msgid "Trnava region"
+msgstr "ట్ర్నావా రాజ్యము"
+
+#: contrib/localflavor/sk/sk_regions.py:15
+msgid "Zilina region"
+msgstr "జిలిన రాజ్యము"
+
+#: contrib/localflavor/uk/forms.py:21
+msgid "Enter a valid postcode."
+msgstr "దయచేసి సరైన తపాలు సంహిత ఇవ్వండి."
+
+#: contrib/localflavor/uk/uk_regions.py:11
+msgid "Bedfordshire"
+msgstr "బెడ్ఫర్డషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:12
+msgid "Buckinghamshire"
+msgstr "బఖింఘమషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:14
+msgid "Cheshire"
+msgstr "చెషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:15
+msgid "Cornwall and Isles of Scilly"
+msgstr "కార్న్వాల్ మరియు సిసిల్లీ ద్వీపాలు"
+
+#: contrib/localflavor/uk/uk_regions.py:16
+msgid "Cumbria"
+msgstr "కంబ్రియా"
+
+#: contrib/localflavor/uk/uk_regions.py:17
+msgid "Derbyshire"
+msgstr "డెర్బీషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:18
+msgid "Devon"
+msgstr "డెవొన్"
+
+#: contrib/localflavor/uk/uk_regions.py:19
+msgid "Dorset"
+msgstr "డొర్సెట్"
+
+#: contrib/localflavor/uk/uk_regions.py:20
+msgid "Durham"
+msgstr "డుర్హం"
+
+#: contrib/localflavor/uk/uk_regions.py:21
+msgid "East Sussex"
+msgstr "తూర్పు  సుస్సెక్స"
+
+#: contrib/localflavor/uk/uk_regions.py:22
+msgid "Essex"
+msgstr "ఎసెక్స"
+
+#: contrib/localflavor/uk/uk_regions.py:23
+msgid "Gloucestershire"
+msgstr "గ్లౌసెస్తెరషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:24
+msgid "Greater London"
+msgstr "గ్రెటర్ లండన్"
+
+#: contrib/localflavor/uk/uk_regions.py:25
+msgid "Greater Manchester"
+msgstr "గ్రెటర్ మాంచెస్టర్"
+
+#: contrib/localflavor/uk/uk_regions.py:26
+msgid "Hampshire"
+msgstr "హాంపషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:27
+msgid "Hertfordshire"
+msgstr "హెర్ట్ఫొర్డషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:28
+msgid "Kent"
+msgstr "కెంట్"
+
+#: contrib/localflavor/uk/uk_regions.py:29
+msgid "Lancashire"
+msgstr "లెంకషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:30
+msgid "Leicestershire"
+msgstr "లెసెటర్షర్"
+
+#: contrib/localflavor/uk/uk_regions.py:31
+msgid "Lincolnshire"
+msgstr "లింకన్షర్"
+
+#: contrib/localflavor/uk/uk_regions.py:32
+msgid "Merseyside"
+msgstr "మర్సీసైడ్"
+
+#: contrib/localflavor/uk/uk_regions.py:33
+msgid "Norfolk"
+msgstr "నార్ఫొల్క"
+
+#: contrib/localflavor/uk/uk_regions.py:34
+msgid "North Yorkshire"
+msgstr "ఉత్తర యొర్కషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:35
+msgid "Northamptonshire"
+msgstr "నార్తంప్టొనషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:36
+msgid "Northumberland"
+msgstr "నార్థంబెర్లాండ్"
+
+#: contrib/localflavor/uk/uk_regions.py:37
+msgid "Nottinghamshire"
+msgstr "నాటింఘమషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:38
+msgid "Oxfordshire"
+msgstr "ఆక్ష్ఫర్డషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:39
+msgid "Shropshire"
+msgstr "ష్రొపషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:40
+msgid "Somerset"
+msgstr "సొమర్సెట్"
+
+#: contrib/localflavor/uk/uk_regions.py:41
+msgid "South Yorkshire"
+msgstr "దక్షిణ యొర్కషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:42
+msgid "Staffordshire"
+msgstr "స్టఫ్ఫొర్డషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:43
+msgid "Suffolk"
+msgstr "సఫ్ఫొల్క"
+
+#: contrib/localflavor/uk/uk_regions.py:44
+msgid "Surrey"
+msgstr "సుర్రెయ్"
+
+#: contrib/localflavor/uk/uk_regions.py:45
+msgid "Tyne and Wear"
+msgstr "టైన్ మరియు వెర్"
+
+#: contrib/localflavor/uk/uk_regions.py:46
+msgid "Warwickshire"
+msgstr "వార్విక్షైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:47
+msgid "West Midlands"
+msgstr "పశ్చిమ మిడ్లాండ్స"
+
+#: contrib/localflavor/uk/uk_regions.py:48
+msgid "West Sussex"
+msgstr "పశ్చిమ ససెక్స"
+
+#: contrib/localflavor/uk/uk_regions.py:49
+msgid "West Yorkshire"
+msgstr "పశ్చిమ యొర్కషైరె"
+
+#: contrib/localflavor/uk/uk_regions.py:50
+msgid "Wiltshire"
+msgstr "విల్టషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:51
+msgid "Worcestershire"
+msgstr "వొర్సెస్టషైర్"
+
+#: contrib/localflavor/uk/uk_regions.py:55
+msgid "County Antrim"
+msgstr "కౌంటీ అంట్రిం"
+
+#: contrib/localflavor/uk/uk_regions.py:56
+msgid "County Armagh"
+msgstr "కౌంటీ అర్మాఘ్"
+
+#: contrib/localflavor/uk/uk_regions.py:57
+msgid "County Down"
+msgstr "కౌంటీ డౌన్"
+
+#: contrib/localflavor/uk/uk_regions.py:58
+msgid "County Fermanagh"
+msgstr "కౌంటీ ఫెర్మనాఘ్"
+
+#: contrib/localflavor/uk/uk_regions.py:59
+msgid "County Londonderry"
+msgstr "కౌంటీ లొండొండెర్రీ"
+
+#: contrib/localflavor/uk/uk_regions.py:60
+msgid "County Tyrone"
+msgstr "కౌంటీ టైరొన్"
+
+#: contrib/localflavor/uk/uk_regions.py:64
+msgid "Clwyd"
+msgstr "క్ల్వైడ్"
+
+#: contrib/localflavor/uk/uk_regions.py:65
+msgid "Dyfed"
+msgstr "డైఫెద్"
+
+#: contrib/localflavor/uk/uk_regions.py:66
+msgid "Gwent"
+msgstr "గ్వెంట్"
+
+#: contrib/localflavor/uk/uk_regions.py:67
+msgid "Gwynedd"
+msgstr "గ్వైనెడ్"
+
+#: contrib/localflavor/uk/uk_regions.py:68
+msgid "Mid Glamorgan"
+msgstr "మిడ్ గ్లమార్గాను"
+
+#: contrib/localflavor/uk/uk_regions.py:69
+msgid "Powys"
+msgstr "పొవిస్"
+
+#: contrib/localflavor/uk/uk_regions.py:70
+msgid "South Glamorgan"
+msgstr "దక్షిణ గ్లమార్గాను"
+
+#: contrib/localflavor/uk/uk_regions.py:71
+msgid "West Glamorgan"
+msgstr "పశ్చిమ గ్లమార్గాను"
+
+#: contrib/localflavor/uk/uk_regions.py:75
+msgid "Borders"
+msgstr "బార్డర్స్"
+
+#: contrib/localflavor/uk/uk_regions.py:76
+msgid "Central Scotland"
+msgstr "మధ్యస్థమైన  స్కాట్లాండ్"
+
+#: contrib/localflavor/uk/uk_regions.py:77
+msgid "Dumfries and Galloway"
+msgstr "డుంఫ్రిఎస్ మరియు గెలొవెస్"
+
+#: contrib/localflavor/uk/uk_regions.py:78
+msgid "Fife"
+msgstr "ఫిఫె"
+
+#: contrib/localflavor/uk/uk_regions.py:79
+msgid "Grampian"
+msgstr "గ్రాంపియన్"
+
+#: contrib/localflavor/uk/uk_regions.py:80
+msgid "Highland"
+msgstr "హైలాండ్"
+
+#: contrib/localflavor/uk/uk_regions.py:81
+msgid "Lothian"
+msgstr "లొతియన్"
+
+#: contrib/localflavor/uk/uk_regions.py:82
+msgid "Orkney Islands"
+msgstr "ఓర్క్నీ ద్వీపాలు"
+
+#: contrib/localflavor/uk/uk_regions.py:83
+msgid "Shetland Islands"
+msgstr "షెట్లాండ్ ద్వీపాలు"
+
+#: contrib/localflavor/uk/uk_regions.py:84
+msgid "Strathclyde"
+msgstr "స్త్రట్తక్లైడ్"
+
+#: contrib/localflavor/uk/uk_regions.py:85
+msgid "Tayside"
+msgstr "టేసైడ్"
+
+#: contrib/localflavor/uk/uk_regions.py:86
+msgid "Western Isles"
+msgstr "వెస్టెర్న ద్వీపాలు"
+
+#: contrib/localflavor/uk/uk_regions.py:90
+msgid "England"
+msgstr "ఇంగ్లాండ్"
+
+#: contrib/localflavor/uk/uk_regions.py:91
+msgid "Northern Ireland"
+msgstr "నార్తెర్న ఐర్లాండ్"
+
+#: contrib/localflavor/uk/uk_regions.py:92
+msgid "Scotland"
+msgstr "స్కాట్లాండ్"
+
+#: contrib/localflavor/uk/uk_regions.py:93
+msgid "Wales"
+msgstr "వెల్స్"
+
+#: contrib/localflavor/us/forms.py:16
+msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
+msgstr "దయచేసి తపాలు సంహిత  (XXXXX లెక XXXXX-XXXX రూపలవన్యము) ఇవ్వండి."
+
+#: contrib/localflavor/us/forms.py:54
+msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
+msgstr "దయచేసి సరైన అమెరిక సొషల్ సెక్యురిటి (XXX-XX-XXXX రూపలవన్యము) సంఖ్య ఇవ్వండి."
+
+#: contrib/localflavor/za/forms.py:20
+msgid "Enter a valid South African ID number"
+msgstr "దయచేసి సరైన దక్షిణ ఆఫ్రిక  ఐడ్ ఇవ్వండి."
+
+#: contrib/localflavor/za/forms.py:54
+msgid "Enter a valid South African postal code"
+msgstr "దయచేసి సరైన దక్షిణ ఆఫ్రిక తపాలు సాంహిత ఇవ్వండి."
+
+#: contrib/localflavor/za/za_provinces.py:4
+msgid "Eastern Cape"
+msgstr "తూర్పు కెప్"
+
+#: contrib/localflavor/za/za_provinces.py:5
+msgid "Free State"
+msgstr "ఫ్రీ స్టెట్"
+
+#: contrib/localflavor/za/za_provinces.py:6
+msgid "Gauteng"
+msgstr "గౌటెంగ్"
+
+#: contrib/localflavor/za/za_provinces.py:7
+msgid "KwaZulu-Natal"
+msgstr "క్వజులు-నటాల్"
+
+#: contrib/localflavor/za/za_provinces.py:8
+msgid "Limpopo"
+msgstr "లింపొపొ"
+
+#: contrib/localflavor/za/za_provinces.py:9
+msgid "Mpumalanga"
+msgstr "పుమలంగ"
+
+#: contrib/localflavor/za/za_provinces.py:10
+msgid "Northern Cape"
+msgstr "naarterna kEp"
+
+#: contrib/localflavor/za/za_provinces.py:11
+msgid "North West"
 msgstr ""
 
-#: contrib/contenttypes/models.py:24
-msgid "content types"
+#: contrib/localflavor/za/za_provinces.py:12
+msgid "Western Cape"
+msgstr "పశ్చిమ కెప్"
+
+#: contrib/redirects/models.py:7
+msgid "redirect from"
 msgstr ""
 
-#: contrib/sessions/models.py:51
+#: contrib/redirects/models.py:8
+msgid "This should be an absolute path, excluding the domain name. Example: '/events/search/'."
+msgstr ""
+
+#: contrib/redirects/models.py:9
+msgid "redirect to"
+msgstr ""
+
+#: contrib/redirects/models.py:10
+msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
+msgstr ""
+
+#: contrib/redirects/models.py:13
+msgid "redirect"
+msgstr ""
+
+#: contrib/redirects/models.py:14
+msgid "redirects"
+msgstr ""
+
+#: contrib/sessions/models.py:45
 msgid "session key"
-msgstr ""
+msgstr "భాగము తాళంచెవి"
 
-#: contrib/sessions/models.py:52
+#: contrib/sessions/models.py:47
 msgid "session data"
-msgstr ""
+msgstr "భాగము దత్తం"
 
-#: contrib/sessions/models.py:53
+#: contrib/sessions/models.py:48
 msgid "expire date"
 msgstr ""
 
-#: contrib/sessions/models.py:57
+#: contrib/sessions/models.py:53
 msgid "session"
-msgstr ""
+msgstr "భాగము"
 
-#: contrib/sessions/models.py:58
+#: contrib/sessions/models.py:54
 msgid "sessions"
-msgstr ""
+msgstr "భాగములు"
 
-#: contrib/sites/models.py:10
+#: contrib/sites/models.py:32
 msgid "domain name"
-msgstr ""
+msgstr "డొమైన్ నామము"
 
-#: contrib/sites/models.py:11
+#: contrib/sites/models.py:33
 msgid "display name"
 msgstr "కనిపిచ్చే పేరు"
 
-#: contrib/sites/models.py:15
-msgid "site"
-msgstr "సైట్"
-
-#: contrib/sites/models.py:16
+#: contrib/sites/models.py:39
 msgid "sites"
 msgstr "సైట్లు"
+
+#: db/models/fields/__init__.py:348
+#: db/models/fields/__init__.py:683
+msgid "This value must be an integer."
+msgstr "ఈ  విలువ  లో  ఉందాలి"
+
+#: db/models/fields/__init__.py:379
+msgid "This value must be either True or False."
+msgstr "ఈ  విలువ  తప్పైన ఒప్పైన  ఉందాలి"
+
+#: db/models/fields/__init__.py:412
+msgid "This field cannot be null."
+msgstr "ఈ ఫీల్డ్ కాళీగా ఉందకూడడు      "
+
+#: db/models/fields/__init__.py:428
+msgid "Enter only digits separated by commas."
+msgstr "కామాల తో అంకెలు విడడీసి ఇవ్వండి "
+
+#: db/models/fields/__init__.py:459
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "దయచేసి సరైన తెది (YYYY-MM-DD రూపలావన్యం) ఇవ్వండి"
+
+#: db/models/fields/__init__.py:468
+#, python-format
+msgid "Invalid date: %s"
+msgstr "సరికాని తారీఖు : %s."
+
+#: db/models/fields/__init__.py:532
+#: db/models/fields/__init__.py:550
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr "దయచేసి సరైన తెది/సమయం (YYYY-MM-DD HH:MM[:ss[.uuuuuu]] రూపలావన్యం) ఇవ్వండి"
+
+#: db/models/fields/__init__.py:586
+msgid "This value must be a decimal number."
+msgstr ""
+
+#: db/models/fields/__init__.py:719
+msgid "This value must be either None, True or False."
+msgstr ""
+
+#: db/models/fields/__init__.py:817
+#: db/models/fields/__init__.py:831
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "దయచేసి సరైన సమయం (HH:MM[:ss[.uuuuuu]] రూపలావన్యం) ఇవ్వండి"
+
+#: db/models/fields/related.py:761
+msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "\"Control\" కాని  \"Command\" మాక్ లో  నొక్కి ఉంచండి  , ఒకటి కన్న ఎక్కువ ఎన్నుకోవటానికి"
+
+#: db/models/fields/related.py:838
+#, python-format
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "దయచేసి సరైన  %(self)s ఐడి ఇవ్వండి. మీరు ఇచ్చిన వెల %(value)r తప్పు."
+msgstr[1] "దయచేసి సరైన  %(self)s ఐడిలు ఇవ్వండి. మీరు ఇచ్చిన వెలలు %(value)r తప్పు."
+
+#: forms/fields.py:54
+msgid "This field is required."
+msgstr "ఈ ఫీల్డ్ అవసరము"
+
+#: forms/fields.py:55
+msgid "Enter a valid value."
+msgstr "దయచేసి సరైన వెల ఇవ్వండి."
+
+#: forms/fields.py:138
+#, python-format
+msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
+msgstr ""
+
+#: forms/fields.py:139
+#, python-format
+msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
+msgstr ""
+
+#: forms/fields.py:166
+msgid "Enter a whole number."
+msgstr "పూర్ణ సంఖ్య ఇవ్వండి"
+
+#: forms/fields.py:167
+#: forms/fields.py:196
+#: forms/fields.py:225
+#, python-format
+msgid "Ensure this value is less than or equal to %s."
+msgstr ""
+
+#: forms/fields.py:168
+#: forms/fields.py:197
+#: forms/fields.py:226
+#, python-format
+msgid "Ensure this value is greater than or equal to %s."
+msgstr ""
+
+#: forms/fields.py:195
+#: forms/fields.py:224
+msgid "Enter a number."
+msgstr "దయచేసి పూర్ణ సంఖ్య ఇవ్వండి"
+
+#: forms/fields.py:227
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr ""
+
+#: forms/fields.py:228
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr ""
+
+#: forms/fields.py:229
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr ""
+
+#: forms/fields.py:287
+#: forms/fields.py:848
+msgid "Enter a valid date."
+msgstr "దయచేసి సరైన తేది ఇవ్వండి."
+
+#: forms/fields.py:321
+#: forms/fields.py:849
+msgid "Enter a valid time."
+msgstr "దయచేసి సరైన సమయం ఇవ్వండి."
+
+#: forms/fields.py:360
+msgid "Enter a valid date/time."
+msgstr "దయచేసి సరైన తెది/సమయం ఇవ్వండి."
+
+#: forms/fields.py:446
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+
+#: forms/fields.py:447
+msgid "No file was submitted."
+msgstr ""
+
+#: forms/fields.py:448
+msgid "The submitted file is empty."
+msgstr "మీరు సమర్పించిన  ఫైల్ కాళీగా ఉంది "
+
+#: forms/fields.py:477
+msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+msgstr ""
+
+#: forms/fields.py:538
+msgid "Enter a valid URL."
+msgstr "దయచేసి సరైన URL ఇవ్వండి."
+
+#: forms/fields.py:539
+msgid "This URL appears to be a broken link."
+msgstr ""
+
+#: forms/fields.py:618
+#: forms/fields.py:696
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+
+#: forms/fields.py:697
+#: forms/fields.py:758
+#: forms/models.py:654
+msgid "Enter a list of values."
+msgstr ""
+
+#: forms/fields.py:877
+msgid "Enter a valid IPv4 address."
+msgstr "దయచేసి సరైన IPv4 అడ్రస్ ఇవ్వండి"
+
+#: forms/fields.py:887
+msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+
+#: forms/formsets.py:242
+#: forms/formsets.py:244
+msgid "Order"
+msgstr "అంతరము"
+
+#: forms/models.py:268
+#: forms/models.py:277
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr ""
+
+#: forms/models.py:584
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+
+#: forms/models.py:655
+#, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr ""
+
+#: template/defaultfilters.py:706
+msgid "yes,no,maybe"
+msgstr "అవును, కాదు , ఏమొ"
+
+#: template/defaultfilters.py:737
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)d byte"
+msgstr[1] "%(size)d bytes"
+
+#: template/defaultfilters.py:739
+#, python-format
+msgid "%.1f KB"
+msgstr "%.1f KB"
+
+#: template/defaultfilters.py:741
+#, python-format
+msgid "%.1f MB"
+msgstr "%.1f MB"
+
+#: template/defaultfilters.py:742
+#, python-format
+msgid "%.1f GB"
+msgstr "%.1f GB"
+
+#: utils/dateformat.py:41
+msgid "p.m."
+msgstr "p.m."
+
+#: utils/dateformat.py:42
+msgid "a.m."
+msgstr "a.m."
+
+#: utils/dateformat.py:47
+msgid "PM"
+msgstr "PM"
+
+#: utils/dateformat.py:48
+msgid "AM"
+msgstr "AM"
+
+#: utils/dateformat.py:97
+msgid "midnight"
+msgstr "అర్ధరాత్రి"
+
+#: utils/dateformat.py:99
+msgid "noon"
+msgstr "మధ్యానం"
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -1426,684 +3697,416 @@ msgstr "శనివారము"
 msgid "Sunday"
 msgstr "ఆదివారము"
 
-#: utils/dates.py:14
+#: utils/dates.py:10
+msgid "Mon"
+msgstr "సోమవారము"
+
+#: utils/dates.py:10
+msgid "Tue"
+msgstr "మంగళవారము"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr "బుధవారం"
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr "గురువారం"
+
+#: utils/dates.py:10
+msgid "Fri"
+msgstr "శుక్రవారము"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr "షనివారం"
+
+#: utils/dates.py:11
+msgid "Sun"
+msgstr "ఆదివారము"
+
+#: utils/dates.py:18
 msgid "January"
 msgstr "జాన్వరి "
 
-#: utils/dates.py:14
+#: utils/dates.py:18
 msgid "February"
 msgstr "ఫిబ్రవరి"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18
+#: utils/dates.py:31
 msgid "March"
 msgstr "మార్చి"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18
+#: utils/dates.py:31
 msgid "April"
 msgstr "ఎప్రిల్"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18
+#: utils/dates.py:31
 msgid "May"
 msgstr "మే"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18
+#: utils/dates.py:31
 msgid "June"
 msgstr "జూను"
 
-#: utils/dates.py:15 utils/dates.py:27
+#: utils/dates.py:19
+#: utils/dates.py:31
 msgid "July"
 msgstr "జులై"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "August"
 msgstr "ఆగష్టు"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "September"
 msgstr "సెప్టెంబర్"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "October"
 msgstr "అక్టోబర్"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "November"
 msgstr "నవంబర్"
 
-#: utils/dates.py:16
+#: utils/dates.py:20
 msgid "December"
 msgstr "డిసెంబర్"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jan"
 msgstr "జాన్"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "feb"
 msgstr "ఫిబ్"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "mar"
 msgstr "మార్"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "apr"
 msgstr "ఎప్ర్"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "may"
 msgstr "మే"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jun"
 msgstr "జూన్"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "jul"
 msgstr "జుల్"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "aug"
 msgstr "ఆగ్"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "sep"
 msgstr "సెప్"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "oct"
 msgstr "అక్ట్"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "nov"
 msgstr "నవ్"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "dec"
 msgstr "డిస్"
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Jan."
 msgstr "జాన్"
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Feb."
 msgstr "ఫిబ్"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Aug."
 msgstr "ఆగ్"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Sept."
 msgstr "సెప్"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Oct."
 msgstr "అక్ట్"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Nov."
 msgstr "నవ్"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Dec."
 msgstr "డిస్"
 
-#: utils/timesince.py:12
+#: utils/text.py:128
+msgid "or"
+msgstr "లెక"
+
+#: utils/timesince.py:21
 msgid "year"
 msgid_plural "years"
 msgstr[0] "సంవత్సరం"
 msgstr[1] "సంవత్సరాలు"
 
-#: utils/timesince.py:13
+#: utils/timesince.py:22
 msgid "month"
 msgid_plural "months"
 msgstr[0] "నెల"
 msgstr[1] "నెలలు"
 
-#: utils/timesince.py:14
+#: utils/timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "వారం"
 msgstr[1] "వారాలు"
 
-#: utils/timesince.py:15
+#: utils/timesince.py:24
 msgid "day"
 msgid_plural "days"
 msgstr[0] "రోజు"
 msgstr[1] "రోజులు"
 
-#: utils/timesince.py:16
+#: utils/timesince.py:25
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "గంటలు"
 msgstr[1] "గంట"
 
-#: utils/timesince.py:17
+#: utils/timesince.py:26
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "నిముషం"
 msgstr[1] "నిముషాలు"
 
-#: utils/translation/trans_real.py:362
+#: utils/timesince.py:43
+msgid "minutes"
+msgstr "నిముషం"
+
+#: utils/timesince.py:48
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr "%(number)d %(type)s"
+
+#: utils/timesince.py:54
+#, python-format
+msgid ", %(number)d %(type)s"
+msgstr ", %(number)d %(type)s"
+
+#: utils/translation/trans_real.py:403
 msgid "DATE_FORMAT"
-msgstr ""
+msgstr "తెది_రూపలావణ్యం"
 
-#: utils/translation/trans_real.py:363
-msgid "DATETIME_FORMAT"
-msgstr ""
-
-#: utils/translation/trans_real.py:364
+#: utils/translation/trans_real.py:405
 msgid "TIME_FORMAT"
-msgstr ""
+msgstr "సమయం_రూపలావణ్యం"
 
-#: utils/translation/trans_real.py:380
+#: utils/translation/trans_real.py:421
 msgid "YEAR_MONTH_FORMAT"
-msgstr ""
+msgstr "సంవత్సరం_మాసము_రూపలావణ్యం"
 
-#: utils/translation/trans_real.py:381
+#: utils/translation/trans_real.py:422
 msgid "MONTH_DAY_FORMAT"
-msgstr ""
+msgstr "మాసము_దినము_రూపలావణ్యం"
 
-#: conf/global_settings.py:39
-msgid "Arabic"
-msgstr "ఆరబిక్"
-
-#: conf/global_settings.py:40
-msgid "Bengali"
-msgstr "బెంగాలి"
-
-#: conf/global_settings.py:41
-msgid "Czech"
-msgstr "క్జెఖ్"
-
-#: conf/global_settings.py:42
-msgid "Welsh"
-msgstr "వెల్శ్"
-
-#: conf/global_settings.py:43
-msgid "Danish"
-msgstr "డానిశ్"
-
-#: conf/global_settings.py:44
-msgid "German"
-msgstr "జెర్మన్"
-
-#: conf/global_settings.py:45
-msgid "Greek"
-msgstr "గ్రీక్"
-
-#: conf/global_settings.py:46
-msgid "English"
-msgstr "ఆంగ్లము"
-
-#: conf/global_settings.py:47
-msgid "Spanish"
-msgstr "స్పానిష్"
-
-#: conf/global_settings.py:48
-msgid "Argentinean Spanish"
-msgstr "అర్జంటీనా స్పానిష్"
-
-#: conf/global_settings.py:49
-msgid "Finnish"
-msgstr "ఫీన్నిష్"
-
-#: conf/global_settings.py:50
-msgid "French"
-msgstr "ఫ్రెంచ్"
-
-#: conf/global_settings.py:51
-msgid "Galician"
-msgstr "గలిసియన్"
-
-#: conf/global_settings.py:52
-msgid "Hungarian"
-msgstr "హంగారియన్"
-
-#: conf/global_settings.py:53
-msgid "Hebrew"
-msgstr "హెబ్రివ్"
-
-#: conf/global_settings.py:54
-msgid "Icelandic"
-msgstr "ఐస్ లాండిక్"
-
-#: conf/global_settings.py:55
-msgid "Italian"
-msgstr "ఇటాలియవ్"
-
-#: conf/global_settings.py:56
-msgid "Japanese"
-msgstr "జపనీస్"
-
-#: conf/global_settings.py:57
-msgid "Dutch"
-msgstr "డట్చ్"
-
-#: conf/global_settings.py:58
-msgid "Norwegian"
-msgstr "నార్వీజియన్"
-
-#: conf/global_settings.py:59
-msgid "Brazilian"
-msgstr "బ్రజీలియన్"
-
-#: conf/global_settings.py:60
-msgid "Romanian"
-msgstr "రొమానియన్"
-
-#: conf/global_settings.py:61
-msgid "Russian"
-msgstr "రస్సెన్"
-
-#: conf/global_settings.py:62
-msgid "Slovak"
-msgstr "స్లొవాక్"
-
-#: conf/global_settings.py:63
-msgid "Slovenian"
-msgstr "స్లొవానియన్"
-
-#: conf/global_settings.py:64
-msgid "Serbian"
-msgstr "సెర్బియన్"
-
-#: conf/global_settings.py:65
-msgid "Swedish"
-msgstr "స్వీడిష్"
-
-#: conf/global_settings.py:66
-msgid "Tamil"
-msgstr "తమిళ్"
-
-#: conf/global_settings.py:67
-msgid "Turkish"
-msgstr "టర్కిశ్"
-
-#: conf/global_settings.py:68
-msgid "Ukrainian"
-msgstr "యుక్రానియన్"
-
-#: conf/global_settings.py:69
-msgid "Simplified Chinese"
-msgstr "వాడుక చైనీస్"
-
-#: conf/global_settings.py:70
-msgid "Traditional Chinese"
-msgstr "గ్రాంధిక  చైనీస్"
-
-#: core/validators.py:63
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "ఈ విలువ   లో అక్షరాలు, అంకెలు ఇంకా అండర్ స్కోర్లు ఉందాలి"
-
-#: core/validators.py:67
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr "ఈ విలువ   లో అక్షరాలు, అంకెలు , అండర్ స్కోర్లు ,డాష్ లు లేక స్లాష్ లు ఉందాలి"
-
-#: core/validators.py:71
-msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr "ఈ విలువ   లో అక్షరాలు, అంకెలు , అండర్ స్కోర్లు  లేక హైఫన్లు  ఉందాలి"
-
-#: core/validators.py:75
-msgid "Uppercase letters are not allowed here."
-msgstr ""
-
-#: core/validators.py:79
-msgid "Lowercase letters are not allowed here."
-msgstr ""
-
-#: core/validators.py:86
-msgid "Enter only digits separated by commas."
-msgstr "కామాల తో అంకెలు విడడీసి ఇవ్వండి "
-
-#: core/validators.py:98
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "కామాల తో విడతీసి  సరైన ఈ మెయిల్  అడ్రస్ ఇవ్వండి"
-
-#: core/validators.py:102
-msgid "Please enter a valid IP address."
-msgstr "దయచేసి సరైన ఐపి అడ్రస్ ఇవ్వండి "
-
-#: core/validators.py:106
-msgid "Empty values are not allowed here."
-msgstr "ఇక్కడ కాళీ విలువలు అనుమతించబడవు "
-
-#: core/validators.py:110
-msgid "Non-numeric characters aren't allowed here."
-msgstr "అంకెలు కాని చిహ్నాలు అనుమతించబడవు"
-
-#: core/validators.py:114
-msgid "This value can't be comprised solely of digits."
-msgstr "ఈ విలువ లో ఉట్టి మాత్రమే ఉందకూడడు"
-
-#: core/validators.py:119
-msgid "Enter a whole number."
-msgstr "పూర్ణ సంఖ్య ఇవ్వండి"
-
-#: core/validators.py:123
-msgid "Only alphabetical characters are allowed here."
-msgstr "అక్షరాలు  అయిన చిహ్నాలు మాత్రమే  అనుమతించబడతాయి "
-
-#: core/validators.py:138
-msgid "Year must be 1900 or later."
-msgstr "సంవత్సరము 1900 లేక దాని తరువాత అయ్యి ఉందాలి "
-
-#: core/validators.py:142
-#, python-format
-msgid "Invalid date: %s."
-msgstr "సరికాని తారీఖు : %s."
-
-#: core/validators.py:146 db/models/fields/__init__.py:415
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr ""
-
-#: core/validators.py:151
-msgid "Enter a valid time in HH:MM format."
-msgstr ""
-
-#: core/validators.py:155 db/models/fields/__init__.py:477
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr ""
-
-#: core/validators.py:160
-msgid "Enter a valid e-mail address."
-msgstr "సరైన ఈ మెయిల్  అడ్రస్ ఇవ్వండి"
-
-#: core/validators.py:172 core/validators.py:401 forms/__init__.py:661
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
-
-#: core/validators.py:176
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
-msgstr ""
-
-#: core/validators.py:183
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr ""
-
-#: core/validators.py:187
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr ""
-
-#: core/validators.py:195
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr ""
-
-#: core/validators.py:199
-msgid "A valid URL is required."
-msgstr "సరైన  URL కావాలి"
-
-#: core/validators.py:213
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-"సరైన  HTML ఇవ్వండి .ప్రత్యేకమైన తప్పులు :\n"
-"%s"
-
-#: core/validators.py:220
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr ""
-
-#: core/validators.py:230
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "సరికాని  URL: %s"
-
-#: core/validators.py:234 core/validators.py:236
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr ""
-
-#: core/validators.py:242
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "దయచేసి  సరైన అగ్ర రాజ్య  సంక్షేపము చేసిన  రాష్ట్రము పేరు ఇవ్వండి"
-
-#: core/validators.py:256
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] ""
-msgstr[1] ""
-
-#: core/validators.py:263
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "ఈ ఫీల్డ్  '%s' ఫీల్డ్ కి సరి తూగాలి"
-
-#: core/validators.py:282
-msgid "Please enter something for at least one field."
-msgstr "దయచేసి ఏదో  ఒకటి  ఏదో ఒక ఫీల్డ్ కి ఇవ్వండి "
-
-#: core/validators.py:291 core/validators.py:302
-msgid "Please enter both fields or leave them both empty."
-msgstr "దయచేసి రెండు ఫీల్డ్లలు ఇవ్వండి  లేకపోతే రెండు కాళీ గా వదిలేయండి   "
-
-#: core/validators.py:309
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "%(field)s %(value)s ఐతే ఈ ఫీల్డ్  ఇవ్వాలి  "
-
-#: core/validators.py:321
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "%(field)s %(value)s అవ్వకపోతే ఈ ఫీల్డ్  ఇవ్వాలి "
-
-#: core/validators.py:340
-msgid "Duplicate values are not allowed."
-msgstr "నకలీ విలువలు ఇక్కడ అనుమతించబడవు"
-
-#: core/validators.py:363
-#, python-format
-msgid "This value must be a power of %s."
-msgstr ""
-
-#: core/validators.py:374
-msgid "Please enter a valid decimal number."
-msgstr ""
-
-#: core/validators.py:378
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] ""
-msgstr[1] ""
-
-#: core/validators.py:381
-#, python-format
-msgid "Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] ""
-msgstr[1] ""
-
-#: core/validators.py:384
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] ""
-msgstr[1] ""
-
-#: core/validators.py:394
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr ""
-
-#: core/validators.py:395
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr ""
-
-#: core/validators.py:412
-msgid "The format for this field is wrong."
-msgstr "ఈ ఫీల్డ్  ఫోర్మాట్ తప్పు"
-
-#: core/validators.py:427
-msgid "This field is invalid."
-msgstr "ఈ ఫీల్డ్ సరి కానిది"
-
-#: core/validators.py:463
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "%s నించి  ఏమి  రాబట్టలేము"
-
-#: core/validators.py:466
-#, python-format
-msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr ""
-
-#: core/validators.py:499
-#, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-
-#: core/validators.py:503
-#, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-
-#: core/validators.py:508
-#, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-
-#: core/validators.py:513
-#, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-
-#: core/validators.py:517
-#, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-
-#: core/validators.py:522
-#, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-
-#: views/generic/create_update.py:43
+#: views/generic/create_update.py:114
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "%(verbose_name)s జయప్రదంగా తయారయింది"
 
-#: views/generic/create_update.py:117
+#: views/generic/create_update.py:156
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "%(verbose_name)s జయప్రదంగా  @@"
 
-#: views/generic/create_update.py:184
+#: views/generic/create_update.py:198
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s తీసివేయబడినది"
 
-#: db/models/manipulators.py:302
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(field)s లో %(object)s తో  %(type)s  ఉన్నాయి"
-
-#: db/models/fields/__init__.py:40
-#, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s తో %(fieldname)s ముందే ఉన్నాయి ."
-
-#: db/models/fields/__init__.py:114 db/models/fields/__init__.py:265
-#: db/models/fields/__init__.py:551 db/models/fields/__init__.py:562
-#: forms/__init__.py:346
-msgid "This field is required."
-msgstr "ఈ ఫీల్డ్ అవసరము"
-
-#: db/models/fields/__init__.py:340
-msgid "This value must be an integer."
-msgstr "ఈ  విలువ  లో  ఉందాలి"
-
-#: db/models/fields/__init__.py:372
-msgid "This value must be either True or False."
-msgstr "ఈ  విలువ  తప్పైన ఒప్పైన  ఉందాలి"
-
-#: db/models/fields/__init__.py:388
-msgid "This field cannot be null."
-msgstr "ఈ ఫీల్డ్ కాళీగా ఉందకూడడు      "
-
-#: db/models/fields/__init__.py:571
-msgid "Enter a valid filename."
-msgstr "దయచేసి సరైన దస్త్రం పేరు ఇవ్వండి."
-
-#: db/models/fields/related.py:51
-#, python-format
-msgid "Please enter a valid %s."
-msgstr "దయచేసి సరైన %sఇవ్వండి."
-
-#: db/models/fields/related.py:618
-msgid "Separate multiple IDs with commas."
-msgstr "గుంపు    గా ఉన్న ఐడిల ను కామా తో విడడీయంది"
-
-#: db/models/fields/related.py:620
-msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "\"Control\" కాని  \"Command\" మాక్ లో  నొక్కి ఉంచండి  , ఒకటి కన్న ఎక్కువ ఎన్నుకోవటానికి"
-
-#: db/models/fields/related.py:664
-#, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "దయచేసి సరైన  %(self)s ఐడిలు ఇవ్వండి.  "
-msgstr[1] ""
-
-#: forms/__init__.py:381
-#, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "మీరు  ఇచ్చిన టెక్స్ట %s ఆక్షరము కన్న తక్కువ ఉందాలి"
-msgstr[1] "మీరు  ఇచ్చిన టెక్స్ట %s ఆక్షరములు కన్న తక్కువ ఉందాలి"
-
-#: forms/__init__.py:386
-msgid "Line breaks are not allowed here."
-msgstr "లైన్  బ్రేక్స్  కి ఇక్కడ  ఆనుమతి లేదు"
-
-#: forms/__init__.py:487 forms/__init__.py:560 forms/__init__.py:599
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "సరైనది ఎంచుకోండి;  %(choices)s లో  '%(data)s' లేవు  "
-
-#: forms/__init__.py:663
-msgid "The submitted file is empty."
-msgstr "మీరు సమర్పించిన  ఫైల్ కాళీగా ఉంది "
-
-#: forms/__init__.py:719
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr " -32,768 ఇంకా  32,767 మధ్యలో  ఒక    ఆంకె ఇవ్వండి"
-
-#: forms/__init__.py:729
-msgid "Enter a positive number."
-msgstr "ఒక    ధన సంఖ్య ఇవ్వండి"
-
-#: forms/__init__.py:739
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "0 ఇంకా  32,767 మధ్యలో  ఒక    పూర్ ఇవ్వండి"
-
-#: template/defaultfilters.py:401
-msgid "yes,no,maybe"
-msgstr "అవును, కాదు , ఏమొ"
+#~ msgid "headline"
+#~ msgstr "ముఖ్య అంశం"
+#~ msgid "rating #1"
+#~ msgstr "రేటింగ్ #1"
+#~ msgid "rating #2"
+#~ msgstr "రేటింగ్ #2"
+#~ msgid "rating #3"
+#~ msgstr "రేటింగ్ #3"
+#~ msgid "rating #4"
+#~ msgstr "రేటింగ్ #4"
+#~ msgid "rating #5"
+#~ msgstr "రేటింగ్ #5"
+#~ msgid "rating #6"
+#~ msgstr "రేటింగ్ #6"
+#~ msgid "rating #7"
+#~ msgstr "రేటింగ్ #7"
+#~ msgid "rating #8"
+#~ msgstr "రేటింగ్ #8"
+#~ msgid "is valid rating"
+#~ msgstr "సరైన  రేటింగ్"
+#~ msgid "comments"
+#~ msgstr "వ్యాఖ్యానములు"
+#~ msgid "person's name"
+#~ msgstr "వ్యక్తి పేరు"
+#~ msgid "ip address"
+#~ msgstr "ఐపి అడ్రస్"
+#~ msgid "approved by staff"
+#~ msgstr " అధికారుల చేత ఆమోదించబడినది"
+#~ msgid "free comment"
+#~ msgstr "నిరాటంకమైన వ్యాఖ్యానము"
+#~ msgid "free comments"
+#~ msgstr "నిరాటంకము గావ్యాఖ్యానములు"
+#~ msgid "score"
+#~ msgstr "స్కొర్"
+#~ msgid "karma score"
+#~ msgstr "కర్మ  స్కొర్"
+#~ msgid "karma scores"
+#~ msgstr "కర్మ  స్కొరులు"
+#~ msgid "%(score)d rating by %(user)s"
+#~ msgstr "%(score)d కి     %(user)s  రేటింగ్"
+#~ msgid ""
+#~ "This comment was flagged by %(user)s:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgstr ""
+#~ "%(user)s చేత చేయబడ్డ  వ్యాఖ్యానములు:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgid "flag date"
+#~ msgstr "ఫ్లాగ్ తేది "
+#~ msgid "user flag"
+#~ msgstr "యూజర్ ఫ్లాగ్"
+#~ msgid "user flags"
+#~ msgstr "యూజర్ ఫ్లాగులు"
+#~ msgid "Flag by %r"
+#~ msgstr "%r యొక్క ఫ్లాగ్"
+#~ msgid "deletion date"
+#~ msgstr "తీసివేసిన  తారీఖు"
+#~ msgid "moderator deletion"
+#~ msgstr "మొదరేటర్  చేత తీసివేయబడినది "
+#~ msgid "moderator deletions"
+#~ msgstr "మొదరేటర్  చేత తీసివేయబడినవి"
+#~ msgid "Moderator deletion by %r"
+#~ msgstr "మొదరేటర్ తీసివేసిన %r"
+#~ msgid "Anonymous users cannot vote"
+#~ msgstr "అపరిచిత  యూజర్లు వోటు వేయలేరు"
+#~ msgid "No voting for yourself"
+#~ msgstr "మీకు వోటు హక్కు లేదు"
+#~ msgid ""
+#~ "This rating is required because you've entered at least one other rating."
+#~ msgstr "ఈ రేటింగ్ అవసరం  ఎం దుకంటే మీరు ఒక్కసారైన రేటింగ్ ఇచ్చారు"
+#~ msgid ""
+#~ "This comment was posted by a user who has posted fewer than %(count)s "
+#~ "comment:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgid_plural ""
+#~ "This comment was posted by a user who has posted fewer than %(count)s "
+#~ "comments:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgstr[0] ""
+#~ "ఈ  వ్యాఖ్యానము చేసిన యూజర్  %(count)s లు కన్న తక్కువ  సమర్పించాడు  వ్యాఖ్యానము:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgstr[1] ""
+#~ "ఈ  వ్యాఖ్యానము చేసిన యూజర్  %(count)s లు కన్న తక్కువ  సమర్పించాడువ్యాఖ్యానములు:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgid "Only POSTs are allowed"
+#~ msgstr "ఇక్కడ సమర్పణలు మాత్రమే అంగీకరిస్తాము"
+#~ msgid "One or more of the required fields wasn't submitted"
+#~ msgstr "ఒకటి కాని ,అంత కన్నఎక్కువ ఫీల్డస్  సమర్పించలేదు"
+#~ msgid "Somebody tampered with the comment form (security violation)"
+#~ msgstr "ఎవరో వ్యాఖ్యానము ఫార్మ్ ని గెలికారు (భద్రత కి భంగం) "
+#~ msgid ""
+#~ "The comment form had an invalid 'target' parameter -- the object ID was "
+#~ "invalid"
+#~ msgstr "వ్యాఖ్యానము ఫార్మ్ లో  చెల్లని  'టార్గెట్ ' పారామీటర్ , ఆ వస్తువు ఐడి చెల్లదు"
+#~ msgid "The comment form didn't provide either 'preview' or 'post'"
+#~ msgstr "వ్యాఖ్యానము ఫార్మ్ లో 'ప్రివ్యీవ్'  కాని 'పోస్ట్'  ఇవ్వలేదు "
+#~ msgid "Forgotten your password?"
+#~ msgstr "పాస్ వర్డ్ మర్చిపోయారా?"
+#~ msgid "Required"
+#~ msgstr "అవసరము"
+#~ msgid "Post a photo"
+#~ msgstr "ఫొటొ  పెట్టండి"
+#~ msgid "Preview comment"
+#~ msgstr "వ్యాఖ్యానము ని ప్రివ్యీవ్ చేయండి"
+#~ msgid "Your name:"
+#~ msgstr "మీ పేరు"
+#~ msgid "Added %s."
+#~ msgstr "%s కలపబడ్డడి"
+#~ msgid "Deleted %s."
+#~ msgstr "%s తీసివేయబడ్డడి"
+#~ msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+#~ msgstr "మీరు<a href=\"/password_reset/\">పాస్ వర్డ మర్చిపోయారా? "
+#~ msgid "Your new password is: %(new_password)s"
+#~ msgstr "మీ  కొత్త పాస్ వర్డ్ : %(new_password)s "
+#~ msgid "Feel free to change this password by going to this page:"
+#~ msgstr "నిస్సందేహము గా ఈ పేజి క్ కి వెళ్ళి పాస్ వర్డ్  మార్చుకోండి "
+#~ msgid "Enter valid e-mail addresses separated by commas."
+#~ msgstr "కామాల తో విడతీసి  సరైన ఈ మెయిల్  అడ్రస్ ఇవ్వండి"
+#~ msgid "Empty values are not allowed here."
+#~ msgstr "ఇక్కడ కాళీ విలువలు అనుమతించబడవు "
+#~ msgid "Non-numeric characters aren't allowed here."
+#~ msgstr "అంకెలు కాని చిహ్నాలు అనుమతించబడవు"
+#~ msgid "This value can't be comprised solely of digits."
+#~ msgstr "ఈ విలువ లో ఉట్టి మాత్రమే ఉందకూడడు"
+#~ msgid "Only alphabetical characters are allowed here."
+#~ msgstr "అక్షరాలు  అయిన చిహ్నాలు మాత్రమే  అనుమతించబడతాయి "
+#~ msgid "Year must be 1900 or later."
+#~ msgstr "సంవత్సరము 1900 లేక దాని తరువాత అయ్యి ఉందాలి "
+#~ msgid "A valid URL is required."
+#~ msgstr "సరైన  URL కావాలి"
+#~ msgid ""
+#~ "Valid HTML is required. Specific errors are:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "సరైన  HTML ఇవ్వండి .ప్రత్యేకమైన తప్పులు :\n"
+#~ "%s"
+#~ msgid "Enter a valid U.S. state abbreviation."
+#~ msgstr "దయచేసి  సరైన అగ్ర రాజ్య  సంక్షేపము చేసిన  రాష్ట్రము పేరు ఇవ్వండి"
+#~ msgid "This field must match the '%s' field."
+#~ msgstr "ఈ ఫీల్డ్  '%s' ఫీల్డ్ కి సరి తూగాలి"
+#~ msgid "Please enter something for at least one field."
+#~ msgstr "దయచేసి ఏదో  ఒకటి  ఏదో ఒక ఫీల్డ్ కి ఇవ్వండి "
+#~ msgid "Please enter both fields or leave them both empty."
+#~ msgstr "దయచేసి రెండు ఫీల్డ్లలు ఇవ్వండి  లేకపోతే రెండు కాళీ గా వదిలేయండి   "
+#~ msgid "This field must be given if %(field)s is %(value)s"
+#~ msgstr "%(field)s %(value)s ఐతే ఈ ఫీల్డ్  ఇవ్వాలి  "
+#~ msgid "This field must be given if %(field)s is not %(value)s"
+#~ msgstr "%(field)s %(value)s అవ్వకపోతే ఈ ఫీల్డ్  ఇవ్వాలి "
+#~ msgid "Duplicate values are not allowed."
+#~ msgstr "నకలీ విలువలు ఇక్కడ అనుమతించబడవు"
+#~ msgid "The format for this field is wrong."
+#~ msgstr "ఈ ఫీల్డ్  ఫోర్మాట్ తప్పు"
+#~ msgid "Could not retrieve anything from %s."
+#~ msgstr "%s నించి  ఏమి  రాబట్టలేము"
+#~ msgid ""
+#~ "%(object)s with this %(type)s already exists for the given %(field)s."
+#~ msgstr "%(field)s లో %(object)s తో  %(type)s  ఉన్నాయి"
+#~ msgid "Separate multiple IDs with commas."
+#~ msgstr "గుంపు    గా ఉన్న ఐడిల ను కామా తో విడడీయంది"
+#~ msgid "Line breaks are not allowed here."
+#~ msgstr "లైన్  బ్రేక్స్  కి ఇక్కడ  ఆనుమతి లేదు"
+#~ msgid "Enter a whole number between -32,768 and 32,767."
+#~ msgstr " -32,768 ఇంకా  32,767 మధ్యలో  ఒక    ఆంకె ఇవ్వండి"
+#~ msgid "Enter a whole number between 0 and 32,767."
+#~ msgstr "0 ఇంకా  32,767 మధ్యలో  ఒక    పూర్ ఇవ్వండి"
 
