@@ -26,7 +26,7 @@ probably already have it installed.
 
 .. _jython: http://jython.org/
 
-You can verify that Python's installed py typing ``python`` from your shell; you should see something like::
+You can verify that Python's installed by typing ``python`` from your shell; you should see something like::
 
     Python 2.5.1 (r251:54863, Jan 17 2008, 19:35:17) 
     [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
