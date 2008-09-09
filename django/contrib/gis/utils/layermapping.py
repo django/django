@@ -179,13 +179,16 @@ class LayerMapping(object):
             self.ds = data
         self.layer = self.ds[layer]
 
-        # Setting the mapping
+        # Setting the mapping & model attributes.
         self.mapping = mapping
-
-        # Setting the model, and getting the geometry column associated 
-        # with the model (an exception will be raised if there is no 
-        # geometry column).
         self.model = model
+ 
+        # Checking the layer -- intitialization of the object will fail if
+        # things don't check out before hand.
+        self.check_layer()
+
+        # Getting the geometry column associated with the model (an 
+        # exception will be raised if there is no geometry column).
         self.geo_col = self.geometry_column()
 
         # Checking the source spatial reference system, and getting
@@ -196,10 +199,6 @@ class LayerMapping(object):
             self.transform = self.coord_transform()
         else:
             self.transform = transform
-
-        # Checking the layer -- intitialization of the object will fail if
-        # things don't check out before hand.
-        self.check_layer()
 
         # Setting the encoding for OFTString fields, if specified.
         if encoding:
@@ -246,7 +245,8 @@ class LayerMapping(object):
         there is no need to increment through each feature in the Layer.
         """
         # The geometry field of the model is set here.
-        # TODO: Support more than one geometry field / model.
+        # TODO: Support more than one geometry field / model.  However, this
+        # depends on the GDAL Driver in use.
         self.geom_field = False
         self.fields = {}
 
@@ -512,8 +512,14 @@ class LayerMapping(object):
         # Getting the GeometryColumn object.
         try:
             db_table = self.model._meta.db_table
-            if SpatialBackend.name == 'oracle': db_table = db_table.upper()
-            gc_kwargs = {GeometryColumns.table_name_col() : db_table}
+            geo_col = self.geom_field
+            if SpatialBackend.name == 'oracle':
+                # Making upper case for Oracle.
+                db_table = db_table.upper()
+                geo_col = geo_col.upper()
+            gc_kwargs = {GeometryColumns.table_name_col() : db_table,
+                         GeometryColumns.geom_col_name() : geo_col,
+                         }
             return GeometryColumns.objects.get(**gc_kwargs)
         except Exception, msg:
             raise LayerMapError('Geometry column does not exist for model. (did you run syncdb?):\n %s' % msg)

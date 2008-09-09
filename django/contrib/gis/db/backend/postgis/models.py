@@ -27,8 +27,19 @@ class GeometryColumns(models.Model):
 
     @classmethod
     def table_name_col(cls):
-        "Class method for returning the table name column for this model."
+        """
+        Returns the name of the metadata column used to store the 
+        the feature table name.
+        """
         return 'f_table_name'
+
+    @classmethod
+    def geom_col_name(cls):
+        """
+        Returns the name of the metadata column used to store the 
+        the feature geometry column.
+        """
+        return 'f_geometry_column'
 
     def __unicode__(self):
         return "%s.%s - %dD %s field (SRID: %d)" % \
