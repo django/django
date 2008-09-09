@@ -148,14 +148,6 @@ Like we said: We're picky.
 We've documented our philosophies on the
 :ref:`design philosophies page <misc-design-philosophies>`.
 
-Do you have any of those nifty "screencast" things?
----------------------------------------------------
-
-You can bet your bottom they're on the way. But, since we're still hammering
-out a few points, we want to make sure they reflect the final state of things
-at Django 1.0, not some intermediary step. In other words, we don't want to
-spend a lot of energy creating screencasts yet, because Django APIs will shift.
-
 Is Django a content-management-system (CMS)?
 --------------------------------------------
 
@@ -172,14 +164,6 @@ it's not just as appropriate for building "non-CMS-y" apps (whatever that
 means!).
 
 .. _Drupal: http://drupal.org/
-
-When will you release Django 1.0?
----------------------------------
-
-See our `version one roadmap`_ for the detailed timeline. We're aiming for
-September 2, 2008.
-
-.. _version one roadmap: http://code.djangoproject.com/wiki/VersionOneRoadmap
 
 How can I download the Django documentation to read it offline?
 ---------------------------------------------------------------
