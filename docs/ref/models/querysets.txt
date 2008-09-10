@@ -865,13 +865,12 @@ SQL equivalents::
 
 .. admonition:: MySQL comparisons
 
-    In MySQL, whether or not ``exact`` comparisons are case-insensitive by
-    default. This is controlled by the collation setting on the database
-    tables (this is a database setting, *not* a Django setting).  It is
-    possible to configured you MySQL tables to use case-sensitive comparisons,
-    however there are some trade-offs involved. For more information about
-    this, see the :ref:`collation section <mysql-collation>` in the
-    :ref:`databases <ref-databases>` documentation.
+    In MySQL, a database table's "collation" setting determines whether
+    ``exact`` comparisons are case-sensitive. This is a database setting, *not*
+    a Django setting. It's possible to configure your MySQL tables to use
+    case-sensitive comparisons, but some trade-offs are involved. For more
+    information about this, see the :ref:`collation section <mysql-collation>`
+    in the :ref:`databases <ref-databases>` documentation.
 
 iexact
 ~~~~~~
