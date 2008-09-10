@@ -17,10 +17,10 @@ Having trouble? We'd like to help!
   the :ref:`detailed table of contents <contents>`.
 
 * Search for information in the `archives of the django-users mailing list`_, or
-  `post a question`_
-  
+  `post a question`_.
+
 * Ask a question in the `#django IRC channel`_, or search the `IRC logs`_ to see
-  if its been asked before
+  if its been asked before.
 
 * Report bugs with Django in our `ticket tracker`_.
 
@@ -35,40 +35,40 @@ First steps
 
 :ref:`Overview <intro-overview>`
     See what writing a database-driven application with Django looks like.
-    
+
 :ref:`Installation <intro-install>`
     Get Django installed on your computer.
-    
+
 Tutorial: Writing your first Django application
 ===============================================
 
 :ref:`Part 1 <intro-tutorial01>`
     Get set up, create models, and play with the database API.
-    
+
 :ref:`Part 2 <intro-tutorial02>`
     Explore the automatically-generated admin site.
-    
+
 :ref:`Part 3 <intro-tutorial03>`
     Write the public interface views.
-    
+
 :ref:`Part 4 <intro-tutorial04>`
     Learn how to process forms.
-        
+
 Using Django
 ============
 
 :ref:`Models <topics-db-index>`
     Design a single, definitive source of data about your data.
-    
+
 :ref:`Handling web requests <topics-http-index>`
     Handle web requests, map them to views, and return pages.
-    
+
 :ref:`Forms <topics-forms-index>`
     Build and handle HTML forms.
-    
+
 :ref:`Templates <topics-templates>`
     Develop the visual design of your site.
-    
+
 And more:
 ---------
 
@@ -84,22 +84,22 @@ And more:
     * :ref:`topics-signals`
     * :ref:`topics-testing`
     * :ref:`topics-http-sessions`
-    
+
 Add-on ("contrib") applications
 ===============================
 
 :ref:`Django's automatic admin site <ref-contrib-admin>`
     Get a clean interface to your data with no effort at all.
-    
+
 :ref:`Form tools <ref-contrib-formtools-index>`
     Easily handle complex form workflows.
-    
+
 :ref:`Syndication feeds <ref-contrib-syndication>`
     Generate RSS and Atom feeds of your data.
-    
+
 :ref:`"Local flavor" <ref-contrib-localflavor>`
     Give your site that special local touch.
-    
+
 And more:
 ---------
 
@@ -119,17 +119,17 @@ Solving specific problems
 
 :ref:`Deployment <howto-deployment-index>`
     Release your project to the world.
-    
+
 :ref:`Importing data from legacy databases <howto-legacy-databases>`
     Use Django with an existing database or alongside other web development
     toolkits.
 
 :ref:`Custom template tags <howto-custom-template-tags>`
     Add your own extensions to Django's template language.
-    
+
 :ref:`Generating CSV <howto-outputting-csv>` & :ref:`PDF <howto-outputting-pdf>`
     Produce non-HTML content with Django.
-    
+
 And more:
 ---------
 
@@ -147,16 +147,16 @@ Reference
 
 :ref:`Settings <ref-settings>`
     See all of Django's settings and what they do.
-    
+
 :ref:`Request & response objects <ref-request-response>`
     Understand the classes Django uses to represent HTTP requests and responses.
 
 :ref:`Model API reference <ref-models-index>`
     Revel in the gory details of Django's model system.
-        
+
 :ref:`Form API reference <ref-forms-index>`
     Learn the details of forms, fields, and widgets.
-    
+
 And more:
 ---------
 
@@ -167,7 +167,7 @@ And more:
     * :ref:`ref-middleware`
     * :ref:`ref-templates-index`
     * :ref:`ref-unicode`
-    
+
 And all the rest
 ================
 
