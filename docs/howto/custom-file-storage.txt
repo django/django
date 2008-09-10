@@ -45,7 +45,7 @@ Your custom storage system may override any of the storage methods explained in
     * :meth:`Storage.size`
     * :meth:`Storage.url`
 
-You'all also usually want to use hooks specifically designed for custom storage
+You'll also usually want to use hooks specifically designed for custom storage
 objects. These are:
 
 ``_open(name, mode='rb')``
