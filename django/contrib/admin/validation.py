@@ -120,8 +120,7 @@ def validate(cls, model):
 def validate_inline(cls):
     # model is already verified to exist and be a Model
     if cls.fk_name: # default value is None
-        f = get_field(cls, cls.model, cls.model._meta,
-                'fk_name', cls.fk_name)
+        f = get_field(cls, cls.model, cls.model._meta, 'fk_name', cls.fk_name)
         if not isinstance(f, models.ForeignKey):
             raise ImproperlyConfigured("'%s.fk_name is not an instance of "
                     "models.ForeignKey." % cls.__name__)
@@ -229,19 +228,15 @@ def validate_base(cls, model):
                         % (cls.__name__, field))
             check_isseq(cls, "prepopulated_fields['%s']" % field, val)
             for idx, f in enumerate(val):
-                get_field(cls, model,
-                        opts, "prepopulated_fields['%s'][%d]"
-                        % (f, idx), f)
+                get_field(cls, model, opts, "prepopulated_fields['%s'][%d]" % (field, idx), f)
 
 def check_isseq(cls, label, obj):
     if not isinstance(obj, (list, tuple)):
-        raise ImproperlyConfigured("'%s.%s' must be a list or tuple."
-                % (cls.__name__, label))
+        raise ImproperlyConfigured("'%s.%s' must be a list or tuple." % (cls.__name__, label))
 
 def check_isdict(cls, label, obj):
     if not isinstance(obj, dict):
-        raise ImproperlyConfigured("'%s.%s' must be a dictionary."
-                % (cls.__name__, label))
+        raise ImproperlyConfigured("'%s.%s' must be a dictionary." % (cls.__name__, label))
 
 def get_field(cls, model, opts, label, field):
     try:
