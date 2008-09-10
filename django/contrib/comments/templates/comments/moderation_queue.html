@@ -53,17 +53,17 @@
               <input class="remove submit" type="submit" name="submit" value="Remove">
             </form>
           </td>
-          <td>{{ comment.name|escape }}</td>
-          <td>{{ comment.comment|truncatewords:"50"|escape }}</td>
-          <td>{{ comment.email|escape }}</td>
-          <td>{{ comment.url|escape }}</td>
+          <td>{{ comment.name }}</td>
+          <td>{{ comment.comment|truncatewords:"50" }}</td>
+          <td>{{ comment.email }}</td>
+          <td>{{ comment.url }}</td>
           <td>
             <img
               src="{% admin_media_prefix %}img/admin/icon-{% if comment.user %}yes{% else %}no{% endif %}.gif"
               alt="{% if comment.user %}yes{% else %}no{% endif %}"
             />
           </td>
-          <td>{{ comment.ip_address|escape }}</td>
+          <td>{{ comment.ip_address }}</td>
           <td>{{ comment.submit_date|date:"F j, P" }}</td>
         </tr>
       {% endfor %}

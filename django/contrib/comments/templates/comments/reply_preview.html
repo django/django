@@ -9,7 +9,7 @@
       <h1>Please correct the error{{ form.errors|pluralize }} below</h1>
     {% else %}
       <h1>Preview your comment</h1>
-      <blockquote>{{ comment|escape|linebreaks }}</blockquote>
+      <blockquote>{{ comment|linebreaks }}</blockquote>
       <p>
         and <input type="submit" name="submit" value="Post your comment" id="submit"> or make changes:
       </p>

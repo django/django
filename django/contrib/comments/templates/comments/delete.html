@@ -4,9 +4,9 @@
 
 {% block content %}
   <h1>Really remove this comment?</h1>
-  <blockquote>{{ comment|escape|linebreaks }}</blockquote>
+  <blockquote>{{ comment|linebreaks }}</blockquote>
   <form action="." method="POST">
-    <input type="hidden" name="next" value="{{ next|escape }}" id="next">
+    <input type="hidden" name="next" value="{{ next }}" id="next">
     <p class="submit">
       <input type="submit" name="submit" value="Remove"> or <a href="{{ comment.permalink }}">cancel</a>
     </p>
