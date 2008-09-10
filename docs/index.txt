@@ -43,7 +43,7 @@ Tutorial: Writing your first Django application
 ===============================================
 
 :ref:`Part 1 <intro-tutorial01>`
-    Get set up, create models, and play with the database API.
+    Start a project, create models and play with the database API.
 
 :ref:`Part 2 <intro-tutorial02>`
     Explore the automatically-generated admin site.
@@ -61,7 +61,7 @@ Using Django
     Design a single, definitive source of data about your data.
 
 :ref:`Handling web requests <topics-http-index>`
-    Handle web requests, map them to views, and return pages.
+    Handle web requests, map them to views and return pages.
 
 :ref:`Forms <topics-forms-index>`
     Build and handle HTML forms.
@@ -72,24 +72,23 @@ Using Django
 And more:
 ---------
 
-    * :ref:`topics-auth`
-    * :ref:`topics-cache`
-    * :ref:`topics-email`
-    * :ref:`topics-files`
+    * :ref:`Authentication <topics-auth>`
+    * :ref:`Caching <topics-cache>`
+    * :ref:`E-mail <topics-email>`
+    * :ref:`File uploads <topics-files>`
     * :ref:`topics-i18n`
-    * :ref:`topics-install`
     * :ref:`topics-pagination`
-    * :ref:`topics-serialization`
-    * :ref:`topics-settings`
+    * :ref:`Serialization <topics-serialization>`
+    * :ref:`Sessions <topics-http-sessions>`
+    * :ref:`Settings/configuration <topics-settings>`
     * :ref:`topics-signals`
-    * :ref:`topics-testing`
-    * :ref:`topics-http-sessions`
+    * :ref:`Testing <topics-testing>`
 
 Add-on ("contrib") applications
 ===============================
 
 :ref:`Django's automatic admin site <ref-contrib-admin>`
-    Get a clean interface to your data with no effort at all.
+    Get a clean Web interface to your data with little effort.
 
 :ref:`Form tools <ref-contrib-formtools-index>`
     Easily handle complex form workflows.
@@ -103,16 +102,16 @@ Add-on ("contrib") applications
 And more:
 ---------
 
-    * :ref:`ref-contrib-comments-index`
-    * :ref:`ref-contrib-contenttypes`
-    * :ref:`ref-contrib-csrf`
-    * :ref:`ref-contrib-databrowse`
-    * :ref:`ref-contrib-flatpages`
-    * :ref:`ref-contrib-humanize`
-    * :ref:`ref-contrib-redirects`
-    * :ref:`ref-contrib-sitemaps`
-    * :ref:`ref-contrib-sites`
-    * :ref:`ref-contrib-webdesign`
+    * :ref:`Comments <ref-contrib-comments-index>`
+    * :ref:`Content types <ref-contrib-contenttypes>`
+    * :ref:`Cross Site Request Forgery protection <ref-contrib-csrf>`
+    * :ref:`Databrowse <ref-contrib-databrowse>`
+    * :ref:`Flatpages <ref-contrib-flatpages>`
+    * :ref:`Humanize <ref-contrib-humanize>`
+    * :ref:`Redirects <ref-contrib-redirects>`
+    * :ref:`Sitemaps <ref-contrib-sitemaps>`
+    * :ref:`Sites <ref-contrib-sites>`
+    * :ref:`Web design helpers <ref-contrib-webdesign>`
 
 Solving specific problems
 =========================
@@ -137,10 +136,10 @@ And more:
     * :ref:`howto-custom-file-storage`
     * :ref:`howto-custom-management-commands`
     * :ref:`howto-custom-model-fields`
-    * :ref:`howto-error-reporting`
+    * :ref:`Tracking code errors by e-mail <howto-error-reporting>`
     * :ref:`howto-initial-data`
     * :ref:`howto-jython`
-    * :ref:`howto-static-files`
+    * :ref:`Serving static files <howto-static-files>`
 
 Reference
 =========
@@ -155,7 +154,7 @@ Reference
     Revel in the gory details of Django's model system.
 
 :ref:`Form API reference <ref-forms-index>`
-    Learn the details of forms, fields, and widgets.
+    Learn the details of forms, fields and widgets.
 
 And more:
 ---------
@@ -172,7 +171,7 @@ And all the rest
 ================
 
 :ref:`Internals <internals-index>`
-    Learn how Django works under the hood, and how you can contribute to the
+    Learn how Django works under the hood and how you can contribute to the
     project.
 
 :ref:`Release notes <releases-index>`
@@ -180,4 +179,4 @@ And all the rest
 
 :ref:`Miscellany <misc-index>`
     Stuff we can't find a more organized place for. Like that drawer in your
-    kitchen with the scissors, batteries, and duct tape.
+    kitchen with the scissors, batteries and duct tape.
