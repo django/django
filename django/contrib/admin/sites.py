@@ -148,9 +148,9 @@ class AdminSite(object):
             return self.password_change_done(request)
         elif url == 'jsi18n':
             return self.i18n_javascript(request)
-        # urls starting with 'r/' are for the "show in web" links
+        # URLs starting with 'r/' are for the "View on site" links.
         elif url.startswith('r/'):
-            from django.views.defaults import shortcut
+            from django.contrib.contenttypes.views import shortcut
             return shortcut(request, *url.split('/')[1:])
         else:
             if '/' in url:
