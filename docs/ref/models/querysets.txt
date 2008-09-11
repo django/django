@@ -7,9 +7,9 @@ QuerySet API reference
 .. currentmodule:: django.db.models
 
 This document describes the details of the ``QuerySet`` API. It builds on the
-material presented in the :ref:`model <topics-db-models>` and `database query
-<topics-db-queries>` guides, so you'll probably want to read and understand
-those documents before reading this one.
+material presented in the :ref:`model <topics-db-models>` and :ref:`database
+query <topics-db-queries>` guides, so you'll probably want to read and
+understand those documents before reading this one.
 
 Throughout this reference we'll use the :ref:`example weblog models
 <queryset-model-example>` presented in the :ref:`database query guide
@@ -192,6 +192,26 @@ There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
 
+``reverse()``
+~~~~~~~~~~~~~
+
+.. versionadded:: 1.0
+
+Use the ``reverse()`` method to reverse the order in which a queryset's
+elements are returned. Calling ``reverse()`` a second time restores the
+ordering back to the normal direction.
+
+To retrieve the ''last'' five items in a queryset, you could do this::
+
+    my_queryset.reverse()[:5]
+
+Note that this is not quite the same as slicing from the end of a sequence in
+Python. The above example will return the last item first, then the
+penultimate item and so on. If we had a Python sequence and looked at
+``seq[-5:]``, we would see the fifth-last item first. Django doesn't support
+that mode of access (slicing from the end), because it's not possible to do it
+efficiently in SQL.
+
 Also, note that ``reverse()`` should generally only be called on a
 ``QuerySet`` which has a defined ordering (e.g., when querying against
 a model which defines a default ordering, or when using
@@ -199,7 +219,6 @@ a model which defines a default ordering, or when using
 ``QuerySet``, calling ``reverse()`` on it has no real effect (the
 ordering was undefined prior to calling ``reverse()``, and will remain
 undefined afterward).
-
 
 ``distinct()``
 ~~~~~~~~~~~~~~
@@ -392,6 +411,17 @@ Examples::
 
     >>> Entry.objects.none()
     []
+
+``all()``
+~~~~~~~~~~
+
+.. versionadded:: 1.0
+
+Returns a ''copy'' of the current ``QuerySet`` (or ``QuerySet`` subclass you
+pass in). This can be useful in some situations where you might want to pass
+in either a model manager or a ``QuerySet`` and do further filtering on the
+result. You can safely call ``all()`` on either object and then you'll
+definitely have a ``QuerySet`` to work with.
 
 .. _select-related:
 
