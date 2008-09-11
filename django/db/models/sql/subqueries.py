@@ -106,7 +106,7 @@ class UpdateQuery(Query):
 
     def clone(self, klass=None, **kwargs):
         return super(UpdateQuery, self).clone(klass,
-                related_updates=self.related_updates.copy, **kwargs)
+                related_updates=self.related_updates.copy(), **kwargs)
 
     def execute_sql(self, result_type=None):
         """
