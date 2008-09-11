@@ -266,7 +266,7 @@ tests in the Django test suite that will fail when run under this setup.  As
 described above, this can be solved by downloading and installing a newer 
 version of ``pysqlite2`` (``pysqlite-2.x.x.win32-py2.5.exe``) that includes and 
 uses a newer version of SQLite. Python 2.6 ships with a newer version of 
-SQLite and is not be affected by this issue.
+SQLite and is not affected by this issue.
  
 If you are in such platform and find yourself in the need to update 
 ``pysqlite``/SQLite, you will also need to manually modify the 
