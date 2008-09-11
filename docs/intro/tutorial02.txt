@@ -97,17 +97,17 @@ Make the poll app modifiable in the admin
 But where's our poll app? It's not displayed on the admin index page.
 
 Just one thing to do: We need to tell the admin that ``Poll``
-objects have an admin interface. Edit the ``mysite/polls/admin.py`` file and
-add the following to the bottom of the file::
+objects have an admin interface. Create a file called ``admin.py`` in your 
+``polls`` application and edit it to look like this:: 
 
     from mysite.polls.models import Poll
     from django.contrib import admin
     
     admin.site.register(Poll)
 
-Now reload the Django admin page to see your changes. Note that you don't have
-to restart the development server -- the server will auto-reload your project,
-so any modifications code will be seen immediately in your browser.
+You will need to restart the development server to see your changes. Normally
+the server will auto-reload itself every time you modify a file, but here the
+action of creating a new file will not trigger the auto-reloading logic.
 
 Explore the free admin functionality
 ====================================
