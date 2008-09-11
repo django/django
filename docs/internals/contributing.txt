@@ -403,7 +403,7 @@ translated, here's what to do:
     * Create translations using the methods described in the :ref:`i18n
       documentation <topics-i18n>`. For this you will use the ``django-admin.py
       makemessages`` tool. In this particular case it should be run from the
-      top-level``django`` directory of the Django source tree.
+      top-level ``django`` directory of the Django source tree.
 
       The script runs over the entire Django source tree and pulls out all
       strings marked for translation. It creates (or updates) a message file in
@@ -415,7 +415,7 @@ translated, here's what to do:
     
     * Repeat the last two steps for the ``djangojs`` domain (by appending the
       ``-d djangojs`` command line option to the ``django-admin.py``
-      invocations.
+      invocations.)
     
     * Create a diff of the ``.po`` file(s) against the current Subversion trunk.
     

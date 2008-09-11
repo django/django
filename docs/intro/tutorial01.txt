@@ -162,6 +162,9 @@ database's connection parameters:
       that file. If the file doesn't exist, it will automatically be created
       when you synchronize the database for the first time (see below).
       
+      When specifying the path, always use forward slashes, even on Windows 
+      (e.g. ``C:/homes/user/mysite/sqlite3.db``).
+      
     * :setting:`DATABASE_USER` -- Your database username (not used for SQLite).
     
     * :setting:`DATABASE_PASSWORD` -- Your database password (not used for
