@@ -292,6 +292,11 @@ class Query(object):
             grouping = self.get_grouping()
             result.append('GROUP BY %s' % ', '.join(grouping))
 
+        if self.having:
+            having, h_params = self.get_having()
+            result.append('HAVING %s' % ', '.join(having))
+            params.extend(h_params)
+
         if ordering:
             result.append('ORDER BY %s' % ', '.join(ordering))
 
@@ -572,6 +577,24 @@ class Query(object):
             else:
                 result.append(str(col))
         return result
+
+    def get_having(self):
+        """
+        Returns a tuple representing the SQL elements in the "having" clause.
+        By default, the elements of self.having have their as_sql() method
+        called or are returned unchanged (if they don't have an as_sql()
+        method).
+        """
+        result = []
+        params = []
+        for elt in self.having:
+            if hasattr(elt, 'as_sql'):
+                sql, params = elt.as_sql()
+                result.append(sql)
+                params.extend(params)
+            else:
+                result.append(elt)
+        return result, params
 
     def get_ordering(self):
         """
