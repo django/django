@@ -184,11 +184,13 @@ If you don't like the verbose name ``ugettext_lazy``, you can just alias it as
     class MyThing(models.Model):
         name = models.CharField(help_text=_('This is the help text'))
 
-Always use lazy translations in :ref:`Django models <topics-db-models>`. 
-Field names and table names should be marked for translation or else they 
-will not be translated in the admin interface. This means writing explicit 
+Always use lazy translations in :ref:`Django models <topics-db-models>`.
+Field names and table names should be marked for translation (otherwise, they
+won't be translated in the admin interface). This means writing explicit
 ``verbose_name`` and ``verbose_name_plural`` options in the ``Meta`` class,
-though:: 
+though, rather than relying on Django's default determination of
+``verbose_name`` and ``verbose_name_plural`` by looking at the model's class
+name::
 
     from django.utils.translation import ugettext_lazy as _
 
@@ -278,7 +280,7 @@ Each ``RequestContext`` has access to three translation-specific variables:
 
     * ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
       Example: ``en-us``. (See "How language preference is discovered", below.)
-      
+
     * ``LANGUAGE_BIDI`` is the current locale's direction. If True, it's a
       right-to-left language, e.g.: Hebrew, Arabic. If False it's a
       left-to-right language, e.g.: English, French, German etc.
@@ -592,21 +594,21 @@ following this algorithm:
 
     * First, it looks for a ``django_language`` key in the current user's
       session.
-    
+
     * Failing that, it looks for a cookie.
-    
+
       .. versionchanged:: 1.0
-    
+
       In Django version 0.96 and before, the cookie's name is hard-coded to
       ``django_language``. In Django 1,0, The cookie name is set by the
       ``LANGUAGE_COOKIE_NAME`` setting. (The default name is
       ``django_language``.)
-    
+
     * Failing that, it looks at the ``Accept-Language`` HTTP header. This
       header is sent by your browser and tells the server which language(s) you
       prefer, in order by priority. Django tries each language in the header
       until it finds one with available translations.
-    
+
     * Failing that, it uses the global ``LANGUAGE_CODE`` setting.
 
 .. _locale-middleware-notes:
@@ -616,12 +618,12 @@ Notes:
     * In each of these places, the language preference is expected to be in the
       standard language format, as a string. For example, Brazilian Portuguese
       is ``pt-br``.
-    
+
     * If a base language is available but the sublanguage specified is not,
       Django uses the base language. For example, if a user specifies ``de-at``
       (Austrian German) but Django only has ``de`` available, Django uses
       ``de``.
-    
+
     * Only languages listed in the :setting:`LANGUAGES` setting can be selected.
       If you want to restrict the language selection to a subset of provided
       languages (because your application doesn't provide all those languages),
