@@ -13,13 +13,13 @@ automatically-generated admin site.
     Generating admin sites for your staff or clients to add, change and delete
     content is tedious work that doesn't require much creativity. For that
     reason, Django entirely automates creation of admin interfaces for models.
-    
+
     Django was written in a newsroom environment, with a very clear separation
     between "content publishers" and the "public" site. Site managers use the
     system to add news stories, events, sports scores, etc., and that content is
     displayed on the public site. Django solves the problem of creating a
     unified interface for site administrators to edit content.
-    
+
     The admin isn't necessarily intended to be used by site visitors; it's for
     site managers.
 
@@ -30,18 +30,18 @@ The Django admin site is not activated by default -- it's an opt-in thing. To
 activate the admin site for your installation, do these three things:
 
     * Add ``"django.contrib.admin"`` to your :setting:`INSTALLED_APPS` setting.
-    
+
     * Run ``python manage.py syncdb``. Since you have added a new application
       to :setting:`INSTALLED_APPS`, the database tables need to be updated.
-      
+
     * Edit your ``mysite/urls.py`` file and uncomment the lines below the
       "Uncomment this for admin:" comments. This file is a URLconf; we'll dig
       into URLconfs in the next tutorial. For now, all you need to know is that
       it maps URL roots to applications. In the end, you should have a
       ``urls.py`` file that looks like this:
-      
+
       .. parsed-literal::
-      
+
           from django.conf.urls.defaults import *
 
           # Uncomment the next two lines to enable the admin:
@@ -59,7 +59,7 @@ activate the admin site for your installation, do these three things:
               # Uncomment the next line to enable the admin:
               **(r'^admin/(.*)', admin.site.root),**
           )
-          
+
       (The bold lines are the ones that needed to be uncommented.)
 
 Start the development server
@@ -97,17 +97,17 @@ Make the poll app modifiable in the admin
 But where's our poll app? It's not displayed on the admin index page.
 
 Just one thing to do: We need to tell the admin that ``Poll``
-objects have an admin interface. Create a file called ``admin.py`` in your 
-``polls`` application and edit it to look like this:: 
+objects have an admin interface. To do this, create a file called
+``admin.py`` in your ``polls`` directory, and edit it to look like this::
 
     from mysite.polls.models import Poll
     from django.contrib import admin
-    
+
     admin.site.register(Poll)
 
-You will need to restart the development server to see your changes. Normally
-the server will auto-reload itself every time you modify a file, but here the
-action of creating a new file will not trigger the auto-reloading logic.
+You'll need to restart the development server to see your changes. Normally,
+the server auto-reloads code every time you modify a file, but the action of
+creating a new file doesn't trigger the auto-reloading logic.
 
 Explore the free admin functionality
 ====================================
@@ -133,12 +133,12 @@ Click the "What's up?" poll to edit it:
 Things to note here:
 
     * The form is automatically generated from the Poll model.
-    
+
     * The different model field types (:class:`~django.db.models.DateTimeField`,
       :class:`~django.db.models.CharField`) correspond to the appropriate HTML
       input widget. Each type of field knows how to display itself in the Django
       admin.
-    
+
     * Each :class:`~django.db.models.DateTimeField` gets free JavaScript
       shortcuts. Dates get a "Today" shortcut and calendar popup, and times get
       a "Now" shortcut and a convenient popup that lists commonly entered times.
@@ -147,13 +147,13 @@ The bottom part of the page gives you a couple of options:
 
     * Save -- Saves changes and returns to the change-list page for this type of
       object.
-      
+
     * Save and continue editing -- Saves changes and reloads the admin page for
       this object.
-      
+
     * Save and add another -- Saves changes and loads a new, blank form for this
       type of object.
-      
+
     * Delete -- Displays a delete confirmation page.
 
 Change the "Date published" by clicking the "Today" and "Now" shortcuts. Then
@@ -178,13 +178,13 @@ Let's see how this works by reordering the fields on the edit form. Replace the
 
     class PollAdmin(admin.ModelAdmin):
         fields = ['pub_date', 'question']
-        
+
     admin.site.register(Poll, PollAdmin)
 
 You'll follow this pattern -- create a model admin object, then pass it as the
 second argument to ``admin.site.register()`` -- any time you need to change the
 admin options for an object.
-    
+
 This particular change above makes the "Publication date" come before the
 "Question" field:
 
@@ -202,7 +202,7 @@ up into fieldsets::
             (None,               {'fields': ['question']}),
             ('Date information', {'fields': ['pub_date']}),
         ]
-        
+
     admin.site.register(Poll, PollAdmin)
 
 The first element of each tuple in ``fieldsets`` is the title of the fieldset.
@@ -235,9 +235,9 @@ Yet.
 
 There are two ways to solve this problem. The first register ``Choice`` with the
 admin just as we did with ``Poll``. That's easy::
-    
+
     from mysite.polls.models import Choice
-    
+
     admin.site.register(Choice)
 
 Now "Choices" is an available option in the Django admin. The "Add choice" form
@@ -268,7 +268,7 @@ registration code to read::
     class ChoiceInline(admin.StackedInline):
         model = Choice
         extra = 3
-        
+
     class PollAdmin(admin.ModelAdmin):
         fieldsets = [
             (None,               {'fields': ['question']}),

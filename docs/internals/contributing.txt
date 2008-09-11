@@ -399,7 +399,7 @@ incorrect translation, or if you'd like to add a language that isn't yet
 translated, here's what to do:
 
     * Join the `Django i18n mailing list`_ and introduce yourself.
-    
+
     * Create translations using the methods described in the :ref:`i18n
       documentation <topics-i18n>`. For this you will use the ``django-admin.py
       makemessages`` tool. In this particular case it should be run from the
@@ -409,16 +409,16 @@ translated, here's what to do:
       strings marked for translation. It creates (or updates) a message file in
       the directory ``conf/locale`` (for example for ``pt-BR``, the file will be
       ``conf/locale/pt-br/LC_MESSAGES/django.po``).
-      
+
     * Make sure that ``django-admin.py compilemessages -l <lang>`` runs without
       producing any warnings.
-    
+
     * Repeat the last two steps for the ``djangojs`` domain (by appending the
       ``-d djangojs`` command line option to the ``django-admin.py``
-      invocations.)
-    
+      invocations).
+
     * Create a diff of the ``.po`` file(s) against the current Subversion trunk.
-    
+
     * Open a ticket in Django's ticket system, set its ``Component`` field to
       ``Translations``, and attach the patch to it.
 
