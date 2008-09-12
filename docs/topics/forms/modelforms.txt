@@ -521,7 +521,7 @@ formset to a user to edit ``Author`` model instances::
 
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author)
-        if request.POST == 'POST':
+        if request.method == 'POST':
             formset = AuthorFormSet(request.POST, request.FILES)
             if formset.is_valid():
                 formset.save()
