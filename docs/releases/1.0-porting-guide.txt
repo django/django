@@ -150,7 +150,7 @@ New (1.0)::
         model = Child
         extra = 3
 
-    class ParentAdmin(models.ModelAdmin):
+    class ParentAdmin(admin.ModelAdmin):
         model = Parent
         inlines = [ChildInline]
 
