@@ -411,8 +411,9 @@ working with ``ModelForm`` instances instead of ``Form`` instances::
     <tr><th><label for="id_form-0-birth_date">Birth date:</label></th><td><input type="text" name="form-0-birth_date" id="id_form-0-birth_date" /><input type="hidden" name="form-0-id" id="id_form-0-id" /></td></tr>
 
 .. note::
-    One thing to note is that ``modelformset_factory`` uses ``formset_factory``
-    and by default uses ``can_delete=True``.
+    ``modelformset_factory`` uses ``formset_factory`` to generate the forms
+    making model formsets simply an abstraction on top of formsets that knows
+    about models and how to interact.
 
 Changing the queryset
 ---------------------
@@ -558,6 +559,10 @@ some author you would do::
     >>> BookFormSet = inlineformset_factory(Author, Book)
     >>> author = Author.objects.get(name=u'Orson Scott Card')
     >>> formset = BookFormSet(instance=author)
+
+.. note::
+    ``inlineformset_factory`` uses ``modelformset_factory`` and marks
+    ``can_delete=True``.
 
 More than one foreign key to the same model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
