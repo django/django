@@ -212,7 +212,7 @@ tags:
 
             {% ifnotequal athlete.name "Joe" %}
                 ...
-            {% endifequal %}
+            {% endifnotequal %}
     
     :ttag:`block` and :ttag:`extends`
         Set up `template inheritance`_ (see below), a powerful way
