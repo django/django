@@ -50,6 +50,20 @@ Let's take a look at a very simple example the ``ModelAdmin``::
         pass
     admin.site.register(Author, AuthorAdmin)
 
+.. admonition:: Do you need a ``ModelAdmin`` object at all?
+
+    In the preceding example, the ``ModelAdmin`` class doesn't define any
+    custom values (yet). As a result, the default admin interface will be
+    provided. If you are happy with the default admin interface, you don't
+    need to define a ``ModelAdmin`` object at all -- you can register the
+    model class without providing a ``ModelAdmin`` description. The
+    preceding example could be simplified to::
+
+        from django.contrib import admin
+        from myproject.myapp.models import Author
+    
+        admin.site.register(Author)
+    
 ``ModelAdmin`` Options
 ----------------------
 
