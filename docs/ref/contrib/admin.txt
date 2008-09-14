@@ -41,7 +41,7 @@ There are five steps in activating the Django admin site:
 
 The ``ModelAdmin`` class is the representation of a model in the admin
 interface. These are stored in a file named ``admin.py`` in your application.
-Let's take a look at a very simple example the ``ModelAdmin``::
+Let's take a look at a very simple example of the ``ModelAdmin``::
 
     from django.contrib import admin
     from myproject.myapp.models import Author
@@ -159,7 +159,7 @@ The ``field_options`` dictionary can have the following keys:
             'classes': ['wide', 'extrapretty'],
             }
 
-        Two useful classes defined by the default admin-site stylesheet are
+        Two useful classes defined by the default admin site stylesheet are
         ``collapse`` and ``wide``. Fieldsets with the ``collapse`` style will
         be initially collapsed in the admin and replaced with a small
         "click to expand" link. Fieldsets with the ``wide`` style will be
