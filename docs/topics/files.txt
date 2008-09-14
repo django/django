@@ -35,7 +35,7 @@ Consider the following model, using a ``FileField`` to store a photo::
 Any ``Car`` instance will have a ``photo`` attribute that you can use to get at
 the details of the attached photo::
 
-    >>> car = Car.object.get(name="57 Chevy")
+    >>> car = Car.objects.get(name="57 Chevy")
     >>> car.photo
     <ImageFieldFile: chevy.jpg>
     >>> car.photo.name
