@@ -249,6 +249,44 @@ over them::
         {% endfor %}
         </ol>
     {% endif %}
+
+Looping over the form's fields
+------------------------------
+
+If you are using the similar HTML for each of your form fields, you can 
+reduce duplicate code by looping through each field in turn using
+``{% for field in form %}``::
+
+    <form action="/contact/" method="POST">
+        {% for field in form %}
+            <div class="fieldWrapper">
+                {{ field.errors }}
+                {{ field.label_tag }}: {{ field }}
+            </div>
+        {% endfor %}
+        <p><input type="submit" value="Send message"></p>
+    </form>
+
+As in the above example, {{ field.errors }} will output a 
+``<ul class="errorlist">`` by default. You can further customise the display
+of errors with a ``{% for error in field.errors %}`` loop.
+
+Within this loop, ``{{ field }}`` is an instance of BoundField. BoundField 
+also has the following attributes which can be useful in your templates:
+
+    ``{{ field.label }}``
+        The label of the field, e.g. ``Name``.
+    
+    ``{{ field.label_tag }}``
+        The field's label wrapped in the appropriate HTML ``<label>`` tag, 
+        e.g. ``<label for="id_name">Name</label>``
+    
+    ``{{ field.html_name }}``
+        The name of the field that will be used in the input element's name 
+        field; this takes the form prefix in to account if it has been set.
+    
+    ``{{ field.help_text}}``
+        Any help text that has been associated with the field.
     
 Further topics
 ==============
