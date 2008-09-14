@@ -43,7 +43,7 @@ A quick rundown:
       data server-side, use ``method="post"``. This tip isn't specific to
       Django; it's just good Web development practice.
 
-    * ``forloop.counter`` indicates how many times the ;ttag:`for` tag has gone
+    * ``forloop.counter`` indicates how many times the :ttag:`for` tag has gone
       through its loop
 
 Now, let's create a Django view that handles the submitted data and does
