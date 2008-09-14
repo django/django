@@ -478,7 +478,7 @@ many-to-many relationships, you can query using the attributes of the
 many-to-many-related model::
 
     # Find all the groups with a member whose name starts with 'Paul'
-    >>> Groups.objects.filter(person__name__startswith='Paul')
+    >>> Groups.objects.filter(members__name__startswith='Paul')
     [<Group: The Beatles>]
 
 As you are using an intermediate model, you can also query on its attributes::
