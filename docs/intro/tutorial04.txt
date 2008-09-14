@@ -268,8 +268,8 @@ context that contains the ``poll`` and ``latest_poll_list`` context variables.
 However, the generic views provide the variables ``object`` and ``object_list``
 as context. Therefore, you need to change your templates to match the new
 context variables. Go through your templates, and modify any reference to
-``latest_poll_list`` to :func:`~django.views.generic.list_detail.object_list`,
-and change any reference to ``poll`` to ``object``.
+``latest_poll_list`` to ``object_list``, and change any reference to ``poll``
+to ``object``.
 
 You can now delete the ``index()``, ``detail()`` and ``results()`` views
 from ``polls/views.py``. We don't need them anymore -- they have been replaced
