@@ -98,11 +98,11 @@ Django will need permission to create a test database.
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _Django's ticket system: http://code.djangoproject.com/report/1
-.. _psycopg: http://initd.org/tracker/psycopg
+.. _psycopg: http://initd.org/pub/software/psycopg/
 .. _compiled Windows version: http://stickpeople.com/projects/python/win-psycopg/
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 .. _SQLite: http://www.sqlite.org/
-.. _pysqlite: http://initd.org/tracker/pysqlite
+.. _pysqlite: http://initd.org/pub/software/pysqlite/
 .. _cx_Oracle: http://cx-oracle.sourceforge.net/
 .. _Oracle: http://www.oracle.com/
 
