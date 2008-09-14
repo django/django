@@ -411,9 +411,9 @@ working with ``ModelForm`` instances instead of ``Form`` instances::
     <tr><th><label for="id_form-0-birth_date">Birth date:</label></th><td><input type="text" name="form-0-birth_date" id="id_form-0-birth_date" /><input type="hidden" name="form-0-id" id="id_form-0-id" /></td></tr>
 
 .. note::
-    ``modelformset_factory`` uses ``formset_factory`` to generate the forms
-    making model formsets simply an abstraction on top of formsets that knows
-    about models and how to interact.
+    ``modelformset_factory`` uses ``formset_factory`` to generate formsets.
+    This means that a model formset is just an extension of a basic formset
+    that knows how to interact with a particular model.
 
 Changing the queryset
 ---------------------
