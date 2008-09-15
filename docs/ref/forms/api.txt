@@ -530,6 +530,16 @@ string or Unicode object, respectively::
     >>> unicode(f['subject'])
     u'<input id="id_subject" type="text" name="subject" maxlength="100" />'
 
+Form objects define a custom ``__iter__`` method which allows you to loop 
+through their fields::
+
+    >>> f = ContactForm()
+    >>> for field in f: print field
+    <input id="id_subject" type="text" name="subject" maxlength="100" />
+    <input type="text" name="message" id="id_message" />
+    <input type="text" name="sender" id="id_sender" />
+    <input type="checkbox" name="cc_myself" id="id_cc_myself" />
+
 The field-specific output honors the form object's ``auto_id`` setting::
 
     >>> f = ContactForm(auto_id=False)
