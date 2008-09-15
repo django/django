@@ -42,7 +42,7 @@ lgdal = CDLL(lib_path)
 # different calling convention.
 if os.name == 'nt':
     from ctypes import WinDLL
-    lwingdal = WinDLL(lib_name)
+    lwingdal = WinDLL(lib_path)
 
 def std_call(func):
     """
