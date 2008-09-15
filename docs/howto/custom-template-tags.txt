@@ -619,6 +619,8 @@ When your template tag does not need access to the current context, writing a
 function to work with the input values and using the ``simple_tag`` helper is
 the easiest way to create a new tag.
 
+.. _howto-custom-template-tags-inclusion-tags:
+
 Inclusion tags
 ~~~~~~~~~~~~~~
 

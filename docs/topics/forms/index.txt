@@ -321,6 +321,9 @@ context you can alias it using the :ttag:`with` tag::
         <p><input type="submit" value="Submit comment" /></p>
     </form>
 
+You can also create a custom :ref:`inclusion 
+tag<howto-custom-template-tags-inclusion-tags>`.
+
 Further topics
 ==============
 
