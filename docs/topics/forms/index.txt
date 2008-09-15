@@ -290,6 +290,37 @@ templates:
         corresponding to this field. You can customize the presentation of 
         the errors with a ``{% for error in field.errors %}`` loop.
 
+Reusable form templates
+-----------------------
+
+If your site uses the same rendering logic for forms in multiple places you 
+can create a template that contains just the form loop and use the 
+:ttag:`include` tag to reuse it in your other templates::
+
+    <form action="/contact/" method="POST">
+        {% include "form_snippet.html" %}
+        <p><input type="submit" value="Send message"></p>
+    </form>
+    
+    # In form_snippet.html:
+    
+    {% for field in form %}
+        <div class="fieldWrapper">
+            {{ field.errors }}
+            {{ field.label_tag }}: {{ field }}
+        </div>
+    {% endfor %}
+
+If the form object passed to a template has a different name within the 
+context you can alias it using the :ttag:`with` tag::
+
+    <form action="/comments/add/" method="POST">
+        {% with comment_form as form %}
+            {% include "form_snippet.html" %}
+        {% endwith %}
+        <p><input type="submit" value="Submit comment"></p>
+    </form>
+
 Further topics
 ==============
 
