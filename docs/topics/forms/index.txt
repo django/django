@@ -168,7 +168,7 @@ context variable ``form``. Here's a simple example template::
 
     <form action="/contact/" method="POST">
     {{ form.as_p }}
-    <input type="submit" value="Submit">
+    <input type="submit" value="Submit" />
     </form>
 
 The form only outputs its own fields; it is up to you to provide the surrounding
@@ -186,7 +186,7 @@ wrapped in a paragraph. Here's the output for our example template::
        <input type="text" name="sender" id="id_sender" /></p>
    <p><label for="id_cc_myself">Cc myself:</label>
        <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
-   <input type="submit" value="Submit">
+   <input type="submit" value="Submit" />
    </form>
    
 Note that each form field has an ID attribute set to ``id_<field-name>``, which
@@ -226,7 +226,7 @@ above example::
             <label for="id_cc_myself">CC yourself?</label>
             {{ form.cc_myself }}
         </div>
-        <p><input type="submit" value="Send message"></p>
+        <p><input type="submit" value="Send message" /></p>
     </form>
 
 Each named form-field can be output to the template using
@@ -264,7 +264,7 @@ reduce duplicate code by looping through each field in turn using
                 {{ field.label_tag }}: {{ field }}
             </div>
         {% endfor %}
-        <p><input type="submit" value="Send message"></p>
+        <p><input type="submit" value="Send message" /></p>
     </form>
 
 Within this loop, ``{{ field }}`` is an instance of :class:`BoundField`.
@@ -299,7 +299,7 @@ can create a template that contains just the form loop and use the
 
     <form action="/contact/" method="POST">
         {% include "form_snippet.html" %}
-        <p><input type="submit" value="Send message"></p>
+        <p><input type="submit" value="Send message" /></p>
     </form>
     
     # In form_snippet.html:
@@ -318,7 +318,7 @@ context you can alias it using the :ttag:`with` tag::
         {% with comment_form as form %}
             {% include "form_snippet.html" %}
         {% endwith %}
-        <p><input type="submit" value="Submit comment"></p>
+        <p><input type="submit" value="Submit comment" /></p>
     </form>
 
 Further topics
