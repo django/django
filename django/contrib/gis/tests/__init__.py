@@ -1,11 +1,5 @@
 import sys, unittest
 
-from django.conf import settings
-from django.db import connection
-from django.db.models import get_app, get_apps, loading
-from django.test.simple import build_suite, build_test
-from django.test.utils import setup_test_environment, teardown_test_environment
-
 def geo_suite():
     """
     Builds a test suite for the GIS package.  This is not named
@@ -13,6 +7,7 @@ def geo_suite():
     spatial database tables are required to execute these tests on
     some backends).
     """
+    from django.conf import settings
     from django.contrib.gis.tests.utils import mysql, oracle, postgis
     from django.contrib.gis.gdal import HAS_GDAL
     from django.contrib.gis.utils import HAS_GEOIP
@@ -62,6 +57,8 @@ def run_gis_tests(test_labels, **kwargs):
     GeoDjango test suite.  This must be done as a database superuser for
     PostGIS, so read the docstring in `run_test()` below for more details.
     """
+    from django.conf import settings
+    from django.db.models import loading
     from django.contrib.gis.tests.utils import mysql
 
     # Getting initial values.
@@ -160,6 +157,12 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[], suite=
 
     Finally, the tests may be run by invoking `./manage.py test`.
     """
+    from django.conf import settings
+    from django.db import connection
+    from django.db.models import get_app, get_apps
+    from django.test.simple import build_suite, build_test
+    from django.test.utils import setup_test_environment, teardown_test_environment
+
     # The `create_spatial_db` routine abstracts away all the steps needed
     # to properly construct a spatial database for the backend.
     from django.contrib.gis.db.backend import create_spatial_db
