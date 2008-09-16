@@ -44,9 +44,9 @@ fieldset.collapsed .collapse-toggle { padding:3px 5px !important; background:tra
 fieldset.monospace textarea { font-family:"Bitstream Vera Sans Mono",Monaco,"Courier New",Courier,monospace; }
 
 /* SUBMIT ROW */
-.submit-row { padding:5px 7px; text-align:right; background:white url(../img/admin/nav-bg.gif) 0 100% repeat-x; border:1px solid #ccc; margin:5px 0; }
+.submit-row { padding:5px 7px; text-align:right; background:white url(../img/admin/nav-bg.gif) 0 100% repeat-x; border:1px solid #ccc; margin:5px 0; overflow:hidden; }
 .submit-row input { margin:0 0 0 5px; }
-.submit-row p { margin-top:0.3em; }
+.submit-row p { margin:0.3em; }
 .submit-row p.deletelink-box { float: left; }
 .submit-row .deletelink { background:url(../img/admin/icon_deletelink.gif) 0 50% no-repeat; padding-left:14px; }
 
