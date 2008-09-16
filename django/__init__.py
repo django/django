@@ -1,4 +1,4 @@
-VERSION = (1, 0, 'final')
+VERSION = (1, 0, 'post-release-SVN')
 
 def get_version():
     "Returns the version as a human-format string."
