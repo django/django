@@ -4,7 +4,7 @@
 
 {% block content %}
   {% load comments %}
-  <form action="{% comment_form_target %}" method="POST">
+  <form action="{% comment_form_target %}" method="post">
     {% if form.errors %}
       <h1>Please correct the error{{ form.errors|pluralize }} below</h1>
     {% else %}

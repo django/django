@@ -44,11 +44,11 @@
       {% for comment in comments %}
         <tr class="{% cycle 'row1' 'row2' %}">
           <td class="actions">
-            <form action="{% url comments-approve comment.pk %}" method="POST">
+            <form action="{% url comments-approve comment.pk %}" method="post">
               <input type="hidden" name="next" value="{% url comments-moderation-queue %}">
               <input class="approve submit" type="submit" name="submit" value="Approve">
             </form>
-            <form action="{% url comments-delete comment.pk %}" method="POST">
+            <form action="{% url comments-delete comment.pk %}" method="post">
               <input type="hidden" name="next" value="{% url comments-moderation-queue %}">
               <input class="remove submit" type="submit" name="submit" value="Remove">
             </form>

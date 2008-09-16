@@ -1,5 +1,5 @@
 {% load comments %}
-<form action="{% comment_form_target %}" method="POST">
+<form action="{% comment_form_target %}" method="post">
   {% for field in form %}
     {% if field.is_hidden %}
       {{ field }}
