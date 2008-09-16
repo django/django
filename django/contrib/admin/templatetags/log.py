@@ -12,11 +12,11 @@ class AdminLogNode(template.Node):
 
     def render(self, context):
         if self.user is None:
-            context[self.varname] = LogEntry.objects.all().select_related()[:self.limit]
+            context[self.varname] = LogEntry.objects.all().select_related('content_type', 'user')[:self.limit]
         else:
             if not self.user.isdigit():
                 self.user = context[self.user].id
-            context[self.varname] = LogEntry.objects.filter(user__id__exact=self.user).select_related()[:self.limit]
+            context[self.varname] = LogEntry.objects.filter(user__id__exact=self.user).select_related('content_type', 'user')[:self.limit]
         return ''
 
 class DoGetAdminLog:
