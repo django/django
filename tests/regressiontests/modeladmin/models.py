@@ -549,7 +549,7 @@ ImproperlyConfigured: 'ValidationTestModelAdmin.prepopulated_fields' refers to f
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: 'ValidationTestModelAdmin.prepopulated_fields['non_existent_field'][0]' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.
+ImproperlyConfigured: 'ValidationTestModelAdmin.prepopulated_fields['slug'][0]' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.
 
 >>> class ValidationTestModelAdmin(ModelAdmin):
 ...     prepopulated_fields = {"users": ("name",)}
