@@ -523,57 +523,29 @@ Now your tag should begin to look like this::
             raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
         return FormatTimeNode(date_to_be_formatted, format_string[1:-1])
 
+.. versionchanged:: 1.0
+    Variable resolution has changed in the 1.0 release of Django. ``template.resolve_variable()``
+    has been deprecated in favor of a new ``template.Variable`` class.
+
 You also have to change the renderer to retrieve the actual contents of the
 ``date_updated`` property of the ``blog_entry`` object.  This can be
-accomplished by using the ``resolve_variable()`` function in
-``django.template``. You pass ``resolve_variable()`` the variable name and the
-current context, available in the ``render`` method::
+accomplished by using the ``Variable()`` class in ``django.template``.
 
-    from django import template
-    from django.template import resolve_variable
-    import datetime
+To use the ``Variable`` class, simply instantiate it with the name of the
+variable to be resolved, and then call ``variable.resolve(context)``. So,
+for example::
+
     class FormatTimeNode(template.Node):
         def __init__(self, date_to_be_formatted, format_string):
-            self.date_to_be_formatted = date_to_be_formatted
+            self.date_to_be_formatted = Variable(date_to_be_formatted)
             self.format_string = format_string
 
         def render(self, context):
             try:
-                actual_date = resolve_variable(self.date_to_be_formatted, context)
+                actual_date = self.date_to_be_formatted.resolve(context)
                 return actual_date.strftime(self.format_string)
             except template.VariableDoesNotExist:
                 return ''
-
-``resolve_variable`` will try to resolve ``blog_entry.date_updated`` and then
-format it accordingly.
-
-.. versionadded:: 1.0
-
-    Variable resolution has changed in the development version of Django.
-    ``template.resolve_variable()`` is still available, but has been deprecated
-    in favor of a new ``template.Variable`` class. Using this class will usually
-    be more efficient than calling ``template.resolve_variable``
-
-    To use the ``Variable`` class, simply instantiate it with the name of the
-    variable to be resolved, and then call ``variable.resolve(context)``. So,
-    in the development version, the above example would be more correctly
-    written as:
-
-    .. parsed-literal::
-
-        class FormatTimeNode(template.Node):
-            def __init__(self, date_to_be_formatted, format_string):
-                self.date_to_be_formatted = **Variable(date_to_be_formatted)**
-                self.format_string = format_string
-
-            def render(self, context):
-                try:
-                    actual_date = **self.date_to_be_formatted.resolve(context)**
-                    return actual_date.strftime(self.format_string)
-                except template.VariableDoesNotExist:
-                    return ''
-
-    Changes are highlighted in bold.
 
 Variable resolution will throw a ``VariableDoesNotExist`` exception if it cannot
 resolve the string passed to it in the current context of the page.

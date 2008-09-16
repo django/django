@@ -348,7 +348,7 @@ In addition, ``QueryDict`` has the following methods:
 
 .. method:: QueryDict.lists()
 
-    Like :method:items(), except it includes all values, as a list, for each
+    Like :meth:`items()`, except it includes all values, as a list, for each
     member of the dictionary. For example::
     
          >>> q = QueryDict('a=1&a=2&a=3')
