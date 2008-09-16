@@ -75,7 +75,7 @@ And more:
     * :ref:`Authentication <topics-auth>`
     * :ref:`Caching <topics-cache>`
     * :ref:`E-mail <topics-email>`
-    * :ref:`File uploads <topics-files>`
+    * :ref:`File-access APIs <topics-files>`
     * :ref:`topics-i18n`
     * :ref:`topics-pagination`
     * :ref:`Serialization <topics-serialization>`
