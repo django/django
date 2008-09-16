@@ -112,7 +112,7 @@ This code includes a few things we haven't covered yet in this tutorial:
       This function helps avoid having to hardcode a URL in the view function.
       It is given the name of the view that we want to pass control to and the
       variable portion of the URL pattern that points to that view. In this
-      case, using the URLConf we set up in Tutorial 3, this
+      case, using the URLconf we set up in Tutorial 3, this
       :func:`~django.core.urlresolvers.reverse` call will return a string like
       ::
 
