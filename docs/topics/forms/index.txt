@@ -295,9 +295,9 @@ templates:
 Reusable form templates
 -----------------------
 
-If your site uses the same rendering logic for forms in multiple places you
-can create a template that contains just the form loop and use the
-:ttag:`include` tag to reuse it in your other templates::
+If your site uses the same rendering logic for forms in multiple places, you
+can reduce duplication by saving the form's loop in a standalone template and
+using the :ttag:`include` tag to reuse it in other templates::
 
     <form action="/contact/" method="POST">
         {% include "form_snippet.html" %}
@@ -314,7 +314,7 @@ can create a template that contains just the form loop and use the
     {% endfor %}
 
 If the form object passed to a template has a different name within the
-context you can alias it using the :ttag:`with` tag::
+context, you can alias it using the :ttag:`with` tag::
 
     <form action="/comments/add/" method="POST">
         {% with comment_form as form %}
@@ -323,8 +323,8 @@ context you can alias it using the :ttag:`with` tag::
         <p><input type="submit" value="Submit comment" /></p>
     </form>
 
-You can also create a custom :ref:`inclusion
-tag<howto-custom-template-tags-inclusion-tags>`.
+If you find yourself doing this often, you might consider creating a custom
+:ref:`inclusion tag<howto-custom-template-tags-inclusion-tags>`.
 
 Further topics
 ==============

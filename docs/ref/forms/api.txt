@@ -96,7 +96,7 @@ e-mail address::
     >>> f = ContactForm(data)
     >>> f.is_valid()
     False
-    
+
 .. attribute:: Form.errors
 
 Access the :attr:`~Form.errors` attribute to get a dictionary of error
@@ -530,7 +530,7 @@ string or Unicode object, respectively::
     >>> unicode(f['subject'])
     u'<input id="id_subject" type="text" name="subject" maxlength="100" />'
 
-Form objects define a custom ``__iter__`` method which allows you to loop 
+Form objects define a custom ``__iter__()`` method, which allows you to loop
 through their fields::
 
     >>> f = ContactForm()
