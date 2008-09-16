@@ -295,7 +295,7 @@ class AdminSite(object):
                     else:
                         app_dict[app_label] = {
                             'name': app_label.title(),
-                            'app_url': app_label,
+                            'app_url': app_label + '/',
                             'has_module_perms': has_module_perms,
                             'models': [model_dict],
                         }
