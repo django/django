@@ -194,8 +194,13 @@ def copy_helper(style, app_or_project, name, directory, other_name=''):
     import re
     import shutil
     other = {'project': 'app', 'app': 'project'}[app_or_project]
-    if not re.search(r'^\w+$', name): # If it's not a valid directory name.
-        raise CommandError("%r is not a valid %s name. Please use only numbers, letters and underscores." % (name, app_or_project))
+    if not re.search(r'^[_a-zA-Z]\w*$', name): # If it's not a valid directory name.
+        # Provide a smart error message, depending on the error.
+        if not re.search(r'^[_a-zA-Z]', name):
+            message = 'make sure the name begins with a letter or underscore'
+        else:
+            message = 'use only numbers, letters and underscores'
+        raise CommandError("%r is not a valid %s name. Please %s." % (name, app_or_project, message))
     top_dir = os.path.join(directory, name)
     try:
         os.mkdir(top_dir)
