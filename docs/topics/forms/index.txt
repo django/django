@@ -45,7 +45,7 @@ The library deals with these concepts:
 
     Form Media
         The CSS and JavaScript resources that are required to render a form.
-            
+
 The library is decoupled from the other Django components, such as the database
 layer, views and templates. It relies only on Django settings, a couple of
 ``django.utils`` helper functions and Django's internationalization hooks (but
@@ -99,7 +99,7 @@ The standard pattern for processing a form in a view looks like this:
                return HttpResponseRedirect('/thanks/') # Redirect after POST
        else:
            form = ContactForm() # An unbound form
-   
+
        return render_to_response('contact.html', {
            'form': form,
        })
@@ -148,11 +148,11 @@ Extending the above example, here's how the form data could be processed:
         message = form.cleaned_data['message']
         sender = form.cleaned_data['sender']
         cc_myself = form.cleaned_data['cc_myself']
-    
+
         recipients = ['info@example.com']
         if cc_myself:
             recipients.append(sender)
-    
+
         from django.core.mail import send_mail
         send_mail(subject, message, sender, recipients)
         return HttpResponseRedirect('/thanks/') # Redirect after POST
@@ -188,7 +188,7 @@ wrapped in a paragraph. Here's the output for our example template::
        <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
    <input type="submit" value="Submit" />
    </form>
-   
+
 Note that each form field has an ID attribute set to ``id_<field-name>``, which
 is referenced by the accompanying label tag. This is important for ensuring
 forms are accessible to assistive technology such as screen reader software. You
@@ -253,9 +253,9 @@ over them::
 Looping over the form's fields
 ------------------------------
 
-If you are using the similar HTML for each of your form fields, you can 
+If you're the same HTML for each of your form fields, you can
 reduce duplicate code by looping through each field in turn using
-``{% for field in form %}``::
+a ``{% for %}`` loop::
 
     <form action="/contact/" method="POST">
         {% for field in form %}
@@ -268,42 +268,44 @@ reduce duplicate code by looping through each field in turn using
     </form>
 
 Within this loop, ``{{ field }}`` is an instance of :class:`BoundField`.
-``BoundField`` also has the following attributes which can be useful in your 
+``BoundField`` also has the following attributes, which can be useful in your
 templates:
 
     ``{{ field.label }}``
-        The label of the field, e.g. ``Name``.
-    
+        The label of the field, e.g. ``E-mail address``.
+
     ``{{ field.label_tag }}``
-        The field's label wrapped in the appropriate HTML ``<label>`` tag, 
-        e.g. ``<label for="id_name">Name</label>``
-    
+        The field's label wrapped in the appropriate HTML ``<label>`` tag,
+        e.g. ``<label for="id_email">E-mail address</label>``
+
     ``{{ field.html_name }}``
-        The name of the field that will be used in the input element's name 
-        field; this takes the form prefix in to account if it has been set.
-    
+        The name of the field that will be used in the input element's name
+        field. This takes the form prefix into account, if it has been set.
+
     ``{{ field.help_text }}``
         Any help text that has been associated with the field.
-    
+
     ``{{ field.errors }}``
         Outputs a ``<ul class="errorlist">`` containing any validation errors
-        corresponding to this field. You can customize the presentation of 
-        the errors with a ``{% for error in field.errors %}`` loop.
+        corresponding to this field. You can customize the presentation of
+        the errors with a ``{% for error in field.errors %}`` loop. In this
+        case, each object in the loop is a simple string containing the error
+        message.
 
 Reusable form templates
 -----------------------
 
-If your site uses the same rendering logic for forms in multiple places you 
-can create a template that contains just the form loop and use the 
+If your site uses the same rendering logic for forms in multiple places you
+can create a template that contains just the form loop and use the
 :ttag:`include` tag to reuse it in your other templates::
 
     <form action="/contact/" method="POST">
         {% include "form_snippet.html" %}
         <p><input type="submit" value="Send message" /></p>
     </form>
-    
+
     # In form_snippet.html:
-    
+
     {% for field in form %}
         <div class="fieldWrapper">
             {{ field.errors }}
@@ -311,7 +313,7 @@ can create a template that contains just the form loop and use the
         </div>
     {% endfor %}
 
-If the form object passed to a template has a different name within the 
+If the form object passed to a template has a different name within the
 context you can alias it using the :ttag:`with` tag::
 
     <form action="/comments/add/" method="POST">
@@ -321,7 +323,7 @@ context you can alias it using the :ttag:`with` tag::
         <p><input type="submit" value="Submit comment" /></p>
     </form>
 
-You can also create a custom :ref:`inclusion 
+You can also create a custom :ref:`inclusion
 tag<howto-custom-template-tags-inclusion-tags>`.
 
 Further topics
@@ -335,7 +337,7 @@ This covers the basics, but forms can do a whole lot more:
    modelforms
    formsets
    media
-   
+
 .. seealso::
 
     The :ref:`form API reference <ref-forms-index>`.
