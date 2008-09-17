@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-18 15:00+0000\n"
-"PO-Revision-Date: 2008-01-18 17:16+0100\n"
+"POT-Creation-Date: 2008-09-09 15:51+0000\n"
+"PO-Revision-Date: 2008-09-09 16:34-0000\n"
 "Last-Translator: Jökull Sólberg Auðunsson <jokullsolberg@gmail.com>\n"
 "Language-Team:  <dagurp@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -14,183 +14,199 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1\n"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:44
 msgid "Arabic"
 msgstr "Arabíska"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:45
 msgid "Bengali"
 msgstr "Bengalska"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:46
 msgid "Bulgarian"
 msgstr "Búlgarska"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:47
 msgid "Catalan"
 msgstr ""
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:48
 msgid "Czech"
 msgstr "Tékkneska"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:49
 msgid "Welsh"
 msgstr "Velska"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:50
 msgid "Danish"
 msgstr "Danska"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:51
 msgid "German"
 msgstr "Þýska"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:52
 msgid "Greek"
 msgstr "Gríska"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:53
 msgid "English"
 msgstr "Enska"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:54
 msgid "Spanish"
 msgstr "Spænska"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:55
+msgid "Estonian"
+msgstr "Eistland"
+
+#: conf/global_settings.py:56
 msgid "Argentinean Spanish"
 msgstr "Argentínsk Spænska"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:57
+msgid "Basque"
+msgstr ""
+
+#: conf/global_settings.py:58
 msgid "Persian"
 msgstr ""
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:59
 msgid "Finnish"
 msgstr "Finnska"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:60
 msgid "French"
 msgstr "Franska"
 
-#: conf/global_settings.py:54
-msgid "Gaeilge"
+#: conf/global_settings.py:61
+msgid "Irish"
 msgstr ""
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:62
 msgid "Galician"
 msgstr "Galíska"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:63
 msgid "Hungarian"
 msgstr "Ungverska"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:64
 msgid "Hebrew"
 msgstr "Hebreska"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:65
 msgid "Croatian"
 msgstr ""
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:66
 msgid "Icelandic"
 msgstr "Íslenska"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:67
 msgid "Italian"
 msgstr "Ítalska"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:68
 msgid "Japanese"
 msgstr "Japanska"
 
-#: conf/global_settings.py:62
-msgid "Korean"
-msgstr ""
-
-#: conf/global_settings.py:63
-msgid "Khmer"
-msgstr ""
-
-#: conf/global_settings.py:64
-msgid "Kannada"
-msgstr ""
-
-#: conf/global_settings.py:65
-msgid "Latvian"
-msgstr ""
-
-#: conf/global_settings.py:66
-msgid "Macedonian"
-msgstr ""
-
-#: conf/global_settings.py:67
-msgid "Dutch"
-msgstr "Hollenska"
-
-#: conf/global_settings.py:68
-msgid "Norwegian"
-msgstr "Norska"
-
 #: conf/global_settings.py:69
-msgid "Polish"
+msgid "Georgian"
 msgstr ""
 
 #: conf/global_settings.py:70
-msgid "Portugese"
-msgstr "Portúgalska"
+msgid "Korean"
+msgstr ""
 
 #: conf/global_settings.py:71
-msgid "Brazilian"
-msgstr "Brasilíska"
+msgid "Khmer"
+msgstr ""
 
 #: conf/global_settings.py:72
-msgid "Romanian"
-msgstr "Rúmenska"
+msgid "Kannada"
+msgstr ""
 
 #: conf/global_settings.py:73
-msgid "Russian"
-msgstr "Rússneska"
+msgid "Latvian"
+msgstr ""
 
 #: conf/global_settings.py:74
-msgid "Slovak"
-msgstr "Slóvaska"
+msgid "Lithuanian"
+msgstr ""
 
 #: conf/global_settings.py:75
-msgid "Slovenian"
+msgid "Macedonian"
 msgstr ""
 
 #: conf/global_settings.py:76
-msgid "Serbian"
-msgstr "Serbneska"
+msgid "Dutch"
+msgstr "Hollenska"
 
 #: conf/global_settings.py:77
-msgid "Swedish"
-msgstr "Sænska"
+msgid "Norwegian"
+msgstr "Norska"
 
 #: conf/global_settings.py:78
-msgid "Tamil"
+msgid "Polish"
 msgstr ""
 
 #: conf/global_settings.py:79
+msgid "Portugese"
+msgstr "Portúgalska"
+
+#: conf/global_settings.py:80
+msgid "Brazilian Portuguese"
+msgstr "Brasilísk Portúgalska"
+
+#: conf/global_settings.py:81
+msgid "Romanian"
+msgstr "Rúmenska"
+
+#: conf/global_settings.py:82
+msgid "Russian"
+msgstr "Rússneska"
+
+#: conf/global_settings.py:83
+msgid "Slovak"
+msgstr "Slóvaska"
+
+#: conf/global_settings.py:84
+msgid "Slovenian"
+msgstr ""
+
+#: conf/global_settings.py:85
+msgid "Serbian"
+msgstr "Serbneska"
+
+#: conf/global_settings.py:86
+msgid "Swedish"
+msgstr "Sænska"
+
+#: conf/global_settings.py:87
+msgid "Tamil"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Telugu"
 msgstr ""
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:89
 msgid "Turkish"
 msgstr ""
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:90
 msgid "Ukrainian"
 msgstr ""
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:91
 msgid "Simplified Chinese"
 msgstr "Einfölduð Kínverska "
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:92
 msgid "Traditional Chinese"
 msgstr "Hefðbundin Kínverska"
 
@@ -200,7 +216,7 @@ msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 msgstr ""
-"<h3>Frá %s:</h3>\n"
+"<h3>Höfundur: %s:</h3>\n"
 "<ul>\n"
 
 #: contrib/admin/filterspecs.py:74
@@ -231,50 +247,216 @@ msgid "This year"
 msgstr "Þetta ár"
 
 #: contrib/admin/filterspecs.py:147
-#: newforms/widgets.py:231
-#: oldforms/__init__.py:592
+#: forms/widgets.py:391
 msgid "Yes"
 msgstr "Já"
 
 #: contrib/admin/filterspecs.py:147
-#: newforms/widgets.py:231
-#: oldforms/__init__.py:592
+#: forms/widgets.py:391
 msgid "No"
 msgstr "Nei"
 
 #: contrib/admin/filterspecs.py:154
-#: newforms/widgets.py:231
-#: oldforms/__init__.py:592
+#: forms/widgets.py:391
 msgid "Unknown"
 msgstr "Óþekkt"
 
-#: contrib/admin/models.py:18
+#: contrib/admin/models.py:19
 msgid "action time"
 msgstr "tími aðgerðar"
 
-#: contrib/admin/models.py:21
+#: contrib/admin/models.py:22
 msgid "object id"
 msgstr "kenni hlutar"
 
-#: contrib/admin/models.py:22
+#: contrib/admin/models.py:23
 msgid "object repr"
 msgstr "framsetning hlutar"
 
-#: contrib/admin/models.py:23
+#: contrib/admin/models.py:24
 msgid "action flag"
 msgstr "aðgerðarveifa"
 
-#: contrib/admin/models.py:24
+#: contrib/admin/models.py:25
 msgid "change message"
 msgstr "breyta skilaboði"
 
-#: contrib/admin/models.py:27
+#: contrib/admin/models.py:28
 msgid "log entry"
 msgstr "kladdafærsla"
 
-#: contrib/admin/models.py:28
+#: contrib/admin/models.py:29
 msgid "log entries"
 msgstr "kladdafærslur"
+
+#: contrib/admin/options.py:60
+#: contrib/admin/options.py:121
+msgid "None"
+msgstr "Ekkert"
+
+#: contrib/admin/options.py:338
+#, python-format
+msgid "Changed %s."
+msgstr "Breytti %s."
+
+#: contrib/admin/options.py:338
+#: contrib/admin/options.py:348
+#: forms/models.py:275
+msgid "and"
+msgstr "og"
+
+#: contrib/admin/options.py:343
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "Bætti við %(name)s \"%(object)s\"."
+
+#: contrib/admin/options.py:347
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "Breytti %(list)s fyrir %(name)s \"%(object)s\"."
+
+#: contrib/admin/options.py:352
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "Eyddi %(name)s \"%(object)s\"."
+
+#: contrib/admin/options.py:356
+msgid "No fields changed."
+msgstr "Engum reitum breytt."
+
+#: contrib/admin/options.py:417
+#: contrib/auth/admin.py:51
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s „%(obj)s“ var bætt við."
+
+#: contrib/admin/options.py:421
+#: contrib/admin/options.py:454
+#: contrib/auth/admin.py:59
+msgid "You may edit it again below."
+msgstr "Þú getur breytt því aftur að neðan."
+
+#: contrib/admin/options.py:431
+#: contrib/admin/options.py:464
+#, python-format
+msgid "You may add another %s below."
+msgstr "Þú getur bætt öðru %s við að neðan."
+
+#: contrib/admin/options.py:452
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s „%(obj)s“ hefur verið breytt."
+
+#: contrib/admin/options.py:460
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "%(name)s „%(obj)s“ hefur verið bætt við. Þú getur breytt því aftur að neðan."
+
+#: contrib/admin/options.py:536
+#, python-format
+msgid "Add %s"
+msgstr "Bæta við %s"
+
+#: contrib/admin/options.py:614
+#, python-format
+msgid "Change %s"
+msgstr "Breyta %s"
+
+#: contrib/admin/options.py:646
+msgid "Database error"
+msgstr "Gagnagrunnsvilla"
+
+#: contrib/admin/options.py:696
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s „%(obj)s“ var eytt."
+
+#: contrib/admin/options.py:703
+msgid "Are you sure?"
+msgstr "Ertu viss?"
+
+#: contrib/admin/options.py:732
+#, python-format
+msgid "Change history: %s"
+msgstr "Breytingarsaga: %s"
+
+#: contrib/admin/sites.py:16
+#: contrib/admin/views/decorators.py:14
+#: contrib/auth/forms.py:80
+msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
+msgstr "Vinsamlegast sláðu inn rétt notandanafn og lykilorð. Athugaðu að báðir reitirnir þurfa að vera stafréttir."
+
+#: contrib/admin/sites.py:227
+#: contrib/admin/views/decorators.py:40
+msgid "Please log in again, because your session has expired."
+msgstr "Vinsamlegast skráðu þig inn aftur vegna þess að setan þín rann út. "
+
+#: contrib/admin/sites.py:234
+#: contrib/admin/views/decorators.py:47
+msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
+msgstr "Vafri þinn virðist ekki vera stilltur til að leyfa dúsur (cookies). Vinsamlegast gerðu dúsur virkar, endurhladdu þessa síðu og reyndu aftur."
+
+#: contrib/admin/sites.py:250
+#: contrib/admin/sites.py:256
+#: contrib/admin/views/decorators.py:66
+msgid "Usernames cannot contain the '@' character."
+msgstr "Notendanöfn mega ekki innihalda '@' merkið."
+
+#: contrib/admin/sites.py:253
+#: contrib/admin/views/decorators.py:62
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "Tölvupóstfangið þitt er ekki notandanafnið þitt. Prófaðu '%s' í staðinn."
+
+#: contrib/admin/sites.py:313
+msgid "Site administration"
+msgstr "Vefstjóri"
+
+#: contrib/admin/sites.py:326
+#: contrib/admin/templates/admin/login.html:26
+#: contrib/admin/templates/registration/password_reset_complete.html:14
+#: contrib/admin/views/decorators.py:20
+msgid "Log in"
+msgstr "Skrá inn"
+
+#: contrib/admin/sites.py:373
+#, python-format
+msgid "%s administration"
+msgstr "%s vefstjórn"
+
+#: contrib/admin/util.py:138
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "Eitt eða fleiri %(fieldname)s í %(name)s: %(obj)s"
+
+#: contrib/admin/util.py:143
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "Eitt eða fleiri %(fieldname)s í %(name)s:"
+
+#: contrib/admin/widgets.py:70
+msgid "Date:"
+msgstr "Dagsetning:"
+
+#: contrib/admin/widgets.py:70
+msgid "Time:"
+msgstr "Tími:"
+
+#: contrib/admin/widgets.py:94
+msgid "Currently:"
+msgstr "Eins og er:"
+
+#: contrib/admin/widgets.py:94
+msgid "Change:"
+msgstr "Breyta:"
+
+#: contrib/admin/widgets.py:123
+msgid "Lookup"
+msgstr "Fletta upp"
+
+#: contrib/admin/widgets.py:230
+msgid "Add Another"
+msgstr "Bæta við öðru"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -286,19 +468,22 @@ msgid "We're sorry, but the requested page could not be found."
 msgstr "Því miður fannst umbeðin síða ekki."
 
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/base.html:37
-#: contrib/admin/templates/admin/change_form.html:12
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/delete_confirmation.html:5
+#: contrib/admin/templates/admin/app_index.html:8
+#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/change_form.html:17
+#: contrib/admin/templates/admin/change_list.html:8
+#: contrib/admin/templates/admin/delete_confirmation.html:6
 #: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/admin/object_history.html:4
-#: contrib/admin/templates/admin/auth/user/change_password.html:11
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/admin/object_history.html:6
+#: contrib/admin/templates/admin/auth/user/change_password.html:10
 #: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_reset_complete.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Home"
 msgstr "Heim"
 
@@ -318,23 +503,34 @@ msgstr "Kerfisvilla <em>(500)</em>"
 msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
 msgstr "Villa hefur komið upp. Hún hefur verið tilkynnt vefstjórunum með tölvupósti og verður örugglega löguð fljótlega. Við þökkum þolinmæðina."
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/app_index.html:10
+#: contrib/admin/templates/admin/index.html:19
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: contrib/admin/templates/admin/base.html:25
 msgid "Welcome,"
 msgstr "Velkomin(n),"
 
-#: contrib/admin/templates/admin/base.html:28
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Skjölun"
 
-#: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin/auth/user/change_password.html:14
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/auth/user/change_password.html:13
+#: contrib/admin/templates/admin/auth/user/change_password.html:46
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Change password"
 msgstr "Breyta lykilorði"
 
-#: contrib/admin/templates/admin/base.html:30
-#: contrib/comments/templates/comments/form.html:6
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
 msgstr "Skrá út"
 
@@ -346,56 +542,55 @@ msgstr "Django vefstjóri"
 msgid "Django administration"
 msgstr "Django vefstjórn"
 
-#: contrib/admin/templates/admin/change_form.html:14
-#: contrib/admin/templates/admin/index.html:28
+#: contrib/admin/templates/admin/change_form.html:20
+#: contrib/admin/templates/admin/index.html:29
 msgid "Add"
 msgstr "Bæta við"
 
-#: contrib/admin/templates/admin/change_form.html:20
-#: contrib/admin/templates/admin/object_history.html:4
+#: contrib/admin/templates/admin/change_form.html:27
+#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Saga"
 
-#: contrib/admin/templates/admin/change_form.html:21
+#: contrib/admin/templates/admin/change_form.html:28
+#: contrib/admin/templates/admin/edit_inline/stacked.html:13
+#: contrib/admin/templates/admin/edit_inline/tabular.html:25
 msgid "View on site"
 msgstr "Skoða á vef"
 
-#: contrib/admin/templates/admin/change_form.html:31
-#: contrib/admin/templates/admin/auth/user/change_password.html:23
+#: contrib/admin/templates/admin/change_form.html:38
+#: contrib/admin/templates/admin/auth/user/change_password.html:22
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Vinsamlegast leiðréttu villuna hér að neðan:"
 msgstr[1] "Vinsamlegast leiðréttu villurnar hér að neðan:"
 
-#: contrib/admin/templates/admin/change_form.html:49
-msgid "Ordering"
-msgstr "Röðun"
-
-#: contrib/admin/templates/admin/change_form.html:52
-msgid "Order:"
-msgstr "Röð:"
-
-#: contrib/admin/templates/admin/change_list.html:11
+#: contrib/admin/templates/admin/change_list.html:16
 #, python-format
 msgid "Add %(name)s"
 msgstr "Bæta við %(name)s"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/submit_line.html:3
+#: contrib/admin/templates/admin/change_list.html:26
+msgid "Filter"
+msgstr "Sía"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:10
+#: contrib/admin/templates/admin/submit_line.html:4
+#: forms/formsets.py:246
 msgid "Delete"
 msgstr "Eyða"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:13
+#: contrib/admin/templates/admin/delete_confirmation.html:16
 #, python-format
 msgid "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
 msgstr "Eyðing á %(object_name)s „%(escaped_object)s“ hefði í för með sér eyðingu á tengdum hlutum en þú hefur ekki réttindi til að eyða eftirfarandi hlutum:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:20
+#: contrib/admin/templates/admin/delete_confirmation.html:23
 #, python-format
 msgid "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? All of the following related items will be deleted:"
 msgstr "Ertu viss um að þú viljir eyða %(object_name)s „%(escaped_object)s“? Öllu eftirfarandi verður eytt:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:25
+#: contrib/admin/templates/admin/delete_confirmation.html:28
 msgid "Yes, I'm sure"
 msgstr "Já ég er viss."
 
@@ -404,77 +599,61 @@ msgstr "Já ég er viss."
 msgid " By %(filter_title)s "
 msgstr " Eftir %(filter_title)s "
 
-#: contrib/admin/templates/admin/filters.html:4
-msgid "Filter"
-msgstr "Sía"
-
-#: contrib/admin/templates/admin/index.html:17
+#: contrib/admin/templates/admin/index.html:18
 #, python-format
 msgid "Models available in the %(name)s application."
 msgstr "Líkön sem eru hluti af %(name)s forritinu."
 
-#: contrib/admin/templates/admin/index.html:18
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
-
-#: contrib/admin/templates/admin/index.html:34
+#: contrib/admin/templates/admin/index.html:35
 msgid "Change"
 msgstr "Breyta"
 
-#: contrib/admin/templates/admin/index.html:44
+#: contrib/admin/templates/admin/index.html:45
 msgid "You don't have permission to edit anything."
 msgstr "Þú hefur ekki réttindi til að breyta neinu"
 
-#: contrib/admin/templates/admin/index.html:52
+#: contrib/admin/templates/admin/index.html:53
 msgid "Recent Actions"
 msgstr "Nýlegar aðgerðir"
 
-#: contrib/admin/templates/admin/index.html:53
+#: contrib/admin/templates/admin/index.html:54
 msgid "My Actions"
 msgstr "Mínar aðgerðir"
 
-#: contrib/admin/templates/admin/index.html:57
+#: contrib/admin/templates/admin/index.html:58
 msgid "None available"
 msgstr "Engin fáanleg"
 
-#: contrib/admin/templates/admin/invalid_setup.html:8
+#: contrib/admin/templates/admin/invalid_setup.html:7
 msgid "Something's wrong with your database installation. Make sure the appropriate database tables have been created, and make sure the database is readable by the appropriate user."
 msgstr "Eitthvað er að gagnagrunnsuppsetningu. Gakktu úr skuggum um að allar töflur séu til staðar og að notandinn hafi aðgang að grunninum."
 
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:19
 msgid "Username:"
 msgstr "Notandanafn:"
 
-#: contrib/admin/templates/admin/login.html:20
-#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:22
 msgid "Password:"
 msgstr "Lykilorð:"
 
-#: contrib/admin/templates/admin/login.html:25
-#: contrib/admin/views/decorators.py:25
-msgid "Log in"
-msgstr "Skrá inn"
-
-#: contrib/admin/templates/admin/object_history.html:17
+#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Dagsetning/tími"
 
-#: contrib/admin/templates/admin/object_history.html:18
+#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Notandi"
 
-#: contrib/admin/templates/admin/object_history.html:19
+#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Aðgerð"
 
-#: contrib/admin/templates/admin/object_history.html:25
-msgid "DATE_WITH_TIME_FULL"
-msgstr "N j, Y, P"
+#: contrib/admin/templates/admin/object_history.html:30
+#: utils/translation/trans_real.py:404
+msgid "DATETIME_FORMAT"
+msgstr "j. N Y, H:i"
 
-#: contrib/admin/templates/admin/object_history.html:35
+#: contrib/admin/templates/admin/object_history.html:38
 msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
 msgstr "Þessi hlutur hefur enga breytingasögu. Hann var líklega ekki búinn til á þessu stjórnunarsvæði."
 
@@ -498,59 +677,379 @@ msgstr[1] "%(counter)s niðurstöður"
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s í heildina"
 
-#: contrib/admin/templates/admin/submit_line.html:4
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Vista"
+
+#: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save as new"
 msgstr "Vista sem nýtt"
 
-#: contrib/admin/templates/admin/submit_line.html:5
+#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and add another"
 msgstr "Vista og búa til nýtt"
 
-#: contrib/admin/templates/admin/submit_line.html:6
+#: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save and continue editing"
 msgstr "Vista og halda áfram að breyta"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr "Vista"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid "First, enter a username and password. Then, you'll be able to edit more user options."
 msgstr "Fyrst, settu inn notendanafn og lykilorð. Svo geturðu breytt öðrum notendamöguleikum."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:12
+#: contrib/admin/templates/admin/auth/user/add_form.html:13
+#: contrib/auth/forms.py:14
+#: contrib/auth/forms.py:47
+#: contrib/auth/forms.py:59
 msgid "Username"
 msgstr "Notandanafn"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:18
+#: contrib/admin/templates/admin/auth/user/add_form.html:20
 #: contrib/admin/templates/admin/auth/user/change_password.html:33
+#: contrib/auth/forms.py:17
+#: contrib/auth/forms.py:60
+#: contrib/auth/forms.py:184
 msgid "Password"
 msgstr "Lykilorð"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:23
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
+#: contrib/admin/templates/admin/auth/user/add_form.html:26
+#: contrib/admin/templates/admin/auth/user/change_password.html:39
+#: contrib/auth/forms.py:185
 msgid "Password (again)"
 msgstr "Lykilorð (aftur)"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:24
-#: contrib/admin/templates/admin/auth/user/change_password.html:39
+#: contrib/admin/templates/admin/auth/user/add_form.html:27
+#: contrib/admin/templates/admin/auth/user/change_password.html:40
 msgid "Enter the same password as above, for verification."
 msgstr "Settu inn sama lykilorðið aftur til staðfestingar."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
+#: contrib/admin/templates/admin/auth/user/change_password.html:26
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Settu inn nýtt lykilorð fyrir notandann <strong>%(username)s</strong>."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/admin/edit_inline/tabular.html:15
+msgid "Delete?"
+msgstr "Eyða?"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Takk fyrir að verja tíma í vefsíðuna í dag."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Skráðu þig inn aftur"
+
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr "Breyta lykilorði"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "Breyting á lykilorði tókst"
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "Lykilorði þínu var breytt"
+
+#: contrib/admin/templates/registration/password_change_form.html:12
+msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
+msgstr "Vinsamlegast skrifaðu gamla lykilorðið þitt til öryggis. Sláðu svo nýja lykilorðið tvisvar inn svo að hægt sé að ganga úr skugga um að þú hafir ekki gert innsláttarvillu."
+
+#: contrib/admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr "Gamalt lykilorð:"
+
+#: contrib/admin/templates/registration/password_change_form.html:19
+#: contrib/admin/templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "Nýtt lykilorð:"
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+#: contrib/admin/templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "Staðfestu lykilorð:"
+
+#: contrib/admin/templates/registration/password_change_form.html:23
+#: contrib/admin/templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr "Breyta lykilorðinu mínu"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "Endurstilla lykilorð"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:6
+#: contrib/admin/templates/registration/password_reset_complete.html:10
+msgid "Password reset complete"
+msgstr "Endurstilling lykilorðs tókst"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Lykilorðið var endurstillt. Þú getur núna skráð þig inn á vefsvæðið."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
+msgid "Password reset confirmation"
+msgstr "Staðfesting endurstillingar lykilorðs"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:12
+msgid "Enter new password"
+msgstr "Settu inn nýtt lykilorð"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:14
+msgid "Please enter your new password twice so we can verify you typed it in correctly."
+msgstr "Vinsamlegast settu inn nýja lykilorðið tvisvar til að forðast innsláttarvillur."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:26
+msgid "Password reset unsuccessful"
+msgstr "Endurstilling á lykilorði mistókst"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:28
+msgid "The password reset link was invalid, possibly because it has already been used.  Please request a new password reset."
+msgstr "Endurstilling lykilorðs tókst ekki. Slóðin var ógild. Hugsanlega hefur hún nú þegar verið notuð. Vinsamlegast biddu um nýja endurstillingu."
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Endurstilling á lykilorði tókst"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid "We've e-mailed you instructions for setting your password to the e-mail address you submitted. You should be receiving it shortly."
+msgstr "Við sendum þér leiðbeiningar fyrir endurstillingu lykilorðs. Leiðbeiningarnar ættu að berast til þín í tölvupósti fljótlega."
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "Þú fékkst þennan tölvupóst vegna þess að þú baðst um endurstillingu á lykilorðinu þínu"
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "fyrir notandareikning þinn á %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr "Vinsamlegast farðu á eftirfarandi síðu og veldu nýtt lykilorð:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr "Notandanafnið þitt ef þú skyldir hafa gleymt því:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr "Takk fyrir að nota vefinn okkar!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s hópurinn"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid "Forgotten your password? Enter your e-mail address below, and we'll e-mail instructions for setting a new one."
+msgstr "Gleymdir þú lykilorðinu þínu? Sláðu tölvupóstfangið þitt inn að neðan og við munum senda þér leiðbeiningar fyrir endurstillingu lykilorðs."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "Tölvupóstfang:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Endursstilla lykilorðið mitt"
+
+#: contrib/admin/templatetags/admin_list.py:288
+msgid "All dates"
+msgstr "Allar dagsetningar"
+
+#: contrib/admin/views/main.py:69
+#, python-format
+msgid "Select %s"
+msgstr "Veldu %s"
+
+#: contrib/admin/views/main.py:69
+#, python-format
+msgid "Select %s to change"
+msgstr "Veldu %s til að breyta"
+
+#: contrib/admin/views/template.py:36
+#: contrib/sites/models.py:38
+msgid "site"
+msgstr "vefur"
+
+#: contrib/admin/views/template.py:38
+msgid "template"
+msgstr "sniðmáti"
+
+#: contrib/admindocs/views.py:57
+#: contrib/admindocs/views.py:59
+#: contrib/admindocs/views.py:61
+msgid "tag:"
+msgstr "merki:"
+
+#: contrib/admindocs/views.py:90
+#: contrib/admindocs/views.py:92
+#: contrib/admindocs/views.py:94
+msgid "filter:"
+msgstr "sía:"
+
+#: contrib/admindocs/views.py:154
+#: contrib/admindocs/views.py:156
+#: contrib/admindocs/views.py:158
+msgid "view:"
+msgstr "skoða:"
+
+#: contrib/admindocs/views.py:186
+#, python-format
+msgid "App %r not found"
+msgstr "Forrit %r fannst ekki"
+
+#: contrib/admindocs/views.py:193
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "Líkanið %(model_name)r finnst ekki í forritinu %(app_label)r"
+
+#: contrib/admindocs/views.py:205
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "tengdi `%(app_label)s.%(data_type)s` hluturinn"
+
+#: contrib/admindocs/views.py:205
+#: contrib/admindocs/views.py:227
+#: contrib/admindocs/views.py:241
+#: contrib/admindocs/views.py:246
+msgid "model:"
+msgstr "líkan:"
+
+#: contrib/admindocs/views.py:236
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "tengdir `%(app_label)s.%(object_name)s` hlutir"
+
+#: contrib/admindocs/views.py:241
+#, python-format
+msgid "all %s"
+msgstr "allt %s"
+
+#: contrib/admindocs/views.py:246
+#, python-format
+msgid "number of %s"
+msgstr "fjöldi af %s"
+
+#: contrib/admindocs/views.py:251
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Svæði í %s hlutnum"
+
+#: contrib/admindocs/views.py:314
+#: contrib/admindocs/views.py:325
+#: contrib/admindocs/views.py:327
+#: contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:334
+#: contrib/admindocs/views.py:336
+msgid "Integer"
+msgstr "Heiltala"
+
+#: contrib/admindocs/views.py:315
+msgid "Boolean (Either True or False)"
+msgstr "Boole-gildi (True eða False)"
+
+#: contrib/admindocs/views.py:316
+#: contrib/admindocs/views.py:335
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Strengur (mest %(max_length)s)"
+
+#: contrib/admindocs/views.py:317
+msgid "Comma-separated integers"
+msgstr "Kommuaðgreindar heiltölur"
+
+#: contrib/admindocs/views.py:318
+msgid "Date (without time)"
+msgstr "Dagsetning (án tíma)"
+
+#: contrib/admindocs/views.py:319
+msgid "Date (with time)"
+msgstr "Dagsetning (með tíma)"
+
+#: contrib/admindocs/views.py:320
+msgid "Decimal number"
+msgstr "Tugatala"
+
+#: contrib/admindocs/views.py:321
+msgid "E-mail address"
+msgstr "Tölvupóstfang"
+
+#: contrib/admindocs/views.py:322
+#: contrib/admindocs/views.py:323
+#: contrib/admindocs/views.py:326
+msgid "File path"
+msgstr "Skjalaslóð"
+
+#: contrib/admindocs/views.py:324
+msgid "Floating point number"
+msgstr "Hlaupakommutala (floating point number)"
+
+#: contrib/admindocs/views.py:328
+#: contrib/comments/models.py:58
+msgid "IP address"
+msgstr "IP tala"
+
+#: contrib/admindocs/views.py:330
+msgid "Boolean (Either True, False or None)"
+msgstr "Boole-gildi (True, False eða None)"
+
+#: contrib/admindocs/views.py:331
+msgid "Relation to parent model"
+msgstr "Tengsl við yfirlíkan"
+
+#: contrib/admindocs/views.py:332
+msgid "Phone number"
+msgstr "Símanúmer"
+
+#: contrib/admindocs/views.py:337
+msgid "Text"
+msgstr "Texti"
+
+#: contrib/admindocs/views.py:338
+msgid "Time"
+msgstr "Tími"
+
+#: contrib/admindocs/views.py:339
+#: contrib/comments/forms.py:22
+#: contrib/flatpages/admin.py:8
+#: contrib/flatpages/models.py:7
+msgid "URL"
+msgstr "Veffang"
+
+#: contrib/admindocs/views.py:340
+msgid "U.S. state (two uppercase letters)"
+msgstr "Bandarískt fylki (tveir hástafir)"
+
+#: contrib/admindocs/views.py:341
+msgid "XML text"
+msgstr "XML texti"
+
+#: contrib/admindocs/views.py:367
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s virðist ekki vera urlpattern hlutur"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
 msgstr "Bókamerklar"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:4
 msgid "Documentation bookmarklets"
 msgstr "Skjölunarbókamerklar"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:8
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -567,695 +1066,321 @@ msgstr ""
 "þessara bókamerkla krefjast þess að þú sért að skoða vefinn frá tölvu sem er\n"
 "skráð sem \"internal\" (hafðu samband við kerfisstjórann ef þú ert óviss hvort tölvan þín er \"internal\").</p>\n"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:18
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
 msgstr "Skjölun þessarar síðu"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:19
 msgid "Jumps you from any page to the documentation for the view that generates that page."
 msgstr "Sendir þig af hvaða síðu sem er á skjölun þess framsetningarlags sem myndar hana."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:21
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
 msgstr "Sýna kenni hlutar"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:22
 msgid "Shows the content-type and unique ID for pages that represent a single object."
 msgstr "Sýnir efnistag og sérkenni síða sem gefa tiltekna mynd af stökum hlut."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:24
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
 msgstr "Breyta þessum hlut (í þessum glugga)"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "Stekkur á stjórnunarsíðuna fyrir þær síður sem gefa tiltekna mynd af stökum hlut."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:27
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
 msgstr "Breyta þessum hlut (nýr gluggi)"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
 msgstr "Eins og að ofan en opnar stjórnunarsíðuna í nýjum glugga."
 
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Takk fyrir að verja tíma í vefsíðuna í dag."
+#: contrib/auth/admin.py:21
+msgid "Personal info"
+msgstr "Persónuupplýsingar"
 
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Skráðu þig inn aftur"
+#: contrib/auth/admin.py:22
+msgid "Permissions"
+msgstr "Réttindi"
 
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_form.html:5
-#: contrib/admin/templates/registration/password_change_form.html:9
-msgid "Password change"
-msgstr "Breyta lykilorði"
+#: contrib/auth/admin.py:23
+msgid "Important dates"
+msgstr "Mikilvægar dagsetningar"
 
-#: contrib/admin/templates/registration/password_change_done.html:5
-#: contrib/admin/templates/registration/password_change_done.html:9
-msgid "Password change successful"
-msgstr "Breyting á lykilorði tókst"
+#: contrib/auth/admin.py:24
+msgid "Groups"
+msgstr "Hópar"
 
-#: contrib/admin/templates/registration/password_change_done.html:11
-msgid "Your password was changed."
-msgstr "Lykilorði þínu var breytt"
-
-#: contrib/admin/templates/registration/password_change_form.html:11
-msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
-msgstr "Vinsamlegast skrifaðu gamla lykilorðið þitt til öryggis. Sláðu svo nýja lykilorðið tvisvar inn svo að hægt sé að ganga úr skugga um að þú hafir ekki gert innsláttarvillu."
-
-#: contrib/admin/templates/registration/password_change_form.html:16
-msgid "Old password:"
-msgstr "Gamla lykilorðið:"
-
-#: contrib/admin/templates/registration/password_change_form.html:18
-msgid "New password:"
-msgstr "Nýja lykilorðið:"
-
-#: contrib/admin/templates/registration/password_change_form.html:20
-msgid "Confirm password:"
-msgstr "Staðfesta lykilorð:"
-
-#: contrib/admin/templates/registration/password_change_form.html:22
-msgid "Change my password"
-msgstr "Breyta lykilorðinu mínu"
-
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-msgid "Password reset"
-msgstr "Endurstilla lykilorð"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Endurstilling á lykilorði tókst"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid "We've e-mailed a new password to the e-mail address you submitted. You should be receiving it shortly."
-msgstr "Við sendum nýtt lykilorð á tölvupóstfangið sem þú gafst upp. Það ætti að berast fljótlega til þín."
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Þú fékkst þennan tölvupóst vegna þess að þú baðst um endurstillingu á lykilorðinu þínu"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "fyrir notandareikning þinn á %(site_name)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "Nýja lykilorðið þitt er: %(new_password)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "Þér er frjálst að breyta lykilorðinu með því að fara á þessa síðu:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "Notandanafnið þitt ef þú skyldir hafa gleymt því:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-msgid "Thanks for using our site!"
-msgstr "Takk fyrir að nota vefinn okkar!"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "%(site_name)s hópurinn"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid "Forgotten your password? Enter your e-mail address below, and we'll reset your password and e-mail the new one to you."
-msgstr "Gleymdir þú lykilorðinu þínu? Sláðu tölvupóstfangið þitt inn að neðan og við munum endurstilla lykilorðið þitt og senda til þín."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "Tölvupóstfang:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Endursstilla lykilorðið mitt"
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "Dagsetning:"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "Tími:"
-
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr "Eins og er:"
-
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "Breyta:"
-
-#: contrib/admin/templatetags/admin_list.py:257
-msgid "All dates"
-msgstr "Allar dagsetningar"
-
-#: contrib/admin/views/auth.py:20
-#: contrib/admin/views/main.py:267
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s „%(obj)s“ var bætt við."
-
-#: contrib/admin/views/auth.py:25
-#: contrib/admin/views/main.py:271
-#: contrib/admin/views/main.py:356
-msgid "You may edit it again below."
-msgstr "Þú getur breytt því aftur að neðan."
-
-#: contrib/admin/views/auth.py:31
+#: contrib/auth/admin.py:64
 msgid "Add user"
 msgstr "Bæta við notanda"
 
-#: contrib/admin/views/auth.py:58
+#: contrib/auth/admin.py:90
 msgid "Password changed successfully."
 msgstr "Breyting á lykilorði tókst."
 
-#: contrib/admin/views/auth.py:65
+#: contrib/auth/admin.py:96
 #, python-format
 msgid "Change password: %s"
 msgstr "Breyta lykilorði: %s"
 
-#: contrib/admin/views/decorators.py:11
-#: contrib/auth/forms.py:60
-msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
-msgstr "Vinsamlegast sláðu inn rétt notandanafn og lykilorð. Athugaðu að báðir reitirnir þurfa að vera stafréttir."
+#: contrib/auth/forms.py:15
+#: contrib/auth/forms.py:48
+#: contrib/auth/models.py:136
+msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
+msgstr "Krafist. 30 stafir eða færri. Aðeins enskir ritstafastafir (enskir ritstafir, tölur og undirstrik)."
 
-#: contrib/admin/views/decorators.py:63
-msgid "Please log in again, because your session has expired. Don't worry: Your submission has been saved."
-msgstr "Vinsamlegast skráðu þig inn aftur vegna þess að setan þín rann út. Engar áhyggjur, breytingin þín var vistuð."
+#: contrib/auth/forms.py:16
+#: contrib/auth/forms.py:49
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "Þetta gildi má einungis innihalda stafi, tölur og undirstrik."
 
-#: contrib/admin/views/decorators.py:70
-msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
-msgstr "Vafri þinn virðist ekki vera stilltur til að leyfa dúsur (cookies). Vinsamlegast gerðu dúsur virkar, endurhladdu þessa síðu og reyndu aftur."
+#: contrib/auth/forms.py:18
+msgid "Password confirmation"
+msgstr "Staðfesting lykilorðs"
 
-#: contrib/admin/views/decorators.py:84
-msgid "Usernames cannot contain the '@' character."
-msgstr "Notendanöfn geta ekki innihaldið '@' merkið."
-
-#: contrib/admin/views/decorators.py:86
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Tölvupóstfangið þitt er ekki notandanafnið þitt. Prófaðu '%s' í staðinn."
-
-#: contrib/admin/views/doc.py:48
-#: contrib/admin/views/doc.py:50
-#: contrib/admin/views/doc.py:52
-msgid "tag:"
-msgstr "merki:"
-
-#: contrib/admin/views/doc.py:79
-#: contrib/admin/views/doc.py:81
-#: contrib/admin/views/doc.py:83
-msgid "filter:"
-msgstr "sía:"
-
-#: contrib/admin/views/doc.py:137
-#: contrib/admin/views/doc.py:139
-#: contrib/admin/views/doc.py:141
-msgid "view:"
-msgstr "skoða:"
-
-#: contrib/admin/views/doc.py:166
-#, python-format
-msgid "App %r not found"
-msgstr "Forrit %r fannst ekki"
-
-#: contrib/admin/views/doc.py:173
-#, python-format
-msgid "Model %(name)r not found in app %(label)r"
-msgstr "Líkanið %(name)r finnst ekki í forritinu %(label)r"
-
-#: contrib/admin/views/doc.py:185
-#, python-format
-msgid "the related `%(label)s.%(type)s` object"
-msgstr "tengdur `%(label)s.%(type)s` hluturinn"
-
-#: contrib/admin/views/doc.py:185
-#: contrib/admin/views/doc.py:207
-#: contrib/admin/views/doc.py:221
-#: contrib/admin/views/doc.py:226
-msgid "model:"
-msgstr "líkan:"
-
-#: contrib/admin/views/doc.py:216
-#, python-format
-msgid "related `%(label)s.%(name)s` objects"
-msgstr "tengdir `%(label)s.%(name)s` hlutir"
-
-#: contrib/admin/views/doc.py:221
-#, python-format
-msgid "all %s"
-msgstr "allt %s"
-
-#: contrib/admin/views/doc.py:226
-#, python-format
-msgid "number of %s"
-msgstr "fjöldi af %s"
-
-#: contrib/admin/views/doc.py:231
-#, python-format
-msgid "Fields on %s objects"
-msgstr "Svæði í %s hlutnum"
-
-#: contrib/admin/views/doc.py:293
-#: contrib/admin/views/doc.py:304
-#: contrib/admin/views/doc.py:306
-#: contrib/admin/views/doc.py:312
-#: contrib/admin/views/doc.py:313
-#: contrib/admin/views/doc.py:315
-msgid "Integer"
-msgstr "Heiltala"
-
-#: contrib/admin/views/doc.py:294
-msgid "Boolean (Either True or False)"
-msgstr "Boole-gildi (True eða False)"
-
-#: contrib/admin/views/doc.py:295
-#: contrib/admin/views/doc.py:314
-#, python-format
-msgid "String (up to %(max_length)s)"
-msgstr "Strengur (mest %(max_length)s)"
-
-#: contrib/admin/views/doc.py:296
-msgid "Comma-separated integers"
-msgstr "Kommuaðgreindar heiltölur"
-
-#: contrib/admin/views/doc.py:297
-msgid "Date (without time)"
-msgstr "Dagsetning (án tíma)"
-
-#: contrib/admin/views/doc.py:298
-msgid "Date (with time)"
-msgstr "Dagsetning (með tíma)"
-
-#: contrib/admin/views/doc.py:299
-msgid "Decimal number"
-msgstr "Tugatala"
-
-#: contrib/admin/views/doc.py:300
-msgid "E-mail address"
-msgstr "Tölvupóstfang"
-
-#: contrib/admin/views/doc.py:301
-#: contrib/admin/views/doc.py:302
-#: contrib/admin/views/doc.py:305
-msgid "File path"
-msgstr "Skjalaslóð"
-
-#: contrib/admin/views/doc.py:303
-msgid "Floating point number"
-msgstr "Hlaupakommutala (floating point number)"
-
-#: contrib/admin/views/doc.py:307
-#: contrib/comments/models.py:85
-msgid "IP address"
-msgstr "IP tala"
-
-#: contrib/admin/views/doc.py:309
-msgid "Boolean (Either True, False or None)"
-msgstr "Boole-gildi (True, False eða None)"
-
-#: contrib/admin/views/doc.py:310
-msgid "Relation to parent model"
-msgstr "Tengsl við yfirlíkan"
-
-#: contrib/admin/views/doc.py:311
-msgid "Phone number"
-msgstr "Símanúmer"
-
-#: contrib/admin/views/doc.py:316
-msgid "Text"
-msgstr "Texti"
-
-#: contrib/admin/views/doc.py:317
-msgid "Time"
-msgstr "Tími"
-
-#: contrib/admin/views/doc.py:318
-#: contrib/flatpages/models.py:7
-msgid "URL"
-msgstr "Veffang"
-
-#: contrib/admin/views/doc.py:319
-msgid "U.S. state (two uppercase letters)"
-msgstr "Bandarískt fylki (tveir hástafir)"
-
-#: contrib/admin/views/doc.py:320
-msgid "XML text"
-msgstr "XML texti"
-
-#: contrib/admin/views/doc.py:346
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s virðist ekki vera urlpattern hlutur"
-
-#: contrib/admin/views/main.py:233
-msgid "Site administration"
-msgstr "Vefstjórn"
-
-#: contrib/admin/views/main.py:280
-#: contrib/admin/views/main.py:365
-#, python-format
-msgid "You may add another %s below."
-msgstr "Þú getur bætt öðru %s við að neðan."
-
-#: contrib/admin/views/main.py:298
-#, python-format
-msgid "Add %s"
-msgstr "Bæta við %s"
-
-#: contrib/admin/views/main.py:344
-#, python-format
-msgid "Added %s."
-msgstr "Bætti við %s."
-
-#: contrib/admin/views/main.py:344
-#: contrib/admin/views/main.py:346
-#: contrib/admin/views/main.py:348
-#: core/validators.py:283
-#: db/models/manipulators.py:309
-msgid "and"
-msgstr "og"
-
-#: contrib/admin/views/main.py:346
-#, python-format
-msgid "Changed %s."
-msgstr "Breytti %s."
-
-#: contrib/admin/views/main.py:348
-#, python-format
-msgid "Deleted %s."
-msgstr "Eyddi %s."
-
-#: contrib/admin/views/main.py:351
-msgid "No fields changed."
-msgstr "Engum reitum breytt."
-
-#: contrib/admin/views/main.py:354
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s „%(obj)s“ hefur verið breytt."
-
-#: contrib/admin/views/main.py:362
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s „%(obj)s“ hefur verið bætt við. Þú getur breytt því aftur að neðan."
-
-#: contrib/admin/views/main.py:400
-#, python-format
-msgid "Change %s"
-msgstr "Breyta %s"
-
-#: contrib/admin/views/main.py:487
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Eitt eða fleiri %(fieldname)s í %(name)s: %(obj)s"
-
-#: contrib/admin/views/main.py:492
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Eitt eða fleiri %(fieldname)s í %(name)s:"
-
-#: contrib/admin/views/main.py:524
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s „%(obj)s“ var eytt."
-
-#: contrib/admin/views/main.py:527
-msgid "Are you sure?"
-msgstr "Ertu viss?"
-
-#: contrib/admin/views/main.py:549
-#, python-format
-msgid "Change history: %s"
-msgstr "Breytingarsaga: %s"
-
-#: contrib/admin/views/main.py:583
-#, python-format
-msgid "Select %s"
-msgstr "Veldu %s"
-
-#: contrib/admin/views/main.py:583
-#, python-format
-msgid "Select %s to change"
-msgstr "Veldu %s til að breyta"
-
-#: contrib/admin/views/main.py:784
-msgid "Database error"
-msgstr "Gagnagrunnsvilla"
-
-#: contrib/auth/forms.py:17
-#: contrib/auth/forms.py:138
-msgid "The two password fields didn't match."
-msgstr "Lykilorðin tvö pössuðu ekki saman."
-
-#: contrib/auth/forms.py:25
+#: contrib/auth/forms.py:30
 msgid "A user with that username already exists."
 msgstr "Notandi með þetta notendanafn er nú þegar til."
 
-#: contrib/auth/forms.py:53
-msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
-msgstr "Vafri þinn virðist ekki vera stilltur til að leyfa dúsur (cookies). Dúsur eru nauðsynlegar fyrir innskráningu."
+#: contrib/auth/forms.py:36
+#: contrib/auth/forms.py:154
+#: contrib/auth/forms.py:196
+msgid "The two password fields didn't match."
+msgstr "Lykilorðin tvö pössuðu ekki saman."
 
-#: contrib/auth/forms.py:62
+#: contrib/auth/forms.py:82
 msgid "This account is inactive."
 msgstr "Þessi reikningur er óvirku."
 
-#: contrib/auth/forms.py:84
+#: contrib/auth/forms.py:87
+msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
+msgstr "Vafri þinn virðist ekki vera stilltur til að leyfa dúsur (cookies). Dúsur eru nauðsynlegar fyrir innskráningu."
+
+#: contrib/auth/forms.py:100
+msgid "E-mail"
+msgstr "Netfang"
+
+#: contrib/auth/forms.py:109
 msgid "That e-mail address doesn't have an associated user account. Are you sure you've registered?"
 msgstr "Þetta netfang hefur engan tengdan notandareikning. Ertu viss um að þú hafi skráð þig?"
 
-#: contrib/auth/forms.py:107
+#: contrib/auth/forms.py:134
 #, python-format
 msgid "Password reset on %s"
 msgstr "Lykilorð endurstillt á %s"
 
-#: contrib/auth/forms.py:117
-msgid "The two 'new password' fields didn't match."
-msgstr "'Nýtt lykilorð' svæðin passa ekki saman."
+#: contrib/auth/forms.py:142
+msgid "New password"
+msgstr "Nýtt lykilorð"
 
-#: contrib/auth/forms.py:124
+#: contrib/auth/forms.py:143
+msgid "New password confirmation"
+msgstr "Nýtt lykilorð (endurtekið)"
+
+#: contrib/auth/forms.py:168
+msgid "Old password"
+msgstr "Gamalt lykilorð"
+
+#: contrib/auth/forms.py:176
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Gamla lykilorðið var vitlaust. Vinsamlegast reyndu aftur."
 
-#: contrib/auth/models.py:73
-#: contrib/auth/models.py:93
+#: contrib/auth/models.py:72
+#: contrib/auth/models.py:95
 msgid "name"
 msgstr "nafn"
 
-#: contrib/auth/models.py:75
+#: contrib/auth/models.py:74
 msgid "codename"
 msgstr "vinnuheiti"
 
-#: contrib/auth/models.py:78
+#: contrib/auth/models.py:77
 msgid "permission"
 msgstr "réttindi"
 
-#: contrib/auth/models.py:79
-#: contrib/auth/models.py:94
+#: contrib/auth/models.py:78
+#: contrib/auth/models.py:96
 msgid "permissions"
 msgstr "réttindi"
 
-#: contrib/auth/models.py:97
+#: contrib/auth/models.py:99
 msgid "group"
 msgstr "hópur"
 
-#: contrib/auth/models.py:98
-#: contrib/auth/models.py:141
+#: contrib/auth/models.py:100
+#: contrib/auth/models.py:146
 msgid "groups"
 msgstr "hópar"
 
-#: contrib/auth/models.py:131
+#: contrib/auth/models.py:136
 msgid "username"
 msgstr "notandanafn"
 
-#: contrib/auth/models.py:131
-msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
-msgstr "Krafist. 30 stafir eða færri. Aðeins enskir ritstafastafir (enskir ritstafir, tölur og undirstrik)."
-
-#: contrib/auth/models.py:132
+#: contrib/auth/models.py:137
 msgid "first name"
 msgstr "skírnarnafn"
 
-#: contrib/auth/models.py:133
+#: contrib/auth/models.py:138
 msgid "last name"
 msgstr "eftirnafn"
 
-#: contrib/auth/models.py:134
+#: contrib/auth/models.py:139
 msgid "e-mail address"
 msgstr "tölvupóstfang"
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:140
 msgid "password"
 msgstr "lykilorð"
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:140
 msgid "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
 msgstr "Notaðu '[algo]$[salt]$[hexdigest]' eða <a href=\"password/\">'breyta lykilorði' formið</a>."
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:141
 msgid "staff status"
 msgstr "staða starfsmanns"
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:141
 msgid "Designates whether the user can log into this admin site."
 msgstr "Segir til um hvort notandinn getur skráð sig inn á þetta stjórnunarsvæði."
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:142
 msgid "active"
 msgstr "virkur"
 
-#: contrib/auth/models.py:137
-msgid "Designates whether this user can log into the Django admin. Unselect this instead of deleting accounts."
-msgstr "Segir til um hvort notandinn geti skráð sig inn á þetta stjórnunarsvæði. Slökktu á þessum möguleika í stað þess að eyða notandanum."
+#: contrib/auth/models.py:142
+msgid "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
+msgstr "Til marks um að notandinn sé virku. Taktu hakið úr þessum möguleika til að eyða aðgangi."
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:143
 msgid "superuser status"
 msgstr "staða ofurnotanda"
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:143
 msgid "Designates that this user has all permissions without explicitly assigning them."
 msgstr "Til marks um að notandinn hafi öll réttindi án þess að taka þau sérstaklega fram."
 
-#: contrib/auth/models.py:139
+#: contrib/auth/models.py:144
 msgid "last login"
 msgstr "síðasta innskráning"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:145
 msgid "date joined"
 msgstr "skráning dags."
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:147
 msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
 msgstr "Auk réttindanna sem notandanum var gefið sérstaklega fær hann öll þau réttindi sem hópurinn hans hefur."
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:148
 msgid "user permissions"
 msgstr "réttindi"
 
-#: contrib/auth/models.py:147
+#: contrib/auth/models.py:152
 msgid "user"
 msgstr "notandi"
 
-#: contrib/auth/models.py:148
+#: contrib/auth/models.py:153
 msgid "users"
 msgstr "notendur"
 
-#: contrib/auth/models.py:154
-msgid "Personal info"
-msgstr "Persónuupplýsingar"
-
-#: contrib/auth/models.py:155
-msgid "Permissions"
-msgstr "Réttindi"
-
-#: contrib/auth/models.py:156
-msgid "Important dates"
-msgstr "Mikilvægar dagsetningar"
-
-#: contrib/auth/models.py:157
-msgid "Groups"
-msgstr "Hópar"
-
-#: contrib/auth/models.py:316
+#: contrib/auth/models.py:308
 msgid "message"
 msgstr "skilaboð"
 
-#: contrib/auth/views.py:47
+#: contrib/auth/views.py:50
 msgid "Logged out"
 msgstr "Útskráður"
 
-#: contrib/comments/models.py:67
-#: contrib/comments/models.py:169
+#: contrib/auth/management/commands/createsuperuser.py:23
+#: forms/fields.py:428
+msgid "Enter a valid e-mail address."
+msgstr "Sláðu inn gilt tölvupóstfang."
+
+#: contrib/comments/admin.py:11
+msgid "Content"
+msgstr "Innihald"
+
+#: contrib/comments/admin.py:14
+msgid "Metadata"
+msgstr "Hengigögn"
+
+#: contrib/comments/forms.py:20
+msgid "Name"
+msgstr "Nafn"
+
+#: contrib/comments/forms.py:21
+msgid "Email address"
+msgstr "Netfang"
+
+#: contrib/comments/forms.py:23
+msgid "Comment"
+msgstr "Athugasemd"
+
+#: contrib/comments/forms.py:26
+msgid "If you enter anything in this field your comment will be treated as spam"
+msgstr "Ef þú skrifar eitthvað hérna verður athugasemdin sjálfkrafa meðhöndluð sem ruslpóstur"
+
+#: contrib/comments/forms.py:126
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Passaðu orðbragðið! Orðið %s er ekki leyft hér."
+msgstr[1] "Passaðu orðbragðið! Orðin %s eru ekki leyfð hér."
+
+#: contrib/comments/models.py:23
 msgid "object ID"
 msgstr "kenni hlutar"
 
-#: contrib/comments/models.py:68
-msgid "headline"
-msgstr "fyrirsögn"
+#: contrib/comments/models.py:50
+msgid "user's name"
+msgstr "nafn notanda"
 
-#: contrib/comments/models.py:69
-#: contrib/comments/models.py:90
-#: contrib/comments/models.py:170
+#: contrib/comments/models.py:51
+msgid "user's email address"
+msgstr "netfang notanda"
+
+#: contrib/comments/models.py:52
+msgid "user's URL"
+msgstr "veffang notanda"
+
+#: contrib/comments/models.py:54
 msgid "comment"
 msgstr "athugasemd"
 
-#: contrib/comments/models.py:70
-msgid "rating #1"
-msgstr "einkunn #1"
-
-#: contrib/comments/models.py:71
-msgid "rating #2"
-msgstr "einkunn #2"
-
-#: contrib/comments/models.py:72
-msgid "rating #3"
-msgstr "einkunn #3"
-
-#: contrib/comments/models.py:73
-msgid "rating #4"
-msgstr "einkunn #4"
-
-#: contrib/comments/models.py:74
-msgid "rating #5"
-msgstr "einkunn #5"
-
-#: contrib/comments/models.py:75
-msgid "rating #6"
-msgstr "einkunn #6"
-
-#: contrib/comments/models.py:76
-msgid "rating #7"
-msgstr "einkunn #7"
-
-#: contrib/comments/models.py:77
-msgid "rating #8"
-msgstr "einkunn #8"
-
-#: contrib/comments/models.py:82
-msgid "is valid rating"
-msgstr "er gild einkunn"
-
-#: contrib/comments/models.py:83
-#: contrib/comments/models.py:172
+#: contrib/comments/models.py:57
 msgid "date/time submitted"
 msgstr "innsent dags/tími"
 
-#: contrib/comments/models.py:84
-#: contrib/comments/models.py:173
+#: contrib/comments/models.py:59
 msgid "is public"
 msgstr "er öllum sýnilegt"
 
-#: contrib/comments/models.py:86
+#: contrib/comments/models.py:60
+msgid "Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Taktu hakið úr til að fjarlægja athugasemdina af vefsíðunni."
+
+#: contrib/comments/models.py:62
 msgid "is removed"
 msgstr "hefur verið fjarlægt"
 
-#: contrib/comments/models.py:86
+#: contrib/comments/models.py:63
 msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
 msgstr "Hakaðu við þennan reit ef athugasemdin er óviðeigandi. Skilaboðin „Þessi athugasemd hefur verið fjarlægð“ birtist í staðinn."
 
-#: contrib/comments/models.py:91
-msgid "comments"
-msgstr "athugasemdir"
+#: contrib/comments/models.py:115
+msgid "This comment was posted by an authenticated user and thus the name is read-only."
+msgstr "Athugasemdin var send inn af innskráðum notanda og því er ekki hægt að breyta nafninu."
 
-#: contrib/comments/models.py:134
-#: contrib/comments/models.py:213
-msgid "Content object"
-msgstr "Efnishlutur"
+#: contrib/comments/models.py:124
+msgid "This comment was posted by an authenticated user and thus the email is read-only."
+msgstr "Athugasemdin var send inn af innskráðum notanda og því er ekki hægt að breyta netfanginu."
 
-#: contrib/comments/models.py:162
+#: contrib/comments/models.py:149
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -1270,240 +1395,55 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: contrib/comments/models.py:171
-msgid "person's name"
-msgstr "nafn einstaklings"
-
-#: contrib/comments/models.py:174
-msgid "ip address"
-msgstr "IP tala"
-
-#: contrib/comments/models.py:176
-msgid "approved by staff"
-msgstr "samþykkt af umsjónarmönnum"
-
-#: contrib/comments/models.py:179
-msgid "free comment"
-msgstr "frjáls athugasemd"
-
-#: contrib/comments/models.py:180
-msgid "free comments"
-msgstr "frjálsar athugasemdir"
-
-#: contrib/comments/models.py:239
-msgid "score"
-msgstr "stig"
-
-#: contrib/comments/models.py:240
-msgid "score date"
-msgstr "dagsetning stigagjafar"
-
-#: contrib/comments/models.py:243
-msgid "karma score"
-msgstr "karma stig"
-
-#: contrib/comments/models.py:244
-msgid "karma scores"
-msgstr "karma stig"
-
-#: contrib/comments/models.py:248
-#, python-format
-msgid "%(score)d rating by %(user)s"
-msgstr "%(score)d stig frá %(user)s"
-
-#: contrib/comments/models.py:264
-#, python-format
-msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"Þessi athugasemd var veifuð af %(user)s:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/models.py:271
-msgid "flag date"
-msgstr "Dagsetning veifu"
-
-#: contrib/comments/models.py:274
-msgid "user flag"
-msgstr "notandaveifa"
-
-#: contrib/comments/models.py:275
-msgid "user flags"
-msgstr "notendaveifur"
-
-#: contrib/comments/models.py:279
-#, python-format
-msgid "Flag by %r"
-msgstr "Veifað af %r"
-
-#: contrib/comments/models.py:284
-msgid "deletion date"
-msgstr "eytt dags."
-
-#: contrib/comments/models.py:286
-msgid "moderator deletion"
-msgstr "eytt af umsjónarmanni"
-
-#: contrib/comments/models.py:287
-msgid "moderator deletions"
-msgstr "eytt af umsjónarmanni"
-
-#: contrib/comments/models.py:291
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "Eytt af umsjónarmanni %r"
-
-#: contrib/comments/templates/comments/form.html:8
-msgid "Forgotten your password?"
-msgstr "Gleymdir þú lykilorðinu þínu?"
-
-#: contrib/comments/templates/comments/form.html:12
-msgid "Ratings"
-msgstr "Einkunnir"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr "Nauðsynlegt"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr "Valfrjálst"
-
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr "Sendu inn ljósmynd"
-
-#: contrib/comments/templates/comments/form.html:28
-#: contrib/comments/templates/comments/freeform.html:5
-msgid "Comment:"
-msgstr "Athugasemd:"
-
-#: contrib/comments/templates/comments/form.html:35
-#: contrib/comments/templates/comments/freeform.html:10
-msgid "Preview comment"
-msgstr "Forskoða athugasemd"
-
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "Nafnið þitt:"
-
-#: contrib/comments/views/comments.py:28
-msgid "This rating is required because you've entered at least one other rating."
-msgstr "Þessi stigagjöf er nauðsynleg vegna þess að þú gafst að minnsta kosti eina aðra einkunn."
-
-#: contrib/comments/views/comments.py:112
-#, python-format
-msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-"Þessi athugasemd var send inn af notanda sem hefur sent inn færri en %(count)s athugasemd:\n"
-"\n"
-"%(text)s"
-msgstr[1] ""
-"Þessi athugasemd var send inn af notanda sem hefur sent inn færri en %(count)s athugasemdir:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:117
-#, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"Þessi athugasemd var send inn af vafasömum notanda:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:190
-#: contrib/comments/views/comments.py:283
-msgid "Only POSTs are allowed"
-msgstr "Eingöngu POST eru leyfð"
-
-#: contrib/comments/views/comments.py:194
-#: contrib/comments/views/comments.py:287
-msgid "One or more of the required fields wasn't submitted"
-msgstr "Einn eða fleiri nauðsynlegir reitir voru ekki fylltir"
-
-#: contrib/comments/views/comments.py:198
-#: contrib/comments/views/comments.py:289
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Einhver átti við athugasemdaformið (öryggisbrot)"
-
-#: contrib/comments/views/comments.py:208
-#: contrib/comments/views/comments.py:295
-msgid "The comment form had an invalid 'target' parameter -- the object ID was invalid"
-msgstr "Athugasemdaformið hafði ógildan 'target' stika -- kenni hlutarins var ógilt"
-
-#: contrib/comments/views/comments.py:259
-#: contrib/comments/views/comments.py:324
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "Athugasemdaformið útvegaði ekki annað hvort 'forskoða' eða 'senda'"
-
-#: contrib/comments/views/karma.py:21
-msgid "Anonymous users cannot vote"
-msgstr "Ónafngreindir notendur geta ekki kosið"
-
-#: contrib/comments/views/karma.py:25
-msgid "Invalid comment ID"
-msgstr "Ógilt kenni á athugasemd"
-
-#: contrib/comments/views/karma.py:27
-msgid "No voting for yourself"
-msgstr "Þú getur ekki kosið sjálfa(n) þig"
-
-#: contrib/contenttypes/models.py:37
+#: contrib/contenttypes/models.py:67
 msgid "python model class name"
 msgstr "python eininga klasa nafn"
 
-#: contrib/contenttypes/models.py:40
+#: contrib/contenttypes/models.py:71
 msgid "content type"
 msgstr "efnistag"
 
-#: contrib/contenttypes/models.py:41
+#: contrib/contenttypes/models.py:72
 msgid "content types"
 msgstr "efnistög"
 
-#: contrib/flatpages/models.py:8
+#: contrib/flatpages/admin.py:9
 msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr "Dæmi: '/about/contact/'. Passaðu að hafa skástrik fremst og aftast."
 
-#: contrib/flatpages/models.py:9
+#: contrib/flatpages/admin.py:11
+msgid "This value must contain only letters, numbers, underscores, dashes or slashes."
+msgstr "Þetta gildi má einungis innihalda stafi, tölur, undirstrik, skástrik og bandstrik."
+
+#: contrib/flatpages/admin.py:22
+msgid "Advanced options"
+msgstr "Ítarlegar stillingar"
+
+#: contrib/flatpages/models.py:8
 msgid "title"
 msgstr "titill"
 
-#: contrib/flatpages/models.py:10
+#: contrib/flatpages/models.py:9
 msgid "content"
 msgstr "innihald"
 
-#: contrib/flatpages/models.py:11
+#: contrib/flatpages/models.py:10
 msgid "enable comments"
 msgstr "virkja athugasemdir"
 
-#: contrib/flatpages/models.py:12
+#: contrib/flatpages/models.py:11
 msgid "template name"
 msgstr "nafn sniðmáts"
 
-#: contrib/flatpages/models.py:13
+#: contrib/flatpages/models.py:12
 msgid "Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use 'flatpages/default.html'."
 msgstr "Dæmi: 'flatpages/contact_page.html'. Ef ekkert er gefið upp mun kerfið nota 'flatpages/default.html'."
 
-#: contrib/flatpages/models.py:14
+#: contrib/flatpages/models.py:13
 msgid "registration required"
 msgstr "skráning nauðsynleg"
 
-#: contrib/flatpages/models.py:14
+#: contrib/flatpages/models.py:13
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "Ef þetta er valið geta eingöngu innskráðir notendur séð síðuna."
 
@@ -1515,96 +1455,112 @@ msgstr "flatskrá"
 msgid "flat pages"
 msgstr "flatskrár"
 
-#: contrib/humanize/templatetags/humanize.py:20
+#: contrib/formtools/wizard.py:130
+msgid "We apologize, but your form has expired. Please continue filling out the form from this page."
+msgstr "Því miður er formið runnið út. Vinsamlegast haltu áfram að fylla út formið á þessari síðu."
+
+#: contrib/gis/forms/fields.py:14
+msgid "No geometry value provided."
+msgstr "Ekkert rúmgildi gefið."
+
+#: contrib/gis/forms/fields.py:15
+msgid "Invalid geometry value."
+msgstr "Ógild rúmeining"
+
+#: contrib/gis/forms/fields.py:16
+msgid "Invalid geometry type."
+msgstr "Ógild rúmmálsgerð."
+
+#: contrib/humanize/templatetags/humanize.py:19
 msgid "th"
 msgstr "."
 
-#: contrib/humanize/templatetags/humanize.py:20
+#: contrib/humanize/templatetags/humanize.py:19
 msgid "st"
 msgstr "."
 
-#: contrib/humanize/templatetags/humanize.py:20
+#: contrib/humanize/templatetags/humanize.py:19
 msgid "nd"
 msgstr "."
 
-#: contrib/humanize/templatetags/humanize.py:20
+#: contrib/humanize/templatetags/humanize.py:19
 msgid "rd"
 msgstr "."
 
-#: contrib/humanize/templatetags/humanize.py:52
+#: contrib/humanize/templatetags/humanize.py:51
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f milljón"
 msgstr[1] "%(value).1f milljónir"
 
-#: contrib/humanize/templatetags/humanize.py:55
+#: contrib/humanize/templatetags/humanize.py:54
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f milljarður"
 msgstr[1] "%(value).1f milljarðar"
 
-#: contrib/humanize/templatetags/humanize.py:58
+#: contrib/humanize/templatetags/humanize.py:57
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f billjarður"
 msgstr[1] "%(value).1f billjónir"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "one"
 msgstr "einn"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "two"
 msgstr "tveir"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "three"
 msgstr "þrír"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "four"
 msgstr "fjórir"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "five"
 msgstr "fimm"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "six"
 msgstr "sex"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "seven"
 msgstr "sjö"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "eight"
 msgstr "átta"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "nine"
 msgstr "níu"
 
-#: contrib/humanize/templatetags/humanize.py:94
+#: contrib/humanize/templatetags/humanize.py:93
 msgid "today"
 msgstr "í dag"
 
-#: contrib/humanize/templatetags/humanize.py:96
+#: contrib/humanize/templatetags/humanize.py:95
 msgid "tomorrow"
 msgstr "morgundagur"
 
-#: contrib/humanize/templatetags/humanize.py:98
+#: contrib/humanize/templatetags/humanize.py:97
 msgid "yesterday"
 msgstr "gærdagur"
 
-#: contrib/localflavor/ar/forms.py:28
+#: contrib/localflavor/ar/forms.py:27
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
 msgstr "Færðu inn póstnúmer í sniðinu NNNN eða ANNNNAAA."
 
-#: contrib/localflavor/ar/forms.py:50
+#: contrib/localflavor/ar/forms.py:49
 #: contrib/localflavor/br/forms.py:96
 #: contrib/localflavor/br/forms.py:135
 #: contrib/localflavor/pe/forms.py:23
@@ -1612,17 +1568,63 @@ msgstr "Færðu inn póstnúmer í sniðinu NNNN eða ANNNNAAA."
 msgid "This field requires only numbers."
 msgstr "Þessi reitur tekur aðeins tölugildi."
 
-#: contrib/localflavor/ar/forms.py:51
+#: contrib/localflavor/ar/forms.py:50
 msgid "This field requires 7 or 8 digits."
 msgstr "Þessi reitur krefst 7 eða 8 tölustafa."
 
-#: contrib/localflavor/ar/forms.py:80
+#: contrib/localflavor/ar/forms.py:79
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
 msgstr "Færðu inn gilt CUIT í XX-XXXXXXXX-X eða XXXXXXXXXXXX sniðinu."
 
-#: contrib/localflavor/ar/forms.py:81
+#: contrib/localflavor/ar/forms.py:80
 msgid "Invalid CUIT."
 msgstr "Ógilt CUIT."
+
+#: contrib/localflavor/at/at_states.py:5
+msgid "Burgenland"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:6
+msgid "Carinthia"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:7
+msgid "Lower Austria"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:8
+msgid "Upper Austria"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:9
+msgid "Salzburg"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:10
+msgid "Styria"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:11
+msgid "Tyrol"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:12
+msgid "Vorarlberg"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:13
+msgid "Vienna"
+msgstr ""
+
+#: contrib/localflavor/at/forms.py:20
+#: contrib/localflavor/ch/forms.py:16
+#: contrib/localflavor/no/forms.py:12
+msgid "Enter a zip code in the format XXXX."
+msgstr ""
+
+#: contrib/localflavor/at/forms.py:48
+msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
+msgstr ""
 
 #: contrib/localflavor/au/forms.py:16
 msgid "Enter a 4 digit post code."
@@ -1766,11 +1768,6 @@ msgstr ""
 
 #: contrib/localflavor/ch/ch_states.py:30
 msgid "Zurich"
-msgstr ""
-
-#: contrib/localflavor/ch/forms.py:16
-#: contrib/localflavor/no/forms.py:12
-msgid "Enter a zip code in the format XXXX."
 msgstr ""
 
 #: contrib/localflavor/ch/forms.py:64
@@ -2194,7 +2191,7 @@ msgstr ""
 msgid "Enter a valid VAT number."
 msgstr ""
 
-#: contrib/localflavor/jp/forms.py:19
+#: contrib/localflavor/jp/forms.py:16
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
 msgstr ""
 
@@ -2527,7 +2524,7 @@ msgid "Enter a valid SoFi number"
 msgstr ""
 
 #: contrib/localflavor/nl/nl_provinces.py:4
-msgid "Drente"
+msgid "Drenthe"
 msgstr ""
 
 #: contrib/localflavor/nl/nl_provinces.py:5
@@ -2586,31 +2583,31 @@ msgstr "Þessi reitur krefst 8 tölustafa."
 msgid "This field requires 11 digits."
 msgstr "Þessi reitur krefst 11 tölustafa."
 
-#: contrib/localflavor/pl/forms.py:39
+#: contrib/localflavor/pl/forms.py:38
 msgid "National Identification Number consists of 11 digits."
 msgstr ""
 
-#: contrib/localflavor/pl/forms.py:40
+#: contrib/localflavor/pl/forms.py:39
 msgid "Wrong checksum for the National Identification Number."
 msgstr ""
 
-#: contrib/localflavor/pl/forms.py:72
+#: contrib/localflavor/pl/forms.py:71
 msgid "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgstr ""
 
-#: contrib/localflavor/pl/forms.py:73
+#: contrib/localflavor/pl/forms.py:72
 msgid "Wrong checksum for the Tax Number (NIP)."
 msgstr ""
 
-#: contrib/localflavor/pl/forms.py:112
+#: contrib/localflavor/pl/forms.py:111
 msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
 msgstr ""
 
-#: contrib/localflavor/pl/forms.py:113
+#: contrib/localflavor/pl/forms.py:112
 msgid "Wrong checksum for the National Business Register Number (REGON)."
 msgstr ""
 
-#: contrib/localflavor/pl/forms.py:156
+#: contrib/localflavor/pl/forms.py:155
 msgid "Enter a postal code in the format XX-XXX."
 msgstr ""
 
@@ -2676,6 +2673,26 @@ msgstr ""
 
 #: contrib/localflavor/pl/pl_voivodeships.py:23
 msgid "West Pomerania"
+msgstr ""
+
+#: contrib/localflavor/ro/forms.py:19
+msgid "Enter a valid CIF."
+msgstr ""
+
+#: contrib/localflavor/ro/forms.py:56
+msgid "Enter a valid CNP."
+msgstr ""
+
+#: contrib/localflavor/ro/forms.py:141
+msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
+msgstr ""
+
+#: contrib/localflavor/ro/forms.py:171
+msgid "Phone numbers must be in XXXX-XXXXXX format."
+msgstr ""
+
+#: contrib/localflavor/ro/forms.py:194
+msgid "Enter a valid postal code in the format XXXXXX"
 msgstr ""
 
 #: contrib/localflavor/sk/forms.py:30
@@ -3203,8 +3220,11 @@ msgid "County Armagh"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:57
-#: contrib/localflavor/uk/uk_regions.py:58
 msgid "County Down"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:58
+msgid "County Fermanagh"
 msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:59
@@ -3387,7 +3407,7 @@ msgstr "vísun"
 msgid "redirects"
 msgstr "vísanir"
 
-#: contrib/sessions/models.py:46
+#: contrib/sessions/models.py:45
 msgid "session key"
 msgstr "setulykill"
 
@@ -3415,516 +3435,221 @@ msgstr "lén"
 msgid "display name"
 msgstr "birtingarnafn"
 
-#: contrib/sites/models.py:37
-msgid "site"
-msgstr "vefur"
-
-#: contrib/sites/models.py:38
+#: contrib/sites/models.py:39
 msgid "sites"
 msgstr "vefir"
 
-#: core/validators.py:72
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "Þetta gildi má einungis innihalda stafi, tölur og undirstrik."
+#: db/models/fields/__init__.py:348
+#: db/models/fields/__init__.py:683
+msgid "This value must be an integer."
+msgstr "Þetta gildi verður að vera heil tala."
 
-#: core/validators.py:76
-msgid "This value must contain only letters, numbers, underscores, dashes or slashes."
-msgstr "Þetta gildi má einungis innihalda stafi, tölur, undirstrik, skástrik og bandstrik."
+#: db/models/fields/__init__.py:379
+msgid "This value must be either True or False."
+msgstr "Þetta gildi verður að vera True eða False."
 
-#: core/validators.py:80
-msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr "Þetta gildi má einungis innihalda stafi, tölur, undirstrik og úrfellingarkommur."
+#: db/models/fields/__init__.py:412
+msgid "This field cannot be null."
+msgstr "Þessi reitur getur ekki haft tómgildi (null)."
 
-#: core/validators.py:84
-msgid "Uppercase letters are not allowed here."
-msgstr "Hástafir eru ekki leyfðir hér."
-
-#: core/validators.py:88
-msgid "Lowercase letters are not allowed here."
-msgstr "Lágstafir eru ekki leyfðir hér."
-
-#: core/validators.py:95
+#: db/models/fields/__init__.py:428
 msgid "Enter only digits separated by commas."
 msgstr "Skrifaðu einungis tölur aðskildar með kommum."
 
-#: core/validators.py:107
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Sláðu inn gild tölvupóstföng aðskilin með kommum."
+#: db/models/fields/__init__.py:459
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Sláðu inn gilda dagsetningu á YYYY-MM-DD sniði."
 
-#: core/validators.py:111
-msgid "Please enter a valid IP address."
-msgstr "Vinsamlegast sláðu inn gilda IP tölu."
-
-#: core/validators.py:115
-msgid "Empty values are not allowed here."
-msgstr "Tóm gildi eru ekki leyfð hér."
-
-#: core/validators.py:119
-msgid "Non-numeric characters aren't allowed here."
-msgstr "Aðeins tölustafir eru leyfðir hér."
-
-#: core/validators.py:123
-msgid "This value can't be comprised solely of digits."
-msgstr "Þetta gildi verður að vera samsett úr fleiru en tölustöfum."
-
-#: core/validators.py:128
-#: newforms/fields.py:151
-msgid "Enter a whole number."
-msgstr "Sláðu inn heila tölu."
-
-#: core/validators.py:132
-msgid "Only alphabetical characters are allowed here."
-msgstr "Einungis bókstafir eru leyfðir hér."
-
-#: core/validators.py:147
-msgid "Year must be 1900 or later."
-msgstr ""
-
-#: core/validators.py:151
+#: db/models/fields/__init__.py:468
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Ógild dagsetning: %s"
 
-#: core/validators.py:156
-#: db/models/fields/__init__.py:509
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Sláðu inn gilda dagsetningu á YYYY-MM-DD sniði."
+#: db/models/fields/__init__.py:532
+#: db/models/fields/__init__.py:550
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr "Sláðu inn gilda dagsetningu/tíma í ÁÁÁÁ-MM-DD KK:MM[:ss[.uuuuuu]] sniði."
 
-#: core/validators.py:161
-msgid "Enter a valid time in HH:MM format."
-msgstr "Sláðu inn gildan tíma á HH:MM sniði."
-
-#: core/validators.py:165
-#: db/models/fields/__init__.py:583
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "Sláðu inn gilda dagsetningu/tíma á YYYY-MM-DD HH:MM sniði."
-
-#: core/validators.py:170
-#: newforms/fields.py:402
-msgid "Enter a valid e-mail address."
-msgstr "Sláðu inn gilt tölvupóstfang."
-
-#: core/validators.py:182
-#: core/validators.py:474
-#: newforms/fields.py:432
-#: oldforms/__init__.py:687
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Engin skrá var send. Athugaðu kótunartegund á forminu (encoding type)."
-
-#: core/validators.py:193
-#: newforms/fields.py:456
-msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
-msgstr "Halaðu upp gildri myndskrá. Skráin sem þú halaðir upp var annað hvort gölluð eða ekki mynd."
-
-#: core/validators.py:200
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "Veffangið %s bendir ekki á fullgilda mynd."
-
-#: core/validators.py:204
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr "Símanúmer verða að vera á XXX-XXX-XXXX forminu. „%s“ er ógilt."
-
-#: core/validators.py:212
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "Veffangið %s vísar ekki á gilt QuickTime myndskeið."
-
-#: core/validators.py:216
-msgid "A valid URL is required."
-msgstr "Gilds veffangs er krafist."
-
-#: core/validators.py:230
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-"Gilt HTML er nauðsynlegt. Tilteknar villur:\n"
-"%s"
-
-#: core/validators.py:237
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr "Illa sniðið XML: %s"
-
-#: core/validators.py:254
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "Ógilt veffang: %s"
-
-#: core/validators.py:259
-#: core/validators.py:261
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "Veffangið %s er brotinn hlekkur."
-
-#: core/validators.py:267
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "Skrifaðu gilda styttingu á bandarísku fylkisnafni."
-
-#: core/validators.py:281
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Passaðu orðbragðið! Orðið %s er ekki leyft hér."
-msgstr[1] "Passaðu orðbragðið! Orðin %s eru ekki leyfð hér."
-
-#: core/validators.py:288
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "Þessi reitur verður að passa við „%s“ reitinn."
-
-#: core/validators.py:307
-msgid "Please enter something for at least one field."
-msgstr "Vinsamlegast fylltu út einn reit að minnsta kosti."
-
-#: core/validators.py:316
-#: core/validators.py:327
-msgid "Please enter both fields or leave them both empty."
-msgstr "Vinsamlegast fylltu út í báða reitina eða skildu þá eftir tóma."
-
-#: core/validators.py:335
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "Þessi reitur þarf að vera útfylltur ef %(field)s er %(value)s"
-
-#: core/validators.py:348
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "Þessi reitur verður að vera útfylltur ef %(field)s er ekki %(value)s"
-
-#: core/validators.py:367
-msgid "Duplicate values are not allowed."
-msgstr "Endurtekin gildi eru ekki leyfð."
-
-#: core/validators.py:382
-#, python-format
-msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "Þetta gildi verður að vera á milli  %(lower)s og %(upper)s."
-
-#: core/validators.py:384
-#, python-format
-msgid "This value must be at least %s."
-msgstr "Þetta gildi verður að vera að minnsta kosti  %s."
-
-#: core/validators.py:386
-#, python-format
-msgid "This value must be no more than %s."
-msgstr "Þetta gildi má ekki vera hærra en  %s."
-
-#: core/validators.py:427
-#, python-format
-msgid "This value must be a power of %s."
-msgstr "Þessi reitur verður að vera veldi af %s."
-
-#: core/validators.py:437
-msgid "Please enter a valid decimal number."
-msgstr "Vinsamlegast settu inn gilda tugatölu."
-
-#: core/validators.py:444
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Vinsamlegast skrifaðu gilda tugatölu með hámark %s tölustaf."
-msgstr[1] "Vinsamlegast skrifaðu gilda tugatölu með hámark %s tölustafi."
-
-#: core/validators.py:447
-#, python-format
-msgid "Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] "Vinsamlegast settu inn gilda tugatölu með hámark %s tölustaf."
-msgstr[1] "Vinsamlegast settu inn gilda tugatölu með hámark %s tölustafi."
-
-#: core/validators.py:450
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Vinsamlegast skrifaðu gilda tugatölu með hámark %s tugbrotastaf."
-msgstr[1] "Vinsamlegast skrifaðu gilda tugatölu með hámark %s tugbrotastafi."
-
-#: core/validators.py:458
-msgid "Please enter a valid floating point number."
-msgstr "Vinsamlegast settu inn gilda hlaupakommutölu (floating point number)."
-
-#: core/validators.py:467
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Gakktu úr skugga um að upphöluð skrá sé að minnsta kosti %s bæti að stærð."
-
-#: core/validators.py:468
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "Gakktu úr skugga um að upphlaðin skrá sé í mesta lagi %s bæti að stærð."
-
-#: core/validators.py:485
-msgid "The format for this field is wrong."
-msgstr "Sniðið á þessum reit í rangt."
-
-#: core/validators.py:500
-msgid "This field is invalid."
-msgstr "Þessi reitur er ótækur."
-
-#: core/validators.py:536
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "Gat engu náð úr %s."
-
-#: core/validators.py:539
-#, python-format
-msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr "Veffangið %(url)s skilaði ótæka efnistagshausnum '%(contenttype)s'."
-
-#: core/validators.py:572
-#, python-format
-msgid "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with \"%(start)s\".)"
-msgstr "Vinsamlegast lokaðu opna %(tag)s taginu sem byrjar á línu %(line)s. (Línan hefst á \"%(start)s\".)"
-
-#: core/validators.py:576
-#, python-format
-msgid "Some text starting on line %(line)s is not allowed in that context. (Line starts with \"%(start)s\".)"
-msgstr "Texti sem hefst á línu %(line)s er ekki leyfður í því samhengi. (Line starts with \"%(start)s\".)"
-
-#: core/validators.py:581
-#, python-format
-msgid "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%(start)s\".)"
-msgstr "\"%(attr)s\" á línu %(line)s er ótækt eigindi (línan hefst á \"%(start)s\")."
-
-#: core/validators.py:586
-#, python-format
-msgid "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%(start)s\".)"
-msgstr "\"<%(tag)s>\" á línu %(line)s er ótækt tag. (Línan hefst á \"%(start)s\".)"
-
-#: core/validators.py:590
-#, python-format
-msgid "A tag on line %(line)s is missing one or more required attributes. (Line starts with \"%(start)s\".)"
-msgstr "Tag á línu %(line)s vantar eitt eða fleiri nauðsynleg eigindi. (Línan hefst á \"%(start)s\".)"
-
-#: core/validators.py:595
-#, python-format
-msgid "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line starts with \"%(start)s\".)"
-msgstr "\"%(attr)s\" eigindið á línu %(line)s hefur ótækt gildi (línan hefst á \"%(start)s\")."
-
-#: db/models/manipulators.py:308
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(object)s með þetta %(type)s er nú þegar til fyrir uppgefið %(field)s."
-
-#: db/models/fields/__init__.py:52
-#, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s með þetta %(fieldname)s er nú þegar til."
-
-#: db/models/fields/__init__.py:161
-#: db/models/fields/__init__.py:318
-#: db/models/fields/__init__.py:735
-#: db/models/fields/__init__.py:746
-#: newforms/fields.py:45
-#: oldforms/__init__.py:374
-msgid "This field is required."
-msgstr "Þennan reit þarf að fylla út."
-
-#: db/models/fields/__init__.py:418
-msgid "This value must be an integer."
-msgstr "Þetta gildi verður að vera heil tala."
-
-#: db/models/fields/__init__.py:454
-msgid "This value must be either True or False."
-msgstr "Þetta gildi verður að vera True eða False."
-
-#: db/models/fields/__init__.py:475
-msgid "This field cannot be null."
-msgstr "Þessi reitur getur ekki haft tómgildi (null)."
-
-#: db/models/fields/__init__.py:644
+#: db/models/fields/__init__.py:586
 msgid "This value must be a decimal number."
 msgstr "Þetta gildi verður að vera tugatala (decimal number)."
 
-#: db/models/fields/__init__.py:755
-msgid "Enter a valid filename."
-msgstr "Sláðu inn gilt tölvupóstfang."
-
-#: db/models/fields/__init__.py:904
+#: db/models/fields/__init__.py:719
 msgid "This value must be either None, True or False."
 msgstr "Þetta gildi verður að vera annaðhvort None, True eða False."
 
-#: db/models/fields/related.py:55
-#, python-format
-msgid "Please enter a valid %s."
-msgstr "Vinsamlegast sláðu inn fullgilt %s."
+#: db/models/fields/__init__.py:817
+#: db/models/fields/__init__.py:831
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "Sláðu inn gildan tíma á KK:MM sniði."
 
-#: db/models/fields/related.py:658
-msgid "Separate multiple IDs with commas."
-msgstr "Aðgreindu mörg kenni með kommum."
-
-#: db/models/fields/related.py:660
+#: db/models/fields/related.py:761
 msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "Haltu inni „Control“, eða „Command“ á Mac til þess að velja fleira en eitt."
 
-#: db/models/fields/related.py:707
+#: db/models/fields/related.py:838
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] "Vinsamlegast sláðu inn gild %(self)s kenni. Gildið %(value)r er ógilt."
 msgstr[1] "Vinsamlegast sláðu inn gild %(self)s kenni. Gildin %(value)r eru ógild."
 
-#: newforms/fields.py:46
+#: forms/fields.py:54
+msgid "This field is required."
+msgstr "Þennan reit þarf að fylla út."
+
+#: forms/fields.py:55
 msgid "Enter a valid value."
 msgstr "Sláðu inn gilt gildi."
 
-#: newforms/fields.py:123
+#: forms/fields.py:138
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr "Gildið má ekki hafa fleiri en %(max)d stafi (gildið hefur %(length)d)."
 
-#: newforms/fields.py:124
+#: forms/fields.py:139
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr "Gildið má ekki hafa færri en %(min)d stafi (gildið hefur %(length)d)."
 
-#: newforms/fields.py:152
-#: newforms/fields.py:181
-#: newforms/fields.py:210
+#: forms/fields.py:166
+msgid "Enter a whole number."
+msgstr "Sláðu inn heila tölu."
+
+#: forms/fields.py:167
+#: forms/fields.py:196
+#: forms/fields.py:225
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Gakktu úr skuggum um að gildið sé minna en eða jafn og %s."
 
-#: newforms/fields.py:153
-#: newforms/fields.py:182
-#: newforms/fields.py:211
+#: forms/fields.py:168
+#: forms/fields.py:197
+#: forms/fields.py:226
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Gildið þarf að vera jafnt og eða hærra en %s."
 
-#: newforms/fields.py:180
-#: newforms/fields.py:209
+#: forms/fields.py:195
+#: forms/fields.py:224
 msgid "Enter a number."
 msgstr "Sláðu inn heila tölu."
 
-#: newforms/fields.py:212
+#: forms/fields.py:227
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Gildið má ekki hafa fleiri en %s tölur."
 
-#: newforms/fields.py:213
+#: forms/fields.py:228
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Gildið má ekki hafa meira en %s tugatölustafi (decimal places)."
 
-#: newforms/fields.py:214
+#: forms/fields.py:229
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Gildið má ekki hafa fleiri en %s tölur fyrir tugabrotskil."
 
-#: newforms/fields.py:262
-#: newforms/fields.py:719
+#: forms/fields.py:287
+#: forms/fields.py:848
 msgid "Enter a valid date."
 msgstr "Sláðu inn gilda dagsetningu."
 
-#: newforms/fields.py:295
-#: newforms/fields.py:720
+#: forms/fields.py:321
+#: forms/fields.py:849
 msgid "Enter a valid time."
 msgstr "Sláðu inn gilda tímasetningu."
 
-#: newforms/fields.py:334
+#: forms/fields.py:360
 msgid "Enter a valid date/time."
 msgstr "Sláðu inn gilda dagsetningu ásamt tíma."
 
-#: newforms/fields.py:433
+#: forms/fields.py:446
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Engin skrá var send. Athugaðu kótunartegund á forminu (encoding type)."
+
+#: forms/fields.py:447
 msgid "No file was submitted."
 msgstr "Engin skrá var send."
 
-#: newforms/fields.py:434
-#: oldforms/__init__.py:689
+#: forms/fields.py:448
 msgid "The submitted file is empty."
 msgstr "Innsend skrá er tóm."
 
-#: newforms/fields.py:492
+#: forms/fields.py:477
+msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+msgstr "Halaðu upp gildri myndskrá. Skráin sem þú halaðir upp var annað hvort gölluð eða ekki mynd."
+
+#: forms/fields.py:538
 msgid "Enter a valid URL."
 msgstr "Sláðu inn gilt veffang (URL)."
 
-#: newforms/fields.py:493
+#: forms/fields.py:539
 msgid "This URL appears to be a broken link."
 msgstr "Síðan á þessari slóð lítur út fyrir að skila villu."
 
-#: newforms/fields.py:555
-#: newforms/models.py:317
-msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Veldu gildan valmöguleika. Valið virðist ekki vera eitt af gildum valmöguleikum."
-
-#: newforms/fields.py:594
+#: forms/fields.py:618
+#: forms/fields.py:696
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Veldu gildan valmöguleika. %(value)s er ekki eitt af gildum valmöguleikum."
 
-#: newforms/fields.py:595
-#: newforms/fields.py:657
-#: newforms/models.py:377
+#: forms/fields.py:697
+#: forms/fields.py:758
+#: forms/models.py:660
 msgid "Enter a list of values."
 msgstr "Sláðu inn lista af gildum."
 
-#: newforms/fields.py:748
+#: forms/fields.py:877
 msgid "Enter a valid IPv4 address."
 msgstr "Sláðu inn gilda IPv4 tölu."
 
-#: newforms/models.py:378
+#: forms/fields.py:887
+msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr "Settu inn gildan vefslóðartitil sem samanstendur af latneskum bókstöfum, númerin, undirstrikum og bandstrikum."
+
+#: forms/formsets.py:242
+#: forms/formsets.py:244
+msgid "Order"
+msgstr "Röð"
+
+#: forms/models.py:268
+#: forms/models.py:277
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s með þetta %(field_label)s er nú þegar til."
+
+#: forms/models.py:590
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "Veldu gildan valmöguleika. Valið virðist ekki vera eitt af gildum valmöguleikum."
+
+#: forms/models.py:661
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Veldu gildan valmöguleika. %s er ekki einn af gildum valmöguleikum."
 
-#: oldforms/__init__.py:409
-#, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Gangtu úr skugga um að textinn þin sé styttri en %s tákn."
-msgstr[1] "Gangtu úr skugga um að textinn þin sé styttri en %s tákn."
-
-#: oldforms/__init__.py:414
-msgid "Line breaks are not allowed here."
-msgstr "Línuskil eru ekki leyfð hér."
-
-#: oldforms/__init__.py:512
-#: oldforms/__init__.py:586
-#: oldforms/__init__.py:625
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "Veldu gildan valmöguleika; „%(data)s“ er ekki í %(choices)s."
-
-#: oldforms/__init__.py:745
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Sláðu inn heila tölu á bilinu -32.768 til 32.767."
-
-#: oldforms/__init__.py:755
-msgid "Enter a positive number."
-msgstr "Sláðu inn jákvæða tölu."
-
-#: oldforms/__init__.py:765
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "Sláðu inn heila tölu á bilinu 0 til 32.767."
-
-#: template/defaultfilters.py:691
+#: template/defaultfilters.py:706
 msgid "yes,no,maybe"
 msgstr "já,nei,kannski"
 
-#: template/defaultfilters.py:722
+#: template/defaultfilters.py:737
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d bæti"
 msgstr[1] "%(size)d bæti"
 
-#: template/defaultfilters.py:724
+#: template/defaultfilters.py:739
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:726
+#: template/defaultfilters.py:741
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:727
+#: template/defaultfilters.py:742
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
@@ -4138,7 +3863,7 @@ msgstr "nóv."
 msgid "Dec."
 msgstr "des."
 
-#: utils/text.py:127
+#: utils/text.py:128
 msgid "or"
 msgstr "eða"
 
@@ -4178,61 +3903,355 @@ msgid_plural "minutes"
 msgstr[0] "mínúta"
 msgstr[1] "mínútur"
 
-#: utils/timesince.py:46
+#: utils/timesince.py:43
 msgid "minutes"
 msgstr "mínútur"
 
-#: utils/timesince.py:51
+#: utils/timesince.py:48
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: utils/timesince.py:57
+#: utils/timesince.py:54
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:399
+#: utils/translation/trans_real.py:403
 msgid "DATE_FORMAT"
 msgstr "j. N Y"
 
-#: utils/translation/trans_real.py:400
-msgid "DATETIME_FORMAT"
-msgstr "j. N Y, H:i"
-
-#: utils/translation/trans_real.py:401
+#: utils/translation/trans_real.py:405
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: utils/translation/trans_real.py:417
+#: utils/translation/trans_real.py:421
 msgid "YEAR_MONTH_FORMAT"
 msgstr "j. N Y"
 
-#: utils/translation/trans_real.py:418
+#: utils/translation/trans_real.py:422
 msgid "MONTH_DAY_FORMAT"
 msgstr "j. N Y"
 
-#: views/generic/create_update.py:43
+#: views/generic/create_update.py:114
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "%(verbose_name)s var fært inn."
 
-#: views/generic/create_update.py:117
+#: views/generic/create_update.py:156
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "%(verbose_name)s var uppfært."
 
-#: views/generic/create_update.py:184
+#: views/generic/create_update.py:198
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s var eytt."
 
+#~ msgid "Brazilian"
+#~ msgstr "Brasilíska"
+#~ msgid "Ordering"
+#~ msgstr "Röðun"
+#~ msgid "DATE_WITH_TIME_FULL"
+#~ msgstr "N j, Y, P"
+#~ msgid "Your new password is: %(new_password)s"
+#~ msgstr "Nýja lykilorðið þitt er: %(new_password)s"
+#~ msgid "Feel free to change this password by going to this page:"
+#~ msgstr "Þér er frjálst að breyta lykilorðinu með því að fara á þessa síðu:"
+#~ msgid "Added %s."
+#~ msgstr "Bætti við %s."
+#~ msgid "Deleted %s."
+#~ msgstr "Eyddi %s."
+#~ msgid "The two 'new password' fields didn't match."
+#~ msgstr "'Nýtt lykilorð' svæðin passa ekki saman."
+#~ msgid "headline"
+#~ msgstr "fyrirsögn"
+#~ msgid "rating #1"
+#~ msgstr "einkunn #1"
+#~ msgid "rating #2"
+#~ msgstr "einkunn #2"
+#~ msgid "rating #3"
+#~ msgstr "einkunn #3"
+#~ msgid "rating #4"
+#~ msgstr "einkunn #4"
+#~ msgid "rating #5"
+#~ msgstr "einkunn #5"
+#~ msgid "rating #6"
+#~ msgstr "einkunn #6"
+#~ msgid "rating #7"
+#~ msgstr "einkunn #7"
+#~ msgid "rating #8"
+#~ msgstr "einkunn #8"
+#~ msgid "is valid rating"
+#~ msgstr "er gild einkunn"
+#~ msgid "comments"
+#~ msgstr "athugasemdir"
+#~ msgid "Content object"
+#~ msgstr "Efnishlutur"
+#~ msgid "person's name"
+#~ msgstr "nafn einstaklings"
+#~ msgid "ip address"
+#~ msgstr "IP tala"
+#~ msgid "approved by staff"
+#~ msgstr "samþykkt af umsjónarmönnum"
+#~ msgid "free comment"
+#~ msgstr "frjáls athugasemd"
+#~ msgid "free comments"
+#~ msgstr "frjálsar athugasemdir"
+#~ msgid "score"
+#~ msgstr "stig"
+#~ msgid "score date"
+#~ msgstr "dagsetning stigagjafar"
+#~ msgid "karma score"
+#~ msgstr "karma stig"
+#~ msgid "karma scores"
+#~ msgstr "karma stig"
+#~ msgid "%(score)d rating by %(user)s"
+#~ msgstr "%(score)d stig frá %(user)s"
+#~ msgid ""
+#~ "This comment was flagged by %(user)s:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgstr ""
+#~ "Þessi athugasemd var veifuð af %(user)s:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgid "flag date"
+#~ msgstr "Dagsetning veifu"
+#~ msgid "user flag"
+#~ msgstr "notandaveifa"
+#~ msgid "user flags"
+#~ msgstr "notendaveifur"
+#~ msgid "Flag by %r"
+#~ msgstr "Veifað af %r"
+#~ msgid "deletion date"
+#~ msgstr "eytt dags."
+#~ msgid "moderator deletion"
+#~ msgstr "eytt af umsjónarmanni"
+#~ msgid "moderator deletions"
+#~ msgstr "eytt af umsjónarmanni"
+#~ msgid "Moderator deletion by %r"
+#~ msgstr "Eytt af umsjónarmanni %r"
+#~ msgid "Forgotten your password?"
+#~ msgstr "Gleymdir þú lykilorðinu þínu?"
+#~ msgid "Ratings"
+#~ msgstr "Einkunnir"
+#~ msgid "Required"
+#~ msgstr "Nauðsynlegt"
+#~ msgid "Optional"
+#~ msgstr "Valfrjálst"
+#~ msgid "Post a photo"
+#~ msgstr "Sendu inn ljósmynd"
+#~ msgid "Comment:"
+#~ msgstr "Athugasemd:"
+#~ msgid "Preview comment"
+#~ msgstr "Forskoða athugasemd"
+#~ msgid "Your name:"
+#~ msgstr "Nafnið þitt:"
+#~ msgid ""
+#~ "This rating is required because you've entered at least one other rating."
+#~ msgstr ""
+#~ "Þessi stigagjöf er nauðsynleg vegna þess að þú gafst að minnsta kosti "
+#~ "eina aðra einkunn."
+#~ msgid ""
+#~ "This comment was posted by a user who has posted fewer than %(count)s "
+#~ "comment:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgid_plural ""
+#~ "This comment was posted by a user who has posted fewer than %(count)s "
+#~ "comments:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgstr[0] ""
+#~ "Þessi athugasemd var send inn af notanda sem hefur sent inn færri en %"
+#~ "(count)s athugasemd:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgstr[1] ""
+#~ "Þessi athugasemd var send inn af notanda sem hefur sent inn færri en %"
+#~ "(count)s athugasemdir:\n"
+#~ "\n"
+#~ "%(text)s"
+#~ msgid "Only POSTs are allowed"
+#~ msgstr "Eingöngu POST eru leyfð"
+#~ msgid "One or more of the required fields wasn't submitted"
+#~ msgstr "Einn eða fleiri nauðsynlegir reitir voru ekki fylltir"
+#~ msgid "Somebody tampered with the comment form (security violation)"
+#~ msgstr "Einhver átti við athugasemdaformið (öryggisbrot)"
+#~ msgid ""
+#~ "The comment form had an invalid 'target' parameter -- the object ID was "
+#~ "invalid"
+#~ msgstr ""
+#~ "Athugasemdaformið hafði ógildan 'target' stika -- kenni hlutarins var "
+#~ "ógilt"
+#~ msgid "The comment form didn't provide either 'preview' or 'post'"
+#~ msgstr "Athugasemdaformið útvegaði ekki annað hvort 'forskoða' eða 'senda'"
+#~ msgid "Anonymous users cannot vote"
+#~ msgstr "Ónafngreindir notendur geta ekki kosið"
+#~ msgid "No voting for yourself"
+#~ msgstr "Þú getur ekki kosið sjálfa(n) þig"
+#~ msgid "Uppercase letters are not allowed here."
+#~ msgstr "Hástafir eru ekki leyfðir hér."
+#~ msgid "Lowercase letters are not allowed here."
+#~ msgstr "Lágstafir eru ekki leyfðir hér."
+#~ msgid "Enter valid e-mail addresses separated by commas."
+#~ msgstr "Sláðu inn gild tölvupóstföng aðskilin með kommum."
+#~ msgid "Please enter a valid IP address."
+#~ msgstr "Vinsamlegast sláðu inn gilda IP tölu."
+#~ msgid "Empty values are not allowed here."
+#~ msgstr "Tóm gildi eru ekki leyfð hér."
+#~ msgid "Non-numeric characters aren't allowed here."
+#~ msgstr "Aðeins tölustafir eru leyfðir hér."
+#~ msgid "This value can't be comprised solely of digits."
+#~ msgstr "Þetta gildi verður að vera samsett úr fleiru en tölustöfum."
+#~ msgid "Only alphabetical characters are allowed here."
+#~ msgstr "Einungis bókstafir eru leyfðir hér."
+#~ msgid "The URL %s does not point to a valid image."
+#~ msgstr "Veffangið %s bendir ekki á fullgilda mynd."
+#~ msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+#~ msgstr "Símanúmer verða að vera á XXX-XXX-XXXX forminu. „%s“ er ógilt."
+#~ msgid "The URL %s does not point to a valid QuickTime video."
+#~ msgstr "Veffangið %s vísar ekki á gilt QuickTime myndskeið."
+#~ msgid "A valid URL is required."
+#~ msgstr "Gilds veffangs er krafist."
+#~ msgid ""
+#~ "Valid HTML is required. Specific errors are:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Gilt HTML er nauðsynlegt. Tilteknar villur:\n"
+#~ "%s"
+#~ msgid "Badly formed XML: %s"
+#~ msgstr "Illa sniðið XML: %s"
+#~ msgid "Invalid URL: %s"
+#~ msgstr "Ógilt veffang: %s"
+#~ msgid "The URL %s is a broken link."
+#~ msgstr "Veffangið %s er brotinn hlekkur."
+#~ msgid "Enter a valid U.S. state abbreviation."
+#~ msgstr "Skrifaðu gilda styttingu á bandarísku fylkisnafni."
+#~ msgid "This field must match the '%s' field."
+#~ msgstr "Þessi reitur verður að passa við „%s“ reitinn."
+#~ msgid "Please enter something for at least one field."
+#~ msgstr "Vinsamlegast fylltu út einn reit að minnsta kosti."
+#~ msgid "Please enter both fields or leave them both empty."
+#~ msgstr "Vinsamlegast fylltu út í báða reitina eða skildu þá eftir tóma."
+#~ msgid "This field must be given if %(field)s is %(value)s"
+#~ msgstr "Þessi reitur þarf að vera útfylltur ef %(field)s er %(value)s"
+#~ msgid "This field must be given if %(field)s is not %(value)s"
+#~ msgstr ""
+#~ "Þessi reitur verður að vera útfylltur ef %(field)s er ekki %(value)s"
+#~ msgid "Duplicate values are not allowed."
+#~ msgstr "Endurtekin gildi eru ekki leyfð."
+#~ msgid "This value must be between %(lower)s and %(upper)s."
+#~ msgstr "Þetta gildi verður að vera á milli  %(lower)s og %(upper)s."
+#~ msgid "This value must be at least %s."
+#~ msgstr "Þetta gildi verður að vera að minnsta kosti  %s."
+#~ msgid "This value must be no more than %s."
+#~ msgstr "Þetta gildi má ekki vera hærra en  %s."
+#~ msgid "This value must be a power of %s."
+#~ msgstr "Þessi reitur verður að vera veldi af %s."
+#~ msgid "Please enter a valid decimal number."
+#~ msgstr "Vinsamlegast settu inn gilda tugatölu."
+#~ msgid "Please enter a valid decimal number with at most %s total digit."
+#~ msgid_plural ""
+#~ "Please enter a valid decimal number with at most %s total digits."
+#~ msgstr[0] "Vinsamlegast skrifaðu gilda tugatölu með hámark %s tölustaf."
+#~ msgstr[1] "Vinsamlegast skrifaðu gilda tugatölu með hámark %s tölustafi."
+#~ msgid ""
+#~ "Please enter a valid decimal number with a whole part of at most %s digit."
+#~ msgid_plural ""
+#~ "Please enter a valid decimal number with a whole part of at most %s "
+#~ "digits."
+#~ msgstr[0] "Vinsamlegast settu inn gilda tugatölu með hámark %s tölustaf."
+#~ msgstr[1] "Vinsamlegast settu inn gilda tugatölu með hámark %s tölustafi."
+#~ msgid "Please enter a valid decimal number with at most %s decimal place."
+#~ msgid_plural ""
+#~ "Please enter a valid decimal number with at most %s decimal places."
+#~ msgstr[0] "Vinsamlegast skrifaðu gilda tugatölu með hámark %s tugbrotastaf."
+#~ msgstr[1] ""
+#~ "Vinsamlegast skrifaðu gilda tugatölu með hámark %s tugbrotastafi."
+#~ msgid "Please enter a valid floating point number."
+#~ msgstr ""
+#~ "Vinsamlegast settu inn gilda hlaupakommutölu (floating point number)."
+#~ msgid "Make sure your uploaded file is at least %s bytes big."
+#~ msgstr ""
+#~ "Gakktu úr skugga um að upphöluð skrá sé að minnsta kosti %s bæti að stærð."
+#~ msgid "Make sure your uploaded file is at most %s bytes big."
+#~ msgstr ""
+#~ "Gakktu úr skugga um að upphlaðin skrá sé í mesta lagi %s bæti að stærð."
+#~ msgid "The format for this field is wrong."
+#~ msgstr "Sniðið á þessum reit í rangt."
+#~ msgid "This field is invalid."
+#~ msgstr "Þessi reitur er ótækur."
+#~ msgid "Could not retrieve anything from %s."
+#~ msgstr "Gat engu náð úr %s."
+#~ msgid ""
+#~ "The URL %(url)s returned the invalid Content-Type header '%(contenttype)"
+#~ "s'."
+#~ msgstr "Veffangið %(url)s skilaði ótæka efnistagshausnum '%(contenttype)s'."
+#~ msgid ""
+#~ "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts "
+#~ "with \"%(start)s\".)"
+#~ msgstr ""
+#~ "Vinsamlegast lokaðu opna %(tag)s taginu sem byrjar á línu %(line)s. "
+#~ "(Línan hefst á \"%(start)s\".)"
+#~ msgid ""
+#~ "Some text starting on line %(line)s is not allowed in that context. (Line "
+#~ "starts with \"%(start)s\".)"
+#~ msgstr ""
+#~ "Texti sem hefst á línu %(line)s er ekki leyfður í því samhengi. (Line "
+#~ "starts with \"%(start)s\".)"
+#~ msgid ""
+#~ "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with "
+#~ "\"%(start)s\".)"
+#~ msgstr ""
+#~ "\"%(attr)s\" á línu %(line)s er ótækt eigindi (línan hefst á \"%(start)s"
+#~ "\")."
+#~ msgid ""
+#~ "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
+#~ "(start)s\".)"
+#~ msgstr ""
+#~ "\"<%(tag)s>\" á línu %(line)s er ótækt tag. (Línan hefst á \"%(start)s\".)"
+#~ msgid ""
+#~ "A tag on line %(line)s is missing one or more required attributes. (Line "
+#~ "starts with \"%(start)s\".)"
+#~ msgstr ""
+#~ "Tag á línu %(line)s vantar eitt eða fleiri nauðsynleg eigindi. (Línan "
+#~ "hefst á \"%(start)s\".)"
+#~ msgid ""
+#~ "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
+#~ "starts with \"%(start)s\".)"
+#~ msgstr ""
+#~ "\"%(attr)s\" eigindið á línu %(line)s hefur ótækt gildi (línan hefst á \"%"
+#~ "(start)s\")."
+#~ msgid ""
+#~ "%(object)s with this %(type)s already exists for the given %(field)s."
+#~ msgstr ""
+#~ "%(object)s með þetta %(type)s er nú þegar til fyrir uppgefið %(field)s."
+#~ msgid "Enter a valid filename."
+#~ msgstr "Sláðu inn gilt tölvupóstfang."
+#~ msgid "Please enter a valid %s."
+#~ msgstr "Vinsamlegast sláðu inn fullgilt %s."
+#~ msgid "Separate multiple IDs with commas."
+#~ msgstr "Aðgreindu mörg kenni með kommum."
+#~ msgid "Ensure your text is less than %s character."
+#~ msgid_plural "Ensure your text is less than %s characters."
+#~ msgstr[0] "Gangtu úr skugga um að textinn þin sé styttri en %s tákn."
+#~ msgstr[1] "Gangtu úr skugga um að textinn þin sé styttri en %s tákn."
+#~ msgid "Line breaks are not allowed here."
+#~ msgstr "Línuskil eru ekki leyfð hér."
+#~ msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+#~ msgstr "Veldu gildan valmöguleika; „%(data)s“ er ekki í %(choices)s."
+#~ msgid "Enter a whole number between -32,768 and 32,767."
+#~ msgstr "Sláðu inn heila tölu á bilinu -32.768 til 32.767."
+#~ msgid "Enter a positive number."
+#~ msgstr "Sláðu inn jákvæða tölu."
+#~ msgid "Enter a whole number between 0 and 32,767."
+#~ msgstr "Sláðu inn heila tölu á bilinu 0 til 32.767."
 #~ msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 #~ msgstr "<a href=\"/password_reset/\">Gleymdir þú lykilorðinu</a> þínu?"
 #~ msgid "Use '[algo]$[salt]$[hexdigest]'"
 #~ msgstr "Notaðu '[algo]$[salt]$[hexdigest]'"
-#~ msgid "Comment"
-#~ msgstr "Athugasemd"
 #~ msgid "Comments"
 #~ msgstr "Athugasemdir"
 #~ msgid ""
