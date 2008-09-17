@@ -4,6 +4,9 @@
 The Django admin site
 =====================
 
+.. module:: django.contrib.admin
+   :synopsis: Django's admin site.
+
 One of the most powerful parts of Django is the automatic admin interface. It
 reads metadata in your model to provide a powerful and production-ready
 interface that content producers can immediately use to start adding content to
