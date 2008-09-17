@@ -1300,9 +1300,10 @@ u''
 >>> fix_os_paths(path)
 '.../django/forms/'
 >>> f = forms.FilePathField(path=path)
+>>> f.choices = [p for p in f.choices if p[0].endswith('.py')]
 >>> f.choices.sort()
 >>> fix_os_paths(f.choices)
-[('.../django/forms/__init__.py', '__init__.py'), ('.../django/forms/__init__.pyc', '__init__.pyc'), ('.../django/forms/fields.py', 'fields.py'), ('.../django/forms/fields.pyc', 'fields.pyc'), ('.../django/forms/forms.py', 'forms.py'), ('.../django/forms/forms.pyc', 'forms.pyc'), ('.../django/forms/models.py', 'models.py'), ('.../django/forms/models.pyc', 'models.pyc'), ('.../django/forms/util.py', 'util.py'), ('.../django/forms/util.pyc', 'util.pyc'), ('.../django/forms/widgets.py', 'widgets.py'), ('.../django/forms/widgets.pyc', 'widgets.pyc')]
+[('.../django/forms/__init__.py', '__init__.py'), ('.../django/forms/fields.py', 'fields.py'), ('.../django/forms/forms.py', 'forms.py'), ('.../django/forms/models.py', 'models.py'), ('.../django/forms/util.py', 'util.py'), ('.../django/forms/widgets.py', 'widgets.py')]
 >>> f.clean('fields.py')
 Traceback (most recent call last):
 ...
