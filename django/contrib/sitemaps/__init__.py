@@ -33,7 +33,7 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     params = urllib.urlencode({'sitemap':url})
     urllib.urlopen("%s?%s" % (ping_url, params))
 
-class Sitemap:
+class Sitemap(object):
     # This limit is defined by Google. See the index documentation at
     # http://sitemaps.org/protocol.php#index.
     limit = 50000
