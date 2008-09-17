@@ -558,7 +558,7 @@ class ModelAdmin(BaseModelAdmin):
         if obj is None:
             raise Http404('%s object with primary key %r does not exist.' % (force_unicode(opts.verbose_name), escape(object_id)))
 
-        if request.POST and request.POST.has_key("_saveasnew"):
+        if request.method == 'POST' and request.POST.has_key("_saveasnew"):
             return self.add_view(request, form_url='../../add/')
 
         ModelForm = self.get_form(request, obj)
