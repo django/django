@@ -11,8 +11,10 @@ class SessionMiddleware(object):
         request.session = engine.SessionStore(session_key)
 
     def process_response(self, request, response):
-        # If request.session was modified, or if response.session was set, save
-        # those changes and set a session cookie.
+        """
+        If request.session was modified, or if the configuration is to save the
+        session every time, save the changes and set a session cookie.
+        """
         try:
             accessed = request.session.accessed
             modified = request.session.modified
