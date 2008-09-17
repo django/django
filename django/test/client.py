@@ -134,8 +134,8 @@ def encode_file(boundary, key, file):
         '',
         file.read()
     ]
-    
-class Client:
+
+class Client(object):
     """
     A class that can act as a client for testing purposes.
 
