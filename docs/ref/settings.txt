@@ -804,8 +804,8 @@ the ``hasNoProfanities`` validator is called.
 We don't list the default values here, because that would be profane. To see
 the default values, see the file `django/conf/global_settings.py`_.
 
-.. setting:: ROOT_URLCONF
 .. _django/conf/global_settings.py: http://code.djangoproject.com/browser/django/trunk/django/conf/global_settings.py
+.. setting:: ROOT_URLCONF
 
 ROOT_URLCONF
 ------------
