@@ -126,7 +126,7 @@ msgstr "韩语"
 
 #: conf/global_settings.py:71
 msgid "Khmer"
-msgstr "高棉"
+msgstr "高棉语"
 
 #: conf/global_settings.py:72
 msgid "Kannada"
@@ -210,7 +210,7 @@ msgstr "简体中文"
 
 #: conf/global_settings.py:92
 msgid "Traditional Chinese"
-msgstr "正体中文"
+msgstr "繁体中文"
 
 #: contrib/admin/filterspecs.py:44
 #, python-format
@@ -385,7 +385,7 @@ msgstr "变更历史： %s"
 #: contrib/admin/views/decorators.py:16
 #: contrib/auth/forms.py:80
 msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
-msgstr "请输入正确的用户名和口令。请注意两者都是大小写敏感的。"
+msgstr "请输入正确的用户名和密码。请注意两者都是大小写敏感的。"
 
 #: contrib/admin/sites.py:242
 #: contrib/admin/views/decorators.py:68
@@ -395,7 +395,7 @@ msgstr "请重新登录，因为你的会话已经过期。不用担心：你的
 #: contrib/admin/sites.py:249
 #: contrib/admin/views/decorators.py:75
 msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
-msgstr "似乎你的浏览器没有配置为接受 cookie 。请允许 cookie，重新装入本页面，再试一次。"
+msgstr "似乎你的浏览器没有配置为接受 cookie 。请允许 cookie，再刷新本页面，重试一次。"
 
 #: contrib/admin/sites.py:265
 #: contrib/admin/sites.py:271
@@ -502,7 +502,7 @@ msgstr "服务器错误 <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
 msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
-msgstr "发生了一个错误。它已经通过电子邮件报告给站点管理员了，而且应该很快会得到解决。感谢您的耐心。"
+msgstr "发生了一个错误。系统已将错误通过电子邮件报告给了站点管理员，相信问题应该会很快得到解决。感谢您的耐心。"
 
 #: contrib/admin/templates/admin/app_index.html:10
 #: contrib/admin/templates/admin/index.html:19
@@ -527,7 +527,7 @@ msgstr "文档"
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Change password"
-msgstr "修改口令"
+msgstr "修改密码"
 
 #: contrib/admin/templates/admin/base.html:25
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -634,7 +634,7 @@ msgstr "用户名："
 
 #: contrib/admin/templates/admin/login.html:22
 msgid "Password:"
-msgstr "口令："
+msgstr "密码："
 
 #: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
@@ -695,7 +695,7 @@ msgstr "保存并继续编辑"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid "First, enter a username and password. Then, you'll be able to edit more user options."
-msgstr "首先，输入一个用户名和口令。然后，你就可以编辑更多的用户选项。"
+msgstr "首先，输入一个用户名和密码。然后，你就可以编辑更多的用户选项。"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:13
 #: contrib/auth/forms.py:14
@@ -710,23 +710,23 @@ msgstr "用户名"
 #: contrib/auth/forms.py:60
 #: contrib/auth/forms.py:184
 msgid "Password"
-msgstr "口令"
+msgstr "密码"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:26
 #: contrib/admin/templates/admin/auth/user/change_password.html:39
 #: contrib/auth/forms.py:185
 msgid "Password (again)"
-msgstr "口令(重复)"
+msgstr "密码(重复)"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:27
 #: contrib/admin/templates/admin/auth/user/change_password.html:40
 msgid "Enter the same password as above, for verification."
-msgstr "为了校验，输入与上面相同的口令。"
+msgstr "为了校验，输入与上面相同的密码。"
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:26
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "为用户<strong>%(username)s</strong>输入一个新的口令。"
+msgstr "为用户 <strong>%(username)s</strong> 输入一个新的密码。"
 
 #: contrib/admin/templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
@@ -745,39 +745,39 @@ msgstr "重新登录"
 #: contrib/admin/templates/registration/password_change_form.html:6
 #: contrib/admin/templates/registration/password_change_form.html:10
 msgid "Password change"
-msgstr "口令修改"
+msgstr "密码修改"
 
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
 msgid "Password change successful"
-msgstr "口令修改成功"
+msgstr "密码修改成功"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
-msgstr "你的口令已修改。"
+msgstr "你的密码已修改。"
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
-msgstr "请输入你的旧口令，为了安全起见，接着要输入两遍新口令，以便我们校验你输入的是否正确。"
+msgstr "请输入你的旧密码，为了安全起见，接着要输入两遍新密码，以便我们校验你输入的是否正确。"
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
-msgstr "旧口令："
+msgstr "旧密码："
 
 #: contrib/admin/templates/registration/password_change_form.html:19
 #: contrib/admin/templates/registration/password_reset_confirm.html:18
 msgid "New password:"
-msgstr "新口令："
+msgstr "新密码："
 
 #: contrib/admin/templates/registration/password_change_form.html:21
 #: contrib/admin/templates/registration/password_reset_confirm.html:20
 msgid "Confirm password:"
-msgstr "确认口令："
+msgstr "确认密码："
 
 #: contrib/admin/templates/registration/password_change_form.html:23
 #: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "Change my password"
-msgstr "修改我的口令"
+msgstr "修改我的密码"
 
 #: contrib/admin/templates/registration/password_reset_complete.html:4
 #: contrib/admin/templates/registration/password_reset_confirm.html:6
@@ -786,32 +786,32 @@ msgstr "修改我的口令"
 #: contrib/admin/templates/registration/password_reset_form.html:6
 #: contrib/admin/templates/registration/password_reset_form.html:10
 msgid "Password reset"
-msgstr "口令重设"
+msgstr "密码重设"
 
 #: contrib/admin/templates/registration/password_reset_complete.html:6
 #: contrib/admin/templates/registration/password_reset_complete.html:10
 msgid "Password reset complete"
-msgstr "完成口令重设"
+msgstr "完成密码重设"
 
 #: contrib/admin/templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "你的口令尚未设置。现在你可以继续进行登录。"
+msgstr "你的密码尚未设置。现在你可以继续进行登录。"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
-msgstr "口令重设确认"
+msgstr "密码重设确认"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:12
 msgid "Enter new password"
-msgstr "输入新口令"
+msgstr "输入新密码"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:14
 msgid "Please enter your new password twice so we can verify you typed it in correctly."
-msgstr "请输入两遍新口令，以便我们校验你输入的是否正确。"
+msgstr "请输入两遍新密码，以便我们校验你输入的是否正确。"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
-msgstr "口令重设失败"
+msgstr "密码重设失败"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:28
 msgid "The password reset link was invalid, possibly because it has already been used.  Please request a new password reset."
@@ -820,15 +820,15 @@ msgstr "密码重置链接无效，可能是因为它已使用。可以请求一
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "口令重设成功"
+msgstr "密码重设成功"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
 msgid "We've e-mailed you instructions for setting your password to the e-mail address you submitted. You should be receiving it shortly."
-msgstr "我们已经按你所提交的邮箱地址发送了口令设置说明。你应该很快就能收到这封邮件。"
+msgstr "我们已经按你所提交的电子邮箱地址发送了密码设置说明。你应该很快就能收到这封邮件。"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "之所以收到这封邮件，是因为你请求了口令重设"
+msgstr "之所以收到这封邮件，是因为你请求了密码重设"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -837,7 +837,7 @@ msgstr "在 %(site_name)s 你的用户帐号"
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 msgid "Please go to the following page and choose a new password:"
-msgstr "请访问该页面并选择一个新的密码："
+msgstr "请访问该页面并选择一个新密码："
 
 #: contrib/admin/templates/registration/password_reset_email.html:9
 msgid "Your username, in case you've forgotten:"
@@ -854,7 +854,7 @@ msgstr "%(site_name)s 团队"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
 msgid "Forgotten your password? Enter your e-mail address below, and we'll e-mail instructions for setting a new one."
-msgstr "忘记了你的口令？请在下面输入你的 e-mail 地址，我们将把新口令设置说明通过邮件发送给你。"
+msgstr "忘记了你的密码？请在下面输入你的 e-mail 地址，我们将把新密码设置说明通过邮件发送给你。"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -862,7 +862,7 @@ msgstr "E-mail 地址："
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "Reset my password"
-msgstr "重设我的口令"
+msgstr "重设我的密码"
 
 #: contrib/admin/templatetags/admin_list.py:284
 msgid "All dates"
@@ -958,13 +958,13 @@ msgstr "整数"
 
 #: contrib/admindocs/views.py:318
 msgid "Boolean (Either True or False)"
-msgstr "布尔(True或False)"
+msgstr "布尔值（真或假）"
 
 #: contrib/admindocs/views.py:319
 #: contrib/admindocs/views.py:338
 #, python-format
 msgid "String (up to %(max_length)s)"
-msgstr "字符串(最长 %(max_length)s)"
+msgstr "字符串（最长 %(max_length)s 位）"
 
 #: contrib/admindocs/views.py:320
 msgid "Comma-separated integers"
@@ -972,11 +972,11 @@ msgstr "逗号分隔的整数"
 
 #: contrib/admindocs/views.py:321
 msgid "Date (without time)"
-msgstr "日期(无时间)"
+msgstr "日期（无时间）"
 
 #: contrib/admindocs/views.py:322
 msgid "Date (with time)"
-msgstr "日期(带时间)"
+msgstr "日期（带时间）"
 
 #: contrib/admindocs/views.py:323
 msgid "Decimal number"
@@ -1003,7 +1003,7 @@ msgstr "IP 地址"
 
 #: contrib/admindocs/views.py:333
 msgid "Boolean (Either True, False or None)"
-msgstr "布尔值(True, False或None)"
+msgstr "布尔值（真、假或无)"
 
 #: contrib/admindocs/views.py:334
 msgid "Relation to parent model"
@@ -1072,7 +1072,7 @@ msgstr "关于本页面的文档"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:19
 msgid "Jumps you from any page to the documentation for the view that generates that page."
-msgstr "从任何页面跳转到生成该页面的view文档。"
+msgstr "从任何页面跳转到生成该页面的 view 文档。"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
@@ -1080,7 +1080,7 @@ msgstr "显示对象 ID"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:22
 msgid "Shows the content-type and unique ID for pages that represent a single object."
-msgstr "为那些展现单个对象的页面，显示 content-type 和唯一ID。"
+msgstr "为那些展现单个对象的页面，显示 content-type 和唯一 ID。"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
@@ -1120,18 +1120,18 @@ msgstr "新增用户"
 
 #: contrib/auth/admin.py:88
 msgid "Password changed successfully."
-msgstr "口令修改成功。"
+msgstr "密码修改成功。"
 
 #: contrib/auth/admin.py:94
 #, python-format
 msgid "Change password: %s"
-msgstr "修改口令：%s"
+msgstr "修改密码：%s"
 
 #: contrib/auth/forms.py:15
 #: contrib/auth/forms.py:48
 #: contrib/auth/models.py:136
 msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
-msgstr "必填。不多于30个字符。只能用字母数字（字母、数字和下横线）"
+msgstr "必填。不多于30个字符。只能用字母、数字和下划线。"
 
 #: contrib/auth/forms.py:16
 #: contrib/auth/forms.py:49
@@ -1140,7 +1140,7 @@ msgstr "该值只能包含字母、数字和下划线。"
 
 #: contrib/auth/forms.py:18
 msgid "Password confirmation"
-msgstr "口令确认"
+msgstr "密码确认"
 
 #: contrib/auth/forms.py:30
 msgid "A user with that username already exists."
@@ -1150,7 +1150,7 @@ msgstr "已存在一位使用该名字的用户。"
 #: contrib/auth/forms.py:154
 #: contrib/auth/forms.py:196
 msgid "The two password fields didn't match."
-msgstr "两个口令字段不一致。"
+msgstr "两个密码字段不一致。"
 
 #: contrib/auth/forms.py:82
 msgid "This account is inactive."
@@ -1158,7 +1158,7 @@ msgstr "该帐号未激活。"
 
 #: contrib/auth/forms.py:87
 msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
-msgstr "你的浏览器好象不允许使用cookie。登录需要使用cookie。"
+msgstr "你的浏览器好象不允许使用cookie。登录需要使用启用cookie。"
 
 #: contrib/auth/forms.py:100
 msgid "E-mail"
@@ -1171,23 +1171,23 @@ msgstr "该电子邮件地址没有关联任何用户帐号。你确定已经注
 #: contrib/auth/forms.py:134
 #, python-format
 msgid "Password reset on %s"
-msgstr "口令重设于 %s"
+msgstr "密码重设于 %s"
 
 #: contrib/auth/forms.py:142
 msgid "New password"
-msgstr "新口令"
+msgstr "新密码"
 
 #: contrib/auth/forms.py:143
 msgid "New password confirmation"
-msgstr "新口令确认"
+msgstr "新密码确认"
 
 #: contrib/auth/forms.py:168
 msgid "Old password"
-msgstr "旧口令"
+msgstr "旧密码"
 
 #: contrib/auth/forms.py:176
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "你的旧口令不正确。请重新输入。"
+msgstr "你的旧密码不正确。请重新输入。"
 
 #: contrib/auth/models.py:72
 #: contrib/auth/models.py:95
@@ -1234,7 +1234,7 @@ msgstr "e-mail 地址"
 
 #: contrib/auth/models.py:140
 msgid "password"
-msgstr "口令"
+msgstr "密码"
 
 #: contrib/auth/models.py:140
 msgid "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
@@ -1353,7 +1353,7 @@ msgstr "评论"
 
 #: contrib/comments/models.py:56
 msgid "date/time submitted"
-msgstr "日期/时间已提交"
+msgstr "提交日期/时间"
 
 #: contrib/comments/models.py:58
 msgid "is public"
@@ -1361,7 +1361,7 @@ msgstr "公开"
 
 #: contrib/comments/models.py:59
 msgid "Uncheck this box to make the comment effectively disappear from the site."
-msgstr "反选此框，使该评论从本站点消失。"
+msgstr "取消选中此复选框，可隐藏该条评论。"
 
 #: contrib/comments/models.py:61
 msgid "is removed"
@@ -1369,15 +1369,15 @@ msgstr "已删除"
 
 #: contrib/comments/models.py:62
 msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
-msgstr "若评论内容不妥，则选中这个检查框。该评论将被一条\"此评论已经被删除\"的消息所替换。"
+msgstr "若评论内容不妥，则选中这个复选框。该评论将被一条\"此评论已经被删除\"的消息所替换。"
 
 #: contrib/comments/models.py:114
 msgid "This comment was posted by an authenticated user and thus the name is read-only."
-msgstr "此评论由一位验证用户张贴，而该名称是只读的。"
+msgstr "此评论由一位验证用户发表，因此该用户名是只读的。"
 
 #: contrib/comments/models.py:123
 msgid "This comment was posted by an authenticated user and thus the email is read-only."
-msgstr "此评论由一位验证用户张贴，而该 email 是只读的。"
+msgstr "此评论由一位验证用户发表，因此该 email 是只读的。"
 
 #: contrib/comments/models.py:148
 #, python-format
@@ -1408,11 +1408,11 @@ msgstr "内容类型"
 
 #: contrib/flatpages/admin.py:9
 msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "例如：'/about/contact/'。请确保前导和结尾的斜杠。"
+msgstr "例如：'/about/contact/'。请确保开始和结尾的斜杠。"
 
 #: contrib/flatpages/admin.py:11
 msgid "This value must contain only letters, numbers, underscores, dashes or slashes."
-msgstr "该值只能包含字母、数字、下划线、反斜线和斜线。"
+msgstr "该值只能包含字母、数字、下划线、斜线或反斜线。"
 
 #: contrib/flatpages/admin.py:22
 msgid "Advanced options"
@@ -1456,7 +1456,7 @@ msgstr "简单页面"
 
 #: contrib/formtools/wizard.py:130
 msgid "We apologize, but your form has expired. Please continue filling out the form from this page."
-msgstr "很抱歉，但是你的表单已过期。请继续填写本页中的表单其余部分。"
+msgstr "很抱歉，但是你的表单已过期。请继续填写本页中表单的其余部分。"
 
 #: contrib/gis/forms/fields.py:14
 msgid "No geometry value provided."
@@ -1668,39 +1668,39 @@ msgstr "阿尔高州"
 
 #: contrib/localflavor/ch/ch_states.py:6
 msgid "Appenzell Innerrhoden"
-msgstr "Appenzell Innerrhoden"
+msgstr "内阿彭策尔半州"
 
 #: contrib/localflavor/ch/ch_states.py:7
 msgid "Appenzell Ausserrhoden"
-msgstr "Appenzell Ausserrhoden"
+msgstr "外阿彭策尔半州"
 
 #: contrib/localflavor/ch/ch_states.py:8
 msgid "Basel-Stadt"
-msgstr "Basel-Stadt"
+msgstr "巴塞尔城半州"
 
 #: contrib/localflavor/ch/ch_states.py:9
 msgid "Basel-Land"
-msgstr "Basel-Land"
+msgstr "巴塞尔乡半州"
 
 #: contrib/localflavor/ch/ch_states.py:10
 msgid "Berne"
-msgstr "伯尔尼"
+msgstr "伯尔尼州"
 
 #: contrib/localflavor/ch/ch_states.py:11
 msgid "Fribourg"
-msgstr "弗里堡"
+msgstr "弗里堡州"
 
 #: contrib/localflavor/ch/ch_states.py:12
 msgid "Geneva"
-msgstr "日内瓦"
+msgstr "日内瓦州"
 
 #: contrib/localflavor/ch/ch_states.py:13
 msgid "Glarus"
-msgstr "格拉鲁斯"
+msgstr "格拉鲁斯州"
 
 #: contrib/localflavor/ch/ch_states.py:14
 msgid "Graubuenden"
-msgstr "Graubuenden"
+msgstr "格劳宾登州"
 
 #: contrib/localflavor/ch/ch_states.py:15
 msgid "Jura"
@@ -1708,23 +1708,23 @@ msgstr "汝拉州"
 
 #: contrib/localflavor/ch/ch_states.py:16
 msgid "Lucerne"
-msgstr "琉森"
+msgstr "琉森州"
 
 #: contrib/localflavor/ch/ch_states.py:17
 msgid "Neuchatel"
-msgstr "纳沙特尔"
+msgstr "纳沙特尔州"
 
 #: contrib/localflavor/ch/ch_states.py:18
 msgid "Nidwalden"
-msgstr "下瓦尔登"
+msgstr "下瓦尔登州"
 
 #: contrib/localflavor/ch/ch_states.py:19
 msgid "Obwalden"
-msgstr "上瓦尔登"
+msgstr "上瓦尔登州"
 
 #: contrib/localflavor/ch/ch_states.py:20
 msgid "Schaffhausen"
-msgstr "沙夫豪森"
+msgstr "沙夫豪森州"
 
 #: contrib/localflavor/ch/ch_states.py:21
 msgid "Schwyz"
@@ -1732,15 +1732,15 @@ msgstr "施维茨州"
 
 #: contrib/localflavor/ch/ch_states.py:22
 msgid "Solothurn"
-msgstr "索洛"
+msgstr "索洛图恩州"
 
 #: contrib/localflavor/ch/ch_states.py:23
 msgid "St. Gallen"
-msgstr "圣加仑"
+msgstr "圣加仑州"
 
 #: contrib/localflavor/ch/ch_states.py:24
 msgid "Thurgau"
-msgstr "高州"
+msgstr "图尔高州"
 
 #: contrib/localflavor/ch/ch_states.py:25
 msgid "Ticino"
@@ -1748,7 +1748,7 @@ msgstr "提契诺州"
 
 #: contrib/localflavor/ch/ch_states.py:26
 msgid "Uri"
-msgstr "Uri"
+msgstr "乌里州"
 
 #: contrib/localflavor/ch/ch_states.py:27
 msgid "Valais"
@@ -1760,11 +1760,11 @@ msgstr "沃州"
 
 #: contrib/localflavor/ch/ch_states.py:29
 msgid "Zug"
-msgstr "楚格"
+msgstr "楚格州"
 
 #: contrib/localflavor/ch/ch_states.py:30
 msgid "Zurich"
-msgstr "苏黎世"
+msgstr "苏黎世州"
 
 #: contrib/localflavor/ch/forms.py:64
 msgid "Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format."
@@ -1922,7 +1922,7 @@ msgstr "昆卡"
 
 #: contrib/localflavor/es/es_provinces.py:21
 msgid "Girona"
-msgstr "Girona"
+msgstr "西罗纳"
 
 #: contrib/localflavor/es/es_provinces.py:22
 msgid "Granada"
