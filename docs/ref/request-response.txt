@@ -433,6 +433,14 @@ this is how you might return a Microsoft Excel spreadsheet::
 There's nothing Django-specific about the ``Content-Disposition`` header, but
 it's easy to forget the syntax, so we've included it here.
 
+Attributes
+----------
+
+.. attribute:: HttpResponse.content
+
+    A normal Python string representing the content, encoded from a Unicode
+    object if necessary.
+
 Methods
 -------
 
@@ -501,12 +509,6 @@ Methods
     Due to the way cookies work, ``path`` and ``domain`` should be the same
     values you used in ``set_cookie()`` -- otherwise the cookie may not be
     deleted.
-
-.. method:: HttpResponse.content()
-
-    Returns the content as a Python string, encoding it from a Unicode object
-    if necessary. Note this is a property, not a method, so use ``r.content``
-    instead of ``r.content()``.
 
 .. method:: HttpResponse.write(content)
 
