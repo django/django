@@ -125,7 +125,7 @@ htmlhelp_basename = 'Djangodoc'
 # (source start file, target name, title, author, document class [howto/manual]).
 #latex_documents = []
 latex_documents = [
-  ('index', 'django.tex', 'Django Documentation', 'Django Software Foundation', 'manual'),
+  ('contents', 'django.tex', 'Django Documentation', 'Django Software Foundation', 'manual'),
 ]
 
 # Additional stuff for the LaTeX preamble.
