@@ -88,4 +88,18 @@ doesn't come back.
 True
 >>> f.cleaned_data
 {'data': u'xyzzy'}
+
+A form with *only* hidden fields that has errors is going to be very unusual.
+But we can try to make sure it doesn't generate invalid XHTML. In this case,
+the as_p() method is the tricky one, since error lists cannot be nested
+(validly) inside p elements.
+
+>>> class HiddenForm(Form):
+...     data = IntegerField(widget=HiddenInput)
+>>> f = HiddenForm({})
+>>> f.as_p()
+u'<ul class="errorlist"><li>(Hidden field data) This field is required.</li></ul>\n<p> <input type="hidden" name="data" id="id_data" /></p>'
+>>> f.as_table()
+u'<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field data) This field is required.</li></ul><input type="hidden" name="data" id="id_data" /></td></tr>'
+
 """
