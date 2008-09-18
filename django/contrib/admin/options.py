@@ -680,7 +680,7 @@ class ModelAdmin(BaseModelAdmin):
         if request.POST: # The user has already confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied
-            obj_display = str(obj)
+            obj_display = force_unicode(obj)
             obj.delete()
             
             self.log_deletion(request, obj, obj_display)
