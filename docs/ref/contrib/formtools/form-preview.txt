@@ -27,9 +27,9 @@ application takes care of the following workflow:
       a. If it's valid, displays a preview page.
       b. If it's not valid, redisplays the form with error messages.
    3. When the "confirmation" form is submitted from the preview page, calls
-       a hook that you define -- a
-       :meth:`~django.contrib.formtools.FormPreview.done()` method that gets
-       passed the valid data.
+      a hook that you define -- a
+      :meth:`~django.contrib.formtools.FormPreview.done()` method that gets
+      passed the valid data.
 
 The framework enforces the required preview by passing a shared-secret hash to
 the preview page via hidden form fields. If somebody tweaks the form parameters
