@@ -1,5 +1,6 @@
 .. _internals-committers:
 
+=================
 Django committers
 =================
 
