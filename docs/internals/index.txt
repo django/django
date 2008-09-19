@@ -21,3 +21,4 @@ the hood".
    contributing
    documentation
    committers
+   release-process

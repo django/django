@@ -184,6 +184,8 @@ Patch style
       An exception is for code changes that are described more clearly in plain
       English than in code. Indentation is the most common example; it's hard to
       read patches when the only difference in code is that it's indented.
+      
+      Patches in ``git diff`` format are also acceptable.
 
     * When creating patches, always run ``svn diff`` from the top-level
       ``trunk`` directory -- i.e., the one that contains ``django``, ``docs``,
@@ -400,10 +402,10 @@ translated, here's what to do:
 
     * Join the `Django i18n mailing list`_ and introduce yourself.
 
-    * Create translations using the methods described in the :ref:`i18n
-      documentation <topics-i18n>`. For this you will use the ``django-admin.py
-      makemessages`` tool. In this particular case it should be run from the
-      top-level ``django`` directory of the Django source tree.
+    * Create translations using the methods described in the 
+      :ref:`i18n documentation <topics-i18n>`. For this you will use the
+      ``django-admin.py makemessages`` tool. In this particular case it should
+      be run from the top-level ``django`` directory of the Django source tree.
 
       The script runs over the entire Django source tree and pulls out all
       strings marked for translation. It creates (or updates) a message file in
@@ -597,11 +599,11 @@ Our policy is:
     version. Assume documentation readers are using the latest release, not the
     development version.**
 
-Our prefered way for marking new features is by prefacing the features'
+Our preferred way for marking new features is by prefacing the features'
 documentation with: ".. versionadded:: X.Y", followed by an optional one line
 comment and a mandatory blank line.
 
-General improvements, or other changes to the APIs that should be emphasised
+General improvements, or other changes to the APIs that should be emphasized
 should use the ".. versionchanged:: X.Y" directive (with the same format as the
 ``versionadded`` mentioned above.
 
@@ -690,6 +692,11 @@ repository:
       first commit the change to library Y, then commit feature X in a separate
       commit. This goes a *long way* in helping all core Django developers
       follow your changes.
+      
+    * Separate bug fixes from feature changes. 
+    
+      Bug fixes need to be added to the current bugfix branch (e.g. the
+      ``1.0.X`` branch) as well as the current trunk.
 
     * If your commit closes a ticket in the Django `ticket tracker`_, begin
       your commit message with the text "Fixed #abc", where "abc" is the number
@@ -809,7 +816,6 @@ method as above::
 
     ./runtests.py --settings=settings markup
 
-
 Requesting features
 ===================
 
@@ -837,23 +843,80 @@ our repository; see below.
 Branch policy
 =============
 
-In general, most development is confined to the trunk, and the trunk
-is kept stable. People should be able to run production sites against the
-trunk at any time.
+In general, the trunk must be kept stable. People should be able to run
+production sites against the trunk at any time. Additionally, commits to trunk
+ought to be as atomic as possible -- smaller changes are better. Thus, large
+feature changes -- that is, changes too large to be encapsulated in a single
+patch, or changes that need multiple eyes on them -- must happen on dedicated
+branches.
 
-Thus, large architectural changes -- that is, changes too large to be
-encapsulated in a single patch, or changes that need multiple eyes on them --
-will have dedicated branches. See, for example, the `i18n branch`_. If you
-have a change of this nature that you'd like to work on, ask on
-`django-developers`_ for a branch to be created for you. We'll create a branch
-for pretty much any kind of experimenting you'd like to do.
+This means that if you want to work on a large feature -- anything that would
+take more than a single patch, or requires large-scale refactoring -- you need
+to do it on a feature branch. Our development process recognizes two options
+for feature branches:
 
-We will only branch entire copies of the Django tree, even if work is only
-happening on part of that tree. This makes it painless to switch to a branch.
+    1. Feature branches using a distributed revision control system like
+       Git_, Mercurial_, Bazaar_, etc.
+       
+       If you're familiar with one of these tools, this is probably your best 
+       option since it doesn't require any support or buy-in from the Django
+       core developers.
+       
+       However, do keep in mind that Django will continue to use Subversion for
+       the foreseeable future, and this will naturally limit the recognition of
+       your branch. Further, if your branch becomes eligible for merging to
+       trunk you'll need to find a core developer familiar with your DVCS of
+       choice who'll actually perform the merge.
+       
+       If you do decided to start a distributed branch of Django and choose to make it
+       public, please add the branch to the `Django branches`_ wiki page.
+       
+    2. Feature branches using SVN have a higher bar. If you want a branch in SVN
+       itself, you'll need a "mentor" among the :ref:`core committers
+       <internals-committers>`. This person is responsible for actually creating
+       the branch, monitoring your process (see below), and ultimately merging
+       the branch into trunk.
+       
+       If you want a feature branch in SVN, you'll need to ask in
+       `django-developers`_ for a mentor. 
 
-Developers working on a branch should periodically merge changes from the trunk
-into the branch. Please merge at least once a week. Every time you merge from
-the trunk, note the merge and revision numbers in the commit message.
+.. _git: http://git.or.cz/
+.. _mercurial: http://www.selenic.com/mercurial/
+.. _bazaar: http://bazaar-vcs.org/
+.. _django branches: http://code.djangoproject.com/wiki/DjangoBranches
+
+Branch rules
+------------
+
+We've got a few rules for branches born out of experience with what makes a
+successful Django branch. 
+
+DVCS branches are obviously not under central control, so we have no way of
+enforcing these rules. However, if you're using a DVCS, following these rules
+will give you the best chance of having a successful branch (read: merged back to
+trunk).
+
+Developers with branches in SVN, however, **must** follow these rules. The
+branch mentor will keep on eye on the branch and **will delete it** if these
+rules are broken.
+
+    * Only branch entire copies of the Django tree, even if work is only
+      happening on part of that tree. This makes it painless to switch to a
+      branch.
+      
+    * Merge changes from trunk no less than once a week, and preferably every
+      couple-three days.
+      
+      In our experience, doing regular trunk merges is often the difference
+      between a successful branch and one that fizzles and dies.
+      
+      If you're working on an SVN branch, you should be using `svnmerge.py`_
+      to track merges from trunk.
+      
+    * Keep tests passing and documentation up-to-date. As with patches,
+      we'll only merge a branch that comes with tests and documentation.
+      
+.. _svnmerge.py: http://www.orcaware.com/svn/wiki/Svnmerge.py
 
 Once the branch is stable and ready to be merged into the trunk, alert
 `django-developers`_.
@@ -952,47 +1015,6 @@ file. Then copy the branch's version of the ``django`` directory into
 ``site-packages``.
 
 .. _path file: http://docs.python.org/lib/module-site.html
-
-.. _official-releases:
-
-Official releases
-=================
-
-Django's release numbering works as follows:
-
-    * Versions are numbered in the form ``A.B`` or ``A.B.C``.
-
-    * ``A`` is the major version number, which is only incremented for major
-      changes to Django, and these changes are not necessarily
-      backwards-compatible. That is, code you wrote for Django 6.0 may break
-      when we release Django 7.0.
-
-    * ``B`` is the minor version number, which is incremented for large yet
-      backwards compatible changes.  Code written for Django 6.4 will continue
-      to work under Django 6.5.
-
-      A minor release may deprecate certain features in previous releases. If a
-      feature in version ``A.B`` is deprecated, it will continue to work in
-      version ``A.B+1``. In version ``A.B+2``, use of the feature will raise a
-      ``PendingDeprecationWarning`` but will continue to work.  Version
-      ``A.B+3`` will remove the feature entirely. Major point releases will
-      always remove deprecated features immediately.
-
-    * ``C`` is the micro version number which, is incremented for bug and
-      security fixes.  A new micro-release will always be 100%
-      backwards-compatible with the previous micro-release.
-
-    * In some cases, we'll make release candidate releases. These are of the
-      form ``A.BrcN``, which means the ``Nth`` candidate release of version
-      ``A.B``.
-
-An exception to this version numbering scheme is the pre-1.0 Django code.
-There's no guarantee of backwards-compatibility until the 1.0 release.
-
-In Subversion, each Django release will be tagged under `tags/releases`_.  If
-it's necessary to release a bug fix release or a security release that doesn't
-come from the trunk, we'll copy that tag to ``branches/releases`` to make the
-bug fix release.
 
 Deciding on features
 ====================
