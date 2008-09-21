@@ -141,7 +141,7 @@ into those elements.
 
     * To specify the contents of ``<title>`` and ``<description>``, create
       :ref:`Django templates <topics-templates>` called
-      :file:`feeds/latest_title.html`` and
+      :file:`feeds/latest_title.html` and
       :file:`feeds/latest_description.html`, where :attr:`latest` is the
       :attr:`slug` specified in the URLconf for the given feed. Note the
       ``.html`` extension is required. The RSS system renders that template for
