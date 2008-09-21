@@ -116,11 +116,7 @@ def result_headers(cl):
             # So this _is_ a sortable non-field.  Go to the yield
             # after the else clause.
         else:
-            if isinstance(f.rel, models.ManyToOneRel) and f.null:
-                yield {"text": f.verbose_name}
-                continue
-            else:
-                header = f.verbose_name
+            header = f.verbose_name
 
         th_classes = []
         new_order_type = 'asc'

@@ -162,8 +162,7 @@ class ChangeList(object):
                     except AttributeError:
                         pass
                 else:
-                    if not isinstance(f.rel, models.ManyToOneRel) or not f.null:
-                        order_field = f.name
+                    order_field = f.name
             except (IndexError, ValueError):
                 pass # Invalid ordering specified. Just use the default.
         if ORDER_TYPE_VAR in params and params[ORDER_TYPE_VAR] in ('asc', 'desc'):
