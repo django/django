@@ -808,6 +808,7 @@ class Query(object):
         self.where.relabel_aliases(change_map)
         for pos, col in enumerate(self.select):
             if isinstance(col, (list, tuple)):
+                old_alias = col[0]
                 self.select[pos] = (change_map.get(old_alias, old_alias), col[1])
             else:
                 col.relabel_aliases(change_map)

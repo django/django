@@ -966,6 +966,11 @@ about them and shouldn't do bad things.
 >>> expected == result
 True
 
+Make sure bump_prefix() (an internal Query method) doesn't (re-)break.
+>>> query = Tag.objects.values_list('id').order_by().query
+>>> query.bump_prefix()
+>>> print query.as_sql()[0]
+SELECT U0."id" FROM "queries_tag" U0
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
