@@ -192,7 +192,8 @@ DATABASE_NAME
 Default: ``''`` (Empty string)
 
 The name of the database to use. For SQLite, it's the full path to the database
-file.
+file. When specifying the path, always use forward slashes, even on Windows  
+(e.g. ``C:/homes/user/mysite/sqlite3.db``).
 
 .. setting:: DATABASE_OPTIONS
 
