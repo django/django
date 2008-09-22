@@ -887,6 +887,17 @@ that control how the relationship functions.
     add the descriptor for the reverse relationship, allowing
     :class:`ManyToManyField` relationships to be non-symmetrical.
     
+.. attribute:: ManyToManyFields.through
+
+    Django will automatically generate a table to manage many-to-many 
+    relationships. However, if you want to manually specify the intermediary
+    table, you can use the :attr:`~ManyToManyField.through` option to specify
+    the Django model that represents the intermediate table that you want to
+    use.
+    
+    The most common use for this option is when you want to associate
+    :ref:`extra data with a many-to-many relationship <intermediary-manytomany>`.
+
 .. attribute:: ManyToManyField.db_table
 
     The name of the table to create for storing the many-to-many data. If this

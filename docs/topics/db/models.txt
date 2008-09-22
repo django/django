@@ -357,6 +357,8 @@ arguments which are explained in :ref:`the model field reference
 <manytomany-arguments>`. These options help define how the relationship should
 work; all are optional.
 
+.. _intermediary-manytomany:
+
 Extra fields on many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
