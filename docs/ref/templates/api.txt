@@ -291,7 +291,7 @@ normal ``django.template.Context``. The first difference is that it takes an
 
     c = RequestContext(request, {
         'foo': 'bar',
-    }
+    })
 
 The second difference is that it automatically populates the context with a few
 variables, according to your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting`.
