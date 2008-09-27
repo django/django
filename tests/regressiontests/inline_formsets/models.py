@@ -51,5 +51,7 @@ Traceback (most recent call last):
 Exception: <class 'regressiontests.inline_formsets.models.Child'> has no field named 'test'
 
 
+# Regression test for #9171.
+>>> ifs = inlineformset_factory(Parent, Child, exclude=('school',), fk_name='mother')
 """
 }

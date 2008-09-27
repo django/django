@@ -266,7 +266,7 @@ class ModelAdmin(BaseModelAdmin):
         if self.exclude is None:
             exclude = []
         else:
-            exclude = self.exclude
+            exclude = list(self.exclude)
         defaults = {
             "form": self.form,
             "fields": fields,
@@ -780,7 +780,7 @@ class InlineModelAdmin(BaseModelAdmin):
         if self.exclude is None:
             exclude = []
         else:
-            exclude = self.exclude
+            exclude = list(self.exclude)
         defaults = {
             "form": self.form,
             "formset": self.formset,

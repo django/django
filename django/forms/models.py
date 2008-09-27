@@ -528,6 +528,7 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
     if fk.unique:
         max_num = 1
     if exclude is not None:
+        exclude = list(exclude)
         exclude.append(fk.name)
     else:
         exclude = [fk.name]

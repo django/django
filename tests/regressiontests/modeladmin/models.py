@@ -123,6 +123,14 @@ displayed because you forgot to add it to fields/fielsets
 >>> ma = BandAdmin(Band, site) 
 >>> ma.get_form(request).base_fields.keys() 
 ['name', 'sign_date']
+
+# You can also pass a tuple to `exclude`.
+ 
+>>> class BandAdmin(ModelAdmin): 
+...     exclude = ('bio',) 
+>>> ma = BandAdmin(Band, site) 
+>>> ma.get_form(request).base_fields.keys() 
+['name', 'sign_date']
  
 # Using `fields` and `exclude`.
 
