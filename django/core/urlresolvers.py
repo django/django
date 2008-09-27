@@ -11,6 +11,7 @@ import re
 
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import iri_to_uri, force_unicode, smart_str
 from django.utils.functional import memoize
 from django.utils.regex_helper import normalize
@@ -144,7 +145,7 @@ class RegexURLResolver(object):
         self.urlconf_name = urlconf_name
         self.callback = None
         self.default_kwargs = default_kwargs or {}
-        self._reverse_dict = {}
+        self._reverse_dict = MultiValueDict()
 
     def __repr__(self):
         return '<%s %s %s>' % (self.__class__.__name__, self.urlconf_name, self.regex.pattern)
@@ -162,11 +163,11 @@ class RegexURLResolver(object):
                         for piece, p_args in parent:
                             new_matches.extend([(piece + suffix, p_args + args)
                                     for (suffix, args) in matches])
-                        self._reverse_dict[name] = new_matches, p_pattern + pat
+                        self._reverse_dict.appendlist(name, (new_matches, p_pattern + pat))
                 else:
                     bits = normalize(p_pattern)
-                    self._reverse_dict[pattern.callback] = bits, p_pattern
-                    self._reverse_dict[pattern.name] = bits, p_pattern
+                    self._reverse_dict.appendlist(pattern.callback, (bits, p_pattern))
+                    self._reverse_dict.appendlist(pattern.name, (bits, p_pattern))
         return self._reverse_dict
     reverse_dict = property(_get_reverse_dict)
 
@@ -223,20 +224,21 @@ class RegexURLResolver(object):
             lookup_view = get_callable(lookup_view, True)
         except (ImportError, AttributeError), e:
             raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
-        possibilities, pattern = self.reverse_dict.get(lookup_view, [(), ()])
-        for result, params in possibilities:
-            if args:
-                if len(args) != len(params):
-                    continue
-                unicode_args = [force_unicode(val) for val in args]
-                candidate =  result % dict(zip(params, unicode_args))
-            else:
-                if set(kwargs.keys()) != set(params):
-                    continue
-                unicode_kwargs = dict([(k, force_unicode(v)) for (k, v) in kwargs.items()])
-                candidate = result % unicode_kwargs
-            if re.search(u'^%s' % pattern, candidate, re.UNICODE):
-                return candidate
+        possibilities = self.reverse_dict.getlist(lookup_view)
+        for possibility, pattern in possibilities:
+            for result, params in possibility:
+                if args:
+                    if len(args) != len(params):
+                        continue
+                    unicode_args = [force_unicode(val) for val in args]
+                    candidate =  result % dict(zip(params, unicode_args))
+                else:
+                    if set(kwargs.keys()) != set(params):
+                        continue
+                    unicode_kwargs = dict([(k, force_unicode(v)) for (k, v) in kwargs.items()])
+                    candidate = result % unicode_kwargs
+                if re.search(u'^%s' % pattern, candidate, re.UNICODE):
+                    return candidate
         raise NoReverseMatch("Reverse for '%s' with arguments '%s' and keyword "
                 "arguments '%s' not found." % (lookup_view, args, kwargs))
 

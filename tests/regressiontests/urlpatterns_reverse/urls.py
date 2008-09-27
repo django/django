@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from views import empty_view
+from views import empty_view, absolute_kwargs_view
 
 urlpatterns = patterns('',
     url(r'^places/(\d+)/$', empty_view, name='places'),
@@ -45,4 +45,11 @@ urlpatterns = patterns('',
 
     # This is non-reversible, but we shouldn't blow up when parsing it.
     url(r'^(?:foo|bar)(\w+)/$', empty_view, name="disjunction"),
+
+    # Regression views for #9038. See tests for more details
+    url(r'arg_view/$', 'kwargs_view'),
+    url(r'arg_view/(?P<arg1>\d+)/$', 'kwargs_view'),
+    url(r'absolute_arg_view/(?P<arg1>\d+)/$', absolute_kwargs_view),
+    url(r'absolute_arg_view/$', absolute_kwargs_view),
+
 )

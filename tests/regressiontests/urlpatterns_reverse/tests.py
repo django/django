@@ -65,6 +65,17 @@ test_data = (
     ('extra-places', '/e-places/10/', ['10'], {}),
     ('extra-people', '/e-people/fred/', ['fred'], {}),
     ('extra-people', '/e-people/fred/', [], {'name': 'fred'}),
+
+    # Regression for #9038
+    # These views are resolved by method name. Each method is deployed twice -
+    # once with an explicit argument, and once using the default value on
+    # the method. This is potentially ambiguous, as you have to pick the
+    # correct view for the arguments provided.
+    ('kwargs_view', '/arg_view/', [], {}),
+    ('kwargs_view', '/arg_view/10/', [], {'arg1':10}),
+    ('regressiontests.urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/', [], {}),
+    ('regressiontests.urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/10/', [], {'arg1':10}),
+
 )
 
 class URLPatternReverse(TestCase):
