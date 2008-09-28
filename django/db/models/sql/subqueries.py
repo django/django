@@ -394,6 +394,7 @@ class DateQuery(Query):
         self.select = [select]
         self.select_fields = [None]
         self.select_related = False # See #7097.
+        self.extra_select = {}
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
 

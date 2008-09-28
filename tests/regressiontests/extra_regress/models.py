@@ -1,4 +1,5 @@
 import copy
+import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -9,6 +10,7 @@ from django.utils.datastructures import SortedDict
 class RevisionableModel(models.Model):
     base = models.ForeignKey('self', null=True)
     title = models.CharField(blank=True, max_length=255)
+    when = models.DateTimeField(default=datetime.datetime.now)
 
     def __unicode__(self):
         return u"%s (%s, %s)" % (self.title, self.id, self.base.id)
@@ -31,12 +33,13 @@ class Order(models.Model):
 __test__ = {"API_TESTS": """
 # Regression tests for #7314 and #7372
 
->>> rm = RevisionableModel.objects.create(title='First Revision')
+>>> rm = RevisionableModel.objects.create(title='First Revision', when=datetime.datetime(2008, 9, 28, 10, 30, 0))
 >>> rm.pk, rm.base.pk
 (1, 1)
 
 >>> rm2 = rm.new_revision()
 >>> rm2.title = "Second Revision"
+>>> rm.when = datetime.datetime(2008, 9, 28, 14, 25, 0)
 >>> rm2.save()
 >>> print u"%s of %s" % (rm2.title, rm2.base.title)
 Second Revision of First Revision
@@ -107,4 +110,9 @@ True
 >>> User.objects.filter(pk=u.id).extra(select={'extra_field': 1}, order_by=['extra_field']).distinct()
 [<User: fred>]
 
+# When calling the dates() method on a queryset with extra selection columns,
+# we can (and should) ignore those columns. They don't change the result and
+# cause incorrect SQL to be produced otherwise.
+>>> RevisionableModel.objects.extra(select={"the_answer": 'id'}).dates('when', 'month')
+[datetime.datetime(2008, 9, 1, 0, 0)]
 """}
