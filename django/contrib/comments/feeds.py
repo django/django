@@ -31,7 +31,7 @@ class LatestCommentFeed(Feed):
             where = ['user_id NOT IN (SELECT user_id FROM auth_users_group WHERE group_id = %s)']
             params = [settings.COMMENTS_BANNED_USERS_GROUP]
             qs = qs.extra(where=where, params=params)
-        return qs[:40]
+        return qs.order_by('-submit_date')[:40]
         
     def item_pubdate(self, item):
         return item.submit_date
