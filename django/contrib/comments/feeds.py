@@ -28,7 +28,7 @@ class LatestCommentFeed(Feed):
             is_removed = False,
         )
         if getattr(settings, 'COMMENTS_BANNED_USERS_GROUP', None):
-            where = ['user_id NOT IN (SELECT user_id FROM auth_users_group WHERE group_id = %s)']
+            where = ['user_id NOT IN (SELECT user_id FROM auth_user_groups WHERE group_id = %s)']
             params = [settings.COMMENTS_BANNED_USERS_GROUP]
             qs = qs.extra(where=where, params=params)
         return qs.order_by('-submit_date')[:40]
