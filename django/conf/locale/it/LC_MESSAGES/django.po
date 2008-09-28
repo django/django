@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-03 10:48+0200\n"
+"POT-Creation-Date: 2008-09-28 12:30+0200\n"
 "PO-Revision-Date: 2008-08-29 18:25+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "Language-Team: Italiano\n"
@@ -322,7 +322,7 @@ msgstr "Nessun campo modificato."
 #: contrib/admin/options.py:417 contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" stato aggiunto correttamente."
+msgstr "%(name)s \"%(obj)s\" è stato aggiunto correttamente."
 
 #: contrib/admin/options.py:421 contrib/admin/options.py:454
 #: contrib/auth/admin.py:59
@@ -347,30 +347,30 @@ msgstr ""
 "%(name)s \"%(obj)s\" aggiunto correttamente. Puoi modificarlo ancora qui "
 "sotto."
 
-#: contrib/admin/options.py:536
+#: contrib/admin/options.py:528
 #, python-format
 msgid "Add %s"
 msgstr "Aggiungi %s"
 
-#: contrib/admin/options.py:614
+#: contrib/admin/options.py:605
 #, python-format
 msgid "Change %s"
 msgstr "Modifica %s"
 
-#: contrib/admin/options.py:646
+#: contrib/admin/options.py:637
 msgid "Database error"
 msgstr "Errore nel database"
 
-#: contrib/admin/options.py:696
+#: contrib/admin/options.py:687
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" cancellato correttamente."
 
-#: contrib/admin/options.py:703
+#: contrib/admin/options.py:694
 msgid "Are you sure?"
 msgstr "Sei sicuro?"
 
-#: contrib/admin/options.py:732
+#: contrib/admin/options.py:723
 #, python-format
 msgid "Change history: %s"
 msgstr "Tracciato delle modifiche: %s"
@@ -384,11 +384,11 @@ msgstr ""
 "Inserisci nome utente e password corretti. In entrambi i campi le maiuscole "
 "sono significative."
 
-#: contrib/admin/sites.py:227 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:226 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Effettua di nuovo l'accesso, perché la tua sessione è scaduta."
 
-#: contrib/admin/sites.py:234 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:233 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -396,27 +396,27 @@ msgstr ""
 "Il browser non sembra configurato per accettare i cookie. Una volta "
 "abilitati, ricarica la pagina e riprova."
 
-#: contrib/admin/sites.py:250 contrib/admin/sites.py:256
+#: contrib/admin/sites.py:249 contrib/admin/sites.py:255
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "I nomi utente non possono contenere il carattere '@'."
 
-#: contrib/admin/sites.py:253 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:252 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Il nome utente non è costituito dall'indirizzo e-mail. Prova con '%s'."
 
-#: contrib/admin/sites.py:313
+#: contrib/admin/sites.py:312
 msgid "Site administration"
 msgstr "Amministrazione sito"
 
-#: contrib/admin/sites.py:326 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:325 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Accedi"
 
-#: contrib/admin/sites.py:373
+#: contrib/admin/sites.py:372
 #, python-format
 msgid "%s administration"
 msgstr "Amministrazione %s"
@@ -447,11 +447,11 @@ msgstr "Attualmente:"
 msgid "Change:"
 msgstr "Modifica:"
 
-#: contrib/admin/widgets.py:121
+#: contrib/admin/widgets.py:123
 msgid "Lookup"
 msgstr "Recupero"
 
-#: contrib/admin/widgets.py:228
+#: contrib/admin/widgets.py:230
 msgid "Add Another"
 msgstr "Aggiungi un Altro"
 
@@ -906,7 +906,7 @@ msgstr "Indirizzo e-mail:"
 msgid "Reset my password"
 msgstr "Reimposta la mia password"
 
-#: contrib/admin/templatetags/admin_list.py:288
+#: contrib/admin/templatetags/admin_list.py:284
 msgid "All dates"
 msgstr "Tutte le date"
 
@@ -3735,7 +3735,7 @@ msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Scegli un'opzione valida. '%(value)s non compare tra quelle disponibili."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:654
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:661
 msgid "Enter a list of values."
 msgstr "Inserisci una lista di valori."
 
@@ -3759,13 +3759,13 @@ msgstr "Ordine"
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s con questo %(field_label)s esiste già."
 
-#: forms/models.py:584
+#: forms/models.py:591
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Scegli un'opzione valida. La scelta effettuata non compare tra quelle "
 "disponibili."
 
-#: forms/models.py:655
+#: forms/models.py:662
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Scegli un'opzione valida. %s non compare tra quelle disponibili."
