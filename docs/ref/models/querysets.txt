@@ -39,6 +39,10 @@ You can evaluate a ``QuerySet`` in the following ways:
       execute the database query if you use the "step" parameter of slice
       syntax.
 
+    * **Pickling/Caching.** See the following section for details of what
+      is involved when `pickling QuerySets`_. The important thing for the
+      purposes of this section is that the results are read from the database.
+
     * **repr().** A ``QuerySet`` is evaluated when you call ``repr()`` on it.
       This is for convenience in the Python interactive interpreter, so you can
       immediately see your results when using the API interactively.
@@ -61,6 +65,36 @@ You can evaluate a ``QuerySet`` in the following ways:
       Django will load each element of the list into memory. In contrast,
       iterating over a ``QuerySet`` will take advantage of your database to
       load data and instantiate objects only as you need them.
+
+.. _pickling QuerySets:
+
+Pickling QuerySets
+------------------
+
+If you pickle_ a ``QuerySet``, this will force all the results to be loaded
+into memory prior to pickling. Pickling is usually used as a precursor to
+caching and when the cached queryset is reloaded, you want the results to
+already be present and ready for use (reading from the database can take some
+time, defeating the purpose of caching). This means that when you unpickle a
+``QuerySet``, it contains the results at the moment it was pickled, rather
+than the results that are currently in the database.
+
+If you only want to pickle the necessary information to recreate the
+``Queryset`` from the database at a later time, pickle the ``query`` attribute
+of the ``QuerySet``. You can then recreate the original ``QuerySet`` (without
+any results loaded) using some code like this::
+
+    >>> import pickle
+    >>> query = pickle.loads(s)     # Assuming 's' is the pickled string.
+    >>> qs = MyModel.objects.all()
+    >>> qs.query = query            # Restore the original 'query'.
+
+The ``query`` attribute is an opaque object. It represents the internals of
+the query construction and is not part of the public API. However, it is safe
+(and fully supported) to pickle and unpickle the attribute's contents as
+described here.
+
+.. _pickle: http://docs.python.org/lib/module-pickle.html
 
 .. _queryset-api:
 
