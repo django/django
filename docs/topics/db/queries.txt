@@ -340,7 +340,7 @@ you'll probably use:
         
         .. code-block:: sql
 
-            SELECT ... WHERE headline = 'Man bits dog';
+            SELECT ... WHERE headline = 'Man bites dog';
             
         If you don't provide a lookup type -- that is, if your keyword argument
         doesn't contain a double underscore -- the lookup type is assumed to be
