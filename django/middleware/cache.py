@@ -89,8 +89,9 @@ class UpdateCacheMiddleware(object):
             # max-age was set to 0, don't bother caching.
             return response
         patch_response_headers(response, timeout)
-        cache_key = learn_cache_key(request, response, timeout, self.key_prefix)
-        cache.set(cache_key, response, timeout)
+        if timeout:
+            cache_key = learn_cache_key(request, response, timeout, self.key_prefix)
+            cache.set(cache_key, response, timeout)
         return response
 
 class FetchFromCacheMiddleware(object):
