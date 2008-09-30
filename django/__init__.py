@@ -1,9 +1,17 @@
-VERSION = (1, 0, 'post-release-SVN')
+VERSION = (1, 1, 0, 'alpha', 0)
 
 def get_version():
-    "Returns the version as a human-format string."
-    v = '.'.join([str(i) for i in VERSION[:-1]])
-    if VERSION[-1]:
-        from django.utils.version import get_svn_revision
-        v = '%s-%s-%s' % (v, VERSION[-1], get_svn_revision())
-    return v
+    version = '%s.%s' % (VERSION[0], VERSION[1])
+    if VERSION[2]:
+        version = '%s.%s' % (version, VERSION[2])
+    if VERSION[3:] == ('alpha', 0):
+        version = '%s pre-alpha' % version
+    else:
+        version = '%s %s' % (version, VERSION[3])
+        if VERSION[3] != 'final':
+            version = '%s %s' % (version, VERSION[4])
+    from django.utils.version import get_svn_revision
+    svn_rev = get_svn_revision()
+    if svn_rev != u'SVN-unknown':
+        version = "%s %s" % (version, svn_rev)
+    return version
