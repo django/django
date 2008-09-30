@@ -65,6 +65,12 @@ test_data = (
     ('extra-places', '/e-places/10/', ['10'], {}),
     ('extra-people', '/e-people/fred/', ['fred'], {}),
     ('extra-people', '/e-people/fred/', [], {'name': 'fred'}),
+    ('part', '/part/one/', [], {'value': 'one'}),
+    ('part', '/prefix/xx/part/one/', [], {'value': 'one', 'prefix': 'xx'}),
+    ('part2', '/part2/one/', [], {'value': 'one'}),
+    ('part2', '/part2/', [], {}),
+    ('part2', '/prefix/xx/part2/one/', [], {'value': 'one', 'prefix': 'xx'}),
+    ('part2', '/prefix/xx/part2/', [], {'prefix': 'xx'}),
 
     # Regression for #9038
     # These views are resolved by method name. Each method is deployed twice -

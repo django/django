@@ -158,12 +158,12 @@ class RegexURLResolver(object):
                     p_pattern = p_pattern[1:]
                 if isinstance(pattern, RegexURLResolver):
                     parent = normalize(pattern.regex.pattern)
-                    for name, (matches, pat) in pattern.reverse_dict.iteritems():
-                        new_matches = []
-                        for piece, p_args in parent:
-                            new_matches.extend([(piece + suffix, p_args + args)
-                                    for (suffix, args) in matches])
-                        self._reverse_dict.appendlist(name, (new_matches, p_pattern + pat))
+                    for name in pattern.reverse_dict:
+                        for matches, pat in pattern.reverse_dict.getlist(name):
+                            new_matches = []
+                            for piece, p_args in parent:
+                                new_matches.extend([(piece + suffix, p_args + args) for (suffix, args) in matches])
+                            self._reverse_dict.appendlist(name, (new_matches, p_pattern + pat))
                 else:
                     bits = normalize(p_pattern)
                     self._reverse_dict.appendlist(pattern.callback, (bits, p_pattern))
