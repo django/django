@@ -1182,14 +1182,6 @@ SQL equivalent::
 
     SELECT ... WHERE pub_date IS NULL;
 
-.. admonition:: ``__isnull=True`` vs ``__exact=None``
-
-    There is an important difference between ``__isnull=True`` and
-    ``__exact=None``. ``__exact=None`` will *always* return an empty result
-    set, because SQL requires that no value is equal to ``NULL``.
-    ``__isnull`` determines if the field is currently holding the value
-    of ``NULL`` without performing a comparison.
-
 search
 ~~~~~~
 
