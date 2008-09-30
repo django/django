@@ -59,33 +59,58 @@ cycle
 .. versionchanged:: 1.0
     Cycle among the given strings or variables each time this tag is encountered.
 
-Within a loop, cycles among the given strings/variables each time through the
+Within a loop, cycles among the given strings each time through the
 loop::
 
     {% for o in some_list %}
-        <tr class="{% cycle 'row1' 'row2' rowvar %}">
+        <tr class="{% cycle 'row1' 'row2' %}">
             ...
         </tr>
     {% endfor %}
 
-Outside of a loop, give the values a unique name the first time you call it,
-then use that name each successive time through::
+You can use variables, too. For example, if you have two template variables,
+``rowvalue1`` and ``rowvalue2``, you can cycle between their values like this::
 
-        <tr class="{% cycle 'row1' 'row2' rowvar as rowcolors %}">...</tr>
-        <tr class="{% cycle rowcolors %}">...</tr>
-        <tr class="{% cycle rowcolors %}">...</tr>
+    {% for o in some_list %}
+        <tr class="{% cycle rowvalue1 rowvalue2 %}">
+            ...
+        </tr>
+    {% endfor %}
 
-You can use any number of values, separated by spaces. Values enclosed in
-single (') or double quotes (") are treated as string literals, while values
-without quotes are assumed to refer to context variables.
+Yes, you can mix variables and strings::
 
-You can also separate values with commas::
+    {% for o in some_list %}
+        <tr class="{% cycle 'row1' rowvalue2 'row3' %}">
+            ...
+        </tr>
+    {% endfor %}
+
+In some cases you might want to refer to the next value of a cycle from
+outside of a loop. To do this, just give the ``{% cycle %}`` tag a name, using
+"as", like this::
+
+    {% cycle 'row1' 'row2' as rowcolors %}
+
+From then on, you can insert the current value of the cycle wherever you'd like
+in your template::
+
+    <tr class="{% cycle rowcolors %}">...</tr>
+    <tr class="{% cycle rowcolors %}">...</tr>
+
+You can use any number of values in a ``{% cycle %}`` tag, separated by spaces.
+Values enclosed in single (``'``) or double quotes (``"``) are treated as
+string literals, while values without quotes are treated as template variables.
+
+For backwards compatibility, the ``{% cycle %}`` tag supports the much inferior
+old syntax from previous Django versions. You shouldn't use this in any new
+projects, but for the sake of the people who are still using it, here's what it
+looks like::
 
     {% cycle row1,row2,row3 %}
 
-In this syntax, each value will be interpreted as literal text. The
-comma-based syntax exists for backwards-compatibility, and should not be
-used for new projects.
+In this syntax, each value gets interpreted as a literal string, and there's no
+way to specify variable values. Or literal commas. Or spaces. Did we mention
+you shouldn't use this syntax in any new projects?
 
 .. templatetag:: debug
 
