@@ -66,7 +66,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
         file_info[0] = '\\PURELIB\\%s' % file_info[0]
 
 # Dynamically calculate the version based on django.VERSION.
-version_tuple = __import__('django').get_version()
+version = __import__('django').get_version()
 if u'SVN' in version:
     version = ' '.join(version.split(' ')[:-1])
 
