@@ -85,17 +85,13 @@ Displaying debug output
 .. django-admin-option:: --verbosity <amount>
 
 Use ``--verbosity`` to specify the amount of notification and debug information
-that ``django-admin.py`` should print to the console.
-
-    * ``0`` means no output.
-    * ``1`` means normal output (default).
-    * ``2`` means verbose output.
-
+that ``django-admin.py`` should print to the console. For more details, see the
+documentation for the :ref:`default options for django-admin.py <django-admin-verbosity>`.
 
 Available subcommands
 =====================
 
-cleanup 
+cleanup
 -------
 
 .. versionadded:: 1.0
@@ -122,7 +118,7 @@ Example usage::
 
     django-admin.py compilemessages --locale=br_PT
 
-createcachetable 
+createcachetable
 ----------------
 
 .. django-admin:: createcachetable <tablename>
@@ -133,7 +129,7 @@ backend. See :ref:`topics-cache` for more information.
 createsuperuser
 ---------------
 
-.. django-admin:: createsuperuser 
+.. django-admin:: createsuperuser
 
 .. versionadded:: 1.0
 
@@ -182,7 +178,7 @@ diffsettings
 .. django-admin:: diffsettings
 
 Displays differences between the current settings file and Django's default
-settings. 
+settings.
 
 Settings that don't appear in the defaults are followed by ``"###"``. For
 example, the default settings don't define ``ROOT_URLCONF``, so
@@ -367,20 +363,6 @@ The ``dumpdata`` command can be used to generate input for ``loaddata``.
     references in your data files - MySQL doesn't provide a mechanism to
     defer checking of row constraints until a transaction is committed.
 
---verbosity
-~~~~~~~~~~~
-
-Use ``--verbosity`` to specify the amount of notification and debug information
-that ``django-admin.py`` should print to the console.
-
-	* ``0`` means no output.
-	* ``1`` means normal output (default).
-	* ``2`` means verbose output.
-
-Example usage::
-
-    django-admin.py loaddata --verbosity=2
-
 makemessages
 ------------
 
@@ -433,22 +415,8 @@ Example usage::
 Use the ``--domain`` or ``-d`` option to change the domain of the messages files.
 Currently supported:
 
-	* ``django`` for all ``*.py`` and ``*.html`` files (default) 
+	* ``django`` for all ``*.py`` and ``*.html`` files (default)
 	* ``djangojs`` for ``*.js`` files
-
---verbosity
-~~~~~~~~~~~
-
-Use ``--verbosity`` or ``-v`` to specify the amount of notification and debug
-information that ``django-admin.py`` should print to the console.
-
-	* ``0`` means no output.
-	* ``1`` means normal output (default).
-	* ``2`` means verbose output.
-
-Example usage::
-
-    django-admin.py makemessages --verbosity=2
 
 reset <appname appname ...>
 ---------------------------
@@ -685,20 +653,6 @@ with an appropriate extension (e.g. ``json`` or ``xml``). See the
 documentation for ``loaddata`` for details on the specification of fixture
 data files.
 
---verbosity
-~~~~~~~~~~~
-
-Use ``--verbosity`` to specify the amount of notification and debug information
-that ``django-admin.py`` should print to the console.
-
-	* ``0`` means no output.
-	* ``1`` means normal output (default).
-	* ``2`` means verbose output.
-
-Example usage::
-
-    django-admin.py syncdb --verbosity=2
-
 --noinput
 ~~~~~~~~~
 
@@ -718,20 +672,6 @@ information.
 Use the ``--noinput`` option to suppress all user prompting, such as
 "Are you sure?" confirmation messages. This is useful if ``django-admin.py``
 is being executed as an unattended, automated script.
-
---verbosity
-~~~~~~~~~~~
-
-Use ``--verbosity`` to specify the amount of notification and debug information
-that ``django-admin.py`` should print to the console.
-
-	* ``0`` means no output.
-	* ``1`` means normal output (default).
-	* ``2`` means verbose output.
-
-Example usage::
-
-    django-admin.py test --verbosity=2
 
 testserver <fixture fixture ...>
 --------------------------------
@@ -793,20 +733,6 @@ To run on 1.2.3.4:7000 with a ``test`` fixture::
 
     django-admin.py testserver --addrport 1.2.3.4:7000 test
 
---verbosity
-~~~~~~~~~~~
-
-Use ``--verbosity`` to specify the amount of notification and debug information
-that ``django-admin.py`` should print to the console.
-
-	* ``0`` means no output.
-	* ``1`` means normal output (default).
-	* ``2`` means verbose output.
-
-Example usage::
-
-    django-admin.py testserver --verbosity=2
-
 validate
 --------
 
@@ -861,6 +787,22 @@ By default, ``django-admin.py`` will show a simple error message whenever an
 error occurs. If you specify ``--traceback``, ``django-admin.py``  will
 output a full stack trace whenever an exception is raised.
 
+.. _django-admin-verbosity:
+
+--verbosity
+-----------
+
+Example usage::
+
+    django-admin.py syncdb --verbosity 2
+
+Use ``--verbosity`` to specify the amount of notification and debug information
+that ``django-admin.py`` should print to the console.
+
+    * ``0`` means no output.
+    * ``1`` means normal output (default).
+    * ``2`` means verbose output.
+
 Extra niceties
 ==============
 
@@ -887,4 +829,4 @@ distribution. It enables tab-completion of ``django-admin.py`` and
 
 
 
-See :ref:`howto-custom-management-commands` for how to add customized actions. 
+See :ref:`howto-custom-management-commands` for how to add customized actions.

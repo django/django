@@ -212,7 +212,7 @@ Arguments sent with this signal:
 
     ``verbosity``
         Indicates how much information manage.py is printing on screen. See
-        the :djadminopt:`--verbosity`` flag for details.
+        the :djadminopt:`--verbosity` flag for details.
 
         Functions which listen for :data:`post_syncdb` should adjust what they
         output to the screen based on the value of this argument.

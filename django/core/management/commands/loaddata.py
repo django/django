@@ -10,11 +10,6 @@ except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--verbosity', action='store', dest='verbosity', default='1',
-            type='choice', choices=['0', '1', '2'],
-            help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
-    )
     help = 'Installs the named fixture(s) in the database.'
     args = "fixture [fixture ...]"
 
@@ -28,15 +23,15 @@ class Command(BaseCommand):
 
         verbosity = int(options.get('verbosity', 1))
         show_traceback = options.get('traceback', False)
-        
-        # commit is a stealth option - it isn't really useful as 
+
+        # commit is a stealth option - it isn't really useful as
         # a command line option, but it can be useful when invoking
-        # loaddata from within another script. 
+        # loaddata from within another script.
         # If commit=True, loaddata will use its own transaction;
         # if commit=False, the data load SQL will become part of
         # the transaction in place when loaddata was invoked.
         commit = options.get('commit', True)
-        
+
         # Keep a count of the installed objects and fixtures
         fixture_count = 0
         object_count = 0
@@ -151,7 +146,7 @@ class Command(BaseCommand):
             transaction.rollback()
             transaction.leave_transaction_management()
             return
-            
+
         # If we found even one object in a fixture, we need to reset the
         # database sequences.
         if object_count > 0:
@@ -161,7 +156,7 @@ class Command(BaseCommand):
                     print "Resetting sequences"
                 for line in sequence_sql:
                     cursor.execute(line)
-        
+
         if commit:
             transaction.commit()
             transaction.leave_transaction_management()
@@ -172,7 +167,7 @@ class Command(BaseCommand):
         else:
             if verbosity > 0:
                 print "Installed %d object(s) from %d fixture(s)" % (object_count, fixture_count)
-                
+
         # Close the DB connection. This is required as a workaround for an
         # edge case in MySQL: if the same connection is used to
         # create tables, load data, and query, the query can return

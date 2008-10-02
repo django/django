@@ -142,12 +142,12 @@ def django_tests(verbosity, interactive, test_labels):
         if not test_labels or model_name in test_labels:
             extra_tests.append(InvalidModelTestCase(model_label))
             try:
-                # Invalid models are not working apps, so we cannot pass them into 
+                # Invalid models are not working apps, so we cannot pass them into
                 # the test runner with the other test_labels
                 test_labels.remove(model_name)
             except ValueError:
                 pass
-    
+
     # Run the test suite, including the extra validation tests.
     from django.test.simple import run_tests
     failures = run_tests(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
