@@ -7,6 +7,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.html import escape
+from django.views.decorators.http import require_POST
 from django.contrib import comments
 from django.contrib.comments import signals
 
@@ -28,11 +29,6 @@ def post_comment(request, next=None):
     HTTP POST is required. If ``POST['submit'] == "preview"`` or if there are
     errors a preview template, ``comments/preview.html``, will be rendered.
     """
-
-    # Require POST
-    if request.method != 'POST':
-        return http.HttpResponseNotAllowed(["POST"])
-
     # Fill out some initial data fields from an authenticated user, if present
     data = request.POST.copy()
     if request.user.is_authenticated():
@@ -115,6 +111,8 @@ def post_comment(request, next=None):
     )
 
     return next_redirect(data, next, comment_done, c=comment._get_pk_val())
+
+post_comment = require_POST(post_comment)
 
 comment_done = confirmation_view(
     template = "comments/posted.html",
