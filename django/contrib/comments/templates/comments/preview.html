@@ -1,17 +1,18 @@
 {% extends "comments/base.html" %}
+{% load i18n %}
 
-{% block title %}Preview your comment{% endblock %}
+{% block title %}{% trans "Preview your comment" %}{% endblock %}
 
 {% block content %}
   {% load comments %}
   <form action="{% comment_form_target %}" method="post">
     {% if form.errors %}
-      <h1>Please correct the error{{ form.errors|pluralize }} below</h1>
+    <h1>{% blocktrans count form.errors|length as counter %}Please correct the error below{% plural %}Please correct the errors below{% endblocktrans %}</h1>
     {% else %}
-      <h1>Preview your comment</h1>
+    <h1>{% trans "Preview your comment" %}</h1>
       <blockquote>{{ comment|linebreaks }}</blockquote>
       <p>
-        and <input type="submit" name="submit" value="Post your comment" id="submit" /> or make changes:
+      {% trans "and" %} <input type="submit" name="submit" value="{% trans "Post your comment" %}" id="submit" /> {% trans "or make changes" %}:
       </p>
     {% endif %}
     {% for field in form %}
@@ -27,8 +28,8 @@
       {% endif %}
     {% endfor %}
     <p class="submit">
-      <input type="submit" name="submit" class="submit-post" value="Post" />
-      <input type="submit" name="submit" class="submit-preview" value="Preview" />
+    <input type="submit" name="submit" class="submit-post" value="{% trans "Post" %}" />
+    <input type="submit" name="preview" class="submit-preview" value="{% trans "Preview" %}" />
     </p>
   </form>
 {% endblock %}

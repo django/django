@@ -1,14 +1,15 @@
 {% extends "comments/base.html" %}
+{% load i18n %}
 
-{% block title %}Approve a comment{% endblock %}
+{% block title %}{% trans "Approve a comment" %}{% endblock %}
 
 {% block content %}
-  <h1>Really make this comment public?</h1>
+  <h1>{% trans "Really make this comment public?" %}</h1>
   <blockquote>{{ comment|linebreaks }}</blockquote>
   <form action="." method="post">
     <input type="hidden" name="next" value="{{ next }}" id="next" />
     <p class="submit">
-      <input type="submit" name="submit" value="Approve" /> or <a href="{{ comment.permalink }}">cancel</a>
+      <input type="submit" name="submit" value="{% trans "Approve" %}" /> or <a href="{{ comment.permalink }}">cancel</a>
     </p>
   </form>
 {% endblock %}

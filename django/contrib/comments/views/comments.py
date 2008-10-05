@@ -62,8 +62,7 @@ def post_comment(request, next=None):
                 (escape(ctype), escape(object_pk)))
 
     # Do we want to preview the comment?
-    preview = data.get("submit", "").lower() == "preview" or \
-              data.get("preview", None) is not None
+    preview = "preview" in data
 
     # Construct the comment form
     form = comments.get_form()(target, data=data)
@@ -85,7 +84,7 @@ def post_comment(request, next=None):
             template_list, {
                 "comment" : form.data.get("comment", ""),
                 "form" : form,
-            }, 
+            },
             RequestContext(request, {})
         )
 
