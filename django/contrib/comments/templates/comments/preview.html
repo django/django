@@ -11,7 +11,7 @@
       <h1>Preview your comment</h1>
       <blockquote>{{ comment|linebreaks }}</blockquote>
       <p>
-        and <input type="submit" name="submit" value="Post your comment" id="submit"> or make changes:
+        and <input type="submit" name="submit" value="Post your comment" id="submit" /> or make changes:
       </p>
     {% endif %}
     {% for field in form %}
@@ -27,8 +27,8 @@
       {% endif %}
     {% endfor %}
     <p class="submit">
-      <input type="submit" name="submit" class="submit-post" value="Post">
-      <input type="submit" name="submit" class="submit-preview" value="Preview">
+      <input type="submit" name="submit" class="submit-post" value="Post" />
+      <input type="submit" name="submit" class="submit-preview" value="Preview" />
     </p>
   </form>
 {% endblock %}

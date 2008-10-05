@@ -6,9 +6,9 @@
   <h1>Really remove this comment?</h1>
   <blockquote>{{ comment|linebreaks }}</blockquote>
   <form action="." method="post">
-    <input type="hidden" name="next" value="{{ next }}" id="next">
+    <input type="hidden" name="next" value="{{ next }}" id="next" />
     <p class="submit">
-      <input type="submit" name="submit" value="Remove"> or <a href="{{ comment.permalink }}">cancel</a>
+      <input type="submit" name="submit" value="Remove" /> or <a href="{{ comment.permalink }}">cancel</a>
     </p>
   </form>
 {% endblock %}

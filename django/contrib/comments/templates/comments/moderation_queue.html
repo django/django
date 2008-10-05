@@ -23,7 +23,7 @@
 
 {% block content %}
 {% if empty %}
-  <p id="nocomments">No comments to moderate.</div>
+  <p id="nocomments">No comments to moderate.</p>
 {% else %}
 <div id="content-main">
   <div class="module" id="changelist">
@@ -45,12 +45,12 @@
         <tr class="{% cycle 'row1' 'row2' %}">
           <td class="actions">
             <form action="{% url comments-approve comment.pk %}" method="post">
-              <input type="hidden" name="next" value="{% url comments-moderation-queue %}">
-              <input class="approve submit" type="submit" name="submit" value="Approve">
+              <input type="hidden" name="next" value="{% url comments-moderation-queue %}" />
+              <input class="approve submit" type="submit" name="submit" value="Approve" />
             </form>
             <form action="{% url comments-delete comment.pk %}" method="post">
-              <input type="hidden" name="next" value="{% url comments-moderation-queue %}">
-              <input class="remove submit" type="submit" name="submit" value="Remove">
+              <input type="hidden" name="next" value="{% url comments-moderation-queue %}" />
+              <input class="remove submit" type="submit" name="submit" value="Remove" />
             </form>
           </td>
           <td>{{ comment.name }}</td>
