@@ -131,7 +131,7 @@ The strings you pass to ``_()`` or ``ugettext()`` can take placeholders,
 specified with Python's standard named-string interpolation syntax. Example::
 
     def my_view(request, m, d):
-        output = _('Today is %(month)s, %s(day)s.') % {'month': m, 'day': d}
+        output = _('Today is %(month)s, %(day)s.') % {'month': m, 'day': d}
         return HttpResponse(output)
 
 This technique lets language-specific translations reorder the placeholder
