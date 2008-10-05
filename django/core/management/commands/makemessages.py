@@ -1,14 +1,20 @@
 import re
 import os
 import sys
+import warnings
 from itertools import dropwhile
 from optparse import make_option
+
 from django.core.management.base import CommandError, BaseCommand
 
 try:
     set
 except NameError:
     from sets import Set as set     # For Python 2.3
+
+# Intentionally silence DeprecationWarnings about os.popen3 in Python 2.6. It's
+# still sensible for us to use it, since subprocess didn't exist in 2.3.
+warnings.filterwarnings('ignore', category=DeprecationWarning, message=r'os\.popen3')
 
 pythonize_re = re.compile(r'\n\s*//')
 
