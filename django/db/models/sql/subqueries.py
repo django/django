@@ -293,7 +293,8 @@ class InsertQuery(Query):
     def clone(self, klass=None, **kwargs):
         extras = {'columns': self.columns[:], 'values': self.values[:],
                 'params': self.params}
-        return super(InsertQuery, self).clone(klass, extras)
+        extras.update(kwargs)
+        return super(InsertQuery, self).clone(klass, **extras)
 
     def as_sql(self):
         # We don't need quote_name_unless_alias() here, since these are all
