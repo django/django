@@ -76,8 +76,8 @@ class ESIdentityCardNumberField(RegexField):
         self.cif_control = 'JABCDEFGHI'
         self.cif_types = 'ABCDEFGHKLMNPQS'
         self.nie_types = 'XT'
-        super(ESIdentityCardNumberField, self).__init__(r'^([%s]?)[ -]?(\d+)[ -]?([%s]?)$' % (self.cif_types + self.nie_types + self.cif_types.lower() + self.nie_types.lower(), self.nif_control + self.nif_control.lower()),
-                max_length=None, min_length=None,
+        id_card_re = re.compile(r'^([%s]?)[ -]?(\d+)[ -]?([%s]?)$' % (self.cif_types + self.nie_types, self.nif_control + self.cif_control), re.IGNORECASE)
+        super(ESIdentityCardNumberField, self).__init__(id_card_re, max_length=None, min_length=None,
                 error_message=self.default_error_messages['invalid%s' % (self.only_nif and '_only_nif' or '')],
                 *args, **kwargs)
 
@@ -88,7 +88,7 @@ class ESIdentityCardNumberField(RegexField):
         nif_get_checksum = lambda d: self.nif_control[int(d)%23]
 
         value = value.upper().replace(' ', '').replace('-', '')
-        m = re.match(r'^([%s]?)[ -]?(\d+)[ -]?([%s]?)$' % (self.cif_types + self.nie_types, self.nif_control), value)
+        m = re.match(r'^([%s]?)[ -]?(\d+)[ -]?([%s]?)$' % (self.cif_types + self.nie_types, self.nif_control + self.cif_control), value)
         letter1, number, letter2 = m.groups()
 
         if not letter1 and letter2:
