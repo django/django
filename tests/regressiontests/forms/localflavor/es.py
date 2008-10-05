@@ -157,6 +157,8 @@ ValidationError: [u'Invalid checksum for NIF.']
 'X3287690R'
 >>> f.clean('t-03287690r')
 'T03287690R'
+>>> f.clean('P2907500I')
+'P2907500I'
 >>> f.clean('X-03287690')
 Traceback (most recent call last):
 ...
