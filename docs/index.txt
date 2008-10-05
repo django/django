@@ -112,6 +112,7 @@ And more:
     * :ref:`Sitemaps <ref-contrib-sitemaps>`
     * :ref:`Sites <ref-contrib-sites>`
     * :ref:`Web design helpers <ref-contrib-webdesign>`
+    * :ref:`Markup <ref-contrib-markup>`
 
 Solving specific problems
 =========================
