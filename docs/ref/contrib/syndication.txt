@@ -921,8 +921,8 @@ For example, to create an Atom 1.0 feed and print it to standard output::
     >>> f.add_item(title=u"Hot dog today",
     ...     link=u"http://www.example.com/entries/1/",
     ...     description=u"<p>Today I had a Vienna Beef hot dog. It was pink, plump and perfect.</p>")
-    >>> print f.writeString('utf8')
-    <?xml version="1.0" encoding="utf8"?>
+    >>> print f.writeString('UTF-8')
+    <?xml version="1.0" encoding="UTF-8"?>
     <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
     ...
     </feed>
