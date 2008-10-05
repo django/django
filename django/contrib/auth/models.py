@@ -291,6 +291,7 @@ class User(models.Model):
                 app_label, model_name = settings.AUTH_PROFILE_MODULE.split('.')
                 model = models.get_model(app_label, model_name)
                 self._profile_cache = model._default_manager.get(user__id__exact=self.id)
+                self._profile_cache.user = self
             except (ImportError, ImproperlyConfigured):
                 raise SiteProfileNotAvailable
         return self._profile_cache
