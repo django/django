@@ -950,7 +950,7 @@ Django, such as your machine's mail server, if you're running one.)
 
 .. currentmodule:: django.core.mail
 
-.. data:: django.core.mail.output
+.. data:: django.core.mail.outbox
 
 During test running, each outgoing e-mail is saved in
 ``django.core.mail.outbox``. This is a simple list of all
@@ -960,6 +960,11 @@ running unit tests. The outbox is created during test setup, along with the
 dummy :class:`<~django.core.mail.SMTPConnection>`. When the test framework is
 torn down, the standard :class:`<~django.core.mail.SMTPConnection>` class is
 restored, and the test outbox is destroyed.
+
+The ``outbox`` attribute is a special attribute that is created *only* when
+the tests are run. It doesn't normally exist as part of the
+:mod:`django.core.mail` module and you can't import it directly. The code
+below shows how to access this attribute correctly.
 
 Here's an example test that examines ``django.core.mail.outbox`` for length
 and contents::
