@@ -1,7 +1,8 @@
 {% extends "comments/base.html" %}
+{% load i18n %}
 
-{% block title %}Thanks for commenting.{% endblock %}
+{% block title %}{% trans "Thanks for commenting" %}.{% endblock %}
 
 {% block content %}
-  <h1>Thank you for your comment.</h1>
+  <h1>{% trans "Thank you for your comment" %}.</h1>
 {% endblock %}

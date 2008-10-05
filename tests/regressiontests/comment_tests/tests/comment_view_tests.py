@@ -45,7 +45,7 @@ class CommentViewTests(CommentTestCase):
     def testCommentPreview(self):
         a = Article.objects.get(pk=1)
         data = self.getValidData(a)
-        data["submit"] = "preview"
+        data["preview"] = "Preview"
         response = self.client.post("/post/", data)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "comments/preview.html")

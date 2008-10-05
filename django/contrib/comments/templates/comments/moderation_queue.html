@@ -1,7 +1,7 @@
 {% extends "admin/change_list.html" %}
-{% load adminmedia %}
+{% load adminmedia i18n %}
 
-{% block title %}Comment moderation queue{% endblock %}
+{% block title %}{% trans "Comment moderation queue" %}{% endblock %}
 
 {% block extrahead %}
   {{ block.super }}
@@ -16,28 +16,28 @@
 {% endblock %}
 
 {% block branding %}
-<h1 id="site-name">Comment moderation queue</h1>
+<h1 id="site-name">{% trans "Comment moderation queue" %}</h1>
 {% endblock %}
 
 {% block breadcrumbs %}{% endblock %}
 
 {% block content %}
 {% if empty %}
-  <p id="nocomments">No comments to moderate.</p>
+<p id="nocomments">{% trans "No comments to moderate" %}.</p>
 {% else %}
 <div id="content-main">
   <div class="module" id="changelist">
     <table cellspacing="0">
       <thead>
         <tr>
-          <th>Action</th>
-          <th>Name</th>
-          <th>Comment</th>
-          <th>Email</th>
-          <th>URL</th>
-          <th>Authenticated?</th>
-          <th>IP Address</th>
-          <th class="sorted desc">Date posted</th>
+          <th>{% trans "Action" %}</th>
+          <th>{% trans "Name" %}</th>
+          <th>{% trans "Comment" %}</th>
+          <th>{% trans "Email" %}</th>
+          <th>{% trans "URL" %}</th>
+          <th>{% trans "Authenticated?" %}</th>
+          <th>{% trans "IP Address" %}</th>
+          <th class="sorted desc">{% trans "Date posted" %}</th>
         </tr>
     </thead>
     <tbody>
@@ -46,11 +46,11 @@
           <td class="actions">
             <form action="{% url comments-approve comment.pk %}" method="post">
               <input type="hidden" name="next" value="{% url comments-moderation-queue %}" />
-              <input class="approve submit" type="submit" name="submit" value="Approve" />
+              <input class="approve submit" type="submit" name="submit" value="{% trans "Approve" %}" />
             </form>
             <form action="{% url comments-delete comment.pk %}" method="post">
               <input type="hidden" name="next" value="{% url comments-moderation-queue %}" />
-              <input class="remove submit" type="submit" name="submit" value="Remove" />
+              <input class="remove submit" type="submit" name="submit" value="{% trans "Remove" %}" />
             </form>
           </td>
           <td>{{ comment.name }}</td>
@@ -60,7 +60,7 @@
           <td>
             <img
               src="{% admin_media_prefix %}img/admin/icon-{% if comment.user %}yes{% else %}no{% endif %}.gif"
-              alt="{% if comment.user %}yes{% else %}no{% endif %}"
+              alt="{% if comment.user %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}"
             />
           </td>
           <td>{{ comment.ip_address }}</td>

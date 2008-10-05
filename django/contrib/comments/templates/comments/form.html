@@ -1,4 +1,4 @@
-{% load comments %}
+{% load comments i18n %}
 <form action="{% comment_form_target %}" method="post">
   {% for field in form %}
     {% if field.is_hidden %}
@@ -13,7 +13,7 @@
     {% endif %}
   {% endfor %}
   <p class="submit">
-    <input type="submit" name="submit" class="submit-post" value="Post" />
-    <input type="submit" name="submit" class="submit-preview" value="Preview" />
+    <input type="submit" name="post" class="submit-post" value="{% trans "Post" %}" />
+    <input type="submit" name="preview" class="submit-preview" value="{% trans "Preview" %}" />
   </p>
 </form>

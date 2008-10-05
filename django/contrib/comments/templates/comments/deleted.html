@@ -1,7 +1,8 @@
 {% extends "comments/base.html" %}
+{% load i18n %}
 
-{% block title %}Thanks for removing.{% endblock %}
+{% block title %}{% trans "Thanks for removing" %}.{% endblock %}
 
 {% block content %}
-  <h1>Thanks for taking the time to improve the quality of discussion on our site.</h1>
+  <h1>{% trans "Thanks for taking the time to improve the quality of discussion on our site" %}.</h1>
 {% endblock %}
