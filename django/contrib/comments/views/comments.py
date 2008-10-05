@@ -37,7 +37,7 @@ def post_comment(request, next=None):
     data = request.POST.copy()
     if request.user.is_authenticated():
         if not data.get('name', ''):
-            data["name"] = request.user.get_full_name()
+            data["name"] = request.user.get_full_name() or request.user.username
         if not data.get('email', ''):
             data["email"] = request.user.email
 
