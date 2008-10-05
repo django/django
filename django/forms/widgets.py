@@ -281,7 +281,6 @@ class Textarea(Widget):
 
     def render(self, name, value, attrs=None):
         if value is None: value = ''
-        value = force_unicode(value)
         final_attrs = self.build_attrs(attrs, name=name)
         return mark_safe(u'<textarea%s>%s</textarea>' % (flatatt(final_attrs),
                 conditional_escape(force_unicode(value))))
