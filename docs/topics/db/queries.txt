@@ -9,7 +9,7 @@ Making queries
 Once you've created your :ref:`data models <topics-db-models>`, Django
 automatically gives you a database-abstraction API that lets you create,
 retrieve, update and delete objects. This document explains how to use this 
-API. Refer to the `data model reference <ref-models-index>` for full 
+API. Refer to the :ref:`data model reference <ref-models-index>` for full 
 details of all the various model lookup options.
 
 Throughout this guide (and in the reference), we'll refer to the following
