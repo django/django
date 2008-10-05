@@ -567,6 +567,22 @@ it to ``_`` yourself::
 HTTP request/response objects
 -----------------------------
 
+Dictionary access to ``HttpRequest``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``HttpRequest`` objects no longer directly support dictionary-style
+access; previously, both ``GET`` and ``POST`` data were directly
+available on the ``HttpRequest`` object (e.g., you could check for a
+piece of form data by using ``if 'some_form_key' in request`` or by
+reading ``request['some_form_key']``. This is no longer supported; if
+you need access to the combined ``GET`` and ``POST`` data, use
+``request.REQUEST`` instead.
+
+It is strongly suggested, however, that you always explicitly look in
+the appropriate dictionary for the type of request you expect to
+receive (``request.GET`` or ``request.POST``); relying on the combined
+``request.REQUEST`` dictionary can mask the origin of incoming data.
+
 Accessing ``HTTPResponse`` headers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
