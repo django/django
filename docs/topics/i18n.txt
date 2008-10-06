@@ -974,3 +974,10 @@ test or compile a changed message file, you will need the ``gettext`` utilities:
       * In the ``System variables`` list, click ``Path``, click ``Edit``
       * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
         ``Variable value`` field
+
+You may also use ``gettext`` binaries you have obtained elsewhere, so long as 
+the ``xgettext --version`` command works properly. Some version 0.14.4 binaries
+have been found to not support this command. Do not attempt to use Django 
+translation utilities with a ``gettext`` package if the command ``xgettext
+--version`` entered at a Windows command prompt causes a popup window saying
+"xgettext.exe has generated errors and will be closed by Windows".

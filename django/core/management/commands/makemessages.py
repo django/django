@@ -75,6 +75,22 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
             message = "usage: make-messages.py -l <language>\n   or: make-messages.py -a\n"
         raise CommandError(message)
 
+    # xgettext versions prior to 0.15 assumed Python source files were encoded
+    # in iso-8859-1, and produce utf-8 output.  In the case where xgettext is
+    # given utf-8 input (required for Django files with non-ASCII characters),
+    # this results in a utf-8 re-encoding of the original utf-8 that needs to be
+    # undone to restore the original utf-8.  So we check the xgettext version
+    # here once and set a flag to remember if a utf-8 decoding needs to be done
+    # on xgettext's output for Python files.  We default to assuming this isn't
+    # necessary if we run into any trouble determining the version.
+    xgettext_reencodes_utf8 = False
+    (stdin, stdout, stderr) = os.popen3('xgettext --version', 't')
+    match = re.search(r'(?P<major>\d+)\.(?P<minor>\d+)', stdout.read())
+    if match:
+        xversion = (int(match.group('major')), int(match.group('minor')))
+        if xversion < (0, 15):
+            xgettext_reencodes_utf8 = True
+ 
     languages = []
     if locale is not None:
         languages.append(locale)
@@ -139,6 +155,10 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
                 errors = stderr.read()
                 if errors:
                     raise CommandError("errors happened while running xgettext on %s\n%s" % (file, errors))
+
+                if xgettext_reencodes_utf8:
+                    msgs = msgs.decode('utf-8').encode('iso-8859-1')
+
                 if thefile != file:
                     old = '#: '+os.path.join(dirpath, thefile)[2:]
                     new = '#: '+os.path.join(dirpath, file)[2:]
