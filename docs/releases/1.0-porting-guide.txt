@@ -57,6 +57,15 @@ Remove the ``prepopulated_from`` argument on model fields. It's no longer valid
 and has been moved to the ``AdminModel`` class in ``admin.py``. See `the
 admin`_, below, for more details about changes to the admin.
 
+Remove ``core``
+~~~~~~~~~~~~~~~
+
+Remove the ``core`` argument from your model fields. It is no longer
+necessary, since the equivalent functionality (part of :ref:`inline editing
+<admin-inlines>`) is handled differently by the admin interface now. You don't
+have to worry about inline editing until you get to `the admin`_ section,
+below. For now, remove all references to ``core``.
+
 Replace ``class Admin:`` with ``admin.py``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -286,6 +295,31 @@ Old (0.96)            New (1.0)
 ``f['filename']``     ``f.name``
 ``f['content-type']`` ``f.content_type``
 ===================== =====================
+
+Work with file fields using the new API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The internal implementation of :class:`django.db.models.FileField` have changed.
+A visible result of this is that the way you access special attributes (URL,
+filename, image size, etc) of these model fields has changed. You will need to
+make the following changes, assuming your model's
+:class:`~django.db.models.FileField` is called ``myfile``:
+
+=================================== ========================
+Old (0.96)                           New (1.0)
+=================================== ========================
+``myfile.get_content_filename()``   ``myfile.content.path``
+``myfile.get_content_url()``        ``myfile.content.url``
+``myfile.get_content_size()``       ``myfile.content.size``
+``myfile.save_content_file()``      ``myfile.content.save()``
+``myfile.get_content_width()``      ``myfile.content.width``
+``myfile.get_content_height()``     ``myfile.content.height``
+=================================== ========================
+
+Note that the ``width`` and ``height`` attributes only make sense for
+:class:`~django.db.models.ImageField` fields. More details can be found in the
+:ref:`model API <ref-models-fields>` documentation.
+
 
 Templates
 ---------
