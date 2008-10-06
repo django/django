@@ -7,9 +7,9 @@ Model instance reference
 .. currentmodule:: django.db.models
    
 This document describes the details of the ``Model`` API. It builds on the
-material presented in the :ref:`model <topics-db-models>` and `database query
-<topics-db-queries>` guides, so you'll probably want to read and understand
-those documents before reading this one.
+material presented in the :ref:`model <topics-db-models>` and :ref:`database
+query <topics-db-queries>` guides, so you'll probably want to read and
+understand those documents before reading this one.
 
 Throughout this reference we'll use the :ref:`example weblog models
 <queryset-model-example>` presented in the :ref:`database query guide
@@ -294,7 +294,7 @@ in the URLConf file and in the model.
 You can further decouple your models from the URLconf using the ``permalink``
 decorator:
 
-.. function:: django.db.models.permalink()
+.. function:: permalink()
 
 This decorator is passed the view function, a list of positional parameters and
 (optionally) a dictionary of named parameters. Django then works out the correct
