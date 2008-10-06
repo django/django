@@ -1,12 +1,14 @@
+import datetime
+import urllib
+
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str
+from django.utils.hashcompat import md5_constructor, sha_constructor
 from django.utils.translation import ugettext_lazy as _
-import datetime
-import urllib
 
 UNUSABLE_PASSWORD = '!' # This will never be a valid hash
 
@@ -27,22 +29,11 @@ def get_hexdigest(algorithm, salt, raw_password):
         except ImportError:
             raise ValueError('"crypt" password algorithm not supported in this environment')
         return crypt.crypt(raw_password, salt)
-    # The rest of the supported algorithms are supported by hashlib, but
-    # hashlib is only available in Python 2.5.
-    try:
-        import hashlib
-    except ImportError:
-        if algorithm == 'md5':
-            import md5
-            return md5.new(salt + raw_password).hexdigest()
-        elif algorithm == 'sha1':
-            import sha
-            return sha.new(salt + raw_password).hexdigest()
-    else:
-        if algorithm == 'md5':
-            return hashlib.md5(salt + raw_password).hexdigest()
-        elif algorithm == 'sha1':
-            return hashlib.sha1(salt + raw_password).hexdigest()
+
+    if algorithm == 'md5':
+        return md5_constructor(salt + raw_password).hexdigest()
+    elif algorithm == 'sha1':
+        return sha_constructor(salt + raw_password).hexdigest()
     raise ValueError("Got unknown password algorithm type in password.")
 
 def check_password(raw_password, enc_password):
