@@ -89,8 +89,15 @@ Fields
 
     .. attribute:: models.User.is_active
 
-        Boolean. Designates whether this account can be used to log in. Set this
-        flag to ``False`` instead of deleting accounts.
+        Boolean. Designates whether this user account should be considered
+        active. Set this flag to ``False`` instead of deleting accounts.
+
+        This doesn't control whether or not the user can log in. Nothing in
+        the authentication path checks the ``is_active`` flag, so if you want
+        to reject a login based on ``is_active`` being ``False``, it is up to
+        you to check that in your own login view. However, permission checking
+        using the methods like :meth:`~models.User.has_perm` does check this
+        flag and will always return ``False`` for inactive users.
 
     .. attribute:: models.User.is_superuser
 
