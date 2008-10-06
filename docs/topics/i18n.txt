@@ -174,7 +174,26 @@ For example, to translate a model's ``help_text``, do the following::
 
 In this example, ``ugettext_lazy()`` stores a lazy reference to the string --
 not the actual translation. The translation itself will be done when the string
-is used in a string context, such as template rendering on the Django admin site.
+is used in a string context, such as template rendering on the Django admin
+site.
+
+The result of a ``ugettext_lazy()`` call can be used wherever you would use a
+unicode string (an object with type ``unicode``) in Python. If you try to use
+it where a bytestring (a ``str`` object) is expected, things will not work as
+expected, since a ``ugettext_lazy()`` object doesn't know how to convert
+itself to a bytestring.  You can't use a unicode string inside a bytestring,
+either, so this is consistent with normal Python behavior. For example::
+
+    # This is fine: putting a unicode proxy into a unicode string.
+    u"Hello %s" % ugettext_lazy("people")
+
+    # This will not work, since you cannot insert a unicode object
+    # into a bytestring (nor can you insert our unicode proxy there)
+    "Hello %s" % ugettext_lazy("people")
+
+If you ever see output that looks like ``"hello
+<django.utils.functional...>"``, you have tried to insert the result of
+``ugettext_lazy()`` into a bytestring. That's a bug in your code.
 
 If you don't like the verbose name ``ugettext_lazy``, you can just alias it as
 ``_`` (underscore), like so::
