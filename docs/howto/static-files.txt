@@ -38,7 +38,8 @@ Here's the formal definition of the :func:`~django.views.static.serve` view:
 
 To use it, just put this in your :ref:`URLconf <topics-http-urls>`::
 
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root': '/path/to/media'}),
 
 ...where ``site_media`` is the URL where your media will be rooted, and
 ``/path/to/media`` is the filesystem root for your media. This will call the
@@ -56,6 +57,18 @@ Given the above URLconf:
     * The file ``/path/bar.jpg`` will not be accessible, because it doesn't
       fall under the document root.
 
+Of course, it's not compulsory to use a fixed string for the
+``'document_root'`` value. You might wish to make that an entry in your
+settings file and use the setting value there. That will allow you and
+other developers working on the code to easily change the value as
+required. For example, if we have a line in ``settings.py`` that says::
+
+    STATIC_DOC_ROOT = '/path/to/media'
+
+...we could write the above :ref:`URLconf <topics-http-urls>` entry as::
+
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root': settings.STATIC_DOC_ROOT}),
 
 Directory listings
 ==================
@@ -66,7 +79,8 @@ Optionally, you can pass the ``show_indexes`` parameter to the
 
 For example::
 
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media', 'show_indexes': True}),
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root': '/path/to/media', 'show_indexes': True}),
 
 You can customize the index view by creating a template called
 ``static/directory_index.html``. That template gets two objects in its context:
