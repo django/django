@@ -620,6 +620,20 @@ vertical bar (``"|"``) character. You can quite happily use such patterns for
 matching against incoming URLs and sending them off to views, but you cannot
 reverse such patterns.
 
+.. admonition:: Make sure your views are all correct
+
+    As part of working out which URL names map to which patterns, the
+    ``reverse()`` function has to import all of your URLConf files and examine
+    the name of each view. This involves importing each view function. If
+    there are *any* errors whilst importing any of your view functions, it
+    will cause ``reverse()`` to raise an error, even if that view function is
+    not the one you are trying to reverse.
+
+    Make sure that any views you reference in your URLConf files exist and can
+    be imported correctly. Do not include lines that reference views you
+    haven't written yet, because those views will not be importable.
+
+
 permalink()
 -----------
 
