@@ -1152,8 +1152,9 @@ multiple Django-powered sites, each with a separate time-zone setting.
 
 Normally, Django sets the ``os.environ['TZ']`` variable to the time zone you
 specify in the ``TIME_ZONE`` setting. Thus, all your views and models will
-automatically operate in the correct time zone. However, if you're using the
-manual configuration option (see below), Django will *not* touch the ``TZ``
+automatically operate in the correct time zone. However, if you're manually
+:ref:`manually configuring settings
+<settings-without-django-settings-module>`, Django will *not* touch the ``TZ``
 environment variable, and it'll be up to you to ensure your processes are
 running in the correct environment.
 

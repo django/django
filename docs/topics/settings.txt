@@ -85,8 +85,8 @@ Default settings
 ================
 
 A Django settings file doesn't have to define any settings if it doesn't need
-to. Each setting has a sensible default value. These defaults live in the file
-``django/conf/global_settings.py``.
+to. Each setting has a sensible default value. These defaults live in the
+module :file:`django/conf/global_settings.py`.
 
 Here's the algorithm Django uses in compiling settings:
 
@@ -176,7 +176,9 @@ itself, you likely don't want to have to set up an environment variable
 pointing to a settings module.
 
 In these cases, you can configure Django's settings manually. Do this by
-calling ``django.conf.settings.configure()``.
+calling:
+
+.. function:: django.conf.settings.configure(default_settings, **settings)
 
 Example::
 
@@ -196,9 +198,10 @@ recommended -- when you're using a piece of the framework inside a larger
 application.
 
 Consequently, when configured via ``settings.configure()``, Django will not
-make any modifications to the process environment variables. (See the
-explanation of ``TIME_ZONE``, above, for why this would normally occur.) It's
-assumed that you're already in full control of your environment in these cases.
+make any modifications to the process environment variables (see the
+documentation of :setting:`TIME_ZONE` for why this would normally occur). It's
+assumed that you're already in full control of your environment in these
+cases.
 
 Custom default settings
 -----------------------
