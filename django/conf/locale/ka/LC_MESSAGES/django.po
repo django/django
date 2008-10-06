@@ -1,18 +1,19 @@
+# translation of django.po to Georgian
 # Django translation to Georgian language.
-# Copyright (C) 2008
 # This file is distributed under the same license as the PACKAGE package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-16 22:32+0400\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2008-10-05 14:11+0400\n"
+"PO-Revision-Date: 2008-10-05 14:34+0400\n"
 "Last-Translator: David Avsajanishvili <avsd05@gmail.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language-Team: Georgian <ka@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -140,7 +141,7 @@ msgstr "ლიტვური"
 
 #: conf/global_settings.py:75
 msgid "Macedonian"
-msgstr "მაკედონური"
+msgstr "მაკედონიური"
 
 #: conf/global_settings.py:76
 msgid "Dutch"
@@ -172,7 +173,7 @@ msgstr "რუსული"
 
 #: conf/global_settings.py:83
 msgid "Slovak"
-msgstr "სლოვარური"
+msgstr "სლოვაკური"
 
 #: conf/global_settings.py:84
 msgid "Slovenian"
@@ -244,15 +245,15 @@ msgstr "მიმდინარე თვე"
 msgid "This year"
 msgstr "მიმდინარე წელი"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
 msgid "Yes"
 msgstr "კი"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
 msgid "No"
 msgstr "არა"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:390
 msgid "Unknown"
 msgstr "გაურკვეველი"
 
@@ -294,7 +295,7 @@ msgid "Changed %s."
 msgstr "%s შეცვლილია."
 
 #: contrib/admin/options.py:338 contrib/admin/options.py:348
-#: forms/models.py:275
+#: contrib/comments/templates/comments/preview.html:15 forms/models.py:275
 msgid "and"
 msgstr "და"
 
@@ -339,8 +340,7 @@ msgstr "%(name)s \"%(obj)s\" წარმატებით შეიცვა�
 
 #: contrib/admin/options.py:460
 #, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" წარმატებით დაემატა. შეგიძლიათ განაგრძოთ მისი "
 "რედაქტირება."
@@ -661,6 +661,7 @@ msgid "User"
 msgstr "მომხმარებელი"
 
 #: contrib/admin/templates/admin/object_history.html:24
+#: contrib/comments/templates/comments/moderation_queue.html:33
 msgid "Action"
 msgstr "მოქმედება"
 
@@ -746,8 +747,7 @@ msgstr "შეიყვანეთ იგივე პაროლი, და�
 #: contrib/admin/templates/admin/auth/user/change_password.html:26
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr ""
-"შეიყვანეთ ახალი პაროლი მომხმარებლისათვის <strong>%(username)s</strong>."
+msgstr "შეიყვანეთ ახალი პაროლი მომხმარებლისათვის <strong>%(username)s</strong>."
 
 #: contrib/admin/templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
@@ -907,7 +907,7 @@ msgstr "ელ. ფოსტა:"
 msgid "Reset my password"
 msgstr "აღვადგინოთ ჩემი პაროლი"
 
-#: contrib/admin/templatetags/admin_list.py:288
+#: contrib/admin/templatetags/admin_list.py:284
 msgid "All dates"
 msgstr "ყველა თარიღი"
 
@@ -1052,7 +1052,8 @@ msgstr "ტექსტი"
 msgid "Time"
 msgstr "დრო"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:22
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:21
+#: contrib/comments/templates/comments/moderation_queue.html:37
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
@@ -1118,8 +1119,7 @@ msgstr "ობიექტის ID-ის ჩვენება"
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
-msgstr ""
-"ერთი ობიექტის ამსახველი გვერდის content-type-ის და უნიკალური ID-ის ჩვენება."
+msgstr "ერთი ობიექტის ამსახველი გვერდის content-type-ის და უნიკალური ID-ის ჩვენება."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
@@ -1202,8 +1202,7 @@ msgstr "თქვენი ანგარიში არააქტიურ�
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
-msgstr ""
-"თქვენი ბროუზერი არ ღებულობს cookie-ებს. Cookie საჭიროა საიტზე შესასვლელად."
+msgstr "თქვენი ბროუზერი არ ღებულობს cookie-ებს. Cookie საჭიროა საიტზე შესასვლელად."
 
 #: contrib/auth/forms.py:100
 msgid "E-mail"
@@ -1296,8 +1295,7 @@ msgstr "თანამშრომლობის სტატუსი"
 
 #: contrib/auth/models.py:141
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
-"განსაზღვრავს, აქვს თუ არა მომხმარებელს ადმინისტრირების საიტზე შესვლის უფლება."
+msgstr "განსაზღვრავს, აქვს თუ არა მომხმარებელს ადმინისტრირების საიტზე შესვლის უფლება."
 
 #: contrib/auth/models.py:142
 msgid "active"
@@ -1369,24 +1367,25 @@ msgstr "კონტენტი"
 msgid "Metadata"
 msgstr "მეტა-მონაცემები"
 
-#: contrib/comments/forms.py:20
+#: contrib/comments/forms.py:19
+#: contrib/comments/templates/comments/moderation_queue.html:34
 msgid "Name"
 msgstr "სახელი"
 
-#: contrib/comments/forms.py:21
+#: contrib/comments/forms.py:20
 msgid "Email address"
 msgstr "ელ. ფოსტის მისამართი"
 
-#: contrib/comments/forms.py:23
+#: contrib/comments/forms.py:22
+#: contrib/comments/templates/comments/moderation_queue.html:35
 msgid "Comment"
 msgstr "კომენტარი"
 
-#: contrib/comments/forms.py:26
-msgid ""
-"If you enter anything in this field your comment will be treated as spam"
+#: contrib/comments/forms.py:25
+msgid "If you enter anything in this field your comment will be treated as spam"
 msgstr "თუ თვენ შეიყვანთ რამეს ამ ველში, თქვენი კომენტარი სპამად აღიქმება"
 
-#: contrib/comments/forms.py:126
+#: contrib/comments/forms.py:125
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -1422,8 +1421,7 @@ msgid "is public"
 msgstr "საყოველთაოა"
 
 #: contrib/comments/models.py:60
-msgid ""
-"Uncheck this box to make the comment effectively disappear from the site."
+msgid "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "გადანიშნეთ ეს დროშა, რათა კომენტარი რეალურად გაქრეს საიტიდან."
 
 #: contrib/comments/models.py:62
@@ -1469,6 +1467,132 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
+#: contrib/comments/templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "კომენტარის დადასტურება"
+
+#: contrib/comments/templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "ნამდვილად გსურთ ამ კომენტარის გამოქვეყნება?"
+
+#: contrib/comments/templates/comments/approve.html:12
+#: contrib/comments/templates/comments/moderation_queue.html:49
+msgid "Approve"
+msgstr "დასტური"
+
+#: contrib/comments/templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "გმადლობთ, კომენტარის დადასტურებისათვის"
+
+#: contrib/comments/templates/comments/approved.html:7
+#: contrib/comments/templates/comments/deleted.html:7
+#: contrib/comments/templates/comments/flagged.html:7
+msgid "Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "გმადლობთ, რომ დრო დახარჯეთ ჩვენს საიტზე დისკუსიის ხარისხის გასაუმჯობესებლად"
+
+#: contrib/comments/templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "წავშალოთ კომენტარები"
+
+#: contrib/comments/templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "ნამდვილად გსურთ ამ კომენტარის წაშლა?"
+
+#: contrib/comments/templates/comments/delete.html:12
+#: contrib/comments/templates/comments/moderation_queue.html:53
+msgid "Remove"
+msgstr "წაშლა"
+
+#: contrib/comments/templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "გმადლობთ, წაშლისათვის"
+
+#: contrib/comments/templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "კომენტარის მარკირება"
+
+#: contrib/comments/templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "ნამდვილად გსურთ ამ კომენტარის მარკირება?"
+
+#: contrib/comments/templates/comments/flag.html:12
+msgid "Flag"
+msgstr "დროშა"
+
+#: contrib/comments/templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "გმადლობთ, მარკირებისათვის"
+
+#: contrib/comments/templates/comments/form.html:16
+#: contrib/comments/templates/comments/preview.html:31
+msgid "Post"
+msgstr "გაგზავნა"
+
+#: contrib/comments/templates/comments/form.html:17
+#: contrib/comments/templates/comments/preview.html:32
+msgid "Preview"
+msgstr "წინასწარი ნახვა"
+
+#: contrib/comments/templates/comments/moderation_queue.html:4
+#: contrib/comments/templates/comments/moderation_queue.html:19
+msgid "Comment moderation queue"
+msgstr "კომენტარის მოდერაციის მიმდევრობა"
+
+#: contrib/comments/templates/comments/moderation_queue.html:26
+msgid "No comments to moderate"
+msgstr "მოდერაციისათვის კომენტარები არ არის"
+
+#: contrib/comments/templates/comments/moderation_queue.html:36
+msgid "Email"
+msgstr "ელ. ფოსტა"
+
+#: contrib/comments/templates/comments/moderation_queue.html:38
+msgid "Authenticated?"
+msgstr "დამოწმებულია?"
+
+#: contrib/comments/templates/comments/moderation_queue.html:39
+msgid "IP Address"
+msgstr "IP-მისამართი"
+
+#: contrib/comments/templates/comments/moderation_queue.html:40
+msgid "Date posted"
+msgstr "გაგზავნის თარიღი"
+
+#: contrib/comments/templates/comments/moderation_queue.html:63
+msgid "yes"
+msgstr "კი"
+
+#: contrib/comments/templates/comments/moderation_queue.html:63
+msgid "no"
+msgstr "არა"
+
+#: contrib/comments/templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "გმადლობთ კომენტარისთვის"
+
+#: contrib/comments/templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "გმადლობთ თქვენი კომენტარისათვის"
+
+#: contrib/comments/templates/comments/preview.html:4
+#: contrib/comments/templates/comments/preview.html:12
+msgid "Preview your comment"
+msgstr "კომენტარის წინასწარი ნახვა"
+
+#: contrib/comments/templates/comments/preview.html:10
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "გთხოვთ, გაასწორეთ ქვემოთ მოყვანილი შეცდომა"
+msgstr[1] "გთხოვთ, გაასწორეთ ქვემოთ მოყვანილი შეცდომები"
+
+#: contrib/comments/templates/comments/preview.html:15
+msgid "Post your comment"
+msgstr "კომენტარის გაგზავნა"
+
+#: contrib/comments/templates/comments/preview.html:15
+msgid "or make changes"
+msgstr "ან შეიტანეთ ცვლილებები"
+
 #: contrib/contenttypes/models.py:67
 msgid "python model class name"
 msgstr "python-ის მოდელის კლასის სახელი"
@@ -1482,8 +1606,7 @@ msgid "content types"
 msgstr "კონტენტის ტიპები"
 
 #: contrib/flatpages/admin.py:9
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "მაგალითი: '/about/contact/'. ყურადღება მიაქციეთ დახრილ ხაზებს თავში და "
 "ბოლოში."
@@ -1663,8 +1786,7 @@ msgstr "ამ ველში შეიძლება იყოს 7 ან 8 
 
 #: contrib/localflavor/ar/forms.py:79
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr ""
-"შეიყვანეთ დასაშვები CUIT ერთ-ერთ ფორმატში: XX-XXXXXXXX-X ან XXXXXXXXXXXX."
+msgstr "შეიყვანეთ დასაშვები CUIT ერთ-ერთ ფორმატში: XX-XXXXXXXX-X ან XXXXXXXXXXXX."
 
 #: contrib/localflavor/ar/forms.py:80
 msgid "Invalid CUIT."
@@ -1731,8 +1853,7 @@ msgstr "ტელეფონის ნომრები უნდა იყო
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
-msgstr ""
-"შეიყვანეთ დასაშვები ბრაზილიური შტატი. მოცემული შტატი არ არის დასაშვები."
+msgstr "შეიყვანეთ დასაშვები ბრაზილიური შტატი. მოცემული შტატი არ არის დასაშვები."
 
 #: contrib/localflavor/br/forms.py:94
 msgid "Invalid CPF number."
@@ -1756,8 +1877,7 @@ msgstr "შეიყვანეთ საფოსტო კოდი ფორ
 
 #: contrib/localflavor/ca/forms.py:88
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr ""
-"შეიყვანეთ კანადაში დასაშვები სოციალური დაზღვევის ნომერი ფორმატში: XXX-XXX-XXX"
+msgstr "შეიყვანეთ კანადაში დასაშვები სოციალური დაზღვევის ნომერი ფორმატში: XXX-XXX-XXX"
 
 #: contrib/localflavor/ch/ch_states.py:5
 msgid "Aargau"
@@ -2229,8 +2349,7 @@ msgstr "ვალენსიის თემი"
 
 #: contrib/localflavor/es/forms.py:19
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr ""
-"შეიყვანეთ სწორი საფოსტო კოდი შემდეგ ინტერვალში და ფორმატში: 01XXX - 52XXX."
+msgstr "შეიყვანეთ სწორი საფოსტო კოდი შემდეგ ინტერვალში და ფორმატში: 01XXX - 52XXX."
 
 #: contrib/localflavor/es/forms.py:39
 msgid ""
@@ -2261,8 +2380,7 @@ msgid "Invalid checksum for CIF."
 msgstr "CIF-ის საკონტროლო ჯამი არასწორია."
 
 #: contrib/localflavor/es/forms.py:142
-msgid ""
-"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
+msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr ""
 "გთხოვთ, შეიყვანოთ სწორი საბანკო ანგარიშის ნომერი ფორმატში: XXXX-XXXX-XX-"
 "XXXXXXXXXX."
@@ -2280,10 +2398,8 @@ msgid "Enter a zip code in the format XXXXXXX."
 msgstr "შეიყვანეთ zip-კოდი ფორმატში: XXXXXXX."
 
 #: contrib/localflavor/is_/forms.py:17
-msgid ""
-"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
-msgstr ""
-"შეიყვანეთ სწორი ისლანდიური საიდენტიფიკაციო ნომერი. ფორმატია XXXXXX-XXXX."
+msgid "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+msgstr "შეიყვანეთ სწორი ისლანდიური საიდენტიფიკაციო ნომერი. ფორმატია XXXXXX-XXXX."
 
 #: contrib/localflavor/is_/forms.py:18
 msgid "The Icelandic identification number is not valid."
@@ -2702,8 +2818,7 @@ msgid "Wrong checksum for the National Identification Number."
 msgstr "არასწორი საკონტროლო ჯამი ეროვნულ საიდენტიფიკაციო ნომერში."
 
 #: contrib/localflavor/pl/forms.py:71
-msgid ""
-"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
+msgid "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgstr ""
 "შეიყვანეთ საგადასახადოს ნომერი (NIP) ფორმატში: XXX-XXX-XX-XX or XX-XX-XXX-"
 "XXX."
@@ -2714,13 +2829,11 @@ msgstr "არასწორი საკონტროლო ჯამი ს
 
 #: contrib/localflavor/pl/forms.py:111
 msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
-msgstr ""
-"საწარმოოს ეროვნული სარეგისტრაციო ნომერი (REGON) შედგება 7 ან 9 თანრიგისაგან."
+msgstr "საწარმოოს ეროვნული სარეგისტრაციო ნომერი (REGON) შედგება 7 ან 9 თანრიგისაგან."
 
 #: contrib/localflavor/pl/forms.py:112
 msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr ""
-"არასწორი საკონტროლო ჯამი საწარმოოს ეროვნულ სარეგისტრაციო ნომერში (REGON)."
+msgstr "არასწორი საკონტროლო ჯამი საწარმოოს ეროვნულ სარეგისტრაციო ნომერში (REGON)."
 
 #: contrib/localflavor/pl/forms.py:155
 msgid "Enter a postal code in the format XX-XXX."
@@ -2800,8 +2913,7 @@ msgstr "შეიყვანეთ სწორი URL."
 
 #: contrib/localflavor/ro/forms.py:141
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr ""
-"შეიყვანეთ დასაშვები CUIT ერთ-ერთ ფორმატში: XX-XXXXXXXX-X ან XXXXXXXXXXXX."
+msgstr "შეიყვანეთ დასაშვები CUIT ერთ-ერთ ფორმატში: XX-XXXXXXXX-X ან XXXXXXXXXXXX."
 
 #: contrib/localflavor/ro/forms.py:171
 msgid "Phone numbers must be in XXXX-XXXXXX format."
@@ -3507,8 +3619,7 @@ msgstr "გადამისამართება გვერდიდა�
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
-msgstr ""
-"უნდა იყოს აბსოლუტური გზა დომენის სახელის გარეშე. მაგალითი: '/events/search/'."
+msgstr "უნდა იყოს აბსოლუტური გზა დომენის სახელის გარეშე. მაგალითი: '/events/search/'."
 
 #: contrib/redirects/models.py:9
 msgid "redirect to"
@@ -3604,8 +3715,7 @@ msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "შეიყვანეთ სწორი დრო HH:MM ფორმატში."
 
 #: db/models/fields/related.py:761
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "დააჭირეთ \"Control\", ან \"Command\" Mac-ზე, ერთზე მეტი მნიშვნელობის "
 "ასარჩევად."
@@ -3613,12 +3723,9 @@ msgstr ""
 #: db/models/fields/related.py:838
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] ""
-"გთხოვთ, შეიყვანოთ სწორი %(self)s ID-ები. მნიშვნელობა %(value)r არასწორია."
-msgstr[1] ""
-"გთხოვთ, შეიყვანოთ სწორი %(self)s ID-ები. მნიშვნელობები %(value)r არასწორია."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "გთხოვთ, შეიყვანოთ სწორი %(self)s ID-ები. მნიშვნელობა %(value)r არასწორია."
+msgstr[1] "გთხოვთ, შეიყვანოთ სწორი %(self)s ID-ები. მნიშვნელობები %(value)r არასწორია."
 
 #: forms/fields.py:54
 msgid "This field is required."
@@ -3689,8 +3796,7 @@ msgstr "შეიყვანეთ სწორი თარიღი და �
 
 #: forms/fields.py:446
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
-"ფაილი არ იყო გამოგზავნილი. შეამოწმეთ კოდირების ტიპი მოცემული ფორმისათვის."
+msgstr "ფაილი არ იყო გამოგზავნილი. შეამოწმეთ კოდირების ტიპი მოცემული ფორმისათვის."
 
 #: forms/fields.py:447
 msgid "No file was submitted."
@@ -3721,7 +3827,7 @@ msgstr "როგორც ჩანს, URL არის გაწყვეტ�
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. %(value)s დასაშვები არ არის."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:660
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:661
 msgid "Enter a list of values."
 msgstr "შეიყვანეთ მნიშვნელობების სია."
 
@@ -3730,8 +3836,7 @@ msgid "Enter a valid IPv4 address."
 msgstr "შეიყვანეთ სწორი IPv4 მისამართი."
 
 #: forms/fields.py:887
-msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "შეიყვანეთ სწორი 'slug'-მნიშვნელობა, რომელიც შეიცავს მხოლოდ ასოებს, ციფრებს, "
 "ხაზგასმის ნიშნებს და დეფისებს."
@@ -3745,11 +3850,11 @@ msgstr "დალაგება"
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s მოცემული %(field_label)s-ით უკვე არსებობს."
 
-#: forms/models.py:590
+#: forms/models.py:591
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. ეს არჩევანი დასაშვები არ არის."
 
-#: forms/models.py:661
+#: forms/models.py:662
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. %s დასაშვები არ არის."
@@ -4068,3 +4173,4 @@ msgstr "%(verbose_name)s წარმატებით შეიცვალა
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s წაიშალა."
+
