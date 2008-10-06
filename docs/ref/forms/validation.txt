@@ -25,7 +25,8 @@ The three types of cleaning methods are:
     * The ``clean()`` method on a Field subclass. This is responsible
       for cleaning the data in a way that is generic for that type of field.
       For example, a FloatField will turn the data into a Python ``float`` or
-      raise a ``ValidationError``.
+      raise a ``ValidationError``. This method returns the clean data, which
+      is then inserted into the ``cleaned_data`` dictionary of the form.
 
     * The ``clean_<fieldname>()`` method in a form subclass -- where
       ``<fieldname>`` is replaced with the name of the form field attribute.
@@ -44,6 +45,10 @@ The three types of cleaning methods are:
       formfield-specific piece of validation and, possibly,
       cleaning/normalizing the data.
 
+      Just like the general field ``clean()`` method, above, this method
+      should return the cleaned data, regardless of whether it changed
+      anything or not.
+
     * The Form subclass's ``clean()`` method. This method can perform
       any validation that requires access to multiple fields from the form at
       once. This is where you might put in things to check that if field ``A``
@@ -56,7 +61,9 @@ The three types of cleaning methods are:
       Note that any errors raised by your ``Form.clean()`` override will not
       be associated with any field in particular. They go into a special
       "field" (called ``__all__``), which you can access via the
-      ``non_field_errors()`` method if you need to.
+      ``non_field_errors()`` method if you need to. If you want to attach
+      errors to a specific field in the form, you will need to access the
+      `_errors` attribute on the form, which is `described later`_.
 
 These methods are run in the order given above, one field at a time.  That is,
 for each field in the form (in the order they are declared in the form
@@ -64,8 +71,10 @@ definition), the ``Field.clean()`` method (or its override) is run, then
 ``clean_<fieldname>()``. Finally, once those two methods are run for every
 field, the ``Form.clean()`` method, or its override, is executed.
 
-As mentioned above, any of these methods can raise a ``ValidationError``. For
-any field, if the ``Field.clean()`` method raises a ``ValidationError``, any
+Examples of each of these methods are provided below.
+
+As mentioned, any of these methods can raise a ``ValidationError``. For any
+field, if the ``Field.clean()`` method raises a ``ValidationError``, any
 field-specific cleaning method is not called. However, the cleaning methods
 for all remaining fields are still executed.
 
@@ -78,32 +87,219 @@ should iterate through ``self.cleaned_data.items()``, possibly considering the
 ``_errors`` dictionary attribute on the form as well. In this way, you will
 already know which fields have passed their individual validation requirements.
 
-A simple example
-~~~~~~~~~~~~~~~~
+.. _described later:
 
-Here's a simple example of a custom field that validates its input is a string
+Form subclasses and modifying field errors
+==========================================
+
+Sometimes, in a form's ``clean()`` method, you will want to add an error
+message to a particular field in the form. This won't always be appropriate
+and the more typical situation is to raise a ``ValidationError`` from
+``Form.clean()``, which is turned into a form-wide error that is available
+through the ``Form.non_field_errors()`` method.
+
+When you really do need to attach the error to a particular field, you should
+store (or amend) a key in the `Form._errors` attribute. This attribute is an
+instance of a ``django.form.utils.ErrorDict`` class. Essentially, though, it's
+just a dictionary. There is a key in the dictionary for each field in the form
+that has an error. Each value in the dictionary is a
+``django.form.utils.ErrorList`` instance, which is a list that knows how to
+display itself in different ways. So you can treat `_errors` as a dictionary
+mapping field names to lists.
+
+If you want to add a new error to a particular field, you should check whether
+the key already exists in `self._errors` or not. If not, create a new entry
+for the given key, holding an empty ``ErrorList`` instance. In either case,
+you can then append your error message to the list for the field name in
+question and it will be displayed when the form is displayed.
+
+There is an example of modifying `self._errors` in the following section.
+
+.. admonition:: What's in a name?
+
+    You may be wondering why is this attribute called ``_errors`` and not
+    ``errors``. Normal Python practice is to prefix a name with an underscore
+    if it's not for external usage. In this case, you are subclassing the
+    ``Form`` class, so you are essentially writing new internals. In effect,
+    you are given permission to access some of the internals of ``Form``.
+    
+    Of course, any code outside your form should never access ``_errors``
+    directly. The data is available to external code through the ``errors``
+    property, which populates ``_errors`` before returning it).
+
+    Another reason is purely historical: the attribute has been called
+    ``_errors`` since the early days of the forms module and changing it now
+    (particularly since ``errors`` is used for the read-only property name)
+    would be inconvenient for a number of reasons. You can use whichever
+    explanation makes you feel more comfortable. The result is the same.
+
+Using validation in practice
+=============================
+
+The previous sections explained how validation works in general for forms.
+Since it can sometimes be easier to put things into place by seeing each
+feature in use, here are a series of small examples that use each of the
+previous features.
+
+Form field default cleaning
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Let's firstly create a custom form field that validates its input is a string
 containing comma-separated e-mail addresses, with at least one address. We'll
 keep it simple and assume e-mail validation is contained in a function called
-``is_valid_email()``. The full class::
+``is_valid_email()``. The full class looks like this::
 
     from django import forms
 
     class MultiEmailField(forms.Field):
         def clean(self, value):
+            """
+            Check that the field contains one or more comma-separated emails
+            and normalizes the data to a list of the email strings.
+            """
             if not value:
                 raise forms.ValidationError('Enter at least one e-mail address.')
             emails = value.split(',')
             for email in emails:
                 if not is_valid_email(email):
                     raise forms.ValidationError('%s is not a valid e-mail address.' % email)
+
+            # Always return the cleaned data.
             return emails
 
-Let's alter the ongoing ``ContactForm`` example to demonstrate how you'd use
-this in a form. Simply use ``MultiEmailField`` instead of ``forms.EmailField``,
-like so::
+Every form that uses this field will have this ``clean()`` method run before
+anything else can be done with the field's data. This is cleaning that is
+specific to this type of field, regardless of how it is subsequently used.
+
+Let's create a simple ``ContactForm`` to demonstrate how you'd use this
+field::
 
     class ContactForm(forms.Form):
         subject = forms.CharField(max_length=100)
         message = forms.CharField()
-        senders = MultiEmailField()
+        sender = forms.EmailField()
+        recipients = MultiEmailField()
         cc_myself = forms.BooleanField(required=False)
+
+Simply use ``MultiEmailField`` like any other form field. When the
+``is_valid()`` method is called on the form, the ``MultiEmailField.clean()``
+method will be run as part of the cleaning process.
+
+Cleaning a specific field attribute
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Continuing on from the previous example, suppose that in our ``ContactForm``,
+we want to make sure that the ``recipients`` field always contains the address
+``"fred@example.com"``. This is validation that is specific to our form, so we
+don't want to put it into the general ``MultiEmailField`` class. Instead, we
+write a cleaning method that operates on the ``recipients`` field, like so::
+
+    class ContactForm(forms.Form):
+        # Everything as before.
+        ...
+
+        def clean_recipients(self):
+            data = self.cleaned_data['recipients']
+            if "fred@example.com" not in data:
+                raise forms.ValidationError("You have forgotten about Fred!")
+
+            # Always return the cleaned data, whether you have changed it or
+            # not.
+            return data
+
+Cleaning and validating fields that depend on each other
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Suppose we add another requirement to our contact form: if the ``cc_myself``
+field is ``True``, the ``subject`` must contain the word ``"help"``. We are
+performing validation on more than one field at a time, so the form's
+``clean()`` method is a good spot to do this. Notice that we are talking about
+the ``clean()`` method on the form here, whereas earlier we were writing a
+``clean()`` method on a field. It's important to keep the field and form
+difference clear when working out where to validate things. Fields are single
+data points, forms are a collection of fields.
+
+By the time the form's ``clean()`` method is called, all the individual field
+clean methods will have been run (the previous two sections), so
+``self.cleaned_data`` will be populated with any data that has survived so
+far. So you also need to remember to allow for the fact that the fields you
+are wanting to validate might not have survived the initial individual field
+checks.
+
+There are two way to report any errors from this step. Probably the most
+common method is to display the error at the top of the form. To create such
+an error, you can raise a ``ValidationError`` from the ``clean()`` method. For
+example::
+
+    class ContactForm(forms.Form):
+        # Everything as before.
+        ...
+
+        def clean(self):
+            cleaned_data = self.cleaned_data
+            cc_myself = cleaned_data.get("cc_myself")
+            subject = cleaned_data.get("subject")
+
+            if cc_myself and subject:
+                # Only do something if both fields are valid so far.
+                if "help" not in subject:
+                    raise forms.ValidationError("Did not send for 'help' in "
+                            "the subject despite CC'ing yourself.")
+
+            # Always return the full collection of cleaned data.
+            return cleaned_data
+
+In this code, if the validation error is raised, the form will display an
+error message at the top of the form (normally) describing the problem.
+
+The second approach might involve assigning the error message to one of the
+fields. In this case, let's assign an error message to both the "subject" and
+"cc_myself" rows in the form display. Be careful when doing this in practice,
+since it can lead to confusing form output. We're showing what is possible
+here and leaving it up to you and your designers to work out what works
+effectively in your particular situation. Our new code (replacing the previous
+sample) looks like this::
+
+    from django.forms.utils import ErrorList
+
+    class ContactForm(forms.Form):
+        # Everything as before.
+        ...
+
+        def clean(self):
+            cleaned_data = self.cleaned_data
+            cc_myself = cleaned_data.get("cc_myself")
+            subject = cleaned_data.get("subject")
+
+            if cc_myself and subject and "help" not in subject:
+                # We know these are not in self._errors now (see discussion
+                # below).
+                msg = u"Must put 'help' in subject when cc'ing yourself."
+                self._errors["cc_myself"] = ErrorList([msg])
+                self._errors["subject"] = ErrorList([msg])
+
+                # These fields are no longer valid. Remove them from the
+                # cleaned data.
+                del cleaned_data["cc_myself"]
+                del cleaned_data["subject"]
+
+            # Always return the full collection of cleaned data.
+            return cleaned_data
+
+As you can see, this approach requires a bit more effort, not withstanding the
+extra design effort to create a sensible form display. The details are worth
+noting, however. Firstly, earlier we mentioned that you might need to check if
+the field name keys already exist in the ``_errors`` dictionary. In this case,
+since we know the fields exist in ``self.cleaned_data``, they must have been
+valid when cleaned as individual fields, so there will be no corresonding
+entries in ``_errors``.
+
+Secondly, once we have decided that the combined data in the two fields we are
+considering aren't valid, we must remember to remove them from the
+``cleaned_data``.
+
+In fact, Django will currently completely wipe out the ``cleaned_data``
+dictionary if there are any errors in the form. However, this behaviour may
+change in the future, so it's not a bad idea to clean up after yourself in the
+first place.
+
