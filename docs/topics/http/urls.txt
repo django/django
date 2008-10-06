@@ -594,10 +594,11 @@ reverse()
 ---------
 
 If you need to use something similar to the :ttag:`url` template tag in
-your code, Django provides the ``django.core.urlresolvers.reverse()``. The
-``reverse()`` function has the following signature::
+your code, Django provides the following method (in the
+``django.core.urlresolvers`` module):
 
-    reverse(viewname, urlconf=None, args=None, kwargs=None)
+.. currentmodule:: django.core.urlresolvers
+.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None)
 
 ``viewname`` is either the function name (either a function reference, or the
 string version of the name, if you used that form in ``urlpatterns``) or the
