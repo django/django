@@ -92,34 +92,45 @@ class UTF8Class:
 class Templates(unittest.TestCase):
     def test_loaders_security(self):
         def test_template_sources(path, template_dirs, expected_sources):
-            # Fix expected sources so they are normcased and abspathed
-            expected_sources = [os.path.normcase(os.path.abspath(s)) for s in expected_sources]
-            # Test app_directories loader
-            sources = app_directories.get_template_sources(path, template_dirs)
-            self.assertEqual(list(sources), expected_sources)
-            # Test filesystem loader
-            sources = filesystem.get_template_sources(path, template_dirs)
-            self.assertEqual(list(sources), expected_sources)
+            if isinstance(expected_sources, list):
+                # Fix expected sources so they are normcased and abspathed
+                expected_sources = [os.path.normcase(os.path.abspath(s)) for s in expected_sources]
+            # Test the two loaders (app_directores and filesystem).
+            func1 = lambda p, t: list(app_directories.get_template_sources(p, t))
+            func2 = lambda p, t: list(filesystem.get_template_sources(p, t))
+            for func in (func1, func2):
+                if isinstance(expected_sources, list):
+                    self.assertEqual(func(path, template_dirs), expected_sources)
+                else:
+                    self.assertRaises(expected_sources, func, path, template_dirs)
 
         template_dirs = ['/dir1', '/dir2']
         test_template_sources('index.html', template_dirs,
                               ['/dir1/index.html', '/dir2/index.html'])
-        test_template_sources('/etc/passwd', template_dirs,
-                              [])
+        test_template_sources('/etc/passwd', template_dirs, [])
         test_template_sources('etc/passwd', template_dirs,
                               ['/dir1/etc/passwd', '/dir2/etc/passwd'])
-        test_template_sources('../etc/passwd', template_dirs,
-                              [])
-        test_template_sources('../../../etc/passwd', template_dirs,
-                              [])
+        test_template_sources('../etc/passwd', template_dirs, [])
+        test_template_sources('../../../etc/passwd', template_dirs, [])
         test_template_sources('/dir1/index.html', template_dirs,
                               ['/dir1/index.html'])
         test_template_sources('../dir2/index.html', template_dirs,
                               ['/dir2/index.html'])
-        test_template_sources('/dir1blah', template_dirs,
-                              [])
-        test_template_sources('../dir1blah', template_dirs,
-                              [])
+        test_template_sources('/dir1blah', template_dirs, [])
+        test_template_sources('../dir1blah', template_dirs, [])
+
+        # UTF-8 bytestrings are permitted.
+        test_template_sources('\xc3\x85ngstr\xc3\xb6m', template_dirs,
+                              [u'/dir1/Ångström', u'/dir2/Ångström'])
+        # Unicode strings are permitted.
+        test_template_sources(u'Ångström', template_dirs,
+                              [u'/dir1/Ångström', u'/dir2/Ångström'])
+        test_template_sources(u'Ångström', ['/Straße'], [u'/Straße/Ångström'])
+        test_template_sources('\xc3\x85ngstr\xc3\xb6m', ['/Straße'],
+                              [u'/Straße/Ångström'])
+        # Invalid UTF-8 encoding in bytestrings is not. Should raise a
+        # semi-useful error message.
+        test_template_sources('\xc3\xc3', template_dirs, UnicodeDecodeError)
 
         # Case insensitive tests (for win32). Not run unless we're on
         # a case insensitive operating system.
@@ -372,7 +383,7 @@ class Templates(unittest.TestCase):
 
             # Numbers as filter arguments should work
             'filter-syntax19': ('{{ var|truncatewords:1 }}', {"var": "hello world"}, "hello ..."),
-            
+
             #filters should accept empty string constants
             'filter-syntax20': ('{{ ""|default_if_none:"was none" }}', {}, ""),
 

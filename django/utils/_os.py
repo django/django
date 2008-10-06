@@ -1,4 +1,5 @@
 from os.path import join, normcase, abspath, sep
+from django.utils.encoding import force_unicode
 
 def safe_join(base, *paths):
     """
@@ -10,6 +11,8 @@ def safe_join(base, *paths):
     """
     # We need to use normcase to ensure we don't false-negative on case
     # insensitive operating systems (like Windows).
+    base = force_unicode(base)
+    paths = [force_unicode(p) for p in paths]
     final_path = normcase(abspath(join(base, *paths)))
     base_path = normcase(abspath(base))
     base_path_len = len(base_path)
