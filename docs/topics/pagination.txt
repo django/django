@@ -75,6 +75,63 @@ page::
     objects such as Django's ``QuerySet`` to use a more efficient ``count()``
     method when available.
 
+
+Using ``Paginator`` in a view
+==============================
+
+Here's a slightly more complex example using :class:`Paginator` in a view to
+paginate a queryset. We give both the view and the accompanying template to
+show how you can display the results. This example assumes you have a
+``Contacts`` model that has already been imported.
+
+The view function looks like this::
+
+    from django.core.paginator import Paginator, InvalidPage, EmptyPage
+
+    def listing(request):
+        contact_list = Contacts.objects.all()
+        paginator = Paginator(contact_list, 25) # Show 25 contacts per page
+
+        # Make sure page request is an int. If not, deliver first page.
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+
+        # If page request (9999) is out of range, deliver last page of results.
+        try:
+            contacts = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            contacts = paginator.page(paginator.num_pages)
+
+        return render_to_response('list.html', {"contacts": contacts})
+
+In the template :file:`list.html`, you'll want to include navigation between
+pages along with any interesting information from the objects themselves::
+
+    {% for contact in contacts.object_list %}
+        {# Each "contact" is a Contact model object. #}
+        {{ contact.full_name|upper }}<br />
+        ...
+    {% endfor %}
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if contacts.has_previous %}
+                <a href="?page={{ contacts.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ contacts.number }} of {{ contacts.paginator.num_pages }}.
+            </span>
+
+            {% if contacts.has_next %}
+                <a href="?page={{ contacts.next_page_number }}">next</a>
+            {% endif %}
+        </span>
+    </div>
+
+
 ``Paginator`` objects
 =====================
 
@@ -114,7 +171,7 @@ Methods
 -------
 
 .. method:: Paginator.page(number)
-    
+
     Returns a :class:`Page` object with the given 1-based index. Raises
     :exc:`InvalidPage` if the given page number doesn't exist.
 
@@ -122,10 +179,10 @@ Attributes
 ----------
 
 .. attribute:: Paginator.count
-    
+
     The total number of objects, across all pages.
-    
-    .. note:: 
+
+    .. note::
 
         When determining the number of objects contained in ``object_list``,
         ``Paginator`` will first try calling ``object_list.count()``. If
@@ -133,13 +190,13 @@ Attributes
         fallback to using ``object_list.__len__()``. This allows objects, such
         as Django's ``QuerySet``, to use a more efficient ``count()`` method
         when available.
-        
+
 .. attribute:: Paginator.num_pages
-    
+
     The total number of pages.
-    
+
 .. attribute:: Paginator.page_range
-    
+
     A 1-based range of page numbers, e.g., ``[1, 2, 3, 4]``.
 
 ``InvalidPage`` exceptions
@@ -174,36 +231,36 @@ Methods
 -------
 
 .. method:: Page.has_next()
-    
+
     Returns ``True`` if there's a next page.
-    
+
 .. method:: Page.has_previous()
-    
+
     Returns ``True`` if there's a previous page.
-    
+
 .. method:: Page.has_other_pages()
-    
+
     Returns ``True`` if there's a next *or* previous page.
-    
+
 .. method:: Page.next_page_number()
-    
+
     Returns the next page number. Note that this is "dumb" and will return the
     next page number regardless of whether a subsequent page exists.
-    
+
 .. method:: Page.previous_page_number()
-    
+
     Returns the previous page number. Note that this is "dumb" and will return
     the previous page number regardless of whether a previous page exists.
-    
+
 .. method:: Page.start_index()
-    
+
     Returns the 1-based index of the first object on the page, relative to all
     of the objects in the paginator's list. For example, when paginating a list
     of 5 objects with 2 objects per page, the second page's :meth:`~Page.start_index`
     would return ``3``.
-    
+
 .. method:: Page.end_index()
-    
+
     Returns the 1-based index of the last object on the page, relative to all of
     the objects in the paginator's list. For example, when paginating a list of
     5 objects with 2 objects per page, the second page's :meth:`~Page.end_index`
@@ -213,14 +270,14 @@ Attributes
 ----------
 
 .. attribute:: Page.object_list
-    
+
     The list of objects on this page.
-    
+
 .. attribute:: Page.number
-    
+
     The 1-based page number for this page.
-    
+
 .. attribute:: Page.paginator
-    
+
     The associated :class:`Paginator` object.
 
