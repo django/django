@@ -382,4 +382,42 @@ class SessionTests(TestCase):
         response = self.client.get('/test_client_regress/check_session/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, 'YES')
-        
+
+class RequestMethodTests(TestCase):
+    def test_get(self):
+        "Request a view via request method GET"
+        response = self.client.get('/test_client_regress/request_methods/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'request method: GET')
+
+    def test_post(self):
+        "Request a view via request method POST"
+        response = self.client.post('/test_client_regress/request_methods/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'request method: POST')
+
+    def test_head(self):
+        "Request a view via request method HEAD"
+        response = self.client.head('/test_client_regress/request_methods/')
+        self.assertEqual(response.status_code, 200)
+        # A HEAD request doesn't return any content.
+        self.assertNotEqual(response.content, 'request method: HEAD')
+        self.assertEqual(response.content, '')
+
+    def test_options(self):
+        "Request a view via request method OPTIONS"
+        response = self.client.options('/test_client_regress/request_methods/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'request method: OPTIONS')
+
+    def test_put(self):
+        "Request a view via request method PUT"
+        response = self.client.put('/test_client_regress/request_methods/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'request method: PUT')
+
+    def test_delete(self):
+        "Request a view via request method DELETE"
+        response = self.client.delete('/test_client_regress/request_methods/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'request method: DELETE')

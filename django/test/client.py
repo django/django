@@ -284,6 +284,69 @@ class Client(object):
 
         return self.request(**r)
 
+    def head(self, path, data={}, **extra):
+        """
+        Request a response from the server using HEAD.
+        """
+        r = {
+            'CONTENT_LENGTH':  None,
+            'CONTENT_TYPE':    'text/html; charset=utf-8',
+            'PATH_INFO':       urllib.unquote(path),
+            'QUERY_STRING':    urlencode(data, doseq=True),
+            'REQUEST_METHOD': 'HEAD',
+        }
+        r.update(extra)
+
+        return self.request(**r)
+
+    def options(self, path, data={}, **extra):
+        """
+        Request a response from the server using OPTIONS.
+        """
+        r = {
+            'CONTENT_LENGTH':  None,
+            'CONTENT_TYPE':    None,
+            'PATH_INFO':       urllib.unquote(path),
+            'QUERY_STRING':    urlencode(data, doseq=True),
+            'REQUEST_METHOD': 'OPTIONS',
+        }
+        r.update(extra)
+
+        return self.request(**r)
+
+    def put(self, path, data={}, content_type=MULTIPART_CONTENT, **extra):
+        """
+        Send a resource to the server using PUT.
+        """
+        if content_type is MULTIPART_CONTENT:
+            post_data = encode_multipart(BOUNDARY, data)
+        else:
+            post_data = data
+        r = {
+            'CONTENT_LENGTH': len(post_data),
+            'CONTENT_TYPE':   content_type,
+            'PATH_INFO':      urllib.unquote(path),
+            'REQUEST_METHOD': 'PUT',
+            'wsgi.input':     FakePayload(post_data),
+        }
+        r.update(extra)
+
+        return self.request(**r)
+
+    def delete(self, path, data={}, **extra):
+        """
+        Send a DELETE request to the server.
+        """
+        r = {
+            'CONTENT_LENGTH':  None,
+            'CONTENT_TYPE':    None,
+            'PATH_INFO':       urllib.unquote(path),
+            'REQUEST_METHOD': 'DELETE',
+            }
+        r.update(extra)
+
+        return self.request(**r)
+
     def login(self, **credentials):
         """
         Sets the Client to appear as if it has successfully logged into a site.
