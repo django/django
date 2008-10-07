@@ -608,6 +608,10 @@ General improvements, or other changes to the APIs that should be emphasized
 should use the ".. versionchanged:: X.Y" directive (with the same format as the
 ``versionadded`` mentioned above.
 
+There's a full page of information about the :ref:`Django documentation
+system <internals-documentation>` that you should read prior to working on the
+documentation.
+
 Guidelines for ReST files
 -------------------------
 
