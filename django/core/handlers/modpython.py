@@ -6,7 +6,7 @@ from django.core import signals
 from django.core.handlers.base import BaseHandler
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
-from django.utils.encoding import force_unicode, smart_str
+from django.utils.encoding import force_unicode, smart_str, iri_to_uri
 
 # NOTE: do *not* import settings (or any module which eventually imports
 # settings) until after ModPythonHandler has been called; otherwise os.environ
@@ -64,7 +64,9 @@ class ModPythonRequest(http.HttpRequest):
                           unicode(cookies), unicode(meta)))
 
     def get_full_path(self):
-        return '%s%s' % (self.path, self._req.args and ('?' + self._req.args) or '')
+        # RFC 3986 requires self._req.args to be in the ASCII range, but this
+        # doesn't always happen, so rather than crash, we defensively encode it.
+        return '%s%s' % (self.path, self._req.args and ('?' + iri_to_uri(self._req.args)) or '')
 
     def is_secure(self):
         try:
