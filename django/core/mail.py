@@ -247,8 +247,14 @@ class EmailMessage(object):
         msg['Subject'] = self.subject
         msg['From'] = self.from_email
         msg['To'] = ', '.join(self.to)
-        msg['Date'] = formatdate()
-        msg['Message-ID'] = make_msgid()
+
+        # Email header names are case-insensitive (RFC 2045), so we have to
+        # accommodate that when doing comparisons.
+        header_names = [key.lower() for key in self.extra_headers]
+        if 'date' not in header_names:
+            msg['Date'] = formatdate()
+        if 'message-id' not in header_names:
+            msg['Message-ID'] = make_msgid()
         for name, value in self.extra_headers.items():
             msg[name] = value
         return msg

@@ -52,4 +52,12 @@ BadHeaderError: Header values can't contain newlines (got u'Subject\nInjection T
 >>> message.as_string()
 'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: Long subject lines that get wrapped should use a space continuation\n character to get expected behaviour in Outlook and Thunderbird\nFrom: from@example.com\nTo: to@example.com\nDate: ...\nMessage-ID: <...>\n\nContent'
 
+# Specifying dates or message-ids in the extra headers overrides the defaul
+# values (#9233).
+
+>>> headers = {"date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
+>>> email = EmailMessage('subject', 'content', 'from@example.com', ['to@example.com'], headers=headers)
+>>> email.message().as_string()
+'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: subject\nFrom: from@example.com\nTo: to@example.com\ndate: Fri, 09 Nov 2001 01:08:47 -0000\nMessage-ID: foo\n\ncontent'
+
 """
