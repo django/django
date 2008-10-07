@@ -555,6 +555,7 @@ Model style
       follows (noting that these are not all required):
 
         * All database fields
+        * Custom manager attributes
         * ``class Meta``
         * ``def __unicode__()``
         * ``def __str__()``
