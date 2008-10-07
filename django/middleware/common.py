@@ -53,9 +53,8 @@ class CommonMiddleware(object):
         # Append a slash if APPEND_SLASH is set and the URL doesn't have a
         # trailing slash and there is no pattern for the current path
         if settings.APPEND_SLASH and (not old_url[1].endswith('/')):
-            try:
-                urlresolvers.resolve(request.path_info)
-            except urlresolvers.Resolver404:
+            if (not _is_valid_path(request.path_info) and
+                    _is_valid_path("%s/" % request.path_info)):
                 new_url[1] = new_url[1] + '/'
                 if settings.DEBUG and request.method == 'POST':
                     raise RuntimeError, (""
@@ -66,24 +65,18 @@ class CommonMiddleware(object):
                     "slash), or set APPEND_SLASH=False in your Django "
                     "settings.") % (new_url[0], new_url[1])
 
-        if new_url != old_url:
-            # Redirect if the target url exists
-            try:
-                urlresolvers.resolve("%s/" % request.path_info)
-            except urlresolvers.Resolver404:
-                pass
-            else:
-                if new_url[0]:
-                    newurl = "%s://%s%s" % (
-                        request.is_secure() and 'https' or 'http',
-                        new_url[0], urlquote(new_url[1]))
-                else:
-                    newurl = urlquote(new_url[1])
-                if request.GET:
-                    newurl += '?' + request.META['QUERY_STRING']
-                return http.HttpResponsePermanentRedirect(newurl)
-
-        return None
+        if new_url == old_url:
+            # No redirects required.
+            return
+        if new_url[0]:
+            newurl = "%s://%s%s" % (
+                request.is_secure() and 'https' or 'http',
+                new_url[0], urlquote(new_url[1]))
+        else:
+            newurl = urlquote(new_url[1])
+        if request.GET:
+            newurl += '?' + request.META['QUERY_STRING']
+        return http.HttpResponsePermanentRedirect(newurl)
 
     def process_response(self, request, response):
         "Check for a flat page (for 404s) and calculate the Etag, if needed."
@@ -119,7 +112,9 @@ class CommonMiddleware(object):
         return response
 
 def _is_ignorable_404(uri):
-    "Returns True if a 404 at the given URL *shouldn't* notify the site managers"
+    """
+    Returns True if a 404 at the given URL *shouldn't* notify the site managers.
+    """
     for start in settings.IGNORABLE_404_STARTS:
         if uri.startswith(start):
             return True
@@ -129,6 +124,23 @@ def _is_ignorable_404(uri):
     return False
 
 def _is_internal_request(domain, referer):
-    "Return true if the referring URL is the same domain as the current request"
+    """
+    Returns true if the referring URL is the same domain as the current request.
+    """
     # Different subdomains are treated as different domains.
     return referer is not None and re.match("^https?://%s/" % re.escape(domain), referer)
+
+def _is_valid_path(path):
+    """
+    Returns True if the given path resolves against the default URL resolver,
+    False otherwise.
+
+    This is a convenience method to make working with "is this a match?" cases
+    easier, avoiding unnecessarily indented try...except blocks.
+    """
+    try:
+        urlresolvers.resolve(path)
+        return True
+    except urlresolvers.Resolver404:
+        return False
+
