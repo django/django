@@ -9,4 +9,5 @@ urlpatterns = patterns('',
     (r'^login_protected_redirect_view/$', views.login_protected_redirect_view),
     (r'^set_session/$', views.set_session_view),
     (r'^check_session/$', views.check_session_view),
+    (r'^request_methods/$', views.request_methods_view),
 )

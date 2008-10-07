@@ -544,6 +544,36 @@ arguments at time of construction:
         Note that you should manually close the file after it has been provided
         to ``post()``.
 
+    .. method:: Client.head(path, data={})
+
+        .. versionadded:: development
+
+        Makes a HEAD request on the provided ``path`` and returns a ``Response``
+        object. Useful for testing RESTful interfaces. Acts just like
+        :meth:`Client.get` except it does not return a message body.
+
+    .. method:: Client.options(path, data={})
+
+        .. versionadded:: development
+
+        Makes an OPTIONS request on the provided ``path`` and returns a
+        ``Response`` object. Useful for testing RESTful interfaces.
+
+    .. method:: Client.put(path, data={}, content_type=MULTIPART_CONTENT)
+
+        .. versionadded:: development
+
+        Makes an PUT request on the provided ``path`` and returns a
+        ``Response`` object. Useful for testing RESTful interfaces. Acts just
+        like :meth:`Client.put` except with the PUT request method.
+
+    .. method:: Client.delete(path)
+
+        .. versionadded:: development
+
+        Makes an DELETE request on the provided ``path`` and returns a
+        ``Response`` object. Useful for testing RESTful interfaces.
+
     .. method:: Client.login(**credentials)
 
         .. versionadded:: 1.0
