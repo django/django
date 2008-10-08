@@ -71,34 +71,83 @@ class AdminViewBasicTest(TestCase):
         post_data = {
             "name": u"Test section",
             # inline data
-            "article_set-TOTAL_FORMS": u"4",
-            "article_set-INITIAL_FORMS": u"1",
+            "article_set-TOTAL_FORMS": u"6",
+            "article_set-INITIAL_FORMS": u"3",
             "article_set-0-id": u"1",
             # there is no title in database, give one here or formset
             # will fail.
             "article_set-0-title": u"Need a title.",
-            "article_set-0-content": u"&lt;p&gt;test content&lt;/p&gt;",
+            "article_set-0-content": u"&lt;p&gt;Middle content&lt;/p&gt;",
             "article_set-0-date_0": u"2008-03-18",
             "article_set-0-date_1": u"11:54:58",
-            "article_set-1-id": u"",
-            "article_set-1-title": u"",
-            "article_set-1-content": u"",
-            "article_set-1-date_0": u"",
-            "article_set-1-date_1": u"",
-            "article_set-2-id": u"",
-            "article_set-2-title": u"",
-            "article_set-2-content": u"",
-            "article_set-2-date_0": u"",
-            "article_set-2-date_1": u"",
+            "article_set-1-id": u"2",
+            "article_set-1-title": u"Need a title.",
+            "article_set-1-content": u"&lt;p&gt;Oldest content&lt;/p&gt;",
+            "article_set-1-date_0": u"2000-03-18",
+            "article_set-1-date_1": u"11:54:58",
+            "article_set-2-id": u"3",
+            "article_set-2-title": u"Need a title.",
+            "article_set-2-content": u"&lt;p&gt;Newest content&lt;/p&gt;",
+            "article_set-2-date_0": u"2009-03-18",
+            "article_set-2-date_1": u"11:54:58",
             "article_set-3-id": u"",
             "article_set-3-title": u"",
             "article_set-3-content": u"",
             "article_set-3-date_0": u"",
             "article_set-3-date_1": u"",
+            "article_set-4-id": u"",
+            "article_set-4-title": u"",
+            "article_set-4-content": u"",
+            "article_set-4-date_0": u"",
+            "article_set-4-date_1": u"",
+            "article_set-5-id": u"",
+            "article_set-5-title": u"",
+            "article_set-5-content": u"",
+            "article_set-5-date_0": u"",
+            "article_set-5-date_1": u"",
         }
         response = self.client.post('/test_admin/admin/admin_views/section/1/', post_data)
         self.failUnlessEqual(response.status_code, 302) # redirect somewhere
 
+    def testChangeListSortingCallable(self):
+        """
+        Ensure we can sort on a list_display field that is a callable 
+        (column 2 is callable_year in ArticleAdmin)
+        """
+        response = self.client.get('/test_admin/admin/admin_views/article/', {'ot': 'asc', 'o': 2})
+        self.failUnlessEqual(response.status_code, 200)
+        self.failUnless(
+            response.content.index('Oldest content') < response.content.index('Middle content') and
+            response.content.index('Middle content') < response.content.index('Newest content'),
+            "Results of sorting on callable are out of order."
+        )
+    
+    def testChangeListSortingModel(self):
+        """
+        Ensure we can sort on a list_display field that is a Model method 
+        (colunn 3 is 'model_year' in ArticleAdmin)
+        """
+        response = self.client.get('/test_admin/admin/admin_views/article/', {'ot': 'dsc', 'o': 3})
+        self.failUnlessEqual(response.status_code, 200)
+        self.failUnless(
+            response.content.index('Newest content') < response.content.index('Middle content') and
+            response.content.index('Middle content') < response.content.index('Oldest content'),
+            "Results of sorting on Model method are out of order."
+        )
+    
+    def testChangeListSortingModelAdmin(self):
+        """
+        Ensure we can sort on a list_display field that is a ModelAdmin method 
+        (colunn 4 is 'modeladmin_year' in ArticleAdmin)
+        """
+        response = self.client.get('/test_admin/admin/admin_views/article/', {'ot': 'asc', 'o': 4})
+        self.failUnlessEqual(response.status_code, 200)
+        self.failUnless(
+            response.content.index('Oldest content') < response.content.index('Middle content') and 
+            response.content.index('Middle content') < response.content.index('Newest content'),
+            "Results of sorting on ModelAdmin method are out of order."
+        )
+    
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
     ct = ContentType.objects.get_for_model(Model)
@@ -252,7 +301,7 @@ class AdminViewPermissionsTest(TestCase):
         # Try POST just to make sure
         post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
         self.failUnlessEqual(post.status_code, 403)
-        self.failUnlessEqual(Article.objects.all().count(), 1)
+        self.failUnlessEqual(Article.objects.all().count(), 3)
         self.client.get('/test_admin/admin/logout/')
 
         # Add user may login and POST to add view, then redirect to admin root
@@ -260,7 +309,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.post('/test_admin/admin/', self.adduser_login)
         post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
         self.assertRedirects(post, '/test_admin/admin/')
-        self.failUnlessEqual(Article.objects.all().count(), 2)
+        self.failUnlessEqual(Article.objects.all().count(), 4)
         self.client.get('/test_admin/admin/logout/')
 
         # Super can add too, but is redirected to the change list view
@@ -268,7 +317,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.post('/test_admin/admin/', self.super_login)
         post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
         self.assertRedirects(post, '/test_admin/admin/admin_views/article/')
-        self.failUnlessEqual(Article.objects.all().count(), 3)
+        self.failUnlessEqual(Article.objects.all().count(), 5)
         self.client.get('/test_admin/admin/logout/')
 
         # 8509 - if a normal user is already logged in, it is possible
@@ -392,7 +441,7 @@ class AdminViewPermissionsTest(TestCase):
         self.failUnlessEqual(request.status_code, 403)
         post = self.client.post('/test_admin/admin/admin_views/article/1/delete/', delete_dict)
         self.failUnlessEqual(post.status_code, 403)
-        self.failUnlessEqual(Article.objects.all().count(), 1)
+        self.failUnlessEqual(Article.objects.all().count(), 3)
         self.client.get('/test_admin/admin/logout/')
 
         # Delete user can delete
@@ -406,7 +455,7 @@ class AdminViewPermissionsTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         post = self.client.post('/test_admin/admin/admin_views/article/1/delete/', delete_dict)
         self.assertRedirects(post, '/test_admin/admin/')
-        self.failUnlessEqual(Article.objects.all().count(), 0)
+        self.failUnlessEqual(Article.objects.all().count(), 2)
         self.client.get('/test_admin/admin/logout/')
 
 class AdminViewStringPrimaryKeyTest(TestCase):

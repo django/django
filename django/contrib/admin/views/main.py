@@ -157,7 +157,12 @@ class ChangeList(object):
                     # See whether field_name is a name of a non-field
                     # that allows sorting.
                     try:
-                        attr = getattr(self.model, field_name)
+                        if callable(field_name):
+                            attr = field_name
+                        elif hasattr(self.model_admin, field_name):
+                            attr = getattr(self.model_admin, field_name)
+                        else:
+                            attr = getattr(self.model, field_name)
                         order_field = attr.admin_order_field
                     except AttributeError:
                         pass
