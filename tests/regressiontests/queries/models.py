@@ -862,6 +862,8 @@ used in lookups.
 Bug #7698 -- People like to slice with '0' as the high-water mark.
 >>> Item.objects.all()[0:0]
 []
+>>> Item.objects.all()[0:0][:10]
+[]
 
 Bug #7411 - saving to db must work even with partially read result set in
 another cursor.
