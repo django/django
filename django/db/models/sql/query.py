@@ -608,7 +608,7 @@ class Query(object):
         if self.extra_order_by:
             ordering = self.extra_order_by
         elif not self.default_ordering:
-            ordering = []
+            ordering = self.order_by
         else:
             ordering = self.order_by or self.model._meta.ordering
         qn = self.quote_name_unless_alias

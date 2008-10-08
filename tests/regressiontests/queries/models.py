@@ -973,6 +973,12 @@ Make sure bump_prefix() (an internal Query method) doesn't (re-)break.
 >>> query.bump_prefix()
 >>> print query.as_sql()[0]
 SELECT U0."id" FROM "queries_tag" U0
+
+Calling order_by() with no parameters removes any existing ordering on the
+model. But it should still be possible to add new ordering after that.
+>>> qs = Author.objects.order_by().order_by('name')
+>>> 'ORDER BY' in qs.query.as_sql()[0]
+True
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
