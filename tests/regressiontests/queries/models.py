@@ -556,7 +556,7 @@ Bug #2076
 # automatically. Item normally requires a join with Note to do the default
 # ordering, but that isn't needed here.
 >>> qs = Item.objects.order_by('name')
->>> qs
+>>> list(qs)
 [<Item: four>, <Item: one>, <Item: three>, <Item: two>]
 >>> len(qs.query.tables)
 1
