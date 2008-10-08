@@ -6,6 +6,14 @@ from django.middleware.common import CommonMiddleware
 from django.conf import settings
 
 class CommonMiddlewareTest(TestCase):
+    def setUp(self):
+        self.slash = settings.APPEND_SLASH
+        self.www = settings.PREPEND_WWW
+
+    def tearDown(self):
+        settings.APPEND_SLASH = self.slash
+        settings.PREPEND_WWW = self.www
+
     def _get_request(self, path):
         request = HttpRequest()
         request.META = {
