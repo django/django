@@ -15,6 +15,11 @@ from widgets import Select, SelectMultiple, HiddenInput, MultipleHiddenInput
 from widgets import media_property
 from formsets import BaseFormSet, formset_factory, DELETION_FIELD_NAME
 
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback
+
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
     'save_instance', 'form_for_fields', 'ModelChoiceField',
@@ -219,9 +224,9 @@ class BaseModelForm(BaseForm):
             fields_on_form = [field for field in check if field in self.fields]
             if len(fields_on_form) == len(check):
                 unique_checks.append(check)
-            
+
         form_errors = []
-        
+
         # Gather a list of checks for fields declared as unique and add them to
         # the list of checks. Again, skip fields not on the form.
         for name, field in self.fields.items():
@@ -235,30 +240,31 @@ class BaseModelForm(BaseForm):
             is_null_pk = f.primary_key and self.cleaned_data[name] is None
             if name in self.cleaned_data and f.unique and not is_null_pk:
                 unique_checks.append((name,))
-                
+
         # Don't run unique checks on fields that already have an error.
         unique_checks = [check for check in unique_checks if not [x in self._errors for x in check if x in self._errors]]
-        
+
+        bad_fields = set()
         for unique_check in unique_checks:
             # Try to look up an existing object with the same values as this
             # object's values for all the unique field.
-            
+
             lookup_kwargs = {}
             for field_name in unique_check:
                 lookup_kwargs[field_name] = self.cleaned_data[field_name]
-            
+
             qs = self.instance.__class__._default_manager.filter(**lookup_kwargs)
 
-            # Exclude the current object from the query if we are editing an 
+            # Exclude the current object from the query if we are editing an
             # instance (as opposed to creating a new one)
             if self.instance.pk is not None:
                 qs = qs.exclude(pk=self.instance.pk)
-                
+
             # This cute trick with extra/values is the most efficient way to
             # tell if a particular query returns any results.
             if qs.extra(select={'a': 1}).values('a').order_by():
                 model_name = capfirst(self.instance._meta.verbose_name)
-                
+
                 # A unique field
                 if len(unique_check) == 1:
                     field_name = unique_check[0]
@@ -278,13 +284,17 @@ class BaseModelForm(BaseForm):
                         {'model_name': unicode(model_name),
                          'field_label': unicode(field_labels)}
                     )
-                
-                # Remove the data from the cleaned_data dict since it was invalid
+
+                # Mark these fields as needing to be removed from cleaned data
+                # later.
                 for field_name in unique_check:
-                    del self.cleaned_data[field_name]
-        
+                    bad_fields.add(field_name)
+
+        for field_name in bad_fields:
+            del self.cleaned_data[field_name]
         if form_errors:
-            # Raise the unique together errors since they are considered form-wide.
+            # Raise the unique together errors since they are considered
+            # form-wide.
             raise ValidationError(form_errors)
 
     def save(self, commit=True):
@@ -471,7 +481,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         kwargs = {self.fk.get_attname(): self.instance.pk}
         new_obj = self.model(**kwargs)
         return save_instance(form, new_obj, exclude=[self._pk_field.name], commit=commit)
-    
+
     def add_fields(self, form, index):
         super(BaseInlineFormSet, self).add_fields(form, index)
         if self._pk_field == self.fk:
