@@ -19,12 +19,20 @@ class Article(models.Model):
 
     def __unicode__(self):
         return self.title
+    
+    def model_year(self):
+        return self.date.year
+    model_year.admin_order_field = 'date'
+
+def callable_year(dt_value):
+    return dt_value.year
+callable_year.admin_order_field = 'date'
 
 class ArticleInline(admin.TabularInline):
     model = Article
 
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('content', 'date')
+    list_display = ('content', 'date', callable_year, 'model_year', 'modeladmin_year')
     list_filter = ('date',)
 
     def changelist_view(self, request):
@@ -34,6 +42,10 @@ class ArticleAdmin(admin.ModelAdmin):
                 'extra_var': 'Hello!'
             }
         )
+        
+    def modeladmin_year(self, obj):
+        return obj.date.year
+    modeladmin_year.admin_order_field = 'date'
 
 class CustomArticle(models.Model):
     content = models.TextField()
