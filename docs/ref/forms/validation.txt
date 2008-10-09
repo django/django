@@ -260,7 +260,7 @@ here and leaving it up to you and your designers to work out what works
 effectively in your particular situation. Our new code (replacing the previous
 sample) looks like this::
 
-    from django.forms.utils import ErrorList
+    from django.forms.util import ErrorList
 
     class ContactForm(forms.Form):
         # Everything as before.
