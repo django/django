@@ -54,7 +54,7 @@ Remove ``prepopulated_from``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Remove the ``prepopulated_from`` argument on model fields. It's no longer valid
-and has been moved to the ``AdminModel`` class in ``admin.py``. See `the
+and has been moved to the ``ModelAdmin`` class in ``admin.py``. See `the
 admin`_, below, for more details about changes to the admin.
 
 Remove ``core``
