@@ -253,9 +253,9 @@ over them::
 Looping over the form's fields
 ------------------------------
 
-If you're the same HTML for each of your form fields, you can
-reduce duplicate code by looping through each field in turn using
-a ``{% for %}`` loop::
+If you're using the same HTML for each of your form fields, you can reduce
+duplicate code by looping through each field in turn using a ``{% for %}``
+loop::
 
     <form action="/contact/" method="POST">
         {% for field in form %}
