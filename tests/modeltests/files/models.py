@@ -5,14 +5,15 @@
 and where files should be stored.
 """
 
+import shutil
 import tempfile
-
 from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage
 from django.core.cache import cache
 
-temp_storage = FileSystemStorage(location=tempfile.gettempdir())
+temp_storage_location = tempfile.mkdtemp()
+temp_storage = FileSystemStorage(location=temp_storage_location)
 
 # Write out a file to be used as default content
 temp_storage.save('tests/default.txt', ContentFile('default content'))
@@ -109,10 +110,10 @@ ValueError: The 'normal' attribute has no file associated with it.
 >>> obj4.random
 <FieldFile: .../random_file>
 
-# Clean up the temporary files.
-
+# Clean up the temporary files and dir.
 >>> obj1.normal.delete()
 >>> obj2.normal.delete()
 >>> obj3.default.delete()
 >>> obj4.random.delete()
+>>> shutil.rmtree(temp_storage_location)
 """}
