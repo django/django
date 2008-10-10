@@ -54,6 +54,11 @@ True
 >>> db_session.save()
 >>> DatabaseSession('1').get('cat')
 
+# Do file session tests in an isolated directory, and kill it after we're done.
+>>> original_session_file_path = settings.SESSION_FILE_PATH
+>>> import tempfile
+>>> temp_session_store = settings.SESSION_FILE_PATH = tempfile.mkdtemp()
+
 >>> file_session = FileSession()
 >>> file_session.modified
 False
@@ -105,6 +110,17 @@ Traceback (innermost last):
     ...
 ImproperlyConfigured: The session storage path '/if/this/directory/exists/you/have/a/weird/computer' doesn't exist. Please set your SESSION_FILE_PATH setting to an existing directory in which Django can store session data.
 
+# Clean up after the file tests
+>>> settings.SESSION_FILE_PATH = original_session_file_path
+>>> import shutil
+>>> shutil.rmtree(temp_session_store)
+
+#
+# Cache-based tests
+# NB: be careful to delete any sessions created; stale sessions fill up the
+# /tmp and eventually overwhelm it after lots of runs (think buildbots)
+#
+
 >>> cache_session = CacheSession()
 >>> cache_session.modified
 False
@@ -144,7 +160,7 @@ True
 >>> Session.objects.filter(pk=cache_session.session_key).delete()
 >>> cache_session = CacheSession(cache_session.session_key)
 >>> cache_session.save()
->>> CacheSession('1').get('cat')
+>>> cache_session.delete(cache_session.session_key)
 
 >>> s = SessionBase()
 >>> s._session['some key'] = 'exists' # Pre-populate the session with some data
