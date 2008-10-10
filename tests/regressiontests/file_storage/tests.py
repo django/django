@@ -88,10 +88,12 @@ u'custom_storage.2'
 # without threading.
 import os
 import time
+import shutil
+import tempfile
 from unittest import TestCase
 from django.conf import settings
 from django.core.files.base import ContentFile
-from models import temp_storage
+from django.core.files.storage import FileSystemStorage
 try:
     import threading
 except ImportError:
@@ -104,29 +106,38 @@ class SlowFile(ContentFile):
 
 class FileSaveRaceConditionTest(TestCase):
     def setUp(self):
+        self.storage_dir = tempfile.mkdtemp()
+        self.storage = FileSystemStorage(self.storage_dir)
         self.thread = threading.Thread(target=self.save_file, args=['conflict'])
     
+    def tearDown(self):
+        shutil.rmtree(self.storage_dir)
+    
     def save_file(self, name):
-        name = temp_storage.save(name, SlowFile("Data"))
+        name = self.storage.save(name, SlowFile("Data"))
     
     def test_race_condition(self):
         self.thread.start()
         name = self.save_file('conflict')
         self.thread.join()
-        self.assert_(temp_storage.exists('conflict'))
-        self.assert_(temp_storage.exists('conflict_'))
-        temp_storage.delete('conflict')
-        temp_storage.delete('conflict_')
+        self.assert_(self.storage.exists('conflict'))
+        self.assert_(self.storage.exists('conflict_'))
+        self.storage.delete('conflict')
+        self.storage.delete('conflict_')
 
 class FileStoragePermissions(TestCase):
     def setUp(self):
         self.old_perms = settings.FILE_UPLOAD_PERMISSIONS
         settings.FILE_UPLOAD_PERMISSIONS = 0666
-        
-    def test_file_upload_permissions(self):
-        name = temp_storage.save("the_file", ContentFile("data"))
-        actual_mode = os.stat(temp_storage.path(name))[0] & 0777
-        self.assertEqual(actual_mode, 0666)
-        
+        self.storage_dir = tempfile.mkdtemp()
+        self.storage = FileSystemStorage(self.storage_dir)
+
     def tearDown(self):
         settings.FILE_UPLOAD_PERMISSIONS = self.old_perms
+        shutil.rmtree(self.storage_dir)
+
+    def test_file_upload_permissions(self):
+        name = self.storage.save("the_file", ContentFile("data"))
+        actual_mode = os.stat(self.storage.path(name))[0] & 0777
+        self.assertEqual(actual_mode, 0666)
+
