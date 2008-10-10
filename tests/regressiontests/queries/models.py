@@ -334,6 +334,12 @@ Bug #4464
 >>> Item.objects.filter(tags__in=[t1, t2]).filter(tags=t3)
 [<Item: two>]
 
+Make sure .distinct() works with slicing (this was broken in Oracle).
+>>> Item.objects.filter(tags__in=[t1, t2]).order_by('name')[:3]
+[<Item: one>, <Item: one>, <Item: two>]
+>>> Item.objects.filter(tags__in=[t1, t2]).distinct().order_by('name')[:3]
+[<Item: one>, <Item: two>]
+
 Bug #2080, #3592
 >>> Author.objects.filter(item__name='one') | Author.objects.filter(name='a3')
 [<Author: a1>, <Author: a3>]
