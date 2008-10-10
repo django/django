@@ -19,7 +19,8 @@ try:
 except NameError:
     from django.utils.itercompat import sorted
 
-temp_storage = FileSystemStorage(tempfile.gettempdir())
+temp_storage_dir = tempfile.mkdtemp()
+temp_storage = FileSystemStorage(temp_storage_dir)
 
 ARTICLE_STATUS = (
     (1, 'Draft'),
@@ -1251,4 +1252,8 @@ ValidationError: [u'Select a valid choice. z is not one of the available choices
 >>> core = form.save()
 >>> core.parent
 <Inventory: Pear>
+
+# Clean up
+>>> import shutil
+>>> shutil.rmtree(temp_storage_dir)
 """}

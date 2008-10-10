@@ -1,10 +1,12 @@
 import os
 import tempfile
+import shutil
 from django.db import models
 from django.core.files.storage import FileSystemStorage
 from django.core.files.base import ContentFile
 
-temp_storage = FileSystemStorage(tempfile.gettempdir())
+temp_storage_dir = tempfile.mkdtemp()
+temp_storage = FileSystemStorage(temp_storage_dir)
 
 # Test for correct behavior of width_field/height_field.
 # Of course, we can't run this without PIL.
@@ -64,5 +66,7 @@ False
 >>> _ = p3.mugshot.size
 >>> hasattr(p3.mugshot, '_file')
 False
+
+>>> shutil.rmtree(temp_storage_dir)
 """}
     
