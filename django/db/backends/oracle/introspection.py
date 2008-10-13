@@ -8,13 +8,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     # Maps type objects to Django Field types.
     data_types_reverse = {
         cx_Oracle.CLOB: 'TextField',
-        cx_Oracle.DATETIME: 'DateTimeField',
+        cx_Oracle.DATETIME: 'DateField',
         cx_Oracle.FIXED_CHAR: 'CharField',
         cx_Oracle.NCLOB: 'TextField',
         cx_Oracle.NUMBER: 'DecimalField',
         cx_Oracle.STRING: 'CharField',
         cx_Oracle.TIMESTAMP: 'DateTimeField',
     }
+
+    try:
+        data_types_reverse[cx_Oracle.NATIVE_FLOAT] = 'FloatField'
+    except AttributeError:
+        pass
 
     def get_table_list(self, cursor):
         "Returns a list of table names in the current database."
