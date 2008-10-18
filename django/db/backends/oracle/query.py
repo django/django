@@ -111,9 +111,10 @@ def query_class(QueryClass, Database):
                 # Wrap the base query in an outer SELECT * with boundaries on
                 # the "_RN" column.  This is the canonical way to emulate LIMIT
                 # and OFFSET on Oracle.
-                sql = 'SELECT * FROM (SELECT ROW_NUMBER() OVER (ORDER BY 1) AS "_RN", "_SUB".* FROM (%s) "_SUB") WHERE "_RN" > %d' % (sql, self.low_mark)
+                high_where = ''
                 if self.high_mark is not None:
-                    sql = '%s AND "_RN" <= %d' % (sql, self.high_mark)
+                    high_where = 'WHERE ROWNUM <= %d' % (self.high_mark,)
+                sql = 'SELECT * FROM (SELECT ROWNUM AS "_RN", "_SUB".* FROM (%s) "_SUB" %s) WHERE "_RN" > %d' % (sql, high_where, self.low_mark)
 
             return sql, params
 
