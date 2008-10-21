@@ -585,6 +585,7 @@ class ModelAdmin(BaseModelAdmin):
                 change_message = self.construct_change_message(request, form, formsets)
                 self.log_change(request, new_object, change_message)
                 return self.response_change(request, new_object)
+                
         else:
             form = ModelForm(instance=obj)
             for FormSet in self.get_formsets(request, obj):
@@ -600,7 +601,7 @@ class ModelAdmin(BaseModelAdmin):
             inline_admin_formset = helpers.InlineAdminFormSet(inline, formset, fieldsets)
             inline_admin_formsets.append(inline_admin_formset)
             media = media + inline_admin_formset.media
-
+        
         context = {
             'title': _('Change %s') % force_unicode(opts.verbose_name),
             'adminform': adminForm,

@@ -129,6 +129,16 @@ class InlineAdminForm(AdminForm):
             self.original.content_type_id = ContentType.objects.get_for_model(original).pk
         self.show_url = original and hasattr(original, 'get_absolute_url')
         super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields)
+    
+    def field_count(self):
+        # tabular.html uses this function for colspan value.
+        num_of_fields = 1 # always has at least one field
+        num_of_fields += len(self.fieldsets[0][1]["fields"])
+        if self.formset.can_order:
+            num_of_fields += 1
+        if self.formset.can_delete:
+            num_of_fields += 1
+        return num_of_fields
 
     def pk_field(self):
         return AdminField(self.form, self.formset._pk_field.name, False)
