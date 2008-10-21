@@ -74,7 +74,24 @@ class ModelWithStringPrimaryKey(models.Model):
     def __unicode__(self):
         return self.id
 
+class Color(models.Model):
+    value = models.CharField(max_length=10)
+    warm = models.BooleanField()   
+    def __unicode__(self):
+        return self.value
+
+class Thing(models.Model):
+    title = models.CharField(max_length=20)
+    color = models.ForeignKey(Color, limit_choices_to={'warm': True})
+    def __unicode__(self):
+        return self.title
+
+class ThingAdmin(admin.ModelAdmin):
+    list_filter = ('color',)
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, inlines=[ArticleInline])
 admin.site.register(ModelWithStringPrimaryKey)
+admin.site.register(Color)
+admin.site.register(Thing, ThingAdmin)

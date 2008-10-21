@@ -12,7 +12,7 @@ from django.utils.html import escape
 from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey
 
 class AdminViewBasicTest(TestCase):
-    fixtures = ['admin-views-users.xml']
+    fixtures = ['admin-views-users.xml', 'admin-views-colors.xml']
     
     def setUp(self):
         self.client.login(username='super', password='secret')
@@ -146,6 +146,19 @@ class AdminViewBasicTest(TestCase):
             response.content.index('Oldest content') < response.content.index('Middle content') and 
             response.content.index('Middle content') < response.content.index('Newest content'),
             "Results of sorting on ModelAdmin method are out of order."
+        )
+        
+    def testLimitedFilter(self):
+        """Ensure admin changelist filters do not contain objects excluded via limit_choices_to."""
+        response = self.client.get('/test_admin/admin/admin_views/thing/')
+        self.failUnlessEqual(response.status_code, 200)
+        self.failUnless(
+            '<div id="changelist-filter">' in response.content, 
+            "Expected filter not found in changelist view."
+        )
+        self.failIf(
+            '<a href="?color__id__exact=3">Blue</a>' in response.content,
+            "Changelist filter not correctly limited by limit_choices_to."
         )
     
 def get_perm(Model, perm):
