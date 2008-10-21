@@ -216,33 +216,30 @@ class BaseModelForm(BaseForm):
     def validate_unique(self):
         from django.db.models.fields import FieldDoesNotExist
 
-        # Gather a list of checks to perform. Since this is a ModelForm, some
-        # fields may have been excluded; we can't perform a unique check on a
-        # form that is missing fields involved in that check.
+        # Gather a list of checks to perform. We only perform unique checks 
+        # for fields present and not None in cleaned_data.  Since this is a 
+        # ModelForm, some fields may have been excluded; we can't perform a unique 
+        # check on a form that is missing fields involved in that check.  It also does
+        # not make sense to check data that didn't validate, and since NULL does not 
+        # equal NULL in SQL we should not do any unique checking for NULL values.
         unique_checks = []
         for check in self.instance._meta.unique_together[:]:
-            fields_on_form = [field for field in check if field in self.fields]
+            fields_on_form = [field for field in check if field in self.cleaned_data and not self.cleaned_data[field] is None]
             if len(fields_on_form) == len(check):
                 unique_checks.append(check)
 
         form_errors = []
 
         # Gather a list of checks for fields declared as unique and add them to
-        # the list of checks. Again, skip fields not on the form.
+        # the list of checks. Again, skip empty fields and any that did not validate.
         for name, field in self.fields.items():
             try:
                 f = self.instance._meta.get_field_by_name(name)[0]
             except FieldDoesNotExist:
                 # This is an extra field that's not on the ModelForm, ignore it
                 continue
-            # MySQL can't handle ... WHERE pk IS NULL, so make sure we
-            # don't generate queries of that form.
-            is_null_pk = f.primary_key and self.cleaned_data[name] is None
-            if name in self.cleaned_data and f.unique and not is_null_pk:
+            if f.unique and name in self.cleaned_data and not self.cleaned_data[name] is None:
                 unique_checks.append((name,))
-
-        # Don't run unique checks on fields that already have an error.
-        unique_checks = [check for check in unique_checks if not [x in self._errors for x in check if x in self._errors]]
 
         bad_fields = set()
         for unique_check in unique_checks:
