@@ -12,6 +12,7 @@
   {% if inline_admin_form.show_url %}
   <p><a href="../../../r/{{ inline_admin_form.original.content_type_id }}/{{ inline_admin_form.original.id }}/">{% trans "View on site" %}</a></p>
   {% endif %}
+  {% if inline_admin_form.form.non_field_errors %}{{ inline_admin_form.form.non_field_errors }}{% endif %}
 
   {% for fieldset in inline_admin_form %}
     {% include "admin/includes/fieldset.html" %}
