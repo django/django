@@ -42,7 +42,6 @@
 import re, sys
 from binascii import a2b_hex
 from ctypes import byref, string_at, c_char_p, c_double, c_ubyte, c_void_p
-from types import UnicodeType
 
 # Getting GDAL prerequisites
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
@@ -82,9 +81,9 @@ class OGRGeometry(object):
         # Constructing the geometry, 
         if str_instance:
             # Checking if unicode
-            if isinstance(geom_input, UnicodeType):
+            if isinstance(geom_input, unicode):
                 # Encoding to ASCII, WKT or HEX doesn't need any more.
-                geo_input = geo_input.encode('ascii')
+                geom_input = geom_input.encode('ascii')
 
             wkt_m = wkt_regex.match(geom_input)
             json_m = json_regex.match(geom_input)
