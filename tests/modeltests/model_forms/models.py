@@ -145,7 +145,15 @@ class Inventory(models.Model):
 
    def __unicode__(self):
       return self.name
-      
+
+class Book(models.Model):
+    title = models.CharField(max_length=40)
+    author = models.ForeignKey(Writer, blank=True, null=True)
+    special_id = models.IntegerField(blank=True, null=True, unique=True)
+    
+    class Meta:
+        unique_together = ('title', 'author')
+
 __test__ = {'API_TESTS': """
 >>> from django import forms
 >>> from django.forms.models import ModelForm, model_to_dict
@@ -1200,6 +1208,32 @@ False
 >>> form = PriceForm({'price': '6.00'})
 >>> form.is_valid()
 True
+
+# Unique & unique together with null values
+>>> class BookForm(ModelForm): 
+...     class Meta: 
+...        model = Book
+>>> w = Writer.objects.get(name='Mike Royko')
+>>> form = BookForm({'title': 'I May Be Wrong But I Doubt It', 'author' : w.pk})
+>>> form.is_valid()
+True
+>>> form.save()
+<Book: Book object>
+>>> form = BookForm({'title': 'I May Be Wrong But I Doubt It', 'author' : w.pk})
+>>> form.is_valid()
+False
+>>> form._errors
+{'__all__': [u'Book with this Title and Author already exists.']}
+>>> form = BookForm({'title': 'I May Be Wrong But I Doubt It'})
+>>> form.is_valid()
+True
+>>> form.save()
+<Book: Book object>
+>>> form = BookForm({'title': 'I May Be Wrong But I Doubt It'})
+>>> form.is_valid()
+True
+>>> form.save()
+<Book: Book object>
 
 # Choices on CharField and IntegerField
 >>> class ArticleForm(ModelForm):
