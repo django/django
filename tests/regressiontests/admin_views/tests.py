@@ -160,7 +160,14 @@ class AdminViewBasicTest(TestCase):
             '<a href="?color__id__exact=3">Blue</a>' in response.content,
             "Changelist filter not correctly limited by limit_choices_to."
         )
-    
+        
+    def testIncorrectLookupParameters(self):
+        """Ensure incorrect lookup parameters are handled gracefully."""
+        response = self.client.get('/test_admin/admin/admin_views/thing/', {'notarealfield': '5'})
+        self.assertRedirects(response, '/test_admin/admin/admin_views/thing/?e=1')        
+        response = self.client.get('/test_admin/admin/admin_views/thing/', {'color__id__exact': 'StringNotInteger!'})
+        self.assertRedirects(response, '/test_admin/admin/admin_views/thing/?e=1')
+            
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
     ct = ContentType.objects.get_for_model(Model)
