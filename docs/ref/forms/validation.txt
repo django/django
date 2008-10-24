@@ -100,10 +100,10 @@ through the ``Form.non_field_errors()`` method.
 
 When you really do need to attach the error to a particular field, you should
 store (or amend) a key in the `Form._errors` attribute. This attribute is an
-instance of a ``django.form.utils.ErrorDict`` class. Essentially, though, it's
+instance of a ``django.forms.util.ErrorDict`` class. Essentially, though, it's
 just a dictionary. There is a key in the dictionary for each field in the form
 that has an error. Each value in the dictionary is a
-``django.form.utils.ErrorList`` instance, which is a list that knows how to
+``django.forms.util.ErrorList`` instance, which is a list that knows how to
 display itself in different ways. So you can treat `_errors` as a dictionary
 mapping field names to lists.
 
