@@ -1262,7 +1262,7 @@ msgstr "超级用户状态"
 
 #: contrib/auth/models.py:143
 msgid "Designates that this user has all permissions without explicitly assigning them."
-msgstr "指明用户是否可以登录到这个管理站点。"
+msgstr "指明该用户缺省拥有所有权限。"
 
 #: contrib/auth/models.py:144
 msgid "last login"
