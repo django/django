@@ -257,4 +257,14 @@ DoesNotExist: ArticleWithAuthor matching query does not exist.
 # without error.
 >>> _ = QualityControl.objects.create(headline="Problems in Django", pub_date=datetime.datetime.now(), quality=10, assignee="adrian")
 
+# Ordering should not include any database column more than once (this is most
+# likely to ocurr naturally with model inheritance, so we check it here).
+# Regression test for #9390. This necessarily pokes at the SQL string for the
+# query, since the duplicate problems are only apparent at that late stage.
+>>> sql = ArticleWithAuthor.objects.order_by('pub_date', 'pk').query.as_sql()[0]
+>>> fragment = sql[sql.find('ORDER BY'):]
+>>> pos = fragment.find('pub_date')
+>>> fragment.find('pub_date', pos + 1) == -1
+True
+
 """}
