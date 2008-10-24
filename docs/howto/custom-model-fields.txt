@@ -167,7 +167,7 @@ behave like any existing field, so we'll subclass directly from
             kwargs['max_length'] = 104
             super(HandField, self).__init__(*args, **kwargs)
 
-Our ``HandField`` accept most of the standard field options (see the list
+Our ``HandField`` accepts most of the standard field options (see the list
 below), but we ensure it has a fixed length, since it only needs to hold 52
 card values plus their suits; 104 characters in total.
 
