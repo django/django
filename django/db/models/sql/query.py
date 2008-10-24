@@ -621,6 +621,12 @@ class Query(object):
             asc, desc = ORDER_DIR['ASC']
         else:
             asc, desc = ORDER_DIR['DESC']
+
+        # It's possible, due to model inheritance, that normal usage might try
+        # to include the same field more than once in the ordering. We track
+        # the table/column pairs we use and discard any after the first use.
+        processed_pairs = set()
+
         for field in ordering:
             if field == '?':
                 result.append(self.connection.ops.random_function_sql())
@@ -638,18 +644,22 @@ class Query(object):
                 # on verbatim.
                 col, order = get_order_dir(field, asc)
                 table, col = col.split('.', 1)
-                elt = '%s.%s' % (qn(table), col)
-                if not distinct or elt in select_aliases:
-                    result.append('%s %s' % (elt, order))
+                if (table, col) not in processed_pairs:
+                    elt = '%s.%s' % (qn(table), col)
+                    processed_pairs.add((table, col))
+                    if not distinct or elt in select_aliases:
+                        result.append('%s %s' % (elt, order))
             elif get_order_dir(field)[0] not in self.extra_select:
                 # 'col' is of the form 'field' or 'field1__field2' or
                 # '-field1__field2__field', etc.
                 for table, col, order in self.find_ordering_name(field,
                         self.model._meta, default_order=asc):
-                    elt = '%s.%s' % (qn(table), qn2(col))
-                    if distinct and elt not in select_aliases:
-                        ordering_aliases.append(elt)
-                    result.append('%s %s' % (elt, order))
+                    if (table, col) not in processed_pairs:
+                        elt = '%s.%s' % (qn(table), qn2(col))
+                        processed_pairs.add((table, col))
+                        if distinct and elt not in select_aliases:
+                            ordering_aliases.append(elt)
+                        result.append('%s %s' % (elt, order))
             else:
                 col, order = get_order_dir(field, asc)
                 elt = qn2(col)
