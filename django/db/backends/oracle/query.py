@@ -25,6 +25,18 @@ def query_class(QueryClass, Database):
         pass
 
     class OracleQuery(QueryClass):
+        def __reduce__(self):
+            """
+            Enable pickling for this class (normal pickling handling doesn't
+            work as Python can only pickle module-level classes by default).
+            """
+            if hasattr(QueryClass, '__getstate__'):
+                assert hasattr(QueryClass, '__setstate__')
+                data = self.__getstate__()
+            else:
+                data = self.__dict__
+            return (unpickle_query_class, (QueryClass,), data)
+
         def resolve_columns(self, row, fields=()):
             # If this query has limit/offset information, then we expect the
             # first column to be an extra "_RN" column that we need to throw
@@ -120,3 +132,17 @@ def query_class(QueryClass, Database):
 
     _classes[QueryClass] = OracleQuery
     return OracleQuery
+
+def unpickle_query_class(QueryClass):
+    """
+    Utility function, called by Python's unpickling machinery, that handles
+    unpickling of Oracle Query subclasses.
+    """
+    # XXX: Would be nice to not have any dependency on cx_Oracle here. Since
+    # modules can't be pickled, we need a way to know to load the right module.
+    import cx_Oracle
+
+    klass = query_class(QueryClass, cx_Oracle)
+    return klass.__new__(klass)
+unpickle_query_class.__safe_for_unpickling__ = True
+

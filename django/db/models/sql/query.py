@@ -27,9 +27,9 @@ try:
 except NameError:
     from sets import Set as set     # Python 2.3 fallback
 
-__all__ = ['Query']
+__all__ = ['Query', 'BaseQuery']
 
-class Query(object):
+class BaseQuery(object):
     """
     A single SQL query.
     """
@@ -1757,7 +1757,9 @@ class Query(object):
 # Use the backend's custom Query class if it defines one. Otherwise, use the
 # default.
 if connection.features.uses_custom_query_class:
-    Query = connection.ops.query_class(Query)
+    Query = connection.ops.query_class(BaseQuery)
+else:
+    Query = BaseQuery
 
 def get_order_dir(field, default='ASC'):
     """
