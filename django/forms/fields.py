@@ -667,7 +667,7 @@ class TypedChoiceField(ChoiceField):
         self.coerce = kwargs.pop('coerce', lambda val: val)
         self.empty_value = kwargs.pop('empty_value', '')
         super(TypedChoiceField, self).__init__(*args, **kwargs)
-        
+
     def clean(self, value):
         """
         Validate that the value is in self.choices and can be coerced to the
@@ -676,12 +676,12 @@ class TypedChoiceField(ChoiceField):
         value = super(TypedChoiceField, self).clean(value)
         if value == self.empty_value or value in EMPTY_VALUES:
             return self.empty_value
-        
+
         # Hack alert: This field is purpose-made to use with Field.to_python as
         # a coercion function so that ModelForms with choices work. However,
-        # Django's Field.to_python raises django.core.exceptions.ValidationError,
-        # which is a *different* exception than
-        # django.forms.utils.ValidationError. So unfortunatly we need to catch
+        # Django's Field.to_python raises
+        # django.core.exceptions.ValidationError, which is a *different*
+        # exception than django.forms.util.ValidationError. So we need to catch
         # both.
         try:
             value = self.coerce(value)
