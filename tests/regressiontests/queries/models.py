@@ -974,11 +974,12 @@ about them and shouldn't do bad things.
 >>> expected == result
 True
 
-Make sure bump_prefix() (an internal Query method) doesn't (re-)break.
->>> query = Tag.objects.values_list('id').order_by().query
->>> query.bump_prefix()
->>> print query.as_sql()[0]
-SELECT U0."id" FROM "queries_tag" U0
+Make sure bump_prefix() (an internal Query method) doesn't (re-)break. It's
+sufficient that this query runs without error.
+>>> qs = Tag.objects.values_list('id', flat=True).order_by('id')
+>>> qs.query.bump_prefix()
+>>> list(qs)
+[1, 2, 3, 4, 5]
 
 Calling order_by() with no parameters removes any existing ordering on the
 model. But it should still be possible to add new ordering after that.
