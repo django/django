@@ -64,11 +64,13 @@ date and time. To display this view at a particular URL, you'll need to create a
 Returning errors
 ================
 
-Returning HTTP error codes in Django is easy. We've already mentioned the
-:class:`HttpResponseNotFound`, :class:`HttpResponseForbidden`,
-:class:`HttpResponseServerError`, etc., subclasses; just return an instance of one
-of those subclasses instead of a normal :class:`HttpResponse` in order to signify
-an error. For example::
+Returning HTTP error codes in Django is easy. There are subclasses of
+:class:`~django.http.HttpResponse` for a number of common HTTP status codes
+other than 200 (which means *"OK"*). You can find the full list of available
+subclasses in the :ref:`request/response <ref-httpresponse-subclasses>`
+documentation.  Just return an instance of one of those subclasses instead of
+a normal :class:`~django.http.HttpResponse` in order to signify an error. For
+example::
 
     def my_view(request):
         # ...
@@ -76,6 +78,18 @@ an error. For example::
             return HttpResponseNotFound('<h1>Page not found</h1>')
         else:
             return HttpResponse('<h1>Page was found</h1>')
+
+There isn't a specialized subclass for every possible HTTP response code,
+since many of them aren't going to be that common. However, as documented in
+the :class:`~django.http.HttpResponse` documentation, you can also pass the
+HTTP status code into the constructor for :class:`~django.http.HttpResponse`
+to create a return class for any status code you like. For example::
+
+    def my_view(request):
+        # ...
+
+        # Return a "created" (201) response code.
+        return HttpResponse(status=201)
 
 Because 404 errors are by far the most common HTTP error, there's an easier way
 to handle those errors.

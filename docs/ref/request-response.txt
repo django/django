@@ -525,6 +525,8 @@ Methods
 .. _HTTP Status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
 
 
+.. _ref-httpresponse-subclasses:
+
 HttpResponse subclasses
 -----------------------
 
