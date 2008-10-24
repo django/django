@@ -743,11 +743,13 @@ they query the database each time they're called.
 Returns the object matching the given lookup parameters, which should be in
 the format described in `Field lookups`_.
 
-``get()`` raises ``AssertionError`` if more than one object was found.
+``get()`` raises ``MultipleObjectsReturned`` if more than one object was
+found. The ``MultipleObjectsReturned`` exception is an attribute of the model
+class.
 
-``get()`` raises a ``DoesNotExist`` exception if an object wasn't found for the
-given parameters. The ``DoesNotExist`` exception is an attribute of the model
-class. Example::
+``get()`` raises a ``DoesNotExist`` exception if an object wasn't found for
+the given parameters. This exception is also an attribute of the model class.
+Example::
 
     Entry.objects.get(id='foo') # raises Entry.DoesNotExist
 
