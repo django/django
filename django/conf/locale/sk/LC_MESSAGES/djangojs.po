@@ -5,7 +5,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-04-01 19:21+0200\n"
 "PO-Revision-Date: 2008-08-09 21:19+0100\n"
-"Last-Translator: Frantisek Malina <vizualbod@vizualbod.com>\n"
+"Last-Translator: Marian Andre <django@andre.sk>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,20 +35,20 @@ msgstr "Vybrané %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "Vyberte svoje voľby a kliknite"
+msgstr "Zvoľte si a kliknite"
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr "Odstrániť vybrané"
+msgstr "Všetko zrušiť"
 
 #: contrib/admin/media/js/dateparse.js:32
 #: contrib/admin/media/js/calendar.js:24
 msgid "January February March April May June July August September October November December"
-msgstr "Január Február Marec Apríl Máj Jún Júl August September Október November December"
+msgstr "január február marec apríl máj jún júl august september október november december"
 
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Nedeľa Pondelok Utorok Streda Štvrtok Piatok Sobota"
+msgstr "nedeľa pondelok utorok streda štvrtok piatok sobota"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
@@ -57,11 +57,11 @@ msgstr "N P U S Š P S"
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
 msgid "Show"
-msgstr "Ukáž!"
+msgstr "Ukáž"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
 msgid "Hide"
-msgstr "Skry!"
+msgstr "Skry"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
