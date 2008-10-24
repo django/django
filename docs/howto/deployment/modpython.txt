@@ -160,7 +160,8 @@ instance. Just use ``VirtualHost`` for that, like so::
         SetEnv DJANGO_SETTINGS_MODULE mysite.other_settings
     </VirtualHost>
 
-If you need to put two Django installations within the same ``VirtualHost``,
+If you need to put two Django installations within the same ``VirtualHost``
+(or in different ``VirtualHost`` blocks that share the same server name),
 you'll need to take a special precaution to ensure mod_python's cache doesn't
 mess things up. Use the ``PythonInterpreter`` directive to give different
 ``<Location>`` directives separate interpreters::
