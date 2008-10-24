@@ -601,7 +601,11 @@ This is equivalent to the following SQL ``WHERE`` clause::
     WHERE question LIKE 'Who%' OR question LIKE 'What%'
 
 You can compose statements of arbitrary complexity by combining ``Q`` objects
-with the ``&`` and ``|`` operators. You can also use parenthetical grouping.
+with the ``&`` and ``|`` operators and use parenthetical grouping. Also, ``Q``
+objects can be negated using the ``~`` operator, allowing for combined lookups
+that combine both a normal query and a negated (``NOT``) query::
+
+    Q(question__startswith='Who') | ~Q(pub_date__year=2005)
 
 Each lookup function that takes keyword-arguments (e.g. ``filter()``,
 ``exclude()``, ``get()``) can also be passed one or more ``Q`` objects as
