@@ -327,6 +327,11 @@ class AdminViewPermissionsTest(TestCase):
         # Add user may login and POST to add view, then redirect to admin root
         self.client.get('/test_admin/admin/')
         self.client.post('/test_admin/admin/', self.adduser_login)
+        addpage = self.client.get('/test_admin/admin/admin_views/article/add/')
+        self.failUnlessEqual(addpage.status_code, 200)
+        change_list_link = '<a href="../">Articles</a> &rsaquo;'
+        self.failIf(change_list_link in addpage.content,
+                    'User restricted to add permission is given link to change list view in breadcrumbs.')
         post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
         self.assertRedirects(post, '/test_admin/admin/')
         self.failUnlessEqual(Article.objects.all().count(), 4)
@@ -335,6 +340,10 @@ class AdminViewPermissionsTest(TestCase):
         # Super can add too, but is redirected to the change list view
         self.client.get('/test_admin/admin/')
         self.client.post('/test_admin/admin/', self.super_login)
+        addpage = self.client.get('/test_admin/admin/admin_views/article/add/')
+        self.failUnlessEqual(addpage.status_code, 200)
+        self.failIf(change_list_link not in addpage.content,
+                    'Unrestricted user is not given link to change list view in breadcrumbs.')
         post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
         self.assertRedirects(post, '/test_admin/admin/admin_views/article/')
         self.failUnlessEqual(Article.objects.all().count(), 5)
