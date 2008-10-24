@@ -511,8 +511,8 @@ related ``Person`` *and* the related ``City``::
     p = b.author         # Hits the database.
     c = p.hometown       # Hits the database.
 
-Note that ``select_related()`` does not follow foreign keys that have
-``null=True``.
+Note that, by default, ``select_related()`` does not follow foreign keys that
+have ``null=True``.
 
 Usually, using ``select_related()`` can vastly improve performance because your
 app can avoid many database calls. However, in situations with deeply nested
@@ -527,9 +527,44 @@ follow::
     p = b.author         # Doesn't hit the database.
     c = p.hometown       # Requires a database call.
 
+Sometimes you only want to access specific models that are related to your root
+model, not all of the related models. In these cases, you can pass the related
+field names to ``select_related()`` and it will only follow those relations.
+You can even do this for models that are more than one relation away by
+separating the field names with double underscores, just as for filters. For
+example, if you have this model::
+
+    class Room(models.Model):
+        # ...
+        building = models.ForeignKey(...)
+
+    class Group(models.Model):
+        # ...
+        teacher = models.ForeignKey(...)
+        room = models.ForeignKey(Room)
+        subject = models.ForeignKey(...)
+
+...and you only needed to work with the ``room`` and ``subject`` attributes,
+you could write this::
+
+    g = Group.objects.select_related('room', 'subject')
+
+This is also valid::
+
+    g = Group.objects.select_related('room__building', 'subject')
+
+...and would also pull in the ``building`` relation.
+
+You can only refer to ``ForeignKey`` relations in the list of fields passed to
+``select_related``. You *can* refer to foreign keys that have ``null=True``
+(unlike the default ``select_related()`` call). It's an error to use both a
+list of fields and the ``depth`` parameter in the same ``select_related()``
+call, since they are conflicting options.
+
 .. versionadded:: 1.0
 
-The ``depth`` argument is new in Django version 1.0.
+Both the ``depth`` argument and the ability to specify field names in the call
+to ``select_related()`` are new in Django version 1.0.
 
 ``extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
