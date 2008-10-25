@@ -97,6 +97,9 @@ class Command(ArgsCommand):
         # Whether the user wants to generate the LayerMapping dictionary as well.
         show_mapping = options.pop('mapping', False)
 
+        # Popping the verbosity global option, as it's not accepted by `_ogrinspect`.
+        verbosity = options.pop('verbosity', False)
+
         # Returning the output of ogrinspect with the given arguments
         # and options.
         from django.contrib.gis.utils.ogrinspect import _ogrinspect, mapping
