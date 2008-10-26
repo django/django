@@ -443,8 +443,8 @@ To avoid this problem, you have two options:
     * Two, you can take advantage of Django's automatic HTML escaping. The
       remainder of this section describes how auto-escaping works.
 
-By default in the Django, every template automatically escapes the
-output of every variable tag. Specifically, these five characters are
+By default in Django, every template automatically escapes the output
+of every variable tag. Specifically, these five characters are
 escaped:
 
     * ``<`` is converted to ``&lt;``
