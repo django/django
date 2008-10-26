@@ -25,12 +25,18 @@ class Layer(object):
     "A class that wraps an OGR Layer, needs to be instantiated from a DataSource object."
 
     #### Python 'magic' routines ####
-    def __init__(self, layer_ptr):
-        "Needs a C pointer (Python/ctypes integer) in order to initialize."
+    def __init__(self, layer_ptr, ds):
+        """
+        Initializes on an OGR C pointer to the Layer and the `DataSource` object
+        that owns this layer.  The `DataSource` object is required so that a 
+        reference to it is kept with this Layer.  This prevents garbage 
+        collection of the `DataSource` while this Layer is still active.
+        """
         self._ptr = None # Initially NULL
         if not layer_ptr:
             raise OGRException('Cannot create Layer, invalid pointer given')
         self._ptr = layer_ptr
+        self._ds = ds
         self._ldefn = get_layer_defn(self._ptr)
         # Does the Layer support random reading?
         self._random_read = self.test_capability('RandomRead')
