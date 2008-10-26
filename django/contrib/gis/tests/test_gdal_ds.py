@@ -130,6 +130,23 @@ class DataSourceTest(unittest.TestCase):
             control_vals = source.field_values[fld_name][sl]
             self.assertEqual(control_vals, test_vals)
 
+    def test03c_layer_references(self):
+        "Test to make sure Layer access is still available without the DataSource."
+        source = ds_list[0]
+
+        # See ticket #9448.
+        def get_layer():
+            # This DataSource object is not accessible outside this
+            # scope.  However, a reference should still be kept alive
+            # on the `Layer` returned.
+            ds = DataSource(source.ds)
+            return ds[0]
+
+        # Making sure we can call OGR routines on the Layer returned.
+        lyr = get_layer()
+        self.assertEqual(source.nfeat, len(lyr))
+        self.assertEqual(source.gtype, lyr.geom_type.num)        
+
     def test04_features(self):
         "Testing Data Source Features."
         for source in ds_list:

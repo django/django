@@ -111,7 +111,7 @@ class DataSource(object):
             l = get_layer(self._ptr, index)
         else:
             raise TypeError('Invalid index type: %s' % type(index))
-        return Layer(l)
+        return Layer(l, self)
         
     def __len__(self):
         "Returns the number of layers within the data source."
