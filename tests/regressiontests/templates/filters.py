@@ -277,5 +277,9 @@ def get_filter_tests():
 
         'escapejs01': (r'{{ a|escapejs }}', {'a': 'testing\r\njavascript \'string" <b>escaping</b>'}, 'testing\\x0D\\x0Ajavascript \\x27string\\x22 \\x3Cb\\x3Eescaping\\x3C/b\\x3E'),
         'escapejs02': (r'{% autoescape off %}{{ a|escapejs }}{% endautoescape %}', {'a': 'testing\r\njavascript \'string" <b>escaping</b>'}, 'testing\\x0D\\x0Ajavascript \\x27string\\x22 \\x3Cb\\x3Eescaping\\x3C/b\\x3E'),
+        
+        # Boolean return value from length_is should not be coerced to a string
+        'lengthis01': (r'{% if "X"|length_is:0 %}Length is 0{% else %}Length not 0{% endif %}', {}, 'Length not 0'),
+        'lengthis02': (r'{% if "X"|length_is:1 %}Length is 1{% else %}Length not 1{% endif %}', {}, 'Length is 1'),
     }
 
