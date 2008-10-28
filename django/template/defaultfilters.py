@@ -476,7 +476,7 @@ length.is_safe = True
 def length_is(value, arg):
     """Returns a boolean of whether the value's length is the argument."""
     return len(value) == int(arg)
-length_is.is_safe = True
+length_is.is_safe = False
 
 def random(value):
     """Returns a random item from the list."""
