@@ -1232,8 +1232,6 @@ True
 >>> form = BookForm({'title': 'I May Be Wrong But I Doubt It'})
 >>> form.is_valid()
 True
->>> form.save()
-<Book: Book object>
 
 # Choices on CharField and IntegerField
 >>> class ArticleForm(ModelForm):
