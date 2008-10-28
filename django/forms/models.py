@@ -446,7 +446,10 @@ class BaseInlineFormSet(BaseModelFormSet):
     def __init__(self, data=None, files=None, instance=None,
                  save_as_new=False, prefix=None):
         from django.db.models.fields.related import RelatedObject
-        self.instance = instance
+        if instance is None:
+            self.instance = self.model()
+        else:
+            self.instance = instance
         self.save_as_new = save_as_new
         # is there a better way to get the object descriptor?
         self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()

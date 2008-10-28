@@ -107,6 +107,17 @@ class Membership(models.Model):
     date_joined = models.DateTimeField(default=datetime.datetime.now)
     karma = models.IntegerField()
 
+# models for testing a null=True fk to a parent
+class Team(models.Model):
+    name = models.CharField(max_length=100)
+
+class Player(models.Model):
+    team = models.ForeignKey(Team, null=True)
+    name = models.CharField(max_length=100)
+    
+    def __unicode__(self):
+        return self.name
+
 __test__ = {'API_TESTS': """
 
 >>> from datetime import date
@@ -700,5 +711,20 @@ False
 >>> formset = FormSet(data, instance=person)
 >>> formset.is_valid()
 True
+
+# inlineformset_factory tests with fk having null=True. see #9462.
+# create some data that will exbit the issue
+>>> team = Team.objects.create(name=u"Red Vipers")
+>>> Player(name="Timmy").save()
+>>> Player(name="Bobby", team=team).save()
+
+>>> PlayerInlineFormSet = inlineformset_factory(Team, Player)
+>>> formset = PlayerInlineFormSet()
+>>> formset.get_queryset()
+[]
+
+>>> formset = PlayerInlineFormSet(instance=team)
+>>> formset.get_queryset()
+[<Player: Bobby>]
 
 """}
