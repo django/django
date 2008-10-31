@@ -1,47 +1,51 @@
+/* IE 6 & 7 */
+
+/* Proper fixed width for dashboard in IE6 */
+
+.dashboard #content {
+    *width: 768px;
+}
+
+.dashboard #content-main {
+    *width: 535px;
+}
+
+/* IE 6 ONLY */
+
 /* Keep header from flowing off the page */
 
 #container {
-    position: static;
+    _position: static;
 }
 
 /* Put the right sidebars back on the page */
 
 .colMS #content-related {
-    margin-right: 0;
-    margin-left: 10px;
-    position: static;
+    _margin-right: 0;
+    _margin-left: 10px;
+    _position: static;
 }
 
 /* Put the left sidebars back on the page */
 
 .colSM #content-related {
-    margin-right: 10px;
-    margin-left: -115px;
-    position: static;
+    _margin-right: 10px;
+    _margin-left: -115px;
+    _position: static;
 }
 
 .form-row {
-    height: 1%;
-}
-
-/* Proper fixed width for dashboard in IE6 */
-
-.dashboard #content {
-    width: 768px;
-}
-
-.dashboard #content-main {
-    width: 535px;
+    _height: 1%;
 }
 
 /* Fix right margin for changelist filters in IE6 */
 
 #changelist-filter ul {
-    margin-right: -10px;
+    _margin-right: -10px;
 }
 
 /* IE ignores min-height, but treats height as if it were min-height */
 
 .change-list .filtered {
-    height: 400px;
+    _height: 400px;
 }
