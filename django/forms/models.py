@@ -3,7 +3,7 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.datastructures import SortedDict
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _
@@ -468,7 +468,7 @@ class BaseInlineFormSet(BaseModelFormSet):
             # creating new instances
             form.data[form.add_prefix(self._pk_field.name)] = None
         return form
-
+    
     def get_queryset(self):
         """
         Returns this FormSet's queryset, but restricted to children of
@@ -485,7 +485,9 @@ class BaseInlineFormSet(BaseModelFormSet):
     def add_fields(self, form, index):
         super(BaseInlineFormSet, self).add_fields(form, index)
         if self._pk_field == self.fk:
-            form.fields[self._pk_field.name] = IntegerField(required=False, widget=HiddenInput)
+            form.fields[self._pk_field.name] = InlineForeignKeyField(self.instance, pk_field=True)
+        else:
+            form.fields[self.fk.name] = InlineForeignKeyField(self.instance, label=form.fields[self.fk.name].label)
 
 def _get_foreign_key(parent_model, model, fk_name=None):
     """
@@ -537,11 +539,6 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
     # enforce a max_num=1 when the foreign key to the parent model is unique.
     if fk.unique:
         max_num = 1
-    if exclude is not None:
-        exclude = list(exclude)
-        exclude.append(fk.name)
-    else:
-        exclude = [fk.name]
     kwargs = {
         'form': form,
         'formfield_callback': formfield_callback,
@@ -559,6 +556,41 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
 
 
 # Fields #####################################################################
+
+class InlineForeignKeyHiddenInput(HiddenInput):
+    def _has_changed(self, initial, data):
+        return False
+
+class InlineForeignKeyField(Field):
+    """
+    A basic integer field that deals with validating the given value to a
+    given parent instance in an inline.
+    """
+    default_error_messages = {
+        'invalid_choice': _(u'The inline foreign key did not match the parent instance primary key.'),
+    }
+    
+    def __init__(self, parent_instance, *args, **kwargs):
+        self.parent_instance = parent_instance
+        self.pk_field = kwargs.pop("pk_field", False)
+        if self.parent_instance is not None:
+            kwargs["initial"] = self.parent_instance.pk
+        kwargs["required"] = False
+        kwargs["widget"] = InlineForeignKeyHiddenInput
+        super(InlineForeignKeyField, self).__init__(*args, **kwargs)
+    
+    def clean(self, value):
+        if value in EMPTY_VALUES:
+            if self.pk_field:
+                return None
+            # if there is no value act as we did before.
+            return self.parent_instance
+        # ensure the we compare the values as equal types.
+        if force_unicode(value) != force_unicode(self.parent_instance.pk):
+            raise ValidationError(self.error_messages['invalid_choice'])
+        if self.pk_field:
+            return self.parent_instance.pk
+        return self.parent_instance
 
 class ModelChoiceIterator(object):
     def __init__(self, field):
