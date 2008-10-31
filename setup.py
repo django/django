@@ -74,6 +74,7 @@ setup(
     name = "Django",
     version = version,
     url = 'http://www.djangoproject.com/',
+    download_url='http://www.djangoproject.com/download/1.0.1-beta-1/tarball/'
     author = 'Django Software Foundation',
     author_email = 'foundation@djangoproject.com',
     description = 'A high-level Python Web framework that encourages rapid development and clean, pragmatic design.',
