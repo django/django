@@ -26,7 +26,7 @@
           {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
           {% if inline_admin_form.show_url %}<a href="../../../r/{{ inline_admin_form.original.content_type_id }}/{{ inline_admin_form.original.id }}/">{% trans "View on site" %}</a>{% endif %}
             </p>{% endif %}
-          {{ inline_admin_form.pk_field.field }}
+          {{ inline_admin_form.pk_field.field }} {{ inline_admin_form.fk_field.field }}
           {% spaceless %}
           {% for fieldset in inline_admin_form %}
             {% for line in fieldset %}

@@ -109,6 +109,8 @@ class InlineAdminFormSet(object):
 
     def fields(self):
         for field_name in flatten_fieldsets(self.fieldsets):
+            if self.formset.fk.name == field_name:
+                continue
             yield self.formset.form.base_fields[field_name]
 
     def _media(self):
@@ -130,6 +132,10 @@ class InlineAdminForm(AdminForm):
         self.show_url = original and hasattr(original, 'get_absolute_url')
         super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields)
     
+    def __iter__(self):
+        for name, options in self.fieldsets:
+            yield InlineFieldset(self.formset, self.form, name, **options)
+    
     def field_count(self):
         # tabular.html uses this function for colspan value.
         num_of_fields = 1 # always has at least one field
@@ -142,6 +148,9 @@ class InlineAdminForm(AdminForm):
 
     def pk_field(self):
         return AdminField(self.form, self.formset._pk_field.name, False)
+    
+    def fk_field(self):
+        return AdminField(self.form, self.formset.fk.name, False)
 
     def deletion_field(self):
         from django.forms.formsets import DELETION_FIELD_NAME
@@ -151,6 +160,17 @@ class InlineAdminForm(AdminForm):
         from django.forms.formsets import ORDERING_FIELD_NAME
         return AdminField(self.form, ORDERING_FIELD_NAME, False)
 
+class InlineFieldset(Fieldset):
+    def __init__(self, formset, *args, **kwargs):
+        self.formset = formset
+        super(InlineFieldset, self).__init__(*args, **kwargs)
+        
+    def __iter__(self):
+        for field in self.fields:
+            if self.formset.fk.name == field:
+                continue
+            yield Fieldline(self.form, field)
+            
 class AdminErrorList(forms.util.ErrorList):
     """
     Stores all errors for the form/formsets in an add/change stage view.
