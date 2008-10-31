@@ -1,56 +1,195 @@
-body { direction: rtl; }
+body {
+    direction: rtl;
+}
 
-/* login styles */
+/* LOGIN */
 
-.login .form-row { float:right; }
-.login .form-row label { float:right; padding-left:0.5em; padding-right:0; text-align:left;}
-.login .submit-row { clear:both; padding:1em 9.4em 0 0; }
+.login .form-row {
+    float: right;
+}
 
+.login .form-row label {
+    float: right;
+    padding-left: 0.5em;
+    padding-right: 0;
+    text-align: left;
+}
 
-/* global styles */
-th { text-align: right; }
-.module h2, .module caption { text-align: right; }
-.addlink, .changelink { padding-left:0px; padding-right:12px; background-position:100% 0.2em; }
-.deletelink { padding-left:0px; padding-right:12px; background-position:100% 0.25em; }
-.object-tools { float:left; }
+.login .submit-row {
+    clear: both;
+    padding: 1em 9.4em 0 0;
+}
 
+/* GLOBAL */
 
-/* layout styles */
-#user-tools { right:auto; left:0; text-align:left; }
-div.breadcrumbs { text-align:right; }
-#content-main { float:right;}
-#content-related { float:left; margin-left:-19em; margin-right:auto;}
-.colMS { margin-left:20em !important; margin-right:10px !important;}
+th {
+    text-align: right;
+}
+
+.module h2, .module caption {
+    text-align: right;
+}
+
+.addlink, .changelink {
+    padding-left: 0px;
+    padding-right: 12px;
+    background-position: 100% 0.2em;
+}
+
+.deletelink {
+    padding-left: 0px;
+    padding-right: 12px;
+    background-position: 100% 0.25em;
+}
+
+.object-tools {
+    float: left;
+}
+
+/* LAYOUT */
+
+#user-tools {
+    right: auto;
+    left: 0;
+    text-align: left;
+}
+
+div.breadcrumbs {
+    text-align: right;
+}
+
+#content-main {
+    float: right;
+}
+
+#content-related {
+    float: left;
+    margin-left: -19em;
+    margin-right: auto;
+}
+
+.colMS {
+    margin-left: 20em !important;
+    margin-right: 10px !important;
+}
 
 /* dashboard styles */
-.dashboard .module table td a { padding-left:.6em; padding-right:12px; }
+
+.dashboard .module table td a {
+    padding-left: .6em;
+    padding-right: 12px;
+}
 
 /* changelists styles */
-.change-list .filtered { background:white url(../img/admin/changelist-bg_rtl.gif) top left repeat-y !important; }
-.change-list .filtered table { border-left:1px solid #ddd; border-right:0px none; }
-#changelist-filter { right:auto; left:0; border-left:0px none; border-right:1px solid #ddd;}
-.change-list .filtered table, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull { margin-right:0px !important; margin-left:160px !important; }
-#changelist-filter li.selected { border-left:0px none; padding-left:0px; margin-left:0; border-right:5px solid #ccc; padding-right:5px;margin-right:-10px; }
 
-/* form styles */
-.aligned label { padding:0 0 3px 1em;  float:right; }
-.submit-row { text-align: left }
-.submit-row p.deletelink-box { float: right;}
-.submit-row .deletelink { background:url(../img/admin/icon_deletelink.gif) 0 50% no-repeat; padding-right:14px; }
-.vDateField, .vTimeField { margin-left:2px; }
-form ul.inline li { float:right; padding-right:0; padding-left:7px; }
-input[type=submit].default, .submit-row input.default { float:left; }
-fieldset .field-box { float:right; margin-left: 20px; }
-.errorlist li {background-position: 100% .3em; padding: 4px 25px 4px 5px; }
-.errornote {background-position: 100% .3em; padding: 4px 25px 4px 5px;
+.change-list .filtered {
+    background: white url(../img/admin/changelist-bg_rtl.gif) top left repeat-y !important;
+}
 
-/* widget styles */
-.calendarnav-previous { top:0; left:auto; right:0; }
-.calendarnav-next { top:0; right:auto; left:0;}
-.calendar caption, .calendarbox h2 { text-align:center; }
+.change-list .filtered table {
+    border-left: 1px solid #ddd;
+    border-right: 0px none;
+}
 
-.selector { float: right;}
-.selector .selector-filter { text-align: right;}
+#changelist-filter {
+    right: auto;
+    left: 0;
+    border-left: 0px none;
+    border-right: 1px solid #ddd;
+}
 
-/* x unsorted */
-.inline-related h2 { text-align:right }
+.change-list .filtered table, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
+    margin-right: 0px !important;
+    margin-left: 160px !important;
+}
+
+#changelist-filter li.selected {
+    border-left: 0px none;
+    padding-left: 0px;
+    margin-left: 0;
+    border-right: 5px solid #ccc;
+    padding-right: 5px;
+    margin-right: -10px;
+}
+
+/* FORMS */
+
+.aligned label {
+    padding: 0 0 3px 1em;
+    float: right;
+}
+
+.submit-row {
+    text-align: left
+}
+
+.submit-row p.deletelink-box {
+    float: right;
+}
+
+.submit-row .deletelink {
+    background: url(../img/admin/icon_deletelink.gif) 0 50% no-repeat;
+    padding-right: 14px;
+}
+
+.vDateField, .vTimeField {
+    margin-left: 2px;
+}
+
+form ul.inline li {
+    float: right;
+    padding-right: 0;
+    padding-left: 7px;
+}
+
+input[type=submit].default, .submit-row input.default {
+    float: left;
+}
+
+fieldset .field-box {
+    float: right;
+    margin-left: 20px;
+}
+
+.errorlist li {
+    background-position: 100% .3em;
+    padding: 4px 25px 4px 5px;
+}
+
+.errornote {
+    background-position: 100% .3em;
+    padding: 4px 25px 4px 5px;
+}
+
+/* WIDGETS */
+
+.calendarnav-previous {
+    top: 0;
+    left: auto;
+    right: 0;
+}
+
+.calendarnav-next {
+    top: 0;
+    right: auto;
+    left: 0;
+}
+
+.calendar caption, .calendarbox h2 {
+    text-align: center;
+}
+
+.selector {
+    float: right;
+}
+
+.selector .selector-filter {
+    text-align: right;
+}
+
+/* MISC */
+
+.inline-related h2 {
+    text-align: right
+}
+
