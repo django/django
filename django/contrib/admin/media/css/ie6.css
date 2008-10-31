@@ -1,12 +1,12 @@
 /* Keep header from flowing off the page */
 
-* html #container {
+#container {
     position: static;
 }
 
 /* Put the right sidebars back on the page */
 
-* html .colMS #content-related {
+.colMS #content-related {
     margin-right: 0;
     margin-left: 10px;
     position: static;
@@ -14,34 +14,34 @@
 
 /* Put the left sidebars back on the page */
 
-* html .colSM #content-related {
+.colSM #content-related {
     margin-right: 10px;
     margin-left: -115px;
     position: static;
 }
 
-* html .form-row {
+.form-row {
     height: 1%;
 }
 
 /* Proper fixed width for dashboard in IE6 */
 
-* html .dashboard #content {
+.dashboard #content {
     width: 768px;
 }
 
-* html .dashboard #content-main {
+.dashboard #content-main {
     width: 535px;
 }
 
 /* Fix right margin for changelist filters in IE6 */
 
-* html #changelist-filter ul {
+#changelist-filter ul {
     margin-right: -10px;
 }
 
 /* IE ignores min-height, but treats height as if it were min-height */
 
-* html .change-list .filtered {
+.change-list .filtered {
     height: 400px;
 }

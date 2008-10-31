@@ -1,14 +1,7 @@
 /*
     DJANGO Admin
-    by Wilson Miner wilson@lawrence.com
 */
-
-/* Block IE 5 */
-@import "null.css?\"\{";
 
 /* Import other styles */
 @import url('global.css');
 @import url('layout.css');
-
-/* Import patch for IE 6 Windows */
-/*\*/ @import "patch-iewin.css"; /**/
