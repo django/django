@@ -539,6 +539,13 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
     # enforce a max_num=1 when the foreign key to the parent model is unique.
     if fk.unique:
         max_num = 1
+    if fields is not None:
+        fields = list(fields)
+        fields.append(fk.name)
+    else:
+        # get all the fields for this model that will be generated.
+        fields = fields_for_model(model, fields, exclude, formfield_callback).keys()
+        fields.append(fk.name)
     kwargs = {
         'form': form,
         'formfield_callback': formfield_callback,
