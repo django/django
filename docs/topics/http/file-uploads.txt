@@ -132,7 +132,7 @@ Three settings control Django's file upload behavior:
 
     :setting:`FILE_UPLOAD_TEMP_DIR`
         The directory where uploaded files larger than
-        :setting:`FILE_UPLOAD_TEMP_DIR` will be stored.
+        :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` will be stored.
 
         Defaults to your system's standard temporary directory (i.e. ``/tmp`` on
         most Unix-like systems).
