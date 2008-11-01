@@ -13,7 +13,7 @@ extra quick.
 
 The code lives in a single module: ``django.core.mail``.
 
-.. _smtplib library: http://www.python.org/doc/current/lib/module-smtplib.html
+.. _smtplib library: http://docs.python.org/library/smtplib.html
 
 Quick example
 =============
@@ -63,7 +63,7 @@ are required.
       SMTP server. If this isn't provided, Django will use the value of the
       ``EMAIL_HOST_PASSWORD`` setting.
 
-.. _smtplib docs: http://www.python.org/doc/current/lib/module-smtplib.html
+.. _smtplib docs: http://docs.python.org/library/smtplib.html
 
 send_mass_mail()
 ================

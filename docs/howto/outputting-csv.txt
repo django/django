@@ -8,7 +8,7 @@ This document explains how to output CSV (Comma Separated Values) dynamically
 using Django views. To do this, you can either use the `Python CSV library`_ or
 the Django template system.
 
-.. _Python CSV library: http://www.python.org/doc/current/lib/module-csv.html
+.. _Python CSV library: http://docs.python.org/library/csv.html
 
 Using the Python CSV library
 ============================

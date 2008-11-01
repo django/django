@@ -466,7 +466,7 @@ Technical details
     * Django only sends a cookie if it needs to. If you don't set any session
       data, it won't send a session cookie.
 
-.. _`the pickle module`: http://www.python.org/doc/current/lib/module-pickle.html
+.. _`the pickle module`: http://docs.python.org/library/pickle.html
 
 Session IDs in URLs
 ===================

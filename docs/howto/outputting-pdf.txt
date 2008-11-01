@@ -131,7 +131,7 @@ Here's the above "Hello World" example rewritten to use ``cStringIO``::
         response.write(pdf)
         return response
 
-.. _cStringIO: http://www.python.org/doc/current/lib/module-cStringIO.html
+.. _cStringIO: http://docs.python.org/library/stringio.html#module-cStringIO
 
 Further resources
 =================

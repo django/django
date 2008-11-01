@@ -499,7 +499,7 @@ Methods
           calendars.lawrence.com. Otherwise, a cookie will only be readable by
           the domain that set it.
 
-    .. _`cookie Morsel`: http://www.python.org/doc/current/lib/morsel-objects.html
+    .. _`cookie Morsel`: http://docs.python.org/library/cookie.html#Cookie.Morsel
 
 .. method:: HttpResponse.delete_cookie(key, path='/', domain=None)
 
