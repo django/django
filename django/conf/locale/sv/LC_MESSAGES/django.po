@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-03 04:36+0200\n"
+"POT-Creation-Date: 2008-11-01 20:51+0100\n"
 "PO-Revision-Date: 2008-05-26 11:15+0200\n"
 "Last-Translator: Ludvig Ericson <ludvig.ericson@gmail.com>\n"
 "Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
@@ -158,7 +158,7 @@ msgid "Polish"
 msgstr "Polska"
 
 #: conf/global_settings.py:79
-msgid "Portugese"
+msgid "Portuguese"
 msgstr "Portugisiska"
 
 #: conf/global_settings.py:80
@@ -222,40 +222,40 @@ msgstr ""
 "<h3>Av %s:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:92
-#: contrib/admin/filterspecs.py:147 contrib/admin/filterspecs.py:173
+#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:91
+#: contrib/admin/filterspecs.py:146 contrib/admin/filterspecs.py:172
 msgid "All"
 msgstr "Alla"
 
-#: contrib/admin/filterspecs.py:113
+#: contrib/admin/filterspecs.py:112
 msgid "Any date"
 msgstr "Alla datum"
 
-#: contrib/admin/filterspecs.py:114
+#: contrib/admin/filterspecs.py:113
 msgid "Today"
 msgstr "Idag"
 
-#: contrib/admin/filterspecs.py:117
+#: contrib/admin/filterspecs.py:116
 msgid "Past 7 days"
 msgstr "Senaste 7 dagarna"
 
-#: contrib/admin/filterspecs.py:119
+#: contrib/admin/filterspecs.py:118
 msgid "This month"
 msgstr "Denna månad"
 
-#: contrib/admin/filterspecs.py:121
+#: contrib/admin/filterspecs.py:120
 msgid "This year"
 msgstr "Detta år"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:146 forms/widgets.py:391
 msgid "Yes"
 msgstr "Ja"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:146 forms/widgets.py:391
 msgid "No"
 msgstr "Nej"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:153 forms/widgets.py:391
 msgid "Unknown"
 msgstr "Okänt"
 
@@ -297,7 +297,7 @@ msgid "Changed %s."
 msgstr "Ändrade %s."
 
 #: contrib/admin/options.py:338 contrib/admin/options.py:348
-#: forms/models.py:275
+#: contrib/comments/templates/comments/preview.html:15 forms/models.py:278
 msgid "and"
 msgstr "och"
 
@@ -347,30 +347,30 @@ msgid ""
 msgstr ""
 "%(name)s \"%(obj)s\" lades till. Du kan redigera objektet igen nedanför."
 
-#: contrib/admin/options.py:536
+#: contrib/admin/options.py:528
 #, python-format
 msgid "Add %s"
 msgstr "Lägg till %s"
 
-#: contrib/admin/options.py:614
+#: contrib/admin/options.py:606
 #, python-format
 msgid "Change %s"
 msgstr "Ändra %s"
 
-#: contrib/admin/options.py:646
+#: contrib/admin/options.py:638
 msgid "Database error"
 msgstr "Databasfel"
 
-#: contrib/admin/options.py:696
+#: contrib/admin/options.py:688
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" togs bort."
 
-#: contrib/admin/options.py:703
+#: contrib/admin/options.py:695
 msgid "Are you sure?"
 msgstr "Är du säker?"
 
-#: contrib/admin/options.py:732
+#: contrib/admin/options.py:724
 #, python-format
 msgid "Change history: %s"
 msgstr "Ändringshistorik: %s"
@@ -384,11 +384,11 @@ msgstr ""
 "Var god ange ett korrekt användarnamn och lösenord. Tänk på att skilja "
 "mellan gemener och versaler."
 
-#: contrib/admin/sites.py:227 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:226 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Var god logga in igen, eftersom din session har förfallit."
 
-#: contrib/admin/sites.py:234 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:233 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -396,27 +396,27 @@ msgstr ""
 "Det verkar som att din webläsare inte är konfigurerad att acceptera cookies. "
 "Aktivera cookies, ladda om denna sida och försök igen."
 
-#: contrib/admin/sites.py:250 contrib/admin/sites.py:256
+#: contrib/admin/sites.py:249 contrib/admin/sites.py:255
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Användarnamn får inte innehålla '@'-tecknet."
 
-#: contrib/admin/sites.py:253 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:252 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Din e-postadress är inte ditt användarnamn. Försök med '%s' istället."
 
-#: contrib/admin/sites.py:313
+#: contrib/admin/sites.py:312
 msgid "Site administration"
 msgstr "Webbplatsadministration"
 
-#: contrib/admin/sites.py:326 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:325 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Logga in"
 
-#: contrib/admin/sites.py:373
+#: contrib/admin/sites.py:372
 #, python-format
 msgid "%s administration"
 msgstr "Administration av %s"
@@ -447,11 +447,11 @@ msgstr "Aktuell:"
 msgid "Change:"
 msgstr "Ändra:"
 
-#: contrib/admin/widgets.py:121
+#: contrib/admin/widgets.py:123
 msgid "Lookup"
 msgstr "Uppslag"
 
-#: contrib/admin/widgets.py:228
+#: contrib/admin/widgets.py:230
 msgid "Add Another"
 msgstr "Lägg till ytterligare"
 
@@ -555,7 +555,7 @@ msgstr "Historik"
 
 #: contrib/admin/templates/admin/change_form.html:28
 #: contrib/admin/templates/admin/edit_inline/stacked.html:13
-#: contrib/admin/templates/admin/edit_inline/tabular.html:25
+#: contrib/admin/templates/admin/edit_inline/tabular.html:27
 msgid "View on site"
 msgstr "Visa på webbplats"
 
@@ -660,6 +660,7 @@ msgid "User"
 msgstr "Användare"
 
 #: contrib/admin/templates/admin/object_history.html:24
+#: contrib/comments/templates/comments/moderation_queue.html:33
 msgid "Action"
 msgstr "Händelse"
 
@@ -904,7 +905,7 @@ msgstr "E-postadress:"
 msgid "Reset my password"
 msgstr "Nollställ mitt lösenord"
 
-#: contrib/admin/templatetags/admin_list.py:288
+#: contrib/admin/templatetags/admin_list.py:284
 msgid "All dates"
 msgstr "Alla datum"
 
@@ -1049,7 +1050,8 @@ msgstr "Text"
 msgid "Time"
 msgstr "Tid"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:22
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:21
+#: contrib/comments/templates/comments/moderation_queue.html:37
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
@@ -1368,29 +1370,31 @@ msgstr "Innehåll"
 msgid "Metadata"
 msgstr "Metadata"
 
-#: contrib/comments/forms.py:20
+#: contrib/comments/forms.py:19
+#: contrib/comments/templates/comments/moderation_queue.html:34
 msgid "Name"
 msgstr "Namn"
 
-#: contrib/comments/forms.py:21
+#: contrib/comments/forms.py:20
 msgid "Email address"
 msgstr "E-postadress"
 
-#: contrib/comments/forms.py:23
+#: contrib/comments/forms.py:22
+#: contrib/comments/templates/comments/moderation_queue.html:35
 msgid "Comment"
 msgstr "Kommentar"
 
-#: contrib/comments/forms.py:26
+#: contrib/comments/forms.py:25
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "Om du fyller i detta fält kommer din kommentar att betraktas som spam"
 
-#: contrib/comments/forms.py:126
+#: contrib/comments/forms.py:125
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Akta din tunga! Ordet %s är inte tillåtet här."
-msgstr[1] "Akta din tunga! Orden %s är inte tillåtna här."
+msgstr[0] "Håll tungan rätt i mun! Ordet %s är inte tillåtet här."
+msgstr[1] "Håll tungan rätt i mun! Orden %s är inte tillåtna här."
 
 #: contrib/comments/models.py:23
 msgid "object ID"
@@ -1423,7 +1427,7 @@ msgstr "är offentlig"
 #: contrib/comments/models.py:60
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
-msgstr "Avmarkeras detta kommer kommentaren inte synas på webbplatsen."
+msgstr "Bocka av detta så syns kommentaren inte på webbplatsen."
 
 #: contrib/comments/models.py:62
 msgid "is removed"
@@ -1468,17 +1472,146 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
+#: contrib/comments/templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Godkänna kommentarer"
+
+#: contrib/comments/templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Är du säker på att du vill publicera denna kommentar?"
+
+#: contrib/comments/templates/comments/approve.html:12
+#: contrib/comments/templates/comments/moderation_queue.html:49
+msgid "Approve"
+msgstr "Godkänn"
+
+#: contrib/comments/templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Tack för ditt godkännande"
+
+#: contrib/comments/templates/comments/approved.html:7
+#: contrib/comments/templates/comments/deleted.html:7
+#: contrib/comments/templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Tack för att du tog dig tid att förbättra diskussionskvaliteten på vår "
+"sida"
+
+#: contrib/comments/templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Ta bort kommentar"
+
+#: contrib/comments/templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Är du säker på att du vill ta bort denna kommentar?"
+
+#: contrib/comments/templates/comments/delete.html:12
+#: contrib/comments/templates/comments/moderation_queue.html:53
+msgid "Remove"
+msgstr "Ta bort"
+
+#: contrib/comments/templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Tack borttagning"
+
+#: contrib/comments/templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Flagga denna kommentar"
+
+#: contrib/comments/templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Är du säker på att du vill flagga denna kommentar?"
+
+#: contrib/comments/templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Flagga"
+
+#: contrib/comments/templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Tack för flaggningen"
+
+#: contrib/comments/templates/comments/form.html:16
+#: contrib/comments/templates/comments/preview.html:31
+msgid "Post"
+msgstr "Skicka"
+
+#: contrib/comments/templates/comments/form.html:17
+#: contrib/comments/templates/comments/preview.html:32
+msgid "Preview"
+msgstr "Förhandsgranska"
+
+#: contrib/comments/templates/comments/moderation_queue.html:4
+#: contrib/comments/templates/comments/moderation_queue.html:19
+msgid "Comment moderation queue"
+msgstr "Moderera kommentarer"
+
+#: contrib/comments/templates/comments/moderation_queue.html:26
+msgid "No comments to moderate"
+msgstr "Inga kommentarer att moderera"
+
+#: contrib/comments/templates/comments/moderation_queue.html:36
+msgid "Email"
+msgstr "E-postadress"
+
+#: contrib/comments/templates/comments/moderation_queue.html:38
+msgid "Authenticated?"
+msgstr "Autentiserad?"
+
+#: contrib/comments/templates/comments/moderation_queue.html:39
+msgid "IP Address"
+msgstr "IP-adress"
+
+#: contrib/comments/templates/comments/moderation_queue.html:40
+msgid "Date posted"
+msgstr "Inskickat den"
+
+#: contrib/comments/templates/comments/moderation_queue.html:63
+msgid "yes"
+msgstr "ja"
+
+#: contrib/comments/templates/comments/moderation_queue.html:63
+msgid "no"
+msgstr "nej"
+
+#: contrib/comments/templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Tack för din kommentar"
+
+#: contrib/comments/templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Tack för din kommentar"
+
+#: contrib/comments/templates/comments/preview.html:4
+#: contrib/comments/templates/comments/preview.html:12
+msgid "Preview your comment"
+msgstr "Förhandsgranska din kommentar"
+
+#: contrib/comments/templates/comments/preview.html:10
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Rätta till felet nedan."
+msgstr[1] "Rätta till felen nedan."
+
+#: contrib/comments/templates/comments/preview.html:15
+msgid "Post your comment"
+msgstr "Skicka kommentar"
+
+#: contrib/comments/templates/comments/preview.html:15
+msgid "or make changes"
+msgstr "eller ändra den"
+
 #: contrib/contenttypes/models.py:67
 msgid "python model class name"
-msgstr "python klassnamn för modell"
+msgstr "python-klassnamn för modell"
 
 #: contrib/contenttypes/models.py:71
 msgid "content type"
-msgstr "innehålls typ"
+msgstr "innehållstyp"
 
 #: contrib/contenttypes/models.py:72
 msgid "content types"
-msgstr "innehålls typer"
+msgstr "innehållstyper"
 
 #: contrib/flatpages/admin.py:9
 msgid ""
@@ -1637,11 +1770,11 @@ msgstr "idag"
 
 #: contrib/humanize/templatetags/humanize.py:95
 msgid "tomorrow"
-msgstr "imorgon"
+msgstr "i morgon"
 
 #: contrib/humanize/templatetags/humanize.py:97
 msgid "yesterday"
-msgstr "igår"
+msgstr "i går"
 
 #: contrib/localflavor/ar/forms.py:27
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -3711,7 +3844,7 @@ msgstr ""
 "Välj ett giltigt alternativ. %(value)s finns inte bland tillgängliga "
 "alternativ."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:654
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:703
 msgid "Enter a list of values."
 msgstr "Fyll i en lista med värden."
 
@@ -3730,18 +3863,22 @@ msgstr ""
 msgid "Order"
 msgstr "Sortering"
 
-#: forms/models.py:268 forms/models.py:277
+#: forms/models.py:271 forms/models.py:280
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s med detta %(field_label)s finns redan."
 
-#: forms/models.py:584
+#: forms/models.py:570
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr "Inline foreign-key:n matchade inte den ägande instansens primärnyckel."
+
+#: forms/models.py:633
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Välj ett giltigt alternativ. Det valet finns inte bland tillgängliga "
 "alternativ."
 
-#: forms/models.py:655
+#: forms/models.py:704
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr ""
@@ -4110,9 +4247,6 @@ msgstr "%(verbose_name)s togs bort."
 #~ msgid "approved by staff"
 #~ msgstr "godkänd av personal"
 
-#~ msgid "free comment"
-#~ msgstr "fri kommentar"
-
 #~ msgid "free comments"
 #~ msgstr "fria kommentarer"
 
@@ -4178,9 +4312,6 @@ msgstr "%(verbose_name)s togs bort."
 
 #~ msgid "Post a photo"
 #~ msgstr "Lägg till foto"
-
-#~ msgid "Preview comment"
-#~ msgstr "Förhandsgranska kommentar"
 
 #~ msgid "Your name:"
 #~ msgstr "Ditt namn:"
