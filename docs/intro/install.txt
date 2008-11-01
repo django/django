@@ -24,7 +24,7 @@ probably already have it installed.
     If you use Jython_ (a Python implementation for the Java platform), you'll
     need to follow a few additional steps. See :ref:`howto-jython` for details.
 
-.. _jython: http://jython.org/
+.. _jython: http://www.jython.org/
 
 You can verify that Python's installed by typing ``python`` from your shell; you should see something like::
 
