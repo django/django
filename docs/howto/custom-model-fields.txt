@@ -437,7 +437,7 @@ for the first time, the ``add`` parameter will be ``True``, otherwise it will be
 
 You only need to override this method if you want to preprocess the value
 somehow, just before saving. For example, Django's
-`:class:`~django.db.models.DateTimeField` uses this method to set the attribute
+:class:`~django.db.models.DateTimeField` uses this method to set the attribute
 correctly in the case of :attr:`~django.db.models.Field.auto_now` or
 :attr:`~django.db.models.Field.auto_now_add`.
 
@@ -569,7 +569,7 @@ Converting field data for serialization
 .. method:: value_to_string(self, obj)
 
 This method is used by the serializers to convert the field into a string for
-output. Calling :meth:``Field._get_val_from_obj(obj)`` is the best way to get the
+output. Calling :meth:`Field._get_val_from_obj(obj)` is the best way to get the
 value to serialize. For example, since our ``HandField`` uses strings for its
 data storage anyway, we can reuse some existing conversion code::
 
