@@ -1255,7 +1255,7 @@ pprint
 
 A wrapper around `pprint.pprint`__ -- for debugging, really.
 
-__ http://www.python.org/doc/2.5/lib/module-pprint.html
+__ http://docs.python.org/library/pprint.html
 
 .. templatefilter:: random
 

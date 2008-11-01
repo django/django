@@ -128,7 +128,7 @@ Finally, a performance note: these regular expressions are compiled the first
 time the URLconf module is loaded. They're super fast.
 
 .. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
-.. _Python documentation: http://www.python.org/doc/current/lib/module-re.html
+.. _Python documentation: http://docs.python.org/library/re.html
 
 Write your first view
 =====================

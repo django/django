@@ -344,7 +344,7 @@ else. In our case, let's say the tag should be used like this:
 
     <p>The time is {% current_time "%Y-%m-%d %I:%M %p" %}.</p>
 
-.. _`strftime syntax`: http://www.python.org/doc/current/lib/module-time.html#l2h-1941
+.. _`strftime syntax`: http://docs.python.org/library/time.html#time.strftime
 
 The parser for this function should grab the parameter and create a ``Node``
 object::

@@ -406,7 +406,7 @@ In addition to ``extra_context``, the template's context will be:
       is ``'object'`` by default. If ``template_object_name`` is ``'foo'``,
       this variable's name will be ``foo_list``.
 
-.. _strftime docs: http://www.python.org/doc/current/lib/module-time.html#l2h-1941
+.. _strftime docs: http://docs.python.org/library/time.html#time.strftime
 
 ``django.views.generic.date_based.archive_week``
 ------------------------------------------------
