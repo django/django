@@ -30,7 +30,7 @@ You can also use a serializer object directly::
     data = xml_serializer.getvalue()
 
 This is useful if you want to serialize data directly to a file-like object
-(which includes an :class:`~django.http.HttpResponse` ::
+(which includes an :class:`~django.http.HttpResponse`)::
 
     out = open("file.xml", "w")
     xml_serializer.serialize(SomeModel.objects.all(), stream=out)
