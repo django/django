@@ -207,7 +207,7 @@ In this case, you'd have to create :file:`subject.txt` and :file:`message.txt` t
 files for both the LJWorld.com and Lawrence.com template directories. That
 gives you more flexibility, but it's also more complex.
 
-It's a good idea to exploit the :class:`~django.contrib.sites.models.Site``
+It's a good idea to exploit the :class:`~django.contrib.sites.models.Site`
 objects as much as possible, to remove unneeded complexity and redundancy.
 
 Getting the current domain for full URLs

@@ -35,7 +35,7 @@ How to use Databrowse
          more.
 
        * Otherwise, determine the full filesystem path to the
-         `:file:`django/contrib/databrowse/templates` directory, and add that
+         :file:`django/contrib/databrowse/templates` directory, and add that
          directory to your :setting:`TEMPLATE_DIRS` setting.
 
     2. Register a number of models with the Databrowse site::

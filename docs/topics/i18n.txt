@@ -298,7 +298,8 @@ Each ``RequestContext`` has access to three translation-specific variables:
       currently active locale).
 
     * ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
-      Example: ``en-us``. (See "How language preference is discovered", below.)
+      Example: ``en-us``. (See :ref:`how-django-discovers-language-preference`,
+      below.)
 
     * ``LANGUAGE_BIDI`` is the current locale's direction. If True, it's a
       right-to-left language, e.g.: Hebrew, Arabic. If False it's a
@@ -514,7 +515,7 @@ A quick explanation:
       out empty, so it's your responsibility to change it. Make sure you keep
       the quotes around your translation.
     * As a convenience, each message includes, in the form of a comment line
-      prefixed with ``#`` and locted above the ``msgid`` line, the filename and
+      prefixed with ``#`` and located above the ``msgid`` line, the filename and
       line number from which the translation string was gleaned.
 
 Long messages are a special case. There, the first string directly after the
@@ -565,6 +566,8 @@ That's it. Your translations are ready for use.
    If you're using Windows and need to install the GNU gettext utilities so
    ``django-admin compilemessages`` works see `gettext on Windows`_ for more
    information.
+
+.. _how-django-discovers-language-preference:
 
 3. How Django discovers language preference
 ===========================================
@@ -783,7 +786,6 @@ project message file that are already in application message files.
 
 The easiest way out is to store applications that are not part of the project
 (and so carry their own translations) outside the project tree. That way,
-
 ``django-admin.py makemessages`` on the project level will only translate
 strings that are connected to your explicit project and not strings that are
 distributed independently.

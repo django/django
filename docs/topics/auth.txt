@@ -687,7 +687,7 @@ the following line to your URLconf::
           a query string, too.
 
         * ``site_name``: The name of the current
-          :class:`~django.contrib.sites.models.Site``, according to the
+          :class:`~django.contrib.sites.models.Site`, according to the
           :setting:`SITE_ID` setting. If you're using the Django development version
           and you don't have the site framework installed, this will be set to the
           value of ``request.META['SERVER_NAME']``. For more on sites, see 
