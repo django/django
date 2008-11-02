@@ -554,7 +554,7 @@ give a name to a URL pattern in order to distinguish it from other patterns
 using the same view and parameters. Then, you can use this name in reverse URL
 matching.
 
-Here's the above example, rewritten to used named URL patterns::
+Here's the above example, rewritten to use named URL patterns::
 
     urlpatterns = patterns('',
         url(r'/archive/(\d{4})/$', archive, name="full-archive"),
