@@ -35,7 +35,7 @@ You can evaluate a ``QuerySet`` in the following ways:
 
     * **Slicing.** As explained in :ref:`limiting-querysets`, a ``QuerySet`` can
       be sliced, using Python's array-slicing syntax. Usually slicing a
-      ``QuerySet`` returns another (unevaluated )``QuerySet``, but Django will
+      ``QuerySet`` returns another (unevaluated ) ``QuerySet``, but Django will
       execute the database query if you use the "step" parameter of slice
       syntax.
 
@@ -627,7 +627,7 @@ of the arguments is required, but you should use at least one of them.
     .. versionadded:: 1.0
 
     In some rare cases, you might wish to pass parameters to the SQL fragments
-    in ``extra(select=...)```. For this purpose, use the ``select_params``
+    in ``extra(select=...)``. For this purpose, use the ``select_params``
     parameter. Since ``select_params`` is a sequence and the ``select``
     attribute is a dictionary, some care is required so that the parameters
     are matched up correctly with the extra select pieces.  In this situation,

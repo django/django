@@ -294,7 +294,7 @@ normal ``django.template.Context``. The first difference is that it takes an
     })
 
 The second difference is that it automatically populates the context with a few
-variables, according to your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting`.
+variables, according to your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
 
 The :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting is a tuple of callables --
 called **context processors** -- that take a request object as their argument
@@ -384,7 +384,7 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 
     * ``LANGUAGES`` -- The value of the :setting:`LANGUAGES` setting.
     * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
-      the value of the :setting:`LANGUAGE_CODE` setting`.
+      the value of the :setting:`LANGUAGE_CODE` setting.
 
 See :ref:`topics-i18n` for more.
 

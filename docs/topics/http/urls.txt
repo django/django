@@ -50,7 +50,7 @@ algorithm the system follows to determine which Python code to execute:
     
     4. Once one of the regexes matches, Django imports and calls the given
        view, which is a simple Python function. The view gets passed an
-       :class:`~django.http.HttpRequest`` as its first argument and any values
+       :class:`~django.http.HttpRequest` as its first argument and any values
        captured in the regex as remaining arguments.
 
 Example

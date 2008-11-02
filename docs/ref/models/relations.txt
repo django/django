@@ -19,7 +19,7 @@ Extra methods on managers when used in a ForeignKey context
         >>> e = Entry.objects.get(id=234)
         >>> b.entry_set.add(e) # Associates Entry e with Blog b.
 
-.. method:: QuerySet.create(**kwargs)`
+.. method:: QuerySet.create(**kwargs)
 
     Creates a new object, saves it and puts it in the related object set.
     Returns the newly created object::
@@ -73,5 +73,5 @@ Extra methods on managers when used in a ForeignKey context
 
     Note this doesn't delete the related objects -- it just disassociates them.
 
-    Just like ``remove()``, ``clear()`` is only available on ``ForeignKey``s
+    Just like ``remove()``, ``clear()`` is only available on ``ForeignKey``\s
     where ``null=True``.

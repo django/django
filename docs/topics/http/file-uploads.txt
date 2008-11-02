@@ -153,8 +153,8 @@ Three settings control Django's file upload behavior:
             ``0`` is very important: it indicates an octal number, which is the
             way that modes must be specified. If you try to use ``644``, you'll
             get totally incorrect behavior.
-            
-            **Always prefix the mode with a ``0``.**
+
+            **Always prefix the mode with a 0.**
 
     :setting:`FILE_UPLOAD_HANDLERS`
         The actual handlers for uploaded files. Changing this setting allows
