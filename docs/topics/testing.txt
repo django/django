@@ -565,7 +565,7 @@ arguments at time of construction:
 
         Makes an PUT request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces. Acts just
-        like :meth:`Client.put` except with the PUT request method.
+        like :meth:`Client.post` except with the PUT request method.
 
     .. method:: Client.delete(path)
 
