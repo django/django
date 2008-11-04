@@ -99,6 +99,10 @@ class TextFile(models.Model):
         return self.description
 
 class ImageFile(models.Model):
+    def custom_upload_path(self, filename):
+        path = self.path or 'tests'
+        return '%s/%s' % (path, filename)
+    
     description = models.CharField(max_length=20)
     try:
         # If PIL is available, try testing PIL.
@@ -106,9 +110,10 @@ class ImageFile(models.Model):
         # for PyPy, you need to check for the underlying modules
         # If PIL is not available, this test is equivalent to TextFile above.
         from PIL import Image, _imaging
-        image = models.ImageField(storage=temp_storage, upload_to='tests')
+        image = models.ImageField(storage=temp_storage, upload_to=custom_upload_path)
     except ImportError:
-        image = models.FileField(storage=temp_storage, upload_to='tests')
+        image = models.FileField(storage=temp_storage, upload_to=custom_upload_path)
+    path = models.CharField(max_length=16, blank=True, default='')
 
     def __unicode__(self):
         return self.description
@@ -1120,6 +1125,15 @@ True
 >>> instance = f.save()
 >>> instance.image
 <...FieldFile: tests/test3.png>
+>>> instance.delete()
+
+# Test callable upload_to behavior that's dependent on the value of another field in the model
+>>> f = ImageFileForm(data={'description': u'And a final one', 'path': 'foo'}, files={'image': SimpleUploadedFile('test4.png', image_data)})
+>>> f.is_valid()
+True
+>>> instance = f.save()
+>>> instance.image
+<...FieldFile: foo/test4.png>
 >>> instance.delete()
 
 # Media on a ModelForm ########################################################
