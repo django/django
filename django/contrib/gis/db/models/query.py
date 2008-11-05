@@ -605,13 +605,19 @@ class GeoQuerySet(QuerySet):
         # set on the `GeoQuery` object of this queryset.
         if aggregate: self.query.aggregate = True
 
-        # Is this operation going to be on a related geographic field?
-        if not geo_field in self.model._meta.fields:
+        opts = self.model._meta
+        if not geo_field in opts.fields:
+            # Is this operation going to be on a related geographic field?
             # If so, it'll have to be added to the select related information
             # (e.g., if 'location__point' was given as the field name).
             self.query.add_select_related([field_name])
             self.query.pre_sql_setup()
             rel_table, rel_col = self.query.related_select_cols[self.query.related_select_fields.index(geo_field)]
             return self.query._field_column(geo_field, rel_table)
+        elif not geo_field in opts.local_fields:
+            # This geographic field is inherited from another model, so we have to
+            # use the db table for the _parent_ model instead.
+            tmp_fld, parent_model, direct, m2m = opts.get_field_by_name(geo_field.name)
+            return self.query._field_column(geo_field, parent_model._meta.db_table)
         else:
             return self.query._field_column(geo_field)
