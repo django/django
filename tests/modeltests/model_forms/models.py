@@ -158,6 +158,15 @@ class Book(models.Model):
     
     class Meta:
         unique_together = ('title', 'author')
+        
+class ExplicitPK(models.Model):
+    key = models.CharField(max_length=20, primary_key=True)
+    desc = models.CharField(max_length=20, blank=True, unique=True)
+    class Meta:
+        unique_together = ('key', 'desc')
+    
+    def __unicode__(self):
+        return self.key
 
 __test__ = {'API_TESTS': """
 >>> from django import forms
@@ -1246,6 +1255,27 @@ True
 >>> form = BookForm({'title': 'I May Be Wrong But I Doubt It'})
 >>> form.is_valid()
 True
+
+# Test for primary_key being in the form and failing validation.
+>>> class ExplicitPKForm(ModelForm):
+...     class Meta:
+...         model = ExplicitPK
+...         fields = ('key', 'desc',)
+>>> form = ExplicitPKForm({'key': u'', 'desc': u'' })
+>>> form.is_valid()
+False
+
+# Ensure keys and blank character strings are tested for uniqueness.
+>>> form = ExplicitPKForm({'key': u'key1', 'desc': u''})
+>>> form.is_valid()
+True
+>>> form.save()
+<ExplicitPK: key1>
+>>> form = ExplicitPKForm({'key': u'key1', 'desc': u''})
+>>> form.is_valid()
+False
+>>> form.errors
+{'__all__': [u'Explicit pk with this Key and Desc already exists.'], 'key': [u'Explicit pk with this Key already exists.'], 'desc': [u'Explicit pk with this Desc already exists.']}
 
 # Choices on CharField and IntegerField
 >>> class ArticleForm(ModelForm):
