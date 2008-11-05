@@ -234,7 +234,7 @@ class BaseModelForm(BaseForm):
         # equal NULL in SQL we should not do any unique checking for NULL values.
         unique_checks = []
         for check in self.instance._meta.unique_together[:]:
-            fields_on_form = [field for field in check if field in self.cleaned_data and not self.cleaned_data[field] is None]
+            fields_on_form = [field for field in check if self.cleaned_data.get(field) is not None]
             if len(fields_on_form) == len(check):
                 unique_checks.append(check)
 
@@ -248,7 +248,7 @@ class BaseModelForm(BaseForm):
             except FieldDoesNotExist:
                 # This is an extra field that's not on the ModelForm, ignore it
                 continue
-            if f.unique and name in self.cleaned_data and not self.cleaned_data[name] is None:
+            if f.unique and self.cleaned_data.get(name) is not None:
                 unique_checks.append((name,))
 
         bad_fields = set()
