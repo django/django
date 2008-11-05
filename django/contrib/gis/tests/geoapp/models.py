@@ -16,6 +16,11 @@ class City(models.Model):
     objects = models.GeoManager()
     def __unicode__(self): return self.name
 
+# This is an inherited model from City
+class PennsylvaniaCity(City):
+    county = models.CharField(max_length=30)
+    objects = models.GeoManager() # TODO: This should be implicitly inherited.
+
 class State(models.Model):
     name = models.CharField(max_length=30)
     poly = models.PolygonField(null=null_flag) # Allowing NULL geometries here.

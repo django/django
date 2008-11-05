@@ -1,10 +1,10 @@
 import os, unittest
-from models import Country, City, State, Feature, MinusOneSRID
+from models import Country, City, PennsylvaniaCity, State, Feature, MinusOneSRID
 from django.contrib.gis import gdal
 from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.geos import *
 from django.contrib.gis.measure import Distance
-from django.contrib.gis.tests.utils import no_oracle, no_postgis, oracle, postgis
+from django.contrib.gis.tests.utils import no_oracle, no_postgis
 
 # TODO: Some tests depend on the success/failure of previous tests, these should
 # be decoupled.  This flag is an artifact of this problem, and makes debugging easier;
@@ -17,7 +17,7 @@ class GeoModelTest(unittest.TestCase):
     def test01_initial_sql(self):
         "Testing geographic initial SQL."
         if DISABLE: return
-        if oracle:
+        if SpatialBackend.oracle:
             # Oracle doesn't allow strings longer than 4000 characters
             # in SQL files, and I'm stumped on how to use Oracle BFILE's
             # in PLSQL, so we set up the larger geometries manually, rather
@@ -38,7 +38,7 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual(8, City.objects.count())
 
         # Oracle cannot handle NULL geometry values w/certain queries.
-        if oracle: n_state = 2
+        if SpatialBackend.oracle: n_state = 2
         else: n_state = 3
         self.assertEqual(n_state, State.objects.count())
 
@@ -147,7 +147,7 @@ class GeoModelTest(unittest.TestCase):
         ptown1 = City.objects.gml(field_name='point', precision=9).get(name='Pueblo')
         ptown2 = City.objects.gml(precision=9).get(name='Pueblo')
 
-        if oracle:
+        if SpatialBackend.oracle:
             # No precision parameter for Oracle :-/
             import re
             gml_regex = re.compile(r'<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml"><gml:coordinates decimal="\." cs="," ts=" ">-104.60925199\d+,38.25500\d+ </gml:coordinates></gml:Point>')
@@ -167,7 +167,7 @@ class GeoModelTest(unittest.TestCase):
 
         # Asserting the result of the transform operation with the values in
         #  the pre-transformed points.  Oracle does not have the 3084 SRID.
-        if not oracle:
+        if not SpatialBackend.oracle:
             h = City.objects.transform(htown.srid).get(name='Houston')
             self.assertEqual(3084, h.point.srid)
             self.assertAlmostEqual(htown.x, h.point.x, prec)
@@ -214,7 +214,7 @@ class GeoModelTest(unittest.TestCase):
         qs1 = City.objects.filter(point__disjoint=ptown.point)
         self.assertEqual(7, qs1.count())
 
-        if not postgis:
+        if not SpatialBackend.postgis:
             # TODO: Do NULL columns bork queries on PostGIS?  The following
             # error is encountered:
             #  psycopg2.ProgrammingError: invalid memory alloc request size 4294957297
@@ -231,7 +231,7 @@ class GeoModelTest(unittest.TestCase):
         # Seeing what cities are in Texas, should get Houston and Dallas,
         #  and Oklahoma City because 'contained' only checks on the
         #  _bounding box_ of the Geometries.
-        if not oracle:
+        if not SpatialBackend.oracle:
             qs = City.objects.filter(point__contained=texas.mpoly)
             self.assertEqual(3, qs.count())
             cities = ['Houston', 'Dallas', 'Oklahoma City']
@@ -259,7 +259,7 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual(0, len(Country.objects.filter(mpoly__contains=okcity.point.wkt))) # Qeury w/WKT
 
         # OK City is contained w/in bounding box of Texas.
-        if not oracle:
+        if not SpatialBackend.oracle:
             qs = Country.objects.filter(mpoly__bbcontains=okcity.point)
             self.assertEqual(1, len(qs))
             self.assertEqual('Texas', qs[0].name)
@@ -272,7 +272,7 @@ class GeoModelTest(unittest.TestCase):
         wgs_pnt = fromstr(sa_4326, srid=4326) # Our reference point in WGS84
 
         # Oracle doesn't have SRID 3084, using 41157.
-        if oracle:
+        if SpatialBackend.oracle:
             # San Antonio in 'Texas 4205, Southern Zone (1983, meters)' (SRID 41157)
             # Used the following Oracle SQL to get this value:
             #  SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_CS.TRANSFORM(SDO_GEOMETRY('POINT (-98.493183 29.424170)', 4326), 41157)) FROM DUAL;
@@ -287,7 +287,7 @@ class GeoModelTest(unittest.TestCase):
         # `SDO_OVERLAPBDYINTERSECT` operates differently from
         # `ST_Intersects`, so contains is used instead.
         nad_pnt = fromstr(nad_wkt, srid=nad_srid)
-        if oracle:
+        if SpatialBackend.oracle:
             tx = Country.objects.get(mpoly__contains=nad_pnt) 
         else:
             tx = Country.objects.get(mpoly__intersects=nad_pnt)
@@ -329,7 +329,7 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual(True, 'Kansas' in state_names)
 
         # Saving another commonwealth w/a NULL geometry.
-        if not oracle:
+        if not SpatialBackend.oracle:
             # TODO: Fix saving w/NULL geometry on Oracle.
             State(name='Northern Mariana Islands', poly=None).save()
 
@@ -398,11 +398,11 @@ class GeoModelTest(unittest.TestCase):
             self.assertRaises(e, qs.count)
 
         # Relate works differently for the different backends.
-        if postgis:
+        if SpatialBackend.postgis:
             contains_mask = 'T*T***FF*'
             within_mask = 'T*F**F***'
             intersects_mask = 'T********'
-        elif oracle:
+        elif SpatialBackend.oracle:
             contains_mask = 'contains'
             within_mask = 'inside'
             # TODO: This is not quite the same as the PostGIS mask above
@@ -417,7 +417,7 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, within_mask)).name)
 
         # Testing intersection relation mask.
-        if not oracle:
+        if not SpatialBackend.oracle:
             self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, intersects_mask)).name)
             self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, intersects_mask)).name)
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
@@ -479,7 +479,7 @@ class GeoModelTest(unittest.TestCase):
         "Testing the `centroid` GeoQuerySet method."
         if DISABLE: return
         qs = State.objects.exclude(poly__isnull=True).centroid()
-        if oracle: tol = 0.1
+        if SpatialBackend.oracle: tol = 0.1
         else: tol = 0.000000001
         for s in qs:
             self.assertEqual(True, s.poly.centroid.equals_exact(s.centroid, tol))
@@ -536,14 +536,14 @@ class GeoModelTest(unittest.TestCase):
         for c in City.objects.filter(point__isnull=False).num_geom(): 
             # Oracle will return 1 for the number of geometries on non-collections,
             # whereas PostGIS will return None.
-            if postgis: self.assertEqual(None, c.num_geom)
+            if SpatialBackend.postgis: self.assertEqual(None, c.num_geom)
             else: self.assertEqual(1, c.num_geom)
 
     def test24_numpoints(self):
         "Testing the `num_points` GeoQuerySet method."
         if DISABLE: return
         for c in Country.objects.num_points(): self.assertEqual(c.mpoly.num_points, c.num_points)
-        if postgis:
+        if SpatialBackend.postgis:
             # Oracle cannot count vertices in Point geometries.
             for c in City.objects.num_points(): self.assertEqual(1, c.num_points)
 
@@ -557,6 +557,18 @@ class GeoModelTest(unittest.TestCase):
             self.assertEqual(c.mpoly.intersection(geom), c.intersection)
             self.assertEqual(c.mpoly.sym_difference(geom), c.sym_difference)
             self.assertEqual(c.mpoly.union(geom), c.union)
+
+    def test26_inherited_geofields(self):
+        "Test GeoQuerySet methods on inherited Geometry fields."
+        # Creating a Pennsylvanian city.
+        mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)')
+
+        # All transformation SQL will need to be performed on the
+        # _parent_ table.
+        qs = PennsylvaniaCity.objects.transform(32128)
+        
+        self.assertEqual(1, qs.count())
+        for pc in qs: self.assertEqual(32128, pc.point.srid)
 
 from test_feeds import GeoFeedTest
 from test_sitemaps import GeoSitemapTest
