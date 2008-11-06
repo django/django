@@ -7,7 +7,7 @@ class Animal(models.Model):
     name = models.CharField(max_length=150)
     latin_name = models.CharField(max_length=150)
     count = models.IntegerField()
-    
+
     def __unicode__(self):
         return self.common_name
 
@@ -56,7 +56,7 @@ class Channel(models.Model):
 class Article(models.Model):
     title = models.CharField(max_length=255)
     channels = models.ManyToManyField(Channel)
-    
+
     class Meta:
         ordering = ('id',)
 
@@ -113,6 +113,15 @@ No fixture data found for 'bad_fixture2'. (File format may be invalid.)
 >>> management.call_command('loaddata', 'bad_fixture2', verbosity=0)
 No fixture data found for 'bad_fixture2'. (File format may be invalid.)
 
+# Loading a fixture file with no data returns an error
+>>> management.call_command('loaddata', 'empty', verbosity=0)
+No fixture data found for 'empty'. (File format may be invalid.)
+
+# If any of the fixtures contain an error, loading is aborted
+# (Regression for #9011 - error message is correct)
+>>> management.call_command('loaddata', 'bad_fixture2', 'animal', verbosity=0)
+No fixture data found for 'bad_fixture2'. (File format may be invalid.)
+
 >>> sys.stderr = savestderr
 
 ###############################################
@@ -123,7 +132,7 @@ No fixture data found for 'bad_fixture2'. (File format may be invalid.)
 >>> management.call_command('loaddata', 'model-inheritance.json', verbosity=0)
 
 ###############################################
-# Test for ticket #7572 -- MySQL has a problem if the same connection is 
+# Test for ticket #7572 -- MySQL has a problem if the same connection is
 # used to create tables, load data, and then query over that data.
 # To compensate, we close the connection after running loaddata.
 # This ensures that a new connection is opened when test queries are issued.

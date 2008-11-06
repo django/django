@@ -35,7 +35,6 @@ class Command(BaseCommand):
         # Keep a count of the installed objects and fixtures
         fixture_count = 0
         object_count = 0
-        objects_per_fixture = []
         models = set()
 
         humanize = lambda dirname: dirname and "'%s'" % dirname or 'absolute path'
@@ -103,17 +102,17 @@ class Command(BaseCommand):
                             return
                         else:
                             fixture_count += 1
-                            objects_per_fixture.append(0)
+                            objects_in_fixture = 0
                             if verbosity > 0:
                                 print "Installing %s fixture '%s' from %s." % \
                                     (format, fixture_name, humanize(fixture_dir))
                             try:
                                 objects = serializers.deserialize(format, fixture)
                                 for obj in objects:
-                                    object_count += 1
-                                    objects_per_fixture[-1] += 1
+                                    objects_in_fixture += 1
                                     models.add(obj.object.__class__)
                                     obj.save()
+                                object_count += objects_in_fixture
                                 label_found = True
                             except (SystemExit, KeyboardInterrupt):
                                 raise
@@ -131,21 +130,20 @@ class Command(BaseCommand):
                                              (full_path, traceback.format_exc())))
                                 return
                             fixture.close()
+
+                            # If the fixture we loaded contains 0 objects, assume that an
+                            # error was encountered during fixture loading.
+                            if objects_in_fixture == 0:
+                                sys.stderr.write(
+                                    self.style.ERROR("No fixture data found for '%s'. (File format may be invalid.)" %
+                                        (fixture_name)))
+                                transaction.rollback()
+                                transaction.leave_transaction_management()
+                                return
                     except:
                         if verbosity > 1:
                             print "No %s fixture '%s' in %s." % \
                                 (format, fixture_name, humanize(fixture_dir))
-
-
-        # If any of the fixtures we loaded contain 0 objects, assume that an
-        # error was encountered during fixture loading.
-        if 0 in objects_per_fixture:
-            sys.stderr.write(
-                self.style.ERROR("No fixture data found for '%s'. (File format may be invalid.)" %
-                    (fixture_name)))
-            transaction.rollback()
-            transaction.leave_transaction_management()
-            return
 
         # If we found even one object in a fixture, we need to reset the
         # database sequences.
