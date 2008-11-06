@@ -556,7 +556,7 @@ class ModelAdmin(BaseModelAdmin):
             raise PermissionDenied
 
         if obj is None:
-            raise Http404('%s object with primary key %r does not exist.' % (force_unicode(opts.verbose_name), escape(object_id)))
+            raise Http404(_('%s object with primary key %r does not exist.') % (force_unicode(opts.verbose_name), escape(object_id)))
 
         if request.method == 'POST' and request.POST.has_key("_saveasnew"):
             return self.add_view(request, form_url='../../add/')
