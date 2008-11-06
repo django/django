@@ -448,7 +448,7 @@ msgstr "Время:"
 
 #: contrib/admin/widgets.py:94
 msgid "Currently:"
-msgstr "Современно:"
+msgstr "Текущий файл:"
 
 #: contrib/admin/widgets.py:94
 msgid "Change:"
