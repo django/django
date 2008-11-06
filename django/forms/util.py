@@ -39,7 +39,7 @@ class ErrorList(list, StrAndUnicode):
     def as_ul(self):
         if not self: return u''
         return mark_safe(u'<ul class="errorlist">%s</ul>'
-                % ''.join([u'<li>%s</li>' % force_unicode(e) for e in self]))
+                % ''.join([u'<li>%s</li>' % conditional_escape(force_unicode(e)) for e in self]))
 
     def as_text(self):
         if not self: return u''

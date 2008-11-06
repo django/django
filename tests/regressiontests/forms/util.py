@@ -49,4 +49,11 @@ u''
 # Can take a non-string.
 >>> print ValidationError(VeryBadError()).messages
 <ul class="errorlist"><li>A very bad error.</li></ul>
+
+# Escapes non-safe input but not input marked safe.
+>>> example = 'Example of link: <a href="http://www.example.com/">example</a>'
+>>> print ValidationError(example).messages
+<ul class="errorlist"><li>Example of link: &lt;a href=&quot;http://www.example.com/&quot;&gt;example&lt;/a&gt;</li></ul>
+>>> print ValidationError(mark_safe(example)).messages
+<ul class="errorlist"><li>Example of link: <a href="http://www.example.com/">example</a></li></ul>
 """

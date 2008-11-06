@@ -593,17 +593,25 @@ u'Yesterday'
 u'Yesterday'
 
 Validation errors are HTML-escaped when output as HTML.
+>>> from django.utils.safestring import mark_safe
 >>> class EscapingForm(Form):
-...     special_name = CharField()
+...     special_name = CharField(label="<em>Special</em> Field")
+...     special_safe_name = CharField(label=mark_safe("<em>Special</em> Field"))
 ...     def clean_special_name(self):
 ...         raise ValidationError("Something's wrong with '%s'" % self.cleaned_data['special_name'])
+...     def clean_special_safe_name(self):
+...         raise ValidationError(mark_safe("'<b>%s</b>' is a safe string" % self.cleaned_data['special_safe_name']))
 
->>> f = EscapingForm({'special_name': "Nothing to escape"}, auto_id=False)
+>>> f = EscapingForm({'special_name': "Nothing to escape", 'special_safe_name': "Nothing to escape"}, auto_id=False)
 >>> print f
-<tr><th>Special name:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Nothing to escape&#39;</li></ul><input type="text" name="special_name" value="Nothing to escape" /></td></tr>
->>> f = EscapingForm({'special_name': "Should escape < & > and <script>alert('xss')</script>"}, auto_id=False)
+<tr><th>&lt;em&gt;Special&lt;/em&gt; Field:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Nothing to escape&#39;</li></ul><input type="text" name="special_name" value="Nothing to escape" /></td></tr>
+<tr><th><em>Special</em> Field:</th><td><ul class="errorlist"><li>'<b>Nothing to escape</b>' is a safe string</li></ul><input type="text" name="special_safe_name" value="Nothing to escape" /></td></tr>
+>>> f = EscapingForm(
+...     {'special_name': "Should escape < & > and <script>alert('xss')</script>",
+...     'special_safe_name': "<i>Do not escape</i>"}, auto_id=False)
 >>> print f
-<tr><th>Special name:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;&#39;</li></ul><input type="text" name="special_name" value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;" /></td></tr>
+<tr><th>&lt;em&gt;Special&lt;/em&gt; Field:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;&#39;</li></ul><input type="text" name="special_name" value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;" /></td></tr>
+<tr><th><em>Special</em> Field:</th><td><ul class="errorlist"><li>'<b><i>Do not escape</i></b>' is a safe string</li></ul><input type="text" name="special_safe_name" value="&lt;i&gt;Do not escape&lt;/i&gt;" /></td></tr>
 
 """ + \
 r""" # [This concatenation is to keep the string below the jython's 32K limit].

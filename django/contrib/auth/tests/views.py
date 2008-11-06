@@ -16,7 +16,7 @@ class PasswordResetTest(TestCase):
         response = self.client.get('/password_reset/')
         self.assertEquals(response.status_code, 200)
         response = self.client.post('/password_reset/', {'email': 'not_a_real_email@email.com'})
-        self.assertContains(response, "That e-mail address doesn't have an associated user account")
+        self.assertContains(response, "That e-mail address doesn&#39;t have an associated user account")
         self.assertEquals(len(mail.outbox), 0)
 
     def test_email_found(self):
@@ -87,7 +87,7 @@ class PasswordResetTest(TestCase):
         response = self.client.post(path, {'new_password1': 'anewpassword',
                                            'new_password2':' x'})
         self.assertEquals(response.status_code, 200)
-        self.assert_("The two password fields didn't match" in response.content)
+        self.assert_("The two password fields didn&#39;t match" in response.content)
 
 
 class ChangePasswordTest(TestCase):
@@ -147,7 +147,7 @@ class ChangePasswordTest(TestCase):
             }
         )
         self.assertEquals(response.status_code, 200)
-        self.assert_("The two password fields didn't match." in response.content)
+        self.assert_("The two password fields didn&#39;t match." in response.content)
 
     def test_password_change_succeeds(self):
         self.login()
