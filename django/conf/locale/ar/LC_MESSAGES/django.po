@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-09-03 08:49+0300\n"
-"PO-Revision-Date: 2008-09-03 15:10+0300\n"
+"PO-Revision-Date: 2008-11-05 12:48+0300\n"
 "Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
 "Language-Team: Arabic <support@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
@@ -1682,7 +1682,7 @@ msgstr ""
 
 #: contrib/localflavor/at/at_states.py:13
 msgid "Vienna"
-msgstr ""
+msgstr "فيينا"
 
 #: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:16
 #: contrib/localflavor/no/forms.py:12
@@ -2002,11 +2002,11 @@ msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:22
 msgid "Granada"
-msgstr ""
+msgstr "غرناطة"
 
 #: contrib/localflavor/es/es_provinces.py:23
 msgid "Guadalajara"
-msgstr ""
+msgstr "جوادالاخارا"
 
 #: contrib/localflavor/es/es_provinces.py:24
 msgid "Guipuzkoa"
@@ -2177,7 +2177,7 @@ msgstr ""
 
 #: contrib/localflavor/es/es_regions.py:14
 msgid "Catalonia"
-msgstr ""
+msgstr "كتالونيا"
 
 #: contrib/localflavor/es/es_regions.py:15
 msgid "Extremadura"
@@ -2375,7 +2375,7 @@ msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:30
 msgid "Osaka"
-msgstr ""
+msgstr "أُساكا"
 
 #: contrib/localflavor/jp/jp_prefectures.py:31
 msgid "Hyogo"
@@ -2435,7 +2435,7 @@ msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:45
 msgid "Nagasaki"
-msgstr ""
+msgstr "ناجاساكي"
 
 #: contrib/localflavor/jp/jp_prefectures.py:46
 msgid "Kumamoto"
@@ -2495,7 +2495,7 @@ msgstr ""
 
 #: contrib/localflavor/mx/mx_states.py:21
 msgid "Durango"
-msgstr ""
+msgstr "دورانجو"
 
 #: contrib/localflavor/mx/mx_states.py:22
 msgid "Guerrero"
@@ -3399,7 +3399,7 @@ msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:92
 msgid "Scotland"
-msgstr ""
+msgstr "اسكوتلندة"
 
 #: contrib/localflavor/uk/uk_regions.py:93
 msgid "Wales"
@@ -3415,11 +3415,11 @@ msgstr "أدخل رقم ضمان اجتماعي أميركي صالح بالنس
 
 #: contrib/localflavor/za/forms.py:20
 msgid "Enter a valid South African ID number"
-msgstr ""
+msgstr "أدخل رقم هويّة جنوب إفريقيّة صحيح"
 
 #: contrib/localflavor/za/forms.py:54
 msgid "Enter a valid South African postal code"
-msgstr ""
+msgstr "أدخل رمز بريد جنوب إفريقي صحيح"
 
 #: contrib/localflavor/za/za_provinces.py:4
 msgid "Eastern Cape"
