@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-01 14:02+0100\n"
+"POT-Creation-Date: 2008-11-06 22:16+0100\n"
 "PO-Revision-Date: 2008-08-28 22:58+0100\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: \n"
@@ -299,7 +299,7 @@ msgid "Changed %s."
 msgstr "%s geändert."
 
 #: contrib/admin/options.py:338 contrib/admin/options.py:348
-#: contrib/comments/templates/comments/preview.html:15 forms/models.py:278
+#: contrib/comments/templates/comments/preview.html:15 forms/models.py:288
 msgid "and"
 msgstr "und"
 
@@ -354,6 +354,11 @@ msgstr ""
 #, python-format
 msgid "Add %s"
 msgstr "%s hinzufügen"
+
+#: contrib/admin/options.py:559 contrib/admin/options.py:673
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Das %(name)s-Objekt mit dem Primärschlüssel %(key)r ist nicht vorhanden."
 
 #: contrib/admin/options.py:606
 #, python-format
@@ -3882,7 +3887,7 @@ msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Bitte eine gültige Auswahl treffen. %(value)s ist keine gültige Auswahl."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:703
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:720
 msgid "Enter a list of values."
 msgstr "Bitte eine Liste mit Werten eingeben."
 
@@ -3901,22 +3906,22 @@ msgstr ""
 msgid "Order"
 msgstr "Reihenfolge"
 
-#: forms/models.py:271 forms/models.py:280
+#: forms/models.py:281 forms/models.py:290
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s mit diesem %(field_label)s existiert bereits."
 
-#: forms/models.py:570
+#: forms/models.py:587
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 "Der Inline-Fremdschlüssel passt nicht zum Primärschlüssel der übergeordneten "
 "Instanz."
 
-#: forms/models.py:633
+#: forms/models.py:650
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Bitte eine gültige Auswahl treffen. Dies ist keine gültige Auswahl."
 
-#: forms/models.py:704
+#: forms/models.py:721
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Bitte eine gültige Auswahl treffen. %s ist keine gültige Auswahl."
