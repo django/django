@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-02 22:48-0400\n"
-"PO-Revision-Date: 2008-09-02 23:02-0500\n"
+"POT-Creation-Date: 2008-11-04 01:50-0500\n"
+"PO-Revision-Date: 2008-11-04 02:05-0500\n"
 "Last-Translator: Alex <alex.gaynor@gmail.com>\n"
 "Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -156,7 +156,7 @@ msgid "Polish"
 msgstr "פולנית"
 
 #: conf/global_settings.py:79
-msgid "Portugese"
+msgid "Portuguese"
 msgstr "פורטוגזית"
 
 #: conf/global_settings.py:80
@@ -221,43 +221,43 @@ msgstr ""
 "<ul>\n"
 
 #: contrib/admin/filterspecs.py:74
-#: contrib/admin/filterspecs.py:92
-#: contrib/admin/filterspecs.py:147
-#: contrib/admin/filterspecs.py:173
+#: contrib/admin/filterspecs.py:91
+#: contrib/admin/filterspecs.py:146
+#: contrib/admin/filterspecs.py:172
 msgid "All"
 msgstr "הכל"
 
-#: contrib/admin/filterspecs.py:113
+#: contrib/admin/filterspecs.py:112
 msgid "Any date"
 msgstr "כל תאריך"
 
-#: contrib/admin/filterspecs.py:114
+#: contrib/admin/filterspecs.py:113
 msgid "Today"
 msgstr "היום"
 
-#: contrib/admin/filterspecs.py:117
+#: contrib/admin/filterspecs.py:116
 msgid "Past 7 days"
 msgstr "בשבוע האחרון"
 
-#: contrib/admin/filterspecs.py:119
+#: contrib/admin/filterspecs.py:118
 msgid "This month"
 msgstr "החודש"
 
-#: contrib/admin/filterspecs.py:121
+#: contrib/admin/filterspecs.py:120
 msgid "This year"
 msgstr "השנה"
 
-#: contrib/admin/filterspecs.py:147
+#: contrib/admin/filterspecs.py:146
 #: forms/widgets.py:391
 msgid "Yes"
 msgstr "כן"
 
-#: contrib/admin/filterspecs.py:147
+#: contrib/admin/filterspecs.py:146
 #: forms/widgets.py:391
 msgid "No"
 msgstr "לא"
 
-#: contrib/admin/filterspecs.py:154
+#: contrib/admin/filterspecs.py:153
 #: forms/widgets.py:391
 msgid "Unknown"
 msgstr "לא ידוע"
@@ -302,7 +302,8 @@ msgstr "%s שונה."
 
 #: contrib/admin/options.py:338
 #: contrib/admin/options.py:348
-#: forms/models.py:275
+#: contrib/comments/templates/comments/preview.html:15
+#: forms/models.py:278
 msgid "and"
 msgstr "ו"
 
@@ -353,30 +354,30 @@ msgstr "שינוי %(name)s \"%(obj)s\" בוצע בהצלחה."
 msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן לערוך אותו שוב מתחת."
 
-#: contrib/admin/options.py:536
+#: contrib/admin/options.py:528
 #, python-format
 msgid "Add %s"
 msgstr "הוספת %s"
 
-#: contrib/admin/options.py:614
+#: contrib/admin/options.py:606
 #, python-format
 msgid "Change %s"
 msgstr "שינוי %s"
 
-#: contrib/admin/options.py:646
+#: contrib/admin/options.py:638
 msgid "Database error"
 msgstr "שגיאת בסיס נתונים"
 
-#: contrib/admin/options.py:696
+#: contrib/admin/options.py:688
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "מחיקת %(name)s \"%(obj)s\" בוצעה בהצלחה."
 
-#: contrib/admin/options.py:703
+#: contrib/admin/options.py:695
 msgid "Are you sure?"
 msgstr "האם את/ה בטוח/ה ?"
 
-#: contrib/admin/options.py:732
+#: contrib/admin/options.py:724
 #, python-format
 msgid "Change history: %s"
 msgstr "היסטוריית שינוי: %s"
@@ -387,40 +388,40 @@ msgstr "היסטוריית שינוי: %s"
 msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
 msgstr "נא להזין שם משתמש וסיסמה נכונים. בשני השדות גודל האותיות האנגליות משנה."
 
-#: contrib/admin/sites.py:227
+#: contrib/admin/sites.py:226
 #: contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "עליך להתחבר שנית כי פג הזמן המוקצב לך."
 
-#: contrib/admin/sites.py:234
+#: contrib/admin/sites.py:233
 #: contrib/admin/views/decorators.py:47
 msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
 msgstr "נראה שהדפדפן שלך אינו מוגדר לקבל עוגיות. נא לאפשר עוגיות, לטעון מחדש את הדף ולנסות שוב."
 
-#: contrib/admin/sites.py:250
-#: contrib/admin/sites.py:256
+#: contrib/admin/sites.py:249
+#: contrib/admin/sites.py:255
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "שם משתמש אינו יכול להכיל את התו '@'."
 
-#: contrib/admin/sites.py:253
+#: contrib/admin/sites.py:252
 #: contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "כתובת הדוא\"ל שלך אינה שם המשתמש שלך. נסה/י '%s' במקום."
 
-#: contrib/admin/sites.py:313
+#: contrib/admin/sites.py:312
 msgid "Site administration"
 msgstr "ניהול אתר"
 
-#: contrib/admin/sites.py:326
+#: contrib/admin/sites.py:325
 #: contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "כניסה"
 
-#: contrib/admin/sites.py:373
+#: contrib/admin/sites.py:372
 #, python-format
 msgid "%s administration"
 msgstr "ניהול %s"
@@ -451,11 +452,11 @@ msgstr "הנוכחי:"
 msgid "Change:"
 msgstr "שינוי:"
 
-#: contrib/admin/widgets.py:121
+#: contrib/admin/widgets.py:123
 msgid "Lookup"
 msgstr "חפש"
 
-#: contrib/admin/widgets.py:228
+#: contrib/admin/widgets.py:230
 msgid "Add Another"
 msgstr "הוסף עוד אחת"
 
@@ -555,7 +556,7 @@ msgstr "היסטוריה"
 
 #: contrib/admin/templates/admin/change_form.html:28
 #: contrib/admin/templates/admin/edit_inline/stacked.html:13
-#: contrib/admin/templates/admin/edit_inline/tabular.html:25
+#: contrib/admin/templates/admin/edit_inline/tabular.html:27
 msgid "View on site"
 msgstr "צפיה באתר"
 
@@ -646,6 +647,7 @@ msgid "User"
 msgstr "משתמש"
 
 #: contrib/admin/templates/admin/object_history.html:24
+#: contrib/comments/templates/comments/moderation_queue.html:33
 msgid "Action"
 msgstr "פעולה"
 
@@ -865,7 +867,7 @@ msgstr "כתובת דוא\"ל:"
 msgid "Reset my password"
 msgstr "אפס את סיסמתי"
 
-#: contrib/admin/templatetags/admin_list.py:288
+#: contrib/admin/templatetags/admin_list.py:284
 msgid "All dates"
 msgstr "כל התאריכים"
 
@@ -1023,7 +1025,8 @@ msgid "Time"
 msgstr "זמן"
 
 #: contrib/admindocs/views.py:339
-#: contrib/comments/forms.py:22
+#: contrib/comments/forms.py:21
+#: contrib/comments/templates/comments/moderation_queue.html:37
 #: contrib/flatpages/admin.py:8
 #: contrib/flatpages/models.py:7
 msgid "URL"
@@ -1311,23 +1314,25 @@ msgstr "תוכן"
 msgid "Metadata"
 msgstr "מטא-נתונים"
 
-#: contrib/comments/forms.py:20
+#: contrib/comments/forms.py:19
+#: contrib/comments/templates/comments/moderation_queue.html:34
 msgid "Name"
 msgstr "שם"
 
-#: contrib/comments/forms.py:21
+#: contrib/comments/forms.py:20
 msgid "Email address"
 msgstr "כתובת דוא\"ל"
 
-#: contrib/comments/forms.py:23
+#: contrib/comments/forms.py:22
+#: contrib/comments/templates/comments/moderation_queue.html:35
 msgid "Comment"
 msgstr "תגובה"
 
-#: contrib/comments/forms.py:26
+#: contrib/comments/forms.py:25
 msgid "If you enter anything in this field your comment will be treated as spam"
 msgstr "אם יוזן משהו בשדה היחס לתגובתך יהיה כמו לספאם"
 
-#: contrib/comments/forms.py:126
+#: contrib/comments/forms.py:125
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -1396,6 +1401,132 @@ msgstr ""
 "%(comment)s\n"
 "\n"
 "http://%(domain)s%(url)s"
+
+#: contrib/comments/templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "אשר הערה"
+
+#: contrib/comments/templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "באמת הופכים את התגובה הציבורית?"
+
+#: contrib/comments/templates/comments/approve.html:12
+#: contrib/comments/templates/comments/moderation_queue.html:49
+msgid "Approve"
+msgstr "אשר"
+
+#: contrib/comments/templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "תודה על השימוש באתר שלנו!"
+
+#: contrib/comments/templates/comments/approved.html:7
+#: contrib/comments/templates/comments/deleted.html:7
+#: contrib/comments/templates/comments/flagged.html:7
+msgid "Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "תודה שהקדשת מזמנך כדי לשפר את האתר שלנו"
+
+#: contrib/comments/templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "הסר הערה"
+
+#: contrib/comments/templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "באמת להסיר את הערה זו?"
+
+#: contrib/comments/templates/comments/delete.html:12
+#: contrib/comments/templates/comments/moderation_queue.html:53
+msgid "Remove"
+msgstr "להסיר"
+
+#: contrib/comments/templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "תודה על הסרת"
+
+#: contrib/comments/templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "סמן את הערה זו"
+
+#: contrib/comments/templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "באמת, סמן את הערה זו?"
+
+#: contrib/comments/templates/comments/flag.html:12
+msgid "Flag"
+msgstr "סימן"
+
+#: contrib/comments/templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "תודה לציון"
+
+#: contrib/comments/templates/comments/form.html:16
+#: contrib/comments/templates/comments/preview.html:31
+msgid "Post"
+msgstr "פוסט"
+
+#: contrib/comments/templates/comments/form.html:17
+#: contrib/comments/templates/comments/preview.html:32
+msgid "Preview"
+msgstr "תצוגה מקדימה"
+
+#: contrib/comments/templates/comments/moderation_queue.html:4
+#: contrib/comments/templates/comments/moderation_queue.html:19
+msgid "Comment moderation queue"
+msgstr "תור תגובה עבור מתון של תגובות"
+
+#: contrib/comments/templates/comments/moderation_queue.html:26
+msgid "No comments to moderate"
+msgstr "אין תגובות עד בינוני"
+
+#: contrib/comments/templates/comments/moderation_queue.html:36
+msgid "Email"
+msgstr "כתובת דוא\"ל"
+
+#: contrib/comments/templates/comments/moderation_queue.html:38
+msgid "Authenticated?"
+msgstr "מאומתים?"
+
+#: contrib/comments/templates/comments/moderation_queue.html:39
+msgid "IP Address"
+msgstr "כתובת IP"
+
+#: contrib/comments/templates/comments/moderation_queue.html:40
+msgid "Date posted"
+msgstr "תאריך הצטרפות"
+
+#: contrib/comments/templates/comments/moderation_queue.html:63
+msgid "yes"
+msgstr "כן"
+
+#: contrib/comments/templates/comments/moderation_queue.html:63
+msgid "no"
+msgstr "לא"
+
+#: contrib/comments/templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "תודה על התגובה"
+
+#: contrib/comments/templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "תודה על התגובה"
+
+#: contrib/comments/templates/comments/preview.html:4
+#: contrib/comments/templates/comments/preview.html:12
+msgid "Preview your comment"
+msgstr "תצוגה מקדימה של התגובה"
+
+#: contrib/comments/templates/comments/preview.html:10
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "בבקשה לתקן את השגיאה למטה"
+msgstr[1] "אנא תקן את שגיאות למטה"
+
+#: contrib/comments/templates/comments/preview.html:15
+msgid "Post your comment"
+msgstr "פרסם את התגובה"
+
+#: contrib/comments/templates/comments/preview.html:15
+msgid "or make changes"
+msgstr "או לבצע שינויים"
 
 #: contrib/contenttypes/models.py:67
 msgid "python model class name"
@@ -3598,7 +3729,7 @@ msgstr "יש לבחור אפשרות חוקית. %(value)s אינו בין הא�
 
 #: forms/fields.py:697
 #: forms/fields.py:758
-#: forms/models.py:654
+#: forms/models.py:710
 msgid "Enter a list of values."
 msgstr "יש להזין רשימת ערכים"
 
@@ -3615,17 +3746,21 @@ msgstr "יש להזין ערך המכיל אותיות, ספרות, קווים �
 msgid "Order"
 msgstr "מיון"
 
-#: forms/models.py:268
-#: forms/models.py:277
+#: forms/models.py:271
+#: forms/models.py:280
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s·עם·%(field_label)s·זה קיימת כבר."
 
-#: forms/models.py:584
+#: forms/models.py:577
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr "הרצופות מפתח זר לא תאם את האב מופע המפתח העיקרי."
+
+#: forms/models.py:640
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "יש לבחור אפשרות חוקית; '%(data)s' אינו בין %(choices)s."
 
-#: forms/models.py:655
+#: forms/models.py:711
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "יש לבחור אפשרות חוקית. %s אינו בין האפשרויות הזמינות."
@@ -3982,8 +4117,6 @@ msgstr "ה-%(verbose_name)s נמחק."
 #~ msgstr "כתובת IP"
 #~ msgid "approved by staff"
 #~ msgstr "אושר ע\"י הצוות"
-#~ msgid "free comment"
-#~ msgstr "הערה אנונימית"
 #~ msgid "free comments"
 #~ msgstr "הערות אנונימיות"
 #~ msgid "score"
@@ -4030,8 +4163,6 @@ msgstr "ה-%(verbose_name)s נמחק."
 #~ msgstr "אופציונלי"
 #~ msgid "Post a photo"
 #~ msgstr "שליחת תמונה"
-#~ msgid "Preview comment"
-#~ msgstr "תצוגה מקדימה של התגובה"
 #~ msgid "Your name:"
 #~ msgstr "שמך:"
 #~ msgid ""
