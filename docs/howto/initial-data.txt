@@ -33,23 +33,23 @@ look like in JSON:
 
     [
       {
-        "model": "myapp.person",  
+        "model": "myapp.person",
         "pk": 1,
         "fields": {
           "first_name": "John",
-          "last_name": "Lennon",
+          "last_name": "Lennon"
         }
       },
       {
-        "model": "myapp.person",  
+        "model": "myapp.person",
         "pk": 2,
         "fields": {
           "first_name": "Paul",
-          "last_name": "McCartney",
+          "last_name": "McCartney"
         }
       },
     ]
-    
+
 And here's that same fixture as YAML:
 
 .. code-block:: none
@@ -64,7 +64,7 @@ And here's that same fixture as YAML:
       fields:
         first_name: Paul
         last_name: McCartney
-        
+
 You'll store this data in a ``fixtures`` directory inside you app.
 
 Loading data is easy: just call :djadmin:`manage.py loaddata fixturename
