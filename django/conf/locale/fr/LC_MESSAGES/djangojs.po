@@ -1,12 +1,12 @@
 # French translation for js. 
 # Copyright (C) 2005 Mikaël Barbero 
 # This file is distributed under the same license as the PACKAGE package. 
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-02 01:08+0200\n"
+"POT-Creation-Date: 2008-11-04 11:14+0100\n"
 "PO-Revision-Date: 2005-12-24 16:39+0100\n"
 "Last-Translator: David Larlet <http://david.larlet.fr>\n"
 "Language-Team: français <http://django-fr.org>\n"
