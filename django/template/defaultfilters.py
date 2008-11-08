@@ -1,6 +1,12 @@
 """Default variable filters."""
 
 import re
+
+try:
+    from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+except ImportError:
+    from django.utils._decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
 import random as random_module
 try:
     from functools import wraps
@@ -44,7 +50,6 @@ def stringfilter(func):
 ###################
 # STRINGS         #
 ###################
-
 
 def addslashes(value):
     """
@@ -92,6 +97,18 @@ def fix_ampersands(value):
 fix_ampersands.is_safe=True
 fix_ampersands = stringfilter(fix_ampersands)
 
+# Values for testing floatformat input against infinity and NaN representations,
+# which differ across platforms and Python versions.  Some (i.e. old Windows
+# ones) are not recognized by Decimal but we want to return them unchanged vs. 
+# returning an empty string as we do for completley invalid input.  Note these
+# need to be built up from values that are not inf/nan, since inf/nan values do 
+# not reload properly from .pyc files on Windows prior to some level of Python 2.5 
+# (see Python Issue757815 and Issue1080440).
+pos_inf = 1e200 * 1e200
+neg_inf = -1e200 * 1e200
+nan = (1e200 * 1e200) / (1e200 * 1e200)
+special_floats = [str(pos_inf), str(neg_inf), str(nan)]
+
 def floatformat(text, arg=-1):
     """
     Displays a float to a specified number of decimal places.
@@ -119,24 +136,42 @@ def floatformat(text, arg=-1):
     * {{ num1|floatformat:"-3" }} displays "34.232"
     * {{ num2|floatformat:"-3" }} displays "34"
     * {{ num3|floatformat:"-3" }} displays "34.260"
+    
+    If the input float is infinity or NaN, the (platform-dependent) string
+    representation of that value will be displayed.
     """
+        
     try:
-        f = float(text)
-    except (ValueError, TypeError):
+        input_val = force_unicode(text)
+        d = Decimal(input_val)
+    except UnicodeEncodeError:
         return u''
+    except InvalidOperation:
+        if input_val in special_floats:
+            return input_val
+        else:
+            return u''
     try:
-        d = int(arg)
+        p = int(arg)
     except ValueError:
-        return force_unicode(f)
+        return input_val
+    
     try:
-        m = f - int(f)
-    except OverflowError:
-        return force_unicode(f)
-    if not m and d < 0:
-        return mark_safe(u'%d' % int(f))
+        m = int(d) - d
+    except (OverflowError, InvalidOperation):
+        return input_val
+    
+    if not m and p < 0:
+        return mark_safe(u'%d' % (int(d)))
+    
+    if p == 0:
+        exp = Decimal(1)
     else:
-        formatstr = u'%%.%df' % abs(d)
-        return mark_safe(formatstr % f)
+        exp = Decimal('1.0') / (Decimal(10) ** abs(p))
+    try:
+        return mark_safe(u'%s' % str(d.quantize(exp, ROUND_HALF_UP)))
+    except InvalidOperation:
+        return input_val
 floatformat.is_safe = True
 
 def iriencode(value):

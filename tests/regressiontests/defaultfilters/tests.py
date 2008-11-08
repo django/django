@@ -13,15 +13,15 @@ u'0.1'
 u'0.0'
 >>> floatformat(0.0)
 u'0'
->>> floatformat(7.7,3)
+>>> floatformat(7.7, 3)
 u'7.700'
->>> floatformat(6.000000,3)
+>>> floatformat(6.000000, 3)
 u'6.000'
 >>> floatformat(6.200000, 3)
 u'6.200'
 >>> floatformat(6.200000, -3)
 u'6.200'
->>> floatformat(13.1031,-3)
+>>> floatformat(13.1031, -3)
 u'13.103'
 >>> floatformat(11.1197, -2)
 u'11.12'
@@ -35,10 +35,23 @@ u'8.280'
 u''
 >>> floatformat(13.1031, u'bar')
 u'13.1031'
+>>> floatformat(18.125, 2) 
+u'18.13' 
 >>> floatformat(u'foo', u'bar')
+u''
+>>> floatformat(u'¿Cómo esta usted?')
 u''
 >>> floatformat(None)
 u''
+>>> pos_inf = float(1e30000)
+>>> floatformat(pos_inf) == unicode(pos_inf)
+True
+>>> neg_inf = float(-1e30000)
+>>> floatformat(neg_inf) == unicode(neg_inf)
+True
+>>> nan = pos_inf / pos_inf
+>>> floatformat(nan) == unicode(nan)
+True
 
 >>> addslashes(u'"double quotes" and \'single quotes\'')
 u'\\"double quotes\\" and \\\'single quotes\\\''
