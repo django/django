@@ -387,6 +387,18 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post('/test_admin/admin/admin_views/article/1/', change_dict)
         self.assertRedirects(post, '/test_admin/admin/admin_views/article/')
         self.failUnlessEqual(Article.objects.get(pk=1).content, '<p>edited article</p>')
+        
+        # one error in form should produce singular error message, multiple errors plural
+        change_dict['title'] = ''
+        post = self.client.post('/test_admin/admin/admin_views/article/1/', change_dict)
+        self.failUnlessEqual(request.status_code, 200)
+        self.failUnless('Please correct the error below.' in post.content,
+                        'Singular error message not found in response to post with one error.')
+        change_dict['content'] = ''
+        post = self.client.post('/test_admin/admin/admin_views/article/1/', change_dict)
+        self.failUnlessEqual(request.status_code, 200)
+        self.failUnless('Please correct the errors below.' in post.content,
+                        'Plural error message not found in response to post with multiple errors.')        
         self.client.get('/test_admin/admin/logout/')
 
     def testCustomModelAdminTemplates(self):
