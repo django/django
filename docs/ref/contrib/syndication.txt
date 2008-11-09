@@ -976,8 +976,8 @@ attributes. Thus, you can subclass the appropriate feed generator class
 For example, you might start implementing an iTunes RSS feed generator like so::
 
     class iTunesFeed(Rss201rev2Feed):
-        def root_attibutes(self):
-            attrs = super(iTunesFeed, self).root_attibutes()
+        def root_attributes(self):
+            attrs = super(iTunesFeed, self).root_attributes()
             attrs['xmlns:itunes'] = 'http://www.itunes.com/dtds/podcast-1.0.dtd'
             return attrs
             
