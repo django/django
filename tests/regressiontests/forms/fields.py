@@ -366,7 +366,7 @@ True
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure that there are no more than 2 decimal places.']
->>> f.clean('-000.1234')
+>>> f.clean('-000.12345')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure that there are no more than 4 digits in total.']
@@ -416,19 +416,20 @@ ValidationError: [u'Ensure that there are no more than 2 decimal places.']
 # Leading whole zeros "collapse" to one digit.
 >>> f.clean('0000000.10') == Decimal("0.1")
 True
->>> f.clean('0000000.100')
-Traceback (most recent call last):
-...
-ValidationError: [u'Ensure that there are no more than 3 digits in total.']
+
+# But a leading 0 before the . doesn't count towards max_digits
+>>> f.clean('0000000.100') == Decimal("0.100")
+True
 
 # Only leading whole zeros "collapse" to one digit.
 >>> f.clean('000000.02') == Decimal('0.02')
 True
->>> f.clean('000000.002')
+>>> f.clean('000000.0002')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure that there are no more than 3 digits in total.']
-
+>>> f.clean('.002') == Decimal("0.002")
+True
 
 # DateField ###################################################################
 

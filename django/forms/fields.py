@@ -254,12 +254,12 @@ class DecimalField(Field):
         decimals = abs(exponent)
         # digittuple doesn't include any leading zeros.
         digits = len(digittuple)
-        if decimals >= digits:
+        if decimals > digits:
             # We have leading zeros up to or past the decimal point.  Count
-            # everything past the decimal point as a digit.  We also add one
-            # for leading zeros before the decimal point (any number of leading
-            # whole zeros collapse to one digit).
-            digits = decimals + 1
+            # everything past the decimal point as a digit.  We do not count 
+            # 0 before the decimal point as a digit since that would mean 
+            # we would not allow max_digits = decimal_places.
+            digits = decimals
         whole_digits = digits - decimals
 
         if self.max_value is not None and value > self.max_value:
