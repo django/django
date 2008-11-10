@@ -76,7 +76,7 @@ class AdminViewBasicTest(TestCase):
             "article_set-0-id": u"1",
             # there is no title in database, give one here or formset
             # will fail.
-            "article_set-0-title": u"Need a title.",
+            "article_set-0-title": u"Norske bostaver æøå skaper problemer",
             "article_set-0-content": u"&lt;p&gt;Middle content&lt;/p&gt;",
             "article_set-0-date_0": u"2008-03-18",
             "article_set-0-date_1": u"11:54:58",
