@@ -431,6 +431,15 @@ ValidationError: [u'Ensure that there are no more than 3 digits in total.']
 >>> f.clean('.002') == Decimal("0.002")
 True
 
+>>> f = DecimalField(max_digits=2, decimal_places=2)
+>>> f.clean('.01') == Decimal(".01")
+True
+>>> f.clean('1.1')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 0 digits before the decimal point.']
+
+
 # DateField ###################################################################
 
 >>> import datetime
