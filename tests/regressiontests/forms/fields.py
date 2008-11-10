@@ -1322,6 +1322,8 @@ u'.../django/forms/fields.py'
 # SplitDateTimeField ##########################################################
 
 >>> f = SplitDateTimeField()
+>>> f.widget
+<django.forms.widgets.SplitDateTimeWidget object ...
 >>> f.clean([datetime.date(2006, 1, 10), datetime.time(7, 30)])
 datetime.datetime(2006, 1, 10, 7, 30)
 >>> f.clean(None)

@@ -28,7 +28,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
 
 from util import ErrorList, ValidationError
-from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateTimeInput, TimeInput, SplitHiddenDateTimeWidget
+from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateTimeInput, TimeInput, SplitDateTimeWidget, SplitHiddenDateTimeWidget
 from django.core.files.uploadedfile import SimpleUploadedFile as UploadedFile
 
 __all__ = (
@@ -843,6 +843,7 @@ class FilePathField(ChoiceField):
         self.widget.choices = self.choices
 
 class SplitDateTimeField(MultiValueField):
+    widget = SplitDateTimeWidget
     hidden_widget = SplitHiddenDateTimeWidget
     default_error_messages = {
         'invalid_date': _(u'Enter a valid date.'),
