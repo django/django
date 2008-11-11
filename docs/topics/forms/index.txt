@@ -57,7 +57,7 @@ Form objects
 
 A Form object encapsulates a sequence of form fields and a collection of
 validation rules that must be fulfilled in order for the form to be accepted.
-Form classes are created as subclasses of ``django.forms.Form`` and are
+Form classes are created as subclasses of ``django.forms.Form`` and 
 make use of a declarative style that you'll be familiar with if you've used
 Django's database models.
 
