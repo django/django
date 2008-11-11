@@ -61,7 +61,7 @@ from django.contrib.gis.gdal.prototypes.srs import clone_srs
 # Regular expressions for recognizing HEXEWKB and WKT.
 hex_regex = re.compile(r'^[0-9A-F]+$', re.I)
 wkt_regex = re.compile(r'^(?P<type>POINT|LINESTRING|LINEARRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)[ACEGIMLONPSRUTY\d,\.\-\(\) ]+$', re.I)
-json_regex = re.compile(r'^\{[\s\w,\-\.\"\'\:\[\]]+\}$')
+json_regex = re.compile(r'^(\s+)?\{[\s\w,\[\]\{\}\-\."\':]+\}(\s+)?$')
 
 #### OGRGeometry Class ####
 class OGRGeometry(object):
