@@ -79,8 +79,9 @@ class OGRGeomTest(unittest.TestCase):
         if not GEOJSON: return
         for g in json_geoms:
             geom = OGRGeometry(g.wkt)
-            self.assertEqual(g.json, geom.json)
-            self.assertEqual(g.json, geom.geojson)
+            if not hasattr(g, 'not_equal'):
+                self.assertEqual(g.json, geom.json)
+                self.assertEqual(g.json, geom.geojson)
             self.assertEqual(OGRGeometry(g.wkt), OGRGeometry(geom.json))
 
     def test02_points(self):

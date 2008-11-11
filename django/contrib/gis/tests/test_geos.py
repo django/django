@@ -102,8 +102,9 @@ class GEOSTest(unittest.TestCase):
         if not HAS_GDAL or not GEOJSON: return
         for g in json_geoms:
             geom = GEOSGeometry(g.wkt)
-            self.assertEqual(g.json, geom.json)
-            self.assertEqual(g.json, geom.geojson)
+            if not hasattr(g, 'not_equal'):
+                self.assertEqual(g.json, geom.json)
+                self.assertEqual(g.json, geom.geojson)
             self.assertEqual(GEOSGeometry(g.wkt), GEOSGeometry(geom.json))
 
     def test01j_eq(self):

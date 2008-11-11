@@ -21,6 +21,7 @@ from django.contrib.gis.geos.prototypes import *
 # try/except since this package may be used outside GeoDjango.
 try:
     from django.contrib.gis.gdal import OGRGeometry, SpatialReference, GEOJSON
+    from django.contrib.gis.gdal.geometries import json_regex
     HAS_GDAL = True
 except:
     HAS_GDAL, GEOJSON = False, False
@@ -30,7 +31,6 @@ except:
 # library.  Not a substitute for good web security programming practices.
 hex_regex = re.compile(r'^[0-9A-F]+$', re.I)
 wkt_regex = re.compile(r'^(SRID=(?P<srid>\d+);)?(?P<wkt>(POINT|LINESTRING|LINEARRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)[ACEGIMLONPSRUTY\d,\.\-\(\) ]+)$', re.I)
-json_regex = re.compile(r'^\{.+\}$')
 
 class GEOSGeometry(object):
     "A class that, generally, encapsulates a GEOS geometry."
