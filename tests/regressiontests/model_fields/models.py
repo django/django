@@ -32,6 +32,9 @@ class Whiz(models.Model):
         (0,'Other'),
     )
     c = models.IntegerField(choices=CHOICES, null=True)
+    
+class BigD(models.Model):
+    d = models.DecimalField(max_digits=38, decimal_places=30)
 
 __test__ = {'API_TESTS':"""
 # Create a couple of Places.
@@ -78,5 +81,11 @@ u''
 >>> Foo.objects.filter(d=u'1.23')
 []
 
-
+# Regression test for #5079 -- ensure decimals don't go through a corrupting
+# float conversion during save.  
+>>> bd = BigD(d="12.9")
+>>> bd.save()
+>>> bd = BigD.objects.get(pk=bd.pk)
+>>> bd.d == decimal.Decimal("12.9")
+True
 """}
