@@ -309,17 +309,17 @@ class ExceptionTests(TestCase):
             self.client.get("/test_client_regress/staff_only/")
         except SuspiciousOperation:
             self.fail("Staff should be able to visit this page")
-    
+
 class TemplateExceptionTests(TestCase):
     def setUp(self):
         self.old_templates = settings.TEMPLATE_DIRS
         settings.TEMPLATE_DIRS = ()
-        
+
     def tearDown(self):
         settings.TEMPLATE_DIRS = self.old_templates
-        
+
     def test_no_404_template(self):
-        "Missing templates are correctly reported by test client"    
+        "Missing templates are correctly reported by test client"
         try:
             response = self.client.get("/no_such_view/")
             self.fail("Should get error about missing template")
@@ -334,7 +334,7 @@ class TemplateExceptionTests(TestCase):
             self.fail("Should get error about syntax error in template")
         except TemplateSyntaxError:
             pass
-        
+
 # We need two different tests to check URLconf substitution -  one to check
 # it was changed, and another one (without self.urls) to check it was reverted on
 # teardown. This pair of tests relies upon the alphabetical ordering of test execution.
@@ -421,3 +421,54 @@ class RequestMethodTests(TestCase):
         response = self.client.delete('/test_client_regress/request_methods/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, 'request method: DELETE')
+
+class QueryStringTests(TestCase):
+    def test_get_like_requests(self):
+        for method_name in ('get','head','options','put','delete'):
+            # A GET-like request can pass a query string as data
+            method = getattr(self.client, method_name)
+            response = method("/test_client_regress/request_data/", data={'foo':'whiz'})
+            self.assertEqual(response.context['get-foo'], 'whiz')
+            self.assertEqual(response.context['request-foo'], 'whiz')
+
+            # A GET-like request can pass a query string as part of the URL
+            response = method("/test_client_regress/request_data/?foo=whiz")
+            self.assertEqual(response.context['get-foo'], 'whiz')
+            self.assertEqual(response.context['request-foo'], 'whiz')
+
+            # Data provided in the URL to a GET-like request is overridden by actual form data
+            response = method("/test_client_regress/request_data/?foo=whiz", data={'foo':'bang'})
+            self.assertEqual(response.context['get-foo'], 'bang')
+            self.assertEqual(response.context['request-foo'], 'bang')
+
+            response = method("/test_client_regress/request_data/?foo=whiz", data={'bar':'bang'})
+            self.assertEqual(response.context['get-foo'], None)
+            self.assertEqual(response.context['get-bar'], 'bang')
+            self.assertEqual(response.context['request-foo'], None)
+            self.assertEqual(response.context['request-bar'], 'bang')
+
+    def test_post_like_requests(self):
+        # A POST-like request can pass a query string as data
+        response = self.client.post("/test_client_regress/request_data/", data={'foo':'whiz'})
+        self.assertEqual(response.context['get-foo'], None)
+        self.assertEqual(response.context['post-foo'], 'whiz')
+
+        # A POST-like request can pass a query string as part of the URL
+        response = self.client.post("/test_client_regress/request_data/?foo=whiz")
+        self.assertEqual(response.context['get-foo'], 'whiz')
+        self.assertEqual(response.context['post-foo'], None)
+        self.assertEqual(response.context['request-foo'], 'whiz')
+
+        # POST data provided in the URL augments actual form data
+        response = self.client.post("/test_client_regress/request_data/?foo=whiz", data={'foo':'bang'})
+        self.assertEqual(response.context['get-foo'], 'whiz')
+        self.assertEqual(response.context['post-foo'], 'bang')
+        self.assertEqual(response.context['request-foo'], 'bang')
+
+        response = self.client.post("/test_client_regress/request_data/?foo=whiz", data={'bar':'bang'})
+        self.assertEqual(response.context['get-foo'], 'whiz')
+        self.assertEqual(response.context['get-bar'], None)
+        self.assertEqual(response.context['post-foo'], None)
+        self.assertEqual(response.context['post-bar'], 'bang')
+        self.assertEqual(response.context['request-foo'], 'whiz')
+        self.assertEqual(response.context['request-bar'], 'bang')

@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import SuspiciousOperation
+from django.shortcuts import render_to_response
 
 def no_template_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -17,6 +18,17 @@ def get_view(request):
     "A simple login protected view"
     return HttpResponse("Hello world")
 get_view = login_required(get_view)
+
+def request_data(request):
+    "A simple view that returns the request data in the context"
+    return render_to_response('base.html', {
+        'get-foo':request.GET.get('foo',None),
+        'get-bar':request.GET.get('bar',None),
+        'post-foo':request.POST.get('foo',None),
+        'post-bar':request.POST.get('bar',None),
+        'request-foo':request.REQUEST.get('foo',None),
+        'request-bar':request.REQUEST.get('bar',None),
+    })
 
 def view_with_argument(request, name):
     """A view that takes a string argument

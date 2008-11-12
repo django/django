@@ -493,6 +493,18 @@ arguments at time of construction:
 
             /customers/details/?name=fred&age=7
 
+        .. versionadded:: development
+
+        If you already have the GET arguments in URL-encoded form, you can
+        use that encoding instead of using the data argument. For example,
+        the previous GET request could also be posed as::
+
+        >>> c = Client()
+        >>> c.get('/customers/details/?name=fred&age=7')
+
+        If you provide URL both an encoded GET data and a data argument,
+        the data argument will take precedence.
+
     .. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT)
 
         Makes a POST request on the provided ``path`` and returns a
@@ -543,6 +555,18 @@ arguments at time of construction:
 
         Note that you should manually close the file after it has been provided
         to ``post()``.
+
+        .. versionadded:: development
+
+        If the URL you request with a POST contains encoded parameters, these
+        parameters will be made available in the request.GET data. For example,
+        if you were to make the request::
+
+        >>> c.post('/login/?vistor=true', {'name': 'fred', 'passwd': 'secret'})
+
+        ... the view handling this request could interrogate request.POST
+        to retrieve the username and password, and could interrogate request.GET
+        to determine if the user was a visitor.
 
     .. method:: Client.head(path, data={})
 
