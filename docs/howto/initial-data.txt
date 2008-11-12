@@ -77,7 +77,7 @@ out any changes you've made.
 Automatically loading initial data fixtures
 -------------------------------------------
 
-If you create a fixture named ``initial_data.[xml/yml/json]``, that fixture will
+If you create a fixture named ``initial_data.[xml/yaml/json]``, that fixture will
 be loaded every time you run :djadmin:`syncdb`. This is extremely convenient,
 but be careful: remember that the data will be refreshed *every time* you run
 :djadmin:`syncdb`. So don't use ``initial_data`` for data you'll want to edit.
