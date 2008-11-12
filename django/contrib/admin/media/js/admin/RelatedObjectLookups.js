@@ -11,10 +11,25 @@ function html_unescape(text) {
     return text;
 }
 
+// IE doesn't accept periods or dashes in the window name, but the element IDs
+// we use to generate popup window names may contain them, therefore we map them
+// to allowed characters in a reversible way so that we can locate the correct 
+// element when the popup window is dismissed.
+function id_to_windowname(text) {
+    text = text.replace(/\./g, '__dot__');
+    text = text.replace(/\-/g, '__dash__');
+    return text;
+}
+
+function windowname_to_id(text) {
+    text = text.replace(/__dot__/g, '.');
+    text = text.replace(/__dash__/g, '-');
+    return text;
+}
+
 function showRelatedObjectLookupPopup(triggeringLink) {
     var name = triggeringLink.id.replace(/^lookup_/, '');
-    // IE doesn't like periods in the window name, so convert temporarily.
-    name = name.replace(/\./g, '___');
+    name = id_to_windowname(name);
     var href;
     if (triggeringLink.href.search(/\?/) >= 0) {
         href = triggeringLink.href + '&pop=1';
@@ -27,7 +42,7 @@ function showRelatedObjectLookupPopup(triggeringLink) {
 }
 
 function dismissRelatedLookupPopup(win, chosenId) {
-    var name = win.name.replace(/___/g, '.');
+    var name = windowname_to_id(win.name);
     var elem = document.getElementById(name);
     if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1 && elem.value) {
         elem.value += ',' + chosenId;
@@ -39,7 +54,7 @@ function dismissRelatedLookupPopup(win, chosenId) {
 
 function showAddAnotherPopup(triggeringLink) {
     var name = triggeringLink.id.replace(/^add_/, '');
-    name = name.replace(/\./g, '___');
+    name = id_to_windowname(name);
     href = triggeringLink.href
     if (href.indexOf('?') == -1) {
         href += '?_popup=1';
@@ -56,7 +71,7 @@ function dismissAddAnotherPopup(win, newId, newRepr) {
     // django.utils.html.escape.
     newId = html_unescape(newId);
     newRepr = html_unescape(newRepr);
-    var name = win.name.replace(/___/g, '.');
+    var name = windowname_to_id(win.name);
     var elem = document.getElementById(name);
     if (elem) {
         if (elem.nodeName == 'SELECT') {
