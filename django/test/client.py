@@ -332,6 +332,7 @@ class Client(object):
             'CONTENT_LENGTH': len(post_data),
             'CONTENT_TYPE':   content_type,
             'PATH_INFO':      urllib.unquote(path),
+            'QUERY_STRING':   urlencode(data, doseq=True),
             'REQUEST_METHOD': 'PUT',
             'wsgi.input':     FakePayload(post_data),
         }
@@ -345,6 +346,7 @@ class Client(object):
         """
         r = {
             'PATH_INFO':       urllib.unquote(path),
+            'QUERY_STRING':    urlencode(data, doseq=True),
             'REQUEST_METHOD': 'DELETE',
             'wsgi.input':      FakePayload('')
         }
