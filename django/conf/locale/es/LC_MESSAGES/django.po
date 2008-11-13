@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-06 09:53+0100\n"
-"PO-Revision-Date: 2008-11-06 09:46+0100\n"
+"POT-Creation-Date: 2008-11-13 18:56+0100\n"
+"PO-Revision-Date: 2008-11-13 19:09+0100\n"
 "Last-Translator: Django Spanish Team <django-cat@googlegroups.com>Language-"
 "Team: Django Spanish Team <django-cat@googlegroups.com>MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -194,18 +194,22 @@ msgid "Telugu"
 msgstr "telugu"
 
 #: conf/global_settings.py:89
+msgid "Thai"
+msgstr "tailandés"
+
+#: conf/global_settings.py:90
 msgid "Turkish"
 msgstr "turco"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Ukrainian"
 msgstr "ucraniano"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Simplified Chinese"
 msgstr "chino simplificado"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Traditional Chinese"
 msgstr "chino tradicional"
 
@@ -347,6 +351,11 @@ msgstr ""
 #, python-format
 msgid "Add %s"
 msgstr "Añadir %s"
+
+#: contrib/admin/options.py:559 contrib/admin/options.py:673
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "No existe ningún objeto %(name)s con la clave primaria %(key)r."
 
 #: contrib/admin/options.py:606
 #, python-format
@@ -1537,7 +1546,7 @@ msgstr "¿Realmente desea marcar este comentario?"
 
 #: contrib/comments/templates/comments/flag.html:12
 msgid "Flag"
-msgstr ""
+msgstr "Marcar"
 
 #: contrib/comments/templates/comments/flagged.html:4
 msgid "Thanks for flagging"
@@ -3821,11 +3830,11 @@ msgstr "Asegúrese de que no hay más de %s decimales."
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Asegúrese de que no hay más de %s dígitos antes de la coma decimal."
 
-#: forms/fields.py:287 forms/fields.py:848
+#: forms/fields.py:287 forms/fields.py:849
 msgid "Enter a valid date."
 msgstr "Introduzca una fecha válida."
 
-#: forms/fields.py:321 forms/fields.py:849
+#: forms/fields.py:321 forms/fields.py:850
 msgid "Enter a valid time."
 msgstr "Introduzca una hora válida."
 
@@ -3873,11 +3882,11 @@ msgstr ""
 msgid "Enter a list of values."
 msgstr "Introduzca una lista de valores."
 
-#: forms/fields.py:877
+#: forms/fields.py:878
 msgid "Enter a valid IPv4 address."
 msgstr "Introduzca una dirección IPv4 válida."
 
-#: forms/fields.py:887
+#: forms/fields.py:888
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -3908,28 +3917,28 @@ msgstr "Escoja una opción válida. Esa opción no está entre las disponibles."
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Escoja una opción válida; '%s' no es una de las opciones disponibles."
 
-#: template/defaultfilters.py:706
+#: template/defaultfilters.py:741
 msgid "yes,no,maybe"
 msgstr "sí,no,tal vez"
 
-#: template/defaultfilters.py:737
+#: template/defaultfilters.py:772
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
 
-#: template/defaultfilters.py:739
+#: template/defaultfilters.py:774
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:741
+#: template/defaultfilters.py:776
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:742
+#: template/defaultfilters.py:777
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
