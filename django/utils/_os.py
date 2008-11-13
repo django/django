@@ -1,5 +1,25 @@
-from os.path import join, normcase, abspath, sep
+import os
+from os.path import join, normcase, normpath, abspath, isabs, sep
 from django.utils.encoding import force_unicode
+
+# Define our own abspath function that can handle joining 
+# unicode paths to a current working directory that has non-ASCII
+# characters in it.  This isn't necessary on Windows since the 
+# Windows version of abspath handles this correctly.  The Windows
+# abspath also handles drive letters differently than the pure 
+# Python implementation, so it's best not to replace it.
+if os.name == 'nt':
+    abspathu = abspath
+else:
+    def abspathu(path):
+        """
+        Version of os.path.abspath that uses the unicode representation
+        of the current working directory, thus avoiding a UnicodeDecodeError
+        in join when the cwd has non-ASCII characters.
+        """
+        if not isabs(path):
+            path = join(os.getcwdu(), path)
+        return normpath(path)
 
 def safe_join(base, *paths):
     """
@@ -13,8 +33,8 @@ def safe_join(base, *paths):
     # insensitive operating systems (like Windows).
     base = force_unicode(base)
     paths = [force_unicode(p) for p in paths]
-    final_path = normcase(abspath(join(base, *paths)))
-    base_path = normcase(abspath(base))
+    final_path = normcase(abspathu(join(base, *paths)))
+    base_path = normcase(abspathu(base))
     base_path_len = len(base_path)
     # Ensure final_path starts with base_path and that the next character after
     # the final path is os.sep (or nothing, in which case final_path must be
