@@ -108,8 +108,9 @@ class InlineAdminFormSet(object):
             yield InlineAdminForm(self.formset, form, self.fieldsets, self.opts.prepopulated_fields, None)
 
     def fields(self):
+        fk = getattr(self.formset, "fk", None)
         for field_name in flatten_fieldsets(self.fieldsets):
-            if self.formset.fk.name == field_name:
+            if fk and fk.name == field_name:
                 continue
             yield self.formset.form.base_fields[field_name]
 
@@ -150,7 +151,11 @@ class InlineAdminForm(AdminForm):
         return AdminField(self.form, self.formset._pk_field.name, False)
     
     def fk_field(self):
-        return AdminField(self.form, self.formset.fk.name, False)
+        fk = getattr(self.formset, "fk", None)
+        if fk:
+            return AdminField(self.form, fk.name, False)
+        else:
+            return ""
 
     def deletion_field(self):
         from django.forms.formsets import DELETION_FIELD_NAME
@@ -166,8 +171,9 @@ class InlineFieldset(Fieldset):
         super(InlineFieldset, self).__init__(*args, **kwargs)
         
     def __iter__(self):
+        fk = getattr(self.formset, "fk", None)
         for field in self.fields:
-            if self.formset.fk.name == field:
+            if fk and fk.name == field:
                 continue
             yield Fieldline(self.form, field)
             
