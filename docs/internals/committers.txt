@@ -151,7 +151,17 @@ Gary Wilson
     In early 2007, Gary started contributing a lot of cleanup fixes and fixing
     broken windows. He's continued to do that necessary tidying up work
     throughout the code base since then.
-    
+
+Karen Tracey
+    Karen has a background in distributed operating systems (graduate school),
+    communications software (industry) and crossword puzzle construction 
+    (freelance).  The last of these brought her to Django, in late 2006, when
+    she set out to put a web front-end on her crossword puzzle database.  
+    That done, she stuck around in the community answering questions, debugging
+    problems, etc. -- because coding puzzles are as much fun as word puzzles.
+
+    Karen lives in Apex, NC, USA.
+
 Specialists
 -----------
 

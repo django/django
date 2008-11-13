@@ -14,6 +14,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Robert Wittams
     * Gary Wilson
     * Brian Rosner
+    * Karen Tracey
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -395,7 +396,6 @@ answer newbie questions, and generally made Django that much better:
     Tom Tobin
     Joe Topjian <http://joe.terrarum.net/geek/code/python/django/>
     torne-django@wolfpuppy.org.uk
-    Karen Tracey <graybark@bellsouth.net>
     Jeff Triplett <jeff.triplett@gmail.com>
     tstromberg@google.com
     Makoto Tsuyuki <mtsuyuki@gmail.com>
