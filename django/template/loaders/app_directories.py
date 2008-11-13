@@ -4,6 +4,7 @@ packages.
 """
 
 import os
+import sys
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -11,6 +12,7 @@ from django.template import TemplateDoesNotExist
 from django.utils._os import safe_join
 
 # At compile time, cache the directories to search.
+fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
 app_template_dirs = []
 for app in settings.INSTALLED_APPS:
     i = app.rfind('.')
@@ -27,7 +29,7 @@ for app in settings.INSTALLED_APPS:
         raise ImproperlyConfigured, 'ImportError %s: %s' % (app, e.args[0])
     template_dir = os.path.join(os.path.dirname(mod.__file__), 'templates')
     if os.path.isdir(template_dir):
-        app_template_dirs.append(template_dir)
+        app_template_dirs.append(template_dir.decode(fs_encoding))
 
 # It won't change, so convert it to a tuple to save memory.
 app_template_dirs = tuple(app_template_dirs)
