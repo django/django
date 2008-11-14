@@ -76,8 +76,8 @@ force the maximum number of forms the formset will display::
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
 
-The default value of ``max_num`` is ``0`` which is the same as saying put no
-limit on the number forms displayed.
+A ``max_num`` value of ``0`` (the default) puts no limit on the number forms
+displayed.
 
 Formset validation
 ------------------
