@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-30 07:12+0100\n"
-"PO-Revision-Date: 2008-10-30 08:04+0100\n"
+"POT-Creation-Date: 2008-11-14 08:07+0100\n"
+"PO-Revision-Date: 2008-11-14 08:10+0100\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "Language-Team: Italiano\n"
 "MIME-Version: 1.0\n"
@@ -197,18 +197,22 @@ msgid "Telugu"
 msgstr "telugu"
 
 #: conf/global_settings.py:89
+msgid "Thai"
+msgstr "thai"
+
+#: conf/global_settings.py:90
 msgid "Turkish"
 msgstr "turco"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Ukrainian"
 msgstr "ucraino"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Simplified Chinese"
 msgstr "cinese semplificato"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Traditional Chinese"
 msgstr "cinese tradizionale"
 
@@ -296,7 +300,7 @@ msgid "Changed %s."
 msgstr "%s modificato."
 
 #: contrib/admin/options.py:338 contrib/admin/options.py:348
-#: contrib/comments/templates/comments/preview.html:15 forms/models.py:278
+#: contrib/comments/templates/comments/preview.html:15 forms/models.py:288
 msgid "and"
 msgstr "e"
 
@@ -350,6 +354,11 @@ msgstr ""
 #, python-format
 msgid "Add %s"
 msgstr "Aggiungi %s"
+
+#: contrib/admin/options.py:559 contrib/admin/options.py:673
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "L'oggetto %(name)s con chiave primaria %(key)r non esiste."
 
 #: contrib/admin/options.py:606
 #, python-format
@@ -465,7 +474,7 @@ msgstr "Spiacenti, ma la pagina richiesta non è stata trovata."
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/base.html:31
 #: contrib/admin/templates/admin/change_form.html:17
 #: contrib/admin/templates/admin/change_list.html:8
 #: contrib/admin/templates/admin/delete_confirmation.html:6
@@ -509,18 +518,18 @@ msgstr ""
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:26
 msgid "Welcome,"
 msgstr "Benvenuto,"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:26
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Documentazione"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:26
 #: contrib/admin/templates/admin/auth/user/change_password.html:13
 #: contrib/admin/templates/admin/auth/user/change_password.html:46
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -528,7 +537,7 @@ msgstr "Documentazione"
 msgid "Change password"
 msgstr "Cambia la password"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:26
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
@@ -1492,7 +1501,9 @@ msgstr "Grazie per aver approvato"
 #: contrib/comments/templates/comments/deleted.html:7
 #: contrib/comments/templates/comments/flagged.html:7
 msgid "Thanks for taking the time to improve the quality of discussion on our site"
-msgstr "Grazie per aver speso tempo a migliorare la qualità della discussione sul nostro sito"
+msgstr ""
+"Grazie per aver speso tempo a migliorare la qualità della discussione sul "
+"nostro sito"
 
 #: contrib/comments/templates/comments/delete.html:4
 msgid "Remove a comment"
@@ -1586,8 +1597,8 @@ msgstr "Mostra l'anteprima del tuo commento"
 #: contrib/comments/templates/comments/preview.html:10
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "Correggi l'errore qui sotto."
-msgstr[1] "Correggi gli errori qui sotto."
+msgstr[0] "Correggi l'errore qui sotto"
+msgstr[1] "Correggi gli errori qui sotto"
 
 #: contrib/comments/templates/comments/preview.html:15
 msgid "Post your comment"
@@ -3798,11 +3809,11 @@ msgstr "Assicurarsi che non vi siano più di %s cifre decimali."
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Assicurarsi che non vi siano più di %s cifre prima della virgola."
 
-#: forms/fields.py:287 forms/fields.py:848
+#: forms/fields.py:287 forms/fields.py:849
 msgid "Enter a valid date."
 msgstr "Inserisci una data valida."
 
-#: forms/fields.py:321 forms/fields.py:849
+#: forms/fields.py:321 forms/fields.py:850
 msgid "Enter a valid time."
 msgstr "Inserisci un ora valida."
 
@@ -3841,15 +3852,15 @@ msgstr "Questa URL non sembra funzionare."
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Scegli un'opzione valida. '%(value)s non compare tra quelle disponibili."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:671
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:720
 msgid "Enter a list of values."
 msgstr "Inserisci una lista di valori."
 
-#: forms/fields.py:877
+#: forms/fields.py:878
 msgid "Enter a valid IPv4 address."
 msgstr "Inserisci un indirizzo IPv4 valido."
 
-#: forms/fields.py:887
+#: forms/fields.py:888
 msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Inserisci uno 'slug' valido contenente lettere, cifre, sottolineati o "
@@ -3859,44 +3870,48 @@ msgstr ""
 msgid "Order"
 msgstr "Ordine"
 
-#: forms/models.py:271 forms/models.py:280
+#: forms/models.py:281 forms/models.py:290
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s con questo %(field_label)s esiste già."
 
-#: forms/models.py:601
+#: forms/models.py:587
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr "La foreign key inline non concorda con la chiave primaria dell'istanza principale."
+
+#: forms/models.py:650
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Scegli un'opzione valida. La scelta effettuata non compare tra quelle "
 "disponibili."
 
-#: forms/models.py:672
+#: forms/models.py:721
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Scegli un'opzione valida. %s non compare tra quelle disponibili."
 
-#: template/defaultfilters.py:706
+#: template/defaultfilters.py:741
 msgid "yes,no,maybe"
 msgstr "sì,no,forse"
 
-#: template/defaultfilters.py:737
+#: template/defaultfilters.py:772
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d byte"
 
-#: template/defaultfilters.py:739
+#: template/defaultfilters.py:774
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:741
+#: template/defaultfilters.py:776
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:742
+#: template/defaultfilters.py:777
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
