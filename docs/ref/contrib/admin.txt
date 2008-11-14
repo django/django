@@ -262,7 +262,7 @@ You have four possible values that can be used in ``list_display``:
       example::
     
           def upper_case_name(obj):
-              return "%s %s" % (obj.first_name, obj.last_name).upper()
+              return ("%s %s" % (obj.first_name, obj.last_name)).upper()
           upper_case_name.short_description = 'Name'
         
           class PersonAdmin(admin.ModelAdmin):
@@ -275,7 +275,7 @@ You have four possible values that can be used in ``list_display``:
               list_display = ('upper_case_name',)
               
               def upper_case_name(self, obj):
-                return "%s %s" % (obj.first_name, obj.last_name).upper()
+                return ("%s %s" % (obj.first_name, obj.last_name)).upper()
               upper_case_name.short_description = 'Name'
     
     * A string representing an attribute on the model. This behaves almost
