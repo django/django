@@ -72,15 +72,17 @@ bindings. Two versions of this are available. Choose and install *one* of the
 following modules:
 
     * The fastest available option is a module called ``cmemcache``, available
-      at http://gijsbert.org/cmemcache/ . (This module is only compatible with
-      the Django development version. Django 0.96 is only compatible with the
-      second option, below.)
+      at http://gijsbert.org/cmemcache/ .
 
     * If you can't install ``cmemcache``, you can install ``python-memcached``,
       available at ftp://ftp.tummy.com/pub/python-memcached/ . If that URL is
       no longer valid, just go to the Memcached Web site
       (http://www.danga.com/memcached/) and get the Python bindings from the
       "Client APIs" section.
+
+.. versionadded:: 1.0
+    The ``cmemcache`` option is new in 1.0. Previously, only
+    ``python-memcached`` was supported.
 
 To use Memcached with Django, set ``CACHE_BACKEND`` to
 ``memcached://ip:port/``, where ``ip`` is the IP address of the Memcached
