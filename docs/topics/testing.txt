@@ -1034,10 +1034,10 @@ and contents::
                 fail_silently=False)
 
             # Test that one message has been sent.
-            self.assertEqual(len(mail.outbox), 1)
+            self.assertEquals(len(mail.outbox), 1)
 
             # Verify that the subject of the first message is correct.
-            self.assertEqual(mail.outbox[0].subject, 'Subject here')
+            self.assertEquals(mail.outbox[0].subject, 'Subject here')
 
 As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
 at the start of every test in a Django ``TestCase``. To empty the outbox
