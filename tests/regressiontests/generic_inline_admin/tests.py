@@ -7,7 +7,7 @@ from django.conf import settings
 from models import Episode, Media
 
 class GenericAdminViewTest(TestCase):
-    fixtures = ['users.xml', 'model-data.xml']
+    fixtures = ['users.xml']
 
     def setUp(self):
         # set TEMPLATE_DEBUG to True to ensure {% include %} will raise
@@ -16,6 +16,13 @@ class GenericAdminViewTest(TestCase):
         self.original_template_debug = settings.TEMPLATE_DEBUG
         settings.TEMPLATE_DEBUG = True
         self.client.login(username='super', password='secret')
+        
+        # Can't load content via a fixture (since the GenericForeignKey
+        # relies on content type IDs, which will vary depending on what
+        # other tests have been run), thus we do it here.
+        e = Episode.objects.create(name='This Week in Django')
+        m = Media(content_object=e, url='http://example.com/podcast.mp3')
+        m.save()
     
     def tearDown(self):
         self.client.logout()
