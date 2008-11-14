@@ -79,7 +79,7 @@ Why is Django leaking memory?
 
 Django isn't known to leak memory. If you find your Django processes are
 allocating more and more memory, with no sign of releasing it, check to make
-sure your ``DEBUG`` setting is set to ``True``. If ``DEBUG`` is ``True``, then
+sure your ``DEBUG`` setting is set to ``False``. If ``DEBUG`` is ``True``, then
 Django saves a copy of every SQL statement it has executed.
 
 (The queries are saved in ``django.db.connection.queries``. See
