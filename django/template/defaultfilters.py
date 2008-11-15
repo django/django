@@ -99,10 +99,10 @@ fix_ampersands = stringfilter(fix_ampersands)
 
 # Values for testing floatformat input against infinity and NaN representations,
 # which differ across platforms and Python versions.  Some (i.e. old Windows
-# ones) are not recognized by Decimal but we want to return them unchanged vs. 
+# ones) are not recognized by Decimal but we want to return them unchanged vs.
 # returning an empty string as we do for completley invalid input.  Note these
-# need to be built up from values that are not inf/nan, since inf/nan values do 
-# not reload properly from .pyc files on Windows prior to some level of Python 2.5 
+# need to be built up from values that are not inf/nan, since inf/nan values do
+# not reload properly from .pyc files on Windows prior to some level of Python 2.5
 # (see Python Issue757815 and Issue1080440).
 pos_inf = 1e200 * 1e200
 neg_inf = -1e200 * 1e200
@@ -136,11 +136,11 @@ def floatformat(text, arg=-1):
     * {{ num1|floatformat:"-3" }} displays "34.232"
     * {{ num2|floatformat:"-3" }} displays "34"
     * {{ num3|floatformat:"-3" }} displays "34.260"
-    
+
     If the input float is infinity or NaN, the (platform-dependent) string
     representation of that value will be displayed.
     """
-        
+
     try:
         input_val = force_unicode(text)
         d = Decimal(input_val)
@@ -155,15 +155,15 @@ def floatformat(text, arg=-1):
         p = int(arg)
     except ValueError:
         return input_val
-    
+
     try:
         m = int(d) - d
     except (OverflowError, InvalidOperation):
         return input_val
-    
+
     if not m and p < 0:
         return mark_safe(u'%d' % (int(d)))
-    
+
     if p == 0:
         exp = Decimal(1)
     else:
@@ -481,19 +481,20 @@ def first(value):
         return u''
 first.is_safe = False
 
-def join(value, arg):
-    """Joins a list with a string, like Python's ``str.join(list)``."""
+def join(value, arg, autoescape=None):
+    """
+    Joins a list with a string, like Python's ``str.join(list)``.
+    """
+    if autoescape:
+        from django.utils.html import conditional_escape
+        value = [conditional_escape(v) for v in value]
     try:
-        data = arg.join(map(force_unicode, value))
+        data = arg.join(value)
     except AttributeError: # fail silently but nicely
         return value
-    safe_args = reduce(lambda lhs, rhs: lhs and isinstance(rhs, SafeData),
-            value, True)
-    if safe_args:
-        return mark_safe(data)
-    else:
-        return data
+    return mark_safe(data)
 join.is_safe = True
+join.needs_autoescape = True
 
 def last(value):
     "Returns the last item in a list"
