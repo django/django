@@ -413,11 +413,6 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 
 A :class:`CharField` that checks that the value is a valid e-mail address.
 
-In Django 0.96, this doesn't accept :attr:`~CharField.max_length`; its
-:class:`~CharField.max_length` is automatically set to 75. In the Django
-development version, :class:`~CharField.max_length` is set to 75 by default, but
-you can specify it to override default behavior.
-
 ``FileField``
 -------------
 
@@ -576,11 +571,6 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 A floating-point number represented in Python by a ``float`` instance.
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
-
-**NOTE:** The semantics of :class:`FloatField` have changed in the Django
-development version. See the `Django 0.96 documentation`_ for the old behavior.
-
-.. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
 
 ``ImageField``
 --------------
