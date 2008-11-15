@@ -485,6 +485,7 @@ def join(value, arg, autoescape=None):
     """
     Joins a list with a string, like Python's ``str.join(list)``.
     """
+    value = map(force_unicode, value)
     if autoescape:
         from django.utils.html import conditional_escape
         value = [conditional_escape(v) for v in value]
