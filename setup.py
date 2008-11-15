@@ -72,7 +72,7 @@ if u'SVN' in version:
 
 setup(
     name = "Django",
-    version = version,
+    version = version.replace(' ', '-'),
     url = 'http://www.djangoproject.com/',
     download_url='http://www.djangoproject.com/download/1.0.1-beta-1/tarball/',
     author = 'Django Software Foundation',
