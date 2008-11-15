@@ -316,8 +316,9 @@ For each field, we describe the default widget used if you don't specify
     * Error message keys: ``required``
 
 .. versionchanged:: 1.0
-   The empty value for a ``CheckboxInput`` (and hence the standard ``BooleanField``)
-   has changed to return ``False`` instead of ``None`` in the development version.
+   The empty value for a ``CheckboxInput`` (and hence the standard
+   ``BooleanField``) has changed to return ``False`` instead of ``None`` in
+   the Django 1.0.
 
 .. note::
 

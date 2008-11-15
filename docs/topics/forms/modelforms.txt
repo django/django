@@ -77,9 +77,9 @@ the full list of conversions:
     ===============================  ========================================
 
 
-.. note::
+.. versionadded:: 1.0
     The ``FloatField`` form field and ``DecimalField`` model and form fields
-    are new in the development version.
+    are new in Django 1.0.
 
 As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
 types are special cases:

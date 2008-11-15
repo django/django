@@ -36,12 +36,6 @@ class and point to it in your :ref:`URLconf <topics-http-urls>`.
 Initialization
 --------------
 
-If you're not using the latest Django development version, you'll need to make
-sure Django's sites framework is installed -- including its database table. (See
-the :mod:`sites framework documentation <django.contrib.sites>` for more
-information.) This has changed in the Django development version; the
-syndication feed framework no longer requires the sites framework.
-
 To activate syndication feeds on your Django site, add this line to your
 :ref:`URLconf <topics-http-urls>`::
 
@@ -152,8 +146,7 @@ into those elements.
          
          * ``{{ site }}`` -- A :class:`django.contrib.sites.models.Site` object
            representing the current site. This is useful for ``{{ site.domain
-           }}`` or ``{{ site.name }}``. Note that if you're using the latest
-           Django development version and do *not* have the Django sites
+           }}`` or ``{{ site.name }}``. If you do *not* have the Django sites
            framework installed, this will be set to a
            :class:`django.contrib.sites.models.RequestSite` object. See the
            :ref:`RequestSite section of the sites framework documentation

@@ -320,8 +320,10 @@ Hashtype is either ``sha1`` (default), ``md5`` or ``crypt`` -- the algorithm
 used to perform a one-way hash of the password. Salt is a random string used
 to salt the raw password to create the hash. Note that the ``crypt`` method is
 only supported on platforms that have the standard Python ``crypt`` module
-available, and ``crypt`` support is only available in the Django development
-version.
+available.
+
+.. versionadded:: 1.0
+    Support for the ``crypt`` module is new in Django 1.0.
 
 For example::
 
@@ -626,7 +628,6 @@ The login_required decorator
         def my_view(request):
             # ...
 
-    In the Django development version,
     :func:`~django.contrib.auth.decorators.login_required` also takes an
     optional ``redirect_field_name`` parameter. Example::
 

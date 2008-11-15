@@ -959,10 +959,10 @@ SQL equivalents::
     SELECT ... WHERE id IS NULL;
 
 .. versionchanged:: 1.0
-   The semantics of ``id__exact=None`` have
-   changed in the development version. Previously, it was (intentionally)
-   converted to ``WHERE id = NULL`` at the SQL level, which would never match
-   anything. It has now been changed to behave the same as ``id__isnull=True``.
+   The semantics of ``id__exact=None`` have changed in Django 1.0. Previously,
+   it was (intentionally) converted to ``WHERE id = NULL`` at the SQL level,
+   which would never match anything. It has now been changed to behave the
+   same as ``id__isnull=True``.
 
 .. admonition:: MySQL comparisons
 

@@ -186,12 +186,12 @@ test utility is to find all the test cases (that is, subclasses of
 ``unittest.TestCase``) in ``models.py`` and ``tests.py``, automatically build a
 test suite out of those test cases, and run that suite.
 
-In the Django development version, there is a second way to define the test
-suite for a module: if you define a function called ``suite()`` in either
-``models.py`` or ``tests.py``, the Django test runner will use that function
-to construct the test suite for that module. This follows the `suggested
-organization`_ for unit tests. See the Python documentation for more details on
-how to construct a complex test suite.
+There is a second way to define the test suite for a module: if you define a
+function called ``suite()`` in either ``models.py`` or ``tests.py``, the
+Django test runner will use that function to construct the test suite for that
+module. This follows the `suggested organization`_ for unit tests. See the
+Python documentation for more details on how to construct a complex test
+suite.
 
 For more details about ``unittest``, see the `standard library unittest
 documentation`_.

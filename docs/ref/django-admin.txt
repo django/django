@@ -51,13 +51,9 @@ Getting runtime help
 
 .. django-admin-option:: --help
 
-In Django 0.96, run ``django-admin.py --help`` to display a help message that
-includes a terse list of all available subcommands and options.
-
-In the Django development version, run ``django-admin.py help`` to display a
-list of all available subcommands. Run ``django-admin.py help <subcommand>``
-to display a description of the given subcommand and a list of its available
-options.
+Run ``django-admin.py help`` to display a list of all available subcommands.
+Run ``django-admin.py help <subcommand>`` to display a description of the
+given subcommand and a list of its available options.
 
 App names
 ---------
@@ -241,13 +237,6 @@ Returns the database to the state it was in immediately after syncdb was
 executed. This means that all data will be removed from the database, any
 post-synchronization handlers will be re-executed, and the ``initial_data``
 fixture will be re-installed.
-
-The behavior of this command has changed in the Django development version.
-Previously, this command cleared *every* table in the database, including any
-table that Django didn't know about (i.e., tables that didn't have associated
-models and/or weren't in ``INSTALLED_APPS``). Now, the command only clears
-tables that are represented by Django models and are activated in
-``INSTALLED_APPS``.
 
 .. django-admin-option:: --noinput
 

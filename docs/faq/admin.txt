@@ -94,10 +94,3 @@ site is built using semantic HTML and plenty of CSS hooks, so any changes you'd
 like to make should be possible by editing the stylesheet. We've got a
 :ref:`guide to the CSS used in the admin <obsolete-admin-css>` to get you started.
 
-How do I create users without having to edit password hashes?
--------------------------------------------------------------
-
-If you'd like to use the admin site to create users, upgrade to the Django
-development version, where this problem was fixed on Aug. 4, 2006.
-
-You can also use the Python API. See :ref:`creating users <topics-auth-creating-users>` for full info.

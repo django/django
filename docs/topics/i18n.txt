@@ -806,8 +806,7 @@ The view expects to be called via the ``POST`` method, with a ``language``
 parameter set in request. If session support is enabled, the view
 saves the language choice in the user's session. Otherwise, it saves the
 language choice in a cookie that is by default named ``django_language``.
-(The name can be changed through the ``LANGUAGE_COOKIE_NAME`` setting if you're
-using the Django development version.)
+(The name can be changed through the ``LANGUAGE_COOKIE_NAME`` setting.)
 
 After setting the language choice, Django redirects the user, following this
 algorithm:
