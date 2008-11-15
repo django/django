@@ -47,10 +47,6 @@ highlights:
   change list based on a callable model attribute, by associating the
   callable with a database-backed field.
 
-* Refactored and consolidated CSS for the Django administration
-  application, simplifying the admin stylesheets and making
-  customization easier.
-
 * A fix to the application of autoescaping for literal strings passed
   to the ``join`` template filter. Previously, literal strings passed
   to ``join`` were automatically escaped, contrary to `the documented
