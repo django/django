@@ -24,10 +24,19 @@ class Album(models.Model):
     def __unicode__(self):
         return self.name
 
+class HiddenInventoryManager(models.Manager):
+    def get_query_set(self):
+        return super(HiddenInventoryManager, self).get_query_set().filter(hidden=False) 
+
 class Inventory(models.Model):
    barcode = models.PositiveIntegerField(unique=True)
    parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
    name = models.CharField(blank=False, max_length=20)
+   hidden = models.BooleanField(default=False)
+   
+   # see #9258
+   default_manager = models.Manager()
+   objects = HiddenInventoryManager()
 
    def __unicode__(self):
       return self.name
@@ -101,6 +110,12 @@ True
 >>> w = ForeignKeyRawIdWidget(rel)
 >>> print w.render('test', core.parent_id, attrs={})
 <input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="../../../admin_widgets/inventory/?t=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>
+
+# see #9258
+>>> hidden = Inventory.objects.create(barcode=93, name='Hidden', hidden=True) 
+>>> child_of_hidden = Inventory.objects.create(barcode=94, name='Child of hidden', parent=hidden)
+>>> print w.render('test', child_of_hidden.parent_id, attrs={}) 
+<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="../../../admin_widgets/inventory/?t=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>
 """ % {
     'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX,
     'STORAGE_URL': default_storage.url(''),
