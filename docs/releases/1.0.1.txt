@@ -43,9 +43,8 @@ highlights:
 * Fixed support for custom callable ``upload_to`` declarations when
   handling file uploads through automatically-generated forms.
 
-* Restored support which previously existed for sorting an admin
-  change list based on a callable model attribute, by associating the
-  callable with a database-backed field.
+* Fixed support for sorting an admin change list based on a callable
+  attributes in ``list_display``.
 
 * A fix to the application of autoescaping for literal strings passed
   to the ``join`` template filter. Previously, literal strings passed
