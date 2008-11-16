@@ -46,6 +46,12 @@ class Worker(models.Model):
     def __unicode__(self):
         return self.name
 
+class BrokenUnicodeMethod(models.Model):
+    name = models.CharField(max_length=7)
+    def __unicode__(self):
+        return 'Názov: %s' % self.name
+
+
 __test__ = {'API_TESTS': """
 (NOTE: Part of the regression test here is merely parsing the model
 declaration. The verbose_name, in particular, did not always work.)
@@ -127,6 +133,12 @@ datetime.datetime(2000, 1, 1, 6, 1, 1)
 >>> w.save()
 >>> w
 <Worker: Full-time>
+
+# Models with broken unicode methods should still have a printable repr
+>>> b = BrokenUnicodeMethod(name="Jerry")
+>>> b.save()
+>>> BrokenUnicodeMethod.objects.all()
+[<BrokenUnicodeMethod: [Bad Unicode data]>]
 
 """
 }
