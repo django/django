@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 32. Callable defaults
 
@@ -19,7 +20,7 @@ class Article(models.Model):
     def __unicode__(self):
         return self.headline
 
-__test__ = {'API_TESTS':"""
+__test__ = {'API_TESTS': u"""
 >>> from datetime import datetime
 
 # No articles are in the system yet.
@@ -51,8 +52,8 @@ True
 
 # make sure that SafeString/SafeUnicode fields work
 >>> from django.utils.safestring import SafeUnicode, SafeString
->>> a.headline = SafeUnicode(u'SafeUnicode Headline')
+>>> a.headline = SafeUnicode(u'Iñtërnâtiônàlizætiøn1')
 >>> a.save()
->>> a.headline = SafeString(u'SafeString Headline')
+>>> a.headline = SafeString(u'Iñtërnâtiônàlizætiøn1'.encode('utf-8'))
 >>> a.save()
 """}
