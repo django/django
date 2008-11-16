@@ -266,7 +266,11 @@ class Model(object):
         signals.post_init.send(sender=self.__class__, instance=self)
 
     def __repr__(self):
-        return smart_str(u'<%s: %s>' % (self.__class__.__name__, unicode(self)))
+        try:
+            u = unicode(self)
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            u = '[Bad Unicode data]'
+        return smart_str(u'<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
         if hasattr(self, '__unicode__'):
