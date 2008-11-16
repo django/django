@@ -207,7 +207,7 @@ class LaxOptionParser(OptionParser):
                     # either way, add it to the args list so we can keep
                     # dealing with options
                     del rargs[0]
-                    raise error
+                    raise Exception
             except:
                 largs.append(arg)
 
