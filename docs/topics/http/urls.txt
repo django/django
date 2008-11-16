@@ -227,7 +227,7 @@ You can use the ``url()`` function, instead of a tuple, as an argument to
 optional extra arguments dictionary. For example::
 
     urlpatterns = patterns('',
-        url(r'/index/$', index_view, name="main-view"),
+        url(r'^index/$', index_view, name="main-view"),
         ...
     )
 
@@ -539,8 +539,8 @@ your URLconf. For example, these two URL patterns both point to the ``archive``
 view::
 
     urlpatterns = patterns('',
-        (r'/archive/(\d{4})/$', archive),
-        (r'/archive-summary/(\d{4})/$', archive, {'summary': True}),
+        (r'^archive/(\d{4})/$', archive),
+        (r'^archive-summary/(\d{4})/$', archive, {'summary': True}),
     )
 
 This is completely valid, but it leads to problems when you try to do reverse
@@ -557,8 +557,8 @@ matching.
 Here's the above example, rewritten to use named URL patterns::
 
     urlpatterns = patterns('',
-        url(r'/archive/(\d{4})/$', archive, name="full-archive"),
-        url(r'/archive-summary/(\d{4})/$', archive, {'summary': True}, "arch-summary"),
+        url(r'^archive/(\d{4})/$', archive, name="full-archive"),
+        url(r'^archive-summary/(\d{4})/$', archive, {'summary': True}, "arch-summary"),
     )
 
 With these names in place (``full-archive`` and ``arch-summary``), you can
