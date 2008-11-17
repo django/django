@@ -4,6 +4,8 @@ include INSTALL
 include LICENSE
 include MANIFEST.in
 include django/utils/simplejson/LICENSE.txt
+include django/contrib/gis/gdal/LICENSE
+include django/contrib/gis/geos/LICENSE
 recursive-include docs *
 recursive-include scripts *
 recursive-include examples *
