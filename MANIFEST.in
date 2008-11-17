@@ -3,6 +3,7 @@ include AUTHORS
 include INSTALL
 include LICENSE
 include MANIFEST.in
+include django/utils/simplejson/LICENSE.txt
 recursive-include docs *
 recursive-include scripts *
 recursive-include examples *
@@ -11,8 +12,11 @@ recursive-include django/conf/locale *
 recursive-include django/contrib/admin/templates *
 recursive-include django/contrib/admin/media *
 recursive-include django/contrib/admindocs/templates *
+recursive-include django/contrib/auth/fixtures *
+recursive-include django/contrib/auth/tests/templates *
 recursive-include django/contrib/comments/templates *
 recursive-include django/contrib/databrowse/templates *
+recursive-include django/contrib/formtools/templates *
 recursive-include django/contrib/gis/templates *
 recursive-include django/contrib/gis/tests/data *
 recursive-include django/contrib/gis/tests/geoapp/sql *
