@@ -17,6 +17,7 @@ class GeometryColumns(models.Model):
     srid = models.IntegerField(primary_key=True)
     # TODO: Add support for `diminfo` column (type MDSYS.SDO_DIM_ARRAY).
     class Meta:
+        app_label = 'gis'
         db_table = 'USER_SDO_GEOM_METADATA'
 
     @classmethod
@@ -50,6 +51,7 @@ class SpatialRefSys(models.Model, SpatialRefSysMixin):
     class Meta:
         # TODO: Figure out way to have this be MDSYS.CS_SRS without
         #  having django's quoting mess up the SQL.
+        app_label = 'gis'
         db_table = 'CS_SRS'
 
     @property
