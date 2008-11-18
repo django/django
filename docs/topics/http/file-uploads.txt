@@ -8,11 +8,11 @@ File Uploads
 
 .. versionadded:: 1.0
 
-Most Web sites wouldn't be complete without a way to upload files. When Django
-handles a file upload, the file data ends up placed in ``request.FILES`` (for
-more on the ``request`` object see the documentation for :ref:`request and
-response objects <ref-request-response>`). This document explains how files are
-stored on disk and in memory, and how to customize the default behavior.
+When Django handles a file upload, the file data ends up placed in
+``request.FILES`` (for more on the ``request`` object see the documentation for
+:ref:`request and response objects <ref-request-response>`). This document
+explains how files are stored on disk and in memory, and how to customize the
+default behavior.
 
 Basic file uploads
 ==================
