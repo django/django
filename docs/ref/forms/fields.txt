@@ -517,7 +517,7 @@ given length.
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``
 
 To learn more about the ``UploadedFile`` object, see the :ref:`file uploads
-documentation <topics-file-uploads>`.
+documentation <topics-http-file-uploads>`.
 
 When you use a ``FileField`` in a form, you must also remember to
 :ref:`bind the file data to the form <topics-file-uploads>`.

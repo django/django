@@ -1,4 +1,4 @@
-.. _topics-file-uploads:
+.. _topics-http-file-uploads:
 
 ============
 File Uploads
