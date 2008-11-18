@@ -33,151 +33,82 @@ Having trouble? We'd like to help!
 First steps
 ===========
 
-:ref:`Overview <intro-overview>`
-    See what writing a database-driven application with Django looks like.
+    * **From scratch:** :ref:`Overview <intro-overview>` | :ref:`Installation <intro-install>`
+    * **Tutorial:** :ref:`Part 1 <intro-tutorial01>` | :ref:`Part 2 <intro-tutorial02>` | :ref:`Part 3 <intro-tutorial03>` | :ref:`Part 4 <intro-tutorial04>`
 
-:ref:`Installation <intro-install>`
-    Get Django installed on your computer.
+The model layer
+===============
 
-Tutorial: Writing your first Django application
-===============================================
+    * **Models:** :ref:`Model syntax <topics-db-models>` | :ref:`Field types <ref-models-fields>` | :ref:`Meta options <ref-models-options>`
+    * **QuerySets:** :ref:`Executing queries <topics-db-queries>` | :ref:`QuerySet method reference <ref-models-querysets>`
+    * **Model instances:** :ref:`Instance methods <ref-models-instances>` | :ref:`Accessing related objects <ref-models-relations>`
+    * **Advanced:** :ref:`Managers <topics-db-managers>` | :ref:`Raw SQL <topics-db-sql>` | :ref:`Transactions <topics-db-transactions>` | :ref:`Custom fields <howto-custom-model-fields>`
+    * **Other:** :ref:`Supported databases <ref-databases>` | :ref:`Legacy databases <howto-legacy-databases>` | :ref:`Providing initial data <howto-initial-data>`
 
-:ref:`Part 1 <intro-tutorial01>`
-    Start a project, create models and play with the database API.
+The template layer
+==================
 
-:ref:`Part 2 <intro-tutorial02>`
-    Explore the automatically-generated admin site.
+    * **For designers:** :ref:`Syntax overview <topics-templates>` | :ref:`Built-in tags and filters <ref-templates-builtins>`
+    * **For programmers:** :ref:`Template API <ref-templates-api>` | :ref:`Custom tags and filters <howto-custom-template-tags>`
 
-:ref:`Part 3 <intro-tutorial03>`
-    Write the public interface views.
+The view layer
+==============
 
-:ref:`Part 4 <intro-tutorial04>`
-    Learn how to process forms.
+    * **The basics:** :ref:`URLconfs <topics-http-urls>` | :ref:`View functions <topics-http-views>` | :ref:`Shortcuts <topics-http-shortcuts>`
+    * **Reference:** :ref:`Request/response objects <ref-request-response>`
+    * **File uploads:** :ref:`Overview <topics-http-file-uploads>` | :ref:`File objects <ref-files-file>` | :ref:`Storage API <ref-files-storage>` | :ref:`Managing files <topics-files>` | :ref:`Custom storage <howto-custom-file-storage>`
+    * **Advanced:** :ref:`Generic views <ref-generic-views>` | :ref:`Generating CSV <howto-outputting-csv>` | :ref:`Generating PDF <howto-outputting-pdf>`
+    * **Middleware:** :ref:`Overview <topics-http-middleware>` | :ref:`Built-in middleware classes <ref-middleware>`
 
-Using Django
-============
+Forms
+=====
 
-:ref:`Models <topics-db-index>`
-    Design a single, definitive source of data about your data.
+    * **The basics:** :ref:`Overview <topics-forms-index>` | :ref:`Form API <ref-forms-api>` | :ref:`Built-in fields <ref-forms-fields>` | :ref:`Built-in widgets <ref-forms-widgets>`
+    * **Advanced:** :ref:`Forms for models <topics-forms-modelforms>` | :ref:`Integrating media <topics-forms-media>` | :ref:`Formsets <topics-forms-formsets>` | :ref:`Customizing validation <ref-forms-validation>`
+    * **Extras:** :ref:`Form preview <ref-contrib-formtools-form-preview>` | :ref:`Form wizard <ref-contrib-formtools-form-wizard>`
 
-:ref:`Handling web requests <topics-http-index>`
-    Handle web requests, map them to views and return pages.
+The development process
+=======================
 
-:ref:`Forms <topics-forms-index>`
-    Build and handle HTML forms.
+    * **Settings:** :ref:`Overview <topics-settings>` | :ref:`Full list of settings <ref-settings>`
+    * **django-admin.py and manage.py:** :ref:`Overview <ref-django-admin>` | :ref:`Adding custom commands <howto-custom-management-commands>`
+    * **Testing:** :ref:`Overview <topics-testing>`
+    * **Deployment:** :ref:`Overview <howto-deployment-index>` | :ref:`Apache/mod_python <howto-deployment-modpython>` | :ref:`FastCGI/SCGI/AJP <howto-deployment-fastcgi>` | :ref:`Apache authentication <howto-apache-auth>` | :ref:`Serving static files <howto-static-files>` | :ref:`Tracking code errors by e-mail <howto-error-reporting>`
 
-:ref:`Templates <topics-templates>`
-    Develop the visual design of your site.
+Other batteries included
+========================
 
-And more:
----------
-
+    * :ref:`Admin site <ref-contrib-admin>`
     * :ref:`Authentication <topics-auth>`
-    * :ref:`Caching <topics-cache>`
-    * :ref:`E-mail <topics-email>`
-    * :ref:`File-access APIs <topics-files>`
-    * :ref:`topics-i18n`
-    * :ref:`topics-pagination`
-    * :ref:`Serialization <topics-serialization>`
-    * :ref:`Sessions <topics-http-sessions>`
-    * :ref:`Settings/configuration <topics-settings>`
-    * :ref:`topics-signals`
-    * :ref:`Testing <topics-testing>`
-
-Add-on ("contrib") applications
-===============================
-
-:ref:`Django's automatic admin site <ref-contrib-admin>`
-    Get a clean Web interface to your data with little effort.
-
-:ref:`Form tools <ref-contrib-formtools-index>`
-    Easily handle complex form workflows.
-
-:ref:`Syndication feeds <ref-contrib-syndication>`
-    Generate RSS and Atom feeds of your data.
-
-:ref:`"Local flavor" <ref-contrib-localflavor>`
-    Give your site that special local touch.
-
-And more:
----------
-
+    * :ref:`Cache system <topics-cache>`
     * :ref:`Comments <ref-contrib-comments-index>`
     * :ref:`Content types <ref-contrib-contenttypes>`
     * :ref:`Cross Site Request Forgery protection <ref-contrib-csrf>`
     * :ref:`Databrowse <ref-contrib-databrowse>`
+    * :ref:`E-mail (sending) <topics-email>`
     * :ref:`Flatpages <ref-contrib-flatpages>`
     * :ref:`Humanize <ref-contrib-humanize>`
+    * :ref:`Internationalization <topics-i18n>`
+    * :ref:`Jython support <howto-jython>`
+    * :ref:`"Local flavor" <ref-contrib-localflavor>`
+    * :ref:`Pagination <topics-pagination>`
     * :ref:`Redirects <ref-contrib-redirects>`
+    * :ref:`Serialization <topics-serialization>`
+    * :ref:`Sessions <topics-http-sessions>`
+    * :ref:`Signals <topics-signals>`
     * :ref:`Sitemaps <ref-contrib-sitemaps>`
     * :ref:`Sites <ref-contrib-sites>`
+    * :ref:`Syndication feeds (RSS/Atom) <ref-contrib-syndication>`
+    * :ref:`Unicode in Django <ref-unicode>`
     * :ref:`Web design helpers <ref-contrib-webdesign>`
-    * :ref:`Markup <ref-contrib-markup>`
 
-Solving specific problems
-=========================
+The Django open-source project
+==============================
 
-:ref:`Deployment <howto-deployment-index>`
-    Release your project to the world.
+    * **Community:** :ref:`How to get involved <internals-contributing>` | :ref:`The release process <internals-release-process>` | :ref:`Team of committers <internals-committers>`
+    * **Design philosophies:** :ref:`Overview <misc-design-philosophies>`
+    * **Documentation:** :ref:`About this documentation <internals-documentation>`
+    * **Third-party distributions:** :ref:`Overview <misc-distributions>`
+    * **Django over time:** :ref:`API stability <misc-api-stability>` | :ref:`Archive of release notes <releases-index>` | `Backwards-incompatible changes`_
 
-:ref:`Importing data from legacy databases <howto-legacy-databases>`
-    Use Django with an existing database or alongside other web development
-    toolkits.
-
-:ref:`Custom template tags <howto-custom-template-tags>`
-    Add your own extensions to Django's template language.
-
-:ref:`Generating CSV <howto-outputting-csv>` & :ref:`PDF <howto-outputting-pdf>`
-    Produce non-HTML content with Django.
-
-And more:
----------
-
-    * :ref:`Authenticating in Apache <howto-apache-auth>`
-    * :ref:`howto-custom-file-storage`
-    * :ref:`howto-custom-management-commands`
-    * :ref:`howto-custom-model-fields`
-    * :ref:`Tracking code errors by e-mail <howto-error-reporting>`
-    * :ref:`howto-initial-data`
-    * :ref:`howto-jython`
-    * :ref:`Serving static files <howto-static-files>`
-
-Reference
-=========
-
-:ref:`Settings <ref-settings>`
-    See all of Django's settings and what they do.
-
-:ref:`Request & response objects <ref-request-response>`
-    Understand the classes Django uses to represent HTTP requests and responses.
-
-:ref:`Model API reference <ref-models-index>`
-    Revel in the gory details of Django's model system.
-
-:ref:`Form API reference <ref-forms-index>`
-    Learn the details of forms, fields and widgets.
-
-And more:
----------
-
-    * :ref:`ref-databases`
-    * :ref:`ref-django-admin`
-    * :ref:`ref-files-index`
-    * :ref:`ref-generic-views`
-    * :ref:`ref-middleware`
-    * :ref:`ref-templates-index`
-    * :ref:`ref-unicode`
-
-And all the rest
-================
-
-:ref:`Internals <internals-index>`
-    Learn how Django works under the hood and how you can contribute to the
-    project.
-
-:ref:`Release notes <releases-index>`
-    See what is and was new in each release of Django.
-
-:ref:`Miscellany <misc-index>`
-    Stuff we can't find a more organized place for. Like that drawer in your
-    kitchen with the scissors, batteries and duct tape.
+.. _Backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
