@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-04 01:50-0500\n"
-"PO-Revision-Date: 2008-11-04 02:05-0500\n"
+"POT-Creation-Date: 2008-11-14 02:20-0500\n"
+"PO-Revision-Date: 2008-11-14 02:21-0500\n"
 "Last-Translator: Alex <alex.gaynor@gmail.com>\n"
 "Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -100,114 +100,122 @@ msgid "Hebrew"
 msgstr "עברית"
 
 #: conf/global_settings.py:65
+msgid "Hindi"
+msgstr "הינדי"
+
+#: conf/global_settings.py:66
 msgid "Croatian"
 msgstr "קרואטית"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Icelandic"
 msgstr "איסלנדית"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Italian"
 msgstr "איטלקית"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Japanese"
 msgstr "יפנית"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Georgian"
 msgstr "גיאורגית"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Korean"
 msgstr "קוריאנית"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Khmer"
 msgstr "חמר"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Kannada"
 msgstr "קנדית"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Latvian"
 msgstr "לטבית"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Lithuanian"
 msgstr "ליטאית"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Macedonian"
 msgstr "מקדונית"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Dutch"
 msgstr "הולנדית"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Norwegian"
 msgstr "נורווגית"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Polish"
 msgstr "פולנית"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Portuguese"
 msgstr "פורטוגזית"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Brazilian Portuguese"
 msgstr "פורטוגזית ברזילאית"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Romanian"
 msgstr "רומנית"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Russian"
 msgstr "רוסית"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Slovak"
 msgstr "סלובקית"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Slovenian"
 msgstr "סלובנית"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Serbian"
 msgstr "סרבית"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Swedish"
 msgstr "שוודית"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Tamil"
 msgstr "טמילית"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:89
 msgid "Telugu"
 msgstr "טלגו"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
+msgid "Thai"
+msgstr "תאילנדית"
+
+#: conf/global_settings.py:91
 msgid "Turkish"
 msgstr "טורקית"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:92
 msgid "Ukrainian"
 msgstr "אוקראינית"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:93
 msgid "Simplified Chinese"
 msgstr "סינית פשוטה"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:94
 msgid "Traditional Chinese"
 msgstr "סינית מסורתית"
 
@@ -248,17 +256,17 @@ msgid "This year"
 msgstr "השנה"
 
 #: contrib/admin/filterspecs.py:146
-#: forms/widgets.py:391
+#: forms/widgets.py:390
 msgid "Yes"
 msgstr "כן"
 
 #: contrib/admin/filterspecs.py:146
-#: forms/widgets.py:391
+#: forms/widgets.py:390
 msgid "No"
 msgstr "לא"
 
 #: contrib/admin/filterspecs.py:153
-#: forms/widgets.py:391
+#: forms/widgets.py:390
 msgid "Unknown"
 msgstr "לא ידוע"
 
@@ -303,7 +311,7 @@ msgstr "%s שונה."
 #: contrib/admin/options.py:338
 #: contrib/admin/options.py:348
 #: contrib/comments/templates/comments/preview.html:15
-#: forms/models.py:278
+#: forms/models.py:288
 msgid "and"
 msgstr "ו"
 
@@ -358,6 +366,12 @@ msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן לער
 #, python-format
 msgid "Add %s"
 msgstr "הוספת %s"
+
+#: contrib/admin/options.py:559
+#: contrib/admin/options.py:673
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
 
 #: contrib/admin/options.py:606
 #, python-format
@@ -471,7 +485,7 @@ msgstr "אנו מצטערים, לא ניתן למצוא את הדף המבוקש
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/base.html:31
 #: contrib/admin/templates/admin/change_form.html:17
 #: contrib/admin/templates/admin/change_list.html:8
 #: contrib/admin/templates/admin/delete_confirmation.html:6
@@ -511,18 +525,18 @@ msgstr "התרחשה שגיאה. היא דווחה למנהלי האתר בדו�
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:26
 msgid "Welcome,"
 msgstr "שלום,"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:26
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "תיעוד"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:26
 #: contrib/admin/templates/admin/auth/user/change_password.html:13
 #: contrib/admin/templates/admin/auth/user/change_password.html:46
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -530,7 +544,7 @@ msgstr "תיעוד"
 msgid "Change password"
 msgstr "שינוי סיסמה"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:26
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
@@ -1134,7 +1148,7 @@ msgstr "שינוי סיסמה: %s"
 
 #: contrib/auth/forms.py:15
 #: contrib/auth/forms.py:48
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:127
 msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
 msgstr "דורש 30 תווים או פחות. תווים אלפאנומריים בלבד (אותיות, ספרות וקווים תחתונים)."
 
@@ -1194,106 +1208,106 @@ msgstr "סיסמה ישנה"
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "סיסמתך הישנה הוזנה בצורה שגויה. נא להזינה שוב."
 
-#: contrib/auth/models.py:72
-#: contrib/auth/models.py:95
+#: contrib/auth/models.py:63
+#: contrib/auth/models.py:86
 msgid "name"
 msgstr "שם"
 
-#: contrib/auth/models.py:74
+#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "שם קוד"
 
-#: contrib/auth/models.py:77
+#: contrib/auth/models.py:68
 msgid "permission"
 msgstr "הרשאה"
 
-#: contrib/auth/models.py:78
-#: contrib/auth/models.py:96
+#: contrib/auth/models.py:69
+#: contrib/auth/models.py:87
 msgid "permissions"
 msgstr "הרשאות"
 
-#: contrib/auth/models.py:99
+#: contrib/auth/models.py:90
 msgid "group"
 msgstr "קבוצה"
 
-#: contrib/auth/models.py:100
-#: contrib/auth/models.py:146
+#: contrib/auth/models.py:91
+#: contrib/auth/models.py:137
 msgid "groups"
 msgstr "קבוצות"
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:127
 msgid "username"
 msgstr "שם משתמש"
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:128
 msgid "first name"
 msgstr "שם פרטי"
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:129
 msgid "last name"
 msgstr "שם משפחה"
 
-#: contrib/auth/models.py:139
+#: contrib/auth/models.py:130
 msgid "e-mail address"
 msgstr "כתובת דוא\"ל"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:131
 msgid "password"
 msgstr "סיסמה"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:131
 msgid "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
 msgstr "יש להזין '[algo]$[salt]$[hexdigest]' או להשתמש ב<a href=\"password/\">טופס שינוי הסיסמה</a>."
 
-#: contrib/auth/models.py:141
+#: contrib/auth/models.py:132
 msgid "staff status"
 msgstr "סטטוס איש צוות"
 
-#: contrib/auth/models.py:141
+#: contrib/auth/models.py:132
 msgid "Designates whether the user can log into this admin site."
 msgstr "מציין האם המשתמש יכול להתחבר לאתר הניהול."
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:133
 msgid "active"
 msgstr "פעיל"
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:133
 msgid "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
 msgstr "מציין האם יש להתייחס למשתמש כפעיל. יש לבטל בחירה זו במקום למחוק חשבונות משתמשים."
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:134
 msgid "superuser status"
 msgstr "סטטוס משתמש על"
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:134
 msgid "Designates that this user has all permissions without explicitly assigning them."
 msgstr "מציין שלמשתמש זה יש את כל ההרשאות ללא הצורך המפורש בהענקתן."
 
-#: contrib/auth/models.py:144
+#: contrib/auth/models.py:135
 msgid "last login"
 msgstr "כניסה אחרונה"
 
-#: contrib/auth/models.py:145
+#: contrib/auth/models.py:136
 msgid "date joined"
 msgstr "תאריך הצטרפות"
 
-#: contrib/auth/models.py:147
+#: contrib/auth/models.py:138
 msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
 msgstr "בנוסף לכל ההרשאות שהוקצו ידנית, יוענקו למשתמש גם כל ההרשאות של כל קבוצה המשוייכת אליו."
 
-#: contrib/auth/models.py:148
+#: contrib/auth/models.py:139
 msgid "user permissions"
 msgstr "הרשאות משתמש"
 
-#: contrib/auth/models.py:152
+#: contrib/auth/models.py:143
 msgid "user"
 msgstr "משתמש"
 
-#: contrib/auth/models.py:153
+#: contrib/auth/models.py:144
 msgid "users"
 msgstr "משתמשים"
 
-#: contrib/auth/models.py:308
+#: contrib/auth/models.py:300
 msgid "message"
 msgstr "הודעה"
 
@@ -3684,12 +3698,12 @@ msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "נא לוודא שאין יותר מ-%s ספרות לפני הנקודה העשרונית"
 
 #: forms/fields.py:287
-#: forms/fields.py:848
+#: forms/fields.py:849
 msgid "Enter a valid date."
 msgstr "יש להזין תאריך חוקי."
 
 #: forms/fields.py:321
-#: forms/fields.py:849
+#: forms/fields.py:850
 msgid "Enter a valid time."
 msgstr "יש להזין שעה חוקית."
 
@@ -3729,15 +3743,15 @@ msgstr "יש לבחור אפשרות חוקית. %(value)s אינו בין הא�
 
 #: forms/fields.py:697
 #: forms/fields.py:758
-#: forms/models.py:710
+#: forms/models.py:720
 msgid "Enter a list of values."
 msgstr "יש להזין רשימת ערכים"
 
-#: forms/fields.py:877
+#: forms/fields.py:878
 msgid "Enter a valid IPv4 address."
 msgstr "יש להזין כתובת IPv4 חוקית."
 
-#: forms/fields.py:887
+#: forms/fields.py:888
 msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "יש להזין ערך המכיל אותיות, ספרות, קווים תחתונים ומקפים בלבד."
 
@@ -3746,47 +3760,47 @@ msgstr "יש להזין ערך המכיל אותיות, ספרות, קווים �
 msgid "Order"
 msgstr "מיון"
 
-#: forms/models.py:271
-#: forms/models.py:280
+#: forms/models.py:281
+#: forms/models.py:290
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s·עם·%(field_label)s·זה קיימת כבר."
 
-#: forms/models.py:577
+#: forms/models.py:587
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "הרצופות מפתח זר לא תאם את האב מופע המפתח העיקרי."
 
-#: forms/models.py:640
+#: forms/models.py:650
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "יש לבחור אפשרות חוקית; '%(data)s' אינו בין %(choices)s."
 
-#: forms/models.py:711
+#: forms/models.py:721
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "יש לבחור אפשרות חוקית. %s אינו בין האפשרויות הזמינות."
 
-#: template/defaultfilters.py:706
+#: template/defaultfilters.py:741
 msgid "yes,no,maybe"
 msgstr "כן,לא,אולי"
 
-#: template/defaultfilters.py:737
+#: template/defaultfilters.py:772
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d בית"
 msgstr[1] "%(size)d בתים"
 
-#: template/defaultfilters.py:739
+#: template/defaultfilters.py:774
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:741
+#: template/defaultfilters.py:776
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:742
+#: template/defaultfilters.py:777
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
