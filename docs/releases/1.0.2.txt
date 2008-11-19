@@ -8,8 +8,8 @@ Welcome to Django 1.0.2!
 
 This is the second "bugfix" release in the Django 1.0 series,
 improving the stability and performance of the Django 1.0 codebase. As
-such, Django 1.0.2 contains no new features (and, pursuant to `our
-compatibility policy`_, maintains backwards compatibility with Django
+such, Django 1.0.2 contains no new features (and, pursuant to
+:ref:`our compatibility policy <misc-api-stability>`, maintains backwards compatibility with Django
 1.0.2), but does contain a number of fixes and other
 improvements. Django 1.0.2 is a recommended upgrade for any
 development or deployment currently using or targeting Django 1.0.
