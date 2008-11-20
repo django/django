@@ -237,7 +237,7 @@ class ChangeList(object):
                     qs = qs.distinct()
                     break
 
-        if self.opts.one_to_one_field:
+        if self.is_popup and self.opts.one_to_one_field:
             qs = qs.complex_filter(self.opts.one_to_one_field.rel.limit_choices_to)
 
         return qs
