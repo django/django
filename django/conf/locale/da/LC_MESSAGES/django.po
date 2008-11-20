@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-05 21:55+0100\n"
+"POT-Creation-Date: 2008-11-16 20:27+0100\n"
 "PO-Revision-Date: 2008-11-07 20:41+0200\n"
 "Last-Translator: Finn Gruwier Larsen<finn@gruwier.dk>\n"
 "Language-Team: \n"
@@ -99,114 +99,122 @@ msgid "Hebrew"
 msgstr "Hebræisk"
 
 #: conf/global_settings.py:65
+msgid "Hindi"
+msgstr "Hindi"
+
+#: conf/global_settings.py:66
 msgid "Croatian"
 msgstr "Kroatisk"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Icelandic"
 msgstr "Islandsk"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Italian"
 msgstr "Italiensk"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Japanese"
 msgstr "Japansk"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Georgian"
 msgstr "Georgisk"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Korean"
 msgstr "Koreansk"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Khmer"
 msgstr "Khmer"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Kannada"
 msgstr "Kannada"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Latvian"
 msgstr "Lettisk"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Lithuanian"
 msgstr "Litauisk"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Macedonian"
 msgstr "Makedonsk"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Dutch"
 msgstr "Hollandsk"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Polish"
 msgstr "Polsk"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Portuguese"
 msgstr "Portugisisk"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Brazilian Portuguese"
 msgstr "Brasiliansk portugisisk"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Romanian"
 msgstr "Rumænsk"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Russian"
 msgstr "Russisk"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Slovak"
 msgstr "Slovakisk"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Slovenian"
 msgstr "Slovensk"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Serbian"
 msgstr "Serbisk"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Swedish"
 msgstr "Svensk"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Tamil"
 msgstr "Tamil"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:89
 msgid "Telugu"
 msgstr "Telugu"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
+msgid "Thai"
+msgstr "Thai"
+
+#: conf/global_settings.py:91
 msgid "Turkish"
 msgstr "Tyrkisk"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:92
 msgid "Ukrainian"
 msgstr "Ukrainsk"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:93
 msgid "Simplified Chinese"
 msgstr "Forenklet kinesisk"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:94
 msgid "Traditional Chinese"
 msgstr "Traditionelt kinesisk"
 
@@ -348,6 +356,11 @@ msgstr "%(name)s \"%(obj)s\" blev tilføjet. Du kan redigere det igen herunder."
 msgid "Add %s"
 msgstr "Tilføj %s"
 
+#: contrib/admin/options.py:559 contrib/admin/options.py:673
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Der findes ikke et %(name)s-objekt med primærnøgle %(key)r."
+
 #: contrib/admin/options.py:606
 #, python-format
 msgid "Change %s"
@@ -462,7 +475,7 @@ msgstr "Vi beklager, men den ønskede side kunne ikke findes"
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:31
+#: contrib/admin/templates/admin/base.html:33
 #: contrib/admin/templates/admin/change_form.html:17
 #: contrib/admin/templates/admin/change_list.html:8
 #: contrib/admin/templates/admin/delete_confirmation.html:6
@@ -506,18 +519,18 @@ msgstr ""
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:28
 msgid "Welcome,"
 msgstr "Velkommen,"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Dokumentation"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/admin/auth/user/change_password.html:13
 #: contrib/admin/templates/admin/auth/user/change_password.html:46
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -525,7 +538,7 @@ msgstr "Dokumentation"
 msgid "Change password"
 msgstr "Skift adgangskode"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
@@ -664,7 +677,7 @@ msgstr "Funktion"
 #: contrib/admin/templates/admin/object_history.html:30
 #: utils/translation/trans_real.py:404
 msgid "DATETIME_FORMAT"
-msgstr "DATETIME_FORMAT"
+msgstr "j. F Y H:i"
 
 #: contrib/admin/templates/admin/object_history.html:38
 msgid ""
@@ -1499,7 +1512,8 @@ msgstr "Tak for godkendelsen"
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
 msgstr ""
-"Tak fordi du tog dig tid til at højne kvaliteten af diskussionen på vores website."
+"Tak fordi du tog dig tid til at højne kvaliteten af diskussionen på vores "
+"website"
 
 #: contrib/comments/templates/comments/delete.html:4
 msgid "Remove a comment"
@@ -3796,11 +3810,11 @@ msgstr "Der må højst være %s decimalpladser."
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Der må maksimalt være %s cifre før decimaltegnet."
 
-#: forms/fields.py:287 forms/fields.py:848
+#: forms/fields.py:287 forms/fields.py:849
 msgid "Enter a valid date."
 msgstr "Indtast en gyldig dato."
 
-#: forms/fields.py:321 forms/fields.py:849
+#: forms/fields.py:321 forms/fields.py:850
 msgid "Enter a valid time."
 msgstr "Indtast en gyldig tid."
 
@@ -3843,15 +3857,15 @@ msgstr ""
 "Marker en gyldigt valgmulighed; '%(value)s' er ikke en af de tilgængelige "
 "valgmuligheder."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:720
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:714
 msgid "Enter a list of values."
 msgstr "Indtast en liste af værdier."
 
-#: forms/fields.py:877
+#: forms/fields.py:878
 msgid "Enter a valid IPv4 address."
 msgstr "Indtast en gyldig IPv4-adresse."
 
-#: forms/fields.py:887
+#: forms/fields.py:888
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -3866,44 +3880,44 @@ msgstr "Rækkefølge"
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s med dette %(field_label)s eksisterer allerede."
 
-#: forms/models.py:587
+#: forms/models.py:581
 msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
+msgstr "Den indlejrede fremmednøgle passede ikke med forælderinstansens primærnøgle."
 
-#: forms/models.py:650
+#: forms/models.py:644
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Marker en gyldig valgmulighed. Det valg, du har foretaget, er ikke blandt de "
 "tilgængelige valgmuligheder."
 
-#: forms/models.py:721
+#: forms/models.py:715
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr ""
 "Marker et gyldigt valg. %s er ikke en af de tilgængelige valgmuligheder."
 
-#: template/defaultfilters.py:706
+#: template/defaultfilters.py:743
 msgid "yes,no,maybe"
 msgstr "ja,nej,måske"
 
-#: template/defaultfilters.py:737
+#: template/defaultfilters.py:774
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
 
-#: template/defaultfilters.py:739
+#: template/defaultfilters.py:776
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:741
+#: template/defaultfilters.py:778
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:742
+#: template/defaultfilters.py:779
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
@@ -3990,51 +4004,51 @@ msgstr "Søn"
 
 #: utils/dates.py:18
 msgid "January"
-msgstr "Januar"
+msgstr "januar"
 
 #: utils/dates.py:18
 msgid "February"
-msgstr "Februar"
+msgstr "februar"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "March"
-msgstr "Marts"
+msgstr "marts"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "April"
-msgstr "April"
+msgstr "april"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "May"
-msgstr "Maj"
+msgstr "maj"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "June"
-msgstr "Juni"
+msgstr "juni"
 
 #: utils/dates.py:19 utils/dates.py:31
 msgid "July"
-msgstr "Juli"
+msgstr "juli"
 
 #: utils/dates.py:19
 msgid "August"
-msgstr "August"
+msgstr "august"
 
 #: utils/dates.py:19
 msgid "September"
-msgstr "September"
+msgstr "september"
 
 #: utils/dates.py:19
 msgid "October"
-msgstr "Oktober"
+msgstr "oktober"
 
 #: utils/dates.py:19
 msgid "November"
-msgstr "November"
+msgstr "november"
 
 #: utils/dates.py:20
 msgid "December"
-msgstr "December"
+msgstr "december"
 
 #: utils/dates.py:23
 msgid "jan"
@@ -4168,19 +4182,19 @@ msgstr ", %(number)d %(type)s"
 
 #: utils/translation/trans_real.py:403
 msgid "DATE_FORMAT"
-msgstr "DATE_FORMAT"
+msgstr "j. F Y"
 
 #: utils/translation/trans_real.py:405
 msgid "TIME_FORMAT"
-msgstr "TIME_FORMAT"
+msgstr "H:i"
 
 #: utils/translation/trans_real.py:421
 msgid "YEAR_MONTH_FORMAT"
-msgstr "YEAR_MONTH_FORMAT"
+msgstr "F Y"
 
 #: utils/translation/trans_real.py:422
 msgid "MONTH_DAY_FORMAT"
-msgstr "MONTH_DAY_FORMAT"
+msgstr "j. F"
 
 #: views/generic/create_update.py:114
 #, python-format
