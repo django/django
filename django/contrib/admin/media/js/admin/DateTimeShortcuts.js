@@ -109,11 +109,11 @@ var DateTimeShortcuts = {
     
         // Show the clock box
         clock_box.style.display = 'block';
-        addEvent(window, 'click', function() { DateTimeShortcuts.dismissClock(num); return true; });
+        addEvent(window.document, 'click', function() { DateTimeShortcuts.dismissClock(num); return true; });
     },
     dismissClock: function(num) {
        document.getElementById(DateTimeShortcuts.clockDivName + num).style.display = 'none';
-       window.onclick = null;
+       window.document.onclick = null;
     },
     handleClockQuicklink: function(num, val) {
        DateTimeShortcuts.clockInputs[num].value = val;
@@ -224,10 +224,11 @@ var DateTimeShortcuts = {
         cal_box.style.top = findPosY(cal_link) - 75 + 'px';
     
         cal_box.style.display = 'block';
-        addEvent(window, 'click', function() { DateTimeShortcuts.dismissCalendar(num); return true; });
+        addEvent(window.document, 'click', function() { DateTimeShortcuts.dismissCalendar(num); return true; });
     },
     dismissCalendar: function(num) {
         document.getElementById(DateTimeShortcuts.calendarDivName1+num).style.display = 'none';
+        window.document.onclick = null;
     },
     drawPrev: function(num) {
         DateTimeShortcuts.calendars[num].drawPreviousMonth();
