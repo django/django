@@ -244,7 +244,7 @@ over them::
 
     {% if form.subject.errors %}
         <ol>
-        {% for error in form.message.errors %}
+        {% for error in form.subject.errors %}
             <li><strong>{{ error|escape }}</strong></li>
         {% endfor %}
         </ol>
