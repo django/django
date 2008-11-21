@@ -15,11 +15,6 @@ How do I get started?
 .. _`Download the code`: http://www.djangoproject.com/download/
 .. _ask questions: http://www.djangoproject.com/community/
 
-How do I fix the "install a later version of setuptools" error?
----------------------------------------------------------------
-
-Just run the ``ez_setup.py`` script in the Django distribution.
-
 What are Django's prerequisites?
 --------------------------------
 
