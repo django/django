@@ -147,7 +147,7 @@ class ModPythonRequest(http.HttpRequest):
                 'REQUEST_METHOD':    self._req.method,
                 'SCRIPT_NAME':       self.django_root,
                 'SERVER_NAME':       self._req.server.server_hostname,
-                'SERVER_PORT':       self._req.server.port,
+                'SERVER_PORT':       self._req.connection.local_addr[1],
                 'SERVER_PROTOCOL':   self._req.protocol,
                 'SERVER_SOFTWARE':   'mod_python'
             }
