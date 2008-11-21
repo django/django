@@ -756,7 +756,7 @@ msgstr "Podaj nowe hasło dla użytkownika <strong>%(username)s</strong>."
 
 #: contrib/admin/templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
-msgstr "Usuąć?"
+msgstr "Usunąć?"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
