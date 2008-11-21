@@ -48,8 +48,10 @@ PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?
 ----------------------------------------------------------------------------------------
 
-No. Django itself is guaranteed to work with any version of Python from 2.3
-and higher.
+No, not in the core framework. Django itself is guaranteed to work with any
+version of Python from 2.3 and higher. However, some "django.contrib" add-on 
+components may require a more recent Python release.  The django.contrib.gis
+component, for example, requires Python 2.4.
 
 If you use a Python version newer than 2.3, you will, of course, be able to
 take advantage of newer Python features in your own code, along with the speed
