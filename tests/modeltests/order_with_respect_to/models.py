@@ -68,7 +68,7 @@ The ordering can be altered:
 >>> id_list = [o.pk for o in q1.answer_set.all()]
 >>> x = id_list.pop()
 >>> id_list.insert(-1, x)
->>> a5.question.get_answer_order == id_list
+>>> a5.question.get_answer_order() == id_list
 False
 >>> a5.question.set_answer_order(id_list)
 >>> q1.answer_set.all()
