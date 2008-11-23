@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-06 21:27+0100\n"
+"POT-Creation-Date: 2008-11-23 21:07+0100\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -99,114 +99,122 @@ msgid "Hebrew"
 msgstr "hebrajski"
 
 #: conf/global_settings.py:65
+msgid "Hindi"
+msgstr "hindi"
+
+#: conf/global_settings.py:66
 msgid "Croatian"
 msgstr "chorwacki"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Icelandic"
 msgstr "islandzki"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Italian"
 msgstr "włoski"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Japanese"
 msgstr "japoński"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Georgian"
 msgstr "gruziński"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Korean"
 msgstr "koreański"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Khmer"
 msgstr "khmerski"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Kannada"
 msgstr "kannada"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Latvian"
 msgstr "łotewski"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Lithuanian"
 msgstr "litewski"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Macedonian"
 msgstr "macedoński"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Dutch"
 msgstr "holenderski"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Norwegian"
 msgstr "norweski"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Polish"
 msgstr "polski"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Portuguese"
 msgstr "portugalski"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Brazilian Portuguese"
 msgstr "brazylijski portugalski"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Romanian"
 msgstr "rumuński"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Russian"
 msgstr "rosyjski"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Slovak"
 msgstr "słowacki"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Slovenian"
 msgstr "słoweński"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Serbian"
 msgstr "serbski"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Swedish"
 msgstr "szwedzki"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Tamil"
 msgstr "tamilski"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:89
 msgid "Telugu"
 msgstr "telugu"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
+msgid "Thai"
+msgstr "tajski"
+
+#: conf/global_settings.py:91
 msgid "Turkish"
 msgstr "turecki"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:92
 msgid "Ukrainian"
 msgstr "ukraiński"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:93
 msgid "Simplified Chinese"
 msgstr "chiński uproszczony"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:94
 msgid "Traditional Chinese"
 msgstr "chiński tradycyjny"
 
@@ -468,7 +476,7 @@ msgstr "Niestety, żądana strona nie została znaleziona."
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:31
+#: contrib/admin/templates/admin/base.html:33
 #: contrib/admin/templates/admin/change_form.html:17
 #: contrib/admin/templates/admin/change_list.html:8
 #: contrib/admin/templates/admin/delete_confirmation.html:6
@@ -513,18 +521,18 @@ msgstr ""
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:28
 msgid "Welcome,"
 msgstr "Witaj,"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Dokumentacja"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/admin/auth/user/change_password.html:13
 #: contrib/admin/templates/admin/auth/user/change_password.html:46
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -532,7 +540,7 @@ msgstr "Dokumentacja"
 msgid "Change password"
 msgstr "Zmiana hasła"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
@@ -3812,11 +3820,11 @@ msgstr "Upewnij się, że jest nie więcej niż %s miejsc po przecinku."
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Upewnij się, że jest nie więcej niż %s miejsc przed przecinkiem."
 
-#: forms/fields.py:287 forms/fields.py:848
+#: forms/fields.py:287 forms/fields.py:849
 msgid "Enter a valid date."
 msgstr "Wpisz poprawną datę."
 
-#: forms/fields.py:321 forms/fields.py:849
+#: forms/fields.py:321 forms/fields.py:850
 msgid "Enter a valid time."
 msgstr "Wpisz poprawną godzinę."
 
@@ -3858,15 +3866,15 @@ msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Wybierz poprawną wartość. %(value)s nie jest jednym z dostępnych wyborów."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:720
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:714
 msgid "Enter a list of values."
 msgstr "Podaj listę wartości."
 
-#: forms/fields.py:877
+#: forms/fields.py:878
 msgid "Enter a valid IPv4 address."
 msgstr "Wprowadź poprawny adres IPv4."
 
-#: forms/fields.py:887
+#: forms/fields.py:888
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "To pole może zawierać jedynie litery, cyfry, podkreślenia i myślniki."
@@ -3880,24 +3888,24 @@ msgstr "Porządek"
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(field_label)s już istnieje w %(model_name)s."
 
-#: forms/models.py:587
+#: forms/models.py:581
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "Osadzony klucz obcy nie pasuje do klucza głównego obiektu rodzica."
 
-#: forms/models.py:650
+#: forms/models.py:644
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wyborów."
 
-#: forms/models.py:721
+#: forms/models.py:715
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Wybierz poprawną wartość. %s nie jest jednym z dostępnych wyborów."
 
-#: template/defaultfilters.py:706
+#: template/defaultfilters.py:743
 msgid "yes,no,maybe"
 msgstr "tak,nie,może"
 
-#: template/defaultfilters.py:737
+#: template/defaultfilters.py:774
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
@@ -3905,17 +3913,17 @@ msgstr[0] "%(size)d bajt"
 msgstr[1] "%(size)d bajty"
 msgstr[2] "%(size)d bajtów"
 
-#: template/defaultfilters.py:739
+#: template/defaultfilters.py:776
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:741
+#: template/defaultfilters.py:778
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:742
+#: template/defaultfilters.py:779
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
