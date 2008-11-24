@@ -679,14 +679,14 @@ def do_for(parser, token):
                                       " %s" % token.contents)
 
     sequence = parser.compile_filter(bits[in_index+1])
-    nodelist_loop = parser.parse(('default', 'endfor',))
+    nodelist_loop = parser.parse(('empty', 'endfor',))
     token = parser.next_token()
-    if token.contents == 'default':
-        nodelist_default = parser.parse(('endfor',))
+    if token.contents == 'empty':
+        nodelist_empty = parser.parse(('endfor',))
         parser.delete_first_token()
     else:
-        nodelist_default = None
-    return ForNode(loopvars, sequence, is_reversed, nodelist_loop, nodelist_default)
+        nodelist_empty = None
+    return ForNode(loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty)
 do_for = register.tag("for", do_for)
 
 def do_ifequal(parser, token, negate):
