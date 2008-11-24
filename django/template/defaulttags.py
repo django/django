@@ -83,10 +83,14 @@ class FirstOfNode(Node):
         return u''
 
 class ForNode(Node):
-    def __init__(self, loopvars, sequence, is_reversed, nodelist_loop):
+    def __init__(self, loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty=None):
         self.loopvars, self.sequence = loopvars, sequence
         self.is_reversed = is_reversed
         self.nodelist_loop = nodelist_loop
+        if nodelist_empty is None:
+            self.nodelist_empty = NodeList()
+        else:
+            self.nodelist_empty = nodelist_empty
 
     def __repr__(self):
         reversed_text = self.is_reversed and ' reversed' or ''
@@ -97,16 +101,18 @@ class ForNode(Node):
     def __iter__(self):
         for node in self.nodelist_loop:
             yield node
+        for node in self.nodelist_empty:
+            yield node
 
     def get_nodes_by_type(self, nodetype):
         nodes = []
         if isinstance(self, nodetype):
             nodes.append(self)
         nodes.extend(self.nodelist_loop.get_nodes_by_type(nodetype))
+        nodes.extend(self.nodelist_empty.get_nodes_by_type(nodetype))
         return nodes
 
     def render(self, context):
-        nodelist = NodeList()
         if 'forloop' in context:
             parentloop = context['forloop']
         else:
@@ -121,6 +127,9 @@ class ForNode(Node):
         if not hasattr(values, '__len__'):
             values = list(values)
         len_values = len(values)
+        if len_values < 1:
+            return self.nodelist_empty.render(context)
+        nodelist = NodeList()
         if self.is_reversed:
             values = reversed(values)
         unpack = len(self.loopvars) > 1
@@ -610,6 +619,30 @@ def do_for(parser, token):
             {{ key }}: {{ value }}
         {% endfor %}
 
+    The ``for`` tag can take an optional ``{% empty %}`` clause that will
+    be displayed if the given array is empty or could not be found::
+
+        <ul>
+          {% for athlete in athlete_list %}
+            <li>{{ athlete.name }}</li>
+          {% empty %}
+            <li>Sorry, no athletes in this list.</li>
+          {% endfor %}
+        <ul>
+        
+    The above is equivalent to -- but shorter, cleaner, and possibly faster
+    than -- the following::
+    
+        <ul>
+          {% if althete_list %}
+            {% for athlete in athlete_list %}
+              <li>{{ athlete.name }}</li>
+            {% endfor %}
+          {% else %}
+            <li>Sorry, no athletes in this list.</li>
+          {% endif %}
+        </ul>
+
     The for loop sets a number of variables available within the loop:
 
         ==========================  ================================================
@@ -646,9 +679,14 @@ def do_for(parser, token):
                                       " %s" % token.contents)
 
     sequence = parser.compile_filter(bits[in_index+1])
-    nodelist_loop = parser.parse(('endfor',))
-    parser.delete_first_token()
-    return ForNode(loopvars, sequence, is_reversed, nodelist_loop)
+    nodelist_loop = parser.parse(('default', 'endfor',))
+    token = parser.next_token()
+    if token.contents == 'default':
+        nodelist_default = parser.parse(('endfor',))
+        parser.delete_first_token()
+    else:
+        nodelist_default = None
+    return ForNode(loopvars, sequence, is_reversed, nodelist_loop, nodelist_default)
 do_for = register.tag("for", do_for)
 
 def do_ifequal(parser, token, negate):

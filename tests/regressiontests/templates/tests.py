@@ -484,6 +484,9 @@ class Templates(unittest.TestCase):
             'for-tag-unpack11': ("{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, ("one:1,/two:2,/", "one:1,INVALID/two:2,INVALID/")),
             'for-tag-unpack12': ("{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": (('one', 1, 'carrot'), ('two', 2))}, ("one:1,carrot/two:2,/", "one:1,carrot/two:2,INVALID/")),
             'for-tag-unpack13': ("{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": (('one', 1, 'carrot'), ('two', 2, 'cheese'))}, ("one:1,carrot/two:2,cheese/", "one:1,carrot/two:2,cheese/")),
+            'for-tag-default01': ("{% for val in values %}{{ val }}{% default %}default text{% endfor %}", {"values": [1, 2, 3]}, "123"),
+            'for-tag-default02': ("{% for val in values %}{{ val }}{% default %}values array empty{% endfor %}", {"values": []}, "values array empty"),
+            'for-tag-default03': ("{% for val in values %}{{ val }}{% default %}values array not found{% endfor %}", {}, "values array not found"),
 
             ### IF TAG ################################################################
             'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),

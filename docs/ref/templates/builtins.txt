@@ -234,6 +234,35 @@ The for loop sets a number of variables available within the loop:
                                 current one
     ==========================  ================================================
 
+for ... empty
+^^^^^^^^^^^^^
+
+.. versionadded:: 1.1
+
+The ``for`` tag can take an optional ``{% empty %}`` clause that will be
+displayed if the given array is empty or could not be found::
+
+    <ul>
+    {% for athlete in athlete_list %}
+        <li>{{ athlete.name }}</li>
+    {% empty %}
+        <li>Sorry, no athlete in this list!</li>
+    {% endfor %}
+    <ul>
+
+The above is equivalent to -- but shorter, cleaner, and possibly faster
+than -- the following::
+
+    <ul>
+      {% if althete_list %}
+        {% for athlete in athlete_list %}
+          <li>{{ athlete.name }}</li>
+        {% endfor %}
+      {% else %}
+        <li>Sorry, no athletes in this list.</li>
+      {% endif %}
+    </ul>
+
 .. templatetag:: if
 
 if
