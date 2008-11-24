@@ -76,12 +76,46 @@ if settings.DATABASE_ENGINE != 'mysql':
 >>> management.call_command('loaddata', 'fixture2', verbosity=0) # doctest: +ELLIPSIS
 Multiple fixtures named 'fixture2' in '...fixtures'. Aborting.
 
+# object list is unaffected
 >>> Article.objects.all()
 [<Article: Time to reform copyright>, <Article: Poker has no place on ESPN>, <Article: Python program becomes self aware>]
 
 # Dump the current contents of the database as a JSON fixture
 >>> management.call_command('dumpdata', 'fixtures', format='json')
 [{"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:00"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16 12:00:00"}}, {"pk": 1, "model": "fixtures.article", "fields": {"headline": "Python program becomes self aware", "pub_date": "2006-06-16 11:00:00"}}]
+
+# Load fixture 4 (compressed), using format discovery
+>>> management.call_command('loaddata', 'fixture4', verbosity=0)
+>>> Article.objects.all()
+[<Article: Django pets kitten>, <Article: Time to reform copyright>, <Article: Poker has no place on ESPN>, <Article: Python program becomes self aware>]
+
+>>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Load fixture 4 (compressed), using format specification
+>>> management.call_command('loaddata', 'fixture4.json', verbosity=0)
+>>> Article.objects.all()
+[<Article: Django pets kitten>, <Article: Python program becomes self aware>]
+
+>>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Load fixture 5 (compressed), using format *and* compression specification
+>>> management.call_command('loaddata', 'fixture5.json.zip', verbosity=0)
+>>> Article.objects.all()
+[<Article: WoW subscribers now outnumber readers>, <Article: Python program becomes self aware>]
+
+>>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Load fixture 5 (compressed), only compression specification
+>>> management.call_command('loaddata', 'fixture5.zip', verbosity=0)
+>>> Article.objects.all()
+[<Article: WoW subscribers now outnumber readers>, <Article: Python program becomes self aware>]
+
+>>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Try to load fixture 5 using format and compression discovery; this will fail
+# because there are two fixture5's in the fixtures directory
+>>> management.call_command('loaddata', 'fixture5', verbosity=0) # doctest: +ELLIPSIS
+Multiple fixtures named 'fixture5' in '...fixtures'. Aborting.
 """
 
 from django.test import TestCase

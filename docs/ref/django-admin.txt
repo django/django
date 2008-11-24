@@ -290,6 +290,9 @@ loaddata <fixture fixture ...>
 
 Searches for and loads the contents of the named fixture into the database.
 
+What's a "fixture"?
+~~~~~~~~~~~~~~~~~~~
+
 A *fixture* is a collection of files that contain the serialized contents of
 the database. Each fixture has a unique name, and the files that comprise the
 fixture can be distributed over multiple directories, in multiple applications.
@@ -309,21 +312,17 @@ will be loaded. For example::
     django-admin.py loaddata mydata.json
 
 would only load JSON fixtures called ``mydata``. The fixture extension
-must correspond to the registered name of a serializer (e.g., ``json`` or
-``xml``).
+must correspond to the registered name of a
+:ref:`serializer <serialization-formats>` (e.g., ``json`` or ``xml``).
 
-If you omit the extension, Django will search all available fixture types
+If you omit the extensions, Django will search all available fixture types
 for a matching fixture. For example::
 
     django-admin.py loaddata mydata
 
 would look for any fixture of any fixture type called ``mydata``. If a fixture
 directory contained ``mydata.json``, that fixture would be loaded
-as a JSON fixture. However, if two fixtures with the same name but different
-fixture type are discovered (for example, if ``mydata.json`` and
-``mydata.xml`` were found in the same fixture directory), fixture
-installation will be aborted, and any data installed in the call to
-``loaddata`` will be removed from the database.
+as a JSON fixture.
 
 The fixtures that are named can include directory components. These
 directories will be included in the search path. For example::
@@ -341,6 +340,23 @@ supports row-level constraints, these constraints will be checked at the
 end of the transaction.
 
 The ``dumpdata`` command can be used to generate input for ``loaddata``.
+
+Compressed fixtures
+~~~~~~~~~~~~~~~~~~~
+
+Fixtures may be compressed in ``zip``, ``gz``, or ``bz2`` format. For example::
+
+    django-admin.py loaddata mydata.json
+
+would look for any of ``mydata.json``, ``mydata.json.zip``,
+``mydata.json.gz``, or ``mydata.json.bz2``.  The first file contained within a
+zip-compressed archive is used.
+
+Note that if two fixtures with the same name but different
+fixture type are discovered (for example, if ``mydata.json`` and
+``mydata.xml.gz`` were found in the same fixture directory), fixture
+installation will be aborted, and any data installed in the call to
+``loaddata`` will be removed from the database.
 
 .. admonition:: MySQL and Fixtures
 
