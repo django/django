@@ -160,7 +160,7 @@ class Command(BaseCommand):
                                                  (full_path, traceback.format_exc())))
                                     return
                                 fixture.close()
-                                
+
                                 # If the fixture we loaded contains 0 objects, assume that an
                                 # error was encountered during fixture loading.
                                 if objects_in_fixture == 0:
@@ -170,7 +170,7 @@ class Command(BaseCommand):
                                     transaction.rollback()
                                     transaction.leave_transaction_management()
                                     return
-                                
+
                         except Exception, e:
                             if verbosity > 1:
                                 print "No %s fixture '%s' in %s." % \
