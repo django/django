@@ -119,13 +119,13 @@ def sql_reset(app, style):
 def sql_flush(style, only_django=False):
     """
     Returns a list of the SQL statements used to flush the database.
-    
+
     If only_django is True, then only table names that have associated Django
     models and are in INSTALLED_APPS will be included.
     """
     from django.db import connection
     if only_django:
-        tables = connection.introspection.django_table_names()
+        tables = connection.introspection.django_table_names(only_existing=True)
     else:
         tables = connection.introspection.table_names()
     statements = connection.ops.sql_flush(style, tables, connection.introspection.sequence_list())
