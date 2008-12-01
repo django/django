@@ -1,9 +1,11 @@
-from django.core.management.base import BaseCommand
-from django.core.management.color import no_style
-from optparse import make_option
 import sys
 import os
-import bz2, gzip, zipfile
+import gzip
+import zipfile
+from optparse import make_option
+
+from django.core.management.base import BaseCommand
+from django.core.management.color import no_style
 
 try:
     set
