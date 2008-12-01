@@ -10,6 +10,12 @@ try:
 except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
+try:
+    import bz2
+    has_bz2 = True
+except ImportError:
+    has_bz2 = False
+
 class Command(BaseCommand):
     help = 'Installs the named fixture(s) in the database.'
     args = "fixture [fixture ...]"
@@ -62,10 +68,11 @@ class Command(BaseCommand):
 
         compression_types = {
             None:   file,
-            'bz2':  bz2.BZ2File,
             'gz':   gzip.GzipFile,
             'zip':  SingleZipReader
         }
+        if has_bz2:
+            compression_types['bz2'] = bz2.BZ2File
 
         app_fixtures = [os.path.join(os.path.dirname(app.__file__), 'fixtures') for app in get_apps()]
         for fixture_label in fixture_labels:
