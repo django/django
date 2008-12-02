@@ -1,4 +1,5 @@
 from django.db import connection, transaction
+from django.db.backends import util
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist
 from django.db.models.related import RelatedObject
@@ -771,7 +772,8 @@ class ManyToManyField(RelatedField, Field):
         elif self.db_table:
             return self.db_table
         else:
-            return '%s_%s' % (opts.db_table, self.name)
+            return util.truncate_name('%s_%s' % (opts.db_table, self.name),
+                                      connection.ops.max_name_length())
 
     def _get_m2m_column_name(self, related):
         "Function that can be curried to provide the source column name for the m2m table"
