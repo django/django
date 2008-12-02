@@ -32,7 +32,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'OneToOneField':                'NUMBER(11)',
         'PositiveIntegerField':         'NUMBER(11) CHECK (%(qn_column)s >= 0)',
         'PositiveSmallIntegerField':    'NUMBER(11) CHECK (%(qn_column)s >= 0)',
-        'SlugField':                    'NVARCHAR2(50)',
+        'SlugField':                    'NVARCHAR2(%(max_length)s)',
         'SmallIntegerField':            'NUMBER(11)',
         'TextField':                    'NCLOB',
         'TimeField':                    'TIMESTAMP',

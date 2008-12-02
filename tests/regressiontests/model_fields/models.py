@@ -36,6 +36,9 @@ class Whiz(models.Model):
 class BigD(models.Model):
     d = models.DecimalField(max_digits=38, decimal_places=30)
 
+class BigS(models.Model):
+    s = models.SlugField(max_length=255)
+
 __test__ = {'API_TESTS':"""
 # Create a couple of Places.
 >>> f = Foo.objects.create(a='abc', d=decimal.Decimal("12.34"))
@@ -87,5 +90,11 @@ u''
 >>> bd.save()
 >>> bd = BigD.objects.get(pk=bd.pk)
 >>> bd.d == decimal.Decimal("12.9")
+True
+
+# Regression test for #9706: ensure SlugField honors max_length.
+>>> bs = BigS.objects.create(s = 'slug' * 50)
+>>> bs = BigS.objects.get(pk=bs.pk)
+>>> bs.s == 'slug' * 50
 True
 """}
