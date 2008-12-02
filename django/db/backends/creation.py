@@ -126,7 +126,7 @@ class BaseDatabaseCreation(object):
                 # So we are careful with character usage here.
                 r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s;' % \
-                    (qn(r_table), truncate_name(r_name, self.connection.ops.max_name_length()),
+                    (qn(r_table), qn(truncate_name(r_name, self.connection.ops.max_name_length())),
                     qn(r_col), qn(table), qn(col),
                     self.connection.ops.deferrable_sql()))
             del pending_references[model]
@@ -186,7 +186,7 @@ class BaseDatabaseCreation(object):
                         abs(hash((r_table, table))))
                 output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s;' %
                 (qn(r_table),
-                truncate_name(r_name, self.connection.ops.max_name_length()),
+                qn(truncate_name(r_name, self.connection.ops.max_name_length())),
                 qn(r_col), qn(table), qn(col),
                 self.connection.ops.deferrable_sql()))
 
