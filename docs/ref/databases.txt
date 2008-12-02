@@ -249,6 +249,9 @@ matter unless you're printing out the field values and are expecting to see
 SQLite notes 
 ============ 
  
+Versions prior to 3.3.6
+------------------------
+
 Versions of SQLite 3.3.5 and older `contain a bug`_ when handling ``ORDER BY``
 parameters. This can cause problems when you use the ``select`` parameter for
 the ``extra()`` QuerySet method. The bug can be identified by the error message
@@ -277,6 +280,17 @@ If you are in such platform and find yourself in the need to update
 ``django/db/backends/sqlite3/base.py`` file in the Django source tree so it
 attempts to import ``pysqlite2`` before than ``sqlite3`` and so it can take
 advantage of the new ``pysqlite2``/SQLite versions.
+
+Version 3.6.2
+--------------
+
+SQLite version 3.6.2 (released August 30, 2008) introduced a bug into ``SELECT
+DISTINCT`` handling that is triggered by, amongst other things, Django's
+``DateQuerySet`` (returned by the ``dates()`` method on a queryset).
+
+You should avoid using this version of SQLite with Django. Either upgrade to
+3.6.3 (released September 22, 2008) or later, or downgrade to an earlier
+version of SQLite.
 
 .. _oracle-notes:
 
