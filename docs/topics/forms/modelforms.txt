@@ -196,7 +196,8 @@ accepts either ``True`` or ``False``. If you call ``save()`` with
 ``commit=False``, then it will return an object that hasn't yet been saved to
 the database. In this case, it's up to you to call ``save()`` on the resulting
 model instance. This is useful if you want to do custom processing on the
-object before saving it. ``commit`` is ``True`` by default.
+object before saving it, or if you want to use on of the specialised
+:ref:`model saving options <ref-models-force-insert>`. ``commit`` is ``True`` by default.
 
 Another side effect of using ``commit=False`` is seen when your model has
 a many-to-many relation with another model. If your model has a many-to-many
