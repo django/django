@@ -32,6 +32,8 @@ list.
 Exceptions
 ----------
 
+.. versionadded:: 1.1
+
 To manually exclude a view function from being handled by the
 CsrfMiddleware, you can use the ``csrf_exempt`` decorator (found in
 the ``django.contrib.csrf.middleware`` module).
@@ -81,6 +83,10 @@ The above two functions of ``CsrfMiddleware`` are split between two
 classes: ``CsrfResponseMiddleware`` and ``CsrfViewMiddleware``
 respectively.  This allows the individual components to be used and/or
 replaced instead of using ``CsrfMiddleware``.
+
+.. versionchanged:: 1.1
+    (previous versions of Django did not provide these two components
+    of ``CsrfMiddleware`` as described above)
 
 .. _9.1.1 Safe Methods, HTTP 1.1, RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
 
