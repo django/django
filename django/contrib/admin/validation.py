@@ -36,6 +36,8 @@ def validate(cls, model):
                         except models.FieldDoesNotExist:
                             raise ImproperlyConfigured("%s.list_display[%d], %r is not a callable or an attribute of %r or found in the model %r."
                                 % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))
+                    else:
+                        # getattr(model, field) could be an X_RelatedObjectsDescriptor
                         f = fetch_attr(cls, model, opts, "list_display[%d]" % idx, field)
                         if isinstance(f, models.ManyToManyField):
                             raise ImproperlyConfigured("'%s.list_display[%d]', '%s' is a ManyToManyField which is not supported."
