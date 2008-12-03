@@ -7,6 +7,10 @@ against request forgeries from other sites.
 
 import re
 import itertools
+try:
+    from functools import wraps
+except ImportError:
+    from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
 
 from django.conf import settings
 from django.http import HttpResponseForbidden
@@ -30,6 +34,12 @@ class CsrfViewMiddleware(object):
     """
     def process_view(self, request, callback, callback_args, callback_kwargs):
         if request.method == 'POST':
+            if getattr(callback, 'csrf_exempt', False):
+                return None
+
+            if request.is_ajax():
+                return None
+
             try:
                 session_id = request.COOKIES[settings.SESSION_COOKIE_NAME]
             except KeyError:
@@ -107,3 +117,14 @@ class CsrfMiddleware(CsrfViewMiddleware, CsrfResponseMiddleware):
     and CsrfResponseMiddleware which can be used independently.
     """
     pass
+
+def csrf_exempt(view_func):
+    """
+    Marks a view function as being exempt from the CSRF checks
+    """
+    def wrapped_view(*args, **kwargs):
+        return view_func(*args, **kwargs)
+    # We could just do view.csrf_exempt = True, but decorators are
+    # nicer if they don't have side-effects.
+    wrapped_view.csrf_exempt = True
+    return wraps(view_func)(wrapped_view)

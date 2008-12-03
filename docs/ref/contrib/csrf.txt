@@ -26,7 +26,18 @@ Add the middleware ``'django.contrib.csrf.middleware.CsrfMiddleware'`` to
 your list of middleware classes, :setting:`MIDDLEWARE_CLASSES`. It needs to process
 the response after the SessionMiddleware, so must come before it in the
 list. It also must process the response before things like compression
-happen to the response, so it must come after GZipMiddleware in the list.
+happen to the response, so it must come after GZipMiddleware in the
+list.
+
+Exceptions
+----------
+
+To manually exclude a view function from being handled by the
+CsrfMiddleware, you can use the ``csrf_exempt`` decorator (found in
+the ``django.contrib.csrf.middleware`` module).
+
+AJAX requests sent with "X-Requested-With: XMLHttpRequest" are
+automatically exempt (see below).
 
 How it works
 ============
@@ -58,6 +69,18 @@ could make these kind of requests anyway.
 The Content-Type is checked before modifying the response, and only
 pages that are served as 'text/html' or 'application/xml+xhtml'
 are modified.
+
+AJAX requests sent with "X-Requested-With: XMLHttpRequest", as done by
+many AJAX toolkits, are detected and automatically excepted from this
+mechanism.  This is because in the context of a browser, this header
+can only be added by using XMLHttpRequest, and browsers already
+implement a same-domain policy for XMLHttpRequest.  This is not secure
+if you do not trust content within the same domain or sub-domains.
+
+The above two functions of ``CsrfMiddleware`` are split between two
+classes: ``CsrfResponseMiddleware`` and ``CsrfViewMiddleware``
+respectively.  This allows the individual components to be used and/or
+replaced instead of using ``CsrfMiddleware``.
 
 .. _9.1.1 Safe Methods, HTTP 1.1, RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
 

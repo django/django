@@ -2,9 +2,18 @@
 
 from django.test import TestCase
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
-from django.contrib.csrf.middleware import CsrfMiddleware, _make_token
+from django.contrib.csrf.middleware import CsrfMiddleware, _make_token, csrf_exempt
 from django.conf import settings
 
+
+def post_form_response():
+    resp = HttpResponse(content="""
+<html><body><form method="POST"><input type="text" /></form></body></html>
+""", mimetype="text/html")
+    return resp
+
+def test_view(request):
+    return post_form_response()
 
 class CsrfMiddlewareTest(TestCase):
 
@@ -34,10 +43,7 @@ class CsrfMiddlewareTest(TestCase):
         return req
 
     def _get_post_form_response(self):
-        resp = HttpResponse(content="""
-<html><body><form method="POST"><input type="text" /></form></body></html>
-""", mimetype="text/html")
-        return resp
+        return post_form_response()
 
     def _get_new_session_response(self):
         resp = self._get_post_form_response()
@@ -48,8 +54,7 @@ class CsrfMiddlewareTest(TestCase):
         self.assertContains(response, "name='csrfmiddlewaretoken' value='%s'" % _make_token(self._session_id))
 
     def get_view(self):
-        def dummyview(request):
-            return self._get_post_form_response()
+        return test_view
 
     # Check the post processing
     def test_process_response_no_session(self):
@@ -107,5 +112,23 @@ class CsrfMiddlewareTest(TestCase):
         Check that if a session is present and a token, the middleware lets it through
         """
         req = self._get_POST_session_request_with_token()
+        req2 = CsrfMiddleware().process_view(req, self.get_view(), (), {})
+        self.assertEquals(None, req2)
+
+    def test_process_request_session_no_token_exempt_view(self):
+        """
+        Check that if a session is present and no token, but the csrf_exempt
+        decorator has been applied to the view, the middleware lets it through
+        """
+        req = self._get_POST_session_request()
+        req2 = CsrfMiddleware().process_view(req, csrf_exempt(self.get_view()), (), {})
+        self.assertEquals(None, req2)
+
+    def test_ajax_exemption(self):
+        """
+        Check the AJAX requests are automatically exempted.
+        """
+        req = self._get_POST_session_request()
+        req.META['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
         req2 = CsrfMiddleware().process_view(req, self.get_view(), (), {})
         self.assertEquals(None, req2)
