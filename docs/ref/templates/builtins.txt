@@ -254,7 +254,7 @@ The above is equivalent to -- but shorter, cleaner, and possibly faster
 than -- the following::
 
     <ul>
-      {% if althete_list %}
+      {% if athlete_list %}
         {% for athlete in athlete_list %}
           <li>{{ athlete.name }}</li>
         {% endfor %}
