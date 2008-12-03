@@ -213,8 +213,9 @@ All caches may take arguments. They're given in query-string style on the
         minutes (300 seconds).
 
     max_entries
-        For the simple and database backends, the maximum number of entries
-        allowed in the cache before it is cleaned. Defaults to 300.
+        For the ``locmem``, ``filesystem`` and ``database`` backends, the
+        maximum number of entries allowed in the cache before it is cleaned.
+        Defaults to 300.
 
     cull_percentage
         The percentage of entries that are culled when max_entries is reached.
@@ -231,7 +232,7 @@ In this example, ``timeout`` is set to ``60``::
 
 In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
 
-    CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=30&max_entries=400"
+    CACHE_BACKEND = "locmem:///?timeout=30&max_entries=400"
 
 Invalid arguments are silently ignored, as are invalid values of known
 arguments.
