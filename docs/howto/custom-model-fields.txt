@@ -31,12 +31,12 @@ Our example object
 ------------------
 
 Creating custom fields requires a bit of attention to detail. To make things
-easier to follow, we'll use a consistent example throughout this document.
-Suppose you have a Python object representing the deal of cards in a hand of
-Bridge_. (Don't worry, you don't know how to play Bridge to follow this
-example. You only need to know that 52 cards are dealt out equally to four
-players, who are traditionally called *north*, *east*, *south* and *west*.)
-Our class looks something like this::
+easier to follow, we'll use a consistent example throughout this document:
+wrapping a Python object representing the deal of cards in a hand of Bridge_.
+Don't worry, you don't have know how to play Bridge to follow this example.
+You only need to know that 52 cards are dealt out equally to four players, who
+are traditionally called *north*, *east*, *south* and *west*.  Our class looks
+something like this::
 
     class Hand(object):
         def __init__(self, north, east, south, west):
