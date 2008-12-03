@@ -67,11 +67,16 @@ class CsrfResponseMiddleware(object):
     def process_response(self, request, response):
         csrf_token = None
         try:
+            # This covers a corner case in which the outgoing request
+            # both contains a form and sets a session cookie.  This
+            # really should not be needed, since it is best if views
+            # that create a new session (login pages) also do a
+            # redirect, as is done by all such view functions in
+            # Django.
             cookie = response.cookies[settings.SESSION_COOKIE_NAME]
             csrf_token = _make_token(cookie.value)
         except KeyError:
-            # No outgoing cookie to set session, but
-            # a session might already exist.
+            # Normal case - look for existing session cookie
             try:
                 session_id = request.COOKIES[settings.SESSION_COOKIE_NAME]
                 csrf_token = _make_token(session_id)
