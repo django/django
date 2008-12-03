@@ -5,6 +5,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.contrib.csrf.middleware import CsrfMiddleware, _make_token
 from django.conf import settings
 
+
 class CsrfMiddlewareTest(TestCase):
 
     _session_id = "1"
@@ -46,6 +47,10 @@ class CsrfMiddlewareTest(TestCase):
     def _check_token_present(self, response):
         self.assertContains(response, "name='csrfmiddlewaretoken' value='%s'" % _make_token(self._session_id))
 
+    def get_view(self):
+        def dummyview(request):
+            return self._get_post_form_response()
+
     # Check the post processing
     def test_process_response_no_session(self):
         """
@@ -86,7 +91,7 @@ class CsrfMiddlewareTest(TestCase):
         to the incoming request.
         """
         req = self._get_POST_no_session_request()
-        req2 = CsrfMiddleware().process_request(req)
+        req2 = CsrfMiddleware().process_view(req, self.get_view(), (), {})
         self.assertEquals(None, req2)
 
     def test_process_request_session_no_token(self):
@@ -94,7 +99,7 @@ class CsrfMiddlewareTest(TestCase):
         Check that if a session is present but no token, we get a 'forbidden'
         """
         req = self._get_POST_session_request()
-        req2 = CsrfMiddleware().process_request(req)
+        req2 = CsrfMiddleware().process_view(req, self.get_view(), (), {})
         self.assertEquals(HttpResponseForbidden, req2.__class__)
 
     def test_process_request_session_and_token(self):
@@ -102,5 +107,5 @@ class CsrfMiddlewareTest(TestCase):
         Check that if a session is present and a token, the middleware lets it through
         """
         req = self._get_POST_session_request_with_token()
-        req2 = CsrfMiddleware().process_request(req)
+        req2 = CsrfMiddleware().process_view(req, self.get_view(), (), {})
         self.assertEquals(None, req2)

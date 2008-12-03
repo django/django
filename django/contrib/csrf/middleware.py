@@ -23,25 +23,12 @@ _HTML_TYPES = ('text/html', 'application/xhtml+xml')
 def _make_token(session_id):
     return md5_constructor(settings.SECRET_KEY + session_id).hexdigest()
 
-class CsrfMiddleware(object):
-    """Django middleware that adds protection against Cross Site
-    Request Forgeries by adding hidden form fields to POST forms and
-    checking requests for the correct value.
-
-    In the list of middlewares, SessionMiddleware is required, and must come
-    after this middleware.  CsrfMiddleWare must come after compression
-    middleware.
-
-    If a session ID cookie is present, it is hashed with the SECRET_KEY
-    setting to create an authentication token.  This token is added to all
-    outgoing POST forms and is expected on all incoming POST requests that
-    have a session ID cookie.
-
-    If you are setting cookies directly, instead of using Django's session
-    framework, this middleware will not work.
+class CsrfViewMiddleware(object):
     """
-
-    def process_request(self, request):
+    Middleware that requires a present and correct csrfmiddlewaretoken
+    for POST requests that have an active session.
+    """
+    def process_view(self, request, callback, callback_args, callback_kwargs):
         if request.method == 'POST':
             try:
                 session_id = request.COOKIES[settings.SESSION_COOKIE_NAME]
@@ -61,6 +48,12 @@ class CsrfMiddleware(object):
 
         return None
 
+class CsrfResponseMiddleware(object):
+    """
+    Middleware that post-processes a response to add a
+    csrfmiddlewaretoken if the response/request have an active
+    session.
+    """
     def process_response(self, request, response):
         csrf_token = None
         try:
@@ -92,3 +85,25 @@ class CsrfMiddleware(object):
             # Modify any POST forms
             response.content = _POST_FORM_RE.sub(add_csrf_field, response.content)
         return response
+
+class CsrfMiddleware(CsrfViewMiddleware, CsrfResponseMiddleware):
+    """Django middleware that adds protection against Cross Site
+    Request Forgeries by adding hidden form fields to POST forms and
+    checking requests for the correct value.
+
+    In the list of middlewares, SessionMiddleware is required, and
+    must come after this middleware.  CsrfMiddleWare must come after
+    compression middleware.
+
+    If a session ID cookie is present, it is hashed with the
+    SECRET_KEY setting to create an authentication token.  This token
+    is added to all outgoing POST forms and is expected on all
+    incoming POST requests that have a session ID cookie.
+
+    If you are setting cookies directly, instead of using Django's
+    session framework, this middleware will not work.
+
+    CsrfMiddleWare is composed of two middleware, CsrfViewMiddleware
+    and CsrfResponseMiddleware which can be used independently.
+    """
+    pass
