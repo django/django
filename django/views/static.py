@@ -28,7 +28,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     also set ``show_indexes`` to ``True`` if you'd like to serve a basic index
     of the directory.  This index view will use the template hardcoded below,
     but if you'd like to override it, you can create a template called
-    ``static/directory_index``.
+    ``static/directory_index.html``.
     """
 
     # Clean up given path to only allow serving files below document_root.
@@ -91,7 +91,7 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
 
 def directory_index(path, fullpath):
     try:
-        t = loader.get_template('static/directory_index')
+        t = loader.get_template('static/directory_index.html')
     except TemplateDoesNotExist:
         t = Template(DEFAULT_DIRECTORY_INDEX_TEMPLATE, name='Default directory index template')
     files = []
