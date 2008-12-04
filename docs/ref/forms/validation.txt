@@ -63,7 +63,7 @@ The three types of cleaning methods are:
       "field" (called ``__all__``), which you can access via the
       ``non_field_errors()`` method if you need to. If you want to attach
       errors to a specific field in the form, you will need to access the
-      `_errors` attribute on the form, which is `described later`_.
+      ``_errors`` attribute on the form, which is `described later`_.
 
 These methods are run in the order given above, one field at a time.  That is,
 for each field in the form (in the order they are declared in the form
@@ -99,21 +99,21 @@ and the more typical situation is to raise a ``ValidationError`` from
 through the ``Form.non_field_errors()`` method.
 
 When you really do need to attach the error to a particular field, you should
-store (or amend) a key in the `Form._errors` attribute. This attribute is an
+store (or amend) a key in the ``Form._errors`` attribute. This attribute is an
 instance of a ``django.forms.util.ErrorDict`` class. Essentially, though, it's
 just a dictionary. There is a key in the dictionary for each field in the form
 that has an error. Each value in the dictionary is a
 ``django.forms.util.ErrorList`` instance, which is a list that knows how to
-display itself in different ways. So you can treat `_errors` as a dictionary
+display itself in different ways. So you can treat ``_errors`` as a dictionary
 mapping field names to lists.
 
 If you want to add a new error to a particular field, you should check whether
-the key already exists in `self._errors` or not. If not, create a new entry
+the key already exists in ``self._errors`` or not. If not, create a new entry
 for the given key, holding an empty ``ErrorList`` instance. In either case,
 you can then append your error message to the list for the field name in
 question and it will be displayed when the form is displayed.
 
-There is an example of modifying `self._errors` in the following section.
+There is an example of modifying ``self._errors`` in the following section.
 
 .. admonition:: What's in a name?
 
