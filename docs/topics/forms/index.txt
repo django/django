@@ -292,6 +292,56 @@ templates:
         case, each object in the loop is a simple string containing the error
         message.
 
+    ``field.is_hidden``
+        This attribute is ``True`` is the form field is a hidden field and
+        ``False`` otherwise. It's not particularly useful as a template
+        variable, but could be useful in conditional tests such as::
+
+            {% if field.is_hidden %}
+               {# Do something special #}
+            {% endif %}
+
+Looping over hidden and visible fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are manually laying out a form in a template, you will often want to
+work with any hidden fields in a single loop and then treat the visible fields
+differently. For example, since hidden fields don't display anything, putting
+their error messages "next to" the field isn't going to be very clear to the
+reader. So you need to handle errors for those fields a bit differently.
+
+Django provides two methods on a form that allow you to loop over the hidden
+and visible fields independently: ``hidden_fields()`` and
+``visible_fields()``. In a template, you might use these like this (this is a
+modification of an earlier example)::
+
+    <form action="/contact/" method="POST">
+        {% for field in form.visible_fields %}
+            <div class="fieldWrapper">
+
+                {# Include the hidden fields in the form #}
+                {% if forloop.first %}
+                    {% for hidden in form.hidden_fields %}
+                    {{ field }}
+                    {% endfor %}
+                {% endif %}
+
+                {{ field.errors }}
+                {{ field.label_tag }}: {{ field }}
+            </div>
+        {% endfor %}
+        <p><input type="submit" value="Send message" /></p>
+    </form>
+
+This example does not handle any errors in the hidden fields. Usually, an
+error in a hidden field is a sign of form tampering, since normal form
+interaction won't alter them. However, you could easily insert some error
+displays for those form errors as well.
+
+.. versionadded:: 1.1
+    The ``hidden_fields`` and ``visible_fields`` methods are new in Django
+    1.1.
+
 Reusable form templates
 -----------------------
 

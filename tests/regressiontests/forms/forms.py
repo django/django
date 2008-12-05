@@ -1757,4 +1757,16 @@ initial that returns False on a boolean call needs to be treated literally.
 >>> form.is_valid()
 True
 
+# Extracting hidden and visible fields ######################################
+
+>>> class SongForm(Form):
+...     token = CharField(widget=HiddenInput)
+...     artist = CharField()
+...     name = CharField()
+>>> form = SongForm()
+>>> [f.name for f in form.hidden_fields()]
+['token']
+>>> [f.name for f in form.visible_fields()]
+['artist', 'name']
+
 """

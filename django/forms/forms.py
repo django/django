@@ -303,6 +303,20 @@ class BaseForm(StrAndUnicode):
                 return True
         return False
 
+    def hidden_fields(self):
+        """
+        Returns a list of all the BoundField objects that correspond to hidden
+        fields in the HTML output. Useful for manual form layout in templates.
+        """
+        return [field for field in self if field.is_hidden]
+
+    def visible_fields(self):
+        """
+        Returns a lits of BoundField objects that do not correspond to hidden
+        fields. The opposite of the hidden_fields() method.
+        """
+        return [field for field in self if not field.is_hidden]
+
 class Form(BaseForm):
     "A collection of Fields, plus their associated data."
     # This is a separate class from BaseForm in order to abstract the way
@@ -363,7 +377,7 @@ class BoundField(StrAndUnicode):
         else:
             name = self.html_initial_name
         return widget.render(name, data, attrs=attrs)
-        
+
     def as_text(self, attrs=None, **kwargs):
         """
         Returns a string of HTML for representing this as an <input type="text">.
