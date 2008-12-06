@@ -14,7 +14,7 @@ def compress_kml(kml):
 def render_to_kml(*args, **kwargs):
     "Renders the response as KML (using the correct MIME type)."
     return HttpResponse(loader.render_to_string(*args, **kwargs),
-                        mimetype='application/vnd.google-earth.kml+xml kml')
+                        mimetype='application/vnd.google-earth.kml+xml')
 
 def render_to_kmz(*args, **kwargs):
     """
