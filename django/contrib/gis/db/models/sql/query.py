@@ -122,7 +122,7 @@ class GeoQuery(sql.Query):
             table_alias = start_alias
         else:
             table_alias = self.tables[0]
-        root_pk = self.model._meta.pk.column
+        root_pk = opts.pk.column
         seen = {None: table_alias}
         aliases = set()
         for field, model in opts.get_fields_with_model():

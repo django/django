@@ -2,7 +2,7 @@ import os, unittest
 from django.contrib.gis.geos import *
 from django.contrib.gis.tests.utils import no_mysql, postgis
 from django.conf import settings
-from models import City, Location
+from models import City, Location, DirectoryEntry
 
 cities = (('Aurora', 'TX', -97.516111, 33.058333),
           ('Roswell', 'NM', -104.528056, 33.387222),
@@ -89,6 +89,11 @@ class RelatedGeoModelTest(unittest.TestCase):
         u2 = City.objects.exclude(name='Roswell').unionagg(field_name='location__point')
         self.assertEqual(ref_u1, u1)
         self.assertEqual(ref_u2, u2)
+        
+    def test05_select_related_fk_to_subclass(self):
+        "Testing that calling select_related on a query over a model with an FK to a model subclass works"
+        # Regression test for #9752.
+        l = list(DirectoryEntry.objects.all().select_related())
 
     # TODO: Related tests for KML, GML, and distance lookups.
         

@@ -11,3 +11,12 @@ class City(models.Model):
     state = USStateField()
     location = models.ForeignKey(Location)
     objects = models.GeoManager()
+
+class AugmentedLocation(Location):
+    extra_text = models.TextField(blank=True)
+    objects = models.GeoManager()
+    
+class DirectoryEntry(models.Model):
+    listing_text = models.CharField(max_length=50)
+    location = models.ForeignKey(AugmentedLocation)
+    objects = models.GeoManager()
