@@ -47,12 +47,12 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Finland_
     * France_
     * Germany_
-    * Holland_
     * Iceland_
     * India_
     * Italy_
     * Japan_
     * Mexico_
+    * `The Netherlands`_
     * Norway_
     * Peru_
     * Poland_
@@ -86,7 +86,7 @@ Here's an example of how to use them::
 .. _Finland: `Finland (fi)`_
 .. _France: `France (fr)`_
 .. _Germany: `Germany (de)`_
-.. _Holland: `Holland (nl)`_
+.. _The Netherlands: `The Netherlands (nl)`_
 .. _Iceland: `Iceland (is\_)`_
 .. _India: `India (in\_)`_
 .. _Italy: `Italy (it)`_
@@ -286,8 +286,8 @@ Germany (``de``)
 
     A ``Select`` widget that uses a list of German states as its choices.
 
-Holland (``nl``)
-================
+The Netherlands (``nl``)
+========================
 
 .. class:: nl.forms.NLPhoneNumberField
 
