@@ -130,21 +130,21 @@ class DjangoHTMLTranslator(sphinx.htmlwriter.SmartyPantsHTMLTranslator):
     
     # Give each section a unique ID -- nice for custom CSS hooks
     # This is different on docutils 0.5 vs. 0.4...
-    
-    # The docutils 0.4 override.
-    if hasattr(sphinx.htmlwriter.SmartyPantsHTMLTranslator, 'start_tag_with_title'):
+
+    if hasattr(sphinx.htmlwriter.SmartyPantsHTMLTranslator, 'start_tag_with_title') and sphinx.__version__ == '0.4.2':
         def start_tag_with_title(self, node, tagname, **atts):
             node = {
                 'classes': node.get('classes', []), 
                 'ids': ['s-%s' % i for i in node.get('ids', [])]
             }
             return self.starttag(node, tagname, **atts)
-            
-    # The docutils 0.5 override.
-    else:        
+
+    else:
         def visit_section(self, node):
             old_ids = node.get('ids', [])
             node['ids'] = ['s-' + i for i in old_ids]
+            if sphinx.__version__ != '0.4.2':
+                node['ids'].extend(old_ids)
             sphinx.htmlwriter.SmartyPantsHTMLTranslator.visit_section(self, node)
             node['ids'] = old_ids
 
