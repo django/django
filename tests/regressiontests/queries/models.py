@@ -227,6 +227,17 @@ class ReservedName(models.Model):
     def __unicode__(self):
         return self.name
 
+# A simpler shared-foreign-key setup that can expose some problems.
+class SharedConnection(models.Model):
+    data = models.CharField(max_length=10)
+
+class PointerA(models.Model):
+    connection = models.ForeignKey(SharedConnection)
+
+class PointerB(models.Model):
+    connection = models.ForeignKey(SharedConnection)
+
+
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag.objects.create(name='t1')
 >>> t2 = Tag.objects.create(name='t2', parent=t1)
@@ -986,6 +997,14 @@ model. But it should still be possible to add new ordering after that.
 >>> qs = Author.objects.order_by().order_by('name')
 >>> 'ORDER BY' in qs.query.as_sql()[0]
 True
+
+Bug #9188 -- incorrect SQL was being generated for certain types of
+exclude() queries that crossed multi-valued relations.
+
+>>> PointerA.objects.filter(connection__pointerb__id=1)
+[]
+>>> PointerA.objects.exclude(connection__pointerb__id=1)
+[]
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
