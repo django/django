@@ -142,6 +142,13 @@ All attributes except ``session`` should be considered read-only.
         * ``SERVER_NAME`` -- The hostname of the server.
         * ``SERVER_PORT`` -- The port of the server.
 
+    With the exception of ``CONTENT_LENGTH`` and ``CONTENT_TYPE``, as given
+    above, any HTTP headers in the request are converted to ``META`` keys by
+    converting all characters to uppercase, replacing any hyphens with
+    underscores and adding an ``HTTP_`` prefix to the name. So, for example, a
+    header called ``X-Bender`` would be mapped to the ``META`` key
+    ``HTTP_X_BENDER``.
+
 .. attribute:: HttpRequest.user
 
     A ``django.contrib.auth.models.User`` object representing the currently
