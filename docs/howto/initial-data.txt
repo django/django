@@ -65,7 +65,7 @@ And here's that same fixture as YAML:
         first_name: Paul
         last_name: McCartney
 
-You'll store this data in a ``fixtures`` directory inside you app.
+You'll store this data in a ``fixtures`` directory inside your app.
 
 Loading data is easy: just call :djadmin:`manage.py loaddata fixturename
 <loaddata>`, where *fixturename* is the name of the fixture file you've created.
