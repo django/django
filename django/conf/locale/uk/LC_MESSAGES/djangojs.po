@@ -1,118 +1,118 @@
-# SOME DESCRIPTIVE TITLE.
+# Django, ukrainian translation.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-28 17:36+1000\n"
+"POT-Creation-Date: 2008-11-16 04:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: Mykola Zamkovoy <nickzam@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: contrib/admin/media/js/SelectFilter2.js:33
+#: .\contrib\admin\media\js\SelectFilter2.js.py:33
 #, perl-format
 msgid "Available %s"
-msgstr ""
+msgstr "В наявності %s"
 
-#: contrib/admin/media/js/SelectFilter2.js:41
+#: .\contrib\admin\media\js\SelectFilter2.js.py:41
 msgid "Choose all"
-msgstr ""
+msgstr "Обрати всі"
 
-#: contrib/admin/media/js/SelectFilter2.js:46
+#: .\contrib\admin\media\js\SelectFilter2.js.py:46
 msgid "Add"
-msgstr ""
+msgstr "Додати"
 
-#: contrib/admin/media/js/SelectFilter2.js:48
+#: .\contrib\admin\media\js\SelectFilter2.js.py:48
 msgid "Remove"
-msgstr ""
+msgstr "Видалити"
 
-#: contrib/admin/media/js/SelectFilter2.js:53
+#: .\contrib\admin\media\js\SelectFilter2.js.py:53
 #, perl-format
 msgid "Chosen %s"
-msgstr ""
+msgstr "Обрано %s"
 
-#: contrib/admin/media/js/SelectFilter2.js:54
+#: .\contrib\admin\media\js\SelectFilter2.js.py:54
 msgid "Select your choice(s) and click "
-msgstr ""
+msgstr "Зробіть ваш вибір та клікніть "
 
-#: contrib/admin/media/js/SelectFilter2.js:59
+#: .\contrib\admin\media\js\SelectFilter2.js.py:59
 msgid "Clear all"
-msgstr ""
+msgstr "Очистити все"
 
-#: contrib/admin/media/js/dateparse.js:32
-#: contrib/admin/media/js/calendar.js:24
+#: .\contrib\admin\media\js\calendar.js.py:24
+#: .\contrib\admin\media\js\dateparse.js.py:32
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
+"Січень Лютий Березень Квітень Травень Червень Липень Серпень Вересень Жовтень Листопад "
+"Грудень"
 
-#: contrib/admin/media/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr ""
-
-#: contrib/admin/media/js/calendar.js:25
+#: .\contrib\admin\media\js\calendar.js.py:25
 msgid "S M T W T F S"
-msgstr ""
+msgstr "Нд Пн Вт Ср Чт Пт Сб"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
-msgid "Now"
-msgstr ""
+#: .\contrib\admin\media\js\dateparse.js.py:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Неділя Понеділок Вівторок Середа Четвер П'ятниця Субота"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
-msgid "Clock"
-msgstr ""
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
-msgid "Choose a time"
-msgstr ""
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
-msgid "Midnight"
-msgstr ""
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
-msgid "6 a.m."
-msgstr ""
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
-msgid "Noon"
-msgstr ""
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
-msgid "Cancel"
-msgstr ""
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
-msgid "Today"
-msgstr ""
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
-msgid "Calendar"
-msgstr ""
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
-msgid "Yesterday"
-msgstr ""
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
-msgid "Tomorrow"
-msgstr ""
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+#: .\contrib\admin\media\js\admin\CollapsedFieldsets.js.py:34
+#: .\contrib\admin\media\js\admin\CollapsedFieldsets.js.py:72
 msgid "Show"
-msgstr ""
+msgstr "Показати"
 
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+#: .\contrib\admin\media\js\admin\CollapsedFieldsets.js.py:63
 msgid "Hide"
-msgstr ""
+msgstr "Сховати"
+
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:47
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:81
+msgid "Now"
+msgstr "Зараз"
+
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:51
+msgid "Clock"
+msgstr "Годинник"
+
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:78
+msgid "Choose a time"
+msgstr "Оберіть час"
+
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:82
+msgid "Midnight"
+msgstr "північ"
+
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:83
+msgid "6 a.m."
+msgstr "6"
+
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:84
+msgid "Noon"
+msgstr "полудень"
+
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:88
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:183
+msgid "Cancel"
+msgstr "Відмінити"
+
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:128
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:177
+msgid "Today"
+msgstr "Сьогодні"
+
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:132
+msgid "Calendar"
+msgstr "Календар"
+
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:175
+msgid "Yesterday"
+msgstr "Вчора"
+
+#: .\contrib\admin\media\js\admin\DateTimeShortcuts.js.py:179
+msgid "Tomorrow"
+msgstr "Завтра"
