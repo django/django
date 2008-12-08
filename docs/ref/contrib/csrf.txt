@@ -35,11 +35,18 @@ Exceptions
 .. versionadded:: 1.1
 
 To manually exclude a view function from being handled by the
-CsrfMiddleware, you can use the ``csrf_exempt`` decorator (found in
-the ``django.contrib.csrf.middleware`` module).
+CsrfMiddleware, you can use the ``csrf_exempt`` decorator, found in
+the ``django.contrib.csrf.middleware`` module. For example::
 
-AJAX requests sent with "X-Requested-With: XMLHttpRequest" are
-automatically exempt (see below).
+    from django.contrib.csrf.middleware import csrf_exempt
+
+    def my_view(request):
+        return HttpResponse('Hello world')
+    my_view = csrf_exempt(my_view)
+
+You don't have to worry about doing this for most AJAX views. Any request sent
+with "X-Requested-With: XMLHttpRequest" is automatically exempt. (See the next
+section.)
 
 How it works
 ============
@@ -72,12 +79,13 @@ The Content-Type is checked before modifying the response, and only
 pages that are served as 'text/html' or 'application/xml+xhtml'
 are modified.
 
-AJAX requests sent with "X-Requested-With: XMLHttpRequest", as done by
-many AJAX toolkits, are detected and automatically excepted from this
-mechanism.  This is because in the context of a browser, this header
-can only be added by using XMLHttpRequest, and browsers already
-implement a same-domain policy for XMLHttpRequest.  This is not secure
-if you do not trust content within the same domain or sub-domains.
+The middleware tries to be smart about requests that come in via AJAX. Many
+JavaScript toolkits send an "X-Requested-With: XMLHttpRequest" HTTP header;
+these requests are detected and automatically *not* handled by this middleware.
+We can do this safely because, in the context of a browser, the header can only
+be added by using ``XMLHttpRequest``, and browsers already implement a
+same-domain policy for ``XMLHttpRequest``. (Note that this is not secure if you
+don't trust content within the same domain or subdomains.)
 
 The above two functions of ``CsrfMiddleware`` are split between two
 classes: ``CsrfResponseMiddleware`` and ``CsrfViewMiddleware``
