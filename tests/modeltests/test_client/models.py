@@ -118,6 +118,12 @@ class ClientTest(TestCase):
         # Check that the response was a 301 (permanent redirect) with absolute URI
         self.assertRedirects(response, 'http://django.testserver/test_client/get_view/', status_code=301)
 
+    def test_temporary_redirect(self):
+        "GET a URL that does a non-permanent redirect"
+        response = self.client.get('/test_client/temporary_redirect_view/')
+        # Check that the response was a 302 (non-permanent redirect)
+        self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=302)
+
     def test_redirect_to_strange_location(self):
         "GET a URL that redirects to a non-200 page"
         response = self.client.get('/test_client/double_redirect_view/')

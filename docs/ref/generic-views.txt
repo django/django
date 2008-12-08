@@ -129,12 +129,27 @@ If the given URL is ``None``, Django will return an ``HttpResponseGone`` (410).
     * ``url``: The URL to redirect to, as a string. Or ``None`` to raise a 410
       (Gone) HTTP error.
 
+**Optional arguments:**
+
+    * ``permanent``: Whether the redirect should be permanent. The only
+      difference here is the HTTP status code returned. If ``True``, then the
+      redirect will use status code 301. If ``False``, then the redirect will
+      use status code 302. By default, ``permanent`` is ``True``.
+
 **Example:**
 
-This example redirects from ``/foo/<id>/`` to ``/bar/<id>/``::
+This example issues a permanent redirect (HTTP status code 301) from
+``/foo/<id>/`` to ``/bar/<id>/``::
 
     urlpatterns = patterns('django.views.generic.simple',
         ('^foo/(?P<id>\d+)/$', 'redirect_to', {'url': '/bar/%(id)s/'}),
+    )
+
+This example issues a non-permanent redirect (HTTP status code 302) from
+``/foo/<id>/`` to ``/bar/<id>/``::
+
+    urlpatterns = patterns('django.views.generic.simple',
+        ('^foo/(?P<id>\d+)/$', 'redirect_to', {'url': '/bar/%(id)s/', 'permanent': False}),
     )
 
 This example returns a 410 HTTP error for requests to ``/bar/``::

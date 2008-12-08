@@ -1,5 +1,5 @@
 from django.template import loader, RequestContext
-from django.http import HttpResponse, HttpResponsePermanentRedirect, HttpResponseGone
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, HttpResponseGone
 
 def direct_to_template(request, template, extra_context=None, mimetype=None, **kwargs):
     """
@@ -17,7 +17,7 @@ def direct_to_template(request, template, extra_context=None, mimetype=None, **k
     t = loader.get_template(template)
     return HttpResponse(t.render(c), mimetype=mimetype)
 
-def redirect_to(request, url, **kwargs):
+def redirect_to(request, url, permanent=True, **kwargs):
     """
     Redirect to a given URL.
 
@@ -30,8 +30,12 @@ def redirect_to(request, url, **kwargs):
         )
 
     If the given url is ``None``, a HttpResponseGone (410) will be issued.
+
+    If the ``permanent`` argument is False, then the response will have a 302
+    HTTP status code. Otherwise, the status code will be 301.
     """
     if url is not None:
-        return HttpResponsePermanentRedirect(url % kwargs)
+        klass = permanent and HttpResponsePermanentRedirect or HttpResponseRedirect
+        return klass(url % kwargs)
     else:
         return HttpResponseGone()
