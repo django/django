@@ -6,7 +6,7 @@ How to serve static files
 
 .. module:: django.views.static
    :synopsis: Serving of static files during development.
- 
+
 Django itself doesn't serve static (media) files, such as images, style sheets,
 or video. It leaves that job to whichever Web server you choose.
 
@@ -67,6 +67,8 @@ required. For example, if we have a line in ``settings.py`` that says::
 
 ...we could write the above :ref:`URLconf <topics-http-urls>` entry as::
 
+    from django.conf import settings
+    ...
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.STATIC_DOC_ROOT}),
 
