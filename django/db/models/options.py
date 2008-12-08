@@ -448,3 +448,4 @@ class Options(object):
             #        objects.append(opts)
             self._ordered_objects = objects
         return self._ordered_objects
+

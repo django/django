@@ -296,6 +296,16 @@ class Model(object):
 
     pk = property(_get_pk_val, _set_pk_val)
 
+    def serializable_value(self, field_name):
+        """
+        Returns the value of the field name for this instance. If the field
+        is a foreign key, returns the id value, instead of the object.
+        Used to serialize a field's value (in the serializer, or form output,
+        for example).
+        """
+        field = self._meta.get_field_by_name(field_name)[0]
+        return getattr(self, field.attname)
+
     def save(self, force_insert=False, force_update=False):
         """
         Saves the current instance. Override this in a subclass if you want to
