@@ -305,15 +305,15 @@ class BaseForm(StrAndUnicode):
 
     def hidden_fields(self):
         """
-        Returns a list of all the BoundField objects that correspond to hidden
-        fields in the HTML output. Useful for manual form layout in templates.
+        Returns a list of all the BoundField objects that are hidden fields.
+        Useful for manual form layout in templates.
         """
         return [field for field in self if field.is_hidden]
 
     def visible_fields(self):
         """
-        Returns a lits of BoundField objects that do not correspond to hidden
-        fields. The opposite of the hidden_fields() method.
+        Returns a list of BoundField objects that aren't hidden fields.
+        The opposite of the hidden_fields() method.
         """
         return [field for field in self if not field.is_hidden]
 
