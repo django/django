@@ -5,7 +5,7 @@ from django.template import loader
 def compress_kml(kml):
     "Returns compressed KMZ from the given KML string."
     kmz = cStringIO.StringIO()
-    zf = zipfile.ZipFile(kmz, 'a', zipfile.ZIP_DEFLATED, False)
+    zf = zipfile.ZipFile(kmz, 'a', zipfile.ZIP_DEFLATED)
     zf.writestr('doc.kml', kml)
     zf.close()
     kmz.seek(0)
