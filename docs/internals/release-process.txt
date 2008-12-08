@@ -179,9 +179,10 @@ After a minor release (i.e 1.1), the previous release will go into bug-fix mode.
 A branch will be created of the form ``branches/releases/1.0.X`` to track
 bug-fixes to the previous release. When possible, bugs fixed on trunk must
 *also* be fixed on the bug-fix branch; this means that commits need to cleanly
-separate bug fixes from feature additions. Each bug-fix branch will have a
-maintainer who will work with the committers to keep them honest on backporting
-bug fixes.
+separate bug fixes from feature additions. The developer who commits a fix to 
+trunk will be responsible for also applying the fix to the current bug-fix
+branch.  Each bug-fix branch will have a maintainer who will work with the
+committers to keep them honest on backporting bug fixes.
 
 How this all fits together
 --------------------------
