@@ -253,8 +253,8 @@ Manager functions
     .. method:: models.UserManager.create_user(username, email, password=None)
 
         Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
-        The :attr:`~django.contrib.auth.models.User.username`, 
-        :attr:`~django.contrib.auth.models.User.email` and 
+        The :attr:`~django.contrib.auth.models.User.username`,
+        :attr:`~django.contrib.auth.models.User.email` and
         :attr:`~django.contrib.auth.models.User.password` are set as given, and the
         :class:`~django.contrib.auth.models.User` gets ``is_active=True``.
 
@@ -360,11 +360,11 @@ Anonymous users
       ``False`` instead of ``True``.
     * :meth:`~django.contrib.auth.models.User.has_perm()` always returns ``False``.
     * :meth:`~django.contrib.auth.models.User.set_password()`,
-      :meth:`~django.contrib.auth.models.User.check_password()`, 
-      :meth:`~django.contrib.auth.models.User.save()`, 
+      :meth:`~django.contrib.auth.models.User.check_password()`,
+      :meth:`~django.contrib.auth.models.User.save()`,
       :meth:`~django.contrib.auth.models.User.delete()`,
-      :meth:`~django.contrib.auth.models.User.set_groups()` and 
-      :meth:`~django.contrib.auth.models.User.set_permissions()` raise 
+      :meth:`~django.contrib.auth.models.User.set_groups()` and
+      :meth:`~django.contrib.auth.models.User.set_permissions()` raise
       :exc:`NotImplementedError`.
 
 In practice, you probably won't need to use
@@ -682,7 +682,7 @@ the following line to your URLconf::
 
         * ``form``: A :class:`~django.forms.Form` object representing the
           login form. See the :ref:`forms documentation <topics-forms-index>`
-          for more on ``FormWrapper`` objects.
+          for more on ``Form`` objects.
 
         * ``next``: The URL to redirect to after successful login. This may contain
           a query string, too.
@@ -691,7 +691,7 @@ the following line to your URLconf::
           :class:`~django.contrib.sites.models.Site`, according to the
           :setting:`SITE_ID` setting. If you're using the Django development version
           and you don't have the site framework installed, this will be set to the
-          value of ``request.META['SERVER_NAME']``. For more on sites, see 
+          value of ``request.META['SERVER_NAME']``. For more on sites, see
           :ref:`ref-contrib-sites`.
 
     If you'd prefer not to call the template :file:`registration/login.html`,
@@ -1037,7 +1037,7 @@ Fields
 fields:
 
 .. attribute:: models.Permission.name
-    
+
     Required. 50 characters or fewer. Example: ``'Can vote'``.
 
 .. attribute:: models.Permission.content_type
@@ -1046,7 +1046,7 @@ fields:
     which contains a record for each installed Django model.
 
 .. attribute:: models.Permission.codename
-    
+
     Required. 100 characters or fewer. Example: ``'can_vote'``.
 
 Methods
@@ -1069,7 +1069,7 @@ The currently logged-in user and his/her permissions are made available in the
    :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting contains
    ``"django.core.context_processors.auth"``, which is default. For more, see
    the :ref:`RequestContext docs <subclassing-context-requestcontext>`.
-   
+
 Users
 -----
 
@@ -1099,7 +1099,7 @@ in the ``foo`` app::
 
     {{ perms.foo }}
 
-Two-level-attribute lookup is a proxy to 
+Two-level-attribute lookup is a proxy to
 :meth:`User.has_perm <django.contrib.auth.models.User.has_perm>`. This example
 would display ``True`` if the logged-in user had the permission
 ``foo.can_vote``::
@@ -1153,7 +1153,7 @@ The API is simple:
 
     To create a new message, use
     ``user_obj.message_set.create(message='message_text')``.
-    
+
     To retrieve/delete messages, use
     :meth:`user_obj.get_and_delete_messages() <django.contrib.auth.models.User.get_and_delete_messages>`,
     which returns a list of ``Message`` objects in the user's queue (if any)
@@ -1313,7 +1313,7 @@ Custom auth backends can provide their own permissions.
 
 The user model will delegate permission lookup functions
 (:meth:`~django.contrib.auth.models.User.get_group_permissions()`,
-:meth:`~django.contrib.auth.models.User.get_all_permissions()`, 
+:meth:`~django.contrib.auth.models.User.get_all_permissions()`,
 :meth:`~django.contrib.auth.models.User.has_perm()`, and
 :meth:`~django.contrib.auth.models.User.has_module_perms()`) to any
 authentication backend that implements these functions.
