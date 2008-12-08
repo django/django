@@ -54,7 +54,6 @@ class BaseQuery(object):
         self.default_ordering = True
         self.standard_ordering = True
         self.ordering_aliases = []
-        self.start_meta = None
         self.select_fields = []
         self.related_select_fields = []
         self.dupe_avoidance = {}
@@ -125,10 +124,9 @@ class BaseQuery(object):
     def get_meta(self):
         """
         Returns the Options instance (the model._meta) from which to start
-        processing. Normally, this is self.model._meta, but it can change.
+        processing. Normally, this is self.model._meta, but it can be changed
+        by subclasses.
         """
-        if self.start_meta:
-            return self.start_meta
         return self.model._meta
 
     def quote_name_unless_alias(self, name):
@@ -166,7 +164,6 @@ class BaseQuery(object):
         obj.default_ordering = self.default_ordering
         obj.standard_ordering = self.standard_ordering
         obj.ordering_aliases = []
-        obj.start_meta = self.start_meta
         obj.select_fields = self.select_fields[:]
         obj.related_select_fields = self.related_select_fields[:]
         obj.dupe_avoidance = self.dupe_avoidance.copy()
@@ -1485,10 +1482,23 @@ class BaseQuery(object):
         query = Query(self.model, self.connection)
         query.add_filter(filter_expr, can_reuse=can_reuse)
         query.bump_prefix()
-        query.set_start(prefix)
         query.clear_ordering(True)
+        query.set_start(prefix)
         self.add_filter(('%s__in' % prefix, query), negate=True, trim=True,
                 can_reuse=can_reuse)
+
+        # If there's more than one join in the inner query (before any initial
+        # bits were trimmed -- which means the last active table is more than
+        # two places into the alias list), we need to also handle the
+        # possibility that the earlier joins don't match anything by adding a
+        # comparison to NULL (e.g. in
+        # Tag.objects.exclude(parent__parent__name='t1'), a tag with no parent
+        # would otherwise be overlooked).
+        active_positions = [pos for (pos, count) in
+                enumerate(query.alias_refcount.itervalues()) if count]
+        if active_positions[-1] > 1:
+            self.add_filter(('%s__isnull' % prefix, False), negate=True,
+                    trim=True, can_reuse=can_reuse)
 
     def set_limits(self, low=None, high=None):
         """
@@ -1695,18 +1705,26 @@ class BaseQuery(object):
         alias = self.get_initial_alias()
         field, col, opts, joins, last, extra = self.setup_joins(
                 start.split(LOOKUP_SEP), opts, alias, False)
-        alias = joins[last[-1]]
-        self.select = [(alias, self.alias_map[alias][RHS_JOIN_COL])]
-        self.select_fields = [field]
-        self.start_meta = opts
+        select_col = self.alias_map[joins[1]][LHS_JOIN_COL]
+        select_alias = alias
 
-        # The call to setup_joins add an extra reference to everything in
-        # joins. So we need to unref everything once, and everything prior to
-        # the final join a second time.
+        # The call to setup_joins added an extra reference to everything in
+        # joins. Reverse that.
         for alias in joins:
             self.unref_alias(alias)
-        for alias in joins[:last[-1]]:
-            self.unref_alias(alias)
+
+        # We might be able to trim some joins from the front of this query,
+        # providing that we only traverse "always equal" connections (i.e. rhs
+        # is *always* the same value as lhs).
+        for alias in joins[1:]:
+            join_info = self.alias_map[alias]
+            if (join_info[LHS_JOIN_COL] != select_col
+                    or join_info[JOIN_TYPE] != self.INNER):
+                break
+            self.unref_alias(select_alias)
+            select_alias = join_info[RHS_ALIAS]
+            select_col = join_info[RHS_JOIN_COL]
+        self.select = [(select_alias, select_col)]
 
     def execute_sql(self, result_type=MULTI):
         """

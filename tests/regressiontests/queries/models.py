@@ -675,7 +675,7 @@ thus fail.)
 ...     s.reverse()
 ...     params.reverse()
 
-# This slightly odd comparison works aorund the fact that PostgreSQL will
+# This slightly odd comparison works around the fact that PostgreSQL will
 # return 'one' and 'two' as strings, not Unicode objects. It's a side-effect of
 # using constants here and not a real concern.
 >>> d = Item.objects.extra(select=SortedDict(s), select_params=params).values('a', 'b')[0]
@@ -742,7 +742,7 @@ We can do slicing beyond what is currently in the result cache, too.
 ## only apparent much later when the full test suite runs. I don't understand
 ## what's going on here yet.
 ##
-## # We need to mess with the implemenation internals a bit here to decrease the
+## # We need to mess with the implementation internals a bit here to decrease the
 ## # cache fill size so that we don't read all the results at once.
 ## >>> from django.db.models import query
 ## >>> query.ITER_CHUNK_SIZE = 2
@@ -795,7 +795,7 @@ More twisted cases, involving nested negations.
 [<Item: four>, <Item: one>, <Item: three>]
 
 Bug #7095
-Updates that are filtered on the model being updated are somewhat tricky to get
+Updates that are filtered on the model being updated are somewhat tricky
 in MySQL. This exercises that case.
 >>> mm = ManagedModel.objects.create(data='mm1', tag=t1, public=True)
 >>> ManagedModel.objects.update(data='mm')
@@ -998,13 +998,28 @@ model. But it should still be possible to add new ordering after that.
 >>> 'ORDER BY' in qs.query.as_sql()[0]
 True
 
-Bug #9188 -- incorrect SQL was being generated for certain types of
-exclude() queries that crossed multi-valued relations.
+Incorrect SQL was being generated for certain types of exclude() queries that
+crossed multi-valued relations (#8921, #9188 and some pre-emptively discovered
+cases).
 
 >>> PointerA.objects.filter(connection__pointerb__id=1)
 []
 >>> PointerA.objects.exclude(connection__pointerb__id=1)
 []
+
+>>> Tag.objects.exclude(children=None)
+[<Tag: t1>, <Tag: t3>]
+
+# This example is tricky because the parent could be NULL, so only checking
+# parents with annotations omits some results (tag t1, in this case).
+>>> Tag.objects.exclude(parent__annotation__name="a1")
+[<Tag: t1>, <Tag: t4>, <Tag: t5>]
+
+# The annotation->tag link is single values and tag->children links is
+# multi-valued. So we have to split the exclude filter in the middle and then
+# optimise the inner query without losing results.
+>>> Annotation.objects.exclude(tag__children__name="t2")
+[<Annotation: a2>]
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
