@@ -49,17 +49,17 @@ class DatabaseOperations(BaseDatabaseOperations):
                 SELECT COUNT(*) INTO i FROM USER_CATALOG
                     WHERE TABLE_NAME = '%(sq_name)s' AND TABLE_TYPE = 'SEQUENCE';
                 IF i = 0 THEN
-                    EXECUTE IMMEDIATE 'CREATE SEQUENCE %(sq_name)s';
+                    EXECUTE IMMEDIATE 'CREATE SEQUENCE "%(sq_name)s"';
                 END IF;
             END;
             /""" % locals()
         trigger_sql = """
-            CREATE OR REPLACE TRIGGER %(tr_name)s
+            CREATE OR REPLACE TRIGGER "%(tr_name)s"
             BEFORE INSERT ON %(tbl_name)s
             FOR EACH ROW
             WHEN (new.%(col_name)s IS NULL)
                 BEGIN
-                    SELECT %(sq_name)s.nextval
+                    SELECT "%(sq_name)s".nextval
                     INTO :new.%(col_name)s FROM dual;
                 END;
                 /""" % locals()
@@ -94,8 +94,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "%s"
 
     def last_insert_id(self, cursor, table_name, pk_name):
-        sq_name = util.truncate_name(table_name, self.max_name_length() - 3)
-        cursor.execute('SELECT %s_sq.currval FROM dual' % sq_name)
+        sq_name = get_sequence_name(table_name)
+        cursor.execute('SELECT "%s".currval FROM dual' % sq_name)
         return cursor.fetchone()[0]
 
     def lookup_cast(self, lookup_type):
@@ -403,12 +403,12 @@ def _get_sequence_reset_sql():
         BEGIN
             LOCK TABLE %(table)s IN SHARE MODE;
             SELECT NVL(MAX(%(column)s), 0) INTO startvalue FROM %(table)s;
-            SELECT %(sequence)s.nextval INTO cval FROM dual;
+            SELECT "%(sequence)s".nextval INTO cval FROM dual;
             cval := startvalue - cval;
             IF cval != 0 THEN
-                EXECUTE IMMEDIATE 'ALTER SEQUENCE %(sequence)s MINVALUE 0 INCREMENT BY '||cval;
-                SELECT %(sequence)s.nextval INTO cval FROM dual;
-                EXECUTE IMMEDIATE 'ALTER SEQUENCE %(sequence)s INCREMENT BY 1';
+                EXECUTE IMMEDIATE 'ALTER SEQUENCE "%(sequence)s" MINVALUE 0 INCREMENT BY '||cval;
+                SELECT "%(sequence)s".nextval INTO cval FROM dual;
+                EXECUTE IMMEDIATE 'ALTER SEQUENCE "%(sequence)s" INCREMENT BY 1';
             END IF;
             COMMIT;
         END;
