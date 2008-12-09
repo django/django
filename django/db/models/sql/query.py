@@ -1455,7 +1455,10 @@ class BaseQuery(object):
                     self.update_dupe_avoidance(dupe_opts, dupe_col, alias)
 
         if pos != len(names) - 1:
-            raise FieldError("Join on field %r not permitted." % name)
+            if pos == len(names) - 2:
+                raise FieldError("Join on field %r not permitted. Did you misspell %r for the lookup type?" % (name, names[pos + 1]))
+            else:
+                raise FieldError("Join on field %r not permitted." % name)
 
         return field, target, opts, joins, last, extra_filters
 
