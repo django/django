@@ -385,19 +385,18 @@ tricky with subclassing.
 
 .. _model-formsets:
 
-Model Formsets
+Model formsets
 ==============
 
-Similar to :ref:`regular formsets <topics-forms-formsets>` there are a couple
-enhanced formset classes that provide all the right things to work with your
-models. Lets reuse the ``Author`` model from above::
+Like :ref:`regular formsets <topics-forms-formsets>`, Django provides a couple
+of enhanced formset classes that make it easy to work with Django models. Let's
+reuse the ``Author`` model from above::
 
     >>> from django.forms.models import modelformset_factory
     >>> AuthorFormSet = modelformset_factory(Author)
 
 This will create a formset that is capable of working with the data associated
-to the ``Author`` model. It works just like a regular formset just that we are
-working with ``ModelForm`` instances instead of ``Form`` instances::
+with the ``Author`` model. It works just like a regular formset::
 
     >>> formset = AuthorFormSet()
     >>> print formset
@@ -419,13 +418,15 @@ working with ``ModelForm`` instances instead of ``Form`` instances::
 Changing the queryset
 ---------------------
 
-By default when you create a formset from a model the queryset will be all
-objects in the model. This is best shown as ``Author.objects.all()``. This is
-configurable::
+By default, when you create a formset from a model, the formset will use a
+queryset that includes all objects in the model (e.g.,
+``Author.objects.all()``). You can override this behavior by using the
+``queryset`` argument::
 
     >>> formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
 
-Alternatively, you can use a subclassing based approach::
+Alternatively, you can create a subclass that implements a ``get_queryset()``
+method::
 
     from django.forms.models import BaseModelFormSet
     
@@ -433,46 +434,44 @@ Alternatively, you can use a subclassing based approach::
         def get_queryset(self):
             return super(BaseAuthorFormSet, self).get_queryset().filter(name__startswith='O')
 
-Then your ``BaseAuthorFormSet`` would be passed into the factory function to
-be used as a base::
+Then, pass your ``BaseAuthorFormSet`` class to the factory function::
 
     >>> AuthorFormSet = modelformset_factory(Author, formset=BaseAuthorFormSet)
 
 Controlling which fields are used with ``fields`` and ``exclude``
 -----------------------------------------------------------------
 
-By default a model formset will use all fields in the model that are not marked
-with ``editable=False``. However, this can be overidden at the formset level::
+By default, a model formset uses all fields in the model that are not marked
+with ``editable=False``. However, this can be overridden at the formset level::
 
     >>> AuthorFormSet = modelformset_factory(Author, fields=('name', 'title'))
 
-Using ``fields`` will restrict the formset to use just the given fields. Or if
-you need to go the other way::
+Using ``fields`` restricts the formset to use only the given fields.
+Alternatively, you can take an "opt-out" approach, specifying which fields to
+exclude::
 
     >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
-
-Using ``exclude`` will prevent the given fields from being used in the formset.
 
 .. _saving-objects-in-the-formset:
 
 Saving objects in the formset
 -----------------------------
 
-Similar to a ``ModelForm`` you can save the data into the model. This is done
-with the ``save()`` method on the formset::
+As with a ``ModelForm``, you can save the data as a model object. This is done
+with the formset's ``save()`` method::
 
-    # create a formset instance with POST data.
+    # Create a formset instance with POST data.
     >>> formset = AuthorFormSet(request.POST)
-    
-    # assuming all is valid, save the data
+
+    # Assuming all is valid, save the data.
     >>> instances = formset.save()
 
-The ``save()`` method will return the instances that have been saved to the
-database. If an instance did not change in the bound data it will not be
-saved to the database and not found in ``instances`` in the above example.
+The ``save()`` method returns the instances that have been saved to the
+database. If a given instance's data didn't change in the bound data, the
+instance won't be saved to the database and won't be included in the return
+value (``instances``, in the above example).
 
-You can optionally pass in ``commit=False`` to ``save()`` to only return the
-model instances without any database interaction::
+Pass ``commit=False`` to return the unsaved model instances::
 
     # don't save to the database
     >>> instances = formset.save(commit=False)
@@ -481,18 +480,18 @@ model instances without any database interaction::
     ...     instance.save()
 
 This gives you the ability to attach data to the instances before saving them
-to the database. If your formset contains a ``ManyToManyField`` you will also
-need to make a call to ``formset.save_m2m()`` to ensure the many-to-many
-relationships are saved properly.
+to the database. If your formset contains a ``ManyToManyField``, you'll also
+need to call ``formset.save_m2m()`` to ensure the many-to-many relationships
+are saved properly.
 
 .. _model-formsets-max-num:
 
-Limiting the number of objects editable
+Limiting the number of editable objects
 ---------------------------------------
 
-Similar to regular formsets you can use the ``max_num`` parameter to
+As with regular formsets, you can use the ``max_num`` parameter to
 ``modelformset_factory`` to limit the number of forms displayed. With
-model formsets this will properly limit the query to only select the maximum
+model formsets, this properly limits the query to select only the maximum
 number of objects needed::
 
     >>> Author.objects.order_by('name')
@@ -503,8 +502,8 @@ number of objects needed::
     >>> formset.initial
     [{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}]
 
-If the value of ``max_num`` is less than the total objects returned it will
-fill the rest with extra forms::
+If the value of ``max_num`` is less than the total objects returned, the
+formset will fill the rest with extra forms::
 
     >>> AuthorFormSet = modelformset_factory(Author, max_num=4, extra=1)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
@@ -518,8 +517,8 @@ fill the rest with extra forms::
 Using a model formset in a view
 -------------------------------
 
-Model formsets are very similar to formsets. Lets say we want to present a
-formset to a user to edit ``Author`` model instances::
+Model formsets are very similar to formsets. Let's say we want to present a
+formset to edit ``Author`` model instances::
 
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author)
@@ -534,16 +533,16 @@ formset to a user to edit ``Author`` model instances::
             "formset": formset,
         })
 
-As you can see the view is not drastically different than how to use a formset
-in a view. The only difference is that we call ``formset.save()`` to save the
-data into the database. This is described above in
-:ref:`saving-objects-in-the-formset`.
+As you can see, the view logic of a model formset isn't drastically different
+than that of a "normal" formset. The only difference is that we call
+``formset.save()`` to save the data into the database. (This was described
+above, in :ref:`saving-objects-in-the-formset`.)
 
 Using a custom queryset
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-As stated earlier you can override the default queryset the model formset
-uses::
+As stated earlier, you can override the default queryset used by the model
+formset::
 
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author)
@@ -552,27 +551,29 @@ uses::
                                     queryset=Author.objects.filter(name__startswith='O'))
             if formset.is_valid():
                 formset.save()
-                # do something.
+                # Do something.
         else:
             formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
         return render_to_response("manage_authors.html", {
             "formset": formset,
         })
 
-What is critical to point out here is that you must pass the queryset in both
-the ``POST`` and ``GET`` cases shown above.
+Note that we pass the ``queryset`` argument in both the ``POST`` and ``GET``
+cases in this example.
 
 Using the formset in the template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are three ways you might want to render the formset in your template.
-You can let the formset do most of the work::
+There are three ways to render a formset in a Django template.
+
+First, you can let the formset do most of the work::
 
     <form method="POST" action="">
         {{ formset }}
     </form>
 
-You can manually render the formset, but let the form deal with it self::
+Second, you can manually render the formset, but let the form deal with
+itself::
 
     <form method="POST" action="">
         {{ formset.management_form }}
@@ -582,9 +583,9 @@ You can manually render the formset, but let the form deal with it self::
     </form>
 
 When you manually render the forms yourself, be sure to render the management
-form as shown above. Also see the :ref:`management form documentation <understanding-the-managementform>`.
+form as shown above. See the :ref:`management form documentation <understanding-the-managementform>`.
 
-Or you can just do it all yourself::
+Third, you can manually render each field::
 
     <form method="POST" action="">
         {{ formset.management_form }}
@@ -595,10 +596,9 @@ Or you can just do it all yourself::
         {% endfor %}
     </form>
 
-It is critical to note that if you opt to do most of the work yourself and you
-don't go with a field ``{% for %}`` loop of the form, as shown in the last
-example, you need to render to the primary key field. For example if you were
-to render just the ``name`` and ``age`` fields of a model::
+If you opt to use this third method and you don't iterate over the fields with
+a ``{% for %}`` loop, you'll need to render the primary key field. For example,
+if you were rendering the ``name`` and ``age`` fields of a model::
 
     <form method="POST" action="">
         {{ formset.management_form }}
@@ -611,33 +611,31 @@ to render just the ``name`` and ``age`` fields of a model::
         {% endfor %}
     </form>
 
-Notice how we need to explicitly render ``{{ form.id }}``. This will ensure
-the model formset, in the ``POST`` case, will work correctly. The above
-example is assuming a primary key named ``id`` which is the name of the
-implicit primary key Django creates for you when one isn't given. If you have
-explicitly defined your own primary key field just make sure it gets rendered
-(it is likely to be a visible field anyway).
+Notice how we need to explicitly render ``{{ form.id }}``. This ensures that
+the model formset, in the ``POST`` case, will work correctly. (This example
+assumes a primary key named ``id``. If you've explicitly defined your own
+primary key that isn't called ``id``, make sure it gets rendered.)
 
-Inline Formsets
+Inline formsets
 ===============
 
-Inline formsets is a small abstraction layer on top of model formsets. It
-simplifies the case of working with related objects via a foreign key. Suppose
+Inline formsets is a small abstraction layer on top of model formsets. These
+simplify the case of working with related objects via a foreign key. Suppose
 you have these two models::
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
-    
+
     class Book(models.Model):
         author = models.ForeignKey(Author)
         title = models.CharField(max_length=100)
 
 If you want to create a formset that allows you to edit books belonging to
-some author you might do::
+a particular author, you could do this::
 
     >>> from django.forms.models import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book)
-    >>> author = Author.objects.get(name=u'Orson Scott Card')
+    >>> author = Author.objects.get(name=u'Mike Royko')
     >>> formset = BookFormSet(instance=author)
 
 .. note::
@@ -647,16 +645,16 @@ some author you might do::
 More than one foreign key to the same model
 -------------------------------------------
 
-If your model contains more than one foreign key to the same model you will
-need to resolve the ambiguity manually using ``fk_name``. Given the following
-model::
+If your model contains more than one foreign key to the same model, you'll
+need to resolve the ambiguity manually using ``fk_name``. For example, consider
+the following model::
 
     class Friendship(models.Model):
         from_friend = models.ForeignKey(Friend)
         to_friend = models.ForeignKey(Friend)
         length_in_months = models.IntegerField()
 
-To resolve this you can simply use ``fk_name`` to ``inlineformset_factory``::
+To resolve this, you can use ``fk_name`` to ``inlineformset_factory``::
 
     >>> FrienshipFormSet = inlineformset_factory(Friend, Friendship, fk_name="from_friend")
 
@@ -664,7 +662,7 @@ Using an inline formset in a view
 ---------------------------------
 
 You may want to provide a view that allows a user to edit the related objects
-of some model. Here is how you might construct this view::
+of a model. Here's how you can do that::
 
     def manage_books(request, author_id):
         author = Author.objects.get(pk=author_id)
@@ -673,13 +671,11 @@ of some model. Here is how you might construct this view::
             formset = BookInlineFormSet(request.POST, request.FILES, instance=author)
             if formset.is_valid():
                 formset.save()
-                # do something
+                # Do something.
         else:
             formset = BookInlineFormSet(instance=author)
         return render_to_response("manage_books.html", {
             "formset": formset,
         })
 
-Notice how we pass the instance in both the ``POST`` and ``GET`` cases. This
-is required similiar to model formsets since the ``instance`` is simply used
-to create the queryset for the model formset that lives underneath.
+Notice how we pass ``instance`` in both the ``POST`` and ``GET`` cases.
