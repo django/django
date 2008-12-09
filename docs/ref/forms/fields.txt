@@ -520,7 +520,7 @@ To learn more about the ``UploadedFile`` object, see the :ref:`file uploads
 documentation <topics-http-file-uploads>`.
 
 When you use a ``FileField`` in a form, you must also remember to
-:ref:`bind the file data to the form <topics-file-uploads>`.
+:ref:`bind the file data to the form <binding-uploaded-files>`.
 
 ``FilePathField``
 ~~~~~~~~~~~~~~~~~
@@ -587,7 +587,7 @@ These control the range of values permitted in the field.
 Using an ImageField requires that the `Python Imaging Library`_ is installed.
 
 When you use an ``ImageField`` on a form, you must also remember to
-:ref:`bind the file data to the form <topics-file-uploads>`.
+:ref:`bind the file data to the form <binding-uploaded-files>`.
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
