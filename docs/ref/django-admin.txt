@@ -213,7 +213,7 @@ the output, you would call::
 If you want to exclude multiple applications, use multiple ``--exclude``
 directives::
 
-    django-admin.py dumpdata --exclude=auth --exclude=contenttype
+    django-admin.py dumpdata --exclude=auth --exclude=contenttypes
 
 
 .. django-admin-option:: --format <fmt>
