@@ -136,6 +136,9 @@ If the given URL is ``None``, Django will return an ``HttpResponseGone`` (410).
       redirect will use status code 301. If ``False``, then the redirect will
       use status code 302. By default, ``permanent`` is ``True``.
 
+.. versionadded:: 1.1
+    The ``permanent`` keyword argument is new in Django 1.1.
+
 **Example:**
 
 This example issues a permanent redirect (HTTP status code 301) from
