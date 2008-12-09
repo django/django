@@ -120,7 +120,10 @@ variable ``{{ params.id }}`` that is set to ``15``.
 Redirects to a given URL.
 
 The given URL may contain dictionary-style string formatting, which will be
-interpolated against the parameters captured in the URL.
+interpolated against the parameters captured in the URL. Because keyword
+interpolation is *always* done (even if no arguments are passed in), any ``"%"``
+characters in the URL must be written as ``"%%"`` so that Python will convert
+them to a single percent sign on output.
 
 If the given URL is ``None``, Django will return an ``HttpResponseGone`` (410).
 
@@ -159,6 +162,14 @@ This example returns a 410 HTTP error for requests to ``/bar/``::
 
     urlpatterns = patterns('django.views.generic.simple',
         ('^bar/$', 'redirect_to', {'url': None}),
+    )
+
+This example shows how ``"%"`` characters must be written in the URL in order
+to avoid confusion with Python's string formatting markers. If the redirect
+string is written as ``"%7Ejacob/"`` (with only a single ``%``), an exception would be raised::
+
+    urlpatterns = patterns('django.views.generic.simple',
+        ('^bar/$', 'redirect_to', {'url': '%%7Ejacob.'}),
     )
 
 Date-based generic views
