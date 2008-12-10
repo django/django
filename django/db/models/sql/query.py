@@ -288,6 +288,8 @@ class BaseQuery(object):
         if self.group_by:
             grouping = self.get_grouping()
             result.append('GROUP BY %s' % ', '.join(grouping))
+            if not ordering:
+                ordering = self.connection.ops.force_no_ordering()
 
         if self.having:
             having, h_params = self.get_having()

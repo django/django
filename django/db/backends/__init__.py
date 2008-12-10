@@ -143,6 +143,14 @@ class BaseDatabaseOperations(object):
         """
         return '%s'
 
+    def force_no_ordering(self):
+        """
+        Returns a list used in the "ORDER BY" clause to force no ordering at
+        all. Returning an empty list means that nothing will be included in the
+        ordering.
+        """
+        return []
+
     def fulltext_search_sql(self, field_name):
         """
         Returns the SQL WHERE clause to use in order to perform a full-text

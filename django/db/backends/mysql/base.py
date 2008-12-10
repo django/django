@@ -133,6 +133,14 @@ class DatabaseOperations(BaseDatabaseOperations):
     def drop_foreignkey_sql(self):
         return "DROP FOREIGN KEY"
 
+    def force_no_ordering(self):
+        """
+        "ORDER BY NULL" prevents MySQL from implicitly ordering by grouped
+        columns. If no ordering would otherwise be applied, we don't want any
+        implicit sorting going on.
+        """
+        return ["NULL"]
+
     def fulltext_search_sql(self, field_name):
         return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
 

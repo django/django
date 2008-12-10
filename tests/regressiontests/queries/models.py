@@ -6,6 +6,7 @@ import datetime
 import pickle
 import sys
 
+from django.conf import settings
 from django.db import models
 from django.db.models.query import Q, ITER_CHUNK_SIZE
 
@@ -1051,5 +1052,22 @@ FieldError: Infinite loop caused by ordering.
 # (the previous test failed because the default ordering was recursive).
 >>> LoopX.objects.all().order_by('y__x__y__x__id')
 []
+
+"""
+
+if settings.DATABASE_ENGINE == "mysql":
+    __test__["API_TESTS"] += """
+When grouping without specifying ordering, we add an explicit "ORDER BY NULL"
+portion in MySQL to prevent unnecessary sorting.
+
+>>> query = Tag.objects.values_list('parent_id', flat=True).order_by().query
+>>> query.group_by = ['parent_id']
+>>> sql = query.as_sql()[0]
+>>> fragment = "ORDER BY "
+>>> pos = sql.find(fragment)
+>>> sql.find(fragment, pos + 1) == -1
+True
+>>> sql.find("NULL", pos + len(fragment)) == pos + len(fragment)
+True
 
 """
