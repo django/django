@@ -18,8 +18,9 @@ How do I get started?
 What are Django's prerequisites?
 --------------------------------
 
-Django requires Python_ 2.3 or later. No other Python libraries are required
-for basic Django usage.
+Django requires Python_, specifically any version of Python from 2.3
+through 2.6. No other Python libraries are required for basic Django
+usage.
 
 For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
