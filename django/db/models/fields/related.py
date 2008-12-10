@@ -175,7 +175,7 @@ class SingleRelatedObjectDescriptor(object):
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
-            raise AttributeError, "%s must be accessed via instance" % self.related.opts.object_name
+            return self
 
         try:
             return getattr(instance, self.cache_name)
@@ -223,7 +223,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
-            raise AttributeError, "%s must be accessed via instance" % self.field.name
+            return self
         cache_name = self.field.get_cache_name()
         try:
             return getattr(instance, cache_name)
@@ -287,7 +287,7 @@ class ForeignRelatedObjectsDescriptor(object):
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
-            raise AttributeError, "Manager must be accessed via instance"
+            return self
 
         rel_field = self.related.field
         rel_model = self.related.model
@@ -500,7 +500,7 @@ class ManyRelatedObjectsDescriptor(object):
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
-            raise AttributeError, "Manager must be accessed via instance"
+            return self
 
         # Dynamically create a class that subclasses the related
         # model's default manager.
@@ -545,7 +545,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
-            raise AttributeError, "Manager must be accessed via instance"
+            return self
 
         # Dynamically create a class that subclasses the related
         # model's default manager.
