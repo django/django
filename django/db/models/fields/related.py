@@ -728,8 +728,6 @@ class OneToOneField(ForeignKey):
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(),
                 SingleRelatedObjectDescriptor(related))
-        if not cls._meta.one_to_one_field:
-            cls._meta.one_to_one_field = self
 
     def formfield(self, **kwargs):
         if self.rel.parent_link:

@@ -41,7 +41,6 @@ class Options(object):
         self.meta = meta
         self.pk = None
         self.has_auto_field, self.auto_field = False, None
-        self.one_to_one_field = None
         self.abstract = False
         self.parents = SortedDict()
         self.duplicate_targets = {}
