@@ -1,7 +1,7 @@
 """
 Oracle database backend for Django.
 
-Requires cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
+Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 """
 
 import os
@@ -35,6 +35,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+
     def autoinc_sql(self, table, column):
         # To simulate auto-incrementing primary keys in Oracle, we have to
         # create a sequence and a trigger.
@@ -43,26 +44,26 @@ class DatabaseOperations(BaseDatabaseOperations):
         tbl_name = self.quote_name(table)
         col_name = self.quote_name(column)
         sequence_sql = """
-            DECLARE
-                i INTEGER;
-            BEGIN
-                SELECT COUNT(*) INTO i FROM USER_CATALOG
-                    WHERE TABLE_NAME = '%(sq_name)s' AND TABLE_TYPE = 'SEQUENCE';
-                IF i = 0 THEN
-                    EXECUTE IMMEDIATE 'CREATE SEQUENCE "%(sq_name)s"';
-                END IF;
-            END;
-            /""" % locals()
+DECLARE
+    i INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO i FROM USER_CATALOG
+        WHERE TABLE_NAME = '%(sq_name)s' AND TABLE_TYPE = 'SEQUENCE';
+    IF i = 0 THEN
+        EXECUTE IMMEDIATE 'CREATE SEQUENCE "%(sq_name)s"';
+    END IF;
+END;
+/""" % locals()
         trigger_sql = """
-            CREATE OR REPLACE TRIGGER "%(tr_name)s"
-            BEFORE INSERT ON %(tbl_name)s
-            FOR EACH ROW
-            WHEN (new.%(col_name)s IS NULL)
-                BEGIN
-                    SELECT "%(sq_name)s".nextval
-                    INTO :new.%(col_name)s FROM dual;
-                END;
-                /""" % locals()
+CREATE OR REPLACE TRIGGER "%(tr_name)s"
+BEFORE INSERT ON %(tbl_name)s
+FOR EACH ROW
+WHEN (new.%(col_name)s IS NULL)
+    BEGIN
+        SELECT "%(sq_name)s".nextval
+        INTO :new.%(col_name)s FROM dual;
+    END;
+/""" % locals()
         return sequence_sql, trigger_sql
 
     def date_extract_sql(self, lookup_type, field_name):
@@ -118,7 +119,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         # always defaults to uppercase.
         # We simplify things by making Oracle identifiers always uppercase.
         if not name.startswith('"') and not name.endswith('"'):
-            name = '"%s"' % util.truncate_name(name.upper(), self.max_name_length())
+            name = '"%s"' % util.truncate_name(name.upper(),
+                                               self.max_name_length())
         return name.upper()
 
     def random_function_sql(self):
@@ -150,8 +152,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql = ['%s %s %s;' % \
                     (style.SQL_KEYWORD('DELETE'),
                      style.SQL_KEYWORD('FROM'),
-                     style.SQL_FIELD(self.quote_name(table))
-                     ) for table in tables]
+                     style.SQL_FIELD(self.quote_name(table)))
+                    for table in tables]
             # Since we've just deleted all the rows, running our sequence
             # ALTER code will reset the sequence to 0.
             for sequence_info in sequences:
@@ -179,7 +181,9 @@ class DatabaseOperations(BaseDatabaseOperations):
                     output.append(query % {'sequence': sequence_name,
                                            'table': table_name,
                                            'column': column_name})
-                    break # Only one AutoField is allowed per model, so don't bother continuing.
+                    # Only one AutoField is allowed per model, so don't
+                    # continue to loop
+                    break
             for f in model._meta.many_to_many:
                 table_name = self.quote_name(f.m2m_db_table())
                 sequence_name = get_sequence_name(f.m2m_db_table())
@@ -193,7 +197,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         return ''
 
     def tablespace_sql(self, tablespace, inline=False):
-        return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""), self.quote_name(tablespace))
+        return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""),
+            self.quote_name(tablespace))
 
     def value_to_db_time(self, value):
         if value is None:
@@ -246,10 +251,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if len(settings.DATABASE_HOST.strip()) == 0:
                 settings.DATABASE_HOST = 'localhost'
             if len(settings.DATABASE_PORT.strip()) != 0:
-                dsn = Database.makedsn(settings.DATABASE_HOST, int(settings.DATABASE_PORT), settings.DATABASE_NAME)
-                self.connection = Database.connect(settings.DATABASE_USER, settings.DATABASE_PASSWORD, dsn, **self.options)
+                dsn = Database.makedsn(settings.DATABASE_HOST,
+                                       int(settings.DATABASE_PORT),
+                                       settings.DATABASE_NAME)
+                self.connection = Database.connect(settings.DATABASE_USER,
+                                                   settings.DATABASE_PASSWORD,
+                                                   dsn, **self.options)
             else:
-                conn_string = "%s/%s@%s" % (settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
+                conn_string = "%s/%s@%s" % (settings.DATABASE_USER,
+                                            settings.DATABASE_PASSWORD,
+                                            settings.DATABASE_NAME)
                 self.connection = Database.connect(conn_string, **self.options)
             cursor = FormatStylePlaceholderCursor(self.connection)
             # Set oracle date to ansi date format.  This only needs to execute
@@ -285,18 +296,19 @@ class OracleParam(object):
     """
     Wrapper object for formatting parameters for Oracle. If the string
     representation of the value is large enough (greater than 4000 characters)
-    the input size needs to be set as NCLOB. Alternatively, if the parameter has
-    an `input_size` attribute, then the value of the `input_size` attribute will
-    be used instead. Otherwise, no input size will be set for the parameter when
-    executing the query.
+    the input size needs to be set as NCLOB. Alternatively, if the parameter
+    has an `input_size` attribute, then the value of the `input_size` attribute
+    will be used instead. Otherwise, no input size will be set for the
+    parameter when executing the query.
     """
+
     def __init__(self, param, charset, strings_only=False):
         self.smart_str = smart_str(param, charset, strings_only)
         if hasattr(param, 'input_size'):
             # If parameter has `input_size` attribute, use that.
             self.input_size = param.input_size
         elif isinstance(param, basestring) and len(param) > 4000:
-            # Mark any string parameter greater than 4000 characters as an NCLOB.
+            # Mark any string param greater than 4000 characters as an NCLOB.
             self.input_size = Database.NCLOB
         else:
             self.input_size = None
@@ -320,7 +332,8 @@ class FormatStylePlaceholderCursor(Database.Cursor):
         sizes = [None] * len(params_list[0])
         for params in params_list:
             for i, value in enumerate(params):
-                if value.input_size: sizes[i] = value.input_size
+                if value.input_size:
+                    sizes[i] = value.input_size
         self.setinputsizes(*sizes)
 
     def _param_generator(self, params):
@@ -341,7 +354,8 @@ class FormatStylePlaceholderCursor(Database.Cursor):
         query = smart_str(query, self.charset) % tuple(args)
         self._guess_input_sizes([params])
         try:
-            return Database.Cursor.execute(self, query, self._param_generator(params))
+            return Database.Cursor.execute(self, query,
+                                           self._param_generator(params))
         except DatabaseError, e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if e.args[0].code == 1400 and not isinstance(e, IntegrityError):
@@ -350,10 +364,10 @@ class FormatStylePlaceholderCursor(Database.Cursor):
 
     def executemany(self, query, params=None):
         try:
-          args = [(':arg%d' % i) for i in range(len(params[0]))]
+            args = [(':arg%d' % i) for i in range(len(params[0]))]
         except (IndexError, TypeError):
-          # No params given, nothing to do
-          return None
+            # No params given, nothing to do
+            return None
         # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
         # it does want a trailing ';' but not a trailing '/'.  However, these
         # characters must be included in the original query in case the query
@@ -364,7 +378,8 @@ class FormatStylePlaceholderCursor(Database.Cursor):
         formatted = [self._format_params(i) for i in params]
         self._guess_input_sizes(formatted)
         try:
-            return Database.Cursor.executemany(self, query, [self._param_generator(p) for p in formatted])
+            return Database.Cursor.executemany(self, query,
+                                [self._param_generator(p) for p in formatted])
         except DatabaseError, e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if e.args[0].code == 1400 and not isinstance(e, IntegrityError):
@@ -380,10 +395,13 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     def fetchmany(self, size=None):
         if size is None:
             size = self.arraysize
-        return tuple([tuple([to_unicode(e) for e in r]) for r in Database.Cursor.fetchmany(self, size)])
+        return tuple([tuple([to_unicode(e) for e in r])
+                      for r in Database.Cursor.fetchmany(self, size)])
 
     def fetchall(self):
-        return tuple([tuple([to_unicode(e) for e in r]) for r in Database.Cursor.fetchall(self)])
+        return tuple([tuple([to_unicode(e) for e in r])
+                      for r in Database.Cursor.fetchall(self)])
+
 
 def to_unicode(s):
     """
@@ -394,29 +412,32 @@ def to_unicode(s):
         return force_unicode(s)
     return s
 
+
 def _get_sequence_reset_sql():
     # TODO: colorize this SQL code with style.SQL_KEYWORD(), etc.
     return """
-        DECLARE
-            startvalue integer;
-            cval integer;
-        BEGIN
-            LOCK TABLE %(table)s IN SHARE MODE;
-            SELECT NVL(MAX(%(column)s), 0) INTO startvalue FROM %(table)s;
-            SELECT "%(sequence)s".nextval INTO cval FROM dual;
-            cval := startvalue - cval;
-            IF cval != 0 THEN
-                EXECUTE IMMEDIATE 'ALTER SEQUENCE "%(sequence)s" MINVALUE 0 INCREMENT BY '||cval;
-                SELECT "%(sequence)s".nextval INTO cval FROM dual;
-                EXECUTE IMMEDIATE 'ALTER SEQUENCE "%(sequence)s" INCREMENT BY 1';
-            END IF;
-            COMMIT;
-        END;
-        /"""
+DECLARE
+    startvalue integer;
+    cval integer;
+BEGIN
+    LOCK TABLE %(table)s IN SHARE MODE;
+    SELECT NVL(MAX(%(column)s), 0) INTO startvalue FROM %(table)s;
+    SELECT "%(sequence)s".nextval INTO cval FROM dual;
+    cval := startvalue - cval;
+    IF cval != 0 THEN
+        EXECUTE IMMEDIATE 'ALTER SEQUENCE "%(sequence)s" MINVALUE 0 INCREMENT BY '||cval;
+        SELECT "%(sequence)s".nextval INTO cval FROM dual;
+        EXECUTE IMMEDIATE 'ALTER SEQUENCE "%(sequence)s" INCREMENT BY 1';
+    END IF;
+    COMMIT;
+END;
+/"""
+
 
 def get_sequence_name(table):
     name_length = DatabaseOperations().max_name_length() - 3
     return '%s_SQ' % util.truncate_name(table, name_length).upper()
+
 
 def get_trigger_name(table):
     name_length = DatabaseOperations().max_name_length() - 3
