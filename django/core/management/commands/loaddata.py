@@ -184,10 +184,6 @@ class Command(BaseCommand):
                             if verbosity > 1:
                                 print "No %s fixture '%s' in %s." % \
                                     (format, fixture_name, humanize(fixture_dir))
-                                print e
-                                transaction.rollback()
-                                transaction.leave_transaction_management()
-                                return
 
         # If we found even one object in a fixture, we need to reset the
         # database sequences.
