@@ -16,7 +16,7 @@ class Article(models.Model):
     def __unicode__(self):
         return self.headline
 
-__test__ = {'API_TESTS':r"""
+__test__ = {'API_TESTS': r"""
 # Create a couple of Articles.
 >>> from datetime import datetime
 >>> a1 = Article(headline='Article 1', pub_date=datetime(2005, 7, 26))
@@ -33,13 +33,18 @@ __test__ = {'API_TESTS':r"""
 >>> a6.save()
 >>> a7 = Article(headline='Article 7', pub_date=datetime(2005, 7, 27))
 >>> a7.save()
+"""}
 
+if settings.DATABASE_ENGINE in ('postgresql', 'postgresql_pysycopg2'):
+    __test__['API_TESTS'] += r"""
 # text matching tests for PostgreSQL 8.3
 >>> Article.objects.filter(id__iexact='1')
 [<Article: Article 1>]
 >>> Article.objects.filter(pub_date__startswith='2005')
 [<Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
+"""
 
+__test__['API_TESTS'] += r"""
 # Each QuerySet gets iterator(), which is a generator that "lazily" returns
 # results using database-level iteration.
 >>> for a in Article.objects.iterator():
@@ -383,7 +388,7 @@ FieldError: Join on field 'headline' not permitted. Did you misspell 'starts' fo
 [<Article: barfoobaz>, <Article: baz>, <Article: bazbaRFOO>, <Article: foobarbaz>, <Article: foobaz>]
 >>> Article.objects.filter(headline__iregex=r'b.*ar')
 [<Article: bar>, <Article: barfoobaz>, <Article: bazbaRFOO>, <Article: foobar>, <Article: foobarbaz>]
-"""}
+"""
 
 
 if settings.DATABASE_ENGINE != 'mysql':
