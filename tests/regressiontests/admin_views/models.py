@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.db import models
 from django.contrib import admin
 
@@ -24,12 +25,56 @@ class Article(models.Model):
         return self.date.year
     model_year.admin_order_field = 'date'
 
+class Book(models.Model):
+    """
+    A simple book that has chapters.
+    """
+    name = models.CharField(max_length=100, verbose_name=u'¿Name?')
+
+    def __unicode__(self):
+        return self.name
+
+class Promo(models.Model):
+    name = models.CharField(max_length=100, verbose_name=u'¿Name?')
+    book = models.ForeignKey(Book)
+
+    def __unicode__(self):
+        return self.name
+
+class Chapter(models.Model):
+    title = models.CharField(max_length=100, verbose_name=u'¿Title?')
+    content = models.TextField()
+    book = models.ForeignKey(Book)
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = u'¿Chapter?'
+
+class ChapterXtra1(models.Model):
+    chap = models.OneToOneField(Chapter, verbose_name=u'¿Chap?')
+    xtra = models.CharField(max_length=100, verbose_name=u'¿Xtra?') 
+
+    def __unicode__(self):
+        return u'¿Xtra1: %s' % self.xtra
+
+class ChapterXtra2(models.Model):
+    chap = models.OneToOneField(Chapter, verbose_name=u'¿Chap?')
+    xtra = models.CharField(max_length=100, verbose_name=u'¿Xtra?') 
+
+    def __unicode__(self):
+        return u'¿Xtra2: %s' % self.xtra
+
 def callable_year(dt_value):
     return dt_value.year
 callable_year.admin_order_field = 'date'
 
 class ArticleInline(admin.TabularInline):
     model = Article
+
+class ChapterInline(admin.TabularInline):
+    model = Chapter
 
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('content', 'date', callable_year, 'model_year', 'modeladmin_year')
@@ -95,3 +140,16 @@ admin.site.register(Section, inlines=[ArticleInline])
 admin.site.register(ModelWithStringPrimaryKey)
 admin.site.register(Color)
 admin.site.register(Thing, ThingAdmin)
+
+# We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
+# That way we cover all four cases:
+#     related ForeignKey object registered in admin
+#     related ForeignKey object not registered in admin
+#     related OneToOne object registered in admin
+#     related OneToOne object not registered in admin
+# when deleting Book so as exercise all four troublesome (w.r.t escaping
+# and calling force_unicode to avoid problems on Python 2.3) paths through
+# contrib.admin.util's get_deleted_objects function.
+admin.site.register(Book, inlines=[ChapterInline])
+admin.site.register(Promo)
+admin.site.register(ChapterXtra1)
