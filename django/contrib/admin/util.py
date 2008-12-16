@@ -104,7 +104,7 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
                 if not has_admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), sub_obj), []])
+                    nh(deleted_objects, current_depth, [u'%s: %s' % (capfirst(related.opts.verbose_name), force_unicode(sub_obj)), []])
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, [mark_safe(u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \

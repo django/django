@@ -684,3 +684,54 @@ class SecureViewTest(TestCase):
         self.client.post('/test_admin/admin/secure-view/', self.super_login)
         # make sure the view removes test cookie
         self.failUnlessEqual(self.client.session.test_cookie_worked(), False)
+
+class AdminViewUnicodeTest(TestCase):
+    fixtures = ['admin-views-unicode.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def testUnicodeEdit(self):
+        """
+        A test to ensure that POST on edit_view handles non-ascii characters.
+        """
+        post_data = {
+            "name": u"Test lærdommer",
+            # inline data
+            "chapter_set-TOTAL_FORMS": u"6",
+            "chapter_set-INITIAL_FORMS": u"3",
+            "chapter_set-0-id": u"1",
+            "chapter_set-0-title": u"Norske bostaver æøå skaper problemer",
+            "chapter_set-0-content": u"&lt;p&gt;Svært frustrerende med UnicodeDecodeError&lt;/p&gt;",
+            "chapter_set-1-id": u"2",
+            "chapter_set-1-title": u"Kjærlighet.",
+            "chapter_set-1-content": u"&lt;p&gt;La kjærligheten til de lidende seire.&lt;/p&gt;",
+            "chapter_set-2-id": u"3",
+            "chapter_set-2-title": u"Need a title.",
+            "chapter_set-2-content": u"&lt;p&gt;Newest content&lt;/p&gt;",
+            "chapter_set-3-id": u"",
+            "chapter_set-3-title": u"",
+            "chapter_set-3-content": u"",
+            "chapter_set-4-id": u"",
+            "chapter_set-4-title": u"",
+            "chapter_set-4-content": u"",
+            "chapter_set-5-id": u"",
+            "chapter_set-5-title": u"",
+            "chapter_set-5-content": u"",
+        }
+
+        response = self.client.post('/test_admin/admin/admin_views/book/1/', post_data)
+        self.failUnlessEqual(response.status_code, 302) # redirect somewhere
+
+    def testUnicodeDelete(self):
+        """
+        Ensure that the delete_view handles non-ascii characters
+        """
+        delete_dict = {'post': 'yes'}
+        response = self.client.get('/test_admin/admin/admin_views/book/1/delete/')
+        self.failUnlessEqual(response.status_code, 200)
+        response = self.client.post('/test_admin/admin/admin_views/book/1/delete/', delete_dict)
+        self.assertRedirects(response, '/test_admin/admin/admin_views/book/')

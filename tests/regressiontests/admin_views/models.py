@@ -24,12 +24,29 @@ class Article(models.Model):
         return self.date.year
     model_year.admin_order_field = 'date'
 
+class Book(models.Model):
+    """
+    A simple book that has chapters.
+    """
+    name = models.CharField(max_length=100)
+
+class Chapter(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    book = models.ForeignKey(Book)
+
+    def __unicode__(self):
+        return self.title
+
 def callable_year(dt_value):
     return dt_value.year
 callable_year.admin_order_field = 'date'
 
 class ArticleInline(admin.TabularInline):
     model = Article
+
+class ChapterInline(admin.TabularInline):
+    model = Chapter
 
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('content', 'date', callable_year, 'model_year', 'modeladmin_year')
@@ -92,6 +109,7 @@ class ThingAdmin(admin.ModelAdmin):
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, inlines=[ArticleInline])
+admin.site.register(Book, inlines=[ChapterInline])
 admin.site.register(ModelWithStringPrimaryKey)
 admin.site.register(Color)
 admin.site.register(Thing, ThingAdmin)
