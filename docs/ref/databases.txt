@@ -234,8 +234,11 @@ storage engine, you have a couple of options.
 
 .. _AlterModelOnSyncDB: http://code.djangoproject.com/wiki/AlterModelOnSyncDB
 
-Boolean fields in Django
--------------------------
+Notes on specific fields
+------------------------
+
+Boolean fields
+~~~~~~~~~~~~~~
 
 Since MySQL doesn't have a direct ``BOOLEAN`` column type, Django uses a
 ``TINYINT`` column with values of ``1`` and ``0`` to store values for the
@@ -243,6 +246,19 @@ Since MySQL doesn't have a direct ``BOOLEAN`` column type, Django uses a
 of that field for more details, but usually this won't be something that will
 matter unless you're printing out the field values and are expecting to see
 ``True`` and ``False.``.
+
+Character fields
+~~~~~~~~~~~~~~~~
+
+Any fields that are stored with ``VARCHAR`` column types have their
+``max_length`` restricted to 255 characters if you are using ``unique=True``
+for the field. This affects :class:`~django.db.models.CharField`,
+:class:`~django.db.models.SlugField` and
+:class:`~django.db.models.CommaSeparatedIntegerField`.
+
+Furthermore, if you are using a version of MySQL prior to 5.0.3, all of those
+column types have a maximum length restriction of 255 characters, regardless
+of whether ``unique=True`` is specified or not.
 
 .. _sqlite-notes:
 
