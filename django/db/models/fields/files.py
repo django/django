@@ -29,6 +29,9 @@ class FieldFile(File):
             return self.name == other.name
         return self.name == other
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     # The standard File contains most of the necessary properties, but
     # FieldFiles can be instantiated without a name, so that needs to
     # be checked for here.
