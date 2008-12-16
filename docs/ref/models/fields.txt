@@ -327,6 +327,13 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
     The maximum length (in characters) of the field. The max_length is enforced
     at the database level and in Django's validation.
 
+.. note::
+
+    If you are writing an application that must be portable to multiple
+    database backends, you should be aware that there are restrictions on
+    ``max_length`` for some backends. Refer to the :ref:`database backend
+    notes <ref-databases>` for details.
+
 .. admonition:: MySQL users
 
     If you are using this field with MySQLdb 1.2.2 and the ``utf8_bin``
@@ -341,7 +348,8 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 .. class:: CommaSeparatedIntegerField(max_length=None, [**options])
 
 A field of integers separated by commas. As in :class:`CharField`, the
-:attr:`~CharField.max_length` argument is required.
+:attr:`~CharField.max_length` argument is required and the note about database
+portability mentioned there should be heeded.
 
 ``DateField``
 -------------
@@ -654,9 +662,10 @@ Like a :class:`PositiveIntegerField`, but only allows values under a certain
 containing only letters, numbers, underscores or hyphens. They're generally used
 in URLs.
 
-Like a CharField, you can specify :attr:`~CharField.max_length`. If
-:attr:`~CharField.max_length` is not specified, Django will use a default length
-of 50.
+Like a CharField, you can specify :attr:`~CharField.max_length` (read the note
+about database portability and :attr:`~CharField.max_length` in that section,
+too). If :attr:`~CharField.max_length` is not specified, Django will use a
+default length of 50.
 
 Implies setting :attr:`Field.db_index` to ``True``.
 
