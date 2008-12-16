@@ -10,6 +10,7 @@ from django.db.backends import *
 from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
+from django.utils.safestring import SafeString                                                           
 
 try:
     try:
@@ -49,6 +50,7 @@ if Database.version_info >= (2,4,1):
     # slow-down, this adapter is only registered for sqlite3 versions
     # needing it.
     Database.register_adapter(str, lambda s:s.decode('utf-8'))
+    Database.register_adapter(SafeString, lambda s:s.decode('utf-8'))
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     # SQLite cannot handle us only partially reading from a cursor's result set
