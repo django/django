@@ -18,7 +18,7 @@ class DatabaseValidation(BaseDatabaseValidation):
         if isinstance(f, varchar_fields) and f.max_length > 255:
             if db_version < (5, 0, 3):
                 msg = '"%(name)s": %(cls)s cannot have a "max_length" greater than 255 when you are using a version of MySQL prior to 5.0.3 (you are using %(version)s).'
-            if f.unique == True:
+            elif f.unique == True:
                 msg = '"%(name)s": %(cls)s cannot have a "max_length" greater than 255 when using "unique=True".'
             else:
                 msg = None
