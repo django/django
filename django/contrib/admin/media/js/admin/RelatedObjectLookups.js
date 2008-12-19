@@ -1,10 +1,35 @@
 // Handles related-objects functionality: lookup link for raw_id_admin=True
 // and Add Another links.
 
+function html_unescape(text) {
+    // Unescape a string that was escaped using django.utils.html.escape.
+    text = text.replace(/&lt;/g, '<');
+    text = text.replace(/&gt;/g, '>');
+    text = text.replace(/&quot;/g, '"');
+    text = text.replace(/&#39;/g, "'");
+    text = text.replace(/&amp;/g, '&');
+    return text;
+}
+
+// IE doesn't accept periods or dashes in the window name, but the element IDs
+// we use to generate popup window names may contain them, therefore we map them
+// to allowed characters in a reversible way so that we can locate the correct 
+// element when the popup window is dismissed.
+function id_to_windowname(text) {
+    text = text.replace(/\./g, '__dot__');
+    text = text.replace(/\-/g, '__dash__');
+    return text;
+}
+
+function windowname_to_id(text) {
+    text = text.replace(/__dot__/g, '.');
+    text = text.replace(/__dash__/g, '-');
+    return text;
+}
+
 function showRelatedObjectLookupPopup(triggeringLink) {
     var name = triggeringLink.id.replace(/^lookup_/, '');
-    // IE doesn't like periods in the window name, so convert temporarily.
-    name = name.replace(/\./g, '___');
+    name = id_to_windowname(name);
     var href;
     if (triggeringLink.href.search(/\?/) >= 0) {
         href = triggeringLink.href + '&pop=1';
@@ -17,26 +42,36 @@ function showRelatedObjectLookupPopup(triggeringLink) {
 }
 
 function dismissRelatedLookupPopup(win, chosenId) {
-    var name = win.name.replace(/___/g, '.');
-    var elem = document.getElementById(win.name);
+    var name = windowname_to_id(win.name);
+    var elem = document.getElementById(name);
     if (elem.className.indexOf('vRawIdAdminField') != -1 && elem.value) {
         elem.value += ',' + chosenId;
     } else {
-        document.getElementById(win.name).value = chosenId;
+        document.getElementById(name).value = chosenId;
     }
     win.close();
 }
 
 function showAddAnotherPopup(triggeringLink) {
     var name = triggeringLink.id.replace(/^add_/, '');
-    name = name.replace(/\./g, '___');
-    var win = window.open(triggeringLink.href + '?_popup=1', name, 'height=500,width=800,resizable=yes,scrollbars=yes');
+    name = id_to_windowname(name);
+    href = triggeringLink.href
+    if (href.indexOf('?') == -1) {
+        href += '?_popup=1';
+    } else {
+        href  += '&_popup=1';
+    }
+    var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
     win.focus();
     return false;
 }
 
 function dismissAddAnotherPopup(win, newId, newRepr) {
-    var name = win.name.replace(/___/g, '.');
+    // newId and newRepr are expected to have previously been escaped by
+    // django.utils.html.escape.
+    newId = html_unescape(newId);
+    newRepr = html_unescape(newRepr);
+    var name = windowname_to_id(win.name);
     var elem = document.getElementById(name);
     if (elem) {
         if (elem.nodeName == 'SELECT') {
