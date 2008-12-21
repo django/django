@@ -27,7 +27,15 @@ class Book(models.Model):
 
     def __unicode__(self):
         return self.title
+    
+class BookWithCustomPK(models.Model):
+    my_pk = models.DecimalField(max_digits=5, decimal_places=0, primary_key=True)
+    author = models.ForeignKey(Author)
+    title = models.CharField(max_length=100)
 
+    def __unicode__(self):
+        return u'%s: %s' % (self.my_pk, self.title)
+    
 class AuthorMeeting(models.Model):
     name = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author)
@@ -483,6 +491,34 @@ Test using a custom prefix on an inline formset.
 ...     print form.as_p()
 <p><label for="id_test-0-title">Title:</label> <input id="id_test-0-title" type="text" name="test-0-title" maxlength="100" /><input type="hidden" name="test-0-author" id="id_test-0-author" /><input type="hidden" name="test-0-id" id="id_test-0-id" /></p>
 <p><label for="id_test-1-title">Title:</label> <input id="id_test-1-title" type="text" name="test-1-title" maxlength="100" /><input type="hidden" name="test-1-author" id="id_test-1-author" /><input type="hidden" name="test-1-id" id="id_test-1-id" /></p>
+
+Test inline formsets where the inline-edited object has a custom primary key that is not the fk to the parent object.
+
+>>> AuthorBooksFormSet2 = inlineformset_factory(Author, BookWithCustomPK, can_delete=False, extra=1)
+
+>>> formset = AuthorBooksFormSet2(instance=author)
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_bookwithcustompk_set-0-my_pk">My pk:</label> <input type="text" name="bookwithcustompk_set-0-my_pk" id="id_bookwithcustompk_set-0-my_pk" /></p>
+    <p><label for="id_bookwithcustompk_set-0-title">Title:</label> <input id="id_bookwithcustompk_set-0-title" type="text" name="bookwithcustompk_set-0-title" maxlength="100" /><input type="hidden" name="bookwithcustompk_set-0-author" value="1" id="id_bookwithcustompk_set-0-author" /></p>
+
+>>> data = {
+...     'bookwithcustompk_set-TOTAL_FORMS': '1', # the number of forms rendered
+...     'bookwithcustompk_set-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'bookwithcustompk_set-0-my_pk': '77777',
+...     'bookwithcustompk_set-0-title': 'Les Fleurs du Mal',
+... }
+
+>>> formset = AuthorBooksFormSet2(data, instance=author)
+>>> formset.is_valid()
+True
+
+>>> formset.save()
+[<BookWithCustomPK: 77777: Les Fleurs du Mal>]
+
+>>> for book in author.bookwithcustompk_set.all():
+...     print book.title
+Les Fleurs du Mal
 
 # Test a custom primary key ###################################################
 
