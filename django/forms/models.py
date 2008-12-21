@@ -482,9 +482,14 @@ class BaseInlineFormSet(BaseModelFormSet):
         return form
     
     def save_new(self, form, commit=True):
-        kwargs = {self.fk.get_attname(): self.instance.pk}
+        fk_attname = self.fk.get_attname()
+        kwargs = {fk_attname: self.instance.pk}
         new_obj = self.model(**kwargs)
-        return save_instance(form, new_obj, exclude=[self._pk_field.name], commit=commit)
+        if fk_attname == self._pk_field.attname:
+            exclude =  [self._pk_field.name]
+        else:
+            exclude = []
+        return save_instance(form, new_obj, exclude=exclude, commit=commit)
 
     def add_fields(self, form, index):
         super(BaseInlineFormSet, self).add_fields(form, index)
