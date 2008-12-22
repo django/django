@@ -102,7 +102,7 @@ useful -- you can use the global default storage system::
     >>> path
     u'/path/to/file'
 
-    >>> default_storage.filesize(path)
+    >>> default_storage.size(path)
     11
     >>> default_storage.open(path).read()
     'new content'
