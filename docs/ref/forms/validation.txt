@@ -90,7 +90,7 @@ already know which fields have passed their individual validation requirements.
 .. _described later:
 
 Form subclasses and modifying field errors
-==========================================
+------------------------------------------
 
 Sometimes, in a form's ``clean()`` method, you will want to add an error
 message to a particular field in the form. This won't always be appropriate
@@ -134,7 +134,7 @@ There is an example of modifying ``self._errors`` in the following section.
     explanation makes you feel more comfortable. The result is the same.
 
 Using validation in practice
-=============================
+----------------------------
 
 The previous sections explained how validation works in general for forms.
 Since it can sometimes be easier to put things into place by seeing each
