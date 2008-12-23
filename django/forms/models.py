@@ -56,10 +56,10 @@ def save_instance(form, instance, fields=None, fail_message='saved',
             file_field_list.append(f)
         else:
             f.save_form_data(instance, cleaned_data[f.name])
-            
+
     for f in file_field_list:
         f.save_form_data(instance, cleaned_data[f.name])
-        
+
     # Wrap up the saving of m2m data as a function.
     def save_m2m():
         opts = instance._meta
@@ -226,11 +226,11 @@ class BaseModelForm(BaseForm):
     def validate_unique(self):
         from django.db.models.fields import FieldDoesNotExist
 
-        # Gather a list of checks to perform. We only perform unique checks 
-        # for fields present and not None in cleaned_data.  Since this is a 
-        # ModelForm, some fields may have been excluded; we can't perform a unique 
+        # Gather a list of checks to perform. We only perform unique checks
+        # for fields present and not None in cleaned_data.  Since this is a
+        # ModelForm, some fields may have been excluded; we can't perform a unique
         # check on a form that is missing fields involved in that check.  It also does
-        # not make sense to check data that didn't validate, and since NULL does not 
+        # not make sense to check data that didn't validate, and since NULL does not
         # equal NULL in SQL we should not do any unique checking for NULL values.
         unique_checks = []
         for check in self.instance._meta.unique_together[:]:
@@ -317,6 +317,8 @@ class BaseModelForm(BaseForm):
         else:
             fail_message = 'changed'
         return save_instance(self, self.instance, self._meta.fields, fail_message, commit)
+
+    save.alters_data = True
 
 class ModelForm(BaseModelForm):
     __metaclass__ = ModelFormMetaclass
@@ -480,7 +482,7 @@ class BaseInlineFormSet(BaseModelFormSet):
             # creating new instances
             form.data[form.add_prefix(self._pk_field.name)] = None
         return form
-    
+
     def save_new(self, form, commit=True):
         fk_attname = self.fk.get_attname()
         kwargs = {fk_attname: self.instance.pk}
@@ -585,7 +587,7 @@ class InlineForeignKeyField(Field):
     default_error_messages = {
         'invalid_choice': _(u'The inline foreign key did not match the parent instance primary key.'),
     }
-    
+
     def __init__(self, parent_instance, *args, **kwargs):
         self.parent_instance = parent_instance
         self.pk_field = kwargs.pop("pk_field", False)
@@ -594,7 +596,7 @@ class InlineForeignKeyField(Field):
         kwargs["required"] = False
         kwargs["widget"] = InlineForeignKeyHiddenInput
         super(InlineForeignKeyField, self).__init__(*args, **kwargs)
-    
+
     def clean(self, value):
         if value in EMPTY_VALUES:
             if self.pk_field:
