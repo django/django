@@ -197,7 +197,8 @@ accepts either ``True`` or ``False``. If you call ``save()`` with
 the database. In this case, it's up to you to call ``save()`` on the resulting
 model instance. This is useful if you want to do custom processing on the
 object before saving it, or if you want to use one of the specialized
-:ref:`model saving options <ref-models-force-insert>`. ``commit`` is ``True`` by default.
+:ref:`model saving options <ref-models-force-insert>`. ``commit`` is ``True``
+by default.
 
 Another side effect of using ``commit=False`` is seen when your model has
 a many-to-many relation with another model. If your model has a many-to-many
@@ -272,7 +273,7 @@ specify ``fields`` or ``exclude`` like this::
         class Meta:
             model = Author
             fields = ('name', 'title')
-    
+
     class PartialAuthorForm(ModelForm):
         class Meta:
             model = Author
@@ -429,7 +430,7 @@ Alternatively, you can create a subclass that implements a ``get_queryset()``
 method::
 
     from django.forms.models import BaseModelFormSet
-    
+
     class BaseAuthorFormSet(BaseModelFormSet):
         def get_queryset(self):
             return super(BaseAuthorFormSet, self).get_queryset().filter(name__startswith='O')
@@ -496,7 +497,7 @@ number of objects needed::
 
     >>> Author.objects.order_by('name')
     [<Author: Charles Baudelaire>, <Author: Paul Verlaine>, <Author: Walt Whitman>]
-    
+
     >>> AuthorFormSet = modelformset_factory(Author, max_num=2, extra=1)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
     >>> formset.initial
@@ -583,7 +584,8 @@ itself::
     </form>
 
 When you manually render the forms yourself, be sure to render the management
-form as shown above. See the :ref:`management form documentation <understanding-the-managementform>`.
+form as shown above. See the :ref:`management form documentation
+<understanding-the-managementform>`.
 
 Third, you can manually render each field::
 
