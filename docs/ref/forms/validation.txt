@@ -122,7 +122,7 @@ There is an example of modifying ``self._errors`` in the following section.
     if it's not for external usage. In this case, you are subclassing the
     ``Form`` class, so you are essentially writing new internals. In effect,
     you are given permission to access some of the internals of ``Form``.
-    
+
     Of course, any code outside your form should never access ``_errors``
     directly. The data is available to external code through the ``errors``
     property, which populates ``_errors`` before returning it).
@@ -291,7 +291,7 @@ extra design effort to create a sensible form display. The details are worth
 noting, however. Firstly, earlier we mentioned that you might need to check if
 the field name keys already exist in the ``_errors`` dictionary. In this case,
 since we know the fields exist in ``self.cleaned_data``, they must have been
-valid when cleaned as individual fields, so there will be no corresonding
+valid when cleaned as individual fields, so there will be no corresponding
 entries in ``_errors``.
 
 Secondly, once we have decided that the combined data in the two fields we are
@@ -302,4 +302,3 @@ In fact, Django will currently completely wipe out the ``cleaned_data``
 dictionary if there are any errors in the form. However, this behaviour may
 change in the future, so it's not a bad idea to clean up after yourself in the
 first place.
-
