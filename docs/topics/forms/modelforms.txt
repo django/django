@@ -592,8 +592,8 @@ Third, you can manually render each field::
     <form method="POST" action="">
         {{ formset.management_form }}
         {% for form in formset.forms %}
-            {% for fields in form %}
-                {{ field }}
+            {% for field in form %}
+                {{ field.label_tag }}: {{ field }}
             {% endfor %}
         {% endfor %}
     </form>
