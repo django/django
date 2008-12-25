@@ -292,6 +292,21 @@ that comes with Django::
     >>> user.is_staff = True
     >>> user.save()
 
+You can also create users using the Django admin site. Assuming you've enabled
+the admin site and hooked it to the URL ``/admin/``, the "Add user" page is at
+``/admin/auth/user/add/``. You should also see a link to "Users" in the "Auth"
+section of the main admin index page. The "Add user" admin page is different
+than standard admin pages in that it requires you to choose a username and
+password before allowing you to edit the rest of the user's fields.
+
+Also note: if you want your own user account to be able to create users using
+the Django admin site, you'll need to give yourself permission to add users
+*and* change users (i.e., the "Add user" and "Change user" permissions). If
+your account has permission to add users but not to change them, you won't be
+able to add users. Why? Because if you have permission to add users, you have
+the power to create superusers, which can then, in turn, change other users. So
+Django requires add *and* change permissions as a slight security measure.
+
 Changing passwords
 ~~~~~~~~~~~~~~~~~~
 
