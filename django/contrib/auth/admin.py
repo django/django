@@ -1,14 +1,14 @@
-
+from django import template
+from django.conf import settings
+from django.contrib import admin
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AdminPasswordChangeForm
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import PermissionDenied
-from django import template
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.html import escape
-from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext, ugettext_lazy as _
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AdminPasswordChangeForm
-from django.contrib import admin
 
 class GroupAdmin(admin.ModelAdmin):
     search_fields = ('name',)
@@ -49,6 +49,10 @@ class UserAdmin(admin.ModelAdmin):
         # disallow users from adding users if they don't have change
         # permission.
         if not self.has_change_permission(request):
+            if self.has_add_permission(request) and settings.DEBUG:
+                # Raise Http404 in debug mode so that the user gets a helpful
+                # error message.
+                raise Http404('Your user does not have the "Change user" permission. In order to add users, Django requires that your user account have both the "Add user" and "Change user" permissions set.')
             raise PermissionDenied
         if request.method == 'POST':
             form = self.add_form(request.POST)
