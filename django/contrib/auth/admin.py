@@ -42,6 +42,12 @@ class UserAdmin(admin.ModelAdmin):
         return super(UserAdmin, self).__call__(request, url)
 
     def add_view(self, request):
+        # It's an error for a user to have add permission but NOT change
+        # permission for users. If we allowed such users to add users, they
+        # could create superusers, which would mean they would essentially have
+        # the permission to change users. To avoid the problem entirely, we
+        # disallow users from adding users if they don't have change
+        # permission.
         if not self.has_change_permission(request):
             raise PermissionDenied
         if request.method == 'POST':
