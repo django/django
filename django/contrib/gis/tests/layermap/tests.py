@@ -1,8 +1,8 @@
 import os, unittest
 from copy import copy
-from datetime import date
 from decimal import Decimal
 from models import City, County, CountyFeat, Interstate, State, city_mapping, co_mapping, cofeat_mapping, inter_mapping
+from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.utils.layermapping import LayerMapping, LayerMapError, InvalidDecimal, MissingForeignKey
 from django.contrib.gis.gdal import DataSource
 
@@ -85,7 +85,8 @@ class LayerMapTest(unittest.TestCase):
             lm = LayerMapping(Interstate, inter_shp, inter_mapping)
             lm.save(silent=True, strict=True)
         except InvalidDecimal:
-            pass
+            # No transactions for geoms on MySQL; delete added features.
+            if SpatialBackend.mysql: Interstate.objects.all().delete()
         else:
             self.fail('Should have failed on strict import with invalid decimal values.')
 
@@ -151,7 +152,8 @@ class LayerMapTest(unittest.TestCase):
             self.assertRaises(e, LayerMapping, County, co_shp, co_mapping, transform=False, unique=arg)
 
         # No source reference system defined in the shapefile, should raise an error.
-        self.assertRaises(LayerMapError, LayerMapping, County, co_shp, co_mapping)
+        if not SpatialBackend.mysql:
+            self.assertRaises(LayerMapError, LayerMapping, County, co_shp, co_mapping)
 
         # Passing in invalid ForeignKey mapping parameters -- must be a dictionary
         # mapping for the model the ForeignKey points to.
@@ -227,8 +229,9 @@ class LayerMapTest(unittest.TestCase):
         lm.save(fid_range=slice(None, 1), silent=True, strict=True) # layer[:1]
 
         # Only Pueblo & Honolulu counties should be present because of
-        # the `unique` keyword.
-        qs = County.objects.all()
+        # the `unique` keyword.  Have to set `order_by` on this QuerySet 
+        # or else MySQL will return a different ordering than the other dbs.
+        qs = County.objects.order_by('name') 
         self.assertEqual(2, qs.count())
         hi, co = tuple(qs)
         hi_idx, co_idx = tuple(map(NAMES.index, ('Honolulu', 'Pueblo')))
