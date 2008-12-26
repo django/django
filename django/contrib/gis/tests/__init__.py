@@ -29,7 +29,7 @@ def geo_suite():
         elif postgis:
             test_models += ['distapp', 'layermap', 'relatedapp']
         elif mysql:
-            test_models += ['relatedapp']
+            test_models += ['relatedapp', 'layermap']
 
         test_suite_names += [
             'test_gdal_driver',

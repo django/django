@@ -116,7 +116,6 @@ from django.contrib.gis.gdal import CoordTransform, DataSource, \
     OGRException, OGRGeometry, OGRGeomType, SpatialReference
 from django.contrib.gis.gdal.field import \
     OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime
-from django.contrib.gis.models import GeometryColumns, SpatialRefSys
 from django.db import models, transaction
 from django.contrib.localflavor.us.models import USStateField
 
@@ -189,7 +188,10 @@ class LayerMapping(object):
 
         # Getting the geometry column associated with the model (an 
         # exception will be raised if there is no geometry column).
-        self.geo_col = self.geometry_column()
+        if SpatialBackend.mysql:
+            transform = False
+        else:
+            self.geo_col = self.geometry_column()
 
         # Checking the source spatial reference system, and getting
         # the coordinate transformation object (unless the `transform`
@@ -327,6 +329,7 @@ class LayerMapping(object):
 
     def check_srs(self, source_srs):
         "Checks the compatibility of the given spatial reference object."
+        from django.contrib.gis.models import SpatialRefSys
         if isinstance(source_srs, SpatialReference):
             sr = source_srs
         elif isinstance(source_srs, SpatialRefSys):
@@ -498,6 +501,7 @@ class LayerMapping(object):
     #### Other model methods ####
     def coord_transform(self):
         "Returns the coordinate transformation object."
+        from django.contrib.gis.models import SpatialRefSys
         try:
             # Getting the target spatial reference system
             target_srs = SpatialRefSys.objects.get(srid=self.geo_col.srid).srs
@@ -509,11 +513,12 @@ class LayerMapping(object):
 
     def geometry_column(self):
         "Returns the GeometryColumn model associated with the geographic column."
+        from django.contrib.gis.models import GeometryColumns
         # Getting the GeometryColumn object.
         try:
             db_table = self.model._meta.db_table
             geo_col = self.geom_field
-            if SpatialBackend.name == 'oracle':
+            if SpatialBackend.oracle:
                 # Making upper case for Oracle.
                 db_table = db_table.upper()
                 geo_col = geo_col.upper()
