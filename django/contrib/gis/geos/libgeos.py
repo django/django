@@ -33,7 +33,7 @@ elif os.name == 'nt':
     lib_names = ['libgeos_c-1']
 elif os.name == 'posix':
     # *NIX libraries
-    lib_names = ['geos_c']
+    lib_names = ['geos_c', 'GEOS']
 else:
     raise ImportError('Unsupported OS "%s"' % os.name)
 
