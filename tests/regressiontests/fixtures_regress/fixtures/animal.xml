@@ -4,5 +4,6 @@
       <field type="CharField" name="name">Emu</field>
       <field type="CharField" name="latin_name">Dromaius novaehollandiae</field>
       <field type="IntegerField" name="count">42</field>
+      <field type="FloatField" name="weight">1.2</field>
   </object>
 </django-objects>

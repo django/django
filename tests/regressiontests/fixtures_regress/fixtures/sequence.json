@@ -5,7 +5,8 @@
         "fields": {
             "name": "Lion", 
             "latin_name": "Panthera leo",
-            "count": 3
+            "count": 3,
+            "weight": 1.2
         }
     }
 ]
