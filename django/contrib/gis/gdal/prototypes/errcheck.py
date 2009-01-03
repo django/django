@@ -71,7 +71,7 @@ def check_geom(result, func, cargs):
     "Checks a function that returns a geometry."
     # OGR_G_Clone may return an integer, even though the
     # restype is set to c_void_p
-    if isinstance(result, int):
+    if isinstance(result, (int, long)):
         result = c_void_p(result)
     if not result: 
         raise OGRException('Invalid geometry pointer returned from "%s".' % func.__name__)
@@ -85,7 +85,7 @@ def check_geom_offset(result, func, cargs, offset=-1):
 
 ### Spatial Reference error-checking routines ###
 def check_srs(result, func, cargs):
-    if isinstance(result, int):
+    if isinstance(result, (int, long)):
         result = c_void_p(result)
     if not result:
         raise SRSException('Invalid spatial reference pointer returned from "%s".' % func.__name__)
