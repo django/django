@@ -14,11 +14,11 @@ Journal-World`_ of Lawrence, Kansas, USA.
     Adrian is a Web developer with a background in journalism. He's known in
     journalism circles as one of the pioneers of "journalism via computer
     programming", and in technical circles as "the guy who invented Django."
-    
+
     He was lead developer at World Online for 2.5 years, during which time
     Django was developed and implemented on World Online's sites. He's now the
     leader and founder of EveryBlock_, a "news feed for your block".
-    
+
     Adrian lives in Chicago, USA.
 
 `Simon Willison`_
@@ -27,7 +27,7 @@ Journal-World`_ of Lawrence, Kansas, USA.
     from scratch. The most enthusiastic Brit you'll ever meet, he's passionate
     about best practices in web development and maintains a well-read
     `web-development blog`_.
-    
+
     Simon lives in Brighton, England.
 
 `Jacob Kaplan-Moss`_
@@ -36,14 +36,14 @@ Journal-World`_ of Lawrence, Kansas, USA.
     time is devoted to working on Django. Jacob previous worked for the Lawrence
     Journal-World, where he was the lead developer of Ellington, a commercial
     web publishing platform for media companies.
-    
+
     Jacob lives in Lawrence, Kansas, USA.
-    
+
 `Wilson Miner`_
     Wilson's design-fu is what makes Django look so nice. He designed the
     website you're looking at right now, as well as Django's acclaimed admin
     interface. Wilson is the designer for EveryBlock_.
-    
+
     Wilson lives in San Francisco, USA.
 
 .. _lawrence journal-world: http://ljworld.com/
@@ -81,13 +81,13 @@ and have free rein to hack on all parts of Django.
     Malcolm originally wanted to be a mathematician, somehow ended up a software
     developer. He's contributed to many Open Source projects, has served on the
     board of the GNOME foundation, and will kick your ass at chess.
-        
+
     When he's not busy being an International Man of Mystery, Malcolm lives in
     Sydney, Australia.
 
 .. _malcolm tredinnick: http://www.pointy-stick.com/
 
-Russell Keith-Magee
+`Russell Keith-Magee`_
     Russell studied physics as an undergraduate, and studied neural networks for
     his PhD. His first job was with a startup in the defense industry developing
     simulation frameworks. Over time, mostly through work with Django, he's
@@ -95,22 +95,24 @@ Russell Keith-Magee
 
     Russell has helped with several major aspects of Django, including a
     couple major internal refactorings, creation of the test system, and more.
-    
+
     Russell lives in the most isolated capital city in the world — Perth,
     Australia.
-    
+
+.. _russell keith-magee: http://cecinestpasun.com/
+
 Joseph Kocherhans
     Joseph is currently a developer at EveryBlock_, and previously worked for
     the Lawrence Journal-World where he built most of the backend for the their
     Marketplace site. He often disappears for several days into the woods,
     attempts to teach himself computational linguistics, and annoys his
     neighbors with his Charango_ playing.
-    
+
     Joseph's first contribution to Django was a series of improvements to the
     authorization system leading up to support for pluggable authorization.
     Since then, he's worked on the new forms system, its use in the admin, and
     many other smaller improvements.
-    
+
     Joseph lives in Chicago, USA.
 
 .. _charango: http://en.wikipedia.org/wiki/Charango
@@ -121,11 +123,11 @@ Joseph Kocherhans
     re-igniting an interest in programming.  Since then he has
     contributed to a number of Open Source projects and worked
     professionally as a developer.
-    
+
     Luke has contributed many excellent improvements to Django,
     including database-level improvements, the CSRF middleware and
     many unit tests.
-    
+
     Luke currently works for a church in Bradford, UK, and part-time
     as a freelance developer.
 
@@ -137,11 +139,11 @@ Joseph Kocherhans
     Django. He spends his free time contributing to Django and enjoys to learn
     more about programming languages and system architectures. Brian is the
     co-host of the weekly podcast, `This Week in Django`_.
-    
+
     Brian helped immensely in getting Django's "newforms-admin" branch finished
     in time for Django 1.0; he's now a full committer, continuing to improve on
     the admin and forms system.
-    
+
     Brian lives in Denver, USA.
 
 .. _brian rosner: http://oebfare.com/
@@ -154,9 +156,9 @@ Gary Wilson
 
 Karen Tracey
     Karen has a background in distributed operating systems (graduate school),
-    communications software (industry) and crossword puzzle construction 
+    communications software (industry) and crossword puzzle construction
     (freelance).  The last of these brought her to Django, in late 2006, when
-    she set out to put a web front-end on her crossword puzzle database.  
+    she set out to put a web front-end on her crossword puzzle database.
     That done, she stuck around in the community answering questions, debugging
     problems, etc. -- because coding puzzles are as much fun as word puzzles.
 
@@ -167,7 +169,7 @@ Specialists
 
 `James Bennett`_
     James is Django's release manager; he also contributes to the documentation.
-    
+
     James came to web development from philosophy when he discovered
     that programmers get to argue just as much while collecting much
     better pay. He lives in Lawrence, Kansas, where he works for the
@@ -181,30 +183,30 @@ Specialists
 
 Ian Kelly
     Ian is responsible for Django's support for Oracle.
-    
+
 Matt Boersma
     Matt is also responsible for Django's Oracle support.
-    
+
 Justin Bronn
     Justin Bronn is a computer scientist and third-year law student at the
     University of Houston who enjoys studying legal topics related to
     intellectual property and spatial law.
-    
+
     Justin is the primary developer of ``django.contrib.gis``, a.k.a.
     GeoDjango_.
-    
+
 .. _GeoDjango: http://geodjango.org/
 
 Jeremy Dunck
     Jeremy the lead developer of Pegasus News, a personalized local site based
     in Dallas, Texas. An early contributor to Greasemonkey and Django, he sees
     technology as a tool for communication and access to knowledge.
-    
+
     Jeremy helped kick off GeoDjango development, and is mostly responsible for
     the serious speed improvements that signals received in Django 1.0.
-    
+
     Jeremy lives in Dallas, Texas, USA.
-    
+
 Developers Emeritus
 ===================
 
@@ -212,7 +214,7 @@ Georg "Hugo" Bauer
     Georg created Django's internationalization system, managed i18n
     contributions and made a ton of excellent tweaks, feature additions and bug
     fixes.
-    
+
 Robert Wittams
     Robert was responsible for the *first* refactoring of Django's admin
     application to allow for easier reuse and has made a ton of
