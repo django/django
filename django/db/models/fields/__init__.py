@@ -658,6 +658,15 @@ class FloatField(Field):
     def get_internal_type(self):
         return "FloatField"
 
+    def to_python(self, value):
+        if value is None:
+            return value
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            raise exceptions.ValidationError(
+                _("This value must be a float."))
+
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.FloatField}
         defaults.update(kwargs)
