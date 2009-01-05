@@ -313,6 +313,18 @@ class BaseQuery(object):
         params.extend(self.extra_params)
         return ' '.join(result), tuple(params)
 
+    def as_nested_sql(self):
+        """
+        Perform the same functionality as the as_sql() method, returning an
+        SQL string and parameters. However, the alias prefixes are bumped
+        beforehand (in a copy -- the current query isn't changed).
+
+        Used when nesting this query inside another.
+        """
+        obj = self.clone()
+        obj.bump_prefix()
+        return obj.as_sql()
+
     def combine(self, rhs, connector):
         """
         Merge the 'rhs' query into the current one (with any 'rhs' effects

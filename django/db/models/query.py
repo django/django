@@ -641,6 +641,15 @@ class QuerySet(object):
         """
         pass
 
+    def as_sql(self):
+        """
+        Returns the internal query's SQL and parameters (as a tuple).
+
+        This is a private (internal) method. The name is chosen to provide
+        uniformity with other interfaces (in particular, the Query class).
+        """
+        obj = self.values("pk")
+        return obj.query.as_nested_sql()
 
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):

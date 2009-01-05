@@ -1035,12 +1035,27 @@ SQL equivalent::
     SELECT ... WHERE id IN (1, 3, 4);
 
 You can also use a queryset to dynamically evaluate the list of values
-instead of providing a list of literal values. The queryset must be
-reduced to a list of individual values using the ``values()`` method,
-and then converted into a query using the ``query`` attribute::
+instead of providing a list of literal values::
 
-    q = Blog.objects.filter(name__contains='Cheddar').values('pk').query
-    e = Entry.objects.filter(blog__in=q)
+    inner_qs = Blog.objects.filter(name__contains='Cheddar')
+    entries = Entry.objects.filter(blog__in=inner_qs)
+
+This queryset will be evaluated as subselect statement::
+
+    SELECT ... WHERE blog.id IN (SELECT id FROM ... WHERE NAME LIKE '%Cheddar%')
+
+The above code fragment could also be written as follows::
+
+    inner_q = Blog.objects.filter(name__contains='Cheddar').values('pk').query
+    entries = Entry.objects.filter(blog__in=inner_q)
+
+.. versionchanged:: 1.1
+    In Django 1.0, only the latter piece of code is valid.
+
+This second form is a bit less readable and unnatural to write, since it
+accesses the internal ``query`` attribute and requires a ``ValuesQuerySet``.
+If your code doesn't require compatibility with Django 1.0, use the first
+form, passing in a queryset directly.
 
 .. warning::
 
@@ -1048,9 +1063,18 @@ and then converted into a query using the ``query`` attribute::
     It's fine to use it like above, but its API may change between Django
     versions.
 
-This queryset will be evaluated as subselect statement::
+.. admonition:: Performance considerations
 
-    SELECT ... WHERE blog.id IN (SELECT id FROM ... WHERE NAME LIKE '%Cheddar%')
+    Be cautious about using nested queries and understand your database
+    server's performance characteristics (if in doubt, benchmark!). Some
+    database backends, most notably MySQL, don't optimize nested queries very
+    well. It is more efficient, in those cases, to extract a list of values
+    and then pass that into the second query. That is, execute two queries
+    instead of one::
+
+        values = Blog.objects.filter(
+                name__contains='Cheddar').values_list('pk', flat=True)
+        entries = Entry.objects.filter(blog__in=values)
 
 gt
 ~~

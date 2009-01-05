@@ -1008,6 +1008,13 @@ cases).
 # optimise the inner query without losing results.
 >>> Annotation.objects.exclude(tag__children__name="t2")
 [<Annotation: a2>]
+
+Nested queries are possible (although should be used with care, since they have
+performance problems on backends like MySQL.
+
+>>> Annotation.objects.filter(notes__in=Note.objects.filter(note="n1"))
+[<Annotation: a1>]
+
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
