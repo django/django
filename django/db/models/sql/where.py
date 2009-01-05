@@ -13,6 +13,13 @@ from datastructures import EmptyResultSet, FullResultSet
 AND = 'AND'
 OR = 'OR'
 
+class EmptyShortCircuit(Exception):
+    """
+    Internal exception used to indicate that a "matches nothing" node should be
+    added to the where-clause.
+    """
+    pass
+
 class WhereNode(tree.Node):
     """
     Used to represent the SQL where-clause.
@@ -35,36 +42,35 @@ class WhereNode(tree.Node):
         storing any reference to field objects). Otherwise, the 'data' is
         stored unchanged and can be anything with an 'as_sql()' method.
         """
-        # Because of circular imports, we need to import this here.
-        from django.db.models.base import ObjectDoesNotExist
-
         if not isinstance(data, (list, tuple)):
             super(WhereNode, self).add(data, connector)
             return
 
-        alias, col, field, lookup_type, value = data
-        try:
-            if field:
-                params = field.get_db_prep_lookup(lookup_type, value)
-                db_type = field.db_type()
-            else:
-                # This is possible when we add a comparison to NULL sometimes
-                # (we don't really need to waste time looking up the associated
-                # field object).
-                params = Field().get_db_prep_lookup(lookup_type, value)
-                db_type = None
-        except ObjectDoesNotExist:
-            # This can happen when trying to insert a reference to a null pk.
-            # We break out of the normal path and indicate there's nothing to
-            # match.
-            super(WhereNode, self).add(NothingNode(), connector)
-            return
+        obj, lookup_type, value = data
+        if hasattr(obj, "process"):
+            try:
+                obj, params = obj.process(lookup_type, value)
+            except EmptyShortCircuit:
+                # There are situations where we want to short-circuit any
+                # comparisons and make sure that nothing is returned. One
+                # example is when checking for a NULL pk value, or the
+                # equivalent.
+                super(WhereNode, self).add(NothingNode(), connector)
+                return
+        else:
+            params = Field().get_db_prep_lookup(lookup_type, value)
+
+        # The "annotation" parameter is used to pass auxilliary information
+        # about the value(s) to the query construction. Specifically, datetime
+        # and empty values need special handling. Other types could be used
+        # here in the future (using Python types is suggested for consistency).
         if isinstance(value, datetime.datetime):
             annotation = datetime.datetime
         else:
             annotation = bool(value)
-        super(WhereNode, self).add((alias, col, db_type, lookup_type,
-                annotation, params), connector)
+
+        super(WhereNode, self).add((obj, lookup_type, annotation, params),
+                connector)
 
     def as_sql(self, qn=None):
         """
@@ -130,12 +136,13 @@ class WhereNode(tree.Node):
         Returns the string for the SQL fragment and the parameters to use for
         it.
         """
-        table_alias, name, db_type, lookup_type, value_annot, params = child
-        if table_alias:
-            lhs = '%s.%s' % (qn(table_alias), qn(name))
+        lvalue, lookup_type, value_annot, params = child
+        if isinstance(lvalue, tuple):
+            # A direct database column lookup.
+            field_sql = self.sql_for_columns(lvalue, qn)
         else:
-            lhs = qn(name)
-        field_sql = connection.ops.field_cast_sql(db_type) % lhs
+            # A smart object with an as_sql() method.
+            field_sql = lvalue.as_sql(quote_func=qn)
 
         if value_annot is datetime.datetime:
             cast_sql = connection.ops.datetime_cast_sql()
@@ -175,6 +182,19 @@ class WhereNode(tree.Node):
 
         raise TypeError('Invalid lookup_type: %r' % lookup_type)
 
+    def sql_for_columns(self, data, qn):
+        """
+        Returns the SQL fragment used for the left-hand side of a column
+        constraint (for example, the "T1.foo" portion in the clause
+        "WHERE ... T1.foo = 6").
+        """
+        table_alias, name, db_type = data
+        if table_alias:
+            lhs = '%s.%s' % (qn(table_alias), qn(name))
+        else:
+            lhs = qn(name)
+        return connection.ops.field_cast_sql(db_type) % lhs
+
     def relabel_aliases(self, change_map, node=None):
         """
         Relabels the alias values of any children. 'change_map' is a dictionary
@@ -188,8 +208,10 @@ class WhereNode(tree.Node):
             elif isinstance(child, tree.Node):
                 self.relabel_aliases(change_map, child)
             else:
-                if child[0] in change_map:
-                    node.children[pos] = (change_map[child[0]],) + child[1:]
+                elt = list(child[0])
+                if elt[0] in change_map:
+                    elt[0] = change_map[elt[0]]
+                    node.children[pos] = (tuple(elt),) + child[1:]
 
 class EverythingNode(object):
     """
@@ -210,4 +232,34 @@ class NothingNode(object):
 
     def relabel_aliases(self, change_map, node=None):
         return
+
+class Constraint(object):
+    """
+    An object that can be passed to WhereNode.add() and knows how to
+    pre-process itself prior to including in the WhereNode.
+    """
+    def __init__(self, alias, col, field):
+        self.alias, self.col, self.field = alias, col, field
+
+    def process(self, lookup_type, value):
+        """
+        Returns a tuple of data suitable for inclusion in a WhereNode
+        instance.
+        """
+        # Because of circular imports, we need to import this here.
+        from django.db.models.base import ObjectDoesNotExist
+        try:
+            if self.field:
+                params = self.field.get_db_prep_lookup(lookup_type, value)
+                db_type = self.field.db_type()
+            else:
+                # This branch is used at times when we add a comparison to NULL
+                # (we don't really want to waste time looking up the associated
+                # field object at the calling location).
+                params = Field().get_db_prep_lookup(lookup_type, value)
+                db_type = None
+        except ObjectDoesNotExist:
+            raise EmptyShortCircuit
+
+        return (self.alias, self.col, db_type), params
 

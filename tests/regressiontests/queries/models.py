@@ -973,19 +973,6 @@ relations.
 >>> len([x[2] for x in q.alias_map.values() if x[2] == q.LOUTER and q.alias_refcount[x[1]]])
 1
 
-A check to ensure we don't break the internal query construction of GROUP BY
-and HAVING. These aren't supported in the public API, but the Query class knows
-about them and shouldn't do bad things.
->>> qs = Tag.objects.values_list('parent_id', flat=True).order_by()
->>> qs.query.group_by = ['parent_id']
->>> qs.query.having = ['count(parent_id) > 1']
->>> expected = [t3.parent_id, t4.parent_id]
->>> expected.sort()
->>> result = list(qs)
->>> result.sort()
->>> expected == result
-True
-
 Make sure bump_prefix() (an internal Query method) doesn't (re-)break. It's
 sufficient that this query runs without error.
 >>> qs = Tag.objects.values_list('id', flat=True).order_by('id')

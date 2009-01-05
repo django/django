@@ -16,7 +16,7 @@ from django.db import connection
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models.query_utils import select_related_descend
-from django.db.models.sql.where import WhereNode, EverythingNode, AND, OR
+from django.db.models.sql.where import WhereNode, Constraint, EverythingNode, AND, OR
 from django.db.models.sql.datastructures import Count
 from django.core.exceptions import FieldError
 from datastructures import EmptyResultSet, Empty, MultiJoin
@@ -66,7 +66,7 @@ class BaseQuery(object):
         self.where = where()
         self.where_class = where
         self.group_by = []
-        self.having = []
+        self.having = where()
         self.order_by = []
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
         self.distinct = False
@@ -172,7 +172,7 @@ class BaseQuery(object):
         obj.where = deepcopy(self.where)
         obj.where_class = self.where_class
         obj.group_by = self.group_by[:]
-        obj.having = self.having[:]
+        obj.having = deepcopy(self.having)
         obj.order_by = self.order_by[:]
         obj.low_mark, obj.high_mark = self.low_mark, self.high_mark
         obj.distinct = self.distinct
@@ -261,7 +261,9 @@ class BaseQuery(object):
         # get_from_clause() for details.
         from_, f_params = self.get_from_clause()
 
-        where, w_params = self.where.as_sql(qn=self.quote_name_unless_alias)
+        qn = self.quote_name_unless_alias
+        where, w_params = self.where.as_sql(qn=qn)
+        having, h_params = self.having.as_sql(qn=qn)
         params = []
         for val in self.extra_select.itervalues():
             params.extend(val[1])
@@ -291,9 +293,8 @@ class BaseQuery(object):
             if not ordering:
                 ordering = self.connection.ops.force_no_ordering()
 
-        if self.having:
-            having, h_params = self.get_having()
-            result.append('HAVING %s' % ', '.join(having))
+        if having:
+            result.append('HAVING %s' % having)
             params.extend(h_params)
 
         if ordering:
@@ -576,24 +577,6 @@ class BaseQuery(object):
             else:
                 result.append(str(col))
         return result
-
-    def get_having(self):
-        """
-        Returns a tuple representing the SQL elements in the "having" clause.
-        By default, the elements of self.having have their as_sql() method
-        called or are returned unchanged (if they don't have an as_sql()
-        method).
-        """
-        result = []
-        params = []
-        for elt in self.having:
-            if hasattr(elt, 'as_sql'):
-                sql, params = elt.as_sql()
-                result.append(sql)
-                params.extend(params)
-            else:
-                result.append(elt)
-        return result, params
 
     def get_ordering(self):
         """
@@ -1197,7 +1180,8 @@ class BaseQuery(object):
             self.promote_alias_chain(join_it, join_promote)
             self.promote_alias_chain(table_it, table_promote)
 
-        self.where.add((alias, col, field, lookup_type, value), connector)
+        self.where.add((Constraint(alias, col, field), lookup_type, value),
+            connector)
 
         if negate:
             self.promote_alias_chain(join_list)
@@ -1207,7 +1191,7 @@ class BaseQuery(object):
                         if self.alias_map[alias][JOIN_TYPE] == self.LOUTER:
                             j_col = self.alias_map[alias][RHS_JOIN_COL]
                             entry = self.where_class()
-                            entry.add((alias, j_col, None, 'isnull', True), AND)
+                            entry.add((Constraint(alias, j_col, None), 'isnull', True), AND)
                             entry.negate()
                             self.where.add(entry, AND)
                             break
@@ -1216,7 +1200,7 @@ class BaseQuery(object):
                     # exclude the "foo__in=[]" case from this handling, because
                     # it's short-circuited in the Where class.
                     entry = self.where_class()
-                    entry.add((alias, col, None, 'isnull', True), AND)
+                    entry.add((Constraint(alias, col, None), 'isnull', True), AND)
                     entry.negate()
                     self.where.add(entry, AND)
 

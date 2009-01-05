@@ -6,7 +6,7 @@ from django.core.exceptions import FieldError
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import Date
 from django.db.models.sql.query import Query
-from django.db.models.sql.where import AND
+from django.db.models.sql.where import AND, Constraint
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
         'CountQuery']
@@ -48,8 +48,9 @@ class DeleteQuery(Query):
             if not isinstance(related.field, generic.GenericRelation):
                 for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                     where = self.where_class()
-                    where.add((None, related.field.m2m_reverse_name(),
-                            related.field, 'in',
+                    where.add((Constraint(None,
+                            related.field.m2m_reverse_name(), related.field),
+                            'in',
                             pk_list[offset : offset+GET_ITERATOR_CHUNK_SIZE]),
                             AND)
                     self.do_query(related.field.m2m_db_table(), where)
@@ -59,11 +60,11 @@ class DeleteQuery(Query):
             if isinstance(f, generic.GenericRelation):
                 from django.contrib.contenttypes.models import ContentType
                 field = f.rel.to._meta.get_field(f.content_type_field_name)
-                w1.add((None, field.column, field, 'exact',
+                w1.add((Constraint(None, field.column, field), 'exact',
                         ContentType.objects.get_for_model(cls).id), AND)
             for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                 where = self.where_class()
-                where.add((None, f.m2m_column_name(), f, 'in',
+                where.add((Constraint(None, f.m2m_column_name(), f), 'in',
                         pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
                         AND)
                 if w1:
@@ -81,7 +82,7 @@ class DeleteQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             where = self.where_class()
             field = self.model._meta.pk
-            where.add((None, field.column, field, 'in',
+            where.add((Constraint(None, field.column, field), 'in',
                     pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]), AND)
             self.do_query(self.model._meta.db_table, where)
 
@@ -212,7 +213,7 @@ class UpdateQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             f = self.model._meta.pk
-            self.where.add((None, f.column, f, 'in',
+            self.where.add((Constraint(None, f.column, f), 'in',
                     pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
                     AND)
             self.values = [(related_field.column, None, '%s')]
