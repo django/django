@@ -29,7 +29,10 @@ class GeoWhereNode(WhereNode):
         """
         if not isinstance(data, (list, tuple)):
             return super(WhereNode, self).add(data, connector)
-        alias, col, field, lookup_type, value = data     
+
+        obj, lookup_type, value = data
+        alias, col, field = obj.alias, obj.col, obj.field
+
         if not hasattr(field, "_geom"):
             # Not a geographic field, so call `WhereNode.add`.
             return super(GeoWhereNode, self).add(data, connector)
@@ -43,18 +46,17 @@ class GeoWhereNode(WhereNode):
             # the `get_geo_where_clause` to construct the appropriate
             # spatial SQL when `make_atom` is called.
             annotation = GeoAnnotation(field, value, where)
-            return super(WhereNode, self).add((alias, col, field.db_type(), lookup_type,
-                                               annotation, params), connector)
+            return super(WhereNode, self).add((obj, lookup_type, annotation, params), connector)
 
     def make_atom(self, child, qn):
-        table_alias, name, db_type, lookup_type, value_annot, params = child
- 
+        lvalue, lookup_type, value_annot, params = child
+
         if isinstance(value_annot, GeoAnnotation):
             if lookup_type in SpatialBackend.gis_terms:
                 # Getting the geographic where clause; substitution parameters
                 # will be populated in the GeoFieldSQL object returned by the
                 # GeometryField.
-                gwc = get_geo_where_clause(table_alias, name, lookup_type, value_annot)
+                gwc = get_geo_where_clause(lvalue.alias, lvalue.col, lookup_type, value_annot)
                 return gwc % value_annot.where, params
             else:
                 raise TypeError('Invalid lookup type: %r' % lookup_type)
