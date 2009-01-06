@@ -1,23 +1,14 @@
-r"""
-Using simplejson from the shell to validate and
+r"""Using simplejson from the shell to validate and
 pretty-print::
-    
-    $ echo '{"json":"obj"}' | python -msimplejson
+
+    $ echo '{"json":"obj"}' | python -msimplejson.tool
     {
         "json": "obj"
     }
-    $ echo '{ 1.2:3.4}' | python -msimplejson
+    $ echo '{ 1.2:3.4}' | python -msimplejson.tool
     Expecting property name: line 1 column 2 (char 2)
-
-Note that the JSON produced by this module's default settings
-is a subset of YAML, so it may be used as a serializer for that as well.
 """
-import django.utils.simplejson
-
-#
-# Pretty printer:
-#     curl http://mochikit.com/examples/ajax_tables/domains.json | python -msimplejson.tool
-#
+from django.utils import simplejson
 
 def main():
     import sys
