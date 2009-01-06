@@ -335,7 +335,8 @@ Oracle notes
 
 Django supports `Oracle Database Server`_ versions 9i and higher. Oracle
 version 10g or later is required to use Django's ``regex`` and ``iregex`` query
-operators. You will also need the `cx_Oracle`_ driver, version 4.3.1 or newer.
+operators. You will also need a 4.X release of the `cx_Oracle`_ driver,
+version 4.3.1 or newer.
 
 .. _`Oracle Database Server`: http://www.oracle.com/
 .. _`cx_Oracle`: http://cx-oracle.sourceforge.net/
