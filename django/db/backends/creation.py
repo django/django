@@ -47,7 +47,8 @@ class BaseDatabaseCreation(object):
             # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
             field_output = [style.SQL_FIELD(qn(f.column)),
                 style.SQL_COLTYPE(col_type)]
-            field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
+            if not f.null:
+                field_output.append(style.SQL_KEYWORD('NOT NULL'))
             if f.primary_key:
                 field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
             elif f.unique:
@@ -65,8 +66,7 @@ class BaseDatabaseCreation(object):
             table_output.append(' '.join(field_output))
         if opts.order_with_respect_to:
             table_output.append(style.SQL_FIELD(qn('_order')) + ' ' + \
-                style.SQL_COLTYPE(models.IntegerField().db_type()) + ' ' + \
-                style.SQL_KEYWORD('NULL'))
+                style.SQL_COLTYPE(models.IntegerField().db_type()))
         for field_constraints in opts.unique_together:
             table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' % \
                 ", ".join([style.SQL_FIELD(qn(opts.get_field(f).column)) for f in field_constraints]))
