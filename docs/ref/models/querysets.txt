@@ -986,8 +986,15 @@ SQL equivalent::
 
     SELECT ... WHERE name ILIKE 'beatles blog';
 
-Note this will match ``'Beatles Blog'``, ``'beatles blog'``,
-``'BeAtLes BLoG'``, etc.
+Note this will match ``'Beatles Blog'``, ``'beatles blog'``, ``'BeAtLes
+BLoG'``, etc.
+
+.. admonition:: SQLite users
+
+    When using the SQLite backend and Unicode (non-ASCII) strings, bear in
+    mind the :ref:`database note <sqlite-string-matching>` about string
+    comparisons. SQLite does not do case-insensitive matching for Unicode
+    strings.
 
 contains
 ~~~~~~~~
@@ -1020,6 +1027,12 @@ Example::
 SQL equivalent::
 
     SELECT ... WHERE headline ILIKE '%Lennon%';
+
+.. admonition:: SQLite users
+
+    When using the SQLite backend and Unicode (non-ASCII) strings, bear in
+    mind the :ref:`database note <sqlite-string-matching>` about string
+    comparisons.
 
 in
 ~~
@@ -1133,6 +1146,12 @@ SQL equivalent::
 
     SELECT ... WHERE headline ILIKE 'Will%';
 
+.. admonition:: SQLite users
+
+    When using the SQLite backend and Unicode (non-ASCII) strings, bear in
+    mind the :ref:`database note <sqlite-string-matching>` about string
+    comparisons.
+
 endswith
 ~~~~~~~~
 
@@ -1161,6 +1180,12 @@ Example::
 SQL equivalent::
 
     SELECT ... WHERE headline ILIKE '%will'
+
+.. admonition:: SQLite users
+
+    When using the SQLite backend and Unicode (non-ASCII) strings, bear in
+    mind the :ref:`database note <sqlite-string-matching>` about string
+    comparisons.
 
 range
 ~~~~~

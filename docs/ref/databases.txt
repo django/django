@@ -265,6 +265,26 @@ of whether ``unique=True`` is specified or not.
 SQLite notes 
 ============ 
  
+SQLite_ provides an excellent development alternative for applications that
+are predominantly read-only or require a smaller installation footprint. As
+with all database servers, though, there are some differences that are
+specific to SQLite that you should be aware of.
+
+.. _SQLite: http://www.sqlite.org/
+
+.. _sqlite-string-matching:
+
+String matching for non-ASCII strings
+--------------------------------------
+
+SQLite doesn't support case-insensitive matching for non-ASCII strings. Some
+possible workarounds for this are `documented at sqlite.org`_, but they are
+not utilised by the default SQLite backend in Django. Therefore, if you are
+using the ``iexact`` lookup type in your queryset filters, be aware that it
+will not work as expected for non-ASCII strings.
+
+.. _documented at sqlite.org: http://www.sqlite.org/faq.html#q18
+
 Versions prior to 3.3.6
 ------------------------
 
