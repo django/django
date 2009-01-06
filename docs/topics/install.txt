@@ -82,9 +82,9 @@ installed.
   wrapper in the standard library, so you don't need to install anything extra
   in that case.
 
-* If you're using Oracle, you'll need cx_Oracle_, version 4.3.1 or higher. You
-  will also want to read the database-specific notes for the :ref:`Oracle
-  backend <oracle-notes>`.
+* If you're using Oracle, you'll need a 4.X release of cx_Oracle_, version
+  4.3.1 or higher. You will also want to read the database-specific notes for
+  the :ref:`Oracle backend <oracle-notes>`.
 
 If you plan to use Django's ``manage.py syncdb`` command to
 automatically create database tables for your models, you'll need to
