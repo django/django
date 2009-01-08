@@ -317,11 +317,13 @@ class BaseQuery(object):
         """
         Perform the same functionality as the as_sql() method, returning an
         SQL string and parameters. However, the alias prefixes are bumped
-        beforehand (in a copy -- the current query isn't changed).
+        beforehand (in a copy -- the current query isn't changed) and any
+        ordering is removed.
 
         Used when nesting this query inside another.
         """
         obj = self.clone()
+        obj.clear_ordering(True)
         obj.bump_prefix()
         return obj.as_sql()
 
