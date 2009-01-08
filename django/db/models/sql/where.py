@@ -66,6 +66,8 @@ class WhereNode(tree.Node):
         # here in the future (using Python types is suggested for consistency).
         if isinstance(value, datetime.datetime):
             annotation = datetime.datetime
+        elif hasattr(value, 'value_annotation'):
+            annotation = value.value_annotation
         else:
             annotation = bool(value)
 

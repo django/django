@@ -651,6 +651,10 @@ class QuerySet(object):
         obj = self.values("pk")
         return obj.query.as_nested_sql()
 
+    # When used as part of a nested query, a queryset will never be an "always
+    # empty" result.
+    value_annotation = True
+
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
         super(ValuesQuerySet, self).__init__(*args, **kwargs)
@@ -794,6 +798,10 @@ class EmptyQuerySet(QuerySet):
         # This slightly odd construction is because we need an empty generator
         # (it raises StopIteration immediately).
         yield iter([]).next()
+
+    # EmptyQuerySet is always an empty result in where-clauses (and similar
+    # situations).
+    value_annotation = False
 
 
 def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,

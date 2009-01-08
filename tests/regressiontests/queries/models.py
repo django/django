@@ -1015,6 +1015,13 @@ performance problems on backends like MySQL.
 >>> Annotation.objects.filter(notes__in=Note.objects.filter(note="n1"))
 [<Annotation: a1>]
 
+Nested queries should not evaluate the inner query as part of constructing the
+SQL. This test verifies this: if the inner query is evaluated, the outer "in"
+lookup will raise an EmptyResultSet exception (as the inner query returns
+nothing).
+>>> print Annotation.objects.filter(notes__in=Note.objects.filter(note="xyzzy")).query
+SELECT ...
+
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
