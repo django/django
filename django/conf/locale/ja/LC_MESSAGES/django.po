@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-03 10:01+0900\n"
-"PO-Revision-Date: 2008-09-03 10:03+0900\n"
+"POT-Creation-Date: 2008-12-19 12:05+0900\n"
+"PO-Revision-Date: 2008-12-19 12:26+0900\n"
 "Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
 "Language-Team: Japanese <django-ja@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -97,114 +97,122 @@ msgid "Hebrew"
 msgstr "ヘブライ語"
 
 #: conf/global_settings.py:65
+msgid "Hindi"
+msgstr "ヒンディー語"
+
+#: conf/global_settings.py:66
 msgid "Croatian"
 msgstr "クロアチア語"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Icelandic"
 msgstr "アイスランド語"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Italian"
 msgstr "イタリア語"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Japanese"
 msgstr "日本語"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Georgian"
 msgstr "グルジア語"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Korean"
 msgstr "韓国語"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Khmer"
 msgstr "クメール語"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Kannada"
 msgstr "カンナダ語"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Latvian"
 msgstr "ラトビア語"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Lithuanian"
 msgstr "リトアニア語"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Macedonian"
 msgstr "マケドニア語"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Dutch"
 msgstr "オランダ語"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Norwegian"
 msgstr "ノルウェー語"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Polish"
 msgstr "ポーランド語"
 
-#: conf/global_settings.py:79
-msgid "Portugese"
+#: conf/global_settings.py:80
+msgid "Portuguese"
 msgstr "ポルトガル語"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Brazilian Portuguese"
 msgstr "ブラジルポルトガル語"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Romanian"
 msgstr "ルーマニア語"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Russian"
 msgstr "ロシア語"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Slovak"
 msgstr "スロバキア語"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Slovenian"
 msgstr "スロヴェニア語"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Serbian"
 msgstr "セルビア語"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Swedish"
 msgstr "スウェーデン語"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Tamil"
 msgstr "タミル語"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:89
 msgid "Telugu"
 msgstr "テルグ語"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
+msgid "Thai"
+msgstr "タイ語"
+
+#: conf/global_settings.py:91
 msgid "Turkish"
 msgstr "トルコ語"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:92
 msgid "Ukrainian"
 msgstr "ウクライナ語"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:93
 msgid "Simplified Chinese"
 msgstr "簡体字中国語"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:94
 msgid "Traditional Chinese"
 msgstr "繁体字中国語"
 
@@ -217,40 +225,40 @@ msgstr ""
 "<h3>%s で絞り込む</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:92
-#: contrib/admin/filterspecs.py:147 contrib/admin/filterspecs.py:173
+#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:91
+#: contrib/admin/filterspecs.py:146 contrib/admin/filterspecs.py:172
 msgid "All"
 msgstr "全て"
 
-#: contrib/admin/filterspecs.py:113
+#: contrib/admin/filterspecs.py:112
 msgid "Any date"
 msgstr "いつでも"
 
-#: contrib/admin/filterspecs.py:114
+#: contrib/admin/filterspecs.py:113
 msgid "Today"
 msgstr "今日"
 
-#: contrib/admin/filterspecs.py:117
+#: contrib/admin/filterspecs.py:116
 msgid "Past 7 days"
 msgstr "過去 7 日間"
 
-#: contrib/admin/filterspecs.py:119
+#: contrib/admin/filterspecs.py:118
 msgid "This month"
 msgstr "今月"
 
-#: contrib/admin/filterspecs.py:121
+#: contrib/admin/filterspecs.py:120
 msgid "This year"
 msgstr "今年"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:146 forms/widgets.py:390
 msgid "Yes"
 msgstr "はい"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:146 forms/widgets.py:390
 msgid "No"
 msgstr "いいえ"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:153 forms/widgets.py:390
 msgid "Unknown"
 msgstr "不明"
 
@@ -292,7 +300,7 @@ msgid "Changed %s."
 msgstr "%s を変更しました。"
 
 #: contrib/admin/options.py:338 contrib/admin/options.py:348
-#: forms/models.py:275
+#: contrib/comments/templates/comments/preview.html:15 forms/models.py:288
 msgid "and"
 msgstr "と"
 
@@ -341,30 +349,35 @@ msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" を追加しました。続けて編集できます。"
 
-#: contrib/admin/options.py:536
+#: contrib/admin/options.py:528
 #, python-format
 msgid "Add %s"
 msgstr "%s を追加"
 
-#: contrib/admin/options.py:614
+#: contrib/admin/options.py:559 contrib/admin/options.py:673
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "主キーが %(key)r である %(name)s オブジェクトは存在しません。"
+
+#: contrib/admin/options.py:606
 #, python-format
 msgid "Change %s"
 msgstr "%s を変更"
 
-#: contrib/admin/options.py:646
+#: contrib/admin/options.py:638
 msgid "Database error"
 msgstr "データベースエラー"
 
-#: contrib/admin/options.py:696
+#: contrib/admin/options.py:688
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" を削除しました。"
 
-#: contrib/admin/options.py:703
+#: contrib/admin/options.py:695
 msgid "Are you sure?"
 msgstr "よろしいですか？"
 
-#: contrib/admin/options.py:732
+#: contrib/admin/options.py:724
 #, python-format
 msgid "Change history: %s"
 msgstr "変更履歴: %s"
@@ -377,11 +390,12 @@ msgid ""
 msgstr ""
 "正しいユーザ名とパスワードを入力してください (大文字小文字は区別します) 。"
 
-#: contrib/admin/sites.py:227 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:226 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
-msgstr "再ログインしてください。ログインセッションが有効期間切れしてしまいました。"
+msgstr ""
+"再ログインしてください。ログインセッションが有効期間切れしてしまいました。"
 
-#: contrib/admin/sites.py:234 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:233 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -389,37 +403,37 @@ msgstr ""
 "ブラウザがクッキーの使用を許可していないようです。クッキーの使用を許可して、"
 "もう一度このページを表示してください。"
 
-#: contrib/admin/sites.py:250 contrib/admin/sites.py:256
+#: contrib/admin/sites.py:249 contrib/admin/sites.py:255
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "ユーザ名には '@' を含められません。"
 
-#: contrib/admin/sites.py:253 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:252 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "メールアドレスはユーザ名ではありません。 '%s' を試してみてください。"
 
-#: contrib/admin/sites.py:313
+#: contrib/admin/sites.py:312
 msgid "Site administration"
 msgstr "サイト管理"
 
-#: contrib/admin/sites.py:326 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:325 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "ログイン"
 
-#: contrib/admin/sites.py:373
+#: contrib/admin/sites.py:372
 #, python-format
 msgid "%s administration"
 msgstr "%s サイト管理"
 
-#: contrib/admin/util.py:138
+#: contrib/admin/util.py:145
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "%(name)s に %(fieldname)s が一つ以上あります: %(obj)s"
 
-#: contrib/admin/util.py:143
+#: contrib/admin/util.py:150
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "%(name)s に %(fieldname)s が一つ以上あります:"
@@ -440,11 +454,11 @@ msgstr "現在:"
 msgid "Change:"
 msgstr "変更:"
 
-#: contrib/admin/widgets.py:121
+#: contrib/admin/widgets.py:123
 msgid "Lookup"
 msgstr "検索"
 
-#: contrib/admin/widgets.py:228
+#: contrib/admin/widgets.py:230
 msgid "Add Another"
 msgstr "追加"
 
@@ -459,7 +473,7 @@ msgstr "申し訳ありませんが、お探しのページは見つかりませ
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/base.html:33
 #: contrib/admin/templates/admin/change_form.html:17
 #: contrib/admin/templates/admin/change_list.html:8
 #: contrib/admin/templates/admin/delete_confirmation.html:6
@@ -503,18 +517,18 @@ msgstr ""
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:28
 msgid "Welcome,"
 msgstr "ようこそ"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "ドキュメント"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/admin/auth/user/change_password.html:13
 #: contrib/admin/templates/admin/auth/user/change_password.html:46
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -522,7 +536,7 @@ msgstr "ドキュメント"
 msgid "Change password"
 msgstr "パスワードの変更"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
@@ -548,7 +562,7 @@ msgstr "履歴"
 
 #: contrib/admin/templates/admin/change_form.html:28
 #: contrib/admin/templates/admin/edit_inline/stacked.html:13
-#: contrib/admin/templates/admin/edit_inline/tabular.html:25
+#: contrib/admin/templates/admin/edit_inline/tabular.html:27
 msgid "View on site"
 msgstr "サイト上で表示"
 
@@ -652,6 +666,7 @@ msgid "User"
 msgstr "ユーザ"
 
 #: contrib/admin/templates/admin/object_history.html:24
+#: contrib/comments/templates/comments/moderation_queue.html:33
 msgid "Action"
 msgstr "操作"
 
@@ -895,7 +910,7 @@ msgstr "メールアドレス"
 msgid "Reset my password"
 msgstr "パスワードをリセット"
 
-#: contrib/admin/templatetags/admin_list.py:288
+#: contrib/admin/templatetags/admin_list.py:285
 msgid "All dates"
 msgstr "いつでも"
 
@@ -1041,7 +1056,8 @@ msgstr "テキスト"
 msgid "Time"
 msgstr "時刻"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:22
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:21
+#: contrib/comments/templates/comments/moderation_queue.html:37
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
@@ -1154,7 +1170,7 @@ msgid "Change password: %s"
 msgstr "パスワードの変更: %s"
 
 #: contrib/auth/forms.py:15 contrib/auth/forms.py:48
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:127
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
@@ -1222,51 +1238,51 @@ msgstr "元のパスワード"
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "元のパスワードが間違っています。もう一度入力してください。"
 
-#: contrib/auth/models.py:72 contrib/auth/models.py:95
+#: contrib/auth/models.py:63 contrib/auth/models.py:86
 msgid "name"
 msgstr "名前"
 
-#: contrib/auth/models.py:74
+#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "コード名"
 
-#: contrib/auth/models.py:77
+#: contrib/auth/models.py:68
 msgid "permission"
 msgstr "パーミッション"
 
-#: contrib/auth/models.py:78 contrib/auth/models.py:96
+#: contrib/auth/models.py:69 contrib/auth/models.py:87
 msgid "permissions"
 msgstr "パーミッション"
 
-#: contrib/auth/models.py:99
+#: contrib/auth/models.py:90
 msgid "group"
 msgstr "グループ"
 
-#: contrib/auth/models.py:100 contrib/auth/models.py:146
+#: contrib/auth/models.py:91 contrib/auth/models.py:137
 msgid "groups"
 msgstr "グループ"
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:127
 msgid "username"
 msgstr "ユーザ名"
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:128
 msgid "first name"
 msgstr "名"
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:129
 msgid "last name"
 msgstr "姓"
 
-#: contrib/auth/models.py:139
+#: contrib/auth/models.py:130
 msgid "e-mail address"
 msgstr "メールアドレス"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:131
 msgid "password"
 msgstr "パスワード"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:131
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
@@ -1274,19 +1290,19 @@ msgstr ""
 "'[algo]$[salt]$[hexdigest]'形式か、<a href=\"password/\">パスワード変更フォー"
 "ム</a>を使ってください。"
 
-#: contrib/auth/models.py:141
+#: contrib/auth/models.py:132
 msgid "staff status"
 msgstr "スタッフ権限"
 
-#: contrib/auth/models.py:141
+#: contrib/auth/models.py:132
 msgid "Designates whether the user can log into this admin site."
 msgstr "ユーザが管理サイトにログイン可能かどうかを示します。"
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:133
 msgid "active"
 msgstr "有効"
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:133
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -1294,25 +1310,25 @@ msgstr ""
 "ユーザがアクティブかどうかを示します。アカウントを消す代わりに選択を解除して"
 "ください。"
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:134
 msgid "superuser status"
 msgstr "スーパーユーザ権限"
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:134
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "全ての権限を持っているとみなされます。"
 
-#: contrib/auth/models.py:144
+#: contrib/auth/models.py:135
 msgid "last login"
 msgstr "最終ログイン"
 
-#: contrib/auth/models.py:145
+#: contrib/auth/models.py:136
 msgid "date joined"
 msgstr "登録日"
 
-#: contrib/auth/models.py:147
+#: contrib/auth/models.py:138
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
@@ -1320,19 +1336,19 @@ msgstr ""
 "手動で付与したパーミッションに加え、所属しているグループに付与された全ての"
 "パーミッションを獲得します。"
 
-#: contrib/auth/models.py:148
+#: contrib/auth/models.py:139
 msgid "user permissions"
 msgstr "ユーザパーミッション"
 
-#: contrib/auth/models.py:152
+#: contrib/auth/models.py:143
 msgid "user"
 msgstr "ユーザ"
 
-#: contrib/auth/models.py:153
+#: contrib/auth/models.py:144
 msgid "users"
 msgstr "ユーザ"
 
-#: contrib/auth/models.py:308
+#: contrib/auth/models.py:300
 msgid "message"
 msgstr "メッセージ"
 
@@ -1352,24 +1368,26 @@ msgstr "内容"
 msgid "Metadata"
 msgstr "メタデータ"
 
-#: contrib/comments/forms.py:20
+#: contrib/comments/forms.py:19
+#: contrib/comments/templates/comments/moderation_queue.html:34
 msgid "Name"
 msgstr "名前"
 
-#: contrib/comments/forms.py:21
+#: contrib/comments/forms.py:20
 msgid "Email address"
 msgstr "メールアドレス"
 
-#: contrib/comments/forms.py:23
+#: contrib/comments/forms.py:22
+#: contrib/comments/templates/comments/moderation_queue.html:35
 msgid "Comment"
 msgstr "コメント"
 
-#: contrib/comments/forms.py:26
+#: contrib/comments/forms.py:25
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "このフィールドに入力するとコメントはスパム扱いされます"
 
-#: contrib/comments/forms.py:126
+#: contrib/comments/forms.py:125
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -1451,6 +1469,132 @@ msgstr ""
 "%(comment)s\n"
 "\n"
 "http://%(domain)s%(url)s"
+
+#: contrib/comments/templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "コメントを承認する"
+
+#: contrib/comments/templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "本当にこのコメントを承認しますか？"
+
+#: contrib/comments/templates/comments/approve.html:12
+#: contrib/comments/templates/comments/moderation_queue.html:49
+msgid "Approve"
+msgstr "承認"
+
+#: contrib/comments/templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "ご利用ありがとうございました！"
+
+#: contrib/comments/templates/comments/approved.html:7
+#: contrib/comments/templates/comments/deleted.html:7
+#: contrib/comments/templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "当サイトの品質向上にご協力いただきありがとうございました"
+
+#: contrib/comments/templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "コメントを削除する"
+
+#: contrib/comments/templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "本当にこのコメントを削除しますか？"
+
+#: contrib/comments/templates/comments/delete.html:12
+#: contrib/comments/templates/comments/moderation_queue.html:53
+msgid "Remove"
+msgstr "削除"
+
+#: contrib/comments/templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "ご利用ありがとうございました！"
+
+#: contrib/comments/templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "このコメントにフラグを付ける"
+
+#: contrib/comments/templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "本当にこのコメントにフラグを付けますか？"
+
+#: contrib/comments/templates/comments/flag.html:12
+msgid "Flag"
+msgstr "フラグを付ける"
+
+#: contrib/comments/templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "ご利用ありがとうございました！"
+
+#: contrib/comments/templates/comments/form.html:16
+#: contrib/comments/templates/comments/preview.html:31
+msgid "Post"
+msgstr "投稿"
+
+#: contrib/comments/templates/comments/form.html:17
+#: contrib/comments/templates/comments/preview.html:32
+msgid "Preview"
+msgstr "プレビュー"
+
+#: contrib/comments/templates/comments/moderation_queue.html:4
+#: contrib/comments/templates/comments/moderation_queue.html:19
+msgid "Comment moderation queue"
+msgstr "コメントのモデレーションキュー"
+
+#: contrib/comments/templates/comments/moderation_queue.html:26
+msgid "No comments to moderate"
+msgstr "モデレートするコメントはありません"
+
+#: contrib/comments/templates/comments/moderation_queue.html:36
+msgid "Email"
+msgstr "メールアドレス"
+
+#: contrib/comments/templates/comments/moderation_queue.html:38
+msgid "Authenticated?"
+msgstr "認証済みか？"
+
+#: contrib/comments/templates/comments/moderation_queue.html:39
+msgid "IP Address"
+msgstr "IP アドレス"
+
+#: contrib/comments/templates/comments/moderation_queue.html:40
+msgid "Date posted"
+msgstr "登録日"
+
+#: contrib/comments/templates/comments/moderation_queue.html:63
+msgid "yes"
+msgstr "はい"
+
+#: contrib/comments/templates/comments/moderation_queue.html:63
+msgid "no"
+msgstr "いいえ"
+
+#: contrib/comments/templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "コメントしてくれてありがとうございました"
+
+#: contrib/comments/templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "コメントありがとうございました"
+
+#: contrib/comments/templates/comments/preview.html:4
+#: contrib/comments/templates/comments/preview.html:12
+msgid "Preview your comment"
+msgstr "コメントのプレビュー"
+
+#: contrib/comments/templates/comments/preview.html:10
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "下記のエラーを修正してください。"
+
+#: contrib/comments/templates/comments/preview.html:15
+msgid "Post your comment"
+msgstr "コメントを投稿"
+
+#: contrib/comments/templates/comments/preview.html:15
+msgid "or make changes"
+msgstr "さらに編集"
 
 #: contrib/contenttypes/models.py:67
 msgid "python model class name"
@@ -3567,7 +3711,7 @@ msgstr "値は、空: None、真: True または偽: False でなければなり
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "HH:MM[:ss[.uuuuuu]]形式で時刻を入力してください。"
 
-#: db/models/fields/related.py:761
+#: db/models/fields/related.py:760
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
@@ -3632,11 +3776,11 @@ msgstr "少数部は %s 桁までで入力して下さい。"
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "整数部は %s 桁までで入力して下さい。"
 
-#: forms/fields.py:287 forms/fields.py:848
+#: forms/fields.py:287 forms/fields.py:849
 msgid "Enter a valid date."
 msgstr "日付を正しく入力してください。"
 
-#: forms/fields.py:321 forms/fields.py:849
+#: forms/fields.py:321 forms/fields.py:850
 msgid "Enter a valid time."
 msgstr "時間を正しく入力してください。"
 
@@ -3678,15 +3822,15 @@ msgstr "このURLはリンクが壊れています。"
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "正しく選択してください。 %(value)s は候補にありません。"
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:654
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:708
 msgid "Enter a list of values."
 msgstr "リストを入力してください。"
 
-#: forms/fields.py:877
+#: forms/fields.py:878
 msgid "Enter a valid IPv4 address."
 msgstr "有効なIPアドレス (IPv4) を入力してください。"
 
-#: forms/fields.py:887
+#: forms/fields.py:888
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "slug には半角の英数字、アンダースコア、ハイフン以外は使用できません。"
@@ -3695,41 +3839,45 @@ msgstr "slug には半角の英数字、アンダースコア、ハイフン以�
 msgid "Order"
 msgstr "並び変え"
 
-#: forms/models.py:268 forms/models.py:277
+#: forms/models.py:281 forms/models.py:290
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "この %(field_label)s を持った %(model_name)s が既に存在します。"
 
-#: forms/models.py:584
+#: forms/models.py:581
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr "インライン外部キーが親インスタンスの主キーと一致しません。"
+
+#: forms/models.py:638
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "正しく選択してください。選択したものは候補にありません。"
 
-#: forms/models.py:655
+#: forms/models.py:709
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "正しく選択してください。 %s は候補にありません。"
 
-#: template/defaultfilters.py:706
+#: template/defaultfilters.py:743
 msgid "yes,no,maybe"
 msgstr "はい,いいえ,たぶん"
 
-#: template/defaultfilters.py:737
+#: template/defaultfilters.py:774
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d バイト"
 
-#: template/defaultfilters.py:739
+#: template/defaultfilters.py:776
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:741
+#: template/defaultfilters.py:778
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:742
+#: template/defaultfilters.py:779
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
