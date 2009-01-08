@@ -821,7 +821,7 @@ msgstr "完成密码重设"
 
 #: contrib/admin/templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "你的密码尚未设置。现在你可以继续进行登录。"
+msgstr "你的口令己经设置。现在你可以继续进行登录。"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
