@@ -1538,6 +1538,15 @@ class BaseQuery(object):
         """
         return not (self.low_mark or self.high_mark)
 
+    def clear_select_fields(self):
+        """
+        Clears the list of fields to select (but not extra_select columns).
+        Some queryset types completely replace any existing list of select
+        columns.
+        """
+        self.select = []
+        self.select_fields = []
+
     def add_fields(self, field_names, allow_m2m=True):
         """
         Adds the given (model) fields to the select set. The field names are

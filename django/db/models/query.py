@@ -680,6 +680,7 @@ class ValuesQuerySet(QuerySet):
         Called by the _clone() method after initializing the rest of the
         instance.
         """
+        self.query.clear_select_fields()
         self.extra_names = []
         if self._fields:
             if not self.query.extra_select:
@@ -704,7 +705,10 @@ class ValuesQuerySet(QuerySet):
         Cloning a ValuesQuerySet preserves the current fields.
         """
         c = super(ValuesQuerySet, self)._clone(klass, **kwargs)
-        c._fields = self._fields[:]
+        if not hasattr(c, '_fields'):
+            # Only clone self._fields if _fields wasn't passed into the cloning
+            # call directly.
+            c._fields = self._fields[:]
         c.field_names = self.field_names
         c.extra_names = self.extra_names
         if setup and hasattr(c, '_setup_query'):
