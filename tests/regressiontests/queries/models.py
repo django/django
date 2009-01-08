@@ -1020,6 +1020,10 @@ cases).
 # optimise the inner query without losing results.
 >>> Annotation.objects.exclude(tag__children__name="t2")
 [<Annotation: a2>]
+
+Bug #9985 -- qs.values_list(...).values(...) combinations should work.
+>>> Note.objects.values_list("note", flat=True).values("id").order_by("id")
+[{'id': 1}, {'id': 2}, {'id': 3}]
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
