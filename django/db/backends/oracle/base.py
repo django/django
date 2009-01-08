@@ -245,23 +245,23 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def _valid_connection(self):
         return self.connection is not None
 
+    def _connect_string(self, settings):
+        if len(settings.DATABASE_HOST.strip()) == 0:
+            settings.DATABASE_HOST = 'localhost'
+        if len(settings.DATABASE_PORT.strip()) != 0:
+            dsn = '%s:%s/%s' % (settings.DATABASE_HOST,
+                                settings.DATABASE_PORT,
+                                settings.DATABASE_NAME)
+        else:
+            dsn = settings.DATABASE_NAME
+        return "%s/%s@%s" % (settings.DATABASE_USER,
+                             settings.DATABASE_PASSWORD, dsn)
+
     def _cursor(self, settings):
         cursor = None
         if not self._valid_connection():
-            if len(settings.DATABASE_HOST.strip()) == 0:
-                settings.DATABASE_HOST = 'localhost'
-            if len(settings.DATABASE_PORT.strip()) != 0:
-                dsn = Database.makedsn(settings.DATABASE_HOST,
-                                       int(settings.DATABASE_PORT),
-                                       settings.DATABASE_NAME)
-                self.connection = Database.connect(settings.DATABASE_USER,
-                                                   settings.DATABASE_PASSWORD,
-                                                   dsn, **self.options)
-            else:
-                conn_string = "%s/%s@%s" % (settings.DATABASE_USER,
-                                            settings.DATABASE_PASSWORD,
-                                            settings.DATABASE_NAME)
-                self.connection = Database.connect(conn_string, **self.options)
+            conn_string = self._connect_string(settings)
+            self.connection = Database.connect(conn_string, **self.options)
             cursor = FormatStylePlaceholderCursor(self.connection)
             # Set oracle date to ansi date format.  This only needs to execute
             # once when we create a new connection.
