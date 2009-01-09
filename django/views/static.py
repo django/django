@@ -91,7 +91,8 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
 
 def directory_index(path, fullpath):
     try:
-        t = loader.get_template('static/directory_index.html')
+        t = loader.select_template(['static/directory_index.html',
+                'static/directory_index'])
     except TemplateDoesNotExist:
         t = Template(DEFAULT_DIRECTORY_INDEX_TEMPLATE, name='Default directory index template')
     files = []
