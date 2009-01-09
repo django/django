@@ -90,7 +90,7 @@ You can customize the index view by creating a template called
     * ``directory`` -- the directory name (a string)
     * ``file_list`` -- a list of file names (as strings) in the directory
 
-Here's the default ``static/directory_index`` template:
+Here's the default ``static/directory_index.html`` template:
 
 .. code-block:: html+django
 
@@ -111,6 +111,14 @@ Here's the default ``static/directory_index`` template:
         </ul>
     </body>
     </html>
+
+.. versionchanged:: 1.0.3
+    Prior to Django 1.0.3, there was a bug in the view that provided directory
+    listings. The template that was loaded had to be called
+    ``static/directory_listing`` (with no ``.html`` extension). For backwards
+    compatibility with earlier versions, Django will still load templates with
+    the older (no extension) name, but it will prefer a the
+    ``directory_index.html`` version.
 
 Limiting use to DEBUG=True
 ==========================
