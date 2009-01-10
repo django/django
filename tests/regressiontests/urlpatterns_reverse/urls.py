@@ -1,6 +1,10 @@
 from django.conf.urls.defaults import *
 from views import empty_view, absolute_kwargs_view
 
+other_patterns = patterns('',
+    url(r'non_path_include/$', empty_view, name='non_path_include'),
+)
+
 urlpatterns = patterns('',
     url(r'^places/(\d+)/$', empty_view, name='places'),
     url(r'^places?/$', empty_view, name="places?"),
@@ -51,5 +55,9 @@ urlpatterns = patterns('',
     url(r'arg_view/(?P<arg1>\d+)/$', 'kwargs_view'),
     url(r'absolute_arg_view/(?P<arg1>\d+)/$', absolute_kwargs_view),
     url(r'absolute_arg_view/$', absolute_kwargs_view),
+    
+    url('^includes/', include(other_patterns)),
 
 )
+
+

@@ -143,6 +143,8 @@ class RegexURLResolver(object):
         # urlconf_name is a string representing the module containing urlconfs.
         self.regex = re.compile(regex, re.UNICODE)
         self.urlconf_name = urlconf_name
+        if not isinstance(urlconf_name, basestring):
+            self._urlconf_module = self.urlconf_name
         self.callback = None
         self.default_kwargs = default_kwargs or {}
         self._reverse_dict = MultiValueDict()
@@ -151,8 +153,8 @@ class RegexURLResolver(object):
         return '<%s %s %s>' % (self.__class__.__name__, self.urlconf_name, self.regex.pattern)
 
     def _get_reverse_dict(self):
-        if not self._reverse_dict and hasattr(self.urlconf_module, 'urlpatterns'):
-            for pattern in reversed(self.urlconf_module.urlpatterns):
+        if not self._reverse_dict:
+            for pattern in reversed(self.url_patterns):
                 p_pattern = pattern.regex.pattern
                 if p_pattern.startswith('^'):
                     p_pattern = p_pattern[1:]
@@ -176,7 +178,7 @@ class RegexURLResolver(object):
         match = self.regex.search(path)
         if match:
             new_path = path[match.end():]
-            for pattern in self.urlconf_module.urlpatterns:
+            for pattern in self.url_patterns:
                 try:
                     sub_match = pattern.resolve(new_path)
                 except Resolver404, e:
@@ -200,7 +202,13 @@ class RegexURLResolver(object):
     urlconf_module = property(_get_urlconf_module)
 
     def _get_url_patterns(self):
-        return self.urlconf_module.urlpatterns
+        patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+        try:
+            iter(patterns)
+        except TypeError:
+            raise ImproperlyConfigured("The included urlconf %s doesn't have any"
+                "patterns in it" % self.urlconf_name)
+        return patterns
     url_patterns = property(_get_url_patterns)
 
     def _resolve_special(self, view_type):
