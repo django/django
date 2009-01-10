@@ -43,6 +43,46 @@ By default, Django stores sessions in your database (using the model
 some setups it's faster to store session data elsewhere, so Django can be
 configured to store session data on your filesystem or in your cache.
 
+Using cached sessions
+---------------------
+
+For better performance, you may want to use a cache-based session backend.
+
+.. versionchanged:: 1.1
+   Django 1.0 did not include the ``cached_db`` session backend.
+
+To store session data using Django's cache system, you'll first need to make
+sure you've configured your cache; see the :ref:`cache documentation
+<topics-cache>` for details.
+
+.. warning::
+
+    You should only use cache-based sessions if you're using the Memcached cache
+    backend. The local-memory cache backend doesn't retain data long enough to
+    be a good choice, and it'll be faster to use file or database sessions
+    directly instead of sending everything through the file or database cache
+    backends.
+
+Once your cache in configured, you've got two choices for how to store data in
+the cache:
+
+    * Set :setting:`SESSION_ENGINE` to
+      ``"django.contrib.sessions.backends.cache"`` for a simple caching session
+      store. Session data will be stored directly your cache. However, session
+      data may not be persistant: cached data can be evicted if the cache fills
+      up or if the cache server is restarted.
+
+    * For persistant, cached data, set :setting:`SESSION_ENGINE` to
+      ``"django.contrib.sessions.backends.cached_db"``. This uses a
+      write-through cache -- every write to the cache will also be written to
+      the database. Session reads only use the database if the data is not
+      already in the cache.
+
+Both session stores are quite fast, but the simple cache is faster because it
+disreguards persistance. In most cases, the ``cached_db`` backend will be fast
+enough, but if you need that last bit of performance, and are willing to let
+session data be expunged from time to time, the ``cache`` backend is for you.
+
 Using file-based sessions
 -------------------------
 
@@ -53,23 +93,6 @@ You might also want to set the ``SESSION_FILE_PATH`` setting (which defaults
 to output from ``tempfile.gettempdir()``, most likely ``/tmp``) to control
 where Django stores session files. Be sure to check that your Web server has
 permissions to read and write to this location.
-
-Using cache-based sessions
---------------------------
-
-To store session data using Django's cache system, set ``SESSION_ENGINE``
-to ``"django.contrib.sessions.backends.cache"``. You'll want to make sure
-you've configured your cache; see the :ref:`cache documentation <topics-cache>` for details.
-
-.. _cache documentation: ../cache/
-
-.. note::
-
-    You should probably only use cache-based sessions if you're using the
-    Memcached cache backend. The local-memory cache backend doesn't retain data
-    long enough to be a good choice, and it'll be faster to use file or
-    database sessions directly instead of sending everything through the file
-    or database cache backends.
 
 Using sessions in views
 =======================

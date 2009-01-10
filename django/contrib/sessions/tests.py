@@ -3,6 +3,7 @@ r"""
 >>> from django.conf import settings
 >>> from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 >>> from django.contrib.sessions.backends.cache import SessionStore as CacheSession
+>>> from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
 >>> from django.contrib.sessions.backends.file import SessionStore as FileSession
 >>> from django.contrib.sessions.backends.base import SessionBase
 >>> from django.contrib.sessions.models import Session
@@ -53,6 +54,31 @@ True
 >>> db_session = DatabaseSession(db_session.session_key)
 >>> db_session.save()
 >>> DatabaseSession('1').get('cat')
+
+#
+# Cached DB session tests
+#
+
+>>> cdb_session = CacheDBSession()
+>>> cdb_session.modified
+False
+>>> cdb_session['cat'] = "dog"
+>>> cdb_session.modified
+True
+>>> cdb_session.pop('cat')
+'dog'
+>>> cdb_session.pop('some key', 'does not exist')
+'does not exist'
+>>> cdb_session.save()
+>>> cdb_session.exists(cdb_session.session_key)
+True
+>>> cdb_session.delete(cdb_session.session_key)
+>>> cdb_session.exists(cdb_session.session_key)
+False
+
+#
+# File session tests.
+#
 
 # Do file session tests in an isolated directory, and kill it after we're done.
 >>> original_session_file_path = settings.SESSION_FILE_PATH
