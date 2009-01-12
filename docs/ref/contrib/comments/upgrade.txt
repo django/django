@@ -48,7 +48,7 @@ run the following SQL:
         comment, submit_date, ip_address, is_public, is_removed)
     SELECT
         content_type_id, object_id, site_id, person_name, '', '', comment,
-        submit_date, ip_address, is_public, approved
+        submit_date, ip_address, is_public, not approved
     FROM comments_freecomment;
 
     INSERT INTO django_comments 
