@@ -9,7 +9,7 @@
   <form action="." method="post">
     <input type="hidden" name="next" value="{{ next }}" id="next" />
     <p class="submit">
-    <input type="submit" name="submit" value="{% trans "Remove" %}" /> or <a href="{{ comment.permalink }}">cancel</a>
+    <input type="submit" name="submit" value="{% trans "Remove" %}" /> or <a href="{{ comment.get_absolute_url }}">cancel</a>
     </p>
   </form>
 {% endblock %}
