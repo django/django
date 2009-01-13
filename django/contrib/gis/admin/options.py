@@ -28,12 +28,11 @@ class GeoModelAdmin(ModelAdmin):
     scale_text = True
     layerswitcher = True
     scrollable = True
-    admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
     map_width = 600
     map_height = 400
     map_srid = 4326
     map_template = 'gis/admin/openlayers.html'
-    openlayers_url = 'http://openlayers.org/api/2.6/OpenLayers.js'
+    openlayers_url = 'http://openlayers.org/api/2.7/OpenLayers.js'
     wms_url = 'http://labs.metacarta.com/wms/vmap0'
     wms_layer = 'basic'
     wms_name = 'OpenLayers WMS'
@@ -76,8 +75,7 @@ class GeoModelAdmin(ModelAdmin):
         class OLMap(self.widget):
             template = self.map_template
             geom_type = db_field._geom
-            params = {'admin_media_prefix' : self.admin_media_prefix,
-                      'default_lon' : self.default_lon,
+            params = {'default_lon' : self.default_lon,
                       'default_lat' : self.default_lat,
                       'default_zoom' : self.default_zoom,
                       'display_wkt' : self.debug or self.display_wkt,

@@ -1,7 +1,15 @@
+from django.conf import settings
 from django.contrib.gis.gdal import OGRException
 from django.contrib.gis.geos import GEOSGeometry, GEOSException
 from django.forms.widgets import Textarea
-from django.template.loader import render_to_string
+from django.template import loader, Context
+from django.utils import translation
+
+# Creating a template context that contains Django settings
+# values needed by admin map templates.
+geo_context = Context({'ADMIN_MEDIA_PREFIX' : settings.ADMIN_MEDIA_PREFIX,
+                       'LANGUAGE_BIDI' : translation.get_language_bidi(),
+                       })
 
 class OpenLayersWidget(Textarea):
     """
@@ -40,8 +48,9 @@ class OpenLayersWidget(Textarea):
             srid = self.params['srid']
             if value.srid != srid: 
                 try:
-                    value.transform(srid)
-                    wkt = value.wkt
+                    ogr = value.ogr
+                    ogr.transform(srid)
+                    wkt = ogr.wkt
                 except OGRException:
                     wkt = ''
             else:
@@ -51,7 +60,8 @@ class OpenLayersWidget(Textarea):
             # geometry.
             self.params['wkt'] = wkt
 
-        return render_to_string(self.template, self.params)
+        return loader.render_to_string(self.template, self.params,
+                                       context_instance=geo_context)
     
     def map_options(self):
         "Builds the map options hash for the OpenLayers template."
