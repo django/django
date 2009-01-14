@@ -140,7 +140,7 @@ class Comment(BaseCommentAbstractModel):
         Return this comment as plain text.  Useful for emails.
         """
         d = {
-            'user': self.user,
+            'user': self.user or self.name,
             'date': self.submit_date,
             'comment': self.comment,
             'domain': self.site.domain,

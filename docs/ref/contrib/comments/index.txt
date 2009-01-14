@@ -156,7 +156,7 @@ A complete form might look like::
     <form action="{% comment_form_target %}" method="POST">
       {{ form }}
       <p class="submit">
-        <input type="submit" name="submit" class="submit-post" value="Preview">
+        <input type="submit" name="preview" class="submit-post" value="Preview">
       </p>
     </form>
     

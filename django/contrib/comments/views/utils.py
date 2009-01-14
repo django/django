@@ -9,7 +9,6 @@ from django.core import urlresolvers
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings
 from django.contrib import comments
 
 def next_redirect(data, default, default_view, **get_kwargs):

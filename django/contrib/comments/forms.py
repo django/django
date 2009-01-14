@@ -1,11 +1,9 @@
-import re
 import time
 import datetime
 
 from django import forms
 from django.forms.util import ErrorDict
 from django.conf import settings
-from django.http import Http404
 from django.contrib.contenttypes.models import ContentType
 from models import Comment
 from django.utils.encoding import force_unicode

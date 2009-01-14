@@ -1,5 +1,4 @@
 from django.db import models
-from django.dispatch import dispatcher
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_unicode
 
