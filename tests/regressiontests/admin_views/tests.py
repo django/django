@@ -14,6 +14,11 @@ from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey
 class AdminViewBasicTest(TestCase):
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml']
     
+    # Store the bit of the URL where the admin is registered as a class 
+    # variable. That way we can test a second AdminSite just by subclassing
+    # this test case and changing urlbit.
+    urlbit = 'admin'
+    
     def setUp(self):
         self.client.login(username='super', password='secret')
     
@@ -24,20 +29,20 @@ class AdminViewBasicTest(TestCase):
         """
         If you leave off the trailing slash, app should redirect and add it.
         """
-        request = self.client.get('/test_admin/admin/admin_views/article/add')
+        request = self.client.get('/test_admin/%s/admin_views/article/add' % self.urlbit)
         self.assertRedirects(request,
-            '/test_admin/admin/admin_views/article/add/'
+            '/test_admin/%s/admin_views/article/add/' % self.urlbit, status_code=301
         )
     
     def testBasicAddGet(self):
         """
         A smoke test to ensure GET on the add_view works.
         """
-        response = self.client.get('/test_admin/admin/admin_views/section/add/')
+        response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit)
         self.failUnlessEqual(response.status_code, 200)
     
     def testAddWithGETArgs(self):
-        response = self.client.get('/test_admin/admin/admin_views/section/add/', {'name': 'My Section'})
+        response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit, {'name': 'My Section'})
         self.failUnlessEqual(response.status_code, 200)
         self.failUnless(
             'value="My Section"' in response.content, 
@@ -48,7 +53,7 @@ class AdminViewBasicTest(TestCase):
         """
         A smoke test to ensureGET on the change_view works.
         """
-        response = self.client.get('/test_admin/admin/admin_views/section/1/')
+        response = self.client.get('/test_admin/%s/admin_views/section/1/' % self.urlbit)
         self.failUnlessEqual(response.status_code, 200)
     
     def testBasicAddPost(self):
@@ -61,7 +66,7 @@ class AdminViewBasicTest(TestCase):
             "article_set-TOTAL_FORMS": u"3",
             "article_set-INITIAL_FORMS": u"0",
         }
-        response = self.client.post('/test_admin/admin/admin_views/section/add/', post_data)
+        response = self.client.post('/test_admin/%s/admin_views/section/add/' % self.urlbit, post_data)
         self.failUnlessEqual(response.status_code, 302) # redirect somewhere
     
     def testBasicEditPost(self):
@@ -106,7 +111,7 @@ class AdminViewBasicTest(TestCase):
             "article_set-5-date_0": u"",
             "article_set-5-date_1": u"",
         }
-        response = self.client.post('/test_admin/admin/admin_views/section/1/', post_data)
+        response = self.client.post('/test_admin/%s/admin_views/section/1/' % self.urlbit, post_data)
         self.failUnlessEqual(response.status_code, 302) # redirect somewhere
 
     def testChangeListSortingCallable(self):
@@ -114,7 +119,7 @@ class AdminViewBasicTest(TestCase):
         Ensure we can sort on a list_display field that is a callable 
         (column 2 is callable_year in ArticleAdmin)
         """
-        response = self.client.get('/test_admin/admin/admin_views/article/', {'ot': 'asc', 'o': 2})
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'ot': 'asc', 'o': 2})
         self.failUnlessEqual(response.status_code, 200)
         self.failUnless(
             response.content.index('Oldest content') < response.content.index('Middle content') and
@@ -127,7 +132,7 @@ class AdminViewBasicTest(TestCase):
         Ensure we can sort on a list_display field that is a Model method 
         (colunn 3 is 'model_year' in ArticleAdmin)
         """
-        response = self.client.get('/test_admin/admin/admin_views/article/', {'ot': 'dsc', 'o': 3})
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'ot': 'dsc', 'o': 3})
         self.failUnlessEqual(response.status_code, 200)
         self.failUnless(
             response.content.index('Newest content') < response.content.index('Middle content') and
@@ -140,7 +145,7 @@ class AdminViewBasicTest(TestCase):
         Ensure we can sort on a list_display field that is a ModelAdmin method 
         (colunn 4 is 'modeladmin_year' in ArticleAdmin)
         """
-        response = self.client.get('/test_admin/admin/admin_views/article/', {'ot': 'asc', 'o': 4})
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'ot': 'asc', 'o': 4})
         self.failUnlessEqual(response.status_code, 200)
         self.failUnless(
             response.content.index('Oldest content') < response.content.index('Middle content') and 
@@ -150,7 +155,7 @@ class AdminViewBasicTest(TestCase):
         
     def testLimitedFilter(self):
         """Ensure admin changelist filters do not contain objects excluded via limit_choices_to."""
-        response = self.client.get('/test_admin/admin/admin_views/thing/')
+        response = self.client.get('/test_admin/%s/admin_views/thing/' % self.urlbit)
         self.failUnlessEqual(response.status_code, 200)
         self.failUnless(
             '<div id="changelist-filter">' in response.content, 
@@ -163,11 +168,30 @@ class AdminViewBasicTest(TestCase):
         
     def testIncorrectLookupParameters(self):
         """Ensure incorrect lookup parameters are handled gracefully."""
-        response = self.client.get('/test_admin/admin/admin_views/thing/', {'notarealfield': '5'})
-        self.assertRedirects(response, '/test_admin/admin/admin_views/thing/?e=1')        
-        response = self.client.get('/test_admin/admin/admin_views/thing/', {'color__id__exact': 'StringNotInteger!'})
-        self.assertRedirects(response, '/test_admin/admin/admin_views/thing/?e=1')
-            
+        response = self.client.get('/test_admin/%s/admin_views/thing/' % self.urlbit, {'notarealfield': '5'})
+        self.assertRedirects(response, '/test_admin/%s/admin_views/thing/?e=1' % self.urlbit)        
+        response = self.client.get('/test_admin/%s/admin_views/thing/' % self.urlbit, {'color__id__exact': 'StringNotInteger!'})
+        self.assertRedirects(response, '/test_admin/%s/admin_views/thing/?e=1' % self.urlbit)
+
+class CustomModelAdminTest(AdminViewBasicTest):
+    urlbit = "admin2"
+
+    def testCustomAdminSiteLoginTemplate(self):
+        self.client.logout()
+        request = self.client.get('/test_admin/admin2/')
+        self.assertTemplateUsed(request, 'custom_admin/login.html')
+        self.assert_('Hello from a custom login template' in request.content)
+
+    def testCustomAdminSiteIndexViewAndTemplate(self):
+        request = self.client.get('/test_admin/admin2/')
+        self.assertTemplateUsed(request, 'custom_admin/index.html')
+        self.assert_('Hello from a custom index template *bar*' in request.content)
+    
+    def testCustomAdminSiteView(self):
+        self.client.login(username='super', password='secret')
+        response = self.client.get('/test_admin/%s/my_view/' % self.urlbit)
+        self.assert_(response.content == "Django is a magical pony!", response.content)
+
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
     ct = ContentType.objects.get_for_model(Model)
@@ -431,44 +455,6 @@ class AdminViewPermissionsTest(TestCase):
         self.assertTemplateUsed(request, 'custom_admin/object_history.html')
 
         self.client.get('/test_admin/admin/logout/')
-
-    def testCustomAdminSiteTemplates(self):
-        from django.contrib import admin
-        self.assertEqual(admin.site.index_template, None)
-        self.assertEqual(admin.site.login_template, None)
-
-        self.client.get('/test_admin/admin/logout/')
-        request = self.client.get('/test_admin/admin/')
-        self.assertTemplateUsed(request, 'admin/login.html')
-        self.client.post('/test_admin/admin/', self.changeuser_login)
-        request = self.client.get('/test_admin/admin/')
-        self.assertTemplateUsed(request, 'admin/index.html')
-
-        self.client.get('/test_admin/admin/logout/')
-        admin.site.login_template = 'custom_admin/login.html'
-        admin.site.index_template = 'custom_admin/index.html'
-        request = self.client.get('/test_admin/admin/')
-        self.assertTemplateUsed(request, 'custom_admin/login.html')
-        self.assert_('Hello from a custom login template' in request.content)
-        self.client.post('/test_admin/admin/', self.changeuser_login)
-        request = self.client.get('/test_admin/admin/')
-        self.assertTemplateUsed(request, 'custom_admin/index.html')
-        self.assert_('Hello from a custom index template' in request.content)
-
-        # Finally, using monkey patching check we can inject custom_context arguments in to index
-        original_index = admin.site.index
-        def index(*args, **kwargs):
-            kwargs['extra_context'] = {'foo': '*bar*'}
-            return original_index(*args, **kwargs)
-        admin.site.index = index
-        request = self.client.get('/test_admin/admin/')
-        self.assertTemplateUsed(request, 'custom_admin/index.html')
-        self.assert_('Hello from a custom index template *bar*' in request.content)
-
-        self.client.get('/test_admin/admin/logout/')
-        del admin.site.index # Resets to using the original
-        admin.site.login_template = None
-        admin.site.index_template = None
 
     def testDeleteView(self):
         """Delete view should restrict access and actually delete items."""

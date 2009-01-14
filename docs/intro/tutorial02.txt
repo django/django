@@ -57,7 +57,7 @@ activate the admin site for your installation, do these three things:
               # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
               # Uncomment the next line to enable the admin:
-              **(r'^admin/(.*)', admin.site.root),**
+              **(r'^admin/', include(admin.site.urls)),**
           )
 
       (The bold lines are the ones that needed to be uncommented.)

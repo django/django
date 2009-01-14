@@ -6,7 +6,6 @@ from django.utils.text import capfirst
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
-
 def quote(s):
     """
     Ensure that primary key values do not confuse the admin URLs by escaping

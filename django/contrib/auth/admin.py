@@ -40,6 +40,12 @@ class UserAdmin(admin.ModelAdmin):
         if url.endswith('password'):
             return self.user_change_password(request, url.split('/')[0])
         return super(UserAdmin, self).__call__(request, url)
+    
+    def get_urls(self):
+        from django.conf.urls.defaults import patterns
+        return patterns('',
+            (r'^(\d+)/password/$', self.admin_site.admin_view(self.user_change_password))
+        ) + super(UserAdmin, self).get_urls()
 
     def add_view(self, request):
         # It's an error for a user to have add permission but NOT change

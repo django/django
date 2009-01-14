@@ -632,6 +632,49 @@ model instance::
                 instance.save()
             formset.save_m2m()
 
+``get_urls(self)``
+~~~~~~~~~~~~~~~~~~~
+
+The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for 
+that ModelAdmin in the same way as a URLconf.  Therefore you can extend them as 
+documented in :ref:`topics-http-urls`::
+    
+    class MyModelAdmin(admin.ModelAdmin):
+        def get_urls(self):
+            urls = super(MyModelAdmin, self).get_urls()
+            my_urls = patterns('',
+                (r'^my_view/$', self.my_view)
+            ) 
+            return my_urls + urls
+            
+.. note::
+
+    Notice that the custom patterns are included *before* the regular admin
+    URLs: the admin URL patterns are very permissive and will match nearly
+    anything, so you'll usually want to prepend your custom URLs to the built-in
+    ones.
+
+Note, however, that the ``self.my_view`` function registered above will *not*
+have any permission check done; it'll be accessible to the general public. Since
+this is usually not what you want, Django provides a convience wrapper to check
+permissions. This wrapper is :meth:`AdminSite.admin_view` (i.e.
+``self.admin_site.admin_view`` inside a ``ModelAdmin`` instance); use it like
+so::
+
+    class MyModelAdmin(admin.ModelAdmin):
+        def get_urls(self):
+            urls = super(MyModelAdmin, self).get_urls()
+            my_urls = patterns('',
+                (r'^my_view/$', self.admin_site.admin_view(self.my_view))
+            ) 
+            return my_urls + urls
+
+Notice the wrapped view in the fifth line above::
+
+    (r'^my_view/$', self.admin_site.admin_view(self.my_view))
+    
+This wrapping will protect ``self.my_view`` from unauthorized access.
+
 ``ModelAdmin`` media definitions
 --------------------------------
 
@@ -1027,7 +1070,7 @@ In this example, we register the default ``AdminSite`` instance
     admin.autodiscover()
 
     urlpatterns = patterns('',
-        ('^admin/(.*)', admin.site.root),
+        ('^admin/', include(admin.site.urls)),
     )
 
 Above we used ``admin.autodiscover()`` to automatically load the
@@ -1041,15 +1084,13 @@ In this example, we register the ``AdminSite`` instance
     from myproject.admin import admin_site
 
     urlpatterns = patterns('',
-        ('^myadmin/(.*)', admin_site.root),
+        ('^myadmin/', include(admin_site.urls)),
     )
 
 There is really no need to use autodiscover when using your own ``AdminSite``
 instance since you will likely be importing all the per-app admin.py modules
 in your ``myproject.admin`` module.
 
-Note that the regular expression in the URLpattern *must* group everything in
-the URL that comes after the URL root -- hence the ``(.*)`` in these examples.
 
 Multiple admin sites in the same URLconf
 ----------------------------------------
@@ -1068,6 +1109,29 @@ respectively::
     from myproject.admin import basic_site, advanced_site
 
     urlpatterns = patterns('',
-        ('^basic-admin/(.*)', basic_site.root),
-        ('^advanced-admin/(.*)', advanced_site.root),
+        ('^basic-admin/', include(basic_site.urls)),
+        ('^advanced-admin/', include(advanced_site.urls)),
     )
+
+Adding views to admin sites
+---------------------------
+
+It possible to add additional views to the admin site in the same way one can 
+add them to ``ModelAdmins``.  This by using the ``get_urls()`` method on an 
+AdminSite in the same way as `described above`__
+
+__ `get_urls(self)`_
+
+Protecting Custom ``AdminSite`` and ``ModelAdmin``
+--------------------------------------------------
+
+By default all the views in the Django admin are protected so that only staff 
+members can access them.  If you add your own views to either a ``ModelAdmin`` 
+or ``AdminSite`` you should ensure that where necessary they are protected in 
+the same manner.  To do this use the ``admin_perm_test`` decorator provided in 
+``django.contrib.admin.utils.admin_perm_test``.  It can be used in the same way 
+as the ``login_requied`` decorator.
+
+.. note::
+    The ``admin_perm_test`` decorator can only be used on methods which are on 
+    ``ModelAdmins`` or ``AdminSites``, you cannot use it on arbitrary functions.
