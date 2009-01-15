@@ -1408,7 +1408,9 @@ Aggregation Functions
 .. versionadded:: 1.1
 
 Django provides the following aggregation functions in the
-``django.db.models`` module.
+``django.db.models`` module. For details on how to use these
+aggregate functions, see
+:ref:`the topic guide on aggregation <topics-db-aggregation>`.
 
 ``Avg``
 ~~~~~~~
@@ -1458,7 +1460,7 @@ Returns the minimum value of the given field.
     * Return type: same as input field
 
 ``StdDev``
-~~~~~~~~~
+~~~~~~~~~~
 
 .. class:: StdDev(field, sample=False)
 
@@ -1491,7 +1493,7 @@ Computes the sum of all values of the given field.
     * Return type: same as input field
 
 ``Variance``
-~~~~~~~~~
+~~~~~~~~~~~~
 
 .. class:: Variance(field, sample=False)
 
