@@ -46,6 +46,7 @@ class MeasureBase(object):
         """
         val = 0.0
         for unit, value in kwargs.iteritems():
+            if not isinstance(value, float): value = float(value)
             if unit in self.UNITS:
                 val += self.UNITS[unit] * value
                 default_unit = unit
