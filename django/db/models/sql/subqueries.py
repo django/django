@@ -9,7 +9,7 @@ from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
-        'CountQuery']
+        'AggregateQuery']
 
 class DeleteQuery(Query):
     """
@@ -400,15 +400,25 @@ class DateQuery(Query):
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
 
-class CountQuery(Query):
+class AggregateQuery(Query):
     """
-    A CountQuery knows how to take a normal query which would select over
-    multiple distinct columns and turn it into SQL that can be used on a
-    variety of backends (it requires a select in the FROM clause).
+    An AggregateQuery takes another query as a parameter to the FROM
+    clause and only selects the elements in the provided list.
     """
-    def get_from_clause(self):
-        result, params = self._query.as_sql()
-        return ['(%s) A1' % result], params
+    def add_subquery(self, query):
+        self.subquery, self.sub_params = query.as_sql(with_col_aliases=True)
 
-    def get_ordering(self):
-        return ()
+    def as_sql(self, quote_func=None):
+        """
+        Creates the SQL for this query. Returns the SQL string and list of
+        parameters.
+        """
+        sql = ('SELECT %s FROM (%s) subquery' % (
+            ', '.join([
+                aggregate.as_sql()
+                for aggregate in self.aggregate_select.values()
+            ]),
+            self.subquery)
+        )
+        params = self.sub_params
+        return (sql, params)

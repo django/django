@@ -7,7 +7,7 @@ Model API reference. For introductory material, see :ref:`topics-db-models`.
 
 .. toctree::
    :maxdepth: 1
-   
+
    fields
    relations
    options

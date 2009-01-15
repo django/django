@@ -158,6 +158,48 @@ In SQL terms, that evaluates to::
 
 Note the second example is more restrictive.
 
+``annotate(*args, **kwargs)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.1
+
+Annotates each object in the ``QuerySet`` with the provided list of
+aggregate values (averages, sums, etc) that have been computed over
+the objects that are related to the objects in the ``QuerySet``.
+Each argument to ``annotate()`` is an annotation that will be added
+to each object in the ``QuerySet`` that is returned.
+
+The aggregation functions that are provided by Django are described
+in `Aggregation Functions`_ below.
+
+Annotations specified using keyword arguments will use the keyword as
+the alias for the annotation. Anonymous arguments will have an alias
+generated for them based upon the name of the aggregate function and
+the model field that is being aggregated.
+
+For example, if you were manipulating a list of blogs, you may want
+to determine how many entries have been made in each blog::
+
+    >>> q = Blog.objects.annotate(Count('entry'))
+    # The name of the first blog
+    >>> q[0].name
+    'Blogasaurus'
+    # The number of entries on the first blog
+    >>> q[0].entry__count
+    42
+
+The ``Blog`` model doesn't define an ``entry_count`` attribute by itself,
+but by using a keyword argument to specify the aggregate function, you can
+control the name of the annotation::
+
+    >>> q = Blog.objects.annotate(number_of_entries=Count('entry'))
+    # The number of entries on the first blog, using the name provided
+    >>> q[0].number_of_entries
+    42
+
+For an in-depth discussion of aggregation, see :ref:`the topic guide on
+Aggregation <topics-db-aggregation>`.
+
 ``order_by(*fields)``
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -931,6 +973,38 @@ exist with the given parameters.
 
 Note ``latest()`` exists purely for convenience and readability.
 
+``aggregate(*args, **kwargs)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.1
+
+Returns a dictionary of aggregate values (averages, sums, etc) calculated
+over the ``QuerySet``. Each argument to ``aggregate()`` specifies
+a value that will be included in the dictionary that is returned.
+
+The aggregation functions that are provided by Django are described
+in `Aggregation Functions`_ below.
+
+Aggregates specified using keyword arguments will use the keyword as
+the name for the annotation. Anonymous arguments will have an name
+generated for them based upon the name of the aggregate function and
+the model field that is being aggregated.
+
+For example, if you were manipulating blog entries, you may want to know
+the average number of authors contributing to blog entries::
+
+    >>> q = Blog.objects.aggregate(Count('entry'))
+    {'entry__count': 16}
+
+By using a keyword argument to specify the aggregate function, you can
+control the name of the aggregation value that is returned::
+
+    >>> q = Blog.objects.aggregate(number_of_entries=Count('entry'))
+    {'number_of_entries': 2.34}
+
+For an in-depth discussion of aggregation, see :ref:`the topic guide on
+Aggregation <topics-db-aggregation>`.
+
 .. _field-lookups:
 
 Field lookups
@@ -1326,3 +1400,115 @@ SQL equivalents::
 
     SELECT ... WHERE title REGEXP '(?i)^(an?|the) +'; -- SQLite
 
+.. _aggregation-functions:
+
+Aggregation Functions
+---------------------
+
+.. versionadded:: 1.1
+
+Django provides the following aggregation functions in the
+``django.db.models`` module.
+
+``Avg``
+~~~~~~~
+
+.. class:: Avg(field)
+
+Returns the mean value of the given field.
+
+    * Default alias: ``<field>__avg``
+    * Return type: float
+
+``Count``
+~~~~~~~~~
+
+.. class:: Count(field, distinct=False)
+
+Returns the number of objects that are related through the provided field.
+
+    * Default alias: ``<field>__count``
+    * Return type: integer
+
+Has one optional argument:
+
+.. attribute:: distinct
+
+    If distinct=True, the count will only include unique instances. This has
+    the SQL equivalent of ``COUNT(DISTINCT field)``. Default value is ``False``.
+
+``Max``
+~~~~~~~
+
+.. class:: Max(field)
+
+Returns the maximum value of the given field.
+
+    * Default alias: ``<field>__max``
+    * Return type: same as input field
+
+``Min``
+~~~~~~~
+
+.. class:: Min(field)
+
+Returns the minimum value of the given field.
+
+    * Default alias: ``<field>__min``
+    * Return type: same as input field
+
+``StdDev``
+~~~~~~~~~
+
+.. class:: StdDev(field, sample=False)
+
+Returns the standard deviation of the data in the provided field.
+
+    * Default alias: ``<field>__stddev``
+    * Return type: float
+
+Has one optional argument:
+
+.. attribute:: sample
+
+    By default, ``StdDev`` returns the population standard deviation. However,
+    if ``sample=True``, the return value will be the sample standard deviation.
+
+.. admonition:: SQLite
+
+    SQLite doesn't provide ``StdDev`` out of the box. An implementation is
+    available as an extension module for SQLite. Consult the SQlite
+    documentation for instructions on obtaining and installing this extension.
+
+``Sum``
+~~~~~~~
+
+.. class:: Sum(field)
+
+Computes the sum of all values of the given field.
+
+    * Default alias: ``<field>__sum``
+    * Return type: same as input field
+
+``Variance``
+~~~~~~~~~
+
+.. class:: Variance(field, sample=False)
+
+Returns the variance of the data in the provided field.
+
+    * Default alias: ``<field>__variance``
+    * Return type: float
+
+Has one optional argument:
+
+.. attribute:: sample
+
+    By default, ``Variance`` returns the population variance. However,
+    if ``sample=True``, the return value will be the sample variance.
+
+.. admonition:: SQLite
+
+    SQLite doesn't provide ``Variance`` out of the box. An implementation is
+    available as an extension module for SQLite. Consult the SQlite
+    documentation for instructions on obtaining and installing this extension.

@@ -110,6 +110,7 @@ class CursorWrapper(object):
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
     update_can_self_select = False
+    allows_group_by_pk = True
     related_fields_match_type = True
 
 class DatabaseOperations(BaseDatabaseOperations):

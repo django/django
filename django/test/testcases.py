@@ -14,6 +14,7 @@ from django.test.client import Client
 from django.utils import simplejson
 
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
+normalize_decimals = lambda s: re.sub(r"Decimal\('(\d+(\.\d*)?)'\)", lambda m: "Decimal(\"%s\")" % m.groups()[0], s)
 
 def to_list(value):
     """
@@ -31,7 +32,7 @@ class OutputChecker(doctest.OutputChecker):
     def check_output(self, want, got, optionflags):
         "The entry method for doctest output checking. Defers to a sequence of child checkers"
         checks = (self.check_output_default,
-                  self.check_output_long,
+                  self.check_output_numeric,
                   self.check_output_xml,
                   self.check_output_json)
         for check in checks:
@@ -43,19 +44,23 @@ class OutputChecker(doctest.OutputChecker):
         "The default comparator provided by doctest - not perfect, but good for most purposes"
         return doctest.OutputChecker.check_output(self, want, got, optionflags)
 
-    def check_output_long(self, want, got, optionflags):
-        """Doctest does an exact string comparison of output, which means long
-        integers aren't equal to normal integers ("22L" vs. "22"). The
-        following code normalizes long integers so that they equal normal
-        integers.
+    def check_output_numeric(self, want, got, optionflags):
+        """Doctest does an exact string comparison of output, which means that
+        some numerically equivalent values aren't equal. This check normalizes
+         * long integers (22L) so that they equal normal integers. (22)
+         * Decimals so that they are comparable, regardless of the change
+           made to __repr__ in Python 2.6.
         """
-        return normalize_long_ints(want) == normalize_long_ints(got)
+        return doctest.OutputChecker.check_output(self,
+            normalize_decimals(normalize_long_ints(want)),
+            normalize_decimals(normalize_long_ints(got)),
+            optionflags)
 
     def check_output_xml(self, want, got, optionsflags):
         """Tries to do a 'xml-comparision' of want and got.  Plain string
         comparision doesn't always work because, for example, attribute
         ordering should not be important.
-        
+
         Based on http://codespeak.net/svn/lxml/trunk/src/lxml/doctestcompare.py
         """
         _norm_whitespace_re = re.compile(r'[ \t\n][ \t\n]+')
@@ -102,7 +107,7 @@ class OutputChecker(doctest.OutputChecker):
             wrapper = '<root>%s</root>'
             want = wrapper % want
             got = wrapper % got
-            
+
         # Parse the want and got strings, and compare the parsings.
         try:
             want_root = parseString(want).firstChild
@@ -174,7 +179,7 @@ class TestCase(unittest.TestCase):
         """Performs any pre-test setup. This includes:
 
             * Flushing the database.
-            * If the Test Case class has a 'fixtures' member, installing the 
+            * If the Test Case class has a 'fixtures' member, installing the
               named fixtures.
             * If the Test Case class has a 'urls' member, replace the
               ROOT_URLCONF with it.

@@ -5,6 +5,7 @@ from django.db.models.loading import get_apps, get_app, get_models, get_model, r
 from django.db.models.query import Q
 from django.db.models.manager import Manager
 from django.db.models.base import Model
+from django.db.models.aggregates import *
 from django.db.models.fields import *
 from django.db.models.fields.subclassing import SubfieldBase
 from django.db.models.fields.files import FileField, ImageField

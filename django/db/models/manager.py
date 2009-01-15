@@ -101,6 +101,12 @@ class Manager(object):
     def filter(self, *args, **kwargs):
         return self.get_query_set().filter(*args, **kwargs)
 
+    def aggregate(self, *args, **kwargs):
+        return self.get_query_set().aggregate(*args, **kwargs)
+
+    def annotate(self, *args, **kwargs):
+        return self.get_query_set().annotate(*args, **kwargs)
+
     def complex_filter(self, *args, **kwargs):
         return self.get_query_set().complex_filter(*args, **kwargs)
 

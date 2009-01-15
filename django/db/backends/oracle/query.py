@@ -53,21 +53,23 @@ def query_class(QueryClass, Database):
             return values
 
         def convert_values(self, value, field):
-            from django.db.models.fields import DateField, DateTimeField, \
-                 TimeField, BooleanField, NullBooleanField, DecimalField, Field
+            from django.db.models.fields import Field
             if isinstance(value, Database.LOB):
                 value = value.read()
             # Oracle stores empty strings as null. We need to undo this in
             # order to adhere to the Django convention of using the empty
             # string instead of null, but only if the field accepts the
             # empty string.
-            if value is None and isinstance(field, Field) and field.empty_strings_allowed:
+            if value is None and field and field.empty_strings_allowed:
                 value = u''
             # Convert 1 or 0 to True or False
-            elif value in (1, 0) and isinstance(field, (BooleanField, NullBooleanField)):
+            elif value in (1, 0) and field and field.get_internal_type() in ('BooleanField', 'NullBooleanField'):
                 value = bool(value)
+            # Force floats to the correct type
+            elif value is not None and field and field.get_internal_type() == 'FloatField':
+                value = float(value)
             # Convert floats to decimals
-            elif value is not None and isinstance(field, DecimalField):
+            elif value is not None and field and field.get_internal_type() == 'DecimalField':
                 value = util.typecast_decimal(field.format_number(value))
             # cx_Oracle always returns datetime.datetime objects for
             # DATE and TIMESTAMP columns, but Django wants to see a
@@ -86,13 +88,9 @@ def query_class(QueryClass, Database):
                     value = datetime.datetime(value.year, value.month,
                             value.day, value.hour, value.minute, value.second,
                             value.fsecond)
-                if isinstance(field, DateTimeField):
-                    # DateTimeField subclasses DateField so must be checked
-                    # first.
-                    pass
-                elif isinstance(field, DateField):
+                if field and field.get_internal_type() == 'DateField':
                     value = value.date()
-                elif isinstance(field, TimeField) or (value.year == 1900 and value.month == value.day == 1):
+                elif field and field.get_internal_type() == 'TimeField' or (value.year == 1900 and value.month == value.day == 1):
                     value = value.time()
                 elif value.hour == value.minute == value.second == value.microsecond == 0:
                     value = value.date()

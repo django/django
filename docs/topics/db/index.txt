@@ -12,6 +12,7 @@ model maps to a single database table.
 
    models
    queries
+   aggregation
    managers
    sql
    transactions

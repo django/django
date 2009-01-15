@@ -10,6 +10,12 @@ except NameError:
     # Python 2.3 compat
     from sets import Set as set
 
+try:
+    import decimal
+except ImportError:
+    # Python 2.3 fallback
+    from django.utils import _decimal as decimal
+
 from django.db.backends import util
 from django.utils import datetime_safe
 
@@ -62,6 +68,7 @@ class BaseDatabaseWrapper(local):
         return util.CursorDebugWrapper(cursor, self)
 
 class BaseDatabaseFeatures(object):
+    allows_group_by_pk = False
     # True if django.db.backend.utils.typecast_timestamp is used on values
     # returned from dates() calls.
     needs_datetime_string_cast = True
@@ -375,6 +382,22 @@ class BaseDatabaseOperations(object):
         which include a time part.
         """
         return self.year_lookup_bounds(value)
+
+    def convert_values(self, value, field):
+        """Coerce the value returned by the database backend into a consistent type that
+        is compatible with the field type.
+        """
+        internal_type = field.get_internal_type()
+        if internal_type == 'DecimalField':
+            return value
+        elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
+            return int(value)
+        elif internal_type in ('DateField', 'DateTimeField', 'TimeField'):
+            return value
+        # No field, or the field isn't known to be a decimal or integer
+        # Default to a float
+        return float(value)
+
 
 class BaseDatabaseIntrospection(object):
     """

@@ -64,4 +64,3 @@ def select_related_descend(field, restricted, requested):
     if not restricted and field.null:
         return False
     return True
-

@@ -10,7 +10,7 @@ from django.db.backends import *
 from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
-from django.utils.safestring import SafeString                                                           
+from django.utils.safestring import SafeString
 
 try:
     try:
@@ -101,6 +101,26 @@ class DatabaseOperations(BaseDatabaseOperations):
         first = '%s-01-01'
         second = '%s-12-31 23:59:59.999999'
         return [first % value, second % value]
+
+    def convert_values(self, value, field):
+        """SQLite returns floats when it should be returning decimals,
+        and gets dates and datetimes wrong.
+        For consistency with other backends, coerce when required.
+        """
+        internal_type = field.get_internal_type()
+        if internal_type == 'DecimalField':
+            return util.typecast_decimal(field.format_number(value))
+        elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
+            return int(value)
+        elif internal_type == 'DateField':
+            return util.typecast_date(value)
+        elif internal_type == 'DateTimeField':
+            return util.typecast_timestamp(value)
+        elif internal_type == 'TimeField':
+            return util.typecast_time(value)
+
+        # No field, or the field isn't known to be a decimal or integer
+        return value
 
 class DatabaseWrapper(BaseDatabaseWrapper):
 
