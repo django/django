@@ -286,7 +286,7 @@ average over the books written by both authors.
 The annotation name will be added to the fields returned
 as part of the ``ValuesQuerySet``.
 
-Order of ``annotate()`` and ``filter()`` clauses
+Order of ``annotate()`` and ``values()`` clauses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As with the ``filter()`` clause, the order in which ``annotate()`` and
