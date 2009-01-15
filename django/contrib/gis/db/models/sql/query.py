@@ -6,34 +6,13 @@ from django.db.models.fields.related import ForeignKey
 from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.sql import aggregates as gis_aggregates_module
+from django.contrib.gis.db.models.sql.conversion import AreaField, DistanceField, GeomField
 from django.contrib.gis.db.models.sql.where import GeoWhereNode
 from django.contrib.gis.measure import Area, Distance
 
 # Valid GIS query types.
 ALL_TERMS = sql.constants.QUERY_TERMS.copy()
 ALL_TERMS.update(SpatialBackend.gis_terms)
-
-# Conversion functions used in normalizing geographic aggregates.
-if SpatialBackend.postgis:
-    def convert_extent(box):
-        # TODO: Parsing of BOX3D, Oracle support (patches welcome!)
-        # Box text will be something like "BOX(-90.0 30.0, -85.0 40.0)";
-        # parsing out and returning as a 4-tuple.
-        ll, ur = box[4:-1].split(',')
-        xmin, ymin = map(float, ll.split())
-        xmax, ymax = map(float, ur.split())
-        return (xmin, ymin, xmax, ymax)
-
-    def convert_geom(hex, geo_field):
-        if hex: return SpatialBackend.Geometry(hex)
-        else: return None
-else:
-    def convert_extent(box):
-        raise NotImplementedError('Aggregate extent not implemented for this spatial backend.')
-
-    def convert_geom(clob, geo_field):
-        if clob: return SpatialBackend.Geometry(clob.read(), geo_field._srid)
-        else: return None
 
 class GeoQuery(sql.Query):
     """
@@ -118,7 +97,7 @@ class GeoQuery(sql.Query):
 
         result.extend([
                 '%s%s' % (
-                    aggregate.as_sql(quote_func=qn),
+                    self.get_extra_select_format(alias) % aggregate.as_sql(quote_func=qn),
                     alias is not None and ' AS %s' % alias or ''
                     )
                 for alias, aggregate in self.aggregate_select.items()
@@ -228,7 +207,7 @@ class GeoQuery(sql.Query):
         """
         if SpatialBackend.oracle:
             # Running through Oracle's first.
-            value = super(GeoQuery, self).convert_values(value, field)
+            value = super(GeoQuery, self).convert_values(value, field or GeomField())
         if isinstance(field, DistanceField):
             # Using the field's distance attribute, can instantiate
             # `Distance` with the right context.
@@ -246,9 +225,9 @@ class GeoQuery(sql.Query):
         """
         if isinstance(aggregate, self.aggregates_module.GeoAggregate):
             if aggregate.is_extent:
-                return convert_extent(value)
+                return self.aggregates_module.convert_extent(value)
             else:
-                return convert_geom(value, aggregate.source)
+                return self.aggregates_module.convert_geom(value, aggregate.source)
         else:
             return super(GeoQuery, self).resolve_aggregate(value, aggregate)
 
@@ -361,17 +340,3 @@ class GeoQuery(sql.Query):
             # Otherwise, check by the given field name -- which may be
             # a lookup to a _related_ geographic field.
             return self._check_geo_field(self.model, field_name)
-
-### Field Classes for `convert_values` ####
-class AreaField(object):
-    def __init__(self, area_att):
-        self.area_att = area_att
-
-class DistanceField(object):
-    def __init__(self, distance_att):
-        self.distance_att = distance_att
-
-# Rather than use GeometryField (which requires a SQL query
-# upon instantiation), use this lighter weight class.
-class GeomField(object):
-    pass

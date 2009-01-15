@@ -8,7 +8,6 @@ from django.contrib.gis.db.models.fields import GeometryField, PointField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery, GeoWhereNode
 from django.contrib.gis.measure import Area, Distance
 from django.contrib.gis.models import get_srid_info
-qn = connection.ops.quote_name
 
 # For backwards-compatibility; Q object should work just fine
 # after queryset-refactor.
@@ -331,7 +330,7 @@ class GeoQuerySet(QuerySet):
         if SpatialBackend.oracle: agg_kwargs['tolerance'] = tolerance
 
         # Calling the QuerySet.aggregate, and returning only the value of the aggregate.
-        return self.aggregate(_geoagg=aggregate(agg_col, **agg_kwargs))['_geoagg']
+        return self.aggregate(geoagg=aggregate(agg_col, **agg_kwargs))['geoagg']
 
     def _spatial_attribute(self, att, settings, field_name=None, model_att=None):
         """
