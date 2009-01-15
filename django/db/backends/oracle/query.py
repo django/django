@@ -53,7 +53,6 @@ def query_class(QueryClass, Database):
             return values
 
         def convert_values(self, value, field):
-            from django.db.models.fields import Field
             if isinstance(value, Database.LOB):
                 value = value.read()
             # Oracle stores empty strings as null. We need to undo this in
