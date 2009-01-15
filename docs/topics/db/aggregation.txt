@@ -268,14 +268,14 @@ the annotation is computed over all members of the group.
 For example, consider an author query that attempts to find out the average
 rating of books written by each author:
 
-    >>> Author.objects.annotate(average_rating=Avg('book_rating'))
+    >>> Author.objects.annotate(average_rating=Avg('book__rating'))
 
 This will return one result for each author in the database, annotate with
 their average book rating.
 
 However, the result will be slightly different if you use a ``values()`` clause::
 
-    >>> Author.objects.values('name').annotate(average_rating=Avg('book_rating'))
+    >>> Author.objects.values('name').annotate(average_rating=Avg('book__rating'))
 
 In this example, the authors will be grouped by name, so you will only get
 an annotated result for each *unique* author name. This means if you have
@@ -302,7 +302,7 @@ output.
 For example, if we reverse the order of the ``values()`` and ``annotate()``
 clause from our previous example::
 
-    >>> Author.objects.annotate(average_rating=Avg('book_rating')).values('name')
+    >>> Author.objects.annotate(average_rating=Avg('book__rating')).values('name')
 
 This will now yield one unique result for each author; however, only
 the author's name and the ``average_rating`` annotation will be returned
