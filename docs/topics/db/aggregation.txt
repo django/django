@@ -167,7 +167,7 @@ in a store, you could use the aggregate::
 
     >>> Store.objects.aggregate(min_price=Min('books__price'), max_price=Min('books__price'))
 
-Join chains can be as deep as you required. For example, to extract the
+Join chains can be as deep as you require. For example, to extract the
 age of the youngest author of any book available for sale, you could
 issue the query::
 
