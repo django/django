@@ -87,7 +87,9 @@ def query_class(QueryClass, Database):
                     value = datetime.datetime(value.year, value.month,
                             value.day, value.hour, value.minute, value.second,
                             value.fsecond)
-                if field and field.get_internal_type() == 'DateField':
+                if field and field.get_internal_type() == 'DateTimeField':
+                    pass
+                elif field and field.get_internal_type() == 'DateField':
                     value = value.date()
                 elif field and field.get_internal_type() == 'TimeField' or (value.year == 1900 and value.month == value.day == 1):
                     value = value.time()
