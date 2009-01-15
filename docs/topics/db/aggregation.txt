@@ -39,7 +39,7 @@ used to track the inventory for a series of online bookstores:
        rating = models.FloatField()
        authors = models.ManyToManyField(Author)
        publisher = models.ForeignKey(Publisher)
-       pubdate = models.DateField
+       pubdate = models.DateField()
 
     class Store(models.Model):
        name = models.CharField(max_length=300)
