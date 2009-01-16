@@ -1,3 +1,4 @@
+import copy
 import datetime
 import os
 
@@ -21,6 +22,7 @@ class FieldFile(File):
         self.storage = field.storage
         self._name = name or u''
         self._closed = False
+        self._committed = True
 
     def __eq__(self, other):
         # Older code may be expecting FileField values to be simple strings.
@@ -79,6 +81,7 @@ class FieldFile(File):
 
         # Update the filesize cache
         self._size = len(content)
+        self._committed = True
 
         # Save the object because it has changed, unless save is False
         if save:
@@ -100,6 +103,7 @@ class FieldFile(File):
         # Delete the filesize cache
         if hasattr(self, '_size'):
             del self._size
+        self._committed = False
 
         if save:
             self.instance.save()
@@ -110,7 +114,7 @@ class FieldFile(File):
         # it's attached to in order to work properly, but the only necessary
         # data to be pickled is the file's name itself. Everything else will
         # be restored later, by FileDescriptor below.
-        return {'_name': self.name, '_closed': False}
+        return {'_name': self.name, '_closed': False, '_committed': True}
 
 class FileDescriptor(object):
     def __init__(self, field):
@@ -120,10 +124,21 @@ class FileDescriptor(object):
         if instance is None:
             raise AttributeError, "%s can only be accessed from %s instances." % (self.field.name(self.owner.__name__))
         file = instance.__dict__[self.field.name]
-        if not isinstance(file, FieldFile):
+        if isinstance(file, basestring) or file is None:
             # Create a new instance of FieldFile, based on a given file name
             instance.__dict__[self.field.name] = self.field.attr_class(instance, self.field, file)
-        elif not hasattr(file, 'field'):
+        elif isinstance(file, File) and not isinstance(file, FieldFile):
+            # Other types of files may be assigned as well, but they need to
+            # have the FieldFile interface added to them
+            file_copy = copy.copy(file)
+            file_copy.__class__ = type(file.__class__.__name__, 
+                                       (file.__class__, FieldFile), {})
+            file_copy.instance = instance
+            file_copy.field = self.field
+            file_copy.storage = self.field.storage
+            file_copy._committed = False
+            instance.__dict__[self.field.name] = file_copy
+        elif isinstance(file, FieldFile) and not hasattr(file, 'field'):
             # The FieldFile was pickled, so some attributes need to be reset.
             file.instance = instance
             file.field = self.field
@@ -164,6 +179,14 @@ class FileField(Field):
             return None
         return unicode(value)
 
+    def pre_save(self, model_instance, add):
+        "Returns field's value just before saving."
+        file = super(FileField, self).pre_save(model_instance, add)
+        if file and not file._committed:
+            # Commit the file to storage prior to saving the model
+            file.save(file.name, file, save=False)
+        return file
+
     def contribute_to_class(self, cls, name):
         super(FileField, self).contribute_to_class(cls, name)
         setattr(cls, self.name, FileDescriptor(self))
@@ -189,10 +212,6 @@ class FileField(Field):
 
     def generate_filename(self, instance, filename):
         return os.path.join(self.get_directory_name(), self.get_filename(filename))
-
-    def save_form_data(self, instance, data):
-        if data and isinstance(data, UploadedFile):
-            getattr(instance, self.name).save(data.name, data, save=False)
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.FileField}

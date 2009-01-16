@@ -32,6 +32,8 @@ class File(object):
         return self.size
 
     def _get_name(self):
+        if not hasattr(self, '_name'):
+            raise ValueError("This operation requires the file to have a name.")
         return self._name
     name = property(_get_name)
 
