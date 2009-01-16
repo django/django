@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 import datetime
+import tempfile
 
 from django.db import models
 # Can't import as "forms" due to implementation details in the test suite (the
 # current file is called "forms" and is already imported).
 from django import forms as django_forms
+from django.core.files.storage import FileSystemStorage
+
+temp_storage_location = tempfile.mkdtemp()
+temp_storage = FileSystemStorage(location=temp_storage_location)
 
 class BoundaryModel(models.Model):
     positive_integer = models.PositiveIntegerField(null=True, blank=True)
@@ -19,7 +24,7 @@ class ChoiceModel(models.Model):
     name = models.CharField(max_length=10)
 
 class FileModel(models.Model):
-    file = models.FileField(upload_to='/')
+    file = models.FileField(storage=temp_storage, upload_to='tests')
 
 class FileForm(django_forms.Form):
     file1 = django_forms.FileField()
