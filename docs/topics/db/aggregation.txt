@@ -165,7 +165,7 @@ The same rules apply to the ``aggregate()`` clause. If you wanted to
 know the lowest and highest price of any book that is available for sale
 in a store, you could use the aggregate::
 
-    >>> Store.objects.aggregate(min_price=Min('books__price'), max_price=Min('books__price'))
+    >>> Store.objects.aggregate(min_price=Min('books__price'), max_price=Max('books__price'))
 
 Join chains can be as deep as you require. For example, to extract the
 age of the youngest author of any book available for sale, you could
