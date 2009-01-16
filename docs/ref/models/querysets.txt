@@ -1136,6 +1136,7 @@ The above code fragment could also be written as follows::
     inner_q = Blog.objects.filter(name__contains='Cheddar').values('pk').query
     entries = Entry.objects.filter(blog__in=inner_q)
 
+
 .. versionchanged:: 1.1
     In Django 1.0, only the latter piece of code is valid.
 
@@ -1143,6 +1144,21 @@ This second form is a bit less readable and unnatural to write, since it
 accesses the internal ``query`` attribute and requires a ``ValuesQuerySet``.
 If your code doesn't require compatibility with Django 1.0, use the first
 form, passing in a queryset directly.
+
+If you pass in a ``ValuesQuerySet`` or ``ValuesListQuerySet`` (the result of
+calling ``values()`` or ``values_list()`` on a queryset) as the value to an
+``__in`` lookup, you need to ensure you are only extracting one field in the
+result. For example, this will work (filtering on the blog names)::
+
+    inner_qs = Blog.objects.filter(name__contains='Ch').values('name')
+    entries = Entry.objects.filter(blog__name__in=inner_qs)
+
+This example will raise an exception, since the inner query is trying to
+extract two field values, where only one is expected::
+
+    # Bad code! Will raise a TypeError.
+    inner_qs = Blog.objects.filter(name__contains='Ch').values('name', 'id')
+    entries = Entry.objects.filter(blog__name__in=inner_qs)
 
 .. warning::
 

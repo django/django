@@ -798,6 +798,20 @@ class ValuesQuerySet(QuerySet):
 
         super(ValuesQuerySet, self)._setup_aggregate_query()
 
+    def as_sql(self):
+        """
+        For ValueQuerySet (and subclasses like ValuesListQuerySet), they can
+        only be used as nested queries if they're already set up to select only
+        a single field (in which case, that is the field column that is
+        returned). This differs from QuerySet.as_sql(), where the column to
+        select is set up by Django.
+        """
+        if ((self._fields and len(self._fields) > 1) or
+                (not self._fields and len(self.model._meta.fields) > 1)):
+            raise TypeError('Cannot use a multi-field %s as a filter value.'
+                    % self.__class__.__name__)
+        return self._clone().query.as_nested_sql()
+
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
         self.query.trim_extra_select(self.extra_names)
