@@ -55,7 +55,7 @@ from django.template.context import Context, RequestContext, ContextPopException
 from django.utils.itercompat import is_iterable
 from django.utils.functional import curry, Promise
 from django.utils.text import smart_split
-from django.utils.encoding import smart_unicode, force_unicode
+from django.utils.encoding import smart_unicode, force_unicode, smart_str
 from django.utils.translation import ugettext as _
 from django.utils.safestring import SafeData, EscapeData, mark_safe, mark_for_escaping
 from django.utils.html import escape
@@ -785,7 +785,8 @@ class TextNode(Node):
         self.s = s
 
     def __repr__(self):
-        return "<Text Node: '%s'>" % self.s[:25]
+        return "<Text Node: '%s'>" % smart_str(self.s[:25], 'ascii',
+                errors='replace')
 
     def render(self, context):
         return self.s
