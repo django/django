@@ -21,8 +21,10 @@ class GenericAdminViewTest(TestCase):
         # relies on content type IDs, which will vary depending on what
         # other tests have been run), thus we do it here.
         e = Episode.objects.create(name='This Week in Django')
+        self.episode_pk = e.pk
         m = Media(content_object=e, url='http://example.com/podcast.mp3')
         m.save()
+        self.media_pk = m.pk
     
     def tearDown(self):
         self.client.logout()
@@ -39,7 +41,7 @@ class GenericAdminViewTest(TestCase):
         """
         A smoke test to ensure GET on the change_view works.
         """
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/1/')
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/%d/' % self.episode_pk)
         self.failUnlessEqual(response.status_code, 200)
     
     def testBasicAddPost(self):
@@ -64,10 +66,11 @@ class GenericAdminViewTest(TestCase):
             # inline data
             "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": u"2",
             "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": u"1",
-            "generic_inline_admin-media-content_type-object_id-0-id": u"1",
+            "generic_inline_admin-media-content_type-object_id-0-id": u"%d" % self.media_pk,
             "generic_inline_admin-media-content_type-object_id-0-url": u"http://example.com/podcast.mp3",
             "generic_inline_admin-media-content_type-object_id-1-id": u"",
             "generic_inline_admin-media-content_type-object_id-1-url": u"",
         }
-        response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/episode/1/', post_data)
+        url = '/generic_inline_admin/admin/generic_inline_admin/episode/%d/' % self.episode_pk
+        response = self.client.post(url, post_data)
         self.failUnlessEqual(response.status_code, 302) # redirect somewhere

@@ -238,6 +238,9 @@ class DirectoryCreationTests(unittest.TestCase):
         self.obj = FileModel()
         if not os.path.isdir(temp_storage.location):
             os.makedirs(temp_storage.location)
+        if os.path.isdir(UPLOAD_TO):
+            os.chmod(UPLOAD_TO, 0700)
+            shutil.rmtree(UPLOAD_TO)
 
     def tearDown(self):
         os.chmod(temp_storage.location, 0700)

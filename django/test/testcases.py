@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core import mail
 from django.core.management import call_command
 from django.core.urlresolvers import clear_url_caches
-from django.db import transaction
+from django.db import transaction, connection
 from django.http import QueryDict
 from django.test import _doctest as doctest
 from django.test.client import Client
@@ -27,6 +27,31 @@ def to_list(value):
         value = [value]
     return value
 
+real_commit = transaction.commit
+real_rollback = transaction.rollback
+real_enter_transaction_management = transaction.enter_transaction_management
+real_leave_transaction_management = transaction.leave_transaction_management
+real_savepoint_commit = transaction.savepoint_commit
+real_savepoint_rollback = transaction.savepoint_rollback
+
+def nop(x=None):
+    return
+
+def disable_transaction_methods():
+    transaction.commit = nop
+    transaction.rollback = nop
+    transaction.savepoint_commit = nop
+    transaction.savepoint_rollback = nop
+    transaction.enter_transaction_management = nop
+    transaction.leave_transaction_management = nop        
+
+def restore_transaction_methods():
+    transaction.commit = real_commit
+    transaction.rollback = real_rollback
+    transaction.savepoint_commit = real_savepoint_commit
+    transaction.savepoint_rollback = real_savepoint_rollback
+    transaction.enter_transaction_management = real_enter_transaction_management
+    transaction.leave_transaction_management = real_leave_transaction_management
 
 class OutputChecker(doctest.OutputChecker):
     def check_output(self, want, got, optionflags):
@@ -173,8 +198,8 @@ class DocTestRunner(doctest.DocTestRunner):
         # Rollback, in case of database errors. Otherwise they'd have
         # side effects on other tests.
         transaction.rollback_unless_managed()
-
-class TestCase(unittest.TestCase):
+        
+class TransactionTestCase(unittest.TestCase):
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
 
@@ -185,16 +210,22 @@ class TestCase(unittest.TestCase):
               ROOT_URLCONF with it.
             * Clearing the mail test outbox.
         """
+        self._fixture_setup()
+        self._urlconf_setup()
+        mail.outbox = []
+
+    def _fixture_setup(self):
         call_command('flush', verbosity=0, interactive=False)
         if hasattr(self, 'fixtures'):
             # We have to use this slightly awkward syntax due to the fact
             # that we're using *args and **kwargs together.
             call_command('loaddata', *self.fixtures, **{'verbosity': 0})
+
+    def _urlconf_setup(self):
         if hasattr(self, 'urls'):
             self._old_root_urlconf = settings.ROOT_URLCONF
             settings.ROOT_URLCONF = self.urls
             clear_url_caches()
-        mail.outbox = []
 
     def __call__(self, result=None):
         """
@@ -211,7 +242,7 @@ class TestCase(unittest.TestCase):
             import sys
             result.addError(self, sys.exc_info())
             return
-        super(TestCase, self).__call__(result)
+        super(TransactionTestCase, self).__call__(result)        
         try:
             self._post_teardown()
         except (KeyboardInterrupt, SystemExit):
@@ -226,6 +257,13 @@ class TestCase(unittest.TestCase):
 
             * Putting back the original ROOT_URLCONF if it was changed.
         """
+        self._fixture_teardown()
+        self._urlconf_teardown()
+
+    def _fixture_teardown(self):
+        pass
+
+    def _urlconf_teardown(self):        
         if hasattr(self, '_old_root_urlconf'):
             settings.ROOT_URLCONF = self._old_root_urlconf
             clear_url_caches()
@@ -359,3 +397,37 @@ class TestCase(unittest.TestCase):
         self.failIf(template_name in template_names,
             (u"Template '%s' was used unexpectedly in rendering the"
              u" response") % template_name)
+
+class TestCase(TransactionTestCase):
+    """
+    Does basically the same as TransactionTestCase, but surrounds every test
+    with a transaction, monkey-patches the real transaction management routines to 
+    do nothing, and rollsback the test transaction at the end of the test. You have 
+    to use TransactionTestCase, if you need transaction management inside a test.
+    """
+
+    def _fixture_setup(self):
+        if not settings.DATABASE_SUPPORTS_TRANSACTIONS:
+            return super(TestCase, self)._fixture_setup()
+        
+        transaction.enter_transaction_management()
+        transaction.managed(True)
+        disable_transaction_methods()
+
+        from django.contrib.sites.models import Site
+        Site.objects.clear_cache()
+
+        if hasattr(self, 'fixtures'):
+            call_command('loaddata', *self.fixtures, **{
+                                                        'verbosity': 0,
+                                                        'commit': False
+                                                        })
+
+    def _fixture_teardown(self):
+        if not settings.DATABASE_SUPPORTS_TRANSACTIONS:
+            return super(TestCase, self)._fixture_teardown()
+                
+        restore_transaction_methods()
+        transaction.rollback()
+        transaction.leave_transaction_management()
+        connection.close()

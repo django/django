@@ -19,6 +19,7 @@ from django.utils.functional import curry
 from django.utils.encoding import smart_str
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
+from django.db import transaction, close_connection
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
@@ -69,7 +70,9 @@ class ClientHandler(BaseHandler):
                 response = middleware_method(request, response)
             response = self.apply_response_fixes(request, response)
         finally:
+            signals.request_finished.disconnect(close_connection)            
             signals.request_finished.send(sender=self.__class__)
+            signals.request_finished.connect(close_connection)
 
         return response
 

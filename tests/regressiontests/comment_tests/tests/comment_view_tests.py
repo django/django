@@ -1,9 +1,12 @@
+import re
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.comments import signals
 from django.contrib.comments.models import Comment
 from regressiontests.comment_tests.models import Article
 from regressiontests.comment_tests.tests import CommentTestCase
+
+post_redirect_re = re.compile(r'^http://testserver/posted/\?c=(?P<pk>\d+$)')
 
 class CommentViewTests(CommentTestCase):
 
@@ -181,18 +184,26 @@ class CommentViewTests(CommentTestCase):
         a = Article.objects.get(pk=1)
         data = self.getValidData(a)
         response = self.client.post("/post/", data)
-        self.assertEqual(response["Location"], "http://testserver/posted/?c=1")
-
+        location = response["Location"]
+        match = post_redirect_re.match(location)
+        self.failUnless(match != None, "Unexpected redirect location: %s" % location)
+        
         data["next"] = "/somewhere/else/"
         data["comment"] = "This is another comment"
         response = self.client.post("/post/", data)
-        self.assertEqual(response["Location"], "http://testserver/somewhere/else/?c=2")
+        location = response["Location"]        
+        match = re.search(r"^http://testserver/somewhere/else/\?c=\d+$", location)
+        self.failUnless(match != None, "Unexpected redirect location: %s" % location)
 
     def testCommentDoneView(self):
         a = Article.objects.get(pk=1)
         data = self.getValidData(a)
         response = self.client.post("/post/", data)
-        response = self.client.get("/posted/", {'c':1})
+        location = response["Location"]        
+        match = post_redirect_re.match(location)
+        self.failUnless(match != None, "Unexpected redirect location: %s" % location)
+        pk = int(match.group('pk'))
+        response = self.client.get(location)
         self.assertTemplateUsed(response, "comments/posted.html")
-        self.assertEqual(response.context[0]["comment"], Comment.objects.get(pk=1))
+        self.assertEqual(response.context[0]["comment"], Comment.objects.get(pk=pk))
 

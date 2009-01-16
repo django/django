@@ -311,7 +311,8 @@ class BaseDatabaseCreation(object):
 
         self.connection.close()
         settings.DATABASE_NAME = test_database_name
-
+        settings.DATABASE_SUPPORTS_TRANSACTIONS = self._rollback_works()
+        
         call_command('syncdb', verbosity=verbosity, interactive=False)
 
         if settings.CACHE_BACKEND.startswith('db://'):
@@ -362,7 +363,19 @@ class BaseDatabaseCreation(object):
                 sys.exit(1)
 
         return test_database_name
-
+    
+    def _rollback_works(self):
+        cursor = self.connection.cursor()
+        cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+        self.connection._commit()
+        cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+        self.connection._rollback()
+        cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
+        count, = cursor.fetchone()
+        cursor.execute('DROP TABLE ROLLBACK_TEST')
+        self.connection._commit()
+        return count == 0
+        
     def destroy_test_db(self, old_database_name, verbosity=1):
         """
         Destroy a test database, prompting the user for confirmation if the
