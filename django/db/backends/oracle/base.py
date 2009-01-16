@@ -7,7 +7,10 @@ Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 import os
 import datetime
 import time
-from decimal import Decimal
+try:
+    from decimal import Decimal
+except ImportError:
+    from django.utils._decimal import Decimal
 
 # Oracle takes client-side character set encoding from the environment.
 os.environ['NLS_LANG'] = '.UTF8'
