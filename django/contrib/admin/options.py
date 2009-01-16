@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.functional import update_wrapper
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
+from django.utils.functional import curry
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_unicode
@@ -28,8 +29,28 @@ get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
 class IncorrectLookupParameters(Exception):
     pass
 
+# Defaults for formfield_overrides. ModelAdmin subclasses can change this
+# by adding to ModelAdmin.formfield_overrides.
+    
+FORMFIELD_FOR_DBFIELD_DEFAULTS = {
+    models.DateTimeField: { 
+        'form_class': forms.SplitDateTimeField,
+        'widget': widgets.AdminSplitDateTime 
+    },
+    models.DateField:    {'widget': widgets.AdminDateWidget},
+    models.TimeField:    {'widget': widgets.AdminTimeWidget},
+    models.TextField:    {'widget': widgets.AdminTextareaWidget},
+    models.URLField:     {'widget': widgets.AdminURLFieldWidget},
+    models.IntegerField: {'widget': widgets.AdminIntegerFieldWidget},
+    models.CharField:    {'widget': widgets.AdminTextInputWidget},
+    models.ImageField:   {'widget': widgets.AdminFileWidget},
+    models.FileField:    {'widget': widgets.AdminFileWidget},
+}
+
+
 class BaseModelAdmin(object):
     """Functionality common to both ModelAdmin and InlineAdmin."""
+    
     raw_id_fields = ()
     fields = None
     exclude = None
@@ -39,6 +60,10 @@ class BaseModelAdmin(object):
     filter_horizontal = ()
     radio_fields = {}
     prepopulated_fields = {}
+    formfield_overrides = {}
+    
+    def __init__(self):
+        self.formfield_overrides = dict(FORMFIELD_FOR_DBFIELD_DEFAULTS, **self.formfield_overrides)
     
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
@@ -47,101 +72,92 @@ class BaseModelAdmin(object):
         
         If kwargs are given, they're passed to the form Field's constructor.
         """
+        request = kwargs.pop("request", None)
         
         # If the field specifies choices, we don't need to look for special
         # admin widgets - we just need to use a select widget of some kind.
         if db_field.choices:
-            if db_field.name in self.radio_fields:
-                # If the field is named as a radio_field, use a RadioSelect
+            return self.formfield_for_choice_field(db_field, request, **kwargs)
+        
+        # ForeignKey or ManyToManyFields
+        if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
+            # Combine the field kwargs with any options for formfield_overrides.
+            # Make sure the passed in **kwargs override anything in 
+            # formfield_overrides because **kwargs is more specific, and should
+            # always win.
+            if db_field.__class__ in self.formfield_overrides:
+                kwargs = dict(self.formfield_overrides[db_field.__class__], **kwargs)
+            
+            # Get the correct formfield.
+            if isinstance(db_field, models.ForeignKey):
+                formfield = self.formfield_for_foreignkey(db_field, request, **kwargs)
+            elif isinstance(db_field, models.ManyToManyField):
+                formfield = self.formfield_for_manytomany(db_field, request, **kwargs)
+            
+            # For non-raw_id fields, wrap the widget with a wrapper that adds
+            # extra HTML -- the "add other" interface -- to the end of the
+            # rendered output. formfield can be None if it came from a 
+            # OneToOneField with parent_link=True or a M2M intermediary.
+            if formfield and db_field.name not in self.raw_id_fields:
+                formfield.widget = widgets.RelatedFieldWidgetWrapper(formfield.widget, db_field.rel, self.admin_site)
+
+            return formfield
+                    
+        # If we've got overrides for the formfield defined, use 'em. **kwargs
+        # passed to formfield_for_dbfield override the defaults.
+        if db_field.__class__ in self.formfield_overrides:
+            kwargs = dict(self.formfield_overrides[db_field.__class__], **kwargs)
+            return db_field.formfield(**kwargs)
+                        
+        # For any other type of field, just call its formfield() method.
+        return db_field.formfield(**kwargs)
+        
+    def formfield_for_choice_field(self, db_field, request=None, **kwargs):
+        """
+        Get a form Field for a database Field that has declared choices.
+        """
+        # If the field is named as a radio_field, use a RadioSelect
+        if db_field.name in self.radio_fields:
+            # Avoid stomping on custom widget/choices arguments.
+            if 'widget' not in kwargs:
                 kwargs['widget'] = widgets.AdminRadioSelect(attrs={
                     'class': get_ul_class(self.radio_fields[db_field.name]),
                 })
+            if 'choices' not in kwargs:
                 kwargs['choices'] = db_field.get_choices(
                     include_blank = db_field.blank,
                     blank_choice=[('', _('None'))]
                 )
-                return db_field.formfield(**kwargs)
-            else:
-                # Otherwise, use the default select widget.
-                return db_field.formfield(**kwargs)
+        return db_field.formfield(**kwargs)
+    
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        """
+        Get a form Field for a ForeignKey.
+        """
+        if db_field.name in self.raw_id_fields:
+            kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.rel)
+        elif db_field.name in self.radio_fields:
+            kwargs['widget'] = widgets.AdminRadioSelect(attrs={
+                'class': get_ul_class(self.radio_fields[db_field.name]),
+            })
+            kwargs['empty_label'] = db_field.blank and _('None') or None
         
-        # For DateTimeFields, use a special field and widget.
-        if isinstance(db_field, models.DateTimeField):
-            kwargs['form_class'] = forms.SplitDateTimeField
-            kwargs['widget'] = widgets.AdminSplitDateTime()
-            return db_field.formfield(**kwargs)
+        return db_field.formfield(**kwargs)
+
+    def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+        """
+        Get a form Field for a ManyToManyField.
+        """
+        # If it uses an intermediary model, don't show field in admin.
+        if db_field.rel.through is not None:
+            return None
         
-        # For DateFields, add a custom CSS class.
-        if isinstance(db_field, models.DateField):
-            kwargs['widget'] = widgets.AdminDateWidget
-            return db_field.formfield(**kwargs)
+        if db_field.name in self.raw_id_fields:
+            kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.rel)
+            kwargs['help_text'] = ''
+        elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
+            kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
         
-        # For TimeFields, add a custom CSS class.
-        if isinstance(db_field, models.TimeField):
-            kwargs['widget'] = widgets.AdminTimeWidget
-            return db_field.formfield(**kwargs)
-        
-        # For TextFields, add a custom CSS class.
-        if isinstance(db_field, models.TextField):
-            kwargs['widget'] = widgets.AdminTextareaWidget
-            return db_field.formfield(**kwargs)
-        
-        # For URLFields, add a custom CSS class.
-        if isinstance(db_field, models.URLField):
-            kwargs['widget'] = widgets.AdminURLFieldWidget
-            return db_field.formfield(**kwargs)
-        
-        # For IntegerFields, add a custom CSS class.
-        if isinstance(db_field, models.IntegerField):
-            kwargs['widget'] = widgets.AdminIntegerFieldWidget
-            return db_field.formfield(**kwargs)
-        
-        # For CommaSeparatedIntegerFields, add a custom CSS class.
-        if isinstance(db_field, models.CommaSeparatedIntegerField):
-            kwargs['widget'] = widgets.AdminCommaSeparatedIntegerFieldWidget
-            return db_field.formfield(**kwargs)
-        
-        # For TextInputs, add a custom CSS class.
-        if isinstance(db_field, models.CharField):
-            kwargs['widget'] = widgets.AdminTextInputWidget
-            return db_field.formfield(**kwargs)
-        
-        # For FileFields and ImageFields add a link to the current file.
-        if isinstance(db_field, models.ImageField) or isinstance(db_field, models.FileField):
-            kwargs['widget'] = widgets.AdminFileWidget
-            return db_field.formfield(**kwargs)
-        
-        # For ForeignKey or ManyToManyFields, use a special widget.
-        if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
-            if isinstance(db_field, models.ForeignKey) and db_field.name in self.raw_id_fields:
-                kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.rel)
-            elif isinstance(db_field, models.ForeignKey) and db_field.name in self.radio_fields:
-                kwargs['widget'] = widgets.AdminRadioSelect(attrs={
-                    'class': get_ul_class(self.radio_fields[db_field.name]),
-                })
-                kwargs['empty_label'] = db_field.blank and _('None') or None
-            else:
-                if isinstance(db_field, models.ManyToManyField):
-                    # If it uses an intermediary model, don't show field in admin.
-                    if db_field.rel.through is not None:
-                        return None
-                    elif db_field.name in self.raw_id_fields:
-                        kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.rel)
-                        kwargs['help_text'] = ''
-                    elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
-                        kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
-            # Wrap the widget's render() method with a method that adds
-            # extra HTML to the end of the rendered output.
-            formfield = db_field.formfield(**kwargs)
-            # Don't wrap raw_id fields. Their add function is in the popup window.
-            if not db_field.name in self.raw_id_fields:
-                # formfield can be None if it came from a OneToOneField with
-                # parent_link=True
-                if formfield is not None:
-                    formfield.widget = widgets.RelatedFieldWidgetWrapper(formfield.widget, db_field.rel, self.admin_site)
-            return formfield
-        
-        # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)
     
     def _declared_fieldsets(self):
@@ -292,7 +308,7 @@ class ModelAdmin(BaseModelAdmin):
             "form": self.form,
             "fields": fields,
             "exclude": exclude + kwargs.get("exclude", []),
-            "formfield_callback": self.formfield_for_dbfield,
+            "formfield_callback": curry(self.formfield_for_dbfield, request=request),
         }
         defaults.update(kwargs)
         return modelform_factory(self.model, **defaults)
@@ -837,7 +853,7 @@ class InlineModelAdmin(BaseModelAdmin):
             "fk_name": self.fk_name,
             "fields": fields,
             "exclude": exclude + kwargs.get("exclude", []),
-            "formfield_callback": self.formfield_for_dbfield,
+            "formfield_callback": curry(self.formfield_for_dbfield, request=request),
             "extra": self.extra,
             "max_num": self.max_num,
         }

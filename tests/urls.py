@@ -24,6 +24,9 @@ urlpatterns = patterns('',
     # admin view tests
     (r'^test_admin/', include('regressiontests.admin_views.urls')),
     (r'^generic_inline_admin/', include('regressiontests.generic_inline_admin.urls')),
+    
+    # admin widget tests
+    (r'widget_admin/', include('regressiontests.admin_widgets.urls')),
 
     (r'^utils/', include('regressiontests.utils.urls')),
 

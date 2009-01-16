@@ -597,6 +597,47 @@ with an operator:
     Performs a full-text match. This is like the default search method but uses
     an index. Currently this is only available for MySQL.
 
+``formfield_overrides``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This provides a quick-and-dirty way to override some of the
+:class:`~django.forms.Field` options for use in the admin.
+``formfield_overrides`` is a dictionary mapping a field class to a dict of
+arguments to pass to the field at construction time.
+
+Since that's a bit abstract, let's look at a concrete example. The most common
+use of ``formfield_overrides`` is to add a custom widget for a certain type of
+field. So, imagine we've written a ``RichTextEditorWidget`` that we'd like to
+use for large text fields instead of the default ``<textarea>``. Here's how we'd
+do that::
+
+    from django.db import models
+    from django.contrib import admin
+    
+    # Import our custom widget and our model from where they're defined
+    from myapp.widgets import RichTextEditorWidget
+    from myapp.models import MyModel
+    
+    class MyModelAdmin(admin.ModelAdmin):
+        formfield_overrides = {
+            models.TextField: {'widget': RichTextEditorWidget},
+        }
+        
+Note that the key in the dictionary is the actual field class, *not* a string.
+The value is another dictionary; these arguments will be passed to
+:meth:`~django.forms.Field.__init__`. See :ref:`ref-forms-api` for details.
+
+.. warning::
+
+    If you want to use a custom widget with a relation field (i.e.
+    :class:`~django.db.models.ForeignKey` or
+    :class:`~django.db.models.ManyToManyField`), make sure you haven't included
+    that field's name in ``raw_id_fields`` or ``radio_fields``.
+
+    ``formfield_overrides`` won't let you change the widget on relation fields
+    that have ``raw_id_fields`` or ``radio_fields`` set. That's because
+    ``raw_id_fields`` and ``radio_fields`` imply custom widgets of their own.
+
 ``ModelAdmin`` methods
 ----------------------
 
@@ -674,6 +715,23 @@ Notice the wrapped view in the fifth line above::
     (r'^my_view/$', self.admin_site.admin_view(self.my_view))
     
 This wrapping will protect ``self.my_view`` from unauthorized access.
+
+``formfield_for_foreignkey(self, db_field, request, **kwargs)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``formfield_for_foreignkey`` method on a ``ModelAdmin`` allows you to
+override the default formfield for a foreign key field. For example, to
+return a subset of objects for this foreign key field based on the user::
+
+    class MyModelAdmin(admin.ModelAdmin):
+        def formfield_for_foreignkey(self, db_field, request, **kwargs):
+            if db_field.name == "car":
+                kwargs["queryset"] = Car.object.filter(owner=request.user)
+                return db_field.formfield(**kwargs)
+            return super(MyModelAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key field
+to only the cars owned by the ``User`` instance.
 
 ``ModelAdmin`` media definitions
 --------------------------------

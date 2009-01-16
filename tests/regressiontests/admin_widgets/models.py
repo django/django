@@ -2,9 +2,12 @@
 from django.conf import settings
 from django.db import models
 from django.core.files.storage import default_storage
+from django.contrib.auth.models import User
 
 class Member(models.Model):
     name = models.CharField(max_length=100)
+    birthdate = models.DateTimeField(blank=True, null=True)
+    gender = models.CharField(max_length=1, blank=True, choices=[('M','Male'), ('F', 'Female')])
 
     def __unicode__(self):
         return self.name
@@ -40,6 +43,28 @@ class Inventory(models.Model):
 
    def __unicode__(self):
       return self.name
+      
+class Event(models.Model):
+    band = models.ForeignKey(Band)
+    date = models.DateField(blank=True, null=True)
+    start_time = models.TimeField(blank=True, null=True)
+    description = models.TextField(blank=True)
+    link = models.URLField(blank=True)
+    min_age = models.IntegerField(blank=True, null=True)
+
+class Car(models.Model):
+    owner = models.ForeignKey(User)
+    make = models.CharField(max_length=30)
+    model = models.CharField(max_length=30)
+    
+    def __unicode__(self):
+        return u"%s %s" % (self.make, self.model)
+
+class CarTire(models.Model):
+    """
+    A single car tire. This to test that a user can only select their own cars.
+    """
+    car = models.ForeignKey(Car)
 
 __test__ = {'WIDGETS_TESTS': """
 >>> from datetime import datetime
