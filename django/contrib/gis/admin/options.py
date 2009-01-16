@@ -53,6 +53,7 @@ class GeoModelAdmin(ModelAdmin):
         for viewing/editing GeometryFields.
         """
         if isinstance(db_field, models.GeometryField):
+            request = kwargs.pop('request', None)
             # Setting the widget with the newly defined widget.
             kwargs['widget'] = self.get_map_widget(db_field)
             return db_field.formfield(**kwargs)
