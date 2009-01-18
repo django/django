@@ -360,8 +360,11 @@ def serializerTest(format, self):
             objects.extend(func[0](pk, klass, datum))
             instance_count[klass] = 0
         transaction.commit()
-    finally:
+    except:
+        transaction.rollback()
         transaction.leave_transaction_management()
+        raise
+    transaction.leave_transaction_management()
 
     # Get a count of the number of objects created for each class
     for klass in instance_count:
@@ -381,8 +384,11 @@ def serializerTest(format, self):
         for obj in serializers.deserialize(format, serialized_data):
             obj.save()
         transaction.commit()
-    finally:
+    except:
+        transaction.rollback()
         transaction.leave_transaction_management()
+        raise
+    transaction.leave_transaction_management()
 
     # Assert that the deserialized data is the same
     # as the original source
