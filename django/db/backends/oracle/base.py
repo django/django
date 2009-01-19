@@ -269,7 +269,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor = FormatStylePlaceholderCursor(self.connection)
             # Set oracle date to ansi date format.  This only needs to execute
             # once when we create a new connection.
-            cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD' "
+            cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS' "
                            "NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'")
             try:
                 self.oracle_version = int(self.connection.version.split('.')[0])
