@@ -193,6 +193,17 @@ Extra fields.
 >>> CategoryForm.base_fields.keys()
 ['name', 'slug', 'url', 'some_extra_field']
 
+Extra field that has a name collision with a related object accessor.
+
+>>> class WriterForm(ModelForm):
+...     book = forms.CharField(required=False)
+...
+...     class Meta:
+...         model = Writer
+
+>>> wf = WriterForm({'name': 'Richard Lockridge'})
+>>> wf.is_valid()
+True
 
 Replacing a field.
 

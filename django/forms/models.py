@@ -224,7 +224,7 @@ class BaseModelForm(BaseForm):
         return self.cleaned_data
 
     def validate_unique(self):
-        from django.db.models.fields import FieldDoesNotExist
+        from django.db.models.fields import FieldDoesNotExist, Field as ModelField
 
         # Gather a list of checks to perform. We only perform unique checks
         # for fields present and not None in cleaned_data.  Since this is a
@@ -247,6 +247,12 @@ class BaseModelForm(BaseForm):
                 f = self.instance._meta.get_field_by_name(name)[0]
             except FieldDoesNotExist:
                 # This is an extra field that's not on the ModelForm, ignore it
+                continue
+            if not isinstance(f, ModelField):
+                # This is an extra field that happens to have a name that matches, 
+                # for example, a related object accessor for this model.  So 
+                # get_field_by_name found it, but it is not a Field so do not proceed
+                # to use it as if it were.
                 continue
             if f.unique and self.cleaned_data.get(name) is not None:
                 unique_checks.append((name,))
