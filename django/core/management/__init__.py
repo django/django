@@ -311,7 +311,14 @@ def setup_environ(settings_mod, original_settings_path=None):
     if project_directory == os.curdir or not project_directory:
         project_directory = os.getcwd()
     project_name = os.path.basename(project_directory)
+
+    # Strip filename suffix to get the module name.
     settings_name = os.path.splitext(settings_filename)[0]
+
+    # Strip $py for Jython compiled files (like settings$py.class)
+    if settings_name.endswith("$py"):
+        settings_name = settings_name[:-3]
+
     sys.path.append(os.path.join(project_directory, os.pardir))
     project_module = __import__(project_name, {}, {}, [''])
     sys.path.pop()
