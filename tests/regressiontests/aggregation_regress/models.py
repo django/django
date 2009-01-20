@@ -147,6 +147,9 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, id, i
 >>> Book.objects.aggregate(number=Max('pages'), select=Max('pages'))
 {'number': 1132, 'select': 1132}
 
+# Regression for #10064: select_related() plays nice with aggregates
+>>> Book.objects.select_related('publisher').annotate(num_authors=Count('authors')).values()[0]
+{'rating': 4.0, 'isbn': u'013790395', 'name': u'Artificial Intelligence: A Modern Approach', 'pubdate': datetime.date(1995, 1, 15), 'price': Decimal("82.8..."), 'id': 5, 'num_authors': 2, 'publisher_id': 3, 'pages': 1132}
 
 """
 }

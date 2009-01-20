@@ -250,11 +250,12 @@ class BaseQuery(object):
 
                 if self.aggregate_select:
                     aggregate_start = len(self.extra_select.keys()) + len(self.select)
+                    aggregate_end = aggregate_start + len(self.aggregate_select)
                     row = tuple(row[:aggregate_start]) + tuple([
                         self.resolve_aggregate(value, aggregate)
                         for (alias, aggregate), value
-                        in zip(self.aggregate_select.items(), row[aggregate_start:])
-                    ])
+                        in zip(self.aggregate_select.items(), row[aggregate_start:aggregate_end])
+                    ]) + tuple(row[aggregate_end:])
 
                 yield row
 
