@@ -1285,8 +1285,8 @@ True
 >>> form = ExplicitPKForm({'key': u'key1', 'desc': u''})
 >>> form.is_valid()
 False
->>> form.errors
-{'__all__': [u'Explicit pk with this Key and Desc already exists.'], 'key': [u'Explicit pk with this Key already exists.'], 'desc': [u'Explicit pk with this Desc already exists.']}
+>>> sorted(form.errors.items())
+[('__all__', [u'Explicit pk with this Key and Desc already exists.']), ('desc', [u'Explicit pk with this Desc already exists.']), ('key', [u'Explicit pk with this Key already exists.'])]
 
 # Choices on CharField and IntegerField
 >>> class ArticleForm(ModelForm):
