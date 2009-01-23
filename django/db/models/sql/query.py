@@ -1266,7 +1266,11 @@ class BaseQuery(object):
 
         for alias, aggregate in self.aggregate_select.items():
             if alias == parts[0]:
-                self.having.add((aggregate, lookup_type, value), AND)
+                entry = self.where_class()
+                entry.add((aggregate, lookup_type, value), AND)
+                if negate:
+                    entry.negate()
+                self.having.add(entry, AND)
                 return
 
         opts = self.get_meta()

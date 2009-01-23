@@ -151,6 +151,19 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, id, i
 >>> Book.objects.select_related('publisher').annotate(num_authors=Count('authors')).values()[0]
 {'rating': 4.0, 'isbn': u'013790395', 'name': u'Artificial Intelligence: A Modern Approach', 'pubdate': datetime.date(1995, 1, 15), 'price': Decimal("82.8..."), 'id': 5, 'num_authors': 2, 'publisher_id': 3, 'pages': 1132}
 
+# Regression for #10010: exclude on an aggregate field is correctly negated
+>>> len(Book.objects.annotate(num_authors=Count('authors')))
+6
+>>> len(Book.objects.annotate(num_authors=Count('authors')).filter(num_authors__gt=2))
+1
+>>> len(Book.objects.annotate(num_authors=Count('authors')).exclude(num_authors__gt=2))
+5
+
+>>> len(Book.objects.annotate(num_authors=Count('authors')).filter(num_authors__lt=3).exclude(num_authors__lt=2))
+2
+>>> len(Book.objects.annotate(num_authors=Count('authors')).exclude(num_authors__lt=2).filter(num_authors__lt=3))
+2
+
 """
 }
 
