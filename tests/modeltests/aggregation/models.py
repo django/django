@@ -194,7 +194,7 @@ u'The Definitive Guide to Django: Web Development Done Right'
 # Annotate each publisher with the sum of the price of all books sold
 >>> publishers = Publisher.objects.all().annotate(Sum('book__price'))
 >>> sorted([(p.name, p.book__price__sum) for p in publishers])
-[(u'Apress', Decimal("59.69")), (u'Morgan Kaufmann', Decimal("75.00")), (u'Prentice Hall', Decimal("112.49")), (u'Sams', Decimal("23.09"))]
+[(u'Apress', Decimal("59.69")), (u"Jonno's House of Books", None), (u'Morgan Kaufmann', Decimal("75.00")), (u'Prentice Hall', Decimal("112.49")), (u'Sams', Decimal("23.09"))]
 
 # Calls to values() are not commutative over annotate().
 
@@ -356,7 +356,7 @@ True
 []
 
 # Aggregates also work on dates, times and datetimes
->>> Publisher.objects.annotate(earliest_book=Min('book__pubdate')).order_by('earliest_book').values()
+>>> Publisher.objects.annotate(earliest_book=Min('book__pubdate')).exclude(earliest_book=None).order_by('earliest_book').values()
 [{'earliest_book': datetime.date(1991, 10, 15), 'num_awards': 9, 'id': 4, 'name': u'Morgan Kaufmann'}, {'earliest_book': datetime.date(1995, 1, 15), 'num_awards': 7, 'id': 3, 'name': u'Prentice Hall'}, {'earliest_book': datetime.date(2007, 12, 6), 'num_awards': 3, 'id': 1, 'name': u'Apress'}, {'earliest_book': datetime.date(2008, 3, 3), 'num_awards': 1, 'id': 2, 'name': u'Sams'}]
 
 >>> Store.objects.aggregate(Max('friday_night_closing'), Min("original_opening"))

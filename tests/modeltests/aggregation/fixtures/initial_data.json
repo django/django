@@ -32,6 +32,14 @@
         }
     },
     {
+        "pk": 5,
+        "model": "aggregation.publisher",
+        "fields": {
+            "name": "Jonno's House of Books",
+            "num_awards": 0
+        }
+    },
+    {
         "pk": 1,
         "model": "aggregation.book",
         "fields": {

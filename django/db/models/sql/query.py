@@ -217,6 +217,8 @@ class BaseQuery(object):
         to return Decimal and long types when they are not needed.
         """
         if value is None:
+            if aggregate.is_ordinal:
+                return 0
             # Return None as-is
             return value
         elif aggregate.is_ordinal:
@@ -295,10 +297,14 @@ class BaseQuery(object):
         query.related_select_cols = []
         query.related_select_fields = []
 
+        result = query.execute_sql(SINGLE)
+        if result is None:
+            result = [None for q in query.aggregate_select.items()]
+
         return dict([
             (alias, self.resolve_aggregate(val, aggregate))
             for (alias, aggregate), val
-            in zip(query.aggregate_select.items(), query.execute_sql(SINGLE))
+            in zip(query.aggregate_select.items(), result)
         ])
 
     def get_count(self):
