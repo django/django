@@ -346,7 +346,7 @@ class BaseQuery(object):
         """
         self.pre_sql_setup()
         out_cols = self.get_columns(with_col_aliases)
-        ordering = self.get_ordering()
+        ordering, ordering_group_by = self.get_ordering()
 
         # This must come after 'select' and 'ordering' -- see docstring of
         # get_from_clause() for details.
@@ -380,9 +380,15 @@ class BaseQuery(object):
 
         if self.group_by:
             grouping = self.get_grouping()
-            result.append('GROUP BY %s' % ', '.join(grouping))
-            if not ordering:
+            if ordering:
+                # If the backend can't group by PK (i.e., any database
+                # other than MySQL), then any fields mentioned in the
+                # ordering clause needs to be in the group by clause.
+                if not self.connection.features.allows_group_by_pk:
+                    grouping.extend(ordering_group_by)
+            else:
                 ordering = self.connection.ops.force_no_ordering()
+            result.append('GROUP BY %s' % ', '.join(grouping))
 
         if having:
             result.append('HAVING %s' % having)
@@ -701,7 +707,10 @@ class BaseQuery(object):
 
     def get_ordering(self):
         """
-        Returns list representing the SQL elements in the "order by" clause.
+        Returns a tuple containing a list representing the SQL elements in the
+        "order by" clause, and the list of SQL elements that need to be added
+        to the GROUP BY clause as a result of the ordering.
+
         Also sets the ordering_aliases attribute on this instance to a list of
         extra aliases needed in the select.
 
@@ -719,6 +728,7 @@ class BaseQuery(object):
         distinct = self.distinct
         select_aliases = self._select_aliases
         result = []
+        group_by = []
         ordering_aliases = []
         if self.standard_ordering:
             asc, desc = ORDER_DIR['ASC']
@@ -741,6 +751,7 @@ class BaseQuery(object):
                 else:
                     order = asc
                 result.append('%s %s' % (field, order))
+                group_by.append(field)
                 continue
             col, order = get_order_dir(field, asc)
             if col in self.aggregate_select:
@@ -755,6 +766,7 @@ class BaseQuery(object):
                     processed_pairs.add((table, col))
                     if not distinct or elt in select_aliases:
                         result.append('%s %s' % (elt, order))
+                        group_by.append(elt)
             elif get_order_dir(field)[0] not in self.extra_select:
                 # 'col' is of the form 'field' or 'field1__field2' or
                 # '-field1__field2__field', etc.
@@ -766,13 +778,15 @@ class BaseQuery(object):
                         if distinct and elt not in select_aliases:
                             ordering_aliases.append(elt)
                         result.append('%s %s' % (elt, order))
+                        group_by.append(elt)
             else:
                 elt = qn2(col)
                 if distinct and col not in select_aliases:
                     ordering_aliases.append(elt)
                 result.append('%s %s' % (elt, order))
+                group_by.append(elt)
         self.ordering_aliases = ordering_aliases
-        return result
+        return result, group_by
 
     def find_ordering_name(self, name, opts, alias=None, default_order='ASC',
             already_seen=None):

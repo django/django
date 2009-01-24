@@ -174,6 +174,11 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, id, i
 >>> Publisher.objects.filter(pk=5).annotate(num_authors=Count('book__authors'), avg_authors=Avg('book__authors'), max_authors=Max('book__authors'), max_price=Max('book__price'), max_rating=Max('book__rating')).values()
 [{'max_authors': None, 'name': u"Jonno's House of Books", 'num_awards': 0, 'max_price': None, 'num_authors': 0, 'max_rating': None, 'id': 5, 'avg_authors': None}]
 
+# Regression for #10113 - Fields mentioned in order_by() must be included in the GROUP BY.
+# This only becomes a problem when the order_by introduces a new join.
+>>> Book.objects.annotate(num_authors=Count('authors')).order_by('publisher__name')
+[<Book: The Definitive Guide to Django: Web Development Done Right>, <Book: Practical Django Projects>, <Book: Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp>, <Book: Python Web Development with Django>, <Book: Artificial Intelligence: A Modern Approach>, <Book: Sams Teach Yourself Django in 24 Hours>]
+
 """
 }
 
