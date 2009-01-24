@@ -24,7 +24,81 @@ the amount of time that we have to work on the framework is limited and will
 vary from week to week depending on our spare time. If we're busy, we may not
 be able to spend as much time on Django as we might want.
 
-Besides, if your feature request stands no chance of inclusion in Django, we
-won't ignore it -- we'll just close the ticket. So if your ticket is still
-open, it doesn't mean we're ignoring you; it just means we haven't had time to
-look at it yet.
+The best way to make sure tickets do not get hung up on the way to checkin is
+to make it dead easy, even for someone who may not be intimately familiar with
+that area of the code, to understand the problem and verify the fix:
+
+    * Are there clear instructions on how to reproduce the bug? If this
+      touches a dependency (such as PIL), a contrib module, or a specific
+      database, are those instructions clear enough even for someone not
+      familiar with it?
+
+    * If there are several patches attached to the ticket, is it clear what
+      each one does, which ones can be ignored and which matter?
+
+    * Does the patch include a unit test? If not, is there a very clear
+      explanation why not? A test expresses succinctly what the problem is,
+      and shows that the patch actually fixes it.
+
+If your patch stands no chance of inclusion in Django, we won't ignore it --
+we'll just close the ticket. So if your ticket is still open, it doesn't mean
+we're ignoring you; it just means we haven't had time to look at it yet.
+
+When and how might I remind the core team of a patch I care about?
+------------------------------------------------------------------
+
+A polite, well-timed message to the mailing list is one way to get attention.
+To determine the right time, you need to keep an eye on the schedule. If you
+post your message when the core developers are trying to hit a feature
+deadline or manage a planning phase, you're not going to get the sort of
+attention you require. However, if you draw attention to a ticket when the
+core developers are paying particular attention to bugs -- just before a bug
+fixing sprint, or in the lead up to a beta release for example -- you're much
+more likely to get a productive response.
+
+Gentle IRC reminders can also work -- again, strategically timed if possible.
+During a bug sprint would be a very good time, for example.
+
+Another way to get traction is to pull several related tickets together. When
+the core developers sit down to fix a bug in an area they haven't touched for
+a while, it can take a few minutes to remember all the fine details of how
+that area of code works. If you collect several minor bug fixes together into
+a similarly themed group, you make an attractive target, as the cost of coming
+up to speed on an area of code can be spread over multiple tickets.
+
+Please refrain from emailing core developers personally, or repeatedly raising
+the same issue over and over. This sort of behavior will not gain you any
+additional attention -- certainly not the attention that you need in order to
+get your pet bug addressed.
+
+But I've reminded you several times and you keep ignoring my patch!
+-------------------------------------------------------------------
+
+Seriously - we're not ignoring you. If your patch stands no chance of
+inclusion in Django, we'll close the ticket. For all the other tickets, we
+need to prioritize our efforts, which means that some tickets will be
+addressed before others.
+
+One of the criteria that is used to prioritize bug fixes is the number of
+people that will likely be affected by a given bug. Bugs that have the
+potential to affect many people will generally get priority over those that
+are edge cases.
+
+Another reason that bugs might be ignored for while is if the bug is a symptom
+of a larger problem. While we can spend time writing, testing and applying
+lots of little patches, sometimes the right solution is to rebuild. If a
+rebuild or refactor of a particular component has been proposed or is
+underway, you may find that bugs affecting that component will not get as much
+attention. Again, this is just a matter of prioritizing scarce resources. By
+concentrating on the rebuild, we can close all the little bugs at once, and
+hopefully prevent other little bugs from appearing in the future.
+
+Whatever the reason, please keep in mind that while you may hit a particular
+bug regularly, it doesn't necessarily follow that every single Django user
+will hit the same bug. Different users use Django in different ways, stressing
+different parts of the code under different conditions. When we evaluate the
+relative priorities, we are generally trying to consider the needs of the
+entire community, not just the severity for one particular user. This doesn't
+mean that we think your problem is unimportant -- just that in the limited
+time we have available, we will always err on the side of making 10 people
+happy rather than making 1 person happy.
