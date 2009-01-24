@@ -176,8 +176,8 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, id, i
 
 # Regression for #10113 - Fields mentioned in order_by() must be included in the GROUP BY.
 # This only becomes a problem when the order_by introduces a new join.
->>> Book.objects.annotate(num_authors=Count('authors')).order_by('publisher__name')
-[<Book: The Definitive Guide to Django: Web Development Done Right>, <Book: Practical Django Projects>, <Book: Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp>, <Book: Python Web Development with Django>, <Book: Artificial Intelligence: A Modern Approach>, <Book: Sams Teach Yourself Django in 24 Hours>]
+>>> Book.objects.annotate(num_authors=Count('authors')).order_by('publisher__name', 'name')
+[<Book: Practical Django Projects>, <Book: The Definitive Guide to Django: Web Development Done Right>, <Book: Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp>, <Book: Artificial Intelligence: A Modern Approach>, <Book: Python Web Development with Django>, <Book: Sams Teach Yourself Django in 24 Hours>]
 
 """
 }
