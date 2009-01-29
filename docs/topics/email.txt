@@ -350,3 +350,29 @@ send out, you could send this with::
     connection = SMTPConnection()   # Use default settings for connection
     messages = get_notification_email()
     connection.send_messages(messages)
+
+Testing e-mail sending
+----------------------
+
+The are times when you do not want Django to send e-mails at all. For example,
+while developing a website, you probably don't want to send out thousands of
+e-mails -- but you may want to validate that e-mails will be sent to the right
+people under the right conditions, and that those e-mails will contain the
+correct content.
+
+The easiest way to test your project's use of e-mail is to use a "dumb" e-mail
+server that receives the e-mails locally and displays them to the terminal,
+but does not actually send anything. Python has a built-in way to accomplish
+this with a single command::
+
+    python -m smtpd -n -c DebuggingServer localhost:1025
+
+This command will start a simple SMTP server listening on port 1025 of
+localhost. This server simply prints to standard output all email headers and
+the email body. You then only need to set the :setting:`EMAIL_HOST` and
+:setting:`EMAIL_PORT` accordingly, and you are set.
+
+For more entailed testing and processing of e-mails locally, see the Python
+documentation on the `SMTP Server`_.
+
+.. _SMTP Server: http://docs.python.org/library/smtpd.html
