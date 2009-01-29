@@ -18,6 +18,7 @@ from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models.query_utils import select_related_descend
 from django.db.models.sql import aggregates as base_aggregates_module
+from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import WhereNode, Constraint, EverythingNode, AND, OR
 from django.core.exceptions import FieldError
 from datastructures import EmptyResultSet, Empty, MultiJoin
@@ -1271,6 +1272,10 @@ class BaseQuery(object):
         else:
             lookup_type = parts.pop()
 
+        # By default, this is a WHERE clause. If an aggregate is referenced
+        # in the value, the filter will be promoted to a HAVING
+        having_clause = False
+
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         # uses of None as a query value.
         if value is None:
@@ -1284,6 +1289,10 @@ class BaseQuery(object):
             value = True
         elif callable(value):
             value = value()
+        elif hasattr(value, 'evaluate'):
+            # If value is a query expression, evaluate it
+            value = SQLEvaluator(value, self)
+            having_clause = value.contains_aggregate
 
         for alias, aggregate in self.aggregate_select.items():
             if alias == parts[0]:
@@ -1340,8 +1349,13 @@ class BaseQuery(object):
             self.promote_alias_chain(join_it, join_promote)
             self.promote_alias_chain(table_it, table_promote)
 
-        self.where.add((Constraint(alias, col, field), lookup_type, value),
-            connector)
+
+        if having_clause:
+            self.having.add((Constraint(alias, col, field), lookup_type, value),
+                connector)
+        else:
+            self.where.add((Constraint(alias, col, field), lookup_type, value),
+                connector)
 
         if negate:
             self.promote_alias_chain(join_list)

@@ -141,6 +141,10 @@ class RelatedField(object):
             return v
 
         if hasattr(value, 'as_sql'):
+            # If the value has a relabel_aliases method, it will need to
+            # be invoked before the final SQL is evaluated
+            if hasattr(value, 'relabel_aliases'):
+                return value
             sql, params = value.as_sql()
             return QueryWrapper(('(%s)' % sql), params)
 

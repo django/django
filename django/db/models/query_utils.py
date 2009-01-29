@@ -17,6 +17,9 @@ class QueryWrapper(object):
     def __init__(self, sql, params):
         self.data = sql, params
 
+    def as_sql(self, qn=None):
+        return self.data
+
 class Q(tree.Node):
     """
     Encapsulates filters as objects that can then be combined logically (using

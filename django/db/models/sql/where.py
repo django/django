@@ -97,6 +97,7 @@ class WhereNode(tree.Node):
                 else:
                     # A leaf node in the tree.
                     sql, params = self.make_atom(child, qn)
+
             except EmptyResultSet:
                 if self.connector == AND and not self.negated:
                     # We can bail out early in this particular case (only).
@@ -114,6 +115,7 @@ class WhereNode(tree.Node):
                 if self.negated:
                     empty = True
                 continue
+
             empty = False
             if sql:
                 result.append(sql)
@@ -151,8 +153,9 @@ class WhereNode(tree.Node):
         else:
             cast_sql = '%s'
 
-        if isinstance(params, QueryWrapper):
-            extra, params = params.data
+        if hasattr(params, 'as_sql'):
+            extra, params = params.as_sql(qn)
+            cast_sql = ''
         else:
             extra = ''
 
@@ -214,6 +217,9 @@ class WhereNode(tree.Node):
                 if elt[0] in change_map:
                     elt[0] = change_map[elt[0]]
                     node.children[pos] = (tuple(elt),) + child[1:]
+                # Check if the query value also requires relabelling
+                if hasattr(child[3], 'relabel_aliases'):
+                    child[3].relabel_aliases(change_map)
 
 class EverythingNode(object):
     """

@@ -8,8 +8,8 @@ Making queries
 
 Once you've created your :ref:`data models <topics-db-models>`, Django
 automatically gives you a database-abstraction API that lets you create,
-retrieve, update and delete objects. This document explains how to use this 
-API. Refer to the :ref:`data model reference <ref-models-index>` for full 
+retrieve, update and delete objects. This document explains how to use this
+API. Refer to the :ref:`data model reference <ref-models-index>` for full
 details of all the various model lookup options.
 
 Throughout this guide (and in the reference), we'll refer to the following
@@ -39,6 +39,9 @@ models, which comprise a weblog application:
         body_text = models.TextField()
         pub_date = models.DateTimeField()
         authors = models.ManyToManyField(Author)
+        n_comments = models.IntegerField()
+        n_pingbacks = models.IntegerField()
+        rating = models.IntegerField()
 
         def __unicode__(self):
             return self.headline
@@ -94,11 +97,11 @@ Saving ``ForeignKey`` and ``ManyToManyField`` fields
 ----------------------------------------------------
 
 Updating ``ForeignKey`` fields works exactly the same way as saving a normal
-field; simply assign an object of the right type to the field in question:: 
+field; simply assign an object of the right type to the field in question::
 
-    >>> cheese_blog = Blog.objects.get(name="Cheddar Talk") 
-    >>> entry.blog = cheese_blog 
-    >>> entry.save() 
+    >>> cheese_blog = Blog.objects.get(name="Cheddar Talk")
+    >>> entry.blog = cheese_blog
+    >>> entry.save()
 
 Updating a ``ManyToManyField`` works a little differently; use the ``add()``
 method on the field to add a record to the relation::
@@ -245,7 +248,7 @@ this example::
     >>> q = q.filter(pub_date__lte=datetime.now())
     >>> q = q.exclude(body_text__icontains="food")
     >>> print q
-    
+
 Though this looks like three database hits, in fact it hits the database only
 once, at the last line (``print q``). In general, the results of a ``QuerySet``
 aren't fetched from the database until you "ask" for them. When you do, the
@@ -333,15 +336,15 @@ you'll probably use:
 
     :lookup:`exact`
         An "exact" match. For example::
-        
+
             >>> Entry.objects.get(headline__exact="Man bites dog")
 
         Would generate SQL along these lines:
-        
+
         .. code-block:: sql
 
             SELECT ... WHERE headline = 'Man bites dog';
-            
+
         If you don't provide a lookup type -- that is, if your keyword argument
         doesn't contain a double underscore -- the lookup type is assumed to be
         ``exact``.
@@ -352,36 +355,36 @@ you'll probably use:
             >>> Blog.objects.get(id=14)         # __exact is implied
 
         This is for convenience, because ``exact`` lookups are the common case.
-        
+
     :lookup:`iexact`
         A case-insensitive match. So, the query::
-        
+
             >>> Blog.objects.get(name__iexact="beatles blog")
-            
+
         Would match a ``Blog`` titled "Beatles Blog", "beatles blog", or even
         "BeAtlES blOG".
-    
+
     :lookup:`contains`
         Case-sensitive containment test. For example::
 
             Entry.objects.get(headline__contains='Lennon')
 
         Roughly translates to this SQL:
-        
+
         .. code-block:: sql
 
             SELECT ... WHERE headline LIKE '%Lennon%';
 
         Note this will match the headline ``'Today Lennon honored'`` but not
         ``'today lennon honored'``.
-        
+
         There's also a case-insensitive version, :lookup:`icontains`.
-        
+
     :lookup:`startswith`, :lookup:`endswith`
         Starts-with and ends-with search, respectively. There are also
         case-insensitive versions called :lookup:`istartswith` and
         :lookup:`iendswith`.
-    
+
 Again, this only scratches the surface. A complete reference can be found in the
 :ref:`field lookup reference <field-lookups>`.
 
@@ -485,6 +488,48 @@ are talking about the same multi-valued relation). Conditions in subsequent
 ``filter()`` or ``exclude()`` calls that refer to the same relation may end up
 filtering on different linked objects.
 
+.. _query-expressions:
+
+Filters can reference fields on the model
+-----------------------------------------
+
+.. versionadded:: 1.1
+
+In the examples given so far, we have constructed filters that compare
+the value of a model field with a constant. But what if you want to compare
+the value of a model field with another field on the same model?
+
+Django provides the ``F()`` object to allow such comparisons. Instances
+of ``F()`` act as a reference to a model field within a query. These
+references can then be used in query filters to compare the values of two
+different fields on the same model instance.
+
+For example, to find a list of all blog entries that have had more comments
+than pingbacks, we construct an ``F()`` object to reference the comment count,
+and use that ``F()`` object in the query::
+
+    >>> Entry.objects.filter(n_pingbacks__lt=F('n_comments'))
+
+Django supports the use of addition, subtraction, multiplication,
+division and modulo arithmetic with ``F()`` objects, both with constants
+and with other ``F()`` objects. To find all the blog entries with *twice* as
+many comments as pingbacks, we modify the query::
+
+    >>> Entry.objects.filter(n_pingbacks__lt=F('n_comments') * 2)
+
+To find all the entries where the sum of the pingback count and comment count
+is greater than the rating of the entry, we would issue the query::
+
+    >>> Entry.objects.filter(rating__lt=F('n_comments') + F('n_pingbacks'))
+
+You can also use the double underscore notation to span relationships in
+an ``F()`` object. An ``F()`` object with a double underscore will introduce
+any joins needed to access the related object. For example, to retrieve all
+the entries where the author's name is the same as the blog name, we could
+issue the query:
+
+    >>> Entry.objects.filter(author__name=F('blog__name'))
+
 The pk lookup shortcut
 ----------------------
 
@@ -503,7 +548,7 @@ can be combined with ``pk`` to perform a query on the primary key of a model::
 
     # Get blogs entries with id 1, 4 and 7
     >>> Blog.objects.filter(pk__in=[1,4,7])
-    
+
     # Get all blog entries with id > 14
     >>> Blog.objects.filter(pk__gt=14)
 
@@ -728,7 +773,7 @@ To update ``ForeignKey`` fields, set the new value to be the new model
 instance you want to point to. Example::
 
     >>> b = Blog.objects.get(pk=1)
-    
+
     # Change every Entry so that it belongs to this Blog.
     >>> Entry.objects.all().update(blog=b)
 
@@ -748,6 +793,21 @@ Just loop over them and call ``save()``::
 
     for item in my_queryset:
         item.save()
+
+Calls to update can also use :ref:`F() objects <query-expressions>` to update
+one field based on the value of another field in the model. This is especially
+useful for incrementing counters based upon their current value. For example, to
+increment the pingback count for every entry in the blog::
+
+    >>> Entry.objects.all().update(n_pingbacks=F('n_pingbacks') + 1)
+
+However, unlike ``F()`` objects in filter and exclude clauses, you can't
+introduce joins when you use ``F()`` objects in an update -- you can only
+reference fields local to the model being updated. If you attempt to introduce
+a join with an ``F()`` object, a ``FieldError`` will be raised::
+
+    # THIS WILL RAISE A FieldError
+    >>> Entry.objects.update(headline=F('blog__name'))
 
 Related objects
 ===============

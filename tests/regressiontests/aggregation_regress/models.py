@@ -50,7 +50,7 @@ class Store(models.Model):
 #Extra does not play well with values. Modify the tests if/when this is fixed.
 __test__ = {'API_TESTS': """
 >>> from django.core import management
->>> from django.db.models import get_app
+>>> from django.db.models import get_app, F
 
 # Reset the database representation of this app.
 # This will return the database to a clean initial state.
@@ -163,6 +163,21 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, id, i
 2
 >>> len(Book.objects.annotate(num_authors=Count('authors')).exclude(num_authors__lt=2).filter(num_authors__lt=3))
 2
+
+# Aggregates can be used with F() expressions
+# ... where the F() is pushed into the HAVING clause
+>>> Publisher.objects.annotate(num_books=Count('book')).filter(num_books__lt=F('num_awards')/2).values('name','num_books','num_awards')
+[{'num_books': 2, 'name': u'Prentice Hall', 'num_awards': 7}, {'num_books': 1, 'name': u'Morgan Kaufmann', 'num_awards': 9}]
+
+>>> Publisher.objects.annotate(num_books=Count('book')).exclude(num_books__lt=F('num_awards')/2).values('name','num_books','num_awards')
+[{'num_books': 2, 'name': u'Apress', 'num_awards': 3}, {'num_books': 1, 'name': u'Sams', 'num_awards': 1}, {'num_books': 0, 'name': u"Jonno's House of Books", 'num_awards': 0}]
+
+# ... and where the F() references an aggregate
+>>> Publisher.objects.annotate(num_books=Count('book')).filter(num_awards__gt=2*F('num_books')).values('name','num_books','num_awards')
+[{'num_books': 2, 'name': u'Prentice Hall', 'num_awards': 7}, {'num_books': 1, 'name': u'Morgan Kaufmann', 'num_awards': 9}]
+
+>>> Publisher.objects.annotate(num_books=Count('book')).exclude(num_books__lt=F('num_awards')/2).values('name','num_books','num_awards')
+[{'num_books': 2, 'name': u'Apress', 'num_awards': 3}, {'num_books': 1, 'name': u'Sams', 'num_awards': 1}, {'num_books': 0, 'name': u"Jonno's House of Books", 'num_awards': 0}]
 
 # Regression for #10089: Check handling of empty result sets with aggregates
 >>> Book.objects.filter(id__in=[]).count()

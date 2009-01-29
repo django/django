@@ -5,6 +5,7 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 from django.core.exceptions import FieldError
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import Date
+from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
 
@@ -136,7 +137,11 @@ class UpdateQuery(Query):
         result.append('SET')
         values, update_params = [], []
         for name, val, placeholder in self.values:
-            if val is not None:
+            if hasattr(val, 'as_sql'):
+                sql, params = val.as_sql(qn)
+                values.append('%s = %s' % (qn(name), sql))
+                update_params.extend(params)
+            elif val is not None:
                 values.append('%s = %s' % (qn(name), placeholder))
                 update_params.append(val)
             else:
@@ -251,6 +256,8 @@ class UpdateQuery(Query):
             else:
                 placeholder = '%s'
 
+            if hasattr(val, 'evaluate'):
+                val = SQLEvaluator(val, self, allow_joins=False)
             if model:
                 self.add_related_update(model, field.column, val, placeholder)
             else:

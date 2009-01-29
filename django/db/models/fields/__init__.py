@@ -194,8 +194,13 @@ class Field(object):
     def get_db_prep_lookup(self, lookup_type, value):
         "Returns field's value prepared for database lookup."
         if hasattr(value, 'as_sql'):
+            # If the value has a relabel_aliases method, it will need to
+            # be invoked before the final SQL is evaluated
+            if hasattr(value, 'relabel_aliases'):
+                return value
             sql, params = value.as_sql()
             return QueryWrapper(('(%s)' % sql), params)
+
         if lookup_type in ('regex', 'iregex', 'month', 'day', 'search'):
             return [value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
@@ -309,7 +314,7 @@ class Field(object):
             if callable(self.default):
                 defaults['show_hidden_initial'] = True
         if self.choices:
-            # Fields with choices get special treatment. 
+            # Fields with choices get special treatment.
             include_blank = self.blank or not (self.has_default() or 'initial' in kwargs)
             defaults['choices'] = self.get_choices(include_blank=include_blank)
             defaults['coerce'] = self.to_python
