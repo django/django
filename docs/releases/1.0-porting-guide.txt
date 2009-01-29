@@ -415,7 +415,7 @@ Sessions
 Getting a new session key
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``SeesionBase.get_new_session_key()`` has been renamed to
+``SessionBase.get_new_session_key()`` has been renamed to
 ``_get_new_session_key()``. ``get_new_session_object()`` no longer exists.
 
 Fixtures
