@@ -1,4 +1,5 @@
 import os, re, sys
+from subprocess import Popen, PIPE
 
 from django.conf import settings
 from django.core.management import call_command
@@ -6,12 +7,17 @@ from django.db import connection
 from django.db.backends.creation import TEST_DATABASE_PREFIX
 
 def getstatusoutput(cmd):
-    "A simpler version of getstatusoutput that works on win32 platforms."
-    stdin, stdout, stderr = os.popen3(cmd)
-    output = stdout.read()
-    if output.endswith('\n'): output = output[:-1]
-    status = stdin.close()
-    return status, output
+    """
+    Executes a shell command on the platform using subprocess.Popen and
+    return a tuple of the status and stdout output.
+    """
+    # Set stdout and stderr to PIPE because we want to capture stdout and
+    # prevent stderr from displaying.
+    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+    # We use p.communicate() instead of p.wait() to avoid deadlocks if the
+    # output buffers exceed POSIX buffer size.
+    stdout, stderr = p.communicate()
+    return p.returncode, stdout.strip()
 
 def create_lang(db_name, verbosity=1):
     "Sets up the pl/pgsql language on the given database."
