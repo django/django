@@ -13,6 +13,22 @@ This file describes some of the features that might be relevant to Django
 usage. Of course, it is not intended as a replacement for server-specific
 documentation or reference manuals.
 
+PostgreSQL notes
+================
+
+PostgreSQL 8.2 to 8.2.4
+-----------------------
+
+The implementation of the population statistics aggregates ``STDDEV_POP`` and
+``VAR_POP`` that shipped with PostgreSQL 8.2 to 8.2.4 are `known to be
+faulty`_. Users of these releases of PostgreSQL are advised to upgrade to
+`Release 8.2.5`_ or later. Django will raise a ``NotImplementedError`` if you
+attempt to use the ``StdDev(sample=False)`` or ``Variance(sample=False)``
+aggregate with an database backend falls within the affected release range.
+
+.. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
+.. _Release 8.2.5: http://developer.postgresql.org/pgdocs/postgres/release-8-2-5.html
+
 .. _mysql-notes:
 
 MySQL notes

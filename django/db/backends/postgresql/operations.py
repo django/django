@@ -144,3 +144,14 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def prep_for_iexact_query(self, x):
         return x
+
+    def check_aggregate_support(self, aggregate):
+        """Check that the backend fully supports the provided aggregate.
+
+        The implementation of population statistics (STDDEV_POP and VAR_POP)
+        under Postgres 8.2 - 8.2.4 is known to be faulty. Raise
+        NotImplementedError if this is the database in use.
+        """
+        if aggregate.sql_function == 'STDDEV_POP' or aggregate.sql_function == 'VAR_POP':
+            if self.postgres_version[0] == 8 and self.postgres_version[1] == 2 and self.postgres_version[1] <= 4:
+                raise NotImplementedError('PostgreSQL 8.2 to 8.2.4 is known to have a faulty implementation of %s. Please upgrade your version of PostgreSQL.' % aggregate.sql_function)

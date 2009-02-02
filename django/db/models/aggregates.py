@@ -41,8 +41,12 @@ class Aggregate(object):
          * is_summary is a boolean that is set True if the aggregate is a
            summary value rather than an annotation.
         """
-        aggregate = getattr(query.aggregates_module, self.name)
-        query.aggregate_select[alias] = aggregate(col, source=source, is_summary=is_summary, **self.extra)
+        klass = getattr(query.aggregates_module, self.name)
+        aggregate = klass(col, source=source, is_summary=is_summary, **self.extra)
+        # Validate that the backend has a fully supported, correct
+        # implementation of this aggregate
+        query.connection.ops.check_aggregate_support(aggregate)
+        query.aggregate_select[alias] = aggregate
 
 class Avg(Aggregate):
     name = 'Avg'

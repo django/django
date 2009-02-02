@@ -398,6 +398,15 @@ class BaseDatabaseOperations(object):
         # Default to a float
         return float(value)
 
+    def check_aggregate_support(self, aggregate_func):
+        """Check that the backend supports the provided aggregate
+
+        This is used on specific backends to rule out known aggregates
+        that are known to have faulty implementations. If the named
+        aggregate function has a known problem, the backend should
+        raise NotImplemented.
+        """
+        pass
 
 class BaseDatabaseIntrospection(object):
     """
