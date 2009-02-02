@@ -194,6 +194,11 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, id, i
 >>> Book.objects.annotate(num_authors=Count('authors')).order_by('publisher__name', 'name')
 [<Book: Practical Django Projects>, <Book: The Definitive Guide to Django: Web Development Done Right>, <Book: Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp>, <Book: Artificial Intelligence: A Modern Approach>, <Book: Python Web Development with Django>, <Book: Sams Teach Yourself Django in 24 Hours>]
 
+# Regression for #10127 - Empty select_related() works with annotate
+>>> books = Book.objects.all().filter(rating__lt=4.5).select_related().annotate(Avg('authors__age'))
+>>> sorted([(b.name, b.authors__age__avg) for b in books])
+[(u'Artificial Intelligence: A Modern Approach', 51.5), (u'Practical Django Projects', 29.0), (u'Python Web Development with Django', 30.3...), (u'Sams Teach Yourself Django in 24 Hours', 45.0)]
+
 """
 }
 

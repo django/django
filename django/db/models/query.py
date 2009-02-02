@@ -280,8 +280,8 @@ class QuerySet(object):
 
         for row in self.query.results_iter():
             if fill_cache:
-                obj, aggregate_start = get_cached_row(self.model, row,
-                                    index_start, max_depth, requested=requested)
+                obj, _ = get_cached_row(self.model, row,
+                                        index_start, max_depth, requested=requested)
             else:
                 # omit aggregates in object creation
                 obj = self.model(*row[index_start:aggregate_start])

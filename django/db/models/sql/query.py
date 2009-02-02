@@ -698,7 +698,7 @@ class BaseQuery(object):
         """
         qn = self.quote_name_unless_alias
         result = []
-        for col in self.group_by:
+        for col in self.group_by + self.related_select_cols:
             if isinstance(col, (list, tuple)):
                 result.append('%s.%s' % (qn(col[0]), qn(col[1])))
             elif hasattr(col, 'as_sql'):
