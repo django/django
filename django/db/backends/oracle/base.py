@@ -253,9 +253,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if len(settings.DATABASE_HOST.strip()) == 0:
             settings.DATABASE_HOST = 'localhost'
         if len(settings.DATABASE_PORT.strip()) != 0:
-            dsn = '%s:%s/%s' % (settings.DATABASE_HOST,
-                                settings.DATABASE_PORT,
-                                settings.DATABASE_NAME)
+            dsn = Database.makedsn(settings.DATABASE_HOST,
+                                   int(settings.DATABASE_PORT),
+                                   settings.DATABASE_NAME)
         else:
             dsn = settings.DATABASE_NAME
         return "%s/%s@%s" % (settings.DATABASE_USER,
