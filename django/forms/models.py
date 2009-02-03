@@ -493,7 +493,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         fk_attname = self.fk.get_attname()
         kwargs = {fk_attname: self.instance.pk}
         new_obj = self.model(**kwargs)
-        if fk_attname == self._pk_field.attname:
+        if fk_attname == self._pk_field.attname or self._pk_field.auto_created:
             exclude =  [self._pk_field.name]
         else:
             exclude = []

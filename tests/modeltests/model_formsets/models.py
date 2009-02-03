@@ -36,6 +36,12 @@ class BookWithCustomPK(models.Model):
     def __unicode__(self):
         return u'%s: %s' % (self.my_pk, self.title)
     
+class AlternateBook(Book):
+    notes = models.CharField(max_length=100)
+    
+    def __unicode__(self):
+        return u'%s - %s' % (self.title, self.notes)
+    
 class AuthorMeeting(models.Model):
     name = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author)
@@ -519,6 +525,33 @@ True
 >>> for book in author.bookwithcustompk_set.all():
 ...     print book.title
 Les Fleurs du Mal
+
+Test inline formsets where the inline-edited object uses multi-table inheritance, thus 
+has a non AutoField yet auto-created primary key.
+
+>>> AuthorBooksFormSet3 = inlineformset_factory(Author, AlternateBook, can_delete=False, extra=1)
+
+>>> formset = AuthorBooksFormSet3(instance=author)
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_alternatebook_set-0-title">Title:</label> <input id="id_alternatebook_set-0-title" type="text" name="alternatebook_set-0-title" maxlength="100" /></p>
+    <p><label for="id_alternatebook_set-0-notes">Notes:</label> <input id="id_alternatebook_set-0-notes" type="text" name="alternatebook_set-0-notes" maxlength="100" /><input type="hidden" name="alternatebook_set-0-author" value="1" id="id_alternatebook_set-0-author" /><input type="hidden" name="alternatebook_set-0-book_ptr" id="id_alternatebook_set-0-book_ptr" /></p>
+
+
+>>> data = {
+...     'alternatebook_set-TOTAL_FORMS': '1', # the number of forms rendered
+...     'alternatebook_set-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'alternatebook_set-0-title': 'Flowers of Evil',
+...     'alternatebook_set-0-notes': 'English translation of Les Fleurs du Mal'
+... }
+
+>>> formset = AuthorBooksFormSet3(data, instance=author)
+>>> formset.is_valid()
+True
+
+>>> formset.save()
+[<AlternateBook: Flowers of Evil - English translation of Les Fleurs du Mal>]
+
 
 # Test a custom primary key ###################################################
 
