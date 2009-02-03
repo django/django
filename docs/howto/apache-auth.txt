@@ -50,8 +50,8 @@ with the standard ``Auth*`` and ``Require`` directives:
     from trying to use other authentication modules, as well as specifying
     the ``AuthUserFile`` directive and pointing it to ``/dev/null``. Depending
     on which other authentication modules you have loaded, you might need one
-    or more of the following directives::
-    
+    or more of the following directives:
+
     .. code-block:: apache
 
         AuthBasicAuthoritative Off
