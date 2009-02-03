@@ -28,6 +28,7 @@ class Book(models.Model):
    rating = models.FloatField()
    price = models.DecimalField(decimal_places=2, max_digits=6)
    authors = models.ManyToManyField(Author)
+   contact = models.ForeignKey(Author, related_name='book_contact_set')
    publisher = models.ForeignKey(Publisher)
    pubdate = models.DateField()
 
@@ -180,7 +181,7 @@ u'The Definitive Guide to Django: Web Development Done Right'
 # Count the number of books written by each author
 >>> authors = Author.objects.annotate(num_books=Count('book'))
 >>> sorted([(a.name, a.num_books) for a in authors])
-[(u'Adrian Holovaty', 1), (u'Brad Dayley', 1), (u'Jacob Kaplan-Moss', 1), (u'James Bennett', 1), (u'Jeffrey Forcier ', 1), (u'Paul Bissex', 1), (u'Peter Norvig', 2), (u'Stuart Russell', 1), (u'Wesley J. Chun', 1)]
+[(u'Adrian Holovaty', 1), (u'Brad Dayley', 1), (u'Jacob Kaplan-Moss', 1), (u'James Bennett', 1), (u'Jeffrey Forcier', 1), (u'Paul Bissex', 1), (u'Peter Norvig', 2), (u'Stuart Russell', 1), (u'Wesley J. Chun', 1)]
 
 # On OneToMany Relationships
 
@@ -201,7 +202,7 @@ u'The Definitive Guide to Django: Web Development Done Right'
 # Calling values on a queryset that has annotations returns the output
 # as a dictionary
 >>> Book.objects.filter(pk=1).annotate(mean_age=Avg('authors__age')).values()
-[{'rating': 4.5, 'isbn': u'159059725', 'name': u'The Definitive Guide to Django: Web Development Done Right', 'pubdate': datetime.date(2007, 12, 6), 'price': Decimal("30..."), 'id': 1, 'publisher_id': 1, 'pages': 447, 'mean_age': 34.5}]
+[{'rating': 4.5, 'isbn': u'159059725', 'name': u'The Definitive Guide to Django: Web Development Done Right', 'pubdate': datetime.date(2007, 12, 6), 'price': Decimal("30..."), 'contact_id': 1, 'id': 1, 'publisher_id': 1, 'pages': 447, 'mean_age': 34.5}]
 
 >>> Book.objects.filter(pk=1).annotate(mean_age=Avg('authors__age')).values('pk', 'isbn', 'mean_age')
 [{'pk': 1, 'isbn': u'159059725', 'mean_age': 34.5}]
@@ -214,7 +215,7 @@ u'The Definitive Guide to Django: Web Development Done Right'
 # An empty values() call before annotating has the same effect as an
 # empty values() call after annotating
 >>> Book.objects.filter(pk=1).values().annotate(mean_age=Avg('authors__age'))
-[{'rating': 4.5, 'isbn': u'159059725', 'name': u'The Definitive Guide to Django: Web Development Done Right', 'pubdate': datetime.date(2007, 12, 6), 'price': Decimal("30..."), 'id': 1, 'publisher_id': 1, 'pages': 447, 'mean_age': 34.5}]
+[{'rating': 4.5, 'isbn': u'159059725', 'name': u'The Definitive Guide to Django: Web Development Done Right', 'pubdate': datetime.date(2007, 12, 6), 'price': Decimal("30..."), 'contact_id': 1, 'id': 1, 'publisher_id': 1, 'pages': 447, 'mean_age': 34.5}]
 
 # Calling annotate() on a ValuesQuerySet annotates over the groups of
 # fields to be selected by the ValuesQuerySet.
@@ -231,7 +232,7 @@ u'The Definitive Guide to Django: Web Development Done Right'
 >>> len(authors)
 9
 >>> sorted([(a.name, a.friends__age__avg) for a in authors])
-[(u'Adrian Holovaty', 32.0), (u'Brad Dayley', None), (u'Jacob Kaplan-Moss', 29.5), (u'James Bennett', 34.0), (u'Jeffrey Forcier ', 27.0), (u'Paul Bissex', 31.0), (u'Peter Norvig', 46.0), (u'Stuart Russell', 57.0), (u'Wesley J. Chun', 33.6...)]
+[(u'Adrian Holovaty', 32.0), (u'Brad Dayley', None), (u'Jacob Kaplan-Moss', 29.5), (u'James Bennett', 34.0), (u'Jeffrey Forcier', 27.0), (u'Paul Bissex', 31.0), (u'Peter Norvig', 46.0), (u'Stuart Russell', 57.0), (u'Wesley J. Chun', 33.6...)]
 
 
 # The Count aggregation function allows an extra parameter: distinct.
@@ -268,9 +269,9 @@ True
 # Lets add a publisher to test the different possibilities for filtering
 >>> p = Publisher(name='Expensive Publisher', num_awards=0)
 >>> p.save()
->>> Book(name='ExpensiveBook1', pages=1, isbn='111', rating=3.5, price=Decimal("1000"), publisher=p, pubdate=date(2008,12,1)).save()
->>> Book(name='ExpensiveBook2', pages=1, isbn='222', rating=4.0, price=Decimal("1000"), publisher=p, pubdate=date(2008,12,2)).save()
->>> Book(name='ExpensiveBook3', pages=1, isbn='333', rating=4.5, price=Decimal("35"), publisher=p, pubdate=date(2008,12,3)).save()
+>>> Book(name='ExpensiveBook1', pages=1, isbn='111', rating=3.5, price=Decimal("1000"), publisher=p, contact_id=1, pubdate=date(2008,12,1)).save()
+>>> Book(name='ExpensiveBook2', pages=1, isbn='222', rating=4.0, price=Decimal("1000"), publisher=p, contact_id=1, pubdate=date(2008,12,2)).save()
+>>> Book(name='ExpensiveBook3', pages=1, isbn='333', rating=4.5, price=Decimal("35"), publisher=p, contact_id=1, pubdate=date(2008,12,3)).save()
 
 # Publishers that have:
 

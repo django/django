@@ -281,7 +281,8 @@ class QuerySet(object):
         for row in self.query.results_iter():
             if fill_cache:
                 obj, _ = get_cached_row(self.model, row,
-                                        index_start, max_depth, requested=requested)
+                            index_start, max_depth,
+                            requested=requested, offset=len(aggregate_select))
             else:
                 # omit aggregates in object creation
                 obj = self.model(*row[index_start:aggregate_start])
@@ -898,7 +899,7 @@ class EmptyQuerySet(QuerySet):
 
 
 def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
-                   requested=None):
+                   requested=None, offset=0):
     """
     Helper function that recursively returns an object with the specified
     related attributes already populated.
@@ -915,6 +916,7 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
         obj = None
     else:
         obj = klass(*fields)
+    index_end += offset
     for f in klass._meta.fields:
         if not select_related_descend(f, restricted, requested):
             continue

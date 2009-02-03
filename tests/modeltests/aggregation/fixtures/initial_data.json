@@ -49,6 +49,7 @@
             "price": "30.00",
             "rating": 4.5,
             "authors": [1, 2],
+            "contact": 1,
             "pages": 447,
             "pubdate": "2007-12-6"
         }
@@ -63,6 +64,7 @@
             "price": "23.09",
             "rating": 3.0,
             "authors": [3],
+            "contact": 3,
             "pages": 528,
             "pubdate": "2008-3-3"
         }
@@ -77,6 +79,7 @@
             "price": "29.69",
             "rating": 4.0,
             "authors": [4],
+            "contact": 4,
             "pages": 300,
             "pubdate": "2008-6-23"
         }
@@ -91,6 +94,7 @@
             "price": "29.69",
             "rating": 4.0,
             "authors": [5, 6, 7],
+            "contact": 5,
             "pages": 350,
             "pubdate": "2008-11-3"
         }
@@ -105,6 +109,7 @@
             "price": "82.80",
             "rating": 4.0,
             "authors": [8, 9],
+            "contact": 8,
             "pages": 1132,
             "pubdate": "1995-1-15"
         }
@@ -119,6 +124,7 @@
             "price": "75.00",
             "rating": 5.0,
             "authors": [8],
+            "contact": 8,
             "pages": 946,
             "pubdate": "1991-10-15"
         }
@@ -195,7 +201,7 @@
         "fields": {
             "age": 37,
             "friends": [6, 7],
-            "name": "Jeffrey Forcier "
+            "name": "Jeffrey Forcier"
         }
     },
     {
