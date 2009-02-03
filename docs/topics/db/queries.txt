@@ -508,6 +508,7 @@ For example, to find a list of all blog entries that have had more comments
 than pingbacks, we construct an ``F()`` object to reference the comment count,
 and use that ``F()`` object in the query::
 
+    >>> from django.db.models import F
     >>> Entry.objects.filter(n_pingbacks__lt=F('n_comments'))
 
 Django supports the use of addition, subtraction, multiplication,
