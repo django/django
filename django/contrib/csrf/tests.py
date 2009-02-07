@@ -63,7 +63,7 @@ class CsrfMiddlewareTest(TestCase):
         """
         req = self._get_GET_no_session_request()
         resp = self._get_post_form_response()
-        resp_content = resp.content
+	resp_content = resp.content # needed because process_response modifies resp
         resp2 = CsrfMiddleware().process_response(req, resp)
         self.assertEquals(resp_content, resp2.content)
 
@@ -73,7 +73,7 @@ class CsrfMiddlewareTest(TestCase):
         """
         req = self._get_GET_session_request()
         resp = self._get_post_form_response()
-        resp_content = resp.content
+	resp_content = resp.content # needed because process_response modifies resp
         resp2 = CsrfMiddleware().process_response(req, resp)
         self.assertNotEqual(resp_content, resp2.content)
         self._check_token_present(resp2)
@@ -84,10 +84,20 @@ class CsrfMiddlewareTest(TestCase):
         """
         req = self._get_GET_no_session_request() # no session in request
         resp = self._get_new_session_response() # but new session started
-        resp_content = resp.content
+	resp_content = resp.content # needed because process_response modifies resp
         resp2 = CsrfMiddleware().process_response(req, resp)
         self.assertNotEqual(resp_content, resp2.content)
         self._check_token_present(resp2)
+
+    def test_process_response_exempt_view(self):
+	"""
+	Check that no post processing is done for an exempt view
+	"""
+        req = self._get_POST_session_request()
+	resp = csrf_exempt(self.get_view())(req)
+	resp_content = resp.content
+        resp2 = CsrfMiddleware().process_response(req, resp)
+        self.assertEquals(resp_content, resp2.content)
 
     # Check the request processing
     def test_process_request_no_session(self):
@@ -126,7 +136,7 @@ class CsrfMiddlewareTest(TestCase):
 
     def test_ajax_exemption(self):
         """
-        Check the AJAX requests are automatically exempted.
+        Check that AJAX requests are automatically exempted.
         """
         req = self._get_POST_session_request()
         req.META['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'

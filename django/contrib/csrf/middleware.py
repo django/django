@@ -65,9 +65,12 @@ class CsrfResponseMiddleware(object):
     session.
     """
     def process_response(self, request, response):
+	if getattr(response, 'csrf_exempt', False):
+	    return response
+
         csrf_token = None
         try:
-            # This covers a corner case in which the outgoing request
+            # This covers a corner case in which the outgoing response
             # both contains a form and sets a session cookie.  This
             # really should not be needed, since it is best if views
             # that create a new session (login pages) also do a
@@ -123,13 +126,35 @@ class CsrfMiddleware(CsrfViewMiddleware, CsrfResponseMiddleware):
     """
     pass
 
+def csrf_response_exempt(view_func):
+    """
+    Modifies a view function so that its response is exempt
+    from the post-processing of the CSRF middleware.
+    """
+    def wrapped_view(*args, **kwargs):
+        resp = view_func(*args, **kwargs)
+	resp.csrf_exempt = True
+	return resp
+    return wraps(view_func)(wrapped_view)
+
+def csrf_view_exempt(view_func):
+    """
+    Marks a view function as being exempt from CSRF view protection.
+    """
+    # We could just do view_func.csrf_exempt = True, but decorators
+    # are nicer if they don't have side-effects, so we return a new
+    # function.
+    def wrapped_view(*args, **kwargs):
+        return view_func(*args, **kwargs)
+    wrapped_view.csrf_exempt = True
+    return wraps(view_func)(wrapped_view)
+
 def csrf_exempt(view_func):
     """
     Marks a view function as being exempt from the CSRF checks
+    and post processing.
+
+    This is the same as using both the csrf_exempt_view and
+    csrf_exempt_response decorators.
     """
-    def wrapped_view(*args, **kwargs):
-        return view_func(*args, **kwargs)
-    # We could just do view.csrf_exempt = True, but decorators are
-    # nicer if they don't have side-effects.
-    wrapped_view.csrf_exempt = True
-    return wraps(view_func)(wrapped_view)
+    return csrf_response_exempt(csrf_view_exempt(view_func))

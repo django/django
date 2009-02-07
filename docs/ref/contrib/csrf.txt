@@ -29,6 +29,16 @@ list. It also must process the response before things like compression
 happen to the response, so it must come after GZipMiddleware in the
 list.
 
+The ``CsrfMiddleware`` class is actually composed of two middleware:
+``CsrfViewMiddleware`` which performs the checks on incoming requests,
+and ``CsrfResponseMiddleware`` which performs post-processing of the
+result.  This allows the individual components to be used and/or
+replaced instead of using ``CsrfMiddleware``.
+
+.. versionchanged:: 1.1
+    (previous versions of Django did not provide these two components
+    of ``CsrfMiddleware`` as described above)
+
 Exceptions
 ----------
 
@@ -44,9 +54,16 @@ the ``django.contrib.csrf.middleware`` module. For example::
         return HttpResponse('Hello world')
     my_view = csrf_exempt(my_view)
 
-You don't have to worry about doing this for most AJAX views. Any request sent
-with "X-Requested-With: XMLHttpRequest" is automatically exempt. (See the next
-section.)
+Like the middleware itself, the ``csrf_exempt`` decorator is composed
+of two parts: a ``csrf_view_exempt`` decorator and a
+``csrf_response_exempt`` decorator, found in the same module.  These
+disable the view protection mechanism (``CsrfViewMiddleware``) and the
+response post-processing (``CsrfResponseMiddleware``) respectively.
+They can be used individually if required.
+
+You don't have to worry about doing this for most AJAX views. Any
+request sent with "X-Requested-With: XMLHttpRequest" is automatically
+exempt. (See the next section.)
 
 How it works
 ============
@@ -58,10 +75,12 @@ CsrfMiddleware does two things:
    a hash of the session ID plus a secret. If there is no session ID set,
    this modification of the response isn't done, so there is very little
    performance penalty for those requests that don't have a session.
+   (This is done by ``CsrfResponseMiddleware``).
 
 2. On all incoming POST requests that have the session cookie set, it
    checks that the 'csrfmiddlewaretoken' is present and correct. If it
-   isn't, the user will get a 403 error.
+   isn't, the user will get a 403 error. (This is done by
+   ``CsrfViewMiddleware``)
 
 This ensures that only forms that have originated from your Web site
 can be used to POST data back.
@@ -87,14 +106,6 @@ be added by using ``XMLHttpRequest``, and browsers already implement a
 same-domain policy for ``XMLHttpRequest``. (Note that this is not secure if you
 don't trust content within the same domain or subdomains.)
 
-The above two functions of ``CsrfMiddleware`` are split between two
-classes: ``CsrfResponseMiddleware`` and ``CsrfViewMiddleware``
-respectively.  This allows the individual components to be used and/or
-replaced instead of using ``CsrfMiddleware``.
-
-.. versionchanged:: 1.1
-    (previous versions of Django did not provide these two components
-    of ``CsrfMiddleware`` as described above)
 
 .. _9.1.1 Safe Methods, HTTP 1.1, RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
 
