@@ -154,7 +154,7 @@ def csrf_exempt(view_func):
     Marks a view function as being exempt from the CSRF checks
     and post processing.
 
-    This is the same as using both the csrf_exempt_view and
-    csrf_exempt_response decorators.
+    This is the same as using both the csrf_view_exempt and
+    csrf_response_exempt decorators.
     """
     return csrf_response_exempt(csrf_view_exempt(view_func))
