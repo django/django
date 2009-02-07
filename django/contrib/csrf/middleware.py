@@ -65,8 +65,8 @@ class CsrfResponseMiddleware(object):
     session.
     """
     def process_response(self, request, response):
-	if getattr(response, 'csrf_exempt', False):
-	    return response
+        if getattr(response, 'csrf_exempt', False):
+            return response
 
         csrf_token = None
         try:
@@ -133,8 +133,8 @@ def csrf_response_exempt(view_func):
     """
     def wrapped_view(*args, **kwargs):
         resp = view_func(*args, **kwargs)
-	resp.csrf_exempt = True
-	return resp
+        resp.csrf_exempt = True
+        return resp
     return wraps(view_func)(wrapped_view)
 
 def csrf_view_exempt(view_func):
