@@ -64,10 +64,7 @@ class SQLEvaluator(object):
             if hasattr(child, 'evaluate'):
                 sql, params = child.evaluate(self, qn)
             else:
-                try:
-                    sql, params = qn(child), ()
-                except:
-                    sql, params = str(child), ()
+                sql, params = '%s', (child,)
 
             if hasattr(child, 'children') > 1:
                 format = '(%s)'

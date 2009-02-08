@@ -160,10 +160,10 @@ class WhereNode(tree.Node):
             extra = ''
 
         if lookup_type in connection.operators:
-            format = "%s %%s %s" % (connection.ops.lookup_cast(lookup_type),
-                    extra)
+            format = "%s %%s %%s" % (connection.ops.lookup_cast(lookup_type),)
             return (format % (field_sql,
-                    connection.operators[lookup_type] % cast_sql), params)
+                              connection.operators[lookup_type] % cast_sql,
+                              extra), params)
 
         if lookup_type == 'in':
             if not value_annot:
