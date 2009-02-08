@@ -307,11 +307,13 @@ class QuerySet(object):
         for arg in args:
             kwargs[arg.default_alias] = arg
 
+        query = self.query.clone()
+
         for (alias, aggregate_expr) in kwargs.items():
-            self.query.add_aggregate(aggregate_expr, self.model, alias,
+            query.add_aggregate(aggregate_expr, self.model, alias,
                 is_summary=True)
 
-        return self.query.get_aggregation()
+        return query.get_aggregation()
 
     def count(self):
         """
