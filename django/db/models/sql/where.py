@@ -174,9 +174,9 @@ class WhereNode(tree.Node):
                     params)
         elif lookup_type in ('range', 'year'):
             return ('%s BETWEEN %%s and %%s' % field_sql, params)
-        elif lookup_type in ('month', 'day'):
-            return ('%s = %%s' % connection.ops.date_extract_sql(lookup_type,
-                    field_sql), params)
+        elif lookup_type in ('month', 'day', 'week_day'):
+            return ('%s = %%s' % connection.ops.date_extract_sql(lookup_type, field_sql),
+                    params)
         elif lookup_type == 'isnull':
             return ('%s IS %sNULL' % (field_sql,
                 (not value_annot and 'NOT ' or '')), ())

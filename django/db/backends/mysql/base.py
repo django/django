@@ -116,7 +116,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
         # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
-        return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+        if lookup_type == 'week_day':
+            # DAYOFWEEK() returns an integer, 1-7, Sunday=1.
+            # Note: WEEKDAY() returns 0-6, Monday=0.
+            return "DAYOFWEEK(%s)" % field_name
+        else:
+            return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
     def date_trunc_sql(self, lookup_type, field_name):
         fields = ['year', 'month', 'day', 'hour', 'minute', 'second']

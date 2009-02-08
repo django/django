@@ -74,6 +74,8 @@ datetime.datetime(2005, 7, 28, 0, 0)
 <Article: Area woman programs in Python>
 >>> Article.objects.get(pub_date__year=2005, pub_date__month=7, pub_date__day=28)
 <Article: Area woman programs in Python>
+>>> Article.objects.get(pub_date__week_day=5)
+<Article: Area woman programs in Python>
 
 # The "__exact" lookup type can be omitted, as a shortcut.
 >>> Article.objects.get(id=1)
@@ -88,6 +90,11 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> Article.objects.filter(pub_date__year=2005, pub_date__month=7)
 [<Article: Area woman programs in Python>]
 
+>>> Article.objects.filter(pub_date__week_day=5)
+[<Article: Area woman programs in Python>]
+>>> Article.objects.filter(pub_date__week_day=6)
+[]
+
 # Django raises an Article.DoesNotExist exception for get() if the parameters
 # don't match any object.
 >>> Article.objects.get(id__exact=2)
@@ -96,6 +103,11 @@ Traceback (most recent call last):
 DoesNotExist: Article matching query does not exist.
 
 >>> Article.objects.get(pub_date__year=2005, pub_date__month=8)
+Traceback (most recent call last):
+    ...
+DoesNotExist: Article matching query does not exist.
+
+>>> Article.objects.get(pub_date__week_day=6)
 Traceback (most recent call last):
     ...
 DoesNotExist: Article matching query does not exist.

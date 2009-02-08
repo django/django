@@ -72,7 +72,11 @@ WHEN (new.%(col_name)s IS NULL)
 
     def date_extract_sql(self, lookup_type, field_name):
         # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions42a.htm#1017163
-        return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
+        if lookup_type == 'week_day':
+            # TO_CHAR(field, 'D') returns an integer from 1-7, where 1=Sunday.
+            return "TO_CHAR(%s, 'D')" % field_name
+        else:
+            return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
 
     def date_trunc_sql(self, lookup_type, field_name):
         # Oracle uses TRUNC() for both dates and numbers.
@@ -268,9 +272,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection = Database.connect(conn_string, **self.options)
             cursor = FormatStylePlaceholderCursor(self.connection)
             # Set oracle date to ansi date format.  This only needs to execute
-            # once when we create a new connection.
+            # once when we create a new connection. We also set the Territory
+            # to 'AMERICA' which forces Sunday to evaluate to a '1' in TO_CHAR().
             cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS' "
-                           "NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'")
+                           "NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF' "
+                           "NLS_TERRITORY = 'AMERICA'")
             try:
                 self.oracle_version = int(self.connection.version.split('.')[0])
                 # There's no way for the DatabaseOperations class to know the

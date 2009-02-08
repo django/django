@@ -1344,6 +1344,27 @@ SQL equivalent::
 Note this will match any record with a pub_date on the third day of the month,
 such as January 3, July 3, etc.
 
+week_day
+~~~~~~~~
+
+.. versionadded:: 1.1
+
+For date/datetime fields, a 'day of the week' match.
+
+Example::
+
+    Entry.objects.filter(pub_date__week_day=2)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('dow' FROM pub_date) = '2';
+
+(The exact SQL syntax varies for each database engine.)
+
+Note this will match any record with a pub_date that falls on a Monday (day 2
+of the week), regardless of the month or year in which it occurs. Week days
+are indexed with day 1 being Sunday and day 7 being Saturday.
+
 isnull
 ~~~~~~
 

@@ -201,7 +201,7 @@ class Field(object):
             sql, params = value.as_sql()
             return QueryWrapper(('(%s)' % sql), params)
 
-        if lookup_type in ('regex', 'iregex', 'month', 'day', 'search'):
+        if lookup_type in ('regex', 'iregex', 'month', 'day', 'week_day', 'search'):
             return [value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
             return [self.get_db_prep_value(value)]
@@ -490,9 +490,9 @@ class DateField(Field):
                 curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=False))
 
     def get_db_prep_lookup(self, lookup_type, value):
-        # For "__month" and "__day" lookups, convert the value to a string so
-        # the database backend always sees a consistent type.
-        if lookup_type in ('month', 'day'):
+        # For "__month", "__day", and "__week_day" lookups, convert the value 
+        # to a string so the database backend always sees a consistent type.
+        if lookup_type in ('month', 'day', 'week_day'):
             return [force_unicode(value)]
         return super(DateField, self).get_db_prep_lookup(lookup_type, value)
 
