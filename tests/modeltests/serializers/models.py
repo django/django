@@ -6,6 +6,11 @@
 ``QuerySet`` objects to and from "flat" data (i.e. strings).
 """
 
+try:
+    from decimal import Decimal
+except ImportError:
+    from django.utils._decimal import Decimal # Python 2.3 fallback
+
 from django.db import models
 
 class Category(models.Model):
@@ -57,6 +62,7 @@ class Actor(models.Model):
 class Movie(models.Model):
     actor = models.ForeignKey(Actor)
     title = models.CharField(max_length=50)
+    price = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal('0.00'))
 
     class Meta:
        ordering = ('title',)
@@ -194,7 +200,7 @@ __test__ = {'API_TESTS':"""
 
 # Let's serialize our movie
 >>> print serializers.serialize("json", [mv])
-[{"pk": 1, "model": "serializers.movie", "fields": {"actor": "Za\u017c\u00f3\u0142\u0107", "title": "G\u0119\u015bl\u0105 ja\u017a\u0144"}}]
+[{"pk": 1, "model": "serializers.movie", "fields": {"price": "0.00", "actor": "Za\u017c\u00f3\u0142\u0107", "title": "G\u0119\u015bl\u0105 ja\u017a\u0144"}}]
 
 # Deserialization of movie
 >>> list(serializers.deserialize('json', serializers.serialize('json', [mv])))[0].object.title
@@ -204,7 +210,7 @@ u'G\u0119\u015bl\u0105 ja\u017a\u0144'
 # Primary key is None in case of not saved model
 >>> mv2 = Movie(title="Movie 2", actor=ac)
 >>> print serializers.serialize("json", [mv2])
-[{"pk": null, "model": "serializers.movie", "fields": {"actor": "Za\u017c\u00f3\u0142\u0107", "title": "Movie 2"}}]
+[{"pk": null, "model": "serializers.movie", "fields": {"price": "0.00", "actor": "Za\u017c\u00f3\u0142\u0107", "title": "Movie 2"}}]
 
 # Deserialization of null returns None for pk
 >>> print list(serializers.deserialize('json', serializers.serialize('json', [mv2])))[0].object.id

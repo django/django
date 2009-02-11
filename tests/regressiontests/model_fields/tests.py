@@ -20,6 +20,10 @@ Traceback (most recent call last):
 ...
 ValidationError: This value must be a decimal number.
 
+>>> f = DecimalField(default=Decimal("0.00"))
+>>> f.get_default()
+Decimal("0.00")
+
 >>> f = DecimalField(max_digits=5, decimal_places=1)
 >>> x = f.to_python(2)
 >>> y = f.to_python('2.6')
