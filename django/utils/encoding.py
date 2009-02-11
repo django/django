@@ -1,7 +1,14 @@
 import types
 import urllib
 import datetime
+
 from django.utils.functional import Promise
+
+try:
+    from decimal import Decimal
+except ImportError:
+    from django.utils._decimal import Decimal # Python 2.3 fallback
+
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
@@ -41,7 +48,7 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
-    if strings_only and isinstance(s, (types.NoneType, int, long, datetime.datetime, datetime.date, datetime.time, float)):
+    if strings_only and isinstance(s, (types.NoneType, int, long, datetime.datetime, datetime.date, datetime.time, float, Decimal)):
         return s
     try:
         if not isinstance(s, basestring,):
