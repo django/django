@@ -450,7 +450,8 @@ class FormatStylePlaceholderCursor(object):
                     value = Decimal(value)
                 else:
                     value = int(value)
-            else:
+            elif desc[1] in (Database.STRING, Database.FIXED_CHAR,
+                             Database.LONG_STRING):
                 value = to_unicode(value)
             casted.append(value)
         return tuple(casted)
