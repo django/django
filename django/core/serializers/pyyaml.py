@@ -7,9 +7,20 @@ Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
 from StringIO import StringIO
 import yaml
 
+try:
+    import decimal
+except ImportError:
+    from django.utils import _decimal as decimal # Python 2.3 fallback
+
 from django.db import models
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
+
+class DjangoSafeDumper(yaml.SafeDumper):
+    def represent_decimal(self, data):
+        return self.represent_scalar('tag:yaml.org,2002:str', str(data))
+
+DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)
 
 class Serializer(PythonSerializer):
     """
@@ -33,7 +44,7 @@ class Serializer(PythonSerializer):
     def end_serialization(self):
         self.options.pop('stream', None)
         self.options.pop('fields', None)
-        yaml.safe_dump(self.objects, self.stream, **self.options)
+        yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):
         return self.stream.getvalue()
