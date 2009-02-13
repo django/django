@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-09-03 10:02+0200\n"
-"PO-Revision-Date: 2008-09-03 15:21+0200\n"
+"PO-Revision-Date: 2009-02-13 12:01+0100\n"
 "Last-Translator: Gasper Zejn <zejn@kiberpipa.org>\n"
 "Language-Team:  <sl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -666,7 +666,7 @@ msgstr "Dejanje"
 #: contrib/admin/templates/admin/object_history.html:30
 #: utils/translation/trans_real.py:404
 msgid "DATETIME_FORMAT"
-msgstr "N j, Y, P"
+msgstr "j. F Y, H:i:s"
 
 #: contrib/admin/templates/admin/object_history.html:38
 msgid ""
@@ -4010,19 +4010,19 @@ msgstr ", %(number)d %(type)s"
 
 #: utils/translation/trans_real.py:403
 msgid "DATE_FORMAT"
-msgstr "N j, Y"
+msgstr "j.n.Y"
 
 #: utils/translation/trans_real.py:405
 msgid "TIME_FORMAT"
-msgstr "P"
+msgstr "H:i:s"
 
 #: utils/translation/trans_real.py:421
 msgid "YEAR_MONTH_FORMAT"
-msgstr "YEAR_MONTH_FORMAT"
+msgstr "F Y"
 
 #: utils/translation/trans_real.py:422
 msgid "MONTH_DAY_FORMAT"
-msgstr "MONTH_DAY_FORMAT"
+msgstr "j. F"
 
 #: views/generic/create_update.py:114
 #, python-format
