@@ -8,8 +8,8 @@ Built-in middleware reference
    :synopsis: Django's built-in middleware classes.
 
 This document explains all middleware components that come with Django. For
-information on how how to use them and how to write your own middleware, see the
-:ref:`middleware usage guide <topics-http-middleware>`.
+information on how how to use them and how to write your own middleware, see
+the :ref:`middleware usage guide <topics-http-middleware>`.
 
 Available middleware
 ====================
@@ -18,8 +18,8 @@ Cache middleware
 ----------------
 
 .. module:: django.middleware.cache
-   :synopsis: Middleware for the site-wide cache
-   
+   :synopsis: Middleware for the site-wide cache.
+
 .. class:: django.middleware.cache.UpdateCacheMiddleware
 
 .. class:: django.middleware.cache.FetchFromCacheMiddleware
@@ -33,7 +33,7 @@ defines. See the :ref:`cache documentation <topics-cache>`.
 
 .. module:: django.middleware.common
    :synopsis: Middleware adding "common" conveniences for perfectionists.
-   
+
 .. class:: django.middleware.common.CommonMiddleware
 
 Adds a few conveniences for perfectionists:
@@ -45,14 +45,14 @@ Adds a few conveniences for perfectionists:
       :setting:`PREPEND_WWW` settings.
 
       If :setting:`APPEND_SLASH` is ``True`` and the initial URL doesn't end
-      with a slash, and it is not found in the URLconf, then a new URL is formed
-      by appending a slash at the end. If this new URL is found in the URLconf,
-      then Django redirects the request to this new URL. Otherwise, the initial
-      URL is processed as usual.
+      with a slash, and it is not found in the URLconf, then a new URL is
+      formed by appending a slash at the end. If this new URL is found in the
+      URLconf, then Django redirects the request to this new URL. Otherwise,
+      the initial URL is processed as usual.
 
-      For example, ``foo.com/bar`` will be redirected to ``foo.com/bar/`` if you
-      don't have a valid URL pattern for ``foo.com/bar`` but *do* have a valid
-      pattern for ``foo.com/bar/``.
+      For example, ``foo.com/bar`` will be redirected to ``foo.com/bar/`` if
+      you don't have a valid URL pattern for ``foo.com/bar`` but *do* have a
+      valid pattern for ``foo.com/bar/``.
 
       .. versionchanged:: 1.0
          The behavior of :setting:`APPEND_SLASH` has changed slightly in this
@@ -69,8 +69,8 @@ Adds a few conveniences for perfectionists:
       normalize URLs.
 
     * Handles ETags based on the :setting:`USE_ETAGS` setting. If
-      :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag for
-      each request by MD5-hashing the page content, and it'll take care of
+      :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag
+      for each request by MD5-hashing the page content, and it'll take care of
       sending ``Not Modified`` responses, if appropriate.
 
 View metadata middleware
@@ -90,7 +90,7 @@ GZIP middleware
 
 .. module:: django.middleware.gzip
    :synopsis: Middleware to serve gziped content for performance.
-   
+
 .. class:: django.middleware.gzip.GZipMiddleware
 
 Compresses content for browsers that understand gzip compression (all modern
@@ -139,11 +139,12 @@ Locale middleware
 
 .. module:: django.middleware.locale
    :synopsis: Middleware to enable language selection based on the request.
-   
+
 .. class:: django.middleware.locale.LocaleMiddleware
 
-Enables language selection based on data from the request. It customizes content
-for each user. See the :ref:`internationalization documentation <topics-i18n>`.
+Enables language selection based on data from the request. It customizes
+content for each user. See the :ref:`internationalization documentation
+<topics-i18n>`.
 
 Session middleware
 ------------------
@@ -160,18 +161,20 @@ Authentication middleware
 -------------------------
 
 .. module:: django.contrib.auth.middleware
-  :synopsis: Authentication middleware
-  
+  :synopsis: Authentication middleware.
+
 .. class:: django.contrib.auth.middleware.AuthenticationMiddleware
 
-Adds the ``user`` attribute, representing the currently-logged-in user, to every
-incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests <topics-auth>`.
+Adds the ``user`` attribute, representing the currently-logged-in user, to
+every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
+<topics-auth>`.
 
 CSRF protection middleware
 --------------------------
 
 .. module:: django.contrib.csrf.middleware
-   :synopsis: Middleware adding protection against Cross Site Request Forgeries.
+   :synopsis: Middleware adding protection against Cross Site Request
+              Forgeries.
 
 .. class:: django.contrib.csrf.middleware.CsrfMiddleware
 
@@ -189,9 +192,9 @@ Transaction middleware
 
 .. class:: django.middleware.transaction.TransactionMiddleware
 
-Binds commit and rollback to the request/response phase. If a view function runs
-successfully, a commit is done. If it fails with an exception, a rollback is
-done.
+Binds commit and rollback to the request/response phase. If a view function
+runs successfully, a commit is done. If it fails with an exception, a rollback
+is done.
 
 The order of this middleware in the stack is important: middleware modules
 running outside of it run with commit-on-save - the default Django behavior.
@@ -199,4 +202,3 @@ Middleware modules running inside it (coming later in the stack) will be under
 the same transaction control as the view functions.
 
 See the :ref:`transaction management documentation <topics-db-transactions>`.
-

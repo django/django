@@ -13,9 +13,9 @@ example, Django includes a middleware component, ``XViewMiddleware``, that adds
 an ``"X-View"`` HTTP header to every response to a ``HEAD`` request.
 
 This document explains how middleware works, how you activate middleware, and
-how to write your own middleware. Django ships with some built-in middleware you
-can use right out of the box; they're documented in the :ref:`built-in
-middleware guide <ref-middleware>`.
+how to write your own middleware. Django ships with some built-in middleware
+you can use right out of the box; they're documented in the :ref:`built-in
+middleware reference <ref-middleware>`.
 
 Activating middleware
 =====================
@@ -36,9 +36,9 @@ created by :djadmin:`django-admin.py startproject <startproject>`::
 During the request phases (:meth:`process_request` and :meth:`process_view`
 middleware), Django applies middleware in the order it's defined in
 :setting:`MIDDLEWARE_CLASSES`, top-down. During the response phases
-(:meth:`process_response` and :meth:`process_exception` middleware), the classes
-are applied in reverse order, from the bottom up. You can think of it like an
-onion: each middleware class is a "layer" that wraps the view:
+(:meth:`process_response` and :meth:`process_exception` middleware), the
+classes are applied in reverse order, from the bottom up. You can think of it
+like an onion: each middleware class is a "layer" that wraps the view:
 
 .. image:: _images/middleware.png
    :width: 502
@@ -81,21 +81,22 @@ Response middleware is always called on every response.
 
 .. method:: process_view(self, request, view_func, view_args, view_kwargs)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``view_func`` is the
-Python function that Django is about to use. (It's the actual function object,
-not the name of the function as a string.) ``view_args`` is a list of positional
-arguments that will be passed to the view, and ``view_kwargs`` is a dictionary
-of keyword arguments that will be passed to the view. Neither ``view_args`` nor
-``view_kwargs`` include the first view argument (``request``).
+``request`` is an :class:`~django.http.HttpRequest` object. ``view_func`` is
+the Python function that Django is about to use. (It's the actual function
+object, not the name of the function as a string.) ``view_args`` is a list of
+positional arguments that will be passed to the view, and ``view_kwargs`` is a
+dictionary of keyword arguments that will be passed to the view. Neither
+``view_args`` nor ``view_kwargs`` include the first view argument
+(``request``).
 
-``process_view()`` is called just before Django calls the view. It should return
-either ``None`` or an :class:`~django.http. HttpResponse` object. If it returns
-``None``, Django will continue processing this request, executing any other
-``process_view()`` middleware and, then, the appropriate view. If it returns an
-:class:`~django.http. HttpResponse` object, Django won't bother calling ANY
-other request, view or exception middleware, or the appropriate view; it'll
-return that :class:`~django.http. HttpResponse`. Response middleware is always
-called on every response.
+``process_view()`` is called just before Django calls the view. It should
+return either ``None`` or an :class:`~django.http. HttpResponse` object. If it
+returns ``None``, Django will continue processing this request, executing any
+other ``process_view()`` middleware and, then, the appropriate view. If it
+returns an :class:`~django.http. HttpResponse` object, Django won't bother
+calling ANY other request, view or exception middleware, or the appropriate
+view; it'll return that :class:`~django.http. HttpResponse`. Response
+middleware is always called on every response.
 
 .. _response-middleware:
 
@@ -124,8 +125,8 @@ brand-new :class:`~django.http. HttpResponse`.
 Django calls ``process_exception()`` when a view raises an exception.
 ``process_exception()`` should return either ``None`` or an
 :class:`~django.http. HttpResponse` object. If it returns an
-:class:`~django.http. HttpResponse` object, the response will be returned to the
-browser. Otherwise, default exception handling kicks in.
+:class:`~django.http. HttpResponse` object, the response will be returned to
+the browser. Otherwise, default exception handling kicks in.
 
 ``__init__``
 ------------
@@ -137,7 +138,7 @@ of caveats:
 
     * Django initializes your middleware without any arguments, so you can't
       define ``__init__`` as requiring any arguments.
-      
+
     * Unlike the ``process_*`` methods which get called once per request,
       ``__init__`` gets called only *once*, when the web server starts up.
 
@@ -146,8 +147,8 @@ Marking middleware as unused
 
 It's sometimes useful to determine at run-time whether a piece of middleware
 should be used. In these cases, your middleware's ``__init__`` method may raise
-``django.core.exceptions.MiddlewareNotUsed``. Django will then remove that piece
-of middleware from the middleware process.
+``django.core.exceptions.MiddlewareNotUsed``. Django will then remove that
+piece of middleware from the middleware process.
 
 Guidelines
 ----------
@@ -155,14 +156,11 @@ Guidelines
     * Middleware classes don't have to subclass anything.
 
     * The middleware class can live anywhere on your Python path. All Django
-      cares about is that the :setting:`MIDDLEWARE_CLASSES` setting includes the
-      path
-      to it.
+      cares about is that the :setting:`MIDDLEWARE_CLASSES` setting includes
+      the path to it.
 
-    * Feel free to look at :mod:`Django's available middleware for examples
-      <django.middleware>`. The core Django middleware classes are in
-      ``django/middleware/`` in the Django distribution. The session middleware
-      is in ``django/contrib/sessions``.
+    * Feel free to look at :ref:`Django's available middleware
+      <ref-middleware>` for examples.
 
     * If you write a middleware component that you think would be useful to
       other people, contribute to the community! :ref:`Let us know
