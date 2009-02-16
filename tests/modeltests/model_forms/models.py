@@ -1030,6 +1030,18 @@ True
 >>> instance.file
 <FieldFile: tests/test3.txt>
 
+# Instance can be edited w/out re-uploading the file and existing file should be preserved.
+
+>>> f = TextFileForm(data={'description': u'New Description'}, instance=instance)
+>>> f.fields['file'].required = False
+>>> f.is_valid()
+True
+>>> instance = f.save()
+>>> instance.description
+u'New Description'
+>>> instance.file
+<FieldFile: tests/test3.txt>
+
 # Delete the current file since this is not done by Django.
 >>> instance.file.delete()
 >>> instance.delete()

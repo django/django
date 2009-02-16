@@ -213,6 +213,10 @@ class FileField(Field):
     def generate_filename(self, instance, filename):
         return os.path.join(self.get_directory_name(), self.get_filename(filename))
 
+    def save_form_data(self, instance, data):
+        if data:
+            setattr(instance, self.name, data)
+
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.FileField}
         # If a file has been provided previously, then the form doesn't require
