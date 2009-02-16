@@ -88,4 +88,11 @@ BadHeaderError: Header values can't contain newlines (got u'Subject\nInjection T
 >>> settings.ADMINS = old_admins
 >>> settings.MANAGERS = old_managers
 
+# Make sure we can manually set the From header (#9214)
+
+>>> email = EmailMessage('Subject', 'Content', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'}) 
+>>> message = email.message() 
+>>> message['From']
+'from@example.com'
+
 """
