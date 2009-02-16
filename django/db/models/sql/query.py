@@ -68,7 +68,7 @@ class BaseQuery(object):
         self.tables = []    # Aliases in the order they are created.
         self.where = where()
         self.where_class = where
-        self.group_by = []
+        self.group_by = None
         self.having = where()
         self.order_by = []
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
@@ -177,7 +177,10 @@ class BaseQuery(object):
         obj.tables = self.tables[:]
         obj.where = deepcopy(self.where)
         obj.where_class = self.where_class
-        obj.group_by = self.group_by[:]
+        if self.group_by is None:
+            obj.group_by = None
+        else:
+            obj.group_by = self.group_by[:]
         obj.having = deepcopy(self.having)
         obj.order_by = self.order_by[:]
         obj.low_mark, obj.high_mark = self.low_mark, self.high_mark
@@ -272,7 +275,7 @@ class BaseQuery(object):
         # If there is a group by clause, aggregating does not add useful
         # information but retrieves only the first row. Aggregate
         # over the subquery instead.
-        if self.group_by:
+        if self.group_by is not None:
             from subqueries import AggregateQuery
             query = AggregateQuery(self.model, self.connection)
 
@@ -379,8 +382,8 @@ class BaseQuery(object):
                 result.append('AND')
             result.append(' AND '.join(self.extra_where))
 
-        if self.group_by:
-            grouping = self.get_grouping()
+        grouping = self.get_grouping()
+        if grouping:
             if ordering:
                 # If the backend can't group by PK (i.e., any database
                 # other than MySQL), then any fields mentioned in the
@@ -698,13 +701,15 @@ class BaseQuery(object):
         """
         qn = self.quote_name_unless_alias
         result = []
-        for col in self.group_by + self.related_select_cols:
-            if isinstance(col, (list, tuple)):
-                result.append('%s.%s' % (qn(col[0]), qn(col[1])))
-            elif hasattr(col, 'as_sql'):
-                result.append(col.as_sql(qn))
-            else:
-                result.append(str(col))
+        if self.group_by is not None:
+            group_by = self.group_by or []
+            for col in group_by + self.related_select_cols + self.extra_select.keys():
+                if isinstance(col, (list, tuple)):
+                    result.append('%s.%s' % (qn(col[0]), qn(col[1])))
+                elif hasattr(col, 'as_sql'):
+                    result.append(col.as_sql(qn))
+                else:
+                    result.append(str(col))
         return result
 
     def get_ordering(self):
@@ -1224,7 +1229,7 @@ class BaseQuery(object):
             # Aggregate references a normal field
             field_name = field_list[0]
             source = opts.get_field(field_name)
-            if not (self.group_by and is_summary):
+            if not (self.group_by is not None and is_summary):
                 # Only use a column alias if this is a
                 # standalone aggregate, or an annotation
                 col = (opts.db_table, source.column)
@@ -1816,6 +1821,7 @@ class BaseQuery(object):
         primary key, and the query would be equivalent, the optimization
         will be made automatically.
         """
+        self.group_by = []
         if self.connection.features.allows_group_by_pk:
             if len(self.select) == len(self.model._meta.fields):
                 self.group_by.append('.'.join([self.model._meta.db_table,

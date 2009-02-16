@@ -698,7 +698,7 @@ class QuerySet(object):
         Prepare the query for computing a result that contains aggregate annotations.
         """
         opts = self.model._meta
-        if not self.query.group_by:
+        if self.query.group_by is None:
             field_names = [f.attname for f in opts.fields]
             self.query.add_fields(field_names, False)
             self.query.set_group_by()
@@ -736,6 +736,7 @@ class ValuesQuerySet(QuerySet):
         aggregate_names = self.query.aggregate_select.keys()
 
         names = extra_names + field_names + aggregate_names
+
         for row in self.query.results_iter():
             yield dict(zip(names, row))
 

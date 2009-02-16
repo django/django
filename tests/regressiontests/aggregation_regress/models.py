@@ -200,6 +200,13 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, conta
 >>> sorted([(b.name, b.authors__age__avg, b.publisher.name, b.contact.name) for b in books])
 [(u'Artificial Intelligence: A Modern Approach', 51.5, u'Prentice Hall', u'Peter Norvig'), (u'Practical Django Projects', 29.0, u'Apress', u'James Bennett'), (u'Python Web Development with Django', 30.3..., u'Prentice Hall', u'Jeffrey Forcier'), (u'Sams Teach Yourself Django in 24 Hours', 45.0, u'Sams', u'Brad Dayley')]
 
+# Regression for #10132 - If the values() clause only mentioned extra(select=) columns, those columns are used for grouping
+>>> Book.objects.extra(select={'pub':'publisher_id'}).values('pub').annotate(Count('id')).order_by('pub')
+[{'pub': 1, 'id__count': 2}, {'pub': 2, 'id__count': 1}, {'pub': 3, 'id__count': 2}, {'pub': 4, 'id__count': 1}]
+
+>>> Book.objects.extra(select={'pub':'publisher_id','foo':'pages'}).values('pub').annotate(Count('id')).order_by('pub')
+[{'pub': 1, 'id__count': 2}, {'pub': 2, 'id__count': 1}, {'pub': 3, 'id__count': 2}, {'pub': 4, 'id__count': 1}]
+
 # Regression for #10199 - Aggregate calls clone the original query so the original query can still be used
 >>> books = Book.objects.all()
 >>> _ = books.aggregate(Avg('authors__age'))
