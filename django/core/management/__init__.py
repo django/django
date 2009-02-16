@@ -319,15 +319,18 @@ def setup_environ(settings_mod, original_settings_path=None):
     if settings_name.endswith("$py"):
         settings_name = settings_name[:-3]
 
-    sys.path.append(os.path.join(project_directory, os.pardir))
-    project_module = __import__(project_name, {}, {}, [''])
-    sys.path.pop()
-
     # Set DJANGO_SETTINGS_MODULE appropriately.
     if original_settings_path:
         os.environ['DJANGO_SETTINGS_MODULE'] = original_settings_path
     else:
         os.environ['DJANGO_SETTINGS_MODULE'] = '%s.%s' % (project_name, settings_name)
+
+    # Import the project module. We add the parent directory to PYTHONPATH to 
+    # avoid some of the path errors new users can have.
+    sys.path.append(os.path.join(project_directory, os.pardir))
+    project_module = __import__(project_name, {}, {}, [''])
+    sys.path.pop()
+
     return project_directory
 
 def execute_from_command_line(argv=None):
