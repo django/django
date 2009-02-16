@@ -30,6 +30,11 @@ class Order(models.Model):
     created_by = models.ForeignKey(User)
     text = models.TextField()
 
+class TestObject(models.Model):
+    first = models.CharField(max_length=20)
+    second = models.CharField(max_length=20)
+    third = models.CharField(max_length=20)
+
 __test__ = {"API_TESTS": """
 # Regression tests for #7314 and #7372
 
@@ -115,4 +120,75 @@ True
 # cause incorrect SQL to be produced otherwise.
 >>> RevisionableModel.objects.extra(select={"the_answer": 'id'}).dates('when', 'month')
 [datetime.datetime(2008, 9, 1, 0, 0)]
+
+# Regression test for #10256... If there is a values() clause, Extra columns are
+# only returned if they are explicitly mentioned.
+>>> TestObject(first='first', second='second', third='third').save()
+
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values()
+[{'bar': u'second', 'third': u'third', 'second': u'second', 'whiz': u'third', 'foo': u'first', 'id': 1, 'first': u'first'}]
+
+# Extra clauses after an empty values clause are still included
+>>> TestObject.objects.values().extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third'))))
+[{'bar': u'second', 'third': u'third', 'second': u'second', 'whiz': u'third', 'foo': u'first', 'id': 1, 'first': u'first'}]
+
+# Extra columns are ignored if not mentioned in the values() clause
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values('first', 'second')
+[{'second': u'second', 'first': u'first'}]
+
+# Extra columns after a non-empty values() clause are ignored
+>>> TestObject.objects.values('first', 'second').extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third'))))
+[{'second': u'second', 'first': u'first'}]
+
+# Extra columns can be partially returned
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values('first', 'second', 'foo')
+[{'second': u'second', 'foo': u'first', 'first': u'first'}]
+
+# Also works if only extra columns are included
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values('foo', 'whiz')
+[{'foo': u'first', 'whiz': u'third'}]
+
+# Values list works the same way
+# All columns are returned for an empty values_list()
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values_list()
+[(u'first', u'second', u'third', 1, u'first', u'second', u'third')]
+
+# Extra columns after an empty values_list() are still included
+>>> TestObject.objects.values_list().extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third'))))
+[(u'first', u'second', u'third', 1, u'first', u'second', u'third')]
+
+# Extra columns ignored completely if not mentioned in values_list()
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values_list('first', 'second')
+[(u'first', u'second')]
+
+# Extra columns after a non-empty values_list() clause are ignored completely
+>>> TestObject.objects.values_list('first', 'second').extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third'))))
+[(u'first', u'second')]
+
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values_list('second', flat=True)
+[u'second']
+
+# Only the extra columns specified in the values_list() are returned
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values_list('first', 'second', 'whiz')
+[(u'first', u'second', u'third')]
+
+# ...also works if only extra columns are included
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values_list('foo','whiz')
+[(u'first', u'third')]
+
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values_list('whiz', flat=True)
+[u'third']
+
+# ... and values are returned in the order they are specified
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values_list('whiz','foo')
+[(u'third', u'first')]
+
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values_list('first','id')
+[(u'first', 1)]
+
+>>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values_list('whiz', 'first', 'bar', 'id')
+[(u'third', u'first', u'second', 1)]
+
 """}
+
+
