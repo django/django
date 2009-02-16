@@ -145,7 +145,7 @@ It also has these methods:
       session key value that is sent back to the user in the cookie. This is
       used if you want to ensure that the previous session data can't be
       accessed again from the user's browser (for example, the
-      ``django.contrib.auth.logout()`` method calls it).
+      :func:`django.contrib.auth.logout()` function calls it).
 
     * ``set_test_cookie()``
 
