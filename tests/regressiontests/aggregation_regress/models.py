@@ -213,6 +213,10 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, conta
 >>> books.all()
 [<Book: Artificial Intelligence: A Modern Approach>, <Book: Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp>, <Book: Practical Django Projects>, <Book: Python Web Development with Django>, <Book: Sams Teach Yourself Django in 24 Hours>, <Book: The Definitive Guide to Django: Web Development Done Right>]
 
+# Regression for #10248 - Annotations work with DateQuerySets
+>>> Book.objects.annotate(num_authors=Count('authors')).filter(num_authors=2).dates('pubdate', 'day')
+[datetime.datetime(1995, 1, 15, 0, 0), datetime.datetime(2007, 12, 6, 0, 0)]
+
 """
 }
 

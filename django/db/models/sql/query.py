@@ -389,7 +389,7 @@ class BaseQuery(object):
                 # other than MySQL), then any fields mentioned in the
                 # ordering clause needs to be in the group by clause.
                 if not self.connection.features.allows_group_by_pk:
-                    grouping.extend([col for col in ordering_group_by
+                    grouping.extend([str(col) for col in ordering_group_by
                         if col not in grouping])
             else:
                 ordering = self.connection.ops.force_no_ordering()
