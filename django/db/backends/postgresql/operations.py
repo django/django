@@ -158,5 +158,5 @@ class DatabaseOperations(BaseDatabaseOperations):
         NotImplementedError if this is the database in use.
         """
         if aggregate.sql_function == 'STDDEV_POP' or aggregate.sql_function == 'VAR_POP':
-            if self.postgres_version[0] == 8 and self.postgres_version[1] == 2 and self.postgres_version[1] <= 4:
+            if self.postgres_version[0] == 8 and self.postgres_version[1] == 2 and self.postgres_version[2] <= 4:
                 raise NotImplementedError('PostgreSQL 8.2 to 8.2.4 is known to have a faulty implementation of %s. Please upgrade your version of PostgreSQL.' % aggregate.sql_function)
