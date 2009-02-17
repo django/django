@@ -991,7 +991,7 @@ generated for them based upon the name of the aggregate function and
 the model field that is being aggregated.
 
 For example, if you were manipulating blog entries, you may want to know
-the average number of authors contributing to blog entries::
+the number of authors that have contributed blog entries::
 
     >>> q = Blog.objects.aggregate(Count('entry'))
     {'entry__count': 16}
@@ -1000,7 +1000,7 @@ By using a keyword argument to specify the aggregate function, you can
 control the name of the aggregation value that is returned::
 
     >>> q = Blog.objects.aggregate(number_of_entries=Count('entry'))
-    {'number_of_entries': 2.34}
+    {'number_of_entries': 16}
 
 For an in-depth discussion of aggregation, see :ref:`the topic guide on
 Aggregation <topics-db-aggregation>`.
