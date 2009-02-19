@@ -767,9 +767,7 @@ a ``QuerySet``. You can do this with the ``update()`` method. For example::
     Entry.objects.filter(pub_date__year=2007).update(headline='Everything is the same')
 
 You can only set non-relation fields and ``ForeignKey`` fields using this
-method, and the value you set the field to must be a hard-coded Python value
-(i.e., you can't set a field to be equal to some other field at the moment).
-
+method. To update a non-relation field, provide the new value as a constant.
 To update ``ForeignKey`` fields, set the new value to be the new model
 instance you want to point to. Example::
 
@@ -794,6 +792,8 @@ Just loop over them and call ``save()``::
 
     for item in my_queryset:
         item.save()
+
+.. versionadded:: 1.1
 
 Calls to update can also use :ref:`F() objects <query-expressions>` to update
 one field based on the value of another field in the model. This is especially
