@@ -189,6 +189,7 @@ class Client(object):
             'HTTP_COOKIE':      self.cookies,
             'PATH_INFO':         '/',
             'QUERY_STRING':      '',
+            'REMOTE_ADDR':       '127.0.0.1',
             'REQUEST_METHOD':    'GET',
             'SCRIPT_NAME':       '',
             'SERVER_NAME':       'testserver',
