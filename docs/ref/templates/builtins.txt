@@ -1184,7 +1184,7 @@ For example::
 
     {{ value|linebreaks }}
 
-If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joel<br>is a
+If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joel<br />is a
 slug</p>``.
 
 .. templatefilter:: linebreaksbr
