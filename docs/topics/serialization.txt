@@ -125,7 +125,8 @@ The Django object itself can be inspected as ``deserialized_object.object``.
 Serialization formats
 ---------------------
 
-Django "ships" with a few included serializers:
+Django supports a number of serialization formats, some of which require you
+to install third-party Python modules:
 
     ==========  ==============================================================
     Identifier  Information
