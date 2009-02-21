@@ -70,7 +70,7 @@ class ClientHandler(BaseHandler):
                 response = middleware_method(request, response)
             response = self.apply_response_fixes(request, response)
         finally:
-            signals.request_finished.disconnect(close_connection)            
+            signals.request_finished.disconnect(close_connection)
             signals.request_finished.send(sender=self.__class__)
             signals.request_finished.connect(close_connection)
 
@@ -193,6 +193,7 @@ class Client(object):
             'HTTP_COOKIE':      self.cookies,
             'PATH_INFO':         '/',
             'QUERY_STRING':      '',
+            'REMOTE_ADDR':       '127.0.0.1',
             'REQUEST_METHOD':    'GET',
             'SCRIPT_NAME':       '',
             'SERVER_NAME':       'testserver',
