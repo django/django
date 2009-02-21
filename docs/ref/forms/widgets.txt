@@ -107,6 +107,8 @@ built-in Field classes.
 However, if you want to use a different widget for a field, you can -
 just use the 'widget' argument on the field definition. For example::
 
+    from django import forms
+
     class CommentForm(forms.Form):
         name = forms.CharField()
         url = forms.URLField()

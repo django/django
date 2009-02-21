@@ -23,6 +23,7 @@ how they work. Each ``Field`` instance has a ``clean()`` method, which takes
 a single argument and either raises a ``django.forms.ValidationError``
 exception or returns the clean value::
 
+    >>> from django import forms
     >>> f = forms.EmailField()
     >>> f.clean('foo@example.com')
     u'foo@example.com'
