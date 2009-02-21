@@ -259,7 +259,7 @@ request to the URL :file:`/rss/beats/0613/`:
       a 404 error for that request.
 
       .. versionadded:: 1.0
-         meth:`get_object()` can handle the :file:`/rss/beats/` url.
+         :meth:`get_object()` can handle the :file:`/rss/beats/` url.
 
       The :meth:`get_object()` method also has a chance to handle the
       :file:`/rss/beats/` url. In this case, :data:`bits` will be an
