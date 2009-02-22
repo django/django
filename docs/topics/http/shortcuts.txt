@@ -148,6 +148,6 @@ This example is equivalent to::
     from django.http import Http404
 
     def my_view(request):
-        my_objects = MyModel.objects.filter(published=True)
+        my_objects = list(MyModel.objects.filter(published=True))
         if not my_objects:
             raise Http404
