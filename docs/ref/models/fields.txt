@@ -270,6 +270,15 @@ respect to the month.
 
 Like :attr:`~Field.unique_for_date` and :attr:`~Field.unique_for_month`.
 
+``verbose_name``
+-------------------
+
+.. attribute:: Field.verbose_name
+
+A human-readable name for the field. If the verbose name isn't given, Django
+will automatically create it using the field's attribute name, converting
+underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
+
 .. _model-field-types:
 
 Field types

@@ -218,6 +218,8 @@ sees you've explicitly set :attr:`Field.primary_key`, it won't add the automatic
 Each model requires exactly one field to have :attr:`primary_key=True
 <Field.primary_key>`.
 
+.. _verbose-field-names:
+
 Verbose field names
 -------------------
 
