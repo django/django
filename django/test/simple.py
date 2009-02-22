@@ -7,7 +7,7 @@ from django.test.testcases import OutputChecker, DocTestRunner, TestCase
 
 # The module name for tests outside models.py
 TEST_MODULE = 'tests'
-    
+
 doctestOutputChecker = OutputChecker()
 
 def get_tests(app_module):
@@ -25,7 +25,7 @@ def get_tests(app_module):
             # 'tests' module doesn't exist. Move on.
             test_module = None
         else:
-            # The module exists, so there must be an import error in the 
+            # The module exists, so there must be an import error in the
             # test module itself. We don't need the module; so if the
             # module was a single file module (i.e., tests.py), close the file
             # handle returned by find_module. Otherwise, the test module
@@ -34,11 +34,11 @@ def get_tests(app_module):
                 mod[0].close()
             raise
     return test_module
-    
+
 def build_suite(app_module):
     "Create a complete Django test suite for the provided application module"
     suite = unittest.TestSuite()
-    
+
     # Load unit and doctests in the models.py module. If module has
     # a suite() method, use it. Otherwise build the test suite ourselves.
     if hasattr(app_module, 'suite'):
@@ -52,8 +52,8 @@ def build_suite(app_module):
         except ValueError:
             # No doc tests in models.py
             pass
-    
-    # Check to see if a separate 'tests' module exists parallel to the 
+
+    # Check to see if a separate 'tests' module exists parallel to the
     # models module
     test_module = get_tests(app_module)
     if test_module:
@@ -63,8 +63,8 @@ def build_suite(app_module):
             suite.addTest(test_module.suite())
         else:
             suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(test_module))
-            try:            
-                suite.addTest(doctest.DocTestSuite(test_module, 
+            try:
+                suite.addTest(doctest.DocTestSuite(test_module,
                                                    checker=doctestOutputChecker,
                                                    runner=DocTestRunner))
             except ValueError:
@@ -73,15 +73,15 @@ def build_suite(app_module):
     return suite
 
 def build_test(label):
-    """Construct a test case a test with the specified label. Label should 
+    """Construct a test case a test with the specified label. Label should
     be of the form model.TestClass or model.TestClass.test_method. Returns
     an instantiated test or test suite corresponding to the label provided.
-        
+
     """
     parts = label.split('.')
     if len(parts) < 2 or len(parts) > 3:
         raise ValueError("Test label '%s' should be of the form app.TestCase or app.TestCase.test_method" % label)
-    
+
     app_module = get_app(parts[0])
     TestClass = getattr(app_module, parts[1], None)
 
@@ -95,13 +95,15 @@ def build_test(label):
         try:
             return unittest.TestLoader().loadTestsFromTestCase(TestClass)
         except TypeError:
-            raise ValueError("Test label '%s' does not refer to a test class" % label)            
+            raise ValueError("Test label '%s' does not refer to a test class" % label)
     else: # label is app.TestClass.test_method
+        if not TestClass:
+            raise ValueError("Test label '%s' does not refer to a test class" % label)
         return TestClass(parts[2])
 
 # Python 2.3 compatibility: TestSuites were made iterable in 2.4.
 # We need to iterate over them, so we add the missing method when
-# necessary.    
+# necessary.
 try:
     getattr(unittest.TestSuite, '__iter__')
 except AttributeError:
@@ -110,11 +112,11 @@ except AttributeError:
 def partition_suite(suite, classes, bins):
     """
     Partitions a test suite by test type.
-    
+
     classes is a sequence of types
     bins is a sequence of TestSuites, one more than classes
-    
-    Tests of type classes[i] are added to bins[i], 
+
+    Tests of type classes[i] are added to bins[i],
     tests with no match found in classes are place in bins[-1]
     """
     for test in suite:
@@ -127,13 +129,13 @@ def partition_suite(suite, classes, bins):
                     break
             else:
                 bins[-1].addTest(test)
-            
+
 def reorder_suite(suite, classes):
     """
     Reorders a test suite by test type.
-    
+
     classes is a sequence of types
-    
+
     All tests of type clases[0] are placed first, then tests of type classes[1], etc.
     Tests with no match in classes are placed last.
     """
@@ -157,17 +159,17 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
 
     When looking for tests, the test runner will look in the models and
     tests modules for the application.
-    
+
     A list of 'extra' tests may also be provided; these tests
     will be added to the test suite.
-    
+
     Returns the number of tests that failed.
     """
     setup_test_environment()
-    
-    settings.DEBUG = False    
+
+    settings.DEBUG = False
     suite = unittest.TestSuite()
-    
+
     if test_labels:
         for label in test_labels:
             if '.' in label:
@@ -178,7 +180,7 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     else:
         for app in get_apps():
             suite.addTest(build_suite(app))
-    
+
     for test in extra_tests:
         suite.addTest(test)
 
@@ -189,7 +191,7 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     connection.creation.create_test_db(verbosity, autoclobber=not interactive)
     result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
     connection.creation.destroy_test_db(old_name, verbosity)
-    
+
     teardown_test_environment()
-    
+
     return len(result.failures) + len(result.errors)
