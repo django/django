@@ -14,7 +14,7 @@ The basics:
 
     * Each model is a Python class that subclasses
       :class:`django.db.models.Model`.
-    
+
     * Each attribute of the model represents a database field.
 
     * With all of this, Django gives you an automatically-generated
@@ -58,10 +58,10 @@ Some technical notes:
     * The name of the table, ``myapp_person``, is automatically derived from
       some model metadata but can be overridden. See :ref:`table-names` for more
       details..
-      
+
     * An ``id`` field is added automatically, but this behavior can be
       overridden. See :ref:`automatic-primary-key-fields`.
-            
+
     * The ``CREATE TABLE`` SQL in this example is formatted using PostgreSQL
       syntax, but it's worth noting Django uses SQL tailored to the database
       backend specified in your :ref:`settings file <topics-settings>`.
@@ -276,7 +276,7 @@ For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
     class Car(models.Model):
         manufacturer = models.ForeignKey(Manufacturer)
         # ...
-        
+
 You can also create :ref:`recursive relationships <recursive-relationships>` (an
 object with a many-to-one relationship to itself) and :ref:`relationships to
 models not yet defined <lazy-relationships>`; see :ref:`the model field
@@ -346,7 +346,7 @@ because it's more natural to think about a pizza having toppings than a
 topping being on multiple pizzas. The way it's set up above, the ``Pizza`` admin
 form would let users select the toppings.
 
-.. seealso:: 
+.. seealso::
 
     See the `Many-to-many relationship model example`_ for a full example.
 
@@ -372,13 +372,13 @@ For example, consider the case of an application tracking the musical groups
 which musicians belong to. There is a many-to-many relationship between a person
 and the groups of which they are a member, so you could use a
 :class:`~django.db.models.ManyToManyField` to represent this relationship.
-However, there is a lot of detail about the membership that you might want to 
+However, there is a lot of detail about the membership that you might want to
 collect, such as the date at which the person joined the group.
 
 For these situations, Django allows you to specify the model that will be used
 to govern the many-to-many relationship. You can then put extra fields on the
 intermediate model. The intermediate model is associated with the
-:class:`~django.db.models.ManyToManyField` using the 
+:class:`~django.db.models.ManyToManyField` using the
 :attr:`through <ManyToManyFields.through>` argument to point to the model
 that will act as an intermediary. For our musician example, the code would look
 something like this::
@@ -402,7 +402,7 @@ something like this::
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
-When you set up the intermediary model, you explicitly specify foreign 
+When you set up the intermediary model, you explicitly specify foreign
 keys to the models that are involved in the ManyToMany relation. This
 explicit declaration defines how the two models are related.
 
@@ -411,8 +411,8 @@ There are a few restrictions on the intermediate model:
     * Your intermediate model must contain one - and *only* one - foreign key
       to the target model (this would be ``Person`` in our example). If you
       have more than one foreign key, a validation error will be raised.
-  
-    * Your intermediate model must contain one - and *only* one - foreign key 
+
+    * Your intermediate model must contain one - and *only* one - foreign key
       to the source model (this would be ``Group`` in our example). If you
       have more than one foreign key, a validation error will be raised.
 
@@ -421,22 +421,22 @@ There are a few restrictions on the intermediate model:
       case, two foreign keys to the same model are permitted, but they
       will be treated as the two (different) sides of the many-to-many
       relation.
-    
+
     * When defining a many-to-many relationship from a model to
       itself, using an intermediary model, you *must* use
-      :attr:`symmetrical=False <ManyToManyFields.symmetrical>` (see 
+      :attr:`symmetrical=False <ManyToManyFields.symmetrical>` (see
       :ref:`the model field reference <manytomany-arguments>`).
 
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
 your intermediary model (``Membership``, in this case), you're ready to start
 creating some many-to-many relationships. You do this by creating instances of
 the intermediate model::
-    
+
     >>> ringo = Person.objects.create(name="Ringo Starr")
     >>> paul = Person.objects.create(name="Paul McCartney")
     >>> beatles = Group.objects.create(name="The Beatles")
     >>> m1 = Membership(person=ringo, group=beatles,
-    ...     date_joined=date(1962, 8, 16), 
+    ...     date_joined=date(1962, 8, 16),
     ...     invite_reason= "Needed a new drummer.")
     >>> m1.save()
     >>> beatles.members.all()
@@ -444,7 +444,7 @@ the intermediate model::
     >>> ringo.group_set.all()
     [<Group: The Beatles>]
     >>> m2 = Membership.objects.create(person=paul, group=beatles,
-    ...     date_joined=date(1960, 8, 1), 
+    ...     date_joined=date(1960, 8, 1),
     ...     invite_reason= "Wanted to form a band.")
     >>> beatles.members.all()
     [<Person: Ringo Starr>, <Person: Paul McCartney>]
@@ -458,7 +458,7 @@ or assignment (i.e., ``beatles.members = [...]``) to create relationships::
     >>> beatles.members.create(name="George Harrison")
     # AND NEITHER WILL THIS
     >>> beatles.members = [john, paul, ringo, george]
-    
+
 Why? You can't just create a relationship between a ``Person`` and a ``Group``
 - you need to specify all the detail for the relationship required by the
 ``Membership`` model. The simple ``add``, ``create`` and assignment calls
@@ -475,8 +475,8 @@ for an instance::
     >>> beatles.members.clear()
 
 Once you have established the many-to-many relationships by creating instances
-of your intermediate model, you can issue queries. Just as with normal 
-many-to-many relationships, you can query using the attributes of the 
+of your intermediate model, you can issue queries. Just as with normal
+many-to-many relationships, you can query using the attributes of the
 many-to-many-related model::
 
     # Find all the groups with a member whose name starts with 'Paul'
@@ -490,7 +490,7 @@ As you are using an intermediate model, you can also query on its attributes::
     ...     group__name='The Beatles',
     ...     membership__date_joined__gt=date(1961,1,1))
     [<Person: Ringo Starr]
-    
+
 
 One-to-one relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -668,15 +668,15 @@ below -- but there are a couple that you'll almost always want to define:
         instance needs to be coerced and displayed as a plain string. Most
         notably, this happens when you display an object in an interactive
         console or in the admin.
-        
+
         You'll always want to define this method; the default isn't very helpful
         at all.
-        
+
     :meth:`~Model.get_absolute_url`
         This tells Django how to calculate the URL for an object. Django uses
         this in its admin interface, and any time it needs to figure out a URL
         for an object.
-        
+
         Any object that has a URL that uniquely identifies it should define this
         method.
 
@@ -927,7 +927,7 @@ of the model name::
 
 However, if ``p`` in the above example was *not* a ``Restaurant`` (it had been
 created directly as a ``Place`` object or was the parent of some other class),
-referring to ``p.restaurant`` would give an error.
+referring to ``p.restaurant`` would raise a Restaurant.DoesNotExist exception.
 
 ``Meta`` and multi-table inheritance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -985,7 +985,7 @@ As mentioned, Django will automatically create a
 class back any non-abstract parent models. If you want to control the
 name of the attribute linking back to the parent, you can create your
 own :class:`~django.db.models.fields.OneToOneField` and set
-:attr:`parent_link=True <django.db.models.fields.OneToOneField.parent_link>` 
+:attr:`parent_link=True <django.db.models.fields.OneToOneField.parent_link>`
 to indicate that your field is the link back to the parent class.
 
 Multiple inheritance
