@@ -5,7 +5,7 @@
 {{ inline_admin_formset.formset.non_form_errors }}
 
 {% for inline_admin_form in inline_admin_formset %}
-<div class="inline-related {% if forloop.last %}last-related{% endif %}">
+<div class="inline-related{% if forloop.last %} last-related{% endif %}">
   <h3><b>{{ inline_admin_formset.opts.verbose_name|title }}:</b>&nbsp;{% if inline_admin_form.original %}{{ inline_admin_form.original }}{% else %} #{{ forloop.counter }}{% endif %}
     {% if inline_admin_formset.formset.can_delete and inline_admin_form.original %}<span class="delete">{{ inline_admin_form.deletion_field.field }} {{ inline_admin_form.deletion_field.label_tag }}</span>{% endif %}
   </h3>
