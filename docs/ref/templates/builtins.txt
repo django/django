@@ -753,9 +753,9 @@ different call::
 
 
     {% url path.to.view arg, arg2 as the_url %}
-    
+
     <a href="{{ the_url }}">I'm linking to {{ the_url }}</a>
-    
+
 This ``{% url ... as var %}`` syntax will *not* cause an error if the view is
 missing. In practice you'll use this to link to views that are optional::
 
@@ -1276,7 +1276,7 @@ singular and plural suffix, separated by a comma.
 Example::
 
     You have {{ num_cherries }} cherr{{ num_cherries|pluralize:"y,ies" }}.
-    
+
 .. templatefilter:: pprint
 
 pprint
@@ -1369,8 +1369,8 @@ Formats the variable according to the argument, a string formatting specifier.
 This specifier uses Python string formatting syntax, with the exception that
 the leading "%" is dropped.
 
-See http://docs.python.org/lib/typesseq-strings.html for documentation of
-Python string formatting
+See http://docs.python.org/library/stdtypes.html#string-formatting-operations
+for documentation of Python string formatting
 
 For example::
 
