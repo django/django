@@ -44,6 +44,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Brazil_
     * Canada_
     * Chile_
+    * Czech_
     * Finland_
     * France_
     * Germany_
@@ -83,6 +84,7 @@ Here's an example of how to use them::
 .. _Brazil: `Brazil (br)`_
 .. _Canada: `Canada (ca)`_
 .. _Chile: `Chile (cl)`_
+.. _Czech: `Czech (cz)`_
 .. _Finland: `Finland (fi)`_
 .. _France: `France (fr)`_
 .. _Germany: `Germany (de)`_
@@ -230,6 +232,27 @@ Chile (``cl``)
 
     A ``Select`` widget that uses a list of Chilean regions (Regiones) as its
     choices.
+
+Czech (``cz``)
+==============
+
+.. class:: cz.forms.CZPostalCodeField
+
+    A form field that validates input as a Czech postal code. Valid formats
+    are XXXXX or XXX XX, where X is a digit.
+
+.. class:: cz.forms.CZBirthNumberField
+
+    A form field that validates input as a Czech Birth Number.
+    A valid number must be in format XXXXXX/XXXX (slash is optional).
+
+.. class:: cz.forms.CZICNumberField
+
+    A form field that validates input as a Czech IC number field.
+
+.. class:: cz.forms.CZRegionSelect
+
+    A ``Select`` widget that uses a list of Czech regions as its choices.
 
 Finland (``fi``)
 ================
