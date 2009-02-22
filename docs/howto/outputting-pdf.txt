@@ -31,7 +31,7 @@ Test your installation by importing it in the Python interactive interpreter::
 
 If that command doesn't raise any errors, the installation worked.
 
-.. _user guide: http://www.reportlab.com/docs/userguide.pdf
+.. _user guide: http://www.reportlab.com/docs/reportlab-userguide.pdf
 
 Write your view
 ===============
@@ -139,7 +139,7 @@ Further resources
     * PDFlib_ is another PDF-generation library that has Python bindings. To
       use it with Django, just use the same concepts explained in this article.
     * `Pisa HTML2PDF`_ is yet another PDF-generation library. Pisa ships with
-      an example of how to integrate Pisa with Django.      
+      an example of how to integrate Pisa with Django.
     * HTMLdoc_ is a command-line script that can convert HTML to PDF. It
       doesn't have a Python interface, but you can escape out to the shell
       using ``system`` or ``popen`` and retrieve the output in Python.
