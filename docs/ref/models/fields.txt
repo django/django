@@ -10,7 +10,7 @@ Model field reference
 This document contains all the gory details about all the `field options`_ and
 `field types`_ Django's got to offer.
 
-.. seealso:: 
+.. seealso::
 
     If the built-in fields don't do the trick, you can easily :ref:`write your
     own custom model fields <howto-custom-model-fields>`.
@@ -128,10 +128,10 @@ be used for organizational purposes::
         ('unknown', 'Unknown'),
     )
 
-The first element in each tuple is the name to apply to the group. The 
+The first element in each tuple is the name to apply to the group. The
 second element is an iterable of 2-tuples, with each 2-tuple containing
-a value and a human-readable name for an option. Grouped options may be 
-combined with ungrouped options within a single list (such as the 
+a value and a human-readable name for an option. Grouped options may be
+combined with ungrouped options within a single list (such as the
 `unknown` option in this example).
 
 For each model field that has :attr:`~Field.choices` set, Django will add a
@@ -224,7 +224,7 @@ don't need to set ``primary_key=True`` on any of your fields unless you want to
 override the default primary-key behavior. For more, see
 :ref:`automatic-primary-key-fields`.
 
-``primary_key=True`` implies :attr:`null=False <Field.null>` and :attr:`unique=True <Field.unique>`. 
+``primary_key=True`` implies :attr:`null=False <Field.null>` and :attr:`unique=True <Field.unique>`.
 Only one primary key is allowed on an object.
 
 ``unique``
@@ -239,7 +239,7 @@ you try to save a model with a duplicate value in a :attr:`~Field.unique`
 field, a :exc:`django.db.IntegrityError` will be raised by the model's
 :meth:`~django.db.models.Model.save` method.
 
-This options is valid on all field types except :class:`ManyToManyField`.
+This option is valid on all field types except :class:`ManyToManyField`.
 
 ``unique_for_date``
 -------------------
@@ -274,9 +274,9 @@ Like :attr:`~Field.unique_for_date` and :attr:`~Field.unique_for_month`.
 
 Field types
 ===========
-   
+
 .. currentmodule:: django.db.models
-   
+
 ``AutoField``
 -------------
 
@@ -429,7 +429,7 @@ A :class:`CharField` that checks that the value is a valid e-mail address.
 A file-upload field. Has one **required** argument:
 
 .. attribute:: FileField.upload_to
-    
+
     A local filesystem path that will be appended to your :setting:`MEDIA_ROOT`
     setting to determine the value of the :attr:`~django.core.files.File.url`
     attribute.
@@ -437,7 +437,7 @@ A file-upload field. Has one **required** argument:
     This path may contain `strftime formatting`_, which will be replaced by the
     date/time of the file upload (so that uploaded files don't fill up the given
     directory).
-    
+
     .. versionchanged:: 1.0
 
     This may also be a callable, such as a function, which will be called to
@@ -445,31 +445,31 @@ A file-upload field. Has one **required** argument:
     to accept two arguments, and return a Unix-style path (with forward slashes)
     to be passed along to the storage system. The two arguments that will be
     passed are:
-    
+
         ======================  ===============================================
-        Argument                Description                                    
+        Argument                Description
         ======================  ===============================================
-        ``instance``            An instance of the model where the 
+        ``instance``            An instance of the model where the
                                 ``FileField`` is defined. More specifically,
                                 this is the particular instance where the
                                 current file is being attached.
-                                
+
                                 In most cases, this object will not have been
                                 saved to the database yet, so if it uses the
                                 default ``AutoField``, *it might not yet have a
                                 value for its primary key field*.
-    
-        ``filename``            The filename that was originally given to the 
+
+        ``filename``            The filename that was originally given to the
                                 file. This may or may not be taken into account
                                 when determining the final destination path.
         ======================  ===============================================
-    
+
 Also has one optional argument:
 
 .. attribute:: FileField.storage
 
     .. versionadded:: 1.0
-    
+
     Optional. A storage object, which handles the storage and retrieval of your
     files. See :ref:`topics-files` for details on how to provide this object.
 
@@ -486,14 +486,14 @@ takes a few steps:
        that this directory is writable by the Web server's user account.
 
     2. Add the :class:`FileField` or :class:`ImageField` to your model, making
-       sure to define the :attr:`~FileField.upload_to` option to tell Django 
+       sure to define the :attr:`~FileField.upload_to` option to tell Django
        to which subdirectory of :setting:`MEDIA_ROOT` it should upload files.
 
     3. All that will be stored in your database is a path to the file
        (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
-       convenience :attr:`~django.core.files.File.url` function provided by 
-       Django. For example, if your :class:`ImageField` is called ``mug_shot``, 
-       you can get the absolute URL to your image in a template with 
+       convenience :attr:`~django.core.files.File.url` function provided by
+       Django. For example, if your :class:`ImageField` is called ``mug_shot``,
+       you can get the absolute URL to your image in a template with
        ``{{ object.mug_shot.url }}``.
 
 For example, say your :setting:`MEDIA_ROOT` is set to ``'/home/media'``, and
@@ -504,7 +504,7 @@ day. If you upload a file on Jan. 15, 2007, it will be saved in the directory
 ``/home/media/photos/2007/01/15``.
 
 If you want to retrieve the upload file's on-disk filename, or a URL that refers
-to that file, or the file's size, you can use the 
+to that file, or the file's size, you can use the
 :attr:`~django.core.files.File.name`, :attr:`~django.core.files.File.url`
 and :attr:`~django.core.files.File.size` attributes; see :ref:`topics-files`.
 
@@ -547,7 +547,7 @@ directory on the filesystem. Has three special arguments, of which the first is
     match a file called ``foo23.txt`` but not ``bar.txt`` or ``foo23.gif``.
 
 .. attribute:: FilePathField.recursive
-    
+
     Optional. Either ``True`` or ``False``. Default is ``False``. Specifies
     whether all subdirectories of :attr:`~FilePathField.path` should be included
 
@@ -597,7 +597,7 @@ image. Has two extra optional arguments:
 
     Name of a model field which will be auto-populated with the width of the
     image each time the model instance is saved.
-    
+
 In addition to the special attributes that are available for :class:`FileField`,
 an :class:`ImageField` also has ``File.height`` and ``File.width`` attributes.
 See :ref:`topics-files`.
@@ -739,7 +739,7 @@ Relationship fields
 
 .. module:: django.db.models.fields.related
    :synopsis: Related field types
-   
+
 .. currentmodule:: django.db.models
 
 Django also defines a set of fields that represent relations.
@@ -752,7 +752,7 @@ Django also defines a set of fields that represent relations.
 .. class:: ForeignKey(othermodel, [**options])
 
 A many-to-one relationship. Requires a positional argument: the class to which
-the model is related. 
+the model is related.
 
 .. _recursive-relationships:
 
@@ -809,13 +809,13 @@ define the details of how the relation works.
 
     only allows the choice of related objects with a ``pub_date`` before the
     current date/time to be chosen.
-     
+
     Instead of a dictionary this can also be a :class:`~django.db.models.Q`
     object (an object with a :meth:`get_sql` method) for more complex queries.
-   
+
     ``limit_choices_to`` has no effect on the inline FormSets that are created
     to display related objects in the admin.
-   
+
 .. attribute:: ForeignKey.related_name
 
     The name to use for the relation from the related object back to this one.
@@ -859,11 +859,11 @@ that control how the relationship functions.
 .. attribute:: ManyToManyField.related_name
 
     Same as :attr:`ForeignKey.related_name`.
-    
+
 .. attribute:: ManyToManyFields.limit_choices_to
 
     Same as :attr:`ForeignKey.limit_choices_to`.
-    
+
     ``limit_choices_to`` has no effect when used on a ``ManyToManyField`` with
     an intermediate table.
 
@@ -874,26 +874,26 @@ that control how the relationship functions.
 
         class Person(models.Model):
             friends = models.ManyToManyField("self")
-         
+
     When Django processes this model, it identifies that it has a
     :class:`ManyToManyField` on itself, and as a result, it doesn't add a
     ``person_set`` attribute to the ``Person`` class. Instead, the
     :class:`ManyToManyField` is assumed to be symmetrical -- that is, if I am
     your friend, then you are my friend.
-    
+
     If you do not want symmetry in many-to-many relationships with ``self``, set
     :attr:`~ManyToManyField.symmetrical` to ``False``. This will force Django to
     add the descriptor for the reverse relationship, allowing
     :class:`ManyToManyField` relationships to be non-symmetrical.
-    
+
 .. attribute:: ManyToManyFields.through
 
-    Django will automatically generate a table to manage many-to-many 
+    Django will automatically generate a table to manage many-to-many
     relationships. However, if you want to manually specify the intermediary
     table, you can use the :attr:`~ManyToManyField.through` option to specify
     the Django model that represents the intermediate table that you want to
     use.
-    
+
     The most common use for this option is when you want to associate
     :ref:`extra data with a many-to-many relationship <intermediary-manytomany>`.
 
