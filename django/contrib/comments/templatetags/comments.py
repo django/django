@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import comments
+from django.db.models import FieldDoesNotExist
 from django.utils.encoding import smart_unicode
 
 register = template.Library()
@@ -82,7 +83,15 @@ class BaseCommentNode(template.Node):
             site__pk     = settings.SITE_ID,
             is_public    = True,
         )
-        if getattr(settings, 'COMMENTS_HIDE_REMOVED', True):
+        
+        # The is_public and is_removed fields are implementation details of the
+        # built-in comment model's spam filtering system, so they might not
+        # be present on a custom comment model subclass. If they exist, we 
+        # should filter on them.
+        field_names = [f.name for f in self.comment_model._meta.fields]
+        if 'is_public' in field_names:
+            qs = qs.filter(is_public=True)
+        if getattr(settings, 'COMMENTS_HIDE_REMOVED', True) and 'is_removed' in field_names:
             qs = qs.filter(is_removed=False)
 
         return qs
