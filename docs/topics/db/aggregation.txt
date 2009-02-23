@@ -284,9 +284,6 @@ two authors with the same name, their results will be merged into a single
 result in the output of the query; the average will be computed as the
 average over the books written by both authors.
 
-The annotation name will be added to the fields returned
-as part of the ``ValuesQuerySet``.
-
 Order of ``annotate()`` and ``values()`` clauses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -303,11 +300,20 @@ output.
 For example, if we reverse the order of the ``values()`` and ``annotate()``
 clause from our previous example::
 
-    >>> Author.objects.annotate(average_rating=Avg('book__rating')).values('name')
+    >>> Author.objects.annotate(average_rating=Avg('book__rating')).values('name', 'average_rating')
 
 This will now yield one unique result for each author; however, only
 the author's name and the ``average_rating`` annotation will be returned
 in the output data.
+
+You should also note that ``average_rating`` has been explicitly included
+in the list of values to be returned. This is required because of the
+ordering of the ``values()`` and ``annotate()`` clause.
+
+If the ``values()`` clause precedes the ``annotate()`` clause, any annotations
+will be automatically added to the result set. However, if the ``values()``
+clause is applied after the ``annotate()`` clause, you need to explicitly
+include the aggregate column.
 
 Aggregating annotations
 -----------------------

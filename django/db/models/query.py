@@ -596,7 +596,7 @@ class QuerySet(object):
 
         obj = self._clone()
 
-        obj._setup_aggregate_query()
+        obj._setup_aggregate_query(kwargs.keys())
 
         # Add the aggregates to the query
         for (alias, aggregate_expr) in kwargs.items():
@@ -693,7 +693,7 @@ class QuerySet(object):
         """
         pass
 
-    def _setup_aggregate_query(self):
+    def _setup_aggregate_query(self, aggregates):
         """
         Prepare the query for computing a result that contains aggregate annotations.
         """
@@ -773,6 +773,8 @@ class ValuesQuerySet(QuerySet):
 
         self.query.select = []
         self.query.add_fields(self.field_names, False)
+        if self.aggregate_names is not None:
+            self.query.set_aggregate_mask(self.aggregate_names)
 
     def _clone(self, klass=None, setup=False, **kwargs):
         """
@@ -798,13 +800,17 @@ class ValuesQuerySet(QuerySet):
             raise TypeError("Merging '%s' classes must involve the same values in each case."
                     % self.__class__.__name__)
 
-    def _setup_aggregate_query(self):
+    def _setup_aggregate_query(self, aggregates):
         """
         Prepare the query for computing a result that contains aggregate annotations.
         """
         self.query.set_group_by()
 
-        super(ValuesQuerySet, self)._setup_aggregate_query()
+        if self.aggregate_names is not None:
+            self.aggregate_names.extend(aggregates)
+            self.query.set_aggregate_mask(self.aggregate_names)
+
+        super(ValuesQuerySet, self)._setup_aggregate_query(aggregates)
 
     def as_sql(self):
         """
@@ -824,6 +830,7 @@ class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
         if self.extra_names is not None:
             self.query.trim_extra_select(self.extra_names)
+
         if self.flat and len(self._fields) == 1:
             for row in self.query.results_iter():
                 yield row[0]
@@ -837,6 +844,7 @@ class ValuesListQuerySet(ValuesQuerySet):
             extra_names = self.query.extra_select.keys()
             field_names = self.field_names
             aggregate_names = self.query.aggregate_select.keys()
+
             names = extra_names + field_names + aggregate_names
 
             # If a field list has been specified, use it. Otherwise, use the

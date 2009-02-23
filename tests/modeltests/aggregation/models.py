@@ -207,10 +207,9 @@ u'The Definitive Guide to Django: Web Development Done Right'
 >>> Book.objects.filter(pk=1).annotate(mean_age=Avg('authors__age')).values('pk', 'isbn', 'mean_age')
 [{'pk': 1, 'isbn': u'159059725', 'mean_age': 34.5}]
 
-# Calling it with paramters reduces the output but does not remove the
-# annotation.
+# Calling values() with parameters reduces the output
 >>> Book.objects.filter(pk=1).annotate(mean_age=Avg('authors__age')).values('name')
-[{'name': u'The Definitive Guide to Django: Web Development Done Right', 'mean_age': 34.5}]
+[{'name': u'The Definitive Guide to Django: Web Development Done Right'}]
 
 # An empty values() call before annotating has the same effect as an
 # empty values() call after annotating

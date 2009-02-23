@@ -213,10 +213,14 @@ class WhereNode(tree.Node):
             elif isinstance(child, tree.Node):
                 self.relabel_aliases(change_map, child)
             else:
-                elt = list(child[0])
-                if elt[0] in change_map:
-                    elt[0] = change_map[elt[0]]
-                    node.children[pos] = (tuple(elt),) + child[1:]
+                if isinstance(child[0], (list, tuple)):
+                    elt = list(child[0])
+                    if elt[0] in change_map:
+                        elt[0] = change_map[elt[0]]
+                        node.children[pos] = (tuple(elt),) + child[1:]
+                else:
+                    child[0].relabel_aliases(change_map)
+
                 # Check if the query value also requires relabelling
                 if hasattr(child[3], 'relabel_aliases'):
                     child[3].relabel_aliases(change_map)

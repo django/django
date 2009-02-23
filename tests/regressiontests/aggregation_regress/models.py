@@ -95,9 +95,17 @@ __test__ = {'API_TESTS': """
 >>> sorted(Book.objects.all().values().annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost' : 'price * .5'}).get(pk=2).items())
 [('contact_id', 3), ('id', 2), ('isbn', u'067232959'), ('manufacture_cost', ...11.545...), ('mean_auth_age', 45.0), ('name', u'Sams Teach Yourself Django in 24 Hours'), ('pages', 528), ('price', Decimal("23.09")), ('pubdate', datetime.date(2008, 3, 3)), ('publisher_id', 2), ('rating', 3.0)]
 
-# A values query that selects specific columns reduces the output
+# If the annotation precedes the values clause, it won't be included
+# unless it is explicitly named
 >>> sorted(Book.objects.all().annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page' : 'price / pages'}).values('name').get(pk=1).items())
+[('name', u'The Definitive Guide to Django: Web Development Done Right')]
+
+>>> sorted(Book.objects.all().annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page' : 'price / pages'}).values('name','mean_auth_age').get(pk=1).items())
 [('mean_auth_age', 34.5), ('name', u'The Definitive Guide to Django: Web Development Done Right')]
+
+# If an annotation isn't included in the values, it can still be used in a filter
+>>> Book.objects.annotate(n_authors=Count('authors')).values('name').filter(n_authors__gt=2)
+[{'name': u'Python Web Development with Django'}]
 
 # The annotations are added to values output if values() precedes annotate()
 >>> sorted(Book.objects.all().values('name').annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page' : 'price / pages'}).get(pk=1).items())
@@ -206,6 +214,11 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, conta
 
 >>> Book.objects.extra(select={'pub':'publisher_id','foo':'pages'}).values('pub').annotate(Count('id')).order_by('pub')
 [{'pub': 1, 'id__count': 2}, {'pub': 2, 'id__count': 1}, {'pub': 3, 'id__count': 2}, {'pub': 4, 'id__count': 1}]
+
+# Regression for #10182 - Queries with aggregate calls are correctly realiased when used in a subquery
+>>> ids = Book.objects.filter(pages__gt=100).annotate(n_authors=Count('authors')).filter(n_authors__gt=2).order_by('n_authors')
+>>> Book.objects.filter(id__in=ids)
+[<Book: Python Web Development with Django>]
 
 # Regression for #10199 - Aggregate calls clone the original query so the original query can still be used
 >>> books = Book.objects.all()
