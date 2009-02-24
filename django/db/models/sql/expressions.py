@@ -74,9 +74,8 @@ class SQLEvaluator(object):
             if sql:
                 expressions.append(format % sql)
                 expression_params.extend(params)
-        conn = ' %s ' % node.connector
 
-        return conn.join(expressions), expression_params
+        return connection.ops.combine_expression(node.connector, expressions), expression_params
 
     def evaluate_leaf(self, node, qn):
         if not qn:

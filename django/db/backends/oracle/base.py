@@ -221,6 +221,16 @@ WHEN (new.%(col_name)s IS NULL)
         second = '%s-12-31'
         return [first % value, second % value]
 
+    def combine_expression(self, connector, sub_expressions):
+        "Oracle requires special cases for %% and & operators in query expressions"
+        if connector == '%%':
+            return 'MOD(%s)' % ','.join(sub_expressions)
+        elif connector == '&':
+            return 'BITAND(%s)' % ','.join(sub_expressions)
+        elif connector == '|':
+            raise NotImplementedError("Bit-wise or is not supported in Oracle.")
+        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
 

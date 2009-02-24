@@ -1,7 +1,7 @@
 """
 Spanning tests for all the operations that F() expressions can perform.
 """
-
+from django.conf import settings
 from django.db import models
 
 #
@@ -87,11 +87,6 @@ Complex expressions of different connection types are possible.
 >>> Number.objects.get(pk=n.pk) # LH Bitwise ands on integers
 <Number: 40, 15.500>
 
->>> _ = Number.objects.filter(pk=n.pk).update(integer=42, float=15.5)
->>> _ = Number.objects.filter(pk=n.pk).update(integer=F('integer') | 48)
->>> Number.objects.get(pk=n.pk) # LH Bitwise or on integers
-<Number: 58, 15.500>
-
 # Right hand operators
 
 >>> _ = Number.objects.filter(pk=n.pk).update(integer=42, float=15.5)
@@ -123,11 +118,20 @@ Complex expressions of different connection types are possible.
 >>> _ = Number.objects.filter(pk=n.pk).update(integer=15 & F('integer'))
 >>> Number.objects.get(pk=n.pk) # RH Bitwise ands on integers
 <Number: 10, 15.500>
+"""}
+
+# Oracle doesn't support the Bitwise OR operator.
+if settings.DATABASE_ENGINE != 'oracle':
+    __test__['API_TESTS'] += """
+
+>>> _ = Number.objects.filter(pk=n.pk).update(integer=42, float=15.5)
+>>> _ = Number.objects.filter(pk=n.pk).update(integer=F('integer') | 48)
+>>> Number.objects.get(pk=n.pk) # LH Bitwise or on integers
+<Number: 58, 15.500>
 
 >>> _ = Number.objects.filter(pk=n.pk).update(integer=42, float=15.5)
 >>> _ = Number.objects.filter(pk=n.pk).update(integer=15 | F('integer'))
 >>> Number.objects.get(pk=n.pk) # RH Bitwise or on integers
 <Number: 47, 15.500>
 
-
-"""}
+"""
