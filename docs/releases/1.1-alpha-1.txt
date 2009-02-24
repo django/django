@@ -8,153 +8,155 @@ February 23, 2009
 
 Welcome to Django 1.1 alpha 1!
 
-This is the first in a series of preview/development releases leading
-up to the eventual release of Django 1.1, currently scheduled to take
-place in April 2009. This release is primarily targeted at developers
-who are interested in trying out new features and testing the Django
-codebase to help identify and resolve bugs prior to the final 1.1
-release.
+This is the first in a series of preview/development releases leading up to the
+eventual release of Django 1.1, currently scheduled to take place in April 2009.
+This release is primarily targeted at developers who are interested in trying
+out new features and testing the Django codebase to help identify and resolve
+bugs prior to the final 1.1 release.
 
-As such, this release is *not* intended for production use, and any
-such use is discouraged.
-
+As such, this release is *not* intended for production use, and any such use is
+discouraged.
 
 What's new in Django 1.1 alpha 1
 ================================
 
-Two major enhancements have been added to Django's object-relational
-mapper (ORM):
+ORM improvements
+----------------
+
+Two major enhancements have been added to Django's object-relational mapper
+(ORM):
 
 Aggregate support
-    It's now possible to run various SQL aggregate queries from within
-    Django's ORM, and to either return the results of an aggregate
-    query directly or annotate the objects in a ``QuerySet`` with the
-    results of an aggregate query. This is accomplished by the new
-    ``QuerySet`` methods ``aggregate()`` and ``annotate()``, and is
-    covered in detail in `the ORM aggregation documentation <topics-db-aggregation>`_.
+~~~~~~~~~~~~~~~~~
+
+.. currentmodule:: django.db.models
+
+It's now possible to run SQL aggregate queries (i.e. ``COUNT()``, ``MAX()``, ``MIN()``, etc.) from within Django's ORM. You can choose to either return
+the results of the aggregate directly, or else annotate the objects in a :class:`QuerySet` with the results of the aggregate query.
+
+This feature is available as new :meth:`QuerySet.aggregate()`` and
+:meth:`QuerySet.annotate()`` methods, and is covered in detail in :ref:`the ORM
+aggregation documentation <topics-db-aggregation>`
 
 Query expressions
-    A new type of object -- ``django.db.models.F`` -- has been added.
-    ``F`` instances refer to a particular field on a model (and can
-    traverse relationships to refer to fields on related models as
-    well). This allows a variety of query types to be formulated which
-    were not previously possible; for full details, including
-    examples, consult the `documentation for F expressions <query-expressions>`_.
+~~~~~~~~~~~~~~~~~
 
-Django's test suite and integrated `testing framework <topics-testing>`_
-have also been improved, via the introduction of transaction-based
-tests: when using ``django.test.TestCase``, your tests will now (when
-supported by the underlying database) be run in a transaction which is
-rolled back when finished, instead of by flushing and re-populating
-the database. This results in an immense speedup for most types of
-unit tests. See the documentation for :class:`~django.test.TestCase`
-and :class:`~django.test.TransactionTestCase` for a full description,
-and some important notes on database support.
+Queries can now refer to a another field on the query and can traverse
+relationships to refer to fields on related models. This is implemented in the
+new :class:`F` object; for full details, including examples, consult the
+:ref:`documentation for F expressions <query-expressions>`.
+
+Performance improvements
+------------------------
+
+.. currentmodule:: django.test
+
+Tests written using Django's :ref:`testing framework <topics-testing>` now run
+dramatically faster (as much as 10 times faster in many cases).
+
+This was accomplished through the introduction of transaction-based tests: when
+using :class:`django.test.TestCase`, your tests will now be run in a transaction
+which is rolled back when finished, instead of by flushing and re-populating the
+database. This results in an immense speedup for most types of unit tests. See
+the documentation for :class:`TestCase` and :class:`TransactionTestCase` for a
+full description, and some important notes on database support.
+
+Other improvements
+------------------
 
 Other new features and changes introduced since Django 1.0 include:
 
-* The `CSRF protection middleware <ref-contrib-csrf>`_ has been split
-  into two classes -- ``CsrfViewMiddleware`` checks incoming requests,
-  and ``CsrfResponseMiddleware`` processes outgoing responses. The
-  combined ``CsrfMiddleware`` class (which does both) remains for
-  backwards-compatibility, but using the split classes is now
-  recommended in order to allow fine-grained control of when and where
-  the CSRF processing takes place.
+* The :ref:`CSRF protection middleware <ref-contrib-csrf>` has been split into
+  two classes -- ``CsrfViewMiddleware`` checks incoming requests, and
+  ``CsrfResponseMiddleware`` processes outgoing responses. The combined
+  ``CsrfMiddleware`` class (which does both) remains for
+  backwards-compatibility, but using the split classes is now recommended in
+  order to allow fine-grained control of when and where the CSRF processing
+  takes place.
 
-* :func:`~django.core.urlresolvers.reverse` and code which uses it
-  (e.g., the ``{% url %}`` template tag) now works with URLs in
-  Django's administrative site, provided that the admin URLs are set
-  up via ``include(admin.site.urls)`` (sending admin requests to the
-  ``admin.site.root`` view still works, but URLs in the admin will not
-  be "reversible" when configured this way).
+* :func:`~django.core.urlresolvers.reverse` and code which uses it (e.g., the
+  ``{% url %}`` template tag) now works with URLs in Django's administrative
+  site, provided that the admin URLs are set up via ``include(admin.site.urls)``
+  (sending admin requests to the ``admin.site.root`` view still works, but URLs
+  in the admin will not be "reversible" when configured this way).
 
-* The ``include()`` function in Django URLConf modules can now accept
-  sequences of URL patterns (generated by ``patterns()``) in addition
-  to module names.
+* The ``include()`` function in Django URLConf modules can now accept sequences
+  of URL patterns (generated by ``patterns()``) in addition to module names.
 
-* Instances of Django forms (see `the forms overview <topics-forms-index>`_
-  now have two additional methods, ``hidden_fields()`` and
-  ``visible_fields()``, which return the list of hidden -- i.e.,
-  ``<input type="hidden">`` -- and visible fields on the form,
-  respectively.
+* Instances of Django forms (see `the forms overview <topics-forms-index>`_ now
+  have two additional methods, ``hidden_fields()`` and ``visible_fields()``,
+  which return the list of hidden -- i.e., ``<input type="hidden">`` -- and
+  visible fields on the form, respectively.
 
-* The ``redirect_to`` generic view (see
-  `the generic views documentation <ref-generic-views>`_) now accepts
-  an additional keyword argument ``permanent``. If ``permanent`` is
-  ``True``, the view will emit an HTTP permanent redirect (status code
-  301). If ``False``, the view will emit an HTTP temporary redirect
-  (status code 302).
+* The ``redirect_to`` generic view (see `the generic views documentation
+  <ref-generic-views>`_) now accepts an additional keyword argument
+  ``permanent``. If ``permanent`` is ``True``, the view will emit an HTTP
+  permanent redirect (status code 301). If ``False``, the view will emit an HTTP
+  temporary redirect (status code 302).
 
-* A new database lookup type -- ``week_day`` -- has been added for
-  ``DateField`` and ``DateTimeField``. This type of lookup accepts a
-  number between 1 (Sunday) and 7 (Saturday), and returns objects
-  where the field value matches that day of the week. See
-  `the full list of lookup types <field-lookups>`_ for details.
+* A new database lookup type -- ``week_day`` -- has been added for ``DateField``
+  and ``DateTimeField``. This type of lookup accepts a number between 1 (Sunday)
+  and 7 (Saturday), and returns objects where the field value matches that day
+  of the week. See `the full list of lookup types <field-lookups>`_ for details.
 
-* The ``{% for %}`` tag in Django's template language now accepts an
-  optional ``{% empty %}`` clause, to be displayed when ``{% for %}``
-  is asked to loop over an empty sequence. See
-  `the list of built-in template tags <ref-templates-builtins>`_
-   for examples of this.
-
+* The ``{% for %}`` tag in Django's template language now accepts an optional
+  ``{% empty %}`` clause, to be displayed when ``{% for %}`` is asked to loop
+  over an empty sequence. See :ref:`the list of built-in template tags
+  <ref-templates-builtins>` for examples of this.
 
 The Django 1.1 roadmap
 ======================
 
-Before Django 1.1 goes final, several other preview/development
-releases will be made available. The current schedule consists of at
-least the following:
+Before Django 1.1 goes final, several other preview/development releases will be
+made available. The current schedule consists of at least the following:
 
-* *March 20, 2009:* Django 1.1 beta 1, at which point Django 1.1 will
-   be in "feature freeze": no new features will be implemented for 1.1
-   past that point, and all new feature work will be deferred to
-   Django 1.2.
+* Week of *March 20, 2009:* Django 1.1 beta 1, at which point Django 1.1 will
+  be in "feature freeze": no new features will be implemented for 1.1
+  past that point, and all new feature work will be deferred to
+  Django 1.2.
 
-* *April 2, 2009:* Django 1.1 release candidate. At this point all
-   strings marked for translation must freeze to allow translations to
-   be submitted in advance of the final release.
+* Week of *April 2, 2009:* Django 1.1 release candidate. At this point all
+  strings marked for translation must freeze to allow translations to
+  be submitted in advance of the final release.
 
-* *April 13, 2009:* Django 1.1 is released.
+* Week of *April 13, 2009:* Django 1.1 final.
 
-If necessary, additional alpha, beta or release candidate packages
-will be issued prior to the final 1.1 release.
-
+If deemed necessary, additional alpha, beta or release candidate packages will
+be issued prior to the final 1.1 release.
 
 What you can do to help
 =======================
 
-In order to provide a high-quality 1.1 release, we need your
-help. Although this alpha release is, again, *not* intended for
-production use, you can help the Django team by trying out the alpha
-codebase in a safe test environment and reporting any bugs or issues
-you encounter. The Django ticket tracker is the central place to
-search for open issues:
+In order to provide a high-quality 1.1 release, we need your help. Although this
+alpha release is, again, *not* intended for production use, you can help the
+Django team by trying out the alpha codebase in a safe test environment and
+reporting any bugs or issues you encounter. The Django ticket tracker is the
+central place to search for open issues:
 
-    http://code.djangoproject.com/timeline
+    * http://code.djangoproject.com/timeline
 
-Please open new tickets if no existing ticket corresponds to a problem
-you're running into.
+Please open new tickets if no existing ticket corresponds to a problem you're
+running into.
 
-Additionally, discussion of Django development, including progress
-toward the 1.1 release, takes place daily on the django-developers
-mailing list:
+Additionally, discussion of Django development, including progress toward the
+1.1 release, takes place daily on the django-developers mailing list:
 
-    http://groups.google.com/group/django-developers
+    * http://groups.google.com/group/django-developers
 
-...and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If
-you're interested in helping out with Django's development, feel free
-to join the discussions there.
+... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
+interested in helping out with Django's development, feel free to join the
+discussions there.
 
-Django's online documentation also includes pointers on how to
-contribute to Django:
+Django's online documentation also includes pointers on how to contribute to
+Django: 
 
-    :ref:`contributing to Django <internals-contributing>`
+    * :ref:`How to contribute to Django <internals-contributing>`
 
-Contributions on any level -- developing code, writing
-documentation or simply triaging tickets and helping to test proposed
-bugfixes -- are always welcome and appreciated.
+Contributions on any level -- developing code, writing documentation or simply
+triaging tickets and helping to test proposed bugfixes -- are always welcome and
+appreciated.
 
-Development sprints for Django 1.1 will also be taking place at PyCon
-US 2009, on the dedicated sprint days (March 30 through April 2), and
-anyone who wants to help out is welcome to join in, either in person
-at PyCon or virtually in the IRC channel or on the mailing list.
+Development sprints for Django 1.1 will also be taking place at PyCon US 2009,
+on the dedicated sprint days (March 30 through April 2), and anyone who wants to
+help out is welcome to join in, either in person at PyCon or virtually in the
+IRC channel or on the mailing list.
