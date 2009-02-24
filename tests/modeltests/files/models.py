@@ -35,6 +35,12 @@ class Storage(models.Model):
     default = models.FileField(storage=temp_storage, upload_to='tests', default='tests/default.txt')
 
 __test__ = {'API_TESTS':"""
+# Attempting to access a FileField from the class raises a descriptive error
+>>> Storage.normal
+Traceback (most recent call last):
+...
+AttributeError: The 'normal' attribute can only be accessed from Storage instances.
+
 # An object without a file has limited functionality.
 
 >>> obj1 = Storage()

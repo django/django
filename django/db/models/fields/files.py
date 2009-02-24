@@ -122,7 +122,7 @@ class FileDescriptor(object):
 
     def __get__(self, instance=None, owner=None):
         if instance is None:
-            raise AttributeError, "%s can only be accessed from %s instances." % (self.field.name(self.owner.__name__))
+            raise AttributeError("The '%s' attribute can only be accessed from %s instances." % (self.field.name, owner.__name__))
         file = instance.__dict__[self.field.name]
         if isinstance(file, basestring) or file is None:
             # Create a new instance of FieldFile, based on a given file name
