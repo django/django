@@ -60,4 +60,11 @@ BadHeaderError: Header values can't contain newlines (got u'Subject\nInjection T
 >>> email.message().as_string()
 'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: subject\nFrom: from@example.com\nTo: to@example.com\ndate: Fri, 09 Nov 2001 01:08:47 -0000\nMessage-ID: foo\n\ncontent'
 
+# Make sure we can manually set the From header (#9214)
+
+>>> email = EmailMessage('Subject', 'Content', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'}) 
+>>> message = email.message() 
+>>> message['From']
+'from@example.com'
+
 """

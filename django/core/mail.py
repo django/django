@@ -245,7 +245,7 @@ class EmailMessage(object):
                 else:
                     msg.attach(self._create_attachment(*attachment))
         msg['Subject'] = self.subject
-        msg['From'] = self.from_email
+        msg['From'] = self.extra_headers.pop('From', self.from_email)
         msg['To'] = ', '.join(self.to)
 
         # Email header names are case-insensitive (RFC 2045), so we have to
