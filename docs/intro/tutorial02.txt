@@ -40,6 +40,9 @@ activate the admin site for your installation, do these three things:
       know is that it maps URL roots to applications. In the end, you should
       have a ``urls.py`` file that looks like this:
 
+    .. versionchanged:: 1.1
+        The method for adding admin urls has changed in Django 1.1.
+
       .. parsed-literal::
 
           from django.conf.urls.defaults import *

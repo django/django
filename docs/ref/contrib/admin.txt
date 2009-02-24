@@ -676,6 +676,8 @@ model instance::
 ``get_urls(self)``
 ~~~~~~~~~~~~~~~~~~~
 
+.. versionadded:: 1.1
+
 The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
 that ModelAdmin in the same way as a URLconf.  Therefore you can extend them as
 documented in :ref:`topics-http-urls`::
@@ -1157,6 +1159,10 @@ It's easy to create multiple instances of the admin site on the same
 Django-powered Web site. Just create multiple instances of ``AdminSite`` and
 root each one at a different URL.
 
+.. versionchanged:: 1.1
+    The method for hooking ``AdminSite`` instances into urls has changed in 
+    Django 1.1.
+
 In this example, the URLs ``/basic-admin/`` and ``/advanced-admin/`` feature
 separate versions of the admin site -- using the ``AdminSite`` instances
 ``myproject.admin.basic_site`` and ``myproject.admin.advanced_site``,
@@ -1174,22 +1180,10 @@ respectively::
 Adding views to admin sites
 ---------------------------
 
+.. versionadded:: 1.1
+
 It possible to add additional views to the admin site in the same way one can
 add them to ``ModelAdmins``.  This by using the ``get_urls()`` method on an
 AdminSite in the same way as `described above`__
 
 __ `get_urls(self)`_
-
-Protecting Custom ``AdminSite`` and ``ModelAdmin``
---------------------------------------------------
-
-By default all the views in the Django admin are protected so that only staff
-members can access them.  If you add your own views to either a ``ModelAdmin``
-or ``AdminSite`` you should ensure that where necessary they are protected in
-the same manner.  To do this use the ``admin_perm_test`` decorator provided in
-``django.contrib.admin.utils.admin_perm_test``.  It can be used in the same way
-as the ``login_required`` decorator.
-
-.. note::
-    The ``admin_perm_test`` decorator can only be used on methods which are on
-    ``ModelAdmins`` or ``AdminSites``, you cannot use it on arbitrary functions.
