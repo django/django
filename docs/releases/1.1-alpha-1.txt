@@ -31,8 +31,10 @@ Aggregate support
 
 .. currentmodule:: django.db.models
 
-It's now possible to run SQL aggregate queries (i.e. ``COUNT()``, ``MAX()``, ``MIN()``, etc.) from within Django's ORM. You can choose to either return
-the results of the aggregate directly, or else annotate the objects in a :class:`QuerySet` with the results of the aggregate query.
+It's now possible to run SQL aggregate queries (i.e. ``COUNT()``, ``MAX()``,
+``MIN()``, etc.) from within Django's ORM. You can choose to either return the
+results of the aggregate directly, or else annotate the objects in a
+:class:`QuerySet` with the results of the aggregate query.
 
 This feature is available as new :meth:`QuerySet.aggregate()`` and
 :meth:`QuerySet.annotate()`` methods, and is covered in detail in :ref:`the ORM
