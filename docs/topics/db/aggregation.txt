@@ -143,7 +143,7 @@ Joins and aggregates
 ====================
 
 So far, we have dealt with aggregates over fields that belong to the
-model being queries. However, sometimes the value you want to aggregate
+model being queried. However, sometimes the value you want to aggregate
 will belong to a model that is related to the model you are querying.
 
 When specifying the field to be aggregated in an aggregate functions,
@@ -271,7 +271,7 @@ rating of books written by each author:
 
     >>> Author.objects.annotate(average_rating=Avg('book__rating'))
 
-This will return one result for each author in the database, annotate with
+This will return one result for each author in the database, annotated with
 their average book rating.
 
 However, the result will be slightly different if you use a ``values()`` clause::
