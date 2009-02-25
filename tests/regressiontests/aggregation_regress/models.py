@@ -230,6 +230,12 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, conta
 >>> Book.objects.annotate(num_authors=Count('authors')).filter(num_authors=2).dates('pubdate', 'day')
 [datetime.datetime(1995, 1, 15, 0, 0), datetime.datetime(2007, 12, 6, 0, 0)]
 
+# Regression for #10290 - extra selects with parameters can be used for
+# grouping.
+>>> qs = Book.objects.all().annotate(mean_auth_age=Avg('authors__age')).extra(select={'sheets' : '(pages + %s) / %s'}, select_params=[1, 2]).order_by('sheets').values('sheets')
+>>> [int(x['sheets']) for x in qs]
+[150, 175, 224, 264, 473, 566]
+
 """
 }
 
