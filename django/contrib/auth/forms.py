@@ -107,6 +107,7 @@ class PasswordResetForm(forms.Form):
         self.users_cache = User.objects.filter(email__iexact=email)
         if len(self.users_cache) == 0:
             raise forms.ValidationError(_("That e-mail address doesn't have an associated user account. Are you sure you've registered?"))
+        return email
 
     def save(self, domain_override=None, email_template_name='registration/password_reset_email.html',
              use_https=False, token_generator=default_token_generator):
