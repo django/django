@@ -119,8 +119,14 @@ except ImportError:
 if not use_system_version:
     try:
         from json import *      # Python 2.6 preferred over local copy.
+
+        # There is a "json" package around that is not Python's "json", so we
+        # check for something that is only in the namespace of the version we
+        # want.
+        JSONDecoder
+
         use_system_version = True
-    except ImportError:
+    except (ImportError, NameError):
         pass
 
 # If all else fails, we have a bundled version that can be used.
