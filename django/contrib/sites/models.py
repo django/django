@@ -41,12 +41,18 @@ class Site(models.Model):
 
     def __unicode__(self):
         return self.domain
-    
+
+    def save(self, *args, **kwargs):
+        super(Site, self).save(*args, **kwargs)
+        # Cached information will likely be incorrect now.
+        if self.id in SITE_CACHE:
+            del SITE_CACHE[self.id]
+
     def delete(self):
         pk = self.pk
         super(Site, self).delete()
         try:
-            del(SITE_CACHE[pk])
+            del SITE_CACHE[pk]
         except KeyError:
             pass
 
