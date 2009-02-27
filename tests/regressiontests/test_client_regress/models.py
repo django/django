@@ -148,6 +148,107 @@ class AssertRedirectsTests(TestCase):
         except AssertionError, e:
             self.assertEquals(str(e), "Couldn't retrieve redirection page '/test_client/permanent_redirect_view/': response code was 301 (expected 200)")
 
+    def test_redirect_chain(self):
+        "You can follow a redirect chain of multiple redirects"
+        response = self.client.get('/test_client_regress/redirects/further/more/', {}, follow=True)
+        self.assertRedirects(response, '/test_client_regress/no_template_view/',
+            status_code=301, target_status_code=200)
+
+        self.assertEquals(len(response.redirect_chain), 1)
+        self.assertEquals(response.redirect_chain[0], ('http://testserver/test_client_regress/no_template_view/', 301))
+
+    def test_multiple_redirect_chain(self):
+        "You can follow a redirect chain of multiple redirects"
+        response = self.client.get('/test_client_regress/redirects/', {}, follow=True)
+        self.assertRedirects(response, '/test_client_regress/no_template_view/',
+            status_code=301, target_status_code=200)
+
+        self.assertEquals(len(response.redirect_chain), 3)
+        self.assertEquals(response.redirect_chain[0], ('http://testserver/test_client_regress/redirects/further/', 301))
+        self.assertEquals(response.redirect_chain[1], ('http://testserver/test_client_regress/redirects/further/more/', 301))
+        self.assertEquals(response.redirect_chain[2], ('http://testserver/test_client_regress/no_template_view/', 301))
+
+    def test_redirect_chain_to_non_existent(self):
+        "You can follow a chain to a non-existent view"
+        response = self.client.get('/test_client_regress/redirect_to_non_existent_view2/', {}, follow=True)
+        self.assertRedirects(response, '/test_client_regress/non_existent_view/',
+            status_code=301, target_status_code=404)
+
+    def test_redirect_chain_to_self(self):
+        "Redirections to self are caught and escaped"
+        response = self.client.get('/test_client_regress/redirect_to_self/', {}, follow=True)
+        # The chain of redirects stops once the cycle is detected.
+        self.assertRedirects(response, '/test_client_regress/redirect_to_self/',
+            status_code=301, target_status_code=301)
+        self.assertEquals(len(response.redirect_chain), 2)
+
+    def test_circular_redirect(self):
+        "Circular redirect chains are caught and escaped"
+        response = self.client.get('/test_client_regress/circular_redirect_1/', {}, follow=True)
+        # The chain of redirects will get back to the starting point, but stop there.
+        self.assertRedirects(response, '/test_client_regress/circular_redirect_2/',
+            status_code=301, target_status_code=301)
+        self.assertEquals(len(response.redirect_chain), 4)
+
+    def test_redirect_chain_post(self):
+        "A redirect chain will be followed from an initial POST post"
+        response = self.client.post('/test_client_regress/redirects/',
+            {'nothing': 'to_send'}, follow=True)
+        self.assertRedirects(response,
+            '/test_client_regress/no_template_view/', 301, 200)
+        self.assertEquals(len(response.redirect_chain), 3)
+
+    def test_redirect_chain_head(self):
+        "A redirect chain will be followed from an initial HEAD request"
+        response = self.client.head('/test_client_regress/redirects/',
+            {'nothing': 'to_send'}, follow=True)
+        self.assertRedirects(response,
+            '/test_client_regress/no_template_view/', 301, 200)
+        self.assertEquals(len(response.redirect_chain), 3)
+
+    def test_redirect_chain_options(self):
+        "A redirect chain will be followed from an initial OPTIONS request"
+        response = self.client.options('/test_client_regress/redirects/',
+            {'nothing': 'to_send'}, follow=True)
+        self.assertRedirects(response,
+            '/test_client_regress/no_template_view/', 301, 200)
+        self.assertEquals(len(response.redirect_chain), 3)
+
+    def test_redirect_chain_put(self):
+        "A redirect chain will be followed from an initial PUT request"
+        response = self.client.put('/test_client_regress/redirects/',
+            {'nothing': 'to_send'}, follow=True)
+        self.assertRedirects(response,
+            '/test_client_regress/no_template_view/', 301, 200)
+        self.assertEquals(len(response.redirect_chain), 3)
+
+    def test_redirect_chain_delete(self):
+        "A redirect chain will be followed from an initial DELETE request"
+        response = self.client.delete('/test_client_regress/redirects/',
+            {'nothing': 'to_send'}, follow=True)
+        self.assertRedirects(response,
+            '/test_client_regress/no_template_view/', 301, 200)
+        self.assertEquals(len(response.redirect_chain), 3)
+
+    def test_redirect_chain_on_non_redirect_page(self):
+        "An assertion is raised if the original page couldn't be retrieved as expected"
+        # This page will redirect with code 301, not 302
+        response = self.client.get('/test_client/get_view/', follow=True)
+        try:
+            self.assertRedirects(response, '/test_client/get_view/')
+        except AssertionError, e:
+            self.assertEquals(str(e), "Response didn't redirect as expected: Response code was 200 (expected 302)")
+
+    def test_redirect_on_non_redirect_page(self):
+        "An assertion is raised if the original page couldn't be retrieved as expected"
+        # This page will redirect with code 301, not 302
+        response = self.client.get('/test_client/get_view/')
+        try:
+            self.assertRedirects(response, '/test_client/get_view/')
+        except AssertionError, e:
+            self.assertEquals(str(e), "Response didn't redirect as expected: Response code was 200 (expected 302)")
+
+
 class AssertFormErrorTests(TestCase):
     def test_unknown_form(self):
         "An assertion is raised if the form name is unknown"

@@ -1,5 +1,5 @@
 import urllib
-from urlparse import urlparse, urlunparse
+from urlparse import urlparse, urlunparse, urlsplit
 import sys
 import os
 try:
@@ -12,7 +12,7 @@ from django.contrib.auth import authenticate, login
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import got_request_exception
-from django.http import SimpleCookie, HttpRequest
+from django.http import SimpleCookie, HttpRequest, QueryDict
 from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.utils.functional import curry
@@ -261,7 +261,7 @@ class Client(object):
 
         return response
 
-    def get(self, path, data={}, **extra):
+    def get(self, path, data={}, follow=False, **extra):
         """
         Requests a response from the server using GET.
         """
@@ -275,9 +275,13 @@ class Client(object):
         }
         r.update(extra)
 
-        return self.request(**r)
+        response = self.request(**r)
+        if follow:
+            response = self._handle_redirects(response)
+        return response
 
-    def post(self, path, data={}, content_type=MULTIPART_CONTENT, **extra):
+    def post(self, path, data={}, content_type=MULTIPART_CONTENT,
+             follow=False, **extra):
         """
         Requests a response from the server using POST.
         """
@@ -297,9 +301,12 @@ class Client(object):
         }
         r.update(extra)
 
-        return self.request(**r)
+        response = self.request(**r)
+        if follow:
+            response = self._handle_redirects(response)
+        return response
 
-    def head(self, path, data={}, **extra):
+    def head(self, path, data={}, follow=False, **extra):
         """
         Request a response from the server using HEAD.
         """
@@ -313,9 +320,12 @@ class Client(object):
         }
         r.update(extra)
 
-        return self.request(**r)
+        response = self.request(**r)
+        if follow:
+            response = self._handle_redirects(response)
+        return response
 
-    def options(self, path, data={}, **extra):
+    def options(self, path, data={}, follow=False, **extra):
         """
         Request a response from the server using OPTIONS.
         """
@@ -328,9 +338,13 @@ class Client(object):
         }
         r.update(extra)
 
-        return self.request(**r)
+        response = self.request(**r)
+        if follow:
+            response = self._handle_redirects(response)
+        return response
 
-    def put(self, path, data={}, content_type=MULTIPART_CONTENT, **extra):
+    def put(self, path, data={}, content_type=MULTIPART_CONTENT,
+            follow=False, **extra):
         """
         Send a resource to the server using PUT.
         """
@@ -350,9 +364,12 @@ class Client(object):
         }
         r.update(extra)
 
-        return self.request(**r)
+        response = self.request(**r)
+        if follow:
+            response = self._handle_redirects(response)
+        return response
 
-    def delete(self, path, data={}, **extra):
+    def delete(self, path, data={}, follow=False, **extra):
         """
         Send a DELETE request to the server.
         """
@@ -365,7 +382,10 @@ class Client(object):
         }
         r.update(extra)
 
-        return self.request(**r)
+        response = self.request(**r)
+        if follow:
+            response = self._handle_redirects(response)
+        return response
 
     def login(self, **credentials):
         """
@@ -416,3 +436,27 @@ class Client(object):
         session = __import__(settings.SESSION_ENGINE, {}, {}, ['']).SessionStore()
         session.delete(session_key=self.cookies[settings.SESSION_COOKIE_NAME].value)
         self.cookies = SimpleCookie()
+
+    def _handle_redirects(self, response):
+        "Follows any redirects by requesting responses from the server using GET."
+
+        response.redirect_chain = []
+        while response.status_code in (301, 302, 303, 307):
+            url = response['Location']
+            scheme, netloc, path, query, fragment = urlsplit(url)
+
+            redirect_chain = response.redirect_chain
+            redirect_chain.append((url, response.status_code))
+
+            # The test client doesn't handle external links,
+            # but since the situation is simulated in test_client,
+            # we fake things here by ignoring the netloc portion of the
+            # redirected URL.
+            response = self.get(path, QueryDict(query), follow=False)
+            response.redirect_chain = redirect_chain
+
+            # Prevent loops
+            if response.redirect_chain[-1] in response.redirect_chain[0:-1]:
+                break
+        return response
+

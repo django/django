@@ -70,13 +70,13 @@ class ClientTest(TestCase):
         self.assertEqual(response.context['data'], '37')
         self.assertEqual(response.template.name, 'POST Template')
         self.failUnless('Data received' in response.content)
-    
+
     def test_response_headers(self):
         "Check the value of HTTP headers returned in a response"
         response = self.client.get("/test_client/header_view/")
-        
+
         self.assertEquals(response['X-DJANGO-TEST'], 'Slartibartfast')
-        
+
     def test_raw_post(self):
         "POST raw data (with a content type) to a view"
         test_doc = """<?xml version="1.0" encoding="utf-8"?><library><book><title>Blink</title><author>Malcolm Gladwell</author></book></library>"""
@@ -131,6 +131,12 @@ class ClientTest(TestCase):
         # Check that the response was a 302, and that
         # the attempt to get the redirection location returned 301 when retrieved
         self.assertRedirects(response, 'http://testserver/test_client/permanent_redirect_view/', target_status_code=301)
+
+    def test_follow_redirect(self):
+        "A URL that redirects can be followed to termination."
+        response = self.client.get('/test_client/double_redirect_view/', follow=True)
+        self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=302, target_status_code=200)
+        self.assertEquals(len(response.redirect_chain), 2)
 
     def test_notfound_response(self):
         "GET a URL that responds as '404:Not Found'"

@@ -43,7 +43,7 @@ def disable_transaction_methods():
     transaction.savepoint_commit = nop
     transaction.savepoint_rollback = nop
     transaction.enter_transaction_management = nop
-    transaction.leave_transaction_management = nop        
+    transaction.leave_transaction_management = nop
 
 def restore_transaction_methods():
     transaction.commit = real_commit
@@ -198,7 +198,7 @@ class DocTestRunner(doctest.DocTestRunner):
         # Rollback, in case of database errors. Otherwise they'd have
         # side effects on other tests.
         transaction.rollback_unless_managed()
-        
+
 class TransactionTestCase(unittest.TestCase):
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
@@ -242,7 +242,7 @@ class TransactionTestCase(unittest.TestCase):
             import sys
             result.addError(self, sys.exc_info())
             return
-        super(TransactionTestCase, self).__call__(result)        
+        super(TransactionTestCase, self).__call__(result)
         try:
             self._post_teardown()
         except (KeyboardInterrupt, SystemExit):
@@ -263,7 +263,7 @@ class TransactionTestCase(unittest.TestCase):
     def _fixture_teardown(self):
         pass
 
-    def _urlconf_teardown(self):        
+    def _urlconf_teardown(self):
         if hasattr(self, '_old_root_urlconf'):
             settings.ROOT_URLCONF = self._old_root_urlconf
             clear_url_caches()
@@ -276,25 +276,48 @@ class TransactionTestCase(unittest.TestCase):
         Note that assertRedirects won't work for external links since it uses
         TestClient to do a request.
         """
-        self.assertEqual(response.status_code, status_code,
-            ("Response didn't redirect as expected: Response code was %d"
-             " (expected %d)" % (response.status_code, status_code)))
-        url = response['Location']
-        scheme, netloc, path, query, fragment = urlsplit(url)
+        if hasattr(response, 'redirect_chain'):
+            # The request was a followed redirect
+            self.assertTrue(len(response.redirect_chain) > 0,
+                ("Response didn't redirect as expected: Response code was %d"
+                " (expected %d)" % (response.status_code, status_code)))
+
+            self.assertEqual(response.redirect_chain[0][1], status_code,
+                ("Initial response didn't redirect as expected: Response code was %d"
+                 " (expected %d)" % (response.redirect_chain[0][1], status_code)))
+
+            url, status_code = response.redirect_chain[-1]
+
+            self.assertEqual(response.status_code, target_status_code,
+                ("Response didn't redirect as expected: Final Response code was %d"
+                " (expected %d)" % (response.status_code, target_status_code)))
+
+        else:
+            # Not a followed redirect
+            self.assertEqual(response.status_code, status_code,
+                ("Response didn't redirect as expected: Response code was %d"
+                 " (expected %d)" % (response.status_code, status_code)))
+
+            url = response['Location']
+            scheme, netloc, path, query, fragment = urlsplit(url)
+
+            redirect_response = response.client.get(path, QueryDict(query))
+
+            # Get the redirection page, using the same client that was used
+            # to obtain the original response.
+            self.assertEqual(redirect_response.status_code, target_status_code,
+                ("Couldn't retrieve redirection page '%s': response code was %d"
+                 " (expected %d)") %
+                     (path, redirect_response.status_code, target_status_code))
+
         e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
         if not (e_scheme or e_netloc):
             expected_url = urlunsplit(('http', host or 'testserver', e_path,
-                    e_query, e_fragment))
+                e_query, e_fragment))
+
         self.assertEqual(url, expected_url,
             "Response redirected to '%s', expected '%s'" % (url, expected_url))
 
-        # Get the redirection page, using the same client that was used
-        # to obtain the original response.
-        redirect_response = response.client.get(path, QueryDict(query))
-        self.assertEqual(redirect_response.status_code, target_status_code,
-            ("Couldn't retrieve redirection page '%s': response code was %d"
-             " (expected %d)") %
-                 (path, redirect_response.status_code, target_status_code))
 
     def assertContains(self, response, text, count=None, status_code=200):
         """
@@ -401,15 +424,15 @@ class TransactionTestCase(unittest.TestCase):
 class TestCase(TransactionTestCase):
     """
     Does basically the same as TransactionTestCase, but surrounds every test
-    with a transaction, monkey-patches the real transaction management routines to 
-    do nothing, and rollsback the test transaction at the end of the test. You have 
+    with a transaction, monkey-patches the real transaction management routines to
+    do nothing, and rollsback the test transaction at the end of the test. You have
     to use TransactionTestCase, if you need transaction management inside a test.
     """
 
     def _fixture_setup(self):
         if not settings.DATABASE_SUPPORTS_TRANSACTIONS:
             return super(TestCase, self)._fixture_setup()
-        
+
         transaction.enter_transaction_management()
         transaction.managed(True)
         disable_transaction_methods()
@@ -426,7 +449,7 @@ class TestCase(TransactionTestCase):
     def _fixture_teardown(self):
         if not settings.DATABASE_SUPPORTS_TRANSACTIONS:
             return super(TestCase, self)._fixture_teardown()
-                
+
         restore_transaction_methods()
         transaction.rollback()
         transaction.leave_transaction_management()
