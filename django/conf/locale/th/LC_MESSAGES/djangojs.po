@@ -3,9 +3,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-10 21:10+1100\n"
-"PO-Revision-Date: 2008-11-07 19:34+0700\n"
+"Report-Msgid-Bugs-To: kowito@felspar.com\n"
+"POT-Creation-Date: 2008-09-02 22:36-0700\n"
+"PO-Revision-Date: 2008-11-04 00:35+0700\n"
 "Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
 "Language-Team: Kowit Charoenratchatabhan,Kadsarin Sanjek, Felspar <kowito@felspar.com>\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "มีอยู่ %s"
+msgstr "ที่มีอยู่ %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
@@ -35,7 +35,7 @@ msgstr "ลบออก"
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr "ถูกเลือก %s"
+msgstr "ได้เลือก %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
@@ -43,24 +43,20 @@ msgstr "เลือกและคลิก"
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr "ลบทั้งหมด"
+msgstr "ล้างทั้งหมด"
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"มกราคม กุมภาพันธ์ มีนาคม เมษายน พฤษภาคม มิถุนายน กรกฎาคม สิงหาคม กันยายน ตุลาคม "
-"พฤศจิกายน ธันวาคม"
+msgid "January February March April May June July August September October November December"
+msgstr "มกราคม กุมภาพันธ์ มีนาคม เมษายน พฤษภาคม มิถุนายน กรกฎาคม สิงหาคม กันยายน ตุลาคม พฤศจิกายน ธันวาคม"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
-msgstr "อา. จ. อ. พ. พฤ. ศ. ส."
+msgstr "อา จ. อ. พ. พฤ. ศ. ส."
 
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "อาทิตย์ จันทร์ อังคาร พุธ พฤหัสบดี ศุกร์ เสาร์"
+msgstr "อาทิตย์ จันทร์ อังคาร พุธ พฤหัส ศุกร์ เสาร์"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
@@ -74,7 +70,7 @@ msgstr "ซ่อน"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Now"
-msgstr "ขณะนี้"
+msgstr "เดี๋ยวนี้"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
 msgid "Clock"
@@ -90,11 +86,11 @@ msgstr "เที่ยงคืน"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
-msgstr "หกโมงเช้า"
+msgstr "6 นาฬิกา"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
-msgstr "เที่ยงวัน"
+msgstr "เที่ยง"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
@@ -112,8 +108,9 @@ msgstr "ปฏิทิน"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
 msgid "Yesterday"
-msgstr "เมื่อวาน"
+msgstr "เมื่อวานนี้"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "พรุ่งนี้"
+

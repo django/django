@@ -3,9 +3,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-10 21:10+1100\n"
-"PO-Revision-Date: 2008-11-07 20:53+0700\n"
+"Report-Msgid-Bugs-To: kowito@felspar.com\n"
+"POT-Creation-Date: 2008-09-02 22:36-0700\n"
+"PO-Revision-Date: 2008-11-26 18:40+0700\n"
 "Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
 "Language-Team: Kowit Charoenratchatabhan,Kadsarin Sanjek, Felspar <kowito@felspar.com>\n"
 "MIME-Version: 1.0\n"
@@ -156,8 +156,7 @@ msgid "Polish"
 msgstr "ภาษาโปแลนด์"
 
 #: conf/global_settings.py:79
-#, fuzzy
-msgid "Portuguese"
+msgid "Portugese"
 msgstr "ภาษาโปรตุเกส"
 
 #: conf/global_settings.py:80
@@ -221,40 +220,45 @@ msgstr ""
 "<h3>โดย %s:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:91
-#: contrib/admin/filterspecs.py:146 contrib/admin/filterspecs.py:172
+#: contrib/admin/filterspecs.py:74
+#: contrib/admin/filterspecs.py:92
+#: contrib/admin/filterspecs.py:147
+#: contrib/admin/filterspecs.py:173
 msgid "All"
 msgstr "ทั้งหมด"
 
-#: contrib/admin/filterspecs.py:112
+#: contrib/admin/filterspecs.py:113
 msgid "Any date"
 msgstr "วันไหนก็ได้"
 
-#: contrib/admin/filterspecs.py:113
+#: contrib/admin/filterspecs.py:114
 msgid "Today"
 msgstr "วันนี้"
 
-#: contrib/admin/filterspecs.py:116
+#: contrib/admin/filterspecs.py:117
 msgid "Past 7 days"
 msgstr "สัปดาห์ที่แล้ว"
 
-#: contrib/admin/filterspecs.py:118
+#: contrib/admin/filterspecs.py:119
 msgid "This month"
 msgstr "เดือนนี้"
 
-#: contrib/admin/filterspecs.py:120
+#: contrib/admin/filterspecs.py:121
 msgid "This year"
 msgstr "ปีนี้"
 
-#: contrib/admin/filterspecs.py:146 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:147
+#: forms/widgets.py:391
 msgid "Yes"
 msgstr "ใช่"
 
-#: contrib/admin/filterspecs.py:146 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:147
+#: forms/widgets.py:391
 msgid "No"
 msgstr "ไม่ใช่"
 
-#: contrib/admin/filterspecs.py:153 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:154
+#: forms/widgets.py:391
 msgid "Unknown"
 msgstr "ไม่รู้"
 
@@ -286,7 +290,8 @@ msgstr "log entry"
 msgid "log entries"
 msgstr "log entries"
 
-#: contrib/admin/options.py:60 contrib/admin/options.py:121
+#: contrib/admin/options.py:60
+#: contrib/admin/options.py:121
 msgid "None"
 msgstr "ไม่มี"
 
@@ -295,8 +300,9 @@ msgstr "ไม่มี"
 msgid "Changed %s."
 msgstr "%s เปลี่ยนแล้ว"
 
-#: contrib/admin/options.py:338 contrib/admin/options.py:348
-#: contrib/comments/templates/comments/preview.html:15 forms/models.py:288
+#: contrib/admin/options.py:338
+#: contrib/admin/options.py:348
+#: forms/models.py:275
 msgid "and"
 msgstr "และ"
 
@@ -319,17 +325,20 @@ msgstr "ลบ %(name)s \"%(object)s\" แล้ว"
 msgid "No fields changed."
 msgstr "ไม่มีฟิลด์ใดถูกเปลี่ยน"
 
-#: contrib/admin/options.py:417 contrib/auth/admin.py:51
+#: contrib/admin/options.py:417
+#: contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" ได้ถูกเพิ่มเรียบร้อยแล้ว"
 
-#: contrib/admin/options.py:421 contrib/admin/options.py:454
+#: contrib/admin/options.py:421
+#: contrib/admin/options.py:454
 #: contrib/auth/admin.py:59
 msgid "You may edit it again below."
 msgstr "สามารถแก้ไขเพิ่มเติมได้ด้านล่าง"
 
-#: contrib/admin/options.py:431 contrib/admin/options.py:464
+#: contrib/admin/options.py:431
+#: contrib/admin/options.py:464
 #, python-format
 msgid "You may add another %s below."
 msgstr "คุณอาจจะเพิ่ม %s ได้อีกด้านล่าง"
@@ -341,81 +350,77 @@ msgstr "%(name)s \"%(obj)s\" ได้ถูกเปลี่ยนแปลง
 
 #: contrib/admin/options.py:460
 #, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr " %(name)s \"%(obj)s\" ได้ถูกเพิ่มเรียบร้อยแล้ว, แก้ไขได้ด้านล่าง"
 
-#: contrib/admin/options.py:528
+#: contrib/admin/options.py:536
 #, python-format
 msgid "Add %s"
 msgstr "เพิ่ม%s"
 
-#: contrib/admin/options.py:559 contrib/admin/options.py:673
-#, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
-
-#: contrib/admin/options.py:606
+#: contrib/admin/options.py:614
 #, python-format
 msgid "Change %s"
 msgstr "เปลี่ยนแปลง %s"
 
-#: contrib/admin/options.py:638
+#: contrib/admin/options.py:646
 msgid "Database error"
 msgstr "เกิดความผิดพลาดที่ฐานข้อมูล"
 
-#: contrib/admin/options.py:688
+#: contrib/admin/options.py:696
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ได้ถูกลบเรียบร้อยแล้ว"
 
-#: contrib/admin/options.py:695
+#: contrib/admin/options.py:703
 msgid "Are you sure?"
 msgstr "แน่ใจหรือ"
 
-#: contrib/admin/options.py:724
+#: contrib/admin/options.py:732
 #, python-format
 msgid "Change history: %s"
 msgstr "เปลี่ยนแปลงประวัติ: %s"
 
-#: contrib/admin/sites.py:16 contrib/admin/views/decorators.py:14
+#: contrib/admin/sites.py:16
+#: contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:80
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
+msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
 msgstr "กรุณาใส่ชื่อผู้ใช้และรหัสผ่านให้ถูกต้อง มีการแยกแยะตัวพิมพ์ใหญ่-เล็ก"
 
-#: contrib/admin/sites.py:226 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:227
+#: contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "กรุณาลงชื่อเข้าใช้อีกครั้ง, เนื่องจากคุณไม่ได้ใช้งานนานเกินไป"
 
-#: contrib/admin/sites.py:233 contrib/admin/views/decorators.py:47
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
+#: contrib/admin/sites.py:234
+#: contrib/admin/views/decorators.py:47
+msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
 msgstr "ดูเหมือนบราวเซอร์ของคุณจะไม่เปิดระบบคุกกี้ กรุณาเปิดระบบคุกกี้และลองเรียกหน้านี้ใหม่อีกครั้ง"
 
-#: contrib/admin/sites.py:249 contrib/admin/sites.py:255
+#: contrib/admin/sites.py:250
+#: contrib/admin/sites.py:256
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "ชื่อผู้ใช้ไม่สามารถใช้ '@' สัญลักษณ์นี้ได้"
 
-#: contrib/admin/sites.py:252 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:253
+#: contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "อีเมลของคุณไม่ใช่ชื่อผู้ใช้ ลองใช้ '%s' "
+msgstr "อีเมลล์นี้ไม่สามารถใช้ชื่อผู้ใช้นี้ได้ ลองใช้ '%s' "
 
-#: contrib/admin/sites.py:312
+#: contrib/admin/sites.py:313
 msgid "Site administration"
 msgstr "การจัดการไซต์"
 
-#: contrib/admin/sites.py:325 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:326
+#: contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "เข้าสู่ระบบ"
 
-#: contrib/admin/sites.py:372
+#: contrib/admin/sites.py:373
 #, python-format
 msgid "%s administration"
 msgstr "%s การจัดการ"
@@ -446,11 +451,11 @@ msgstr "ปัจจุบัน :"
 msgid "Change:"
 msgstr "เปลี่ยนแปลง:"
 
-#: contrib/admin/widgets.py:123
+#: contrib/admin/widgets.py:121
 msgid "Lookup"
 msgstr "ดูที่"
 
-#: contrib/admin/widgets.py:230
+#: contrib/admin/widgets.py:228
 msgid "Add Another"
 msgstr "เพิ่มอีก"
 
@@ -465,7 +470,7 @@ msgstr "เสียใจด้วย ไม่พบหน้าที่ต�
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:31
+#: contrib/admin/templates/admin/base.html:30
 #: contrib/admin/templates/admin/change_form.html:17
 #: contrib/admin/templates/admin/change_list.html:8
 #: contrib/admin/templates/admin/delete_confirmation.html:6
@@ -496,12 +501,8 @@ msgid "Server Error <em>(500)</em>"
 msgstr "เซิร์ฟเวอร์ขัดข้อง <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"เกิดเหตุขัดข้องขี้น ทางเราได้รายงานไปยังผู้ดูแลระบบแล้ว และจะดำเนินการซ่อมแซมอย่างเร่งด่วน "
-"ขอบคุณ"
+msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
+msgstr "เกิดเหตุขัดข้องขี้น ทางเราได้รายงานไปยังหน่วยงานที่ดูแลแล้ว และจะดำเนินการซ่อมแซมอย่างเร่งด่วน ขอบคุณ"
 
 #: contrib/admin/templates/admin/app_index.html:10
 #: contrib/admin/templates/admin/index.html:19
@@ -509,18 +510,18 @@ msgstr ""
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:25
 msgid "Welcome,"
 msgstr "ยินดีต้อนรับ,"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:25
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "เอกสารประกอบ"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:25
 #: contrib/admin/templates/admin/auth/user/change_password.html:13
 #: contrib/admin/templates/admin/auth/user/change_password.html:46
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -528,7 +529,7 @@ msgstr "เอกสารประกอบ"
 msgid "Change password"
 msgstr "เปลี่ยนรหัสผ่าน"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:25
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
@@ -554,17 +555,14 @@ msgstr "ประวัติ"
 
 #: contrib/admin/templates/admin/change_form.html:28
 #: contrib/admin/templates/admin/edit_inline/stacked.html:13
-#: contrib/admin/templates/admin/edit_inline/tabular.html:27
+#: contrib/admin/templates/admin/edit_inline/tabular.html:25
 msgid "View on site"
 msgstr "ดูที่หน้าเว็บ"
 
 #: contrib/admin/templates/admin/change_form.html:38
 #: contrib/admin/templates/admin/auth/user/change_password.html:22
-#, fuzzy
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "โปรดแก้ไขข้อผิดพลาดด้านล่าง."
-msgstr[1] "โปรดแก้ไขข้อผิดพลาดด้านล่าง."
+msgstr "โปรดแก้ไขข้อผิดพลาดด้านล่าง"
 
 #: contrib/admin/templates/admin/change_list.html:16
 #, python-format
@@ -576,28 +574,20 @@ msgid "Filter"
 msgstr "ตัวกรอง"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:10
-#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:246
+#: contrib/admin/templates/admin/submit_line.html:4
+#: forms/formsets.py:246
 msgid "Delete"
 msgstr "ลบ"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:16
 #, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr ""
-"กำลังดำเนินการลบ %(object_name)s '%(escaped_object)s'และจะแสดงผลการลบ "
-"ชื่อผู้ใช้งานของคุณไม่สามารถทำการลบข้อมูลนี้ได้"
+msgid "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
+msgstr "กำลังดำเนินการลบ %(object_name)s '%(escaped_object)s'และจะแสดงผลการลบ ชื่อผู้ใช้งานของคุณไม่สามารถทำการลบข้อมูลนี้ได้"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:23
 #, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr ""
-"คุณแน่ใจหรือที่จะลบ %(object_name)s \"%(escaped_object)s\"? "
-"ข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย:"
+msgid "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? All of the following related items will be deleted:"
+msgstr "คุณแน่ใจหรือที่จะลบ %(object_name)s \"%(escaped_object)s\"?ข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:28
 msgid "Yes, I'm sure"
@@ -609,7 +599,7 @@ msgid " By %(filter_title)s "
 msgstr " โดย %(filter_title)s "
 
 #: contrib/admin/templates/admin/index.html:18
-#, fuzzy, python-format
+#, python-format
 msgid "Models available in the %(name)s application."
 msgstr "Models available in the %(name)s application."
 
@@ -634,21 +624,16 @@ msgid "None available"
 msgstr "ไม่ว่าง"
 
 #: contrib/admin/templates/admin/invalid_setup.html:7
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr ""
-"มีสิ่งผิดปกติเกิดขึ้นกับการติดตั้งฐานข้อมูล กรุณาตรวจสอบอีกครั้ง ฐานข้อมูลได้ถูกติดตั้งแล้ว "
-"กรุณาตอบสอบให้แน่ใจว่าสามารถใช้งานได้โดยผู้ใช้ที่จัดสรรให้"
+msgid "Something's wrong with your database installation. Make sure the appropriate database tables have been created, and make sure the database is readable by the appropriate user."
+msgstr "มีสิ่งผิดปกติเกิดขึ้นกับการติดตั้งฐานข้อมูล กรุณาตรวจสอบอีกครั้ง ฐานข้อมูลได้ถูกติดตั้งแล้ว กรุณาตอบสอบให้แน่ใจว่าสามารถใช้งานได้โดยผู้ใช้ที่จัดสรรให้"
 
 #: contrib/admin/templates/admin/login.html:19
 msgid "Username:"
-msgstr "ชื่อผู้ใช้ :"
+msgstr "ชื่อผู้ใช้"
 
 #: contrib/admin/templates/admin/login.html:22
 msgid "Password:"
-msgstr "รหัสผ่าน :"
+msgstr "รหัสผ่าน"
 
 #: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
@@ -659,7 +644,6 @@ msgid "User"
 msgstr "ผู้ใช้"
 
 #: contrib/admin/templates/admin/object_history.html:24
-#: contrib/comments/templates/comments/moderation_queue.html:33
 msgid "Action"
 msgstr "คำสั่ง"
 
@@ -669,10 +653,8 @@ msgid "DATETIME_FORMAT"
 msgstr "N j, Y, P"
 
 #: contrib/admin/templates/admin/object_history.html:38
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr "อ็อบเจ็กนี้ไม่มีประวัติการแก้ไข เป็นไปได้ว่าอาจจะไม่ได้ถูกเพิ่มเข้าไปในส่วนของผู้ดูแลระบบ"
+msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
+msgstr "อ็อบเจ็กนี้ไม่ได้แก้ไขประวัติ เป็นไปได้ว่าอาจจะไม่ได้ถูกเพิ่มเข้าไปในส่วนของผู้ดูแลระบบ"
 
 #: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
@@ -683,11 +665,9 @@ msgid "Go"
 msgstr "ไป"
 
 #: contrib/admin/templates/admin/search_form.html:10
-#, fuzzy, python-format
+#, python-format
 msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "1 ผลลัพท์"
-msgstr[1] ""
+msgstr "1 ผลลัพท์"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
@@ -708,22 +688,24 @@ msgstr "บันทึกและเพิ่ม"
 
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save and continue editing"
-msgstr "บันทึกและกลับไปแก้ไข"
+msgstr "บันทึกและเริ่มต้นการแก้ไข"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:6
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr "ใส่ชื่อผู้ใช้และรหัสผ่าน หลังจากนั้นคุณจะสามารถแก้ไขข้อมูลผู้ใช้ได้มากขึ้น"
+msgid "First, enter a username and password. Then, you'll be able to edit more user options."
+msgstr "ขั้นตอนแรก ใส่ชื่อผู้ใช้และรหัสผ่าน หลังจากนั้นคุณจะสามารถแก้ไขข้อมูลผู้ใช้ได้มากขึ้น"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:13
-#: contrib/auth/forms.py:14 contrib/auth/forms.py:47 contrib/auth/forms.py:59
+#: contrib/auth/forms.py:14
+#: contrib/auth/forms.py:47
+#: contrib/auth/forms.py:59
 msgid "Username"
 msgstr "ชื่อผู้ใช้"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:20
 #: contrib/admin/templates/admin/auth/user/change_password.html:33
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:60 contrib/auth/forms.py:184
+#: contrib/auth/forms.py:17
+#: contrib/auth/forms.py:60
+#: contrib/auth/forms.py:184
 msgid "Password"
 msgstr "รหัสผ่าน"
 
@@ -772,12 +754,8 @@ msgid "Your password was changed."
 msgstr "รหัสผ่านของคุณถูกเปลี่ยนไปแล้ว"
 
 #: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"กรุณาใส่รหัสผ่านเดิม ด้วยเหตุผลทางด้านการรักษาความปลอดภัย "
-"หลังจากนั้นให้ใส่รหัสผ่านตัวใหม่อีกสองครั้ง เพื่อตรวจสอบว่าคุณได้พิมพ์รหัสอย่างถูกต้อง"
+msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
+msgstr "กรุณาใส่รหัสผ่านเดิม ด้วยเหตุผลทางด้านการรักษาความปลอดภัย หลังจากนั้นให้ใส่รหัสผ่านตัวใหม่อีกสองครั้ง เพื่อตรวจสอบว่าคุณได้พิมพ์รหัสอย่างถูกต้อง"
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
@@ -825,9 +803,7 @@ msgid "Enter new password"
 msgstr "ใส่รหัสผ่านใหม่"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:14
-msgid ""
-"Please enter your new password twice so we can verify you typed it in "
-"correctly."
+msgid "Please enter your new password twice so we can verify you typed it in correctly."
 msgstr "กรุณาใส่รหัสผ่านใหม่สองครั้ง เพื่อตรวจสอบว่าคุณได้พิมพ์รหัสอย่างถูกต้อง"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:26
@@ -835,11 +811,8 @@ msgid "Password reset unsuccessful"
 msgstr "การตั้งค่ารหัสผ่านใหม่ ไม่สำเร็จ"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:28
-msgid ""
-"The password reset link was invalid, possibly because it has already been "
-"used.  Please request a new password reset."
-msgstr ""
-"การตั้งรหัสผ่านใหม่ไม่สำเร็จ เป็นเพราะว่าหน้านี้ได้ถูกใช้งานไปแล้ว กรุณาทำการตั้งรหัสผ่านใหม่อีกครั้ง"
+msgid "The password reset link was invalid, possibly because it has already been used.  Please request a new password reset."
+msgstr "การตั้งรหัสผ่านใหม่ไม่สำเร็จ เป็นเพราะว่าหน้านี้ได้ถูกใช้งานไปแล้ว กรุณาทำการตั้งรหัสผ่านใหม่อีกครั้ง"
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
@@ -847,9 +820,7 @@ msgid "Password reset successful"
 msgstr "การตั้งค่ารหัสผ่านใหม่เรียบร้อย"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed you instructions for setting your password to the e-mail "
-"address you submitted. You should be receiving it shortly."
+msgid "We've e-mailed you instructions for setting your password to the e-mail address you submitted. You should be receiving it shortly."
 msgstr "เราได้ส่งอีเมลการตั้งรหัสผ่านถึงคุณ ไปที่อีเมลที่คุณให้ไว้เรียบร้อยแล้ว และคุณจะได้รับเร็วๆ นี้"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
@@ -867,7 +838,7 @@ msgstr "กรุณาไปที่หน้านี้และเลือ
 
 #: contrib/admin/templates/registration/password_reset_email.html:9
 msgid "Your username, in case you've forgotten:"
-msgstr "ชื่อผู้ใช้งานของคุณ ในกรณีที่คุณถูกลืม:"
+msgstr "ชื่อผู้ใช้งานของคุณ ในกรณีที่คุณลืม:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Thanks for using our site!"
@@ -879,9 +850,7 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s ทีม"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
-"instructions for setting a new one."
+msgid "Forgotten your password? Enter your e-mail address below, and we'll e-mail instructions for setting a new one."
 msgstr "ลืมรหัสผ่าน? กรุณาใส่อีเมลด้านล่าง ทางเราจะทำการส่งวิธีการในการสร้างรหัสผ่านใหม่ไปให้"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
@@ -892,7 +861,7 @@ msgstr "อีเมลของคุณ"
 msgid "Reset my password"
 msgstr "ตั้งรหัสผ่านของฉันใหม่"
 
-#: contrib/admin/templatetags/admin_list.py:284
+#: contrib/admin/templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "ทุกวัน"
 
@@ -906,7 +875,8 @@ msgstr "เลือก %s"
 msgid "Select %s to change"
 msgstr "เลือก %s เพื่อเปลี่ยน"
 
-#: contrib/admin/views/template.py:36 contrib/sites/models.py:38
+#: contrib/admin/views/template.py:36
+#: contrib/sites/models.py:38
 msgid "site"
 msgstr "ไซต์"
 
@@ -914,17 +884,20 @@ msgstr "ไซต์"
 msgid "template"
 msgstr "เทมเพลต"
 
-#: contrib/admindocs/views.py:57 contrib/admindocs/views.py:59
+#: contrib/admindocs/views.py:57
+#: contrib/admindocs/views.py:59
 #: contrib/admindocs/views.py:61
 msgid "tag:"
 msgstr "ป้าย:"
 
-#: contrib/admindocs/views.py:90 contrib/admindocs/views.py:92
+#: contrib/admindocs/views.py:90
+#: contrib/admindocs/views.py:92
 #: contrib/admindocs/views.py:94
 msgid "filter:"
 msgstr "ตัวกรอง:"
 
-#: contrib/admindocs/views.py:154 contrib/admindocs/views.py:156
+#: contrib/admindocs/views.py:154
+#: contrib/admindocs/views.py:156
 #: contrib/admindocs/views.py:158
 msgid "view:"
 msgstr "ดู:"
@@ -944,8 +917,10 @@ msgstr "ไม่พบโมเดล %(model_name)r ในโปรแกร�
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "ความสัมพันธ์`%(app_label)s.%(data_type)s` อ็อบเจ็ก"
 
-#: contrib/admindocs/views.py:205 contrib/admindocs/views.py:227
-#: contrib/admindocs/views.py:241 contrib/admindocs/views.py:246
+#: contrib/admindocs/views.py:205
+#: contrib/admindocs/views.py:227
+#: contrib/admindocs/views.py:241
+#: contrib/admindocs/views.py:246
 msgid "model:"
 msgstr "โมเดล:"
 
@@ -969,9 +944,12 @@ msgstr "จำนวนของ %s"
 msgid "Fields on %s objects"
 msgstr "ฟิลด์บน %s อ็อบเจ็ก"
 
-#: contrib/admindocs/views.py:314 contrib/admindocs/views.py:325
-#: contrib/admindocs/views.py:327 contrib/admindocs/views.py:333
-#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:336
+#: contrib/admindocs/views.py:314
+#: contrib/admindocs/views.py:325
+#: contrib/admindocs/views.py:327
+#: contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:334
+#: contrib/admindocs/views.py:336
 msgid "Integer"
 msgstr "จำนวนเต็ม"
 
@@ -979,7 +957,8 @@ msgstr "จำนวนเต็ม"
 msgid "Boolean (Either True or False)"
 msgstr "ตรรกะแบบบูลหมายถึง ค่า\"จริง\" (True) หรือ \"ไม่จริง \" (False)"
 
-#: contrib/admindocs/views.py:316 contrib/admindocs/views.py:335
+#: contrib/admindocs/views.py:316
+#: contrib/admindocs/views.py:335
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "สตริง(ได้ถึง %(max_length)s)"
@@ -1004,7 +983,8 @@ msgstr "เลขฐานสิบ"
 msgid "E-mail address"
 msgstr "ที่อยู่อีเมล"
 
-#: contrib/admindocs/views.py:322 contrib/admindocs/views.py:323
+#: contrib/admindocs/views.py:322
+#: contrib/admindocs/views.py:323
 #: contrib/admindocs/views.py:326
 msgid "File path"
 msgstr "ไฟล์พาธ"
@@ -1013,17 +993,16 @@ msgstr "ไฟล์พาธ"
 msgid "Floating point number"
 msgstr "เลชทศนิยม"
 
-#: contrib/admindocs/views.py:328 contrib/comments/models.py:58
+#: contrib/admindocs/views.py:328
+#: contrib/comments/models.py:58
 msgid "IP address"
 msgstr "ไอพี แอดเดรส"
 
 #: contrib/admindocs/views.py:330
 msgid "Boolean (Either True, False or None)"
-msgstr ""
-"ตรรกะแบบบูลหมายถึง ค่า\"จริง\" (True) หรือ \"ไม่จริง \" (False) หรือ \"ไม่มี\" (None)"
+msgstr "ตรรกะแบบบูลหมายถึง ค่า\"จริง\" (True) หรือ \"ไม่จริง \" (False) หรือ \"ไม่มี\" (None)"
 
 #: contrib/admindocs/views.py:331
-#, fuzzy
 msgid "Relation to parent model"
 msgstr "Relation to parent model"
 
@@ -1039,9 +1018,10 @@ msgstr "ข้อความ"
 msgid "Time"
 msgstr "เวลา"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:21
-#: contrib/comments/templates/comments/moderation_queue.html:37
-#: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
+#: contrib/admindocs/views.py:339
+#: contrib/comments/forms.py:22
+#: contrib/flatpages/admin.py:8
+#: contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
 
@@ -1067,7 +1047,6 @@ msgid "Documentation bookmarklets"
 msgstr "Documentation bookmarklets"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
-#, fuzzy
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -1090,20 +1069,16 @@ msgid "Documentation for this page"
 msgstr "เอกสารสำหรับหน้านี้"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:19
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr ""
+msgid "Jumps you from any page to the documentation for the view that generates that page."
+msgstr "ย้ายจากทุกหน้าไปที่วิวที่สร้างหน้านั้นขึ้นมา"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
 msgstr "แสดงอ็อบเจ็กไอดี"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:22
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
+msgid "Shows the content-type and unique ID for pages that represent a single object."
+msgstr "แสดง content-type และ unique ID เพื่อแสดงอ็อบเจ็กเดี่ยว."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
@@ -1111,7 +1086,7 @@ msgstr "แก้ไขออปเจ็กนี้ (หน้าต่าง�
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
+msgstr "ไปที่หน้าแอดมินเพื่อแสดงอ็อบเจ็กเดี่ยว."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
@@ -1150,16 +1125,14 @@ msgstr "เปลี่ยนรหัสผ่านสำเร็จแล้
 msgid "Change password: %s"
 msgstr "เปลี่ยนรหัสผ่าน: %s "
 
-#: contrib/auth/forms.py:15 contrib/auth/forms.py:48
-#: contrib/auth/models.py:127
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
-msgstr ""
-"ต้องการไม่เกิน 30 ตัวอักษร และเป็นตัวอักษรหรือตัวเลขเท่านั้น (ตัวอักษร ตัวเลข และ "
-"เครื่องหมายขีดล่าง)"
+#: contrib/auth/forms.py:15
+#: contrib/auth/forms.py:48
+#: contrib/auth/models.py:136
+msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
+msgstr "ต้องการไม่เกิน 30 ตัวอักษร และเป็นตัวอักษรหรือตัวเลขเท่านั้น (ตัวอักษร ตัวเลข และ เครื่องหมายขีดล่าง)"
 
-#: contrib/auth/forms.py:16 contrib/auth/forms.py:49
+#: contrib/auth/forms.py:16
+#: contrib/auth/forms.py:49
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "ต้องประกอบด้วยตัวอักษร ตัวเลข และเครื่องหมายขีดล่างเท่านั้น"
 
@@ -1171,7 +1144,8 @@ msgstr "ยืนยันรหัสผ่าน"
 msgid "A user with that username already exists."
 msgstr "ชื่อผู้ใช้นั้นได้ถูกใช้ไปแล้ว"
 
-#: contrib/auth/forms.py:36 contrib/auth/forms.py:154
+#: contrib/auth/forms.py:36
+#: contrib/auth/forms.py:154
 #: contrib/auth/forms.py:196
 msgid "The two password fields didn't match."
 msgstr "รหัสผ่านไม่ตรงกัน"
@@ -1181,9 +1155,7 @@ msgid "This account is inactive."
 msgstr "ชื่อผู้ใช้นี้ไม่สามารถใช้งานได้"
 
 #: contrib/auth/forms.py:87
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
+msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
 msgstr "เว็บเบราเซอร์ของคุณไม่สามารถใช้งานระบบคุกกี้ได้ จำเป็นต้องใช้ระบบคุกกี้ในการเข้าสู่ระบบ"
 
 #: contrib/auth/forms.py:100
@@ -1191,9 +1163,7 @@ msgid "E-mail"
 msgstr "อีเมล"
 
 #: contrib/auth/forms.py:109
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
+msgid "That e-mail address doesn't have an associated user account. Are you sure you've registered?"
 msgstr "อีเมลนั้นไม่สามารถเข้าสู่ระบบได้ คุณแน่ใจหรือว่าคุณได้ลงทะเบียนแล้ว"
 
 #: contrib/auth/forms.py:134
@@ -1217,114 +1187,106 @@ msgstr "รหัสผ่านเก่า"
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "ใส่รหัสผ่านเก่าผิด กรุณาใส่รหัสผ่านอีกครั้ง"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:86
+#: contrib/auth/models.py:72
+#: contrib/auth/models.py:95
 msgid "name"
 msgstr "ชื่อ"
 
-#: contrib/auth/models.py:65
+#: contrib/auth/models.py:74
 msgid "codename"
 msgstr "รหัสชื่อ"
 
-#: contrib/auth/models.py:68
+#: contrib/auth/models.py:77
 msgid "permission"
 msgstr "สิทธิ์"
 
-#: contrib/auth/models.py:69 contrib/auth/models.py:87
+#: contrib/auth/models.py:78
+#: contrib/auth/models.py:96
 msgid "permissions"
 msgstr "สิทธิ์"
 
-#: contrib/auth/models.py:90
+#: contrib/auth/models.py:99
 msgid "group"
 msgstr "กลุ่ม"
 
-#: contrib/auth/models.py:91 contrib/auth/models.py:137
+#: contrib/auth/models.py:100
+#: contrib/auth/models.py:146
 msgid "groups"
 msgstr "กลุ่ม"
 
-#: contrib/auth/models.py:127
+#: contrib/auth/models.py:136
 msgid "username"
 msgstr "ชื่อผู้ใช้"
 
-#: contrib/auth/models.py:128
+#: contrib/auth/models.py:137
 msgid "first name"
 msgstr "ชื่อ"
 
-#: contrib/auth/models.py:129
+#: contrib/auth/models.py:138
 msgid "last name"
 msgstr "นามสกุล"
 
-#: contrib/auth/models.py:130
+#: contrib/auth/models.py:139
 msgid "e-mail address"
 msgstr "ที่อยู่อีเมล"
 
-#: contrib/auth/models.py:131
+#: contrib/auth/models.py:140
 msgid "password"
 msgstr "รหัสผ่าน"
 
-#: contrib/auth/models.py:131
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"ใช้ '[algo]$[salt]$[hexdigest]'หรือใช้ <a href=\"password/\">แบบฟอร์มเปลี่ยนรหัสผ่าน "
-"</a>."
+#: contrib/auth/models.py:140
+msgid "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
+msgstr "ใช้ '[algo]$[salt]$[hexdigest]' หรือใช้ <a href=\"password/\">แบบฟอร์มเปลี่ยนรหัสผ่าน </a>."
 
-#: contrib/auth/models.py:132
+#: contrib/auth/models.py:141
 msgid "staff status"
 msgstr "สถานะ"
 
-#: contrib/auth/models.py:132
+#: contrib/auth/models.py:141
 msgid "Designates whether the user can log into this admin site."
 msgstr "กำหนดผู้ที่จะเข้ามาใช้งานในส่วนของผู้ดูแลระบบ"
 
-#: contrib/auth/models.py:133
+#: contrib/auth/models.py:142
 msgid "active"
 msgstr "ใช้งานได้"
 
-#: contrib/auth/models.py:133
-msgid ""
-"Designates whether this user should be treated as active. Unselect this "
-"instead of deleting accounts."
-msgstr ""
-"ผู้ที่ถูกเลือกนั้นต้องมีสถานะที่สามารถเข้ามาใช้งานได้ตลอดเวลา เลือกออกแทนที่จะลบชื่อผู้ใช้ทิ้งไป "
+#: contrib/auth/models.py:142
+msgid "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
+msgstr "ผู้ที่ถูกเลือกนั้นต้องมีสถานะที่สามารถเข้ามาใช้งานได้ตลอดเวลา เลือกออกแทนที่จะลบชื่อผู้ใช้ทิ้งไป "
 
-#: contrib/auth/models.py:134
+#: contrib/auth/models.py:143
 msgid "superuser status"
 msgstr "สถานะผู้ใช้พิเศษ"
 
-#: contrib/auth/models.py:134
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
+#: contrib/auth/models.py:143
+msgid "Designates that this user has all permissions without explicitly assigning them."
 msgstr "ชื่อผู้ใช้งานที่ถูกเลือกนั้นได้รับอนุญาตในทุกกรณีโดยไม่ต้องการมอบหมายอย่างเป็นทางการ"
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:144
 msgid "last login"
 msgstr "เข้าสู่ระบบครั้งสุดท้าย"
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:145
 msgid "date joined"
 msgstr "วันที่เข้าร่วม"
 
-#: contrib/auth/models.py:138
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr "ดังนั้นการอนุญาตที่ได้รับมอบหมาย ผู้ใช้งานนี้ยังได้รับสิทธิให้ใช้อำนาจได้กับกลุ่มของตนเองอีกด้วย"
+#: contrib/auth/models.py:147
+msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
+msgstr "ดังนั้นการอนุญาตที่ได้รับมอบหมาย ผู้ใช้งานนี้ยังได้รับสิทธิ์ให้ใช้อำนาจได้กับกลุ่มของตนเองอีกด้วย"
 
-#: contrib/auth/models.py:139
+#: contrib/auth/models.py:148
 msgid "user permissions"
 msgstr "สิทธิ์ผู้ใช้งาน"
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:152
 msgid "user"
 msgstr "ผู้ใช้งาน"
 
-#: contrib/auth/models.py:144
+#: contrib/auth/models.py:153
 msgid "users"
 msgstr "ผู้ใช้งาน"
 
-#: contrib/auth/models.py:300
+#: contrib/auth/models.py:308
 msgid "message"
 msgstr "ข้อความ"
 
@@ -1332,7 +1294,8 @@ msgstr "ข้อความ"
 msgid "Logged out"
 msgstr "ออกจากระบบ"
 
-#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:428
+#: contrib/auth/management/commands/createsuperuser.py:23
+#: forms/fields.py:428
 msgid "Enter a valid e-mail address."
 msgstr "กรุณาใส่อีเมลที่ถูกต้อง"
 
@@ -1344,31 +1307,26 @@ msgstr "เนื้อหา"
 msgid "Metadata"
 msgstr "Metadata"
 
-#: contrib/comments/forms.py:19
-#: contrib/comments/templates/comments/moderation_queue.html:34
+#: contrib/comments/forms.py:20
 msgid "Name"
 msgstr "ชื่อ"
 
-#: contrib/comments/forms.py:20
+#: contrib/comments/forms.py:21
 msgid "Email address"
 msgstr "ที่อยู่อีเมล"
 
-#: contrib/comments/forms.py:22
-#: contrib/comments/templates/comments/moderation_queue.html:35
+#: contrib/comments/forms.py:23
 msgid "Comment"
 msgstr "ข้อคิดเห็น"
 
-#: contrib/comments/forms.py:25
-msgid ""
-"If you enter anything in this field your comment will be treated as spam"
+#: contrib/comments/forms.py:26
+msgid "If you enter anything in this field your comment will be treated as spam"
 msgstr "ถ้าคุณใส่ข้อมูลใดๆ ก็ตามในส่วนนี้ มันจะกลายเป็นสแปม"
 
-#: contrib/comments/forms.py:125
-#, fuzzy, python-format
+#: contrib/comments/forms.py:126
+#, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "ระวัง! คำว่า %s ไม่อณุญาตให้ใช้ได้."
-msgstr[1] "ระวัง! คำว่า %s ไม่อณุญาตให้ใช้ได้."
+msgstr "ระวังนะ! คำว่า %s ไม่ได้รับอนุญาตให้ใช้ที่นี่"
 
 #: contrib/comments/models.py:23
 msgid "object ID"
@@ -1399,8 +1357,7 @@ msgid "is public"
 msgstr "สาธารณะ"
 
 #: contrib/comments/models.py:60
-msgid ""
-"Uncheck this box to make the comment effectively disappear from the site."
+msgid "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "เลือกออกเพื่อที่จะทำให้ข้อคิดเห็นนั้นหายไปจากเว็บไซต์"
 
 #: contrib/comments/models.py:62
@@ -1408,22 +1365,15 @@ msgid "is removed"
 msgstr "ถอดออกแล้ว"
 
 #: contrib/comments/models.py:63
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr ""
-"เลือกเมื่อเห็นว่าข้อคิดเห็นไหนไม่เหมาะสม เมื่อข้อคิดเห็นนี้ได้ถูกลบแล้ว ข้อมูลอื่นจะถูกแสดงขึ้นแทน"
+msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
+msgstr "เลือกเมื่อเห็นว่าข้อคิดเห็นไหนไม่เหมาะสม เมื่อข้อคิดเห็นนี้ได้ถูกลบแล้ว ข้อมูลอื่นจะถูกแสดงขึ้นแทน"
 
 #: contrib/comments/models.py:115
-msgid ""
-"This comment was posted by an authenticated user and thus the name is read-"
-"only."
+msgid "This comment was posted by an authenticated user and thus the name is read-only."
 msgstr "ข้อคิดเห็นนี้ได้ถูกเขียนไว้โดยผู้ใช้งานที่สามารถเชื่อถือได้ จะถูกอ่านได้เพียงอย่างเดียว"
 
 #: contrib/comments/models.py:124
-msgid ""
-"This comment was posted by an authenticated user and thus the email is read-"
-"only."
+msgid "This comment was posted by an authenticated user and thus the email is read-only."
 msgstr "ข้อคิดเห็นนี้ถูกเขียนไว้โดยผู้ใช้งานที่สามารถเชื่อถือได้ ดังนั้นอีเมลนั้นจะถูกอ่านเท่านั้น"
 
 #: contrib/comments/models.py:149
@@ -1435,149 +1385,11 @@ msgid ""
 "\n"
 "http://%(domain)s%(url)s"
 msgstr ""
-
-#: contrib/comments/templates/comments/approve.html:4
-#, fuzzy
-msgid "Approve a comment"
-msgstr "ใช้งานข้อติชม"
-
-#: contrib/comments/templates/comments/approve.html:7
-msgid "Really make this comment public?"
-msgstr ""
-
-#: contrib/comments/templates/comments/approve.html:12
-#: contrib/comments/templates/comments/moderation_queue.html:49
-msgid "Approve"
-msgstr ""
-
-#: contrib/comments/templates/comments/approved.html:4
-#, fuzzy
-msgid "Thanks for approving"
-msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
-
-#: contrib/comments/templates/comments/approved.html:7
-#: contrib/comments/templates/comments/deleted.html:7
-#: contrib/comments/templates/comments/flagged.html:7
-msgid ""
-"Thanks for taking the time to improve the quality of discussion on our site"
-msgstr ""
-
-#: contrib/comments/templates/comments/delete.html:4
-#, fuzzy
-msgid "Remove a comment"
-msgstr "ใช้งานข้อติชม"
-
-#: contrib/comments/templates/comments/delete.html:7
-msgid "Really remove this comment?"
-msgstr ""
-
-#: contrib/comments/templates/comments/delete.html:12
-#: contrib/comments/templates/comments/moderation_queue.html:53
-#, fuzzy
-msgid "Remove"
-msgstr "ถอดออกแล้ว"
-
-#: contrib/comments/templates/comments/deleted.html:4
-#, fuzzy
-msgid "Thanks for removing"
-msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
-
-#: contrib/comments/templates/comments/flag.html:4
-msgid "Flag this comment"
-msgstr ""
-
-#: contrib/comments/templates/comments/flag.html:7
-msgid "Really flag this comment?"
-msgstr ""
-
-#: contrib/comments/templates/comments/flag.html:12
-#, fuzzy
-msgid "Flag"
-msgstr "มายอกา"
-
-#: contrib/comments/templates/comments/flagged.html:4
-#, fuzzy
-msgid "Thanks for flagging"
-msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
-
-#: contrib/comments/templates/comments/form.html:16
-#: contrib/comments/templates/comments/preview.html:31
-#, fuzzy
-msgid "Post"
-msgstr "st"
-
-#: contrib/comments/templates/comments/form.html:17
-#: contrib/comments/templates/comments/preview.html:32
-#, fuzzy
-msgid "Preview"
-msgstr "ดู:"
-
-#: contrib/comments/templates/comments/moderation_queue.html:4
-#: contrib/comments/templates/comments/moderation_queue.html:19
-msgid "Comment moderation queue"
-msgstr ""
-
-#: contrib/comments/templates/comments/moderation_queue.html:26
-msgid "No comments to moderate"
-msgstr ""
-
-#: contrib/comments/templates/comments/moderation_queue.html:36
-#, fuzzy
-msgid "Email"
-msgstr "อีเมล"
-
-#: contrib/comments/templates/comments/moderation_queue.html:38
-msgid "Authenticated?"
-msgstr ""
-
-#: contrib/comments/templates/comments/moderation_queue.html:39
-#, fuzzy
-msgid "IP Address"
-msgstr "ไอพี แอดเดรส"
-
-#: contrib/comments/templates/comments/moderation_queue.html:40
-#, fuzzy
-msgid "Date posted"
-msgstr "วันที่เข้าร่วม"
-
-#: contrib/comments/templates/comments/moderation_queue.html:63
-#, fuzzy
-msgid "yes"
-msgstr "ใช่"
-
-#: contrib/comments/templates/comments/moderation_queue.html:63
-#, fuzzy
-msgid "no"
-msgstr "พ.ย."
-
-#: contrib/comments/templates/comments/posted.html:4
-msgid "Thanks for commenting"
-msgstr ""
-
-#: contrib/comments/templates/comments/posted.html:7
-msgid "Thank you for your comment"
-msgstr ""
-
-#: contrib/comments/templates/comments/preview.html:4
-#: contrib/comments/templates/comments/preview.html:12
-msgid "Preview your comment"
-msgstr ""
-
-#: contrib/comments/templates/comments/preview.html:10
-#, fuzzy
-msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "โปรดแก้ไขข้อผิดพลาดด้านล่าง."
-msgstr[1] "โปรดแก้ไขข้อผิดพลาดด้านล่าง."
-
-#: contrib/comments/templates/comments/preview.html:15
-msgid "Post your comment"
-msgstr ""
-
-#: contrib/comments/templates/comments/preview.html:15
-#, fuzzy
-msgid "or make changes"
-msgstr "ไม่มีฟิลด์ใดถูกเปลี่ยน"
+"โพสต์โดย %(user)s ที่ %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
 
 #: contrib/contenttypes/models.py:67
 msgid "python model class name"
@@ -1592,14 +1404,11 @@ msgid "content types"
 msgstr "content types"
 
 #: contrib/flatpages/admin.py:9
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "ตัวอย่าง: '/about/contact/'. ต้องแน่ใจว่าขึ้นต้นและลงท้ายด้วยเครื่องหมาย /"
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "ตัวอย่าง: '/about/contact/'. ต้องแน่ใจว่าขึ้นต้นและลงท้ายด้วยเครื่องหมายขีดทับ (/)"
 
 #: contrib/flatpages/admin.py:11
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
+msgid "This value must contain only letters, numbers, underscores, dashes or slashes."
 msgstr "ค่าที่ว่านี้จะต้องประกอบด้วยตัวหน้งสือ ตัวเลข เครื่องหมายขีดล่าง หรือขีดทับ(/)"
 
 #: contrib/flatpages/admin.py:22
@@ -1623,12 +1432,8 @@ msgid "template name"
 msgstr "ชื่อเทมเพลต"
 
 #: contrib/flatpages/models.py:12
-msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
-msgstr ""
-"ตัวอย่าง: 'flatpages/contact_page.html'ถ้าไม่ได้ถูกนำเสนอ ระบบจะใช้ 'flatpages/"
-"default.html' "
+msgid "Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use 'flatpages/default.html'."
+msgstr "ตัวอย่าง: 'flatpages/contact_page.html'ถ้าไม่ได้ถูกนำเสนอ ระบบจะใช้ 'flatpages/default.html' "
 
 #: contrib/flatpages/models.py:13
 msgid "registration required"
@@ -1639,18 +1444,15 @@ msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "ถ้าถูกเลือก ผู้ใช้งานที่ลงทะเบียนเข้าสู่ระบบเท่านั้นที่จะสามารถดูหน้านี้"
 
 #: contrib/flatpages/models.py:18
-#, fuzzy
 msgid "flat page"
-msgstr "ไม่พบหน้านี้"
+msgstr "flat page"
 
 #: contrib/flatpages/models.py:19
 msgid "flat pages"
-msgstr "flat pages"
+msgstr ""
 
 #: contrib/formtools/wizard.py:130
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
+msgid "We apologize, but your form has expired. Please continue filling out the form from this page."
 msgstr "ขออภัย แบบฟอร์มไม่สามารถใช้งานได้ กรุณาใส่ข้อมูลในหน้านี้ใหม่"
 
 #: contrib/gis/forms/fields.py:14
@@ -1682,25 +1484,19 @@ msgid "rd"
 msgstr "rd"
 
 #: contrib/humanize/templatetags/humanize.py:51
-#, fuzzy, python-format
+#, python-format
 msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f หนึ่งล้าน"
-msgstr[1] ""
+msgstr "%(value).1f ล้าน"
 
 #: contrib/humanize/templatetags/humanize.py:54
-#, fuzzy, python-format
+#, python-format
 msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f สิบล้าน"
-msgstr[1] ""
+msgstr "%(value).1f สิบล้าน"
 
 #: contrib/humanize/templatetags/humanize.py:57
-#, fuzzy, python-format
+#, python-format
 msgid "%(value).1f trillion"
-msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f ร้อยล้าน"
-msgstr[1] ""
+msgstr "%(value).1f ร้อยล้าน"
 
 #: contrib/humanize/templatetags/humanize.py:73
 msgid "one"
@@ -1754,8 +1550,10 @@ msgstr "เมื่อวานนี้"
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
 msgstr "กรุณาใส่รหัสไปรษณีย์ ในรูปแบบของ NNNN หรือ ANNNNAAA  "
 
-#: contrib/localflavor/ar/forms.py:49 contrib/localflavor/br/forms.py:96
-#: contrib/localflavor/br/forms.py:135 contrib/localflavor/pe/forms.py:23
+#: contrib/localflavor/ar/forms.py:49
+#: contrib/localflavor/br/forms.py:96
+#: contrib/localflavor/br/forms.py:135
+#: contrib/localflavor/pe/forms.py:23
 #: contrib/localflavor/pe/forms.py:51
 msgid "This field requires only numbers."
 msgstr "ฟิลด์นี้ต้องการเฉพาะตัวเลขเท่านั้น"
@@ -1808,14 +1606,15 @@ msgstr "โวราร์ลเบิร์ก"
 msgid "Vienna"
 msgstr "เวียนนา"
 
-#: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:16
+#: contrib/localflavor/at/forms.py:20
+#: contrib/localflavor/ch/forms.py:16
 #: contrib/localflavor/no/forms.py:12
 msgid "Enter a zip code in the format XXXX."
 msgstr "ใส่รหัสไปรษณีย์ในรูปแบบของ XXXX"
 
 #: contrib/localflavor/at/forms.py:48
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr "ใส่หมายเลขบัตรประกันสังคมชาวออสเตรีย ในรูปแบบ XXXX XXXXXX "
+msgstr "ใส่หมายเลขบัตรประกันสังคมออสเตรีย ในรูปแบบ XXXX XXXXXX "
 
 #: contrib/localflavor/au/forms.py:16
 msgid "Enter a 4 digit post code."
@@ -1830,9 +1629,7 @@ msgid "Phone numbers must be in XX-XXXX-XXXX format."
 msgstr "ใส่หมายเลขโทรศัพท์ในรูปแบบ XX-XXXX-XXXX "
 
 #: contrib/localflavor/br/forms.py:58
-msgid ""
-"Select a valid brazilian state. That state is not one of the available "
-"states."
+msgid "Select a valid brazilian state. That state is not one of the available states."
 msgstr "เลือกชื่อเมืองของบราซิล"
 
 #: contrib/localflavor/br/forms.py:94
@@ -1841,7 +1638,7 @@ msgstr "ตัวเลข CPF ไม่สมบูรณ์"
 
 #: contrib/localflavor/br/forms.py:95
 msgid "This field requires at most 11 digits or 14 characters."
-msgstr "ฟิลด์นี้ต้องการตัวเลขมากที่สุด 11 หรือ 14 ตัว"
+msgstr "ในส่วนนี้ต้องการตัวเลขมากที่สุด 11 หรือ 14 ตัว"
 
 #: contrib/localflavor/br/forms.py:134
 msgid "Invalid CNPJ number."
@@ -1849,7 +1646,7 @@ msgstr "ตัวเลข CNPJ ไม่สมบูรณ์"
 
 #: contrib/localflavor/br/forms.py:136
 msgid "This field requires at least 14 digits"
-msgstr "ฟิลด์นี้ต้องการตัวเลขอย่างน้อย 14 ตัวเลข"
+msgstr "ส่วนนี้ต้องการตัวเลขอย่างน้อย 14 ตัวเลข"
 
 #: contrib/localflavor/ca/forms.py:17
 msgid "Enter a postal code in the format XXX XXX."
@@ -1857,7 +1654,7 @@ msgstr "ใส่รหัสไปรษณีย์ในรูปแบบ XX
 
 #: contrib/localflavor/ca/forms.py:88
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr "ใส่หมายเลขของบัตรประกันสังคมชาวแคนาดา ในรูปแบบ XXX-XXX-XXX "
+msgstr "ใส่หมายเลขของบัตรประกันสังคมแคนาดา ในรูปแบบ XXX-XXX-XXX "
 
 #: contrib/localflavor/ch/ch_states.py:5
 msgid "Aargau"
@@ -1877,7 +1674,7 @@ msgstr "บาเซิล-ชตัดท์"
 
 #: contrib/localflavor/ch/ch_states.py:9
 msgid "Basel-Land"
-msgstr "บาเซิล-แลนด์"
+msgstr "บาเซิล-ชตัดท์"
 
 #: contrib/localflavor/ch/ch_states.py:10
 msgid "Berne"
@@ -1897,7 +1694,7 @@ msgstr "กลารัส"
 
 #: contrib/localflavor/ch/ch_states.py:14
 msgid "Graubuenden"
-msgstr ""
+msgstr "เกาบึนเดน"
 
 #: contrib/localflavor/ch/ch_states.py:15
 msgid "Jura"
@@ -1964,11 +1761,8 @@ msgid "Zurich"
 msgstr "ซูริค"
 
 #: contrib/localflavor/ch/forms.py:64
-msgid ""
-"Enter a valid Swiss identity or passport card number in X1234567<0 or "
-"1234567890 format."
-msgstr ""
-"ใส่หมายเลขบัตรประชาชนสวิสต์หรือหมายเลขพาสปอร์ต ในรูปแบบ X1234567<0 หรือ 1234567890"
+msgid "Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format."
+msgstr "ใส่หมายเลขบัตรประชาชนสวิสต์หรือหมายเลขพาสปอร์ต ในรูปแบบ X1234567<0 หรือ 1234567890"
 
 #: contrib/localflavor/cl/forms.py:29
 msgid "Enter a valid Chilean RUT."
@@ -1976,7 +1770,7 @@ msgstr "ใส่ RUT ของชิลีที่ถูกต้อง"
 
 #: contrib/localflavor/cl/forms.py:30
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "ใส่หมายเลข RUT ของขาวชิลี. ในรูปแบบ XX.XXX.XXX-X."
+msgstr "ใส่หมายเลข RUT ของชิลีที่ถูกต้องในรูปแบบ XX.XXX.XXX-X."
 
 #: contrib/localflavor/cl/forms.py:31
 msgid "The Chilean RUT is not valid."
@@ -2046,15 +1840,14 @@ msgstr "ชเลสวิก-โฮลชไตน์"
 msgid "Thuringia"
 msgstr "เธอร์ริงเกีย"
 
-#: contrib/localflavor/de/forms.py:14 contrib/localflavor/fi/forms.py:12
+#: contrib/localflavor/de/forms.py:14
+#: contrib/localflavor/fi/forms.py:12
 #: contrib/localflavor/fr/forms.py:15
 msgid "Enter a zip code in the format XXXXX."
 msgstr "ใส่รหัสไปรษณ๊ย์ ในรูปแบบ XXXXX"
 
 #: contrib/localflavor/de/forms.py:41
-msgid ""
-"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"format."
+msgid "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format."
 msgstr "ใส่หมายเลขบัตรประชาชนเยอรมันในรูปแบบ XXXXXXXXXXX-XXXXXXX-XXXXXXX-X"
 
 #: contrib/localflavor/es/es_provinces.py:5
@@ -2079,11 +1872,11 @@ msgstr "อบียา"
 
 #: contrib/localflavor/es/es_provinces.py:10
 msgid "Badajoz"
-msgstr "บาดาโฮซ "
+msgstr "บาดาจอซ"
 
 #: contrib/localflavor/es/es_provinces.py:11
 msgid "Illes Balears"
-msgstr ""
+msgstr "หมู่เกาะแบลีแอริก"
 
 #: contrib/localflavor/es/es_provinces.py:12
 msgid "Barcelona"
@@ -2095,7 +1888,7 @@ msgstr "เบอร์โกซ"
 
 #: contrib/localflavor/es/es_provinces.py:14
 msgid "Caceres"
-msgstr ""
+msgstr "กาเซเรส"
 
 #: contrib/localflavor/es/es_provinces.py:15
 msgid "Cadiz"
@@ -2103,7 +1896,7 @@ msgstr "คาดิซ"
 
 #: contrib/localflavor/es/es_provinces.py:16
 msgid "Castello"
-msgstr "กัสเตโย"
+msgstr "คาสเทลโล"
 
 #: contrib/localflavor/es/es_provinces.py:17
 msgid "Ciudad Real"
@@ -2119,7 +1912,7 @@ msgstr "ลา คอรุนญ่า"
 
 #: contrib/localflavor/es/es_provinces.py:20
 msgid "Cuenca"
-msgstr ""
+msgstr "เกวงกา"
 
 #: contrib/localflavor/es/es_provinces.py:21
 msgid "Girona"
@@ -2135,7 +1928,7 @@ msgstr "กวาดาลาฮารา"
 
 #: contrib/localflavor/es/es_provinces.py:24
 msgid "Guipuzkoa"
-msgstr ""
+msgstr "กีปุซโกอา"
 
 #: contrib/localflavor/es/es_provinces.py:25
 msgid "Huelva"
@@ -2147,7 +1940,7 @@ msgstr "อวยสกา"
 
 #: contrib/localflavor/es/es_provinces.py:27
 msgid "Jaen"
-msgstr ""
+msgstr "คาเอน "
 
 #: contrib/localflavor/es/es_provinces.py:28
 msgid "Leon"
@@ -2155,7 +1948,7 @@ msgstr "ลีออน"
 
 #: contrib/localflavor/es/es_provinces.py:29
 msgid "Lleida"
-msgstr ""
+msgstr "เยย์ดา"
 
 #: contrib/localflavor/es/es_provinces.py:30
 #: contrib/localflavor/es/es_regions.py:17
@@ -2173,7 +1966,7 @@ msgstr "มาดริด"
 
 #: contrib/localflavor/es/es_provinces.py:33
 msgid "Malaga"
-msgstr "มายอกา"
+msgstr "มะยอกา"
 
 #: contrib/localflavor/es/es_provinces.py:34
 msgid "Murcia"
@@ -2181,7 +1974,7 @@ msgstr "มูร์เซีย"
 
 #: contrib/localflavor/es/es_provinces.py:35
 msgid "Navarre"
-msgstr "นาวาร์เร"
+msgstr "นาบาร์รา"
 
 #: contrib/localflavor/es/es_provinces.py:36
 msgid "Ourense"
@@ -2201,7 +1994,7 @@ msgstr "ลาส พัลมาส"
 
 #: contrib/localflavor/es/es_provinces.py:40
 msgid "Pontevedra"
-msgstr ""
+msgstr "ปอนเตเบดรา"
 
 #: contrib/localflavor/es/es_provinces.py:41
 msgid "Salamanca"
@@ -2209,12 +2002,12 @@ msgstr "ซาลามังกา"
 
 #: contrib/localflavor/es/es_provinces.py:42
 msgid "Santa Cruz de Tenerife"
-msgstr "ซานตากรุซ เด เตเนรีเฟ"
+msgstr "ซานตาครูซ ดา เตริเนเฟ"
 
 #: contrib/localflavor/es/es_provinces.py:43
 #: contrib/localflavor/es/es_regions.py:11
 msgid "Cantabria"
-msgstr ""
+msgstr "ปอนเตเบดรา"
 
 #: contrib/localflavor/es/es_provinces.py:44
 msgid "Segovia"
@@ -2234,7 +2027,7 @@ msgstr "ตาร์ราโกนา"
 
 #: contrib/localflavor/es/es_provinces.py:48
 msgid "Teruel"
-msgstr ""
+msgstr "เตรวยล์"
 
 #: contrib/localflavor/es/es_provinces.py:49
 msgid "Toledo"
@@ -2250,7 +2043,7 @@ msgstr "บายาโดลิด"
 
 #: contrib/localflavor/es/es_provinces.py:52
 msgid "Bizkaia"
-msgstr ""
+msgstr "บิสกาเอีย"
 
 #: contrib/localflavor/es/es_provinces.py:53
 msgid "Zamora"
@@ -2294,7 +2087,7 @@ msgstr "หมู่เกาะคะเนรี"
 
 #: contrib/localflavor/es/es_regions.py:12
 msgid "Castile-La Mancha"
-msgstr "คาสตีล-ลามันชา"
+msgstr "กัสตียา-ลามันชา"
 
 #: contrib/localflavor/es/es_regions.py:13
 msgid "Castile and Leon"
@@ -2318,7 +2111,7 @@ msgstr "แคว้น มูเซียร์"
 
 #: contrib/localflavor/es/es_regions.py:20
 msgid "Foral Community of Navarre"
-msgstr ""
+msgstr "แคว้นกฎบัตรนาวาร์ "
 
 #: contrib/localflavor/es/es_regions.py:21
 msgid "Valencian Community"
@@ -2329,9 +2122,7 @@ msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
 msgstr "ใส่รหัสไปรษณีย์ในรูปของ 01XXX - 52XXX "
 
 #: contrib/localflavor/es/forms.py:39
-msgid ""
-"Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
-"9XXXXXXXX."
+msgid "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or 9XXXXXXXX."
 msgstr "ใส่เบอร์โทรศัพท์ในรูปของ 6XXXXXXXX, 8XXXXXXXX หรือ 9XXXXXXXX "
 
 #: contrib/localflavor/es/forms.py:66
@@ -2355,8 +2146,7 @@ msgid "Invalid checksum for CIF."
 msgstr "ผลรวมตรวจสอบ สำหรับ CIF ผิดพลาด"
 
 #: contrib/localflavor/es/forms.py:142
-msgid ""
-"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
+msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr "กรุณาใส่หมายเลขบัญชีในรูปแบบ XXXX-XXXX-XX-XXXXXXXXXX"
 
 #: contrib/localflavor/es/forms.py:143
@@ -2372,8 +2162,7 @@ msgid "Enter a zip code in the format XXXXXXX."
 msgstr "กรุณาใส่รหัสไปรษณีย์ในรูปของ XXXXXXX"
 
 #: contrib/localflavor/is_/forms.py:17
-msgid ""
-"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+msgid "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
 msgstr "ใส่หมายเลขประจำตัวประชาชนของไอซ์แลนด์ในรูปของ XXXXXX-XXXX"
 
 #: contrib/localflavor/is_/forms.py:18
@@ -2590,7 +2379,7 @@ msgstr "อากวัสกาเลียนเตส"
 
 #: contrib/localflavor/mx/mx_states.py:13
 msgid "Baja California"
-msgstr "บาจา แคลิฟอร์เนีย"
+msgstr "บาฮา กาลิฟอร์เนีย"
 
 #: contrib/localflavor/mx/mx_states.py:14
 msgid "Baja California Sur"
@@ -2602,7 +2391,7 @@ msgstr "กัมเปเช"
 
 #: contrib/localflavor/mx/mx_states.py:16
 msgid "Chihuahua"
-msgstr ""
+msgstr "ชีวาวา"
 
 #: contrib/localflavor/mx/mx_states.py:17
 msgid "Chiapas"
@@ -2610,7 +2399,7 @@ msgstr "เชียปัส"
 
 #: contrib/localflavor/mx/mx_states.py:18
 msgid "Coahuila"
-msgstr ""
+msgstr "โกอาวีลา"
 
 #: contrib/localflavor/mx/mx_states.py:19
 msgid "Colima"
@@ -2618,7 +2407,7 @@ msgstr "โคลิมา"
 
 #: contrib/localflavor/mx/mx_states.py:20
 msgid "Distrito Federal"
-msgstr "เขตสหพันธ์เม็กซิโก"
+msgstr "เมคีโก เด.เอเฟ. เฟเดอรัลดิสตริกต์"
 
 #: contrib/localflavor/mx/mx_states.py:21
 msgid "Durango"
@@ -2642,19 +2431,19 @@ msgstr "จาลิสโค"
 
 #: contrib/localflavor/mx/mx_states.py:26
 msgid "Estado de México"
-msgstr "สหรัฐเม็กซิโก"
+msgstr "เม็กซิโก"
 
 #: contrib/localflavor/mx/mx_states.py:27
 msgid "Michoacán"
-msgstr ""
+msgstr "มิโชอากัง"
 
 #: contrib/localflavor/mx/mx_states.py:28
 msgid "Morelos"
-msgstr ""
+msgstr "มอเรโลส"
 
 #: contrib/localflavor/mx/mx_states.py:29
 msgid "Nayarit"
-msgstr "นายาริต"
+msgstr "Nayarit"
 
 #: contrib/localflavor/mx/mx_states.py:30
 msgid "Nuevo León"
@@ -2706,7 +2495,7 @@ msgstr "เวรากรูซ"
 
 #: contrib/localflavor/mx/mx_states.py:42
 msgid "Yucatán"
-msgstr ""
+msgstr "ยูกาตัง"
 
 #: contrib/localflavor/mx/mx_states.py:43
 msgid "Zacatecas"
@@ -2722,19 +2511,19 @@ msgstr "ใส่หมายเลขโทรศัพท์"
 
 #: contrib/localflavor/nl/forms.py:78
 msgid "Enter a valid SoFi number"
-msgstr "กรอกหมายเลขภาษีมูลค่าเพิ่มที่ถูต้อง"
+msgstr "กรอกหมายเลข SoFi ที่ถูต้อง"
 
 #: contrib/localflavor/nl/nl_provinces.py:4
 msgid "Drenthe"
-msgstr ""
+msgstr "แดรนด์"
 
 #: contrib/localflavor/nl/nl_provinces.py:5
 msgid "Flevoland"
-msgstr ""
+msgstr "เฟลโวแลนด์"
 
 #: contrib/localflavor/nl/nl_provinces.py:6
 msgid "Friesland"
-msgstr "ฟรายส์แลนด์"
+msgstr "ฟรีส์แลนด์"
 
 #: contrib/localflavor/nl/nl_provinces.py:7
 msgid "Gelderland"
@@ -2742,7 +2531,7 @@ msgstr "เกลเดอร์แลนด์"
 
 #: contrib/localflavor/nl/nl_provinces.py:8
 msgid "Groningen"
-msgstr ""
+msgstr "เกรอนิงเกน"
 
 #: contrib/localflavor/nl/nl_provinces.py:9
 msgid "Limburg"
@@ -2750,15 +2539,15 @@ msgstr "ลิมเบอร์ก"
 
 #: contrib/localflavor/nl/nl_provinces.py:10
 msgid "Noord-Brabant"
-msgstr ""
+msgstr "นอร์ด บราเบนต์"
 
 #: contrib/localflavor/nl/nl_provinces.py:11
 msgid "Noord-Holland"
-msgstr ""
+msgstr "นอร์ด ฮอลแลนด์"
 
 #: contrib/localflavor/nl/nl_provinces.py:12
 msgid "Overijssel"
-msgstr ""
+msgstr "โอเวอรีเซล"
 
 #: contrib/localflavor/nl/nl_provinces.py:13
 msgid "Utrecht"
@@ -2770,7 +2559,7 @@ msgstr "ซีแลนด์"
 
 #: contrib/localflavor/nl/nl_provinces.py:15
 msgid "Zuid-Holland"
-msgstr ""
+msgstr "ซูด ฮอลแลนด์"
 
 #: contrib/localflavor/no/forms.py:33
 msgid "Enter a valid Norwegian social security number."
@@ -2786,28 +2575,27 @@ msgstr "ฟิลด์นี้ต้องการตัวเลข 11 ต�
 
 #: contrib/localflavor/pl/forms.py:38
 msgid "National Identification Number consists of 11 digits."
-msgstr "บัตรประจำตัวประชาประกอบด้วยตัวเลข 11 ตัว"
+msgstr "บัตรประจำตัวประชาประกอบด้วยตัวเลข 11 หน่วย"
 
 #: contrib/localflavor/pl/forms.py:39
 msgid "Wrong checksum for the National Identification Number."
-msgstr ""
+msgstr "ผลรวมตรวจสอบของหมายเลขประจำตัวประชาชนผิดพลาด"
 
 #: contrib/localflavor/pl/forms.py:71
-msgid ""
-"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
+msgid "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgstr "ใส่หมายเลขประจำตัวของผู้เสียภาษีอากรในรูปของ XXX-XXX-XX-XX หรือ XX-XX-XXX-XXX "
 
 #: contrib/localflavor/pl/forms.py:72
 msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr ""
+msgstr "ผลรวมตรวจสอบสำหรับหมายเลขผู้เสียภาษี (NIP) ผิดพลาด."
 
 #: contrib/localflavor/pl/forms.py:111
 msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
-msgstr ""
+msgstr "National Business Register Number (REGON) ประกอบด้วยตัวเลข 7 หรือ 9 หลัก."
 
 #: contrib/localflavor/pl/forms.py:112
 msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr ""
+msgstr "ผลรวมตรวจสอบ National Business Register Number (REGON) ผิดพลาด."
 
 #: contrib/localflavor/pl/forms.py:155
 msgid "Enter a postal code in the format XX-XXX."
@@ -2823,15 +2611,15 @@ msgstr "คูยาเวีย-โพเมราเนีย"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:10
 msgid "Lublin"
-msgstr ""
+msgstr "ลูบลิน"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:11
 msgid "Lubusz"
-msgstr ""
+msgstr "ลูเบิส์ช"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:12
 msgid "Lodz"
-msgstr ""
+msgstr "ลอดซ์"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:13
 msgid "Lesser Poland"
@@ -2843,15 +2631,15 @@ msgstr "มาโซเวีย"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:15
 msgid "Opole"
-msgstr ""
+msgstr "โอโปล์"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:16
 msgid "Subcarpatia"
-msgstr ""
+msgstr "ซับคาเพเทีย"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:17
 msgid "Podlasie"
-msgstr ""
+msgstr "พอดล่ซีย์"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:18
 msgid "Pomerania"
@@ -2859,15 +2647,15 @@ msgstr "โพเมราเนีย"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:19
 msgid "Silesia"
-msgstr "ซิลเลสเซียใต้"
+msgstr "ซิลเลสเซีย"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:20
 msgid "Swietokrzyskie"
-msgstr ""
+msgstr "สเวียตโตเชียตสกี"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:21
 msgid "Warmia-Masuria"
-msgstr ""
+msgstr "วอร์เมีย มาซูเรีย"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:22
 msgid "Greater Poland"
@@ -2887,7 +2675,7 @@ msgstr "กรุณาใส่ CNP"
 
 #: contrib/localflavor/ro/forms.py:141
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr "ใส่ข้อมูล IBAN ในรูปแบบ ROXX-XXXX-XXXX-XXXX-XXXX-XXXX"
+msgstr "ใส่หมายเลข IBAN ในรูปแบบ ROXX-XXXX-XXXX-XXXX-XXXX-XXXX"
 
 #: contrib/localflavor/ro/forms.py:171
 msgid "Phone numbers must be in XXXX-XXXXXX format."
@@ -2903,15 +2691,15 @@ msgstr "กรุณาใส่รหัสไปรษณีย์ในรู
 
 #: contrib/localflavor/sk/sk_districts.py:8
 msgid "Banska Bystrica"
-msgstr "บันสคา บิสทิคา"
+msgstr "แคว้น บันสคา บิสทิคา"
 
 #: contrib/localflavor/sk/sk_districts.py:9
 msgid "Banska Stiavnica"
-msgstr "บันสคา สเตรียนิคา"
+msgstr "แคว้น บันสคา สเตรียนิคา"
 
 #: contrib/localflavor/sk/sk_districts.py:10
 msgid "Bardejov"
-msgstr ""
+msgstr "บาเดโยฟ"
 
 #: contrib/localflavor/sk/sk_districts.py:11
 msgid "Banovce nad Bebravou"
@@ -2943,7 +2731,7 @@ msgstr "บราทิสลาวา ห้า"
 
 #: contrib/localflavor/sk/sk_districts.py:18
 msgid "Bytca"
-msgstr ""
+msgstr "ไบต์กา"
 
 #: contrib/localflavor/sk/sk_districts.py:19
 msgid "Cadca"
@@ -2959,7 +2747,7 @@ msgstr "ดอลนี่ คูบิน"
 
 #: contrib/localflavor/sk/sk_districts.py:22
 msgid "Dunajska Streda"
-msgstr ""
+msgstr "ดูนูซกา สเตรดา"
 
 #: contrib/localflavor/sk/sk_districts.py:23
 msgid "Galanta"
@@ -2971,19 +2759,19 @@ msgstr "เกลนิคา"
 
 #: contrib/localflavor/sk/sk_districts.py:25
 msgid "Hlohovec"
-msgstr ""
+msgstr "ลอเวคช์"
 
 #: contrib/localflavor/sk/sk_districts.py:26
 msgid "Humenne"
-msgstr ""
+msgstr "ฮูเมนเน"
 
 #: contrib/localflavor/sk/sk_districts.py:27
 msgid "Ilava"
-msgstr ""
+msgstr "อิลลาวา"
 
 #: contrib/localflavor/sk/sk_districts.py:28
 msgid "Kezmarok"
-msgstr ""
+msgstr "เคซมารอก"
 
 #: contrib/localflavor/sk/sk_districts.py:29
 msgid "Komarno"
@@ -3011,11 +2799,11 @@ msgstr "แคว้น โคซิเซ โอโคไล"
 
 #: contrib/localflavor/sk/sk_districts.py:35
 msgid "Krupina"
-msgstr ""
+msgstr "ครูพินา"
 
 #: contrib/localflavor/sk/sk_districts.py:36
 msgid "Kysucke Nove Mesto"
-msgstr ""
+msgstr "เคียสเซียก โนฟ เมสโต"
 
 #: contrib/localflavor/sk/sk_districts.py:37
 msgid "Levice"
@@ -3027,35 +2815,35 @@ msgstr "เลโวคา"
 
 #: contrib/localflavor/sk/sk_districts.py:39
 msgid "Liptovsky Mikulas"
-msgstr ""
+msgstr "ลิบโตสกี มิคูลาส"
 
 #: contrib/localflavor/sk/sk_districts.py:40
 msgid "Lucenec"
-msgstr ""
+msgstr "ลูเซินเนค"
 
 #: contrib/localflavor/sk/sk_districts.py:41
 msgid "Malacky"
-msgstr ""
+msgstr "มาเลคสกี"
 
 #: contrib/localflavor/sk/sk_districts.py:42
 msgid "Martin"
-msgstr ""
+msgstr "มาร์ติน"
 
 #: contrib/localflavor/sk/sk_districts.py:43
 msgid "Medzilaborce"
-msgstr ""
+msgstr "เม็ดซิลลาบอร์ซ"
 
 #: contrib/localflavor/sk/sk_districts.py:44
 msgid "Michalovce"
-msgstr ""
+msgstr "มิคัลโลฟเซอ"
 
 #: contrib/localflavor/sk/sk_districts.py:45
 msgid "Myjava"
-msgstr ""
+msgstr "มียาวา"
 
 #: contrib/localflavor/sk/sk_districts.py:46
 msgid "Namestovo"
-msgstr ""
+msgstr "เนเมสโตโว"
 
 #: contrib/localflavor/sk/sk_districts.py:47
 msgid "Nitra"
@@ -3063,23 +2851,23 @@ msgstr "นิทรา"
 
 #: contrib/localflavor/sk/sk_districts.py:48
 msgid "Nove Mesto nad Vahom"
-msgstr ""
+msgstr "โนเฟ เมสโต นาด วาห์อม"
 
 #: contrib/localflavor/sk/sk_districts.py:49
 msgid "Nove Zamky"
-msgstr ""
+msgstr "โนเฟ ซามกี"
 
 #: contrib/localflavor/sk/sk_districts.py:50
 msgid "Partizanske"
-msgstr ""
+msgstr "ปาร์ติซานเก"
 
 #: contrib/localflavor/sk/sk_districts.py:51
 msgid "Pezinok"
-msgstr ""
+msgstr "เปซินอก"
 
 #: contrib/localflavor/sk/sk_districts.py:52
 msgid "Piestany"
-msgstr ""
+msgstr "เปียสตานี"
 
 #: contrib/localflavor/sk/sk_districts.py:53
 msgid "Poltar"
@@ -3087,7 +2875,7 @@ msgstr "พอลต้าร์"
 
 #: contrib/localflavor/sk/sk_districts.py:54
 msgid "Poprad"
-msgstr ""
+msgstr "ป็อบปราด"
 
 #: contrib/localflavor/sk/sk_districts.py:55
 msgid "Povazska Bystrica"
@@ -3095,11 +2883,11 @@ msgstr "โปวาสคา บิสทิคา"
 
 #: contrib/localflavor/sk/sk_districts.py:56
 msgid "Presov"
-msgstr "พรีซอฟ"
+msgstr "แคว้น พรีซอฟ"
 
 #: contrib/localflavor/sk/sk_districts.py:57
 msgid "Prievidza"
-msgstr ""
+msgstr "เปรียวิซา"
 
 #: contrib/localflavor/sk/sk_districts.py:58
 msgid "Puchov"
@@ -3111,7 +2899,7 @@ msgstr "เรวูก้า"
 
 #: contrib/localflavor/sk/sk_districts.py:60
 msgid "Rimavska Sobota"
-msgstr ""
+msgstr "ริมาฟสกา โซโบตา"
 
 #: contrib/localflavor/sk/sk_districts.py:61
 msgid "Roznava"
@@ -3119,7 +2907,7 @@ msgstr "รอซนาวา"
 
 #: contrib/localflavor/sk/sk_districts.py:62
 msgid "Ruzomberok"
-msgstr ""
+msgstr "บูซอมเบรอก"
 
 #: contrib/localflavor/sk/sk_districts.py:63
 msgid "Sabinov"
@@ -3139,19 +2927,19 @@ msgstr "สคาลิก้า"
 
 #: contrib/localflavor/sk/sk_districts.py:67
 msgid "Snina"
-msgstr ""
+msgstr "สนินา"
 
 #: contrib/localflavor/sk/sk_districts.py:68
 msgid "Sobrance"
-msgstr ""
+msgstr "โซบรานเซ"
 
 #: contrib/localflavor/sk/sk_districts.py:69
 msgid "Spisska Nova Ves"
-msgstr ""
+msgstr "สปิสสกา โนวา เวส"
 
 #: contrib/localflavor/sk/sk_districts.py:70
 msgid "Stara Lubovna"
-msgstr ""
+msgstr "สตรารา ลูโบฟนา"
 
 #: contrib/localflavor/sk/sk_districts.py:71
 msgid "Stropkov"
@@ -3159,7 +2947,7 @@ msgstr "สตรอปคอฟ"
 
 #: contrib/localflavor/sk/sk_districts.py:72
 msgid "Svidnik"
-msgstr ""
+msgstr "สวิดนิก"
 
 #: contrib/localflavor/sk/sk_districts.py:73
 msgid "Sala"
@@ -3179,19 +2967,19 @@ msgstr "เทรนซิน"
 
 #: contrib/localflavor/sk/sk_districts.py:77
 msgid "Trnava"
-msgstr "ทนาวา"
+msgstr "แคว้น ทนาวา"
 
 #: contrib/localflavor/sk/sk_districts.py:78
 msgid "Turcianske Teplice"
-msgstr ""
+msgstr "เทอเซียนสเค เตปลิเซ"
 
 #: contrib/localflavor/sk/sk_districts.py:79
 msgid "Tvrdosin"
-msgstr ""
+msgstr "ทวาโดซิน"
 
 #: contrib/localflavor/sk/sk_districts.py:80
 msgid "Velky Krtis"
-msgstr ""
+msgstr "เวลเค เคอติส"
 
 #: contrib/localflavor/sk/sk_districts.py:81
 msgid "Vranov nad Toplou"
@@ -3199,7 +2987,7 @@ msgstr "วรานอฟ นาด ท็อปพลู"
 
 #: contrib/localflavor/sk/sk_districts.py:82
 msgid "Zlate Moravce"
-msgstr ""
+msgstr "สตาเต โทราฟเซ"
 
 #: contrib/localflavor/sk/sk_districts.py:83
 msgid "Zvolen"
@@ -3267,7 +3055,7 @@ msgstr "ชีเชียร์"
 
 #: contrib/localflavor/uk/uk_regions.py:15
 msgid "Cornwall and Isles of Scilly"
-msgstr ""
+msgstr "คอนวอลล์ และไฮเซลส์แห่งซิลลี"
 
 #: contrib/localflavor/uk/uk_regions.py:16
 msgid "Cumbria"
@@ -3590,19 +3378,15 @@ msgid "redirect from"
 msgstr "เปลี่ยนทิศทางจาก"
 
 #: contrib/redirects/models.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr "ต้องเป็นพาธจริง และไม่รวมชื่อโดเมน ตัวอย่าง : '/events/search/'"
+msgid "This should be an absolute path, excluding the domain name. Example: '/events/search/'."
+msgstr "สิ่งนี้น่าจะเป็นแนวทางที่แน่นอนที่จะแยกออกมาจากชื่อโดเมน ตัวอย่าง : '/events/search/'"
 
 #: contrib/redirects/models.py:9
 msgid "redirect to"
 msgstr "เปลี่ยนทิศทางไปที่"
 
 #: contrib/redirects/models.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
 msgstr "มันอาจจะเป็นพาธที่แท้จริงหรือ URL แบบเต็มที่ขึ้นต้นด้วย 'http://'."
 
 #: contrib/redirects/models.py:13
@@ -3623,7 +3407,7 @@ msgstr "เซสชันดาตา"
 
 #: contrib/sessions/models.py:48
 msgid "expire date"
-msgstr "วันหมดอายุ"
+msgstr "expire date"
 
 #: contrib/sessions/models.py:53
 msgid "session"
@@ -3639,13 +3423,14 @@ msgstr "ชื่อโดเมน"
 
 #: contrib/sites/models.py:33
 msgid "display name"
-msgstr "ชื่อ"
+msgstr "ชื่อที่แสดง"
 
 #: contrib/sites/models.py:39
 msgid "sites"
 msgstr "ไซต์"
 
-#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:683
+#: db/models/fields/__init__.py:348
+#: db/models/fields/__init__.py:683
 msgid "This value must be an integer."
 msgstr "ค่านี้ต้องเป็นจำนวนเต็ม"
 
@@ -3659,43 +3444,43 @@ msgstr "ฟิลด์นี้จำเป็น"
 
 #: db/models/fields/__init__.py:428
 msgid "Enter only digits separated by commas."
-msgstr "ใส่ตัวเลขและลูกน้ำเท่านั้น"
+msgstr "ใส่ตัวเลขหรือลูกน้ำเท่านั้น"
 
 #: db/models/fields/__init__.py:459
 msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "ใส่วันที่ในรูปแบบ YYYY-MM-DD"
+msgstr "Enter a valid date in YYYY-MM-DD format."
 
 #: db/models/fields/__init__.py:468
 #, python-format
 msgid "Invalid date: %s"
-msgstr "วันที่ไม่ถูกต้อง: %s"
+msgstr "Invalid date: %s"
 
-#: db/models/fields/__init__.py:532 db/models/fields/__init__.py:550
+#: db/models/fields/__init__.py:532
+#: db/models/fields/__init__.py:550
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "ใส่วันเวลาที่ถูกต้องในรูปแบบ YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 
 #: db/models/fields/__init__.py:586
 msgid "This value must be a decimal number."
-msgstr "ค่านี้ต้องเป็นเลขฐานสิบ"
+msgstr "ช่องนี้ต้องเป็นเลขฐานสิบ"
 
 #: db/models/fields/__init__.py:719
 msgid "This value must be either None, True or False."
 msgstr "ค่านี้ต้องเป็นอย่างใดอย่างหนึ่ง None, True หรือ False"
 
-#: db/models/fields/__init__.py:817 db/models/fields/__init__.py:831
+#: db/models/fields/__init__.py:817
+#: db/models/fields/__init__.py:831
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "ใส่เวลาในรูปแบบ HH:MM[:ss[.uuuuuu]]"
 
 #: db/models/fields/related.py:761
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "กดปุ่ม \"Control\", หรือ \"Command\" บน Mac ค้างไว้, เพื่อเลือกหลายๆตัวเลือก"
 
 #: db/models/fields/related.py:838
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -3719,42 +3504,49 @@ msgstr "ค่านี้มีได้น้อยที่สุด %(min)d 
 
 #: forms/fields.py:166
 msgid "Enter a whole number."
-msgstr "ใส่หมายเลข"
+msgstr "กรอกหมายเลข"
 
-#: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
+#: forms/fields.py:167
+#: forms/fields.py:196
+#: forms/fields.py:225
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "ค่านี้ต้องน้อยกว่าหรือเท่ากับ %s."
 
-#: forms/fields.py:168 forms/fields.py:197 forms/fields.py:226
+#: forms/fields.py:168
+#: forms/fields.py:197
+#: forms/fields.py:226
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "ค่านี้ต้องมากกว่าหรือเท่ากับ %s."
 
-#: forms/fields.py:195 forms/fields.py:224
+#: forms/fields.py:195
+#: forms/fields.py:224
 msgid "Enter a number."
-msgstr "ใส่หมายเลข"
+msgstr "กรอกหมายเลข"
 
 #: forms/fields.py:227
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
-msgstr ""
+msgstr "แน่ใจว่ารวมแล้วไม่เกิน %s หลัก."
 
 #: forms/fields.py:228
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
-msgstr ""
+msgstr "แน่ใจว่ารวมแล้วไม่เกิน %s หลัก."
 
 #: forms/fields.py:229
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr ""
+msgstr "Ensure that there are no more than %s digits before the decimal point."
 
-#: forms/fields.py:287 forms/fields.py:848
+#: forms/fields.py:287
+#: forms/fields.py:848
 msgid "Enter a valid date."
 msgstr "กรุณาใส่วัน"
 
-#: forms/fields.py:321 forms/fields.py:849
+#: forms/fields.py:321
+#: forms/fields.py:849
 msgid "Enter a valid time."
 msgstr "กรุณาใส่เวลา"
 
@@ -3775,9 +3567,7 @@ msgid "The submitted file is empty."
 msgstr "ไฟล์ที่ส่งว่างเปล่า"
 
 #: forms/fields.py:477
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
+msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
 msgstr "อัพโหลดไฟล์ที่ถูกต้อง. ไฟล์ที่อัพโหลดไปไม่ใช่รูป หรือรูปเสียหาย."
 
 #: forms/fields.py:538
@@ -3788,12 +3578,15 @@ msgstr "ใส่ URL ที่ถูกต้อง"
 msgid "This URL appears to be a broken link."
 msgstr "URL อาจจะเป็นลิ้งค์ที่เสียหาย."
 
-#: forms/fields.py:618 forms/fields.py:696
+#: forms/fields.py:618
+#: forms/fields.py:696
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "เลือกตัวเลือกที่ถูกต้อง. %(value)s ไม่ใช่ตัวเลือกที่ถูกต้อง."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:720
+#: forms/fields.py:697
+#: forms/fields.py:758
+#: forms/models.py:654
 msgid "Enter a list of values."
 msgstr "ใส่รายการ"
 
@@ -3802,57 +3595,54 @@ msgid "Enter a valid IPv4 address."
 msgstr "กรุณาใส่หมายเลขไอพีที่ถูกต้อง"
 
 #: forms/fields.py:887
-msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr ""
+msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr "ใส่ 'slug' ประกอปด้วย ตัวหนังสือ ตัวเลข เครื่องหมายขีดล่าง หรือ  เครื่องหมายขีด"
 
-#: forms/formsets.py:242 forms/formsets.py:244
+#: forms/formsets.py:242
+#: forms/formsets.py:244
 msgid "Order"
 msgstr "เรียงลำดับ"
 
-#: forms/models.py:281 forms/models.py:290
+#: forms/models.py:268
+#: forms/models.py:277
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s และ %(field_label)s มีอยู่แล้ว"
 
-#: forms/models.py:587
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-
-#: forms/models.py:650
+#: forms/models.py:584
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "เลือกตัวเลือกที่ถูกต้อง. สิ่งที่เลือกไม่ใช่ตัวเลือกที่สามารถเลือกได้."
+msgstr "เลือกตัวเลือกที่ถูกต้อง. ตัวเลือกนั้นไม่สามารถเลือกได้."
 
-#: forms/models.py:721
+#: forms/models.py:655
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "เลือกตัวเลือกที่ถูกต้อง. %s ไม่ใช่ตัวเลือกที่สามารถเลือกได้."
+msgstr "เลือกตัวเลือกที่ถูกต้อง. %s ไม่สามารถเลือกได้"
 
-#: template/defaultfilters.py:741
+#: template/defaultfilters.py:706
 msgid "yes,no,maybe"
 msgstr "ใช่,ไม่ใช่,อาจจะ"
 
-#: template/defaultfilters.py:772
-#, python-format
+#: template/defaultfilters.py:737
+#, fuzzy, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:739
 #, python-format
 msgid "%.1f KB"
-msgstr "%.1f KB"
+msgstr "%.1f กิโลไบต์"
 
-#: template/defaultfilters.py:776
+#: template/defaultfilters.py:741
 #, python-format
 msgid "%.1f MB"
-msgstr "%.1f MB"
+msgstr "%.1f เมกะไบต์"
 
-#: template/defaultfilters.py:777
+#: template/defaultfilters.py:742
 #, python-format
 msgid "%.1f GB"
-msgstr "%.1f GB"
+msgstr "%.1f กิกะไบต์"
 
 #: utils/dateformat.py:41
 msgid "p.m."
@@ -3942,23 +3732,28 @@ msgstr "มกราคม"
 msgid "February"
 msgstr "กุมภาพันธ์"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
+#: utils/dates.py:31
 msgid "March"
 msgstr "มีนาคม"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
+#: utils/dates.py:31
 msgid "April"
 msgstr "เมษายน"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
+#: utils/dates.py:31
 msgid "May"
 msgstr "พฤษภาคม"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
+#: utils/dates.py:31
 msgid "June"
 msgstr "มิถุนายน"
 
-#: utils/dates.py:19 utils/dates.py:31
+#: utils/dates.py:19
+#: utils/dates.py:31
 msgid "July"
 msgstr "กรกฎาคม"
 
@@ -3984,7 +3779,7 @@ msgstr "ธันวาคม"
 
 #: utils/dates.py:23
 msgid "jan"
-msgstr "มค."
+msgstr "มก."
 
 #: utils/dates.py:23
 msgid "feb"
@@ -4032,7 +3827,7 @@ msgstr "ธ.ค."
 
 #: utils/dates.py:31
 msgid "Jan."
-msgstr "มค."
+msgstr "มก."
 
 #: utils/dates.py:31
 msgid "Feb."
@@ -4063,17 +3858,10 @@ msgid "or"
 msgstr "หรือ"
 
 #: utils/timesince.py:21
-#, fuzzy
-msgid "year"
-msgid_plural "years"
-msgstr[0] "<b>_ปี:</b>"
-msgstr[1] ""
-
 #: utils/timesince.py:22
-#, fuzzy
 msgid "month"
 msgid_plural "months"
-msgstr[0] "เดือนนี้"
+msgstr[0] ""
 msgstr[1] ""
 
 #: utils/timesince.py:23
@@ -4083,10 +3871,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: utils/timesince.py:24
-#, fuzzy
 msgid "day"
 msgid_plural "days"
-msgstr[0] "F j"
+msgstr[0] ""
 msgstr[1] ""
 
 #: utils/timesince.py:25
@@ -4108,12 +3895,12 @@ msgstr "นาที"
 #: utils/timesince.py:48
 #, python-format
 msgid "%(number)d %(type)s"
-msgstr "%(number)d %(type)s"
+msgstr ""
 
 #: utils/timesince.py:54
 #, python-format
 msgid ", %(number)d %(type)s"
-msgstr ", %(number)d %(type)s"
+msgstr ""
 
 #: utils/translation/trans_real.py:403
 msgid "DATE_FORMAT"
@@ -4145,3 +3932,4 @@ msgstr "%(verbose_name)s ได้ถูกปรับปรุงเรีย�
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s ได้ถูกลบเรียบร้อยแล้ว"
+
