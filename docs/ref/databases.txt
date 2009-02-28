@@ -366,10 +366,15 @@ version of SQLite.
 Oracle notes
 ============
 
-Django supports `Oracle Database Server`_ versions 9i and higher. Oracle
-version 10g or later is required to use Django's ``regex`` and ``iregex`` query
-operators. You will also need a 4.X release of the `cx_Oracle`_ driver,
-version 4.3.1 or newer.
+Django supports `Oracle Database Server`_ versions 9i and
+higher. Oracle version 10g or later is required to use Django's
+``regex`` and ``iregex`` query operators. You will also need at least
+version 4.3.1 of the `cx_Oracle`_ Python driver.
+
+Note that due to a Unicode-corruption bug in ``cx_Oracle`` 5.0, that
+version of the driver should **not** be used with Django;
+``cx_Oracle`` 5.0.1 resolved this issue, so if you'd like to use a
+more recent ``cx_Oracle``, use version 5.0.1.
 
 .. _`Oracle Database Server`: http://www.oracle.com/
 .. _`cx_Oracle`: http://cx-oracle.sourceforge.net/
