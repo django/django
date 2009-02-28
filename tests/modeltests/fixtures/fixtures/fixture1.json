@@ -1,18 +1,34 @@
 [
     {
-        "pk": "2", 
-        "model": "fixtures.article", 
+        "pk": 1,
+        "model": "sites.site",
         "fields": {
-            "headline": "Poker has no place on ESPN", 
+            "domain": "example.com",
+            "name": "example.com"
+        }
+    },
+    {
+        "pk": "2",
+        "model": "fixtures.article",
+        "fields": {
+            "headline": "Poker has no place on ESPN",
             "pub_date": "2006-06-16 12:00:00"
         }
-    }, 
+    },
     {
-        "pk": "3", 
-        "model": "fixtures.article", 
+        "pk": "3",
+        "model": "fixtures.article",
         "fields": {
-            "headline": "Time to reform copyright", 
+            "headline": "Time to reform copyright",
             "pub_date": "2006-06-16 13:00:00"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "fixtures.category",
+        "fields": {
+            "description": "Latest news stories",
+            "title": "News Stories"
         }
     }
 ]

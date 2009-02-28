@@ -186,7 +186,7 @@ if you're ever curious to see the full list of defaults.
 dumpdata
 --------
 
-.. django-admin:: dumpdata <appname appname ...>
+.. django-admin:: dumpdata <appname appname appname.Model ...>
 
 Outputs to standard output all data in the database associated with the named
 application(s).
@@ -227,6 +227,14 @@ directives::
     By default, ``dumpdata`` will output all data on a single line. This isn't
     easy for humans to read, so you can use the ``--indent`` option to
     pretty-print the output with a number of indentation spaces.
+
+.. versionadded: 1.1
+
+In addition to specifying application names, you can provide a list of
+individual models, in the form of ``appname.Model``. If you specify a model
+name to ``dumpdata``, the dumped output will be restricted to that model,
+rather than the entire application. You can also mix application names and
+model names.
 
 flush
 -----
