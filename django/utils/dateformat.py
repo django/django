@@ -131,7 +131,7 @@ class DateFormat(TimeFormat):
 
     def I(self):
         "'1' if Daylight Savings Time, '0' otherwise."
-        if self.timezone.dst(self.data):
+        if self.timezone and self.timezone.dst(self.data):
             return u'1'
         else:
             return u'0'
@@ -192,14 +192,14 @@ class DateFormat(TimeFormat):
 
     def T(self):
         "Time zone of this machine; e.g. 'EST' or 'MDT'"
-        name = self.timezone.tzname(self.data)
+        name = self.timezone and self.timezone.tzname(self.data) or None
         if name is None:
             name = self.format('O')
         return unicode(name)
 
     def U(self):
         "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
-        off = self.timezone.utcoffset(self.data)
+        off = self.timezone and self.timezone.utcoffset(self.data) or 0
         return int(time.mktime(self.data.timetuple())) + off.seconds * 60
 
     def w(self):
@@ -253,6 +253,8 @@ class DateFormat(TimeFormat):
         timezones west of UTC is always negative, and for those east of UTC is
         always positive.
         """
+        if not self.timezone:
+            return 0
         offset = self.timezone.utcoffset(self.data)
         # Only days can be negative, so negative offsets have days=-1 and
         # seconds positive. Positive offsets have days=0
