@@ -237,6 +237,32 @@ class PointerA(models.Model):
 class PointerB(models.Model):
     connection = models.ForeignKey(SharedConnection)
 
+# Multi-layer ordering
+class SingleObject(models.Model):
+    name = models.CharField(max_length=10)
+
+    class Meta:
+        ordering = ['name']
+
+    def __unicode__(self):
+        return self.name
+
+class RelatedObject(models.Model):
+    single = models.ForeignKey(SingleObject)
+
+    class Meta:
+        ordering = ['single']
+
+class Plaything(models.Model):
+    name = models.CharField(max_length=10)
+    others = models.ForeignKey(RelatedObject, null=True)
+
+    class Meta:
+        ordering = ['others']
+
+    def __unicode__(self):
+        return self.name
+
 
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag.objects.create(name='t1')

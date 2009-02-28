@@ -687,8 +687,9 @@ class BaseQuery(object):
             # the model.
             self.ref_alias(alias)
 
-        # Must use left outer joins for nullable fields.
-        self.promote_alias_chain(joins)
+        # Must use left outer joins for nullable fields and their relations.
+        self.promote_alias_chain(joins,
+                self.alias_map[joins[0]][JOIN_TYPE] == self.LOUTER)
 
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model.
