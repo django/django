@@ -1,15 +1,18 @@
+# Slovak translation of Django
+# This file is distributed under the same license as the Django package.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-04-01 19:21+0200\n"
-"PO-Revision-Date: 2008-08-09 21:19+0100\n"
-"Last-Translator: Marian Andre <django@andre.sk>\n"
-"Language-Team: \n"
+"PO-Revision-Date: 2009-01-24 13:04+0100\n"
+"Last-Translator: Marcel Telka <marcel@telka.sk>\n"
+"Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural= (n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0;\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -35,7 +38,7 @@ msgstr "Vybrané %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "Zvoľte si a kliknite"
+msgstr "Zvoľte si a kliknite "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
@@ -57,16 +60,16 @@ msgstr "N P U S Š P S"
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
 msgid "Show"
-msgstr "Ukáž"
+msgstr "Zobraziť"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
 msgid "Hide"
-msgstr "Skry"
+msgstr "Skryť"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Now"
-msgstr "Práve teraz"
+msgstr "Teraz"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
 msgid "Clock"
@@ -82,7 +85,7 @@ msgstr "Polnoc"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
-msgstr "6 ráno"
+msgstr "6:00"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
@@ -91,7 +94,7 @@ msgstr "Poludnie"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
 msgid "Cancel"
-msgstr "Zruš"
+msgstr "Zrušiť"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
@@ -109,4 +112,3 @@ msgstr "Včera"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "Zajtra"
-
