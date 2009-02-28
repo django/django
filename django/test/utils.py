@@ -65,3 +65,14 @@ def teardown_test_environment():
 
     del mail.outbox
 
+
+def get_runner(settings):
+    test_path = settings.TEST_RUNNER.split('.')
+    # Allow for Python 2.5 relative paths
+    if len(test_path) > 1:
+        test_module_name = '.'.join(test_path[:-1])
+    else:
+        test_module_name = '.'
+    test_module = __import__(test_module_name, {}, {}, test_path[-1])
+    test_runner = getattr(test_module, test_path[-1])
+    return test_runner

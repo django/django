@@ -14,18 +14,11 @@ class Command(BaseCommand):
 
     def handle(self, *test_labels, **options):
         from django.conf import settings
+        from django.test.utils import get_runner
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)
-
-        test_path = settings.TEST_RUNNER.split('.')
-        # Allow for Python 2.5 relative paths
-        if len(test_path) > 1:
-            test_module_name = '.'.join(test_path[:-1])
-        else:
-            test_module_name = '.'
-        test_module = __import__(test_module_name, {}, {}, test_path[-1])
-        test_runner = getattr(test_module, test_path[-1])
+        test_runner = get_runner(settings)
 
         failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive)
         if failures:

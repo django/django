@@ -149,8 +149,12 @@ def django_tests(verbosity, interactive, test_labels):
                 pass
 
     # Run the test suite, including the extra validation tests.
-    from django.test.simple import run_tests
-    failures = run_tests(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
+    from django.test.utils import get_runner
+    if not hasattr(settings, 'TEST_RUNNER'):
+        settings.TEST_RUNNER = 'django.test.simple.run_tests'
+    test_runner = get_runner(settings)
+
+    failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
     if failures:
         sys.exit(failures)
 
