@@ -716,7 +716,7 @@ class BaseQuery(object):
         result, params = [], []
         if self.group_by is not None:
             group_by = self.group_by or []
-            
+
             extra_selects = []
             for extra_select, extra_params in self.extra_select.itervalues():
                 extra_selects.append(extra_select)
@@ -834,8 +834,9 @@ class BaseQuery(object):
             # the model.
             self.ref_alias(alias)
 
-        # Must use left outer joins for nullable fields.
-        self.promote_alias_chain(joins)
+        # Must use left outer joins for nullable fields and their relations.
+        self.promote_alias_chain(joins,
+                self.alias_map[joins[0]][JOIN_TYPE] == self.LOUTER)
 
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model.

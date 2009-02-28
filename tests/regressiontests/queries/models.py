@@ -238,6 +238,32 @@ class PointerA(models.Model):
 class PointerB(models.Model):
     connection = models.ForeignKey(SharedConnection)
 
+# Multi-layer ordering
+class SingleObject(models.Model):
+    name = models.CharField(max_length=10)
+
+    class Meta:
+        ordering = ['name']
+
+    def __unicode__(self):
+        return self.name
+
+class RelatedObject(models.Model):
+    single = models.ForeignKey(SingleObject)
+
+    class Meta:
+        ordering = ['single']
+
+class Plaything(models.Model):
+    name = models.CharField(max_length=10)
+    others = models.ForeignKey(RelatedObject, null=True)
+
+    class Meta:
+        ordering = ['others']
+
+    def __unicode__(self):
+        return self.name
+
 
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag.objects.create(name='t1')
@@ -1044,6 +1070,11 @@ Bug #9985 -- qs.values_list(...).values(...) combinations should work.
 >>> Annotation.objects.filter(notes__in=Note.objects.filter(note="n1").values_list('note').values('id'))
 [<Annotation: a1>]
 
+Bug #10028 -- ordering by model related to nullable relations(!) should use
+outer joins, so that all results are included.
+>>> _ = Plaything.objects.create(name="p1")
+>>> Plaything.objects.all()
+[<Plaything: p1>]
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
