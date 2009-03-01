@@ -345,7 +345,7 @@ class BaseQuery(object):
         # in SQL (in variants that provide them) doesn't change the COUNT
         # output.
         number = max(0, number - self.low_mark)
-        if self.high_mark:
+        if self.high_mark is not None:
             number = min(number, self.high_mark - self.low_mark)
 
         return number
@@ -1760,7 +1760,7 @@ class BaseQuery(object):
 
         Typically, this means no limits or offsets have been put on the results.
         """
-        return not (self.low_mark or self.high_mark)
+        return not self.low_mark and self.high_mark is None
 
     def clear_select_fields(self):
         """

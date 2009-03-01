@@ -903,11 +903,17 @@ used in lookups.
 >>> Item.objects.filter(created__in=[time1, time2])
 [<Item: one>, <Item: two>]
 
-Bug #7698 -- People like to slice with '0' as the high-water mark.
+Bug #7698, #10202 -- People like to slice with '0' as the high-water mark.
 >>> Item.objects.all()[0:0]
 []
 >>> Item.objects.all()[0:0][:10]
 []
+>>> Item.objects.all()[:0].count()
+0
+>>> Item.objects.all()[:0].latest('created')
+Traceback (most recent call last):
+    ...
+AssertionError: Cannot change a query once a slice has been taken.
 
 Bug #7411 - saving to db must work even with partially read result set in
 another cursor.
