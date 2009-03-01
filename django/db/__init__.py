@@ -25,7 +25,8 @@ except ImportError, e:
         # listing all possible (built-in) database backends.
         backend_dir = os.path.join(__path__[0], 'backends')
         try:
-            available_backends = [f for f in os.listdir(backend_dir) if not f.startswith('_') and not f.startswith('.') and not f.endswith('.py') and not f.endswith('.pyc')]
+            available_backends = [f for f in os.listdir(backend_dir)
+                    if os.path.isdir(os.path.join(backend_dir, f))]
         except EnvironmentError:
             available_backends = []
         available_backends.sort()
