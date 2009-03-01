@@ -312,11 +312,12 @@ class BaseDatabaseCreation(object):
         self.connection.close()
         settings.DATABASE_NAME = test_database_name
         settings.DATABASE_SUPPORTS_TRANSACTIONS = self._rollback_works()
-        
+
         call_command('syncdb', verbosity=verbosity, interactive=False)
 
         if settings.CACHE_BACKEND.startswith('db://'):
-            cache_name = settings.CACHE_BACKEND[len('db://'):]
+            from django.core.cache import parse_backend_uri
+            _, cache_name, _ = parse_backend_uri(settings.CACHE_BACKEND)
             call_command('createcachetable', cache_name)
 
         # Get a cursor (even though we don't need one yet). This has
@@ -363,7 +364,7 @@ class BaseDatabaseCreation(object):
                 sys.exit(1)
 
         return test_database_name
-    
+
     def _rollback_works(self):
         cursor = self.connection.cursor()
         cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
@@ -375,7 +376,7 @@ class BaseDatabaseCreation(object):
         cursor.execute('DROP TABLE ROLLBACK_TEST')
         self.connection._commit()
         return count == 0
-        
+
     def destroy_test_db(self, old_database_name, verbosity=1):
         """
         Destroy a test database, prompting the user for confirmation if the
