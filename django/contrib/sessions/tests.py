@@ -182,6 +182,11 @@ False
 False
 >>> cache_session.items() == prev_data
 True
+>>> cache_session = CacheSession()
+>>> cache_session.save()
+>>> key = cache_session.session_key
+>>> cache_session.exists(key)
+True
 
 >>> Session.objects.filter(pk=cache_session.session_key).delete()
 >>> cache_session = CacheSession(cache_session.session_key)
