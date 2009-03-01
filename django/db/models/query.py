@@ -703,12 +703,9 @@ class QuerySet(object):
             self.query.add_fields(field_names, False)
             self.query.set_group_by()
 
-    def as_sql(self):
+    def _as_sql(self):
         """
         Returns the internal query's SQL and parameters (as a tuple).
-
-        This is a private (internal) method. The name is chosen to provide
-        uniformity with other interfaces (in particular, the Query class).
         """
         obj = self.values("pk")
         return obj.query.as_nested_sql()
@@ -812,7 +809,7 @@ class ValuesQuerySet(QuerySet):
 
         super(ValuesQuerySet, self)._setup_aggregate_query(aggregates)
 
-    def as_sql(self):
+    def _as_sql(self):
         """
         For ValueQuerySet (and subclasses like ValuesListQuerySet), they can
         only be used as nested queries if they're already set up to select only

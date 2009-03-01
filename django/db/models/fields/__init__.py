@@ -193,12 +193,15 @@ class Field(object):
 
     def get_db_prep_lookup(self, lookup_type, value):
         "Returns field's value prepared for database lookup."
-        if hasattr(value, 'as_sql'):
+        if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
             # If the value has a relabel_aliases method, it will need to
             # be invoked before the final SQL is evaluated
             if hasattr(value, 'relabel_aliases'):
                 return value
-            sql, params = value.as_sql()
+            try:
+                sql, params = value.as_sql()
+            except AttributeError:
+                sql, params = value._as_sql()
             return QueryWrapper(('(%s)' % sql), params)
 
         if lookup_type in ('regex', 'iregex', 'month', 'day', 'week_day', 'search'):
