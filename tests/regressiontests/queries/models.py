@@ -1056,6 +1056,20 @@ cases).
 Bug #9985 -- qs.values_list(...).values(...) combinations should work.
 >>> Note.objects.values_list("note", flat=True).values("id").order_by("id")
 [{'id': 1}, {'id': 2}, {'id': 3}]
+>>> Annotation.objects.filter(notes__in=Note.objects.filter(note="n1").values_list('note').values('id'))
+[<Annotation: a1>]
+
+Bug #10028 -- ordering by model related to nullable relations(!) should use
+outer joins, so that all results are included.
+>>> _ = Plaything.objects.create(name="p1")
+>>> Plaything.objects.all()
+[<Plaything: p1>]
+
+Bug #10205 -- When bailing out early because of an empty "__in" filter, we need
+to set things up correctly internally so that subqueries can continue properly.
+>>> Tag.objects.filter(name__in=()).update(name="foo")
+0
+
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
