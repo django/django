@@ -117,7 +117,7 @@ class UpdateQuery(Query):
         tables, but their rowcounts are not returned).
         """
         cursor = super(UpdateQuery, self).execute_sql(result_type)
-        rows = cursor.rowcount
+        rows = cursor and cursor.rowcount or 0
         del cursor
         for query in self.get_related_updates():
             query.execute_sql(result_type)
@@ -315,7 +315,7 @@ class InsertQuery(Query):
 
     def execute_sql(self, return_id=False):
         cursor = super(InsertQuery, self).execute_sql(None)
-        if return_id:
+        if return_id and cursor:
             return self.connection.ops.last_insert_id(cursor,
                     self.model._meta.db_table, self.model._meta.pk.column)
 

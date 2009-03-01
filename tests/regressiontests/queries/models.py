@@ -1081,6 +1081,12 @@ outer joins, so that all results are included.
 >>> _ = Plaything.objects.create(name="p1")
 >>> Plaything.objects.all()
 [<Plaything: p1>]
+
+Bug #10205 -- When bailing out early because of an empty "__in" filter, we need
+to set things up correctly internally so that subqueries can continue properly.
+>>> Tag.objects.filter(name__in=()).update(name="foo")
+0
+
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__

@@ -2012,9 +2012,11 @@ class BaseQuery(object):
         iterator over the results if the result_type is MULTI.
 
         result_type is either MULTI (use fetchmany() to retrieve all rows),
-        SINGLE (only retrieve a single row), or None (no results expected, but
-        the cursor is returned, since it's used by subclasses such as
-        InsertQuery).
+        SINGLE (only retrieve a single row), or None. In this last case, the
+        cursor is returned if any query is executed, since it's used by
+        subclasses such as InsertQuery). It's possible, however, that no query
+        is needed, as the filters describe an empty set. In that case, None is
+        returned, to avoid any unnecessary database interaction.
         """
         try:
             sql, params = self.as_sql()
