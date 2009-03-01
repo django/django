@@ -315,7 +315,8 @@ class BaseDatabaseCreation(object):
         call_command('syncdb', verbosity=verbosity, interactive=False)
 
         if settings.CACHE_BACKEND.startswith('db://'):
-            cache_name = settings.CACHE_BACKEND[len('db://'):]
+            from django.core.cache import parse_backend_uri
+            _, cache_name, _ = parse_backend_uri(settings.CACHE_BACKEND)
             call_command('createcachetable', cache_name)
 
         # Get a cursor (even though we don't need one yet). This has
