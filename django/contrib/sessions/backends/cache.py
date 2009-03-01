@@ -43,7 +43,7 @@ class SessionStore(SessionBase):
             raise CreateError
 
     def exists(self, session_key):
-        if self._cache.get(session_key):
+        if self._cache.has_key(session_key):
             return True
         return False
 
