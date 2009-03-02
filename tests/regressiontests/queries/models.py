@@ -1056,8 +1056,6 @@ cases).
 Bug #9985 -- qs.values_list(...).values(...) combinations should work.
 >>> Note.objects.values_list("note", flat=True).values("id").order_by("id")
 [{'id': 1}, {'id': 2}, {'id': 3}]
->>> Annotation.objects.filter(notes__in=Note.objects.filter(note="n1").values_list('note').values('id'))
-[<Annotation: a1>]
 
 Bug #10028 -- ordering by model related to nullable relations(!) should use
 outer joins, so that all results are included.
