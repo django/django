@@ -43,7 +43,7 @@ class LazySettings(LazyObject):
         parameter sets where to retrieve any unspecified values from (its
         argument must support attribute access (__getattr__)).
         """
-        if self._target != None:
+        if self._wrapped != None:
             raise RuntimeError, 'Settings already configured.'
         holder = UserSettingsHolder(default_settings)
         for name, value in options.items():
