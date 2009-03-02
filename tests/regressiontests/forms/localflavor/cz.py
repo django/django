@@ -34,7 +34,7 @@ ValidationError: [u'Enter a postal code in the format XXXXX or XXX XX.']
 >>> from django.contrib.localflavor.cz.forms import CZRegionSelect
 >>> w = CZRegionSelect()
 >>> w.render('regions', 'TT')
-u'<select name="regions">\n<option value="PR">Prague</option>\n<option value="CE">Cenral Bohemian Region</option>\n<option value="SO">South Bohemian Region</option>\n<option value="PI">Pilsen Region</option>\n<option value="CA">Carlsbad Region</option>\n<option value="US">Usti Region</option>\n<option value="LB">Liberec Region</option>\n<option value="HK">Hradec Region</option>\n<option value="PA">Pardubice Region</option>\n<option value="VY">Vysocina Region</option>\n<option value="SM">South Moravian Region</option>\n<option value="OL">Olomouc Region</option>\n<option value="ZL">Zlin Region</option>\n<option value="MS">Moravian-Silesian Region</option>\n</select>'
+u'<select name="regions">\n<option value="PR">Prague</option>\n<option value="CE">Central Bohemian Region</option>\n<option value="SO">South Bohemian Region</option>\n<option value="PI">Pilsen Region</option>\n<option value="CA">Carlsbad Region</option>\n<option value="US">Usti Region</option>\n<option value="LB">Liberec Region</option>\n<option value="HK">Hradec Region</option>\n<option value="PA">Pardubice Region</option>\n<option value="VY">Vysocina Region</option>\n<option value="SM">South Moravian Region</option>\n<option value="OL">Olomouc Region</option>\n<option value="ZL">Zlin Region</option>\n<option value="MS">Moravian-Silesian Region</option>\n</select>'
 
 # CZBirthNumberField ########################################################
 
