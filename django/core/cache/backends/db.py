@@ -54,9 +54,11 @@ class CacheClass(BaseCache):
         if num > self._max_entries:
             self._cull(cursor, now)
         encoded = base64.encodestring(pickle.dumps(value, 2)).strip()
-        cursor.execute("SELECT cache_key FROM %s WHERE cache_key = %%s" % self._table, [key])
+        cursor.execute("SELECT cache_key, expires FROM %s WHERE cache_key = %%s" % self._table, [key])
         try:
-            if mode == 'set' and cursor.fetchone():
+            result = cursor.fetchone()
+            if result and (mode == 'set' or
+                    (mode == 'add' and result[1] < now)):
                 cursor.execute("UPDATE %s SET value = %%s, expires = %%s WHERE cache_key = %%s" % self._table, [encoded, str(exp), key])
             else:
                 cursor.execute("INSERT INTO %s (cache_key, value, expires) VALUES (%%s, %%s, %%s)" % self._table, [key, encoded, str(exp)])
@@ -73,8 +75,9 @@ class CacheClass(BaseCache):
         transaction.commit_unless_managed()
 
     def has_key(self, key):
+        now = datetime.now().replace(microsecond=0)
         cursor = connection.cursor()
-        cursor.execute("SELECT cache_key FROM %s WHERE cache_key = %%s" % self._table, [key])
+        cursor.execute("SELECT cache_key FROM %s WHERE cache_key = %%s and expires > %%s" % self._table, [key, now])
         return cursor.fetchone() is not None
 
     def _cull(self, cursor, now):
