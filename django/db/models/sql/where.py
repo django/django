@@ -50,7 +50,7 @@ class WhereNode(tree.Node):
         if hasattr(obj, "process"):
             try:
                 obj, params = obj.process(lookup_type, value)
-            except EmptyShortCircuit:
+            except (EmptyShortCircuit, EmptyResultSet):
                 # There are situations where we want to short-circuit any
                 # comparisons and make sure that nothing is returned. One
                 # example is when checking for a NULL pk value, or the

@@ -1048,11 +1048,14 @@ performance problems on backends like MySQL.
 [<Annotation: a1>]
 
 Nested queries should not evaluate the inner query as part of constructing the
-SQL. This test verifies this: if the inner query is evaluated, the outer "in"
-lookup will raise an EmptyResultSet exception (as the inner query returns
-nothing).
->>> print Annotation.objects.filter(notes__in=Note.objects.filter(note="xyzzy")).query
-SELECT ...
+SQL (so we should see a nested query here, indicated by two "SELECT" calls).
+>>> Annotation.objects.filter(notes__in=Note.objects.filter(note="xyzzy")).query.as_sql()[0].count('SELECT')
+2
+
+Bug #10181 -- Avoid raising an EmptyResultSet if an inner query is provably
+empty (and hence, not executed).
+>>> Tag.objects.filter(id__in=Tag.objects.filter(id__in=[]))
+[]
 
 Bug #9997 -- If a ValuesList or Values queryset is passed as an inner query, we
 make sure it's only requesting a single value and use that as the thing to
