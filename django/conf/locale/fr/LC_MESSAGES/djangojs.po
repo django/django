@@ -1,15 +1,15 @@
-# French translation for js. 
-# Copyright (C) 2005 Mikaël Barbero 
-# This file is distributed under the same license as the PACKAGE package. 
+# French translation for Django Javascript. 
+# Copyright (C) 2005 Mikaël Barbero
+# This file is distributed under the same license as the Django package. 
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-11-04 11:14+0100\n"
-"PO-Revision-Date: 2005-12-24 16:39+0100\n"
-"Last-Translator: David Larlet <http://david.larlet.fr>\n"
-"Language-Team: français <http://django-fr.org>\n"
+"PO-Revision-Date: 2009-03-01 12:43+0100\n"
+"Last-Translator: Stéphane Raimbault <stephane.raimbault@gmail.com>\n"
+"Language-Team: French <http://django-fr.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -64,7 +64,7 @@ msgstr "Dimanche Lundi Mardi Mercredi Jeudi Vendredi Samedi"
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
 msgid "Show"
-msgstr "Montrer"
+msgstr "Afficher"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
 msgid "Hide"
