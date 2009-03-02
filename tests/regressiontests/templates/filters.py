@@ -199,6 +199,9 @@ def get_filter_tests():
         'filter-safe01': ("{{ a }} -- {{ a|safe }}", {"a": u"<b>hello</b>"}, "&lt;b&gt;hello&lt;/b&gt; -- <b>hello</b>"),
         'filter-safe02': ("{% autoescape off %}{{ a }} -- {{ a|safe }}{% endautoescape %}", {"a": "<b>hello</b>"}, u"<b>hello</b> -- <b>hello</b>"),
 
+        'filter-safeseq01': ('{{ a|join:", " }} -- {{ a|safeseq|join:", " }}', {"a": ["&", "<"]}, "&amp;, &lt; -- &, <"),
+        'filter-safeseq02': ('{% autoescape off %}{{ a|join:", " }} -- {{ a|safeseq|join:", " }}{% endautoescape %}', {"a": ["&", "<"]}, "&, < -- &, <"),
+
         'filter-removetags01': ('{{ a|removetags:"a b" }} {{ b|removetags:"a b" }}', {"a": "<a>x</a> <p><b>y</b></p>", "b": mark_safe("<a>x</a> <p><b>y</b></p>")}, u"x &lt;p&gt;y&lt;/p&gt; x <p>y</p>"),
         'filter-removetags02': ('{% autoescape off %}{{ a|removetags:"a b" }} {{ b|removetags:"a b" }}{% endautoescape %}', {"a": "<a>x</a> <p><b>y</b></p>", "b": mark_safe("<a>x</a> <p><b>y</b></p>")}, u"x <p>y</p> x <p>y</p>"),
 

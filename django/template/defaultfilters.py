@@ -422,10 +422,18 @@ def safe(value):
     """
     Marks the value as a string that should not be auto-escaped.
     """
-    from django.utils.safestring import mark_safe
     return mark_safe(value)
 safe.is_safe = True
 safe = stringfilter(safe)
+
+def safeseq(value):
+    """
+    A "safe" filter for sequences. Marks each element in the sequence,
+    individually, as safe, after converting them to unicode. Returns a list
+    with the results.
+    """
+    return [mark_safe(force_unicode(obj)) for obj in value]
+safeseq.is_safe = True
 
 def removetags(value, tags):
     """Removes a space separated list of [X]HTML tags from the output."""
@@ -876,6 +884,7 @@ register.filter(removetags)
 register.filter(random)
 register.filter(rjust)
 register.filter(safe)
+register.filter(safeseq)
 register.filter('slice', slice_)
 register.filter(slugify)
 register.filter(stringformat)
