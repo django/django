@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 REGION_CHOICES = (
     ('PR', _('Prague')),
-    ('CE', _('Cenral Bohemian Region')),
+    ('CE', _('Central Bohemian Region')),
     ('SO', _('South Bohemian Region')),
     ('PI', _('Pilsen Region')),
     ('CA', _('Carlsbad Region')),
