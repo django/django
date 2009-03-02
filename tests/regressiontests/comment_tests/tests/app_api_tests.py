@@ -41,7 +41,7 @@ class CustomCommentTest(CommentTestCase):
         del settings.INSTALLED_APPS[-1]
         settings.COMMENTS_APP = self.old_comments_app
         if settings.COMMENTS_APP is None:
-            delattr(settings._target, 'COMMENTS_APP')
+            delattr(settings._wrapped, 'COMMENTS_APP')
 
     def testGetCommentApp(self):
         from regressiontests.comment_tests import custom_comments
