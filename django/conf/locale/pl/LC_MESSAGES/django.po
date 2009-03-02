@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-23 21:21+0100\n"
+"POT-Creation-Date: 2009-03-02 09:50+0100\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -302,7 +302,7 @@ msgid "Changed %s."
 msgstr "Zmieniono %s"
 
 #: contrib/admin/options.py:338 contrib/admin/options.py:348
-#: contrib/comments/templates/comments/preview.html:15 forms/models.py:288
+#: contrib/comments/templates/comments/preview.html:15 forms/models.py:294
 msgid "and"
 msgstr "i"
 
@@ -325,13 +325,13 @@ msgstr "Usunięto %(name)s \"%(object)s\"."
 msgid "No fields changed."
 msgstr "Żadne pole nie zmienione."
 
-#: contrib/admin/options.py:417 contrib/auth/admin.py:51
+#: contrib/admin/options.py:417 contrib/auth/admin.py:61
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" dodany pomyślnie."
 
 #: contrib/admin/options.py:421 contrib/admin/options.py:454
-#: contrib/auth/admin.py:59
+#: contrib/auth/admin.py:69
 msgid "You may edit it again below."
 msgstr "Możesz ponownie edytować wpis poniżej."
 
@@ -431,12 +431,12 @@ msgstr "Zaloguj się"
 msgid "%s administration"
 msgstr "%s - administracja"
 
-#: contrib/admin/util.py:138
+#: contrib/admin/util.py:145
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Jedno lub więcej %(fieldname)s w %(name)s: %(obj)s"
 
-#: contrib/admin/util.py:143
+#: contrib/admin/util.py:150
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Jedno lub więcej %(fieldname)s w %(name)s:"
@@ -742,13 +742,13 @@ msgstr "Nazwa użytkownika"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:20
 #: contrib/admin/templates/admin/auth/user/change_password.html:33
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:60 contrib/auth/forms.py:184
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:60 contrib/auth/forms.py:185
 msgid "Password"
 msgstr "Hasło"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:26
 #: contrib/admin/templates/admin/auth/user/change_password.html:39
-#: contrib/auth/forms.py:185
+#: contrib/auth/forms.py:186
 msgid "Password (again)"
 msgstr "Hasło (powtórz)"
 
@@ -916,7 +916,7 @@ msgstr "Adres e-mail:"
 msgid "Reset my password"
 msgstr "Zresetuj moje hasło"
 
-#: contrib/admin/templatetags/admin_list.py:284
+#: contrib/admin/templatetags/admin_list.py:285
 msgid "All dates"
 msgstr "Wszystkie daty"
 
@@ -1061,7 +1061,7 @@ msgstr "Tekst"
 msgid "Time"
 msgstr "Czas"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:21
+#: contrib/admindocs/views.py:339 contrib/comments/forms.py:19
 #: contrib/comments/templates/comments/moderation_queue.html:37
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
@@ -1164,15 +1164,15 @@ msgstr "Ważne daty"
 msgid "Groups"
 msgstr "Grupy"
 
-#: contrib/auth/admin.py:64
+#: contrib/auth/admin.py:74
 msgid "Add user"
 msgstr "Dodaj użytkownika"
 
-#: contrib/auth/admin.py:90
+#: contrib/auth/admin.py:100
 msgid "Password changed successfully."
 msgstr "Hasło zostało zmienione pomyślnie."
 
-#: contrib/auth/admin.py:96
+#: contrib/auth/admin.py:106
 #, python-format
 msgid "Change password: %s"
 msgstr "Zmień hasło: %s"
@@ -1198,8 +1198,8 @@ msgstr "Potwierdzenie hasła"
 msgid "A user with that username already exists."
 msgstr "Użytkownik o tej nazwie już istnieje."
 
-#: contrib/auth/forms.py:36 contrib/auth/forms.py:154
-#: contrib/auth/forms.py:196
+#: contrib/auth/forms.py:36 contrib/auth/forms.py:155
+#: contrib/auth/forms.py:197
 msgid "The two password fields didn't match."
 msgstr "Hasła się nie zgadzają."
 
@@ -1227,24 +1227,24 @@ msgstr ""
 "Ten adres e-mail nie ma przypisanego konta. Jesteś pewien, że "
 "zarejestrowałeś się?"
 
-#: contrib/auth/forms.py:134
+#: contrib/auth/forms.py:135
 #, python-format
 msgid "Password reset on %s"
 msgstr "Hasło zresetowane dla %s"
 
-#: contrib/auth/forms.py:142
+#: contrib/auth/forms.py:143
 msgid "New password"
 msgstr "Nowe hasło"
 
-#: contrib/auth/forms.py:143
+#: contrib/auth/forms.py:144
 msgid "New password confirmation"
 msgstr "Nowe hasło ponownie"
 
-#: contrib/auth/forms.py:168
+#: contrib/auth/forms.py:169
 msgid "Old password"
 msgstr "Stare hasło"
 
-#: contrib/auth/forms.py:176
+#: contrib/auth/forms.py:177
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Podane stare hasło jest niepoprawne. Proszę podać je jeszcze raz."
 
@@ -1372,35 +1372,35 @@ msgstr "Wylogowany"
 msgid "Enter a valid e-mail address."
 msgstr "Wprowadź poprawny adres e-mail."
 
-#: contrib/comments/admin.py:11
+#: contrib/comments/admin.py:10
 msgid "Content"
 msgstr "Zawartość"
 
-#: contrib/comments/admin.py:14
+#: contrib/comments/admin.py:13
 msgid "Metadata"
 msgstr "Metadane"
 
-#: contrib/comments/forms.py:19
+#: contrib/comments/forms.py:17
 #: contrib/comments/templates/comments/moderation_queue.html:34
 msgid "Name"
 msgstr "Nazwa"
 
-#: contrib/comments/forms.py:20
+#: contrib/comments/forms.py:18
 msgid "Email address"
 msgstr "Adres e-mail"
 
-#: contrib/comments/forms.py:22
+#: contrib/comments/forms.py:20
 #: contrib/comments/templates/comments/moderation_queue.html:35
 msgid "Comment"
 msgstr "Komentarz"
 
-#: contrib/comments/forms.py:25
+#: contrib/comments/forms.py:23
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
 "Jeżeli wpiszesz cokolwiek w to pole, Twój komentarz zostanie uznany za spam"
 
-#: contrib/comments/forms.py:125
+#: contrib/comments/forms.py:123
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -3699,7 +3699,7 @@ msgstr "wyświetlana nazwa"
 msgid "sites"
 msgstr "strony"
 
-#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:683
+#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:692
 msgid "This value must be an integer."
 msgstr "Ta wartość musi być liczbą całkowitą."
 
@@ -3734,23 +3734,27 @@ msgstr ""
 msgid "This value must be a decimal number."
 msgstr "Ta wartość musi być liczbą dziesiętną."
 
-#: db/models/fields/__init__.py:719
+#: db/models/fields/__init__.py:668
+msgid "This value must be a float."
+msgstr "Ta wartość musi być liczbą zmiennoprzecinkową."
+
+#: db/models/fields/__init__.py:728
 msgid "This value must be either None, True or False."
 msgstr ""
 "Ta wartość musi być jedną z None (nic), True (prawda) lub False (fałsz)."
 
-#: db/models/fields/__init__.py:817 db/models/fields/__init__.py:831
+#: db/models/fields/__init__.py:826 db/models/fields/__init__.py:840
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Proszę wpisać poprawną godzinę w formacie HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:761
+#: db/models/fields/related.py:762
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Przytrzymaj wciśnięty klawisz \"Ctrl\" lub \"Command\" na Mac'u aby "
 "zaznaczyć więcej niż jeden wybór."
 
-#: db/models/fields/related.py:838
+#: db/models/fields/related.py:840
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3866,7 +3870,7 @@ msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Wybierz poprawną wartość. %(value)s nie jest jednym z dostępnych wyborów."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:714
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:721
 msgid "Enter a list of values."
 msgstr "Podaj listę wartości."
 
@@ -3883,20 +3887,20 @@ msgstr "To pole może zawierać jedynie litery, cyfry, podkreślenia i myślniki
 msgid "Order"
 msgstr "Porządek"
 
-#: forms/models.py:281 forms/models.py:290
+#: forms/models.py:287 forms/models.py:296
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(field_label)s już istnieje w %(model_name)s."
 
-#: forms/models.py:581
+#: forms/models.py:594
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "Osadzony klucz obcy nie pasuje do klucza głównego obiektu rodzica."
 
-#: forms/models.py:644
+#: forms/models.py:651
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wyborów."
 
-#: forms/models.py:715
+#: forms/models.py:722
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Wybierz poprawną wartość. %s nie jest jednym z dostępnych wyborów."
