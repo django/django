@@ -42,7 +42,7 @@ import os, re
 from ctypes import c_char_p, c_float, c_int, Structure, CDLL, POINTER
 from ctypes.util import find_library
 from django.conf import settings
-if not settings._target: settings.configure()
+if not settings.configured: settings.configure()
 
 # Creating the settings dictionary with any settings, if needed.
 GEOIP_SETTINGS = dict((key, getattr(settings, key)) 

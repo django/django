@@ -16,9 +16,9 @@ class Command(NoArgsCommand):
         from django.conf import settings, global_settings
 
         # Because settings are imported lazily, we need to explicitly load them.
-        settings._import_settings()
+        settings._setup()
 
-        user_settings = module_to_dict(settings._target)
+        user_settings = module_to_dict(settings._wrapped)
         default_settings = module_to_dict(global_settings)
 
         output = []
