@@ -278,40 +278,6 @@ class GeoQuery(sql.Query):
         return sel_fmt
 
     # Private API utilities, subject to change.
-    def _check_geo_field(self, model, name_param):
-        """
-        Recursive utility routine for checking the given name parameter
-        on the given model.  Initially, the name parameter is a string,
-        of the field on the given model e.g., 'point', 'the_geom'.
-        Related model field strings like 'address__point', may also be
-        used.
-
-        If a GeometryField exists according to the given name parameter
-        it will be returned, otherwise returns False.
-        """
-        if isinstance(name_param, basestring):
-            # This takes into account the situation where the name is a
-            # lookup to a related geographic field, e.g., 'address__point'.
-            name_param = name_param.split(sql.constants.LOOKUP_SEP)
-            name_param.reverse() # Reversing so list operates like a queue of related lookups.
-        elif not isinstance(name_param, list):
-            raise TypeError
-        try:
-            # Getting the name of the field for the model (by popping the first
-            # name from the `name_param` list created above).
-            fld, mod, direct, m2m = model._meta.get_field_by_name(name_param.pop())
-        except (FieldDoesNotExist, IndexError):
-            return False
-        # TODO: ManyToManyField?
-        if isinstance(fld, GeometryField):
-            return fld # A-OK.
-        elif isinstance(fld, ForeignKey):
-            # ForeignKey encountered, return the output of this utility called
-            # on the _related_ model with the remaining name parameters.
-            return self._check_geo_field(fld.rel.to, name_param) # Recurse to check ForeignKey relation.
-        else:
-            return False
-
     def _field_column(self, field, table_alias=None):
         """
         Helper function that returns the database column for the given field.
@@ -339,4 +305,4 @@ class GeoQuery(sql.Query):
         else:
             # Otherwise, check by the given field name -- which may be
             # a lookup to a _related_ geographic field.
-            return self._check_geo_field(self.model, field_name)
+            return GeoWhereNode._check_geo_field(self.model._meta, field_name)

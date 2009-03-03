@@ -21,12 +21,7 @@ def geo_suite():
         'test_measure',
         ]
     if HAS_GDAL:
-        if oracle:
-            # TODO: There's a problem with `select_related` and GeoQuerySet on
-            # Oracle -- e.g., GeoModel.objects.distance(geom, field_name='fk__point')
-            # doesn't work so we don't test `relatedapp`.
-            test_models += ['distapp', 'layermap']
-        elif postgis:
+        if oracle or postgis:
             test_models += ['distapp', 'layermap', 'relatedapp']
         elif mysql:
             test_models += ['relatedapp', 'layermap']
