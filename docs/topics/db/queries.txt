@@ -463,8 +463,9 @@ the primary model, not necessarily those objects that were selected by an
 earlier ``filter()`` call.
 
 That may sound a bit confusing, so hopefully an example will clarify. To
-select all blogs that contains entries with *"Lennon"* in the headline and
-were published in 2008, we would write::
+select all blogs that contain entries with both *"Lennon"* in the headline
+and that were published in 2008 (the same entry satisfying both conditions),
+we would write::
 
     Blog.objects.filter(entry__headline__contains='Lennon',
             entry__pub_date__year=2008)
