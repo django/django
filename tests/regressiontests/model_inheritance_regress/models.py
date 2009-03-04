@@ -43,6 +43,16 @@ class ParkingLot(Place):
     def __unicode__(self):
         return u"%s the parking lot" % self.name
 
+class ParkingLot2(Place):
+    # In lieu of any other connector, an existing OneToOneField will be
+    # promoted to the primary key.
+    parent = models.OneToOneField(Place)
+
+class ParkingLot3(Place):
+    # The parent_link connector need not be the pk on the model.
+    primary_key = models.AutoField(primary_key=True)
+    parent = models.OneToOneField(Place, parent_link=True)
+
 class Supplier(models.Model):
     restaurant = models.ForeignKey(Restaurant)
 
@@ -292,6 +302,21 @@ True
 <DerivedM: PK = 44, base_name = b1, derived_name = d1>
 >>> DerivedM.objects.all()
 [<DerivedM: PK = 44, base_name = b1, derived_name = d1>]
+
+# Regression tests for #10406
+
+# If there's a one-to-one link between a child model and the parent and no
+# explicit pk declared, we can use the one-to-one link as the pk on the child.
+# The ParkingLot2 model shows this behaviour.
+>>> ParkingLot2._meta.pk.name
+"parent"
+
+# However, the connector from child to parent need not be the pk on the child
+# at all.
+>>> ParkingLot3._meta.pk.name
+"primary_key"
+>>> ParkingLot3._meta.get_ancestor_link(Place).name  # the child->parent link
+"parent"
 
 """}
 
