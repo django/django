@@ -435,6 +435,21 @@ class Options(object):
             result.update(parent._meta.get_parent_list())
         return result
 
+    def get_ancestor_link(self, ancestor):
+        """
+        Returns the field on the current model which points to the given
+        "ancestor". This is possible an indirect link (a pointer to a parent
+        model, which points, eventually, to the ancestor). Used when
+        constructing table joins for model inheritance.
+
+        Returns None if the model isn't an ancestor of this one.
+        """
+        if ancestor in self.parents:
+            return self.parents[ancestor]
+        for parent in self.parents:
+            if parent._meta.get_ancestor_link(ancestor):
+                return self.parents[parent]
+
     def get_ordered_objects(self):
         "Returns a list of Options objects that are ordered with respect to this object."
         if not hasattr(self, '_ordered_objects'):

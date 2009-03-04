@@ -643,14 +643,14 @@ class BaseQuery(object):
         aliases = set()
         if start_alias:
             seen = {None: start_alias}
-            root_pk = opts.pk.column
         for field, model in opts.get_fields_with_model():
             if start_alias:
                 try:
                     alias = seen[model]
                 except KeyError:
+                    link_field = opts.get_ancestor_link(model)
                     alias = self.join((start_alias, model._meta.db_table,
-                            root_pk, model._meta.pk.column))
+                            link_field.column, model._meta.pk.column))
                     seen[model] = alias
             else:
                 # If we're starting from the base model of the queryset, the
@@ -1156,13 +1156,13 @@ class BaseQuery(object):
         as_sql()).
         """
         opts = self.model._meta
-        root_pk = opts.pk.column
         root_alias = self.tables[0]
         seen = {None: root_alias}
         for field, model in opts.get_fields_with_model():
             if model not in seen:
+                link_field = opts.get_ancestor_link(model)
                 seen[model] = self.join((root_alias, model._meta.db_table,
-                        root_pk, model._meta.pk.column))
+                        link_field.column, model._meta.pk.column))
         self.included_inherited_models = seen
 
     def remove_inherited_models(self):
