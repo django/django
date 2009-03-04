@@ -271,8 +271,8 @@ True
 # (regression test for #10362).
 >>> article = ArticleWithAuthor.objects.create(author="fred", headline="Hey there!", pub_date = datetime.datetime(2009, 3, 1, 8, 0, 0))
 >>> ArticleWithAuthor.objects.filter(author="fred").update(headline="Oh, no!")
-0
+1
 >>> ArticleWithAuthor.objects.filter(pk=article.pk).update(headline="Oh, no!")
-0
+1
 
 """}
