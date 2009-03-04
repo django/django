@@ -94,6 +94,16 @@ class ModelBase(type):
                          new_class._meta.virtual_fields
             field_names = set([f.name for f in new_fields])
 
+            parent_fields = base._meta.local_fields + base._meta.local_many_to_many
+            # Check for clashes between locally declared fields and those
+            # on the base classes (we cannot handle shadowed fields at the
+            # moment).
+            for field in parent_fields:
+                if field.name in field_names:
+                    raise FieldError('Local field %r in class %r clashes '
+                                     'with field of similar name from '
+                                     'base class %r' %
+                                        (field.name, name, base.__name__))
             if not base._meta.abstract:
                 # Concrete classes...
                 if base in o2o_map:
@@ -107,16 +117,7 @@ class ModelBase(type):
 
             else:
                 # .. and abstract ones.
-
-                # Check for clashes between locally declared fields and those
-                # on the ABC.
-                parent_fields = base._meta.local_fields + base._meta.local_many_to_many
                 for field in parent_fields:
-                    if field.name in field_names:
-                        raise FieldError('Local field %r in class %r clashes '\
-                                         'with field of similar name from '\
-                                         'abstract base class %r' % \
-                                            (field.name, name, base.__name__))
                     new_class.add_to_class(field.name, copy.deepcopy(field))
 
                 # Pass any non-abstract parent classes onto child.
@@ -131,7 +132,8 @@ class ModelBase(type):
                     new_manager = manager._copy_to_model(new_class)
                     new_class.add_to_class(mgr_name, new_manager)
 
-            # Inherit virtual fields (like GenericForeignKey) from the parent class
+            # Inherit virtual fields (like GenericForeignKey) from the parent
+            # class
             for field in base._meta.virtual_fields:
                 if base._meta.abstract and field.name in field_names:
                     raise FieldError('Local field %r in class %r clashes '\
