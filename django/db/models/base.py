@@ -98,8 +98,6 @@ class ModelBase(type):
                 # Concrete classes...
                 if base in o2o_map:
                     field = o2o_map[base]
-                    field.primary_key = True
-                    new_class._meta.setup_pk(field)
                 else:
                     attr_name = '%s_ptr' % base._meta.module_name
                     field = OneToOneField(base, name=attr_name,
