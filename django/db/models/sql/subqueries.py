@@ -179,21 +179,9 @@ class UpdateQuery(Query):
         query = self.clone(klass=Query)
         query.bump_prefix()
         query.extra_select = {}
-        first_table = query.tables[0]
-        if query.alias_refcount[first_table] == 1:
-            # We can remove one table from the inner query.
-            query.unref_alias(first_table)
-            for i in xrange(1, len(query.tables)):
-                table = query.tables[i]
-                if query.alias_refcount[table]:
-                    break
-            join_info = query.alias_map[table]
-            query.select = [(join_info[RHS_ALIAS], join_info[RHS_JOIN_COL])]
-            must_pre_select = False
-        else:
-            query.select = []
-            query.add_fields([query.model._meta.pk.name])
-            must_pre_select = not self.connection.features.update_can_self_select
+        query.select = []
+        query.add_fields([query.model._meta.pk.name])
+        must_pre_select = count > 1 and not self.connection.features.update_can_self_select
 
         # Now we adjust the current query: reset the where clause and get rid
         # of all the tables we don't need (since they're in the sub-select).

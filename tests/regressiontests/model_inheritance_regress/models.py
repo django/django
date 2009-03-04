@@ -222,7 +222,7 @@ True
 >>> obj = SelfRefChild.objects.create(child_data=37, parent_data=42)
 >>> obj.delete()
 
-# Regression tests for #8076 - get_(next/previous)_by_date should 
+# Regression tests for #8076 - get_(next/previous)_by_date should work.
 >>> c1 = ArticleWithAuthor(headline='ArticleWithAuthor 1', author="Person 1", pub_date=datetime.datetime(2005, 8, 1, 3, 0))
 >>> c1.save()
 >>> c2 = ArticleWithAuthor(headline='ArticleWithAuthor 2', author="Person 2", pub_date=datetime.datetime(2005, 8, 1, 10, 0))
@@ -266,5 +266,13 @@ DoesNotExist: ArticleWithAuthor matching query does not exist.
 >>> pos = fragment.find('pub_date')
 >>> fragment.find('pub_date', pos + 1) == -1
 True
+
+# It is possible to call update() and only change a field in an ancestor model
+# (regression test for #10362).
+>>> article = ArticleWithAuthor.objects.create(author="fred", headline="Hey there!", pub_date = datetime.datetime(2009, 3, 1, 8, 0, 0))
+>>> ArticleWithAuthor.objects.filter(author="fred").update(headline="Oh, no!")
+1
+>>> ArticleWithAuthor.objects.filter(pk=article.pk).update(headline="Oh, no!")
+1
 
 """}
