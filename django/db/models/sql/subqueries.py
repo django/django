@@ -113,14 +113,19 @@ class UpdateQuery(Query):
     def execute_sql(self, result_type=None):
         """
         Execute the specified update. Returns the number of rows affected by
-        the primary update query (there could be other updates on related
-        tables, but their rowcounts are not returned).
+        the primary update query. The "primary update query" is the first
+        non-empty query that is executed. Row counts for any subsequent,
+        related queries are not available.
         """
         cursor = super(UpdateQuery, self).execute_sql(result_type)
         rows = cursor and cursor.rowcount or 0
+        is_empty = cursor is None
         del cursor
         for query in self.get_related_updates():
-            query.execute_sql(result_type)
+            aux_rows = query.execute_sql(result_type)
+            if is_empty:
+                rows = aux_rows
+                is_empty = False
         return rows
 
     def as_sql(self):
