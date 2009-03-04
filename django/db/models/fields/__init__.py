@@ -198,9 +198,9 @@ class Field(object):
             # be invoked before the final SQL is evaluated
             if hasattr(value, 'relabel_aliases'):
                 return value
-            try:
+            if hasattr(value, 'as_sql'):
                 sql, params = value.as_sql()
-            except AttributeError:
+            else:
                 sql, params = value._as_sql()
             return QueryWrapper(('(%s)' % sql), params)
 
