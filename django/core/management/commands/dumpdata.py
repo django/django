@@ -1,6 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
+from django.utils.datastructures import SortedDict
 
 from optparse import make_option
 
@@ -27,9 +28,9 @@ class Command(BaseCommand):
         excluded_apps = [get_app(app_label) for app_label in exclude]
 
         if len(app_labels) == 0:
-            app_list = dict([(app, None) for app in get_apps() if app not in excluded_apps])
+            app_list = SortedDict([(app, None) for app in get_apps() if app not in excluded_apps])
         else:
-            app_list = {}
+            app_list = SortedDict()
             for label in app_labels:
                 try:
                     app_label, model_label = label.split('.')
