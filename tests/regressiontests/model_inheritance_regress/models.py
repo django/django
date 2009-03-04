@@ -86,6 +86,19 @@ class Evaluation(Article):
 class QualityControl(Evaluation):
     assignee = models.CharField(max_length=50)
 
+class BaseM(models.Model):
+    base_name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.base_name
+
+class DerivedM(BaseM):
+    customPK = models.IntegerField(primary_key=True)
+    derived_name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return "PK = %d, base_name = %s, derived_name = %s" \
+                % (self.customPK, self.base_name, self.derived_name)
 
 __test__ = {'API_TESTS':"""
 # Regression for #7350, #7202
@@ -275,4 +288,10 @@ True
 >>> ArticleWithAuthor.objects.filter(pk=article.pk).update(headline="Oh, no!")
 1
 
+>>> DerivedM.objects.create(customPK=44, base_name="b1", derived_name="d1")
+<DerivedM: PK = 44, base_name = b1, derived_name = d1>
+>>> DerivedM.objects.all()
+[<DerivedM: PK = 44, base_name = b1, derived_name = d1>]
+
 """}
+
