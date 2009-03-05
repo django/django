@@ -54,8 +54,8 @@ string, not ``NULL``.
 .. note::
 
     When using the Oracle database backend, the ``null=True`` option will be
-    coerced for string-based fields that can blank, and the value ``NULL`` will
-    be stored to denote the empty string.
+    coerced for string-based fields that have the empty string as a possible
+    value, and the value ``NULL`` will be stored to denote the empty string.
 
 ``blank``
 ---------
