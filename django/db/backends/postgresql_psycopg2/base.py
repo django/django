@@ -72,16 +72,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if settings.DATABASE_NAME == '':
                 from django.core.exceptions import ImproperlyConfigured
                 raise ImproperlyConfigured("You need to specify DATABASE_NAME in your Django settings file.")
-            conn_string = "dbname=%s" % settings.DATABASE_NAME
+            conn_params = {
+                'database': settings.DATABASE_NAME,
+            }
+            conn_params.update(self.options)
             if settings.DATABASE_USER:
-                conn_string = "user=%s %s" % (settings.DATABASE_USER, conn_string)
+                conn_params['user'] = settings.DATABASE_USER
             if settings.DATABASE_PASSWORD:
-                conn_string += " password='%s'" % settings.DATABASE_PASSWORD
+                conn_params['password'] = settings.DATABASE_PASSWORD
             if settings.DATABASE_HOST:
-                conn_string += " host=%s" % settings.DATABASE_HOST
+                conn_params['host'] = settings.DATABASE_HOST
             if settings.DATABASE_PORT:
-                conn_string += " port=%s" % settings.DATABASE_PORT
-            self.connection = Database.connect(conn_string, **self.options)
+                conn_params['port'] = settings.DATABASE_PORT
+            self.connection = Database.connect(**conn_params)
             self.connection.set_isolation_level(1) # make transactions transparent to all cursors
             self.connection.set_client_encoding('UTF8')
         cursor = self.connection.cursor()
