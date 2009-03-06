@@ -33,6 +33,15 @@ class Favorites(models.Model):
     def __unicode__(self):
         return u"Favorites for %s" % self.name
 
+class Target(models.Model):
+    pass
+
+class Pointer(models.Model):
+    other = models.OneToOneField(Target, primary_key=True)
+
+class Pointer2(models.Model):
+    other = models.OneToOneField(Target)
+
 __test__ = {'API_TESTS':"""
 # Regression test for #1064 and #1506: Check that we create models via the m2m
 # relation if the remote model has a OneToOneField.
@@ -118,5 +127,18 @@ True
 False
 >>> r.place == p
 True
+
+# Regression test for #9968: filtering reverse one-to-one relations with
+# primary_key=True was misbehaving. We test both (primary_key=True & False)
+# cases here to prevent any reappearance of the problem.
+>>> _ = Target.objects.create()
+>>> Target.objects.filter(pointer=None)
+[<Target: Target object>]
+>>> Target.objects.exclude(pointer=None)
+[]
+>>> Target.objects.filter(pointer2=None)
+[<Target: Target object>]
+>>> Target.objects.exclude(pointer2=None)
+[]
 
 """}

@@ -1197,14 +1197,21 @@ class BaseQuery(object):
             col = target.column
         alias = join_list[-1]
 
+        if (lookup_type == 'isnull' and value is True and not negate and
+                len(join_list) > 1):
+            # If the comparison is against NULL, we may need to use some left
+            # outer joins when creating the join chain. This is only done when
+            # needed, as it's less efficient at the database level.
+            self.promote_alias_chain(join_list)
+
         while final > 1:
-            # An optimization: if the final join is against the same column as
-            # we are comparing against, we can go back one step in the join
-            # chain and compare against the lhs of the join instead (and then
-            # repeat the optimization). The result, potentially, involves less
-            # table joins.
+            # An optimization: if the final join is an inner join against the
+            # same column as we are comparing against, we can go back one step
+            # in the join chain and compare against the lhs of the join instead
+            # (and then repeat the optimization). The result, potentially,
+            # involves less table joins.
             join = self.alias_map[alias]
-            if col != join[RHS_JOIN_COL]:
+            if col != join[RHS_JOIN_COL] or join[JOIN_TYPE] != self.INNER:
                 break
             self.unref_alias(alias)
             alias = join[LHS_ALIAS]
@@ -1213,14 +1220,6 @@ class BaseQuery(object):
             final -= 1
             if final == penultimate:
                 penultimate = last.pop()
-
-        if (lookup_type == 'isnull' and value is True and not negate and
-                final > 1):
-            # If the comparison is against NULL, we need to use a left outer
-            # join when connecting to the previous model. We make that
-            # adjustment here. We don't do this unless needed as it's less
-            # efficient at the database level.
-            self.promote_alias(join_list[penultimate])
 
         if connector == OR:
             # Some joins may need to be promoted when adding a new filter to a
