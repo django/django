@@ -13,6 +13,17 @@ class Choice(models.Model):
     def __unicode__(self):
         return u"Choice: %s in poll %s" % (self.choice, self.poll)
 
+# A set of models with an inner one pointing to two outer ones.
+class OuterA(models.Model):
+    pass
+
+class OuterB(models.Model):
+    data = models.CharField(max_length=10)
+
+class Inner(models.Model):
+    first = models.ForeignKey(OuterA)
+    second = models.ForeignKey(OuterB, null=True)
+
 __test__ = {'API_TESTS':"""
 # Regression test for the use of None as a query value. None is interpreted as
 # an SQL NULL, but only in __exact queries.
@@ -55,5 +66,17 @@ ValueError: Cannot use None as a query value
 >>> p2 = Poll(question="How?")
 >>> p2.choice_set.all()
 []
+
+# Querying across reverse relations and then another relation should insert
+# outer joins correctly so as not to exclude results.
+>>> obj = OuterA.objects.create()
+>>> OuterA.objects.filter(inner__second=None)
+[<OuterA: OuterA object>]
+>>> OuterA.objects.filter(inner__second__data=None)
+[<OuterA: OuterA object>]
+>>> _ = Inner.objects.create(first=obj)
+>>> Inner.objects.filter(first__inner__second=None)
+[<Inner: Inner object>]
+
 
 """}

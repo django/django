@@ -1287,7 +1287,7 @@ class BaseQuery(object):
                 field_list, opts, self.get_initial_alias(), False)
 
             # Process the join chain to see if it can be trimmed
-            _, _, col, _, join_list = self.trim_joins(source, join_list, last, False)
+            col, _, join_list = self.trim_joins(source, join_list, last, False)
 
             # If the aggregate references a model or field that requires a join,
             # those joins must be LEFT OUTER - empty join rows must be returned
@@ -1392,16 +1392,16 @@ class BaseQuery(object):
                     can_reuse)
             return
 
-        # Process the join chain to see if it can be trimmed
-        final, penultimate, col, alias, join_list = self.trim_joins(target, join_list, last, trim)
-
         if (lookup_type == 'isnull' and value is True and not negate and
-                final > 1):
-            # If the comparison is against NULL, we need to use a left outer
-            # join when connecting to the previous model. We make that
-            # adjustment here. We don't do this unless needed as it's less
-            # efficient at the database level.
-            self.promote_alias(join_list[penultimate])
+                len(join_list) > 1):
+            # If the comparison is against NULL, we may need to use some left
+            # outer joins when creating the join chain. This is only done when
+            # needed, as it's less efficient at the database level.
+            self.promote_alias_chain(join_list)
+
+        # Process the join list to see if we can remove any inner joins from
+        # the far end (fewer tables in a query is better).
+        col, alias, join_list = self.trim_joins(target, join_list, last, trim)
 
         if connector == OR:
             # Some joins may need to be promoted when adding a new filter to a
@@ -1436,7 +1436,7 @@ class BaseQuery(object):
         if negate:
             self.promote_alias_chain(join_list)
             if lookup_type != 'isnull':
-                if final > 1:
+                if len(join_list) > 1:
                     for alias in join_list:
                         if self.alias_map[alias][JOIN_TYPE] == self.LOUTER:
                             j_col = self.alias_map[alias][RHS_JOIN_COL]
@@ -1699,13 +1699,28 @@ class BaseQuery(object):
         return field, target, opts, joins, last, extra_filters
 
     def trim_joins(self, target, join_list, last, trim):
-        """An optimization: if the final join is against the same column as
-        we are comparing against, we can go back one step in a join
-        chain and compare against the LHS of the join instead (and then
-        repeat the optimization). The result, potentially, involves less
-        table joins.
+        """
+        Sometimes joins at the end of a multi-table sequence can be trimmed. If
+        the final join is against the same column as we are comparing against,
+        and is an inner join, we can go back one step in a join chain and
+        compare against the LHS of the join instead (and then repeat the
+        optimization). The result, potentially, involves less table joins.
 
-        Returns a tuple
+        The 'target' parameter is the final field being joined to, 'join_list'
+        is the full list of join aliases.
+
+        The 'last' list contains offsets into 'join_list', corresponding to
+        each component of the filter.  Many-to-many relations, for example, add
+        two tables to the join list and we want to deal with both tables the
+        same way, so 'last' has an entry for the first of the two tables and
+        then the table immediately after the second table, in that case.
+
+        The 'trim' parameter forces the final piece of the join list to be
+        trimmed before anything. See the documentation of add_filter() for
+        details about this.
+
+        Returns the final active column and table alias and the new active
+        join_list.
         """
         final = len(join_list)
         penultimate = last.pop()
@@ -1724,7 +1739,7 @@ class BaseQuery(object):
         alias = join_list[-1]
         while final > 1:
             join = self.alias_map[alias]
-            if col != join[RHS_JOIN_COL]:
+            if col != join[RHS_JOIN_COL] or join[JOIN_TYPE] != self.INNER:
                 break
             self.unref_alias(alias)
             alias = join[LHS_ALIAS]
@@ -1733,7 +1748,7 @@ class BaseQuery(object):
             final -= 1
             if final == penultimate:
                 penultimate = last.pop()
-        return final, penultimate, col, alias, join_list
+        return col, alias, join_list
 
     def update_dupe_avoidance(self, opts, col, alias):
         """
