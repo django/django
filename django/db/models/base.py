@@ -224,12 +224,13 @@ class Model(object):
         # keywords, or default.
 
         for field in fields_iter:
-            rel_obj = None
+            is_related_object = False
             if kwargs:
                 if isinstance(field.rel, ManyToOneRel):
                     try:
                         # Assume object instance was passed in.
                         rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
                     except KeyError:
                         try:
                             # Object instance wasn't passed in -- must be an ID.
@@ -245,11 +246,11 @@ class Model(object):
                     val = kwargs.pop(field.attname, field.get_default())
             else:
                 val = field.get_default()
-            # If we got passed a related instance, set it using the field.name
-            # instead of field.attname (e.g. "user" instead of "user_id") so
-            # that the object gets properly cached (and type checked) by the
-            # RelatedObjectDescriptor.
-            if rel_obj:
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
                 setattr(self, field.name, rel_obj)
             else:
                 setattr(self, field.attname, val)

@@ -1,5 +1,5 @@
 """
-Regression tests for a few FK bugs: #1578, #6886
+Regression tests for a few ForeignKey bugs.
 """
 
 from django.db import models
@@ -105,6 +105,17 @@ ValueError: Cannot assign None: "Child.parent" does not allow null values.
 Traceback (most recent call last):
     ...
 ValueError: Cannot assign "<First: First object>": "Child.parent" must be a "Parent" instance.
+
+# Nor can you explicitly assign None to Child.parent during object creation
+# (regression for #9649).
+>>> Child(name='xyzzy', parent=None)
+Traceback (most recent call last):
+    ...
+ValueError: Cannot assign None: "Child.parent" does not allow null values.
+>>> Child.objects.create(name='xyzzy', parent=None)
+Traceback (most recent call last):
+    ...
+ValueError: Cannot assign None: "Child.parent" does not allow null values.
 
 # Creation using keyword argument should cache the related object.
 >>> p = Parent.objects.get(name="Parent")
