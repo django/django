@@ -9,42 +9,45 @@ def geo_suite():
     """
     from django.conf import settings
     from django.contrib.gis.tests.utils import mysql, oracle, postgis
-    from django.contrib.gis.gdal import HAS_GDAL
-    from django.contrib.gis.utils import HAS_GEOIP
+    from django.contrib.gis import gdal, utils
 
-    # Tests that require use of a spatial database (e.g., creation of models)
-    test_models = ['geoapp',]
+    # The test suite.
+    s = unittest.TestSuite()
 
-    # Tests that do not require setting up and tearing down a spatial database.
+    # Adding the GEOS tests. (__future__)
+    #from django.contrib.gis.geos import tests as geos_tests
+    #s.addTest(geos_tests.suite())
+
+    # Test apps that require use of a spatial database (e.g., creation of models)
+    test_apps = ['geoapp', 'relatedapp']
+    if oracle or postgis:
+        test_apps.append('distapp')
+
+    # Tests that do not require setting up and tearing down a spatial database
+    # and are modules in `django.contrib.gis.tests`.
     test_suite_names = [
         'test_geos',
         'test_measure',
         ]
-    if HAS_GDAL:
-        if oracle or postgis:
-            test_models += ['distapp', 'layermap', 'relatedapp']
-        elif mysql:
-            test_models += ['relatedapp', 'layermap']
 
-        test_suite_names += [
-            'test_gdal_driver',
-            'test_gdal_ds',
-            'test_gdal_envelope',
-            'test_gdal_geom',
-            'test_gdal_srs',
-            'test_spatialrefsys',
-            ]
+    if gdal.HAS_GDAL:
+        # These tests require GDAL.
+        test_suite_names.append('test_spatialrefsys')
+        test_apps.append('layermap')
+
+        # Adding the GDAL tests.
+        from django.contrib.gis.gdal import tests as gdal_tests
+        s.addTest(gdal_tests.suite())
     else:
         print >>sys.stderr, "GDAL not available - no GDAL tests will be run."
 
-    if HAS_GEOIP and hasattr(settings, 'GEOIP_PATH'):
+    if utils.HAS_GEOIP and hasattr(settings, 'GEOIP_PATH'):
         test_suite_names.append('test_geoip')
 
-    s = unittest.TestSuite()
-    for test_suite in test_suite_names:
-        tsuite = getattr(__import__('django.contrib.gis.tests', globals(), locals(), [test_suite]),test_suite)
+    for suite_name in test_suite_names:
+        tsuite = getattr(__import__('django.contrib.gis.tests', globals(), locals(), [suite_name]), suite_name)
         s.addTest(tsuite.suite())
-    return s, test_models
+    return s, test_apps
 
 def run_gis_tests(test_labels, **kwargs):
     """
@@ -80,9 +83,9 @@ def run_gis_tests(test_labels, **kwargs):
 
     # Creating the test suite, adding the test models to INSTALLED_APPS, and
     # adding the model test suites to our suite package.
-    gis_suite, test_models = geo_suite()
-    for test_model in test_models:
-        module_name = 'django.contrib.gis.tests.%s' % test_model
+    gis_suite, test_apps = geo_suite()
+    for test_app in test_apps:
+        module_name = 'django.contrib.gis.tests.%s' % test_app
         if mysql:
             test_module_name = 'tests_mysql'
         else:
@@ -90,13 +93,13 @@ def run_gis_tests(test_labels, **kwargs):
         new_installed.append(module_name)
 
         # Getting the model test suite
-        tsuite = getattr(__import__('django.contrib.gis.tests.%s' % test_model, globals(), locals(), [test_module_name]), 
+        tsuite = getattr(__import__('django.contrib.gis.tests.%s' % test_app, globals(), locals(), [test_module_name]),
                          test_module_name)
         gis_suite.addTest(tsuite.suite())
 
-    # Resetting the loaded flag to take into account what we appended to 
-    # the INSTALLED_APPS (since this routine is invoked through 
-    # django/core/management, it caches the apps; this ensures that syncdb 
+    # Resetting the loaded flag to take into account what we appended to
+    # the INSTALLED_APPS (since this routine is invoked through
+    # django/core/management, it caches the apps; this ensures that syncdb
     # will see our appended models)
     settings.INSTALLED_APPS = new_installed
     loading.cache.loaded = False
@@ -198,3 +201,25 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[], suite=
 
     # Returning the total failures and errors
     return len(result.failures) + len(result.errors)
+
+# Class for creating a fake module with a run method.  This is for the
+# GEOS and GDAL tests that were moved to their respective modules.
+class _DeprecatedTestModule(object):
+    def __init__(self, tests, mod):
+        self.tests = tests
+        self.mod = mod
+
+    def run(self):
+        from warnings import warn
+        warn('This test module is deprecated because it has moved to ' \
+             '`django.contrib.gis.%s.tests` and will disappear in 1.2.' %
+             self.mod, DeprecationWarning)
+        self.tests.run()
+
+#from django.contrib.gis.geos import tests as _tests
+#test_geos = _DeprecatedTestModule(_tests, 'geos')
+
+from django.contrib.gis.gdal import HAS_GDAL
+if HAS_GDAL:
+    from django.contrib.gis.gdal import tests as _tests
+    test_gdal = _DeprecatedTestModule(_tests, 'gdal')

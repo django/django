@@ -1,16 +1,14 @@
 from ctypes import byref, c_int
 from datetime import date, datetime, time
+from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import OGRException
-from django.contrib.gis.gdal.prototypes.ds import \
-    get_feat_field_defn, get_field_as_datetime, get_field_as_double, \
-    get_field_as_integer, get_field_as_string, get_field_name, get_field_precision, \
-    get_field_type, get_field_type_name, get_field_width
+from django.contrib.gis.gdal.prototypes import ds as capi
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
 # The OGR_Fld_* routines are relevant here.
-class Field(object):
+class Field(GDALBase):
     "A class that wraps an OGR Field, needs to be instantiated from a Feature object."
 
     #### Python 'magic' routines ####
@@ -24,13 +22,13 @@ class Field(object):
         self._index = index
         
         # Getting the pointer for this field.
-        fld = get_feat_field_defn(feat, index)
-        if not fld:
+        fld_ptr = capi.get_feat_field_defn(feat, index)
+        if not fld_ptr:
             raise OGRException('Cannot create OGR Field, invalid pointer given.')
-        self._ptr = fld
+        self.ptr = fld_ptr
 
         # Setting the class depending upon the OGR Field Type (OFT)
-        self.__class__ = FIELD_CLASSES[self.type]
+        self.__class__ = OGRFieldTypes[self.type]
 
         # OFTReal with no precision should be an OFTInteger.
         if isinstance(self, OFTReal) and self.precision == 0:
@@ -43,21 +41,21 @@ class Field(object):
     #### Field Methods ####
     def as_double(self):
         "Retrieves the Field's value as a double (float)."
-        return get_field_as_double(self._feat, self._index)
+        return capi.get_field_as_double(self._feat, self._index)
 
     def as_int(self):
         "Retrieves the Field's value as an integer."
-        return get_field_as_integer(self._feat, self._index)
+        return capi.get_field_as_integer(self._feat, self._index)
 
     def as_string(self):
         "Retrieves the Field's value as a string."
-        return get_field_as_string(self._feat, self._index)
+        return capi.get_field_as_string(self._feat, self._index)
 
     def as_datetime(self):
         "Retrieves the Field's value as a tuple of date & time components."
         yy, mm, dd, hh, mn, ss, tz = [c_int() for i in range(7)]
-        status = get_field_as_datetime(self._feat, self._index, byref(yy), byref(mm), byref(dd),
-                                       byref(hh), byref(mn), byref(ss), byref(tz))
+        status = capi.get_field_as_datetime(self._feat, self._index, byref(yy), byref(mm), byref(dd),
+                                            byref(hh), byref(mn), byref(ss), byref(tz))
         if status:
             return (yy, mm, dd, hh, mn, ss, tz)
         else:
@@ -67,22 +65,22 @@ class Field(object):
     @property
     def name(self):
         "Returns the name of this Field."
-        return get_field_name(self._ptr)
+        return capi.get_field_name(self.ptr)
 
     @property
     def precision(self):
         "Returns the precision of this Field."
-        return get_field_precision(self._ptr)
+        return capi.get_field_precision(self.ptr)
 
     @property
     def type(self):
         "Returns the OGR type of this Field."
-        return get_field_type(self._ptr)
+        return capi.get_field_type(self.ptr)
 
     @property
     def type_name(self):
         "Return the OGR field type name for this Field."
-        return get_field_type_name(self.type)
+        return capi.get_field_type_name(self.type)
 
     @property
     def value(self):
@@ -93,7 +91,7 @@ class Field(object):
     @property
     def width(self):
         "Returns the width of this Field."
-        return get_field_width(self._ptr)
+        return capi.get_field_width(self.ptr)
 
 ### The Field sub-classes for each OGR Field type. ###
 class OFTInteger(Field):
@@ -163,8 +161,8 @@ class OFTRealList(Field): pass
 class OFTStringList(Field): pass
 class OFTWideStringList(Field): pass
 
-# Class mapping dictionary for OFT Types
-FIELD_CLASSES = { 0 : OFTInteger,
+# Class mapping dictionary for OFT Types and reverse mapping.
+OGRFieldTypes = { 0 : OFTInteger,
                   1 : OFTIntegerList,
                   2 : OFTReal,
                   3 : OFTRealList,
@@ -177,3 +175,4 @@ FIELD_CLASSES = { 0 : OFTInteger,
                  10 : OFTTime,
                  11 : OFTDateTime,
                   }
+ROGRFieldTypes = dict([(cls, num) for num, cls in OGRFieldTypes.items()])

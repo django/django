@@ -27,89 +27,74 @@
   NAD83 / Texas South Central
 """
 import re
-from types import UnicodeType, TupleType
 from ctypes import byref, c_char_p, c_int, c_void_p
 
 # Getting the error checking routine and exceptions
+from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import OGRException, SRSException
-from django.contrib.gis.gdal.prototypes.srs import *
+from django.contrib.gis.gdal.prototypes import srs as capi
 
 #### Spatial Reference class. ####
-class SpatialReference(object):
+class SpatialReference(GDALBase):
     """
     A wrapper for the OGRSpatialReference object.  According to the GDAL website,
     the SpatialReference object "provide[s] services to represent coordinate 
     systems (projections and datums) and to transform between them."
     """
 
-    # Well-Known Geographical Coordinate System Name
-    _well_known = {'WGS84':4326, 'WGS72':4322, 'NAD27':4267, 'NAD83':4269}
-    _epsg_regex = re.compile('^(EPSG:)?(?P<epsg>\d+)$', re.I)
-    _proj_regex = re.compile(r'^\+proj')
-
     #### Python 'magic' routines ####
-    def __init__(self, srs_input='', srs_type='wkt'):
+    def __init__(self, srs_input=''):
         """
         Creates a GDAL OSR Spatial Reference object from the given input.
         The input may be string of OGC Well Known Text (WKT), an integer 
         EPSG code, a PROJ.4 string, and/or a projection "well known" shorthand 
         string (one of 'WGS84', 'WGS72', 'NAD27', 'NAD83').
         """
-        # Intializing pointer and string buffer.
-        self._ptr = None
         buf = c_char_p('')
+        srs_type = 'user'
 
         if isinstance(srs_input, basestring):
             # Encoding to ASCII if unicode passed in.
-            if isinstance(srs_input, UnicodeType):
+            if isinstance(srs_input, unicode):
                 srs_input = srs_input.encode('ascii')
-
-            epsg_m = self._epsg_regex.match(srs_input)
-            proj_m = self._proj_regex.match(srs_input)
-            if epsg_m:
-                # Is this an EPSG well known name?    
-                srs_type = 'epsg'
-                srs_input = int(epsg_m.group('epsg'))
-            elif proj_m:
-                # Is the string a PROJ.4 string?
-                srs_type = 'proj'
-            elif srs_input in self._well_known:
-                # Is this a short-hand well known name?  
-                srs_type = 'epsg'
-                srs_input = self._well_known[srs_input]
-            elif srs_type == 'proj':
+            try:
+                # If SRID is a string, e.g., '4326', then make acceptable
+                # as user input.
+                srid = int(srs_input)
+                srs_input = 'EPSG:%d' % srid
+            except ValueError:
                 pass
-            else:
-                # Setting the buffer with WKT, PROJ.4 string, etc.
-                buf = c_char_p(srs_input)
-        elif isinstance(srs_input, int):
+        elif isinstance(srs_input, (int, long)):
             # EPSG integer code was input.
-            if srs_type != 'epsg': srs_type = 'epsg'
-        elif isinstance(srs_input, c_void_p):
+            srs_type = 'epsg'
+        elif isinstance(srs_input, self.ptr_type):
+            srs = srs_input
             srs_type = 'ogr'
         else:
             raise TypeError('Invalid SRS type "%s"' % srs_type)
 
         if srs_type == 'ogr':
-            # SRS input is OGR pointer
+            # Input is already an SRS pointer.
             srs = srs_input
         else:
-            # Creating a new pointer, using the string buffer.
-            srs = new_srs(buf)
+            # Creating a new SRS pointer, using the string buffer.
+            srs = capi.new_srs(buf)
 
         # If the pointer is NULL, throw an exception.
         if not srs:
             raise SRSException('Could not create spatial reference from: %s' % srs_input)
         else:
-            self._ptr = srs
+            self.ptr = srs
 
-        # Post-processing if in PROJ.4 or EPSG formats.
-        if srs_type == 'proj': self.import_proj(srs_input)
-        elif srs_type == 'epsg': self.import_epsg(srs_input)
+        # Importing from either the user input string or an integer SRID.
+        if srs_type == 'user':
+            self.import_user_input(srs_input)
+        elif srs_type == 'epsg':
+            self.import_epsg(srs_input)
 
     def __del__(self):
         "Destroys this spatial reference."
-        if self._ptr: release_srs(self._ptr)
+        if self._ptr: capi.release_srs(self._ptr)
 
     def __getitem__(self, target):
         """
@@ -134,7 +119,7 @@ class SpatialReference(object):
         >>> print srs['UNIT|AUTHORITY', 1] # The authority value for the untis
         9122
         """
-        if isinstance(target, TupleType):
+        if isinstance(target, tuple):
             return self.attr_value(*target)
         else:
             return self.attr_value(target)
@@ -149,40 +134,40 @@ class SpatialReference(object):
         The attribute value for the given target node (e.g. 'PROJCS'). The index
         keyword specifies an index of the child node to return.
         """
-        if not isinstance(target, str) or not isinstance(index, int):
+        if not isinstance(target, basestring) or not isinstance(index, int):
             raise TypeError
-        return get_attr_value(self._ptr, target, index)
+        return capi.get_attr_value(self.ptr, target, index)
 
     def auth_name(self, target):
         "Returns the authority name for the given string target node."
-        return get_auth_name(self._ptr, target)
+        return capi.get_auth_name(self.ptr, target)
     
     def auth_code(self, target):
         "Returns the authority code for the given string target node."
-        return get_auth_code(self._ptr, target)
+        return capi.get_auth_code(self.ptr, target)
 
     def clone(self):
         "Returns a clone of this SpatialReference object."
-        return SpatialReference(clone_srs(self._ptr))
+        return SpatialReference(capi.clone_srs(self.ptr))
 
     def from_esri(self):
         "Morphs this SpatialReference from ESRI's format to EPSG."
-        morph_from_esri(self._ptr)
+        capi.morph_from_esri(self.ptr)
 
     def identify_epsg(self):
         """
         This method inspects the WKT of this SpatialReference, and will
         add EPSG authority nodes where an EPSG identifier is applicable.
         """
-        identify_epsg(self._ptr)
+        capi.identify_epsg(self.ptr)
 
     def to_esri(self):
         "Morphs this SpatialReference to ESRI's format."
-        morph_to_esri(self._ptr)
+        capi.morph_to_esri(self.ptr)
 
     def validate(self):
         "Checks to see if the given spatial reference is valid."
-        srs_validate(self._ptr)
+        capi.srs_validate(self.ptr)
     
     #### Name & SRID properties ####
     @property
@@ -205,25 +190,25 @@ class SpatialReference(object):
     @property
     def linear_name(self):
         "Returns the name of the linear units."
-        units, name = linear_units(self._ptr, byref(c_char_p()))
+        units, name = capi.linear_units(self.ptr, byref(c_char_p()))
         return name
 
     @property
     def linear_units(self):
         "Returns the value of the linear units."
-        units, name = linear_units(self._ptr, byref(c_char_p()))
+        units, name = capi.linear_units(self.ptr, byref(c_char_p()))
         return units
 
     @property
     def angular_name(self):
         "Returns the name of the angular units."
-        units, name = angular_units(self._ptr, byref(c_char_p()))
+        units, name = capi.angular_units(self.ptr, byref(c_char_p()))
         return name
 
     @property
     def angular_units(self):
         "Returns the value of the angular units."
-        units, name = angular_units(self._ptr, byref(c_char_p()))
+        units, name = capi.angular_units(self.ptr, byref(c_char_p()))
         return units
 
     @property
@@ -234,9 +219,9 @@ class SpatialReference(object):
         or angular units.
         """
         if self.projected or self.local:
-            return linear_units(self._ptr, byref(c_char_p()))
+            return capi.linear_units(self.ptr, byref(c_char_p()))
         elif self.geographic:
-            return angular_units(self._ptr, byref(c_char_p()))
+            return capi.angular_units(self.ptr, byref(c_char_p()))
         else:
             return (None, None)
 
@@ -252,17 +237,17 @@ class SpatialReference(object):
     @property
     def semi_major(self):
         "Returns the Semi Major Axis for this Spatial Reference."
-        return semi_major(self._ptr, byref(c_int()))
+        return capi.semi_major(self.ptr, byref(c_int()))
 
     @property
     def semi_minor(self):
         "Returns the Semi Minor Axis for this Spatial Reference."
-        return semi_minor(self._ptr, byref(c_int()))
+        return capi.semi_minor(self.ptr, byref(c_int()))
 
     @property
     def inverse_flattening(self):
         "Returns the Inverse Flattening for this Spatial Reference."
-        return invflattening(self._ptr, byref(c_int()))
+        return capi.invflattening(self.ptr, byref(c_int()))
 
     #### Boolean Properties ####
     @property
@@ -271,12 +256,12 @@ class SpatialReference(object):
         Returns True if this SpatialReference is geographic 
          (root node is GEOGCS).
         """
-        return bool(isgeographic(self._ptr))
+        return bool(capi.isgeographic(self.ptr))
 
     @property
     def local(self):
         "Returns True if this SpatialReference is local (root node is LOCAL_CS)."
-        return bool(islocal(self._ptr))
+        return bool(capi.islocal(self.ptr))
 
     @property
     def projected(self):
@@ -284,40 +269,44 @@ class SpatialReference(object):
         Returns True if this SpatialReference is a projected coordinate system 
          (root node is PROJCS).
         """
-        return bool(isprojected(self._ptr))
+        return bool(capi.isprojected(self.ptr))
 
     #### Import Routines #####
-    def import_wkt(self, wkt):
-        "Imports the Spatial Reference from OGC WKT (string)"
-        from_wkt(self._ptr, byref(c_char_p(wkt)))
+    def import_epsg(self, epsg):
+        "Imports the Spatial Reference from the EPSG code (an integer)."
+        capi.from_epsg(self.ptr, epsg)
 
     def import_proj(self, proj):
         "Imports the Spatial Reference from a PROJ.4 string."
-        from_proj(self._ptr, proj)
+        capi.from_proj(self.ptr, proj)
 
-    def import_epsg(self, epsg):
-        "Imports the Spatial Reference from the EPSG code (an integer)."
-        from_epsg(self._ptr, epsg)
+    def import_user_input(self, user_input):
+        "Imports the Spatial Reference from the given user input string."
+        capi.from_user_input(self.ptr, user_input)
+
+    def import_wkt(self, wkt):
+        "Imports the Spatial Reference from OGC WKT (string)"
+        capi.from_wkt(self.ptr, byref(c_char_p(wkt)))
 
     def import_xml(self, xml):
         "Imports the Spatial Reference from an XML string."
-        from_xml(self._ptr, xml)
+        capi.from_xml(self.ptr, xml)
 
     #### Export Properties ####
     @property
     def wkt(self):
         "Returns the WKT representation of this Spatial Reference."
-        return to_wkt(self._ptr, byref(c_char_p()))
+        return capi.to_wkt(self.ptr, byref(c_char_p()))
 
     @property
     def pretty_wkt(self, simplify=0):
         "Returns the 'pretty' representation of the WKT."
-        return to_pretty_wkt(self._ptr, byref(c_char_p()), simplify)
+        return capi.to_pretty_wkt(self.ptr, byref(c_char_p()), simplify)
 
     @property
     def proj(self):
         "Returns the PROJ.4 representation for this Spatial Reference."
-        return to_proj(self._ptr, byref(c_char_p()))
+        return capi.to_proj(self.ptr, byref(c_char_p()))
 
     @property
     def proj4(self):
@@ -327,34 +316,22 @@ class SpatialReference(object):
     @property
     def xml(self, dialect=''):
         "Returns the XML representation of this Spatial Reference."
-        # FIXME: This leaks memory, have to figure out why.
-        return to_xml(self._ptr, byref(c_char_p()), dialect)
+        return capi.to_xml(self.ptr, byref(c_char_p()), dialect)
 
-    def to_esri(self):
-        "Morphs this SpatialReference to ESRI's format."
-        morph_to_esri(self._ptr)
-
-    def from_esri(self):
-        "Morphs this SpatialReference from ESRI's format to EPSG."
-        morph_from_esri(self._ptr)
-
-class CoordTransform(object):
+class CoordTransform(GDALBase):
     "The coordinate system transformation object."
 
     def __init__(self, source, target):
         "Initializes on a source and target SpatialReference objects."
-        self._ptr = None # Initially NULL 
         if not isinstance(source, SpatialReference) or not isinstance(target, SpatialReference):
-            raise SRSException('source and target must be of type SpatialReference')
-        self._ptr = new_ct(source._ptr, target._ptr)
-        if not self._ptr:
-            raise SRSException('could not intialize CoordTransform object')
+            raise TypeError('source and target must be of type SpatialReference')
+        self.ptr = capi.new_ct(source._ptr, target._ptr)
         self._srs1_name = source.name
         self._srs2_name = target.name
 
     def __del__(self):
         "Deletes this Coordinate Transformation object."
-        if self._ptr: destroy_ct(self._ptr)
+        if self._ptr: capi.destroy_ct(self._ptr)
 
     def __str__(self):
         return 'Transform from "%s" to "%s"' % (self._srs1_name, self._srs2_name)

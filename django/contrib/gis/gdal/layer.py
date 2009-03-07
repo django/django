@@ -2,26 +2,22 @@
 from ctypes import byref
 
 # Other GDAL imports.
+from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
 from django.contrib.gis.gdal.feature import Feature
-from django.contrib.gis.gdal.field import FIELD_CLASSES
+from django.contrib.gis.gdal.field import OGRFieldTypes
 from django.contrib.gis.gdal.geometries import OGRGeomType
 from django.contrib.gis.gdal.srs import SpatialReference
 
 # GDAL ctypes function prototypes.
-from django.contrib.gis.gdal.prototypes.ds import \
-    get_extent, get_fd_geom_type, get_fd_name, get_feature, get_feature_count, \
-    get_field_count, get_field_defn, get_field_name, get_field_precision, \
-    get_field_width, get_field_type, get_layer_defn, get_layer_srs, \
-    get_next_feature, reset_reading, test_capability
-from django.contrib.gis.gdal.prototypes.srs import clone_srs
+from django.contrib.gis.gdal.prototypes import ds as capi, srs as srs_api
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
 # The OGR_L_* routines are relevant here.
-class Layer(object):
+class Layer(GDALBase):
     "A class that wraps an OGR Layer, needs to be instantiated from a DataSource object."
 
     #### Python 'magic' routines ####
@@ -32,12 +28,11 @@ class Layer(object):
         reference to it is kept with this Layer.  This prevents garbage 
         collection of the `DataSource` while this Layer is still active.
         """
-        self._ptr = None # Initially NULL
         if not layer_ptr:
             raise OGRException('Cannot create Layer, invalid pointer given')
-        self._ptr = layer_ptr
+        self.ptr = layer_ptr
         self._ds = ds
-        self._ldefn = get_layer_defn(self._ptr)
+        self._ldefn = capi.get_layer_defn(self._ptr)
         # Does the Layer support random reading?
         self._random_read = self.test_capability('RandomRead')
 
@@ -59,9 +54,9 @@ class Layer(object):
     def __iter__(self):
         "Iterates over each Feature in the Layer."
         # ResetReading() must be called before iteration is to begin.
-        reset_reading(self._ptr)
+        capi.reset_reading(self._ptr)
         for i in xrange(self.num_feat):
-            yield Feature(get_next_feature(self._ptr), self._ldefn)
+            yield Feature(capi.get_next_feature(self._ptr), self._ldefn)
 
     def __len__(self):
         "The length is the number of features."
@@ -81,7 +76,7 @@ class Layer(object):
         if self._random_read:
             # If the Layer supports random reading, return.
             try:
-                return Feature(get_feature(self._ptr, feat_id), self._ldefn)
+                return Feature(capi.get_feature(self.ptr, feat_id), self._ldefn)
             except OGRException:
                 pass
         else:
@@ -97,35 +92,35 @@ class Layer(object):
     def extent(self):
         "Returns the extent (an Envelope) of this layer."
         env = OGREnvelope()
-        get_extent(self._ptr, byref(env), 1)
+        capi.get_extent(self.ptr, byref(env), 1)
         return Envelope(env)
 
     @property
     def name(self):
         "Returns the name of this layer in the Data Source."
-        return get_fd_name(self._ldefn)
+        return capi.get_fd_name(self._ldefn)
 
     @property
     def num_feat(self, force=1):
         "Returns the number of features in the Layer."
-        return get_feature_count(self._ptr, force)
+        return capi.get_feature_count(self.ptr, force)
 
     @property
     def num_fields(self):
         "Returns the number of fields in the Layer."
-        return get_field_count(self._ldefn)
+        return capi.get_field_count(self._ldefn)
 
     @property
     def geom_type(self):
         "Returns the geometry type (OGRGeomType) of the Layer."
-        return OGRGeomType(get_fd_geom_type(self._ldefn))
+        return OGRGeomType(capi.get_fd_geom_type(self._ldefn))
 
     @property
     def srs(self):
         "Returns the Spatial Reference used in this Layer."
         try:
-            ptr = get_layer_srs(self._ptr)
-            return SpatialReference(clone_srs(ptr))
+            ptr = capi.get_layer_srs(self.ptr)
+            return SpatialReference(srs_api.clone_srs(ptr))
         except SRSException:
             return None
 
@@ -135,7 +130,7 @@ class Layer(object):
         Returns a list of string names corresponding to each of the Fields
         available in this Layer.
         """
-        return [get_field_name(get_field_defn(self._ldefn, i)) 
+        return [capi.get_field_name(capi.get_field_defn(self._ldefn, i)) 
                 for i in xrange(self.num_fields) ]
     
     @property
@@ -146,19 +141,19 @@ class Layer(object):
         an OGR layer that had an integer, a floating-point, and string
         fields.
         """
-        return [FIELD_CLASSES[get_field_type(get_field_defn(self._ldefn, i))]
+        return [OGRFieldTypes[capi.get_field_type(capi.get_field_defn(self._ldefn, i))]
                 for i in xrange(self.num_fields)]
 
     @property 
     def field_widths(self):
         "Returns a list of the maximum field widths for the features."
-        return [get_field_width(get_field_defn(self._ldefn, i))
+        return [capi.get_field_width(capi.get_field_defn(self._ldefn, i))
                 for i in xrange(self.num_fields)]
 
     @property 
     def field_precisions(self):
         "Returns the field precisions for the features."
-        return [get_field_precision(get_field_defn(self._ldefn, i))
+        return [capi.get_field_precision(capi.get_field_defn(self._ldefn, i))
                 for i in xrange(self.num_fields)]
 
     #### Layer Methods ####
@@ -190,4 +185,4 @@ class Layer(object):
           'FastFeatureCount', 'FastGetExtent', 'CreateField', 'Transactions',
           'DeleteFeature', and 'FastSetNextByIndex'.
         """
-        return bool(test_capability(self._ptr, capability))
+        return bool(capi.test_capability(self.ptr, capability))

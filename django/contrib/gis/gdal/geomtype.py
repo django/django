@@ -24,7 +24,9 @@ class OGRGeomType(object):
         if isinstance(type_input, OGRGeomType):
             num = type_input.num
         elif isinstance(type_input, basestring):
-            num = self._str_types.get(type_input.lower(), None)
+            type_input = type_input.lower()
+            if type_input == 'geometry': type_input='unknown'
+            num = self._str_types.get(type_input, None)
             if num is None:
                 raise OGRException('Invalid OGR String Type "%s"' % type_input)
         elif isinstance(type_input, int):
@@ -67,7 +69,8 @@ class OGRGeomType(object):
     def django(self):
         "Returns the Django GeometryField for this OGR Type."
         s = self.name
-        if s in ('Unknown', 'LinearRing', 'None'):
+        if s in ('LinearRing', 'None'):
             return None
-        else:
-            return s + 'Field'
+        elif s == 'Unknown':
+            s = 'Geometry'
+        return s + 'Field'

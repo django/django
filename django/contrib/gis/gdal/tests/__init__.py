@@ -5,16 +5,13 @@ of these tests require the use of the database.
 from unittest import TestSuite, TextTestRunner
 
 # Importing the GDAL test modules.
-from django.contrib.gis.tests import \
-     test_gdal_driver, test_gdal_ds, test_gdal_envelope, \
-     test_gdal_geom, test_gdal_srs
-     
+import test_driver, test_ds, test_envelope, test_geom, test_srs
 
-test_suites = [test_gdal_driver.suite(),
-               test_gdal_ds.suite(),
-               test_gdal_envelope.suite(),
-               test_gdal_geom.suite(),
-               test_gdal_srs.suite(),
+test_suites = [test_driver.suite(),
+               test_ds.suite(),
+               test_envelope.suite(),
+               test_geom.suite(),
+               test_srs.suite(),
                ]
 
 def suite():

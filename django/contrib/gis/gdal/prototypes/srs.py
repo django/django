@@ -36,6 +36,7 @@ from_wkt = void_output(lgdal.OSRImportFromWkt, [c_void_p, POINTER(c_char_p)])
 from_proj = void_output(lgdal.OSRImportFromProj4, [c_void_p, c_char_p])
 from_epsg = void_output(std_call('OSRImportFromEPSG'), [c_void_p, c_int])
 from_xml = void_output(lgdal.OSRImportFromXML, [c_void_p, c_char_p])
+from_user_input = void_output(std_call('OSRSetFromUserInput'), [c_void_p, c_char_p])
 
 # Morphing to/from ESRI WKT.
 morph_to_esri = void_output(lgdal.OSRMorphToESRI, [c_void_p])

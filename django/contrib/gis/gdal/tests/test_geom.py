@@ -7,7 +7,7 @@ from django.contrib.gis.tests.geometries import *
 class OGRGeomTest(unittest.TestCase):
     "This tests the OGR Geometry."
 
-    def test00_geomtype(self):
+    def test00a_geomtype(self):
         "Testing OGRGeomType object."
 
         # OGRGeomType should initialize on all these inputs.
@@ -22,9 +22,9 @@ class OGRGeomTest(unittest.TestCase):
             self.fail('Could not create an OGRGeomType object!')
 
         # Should throw TypeError on this input
-        self.assertRaises(TypeError, OGRGeomType.__init__, 23)
-        self.assertRaises(TypeError, OGRGeomType.__init__, 'fooD')
-        self.assertRaises(TypeError, OGRGeomType.__init__, 9)
+        self.assertRaises(OGRException, OGRGeomType, 23)
+        self.assertRaises(OGRException, OGRGeomType, 'fooD')
+        self.assertRaises(OGRException, OGRGeomType, 9)
 
         # Equivalence can take strings, ints, and other OGRGeomTypes
         self.assertEqual(True, OGRGeomType(1) == OGRGeomType(1))
@@ -38,8 +38,13 @@ class OGRGeomTest(unittest.TestCase):
 
         # Testing the Django field name equivalent property.
         self.assertEqual('PointField', OGRGeomType('Point').django)
-        self.assertEqual(None, OGRGeomType('Unknown').django)
+        self.assertEqual('GeometryField', OGRGeomType('Unknown').django)
         self.assertEqual(None, OGRGeomType('none').django)
+
+        # 'Geometry' initialization implies an unknown geometry type.
+        gt = OGRGeomType('Geometry')
+        self.assertEqual(0, gt.num)
+        self.assertEqual('Unknown', gt.name)
 
     def test01a_wkt(self):
         "Testing WKT output."
@@ -165,6 +170,12 @@ class OGRGeomTest(unittest.TestCase):
 
     def test07a_polygons(self):
         "Testing Polygon objects."
+
+        # Testing `from_bbox` class method
+        bbox =  (-180,-90,180,90) 
+        p = OGRGeometry.from_bbox( bbox )
+        self.assertEqual(bbox, p.extent)
+
         prev = OGRGeometry('POINT(0 0)')
         for p in polygons:
             poly = OGRGeometry(p.wkt)

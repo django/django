@@ -4,6 +4,7 @@
  OGR methods.
 """
 #### OGR & SRS Exceptions ####
+class GDALException(Exception): pass
 class OGRException(Exception): pass
 class SRSException(Exception): pass
 class OGRIndexError(OGRException, KeyError):

@@ -38,9 +38,11 @@ def topology_func(f):
 if GEOJSON:
     from_json = geom_output(lgdal.OGR_G_CreateGeometryFromJson, [c_char_p])
     to_json = string_output(lgdal.OGR_G_ExportToJson, [c_void_p], str_result=True)
+    to_kml = string_output(lgdal.OGR_G_ExportToKML, [c_void_p, c_char_p], str_result=True) 
 else:
     from_json = False
     to_json = False
+    to_kml = False
 
 # GetX, GetY, GetZ all return doubles.
 getx = pnt_func(lgdal.OGR_G_GetX)

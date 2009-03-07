@@ -1,10 +1,13 @@
 import os, os.path, unittest
 from django.contrib.gis.gdal import DataSource, Envelope, OGRException, OGRIndexError
 from django.contrib.gis.gdal.field import OFTReal, OFTInteger, OFTString
+from django.contrib import gis
 
 # Path for SHP files
-data_path = os.path.join(os.path.dirname(__file__), 'data')
+data_path = os.path.join(os.path.dirname(gis.__file__), 'tests' + os.sep + 'data')
 def get_ds_file(name, ext):
+    
+
     return os.sep.join([data_path, name, name + '.%s' % ext])
 
 # Test SHP data source object
