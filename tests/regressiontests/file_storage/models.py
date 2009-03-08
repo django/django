@@ -54,6 +54,11 @@ False
 >>> p.mugshot != p1.mugshot
 True
 
+Bug #9508: Similarly to the previous test, make sure hash() works as expected
+(equal items must hash to the same value).
+>>> hash(p.mugshot) == hash(p2.mugshot)
+True
+
 # Bug #8175: correctly delete files that have been removed off the file system.
 >>> import os
 >>> p2 = Person(name="Fred")
