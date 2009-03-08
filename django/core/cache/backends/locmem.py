@@ -96,8 +96,11 @@ class CacheClass(BaseCache):
 
         self._lock.writer_enters()
         try:
-            del self._cache[key]
-            del self._expire_info[key]
+            try:
+                del self._cache[key]
+                del self._expire_info[key]
+            except KeyError:
+                pass
             return False
         finally:
             self._lock.writer_leaves()
