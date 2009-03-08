@@ -1090,6 +1090,19 @@ to set things up correctly internally so that subqueries can continue properly.
 >>> Tag.objects.filter(name__in=()).update(name="foo")
 0
 
+Bug #10432 (see also the Python 2.4+ tests for this, below). Testing an empty
+"__in" filter with a generator as the value.
+>>> def f():
+...     return iter([])
+>>> n_obj = Note.objects.all()[0]
+>>> def g():
+...     for i in [n_obj.pk]:
+...         yield i
+>>> Note.objects.filter(pk__in=f())
+[]
+>>> list(Note.objects.filter(pk__in=g())) == [n_obj]
+True
+
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
@@ -1138,5 +1151,15 @@ portion in MySQL to prevent unnecessary sorting.
 True
 >>> sql.find("NULL", pos + len(fragment)) == pos + len(fragment)
 True
+
+"""
+
+# Generator expressions are only in Python 2.4 and later.
+if sys.version_info >= (2, 4):
+    __test__["API_TESTS"] += """
+Using an empty generator expression as the rvalue for an "__in" lookup is legal
+(regression for #10432).
+>>> Note.objects.filter(pk__in=(x for x in ()))
+[]
 
 """

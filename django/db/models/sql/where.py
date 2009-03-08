@@ -47,6 +47,10 @@ class WhereNode(tree.Node):
             return
 
         obj, lookup_type, value = data
+        if hasattr(value, '__iter__') and hasattr(value, 'next'):
+            # Consume any generators immediately, so that we can determine
+            # emptiness and transform any non-empty values correctly.
+            value = list(value)
         if hasattr(obj, "process"):
             try:
                 obj, params = obj.process(lookup_type, value)
