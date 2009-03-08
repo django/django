@@ -1,0 +1,3 @@
+INSTALLED_APPS = (
+    'parent.*',
+)

@@ -92,7 +92,7 @@ class Settings(object):
                 app_subdirs = os.listdir(appdir)
                 app_subdirs.sort()
                 for d in app_subdirs:
-                    if d.isalpha() and os.path.isdir(os.path.join(appdir, d)):
+                    if d.isalnum() and d[0].isalpha() and os.path.isdir(os.path.join(appdir, d)):
                         new_installed_apps.append('%s.%s' % (app[:-2], d))
             else:
                 new_installed_apps.append(app)
