@@ -184,7 +184,7 @@ class GMarker(GOverlayBase):
           return render_to_response('mytemplate.html', 
                  {'google' : GoogleMap(markers=[marker])})
     """
-    def __init__(self, geom, title=None):
+    def __init__(self, geom, title=None, draggable=False):
         """
         The GMarker object may initialize on GEOS Points or a parameter
         that may be instantiated into a GEOS point.  Keyword options map to
@@ -193,6 +193,9 @@ class GMarker(GOverlayBase):
         Keyword Options:
          title: 
            Title option for GMarker, will be displayed as a tooltip.
+         
+         draggable:
+           Draggable option for GMarker, disabled by default.
         """
         # If a GEOS geometry isn't passed in, try to construct one.
         if isinstance(geom, basestring): geom = fromstr(geom)
@@ -205,6 +208,7 @@ class GMarker(GOverlayBase):
         self.envelope = geom.envelope
         # TODO: Add support for more GMarkerOptions
         self.title = title
+        self.draggable = draggable
         super(GMarker, self).__init__()
 
     def latlng_from_coords(self, coords):
@@ -212,7 +216,8 @@ class GMarker(GOverlayBase):
     
     def options(self):
         result = []
-        if self.title: result.append('title: "%s"' % self.title) 
+        if self.title: result.append('title: "%s"' % self.title)
+        if self.draggable: result.append('draggable: true') 
         return '{%s}' % ','.join(result)
 
     @property
