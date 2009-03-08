@@ -34,6 +34,10 @@ class FieldFile(File):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __hash__(self):
+        # Required because we defined a custom __eq__.
+        return hash(self.name)
+
     # The standard File contains most of the necessary properties, but
     # FieldFiles can be instantiated without a name, so that needs to
     # be checked for here.
