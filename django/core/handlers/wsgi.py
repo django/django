@@ -10,7 +10,7 @@ from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_unicode, iri_to_uri
 
 # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 STATUS_CODE_TEXT = {
@@ -120,7 +120,9 @@ class WSGIRequest(http.HttpRequest):
             (get, post, cookies, meta)
 
     def get_full_path(self):
-        return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + self.environ.get('QUERY_STRING', '')) or '')
+        # RFC 3986 requires query string arguments to be in the ASCII range.
+        # Rather than crash if this doesn't happen, we encode defensively.
+        return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + iri_to_uri(self.environ.get('QUERY_STRING', ''))) or '')
 
     def is_secure(self):
         return 'wsgi.url_scheme' in self.environ \
