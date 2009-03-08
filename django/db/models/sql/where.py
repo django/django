@@ -43,6 +43,10 @@ class WhereNode(tree.Node):
             return
 
         alias, col, field, lookup_type, value = data
+        if hasattr(value, '__iter__') and hasattr(value, 'next'):
+            # Consume any generators immediately, so that we can determine
+            # emptiness and transform any non-empty values correctly.
+            value = list(value)
         try:
             if field:
                 params = field.get_db_prep_lookup(lookup_type, value)
