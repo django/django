@@ -830,7 +830,7 @@ behavior, you should use a Django ``TransactionTestCase``.
 
 ``TransactionTestCase`` and ``TestCase`` are identical except for the manner
 in which the database is reset to a known state and the ability for test code
-to test the effects of commit and rollback. A ``TranscationTestCase`` resets
+to test the effects of commit and rollback. A ``TransactionTestCase`` resets
 the database before the test runs by truncating all tables and reloading
 initial data. A ``TransactionTestCase`` may call commit and rollback and
 observe the effects of these calls on the database.
