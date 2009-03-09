@@ -19,14 +19,14 @@ class GoogleMap(object):
     xmlns    = mark_safe('xmlns:v="urn:schemas-microsoft-com:vml"') # XML Namespace (for IE VML).
 
     def __init__(self, key=None, api_url=None, version=None, 
-                 center=None, zoom=None, dom_id='map', load_func='gmap_load', 
+                 center=None, zoom=None, dom_id='map',
                  kml_urls=[], polygons=[], polylines=[], markers=[],
-                 template='gis/google/js/google-map.js',
-                 extra_context={}):
+                 template='gis/google/google-single.js',
+                 js_module='geodjango',extra_context={}):
 
         # The Google Maps API Key defined in the settings will be used
-        #  if not passed in as a parameter.  The use of an API key is
-        #  _required_.
+        # if not passed in as a parameter.  The use of an API key is
+        # _required_.
         if not key:
             try:
                 self.key = settings.GOOGLE_MAPS_API_KEY
@@ -36,7 +36,7 @@ class GoogleMap(object):
             self.key = key
         
         # Getting the Google Maps API version, defaults to using the latest ("2.x"),
-        #  this is not necessarily the most stable.
+        # this is not necessarily the most stable.
         if not version:
             self.version = getattr(settings, 'GOOGLE_MAPS_API_VERSION', '2.x')
         else:
@@ -51,7 +51,8 @@ class GoogleMap(object):
         # Setting the DOM id of the map, the load function, the JavaScript
         # template, and the KML URLs array.
         self.dom_id = dom_id
-        self.load_func = load_func
+        self.extra_context = extra_context
+        self.js_module = js_module
         self.template = template
         self.kml_urls = kml_urls
         
@@ -76,11 +77,10 @@ class GoogleMap(object):
                 else:
                     self.polylines.append(GPolyline(pline))
        
-        # If GMarker, GPolygons, and/or GPolylines 
-        # are used the zoom will be automatically
-        # calculated via the Google Maps API.  If both a zoom level and a
-        # center coordinate are provided with polygons/polylines, no automatic
-        # determination will occur.
+        # If GMarker, GPolygons, and/or GPolylines are used the zoom will be
+        # automatically calculated via the Google Maps API.  If both a zoom
+        # level and a center coordinate are provided with polygons/polylines,
+        # no automatic determination will occur.
         self.calc_zoom = False
         if self.polygons or self.polylines  or self.markers:
             if center is None or zoom is None:
@@ -93,19 +93,22 @@ class GoogleMap(object):
         if center is None: center = (0, 0)
         self.center = center
 
-        # Setting the parameters for the javascript template.
+    def render(self):
+        """
+        Generates the JavaScript necessary for displaying this Google Map.
+        """
         params = {'calc_zoom' : self.calc_zoom,
                   'center' : self.center,
                   'dom_id' : self.dom_id,
+                  'js_module' : self.js_module,
                   'kml_urls' : self.kml_urls,
-                  'load_func' : self.load_func,
                   'zoom' : self.zoom,
                   'polygons' : self.polygons,
                   'polylines' : self.polylines,
                   'markers' : self.markers,
                   }
-        params.update(extra_context)
-        self.js = render_to_string(self.template, params)
+        params.update(self.extra_context)
+        return render_to_string(self.template, params)
 
     @property
     def body(self):
@@ -115,7 +118,7 @@ class GoogleMap(object):
     @property
     def onload(self):
         "Returns the `onload` HTML <body> attribute."
-        return mark_safe('onload="%s()"' % self.load_func)
+        return mark_safe('onload="%s.%s_load()"' % (self.js_module, self.dom_id))
 
     @property
     def api_script(self):
@@ -123,8 +126,13 @@ class GoogleMap(object):
         return mark_safe('<script src="%s%s" type="text/javascript"></script>' % (self.api_url, self.key))
 
     @property
+    def js(self):
+        "Returns only the generated Google Maps JavaScript (no <script> tags)."
+        return self.render()
+
+    @property
     def scripts(self):
-        "Returns all <script></script> tags required for Google Maps JavaScript."
+        "Returns all <script></script> tags required with Google Maps JavaScript."
         return mark_safe('%s\n  <script type="text/javascript">\n//<![CDATA[\n%s//]]>\n  </script>' % (self.api_script, self.js))
 
     @property
@@ -136,3 +144,75 @@ class GoogleMap(object):
     def xhtml(self):
         "Returns XHTML information needed for IE VML overlays."
         return mark_safe('<html xmlns="http://www.w3.org/1999/xhtml" %s>' % self.xmlns)
+
+class GoogleMapSet(GoogleMap):
+
+    def __init__(self, *args, **kwargs):
+        """
+        A class for generating sets of Google Maps that will be shown on the
+        same page together.
+
+        Example:
+         gmapset = GoogleMapSet( GoogleMap( ... ), GoogleMap( ... ) )
+         gmapset = GoogleMapSet( [ gmap1, gmap2] )
+        """
+        # The `google-multi.js` template is used instead of `google-single.js`
+        # by default.
+        template = kwargs.pop('template', 'gis/google/google-multi.js')
+
+        # This is the template used to generate the GMap load JavaScript for
+        # each map in the set.
+        self.map_template = kwargs.pop('map_template', 'gis/google/google-map.js')
+
+        # Running GoogleMap.__init__(), and resetting the template
+        # value with default obtained above.
+        super(GoogleMapSet, self).__init__(**kwargs)
+        self.template = template
+
+        # If a tuple/list passed in as first element of args, then assume
+        if isinstance(args[0], (tuple, list)):
+            self.maps = args[0]
+        else:
+            self.maps = args
+        
+        # Generating DOM ids for each of the maps in the set.
+        self.dom_ids = ['map%d' % i for i in xrange(len(self.maps))]
+
+    def load_map_js(self):
+        """
+        Returns JavaScript containing all of the loading routines for each
+        map in this set.
+        """
+        result = []
+        for dom_id, gmap in zip(self.dom_ids, self.maps):
+            # Backup copies the GoogleMap DOM id and template attributes.
+            # They are overridden on each GoogleMap instance in the set so
+            # that only the loading JavaScript (and not the header variables)
+            # is used with the generated DOM ids.
+            tmp = (gmap.template, gmap.dom_id)
+            gmap.template = self.map_template
+            gmap.dom_id = dom_id
+            result.append(gmap.js)
+            # Restoring the backup values.
+            gmap.template, gmap.dom_id = tmp
+        return mark_safe(''.join(result))
+
+    def render(self):
+        """
+        Generates the JavaScript for the collection of Google Maps in
+        this set.
+        """
+        params = {'js_module' : self.js_module,
+                  'dom_ids' : self.dom_ids,
+                  'load_map_js' : self.load_map_js(),
+                  }
+        params.update(self.extra_context)
+        return render_to_string(self.template, params)
+
+    @property
+    def onload(self):
+        "Returns the `onload` HTML <body> attribute."
+        # Overloaded to use the `load` function defined in the
+        # `google-multi.js`, which calls the load routines for
+        # each one of the individual maps in the set.
+        return mark_safe('onload="%s.load()"' % self.js_module)
