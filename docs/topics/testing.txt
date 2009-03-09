@@ -494,7 +494,7 @@ arguments at time of construction:
 
             /customers/details/?name=fred&age=7
 
-        .. versionadded:: development
+        .. versionadded:: 1.1
 
         If you already have the GET arguments in URL-encoded form, you can
         use that encoding instead of using the data argument. For example,
@@ -586,7 +586,7 @@ arguments at time of construction:
 
     .. method:: Client.head(path, data={}, follow=False)
 
-        .. versionadded:: development
+        .. versionadded:: 1.1
 
         Makes a HEAD request on the provided ``path`` and returns a ``Response``
         object. Useful for testing RESTful interfaces. Acts just like
@@ -598,7 +598,7 @@ arguments at time of construction:
 
     .. method:: Client.options(path, data={}, follow=False)
 
-        .. versionadded:: development
+        .. versionadded:: 1.1
 
         Makes an OPTIONS request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
@@ -609,7 +609,7 @@ arguments at time of construction:
 
     .. method:: Client.put(path, data={}, content_type=MULTIPART_CONTENT, follow=False)
 
-        .. versionadded:: development
+        .. versionadded:: 1.1
 
         Makes an PUT request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces. Acts just
@@ -621,7 +621,7 @@ arguments at time of construction:
 
     .. method:: Client.delete(path, follow=False)
 
-        .. versionadded:: development
+        .. versionadded:: 1.1
 
         Makes an DELETE request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
