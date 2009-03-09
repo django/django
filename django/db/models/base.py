@@ -499,6 +499,8 @@ class Model(object):
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
+    def prepare_database_save(self, unused):
+        return self.pk
 
 
 ############################################

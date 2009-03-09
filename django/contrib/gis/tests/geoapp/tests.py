@@ -13,7 +13,7 @@ from django.contrib.gis.tests.utils import no_oracle, no_postgis
 DISABLE = False
 
 class GeoModelTest(unittest.TestCase):
-    
+
     def test01_initial_sql(self):
         "Testing geographic initial SQL."
         if DISABLE: return
@@ -21,7 +21,7 @@ class GeoModelTest(unittest.TestCase):
             # Oracle doesn't allow strings longer than 4000 characters
             # in SQL files, and I'm stumped on how to use Oracle BFILE's
             # in PLSQL, so we set up the larger geometries manually, rather
-            # than relying on the initial SQL. 
+            # than relying on the initial SQL.
 
             # Routine for returning the path to the data files.
             data_dir = os.path.join(os.path.dirname(__file__), 'sql')
@@ -65,7 +65,7 @@ class GeoModelTest(unittest.TestCase):
         new = Point(5, 23)
         nullcity.point = new
 
-        # Ensuring that the SRID is automatically set to that of the 
+        # Ensuring that the SRID is automatically set to that of the
         #  field after assignment, but before saving.
         self.assertEqual(4326, nullcity.point.srid)
         nullcity.save()
@@ -94,7 +94,7 @@ class GeoModelTest(unittest.TestCase):
 
         ns = State.objects.get(name='NullState')
         self.assertEqual(ply, ns.poly)
-        
+
         # Testing the `ogr` and `srs` lazy-geometry properties.
         if gdal.HAS_GDAL:
             self.assertEqual(True, isinstance(ns.poly.ogr, gdal.OGRGeometry))
@@ -120,7 +120,7 @@ class GeoModelTest(unittest.TestCase):
         qs = City.objects.all()
         self.assertRaises(TypeError, qs.kml, 'name')
 
-        # The reference KML depends on the version of PostGIS used 
+        # The reference KML depends on the version of PostGIS used
         # (the output stopped including altitude in 1.3.3).
         major, minor1, minor2 = SpatialBackend.version
         ref_kml1 = '<Point><coordinates>-104.609252,38.255001,0</coordinates></Point>'
@@ -204,8 +204,8 @@ class GeoModelTest(unittest.TestCase):
         self.assertRaises(TypeError, Country.objects.make_line)
         # Reference query:
         # SELECT AsText(ST_MakeLine(geoapp_city.point)) FROM geoapp_city;
-        self.assertEqual(GEOSGeometry('LINESTRING(-95.363151 29.763374,-96.801611 32.782057,-97.521157 34.464642,174.783117 -41.315268,-104.609252 38.255001,-95.23506 38.971823,-87.650175 41.850385,-123.305196 48.462611)', srid=4326),
-                         City.objects.make_line())
+        ref_line = GEOSGeometry('LINESTRING(-95.363151 29.763374,-96.801611 32.782057,-97.521157 34.464642,174.783117 -41.315268,-104.609252 38.255001,-95.23506 38.971823,-87.650175 41.850385,-123.305196 48.462611)', srid=4326)
+        self.assertEqual(ref_line, City.objects.make_line())
 
     def test09_disjoint(self):
         "Testing the `disjoint` lookup type."
@@ -227,7 +227,7 @@ class GeoModelTest(unittest.TestCase):
         if DISABLE: return
         # Getting Texas, yes we were a country -- once ;)
         texas = Country.objects.get(name='Texas')
-        
+
         # Seeing what cities are in Texas, should get Houston and Dallas,
         #  and Oklahoma City because 'contained' only checks on the
         #  _bounding box_ of the Geometries.
@@ -288,15 +288,15 @@ class GeoModelTest(unittest.TestCase):
         # `ST_Intersects`, so contains is used instead.
         nad_pnt = fromstr(nad_wkt, srid=nad_srid)
         if SpatialBackend.oracle:
-            tx = Country.objects.get(mpoly__contains=nad_pnt) 
+            tx = Country.objects.get(mpoly__contains=nad_pnt)
         else:
             tx = Country.objects.get(mpoly__intersects=nad_pnt)
         self.assertEqual('Texas', tx.name)
-        
+
         # Creating San Antonio.  Remember the Alamo.
         sa = City(name='San Antonio', point=nad_pnt)
         sa.save()
-        
+
         # Now verifying that San Antonio was transformed correctly
         sa = City.objects.get(name='San Antonio')
         self.assertAlmostEqual(wgs_pnt.x, sa.point.x, 6)
@@ -321,7 +321,7 @@ class GeoModelTest(unittest.TestCase):
         # Puerto Rico should be NULL (it's a commonwealth unincorporated territory)
         self.assertEqual(1, len(nullqs))
         self.assertEqual('Puerto Rico', nullqs[0].name)
-        
+
         # The valid states should be Colorado & Kansas
         self.assertEqual(2, len(validqs))
         state_names = [s.name for s in validqs]
@@ -338,18 +338,18 @@ class GeoModelTest(unittest.TestCase):
         "Testing the 'left' and 'right' lookup types."
         if DISABLE: return
         # Left: A << B => true if xmax(A) < xmin(B)
-        # Right: A >> B => true if xmin(A) > xmax(B) 
+        # Right: A >> B => true if xmin(A) > xmax(B)
         #  See: BOX2D_left() and BOX2D_right() in lwgeom_box2dfloat4.c in PostGIS source.
-        
+
         # Getting the borders for Colorado & Kansas
         co_border = State.objects.get(name='Colorado').poly
         ks_border = State.objects.get(name='Kansas').poly
 
         # Note: Wellington has an 'X' value of 174, so it will not be considered
         #  to the left of CO.
-        
+
         # These cities should be strictly to the right of the CO border.
-        cities = ['Houston', 'Dallas', 'San Antonio', 'Oklahoma City', 
+        cities = ['Houston', 'Dallas', 'San Antonio', 'Oklahoma City',
                   'Lawrence', 'Chicago', 'Wellington']
         qs = City.objects.filter(point__right=co_border)
         self.assertEqual(7, len(qs))
@@ -365,7 +365,7 @@ class GeoModelTest(unittest.TestCase):
         #  to the left of CO.
         vic = City.objects.get(point__left=co_border)
         self.assertEqual('Victoria', vic.name)
-        
+
         cities = ['Pueblo', 'Victoria']
         qs = City.objects.filter(point__left=ks_border)
         self.assertEqual(2, len(qs))
@@ -383,12 +383,12 @@ class GeoModelTest(unittest.TestCase):
     def test15_relate(self):
         "Testing the 'relate' lookup type."
         if DISABLE: return
-        # To make things more interesting, we will have our Texas reference point in 
+        # To make things more interesting, we will have our Texas reference point in
         # different SRIDs.
         pnt1 = fromstr('POINT (649287.0363174 4177429.4494686)', srid=2847)
         pnt2 = fromstr('POINT(-98.4919715741052 29.4333344025053)', srid=4326)
 
-        # Not passing in a geometry as first param shoud 
+        # Not passing in a geometry as first param shoud
         # raise a type error when initializing the GeoQuerySet
         self.assertRaises(TypeError, Country.objects.filter, mpoly__relate=(23, 'foo'))
         # Making sure the right exception is raised for the given
@@ -440,7 +440,7 @@ class GeoModelTest(unittest.TestCase):
         # Using `field_name` keyword argument in one query and specifying an
         # order in the other (which should not be used because this is
         # an aggregate method on a spatial column)
-        u1 = qs.unionagg(field_name='point') 
+        u1 = qs.unionagg(field_name='point')
         u2 = qs.order_by('name').unionagg()
         tol = 0.00001
         if SpatialBackend.oracle:
@@ -458,8 +458,8 @@ class GeoModelTest(unittest.TestCase):
         Feature(name='Point', geom=Point(1, 1)).save()
         Feature(name='LineString', geom=LineString((0, 0), (1, 1), (5, 5))).save()
         Feature(name='Polygon', geom=Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0)))).save()
-        Feature(name='GeometryCollection', 
-                geom=GeometryCollection(Point(2, 2), LineString((0, 0), (2, 2)), 
+        Feature(name='GeometryCollection',
+                geom=GeometryCollection(Point(2, 2), LineString((0, 0), (2, 2)),
                                         Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0))))).save()
 
         f_1 = Feature.objects.get(name='Point')
@@ -474,7 +474,7 @@ class GeoModelTest(unittest.TestCase):
         f_4 = Feature.objects.get(name='GeometryCollection')
         self.assertEqual(True, isinstance(f_4.geom, GeometryCollection))
         self.assertEqual(f_3.geom, f_4.geom[2])
-    
+
     def test19_centroid(self):
         "Testing the `centroid` GeoQuerySet method."
         if DISABLE: return
@@ -494,7 +494,7 @@ class GeoModelTest(unittest.TestCase):
                    'Texas' : fromstr('POINT (-103.002434 36.500397)', srid=4326),
                    }
         elif SpatialBackend.postgis:
-            # Using GEOSGeometry to compute the reference point on surface values 
+            # Using GEOSGeometry to compute the reference point on surface values
             # -- since PostGIS also uses GEOS these should be the same.
             ref = {'New Zealand' : Country.objects.get(name='New Zealand').mpoly.point_on_surface,
                    'Texas' : Country.objects.get(name='Texas').mpoly.point_on_surface
@@ -533,7 +533,7 @@ class GeoModelTest(unittest.TestCase):
         if DISABLE: return
         # Both 'countries' only have two geometries.
         for c in Country.objects.num_geom(): self.assertEqual(2, c.num_geom)
-        for c in City.objects.filter(point__isnull=False).num_geom(): 
+        for c in City.objects.filter(point__isnull=False).num_geom():
             # Oracle will return 1 for the number of geometries on non-collections,
             # whereas PostGIS will return None.
             if SpatialBackend.postgis: self.assertEqual(None, c.num_geom)
@@ -566,15 +566,18 @@ class GeoModelTest(unittest.TestCase):
         # All transformation SQL will need to be performed on the
         # _parent_ table.
         qs = PennsylvaniaCity.objects.transform(32128)
-        
+
         self.assertEqual(1, qs.count())
         for pc in qs: self.assertEqual(32128, pc.point.srid)
 
 from test_feeds import GeoFeedTest
+from test_regress import GeoRegressionTests
 from test_sitemaps import GeoSitemapTest
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(GeoModelTest))
     s.addTest(unittest.makeSuite(GeoFeedTest))
     s.addTest(unittest.makeSuite(GeoSitemapTest))
+    s.addTest(unittest.makeSuite(GeoRegressionTests))
     return s

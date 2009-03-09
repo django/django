@@ -90,6 +90,9 @@ class ExpressionNode(tree.Node):
     def __ror__(self, other):
         return self._combine(other, self.OR, True)
 
+    def prepare_database_save(self, unused):
+        return self
+
 class F(ExpressionNode):
     """
     An expression representing the value of the given field.

@@ -8,7 +8,7 @@ from django.contrib.gis.geos import *
 from django.core.exceptions import ImproperlyConfigured
 
 class GeoModelTest(unittest.TestCase):
-    
+
     def test01_initial_sql(self):
         "Testing geographic initial SQL."
         # Ensuring that data was loaded from initial SQL.
@@ -38,7 +38,7 @@ class GeoModelTest(unittest.TestCase):
         new = Point(5, 23)
         nullcity.point = new
 
-        # Ensuring that the SRID is automatically set to that of the 
+        # Ensuring that the SRID is automatically set to that of the
         #  field after assignment, but before saving.
         self.assertEqual(4326, nullcity.point.srid)
         nullcity.save()
@@ -67,7 +67,7 @@ class GeoModelTest(unittest.TestCase):
 
         ns = State.objects.get(name='NullState')
         self.assertEqual(ply, ns.poly)
-        
+
         # Testing the `ogr` and `srs` lazy-geometry properties.
         if gdal.HAS_GDAL:
             self.assertEqual(True, isinstance(ns.poly.ogr, gdal.OGRGeometry))
@@ -88,7 +88,7 @@ class GeoModelTest(unittest.TestCase):
         "Testing the 'contained', 'contains', and 'bbcontains' lookup types."
         # Getting Texas, yes we were a country -- once ;)
         texas = Country.objects.get(name='Texas')
-        
+
         # Seeing what cities are in Texas, should get Houston and Dallas,
         #  and Oklahoma City because MySQL 'within' only checks on the
         #  _bounding box_ of the Geometries.
@@ -146,8 +146,8 @@ class GeoModelTest(unittest.TestCase):
         f1 = Feature(name='Point', geom=Point(1, 1))
         f2 = Feature(name='LineString', geom=LineString((0, 0), (1, 1), (5, 5)))
         f3 = Feature(name='Polygon', geom=Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0))))
-        f4 = Feature(name='GeometryCollection', 
-                     geom=GeometryCollection(Point(2, 2), LineString((0, 0), (2, 2)), 
+        f4 = Feature(name='GeometryCollection',
+                     geom=GeometryCollection(Point(2, 2), LineString((0, 0), (2, 2)),
                                              Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0)))))
         f1.save()
         f2.save()
@@ -166,7 +166,7 @@ class GeoModelTest(unittest.TestCase):
         f_4 = Feature.objects.get(name='GeometryCollection')
         self.assertEqual(True, isinstance(f_4.geom, GeometryCollection))
         self.assertEqual(f_3.geom, f_4.geom[2])
-    
+
     def test07_mysql_limitations(self):
         "Testing that union(), kml(), gml() raise exceptions."
         self.assertRaises(ImproperlyConfigured, City.objects.union, Point(5, 23), field_name='point')
@@ -174,10 +174,13 @@ class GeoModelTest(unittest.TestCase):
         self.assertRaises(ImproperlyConfigured, Country.objects.all().gml, field_name='mpoly')
 
 from test_feeds import GeoFeedTest
+from test_regress import GeoRegressionTests
 from test_sitemaps import GeoSitemapTest
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(GeoModelTest))
     s.addTest(unittest.makeSuite(GeoFeedTest))
     s.addTest(unittest.makeSuite(GeoSitemapTest))
+    s.addTest(unittest.makeSuite(GeoRegressionTests))
     return s

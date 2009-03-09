@@ -8,7 +8,10 @@ class WKTAdaptor(object):
         self.srid = geom.srid
 
     def __eq__(self, other):
-        return self.wkt == other.wkt and self.srid == other.srid 
+        return self.wkt == other.wkt and self.srid == other.srid
 
     def __str__(self):
         return self.wkt
+
+    def prepare_database_save(self, unused):
+        return self

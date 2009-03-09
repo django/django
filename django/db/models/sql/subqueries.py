@@ -239,9 +239,10 @@ class UpdateQuery(Query):
         """
         from django.db.models.base import Model
         for field, model, val in values_seq:
-            # FIXME: Some sort of db_prep_* is probably more appropriate here.
-            if field.rel and isinstance(val, Model):
-                val = val.pk
+            if hasattr(val, 'prepare_database_save'):
+                val = val.prepare_database_save(field)
+            else:
+                val = field.get_db_prep_save(val)
 
             # Getting the placeholder for the field.
             if hasattr(field, 'get_placeholder'):
