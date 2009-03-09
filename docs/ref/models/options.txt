@@ -75,6 +75,30 @@ Example::
 
 See the docs for :meth:`~django.db.models.QuerySet.latest` for more.
 
+``managed``
+-----------------------
+
+.. attribute:: Options.managed
+
+.. versionadded:: 1.1
+
+If ``False``, no database table creation or deletion operations will be
+performed for this model. This is useful if the model represents an existing
+table or a database view that has been created by some other means.
+
+The default value is ``True``, meaning Django will create the appropriate
+database tables in :ref:`django-admin-syncdb` and remove them as part of a
+:ref:`reset <django-admin-reset>` management command.
+
+If a model contains a :class:`~django.db.models.ManyToManyField` and has
+``managed=False``, the intermediate table for the many-to-many join will also
+not be created. Should you require the intermediate table to be created, set
+it up as an explicit model and use the :attr:`ManyToManyField.through`
+attribute.
+
+For tests involving models with ``managed=False``, it's up to you to ensure
+the correct tables are created as part of the test setup.
+
 ``order_with_respect_to``
 -------------------------
 
@@ -181,3 +205,4 @@ The plural name for the object::
     verbose_name_plural = "stories"
 
 If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
+

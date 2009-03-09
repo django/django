@@ -431,6 +431,8 @@ Currently supported:
 	* ``django`` for all ``*.py`` and ``*.html`` files (default)
 	* ``djangojs`` for ``*.js`` files
 
+.. _django-admin-reset:
+
 reset <appname appname ...>
 ---------------------------
 
@@ -633,6 +635,8 @@ This command is disabled when the ``--settings`` option to
 ``DJANGO_SETTINGS_MODULE`` has been set. To re-enable it in these
 situations, either omit the ``--settings`` option or unset
 ``DJANGO_SETTINGS_MODULE``.
+
+.. _django-admin-syncdb:
 
 syncdb
 ------

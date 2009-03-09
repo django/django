@@ -71,7 +71,7 @@ class Command(NoArgsCommand):
                     if refto in seen_models:
                         sql.extend(connection.creation.sql_for_pending_references(refto, self.style, pending_references))
                 sql.extend(connection.creation.sql_for_pending_references(model, self.style, pending_references))
-                if verbosity >= 1:
+                if verbosity >= 1 and sql:
                     print "Creating table %s" % model._meta.db_table
                 for statement in sql:
                     cursor.execute(statement)

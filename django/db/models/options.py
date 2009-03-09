@@ -21,7 +21,7 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
-                 'abstract')
+                 'abstract', 'managed')
 
 class Options(object):
     def __init__(self, meta, app_label=None):
@@ -42,6 +42,7 @@ class Options(object):
         self.pk = None
         self.has_auto_field, self.auto_field = False, None
         self.abstract = False
+        self.managed = True
         self.parents = SortedDict()
         self.duplicate_targets = {}
         # Managers that have been inherited from abstract base classes. These
