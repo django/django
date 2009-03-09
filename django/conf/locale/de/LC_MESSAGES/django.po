@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-01 15:21+0100\n"
+"POT-Creation-Date: 2009-03-09 17:43+0100\n"
 "PO-Revision-Date: 2008-08-28 22:58+0100\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: \n"
@@ -932,7 +932,7 @@ msgstr "Mein Passwort zurücksetzen"
 
 #: contrib/admin/templatetags/admin_list.py:285
 msgid "All dates"
-msgstr "Alle Tage"
+msgstr "Alle Daten"
 
 #: contrib/admin/views/main.py:69
 #, python-format
