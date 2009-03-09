@@ -44,6 +44,8 @@ copyright = 'Django Software Foundation and contributors'
 version = '1.0'
 # The full version, including alpha/beta/rc tags.
 release = version
+# The next version to be released
+django_next_version = '1.1'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:

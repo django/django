@@ -10,6 +10,8 @@ import sphinx.builder
 import sphinx.directives
 import sphinx.environment
 import sphinx.htmlwriter
+import sphinx.roles
+from docutils import nodes
 
 def setup(app):
     app.add_crossref_type(
@@ -44,11 +46,40 @@ def setup(app):
         indextemplate = "pair: %s; django-admin command-line option",
         parse_node    = lambda env, sig, signode: sphinx.directives.parse_option_desc(signode, sig),
     )
+    app.add_config_value('django_next_version', '0.0', True)
+    app.add_directive('versionadded', parse_version_directive, 1, (1, 1, 1))
+    app.add_directive('versionchanged', parse_version_directive, 1, (1, 1, 1))
     app.add_transform(SuppressBlockquotes)
     
     # Monkeypatch PickleHTMLBuilder so that it doesn't die in Sphinx 0.4.2
     if sphinx.__version__ == '0.4.2':
         monkeypatch_pickle_builder()
+
+def parse_version_directive(name, arguments, options, content, lineno,
+                      content_offset, block_text, state, state_machine):
+    env = state.document.settings.env
+    is_nextversion = env.config.django_next_version == arguments[0]
+    ret = []
+    node = sphinx.addnodes.versionmodified()
+    ret.append(node)
+    if not is_nextversion:
+        if len(arguments) == 1:
+            linktext = 'Please, see the release notes <releases-%s>' % (arguments[0])
+            xrefs = sphinx.roles.xfileref_role('ref', linktext, linktext, lineno, state)
+            node.extend(xrefs[0])
+        node['version'] = arguments[0]
+    else:
+        node['version'] = "Development version"
+    node['type'] = name
+    if len(arguments) == 2:
+        inodes, messages = state.inline_text(arguments[1], lineno+1)
+        node.extend(inodes)
+        if content:
+            state.nested_parse(content, content_offset, node)
+        ret = ret + messages
+    env.note_versionchange(node['type'], node['version'], node, lineno)
+    return ret
+
                 
 class SuppressBlockquotes(docutils.transforms.Transform):
     """
