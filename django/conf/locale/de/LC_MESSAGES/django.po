@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-01 13:55+0100\n"
+"POT-Creation-Date: 2009-03-09 17:31+0100\n"
 "PO-Revision-Date: 2008-08-28 22:58+0100\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: \n"
@@ -932,7 +932,7 @@ msgstr "Mein Passwort zurücksetzen"
 
 #: contrib/admin/templatetags/admin_list.py:285
 msgid "All dates"
-msgstr "Alle Tage"
+msgstr "Alle Daten"
 
 #: contrib/admin/views/main.py:69
 #, python-format
@@ -2056,7 +2056,7 @@ msgid "Prague"
 msgstr "Prag"
 
 #: contrib/localflavor/cz/cz_regions.py:9
-msgid "Cenral Bohemian Region"
+msgid "Central Bohemian Region"
 msgstr "Mittelböhmische Region"
 
 #: contrib/localflavor/cz/cz_regions.py:10
@@ -4012,28 +4012,28 @@ msgstr "Bitte eine gültige Auswahl treffen. Dies ist keine gültige Auswahl."
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Bitte eine gültige Auswahl treffen. %s ist keine gültige Auswahl."
 
-#: template/defaultfilters.py:743
+#: template/defaultfilters.py:751
 msgid "yes,no,maybe"
 msgstr "Ja,Nein,Vielleicht"
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:782
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d Byte"
 msgstr[1] "%(size)d Bytes"
 
-#: template/defaultfilters.py:776
+#: template/defaultfilters.py:784
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:778
+#: template/defaultfilters.py:786
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:779
+#: template/defaultfilters.py:787
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
