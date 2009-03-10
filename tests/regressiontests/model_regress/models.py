@@ -149,8 +149,8 @@ datetime.datetime(2000, 1, 1, 6, 1, 1)
 
 """}
 
-if settings.DATABASE_ENGINE != "mysql":
-    __test__["non-mysql-tests"] = """
+if settings.DATABASE_ENGINE not in ("mysql", "oracle"):
+    __test__["timezone-tests"] = """
 # Saving an updating with timezone-aware datetime Python objects. Regression
 # test for #10443.
 
