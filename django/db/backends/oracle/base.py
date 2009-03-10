@@ -36,6 +36,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     uses_custom_query_class = True
     interprets_empty_strings_as_nulls = True
+    uses_savepoints = True
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -150,6 +151,12 @@ WHEN (new.%(col_name)s IS NULL)
         from django.db import connection
         connection.cursor()
         return connection.ops.regex_lookup(lookup_type)
+
+    def savepoint_create_sql(self, sid):
+        return "SAVEPOINT " + self.quote_name(sid)
+
+    def savepoint_rollback_sql(self, sid):
+        return "ROLLBACK TO SAVEPOINT " + self.quote_name(sid)
 
     def sql_flush(self, style, tables, sequences):
         # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
@@ -308,6 +315,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if not cursor:
             cursor = FormatStylePlaceholderCursor(self.connection)
         return cursor
+
+    # Oracle doesn't support savepoint commits.  Ignore them.
+    def _savepoint_commit(self, sid):
+        pass
 
 
 class OracleParam(object):
