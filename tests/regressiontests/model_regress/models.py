@@ -48,7 +48,10 @@ class Worker(models.Model):
 
 class BrokenUnicodeMethod(models.Model):
     name = models.CharField(max_length=7)
+
     def __unicode__(self):
+        # Intentionally broken (trying to insert a unicode value into a str
+        # object).
         return 'Názov: %s' % self.name
 
 
