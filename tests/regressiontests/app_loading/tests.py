@@ -1,18 +1,27 @@
-"""
+import os
+import sys
+import time
+
+from django.conf import Settings
+
+__test__ = {"API_TESTS": """
 Test the globbing of INSTALLED_APPS.
 
->>> import os, sys
 >>> old_sys_path = sys.path
 >>> sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
->>> from django.conf import Settings
+>>> old_tz = os.environ["TZ"]
+>>> settings = Settings('test_settings')
 
->>> s = Settings('test_settings')
-
->>> s.INSTALLED_APPS
+>>> settings.INSTALLED_APPS
 ['parent.app', 'parent.app1']
 
 >>> sys.path = old_sys_path
 
-"""
+# Undo a side-effect of installing a new settings object.
+>>> if hasattr(time, "tzset"):
+...     os.environ["TZ"] = old_tz
+...     time.tzset()
+
+"""}
 
