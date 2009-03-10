@@ -217,8 +217,7 @@ class BaseDatabaseOperations(object):
         Returns the value to use for the LIMIT when we are wanting "LIMIT
         infinity". Returns None if the limit clause can be omitted in this case.
         """
-        # FIXME: API may need to change once Oracle backend is repaired.
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def pk_default_value(self):
         """
