@@ -249,8 +249,8 @@ class BaseModelForm(BaseForm):
                 # This is an extra field that's not on the ModelForm, ignore it
                 continue
             if not isinstance(f, ModelField):
-                # This is an extra field that happens to have a name that matches, 
-                # for example, a related object accessor for this model.  So 
+                # This is an extra field that happens to have a name that matches,
+                # for example, a related object accessor for this model.  So
                 # get_field_by_name found it, but it is not a Field so do not proceed
                 # to use it as if it were.
                 continue
@@ -472,7 +472,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         # is there a better way to get the object descriptor?
         self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
         qs = self.model._default_manager.filter(**{self.fk.name: self.instance})
-        super(BaseInlineFormSet, self).__init__(data, files, prefix=prefix or self.rel_name,
+        super(BaseInlineFormSet, self).__init__(data, files, prefix=prefix,
                                                 queryset=qs)
 
     def _construct_forms(self):
@@ -488,6 +488,12 @@ class BaseInlineFormSet(BaseModelFormSet):
             # creating new instances
             form.data[form.add_prefix(self._pk_field.name)] = None
         return form
+
+    #@classmethod
+    def get_default_prefix(cls):
+        from django.db.models.fields.related import RelatedObject
+        return RelatedObject(cls.fk.rel.to, cls.model, cls.fk).get_accessor_name()
+    get_default_prefix = classmethod(get_default_prefix)
 
     def save_new(self, form, commit=True):
         fk_attname = self.fk.get_attname()

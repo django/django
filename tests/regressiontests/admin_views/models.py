@@ -20,7 +20,7 @@ class Article(models.Model):
 
     def __unicode__(self):
         return self.title
-    
+
     def model_year(self):
         return self.date.year
     model_year.admin_order_field = 'date'
@@ -54,14 +54,14 @@ class Chapter(models.Model):
 
 class ChapterXtra1(models.Model):
     chap = models.OneToOneField(Chapter, verbose_name=u'¿Chap?')
-    xtra = models.CharField(max_length=100, verbose_name=u'¿Xtra?') 
+    xtra = models.CharField(max_length=100, verbose_name=u'¿Xtra?')
 
     def __unicode__(self):
         return u'¿Xtra1: %s' % self.xtra
 
 class ChapterXtra2(models.Model):
     chap = models.OneToOneField(Chapter, verbose_name=u'¿Chap?')
-    xtra = models.CharField(max_length=100, verbose_name=u'¿Xtra?') 
+    xtra = models.CharField(max_length=100, verbose_name=u'¿Xtra?')
 
     def __unicode__(self):
         return u'¿Xtra2: %s' % self.xtra
@@ -87,7 +87,7 @@ class ArticleAdmin(admin.ModelAdmin):
                 'extra_var': 'Hello!'
             }
         )
-        
+
     def modeladmin_year(self, obj):
         return obj.date.year
     modeladmin_year.admin_order_field = 'date'
@@ -121,7 +121,7 @@ class ModelWithStringPrimaryKey(models.Model):
 
 class Color(models.Model):
     value = models.CharField(max_length=10)
-    warm = models.BooleanField()   
+    warm = models.BooleanField()
     def __unicode__(self):
         return self.value
 
@@ -134,12 +134,56 @@ class Thing(models.Model):
 class ThingAdmin(admin.ModelAdmin):
     list_filter = ('color',)
 
+class Persona(models.Model):
+    """
+    A simple persona associated with accounts, to test inlining of related
+    accounts which inherit from a common accounts class.
+    """
+    name = models.CharField(blank=False,  max_length=80)
+    def __unicode__(self):
+        return self.name
+
+class Account(models.Model):
+    """
+    A simple, generic account encapsulating the information shared by all
+    types of accounts.
+    """
+    username = models.CharField(blank=False,  max_length=80)
+    persona = models.ForeignKey(Persona, related_name="accounts")
+    servicename = u'generic service'
+
+    def __unicode__(self):
+        return "%s: %s" % (self.servicename, self.username)
+
+class FooAccount(Account):
+    """A service-specific account of type Foo."""
+    servicename = u'foo'
+
+class BarAccount(Account):
+    """A service-specific account of type Bar."""
+    servicename = u'bar'
+
+class FooAccountAdmin(admin.StackedInline):
+    model = FooAccount
+    extra = 1
+
+class BarAccountAdmin(admin.StackedInline):
+    model = BarAccount
+    extra = 1
+
+class PersonaAdmin(admin.ModelAdmin):
+    inlines = (
+        FooAccountAdmin,
+        BarAccountAdmin
+    )
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, inlines=[ArticleInline])
 admin.site.register(ModelWithStringPrimaryKey)
 admin.site.register(Color)
 admin.site.register(Thing, ThingAdmin)
+admin.site.register(Persona, PersonaAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
@@ -153,3 +197,5 @@ admin.site.register(Thing, ThingAdmin)
 admin.site.register(Book, inlines=[ChapterInline])
 admin.site.register(Promo)
 admin.site.register(ChapterXtra1)
+
+
