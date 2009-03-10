@@ -32,7 +32,7 @@ class BaseFormSet(StrAndUnicode):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList):
         self.is_bound = data is not None or files is not None
-        self.prefix = prefix or 'form'
+        self.prefix = prefix or self.get_default_prefix()
         self.auto_id = auto_id
         self.data = data
         self.files = files
@@ -62,7 +62,7 @@ class BaseFormSet(StrAndUnicode):
             initial = {TOTAL_FORM_COUNT: self._total_form_count,
                        INITIAL_FORM_COUNT: self._initial_form_count}
             self.management_form = ManagementForm(initial=initial, auto_id=self.auto_id, prefix=self.prefix)
-        
+
         # construct the forms in the formset
         self._construct_forms()
 
@@ -74,7 +74,7 @@ class BaseFormSet(StrAndUnicode):
         self.forms = []
         for i in xrange(self._total_form_count):
             self.forms.append(self._construct_form(i))
-    
+
     def _construct_form(self, i, **kwargs):
         """
         Instantiates and returns the i-th form instance in a formset.
@@ -118,7 +118,7 @@ class BaseFormSet(StrAndUnicode):
 
     def _get_deleted_forms(self):
         """
-        Returns a list of forms that have been marked for deletion. Raises an 
+        Returns a list of forms that have been marked for deletion. Raises an
         AttributeError if deletion is not allowed.
         """
         if not self.is_valid() or not self.can_delete:
@@ -175,6 +175,11 @@ class BaseFormSet(StrAndUnicode):
         # the form data.
         return [self.forms[i[0]] for i in self._ordering]
     ordered_forms = property(_get_ordered_forms)
+
+    #@classmethod
+    def get_default_prefix(cls):
+        return 'form'
+    get_default_prefix = classmethod(get_default_prefix)
 
     def non_form_errors(self):
         """
