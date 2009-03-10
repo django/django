@@ -57,5 +57,5 @@
       version.
 """
 from django.contrib.gis.maps.google.gmap import GoogleMap, GoogleMapSet
-from django.contrib.gis.maps.google.overlays import GEvent, GMarker, GPolygon, GPolyline
+from django.contrib.gis.maps.google.overlays import GEvent, GIcon, GMarker, GPolygon, GPolyline
 from django.contrib.gis.maps.google.zoom import GoogleZoom

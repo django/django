@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 class GoogleMapException(Exception): pass
-from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline, GMarker
+from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline, GMarker, GIcon
 
 # The default Google Maps URL (for the API javascript)
 # TODO: Internationalize for Japan, UK, etc.
@@ -18,11 +18,12 @@ class GoogleMap(object):
     vml_css  = mark_safe('v\:* {behavior:url(#default#VML);}') # CSS for IE VML
     xmlns    = mark_safe('xmlns:v="urn:schemas-microsoft-com:vml"') # XML Namespace (for IE VML).
 
-    def __init__(self, key=None, api_url=None, version=None, 
+    def __init__(self, key=None, api_url=None, version=None,
                  center=None, zoom=None, dom_id='map',
-                 kml_urls=[], polygons=[], polylines=[], markers=[],
+                 kml_urls=[], polylines=None, polygons=None, markers=None,
                  template='gis/google/google-single.js',
-                 js_module='geodjango',extra_context={}):
+                 js_module='geodjango',
+                 extra_context={}):
 
         # The Google Maps API Key defined in the settings will be used
         # if not passed in as a parameter.  The use of an API key is
@@ -34,7 +35,7 @@ class GoogleMap(object):
                 raise GoogleMapException('Google Maps API Key not found (try adding GOOGLE_MAPS_API_KEY to your settings).')
         else:
             self.key = key
-        
+
         # Getting the Google Maps API version, defaults to using the latest ("2.x"),
         # this is not necessarily the most stable.
         if not version:
@@ -55,28 +56,24 @@ class GoogleMap(object):
         self.js_module = js_module
         self.template = template
         self.kml_urls = kml_urls
-        
+
         # Does the user want any GMarker, GPolygon, and/or GPolyline overlays?
-        self.polygons, self.polylines, self.markers = [], [], []
-        if markers:
-            for point in markers:
-                if isinstance(point, GMarker): 
-                    self.markers.append(point)
-                else:
-                    self.markers.append(GMarker(point))
-        if polygons:
-            for poly in polygons:
-                if isinstance(poly, GPolygon): 
-                    self.polygons.append(poly)
-                else:
-                    self.polygons.append(GPolygon(poly))
-        if polylines:
-            for pline in polylines:
-                if isinstance(pline, GPolyline):
-                    self.polylines.append(pline)
-                else:
-                    self.polylines.append(GPolyline(pline))
-       
+        overlay_info = [[GMarker, markers, 'markers'],
+                        [GPolygon, polygons, 'polygons'],
+                        [GPolyline, polylines, 'polylines']]
+
+        for overlay_class, overlay_list, varname in overlay_info:
+            setattr(self, varname, [])
+            if overlay_list:
+                for overlay in overlay_list:
+                    if isinstance(overlay, overlay_class):
+                        getattr(self, varname).append(overlay)
+                    else:
+                        getattr(self, varname).append(overlay_class(overlay))
+
+        # Pulling any icons from the markers.
+        self.icons = [marker.icon for marker in self.markers if marker.icon]
+
         # If GMarker, GPolygons, and/or GPolylines are used the zoom will be
         # automatically calculated via the Google Maps API.  If both a zoom
         # level and a center coordinate are provided with polygons/polylines,
@@ -85,7 +82,7 @@ class GoogleMap(object):
         if self.polygons or self.polylines  or self.markers:
             if center is None or zoom is None:
                 self.calc_zoom = True
-    
+
         # Defaults for the zoom level and center coordinates if the zoom
         # is not automatically calculated.
         if zoom is None: zoom = 4
@@ -105,6 +102,7 @@ class GoogleMap(object):
                   'zoom' : self.zoom,
                   'polygons' : self.polygons,
                   'polylines' : self.polylines,
+                  'icons': self.icons,
                   'markers' : self.markers,
                   }
         params.update(self.extra_context)
@@ -174,7 +172,12 @@ class GoogleMapSet(GoogleMap):
             self.maps = args[0]
         else:
             self.maps = args
-        
+
+        # Creating the icons sequence from every map in this set.
+        self.icons = []
+        for map in self.maps:
+            self.icons.extend(map.icons)
+
         # Generating DOM ids for each of the maps in the set.
         self.dom_ids = ['map%d' % i for i in xrange(len(self.maps))]
 
@@ -205,6 +208,7 @@ class GoogleMapSet(GoogleMap):
         params = {'js_module' : self.js_module,
                   'dom_ids' : self.dom_ids,
                   'load_map_js' : self.load_map_js(),
+                  'icons' : self.icons,
                   }
         params.update(self.extra_context)
         return render_to_string(self.template, params)
