@@ -322,8 +322,9 @@ class BaseDatabaseCreation(object):
         self.connection.close()
         settings.DATABASE_NAME = test_database_name
         self.connection.settings_dict["DATABASE_NAME"] = test_database_name
-        settings.DATABASE_SUPPORTS_TRANSACTIONS = self._rollback_works()
-        self.connection.settings_dict["DATABASE_SUPPORTS_TRANSACTIONS"] = self._rollback_works()
+        can_rollback = self._rollback_works()
+        settings.DATABASE_SUPPORTS_TRANSACTIONS = can_rollback
+        self.connection.settings_dict["DATABASE_SUPPORTS_TRANSACTIONS"] = can_rollback
 
         call_command('syncdb', verbosity=verbosity, interactive=False)
 

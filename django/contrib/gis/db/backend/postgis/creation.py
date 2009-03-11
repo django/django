@@ -140,7 +140,10 @@ def create_spatial_db(test=False, verbosity=1, autoclobber=False, interactive=Fa
     # Closing the connection
     connection.close()
     settings.DATABASE_NAME = db_name
-    settings.DATABASE_SUPPORTS_TRANSACTIONS = connection.creation._rollback_works()
+    connection.settings_dict["DATABASE_NAME"] = db_name
+    can_rollback = connection.creation._rollback_works()
+    settings.DATABASE_SUPPORTS_TRANSACTIONS = can_rollback
+    connection.settings_dict["DATABASE_SUPPORTS_TRANSACTIONS"] = can_rollback
 
     # Syncing the database
     call_command('syncdb', verbosity=verbosity, interactive=interactive)
