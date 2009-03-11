@@ -45,3 +45,8 @@ class CacheClass(BaseCache):
     def close(self, **kwargs):
         self._cache.disconnect_all()
 
+    def incr(self, key, delta=1):
+        return self._cache.incr(key, delta)
+
+    def decr(self, key, delta=1):
+        return self._cache.decr(key, delta)

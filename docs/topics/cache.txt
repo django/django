@@ -162,7 +162,7 @@ cache is multi-process and thread-safe. To use it, set ``CACHE_BACKEND`` to
 ``"locmem:///"``. For example::
 
     CACHE_BACKEND = 'locmem:///'
-    
+
 Note that each process will have its own private cache instance, which means no
 cross-process caching is possible. This obviously also means the local memory
 cache isn't particularly memory-efficient, so it's probably not a good choice
@@ -438,6 +438,33 @@ Finally, you can delete keys explicitly with ``delete()``. This is an easy way
 of clearing the cache for a particular object::
 
     >>> cache.delete('a')
+
+.. versionadded:: 1.1
+
+You can also increment or decrement a key that already exists using the
+``incr()`` or ``decr()`` methods, respectively. By default, the existing cache
+value will incremented or decremented by 1. Other increment/decrement values
+can be specified by providing an argument to the increment/decrement call. A
+ValueError will be raised if you attempt to increment or decrement a
+nonexistent cache key.::
+
+    >>> cache.set('num', 1)
+    >>> cache.incr('num')
+    2
+    >>> cache.incr('num', 10)
+    12
+    >>> cache.decr('num')
+    11
+    >>> cache.decr('num', 5)
+    6
+
+.. note::
+
+    ``incr()``/``decr()`` methods are not guaranteed to be atomic. On those
+    backends that support atomic increment/decrement (most notably, the
+    memcached backend), increment and decrement operations will be atomic.
+    However, if the backend doesn't natively provide an increment/decrement
+    operation, it will be implemented using a 2 step retrieve/update.
 
 That's it. The cache has very few restrictions: You can cache any object that
 can be pickled safely, although keys must be strings.

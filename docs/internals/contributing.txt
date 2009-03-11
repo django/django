@@ -184,7 +184,7 @@ Patch style
       An exception is for code changes that are described more clearly in plain
       English than in code. Indentation is the most common example; it's hard to
       read patches when the only difference in code is that it's indented.
-      
+
       Patches in ``git diff`` format are also acceptable.
 
     * When creating patches, always run ``svn diff`` from the top-level
@@ -402,7 +402,7 @@ translated, here's what to do:
 
     * Join the `Django i18n mailing list`_ and introduce yourself.
 
-    * Create translations using the methods described in the 
+    * Create translations using the methods described in the
       :ref:`i18n documentation <topics-i18n>`. For this you will use the
       ``django-admin.py makemessages`` tool. In this particular case it should
       be run from the top-level ``django`` directory of the Django source tree.
@@ -697,9 +697,9 @@ repository:
       first commit the change to library Y, then commit feature X in a separate
       commit. This goes a *long way* in helping all core Django developers
       follow your changes.
-      
-    * Separate bug fixes from feature changes. 
-    
+
+    * Separate bug fixes from feature changes.
+
       Bug fixes need to be added to the current bugfix branch (e.g. the
       ``1.0.X`` branch) as well as the current trunk.
 
@@ -782,6 +782,10 @@ dependencies:
     *  Textile_
     *  Docutils_
     *  setuptools_
+    *  memcached_, plus the either the python-memcached_ or cmemcached_ Python binding
+
+If you want to test the memcached cache backend, you will also need to define
+a :setting:`CACHE_BACKEND` setting that points at your memcached instance.
 
 Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
@@ -791,6 +795,9 @@ associated tests will be skipped.
 .. _Textile: http://pypi.python.org/pypi/textile
 .. _docutils: http://pypi.python.org/pypi/docutils/0.4
 .. _setuptools: http://pypi.python.org/pypi/setuptools/
+.. _memcached: http://www.danga.com/memcached/
+.. _python-memcached: http://pypi.python.org/pypi/python-memcached/
+.. _cmemcached: http://pypi.python.org/pypi/cmemcache
 
 To run a subset of the unit tests, append the names of the test modules to the
 ``runtests.py`` command line. See the list of directories in
@@ -862,28 +869,28 @@ for feature branches:
 
     1. Feature branches using a distributed revision control system like
        Git_, Mercurial_, Bazaar_, etc.
-       
-       If you're familiar with one of these tools, this is probably your best 
+
+       If you're familiar with one of these tools, this is probably your best
        option since it doesn't require any support or buy-in from the Django
        core developers.
-       
+
        However, do keep in mind that Django will continue to use Subversion for
        the foreseeable future, and this will naturally limit the recognition of
        your branch. Further, if your branch becomes eligible for merging to
        trunk you'll need to find a core developer familiar with your DVCS of
        choice who'll actually perform the merge.
-       
+
        If you do decided to start a distributed branch of Django and choose to make it
        public, please add the branch to the `Django branches`_ wiki page.
-       
+
     2. Feature branches using SVN have a higher bar. If you want a branch in SVN
        itself, you'll need a "mentor" among the :ref:`core committers
        <internals-committers>`. This person is responsible for actually creating
        the branch, monitoring your process (see below), and ultimately merging
        the branch into trunk.
-       
+
        If you want a feature branch in SVN, you'll need to ask in
-       `django-developers`_ for a mentor. 
+       `django-developers`_ for a mentor.
 
 .. _git: http://git.or.cz/
 .. _mercurial: http://www.selenic.com/mercurial/
@@ -894,7 +901,7 @@ Branch rules
 ------------
 
 We've got a few rules for branches born out of experience with what makes a
-successful Django branch. 
+successful Django branch.
 
 DVCS branches are obviously not under central control, so we have no way of
 enforcing these rules. However, if you're using a DVCS, following these rules
@@ -908,19 +915,19 @@ rules are broken.
     * Only branch entire copies of the Django tree, even if work is only
       happening on part of that tree. This makes it painless to switch to a
       branch.
-      
+
     * Merge changes from trunk no less than once a week, and preferably every
       couple-three days.
-      
+
       In our experience, doing regular trunk merges is often the difference
       between a successful branch and one that fizzles and dies.
-      
+
       If you're working on an SVN branch, you should be using `svnmerge.py`_
       to track merges from trunk.
-      
+
     * Keep tests passing and documentation up-to-date. As with patches,
       we'll only merge a branch that comes with tests and documentation.
-      
+
 .. _svnmerge.py: http://www.orcaware.com/svn/wiki/Svnmerge.py
 
 Once the branch is stable and ready to be merged into the trunk, alert

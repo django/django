@@ -9,8 +9,10 @@ import tempfile
 import time
 import unittest
 
-from django.core.cache import cache, get_cache
-from django.core.cache.backends.filebased import CacheClass as FileCache
+from django.conf import settings
+from django.core import management
+from django.core.cache import get_cache
+from django.core.cache.backends.base import InvalidCacheBackendError
 from django.http import HttpResponse
 from django.utils.cache import patch_vary_headers
 from django.utils.hashcompat import md5_constructor
@@ -22,39 +24,133 @@ class C:
     def m(n):
         return 24
 
-class Cache(unittest.TestCase):
+class DummyCacheTests(unittest.TestCase):
+    # The Dummy cache backend doesn't really behave like a test backend,
+    # so it has different test requirements.
     def setUp(self):
-        # Special-case the file cache so we can clean up after ourselves.
-        if isinstance(cache, FileCache):
-            self.cache_dir = tempfile.mkdtemp()
-            self.cache = get_cache("file:///%s" % self.cache_dir)
-        else:
-            self.cache_dir = None
-            self.cache = cache
-            
-    def tearDown(self):
-        if self.cache_dir is not None:
-            shutil.rmtree(self.cache_dir)
-    
+        self.cache = get_cache('dummy://')
+
     def test_simple(self):
-        # simple set/get
+        "Dummy cache backend ignores cache set calls"
+        self.cache.set("key", "value")
+        self.assertEqual(self.cache.get("key"), None)
+
+    def test_add(self):
+        "Add doesn't do anything in dummy cache backend"
+        self.cache.add("addkey1", "value")
+        result = self.cache.add("addkey1", "newvalue")
+        self.assertEqual(result, True)
+        self.assertEqual(self.cache.get("addkey1"), None)
+
+    def test_non_existent(self):
+        "Non-existent keys aren't found in the dummy cache backend"
+        self.assertEqual(self.cache.get("does_not_exist"), None)
+        self.assertEqual(self.cache.get("does_not_exist", "bang!"), "bang!")
+
+    def test_get_many(self):
+        "get_many returns nothing for the dummy cache backend"
+        self.cache.set('a', 'a')
+        self.cache.set('b', 'b')
+        self.cache.set('c', 'c')
+        self.cache.set('d', 'd')
+        self.assertEqual(self.cache.get_many(['a', 'c', 'd']), {})
+        self.assertEqual(self.cache.get_many(['a', 'b', 'e']), {})
+
+    def test_delete(self):
+        "Cache deletion is transparently ignored on the dummy cache backend"
+        self.cache.set("key1", "spam")
+        self.cache.set("key2", "eggs")
+        self.assertEqual(self.cache.get("key1"), None)
+        self.cache.delete("key1")
+        self.assertEqual(self.cache.get("key1"), None)
+        self.assertEqual(self.cache.get("key2"), None)
+
+    def test_has_key(self):
+        "The has_key method doesn't ever return True for the dummy cache backend"
+        self.cache.set("hello1", "goodbye1")
+        self.assertEqual(self.cache.has_key("hello1"), False)
+        self.assertEqual(self.cache.has_key("goodbye1"), False)
+
+    def test_in(self):
+        "The in operator doesn't ever return True for the dummy cache backend"
+        self.cache.set("hello2", "goodbye2")
+        self.assertEqual("hello2" in self.cache, False)
+        self.assertEqual("goodbye2" in self.cache, False)
+
+    def test_incr(self):
+        "Dummy cache values can't be incremented"
+        self.cache.set('answer', 42)
+        self.assertRaises(ValueError, self.cache.incr, 'answer')
+        self.assertRaises(ValueError, self.cache.incr, 'does_not_exist')
+
+    def test_decr(self):
+        "Dummy cache values can't be decremented"
+        self.cache.set('answer', 42)
+        self.assertRaises(ValueError, self.cache.decr, 'answer')
+        self.assertRaises(ValueError, self.cache.decr, 'does_not_exist')
+
+    def test_data_types(self):
+        "All data types are ignored equally by the dummy cache"
+        stuff = {
+            'string'    : 'this is a string',
+            'int'       : 42,
+            'list'      : [1, 2, 3, 4],
+            'tuple'     : (1, 2, 3, 4),
+            'dict'      : {'A': 1, 'B' : 2},
+            'function'  : f,
+            'class'     : C,
+        }
+        self.cache.set("stuff", stuff)
+        self.assertEqual(self.cache.get("stuff"), None)
+
+    def test_expiration(self):
+        "Expiration has no effect on the dummy cache"
+        self.cache.set('expire1', 'very quickly', 1)
+        self.cache.set('expire2', 'very quickly', 1)
+        self.cache.set('expire3', 'very quickly', 1)
+
+        time.sleep(2)
+        self.assertEqual(self.cache.get("expire1"), None)
+
+        self.cache.add("expire2", "newvalue")
+        self.assertEqual(self.cache.get("expire2"), None)
+        self.assertEqual(self.cache.has_key("expire3"), False)
+
+    def test_unicode(self):
+        "Unicode values are ignored by the dummy cache"
+        stuff = {
+            u'ascii': u'ascii_value',
+            u'unicode_ascii': u'Iñtërnâtiônàlizætiøn1',
+            u'Iñtërnâtiônàlizætiøn': u'Iñtërnâtiônàlizætiøn2',
+            u'ascii': {u'x' : 1 }
+            }
+        for (key, value) in stuff.items():
+            self.cache.set(key, value)
+            self.assertEqual(self.cache.get(key), None)
+
+
+class BaseCacheTests(object):
+    # A common set of tests to apply to all cache backends
+    def test_simple(self):
+        # Simple cache set/get works
         self.cache.set("key", "value")
         self.assertEqual(self.cache.get("key"), "value")
 
     def test_add(self):
-        # test add (only add if key isn't already in cache)
+        # A key can be added to a cache
         self.cache.add("addkey1", "value")
         result = self.cache.add("addkey1", "newvalue")
         self.assertEqual(result, False)
         self.assertEqual(self.cache.get("addkey1"), "value")
 
     def test_non_existent(self):
+        # Non-existent cache keys return as None/default
         # get with non-existent keys
         self.assertEqual(self.cache.get("does_not_exist"), None)
         self.assertEqual(self.cache.get("does_not_exist", "bang!"), "bang!")
 
     def test_get_many(self):
-        # get_many
+        # Multiple cache keys can be returned using get_many
         self.cache.set('a', 'a')
         self.cache.set('b', 'b')
         self.cache.set('c', 'c')
@@ -63,7 +159,7 @@ class Cache(unittest.TestCase):
         self.assertEqual(self.cache.get_many(['a', 'b', 'e']), {'a' : 'a', 'b' : 'b'})
 
     def test_delete(self):
-        # delete
+        # Cache keys can be deleted
         self.cache.set("key1", "spam")
         self.cache.set("key2", "eggs")
         self.assertEqual(self.cache.get("key1"), "spam")
@@ -72,17 +168,37 @@ class Cache(unittest.TestCase):
         self.assertEqual(self.cache.get("key2"), "eggs")
 
     def test_has_key(self):
-        # has_key
+        # The cache can be inspected for cache keys
         self.cache.set("hello1", "goodbye1")
         self.assertEqual(self.cache.has_key("hello1"), True)
         self.assertEqual(self.cache.has_key("goodbye1"), False)
 
     def test_in(self):
+        # The in operator can be used to inspet cache contents
         self.cache.set("hello2", "goodbye2")
         self.assertEqual("hello2" in self.cache, True)
         self.assertEqual("goodbye2" in self.cache, False)
 
+    def test_incr(self):
+        # Cache values can be incremented
+        self.cache.set('answer', 41)
+        self.assertEqual(self.cache.incr('answer'), 42)
+        self.assertEqual(self.cache.get('answer'), 42)
+        self.assertEqual(self.cache.incr('answer', 10), 52)
+        self.assertEqual(self.cache.get('answer'), 52)
+        self.assertRaises(ValueError, self.cache.incr, 'does_not_exist')
+
+    def test_decr(self):
+        # Cache values can be decremented
+        self.cache.set('answer', 43)
+        self.assertEqual(self.cache.decr('answer'), 42)
+        self.assertEqual(self.cache.get('answer'), 42)
+        self.assertEqual(self.cache.decr('answer', 10), 32)
+        self.assertEqual(self.cache.get('answer'), 32)
+        self.assertRaises(ValueError, self.cache.decr, 'does_not_exist')
+
     def test_data_types(self):
+        # Many different data types can be cached
         stuff = {
             'string'    : 'this is a string',
             'int'       : 42,
@@ -96,6 +212,7 @@ class Cache(unittest.TestCase):
         self.assertEqual(self.cache.get("stuff"), stuff)
 
     def test_expiration(self):
+        # Cache values can be set to expire
         self.cache.set('expire1', 'very quickly', 1)
         self.cache.set('expire2', 'very quickly', 1)
         self.cache.set('expire3', 'very quickly', 1)
@@ -108,6 +225,7 @@ class Cache(unittest.TestCase):
         self.assertEqual(self.cache.has_key("expire3"), False)
 
     def test_unicode(self):
+        # Unicode values can be cached
         stuff = {
             u'ascii': u'ascii_value',
             u'unicode_ascii': u'Iñtërnâtiônàlizætiøn1',
@@ -118,14 +236,36 @@ class Cache(unittest.TestCase):
             self.cache.set(key, value)
             self.assertEqual(self.cache.get(key), value)
 
+class DBCacheTests(unittest.TestCase, BaseCacheTests):
+    def setUp(self):
+        management.call_command('createcachetable', 'test_cache_table', verbosity=0, interactive=False)
+        self.cache = get_cache('db://test_cache_table')
 
-class FileBasedCacheTests(unittest.TestCase):
+    def tearDown(self):
+        from django.db import connection
+        cursor = connection.cursor()
+        cursor.execute('DROP TABLE test_cache_table');
+
+class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
+    def setUp(self):
+        self.cache = get_cache('locmem://')
+
+# memcached backend isn't guaranteed to be available.
+# To check the memcached backend, the test settings file will
+# need to contain a CACHE_BACKEND setting that points at
+# your memcache server.
+if settings.CACHE_BACKEND.startswith('memcached://'):
+    class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
+        def setUp(self):
+            self.cache = get_cache(settings.CACHE_BACKEND)
+
+class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
     """
     Specific test cases for the file-based cache.
     """
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
-        self.cache = FileCache(self.dirname, {})
+        self.cache = get_cache('file:///%s' % self.dirname)
 
     def tearDown(self):
         shutil.rmtree(self.dirname)

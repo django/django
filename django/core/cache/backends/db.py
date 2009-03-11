@@ -64,6 +64,7 @@ class CacheClass(BaseCache):
                 cursor.execute("INSERT INTO %s (cache_key, value, expires) VALUES (%%s, %%s, %%s)" % self._table, [key, encoded, str(exp)])
         except DatabaseError:
             # To be threadsafe, updates/inserts are allowed to fail silently
+            transaction.rollback()
             return False
         else:
             transaction.commit_unless_managed()

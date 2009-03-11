@@ -65,6 +65,24 @@ class BaseCache(object):
         """
         return self.get(key) is not None
 
+    def incr(self, key, delta=1):
+        """
+        Add delta to value in the cache. If the key does not exist, raise a
+        ValueError exception.
+        """
+        if key not in self:
+            raise ValueError, "Key '%s' not found" % key
+        new_value = self.get(key) + delta
+        self.set(key, new_value)
+        return new_value
+
+    def decr(self, key, delta=1):
+        """
+        Subtract delta from value in the cache. If the key does not exist, raise
+        a ValueError exception.
+        """
+        return self.incr(key, -delta)
+
     def __contains__(self, key):
         """
         Returns True if the key is in the cache and has not expired.
