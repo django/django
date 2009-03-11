@@ -46,7 +46,7 @@ class DatabaseWrapper(object):
 
         self.features = BaseDatabaseFeatures()
         self.ops = DatabaseOperations()
-        self.client = DatabaseClient()
+        self.client = DatabaseClient(self)
         self.creation = BaseDatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation()

@@ -234,11 +234,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def __init__(self, **kwargs):
         super(DatabaseWrapper, self).__init__(**kwargs)
-        self.server_version = None
 
+        self.server_version = None
         self.features = DatabaseFeatures()
         self.ops = DatabaseOperations()
-        self.client = DatabaseClient()
+        self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = DatabaseValidation()
@@ -253,26 +253,27 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 self.connection = None
         return False
 
-    def _cursor(self, settings):
+    def _cursor(self):
         if not self._valid_connection():
             kwargs = {
                 'conv': django_conversions,
                 'charset': 'utf8',
                 'use_unicode': True,
             }
-            if settings.DATABASE_USER:
-                kwargs['user'] = settings.DATABASE_USER
-            if settings.DATABASE_NAME:
-                kwargs['db'] = settings.DATABASE_NAME
-            if settings.DATABASE_PASSWORD:
-                kwargs['passwd'] = settings.DATABASE_PASSWORD
-            if settings.DATABASE_HOST.startswith('/'):
-                kwargs['unix_socket'] = settings.DATABASE_HOST
-            elif settings.DATABASE_HOST:
-                kwargs['host'] = settings.DATABASE_HOST
-            if settings.DATABASE_PORT:
-                kwargs['port'] = int(settings.DATABASE_PORT)
-            kwargs.update(self.options)
+            settings_dict = self.settings_dict
+            if settings_dict['DATABASE_USER']:
+                kwargs['user'] = settings_dict['DATABASE_USER']
+            if settings_dict['DATABASE_NAME']:
+                kwargs['db'] = settings_dict['DATABASE_NAME']
+            if settings_dict['DATABASE_PASSWORD']:
+                kwargs['passwd'] = settings_dict['DATABASE_PASSWORD']
+            if settings_dict['DATABASE_HOST'].startswith('/'):
+                kwargs['unix_socket'] = settings_dict['DATABASE_HOST']
+            elif settings_dict['DATABASE_HOST']:
+                kwargs['host'] = settings_dict['DATABASE_HOST']
+            if settings_dict['DATABASE_PORT']:
+                kwargs['port'] = int(settings_dict['DATABASE_PORT'])
+            kwargs.update(settings_dict['DATABASE_OPTIONS'])
             self.connection = Database.connect(**kwargs)
             self.connection.encoders[SafeUnicode] = self.connection.encoders[unicode]
             self.connection.encoders[SafeString] = self.connection.encoders[str]

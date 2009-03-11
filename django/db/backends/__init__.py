@@ -24,10 +24,14 @@ class BaseDatabaseWrapper(local):
     Represents a database connection.
     """
     ops = None
-    def __init__(self, **kwargs):
+    def __init__(self, settings_dict):
+        # `settings_dict` should be a dictionary containing keys such as
+        # DATABASE_NAME, DATABASE_USER, etc. It's called `settings_dict`
+        # instead of `settings` to disambiguate it from Django settings
+        # modules.
         self.connection = None
         self.queries = []
-        self.options = kwargs
+        self.settings_dict = settings_dict
 
     def _commit(self):
         if self.connection is not None:
@@ -59,7 +63,7 @@ class BaseDatabaseWrapper(local):
 
     def cursor(self):
         from django.conf import settings
-        cursor = self._cursor(settings)
+        cursor = self._cursor()
         if settings.DEBUG:
             return self.make_debug_cursor(cursor)
         return cursor
@@ -497,6 +501,10 @@ class BaseDatabaseClient(object):
     # This should be a string representing the name of the executable
     # (e.g., "psql"). Subclasses must override this.
     executable_name = None
+
+    def __init__(self, connection):
+        # connection is an instance of BaseDatabaseWrapper.
+        self.connection = connection
 
     def runshell(self):
         raise NotImplementedError()

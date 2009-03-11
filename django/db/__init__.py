@@ -36,8 +36,22 @@ except ImportError, e:
         else:
             raise # If there's some other error, this must be an error in Django itself.
 
-# Convenient aliases for backend bits.
-connection = backend.DatabaseWrapper(**settings.DATABASE_OPTIONS)
+# `connection`, `DatabaseError` and `IntegrityError` are convenient aliases
+# for backend bits.
+
+# DatabaseWrapper.__init__() takes a dictionary, not a settings module, so
+# we manually create the dictionary from the settings, passing only the
+# settings that the database backends care about. Note that TIME_ZONE is used
+# by the PostgreSQL backends.
+connection = backend.DatabaseWrapper({
+    'DATABASE_HOST': settings.DATABASE_HOST,
+    'DATABASE_NAME': settings.DATABASE_NAME,
+    'DATABASE_OPTIONS': settings.DATABASE_OPTIONS,
+    'DATABASE_PASSWORD': settings.DATABASE_PASSWORD,
+    'DATABASE_PORT': settings.DATABASE_PORT,
+    'DATABASE_USER': settings.DATABASE_USER,
+    'TIME_ZONE': settings.TIME_ZONE,
+})
 DatabaseError = backend.DatabaseError
 IntegrityError = backend.IntegrityError
 

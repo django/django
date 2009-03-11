@@ -90,32 +90,33 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         self.features = DatabaseFeatures()
         self.ops = DatabaseOperations()
-        self.client = DatabaseClient()
+        self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation()
 
-    def _cursor(self, settings):
+    def _cursor(self):
         set_tz = False
+        settings_dict = self.settings_dict
         if self.connection is None:
             set_tz = True
-            if settings.DATABASE_NAME == '':
+            if settings_dict['DATABASE_NAME'] == '':
                 from django.core.exceptions import ImproperlyConfigured
                 raise ImproperlyConfigured("You need to specify DATABASE_NAME in your Django settings file.")
-            conn_string = "dbname=%s" % settings.DATABASE_NAME
-            if settings.DATABASE_USER:
-                conn_string = "user=%s %s" % (settings.DATABASE_USER, conn_string)
-            if settings.DATABASE_PASSWORD:
-                conn_string += " password='%s'" % settings.DATABASE_PASSWORD
-            if settings.DATABASE_HOST:
-                conn_string += " host=%s" % settings.DATABASE_HOST
-            if settings.DATABASE_PORT:
-                conn_string += " port=%s" % settings.DATABASE_PORT
-            self.connection = Database.connect(conn_string, **self.options)
+            conn_string = "dbname=%s" % settings_dict['DATABASE_NAME']
+            if settings_dict['DATABASE_USER']:
+                conn_string = "user=%s %s" % (settings_dict['DATABASE_USER'], conn_string)
+            if settings_dict['DATABASE_PASSWORD']:
+                conn_string += " password='%s'" % settings_dict['DATABASE_PASSWORD']
+            if settings_dict['DATABASE_HOST']:
+                conn_string += " host=%s" % settings_dict['DATABASE_HOST']
+            if settings_dict['DATABASE_PORT']:
+                conn_string += " port=%s" % settings_dict['DATABASE_PORT']
+            self.connection = Database.connect(conn_string, **settings_dict['DATABASE_OPTIONS'])
             self.connection.set_isolation_level(1) # make transactions transparent to all cursors
         cursor = self.connection.cursor()
         if set_tz:
-            cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
+            cursor.execute("SET TIME ZONE %s", [settings_dict['TIME_ZONE']])
             if not hasattr(self, '_version'):
                 self.__class__._version = get_version(cursor)
             if self._version < (8, 0):
