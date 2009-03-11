@@ -108,8 +108,8 @@ class DatabaseCreation(BaseDatabaseCreation):
                     print "Tests cancelled."
                     sys.exit(1)
 
-        settings.DATABASE_USER = TEST_DATABASE_USER
-        settings.DATABASE_PASSWORD = TEST_DATABASE_PASSWD
+        settings.DATABASE_USER = self.connection.settings_dict["DATABASE_USER"] = TEST_DATABASE_USER
+        settings.DATABASE_PASSWORD = self.connection.settings_dict["DATABASE_PASSWORD"] = TEST_DATABASE_PASSWD
 
         return settings.DATABASE_NAME
 
@@ -124,8 +124,8 @@ class DatabaseCreation(BaseDatabaseCreation):
         TEST_DATABASE_TBLSPACE = self._test_database_tblspace(settings)
         TEST_DATABASE_TBLSPACE_TMP = self._test_database_tblspace_tmp(settings)
 
-        settings.DATABASE_USER = self.remember['user']
-        settings.DATABASE_PASSWORD = self.remember['passwd']
+        settings.DATABASE_USER = self.connection.settings_dict["DATABASE_USER"] = self.remember['user']
+        settings.DATABASE_PASSWORD = self.connection.settings_dict["DATABASE_PASSWORD"] = self.remember['passwd']
 
         parameters = {
             'dbname': TEST_DATABASE_NAME,
