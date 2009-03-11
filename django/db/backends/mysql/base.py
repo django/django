@@ -232,8 +232,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': 'LIKE %s',
     }
 
-    def __init__(self, **kwargs):
-        super(DatabaseWrapper, self).__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
         self.server_version = None
         self.features = DatabaseFeatures()
