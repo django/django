@@ -302,9 +302,13 @@ class InsertQuery(Query):
         # We don't need quote_name_unless_alias() here, since these are all
         # going to be column names (so we can avoid the extra overhead).
         qn = self.connection.ops.quote_name
-        result = ['INSERT INTO %s' % qn(self.model._meta.db_table)]
+        opts = self.model._meta
+        result = ['INSERT INTO %s' % qn(opts.db_table)]
         result.append('(%s)' % ', '.join([qn(c) for c in self.columns]))
         result.append('VALUES (%s)' % ', '.join(self.values))
+        if self.connection.features.can_return_id_from_insert:
+            col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
+            result.append(self.connection.ops.return_insert_id() % col)
         return ' '.join(result), self.params
 
     def execute_sql(self, return_id=False):

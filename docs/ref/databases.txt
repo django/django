@@ -13,6 +13,8 @@ This file describes some of the features that might be relevant to Django
 usage. Of course, it is not intended as a replacement for server-specific
 documentation or reference manuals.
 
+.. postgresql-notes:
+
 PostgreSQL notes
 ================
 
@@ -28,6 +30,56 @@ aggregate with an database backend falls within the affected release range.
 
 .. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
 .. _Release 8.2.5: http://developer.postgresql.org/pgdocs/postgres/release-8-2-5.html
+
+Transaction handling
+---------------------
+
+:ref:`By default <topics-db-transactions>`, Django starts a transaction when a
+database connection if first used and commits the result at the end of the
+request/response handling. The PostgreSQL backends normally operate the same
+as any other Django backend in this respect.
+
+Autocommit mode
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.1
+
+If your application is particularly read-heavy and doesn't make many database
+writes, the overhead of a constantly open transaction can sometimes be
+noticeable. For those situations, if you're using the ``postgresql_psycopg2``
+backend, you can configure Django to use *"autocommit"* behavior for the
+connection, meaning that each database operation will normally be in its own
+transaction, rather than having the transaction extend over multiple
+operations. In this case, you can still manually start a transaction if you're
+doing something that requires consistency across multiple database operations.
+The autocommit behavior is enabled by setting the ``autocommit`` key in the
+:setting:`DATABASE_OPTIONS` setting::
+
+    DATABASE_OPTIONS = {
+        "autocommit": True,
+    }
+
+In this configuration, Django still ensures that :ref:`delete()
+<topics-db-queries-delete>` and :ref:`update() <topics-db-queries-update>`
+queries run inside a single transaction, so that either all the affected
+objects are changed or none of them are.
+
+.. admonition:: This is database-level autocommit
+
+    This functionality is not the same as the
+    :ref:`topics-db-transactions-autocommit` decorator. That decorator is a
+    Django-level implementation that commits automatically after data changing
+    operations. The feature enabled using the :setting:`DATABASE_OPTIONS`
+    settings provides autocommit behavior at the database adapter level. It
+    commits after *every* operation.
+
+If you are using this feature and performing an operation akin to delete or
+updating that requires multiple operations, you are strongly recommended to
+wrap you operations in manual transaction handling to ensure data consistency.
+You should also audit your existing code for any instances of this behavior
+before enabling this feature. It's faster, but it provides less automatic
+protection for multi-call operations.
+
 
 .. _mysql-notes:
 
@@ -199,7 +251,7 @@ Here's a sample configuration which uses a MySQL option file::
   DATABASE_ENGINE = "mysql"
   DATABASE_OPTIONS = {
       'read_default_file': '/path/to/my.cnf',
-      }
+  }
 
   # my.cnf
   [client]
@@ -237,9 +289,7 @@ storage engine, you have a couple of options.
       creating your tables::
 
           DATABASE_OPTIONS = {
-              # ...
              "init_command": "SET storage_engine=INNODB",
-              # ...
           }
 
       This sets the default storage engine upon connecting to the database.

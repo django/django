@@ -4,6 +4,7 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
+from django.conf import settings
 from django.db.backends import *
 from django.db.backends.postgresql.operations import DatabaseOperations as PostgresqlDatabaseOperations
 from django.db.backends.postgresql.client import DatabaseClient
@@ -28,7 +29,7 @@ psycopg2.extensions.register_adapter(SafeUnicode, psycopg2.extensions.QuotedStri
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
-    uses_savepoints = True
+    can_return_id_from_insert = True
 
 class DatabaseOperations(PostgresqlDatabaseOperations):
     def last_executed_query(self, cursor, sql, params):
@@ -36,6 +37,9 @@ class DatabaseOperations(PostgresqlDatabaseOperations):
         # exact query sent to the database. See docs here:
         # http://www.initd.org/tracker/psycopg/wiki/psycopg2_documentation#postgresql-status-message-and-executed-query
         return cursor.query
+
+    def return_insert_id(self):
+        return "RETURNING %s"
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     operators = {
@@ -57,8 +61,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
-        
+
         self.features = DatabaseFeatures()
+        if settings.DATABASE_OPTIONS.get('autocommit', False):
+          self.features.uses_autocommit = True
+          self._iso_level_0()
+        else:
+          self.features.uses_autocommit = False
+          self._iso_level_1()
         self.ops = DatabaseOperations()
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
@@ -77,6 +87,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 'database': settings_dict['DATABASE_NAME'],
             }
             conn_params.update(settings_dict['DATABASE_OPTIONS'])
+            if 'autocommit' in conn_params:
+                del conn_params['autocommit']
             if settings_dict['DATABASE_USER']:
                 conn_params['user'] = settings_dict['DATABASE_USER']
             if settings_dict['DATABASE_PASSWORD']:
@@ -86,7 +98,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if settings_dict['DATABASE_PORT']:
                 conn_params['port'] = settings_dict['DATABASE_PORT']
             self.connection = Database.connect(**conn_params)
-            self.connection.set_isolation_level(1) # make transactions transparent to all cursors
             self.connection.set_client_encoding('UTF8')
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = None
@@ -98,3 +109,44 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 # No savepoint support for earlier version of PostgreSQL.
                 self.features.uses_savepoints = False
         return cursor
+
+    def _enter_transaction_management(self, managed):
+        """
+        Switch the isolation level when needing transaction support, so that
+        the same transaction is visible across all the queries.
+        """
+        if self.features.uses_autocommit and managed and not self.isolation_level:
+            self._iso_level_1()
+
+    def _leave_transaction_management(self, managed):
+        """
+        If the normal operating mode is "autocommit", switch back to that when
+        leaving transaction management.
+        """
+        if self.features.uses_autocommit and not managed and self.isolation_level:
+            self._iso_level_0()
+
+    def _iso_level_0(self):
+        """
+        Do all the related feature configurations for isolation level 0. This
+        doesn't touch the uses_autocommit feature, since that controls the
+        movement *between* isolation levels.
+        """
+        try:
+            if self.connection is not None:
+                self.connection.set_isolation_level(0)
+        finally:
+            self.isolation_level = 0
+            self.features.uses_savepoints = False
+
+    def _iso_level_1(self):
+        """
+        The "isolation level 1" version of _iso_level_0().
+        """
+        try:
+            if self.connection is not None:
+                self.connection.set_isolation_level(1)
+        finally:
+            self.isolation_level = 1
+            self.features.uses_savepoints = True
+

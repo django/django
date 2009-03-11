@@ -447,8 +447,20 @@ class QuerySet(object):
                 "Cannot update a query once a slice has been taken."
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
-        rows = query.execute_sql(None)
-        transaction.commit_unless_managed()
+        if not transaction.is_managed():
+            transaction.enter_transaction_management()
+            forced_managed = True
+        else:
+            forced_managed = False
+        try:
+            rows = query.execute_sql(None)
+            if forced_managed:
+                transaction.commit()
+            else:
+                transaction.commit_unless_managed()
+        finally:
+            if forced_managed:
+                transaction.leave_transaction_management()
         self._result_cache = None
         return rows
     update.alters_data = True
@@ -962,6 +974,11 @@ def delete_objects(seen_objs):
     Iterate through a list of seen classes, and remove any instances that are
     referred to.
     """
+    if not transaction.is_managed():
+        transaction.enter_transaction_management()
+        forced_managed = True
+    else:
+        forced_managed = False
     try:
         ordered_classes = seen_objs.keys()
     except CyclicDependency:
@@ -972,51 +989,58 @@ def delete_objects(seen_objs):
         ordered_classes = seen_objs.unordered_keys()
 
     obj_pairs = {}
-    for cls in ordered_classes:
-        items = seen_objs[cls].items()
-        items.sort()
-        obj_pairs[cls] = items
+    try:
+        for cls in ordered_classes:
+            items = seen_objs[cls].items()
+            items.sort()
+            obj_pairs[cls] = items
 
-        # Pre-notify all instances to be deleted.
-        for pk_val, instance in items:
-            signals.pre_delete.send(sender=cls, instance=instance)
+            # Pre-notify all instances to be deleted.
+            for pk_val, instance in items:
+                signals.pre_delete.send(sender=cls, instance=instance)
 
-        pk_list = [pk for pk,instance in items]
-        del_query = sql.DeleteQuery(cls, connection)
-        del_query.delete_batch_related(pk_list)
+            pk_list = [pk for pk,instance in items]
+            del_query = sql.DeleteQuery(cls, connection)
+            del_query.delete_batch_related(pk_list)
 
-        update_query = sql.UpdateQuery(cls, connection)
-        for field, model in cls._meta.get_fields_with_model():
-            if (field.rel and field.null and field.rel.to in seen_objs and
-                    filter(lambda f: f.column == field.column,
-                    field.rel.to._meta.fields)):
-                if model:
-                    sql.UpdateQuery(model, connection).clear_related(field,
-                            pk_list)
-                else:
-                    update_query.clear_related(field, pk_list)
+            update_query = sql.UpdateQuery(cls, connection)
+            for field, model in cls._meta.get_fields_with_model():
+                if (field.rel and field.null and field.rel.to in seen_objs and
+                        filter(lambda f: f.column == field.column,
+                        field.rel.to._meta.fields)):
+                    if model:
+                        sql.UpdateQuery(model, connection).clear_related(field,
+                                pk_list)
+                    else:
+                        update_query.clear_related(field, pk_list)
 
-    # Now delete the actual data.
-    for cls in ordered_classes:
-        items = obj_pairs[cls]
-        items.reverse()
+        # Now delete the actual data.
+        for cls in ordered_classes:
+            items = obj_pairs[cls]
+            items.reverse()
 
-        pk_list = [pk for pk,instance in items]
-        del_query = sql.DeleteQuery(cls, connection)
-        del_query.delete_batch(pk_list)
+            pk_list = [pk for pk,instance in items]
+            del_query = sql.DeleteQuery(cls, connection)
+            del_query.delete_batch(pk_list)
 
-        # Last cleanup; set NULLs where there once was a reference to the
-        # object, NULL the primary key of the found objects, and perform
-        # post-notification.
-        for pk_val, instance in items:
-            for field in cls._meta.fields:
-                if field.rel and field.null and field.rel.to in seen_objs:
-                    setattr(instance, field.attname, None)
+            # Last cleanup; set NULLs where there once was a reference to the
+            # object, NULL the primary key of the found objects, and perform
+            # post-notification.
+            for pk_val, instance in items:
+                for field in cls._meta.fields:
+                    if field.rel and field.null and field.rel.to in seen_objs:
+                        setattr(instance, field.attname, None)
 
-            signals.post_delete.send(sender=cls, instance=instance)
-            setattr(instance, cls._meta.pk.attname, None)
+                signals.post_delete.send(sender=cls, instance=instance)
+                setattr(instance, cls._meta.pk.attname, None)
 
-    transaction.commit_unless_managed()
+        if forced_managed:
+            transaction.commit()
+        else:
+            transaction.commit_unless_managed()
+    finally:
+        if forced_managed:
+            transaction.leave_transaction_management()
 
 
 def insert_query(model, values, return_id=False, raw_values=False):

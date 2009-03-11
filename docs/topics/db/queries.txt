@@ -714,6 +714,8 @@ primary key field is called ``name``, these two statements are equivalent::
     >>> some_obj == other_obj
     >>> some_obj.name == other_obj.name
 
+.. _topics-db-queries-delete:
+
 Deleting objects
 ================
 
@@ -755,6 +757,8 @@ requesting ``Entry.objects.delete()``, and deleting *all* the entries. If you
 complete query set::
 
     Entry.objects.all().delete()
+
+.. _topics-db-queries-update:
 
 Updating multiple objects at once
 =================================

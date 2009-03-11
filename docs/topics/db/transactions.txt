@@ -63,6 +63,8 @@ particular view function.
     Although the examples below use view functions as examples, these
     decorators can be applied to non-view functions as well.
 
+.. _topics-db-transactions-autocommit:
+
 ``django.db.transaction.autocommit``
 ------------------------------------
 

@@ -40,7 +40,7 @@ savepoint_state = {}
 # database commit.
 dirty = {}
 
-def enter_transaction_management():
+def enter_transaction_management(managed=True):
     """
     Enters transaction management for a running thread. It must be balanced with
     the appropriate leave_transaction_management call, since the actual state is
@@ -58,6 +58,7 @@ def enter_transaction_management():
         state[thread_ident].append(settings.TRANSACTIONS_MANAGED)
     if thread_ident not in dirty:
         dirty[thread_ident] = False
+    connection._enter_transaction_management(managed)
 
 def leave_transaction_management():
     """
@@ -65,6 +66,7 @@ def leave_transaction_management():
     over to the surrounding block, as a commit will commit all changes, even
     those from outside. (Commits are on connection level.)
     """
+    connection._leave_transaction_management(is_managed())
     thread_ident = thread.get_ident()
     if thread_ident in state and state[thread_ident]:
         del state[thread_ident][-1]
@@ -216,7 +218,7 @@ def autocommit(func):
     """
     def _autocommit(*args, **kw):
         try:
-            enter_transaction_management()
+            enter_transaction_management(managed=False)
             managed(False)
             return func(*args, **kw)
         finally:

@@ -41,6 +41,21 @@ class BaseDatabaseWrapper(local):
         if self.connection is not None:
             return self.connection.rollback()
 
+    def _enter_transaction_management(self, managed):
+        """
+        A hook for backend-specific changes required when entering manual
+        transaction handling.
+        """
+        pass
+
+    def _leave_transaction_management(self, managed):
+        """
+        A hook for backend-specific changes required when leaving manual
+        transaction handling. Will usually be implemented only when
+        _enter_transaction_management() is also required.
+        """
+        pass
+
     def _savepoint(self, sid):
         if not self.features.uses_savepoints:
             return
@@ -81,6 +96,8 @@ class BaseDatabaseFeatures(object):
     update_can_self_select = True
     interprets_empty_strings_as_nulls = False
     can_use_chunked_reads = True
+    can_return_id_from_insert = False
+    uses_autocommit = False
     uses_savepoints = False
     # If True, don't use integer foreign keys referring to, e.g., positive
     # integer primary keys.
@@ -229,6 +246,15 @@ class BaseDatabaseOperations(object):
         the field should use its default value.
         """
         return 'DEFAULT'
+
+    def return_insert_id(self):
+        """
+        For backends that support returning the last insert ID as part of an
+        insert query, this method returns the SQL to append to the INSERT
+        query. The returned fragment should contain a format string to hold
+        hold the appropriate column.
+        """
+        pass
 
     def query_class(self, DefaultQueryClass):
         """
