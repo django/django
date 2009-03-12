@@ -313,9 +313,12 @@ class InsertQuery(Query):
 
     def execute_sql(self, return_id=False):
         cursor = super(InsertQuery, self).execute_sql(None)
-        if return_id and cursor:
-            return self.connection.ops.last_insert_id(cursor,
-                    self.model._meta.db_table, self.model._meta.pk.column)
+        if not (return_id and cursor):
+            return
+        if self.connection.features.can_return_id_from_insert:
+            return cursor.fetchone()[0]
+        return self.connection.ops.last_insert_id(cursor,
+                self.model._meta.db_table, self.model._meta.pk.column)
 
     def insert_values(self, insert_values, raw_values=False):
         """
