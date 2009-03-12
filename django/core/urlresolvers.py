@@ -152,6 +152,7 @@ class RegexURLResolver(object):
 
     def _get_reverse_dict(self):
         if not self._reverse_dict and hasattr(self.urlconf_module, 'urlpatterns'):
+            lookups = MultiValueDict()
             for pattern in reversed(self.urlconf_module.urlpatterns):
                 p_pattern = pattern.regex.pattern
                 if p_pattern.startswith('^'):
@@ -163,11 +164,12 @@ class RegexURLResolver(object):
                             new_matches = []
                             for piece, p_args in parent:
                                 new_matches.extend([(piece + suffix, p_args + args) for (suffix, args) in matches])
-                            self._reverse_dict.appendlist(name, (new_matches, p_pattern + pat))
+                            lookups.appendlist(name, (new_matches, p_pattern + pat))
                 else:
                     bits = normalize(p_pattern)
-                    self._reverse_dict.appendlist(pattern.callback, (bits, p_pattern))
-                    self._reverse_dict.appendlist(pattern.name, (bits, p_pattern))
+                    lookups.appendlist(pattern.callback, (bits, p_pattern))
+                    lookups.appendlist(pattern.name, (bits, p_pattern))
+            self._reverse_dict = lookups
         return self._reverse_dict
     reverse_dict = property(_get_reverse_dict)
 
