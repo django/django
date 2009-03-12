@@ -39,7 +39,7 @@ class DatabaseOperations(PostgresqlDatabaseOperations):
         return cursor.query
 
     def return_insert_id(self):
-        return "RETURNING %s"
+        return "RETURNING %s", ()
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     operators = {

@@ -37,6 +37,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     uses_custom_query_class = True
     interprets_empty_strings_as_nulls = True
     uses_savepoints = True
+    can_return_id_from_insert = True
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -97,6 +98,9 @@ WHEN (new.%(col_name)s IS NULL)
     def drop_sequence_sql(self, table):
         return "DROP SEQUENCE %s;" % self.quote_name(get_sequence_name(table))
 
+    def fetch_returned_insert_id(self, cursor):
+        return long(cursor._insert_id_var.getvalue())
+
     def field_cast_sql(self, db_type):
         if db_type and db_type.endswith('LOB'):
             return "DBMS_LOB.SUBSTR(%s)"
@@ -151,6 +155,9 @@ WHEN (new.%(col_name)s IS NULL)
         from django.db import connection
         connection.cursor()
         return connection.ops.regex_lookup(lookup_type)
+
+    def return_insert_id(self):
+        return "RETURNING %s INTO %%s", (InsertIdVar(),)
 
     def savepoint_create_sql(self, sid):
         return "SAVEPOINT " + self.quote_name(sid)
@@ -332,8 +339,11 @@ class OracleParam(object):
     parameter when executing the query.
     """
 
-    def __init__(self, param, charset, strings_only=False):
-        self.smart_str = smart_str(param, charset, strings_only)
+    def __init__(self, param, cursor, strings_only=False):
+        if hasattr(param, 'bind_parameter'):
+            self.smart_str = param.bind_parameter(cursor)
+        else:
+            self.smart_str = smart_str(param, cursor.charset, strings_only)
         if hasattr(param, 'input_size'):
             # If parameter has `input_size` attribute, use that.
             self.input_size = param.input_size
@@ -342,6 +352,19 @@ class OracleParam(object):
             self.input_size = Database.NCLOB
         else:
             self.input_size = None
+
+
+class InsertIdVar(object):
+    """
+    A late-binding cursor variable that can be passed to Cursor.execute
+    as a parameter, in order to receive the id of the row created by an
+    insert statement.
+    """
+
+    def bind_parameter(self, cursor):
+        param = cursor.var(Database.NUMBER)
+        cursor._insert_id_var = param
+        return param
 
 
 class FormatStylePlaceholderCursor(object):
@@ -363,7 +386,7 @@ class FormatStylePlaceholderCursor(object):
         self.cursor.arraysize = 100
 
     def _format_params(self, params):
-        return tuple([OracleParam(p, self.charset, True) for p in params])
+        return tuple([OracleParam(p, self, True) for p in params])
 
     def _guess_input_sizes(self, params_list):
         sizes = [None] * len(params_list[0])

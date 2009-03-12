@@ -306,17 +306,20 @@ class InsertQuery(Query):
         result = ['INSERT INTO %s' % qn(opts.db_table)]
         result.append('(%s)' % ', '.join([qn(c) for c in self.columns]))
         result.append('VALUES (%s)' % ', '.join(self.values))
+        params = self.params
         if self.connection.features.can_return_id_from_insert:
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
-            result.append(self.connection.ops.return_insert_id() % col)
-        return ' '.join(result), self.params
+            r_fmt, r_params = self.connection.ops.return_insert_id()
+            result.append(r_fmt % col)
+            params = params + r_params
+        return ' '.join(result), params
 
     def execute_sql(self, return_id=False):
         cursor = super(InsertQuery, self).execute_sql(None)
         if not (return_id and cursor):
             return
         if self.connection.features.can_return_id_from_insert:
-            return cursor.fetchone()[0]
+            return self.connection.ops.fetch_returned_insert_id(cursor)
         return self.connection.ops.last_insert_id(cursor,
                 self.model._meta.db_table, self.model._meta.pk.column)
 

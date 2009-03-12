@@ -162,6 +162,14 @@ class BaseDatabaseOperations(object):
         """
         return None
 
+    def fetch_returned_insert_id(self, cursor):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table that has an auto-incrementing ID, returns the
+        newly created ID.
+        """
+        return cursor.fetchone()[0]
+
     def field_cast_sql(self, db_type):
         """
         Given a column type (e.g. 'BLOB', 'VARCHAR'), returns the SQL necessary
@@ -249,10 +257,10 @@ class BaseDatabaseOperations(object):
 
     def return_insert_id(self):
         """
-        For backends that support returning the last insert ID as part of an
-        insert query, this method returns the SQL to append to the INSERT
-        query. The returned fragment should contain a format string to hold
-        hold the appropriate column.
+        For backends that support returning the last insert ID as part
+        of an insert query, this method returns the SQL and params to
+        append to the INSERT query. The returned fragment should
+        contain a format string to hold the appropriate column.
         """
         pass
 
