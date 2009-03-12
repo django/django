@@ -50,7 +50,7 @@ class BaseHandler(object):
                 continue
 
             if hasattr(mw_instance, 'process_request'):
-                self._request_middleware.append(mw_instance.process_request)
+                request_middleware.append(mw_instance.process_request)
             if hasattr(mw_instance, 'process_view'):
                 self._view_middleware.append(mw_instance.process_view)
             if hasattr(mw_instance, 'process_response'):
