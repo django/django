@@ -7,54 +7,44 @@ except NameError:
     from django.utils.itercompat import sorted      # For Python 2.3
 
 class Author(models.Model):
-   name = models.CharField(max_length=100)
-   age = models.IntegerField()
-   friends = models.ManyToManyField('self', blank=True)
+    name = models.CharField(max_length=100)
+    age = models.IntegerField()
+    friends = models.ManyToManyField('self', blank=True)
 
-   def __unicode__(self):
-      return self.name
+    def __unicode__(self):
+        return self.name
 
 class Publisher(models.Model):
-   name = models.CharField(max_length=300)
-   num_awards = models.IntegerField()
+    name = models.CharField(max_length=300)
+    num_awards = models.IntegerField()
 
-   def __unicode__(self):
-      return self.name
+    def __unicode__(self):
+        return self.name
 
 class Book(models.Model):
-   isbn = models.CharField(max_length=9)
-   name = models.CharField(max_length=300)
-   pages = models.IntegerField()
-   rating = models.FloatField()
-   price = models.DecimalField(decimal_places=2, max_digits=6)
-   authors = models.ManyToManyField(Author)
-   contact = models.ForeignKey(Author, related_name='book_contact_set')
-   publisher = models.ForeignKey(Publisher)
-   pubdate = models.DateField()
+    isbn = models.CharField(max_length=9)
+    name = models.CharField(max_length=300)
+    pages = models.IntegerField()
+    rating = models.FloatField()
+    price = models.DecimalField(decimal_places=2, max_digits=6)
+    authors = models.ManyToManyField(Author)
+    contact = models.ForeignKey(Author, related_name='book_contact_set')
+    publisher = models.ForeignKey(Publisher)
+    pubdate = models.DateField()
 
-   def __unicode__(self):
-      return self.name
+    def __unicode__(self):
+        return self.name
 
 class Store(models.Model):
-   name = models.CharField(max_length=300)
-   books = models.ManyToManyField(Book)
-   original_opening = models.DateTimeField()
-   friday_night_closing = models.TimeField()
+    name = models.CharField(max_length=300)
+    books = models.ManyToManyField(Book)
+    original_opening = models.DateTimeField()
+    friday_night_closing = models.TimeField()
 
-   def __unicode__(self):
-      return self.name
+    def __unicode__(self):
+        return self.name
 
-class Entries(models.Model):
-   EntryID = models.AutoField(primary_key=True, db_column='Entry ID')
-   Entry = models.CharField(unique=True, max_length=50)
-   Exclude = models.BooleanField()
-
-class Clues(models.Model):
-   ID = models.AutoField(primary_key=True)
-   EntryID = models.ForeignKey(Entries, verbose_name='Entry', db_column = 'Entry ID')
-   Clue = models.CharField(max_length=150)
-
-# Tests on 'aggergate'
+# Tests on 'aggregate'
 # Different backends and numbers.
 __test__ = {'API_TESTS': """
 >>> from django.core import management
@@ -350,10 +340,6 @@ True
 #
 # Cheating: [a for a in Author.objects.all().annotate(num_coleagues=Count('book__authors__id'), num_books=Count('book__id', distinct=True)) if a.num_coleagues - a.num_books > 0]
 # F-Syntax is required. Will be fixed after F objects are available
-
-# Tests on fields with non-default table and column names.
->>> Clues.objects.values('EntryID__Entry').annotate(Appearances=Count('EntryID'), Distinct_Clues=Count('Clue', distinct=True))
-[]
 
 # Aggregates also work on dates, times and datetimes
 >>> Publisher.objects.annotate(earliest_book=Min('book__pubdate')).exclude(earliest_book=None).order_by('earliest_book').values()
