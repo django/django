@@ -28,22 +28,20 @@ class DatabaseOperations(BaseDatabaseOperations):
 
 class DatabaseClient(BaseDatabaseClient):
     runshell = complain
-    
+
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     get_table_list = complain
     get_table_description = complain
     get_relations = complain
     get_indexes = complain
-    
-class DatabaseWrapper(object):    
+
+class DatabaseWrapper(object):
     operators = {}
     cursor = complain
     _commit = complain
     _rollback = ignore
 
     def __init__(self, *args, **kwargs):
-        super(DatabaseWrapper, self).__init__(*args, **kwargs)
-
         self.features = BaseDatabaseFeatures()
         self.ops = DatabaseOperations()
         self.client = DatabaseClient(self)
