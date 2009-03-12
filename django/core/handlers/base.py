@@ -24,10 +24,11 @@ class BaseHandler(object):
         """
         from django.conf import settings
         from django.core import exceptions
-        self._request_middleware = []
         self._view_middleware = []
         self._response_middleware = []
         self._exception_middleware = []
+
+        request_middleware = []
         for middleware_path in settings.MIDDLEWARE_CLASSES:
             try:
                 dot = middleware_path.rindex('.')
@@ -56,6 +57,10 @@ class BaseHandler(object):
                 self._response_middleware.insert(0, mw_instance.process_response)
             if hasattr(mw_instance, 'process_exception'):
                 self._exception_middleware.insert(0, mw_instance.process_exception)
+
+        # We only assign to this when initialization is complete as it is used
+        # as a flag for initialization being complete.
+        self._request_middleware = request_middleware
 
     def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
