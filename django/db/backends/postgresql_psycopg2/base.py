@@ -105,6 +105,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if self._version < (8, 0):
                 # No savepoint support for earlier version of PostgreSQL.
                 self.features.uses_savepoints = False
+            if self._version < (8, 2):
+                # Cannot return the insert ID as part of an INSERT statement
+                # prior to version 8.2.
+                self.features.can_return_id_from_insert = False
+                if self.features.uses_autocommit:
+                    # FIXME: Needs extra code to do reliable model insert
+                    # handling, so we forbid it for now.
+                    from django.core.exceptions import ImproperlyConfigured
+                    raise ImproperlyConfigured("You cannot use autocommit=True with PostgreSQL prior to 8.2 at the moment.")
         return cursor
 
     def _enter_transaction_management(self, managed):
