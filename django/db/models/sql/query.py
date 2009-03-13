@@ -579,7 +579,7 @@ class BaseQuery(object):
                             aliases.add(c_alias)
                             col_aliases.add(c_alias)
                         else:
-                            result.append('%s AS %s' % (r, col[1]))
+                            result.append('%s AS %s' % (r, qn2(col[1])))
                             aliases.add(r)
                             col_aliases.add(col[1])
                     else:
