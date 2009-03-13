@@ -212,6 +212,13 @@ class BaseDatabaseOperations(object):
         """
         return 'DEFAULT'
 
+    def process_clob(self, value):
+        """
+        Returns the value of a CLOB column, for backends that return a locator
+        object that requires additional processing.
+        """
+        return value
+
     def query_class(self, DefaultQueryClass):
         """
         Given the default Query class, returns a custom Query class
