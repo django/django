@@ -291,10 +291,11 @@ class InsertQuery(Query):
         self.columns = []
         self.values = []
         self.params = ()
+        self.return_id = False
 
     def clone(self, klass=None, **kwargs):
         extras = {'columns': self.columns[:], 'values': self.values[:],
-                'params': self.params}
+                  'params': self.params, 'return_id': self.return_id}
         extras.update(kwargs)
         return super(InsertQuery, self).clone(klass, **extras)
 
@@ -307,7 +308,7 @@ class InsertQuery(Query):
         result.append('(%s)' % ', '.join([qn(c) for c in self.columns]))
         result.append('VALUES (%s)' % ', '.join(self.values))
         params = self.params
-        if self.connection.features.can_return_id_from_insert:
+        if self.return_id and self.connection.features.can_return_id_from_insert:
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
             r_fmt, r_params = self.connection.ops.return_insert_id()
             result.append(r_fmt % col)
@@ -315,6 +316,7 @@ class InsertQuery(Query):
         return ' '.join(result), params
 
     def execute_sql(self, return_id=False):
+        self.return_id = return_id
         cursor = super(InsertQuery, self).execute_sql(None)
         if not (return_id and cursor):
             return
