@@ -25,7 +25,8 @@ def load_backend(backend_name):
             backend_dir = os.path.join(__path__[0], 'backends')
             try:
                 available_backends = [f for f in os.listdir(backend_dir)
-                        if os.path.isdir(os.path.join(backend_dir, f))]
+                        if os.path.isdir(os.path.join(backend_dir, f))
+                        and not f.startswith('.')]
             except EnvironmentError:
                 available_backends = []
             available_backends.sort()
