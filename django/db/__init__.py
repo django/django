@@ -9,32 +9,34 @@ __all__ = ('backend', 'connection', 'DatabaseError', 'IntegrityError')
 if not settings.DATABASE_ENGINE:
     settings.DATABASE_ENGINE = 'dummy'
 
-try:
-    # Most of the time, the database backend will be one of the official
-    # backends that ships with Django, so look there first.
-    _import_path = 'django.db.backends.'
-    backend = __import__('%s%s.base' % (_import_path, settings.DATABASE_ENGINE), {}, {}, [''])
-except ImportError, e:
-    # If the import failed, we might be looking for a database backend
-    # distributed external to Django. So we'll try that next.
+def load_backend(backend_name):
     try:
-        _import_path = ''
-        backend = __import__('%s.base' % settings.DATABASE_ENGINE, {}, {}, [''])
-    except ImportError, e_user:
-        # The database backend wasn't found. Display a helpful error message
-        # listing all possible (built-in) database backends.
-        backend_dir = os.path.join(__path__[0], 'backends')
+        # Most of the time, the database backend will be one of the official
+        # backends that ships with Django, so look there first.
+        return __import__('django.db.backends.%s.base' % backend_name, {}, {}, [''])
+    except ImportError, e:
+        # If the import failed, we might be looking for a database backend
+        # distributed external to Django. So we'll try that next.
         try:
-            available_backends = [f for f in os.listdir(backend_dir)
-                    if os.path.isdir(os.path.join(backend_dir, f))]
-        except EnvironmentError:
-            available_backends = []
-        available_backends.sort()
-        if settings.DATABASE_ENGINE not in available_backends:
-            raise ImproperlyConfigured, "%r isn't an available database backend. Available options are: %s\nError was: %s" % \
-                (settings.DATABASE_ENGINE, ", ".join(map(repr, available_backends)), e_user)
-        else:
-            raise # If there's some other error, this must be an error in Django itself.
+            return __import__('%s.base' % backend_name, {}, {}, [''])
+        except ImportError, e_user:
+            # The database backend wasn't found. Display a helpful error message
+            # listing all possible (built-in) database backends.
+            backend_dir = os.path.join(__path__[0], 'backends')
+            try:
+                available_backends = [f for f in os.listdir(backend_dir)
+                        if os.path.isdir(os.path.join(backend_dir, f))]
+            except EnvironmentError:
+                available_backends = []
+            available_backends.sort()
+            if backend_name not in available_backends:
+                error_msg = "%r isn't an available database backend. Available options are: %s\nError was: %s" % \
+                    (backend_name, ", ".join(map(repr, available_backends)), e_user)
+                raise ImproperlyConfigured(error_msg)
+            else:
+                raise # If there's some other error, this must be an error in Django itself.
+
+backend = load_backend(settings.DATABASE_ENGINE)
 
 # `connection`, `DatabaseError` and `IntegrityError` are convenient aliases
 # for backend bits.
