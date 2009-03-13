@@ -123,6 +123,11 @@ WHEN (new.%(col_name)s IS NULL)
     def prep_for_iexact_query(self, x):
         return x
 
+    def process_clob(self, value):
+        if value is None:
+            return u''
+        return force_unicode(value.read())
+
     def query_class(self, DefaultQueryClass):
         return query.query_class(DefaultQueryClass, Database)
 

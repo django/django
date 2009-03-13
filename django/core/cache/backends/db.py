@@ -35,7 +35,8 @@ class CacheClass(BaseCache):
             cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % self._table, [key])
             transaction.commit_unless_managed()
             return default
-        return pickle.loads(base64.decodestring(row[1]))
+        value = connection.ops.process_clob(row[1])
+        return pickle.loads(base64.decodestring(value))
 
     def set(self, key, value, timeout=None):
         self._base_set('set', key, value, timeout)

@@ -255,6 +255,13 @@ class BaseDatabaseOperations(object):
         """
         return 'DEFAULT'
 
+    def process_clob(self, value):
+        """
+        Returns the value of a CLOB column, for backends that return a locator
+        object that requires additional processing.
+        """
+        return value
+
     def return_insert_id(self):
         """
         For backends that support returning the last insert ID as part
