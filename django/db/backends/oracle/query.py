@@ -6,6 +6,7 @@ Derives from: django.db.models.sql.query.Query
 import datetime
 
 from django.db.backends import util
+from django.utils.encoding import force_unicode
 
 # Cache. Maps default query class to new Oracle query class.
 _classes = {}
@@ -55,6 +56,9 @@ def query_class(QueryClass, Database):
         def convert_values(self, value, field):
             if isinstance(value, Database.LOB):
                 value = value.read()
+                if field and field.get_internal_type() == 'TextField':
+                    value = force_unicode(value)
+                    
             # Oracle stores empty strings as null. We need to undo this in
             # order to adhere to the Django convention of using the empty
             # string instead of null, but only if the field accepts the

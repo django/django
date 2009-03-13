@@ -13,6 +13,7 @@ class Donut(models.Model):
     baked_date = models.DateField(null=True)
     baked_time = models.TimeField(null=True)
     consumed_at = models.DateTimeField(null=True)
+    review = models.TextField()
 
     class Meta:
         ordering = ('consumed_at',)
@@ -81,6 +82,12 @@ datetime.datetime(2007, 4, 20, 16, 19, 59)
 
 >>> Donut.objects.filter(consumed_at__year=2008)
 []
+
+# Regression test for #10238: TextField values returned from the database
+# should be unicode.
+>>> d2 = Donut.objects.create(name=u'Jelly Donut', review=u'Outstanding')
+>>> Donut.objects.get(id=d2.id).review
+u'Outstanding'
 
 """}
 
