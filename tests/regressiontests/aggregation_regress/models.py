@@ -252,6 +252,13 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, conta
 >>> [int(x['sheets']) for x in qs]
 [150, 175, 224, 264, 473, 566]
 
+# Regression for 10425 - annotations don't get in the way of a count() clause
+>>> Book.objects.values('publisher').annotate(Count('publisher')).count()
+4
+
+>>> Book.objects.annotate(Count('publisher')).values('publisher').count()
+6
+
 """
 }
 
