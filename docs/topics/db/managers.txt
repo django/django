@@ -217,7 +217,7 @@ to be controlled. So here's how Django handles custom managers and
        class, using Python's normal name resolution order (names on the child
        class override all others; then come names on the first parent class,
        and so on). Abstract base classes are designed to capture information
-       and behaviour that is common to their child classes. Defining common
+       and behavior that is common to their child classes. Defining common
        managers is an appropriate part of this common information.
 
     3. The default manager on a class is either the first manager declared on
@@ -225,6 +225,54 @@ to be controlled. So here's how Django handles custom managers and
        base class in the parent hierarchy, if that exists. If no default
        manager is explicitly declared, Django's normal default manager is
        used.
+
+These rules provide the necessary flexibility if you want to install a
+collection of custom managers on a group of models, via an abstract base
+class, but still customize the default manager. For example, suppose you have
+this base class::
+
+    class AbstractBase(models.Model):
+        ...
+        objects = CustomerManager()
+
+        class Meta:
+            abstract = True
+
+If you use this directly in a subclass, ``objects`` will be the default
+manager if you declare no managers in the base class::
+
+    class ChildA(AbstractBase):
+        ...
+        # This class has CustomManager as the default manager.
+
+If you want to inherit from ``AbstractBase``, but provide a different default
+manager, you can provide the default manager on the child class::
+
+    class ChildB(AbstractBase):
+        ...
+        # An explicit default manager.
+        default_manager = OtherManager()
+
+Here, ``default_manager`` is the default. The ``objects`` manager is
+still available, since it's inherited. It just isn't used as the default.
+
+Finally for this example, suppose you want to add extra managers to the child
+class, but still use the default from ``AbstractBase``. You can't add the new
+manager directly in the child class, as that would override the default and you would
+have to also explicitly include all the managers from the abstract base class.
+The solution is to put the extra managers in another base class and introduce
+it into the inheritance hierarchy *after* the defaults::
+
+    class ExtraManager(models.Model):
+        extra_manager = OtherManager()
+
+        class Meta:
+            abstract = True
+
+    class ChildC(AbstractBase, ExtraManager):
+        ...
+        # Default manager is CustomManager, but OtherManager is
+        # also available via the "extra_manager" attribute.
 
 .. _manager-types:
 
