@@ -69,6 +69,7 @@ class ModelBase(type):
 
         if getattr(new_class, '_default_manager', None):
             new_class._default_manager = None
+            new_class._base_manager = None
 
         # Bail out early if we have already created this class.
         m = get_model(new_class._meta.app_label, name, False)
@@ -369,7 +370,7 @@ class Model(object):
         pk_val = self._get_pk_val(meta)
         pk_set = pk_val is not None
         record_exists = True
-        manager = cls._default_manager
+        manager = cls._base_manager
         if pk_set:
             # Determine whether a record with the primary key already exists.
             if (force_update or (not force_insert and
