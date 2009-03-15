@@ -5,7 +5,8 @@ API Reference
 
 .. toctree::
    :maxdepth: 1
-   
+
+   authbackends
    contrib/index
    databases
    django-admin
@@ -19,4 +20,3 @@ API Reference
    signals
    templates/index
    unicode
-   

@@ -138,6 +138,7 @@ All attributes except ``session`` should be considered read-only.
         * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.
         * ``REMOTE_ADDR`` -- The IP address of the client.
         * ``REMOTE_HOST`` -- The hostname of the client.
+        * ``REMOTE_USER`` -- The user authenticated by the web server, if any.
         * ``REQUEST_METHOD`` -- A string such as ``"GET"`` or ``"POST"``.
         * ``SERVER_NAME`` -- The hostname of the server.
         * ``SERVER_PORT`` -- The port of the server.
@@ -294,7 +295,7 @@ a subclass of dictionary. Exceptions are outlined here:
     Just like the standard dictionary ``setdefault()`` method, except it uses
     ``__setitem__`` internally.
 
-.. method:: QueryDict.update(other_dict) 
+.. method:: QueryDict.update(other_dict)
 
     Takes either a ``QueryDict`` or standard dictionary. Just like the standard
     dictionary ``update()`` method, except it *appends* to the current
@@ -357,11 +358,11 @@ In addition, ``QueryDict`` has the following methods:
 
     Like :meth:`items()`, except it includes all values, as a list, for each
     member of the dictionary. For example::
-    
+
          >>> q = QueryDict('a=1&a=2&a=3')
          >>> q.lists()
          [('a', ['1', '2', '3'])]
-    
+
 .. method:: QueryDict.urlencode()
 
     Returns a string of the data in query-string format.
@@ -452,7 +453,7 @@ Methods
 -------
 
 .. method:: HttpResponse.__init__(content='', mimetype=None, status=200, content_type=DEFAULT_CONTENT_TYPE)
-    
+
     Instantiates an ``HttpResponse`` object with the given page content (a
     string) and MIME type. The ``DEFAULT_CONTENT_TYPE`` is ``'text/html'``.
 

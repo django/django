@@ -1263,9 +1263,12 @@ administrator and the users themselves if users had separate accounts in LDAP
 and the Django-based applications.
 
 So, to handle situations like this, the Django authentication system lets you
-plug in another authentication sources. You can override Django's default
+plug in other authentication sources. You can override Django's default
 database-based scheme, or you can use the default system in tandem with other
 systems.
+
+See the :ref:`authentication backend reference <ref-authentication-backends>`
+for information on the authentication backends included with Django.
 
 Specifying authentication backends
 ----------------------------------

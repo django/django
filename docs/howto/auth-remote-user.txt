@@ -1,0 +1,100 @@
+.. _howto-auth-remote-user:
+
+====================================
+Authentication using ``REMOTE_USER``
+====================================
+
+This document describes how to make use of external authentication sources
+(where the Web server sets the ``REMOTE_USER`` environment variable) in your
+Django applications.  This type of authentication solution is typically seen on
+intranet sites, with single sign-on solutions such as IIS and Integrated
+Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
+`WebAuth`_, `mod_auth_sspi`_, etc.
+
+.. _mod_authnz_ldap: http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
+.. _CAS: http://www.ja-sig.org/products/cas/
+.. _Cosign: http://weblogin.org
+.. _WebAuth: http://www.stanford.edu/services/webauth/
+.. _mod_auth_sspi: http://sourceforge.net/projects/mod-auth-sspi
+
+When the Web server takes care of authentication it typically sets the
+``REMOTE_USER`` environment variable for use in the underlying application.  In
+Django, ``REMOTE_USER`` is made available in the :attr:`request.META
+<django.http.HttpRequest.META>` attribute.  Django can be configured to make
+use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware`` and
+``RemoteUserBackend`` classes found in :mod:`django.contirb.auth`.
+
+Configuration
+=============
+
+First, you must add the
+:class:`django.contrib.auth.middleware.RemoteUserMiddleware` to the
+:setting:`MIDDLEWARE_CLASSES` setting **after** the
+:class:`django.contrib.auth.middleware.AuthenticationMiddleware`::
+
+    MIDDLEWARE_CLASSES = (
+        ...
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.auth.middleware.RemoteUserMiddleware',
+        ...
+        )
+
+Next, you must replace the :class:`~django.contrib.auth.backends.ModelBackend`
+with ``RemoteUserBackend`` in the :setting:`AUTHENTICATION_BACKENDS` setting::
+
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.RemoteUserBackend',
+    )
+
+With this setup, ``RemoteUserMiddleware`` will detect the username in
+``request.META['REMOTE_USER']`` and will authenticate and auto-login that user
+using the ``RemoteUserBackend``.
+
+.. note::
+   Since the ``RemoteUserBackend`` inherits from ``ModelBackend``, you will
+   still have all of the same permissions checking that is implemented in
+   ``ModelBackend``.
+
+If your authentication mechanism uses a custom HTTP header and not
+``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the
+``header`` attribute to the desired ``request.META`` key.  For example::
+
+    from django.contrib.auth.middleware import RemoteUserMiddleware
+
+    class CustomHeaderMiddleware(RemoteUserMiddleware):
+        header = 'HTTP_AUTHUSER'
+
+
+``RemoteUserBackend``
+=====================
+
+.. class:: django.contrib.backends.RemoteUserBackend
+
+If you need more control, you can create your own authentication backend
+that inherits from ``RemoteUserBackend`` and overrides certain parts:
+
+Attributes
+~~~~~~~~~~
+
+.. attribute:: RemoteUserBackend.create_unknown_user
+
+    ``True`` or ``False``.  Determines whether or not a
+    :class:`~django.contrib.auth.models.User` object is created if not already
+    in the database.  Defaults to ``True``.
+
+Methods
+~~~~~~~
+
+.. method:: RemoteUserBackend.clean_username(username)
+
+   Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
+   information) prior to using it to get or create a
+   :class:`~django.contrib.auth.models.User` object.  Returns the cleaned
+   username.
+
+.. method:: RemoteUserBackend.configure_user(user)
+
+   Configures a newly created user.  This method is called immediately after a
+   new user is created, and can be used to perform custom setup actions, such
+   as setting the user's groups based on attributes in an LDAP directory.
+   Returns the user object.

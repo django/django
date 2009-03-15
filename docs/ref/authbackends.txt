@@ -1,0 +1,37 @@
+.. _ref-authentication-backends:
+
+==========================================
+Built-in authentication backends reference
+==========================================
+
+.. module:: django.contrib.auth.backends
+   :synopsis: Django's built-in authentication backend classes.
+
+This document details the authentication backends that come with Django. For
+information on how how to use them and how to write your own authentication
+backends, see the :ref:`Other authentication sources section
+<authentication-backends>` of the :ref:`User authentication guide
+<topics-auth>`.
+
+
+Available authentication backends
+=================================
+
+The following backends are available in :mod:`django.contrib.auth.backends`:
+
+.. class:: ModelBackend
+
+    This is the default authentication backend used by Django.  It
+    authenticates using usernames and passwords stored in the the
+    :class:`~django.contrib.auth.models.User` model.
+
+
+.. class:: RemoteUserBackend
+
+    .. versionadded:: 1.1
+
+    Use this backend to take advantage of external-to-Django-handled
+    authentication.  It authenticates using usernames passed in
+    :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`.  See
+    the :ref:`Authenticating against REMOTE_USER <howto-auth-remote-user>`
+    documentation.
