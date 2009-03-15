@@ -5,8 +5,16 @@ from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 
 def ensure_default_manager(sender, **kwargs):
+    """
+    Ensures that a Model subclass contains a default manager  and sets the
+    _default_manager attribute on the class. Also sets up the _base_manager
+    points to a plain Manager instance (which could be the same as
+    _default_manager if it's not a subclass of Manager).
+    """
     cls = sender
-    if not getattr(cls, '_default_manager', None) and not cls._meta.abstract:
+    if cls._meta.abstract:
+        return
+    if not getattr(cls, '_default_manager', None):
         # Create the default manager, if needed.
         try:
             cls._meta.get_field('objects')
@@ -14,6 +22,22 @@ def ensure_default_manager(sender, **kwargs):
         except FieldDoesNotExist:
             pass
         cls.add_to_class('objects', Manager())
+        cls._base_manager = cls.objects
+    elif not getattr(cls, '_base_manager', None):
+        default_mgr = cls._default_manager.__class__
+        if (default_mgr is Manager or
+                getattr(default_mgr, "use_for_related_fields", False)):
+            cls._base_manager = cls._default_manager
+        else:
+            # Default manager isn't a plain Manager class, or a suitable
+            # replacement, so we walk up the base class hierarchy until we hit
+            # something appropriate.
+            for base_class in default_mgr.mro()[1:]:
+                if (base_class is Manager or
+                        getattr(base_class, "use_for_related_fields", False)):
+                    cls.add_to_class('_base_manager', base_class())
+                    return
+            raise AssertionError("Should never get here. Please report a bug, including your model and model manager setup.")
 
 signals.class_prepared.connect(ensure_default_manager)
 
