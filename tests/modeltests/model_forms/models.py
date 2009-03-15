@@ -105,12 +105,12 @@ try:
     # If PIL is not available, ImageField tests are omitted.
     from PIL import Image, _imaging
     test_images = True
-    
+
     class ImageFile(models.Model):
         def custom_upload_path(self, filename):
             path = self.path or 'tests'
             return '%s/%s' % (path, filename)
-    
+
         description = models.CharField(max_length=20)
         image = models.ImageField(storage=temp_storage, upload_to=custom_upload_path,
                                   width_field='width', height_field='height')
@@ -120,15 +120,15 @@ try:
 
         def __unicode__(self):
             return self.description
-    
+
     class OptionalImageFile(models.Model):
         def custom_upload_path(self, filename):
             path = self.path or 'tests'
             return '%s/%s' % (path, filename)
-    
+
         description = models.CharField(max_length=20)
         image = models.ImageField(storage=temp_storage, upload_to=custom_upload_path,
-                                  width_field='width', height_field='height', 
+                                  width_field='width', height_field='height',
                                   blank=True, null=True)
         width = models.IntegerField(editable=False, null=True)
         height = models.IntegerField(editable=False, null=True)
@@ -138,7 +138,7 @@ try:
             return self.description
 except ImportError:
     test_images = False
-    
+
 class CommaSeparatedInteger(models.Model):
     field = models.CommaSeparatedIntegerField(max_length=20)
 
@@ -176,16 +176,16 @@ class Book(models.Model):
     title = models.CharField(max_length=40)
     author = models.ForeignKey(Writer, blank=True, null=True)
     special_id = models.IntegerField(blank=True, null=True, unique=True)
-    
+
     class Meta:
         unique_together = ('title', 'author')
-        
+
 class ExplicitPK(models.Model):
     key = models.CharField(max_length=20, primary_key=True)
     desc = models.CharField(max_length=20, blank=True, unique=True)
     class Meta:
         unique_together = ('key', 'desc')
-    
+
     def __unicode__(self):
         return self.key
 
@@ -330,6 +330,29 @@ We can also subclass the Meta inner class to change the fields list.
 <tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
 <tr><th><label for="id_slug">Slug:</label></th><td><input id="id_slug" type="text" name="slug" maxlength="20" /></td></tr>
 <tr><th><label for="id_checkbox">Checkbox:</label></th><td><input type="checkbox" name="checkbox" id="id_checkbox" /></td></tr>
+
+# test using fields to provide ordering to the fields
+>>> class CategoryForm(ModelForm):
+...     class Meta:
+...         model = Category
+...         fields = ['url', 'name']
+
+>>> CategoryForm.base_fields.keys()
+['url', 'name']
+
+
+>>> print CategoryForm()
+<tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>
+<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
+
+>>> class CategoryForm(ModelForm):
+...     class Meta:
+...         model = Category
+...         fields = ['slug', 'url', 'name']
+...         exclude = ['url']
+
+>>> CategoryForm.base_fields.keys()
+['slug', 'name']
 
 # Old form_for_x tests #######################################################
 
@@ -1331,8 +1354,8 @@ False
 True
 
 # Unique & unique together with null values
->>> class BookForm(ModelForm): 
-...     class Meta: 
+>>> class BookForm(ModelForm):
+...     class Meta:
 ...        model = Book
 >>> w = Writer.objects.get(name='Mike Royko')
 >>> form = BookForm({'title': 'I May Be Wrong But I Doubt It', 'author' : w.pk})

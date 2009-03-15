@@ -259,7 +259,8 @@ model fields:
 
 2. Use the ``fields`` attribute of the ``ModelForm``'s inner ``Meta``
    class.  This attribute, if given, should be a list of field names
-   to include in the form.
+   to include in the form. The form will render the fields in the same
+   order they are specified in the ``fields`` attribute.
 
 3. Use the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta``
    class.  This attribute, if given, should be a list of field names
@@ -335,6 +336,31 @@ parameter when declaring the form field::
    ...
    ...     class Meta:
    ...         model = Article
+
+Changing the order of fields
+----------------------------
+
+By default, a ``ModelForm`` will render fields in the same order that
+they are defined on the model, with ``ManyToManyField``s appearing last.
+If you want to change the order in which fields are rendered, you can
+use the ``fields`` attribute on the ``Meta`` class.
+
+The ``fields`` attribute defines the subset of model fields that will be
+rendered, and the order in which they will be rendered. For example given this
+model::
+
+    class Book(models.Model):
+        author = models.ForeignKey(Author)
+        title = models.CharField(max_length=100)
+
+the ``author`` field would be rendered first. If we wanted the title field
+to be rendered first, we could specify the following ``ModelForm``::
+
+    >>> class BookForm(ModelForm):
+    ...     class Meta:
+    ...         model = Book
+    ...         fields = ['title', 'author']
+
 
 Overriding the clean() method
 -----------------------------

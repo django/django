@@ -149,7 +149,6 @@ def fields_for_model(model, fields=None, exclude=None, formfield_callback=lambda
     fields will be excluded from the returned fields, even if they are listed
     in the ``fields`` argument.
     """
-    # TODO: if fields is provided, it would be nice to return fields in that order
     field_list = []
     opts = model._meta
     for f in opts.fields + opts.many_to_many:
@@ -162,7 +161,10 @@ def fields_for_model(model, fields=None, exclude=None, formfield_callback=lambda
         formfield = formfield_callback(f)
         if formfield:
             field_list.append((f.name, formfield))
-    return SortedDict(field_list)
+    field_dict = SortedDict(field_list)
+    if fields:
+        field_dict = SortedDict([(f, field_dict[f]) for f in fields if (not exclude) or (exclude and f not in exclude)])
+    return field_dict
 
 class ModelFormOptions(object):
     def __init__(self, options=None):
