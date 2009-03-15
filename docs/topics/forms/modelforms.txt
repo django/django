@@ -340,10 +340,10 @@ parameter when declaring the form field::
 Changing the order of fields
 ----------------------------
 
-By default, a ``ModelForm`` will render fields in the same order that
-they are defined on the model, with ``ManyToManyField``s appearing last.
-If you want to change the order in which fields are rendered, you can
-use the ``fields`` attribute on the ``Meta`` class.
+By default, a ``ModelForm`` will render fields in the same order that they are
+defined on the model, with ``ManyToManyField`` instances appearing last. If
+you want to change the order in which fields are rendered, you can use the
+``fields`` attribute on the ``Meta`` class.
 
 The ``fields`` attribute defines the subset of model fields that will be
 rendered, and the order in which they will be rendered. For example given this
