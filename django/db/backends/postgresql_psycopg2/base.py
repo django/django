@@ -29,7 +29,7 @@ psycopg2.extensions.register_adapter(SafeUnicode, psycopg2.extensions.QuotedStri
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
-    can_return_id_from_insert = True
+    can_return_id_from_insert = False
 
 class DatabaseOperations(PostgresqlDatabaseOperations):
     def last_executed_query(self, cursor, sql, params):
@@ -105,15 +105,17 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if self._version < (8, 0):
                 # No savepoint support for earlier version of PostgreSQL.
                 self.features.uses_savepoints = False
-            if self._version < (8, 2):
-                # Cannot return the insert ID as part of an INSERT statement
-                # prior to version 8.2.
-                self.features.can_return_id_from_insert = False
-                if self.features.uses_autocommit:
+            if self.features.uses_autocommit:
+                if self._version < (8, 2):
                     # FIXME: Needs extra code to do reliable model insert
                     # handling, so we forbid it for now.
                     from django.core.exceptions import ImproperlyConfigured
                     raise ImproperlyConfigured("You cannot use autocommit=True with PostgreSQL prior to 8.2 at the moment.")
+                else:
+                    # FIXME: Eventually we're enable this by default for
+                    # versions that support it, but, right now, that's hard to
+                    # do without breaking other things (#10509).
+                    self.features.can_return_id_from_insert = True
         return cursor
 
     def _enter_transaction_management(self, managed):
