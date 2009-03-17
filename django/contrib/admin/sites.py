@@ -57,14 +57,15 @@ class AdminSite(object):
         
         If a model is already registered, this will raise AlreadyRegistered.
         """
+        if not admin_class:
+            admin_class = ModelAdmin
+
         # Don't import the humongous validation code unless required
         if admin_class and settings.DEBUG:
             from django.contrib.admin.validation import validate
         else:
             validate = lambda model, adminclass: None
         
-        if not admin_class:
-            admin_class = ModelAdmin
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
