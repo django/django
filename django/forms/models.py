@@ -163,7 +163,7 @@ def fields_for_model(model, fields=None, exclude=None, formfield_callback=lambda
             field_list.append((f.name, formfield))
     field_dict = SortedDict(field_list)
     if fields:
-        field_dict = SortedDict([(f, field_dict[f]) for f in fields if (not exclude) or (exclude and f not in exclude)])
+        field_dict = SortedDict([(f, field_dict.get(f)) for f in fields if (not exclude) or (exclude and f not in exclude)])
     return field_dict
 
 class ModelFormOptions(object):

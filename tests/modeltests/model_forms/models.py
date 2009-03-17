@@ -1450,6 +1450,19 @@ ValidationError: [u'Select a valid choice. z is not one of the available choices
 >>> core.parent
 <Inventory: Pear>
 
+>>> class CategoryForm(ModelForm):
+...     description = forms.CharField()
+...     class Meta:
+...         model = Category
+...         fields = ['description', 'url']
+
+>>> CategoryForm.base_fields.keys()
+['description', 'url']
+
+>>> print CategoryForm()
+<tr><th><label for="id_description">Description:</label></th><td><input type="text" name="description" id="id_description" /></td></tr>
+<tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>
+
 # Clean up
 >>> import shutil
 >>> shutil.rmtree(temp_storage_dir)
