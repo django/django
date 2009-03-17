@@ -11,7 +11,7 @@ from django.contrib.admin.util import quote
 from django.utils.html import escape
 
 # local test models
-from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey, Persona, FooAccount, BarAccount
+from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey, Person, Persona, FooAccount, BarAccount
 
 try:
     set
@@ -728,6 +728,76 @@ class AdminViewUnicodeTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         response = self.client.post('/test_admin/admin/admin_views/book/1/delete/', delete_dict)
         self.assertRedirects(response, '/test_admin/admin/admin_views/book/')
+
+
+class AdminViewListEditable(TestCase):
+    fixtures = ['admin-views-users.xml', 'admin-views-person.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+    
+    def test_changelist_input_html(self):
+        response = self.client.get('/test_admin/admin/admin_views/person/')
+        # 2 inputs per object(the field and the hidden id field) = 6
+        # 2 management hidden fields = 2
+        # main form submit button = 1
+        # search field and search submit button = 2
+        # 6 + 2 + 1 + 2 = 11 inputs
+        self.failUnlessEqual(response.content.count("<input"), 11)
+        # 1 select per object = 3 selects
+        self.failUnlessEqual(response.content.count("<select"), 3)
+    
+    def test_post_submission(self):
+        data = {
+            "form-TOTAL_FORMS": "3",
+            "form-INITIAL_FORMS": "3",
+            
+            "form-0-gender": "1",
+            "form-0-id": "1",
+            
+            "form-1-gender": "2",
+            "form-1-id": "2",
+            
+            "form-2-alive": "checked",
+            "form-2-gender": "1",
+            "form-2-id": "3",
+        }
+        self.client.post('/test_admin/admin/admin_views/person/', data)
+
+        self.failUnlessEqual(Person.objects.get(name="John Mauchly").alive, False)
+        self.failUnlessEqual(Person.objects.get(name="Grace Hooper").gender, 2)
+        
+        # test a filtered page
+        data = {
+            "form-TOTAL_FORMS": "2",
+            "form-INITIAL_FORMS": "2",
+            
+            "form-0-id": "1",
+            "form-0-gender": "1",
+            "form-0-alive": "checked",
+            
+            "form-1-id": "3",
+            "form-1-gender": "1",
+            "form-1-alive": "checked",
+        }
+        self.client.post('/test_admin/admin/admin_views/person/?gender__exact=1', data)
+        
+        self.failUnlessEqual(Person.objects.get(name="John Mauchly").alive, True)
+        
+        # test a searched page
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            
+            "form-0-id": "1",
+            "form-0-gender": "1"
+        }
+        self.client.post('/test_admin/admin/admin_views/person/?q=mauchly', data)
+        
+        self.failUnlessEqual(Person.objects.get(name="John Mauchly").alive, False)
 
 class AdminInheritedInlinesTest(TestCase):
     fixtures = ['admin-views-users.xml',]

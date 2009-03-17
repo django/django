@@ -63,6 +63,29 @@ def validate(cls, model):
     if hasattr(cls, 'list_per_page') and not isinstance(cls.list_per_page, int):
         raise ImproperlyConfigured("'%s.list_per_page' should be a integer."
                 % cls.__name__)
+    
+    # list_editable
+    if hasattr(cls, 'list_editable') and cls.list_editable:
+        check_isseq(cls, 'list_editable', cls.list_editable)
+        if not (opts.ordering or cls.ordering):
+            raise ImproperlyConfigured("'%s.list_editable' cannot be used "
+                "without a default ordering. Please define ordering on either %s or %s."
+                % (cls.__name__, cls.__name__, model.__name__))
+        for idx, field in enumerate(cls.list_editable):
+            try:
+                opts.get_field_by_name(field)
+            except models.FieldDoesNotExist:
+                raise ImproperlyConfigured("'%s.list_editable[%d]' refers to a "
+                    "field, '%s', not defiend on %s." % (cls.__name__, idx, field, model.__name__))
+            if field not in cls.list_display:
+                raise ImproperlyConfigured("'%s.list_editable[%d]' refers to "
+                    "'%s' which is not defined in 'list_display'."
+                    % (cls.__name__, idx, field))
+            if field in cls.list_display_links:
+                raise ImproperlyConfigured("'%s' cannot be in both '%s.list_editable'"
+                    " and '%s.list_display_links'"
+                    % (field, cls.__name__, cls.__name__))
+                
 
     # search_fields = ()
     if hasattr(cls, 'search_fields'):

@@ -403,6 +403,32 @@ the change list page::
 Finally, note that in order to use ``list_display_links``, you must define
 ``list_display``, too.
 
+``list_editable``
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.1
+
+Set ``list_editable`` to a list of field names on the model which will allow
+editing on the change list page. That is, fields listed in ``list_editable``
+will be displayed as form widgets on the change list page, allowing users to
+edit and save multiple rows at once.
+
+.. note::
+
+    ``list_editable`` interacts with a couple of other options in particular
+    ways; you should note the following rules:
+    
+        * To use ``list_editable`` you must have defined ``ordering`` defined on
+          either your model or your ``ModelAdmin``.
+        
+        * Any field in ``list_editable`` must also be in ``list_display``. You
+          can't edit a field that's not displayed!
+          
+        * The same field can't be listed in both ``list_editable`` and
+          ``list_display_links`` -- a field can't be both a form and a link.
+        
+    You'll get a validation error if any of these rules are broken.
+
 ``list_filter``
 ~~~~~~~~~~~~~~~
 
