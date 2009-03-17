@@ -258,7 +258,7 @@ class BaseFormSet(StrAndUnicode):
         Returns True if the formset needs to be multipart-encrypted, i.e. it
         has FileInput. Otherwise, False.
         """
-        return self.forms[0].is_multipart()
+        return self.forms and self.forms[0].is_multipart()
 
     def _get_media(self):
         # All the forms on a FormSet are the same, so you only need to
