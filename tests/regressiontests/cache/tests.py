@@ -265,7 +265,7 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
     """
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
-        self.cache = get_cache('file:///%s' % self.dirname)
+        self.cache = get_cache('file://%s' % self.dirname)
 
     def tearDown(self):
         shutil.rmtree(self.dirname)
