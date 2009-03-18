@@ -641,6 +641,7 @@ class BaseQuery(object):
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         aliases = set()
+        proxied_model = opts.proxy and opts.proxy_for_model or 0
         if start_alias:
             seen = {None: start_alias}
         for field, model in opts.get_fields_with_model():
@@ -648,9 +649,12 @@ class BaseQuery(object):
                 try:
                     alias = seen[model]
                 except KeyError:
-                    link_field = opts.get_ancestor_link(model)
-                    alias = self.join((start_alias, model._meta.db_table,
-                            link_field.column, model._meta.pk.column))
+                    if model is proxied_model:
+                        alias = start_alias
+                    else:
+                        link_field = opts.get_ancestor_link(model)
+                        alias = self.join((start_alias, model._meta.db_table,
+                                link_field.column, model._meta.pk.column))
                     seen[model] = alias
             else:
                 # If we're starting from the base model of the queryset, the
@@ -1158,11 +1162,15 @@ class BaseQuery(object):
         opts = self.model._meta
         root_alias = self.tables[0]
         seen = {None: root_alias}
+        proxied_model = opts.proxy and opts.proxy_for_model or 0
         for field, model in opts.get_fields_with_model():
             if model not in seen:
-                link_field = opts.get_ancestor_link(model)
-                seen[model] = self.join((root_alias, model._meta.db_table,
-                        link_field.column, model._meta.pk.column))
+                if model is proxied_model:
+                    seen[model] = root_alias
+                else:
+                    link_field = opts.get_ancestor_link(model)
+                    seen[model] = self.join((root_alias, model._meta.db_table,
+                            link_field.column, model._meta.pk.column))
         self.included_inherited_models = seen
 
     def remove_inherited_models(self):
@@ -1559,20 +1567,25 @@ class BaseQuery(object):
                 raise MultiJoin(pos + 1)
             if model:
                 # The field lives on a base class of the current model.
+                proxied_model = opts.proxy and opts.proxy_for_model or 0
                 for int_model in opts.get_base_chain(model):
-                    lhs_col = opts.parents[int_model].column
-                    dedupe = lhs_col in opts.duplicate_targets
-                    if dedupe:
-                        exclusions.update(self.dupe_avoidance.get(
-                                (id(opts), lhs_col), ()))
-                        dupe_set.add((opts, lhs_col))
-                    opts = int_model._meta
-                    alias = self.join((alias, opts.db_table, lhs_col,
-                            opts.pk.column), exclusions=exclusions)
-                    joins.append(alias)
-                    exclusions.add(alias)
-                    for (dupe_opts, dupe_col) in dupe_set:
-                        self.update_dupe_avoidance(dupe_opts, dupe_col, alias)
+                    if int_model is proxied_model:
+                        opts = int_model._meta
+                    else:
+                        lhs_col = opts.parents[int_model].column
+                        dedupe = lhs_col in opts.duplicate_targets
+                        if dedupe:
+                            exclusions.update(self.dupe_avoidance.get(
+                                    (id(opts), lhs_col), ()))
+                            dupe_set.add((opts, lhs_col))
+                        opts = int_model._meta
+                        alias = self.join((alias, opts.db_table, lhs_col,
+                                opts.pk.column), exclusions=exclusions)
+                        joins.append(alias)
+                        exclusions.add(alias)
+                        for (dupe_opts, dupe_col) in dupe_set:
+                            self.update_dupe_avoidance(dupe_opts, dupe_col,
+                                    alias)
             cached_data = opts._join_cache.get(name)
             orig_opts = opts
             dupe_col = direct and field.column or field.field.column

@@ -60,6 +60,9 @@ class Manager(object):
         if model._meta.abstract or self._inherited:
             model._meta.abstract_managers.append((self.creation_counter, name,
                     self))
+        else:
+            model._meta.concrete_managers.append((self.creation_counter, name,
+                self))
 
     def _set_creation_counter(self):
         """

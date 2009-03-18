@@ -773,13 +773,18 @@ is whether you want the parent models to be models in their own right
 of common information that will only be visible through the child
 models.
 
-Often, you will just want to use the parent class to hold information
-that you don't want to have to type out for each child model. This
-class isn't going to ever be used in isolation, so
-:ref:`abstract-base-classes` are what you're after. However, if you're
-subclassing an existing model (perhaps something from another
-application entirely), or want each model to have its own database
-table, :ref:`multi-table-inheritance` is the way to go.
+There are three styles of inheritance that are possible in Django.
+
+ 1. Often, you will just want to use the parent class to hold information that
+    you don't want to have to type out for each child model. This class isn't
+    going to ever be used in isolation, so :ref:`abstract-base-classes` are
+    what you're after.
+ 2. If you're subclassing an existing model (perhaps something from another
+    application entirely) and want each model to have its own database table,
+    :ref:`multi-table-inheritance` is the way to go.
+ 3. Finally, if you only want to modify the Python-level behaviour of a model,
+    without changing the models fields in any way, you can use
+    :ref:`proxy-models`.
 
 .. _abstract-base-classes:
 
@@ -937,14 +942,16 @@ referring to ``p.restaurant`` would raise a Restaurant.DoesNotExist exception.
 In the multi-table inheritance situation, it doesn't make sense for a child
 class to inherit from its parent's :ref:`Meta <meta-options>` class. All the :ref:`Meta <meta-options>` options
 have already been applied to the parent class and applying them again would
-normally only lead to contradictory behaviour (this is in contrast with the
+normally only lead to contradictory behavior (this is in contrast with the
 abstract base class case, where the base class doesn't exist in its own
 right).
 
-So a child model does not have access to its parent's :ref:`Meta <meta-options>` class. However,
-there are a few limited cases where the child inherits behaviour from the
-parent: if the child does not specify an :attr:`django.db.models.Options.ordering` attribute or a
-:attr:`django.db.models.Options.get_latest_by` attribute, it will inherit these from its parent.
+So a child model does not have access to its parent's :ref:`Meta
+<meta-options>` class. However, there are a few limited cases where the child
+inherits behavior from the parent: if the child does not specify an
+:attr:`django.db.models.Options.ordering` attribute or a
+:attr:`django.db.models.Options.get_latest_by` attribute, it will inherit
+these from its parent.
 
 If the parent has an ordering and you don't want the child to have any natural
 ordering, you can explicitly disable it::
@@ -989,6 +996,126 @@ name of the attribute linking back to the parent, you can create your
 own :class:`~django.db.models.fields.OneToOneField` and set
 :attr:`parent_link=True <django.db.models.fields.OneToOneField.parent_link>`
 to indicate that your field is the link back to the parent class.
+
+.. _proxy-models:
+
+Proxy models
+------------
+
+.. versionadded:: 1.1
+
+When using :ref:`multi-table inheritance <multi-table-inheritance>`, a new
+database table is created for each subclass of a model. This is usually the
+desired behavior, since the subclass needs a place to store any additional
+data fields that are not present on the base class. Sometimes, however, you
+only want to change the Python behavior of a model -- perhaps to change the
+default manager, or add a new method.
+
+This is what proxy model inheritance is for: creating a *proxy* for the
+original model. You can create, delete and update instances of the proxy model
+and all the data will be saved as if you were using the original (non-proxied)
+model. The difference is that you can change things like the default model
+ordering or the default manager in the proxy, without having to alter the
+original.
+
+Proxy models are declared like normal models. You tell Django that it's a
+proxy model by setting the :attr:`~django.db.models.Options.proxy` attribute to of the ``Meta`` class to ``True``.
+
+For example, suppose you want to add a method to the standard ``User`` model
+that will make be used in your templates. You can do it like this::
+
+    from django.contrib.auth.models import User
+
+    class MyUser(User):
+        class Meta:
+            proxy = True
+
+        def do_something(self):
+            ...
+
+The ``MyUser`` class operates on the same database table as its parent
+``User`` class. In particular, any new instances of ``User`` will also be
+accessible through ``MyUser``, and vice-versa::
+
+    >>> u = User.objects.create(username="foobar")
+    >>> MyUser.objects.get(username="foobar")
+    <MyUser: foobar>
+
+You could also use a proxy model to define a different default ordering on a
+model. The standard ``User`` model has no ordering defined on it
+(intentionally; sorting is expensive and we don't want to do it all the time
+when we fetch users). You might want to regularly order by the ``username``
+attribute when you use the proxy. This is easy::
+
+    class OrderedUser(User):
+        class Meta:
+            ordering = ["username"]
+            proxy = True
+
+Now normal ``User`` queries will be unorderd and ``OrderedUser`` queries will
+be ordered by ``username``.
+
+Querysets still return the model that was requested
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There is no way to have Django return, say, a ``MyUser`` object whenever you
+query for ``User`` objects. A queryset for ``User`` objects will return those
+types of objects. The whole point of proxy objects is that code relying on the
+original ``User`` will use those and your own code can use the extensions you
+included (that no other code is relying on anyway). It is not a way to replace
+the ``User`` (or any other) model everywhere with something of your own
+creation.
+
+Base class restrictions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A proxy model must inherit from exactly one non-abstract model class. You
+can't inherit from multiple non-abstract models as the proxy model doesn't
+provide any connection between the rows in the different database tables. A
+proxy model can inherit from any number of abstract model classes, providing
+they do *not* define any model fields.
+
+Proxy models inherit any ``Meta`` options that they don't define from their
+non-abstract model parent (the model they are proxying for).
+
+Proxy model managers
+~~~~~~~~~~~~~~~~~~~~
+
+If you don't specify any model managers on a proxy model, it inherits the
+managers from its model parents. If you define a manager on the proxy model,
+it will become the default, although any managers defined on the parent
+classes will still be available.
+
+Continuing our example from above, you could change the default manager used
+when you query the ``User`` model like this::
+
+    class NewManager(models.Manager):
+        ...
+
+    class MyUser(User):
+        objects = NewManager()
+
+        class Meta:
+            proxy = True
+
+If you wanted to add a new manager to the Proxy, without replacing the
+existing default, you can use the techniques described in the :ref:`custom
+manager <custom-managers-and-inheritance>` documentation: create a base class
+containing the new managers and inherit that after the primary base class::
+
+    # Create an abstract class for the new manager.
+    class ExtraManagers:
+        secondary = NewManager()
+
+        class Meta:
+            abstract = True
+
+    class MyUser(User, ExtraManagers):
+        class Meta:
+            proxy = True
+
+You probably won't need to do this very often, but, when you do, it's
+possible.
 
 Multiple inheritance
 --------------------

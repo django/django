@@ -162,6 +162,16 @@ that has ``admin`` set. This example specifies an extra permission,
 This is a list or tuple of 2-tuples in the format ``(permission_code,
 human_readable_permission_name)``.
 
+``proxy``
+---------
+
+.. attribute:: Options.proxy
+
+.. versionadded: 1.1
+
+If set to ``True``, a model which subclasses another model will be treated as
+a :ref:`proxy model <proxy-models>`.
+
 ``unique_together``
 -------------------
 
