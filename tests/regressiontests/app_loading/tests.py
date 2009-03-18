@@ -14,7 +14,7 @@ Test the globbing of INSTALLED_APPS.
 >>> settings = Settings('test_settings')
 
 >>> settings.INSTALLED_APPS
-['parent.app', 'parent.app1']
+['parent.app', 'parent.app1', 'parent.app_2']
 
 >>> sys.path = old_sys_path
 
