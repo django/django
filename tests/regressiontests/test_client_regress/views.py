@@ -19,15 +19,16 @@ def get_view(request):
     return HttpResponse("Hello world")
 get_view = login_required(get_view)
 
-def request_data(request):
+def request_data(request, template='base.html', data='sausage'):
     "A simple view that returns the request data in the context"
-    return render_to_response('base.html', {
+    return render_to_response(template, {
         'get-foo':request.GET.get('foo',None),
         'get-bar':request.GET.get('bar',None),
         'post-foo':request.POST.get('foo',None),
         'post-bar':request.POST.get('bar',None),
         'request-foo':request.REQUEST.get('foo',None),
         'request-bar':request.REQUEST.get('bar',None),
+        'data': data,
     })
 
 def view_with_argument(request, name):

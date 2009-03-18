@@ -712,6 +712,16 @@ Specifically, a ``Response`` object has the following attributes:
         If the rendered page used multiple templates, then ``context`` will be a
         list of ``Context`` objects, in the order in which they were rendered.
 
+        .. versionadded:: 1.1
+
+        Regardless of the number of templates used during rendering, you can
+        retrieve context values using the ``[]`` operator. For example, the
+        context variable ``name`` could be retrieved using::
+
+            >>> response = client.get('/foo/')
+            >>> response.context['name']
+            'Arthur'
+
     .. attribute:: request
 
         The request data that stimulated the response.

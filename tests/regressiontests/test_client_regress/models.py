@@ -5,9 +5,10 @@ import os
 from django.conf import settings
 
 from django.test import Client, TestCase
+from django.test.utils import ContextList
 from django.core.urlresolvers import reverse
 from django.core.exceptions import SuspiciousOperation
-from django.template import TemplateDoesNotExist, TemplateSyntaxError
+from django.template import TemplateDoesNotExist, TemplateSyntaxError, Context
 
 class AssertContainsTests(TestCase):
     def test_contains(self):
@@ -454,6 +455,26 @@ class zzUrlconfSubstitutionTests(TestCase):
         "URLconf is reverted to original value after modification in a TestCase"
         url = reverse('arg_view', args=['somename'])
         self.assertEquals(url, '/test_client_regress/arg_view/somename/')
+
+class ContextTests(TestCase):
+    fixtures = ['testdata']
+
+    def test_single_context(self):
+        "Context variables can be retrieved from a single context"
+        response = self.client.get("/test_client_regress/request_data/", data={'foo':'whiz'})
+        self.assertEqual(response.context.__class__, Context)
+        self.assertEqual(response.context['get-foo'], 'whiz')
+        self.assertEqual(response.context['request-foo'], 'whiz')
+        self.assertEqual(response.context['data'], 'sausage')
+
+    def test_inherited_context(self):
+        "Context variables can be retrieved from a list of contexts"
+        response = self.client.get("/test_client_regress/request_data_extended/", data={'foo':'whiz'})
+        self.assertEqual(response.context.__class__, ContextList)
+        self.assertEqual(len(response.context), 2)
+        self.assertEqual(response.context['get-foo'], 'whiz')
+        self.assertEqual(response.context['request-foo'], 'whiz')
+        self.assertEqual(response.context['data'], 'bacon')
 
 class SessionTests(TestCase):
     fixtures = ['testdata.json']

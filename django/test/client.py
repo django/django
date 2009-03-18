@@ -20,6 +20,7 @@ from django.utils.encoding import smart_str
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
 from django.db import transaction, close_connection
+from django.test.utils import ContextList
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
@@ -80,8 +81,8 @@ def store_rendered_templates(store, signal, sender, template, context, **kwargs)
     """
     Stores templates and contexts that are rendered.
     """
-    store.setdefault('template',[]).append(template)
-    store.setdefault('context',[]).append(context)
+    store.setdefault('template', []).append(template)
+    store.setdefault('context', ContextList()).append(context)
 
 def encode_multipart(boundary, data):
     """
