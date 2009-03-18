@@ -7,6 +7,7 @@ a list of all possible variables.
 """
 
 import os
+import re
 import time     # Needed for Windows
 
 from django.conf import global_settings
@@ -91,8 +92,9 @@ class Settings(object):
                 appdir = os.path.dirname(__import__(app[:-2], {}, {}, ['']).__file__)
                 app_subdirs = os.listdir(appdir)
                 app_subdirs.sort()
+                name_pattern = re.compile(r'[a-zA-Z]\w*')
                 for d in app_subdirs:
-                    if d.isalnum() and d[0].isalpha() and os.path.isdir(os.path.join(appdir, d)):
+                    if name_pattern.match(d) and os.path.isdir(os.path.join(appdir, d)):
                         new_installed_apps.append('%s.%s' % (app[:-2], d))
             else:
                 new_installed_apps.append(app)
