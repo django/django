@@ -8,6 +8,7 @@ from django.core.files import locks, File
 from django.core.files.move import file_move_safe
 from django.utils.encoding import force_unicode
 from django.utils.functional import LazyObject
+from django.utils.importlib import import_module
 from django.utils.text import get_valid_filename
 from django.utils._os import safe_join
 
@@ -230,7 +231,7 @@ def get_storage_class(import_path=None):
         raise ImproperlyConfigured("%s isn't a storage module." % import_path)
     module, classname = import_path[:dot], import_path[dot+1:]
     try:
-        mod = __import__(module, {}, {}, [''])
+        mod = import_module(module)
     except ImportError, e:
         raise ImproperlyConfigured('Error importing storage module %s: "%s"' % (module, e))
     try:

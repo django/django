@@ -1,6 +1,7 @@
 from django.contrib.admin.options import ModelAdmin, HORIZONTAL, VERTICAL
 from django.contrib.admin.options import StackedInline, TabularInline
 from django.contrib.admin.sites import AdminSite, site
+from django.utils.importlib import import_module
 
 # A flag to tell us if autodiscover is running.  autodiscover will set this to
 # True while running, and False when it finishes.
@@ -36,7 +37,7 @@ def autodiscover():
         # fails silently -- apps that do weird things with __path__ might
         # need to roll their own admin registration.
         try:
-            app_path = __import__(app, {}, {}, [app.split('.')[-1]]).__path__
+            app_path = import_module(app).__path__
         except AttributeError:
             continue
 
@@ -51,6 +52,6 @@ def autodiscover():
 
         # Step 3: import the app's admin file. If this has errors we want them
         # to bubble up.
-        __import__("%s.admin" % app)
+        import_module("%s.admin" % app)
     # autodiscover was successful, reset loading flag.
     LOADING = False

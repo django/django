@@ -52,6 +52,7 @@ import re
 from inspect import getargspec
 from django.conf import settings
 from django.template.context import Context, RequestContext, ContextPopException
+from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils.functional import curry, Promise
 from django.utils.text import smart_split
@@ -935,7 +936,7 @@ def get_library(module_name):
     lib = libraries.get(module_name, None)
     if not lib:
         try:
-            mod = __import__(module_name, {}, {}, [''])
+            mod = import_module(module_name)
         except ImportError, e:
             raise InvalidTemplateLibrary("Could not load template library from %s, %s" % (module_name, e))
         try:

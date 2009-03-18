@@ -1,5 +1,6 @@
 import datetime
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
 
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
@@ -9,7 +10,7 @@ def load_backend(path):
     i = path.rfind('.')
     module, attr = path[:i], path[i+1:]
     try:
-        mod = __import__(module, {}, {}, [attr])
+        mod = import_module(module)
     except ImportError, e:
         raise ImproperlyConfigured, 'Error importing authentication backend %s: "%s"' % (module, e)
     except ValueError, e:

@@ -17,6 +17,7 @@ To add your own serializers, use the SERIALIZATION_MODULES setting::
 """
 
 from django.conf import settings
+from django.utils import importlib
 
 # Built-in serializers
 BUILTIN_SERIALIZERS = {
@@ -47,7 +48,7 @@ def register_serializer(format, serializer_module, serializers=None):
     directly into the global register of serializers. Adding serializers
     directly is not a thread-safe operation.
     """
-    module = __import__(serializer_module, {}, {}, [''])
+    module = importlib.import_module(serializer_module)
     if serializers is None:
         _serializers[format] = module
     else:

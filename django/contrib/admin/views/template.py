@@ -4,6 +4,7 @@ from django.template import loader
 from django.shortcuts import render_to_response
 from django.contrib.sites.models import Site
 from django.conf import settings
+from django.utils.importlib import import_module
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -15,7 +16,7 @@ def template_validator(request):
     # get a dict of {site_id : settings_module} for the validator
     settings_modules = {}
     for mod in settings.ADMIN_FOR:
-        settings_module = __import__(mod, {}, {}, [''])
+        settings_module = import_module(mod)
         settings_modules[settings_module.SITE_ID] = settings_module
     site_list = Site.objects.in_bulk(settings_modules.keys()).values()
     if request.POST:

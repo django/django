@@ -1,5 +1,6 @@
 from django.core.management.base import NoArgsCommand
 from django.core.management.color import no_style
+from django.utils.importlib import import_module
 from optparse import make_option
 import sys
 
@@ -30,7 +31,7 @@ class Command(NoArgsCommand):
         # dispatcher events.
         for app_name in settings.INSTALLED_APPS:
             try:
-                __import__(app_name + '.management', {}, {}, [''])
+                import_module('.management', app_name)
             except ImportError, exc:
                 # This is slightly hackish. We want to ignore ImportErrors
                 # if the "management" module itself is missing -- but we don't

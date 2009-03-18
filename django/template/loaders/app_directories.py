@@ -10,21 +10,14 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateDoesNotExist
 from django.utils._os import safe_join
+from django.utils.importlib import import_module
 
 # At compile time, cache the directories to search.
 fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
 app_template_dirs = []
 for app in settings.INSTALLED_APPS:
-    i = app.rfind('.')
-    if i == -1:
-        m, a = app, None
-    else:
-        m, a = app[:i], app[i+1:]
     try:
-        if a is None:
-            mod = __import__(m, {}, {}, [])
-        else:
-            mod = getattr(__import__(m, {}, {}, [a]), a)
+        mod = import_module(app)
     except ImportError, e:
         raise ImproperlyConfigured, 'ImportError %s: %s' % (app, e.args[0])
     template_dir = os.path.join(os.path.dirname(mod.__file__), 'templates')

@@ -1,7 +1,8 @@
 from django import http
+from django.conf import settings
+from django.utils import importlib
 from django.utils.translation import check_for_language, activate, to_locale, get_language
 from django.utils.text import javascript_quote
-from django.conf import settings
 import os
 import gettext as gettext_module
 
@@ -128,7 +129,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     paths = []
     # first load all english languages files for defaults
     for package in packages:
-        p = __import__(package, {}, {}, [''])
+        p = importlib.import_module(package)
         path = os.path.join(os.path.dirname(p.__file__), 'locale')
         paths.append(path)
         try:

@@ -22,6 +22,7 @@
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Origin, Template, Context, TemplateDoesNotExist, add_to_builtins
+from django.utils.importlib import import_module
 from django.conf import settings
 
 template_source_loaders = None
@@ -51,7 +52,7 @@ def find_template_source(name, dirs=None):
             i = path.rfind('.')
             module, attr = path[:i], path[i+1:]
             try:
-                mod = __import__(module, globals(), locals(), [attr])
+                mod = import_module(module)
             except ImportError, e:
                 raise ImproperlyConfigured, 'Error importing template source loader %s: "%s"' % (module, e)
             try:

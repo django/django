@@ -12,6 +12,7 @@ import time     # Needed for Windows
 
 from django.conf import global_settings
 from django.utils.functional import LazyObject
+from django.utils import importlib
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 
@@ -69,7 +70,7 @@ class Settings(object):
         self.SETTINGS_MODULE = settings_module
 
         try:
-            mod = __import__(self.SETTINGS_MODULE, {}, {}, [''])
+            mod = importlib.import_module(self.SETTINGS_MODULE)
         except ImportError, e:
             raise ImportError, "Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e)
 
@@ -89,7 +90,8 @@ class Settings(object):
         new_installed_apps = []
         for app in self.INSTALLED_APPS:
             if app.endswith('.*'):
-                appdir = os.path.dirname(__import__(app[:-2], {}, {}, ['']).__file__)
+                app_mod = importlib.import_module(app[:-2])
+                appdir = os.path.dirname(app_mod.__file__)
                 app_subdirs = os.listdir(appdir)
                 app_subdirs.sort()
                 name_pattern = re.compile(r'[a-zA-Z]\w*')

@@ -5,6 +5,7 @@ import imp
 
 import django
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
+from django.utils.importlib import import_module
 
 # For backwards compatibility: get_version() used to be in this module.
 get_version = django.get_version
@@ -63,8 +64,8 @@ def load_command_class(app_name, name):
     class instance. All errors raised by the import process
     (ImportError, AttributeError) are allowed to propagate.
     """
-    return getattr(__import__('%s.management.commands.%s' % (app_name, name),
-                   {}, {}, ['Command']), 'Command')()
+    module = import_module('%s.management.commands.%s' % (app_name, name))
+    return module.Command()
 
 def get_commands():
     """
@@ -104,12 +105,9 @@ def get_commands():
         # Find the project directory
         try:
             from django.conf import settings
-            project_directory = setup_environ(
-                __import__(
-                    settings.SETTINGS_MODULE, {}, {},
-                    (settings.SETTINGS_MODULE.split(".")[-1],)
-                ), settings.SETTINGS_MODULE
-            )
+            module = import_module(settings.SETTINGS_MODULE.split('.', 1)[0])
+            project_directory = setup_environ(module,
+                                                settings.SETTINGS_MODULE)
         except (AttributeError, EnvironmentError, ImportError):
             project_directory = None
 
@@ -328,7 +326,7 @@ def setup_environ(settings_mod, original_settings_path=None):
     # Import the project module. We add the parent directory to PYTHONPATH to 
     # avoid some of the path errors new users can have.
     sys.path.append(os.path.join(project_directory, os.pardir))
-    project_module = __import__(project_name, {}, {}, [''])
+    project_module = import_module(project_name)
     sys.path.pop()
 
     return project_directory

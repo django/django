@@ -1,6 +1,7 @@
 import os
 
 from django.core.management.base import copy_helper, CommandError, LabelCommand
+from django.utils.importlib import import_module
 
 class Command(LabelCommand):
     help = "Creates a Django app directory structure for the given app name in the current directory."
@@ -26,7 +27,7 @@ class Command(LabelCommand):
 
         # Check that the app_name cannot be imported.
         try:
-            __import__(app_name)
+            import_module(app_name)
         except ImportError:
             pass
         else:

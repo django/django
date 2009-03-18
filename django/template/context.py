@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
 
 _standard_context_processors = None
 
@@ -62,7 +63,7 @@ class Context(object):
 
     def update(self, other_dict):
         "Like dict.update(). Pushes an entire dictionary's keys and values onto the context."
-        if not hasattr(other_dict, '__getitem__'): 
+        if not hasattr(other_dict, '__getitem__'):
             raise TypeError('other_dict must be a mapping (dictionary-like) object.')
         self.dicts = [other_dict] + self.dicts
         return other_dict
@@ -77,7 +78,7 @@ def get_standard_processors():
             i = path.rfind('.')
             module, attr = path[:i], path[i+1:]
             try:
-                mod = __import__(module, {}, {}, [attr])
+                mod = import_module(module)
             except ImportError, e:
                 raise ImproperlyConfigured('Error importing request processor module %s: "%s"' % (module, e))
             try:

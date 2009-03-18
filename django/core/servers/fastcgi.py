@@ -12,6 +12,7 @@ Run with the extra option "help" for a list of additional options you can
 pass to this server.
 """
 
+from django.utils import importlib
 import sys, os
 
 __version__ = "0.1"
@@ -113,7 +114,7 @@ def runfastcgi(argset=[], **kwargs):
             'maxSpare': int(options["maxspare"]),
             'minSpare': int(options["minspare"]),
             'maxChildren': int(options["maxchildren"]),
-            'maxRequests': int(options["maxrequests"]), 
+            'maxRequests': int(options["maxrequests"]),
         }
         flup_module += '_fork'
     elif options['method'] in ('thread', 'threaded'):
@@ -128,7 +129,8 @@ def runfastcgi(argset=[], **kwargs):
     wsgi_opts['debug'] = False # Turn off flup tracebacks
 
     try:
-        WSGIServer = getattr(__import__('flup.' + flup_module, '', '', flup_module), 'WSGIServer')
+        module = importlib_import_module('.%s' % flup_module, 'flup')
+        WSGIServer = module.WSGIServer
     except:
         print "Can't import flup." + flup_module
         return False

@@ -3,6 +3,7 @@ from django.core import urlresolvers
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.comments.models import Comment
 from django.contrib.comments.forms import CommentForm
+from django.utils.importlib import import_module
 
 DEFAULT_COMMENTS_APP = 'django.contrib.comments'
 
@@ -18,7 +19,7 @@ def get_comment_app():
 
     # Try to import the package
     try:
-        package = __import__(comments_app, '', '', [''])
+        package = import_module(comments_app)
     except ImportError:
         raise ImproperlyConfigured("The COMMENTS_APP setting refers to "\
                                    "a non-existing package.")

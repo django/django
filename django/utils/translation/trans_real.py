@@ -7,6 +7,7 @@ import sys
 import gettext as gettext_module
 from cStringIO import StringIO
 
+from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe, SafeData
 from django.utils.thread_support import currentThread
 
@@ -125,7 +126,7 @@ def translation(language):
 
     if settings.SETTINGS_MODULE is not None:
         parts = settings.SETTINGS_MODULE.split('.')
-        project = __import__(parts[0], {}, {}, [])
+        project = import_module(parts[0])
         projectpath = os.path.join(os.path.dirname(project.__file__), 'locale')
     else:
         projectpath = None
@@ -176,12 +177,7 @@ def translation(language):
             res = _merge(projectpath)
 
         for appname in settings.INSTALLED_APPS:
-            p = appname.rfind('.')
-            if p >= 0:
-                app = getattr(__import__(appname[:p], {}, {}, [appname[p+1:]]), appname[p+1:])
-            else:
-                app = __import__(appname, {}, {}, [])
-
+            app = import_module(appname)
             apppath = os.path.join(os.path.dirname(app.__file__), 'locale')
 
             if os.path.isdir(apppath):

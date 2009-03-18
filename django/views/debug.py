@@ -6,6 +6,7 @@ import datetime
 from django.conf import settings
 from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
+from django.utils.importlib import import_module
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotFound
 from django.utils.encoding import smart_unicode, smart_str
 
@@ -67,7 +68,8 @@ class ExceptionReporter:
             self.loader_debug_info = []
             for loader in template_source_loaders:
                 try:
-                    source_list_func = getattr(__import__(loader.__module__, {}, {}, ['get_template_sources']), 'get_template_sources')
+                    module = import_module(loader.__module__)
+                    source_list_func = module.get_template_sources
                     # NOTE: This assumes exc_value is the name of the template that
                     # the loader attempted to load.
                     template_list = [{'name': t, 'exists': os.path.exists(t)} \

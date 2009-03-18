@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
+from django.utils.importlib import import_module
 
 import sys
 import os
@@ -69,9 +70,10 @@ class AppCache(object):
         """
         self.handled[app_name] = None
         self.nesting_level += 1
-        mod = __import__(app_name, {}, {}, ['models'])
-        self.nesting_level -= 1
-        if not hasattr(mod, 'models'):
+        try:
+            models = import_module('.models', app_name)
+        except ImportError:
+            self.nesting_level -= 1
             if can_postpone:
                 # Either the app has no models, or the package is still being
                 # imported by Python and the model module isn't available yet.
@@ -79,9 +81,10 @@ class AppCache(object):
                 # populate).
                 self.postponed.append(app_name)
             return None
-        if mod.models not in self.app_store:
-            self.app_store[mod.models] = len(self.app_store)
-        return mod.models
+        self.nesting_level -= 1
+        if models not in self.app_store:
+            self.app_store[models] = len(self.app_store)
+        return models
 
     def app_cache_ready(self):
         """

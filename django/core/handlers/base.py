@@ -3,6 +3,7 @@ import sys
 from django import http
 from django.core import signals
 from django.utils.encoding import force_unicode
+from django.utils.importlib import import_module
 
 class BaseHandler(object):
     # Changes that are always applied to a response (in this order).
@@ -36,7 +37,7 @@ class BaseHandler(object):
                 raise exceptions.ImproperlyConfigured, '%s isn\'t a middleware module' % middleware_path
             mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
             try:
-                mod = __import__(mw_module, {}, {}, [''])
+                mod = import_module(mw_module)
             except ImportError, e:
                 raise exceptions.ImproperlyConfigured, 'Error importing middleware %s: "%s"' % (mw_module, e)
             try:

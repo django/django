@@ -18,6 +18,7 @@ from django.test import signals
 from django.utils.functional import curry
 from django.utils.encoding import smart_str
 from django.utils.http import urlencode
+from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.db import transaction, close_connection
 from django.test.utils import ContextList
@@ -176,7 +177,7 @@ class Client(object):
         Obtains the current session variables.
         """
         if 'django.contrib.sessions' in settings.INSTALLED_APPS:
-            engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
+            engine = import_module(settings.SESSION_ENGINE)
             cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
             if cookie:
                 return engine.SessionStore(cookie.value)
@@ -399,7 +400,7 @@ class Client(object):
         user = authenticate(**credentials)
         if user and user.is_active \
                 and 'django.contrib.sessions' in settings.INSTALLED_APPS:
-            engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
+            engine = import_module(settings.SESSION_ENGINE)
 
             # Create a fake request to store login details.
             request = HttpRequest()
@@ -434,7 +435,7 @@ class Client(object):
 
         Causes the authenticated user to be logged out.
         """
-        session = __import__(settings.SESSION_ENGINE, {}, {}, ['']).SessionStore()
+        session = import_module(settings.SESSION_ENGINE).SessionStore()
         session.delete(session_key=self.cookies[settings.SESSION_COOKIE_NAME].value)
         self.cookies = SimpleCookie()
 

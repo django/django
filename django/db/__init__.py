@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core import signals
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import curry
+from django.utils.importlib import import_module
 
 __all__ = ('backend', 'connection', 'DatabaseError', 'IntegrityError')
 
@@ -13,12 +14,12 @@ def load_backend(backend_name):
     try:
         # Most of the time, the database backend will be one of the official
         # backends that ships with Django, so look there first.
-        return __import__('django.db.backends.%s.base' % backend_name, {}, {}, [''])
+        return import_module('.base', 'django.db.backends.%s' % settings.DATABASE_ENGINE)
     except ImportError, e:
         # If the import failed, we might be looking for a database backend
         # distributed external to Django. So we'll try that next.
         try:
-            return __import__('%s.base' % backend_name, {}, {}, [''])
+            return import_module('.base', backend_name)
         except ImportError, e_user:
             # The database backend wasn't found. Display a helpful error message
             # listing all possible (built-in) database backends.
