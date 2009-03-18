@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-02 09:43+0100\n"
+"POT-Creation-Date: 2009-03-18 10:31+0100\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -292,95 +292,103 @@ msgstr "log"
 msgid "log entries"
 msgstr "logi"
 
-#: contrib/admin/options.py:129 contrib/admin/options.py:143
+#: contrib/admin/options.py:130 contrib/admin/options.py:144
 msgid "None"
 msgstr "brak"
 
-#: contrib/admin/options.py:375
+#: contrib/admin/options.py:400
 #, python-format
 msgid "Changed %s."
 msgstr "Zmieniono %s"
 
-#: contrib/admin/options.py:375 contrib/admin/options.py:385
-#: contrib/comments/templates/comments/preview.html:15 forms/models.py:294
+#: contrib/admin/options.py:400 contrib/admin/options.py:410
+#: contrib/comments/templates/comments/preview.html:15 forms/models.py:296
 msgid "and"
 msgstr "i"
 
-#: contrib/admin/options.py:380
+#: contrib/admin/options.py:405
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Dodano %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:384
+#: contrib/admin/options.py:409
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Zmieniono %(list)s w %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:389
+#: contrib/admin/options.py:414
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Usunięto %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:393
+#: contrib/admin/options.py:418
 msgid "No fields changed."
 msgstr "Żadne pole nie zmienione."
 
-#: contrib/admin/options.py:454 contrib/auth/admin.py:67
+#: contrib/admin/options.py:479 contrib/auth/admin.py:67
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" dodany pomyślnie."
 
-#: contrib/admin/options.py:458 contrib/admin/options.py:491
+#: contrib/admin/options.py:483 contrib/admin/options.py:516
 #: contrib/auth/admin.py:75
 msgid "You may edit it again below."
 msgstr "Możesz ponownie edytować wpis poniżej."
 
-#: contrib/admin/options.py:468 contrib/admin/options.py:501
+#: contrib/admin/options.py:493 contrib/admin/options.py:526
 #, python-format
 msgid "You may add another %s below."
 msgstr "Możesz dodać nowy wpis %s poniżej."
 
-#: contrib/admin/options.py:489
+#: contrib/admin/options.py:514
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" zostało pomyślnie zmienione."
 
-#: contrib/admin/options.py:497
+#: contrib/admin/options.py:522
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" dodane pomyślnie. Możesz edytować ponownie wpis poniżej."
 
-#: contrib/admin/options.py:565
+#: contrib/admin/options.py:601
 #, python-format
 msgid "Add %s"
 msgstr "Dodaj %s"
 
-#: contrib/admin/options.py:596 contrib/admin/options.py:710
+#: contrib/admin/options.py:632 contrib/admin/options.py:802
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Obiekt %(name)s o kluczu głównym %(key)r nie istnieje."
 
-#: contrib/admin/options.py:643
+#: contrib/admin/options.py:689
 #, python-format
 msgid "Change %s"
 msgstr "Zmień %s"
 
-#: contrib/admin/options.py:675
+#: contrib/admin/options.py:721
 msgid "Database error"
 msgstr "Błąd bazy danych"
 
-#: contrib/admin/options.py:725
+#: contrib/admin/options.py:749
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s został pomyślnie zmieniony."
+msgstr[1] "%(count)s %(name)s zostały pomyślnie zmienione."
+msgstr[2] "%(count)s %(name)s zostało pomyślnie zmienionych."
+
+#: contrib/admin/options.py:817
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" usunięty pomyślnie."
 
-#: contrib/admin/options.py:732
+#: contrib/admin/options.py:824
 msgid "Are you sure?"
 msgstr "Jesteś pewien?"
 
-#: contrib/admin/options.py:761
+#: contrib/admin/options.py:853
 #, python-format
 msgid "Change history: %s"
 msgstr "Historia zmian: %s"
@@ -394,11 +402,11 @@ msgstr ""
 "Proszę wpisać poprawną nazwę użytkownika i hasło. Uwaga: wielkość liter ma "
 "znaczenie."
 
-#: contrib/admin/sites.py:242 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:243 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Twoja sesja wygasła, zaloguj się ponownie."
 
-#: contrib/admin/sites.py:249 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:250 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -406,27 +414,27 @@ msgstr ""
 "Twoja przeglądarka nie chce akceptować ciasteczek. Zmień jej ustawienia i "
 "spróbuj ponownie."
 
-#: contrib/admin/sites.py:265 contrib/admin/sites.py:271
+#: contrib/admin/sites.py:266 contrib/admin/sites.py:272
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Nazwy użytkowników nie mogą zawierać znaku '@'."
 
-#: contrib/admin/sites.py:268 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:269 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Podany adres e-mail nie jest Twoją nazwą użytkownika. Spróbuj '%s'."
 
-#: contrib/admin/sites.py:328
+#: contrib/admin/sites.py:329
 msgid "Site administration"
 msgstr "Administracja stroną"
 
-#: contrib/admin/sites.py:341 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:342 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Zaloguj się"
 
-#: contrib/admin/sites.py:388
+#: contrib/admin/sites.py:389
 #, python-format
 msgid "%s administration"
 msgstr "%s - administracja"
@@ -478,7 +486,7 @@ msgstr "Niestety, żądana strona nie została znaleziona."
 #: contrib/admin/templates/admin/app_index.html:8
 #: contrib/admin/templates/admin/base.html:33
 #: contrib/admin/templates/admin/change_form.html:17
-#: contrib/admin/templates/admin/change_list.html:8
+#: contrib/admin/templates/admin/change_list.html:20
 #: contrib/admin/templates/admin/delete_confirmation.html:6
 #: contrib/admin/templates/admin/invalid_setup.html:4
 #: contrib/admin/templates/admin/object_history.html:6
@@ -571,6 +579,7 @@ msgid "View on site"
 msgstr "Pokaż na stronie"
 
 #: contrib/admin/templates/admin/change_form.html:38
+#: contrib/admin/templates/admin/change_list.html:49
 #: contrib/admin/templates/admin/auth/user/change_password.html:22
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -578,17 +587,17 @@ msgstr[0] "Proszę popraw poniższy błąd."
 msgstr[1] "Proszę popraw poniższe błędy."
 msgstr[2] "Proszę popraw poniższe błędy."
 
-#: contrib/admin/templates/admin/change_list.html:16
+#: contrib/admin/templates/admin/change_list.html:41
 #, python-format
 msgid "Add %(name)s"
 msgstr "Dodaj %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:26
+#: contrib/admin/templates/admin/change_list.html:60
 msgid "Filter"
 msgstr "Filtr"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:10
-#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:246
+#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:251
 msgid "Delete"
 msgstr "Usuń"
 
@@ -916,16 +925,16 @@ msgstr "Adres e-mail:"
 msgid "Reset my password"
 msgstr "Zresetuj moje hasło"
 
-#: contrib/admin/templatetags/admin_list.py:285
+#: contrib/admin/templatetags/admin_list.py:299
 msgid "All dates"
 msgstr "Wszystkie daty"
 
-#: contrib/admin/views/main.py:69
+#: contrib/admin/views/main.py:70
 #, python-format
 msgid "Select %s"
 msgstr "Zaznacz %s"
 
-#: contrib/admin/views/main.py:69
+#: contrib/admin/views/main.py:70
 #, python-format
 msgid "Select %s to change"
 msgstr "Zaznacz %s aby zmienić"
@@ -3815,7 +3824,7 @@ msgid "This value must be either None, True or False."
 msgstr ""
 "Ta wartość musi być jedną z None (nic), True (prawda) lub False (fałsz)."
 
-#: db/models/fields/__init__.py:834 db/models/fields/__init__.py:848
+#: db/models/fields/__init__.py:839 db/models/fields/__init__.py:853
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Proszę wpisać poprawną godzinę w formacie HH:MM[:ss[.uuuuuu]]."
 
@@ -3942,7 +3951,7 @@ msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Wybierz poprawną wartość. %(value)s nie jest jednym z dostępnych wyborów."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:721
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:729
 msgid "Enter a list of values."
 msgstr "Podaj listę wartości."
 
@@ -3955,24 +3964,24 @@ msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "To pole może zawierać jedynie litery, cyfry, podkreślenia i myślniki."
 
-#: forms/formsets.py:242 forms/formsets.py:244
+#: forms/formsets.py:247 forms/formsets.py:249
 msgid "Order"
 msgstr "Porządek"
 
-#: forms/models.py:287 forms/models.py:296
+#: forms/models.py:289 forms/models.py:298
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(field_label)s już istnieje w %(model_name)s."
 
-#: forms/models.py:594
+#: forms/models.py:602
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "Osadzony klucz obcy nie pasuje do klucza głównego obiektu rodzica."
 
-#: forms/models.py:651
+#: forms/models.py:659
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wyborów."
 
-#: forms/models.py:722
+#: forms/models.py:730
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Wybierz poprawną wartość. %s nie jest jednym z dostępnych wyborów."
