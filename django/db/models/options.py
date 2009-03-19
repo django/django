@@ -477,3 +477,9 @@ class Options(object):
             self._ordered_objects = objects
         return self._ordered_objects
 
+    def pk_index(self):
+        """
+        Returns the index of the primary key field in the self.fields list.
+        """
+        return self.fields.index(self.pk)
+

@@ -890,6 +890,12 @@ unpickling.
 >>> query2.as_sql()[0] == query
 True
 
+Check pickling of deferred-loading querysets
+>>> qs = Item.objects.defer('name', 'creator')
+>>> q2 = pickle.loads(pickle.dumps(qs))
+>>> list(qs) == list(q2)
+True
+
 Bug #7277
 >>> n1.annotation_set.filter(Q(tag=t5) | Q(tag__children=t5) | Q(tag__children__children=t5))
 [<Annotation: a1>]

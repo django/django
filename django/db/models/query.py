@@ -1,3 +1,7 @@
+"""
+The main QuerySet implementation. This provides the public API for the ORM.
+"""
+
 try:
     set
 except NameError:
@@ -6,9 +10,8 @@ except NameError:
 from django.db import connection, transaction, IntegrityError
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import DateField
-from django.db.models.query_utils import Q, select_related_descend
+from django.db.models.query_utils import Q, select_related_descend, CollectedObjects, CyclicDependency, deferred_class_factory
 from django.db.models import signals, sql
-from django.utils.datastructures import SortedDict
 
 
 # Used to control how many objects are worked with at once in some cases (e.g.
@@ -21,102 +24,6 @@ REPR_OUTPUT_SIZE = 20
 
 # Pull into this namespace for backwards compatibility.
 EmptyResultSet = sql.EmptyResultSet
-
-
-class CyclicDependency(Exception):
-    """
-    An error when dealing with a collection of objects that have a cyclic
-    dependency, i.e. when deleting multiple objects.
-    """
-    pass
-
-
-class CollectedObjects(object):
-    """
-    A container that stores keys and lists of values along with remembering the
-    parent objects for all the keys.
-
-    This is used for the database object deletion routines so that we can
-    calculate the 'leaf' objects which should be deleted first.
-    """
-
-    def __init__(self):
-        self.data = {}
-        self.children = {}
-
-    def add(self, model, pk, obj, parent_model, nullable=False):
-        """
-        Adds an item to the container.
-
-        Arguments:
-        * model - the class of the object being added.
-        * pk - the primary key.
-        * obj - the object itself.
-        * parent_model - the model of the parent object that this object was
-          reached through.
-        * nullable - should be True if this relation is nullable.
-
-        Returns True if the item already existed in the structure and
-        False otherwise.
-        """
-        d = self.data.setdefault(model, SortedDict())
-        retval = pk in d
-        d[pk] = obj
-        # Nullable relationships can be ignored -- they are nulled out before
-        # deleting, and therefore do not affect the order in which objects
-        # have to be deleted.
-        if parent_model is not None and not nullable:
-            self.children.setdefault(parent_model, []).append(model)
-        return retval
-
-    def __contains__(self, key):
-        return self.data.__contains__(key)
-
-    def __getitem__(self, key):
-        return self.data[key]
-
-    def __nonzero__(self):
-        return bool(self.data)
-
-    def iteritems(self):
-        for k in self.ordered_keys():
-            yield k, self[k]
-
-    def items(self):
-        return list(self.iteritems())
-
-    def keys(self):
-        return self.ordered_keys()
-
-    def ordered_keys(self):
-        """
-        Returns the models in the order that they should be dealt with (i.e.
-        models with no dependencies first).
-        """
-        dealt_with = SortedDict()
-        # Start with items that have no children
-        models = self.data.keys()
-        while len(dealt_with) < len(models):
-            found = False
-            for model in models:
-                if model in dealt_with:
-                    continue
-                children = self.children.setdefault(model, [])
-                if len([c for c in children if c not in dealt_with]) == 0:
-                    dealt_with[model] = None
-                    found = True
-            if not found:
-                raise CyclicDependency(
-                    "There is a cyclic dependency of items to be processed.")
-
-        return dealt_with.keys()
-
-    def unordered_keys(self):
-        """
-        Fallback for the case where is a cyclic dependency but we don't  care.
-        """
-        return self.data.keys()
-
 
 class QuerySet(object):
     """
@@ -275,6 +182,11 @@ class QuerySet(object):
         extra_select = self.query.extra_select.keys()
         aggregate_select = self.query.aggregate_select.keys()
 
+        only_load = self.query.get_loaded_field_names()
+        if not fill_cache:
+            fields = self.model._meta.fields
+            pk_idx = self.model._meta.pk_index()
+
         index_start = len(extra_select)
         aggregate_start = index_start + len(self.model._meta.fields)
 
@@ -282,10 +194,31 @@ class QuerySet(object):
             if fill_cache:
                 obj, _ = get_cached_row(self.model, row,
                             index_start, max_depth,
-                            requested=requested, offset=len(aggregate_select))
+                            requested=requested, offset=len(aggregate_select),
+                            only_load=only_load)
             else:
-                # omit aggregates in object creation
-                obj = self.model(*row[index_start:aggregate_start])
+                load_fields = only_load.get(self.model)
+                if load_fields:
+                    # Some fields have been deferred, so we have to initialise
+                    # via keyword arguments.
+                    row_data = row[index_start:aggregate_start]
+                    pk_val = row_data[pk_idx]
+                    skip = set()
+                    init_list = []
+                    for field in fields:
+                        if field.name not in load_fields:
+                            skip.add(field.attname)
+                        else:
+                            init_list.append(field.attname)
+                    if skip:
+                        model_cls = deferred_class_factory(self.model, pk_val,
+                                skip)
+                        obj = model_cls(**dict(zip(init_list, row_data)))
+                    else:
+                        obj = self.model(*row[index_start:aggregate_start])
+                else:
+                    # Omit aggregates in object creation.
+                    obj = self.model(*row[index_start:aggregate_start])
 
             for i, k in enumerate(extra_select):
                 setattr(obj, k, row[i])
@@ -655,6 +588,35 @@ class QuerySet(object):
         clone.query.standard_ordering = not clone.query.standard_ordering
         return clone
 
+    def defer(self, *fields):
+        """
+        Defers the loading of data for certain fields until they are accessed.
+        The set of fields to defer is added to any existing set of deferred
+        fields. The only exception to this is if None is passed in as the only
+        parameter, in which case all deferrals are removed (None acts as a
+        reset option).
+        """
+        clone = self._clone()
+        if fields == (None,):
+            clone.query.clear_deferred_loading()
+        else:
+            clone.query.add_deferred_loading(fields)
+        return clone
+
+    def only(self, *fields):
+        """
+        Essentially, the opposite of defer. Only the fields passed into this
+        method and that are not already specified as deferred are loaded
+        immediately when the queryset is evaluated.
+        """
+        if fields == [None]:
+            # Can only pass None to defer(), not only(), as the rest option.
+            # That won't stop people trying to do this, so let's be explicit.
+            raise TypeError("Cannot pass None as an argument to only().")
+        clone = self._clone()
+        clone.query.add_immediate_loading(fields)
+        return clone
+
     ###################
     # PRIVATE METHODS #
     ###################
@@ -757,6 +719,7 @@ class ValuesQuerySet(QuerySet):
         Called by the _clone() method after initializing the rest of the
         instance.
         """
+        self.query.clear_deferred_loading()
         self.query.clear_select_fields()
 
         if self._fields:
@@ -847,9 +810,9 @@ class ValuesListQuerySet(ValuesQuerySet):
             for row in self.query.results_iter():
                 yield tuple(row)
         else:
-            # When extra(select=...) or an annotation is involved, the extra cols are
-            # always at the start of the row, and we need to reorder the fields
-            # to match the order in self._fields.
+            # When extra(select=...) or an annotation is involved, the extra
+            # cols are always at the start of the row, and we need to reorder
+            # the fields to match the order in self._fields.
             extra_names = self.query.extra_select.keys()
             field_names = self.field_names
             aggregate_names = self.query.aggregate_select.keys()
@@ -884,6 +847,7 @@ class DateQuerySet(QuerySet):
         Called by the _clone() method after initializing the rest of the
         instance.
         """
+        self.query.clear_deferred_loading()
         self.query = self.query.clone(klass=sql.DateQuery, setup=True)
         self.query.select = []
         field = self.model._meta.get_field(self._field_name, many_to_many=False)
@@ -935,7 +899,7 @@ class EmptyQuerySet(QuerySet):
 
 
 def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
-                   requested=None, offset=0):
+                   requested=None, offset=0, only_load=None):
     """
     Helper function that recursively returns an object with the specified
     related attributes already populated.
@@ -951,7 +915,24 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
         # If we only have a list of Nones, there was not related object.
         obj = None
     else:
-        obj = klass(*fields)
+        load_fields = only_load and only_load.get(klass) or None
+        if load_fields:
+            # Handle deferred fields.
+            skip = set()
+            init_list = []
+            pk_val = fields[klass._meta.pk_index()]
+            for field in klass._meta.fields:
+                if field.name not in load_fields:
+                    skip.add(field.name)
+                else:
+                    init_list.append(field.attname)
+            if skip:
+                klass = deferred_class_factory(klass, pk_val, skip)
+                obj = klass(**dict(zip(init_list, fields)))
+            else:
+                obj = klass(*fields)
+        else:
+            obj = klass(*fields)
     index_end += offset
     for f in klass._meta.fields:
         if not select_related_descend(f, restricted, requested):

@@ -167,6 +167,12 @@ class Manager(object):
     def reverse(self, *args, **kwargs):
         return self.get_query_set().reverse(*args, **kwargs)
 
+    def defer(self, *args, **kwargs):
+        return self.get_query_set().defer(*args, **kwargs)
+
+    def only(self, *args, **kwargs):
+        return self.get_query_set().only(*args, **kwargs)
+
     def _insert(self, values, **kwargs):
         return insert_query(self.model, values, **kwargs)
 

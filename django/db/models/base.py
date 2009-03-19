@@ -12,7 +12,8 @@ import django.db.models.manager     # Imported to register signal handler.
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
-from django.db.models.query import delete_objects, Q, CollectedObjects
+from django.db.models.query import delete_objects, Q
+from django.db.models.query_utils import CollectedObjects, DeferredAttribute
 from django.db.models.options import Options
 from django.db import connection, transaction, DatabaseError
 from django.db.models import signals
@@ -235,6 +236,7 @@ class ModelBase(type):
 
 class Model(object):
     __metaclass__ = ModelBase
+    _deferred = False
 
     def __init__(self, *args, **kwargs):
         signals.pre_init.send(sender=self.__class__, args=args, kwargs=kwargs)
@@ -271,6 +273,13 @@ class Model(object):
         for field in fields_iter:
             is_related_object = False
             if kwargs:
+                # This slightly odd construct is so that we can access any
+                # data-descriptor object (DeferredAttribute) without triggering
+                # its __get__ method.
+                if (field.attname not in kwargs and
+                        isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)):
+                    # This field will be populated on request.
+                    continue
                 if isinstance(field.rel, ManyToOneRel):
                     try:
                         # Assume object instance was passed in.
@@ -331,6 +340,31 @@ class Model(object):
 
     def __hash__(self):
         return hash(self._get_pk_val())
+
+    def __reduce__(self):
+        """
+        Provide pickling support. Normally, this just dispatches to Python's
+        standard handling. However, for models with deferred field loading, we
+        need to do things manually, as they're dynamically created classes and
+        only module-level classes can be pickled by the default path.
+        """
+        if not self._deferred:
+            return super(Model, self).__reduce__()
+        data = self.__dict__
+        defers = []
+        pk_val = None
+        for field in self._meta.fields:
+            if isinstance(self.__class__.__dict__.get(field.attname),
+                    DeferredAttribute):
+                defers.append(field.attname)
+                if pk_val is None:
+                    # The pk_val and model values are the same for all
+                    # DeferredAttribute classes, so we only need to do this
+                    # once.
+                    obj = self.__class__.__dict__[field.attname]
+                    pk_val = obj.pk_value
+                    model = obj.model_ref()
+        return (model_unpickle, (model, pk_val, defers), data)
 
     def _get_pk_val(self, meta=None):
         if not meta:
@@ -590,6 +624,15 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 
 class Empty(object):
     pass
+
+def model_unpickle(model, pk_val, attrs):
+    """
+    Used to unpickle Model subclasses with deferred fields.
+    """
+    from django.db.models.query_utils import deferred_class_factory
+    cls = deferred_class_factory(model, pk_val, attrs)
+    return cls.__new__(cls)
+model_unpickle.__safe_for_unpickle__ = True
 
 if sys.version_info < (2, 5):
     # Prior to Python 2.5, Exception was an old-style class

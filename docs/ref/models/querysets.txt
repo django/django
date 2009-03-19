@@ -768,6 +768,101 @@ of the arguments is required, but you should use at least one of them.
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
+``defer(*fields)``
+~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.1
+
+In some complex data-modeling situations, your models might contain a lot of
+fields, some of which could contain a lot of data (for example, text fields),
+or require expensive processing to convert them to Python objects. If you are
+using the results of a queryset in some situation where you know you don't
+need those particular fields, you can tell Django not to retrieve them from
+the database.
+
+This is done by passing the names of the fields to not load to ``defer()``::
+
+    Entry.objects.defer("lede", "body")
+
+A queryset that has deferred fields will still return model instances. Each
+deferred field will be retrieved from the database if you access that field
+(one at a time, not all the deferred fields at once).
+
+You can make multiple calls to ``defer()``. Each call adds new fields to the
+deferred set::
+
+    # Defers both the body and lede fields.
+    Entry.objects.defer("body").filter(headline="Lennon").defer("lede")
+
+The order in which fields are added to the deferred set does not matter. Calling ``defer()`` with a field name that has already been deferred is harmless (the field will still be deferred).
+
+You can defer loading of fields in related models (if the related models are
+loading via ``select_related()``) by using the standard double-underscore
+notation to separate related fields::
+
+    Blog.objects.select_related().defer("entry__lede", "entry__body")
+
+If you want to clear the set of deferred fields, pass ``None`` as a parameter
+to ``defer()``::
+
+    # Load all fields immediately.
+    my_queryset.defer(None)
+
+Some fields in a model won't be deferred, even if you ask for them. You can
+never defer the loading of the primary key. If you are using
+``select_related()`` to retrieve other models at the same time you shouldn't
+defer the loading of the field that connects from the primary model to the
+related one (at the moment, that doesn't raise an error, but it will
+eventually).
+
+.. note::
+
+    The ``defer()`` method (and its cousin, ``only()``, below) are only for
+    advanced use-cases. They provide an optimization for when you have
+    analyzed your queries closely and understand *exactly* what information
+    you need and have measured that the difference between returning the
+    fields you need and the full set of fields for the model will be
+    significant. When you are initially developing your applications, don't
+    bother using ``defer()``; leave it until your query construction has
+    settled down and you understand where the hot-points are.
+
+``only(*fields)``
+~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.1
+
+The ``only()`` method is more or less the opposite of ``defer()``. You
+call it with the fields that should *not* be deferred when retrieving a model.
+If you have a model where almost all the fields need to be deferred, using
+``only()`` to specify the complementary set of fields could result in simpler
+code.
+
+If you have a model with fields ``name``, ``age`` and ``biography``, the
+following two querysets are the same, in terms of deferred fields::
+
+    Person.objects.defer("age", "biography")
+    Person.objects.only("name")
+
+Whenever you call ``only()`` it *replaces* the set of fields to load
+immediately. The method's name is mnemonic: **only** those fields are loaded
+immediately; the remainder are deferred. Thus, successive calls to ``only()``
+result in only the final fields being considered::
+
+    # This will defer all fields except the headline.
+    Entry.objects.only("body", "lede").only("headline")
+
+Since ``defer()`` acts incrementally (adding fields to the deferred list), you
+can combine calls to ``only()`` and ``defer()`` and things will behave
+logically::
+
+    # Final result is that everything except "headline" is deferred.
+    Entry.objects.only("headline", "body").defer("body")
+
+    # Final result loads headline and body immediately (only() replaces any
+    # existing set of fields).
+    Entry.objects.defer("body").only("headline", "body")
+
+
 QuerySet methods that do not return QuerySets
 ---------------------------------------------
 

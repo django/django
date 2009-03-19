@@ -94,6 +94,11 @@ class BaseQuery(object):
         self.extra_params = ()
         self.extra_order_by = ()
 
+        # A tuple that is a set of model field names and either True, if these
+        # are the fields to defer, or False if these are the only fields to
+        # load.
+        self.deferred_loading = (set(), True)
+
     def __str__(self):
         """
         Returns the query as a string of SQL with the parameter values
@@ -206,6 +211,7 @@ class BaseQuery(object):
         obj.extra_where = self.extra_where
         obj.extra_params = self.extra_params
         obj.extra_order_by = self.extra_order_by
+        obj.deferred_loading = deepcopy(self.deferred_loading)
         if self.filter_is_sticky and self.used_aliases:
             obj.used_aliases = self.used_aliases.copy()
         else:
@@ -550,9 +556,101 @@ class BaseQuery(object):
         if self.select_related and not self.related_select_cols:
             self.fill_related_selections()
 
+    def deferred_to_data(self, target, callback):
+        """
+        Converts the self.deferred_loading data structure to an alternate data
+        structure, describing the field that *will* be loaded. This is used to
+        compute the columns to select from the database and also by the
+        QuerySet class to work out which fields are being initialised on each
+        model. Models that have all their fields included aren't mentioned in
+        the result, only those that have field restrictions in place.
+
+        The "target" parameter is the instance that is populated (in place).
+        The "callback" is a function that is called whenever a (model, field)
+        pair need to be added to "target". It accepts three parameters:
+        "target", and the model and list of fields being added for that model.
+        """
+        field_names, defer = self.deferred_loading
+        if not field_names:
+            return
+        columns = set()
+        cur_model = self.model
+        opts = cur_model._meta
+        seen = {}
+        must_include = {cur_model: set([opts.pk])}
+        for field_name in field_names:
+            parts = field_name.split(LOOKUP_SEP)
+            for name in parts[:-1]:
+                old_model = cur_model
+                source = opts.get_field_by_name(name)[0]
+                cur_model = opts.get_field_by_name(name)[0].rel.to
+                opts = cur_model._meta
+                # Even if we're "just passing through" this model, we must add
+                # both the current model's pk and the related reference field
+                # to the things we select.
+                must_include[old_model].add(source)
+                add_to_dict(must_include, cur_model, opts.pk)
+            field, model, _, _ = opts.get_field_by_name(parts[-1])
+            if model is None:
+                model = cur_model
+            add_to_dict(seen, model, field)
+
+        if defer:
+            # We need to load all fields for each model, except those that
+            # appear in "seen" (for all models that appear in "seen"). The only
+            # slight complexity here is handling fields that exist on parent
+            # models.
+            workset = {}
+            for model, values in seen.iteritems():
+                for field, f_model in model._meta.get_fields_with_model():
+                    if field in values:
+                        continue
+                    add_to_dict(workset, f_model or model, field)
+            for model, values in must_include.iteritems():
+                # If we haven't included a model in workset, we don't add the
+                # corresponding must_include fields for that model, since an
+                # empty set means "include all fields". That's why there's no
+                # "else" branch here.
+                if model in workset:
+                    workset[model].update(values)
+            for model, values in workset.iteritems():
+                callback(target, model, values)
+        else:
+            for model, values in must_include.iteritems():
+                if model in seen:
+                    seen[model].update(values)
+                else:
+                    # As we've passed through this model, but not explicitly
+                    # included any fields, we have to make sure it's mentioned
+                    # so that only the "must include" fields are pulled in.
+                    seen[model] = values
+            for model, values in seen.iteritems():
+                callback(target, model, values)
+
+    def deferred_to_columns(self):
+        """
+        Converts the self.deferred_loading data structure to mapping of table
+        names to sets of column names which are to be loaded. Returns the
+        dictionary.
+        """
+        columns = {}
+        self.deferred_to_data(columns, self.deferred_to_columns_cb)
+        return columns
+
+    def deferred_to_columns_cb(self, target, model, fields):
+        """
+        Callback used by deferred_to_columns(). The "target" parameter should
+        be a set instance.
+        """
+        table = model._meta.db_table
+        if table not in target:
+            target[table] = set()
+        for field in fields:
+            target[table].add(field.column)
+
     def get_columns(self, with_aliases=False):
         """
-        Return the list of columns to use in the select statement. If no
+        Returns the list of columns to use in the select statement. If no
         columns have been specified, returns all columns relating to fields in
         the model.
 
@@ -569,9 +667,14 @@ class BaseQuery(object):
         else:
             col_aliases = set()
         if self.select:
+            only_load = self.deferred_to_columns()
             for col in self.select:
                 if isinstance(col, (list, tuple)):
-                    r = '%s.%s' % (qn(col[0]), qn(col[1]))
+                    alias, column = col
+                    table = self.alias_map[alias][TABLE_NAME]
+                    if table in only_load and col not in only_load[table]:
+                        continue
+                    r = '%s.%s' % (qn(alias), qn(column))
                     if with_aliases:
                         if col[1] in col_aliases:
                             c_alias = 'Col%d' % len(col_aliases)
@@ -641,6 +744,7 @@ class BaseQuery(object):
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         aliases = set()
+        only_load = self.deferred_to_columns()
         proxied_model = opts.proxy and opts.proxy_for_model or 0
         if start_alias:
             seen = {None: start_alias}
@@ -661,6 +765,9 @@ class BaseQuery(object):
                 # aliases will have already been set up in pre_sql_setup(), so
                 # we can save time here.
                 alias = self.included_inherited_models[model]
+            table = self.alias_map[alias][TABLE_NAME]
+            if table in only_load and field.column not in only_load[table]:
+                continue
             if as_pairs:
                 result.append((alias, field.column))
                 continue
@@ -2014,6 +2121,70 @@ class BaseQuery(object):
         if order_by:
             self.extra_order_by = order_by
 
+    def clear_deferred_loading(self):
+        """
+        Remove any fields from the deferred loading set.
+        """
+        self.deferred_loading = (set(), True)
+
+    def add_deferred_loading(self, field_names):
+        """
+        Add the given list of model field names to the set of fields to
+        exclude from loading from the database when automatic column selection
+        is done. The new field names are added to any existing field names that
+        are deferred (or removed from any existing field names that are marked
+        as the only ones for immediate loading).
+        """
+        # Fields on related models are stored in the literal double-underscore
+        # format, so that we can use a set datastructure. We do the foo__bar
+        # splitting and handling when computing the SQL colum names (as part of
+        # get_columns()).
+        existing, defer = self.deferred_loading
+        if defer:
+            # Add to existing deferred names.
+            self.deferred_loading = existing.union(field_names), True
+        else:
+            # Remove names from the set of any existing "immediate load" names.
+            self.deferred_loading = existing.difference(field_names), False
+
+    def add_immediate_loading(self, field_names):
+        """
+        Add the given list of model field names to the set of fields to
+        retrieve when the SQL is executed ("immediate loading" fields). The
+        field names replace any existing immediate loading field names. If
+        there are field names already specified for deferred loading, those
+        names are removed from the new field_names before storing the new names
+        for immediate loading. (That is, immediate loading overrides any
+        existing immediate values, but respects existing deferrals.)
+        """
+        existing, defer = self.deferred_loading
+        if defer:
+            # Remove any existing deferred names from the current set before
+            # setting the new names.
+            self.deferred_loading = set(field_names).difference(existing), False
+        else:
+            # Replace any existing "immediate load" field names.
+            self.deferred_loading = set(field_names), False
+
+    def get_loaded_field_names(self):
+        """
+        If any fields are marked to be deferred, returns a dictionary mapping
+        models to a set of names in those fields that will be loaded. If a
+        model is not in the returned dictionary, none of it's fields are
+        deferred.
+
+        If no fields are marked for deferral, returns an empty dictionary.
+        """
+        collection = {}
+        self.deferred_to_data(collection, self.get_loaded_field_names_cb)
+        return collection
+
+    def get_loaded_field_names_cb(self, target, model, fields):
+        """
+        Callback used by get_deferred_field_names().
+        """
+        target[model] = set([f.name for f in fields])
+
     def trim_extra_select(self, names):
         """
         Removes any aliases in the extra_select dictionary that aren't in
@@ -2179,4 +2350,14 @@ def setup_join_cache(sender, **kwargs):
     sender._meta._join_cache = {}
 
 signals.class_prepared.connect(setup_join_cache)
+
+def add_to_dict(data, key, value):
+    """
+    A helper function to add "value" to the set of values for "key", whether or
+    not "key" already exists.
+    """
+    if key in data:
+        data[key].add(value)
+    else:
+        data[key] = set([value])
 
