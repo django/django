@@ -14,6 +14,9 @@ class Primary(models.Model):
     value = models.CharField(max_length=50)
     related = models.ForeignKey(Secondary)
 
+    def __unicode__(self):
+        return self.name
+
 def count_delayed_fields(obj, debug=False):
     """
     Returns the number of delayed attributes on the given model instance.
@@ -85,5 +88,15 @@ Using defer() and only() with get() is also valid.
 
 # KNOWN NOT TO WORK: >>> count_delayed_fields(qs.only('name').select_related('related')[0])
 # KNOWN NOT TO WORK >>> count_delayed_fields(qs.defer('related').select_related('related')[0])
+
+# Saving models with deferred fields is possible (but inefficient, since every
+# field has to be retrieved first).
+
+>>> obj = Primary.objects.defer("value").get(name="p1")
+>>> obj.name = "a new name"
+>>> obj.save()
+>>> Primary.objects.all()
+[<Primary: a new name>]
+
 
 """}
