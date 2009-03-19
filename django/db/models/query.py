@@ -609,7 +609,7 @@ class QuerySet(object):
         method and that are not already specified as deferred are loaded
         immediately when the queryset is evaluated.
         """
-        if fields == [None]:
+        if fields == (None,):
             # Can only pass None to defer(), not only(), as the rest option.
             # That won't stop people trying to do this, so let's be explicit.
             raise TypeError("Cannot pass None as an argument to only().")
