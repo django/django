@@ -7,46 +7,47 @@ Cross Site Request Forgery protection
 .. module:: django.contrib.csrf
    :synopsis: Protects against Cross Site Request Forgeries
 
-The CsrfMiddleware class provides easy-to-use protection against
-`Cross Site Request Forgeries`_.  This type of attack occurs when a malicious
-Web site creates a link or form button that is intended to perform some action
-on your Web site, using the credentials of a logged-in user who is tricked
-into clicking on the link in their browser.
+The CsrfMiddleware classes provides easy-to-use protection against
+`Cross Site Request Forgeries`_.  This type of attack occurs when a
+malicious Web site creates a link or form button that is intended to
+perform some action on your Web site, using the credentials of a
+logged-in user who is tricked into clicking on the link in their
+browser.
 
 The first defense against CSRF attacks is to ensure that GET requests
-are side-effect free.  POST requests can then be protected by adding this
-middleware into your list of installed middleware.
+are side-effect free.  POST requests can then be protected by adding
+these middleware into your list of installed middleware.
 
 .. _Cross Site Request Forgeries: http://www.squarefree.com/securitytips/web-developers.html#CSRF
 
 How to use it
 =============
 
-Add the middleware ``'django.contrib.csrf.middleware.CsrfMiddleware'`` to
-your list of middleware classes, :setting:`MIDDLEWARE_CLASSES`. It needs to process
-the response after the SessionMiddleware, so must come before it in the
-list. It also must process the response before things like compression
-happen to the response, so it must come after GZipMiddleware in the
-list.
+Add the middleware
+``'django.contrib.csrf.middleware.CsrfViewMiddleware'`` and
+``'django.contrib.csrf.middleware.CsrfResponseMiddleware'`` to your
+list of middleware classes,
+:setting:`MIDDLEWARE_CLASSES`. ``CsrfResponseMiddleware`` needs to
+process the response after the ``SessionMiddleware``, so must come
+before it in the list.  It also must process the response before
+things like compression happen to the response, so it must come after
+``GZipMiddleware`` in the list.
 
-The ``CsrfMiddleware`` class is actually composed of two middleware:
-``CsrfViewMiddleware`` which performs the checks on incoming requests,
-and ``CsrfResponseMiddleware`` which performs post-processing of the
-result.  This allows the individual components to be used and/or
-replaced instead of using ``CsrfMiddleware``.
+The ``CsrfMiddleware`` class, which combines the two classes, is also
+available, for backwards compatibility with Django 1.0.
 
 .. versionchanged:: 1.1
-    (previous versions of Django did not provide these two components
-    of ``CsrfMiddleware`` as described above)
+    previous versions of Django did not provide these two components
+    of ``CsrfMiddleware`` as described above.
 
 Exceptions
 ----------
 
 .. versionadded:: 1.1
 
-To manually exclude a view function from being handled by the
-CsrfMiddleware, you can use the ``csrf_exempt`` decorator, found in
-the ``django.contrib.csrf.middleware`` module. For example::
+To manually exclude a view function from being handled by either of
+the two CSRF middleware, you can use the ``csrf_exempt`` decorator,
+found in the ``django.contrib.csrf.middleware`` module. For example::
 
     from django.contrib.csrf.middleware import csrf_exempt
 
@@ -54,12 +55,12 @@ the ``django.contrib.csrf.middleware`` module. For example::
         return HttpResponse('Hello world')
     my_view = csrf_exempt(my_view)
 
-Like the middleware itself, the ``csrf_exempt`` decorator is composed
-of two parts: a ``csrf_view_exempt`` decorator and a
-``csrf_response_exempt`` decorator, found in the same module.  These
-disable the view protection mechanism (``CsrfViewMiddleware``) and the
-response post-processing (``CsrfResponseMiddleware``) respectively.
-They can be used individually if required.
+Like the middleware, the ``csrf_exempt`` decorator is composed of two
+parts: a ``csrf_view_exempt`` decorator and a ``csrf_response_exempt``
+decorator, found in the same module.  These disable the view
+protection mechanism (``CsrfViewMiddleware``) and the response
+post-processing (``CsrfResponseMiddleware``) respectively.  They can
+be used individually if required.
 
 You don't have to worry about doing this for most AJAX views. Any
 request sent with "X-Requested-With: XMLHttpRequest" is automatically
@@ -68,7 +69,7 @@ exempt. (See the next section.)
 How it works
 ============
 
-CsrfMiddleware does two things:
+The CSRF middleware do two things:
 
 1. It modifies outgoing requests by adding a hidden form field to all
    'POST' forms, with the name 'csrfmiddlewaretoken' and a value which is
@@ -112,9 +113,9 @@ don't trust content within the same domain or subdomains.)
 Limitations
 ===========
 
-CsrfMiddleware requires Django's session framework to work. If you have
-a custom authentication system that manually sets cookies and the like,
-it won't help you.
+These middleware require Django's session framework to work. If you
+have a custom authentication system that manually sets cookies and the
+like, it won't help you.
 
 If your app creates HTML pages and forms in some unusual way, (e.g.
 it sends fragments of HTML in JavaScript document.write statements)

@@ -74,7 +74,13 @@ Other new features and changes introduced since Django 1.0 include:
   ``CsrfMiddleware`` class (which does both) remains for
   backwards-compatibility, but using the split classes is now recommended in
   order to allow fine-grained control of when and where the CSRF processing
-  takes place.
+  takes place.  Decorators are provided for selectively turning it off for
+  certain views.
+
+  Also, these middleware are now enabled by default when creating new projects.
+  It is recommended to add these middleware, if not already present, to existing
+  projects, to provide protection for the admin (which has no other CSRF
+  protection) and other apps.
 
 * :func:`~django.core.urlresolvers.reverse` and code which uses it (e.g., the
   ``{% url %}`` template tag) now works with URLs in Django's administrative
