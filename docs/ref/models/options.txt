@@ -100,7 +100,7 @@ For tests involving models with ``managed=False``, it's up to you to ensure
 the correct tables are created as part of the test setup.
 
 If you're interested in changing the Python-level behaviour of a model class,
-you *could* use ``managed=True`` and create a copy of an existing model.
+you *could* use ``managed=False`` and create a copy of an existing model.
 However, there's a better approach for that situation: :ref:`proxy-models`.
 
 ``order_with_respect_to``
