@@ -278,7 +278,7 @@ class TransactionTestCase(unittest.TestCase):
         """
         if hasattr(response, 'redirect_chain'):
             # The request was a followed redirect
-            self.assertTrue(len(response.redirect_chain) > 0,
+            self.failUnless(len(response.redirect_chain) > 0,
                 ("Response didn't redirect as expected: Response code was %d"
                 " (expected %d)" % (response.status_code, status_code)))
 
