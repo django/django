@@ -71,9 +71,6 @@ class GoogleMap(object):
                     else:
                         getattr(self, varname).append(overlay_class(overlay))
 
-        # Pulling any icons from the markers.
-        self.icons = [marker.icon for marker in self.markers if marker.icon]
-
         # If GMarker, GPolygons, and/or GPolylines are used the zoom will be
         # automatically calculated via the Google Maps API.  If both a zoom
         # level and a center coordinate are provided with polygons/polylines,
@@ -143,6 +140,11 @@ class GoogleMap(object):
         "Returns XHTML information needed for IE VML overlays."
         return mark_safe('<html xmlns="http://www.w3.org/1999/xhtml" %s>' % self.xmlns)
 
+    @property
+    def icons(self):
+        "Returns a sequence of GIcon objects in this map."
+        return [marker.icon for marker in self.markers if marker.icon]
+
 class GoogleMapSet(GoogleMap):
 
     def __init__(self, *args, **kwargs):
@@ -172,11 +174,6 @@ class GoogleMapSet(GoogleMap):
             self.maps = args[0]
         else:
             self.maps = args
-
-        # Creating the icons sequence from every map in this set.
-        self.icons = []
-        for map in self.maps:
-            self.icons.extend(map.icons)
 
         # Generating DOM ids for each of the maps in the set.
         self.dom_ids = ['map%d' % i for i in xrange(len(self.maps))]
@@ -220,3 +217,10 @@ class GoogleMapSet(GoogleMap):
         # `google-multi.js`, which calls the load routines for
         # each one of the individual maps in the set.
         return mark_safe('onload="%s.load()"' % self.js_module)
+
+    @property
+    def icons(self):
+        "Returns a sequence of all icons in each map of the set."
+        icons = []
+        for map in self.maps: icons.extend(map.icons)
+        return icons
