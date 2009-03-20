@@ -82,24 +82,32 @@ See the docs for :meth:`~django.db.models.QuerySet.latest` for more.
 
 .. versionadded:: 1.1
 
+Defaults to ``True``, meaning Django will create the appropriate database
+tables in :ref:`django-admin-syncdb` and remove them as part of a :ref:`reset
+<django-admin-reset>` management command. That is, Django *manages* the
+database tables' lifecycles.
+
 If ``False``, no database table creation or deletion operations will be
 performed for this model. This is useful if the model represents an existing
-table or a database view that has been created by some other means.
+table or a database view that has been created by some other means. This is
+the *only* difference when ``managed`` is ``False``. All other aspects of
+model handling are exactly the same as normal. This includes
 
-The default value is ``True``, meaning Django will create the appropriate
-database tables in :ref:`django-admin-syncdb` and remove them as part of a
-:ref:`reset <django-admin-reset>` management command.
+    1. Adding an automatic primary key field to the model if you don't declare
+       it.  To avoid confusion for later code readers, it's recommended to
+       specify all the columns from the database table you are modeling when
+       using unmanaged models.
 
-If a model contains a :class:`~django.db.models.ManyToManyField` and has
-``managed=False``, the intermediate table for the many-to-many join will also
-not be created. Should you require the intermediate table to be created, set
-it up as an explicit model and use the :attr:`ManyToManyField.through`
-attribute.
+    2. If a model contains a :class:`~django.db.models.ManyToManyField` and
+       has ``managed=False``, the intermediate table for the many-to-many join
+       will also not be created. Should you require the intermediate table to
+       be created, set it up as an explicit model and use the
+       :attr:`ManyToManyField.through` attribute.
 
 For tests involving models with ``managed=False``, it's up to you to ensure
 the correct tables are created as part of the test setup.
 
-If you're interested in changing the Python-level behaviour of a model class,
+If you're interested in changing the Python-level behavior of a model class,
 you *could* use ``managed=False`` and create a copy of an existing model.
 However, there's a better approach for that situation: :ref:`proxy-models`.
 
