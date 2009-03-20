@@ -188,7 +188,7 @@ class SingleRelatedObjectDescriptor(object):
             return getattr(instance, self.cache_name)
         except AttributeError:
             params = {'%s__pk' % self.related.field.name: instance._get_pk_val()}
-            rel_obj = self.related.model._default_manager.get(**params)
+            rel_obj = self.related.model._base_manager.get(**params)
             setattr(instance, self.cache_name, rel_obj)
             return rel_obj
 
@@ -296,12 +296,35 @@ class ForeignRelatedObjectsDescriptor(object):
         if instance is None:
             return self
 
+        return self.create_manager(instance,
+                self.related.model._default_manager.__class__)
+
+    def __set__(self, instance, value):
+        if instance is None:
+            raise AttributeError, "Manager must be accessed via instance"
+
+        manager = self.__get__(instance)
+        # If the foreign key can support nulls, then completely clear the related set.
+        # Otherwise, just move the named objects into the set.
+        if self.related.field.null:
+            manager.clear()
+        manager.add(*value)
+
+    def delete_manager(self, instance):
+        """
+        Returns a queryset based on the related model's base manager (rather
+        than the default manager, as returned by __get__). Used by
+        Model.delete().
+        """
+        return self.create_manager(instance,
+                self.related.model._base_manager.__class__)
+
+    def create_manager(self, instance, superclass):
+        """
+        Creates the managers used by other methods (__get__() and delete()).
+        """
         rel_field = self.related.field
         rel_model = self.related.model
-
-        # Dynamically create a class that subclasses the related
-        # model's default manager.
-        superclass = self.related.model._default_manager.__class__
 
         class RelatedManager(superclass):
             def get_query_set(self):
@@ -351,17 +374,6 @@ class ForeignRelatedObjectsDescriptor(object):
         manager.model = self.related.model
 
         return manager
-
-    def __set__(self, instance, value):
-        if instance is None:
-            raise AttributeError, "Manager must be accessed via instance"
-
-        manager = self.__get__(instance)
-        # If the foreign key can support nulls, then completely clear the related set.
-        # Otherwise, just move the named objects into the set.
-        if self.related.field.null:
-            manager.clear()
-        manager.add(*value)
 
 def create_many_related_manager(superclass, through=False):
     """Creates a manager that subclasses 'superclass' (which is a Manager)
