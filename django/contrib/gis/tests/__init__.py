@@ -1,4 +1,5 @@
 import sys, unittest
+from django.utils.importlib import import_module
 
 def geo_suite():
     """
@@ -45,7 +46,7 @@ def geo_suite():
         test_suite_names.append('test_geoip')
 
     for suite_name in test_suite_names:
-        tsuite = getattr(__import__('django.contrib.gis.tests', globals(), locals(), [suite_name]), suite_name)
+        tsuite = import_module('django.contrib.gis.tests.' + suite_name)
         s.addTest(tsuite.suite())
     return s, test_apps
 
@@ -87,14 +88,13 @@ def run_gis_tests(test_labels, **kwargs):
     for test_app in test_apps:
         module_name = 'django.contrib.gis.tests.%s' % test_app
         if mysql:
-            test_module_name = 'tests_mysql'
+            test_module = 'tests_mysql'
         else:
-            test_module_name = 'tests'
+            test_module = 'tests'
         new_installed.append(module_name)
 
         # Getting the model test suite
-        tsuite = getattr(__import__('django.contrib.gis.tests.%s' % test_app, globals(), locals(), [test_module_name]),
-                         test_module_name)
+        tsuite = import_module(module_name + '.' + test_module)
         gis_suite.addTest(tsuite.suite())
 
     # Resetting the loaded flag to take into account what we appended to
