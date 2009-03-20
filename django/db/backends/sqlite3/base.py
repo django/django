@@ -3,7 +3,8 @@ SQLite3 backend for django.
 
 Python 2.3 and 2.4 require pysqlite2 (http://pysqlite.org/).
 
-Python 2.5 and later use the sqlite3 module in the standard library.
+Python 2.5 and later can use a pysqlite2 module or the sqlite3 module in the
+standard library.
 """
 
 from django.db.backends import *
@@ -14,18 +15,18 @@ from django.utils.safestring import SafeString
 
 try:
     try:
-        from sqlite3 import dbapi2 as Database
-    except ImportError, e1:
         from pysqlite2 import dbapi2 as Database
+    except ImportError, e1:
+        from sqlite3 import dbapi2 as Database
 except ImportError, exc:
     import sys
     from django.core.exceptions import ImproperlyConfigured
     if sys.version_info < (2, 5, 0):
-        module = 'pysqlite2'
-    else:
-        module = 'sqlite3'
+        module = 'pysqlite2 module'
         exc = e1
-    raise ImproperlyConfigured, "Error loading %s module: %s" % (module, exc)
+    else:
+        module = 'either pysqlite2 or sqlite3 modules (tried in that order)'
+    raise ImproperlyConfigured, "Error loading %s: %s" % (module, exc)
 
 try:
     import decimal
