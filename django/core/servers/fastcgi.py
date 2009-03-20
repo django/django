@@ -129,7 +129,7 @@ def runfastcgi(argset=[], **kwargs):
     wsgi_opts['debug'] = False # Turn off flup tracebacks
 
     try:
-        module = importlib_import_module('.%s' % flup_module, 'flup')
+        module = importlib.import_module('.%s' % flup_module, 'flup')
         WSGIServer = module.WSGIServer
     except:
         print "Can't import flup." + flup_module
