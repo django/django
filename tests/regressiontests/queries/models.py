@@ -895,6 +895,9 @@ Check pickling of deferred-loading querysets
 >>> q2 = pickle.loads(pickle.dumps(qs))
 >>> list(qs) == list(q2)
 True
+>>> q3 = pickle.loads(pickle.dumps(qs, pickle.HIGHEST_PROTOCOL))
+>>> list(qs) == list(q3)
+True
 
 Bug #7277
 >>> n1.annotation_set.filter(Q(tag=t5) | Q(tag__children=t5) | Q(tag__children__children=t5))

@@ -348,9 +348,9 @@ class Model(object):
         need to do things manually, as they're dynamically created classes and
         only module-level classes can be pickled by the default path.
         """
-        if not self._deferred:
-            return super(Model, self).__reduce__()
         data = self.__dict__
+        if not self._deferred:
+            return (self.__class__, (), data)
         defers = []
         pk_val = None
         for field in self._meta.fields:
