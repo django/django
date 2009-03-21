@@ -1,0 +1,48 @@
+.. _ref-contrib-comments-forms:
+
+====================
+Comment form classes
+====================
+
+.. module:: django.contrib.comments.forms
+   :synopsis: Forms for dealing with the built-in comment model.
+
+The ``django.contrib.comments.forms`` module contains a handful of forms
+you'll use when writing custom views dealing with comments, or when writing
+:ref:`custom comment apps <ref-contrib-comments-custom>`.
+
+.. class:: CommentForm
+
+   The main comment form representing the standard, built-in way of handling
+   submitted comments. This is the class used by all the views
+   :mod:`django.contrib.comments` to handle submitted comments.
+
+   If you want to build custom views that are similar to Django's built-in
+   comment handling views, you'll probably want to use this form.
+
+Abstract comment forms for custom comment apps
+----------------------------------------------
+
+If you're building a :ref:`custom comment app <ref-contrib-comments-custom>`,
+you might want to replace *some* of the form logic but still rely on parts of
+the existing form.
+
+:class:`CommentForm` is actually composed of a couple of abstract base class
+forms that you can subclass to reuse pieces of the form handling logic:
+
+.. class:: CommentSecurityForm
+
+   Handles the anti-spoofing protection aspects of the comment form handling.
+
+   This class contains the ``content_type`` and ``object_pk`` fields pointing
+   to the object the comment is attached to, along with a ``timestamp`` and a
+   ``security_hash`` of all the form data. Together, the timestamp and the
+   security hash ensure that spammers can't "replay" form submissions and
+   flood you with comments.
+
+.. class:: CommentDetailsForm
+
+   Handles the details of the comment itself.
+
+   This class contains the ``name``, ``email``, ``url``, and the ``comment``
+   field itself, along with the associated valdation logic.

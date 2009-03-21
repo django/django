@@ -93,7 +93,12 @@ field::
             data['title'] = self.cleaned_data['title']
             return data
 
-Finally, we'll define a couple of methods in ``my_custom_app/__init__.py`` to point Django at these classes we've created::
+Django provides a couple of "helper" classes to make writing certain types of
+custom comment forms easier; see :mod:`django.contrib.comments.forms` for
+more.
+
+Finally, we'll define a couple of methods in ``my_custom_app/__init__.py`` to
+point Django at these classes we've created::
 
     from my_comments_app.models import CommentWithTitle
     from my_comments_app.forms import CommentFormWithTitle
@@ -104,14 +109,18 @@ Finally, we'll define a couple of methods in ``my_custom_app/__init__.py`` to po
     def get_form():
         return CommentFormWithTitle
 
-The above process should take care of most common situations. For more advanced usage, there are additional methods you can define. Those are explained in the next section.
+The above process should take care of most common situations. For more
+advanced usage, there are additional methods you can define. Those are
+explained in the next section.
 
 .. _custom-comment-app-api:
 
 Custom comment app API
 ======================
 
-The :mod:`django.contrib.comments` app defines the following methods; any custom comment app must define at least one of them. All are optional, however.
+The :mod:`django.contrib.comments` app defines the following methods; any
+custom comment app must define at least one of them. All are optional,
+however.
 
 .. function:: get_model()
 
