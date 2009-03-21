@@ -49,8 +49,8 @@ Optional arguments
                                   context_instance=RequestContext(request))
 
 ``mimetype``
-    .. versionadded:: 1.0 
-    
+    .. versionadded:: 1.0
+
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
@@ -84,21 +84,23 @@ This example is equivalent to::
 
 .. function:: redirect(to[, permanent=False], *args, **kwargs)
 
+   .. versionadded:: 1.1
+
    Returns an HttpResponseRedirect to the apropriate URL for the arguments
    passed.
-   
+
    The arguments could be:
-   
+
        * A model: the model's `get_absolute_url()` function will be called.
-   
+
        * A view name, possibly with arguments: `urlresolvers.reverse()` will
          be used to reverse-resolve the name.
-        
+
        * A URL, which will be used as-is for the redirect location.
-       
+
    By default issues a temporary redirect; pass permanent=True to issue a
    permanent redirect
-   
+
 Examples
 --------
 
@@ -107,32 +109,32 @@ You can use the :func:`redirect` function in a number of ways.
     1. By passing some object; that object's
        :meth:`~django.db.models.Model.get_absolute_url` method will be called
        to figure out the redirect URL::
-       
+
             def my_view(request):
                 ...
                 object = MyModel.objects.get(...)
                 return redirect(object)
-                
+
     2. By passing the name of a view and optionally some positional or
        keyword arguments; the URL will be reverse resolved using the
        :func:`~django.core.urlresolvers.reverse` method::
-       
+
             def my_view(request):
                 ...
                 return redirect('some-view-name', foo='bar')
-                
+
     3. By passing a hardcoded URL to redirect to::
-    
+
             def my_view(request):
                 ...
                 return redirect('/some/url/')
-                
+
        This also works with full URLs::
-       
+
             def my_view(request):
                 ...
                 return redirect('http://example.com/')
-                
+
 By default, :func:`redirect` returns a temporary redirect. All of the above
 forms accept a ``permanent`` argument; if set to ``True`` a permanent redirect
 will be returned::
