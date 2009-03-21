@@ -142,7 +142,7 @@ This is a tuple or list of strings. Each string is a field name with an optional
 "-" prefix, which indicates descending order. Fields without a leading "-" will
 be ordered ascending. Use the string "?" to order randomly.
 
-.. note:: 
+.. note::
 
     Regardless of how many fields are in :attr:`~Options.ordering`, the admin
     site uses only the first field.
@@ -179,7 +179,7 @@ human_readable_permission_name)``.
 
 .. attribute:: Options.proxy
 
-.. versionadded: 1.1
+.. versionadded:: 1.1
 
 If set to ``True``, a model which subclasses another model will be treated as
 a :ref:`proxy model <proxy-models>`.
