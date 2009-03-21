@@ -3,6 +3,8 @@ Unit tests for reverse URL lookups.
 """
 
 from django.core.urlresolvers import reverse, NoReverseMatch
+from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.shortcuts import redirect
 from django.test import TestCase
 
 test_data = (
@@ -97,3 +99,34 @@ class URLPatternReverse(TestCase):
             else:
                 self.assertEquals(got, expected)
 
+class ReverseShortcutTests(TestCase):
+    urls = 'regressiontests.urlpatterns_reverse.urls'
+    
+    def test_redirect_to_object(self):
+        # We don't really need a model; just something with a get_absolute_url
+        class FakeObj(object):
+            def get_absolute_url(self):
+                return "/hi-there/"
+                
+        res = redirect(FakeObj())
+        self.assert_(isinstance(res, HttpResponseRedirect))
+        self.assertEqual(res['Location'], '/hi-there/')
+        
+        res = redirect(FakeObj(), permanent=True)
+        self.assert_(isinstance(res, HttpResponsePermanentRedirect))
+        self.assertEqual(res['Location'], '/hi-there/')
+        
+    def test_redirect_to_view_name(self):
+        res = redirect('hardcoded2')
+        self.assertEqual(res['Location'], '/hardcoded/doc.pdf')
+        res = redirect('places', 1)
+        self.assertEqual(res['Location'], '/places/1/')
+        res = redirect('headlines', year='2008', month='02', day='17')
+        self.assertEqual(res['Location'], '/headlines/2008.02.17/')
+        self.assertRaises(NoReverseMatch, redirect, 'not-a-view')
+        
+    def test_redirect_to_url(self):
+        res = redirect('/foo/')
+        self.assertEqual(res['Location'], '/foo/')
+        res = redirect('http://example.com/')
+        self.assertEqual(res['Location'], 'http://example.com/')
