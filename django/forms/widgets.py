@@ -23,7 +23,7 @@ from urlparse import urljoin
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'PasswordInput',
     'HiddenInput', 'MultipleHiddenInput',
-    'FileInput', 'DateTimeInput', 'TimeInput', 'Textarea', 'CheckboxInput',
+    'FileInput', 'DateInput', 'DateTimeInput', 'TimeInput', 'Textarea', 'CheckboxInput',
     'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
     'CheckboxSelectMultiple', 'MultiWidget',
     'SplitDateTimeWidget',
@@ -285,6 +285,23 @@ class Textarea(Widget):
         return mark_safe(u'<textarea%s>%s</textarea>' % (flatatt(final_attrs),
                 conditional_escape(force_unicode(value))))
 
+class DateInput(Input):
+    input_type = 'text'
+    format = '%Y-%m-%d'     # '2006-10-25'
+
+    def __init__(self, attrs=None, format=None):
+        super(DateInput, self).__init__(attrs)
+        if format:
+            self.format = format
+
+    def render(self, name, value, attrs=None):
+        if value is None:
+            value = ''
+        elif hasattr(value, 'strftime'):
+            value = datetime_safe.new_date(value)
+            value = value.strftime(self.format)
+        return super(DateInput, self).render(name, value, attrs)
+
 class DateTimeInput(Input):
     input_type = 'text'
     format = '%Y-%m-%d %H:%M:%S'     # '2006-10-25 14:30:59'
@@ -304,12 +321,18 @@ class DateTimeInput(Input):
 
 class TimeInput(Input):
     input_type = 'text'
+    format = '%H:%M:%S'     # '14:30:59'
+
+    def __init__(self, attrs=None, format=None):
+        super(TimeInput, self).__init__(attrs)
+        if format:
+            self.format = format
 
     def render(self, name, value, attrs=None):
         if value is None:
             value = ''
-        elif isinstance(value, time):
-            value = value.replace(microsecond=0)
+        elif hasattr(value, 'strftime'):
+            value = value.strftime(self.format)
         return super(TimeInput, self).render(name, value, attrs)
 
 class CheckboxInput(Widget):
@@ -654,8 +677,16 @@ class SplitDateTimeWidget(MultiWidget):
     """
     A Widget that splits datetime input into two <input type="text"> boxes.
     """
-    def __init__(self, attrs=None):
-        widgets = (TextInput(attrs=attrs), TextInput(attrs=attrs))
+    date_format = DateInput.format
+    time_format = TimeInput.format
+
+    def __init__(self, attrs=None, date_format=None, time_format=None):
+        if date_format:
+            self.date_format = date_format
+        if time_format:
+            self.time_format = time_format
+        widgets = (DateInput(attrs=attrs, format=self.date_format),
+                   TimeInput(attrs=attrs, format=self.time_format))
         super(SplitDateTimeWidget, self).__init__(widgets, attrs)
 
     def decompress(self, value):
@@ -670,4 +701,3 @@ class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     def __init__(self, attrs=None):
         widgets = (HiddenInput(attrs=attrs), HiddenInput(attrs=attrs))
         super(SplitDateTimeWidget, self).__init__(widgets, attrs)
-

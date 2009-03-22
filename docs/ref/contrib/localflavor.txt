@@ -66,9 +66,9 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * `United States of America`_
 
 The ``django.contrib.localflavor`` package also includes a ``generic`` subpackage,
-containing useful code that is not specific to one particular country or
-culture. Currently, it defines date and datetime input fields based on those
-from :ref:`forms <topics-forms-index>`, but with non-US default formats.
+containing useful code that is not specific to one particular country or culture.
+Currently, it defines date, datetime and split datetime input fields based on
+those from :ref:`forms <topics-forms-index>`, but with non-US default formats.
 Here's an example of how to use them::
 
     from django import forms

@@ -1071,6 +1071,11 @@ included on both widgets.
 >>> w.render('date', datetime.datetime(2006, 1, 10, 7, 30))
 u'<input type="text" class="pretty" value="2006-01-10" name="date_0" /><input type="text" class="pretty" value="07:30:00" name="date_1" />'
 
+Use 'date_format' and 'time_format' to change the way a value is displayed.
+>>> w = SplitDateTimeWidget(date_format='%d/%m/%Y', time_format='%H:%M')
+>>> w.render('date', datetime.datetime(2006, 1, 10, 7, 30))
+u'<input type="text" name="date_0" value="10/01/2006" /><input type="text" name="date_1" value="07:30" />'
+
 >>> w._has_changed(datetime.datetime(2008, 5, 5, 12, 40, 00), [u'2008-05-05', u'12:40:00'])
 False
 >>> w._has_changed(datetime.datetime(2008, 5, 5, 12, 40, 00), [u'2008-05-05', u'12:41:00'])
@@ -1093,6 +1098,34 @@ u'<input type="text" name="date" value="2007-09-17 12:51:34" />'
 >>> w.render('date', datetime.datetime(2007, 9, 17, 12, 51))
 u'<input type="text" name="date" value="2007-09-17 12:51:00" />'
 
+Use 'format' to change the way a value is displayed.
+>>> w = DateTimeInput(format='%d/%m/%Y %H:%M')
+>>> w.render('date', d)
+u'<input type="text" name="date" value="17/09/2007 12:51" />'
+
+# DateInput ###################################################################
+
+>>> w = DateInput()
+>>> w.render('date', None)
+u'<input type="text" name="date" />'
+>>> d = datetime.date(2007, 9, 17)
+>>> print d
+2007-09-17
+
+>>> w.render('date', d)
+u'<input type="text" name="date" value="2007-09-17" />'
+>>> w.render('date', datetime.date(2007, 9, 17))
+u'<input type="text" name="date" value="2007-09-17" />'
+
+We should be able to initialize from a unicode value.
+>>> w.render('date', u'2007-09-17')
+u'<input type="text" name="date" value="2007-09-17" />'
+
+Use 'format' to change the way a value is displayed.
+>>> w = DateInput(format='%d/%m/%Y')
+>>> w.render('date', d)
+u'<input type="text" name="date" value="17/09/2007" />'
+
 # TimeInput ###################################################################
 
 >>> w = TimeInput()
@@ -1114,6 +1147,11 @@ We should be able to initialize from a unicode value.
 >>> w.render('time', u'13:12:11')
 u'<input type="text" name="time" value="13:12:11" />'
 
+Use 'format' to change the way a value is displayed.
+>>> w = TimeInput(format='%H:%M')
+>>> w.render('time', t)
+u'<input type="text" name="time" value="12:51" />'
+
 # SplitHiddenDateTimeWidget ###################################################
 
 >>> from django.forms.widgets import SplitHiddenDateTimeWidget
@@ -1121,6 +1159,9 @@ u'<input type="text" name="time" value="13:12:11" />'
 >>> w = SplitHiddenDateTimeWidget()
 >>> w.render('date', '')
 u'<input type="hidden" name="date_0" /><input type="hidden" name="date_1" />'
+>>> d = datetime.datetime(2007, 9, 17, 12, 51, 34, 482548)
+>>> print d
+2007-09-17 12:51:34.482548
 >>> w.render('date', d)
 u'<input type="hidden" name="date_0" value="2007-09-17" /><input type="hidden" name="date_1" value="12:51:34" />'
 >>> w.render('date', datetime.datetime(2007, 9, 17, 12, 51, 34))
