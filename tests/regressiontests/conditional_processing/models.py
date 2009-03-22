@@ -50,6 +50,14 @@ class ConditionalGet(TestCase):
         response = self.client.get('/condition/')
         self.assertNotModified(response)
 
+    def testIfMatch(self):
+        self.client.defaults['HTTP_IF_MATCH'] = '"%s"' % ETAG
+        response = self.client.put('/condition/etag/', {'data': ''})
+        self.assertEquals(response.status_code, 200)
+        self.client.defaults['HTTP_IF_MATCH'] = '"%s"' % EXPIRED_ETAG
+        response = self.client.put('/condition/etag/', {'data': ''})
+        self.assertEquals(response.status_code, 412)
+
     def testBothHeaders(self):
         self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_STR
         self.client.defaults['HTTP_IF_NONE_MATCH'] = '"%s"' % ETAG

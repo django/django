@@ -75,7 +75,7 @@ def condition(etag_func=None, last_modified_func=None):
             if if_none_match or if_match:
                 # There can be more than one ETag in the request, so we
                 # consider the list of values.
-                etags = parse_etags(if_none_match)
+                etags = parse_etags(if_none_match or if_match)
 
             # Compute values (if any) for the requested resource.
             if etag_func:
