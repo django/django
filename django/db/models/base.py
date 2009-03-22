@@ -272,14 +272,14 @@ class Model(object):
 
         for field in fields_iter:
             is_related_object = False
+            # This slightly odd construct is so that we can access any
+            # data-descriptor object (DeferredAttribute) without triggering its
+            # __get__ method.
+            if (field.attname not in kwargs and
+                    isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)):
+                # This field will be populated on request.
+                continue
             if kwargs:
-                # This slightly odd construct is so that we can access any
-                # data-descriptor object (DeferredAttribute) without triggering
-                # its __get__ method.
-                if (field.attname not in kwargs and
-                        isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)):
-                    # This field will be populated on request.
-                    continue
                 if isinstance(field.rel, ManyToOneRel):
                     try:
                         # Assume object instance was passed in.
