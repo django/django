@@ -1,8 +1,11 @@
+import re
 import urllib
 from email.Utils import formatdate
 
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.functional import allow_lazy
+
+ETAG_MATCH = re.compile(r'(?:W/)?"((?:\\.|[^"])*)"')
 
 def urlquote(url, safe='/'):
     """
@@ -94,3 +97,23 @@ def int_to_base36(i):
         i = i % j
         factor -= 1
     return ''.join(base36)
+
+def parse_etags(etag_str):
+    """
+    Parses a string with one or several etags passed in If-None-Match and
+    If-Match headers by the rules in RFC 2616. Returns a list of etags
+    without surrounding double quotes (") and unescaped from \<CHAR>.
+    """
+    etags = ETAG_MATCH.findall(etag_str)
+    if not etags:
+        # etag_str has wrong format, treat it as an opaque string then
+        return [etag_str]
+    etags = [e.decode('string_escape') for e in etags]
+    return etags
+
+def quote_etag(etag):
+    """
+    Wraps a string in double quotes escaping contents as necesary.
+    """
+    return '"%s"' % etag.replace('\\', '\\\\').replace('"', '\\"')
+

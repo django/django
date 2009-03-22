@@ -7,9 +7,15 @@ try:
 except ImportError:
     from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
 
+from calendar import timegm
+from datetime import timedelta
+from email.Utils import formatdate
+
 from django.utils.decorators import decorator_from_middleware
+from django.utils.http import parse_etags, quote_etag
 from django.middleware.http import ConditionalGetMiddleware
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponseNotModified, HttpResponse
+
 
 conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
 
@@ -37,3 +43,93 @@ require_GET.__doc__ = "Decorator to require that a view only accept the GET meth
 
 require_POST = require_http_methods(["POST"])
 require_POST.__doc__ = "Decorator to require that a view only accept the POST method."
+
+def condition(etag_func=None, last_modified_func=None):
+    """
+    Decorator to support conditional retrieval (or change) for a view
+    function.
+
+    The parameters are callables to compute the ETag and last modified time for
+    the requested resource, respectively. The callables are passed the same
+    parameters as the view itself. The Etag function should return a string (or
+    None if the resource doesn't exist), whilst the last_modified function
+    should return a datetime object (or None if the resource doesn't exist).
+
+    If both parameters are provided, all the preconditions must be met before
+    the view is processed.
+
+    This decorator will either pass control to the wrapped view function or
+    return an HTTP 304 response (unmodified) or 412 response (preconditions
+    failed), depending upon the request method.
+
+    Any behavior marked as "undefined" in the HTTP spec (e.g. If-none-match
+    plus If-modified-since headers) will result in the view function being
+    called.
+    """
+    def decorator(func):
+        def inner(request, *args, **kwargs):
+            # Get HTTP request headers
+            if_modified_since = request.META.get("HTTP_IF_MODIFIED_SINCE")
+            if_none_match = request.META.get("HTTP_IF_NONE_MATCH")
+            if_match = request.META.get("HTTP_IF_MATCH")
+            if if_none_match or if_match:
+                # There can be more than one ETag in the request, so we
+                # consider the list of values.
+                etags = parse_etags(if_none_match)
+
+            # Compute values (if any) for the requested resource.
+            if etag_func:
+                res_etag = etag_func(request, *args, **kwargs)
+            else:
+                res_etag = None
+            if last_modified_func:
+                dt = last_modified_func(request, *args, **kwargs)
+                if dt:
+                    res_last_modified = formatdate(timegm(dt.utctimetuple()))[:26] + 'GMT'
+                else:
+                    res_last_modified = None
+            else:
+                res_last_modified = None
+
+            response = None
+            if not ((if_match and (if_modified_since or if_none_match)) or
+                    (if_match and if_none_match)):
+                # We only get here if no undefined combinations of headers are
+                # specified.
+                if ((if_none_match and (res_etag in etags or
+                        "*" in etags and res_etag)) and
+                        (not if_modified_since or
+                            res_last_modified == if_modified_since)):
+                    if request.method in ("GET", "HEAD"):
+                        response = HttpResponseNotModified()
+                    else:
+                        response = HttpResponse(status=412)
+                elif if_match and ((not res_etag and "*" in etags) or
+                        (res_etag and res_etag not in etags)):
+                    response = HttpResponse(status=412)
+                elif (not if_none_match and if_modified_since and
+                        request.method == "GET" and
+                        res_last_modified == if_modified_since):
+                    response = HttpResponseNotModified()
+
+            if response is None:
+                response = func(request, *args, **kwargs)
+
+            # Set relevant headers on the response if they don't already exist.
+            if res_last_modified and not response.has_header('Last-Modified'):
+                response['Last-Modified'] = res_last_modified
+            if res_etag and not response.has_header('ETag'):
+                response['ETag'] = quote_etag(res_etag)
+
+            return response
+
+        return inner
+    return decorator
+
+# Shortcut decorators for common cases based on ETag or Last-Modified only
+def etag(callable):
+    return condition(etag=callable)
+
+def last_modified(callable):
+    return condition(last_modified=callable)
+

@@ -18,6 +18,7 @@ Introductions to all the key parts of Django you'll need to know:
    testing
    auth
    cache
+   conditional-view-processing
    email
    i18n
    pagination

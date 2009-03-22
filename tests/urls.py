@@ -20,11 +20,11 @@ urlpatterns = patterns('',
 
     # test urlconf for middleware tests
     (r'^middleware/', include('regressiontests.middleware.urls')),
-    
+
     # admin view tests
     (r'^test_admin/', include('regressiontests.admin_views.urls')),
     (r'^generic_inline_admin/', include('regressiontests.generic_inline_admin.urls')),
-    
+
     # admin widget tests
     (r'widget_admin/', include('regressiontests.admin_widgets.urls')),
 
@@ -32,4 +32,7 @@ urlpatterns = patterns('',
 
     # test urlconf for syndication tests
     (r'^syndication/', include('regressiontests.syndication.urls')),
+
+    # conditional get views
+    (r'condition/', include('regressiontests.conditional_processing.urls')),
 )
