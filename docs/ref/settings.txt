@@ -760,10 +760,9 @@ MIDDLEWARE_CLASSES
 
 Default::
 
-    ("django.contrib.sessions.middleware.SessionMiddleware",
-     "django.contrib.auth.middleware.AuthenticationMiddleware",
-     "django.middleware.common.CommonMiddleware",
-     "django.middleware.doc.XViewMiddleware")
+    ('django.middleware.common.CommonMiddleware',
+     'django.contrib.sessions.middleware.SessionMiddleware',
+     'django.contrib.auth.middleware.AuthenticationMiddleware',)
 
 A tuple of middleware classes to use. See :ref:`topics-http-middleware`.
 

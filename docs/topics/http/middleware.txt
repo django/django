@@ -30,7 +30,6 @@ created by :djadmin:`django-admin.py startproject <startproject>`::
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.middleware.doc.XViewMiddleware',
     )
 
 During the request phases (:meth:`process_request` and :meth:`process_view`
