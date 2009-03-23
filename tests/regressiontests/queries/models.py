@@ -830,7 +830,7 @@ in MySQL. This exercises that case.
 A values() or values_list() query across joined models must use outer joins
 appropriately.
 >>> Report.objects.values_list("creator__extra__info", flat=True).order_by("name")
-[u'e1', u'e2', None]
+[u'e1', u'e2', <NONE_OR_EMPTY_UNICODE>]
 
 Similarly for select_related(), joins beyond an initial nullable join must
 use outer joins so that all results are included.
@@ -1114,6 +1114,14 @@ FieldError: Infinite loop caused by ordering.
 []
 
 """
+
+
+# In Oracle, we expect a null CharField to return u'' instead of None.
+if settings.DATABASE_ENGINE == "oracle":
+    __test__["API_TESTS"] = __test__["API_TESTS"].replace("<NONE_OR_EMPTY_UNICODE>", "u''")
+else:
+    __test__["API_TESTS"] = __test__["API_TESTS"].replace("<NONE_OR_EMPTY_UNICODE>", "None")
+
 
 # Generator expressions are only in Python 2.4 and later.
 if sys.version_info >= (2, 4):
