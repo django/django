@@ -24,7 +24,7 @@ those packages have.
 .. toctree::
    :maxdepth: 1
 
-   admin
+   admin/index
    auth
    comments/index
    contenttypes

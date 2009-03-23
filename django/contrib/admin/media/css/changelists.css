@@ -50,10 +50,22 @@
 
 #changelist table thead th {
     white-space: nowrap;
+    vertical-align: middle;
+}
+
+#changelist table thead th:first-child {
+    width: 1.5em;
+    text-align: center;
 }
 
 #changelist table tbody td {
     border-left: 1px solid #ddd;
+}
+
+#changelist table tbody td:first-child {
+    border-left: 0;
+    border-right: 1px solid #ddd;
+    text-align: center;
 }
 
 #changelist table tfoot {
@@ -209,3 +221,35 @@
     border-color: #036;
 }
 
+/* ACTIONS */
+
+.filtered .actions {
+    margin-right: 160px !important;
+    border-right: 1px solid #ddd;
+}
+
+#changelist .actions {
+    color: #666;
+    padding: 3px;
+    border-bottom: 1px solid #ddd;
+    background: #e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x;
+}
+
+#changelist .actions:last-child {
+    border-bottom: none;
+}
+
+#changelist .actions select {
+    border: 1px solid #aaa;
+    margin: 0 0.5em;
+    padding: 1px 2px;
+}
+
+#changelist .actions label {
+    font-size: 11px;
+    margin: 0 0.5em;
+}
+
+#changelist #action-toggle {
+    display: none;
+}

@@ -49,7 +49,7 @@ AlreadyRegistered: The model Person is already registered
 >>> site._registry[Person].search_fields
 ['name']
 >>> site._registry[Person].list_display
-['__str__']
+['action_checkbox', '__str__']
 >>> site._registry[Person].save_on_top
 True
 

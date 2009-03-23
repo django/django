@@ -7,8 +7,8 @@
   {% if cl.formset %}
     <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />
     <script type="text/javascript" src="../../jsi18n/"></script>
-    {{ media }}
   {% endif %}
+  {{ media }}
 {% endblock %}
 
 {% block bodyclass %}change-list{% endblock %}
@@ -63,14 +63,18 @@
         {% endif %}
       {% endblock %}
       
+      <form action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %}>
       {% if cl.formset %}
-        <form action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %}>
         {{ cl.formset.management_form }}
       {% endif %}
 
-      {% block result_list %}{% result_list cl %}{% endblock %}
+      {% block result_list %}
+          {% if actions_on_top and cl.full_result_count %}{% admin_actions %}{% endif %}
+          {% result_list cl %}
+          {% if actions_on_bottom and cl.full_result_count %}{% admin_actions %}{% endif %}
+      {% endblock %}
       {% block pagination %}{% pagination cl %}{% endblock %}
-      {% if cl.formset %}</form>{% endif %}
+      </form>
     </div>
   </div>
 {% endblock %}

@@ -78,7 +78,7 @@ The development process
 Other batteries included
 ========================
 
-    * :ref:`Admin site <ref-contrib-admin>`
+    * :ref:`Admin site <ref-contrib-admin>` | :ref:`Admin actions <ref-contrib-admin-actions>`
     * :ref:`Authentication <topics-auth>`
     * :ref:`Cache system <topics-cache>`
     * :ref:`Conditional content processing <topics-conditional-processing>`

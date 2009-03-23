@@ -1,0 +1,239 @@
+.. _ref-contrib-admin-actions:
+
+=============
+Admin actions
+=============
+
+.. versionadded:: 1.1
+
+.. currentmodule:: django.contrib.admin
+
+The basic workflow of Django's admin is, in a nutshell, "select an object,
+then change it." This works well for a majority of use cases. However, if you
+need to make the same change to many objects at once, this workflow can be
+quite tedious.
+
+In these cases, Django's admin lets you write and register "actions" -- simple
+functions that get called with a list of objects selected on the change list
+page.
+
+If you look at any change list in the admin, you'll see this feature in
+action; Django ships with a "delete selected objects" action available to all
+models. For example, here's the user module from Django's built-in
+:mod:`django.contrib.auth` app:
+
+.. image:: _images/user_actions.png
+    
+Read on to find out how to add your own actions to this list.
+
+Writing actions
+===============
+
+The easiest way to explain actions is by example, so let's dive in.
+
+A common use case for admin actions is the bulk updating of a model. Imagine a simple
+news application with an ``Article`` model::
+
+    from django.db import models
+
+    STATUS_CHOICES = (
+        ('d', 'Draft'),
+        ('p', 'Published'),
+        ('w', 'Withdrawn'),
+    )
+
+    class Article(models.Model):
+        title = models.CharField(max_length=100)
+        body = models.TextField()
+        status = models.CharField(max_length=1, choices=STATUS_CHOICES)
+    
+        def __unicode__(self):
+            return self.title
+        
+A common task we might perform with a model like this is to update an
+article's status from "draft" to "published". We could easily do this in the
+admin one article at a time, but if we wanted to bulk-publish a group of
+articles, it'd be tedious. So, let's write an action that lets us change an
+article's status to "published."
+
+Writing action functions
+------------------------
+
+First, we'll need to write a function that gets called when the action is
+trigged from the admin. Action functions are just regular functions that take
+two arguments: an :class:`~django.http.HttpRequest` representing the current
+request, and a :class:`~django.db.models.QuerySet` containing the set of
+objects selected by the user. Our publish-these-articles function won't need
+the request object, but we will use the queryset::
+
+    def make_published(request, queryset):
+        queryset.update(status='p')
+        
+.. note::
+
+    For the best performance, we're using the queryset's :ref:`update method
+    <topics-db-queries-update>`. Other types of actions might need to deal
+    with each object individually; in these cases we'd just iterate over the
+    queryset::
+    
+        for obj in queryset:
+            do_something_with(obj)
+            
+That's actually all there is to writing an action! However, we'll take one
+more optional-but-useful step and give the action a "nice" title in the admin.
+By default, this action would appear in the action list as "Make published" --
+the function name, with underscores replaced by spaces. That's fine, but we
+can provide a better, more human-friendly name by giving the
+``make_published`` function a ``short_description`` attribute::
+
+    def make_published(request, queryset):
+        queryset.update(status='p')
+    make_published.short_description = "Mark selected stories as published"
+    
+.. note::
+
+    This might look familiar; the admin's ``list_display`` option uses the
+    same technique to provide human-readable descriptions for callback
+    functions registered there, too.
+    
+Adding actions to the :class:`ModelAdmin`
+-----------------------------------------
+
+Next, we'll need to inform our :class:`ModelAdmin` of the action. This works
+just like any other configuration option. So, the complete ``admin.py`` with
+the action and its registration would look like::
+
+    from django.contrib import admin
+    from myapp.models import Article
+
+    def make_published(request, queryset):
+        queryset.update(status='p')
+    make_published.short_description = "Mark selected stories as published"
+
+    class ArticleAdmin(admin.ModelAdmin):
+        list_display = ['title', 'status']
+        ordering = ['title']
+        actions = [make_published]
+
+    admin.site.register(Article, ArticleAdmin)
+    
+That code will give us an admin change list that looks something like this:
+
+.. image:: _images/article_actions.png
+    
+That's really all there is to it! If you're itching to write your own actions,
+you now know enough to get started. The rest of this document just covers more
+advanced techniques.
+
+Advanced action techniques
+==========================
+
+There's a couple of extra options and possibilities you can exploit for more
+advanced options.
+
+Actions as :class:`ModelAdmin` methods
+--------------------------------------
+
+The example above shows the ``make_published`` action defined as a simple
+function. That's perfectly fine, but it's not perfect from a code design point
+of view: since the action is tightly coupled to the ``Article`` object, it
+makes sense to hook the action to the ``ArticleAdmin`` object itself.
+
+That's easy enough to do::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        ...
+        
+        actions = ['make_published']
+
+        def make_published(self, request, queryset):
+            queryset.update(status='p')
+        make_published.short_description = "Mark selected stories as published"
+        
+Notice first that we've moved ``make_published`` into a method (remembering to
+add the ``self`` argument!), and second that we've now put the string
+``'make_published'`` in ``actions`` instead of a direct function reference.
+This tells the :class:`ModelAdmin` to look up the action as a method.
+
+Defining actions as methods is especially nice because it gives the action
+access to the :class:`ModelAdmin` itself, allowing the action to call any of
+the methods provided by the admin.
+
+For example, we can use ``self`` to flash a message to the user informing her
+that the action was successful::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        ...
+
+        def make_published(self, request, queryset):
+            rows_updated = queryset.update(status='p')
+            if rows_updated == 1:
+                message_bit = "1 story was"
+            else:
+                message_bit = "%s stories were" % rows_updated
+            self.message_user(request, "%s successfully marked as published." % message_bit)
+
+This make the action match what the admin itself does after successfully
+performing an action:
+
+.. image:: _images/article_actions_message.png
+    
+Actions that provide intermediate pages
+---------------------------------------
+
+By default, after an action is performed the user is simply redirected back
+the the original change list page. However, some actions, especially more
+complex ones, will need to return intermediate pages. For example, the
+built-in delete action asks for confirmation before deleting the selected
+objects.
+
+To provide an intermediary page, simply return an
+:class:`~django.http.HttpResponse` (or subclass) from your action. For
+example, you might write a simple export function that uses Django's
+:ref:`serialization functions <topics-serialization>` to dump some selected
+objects as JSON::
+
+    from django.http import HttpResponse
+    from django.core import serializers
+
+    def export_as_json(request, queryset):
+        response = HttpResponse(mimetype="text/javascript")
+        serialize.serialize(queryset, stream=response)
+        return response
+
+Generally, something like the above isn't considered a great idea. Most of the
+time, the best practice will be to return an
+:class:`~django.http.HttpResponseRedirect` and redirect the user to a view
+you've written, passing the list of selected objects in the GET query string.
+This allows you to provide complex interaction logic on the intermediary
+pages. For example, if you wanted to provide a more complete export function,
+you'd want to let the user choose a format, and possibly a list of fields to
+include in the export. The best thing to do would be to write a small action that simply redirects
+to your custom export view::
+
+    from django.contrib import admin
+    from django.contrib.contenttypes.models import ContentType
+    from django.http import HttpResponseRedirect
+    
+    def export_selected_objects(request, queryset):
+        selected = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
+        ct = ContentType.objects.get_for_model(queryset.model)
+        return HttpResponseRedirect("/export/?ct=%s&ids=%s" % (ct.pk, ",".join(selected)))
+
+As you can see, the action is the simple part; all the complex logic would
+belong in your export view. This would need to deal with objects of any type,
+hence the business with the ``ContentType``.
+
+Writing this view is left as an exercise to the reader.
+
+Making actions available globally
+---------------------------------
+
+Some actions are best if they're made available to *any* object in the admin
+-- the export action defined above would be a good candidate. You can make an
+action globally available using :meth:`AdminSite.add_action()`::
+
+    from django.contrib import admin
+        
+    admin.site.add_action(export_selected_objects)
+    

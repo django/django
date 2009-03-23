@@ -325,3 +325,12 @@ search_form = register.inclusion_tag('admin/search_form.html')(search_form)
 def admin_list_filter(cl, spec):
     return {'title': spec.title(), 'choices' : list(spec.choices(cl))}
 admin_list_filter = register.inclusion_tag('admin/filter.html')(admin_list_filter)
+
+def admin_actions(context):
+    """
+    Track the number of times the action field has been rendered on the page,
+    so we know which value to use.
+    """
+    context['action_index'] = context.get('action_index', -1) + 1
+    return context
+admin_actions = register.inclusion_tag("admin/actions.html", takes_context=True)(admin_actions)

@@ -8,10 +8,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import LOGIN_FORM_KEY
 from django.contrib.admin.util import quote
+from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.utils.html import escape
 
 # local test models
-from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey, Person, Persona, FooAccount, BarAccount
+from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey, Person, Persona, FooAccount, BarAccount, Subscriber, ExternalSubscriber
 
 try:
     set
@@ -516,7 +517,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def test_changelist_to_changeform_link(self):
         "The link from the changelist referring to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/')
-        should_contain = """<tr class="row1"><th><a href="%s/">%s</a></th></tr>""" % (quote(self.pk), escape(self.pk))
+        should_contain = """<th><a href="%s/">%s</a></th></tr>""" % (quote(self.pk), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_link(self):
@@ -738,29 +739,30 @@ class AdminViewListEditable(TestCase):
 
     def tearDown(self):
         self.client.logout()
-    
+
     def test_changelist_input_html(self):
         response = self.client.get('/test_admin/admin/admin_views/person/')
         # 2 inputs per object(the field and the hidden id field) = 6
         # 2 management hidden fields = 2
+        # 4 action inputs (3 regular checkboxes, 1 checkbox to select all)
         # main form submit button = 1
         # search field and search submit button = 2
         # 6 + 2 + 1 + 2 = 11 inputs
-        self.failUnlessEqual(response.content.count("<input"), 11)
+        self.failUnlessEqual(response.content.count("<input"), 15)
         # 1 select per object = 3 selects
-        self.failUnlessEqual(response.content.count("<select"), 3)
-    
+        self.failUnlessEqual(response.content.count("<select"), 4)
+
     def test_post_submission(self):
         data = {
             "form-TOTAL_FORMS": "3",
             "form-INITIAL_FORMS": "3",
-            
+
             "form-0-gender": "1",
             "form-0-id": "1",
-            
+
             "form-1-gender": "2",
             "form-1-id": "2",
-            
+
             "form-2-alive": "checked",
             "form-2-gender": "1",
             "form-2-id": "3",
@@ -769,34 +771,34 @@ class AdminViewListEditable(TestCase):
 
         self.failUnlessEqual(Person.objects.get(name="John Mauchly").alive, False)
         self.failUnlessEqual(Person.objects.get(name="Grace Hooper").gender, 2)
-        
+
         # test a filtered page
         data = {
             "form-TOTAL_FORMS": "2",
             "form-INITIAL_FORMS": "2",
-            
+
             "form-0-id": "1",
             "form-0-gender": "1",
             "form-0-alive": "checked",
-            
+
             "form-1-id": "3",
             "form-1-gender": "1",
             "form-1-alive": "checked",
         }
         self.client.post('/test_admin/admin/admin_views/person/?gender__exact=1', data)
-        
+
         self.failUnlessEqual(Person.objects.get(name="John Mauchly").alive, True)
-        
+
         # test a searched page
         data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "1",
-            
+
             "form-0-id": "1",
             "form-0-gender": "1"
         }
         self.client.post('/test_admin/admin/admin_views/person/?q=mauchly', data)
-        
+
         self.failUnlessEqual(Person.objects.get(name="John Mauchly").alive, False)
 
 class AdminInheritedInlinesTest(TestCase):
@@ -875,3 +877,65 @@ class AdminInheritedInlinesTest(TestCase):
         self.failUnlessEqual(FooAccount.objects.all()[0].username, "%s-1" % foo_user)
         self.failUnlessEqual(BarAccount.objects.all()[0].username, "%s-1" % bar_user)
         self.failUnlessEqual(Persona.objects.all()[0].accounts.count(), 2)
+
+from django.core import mail
+
+class AdminActionsTest(TestCase):
+    fixtures = ['admin-views-users.xml', 'admin-views-actions.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_model_admin_custom_action(self):
+        "Tests a custom action defined in a ModelAdmin method"
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action' : 'mail_admin',
+            'index': 0,
+        }
+        response = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, 'Greetings from a ModelAdmin action')
+
+    def test_model_admin_default_delete_action(self):
+        "Tests the default delete action defined as a ModelAdmin method"
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1, 2],
+            'action' : 'delete_selected',
+            'index': 0,
+        }
+        delete_confirmation_data = {
+            ACTION_CHECKBOX_NAME: [1, 2],
+            'action' : 'delete_selected',
+            'index': 0,
+            'post': 'yes',
+        }
+        confirmation = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
+        self.assertContains(confirmation, "Are you sure you want to delete the selected subscriber objects")
+        self.failUnless(confirmation.content.count(ACTION_CHECKBOX_NAME) == 2)
+        response = self.client.post('/test_admin/admin/admin_views/subscriber/', delete_confirmation_data)
+        self.failUnlessEqual(Subscriber.objects.count(), 0)
+
+    def test_custom_function_mail_action(self):
+        "Tests a custom action defined in a function"
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action' : 'external_mail',
+            'index': 0,
+        }
+        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, 'Greetings from a function action')
+
+    def test_custom_function_action_with_redirect(self):
+        "Tests a custom action defined in a function"
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action' : 'redirect_to',
+            'index': 0,
+        }
+        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
+        self.failUnlessEqual(response.status_code, 302)

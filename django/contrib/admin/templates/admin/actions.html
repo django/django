@@ -1,0 +1,5 @@
+{% load i18n %}
+<div class="actions">
+    {% for field in action_form %}<label>{{ field.label }} {{ field }}</label>{% endfor %}
+    <button type="submit" class="button" title="{% trans "Run the selected action" %}" name="index" value="{{ action_index|default:0 }}">{% trans "Go" %}</button>
+</div>

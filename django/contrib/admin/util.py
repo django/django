@@ -4,7 +4,8 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.encoding import force_unicode
-from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext, ugettext as _
+from django.core.urlresolvers import reverse, NoReverseMatch
 
 def quote(s):
     """
@@ -60,8 +61,27 @@ def _nest_help(obj, depth, val):
         current = current[-1]
     current.append(val)
 
-def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_depth, admin_site):
-    "Helper function that recursively populates deleted_objects."
+def get_change_view_url(app_label, module_name, pk, admin_site, levels_to_root):
+    """
+    Returns the url to the admin change view for the given app_label,
+    module_name and primary key.
+    """
+    try:
+        return reverse('%sadmin_%s_%s_change' % (admin_site.name, app_label, module_name), None, (pk,))
+    except NoReverseMatch:
+        return '%s%s/%s/%s/' % ('../'*levels_to_root, app_label, module_name, pk)
+
+def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_depth, admin_site, levels_to_root=4):
+    """
+    Helper function that recursively populates deleted_objects.
+
+    `levels_to_root` defines the number of directories (../) to reach the
+    admin root path. In a change_view this is 4, in a change_list view 2.
+
+    This is for backwards compatibility since the options.delete_selected
+    method uses this function also from a change_list view.
+    This will not be used if we can reverse the URL.
+    """
     nh = _nest_help # Bind to local variable for performance
     if current_depth > 16:
         return # Avoid recursing too deep.
@@ -91,11 +111,13 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
                         [u'%s: %s' % (capfirst(related.opts.verbose_name), force_unicode(sub_obj)), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, [mark_safe(u'%s: <a href="../../../../%s/%s/%s/">%s</a>' %
+                    nh(deleted_objects, current_depth, [mark_safe(u'%s: <a href="%s">%s</a>' %
                         (escape(capfirst(related.opts.verbose_name)),
-                        related.opts.app_label,
-                        related.opts.object_name.lower(),
-                        sub_obj._get_pk_val(),
+                        get_change_view_url(related.opts.app_label,
+                                            related.opts.object_name.lower(),
+                                            sub_obj._get_pk_val(),
+                                            admin_site,
+                                            levels_to_root),
                         escape(sub_obj))), []])
                 get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2, admin_site)
         else:
@@ -109,11 +131,13 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
                         [u'%s: %s' % (capfirst(related.opts.verbose_name), force_unicode(sub_obj)), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, [mark_safe(u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % 
+                    nh(deleted_objects, current_depth, [mark_safe(u'%s: <a href="%s">%s</a>' %
                         (escape(capfirst(related.opts.verbose_name)),
-                        related.opts.app_label,
-                        related.opts.object_name.lower(),
-                        sub_obj._get_pk_val(),
+                        get_change_view_url(related.opts.app_label,
+                                            related.opts.object_name.lower(),
+                                            sub_obj._get_pk_val(),
+                                            admin_site,
+                                            levels_to_root),
                         escape(sub_obj))), []])
                 get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2, admin_site)
             # If there were related objects, and the user doesn't have
@@ -147,11 +171,52 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, [
                         mark_safe((_('One or more %(fieldname)s in %(name)s:') % {'fieldname': escape(force_unicode(related.field.verbose_name)), 'name': escape(force_unicode(related.opts.verbose_name))}) + \
-                        (u' <a href="../../../../%s/%s/%s/">%s</a>' % \
-                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(sub_obj)))), []])
+                        (u' <a href="%s">%s</a>' % \
+                            (get_change_view_url(related.opts.app_label,
+                                                 related.opts.object_name.lower(),
+                                                 sub_obj._get_pk_val(),
+                                                 admin_site,
+                                                 levels_to_root),
+                            escape(sub_obj)))), []])
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
         if has_admin and has_related_objs:
             p = u'%s.%s' % (related.opts.app_label, related.opts.get_change_permission())
             if not user.has_perm(p):
                 perms_needed.add(related.opts.verbose_name)
+
+def model_format_dict(obj):
+    """
+    Return a `dict` with keys 'verbose_name' and 'verbose_name_plural',
+    typically for use with string formatting.
+
+    `obj` may be a `Model` instance, `Model` subclass, or `QuerySet` instance.
+
+    """
+    if isinstance(obj, (models.Model, models.base.ModelBase)):
+        opts = obj._meta
+    elif isinstance(obj, models.query.QuerySet):
+        opts = obj.model._meta
+    else:
+        opts = obj
+    return {
+        'verbose_name': force_unicode(opts.verbose_name),
+        'verbose_name_plural': force_unicode(opts.verbose_name_plural)
+    }
+
+def model_ngettext(obj, n=None):
+    """
+    Return the appropriate `verbose_name` or `verbose_name_plural` for `obj`
+    depending on the count `n`.
+
+    `obj` may be a `Model` instance, `Model` subclass, or `QuerySet` instance.
+    If `obj` is a `QuerySet` instance, `n` is optional and the length of the
+    `QuerySet` is used.
+
+    """
+    if isinstance(obj, models.query.QuerySet):
+        if n is None:
+            n = obj.count()
+        obj = obj.model
+    d = model_format_dict(obj)
+    return ungettext(d['verbose_name'], d['verbose_name_plural'], n or 0)
