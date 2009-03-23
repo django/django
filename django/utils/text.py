@@ -203,24 +203,19 @@ def smart_split(text):
     Generator that splits a string by spaces, leaving quoted phrases together.
     Supports both single and double quotes, and supports escaping quotes with
     backslashes. In the output, strings will keep their initial and trailing
-    quote marks.
+    quote marks and escaped quotes will remain escaped (the results can then
+    be further processed with unescape_string_literal()).
 
     >>> list(smart_split(r'This is "a person\'s" test.'))
     [u'This', u'is', u'"a person\\\'s"', u'test.']
-    >>> list(smart_split(r"Another 'person\'s' test.")) 
-    [u'Another', u"'person's'", u'test.']
-    >>> list(smart_split(r'A "\"funky\" style" test.')) 
-    [u'A', u'""funky" style"', u'test.']
+    >>> list(smart_split(r"Another 'person\'s' test."))
+    [u'Another', u"'person\\'s'", u'test.']
+    >>> list(smart_split(r'A "\"funky\" style" test.'))
+    [u'A', u'"\\"funky\\" style"', u'test.']
     """
     text = force_unicode(text)
     for bit in smart_split_re.finditer(text):
-        bit = bit.group(0)
-        if bit[0] == '"' and bit[-1] == '"':
-            yield '"' + bit[1:-1].replace('\\"', '"').replace('\\\\', '\\') + '"'
-        elif bit[0] == "'" and bit[-1] == "'":
-            yield "'" + bit[1:-1].replace("\\'", "'").replace("\\\\", "\\") + "'"
-        else:
-            yield bit
+        yield bit.group(0)
 smart_split = allow_lazy(smart_split, unicode)
 
 def _replace_entity(match):
@@ -246,3 +241,24 @@ _entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 def unescape_entities(text):
      return _entity_re.sub(_replace_entity, text)
 unescape_entities = allow_lazy(unescape_entities, unicode)
+
+def unescape_string_literal(s):
+    r"""
+    Convert quoted string literals to unquoted strings with escaped quotes and
+    backslashes unquoted::
+
+        >>> unescape_string_literal('"abc"')
+        'abc'
+        >>> unescape_string_literal("'abc'")
+        'abc'
+        >>> unescape_string_literal('"a \"bc\""')
+        'a "bc"'
+        >>> unescape_string_literal("'\'ab\' c'")
+        "'ab' c"
+    """
+    if s[0] not in "\"'" or s[-1] != s[0]:
+        raise ValueError("Not a string literal: %r" % s)
+    quote = s[0]
+    return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
+unescape_string_literal = allow_lazy(unescape_string_literal)
+

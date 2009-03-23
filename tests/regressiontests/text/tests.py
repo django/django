@@ -10,7 +10,7 @@ r"""
 >>> print list(smart_split(r'''This is "a person's" test.'''))[2]
 "a person's"
 >>> print list(smart_split(r'''This is "a person\"s" test.'''))[2]
-"a person"s"
+"a person\"s"
 >>> list(smart_split('''"a 'one'''))
 [u'"a', u"'one"]
 >>> print list(smart_split(r'''all friends' tests'''))[1]

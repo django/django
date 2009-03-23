@@ -20,6 +20,7 @@ from django.utils.tzinfo import LocalTimezone
 
 from unicode import unicode_tests
 from context import context_tests
+from parser import filter_parsing, variable_parsing
 
 try:
     from loaders import *
@@ -31,7 +32,8 @@ import filters
 # Some other tests we would like to run
 __test__ = {
     'unicode': unicode_tests,
-    'context': context_tests
+    'context': context_tests,
+    'filter_parsing': filter_parsing,
 }
 
 #################################
