@@ -1,0 +1,209 @@
+.. _releases-1.1-beta-1:
+
+===============================
+Django 1.1 beta 1 release notes
+===============================
+
+March 23, 2009
+
+Welcome to Django 1.1 beta 1!
+
+This is the second in a series of preview/development releases leading up to
+the eventual release of Django 1.1, currently scheduled to take place in April
+2009. This release is primarily targeted at developers who are interested in
+trying out new features and testing the Django codebase to help identify and
+resolve bugs prior to the final 1.1 release.
+
+As such, this release is *not* intended for production use, and any such use
+is discouraged.
+
+What's new in Django 1.1 beta 1
+===============================
+
+.. seealso::
+
+    The :ref:`1.1 alpha release notes <releases-1.1-alpha-1>`, which has a
+    list of everything new between Django 1.0 and Django 1.1 alpha.
+
+Model improvements
+------------------
+
+.. currentmodule:: django.db.models
+
+A number of features have been added to Django's model layer:
+
+"Unmanaged" models
+~~~~~~~~~~~~~~~~~~
+
+You can now control whether or not Django creates database tables for a model
+using the :attr:`~Options.managed` model option. This defaults to ``True``,
+meaning that Django will create the appropriate database tables in
+:djadmin:`syncdb` and remove them as part of :djadmin:`reset` command. That
+is, Django *manages* the database table's lifecycle.
+
+If you set this to ``False``, however, no database table creating or deletion
+will be automatically performed for this model. This is useful if the model
+represents an existing table or a database view that has been created by some
+other means.
+
+For more details, see the documentation for the :attr:`~Options.managed`
+option.
+
+Proxy models
+~~~~~~~~~~~~
+
+You can now create :ref:`proxy models <proxy-models>`: subclasses of existing
+models that only add Python behavior and aren't represented by a new table.
+That is, the new model is a *proxy* for some underlying model, which stores
+all the real data.
+
+All the details can be found in the :ref:`proxy models documentation
+<proxy-models>`. This feature is similar on the surface to unmanaged models,
+so the documentation has an explanation of :ref:`how proxy models differ from
+unmanaged models <proxy-vs-unmanaged-models>`.
+
+Deferred fields
+~~~~~~~~~~~~~~~
+
+In some complex situations, your models might contain fields which could
+contain a lot of data (for example, large text fields), or require expensive
+processing to convert them to Python objects. If you know you don't need those
+particular fields, you can now tell Django not to retrieve them from the
+database.
+
+You'll do this with the :ref:`new queryset methods <queryset-defer>`
+``defer()`` and ``only()``.
+
+New admin features
+------------------
+
+Since 1.1 alpha, a couple of new features have been added to Django's admin
+application:
+
+Editable fields on the change list
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can now make fields editable on the admin list views via the new
+:ref:`list_editable <admin-list-editable>` admin option. These fields will show
+up as form widgets on the list pages, and can be edited and saved in bulk.
+
+Admin "actions"
+~~~~~~~~~~~~~~~
+
+You can now define :ref:`admin actions <ref-contrib-admin-actions>` that can perform
+some action to a group of models in bulk. Users will be able to select objects on
+the change list page and then apply these bulk actions to all selected objects.
+
+Django ships with one pre-defined admin action to delete a group of objects in
+one fell swoop.
+
+Testing improvements
+--------------------
+
+.. currentmodule:: django.test.client
+
+A couple of small but very useful improvements have been made to the
+:ref:`testing framework <topics-testing>`:
+
+    * The test :class:`Client` now can automatically follow redirects with the
+      ``follow`` argument to :meth:`Client.get` and :meth:`Client.post`. This
+      makes testing views that issue redirects simpler.
+      
+    * It's now easier to get at the template context in the response returned
+      the test client: you'll simply access the context as
+      ``request.context[key]``. The old way, which treats ``request.context``
+      as a list of contexts, one for each rendered template, is still
+      available if you need it.
+      
+Conditional view processing
+---------------------------
+
+Django now has much better support for :ref:`conditional view processing
+<topics-conditional-processing>` using the standard ``ETag`` and
+``Last-Modified`` HTTP headers. This means you can now easily short-circuit
+view processing by testing less-expensive conditions. For many views this can
+lead to a serious improvement in speed and reduction in bandwidth.
+
+Other improvements
+------------------
+
+Finally, a grab-bag of other neat features made their way into this beta
+release, including:
+
+    * The :djadmin:`dumpdata` management command now accepts individual
+      model names as arguments, allowing you to export the data just from
+      particular models.
+      
+    * There's a new :tfilter:`safeseq` template filter which works just like
+      :tfilter:`safe` for lists, marking each item in the list as safe.
+      
+    * :ref:`Cache backends <topics-cache>` now support ``incr()`` and
+      ``decr()`` commands to increment and decrement the value of a cache key.
+      On cache backends that support atomic increment/decrement -- most
+      notably, the memcached backend -- these operations will be atomic, and
+      quite fast.
+      
+    * Django now can :ref:`easily delegate authentication to the web server
+      <howto-auth-remote-user>` via a new authentication backend that supports
+      the standard ``REMOTE_USER`` environment variable used for this purpose.
+      
+    * There's a new :func:`django.shortcuts.redirect` function that makes it
+      easier to issue redirects given an object, a view name, or a URL.
+      
+    * The ``postgresql_psycopg2`` backend now supports :ref:`native PostgreSQL
+      autocommit <postgresql-notes>`. This is an advanced, PostgreSQL-specific
+      feature, that can make certain read-heavy applications a good deal
+      faster.
+
+The Django 1.1 roadmap
+======================
+
+Before Django 1.1 goes final, at least one other preview/development release
+will be made available. The current schedule consists of at least the
+following:
+
+* Week of *April 2, 2009:* Django 1.1 release candidate. At this point all
+  strings marked for translation must freeze to allow translations to
+  be submitted in advance of the final release.
+
+* Week of *April 13, 2009:* Django 1.1 final.
+
+If deemed necessary, additional beta or release candidate packages will be
+issued prior to the final 1.1 release.
+
+What you can do to help
+=======================
+
+In order to provide a high-quality 1.1 release, we need your help. Although this
+beta release is, again, *not* intended for production use, you can help the
+Django team by trying out the beta codebase in a safe test environment and
+reporting any bugs or issues you encounter. The Django ticket tracker is the
+central place to search for open issues:
+
+    * http://code.djangoproject.com/timeline
+
+Please open new tickets if no existing ticket corresponds to a problem you're
+running into. 
+
+Additionally, discussion of Django development, including progress toward the
+1.1 release, takes place daily on the django-developers mailing list:
+
+    * http://groups.google.com/group/django-developers
+
+... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
+interested in helping out with Django's development, feel free to join the
+discussions there.
+
+Django's online documentation also includes pointers on how to contribute to
+Django: 
+
+    * :ref:`How to contribute to Django <internals-contributing>`
+
+Contributions on any level -- developing code, writing documentation or simply
+triaging tickets and helping to test proposed bugfixes -- are always welcome and
+appreciated.
+
+Development sprints for Django 1.1 will also be taking place at PyCon US 2009,
+on the dedicated sprint days (March 30 through April 2), and anyone who wants to
+help out is welcome to join in, either in person at PyCon or virtually in the
+IRC channel or on the mailing list.

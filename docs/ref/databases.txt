@@ -13,7 +13,7 @@ This file describes some of the features that might be relevant to Django
 usage. Of course, it is not intended as a replacement for server-specific
 documentation or reference manuals.
 
-.. postgresql-notes:
+.. _postgresql-notes:
 
 PostgreSQL notes
 ================

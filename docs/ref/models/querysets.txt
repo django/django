@@ -768,6 +768,8 @@ of the arguments is required, but you should use at least one of them.
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
+.. _queryset-defer:
+
 ``defer(*fields)``
 ~~~~~~~~~~~~~~~~~~
 

@@ -1117,6 +1117,8 @@ containing the new managers and inherit that after the primary base class::
 You probably won't need to do this very often, but, when you do, it's
 possible.
 
+.. _proxy-vs-unmanaged-models:
+
 Differences between proxy inheritance and  unmanaged models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

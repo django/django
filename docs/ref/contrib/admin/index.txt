@@ -411,6 +411,8 @@ the change list page::
 Finally, note that in order to use ``list_display_links``, you must define
 ``list_display``, too.
 
+.. _admin-list-editable:
+
 ``list_editable``
 ~~~~~~~~~~~~~~~~~
 
