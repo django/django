@@ -301,12 +301,10 @@ DEFAULT_INDEX_TABLESPACE = ''
 # this middleware classes will be applied in the order given, and in the
 # response phase the middleware will be applied in reverse order.
 MIDDLEWARE_CLASSES = (
-#     'django.middleware.gzip.GZipMiddleware',
-    'django.contrib.csrf.middleware.CsrfViewMiddleware',
-    'django.contrib.csrf.middleware.CsrfResponseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 #     'django.middleware.http.ConditionalGetMiddleware',
+#     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
 )
 

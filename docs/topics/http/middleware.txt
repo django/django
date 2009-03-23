@@ -28,10 +28,9 @@ created by :djadmin:`django-admin.py startproject <startproject>`::
 
     MIDDLEWARE_CLASSES = (
         'django.middleware.common.CommonMiddleware',
-        'django.contrib.csrf.middleware.CsrfViewMiddleware',
-        'django.contrib.csrf.middleware.CsrfResponseMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.middleware.doc.XViewMiddleware',
     )
 
 During the request phases (:meth:`process_request` and :meth:`process_view`
