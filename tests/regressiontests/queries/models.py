@@ -6,6 +6,7 @@ import datetime
 import pickle
 import sys
 
+from django.conf import settings
 from django.db import models
 from django.db.models.query import Q, ITER_CHUNK_SIZE
 
