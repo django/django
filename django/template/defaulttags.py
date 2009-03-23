@@ -74,7 +74,7 @@ class FirstOfNode(Node):
 
     def render(self, context):
         for var in self.vars:
-            value = var.resolve(context)
+            value = var.resolve(context, True)
             if value:
                 return smart_unicode(value)
         return u''
