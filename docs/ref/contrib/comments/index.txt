@@ -216,3 +216,4 @@ More information
    upgrade
    custom
    forms
+   moderation

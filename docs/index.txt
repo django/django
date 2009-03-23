@@ -82,7 +82,7 @@ Other batteries included
     * :ref:`Authentication <topics-auth>`
     * :ref:`Cache system <topics-cache>`
     * :ref:`Conditional content processing <topics-conditional-processing>`
-    * :ref:`Comments <ref-contrib-comments-index>`
+    * :ref:`Comments <ref-contrib-comments-index>` | :ref:`Moderation <ref-contrib-comments-moderation>` | :ref:`Custom comments <ref-contrib-comments-custom>`
     * :ref:`Content types <ref-contrib-contenttypes>`
     * :ref:`Cross Site Request Forgery protection <ref-contrib-csrf>`
     * :ref:`Databrowse <ref-contrib-databrowse>`

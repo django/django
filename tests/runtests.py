@@ -110,6 +110,10 @@ def django_tests(verbosity, interactive, test_labels):
         'django.middleware.common.CommonMiddleware',
     )
     settings.SITE_ID = 1
+    # For testing comment-utils, we require the MANAGERS attribute
+    # to be set, so that a test email is sent out which we catch
+    # in our tests.
+    settings.MANAGERS = ("admin@djangoproject.com",)
 
     # Load all the ALWAYS_INSTALLED_APPS.
     # (This import statement is intentionally delayed until after we
