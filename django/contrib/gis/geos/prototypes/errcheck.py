@@ -18,7 +18,7 @@ libc = CDLL(find_library(libc_name))
 def last_arg_byref(args):
     "Returns the last C argument's by reference value."
     return args[-1]._obj.value
-        
+
 def check_dbl(result, func, cargs):
     "Checks the status code and returns the double value passed in by reference."
     # Checking the status code
@@ -28,7 +28,7 @@ def check_dbl(result, func, cargs):
 
 def check_geom(result, func, cargs):
     "Error checking on routines that return Geometries."
-    if not result: 
+    if not result:
         raise GEOSException('Error encountered checking Geometry returned from GEOS C function "%s".' % func.__name__)
     return result
 
@@ -48,22 +48,31 @@ def check_predicate(result, func, cargs):
         raise GEOSException('Error encountered on GEOS C predicate function "%s".' % func.__name__)
 
 def check_sized_string(result, func, cargs):
-    "Error checking for routines that return explicitly sized strings."
+    """
+    Error checking for routines that return explicitly sized strings.
+
+    This frees the memory allocated by GEOS at the result pointer.
+    """
     if not result:
         raise GEOSException('Invalid string pointer returned by GEOS C function "%s"' % func.__name__)
     # A c_size_t object is passed in by reference for the second
     # argument on these routines, and its needed to determine the
     # correct size.
     s = string_at(result, last_arg_byref(cargs))
+    # Freeing the memory allocated within GEOS
     libc.free(result)
     return s
 
 def check_string(result, func, cargs):
-    "Error checking for routines that return strings."
+    """
+    Error checking for routines that return strings.
+
+    This frees the memory allocated by GEOS at the result pointer.
+    """
     if not result: raise GEOSException('Error encountered checking string return value in GEOS C function "%s".' % func.__name__)
     # Getting the string value at the pointer address.
     s = string_at(result)
-    # Freeing the memory allocated by the GEOS library.
+    # Freeing the memory allocated within GEOS
     libc.free(result)
     return s
 
@@ -73,4 +82,3 @@ def check_zero(result, func, cargs):
         raise GEOSException('Error encountered in GEOS C function "%s".' % func.__name__)
     else:
         return result
-                            

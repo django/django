@@ -1,5 +1,5 @@
 """
- This module houses the GEOS ctypes prototype functions for the 
+ This module houses the GEOS ctypes prototype functions for the
  unary and binary predicate operations on geometries.
 """
 from ctypes import c_char, c_char_p, c_double

@@ -1,5 +1,5 @@
 from ctypes import c_char_p, c_int, c_size_t, c_ubyte, c_uint, POINTER
-from django.contrib.gis.geos.libgeos import lgeos, CS_PTR, GEOM_PTR
+from django.contrib.gis.geos.libgeos import lgeos, CS_PTR, GEOM_PTR, PREPGEOM_PTR, GEOS_PREPARE
 from django.contrib.gis.geos.prototypes.errcheck import \
     check_geom, check_minus_one, check_sized_string, check_string, check_zero
 
@@ -47,7 +47,7 @@ def int_from_geom(func, zero=False):
     "Argument is a geometry, return type is an integer."
     func.argtypes = [GEOM_PTR]
     func.restype = c_int
-    if zero: 
+    if zero:
         func.errcheck = check_zero
     else:
         func.errcheck = check_minus_one
@@ -55,8 +55,6 @@ def int_from_geom(func, zero=False):
 
 def string_from_geom(func):
     "Argument is a Geometry, return type is a string."
-    # We do _not_ specify an argument type because we want just an
-    # address returned from the function.
     func.argtypes = [GEOM_PTR]
     func.restype = geos_char_p
     func.errcheck = check_string
@@ -64,13 +62,7 @@ def string_from_geom(func):
 
 ### ctypes prototypes ###
 
-# TODO: Tell all users to use GEOS 3.0.0, instead of the release 
-#  candidates, and use the new Reader and Writer APIs (e.g.,
-#  GEOSWKT[Reader|Writer], GEOSWKB[Reader|Writer]).  A good time
-#  to do this will be when Refractions releases a Windows PostGIS
-#  installer using GEOS 3.0.0.
-
-# Creation routines from WKB, HEX, WKT
+# Deprecated creation routines from WKB, HEX, WKT
 from_hex = bin_constructor(lgeos.GEOSGeomFromHEX_buf)
 from_wkb = bin_constructor(lgeos.GEOSGeomFromWKB_buf)
 from_wkt = geom_output(lgeos.GEOSGeomFromWKT, [c_char_p])
@@ -90,7 +82,7 @@ get_num_geoms = int_from_geom(lgeos.GEOSGetNumGeometries)
 
 # Geometry creation factories
 create_point = geom_output(lgeos.GEOSGeom_createPoint, [CS_PTR])
-create_linestring = geom_output(lgeos.GEOSGeom_createLineString, [CS_PTR]) 
+create_linestring = geom_output(lgeos.GEOSGeom_createLineString, [CS_PTR])
 create_linearring = geom_output(lgeos.GEOSGeom_createLinearRing, [CS_PTR])
 
 # Polygon and collection creation routines are special and will not

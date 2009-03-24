@@ -16,8 +16,8 @@ def geo_suite():
     s = unittest.TestSuite()
 
     # Adding the GEOS tests. (__future__)
-    #from django.contrib.gis.geos import tests as geos_tests
-    #s.addTest(geos_tests.suite())
+    from django.contrib.gis.geos import tests as geos_tests
+    s.addTest(geos_tests.suite())
 
     # Test apps that require use of a spatial database (e.g., creation of models)
     test_apps = ['geoapp', 'relatedapp']
@@ -27,7 +27,6 @@ def geo_suite():
     # Tests that do not require setting up and tearing down a spatial database
     # and are modules in `django.contrib.gis.tests`.
     test_suite_names = [
-        'test_geos',
         'test_measure',
         ]
 
@@ -216,8 +215,8 @@ class _DeprecatedTestModule(object):
              self.mod, DeprecationWarning)
         self.tests.run()
 
-#from django.contrib.gis.geos import tests as _tests
-#test_geos = _DeprecatedTestModule(_tests, 'geos')
+from django.contrib.gis.geos import tests as _tests
+test_geos = _DeprecatedTestModule(_tests, 'geos')
 
 from django.contrib.gis.gdal import HAS_GDAL
 if HAS_GDAL:
