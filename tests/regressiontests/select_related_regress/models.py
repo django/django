@@ -65,6 +65,23 @@ class Client(models.Model):
     state = models.ForeignKey(State, null=True)
     status = models.ForeignKey(ClientStatus)
 
+# Some model inheritance exercises
+class Parent(models.Model):
+    name = models.CharField(max_length=10)
+
+    def __unicode__(self):
+        return self.name
+
+class Child(Parent):
+    value = models.IntegerField()
+
+class Item(models.Model):
+    name = models.CharField(max_length=10)
+    child = models.ForeignKey(Child, null=True)
+
+    def __unicode__(self):
+        return self.name
+
 __test__ = {'API_TESTS': """
 Regression test for bug #7110. When using select_related(), we must query the
 Device and Building tables using two different aliases (each) in order to
@@ -140,4 +157,12 @@ for country before getting status.
 <ClientStatus: ClientStatus object>
 >>> Client.objects.select_related('status')[0].status
 <ClientStatus: ClientStatus object>
+
+Exercising select_related() with multi-table model inheritance.
+>>> c1 = Child.objects.create(name="child1", value=42)
+>>> _ = Item.objects.create(name="item1", child=c1)
+>>> _ = Item.objects.create(name="item2")
+>>> Item.objects.select_related("child").order_by("name")
+[<Item: item1>, <Item: item2>]
+
 """}

@@ -16,10 +16,17 @@ try:
 except NameError:
     from django.utils.itercompat import sorted
 
+class DumbCategory(models.Model):
+    pass
+
+class NamedCategory(DumbCategory):
+    name = models.CharField(max_length=10)
+
 class Tag(models.Model):
     name = models.CharField(max_length=10)
     parent = models.ForeignKey('self', blank=True, null=True,
             related_name='children')
+    category = models.ForeignKey(NamedCategory, null=True, default=None)
 
     class Meta:
         ordering = ['name']
@@ -266,8 +273,9 @@ class Plaything(models.Model):
 
 
 __test__ = {'API_TESTS':"""
->>> t1 = Tag.objects.create(name='t1')
->>> t2 = Tag.objects.create(name='t2', parent=t1)
+>>> generic = NamedCategory.objects.create(name="Generic")
+>>> t1 = Tag.objects.create(name='t1', category=generic)
+>>> t2 = Tag.objects.create(name='t2', parent=t1, category=generic)
 >>> t3 = Tag.objects.create(name='t3', parent=t1)
 >>> t4 = Tag.objects.create(name='t4', parent=t3)
 >>> t5 = Tag.objects.create(name='t5', parent=t3)
@@ -724,6 +732,12 @@ Multiple filter statements are joined using "AND" all the time.
 
 Bug #6981
 >>> Tag.objects.select_related('parent').order_by('name')
+[<Tag: t1>, <Tag: t2>, <Tag: t3>, <Tag: t4>, <Tag: t5>]
+
+Bug #9926
+>>> Tag.objects.select_related("parent", "category").order_by('name')
+[<Tag: t1>, <Tag: t2>, <Tag: t3>, <Tag: t4>, <Tag: t5>]
+>>> Tag.objects.select_related('parent', "parent__category").order_by('name')
 [<Tag: t1>, <Tag: t2>, <Tag: t3>, <Tag: t4>, <Tag: t5>]
 
 Bug #6180, #6203 -- dates with limits and/or counts
