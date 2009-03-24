@@ -724,7 +724,7 @@ A :class:`CharField` for a URL. Has one extra optional argument:
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
 
-Like all ::class:`CharField` subclasses, :class:`URLField` takes the optional
+Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length`argument. If you don't specify
 :attr:`~CharField.max_length`, a default of 200 is used.
 
