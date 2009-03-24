@@ -12,23 +12,23 @@ Django on any Java platform.
 
 This document will get you up and running with Django on top of Jython.
 
-.. _jython: http://jython.org/
+.. _jython: http://www.jython.org/
 
 Installing Jython
 =================
 
-Django works with Jython versions 2.5 and higher. 
+Django works with Jython versions 2.5 and higher.
 
 .. warning::
 
     As of the writing of this document, a version of Jython compatible with
     Django has not yet been released. The forthcoming 2.5a2+ release will be be
-    the first in which Django will work out of the box. 
-    
+    the first in which Django will work out of the box.
+
     In the meantime, you'll need to use the latest development version of Jython
     obtained from Jython's SVN repository.
 
-Download Jython at http://jython.org/.
+Download Jython at http://www.jython.org/.
 
 Creating a servlet container
 ============================
@@ -80,6 +80,6 @@ running on standard Python. However, are a few differences to keep in mind:
       documentation uses ``python`` for consistancy, but if you're using Jython
       you'll want to mentally replace ``python`` with ``jython`` every time it
       occurs.
-     
+
     * Similarly, you'll need to use the ``JYTHONPATH`` environment variable
       instead of ``PYTHONPATH``.
