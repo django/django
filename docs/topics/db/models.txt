@@ -381,7 +381,7 @@ For these situations, Django allows you to specify the model that will be used
 to govern the many-to-many relationship. You can then put extra fields on the
 intermediate model. The intermediate model is associated with the
 :class:`~django.db.models.ManyToManyField` using the
-:attr:`through <ManyToManyFields.through>` argument to point to the model
+:attr:`through <ManyToManyField.through>` argument to point to the model
 that will act as an intermediary. For our musician example, the code would look
 something like this::
 
@@ -426,7 +426,7 @@ There are a few restrictions on the intermediate model:
 
     * When defining a many-to-many relationship from a model to
       itself, using an intermediary model, you *must* use
-      :attr:`symmetrical=False <ManyToManyFields.symmetrical>` (see
+      :attr:`symmetrical=False <ManyToManyField.symmetrical>` (see
       :ref:`the model field reference <manytomany-arguments>`).
 
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
