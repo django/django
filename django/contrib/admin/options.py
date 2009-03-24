@@ -457,11 +457,11 @@ class ModelAdmin(BaseModelAdmin):
     def delete_selected(self, request, queryset):
         """
         Default action which deletes the selected objects.
-        
+
         In the first step, it displays a confirmation page whichs shows all
         the deleteable objects or, if the user has no permission one of the
         related childs (foreignkeys) it displays a "permission denied" message.
-        
+
         In the second step delete all selected objects and display the change
         list again.
         """
@@ -474,7 +474,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # Populate deletable_objects, a data structure of all related objects that
         # will also be deleted.
-        
+
         # deletable_objects must be a list if we want to use '|unordered_list' in the template
         deletable_objects = []
         perms_needed = set()
@@ -495,9 +495,9 @@ class ModelAdmin(BaseModelAdmin):
                     obj_display = force_unicode(obj)
                     self.log_deletion(request, obj, obj_display)
                 queryset.delete()
-                self.message_user(request, _("Successfully deleted %d %s.") % (
-                    n, model_ngettext(self.opts, n)
-                ))
+                self.message_user(request, _("Successfully deleted %(count)d %(items)s.") % {
+                    "count": n, "items": model_ngettext(self.opts, n)
+                })
             # Return None to display the change list page again.
             return None
 
@@ -512,7 +512,7 @@ class ModelAdmin(BaseModelAdmin):
             "app_label": app_label,
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
         }
-        
+
         # Display the confirmation page
         return render_to_response(self.delete_confirmation_template or [
             "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.object_name.lower()),
@@ -685,15 +685,15 @@ class ModelAdmin(BaseModelAdmin):
         if action_form.is_valid():
             action = action_form.cleaned_data['action']
             func, name, description = self.get_actions(request)[action]
-            
-            # Get the list of selected PKs. If nothing's selected, we can't 
+
+            # Get the list of selected PKs. If nothing's selected, we can't
             # perform an action on it, so bail.
             selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
             if not selected:
                 return None
 
             response = func(request, queryset.filter(pk__in=selected))
-                        
+
             # Actions may return an HttpResponse, which will be used as the
             # response from the POST. If not, we'll be a good little HTTP
             # citizen and redirect back to the changelist page.
@@ -901,7 +901,7 @@ class ModelAdmin(BaseModelAdmin):
             response = self.response_action(request, queryset=cl.get_query_set())
             if response:
                 return response
-                
+
         # If we're allowing changelist editing, we need to construct a formset
         # for the changelist given all the fields to be edited. Then we'll
         # use the formset to validate/process POSTed data.
@@ -946,10 +946,10 @@ class ModelAdmin(BaseModelAdmin):
             media = self.media + formset.media
         else:
             media = self.media
-            
+
         # Build the action form and populate it with available actions.
         action_form = self.action_form(auto_id=None)
-        action_form.fields['action'].choices = self.get_action_choices(request)        
+        action_form.fields['action'].choices = self.get_action_choices(request)
 
         context = {
             'title': cl.title,
