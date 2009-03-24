@@ -28,61 +28,119 @@ client that nothing has changed.
 .. _If-none-match: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26
 .. _If-modified-since: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.25
 
-Django allows simple usage of this feature with
-:class:`django.middleware.http.ConditionalGetMiddleware` and
-:class:`~django.middleware.common.CommonMiddleware`. However, whilst being
-easy to use and suitable for many situations, they both have limitations for
-advanced usage:
-
-    * They are applied globally to all views in your project
-    * They don't save you from generating the response itself, which may be
-      expensive
-    * They are only appropriate for HTTP ``GET`` requests.
+When you need more fine-grained control you may use per-view conditional
+processing functions.
 
 .. conditional-decorators:
 
-Decorators
-==========
+The ``condition`` decorator
+===========================
 
-When you need more fine-grained control you may use per-view conditional
-processing functions. 
-
-The decorators ``django.views.decorators.http.etag`` and
-``django.views.decorators.http.last_modified`` each accept a user-defined
-function that takes the same parameters as the view itself. The function
-passed ``last_modified`` should return a standard datetime value specifying
-the last time the resource was modified, or ``None`` if the resource doesn't
-exist. The function passed to the ``etag`` decorator should return a string
-representing the `Etag`_ for the resource, or ``None`` if it doesn't exist.
+Sometimes (in fact, quite often) you can create functions to rapidly compute the ETag_
+value or the last-modified time for a resource, **without** needing to do all
+the computations needed to construct the full view. Django can then use these
+functions to provide an "early bailout" option for the view processing.
+Telling the client that the content has not been modified since the last
+request, perhaps.
 
 .. _ETag: http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.11
 
-For example::
+These two functions are passed as parameters the
+``django.views.decorators.http.condition`` decorator. This decorator uses
+the two functions (you only need to supply one, if you can't compute both
+quantities easily and quickly) to work out if the headers in the HTTP request
+match those on the resource. If they don't match, a new copy of the resource
+must be computed and your normal view is called.
 
-    # Compute the last-modified time from when the object was last saved.
-    @last_modified(lambda r, obj_id: MyObject.objects.get(pk=obj_id).update_time)
-    def my_object_view(request, obj_id):
-        # Expensive generation of response with MyObject instance
+The ``condition`` decorator's signature looks like this::
+
+    condition(etag_func=None, last_modified_func=None)
+
+The two functions, to compute the ETag and the last modified time, will be
+passed the incoming ``request`` object and the same parameters, in the same
+order, as the view function they are helping to wrap. The function passed
+``last_modified`` should return a standard datetime value specifying the last
+time the resource was modified, or ``None`` if the resource doesn't exist. The
+function passed to the ``etag`` decorator should return a string representing
+the `Etag`_ for the resource, or ``None`` if it doesn't exist.
+
+Using this feature usefully is probably best explained with an example.
+Suppose you have this pair of models, representing a simple blog system::
+
+    import datetime
+    from django.db import models
+
+    class Blog(models.Model):
         ...
 
-Of course, you can always use the non-decorator form if you're using Python
-2.3 or don't like the decorator syntax::
-
-    def my_object_view(request, obj_id):
+    class Entry(models.Model):
+        blog = models.ForeignKey(Blog)
+        published = models.DateTimeField(default=datetime.datetime.now)
         ...
-    my_object_view = last_modified(my_func)(my_object_view)
 
-Using the ``etag`` decorator is similar.
+If the front page, displaying the latest blog entries, only changes when you
+add a new blog entry, you can compute the last modified time very quickly. You
+need the latest ``published`` date for every entry associated with that blog.
+One way to do this would be::
 
-In practice, though, you won't know if the client is going to send the
-``Last-modified`` or the ``If-none-match`` header. If you can quickly compute
-both values and want to short-circuit as often as possible, you'll need to use
-the ``conditional`` decorator described below.
+    from django.db.models import Max
 
-HTTP allows to use both "ETag" and "Last-Modified" headers in your response.
-Then a response is considered not modified only if the client sends both
-headers back and they're both equal to the response headers. This means that
-you can't just chain decorators on your view::
+    def latest_entry(request, blog_id):
+        return Entry.objects.filter(blog=blog_id).aggregate(Max("published"))
+
+You can then use this function to provide early detection of an unchanged page
+for your front page view::
+
+    from django.views.decorators.http import condition
+
+    @condition(last_modified_func=latest_entry)
+    def front_page(request, blog_id):
+        ...
+
+Of course, if you're using Python 2.3 or prefer not to use the decorator
+syntax, you can write the same code as follows, there is no difference::
+
+    def front_page(request, blog_id):
+        ...
+    front_page = condition(last_modified_func=latest_entry)(front_page)
+
+Shortcuts for only computing one value
+======================================
+
+As a general rule, if you can provide functions to compute *both* the ETag and
+the last modified time, you should do so. You don't know which headers any
+given HTTP client will send you, so be prepared to handle both. However,
+sometimes only one value is easy to compute and Django provides decorators
+that handle only ETag or only last-modified computations.
+
+The ``django.views.decorators.http.etag`` and
+``django.views.decorators.http.last_modified`` decorators are passed the same
+type of functions as the ``condition`` decorator. Their signatures are::
+
+    etag(etag_func)
+    last_modified(last_modified_func)
+
+We could write the earlier example, which only uses a last-modified function,
+using one of these decorators::
+
+    @last_modified(latest_entry)
+    def front_page(request, blog_id):
+        ...
+
+...or::
+
+    def front_page(request, blog_id):
+        ...
+    front_page = last_modified(latest_entry)(front_page)
+
+Use ``condition`` when testing both conditions
+------------------------------------------------
+
+It might look nicer to some people to try and chain the ``etag`` and
+``last_modified`` decorators if you want to test both preconditions. However,
+this would lead to incorrect behavior.
+
+::
 
     # Bad code. Don't do this!
     @etag(etag_func)
@@ -94,18 +152,13 @@ you can't just chain decorators on your view::
 
 The first decorator doesn't know anything about the second and might
 answer that the response is not modified even if the second decorators would
-determine otherwise. In this case you should use a more general decorator -
-``django.views.decorator.http.condition`` that accepts two functions at once::
-
-    # The correct way to implement the above example
-    @condition(etag_func, last_modified_func)
-    def my_view(request):
-        # ...
+determine otherwise. The ``condition`` decorator uses both callback functions
+simultaneously to work out the right action to take.
 
 Using the decorators with other HTTP methods
 ============================================
 
-The ``conditional`` decorator is useful for more than only ``GET`` and
+The ``condition`` decorator is useful for more than only ``GET`` and
 ``HEAD`` requests (``HEAD`` requests are the same as ``GET`` in this
 situation). It can be used also to be used to provide checking for ``POST``,
 ``PUT`` and ``DELETE`` requests. In these situations, the idea isn't to return
@@ -116,9 +169,9 @@ For example, consider the following exchange between the client and server:
 
     1. Client requests ``/foo/``.
     2. Server responds with some content with an ETag of ``"abcd1234"``.
-    3. Client sends and HTTP ``PUT`` request to ``/foo/`` to update the
-       resource. It sends an ``If-Match: "abcd1234"`` header to specify the
-       version it is trying to update.
+    3. Client sends an HTTP ``PUT`` request to ``/foo/`` to update the
+       resource. It also sends an ``If-Match: "abcd1234"`` header to specify
+       the version it is trying to update.
     4. Server checks to see if the resource has changed, by computing the ETag
        the same way it does for a ``GET`` request (using the same function).
        If the resource *has* changed, it will return a 412 status code code,
@@ -129,6 +182,29 @@ For example, consider the following exchange between the client and server:
 
 The important thing this example shows is that the same functions can be used
 to compute the ETag and last modification values in all situations. In fact,
-you *should* use the same functions, so that the same values are returned
+you **should** use the same functions, so that the same values are returned
 every time.
+
+Comparison with middleware conditional processing
+=================================================
+
+You may notice that Django already provides simple and straightforward
+conditional ``GET`` handling via the
+:class:`django.middleware.http.ConditionalGetMiddleware` and
+:class:`~django.middleware.common.CommonMiddleware`. Whilst certainly being
+easy to use and suitable for many situations, those pieces of middleware
+functionality have limitations for advanced usage:
+
+    * They are applied globally to all views in your project
+    * They don't save you from generating the response itself, which may be
+      expensive
+    * They are only appropriate for HTTP ``GET`` requests.
+
+You should choose the most appropriate tool for your particular problem here.
+If you have a way to compute ETags and modification times quickly and if some
+view takes a while to generate the content, you should consider using the
+``condition`` decorator described in this document. If everything already runs
+fairly quickly, stick to using the middleware and the amount of network
+traffic sent back to the clients will still be reduced if the view hasn't
+changed.
 

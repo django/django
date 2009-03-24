@@ -98,6 +98,21 @@ class ConditionalGet(TestCase):
         response = self.client.get('/condition/etag/')
         self.assertFullResponse(response, check_last_modified=False)
 
+    def testSingleCondition5(self):
+        self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_STR
+        response = self.client.get('/condition/last_modified2/')
+        self.assertNotModified(response)
+        response = self.client.get('/condition/etag2/')
+        self.assertFullResponse(response, check_last_modified=False)
+
+    def testSingleCondition6(self):
+        self.client.defaults['HTTP_IF_NONE_MATCH'] = '"%s"' % ETAG
+        response = self.client.get('/condition/etag2/')
+        self.assertNotModified(response)
+        response = self.client.get('/condition/last_modified2/')
+        self.assertFullResponse(response, check_etag=False)
+
+
 class ETagProcesing(TestCase):
     def testParsing(self):
         etags = parse_etags(r'"", "etag", "e\"t\"ag", "e\\tag", W/"weak"')

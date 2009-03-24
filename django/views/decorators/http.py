@@ -127,9 +127,9 @@ def condition(etag_func=None, last_modified_func=None):
     return decorator
 
 # Shortcut decorators for common cases based on ETag or Last-Modified only
-def etag(callable):
-    return condition(etag=callable)
+def etag(etag_func):
+    return condition(etag_func=etag_func)
 
-def last_modified(callable):
-    return condition(last_modified=callable)
+def last_modified(last_modified_func):
+    return condition(last_modified_func=last_modified_func)
 
