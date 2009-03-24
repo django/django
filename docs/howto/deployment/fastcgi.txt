@@ -250,7 +250,7 @@ Add the following to your lighttpd config file:
         ),
     )
     alias.url = (
-        "/media/" => "/home/user/django/contrib/admin/media/",
+        "/media" => "/home/user/django/contrib/admin/media/",
     )
 
     url.rewrite-once = (
