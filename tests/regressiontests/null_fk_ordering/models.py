@@ -48,15 +48,6 @@ class Comment(models.Model):
     def __unicode__(self):
         return self.comment_text
 
-class Comment(models.Model):
-    post = models.ForeignKey(Post, null=True)
-    comment_text = models.CharField(max_length=250)
-
-    class Meta:
-        ordering = ['post__forum__system_info__system_name', 'comment_text']
-
-    def __unicode__(self):
-        return self.comment_text
 
 __test__ = {'API_TESTS': """
 # Regression test for #7512 -- ordering across nullable Foreign Keys shouldn't
