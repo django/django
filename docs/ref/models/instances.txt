@@ -5,7 +5,7 @@ Model instance reference
 ========================
 
 .. currentmodule:: django.db.models
-   
+
 This document describes the details of the ``Model`` API. It builds on the
 material presented in the :ref:`model <topics-db-models>` and :ref:`database
 query <topics-db-queries>` guides, so you'll probably want to read and
@@ -366,8 +366,7 @@ Extra instance methods
 In addition to ``save()``, ``delete()``, a model object might get any or all
 of the following methods:
 
-get_FOO_display()
------------------
+.. method:: Model.get_FOO_display()
 
 For every field that has ``choices`` set, the object will have a
 ``get_FOO_display()`` method, where ``FOO`` is the name of the field. This
@@ -391,8 +390,8 @@ following model::
     >>> p.get_gender_display()
     'Male'
 
-get_next_by_FOO(\**kwargs) and get_previous_by_FOO(\**kwargs)
--------------------------------------------------------------
+.. method:: Model.get_next_by_FOO(\**kwargs)
+.. method:: Model.get_previous_by_FOO(\**kwargs)
 
 For every ``DateField`` and ``DateTimeField`` that does not have ``null=True``,
 the object will have ``get_next_by_FOO()`` and ``get_previous_by_FOO()``
