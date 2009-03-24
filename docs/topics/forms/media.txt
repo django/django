@@ -152,7 +152,7 @@ The FancyCalendar widget inherits all the media from it's parent widget. If
 you don't want media to be inherited in this way, add an ``extend=False``
 declaration to the media declaration::
 
-    class FancyCalendar(Calendar):
+    class FancyCalendarWidget(CalendarWidget):
         class Media:
             extend = False
             css = {
