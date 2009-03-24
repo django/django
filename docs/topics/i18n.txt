@@ -251,9 +251,9 @@ The ``{% trans %}`` template tag translates either a constant string
     <title>{% trans "This is the title." %}</title>
     <title>{% trans myvar %}</title>
 
-If the ``noop`` option is present, variable lookup still takes place but the
-translation is skipped. This is useful when "stubbing out" content that will
-require translation in the future::
+If the ``noop`` option is present, variable lookup still takes place, but the
+original text will be returned unchanged. This is useful when "stubbing out"
+content that will require translation in the future::
 
     <title>{% trans "myvar" noop %}</title>
 
@@ -995,9 +995,9 @@ test or compile a changed message file, you will need the ``gettext`` utilities:
       * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
         ``Variable value`` field
 
-You may also use ``gettext`` binaries you have obtained elsewhere, so long as 
+You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Some version 0.14.4 binaries
-have been found to not support this command. Do not attempt to use Django 
+have been found to not support this command. Do not attempt to use Django
 translation utilities with a ``gettext`` package if the command ``xgettext
 --version`` entered at a Windows command prompt causes a popup window saying
 "xgettext.exe has generated errors and will be closed by Windows".
