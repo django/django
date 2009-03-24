@@ -259,8 +259,12 @@ model fields:
 
 2. Use the ``fields`` attribute of the ``ModelForm``'s inner ``Meta``
    class.  This attribute, if given, should be a list of field names
-   to include in the form. The form will render the fields in the same
-   order they are specified in the ``fields`` attribute.
+   to include in the form.
+
+   .. versionchanged:: 1.1
+
+   The form will render the fields in the same order they are specified in the
+   ``fields`` attribute.
 
 3. Use the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta``
    class.  This attribute, if given, should be a list of field names
@@ -339,6 +343,8 @@ parameter when declaring the form field::
 
 Changing the order of fields
 ----------------------------
+
+.. versionadded:: 1.1
 
 By default, a ``ModelForm`` will render fields in the same order that they are
 defined on the model, with ``ManyToManyField`` instances appearing last. If
