@@ -510,6 +510,7 @@ class BaseQuery(object):
                 alias = self.included_inherited_models[model]
             if as_pairs:
                 result.append((alias, field.column))
+                aliases.add(alias)
                 continue
             if with_aliases and field.column in col_aliases:
                 c_alias = 'Col%d' % len(col_aliases)
@@ -524,7 +525,7 @@ class BaseQuery(object):
                 if with_aliases:
                     col_aliases.add(field.column)
         if as_pairs:
-            return result, None
+            return result, aliases
         return result, aliases
 
     def get_from_clause(self):
@@ -1076,6 +1077,7 @@ class BaseQuery(object):
             if model:
                 int_opts = opts
                 alias = root_alias
+                alias_chain = []
                 for int_model in opts.get_base_chain(model):
                     lhs_col = int_opts.parents[int_model].column
                     dedupe = lhs_col in opts.duplicate_targets
@@ -1087,8 +1089,11 @@ class BaseQuery(object):
                     alias = self.join((alias, int_opts.db_table, lhs_col,
                             int_opts.pk.column), exclusions=used,
                             promote=promote)
+                    alias_chain.append(alias)
                     for (dupe_opts, dupe_col) in dupe_set:
                         self.update_dupe_avoidance(dupe_opts, dupe_col, alias)
+                if self.alias_map[root_alias][JOIN_TYPE] == self.LOUTER:
+                    self.promote_alias_chain(alias_chain, True)
             else:
                 alias = root_alias
 
@@ -1102,8 +1107,11 @@ class BaseQuery(object):
                     f.rel.get_related_field().column),
                     exclusions=used.union(avoid), promote=promote)
             used.add(alias)
-            self.related_select_cols.extend(self.get_default_columns(
-                start_alias=alias, opts=f.rel.to._meta, as_pairs=True)[0])
+            columns, aliases = self.get_default_columns(start_alias=alias,
+                    opts=f.rel.to._meta, as_pairs=True)
+            self.related_select_cols.extend(columns)
+            if self.alias_map[alias][JOIN_TYPE] == self.LOUTER:
+                self.promote_alias_chain(aliases, True)
             self.related_select_fields.extend(f.rel.to._meta.fields)
             if restricted:
                 next = requested.get(f.name, {})
