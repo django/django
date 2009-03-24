@@ -38,13 +38,13 @@ There are five steps in activating the Django admin site:
        ``ModelAdmin`` classes.
 
     5. Hook the ``AdminSite`` instance into your URLconf.
-    
+
 Other topics
 ------------
 
 .. toctree::
    :maxdepth: 1
-   
+
    actions
 
 ``ModelAdmin`` objects
@@ -427,16 +427,16 @@ edit and save multiple rows at once.
 
     ``list_editable`` interacts with a couple of other options in particular
     ways; you should note the following rules:
-    
+
         * To use ``list_editable`` you must have defined ``ordering`` defined on
           either your model or your ``ModelAdmin``.
-        
+
         * Any field in ``list_editable`` must also be in ``list_display``. You
           can't edit a field that's not displayed!
-          
+
         * The same field can't be listed in both ``list_editable`` and
           ``list_display_links`` -- a field can't be both a form and a link.
-        
+
     You'll get a validation error if any of these rules are broken.
 
 ``list_filter``
@@ -769,6 +769,8 @@ This wrapping will protect ``self.my_view`` from unauthorized access.
 
 ``formfield_for_foreignkey(self, db_field, request, **kwargs)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.1
 
 The ``formfield_for_foreignkey`` method on a ``ModelAdmin`` allows you to
 override the default formfield for a foreign key field. For example, to
@@ -1207,7 +1209,7 @@ Django-powered Web site. Just create multiple instances of ``AdminSite`` and
 root each one at a different URL.
 
 .. versionchanged:: 1.1
-    The method for hooking ``AdminSite`` instances into urls has changed in 
+    The method for hooking ``AdminSite`` instances into urls has changed in
     Django 1.1.
 
 In this example, the URLs ``/basic-admin/`` and ``/advanced-admin/`` feature
