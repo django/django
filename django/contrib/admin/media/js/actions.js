@@ -3,8 +3,8 @@ var Actions = {
         selectAll = document.getElementById('action-toggle');
         if (selectAll) {
             selectAll.style.display = 'inline';
-            addEvent(selectAll, 'change', function() {
-                Actions.checker(this.checked);
+            addEvent(selectAll, 'click', function() {
+                Actions.checker(selectAll.checked);
             });
         }
     },
