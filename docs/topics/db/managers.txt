@@ -12,8 +12,8 @@ A ``Manager`` is the interface through which database query operations are
 provided to Django models. At least one ``Manager`` exists for every model in
 a Django application.
 
-The way ``Manager`` classes work is documented :ref:`topics-db-queries`; this
-document specifically touches on model options that customize ``Manager``
+The way ``Manager`` classes work is documented in :ref:`topics-db-queries`;
+this document specifically touches on model options that customize ``Manager``
 behavior.
 
 .. _manager-names:
