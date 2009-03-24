@@ -71,8 +71,8 @@ Loading data is easy: just call :djadmin:`manage.py loaddata fixturename
 <loaddata>`, where *fixturename* is the name of the fixture file you've created.
 Every time you run :djadmin:`loaddata` the data will be read from the fixture
 and re-loaded into the database. Note that this means that if you change one of
-the rows created by a fixture and the run :djadmin:`loaddata` again you'll wipe
-out any changes you've made.
+the rows created by a fixture and then run :djadmin:`loaddata` again you'll
+wipe out any changes you've made.
 
 Automatically loading initial data fixtures
 -------------------------------------------
