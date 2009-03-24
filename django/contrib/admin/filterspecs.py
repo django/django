@@ -58,7 +58,8 @@ class RelatedFilterSpec(FilterSpec):
             self.lookup_title = f.rel.to._meta.verbose_name
         else:
             self.lookup_title = f.verbose_name
-        self.lookup_kwarg = '%s__%s__exact' % (f.name, f.rel.to._meta.pk.name)
+        rel_name = f.rel.get_related_field().name
+        self.lookup_kwarg = '%s__%s__exact' % (f.name, rel_name)
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)
         self.lookup_choices = f.get_choices(include_blank=False)
 
