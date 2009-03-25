@@ -206,8 +206,8 @@ def model_format_dict(obj):
 
 def model_ngettext(obj, n=None):
     """
-    Return the appropriate `verbose_name` or `verbose_name_plural` for `obj`
-    depending on the count `n`.
+    Return the appropriate `verbose_name` or `verbose_name_plural` value for
+    `obj` depending on the count `n`.
 
     `obj` may be a `Model` instance, `Model` subclass, or `QuerySet` instance.
     If `obj` is a `QuerySet` instance, `n` is optional and the length of the
@@ -219,4 +219,5 @@ def model_ngettext(obj, n=None):
             n = obj.count()
         obj = obj.model
     d = model_format_dict(obj)
-    return ungettext(d['verbose_name'], d['verbose_name_plural'], n or 0)
+    singular, plural = d["verbose_name"], d["verbose_name_plural"]
+    return ungettext(singular, plural, n or 0)
