@@ -296,6 +296,8 @@ a model which defines a default ordering, or when using
 ordering was undefined prior to calling ``reverse()``, and will remain
 undefined afterward).
 
+.. _querysets-distinct:
+
 ``distinct()``
 ~~~~~~~~~~~~~~
 

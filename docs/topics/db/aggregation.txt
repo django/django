@@ -315,6 +315,57 @@ will be automatically added to the result set. However, if the ``values()``
 clause is applied after the ``annotate()`` clause, you need to explicitly
 include the aggregate column.
 
+Interaction with default ordering or ``order_by()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Fields that are mentioned in the ``order_by()`` part of a queryset (or which
+are used in the default ordering on a model) are used when selecting the
+output data, even if they are not otherwise specified in the ``values()``
+call. These extra fields are used to group "like" results together and they
+can make otherwise identical result rows appear to be separate. This shows up,
+particularly, when counting things.
+
+By way of example, suppose you have a model like this::
+
+    class Item(models.Model):
+        name = models.CharField(max_length=10)
+        data = models.IntegerField()
+
+        class Meta:
+            ordering = ["name"]
+
+The important part here is the default ordering on the ``name`` field. If you
+want to count how many times each distinct ``data`` value appears, you might
+try this::
+
+    # Warning: not quite correct!
+    Item.objects.values("data").annotate(Count("id"))
+
+...which will group the ``Item`` objects by their common ``data`` values and
+then count the number of ``id`` values in each group. Except that it won't
+quite work. The default ordering by ``name`` will also play a part in the
+grouping, so this query will group by distinct ``(data, name)`` pairs, which
+isn't what you want. Instead, you should construct this queryset::
+
+    Item.objects.values("data").annotate(Count("id")).order_by()
+
+...clearing any ordering in the query. You could also order by, say, ``data``
+without any harmful effects, since that is already playing a role in the
+query.
+
+This behavior is the same as that noted in the queryset documentation for
+:ref:`distinct() <querysets-distinct>` and the general rule is the same:
+normally you won't want extra columns playing a part in the result, so clear
+out the ordering, or at least make sure it's restricted only to those fields
+you also select in a ``values()`` call.
+
+.. note::
+    You might reasonably ask why Django doesn't remove the extraneous columns
+    for you. The main reason is consistency with ``distinct()`` and other
+    places: Django **never** removes ordering constraints that you have
+    specified (and we can't change those other methods' behavior, as that
+    would violate our :ref:`misc-api-stability` policy).
+
 Aggregating annotations
 -----------------------
 
