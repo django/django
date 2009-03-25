@@ -644,6 +644,14 @@ class ManyToManyRel(object):
         self.multiple = True
         self.through = through
 
+    def get_related_field(self):
+        """
+        Returns the field in the to' object to which this relationship is tied
+        (this is always the primary key on the target model). Provided for
+        symmetry with ManyToOneRel.
+        """
+        return self.to._meta.pk
+
 class ForeignKey(RelatedField, Field):
     empty_strings_allowed = False
     def __init__(self, to, to_field=None, rel_class=ManyToOneRel, **kwargs):
