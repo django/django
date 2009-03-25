@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-24 09:26+0100\n"
+"POT-Creation-Date: 2009-03-25 09:18+0100\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -463,16 +463,6 @@ msgstr "Jedno lub więcej %(fieldname)s w %(name)s: %(obj)s"
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Jedno lub więcej %(fieldname)s w %(name)s:"
 
-# from the code it seems these translations are not really used
-# is it placeholder only? i'm leaving them as fuzzy (JZ)
-#: contrib/admin/util.py:222
-#, fuzzy
-msgid "verbose_name"
-msgid_plural "verbose_name_plural"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
 #: contrib/admin/widgets.py:70
 msgid "Date:"
 msgstr "Data:"
@@ -671,8 +661,8 @@ msgid ""
 "your account doesn't have permission to delete the following types of "
 "objects:"
 msgstr ""
-"Skasowanie %(object_name)s spowoduje usunięcie zależnych obiektów, lecz "
-"nie posiadasz uprawnień do usunięcia następujących typów obiektów:"
+"Skasowanie %(object_name)s spowoduje usunięcie zależnych obiektów, lecz nie "
+"posiadasz uprawnień do usunięcia następujących typów obiektów:"
 
 #: contrib/admin/templates/admin/delete_selected_confirmation.html:22
 #, python-format
@@ -3882,14 +3872,14 @@ msgstr ""
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Proszę wpisać poprawną godzinę w formacie HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:779
+#: db/models/fields/related.py:787
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Przytrzymaj wciśnięty klawisz \"Ctrl\" lub \"Command\" na Mac'u aby "
 "zaznaczyć więcej niż jeden wybór."
 
-#: db/models/fields/related.py:857
+#: db/models/fields/related.py:865
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
