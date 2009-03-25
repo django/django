@@ -18,9 +18,10 @@ from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.tzinfo import LocalTimezone
 
-from unicode import unicode_tests
 from context import context_tests
+from custom import custom_filters
 from parser import filter_parsing, variable_parsing
+from unicode import unicode_tests
 
 try:
     from loaders import *
@@ -34,6 +35,7 @@ __test__ = {
     'unicode': unicode_tests,
     'context': context_tests,
     'filter_parsing': filter_parsing,
+    'custom_filters': custom_filters,
 }
 
 #################################
