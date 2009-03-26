@@ -13,7 +13,6 @@ from django.contrib.gis.geos import prototypes as capi
 
 class GeometryCollection(GEOSGeometry):
     _typeid = 7
-    _minlength = 0
 
     def __init__(self, *args, **kwargs):
         "Initializes a Geometry Collection from a sequence of Geometry objects."
@@ -76,12 +75,6 @@ class GeometryCollection(GEOSGeometry):
         self.ptr = self._create_collection(length, items)
         if srid: self.srid = srid
         capi.destroy_geom(prev_ptr)
-
-    # Because GeometryCollections need to be rebuilt upon the changing of a
-    # component geometry, these routines are set to their counterparts that
-    # rebuild the entire geometry.
-    _set_single = GEOSGeometry._set_single_rebuild
-    _assign_extended_slice = GEOSGeometry._assign_extended_slice_rebuild
 
     @property
     def kml(self):

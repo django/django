@@ -133,12 +133,6 @@ class Polygon(GEOSGeometry):
     def _getitem_external(self, index):
         return GEOSGeometry(capi.geom_clone(self._getitem_internal(index)), srid=self.srid)
 
-    # Because Polygonss need to be rebuilt upon the changing of a
-    # component geometry, these routines are set to their counterparts that
-    # rebuild the entire geometry.
-    _set_single = GEOSGeometry._set_single_rebuild
-    _assign_extended_slice   = GEOSGeometry._assign_extended_slice_rebuild
-
     #### Polygon Properties ####
     @property
     def num_interior_rings(self):

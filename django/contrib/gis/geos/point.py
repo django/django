@@ -52,9 +52,6 @@ class Point(GEOSGeometry):
 
         return capi.create_point(cs)
 
-    def _getitem_external(self, index):
-        return self._cs.getOrdinate(index, 0)
-
     def _set_collection(self, length, items):
         ptr = self._create_point(length, items)
         if ptr:

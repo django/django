@@ -50,7 +50,18 @@ class ListMixin(object):
     _maxlength = None
     _IndexError = IndexError
 
-    ### Special methods for Python list interface ###
+    ### Python initialization and list interface methods ###
+
+    def __init__(self, *args, **kwargs):
+        if not hasattr(self, '_getitem_internal'):
+            self._getitem_internal = self._getitem_external
+
+        if not hasattr(self, '_set_single'):
+            self._set_single = self._set_single_rebuild
+            self._assign_extended_slice = self._assign_extended_slice_rebuild
+
+        super(ListMixin, self).__init__(*args, **kwargs)
+
     def __getitem__(self, index):
         "Gets the coordinates of the point(s) at the specified index/slice."
         if isinstance(index, slice):
@@ -127,19 +138,6 @@ class ListMixin(object):
         return count
 
     ### Private API routines unique to ListMixin ###
-
-    def __init__(self, *args, **kwargs):
-        if not hasattr(self, '_getitem_internal'):
-            self._getitem_internal = self._getitem_external
-
-        if hasattr(self, '_set_single'):
-            self._canSetSingle = True
-        else:
-            self._canSetSingle = False
-            self._set_single             = self._set_single_rebuild
-            self._assign_extended_slice   = self._assign_extended_slice_rebuild
-
-        super(ListMixin, self).__init__(*args, **kwargs)
 
     def _rebuild(self, newLen, newItems):
         if newLen < self._minlength:
