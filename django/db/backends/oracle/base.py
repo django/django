@@ -14,6 +14,10 @@ except ImportError:
 
 # Oracle takes client-side character set encoding from the environment.
 os.environ['NLS_LANG'] = '.UTF8'
+# This prevents unicode from getting mangled by getting encoded into the
+# potentially non-unicode database character set.
+os.environ['ORA_NCHAR_LITERAL_REPLACE'] = 'TRUE'
+
 try:
     import cx_Oracle as Database
 except ImportError, e:
