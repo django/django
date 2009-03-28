@@ -1,7 +1,6 @@
-import random, unittest, sys
-from ctypes import ArgumentError
+import ctypes, random, unittest, sys
 from django.contrib.gis.geos import *
-from django.contrib.gis.geos.base import gdal, numpy
+from django.contrib.gis.geos.base import gdal, numpy, GEOSBase
 from django.contrib.gis.tests.geometries import *
 
 class GEOSTest(unittest.TestCase):
@@ -17,6 +16,48 @@ class GEOSTest(unittest.TestCase):
             return -1
         else:
             return None
+
+    def test00_base(self):
+        "Tests out the GEOSBase class."
+        # Testing out GEOSBase class, which provides a `ptr` property
+        # that abstracts out access to underlying C pointers.
+        class FakeGeom1(GEOSBase):
+            pass
+
+        # This one only accepts pointers to floats
+        c_float_p = ctypes.POINTER(ctypes.c_float)
+        class FakeGeom2(GEOSBase):
+            ptr_type = c_float_p
+
+        # Default ptr_type is `c_void_p`.
+        fg1 = FakeGeom1()
+        # Default ptr_type is C float pointer
+        fg2 = FakeGeom2()
+
+        # These assignments are OK -- None is allowed because
+        # it's equivalent to the NULL pointer.
+        fg1.ptr = ctypes.c_void_p()
+        fg1.ptr = None
+        fg2.ptr = c_float_p(ctypes.c_float(5.23))
+        fg2.ptr = None
+
+        # Because pointers have been set to NULL, an exception should be
+        # raised when we try to access it.  Raising an exception is
+        # preferrable to a segmentation fault that commonly occurs when
+        # a C method is given a NULL memory reference.
+        for fg in (fg1, fg2):
+            # Equivalent to `fg.ptr`
+            self.assertRaises(GEOSException, fg._get_ptr)
+
+        # Anything that is either not None or the acceptable pointer type will
+        # result in a TypeError when trying to assign it to the `ptr` property.
+        # Thus, memmory addresses (integers) and pointers of the incorrect type
+        # (in `bad_ptrs`) will not be allowed.
+        bad_ptrs = (5, ctypes.c_char_p('foobar'))
+        for bad_ptr in bad_ptrs:
+            # Equivalent to `fg.ptr = bad_ptr`
+            self.assertRaises(TypeError, fg1._set_ptr, bad_ptr)
+            self.assertRaises(TypeError, fg2._set_ptr, bad_ptr)
 
     def test01a_wkt(self):
         "Testing WKT output."
@@ -494,7 +535,7 @@ class GEOSTest(unittest.TestCase):
             exp_buf = fromstr(g_tup[1].wkt)
 
             # Can't use a floating-point for the number of quadsegs.
-            self.assertRaises(ArgumentError, g.buffer, g_tup[2], float(g_tup[3]))
+            self.assertRaises(ctypes.ArgumentError, g.buffer, g_tup[2], float(g_tup[3]))
 
             # Constructing our buffer
             buf = g.buffer(g_tup[2], g_tup[3])
@@ -518,7 +559,7 @@ class GEOSTest(unittest.TestCase):
         self.assertEqual(4326, pnt.srid)
         pnt.srid = 3084
         self.assertEqual(3084, pnt.srid)
-        self.assertRaises(ArgumentError, pnt.set_srid, '4326')
+        self.assertRaises(ctypes.ArgumentError, pnt.set_srid, '4326')
 
         # Testing SRID keyword on fromstr(), and on Polygon rings.
         poly = fromstr(polygons[1].wkt, srid=4269)
@@ -824,7 +865,7 @@ class GEOSTest(unittest.TestCase):
             self.assertEqual(mpoly.intersects(pnt), prep.intersects(pnt))
             self.assertEqual(c, prep.covers(pnt))
 
-    def test26_line_merge(self): 
+    def test26_line_merge(self):
         "Testing line merge support"
         ref_geoms = (fromstr('LINESTRING(1 1, 1 1, 3 3)'),
                      fromstr('MULTILINESTRING((1 1, 3 3), (3 3, 4 2))'),

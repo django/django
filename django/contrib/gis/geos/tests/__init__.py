@@ -2,10 +2,11 @@
 GEOS Testing module.
 """
 from unittest import TestSuite, TextTestRunner
-import test_geos, test_geos_mutation, test_mutable_list
+import test_geos, test_io, test_geos_mutation, test_mutable_list
 
 test_suites = [
     test_geos.suite(),
+    test_io.suite(),
     test_geos_mutation.suite(),
     test_mutable_list.suite(),
     ]
