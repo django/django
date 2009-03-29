@@ -228,11 +228,16 @@
     border-right: 1px solid #ddd;
 }
 
+#changelist table input {
+    margin: 0;
+}
+
 #changelist .actions {
-    color: #666;
+    color: #999;
     padding: 3px;
+    border-top: 1px solid #fff;
     border-bottom: 1px solid #ddd;
-    background: #e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x;
+    background: white url(../img/admin/nav-bg-reverse.gif) 0 -10px repeat-x;
 }
 
 #changelist .actions:last-child {
@@ -241,15 +246,20 @@
 
 #changelist .actions select {
     border: 1px solid #aaa;
-    margin: 0 0.5em;
+    margin-left: 0.5em;
     padding: 1px 2px;
 }
 
 #changelist .actions label {
     font-size: 11px;
-    margin: 0 0.5em;
+    margin-left: 0.5em;
 }
 
 #changelist #action-toggle {
     display: none;
+}
+
+#changelist .actions .button {
+    font-size: 11px;
+    padding: 1px 2px;
 }
