@@ -6,6 +6,7 @@ Requires psycopg 2: http://initd.org/projects/psycopg2
 
 from django.conf import settings
 from django.db.backends import *
+from django.db.backends.signals import connection_created
 from django.db.backends.postgresql.operations import DatabaseOperations as PostgresqlDatabaseOperations
 from django.db.backends.postgresql.client import DatabaseClient
 from django.db.backends.postgresql.creation import DatabaseCreation
@@ -96,6 +97,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 conn_params['port'] = settings_dict['DATABASE_PORT']
             self.connection = Database.connect(**conn_params)
             self.connection.set_client_encoding('UTF8')
+            connection_created.send(sender=self.__class__)
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = None
         if set_tz:

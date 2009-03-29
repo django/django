@@ -25,6 +25,7 @@ from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE, FLAG
 
 from django.db.backends import *
+from django.db.backends.signals import connection_created
 from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
@@ -277,6 +278,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection = Database.connect(**kwargs)
             self.connection.encoders[SafeUnicode] = self.connection.encoders[unicode]
             self.connection.encoders[SafeString] = self.connection.encoders[str]
+            connection_created.send(sender=self.__class__)
         cursor = CursorWrapper(self.connection.cursor())
         return cursor
 
