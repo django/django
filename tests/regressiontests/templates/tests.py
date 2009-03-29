@@ -7,6 +7,7 @@ if __name__ == '__main__':
     settings.configure()
 
 import os
+import traceback
 import unittest
 from datetime import datetime, timedelta
 
@@ -207,10 +208,11 @@ class Templates(unittest.TestCase):
                 try:
                     test_template = loader.get_template(name)
                     output = self.render(test_template, vals)
-                except Exception, e:
-                    if e.__class__ != result:
-                        raise
-                        failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Got %s, exception: %s" % (invalid_str, name, e.__class__, e))
+                except Exception:
+                    exc_type, exc_value, exc_tb = sys.exc_info()
+                    if exc_type != result:
+                        tb = '\n'.join(traceback.format_exception(exc_type, exc_value, exc_tb))
+                        failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Got %s, exception: %s\n%s" % (invalid_str, name, exc_type, exc_value, tb))
                     continue
                 if output != result:
                     failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Expected %r, got %r" % (invalid_str, name, result, output))
@@ -227,7 +229,7 @@ class Templates(unittest.TestCase):
         settings.TEMPLATE_DEBUG = old_td
         settings.TEMPLATE_STRING_IF_INVALID = old_invalid
 
-        self.assertEqual(failures, [], '\n'.join(failures))
+        self.assertEqual(failures, [], ('-'*70 + '\n').join(failures))
 
     def render(self, test_template, vals):
         return test_template.render(template.Context(vals[1]))
