@@ -143,10 +143,10 @@ class Person(models.Model):
     name = models.CharField(max_length=100)
     gender = models.IntegerField(choices=GENDER_CHOICES)
     alive = models.BooleanField()
-    
+
     def __unicode__(self):
         return self.name
-    
+
     class Meta:
         ordering = ["id"]
 
@@ -236,6 +236,18 @@ def redirect_to(request, selected):
 class ExternalSubscriberAdmin(admin.ModelAdmin):
     actions = [external_mail, redirect_to]
 
+class Media(models.Model):
+    name = models.CharField(max_length=60)
+
+class Podcast(Media):
+    release_date = models.DateField()
+
+class PodcastAdmin(admin.ModelAdmin):
+    list_display = ('name', 'release_date')
+    list_editable = ('release_date',)
+
+    ordering = ('name',)
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, inlines=[ArticleInline])
@@ -246,6 +258,7 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(Persona, PersonaAdmin)
 admin.site.register(Subscriber, SubscriberAdmin)
 admin.site.register(ExternalSubscriber, ExternalSubscriberAdmin)
+admin.site.register(Podcast, PodcastAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
@@ -259,5 +272,3 @@ admin.site.register(ExternalSubscriber, ExternalSubscriberAdmin)
 admin.site.register(Book, inlines=[ChapterInline])
 admin.site.register(Promo)
 admin.site.register(ChapterXtra1)
-
-

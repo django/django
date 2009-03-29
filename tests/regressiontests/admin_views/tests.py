@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import re
+import datetime
 
 from django.test import TestCase
 from django.contrib.auth.models import User, Permission
@@ -12,7 +13,7 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.utils.html import escape
 
 # local test models
-from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey, Person, Persona, FooAccount, BarAccount, Subscriber, ExternalSubscriber
+from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey, Person, Persona, FooAccount, BarAccount, Subscriber, ExternalSubscriber, Podcast
 
 try:
     set
@@ -739,6 +740,12 @@ class AdminViewListEditable(TestCase):
 
     def tearDown(self):
         self.client.logout()
+
+    def test_inheritance(self):
+        Podcast.objects.create(name="This Week in Django",
+            release_date=datetime.date.today())
+        response = self.client.get('/test_admin/admin/admin_views/podcast/')
+        self.failUnlessEqual(response.status_code, 200)
 
     def test_changelist_input_html(self):
         response = self.client.get('/test_admin/admin/admin_views/person/')
