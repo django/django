@@ -661,6 +661,8 @@ class Templates(unittest.TestCase):
             'include02': ('{% include "basic-syntax02" %}', {'headline': 'Included'}, "Included"),
             'include03': ('{% include template_name %}', {'template_name': 'basic-syntax02', 'headline': 'Included'}, "Included"),
             'include04': ('a{% include "nonexistent" %}b', {}, "ab"),
+            'include 05': ('template with a space', {}, 'template with a space'),
+            'include06': ('{% include "include 05"%}', {}, 'template with a space'),
 
             ### NAMED ENDBLOCKS #######################################################
 
@@ -759,6 +761,12 @@ class Templates(unittest.TestCase):
 
             # Inheritance from a template that doesn't have any blocks
             'inheritance27': ("{% extends 'inheritance26' %}", {}, 'no tags'),
+
+            # Set up a base template with a space in it.
+            'inheritance 28': ("{% block first %}!{% endblock %}", {}, '!'),
+
+            # Inheritance from a template with a space in its name should work.
+            'inheritance29': ("{% extends 'inheritance 28' %}", {}, '!'),
 
             ### I18N ##################################################################
 

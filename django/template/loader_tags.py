@@ -158,7 +158,7 @@ def do_extends(parser, token):
     name of the parent template to extend (if it evaluates to a string) or as
     the parent tempate itelf (if it evaluates to a Template object).
     """
-    bits = token.contents.split()
+    bits = token.split_contents()
     if len(bits) != 2:
         raise TemplateSyntaxError, "'%s' takes one argument" % bits[0]
     parent_name, parent_name_expr = None, None
@@ -179,7 +179,7 @@ def do_include(parser, token):
 
         {% include "foo/some_include" %}
     """
-    bits = token.contents.split()
+    bits = token.split_contents()
     if len(bits) != 2:
         raise TemplateSyntaxError, "%r tag takes one argument: the name of the template to be included" % bits[0]
     path = bits[1]
