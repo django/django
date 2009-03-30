@@ -8,8 +8,8 @@ Why do I get an error about importing DJANGO_SETTINGS_MODULE?
 
 Make sure that:
 
-    * The environment variable DJANGO_SETTINGS_MODULE is set to a fully-qualified
-      Python module (i.e. "mysite.settings").
+    * The environment variable DJANGO_SETTINGS_MODULE is set to a
+      fully-qualified Python module (i.e. "mysite.settings").
 
     * Said module is on ``sys.path`` (``import mysite.settings`` should work).
 
@@ -45,22 +45,23 @@ Django database layer.
 How do I use image and file fields?
 -----------------------------------
 
-Using a :class:`~django.db.models.FileField` or an 
+Using a :class:`~django.db.models.FileField` or an
 :class:`~django.db.models.ImageField` in a model takes a few steps:
 
-    #. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as the
-       full path to a directory where you'd like Django to store uploaded files.
-       (For performance, these files are not stored in the database.) Define
-       :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
-       that this directory is writable by the Web server's user account.
+    #. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as
+       the full path to a directory where you'd like Django to store uploaded
+       files. (For performance, these files are not stored in the database.)
+       Define :setting:`MEDIA_URL` as the base public URL of that directory.
+       Make sure that this directory is writable by the Web server's user
+       account.
 
-    #. Add the :class:`~django.db.models.FileField` or 
-       :class:`~django.db.models.ImageField` to your model, making sure to 
-       define the :attr:`~django.db.models.FileField.upload_to` option to tell 
-       Django to which subdirectory of :setting:`MEDIA_ROOT` it should upload 
+    #. Add the :class:`~django.db.models.FileField` or
+       :class:`~django.db.models.ImageField` to your model, making sure to
+       define the :attr:`~django.db.models.FileField.upload_to` option to tell
+       Django to which subdirectory of :setting:`MEDIA_ROOT` it should upload
        files.
 
-    #. All that will be stored in your database is a path to the file 
+    #. All that will be stored in your database is a path to the file
        (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
        convenience :attr:`~django.core.files.File.url` attribute provided by
        Django. For example, if your :class:`~django.db.models.ImageField` is
