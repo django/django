@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from fields import IntegerField, BooleanField
 from widgets import Media, HiddenInput
-from util import ErrorList, ValidationError
+from util import ErrorList, ErrorDict, ValidationError
 
 __all__ = ('BaseFormSet', 'all_valid')
 
@@ -152,7 +152,7 @@ class BaseFormSet(StrAndUnicode):
     def _get_ordered_forms(self):
         """
         Returns a list of form in the order specified by the incoming data.
-        Raises an AttributeError if deletion is not allowed.
+        Raises an AttributeError if ordering is not allowed.
         """
         if not self.is_valid() or not self.can_order:
             raise AttributeError("'%s' object has no attribute 'ordered_forms'" % self.__class__.__name__)
@@ -221,8 +221,21 @@ class BaseFormSet(StrAndUnicode):
         # We loop over every form.errors here rather than short circuiting on the
         # first failure to make sure validation gets triggered for every form.
         forms_valid = True
-        for errors in self.errors:
-            if bool(errors):
+        for i in range(0, self.total_form_count()):
+            form = self.forms[i]
+            if self.can_delete:
+                # The way we lookup the value of the deletion field here takes
+                # more code than we'd like, but the form's cleaned_data will
+                # not exist if the form is invalid.
+                field = form.fields[DELETION_FIELD_NAME]
+                prefix = form.add_prefix(DELETION_FIELD_NAME)
+                value = field.widget.value_from_datadict(self.data, self.files, prefix)
+                should_delete = field.clean(value)
+                if should_delete:
+                    # This form is going to be deleted so any of its errors
+                    # should not cause the entire formset to be invalid.
+                    continue
+            if bool(self.errors[i]):
                 forms_valid = False
         return forms_valid and not bool(self.non_form_errors())
 
