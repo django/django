@@ -25,9 +25,11 @@ def timesince(d, now=None):
       (60 * 60, lambda n: ungettext('hour', 'hours', n)),
       (60, lambda n: ungettext('minute', 'minutes', n))
     )
-    # Convert datetime.date to datetime.datetime for comparison
-    if d.__class__ is not datetime.datetime:
+    # Convert datetime.date to datetime.datetime for comparison.
+    if not isinstance(d, datetime.datetime):
         d = datetime.datetime(d.year, d.month, d.day)
+    if now and not isinstance(now, datetime.datetime):
+        now = datetime.datetime(now.year, now.month, now.day)
 
     if not now:
         if d.tzinfo:
