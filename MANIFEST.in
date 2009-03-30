@@ -10,6 +10,7 @@ recursive-include docs *
 recursive-include scripts *
 recursive-include examples *
 recursive-include extras *
+recursive-include tests *
 recursive-include django/conf/locale *
 recursive-include django/contrib/admin/templates *
 recursive-include django/contrib/admin/media *
