@@ -133,6 +133,20 @@ It is used to keep track of how many form instances are being displayed. If
 you are adding new forms via JavaScript, you should increment the count fields
 in this form as well.
 
+.. versionadded:: 1.1
+
+``total_form_count`` and ``initial_form_count``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``BaseModelFormSet`` has a couple of methods that are closely related to the
+``ManagementForm``, ``total_form_count`` and ``initial_form_count``.
+
+``total_form_count`` returns the total number of forms in this formset.
+``initial_form_count`` returns the number of forms in the formset that were
+pre-filled, and is also used to determine how many forms are required. You
+will probably never need to override either of these methods, so please be
+sure you understand what they do before doing so.
+
 Custom formset validation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 

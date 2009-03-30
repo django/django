@@ -40,39 +40,51 @@ class BaseFormSet(StrAndUnicode):
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
-        # initialization is different depending on whether we recieved data, initial, or nothing
-        if data or files:
-            self.management_form = ManagementForm(data, auto_id=self.auto_id, prefix=self.prefix)
-            if self.management_form.is_valid():
-                self._total_form_count = self.management_form.cleaned_data[TOTAL_FORM_COUNT]
-                self._initial_form_count = self.management_form.cleaned_data[INITIAL_FORM_COUNT]
-            else:
-                raise ValidationError('ManagementForm data is missing or has been tampered with')
-        else:
-            if initial:
-                self._initial_form_count = len(initial)
-                if self._initial_form_count > self.max_num and self.max_num > 0:
-                    self._initial_form_count = self.max_num
-                self._total_form_count = self._initial_form_count + self.extra
-            else:
-                self._initial_form_count = 0
-                self._total_form_count = self.extra
-            if self._total_form_count > self.max_num and self.max_num > 0:
-                self._total_form_count = self.max_num
-            initial = {TOTAL_FORM_COUNT: self._total_form_count,
-                       INITIAL_FORM_COUNT: self._initial_form_count}
-            self.management_form = ManagementForm(initial=initial, auto_id=self.auto_id, prefix=self.prefix)
-
         # construct the forms in the formset
         self._construct_forms()
 
     def __unicode__(self):
         return self.as_table()
 
+    def _management_form(self):
+        """Returns the ManagementForm instance for this FormSet."""
+        if self.data or self.files:
+            form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
+            if not form.is_valid():
+                raise ValidationError('ManagementForm data is missing or has been tampered with')
+        else:
+            form = ManagementForm(auto_id=self.auto_id, prefix=self.prefix, initial={
+                TOTAL_FORM_COUNT: self.total_form_count(),
+                INITIAL_FORM_COUNT: self.initial_form_count()
+            })
+        return form
+    management_form = property(_management_form)
+
+    def total_form_count(self):
+        """Returns the total number of forms in this FormSet."""
+        if self.data or self.files:
+            return self.management_form.cleaned_data[TOTAL_FORM_COUNT]
+        else:
+            total_forms = self.initial_form_count() + self.extra
+            if total_forms > self.max_num > 0:
+                total_forms = self.max_num
+        return total_forms
+
+    def initial_form_count(self):
+        """Returns the number of forms that are required in this FormSet."""
+        if self.data or self.files:
+            return self.management_form.cleaned_data[INITIAL_FORM_COUNT]
+        else:
+            # Use the length of the inital data if it's there, 0 otherwise.
+            initial_forms = self.initial and len(self.initial) or 0
+            if initial_forms > self.max_num > 0:
+                initial_forms = self.max_num
+        return initial_forms
+
     def _construct_forms(self):
         # instantiate all the forms and put them in self.forms
         self.forms = []
-        for i in xrange(self._total_form_count):
+        for i in xrange(self.total_form_count()):
             self.forms.append(self._construct_form(i))
 
     def _construct_form(self, i, **kwargs):
@@ -89,7 +101,7 @@ class BaseFormSet(StrAndUnicode):
             except IndexError:
                 pass
         # Allow extra forms to be empty.
-        if i >= self._initial_form_count:
+        if i >= self.initial_form_count():
             defaults['empty_permitted'] = True
         defaults.update(kwargs)
         form = self.form(**defaults)
@@ -97,13 +109,13 @@ class BaseFormSet(StrAndUnicode):
         return form
 
     def _get_initial_forms(self):
-        """Return a list of all the intial forms in this formset."""
-        return self.forms[:self._initial_form_count]
+        """Return a list of all the initial forms in this formset."""
+        return self.forms[:self.initial_form_count()]
     initial_forms = property(_get_initial_forms)
 
     def _get_extra_forms(self):
         """Return a list of all the extra forms in this formset."""
-        return self.forms[self._initial_form_count:]
+        return self.forms[self.initial_form_count():]
     extra_forms = property(_get_extra_forms)
 
     # Maybe this should just go away?
@@ -127,10 +139,10 @@ class BaseFormSet(StrAndUnicode):
         # that have had their deletion widget set to True
         if not hasattr(self, '_deleted_form_indexes'):
             self._deleted_form_indexes = []
-            for i in range(0, self._total_form_count):
+            for i in range(0, self.total_form_count()):
                 form = self.forms[i]
                 # if this is an extra form and hasn't changed, don't consider it
-                if i >= self._initial_form_count and not form.has_changed():
+                if i >= self.initial_form_count() and not form.has_changed():
                     continue
                 if form.cleaned_data[DELETION_FIELD_NAME]:
                     self._deleted_form_indexes.append(i)
@@ -150,10 +162,10 @@ class BaseFormSet(StrAndUnicode):
         # by the form data.
         if not hasattr(self, '_ordering'):
             self._ordering = []
-            for i in range(0, self._total_form_count):
+            for i in range(0, self.total_form_count()):
                 form = self.forms[i]
                 # if this is an extra form and hasn't changed, don't consider it
-                if i >= self._initial_form_count and not form.has_changed():
+                if i >= self.initial_form_count() and not form.has_changed():
                     continue
                 # don't add data marked for deletion to self.ordered_data
                 if self.can_delete and form.cleaned_data[DELETION_FIELD_NAME]:
@@ -221,7 +233,7 @@ class BaseFormSet(StrAndUnicode):
         self._errors = []
         if not self.is_bound: # Stop further processing.
             return
-        for i in range(0, self._total_form_count):
+        for i in range(0, self.total_form_count()):
             form = self.forms[i]
             self._errors.append(form.errors)
         # Give self.clean() a chance to do cross-form validation.
@@ -243,7 +255,7 @@ class BaseFormSet(StrAndUnicode):
         """A hook for adding extra fields on to each form instance."""
         if self.can_order:
             # Only pre-fill the ordering field for initial forms.
-            if index < self._initial_form_count:
+            if index < self.initial_form_count():
                 form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_(u'Order'), initial=index+1, required=False)
             else:
                 form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_(u'Order'), required=False)

@@ -1,6 +1,4 @@
-
 import datetime
-
 from django import forms
 from django.db import models
 
@@ -27,7 +25,7 @@ class Book(models.Model):
 
     def __unicode__(self):
         return self.title
-    
+
 class BookWithCustomPK(models.Model):
     my_pk = models.DecimalField(max_digits=5, decimal_places=0, primary_key=True)
     author = models.ForeignKey(Author)
@@ -35,13 +33,13 @@ class BookWithCustomPK(models.Model):
 
     def __unicode__(self):
         return u'%s: %s' % (self.my_pk, self.title)
-    
+
 class AlternateBook(Book):
     notes = models.CharField(max_length=100)
-    
+
     def __unicode__(self):
         return u'%s - %s' % (self.title, self.notes)
-    
+
 class AuthorMeeting(models.Model):
     name = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author)
@@ -68,7 +66,7 @@ class Owner(models.Model):
     auto_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     place = models.ForeignKey(Place)
-    
+
     def __unicode__(self):
         return "%s at %s" % (self.name, self.place)
 
@@ -81,7 +79,7 @@ class Location(models.Model):
 class OwnerProfile(models.Model):
     owner = models.OneToOneField(Owner, primary_key=True)
     age = models.PositiveIntegerField()
-    
+
     def __unicode__(self):
         return "%s is %d" % (self.owner.name, self.age)
 
@@ -114,17 +112,17 @@ class MexicanRestaurant(Restaurant):
 # using inlineformset_factory.
 class Repository(models.Model):
     name = models.CharField(max_length=25)
-    
+
     def __unicode__(self):
         return self.name
 
 class Revision(models.Model):
     repository = models.ForeignKey(Repository)
     revision = models.CharField(max_length=40)
-    
+
     class Meta:
         unique_together = (("repository", "revision"),)
-    
+
     def __unicode__(self):
         return u"%s (%s)" % (self.revision, unicode(self.repository))
 
@@ -146,7 +144,21 @@ class Team(models.Model):
 class Player(models.Model):
     team = models.ForeignKey(Team, null=True)
     name = models.CharField(max_length=100)
-    
+
+    def __unicode__(self):
+        return self.name
+
+# Models for testing custom ModelForm save methods in formsets and inline formsets
+class Poet(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
+class Poem(models.Model):
+    poet = models.ForeignKey(Poet)
+    name = models.CharField(max_length=100)
+
     def __unicode__(self):
         return self.name
 
@@ -337,13 +349,44 @@ used.
 
 >>> AuthorFormSet = modelformset_factory(Author, max_num=2)
 >>> formset = AuthorFormSet(queryset=qs)
->>> [sorted(x.items()) for x in formset.initial]
-[[('id', 1), ('name', u'Charles Baudelaire')], [('id', 3), ('name', u'Paul Verlaine')]]
+>>> [x.name for x in formset.get_queryset()]
+[u'Charles Baudelaire', u'Paul Verlaine']
 
 >>> AuthorFormSet = modelformset_factory(Author, max_num=3)
 >>> formset = AuthorFormSet(queryset=qs)
->>> [sorted(x.items()) for x in formset.initial]
-[[('id', 1), ('name', u'Charles Baudelaire')], [('id', 3), ('name', u'Paul Verlaine')], [('id', 2), ('name', u'Walt Whitman')]]
+>>> [x.name for x in formset.get_queryset()]
+[u'Charles Baudelaire', u'Paul Verlaine', u'Walt Whitman']
+
+
+# ModelForm with a custom save method in a formset ###########################
+
+>>> class PoetForm(forms.ModelForm):
+...     def save(self, commit=True):
+...         # change the name to "Vladimir Mayakovsky" just to be a jerk.
+...         author = super(PoetForm, self).save(commit=False)
+...         author.name = u"Vladimir Mayakovsky"
+...         if commit:
+...             author.save()
+...         return author
+
+>>> PoetFormSet = modelformset_factory(Poet, form=PoetForm)
+
+>>> data = {
+...     'form-TOTAL_FORMS': '3', # the number of forms rendered
+...     'form-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'form-0-name': 'Walt Whitman',
+...     'form-1-name': 'Charles Baudelaire',
+...     'form-2-name': '',
+... }
+
+>>> qs = Poet.objects.all()
+>>> formset = PoetFormSet(data=data, queryset=qs)
+>>> formset.is_valid()
+True
+
+>>> formset.save()
+[<Poet: Vladimir Mayakovsky>, <Poet: Vladimir Mayakovsky>]
+
 
 # Model inheritance in model formsets ########################################
 
@@ -551,6 +594,36 @@ True
 
 >>> formset.save()
 [<AlternateBook: Flowers of Evil - English translation of Les Fleurs du Mal>]
+
+
+# ModelForm with a custom save method in an inline formset ###################
+
+>>> class PoemForm(forms.ModelForm):
+...     def save(self, commit=True):
+...         # change the name to "Brooklyn Bridge" just to be a jerk.
+...         poem = super(PoemForm, self).save(commit=False)
+...         poem.name = u"Brooklyn Bridge"
+...         if commit:
+...             poem.save()
+...         return poem
+
+>>> PoemFormSet = inlineformset_factory(Poet, Poem, form=PoemForm)
+
+>>> data = {
+...     'poem_set-TOTAL_FORMS': '3', # the number of forms rendered
+...     'poem_set-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'poem_set-0-name': 'The Cloud in Trousers',
+...     'poem_set-1-name': 'I',
+...     'poem_set-2-name': '',
+... }
+
+>>> poet = Poet.objects.create(name='Vladimir Mayakovsky')
+>>> formset = PoemFormSet(data=data, instance=poet)
+>>> formset.is_valid()
+True
+
+>>> formset.save()
+[<Poem: Brooklyn Bridge>, <Poem: Brooklyn Bridge>]
 
 
 # Test a custom primary key ###################################################
