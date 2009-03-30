@@ -309,17 +309,17 @@ class ExceptionTests(TestCase):
             self.client.get("/test_client_regress/staff_only/")
         except SuspiciousOperation:
             self.fail("Staff should be able to visit this page")
-    
+
 class TemplateExceptionTests(TestCase):
     def setUp(self):
         self.old_templates = settings.TEMPLATE_DIRS
         settings.TEMPLATE_DIRS = ()
-        
+
     def tearDown(self):
         settings.TEMPLATE_DIRS = self.old_templates
-        
+
     def test_no_404_template(self):
-        "Missing templates are correctly reported by test client"    
+        "Missing templates are correctly reported by test client"
         try:
             response = self.client.get("/no_such_view/")
             self.fail("Should get error about missing template")
@@ -334,7 +334,7 @@ class TemplateExceptionTests(TestCase):
             self.fail("Should get error about syntax error in template")
         except TemplateSyntaxError:
             pass
-        
+
 # We need two different tests to check URLconf substitution -  one to check
 # it was changed, and another one (without self.urls) to check it was reverted on
 # teardown. This pair of tests relies upon the alphabetical ordering of test execution.
@@ -382,4 +382,11 @@ class SessionTests(TestCase):
         response = self.client.get('/test_client_regress/check_session/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, 'YES')
-        
+
+    def test_logout(self):
+        """Logout should work whether the user is logged in or not (#9978)."""
+        self.client.logout()
+        login = self.client.login(username='testclient',password='password')
+        self.failUnless(login, 'Could not log in')
+        self.client.logout()
+        self.client.logout()
