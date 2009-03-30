@@ -8,6 +8,9 @@ import models
 class WidgetAdmin(admin.AdminSite):
     pass
 
+class CarAdmin(admin.ModelAdmin):
+    list_display = ['make', 'model', 'owner']
+    list_editable = ['owner']
 
 class CarTireAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -18,5 +21,6 @@ class CarTireAdmin(admin.ModelAdmin):
 
 site = WidgetAdmin()
 
-site.register(models.Car)
+site.register(models.User)
+site.register(models.Car, CarAdmin)
 site.register(models.CarTire, CarTireAdmin)

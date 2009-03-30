@@ -110,3 +110,16 @@ class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
         response = self.client.get("/widget_admin/admin_widgets/cartire/add/")
         self.assert_("BMW M3" not in response.content)
         self.assert_("Volkswagon Passat" in response.content)
+
+class AdminForeignKeyWidgetChangeList(DjangoTestCase):
+    fixtures = ["admin-widgets-users.xml"]
+    
+    def setUp(self):
+        self.client.login(username="super", password="secret")
+    
+    def tearDown(self):
+        self.client.logout()
+    
+    def test_changelist_foreignkey(self):
+        response = self.client.get('/widget_admin/admin_widgets/car/')
+        self.failUnless('/widget_admin/auth/user/add/' in response.content)
