@@ -47,10 +47,10 @@ A quick rundown:
       through its loop
 
 Now, let's create a Django view that handles the submitted data and does
-something with it. Remember, in :ref:`Tutorial 3 <intro-tutorial03>`, we created
-a URLconf for the polls application that includes this line::
+something with it. Remember, in :ref:`Tutorial 3 <intro-tutorial03>`, we
+created a URLconf for the polls application that includes this line::
 
-    (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
+    (r'^(?P<poll_id>\d+)/vote/$', 'vote'),
 
 So let's create a ``vote()`` function in ``mysite/polls/views.py``::
 
