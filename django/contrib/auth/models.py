@@ -111,6 +111,7 @@ class UserManager(models.Manager):
         u.is_active = True
         u.is_superuser = True
         u.save()
+        return u
 
     def make_random_password(self, length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'):
         "Generates a random password with the given length and given allowed_chars"
