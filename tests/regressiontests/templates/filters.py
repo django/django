@@ -281,13 +281,33 @@ def get_filter_tests():
         'escapejs01': (r'{{ a|escapejs }}', {'a': 'testing\r\njavascript \'string" <b>escaping</b>'}, 'testing\\x0D\\x0Ajavascript \\x27string\\x22 \\x3Cb\\x3Eescaping\\x3C/b\\x3E'),
         'escapejs02': (r'{% autoescape off %}{{ a|escapejs }}{% endautoescape %}', {'a': 'testing\r\njavascript \'string" <b>escaping</b>'}, 'testing\\x0D\\x0Ajavascript \\x27string\\x22 \\x3Cb\\x3Eescaping\\x3C/b\\x3E'),
 
+
+        # length filter.
+        'length01': ('{{ list|length }}', {'list': ['4', None, True, {}]}, '4'),
+        'length02': ('{{ list|length }}', {'list': []}, '0'),
+        'length03': ('{{ string|length }}', {'string': ''}, '0'),
+        'length04': ('{{ string|length }}', {'string': 'django'}, '6'),
+        # Invalid uses that should fail silently.
+        'length05': ('{{ int|length }}', {'int': 7}, ''),
+        'length06': ('{{ None|length }}', {'None': None}, ''),
+
+        # length_is filter.
+        'length_is01': ('{% if some_list|length_is:"4" %}Four{% endif %}', {'some_list': ['4', None, True, {}]}, 'Four'),
+        'length_is02': ('{% if some_list|length_is:"4" %}Four{% else %}Not Four{% endif %}', {'some_list': ['4', None, True, {}, 17]}, 'Not Four'),
+        'length_is03': ('{% if mystring|length_is:"4" %}Four{% endif %}', {'mystring': 'word'}, 'Four'),
+        'length_is04': ('{% if mystring|length_is:"4" %}Four{% else %}Not Four{% endif %}', {'mystring': 'Python'}, 'Not Four'),
+        'length_is05': ('{% if mystring|length_is:"4" %}Four{% else %}Not Four{% endif %}', {'mystring': ''}, 'Not Four'),
+        'length_is06': ('{% with var|length as my_length %}{{ my_length }}{% endwith %}', {'var': 'django'}, '6'),
         # Boolean return value from length_is should not be coerced to a string
-        'lengthis01': (r'{% if "X"|length_is:0 %}Length is 0{% else %}Length not 0{% endif %}', {}, 'Length not 0'),
-        'lengthis02': (r'{% if "X"|length_is:1 %}Length is 1{% else %}Length not 1{% endif %}', {}, 'Length is 1'),
+        'length_is07': (r'{% if "X"|length_is:0 %}Length is 0{% else %}Length not 0{% endif %}', {}, 'Length not 0'),
+        'length_is08': (r'{% if "X"|length_is:1 %}Length is 1{% else %}Length not 1{% endif %}', {}, 'Length is 1'),
+        # Invalid uses that should fail silently.
+        'length_is09': ('{{ var|length_is:"fish" }}', {'var': 'django'}, ''),
+        'length_is10': ('{{ int|length_is:"1" }}', {'int': 7}, ''),
+        'length_is11': ('{{ none|length_is:"1" }}', {'none': None}, ''),
 
         'join01': (r'{{ a|join:", " }}', {'a': ['alpha', 'beta & me']}, 'alpha, beta &amp; me'),
         'join02': (r'{% autoescape off %}{{ a|join:", " }}{% endautoescape %}', {'a': ['alpha', 'beta & me']}, 'alpha, beta & me'),
         'join03': (r'{{ a|join:" &amp; " }}', {'a': ['alpha', 'beta & me']}, 'alpha &amp; beta &amp; me'),
         'join04': (r'{% autoescape off %}{{ a|join:" &amp; " }}{% endautoescape %}', {'a': ['alpha', 'beta & me']}, 'alpha &amp; beta & me'),
     }
-
