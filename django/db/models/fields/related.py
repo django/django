@@ -332,6 +332,8 @@ class ForeignRelatedObjectsDescriptor(object):
 
             def add(self, *objs):
                 for obj in objs:
+                    if not isinstance(obj, self.model):
+                        raise TypeError, "'%s' instance expected" % self.model._meta.object_name
                     setattr(obj, rel_field.name, instance)
                     obj.save()
             add.alters_data = True
@@ -452,11 +454,14 @@ def create_many_related_manager(superclass, through=False):
 
             # If there aren't any objects, there is nothing to do.
             if objs:
+                from django.db.models.base import Model
                 # Check that all the objects are of the right type
                 new_ids = set()
                 for obj in objs:
                     if isinstance(obj, self.model):
                         new_ids.add(obj._get_pk_val())
+                    elif isinstance(obj, Model):
+                        raise TypeError, "'%s' instance expected" % self.model._meta.object_name
                     else:
                         new_ids.add(obj)
                 # Add the newly created or already existing objects to the join table.

@@ -61,6 +61,12 @@ ValueError: 'Article' instance needs to have a primary key value before a many-t
 # Adding a second time is OK
 >>> a2.publications.add(p3)
 
+# Adding an object of the wrong type raises TypeError
+>>> a2.publications.add(a1)
+Traceback (most recent call last):
+...
+TypeError: 'Publication' instance expected
+
 # Add a Publication directly via publications.add by using keyword arguments.
 >>> new_publication = a2.publications.create(title='Highlights for Children')
 
