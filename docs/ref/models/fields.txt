@@ -365,13 +365,14 @@ portability mentioned there should be heeded.
 
 .. class:: DateField([auto_now=False, auto_now_add=False, **options])
 
-A date field. Has a few extra optional arguments:
+A date, represented in Python by a ``datetime.date`` instance. Has a few extra,
+optional arguments:
 
 .. attribute:: DateField.auto_now
 
     Automatically set the field to now every time the object is saved. Useful
-    for "last-modified" timestamps. Note that the current date is *always* used;
-    it's not just a default value that you can override.
+    for "last-modified" timestamps. Note that the current date is *always*
+    used; it's not just a default value that you can override.
 
 .. attribute:: DateField.auto_now_add
 
@@ -380,18 +381,19 @@ A date field. Has a few extra optional arguments:
     it's not just a default value that you can override.
 
 The admin represents this as an ``<input type="text">`` with a JavaScript
-calendar, and a shortcut for "Today".  The JavaScript calendar will always start
-the week on a Sunday.
+calendar, and a shortcut for "Today".  The JavaScript calendar will always
+start the week on a Sunday.
 
 ``DateTimeField``
 -----------------
 
 .. class:: DateTimeField([auto_now=False, auto_now_add=False, **options])
 
-A date and time field. Takes the same extra options as :class:`DateField`.
+A date and time, represented in Python by a ``datetime.datetime`` instance.
+Takes the same extra arguments as :class:`DateField`.
 
-The admin represents this as two ``<input type="text">`` fields, with JavaScript
-shortcuts.
+The admin represents this as two ``<input type="text">`` fields, with
+JavaScript shortcuts.
 
 ``DecimalField``
 ----------------
@@ -706,9 +708,11 @@ input).
 
 .. class:: TimeField([auto_now=False, auto_now_add=False, **options])
 
-A time. Accepts the same auto-population options as :class:`DateField` and
-:class:`DateTimeField`. The admin represents this as an ``<input type="text">``
-with some JavaScript shortcuts.
+A time, represented in Python by a ``datetime.time`` instance. Accepts the same
+auto-population options as :class:`DateField`.
+
+The admin represents this as an ``<input type="text">`` with some JavaScript
+shortcuts.
 
 ``URLField``
 ------------
