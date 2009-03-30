@@ -2,12 +2,6 @@
  The GeometryColumns and SpatialRefSys models for the PostGIS backend.
 """
 from django.db import models
-from django.contrib.gis.models import SpatialRefSysMixin
-
-# Checking for the presence of GDAL (needed for the SpatialReference object)
-from django.contrib.gis.gdal import HAS_GDAL
-if HAS_GDAL:
-    from django.contrib.gis.gdal import SpatialReference
 
 class GeometryColumns(models.Model):
     """
@@ -28,7 +22,7 @@ class GeometryColumns(models.Model):
     @classmethod
     def table_name_col(cls):
         """
-        Returns the name of the metadata column used to store the 
+        Returns the name of the metadata column used to store the
         the feature table name.
         """
         return 'f_table_name'
@@ -36,7 +30,7 @@ class GeometryColumns(models.Model):
     @classmethod
     def geom_col_name(cls):
         """
-        Returns the name of the metadata column used to store the 
+        Returns the name of the metadata column used to store the
         the feature geometry column.
         """
         return 'f_geometry_column'
@@ -46,7 +40,7 @@ class GeometryColumns(models.Model):
                (self.f_table_name, self.f_geometry_column,
                 self.coord_dimension, self.type, self.srid)
 
-class SpatialRefSys(models.Model, SpatialRefSysMixin):
+class SpatialRefSys(models.Model):
     """
     The 'spatial_ref_sys' table from PostGIS. See the PostGIS
     documentaiton at Ch. 4.2.1.
@@ -58,6 +52,7 @@ class SpatialRefSys(models.Model, SpatialRefSysMixin):
     proj4text = models.CharField(max_length=2048)
 
     class Meta:
+        abstract = True
         db_table = 'spatial_ref_sys'
 
     @property

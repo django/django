@@ -9,10 +9,6 @@ from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField
 from django.contrib.gis.measure import Area, Distance
 from django.contrib.gis.models import get_srid_info
 
-# For backwards-compatibility; Q object should work just fine
-# after queryset-refactor.
-class GeoQ(Q): pass
-
 class GeomSQL(object):
     "Simple wrapper object for geometric SQL."
     def __init__(self, geo_sql):
@@ -44,10 +40,10 @@ class GeoQuerySet(QuerySet):
             s['procedure_fmt'] = '%(geo_col)s,%(tolerance)s'
             s['procedure_args']['tolerance'] = tolerance
             s['select_field'] = AreaField('sq_m') # Oracle returns area in units of meters.
-        elif SpatialBackend.postgis:
+        elif SpatialBackend.postgis or SpatialBackend.spatialite:
             if not geo_field.geodetic:
                 # Getting the area units of the geographic field.
-                s['select_field'] = AreaField(Area.unit_attname(geo_field._unit_name))
+                s['select_field'] = AreaField(Area.unit_attname(geo_field.units_name))
             else:
                 # TODO: Do we want to support raw number areas for geodetic fields?
                 raise Exception('Area on geodetic coordinate systems not supported.')
@@ -196,10 +192,18 @@ class GeoQuerySet(QuerySet):
         Scales the geometry to a new size by multiplying the ordinates
         with the given x,y,z scale factors.
         """
-        s = {'procedure_fmt' : '%(geo_col)s,%(x)s,%(y)s,%(z)s',
-             'procedure_args' : {'x' : x, 'y' : y, 'z' : z},
-             'select_field' : GeomField(),
-             }
+        if SpatialBackend.spatialite:
+            if z != 0.0:
+                raise NotImplementedError('SpatiaLite does not support 3D scaling.')
+            s = {'procedure_fmt' : '%(geo_col)s,%(x)s,%(y)s',
+                 'procedure_args' : {'x' : x, 'y' : y},
+                 'select_field' : GeomField(),
+                 }
+        else:
+            s = {'procedure_fmt' : '%(geo_col)s,%(x)s,%(y)s,%(z)s',
+                 'procedure_args' : {'x' : x, 'y' : y, 'z' : z},
+                 'select_field' : GeomField(),
+                 }
         return self._spatial_attribute('scale', s, **kwargs)
 
     def svg(self, **kwargs):
@@ -226,10 +230,18 @@ class GeoQuerySet(QuerySet):
         Translates the geometry to a new location using the given numeric
         parameters as offsets.
         """
-        s = {'procedure_fmt' : '%(geo_col)s,%(x)s,%(y)s,%(z)s',
-             'procedure_args' : {'x' : x, 'y' : y, 'z' : z},
-             'select_field' : GeomField(),
-             }
+        if SpatialBackend.spatialite:
+            if z != 0.0:
+                raise NotImplementedError('SpatiaLite does not support 3D translation.')
+            s = {'procedure_fmt' : '%(geo_col)s,%(x)s,%(y)s',
+                 'procedure_args' : {'x' : x, 'y' : y},
+                 'select_field' : GeomField(),
+                 }
+        else:
+            s = {'procedure_fmt' : '%(geo_col)s,%(x)s,%(y)s,%(z)s',
+                 'procedure_args' : {'x' : x, 'y' : y, 'z' : z},
+                 'select_field' : GeomField(),
+                 }
         return self._spatial_attribute('translate', s, **kwargs)
 
     def transform(self, srid=4326, **kwargs):
@@ -415,7 +427,7 @@ class GeoQuerySet(QuerySet):
         if geo_field.geodetic:
             dist_att = 'm'
         else:
-            dist_att = Distance.unit_attname(geo_field._unit_name)
+            dist_att = Distance.unit_attname(geo_field.units_name)
 
         # Shortcut booleans for what distance function we're using.
         distance = func == 'distance'
@@ -430,7 +442,7 @@ class GeoQuerySet(QuerySet):
         lookup_params = [geom or 'POINT (0 0)', 0]
 
         # If the spheroid calculation is desired, either by the `spheroid`
-        # keyword or wehn calculating the length of geodetic field, make
+        # keyword or when calculating the length of geodetic field, make
         # sure the 'spheroid' distance setting string is passed in so we
         # get the correct spatial stored procedure.
         if spheroid or (SpatialBackend.postgis and geo_field.geodetic and length):
@@ -456,6 +468,9 @@ class GeoQuerySet(QuerySet):
             else:
                 geodetic = geo_field.geodetic
 
+            if SpatialBackend.spatialite and geodetic:
+                raise ValueError('SQLite does not support linear distance calculations on geodetic coordinate systems.')
+
             if distance:
                 if self.query.transformed_srid:
                     # Setting the `geom_args` flag to false because we want to handle
@@ -467,12 +482,22 @@ class GeoQuerySet(QuerySet):
                     if geom.srid is None or geom.srid == self.query.transformed_srid:
                         # If the geom parameter srid is None, it is assumed the coordinates
                         # are in the transformed units.  A placeholder is used for the
-                        # geometry parameter.
-                        procedure_fmt += ', %%s'
+                        # geometry parameter.  `GeomFromText` constructor is also needed
+                        # to wrap geom placeholder for SpatiaLite.
+                        if SpatialBackend.spatialite:
+                            procedure_fmt += ', %s(%%%%s, %s)' % (SpatialBackend.from_text, self.query.transformed_srid)
+                        else:
+                            procedure_fmt += ', %%s'
                     else:
                         # We need to transform the geom to the srid specified in `transform()`,
                         # so wrapping the geometry placeholder in transformation SQL.
-                        procedure_fmt += ', %s(%%%%s, %s)' % (SpatialBackend.transform, self.query.transformed_srid)
+                        # SpatiaLite also needs geometry placeholder wrapped in `GeomFromText`
+                        # constructor.
+                        if SpatialBackend.spatialite:
+                            procedure_fmt += ', %s(%s(%%%%s, %s), %s)' % (SpatialBackend.transform, SpatialBackend.from_text,
+                                                                          geom.srid, self.query.transformed_srid)
+                        else:
+                            procedure_fmt += ', %s(%%%%s, %s)' % (SpatialBackend.transform, self.query.transformed_srid)
                 else:
                     # `transform()` was not used on this GeoQuerySet.
                     procedure_fmt  = '%(geo_col)s,%(geom)s'
@@ -483,9 +508,9 @@ class GeoQuerySet(QuerySet):
                     # procedures may only do queries from point columns to point geometries
                     # some error checking is required.
                     if not isinstance(geo_field, PointField):
-                        raise TypeError('Spherical distance calculation only supported on PointFields.')
+                        raise ValueError('Spherical distance calculation only supported on PointFields.')
                     if not str(SpatialBackend.Geometry(buffer(params[0].wkb)).geom_type) == 'Point':
-                        raise TypeError('Spherical distance calculation only supported with Point Geometry parameters')
+                        raise ValueError('Spherical distance calculation only supported with Point Geometry parameters')
                     # The `function` procedure argument needs to be set differently for
                     # geodetic distance calculations.
                     if spheroid:

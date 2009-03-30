@@ -44,13 +44,13 @@ class GeometryProxy(object):
         be used to set the geometry as well.
         """
         # The OGC Geometry type of the field.
-        gtype = self._field._geom
+        gtype = self._field.geom_type
         
         # The geometry type must match that of the field -- unless the
         # general GeometryField is used.
         if isinstance(value, self._klass) and (str(value.geom_type).upper() == gtype or gtype == 'GEOMETRY'):
             # Assigning the SRID to the geometry.
-            if value.srid is None: value.srid = self._field._srid
+            if value.srid is None: value.srid = self._field.srid
         elif isinstance(value, (NoneType, StringType, UnicodeType)):
             # Set with None, WKT, or HEX
             pass

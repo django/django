@@ -1,5 +1,5 @@
 
-def create_spatial_db(test=True, verbosity=1, autoclobber=False):
-    if not test: raise NotImplementedError('This uses `create_test_db` from test/utils.py')
+def create_test_spatial_db(verbosity=1, autoclobber=False):
+    "A wrapper over the MySQL `create_test_db` method."
     from django.db import connection
     connection.creation.create_test_db(verbosity, autoclobber)

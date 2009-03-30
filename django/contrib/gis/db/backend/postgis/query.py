@@ -42,6 +42,7 @@ if MAJOR_VERSION >= 1:
     ASGML = get_func('AsGML')
     ASSVG = get_func('AsSVG')
     CENTROID = get_func('Centroid')
+    COLLECT = get_func('Collect')
     DIFFERENCE = get_func('Difference')
     DISTANCE = get_func('Distance')
     DISTANCE_SPHERE = get_func('distance_sphere')

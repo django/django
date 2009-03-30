@@ -208,13 +208,14 @@ class GeoQuery(sql.Query):
         if SpatialBackend.oracle:
             # Running through Oracle's first.
             value = super(GeoQuery, self).convert_values(value, field or GeomField())
+
         if isinstance(field, DistanceField):
             # Using the field's distance attribute, can instantiate
             # `Distance` with the right context.
             value = Distance(**{field.distance_att : value})
         elif isinstance(field, AreaField):
             value = Area(**{field.area_att : value})
-        elif isinstance(field, GeomField):
+        elif isinstance(field, GeomField) and value:
             value = SpatialBackend.Geometry(value)
         return value
 
@@ -260,7 +261,7 @@ class GeoQuery(sql.Query):
         selection formats in order to retrieve geometries in OGC WKT. For all
         other fields a simple '%s' format string is returned.
         """
-        if SpatialBackend.select and hasattr(fld, '_geom'):
+        if SpatialBackend.select and hasattr(fld, 'geom_type'):
             # This allows operations to be done on fields in the SELECT,
             # overriding their values -- used by the Oracle and MySQL
             # spatial backends to get database values as WKT, and by the
@@ -270,8 +271,10 @@ class GeoQuery(sql.Query):
             # Because WKT doesn't contain spatial reference information,
             # the SRID is prefixed to the returned WKT to ensure that the
             # transformed geometries have an SRID different than that of the
-            # field -- this is only used by `transform` for Oracle backends.
-            if self.transformed_srid and SpatialBackend.oracle:
+            # field -- this is only used by `transform` for Oracle and
+            # SpatiaLite backends.
+            if self.transformed_srid and ( SpatialBackend.oracle or
+                                           SpatialBackend.spatialite ):
                 sel_fmt = "'SRID=%d;'||%s" % (self.transformed_srid, sel_fmt)
         else:
             sel_fmt = '%s'

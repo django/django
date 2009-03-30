@@ -23,7 +23,4 @@ class BaseSpatialBackend(object):
             return self.__dict__[name]
         except KeyError:
             return False
-            
-        
-        
-    
+

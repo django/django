@@ -5,7 +5,7 @@ from django.contrib.gis.db.models.sql import GeomField
 class GeoAggregate(Aggregate):
 
     def add_to_query(self, query, alias, col, source, is_summary):
-        if hasattr(source, '_geom'):
+        if hasattr(source, 'geom_type'):
             # Doing additional setup on the Query object for spatial aggregates.
             aggregate = getattr(query.aggregates_module, self.name)
             
@@ -17,6 +17,9 @@ class GeoAggregate(Aggregate):
                     query.custom_select[alias] = SpatialBackend.select
      
         super(GeoAggregate, self).add_to_query(query, alias, col, source, is_summary)
+
+class Collect(GeoAggregate):
+    name = 'Collect'
 
 class Extent(GeoAggregate):
     name = 'Extent'

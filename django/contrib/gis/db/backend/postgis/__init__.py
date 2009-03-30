@@ -1,14 +1,16 @@
-__all__ = ['create_spatial_db', 'get_geo_where_clause', 'SpatialBackend']
+__all__ = ['create_test_spatial_db', 'get_geo_where_clause', 'SpatialBackend']
 
 from django.contrib.gis.db.backend.base import BaseSpatialBackend
 from django.contrib.gis.db.backend.postgis.adaptor import PostGISAdaptor
-from django.contrib.gis.db.backend.postgis.creation import create_spatial_db
+from django.contrib.gis.db.backend.postgis.creation import create_test_spatial_db
 from django.contrib.gis.db.backend.postgis.field import PostGISField
+from django.contrib.gis.db.backend.postgis.models import GeometryColumns, SpatialRefSys
 from django.contrib.gis.db.backend.postgis.query import *
 
 SpatialBackend = BaseSpatialBackend(name='postgis', postgis=True,
                                     area=AREA,
                                     centroid=CENTROID,
+                                    collect=COLLECT,
                                     difference=DIFFERENCE,
                                     distance=DISTANCE,
                                     distance_functions=DISTANCE_FUNCTIONS,
@@ -39,4 +41,6 @@ SpatialBackend = BaseSpatialBackend(name='postgis', postgis=True,
                                     version=(MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2),
                                     Adaptor=PostGISAdaptor,
                                     Field=PostGISField,
+                                    GeometryColumns=GeometryColumns,
+                                    SpatialRefSys=SpatialRefSys,
                                     )

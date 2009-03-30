@@ -44,8 +44,17 @@ elif SpatialBackend.oracle:
             return None
     
     def convert_geom(clob, geo_field):
-        if clob: return SpatialBackend.Geometry(clob.read(), geo_field._srid)
-        else: return None
+        if clob: 
+            return SpatialBackend.Geometry(clob.read(), geo_field.srid)
+        else:
+            return None
+elif SpatialBackend.spatialite:
+    # SpatiaLite returns WKT.
+    def convert_geom(wkt, geo_field):
+        if wkt:
+            return SpatialBackend.Geometry(wkt, geo_field.srid)
+        else:
+            return None
 
 class GeoAggregate(Aggregate):
     # Overriding the SQL template with the geographic one.
@@ -70,6 +79,10 @@ class GeoAggregate(Aggregate):
         # Making sure the SQL function is available for this spatial backend.
         if not self.sql_function:
             raise NotImplementedError('This aggregate functionality not implemented for your spatial backend.')
+
+class Collect(GeoAggregate):
+    conversion_class = GeomField
+    sql_function = SpatialBackend.collect
 
 class Extent(GeoAggregate):
     is_extent = True

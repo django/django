@@ -32,26 +32,25 @@ class OracleSpatialField(Field):
         Adds this geometry column into the Oracle USER_SDO_GEOM_METADATA
         table.
         """
-
         # Checking the dimensions.
         # TODO: Add support for 3D geometries.
-        if self._dim != 2:
+        if self.dim != 2:
             raise Exception('3D geometries not yet supported on Oracle Spatial backend.')
 
         # Constructing the SQL that will be used to insert information about
         # the geometry column into the USER_GSDO_GEOM_METADATA table.
-        meta_sql = style.SQL_KEYWORD('INSERT INTO ') + \
-                   style.SQL_TABLE('USER_SDO_GEOM_METADATA') + \
-                   ' (%s, %s, %s, %s)\n  ' % tuple(map(qn, ['TABLE_NAME', 'COLUMN_NAME', 'DIMINFO', 'SRID'])) + \
-                   style.SQL_KEYWORD(' VALUES ') + '(\n    ' + \
-                   style.SQL_TABLE(gqn(db_table)) + ',\n    ' + \
-                   style.SQL_FIELD(gqn(self.column)) + ',\n    ' + \
-                   style.SQL_KEYWORD("MDSYS.SDO_DIM_ARRAY") + '(\n      ' + \
-                   style.SQL_KEYWORD("MDSYS.SDO_DIM_ELEMENT") + \
-                   ("('LONG', %s, %s, %s),\n      " % (self._extent[0], self._extent[2], self._tolerance)) + \
-                   style.SQL_KEYWORD("MDSYS.SDO_DIM_ELEMENT") + \
-                   ("('LAT', %s, %s, %s)\n    ),\n" % (self._extent[1], self._extent[3], self._tolerance)) + \
-                   '    %s\n  );' % self._srid
+        meta_sql = (style.SQL_KEYWORD('INSERT INTO ') +
+                    style.SQL_TABLE('USER_SDO_GEOM_METADATA') +
+                    ' (%s, %s, %s, %s)\n  ' % tuple(map(qn, ['TABLE_NAME', 'COLUMN_NAME', 'DIMINFO', 'SRID'])) +
+                    style.SQL_KEYWORD(' VALUES ') + '(\n    ' +
+                    style.SQL_TABLE(gqn(db_table)) + ',\n    ' +
+                    style.SQL_FIELD(gqn(self.column)) + ',\n    ' +
+                    style.SQL_KEYWORD("MDSYS.SDO_DIM_ARRAY") + '(\n      ' +
+                    style.SQL_KEYWORD("MDSYS.SDO_DIM_ELEMENT") +
+                    ("('LONG', %s, %s, %s),\n      " % (self._extent[0], self._extent[2], self._tolerance)) +
+                    style.SQL_KEYWORD("MDSYS.SDO_DIM_ELEMENT") +
+                    ("('LAT', %s, %s, %s)\n    ),\n" % (self._extent[1], self._extent[3], self._tolerance)) +
+                    '    %s\n  );' % self.srid)
         return meta_sql
 
     def _geom_index(self, style, db_table):
@@ -60,14 +59,14 @@ class OracleSpatialField(Field):
         # Getting the index name, Oracle doesn't allow object
         # names > 30 characters.
         idx_name = truncate_name('%s_%s_id' % (db_table, self.column), 30)
-        
-        sql = style.SQL_KEYWORD('CREATE INDEX ') + \
-              style.SQL_TABLE(qn(idx_name)) + \
-              style.SQL_KEYWORD(' ON ') + \
-              style.SQL_TABLE(qn(db_table)) + '(' + \
-              style.SQL_FIELD(qn(self.column)) + ') ' + \
-              style.SQL_KEYWORD('INDEXTYPE IS ') + \
-              style.SQL_TABLE('MDSYS.SPATIAL_INDEX') + ';'
+
+        sql = (style.SQL_KEYWORD('CREATE INDEX ') +
+               style.SQL_TABLE(qn(idx_name)) +
+               style.SQL_KEYWORD(' ON ') +
+               style.SQL_TABLE(qn(db_table)) + '(' +
+               style.SQL_FIELD(qn(self.column)) + ') ' +
+               style.SQL_KEYWORD('INDEXTYPE IS ') +
+               style.SQL_TABLE('MDSYS.SPATIAL_INDEX') + ';')
         return sql
 
     def post_create_sql(self, style, db_table):
@@ -79,7 +78,7 @@ class OracleSpatialField(Field):
         post_sql = self._add_geom(style, db_table)
 
         # Getting the geometric index for this Geometry column.
-        if self._index:
+        if self.spatial_index:
             return (post_sql, self._geom_index(style, db_table))
         else:
             return (post_sql,)
@@ -87,7 +86,7 @@ class OracleSpatialField(Field):
     def db_type(self):
         "The Oracle geometric data type is MDSYS.SDO_GEOMETRY."
         return 'MDSYS.SDO_GEOMETRY'
-        
+
     def get_placeholder(self, value):
         """
         Provides a proper substitution value for Geometries that are not in the
@@ -96,8 +95,8 @@ class OracleSpatialField(Field):
         """
         if value is None:
             return '%s'
-        elif value.srid != self._srid:
+        elif value.srid != self.srid:
             # Adding Transform() to the SQL placeholder.
-            return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (TRANSFORM, value.srid, self._srid)
+            return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (TRANSFORM, value.srid, self.srid)
         else:
-            return 'SDO_GEOMETRY(%%s, %s)' % self._srid
+            return 'SDO_GEOMETRY(%%s, %s)' % self.srid

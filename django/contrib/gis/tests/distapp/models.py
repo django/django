@@ -37,6 +37,13 @@ class SouthTexasZipcode(models.Model):
 class Interstate(models.Model):
     "Geodetic model for U.S. Interstates."
     name = models.CharField(max_length=10)
-    line = models.LineStringField()
+    path = models.LineStringField()
+    objects = models.GeoManager()
+    def __unicode__(self): return self.name
+
+class SouthTexasInterstate(models.Model):
+    "Projected model for South Texas Interstates."
+    name = models.CharField(max_length=10)
+    path = models.LineStringField(srid=32140)
     objects = models.GeoManager()
     def __unicode__(self): return self.name

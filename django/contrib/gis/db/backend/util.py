@@ -1,4 +1,21 @@
-from types import UnicodeType
+"""
+A collection of utility routines and classes used by the spatial
+backends.
+"""
+
+def getstatusoutput(cmd):
+    """
+    Executes a shell command on the platform using subprocess.Popen and
+    return a tuple of the status and stdout output.
+    """
+    from subprocess import Popen, PIPE
+    # Set stdout and stderr to PIPE because we want to capture stdout and
+    # prevent stderr from displaying.
+    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+    # We use p.communicate() instead of p.wait() to avoid deadlocks if the
+    # output buffers exceed POSIX buffer size.
+    stdout, stderr = p.communicate()
+    return p.returncode, stdout.strip()
 
 def gqn(val):
     """
@@ -7,7 +24,7 @@ def gqn(val):
     backend quotename function).
     """
     if isinstance(val, basestring):
-        if isinstance(val, UnicodeType): val = val.encode('ascii')
+        if isinstance(val, unicode): val = val.encode('ascii')
         return "'%s'" % val
     else:
         return str(val)

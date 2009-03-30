@@ -8,7 +8,6 @@
  model and the `SDO_COORD_REF_SYS` is used for the SpatialRefSys model.
 """
 from django.db import models
-from django.contrib.gis.models import SpatialRefSysMixin
 
 class GeometryColumns(models.Model):
     "Maps to the Oracle USER_SDO_GEOM_METADATA table."
@@ -22,7 +21,7 @@ class GeometryColumns(models.Model):
     @classmethod
     def table_name_col(cls):
         """
-        Returns the name of the metadata column used to store the 
+        Returns the name of the metadata column used to store the
         the feature table name.
         """
         return 'table_name'
@@ -30,7 +29,7 @@ class GeometryColumns(models.Model):
     @classmethod
     def geom_col_name(cls):
         """
-        Returns the name of the metadata column used to store the 
+        Returns the name of the metadata column used to store the
         the feature geometry column.
         """
         return 'column_name'
@@ -38,19 +37,19 @@ class GeometryColumns(models.Model):
     def __unicode__(self):
         return '%s - %s (SRID: %s)' % (self.table_name, self.column_name, self.srid)
 
-class SpatialRefSys(models.Model, SpatialRefSysMixin):
+class SpatialRefSys(models.Model):
     "Maps to the Oracle MDSYS.CS_SRS table."
     cs_name = models.CharField(max_length=68)
     srid = models.IntegerField(primary_key=True)
     auth_srid = models.IntegerField()
     auth_name = models.CharField(max_length=256)
     wktext = models.CharField(max_length=2046)
-    #cs_bounds = models.GeometryField()
+    #cs_bounds = models.GeometryField() # TODO
 
     class Meta:
-        # TODO: Figure out way to have this be MDSYS.CS_SRS without
-        #  having django's quoting mess up the SQL.
+        abstract = True
         db_table = 'CS_SRS'
+        app_label = '_mdsys' # Hack so that syncdb won't try to create "CS_SRS" table.
 
     @property
     def wkt(self):

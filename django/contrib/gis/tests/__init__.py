@@ -9,28 +9,26 @@ def geo_suite():
     some backends).
     """
     from django.conf import settings
-    from django.contrib.gis.tests.utils import mysql, oracle, postgis
-    from django.contrib.gis import gdal, utils
+    from django.contrib.gis.gdal import HAS_GDAL
+    from django.contrib.gis.utils import HAS_GEOIP
+    from django.contrib.gis.tests.utils import mysql
 
     # The test suite.
     s = unittest.TestSuite()
 
-    # Adding the GEOS tests. (__future__)
-    from django.contrib.gis.geos import tests as geos_tests
-    s.addTest(geos_tests.suite())
-
-    # Test apps that require use of a spatial database (e.g., creation of models)
+    # Tests that require use of a spatial database (e.g., creation of models)
     test_apps = ['geoapp', 'relatedapp']
-    if oracle or postgis:
-        test_apps.append('distapp')
 
-    # Tests that do not require setting up and tearing down a spatial database
-    # and are modules in `django.contrib.gis.tests`.
+    # Tests that do not require setting up and tearing down a spatial database.
     test_suite_names = [
         'test_measure',
         ]
 
-    if gdal.HAS_GDAL:
+    # Tests applications that require a test spatial db.
+    if not mysql:
+        test_apps.append('distapp')
+
+    if HAS_GDAL:
         # These tests require GDAL.
         test_suite_names.append('test_spatialrefsys')
         test_apps.append('layermap')
@@ -39,14 +37,25 @@ def geo_suite():
         from django.contrib.gis.gdal import tests as gdal_tests
         s.addTest(gdal_tests.suite())
     else:
-        print >>sys.stderr, "GDAL not available - no GDAL tests will be run."
+        print >>sys.stderr, "GDAL not available - no tests requiring GDAL will be run."
 
-    if utils.HAS_GEOIP and hasattr(settings, 'GEOIP_PATH'):
+    if HAS_GEOIP and hasattr(settings, 'GEOIP_PATH'):
         test_suite_names.append('test_geoip')
 
+    # Adding the rest of the suites from the modules specified
+    # in the `test_suite_names`.
     for suite_name in test_suite_names:
         tsuite = import_module('django.contrib.gis.tests.' + suite_name)
         s.addTest(tsuite.suite())
+
+    # Adding the GEOS tests _last_.  Doing this because if suite starts
+    # immediately with this test while after running syncdb, it will cause a
+    # segmentation fault.  My initial guess is that SpatiaLite is still in
+    # critical areas of non thread-safe GEOS code when the test suite is run.
+    # TODO: Confirm my reasoning. Are there other consequences?
+    from django.contrib.gis.geos import tests as geos_tests
+    s.addTest(geos_tests.suite())
+
     return s, test_apps
 
 def run_gis_tests(test_labels, **kwargs):
@@ -84,8 +93,8 @@ def run_gis_tests(test_labels, **kwargs):
     # Creating the test suite, adding the test models to INSTALLED_APPS, and
     # adding the model test suites to our suite package.
     gis_suite, test_apps = geo_suite()
-    for test_app in test_apps:
-        module_name = 'django.contrib.gis.tests.%s' % test_app
+    for test_model in test_apps:
+        module_name = 'django.contrib.gis.tests.%s' % test_model
         if mysql:
             test_module = 'tests_mysql'
         else:
@@ -114,12 +123,12 @@ def run_gis_tests(test_labels, **kwargs):
 
 def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[], suite=None):
     """
-    This module allows users to run tests for GIS apps that require the creation 
+    This module allows users to run tests for GIS apps that require the creation
     of a spatial database.  Currently, this is only required for PostgreSQL as
     PostGIS needs extra overhead in test database creation.
 
-    In order to create a PostGIS database, the DATABASE_USER (or 
-    TEST_DATABASE_USER, if defined) will require superuser priviliges.  
+    In order to create a PostGIS database, the DATABASE_USER (or
+    TEST_DATABASE_USER, if defined) will require superuser priviliges.
 
     To accomplish this outside the `postgres` user, you have a few options:
       (A) Make your user a super user:
@@ -133,11 +142,11 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[], suite=
       (B) Create your own PostgreSQL database as a local user:
         1. Initialize database: `initdb -D /path/to/user/db`
         2. If there's already a Postgres instance on the machine, it will need
-           to use a different TCP port than 5432. Edit postgresql.conf (in 
-           /path/to/user/db) to change the database port (e.g. `port = 5433`).  
+           to use a different TCP port than 5432. Edit postgresql.conf (in
+           /path/to/user/db) to change the database port (e.g. `port = 5433`).
         3. Start this database `pg_ctl -D /path/to/user/db start`
 
-      (C) On Windows platforms the pgAdmin III utility may also be used as 
+      (C) On Windows platforms the pgAdmin III utility may also be used as
         a simple way to add superuser privileges to your database user.
 
     The TEST_RUNNER needs to be set in your settings like so:
@@ -145,10 +154,10 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[], suite=
       TEST_RUNNER='django.contrib.gis.tests.run_tests'
 
     Note: This test runner assumes that the PostGIS SQL files ('lwpostgis.sql'
-    and 'spatial_ref_sys.sql') are installed in the directory specified by 
+    and 'spatial_ref_sys.sql') are installed in the directory specified by
     `pg_config --sharedir` (and defaults to /usr/local/share if that fails).
     This behavior is overridden if POSTGIS_SQL_PATH is set in your settings.
-    
+
     Windows users should set POSTGIS_SQL_PATH manually because the output
     of `pg_config` uses paths like 'C:/PROGRA~1/POSTGR~1/..'.
 
@@ -160,18 +169,21 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[], suite=
     from django.test.simple import build_suite, build_test
     from django.test.utils import setup_test_environment, teardown_test_environment
 
-    # The `create_spatial_db` routine abstracts away all the steps needed
+    # The `create_test_spatial_db` routine abstracts away all the steps needed
     # to properly construct a spatial database for the backend.
-    from django.contrib.gis.db.backend import create_spatial_db
+    from django.contrib.gis.db.backend import create_test_spatial_db
 
     # Setting up for testing.
     setup_test_environment()
     settings.DEBUG = False
     old_name = settings.DATABASE_NAME
 
+    # Creating the test spatial database.
+    create_test_spatial_db(verbosity=verbosity)
+
     # The suite may be passed in manually, e.g., when we run the GeoDjango test,
-    # we want to build it and pass it in due to some customizations.  Otherwise, 
-    # the normal test suite creation process from `django.test.simple.run_tests` 
+    # we want to build it and pass it in due to some customizations.  Otherwise,
+    # the normal test suite creation process from `django.test.simple.run_tests`
     # is used to create the test suite.
     if suite is None:
         suite = unittest.TestSuite()
@@ -185,12 +197,9 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[], suite=
         else:
             for app in get_apps():
                 suite.addTest(build_suite(app))
-    
+
         for test in extra_tests:
             suite.addTest(test)
-
-    # Creating the test spatial database.
-    create_spatial_db(test=True, verbosity=verbosity)
 
     # Executing the tests (including the model tests), and destorying the
     # test database after the tests have completed.

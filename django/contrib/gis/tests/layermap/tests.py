@@ -7,9 +7,9 @@ from django.contrib.gis.utils.layermapping import LayerMapping, LayerMapError, I
 from django.contrib.gis.gdal import DataSource
 
 shp_path = os.path.dirname(__file__)
-city_shp = os.path.join(shp_path, 'cities/cities.shp')
-co_shp = os.path.join(shp_path, 'counties/counties.shp')
-inter_shp = os.path.join(shp_path, 'interstates/interstates.shp')
+city_shp = os.path.join(shp_path, '../data/cities/cities.shp')
+co_shp = os.path.join(shp_path, '../data/counties/counties.shp')
+inter_shp = os.path.join(shp_path, '../data/interstates/interstates.shp')
 
 # Dictionaries to hold what's expected in the county shapefile.  
 NAMES  = ['Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo']
@@ -53,7 +53,6 @@ class LayerMapTest(unittest.TestCase):
 
     def test02_simple_layermap(self):
         "Test LayerMapping import of a simple point shapefile."
-
         # Setting up for the LayerMapping.
         lm = LayerMapping(City, city_shp, city_mapping)
         lm.save()
@@ -78,7 +77,6 @@ class LayerMapTest(unittest.TestCase):
 
     def test03_layermap_strict(self):
         "Testing the `strict` keyword, and import of a LineString shapefile."
-
         # When the `strict` keyword is set an error encountered will force
         # the importation to stop.
         try:
@@ -118,7 +116,6 @@ class LayerMapTest(unittest.TestCase):
 
     def county_helper(self, county_feat=True):
         "Helper function for ensuring the integrity of the mapped County models."
-        
         for name, n, st in zip(NAMES, NUMS, STATES):
             # Should only be one record b/c of `unique` keyword.
             c = County.objects.get(name=name)
@@ -198,7 +195,6 @@ class LayerMapTest(unittest.TestCase):
 
     def test05_test_fid_range_step(self):
         "Tests the `fid_range` keyword and the `step` keyword of .save()."
-        
         # Function for clearing out all the counties before testing.
         def clear_counties(): County.objects.all().delete()
         

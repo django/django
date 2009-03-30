@@ -1,9 +1,10 @@
-__all__ = ['create_spatial_db', 'get_geo_where_clause', 'SpatialBackend']
+__all__ = ['create_test_spatial_db', 'get_geo_where_clause', 'SpatialBackend']
 
 from django.contrib.gis.db.backend.base import BaseSpatialBackend
 from django.contrib.gis.db.backend.oracle.adaptor import OracleSpatialAdaptor
-from django.contrib.gis.db.backend.oracle.creation import create_spatial_db
+from django.contrib.gis.db.backend.oracle.creation import create_test_spatial_db
 from django.contrib.gis.db.backend.oracle.field import OracleSpatialField
+from django.contrib.gis.db.backend.oracle.models import GeometryColumns, SpatialRefSys
 from django.contrib.gis.db.backend.oracle.query import *
 
 SpatialBackend = BaseSpatialBackend(name='oracle', oracle=True,
@@ -29,4 +30,6 @@ SpatialBackend = BaseSpatialBackend(name='oracle', oracle=True,
                                     union=UNION,
                                     Adaptor=OracleSpatialAdaptor,
                                     Field=OracleSpatialField,
+                                    GeometryColumns=GeometryColumns,
+                                    SpatialRefSys=SpatialRefSys,
                                     )

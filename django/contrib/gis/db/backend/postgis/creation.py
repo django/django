@@ -1,23 +1,10 @@
 import os, re, sys
-from subprocess import Popen, PIPE
 
 from django.conf import settings
 from django.core.management import call_command
 from django.db import connection
 from django.db.backends.creation import TEST_DATABASE_PREFIX
-
-def getstatusoutput(cmd):
-    """
-    Executes a shell command on the platform using subprocess.Popen and
-    return a tuple of the status and stdout output.
-    """
-    # Set stdout and stderr to PIPE because we want to capture stdout and
-    # prevent stderr from displaying.
-    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
-    # We use p.communicate() instead of p.wait() to avoid deadlocks if the
-    # output buffers exceed POSIX buffer size.
-    stdout, stderr = p.communicate()
-    return p.returncode, stdout.strip()
+from django.contrib.gis.db.backend.util import getstatusoutput
 
 def create_lang(db_name, verbosity=1):
     "Sets up the pl/pgsql language on the given database."
@@ -110,20 +97,16 @@ def _create_with_shell(db_name, verbosity=1, autoclobber=False):
         else:
             raise Exception('Unknown error occurred in creating database: %s' % output)
 
-def create_spatial_db(test=False, verbosity=1, autoclobber=False, interactive=False):
-    "Creates a spatial database based on the settings."
+def create_test_spatial_db(verbosity=1, autoclobber=False, interactive=False):
+    "Creates a test spatial database based on the settings."
 
     # Making sure we're using PostgreSQL and psycopg2
     if settings.DATABASE_ENGINE != 'postgresql_psycopg2':
         raise Exception('Spatial database creation only supported postgresql_psycopg2 platform.')
 
     # Getting the spatial database name
-    if test:
-        db_name = get_spatial_db(test=True)
-        _create_with_cursor(db_name, verbosity=verbosity, autoclobber=autoclobber)
-    else:
-        db_name = get_spatial_db()
-        _create_with_shell(db_name, verbosity=verbosity, autoclobber=autoclobber)
+    db_name = get_spatial_db(test=True)
+    _create_with_cursor(db_name, verbosity=verbosity, autoclobber=autoclobber)
 
     # If a template database is used, then don't need to do any of the following.
     if not hasattr(settings, 'POSTGIS_TEMPLATE'):

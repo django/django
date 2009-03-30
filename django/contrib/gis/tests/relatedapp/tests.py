@@ -2,7 +2,7 @@ import os, unittest
 from django.contrib.gis.geos import *
 from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.db.models import F, Extent, Union
-from django.contrib.gis.tests.utils import no_mysql, no_oracle
+from django.contrib.gis.tests.utils import no_mysql, no_oracle, no_spatialite
 from django.conf import settings
 from models import City, Location, DirectoryEntry, Parcel
 
@@ -12,7 +12,7 @@ cities = (('Aurora', 'TX', -97.516111, 33.058333),
            )
 
 class RelatedGeoModelTest(unittest.TestCase):
-    
+
     def test01_setup(self):
         "Setting up for related model tests."
         for name, state, lon, lat in cities:
@@ -32,7 +32,7 @@ class RelatedGeoModelTest(unittest.TestCase):
                 self.assertEqual(nm, c.name)
                 self.assertEqual(st, c.state)
                 self.assertEqual(Point(lon, lat), c.location.point)
-        
+
     @no_mysql
     @no_oracle # Pagination problem is implicated in this test as well.
     def test03_transform_related(self):
@@ -43,7 +43,7 @@ class RelatedGeoModelTest(unittest.TestCase):
             tol = 3
         else:
             tol = 0
-            
+
         def check_pnt(ref, pnt):
             self.assertAlmostEqual(ref.x, pnt.x, tol)
             self.assertAlmostEqual(ref.y, pnt.y, tol)
@@ -59,14 +59,14 @@ class RelatedGeoModelTest(unittest.TestCase):
             # Doing this implicitly sets `select_related` select the location.
             # TODO: Fix why this breaks on Oracle.
             qs = list(City.objects.filter(name=name).transform(srid, field_name='location__point'))
-            check_pnt(GEOSGeometry(wkt, srid), qs[0].location.point) 
+            check_pnt(GEOSGeometry(wkt, srid), qs[0].location.point)
 
     @no_mysql
-    def test04_related_aggregate(self):
-        "Testing the `extent` and `unionagg` GeoQuerySet aggregates on related geographic models."
-
+    @no_spatialite
+    def test04a_related_extent_aggregate(self):
+        "Testing the `extent` GeoQuerySet aggregates on related geographic models."
         # This combines the Extent and Union aggregates into one query
-        aggs = City.objects.aggregate(Extent('location__point'), Union('location__point'))
+        aggs = City.objects.aggregate(Extent('location__point'))
 
         # One for all locations, one that excludes Roswell.
         all_extent = (-104.528060913086, 33.0583305358887,-79.4607315063477, 40.1847610473633)
@@ -81,14 +81,20 @@ class RelatedGeoModelTest(unittest.TestCase):
         for ref, e in [(all_extent, e1), (txpa_extent, e2), (all_extent, e3)]:
             for ref_val, e_val in zip(ref, e): self.assertAlmostEqual(ref_val, e_val, tol)
 
+    @no_mysql
+    def test04b_related_union_aggregate(self):
+        "Testing the `unionagg` GeoQuerySet aggregates on related geographic models."
+        # This combines the Extent and Union aggregates into one query
+        aggs = City.objects.aggregate(Union('location__point'))
+
         # These are the points that are components of the aggregate geographic
         # union that is returned.
         p1 = Point(-104.528056, 33.387222)
         p2 = Point(-97.516111, 33.058333)
         p3 = Point(-79.460734, 40.18476)
-        
+
         # Creating the reference union geometry depending on the spatial backend,
-        # as Oracle will have a different internal ordering of the component 
+        # as Oracle will have a different internal ordering of the component
         # geometries than PostGIS.  The second union aggregate is for a union
         # query that includes limiting information in the WHERE clause (in other
         # words a `.filter()` precedes the call to `.unionagg()`).
@@ -98,7 +104,7 @@ class RelatedGeoModelTest(unittest.TestCase):
         else:
             ref_u1 = MultiPoint(p1, p2, p3, srid=4326)
             ref_u2 = MultiPoint(p2, p3, srid=4326)
-        
+
         u1 = City.objects.unionagg(field_name='location__point')
         u2 = City.objects.exclude(name='Roswell').unionagg(field_name='location__point')
         u3 = aggs['location__point__union']
@@ -106,7 +112,7 @@ class RelatedGeoModelTest(unittest.TestCase):
         self.assertEqual(ref_u1, u1)
         self.assertEqual(ref_u2, u2)
         self.assertEqual(ref_u1, u3)
-        
+
     def test05_select_related_fk_to_subclass(self):
         "Testing that calling select_related on a query over a model with an FK to a model subclass works"
         # Regression test for #9752.
@@ -140,14 +146,14 @@ class RelatedGeoModelTest(unittest.TestCase):
         qs = Parcel.objects.filter(center1__within=F('border1'))
         self.assertEqual(1, len(qs))
         self.assertEqual('P2', qs[0].name)
-        
+
         if not SpatialBackend.mysql:
             # This time center2 is in a different coordinate system and needs
             # to be wrapped in transformation SQL.
             qs = Parcel.objects.filter(center2__within=F('border1'))
             self.assertEqual(1, len(qs))
             self.assertEqual('P2', qs[0].name)
-        
+
         # Should return the first Parcel, which has the center point equal
         # to the point in the City ForeignKey.
         qs = Parcel.objects.filter(center1=F('city__location__point'))

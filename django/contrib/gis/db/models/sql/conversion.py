@@ -2,10 +2,14 @@
 This module holds simple classes used by GeoQuery.convert_values
 to convert geospatial values from the database.
 """
+from django.contrib.gis.db.backend import SpatialBackend
+
 class BaseField(object):
     def get_internal_type(self):
         "Overloaded method so OracleQuery.convert_values doesn't balk."
         return None
+
+if SpatialBackend.oracle: BaseField.empty_strings_allowed = False
 
 class AreaField(BaseField):
     "Wrapper for Area values."

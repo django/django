@@ -1,5 +1,5 @@
 from django.contrib.gis.db import models
-from django.contrib.gis.tests.utils import mysql
+from django.contrib.gis.tests.utils import mysql, spatialite
 
 # MySQL spatial indices can't handle NULL geometries.
 null_flag = not mysql
@@ -12,7 +12,7 @@ class Country(models.Model):
 
 class City(models.Model):
     name = models.CharField(max_length=30)
-    point = models.PointField() 
+    point = models.PointField()
     objects = models.GeoManager()
     def __unicode__(self): return self.name
 
@@ -27,12 +27,13 @@ class State(models.Model):
     objects = models.GeoManager()
     def __unicode__(self): return self.name
 
-class Feature(models.Model):
-    name = models.CharField(max_length=20)
-    geom = models.GeometryField()
-    objects = models.GeoManager()
-    def __unicode__(self): return self.name
+if not spatialite:
+    class Feature(models.Model):
+        name = models.CharField(max_length=20)
+        geom = models.GeometryField()
+        objects = models.GeoManager()
+        def __unicode__(self): return self.name
 
-class MinusOneSRID(models.Model):
-    geom = models.PointField(srid=-1) # Minus one SRID.
-    objects = models.GeoManager()
+    class MinusOneSRID(models.Model):
+        geom = models.PointField(srid=-1) # Minus one SRID.
+        objects = models.GeoManager()

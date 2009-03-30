@@ -8,12 +8,16 @@ from django.contrib.gis.measure import Distance
 # reference system table w/o using the ORM.
 from django.contrib.gis.models import get_srid_info
 
-#TODO: Flesh out widgets; consider adding support for OGR Geometry proxies.
+def deprecated_property(func):
+    from warnings import warn
+    warn('This attribute has been deprecated, pleas use "%s" instead.' % func.__name__[1:])
+    return property(func)
+
 class GeometryField(SpatialBackend.Field):
     "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 
     # The OpenGIS Geometry name.
-    _geom = 'GEOMETRY'
+    geom_type = 'GEOMETRY'
 
     # Geodetic units.
     geodetic_units = ('Decimal Degree', 'degree')
@@ -37,21 +41,44 @@ class GeometryField(SpatialBackend.Field):
         """
 
         # Setting the index flag with the value of the `spatial_index` keyword.
-        self._index = spatial_index
+        self.spatial_index = spatial_index
 
         # Setting the SRID and getting the units.  Unit information must be
         # easily available in the field instance for distance queries.
-        self._srid = srid
-        self._unit, self._unit_name, self._spheroid = get_srid_info(srid)
+        self.srid = srid
+        self.units, self.units_name, self._spheroid = get_srid_info(srid)
 
         # Setting the dimension of the geometry field.
-        self._dim = dim
+        self.dim = dim
 
         # Setting the verbose_name keyword argument with the positional
         # first parameter, so this works like normal fields.
         kwargs['verbose_name'] = verbose_name
 
         super(GeometryField, self).__init__(**kwargs) # Calling the parent initializtion function
+
+    # The following properties are for formerly private variables that are now
+    # public for GeometryField.  Because of their use by third-party applications,
+    # a deprecation warning is issued to notify them to use new attribute name.
+    def _deprecated_warning(self, old_name, new_name):
+        from warnings import warn
+        warn('The `%s` attribute name is deprecated, please update your code to use `%s` instead.' %
+             (old_name, new_name))
+
+    @property
+    def _geom(self):
+        self._deprecated_warning('_geom', 'geom_type')
+        return self.geom_type
+
+    @property
+    def _index(self):
+        self._deprecated_warning('_index', 'spatial_index')
+        return self.spatial_index
+
+    @property
+    def _srid(self):
+        self._deprecated_warning('_srid', 'srid')
+        return self.srid
 
     ### Routines specific to GeometryField ###
     @property
@@ -60,7 +87,7 @@ class GeometryField(SpatialBackend.Field):
         Returns true if this field's SRID corresponds with a coordinate
         system that uses non-projected units (e.g., latitude/longitude).
         """
-        return self._unit_name in self.geodetic_units
+        return self.units_name in self.geodetic_units
 
     def get_distance(self, dist_val, lookup_type):
         """
@@ -80,7 +107,7 @@ class GeometryField(SpatialBackend.Field):
                 # Spherical distance calculation parameter should be in meters.
                 dist_param = dist.m
             else:
-                dist_param = getattr(dist, Distance.unit_attname(self._unit_name))
+                dist_param = getattr(dist, Distance.unit_attname(self.units_name))
         else:
             # Assuming the distance is in the units of the field.
             dist_param = dist
@@ -127,8 +154,8 @@ class GeometryField(SpatialBackend.Field):
         has no SRID, then that of the field will be returned.
         """
         gsrid = geom.srid # SRID of given geometry.
-        if gsrid is None or self._srid == -1 or (gsrid == -1 and self._srid != -1):
-            return self._srid
+        if gsrid is None or self.srid == -1 or (gsrid == -1 and self.srid != -1):
+            return self.srid
         else:
             return gsrid
 
@@ -141,8 +168,9 @@ class GeometryField(SpatialBackend.Field):
 
     def formfield(self, **kwargs):
         defaults = {'form_class' : forms.GeometryField,
-                    'geom_type' : self._geom,
                     'null' : self.null,
+                    'geom_type' : self.geom_type,
+                    'srid' : self.srid,
                     }
         defaults.update(kwargs)
         return super(GeometryField, self).formfield(**defaults)
@@ -190,22 +218,22 @@ class GeometryField(SpatialBackend.Field):
 
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
-    _geom = 'POINT'
+    geom_type = 'POINT'
 
 class LineStringField(GeometryField):
-    _geom = 'LINESTRING'
+    geom_type = 'LINESTRING'
 
 class PolygonField(GeometryField):
-    _geom = 'POLYGON'
+    geom_type = 'POLYGON'
 
 class MultiPointField(GeometryField):
-    _geom = 'MULTIPOINT'
+    geom_type = 'MULTIPOINT'
 
 class MultiLineStringField(GeometryField):
-    _geom = 'MULTILINESTRING'
+    geom_type = 'MULTILINESTRING'
 
 class MultiPolygonField(GeometryField):
-    _geom = 'MULTIPOLYGON'
+    geom_type = 'MULTIPOLYGON'
 
 class GeometryCollectionField(GeometryField):
-    _geom = 'GEOMETRYCOLLECTION'
+    geom_type = 'GEOMETRYCOLLECTION'

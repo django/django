@@ -19,6 +19,7 @@ class GeometryField(forms.Field):
     def __init__(self, **kwargs):
         self.null = kwargs.pop('null')
         self.geom_type = kwargs.pop('geom_type')
+        self.srid = kwargs.pop('srid')
         super(GeometryField, self).__init__(**kwargs)
 
     def clean(self, value):
