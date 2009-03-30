@@ -210,8 +210,8 @@ class SingleRelatedObjectDescriptor(object):
                                 (value, instance._meta.object_name,
                                  self.related.get_accessor_name(), self.related.opts.object_name))
 
-        # Set the value of the related field
-        setattr(value, self.related.field.rel.get_related_field().attname, instance)
+        # Set the value of the related field to the value of the related object's related field
+        setattr(value, self.related.field.attname, getattr(instance, self.related.field.rel.get_related_field().attname))
 
         # Since we already know what the related object is, seed the related
         # object caches now, too. This avoids another db hit if you get the
