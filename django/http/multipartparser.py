@@ -34,8 +34,6 @@ class MultiPartParser(object):
 
     ``MultiValueDict.parse()`` reads the input stream in ``chunk_size`` chunks
     and returns a tuple of ``(MultiValueDict(POST), MultiValueDict(FILES))``. If
-    ``file_upload_dir`` is defined files will be streamed to temporary files in
-    that directory.
     """
     def __init__(self, META, input_data, upload_handlers, encoding=None):
         """
@@ -44,7 +42,7 @@ class MultiPartParser(object):
         :META:
             The standard ``META`` dictionary in Django request objects.
         :input_data:
-            The raw post data, as a bytestring.
+            The raw post data, as a file-like object.
         :upload_handler:
             An UploadHandler instance that performs operations on the uploaded
             data.
