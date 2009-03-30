@@ -760,6 +760,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         'list': _(u'Enter a list of values.'),
         'invalid_choice': _(u'Select a valid choice. %s is not one of the'
                             u' available choices.'),
+        'invalid_pk_value': _(u'"%s" is not a valid value for a primary key.')
     }
 
     def __init__(self, queryset, cache_choices=False, required=True,
@@ -782,6 +783,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
                 obj = self.queryset.get(pk=val)
             except self.queryset.model.DoesNotExist:
                 raise ValidationError(self.error_messages['invalid_choice'] % val)
+            except ValueError:
+                raise ValidationError(self.error_messages['invalid_pk_value'] % val)
             else:
                 final_values.append(obj)
         return final_values

@@ -857,6 +857,10 @@ ValidationError: [u'Select a valid choice. 100 is not one of the available choic
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a list of values.']
+>>> f.clean(['fail'])
+Traceback (most recent call last):
+...
+ValidationError: [u'"fail" is not a valid value for a primary key.']
 
 # Add a Category object *after* the ModelMultipleChoiceField has already been
 # instantiated. This proves clean() checks the database during clean() rather
