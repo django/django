@@ -64,9 +64,9 @@ Let's take a look at a very simple example of the ``ModelAdmin``::
 
         from django.contrib import admin
         from myproject.myapp.models import Author
-    
+
         admin.site.register(Author)
-    
+
 ``ModelAdmin`` Options
 ----------------------
 
@@ -138,13 +138,13 @@ The ``field_options`` dictionary can have the following keys:
     * ``fields``
         A tuple of field names to display in this fieldset. This key is
         required.
-        
+
         Example::
-        
+
             {
             'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
             }
-            
+
         To display multiple fields on the same line, wrap those fields in
         their own tuple. In this example, the ``first_name`` and ``last_name``
         fields will display on the same line::
@@ -155,9 +155,9 @@ The ``field_options`` dictionary can have the following keys:
 
     * ``classes``
         A list containing extra CSS classes to apply to the fieldset.
-        
+
         Example::
-        
+
             {
             'classes': ['wide', 'extrapretty'],
             }
@@ -213,10 +213,10 @@ For example, let's consider the following model::
 
 If you want a form for the ``Author`` model that includes only the ``name``
 and ``title`` fields, you would specify ``fields`` or ``exclude`` like this::
-    
+
     class AuthorAdmin(admin.ModelAdmin):
         fields = ('name', 'title')
-    
+
     class AuthorAdmin(admin.ModelAdmin):
         exclude = ('birth_date',)
 
@@ -254,30 +254,30 @@ that displays the ``__unicode__()`` representation of each object.
 You have four possible values that can be used in ``list_display``:
 
     * A field of the model. For example::
-    
+
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name')
-    
+
     * A callable that accepts one parameter for the model instance. For
       example::
-    
+
           def upper_case_name(obj):
               return ("%s %s" % (obj.first_name, obj.last_name)).upper()
           upper_case_name.short_description = 'Name'
-        
+
           class PersonAdmin(admin.ModelAdmin):
               list_display = (upper_case_name,)
-    
+
     * A string representing an attribute on the ``ModelAdmin``. This behaves
       same as the callable. For example::
-      
+
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('upper_case_name',)
-              
+
               def upper_case_name(self, obj):
                 return ("%s %s" % (obj.first_name, obj.last_name)).upper()
               upper_case_name.short_description = 'Name'
-    
+
     * A string representing an attribute on the model. This behaves almost
       the same as the callable, but ``self`` in this context is the model
       instance. Here's a full model example::
@@ -311,7 +311,7 @@ A few special cases to note about ``list_display``:
       callable, Django will HTML-escape the output by default. If you'd rather
       not escape the output of the method, give the method an ``allow_tags``
       attribute whose value is ``True``.
-      
+
       Here's a full example model::
 
           class Person(models.Model):
@@ -399,9 +399,6 @@ the change list page::
     class PersonAdmin(admin.ModelAdmin):
         list_display = ('first_name', 'last_name', 'birthday')
         list_display_links = ('first_name', 'last_name')
-
-Finally, note that in order to use ``list_display_links``, you must define
-``list_display``, too.
 
 ``list_filter``
 ~~~~~~~~~~~~~~~
@@ -662,11 +659,11 @@ the ability define your own form::
 ``MyArticleAdminForm`` can be defined anywhere as long as you import where
 needed. Now within your form you can add your own custom validation for
 any field::
-    
+
     class MyArticleAdminForm(forms.ModelForm):
         class Meta:
             model = Article
-        
+
         def clean_name(self):
             # do something that validates your data
             return self.cleaned_data["name"]
@@ -805,7 +802,7 @@ Working with Many-to-Many Intermediary Models
 By default, admin widgets for many-to-many relations will be displayed inline
 on whichever model contains the actual reference to the ``ManyToManyField``.
 However, when you specify an intermediary model using the ``through``
-argument to a ``ManyToManyField``, the admin will not display a widget by 
+argument to a ``ManyToManyField``, the admin will not display a widget by
 default. This is because each instance of that intermediary model requires
 more information than could be displayed in a single widget, and the layout
 required for multiple widgets will vary depending on the intermediate model.
@@ -816,7 +813,7 @@ models::
 
     class Person(models.Model):
         name = models.CharField(max_length=128)
-    
+
     class Group(models.Model):
         name = models.CharField(max_length=128)
         members = models.ManyToManyField(Person, through='Membership')
@@ -847,7 +844,7 @@ Now create admin views for the ``Person`` and ``Group`` models::
         inlines = (MembershipInline,)
 
 Finally, register your ``Person`` and ``Group`` models with the admin site::
-    
+
     admin.site.register(Person, PersonAdmin)
     admin.site.register(Group, GroupAdmin)
 
@@ -865,7 +862,7 @@ you have the following models::
         content_type = models.ForeignKey(ContentType)
         object_id = models.PositiveIntegerField()
         content_object = generic.GenericForeignKey("content_type", "object_id")
-    
+
     class Product(models.Model):
         name = models.CharField(max_length=100)
 
@@ -876,17 +873,17 @@ example app::
 
     from django.contrib import admin
     from django.contrib.contenttypes import generic
-    
+
     from myproject.myapp.models import Image, Product
-    
+
     class ImageInline(generic.GenericTabularInline):
         model = Image
-    
+
     class ProductAdmin(admin.ModelAdmin):
         inlines = [
             ImageInline,
         ]
-    
+
     admin.site.register(Product, ProductAdmin)
 
 ``django.contrib.contenttypes.generic`` provides both a ``GenericTabularInline``
