@@ -431,12 +431,14 @@ class Client(object):
 
     def logout(self):
         """
-        Removes the authenticated user's cookies.
+        Removes the authenticated user's cookies and session object.
 
         Causes the authenticated user to be logged out.
         """
         session = import_module(settings.SESSION_ENGINE).SessionStore()
-        session.delete(session_key=self.cookies[settings.SESSION_COOKIE_NAME].value)
+        session_cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
+        if session_cookie:
+            session.delete(session_key=session_cookie.value)
         self.cookies = SimpleCookie()
 
     def _handle_redirects(self, response):

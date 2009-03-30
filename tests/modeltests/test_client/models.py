@@ -423,4 +423,3 @@ class ClientTest(TestCase):
         self.assertEqual(mail.outbox[1].from_email, 'from@example.com')
         self.assertEqual(mail.outbox[1].to[0], 'second@example.com')
         self.assertEqual(mail.outbox[1].to[1], 'third@example.com')
-

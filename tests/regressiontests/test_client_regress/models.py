@@ -505,6 +505,14 @@ class SessionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, 'YES')
 
+    def test_logout(self):
+        """Logout should work whether the user is logged in or not (#9978)."""
+        self.client.logout()
+        login = self.client.login(username='testclient',password='password')
+        self.failUnless(login, 'Could not log in')
+        self.client.logout()
+        self.client.logout()
+
 class RequestMethodTests(TestCase):
     def test_get(self):
         "Request a view via request method GET"
