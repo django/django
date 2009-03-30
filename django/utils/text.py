@@ -219,27 +219,27 @@ def smart_split(text):
 smart_split = allow_lazy(smart_split, unicode)
 
 def _replace_entity(match):
-     text = match.group(1)
-     if text[0] == u'#':
-         text = text[1:]
-         try:
-             if text[0] in u'xX':
-                 c = int(text[1:], 16)
-             else:
-                 c = int(text)
-             return unichr(c)
-         except ValueError:
-             return match.group(0)
-     else:
-         try:
-             return unichr(name2codepoint[text])
-         except (ValueError, KeyError):
-             return match.group(0)
+    text = match.group(1)
+    if text[0] == u'#':
+        text = text[1:]
+        try:
+            if text[0] in u'xX':
+                c = int(text[1:], 16)
+            else:
+                c = int(text)
+            return unichr(c)
+        except ValueError:
+            return match.group(0)
+    else:
+        try:
+            return unichr(name2codepoint[text])
+        except (ValueError, KeyError):
+            return match.group(0)
 
 _entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
 def unescape_entities(text):
-     return _entity_re.sub(_replace_entity, text)
+    return _entity_re.sub(_replace_entity, text)
 unescape_entities = allow_lazy(unescape_entities, unicode)
 
 def unescape_string_literal(s):
@@ -261,4 +261,3 @@ def unescape_string_literal(s):
     quote = s[0]
     return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
 unescape_string_literal = allow_lazy(unescape_string_literal)
-
