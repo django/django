@@ -7,7 +7,7 @@ timezones are only evaluated at the moment of execution and will therefore be
 consistent.
 """
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from django.utils.tzinfo import LocalTimezone, FixedOffset
 from django.utils.safestring import mark_safe
@@ -28,6 +28,8 @@ def get_filter_tests():
     now = datetime.now()
     now_tz = datetime.now(LocalTimezone(now))
     now_tz_i = datetime.now(FixedOffset((3 * 60) + 15)) # imaginary time zone
+    today = date.today()
+
     return {
         # Default compare with datetime.now()
         'filter-timesince01' : ('{{ a|timesince }}', {'a': datetime.now() + timedelta(minutes=-1, seconds = -10)}, '1 minute'),
@@ -55,6 +57,10 @@ def get_filter_tests():
         'filter-timesince15' : ('{{ a|timesince:b }}', {'a': now, 'b': now_tz_i}, ''),
         'filter-timesince16' : ('{{ a|timesince:b }}', {'a': now_tz_i, 'b': now}, ''),
 
+        # Regression for #9065 (two date objects).
+        'filter-timesince17' : ('{{ a|timesince:b }}', {'a': today, 'b': today}, '0 minutes'),
+        'filter-timesince18' : ('{{ a|timesince:b }}', {'a': today, 'b': today + timedelta(hours=24)}, '1 day'),
+
         # Default compare with datetime.now()
         'filter-timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now() + timedelta(minutes=2, seconds = 10)}, '2 minutes'),
         'filter-timeuntil02' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(days=1, seconds = 10))}, '1 day'),
@@ -73,6 +79,10 @@ def get_filter_tests():
         # Ensures that differing timezones are calculated correctly
         'filter-timeuntil10' : ('{{ a|timeuntil }}', {'a': now_tz_i}, '0 minutes'),
         'filter-timeuntil11' : ('{{ a|timeuntil:b }}', {'a': now_tz_i, 'b': now_tz}, '0 minutes'),
+
+        # Regression for #9065 (two date objects).
+        'filter-timeuntil12' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today}, '0 minutes'),
+        'filter-timeuntil13' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today - timedelta(hours=24)}, '1 day'),
 
         'filter-addslash01': ("{% autoescape off %}{{ a|addslashes }} {{ b|addslashes }}{% endautoescape %}", {"a": "<a>'", "b": mark_safe("<a>'")}, ur"<a>\' <a>\'"),
         'filter-addslash02': ("{{ a|addslashes }} {{ b|addslashes }}", {"a": "<a>'", "b": mark_safe("<a>'")}, ur"&lt;a&gt;\&#39; <a>\'"),
