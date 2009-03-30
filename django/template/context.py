@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 
@@ -71,6 +70,7 @@ class Context(object):
 # This is a function rather than module-level procedural code because we only
 # want it to execute if somebody uses RequestContext.
 def get_standard_processors():
+    from django.conf import settings
     global _standard_context_processors
     if _standard_context_processors is None:
         processors = []
