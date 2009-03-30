@@ -871,7 +871,7 @@ that the field is used in. Since each class has a different name, each related
 name will end up being different. For example::
 
     class Base(models.Model):
-        m2m = models.ManyToMany(OtherModel, related_name="%(class)s_related")
+        m2m = models.ManyToManyField(OtherModel, related_name="%(class)s_related")
 
         class Meta:
             abstract = True
