@@ -1,5 +1,5 @@
 import unittest
-from django.contrib.gis.tests.utils import mysql, no_mysql, oracle, postgis
+from django.contrib.gis.tests.utils import mysql, no_mysql, oracle, postgis, spatialite
 if not mysql:
     from django.contrib.gis.models import SpatialRefSys
 
@@ -9,7 +9,7 @@ test_srs = ({'srid' : 4326,
              'srtext' : 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]',
              'proj4' : '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ',
              'spheroid' : 'WGS 84', 'name' : 'WGS 84', 
-             'geographic' : True, 'projected' : False,
+             'geographic' : True, 'projected' : False, 'spatialite' : True,
              'ellipsoid' : (6378137.0, 6356752.3, 298.257223563), # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
              'eprec' : (1, 1, 9),
              },
@@ -19,7 +19,7 @@ test_srs = ({'srid' : 4326,
              'srtext' : 'PROJCS["NAD83 / Texas South Central",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["standard_parallel_1",30.28333333333333],PARAMETER["standard_parallel_2",28.38333333333333],PARAMETER["latitude_of_origin",27.83333333333333],PARAMETER["central_meridian",-99],PARAMETER["false_easting",600000],PARAMETER["false_northing",4000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","32140"]]',
              'proj4' : '+proj=lcc +lat_1=30.28333333333333 +lat_2=28.38333333333333 +lat_0=27.83333333333333 +lon_0=-99 +x_0=600000 +y_0=4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs ',
              'spheroid' : 'GRS 1980', 'name' : 'NAD83 / Texas South Central',
-             'geographic' : False, 'projected' : True,
+             'geographic' : False, 'projected' : True, 'spatialite' : False,
              'ellipsoid' : (6378137.0, 6356752.31414, 298.257222101), # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
              'eprec' : (1, 5, 10),
              },
@@ -56,13 +56,19 @@ class SpatialRefSysTest(unittest.TestCase):
             self.assertEqual(True, sr.spheroid.startswith(sd['spheroid']))
             self.assertEqual(sd['geographic'], sr.geographic)
             self.assertEqual(sd['projected'], sr.projected)
-            self.assertEqual(True, sr.name.startswith(sd['name']))
+
+            if not (spatialite and not sd['spatialite']):
+                # Can't get 'NAD83 / Texas South Central' from PROJ.4 string
+                # on SpatiaLite
+                self.assertEqual(True, sr.name.startswith(sd['name']))
 
             # Testing the SpatialReference object directly.
-            if postgis:
+            if postgis or spatialite:
                 srs = sr.srs
                 self.assertEqual(sd['proj4'], srs.proj4)
-                self.assertEqual(sd['srtext'], srs.wkt)
+                # No `srtext` field in the `spatial_ref_sys` table in SpatiaLite
+                if not spatialite:
+                    self.assertEqual(sd['srtext'], srs.wkt)
 
     @no_mysql
     def test03_ellipsoid(self):
