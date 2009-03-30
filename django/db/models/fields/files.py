@@ -199,7 +199,7 @@ class FileField(Field):
             getattr(instance, self.name).save(data.name, data, save=False)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.FileField}
+        defaults = {'form_class': forms.FileField, 'max_length': self.max_length}
         # If a file has been provided previously, then the form doesn't require
         # that a new file is provided this time.
         # The code to mark the form field as not required is used by

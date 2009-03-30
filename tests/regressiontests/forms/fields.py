@@ -845,6 +845,21 @@ ValidationError: [u'The submitted file is empty.']
 >>> type(f.clean(SimpleUploadedFile('name', 'Some File Content'), 'files/test4.pdf'))
 <class 'django.core.files.uploadedfile.SimpleUploadedFile'>
 
+>>> f = FileField(max_length = 5)
+>>> f.clean(SimpleUploadedFile('test_maxlength.txt', 'hello world'))
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this filename has at most 5 characters (it has 18).']
+
+>>> f.clean('', 'files/test1.pdf')
+'files/test1.pdf'
+
+>>> f.clean(None, 'files/test2.pdf')
+'files/test2.pdf'
+
+>>> type(f.clean(SimpleUploadedFile('name', 'Some File Content')))
+<class 'django.core.files.uploadedfile.SimpleUploadedFile'>
+
 # URLField ##################################################################
 
 >>> f = URLField()
