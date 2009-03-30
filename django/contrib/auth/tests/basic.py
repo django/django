@@ -24,6 +24,8 @@ True
 False
 >>> u.is_active
 True
+>>> u.is_superuser
+False
 
 >>> a = AnonymousUser()
 >>> a.is_authenticated()
@@ -32,10 +34,21 @@ False
 False
 >>> a.is_active
 False
+>>> a.is_superuser
+False
 >>> a.groups.all()
 []
 >>> a.user_permissions.all()
 []
+
+# superuser tests.
+>>> super = User.objects.create_superuser('super', 'super@example.com', 'super')
+>>> super.is_superuser
+True
+>>> super.is_active
+True
+>>> super.is_staff
+True
 
 #
 # Tests for createsuperuser management command.
