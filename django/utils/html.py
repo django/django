@@ -46,9 +46,9 @@ def linebreaks(value, autoescape=False):
     value = re.sub(r'\r\n|\r|\n', '\n', force_unicode(value)) # normalize newlines
     paras = re.split('\n{2,}', value)
     if autoescape:
-        paras = [u'<p>%s</p>' % escape(p.strip()).replace('\n', '<br />') for p in paras]
+        paras = [u'<p>%s</p>' % escape(p).replace('\n', '<br />') for p in paras]
     else:
-        paras = [u'<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
+        paras = [u'<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
     return u'\n\n'.join(paras)
 linebreaks = allow_lazy(linebreaks, unicode)
 
