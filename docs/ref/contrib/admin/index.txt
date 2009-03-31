@@ -425,7 +425,7 @@ edit and save multiple rows at once.
     ``list_editable`` interacts with a couple of other options in particular
     ways; you should note the following rules:
 
-        * To use ``list_editable`` you must have defined ``ordering`` defined on
+        * To use ``list_editable`` you must have defined ``ordering`` on
           either your model or your ``ModelAdmin``.
 
         * Any field in ``list_editable`` must also be in ``list_display``. You
