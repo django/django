@@ -11,23 +11,17 @@ ways to easily deploy Django:
 .. toctree::
    :maxdepth: 1
    
+   modwsgi
    modpython
    fastcgi
    
-:ref:`Deploying under mod_python <howto-deployment-modpython>` is the
-recommended deployment method; start there if you're not sure which path you'd
-like to go down.
+If you're new to deploying Django and/or Python, we'd recommend you try
+:ref:`mod_wsgi <howto-deployment-modwsgi>` first. In most cases it'll be the easiest,
+fastest, and most stable deployment choice.
 
 .. seealso::
 
     * `Chapter 20 of The Django Book`_ discusses deployment and especially
       scaling in more detail.
       
-    * `mod_wsgi`_ is a newcomer to the Python deployment world, but it's rapidly
-      gaining traction. Currently there's a few hoops you have to jump through to
-      `use mod_wsgi with Django`_, but mod_wsgi tends to get rave reviews from
-      those who use it.
-
 .. _chapter 20 of the django book: http://djangobook.com/en/1.0/chapter20/
-.. _mod_wsgi: http://code.google.com/p/modwsgi/
-.. _use mod_wsgi with Django: http://code.google.com/p/modwsgi/wiki/IntegrationWithDjango

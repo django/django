@@ -1,0 +1,68 @@
+.. _howto-deployment-modwsgi:
+
+==========================================
+How to use Django with Apache and mod_wsgi
+==========================================
+
+Deploying Django with Apache_ and `mod_wsgi`_ is the recommended way to get
+Django into production.
+
+.. _Apache: http://httpd.apache.org/
+.. _mod_wsgi: http://code.google.com/p/modwsgi/
+
+mod_wsgi is an Apache module which can be used to host any Python application
+which supports the `Python WSGI interface`_, including Django. Django will work
+with any version of Apache which supports mod_wsgi.
+
+.. _python wsgi interface: http://www.python.org/dev/peps/pep-0333/
+
+The `official mod_wsgi documentation`_ is fantastic; it's your source for all
+the details about how to use mod_wsgi. You'll probably want to start with the
+`installation and configuration documentation`_.
+
+.. _official mod_wsgi documentation: http://code.google.com/p/modwsgi/
+.. _installation and configuration documentation: http://code.google.com/p/modwsgi/wiki/InstallationInstructions
+
+Basic Configuration
+===================
+
+Once you've got mod_wsgi installed and activated, edit your ``httpd.conf`` file
+and add::
+
+    WSGIScriptAlias / /path/to/mysite/apache/django.wsgi
+
+The first bit aboveis the url you want to be serving your application at (``/``
+indicates the root url), and the second is the location of a "WSGI file" -- see
+below -- on your system, usually inside of your project. This tells Apache
+to serve any request below the given URL using the WSGI application defined by that file.
+
+Next we'll need to actually create this WSGI application, so create the file
+mentioned in the second part of ``WSGIScriptAlias`` and add::
+
+    import os
+    import sys
+
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+
+    import django.core.handlers.wsgi
+    application = django.core.handlers.wsgi.WSGIHandler()
+
+If your project is not on your ``PYTHONPATH`` by default you can add::
+
+    sys.path.append('/usr/local/django')
+
+just above the ``import`` line to place your project on the path. Remember to
+replace 'mysite.settings' with your correct settings file.
+
+See the :ref:`Apache/mod_python documentation<howto-deployment-modpython>` for 
+directions on serving static media, and the `mod_wsgi documentation`_ for an 
+explanation of other directives and configuration options you can use.
+
+Details
+=======
+
+For more details, see the `mod_wsgi documentation`_, which explains the above in
+more detail, and walks through all the various options you've got when deploying
+under mod_wsgi.
+
+.. _mod_wsgi documentation: http://code.google.com/p/modwsgi/wiki/IntegrationWithDjango

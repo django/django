@@ -73,7 +73,7 @@ The development process
     * **Settings:** :ref:`Overview <topics-settings>` | :ref:`Full list of settings <ref-settings>`
     * **django-admin.py and manage.py:** :ref:`Overview <ref-django-admin>` | :ref:`Adding custom commands <howto-custom-management-commands>`
     * **Testing:** :ref:`Overview <topics-testing>`
-    * **Deployment:** :ref:`Overview <howto-deployment-index>` | :ref:`Apache/mod_python <howto-deployment-modpython>` | :ref:`FastCGI/SCGI/AJP <howto-deployment-fastcgi>` | :ref:`Apache authentication <howto-apache-auth>` | :ref:`Serving static files <howto-static-files>` | :ref:`Tracking code errors by e-mail <howto-error-reporting>`
+    * **Deployment:** :ref:`Overview <howto-deployment-index>` | :ref:`Apache/mod_wsgi <howto-deployment-modwsgi>` | | :ref:`Apache/mod_python <howto-deployment-modpython>` :ref:`FastCGI/SCGI/AJP <howto-deployment-fastcgi>` | :ref:`Apache authentication <howto-apache-auth>` | :ref:`Serving static files <howto-static-files>` | :ref:`Tracking code errors by e-mail <howto-error-reporting>`
 
 Other batteries included
 ========================
