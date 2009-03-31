@@ -946,3 +946,20 @@ class AdminActionsTest(TestCase):
         }
         response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
         self.failUnlessEqual(response.status_code, 302)
+
+class TestInlineNotEditable(TestCase):
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        result = self.client.login(username='super', password='secret')
+        self.failUnlessEqual(result, True)
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test(self):
+        """
+        InlineModelAdmin broken?
+        """
+        response = self.client.get('/test_admin/admin/admin_views/parent/add/')
+        self.failUnlessEqual(response.status_code, 200)

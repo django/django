@@ -545,7 +545,11 @@ class BaseInlineFormSet(BaseModelFormSet):
         if self._pk_field == self.fk:
             form.fields[self._pk_field.name] = InlineForeignKeyField(self.instance, pk_field=True)
         else:
-            form.fields[self.fk.name] = InlineForeignKeyField(self.instance, label=form.fields[self.fk.name].label)
+            # The foreign key field might not be on the form, so we poke at the
+            # Model field to get the label, since we need that for error messages.
+            form.fields[self.fk.name] = InlineForeignKeyField(self.instance,
+                label=getattr(form.fields.get(self.fk.name), 'label', capfirst(self.fk.verbose_name))
+            )
 
 def _get_foreign_key(parent_model, model, fk_name=None):
     """

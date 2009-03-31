@@ -248,6 +248,20 @@ class PodcastAdmin(admin.ModelAdmin):
 
     ordering = ('name',)
 
+class Parent(models.Model):
+    name = models.CharField(max_length=128)
+
+class Child(models.Model):
+    parent = models.ForeignKey(Parent, editable=False)
+    name = models.CharField(max_length=30, blank=True)
+
+class ChildInline(admin.StackedInline):
+    model = Child
+
+class ParentAdmin(admin.ModelAdmin):
+    model = Parent
+    inlines = [ChildInline]
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, inlines=[ArticleInline])
@@ -259,6 +273,7 @@ admin.site.register(Persona, PersonaAdmin)
 admin.site.register(Subscriber, SubscriberAdmin)
 admin.site.register(ExternalSubscriber, ExternalSubscriberAdmin)
 admin.site.register(Podcast, PodcastAdmin)
+admin.site.register(Parent, ParentAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
