@@ -618,7 +618,7 @@ demonstration::
 Note the addition of ``import datetime`` to reference Python's standard
 ``datetime`` module.
 
-Let's jump back into the Python interactive shell by running
+Save these changes and start a new Python interactive shell by running
 ``python manage.py shell`` again::
 
     >>> from mysite.polls.models import Poll, Choice
