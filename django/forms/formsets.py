@@ -228,9 +228,8 @@ class BaseFormSet(StrAndUnicode):
                 # more code than we'd like, but the form's cleaned_data will
                 # not exist if the form is invalid.
                 field = form.fields[DELETION_FIELD_NAME]
-                prefix = form.add_prefix(DELETION_FIELD_NAME)
-                value = field.widget.value_from_datadict(self.data, self.files, prefix)
-                should_delete = field.clean(value)
+                raw_value = form._raw_value(DELETION_FIELD_NAME)
+                should_delete = field.clean(raw_value)
                 if should_delete:
                     # This form is going to be deleted so any of its errors
                     # should not cause the entire formset to be invalid.

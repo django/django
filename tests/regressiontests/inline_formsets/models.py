@@ -13,6 +13,19 @@ class Child(models.Model):
     school = models.ForeignKey(School)
     name = models.CharField(max_length=100)
 
+class Poet(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
+class Poem(models.Model):
+    poet = models.ForeignKey(Poet)
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
 __test__ = {'API_TESTS': """
 
 >>> from django.forms.models import inlineformset_factory

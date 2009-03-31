@@ -425,16 +425,22 @@ class BaseModelFormSet(BaseFormSet):
             existing_objects[obj.pk] = obj
         saved_instances = []
         for form in self.initial_forms:
-            obj = existing_objects[form.cleaned_data[self._pk_field.name].pk]
-            if self.can_delete and form.cleaned_data[DELETION_FIELD_NAME]:
-                self.deleted_objects.append(obj)
-                obj.delete()
-            else:
-                if form.changed_data:
-                    self.changed_objects.append((obj, form.changed_data))
-                    saved_instances.append(self.save_existing(form, obj, commit=commit))
-                    if not commit:
-                        self.saved_forms.append(form)
+            pk_name = self._pk_field.name
+            raw_pk_value = form._raw_value(pk_name)
+            pk_value = form.fields[pk_name].clean(raw_pk_value).pk
+            obj = existing_objects[pk_value]
+            if self.can_delete:
+                raw_delete_value = form._raw_value(DELETION_FIELD_NAME)
+                should_delete = form.fields[DELETION_FIELD_NAME].clean(raw_delete_value)
+                if should_delete:
+                    self.deleted_objects.append(obj)
+                    obj.delete()
+                    continue
+            if form.changed_data:
+                self.changed_objects.append((obj, form.changed_data))
+                saved_instances.append(self.save_existing(form, obj, commit=commit))
+                if not commit:
+                    self.saved_forms.append(form)
         return saved_instances
 
     def save_new_objects(self, commit=True):
@@ -444,8 +450,11 @@ class BaseModelFormSet(BaseFormSet):
                 continue
             # If someone has marked an add form for deletion, don't save the
             # object.
-            if self.can_delete and form.cleaned_data[DELETION_FIELD_NAME]:
-                continue
+            if self.can_delete:
+                raw_delete_value = form._raw_value(DELETION_FIELD_NAME)
+                should_delete = form.fields[DELETION_FIELD_NAME].clean(raw_delete_value)
+                if should_delete:
+                    continue
             self.new_objects.append(self.save_new(form, commit=commit))
             if not commit:
                 self.saved_forms.append(form)
