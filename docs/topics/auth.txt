@@ -745,7 +745,7 @@ the following line to your URLconf::
         <p>Your username and password didn't match. Please try again.</p>
         {% endif %}
 
-        <form method="post" action=".">
+        <form method="post" action="">
         <table>
         <tr>
             <td>{{ form.username.label_tag }}</td>
