@@ -377,10 +377,10 @@ version of ``pysqlite2`` (``pysqlite-2.x.x.win32-py2.5.exe``) that includes and
 uses a newer version of SQLite. Python 2.6 ships with a newer version of
 SQLite and is not affected by this issue.
 
-If you are in such platform and find yourself in the need to update
+If you are on such a platform and find yourself needing to update
 ``pysqlite``/SQLite, you will also need to manually modify the
 ``django/db/backends/sqlite3/base.py`` file in the Django source tree so it
-attempts to import ``pysqlite2`` before than ``sqlite3`` and so it can take
+attempts to import ``pysqlite2`` before ``sqlite3`` and so it can take
 advantage of the new ``pysqlite2``/SQLite versions.
 
 Version 3.5.9
