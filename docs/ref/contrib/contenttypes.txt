@@ -303,7 +303,20 @@ be used to retrieve their associated ``TaggedItems``::
     >>> b.tags.all()
     [<TaggedItem: django>, <TaggedItem: python>]
 
-If you don't add the reverse relationship, you can do the lookup manually::
+Just as :class:`django.contrib.contenttypes.generic.GenericForeignKey`
+accepts the names of the content-type and object-ID fields as
+arguments, so too does ``GenericRelation``; if the model which has the
+generic foreign key is using non-default names for those fields, you
+must pass the names of the fields when setting up a
+``GenericRelation`` to it. For example, if the ``TaggedItem`` model
+referred to above used fields named ``content_type_fk`` and
+``object_primary_key`` to create its generic foreign key, then a
+``GenericRelation`` back to it would need to be defined like so::
+
+    tags = generic.GenericRelation('content_type_fk', 'object_primary_key')
+
+Of course, if you don't add the reverse relationship, you can do the
+same types of lookups manually::
 
     >>> b = Bookmark.objects.get(url='http://www.djangoproject.com/')
     >>> bookmark_type = ContentType.objects.get_for_model(b)
