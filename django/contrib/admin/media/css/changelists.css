@@ -232,6 +232,10 @@
     margin: 0;
 }
 
+#changelist table tbody tr.selected {
+    background-color: #FFFFCC;
+}
+
 #changelist .actions {
     color: #999;
     padding: 3px;
