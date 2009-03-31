@@ -6,10 +6,11 @@ if __name__ == '__main__':
     # before importing 'template'.
     settings.configure()
 
+from datetime import datetime, timedelta
 import os
+import sys
 import traceback
 import unittest
-from datetime import datetime, timedelta
 
 from django import template
 from django.core import urlresolvers
