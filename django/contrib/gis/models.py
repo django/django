@@ -286,6 +286,7 @@ if not PYTHON23:
                 srs_wkt = SpatialReference(fetched[0]).wkt
             else:
                 srs_wkt = fetched[0]
+            connection.close()
 
             # Getting metadata associated with the spatial reference system identifier.
             # Specifically, getting the unit information and spheroid information
