@@ -73,7 +73,7 @@ class BaseCommand(object):
        output and, if the command is intended to produce a block of
        SQL statements, will be wrapped in ``BEGIN`` and ``COMMIT``.
 
-    4. If ``handle()`` raised a ``ComandError``, ``execute()`` will
+    4. If ``handle()`` raised a ``CommandError``, ``execute()`` will
        instead print an error message to ``stderr``.
 
     Thus, the ``handle()`` method is typically the starting point for
