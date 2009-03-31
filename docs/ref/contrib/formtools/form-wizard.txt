@@ -290,7 +290,7 @@ Advanced FormWizard methods
 .. method:: FormWizard.render_template
 
     Renders the template for the given step, returning an
-    :class:`~django.http.HttpResponseRedirect` object.
+    :class:`~django.http.HttpResponse` object.
 
     Override this method if you want to add a custom context, return a different
     MIME type, etc. If you only need to override the template name, use

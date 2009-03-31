@@ -42,7 +42,7 @@ Extra methods on managers when used in a ForeignKey context
         ....     body_text='Hi', 
         ....     pub_date=datetime.date(2005, 1, 1)
         .... )
-        >>> e.save()
+        >>> e.save(force_insert=True)
 
     Note that there's no need to specify the keyword argument of the model that
     defines the relationship. In the above example, we don't pass the parameter

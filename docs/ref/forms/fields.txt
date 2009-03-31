@@ -174,6 +174,16 @@ validation if a particular field's value is not given. ``initial`` values are
     >>> f.errors
     {'url': [u'This field is required.'], 'name': [u'This field is required.']}
 
+Instead of a constant, you can also pass any callable::
+
+    >>> import datetime
+    >>> class DateForm(forms.Form):
+    ...     day = forms.DateField(initial=datetime.date.today)
+    >>> print DateForm()
+    <tr><th>Day:</th><td><input type="text" name="day" value="12/23/2008" /><td></tr>
+
+The callable will be evaluated only when the unbound form is displayed, not when it is defined.
+
 ``widget``
 ~~~~~~~~~~
 

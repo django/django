@@ -10,7 +10,7 @@ How to serve static files
 Django itself doesn't serve static (media) files, such as images, style sheets,
 or video. It leaves that job to whichever Web server you choose.
 
-The reasoning here is that standard Web servers, such as Apache_ and lighttpd_,
+The reasoning here is that standard Web servers, such as Apache_, lighttpd_ and Cherokee_,
 are much more fine-tuned at serving static files than a Web application
 framework.
 
@@ -19,6 +19,7 @@ use the :func:`django.views.static.serve` view to serve media files.
 
 .. _Apache: http://httpd.apache.org/
 .. _lighttpd: http://www.lighttpd.net/
+.. _Cherokee: http://www.cherokee-project.com/
 
 The big, fat disclaimer
 =======================
@@ -71,6 +72,9 @@ required. For example, if we have a line in ``settings.py`` that says::
     ...
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.STATIC_DOC_ROOT}),
+
+Be careful not to use the same path as your :setting:`ADMIN_MEDIA_PREFIX` (which defaults
+to ``/media/``) as this will overwrite your URLconf entry.
 
 Directory listings
 ==================

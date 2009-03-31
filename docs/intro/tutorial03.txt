@@ -117,8 +117,8 @@ But, don't do that. It's silly.
 
 Note that these regular expressions do not search GET and POST parameters, or
 the domain name. For example, in a request to ``http://www.example.com/myapp/``,
-the URLconf will look for ``/myapp/``. In a request to
-``http://www.example.com/myapp/?page=3``, the URLconf will look for ``/myapp/``.
+the URLconf will look for ``myapp/``. In a request to
+``http://www.example.com/myapp/?page=3``, the URLconf will look for ``myapp/``.
 
 If you need help with regular expressions, see `Wikipedia's entry`_ and the
 `Python documentation`_. Also, the O'Reilly book "Mastering Regular Expressions"

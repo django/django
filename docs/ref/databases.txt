@@ -87,8 +87,8 @@ MySQL notes
 ===========
 
 Django expects the database to support transactions, referential integrity,
-and Unicode (UTF-8 encoding). Fortunately, MySQL_ has all these
-features available as far back as 3.23. While it may be possible to use
+and Unicode support (UTF-8 encoding). Fortunately, MySQL_ has all these
+features as available as far back as 3.23. While it may be possible to use
 3.23 or 4.0, you'll probably have less trouble if you use 4.1 or 5.0.
 
 MySQL 4.1

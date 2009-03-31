@@ -7,6 +7,8 @@ Model field reference
 .. module:: django.db.models.fields
    :synopsis: Built-in field types.
 
+.. currentmodule:: django.db.models
+
 This document contains all the gory details about all the `field options`_ and
 `field types`_ Django's got to offer.
 
@@ -45,11 +47,11 @@ booleans and dates. For both types of fields, you will also need to set
 :attr:`~Field.blank`).
 
 Avoid using :attr:`~Field.null` on string-based fields such as
-:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`
-unless you have an excellent reason. If a string-based field has ``null=True``,
-that means it has two possible values for "no data": ``NULL``, and the empty
-string. In most cases, it's redundant to have two possible values for "no
-data;" Django convention is to use the empty string, not ``NULL``.
+:class:`CharField` and :class:`TextField` unless you have an excellent reason.
+If a string-based field has ``null=True``, that means it has two possible values
+for "no data": ``NULL``, and the empty string. In most cases, it's redundant to
+have two possible values for "no data;" Django convention is to use the empty
+string, not ``NULL``.
 
 .. note::
 
@@ -142,9 +144,8 @@ documentation.
 Finally, note that choices can be any iterable object -- not necessarily a list
 or tuple. This lets you construct choices dynamically. But if you find yourself
 hacking :attr:`~Field.choices` to be dynamic, you're probably better off using a
-proper database table with a :class:`~django.db.models.ForeignKey`.
-:attr:`~Field.choices` is meant for static data that doesn't change much, if
-ever.
+proper database table with a :class:`ForeignKey`. :attr:`~Field.choices` is
+meant for static data that doesn't change much, if ever.
 
 ``db_column``
 -------------
@@ -220,10 +221,10 @@ Alternatively you can use plain text and
 If ``True``, this field is the primary key for the model.
 
 If you don't specify ``primary_key=True`` for any fields in your model, Django
-will automatically add an :class:`~django.db.models.IntegerField` to hold the
-primary key, so you don't need to set ``primary_key=True`` on any of your
-fields unless you want to override the default primary-key behavior. For more,
-see :ref:`automatic-primary-key-fields`.
+will automatically add an :class:`IntegerField` to hold the primary key, so you
+don't need to set ``primary_key=True`` on any of your fields unless you want to
+override the default primary-key behavior. For more, see
+:ref:`automatic-primary-key-fields`.
 
 ``primary_key=True`` implies :attr:`null=False <Field.null>` and :attr:`unique=True <Field.unique>`.
 Only one primary key is allowed on an object.
@@ -240,18 +241,16 @@ you try to save a model with a duplicate value in a :attr:`~Field.unique`
 field, a :exc:`django.db.IntegrityError` will be raised by the model's
 :meth:`~django.db.models.Model.save` method.
 
-This option is valid on all field types except
-:class:`~django.db.models.ManyToManyField` and
-:class:`~django.db.models.FileField`.
+This option is valid on all field types except :class:`ManyToManyField` and
+:class:`FileField`.
 
 ``unique_for_date``
 -------------------
 
 .. attribute:: Field.unique_for_date
 
-Set this to the name of a :class:`~django.db.models.DateField` or
-:class:`~django.db.models.DateTimeField` to require that this field be unique
-for the value of the date field.
+Set this to the name of a :class:`DateField` or :class:`DateTimeField` to
+require that this field be unique for the value of the date field.
 
 For example, if you have a field ``title`` that has
 ``unique_for_date="pub_date"``, then Django wouldn't allow the entry of two
@@ -734,7 +733,10 @@ A :class:`CharField` for a URL. Has one extra optional argument:
 .. attribute:: URLField.verify_exists
 
     If ``True`` (the default), the URL given will be checked for existence
-    (i.e., the URL actually loads and doesn't give a 404 response).
+    (i.e., the URL actually loads and doesn't give a 404 response). It should
+    be noted that when using the single-threaded development server, validating
+    a url being serverd by the same server will hang.
+    This should not be a problem for multithreaded servers.
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
 

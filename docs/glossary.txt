@@ -13,8 +13,8 @@ Glossary
         See :ref:`topics-db-models`.
 
     generic view
-        A higher-order :term:`view` function that abstracts common idioms and patterns
-        found in view development and abstracts them.
+        A higher-order :term:`view` function that provides an abstract/generic
+        implementation of a common idiom or pattern found in view development.
         
         See :ref:`ref-generic-views`.
 
@@ -71,8 +71,9 @@ Glossary
         the last bit (``spring``) is the slug.
 
     template
-        A chunk of text that separates the presentation of a document from its
-        data.
+        A chunk of text that acts as formatting for representing data. A
+        template helps to abstract the presentation of data from the data
+        itself.
         
         See :ref:`topics-templates`.
         

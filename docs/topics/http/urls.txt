@@ -633,6 +633,40 @@ reverse such patterns.
     be imported correctly. Do not include lines that reference views you
     haven't written yet, because those views will not be importable.
 
+resolve()
+---------
+
+The :func:`django.core.urlresolvers.resolve` function can be used for resolving
+URL paths to the corresponding view functions. It has the following signature:
+
+.. currentmodule:: django.core.urlresolvers
+.. function:: resolve(path, urlconf=None)
+
+``path`` is the URL path you want to resolve. As with ``reverse()`` above, you
+don't need to worry about the ``urlconf`` parameter. The function returns the
+triple (view function, arguments, keyword arguments).
+
+For example, it can be used for testing if a view would raise a ``Http404``
+error before redirecting to it::
+
+    from urlparse import urlparse
+    from django.core.urlresolvers import resolve
+    from django.http import HttpResponseRedirect, Http404
+
+    def myview(request):
+        next = request.META.get('HTTP_REFERER', None) or '/'
+        response = HttpResponseRedirect(next)
+
+        # modify the request and response as required, e.g. change locale
+        # and set corresponding locale cookie
+
+        view, args, kwargs = resolve(urlparse(next)[2])
+        kwargs['request'] = request
+        try:
+            view(*args, **kwargs)
+        except Http404:
+            return HttpResponseRedirect('/')
+        return response
 
 permalink()
 -----------

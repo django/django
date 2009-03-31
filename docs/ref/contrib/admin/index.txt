@@ -832,8 +832,17 @@ It is important you use a ``ModelForm`` here otherwise things can break. See the
 ============================
 
 The admin interface has the ability to edit models on the same page as a
-parent model. These are called inlines. You can add them to a model by
-specifying them in a ``ModelAdmin.inlines`` attribute::
+parent model. These are called inlines. Suppose you have these two models::
+
+     class Author(models.Model):
+        name = models.CharField(max_length=100)
+
+     class Book(models.Model):
+        author = models.ForeignKey(Author)
+        title = models.CharField(max_length=100)
+
+You can edit the books authored by an author on the author page. You add 
+inlines to a model by specifying them in a ``ModelAdmin.inlines``::
 
     class BookInline(admin.TabularInline):
         model = Book
@@ -1165,7 +1174,7 @@ Hooking ``AdminSite`` instances into your URLconf
 
 The last step in setting up the Django admin is to hook your ``AdminSite``
 instance into your URLconf. Do this by pointing a given URL at the
-``AdminSite.root`` method.
+``AdminSite.urls`` method.
 
 In this example, we register the default ``AdminSite`` instance
 ``django.contrib.admin.site`` at the URL ``/admin/`` ::

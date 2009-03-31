@@ -288,6 +288,19 @@ You can also run multiple Django installations on the same site simply by
 specifying multiple entries in the ``fastcgi.server`` directive. Add one
 FastCGI host for each.
 
+Cherokee setup
+==============
+
+Cherokee is a very fast, flexible and easy to configure Web Server. It
+supports the widespread technologies nowadays: FastCGI, SCGI, PHP, CGI, SSI,
+TLS and SSL encrypted connections, Virtual hosts, Authentication, on the fly
+encoding, Load Balancing, Apache compatible log files, Data Base Balancer,
+Reverse HTTP Proxy and much more.
+
+The Cherokee project provides a documentation to `setting up Django`_ with Cherokee.
+
+.. _setting up Django: http://www.cherokee-project.com/doc/cookbook_django.html
+
 Running Django on a shared-hosting provider with Apache
 =======================================================
 

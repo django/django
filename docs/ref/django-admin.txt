@@ -341,6 +341,9 @@ would search ``<appname>/fixtures/foo/bar/mydata.json`` for each installed
 application,  ``<dirname>/foo/bar/mydata.json`` for each directory in
 ``FIXTURE_DIRS``, and the literal path ``foo/bar/mydata.json``.
 
+When fixture files are processed, the data is saved to the database as is.
+Model defined ``save`` methods and ``pre_save`` signals are not called.
+
 Note that the order in which fixture files are processed is undefined. However,
 all fixture data is installed as a single transaction, so data in
 one fixture can reference data in another fixture. If the database backend

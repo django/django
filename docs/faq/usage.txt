@@ -67,3 +67,13 @@ Using a :class:`~django.db.models.FileField` or an
        Django. For example, if your :class:`~django.db.models.ImageField` is
        called ``mug_shot``, you can get the absolute URL to your image in a
        template with ``{{ object.mug_shot.url }}``.
+
+How do I make a variable available to all my templates?
+-------------------------------------------------------
+
+Sometimes your templates just all need the same thing. A common example would
+be dynamically-generated menus. At first glance, it seems logical to simply
+add a common dictionary to the template context.
+
+The correct solution is to use a ``RequestContext``. Details on how to do this
+are here: :ref:`subclassing-context-requestcontext`.

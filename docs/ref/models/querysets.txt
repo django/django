@@ -154,7 +154,7 @@ In SQL terms, that evaluates to::
 
     SELECT ...
     WHERE NOT pub_date > '2005-1-3'
-    AND NOT headline = 'Hello'
+    OR NOT headline = 'Hello'
 
 Note the second example is more restrictive.
 
@@ -1484,8 +1484,18 @@ search
 A boolean full-text search, taking advantage of full-text indexing. This is
 like ``contains`` but is significantly faster due to full-text indexing.
 
+Example::
+    
+    Entry.objects.filter(headline__search="+Django -jazz Python")
+
+SQL equivalent::
+
+    SELECT ... WHERE MATCH(tablename, headline) AGAINST (+Django -jazz Python IN BOOLEAN MODE);
+
 Note this is only available in MySQL and requires direct manipulation of the
-database to add the full-text index.
+database to add the full-text index. By default Django uses BOOLEAN MODE for
+full text searches. `Please check MySQL documentation for additional details. <http://dev.mysql.com/doc/refman/5.1/en/fulltext-boolean.html>`_
+
 
 regex
 ~~~~~

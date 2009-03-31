@@ -138,10 +138,11 @@ and execute those lines while checking that the results match.
 In the case of model tests, note that the test runner takes care of creating
 its own test database. That is, any test that accesses a database -- by
 creating and saving model instances, for example -- will not affect your
-production database. Each doctest begins with a "blank slate" -- a fresh
-database containing an empty table for each model. (See the section on
-fixtures, below, for more on this.) Note that to use this feature, the database
-user Django is connecting as must have ``CREATE DATABASE`` rights.
+production database. However, the database is not refreshed between doctests,
+so if your doctest requires a certain state you should consider flushin the 
+database or loading a fixture. (See the section on fixtures, below, for more 
+on this.) Note that to use this feature, the database user Django is connecting
+as must have ``CREATE DATABASE`` rights.
 
 For more details about how doctest works, see the `standard library
 documentation for doctest`_.
