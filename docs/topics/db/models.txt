@@ -1,8 +1,8 @@
 .. _topics-db-models:
 
-==============
-Writing models
-==============
+======
+Models
+======
 
 .. module:: django.db.models
 
