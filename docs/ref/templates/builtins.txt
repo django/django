@@ -866,6 +866,13 @@ If ``value`` is a ``datetime`` object (e.g., the result of
 ``datetime.datetime.now()``), the output will be the string
 ``'Wed 09 Jan 2008'``.
 
+When used without a format string::
+
+    {{ value|date }}
+
+...the formatting string defined in the :setting:`DATE_FORMAT` setting will be
+used.
+
 .. templatefilter:: default
 
 default
@@ -1423,6 +1430,13 @@ For example::
 
 If ``value`` is equivalent to ``datetime.datetime.now()``, the output will be
 the string ``"01:23"``.
+
+When used without a format string::
+
+    {{ value|time }}
+
+...the formatting string defined in the :setting:`TIME_FORMAT` setting will be
+used.
 
 .. templatefilter:: timesince
 
