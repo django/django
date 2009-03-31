@@ -34,7 +34,7 @@ real_leave_transaction_management = transaction.leave_transaction_management
 real_savepoint_commit = transaction.savepoint_commit
 real_savepoint_rollback = transaction.savepoint_rollback
 
-def nop(x=None):
+def nop(*args, **kwargs):
     return
 
 def disable_transaction_methods():
