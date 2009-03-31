@@ -266,6 +266,7 @@ if _srid_info:
             raise ValueError('Failed to find spatial reference entry in "%s" corresponding to SRID=%s.' % 
                              (SpatialRefSys._meta.db_table, srid))
         srs_wkt = fetched[0]
+        connection.close()
 
         # Getting metadata associated with the spatial reference system identifier.
         # Specifically, getting the unit information and spheroid information 
