@@ -72,6 +72,13 @@ __test__ = {'API_TESTS':"""
 >>> r2.article_set.add(new_article2)
 >>> new_article2.reporter.id
 2
+
+# Adding an object of the wrong type raises TypeError
+>>> r.article_set.add(r2)
+Traceback (most recent call last):
+...
+TypeError: 'Article' instance expected
+
 >>> r.article_set.all()
 [<Article: John's second story>, <Article: This is a test>]
 >>> r2.article_set.all()

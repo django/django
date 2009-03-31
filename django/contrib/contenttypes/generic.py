@@ -253,6 +253,8 @@ def create_generic_related_manager(superclass):
 
         def add(self, *objs):
             for obj in objs:
+                if not isinstance(obj, self.model):
+                    raise TypeError, "'%s' instance expected" % self.model._meta.object_name
                 setattr(obj, self.content_type_field_name, self.content_type)
                 setattr(obj, self.object_id_field_name, self.pk_val)
                 obj.save()
