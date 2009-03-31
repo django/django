@@ -76,7 +76,7 @@ This example is equivalent to::
         # View code here...
         t = loader.get_template('myapp/template.html')
         c = Context({'foo': 'bar'})
-        r = HttpResponse(t.render(c),
+        return HttpResponse(t.render(c),
             mimetype="application/xhtml+xml")
 
 ``redirect``
