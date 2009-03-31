@@ -19,9 +19,9 @@ var Actions = {
         });
     },
     toggleRow: function(tr, checked) {
-        if (checked) {
+        if (checked && tr.className.indexOf('selected') == -1) {
             tr.className += ' selected';
-        } else {
+        } else if (!checked) {
             tr.className = tr.className.replace(' selected', '');
         }  
     },
