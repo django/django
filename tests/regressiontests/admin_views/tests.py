@@ -819,3 +819,20 @@ class AdminInheritedInlinesTest(TestCase):
         self.failUnlessEqual(FooAccount.objects.all()[0].username, "%s-1" % foo_user)
         self.failUnlessEqual(BarAccount.objects.all()[0].username, "%s-1" % bar_user)
         self.failUnlessEqual(Persona.objects.all()[0].accounts.count(), 2)
+
+class TestInlineNotEditable(TestCase):
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        result = self.client.login(username='super', password='secret')
+        self.failUnlessEqual(result, True)
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test(self):
+        """
+        InlineModelAdmin broken?
+        """
+        response = self.client.get('/test_admin/admin/admin_views/parent/add/')
+        self.failUnlessEqual(response.status_code, 200)
