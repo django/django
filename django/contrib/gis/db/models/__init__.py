@@ -12,6 +12,3 @@ from django.contrib.gis.db.models.fields import \
      GeometryField, PointField, LineStringField, PolygonField, \
      MultiPointField, MultiLineStringField, MultiPolygonField, \
      GeometryCollectionField
-
-# The geographic mixin class.
-from mixin import GeoMixin
