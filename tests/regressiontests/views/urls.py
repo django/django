@@ -82,3 +82,8 @@ urlpatterns += patterns('django.views.generic.create_update',
     (r'^create_update/no_url/update/article/(?P<slug>[-\w]+)/$',
         'update_object', dict(slug_field='slug', model=UrlArticle)),
 )
+
+# a view that raises an exception for the debug view
+urlpatterns += patterns('',
+    (r'^raises/$', views.raises)
+)

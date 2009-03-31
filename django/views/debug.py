@@ -611,6 +611,28 @@ Exception Value: {{ exception_value|escape }}
   {% else %}
     <p>No POST data</p>
   {% endif %}
+  <h3 id="files-info">FILES</h3>
+  {% if request.FILES %}
+    <table class="req">
+        <thead>
+            <tr>
+                <th>Variable</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for var in request.FILES.items %}
+                <tr>
+                    <td>{{ var.0 }}</td>
+                    <td class="code"><div>{{ var.1|pprint }}</div></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+  {% else %}
+    <p>No FILES data</p>
+  {% endif %}
+  
 
   <h3 id="cookie-info">COOKIES</h3>
   {% if request.COOKIES %}

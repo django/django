@@ -1,5 +1,8 @@
+import sys
+
 from django.http import HttpResponse
 from django import forms
+from django.views.debug import technical_500_response
 from django.views.generic.create_update import create_object
 
 from models import Article
@@ -27,3 +30,9 @@ def custom_create(request):
     return create_object(request,
         post_save_redirect='/views/create_update/view/article/%(slug)s/',
         form_class=SlugChangingArticleForm)
+
+def raises(request):
+    try:
+        raise Exception
+    except Exception:
+        return technical_500_response(request, *sys.exc_info())
