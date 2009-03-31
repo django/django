@@ -79,6 +79,8 @@ DoesNotExist: Restaurant matching query does not exist.
 <Restaurant: Ace Hardware the restaurant>
 >>> r.place
 <Place: Ace Hardware the place>
+>>> p2.id
+2
 
 # Set the place back again, using assignment in the reverse direction.
 >>> p1.restaurant = r
