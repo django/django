@@ -35,8 +35,8 @@ u'8.280'
 u''
 >>> floatformat(13.1031, u'bar')
 u'13.1031'
->>> floatformat(18.125, 2) 
-u'18.13' 
+>>> floatformat(18.125, 2)
+u'18.13'
 >>> floatformat(u'foo', u'bar')
 u''
 >>> floatformat(u'¿Cómo esta usted?')
@@ -52,6 +52,15 @@ True
 >>> nan = pos_inf / pos_inf
 >>> floatformat(nan) == unicode(nan)
 True
+
+>>> class FloatWrapper(object):
+...     def __init__(self, value):
+...         self.value = value
+...     def __float__(self):
+...         return self.value
+
+>>> floatformat(FloatWrapper(11.000001), -2)
+u'11.00'
 
 >>> addslashes(u'"double quotes" and \'single quotes\'')
 u'\\"double quotes\\" and \\\'single quotes\\\''
@@ -180,23 +189,23 @@ u'<a href="http://31characteruri.com/test/" rel="nofollow">http://31characteruri
 u'<a href="http://31characteruri.com/test/" rel="nofollow">...</a>'
 
 # Check normal urlize
->>> urlize('http://google.com') 
+>>> urlize('http://google.com')
 u'<a href="http://google.com" rel="nofollow">http://google.com</a>'
 
->>> urlize('http://google.com/') 
+>>> urlize('http://google.com/')
 u'<a href="http://google.com/" rel="nofollow">http://google.com/</a>'
 
->>> urlize('www.google.com') 
+>>> urlize('www.google.com')
 u'<a href="http://www.google.com" rel="nofollow">www.google.com</a>'
 
->>> urlize('djangoproject.org') 
+>>> urlize('djangoproject.org')
 u'<a href="http://djangoproject.org" rel="nofollow">djangoproject.org</a>'
 
->>> urlize('info@djangoproject.org') 
+>>> urlize('info@djangoproject.org')
 u'<a href="mailto:info@djangoproject.org">info@djangoproject.org</a>'
 
 # Check urlize with https addresses
->>> urlize('https://google.com') 
+>>> urlize('https://google.com')
 u'<a href="https://google.com" rel="nofollow">https://google.com</a>'
 
 
