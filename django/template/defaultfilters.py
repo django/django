@@ -149,7 +149,9 @@ def floatformat(text, arg=-1):
     except InvalidOperation:
         if input_val in special_floats:
             return input_val
-        else:
+        try:
+            d = Decimal(force_unicode(float(text)))
+        except (ValueError, InvalidOperation, TypeError, UnicodeEncodeError):
             return u''
     try:
         p = int(arg)
