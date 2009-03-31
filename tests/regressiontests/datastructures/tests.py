@@ -45,6 +45,8 @@ MergeDict can merge MultiValueDicts
 ['Adrian', 'Simon']
 >>> list(d.iteritems())
 [('position', 'Developer'), ('name', 'Simon')]
+>>> list(d.iterlists())
+[('position', ['Developer']), ('name', ['Adrian', 'Simon'])]
 >>> d['lastname']
 Traceback (most recent call last):
 ...
@@ -58,6 +60,10 @@ MultiValueDictKeyError: "Key 'lastname' not found in <MultiValueDict: {'position
 >>> d.setlist('lastname', ['Holovaty', 'Willison'])
 >>> d.getlist('lastname')
 ['Holovaty', 'Willison']
+>>> d.values() 
+['Developer', 'Simon', 'Willison']
+>>> list(d.itervalues()) 
+['Developer', 'Simon', 'Willison']
 
 ### SortedDict #################################################################
 

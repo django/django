@@ -294,10 +294,19 @@ class MultiValueDict(dict):
         """Returns a list of (key, list) pairs."""
         return super(MultiValueDict, self).items()
 
+    def iterlists(self):
+        """Yields (key, list) pairs."""
+        return super(MultiValueDict, self).iteritems()
+
     def values(self):
         """Returns a list of the last value on every key list."""
         return [self[key] for key in self.keys()]
-
+        
+    def itervalues(self):
+        """Yield the last value on every key list."""
+        for key in self.iterkeys():
+            yield self[key]
+    
     def copy(self):
         """Returns a copy of this object."""
         return self.__deepcopy__()
