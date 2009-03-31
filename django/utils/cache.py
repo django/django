@@ -146,6 +146,11 @@ def _generate_cache_key(request, headerlist, key_prefix):
     return 'views.decorators.cache.cache_page.%s.%s.%s' % (
                key_prefix, iri_to_uri(request.path), ctx.hexdigest())
 
+def _generate_cache_header_key(key_prefix, request):
+    """Returns a cache key for the header cache."""
+    return 'views.decorators.cache.cache_header.%s.%s' % (
+        key_prefix, iri_to_uri(request.path))
+
 def get_cache_key(request, key_prefix=None):
     """
     Returns a cache key based on the request path. It can be used in the
@@ -158,8 +163,7 @@ def get_cache_key(request, key_prefix=None):
     """
     if key_prefix is None:
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
-    cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
-                    key_prefix, iri_to_uri(request.path))
+    cache_key = _generate_cache_header_key(key_prefix, request)
     headerlist = cache.get(cache_key, None)
     if headerlist is not None:
         return _generate_cache_key(request, headerlist, key_prefix)
@@ -183,8 +187,7 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None):
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
     if cache_timeout is None:
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
-    cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
-                    key_prefix, iri_to_uri(request.path))
+    cache_key = _generate_cache_header_key(key_prefix, request)
     if response.has_header('Vary'):
         headerlist = ['HTTP_'+header.upper().replace('-', '_')
                       for header in cc_delim_re.split(response['Vary'])]
