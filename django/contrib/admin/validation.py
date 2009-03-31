@@ -76,7 +76,7 @@ def validate(cls, model):
                 field = opts.get_field_by_name(field_name)[0]
             except models.FieldDoesNotExist:
                 raise ImproperlyConfigured("'%s.list_editable[%d]' refers to a "
-                    "field, '%s', not defiend on %s."
+                    "field, '%s', not defined on %s."
                     % (cls.__name__, idx, field_name, model.__name__))
             if field_name not in cls.list_display:
                 raise ImproperlyConfigured("'%s.list_editable[%d]' refers to "

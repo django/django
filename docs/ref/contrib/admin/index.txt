@@ -677,7 +677,7 @@ The value is another dictionary; these arguments will be passed to
 A list of actions to make available on the change list page. See
 :ref:`ref-contrib-admin-actions` for details.
 
-``actions_on_top``, ``actions_on_buttom``
+``actions_on_top``, ``actions_on_bottom``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Controls where on the page the actions bar appears. By default, the admin

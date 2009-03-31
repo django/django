@@ -18,12 +18,13 @@ Throughout this reference we'll use the :ref:`example weblog models
 Creating objects
 ================
 
-To create a new instance of a model, just instantiate it like any other Python class:
+To create a new instance of a model, just instantiate it like any other Python
+class:
 
 .. class:: Model(**kwargs)
 
-The keyword arguments to are simply the names of the fields you've defined on
-your model. Note that instantiating a model in no way touches your database; for
+The keyword arguments are simply the names of the fields you've defined on your
+model. Note that instantiating a model in no way touches your database; for
 that, you need to ``save()``.
 
 Saving objects

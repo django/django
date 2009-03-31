@@ -26,7 +26,7 @@ The implementation of the population statistics aggregates ``STDDEV_POP`` and
 faulty`_. Users of these releases of PostgreSQL are advised to upgrade to
 `Release 8.2.5`_ or later. Django will raise a ``NotImplementedError`` if you
 attempt to use the ``StdDev(sample=False)`` or ``Variance(sample=False)``
-aggregate with an database backend falls within the affected release range.
+aggregate with a database backend that falls within the affected release range.
 
 .. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
 .. _Release 8.2.5: http://developer.postgresql.org/pgdocs/postgres/release-8-2-5.html
@@ -35,7 +35,7 @@ Transaction handling
 ---------------------
 
 :ref:`By default <topics-db-transactions>`, Django starts a transaction when a
-database connection if first used and commits the result at the end of the
+database connection is first used and commits the result at the end of the
 request/response handling. The PostgreSQL backends normally operate the same
 as any other Django backend in this respect.
 
@@ -87,8 +87,8 @@ MySQL notes
 ===========
 
 Django expects the database to support transactions, referential integrity,
-and Unicode support (UTF-8 encoding). Fortunately, MySQL_ has all these
-features as available as far back as 3.23. While it may be possible to use
+and Unicode (UTF-8 encoding). Fortunately, MySQL_ has all these
+features available as far back as 3.23. While it may be possible to use
 3.23 or 4.0, you'll probably have less trouble if you use 4.1 or 5.0.
 
 MySQL 4.1

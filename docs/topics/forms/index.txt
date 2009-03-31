@@ -293,7 +293,7 @@ templates:
         message.
 
     ``field.is_hidden``
-        This attribute is ``True`` is the form field is a hidden field and
+        This attribute is ``True`` if the form field is a hidden field and
         ``False`` otherwise. It's not particularly useful as a template
         variable, but could be useful in conditional tests such as::
 

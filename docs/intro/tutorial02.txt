@@ -170,14 +170,14 @@ with the timestamp and username of the person who made the change:
 Customize the admin form
 ========================
 
-Take a few minutes to marvel at all the code you didn't have to write. When you
-call ``admin.site.register(Poll)``, Django just lets you edit the object and
-"guess" at how to display it within the admin. Often you'll want to control how
-the admin looks and works. You'll do this by telling Django about the options
+Take a few minutes to marvel at all the code you didn't have to write. By
+registering the Poll model with ``admin.site.register(Poll)``, Django was able
+to construct a default form representation. Often, you'll want to customize how
+the admin form looks and works. You'll do this by telling Django the options
 you want when you register the object.
 
-Let's see how this works by reordering the fields on the edit form. Replace the
-``admin.site.register(Poll)`` line with::
+Let's see how this works by re-ordering the fields on the edit form. Replace
+the ``admin.site.register(Poll)`` line with::
 
     class PollAdmin(admin.ModelAdmin):
         fields = ['pub_date', 'question']
