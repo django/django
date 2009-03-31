@@ -222,7 +222,18 @@ class MultiValueDict(dict):
             dict.__setitem__(result, copy.deepcopy(key, memo),
                              copy.deepcopy(value, memo))
         return result
-
+    
+    def __getstate__(self):
+        obj_dict = self.__dict__.copy()
+        obj_dict['_data'] = dict([(k, self.getlist(k)) for k in self])
+        return obj_dict
+    
+    def __setstate__(self, obj_dict):
+        data = obj_dict.pop('_data', {})
+        for k, v in data.items():
+            self.setlist(k, v)
+        self.__dict__.update(obj_dict)
+        
     def get(self, key, default=None):
         """
         Returns the last data value for the passed key. If key doesn't exist
