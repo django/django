@@ -290,7 +290,7 @@ The ``permalink`` decorator
 
 The problem with the way we wrote ``get_absolute_url()`` above is that it
 slightly violates the DRY principle: the URL for this object is defined both
-in the URLConf file and in the model.
+in the URLconf file and in the model.
 
 You can further decouple your models from the URLconf using the ``permalink``
 decorator:

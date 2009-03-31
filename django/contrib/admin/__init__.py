@@ -15,7 +15,7 @@ def autodiscover():
     may want.
     """
     # Bail out if autodiscover didn't finish loading from a previous call so
-    # that we avoid running autodiscover again when the URLConf is loaded by
+    # that we avoid running autodiscover again when the URLconf is loaded by
     # the exception handler to resolve the handler500 view.  This prevents an
     # admin.py module with errors from re-registering models and raising a
     # spurious AlreadyRegistered exception (see #8245).

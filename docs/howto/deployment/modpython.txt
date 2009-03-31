@@ -58,12 +58,12 @@ be passed through to the mod_python handler in Django, via the ``PythonOption
 django.root ...`` line. The value set on that line (the last item) should
 match the string given in the ``<Location ...>`` directive. The effect of this
 is that Django will automatically strip the ``/mysite`` string from the front
-of any URLs before matching them against your ``URLConf`` patterns. If you
-later move your site to live under ``/mysite2``, you will not have to change
-anything except the ``django.root`` option in the config file.
+of any URLs before matching them against your URLconf patterns. If you later
+move your site to live under ``/mysite2``, you will not have to change anything
+except the ``django.root`` option in the config file.
 
 When using ``django.root`` you should make sure that what's left, after the
-prefix has been removed, begins with a slash. Your URLConf patterns that are
+prefix has been removed, begins with a slash. Your URLconf patterns that are
 expecting an initial slash will then work correctly. In the above example,
 since we want to send things like ``/mysite/admin/`` to ``/admin/``, we need
 to remove the string ``/mysite`` from the beginning, so that is the

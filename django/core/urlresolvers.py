@@ -24,7 +24,7 @@ except NameError:
     from django.utils.itercompat import reversed     # Python 2.3 fallback
     from sets import Set as set
 
-_resolver_cache = {} # Maps urlconf modules to RegexURLResolver instances.
+_resolver_cache = {} # Maps URLconf modules to RegexURLResolver instances.
 _callable_cache = {} # Maps view and url pattern names to their view functions.
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
@@ -141,7 +141,7 @@ class RegexURLPattern(object):
 class RegexURLResolver(object):
     def __init__(self, regex, urlconf_name, default_kwargs=None):
         # regex is a string representing a regular expression.
-        # urlconf_name is a string representing the module containing urlconfs.
+        # urlconf_name is a string representing the module containing URLconfs.
         self.regex = re.compile(regex, re.UNICODE)
         self.urlconf_name = urlconf_name
         if not isinstance(urlconf_name, basestring):
