@@ -10,7 +10,7 @@ PROVINCE_CHOICES = (
     ('AT', 'Asti'),
     ('AV', 'Avellino'),
     ('BA', 'Bari'),
-#    ('BT', 'Barletta-Andria-Trani'), # active starting from 2009
+    ('BT', 'Barletta-Andria-Trani'), # active starting from 2009
     ('BL', 'Belluno'),
     ('BN', 'Benevento'),
     ('BG', 'Bergamo'),
@@ -33,7 +33,7 @@ PROVINCE_CHOICES = (
     ('KR', 'Crotone'),
     ('CN', 'Cuneo'),
     ('EN', 'Enna'),
-#    ('FM', 'Fermo'), # active starting from 2009
+    ('FM', 'Fermo'), # active starting from 2009
     ('FE', 'Ferrara'),
     ('FI', 'Firenze'),
     ('FG', 'Foggia'),
@@ -60,7 +60,7 @@ PROVINCE_CHOICES = (
     ('ME', 'Messina'),
     ('MI', 'Milano'),
     ('MO', 'Modena'),
-#    ('MB', 'Monza e Brianza'), # active starting from 2009
+    ('MB', 'Monza e Brianza'), # active starting from 2009
     ('NA', 'Napoli'),
     ('NO', 'Novara'),
     ('NU', 'Nuoro'),
