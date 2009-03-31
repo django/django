@@ -150,6 +150,19 @@ class Player(models.Model):
     def __unicode__(self):
         return self.name
 
+class Poet(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
+class Poem(models.Model):
+    poet = models.ForeignKey(Poet)
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
 __test__ = {'API_TESTS': """
 
 >>> from datetime import date
