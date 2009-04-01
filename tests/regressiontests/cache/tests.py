@@ -13,8 +13,8 @@ from django.conf import settings
 from django.core import management
 from django.core.cache import get_cache
 from django.core.cache.backends.base import InvalidCacheBackendError
-from django.http import HttpResponse
-from django.utils.cache import patch_vary_headers
+from django.http import HttpResponse, HttpRequest
+from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key
 from django.utils.hashcompat import md5_constructor
 
 # functions/classes for complex data type tests
@@ -294,6 +294,26 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
 class CacheUtils(unittest.TestCase):
     """TestCase for django.utils.cache functions."""
 
+    def setUp(self):
+        self.path = '/cache/test/'
+        self.old_settings_key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+        self.old_middleware_seconds = settings.CACHE_MIDDLEWARE_SECONDS
+        settings.CACHE_MIDDLEWARE_KEY_PREFIX = 'settingsprefix'
+        settings.CACHE_MIDDLEWARE_SECONDS = 1
+
+    def tearDown(self):
+        settings.CACHE_MIDDLEWARE_KEY_PREFIX = self.old_settings_key_prefix
+        settings.CACHE_MIDDLEWARE_SECONDS = self.old_middleware_seconds
+
+    def _get_request(self, path):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': 80,
+        }
+        request.path = request.path_info = "/cache/%s" % path
+        return request
+
     def test_patch_vary_headers(self):
         headers = (
             # Initial vary, new headers, resulting vary.
@@ -314,6 +334,26 @@ class CacheUtils(unittest.TestCase):
             patch_vary_headers(response, newheaders)
             self.assertEqual(response['Vary'], resulting_vary)
 
+    def test_get_cache_key(self):
+        request = self._get_request(self.path)
+        response = HttpResponse()
+        key_prefix = 'localprefix'
+        # Expect None if no headers have been set yet.
+        self.assertEqual(get_cache_key(request), None)
+        # Set headers to an empty list.
+        learn_cache_key(request, response)
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+        # Verify that a specified key_prefix is taken in to account.
+        learn_cache_key(request, response, key_prefix=key_prefix)
+        self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+
+    def test_learn_cache_key(self):
+        request = self._get_request(self.path)
+        response = HttpResponse()
+        response['Vary'] = 'Pony'
+        # Make sure that the Vary header is added to the key hash
+        learn_cache_key(request, response)
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
 
 if __name__ == '__main__':
     unittest.main()
