@@ -784,8 +784,6 @@ class BaseQuery(object):
                 aliases.add(r)
                 if with_aliases:
                     col_aliases.add(field.column)
-        if as_pairs:
-            return result, aliases
         return result, aliases
 
     def get_from_clause(self):

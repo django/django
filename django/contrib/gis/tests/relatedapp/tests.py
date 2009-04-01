@@ -118,7 +118,7 @@ class RelatedGeoModelTest(unittest.TestCase):
         # Regression test for #9752.
         l = list(DirectoryEntry.objects.all().select_related())
 
-    def test6_f_expressions(self):
+    def test06_f_expressions(self):
         "Testing F() expressions on GeometryFields."
         # Constructing a dummy parcel border and getting the City instance for
         # assigning the FK.
@@ -165,6 +165,31 @@ class RelatedGeoModelTest(unittest.TestCase):
             qs = Parcel.objects.filter(border2__contains=F('city__location__point'))
             self.assertEqual(1, len(qs))
             self.assertEqual('P1', qs[0].name)
+
+    def test07_values(self):
+        "Testing values() and values_list() and GeoQuerySets."
+        # GeoQuerySet and GeoValuesQuerySet, and GeoValuesListQuerySet respectively.
+        gqs = Location.objects.all()
+        gvqs = Location.objects.values()
+        gvlqs = Location.objects.values_list()
+
+        # Incrementing through each of the models, dictionaries, and tuples
+        # returned by the different types of GeoQuerySets.
+        for m, d, t in zip(gqs, gvqs, gvlqs):
+            # The values should be Geometry objects and not raw strings returned
+            # by the spatial database.
+            self.failUnless(isinstance(d['point'], SpatialBackend.Geometry))
+            self.failUnless(isinstance(t[1], SpatialBackend.Geometry))
+            self.assertEqual(m.point, d['point'])
+            self.assertEqual(m.point, t[1])
+
+    # Test disabled until #10572 is resolved.
+    #def test08_defer_only(self):
+    #    "Testing defer() and only() on Geographic models."
+    #    qs = Location.objects.all()
+    #    def_qs = Location.objects.defer('point')
+    #    for loc, def_loc in zip(qs, def_qs):
+    #        self.assertEqual(loc.point, def_loc.point)
 
     # TODO: Related tests for KML, GML, and distance lookups.
 

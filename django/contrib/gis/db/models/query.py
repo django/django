@@ -1,6 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
-from django.db.models.query import sql, QuerySet, Q
+from django.db.models.query import QuerySet, Q, ValuesQuerySet, ValuesListQuerySet
 
 from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.db.models import aggregates
@@ -9,21 +9,28 @@ from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField
 from django.contrib.gis.measure import Area, Distance
 from django.contrib.gis.models import get_srid_info
 
-class GeomSQL(object):
-    "Simple wrapper object for geometric SQL."
-    def __init__(self, geo_sql):
-        self.sql = geo_sql
-
-    def as_sql(self, *args, **kwargs):
-        return self.sql
-
 class GeoQuerySet(QuerySet):
     "The Geographic QuerySet."
 
+    ### Methods overloaded from QuerySet ###
     def __init__(self, model=None, query=None):
         super(GeoQuerySet, self).__init__(model=model, query=query)
         self.query = query or GeoQuery(self.model, connection)
 
+    def values(self, *fields):
+        return self._clone(klass=GeoValuesQuerySet, setup=True, _fields=fields)
+
+    def values_list(self, *fields, **kwargs):
+        flat = kwargs.pop('flat', False)
+        if kwargs:
+            raise TypeError('Unexpected keyword arguments to values_list: %s'
+                    % (kwargs.keys(),))
+        if flat and len(fields) > 1:
+            raise TypeError("'flat' is not valid when values_list is called with more than one field.")
+        return self._clone(klass=GeoValuesListQuerySet, setup=True, flat=flat,
+                           _fields=fields)
+
+    ### GeoQuerySet Methods ###
     def area(self, tolerance=0.05, **kwargs):
         """
         Returns the area of the geographic field in an `area` attribute on
@@ -592,3 +599,14 @@ class GeoQuerySet(QuerySet):
             return self.query._field_column(geo_field, parent_model._meta.db_table)
         else:
             return self.query._field_column(geo_field)
+
+class GeoValuesQuerySet(ValuesQuerySet):
+    def __init__(self, *args, **kwargs):
+        super(GeoValuesQuerySet, self).__init__(*args, **kwargs)
+        # This flag tells `resolve_columns` to run the values through
+        # `convert_values`.  This ensures that Geometry objects instead
+        # of string values are returned with `values()` or `values_list()`.
+        self.query.geo_values = True
+
+class GeoValuesListQuerySet(GeoValuesQuerySet, ValuesListQuerySet):
+    pass

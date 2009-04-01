@@ -14,6 +14,8 @@ from django.contrib.gis.measure import Area, Distance
 ALL_TERMS = sql.constants.QUERY_TERMS.copy()
 ALL_TERMS.update(SpatialBackend.gis_terms)
 
+TABLE_NAME = sql.constants.TABLE_NAME
+
 class GeoQuery(sql.Query):
     """
     A single spatial SQL query.
@@ -64,10 +66,15 @@ class GeoQuery(sql.Query):
         else:
             col_aliases = set()
         if self.select:
+            only_load = self.deferred_to_columns()
             # This loop customized for GeoQuery.
             for col, field in izip(self.select, self.select_fields):
                 if isinstance(col, (list, tuple)):
-                    r = self.get_field_select(field, col[0])
+                    alias, column = col
+                    table = self.alias_map[alias][TABLE_NAME]
+                    if table in only_load and col not in only_load[table]:
+                        continue
+                    r = self.get_field_select(field, alias)
                     if with_aliases:
                         if col[1] in col_aliases:
                             c_alias = 'Col%d' % len(col_aliases)
@@ -75,7 +82,7 @@ class GeoQuery(sql.Query):
                             aliases.add(c_alias)
                             col_aliases.add(c_alias)
                         else:
-                            result.append('%s AS %s' % (r, col[1]))
+                            result.append('%s AS %s' % (r, qn2(col[1])))
                             aliases.add(r)
                             col_aliases.add(col[1])
                     else:
@@ -101,7 +108,7 @@ class GeoQuery(sql.Query):
                     alias is not None and ' AS %s' % alias or ''
                     )
                 for alias, aggregate in self.aggregate_select.items()
-                ])
+        ])
 
         # This loop customized for GeoQuery.
         for (table, col), field in izip(self.related_select_cols, self.related_select_fields):
@@ -123,10 +130,14 @@ class GeoQuery(sql.Query):
                             start_alias=None, opts=None, as_pairs=False):
         """
         Computes the default columns for selecting every field in the base
-        model.
+        model. Will sometimes be called to pull in related models (e.g. via
+        select_related), in which case "opts" and "start_alias" will be given
+        to provide a starting point for the traversal.
 
         Returns a list of strings, quoted appropriately for use in SQL
-        directly, as well as a set of aliases used in the select statement.
+        directly, as well as a set of aliases used in the select statement (if
+        'as_pairs' is True, returns a list of (alias, col_name) pairs instead
+        of strings as the first component and None as the second component).
 
         This routine is overridden from Query to handle customized selection of
         geometry columns.
@@ -134,22 +145,34 @@ class GeoQuery(sql.Query):
         result = []
         if opts is None:
             opts = self.model._meta
-        if start_alias:
-            table_alias = start_alias
-        else:
-            table_alias = self.tables[0]
-        root_pk = opts.pk.column
-        seen = {None: table_alias}
         aliases = set()
+        only_load = self.deferred_to_columns()
+        proxied_model = opts.proxy and opts.proxy_for_model or 0
+        if start_alias:
+            seen = {None: start_alias}
         for field, model in opts.get_fields_with_model():
-            try:
-                alias = seen[model]
-            except KeyError:
-                alias = self.join((table_alias, model._meta.db_table,
-                        root_pk, model._meta.pk.column))
-                seen[model] = alias
+            if start_alias:
+                try:
+                    alias = seen[model]
+                except KeyError:
+                    if model is proxied_model:
+                        alias = start_alias
+                    else:
+                        link_field = opts.get_ancestor_link(model)
+                        alias = self.join((start_alias, model._meta.db_table,
+                                           link_field.column, model._meta.pk.column))
+                    seen[model] = alias
+            else:
+                # If we're starting from the base model of the queryset, the
+                # aliases will have already been set up in pre_sql_setup(), so
+                # we can save time here.
+                alias = self.included_inherited_models[model]
+            table = self.alias_map[alias][TABLE_NAME]
+            if table in only_load and field.column not in only_load[table]:
+                continue
             if as_pairs:
                 result.append((alias, field.column))
+                aliases.add(alias)
                 continue
             # This part of the function is customized for GeoQuery. We
             # see if there was any custom selection specified in the
@@ -166,8 +189,6 @@ class GeoQuery(sql.Query):
                 aliases.add(r)
                 if with_aliases:
                     col_aliases.add(field.column)
-        if as_pairs:
-            return result, None
         return result, aliases
 
     def resolve_columns(self, row, fields=()):
@@ -191,8 +212,8 @@ class GeoQuery(sql.Query):
         # distance objects added by GeoQuerySet methods).
         values = [self.convert_values(v, self.extra_select_fields.get(a, None))
                   for v, a in izip(row[rn_offset:index_start], aliases)]
-        if SpatialBackend.oracle:
-            # This is what happens normally in OracleQuery's `resolve_columns`.
+        if SpatialBackend.oracle or getattr(self, 'geo_values', False):
+            # We resolve the columns 
             for value, field in izip(row[index_start:], fields):
                 values.append(self.convert_values(value, field))
         else:
@@ -215,7 +236,7 @@ class GeoQuery(sql.Query):
             value = Distance(**{field.distance_att : value})
         elif isinstance(field, AreaField):
             value = Area(**{field.area_att : value})
-        elif isinstance(field, GeomField) and value:
+        elif isinstance(field, (GeomField, GeometryField)) and value:
             value = SpatialBackend.Geometry(value)
         return value
 
