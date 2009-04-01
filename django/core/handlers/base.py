@@ -4,7 +4,6 @@ from django import http
 from django.core import signals
 from django.utils.encoding import force_unicode
 from django.utils.importlib import import_module
-from django.utils.translation import ugettext_lazy as _
 
 class BaseHandler(object):
     # Changes that are always applied to a response (in this order).
@@ -124,7 +123,7 @@ class BaseHandler(object):
                     finally:
                         receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
         except exceptions.PermissionDenied:
-            return http.HttpResponseForbidden('<h1>%s</h1>' % _("Permission denied"))
+            return http.HttpResponseForbidden('<h1>Permission denied</h1>')
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
             raise
