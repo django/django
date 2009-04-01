@@ -80,7 +80,7 @@ installed.
 * If you're using SQLite and either Python 2.3 or Python 2.4, you'll need
   pysqlite_. Use version 2.0.3 or higher. Python 2.5 ships with an SQLite
   wrapper in the standard library, so you don't need to install anything extra
-  in that case.
+  in that case. Please read the SQLite backend :ref:`notes<sqlite-notes>`.
 
 * If you're using Oracle, you'll need a copy of cx_Oracle_, but please
   read the database-specific notes for the
@@ -106,7 +106,7 @@ Django will need permission to create a test database.
 .. _compiled Windows version: http://stickpeople.com/projects/python/win-psycopg/
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 .. _SQLite: http://www.sqlite.org/
-.. _pysqlite: http://initd.org/pub/software/pysqlite/
+.. _pysqlite: http://pysqlite.org/
 .. _cx_Oracle: http://cx-oracle.sourceforge.net/
 .. _Oracle: http://www.oracle.com/
 
@@ -132,14 +132,14 @@ This file should also be located in your ``site-packages`` directory.
     The location of the ``site-packages`` directory depends on the operating
     system, and the location in which Python was installed. To find out your
     system's ``site-packages`` location, execute the following:
-    
+
     .. code-block:: bash
 
         python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
 
     (Note that this should be run from a shell prompt, not a Python interactive
     prompt.)
-    
+
 .. _install-django-code:
 
 Install the Django code
@@ -190,7 +190,7 @@ Installing the development version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. admonition:: Tracking Django development
-    
+
     If you decide to use the latest development version of Django,
     you'll want to pay close attention to `the development timeline`_,
     and you'll want to keep an eye on `the list of
@@ -219,7 +219,7 @@ latest bug fixes and improvements, follow these instructions:
 3. Next, make sure that the Python interpreter can load Django's code. There
    are various ways of accomplishing this.  One of the most convenient, on
    Linux, Mac OSX or other Unix-like systems, is to use a symbolic link:
-   
+
    .. code-block:: bash
 
        ln -s `pwd`/django-trunk/django SITE-PACKAGES-DIR/django
@@ -248,7 +248,7 @@ latest bug fixes and improvements, follow these instructions:
 4. On Unix-like systems, create a symbolic link to the file
    ``django-trunk/django/bin/django-admin.py`` in a directory on your system
    path, such as ``/usr/local/bin``. For example:
-   
+
    .. code-block:: bash
 
        ln -s `pwd`/django-trunk/django/bin/django-admin.py /usr/local/bin

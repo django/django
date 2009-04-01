@@ -351,44 +351,44 @@ will not work as expected for non-ASCII strings.
 
 .. _documented at sqlite.org: http://www.sqlite.org/faq.html#q18
 
-Versions prior to 3.3.6
-------------------------
+SQLite 3.3.6 or newer strongly recommended
+------------------------------------------
 
-Versions of SQLite 3.3.5 and older `contain a bug`_ when handling ``ORDER BY``
-parameters. This can cause problems when you use the ``select`` parameter for
-the ``extra()`` QuerySet method. The bug can be identified by the error message
-``OperationalError: ORDER BY terms must not be non-integer constants``. The
-problem can be solved updating SQLite to version 3.3.6 or newer, possibly also
-updating the ``pysqlite2`` Python module in the process.
+Versions of SQLite 3.3.5 and older contains the following bugs:
 
-.. _contain a bug: http://www.sqlite.org/cvstrac/tktview?tn=1768
+ * A bug when `handling`_ ``ORDER BY`` parameters. This can cause problems when
+   you use the ``select`` parameter for the ``extra()`` QuerySet method. The bug
+   can be identified by the error message ``OperationalError: ORDER BY terms
+   must not be non-integer constants``.
 
-This has a very low impact because 3.3.6 was released in April 2006, so most
-current binary distributions for different platforms include newer version of
-SQLite usable from Python through either the ``pysqlite2`` or the ``sqlite3``
-modules.
+ * A bug when handling `aggregation`_ together with DateFields and
+   DecimalFields.
 
-However, in the case of Windows, the official binary distribution of the stable
-release of Python 2.5 (2.5.2, as of this writing) includes SQLite 3.3.4, so the bug can
-make itself evident in that platform. There are (as of Django 1.0) even three
-tests in the Django test suite that will fail when run under this setup.  As
-described above, this can be solved by downloading and installing a newer
-version of ``pysqlite2`` (``pysqlite-2.x.x.win32-py2.5.exe``) that includes and
-uses a newer version of SQLite. Python 2.6 ships with a newer version of
-SQLite and is not affected by this issue.
+.. _handling: http://www.sqlite.org/cvstrac/tktview?tn=1768
+.. _aggregation: http://code.djangoproject.com/ticket/10031
 
-If you are on such a platform and find yourself needing to update
-``pysqlite``/SQLite, you will also need to manually modify the
-``django/db/backends/sqlite3/base.py`` file in the Django source tree so it
-attempts to import ``pysqlite2`` before ``sqlite3`` and so it can take
-advantage of the new ``pysqlite2``/SQLite versions.
+SQLite 3.3.6 was released in April 2006, so most current binary distributions
+for different platforms include newer version of SQLite usable from Python
+through either the ``pysqlite2`` or the ``sqlite3`` modules.
+
+However, some platform/Python version combinations include older versions of
+SQLite (e.g. the official binary distribution of Python 2.5 for Windows, 2.5.4
+as of this writing, includes SQLite 3.3.4). There are (as of Django 1.1) even
+some tests in the Django test suite that will fail when run under this setup.
+
+As described :ref:`below<using-newer-versions-of-pysqlite>`, this can be solved
+by downloading and installing a newer version of ``pysqlite2``
+(``pysqlite-2.x.x.win32-py2.5.exe`` in the described case) that includes and
+uses a newer version of SQLite. Python 2.6 for Windows ships with a version of
+SQLite that is not affected by these issues.
 
 Version 3.5.9
 -------------
 
-The Ubuntu "Intrepid Ibex" SQLite 3.5.9-3 package contains a bug that causes
-problems with the evaluation of query expressions. If you are using Ubuntu
-"Intrepid Ibex", you will need to find an alternate source for SQLite
+The Ubuntu "Intrepid Ibex" (8.10) SQLite 3.5.9-3 package contains a bug that
+causes problems with the evaluation of query expressions. If you are using
+Ubuntu "Intrepid Ibex", you will need to update the package to version
+3.5.9-3ubuntu1 or newer (recommended) or find an alternate source for SQLite
 packages, or install SQLite from source.
 
 At one time, Debian Lenny shipped with the same malfunctioning SQLite 3.5.9-3
@@ -410,6 +410,21 @@ DISTINCT`` handling that is triggered by, amongst other things, Django's
 You should avoid using this version of SQLite with Django. Either upgrade to
 3.6.3 (released September 22, 2008) or later, or downgrade to an earlier
 version of SQLite.
+
+.. _using-newer-versions-of-pysqlite:
+
+Using newer versions of the SQLite DB-API 2.0 driver
+----------------------------------------------------
+
+.. versionadded:: 1.1
+
+For versions of Python 2.5 or newer that include ``sqlite3`` in the standard
+library Django will now use a ``pysqlite2`` interface in preference to
+``sqlite3`` if it finds one is available.
+
+This provides the ability to upgrade both the DB-API 2.0 interface or SQLite 3
+itself to versions newer than the ones included with your particular Python
+binary distribution, if needed.
 
 .. _oracle-notes:
 
