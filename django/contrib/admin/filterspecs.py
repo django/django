@@ -90,7 +90,7 @@ class ChoicesFilterSpec(FilterSpec):
         yield {'selected': self.lookup_val is None,
                'query_string': cl.get_query_string({}, [self.lookup_kwarg]),
                'display': _('All')}
-        for k, v in self.field.choices:
+        for k, v in self.field.flatchoices:
             yield {'selected': smart_unicode(k) == self.lookup_val,
                     'query_string': cl.get_query_string({self.lookup_kwarg: k}),
                     'display': v}

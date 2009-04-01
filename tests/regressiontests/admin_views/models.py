@@ -135,6 +135,21 @@ class Thing(models.Model):
 class ThingAdmin(admin.ModelAdmin):
     list_filter = ('color',)
 
+class Fabric(models.Model):
+    NG_CHOICES = (
+        ('Textured', (
+                ('x', 'Horizontal'),
+                ('y', 'Vertical'),
+            )
+        ),
+        ('plain', 'Smooth'),
+    )
+    surface = models.CharField(max_length=20, choices=NG_CHOICES)
+
+class FabricAdmin(admin.ModelAdmin):
+    list_display = ('surface',)
+    list_filter = ('surface',)
+
 class Person(models.Model):
     GENDER_CHOICES = (
         (1, "Male"),
@@ -283,6 +298,7 @@ admin.site.register(ExternalSubscriber, ExternalSubscriberAdmin)
 admin.site.register(Podcast, PodcastAdmin)
 admin.site.register(Parent, ParentAdmin)
 admin.site.register(EmptyModel, EmptyModelAdmin)
+admin.site.register(Fabric, FabricAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
