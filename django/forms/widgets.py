@@ -422,7 +422,12 @@ class NullBooleanSelect(Select):
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name, None)
-        return {u'2': True, u'3': False, 'True': True, 'False': False}.get(value, None)
+        return {u'2': True, 
+                True: True, 
+                'True': True, 
+                u'3': False, 
+                'False': False, 
+                False: False}.get(value, None)
 
     def _has_changed(self, initial, data):
         # Sometimes data or initial could be None or u'' which should be the
