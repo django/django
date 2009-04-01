@@ -370,14 +370,21 @@ class URLNode(Node):
         url = ''
         try:
             url = reverse(self.view_name, args=args, kwargs=kwargs)
-        except NoReverseMatch:
-            project_name = settings.SETTINGS_MODULE.split('.')[0]
-            try:
-                url = reverse(project_name + '.' + self.view_name,
+        except NoReverseMatch, e:
+            if settings.SETTINGS_MODULE:
+                project_name = settings.SETTINGS_MODULE.split('.')[0]
+                try:
+                    url = reverse(project_name + '.' + self.view_name,
                               args=args, kwargs=kwargs)
-            except NoReverseMatch:
+                except NoReverseMatch:
+                    if self.asvar is None:
+                        # Re-raise the original exception, not the one with
+                        # the path relative to the project. This makes a 
+                        # better error message.
+                        raise e
+            else:
                 if self.asvar is None:
-                    raise
+                    raise e
 
         if self.asvar:
             context[self.asvar] = url

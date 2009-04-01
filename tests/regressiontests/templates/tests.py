@@ -153,6 +153,21 @@ class Templates(unittest.TestCase):
         split = token.split_contents()
         self.assertEqual(split, ["sometag", '_("Page not found")', 'value|yesno:_("yes,no")'])
 
+    def test_url_reverse_no_settings_module(self):
+        #Regression test for #9005
+        from django.template import Template, Context, TemplateSyntaxError
+        old_settings_module = settings.SETTINGS_MODULE
+        settings.SETTINGS_MODULE = None
+        t = Template('{% url will_not_match %}')
+        c = Context()
+        try:
+            rendered = t.render(c)
+        except TemplateSyntaxError, e:
+            #Assert that we are getting the template syntax error and not the
+            #string encoding error.
+            self.assertEquals(e.message, "Caught an exception while rendering: Reverse for 'will_not_match' with arguments '()' and keyword arguments '{}' not found.")
+        settings.SETTINGS_MODULE = old_settings_module
+
     def test_templates(self):
         template_tests = self.get_template_tests()
         filter_tests = filters.get_filter_tests()
