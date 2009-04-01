@@ -215,8 +215,10 @@ We recommend using a separate Web server -- i.e., one that's not also running
 Django -- for serving media. Here are some good choices:
 
     * lighttpd_
+    * Nginx_
     * TUX_
     * A stripped-down version of Apache_
+    * Cherokee_
 
 If, however, you have no option but to serve media files on the same Apache
 ``VirtualHost`` as Django, here's how you can turn off mod_python for a
@@ -249,8 +251,10 @@ the ``media`` subdirectory and any URL that ends with ``.jpg``, ``.gif`` or
 
 
 .. _lighttpd: http://www.lighttpd.net/
+.. _Nginx: http://wiki.codemongers.com/Main
 .. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
 .. _Apache: http://httpd.apache.org/
+.. _Cherokee: http://www.cherokee-project.com/
 
 .. _howto-deployment-modpython-serving-the-admin-files:
 

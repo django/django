@@ -324,6 +324,14 @@ same types of lookups manually::
     ...                           object_id=b.id)
     [<TaggedItem: django>, <TaggedItem: python>]
 
+Note that if the model with a :class:`~django.contrib.contenttypes.generic.GenericForeignKey` 
+that you're referring to uses a non-default value for ``ct_field`` or ``fk_field`` 
+(e.g. the :mod:`django.contrib.comments` app uses ``ct_field="object_pk"``), 
+you'll need to pass ``content_type_field`` and ``object_id_field`` to
+:class:`~django.contrib.contenttypes.generic.GenericRelation`.::
+
+	comments = generic.GenericRelation(Comment, content_type_field="content_type", object_id_field="object_pk")
+	
 Note that if you delete an object that has a
 :class:`~django.contrib.contenttypes.generic.GenericRelation`, any objects
 which have a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`

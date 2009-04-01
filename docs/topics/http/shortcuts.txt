@@ -19,7 +19,7 @@ Required arguments
 ------------------
 
 ``template``
-    The full name of a template to use.
+    The full name of a template to use or sequence of template names.
 
 Optional arguments
 ------------------

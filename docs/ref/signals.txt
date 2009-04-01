@@ -30,6 +30,10 @@ module system.
     If you override these methods on your model, you must call the parent class'
     methods for this signals to be sent.
 
+	Note also that Django stores signal handlers as weak references by default,
+	so if your handler is a local function, it may be garbage collected.  To
+	prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
+
 pre_init
 --------
 
