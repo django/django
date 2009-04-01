@@ -39,6 +39,7 @@ Optional Fcgi settings: (setting=value)
   daemonize=BOOL       whether to detach from terminal.
   pidfile=FILE         write the spawned process-id to this file.
   workdir=DIRECTORY    change to this directory when daemonizing.
+  debug=BOOL           set to true to enable flup tracebacks
   outlog=FILE          write stdout to this file.
   errlog=FILE          write stderr to this file.
   umask=UMASK          umask to use when daemonizing (default 022).
@@ -73,6 +74,7 @@ FASTCGI_OPTIONS = {
     'minspare': 2,
     'maxchildren': 50,
     'maxrequests': 0,
+    'debug': None,
     'outlog': None,
     'errlog': None,
     'umask': None,
@@ -126,7 +128,7 @@ def runfastcgi(argset=[], **kwargs):
     else:
         return fastcgi_help("ERROR: Implementation must be one of prefork or thread.")
 
-    wsgi_opts['debug'] = False # Turn off flup tracebacks
+    wsgi_opts['debug'] = options['debug'] is not None
 
     try:
         module = importlib.import_module('.%s' % flup_module, 'flup')
