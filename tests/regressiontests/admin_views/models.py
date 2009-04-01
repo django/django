@@ -262,6 +262,14 @@ class ParentAdmin(admin.ModelAdmin):
     model = Parent
     inlines = [ChildInline]
 
+class EmptyModel(models.Model):
+    def __unicode__(self):
+        return "Primary key = %s" % self.id
+
+class EmptyModelAdmin(admin.ModelAdmin):
+    def queryset(self, request):
+        return super(EmptyModelAdmin, self).queryset(request).filter(pk__gt=1)
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, inlines=[ArticleInline])
@@ -274,6 +282,7 @@ admin.site.register(Subscriber, SubscriberAdmin)
 admin.site.register(ExternalSubscriber, ExternalSubscriberAdmin)
 admin.site.register(Podcast, PodcastAdmin)
 admin.site.register(Parent, ParentAdmin)
+admin.site.register(EmptyModel, EmptyModelAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

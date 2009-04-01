@@ -13,7 +13,7 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.utils.html import escape
 
 # local test models
-from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey, Person, Persona, FooAccount, BarAccount, Subscriber, ExternalSubscriber, Podcast
+from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey, Person, Persona, FooAccount, BarAccount, Subscriber, ExternalSubscriber, Podcast, EmptyModel
 
 try:
     set
@@ -963,3 +963,27 @@ class TestInlineNotEditable(TestCase):
         """
         response = self.client.get('/test_admin/admin/admin_views/parent/add/')
         self.failUnlessEqual(response.status_code, 200)
+
+
+class AdminCustomQuerysetTest(TestCase):
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+        self.pks = [EmptyModel.objects.create().id for i in range(3)]
+
+    def test_changelist_view(self):
+        response = self.client.get('/test_admin/admin/admin_views/emptymodel/')
+        for i in self.pks:
+            if i > 1:
+                self.assertContains(response, 'Primary key = %s' % i)
+            else:
+                self.assertNotContains(response, 'Primary key = %s' % i)
+
+    def test_change_view(self):
+        for i in self.pks:
+            response = self.client.get('/test_admin/admin/admin_views/emptymodel/%s/' % i)
+            if i > 1:
+                self.assertEqual(response.status_code, 200)
+            else:
+                self.assertEqual(response.status_code, 404)

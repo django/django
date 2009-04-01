@@ -791,7 +791,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = model._meta
 
         try:
-            obj = model._default_manager.get(pk=unquote(object_id))
+            obj = self.queryset(request).get(pk=unquote(object_id))
         except model.DoesNotExist:
             # Don't raise Http404 just yet, because we haven't checked
             # permissions yet. We don't want an unauthenticated user to be able
@@ -976,7 +976,7 @@ class ModelAdmin(BaseModelAdmin):
         app_label = opts.app_label
 
         try:
-            obj = self.model._default_manager.get(pk=unquote(object_id))
+            obj = self.queryset(request).get(pk=unquote(object_id))
         except self.model.DoesNotExist:
             # Don't raise Http404 just yet, because we haven't checked
             # permissions yet. We don't want an unauthenticated user to be able
