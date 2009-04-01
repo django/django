@@ -129,7 +129,7 @@ def view_index(request):
             site_obj = GenericSite()
         for (func, regex) in view_functions:
             views.append({
-                'name': func.__name__,
+                'name': hasattr(func, '__class__') and func.__class__.__name__ or func.__name__,
                 'module': func.__module__,
                 'site_id': settings_mod.SITE_ID,
                 'site': site_obj,
