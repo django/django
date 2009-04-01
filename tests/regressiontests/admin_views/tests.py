@@ -19,7 +19,7 @@ except NameError:
     from sets import Set as set
 
 class AdminViewBasicTest(TestCase):
-    fixtures = ['admin-views-users.xml', 'admin-views-colors.xml']
+    fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml']
 
     def setUp(self):
         self.client.login(username='super', password='secret')
@@ -174,6 +174,37 @@ class AdminViewBasicTest(TestCase):
         self.assertRedirects(response, '/test_admin/admin/admin_views/thing/?e=1')
         response = self.client.get('/test_admin/admin/admin_views/thing/', {'color__id__exact': 'StringNotInteger!'})
         self.assertRedirects(response, '/test_admin/admin/admin_views/thing/?e=1')
+
+    def testNamedGroupFieldChoicesChangeList(self):
+        """
+        Ensures the admin changelist shows correct values in the relevant column
+        for rows corresponding to instances of a model in which a named group
+        has been used in the choices option of a field.
+        """
+        response = self.client.get('/test_admin/admin/admin_views/fabric/')
+        self.failUnlessEqual(response.status_code, 200)
+        self.failUnless(
+            '<a href="1/">Horizontal</a>' in response.content and
+            '<a href="2/">Vertical</a>' in response.content,
+            "Changelist table isn't showing the right human-readable values set by a model field 'choices' option named group."
+        )
+
+    def testNamedGroupFieldChoicesFilter(self):
+        """
+        Ensures the filter UI shows correctly when at least one named group has
+        been used in the choices option of a model field.
+        """
+        response = self.client.get('/test_admin/admin/admin_views/fabric/')
+        self.failUnlessEqual(response.status_code, 200)
+        self.failUnless(
+            '<div id="changelist-filter">' in response.content,
+            "Expected filter not found in changelist view."
+        )
+        self.failUnless(
+            '<a href="?surface__exact=x">Horizontal</a>' in response.content and
+            '<a href="?surface__exact=y">Vertical</a>' in response.content,
+            "Changelist filter isn't showing options contained inside a model field 'choices' option named group."
+        )
 
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
