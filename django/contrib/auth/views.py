@@ -38,6 +38,7 @@ def login(request, template_name='registration/login.html', redirect_field_name=
     return render_to_response(template_name, {
         'form': form,
         redirect_field_name: redirect_to,
+        'site': current_site,
         'site_name': current_site.name,
     }, context_instance=RequestContext(request))
 login = never_cache(login)

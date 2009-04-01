@@ -3,9 +3,12 @@ import os
 import re
 
 from django.conf import settings
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.sites.models import Site, RequestSite
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.core import mail
+from django.core.urlresolvers import reverse
 
 class PasswordResetTest(TestCase):
     fixtures = ['authtestdata.json']
@@ -162,3 +165,23 @@ class ChangePasswordTest(TestCase):
         self.fail_login()
         self.login(password='password1')
 
+class LoginTest(TestCase):
+    fixtures = ['authtestdata.json']
+    urls = 'django.contrib.auth.urls'
+
+    def setUp(self):
+        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'templates'),)
+
+    def tearDown(self):
+        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+
+    def test_current_site_in_context_after_login(self):
+        response = self.client.get(reverse('django.contrib.auth.views.login'))
+        self.assertEquals(response.status_code, 200)
+        site = Site.objects.get_current()
+        self.assertEquals(response.context['site'], site)
+        self.assertEquals(response.context['site_name'], site.name)
+        self.assert_(isinstance(response.context['form'], AuthenticationForm), 
+                     'Login form is not an AuthenticationForm')
+        
