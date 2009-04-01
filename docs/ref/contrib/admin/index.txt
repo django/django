@@ -887,7 +887,7 @@ many possibilities of customization. Inlines are built around
 ``form``
 ~~~~~~~~
 
-The value for ``form`` is inherited from ``ModelAdmin``. This is what is
+The value for ``form`` defaults to ``BaseModelForm``. This is what is
 passed through to ``formset_factory`` when creating the formset for this
 inline.
 
