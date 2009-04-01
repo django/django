@@ -13,6 +13,33 @@ This file describes some of the features that might be relevant to Django
 usage. Of course, it is not intended as a replacement for server-specific
 documentation or reference manuals.
 
+.. _postgresql-notes:
+
+PostgreSQL notes
+================
+
+PostgreSQL 8.2 to 8.2.4
+-----------------------
+
+The implementation of the population statistics aggregates ``STDDEV_POP`` and
+``VAR_POP`` that shipped with PostgreSQL 8.2 to 8.2.4 are `known to be
+faulty`_. Users of these releases of PostgreSQL are advised to upgrade to
+`Release 8.2.5`_ or later. Django will raise a ``NotImplementedError`` if you
+attempt to use the ``StdDev(sample=False)`` or ``Variance(sample=False)``
+aggregate with a database backend that falls within the affected release range.
+
+.. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
+.. _Release 8.2.5: http://developer.postgresql.org/pgdocs/postgres/release-8-2-5.html
+
+Transaction handling
+---------------------
+
+:ref:`By default <topics-db-transactions>`, Django starts a transaction when a
+database connection is first used and commits the result at the end of the
+request/response handling. The PostgreSQL backends normally operate the same
+as any other Django backend in this respect.
+
+
 .. _mysql-notes:
 
 MySQL notes
@@ -163,7 +190,7 @@ table (usually called ``django_session`` and the table
 Connecting to the database
 --------------------------
 
-Refer to the :ref:`settings documentation <ref-settings>`. 
+Refer to the :ref:`settings documentation <ref-settings>`.
 
 Connection settings are used in this order:
 
@@ -183,7 +210,7 @@ Here's a sample configuration which uses a MySQL option file::
   DATABASE_ENGINE = "mysql"
   DATABASE_OPTIONS = {
       'read_default_file': '/path/to/my.cnf',
-      }
+  }
 
   # my.cnf
   [client]
@@ -221,9 +248,7 @@ storage engine, you have a couple of options.
       creating your tables::
 
           DATABASE_OPTIONS = {
-              # ...
              "init_command": "SET storage_engine=INNODB",
-              # ...
           }
 
       This sets the default storage engine upon connecting to the database.
@@ -262,9 +287,9 @@ of whether ``unique=True`` is specified or not.
 
 .. _sqlite-notes:
 
-SQLite notes 
-============ 
- 
+SQLite notes
+============
+
 SQLite_ provides an excellent development alternative for applications that
 are predominantly read-only or require a smaller installation footprint. As
 with all database servers, though, there are some differences that are
@@ -285,37 +310,53 @@ will not work as expected for non-ASCII strings.
 
 .. _documented at sqlite.org: http://www.sqlite.org/faq.html#q18
 
-Versions prior to 3.3.6
-------------------------
+SQLite 3.3.6 or newer strongly recommended
+------------------------------------------
 
-Versions of SQLite 3.3.5 and older `contain a bug`_ when handling ``ORDER BY``
-parameters. This can cause problems when you use the ``select`` parameter for
-the ``extra()`` QuerySet method. The bug can be identified by the error message
-``OperationalError: ORDER BY terms must not be non-integer constants``. The
-problem can be solved updating SQLite to version 3.3.6 or newer, possibly also
-updating the ``pysqlite2`` Python module in the process.
- 
-.. _contain a bug: http://www.sqlite.org/cvstrac/tktview?tn=1768 
- 
-This has a very low impact because 3.3.6 was released in April 2006, so most 
-current binary distributions for different platforms include newer version of 
-SQLite usable from Python through either the ``pysqlite2`` or the ``sqlite3`` 
-modules. 
- 
-However, in the case of Windows, the official binary distribution of the stable 
-release of Python 2.5 (2.5.2, as of this writing) includes SQLite 3.3.4, so the bug can 
-make itself evident in that platform. There are (as of Django 1.0) even three 
-tests in the Django test suite that will fail when run under this setup.  As 
-described above, this can be solved by downloading and installing a newer 
-version of ``pysqlite2`` (``pysqlite-2.x.x.win32-py2.5.exe``) that includes and 
-uses a newer version of SQLite. Python 2.6 ships with a newer version of 
-SQLite and is not affected by this issue.
+Versions of SQLite 3.3.5 and older contains the following bugs:
 
-If you are on such a platform and find yourself needing to update
-``pysqlite``/SQLite, you will also need to manually modify the
-``django/db/backends/sqlite3/base.py`` file in the Django source tree so it
-attempts to import ``pysqlite2`` before ``sqlite3`` and so it can take
-advantage of the new ``pysqlite2``/SQLite versions.
+ * A bug when `handling`_ ``ORDER BY`` parameters. This can cause problems when
+   you use the ``select`` parameter for the ``extra()`` QuerySet method. The bug
+   can be identified by the error message ``OperationalError: ORDER BY terms
+   must not be non-integer constants``.
+
+ * A bug when handling `aggregation`_ together with DateFields and
+   DecimalFields.
+
+.. _handling: http://www.sqlite.org/cvstrac/tktview?tn=1768
+.. _aggregation: http://code.djangoproject.com/ticket/10031
+
+SQLite 3.3.6 was released in April 2006, so most current binary distributions
+for different platforms include newer version of SQLite usable from Python
+through either the ``pysqlite2`` or the ``sqlite3`` modules.
+
+However, some platform/Python version combinations include older versions of
+SQLite (e.g. the official binary distribution of Python 2.5 for Windows, 2.5.4
+as of this writing, includes SQLite 3.3.4).
+
+As described :ref:`below<using-newer-versions-of-pysqlite>`, this can be solved
+by downloading and installing a newer version of ``pysqlite2``
+(``pysqlite-2.x.x.win32-py2.5.exe`` in the described case) that includes and
+uses a newer version of SQLite. Python 2.6 for Windows ships with a version of
+SQLite that is not affected by these issues.
+
+Version 3.5.9
+-------------
+
+The Ubuntu "Intrepid Ibex" (8.10) SQLite 3.5.9-3 package contains a bug that
+causes problems with the evaluation of query expressions. If you are using
+Ubuntu "Intrepid Ibex", you will need to update the package to version
+3.5.9-3ubuntu1 or newer (recommended) or find an alternate source for SQLite
+packages, or install SQLite from source.
+
+At one time, Debian Lenny shipped with the same malfunctioning SQLite 3.5.9-3
+package. However the Debian project has subsequently issued updated versions
+of the SQLite package that correct these bugs. If you find you are getting
+unexpected results under Debian, ensure you have updated your SQLite package
+to 3.5.9-5 or later.
+
+The problem does not appear to exist with other versions of SQLite packaged
+with other operating systems.
 
 Version 3.6.2
 --------------
@@ -327,6 +368,21 @@ DISTINCT`` handling that is triggered by, amongst other things, Django's
 You should avoid using this version of SQLite with Django. Either upgrade to
 3.6.3 (released September 22, 2008) or later, or downgrade to an earlier
 version of SQLite.
+
+.. _using-newer-versions-of-pysqlite:
+
+Using newer versions of the SQLite DB-API 2.0 driver
+----------------------------------------------------
+
+.. versionadded:: 1.1
+
+For versions of Python 2.5 or newer that include ``sqlite3`` in the standard
+library Django will now use a ``pysqlite2`` interface in preference to
+``sqlite3`` if it finds one is available.
+
+This provides the ability to upgrade both the DB-API 2.0 interface or SQLite 3
+itself to versions newer than the ones included with your particular Python
+binary distribution, if needed.
 
 .. _oracle-notes:
 
@@ -353,14 +409,14 @@ database user must have privileges to run the following commands:
     * CREATE SEQUENCE
     * CREATE PROCEDURE
     * CREATE TRIGGER
-    
+
 To run Django's test suite, the user needs these *additional* privileges:
 
     * CREATE USER
     * DROP USER
     * CREATE TABLESPACE
     * DROP TABLESPACE
-    
+
 Connecting to the database
 --------------------------
 
