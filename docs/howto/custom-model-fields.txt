@@ -198,7 +198,6 @@ parameters:
     * :attr:`~django.db.models.Field.blank`
     * :attr:`~django.db.models.Field.null`
     * :attr:`~django.db.models.Field.db_index`
-    * :attr:`~django.db.models.Field.core`
     * :attr:`~django.db.models.Field.rel`: Used for related fields (like
       :class:`ForeignKey`). For advanced use only.
     * :attr:`~django.db.models.Field.default`
@@ -206,7 +205,6 @@ parameters:
     * :attr:`~django.db.models.Field.serialize`: If ``False``, the field will
       not be serialized when the model is passed to Django's :ref:`serializers
       <topics-serialization>`. Defaults to ``True``.
-    * :attr:`~django.db.models.Field.prepopulate_from`
     * :attr:`~django.db.models.Field.unique_for_date`
     * :attr:`~django.db.models.Field.unique_for_month`
     * :attr:`~django.db.models.Field.unique_for_year`
@@ -216,6 +214,9 @@ parameters:
     * :attr:`~django.db.models.Field.db_tablespace`: Currently only used with
       the Oracle backend and only for index creation. You can usually ignore
       this option.
+    * :attr:`~django.db.models.Field.auto_created`: True if the field was
+      automatically created, as for the `OneToOneField` used by model
+      inheritance. For advanced use only.
 
 All of the options without an explanation in the above list have the same
 meaning they do for normal Django fields. See the :ref:`field documentation
