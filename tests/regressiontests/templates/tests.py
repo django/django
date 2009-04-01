@@ -923,7 +923,10 @@ class Templates(unittest.TestCase):
             # Raise exception if we don't have 3 args, last one an integer
             'widthratio08': ('{% widthratio %}', {}, template.TemplateSyntaxError),
             'widthratio09': ('{% widthratio a b %}', {'a':50,'b':100}, template.TemplateSyntaxError),
-            'widthratio10': ('{% widthratio a b 100.0 %}', {'a':50,'b':100}, template.TemplateSyntaxError),
+            'widthratio10': ('{% widthratio a b 100.0 %}', {'a':50,'b':100}, '50'),
+            
+            # #10043: widthratio should allow max_width to be a variable
+            'widthratio11': ('{% widthratio a b c %}', {'a':50,'b':100, 'c': 100}, '50'),
 
             ### WITH TAG ########################################################
             'with01': ('{% with dict.key as key %}{{ key }}{% endwith %}', {'dict': {'key':50}}, '50'),

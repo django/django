@@ -402,12 +402,15 @@ class WidthRatioNode(Node):
         try:
             value = self.val_expr.resolve(context)
             maxvalue = self.max_expr.resolve(context)
+            max_width = int(self.max_width.resolve(context))
         except VariableDoesNotExist:
             return ''
+        except ValueError:
+            raise TemplateSyntaxError("widthratio final argument must be an number")
         try:
             value = float(value)
             maxvalue = float(maxvalue)
-            ratio = (value / maxvalue) * int(self.max_width)
+            ratio = (value / maxvalue) * max_width
         except (ValueError, ZeroDivisionError):
             return ''
         return str(int(round(ratio)))
@@ -1143,12 +1146,10 @@ def widthratio(parser, token):
     if len(bits) != 4:
         raise TemplateSyntaxError("widthratio takes three arguments")
     tag, this_value_expr, max_value_expr, max_width = bits
-    try:
-        max_width = int(max_width)
-    except ValueError:
-        raise TemplateSyntaxError("widthratio final argument must be an integer")
+
     return WidthRatioNode(parser.compile_filter(this_value_expr),
-                          parser.compile_filter(max_value_expr), max_width)
+                          parser.compile_filter(max_value_expr),
+                          parser.compile_filter(max_width))
 widthratio = register.tag(widthratio)
 
 #@register.tag
