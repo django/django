@@ -8,6 +8,14 @@ TOKEN_GENERATOR_TESTS = """
 >>> p0.check_token(u, tk1)
 True
 
+>>> u = User.objects.create_user('comebackkid', 'test3@example.com', 'testpw')
+>>> p0 = PasswordResetTokenGenerator()
+>>> tk1 = p0.make_token(u)
+>>> reload = User.objects.get(username='comebackkid')
+>>> tk2 = p0.make_token(reload)
+>>> tk1 == tk2
+True
+
 Tests to ensure we can use the token after n days, but no greater.
 Use a mocked version of PasswordResetTokenGenerator so we can change
 the value of 'today'

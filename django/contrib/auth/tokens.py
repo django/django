@@ -52,7 +52,7 @@ class PasswordResetTokenGenerator(object):
         # We limit the hash to 20 chars to keep URL short
         from django.utils.hashcompat import sha_constructor
         hash = sha_constructor(settings.SECRET_KEY + unicode(user.id) +
-                               user.password + unicode(user.last_login) +
+                               user.password + user.last_login.strftime('%Y-%m-%d %H:%M:%S') +
                                unicode(timestamp)).hexdigest()[::2]
         return "%s-%s" % (ts_b36, hash)
 
