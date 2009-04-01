@@ -18,19 +18,6 @@ documentation or reference manuals.
 PostgreSQL notes
 ================
 
-PostgreSQL 8.2 to 8.2.4
------------------------
-
-The implementation of the population statistics aggregates ``STDDEV_POP`` and
-``VAR_POP`` that shipped with PostgreSQL 8.2 to 8.2.4 are `known to be
-faulty`_. Users of these releases of PostgreSQL are advised to upgrade to
-`Release 8.2.5`_ or later. Django will raise a ``NotImplementedError`` if you
-attempt to use the ``StdDev(sample=False)`` or ``Variance(sample=False)``
-aggregate with a database backend that falls within the affected release range.
-
-.. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
-.. _Release 8.2.5: http://developer.postgresql.org/pgdocs/postgres/release-8-2-5.html
-
 Transaction handling
 ---------------------
 
@@ -313,15 +300,10 @@ will not work as expected for non-ASCII strings.
 SQLite 3.3.6 or newer strongly recommended
 ------------------------------------------
 
-Versions of SQLite 3.3.5 and older contains the following bugs:
-
- * A bug when `handling`_ ``ORDER BY`` parameters. This can cause problems when
-   you use the ``select`` parameter for the ``extra()`` QuerySet method. The bug
-   can be identified by the error message ``OperationalError: ORDER BY terms
-   must not be non-integer constants``.
-
- * A bug when handling `aggregation`_ together with DateFields and
-   DecimalFields.
+Versions of SQLite 3.3.5 and older contains a bug when `handling`_ ``ORDER BY``
+parameters. This can cause problems when you use the ``select`` parameter for
+the ``extra()`` QuerySet method. The bug can be identified by the error message
+``OperationalError: ORDER BY terms must not be non-integer constants``.
 
 .. _handling: http://www.sqlite.org/cvstrac/tktview?tn=1768
 .. _aggregation: http://code.djangoproject.com/ticket/10031
@@ -333,12 +315,6 @@ through either the ``pysqlite2`` or the ``sqlite3`` modules.
 However, some platform/Python version combinations include older versions of
 SQLite (e.g. the official binary distribution of Python 2.5 for Windows, 2.5.4
 as of this writing, includes SQLite 3.3.4).
-
-As described :ref:`below<using-newer-versions-of-pysqlite>`, this can be solved
-by downloading and installing a newer version of ``pysqlite2``
-(``pysqlite-2.x.x.win32-py2.5.exe`` in the described case) that includes and
-uses a newer version of SQLite. Python 2.6 for Windows ships with a version of
-SQLite that is not affected by these issues.
 
 Version 3.5.9
 -------------
@@ -368,21 +344,6 @@ DISTINCT`` handling that is triggered by, amongst other things, Django's
 You should avoid using this version of SQLite with Django. Either upgrade to
 3.6.3 (released September 22, 2008) or later, or downgrade to an earlier
 version of SQLite.
-
-.. _using-newer-versions-of-pysqlite:
-
-Using newer versions of the SQLite DB-API 2.0 driver
-----------------------------------------------------
-
-.. versionadded:: 1.1
-
-For versions of Python 2.5 or newer that include ``sqlite3`` in the standard
-library Django will now use a ``pysqlite2`` interface in preference to
-``sqlite3`` if it finds one is available.
-
-This provides the ability to upgrade both the DB-API 2.0 interface or SQLite 3
-itself to versions newer than the ones included with your particular Python
-binary distribution, if needed.
 
 .. _oracle-notes:
 
