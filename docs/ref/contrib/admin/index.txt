@@ -1130,6 +1130,7 @@ Templates which may be overridden per app or model
 Not every template in ``contrib\admin\templates\admin`` may be overridden per
 app or per model. The following can:
 
+    * ``app_index.html``
     * ``change_form.html``
     * ``change_list.html``
     * ``delete_confirmation.html``

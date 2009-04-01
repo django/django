@@ -398,7 +398,8 @@ class AdminSite(object):
             'root_path': self.root_path,
         }
         context.update(extra_context or {})
-        return render_to_response(self.app_index_template or 'admin/app_index.html', context,
+        return render_to_response(self.app_index_template or ('admin/%s/app_index.html' % app_label,
+            'admin/app_index.html'), context,
             context_instance=template.RequestContext(request)
         )
 
