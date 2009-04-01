@@ -29,6 +29,7 @@ fully_decorated = cache_control(private=True)(fully_decorated)
 fully_decorated = never_cache(fully_decorated)
 
 # django.contrib.auth.decorators
+# Apply user_passes_test twice to check #9474
 fully_decorated = user_passes_test(lambda u:True)(fully_decorated)
 fully_decorated = login_required(fully_decorated)
 fully_decorated = permission_required('change_world')(fully_decorated)
@@ -54,3 +55,33 @@ class DecoratorsTest(TestCase):
             self.assertEquals(fully_decorated.__name__, 'fully_decorated')
         self.assertEquals(fully_decorated.__doc__, 'Expected __doc__')
         self.assertEquals(fully_decorated.__dict__['anything'], 'Expected __dict__')
+
+    def test_user_passes_test_composition(self):
+        """
+        Test that the user_passes_test decorator can be applied multiple times
+        (#9474).
+        """
+        def test1(user):
+            user.decorators_applied.append('test1')
+            return True
+            
+        def test2(user):
+            user.decorators_applied.append('test2')
+            return True
+            
+        def callback(request):
+            return request.user.decorators_applied
+
+        callback = user_passes_test(test1)(callback)
+        callback = user_passes_test(test2)(callback)
+        
+        class DummyUser(object): pass
+        class DummyRequest(object): pass
+        
+        request = DummyRequest()
+        request.user = DummyUser()
+        request.user.decorators_applied = []
+        response = callback(request)
+        
+        self.assertEqual(response, ['test2', 'test1'])
+        

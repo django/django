@@ -56,8 +56,19 @@ class _CheckLogin(object):
         self.test_func = test_func
         self.login_url = login_url
         self.redirect_field_name = redirect_field_name
-        update_wrapper(self, view_func)
         
+        # We can't blindly apply update_wrapper because it udpates __dict__ and 
+        # if the view function is already a _CheckLogin object then 
+        # self.test_func and friends will get stomped. However, we also can't 
+        # *not* update the wrapper's dict because then view function attributes
+        # don't get updated into the wrapper. So we need to split the
+        # difference: don't let update_wrapper update __dict__, but then update
+        # the (parts of) __dict__ that we care about ourselves.
+        update_wrapper(self, view_func, updated=())
+        for k in view_func.__dict__:
+            if k not in self.__dict__:
+                self.__dict__[k] = view_func.__dict__[k]
+
     def __get__(self, obj, cls=None):
         view_func = self.view_func.__get__(obj, cls)
         return _CheckLogin(view_func, self.test_func, self.login_url, self.redirect_field_name)
