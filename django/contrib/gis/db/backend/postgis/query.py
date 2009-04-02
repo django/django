@@ -38,6 +38,7 @@ if MAJOR_VERSION >= 1:
 
     # Functions used by the GeoManager & GeoQuerySet
     AREA = get_func('Area')
+    ASGEOJSON = get_func('AsGeoJson')
     ASKML = get_func('AsKML')
     ASGML = get_func('AsGML')
     ASSVG = get_func('AsSVG')
@@ -61,11 +62,12 @@ if MAJOR_VERSION >= 1:
     PERIMETER = get_func('Perimeter')
     POINT_ON_SURFACE = get_func('PointOnSurface')
     SCALE = get_func('Scale')
+    SNAP_TO_GRID = get_func('SnapToGrid')
     SYM_DIFFERENCE = get_func('SymDifference')
     TRANSFORM = get_func('Transform')
     TRANSLATE = get_func('Translate')
 
-    # Special cases for union and KML methods.
+    # Special cases for union, KML, and GeoJSON methods.
     if MINOR_VERSION1 < 3:
         UNIONAGG = 'GeomUnion'
         UNION = 'Union'
@@ -75,6 +77,11 @@ if MAJOR_VERSION >= 1:
 
     if MINOR_VERSION1 == 1:
         ASKML = False
+
+    # Only 1.3.4+ have AsGeoJson.
+    if (MINOR_VERSION1 < 3 or 
+        (MINOR_VERSION1 == 3 and MINOR_VERSION2 < 4)):
+        ASGEOJSON = False
 else:
     raise NotImplementedError('PostGIS versions < 1.0 are not supported.')
 

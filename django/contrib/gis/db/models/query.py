@@ -103,6 +103,32 @@ class GeoQuerySet(QuerySet):
         """
         return self._spatial_aggregate(aggregates.Extent, **kwargs)
 
+    def geojson(self, precision=8, crs=False, bbox=False, **kwargs):
+        """
+        Returns a GeoJSON representation of the geomtry field in a `geojson`
+        attribute on each element of the GeoQuerySet.
+
+        The `crs` and `bbox` keywords may be set to True if the users wants
+        the coordinate reference system and the bounding box to be included
+        in the GeoJSON representation of the geometry.
+        """
+        if not SpatialBackend.postgis or not SpatialBackend.geojson:
+            raise NotImplementedError('Only PostGIS 1.3.4+ supports GeoJSON serialization.')
+        
+        if not isinstance(precision, (int, long)):
+            raise TypeError('Precision keyword must be set with an integer.')
+        
+        # Setting the options flag 
+        options = 0
+        if crs and bbox: options = 3
+        elif crs: options = 1
+        elif bbox: options = 2
+        s = {'desc' : 'GeoJSON', 
+             'procedure_args' : {'precision' : precision, 'options' : options},
+             'procedure_fmt' : '%(geo_col)s,%(precision)s,%(options)s',
+             }
+        return self._spatial_attribute('geojson', s, **kwargs)
+
     def gml(self, precision=8, version=2, **kwargs):
         """
         Returns GML representation of the given field in a `gml` attribute
@@ -212,6 +238,42 @@ class GeoQuerySet(QuerySet):
                  'select_field' : GeomField(),
                  }
         return self._spatial_attribute('scale', s, **kwargs)
+
+    def snap_to_grid(self, *args, **kwargs):
+        """
+        Snap all points of the input geometry to the grid.  How the
+        geometry is snapped to the grid depends on how many arguments
+        were given:
+          - 1 argument : A single size to snap both the X and Y grids to.
+          - 2 arguments: X and Y sizes to snap the grid to.
+          - 4 arguments: X, Y sizes and the X, Y origins.
+        """
+        if False in [isinstance(arg, (float, int, long)) for arg in args]:
+            raise TypeError('Size argument(s) for the grid must be a float or integer values.')
+
+        nargs = len(args)
+        if nargs == 1:
+            size = args[0]
+            procedure_fmt = '%(geo_col)s,%(size)s'
+            procedure_args = {'size' : size}
+        elif nargs == 2:
+            xsize, ysize = args
+            procedure_fmt = '%(geo_col)s,%(xsize)s,%(ysize)s'
+            procedure_args = {'xsize' : xsize, 'ysize' : ysize}
+        elif nargs == 4:
+            xsize, ysize, xorigin, yorigin = args
+            procedure_fmt = '%(geo_col)s,%(xorigin)s,%(yorigin)s,%(xsize)s,%(ysize)s'
+            procedure_args = {'xsize' : xsize, 'ysize' : ysize,
+                              'xorigin' : xorigin, 'yorigin' : yorigin}
+        else:
+            raise ValueError('Must provide 1, 2, or 4 arguments to `snap_to_grid`.')
+
+        s = {'procedure_fmt' : procedure_fmt,
+             'procedure_args' : procedure_args,
+             'select_field' : GeomField(),
+             }
+
+        return self._spatial_attribute('snap_to_grid', s, **kwargs)
 
     def svg(self, **kwargs):
         """

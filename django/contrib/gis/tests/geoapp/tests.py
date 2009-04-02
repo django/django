@@ -119,7 +119,7 @@ class GeoModelTest(unittest.TestCase):
     @no_oracle # Oracle does not support KML.
     @no_spatialite # SpatiaLite does not support KML.
     def test03a_kml(self):
-        "Testing KML output from the database using GeoManager.kml()."
+        "Testing KML output from the database using GeoQuerySet.kml()."
         if DISABLE: return
         # Should throw a TypeError when trying to obtain KML from a
         #  non-geometry field.
@@ -145,7 +145,7 @@ class GeoModelTest(unittest.TestCase):
 
     @no_spatialite # SpatiaLite does not support GML.
     def test03b_gml(self):
-        "Testing GML output from the database using GeoManager.gml()."
+        "Testing GML output from the database using GeoQuerySet.gml()."
         if DISABLE: return
         # Should throw a TypeError when tyring to obtain GML from a
         #  non-geometry field.
@@ -164,6 +164,38 @@ class GeoModelTest(unittest.TestCase):
             for ptown in [ptown1, ptown2]:
                 self.assertEqual('<gml:Point srsName="EPSG:4326"><gml:coordinates>-104.609252,38.255001</gml:coordinates></gml:Point>', ptown.gml)
 
+    @no_spatialite
+    @no_oracle
+    def test03c_geojson(self):
+        "Testing GeoJSON output from the database using GeoQuerySet.geojson()."
+        if DISABLE: return
+        # PostGIS only supports GeoJSON on 1.3.4+
+        if not SpatialBackend.geojson:
+            return
+
+        # Precision argument should only be an integer
+        self.assertRaises(TypeError, City.objects.geojson, precision='foo')
+        
+        # Reference queries and values.
+        # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 0) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Pueblo';
+        json = '{"type":"Point","coordinates":[-104.60925200,38.25500100]}'
+        self.assertEqual(City.objects.geojson().get(name='Pueblo').geojson, json)
+
+        # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 1) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Houston';
+        json = '{"type":"Point","crs":{"type":"EPSG","properties":{"EPSG":4326}},"coordinates":[-95.36315100,29.76337400]}'
+        # This time we want to include the CRS by using the `crs` keyword.
+        self.assertEqual(City.objects.geojson(crs=True, model_att='json').get(name='Houston').json, json)
+
+        # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 2) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Victoria';
+        json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.30519600,48.46261100]}'
+        # This time we include the bounding box by using the `bbox` keyword.
+        self.assertEqual(City.objects.geojson(bbox=True).get(name='Victoria').geojson, json)
+
+        # SELECT ST_AsGeoJson("geoapp_city"."point", 5, 3) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Chicago';
+        json = '{"type":"Point","crs":{"type":"EPSG","properties":{"EPSG":4326}},"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
+        # Finally, we set every available keyword.
+        self.assertEqual(City.objects.geojson(bbox=True, crs=True, precision=5).get(name='Chicago').geojson, json)
+        
     def test04_transform(self):
         "Testing the transform() GeoManager method."
         if DISABLE: return
@@ -620,6 +652,46 @@ class GeoModelTest(unittest.TestCase):
 
         self.assertEqual(1, qs.count())
         for pc in qs: self.assertEqual(32128, pc.point.srid)
+        
+    @no_spatialite
+    @no_oracle
+    def test27_snap_to_grid(self):
+        "Testing GeoQuerySet.snap_to_grid()."
+        if DISABLE: return
+
+        # Let's try and break snap_to_grid() with bad combinations of arguments.
+        for bad_args in ((), range(3), range(5)):
+            self.assertRaises(ValueError, Country.objects.snap_to_grid, *bad_args)
+        for bad_args in (('1.0',), (1.0, None), tuple(map(unicode, range(4)))):
+            self.assertRaises(TypeError, Country.objects.snap_to_grid, *bad_args)
+
+        # Boundary for San Marino, courtesy of Bjorn Sandvik of thematicmapping.org
+        # from the world borders dataset he provides.
+        wkt = ('MULTIPOLYGON(((12.41580 43.95795,12.45055 43.97972,12.45389 43.98167,'
+               '12.46250 43.98472,12.47167 43.98694,12.49278 43.98917,'
+               '12.50555 43.98861,12.51000 43.98694,12.51028 43.98277,'
+               '12.51167 43.94333,12.51056 43.93916,12.49639 43.92333,'
+               '12.49500 43.91472,12.48778 43.90583,12.47444 43.89722,'
+               '12.46472 43.89555,12.45917 43.89611,12.41639 43.90472,'
+               '12.41222 43.90610,12.40782 43.91366,12.40389 43.92667,'
+               '12.40500 43.94833,12.40889 43.95499,12.41580 43.95795)))')
+        sm = Country.objects.create(name='San Marino', mpoly=fromstr(wkt))
+
+        # Because floating-point arithmitic isn't exact, we set a tolerance
+        # to pass into GEOS `equals_exact`.
+        tol = 0.000000001
+
+        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.1)) FROM "geoapp_country" WHERE "geoapp_country"."name" = 'San Marino';
+        ref = fromstr('MULTIPOLYGON(((12.4 44,12.5 44,12.5 43.9,12.4 43.9,12.4 44)))')
+        self.failUnless(ref.equals_exact(Country.objects.snap_to_grid(0.1).get(name='San Marino').snap_to_grid, tol))
+
+        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.05, 0.23)) FROM "geoapp_country" WHERE "geoapp_country"."name" = 'San Marino';
+        ref = fromstr('MULTIPOLYGON(((12.4 43.93,12.45 43.93,12.5 43.93,12.45 43.93,12.4 43.93)))')
+        self.failUnless(ref.equals_exact(Country.objects.snap_to_grid(0.05, 0.23).get(name='San Marino').snap_to_grid, tol))
+
+        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.5, 0.17, 0.05, 0.23)) FROM "geoapp_country" WHERE "geoapp_country"."name" = 'San Marino';
+        ref = fromstr('MULTIPOLYGON(((12.4 43.87,12.45 43.87,12.45 44.1,12.5 44.1,12.5 43.87,12.45 43.87,12.4 43.87)))')
+        self.failUnless(ref.equals_exact(Country.objects.snap_to_grid(0.05, 0.23, 0.5, 0.17).get(name='San Marino').snap_to_grid, tol))
 
 from test_feeds import GeoFeedTest
 from test_regress import GeoRegressionTests

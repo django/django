@@ -30,6 +30,9 @@ class GeoManager(Manager):
     def extent(self, *args, **kwargs):
         return self.get_query_set().extent(*args, **kwargs)
 
+    def geojson(self, *args, **kwargs):
+        return self.get_query_set().geojson(*args, **kwargs)
+
     def gml(self, *args, **kwargs):
         return self.get_query_set().gml(*args, **kwargs)
 
@@ -62,6 +65,9 @@ class GeoManager(Manager):
 
     def scale(self, *args, **kwargs):
         return self.get_query_set().scale(*args, **kwargs)
+
+    def snap_to_grid(self, *args, **kwargs):
+        return self.get_query_set().snap_to_grid(*args, **kwargs)
 
     def svg(self, *args, **kwargs):
         return self.get_query_set().svg(*args, **kwargs)
