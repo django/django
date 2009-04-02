@@ -78,48 +78,66 @@ class AdminViewBasicTest(TestCase):
         response = self.client.post('/test_admin/%s/admin_views/section/add/' % self.urlbit, post_data)
         self.failUnlessEqual(response.status_code, 302) # redirect somewhere
 
+    # Post data for edit inline
+    inline_post_data = {
+        "name": u"Test section",
+        # inline data
+        "article_set-TOTAL_FORMS": u"6",
+        "article_set-INITIAL_FORMS": u"3",
+        "article_set-0-id": u"1",
+        # there is no title in database, give one here or formset will fail.
+        "article_set-0-title": u"Norske bostaver æøå skaper problemer",
+        "article_set-0-content": u"&lt;p&gt;Middle content&lt;/p&gt;",
+        "article_set-0-date_0": u"2008-03-18",
+        "article_set-0-date_1": u"11:54:58",
+        "article_set-0-section": u"1",
+        "article_set-1-id": u"2",
+        "article_set-1-title": u"Need a title.",
+        "article_set-1-content": u"&lt;p&gt;Oldest content&lt;/p&gt;",
+        "article_set-1-date_0": u"2000-03-18",
+        "article_set-1-date_1": u"11:54:58",
+        "article_set-2-id": u"3",
+        "article_set-2-title": u"Need a title.",
+        "article_set-2-content": u"&lt;p&gt;Newest content&lt;/p&gt;",
+        "article_set-2-date_0": u"2009-03-18",
+        "article_set-2-date_1": u"11:54:58",
+        "article_set-3-id": u"",
+        "article_set-3-title": u"",
+        "article_set-3-content": u"",
+        "article_set-3-date_0": u"",
+        "article_set-3-date_1": u"",
+        "article_set-4-id": u"",
+        "article_set-4-title": u"",
+        "article_set-4-content": u"",
+        "article_set-4-date_0": u"",
+        "article_set-4-date_1": u"",
+        "article_set-5-id": u"",
+        "article_set-5-title": u"",
+        "article_set-5-content": u"",
+        "article_set-5-date_0": u"",
+        "article_set-5-date_1": u"",
+    }
+
     def testBasicEditPost(self):
         """
         A smoke test to ensure POST on edit_view works.
         """
-        post_data = {
-            "name": u"Test section",
-            # inline data
-            "article_set-TOTAL_FORMS": u"6",
-            "article_set-INITIAL_FORMS": u"3",
-            "article_set-0-id": u"1",
-            # there is no title in database, give one here or formset
-            # will fail.
-            "article_set-0-title": u"Norske bostaver æøå skaper problemer",
-            "article_set-0-content": u"&lt;p&gt;Middle content&lt;/p&gt;",
-            "article_set-0-date_0": u"2008-03-18",
-            "article_set-0-date_1": u"11:54:58",
-            "article_set-1-id": u"2",
-            "article_set-1-title": u"Need a title.",
-            "article_set-1-content": u"&lt;p&gt;Oldest content&lt;/p&gt;",
-            "article_set-1-date_0": u"2000-03-18",
-            "article_set-1-date_1": u"11:54:58",
-            "article_set-2-id": u"3",
-            "article_set-2-title": u"Need a title.",
-            "article_set-2-content": u"&lt;p&gt;Newest content&lt;/p&gt;",
-            "article_set-2-date_0": u"2009-03-18",
-            "article_set-2-date_1": u"11:54:58",
-            "article_set-3-id": u"",
-            "article_set-3-title": u"",
-            "article_set-3-content": u"",
-            "article_set-3-date_0": u"",
-            "article_set-3-date_1": u"",
-            "article_set-4-id": u"",
-            "article_set-4-title": u"",
-            "article_set-4-content": u"",
-            "article_set-4-date_0": u"",
-            "article_set-4-date_1": u"",
-            "article_set-5-id": u"",
-            "article_set-5-title": u"",
-            "article_set-5-content": u"",
-            "article_set-5-date_0": u"",
-            "article_set-5-date_1": u"",
-        }
+        response = self.client.post('/test_admin/%s/admin_views/section/1/' % self.urlbit, self.inline_post_data)
+        self.failUnlessEqual(response.status_code, 302) # redirect somewhere
+
+    def testEditSaveAs(self):
+        """
+        Test "save as".
+        """
+        post_data = self.inline_post_data.copy()
+        post_data.update({
+            '_saveasnew': u'Save+as+new',
+            "article_set-1-section": u"1",
+            "article_set-2-section": u"1",
+            "article_set-3-section": u"1",
+            "article_set-4-section": u"1",
+            "article_set-5-section": u"1",
+        })
         response = self.client.post('/test_admin/%s/admin_views/section/1/' % self.urlbit, post_data)
         self.failUnlessEqual(response.status_code, 302) # redirect somewhere
 

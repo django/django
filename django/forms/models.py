@@ -530,6 +530,9 @@ class BaseInlineFormSet(BaseModelFormSet):
             # Remove the primary key from the form's data, we are only
             # creating new instances
             form.data[form.add_prefix(self._pk_field.name)] = None
+
+            # Remove the foreign key from the form's data
+            form.data[form.add_prefix(self.fk.name)] = None
         return form
 
     #@classmethod
