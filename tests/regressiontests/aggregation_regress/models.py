@@ -259,6 +259,23 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, conta
 >>> Book.objects.annotate(Count('publisher')).values('publisher').count()
 6
 
+>>> publishers = Publisher.objects.filter(id__in=(1,2))
+>>> publishers
+[<Publisher: Apress>, <Publisher: Sams>]
+
+>>> publishers = publishers.annotate(n_books=models.Count('book'))
+>>> publishers[0].n_books
+2
+
+>>> publishers
+[<Publisher: Apress>, <Publisher: Sams>]
+
+>>> books = Book.objects.filter(publisher__in=publishers)
+>>> books
+[<Book: Practical Django Projects>, <Book: Sams Teach Yourself Django in 24 Hours>, <Book: The Definitive Guide to Django: Web Development Done Right>]
+
+>>> publishers
+[<Publisher: Apress>, <Publisher: Sams>]
 """
 }
 
@@ -307,4 +324,3 @@ if settings.DATABASE_ENGINE != 'sqlite3':
 
 
 """
-
