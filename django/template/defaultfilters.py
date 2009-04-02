@@ -673,7 +673,10 @@ def date(value, arg=None):
         return u''
     if arg is None:
         arg = settings.DATE_FORMAT
-    return format(value, arg)
+    try:
+        return format(value, arg)
+    except AttributeError:
+        return ''
 date.is_safe = False
 
 def time(value, arg=None):
@@ -683,7 +686,10 @@ def time(value, arg=None):
         return u''
     if arg is None:
         arg = settings.TIME_FORMAT
-    return time_format(value, arg)
+    try:
+        return time_format(value, arg)
+    except AttributeError:
+        return ''
 time.is_safe = False
 
 def timesince(value, arg=None):
