@@ -320,4 +320,10 @@ def get_filter_tests():
         'join02': (r'{% autoescape off %}{{ a|join:", " }}{% endautoescape %}', {'a': ['alpha', 'beta & me']}, 'alpha, beta & me'),
         'join03': (r'{{ a|join:" &amp; " }}', {'a': ['alpha', 'beta & me']}, 'alpha &amp; beta &amp; me'),
         'join04': (r'{% autoescape off %}{{ a|join:" &amp; " }}{% endautoescape %}', {'a': ['alpha', 'beta & me']}, 'alpha &amp; beta & me'),
+
+
+        'date01': (r'{{ d|date:"m" }}', {'d': datetime(2008, 1, 1)}, '01'),
+        'date02': (r'{{ d|date }}', {'d': datetime(2008, 1, 1)}, 'Jan. 1, 2008'),
+        #Ticket 9520: Make sure |date doesn't blow up on non-dates
+        'date03': (r'{{ d|date:"m" }}', {'d': 'fail_string'}, ''),
     }
