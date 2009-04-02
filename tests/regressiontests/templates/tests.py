@@ -156,8 +156,13 @@ class Templates(unittest.TestCase):
     def test_url_reverse_no_settings_module(self):
         #Regression test for #9005
         from django.template import Template, Context, TemplateSyntaxError
+        
         old_settings_module = settings.SETTINGS_MODULE
+        old_template_debug = settings.TEMPLATE_DEBUG
+        
         settings.SETTINGS_MODULE = None
+        settings.TEMPLATE_DEBUG = True
+        
         t = Template('{% url will_not_match %}')
         c = Context()
         try:
@@ -166,7 +171,9 @@ class Templates(unittest.TestCase):
             #Assert that we are getting the template syntax error and not the
             #string encoding error.
             self.assertEquals(e.message, "Caught an exception while rendering: Reverse for 'will_not_match' with arguments '()' and keyword arguments '{}' not found.")
+        
         settings.SETTINGS_MODULE = old_settings_module
+        settings.TEMPLATE_DEBUG = old_template_debug
 
     def test_templates(self):
         template_tests = self.get_template_tests()
