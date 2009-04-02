@@ -9,8 +9,6 @@ class DatabaseClient(BaseDatabaseClient):
         args = [self.executable_name]
         if settings_dict['DATABASE_USER']:
             args += ["-U", settings_dict['DATABASE_USER']]
-        if settings_dict['DATABASE_PASSWORD']:
-            args += ["-W"]
         if settings_dict['DATABASE_HOST']:
             args.extend(["-h", settings_dict['DATABASE_HOST']])
         if settings_dict['DATABASE_PORT']:
