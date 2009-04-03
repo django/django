@@ -112,6 +112,11 @@ class ConditionalGet(TestCase):
         response = self.client.get('/condition/last_modified2/')
         self.assertFullResponse(response, check_etag=False)
 
+    def testInvalidETag(self):
+        self.client.defaults['HTTP_IF_NONE_MATCH'] = r'"\"'
+        response = self.client.get('/condition/etag/')
+        self.assertFullResponse(response, check_last_modified=False)
+
 
 class ETagProcesing(TestCase):
     def testParsing(self):
