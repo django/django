@@ -193,9 +193,9 @@ class ReverseGenericRelatedObjectsDescriptor(object):
         rel_model = self.field.rel.to
         superclass = rel_model._default_manager.__class__
         RelatedManager = create_generic_related_manager(superclass)
-
+        
         qn = connection.ops.quote_name
-
+                
         manager = RelatedManager(
             model = rel_model,
             instance = instance,
@@ -203,7 +203,7 @@ class ReverseGenericRelatedObjectsDescriptor(object):
             join_table = qn(self.field.m2m_db_table()),
             source_col_name = qn(self.field.m2m_column_name()),
             target_col_name = qn(self.field.m2m_reverse_name()),
-            content_type = ContentType.objects.get_for_model(self.field.model),
+            content_type = ContentType.objects.get_for_model(instance),
             content_type_field_name = self.field.content_type_field_name,
             object_id_field_name = self.field.object_id_field_name
         )
