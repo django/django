@@ -2,6 +2,7 @@
 
 from django.test import TestCase
 from django.conf import settings
+from django.contrib.contenttypes.generic import generic_inlineformset_factory
 
 # local test models
 from models import Episode, Media
@@ -71,3 +72,8 @@ class GenericAdminViewTest(TestCase):
         }
         response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/episode/1/', post_data)
         self.failUnlessEqual(response.status_code, 302) # redirect somewhere
+    
+    def testGenericInlineFormsetFactory(self):
+        # Regression test for #10522.
+        inline_formset = generic_inlineformset_factory(Media,
+            exclude=('url',))

@@ -355,6 +355,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
         raise Exception("fk_name '%s' is not a ForeignKey to ContentType" % ct_field)
     fk_field = opts.get_field(fk_field) # let the exception propagate
     if exclude is not None:
+        exclude = list(exclude)
         exclude.extend([ct_field.name, fk_field.name])
     else:
         exclude = [ct_field.name, fk_field.name]
