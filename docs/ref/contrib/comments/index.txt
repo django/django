@@ -99,6 +99,10 @@ For example::
     {% for comment in comment_list %}
         ...
     {% endfor %}
+    
+This returns a list of :class:`~django.contrib.comments.models.Comment` objects;
+see :ref:`the comment model documentation <ref-contrib-comments-models>` for
+details.
 
 .. templatetag:: get_comment_count
 
@@ -212,6 +216,7 @@ More information
 .. toctree::
    :maxdepth: 1
 
+   models
    settings
    signals
    upgrade

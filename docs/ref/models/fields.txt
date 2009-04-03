@@ -870,11 +870,11 @@ the model is related. This works exactly the same as it does for
 Behind the scenes, Django creates an intermediary join table to represent the
 many-to-many relationship. By default, this table name is generated using the
 names of the two tables being joined. Since some databases don't support table
-names above a certain length (often 32 characters), these table names will be
-automatically truncated to 32 characters and a uniqueness hash will be used.
-This means you might see table names like ``author_books_9cdf4``; this is
-perfectly normal. You can manually provide the name of the join table using
-the :attr:`~ManyToManyField.db_table` option.
+names above a certain length, these table names will be automatically
+truncated to 64 characters and a uniqueness hash will be used. This means you
+might see table names like ``author_books_9cdf4``; this is perfectly normal.
+You can manually provide the name of the join table using the
+:attr:`~ManyToManyField.db_table` option.
 
 .. _manytomany-arguments:
 
@@ -889,8 +889,9 @@ that control how the relationship functions.
 
     Same as :attr:`ForeignKey.limit_choices_to`.
 
-    ``limit_choices_to`` has no effect when used on a ``ManyToManyField`` with
-    an intermediate table.
+    ``limit_choices_to`` has no effect when used on a ``ManyToManyField`` with a
+    custom intermediate table specified using the
+    :attr:`~ManyToManyField.through` paramter.
 
 .. attribute:: ManyToManyField.symmetrical
 
@@ -920,7 +921,8 @@ that control how the relationship functions.
     use.
 
     The most common use for this option is when you want to associate
-    :ref:`extra data with a many-to-many relationship <intermediary-manytomany>`.
+    :ref:`extra data with a many-to-many relationship
+    <intermediary-manytomany>`.
 
 .. attribute:: ManyToManyField.db_table
 

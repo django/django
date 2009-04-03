@@ -208,9 +208,9 @@ Methods
 
     .. method:: models.User.has_perm(perm)
 
-        Returns ``True`` if the user has the specified permission, where perm
-        is in the format ``"package.codename"``. If the user is inactive, this
-        method will always return ``False``.
+        Returns ``True`` if the user has the specified permission, where perm is
+        in the format ``"<application name>.<lowercased model name>"``. If the
+        user is inactive, this method will always return ``False``.
 
     .. method:: models.User.has_perms(perm_list)
 
@@ -444,18 +444,18 @@ To indicate that this model is the user profile model for a given site, fill in
 the setting :setting:`AUTH_PROFILE_MODULE` with a string consisting of the
 following items, separated by a dot:
 
-1. The (normalized to lower-case) name of the application in which the user
-   profile model is defined (in other words, an all-lowercase version of the
+1. The name of the application (case sensitive) in which the user
+   profile model is defined (in other words, the
    name which was passed to :djadmin:`manage.py startapp <startapp>` to create
    the application).
 
-2. The (normalized to lower-case) name of the model class.
+2. The name of the model (not case sensitive) class.
 
 For example, if the profile model was a class named ``UserProfile`` and was
 defined inside an application named ``accounts``, the appropriate setting would
 be::
 
-    AUTH_PROFILE_MODULE = 'accounts.userprofile'
+    AUTH_PROFILE_MODULE = 'accounts.UserProfile'
 
 When a user profile model has been defined and specified in this manner, each
 :class:`~django.contrib.auth.models.User` object will have a method --
@@ -779,7 +779,7 @@ In addition to the :func:`~views.login` view, the authentication system
 includes a few other useful built-in views located in
 :mod:`django.contrib.auth.views`:
 
-.. function:: views.logout(request, [next_page, template_name])
+.. function:: views.logout(request, [next_page, template_name, redirect_field_name])
 
     Logs a user out.
 
@@ -790,6 +790,10 @@ includes a few other useful built-in views located in
         * ``template_name``: The full name of a template to display after
           logging the user out. This will default to
           :file:`registration/logged_out.html` if no argument is supplied.
+          
+        * ``redirect_field_name``: The name of a ``GET`` field containing the
+          URL to redirect to after log out. Overrides ``next_page`` if the given
+          ``GET`` parameter is passed.
 
     **Template context:**
 
@@ -1016,6 +1020,10 @@ The permission_required decorator
         def my_view(request):
             # ...
         my_view = permission_required('polls.can_vote')(my_view)
+
+    As for the :meth:`User.has_perm` method, permission names take the form
+    ``"<application name>.<lowercased model name>"`` (i.e. ``polls.choice`` for
+    a ``Choice`` model in the ``polls`` application).
 
     Note that :func:`~django.contrib.auth.decorators.permission_required()`
     also takes an optional ``login_url`` parameter. Example::
@@ -1331,6 +1339,16 @@ That's the basic authentication scheme that checks the Django users database.
 The order of :setting:`AUTHENTICATION_BACKENDS` matters, so if the same
 username and password is valid in multiple backends, Django will stop
 processing at the first positive match.
+
+.. note::
+
+    Once a user has authenticated, Django stores which backend was used to
+    authenticate the user in the user's session, and re-uses the same backend
+    for subsequent authentication attempts for that user. This effectively means
+    that authentication sources are cached, so if you change
+    :setting:`AUTHENTICATION_BACKENDS`, you'll need to clear out session data if
+    you need to force users to re-authenticate using different methods. A simple
+    way to do that is simply to execute ``Session.objects.all().delete()``.
 
 Writing an authentication backend
 ---------------------------------

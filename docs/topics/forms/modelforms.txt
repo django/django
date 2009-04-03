@@ -45,35 +45,62 @@ the full list of conversions:
     Model field                      Form field
     ===============================  ========================================
     ``AutoField``                    Not represented in the form
+    
     ``BooleanField``                 ``BooleanField``
+    
     ``CharField``                    ``CharField`` with ``max_length`` set to
                                      the model field's ``max_length``
+    
     ``CommaSeparatedIntegerField``   ``CharField``
+    
     ``DateField``                    ``DateField``
+    
     ``DateTimeField``                ``DateTimeField``
+    
     ``DecimalField``                 ``DecimalField``
+    
     ``EmailField``                   ``EmailField``
+    
     ``FileField``                    ``FileField``
+    
     ``FilePathField``                ``CharField``
+    
     ``FloatField``                   ``FloatField``
+    
     ``ForeignKey``                   ``ModelChoiceField`` (see below)
+    
     ``ImageField``                   ``ImageField``
+    
     ``IntegerField``                 ``IntegerField``
+    
     ``IPAddressField``               ``IPAddressField``
+    
     ``ManyToManyField``              ``ModelMultipleChoiceField`` (see
                                      below)
+    
     ``NullBooleanField``             ``CharField``
+    
     ``PhoneNumberField``             ``USPhoneNumberField``
                                      (from ``django.contrib.localflavor.us``)
+    
     ``PositiveIntegerField``         ``IntegerField``
+    
     ``PositiveSmallIntegerField``    ``IntegerField``
+    
     ``SlugField``                    ``SlugField``
+    
     ``SmallIntegerField``            ``IntegerField``
-    ``TextField``                    ``CharField`` with ``widget=Textarea``
+    
+    ``TextField``                    ``CharField`` with 
+                                     ``widget=forms.Textarea``
+    
     ``TimeField``                    ``TimeField``
+    
     ``URLField``                     ``URLField`` with ``verify_exists`` set
                                      to the model field's ``verify_exists``
-    ``XMLField``                     ``CharField`` with ``widget=Textarea``
+    
+    ``XMLField``                     ``CharField`` with 
+                                     ``widget=forms.Textarea``
     ===============================  ========================================
 
 
@@ -458,14 +485,15 @@ queryset that includes all objects in the model (e.g.,
 
     >>> formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
 
-Alternatively, you can create a subclass that implements a ``get_queryset()``
-method::
-
+Alternatively, you can create a subclass that sets ``self.queryset`` in
+``__init__``::
+    
     from django.forms.models import BaseModelFormSet
 
     class BaseAuthorFormSet(BaseModelFormSet):
-        def get_queryset(self):
-            return super(BaseAuthorFormSet, self).get_queryset().filter(name__startswith='O')
+        def __init__(self, *args, **kwargs):
+            self.queryset = Author.objects.filter(name__startswith='O')
+            super(BaseAuthorFormSet, self).__init__(*args, **kwargs)
 
 Then, pass your ``BaseAuthorFormSet`` class to the factory function::
 

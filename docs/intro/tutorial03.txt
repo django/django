@@ -302,6 +302,13 @@ for a given poll. Here's the view::
 The new concept here: The view raises the :exc:`~django.http.Http404` exception
 if a poll with the requested ID doesn't exist.
 
+We'll discuss what you could put in that ``polls/detail.html`` template a bit
+later, but if you'd like to quickly get the above example working, just::
+
+    {{ poll }}
+    
+will get you started for now.
+
 A shortcut: get_object_or_404()
 -------------------------------
 
@@ -357,6 +364,10 @@ in ``django/conf/urls/defaults.py``, ``handler404`` is set to
 
 Three more things to note about 404 views:
 
+    * If :setting:`DEBUG` is set to ``True`` (in your settings module) then your
+      404 view will never be used (and thus the ``404.html`` template will never
+      be rendered) because the traceback will be displayed instead.
+
     * The 404 view is also called if Django doesn't find a match after checking
       every regular expression in the URLconf.
       
@@ -365,8 +376,9 @@ Three more things to note about 404 views:
       template in the root of your template directory. The default 404 view will
       use that template for all 404 errors.
       
-    * If :setting:`DEBUG` is set to ``True`` (in your settings module) then your
-      404 view will never be used, and the traceback will be displayed instead.
+    * If :setting:`DEBUG` is set to ``False`` (in your settings module) and if
+      you didn't create a ``404.html`` file, an ``Http500`` is raised instead.
+      So remember to create a ``404.html``.
 
 Write a 500 (server error) view
 ===============================

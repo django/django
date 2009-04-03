@@ -273,7 +273,7 @@ You can pass either Unicode strings or UTF-8 bytestrings as arguments to
 querysets are identical::
 
     qs = People.objects.filter(name__contains=u'Å')
-    qs = People.objects.filter(name__contains='\xc3\85') # UTF-8 encoding of Å
+    qs = People.objects.filter(name__contains='\xc3\x85') # UTF-8 encoding of Å
 
 Templates
 =========

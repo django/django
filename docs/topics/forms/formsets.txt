@@ -310,7 +310,9 @@ Using a formset in views and templates
 
 Using a formset inside a view is as easy as using a regular ``Form`` class.
 The only thing you will want to be aware of is making sure to use the
-management form inside the template. Lets look at a sample view::
+management form inside the template. Let's look at a sample view:
+
+.. code-block:: python
 
     def manage_articles(request):
         ArticleFormSet = formset_factory(ArticleForm)
@@ -355,7 +357,9 @@ You are able to use more than one formset in a view if you like. Formsets
 borrow much of its behavior from forms. With that said you are able to use
 ``prefix`` to prefix formset form field names with a given value to allow
 more than one formset to be sent to a view without name clashing. Lets take
-a look at how this might be accomplished::
+a look at how this might be accomplished:
+
+.. code-block:: python
 
     def manage_articles(request):
         ArticleFormSet = formset_factory(ArticleForm)

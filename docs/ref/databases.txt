@@ -80,7 +80,6 @@ You should also audit your existing code for any instances of this behavior
 before enabling this feature. It's faster, but it provides less automatic
 protection for multi-call operations.
 
-
 .. _mysql-notes:
 
 MySQL notes
@@ -247,18 +246,18 @@ anything in a `MySQL option file`_.
 
 Here's a sample configuration which uses a MySQL option file::
 
-  # settings.py
-  DATABASE_ENGINE = "mysql"
-  DATABASE_OPTIONS = {
-      'read_default_file': '/path/to/my.cnf',
-  }
-
-  # my.cnf
-  [client]
-  database = DATABASE_NAME
-  user = DATABASE_USER
-  password = DATABASE_PASSWORD
-  default-character-set = utf8
+    # settings.py
+    DATABASE_ENGINE = "mysql"
+    DATABASE_OPTIONS = {
+        'read_default_file': '/path/to/my.cnf',
+    }
+    
+    # my.cnf
+    [client]
+    database = DATABASE_NAME
+    user = DATABASE_USER
+    password = DATABASE_PASSWORD
+    default-character-set = utf8
 
 Several other MySQLdb connection options may be useful, such as ``ssl``,
 ``use_unicode``, ``init_command``, and ``sql_mode``. Consult the
@@ -425,6 +424,42 @@ library Django will now use a ``pysqlite2`` interface in preference to
 This provides the ability to upgrade both the DB-API 2.0 interface or SQLite 3
 itself to versions newer than the ones included with your particular Python
 binary distribution, if needed.
+
+"Database is locked" errors
+-----------------------------------------------
+
+SQLite is meant to be a lightweight database, and thus can't support a high
+level of concurrency. ``OperationalError: database is locked`` errors indicate
+that your application is experiencing more concurrency than ``sqlite`` can
+handle in default configuration. This error means that one thread or process has
+an exclusive lock on the database connection and another thread timed out
+waiting for the lock the be released.
+
+Python's SQLite wrapper has
+a default timeout value that determines how long the second thread is allowed to
+wait on the lock before it times out and raises the ``OperationalError: database
+is locked`` error.
+
+If you're getting this error, you can solve it by:
+
+    * Switching to another database backend. At a certain point SQLite becomes
+      too "lite" for real-world applications, and these sorts of concurrency
+      errors indicate you've reached that point.
+      
+    * Rewriting your code to reduce concurrency and ensure that database 
+      transactions are short-lived.
+      
+    * Increase the default timeout value by setting the ``timeout`` database
+      option option::
+
+          DATABASE_OPTIONS = {
+              # ...
+             "timeout": 20,
+              # ...
+          }
+      
+      This will simply make SQLite wait a bit longer before throwing "database
+      is locked" errors; it won't really do anything to solve them.
 
 .. _oracle-notes:
 

@@ -267,9 +267,9 @@ of all the various ``QuerySet`` methods.
 Limiting QuerySets
 ------------------
 
-Use Python's array-slicing syntax to limit your ``QuerySet`` to a certain
-number of results. This is the equivalent of SQL's ``LIMIT`` and ``OFFSET``
-clauses.
+Use a subset of Python's array-slicing syntax to limit your ``QuerySet`` to a
+certain number of results. This is the equivalent of SQL's ``LIMIT`` and
+``OFFSET`` clauses.
 
 For example, this returns the first 5 objects (``LIMIT 5``)::
 
@@ -278,6 +278,9 @@ For example, this returns the first 5 objects (``LIMIT 5``)::
 This returns the sixth through tenth objects (``OFFSET 5 LIMIT 5``)::
 
     >>> Entry.objects.all()[5:10]
+    
+Negative indexing (i.e. ``Entry.objects.all()[-1]``) is not supported, nor is
+the third "step" slice parameter.
 
 Generally, slicing a ``QuerySet`` returns a new ``QuerySet`` -- it doesn't
 evaluate the query. An exception is if you use the "step" parameter of Python

@@ -188,6 +188,18 @@ almost always do the right thing and trying to override that will lead to
 errors that are difficult to track down. This feature is for advanced use
 only.
 
+Deleting objects
+================
+
+.. method:: Model.delete()
+
+   Issues a SQL ``DELETE`` for the object. This only deletes the object in the
+   database; the Python instance will still be around, and will still have data
+   in its fields.
+   
+   For more details, including how to delete objects in bulk, see
+   :ref:`topics-db-queries-delete`.
+
 .. _model-instance-methods:
 
 Other model instance methods

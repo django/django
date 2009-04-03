@@ -46,6 +46,11 @@ Other topics
    :maxdepth: 1
 
    actions
+   
+.. seealso::
+
+    For information about serving the media files (images, JavaScript, and CSS)
+    associated with the admin in production, see :ref:`serving-media-files`.
 
 ``ModelAdmin`` objects
 ======================
@@ -425,8 +430,8 @@ edit and save multiple rows at once.
     ``list_editable`` interacts with a couple of other options in particular
     ways; you should note the following rules:
 
-        * To use ``list_editable`` you must have defined ``ordering`` on
-          either your model or your ``ModelAdmin``.
+        * To use ``list_editable`` you must have defined ``ordering`` on either
+          your model's or your ``ModelAdmin``'s inner ``Meta``.
 
         * Any field in ``list_editable`` must also be in ``list_display``. You
           can't edit a field that's not displayed!
@@ -1154,6 +1159,37 @@ Root and login templates
 If you wish to change the index or login templates, you are better off creating
 your own ``AdminSite`` instance (see below), and changing the ``index_template``
 or ``login_template`` properties.
+
+Linking to admin views
+======================
+
+.. versionadded:: 1.1
+
+All the admin views use :ref:`named URL patterns <naming-url-patterns>` so it's
+easy to link to admin views with ``urlresolvers.reverse`` or the :ttag:`url`
+template tag. 
+
+Each model gets its own set of views and its own name using the model's app name
+and model name. For example, the "add" view for a ``Choice`` model in a
+``polls`` app would be named ``"admin_polls_choice_add"``.
+
+All the available views and their names are:
+
+    ==============  ======================================  ===================
+    View            View name                               Parameters
+    ==============  ======================================  ===================
+    Change list     ``"admin_<app>_<model>_changelist"``    None
+    Add object      ``"admin_<app>_<model>_add"``           None
+    Change object   ``"admin_<app>_<model>_change"``        ``object_id``
+    Delete object   ``"admin_<app>_<model>_delete"``        ``object_id``
+    Object history  ``"admin_<app>_<model>_history"``       ``object_id``
+    ==============  ======================================  ===================
+
+For example, to get the change URL for a particular ``Choice`` object::
+
+    >>> from django.core import urlresolvers
+    >>> c = Choice.objects.get(...)
+    >>> change_url = urlresolvers.reverse('admin_polls_choice_change', (c.id,))
 
 ``AdminSite`` objects
 =====================

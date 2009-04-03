@@ -111,6 +111,12 @@ middleware is always called on every response.
 object. It could alter the given ``response``, or it could create and return a
 brand-new :class:`~django.http. HttpResponse`.
 
+Remember that your middleware will not be called if another middleware object
+returns a response before you. But unlike ``process_request()`` and
+``process_view()``, during the response phase the classes are applied in reverse
+order, from the bottom up. This means classes defined at the end of
+:setting:`MIDDLEWARE_CLASSES` will be run first.
+
 .. _exception-middleware:
 
 ``process_exception``
@@ -126,6 +132,10 @@ Django calls ``process_exception()`` when a view raises an exception.
 :class:`~django.http. HttpResponse` object. If it returns an
 :class:`~django.http. HttpResponse` object, the response will be returned to
 the browser. Otherwise, default exception handling kicks in.
+
+Again, middleware are run in reverse order during the response phase, which
+includes ``process_exception``. If an exception middleware return a response,
+the middleware classes above that middleware will not be called at all.
 
 ``__init__``
 ------------

@@ -944,9 +944,10 @@ See the :djadmin:`dumpdata documentation<dumpdata>` for more details.
     Fixtures with other names can always be installed manually using the
     ``manage.py loaddata`` command.
 
-Once you've created a fixture and placed it somewhere in your Django project,
-you can use it in your unit tests by specifying a ``fixtures`` class attribute
-on your ``django.test.TestCase`` subclass::
+Once you've created a fixture and placed it in a ``fixtures`` directory in one
+of your :setting:`INSTALLED_APPS`, you can use it in your unit tests by
+specifying a ``fixtures`` class attribute on your ``django.test.TestCase``
+subclass::
 
     from django.test import TestCase
     from myapp.models import Animal

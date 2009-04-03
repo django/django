@@ -127,6 +127,8 @@ We've specified ``auto_id=False`` to simplify the output::
 The ``initial`` argument lets you specify the initial value to use when
 rendering this ``Field`` in an unbound ``Form``.
 
+To specify dynamic initial data, see the :attr:`Form.initial` parameter.
+
 The use-case for this is when you want to display an "empty" form in which a
 field is initialized to a particular value. For example::
 
@@ -234,7 +236,6 @@ fields. We've specified ``auto_id=False`` to simplify the output::
 
 .. attribute:: Field.error_messages
 
-
 The ``error_messages`` argument lets you override the default messages that the
 field will raise. Pass in a dictionary with keys matching the error messages you
 want to override. For example, here is the default error message::
@@ -255,54 +256,6 @@ And here is a custom error message::
 
 In the `built-in Field classes`_ section below, each ``Field`` defines the
 error message keys it uses.
-
-Dynamic initial values
-----------------------
-
-The ``initial`` argument to ``Field`` (explained above) lets you hard-code the
-initial value for a ``Field`` -- but what if you want to declare the initial
-value at runtime? For example, you might want to fill in a ``username`` field
-with the username of the current session.
-
-To accomplish this, use the ``initial`` argument to a ``Form``. This argument,
-if given, should be a dictionary mapping field names to initial values. Only
-include the fields for which you're specifying an initial value; it's not
-necessary to include every field in your form. For example::
-
-    >>> class CommentForm(forms.Form):
-    ...     name = forms.CharField()
-    ...     url = forms.URLField()
-    ...     comment = forms.CharField()
-    >>> f = CommentForm(initial={'name': 'your username'}, auto_id=False)
-    >>> print f
-    <tr><th>Name:</th><td><input type="text" name="name" value="your username" /></td></tr>
-    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
-    >>> f = CommentForm(initial={'name': 'another username'}, auto_id=False)
-    >>> print f
-    <tr><th>Name:</th><td><input type="text" name="name" value="another username" /></td></tr>
-    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
-
-Just like the ``initial`` parameter to ``Field``, these values are only
-displayed for unbound forms, and they're not used as fallback values if a
-particular value isn't provided.
-
-Finally, note that if a ``Field`` defines ``initial`` *and* you include
-``initial`` when instantiating the ``Form``, then the latter ``initial`` will
-have precedence. In this example, ``initial`` is provided both at the field
-level and at the form instance level, and the latter gets precedence::
-
-    >>> class CommentForm(forms.Form):
-    ...     name = forms.CharField(initial='class')
-    ...     url = forms.URLField()
-    ...     comment = forms.CharField()
-    >>> f = CommentForm(initial={'name': 'instance'}, auto_id=False)
-    >>> print f
-    <tr><th>Name:</th><td><input type="text" name="name" value="instance" /></td></tr>
-    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
-
 
 Built-in ``Field`` classes
 --------------------------
@@ -818,6 +771,20 @@ example::
     class MyModelChoiceField(ModelChoiceField):
         def label_from_instance(self, obj):
             return "My Object #%i" % obj.id
+
+.. attribute:: ModelChoiceField.empty_label
+
+   By default the ``<select>`` widget used by ``ModelChoiceField`` will have a
+   an empty choice at the top of the list. You can change the text of this label
+   (which is ``"---------"`` by default) with the ``empty_label`` attribute, or
+   you can disable the empty label entirely by setting ``empty_label`` to
+   ``None``::
+   
+        # A custom empty label
+        field1 = forms.ModelChoiceField(queryset=..., empty_label="(Nothing)")
+        
+        # No empty label
+        field2 = forms.ModelChoiceField(queryset=..., empty_label=None)
 
 ``ModelMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

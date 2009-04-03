@@ -17,14 +17,22 @@ performance gains over other server arrangements.
 Django requires Apache 2.x and mod_python 3.x, and you should use Apache's
 `prefork MPM`_, as opposed to the `worker MPM`_.
 
-You may also be interested in :ref:`How to use Django with FastCGI, SCGI, or
-AJP <howto-deployment-fastcgi>`.
+.. seealso::
+
+    * Apache is a big, complex animal, and this document only scratches the
+      surface of what Apache can do. If you need more advanced information about
+      Apache, there's no better source than `Apache's own official
+      documentation`_
+
+    * You may also be interested in :ref:`How to use Django with FastCGI, SCGI,
+      or AJP <howto-deployment-fastcgi>`.
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _mod_perl: http://perl.apache.org/
 .. _prefork MPM: http://httpd.apache.org/docs/2.2/mod/prefork.html
 .. _worker MPM: http://httpd.apache.org/docs/2.2/mod/worker.html
+.. _apache's own official documentation: http://httpd.apache.org/docs/
 
 Basic configuration
 ===================
@@ -52,15 +60,15 @@ Django mod_python handler." It passes the value of :ref:`DJANGO_SETTINGS_MODULE
 .. versionadded:: 1.0
     The ``PythonOption django.root ...`` is new in this version.
 
-Because mod_python does not know we are
-serving this site from underneath the ``/mysite/`` prefix, this value needs to
-be passed through to the mod_python handler in Django, via the ``PythonOption
-django.root ...`` line. The value set on that line (the last item) should
-match the string given in the ``<Location ...>`` directive. The effect of this
-is that Django will automatically strip the ``/mysite`` string from the front
-of any URLs before matching them against your URLconf patterns. If you later
-move your site to live under ``/mysite2``, you will not have to change anything
-except the ``django.root`` option in the config file.
+Because mod_python does not know we are serving this site from underneath the
+``/mysite/`` prefix, this value needs to be passed through to the mod_python
+handler in Django, via the ``PythonOption django.root ...`` line. The value set
+on that line (the last item) should match the string given in the ``<Location
+...>`` directive. The effect of this is that Django will automatically strip the
+``/mysite`` string from the front of any URLs before matching them against your
+URLconf patterns. If you later move your site to live under ``/mysite2``, you
+will not have to change anything except the ``django.root`` option in the config
+file.
 
 When using ``django.root`` you should make sure that what's left, after the
 prefix has been removed, begins with a slash. Your URLconf patterns that are
@@ -96,6 +104,10 @@ include the parent directory of the :ref:`DJANGO_SETTINGS_MODULE
 setting the Python path for interactive usage. Whenever you try to import
 something, Python will run through all the directories in ``sys.path`` in turn,
 from first to last, and try to import from each directory until one succeeds.
+
+Make sure that your Python source files' permissions are set such that the
+Apache user (usually named ``apache`` or ``httpd`` on most systems) will have
+read access to the files.
 
 An example might make this clearer. Suppose you have some applications under
 ``/usr/local/django-apps/`` (for example, ``/usr/local/django-apps/weblog/`` and

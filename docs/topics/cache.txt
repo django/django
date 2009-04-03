@@ -234,12 +234,12 @@ the ``CACHE_BACKEND`` setting. Valid arguments are as follows:
       backends, the maximum number of entries allowed in the cache before old
       values are deleted. This argument defaults to 300.
 
-    * ``cull_percentage``: The percentage of entries that are culled when
-      ``max_entries`` is reached. The actual ratio is ``1/cull_percentage``, so
-      set ``cull_percentage=2`` to cull half of the entries when ``max_entries``
+    * ``cull_frequency``: The fraction of entries that are culled when
+      ``max_entries`` is reached. The actual ratio is ``1/cull_frequency``, so
+      set ``cull_frequency=2`` to cull half of the entries when ``max_entries``
       is reached.
 
-      A value of ``0`` for ``cull_percentage`` means that the entire cache will
+      A value of ``0`` for ``cull_frequency`` means that the entire cache will
       be dumped when ``max_entries`` is reached. This makes culling *much*
       faster at the expense of more cache misses.
 

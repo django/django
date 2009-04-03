@@ -458,8 +458,10 @@ supports the FastCGI protocol. See the :ref:`FastCGI deployment documentation
 
 .. _flup: http://www.saddi.com/software/flup/
 
-runserver [optional port number, or ipaddr:port]
-------------------------------------------------
+runserver
+---------
+
+.. django-admin:: runserver [port or ipaddr:port]
 
 Starts a lightweight development Web server on the local machine. By default,
 the server runs on port 8000 on the IP address 127.0.0.1. You can pass in an
@@ -491,8 +493,7 @@ machines on your network. To make your development server viewable to other
 machines on the network, use its own IP address (e.g. ``192.168.2.1``) or
 ``0.0.0.0``.
 
---adminmedia
-~~~~~~~~~~~~
+.. django-admin-option:: --adminmedia
 
 Use the ``--adminmedia`` option to tell Django where to find the various CSS
 and JavaScript files for the Django admin interface. Normally, the development
@@ -503,8 +504,7 @@ Example usage::
 
     django-admin.py runserver --adminmedia=/tmp/new-admin-style/
 
---noreload
-~~~~~~~~~~
+.. django-admin-option:: --noreload
 
 Use the ``--noreload`` option to disable the use of the auto-reloader. This
 means any Python code changes you make while the server is running will *not*
@@ -540,14 +540,6 @@ Serving static files with the development server
 By default, the development server doesn't serve any static files for your site
 (such as CSS files, images, things under ``MEDIA_URL`` and so forth). If
 you want to configure Django to serve static media, read :ref:`howto-static-files`.
-
-Turning off auto-reload
-~~~~~~~~~~~~~~~~~~~~~~~
-
-To disable auto-reloading of code while the development server is running, use the
-``--noreload`` option, like so::
-
-    django-admin.py runserver --noreload
 
 shell
 -----
