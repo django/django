@@ -19,8 +19,11 @@ def get_svn_revision(path=None):
         path = django.__path__[0]
     entries_path = '%s/.svn/entries' % path
 
-    if os.path.exists(entries_path):
+    try:
         entries = open(entries_path, 'r').read()
+    except IOError:
+        pass
+    else:
         # Versions >= 7 of the entries file are flat text.  The first line is
         # the version number. The next set of digits after 'dir' is the revision.
         if re.match('(\d+)', entries):
