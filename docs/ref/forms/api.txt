@@ -129,6 +129,40 @@ what happens with unbound forms::
     >>> f.errors
     {}
 
+Dynamic initial values
+----------------------
+
+.. attribute:: Form.initial
+
+Use ``initial`` to declare the initial value of form fields at runtime. For
+example, you might want to fill in a ``username`` field with the username of the
+current session.
+
+To accomplish this, use the ``initial`` argument to a ``Form``. This argument,
+if given, should be a dictionary mapping field names to initial values. Only
+include the fields for which you're specifying an initial value; it's not
+necessary to include every field in your form. For example::
+
+    >>> f = ContactForm(initial={'subject': 'Hi there!'})
+
+These values are only displayed for unbound forms, and they're not used as
+fallback values if a particular value isn't provided.
+
+Note that if a ``Field`` defines ``initial`` *and* you include ``initial`` when
+instantiating the ``Form``, then the latter ``initial`` will have precedence. In
+this example, ``initial`` is provided both at the field level and at the form
+instance level, and the latter gets precedence::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(initial='class')
+    ...     url = forms.URLField()
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(initial={'name': 'instance'}, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="instance" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
 Accessing "clean" data
 ----------------------
 

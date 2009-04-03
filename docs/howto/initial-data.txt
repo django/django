@@ -47,7 +47,7 @@ look like in JSON:
           "first_name": "Paul",
           "last_name": "McCartney"
         }
-      },
+      }
     ]
 
 And here's that same fixture as YAML:

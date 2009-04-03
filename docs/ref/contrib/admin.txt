@@ -38,6 +38,11 @@ There are five steps in activating the Django admin site:
        ``ModelAdmin`` classes.
 
     5. Hook the ``AdminSite`` instance into your URLconf.
+   
+.. seealso::
+
+    For information about serving the media files (images, JavaScript, and CSS)
+    associated with the admin in production, see :ref:`serving-media-files`.
 
 ``ModelAdmin`` objects
 ======================

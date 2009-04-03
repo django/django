@@ -28,7 +28,9 @@ trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\
 del x # Temporary variable
 
 def escape(html):
-    """Returns the given HTML with ampersands, quotes and carets encoded."""
+    """
+    Returns the given HTML with ampersands, quotes and angle brackets encoded.
+    """
     return mark_safe(force_unicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
 escape = allow_lazy(escape, unicode)
 

@@ -9,6 +9,11 @@ objects into other formats. Usually these other formats will be text-based and
 used for sending Django objects over a wire, but it's possible for a
 serializer to handle any format (text-based or not).
 
+.. seealso::
+
+    If you just want to get some data from your tables into a serialized
+    form, you could use the :djadmin:`dumpdata` management command.
+
 Serializing data
 ----------------
 

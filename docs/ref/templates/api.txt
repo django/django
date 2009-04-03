@@ -323,7 +323,7 @@ optional, third positional argument, ``processors``. In this example, the
         c = RequestContext(request, {
             'foo': 'bar',
         }, [ip_address_processor])
-        return t.render(c)
+        return HttpResponse(t.render(c))
 
 .. note::
     If you're using Django's ``render_to_response()`` shortcut to populate a
@@ -519,18 +519,19 @@ By default, Django uses a filesystem-based template loader, but Django comes
 with a few other template loaders, which know how to load templates from other
 sources.
 
-These other loaders are disabled by default, but you can activate them by
-editing your :setting:`TEMPLATE_LOADERS` setting. :setting:`TEMPLATE_LOADERS`
+Some of these other loaders are disabled by default, but you can activate them
+by editing your :setting:`TEMPLATE_LOADERS` setting. :setting:`TEMPLATE_LOADERS`
 should be a tuple of strings, where each string represents a template loader.
 Here are the template loaders that come with Django:
 
 ``django.template.loaders.filesystem.load_template_source``
     Loads templates from the filesystem, according to :setting:`TEMPLATE_DIRS`.
+    This loader is enabled by default.
 
 ``django.template.loaders.app_directories.load_template_source``
     Loads templates from Django apps on the filesystem. For each app in
-    :setting:`INSTALLED_APPS`, the loader looks for a ``templates`` subdirectory. If
-    the directory exists, Django looks for templates in there.
+    :setting:`INSTALLED_APPS`, the loader looks for a ``templates``
+    subdirectory. If the directory exists, Django looks for templates in there.
 
     This means you can store templates with your individual apps. This also
     makes it easy to distribute Django apps with default templates.
@@ -545,16 +546,21 @@ Here are the template loaders that come with Django:
         * ``/path/to/myproject/polls/templates/foo.html``
         * ``/path/to/myproject/music/templates/foo.html``
 
-    Note that the loader performs an optimization when it is first imported:
-    It caches a list of which :setting:`INSTALLED_APPS` packages have a ``templates``
-    subdirectory.
+    Note that the loader performs an optimization when it is first imported: It
+    caches a list of which :setting:`INSTALLED_APPS` packages have a
+    ``templates`` subdirectory.
+    
+    This loader is enabled by default.
 
 ``django.template.loaders.eggs.load_template_source``
     Just like ``app_directories`` above, but it loads templates from Python
     eggs rather than from the filesystem.
+    
+    This loader is disabled by default.
 
-Django uses the template loaders in order according to the :setting:`TEMPLATE_LOADERS`
-setting. It uses each loader until a loader finds a match.
+Django uses the template loaders in order according to the
+:setting:`TEMPLATE_LOADERS` setting. It uses each loader until a loader finds a
+match.
 
 The ``render_to_string()`` shortcut
 ===================================

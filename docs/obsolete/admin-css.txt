@@ -29,7 +29,7 @@ group in a box and applies certain styles to the elements within. An ``h2``
 within a ``div.module`` will align to the top of the ``div`` as a header for the
 whole group.
 
-.. image:: _images/module.gif
+.. image:: _images/module.png
    :alt: Example use of module class on admin homepage
 
 Column Types
@@ -134,7 +134,7 @@ Example from a changelist page:
       <li><a href="/stories/add/" class="addlink">Add redirect</a></li>
     </ul>
 
-.. image:: _images/objecttools_01.gif
+.. image:: _images/objecttools_01.png
    :alt: Object tools on a changelist page
 
 and from a form page:
@@ -146,7 +146,7 @@ and from a form page:
      <li><a href="/r/303/152383/" class="viewsitelink">View on site</a></li>
     </ul>
 
-.. image:: _images/objecttools_02.gif
+.. image:: _images/objecttools_02.png
    :alt: Object tools on a form page
 
 Form Styles
@@ -176,7 +176,7 @@ Each row of the form (within the ``fieldset``) should be enclosed in a ``div``
 with class ``form-row``. If the field in the row is required, a class of
 ``required`` should also be added to the ``div.form-row``.
 
-.. image:: _images/formrow.gif
+.. image:: _images/formrow.png
    :alt: Example use of form-row class
 
 Labels

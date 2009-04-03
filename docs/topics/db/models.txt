@@ -165,12 +165,37 @@ ones:
         A choices list looks like this::
 
             YEAR_IN_SCHOOL_CHOICES = (
-                ('FR', 'Freshman'),
-                ('SO', 'Sophomore'),
-                ('JR', 'Junior'),
-                ('SR', 'Senior'),
-                ('GR', 'Graduate'),
+                (u'FR', u'Freshman'),
+                (u'SO', u'Sophomore'),
+                (u'JR', u'Junior'),
+                (u'SR', u'Senior'),
+                (u'GR', u'Graduate'),
             )
+        
+        The first element in each tuple is the value that will be stored in the
+        database, the second element will be displayed by the admin interface,
+        or in a ModelChoiceField. Given an instance of a model object, the
+        display value for a choices field can be accessed using the
+        ``get_FOO_display`` method. For example::
+        
+            from django.db import models
+            
+            class Person(models.Model):
+                GENDER_CHOICES = (
+                    (u'M', u'Male'),
+                    (u'F', u'Female'),
+                )
+                name = models.CharField(max_length=60)
+                gender = models.CharField(max_length=2, choices=GENDER_CHOICES)
+        
+        ::
+        
+            >>> p = Person(name="Fred Flinstone", gender="M")
+            >>> p.save()
+            >>> p.gender
+            u'M'
+            >>> p.get_gender_display()
+            u'Male'
 
     :attr:`~Field.default`
         The default value for the field. This can be a value or a callable

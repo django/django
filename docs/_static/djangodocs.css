@@ -103,9 +103,9 @@ dt .literal, table .literal { background:none; }
 .note, .admonition { padding:.8em 1em .8em; margin: 1em 0; border:1px solid #94da3a; }
 .admonition-title { font-weight:bold; margin-top:0 !important; margin-bottom:0 !important;}
 .admonition .last { margin-bottom:0 !important; }
-.note, .admonition { padding-left:65px; background:url(docicons-note.gif) .8em .8em no-repeat;}
-div.admonition-philosophy { padding-left:65px; background:url(docicons-philosophy.gif) .8em .8em no-repeat;}
-div.admonition-behind-the-scenes { padding-left:65px; background:url(docicons-behindscenes.gif) .8em .8em no-repeat;}
+.note, .admonition { padding-left:65px; background:url(docicons-note.png) .8em .8em no-repeat;}
+div.admonition-philosophy { padding-left:65px; background:url(docicons-philosophy.png) .8em .8em no-repeat;}
+div.admonition-behind-the-scenes { padding-left:65px; background:url(docicons-behindscenes.png) .8em .8em no-repeat;}
 
 /*** versoinadded/changes ***/
 div.versionadded, div.versionchanged {  }

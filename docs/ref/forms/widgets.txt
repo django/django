@@ -53,6 +53,8 @@ commonly used groups of widgets:
 .. class:: Select
 
     Select widget: ``<select><option ...>...</select>``
+    
+    Requires that your field provides :attr:`~Field.choices`.
 
 .. class:: NullBooleanSelect
 
@@ -62,6 +64,8 @@ commonly used groups of widgets:
 
     Select widget allowing multiple selection: ``<select
     multiple='multiple'>...</select>``
+
+    Requires that your field provides :attr:`~Field.choices`.
 
 .. class:: RadioSelect
 
@@ -73,6 +77,8 @@ commonly used groups of widgets:
           <li><input type='radio' ...></li>
           ...
         </ul>
+        
+    Requires that your field provides :attr:`~Field.choices`.
 
 .. class:: CheckboxSelectMultiple
 

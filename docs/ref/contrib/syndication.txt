@@ -160,11 +160,11 @@ into those elements.
       :class:`~django.contrib.syndication.feeds.Feed` class.
 
     * To specify the contents of ``<link>``, you have two options. For each item
-      in :meth:`items()`, Django first tries executing a ``get_absolute_url()``
-      method on that object. If that method doesn't exist, it tries calling a
-      method :meth:`item_link()` in the
-      :class:`~django.contrib.syndication.feeds.Feed` class, passing it a single
-      parameter, :attr:`item`, which is the object itself. Both
+      in :meth:`items()`, Django first tries calling a method
+      :meth:`item_link()` in the :class:`~django.contrib.syndication.feeds.Feed`
+      class, passing it a single parameter, :attr:`item`, which is the object
+      itself. If that method doesn't exist, Django tries executing a
+      ``get_absolute_url()`` method on that object. . Both
       ``get_absolute_url()`` and :meth:`item_link()` should return the item's
       URL as a normal Python string. As with ``get_absolute_url()``, the result
       of :meth:`item_link()` will be included directly in the URL, so you are
@@ -644,9 +644,8 @@ This example illustrates all possible attributes and methods for a
             Returns the URL for every item in the feed.
             """
 
-        # ITEM_GUID -- The following method is optional. This property is
-        # only used for Atom feeds (it is the ID element for an item in an
-        # Atom feed). If not provided, the item's link is used by default.
+        # ITEM_GUID -- The following method is optional. If not provided, the
+        # item's link is used by default.
 
         def item_guid(self, obj):
             """

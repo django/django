@@ -134,17 +134,26 @@ It worked!
 .. admonition:: Changing the port
 
     By default, the :djadmin:`runserver` command starts the development server
-    on port 8000. If you want to change the server's port, pass it as a
-    command-line argument. For instance, this command starts the server on port
-    8080:
+    on the internal IP at port 8000. 
+    
+    If you want to change the server's port, pass
+    it as a command-line argument. For instance, this command starts the server
+    on port 8080:
     
     .. code-block:: bash
 
         python manage.py runserver 8080
+        
+    If you want to change the server's IP, pass it along with the port. So to
+    listen on all public IPs (useful if you want to show off your work on other
+    computers), use:
+    
+    .. code-block:: bash
+    
+        python manage.py runserver 0.0.0.0:8000
 
     Full docs for the development server can be found in the
     :djadmin:`runserver` reference.
-
 
 Database setup
 --------------

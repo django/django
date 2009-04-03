@@ -4,10 +4,31 @@
 Related objects reference
 =========================
 
-Extra methods on managers when used in a ForeignKey context
-===========================================================
-
 .. currentmodule:: django.db.models
+
+This document describes extra methods available on managers when used in a one-to-many or many-to-many related context. This happens in two cases:
+
+    * The "other side" of a ``ForeignKey`` relation. That is::
+    
+            class Reporter(models.Model):
+                ...
+                
+            class Article(models.Model):
+                reporter = models.ForeignKey(Reporter)
+            
+      In the above example, the methods below will be available on
+      the manager ``reporter.article_set``.
+      
+    * Both sides of a ``ManyToManyField`` relation::
+    
+            class Topping(models.Model):
+                ...
+                
+            class Pizza(models.Model):
+                toppings = models.ManyToManyField(Topping)
+                
+      In this example, the methods below will be available both on
+      ``topping.pizza_set`` and on ``pizza.toppings``.
 
 .. method:: QuerySet.add(obj1, [obj2, ...])
 

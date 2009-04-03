@@ -74,6 +74,14 @@ break anything if you leave them, but they also won't do anything. To register
 apps with the admin you'll move those declarations to an ``admin.py`` file;
 see `the admin`_ below for more details.
 
+.. seealso::
+
+    A contributor to djangosnippets__ has written a script that'll `scan your
+    models.py and generate a corresponding admin.py`__.
+
+    __ http://www.djangosnippets.org/
+    __ http://www.djangosnippets.org/snippets/603/
+
 Example
 ~~~~~~~
 
@@ -121,7 +129,7 @@ The Admin
 One of the biggest changes in 1.0 is the new admin. The Django administrative
 interface (``django.contrib.admin``) has been completely refactored; admin
 definitions are now completely decoupled from model definitions, the framework
-as been rewritten to use Django's new form-handling library and redesigned with
+has been rewritten to use Django's new form-handling library and redesigned with
 extensibility and customization in mind.
 
 Practically, this means you'll need to rewrite all of your ``class Admin``
@@ -129,14 +137,6 @@ declarations. You've already seen in `models`_ above how to replace your ``class
 Admin`` with a ``admin.site.register()`` call in an ``admin.py`` file. Below are
 some more details on how to rewrite that ``Admin`` declaration into the new
 syntax.
-
-.. seealso::
-
-    A contributor to djangosnippets__ has written a script that'll `scan your
-    models.py and generate a corresponding admin.py`__.
-
-    __ http://www.djangosnippets.org/
-    __ http://www.djangosnippets.org/snippets/603/
 
 Use new inline syntax
 ~~~~~~~~~~~~~~~~~~~~~
@@ -320,6 +320,11 @@ Note that the ``width`` and ``height`` attributes only make sense for
 :class:`~django.db.models.ImageField` fields. More details can be found in the
 :ref:`model API <ref-models-fields>` documentation.
 
+Use ``Paginator`` instead of ``ObjectPaginator``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``ObjectPaginator`` in 0.96 has been removed and replaced with an improved
+version, :class:`django.core.paginator.Paginator`.
 
 Templates
 ---------
