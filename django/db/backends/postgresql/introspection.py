@@ -7,6 +7,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         21: 'SmallIntegerField',
         23: 'IntegerField',
         25: 'TextField',
+        700: 'FloatField',
         701: 'FloatField',
         869: 'IPAddressField',
         1043: 'CharField',
