@@ -91,7 +91,7 @@ class GEOSIOTest(unittest.TestCase):
 
         # These tests will fail on 3.0.0 because of a bug that was fixed in 3.1:
         # http://trac.osgeo.org/geos/ticket/216
-        if not geos_version_info()['version'] == '3.0.0':
+        if not geos_version_info()['version'].startswith('3.0.'):
             # Now setting the output dimensions to be 3
             wkb_w.outdim = 3
 
