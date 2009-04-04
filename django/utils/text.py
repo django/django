@@ -116,13 +116,13 @@ def get_valid_filename(s):
     """
     Returns the given string converted to a string that can be used for a clean
     filename. Specifically, leading and trailing spaces are removed; other
-    spaces are converted to underscores; and all non-filename-safe characters
-    are removed.
+    spaces are converted to underscores; and anything that is not a unicode
+    alphanumeric, dash, underscore, or dot, is removed.
     >>> get_valid_filename("john's portrait in 2004.jpg")
     u'johns_portrait_in_2004.jpg'
     """
     s = force_unicode(s).strip().replace(' ', '_')
-    return re.sub(r'[^-A-Za-z0-9_.]', '', s)
+    return re.sub(r'(?u)[^-\w.]', '', s)
 get_valid_filename = allow_lazy(get_valid_filename, unicode)
 
 def get_text_list(list_, last_word=ugettext_lazy(u'or')):
