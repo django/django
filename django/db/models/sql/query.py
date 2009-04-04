@@ -574,12 +574,13 @@ class BaseQuery(object):
         if not field_names:
             return
         columns = set()
-        cur_model = self.model
-        opts = cur_model._meta
+        orig_opts = self.model._meta
         seen = {}
-        must_include = {cur_model: set([opts.pk])}
+        must_include = {self.model: set([orig_opts.pk])}
         for field_name in field_names:
             parts = field_name.split(LOOKUP_SEP)
+            cur_model = self.model
+            opts = orig_opts
             for name in parts[:-1]:
                 old_model = cur_model
                 source = opts.get_field_by_name(name)[0]

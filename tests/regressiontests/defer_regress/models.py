@@ -24,6 +24,7 @@ class Child(models.Model):
 class Leaf(models.Model):
     name = models.CharField(max_length=10)
     child = models.ForeignKey(Child)
+    second_child = models.ForeignKey(Child, related_name="other", null=True)
     value = models.IntegerField(default=42)
 
     def __unicode__(self):
@@ -87,6 +88,8 @@ Some further checks for select_related() and inherited model behaviour
 >>> obj = Leaf.objects.only("name", "child").select_related()[0]
 >>> obj.child.name
 u'c1'
+>>> Leaf.objects.select_related().only("child__name", "second_child__name")
+[<Leaf_Deferred_name_value: l1>]
 
 """
 }
