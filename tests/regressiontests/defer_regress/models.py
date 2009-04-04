@@ -6,13 +6,16 @@ from django.conf import settings
 from django.db import connection, models
 
 class Item(models.Model):
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=15)
     text = models.TextField(default="xyzzy")
     value = models.IntegerField()
     other_value = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.name
+
+class RelatedItem(models.Model):
+    item = models.ForeignKey(Item)
 
 __test__ = {"regression_tests": """
 Deferred fields should really be deferred and not accidentally use the field's
@@ -39,9 +42,31 @@ True
 u"xyzzy"
 >>> len(connection.queries) == num + 2      # Effect of text lookup.
 True
+>>> obj.text
+u"xyzzy"
+>>> len(connection.queries) == num + 2
+True
 
 >>> settings.DEBUG = False
 
+Regression test for #10695. Make sure different instances don't inadvertently
+share data in the deferred descriptor objects.
+
+>>> i = Item.objects.create(name="no I'm first", value=37)
+>>> items = Item.objects.only('value').order_by('-value')
+>>> items[0].name
+u'first'
+>>> items[1].name
+u"no I'm first"
+
+>>> _ = RelatedItem.objects.create(item=i)
+>>> r = RelatedItem.objects.defer('item').get()
+>>> r.item_id == i.id
+True
+>>> r.item == i
+True
+
+
+
 """
 }
-

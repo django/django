@@ -158,9 +158,8 @@ class DeferredAttribute(object):
     A wrapper for a deferred-loading field. When the value is read from this
     object the first time, the query is executed.
     """
-    def __init__(self, field_name, pk_value, model):
+    def __init__(self, field_name, model):
         self.field_name = field_name
-        self.pk_value = pk_value
         self.model_ref = weakref.ref(model)
         self.loaded = False
 
@@ -170,21 +169,18 @@ class DeferredAttribute(object):
         Returns the cached value.
         """
         assert instance is not None
-        if not self.loaded:
-            obj = self.model_ref()
-            if obj is None:
-                return
-            self.value = list(obj._base_manager.filter(pk=self.pk_value).values_list(self.field_name, flat=True))[0]
-            self.loaded = True
-        return self.value
+        cls = self.model_ref()
+        data = instance.__dict__
+        if data.get(self.field_name, self) is self:
+            data[self.field_name] = cls._base_manager.filter(pk=instance.pk).values_list(self.field_name, flat=True).get()
+        return data[self.field_name]
 
-    def __set__(self, name, value):
+    def __set__(self, instance, value):
         """
         Deferred loading attributes can be set normally (which means there will
         never be a database lookup involved.
         """
-        self.value = value
-        self.loaded = True
+        instance.__dict__[self.field_name] = value
 
 def select_related_descend(field, restricted, requested):
     """
@@ -206,7 +202,7 @@ def select_related_descend(field, restricted, requested):
 # This function is needed because data descriptors must be defined on a class
 # object, not an instance, to have any effect.
 
-def deferred_class_factory(model, pk_value, attrs):
+def deferred_class_factory(model, attrs):
     """
     Returns a class object that is a copy of "model" with the specified "attrs"
     being replaced with DeferredAttribute objects. The "pk_value" ties the
@@ -223,7 +219,7 @@ def deferred_class_factory(model, pk_value, attrs):
     # are identical.
     name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
 
-    overrides = dict([(attr, DeferredAttribute(attr, pk_value, model))
+    overrides = dict([(attr, DeferredAttribute(attr, model))
             for attr in attrs])
     overrides["Meta"] = Meta
     overrides["__module__"] = model.__module__
@@ -233,4 +229,3 @@ def deferred_class_factory(model, pk_value, attrs):
 # The above function is also used to unpickle model instances with deferred
 # fields.
 deferred_class_factory.__safe_for_unpickling__ = True
-

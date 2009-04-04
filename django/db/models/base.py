@@ -362,9 +362,8 @@ class Model(object):
                     # DeferredAttribute classes, so we only need to do this
                     # once.
                     obj = self.__class__.__dict__[field.attname]
-                    pk_val = obj.pk_value
                     model = obj.model_ref()
-        return (model_unpickle, (model, pk_val, defers), data)
+        return (model_unpickle, (model, defers), data)
 
     def _get_pk_val(self, meta=None):
         if not meta:
@@ -635,12 +634,12 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 class Empty(object):
     pass
 
-def model_unpickle(model, pk_val, attrs):
+def model_unpickle(model, attrs):
     """
     Used to unpickle Model subclasses with deferred fields.
     """
     from django.db.models.query_utils import deferred_class_factory
-    cls = deferred_class_factory(model, pk_val, attrs)
+    cls = deferred_class_factory(model, attrs)
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
 

@@ -184,12 +184,12 @@ class RelatedGeoModelTest(unittest.TestCase):
             self.assertEqual(m.point, t[1])
 
     # Test disabled until #10572 is resolved.
-    #def test08_defer_only(self):
-    #    "Testing defer() and only() on Geographic models."
-    #    qs = Location.objects.all()
-    #    def_qs = Location.objects.defer('point')
-    #    for loc, def_loc in zip(qs, def_qs):
-    #        self.assertEqual(loc.point, def_loc.point)
+    def test08_defer_only(self):
+        "Testing defer() and only() on Geographic models."
+        qs = Location.objects.all()
+        def_qs = Location.objects.defer('point')
+        for loc, def_loc in zip(qs, def_qs):
+            self.assertEqual(loc.point, def_loc.point)
 
     # TODO: Related tests for KML, GML, and distance lookups.
 

@@ -190,6 +190,20 @@ class QuerySet(object):
         index_start = len(extra_select)
         aggregate_start = index_start + len(self.model._meta.fields)
 
+        load_fields = only_load.get(self.model)
+        skip = None
+        if load_fields and not fill_cache:
+            # Some fields have been deferred, so we have to initialise
+            # via keyword arguments.
+            skip = set()
+            init_list = []
+            for field in fields:
+                if field.name not in load_fields:
+                    skip.add(field.attname)
+                else:
+                    init_list.append(field.attname)
+            model_cls = deferred_class_factory(self.model, skip)
+
         for row in self.query.results_iter():
             if fill_cache:
                 obj, _ = get_cached_row(self.model, row,
@@ -197,25 +211,10 @@ class QuerySet(object):
                             requested=requested, offset=len(aggregate_select),
                             only_load=only_load)
             else:
-                load_fields = only_load.get(self.model)
-                if load_fields:
-                    # Some fields have been deferred, so we have to initialise
-                    # via keyword arguments.
+                if skip:
                     row_data = row[index_start:aggregate_start]
                     pk_val = row_data[pk_idx]
-                    skip = set()
-                    init_list = []
-                    for field in fields:
-                        if field.name not in load_fields:
-                            skip.add(field.attname)
-                        else:
-                            init_list.append(field.attname)
-                    if skip:
-                        model_cls = deferred_class_factory(self.model, pk_val,
-                                skip)
-                        obj = model_cls(**dict(zip(init_list, row_data)))
-                    else:
-                        obj = self.model(*row[index_start:aggregate_start])
+                    obj = model_cls(**dict(zip(init_list, row_data)))
                 else:
                     # Omit aggregates in object creation.
                     obj = self.model(*row[index_start:aggregate_start])
@@ -927,7 +926,7 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
                 else:
                     init_list.append(field.attname)
             if skip:
-                klass = deferred_class_factory(klass, pk_val, skip)
+                klass = deferred_class_factory(klass, skip)
                 obj = klass(**dict(zip(init_list, fields)))
             else:
                 obj = klass(*fields)
