@@ -1,3 +1,4 @@
+#! -*- coding: utf-8 -*-
 import os
 import errno
 import shutil
@@ -11,6 +12,8 @@ from django.utils.hashcompat import sha_constructor
 
 from models import FileModel, temp_storage, UPLOAD_TO
 import uploadhandler
+
+UNICODE_FILENAME = u'test-0123456789_中文_Orléans.jpg'
 
 class FileUploadTests(TestCase):
     def test_simple_upload(self):
@@ -32,16 +35,10 @@ class FileUploadTests(TestCase):
         file2.write('a' * (10 * 2 ** 20))
         file2.seek(0)
 
-        # This file contains chinese symbols for a name.
-        file3 = open(os.path.join(tdir, u'test_&#20013;&#25991;_Orl\u00e9ans.jpg'.encode('utf-8')), 'w+b')
-        file3.write('b' * (2 ** 10))
-        file3.seek(0)
-
         post_data = {
             'name': 'Ringo',
             'file_field1': open(file1.name),
             'file_field2': open(file2.name),
-            'file_unicode': file3,
             }
 
         for key in post_data.keys():
@@ -53,8 +50,24 @@ class FileUploadTests(TestCase):
 
         response = self.client.post('/file_uploads/verify/', post_data)
 
+        self.assertEqual(response.status_code, 200)
+
+    def test_unicode_file_name(self):
+        tdir = tempfile.gettempdir()
+
+        # This file contains chinese symbols and an accented char in the name.
+        file1 = open(os.path.join(tdir, UNICODE_FILENAME.encode('utf-8')), 'w+b')
+        file1.write('b' * (2 ** 10))
+        file1.seek(0)
+
+        post_data = {
+            'file_unicode': file1,
+            }
+
+        response = self.client.post('/file_uploads/unicode_name/', post_data)
+
         try:
-            os.unlink(file3.name)
+            os.unlink(file1.name)
         except:
             pass
 

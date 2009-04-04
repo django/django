@@ -5,6 +5,7 @@ from django.utils import simplejson
 from models import FileModel
 from uploadhandler import QuotaUploadHandler, ErroringUploadHandler
 from django.utils.hashcompat import sha_constructor
+from tests import UNICODE_FILENAME
 
 def file_upload_view(request):
     """
@@ -29,10 +30,6 @@ def file_upload_view_verify(request):
     form_data = request.POST.copy()
     form_data.update(request.FILES)
 
-    # Check to see if unicode names worked out.
-    if not request.FILES['file_unicode'].name.endswith(u'test_\u4e2d\u6587_Orl\xe9ans.jpg'):
-        return HttpResponseServerError()
-
     for key, value in form_data.items():
         if key.endswith('_hash'):
             continue
@@ -52,6 +49,32 @@ def file_upload_view_verify(request):
     obj.testfile.save(largefile.name, largefile)
 
     return HttpResponse('')
+
+def file_upload_unicode_name(request):
+
+    # Check to see if unicode name came through properly.
+    if not request.FILES['file_unicode'].name.endswith(UNICODE_FILENAME):
+        return HttpResponseServerError()
+
+    response = None
+
+    # Check to make sure the exotic characters are preserved even
+    # through file save.
+    uni_named_file = request.FILES['file_unicode']
+    obj = FileModel.objects.create(testfile=uni_named_file)
+    if not obj.testfile.name.endswith(uni_named_file.name):
+        response = HttpResponseServerError()
+
+    # Cleanup the object with its exotic file name immediately.
+    # (shutil.rmtree used elsewhere in the tests to clean up the
+    # upload directory has been seen to choke on unicode
+    # filenames on Windows.)
+    obj.delete()
+
+    if response:
+        return response
+    else:
+        return HttpResponse('')
 
 def file_upload_echo(request):
     """
