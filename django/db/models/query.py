@@ -908,31 +908,35 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
         return None
 
     restricted = requested is not None
-    index_end = index_start + len(klass._meta.fields)
-    fields = row[index_start:index_end]
-    if not [x for x in fields if x is not None]:
-        # If we only have a list of Nones, there was not related object.
-        obj = None
-    else:
-        load_fields = only_load and only_load.get(klass) or None
-        if load_fields:
-            # Handle deferred fields.
-            skip = set()
-            init_list = []
-            pk_val = fields[klass._meta.pk_index()]
-            for field in klass._meta.fields:
-                if field.name not in load_fields:
-                    skip.add(field.name)
-                else:
-                    init_list.append(field.attname)
-            if skip:
-                klass = deferred_class_factory(klass, skip)
-                obj = klass(**dict(zip(init_list, fields)))
+    load_fields = only_load and only_load.get(klass) or None
+    if load_fields:
+        # Handle deferred fields.
+        skip = set()
+        init_list = []
+        pk_val = row[index_start + klass._meta.pk_index()]
+        for field in klass._meta.fields:
+            if field.name not in load_fields:
+                skip.add(field.name)
             else:
-                obj = klass(*fields)
+                init_list.append(field.attname)
+        field_count = len(init_list)
+        fields = row[index_start : index_start + field_count]
+        if fields == (None,) * field_count:
+            obj = None
+        elif skip:
+            klass = deferred_class_factory(klass, skip)
+            obj = klass(**dict(zip(init_list, fields)))
         else:
             obj = klass(*fields)
-    index_end += offset
+    else:
+        field_count = len(klass._meta.fields)
+        fields = row[index_start : index_start + field_count]
+        if fields == (None,) * field_count:
+            obj = None
+        else:
+            obj = klass(*fields)
+
+    index_end = index_start + field_count + offset
     for f in klass._meta.fields:
         if not select_related_descend(f, restricted, requested):
             continue
@@ -947,7 +951,6 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
             if obj is not None:
                 setattr(obj, f.get_cache_name(), rel_obj)
     return obj, index_end
-
 
 def delete_objects(seen_objs):
     """

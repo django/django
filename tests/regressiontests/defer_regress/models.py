@@ -17,6 +17,18 @@ class Item(models.Model):
 class RelatedItem(models.Model):
     item = models.ForeignKey(Item)
 
+class Child(models.Model):
+    name = models.CharField(max_length=10)
+    value = models.IntegerField()
+
+class Leaf(models.Model):
+    name = models.CharField(max_length=10)
+    child = models.ForeignKey(Child)
+    value = models.IntegerField(default=42)
+
+    def __unicode__(self):
+        return self.name
+
 __test__ = {"regression_tests": """
 Deferred fields should really be deferred and not accidentally use the field's
 default value just because they aren't passed to __init__.
@@ -66,7 +78,15 @@ True
 >>> r.item == i
 True
 
+Some further checks for select_related() and inherited model behaviour
+(regression for #10710).
 
+>>> c1 = Child.objects.create(name="c1", value=42)
+>>> obj = Leaf.objects.create(name="l1", child=c1)
+
+>>> obj = Leaf.objects.only("name", "child").select_related()[0]
+>>> obj.child.name
+u'c1'
 
 """
 }
