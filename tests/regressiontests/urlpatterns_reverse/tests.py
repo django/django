@@ -1,6 +1,19 @@
 """
 Unit tests for reverse URL lookups.
 """
+__test__ = {'API_TESTS': """
+
+RegexURLResolver should raise an exception when no urlpatterns exist.
+
+>>> from django.core.urlresolvers import RegexURLResolver
+>>> no_urls = 'regressiontests.urlpatterns_reverse.no_urls'
+>>> resolver = RegexURLResolver(r'^$', no_urls)
+>>> resolver.url_patterns
+Traceback (most recent call last):
+...
+ImproperlyConfigured: The included urlconf regressiontests.urlpatterns_reverse.no_urls doesn't have any patterns in it
+"""}
+
 
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
@@ -101,21 +114,21 @@ class URLPatternReverse(TestCase):
 
 class ReverseShortcutTests(TestCase):
     urls = 'regressiontests.urlpatterns_reverse.urls'
-    
+
     def test_redirect_to_object(self):
         # We don't really need a model; just something with a get_absolute_url
         class FakeObj(object):
             def get_absolute_url(self):
                 return "/hi-there/"
-                
+
         res = redirect(FakeObj())
         self.assert_(isinstance(res, HttpResponseRedirect))
         self.assertEqual(res['Location'], '/hi-there/')
-        
+
         res = redirect(FakeObj(), permanent=True)
         self.assert_(isinstance(res, HttpResponsePermanentRedirect))
         self.assertEqual(res['Location'], '/hi-there/')
-        
+
     def test_redirect_to_view_name(self):
         res = redirect('hardcoded2')
         self.assertEqual(res['Location'], '/hardcoded/doc.pdf')
@@ -124,7 +137,7 @@ class ReverseShortcutTests(TestCase):
         res = redirect('headlines', year='2008', month='02', day='17')
         self.assertEqual(res['Location'], '/headlines/2008.02.17/')
         self.assertRaises(NoReverseMatch, redirect, 'not-a-view')
-        
+
     def test_redirect_to_url(self):
         res = redirect('/foo/')
         self.assertEqual(res['Location'], '/foo/')

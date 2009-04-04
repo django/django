@@ -209,7 +209,7 @@ class RegexURLResolver(object):
         try:
             iter(patterns)
         except TypeError:
-            raise ImproperlyConfigured("The included urlconf %s doesn't have any"
+            raise ImproperlyConfigured("The included urlconf %s doesn't have any "
                 "patterns in it" % self.urlconf_name)
         return patterns
     url_patterns = property(_get_url_patterns)
