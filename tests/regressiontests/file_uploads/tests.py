@@ -37,8 +37,8 @@ class FileUploadTests(TestCase):
 
         post_data = {
             'name': 'Ringo',
-            'file_field1': open(file1.name),
-            'file_field2': open(file2.name),
+            'file_field1': file1,
+            'file_field2': file2,
             }
 
         for key in post_data.keys():
@@ -66,6 +66,7 @@ class FileUploadTests(TestCase):
 
         response = self.client.post('/file_uploads/unicode_name/', post_data)
 
+        file1.close()
         try:
             os.unlink(file1.name)
         except:
@@ -150,51 +151,57 @@ class FileUploadTests(TestCase):
         # A small file (under the 5M quota)
         smallfile = tempfile.NamedTemporaryFile()
         smallfile.write('a' * (2 ** 21))
+        smallfile.seek(0)
 
         # A big file (over the quota)
         bigfile = tempfile.NamedTemporaryFile()
         bigfile.write('a' * (10 * 2 ** 20))
+        bigfile.seek(0)
 
         # Small file posting should work.
-        response = self.client.post('/file_uploads/quota/', {'f': open(smallfile.name)})
+        response = self.client.post('/file_uploads/quota/', {'f': smallfile})
         got = simplejson.loads(response.content)
         self.assert_('f' in got)
 
         # Large files don't go through.
-        response = self.client.post("/file_uploads/quota/", {'f': open(bigfile.name)})
+        response = self.client.post("/file_uploads/quota/", {'f': bigfile})
         got = simplejson.loads(response.content)
         self.assert_('f' not in got)
 
     def test_broken_custom_upload_handler(self):
         f = tempfile.NamedTemporaryFile()
         f.write('a' * (2 ** 21))
+        f.seek(0)
 
         # AttributeError: You cannot alter upload handlers after the upload has been processed.
         self.assertRaises(
             AttributeError,
             self.client.post,
             '/file_uploads/quota/broken/',
-            {'f': open(f.name)}
+            {'f': f}
         )
 
     def test_fileupload_getlist(self):
         file1 = tempfile.NamedTemporaryFile()
         file1.write('a' * (2 ** 23))
+        file1.seek(0)
 
         file2 = tempfile.NamedTemporaryFile()
         file2.write('a' * (2 * 2 ** 18))
+        file2.seek(0)
 
         file2a = tempfile.NamedTemporaryFile()
         file2a.write('a' * (5 * 2 ** 20))
+        file2a.seek(0)
 
         response = self.client.post('/file_uploads/getlist_count/', {
-            'file1': open(file1.name),
+            'file1': file1,
             'field1': u'test',
             'field2': u'test3',
             'field3': u'test5',
             'field4': u'test6',
             'field5': u'test7',
-            'file2': (open(file2.name), open(file2a.name))
+            'file2': (file2, file2a)
         })
         got = simplejson.loads(response.content)
 

@@ -4,7 +4,8 @@ from django.db import models
 from django.core.files.storage import FileSystemStorage
 from django.forms import ModelForm
 
-temp_storage = FileSystemStorage(tempfile.gettempdir())
+temp_storage_dir = tempfile.mkdtemp()
+temp_storage = FileSystemStorage(temp_storage_dir)
 
 class Photo(models.Model):
     title = models.CharField(max_length=30)

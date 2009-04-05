@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import tempfile
+import shutil
 
 from django.db import models
 # Can't import as "forms" due to implementation details in the test suite (the
@@ -41,6 +42,12 @@ True
 {'file1': <SimpleUploadedFile: 我隻氣墊船裝滿晒鱔.txt (text/plain)>}
 >>> m = FileModel.objects.create(file=f.cleaned_data['file1'])
 
+# It's enough that m gets created without error.  Preservation of the exotic name is checked 
+# in a file_uploads test; it's hard to do that correctly with doctest's unicode issues. So
+# we create and then immediately delete m so as to not leave the exotically named file around
+# for shutil.rmtree (on Windows) to have trouble with later.
+>>> m.delete()
+
 # Boundary conditions on a PostitiveIntegerField #########################
 >>> class BoundaryForm(ModelForm):
 ...     class Meta:
@@ -78,4 +85,5 @@ u'instance value'
 datetime.date(1969, 4, 4)
 >>> instance_form.initial['value']
 12
+>>> shutil.rmtree(temp_storage_location)
 """}
