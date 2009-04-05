@@ -1,8 +1,8 @@
 """
 Move a file in the safest way possible::
 
-    >>> from django.core.files.move import file_move_save
-    >>> file_move_save("/tmp/old_file", "/tmp/new_file")
+    >>> from django.core.files.move import file_move_safe
+    >>> file_move_safe("/tmp/old_file", "/tmp/new_file")
 """
 
 import os
@@ -39,10 +39,8 @@ def file_move_safe(old_file_name, new_file_name, chunk_size = 1024*64, allow_ove
     """
     Moves a file from one location to another in the safest way possible.
 
-    First, try using ``shutils.move``, which is OS-dependent but doesn't break
-    if moving across filesystems. Then, try ``os.rename``, which will break
-    across filesystems. Finally, streams manually from one file to another in
-    pure Python.
+    First, tries ``os.rename``, which is simple but will break across filesystems.
+    If that fails, streams manually from one file to another in pure Python.
 
     If the destination file exists and ``allow_overwrite`` is ``False``, this
     function will throw an ``IOError``.
@@ -82,8 +80,9 @@ def file_move_safe(old_file_name, new_file_name, chunk_size = 1024*64, allow_ove
     try:
         os.remove(old_file_name)
     except OSError, e:
-        # Certain operating systems (Cygwin and Windows)
-        # fail when deleting opened files, ignore it
-        if getattr(e, 'winerror', 0) != 32:
-            # FIXME: should we also ignore errno 13?
+        # Certain operating systems (Cygwin and Windows) 
+        # fail when deleting opened files, ignore it.  (For the 
+        # systems where this happens, temporary files will be auto-deleted
+        # on close anyway.)
+        if getattr(e, 'winerror', 0) != 32 and getattr(e, 'errno', 0) != 13:
             raise
