@@ -58,7 +58,7 @@ True
 #
 >>> from django.core.management import call_command
 
->>> call_command("createsuperuser", noinput=True, username="joe", email="joe@somewhere.org")
+>>> call_command("createsuperuser", interactive=False, username="joe", email="joe@somewhere.org")
 Superuser created successfully.
 
 >>> u = User.objects.get(username="joe")
