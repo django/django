@@ -5,9 +5,6 @@ from django.db import models
 from django.core.files.storage import FileSystemStorage
 from django.core.files.base import ContentFile
 
-temp_storage_dir = tempfile.mkdtemp()
-temp_storage = FileSystemStorage(temp_storage_dir)
-
 # Test for correct behavior of width_field/height_field.
 # Of course, we can't run this without PIL.
 
@@ -20,6 +17,9 @@ except ImportError:
 
 # If we have PIL, do these tests
 if Image:
+    temp_storage_dir = tempfile.mkdtemp()
+    temp_storage = FileSystemStorage(temp_storage_dir)
+
     class Person(models.Model):
         name = models.CharField(max_length=50)
         mugshot = models.ImageField(storage=temp_storage, upload_to='tests',
