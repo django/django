@@ -119,10 +119,11 @@ class Signal(object):
             lookup_key = (dispatch_uid, _make_id(sender))
         else:
             lookup_key = (_make_id(receiver), _make_id(sender))
-
-        for idx, (r_key, _) in enumerate(self.receivers):
+        
+        for index in xrange(len(self.receivers)):
+            (r_key, _) = self.receivers[index]
             if r_key == lookup_key:
-                del self.receivers[idx]
+                del self.receivers[index]
 
     def send(self, sender, **named):
         """Send signal from sender to all connected receivers.
