@@ -96,4 +96,15 @@ instance.id is None: False
 >>> models.signals.pre_delete.disconnect(pre_delete_test)
 >>> models.signals.post_save.disconnect(post_save_test)
 >>> models.signals.pre_save.disconnect(pre_save_test)
+
+# Make sure all the signals got removed properly (#9989)
+>>> models.signals.post_delete.receivers
+[]
+>>> models.signals.pre_delete.receivers
+[]
+>>> models.signals.post_save.receivers
+[]
+>>> models.signals.pre_save.receivers
+[]
+
 """}
