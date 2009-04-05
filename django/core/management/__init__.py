@@ -1,6 +1,6 @@
 import os
 import sys
-from optparse import OptionParser
+from optparse import OptionParser, NO_DEFAULT
 import imp
 
 import django
@@ -144,6 +144,7 @@ def call_command(name, *args, **options):
         call_command('shell', plain=True)
         call_command('sqlall', 'myapp')
     """
+    # Load the command object.
     try:
         app_name = get_commands()[name]
         if isinstance(app_name, BaseCommand):
@@ -153,7 +154,17 @@ def call_command(name, *args, **options):
             klass = load_command_class(app_name, name)
     except KeyError:
         raise CommandError, "Unknown command: %r" % name
-    return klass.execute(*args, **options)
+
+    # Grab out a list of defaults from the options. optparse does this for us
+    # when the script runs from the command line, but since call_command can 
+    # be called programatically, we need to simulate the loading and handling
+    # of defaults (see #10080 for details).
+    defaults = dict([(o.dest, o.default)
+                     for o in klass.option_list 
+                     if o.default is not NO_DEFAULT])
+    defaults.update(options)
+
+    return klass.execute(*args, **defaults)
 
 class LaxOptionParser(OptionParser):
     """

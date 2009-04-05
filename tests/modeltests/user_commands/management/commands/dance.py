@@ -1,3 +1,4 @@
+from optparse import make_option
 from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
@@ -5,5 +6,9 @@ class Command(BaseCommand):
     args = ''
     requires_model_validation = True
 
+    option_list =[
+        make_option("-s", "--style", default="Rock'n'Roll")
+    ]
+
     def handle(self, *args, **options):
-        print "I don't feel like dancing."
+        print "I don't feel like dancing %s." % options["style"]
