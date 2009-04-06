@@ -174,7 +174,7 @@ class AdminSite(object):
 
                     urls = super(MyAdminSite, self).get_urls()
                     urls += patterns('',
-                        url(r'^my_view/$', self.protected_view(some_view))
+                        url(r'^my_view/$', self.admin_view(some_view))
                     )
                     return urls
         """
