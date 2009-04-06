@@ -201,7 +201,7 @@ objects as JSON::
     from django.http import HttpResponse
     from django.core import serializers
 
-    def export_as_json(request, queryset):
+    def export_as_json(modeladmin, request, queryset):
         response = HttpResponse(mimetype="text/javascript")
         serialize.serialize(queryset, stream=response)
         return response
@@ -220,7 +220,7 @@ that simply redirects to your custom export view::
     from django.contrib.contenttypes.models import ContentType
     from django.http import HttpResponseRedirect
     
-    def export_selected_objects(request, queryset):
+    def export_selected_objects(modeladmin, request, queryset):
         selected = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
         ct = ContentType.objects.get_for_model(queryset.model)
         return HttpResponseRedirect("/export/?ct=%s&ids=%s" % (ct.pk, ",".join(selected)))
