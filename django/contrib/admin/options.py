@@ -11,6 +11,7 @@ from django.db import models, transaction
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
+from django.utils.datastructures import SortedDict
 from django.utils.functional import update_wrapper
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
@@ -194,7 +195,7 @@ class ModelAdmin(BaseModelAdmin):
     object_history_template = None
 
     # Actions
-    actions = ['delete_selected']
+    actions = []
     action_form = helpers.ActionForm
     actions_on_top = True
     actions_on_bottom = False
@@ -207,7 +208,7 @@ class ModelAdmin(BaseModelAdmin):
         for inline_class in self.inlines:
             inline_instance = inline_class(self.model, self.admin_site)
             self.inline_instances.append(inline_instance)
-        if 'action_checkbox' not in self.list_display:
+        if 'action_checkbox' not in self.list_display and self.actions is not None:
             self.list_display = ['action_checkbox'] +  list(self.list_display)
         if not self.list_display_links:
             for name in self.list_display:
@@ -253,7 +254,7 @@ class ModelAdmin(BaseModelAdmin):
         from django.conf import settings
 
         js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
-        if self.actions:
+        if self.actions is not None:
             js.extend(['js/getElementsBySelector.js', 'js/actions.js'])
         if self.prepopulated_fields:
             js.append('js/urlify.js')
@@ -414,19 +415,46 @@ class ModelAdmin(BaseModelAdmin):
     action_checkbox.short_description = mark_safe('<input type="checkbox" id="action-toggle" />')
     action_checkbox.allow_tags = True
 
-    def get_actions(self, request=None):
+    def get_actions(self, request):
         """
         Return a dictionary mapping the names of all actions for this
         ModelAdmin to a tuple of (callable, name, description) for each action.
         """
-        actions = {}
-        for klass in [self.admin_site] + self.__class__.mro()[::-1]:
-            for action in getattr(klass, 'actions', []):
-                func, name, description = self.get_action(action)
-                actions[name] = (func, name, description)
+        # If self.actions is explicitally set to None that means that we don't
+        # want *any* actions enabled on this page.
+        if self.actions is None:
+            return []
+            
+        actions = []
+        
+        # Gather actions from the admin site first
+        for (name, func) in self.admin_site.actions:
+            description = getattr(func, 'short_description', name.replace('_', ' '))
+            actions.append((func, name, description))
+        
+        # Then gather them from the model admin and all parent classes, 
+        # starting with self and working back up.
+        for klass in self.__class__.mro()[::-1]:
+            class_actions = getattr(klass, 'actions', [])
+            # Avoid trying to iterate over None
+            if not class_actions:
+                continue 
+            actions.extend([self.get_action(action) for action in class_actions])
+        
+        # get_action might have returned None, so filter any of those out.
+        actions = filter(None, actions)
+        
+        # Convert the actions into a SortedDict keyed by name
+        # and sorted by description.
+        actions.sort(lambda a,b: cmp(a[2].lower(), b[2].lower()))
+        actions = SortedDict([
+            (name, (func, name, desc))
+            for func, name, desc in actions
+        ])
+        
         return actions
 
-    def get_action_choices(self, request=None, default_choices=BLANK_CHOICE_DASH):
+    def get_action_choices(self, request, default_choices=BLANK_CHOICE_DASH):
         """
         Return a list of choices for use in a form object.  Each choice is a
         tuple (name, description).
@@ -443,84 +471,29 @@ class ModelAdmin(BaseModelAdmin):
         or the name of a method on the ModelAdmin.  Return is a tuple of
         (callable, name, description).
         """
+        # If the action is a callable, just use it.
         if callable(action):
             func = action
             action = action.__name__
-        elif hasattr(self, action):
-            func = getattr(self, action)
+            
+        # Next, look for a method. Grab it off self.__class__ to get an unbound
+        # method instead of a bound one; this ensures that the calling
+        # conventions are the same for functions and methods.
+        elif hasattr(self.__class__, action):
+            func = getattr(self.__class__, action)
+        
+        # Finally, look for a named method on the admin site
+        else:
+            try:
+                func = self.admin_site.get_action(action)
+            except KeyError:
+                return None
+            
         if hasattr(func, 'short_description'):
             description = func.short_description
         else:
             description = capfirst(action.replace('_', ' '))
         return func, action, description
-
-    def delete_selected(self, request, queryset):
-        """
-        Default action which deletes the selected objects.
-
-        In the first step, it displays a confirmation page whichs shows all
-        the deleteable objects or, if the user has no permission one of the
-        related childs (foreignkeys) it displays a "permission denied" message.
-
-        In the second step delete all selected objects and display the change
-        list again.
-        """
-        opts = self.model._meta
-        app_label = opts.app_label
-
-        # Check that the user has delete permission for the actual model
-        if not self.has_delete_permission(request):
-            raise PermissionDenied
-
-        # Populate deletable_objects, a data structure of all related objects that
-        # will also be deleted.
-
-        # deletable_objects must be a list if we want to use '|unordered_list' in the template
-        deletable_objects = []
-        perms_needed = set()
-        i = 0
-        for obj in queryset:
-            deletable_objects.append([mark_safe(u'%s: <a href="%s/">%s</a>' % (escape(force_unicode(capfirst(opts.verbose_name))), obj.pk, escape(obj))), []])
-            get_deleted_objects(deletable_objects[i], perms_needed, request.user, obj, opts, 1, self.admin_site, levels_to_root=2)
-            i=i+1
-
-        # The user has already confirmed the deletion.
-        # Do the deletion and return a None to display the change list view again.
-        if request.POST.get('post'):
-            if perms_needed:
-                raise PermissionDenied
-            n = queryset.count()
-            if n:
-                for obj in queryset:
-                    obj_display = force_unicode(obj)
-                    self.log_deletion(request, obj, obj_display)
-                queryset.delete()
-                self.message_user(request, _("Successfully deleted %(count)d %(items)s.") % {
-                    "count": n, "items": model_ngettext(self.opts, n)
-                })
-            # Return None to display the change list page again.
-            return None
-
-        context = {
-            "title": _("Are you sure?"),
-            "object_name": force_unicode(opts.verbose_name),
-            "deletable_objects": deletable_objects,
-            'queryset': queryset,
-            "perms_lacking": perms_needed,
-            "opts": opts,
-            "root_path": self.admin_site.root_path,
-            "app_label": app_label,
-            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
-        }
-
-        # Display the confirmation page
-        return render_to_response(self.delete_confirmation_template or [
-            "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.object_name.lower()),
-            "admin/%s/delete_selected_confirmation.html" % app_label,
-            "admin/delete_selected_confirmation.html"
-        ], context, context_instance=template.RequestContext(request))
-
-    delete_selected.short_description = ugettext_lazy("Delete selected %(verbose_name_plural)s")
 
     def construct_change_message(self, request, form, formsets):
         """
@@ -678,6 +651,16 @@ class ModelAdmin(BaseModelAdmin):
         data = request.POST.copy()
         data.pop(helpers.ACTION_CHECKBOX_NAME, None)
         data.pop("index", None)
+        
+        # Use the action whose button was pushed
+        try:
+            data.update({'action': data.getlist('action')[action_index]})
+        except IndexError:
+            # If we didn't get an action from the chosen form that's invalid
+            # POST data, so by deleting action it'll fail the validation check
+            # below. So no need to do anything here
+            pass
+        
         action_form = self.action_form(data, auto_id=None)
         action_form.fields['action'].choices = self.get_action_choices(request)
 
@@ -692,7 +675,7 @@ class ModelAdmin(BaseModelAdmin):
             if not selected:
                 return None
 
-            response = func(request, queryset.filter(pk__in=selected))
+            response = func(self, request, queryset.filter(pk__in=selected))
 
             # Actions may return an HttpResponse, which will be used as the
             # response from the POST. If not, we'll be a good little HTTP
@@ -881,8 +864,20 @@ class ModelAdmin(BaseModelAdmin):
         app_label = opts.app_label
         if not self.has_change_permission(request, None):
             raise PermissionDenied
+        
+        # Check actions to see if any are available on this changelist
+        actions = self.get_actions(request)
+        
+        # Remove action checkboxes if there aren't any actions available.
+        list_display = list(self.list_display)
+        if not actions:
+            try:
+                list_display.remove('action_checkbox')
+            except ValueError:
+                pass
+        
         try:
-            cl = ChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
+            cl = ChangeList(request, self.model, list_display, self.list_display_links, self.list_filter,
                 self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
@@ -893,11 +888,11 @@ class ModelAdmin(BaseModelAdmin):
             if ERROR_FLAG in request.GET.keys():
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
-
+                
         # If the request was POSTed, this might be a bulk action or a bulk edit.
         # Try to look up an action first, but if this isn't an action the POST
         # will fall through to the bulk edit check, below.
-        if request.method == 'POST':
+        if actions and request.method == 'POST':
             response = self.response_action(request, queryset=cl.get_query_set())
             if response:
                 return response
@@ -948,8 +943,11 @@ class ModelAdmin(BaseModelAdmin):
             media = self.media
 
         # Build the action form and populate it with available actions.
-        action_form = self.action_form(auto_id=None)
-        action_form.fields['action'].choices = self.get_action_choices(request)
+        if actions:
+            action_form = self.action_form(auto_id=None)
+            action_form.fields['action'].choices = self.get_action_choices(request)
+        else:
+            action_form = None
 
         context = {
             'title': cl.title,

@@ -127,14 +127,6 @@ def validate(cls, model):
                 continue
             get_field(cls, model, opts, 'ordering[%d]' % idx, field)
 
-    if cls.actions:
-        check_isseq(cls, 'actions', cls.actions)
-        for idx, item in enumerate(cls.actions):
-            if (not callable(item)) and (not hasattr(cls, item)):
-                raise ImproperlyConfigured("'%s.actions[%d]' is neither a "
-                    "callable nor a method on %s" % (cls.__name__, idx, cls.__name__))
-
-
     # list_select_related = False
     # save_as = False
     # save_on_top = False

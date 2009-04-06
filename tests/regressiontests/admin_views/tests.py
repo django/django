@@ -995,6 +995,32 @@ class AdminActionsTest(TestCase):
         }
         response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
         self.failUnlessEqual(response.status_code, 302)
+        
+    def test_model_without_action(self):
+        "Tests a ModelAdmin without any action"
+        response = self.client.get('/test_admin/admin/admin_views/oldsubscriber/')
+        self.assertEquals(response.context["action_form"], None)
+        self.assert_(
+            '<input type="checkbox" class="action-select"' not in response.content,
+            "Found an unexpected action toggle checkboxbox in response"
+        )
+        
+    def test_multiple_actions_form(self):
+        """
+        Test that actions come from the form whose submit button was pressed (#10618).
+        """
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            # Two different actions selected on the two forms...
+            'action': ['external_mail', 'delete_selected'],
+            # ...but we clicked "go" on the top form.
+            'index': 0
+        }
+        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
+
+        # Send mail, don't delete.
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, 'Greetings from a function action')
 
 class TestInlineNotEditable(TestCase):
     fixtures = ['admin-views-users.xml']

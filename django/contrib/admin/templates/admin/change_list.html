@@ -9,6 +9,11 @@
     <script type="text/javascript" src="../../jsi18n/"></script>
   {% endif %}
   {{ media }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
 {% endblock %}
 
 {% block bodyclass %}change-list{% endblock %}
@@ -69,9 +74,9 @@
       {% endif %}
 
       {% block result_list %}
-          {% if actions_on_top and cl.full_result_count %}{% admin_actions %}{% endif %}
+          {% if action_form and actions_on_top and cl.full_result_count %}{% admin_actions %}{% endif %}
           {% result_list cl %}
-          {% if actions_on_bottom and cl.full_result_count %}{% admin_actions %}{% endif %}
+          {% if action_form and actions_on_bottom and cl.full_result_count %}{% admin_actions %}{% endif %}
       {% endblock %}
       {% block pagination %}{% pagination cl %}{% endblock %}
       </form>

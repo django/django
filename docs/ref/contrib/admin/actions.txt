@@ -31,8 +31,8 @@ Writing actions
 
 The easiest way to explain actions is by example, so let's dive in.
 
-A common use case for admin actions is the bulk updating of a model. Imagine a simple
-news application with an ``Article`` model::
+A common use case for admin actions is the bulk updating of a model. Imagine a
+simple news application with an ``Article`` model::
 
     from django.db import models
 
@@ -61,12 +61,17 @@ Writing action functions
 
 First, we'll need to write a function that gets called when the action is
 trigged from the admin. Action functions are just regular functions that take
-two arguments: an :class:`~django.http.HttpRequest` representing the current
-request, and a :class:`~django.db.models.QuerySet` containing the set of
-objects selected by the user. Our publish-these-articles function won't need
-the request object, but we will use the queryset::
+three arguments: 
+    
+    * The current :class:`ModelAdmin`
+    * An :class:`~django.http.HttpRequest` representing the current request,
+    * A :class:`~django.db.models.QuerySet` containing the set of objects
+      selected by the user.
 
-    def make_published(request, queryset):
+Our publish-these-articles function won't need the :class:`ModelAdmin` or the
+request object, but we will use the queryset::
+
+    def make_published(modeladmin, request, queryset):
         queryset.update(status='p')
         
 .. note::
@@ -86,7 +91,7 @@ the function name, with underscores replaced by spaces. That's fine, but we
 can provide a better, more human-friendly name by giving the
 ``make_published`` function a ``short_description`` attribute::
 
-    def make_published(request, queryset):
+    def make_published(modeladmin, request, queryset):
         queryset.update(status='p')
     make_published.short_description = "Mark selected stories as published"
     
@@ -106,7 +111,7 @@ the action and its registration would look like::
     from django.contrib import admin
     from myapp.models import Article
 
-    def make_published(request, queryset):
+    def make_published(modeladmin, request, queryset):
         queryset.update(status='p')
     make_published.short_description = "Mark selected stories as published"
 
@@ -150,14 +155,14 @@ That's easy enough to do::
             queryset.update(status='p')
         make_published.short_description = "Mark selected stories as published"
         
-Notice first that we've moved ``make_published`` into a method (remembering to
-add the ``self`` argument!), and second that we've now put the string
-``'make_published'`` in ``actions`` instead of a direct function reference.
-This tells the :class:`ModelAdmin` to look up the action as a method.
+Notice first that we've moved ``make_published`` into a method and renamed the
+`modeladmin` parameter to `self`, and second that we've now put the string
+``'make_published'`` in ``actions`` instead of a direct function reference. This
+tells the :class:`ModelAdmin` to look up the action as a method.
 
-Defining actions as methods is especially nice because it gives the action
-access to the :class:`ModelAdmin` itself, allowing the action to call any of
-the methods provided by the admin.
+Defining actions as methods is gives the action more straightforward, idiomatic
+access to the :class:`ModelAdmin` itself, allowing the action to call any of the
+methods provided by the admin.
 
 For example, we can use ``self`` to flash a message to the user informing her
 that the action was successful::
@@ -208,8 +213,8 @@ you've written, passing the list of selected objects in the GET query string.
 This allows you to provide complex interaction logic on the intermediary
 pages. For example, if you wanted to provide a more complete export function,
 you'd want to let the user choose a format, and possibly a list of fields to
-include in the export. The best thing to do would be to write a small action that simply redirects
-to your custom export view::
+include in the export. The best thing to do would be to write a small action
+that simply redirects to your custom export view::
 
     from django.contrib import admin
     from django.contrib.contenttypes.models import ContentType
@@ -226,14 +231,108 @@ hence the business with the ``ContentType``.
 
 Writing this view is left as an exercise to the reader.
 
-Making actions available globally
----------------------------------
+.. _adminsite-actions:
 
-Some actions are best if they're made available to *any* object in the admin
--- the export action defined above would be a good candidate. You can make an
-action globally available using :meth:`AdminSite.add_action()`::
+Making actions available site-wide
+----------------------------------
 
-    from django.contrib import admin
+.. method:: AdminSite.add_action(action[, name])
+
+    Some actions are best if they're made available to *any* object in the admin
+    site -- the export action defined above would be a good candidate. You can
+    make an action globally available using :meth:`AdminSite.add_action()`. For
+    example::
+
+        from django.contrib import admin
         
-    admin.site.add_action(export_selected_objects)
+        admin.site.add_action(export_selected_objects)
+
+    This makes the `export_selected_objects` action globally available as an
+    action named `"export_selected_objects"`. You can explicitly give the action
+    a name -- good if you later want to programatically :ref:`remove the action
+    <disabling-admin-actions>` -- by passing a second argument to
+    :meth:`AdminSite.add_action()`::
     
+        admin.site.add_action(export_selected_objects, 'export_selected')
+
+.. _disabling-admin-actions:
+
+Disabling actions
+-----------------
+
+Sometimes you need to disable certain actions -- especially those
+:ref:`registered site-wide <adminsite-actions>` -- for particular objects.
+There's a few ways you can disable actions:
+
+Disabling a site-wide action
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: AdminSite.disable_action(name)
+
+    If you need to disable a :ref:`site-wide action <adminsite-actions>` you can
+    call :meth:`AdminSite.disable_action()`.
+    
+    For example, you can use this method to remove the built-in "delete selected
+    objects" action::
+    
+        admin.site.disable_action('delete_selected')
+        
+    Once you've done the above, that action will no longer be available
+    site-wide.
+    
+    If, however, you need to re-enable a globally-disabled action for one
+    particular model, simply list it explicitally in your ``ModelAdmin.actions``
+    list::
+    
+        # Globally disable delete selected
+        admin.site.disable_action('delete_selected')
+        
+        # This ModelAdmin will not have delete_selected available
+        class SomeModelAdmin(admin.ModelAdmin):
+            actions = ['some_other_action']
+            ...
+            
+        # This one will
+        class AnotherModelAdmin(admin.ModelAdmin):
+            actions = ['delete_selected', 'a_third_action']
+            ...
+            
+
+Disabling all actions for a particular :class:`ModelAdmin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want *no* bulk actions available for a given :class:`ModelAdmin`, simply
+set :attr:`ModelAdmin.actions` to ``None``::
+
+    class MyModelAdmin(admin.ModelAdmin):
+        actions = None
+        
+This tells the :class:`ModelAdmin` to not display or allow any actions,
+including any :ref:`site-wide actions <adminsite-actions>`.
+
+Conditionally enabling or disabling actions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: ModelAdmin.get_actions(request)
+
+    Finally, you can conditionally enable or disable actions on a per-request 
+    (and hence per-user basis) by overriding :meth:`ModelAdmin.get_actions`.
+
+    This returns a dictionary of actions allowed. The keys are action names, and
+    the values are ``(function, name, short_description)`` tuples.
+
+    Most of the time you'll use this method to conditionally remove actions from
+    the list gathered by the superclass. For example, if I only wanted users
+    whose names begin with 'J' to be able to delete objects in bulk, I could do
+    the following::
+    
+        class MyModelAdmin(admin.ModelAdmin):
+            ...
+            
+            def get_actions(self, request):
+                actions = super(MyModelAdmin, self).get_actions(request)
+                if request.user.username[0].upper() != 'J':
+                    del actions['delete_selected']
+                return actions
+    
+
