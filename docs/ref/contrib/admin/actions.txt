@@ -160,7 +160,7 @@ Notice first that we've moved ``make_published`` into a method and renamed the
 ``'make_published'`` in ``actions`` instead of a direct function reference. This
 tells the :class:`ModelAdmin` to look up the action as a method.
 
-Defining actions as methods is gives the action more straightforward, idiomatic
+Defining actions as methods gives the action more straightforward, idiomatic
 access to the :class:`ModelAdmin` itself, allowing the action to call any of the
 methods provided by the admin.
 
