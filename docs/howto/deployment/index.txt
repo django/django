@@ -13,7 +13,6 @@ ways to easily deploy Django:
    
    modwsgi
    modpython
-   modwsgi
    fastcgi
    
 If you're new to deploying Django and/or Python, we'd recommend you try
