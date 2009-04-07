@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 from xml.dom import minidom
 from django.test import TestCase
 from django.test.client import Client
+from django.utils import tzinfo
 from models import Entry
 try:
     set
@@ -92,3 +94,26 @@ class SyndicationFeedTest(TestCase):
             if link.firstChild.wholeText == 'http://example.com/blog/4/':
                 title = item.getElementsByTagName('title')[0]
                 self.assertEquals(title.firstChild.wholeText, u'A &amp; B &lt; C &gt; D')
+                
+    def test_naive_datetime_conversion(self):
+        """
+        Test that datetimes are correctly converted to the local time zone.
+        """
+        # Naive date times passed in get converted to the local time zone, so
+        # check the recived zone offset against the local offset.
+        response = self.client.get('/syndication/feeds/naive-dates/')
+        doc = minidom.parseString(response.content)
+        updated = doc.getElementsByTagName('updated')[0].firstChild.wholeText        
+        tz = tzinfo.LocalTimezone(datetime.datetime.now())
+        now = datetime.datetime.now(tz)
+        self.assertEqual(updated[-6:], str(now)[-6:])
+        
+    def test_aware_datetime_conversion(self):
+        """
+        Test that datetimes with timezones don't get trodden on.
+        """
+        response = self.client.get('/syndication/feeds/aware-dates/')
+        doc = minidom.parseString(response.content)
+        updated = doc.getElementsByTagName('updated')[0].firstChild.wholeText
+        self.assertEqual(updated[-6:], '+00:42')
+        
