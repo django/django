@@ -22,4 +22,5 @@ urlpatterns = patterns('',
     (r'^set_session/$', views.set_session_view),
     (r'^check_session/$', views.check_session_view),
     (r'^request_methods/$', views.request_methods_view),
+    (r'^check_unicode/$', views.return_unicode),
 )

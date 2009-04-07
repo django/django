@@ -60,3 +60,6 @@ def check_session_view(request):
 def request_methods_view(request):
     "A view that responds with the request method"
     return HttpResponse('request method: %s' % request.method)
+
+def return_unicode(request):
+    return render_to_response('unicode.html')

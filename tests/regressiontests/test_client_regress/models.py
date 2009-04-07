@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Regression tests for the Test Client, especially the customized assertions.
 """
@@ -11,6 +12,13 @@ from django.core.exceptions import SuspiciousOperation
 from django.template import TemplateDoesNotExist, TemplateSyntaxError, Context
 
 class AssertContainsTests(TestCase):
+    def setUp(self):
+        self.old_templates = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'templates'),)
+
+    def tearDown(self):
+        settings.TEMPLATE_DIRS = self.old_templates
+
     def test_contains(self):
         "Responses can be inspected for content, including counting repeated substrings"
         response = self.client.get('/test_client_regress/no_template_view/')
@@ -56,6 +64,20 @@ class AssertContainsTests(TestCase):
             self.assertContains(response, 'thrice', 3)
         except AssertionError, e:
             self.assertEquals(str(e), "Found 0 instances of 'thrice' in response (expected 3)")
+
+    def test_unicode_contains(self):
+        "Unicode characters can be found in template context"
+        #Regression test for #10183
+        r = self.client.get('/test_client_regress/check_unicode/')
+        self.assertContains(r, u'さかき')
+        self.assertContains(r, '\xe5\xb3\xa0'.decode('utf-8'))
+
+    def test_unicode_not_contains(self):
+        "Unicode characters can be searched for, and not found in template context"
+        #Regression test for #10183
+        r = self.client.get('/test_client_regress/check_unicode/')
+        self.assertNotContains(r, u'はたけ')
+        self.assertNotContains(r, '\xe3\x81\xaf\xe3\x81\x9f\xe3\x81\x91'.decode('utf-8'))
 
 class AssertTemplateUsedTests(TestCase):
     fixtures = ['testdata.json']
