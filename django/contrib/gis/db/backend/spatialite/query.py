@@ -17,6 +17,7 @@ def get_func(str):
 
 # Functions used by the GeoManager & GeoQuerySet
 AREA = get_func('Area')
+ASSVG = get_func('AsSVG')
 CENTROID = get_func('Centroid')
 CONTAINED = get_func('MbrWithin')
 DIFFERENCE = get_func('Difference')

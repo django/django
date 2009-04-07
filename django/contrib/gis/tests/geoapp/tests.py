@@ -196,6 +196,19 @@ class GeoModelTest(unittest.TestCase):
         # Finally, we set every available keyword.
         self.assertEqual(City.objects.geojson(bbox=True, crs=True, precision=5).get(name='Chicago').geojson, json)
         
+    @no_oracle
+    def test03d_svg(self):
+        "Testing SVG output using GeoQuerySet.svg()."
+        if DISABLE: return
+        self.assertRaises(TypeError, City.objects.svg, precision='foo')
+        # SELECT AsSVG(geoapp_city.point, 0, 8) FROM geoapp_city WHERE name = 'Pueblo';
+        svg1 = 'cx="-104.609252" cy="-38.255001"'
+        # Even though relative, only one point so it's practically the same except for
+        # the 'c' letter prefix on the x,y values.
+        svg2 = svg1.replace('c', '')
+        self.assertEqual(svg1, City.objects.svg().get(name='Pueblo').svg)
+        self.assertEqual(svg2, City.objects.svg(relative=5).get(name='Pueblo').svg)
+
     def test04_transform(self):
         "Testing the transform() GeoManager method."
         if DISABLE: return
@@ -499,10 +512,8 @@ class GeoModelTest(unittest.TestCase):
             union = union1
         self.assertEqual(True, union.equals_exact(u1, tol))
         self.assertEqual(True, union.equals_exact(u2, tol))
-        # SpatiaLite will segfault trying to union a NULL geometry.
-        if not SpatialBackend.spatialite:
-            qs = City.objects.filter(name='NotACity')
-            self.assertEqual(None, qs.unionagg(field_name='point'))
+        qs = City.objects.filter(name='NotACity')
+        self.assertEqual(None, qs.unionagg(field_name='point'))
 
     @no_spatialite # SpatiaLite does not support abstract geometry columns
     def test18_geometryfield(self):

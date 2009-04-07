@@ -275,15 +275,26 @@ class GeoQuerySet(QuerySet):
 
         return self._spatial_attribute('snap_to_grid', s, **kwargs)
 
-    def svg(self, **kwargs):
+    def svg(self, relative=False, precision=8, **kwargs):
         """
         Returns SVG representation of the geographic field in a `svg`
         attribute on each element of this GeoQuerySet.
+
+        Keyword Arguments:
+         `relative`  => If set to True, this will evaluate the path in
+                        terms of relative moves (rather than absolute).
+
+         `precision` => May be used to set the maximum number of decimal
+                        digits used in output (defaults to 8).        
         """
+        relative = int(bool(relative))
+        if not isinstance(precision, (int, long)): 
+            raise TypeError('SVG precision keyword argument must be an integer.')
         s = {'desc' : 'SVG',
              'procedure_fmt' : '%(geo_col)s,%(rel)s,%(precision)s',
-             'procedure_args' : {'rel' : int(kwargs.pop('relative', 0)),
-                                 'precision' : kwargs.pop('precision', 8)},
+             'procedure_args' : {'rel' : relative,
+                                 'precision' : precision,
+                                 }
              }
         return self._spatial_attribute('svg', s, **kwargs)
 
