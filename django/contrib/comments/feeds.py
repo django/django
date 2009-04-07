@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.syndication.feeds import Feed
 from django.contrib.sites.models import Site
 from django.contrib import comments
+from django.utils.translation import ugettext as _
 
 class LatestCommentFeed(Feed):
     """Feed of latest comments on the current site."""
@@ -9,7 +10,7 @@ class LatestCommentFeed(Feed):
     def title(self):
         if not hasattr(self, '_site'):
             self._site = Site.objects.get_current()
-        return u"%s comments" % self._site.name
+        return _("%(site_name)s comments") % dict(site_name=self._site.name)
 
     def link(self):
         if not hasattr(self, '_site'):
@@ -19,7 +20,7 @@ class LatestCommentFeed(Feed):
     def description(self):
         if not hasattr(self, '_site'):
             self._site = Site.objects.get_current()
-        return u"Latest comments on %s" % self._site.name
+        return _("Latest comments on %(site_name)s") % dict(site_name=self._site.name)
 
     def items(self):
         qs = comments.get_model().objects.filter(
