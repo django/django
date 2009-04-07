@@ -7,10 +7,9 @@ How to use Django with FastCGI, SCGI, or AJP
 .. highlight:: bash
 
 Although the current preferred setup for running Django is :ref:`Apache with
-mod_python <howto-deployment-modpython>`, many people use shared hosting, on
+mod_wsgi <howto-deployment-modwsgi>`, many people use shared hosting, on
 which protocols such as FastCGI, SCGI or AJP are the only viable options. In
-some setups, these protocols also allow better security -- and, possibly, better
-performance -- than mod_python_.
+some setups, these protocols may provide better performance than mod_wsgi_.
 
 .. admonition:: Note
 
@@ -28,8 +27,9 @@ served with no startup time. Unlike mod_python_ (or `mod_perl`_), a FastCGI
 process doesn't run inside the Web server process, but in a separate,
 persistent process.
 
-.. _mod_python: http://www.modpython.org/
+.. _mod_wsgi: http://code.google.com/p/modwsgi/
 .. _mod_perl: http://perl.apache.org/
+.. _mod_python: http://www.modpython.org/
 
 .. admonition:: Why run code in a separate process?
 
