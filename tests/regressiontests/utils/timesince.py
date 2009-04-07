@@ -1,18 +1,18 @@
 """
->>> from datetime import datetime, timedelta
+>>> import datetime
 >>> from django.utils.timesince import timesince, timeuntil
 >>> from django.utils.tzinfo import LocalTimezone, FixedOffset
 
->>> t = datetime(2007, 8, 14, 13, 46, 0)
+>>> t = datetime.datetime(2007, 8, 14, 13, 46, 0)
 
->>> onemicrosecond = timedelta(microseconds=1)
->>> onesecond = timedelta(seconds=1)
->>> oneminute = timedelta(minutes=1)
->>> onehour = timedelta(hours=1)
->>> oneday = timedelta(days=1)
->>> oneweek = timedelta(days=7)
->>> onemonth = timedelta(days=30)
->>> oneyear = timedelta(days=365)
+>>> onemicrosecond = datetime.timedelta(microseconds=1)
+>>> onesecond = datetime.timedelta(seconds=1)
+>>> oneminute = datetime.timedelta(minutes=1)
+>>> onehour = datetime.timedelta(hours=1)
+>>> oneday = datetime.timedelta(days=1)
+>>> oneweek = datetime.timedelta(days=7)
+>>> onemonth = datetime.timedelta(days=30)
+>>> oneyear = datetime.timedelta(days=365)
 
 # equal datetimes.
 >>> timesince(t, t)
@@ -77,13 +77,22 @@ u'0 minutes'
 u'0 minutes'
 
 # When using two different timezones.
->>> now = datetime.now()
->>> now_tz = datetime.now(LocalTimezone(now))
->>> now_tz_i = datetime.now(FixedOffset((3 * 60) + 15))
+>>> now = datetime.datetime.now()
+>>> now_tz = datetime.datetime.now(LocalTimezone(now))
+>>> now_tz_i = datetime.datetime.now(FixedOffset((3 * 60) + 15))
 >>> timesince(now)
 u'0 minutes'
 >>> timesince(now_tz)
 u'0 minutes'
 >>> timeuntil(now_tz, now_tz_i)
 u'0 minutes'
+
+# Timesince should work with both date objects (#9672)
+>>> today = datetime.date.today() 
+>>> timeuntil(today+oneday, today) 
+u'1 day' 
+>>> timeuntil(today-oneday, today) 
+u'0 minutes' 
+>>> timeuntil(today+oneweek, today) 
+u'1 week' 
 """
