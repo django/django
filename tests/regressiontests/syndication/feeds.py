@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.syndication import feeds
 from django.utils.feedgenerator import Atom1Feed
+from django.utils import tzinfo
 
 class ComplexFeed(feeds.Feed):
     def get_object(self, bits):
@@ -46,3 +47,20 @@ class MyCustomAtom1Feed(Atom1Feed):
     
 class TestCustomFeed(TestAtomFeed):
     feed_type = MyCustomAtom1Feed
+    
+class NaiveDatesFeed(TestAtomFeed):
+    """
+    A feed with naive (non-timezone-aware) dates.
+    """
+    def item_pubdate(self, item):
+        return item.date
+        
+class TZAwareDatesFeed(TestAtomFeed):
+    """
+    A feed with timezone-aware dates.
+    """
+    def item_pubdate(self, item):
+        # Provide a weird offset so that the test can know it's getting this
+        # specific offset and not accidentally getting on from 
+        # settings.TIME_ZONE.
+        return item.date.replace(tzinfo=tzinfo.FixedOffset(42))

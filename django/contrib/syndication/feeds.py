@@ -145,7 +145,7 @@ class Feed(object):
                 author_email = author_link = None
 
             pubdate = self.__get_dynamic_attr('item_pubdate', item)
-            if pubdate:
+            if pubdate and not pubdate.tzinfo:
                 now = datetime.now()
                 utcnow = datetime.utcnow()
 
