@@ -69,6 +69,9 @@ class SomeException(Exception):
 
 class SomeOtherException(Exception):
     pass
+    
+class ContextStackException(Exception):
+    pass
 
 class SomeClass:
     def __init__(self):
@@ -231,6 +234,9 @@ class Templates(unittest.TestCase):
                 try:
                     test_template = loader.get_template(name)
                     output = self.render(test_template, vals)
+                except ContextStackException:
+                    failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Context stack was left imbalanced" % (invalid_str, name))
+                    continue
                 except Exception:
                     exc_type, exc_value, exc_tb = sys.exc_info()
                     if exc_type != result:
@@ -256,7 +262,12 @@ class Templates(unittest.TestCase):
             ('-'*70, ("\n%s\n" % ('-'*70)).join(failures)))
 
     def render(self, test_template, vals):
-        return test_template.render(template.Context(vals[1]))
+        context = template.Context(vals[1])
+        before_stack_size = len(context.dicts)
+        output = test_template.render(context)
+        if len(context.dicts) != before_stack_size:
+            raise ContextStackException
+        return output
 
     def get_template_tests(self):
         # SYNTAX --

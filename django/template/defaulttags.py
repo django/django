@@ -125,6 +125,7 @@ class ForNode(Node):
             values = list(values)
         len_values = len(values)
         if len_values < 1:
+            context.pop()
             return self.nodelist_empty.render(context)
         nodelist = NodeList()
         if self.is_reversed:
