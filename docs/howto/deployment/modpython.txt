@@ -6,8 +6,9 @@ How to use Django with Apache and mod_python
 
 .. highlight:: apache
 
-Apache_ with `mod_python`_ currently is the preferred setup for using Django
-on a production server.
+The `mod_python`_ module for Apache_ can be used to deploy Django to a 
+production server, although it has been mostly superseded by the simpler 
+:ref:`mod_wsgi deployment option <howto-deployment-modwsgi>`.
 
 mod_python is similar to (and inspired by) `mod_perl`_ : It embeds Python within
 Apache and loads Python code into memory when the server starts. Code stays in
