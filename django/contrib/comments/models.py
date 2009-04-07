@@ -19,6 +19,7 @@ class BaseCommentAbstractModel(models.Model):
 
     # Content-object field
     content_type   = models.ForeignKey(ContentType,
+            verbose_name=_('content type'),
             related_name="content_type_set_for_%(class)s")
     object_pk      = models.TextField(_('object ID'))
     content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
@@ -46,7 +47,8 @@ class Comment(BaseCommentAbstractModel):
     # Who posted this comment? If ``user`` is set then it was an authenticated
     # user; otherwise at least user_name should have been set and the comment
     # was posted by a non-authenticated user.
-    user        = models.ForeignKey(User, blank=True, null=True, related_name="%(class)s_comments")
+    user        = models.ForeignKey(User, verbose_name=_('user'),
+                    blank=True, null=True, related_name="%(class)s_comments")
     user_name   = models.CharField(_("user's name"), max_length=50, blank=True)
     user_email  = models.EmailField(_("user's email address"), blank=True)
     user_url    = models.URLField(_("user's URL"), blank=True)
@@ -71,6 +73,8 @@ class Comment(BaseCommentAbstractModel):
         db_table = "django_comments"
         ordering = ('submit_date',)
         permissions = [("can_moderate", "Can moderate comments")]
+        verbose_name = _('comment')
+        verbose_name_plural = _('comments')
 
     def __unicode__(self):
         return "%s: %s..." % (self.name, self.comment[:50])
@@ -161,10 +165,10 @@ class CommentFlag(models.Model):
     design users are only allowed to flag a comment with a given flag once;
     if you want rating look elsewhere.
     """
-    user      = models.ForeignKey(User, related_name="comment_flags")
-    comment   = models.ForeignKey(Comment, related_name="flags")
-    flag      = models.CharField(max_length=30, db_index=True)
-    flag_date = models.DateTimeField(default=None)
+    user      = models.ForeignKey(User, verbose_name=_('user'), related_name="comment_flags")
+    comment   = models.ForeignKey(Comment, verbose_name=_('comment'), related_name="flags")
+    flag      = models.CharField(_('flag'), max_length=30, db_index=True)
+    flag_date = models.DateTimeField(_('date'), default=None)
 
     # Constants for flag types
     SUGGEST_REMOVAL = "removal suggestion"
@@ -174,6 +178,8 @@ class CommentFlag(models.Model):
     class Meta:
         db_table = 'django_comment_flags'
         unique_together = [('user', 'comment', 'flag')]
+        verbose_name = _('comment flag')
+        verbose_name_plural = _('comment flags')
 
     def __unicode__(self):
         return "%s flag of comment ID %s by %s" % \
