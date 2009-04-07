@@ -207,3 +207,16 @@ class CommentViewTests(CommentTestCase):
         self.assertTemplateUsed(response, "comments/posted.html")
         self.assertEqual(response.context[0]["comment"], Comment.objects.get(pk=pk))
 
+    def testCommentNextWithQueryString(self):
+        """
+        The `next` key needs to handle already having a query string (#10585)
+        """
+        a = Article.objects.get(pk=1)
+        data = self.getValidData(a)
+        data["next"] = "/somewhere/else/?foo=bar"
+        data["comment"] = "This is another comment"
+        response = self.client.post("/post/", data)
+        location = response["Location"]        
+        match = re.search(r"^http://testserver/somewhere/else/\?foo=bar&c=\d+$", location)
+        self.failUnless(match != None, "Unexpected redirect location: %s" % location)
+        

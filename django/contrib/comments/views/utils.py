@@ -25,7 +25,8 @@ def next_redirect(data, default, default_view, **get_kwargs):
     if next is None:
         next = urlresolvers.reverse(default_view)
     if get_kwargs:
-        next += "?" + urllib.urlencode(get_kwargs)
+        joiner = ('?' in next) and '&' or '?'
+        next += joiner + urllib.urlencode(get_kwargs)
     return HttpResponseRedirect(next)
 
 def confirmation_view(template, doc="Display a confirmation view."):
