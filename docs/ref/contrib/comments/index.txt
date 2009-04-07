@@ -180,6 +180,14 @@ you'll always want to use it like above::
 
     <form action="{% comment_form_target %}" method="POST">
 
+Redirecting after the comment post
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To specify the URL you want to redirect to after the comment has been posted,
+you can include a hidden form input called ``next`` in your comment form. For example::
+ 
+    <input type="hidden" name="next" value="{% url my_comment_was_posted %}" />
+
 .. _notes-on-the-comment-form:
 
 Notes on the comment form

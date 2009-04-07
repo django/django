@@ -80,6 +80,7 @@ def post_comment(request, next=None):
             template_list, {
                 "comment" : form.data.get("comment", ""),
                 "form" : form,
+                "next": next,
             },
             RequestContext(request, {})
         )
