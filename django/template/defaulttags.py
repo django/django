@@ -186,10 +186,7 @@ class IfChangedNode(Node):
         if compare_to != self._last_seen:
             firstloop = (self._last_seen == None)
             self._last_seen = compare_to
-            context.push()
-            context['ifchanged'] = {'firstloop': firstloop}
             content = self.nodelist_true.render(context)
-            context.pop()
             return content
         elif self.nodelist_false:
             return self.nodelist_false.render(context)
