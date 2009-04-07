@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import SuspiciousOperation
+from django.shortcuts import render_to_response
 
 def no_template_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -43,3 +44,6 @@ def set_session_view(request):
 def check_session_view(request):
     "A view that reads a session variable"
     return HttpResponse(request.session.get('session_var', 'NO'))
+
+def return_unicode(request):
+    return render_to_response('unicode.html')
