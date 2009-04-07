@@ -42,7 +42,7 @@ To get started using the ``comments`` app, follow these steps:
     #. Use the `comment template tags`_ below to embed comments in your
        templates.
     
-You might also want to examine the :ref:`ref-contrib-comments-settings`
+You might also want to examine :ref:`ref-contrib-comments-settings`.
     
 Comment template tags
 =====================
@@ -166,7 +166,7 @@ A complete form might look like::
     </form>
     
 Be sure to read the `notes on the comment form`_, below, for some special
-considerations you'll need to make if you're using this aproach.
+considerations you'll need to make if you're using this approach.
 
 .. templatetag:: comment_form_target
 
@@ -179,6 +179,16 @@ form. This will always return the correct URL that comments should be posted to;
 you'll always want to use it like above::
 
     <form action="{% comment_form_target %}" method="POST">
+
+Redirecting after the comment post
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To specify the URL you want to redirect to after the comment has been posted,
+you can include a hidden form input called ``next`` in your comment form. For example::
+ 
+    <input type="hidden" name="next" value="{% url my_comment_was_posted %}" />
+
+.. _notes-on-the-comment-form:
 
 Notes on the comment form
 -------------------------
