@@ -74,7 +74,7 @@ class GeoQuery(sql.Query):
                     table = self.alias_map[alias][TABLE_NAME]
                     if table in only_load and col not in only_load[table]:
                         continue
-                    r = self.get_field_select(field, alias)
+                    r = self.get_field_select(field, alias, column)
                     if with_aliases:
                         if col[1] in col_aliases:
                             c_alias = 'Col%d' % len(col_aliases)
@@ -112,7 +112,7 @@ class GeoQuery(sql.Query):
 
         # This loop customized for GeoQuery.
         for (table, col), field in izip(self.related_select_cols, self.related_select_fields):
-            r = self.get_field_select(field, table)
+            r = self.get_field_select(field, table, col)
             if with_aliases and col in col_aliases:
                 c_alias = 'Col%d' % len(col_aliases)
                 result.append('%s AS %s' % (r, c_alias))
@@ -213,7 +213,8 @@ class GeoQuery(sql.Query):
         values = [self.convert_values(v, self.extra_select_fields.get(a, None))
                   for v, a in izip(row[rn_offset:index_start], aliases)]
         if SpatialBackend.oracle or getattr(self, 'geo_values', False):
-            # We resolve the columns 
+            # We resolve the rest of the columns if we're on Oracle or if
+            # the `geo_values` attribute is defined.
             for value, field in izip(row[index_start:], fields):
                 values.append(self.convert_values(value, field))
         else:
@@ -260,19 +261,20 @@ class GeoQuery(sql.Query):
             sel_fmt = sel_fmt % self.custom_select[alias]
         return sel_fmt
 
-    def get_field_select(self, fld, alias=None):
+    def get_field_select(self, field, alias=None, column=None):
         """
         Returns the SELECT SQL string for the given field.  Figures out
         if any custom selection SQL is needed for the column  The `alias`
         keyword may be used to manually specify the database table where
         the column exists, if not in the model associated with this
-        `GeoQuery`.
+        `GeoQuery`.  Similarly, `column` may be used to specify the exact
+        column name, rather than using the `column` attribute on `field`.
         """
-        sel_fmt = self.get_select_format(fld)
-        if fld in self.custom_select:
-            field_sel = sel_fmt % self.custom_select[fld]
+        sel_fmt = self.get_select_format(field)
+        if field in self.custom_select:
+            field_sel = sel_fmt % self.custom_select[field]
         else:
-            field_sel = sel_fmt % self._field_column(fld, alias)
+            field_sel = sel_fmt % self._field_column(field, alias, column)
         return field_sel
 
     def get_select_format(self, fld):
@@ -302,17 +304,18 @@ class GeoQuery(sql.Query):
         return sel_fmt
 
     # Private API utilities, subject to change.
-    def _field_column(self, field, table_alias=None):
+    def _field_column(self, field, table_alias=None, column=None):
         """
         Helper function that returns the database column for the given field.
         The table and column are returned (quoted) in the proper format, e.g.,
         `"geoapp_city"."point"`.  If `table_alias` is not specified, the
         database table associated with the model of this `GeoQuery` will be
-        used.
+        used.  If `column` is specified, it will be used instead of the value
+        in `field.column`.
         """
         if table_alias is None: table_alias = self.model._meta.db_table
         return "%s.%s" % (self.quote_name_unless_alias(table_alias),
-                          self.connection.ops.quote_name(field.column))
+                          self.connection.ops.quote_name(column or field.column))
 
     def _geo_field(self, field_name=None):
         """
