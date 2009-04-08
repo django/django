@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-02 10:33+0200\n"
+"POT-Creation-Date: 2009-04-08 10:54+0200\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -302,7 +302,7 @@ msgid "Changed %s."
 msgstr "Zmieniono %s"
 
 #: contrib/admin/options.py:338 contrib/admin/options.py:348
-#: contrib/comments/templates/comments/preview.html:15 forms/models.py:294
+#: contrib/comments/templates/comments/preview.html:16 forms/models.py:294
 msgid "and"
 msgstr "i"
 
@@ -772,7 +772,7 @@ msgstr "Dziękujemy za odwiedzenie serwisu."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
-msgstr "Zaloguj ponownie"
+msgstr "Zaloguj się ponownie"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -1037,7 +1037,7 @@ msgstr "Ścieżka do pliku"
 msgid "Floating point number"
 msgstr "Liczba zmiennoprzecinkowa"
 
-#: contrib/admindocs/views.py:328 contrib/comments/models.py:58
+#: contrib/admindocs/views.py:328 contrib/comments/models.py:60
 msgid "IP address"
 msgstr "Adres IP"
 
@@ -1352,7 +1352,8 @@ msgstr ""
 msgid "user permissions"
 msgstr "uprawnienia użytkownika"
 
-#: contrib/auth/models.py:153
+#: contrib/auth/models.py:153 contrib/comments/models.py:50
+#: contrib/comments/models.py:168
 msgid "user"
 msgstr "użytkownik"
 
@@ -1379,6 +1380,16 @@ msgstr "Zawartość"
 #: contrib/comments/admin.py:13
 msgid "Metadata"
 msgstr "Metadane"
+
+#: contrib/comments/feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "komentarze na %(site_name)s"
+
+#: contrib/comments/feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Ostatnie komentarze na %(site_name)s"
 
 #: contrib/comments/forms.py:17
 #: contrib/comments/templates/comments/moderation_queue.html:34
@@ -1408,44 +1419,49 @@ msgstr[0] "Nie wolno przeklinać! Słowo %s nie jest dozwolone."
 msgstr[1] "Nie wolno przeklinać! Słowa %s nie są dozwolone."
 msgstr[2] "Nie wolno przeklinać! Słowa %s nie są dozwolone."
 
-#: contrib/comments/models.py:23
+#: contrib/comments/models.py:22 contrib/contenttypes/models.py:71
+msgid "content type"
+msgstr "typ zawartości"
+
+#: contrib/comments/models.py:24
 msgid "object ID"
 msgstr "ID obiektu"
 
-#: contrib/comments/models.py:50
+#: contrib/comments/models.py:52
 msgid "user's name"
 msgstr "nazwa użytkownika"
 
-#: contrib/comments/models.py:51
+#: contrib/comments/models.py:53
 msgid "user's email address"
 msgstr "adres e-mail użytkownika"
 
-#: contrib/comments/models.py:52
+#: contrib/comments/models.py:54
 msgid "user's URL"
 msgstr "URL użytkownika"
 
-#: contrib/comments/models.py:54
+#: contrib/comments/models.py:56 contrib/comments/models.py:76
+#: contrib/comments/models.py:169
 msgid "comment"
 msgstr "komentarz"
 
-#: contrib/comments/models.py:57
+#: contrib/comments/models.py:59
 msgid "date/time submitted"
 msgstr "data/czas dodania"
 
-#: contrib/comments/models.py:59
+#: contrib/comments/models.py:61
 msgid "is public"
 msgstr "publicznie dostępny"
 
-#: contrib/comments/models.py:60
+#: contrib/comments/models.py:62
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "Odznacz to pole, aby komentarz nie był wyświetlany w serwisie."
 
-#: contrib/comments/models.py:62
+#: contrib/comments/models.py:64
 msgid "is removed"
 msgstr "usunięty"
 
-#: contrib/comments/models.py:63
+#: contrib/comments/models.py:65
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -1453,7 +1469,11 @@ msgstr ""
 "Zaznacz to pole jeżeli komentarz jest nieodpowiedni. Wyświetlony zostanie "
 "tekst \"Ten komentarz został usunięty\"."
 
-#: contrib/comments/models.py:115
+#: contrib/comments/models.py:77
+msgid "comments"
+msgstr "komentarze"
+
+#: contrib/comments/models.py:119
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
@@ -1461,7 +1481,7 @@ msgstr ""
 "Ten komentarz został dodany przez zalogowanego użytkownika i dlatego nazwa "
 "jest tylko do odczytu."
 
-#: contrib/comments/models.py:124
+#: contrib/comments/models.py:128
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -1469,7 +1489,7 @@ msgstr ""
 "Ten komentarz został dodany przez zalogowanego użytkownika i dlatego adres e-"
 "mail jest tylko do odczytu."
 
-#: contrib/comments/models.py:149
+#: contrib/comments/models.py:153
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -1483,6 +1503,22 @@ msgstr ""
 "%(comment)s\n"
 "\n"
 "http://%(domain)s%(url)s"
+
+#: contrib/comments/models.py:170
+msgid "flag"
+msgstr "flaga"
+
+#: contrib/comments/models.py:171
+msgid "date"
+msgstr "data"
+
+#: contrib/comments/models.py:181
+msgid "comment flag"
+msgstr "flaga dla komentarza"
+
+#: contrib/comments/models.py:182
+msgid "comment flags"
+msgstr "flagi dla komentarzy"
 
 #: contrib/comments/templates/comments/approve.html:4
 msgid "Approve a comment"
@@ -1543,13 +1579,13 @@ msgstr "Flaga"
 msgid "Thanks for flagging"
 msgstr "Dziękujemy za oflagowanie"
 
-#: contrib/comments/templates/comments/form.html:16
-#: contrib/comments/templates/comments/preview.html:31
+#: contrib/comments/templates/comments/form.html:17
+#: contrib/comments/templates/comments/preview.html:32
 msgid "Post"
 msgstr "Zapisz"
 
-#: contrib/comments/templates/comments/form.html:17
-#: contrib/comments/templates/comments/preview.html:32
+#: contrib/comments/templates/comments/form.html:18
+#: contrib/comments/templates/comments/preview.html:33
 msgid "Preview"
 msgstr "Podgląd"
 
@@ -1595,32 +1631,28 @@ msgid "Thank you for your comment"
 msgstr "Dziękujemy za komentarz"
 
 #: contrib/comments/templates/comments/preview.html:4
-#: contrib/comments/templates/comments/preview.html:12
+#: contrib/comments/templates/comments/preview.html:13
 msgid "Preview your comment"
 msgstr "Podgląd komentarza"
 
-#: contrib/comments/templates/comments/preview.html:10
+#: contrib/comments/templates/comments/preview.html:11
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
 msgstr[0] "Proszę popraw poniższy błąd."
 msgstr[1] "Proszę popraw poniższe błędy."
 msgstr[2] "Proszę popraw poniższe błędy."
 
-#: contrib/comments/templates/comments/preview.html:15
+#: contrib/comments/templates/comments/preview.html:16
 msgid "Post your comment"
 msgstr "Zapisz swój komentarz"
 
-#: contrib/comments/templates/comments/preview.html:15
+#: contrib/comments/templates/comments/preview.html:16
 msgid "or make changes"
 msgstr "lub wprowadź jakieś zmiany"
 
 #: contrib/contenttypes/models.py:67
 msgid "python model class name"
 msgstr "nazwa pythonowa modelu klasy"
-
-#: contrib/contenttypes/models.py:71
-msgid "content type"
-msgstr "typ zawartości"
 
 #: contrib/contenttypes/models.py:72
 msgid "content types"
@@ -3061,7 +3093,7 @@ msgstr "Koszyce IV"
 
 #: contrib/localflavor/sk/sk_districts.py:34
 msgid "Kosice - okolie"
-msgstr "Koszyce - okolie"
+msgstr "Koszyce - okolice"
 
 #: contrib/localflavor/sk/sk_districts.py:35
 msgid "Krupina"
@@ -3736,7 +3768,7 @@ msgstr "Ta wartość musi być liczbą dziesiętną."
 
 #: db/models/fields/__init__.py:668
 msgid "This value must be a float."
-msgstr "Ta wartość musi być liczbą zmiennoprzecinkową."
+msgstr "Ta wartość musi być liczbą rzeczywistą."
 
 #: db/models/fields/__init__.py:728
 msgid "This value must be either None, True or False."
