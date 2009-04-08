@@ -39,7 +39,9 @@ True
 ...         model = FilePathModel
 
 >>> form = FPForm()
->>> [c[1] for c in form['path'].field.choices]
+>>> names = [c[1] for c in form['path'].field.choices]
+>>> names.sort()
+>>> names
 ['---------', '__init__.py', 'models.py']
 """}
 
