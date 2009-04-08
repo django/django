@@ -79,7 +79,11 @@ function dismissAddAnotherPopup(win, newId, newRepr) {
             elem.options[elem.options.length] = o;
             o.selected = true;
         } else if (elem.nodeName == 'INPUT') {
-            elem.value = newId;
+            if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1 && elem.value) {
+                elem.value += ',' + newId;
+            } else {
+                elem.value = newId;
+            }
         }
     } else {
         var toId = name + "_to";
