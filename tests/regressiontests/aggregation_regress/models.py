@@ -58,6 +58,12 @@ class Clues(models.Model):
     EntryID = models.ForeignKey(Entries, verbose_name='Entry', db_column = 'Entry ID')
     Clue = models.CharField(max_length=150)
 
+class HardbackBook(Book):
+    weight = models.FloatField()
+
+    def __unicode__(self):
+        return "%s (hardback): %s" % (self.name, self.weight)
+
 __test__ = {'API_TESTS': """
 >>> from django.core import management
 >>> from django.db.models import get_app, F
@@ -137,17 +143,17 @@ __test__ = {'API_TESTS': """
 >>> Book.objects.all().aggregate(num_authors=Count('foo'))
 Traceback (most recent call last):
 ...
-FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, contact, id, isbn, name, pages, price, pubdate, publisher, rating, store
+FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, contact, hardbackbook, id, isbn, name, pages, price, pubdate, publisher, rating, store
 
 >>> Book.objects.all().annotate(num_authors=Count('foo'))
 Traceback (most recent call last):
 ...
-FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, contact, id, isbn, name, pages, price, pubdate, publisher, rating, store
+FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, contact, hardbackbook, id, isbn, name, pages, price, pubdate, publisher, rating, store
 
 >>> Book.objects.all().annotate(num_authors=Count('authors__id')).aggregate(Max('foo'))
 Traceback (most recent call last):
 ...
-FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, contact, id, isbn, name, pages, price, pubdate, publisher, rating, store, num_authors
+FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, contact, hardbackbook, id, isbn, name, pages, price, pubdate, publisher, rating, store, num_authors
 
 # Old-style count aggregations can be mixed with new-style
 >>> Book.objects.annotate(num_authors=Count('authors')).count()
@@ -276,6 +282,22 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, conta
 
 >>> publishers
 [<Publisher: Apress>, <Publisher: Sams>]
+
+
+# Regression for 10666 - inherited fields work with annotations and aggregations
+>>> HardbackBook.objects.aggregate(n_pages=Sum('book_ptr__pages'))
+{'n_pages': 2078}
+
+>>> HardbackBook.objects.aggregate(n_pages=Sum('pages'))
+{'n_pages': 2078}
+
+>>> HardbackBook.objects.annotate(n_authors=Count('book_ptr__authors')).values('name','n_authors')
+[{'n_authors': 2, 'name': u'Artificial Intelligence: A Modern Approach'}, {'n_authors': 1, 'name': u'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp'}]
+
+>>> HardbackBook.objects.annotate(n_authors=Count('authors')).values('name','n_authors')
+[{'n_authors': 2, 'name': u'Artificial Intelligence: A Modern Approach'}, {'n_authors': 1, 'name': u'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp'}]
+
+
 """
 }
 

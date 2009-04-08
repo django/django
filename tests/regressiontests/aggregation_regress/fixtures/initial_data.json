@@ -239,5 +239,19 @@
             "friends": [8],
             "name": "Stuart Russell"
         }
+    },
+    {
+        "pk": 5,
+        "model": "aggregation_regress.hardbackbook",
+        "fields": {
+            "weight": 4.5
+        }
+    },
+    {
+        "pk": 6,
+        "model": "aggregation_regress.hardbackbook",
+        "fields": {
+            "weight": 3.7
+        }
     }
 ]

@@ -1403,8 +1403,17 @@ class BaseQuery(object):
             field_name = field_list[0]
             col = field_name
             source = self.aggregates[field_name]
-        elif (len(field_list) > 1 or
-            field_list[0] not in [i.name for i in opts.fields]):
+        elif ((len(field_list) > 1) or
+            (field_list[0] not in [i.name for i in opts.fields]) or
+            self.group_by is None or
+            not is_summary):
+            # If:
+            #   - the field descriptor has more than one part (foo__bar), or
+            #   - the field descriptor is referencing an m2m/m2o field, or
+            #   - this is a reference to a model field (possibly inherited), or
+            #   - this is an annotation over a model field
+            # then we need to explore the joins that are required.
+
             field, source, opts, join_list, last, _ = self.setup_joins(
                 field_list, opts, self.get_initial_alias(), False)
 
@@ -1419,15 +1428,11 @@ class BaseQuery(object):
 
             col = (join_list[-1], col)
         else:
-            # Aggregate references a normal field
+            # The simplest cases. No joins required -
+            # just reference the provided column alias.
             field_name = field_list[0]
             source = opts.get_field(field_name)
-            if not (self.group_by is not None and is_summary):
-                # Only use a column alias if this is a
-                # standalone aggregate, or an annotation
-                col = (opts.db_table, source.column)
-            else:
-                col = field_name
+            col = field_name
 
         # Add the aggregate to the query
         alias = truncate_name(alias, self.connection.ops.max_name_length())
@@ -1659,7 +1664,6 @@ class BaseQuery(object):
             last.append(len(joins))
             if name == 'pk':
                 name = opts.pk.name
-
             try:
                 field, model, direct, m2m = opts.get_field_by_name(name)
             except FieldDoesNotExist:
