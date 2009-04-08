@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django import forms
 
@@ -11,6 +12,9 @@ class Triple(models.Model):
 
     class Meta:
         unique_together = (('left', 'middle'), ('middle', 'right'))
+
+class FilePathModel(models.Model):
+    path = models.FilePathField(path=os.path.dirname(__file__), match=".*\.py$", blank=True)
 
 __test__ = {'API_TESTS': """
 When the same field is involved in multiple unique_together constraints, we
@@ -28,5 +32,14 @@ False
 >>> form = TripleForm({'left': '1', 'middle': '3', 'right': '1'})
 >>> form.is_valid()
 True
+
+# Regression test for #8842: FilePathField(blank=True)
+>>> class FPForm(forms.ModelForm):
+...     class Meta:
+...         model = FilePathModel
+
+>>> form = FPForm()
+>>> [c[1] for c in form['path'].field.choices]
+['---------', '__init__.py', 'models.py']
 """}
 
