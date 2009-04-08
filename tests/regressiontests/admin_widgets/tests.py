@@ -98,6 +98,8 @@ class AdminFormfieldForDBFieldTests(TestCase):
         self.assertFormfield(models.Member, 'gender', widgets.AdminRadioSelect,
                              radio_fields={'gender':admin.VERTICAL})
 
+    def testInheritance(self):
+        self.assertFormfield(models.Album, 'backside_art', widgets.AdminFileWidget)
 
 class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
@@ -113,13 +115,13 @@ class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
 
 class AdminForeignKeyWidgetChangeList(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
-    
+
     def setUp(self):
         self.client.login(username="super", password="secret")
-    
+
     def tearDown(self):
         self.client.logout()
-    
+
     def test_changelist_foreignkey(self):
         response = self.client.get('/widget_admin/admin_widgets/car/')
         self.failUnless('/widget_admin/auth/user/add/' in response.content)

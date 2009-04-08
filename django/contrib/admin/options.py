@@ -108,9 +108,10 @@ class BaseModelAdmin(object):
 
         # If we've got overrides for the formfield defined, use 'em. **kwargs
         # passed to formfield_for_dbfield override the defaults.
-        if db_field.__class__ in self.formfield_overrides:
-            kwargs = dict(self.formfield_overrides[db_field.__class__], **kwargs)
-            return db_field.formfield(**kwargs)
+        for klass in db_field.__class__.mro(): 
+            if klass in self.formfield_overrides: 
+                kwargs = dict(self.formfield_overrides[klass], **kwargs) 
+                return db_field.formfield(**kwargs) 
 
         # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)
