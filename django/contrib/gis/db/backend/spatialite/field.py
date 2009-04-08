@@ -25,8 +25,9 @@ class SpatiaLiteField(Field):
                style.SQL_FIELD(gqn(self.column)) + ', ' +
                style.SQL_FIELD(str(self.srid)) + ', ' +
                style.SQL_COLTYPE(gqn(self.geom_type)) + ', ' +
-               style.SQL_KEYWORD(str(self.dim)) + ');')
-
+               style.SQL_KEYWORD(str(self.dim)) + ', ' +
+               style.SQL_KEYWORD(str(int(not self.null))) +
+               ');')
         return sql
 
     def _geom_index(self, style, db_table):
