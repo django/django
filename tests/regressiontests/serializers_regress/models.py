@@ -11,10 +11,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.localflavor.us.models import USStateField, PhoneNumberField
 
 # The following classes are for testing basic data
-# marshalling, including NULL values.
+# marshalling, including NULL values, where allowed.
 
 class BooleanData(models.Model):
-    data = models.BooleanField(null=True)
+    data = models.BooleanField()
 
 class CharData(models.Model):
     data = models.CharField(max_length=30, null=True)

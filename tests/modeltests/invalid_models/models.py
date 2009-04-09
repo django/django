@@ -14,6 +14,7 @@ class FieldErrors(models.Model):
     choices2 = models.CharField(max_length=10, choices=[(1,2,3),(1,2,3)])
     index = models.CharField(max_length=10, db_index='bad')
     field_ = models.CharField(max_length=10)
+    nullbool = models.BooleanField(null=True)
 
 class Target(models.Model):
     tgt_safe = models.CharField(max_length=10)
@@ -190,6 +191,7 @@ invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tu
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
 invalid_models.fielderrors: "index": "db_index" should be either None, True or False.
 invalid_models.fielderrors: "field_": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.
+invalid_models.fielderrors: "nullbool": BooleanFields do not accept null values. Use a NullBooleanField instead.
 invalid_models.clash1: Accessor for field 'foreign' clashes with field 'Target.clash1_set'. Add a related_name argument to the definition for 'foreign'.
 invalid_models.clash1: Accessor for field 'foreign' clashes with related m2m field 'Target.clash1_set'. Add a related_name argument to the definition for 'foreign'.
 invalid_models.clash1: Reverse query name for field 'foreign' clashes with field 'Target.clash1'. Add a related_name argument to the definition for 'foreign'.
