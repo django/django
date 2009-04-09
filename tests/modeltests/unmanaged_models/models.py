@@ -89,6 +89,27 @@ class Intermediate(models.Model):
         db_table = 'D01'
         managed = False
 
+#
+# These next models test the creation (or not) of many to many join tables
+# between managed and unmanaged models. A join table between two unmanaged 
+# models shouldn't be automatically created (see #10647). 
+#
+class Unmanaged1(models.Model):    
+    class Meta:
+        managed = False
+
+# Unmanged with an m2m to unmanaged: the intermediary table won't be created.
+class Unmanaged2(models.Model):
+    mm = models.ManyToManyField(Unmanaged1)
+    
+    class Meta:
+        managed = False
+
+# Here's an unmanaged model with an m2m to a managed one; the intermediary
+# table *will* be created (unless given a custom `through` as for C02 above).
+class Managed1(models.Model):
+    mm = models.ManyToManyField(Unmanaged1)
+
 __test__ = {'API_TESTS':"""
 The main test here is that the all the models can be created without any
 database errors. We can also do some more simple insertion and lookup tests

@@ -98,11 +98,16 @@ model handling are exactly the same as normal. This includes
        specify all the columns from the database table you are modeling when
        using unmanaged models.
 
-    2. If a model contains a :class:`~django.db.models.ManyToManyField` and
-       has ``managed=False``, the intermediate table for the many-to-many join
-       will also not be created. Should you require the intermediate table to
-       be created, set it up as an explicit model and use the
-       :attr:`ManyToManyField.through` attribute.
+    2. If a model with ``managed=False`` contains a
+       :class:`~django.db.models.ManyToManyField` that points to another
+       unmanaged model, then the intermediate table for the many-to-many join
+       will also not be created. However, a the intermediary table between one
+       managed and one unmanaged model *will* be created.
+       
+       If you need to change this default behavior, create the intermediary
+       table as an explicit model (with ``managed`` set as needed) and use the
+       :attr:`ManyToManyField.through` attribute to make the relation use your
+       custom model.
 
 For tests involving models with ``managed=False``, it's up to you to ensure
 the correct tables are created as part of the test setup.

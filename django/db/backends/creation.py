@@ -140,7 +140,8 @@ class BaseDatabaseCreation(object):
         "Return the CREATE TABLE statments for all the many-to-many tables defined on a model"
         output = []
         for f in model._meta.local_many_to_many:
-            output.extend(self.sql_for_many_to_many_field(model, f, style))
+            if model._meta.managed or f.rel.to._meta.managed:
+                output.extend(self.sql_for_many_to_many_field(model, f, style))
         return output
 
     def sql_for_many_to_many_field(self, model, f, style):
