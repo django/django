@@ -90,3 +90,14 @@ class MonthArchiveTest(TestCase):
         response = self.client.get('/views/date_based/datefield/archive_month/2004/02/')
         self.assertEqual(response.status_code, 404)
 
+class DayArchiveTests(TestCase):
+
+    def test_year_month_day_format(self):
+        """
+        Make sure day views don't get confused with numeric month formats (#7944)
+        """
+        author = Author.objects.create(name="John Smith")
+        article = Article.objects.create(title="example", author=author, date_created=datetime(2004, 1, 21, 0, 0, 1))
+        response = self.client.get('/views/date_based/archive_day/2004/1/21/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'][0], article)
