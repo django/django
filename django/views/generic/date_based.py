@@ -116,7 +116,8 @@ def archive_month(request, year, month, queryset, date_field,
     """
     if extra_context is None: extra_context = {}
     try:
-        date = datetime.date(*time.strptime(year+month, '%Y'+month_format)[:3])
+        tt = time.strptime("%s-%s" % (year, month), '%s-%s' % ('%Y', month_format))
+        date = datetime.date(*tt[:3])
     except ValueError:
         raise Http404
 
@@ -181,7 +182,8 @@ def archive_week(request, year, week, queryset, date_field,
     """
     if extra_context is None: extra_context = {}
     try:
-        date = datetime.date(*time.strptime(year+'-0-'+week, '%Y-%w-%U')[:3])
+        tt = time.strptime(year+'-0-'+week, '%Y-%w-%U')
+        date = datetime.date(*tt[:3])
     except ValueError:
         raise Http404
 
@@ -237,7 +239,9 @@ def archive_day(request, year, month, day, queryset, date_field,
     """
     if extra_context is None: extra_context = {}
     try:
-        date = datetime.date(*time.strptime(year+month+day, '%Y'+month_format+day_format)[:3])
+        tt = time.strptime('%s-%s-%s' % (year, month, day), 
+                           '%s-%s-%s' % ('%Y', month_format, day_format))
+        date = datetime.date(*tt[:3])
     except ValueError:
         raise Http404
 
@@ -307,7 +311,9 @@ def object_detail(request, year, month, day, queryset, date_field,
     """
     if extra_context is None: extra_context = {}
     try:
-        date = datetime.date(*time.strptime(year+month+day, '%Y'+month_format+day_format)[:3])
+        tt = time.strptime('%s-%s-%s' % (year, month, day), 
+                           '%s-%s-%s' % ('%Y', month_format, day_format))
+        date = datetime.date(*tt[:3])
     except ValueError:
         raise Http404
 
