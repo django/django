@@ -72,19 +72,11 @@ def run_gis_tests(test_labels, **kwargs):
     old_installed = settings.INSTALLED_APPS
     old_root_urlconf = settings.ROOT_URLCONF
 
-    # Based on ALWAYS_INSTALLED_APPS from django test suite --
-    # this prevents us from creating tables in our test database
-    # from locally installed apps.
-    new_installed =  ['django.contrib.contenttypes',
-                      'django.contrib.auth',
-                      'django.contrib.sites',
+    # Overridding the INSTALLED_APPS with only what we need,
+    # to prevent unnecessary database table creation.
+    new_installed =  ['django.contrib.sites',
                       'django.contrib.sitemaps',
-                      'django.contrib.flatpages',
                       'django.contrib.gis',
-                      'django.contrib.redirects',
-                      'django.contrib.sessions',
-                      'django.contrib.comments',
-                      'django.contrib.admin',
                       ]
 
     # Setting the URLs.
