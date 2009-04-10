@@ -100,20 +100,18 @@ class PLNIPField(RegexField):
 
 class PLREGONField(RegexField):
     """
-    A form field that validated as Polish National Official Business Register
-    Number (REGON). Valid numbers contain 7 or 9 digits.
+    A form field that validates its input is a REGON number.
 
-    More on the field: http://www.stat.gov.pl/bip/regon_ENG_HTML.htm
-
-    The checksum algorithm is documented at http://wipos.p.lodz.pl/zylla/ut/nip-rego.html
+    Valid regon number consists of 9 or 14 digits.
+    See http://www.stat.gov.pl/bip/regon_ENG_HTML.htm for more information.
     """
     default_error_messages = {
-        'invalid': _(u'National Business Register Number (REGON) consists of 7 or 9 digits.'),
+        'invalid': _(u'National Business Register Number (REGON) consists of 9 or 14 digits.'),
         'checksum': _(u'Wrong checksum for the National Business Register Number (REGON).'),
     }
 
     def __init__(self, *args, **kwargs):
-        super(PLREGONField, self).__init__(r'^\d{7,9}$',
+        super(PLREGONField, self).__init__(r'^\d{9,14}$',
             max_length=None, min_length=None, *args, **kwargs)
 
     def clean(self,value):
@@ -126,25 +124,20 @@ class PLREGONField(RegexField):
         """
         Calculates a checksum with the provided algorithm.
         """
-        multiple_table_7 = (2, 3, 4, 5, 6, 7)
-        multiple_table_9 = (8, 9, 2, 3, 4, 5, 6, 7)
-        result = 0
+        weights = (
+            (8, 9, 2, 3, 4, 5, 6, 7, -1),
+            (2, 4, 8, 5, 0, 9, 7, 3, 6, 1, 2, 4, 8, -1),
+            (8, 9, 2, 3, 4, 5, 6, 7, -1, 0, 0, 0, 0, 0),
+        )
 
-        if len(number) == 7:
-            multiple_table = multiple_table_7
-        else:
-            multiple_table = multiple_table_9
+        weights = [table for table in weights if len(table) == len(number)]
 
-        for i in range(len(number)-1):
-            result += int(number[i]) * multiple_table[i]
+        for table in weights:
+            checksum = sum([int(n) * w for n, w in zip(number, table)])
+            if checksum % 11 % 10:
+                return False
 
-        result %= 11
-        if result == 10:
-            result = 0
-        if result  == int(number[-1]):
-            return True
-        else:
-            return False
+        return bool(weights)
 
 class PLPostalCodeField(RegexField):
     """

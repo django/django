@@ -67,8 +67,18 @@ ValidationError: [u'National Identification Number consists of 11 digits.']
 
 >>> from django.contrib.localflavor.pl.forms import PLREGONField
 >>> f = PLREGONField()
+>>> f.clean('12345678512347')
+u'12345678512347'
 >>> f.clean('590096454')
 u'590096454'
+>>> f.clean('123456784')
+Traceback (most recent call last):
+...
+ValidationError: [u'Wrong checksum for the National Business Register Number (REGON).']
+>>> f.clean('12345678412342')
+Traceback (most recent call last):
+...
+ValidationError: [u'Wrong checksum for the National Business Register Number (REGON).']
 >>> f.clean('590096453')
 Traceback (most recent call last):
 ...
@@ -76,6 +86,6 @@ ValidationError: [u'Wrong checksum for the National Business Register Number (RE
 >>> f.clean('590096')
 Traceback (most recent call last):
 ...
-ValidationError: [u'National Business Register Number (REGON) consists of 7 or 9 digits.']
+ValidationError: [u'National Business Register Number (REGON) consists of 9 or 14 digits.']
 
 """
