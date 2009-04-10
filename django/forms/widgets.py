@@ -75,7 +75,7 @@ class Media(StrAndUnicode):
     def __getitem__(self, name):
         "Returns a Media object that only contains media of the given type"
         if name in MEDIA_TYPES:
-            return Media(**{name: getattr(self, '_' + name)})
+            return Media(**{str(name): getattr(self, '_' + name)})
         raise KeyError('Unknown media type "%s"' % name)
 
     def add_js(self, data):

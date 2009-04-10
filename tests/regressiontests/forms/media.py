@@ -355,5 +355,17 @@ media_tests = r"""
 <script type="text/javascript" src="/path/to/js4"></script>
 <script type="text/javascript" src="/some/form/javascript"></script>
 
+# Media works in templates
+>>> from django.template import Template, Context
+>>> Template("{{ form.media.js }}{{ form.media.css }}").render(Context({'form': f3}))
+u'<script type="text/javascript" src="/path/to/js1"></script>
+<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
+<script type="text/javascript" src="/path/to/js4"></script>
+<script type="text/javascript" src="/some/form/javascript"></script><link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />'
+
 >>> settings.MEDIA_URL = ORIGINAL_MEDIA_URL
 """
