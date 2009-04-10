@@ -1,13 +1,13 @@
 # Slovak translation of Django
 # This file is distributed under the same license as the Django package.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-14 20:57+0200\n"
-"PO-Revision-Date: 2009-01-24 18:01+0100\n"
-"Last-Translator: Marcel Telka <marcel@telka.sk>\n"
+"POT-Creation-Date: 2009-03-20 20:16+0100\n"
+"PO-Revision-Date: 2009-03-18 19:18+0100\n"
+"Last-Translator: Marian Andre <django@andre.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -99,114 +99,122 @@ msgid "Hebrew"
 msgstr "hebrejský"
 
 #: conf/global_settings.py:65
+msgid "Hindi"
+msgstr "hindský"
+
+#: conf/global_settings.py:66
 msgid "Croatian"
 msgstr "chorvátsky"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Icelandic"
 msgstr "islandský"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Italian"
 msgstr "taliansky"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Japanese"
 msgstr "japonský"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Georgian"
 msgstr "gruzínsky"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Korean"
 msgstr "kórejský"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Khmer"
 msgstr "kmérsky"
 
-#: conf/global_settings.py:72
-msgid "Kannada"
-msgstr "kannadský"
-
 #: conf/global_settings.py:73
+msgid "Kannada"
+msgstr "kanadský"
+
+#: conf/global_settings.py:74
 msgid "Latvian"
 msgstr "lotyšský"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Lithuanian"
 msgstr "litovský"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Macedonian"
 msgstr "macedónsky"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Dutch"
 msgstr "holandský"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Norwegian"
 msgstr "nórsky"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Polish"
 msgstr "poľský"
 
-#: conf/global_settings.py:79
-msgid "Portugese"
+#: conf/global_settings.py:80
+msgid "Portuguese"
 msgstr "portugalský"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Brazilian Portuguese"
 msgstr "portugalský (Brazília)"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Romanian"
 msgstr "rumunský"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Russian"
 msgstr "ruský"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Slovak"
 msgstr "slovenský"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Slovenian"
 msgstr "slovinský"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Serbian"
 msgstr "srbský"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Swedish"
 msgstr "švédsky"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Tamil"
 msgstr "tamilský"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:89
 msgid "Telugu"
 msgstr "telúgsky"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
+msgid "Thai"
+msgstr "thajský"
+
+#: conf/global_settings.py:91
 msgid "Turkish"
 msgstr "turecký"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:92
 msgid "Ukrainian"
 msgstr "ukrajinský"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:93
 msgid "Simplified Chinese"
 msgstr "čínsky (zjednodušene)"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:94
 msgid "Traditional Chinese"
 msgstr "čínsky (tradične)"
 
@@ -219,40 +227,40 @@ msgstr ""
 "<h3>Od %s:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:92
-#: contrib/admin/filterspecs.py:147 contrib/admin/filterspecs.py:173
+#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:91
+#: contrib/admin/filterspecs.py:146 contrib/admin/filterspecs.py:172
 msgid "All"
 msgstr "Všetko"
 
-#: contrib/admin/filterspecs.py:113
+#: contrib/admin/filterspecs.py:112
 msgid "Any date"
 msgstr "Ľubovoľný dátum"
 
-#: contrib/admin/filterspecs.py:114
+#: contrib/admin/filterspecs.py:113
 msgid "Today"
 msgstr "Dnes"
 
-#: contrib/admin/filterspecs.py:117
+#: contrib/admin/filterspecs.py:116
 msgid "Past 7 days"
 msgstr "Posledných 7 dní"
 
-#: contrib/admin/filterspecs.py:119
+#: contrib/admin/filterspecs.py:118
 msgid "This month"
 msgstr "Tento mesiac"
 
-#: contrib/admin/filterspecs.py:121
+#: contrib/admin/filterspecs.py:120
 msgid "This year"
 msgstr "Tento rok"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:146 forms/widgets.py:390
 msgid "Yes"
 msgstr "Áno"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:146 forms/widgets.py:390
 msgid "No"
 msgstr "Nie"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:153 forms/widgets.py:390
 msgid "Unknown"
 msgstr "Neznámy"
 
@@ -284,60 +292,60 @@ msgstr "položka záznamu"
 msgid "log entries"
 msgstr "položky záznamu"
 
-#: contrib/admin/options.py:60 contrib/admin/options.py:121
+#: contrib/admin/options.py:130 contrib/admin/options.py:144
 msgid "None"
 msgstr "Žiadne"
 
-#: contrib/admin/options.py:338
+#: contrib/admin/options.py:400
 #, python-format
 msgid "Changed %s."
 msgstr "Zmenené %s."
 
-#: contrib/admin/options.py:338 contrib/admin/options.py:348
-#: contrib/comments/templates/comments/preview.html:15 forms/models.py:281
+#: contrib/admin/options.py:400 contrib/admin/options.py:410
+#: contrib/comments/templates/comments/preview.html:15 forms/models.py:296
 msgid "and"
 msgstr "a"
 
-#: contrib/admin/options.py:343
+#: contrib/admin/options.py:405
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Pridaný %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:347
+#: contrib/admin/options.py:409
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Zmenený %(list)s pre %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:352
+#: contrib/admin/options.py:414
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Zmazaný %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:356
+#: contrib/admin/options.py:418
 msgid "No fields changed."
 msgstr "Polia nezmenené."
 
-#: contrib/admin/options.py:417 contrib/auth/admin.py:51
+#: contrib/admin/options.py:479 contrib/auth/admin.py:67
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne pridaný."
 
-#: contrib/admin/options.py:421 contrib/admin/options.py:454
-#: contrib/auth/admin.py:59
+#: contrib/admin/options.py:483 contrib/admin/options.py:516
+#: contrib/auth/admin.py:75
 msgid "You may edit it again below."
 msgstr "Nižšie to môžete znova upraviť."
 
-#: contrib/admin/options.py:431 contrib/admin/options.py:464
+#: contrib/admin/options.py:493 contrib/admin/options.py:526
 #, python-format
 msgid "You may add another %s below."
 msgstr "Nižšie môžete pridať ďalšie %s."
 
-#: contrib/admin/options.py:452
+#: contrib/admin/options.py:514
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne zmenený."
 
-#: contrib/admin/options.py:460
+#: contrib/admin/options.py:522
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -345,35 +353,48 @@ msgstr ""
 "Objekt %(name)s \"%(obj)s\" bol úspešne pridaný. Ďalšie zmeny môžete urobiť "
 "nižšie."
 
-#: contrib/admin/options.py:528
+#: contrib/admin/options.py:601
 #, python-format
 msgid "Add %s"
 msgstr "Pridať %s"
 
-#: contrib/admin/options.py:605
+#: contrib/admin/options.py:632 contrib/admin/options.py:802
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Objekt %(name)s s primárnym kľúčom %(key)r neexistuje."
+
+#: contrib/admin/options.py:689
 #, python-format
 msgid "Change %s"
 msgstr "Zmeniť %s"
 
-#: contrib/admin/options.py:637
+#: contrib/admin/options.py:721
 msgid "Database error"
 msgstr "Chyba databázy"
 
-#: contrib/admin/options.py:687
+#: contrib/admin/options.py:749
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s bolo úspešne zmenených."
+msgstr[1] "%(count)s %(name)s bol úspešne zmenený."
+msgstr[2] "%(count)s %(name)s boli úspešne zmenené."
+
+#: contrib/admin/options.py:817
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne vymazaný."
 
-#: contrib/admin/options.py:694
+#: contrib/admin/options.py:824
 msgid "Are you sure?"
 msgstr "Ste si istý?"
 
-#: contrib/admin/options.py:723
+#: contrib/admin/options.py:853
 #, python-format
 msgid "Change history: %s"
 msgstr "Zmeniť históriu: %s"
 
-#: contrib/admin/sites.py:16 contrib/admin/views/decorators.py:14
+#: contrib/admin/sites.py:15 contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:80
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -382,11 +403,11 @@ msgstr ""
 "Prosím, zadajte správne používateľské meno a heslo. Rešpektujte malé a veľké "
 "písmená."
 
-#: contrib/admin/sites.py:226 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:243 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Vaše prihlásenie vypršalo. Prosím, prihláste sa znovu."
 
-#: contrib/admin/sites.py:233 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:250 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -394,38 +415,39 @@ msgstr ""
 "Zdá sa, že váš prehliadač nemá povolené cookies. Prosím, povoľte cookies, "
 "znova načítajte túto stránku a skúste to znova."
 
-#: contrib/admin/sites.py:249 contrib/admin/sites.py:255
+#: contrib/admin/sites.py:266 contrib/admin/sites.py:272
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Používateľské mená nemožu obsahovať znak '@'."
 
-#: contrib/admin/sites.py:252 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:269 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
-"Vaša e-mail adresa nie je vašim používateľským menom. Skúste namiesto toho použiť '%s'."
+"Vaša e-mail adresa nie je vašim používateľským menom. Skúste namiesto toho "
+"použiť '%s'."
 
-#: contrib/admin/sites.py:312
+#: contrib/admin/sites.py:329
 msgid "Site administration"
 msgstr "Správa stránky"
 
-#: contrib/admin/sites.py:325 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:342 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Prihlásenie"
 
-#: contrib/admin/sites.py:372
+#: contrib/admin/sites.py:389
 #, python-format
 msgid "%s administration"
 msgstr "%s správa"
 
-#: contrib/admin/util.py:138
+#: contrib/admin/util.py:144
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Jeden alebo viac %(fieldname)s v %(name)s: %(obj)s"
 
-#: contrib/admin/util.py:143
+#: contrib/admin/util.py:149
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Jeden alebo viac %(fieldname)s v %(name)s:"
@@ -465,9 +487,9 @@ msgstr "Ľutujeme, ale požadovanú stránku nie je možné nájsť."
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/base.html:33
 #: contrib/admin/templates/admin/change_form.html:17
-#: contrib/admin/templates/admin/change_list.html:8
+#: contrib/admin/templates/admin/change_list.html:20
 #: contrib/admin/templates/admin/delete_confirmation.html:6
 #: contrib/admin/templates/admin/invalid_setup.html:4
 #: contrib/admin/templates/admin/object_history.html:6
@@ -500,8 +522,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Vyskytla sa chyba. Bola oznámená správcovi stránky e-mailom a mala by byť čoskoro opravená."
-"Ďakujeme za pochopenie."
+"Vyskytla sa chyba. Bola oznámená správcovi stránky e-mailom a mala by byť "
+"čoskoro opravená.Ďakujeme za pochopenie."
 
 #: contrib/admin/templates/admin/app_index.html:10
 #: contrib/admin/templates/admin/index.html:19
@@ -509,18 +531,18 @@ msgstr ""
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:28
 msgid "Welcome,"
 msgstr "Vitajte,"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Dokumentácia"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/admin/auth/user/change_password.html:13
 #: contrib/admin/templates/admin/auth/user/change_password.html:46
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -528,7 +550,7 @@ msgstr "Dokumentácia"
 msgid "Change password"
 msgstr "Zmeniť heslo"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
@@ -554,11 +576,12 @@ msgstr "História"
 
 #: contrib/admin/templates/admin/change_form.html:28
 #: contrib/admin/templates/admin/edit_inline/stacked.html:13
-#: contrib/admin/templates/admin/edit_inline/tabular.html:25
+#: contrib/admin/templates/admin/edit_inline/tabular.html:27
 msgid "View on site"
 msgstr "Pozrieť na stránke"
 
 #: contrib/admin/templates/admin/change_form.html:38
+#: contrib/admin/templates/admin/change_list.html:49
 #: contrib/admin/templates/admin/auth/user/change_password.html:22
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -566,19 +589,19 @@ msgstr[0] "Prosím, opravte chyby uvedené nižšie."
 msgstr[1] "Prosím, opravte chybu uvedenú nižšie."
 msgstr[2] "Prosím, opravte chyby uvedené nižšie."
 
-#: contrib/admin/templates/admin/change_list.html:16
+#: contrib/admin/templates/admin/change_list.html:41
 #, python-format
 msgid "Add %(name)s"
 msgstr "Pridať %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:26
+#: contrib/admin/templates/admin/change_list.html:60
 msgid "Filter"
 msgstr "Filtrovať"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:10
-#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:246
+#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:251
 msgid "Delete"
-msgstr "Vymazať"
+msgstr "Odstrániť"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:16
 #, python-format
@@ -587,9 +610,9 @@ msgid ""
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Odstránenie objektu %(object_name)s '%(escaped_object)s' by malo za následok aj odstránenie "
-"súvisiacich objektov, avšak váš účet nemá oprávnenie na odstránenie "
-"nasledujúcich typov objektov:"
+"Odstránenie objektu %(object_name)s '%(escaped_object)s' by malo za následok "
+"aj odstránenie súvisiacich objektov, avšak váš účet nemá oprávnenie na "
+"odstránenie nasledujúcich typov objektov:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:23
 #, python-format
@@ -597,8 +620,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Ste si istý, že chcete odstrániť objekt %(object_name)s \"%(escaped_object)s\"? "
-"Všetky nasledujúce súvisiace objekty budú odstránené:"
+"Ste si istý, že chcete odstrániť objekt %(object_name)s \"%(escaped_object)s"
+"\"? Všetky nasledujúce súvisiace objekty budú odstránené:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:28
 msgid "Yes, I'm sure"
@@ -640,9 +663,9 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Niečo nie je v poriadku s inštaláciou vašej databázy. "
-"Uistite sa, že boli vytvorené potrebné databázové tabuľky a taktiež "
-"skontrolujte, či príslušný používateľ môže databázu čítať."
+"Niečo nie je v poriadku s vašou inštaláciou databázy. Uistite sa, že boli "
+"vytvorené potrebné databázové tabuľky a taktiež skontrolujte, či príslušný "
+"používateľ môže databázu čítať."
 
 #: contrib/admin/templates/admin/login.html:19
 msgid "Username:"
@@ -666,7 +689,7 @@ msgid "Action"
 msgstr "Udalosť"
 
 #: contrib/admin/templates/admin/object_history.html:30
-#: utils/translation/trans_real.py:404
+#: utils/translation/trans_real.py:400
 msgid "DATETIME_FORMAT"
 msgstr "j. F Y o G:i"
 
@@ -675,7 +698,7 @@ msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
-"Tento objekt nemá históriu zmien. Možno nebol pridaný "
+"Tento objekt nemá históriu zmien. Pravdepodobne nebol pridaný "
 "prostredníctvom tejto správcovskej stránky."
 
 #: contrib/admin/templates/admin/pagination.html:10
@@ -720,8 +743,8 @@ msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
-"Najskôr zadajte používateľské meno a heslo. Potom budete môcť upraviť "
-"viac používateľských nastavení."
+"Najskôr zadajte používateľské meno a heslo. Potom budete môcť upraviť viac "
+"používateľských nastavení."
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:13
 #: contrib/auth/forms.py:14 contrib/auth/forms.py:47 contrib/auth/forms.py:59
@@ -730,20 +753,20 @@ msgstr "Používateľské meno"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:20
 #: contrib/admin/templates/admin/auth/user/change_password.html:33
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:60 contrib/auth/forms.py:184
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:60 contrib/auth/forms.py:185
 msgid "Password"
 msgstr "Heslo"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:26
 #: contrib/admin/templates/admin/auth/user/change_password.html:39
-#: contrib/auth/forms.py:185
+#: contrib/auth/forms.py:186
 msgid "Password (again)"
 msgstr "Heslo (znova)"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:27
 #: contrib/admin/templates/admin/auth/user/change_password.html:40
 msgid "Enter the same password as above, for verification."
-msgstr "Zadajte rovnaké heslo ako vyššie, kvôli overeniu."
+msgstr "Kvôli overeniu zadajte rovnaké heslo ako vyššie."
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:26
 #, python-format
@@ -783,8 +806,8 @@ msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Z bezpečnostných dôvodov zadajte staré heslo a potom svoje nové heslo dvakrát, "
-"aby sme mohli overiť, že ste ho zadali správne."
+"Z bezpečnostných dôvodov zadajte staré heslo a potom nové heslo dvakrát, aby "
+"sme mohli overiť, že ste ho zadali správne."
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
@@ -821,7 +844,7 @@ msgstr "Obnovenie hesla ukončené"
 
 #: contrib/admin/templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Vaše heslo bolo nastavené. Môžete pokračovať a hneď sa prihlásiť."
+msgstr "Vaše heslo bolo nastavené. Môžete pokračovať a prihlásiť sa."
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
@@ -836,7 +859,7 @@ msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
-"Zadajte svoje nové heslo dvakrát, aby sme mohli overiť, že ste ho zadali správne."
+"Zadajte nové heslo dvakrát, aby sme mohli overiť, že ste ho zadali správne."
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
@@ -860,12 +883,13 @@ msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-"Poslali sme vám elektronickou poštou návod na nastavenie vášho hesla na elektronickú adresu, ktorú ste zadali."
-"Mali by ste ho zakrátko dostať."
+"Poslali sme vám e-mailom návod na nastavenie vášho hesla na mailovú adresu, "
+"ktorú ste zadali.Mali by ste ho zakrátko dostať."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Dostávate túto elektronickú poštu, pretože ste si vyžiadali obnovenie hesla."
+msgstr ""
+"Dostávate túto elektronickú poštu, pretože ste si vyžiadali obnovenie hesla."
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -905,166 +929,166 @@ msgstr "E-mail adresa:"
 msgid "Reset my password"
 msgstr "Obnova môjho hesla"
 
-#: contrib/admin/templatetags/admin_list.py:284
+#: contrib/admin/templatetags/admin_list.py:299
 msgid "All dates"
 msgstr "Všetky dátumy"
 
-#: contrib/admin/views/main.py:69
+#: contrib/admin/views/main.py:70
 #, python-format
 msgid "Select %s"
 msgstr "Vybrať %s"
 
-#: contrib/admin/views/main.py:69
+#: contrib/admin/views/main.py:70
 #, python-format
 msgid "Select %s to change"
 msgstr "Vybrať \"%s\" na úpravu"
 
-#: contrib/admin/views/template.py:36 contrib/sites/models.py:38
+#: contrib/admin/views/template.py:37 contrib/sites/models.py:38
 msgid "site"
 msgstr "stránka"
 
-#: contrib/admin/views/template.py:38
+#: contrib/admin/views/template.py:39
 msgid "template"
 msgstr "šablóna"
 
-#: contrib/admindocs/views.py:57 contrib/admindocs/views.py:59
-#: contrib/admindocs/views.py:61
+#: contrib/admindocs/views.py:58 contrib/admindocs/views.py:60
+#: contrib/admindocs/views.py:62
 msgid "tag:"
 msgstr "značka:"
 
-#: contrib/admindocs/views.py:90 contrib/admindocs/views.py:92
-#: contrib/admindocs/views.py:94
+#: contrib/admindocs/views.py:91 contrib/admindocs/views.py:93
+#: contrib/admindocs/views.py:95
 msgid "filter:"
 msgstr "filter:"
 
-#: contrib/admindocs/views.py:154 contrib/admindocs/views.py:156
-#: contrib/admindocs/views.py:158
+#: contrib/admindocs/views.py:155 contrib/admindocs/views.py:157
+#: contrib/admindocs/views.py:159
 msgid "view:"
 msgstr "pohľad:"
 
-#: contrib/admindocs/views.py:186
+#: contrib/admindocs/views.py:187
 #, python-format
 msgid "App %r not found"
 msgstr "Aplikácia %r nenájdená"
 
-#: contrib/admindocs/views.py:193
+#: contrib/admindocs/views.py:194
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Model %(model_name)r sa nenachádza v aplikácii %(app_label)r"
 
-#: contrib/admindocs/views.py:205
+#: contrib/admindocs/views.py:206
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "súvisiaci objekt `%(app_label)s.%(data_type)s`"
 
-#: contrib/admindocs/views.py:205 contrib/admindocs/views.py:227
-#: contrib/admindocs/views.py:241 contrib/admindocs/views.py:246
+#: contrib/admindocs/views.py:206 contrib/admindocs/views.py:228
+#: contrib/admindocs/views.py:242 contrib/admindocs/views.py:247
 msgid "model:"
 msgstr "model:"
 
-#: contrib/admindocs/views.py:236
+#: contrib/admindocs/views.py:237
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "súvisiace objekty `%(app_label)s.%(object_name)s`"
 
-#: contrib/admindocs/views.py:241
+#: contrib/admindocs/views.py:242
 #, python-format
 msgid "all %s"
 msgstr "všetky %s"
 
-#: contrib/admindocs/views.py:246
+#: contrib/admindocs/views.py:247
 #, python-format
 msgid "number of %s"
 msgstr "počet %s"
 
-#: contrib/admindocs/views.py:251
+#: contrib/admindocs/views.py:252
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Polia objektov %s"
 
-#: contrib/admindocs/views.py:314 contrib/admindocs/views.py:325
-#: contrib/admindocs/views.py:327 contrib/admindocs/views.py:333
-#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:336
+#: contrib/admindocs/views.py:315 contrib/admindocs/views.py:326
+#: contrib/admindocs/views.py:328 contrib/admindocs/views.py:334
+#: contrib/admindocs/views.py:335 contrib/admindocs/views.py:337
 msgid "Integer"
 msgstr "Celé číslo"
 
-#: contrib/admindocs/views.py:315
+#: contrib/admindocs/views.py:316
 msgid "Boolean (Either True or False)"
-msgstr "Logická hodnota (True alebo False)"
+msgstr "Logická hodnota (buď True alebo False)"
 
-#: contrib/admindocs/views.py:316 contrib/admindocs/views.py:335
+#: contrib/admindocs/views.py:317 contrib/admindocs/views.py:336
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Reťazec (až do %(max_length)s)"
 
-#: contrib/admindocs/views.py:317
+#: contrib/admindocs/views.py:318
 msgid "Comma-separated integers"
 msgstr "Celé čísla oddelené čiarkou"
 
-#: contrib/admindocs/views.py:318
+#: contrib/admindocs/views.py:319
 msgid "Date (without time)"
 msgstr "Dátum (bez času)"
 
-#: contrib/admindocs/views.py:319
+#: contrib/admindocs/views.py:320
 msgid "Date (with time)"
 msgstr "Dátum (a čas)"
 
-#: contrib/admindocs/views.py:320
+#: contrib/admindocs/views.py:321
 msgid "Decimal number"
 msgstr "Desatinné číslo"
 
-#: contrib/admindocs/views.py:321
+#: contrib/admindocs/views.py:322
 msgid "E-mail address"
 msgstr "E-mail adresa"
 
-#: contrib/admindocs/views.py:322 contrib/admindocs/views.py:323
-#: contrib/admindocs/views.py:326
+#: contrib/admindocs/views.py:323 contrib/admindocs/views.py:324
+#: contrib/admindocs/views.py:327
 msgid "File path"
 msgstr "Cesta k súboru"
 
-#: contrib/admindocs/views.py:324
+#: contrib/admindocs/views.py:325
 msgid "Floating point number"
 msgstr "Číslo s plávajúcou desatinnou čiarkou"
 
-#: contrib/admindocs/views.py:328 contrib/comments/models.py:58
+#: contrib/admindocs/views.py:329 contrib/comments/models.py:58
 msgid "IP address"
 msgstr "IP adresa"
 
-#: contrib/admindocs/views.py:330
-msgid "Boolean (Either True, False or None)"
-msgstr "Logická hodnota (True, False alebo None)"
-
 #: contrib/admindocs/views.py:331
+msgid "Boolean (Either True, False or None)"
+msgstr "Logická hodnota (buď True, False alebo None)"
+
+#: contrib/admindocs/views.py:332
 msgid "Relation to parent model"
 msgstr "Vzťah k nadradenému modelu"
 
-#: contrib/admindocs/views.py:332
+#: contrib/admindocs/views.py:333
 msgid "Phone number"
 msgstr "Telefónne číslo"
 
-#: contrib/admindocs/views.py:337
+#: contrib/admindocs/views.py:338
 msgid "Text"
 msgstr "Text"
 
-#: contrib/admindocs/views.py:338
+#: contrib/admindocs/views.py:339
 msgid "Time"
 msgstr "Čas"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:21
+#: contrib/admindocs/views.py:340 contrib/comments/forms.py:19
 #: contrib/comments/templates/comments/moderation_queue.html:37
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admindocs/views.py:340
+#: contrib/admindocs/views.py:341
 msgid "U.S. state (two uppercase letters)"
 msgstr "Štát USA (dve veľké písmená)"
 
-#: contrib/admindocs/views.py:341
+#: contrib/admindocs/views.py:342
 msgid "XML text"
 msgstr "XML text"
 
-#: contrib/admindocs/views.py:367
+#: contrib/admindocs/views.py:368
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s nevyzerá ako urlpattern objekt"
@@ -1088,13 +1112,13 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Ak chete nainštalovať záložky, pretiahnite odkaz do vašej\n"
-"nástrojovej lišty so záložkami, "
-"alebo kliknite pravým tlačidlom myši na odkaz a pridajte ho do svojich "
-"záložiek.\n"
+"<p class=\"help\">Ak chete nainštalovať záložky, pretiahnite odkaz do\n"
+"nástrojovej lišty so záložkami, alebo kliknite pravým tlačidlom myši na "
+"odkaz a pridajte ho do záložiek.\n"
 "Následne môžete záložky použiť na stránkach. Poznamenávame, že použitie "
 "niektorých záložiek vyžaduje, aby bol váš počítač \"interný\" (ak si nie ste "
-"istý, že váš počítač je \"interný\", oslovte vášho systémového správcu).</p>\n"
+"istý, že váš počítač je \"interný\", oslovte svojho systémového správcu).</"
+"p>\n"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
@@ -1117,7 +1141,8 @@ msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
-"Zobrazí content-type a jedinečný identifikátor pre stránky, ktoré reprezentujú samostatný objekt."
+"Zobrazí content-type a jedinečný identifikátor pre stránky, ktoré "
+"reprezentujú samostatný objekt."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
@@ -1125,7 +1150,8 @@ msgstr "Upraviť tento objekt (aktuálne okno)"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Skočí na stránku správy pre stránky, ktoré reprezentujú samostatný objekt."
+msgstr ""
+"Skočí na stránku správy pre stránky, ktoré reprezentujú samostatný objekt."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
@@ -1151,15 +1177,15 @@ msgstr "Dôležité dátumy"
 msgid "Groups"
 msgstr "Skupiny"
 
-#: contrib/auth/admin.py:64
+#: contrib/auth/admin.py:80
 msgid "Add user"
 msgstr "Pridať používateľa"
 
-#: contrib/auth/admin.py:90
+#: contrib/auth/admin.py:106
 msgid "Password changed successfully."
 msgstr "Heslo úspešne zmenené."
 
-#: contrib/auth/admin.py:96
+#: contrib/auth/admin.py:112
 #, python-format
 msgid "Change password: %s"
 msgstr "Zmeniť heslo: %s"
@@ -1170,8 +1196,8 @@ msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
 msgstr ""
-"Povinné. 30 znakov alebo menej. Len alfanumerické "
-"znaky (písmená, čísla a podčiarkovníky)."
+"Povinné. 30 znakov alebo menej. Len alfanumerické znaky (písmená, čísla a "
+"podčiarkovníky)."
 
 #: contrib/auth/forms.py:16 contrib/auth/forms.py:49
 msgid "This value must contain only letters, numbers and underscores."
@@ -1185,8 +1211,8 @@ msgstr "Potvrdenie hesla"
 msgid "A user with that username already exists."
 msgstr "Používateľ s takým používateľským menom už existuje."
 
-#: contrib/auth/forms.py:36 contrib/auth/forms.py:154
-#: contrib/auth/forms.py:196
+#: contrib/auth/forms.py:36 contrib/auth/forms.py:155
+#: contrib/auth/forms.py:197
 msgid "The two password fields didn't match."
 msgstr "Pole hesla a jeho potvrdenie sa nezhodujú."
 
@@ -1199,8 +1225,7 @@ msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
-"Váš prehliadač nemá povolené cookies. Cookies sú potrebné pre "
-"prihlásenie."
+"Váš prehliadač nemá povolené cookies. Cookies sú potrebné pre prihlásenie."
 
 #: contrib/auth/forms.py:100
 msgid "E-mail"
@@ -1211,27 +1236,27 @@ msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
-"Táto e-mail adresa nemá priradený žiadny používateľský účet. Ste si istí, že "
+"Táto e-mail adresa nemá priradený žiadny používateľský účet. Ste si istý, že "
 "ste sa zaregistrovali?"
 
-#: contrib/auth/forms.py:134
+#: contrib/auth/forms.py:135
 #, python-format
 msgid "Password reset on %s"
 msgstr "Obnovenie hesla na %s"
 
-#: contrib/auth/forms.py:142
+#: contrib/auth/forms.py:143
 msgid "New password"
 msgstr "Nové heslo"
 
-#: contrib/auth/forms.py:143
+#: contrib/auth/forms.py:144
 msgid "New password confirmation"
 msgstr "Potvrdenie nového hesla"
 
-#: contrib/auth/forms.py:168
+#: contrib/auth/forms.py:169
 msgid "Old password"
 msgstr "Staré heslo"
 
-#: contrib/auth/forms.py:176
+#: contrib/auth/forms.py:177
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Nezadali ste správne svoje staré heslo. Napíšte ho znovu, prosím."
 
@@ -1245,11 +1270,11 @@ msgstr "kódový názov"
 
 #: contrib/auth/models.py:68
 msgid "permission"
-msgstr "povolenie"
+msgstr "oprávnenie"
 
 #: contrib/auth/models.py:69 contrib/auth/models.py:87
 msgid "permissions"
-msgstr "povolenia"
+msgstr "oprávnenia"
 
 #: contrib/auth/models.py:90
 msgid "group"
@@ -1293,8 +1318,7 @@ msgstr "postavenie zamestnanca"
 
 #: contrib/auth/models.py:132
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
-"Určuje, či má používateľ oprávnenie prihlásiť sa do správy stránok."
+msgstr "Určuje, či sa používateľ môže prihlásiť do správy stránok."
 
 #: contrib/auth/models.py:133
 msgid "active"
@@ -1367,27 +1391,27 @@ msgstr "Obsah"
 msgid "Metadata"
 msgstr "Metaúdaje"
 
-#: contrib/comments/forms.py:19
+#: contrib/comments/forms.py:17
 #: contrib/comments/templates/comments/moderation_queue.html:34
 msgid "Name"
 msgstr "Meno"
 
-#: contrib/comments/forms.py:20
+#: contrib/comments/forms.py:18
 msgid "Email address"
 msgstr "E-mail adresa"
 
-#: contrib/comments/forms.py:22
+#: contrib/comments/forms.py:20
 #: contrib/comments/templates/comments/moderation_queue.html:35
 msgid "Comment"
 msgstr "Komentár"
 
-#: contrib/comments/forms.py:25
+#: contrib/comments/forms.py:23
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
 "Ak ste do tohoto poľa čokoľvek zadali, váš komentár bude považovaný za spam"
 
-#: contrib/comments/forms.py:125
+#: contrib/comments/forms.py:146
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -1446,14 +1470,16 @@ msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
-"Tento komentár je od autentifikovaného používateľa a preto je jeho meno len na čítanie."
+"Tento komentár je od autentifikovaného používateľa a preto je jeho meno len "
+"na čítanie."
 
 #: contrib/comments/models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"Tento komentár je od autentifikovaného používateľa a preto je jeho e-mail len na čítanie."
+"Tento komentár je od autentifikovaného používateľa a preto je jeho e-mail "
+"len na čítanie."
 
 #: contrib/comments/models.py:149
 #, python-format
@@ -1492,7 +1518,8 @@ msgstr "Ďakujeme za povolenie"
 #: contrib/comments/templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
-msgstr "Ďakujeme za čas, ktorý ste venovali zvýšniu kvality diskusie na našej stránke"
+msgstr ""
+"Ďakujeme za čas, ktorý ste venovali zvýšniu kvality diskusie na našej stránke"
 
 #: contrib/comments/templates/comments/delete.html:4
 msgid "Remove a comment"
@@ -1614,8 +1641,7 @@ msgstr "typy obsahu"
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
-"Príklad: '/about/contact/'. Uistite sa, že máte lomky na začiatku a na "
-"konci."
+"Príklad: '/about/contact/'. Uistite sa, že máte lomky na začiatku a na konci."
 
 #: contrib/flatpages/admin.py:11
 msgid ""
@@ -1660,7 +1686,8 @@ msgstr "nutná registrácia"
 #: contrib/flatpages/models.py:13
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
-"Ak zaškrtnete toto, stránku budú môcť prezerať len prihlásení používatelia."
+"Ak je toto zaškrtnuté, stránku budú môcť prezerať len prihlásení "
+"používatelia."
 
 #: contrib/flatpages/models.py:18
 msgid "flat page"
@@ -1675,8 +1702,8 @@ msgid ""
 "We apologize, but your form has expired. Please continue filling out the "
 "form from this page."
 msgstr ""
-"Ospravedlňujeme sa, ale platnosť formulára vypršala. Prosím, pokračujte vo vypĺňaní z "
-"tejto stránky."
+"Ospravedlňujeme sa, ale platnosť formulára vypršala. Prosím, pokračujte vo "
+"vypĺňaní z tejto stránky."
 
 #: contrib/gis/forms/fields.py:14
 msgid "No geometry value provided."
@@ -2004,15 +2031,91 @@ msgstr ""
 
 #: contrib/localflavor/cl/forms.py:29
 msgid "Enter a valid Chilean RUT."
-msgstr "Vložte platné čílske RUT."
+msgstr "Vložte platné čilské RUT."
 
 #: contrib/localflavor/cl/forms.py:30
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "Vložte platné čílske RUT. Formát je XX.XXX.XXX-X."
+msgstr "Vložte platné čilské RUT. Formát je XX.XXX.XXX-X."
 
 #: contrib/localflavor/cl/forms.py:31
 msgid "The Chilean RUT is not valid."
-msgstr "Čílske RUT nie je platné."
+msgstr "Čilské RUT nie je platné."
+
+#: contrib/localflavor/cz/cz_regions.py:8
+msgid "Prague"
+msgstr "Praha"
+
+#: contrib/localflavor/cz/cz_regions.py:9
+msgid "Central Bohemian Region"
+msgstr "Stredočeský kraj"
+
+#: contrib/localflavor/cz/cz_regions.py:10
+msgid "South Bohemian Region"
+msgstr "Juhočeský kraj"
+
+#: contrib/localflavor/cz/cz_regions.py:11
+msgid "Pilsen Region"
+msgstr "Plzenský kraj"
+
+#: contrib/localflavor/cz/cz_regions.py:12
+msgid "Carlsbad Region"
+msgstr "Karlovarský kraj"
+
+#: contrib/localflavor/cz/cz_regions.py:13
+msgid "Usti Region"
+msgstr "Ústecký kraj"
+
+#: contrib/localflavor/cz/cz_regions.py:14
+msgid "Liberec Region"
+msgstr "Liberecký kraj"
+
+#: contrib/localflavor/cz/cz_regions.py:15
+msgid "Hradec Region"
+msgstr "Hradecký kraj"
+
+#: contrib/localflavor/cz/cz_regions.py:16
+msgid "Pardubice Region"
+msgstr "Pardubický kraj"
+
+#: contrib/localflavor/cz/cz_regions.py:17
+msgid "Vysocina Region"
+msgstr "Vysočina"
+
+#: contrib/localflavor/cz/cz_regions.py:18
+msgid "South Moravian Region"
+msgstr "Juhomoravský kraj"
+
+#: contrib/localflavor/cz/cz_regions.py:19
+msgid "Olomouc Region"
+msgstr "Olomoucký kraj"
+
+#: contrib/localflavor/cz/cz_regions.py:20
+msgid "Zlin Region"
+msgstr "Žlínsky kraj"
+
+#: contrib/localflavor/cz/cz_regions.py:21
+msgid "Moravian-Silesian Region"
+msgstr "Moravskosliezsky kraj"
+
+#: contrib/localflavor/cz/forms.py:27 contrib/localflavor/sk/forms.py:30
+msgid "Enter a postal code in the format XXXXX or XXX XX."
+msgstr "Zadajte poštové smerovacie číslo v tvare XXXXX alebo XXX XX."
+
+#: contrib/localflavor/cz/forms.py:47
+msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
+msgstr "Zadajte rodné číslo vo formáte XXXXXX/XXXX alebo XXXXXXXXXX."
+
+#: contrib/localflavor/cz/forms.py:48
+msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
+msgstr "Neplatný voliteľný parameter Pohlavie, platné hodnoty sú 'f' a 'm'"
+
+#: contrib/localflavor/cz/forms.py:49
+msgid "Enter a valid birth number."
+msgstr "Zadajte platné rodné číslo."
+
+#: contrib/localflavor/cz/forms.py:106
+msgid "Enter a valid IC number."
+msgstr "Zadajte platné IC číslo."
 
 #: contrib/localflavor/de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -2256,7 +2359,7 @@ msgstr "Segovia"
 
 #: contrib/localflavor/es/es_provinces.py:45
 msgid "Seville"
-msgstr "Seville"
+msgstr "Sevilla"
 
 #: contrib/localflavor/es/es_provinces.py:46
 msgid "Soria"
@@ -2312,7 +2415,7 @@ msgstr "Aragon"
 
 #: contrib/localflavor/es/es_regions.py:7
 msgid "Principality of Asturias"
-msgstr "Principality of Asturias"
+msgstr "Asturské kniežatstvo"
 
 #: contrib/localflavor/es/es_regions.py:8
 msgid "Balearic Islands"
@@ -2328,11 +2431,11 @@ msgstr "Kanárske ostrovy"
 
 #: contrib/localflavor/es/es_regions.py:12
 msgid "Castile-La Mancha"
-msgstr "Castile-La Mancha"
+msgstr "Kastília-La Mancha"
 
 #: contrib/localflavor/es/es_regions.py:13
 msgid "Castile and Leon"
-msgstr "Castile and Leon"
+msgstr "Kastília-León"
 
 #: contrib/localflavor/es/es_regions.py:14
 msgid "Catalonia"
@@ -2340,7 +2443,7 @@ msgstr "Katalánsko"
 
 #: contrib/localflavor/es/es_regions.py:15
 msgid "Extremadura"
-msgstr "Extremadura"
+msgstr "Estremadura"
 
 #: contrib/localflavor/es/es_regions.py:16
 msgid "Galicia"
@@ -2352,11 +2455,11 @@ msgstr "Murcia a okolie"
 
 #: contrib/localflavor/es/es_regions.py:20
 msgid "Foral Community of Navarre"
-msgstr "Foral Community of Navarre"
+msgstr "Navarra"
 
 #: contrib/localflavor/es/es_regions.py:21
 msgid "Valencian Community"
-msgstr "Valencian Community"
+msgstr "Valencijské spoločenstvo"
 
 #: contrib/localflavor/es/forms.py:19
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
@@ -2393,7 +2496,8 @@ msgstr "Neplatný kontrolný súčet pre CIF."
 #: contrib/localflavor/es/forms.py:142
 msgid ""
 "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
-msgstr "Zadajte, prosím, platné číslo bankového účtu v tvare XXXX-XXXX-XX-XXXXXXXXXX."
+msgstr ""
+"Zadajte, prosím, platné číslo bankového účtu v tvare XXXX-XXXX-XX-XXXXXXXXXX."
 
 #: contrib/localflavor/es/forms.py:143
 msgid "Invalid checksum for bank account number."
@@ -2401,8 +2505,7 @@ msgstr "Neplatný kontrolný súčet čísla bankového účtu."
 
 #: contrib/localflavor/fi/forms.py:28
 msgid "Enter a valid Finnish social security number."
-msgstr ""
-"Vložte platné fínske číslo sociálneho poistenia."
+msgstr "Vložte platné fínske číslo sociálneho poistenia."
 
 #: contrib/localflavor/in_/forms.py:14
 msgid "Enter a zip code in the format XXXXXXX."
@@ -2711,11 +2814,11 @@ msgstr "Querétaro"
 
 #: contrib/localflavor/mx/mx_states.py:34
 msgid "Quintana Roo"
-msgstr "Quintana Roo"
+msgstr "Quintana Róo"
 
 #: contrib/localflavor/mx/mx_states.py:35
 msgid "Sinaloa"
-msgstr "Shinaloa"
+msgstr "Sinaloa"
 
 #: contrib/localflavor/mx/mx_states.py:36
 msgid "San Luis Potosí"
@@ -2937,10 +3040,6 @@ msgstr "Telefónne čísla musia mať formát XXXX-XXXXXX."
 #: contrib/localflavor/ro/forms.py:194
 msgid "Enter a valid postal code in the format XXXXXX"
 msgstr "Zadajte platné poštové smerovacie číslo v tvare XXXXXX"
-
-#: contrib/localflavor/sk/forms.py:30
-msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "Zadajte poštové smerovacie číslo v tvare XXXXX alebo XXX XX."
 
 #: contrib/localflavor/sk/sk_districts.py:8
 msgid "Banska Bystrica"
@@ -3580,7 +3679,7 @@ msgstr "Zadajte poštové smerovacie číslo vo formáte XXXXX alebo XXXXX-XXXX.
 
 #: contrib/localflavor/us/forms.py:54
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
-msgstr "Vložte platné U.S. číslo sociálneho poistenia vo formáte XXX-XX-XXXX."
+msgstr "Vložte platné číslo U.S. sociálneho poistenia vo formáte XXX-XX-XXXX."
 
 #: contrib/localflavor/za/forms.py:20
 msgid "Enter a valid South African ID number"
@@ -3647,8 +3746,8 @@ msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"Toto môže byť buď absolútna cesta (ako vyššie) alebo úplná adresa "
-"URL začínajúca s 'http://'."
+"Toto môže byť buď absolútna cesta (ako vyššie) alebo úplné URL začínajúce na "
+"'http://'."
 
 #: contrib/redirects/models.py:13
 msgid "redirect"
@@ -3690,62 +3789,69 @@ msgstr "zobrazené meno"
 msgid "sites"
 msgstr "weby"
 
-#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:683
+#: db/models/fields/__init__.py:356 db/models/fields/__init__.py:700
 msgid "This value must be an integer."
 msgstr "Táto hodnota musí byť celé číslo."
 
-#: db/models/fields/__init__.py:379
+#: db/models/fields/__init__.py:387
 msgid "This value must be either True or False."
 msgstr "Táto hodnota musí byť True alebo False."
 
-#: db/models/fields/__init__.py:412
+#: db/models/fields/__init__.py:420
 msgid "This field cannot be null."
 msgstr "Toto pole nemôže byť prázdne."
 
-#: db/models/fields/__init__.py:428
+#: db/models/fields/__init__.py:436
 msgid "Enter only digits separated by commas."
 msgstr "Zadajte len číslice oddelené čiarkami."
 
-#: db/models/fields/__init__.py:459
+#: db/models/fields/__init__.py:467
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Zadajte platný dátum vo formáte RRRR-MM-DD."
 
-#: db/models/fields/__init__.py:468
+#: db/models/fields/__init__.py:476
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Neplatný dátum: %s"
 
-#: db/models/fields/__init__.py:532 db/models/fields/__init__.py:550
+#: db/models/fields/__init__.py:540 db/models/fields/__init__.py:558
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "Zadajte platný dátum a čas vo formáte RRRR-MM-DD HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:586
+#: db/models/fields/__init__.py:594
 msgid "This value must be a decimal number."
-msgstr "Táto hodnota musí byť desiatkove číslo."
+msgstr "Táto hodnota musí byť desiatkové číslo."
 
-#: db/models/fields/__init__.py:719
+#: db/models/fields/__init__.py:676
+msgid "This value must be a float."
+msgstr "Táto hodnota musí byť číslo s plávajúcou desatinnou čiarkou."
+
+#: db/models/fields/__init__.py:736
 msgid "This value must be either None, True or False."
 msgstr "Táto hodnota musí byť buď None, True alebo False."
 
-#: db/models/fields/__init__.py:817 db/models/fields/__init__.py:831
+#: db/models/fields/__init__.py:839 db/models/fields/__init__.py:853
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Zadajte platný čas vo formáte HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:761
+#: db/models/fields/related.py:779
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-"Ak chcete vybrať viac ako jedno, podržte \"Control\" alebo \"Command\" na "
-"počítači Mac."
+"Ak chcete vybrať viac ako jednu položku, podržte \"Control\", alebo \"Command"
+"\" na počítači Mac."
 
-#: db/models/fields/related.py:838
+#: db/models/fields/related.py:857
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "Prosím, zadajte platný identifikátor %(self)s. Hodnoty %(value)r sú neplatné."
-msgstr[1] "Prosím, zadajte platný identifikátor %(self)s. Hodnota %(value)r je neplatná."
-msgstr[2] "Prosím, zadajte platný identifikátor %(self)s. Hodnoty %(value)r sú neplatné."
+msgstr[0] ""
+"Prosím, zadajte platný identifikátor %(self)s. Hodnoty %(value)r sú neplatné."
+msgstr[1] ""
+"Prosím, zadajte platný identifikátor %(self)s. Hodnota %(value)r je neplatná."
+msgstr[2] ""
+"Prosím, zadajte platný identifikátor %(self)s. Hodnoty %(value)r sú neplatné."
 
 #: forms/fields.py:54
 msgid "This field is required."
@@ -3758,15 +3864,13 @@ msgstr "Zadajte platnú hodnotu."
 #: forms/fields.py:138
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
-msgstr ""
-"Uistite sa, že táto hodnota má najviac %(max)d znakov (má %(length)d)."
+msgstr "Uistite sa, že táto hodnota má najviac %(max)d znakov (má %(length)d)."
 
 #: forms/fields.py:139
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
-"Uistite sa, že zadaná hodnota má najmenej %(min)d znakov (má %(length)"
-"d)."
+"Uistite sa, že zadaná hodnota má najmenej %(min)d znakov (má %(length)d)."
 
 #: forms/fields.py:166
 msgid "Enter a whole number."
@@ -3802,11 +3906,11 @@ msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr ""
 "Uistite sa, že nie je zadaných viac ako %s číslic pred desatinnou čiarkou."
 
-#: forms/fields.py:287 forms/fields.py:848
+#: forms/fields.py:287 forms/fields.py:849
 msgid "Enter a valid date."
 msgstr "Zadajte platný dátum."
 
-#: forms/fields.py:321 forms/fields.py:849
+#: forms/fields.py:321 forms/fields.py:850
 msgid "Enter a valid time."
 msgstr "Zadajte platný čas."
 
@@ -3816,8 +3920,7 @@ msgstr "Zadajte platný dátum a čas."
 
 #: forms/fields.py:446
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
-"Súbor nebol odoslaný. Skontrolujte typ kódovania vo formulári."
+msgstr "Súbor nebol odoslaný. Skontrolujte typ kódovania vo formulári."
 
 #: forms/fields.py:447
 msgid "No file was submitted."
@@ -3848,44 +3951,50 @@ msgstr "Toto URL je chybný odkaz."
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Vyberte platnú voľbu. %(value)s nepatrí medzi dostupné možnosti."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:671
+#: forms/fields.py:697 forms/fields.py:758 forms/models.py:729
 msgid "Enter a list of values."
 msgstr "Vložte zoznam hodnôt."
 
-#: forms/fields.py:877
+#: forms/fields.py:878
 msgid "Enter a valid IPv4 address."
 msgstr "Zadajte platnú IPv4 adresu."
 
-#: forms/fields.py:887
+#: forms/fields.py:888
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Zadajte platný 'slug pozostávajúci z písmen, čísel, podčiarkovníkov alebo "
+"Zadajte platný 'slug' pozostávajúci z písmen, čísel, podčiarkovníkov alebo "
 "pomlčiek."
 
-#: forms/formsets.py:242 forms/formsets.py:244
+#: forms/formsets.py:247 forms/formsets.py:249
 msgid "Order"
 msgstr "Poradie"
 
-#: forms/models.py:274 forms/models.py:283
+#: forms/models.py:289 forms/models.py:298
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s s týmto %(field_label)s už existuje."
 
-#: forms/models.py:601
-msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Vyberte platnú možnosť. Vybraná položka nepatrí medzi dostupné možnosti."
+#: forms/models.py:602
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr ""
+"Vnorený cudzí kľúč sa nezhoduje s nadradenou inštanciou primárnho kľúča."
 
-#: forms/models.py:672
+#: forms/models.py:659
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+"Vyberte platnú možnosť. Vybraná položka nepatrí medzi dostupné možnosti."
+
+#: forms/models.py:730
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Vyberte platnú možnost. %s nepatrí medzi dostupné možnosti."
 
-#: template/defaultfilters.py:706
+#: template/defaultfilters.py:751
 msgid "yes,no,maybe"
 msgstr "áno,nie,možno"
 
-#: template/defaultfilters.py:737
+#: template/defaultfilters.py:782
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
@@ -3893,17 +4002,17 @@ msgstr[0] "%(size)d bajtov"
 msgstr[1] "%(size)d bajt"
 msgstr[2] "%(size)d bajty"
 
-#: template/defaultfilters.py:739
+#: template/defaultfilters.py:784
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:741
+#: template/defaultfilters.py:786
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:742
+#: template/defaultfilters.py:787
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
@@ -4172,19 +4281,19 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:403
+#: utils/translation/trans_real.py:399
 msgid "DATE_FORMAT"
 msgstr "j. F Y"
 
-#: utils/translation/trans_real.py:405
+#: utils/translation/trans_real.py:401
 msgid "TIME_FORMAT"
 msgstr "G:i"
 
-#: utils/translation/trans_real.py:421
+#: utils/translation/trans_real.py:417
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:422
+#: utils/translation/trans_real.py:418
 msgid "MONTH_DAY_FORMAT"
 msgstr "j. F"
 
