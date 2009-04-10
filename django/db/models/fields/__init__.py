@@ -401,7 +401,13 @@ class BooleanField(Field):
         return bool(value)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.BooleanField}
+        # Unlike most fields, BooleanField figures out include_blank from
+        # self.null instead of self.blank.
+        if self.choices:
+            include_blank = self.null or not (self.has_default() or 'initial' in kwargs)
+            defaults = {'choices': self.get_choices(include_blank=include_blank)}
+        else:
+            defaults = {'form_class': forms.BooleanField}
         defaults.update(kwargs)
         return super(BooleanField, self).formfield(**defaults)
 

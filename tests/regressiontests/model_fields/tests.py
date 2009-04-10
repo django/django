@@ -1,6 +1,7 @@
 import datetime
 import unittest
 import django.test
+from django import forms
 from django.db import models
 from django.core.exceptions import ValidationError
 from models import Foo, Bar, Whiz, BigD, BigS
@@ -83,9 +84,21 @@ class BooleanFieldTests(unittest.TestCase):
 
     def test_booleanfield_get_db_prep_lookup(self):
         self._test_get_db_prep_lookup(models.BooleanField())
-        
+
     def test_nullbooleanfield_get_db_prep_lookup(self):
         self._test_get_db_prep_lookup(models.NullBooleanField())
+
+    def test_booleanfield_choices_blank(self):
+        """
+        Test that BooleanField with choices and defaults doesn't generate a
+        formfield with the blank option (#9640, #10549).
+        """
+        choices = [(1, u'Si'), (2, 'No')]
+        f = models.BooleanField(choices=choices, default=1, null=True)
+        self.assertEqual(f.formfield().choices, [('', '---------')] + choices)
+
+        f = models.BooleanField(choices=choices, default=1, null=False)
+        self.assertEqual(f.formfield().choices, choices)
 
 class ChoicesTests(django.test.TestCase):
     def test_choices_and_field_display(self):
