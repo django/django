@@ -74,12 +74,12 @@ class LineString(GEOSGeometry):
         "Returns the number of points in this LineString."
         return len(self._cs)
 
-    def _getitem_external(self, index):
-        self._checkindex(index)
+    def _get_single_external(self, index):
         return self._cs[index]
-    _getitem_internal = _getitem_external
 
-    def _set_collection(self, length, items):
+    _get_single_internal = _get_single_external
+
+    def _set_list(self, length, items):
         ndim = self._cs.dims #
         hasz = self._cs.hasz # I don't understand why these are different
 

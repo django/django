@@ -2,36 +2,43 @@
 # Released under the New BSD license.
 """
 This module contains a base type which provides list-style mutations
-This is akin to UserList, but without specific data storage methods.
-Possible candidate for a more general position in the source tree,
-perhaps django.utils
+without specific data storage methods.
+
+See also http://www.aryehleib.com/MutableLists.html
 
 Author: Aryeh Leib Taurog.
 """
 class ListMixin(object):
     """
-    A base class which provides complete list interface
-    derived classes should implement the following:
+    A base class which provides complete list interface.
+    Derived classes must call ListMixin's __init__() function
+    and implement the following:
 
-    function _getitem_external(self, i):
-        Return single item with index i for general use
+    function _get_single_external(self, i):
+        Return single item with index i for general use.
+        The index i will always satisfy 0 <= i < len(self).
 
-    function _getitem_internal(self, i):
+    function _get_single_internal(self, i):
         Same as above, but for use within the class [Optional]
+        Note that if _get_single_internal and _get_single_internal return
+        different types of objects, _set_list must distinguish
+        between the two and handle each appropriately.
 
-    function _set_collection(self, length, items):
-        Recreate the entire object
+    function _set_list(self, length, items):
+        Recreate the entire object.
+
+        NOTE: items may be a generator which calls _get_single_internal.
+        Therefore, it is necessary to cache the values in a temporary:
+            temp = list(items)
+        before clobbering the original storage.
 
     function _set_single(self, i, value):
         Set the single item at index i to value [Optional]
         If left undefined, all mutations will result in rebuilding
-        the object using _set_collection.
+        the object using _set_list.
 
     function __len__(self):
         Return the length
-
-    function __iter__(self):
-        Return an iterator for the object
 
     int _minlength:
         The minimum legal length [Optional]
@@ -39,8 +46,8 @@ class ListMixin(object):
     int _maxlength:
         The maximum legal length [Optional]
 
-    iterable _allowed:
-        A list of allowed item types [Optional]
+    type or tuple _allowed:
+        A type or tuple of allowed item types [Optional]
 
     class _IndexError:
         The type of exception to be raise on invalid index [Optional]
@@ -50,11 +57,11 @@ class ListMixin(object):
     _maxlength = None
     _IndexError = IndexError
 
-    ### Python initialization and list interface methods ###
+    ### Python initialization and special list interface methods ###
 
     def __init__(self, *args, **kwargs):
-        if not hasattr(self, '_getitem_internal'):
-            self._getitem_internal = self._getitem_external
+        if not hasattr(self, '_get_single_internal'):
+            self._get_single_internal = self._get_single_external
 
         if not hasattr(self, '_set_single'):
             self._set_single = self._set_single_rebuild
@@ -63,15 +70,15 @@ class ListMixin(object):
         super(ListMixin, self).__init__(*args, **kwargs)
 
     def __getitem__(self, index):
-        "Gets the coordinates of the point(s) at the specified index/slice."
+        "Get the item(s) at the specified index/slice."
         if isinstance(index, slice):
-            return [self._getitem_external(i) for i in xrange(*index.indices(len(self)))]
+            return [self._get_single_external(i) for i in xrange(*index.indices(len(self)))]
         else:
             index = self._checkindex(index)
-            return self._getitem_external(index)
+            return self._get_single_external(index)
 
     def __delitem__(self, index):
-        "Delete the point(s) at the specified index/slice."
+        "Delete the item(s) at the specified index/slice."
         if not isinstance(index, (int, long, slice)):
             raise TypeError("%s is not a legal index" % index)
 
@@ -84,14 +91,14 @@ class ListMixin(object):
             indexRange  = range(*index.indices(origLen))
 
         newLen      = origLen - len(indexRange)
-        newItems    = ( self._getitem_internal(i)
+        newItems    = ( self._get_single_internal(i)
                         for i in xrange(origLen)
                         if i not in indexRange )
 
         self._rebuild(newLen, newItems)
 
     def __setitem__(self, index, val):
-        "Sets the Geometry at the specified index."
+        "Set the item(s) at the specified index/slice."
         if isinstance(index, slice):
             self._set_slice(index, val)
         else:
@@ -99,7 +106,74 @@ class ListMixin(object):
             self._check_allowed((val,))
             self._set_single(index, val)
 
+    def __iter__(self):
+        "Iterate over the items in the list"
+        for i in xrange(len(self)):
+            yield self[i]
+
+    ### Special methods for arithmetic operations ###
+    def __add__(self, other):
+        'add another list-like object'
+        return self.__class__(list(self) + list(other))
+
+    def __radd__(self, other):
+        'add to another list-like object'
+        return other.__class__(list(other) + list(self))
+
+    def __iadd__(self, other):
+        'add another list-like object to self'
+        self.extend(list(other))
+        return self
+
+    def __mul__(self, n):
+        'multiply'
+        return self.__class__(list(self) * n)
+
+    def __rmul__(self, n):
+        'multiply'
+        return self.__class__(list(self) * n)
+
+    def __imul__(self, n):
+        'multiply'
+        if n <= 0:
+            del self[:]
+        else:
+            cache = list(self)
+            for i in range(n-1):
+                self.extend(cache)
+        return self
+
+    def __cmp__(self, other):
+        'cmp'
+        slen = len(self)
+        for i in range(slen):
+            try:
+                c = cmp(self[i], other[i])
+            except IndexError:
+                # must be other is shorter
+                return 1
+            else:
+                # elements not equal
+                if c: return c
+
+        return cmp(slen, len(other))
+
     ### Public list interface Methods ###
+    ## Non-mutating ##
+    def count(self, val):
+        "Standard list count method"
+        count = 0
+        for i in self:
+            if val == i: count += 1
+        return count
+
+    def index(self, val):
+        "Standard list index method"
+        for i in xrange(0, len(self)):
+            if self[i] == val: return i
+        raise ValueError('%s not found in object' % str(val))
+
+    ## Mutating ##
     def append(self, val):
         "Standard list append method"
         self[len(self):] = [val]
@@ -120,32 +194,33 @@ class ListMixin(object):
         del self[index]
         return result
 
-    def index(self, val):
-        "Standard list index method"
-        for i in xrange(0, len(self)):
-            if self[i] == val: return i
-        raise ValueError('%s not found in object' % str(val))
-
     def remove(self, val):
         "Standard list remove method"
         del self[self.index(val)]
 
-    def count(self, val):
-        "Standard list count method"
-        count = 0
-        for i in self:
-            if val == i: count += 1
-        return count
+    def reverse(self):
+        "Standard list reverse method"
+        self[:] = self[-1::-1]
 
-    ### Private API routines unique to ListMixin ###
+    def sort(self, cmp=cmp, key=None, reverse=False):
+        "Standard list sort method"
+        if key:
+            temp = [(key(v),v) for v in self]
+            temp.sort(cmp=cmp, key=lambda x: x[0], reverse=reverse)
+            self[:] = [v[1] for v in temp]
+        else:
+            temp = list(self)
+            temp.sort(cmp=cmp, reverse=reverse)
+            self[:] = temp
 
+    ### Private routines ###
     def _rebuild(self, newLen, newItems):
         if newLen < self._minlength:
             raise ValueError('Must have at least %d items' % self._minlength)
         if self._maxlength is not None and newLen > self._maxlength:
             raise ValueError('Cannot have more than %d items' % self._maxlength)
 
-        self._set_collection(newLen, newItems)
+        self._set_list(newLen, newItems)
 
     def _set_single_rebuild(self, index, value):
         self._set_slice(slice(index, index + 1, 1), [value])
@@ -200,7 +275,7 @@ class ListMixin(object):
                 if i in newVals:
                     yield newVals[i]
                 else:
-                    yield self._getitem_internal(i)
+                    yield self._get_single_internal(i)
 
         self._rebuild(newLen, newItems())
 
@@ -229,6 +304,6 @@ class ListMixin(object):
 
                 if i < origLen:
                     if i < start or i >= stop:
-                        yield self._getitem_internal(i)
+                        yield self._get_single_internal(i)
 
         self._rebuild(newLen, newItems())

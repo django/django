@@ -90,7 +90,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
 
         # Post-initialization setup.
         self._post_init(srid)
-        super(GEOSGeometry, self).__init__()
 
     def _post_init(self, srid):
         "Helper routine for performing post-initialization setup."

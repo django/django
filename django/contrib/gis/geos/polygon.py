@@ -59,9 +59,8 @@ class Polygon(GEOSGeometry):
         return GEOSGeometry( 'POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' %  (
                 x0, y0, x0, y1, x1, y1, x1, y0, x0, y0) )
 
-    ### These classmethods and routines are needed for list-like operation w/ListMixin ###
-    @classmethod
-    def _create_polygon(cls, length, items):
+    ### These routines are needed for list-like operation w/ListMixin ###
+    def _create_polygon(self, length, items):
         # Instantiate LinearRing objects if necessary, but don't clone them yet
         # _construct_ring will throw a TypeError if a parameter isn't a valid ring
         # If we cloned the pointers here, we wouldn't be able to clean up
@@ -71,30 +70,28 @@ class Polygon(GEOSGeometry):
             if isinstance(r, GEOM_PTR):
                 rings.append(r)
             else:
-                rings.append(cls._construct_ring(r))
+                rings.append(self._construct_ring(r))
 
-        shell = cls._clone(rings.pop(0))
+        shell = self._clone(rings.pop(0))
 
         n_holes = length - 1
         if n_holes:
             holes = get_pointer_arr(n_holes)
             for i, r in enumerate(rings):
-                holes[i] = cls._clone(r)
+                holes[i] = self._clone(r)
                 holes_param = byref(holes)
         else:
             holes_param = None
 
         return capi.create_polygon(shell, holes_param, c_uint(n_holes))
 
-    @classmethod
-    def _clone(cls, g):
+    def _clone(self, g):
         if isinstance(g, GEOM_PTR):
             return capi.geom_clone(g)
         else:
             return capi.geom_clone(g.ptr)
 
-    @classmethod
-    def _construct_ring(cls, param, msg='Parameter must be a sequence of LinearRings or objects that can initialize to LinearRings'):
+    def _construct_ring(self, param, msg='Parameter must be a sequence of LinearRings or objects that can initialize to LinearRings'):
         "Helper routine for trying to construct a ring from the given parameter."
         if isinstance(param, LinearRing): return param
         try:
@@ -103,7 +100,7 @@ class Polygon(GEOSGeometry):
         except TypeError:
             raise TypeError(msg)
 
-    def _set_collection(self, length, items):
+    def _set_list(self, length, items):
         # Getting the current pointer, replacing with the newly constructed
         # geometry, and destroying the old geometry.
         prev_ptr = self.ptr
@@ -112,7 +109,7 @@ class Polygon(GEOSGeometry):
         if srid: self.srid = srid
         capi.destroy_geom(prev_ptr)
 
-    def _getitem_internal(self, index):
+    def _get_single_internal(self, index):
         """
         Returns the ring at the specified index.  The first index, 0, will
         always return the exterior ring.  Indices > 0 will return the
@@ -120,8 +117,8 @@ class Polygon(GEOSGeometry):
         return the first and second interior ring, respectively).
 
         CAREFUL: Internal/External are not the same as Interior/Exterior!
-        _getitem_internal returns a pointer from the existing geometries for use
-        internally by the object's methods.  _getitem_external returns a clone
+        _get_single_internal returns a pointer from the existing geometries for use
+        internally by the object's methods.  _get_single_external returns a clone
         of the same geometry for use by external code.
         """
         if index == 0:
@@ -130,8 +127,11 @@ class Polygon(GEOSGeometry):
             # Getting the interior ring, have to subtract 1 from the index.
             return capi.get_intring(self.ptr, index-1)
 
-    def _getitem_external(self, index):
-        return GEOSGeometry(capi.geom_clone(self._getitem_internal(index)), srid=self.srid)
+    def _get_single_external(self, index):
+        return GEOSGeometry(capi.geom_clone(self._get_single_internal(index)), srid=self.srid)
+
+    _set_single = GEOSGeometry._set_single_rebuild
+    _assign_extended_slice = GEOSGeometry._assign_extended_slice_rebuild
 
     #### Polygon Properties ####
     @property

@@ -49,8 +49,7 @@ class GeometryCollection(GEOSGeometry):
         return self.num_geom
 
     ### Methods for compatibility with ListMixin ###
-    @classmethod
-    def _create_collection(cls, length, items):
+    def _create_collection(self, length, items):
         # Creating the geometry pointer array.
         geoms = get_pointer_arr(length)
         for i, g in enumerate(items):
@@ -58,23 +57,26 @@ class GeometryCollection(GEOSGeometry):
             # allow GEOSGeometry types (python wrappers) or pointer types
             geoms[i] = capi.geom_clone(getattr(g, 'ptr', g))
 
-        return capi.create_collection(c_int(cls._typeid), byref(geoms), c_uint(length))
+        return capi.create_collection(c_int(self._typeid), byref(geoms), c_uint(length))
 
-    def _getitem_internal(self, index):
+    def _get_single_internal(self, index):
         return capi.get_geomn(self.ptr, index)
 
-    def _getitem_external(self, index):
+    def _get_single_external(self, index):
         "Returns the Geometry from this Collection at the given index (0-based)."
         # Checking the index and returning the corresponding GEOS geometry.
-        return GEOSGeometry(capi.geom_clone(self._getitem_internal(index)), srid=self.srid)
+        return GEOSGeometry(capi.geom_clone(self._get_single_internal(index)), srid=self.srid)
 
-    def _set_collection(self, length, items):
+    def _set_list(self, length, items):
         "Create a new collection, and destroy the contents of the previous pointer."
         prev_ptr = self.ptr
         srid = self.srid
         self.ptr = self._create_collection(length, items)
         if srid: self.srid = srid
         capi.destroy_geom(prev_ptr)
+
+    _set_single = GEOSGeometry._set_single_rebuild
+    _assign_extended_slice = GEOSGeometry._assign_extended_slice_rebuild
 
     @property
     def kml(self):

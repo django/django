@@ -1,4 +1,6 @@
-# Copyright (c) 2008-2009 Aryeh Leib Taurog, all rights reserved.
+# Copyright (c) 2008-2009 Aryeh Leib Taurog, http://www.aryehleib.com
+# All rights reserved.
+#
 # Modified from original contribution by Aryeh Leib Taurog, which was
 # released under the New BSD license.
 import unittest
@@ -12,13 +14,11 @@ class UserListA(ListMixin):
 
     def __len__(self):  return len(self._list)
 
-    def __iter__(self): return iter(self._list)
-
     def __str__(self):  return str(self._list)
 
     def __repr__(self): return repr(self._list)
 
-    def _set_collection(self, length, items):
+    def _set_list(self, length, items):
         # this would work:
         # self._list = self._mytype(items)
         # but then we wouldn't be testing length parameter
@@ -28,12 +28,8 @@ class UserListA(ListMixin):
 
         self._list = self._mytype(itemList)
 
-    def _getitem_external(self, index):
+    def _get_single_external(self, index):
         return self._list[index]
-
-    _getitem_internal = _getitem_external
-    _set_single = ListMixin._set_single_rebuild
-    _assign_extended_slice = ListMixin._assign_extended_slice_rebuild
 
 class UserListB(UserListA):
     _mytype = list
@@ -55,22 +51,19 @@ class ListMixinTest(unittest.TestCase):
     limit = 3
     listType = UserListA
 
-    @classmethod
-    def lists_of_len(cls, length=None):
-        if length is None: length = cls.limit
+    def lists_of_len(self, length=None):
+        if length is None: length = self.limit
         pl = range(length)
-        return pl, cls.listType(pl)
+        return pl, self.listType(pl)
 
-    @classmethod
-    def limits_plus(cls, b):
-        return range(-cls.limit - b, cls.limit + b)
+    def limits_plus(self, b):
+        return range(-self.limit - b, self.limit + b)
 
-    @classmethod
-    def step_range(cls):
-        return range(-1 - cls.limit, 0) + range(1, 1 + cls.limit)
+    def step_range(self):
+        return range(-1 - self.limit, 0) + range(1, 1 + self.limit)
 
     def test01_getslice(self):
-        'Testing slice retrieval'
+        'Slice retrieval'
         pl, ul = self.lists_of_len()
         for i in self.limits_plus(1):
             self.assertEqual(pl[i:], ul[i:], 'slice [%d:]' % (i))
@@ -89,7 +82,7 @@ class ListMixinTest(unittest.TestCase):
             self.assertEqual(pl[::k], ul[::k], 'slice [::%d]' % (k))
 
     def test02_setslice(self):
-        'Testing slice assignment'
+        'Slice assignment'
         def setfcn(x,i,j,k,L): x[i:j:k] = range(L)
         pl, ul = self.lists_of_len()
         for slen in range(self.limit + 1):
@@ -145,7 +138,7 @@ class ListMixinTest(unittest.TestCase):
 
 
     def test03_delslice(self):
-        'Testing delete slice'
+        'Delete slice'
         for Len in range(self.limit):
             pl, ul = self.lists_of_len(Len)
             del pl[:]
@@ -189,7 +182,7 @@ class ListMixinTest(unittest.TestCase):
                 self.assertEqual(pl[:], ul[:], 'del slice [::%d]' % (k))
 
     def test04_get_set_del_single(self):
-        'Testing get/set/delete single item'
+        'Get/set/delete single item'
         pl, ul = self.lists_of_len()
         for i in self.limits_plus(0):
             self.assertEqual(pl[i], ul[i], 'get single item [%d]' % i)
@@ -207,7 +200,7 @@ class ListMixinTest(unittest.TestCase):
             self.assertEqual(pl[:], ul[:], 'del single item [%d]' % i)
 
     def test05_out_of_range_exceptions(self):
-        'Testing out of range exceptions'
+        'Out of range exceptions'
         def setfcn(x, i): x[i] = 20
         def getfcn(x, i): return x[i]
         def delfcn(x, i): del x[i]
@@ -218,7 +211,7 @@ class ListMixinTest(unittest.TestCase):
             self.assertRaises(IndexError, delfcn, ul, i) # 'del index %d' % i)
 
     def test06_list_methods(self):
-        'Testing list methods'
+        'List methods'
         pl, ul = self.lists_of_len()
         pl.append(40)
         ul.append(40)
@@ -227,6 +220,10 @@ class ListMixinTest(unittest.TestCase):
         pl.extend(range(50,55))
         ul.extend(range(50,55))
         self.assertEqual(pl[:], ul[:], 'extend')
+
+        pl.reverse()
+        ul.reverse()
+        self.assertEqual(pl[:], ul[:], 'reverse')
 
         for i in self.limits_plus(1):
             pl, ul = self.lists_of_len()
@@ -267,7 +264,7 @@ class ListMixinTest(unittest.TestCase):
         self.assertRaises(ValueError, removefcn, ul, 40)
 
     def test07_allowed_types(self):
-        'Testing type-restricted list'
+        'Type-restricted list'
         pl, ul = self.lists_of_len()
         ul._allowed = (int, long)
         ul[1] = 50
@@ -277,7 +274,7 @@ class ListMixinTest(unittest.TestCase):
         self.assertRaises(TypeError, setfcn, ul, slice(0,3,2), ('hello','goodbye'))
 
     def test08_min_length(self):
-        'Testing length limits'
+        'Length limits'
         pl, ul = self.lists_of_len()
         ul._minlength = 1
         def delfcn(x,i): del x[:i]
@@ -293,13 +290,13 @@ class ListMixinTest(unittest.TestCase):
         self.assertRaises(ValueError, ul.append, 10)
 
     def test09_iterable_check(self):
-        'Testing error on assigning non-iterable to slice'
+        'Error on assigning non-iterable to slice'
         pl, ul = self.lists_of_len(self.limit + 1)
         def setfcn(x, i, v): x[i] = v
         self.assertRaises(TypeError, setfcn, ul, slice(0,3,2), 2)
 
     def test10_checkindex(self):
-        'Testing index check'
+        'Index check'
         pl, ul = self.lists_of_len()
         for i in self.limits_plus(0):
             if i < 0:
@@ -312,6 +309,78 @@ class ListMixinTest(unittest.TestCase):
 
         ul._IndexError = TypeError
         self.assertRaises(TypeError, ul._checkindex, -self.limit - 1)
+
+    def test_11_sorting(self):
+        'Sorting'
+        pl, ul = self.lists_of_len()
+        pl.insert(0, pl.pop())
+        ul.insert(0, ul.pop())
+        pl.sort()
+        ul.sort()
+        self.assertEqual(pl[:], ul[:], 'sort')
+        mid = pl[len(pl) / 2]
+        pl.sort(key=lambda x: (mid-x)**2)
+        ul.sort(key=lambda x: (mid-x)**2)
+        self.assertEqual(pl[:], ul[:], 'sort w/ key')
+
+        pl.insert(0, pl.pop())
+        ul.insert(0, ul.pop())
+        pl.sort(reverse=True)
+        ul.sort(reverse=True)
+        self.assertEqual(pl[:], ul[:], 'sort w/ reverse')
+        mid = pl[len(pl) / 2]
+        pl.sort(key=lambda x: (mid-x)**2)
+        ul.sort(key=lambda x: (mid-x)**2)
+        self.assertEqual(pl[:], ul[:], 'sort w/ key')
+
+    def test_12_arithmetic(self):
+        'Arithmetic'
+        pl, ul = self.lists_of_len()
+        al = range(10,14)
+        self.assertEqual(list(pl + al), list(ul + al), 'add')
+        self.assertEqual(type(ul), type(ul + al), 'type of add result')
+        self.assertEqual(list(al + pl), list(al + ul), 'radd')
+        self.assertEqual(type(al), type(al + ul), 'type of radd result')
+        objid = id(ul)
+        pl += al
+        ul += al
+        self.assertEqual(pl[:], ul[:], 'in-place add')
+        self.assertEqual(objid, id(ul), 'in-place add id')
+
+        for n in (-1,0,1,3):
+            pl, ul = self.lists_of_len()
+            self.assertEqual(list(pl * n), list(ul * n), 'mul by %d' % n)
+            self.assertEqual(type(ul), type(ul * n), 'type of mul by %d result' % n)
+            self.assertEqual(list(n * pl), list(n * ul), 'rmul by %d' % n)
+            self.assertEqual(type(ul), type(n * ul), 'type of rmul by %d result' % n)
+            objid = id(ul)
+            pl *= n
+            ul *= n
+            self.assertEqual(pl[:], ul[:], 'in-place mul by %d' % n)
+            self.assertEqual(objid, id(ul), 'in-place mul by %d id' % n)
+
+        pl, ul = self.lists_of_len()
+        self.assertEqual(pl, ul, 'cmp for equal')
+        self.assert_(pl >= ul, 'cmp for gte self')
+        self.assert_(pl <= ul, 'cmp for lte self')
+        self.assert_(ul >= pl, 'cmp for self gte')
+        self.assert_(ul <= pl, 'cmp for self lte')
+
+        self.assert_(pl + [5] > ul, 'cmp')
+        self.assert_(pl + [5] >= ul, 'cmp')
+        self.assert_(pl < ul + [2], 'cmp')
+        self.assert_(pl <= ul + [2], 'cmp')
+        self.assert_(ul + [5] > pl, 'cmp')
+        self.assert_(ul + [5] >= pl, 'cmp')
+        self.assert_(ul < pl + [2], 'cmp')
+        self.assert_(ul <= pl + [2], 'cmp')
+
+        pl[1] = 20
+        self.assert_(pl > ul, 'cmp for gt self')
+        self.assert_(ul < pl, 'cmp for self lt')
+        pl[1] = -20
+        self.assert_(pl < ul, 'cmp for lt self')
+        self.assert_(pl < ul, 'cmp for lt self')
 
 class ListMixinTestSingle(ListMixinTest):
     listType = UserListB

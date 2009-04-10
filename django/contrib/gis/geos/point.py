@@ -5,6 +5,7 @@ from django.contrib.gis.geos import prototypes as capi
 
 class Point(GEOSGeometry):
     _minlength = 2
+    _maxlength = 3
 
     def __init__(self, x, y=None, z=None, srid=None):
         """
@@ -36,7 +37,6 @@ class Point(GEOSGeometry):
         #  createPoint factory.
         super(Point, self).__init__(point, srid=srid)
 
-    @classmethod
     def _create_point(self, ndim, coords):
         """
         Create a coordinate sequence, set X, Y, [Z], and create point
@@ -52,7 +52,7 @@ class Point(GEOSGeometry):
 
         return capi.create_point(cs)
 
-    def _set_collection(self, length, items):
+    def _set_list(self, length, items):
         ptr = self._create_point(length, items)
         if ptr:
             capi.destroy_geom(self.ptr)
@@ -76,15 +76,15 @@ class Point(GEOSGeometry):
         if self.hasz: return 3
         else: return 2
 
-    def _getitem_external(self, index):
-        self._checkindex(index)
+    def _get_single_external(self, index):
         if index == 0:
             return self.x
         elif index == 1:
             return self.y
         elif index == 2:
             return self.z
-    _getitem_internal = _getitem_external
+
+    _get_single_internal = _get_single_external
 
     def get_x(self):
         "Returns the X component of the Point."

@@ -45,15 +45,15 @@ class GEOSMutationTest(unittest.TestCase):
     def test01_PointMutations(self):
         'Testing Point mutations'
         for p in (Point(1,2,3), fromstr('POINT (1 2 3)')):
-            self.assertEqual(p._getitem_external(1), 2.0, 'Point _getitem_external')
+            self.assertEqual(p._get_single_external(1), 2.0, 'Point _get_single_external')
 
             # _set_single
             p._set_single(0,100)
             self.assertEqual(p.coords, (100.0,2.0,3.0), 'Point _set_single')
 
-            # _set_collection
-            p._set_collection(2,(50,3141))
-            self.assertEqual(p.coords, (50.0,3141.0), 'Point _set_collection')
+            # _set_list
+            p._set_list(2,(50,3141))
+            self.assertEqual(p.coords, (50.0,3141.0), 'Point _set_list')
 
     def test02_PointExceptions(self):
         'Testing Point exceptions'
@@ -72,15 +72,15 @@ class GEOSMutationTest(unittest.TestCase):
         'Testing LineString mutations'
         for ls in (LineString((1,0),(4,1),(6,-1)),
                     fromstr('LINESTRING (1 0,4 1,6 -1)')):
-            self.assertEqual(ls._getitem_external(1), (4.0,1.0), 'LineString _getitem_external')
+            self.assertEqual(ls._get_single_external(1), (4.0,1.0), 'LineString _get_single_external')
 
             # _set_single
             ls._set_single(0,(-50,25))
             self.assertEqual(ls.coords, ((-50.0,25.0),(4.0,1.0),(6.0,-1.0)), 'LineString _set_single')
 
-            # _set_collection
-            ls._set_collection(2, ((-50.0,25.0),(6.0,-1.0)))
-            self.assertEqual(ls.coords, ((-50.0,25.0),(6.0,-1.0)), 'LineString _set_collection')
+            # _set_list
+            ls._set_list(2, ((-50.0,25.0),(6.0,-1.0)))
+            self.assertEqual(ls.coords, ((-50.0,25.0),(6.0,-1.0)), 'LineString _set_list')
 
             lsa = LineString(ls.coords)
             for f in geos_function_tests:
@@ -91,20 +91,20 @@ class GEOSMutationTest(unittest.TestCase):
         for pg in (Polygon(((1,0),(4,1),(6,-1),(8,10),(1,0)),
                             ((5,4),(6,4),(6,3),(5,4))),
                     fromstr('POLYGON ((1 0,4 1,6 -1,8 10,1 0),(5 4,6 4,6 3,5 4))')):
-            self.assertEqual(pg._getitem_external(0),
+            self.assertEqual(pg._get_single_external(0),
                             LinearRing((1,0),(4,1),(6,-1),(8,10),(1,0)),
-                            'Polygon _getitem_external(0)')
-            self.assertEqual(pg._getitem_external(1),
+                            'Polygon _get_single_external(0)')
+            self.assertEqual(pg._get_single_external(1),
                             LinearRing((5,4),(6,4),(6,3),(5,4)),
-                            'Polygon _getitem_external(1)')
+                            'Polygon _get_single_external(1)')
 
-            # _set_collection
-            pg._set_collection(2, (((1,2),(10,0),(12,9),(-1,15),(1,2)),
+            # _set_list
+            pg._set_list(2, (((1,2),(10,0),(12,9),(-1,15),(1,2)),
                             ((4,2),(5,2),(5,3),(4,2))))
             self.assertEqual(pg.coords,
                     (((1.0,2.0),(10.0,0.0),(12.0,9.0),(-1.0,15.0),(1.0,2.0)),
                         ((4.0,2.0),(5.0,2.0),(5.0,3.0),(4.0,2.0))),
-                    'Polygon _set_collection')
+                    'Polygon _set_list')
 
             lsa = Polygon(*pg.coords)
             for f in geos_function_tests:
@@ -114,10 +114,10 @@ class GEOSMutationTest(unittest.TestCase):
         'Testing Collection mutations'
         for mp in (MultiPoint(*map(Point,((3,4),(-1,2),(5,-4),(2,8)))),
                     fromstr('MULTIPOINT (3 4,-1 2,5 -4,2 8)')):
-            self.assertEqual(mp._getitem_external(2), Point(5,-4), 'Collection _getitem_external')
+            self.assertEqual(mp._get_single_external(2), Point(5,-4), 'Collection _get_single_external')
 
-            mp._set_collection(3, map(Point,((5,5),(3,-2),(8,1))))
-            self.assertEqual(mp.coords, ((5.0,5.0),(3.0,-2.0),(8.0,1.0)), 'Collection _set_collection')
+            mp._set_list(3, map(Point,((5,5),(3,-2),(8,1))))
+            self.assertEqual(mp.coords, ((5.0,5.0),(3.0,-2.0),(8.0,1.0)), 'Collection _set_list')
 
             lsa = MultiPoint(*map(Point,((5,5),(3,-2),(8,1))))
             for f in geos_function_tests:
