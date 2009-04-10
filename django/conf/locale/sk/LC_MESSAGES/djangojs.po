@@ -1,13 +1,13 @@
 # Slovak translation of Django
 # This file is distributed under the same license as the Django package.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-01 19:21+0200\n"
-"PO-Revision-Date: 2009-01-24 13:04+0100\n"
-"Last-Translator: Marcel Telka <marcel@telka.sk>\n"
+"POT-Creation-Date: 2009-03-20 20:16+0100\n"
+"PO-Revision-Date: 2009-03-15 17:23+0100\n"
+"Last-Translator: Marian Andre <django@andre.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -44,18 +44,22 @@ msgstr "Zvoľte si a kliknite "
 msgid "Clear all"
 msgstr "Všetko zrušiť"
 
-#: contrib/admin/media/js/dateparse.js:32
 #: contrib/admin/media/js/calendar.js:24
-msgid "January February March April May June July August September October November December"
-msgstr "január február marec apríl máj jún júl august september október november december"
-
-#: contrib/admin/media/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "nedeľa pondelok utorok streda štvrtok piatok sobota"
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"január február marec apríl máj jún júl august september október november "
+"december"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
 msgstr "N P U S Š P S"
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "nedeľa pondelok utorok streda štvrtok piatok sobota"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
