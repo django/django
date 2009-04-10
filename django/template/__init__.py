@@ -480,8 +480,7 @@ filter_raw_string = r"""
     'arg_sep': re.escape(FILTER_ARGUMENT_SEPARATOR),
   }
 
-filter_raw_string = filter_raw_string.replace("\n", "").replace(" ", "")
-filter_re = re.compile(filter_raw_string, re.UNICODE)
+filter_re = re.compile(filter_raw_string, re.UNICODE|re.VERBOSE)
 
 class FilterExpression(object):
     r"""

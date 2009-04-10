@@ -197,7 +197,13 @@ def javascript_quote(s, quote_double_quotes=False):
     return str(ustring_re.sub(fix, s))
 javascript_quote = allow_lazy(javascript_quote, unicode)
 
-smart_split_re = re.compile('("(?:[^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'(?:[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\'|[^\\s]+)')
+# Expression to match some_token and some_token="with spaces" (and similarly
+# for single-quoted strings).
+smart_split_re = re.compile(r"""
+    ([^\s"]*"(?:[^"\\]*(?:\\.[^"\\]*)*)"\S*|
+     [^\s']*'(?:[^'\\]*(?:\\.[^'\\]*)*)'\S*|
+     \S+)""", re.VERBOSE)
+
 def smart_split(text):
     r"""
     Generator that splits a string by spaces, leaving quoted phrases together.

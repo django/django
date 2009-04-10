@@ -1100,7 +1100,7 @@ def url(parser, token):
 
     The URL will look like ``/clients/client/123/``.
     """
-    bits = token.contents.split(' ')
+    bits = token.split_contents()
     if len(bits) < 2:
         raise TemplateSyntaxError("'%s' takes at least one argument"
                                   " (path to a view)" % bits[0])
