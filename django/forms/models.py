@@ -436,7 +436,7 @@ class BaseModelFormSet(BaseFormSet):
                     self.deleted_objects.append(obj)
                     obj.delete()
                     continue
-            if form.changed_data:
+            if form.has_changed():
                 self.changed_objects.append((obj, form.changed_data))
                 saved_instances.append(self.save_existing(form, obj, commit=commit))
                 if not commit:
