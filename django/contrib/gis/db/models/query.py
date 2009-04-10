@@ -4,10 +4,9 @@ from django.db.models.query import QuerySet, Q, ValuesQuerySet, ValuesListQueryS
 
 from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.db.models import aggregates
-from django.contrib.gis.db.models.fields import GeometryField, PointField
+from django.contrib.gis.db.models.fields import get_srid_info, GeometryField, PointField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery, GeoWhereNode
 from django.contrib.gis.measure import Area, Distance
-from django.contrib.gis.models import get_srid_info
 
 class GeoQuerySet(QuerySet):
     "The Geographic QuerySet."

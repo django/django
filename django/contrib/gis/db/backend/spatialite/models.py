@@ -48,6 +48,11 @@ class SpatialRefSys(models.Model):
     ref_sys_name = models.CharField(max_length=256)
     proj4text = models.CharField(max_length=2048)
 
+    @property
+    def wkt(self):
+        from django.contrib.gis.gdal import SpatialReference
+        return SpatialReference(self.proj4text).wkt
+    
     class Meta:
         abstract = True
         db_table = 'spatial_ref_sys'

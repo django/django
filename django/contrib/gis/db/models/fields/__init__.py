@@ -4,18 +4,30 @@ from django.contrib.gis.db.backend import SpatialBackend, gqn
 # GeometryProxy, GEOS, and Distance imports.
 from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.measure import Distance
-# The `get_srid_info` function gets SRID information from the spatial
-# reference system table w/o using the ORM.
-from django.contrib.gis.models import get_srid_info
-
-def deprecated_property(func):
-    from warnings import warn
-    warn('This attribute has been deprecated, please use "%s" instead.' % func.__name__[1:])
-    return property(func)
 
 # Local cache of the spatial_ref_sys table, which holds static data.
 # This exists so that we don't have to hit the database each time.
-SRID_CACHE = {}
+_srid_cache = {}
+
+def get_srid_info(srid):
+    """
+    Returns the units, unit name, and spheroid WKT associated with the
+    given SRID from the `spatial_ref_sys` (or equivalent) spatial database
+    table.  These results are cached.
+    """
+    global _srid_cache
+
+    if SpatialBackend.mysql:
+        return None, None, None
+
+    if not srid in _srid_cache:
+        from django.contrib.gis.models import SpatialRefSys
+        sr = SpatialRefSys.objects.get(srid=srid)
+        units, units_name = sr.units
+        spheroid = SpatialRefSys.get_spheroid(sr.wkt)
+        _srid_cache[srid] = (units, units_name, spheroid)
+
+    return _srid_cache[srid]
 
 class GeometryField(SpatialBackend.Field):
     "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -51,9 +63,6 @@ class GeometryField(SpatialBackend.Field):
         # easily available in the field instance for distance queries.
         self.srid = srid
 
-        # units_cache, units_name_cache and _spheroid_cache are lazily loaded.
-        self._units_cache = self._units_name_cache = self._spheroid_cache = None
-
         # Setting the dimension of the geometry field.
         self.dim = dim
 
@@ -63,28 +72,29 @@ class GeometryField(SpatialBackend.Field):
 
         super(GeometryField, self).__init__(**kwargs) # Calling the parent initializtion function
 
-    def _populate_srid_info(self):
-        if self.srid not in SRID_CACHE:
-            SRID_CACHE[self.srid] = get_srid_info(self.srid)
-        self._units_cache, self._units_name_cache, self._spheroid_cache = SRID_CACHE[self.srid]
+    # The following properties are used to get the units, their name, and
+    # the spheroid corresponding to the SRID of the GeometryField.
+    def _get_srid_info(self):
+        # Get attributes from `get_srid_info`.
+        self._units, self._units_name, self._spheroid = get_srid_info(self.srid)
 
-    def _get_units(self):
-        if self._units_cache is None:
-            self._populate_srid_info()
-        return self._units_cache
-    units = property(_get_units)
+    @property
+    def spheroid(self):
+        if not hasattr(self, '_spheroid'):
+            self._get_srid_info()
+        return self._spheroid
 
-    def _get_units_name(self):
-        if self._units_name_cache is None:
-            self._populate_srid_info()
-        return self._units_name_cache
-    units_name = property(_get_units_name)
+    @property
+    def units(self):
+        if not hasattr(self, '_units'):
+            self._get_srid_info()
+        return self._units
 
-    def _get_spheroid(self):
-        if self._spheroid_cache is None:
-            self._populate_srid_info()
-        return self._spheroid_cache
-    _spheroid = property(_get_spheroid)
+    @property
+    def units_name(self):
+        if not hasattr(self, '_units_name'):
+            self._get_srid_info()
+        return self._units_name
 
     # The following properties are for formerly private variables that are now
     # public for GeometryField.  Because of their use by third-party applications,

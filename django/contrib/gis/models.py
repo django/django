@@ -214,14 +214,6 @@ class SpatialRefSysMixin(object):
         except:
             return unicode(self.wkt)
 
-# Defining dummy default first; if spatial db, will overrride.
-def get_srid_info(srid):
-    """
-    Dummy routine for the backends that do not have the OGC required
-    spatial metadata tables (like MySQL).
-    """
-    return None, None, None
-
 # Django test suite on 2.3 platforms will choke on code inside this
 # conditional.
 if not PYTHON23:
@@ -237,62 +229,5 @@ if not PYTHON23:
         class SpatialRefSys(SpatialBackend.SpatialRefSys, SpatialRefSysMixin):
             pass
         GeometryColumns = SpatialBackend.GeometryColumns
-
-        # Override `get_srid_info` with something real thing.
-        def get_srid_info(srid):
-            """
-            Returns the units, unit name, and spheroid WKT associated with the
-            given SRID from the `spatial_ref_sys` (or equivalent) spatial database
-            table.  We use a database cursor to execute the query because this
-            function is used when it is not possible to use the ORM (for example,
-            during field initialization).
-            """
-            # SRID=-1 is a common convention for indicating the geometry has no
-            # spatial reference information associated with it.  Thus, we will
-            # return all None values without raising an exception.
-            if srid == -1: return None, None, None
-
-            # Getting the spatial reference WKT associated with the SRID from the
-            # `spatial_ref_sys` (or equivalent) spatial database table. This query
-            # cannot be executed using the ORM because this information is needed
-            # when the ORM cannot be used (e.g., during the initialization of
-            # `GeometryField`).
-            from django.db import connection
-            cur = connection.cursor()
-            qn = connection.ops.quote_name
-            stmt = 'SELECT %(table)s.%(wkt_col)s FROM %(table)s WHERE (%(table)s.%(srid_col)s = %(srid)s)'
-            params = {'table' : qn(SpatialRefSys._meta.db_table),
-                      'srid_col' : qn('srid'),
-                      'srid' : srid,
-                      }
-            if SpatialBackend.spatialite:
-                if not HAS_GDAL: raise Exception('GDAL is required to use the SpatiaLite backend.')
-                params['wkt_col'] = 'proj4text'
-            else:
-                params['wkt_col'] = qn(SpatialRefSys.wkt_col())
-
-            # Executing the SQL statement.
-            cur.execute(stmt % params)
-
-            # Fetching the WKT from the cursor; if the query failed raise an Exception.
-            fetched = cur.fetchone()
-            if not fetched:
-                raise ValueError('Failed to find spatial reference entry in "%s" corresponding to SRID=%s.' %
-                                 (SpatialRefSys._meta.db_table, srid))
-
-            if SpatialBackend.spatialite:
-                # Because the `spatial_ref_sys` table does _not_ contain a WKT column,
-                # we have to use GDAL to determine the units from the PROJ.4 string.
-                srs_wkt = SpatialReference(fetched[0]).wkt
-            else:
-                srs_wkt = fetched[0]
-            connection.close()
-
-            # Getting metadata associated with the spatial reference system identifier.
-            # Specifically, getting the unit information and spheroid information
-            # (both required for distance queries).
-            unit, unit_name = SpatialRefSys.get_units(srs_wkt)
-            spheroid = SpatialRefSys.get_spheroid(srs_wkt)
-            return unit, unit_name, spheroid
     except:
         pass
