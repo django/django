@@ -465,8 +465,7 @@ filter_raw_string = r"""
     'i18n_close' : re.escape(")"),
   }
 
-filter_raw_string = filter_raw_string.replace("\n", "").replace(" ", "")
-filter_re = re.compile(filter_raw_string, re.UNICODE)
+filter_re = re.compile(filter_raw_string, re.UNICODE|re.VERBOSE)
 
 class FilterExpression(object):
     """
