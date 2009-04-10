@@ -46,7 +46,9 @@ class GeometryField(SpatialBackend.Field):
         # Setting the SRID and getting the units.  Unit information must be
         # easily available in the field instance for distance queries.
         self.srid = srid
-        self.units, self.units_name, self._spheroid = get_srid_info(srid)
+
+        # units_cache, units_name_cache and _spheroid_cache are lazily loaded.
+        self._units_cache = self._units_name_cache = self._spheroid_cache = None
 
         # Setting the dimension of the geometry field.
         self.dim = dim
@@ -56,6 +58,27 @@ class GeometryField(SpatialBackend.Field):
         kwargs['verbose_name'] = verbose_name
 
         super(GeometryField, self).__init__(**kwargs) # Calling the parent initializtion function
+
+    def _populate_srid_info(self):
+        self._units_cache, self._units_name_cache, self._spheroid_cache = get_srid_info(self.srid)
+
+    def _get_units(self):
+        if self._units_cache is None:
+            self._populate_srid_info()
+        return self._units_cache
+    units = property(_get_units)
+
+    def _get_units_name(self):
+        if self._units_name_cache is None:
+            self._populate_srid_info()
+        return self._units_name_cache
+    units_name = property(_get_units_name)
+
+    def _get_spheroid(self):
+        if self._spheroid_cache is None:
+            self._populate_srid_info()
+        return self._spheroid_cache
+    _spheroid = property(_get_spheroid)
 
     # The following properties are for formerly private variables that are now
     # public for GeometryField.  Because of their use by third-party applications,
