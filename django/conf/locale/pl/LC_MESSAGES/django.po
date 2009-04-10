@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-08 10:49+0200\n"
+"POT-Creation-Date: 2009-04-10 11:44+0200\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -223,7 +223,7 @@ msgstr "chiński tradycyjny"
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Usunięto %(count)d %(items)s."
 
-#: contrib/admin/actions.py:63 contrib/admin/options.py:1010
+#: contrib/admin/actions.py:63 contrib/admin/options.py:1023
 msgid "Are you sure?"
 msgstr "Jesteś pewien?"
 
@@ -310,86 +310,86 @@ msgstr "log"
 msgid "log entries"
 msgstr "logi"
 
-#: contrib/admin/options.py:132 contrib/admin/options.py:146
+#: contrib/admin/options.py:133 contrib/admin/options.py:147
 msgid "None"
 msgstr "brak"
 
-#: contrib/admin/options.py:504
+#: contrib/admin/options.py:517
 #, python-format
 msgid "Changed %s."
 msgstr "Zmieniono %s"
 
-#: contrib/admin/options.py:504 contrib/admin/options.py:514
+#: contrib/admin/options.py:517 contrib/admin/options.py:527
 #: contrib/comments/templates/comments/preview.html:16 forms/models.py:306
 msgid "and"
 msgstr "i"
 
-#: contrib/admin/options.py:509
+#: contrib/admin/options.py:522
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Dodano %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:513
+#: contrib/admin/options.py:526
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Zmieniono %(list)s w %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:518
+#: contrib/admin/options.py:531
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Usunięto %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:522
+#: contrib/admin/options.py:535
 msgid "No fields changed."
 msgstr "Żadne pole nie zmienione."
 
-#: contrib/admin/options.py:583 contrib/auth/admin.py:67
+#: contrib/admin/options.py:596 contrib/auth/admin.py:67
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" dodany pomyślnie."
 
-#: contrib/admin/options.py:587 contrib/admin/options.py:620
+#: contrib/admin/options.py:600 contrib/admin/options.py:633
 #: contrib/auth/admin.py:75
 msgid "You may edit it again below."
 msgstr "Możesz ponownie edytować wpis poniżej."
 
-#: contrib/admin/options.py:597 contrib/admin/options.py:630
+#: contrib/admin/options.py:610 contrib/admin/options.py:643
 #, python-format
 msgid "You may add another %s below."
 msgstr "Możesz dodać nowy wpis %s poniżej."
 
-#: contrib/admin/options.py:618
+#: contrib/admin/options.py:631
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" zostało pomyślnie zmienione."
 
-#: contrib/admin/options.py:626
+#: contrib/admin/options.py:639
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" dodane pomyślnie. Możesz edytować ponownie wpis poniżej."
 
-#: contrib/admin/options.py:757
+#: contrib/admin/options.py:770
 #, python-format
 msgid "Add %s"
 msgstr "Dodaj %s"
 
-#: contrib/admin/options.py:788 contrib/admin/options.py:988
+#: contrib/admin/options.py:801 contrib/admin/options.py:1001
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Obiekt %(name)s o kluczu głównym %(key)r nie istnieje."
 
-#: contrib/admin/options.py:845
+#: contrib/admin/options.py:858
 #, python-format
 msgid "Change %s"
 msgstr "Zmień %s"
 
-#: contrib/admin/options.py:889
+#: contrib/admin/options.py:902
 msgid "Database error"
 msgstr "Błąd bazy danych"
 
-#: contrib/admin/options.py:925
+#: contrib/admin/options.py:938
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -397,12 +397,12 @@ msgstr[0] "%(count)s %(name)s został pomyślnie zmieniony."
 msgstr[1] "%(count)s %(name)s zostały pomyślnie zmienione."
 msgstr[2] "%(count)s %(name)s zostało pomyślnie zmienionych."
 
-#: contrib/admin/options.py:1003
+#: contrib/admin/options.py:1016
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" usunięty pomyślnie."
 
-#: contrib/admin/options.py:1039
+#: contrib/admin/options.py:1052
 #, python-format
 msgid "Change history: %s"
 msgstr "Historia zmian: %s"
@@ -438,17 +438,17 @@ msgstr "Nazwy użytkowników nie mogą zawierać znaku '@'."
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Podany adres e-mail nie jest Twoją nazwą użytkownika. Spróbuj '%s'."
 
-#: contrib/admin/sites.py:364
+#: contrib/admin/sites.py:360
 msgid "Site administration"
 msgstr "Administracja stroną"
 
-#: contrib/admin/sites.py:377 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:373 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Zaloguj się"
 
-#: contrib/admin/sites.py:424
+#: contrib/admin/sites.py:417
 #, python-format
 msgid "%s administration"
 msgstr "%s - administracja"
@@ -3016,15 +3016,15 @@ msgstr "Wpisz numer NIP w formacie XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgid "Wrong checksum for the Tax Number (NIP)."
 msgstr "Błędna suma kontrolna numeru NIP"
 
-#: contrib/localflavor/pl/forms.py:111
-msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
-msgstr "Numer REGON składa się z 7 lub 9 cyfr."
+#: contrib/localflavor/pl/forms.py:109
+msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
+msgstr "Numer REGON składa się z 9 lub 14 cyfr."
 
-#: contrib/localflavor/pl/forms.py:112
+#: contrib/localflavor/pl/forms.py:110
 msgid "Wrong checksum for the National Business Register Number (REGON)."
 msgstr "Błędna suma kontrolna numeru REGON"
 
-#: contrib/localflavor/pl/forms.py:155
+#: contrib/localflavor/pl/forms.py:148
 msgid "Enter a postal code in the format XX-XXX."
 msgstr "Wpisz kod pocztowy w formacie XX-XXX."
 
@@ -3981,11 +3981,11 @@ msgstr "Upewnij się, że jest nie więcej niż %s miejsc po przecinku."
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Upewnij się, że jest nie więcej niż %s miejsc przed przecinkiem."
 
-#: forms/fields.py:288 forms/fields.py:855
+#: forms/fields.py:288 forms/fields.py:862
 msgid "Enter a valid date."
 msgstr "Wpisz poprawną datę."
 
-#: forms/fields.py:322 forms/fields.py:856
+#: forms/fields.py:322 forms/fields.py:863
 msgid "Enter a valid time."
 msgstr "Wpisz poprawną godzinę."
 
@@ -4039,11 +4039,11 @@ msgstr ""
 msgid "Enter a list of values."
 msgstr "Podaj listę wartości."
 
-#: forms/fields.py:884
+#: forms/fields.py:891
 msgid "Enter a valid IPv4 address."
 msgstr "Wprowadź poprawny adres IPv4."
 
-#: forms/fields.py:894
+#: forms/fields.py:901
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "To pole może zawierać jedynie litery, cyfry, podkreślenia i myślniki."
