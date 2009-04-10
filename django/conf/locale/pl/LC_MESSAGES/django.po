@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-08 10:54+0200\n"
+"POT-Creation-Date: 2009-04-10 11:52+0200\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -2887,15 +2887,15 @@ msgstr "Wpisz numer NIP w formacie XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgid "Wrong checksum for the Tax Number (NIP)."
 msgstr "Błędna suma kontrolna numeru NIP"
 
-#: contrib/localflavor/pl/forms.py:111
-msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
-msgstr "Numer REGON składa się z 7 lub 9 cyfr."
+#: contrib/localflavor/pl/forms.py:109
+msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
+msgstr "Numer REGON składa się z 9 lub 14 cyfr."
 
-#: contrib/localflavor/pl/forms.py:112
+#: contrib/localflavor/pl/forms.py:110
 msgid "Wrong checksum for the National Business Register Number (REGON)."
 msgstr "Błędna suma kontrolna numeru REGON"
 
-#: contrib/localflavor/pl/forms.py:155
+#: contrib/localflavor/pl/forms.py:148
 msgid "Enter a postal code in the format XX-XXX."
 msgstr "Wpisz kod pocztowy w formacie XX-XXX."
 
@@ -3856,11 +3856,11 @@ msgstr "Upewnij się, że jest nie więcej niż %s miejsc po przecinku."
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Upewnij się, że jest nie więcej niż %s miejsc przed przecinkiem."
 
-#: forms/fields.py:287 forms/fields.py:854
+#: forms/fields.py:287 forms/fields.py:861
 msgid "Enter a valid date."
 msgstr "Wpisz poprawną datę."
 
-#: forms/fields.py:321 forms/fields.py:855
+#: forms/fields.py:321 forms/fields.py:862
 msgid "Enter a valid time."
 msgstr "Wpisz poprawną godzinę."
 
@@ -3914,11 +3914,11 @@ msgstr ""
 msgid "Enter a list of values."
 msgstr "Podaj listę wartości."
 
-#: forms/fields.py:883
+#: forms/fields.py:890
 msgid "Enter a valid IPv4 address."
 msgstr "Wprowadź poprawny adres IPv4."
 
-#: forms/fields.py:893
+#: forms/fields.py:900
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "To pole może zawierać jedynie litery, cyfry, podkreślenia i myślniki."
