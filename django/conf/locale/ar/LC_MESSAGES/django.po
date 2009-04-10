@@ -1,20 +1,22 @@
 # translation of django.po to Arabic
 # This file is distributed under the same license as the django package.
 #
-# Ossama M. Khayat <okhayat@yahoo.com>, 2008.
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-11 15:57+0300\n"
-"PO-Revision-Date: 2008-11-11 16:26+0300\n"
+"POT-Creation-Date: 2009-03-31 11:13+0300\n"
+"PO-Revision-Date: 2009-03-31 11:19+0300\n"
 "Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
 "Language-Team: Arabic <support@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=4; plural=(n == 1? 0 : (n == 2? 1 : (n <= 10? 2 : 3)))\n"
+"Plural-Forms: nplurals=4; plural=(n == 1? 0 : (n == 2? 1 : (n <= 10? 2 : 3)))\n\n"
+"\n"
+"\n"
+"\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -101,118 +103,122 @@ msgid "Hebrew"
 msgstr "العبريّة"
 
 #: conf/global_settings.py:65
+msgid "Hindi"
+msgstr "الهندية"
+
+#: conf/global_settings.py:66
 msgid "Croatian"
 msgstr "الكرواتيّة"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Icelandic"
 msgstr "الآيسلنديّة"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Italian"
 msgstr "الإيطاليّة"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Japanese"
 msgstr "اليابانيّة"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Georgian"
 msgstr "الجورجيّة"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Korean"
 msgstr "الكوريّة"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Khmer"
 msgstr "الخمر"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Kannada"
 msgstr "الهنديّة (كنّادا)"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Latvian"
 msgstr "اللاتفيّة"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Lithuanian"
 msgstr "اللتوانيّة"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Macedonian"
 msgstr "المقدونيّة"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Dutch"
 msgstr "الهولنديّة"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Norwegian"
 msgstr "النرويجيّة"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Polish"
 msgstr "البولنديّة"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Portuguese"
 msgstr "البرتغاليّة"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Brazilian Portuguese"
 msgstr "البرتغاليّة البرازيليّة"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Romanian"
 msgstr "الرومانيّة"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Russian"
 msgstr "الروسيّة"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Slovak"
 msgstr "السلوفاكيّة"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Slovenian"
 msgstr "السلوفانيّة"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Serbian"
 msgstr "الصربيّة"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Swedish"
 msgstr "السويديّة"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Tamil"
 msgstr "التاميل"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:89
 msgid "Telugu"
 msgstr "التيلوغو"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
 msgid "Thai"
 msgstr "التايلنديّة"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Turkish"
 msgstr "التركيّة"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Ukrainian"
 msgstr "الأكرانيّة"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Simplified Chinese"
 msgstr "الصينيّة المبسطة"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Traditional Chinese"
 msgstr "الصينيّة التقليدية"
 
@@ -225,42 +231,46 @@ msgstr ""
 "<h3>حسب %s:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:91
-#: contrib/admin/filterspecs.py:146 contrib/admin/filterspecs.py:172
+#: contrib/admin/filterspecs.py:75 contrib/admin/filterspecs.py:92
+#: contrib/admin/filterspecs.py:147 contrib/admin/filterspecs.py:173
 msgid "All"
 msgstr "الكل"
 
-#: contrib/admin/filterspecs.py:112
+#: contrib/admin/filterspecs.py:113
 msgid "Any date"
 msgstr "أي تاريخ"
 
-#: contrib/admin/filterspecs.py:113
+#: contrib/admin/filterspecs.py:114
 msgid "Today"
 msgstr "اليوم"
 
-#: contrib/admin/filterspecs.py:116
+#: contrib/admin/filterspecs.py:117
 msgid "Past 7 days"
 msgstr "الأيام السبعة الماضية"
 
-#: contrib/admin/filterspecs.py:118
+#: contrib/admin/filterspecs.py:119
 msgid "This month"
 msgstr "هذا الشهر"
 
-#: contrib/admin/filterspecs.py:120
+#: contrib/admin/filterspecs.py:121
 msgid "This year"
 msgstr "هذه السنة"
 
-#: contrib/admin/filterspecs.py:146 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:413
 msgid "Yes"
 msgstr "نعم"
 
-#: contrib/admin/filterspecs.py:146 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:413
 msgid "No"
 msgstr "لا"
 
-#: contrib/admin/filterspecs.py:153 forms/widgets.py:390
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:413
 msgid "Unknown"
 msgstr "مجهول"
+
+#: contrib/admin/helpers.py:14
+msgid "Action:"
+msgstr "العملية:"
 
 #: contrib/admin/models.py:19
 msgid "action time"
@@ -290,98 +300,117 @@ msgstr "مُدخل السجل"
 msgid "log entries"
 msgstr "مُدخلات السجل"
 
-#: contrib/admin/options.py:60 contrib/admin/options.py:121
+#: contrib/admin/options.py:131 contrib/admin/options.py:145
 msgid "None"
 msgstr "لاشيء"
 
-#: contrib/admin/options.py:338
+#: contrib/admin/options.py:498
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "تم حذف %(count)d %(items)s بنجاح."
+
+#: contrib/admin/options.py:505 contrib/admin/options.py:1012
+msgid "Are you sure?"
+msgstr "هل أنت متأكد؟"
+
+#: contrib/admin/options.py:523
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "حذف %(verbose_name_plural)s المحددون"
+
+#: contrib/admin/options.py:531
 #, python-format
 msgid "Changed %s."
 msgstr "عدّل %s."
 
-#: contrib/admin/options.py:338 contrib/admin/options.py:348
-#: contrib/comments/templates/comments/preview.html:15 forms/models.py:288
+#: contrib/admin/options.py:531 contrib/admin/options.py:541
+#: contrib/comments/templates/comments/preview.html:15 forms/models.py:306
 msgid "and"
 msgstr "و"
 
-#: contrib/admin/options.py:343
+#: contrib/admin/options.py:536
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "أضاف %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:347
+#: contrib/admin/options.py:540
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "غيّر %(list)s في %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:352
+#: contrib/admin/options.py:545
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "حذف %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:356
+#: contrib/admin/options.py:549
 msgid "No fields changed."
 msgstr "لم يتم تغيير أية حقول."
 
-#: contrib/admin/options.py:417 contrib/auth/admin.py:51
+#: contrib/admin/options.py:610 contrib/auth/admin.py:67
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "تم اضافة %(name)s \"%(obj)s\" بنجاح."
 
-#: contrib/admin/options.py:421 contrib/admin/options.py:454
-#: contrib/auth/admin.py:59
+#: contrib/admin/options.py:614 contrib/admin/options.py:647
+#: contrib/auth/admin.py:75
 msgid "You may edit it again below."
 msgstr "يمكنك تعديله مجددا في الأسفل."
 
-#: contrib/admin/options.py:431 contrib/admin/options.py:464
+#: contrib/admin/options.py:624 contrib/admin/options.py:657
 #, python-format
 msgid "You may add another %s below."
 msgstr "يمكنك إضافة %s آخر بالأسفل."
 
-#: contrib/admin/options.py:452
+#: contrib/admin/options.py:645
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "تم تغيير %(name)s \"%(obj)s\" بنجاح."
 
-#: contrib/admin/options.py:460
+#: contrib/admin/options.py:653
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "تمت إضافة %(name)s \"%(obj)s\" بنجاح، يمكنك تعديله مرة أخرى بالأسفل."
 
-#: contrib/admin/options.py:528
+#: contrib/admin/options.py:774
 #, python-format
 msgid "Add %s"
 msgstr "أضف %s"
 
-#: contrib/admin/options.py:559 contrib/admin/options.py:673
+#: contrib/admin/options.py:805 contrib/admin/options.py:990
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "العنصر %(name)s الذي به الحقل الأساسي %(key)r غير موجود."
 
-#: contrib/admin/options.py:606
+#: contrib/admin/options.py:862
 #, python-format
 msgid "Change %s"
 msgstr "عدّل %s"
 
-#: contrib/admin/options.py:638
+#: contrib/admin/options.py:894
 msgid "Database error"
 msgstr "خطـأ في قاعدة البيانات"
 
-#: contrib/admin/options.py:688
+#: contrib/admin/options.py:930
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "تم تغيير %(name)s بنجاح."
+msgstr[1] "تم تغيير عنصري %(name)s بنجاح."
+msgstr[2] "تم تغيير %(count)s %(name)s بنجاح."
+msgstr[3] "تم تغيير %(count)s %(name)s بنجاح."
+
+#: contrib/admin/options.py:1005
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "تم حذف %(name)s \"%(obj)s\" بنجاح."
 
-#: contrib/admin/options.py:695
-msgid "Are you sure?"
-msgstr "هل أنت متأكد؟"
-
-#: contrib/admin/options.py:724
+#: contrib/admin/options.py:1041
 #, python-format
 msgid "Change history: %s"
 msgstr "تاريخ التغيير: %s"
 
-#: contrib/admin/sites.py:16 contrib/admin/views/decorators.py:14
+#: contrib/admin/sites.py:15 contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:80
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -390,11 +419,11 @@ msgstr ""
 "رجاءً أدخل اسم مستخدم وكلمة مرور صحيحين، وانتبه إلى أن كلا الحقلين حساس لحالة "
 "الأحرف."
 
-#: contrib/admin/sites.py:226 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:250 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "رجاءً ادخل مرةً أخرى لأن جلستك انتهت."
 
-#: contrib/admin/sites.py:233 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:257 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -402,62 +431,62 @@ msgstr ""
 "يبدو بأن متصفحك غير معد لقبول الكوكيز، قم بتفعيل الكوكيز من فضلك ثم تحديث "
 "هذه الصفحة والمحاولة مرة أخرى."
 
-#: contrib/admin/sites.py:249 contrib/admin/sites.py:255
+#: contrib/admin/sites.py:273 contrib/admin/sites.py:279
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "اسم المستخدم يجب أن لا يحتوي على علامة '@'."
 
-#: contrib/admin/sites.py:252 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:276 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "بريدك الإلكتروني ليس اسم المستخدم الخاص بك، جرب استخدام '%s' بدلا من ذلك."
 
-#: contrib/admin/sites.py:312
+#: contrib/admin/sites.py:336
 msgid "Site administration"
 msgstr "إدارة الموقع"
 
-#: contrib/admin/sites.py:325 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:349 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "ادخل"
 
-#: contrib/admin/sites.py:372
+#: contrib/admin/sites.py:396
 #, python-format
 msgid "%s administration"
 msgstr "إدارة %s"
 
-#: contrib/admin/util.py:138
+#: contrib/admin/util.py:168
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "%(fieldname)s واحد أو أكثر في %(name)s: %(obj)s"
 
-#: contrib/admin/util.py:143
+#: contrib/admin/util.py:173
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "%(fieldname)s واحد أو أكثر في %(name)s:"
 
-#: contrib/admin/widgets.py:70
+#: contrib/admin/widgets.py:71
 msgid "Date:"
 msgstr "التاريخ:"
 
-#: contrib/admin/widgets.py:70
+#: contrib/admin/widgets.py:71
 msgid "Time:"
 msgstr "الوقت:"
 
-#: contrib/admin/widgets.py:94
+#: contrib/admin/widgets.py:95
 msgid "Currently:"
 msgstr "حالياً:"
 
-#: contrib/admin/widgets.py:94
+#: contrib/admin/widgets.py:95
 msgid "Change:"
 msgstr "تغيير:"
 
-#: contrib/admin/widgets.py:123
+#: contrib/admin/widgets.py:124
 msgid "Lookup"
 msgstr "ابحث"
 
-#: contrib/admin/widgets.py:230
+#: contrib/admin/widgets.py:236
 msgid "Add Another"
 msgstr "أضف آخر"
 
@@ -472,10 +501,11 @@ msgstr "نحن آسفون، لكننا لم نعثر على الصفحة الم�
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:31
+#: contrib/admin/templates/admin/base.html:33
 #: contrib/admin/templates/admin/change_form.html:17
-#: contrib/admin/templates/admin/change_list.html:8
+#: contrib/admin/templates/admin/change_list.html:20
 #: contrib/admin/templates/admin/delete_confirmation.html:6
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:6
 #: contrib/admin/templates/admin/invalid_setup.html:4
 #: contrib/admin/templates/admin/object_history.html:6
 #: contrib/admin/templates/admin/auth/user/change_password.html:10
@@ -510,32 +540,41 @@ msgstr ""
 "حدث خطأ، وقم تم الابلاغ عنه إلى مدراء الموقع عبر البريد الإلكتروني وسيتم حل "
 "المشكلة قريبا. شكرا لك على صبرك."
 
+#: contrib/admin/templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "نفذ العملية المحدّدة"
+
+#: contrib/admin/templates/admin/actions.html:4
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Go"
+msgstr "نفّذ"
+
 #: contrib/admin/templates/admin/app_index.html:10
 #: contrib/admin/templates/admin/index.html:19
 #, python-format
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:28
 msgid "Welcome,"
 msgstr "أهلا، "
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "الوثائق"
 
-#: contrib/admin/templates/admin/base.html:26
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/auth/user/change_password.html:46
+#: contrib/admin/templates/admin/base.html:28
+#: contrib/admin/templates/admin/auth/user/change_password.html:14
+#: contrib/admin/templates/admin/auth/user/change_password.html:47
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Change password"
 msgstr "غيّر كلمة المرور"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
@@ -566,7 +605,8 @@ msgid "View on site"
 msgstr "مشاهدة على الموقع"
 
 #: contrib/admin/templates/admin/change_form.html:38
-#: contrib/admin/templates/admin/auth/user/change_password.html:22
+#: contrib/admin/templates/admin/change_list.html:49
+#: contrib/admin/templates/admin/auth/user/change_password.html:23
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "رجاءً صحّح الخطأ التالي."
@@ -574,17 +614,17 @@ msgstr[1] "رجاءً صحّح الخطأين التاليين."
 msgstr[2] "رجاءً صحّح الأخطاء التالية."
 msgstr[3] "رجاءً صحّح الأخطاء التالية."
 
-#: contrib/admin/templates/admin/change_list.html:16
+#: contrib/admin/templates/admin/change_list.html:41
 #, python-format
 msgid "Add %(name)s"
 msgstr "أضف %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:26
+#: contrib/admin/templates/admin/change_list.html:60
 msgid "Filter"
 msgstr "مرشّح"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:10
-#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:246
+#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:276
 msgid "Delete"
 msgstr "احذف"
 
@@ -608,8 +648,32 @@ msgstr ""
 "جميع العناصر التالية المرتبطة به:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:28
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:33
 msgid "Yes, I'm sure"
 msgstr "نعم، أنا متأكد"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:9
+msgid "Delete multiple objects"
+msgstr "حذف عدّة عناصر"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:15
+#, python-format
+msgid ""
+"Deleting the %(object_name)s would result in deleting related objects, but "
+"your account doesn't have permission to delete the following types of "
+"objects:"
+msgstr ""
+"حذف %(object_name)s قد يؤدي إلى حذف العناصر المرتبطة به، إلا أن حساب "
+"المستخدم الخاص بك ليست له صلاحية حذف أنواع العناصر التالية:"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:22
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(object_name)s objects? All of "
+"the following objects and it's related items will be deleted:"
+msgstr ""
+"متأكد أنك تريد حذف %(object_name)s المحددة؟ سيتم حذف جميل العناصر التالية "
+"والتابعة لها:"
 
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
@@ -664,7 +728,7 @@ msgstr "التاريخ/الوقت"
 
 #: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
-msgstr "مستخدم"
+msgstr "المستخدم"
 
 #: contrib/admin/templates/admin/object_history.html:24
 #: contrib/comments/templates/comments/moderation_queue.html:33
@@ -672,7 +736,7 @@ msgid "Action"
 msgstr "العملية"
 
 #: contrib/admin/templates/admin/object_history.html:30
-#: utils/translation/trans_real.py:404
+#: utils/translation/trans_real.py:400
 msgid "DATETIME_FORMAT"
 msgstr "j F Y، G:i"
 
@@ -680,15 +744,13 @@ msgstr "j F Y، G:i"
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
-msgstr "ليس لهذا العنصر سجلّ تغييرات، على الأغلب أنه لم يُنشأ من خلال نظام إدارة الموقع."
+msgstr ""
+"ليس لهذا العنصر سجلّ تغييرات، على الأغلب أنه لم يُنشأ من خلال نظام إدارة "
+"الموقع."
 
 #: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "أظهر الكل"
-
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "نفّذ"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
@@ -734,23 +796,23 @@ msgid "Username"
 msgstr "اسم المستخدم"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:20
-#: contrib/admin/templates/admin/auth/user/change_password.html:33
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:60 contrib/auth/forms.py:184
+#: contrib/admin/templates/admin/auth/user/change_password.html:34
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:60 contrib/auth/forms.py:185
 msgid "Password"
 msgstr "كلمة المرور"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:26
-#: contrib/admin/templates/admin/auth/user/change_password.html:39
-#: contrib/auth/forms.py:185
+#: contrib/admin/templates/admin/auth/user/change_password.html:40
+#: contrib/auth/forms.py:186
 msgid "Password (again)"
 msgstr "كلمة المرور (مجدداً)"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:27
-#: contrib/admin/templates/admin/auth/user/change_password.html:40
+#: contrib/admin/templates/admin/auth/user/change_password.html:41
 msgid "Enter the same password as above, for verification."
 msgstr "أدخل كلمة المرور ذاتها التي أعلاه لتأكيدها."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:26
+#: contrib/admin/templates/admin/auth/user/change_password.html:27
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "أدخل كلمة مرور جديدة للمستخدم <strong>%(username)s</strong>."
@@ -851,7 +913,7 @@ msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
-"رابط استعادة كلمة المرور غير صالح، ربما لأنه استُخدم من قبل. رجاءً اطلب "
+"رابط استعادة كلمة المرور غير صحيح، ربما لأنه استُخدم من قبل. رجاءً اطلب "
 "استعادة كلمة المرور مرة أخرى."
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
@@ -909,166 +971,166 @@ msgstr "عنوان البريد الإلكتروني:"
 msgid "Reset my password"
 msgstr "استعد كلمة مروري"
 
-#: contrib/admin/templatetags/admin_list.py:284
+#: contrib/admin/templatetags/admin_list.py:299
 msgid "All dates"
 msgstr "كافة التواريخ"
 
-#: contrib/admin/views/main.py:69
+#: contrib/admin/views/main.py:70
 #, python-format
 msgid "Select %s"
 msgstr "اختر %s"
 
-#: contrib/admin/views/main.py:69
+#: contrib/admin/views/main.py:70
 #, python-format
 msgid "Select %s to change"
 msgstr "اختر %s لتغييره"
 
-#: contrib/admin/views/template.py:36 contrib/sites/models.py:38
+#: contrib/admin/views/template.py:37 contrib/sites/models.py:38
 msgid "site"
 msgstr "موقع"
 
-#: contrib/admin/views/template.py:38
+#: contrib/admin/views/template.py:39
 msgid "template"
 msgstr "قالب"
 
-#: contrib/admindocs/views.py:57 contrib/admindocs/views.py:59
-#: contrib/admindocs/views.py:61
+#: contrib/admindocs/views.py:58 contrib/admindocs/views.py:60
+#: contrib/admindocs/views.py:62
 msgid "tag:"
 msgstr "وسم:"
 
-#: contrib/admindocs/views.py:90 contrib/admindocs/views.py:92
-#: contrib/admindocs/views.py:94
+#: contrib/admindocs/views.py:91 contrib/admindocs/views.py:93
+#: contrib/admindocs/views.py:95
 msgid "filter:"
 msgstr "مرشّح"
 
-#: contrib/admindocs/views.py:154 contrib/admindocs/views.py:156
-#: contrib/admindocs/views.py:158
+#: contrib/admindocs/views.py:155 contrib/admindocs/views.py:157
+#: contrib/admindocs/views.py:159
 msgid "view:"
 msgstr "عرض:"
 
-#: contrib/admindocs/views.py:186
+#: contrib/admindocs/views.py:187
 #, python-format
 msgid "App %r not found"
 msgstr "التطبيق %r غير موجود"
 
-#: contrib/admindocs/views.py:193
+#: contrib/admindocs/views.py:194
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "النموذج %(model_name)r غير موجود في التطبيق %(app_label)r"
 
-#: contrib/admindocs/views.py:205
+#: contrib/admindocs/views.py:206
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "العنصر `%(app_label)s.%(data_type)s` المرتبط"
 
-#: contrib/admindocs/views.py:205 contrib/admindocs/views.py:227
-#: contrib/admindocs/views.py:241 contrib/admindocs/views.py:246
+#: contrib/admindocs/views.py:206 contrib/admindocs/views.py:228
+#: contrib/admindocs/views.py:242 contrib/admindocs/views.py:247
 msgid "model:"
 msgstr "نموذج:"
 
-#: contrib/admindocs/views.py:236
+#: contrib/admindocs/views.py:237
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "عناصر `%(app_label)s.%(object_name)s` مرتبطة"
 
-#: contrib/admindocs/views.py:241
+#: contrib/admindocs/views.py:242
 #, python-format
 msgid "all %s"
 msgstr "كل %s"
 
-#: contrib/admindocs/views.py:246
+#: contrib/admindocs/views.py:247
 #, python-format
 msgid "number of %s"
 msgstr "عدد %s"
 
-#: contrib/admindocs/views.py:251
+#: contrib/admindocs/views.py:252
 #, python-format
 msgid "Fields on %s objects"
 msgstr "الحقول في عناصر %s"
 
-#: contrib/admindocs/views.py:314 contrib/admindocs/views.py:325
-#: contrib/admindocs/views.py:327 contrib/admindocs/views.py:333
-#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:336
+#: contrib/admindocs/views.py:315 contrib/admindocs/views.py:326
+#: contrib/admindocs/views.py:328 contrib/admindocs/views.py:334
+#: contrib/admindocs/views.py:335 contrib/admindocs/views.py:337
 msgid "Integer"
 msgstr "عدد صحيح"
 
-#: contrib/admindocs/views.py:315
+#: contrib/admindocs/views.py:316
 msgid "Boolean (Either True or False)"
 msgstr "ثنائي (إما True أو False)"
 
-#: contrib/admindocs/views.py:316 contrib/admindocs/views.py:335
+#: contrib/admindocs/views.py:317 contrib/admindocs/views.py:336
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "سلسلة نص (%(max_length)s كحد أقصى)"
 
-#: contrib/admindocs/views.py:317
+#: contrib/admindocs/views.py:318
 msgid "Comma-separated integers"
 msgstr "أرقام صحيحة مفصولة بفواصل"
 
-#: contrib/admindocs/views.py:318
+#: contrib/admindocs/views.py:319
 msgid "Date (without time)"
 msgstr "التاريخ (دون الوقت)"
 
-#: contrib/admindocs/views.py:319
+#: contrib/admindocs/views.py:320
 msgid "Date (with time)"
 msgstr "التاريخ (مع الوقت)"
 
-#: contrib/admindocs/views.py:320
+#: contrib/admindocs/views.py:321
 msgid "Decimal number"
 msgstr "رقم عشري"
 
-#: contrib/admindocs/views.py:321
+#: contrib/admindocs/views.py:322
 msgid "E-mail address"
 msgstr "عنوان بريد إلكتروني"
 
-#: contrib/admindocs/views.py:322 contrib/admindocs/views.py:323
-#: contrib/admindocs/views.py:326
+#: contrib/admindocs/views.py:323 contrib/admindocs/views.py:324
+#: contrib/admindocs/views.py:327
 msgid "File path"
 msgstr "مسار الملف"
 
-#: contrib/admindocs/views.py:324
+#: contrib/admindocs/views.py:325
 msgid "Floating point number"
 msgstr "رقم فاصلة عائمة"
 
-#: contrib/admindocs/views.py:328 contrib/comments/models.py:58
+#: contrib/admindocs/views.py:329 contrib/comments/models.py:58
 msgid "IP address"
 msgstr "عنوان IP"
 
-#: contrib/admindocs/views.py:330
+#: contrib/admindocs/views.py:331
 msgid "Boolean (Either True, False or None)"
 msgstr "ثنائي (إما True أو False أو None)"
 
-#: contrib/admindocs/views.py:331
+#: contrib/admindocs/views.py:332
 msgid "Relation to parent model"
 msgstr "العلاقة بالنموذج الأب"
 
-#: contrib/admindocs/views.py:332
+#: contrib/admindocs/views.py:333
 msgid "Phone number"
 msgstr "رقم هاتف"
 
-#: contrib/admindocs/views.py:337
+#: contrib/admindocs/views.py:338
 msgid "Text"
 msgstr "نص"
 
-#: contrib/admindocs/views.py:338
+#: contrib/admindocs/views.py:339
 msgid "Time"
 msgstr "وقت"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:21
+#: contrib/admindocs/views.py:340 contrib/comments/forms.py:95
 #: contrib/comments/templates/comments/moderation_queue.html:37
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "رابط"
 
-#: contrib/admindocs/views.py:340
+#: contrib/admindocs/views.py:341
 msgid "U.S. state (two uppercase letters)"
 msgstr "ولاية أمريكية (حرفان كبيران)"
 
-#: contrib/admindocs/views.py:341
+#: contrib/admindocs/views.py:342
 msgid "XML text"
 msgstr "نص XML"
 
-#: contrib/admindocs/views.py:367
+#: contrib/admindocs/views.py:368
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "يبدو أن %s ليس عنصر urlpattern"
@@ -1150,23 +1212,23 @@ msgstr "تواريخ مهمة"
 
 #: contrib/auth/admin.py:24
 msgid "Groups"
-msgstr "مجموعات"
+msgstr "المجموعات"
 
-#: contrib/auth/admin.py:64
+#: contrib/auth/admin.py:80
 msgid "Add user"
 msgstr "أضف مستخدم"
 
-#: contrib/auth/admin.py:90
+#: contrib/auth/admin.py:106
 msgid "Password changed successfully."
 msgstr "تم تغيير كلمة المرور بنجاح."
 
-#: contrib/auth/admin.py:96
+#: contrib/auth/admin.py:112
 #, python-format
 msgid "Change password: %s"
 msgstr "غيّر كلمة المرور: %s"
 
 #: contrib/auth/forms.py:15 contrib/auth/forms.py:48
-#: contrib/auth/models.py:127
+#: contrib/auth/models.py:128
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
@@ -1184,8 +1246,8 @@ msgstr "تأكيد كلمة المرور"
 msgid "A user with that username already exists."
 msgstr "هناك مستخدم موجود مسبقاً بهذا الاسم."
 
-#: contrib/auth/forms.py:36 contrib/auth/forms.py:154
-#: contrib/auth/forms.py:196
+#: contrib/auth/forms.py:36 contrib/auth/forms.py:155
+#: contrib/auth/forms.py:197
 msgid "The two password fields didn't match."
 msgstr "حقلا كلمتي المرور غير متطابقين."
 
@@ -1211,24 +1273,24 @@ msgstr ""
 "عنوان البريد الإلكتروني هذا ليس مرتبط بأي حساب مستخدم. أأنت متأكد أنك قمت "
 "بالتسجيل؟"
 
-#: contrib/auth/forms.py:134
+#: contrib/auth/forms.py:135
 #, python-format
 msgid "Password reset on %s"
 msgstr "استعادة كلمة المرور في %s"
 
-#: contrib/auth/forms.py:142
+#: contrib/auth/forms.py:143
 msgid "New password"
 msgstr "كلمة المرور الجديدة"
 
-#: contrib/auth/forms.py:143
+#: contrib/auth/forms.py:144
 msgid "New password confirmation"
 msgstr "تأكيد كلمة المرور الجديدة"
 
-#: contrib/auth/forms.py:168
+#: contrib/auth/forms.py:169
 msgid "Old password"
 msgstr "كلمة المرور القديمة"
 
-#: contrib/auth/forms.py:176
+#: contrib/auth/forms.py:177
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "كلمة مرورك القديمة غير صحيحة. رجاءً أدخلها مرة أخرى."
 
@@ -1252,31 +1314,31 @@ msgstr "الصلاحيات"
 msgid "group"
 msgstr "مجموعة"
 
-#: contrib/auth/models.py:91 contrib/auth/models.py:137
+#: contrib/auth/models.py:91 contrib/auth/models.py:138
 msgid "groups"
-msgstr "مجموعات"
+msgstr "المجموعات"
 
-#: contrib/auth/models.py:127
+#: contrib/auth/models.py:128
 msgid "username"
 msgstr "اسم المستخدم"
 
-#: contrib/auth/models.py:128
+#: contrib/auth/models.py:129
 msgid "first name"
 msgstr "الاسم الأول"
 
-#: contrib/auth/models.py:129
+#: contrib/auth/models.py:130
 msgid "last name"
 msgstr "الاسم الأخير"
 
-#: contrib/auth/models.py:130
+#: contrib/auth/models.py:131
 msgid "e-mail address"
 msgstr "عنوان البريد الإلكتروني"
 
-#: contrib/auth/models.py:131
+#: contrib/auth/models.py:132
 msgid "password"
 msgstr "كلمة المرور"
 
-#: contrib/auth/models.py:131
+#: contrib/auth/models.py:132
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
@@ -1284,19 +1346,19 @@ msgstr ""
 "استخدم '[algo]$[salt]$[hexdigest]' أو استخدم <a href=\"password/\">استمارة "
 "تغيير كلمة المرور</a>."
 
-#: contrib/auth/models.py:132
+#: contrib/auth/models.py:133
 msgid "staff status"
 msgstr "حالة الطاقم"
 
-#: contrib/auth/models.py:132
+#: contrib/auth/models.py:133
 msgid "Designates whether the user can log into this admin site."
 msgstr "يحدد ما إذا كان المستخدم يستطيع الدخول إلى موقع الإدارة هذا."
 
-#: contrib/auth/models.py:133
+#: contrib/auth/models.py:134
 msgid "active"
 msgstr "نشط"
 
-#: contrib/auth/models.py:133
+#: contrib/auth/models.py:134
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -1304,25 +1366,25 @@ msgstr ""
 "يحدد ما إذا كان المستخدم سيُعامل على أنّه نشط. أزل تحديد ها الخيار بدلاً من حذف "
 "الحسابات."
 
-#: contrib/auth/models.py:134
+#: contrib/auth/models.py:135
 msgid "superuser status"
 msgstr "حالة المستخدم الخارق"
 
-#: contrib/auth/models.py:134
+#: contrib/auth/models.py:135
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "حدد بأن هذا المستخدم يمتلك كافة الصلاحيات دون الحاجة لتحديدها له تصريحا."
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:136
 msgid "last login"
 msgstr "آخر دخول"
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:137
 msgid "date joined"
 msgstr "تاريخ الانضمام"
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:139
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
@@ -1330,19 +1392,19 @@ msgstr ""
 "بالإضافة إلى الصلاحيات المحددة للمستخدم يدويا، فإن المستخدم يحصل أيضا على "
 "كافة صلاحيات المجموعة التي ينتمي إليها."
 
-#: contrib/auth/models.py:139
+#: contrib/auth/models.py:140
 msgid "user permissions"
 msgstr "صلاحيات المستخدم"
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:144
 msgid "user"
 msgstr "مستخدم"
 
-#: contrib/auth/models.py:144
+#: contrib/auth/models.py:145
 msgid "users"
-msgstr "مستخدمون"
+msgstr "المستخدمون"
 
-#: contrib/auth/models.py:300
+#: contrib/auth/models.py:301
 msgid "message"
 msgstr "رسالة"
 
@@ -1350,9 +1412,9 @@ msgstr "رسالة"
 msgid "Logged out"
 msgstr "تم الخروج"
 
-#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:428
+#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:429
 msgid "Enter a valid e-mail address."
-msgstr "أدخل عنوان بريد إلكتروني صالح."
+msgstr "أدخل عنوان بريد إلكتروني صحيح."
 
 #: contrib/comments/admin.py:11
 msgid "Content"
@@ -1362,25 +1424,21 @@ msgstr "محتوى"
 msgid "Metadata"
 msgstr "ميتاداتا"
 
-#: contrib/comments/forms.py:19
+#: contrib/comments/forms.py:93
 #: contrib/comments/templates/comments/moderation_queue.html:34
 msgid "Name"
 msgstr "الاسم"
 
-#: contrib/comments/forms.py:20
+#: contrib/comments/forms.py:94
 msgid "Email address"
 msgstr "عنوان بريد إلكتروني"
 
-#: contrib/comments/forms.py:22
+#: contrib/comments/forms.py:96
 #: contrib/comments/templates/comments/moderation_queue.html:35
 msgid "Comment"
 msgstr "تعليق"
 
-#: contrib/comments/forms.py:25
-msgid "If you enter anything in this field your comment will be treated as spam"
-msgstr "إن كتبت أي شيء في هذا الحقل فسيُعتبر تعليقك غير مرغوب به"
-
-#: contrib/comments/forms.py:125
+#: contrib/comments/forms.py:173
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -1388,6 +1446,10 @@ msgstr[0] "انتبه إلى ما تقول! الكلمة %s غير مسموح ب
 msgstr[1] "انتبه إلى ما تقول! الكلمتان %s غير مسموح بهما هنا."
 msgstr[2] "انتبه إلى ما تقول! الكلمات %s غير مسموح بها هنا."
 msgstr[3] "انتبه إلى ما تقول! الكلمات %s غير مسموح بها هنا."
+
+#: contrib/comments/forms.py:180
+msgid "If you enter anything in this field your comment will be treated as spam"
+msgstr "إن كتبت أي شيء في هذا الحقل فسيُعتبر تعليقك غير مرغوب به"
 
 #: contrib/comments/models.py:23
 msgid "object ID"
@@ -1670,11 +1732,11 @@ msgstr "لم تُدخل أي أحداثيات."
 
 #: contrib/gis/forms/fields.py:15
 msgid "Invalid geometry value."
-msgstr "الإحداثيات غير صالحة."
+msgstr "الإحداثيات غير صحيحة."
 
 #: contrib/gis/forms/fields.py:16
 msgid "Invalid geometry type."
-msgstr "نوع الإحداثيات غير صالح."
+msgstr "نوع الإحداثيات غير صحيح."
 
 #: contrib/humanize/templatetags/humanize.py:19
 msgid "th"
@@ -1783,11 +1845,11 @@ msgstr "يتطلب الحقل 7 أو 8 أعداد."
 
 #: contrib/localflavor/ar/forms.py:79
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr "أدخل رمز CUIT صالح بالنسق XX-XXXXXXXX-X أو XXXXXXXXXXXX."
+msgstr "أدخل رمز CUIT صحيح بالنسق XX-XXXXXXXX-X أو XXXXXXXXXXXX."
 
 #: contrib/localflavor/ar/forms.py:80
 msgid "Invalid CUIT."
-msgstr "رمز CUIT غير صالح."
+msgstr "رمز CUIT غير صحيح."
 
 #: contrib/localflavor/at/at_states.py:5
 msgid "Burgenland"
@@ -1832,7 +1894,7 @@ msgstr "أدخل رمز zip بالنسق XXXX."
 
 #: contrib/localflavor/at/forms.py:48
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr "أدخل رقم ضمان اجتماعي سويدي صالح بالنسق XXXX XXXXXX."
+msgstr "أدخل رقم ضمان اجتماعي سويدي صحيح بالنسق XXXX XXXXXX."
 
 #: contrib/localflavor/au/forms.py:16
 msgid "Enter a 4 digit post code."
@@ -1850,11 +1912,11 @@ msgstr "أرقام الهاتف يجب أن تكون بالنسق XX-XXXX-XXXX."
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
-msgstr "انتق ولايةً برازيلية صالحة. تلك الولاية ليست ضمن الولايات المتاحة."
+msgstr "انتق ولايةً برازيلية صحيحة. تلك الولاية ليست ضمن الولايات المتاحة."
 
 #: contrib/localflavor/br/forms.py:94
 msgid "Invalid CPF number."
-msgstr "رقم CPF غير صالح."
+msgstr "رقم CPF غير صحيح."
 
 #: contrib/localflavor/br/forms.py:95
 msgid "This field requires at most 11 digits or 14 characters."
@@ -1862,7 +1924,7 @@ msgstr "يتطلب هذا الحقل 11 رقماً أو 14 حرفاً كحد أ�
 
 #: contrib/localflavor/br/forms.py:134
 msgid "Invalid CNPJ number."
-msgstr "رقم CNPJ غير صالح."
+msgstr "رقم CNPJ غير صحيح."
 
 #: contrib/localflavor/br/forms.py:136
 msgid "This field requires at least 14 digits"
@@ -1874,7 +1936,7 @@ msgstr "أدخل رمزاً بريدياً بنسق XXX XXX."
 
 #: contrib/localflavor/ca/forms.py:88
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr "أدخل رقم ضمان اجتماعي كندي صالح بالنسق XXX-XXX-XXX."
+msgstr "أدخل رقم ضمان اجتماعي كندي صحيح بالنسق XXX-XXX-XXX."
 
 #: contrib/localflavor/ch/ch_states.py:5
 msgid "Aargau"
@@ -1984,19 +2046,95 @@ msgstr "زيورخ"
 msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
 "1234567890 format."
-msgstr "أدخل رقم هوية سويسرية صالح أو رقم جواز سفر بالنسق X1234567<0 أو 1234567890."
+msgstr "أدخل رقم هوية سويسرية صحيح أو رقم جواز سفر بالنسق X1234567<0 أو 1234567890."
 
 #: contrib/localflavor/cl/forms.py:29
 msgid "Enter a valid Chilean RUT."
-msgstr "أدخل رمز RUT تشيلي صالح."
+msgstr "أدخل رمز RUT تشيلي صحيح."
 
 #: contrib/localflavor/cl/forms.py:30
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "أدخل رمز RUT تشيلي صالح. النسق هو XX.XXX.XXX-X."
+msgstr "أدخل رمز RUT تشيلي صحيح. النسق هو XX.XXX.XXX-X."
 
 #: contrib/localflavor/cl/forms.py:31
 msgid "The Chilean RUT is not valid."
-msgstr "قيمة RUT التشيلية غير صالحة."
+msgstr "قيمة RUT التشيلية غير صحيحة."
+
+#: contrib/localflavor/cz/cz_regions.py:8
+msgid "Prague"
+msgstr "براغ"
+
+#: contrib/localflavor/cz/cz_regions.py:9
+msgid "Central Bohemian Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:10
+msgid "South Bohemian Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:11
+msgid "Pilsen Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:12
+msgid "Carlsbad Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:13
+msgid "Usti Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:14
+msgid "Liberec Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:15
+msgid "Hradec Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:16
+msgid "Pardubice Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:17
+msgid "Vysocina Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:18
+msgid "South Moravian Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:19
+msgid "Olomouc Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:20
+msgid "Zlin Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:21
+msgid "Moravian-Silesian Region"
+msgstr ""
+
+#: contrib/localflavor/cz/forms.py:27 contrib/localflavor/sk/forms.py:30
+msgid "Enter a postal code in the format XXXXX or XXX XX."
+msgstr "أدخل رمزاً بريدياً بالنسق XXXXX أو XXX XX."
+
+#: contrib/localflavor/cz/forms.py:47
+msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
+msgstr "أدخل رقم الميلاد بالنسق XXXXXX/XXXX أو XXXXXXXXXX."
+
+#: contrib/localflavor/cz/forms.py:48
+msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
+msgstr "مُعطى غير صحيح للجنس، الرجاء إدخال القيمة 'f' أو 'm'"
+
+#: contrib/localflavor/cz/forms.py:49
+msgid "Enter a valid birth number."
+msgstr "أدخل رقم ميلاد صحيح."
+
+#: contrib/localflavor/cz/forms.py:106
+msgid "Enter a valid IC number."
+msgstr "أدخل رقم IC صحيح."
 
 #: contrib/localflavor/de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -2071,7 +2209,7 @@ msgstr "أدخل رمز zip بالنسق XXXXX."
 msgid ""
 "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
 "format."
-msgstr "أدخل رقم بطاقة هوية ألمانية صالحة بالنسق XXXXXXXXXXX-XXXXXXX-XXXXXXX-X."
+msgstr "أدخل رقم بطاقة هوية ألمانية صحيحة بالنسق XXXXXXXXXXX-XXXXXXX-XXXXXXX-X."
 
 #: contrib/localflavor/es/es_provinces.py:5
 msgid "Arava"
@@ -2342,45 +2480,45 @@ msgstr ""
 
 #: contrib/localflavor/es/forms.py:19
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "أدخل رمزاً بريدياً صالحاً بالمدى والنسق 01XXX - 52XXX."
+msgstr "أدخل رمزاً بريدياً صحيحاً بالمدى والنسق 01XXX - 52XXX."
 
 #: contrib/localflavor/es/forms.py:39
 msgid ""
 "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
 "9XXXXXXXX."
-msgstr "أدخل رقم هاتف صالح بأحد الأنساق 6XXXXXXXX، 8XXXXXXXX أو 9XXXXXXXX."
+msgstr "أدخل رقم هاتف صحيح بأحد الأنساق 6XXXXXXXX، 8XXXXXXXX أو 9XXXXXXXX."
 
 #: contrib/localflavor/es/forms.py:66
 msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "رجاءً أدخل قيمة NIF، NIE أو CIF صالحة."
+msgstr "رجاءً أدخل قيمة NIF، NIE أو CIF صحيحة."
 
 #: contrib/localflavor/es/forms.py:67
 msgid "Please enter a valid NIF or NIE."
-msgstr "رجاءً أدخل قيمة NIF أو NIE صالحة."
+msgstr "رجاءً أدخل قيمة NIF أو NIE صحيحة."
 
 #: contrib/localflavor/es/forms.py:68
 msgid "Invalid checksum for NIF."
-msgstr "تدقيق مجموع NIF غير صالح."
+msgstr "تدقيق مجموع NIF غير صحيح."
 
 #: contrib/localflavor/es/forms.py:69
 msgid "Invalid checksum for NIE."
-msgstr "تدقيق مجموع NIE غير صالح."
+msgstr "تدقيق مجموع NIE غير صحيح."
 
 #: contrib/localflavor/es/forms.py:70
 msgid "Invalid checksum for CIF."
-msgstr "تدقيق مجموع CIF غير صالح."
+msgstr "تدقيق مجموع CIF غير صحيح."
 
 #: contrib/localflavor/es/forms.py:142
 msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
-msgstr "رجاءً أدخل رقم حساب بنكي صالح بالنسق XXXX-XXXX-XX-XXXXXXXXXX."
+msgstr "رجاءً أدخل رقم حساب بنكي صحيح بالنسق XXXX-XXXX-XX-XXXXXXXXXX."
 
 #: contrib/localflavor/es/forms.py:143
 msgid "Invalid checksum for bank account number."
-msgstr "تدقيق مجموع رقم حساب البنك غير صالح."
+msgstr "تدقيق مجموع رقم حساب البنك غير صحيح."
 
 #: contrib/localflavor/fi/forms.py:28
 msgid "Enter a valid Finnish social security number."
-msgstr "أدخل رقم ضمان اجتماع فنلندي صالح."
+msgstr "أدخل رقم ضمان اجتماع فنلندي صحيح."
 
 #: contrib/localflavor/in_/forms.py:14
 msgid "Enter a zip code in the format XXXXXXX."
@@ -2388,23 +2526,23 @@ msgstr "أدخل رمز zip بالنسق XXXXXXX."
 
 #: contrib/localflavor/is_/forms.py:17
 msgid "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
-msgstr "رجاءً أدخل رقم مُعرّف آيسلندي صالح. النسق هو XXXXXX-XXXX."
+msgstr "رجاءً أدخل رقم مُعرّف آيسلندي صحيح. النسق هو XXXXXX-XXXX."
 
 #: contrib/localflavor/is_/forms.py:18
 msgid "The Icelandic identification number is not valid."
-msgstr "رقم المُعرّف الآيسلندي غير صالح."
+msgstr "رقم المُعرّف الآيسلندي غير صحيح."
 
 #: contrib/localflavor/it/forms.py:14
 msgid "Enter a valid zip code."
-msgstr "أدخل رمز zip صالح."
+msgstr "أدخل رمز zip صحيح."
 
 #: contrib/localflavor/it/forms.py:43
 msgid "Enter a valid Social Security number."
-msgstr "أدخل رقم ضمان اجتماعي صالح."
+msgstr "أدخل رقم ضمان اجتماعي صحيح."
 
 #: contrib/localflavor/it/forms.py:68
 msgid "Enter a valid VAT number."
-msgstr "أدخل رقم ضريبة VAT صالح."
+msgstr "أدخل رقم ضريبة VAT صحيح."
 
 #: contrib/localflavor/jp/forms.py:16
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
@@ -2728,15 +2866,15 @@ msgstr ""
 
 #: contrib/localflavor/nl/forms.py:21
 msgid "Enter a valid postal code"
-msgstr "أدخل رمزاً بريدياً صالحاً."
+msgstr "أدخل رمزاً بريدياً صحيحاً."
 
 #: contrib/localflavor/nl/forms.py:52
 msgid "Enter a valid phone number"
-msgstr "أدخل رقم هاتف صالح"
+msgstr "أدخل رقم هاتف صحيح"
 
 #: contrib/localflavor/nl/forms.py:78
 msgid "Enter a valid SoFi number"
-msgstr "أدخل رقم SoFi صالح."
+msgstr "أدخل رقم SoFi صحيح."
 
 #: contrib/localflavor/nl/nl_provinces.py:4
 msgid "Drenthe"
@@ -2788,7 +2926,7 @@ msgstr ""
 
 #: contrib/localflavor/no/forms.py:33
 msgid "Enter a valid Norwegian social security number."
-msgstr "أدخل رقم ضمان اجتماعي نرويجي صالح."
+msgstr "أدخل رقم ضمان اجتماعي نرويجي صحيح."
 
 #: contrib/localflavor/pe/forms.py:24
 msgid "This field requires 8 digits."
@@ -2892,15 +3030,15 @@ msgstr ""
 
 #: contrib/localflavor/ro/forms.py:19
 msgid "Enter a valid CIF."
-msgstr "أدخل قيمة CIF صالحة."
+msgstr "أدخل قيمة CIF صحيحة."
 
 #: contrib/localflavor/ro/forms.py:56
 msgid "Enter a valid CNP."
-msgstr "أدخل قيمة CNP صالحة."
+msgstr "أدخل قيمة CNP صحيحة."
 
 #: contrib/localflavor/ro/forms.py:141
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr "أدخل رمز IBAN صالحاً بالنسق ROXX-XXXX-XXXX-XXXX-XXXX-XXXX"
+msgstr "أدخل رمز IBAN صحيحاً بالنسق ROXX-XXXX-XXXX-XXXX-XXXX-XXXX"
 
 #: contrib/localflavor/ro/forms.py:171
 msgid "Phone numbers must be in XXXX-XXXXXX format."
@@ -2908,11 +3046,7 @@ msgstr "أرقام الهاتف يجب أن تكون بالنسق XXXX-XXXXXX."
 
 #: contrib/localflavor/ro/forms.py:194
 msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "أدخل رمزاً بريدياً صالحاً بالنسق XXXXXX"
-
-#: contrib/localflavor/sk/forms.py:30
-msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "أدخل رمزاً بريدياً بالنسق XXXXX أو XXX XX."
+msgstr "أدخل رمزاً بريدياً صحيحاً بالنسق XXXXXX"
 
 #: contrib/localflavor/sk/sk_districts.py:8
 msgid "Banska Bystrica"
@@ -3264,7 +3398,7 @@ msgstr ""
 
 #: contrib/localflavor/uk/forms.py:21
 msgid "Enter a valid postcode."
-msgstr "أدخل رمزاً بريدياً صالحاً."
+msgstr "أدخل رمزاً بريدياً صحيحاً."
 
 #: contrib/localflavor/uk/uk_regions.py:11
 msgid "Bedfordshire"
@@ -3552,7 +3686,7 @@ msgstr "أدخل رمز zip بالنسق XXXXX أو XXXXX-XXXX."
 
 #: contrib/localflavor/us/forms.py:54
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
-msgstr "أدخل رقم ضمان اجتماعي أميركي صالح بالنسق XXX-XX-XXXX."
+msgstr "أدخل رقم ضمان اجتماعي أميركي صحيح بالنسق XXX-XX-XXXX."
 
 #: contrib/localflavor/za/forms.py:20
 msgid "Enter a valid South African ID number"
@@ -3660,61 +3794,65 @@ msgstr "اسم العرض"
 msgid "sites"
 msgstr "مواقع"
 
-#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:683
+#: db/models/fields/__init__.py:356 db/models/fields/__init__.py:700
 msgid "This value must be an integer."
 msgstr "هذه القيمة يجب أن تكون رقما صحيحا."
 
-#: db/models/fields/__init__.py:379
+#: db/models/fields/__init__.py:387
 msgid "This value must be either True or False."
 msgstr "هذه القيمة يجب أن تكون إما True أو False."
 
-#: db/models/fields/__init__.py:412
+#: db/models/fields/__init__.py:420
 msgid "This field cannot be null."
 msgstr "لا يمكن ترك هذا الحقل فارغاً."
 
-#: db/models/fields/__init__.py:428
+#: db/models/fields/__init__.py:436
 msgid "Enter only digits separated by commas."
 msgstr "أدخل أرقاما فقط مفصول بينها بفواصل."
 
-#: db/models/fields/__init__.py:459
+#: db/models/fields/__init__.py:467
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "أدخل تاريخا صحيحا بالنسق YYYY-MM-DD."
 
-#: db/models/fields/__init__.py:468
+#: db/models/fields/__init__.py:476
 #, python-format
 msgid "Invalid date: %s"
-msgstr "تاريخ غير صالح: %s"
+msgstr "تاريخ غير صحيح: %s"
 
-#: db/models/fields/__init__.py:532 db/models/fields/__init__.py:550
+#: db/models/fields/__init__.py:540 db/models/fields/__init__.py:558
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr "أدخل تاريخ/وقت صالح بالنسق YYYY-MM-DD HH:MM[:ss[.uuuuuu]]."
+msgstr "أدخل تاريخ/وقت صحيح بالنسق YYYY-MM-DD HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:586
+#: db/models/fields/__init__.py:594
 msgid "This value must be a decimal number."
 msgstr "يجب أن تكون هذه القيمة رقماً عشرياً."
 
-#: db/models/fields/__init__.py:719
+#: db/models/fields/__init__.py:676
+msgid "This value must be a float."
+msgstr "هذه القيمة يجب أن تكون عدد فاصلة عائمة."
+
+#: db/models/fields/__init__.py:736
 msgid "This value must be either None, True or False."
 msgstr "يجب أن تكون هذه القيمة None، أو True أو False."
 
-#: db/models/fields/__init__.py:817 db/models/fields/__init__.py:831
+#: db/models/fields/__init__.py:839 db/models/fields/__init__.py:853
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "أدخل توقيتاً صالحاً بالنسق HH:MM[:ss[.uuuuuu]]."
+msgstr "أدخل توقيتاً صحيحاً بالنسق HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:761
+#: db/models/fields/related.py:792
 msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "اضغط زر التحكم \"Control\", أو \"Command\" على أجهزة Mac لاختيار أكثر من "
 "واحد."
 
-#: db/models/fields/related.py:838
+#: db/models/fields/related.py:870
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "رجاء ادخال معرفات %(self)s صالحة. القيمة %(value)r غير صالحة."
-msgstr[1] "رجاء ادخال معرفات %(self)s صالحة. القيمتان %(value)r غير صالحتين."
-msgstr[2] "رجاء ادخال معرفات %(self)s صالحة. القيم %(value)r غير صالحة."
-msgstr[3] "رجاء ادخال معرفات %(self)s صالحة. القيم %(value)r غير صالحة."
+msgstr[0] "رجاء ادخال معرفات %(self)s صحيحة. القيمة %(value)r غير صحيحة."
+msgstr[1] "رجاء ادخال معرفات %(self)s صحيحة. القيمتان %(value)r غير صحيحتين."
+msgstr[2] "رجاء ادخال معرفات %(self)s صحيحة. القيم %(value)r غير صحيحة."
+msgstr[3] "رجاء ادخال معرفات %(self)s صحيحة. القيم %(value)r غير صحيحة."
 
 #: forms/fields.py:54
 msgid "This field is required."
@@ -3722,7 +3860,7 @@ msgstr "هذا الحقل مطلوب."
 
 #: forms/fields.py:55
 msgid "Enter a valid value."
-msgstr "أدخل قيمة صالحة."
+msgstr "أدخل قيمة صحيحة."
 
 #: forms/fields.py:138
 #, python-format
@@ -3767,90 +3905,100 @@ msgstr "تحقق من أن تدخل %s خانات عشرية لا أكثر."
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "تحقق من أن تدخل %s أرقام قبل الفاصل العشري لا أكثر."
 
-#: forms/fields.py:287 forms/fields.py:849
+#: forms/fields.py:288 forms/fields.py:855
 msgid "Enter a valid date."
-msgstr "أدخل تاريخاً صالحاً."
+msgstr "أدخل تاريخاً صحيحاً."
 
-#: forms/fields.py:321 forms/fields.py:850
+#: forms/fields.py:322 forms/fields.py:856
 msgid "Enter a valid time."
-msgstr "أدخل وقتاً صالحاً."
+msgstr "أدخل وقتاً صحيحاً."
 
-#: forms/fields.py:360
+#: forms/fields.py:361
 msgid "Enter a valid date/time."
-msgstr "أدخل تاريخاً/وقتاً صالحاً."
+msgstr "أدخل تاريخاً/وقتاً صحيحاً."
 
-#: forms/fields.py:446
+#: forms/fields.py:447
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "لم يتم ارسال ملف، الرجاء التأكد من نوع ترميز الاستمارة."
 
-#: forms/fields.py:447
+#: forms/fields.py:448
 msgid "No file was submitted."
 msgstr "لم يتم إرسال اي ملف."
 
-#: forms/fields.py:448
+#: forms/fields.py:449
 msgid "The submitted file is empty."
 msgstr "الملف الذي قمت بإرساله فارغ."
 
-#: forms/fields.py:477
+#: forms/fields.py:450
+#, python-format
+msgid "Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr "تحقق من أن اسم الملف يتكون بحد أقصى من %(max)d أحرف (يتكون حالياً من %(length)d)."
+
+#: forms/fields.py:483
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"قم برفع صورة صالحة، الملف الذي قمت برفعه إما أنه ليس ملفا لصورة أو أنه ملف "
+"قم برفع صورة صحيحة، الملف الذي قمت برفعه إما أنه ليس ملفا لصورة أو أنه ملف "
 "معطوب."
 
-#: forms/fields.py:538
+#: forms/fields.py:544
 msgid "Enter a valid URL."
 msgstr "أدخل رابطاً صحيحاً."
 
-#: forms/fields.py:539
+#: forms/fields.py:545
 msgid "This URL appears to be a broken link."
 msgstr "يبدو أن هذا الرابط غير متوفر."
 
-#: forms/fields.py:618 forms/fields.py:696
+#: forms/fields.py:624 forms/fields.py:702
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "انتق خياراً صالحاً. %(value)s ليس أحد الخيارات المتاحة."
+msgstr "انتق خياراً صحيحاً. %(value)s ليس أحد الخيارات المتاحة."
 
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:720
+#: forms/fields.py:703 forms/fields.py:764 forms/models.py:764
 msgid "Enter a list of values."
 msgstr "أدخل قائمة من القيم."
 
-#: forms/fields.py:878
+#: forms/fields.py:884
 msgid "Enter a valid IPv4 address."
-msgstr "أدخل عنوان IPv4 صالح."
+msgstr "أدخل عنوان IPv4 صحيح."
 
-#: forms/fields.py:888
+#: forms/fields.py:894
 msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "أدخل اختصار 'slug' صالح يتكوّن من أحرف، أرقام، شرطات سفلية وعاديّة."
+msgstr "أدخل اختصار 'slug' صحيح يتكوّن من أحرف، أرقام، شرطات سفلية وعاديّة."
 
-#: forms/formsets.py:242 forms/formsets.py:244
+#: forms/formsets.py:272 forms/formsets.py:274
 msgid "Order"
 msgstr "الترتيب"
 
-#: forms/models.py:281 forms/models.py:290
+#: forms/models.py:299 forms/models.py:308
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "النموذج %(model_name)s والحقل %(field_label)s موجود مسبقاً."
 
-#: forms/models.py:587
+#: forms/models.py:639
 msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
+msgstr "حقل foreign key المحدد لا يطابق الحقل الرئيسي له."
 
-#: forms/models.py:650
+#: forms/models.py:694
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "انتق خياراً صالحاً. اختيارك ليس أحد الخيارات المتاحة."
+msgstr "انتق خياراً صحيحاً. اختيارك ليس أحد الخيارات المتاحة."
 
-#: forms/models.py:721
+#: forms/models.py:765
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "انتق خياراً صالحاً. %s ليس أحد الخيارات المتاحة."
+msgstr "انتق خياراً صحيحاً. %s ليس أحد الخيارات المتاحة."
 
-#: template/defaultfilters.py:741
+#: forms/models.py:767
+#, python-format
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr "القيمة \"%s\" هي صحيحة للحقل المرجعي."
+
+#: template/defaultfilters.py:757
 msgid "yes,no,maybe"
 msgstr "نعم,لا,ربما"
 
-#: template/defaultfilters.py:772
+#: template/defaultfilters.py:788
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
@@ -3859,17 +4007,17 @@ msgstr[1] "%(size)d بايت"
 msgstr[2] "%(size)d بايت"
 msgstr[3] "%(size)d بايت"
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:790
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f ك.ب"
 
-#: template/defaultfilters.py:776
+#: template/defaultfilters.py:792
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f م.ب"
 
-#: template/defaultfilters.py:777
+#: template/defaultfilters.py:793
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f ج.ب"
@@ -4130,33 +4278,33 @@ msgstr[1] "دقيقتان"
 msgstr[2] "دقائق"
 msgstr[3] "دقيقة"
 
-#: utils/timesince.py:43
+#: utils/timesince.py:45
 msgid "minutes"
 msgstr "دقائق"
 
-#: utils/timesince.py:48
+#: utils/timesince.py:50
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: utils/timesince.py:54
+#: utils/timesince.py:56
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr "، %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:403
+#: utils/translation/trans_real.py:399
 msgid "DATE_FORMAT"
 msgstr "j F Y"
 
-#: utils/translation/trans_real.py:405
+#: utils/translation/trans_real.py:401
 msgid "TIME_FORMAT"
 msgstr "G:i:s"
 
-#: utils/translation/trans_real.py:421
+#: utils/translation/trans_real.py:417
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:422
+#: utils/translation/trans_real.py:418
 msgid "MONTH_DAY_FORMAT"
 msgstr "j F"
 
