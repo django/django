@@ -10,7 +10,7 @@ from django.contrib.gis.models import get_srid_info
 
 def deprecated_property(func):
     from warnings import warn
-    warn('This attribute has been deprecated, pleas use "%s" instead.' % func.__name__[1:])
+    warn('This attribute has been deprecated, please use "%s" instead.' % func.__name__[1:])
     return property(func)
 
 class GeometryField(SpatialBackend.Field):
