@@ -1,120 +1,121 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-29 12:07+0200\n"
+"POT-Creation-Date: 2009-01-23 23:46+0100\n"
 "PO-Revision-Date: 2008-07-29 12:53+0100\n"
 "Last-Translator: Nebojsa Djordjevic <djnesh@gmail.com>\n"
-"Language-Team: Nesh <djnesh@gmail.com> & Petar <petar.maric@gmail.com> <sr@li.org>\n"
+"Language-Team: Nesh <djnesh@gmail.com> & Petar <petar.maric@gmail.com> & Janos Guljas <janos@janos.in.rs>"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Country: YUGOSLAVIA\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Poedit-Language: Serbian\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "Dostupno %s"
+msgstr "Доступно %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
-msgstr "Izaberite sve"
+msgstr "Изаберите све"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
-msgstr "Dodajte"
+msgstr "Додајте"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr "Izbacite"
+msgstr "Избаците"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr "Izabrano %s"
+msgstr "Изабрано %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "Izaberite potrebno i kliknite"
+msgstr "Изаберите потребно и кликните"
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr "Obrišite sve"
+msgstr "Обришите све"
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
-msgid "January February March April May June July August September October November December"
-msgstr "Januar Februar Mart April Maj Jun Jul Avgust Septembar Oktobar Novembar Decembar"
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"јануар фебруар март април мај јун јул август септембар октобар новембар "
+"децембар"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
-msgstr "N P U S Č P S"
+msgstr "Н П У С Ч П С"
 
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Nedelja Ponedeljak Utorak Sreda Četvrtak Petak Subota"
+msgstr "недеља понедељак уторак среда четвртак петак субота"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
 msgid "Show"
-msgstr "Prikaži"
+msgstr "Прикажи"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
 msgid "Hide"
-msgstr "Sakrij"
+msgstr "Сакриј"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Now"
-msgstr "Sada"
+msgstr "Сада"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
 msgid "Clock"
-msgstr "Sat"
+msgstr "Сат"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
 msgid "Choose a time"
-msgstr "Izaberite vreme"
+msgstr "Изаберите време"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "Midnight"
-msgstr "Ponoć"
+msgstr "Поноћ"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
-msgstr "6 sati"
+msgstr "6 сати"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
-msgstr "Podne"
+msgstr "Подне"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
 msgid "Cancel"
-msgstr "Poništi"
+msgstr "Поништи"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
 msgid "Today"
-msgstr "Danas"
+msgstr "Данас"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
 msgid "Calendar"
-msgstr "Kalendar"
+msgstr "Календар"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
 msgid "Yesterday"
-msgstr "Juče"
+msgstr "Јуче"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
-msgstr "Sutra"
-
+msgstr "Сутра"
