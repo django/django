@@ -31,11 +31,11 @@ Journal-World`_ of Lawrence, Kansas, USA.
     Simon lives in Brighton, England.
 
 `Jacob Kaplan-Moss`_
-    Jacob is a software architect at `Whiskey Media`_, one of those newfangled
-    Web 1.0 companies you've read so much about. A good deal of Jacob's work
-    time is devoted to working on Django. Jacob previous worked for the Lawrence
-    Journal-World, where he was the lead developer of Ellington, a commercial
-    web publishing platform for media companies.
+    Jacob is a partner at `Revolution Systems`_ which provides support services
+    around Django and related open source technologies. A good deal of Jacob's
+    work time is devoted to working on Django. Jacob previous worked at World
+    Online, where Django was invented, where he was the lead developer of
+    Ellington, a commercial web publishing platform for media companies.
 
     Jacob lives in Lawrence, Kansas, USA.
 
@@ -52,7 +52,7 @@ Journal-World`_ of Lawrence, Kansas, USA.
 .. _simon willison: http://simonwillison.net/
 .. _web-development blog: `simon willison`_
 .. _jacob kaplan-moss: http://jacobian.org/
-.. _whiskey media: http://whiskeymedia.com/
+.. _revolution systems: http://revsys.com/
 .. _wilson miner: http://wilsonminer.com/
 
 Current developers
