@@ -1,79 +1,109 @@
-"""
->>> from django.db.models.fields import *
->>> try:
-...     from decimal import Decimal
-... except ImportError:
-...     from django.utils._decimal import Decimal
+import datetime
+import unittest
+import django.test
+from django.db import models
+from django.core.exceptions import ValidationError
+from models import Foo, Bar, Whiz, BigD, BigS
+try:
+    from decimal import Decimal
+except ImportError:
+    from django.utils._decimal import Decimal
+    
+class DecimalFieldTests(django.test.TestCase):
+    def test_to_python(self):
+        f = models.DecimalField(max_digits=4, decimal_places=2)
+        self.assertEqual(f.to_python(3), Decimal("3"))
+        self.assertEqual(f.to_python("3.14"), Decimal("3.14"))
+        self.assertRaises(ValidationError, f.to_python, "abc")
+    
+    def test_default(self):
+        f = models.DecimalField(default=Decimal("0.00"))
+        self.assertEqual(f.get_default(), Decimal("0.00"))
+    
+    def test_format(self):
+        f = models.DecimalField(max_digits=5, decimal_places=1)
+        self.assertEqual(f._format(f.to_python(2)), u'2.0')
+        self.assertEqual(f._format(f.to_python('2.6')), u'2.6')
+        self.assertEqual(f._format(None), None)
+    
+    def test_get_db_prep_lookup(self):
+        f = models.DecimalField(max_digits=5, decimal_places=1)
+        self.assertEqual(f.get_db_prep_lookup('exact', None), [None])
 
-# DecimalField
+    def test_filter_with_strings(self):
+        """
+        We should be able to filter decimal fields using strings (#8023)
+        """
+        Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
+        self.assertEqual(list(Foo.objects.filter(d=u'1.23')), [])
 
->>> f = DecimalField(max_digits=4, decimal_places=2)
+    def test_save_wihout_float_conversion(self):
+        """
+        Ensure decimals don't go through a corrupting float conversion during
+        save (#5079).
+        """
+        bd = BigD(d="12.9")
+        bd.save()
+        bd = BigD.objects.get(pk=bd.pk)
+        self.assertEqual(bd.d, Decimal("12.9"))
 
->>> f.to_python(3) == Decimal("3")
-True
+class ForeignKeyTests(django.test.TestCase):
+    def test_callable_default(self):
+        """Test the use of a lazy callable for ForeignKey.default"""
+        a = Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
+        b = Bar.objects.create(b="bcd")
+        self.assertEqual(b.a, a)
 
->>> f.to_python("3.14") == Decimal("3.14")
-True
+class DateTimeFieldTests(unittest.TestCase):
+    def test_datetimefield_to_python_usecs(self):
+        """DateTimeField.to_python should support usecs"""
+        f = models.DateTimeField()
+        self.assertEqual(f.to_python('2001-01-02 03:04:05.000006'),
+                         datetime.datetime(2001, 1, 2, 3, 4, 5, 6))
+        self.assertEqual(f.to_python('2001-01-02 03:04:05.999999'),
+                         datetime.datetime(2001, 1, 2, 3, 4, 5, 999999))
+        
+    def test_timefield_to_python_usecs(self):
+        """TimeField.to_python should support usecs"""
+        f = models.TimeField()
+        self.assertEqual(f.to_python('01:02:03.000004'), 
+                         datetime.time(1, 2, 3, 4))
+        self.assertEqual(f.to_python('01:02:03.999999'),
+                         datetime.time(1, 2, 3, 999999))
 
->>> f.to_python("abc")
-Traceback (most recent call last):
-...
-ValidationError: This value must be a decimal number.
+class BooleanFieldTests(unittest.TestCase):
+    def _test_get_db_prep_lookup(self, f):
+        self.assertEqual(f.get_db_prep_lookup('exact', True), [True])
+        self.assertEqual(f.get_db_prep_lookup('exact', '1'), [True])
+        self.assertEqual(f.get_db_prep_lookup('exact', 1), [True])
+        self.assertEqual(f.get_db_prep_lookup('exact', False), [False])
+        self.assertEqual(f.get_db_prep_lookup('exact', '0'), [False])
+        self.assertEqual(f.get_db_prep_lookup('exact', 0), [False])
+        self.assertEqual(f.get_db_prep_lookup('exact', None), [None])
 
->>> f = DecimalField(default=Decimal("0.00"))
->>> f.get_default()
-Decimal("0.00")
+    def test_booleanfield_get_db_prep_lookup(self):
+        self._test_get_db_prep_lookup(models.BooleanField())
+        
+    def test_nullbooleanfield_get_db_prep_lookup(self):
+        self._test_get_db_prep_lookup(models.NullBooleanField())
 
->>> f = DecimalField(max_digits=5, decimal_places=1)
->>> x = f.to_python(2)
->>> y = f.to_python('2.6')
-
->>> f._format(x)
-u'2.0'
->>> f._format(y)
-u'2.6'
->>> f._format(None)
->>> f.get_db_prep_lookup('exact', None)
-[None]
-
-# DateTimeField and TimeField to_python should support usecs:
->>> f = DateTimeField()
->>> f.to_python('2001-01-02 03:04:05.000006')
-datetime.datetime(2001, 1, 2, 3, 4, 5, 6)
->>> f.to_python('2001-01-02 03:04:05.999999')
-datetime.datetime(2001, 1, 2, 3, 4, 5, 999999)
-
->>> f = TimeField()
->>> f.to_python('01:02:03.000004')
-datetime.time(1, 2, 3, 4)
->>> f.to_python('01:02:03.999999')
-datetime.time(1, 2, 3, 999999)
-
-# Boolean and null boolean fields
->>> f = BooleanField()
->>> for val in (True, '1', 1):
-...     f.get_db_prep_lookup('exact', val)
-[True]
-[True]
-[True]
->>> for val in (False, '0', 0):
-...     f.get_db_prep_lookup('exact', val)
-[False]
-[False]
-[False]
-
->>> f = NullBooleanField()
->>> for val in (True, '1', 1):
-...     f.get_db_prep_lookup('exact', val)
-[True]
-[True]
-[True]
->>> for val in (False, '0', 0):
-...     f.get_db_prep_lookup('exact', val)
-[False]
-[False]
-[False]
->>> f.get_db_prep_lookup('exact', None)
-[None]
-
-"""
+class ChoicesTests(django.test.TestCase):
+    def test_choices_and_field_display(self):
+        """
+        Check that get_choices and get_flatchoices interact with
+        get_FIELD_display to return the expected values (#7913).
+        """
+        self.assertEqual(Whiz(c=1).get_c_display(), 'First')    # A nested value
+        self.assertEqual(Whiz(c=0).get_c_display(), 'Other')    # A top level value
+        self.assertEqual(Whiz(c=9).get_c_display(), 9)          # Invalid value
+        self.assertEqual(Whiz(c=None).get_c_display(), None)    # Blank value
+        self.assertEqual(Whiz(c='').get_c_display(), '')        # Empty value
+        
+class SlugFieldTests(django.test.TestCase):
+    def test_slugfield_max_length(self):
+        """
+        Make sure SlugField honors max_length (#9706)
+        """
+        bs = BigS.objects.create(s = 'slug'*50)
+        bs = BigS.objects.get(pk=bs.pk)
+        self.assertEqual(bs.s, 'slug'*50)
