@@ -7,9 +7,26 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.core import mail
 
-class PasswordResetTest(TestCase):
+class AuthViewsTestCase(TestCase):
+    """
+    Helper base class for all the follow test cases.
+    """
     fixtures = ['authtestdata.json']
     urls = 'django.contrib.auth.urls'
+
+    def setUp(self):
+        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = (
+            os.path.join(
+                os.path.dirname(__file__),
+                'templates'
+            )
+        ,)
+
+    def tearDown(self):
+        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+
+class PasswordResetTest(AuthViewsTestCase):
 
     def test_email_not_found(self):
         "Error is raised if the provided email address isn't currently registered"
@@ -89,22 +106,7 @@ class PasswordResetTest(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assert_("The two password fields didn&#39;t match" in response.content)
 
-
-class ChangePasswordTest(TestCase):
-    fixtures = ['authtestdata.json']
-    urls = 'django.contrib.auth.urls'
-
-    def setUp(self):
-        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
-        settings.TEMPLATE_DIRS = (
-            os.path.join(
-                os.path.dirname(__file__),
-                'templates'
-            )
-        ,)
-
-    def tearDown(self):
-        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+class ChangePasswordTest(AuthViewsTestCase):
 
     def login(self, password='password'):
         response = self.client.post('/login/', {
@@ -162,3 +164,61 @@ class ChangePasswordTest(TestCase):
         self.fail_login()
         self.login(password='password1')
 
+class LoginTest(AuthViewsTestCase):
+
+    def test_current_site_in_context_after_login(self):
+        response = self.client.get(reverse('django.contrib.auth.views.login'))
+        self.assertEquals(response.status_code, 200)
+        site = Site.objects.get_current()
+        self.assertEquals(response.context['site'], site)
+        self.assertEquals(response.context['site_name'], site.name)
+        self.assert_(isinstance(response.context['form'], AuthenticationForm), 
+                     'Login form is not an AuthenticationForm')
+        
+class LogoutTest(AuthViewsTestCase):
+    urls = 'django.contrib.auth.tests.urls'
+
+    def login(self, password='password'):
+        response = self.client.post('/login/', {
+            'username': 'testclient',
+            'password': password
+            }
+        )
+        self.assertEquals(response.status_code, 302)
+        self.assert_(response['Location'].endswith(settings.LOGIN_REDIRECT_URL))
+        self.assert_(SESSION_KEY in self.client.session)
+
+    def confirm_logged_out(self):
+        self.assert_(SESSION_KEY not in self.client.session)
+
+    def test_logout_default(self):
+        "Logout without next_page option renders the default template"
+        self.login()
+        response = self.client.get('/logout/')
+        self.assertEquals(200, response.status_code)
+        self.assert_('Logged out' in response.content)
+        self.confirm_logged_out()
+
+    def test_logout_with_next_page_specified(self): 
+        "Logout with next_page option given redirects to specified resource"
+        self.login()
+        response = self.client.get('/logout/next_page/')
+        self.assertEqual(response.status_code, 302)
+        self.assert_(response['Location'].endswith('/somewhere/'))
+        self.confirm_logged_out()
+
+    def test_logout_with_redirect_argument(self):
+        "Logout with query string redirects to specified resource"
+        self.login()
+        response = self.client.get('/logout/?next=/login/')
+        self.assertEqual(response.status_code, 302)
+        self.assert_(response['Location'].endswith('/login/'))
+        self.confirm_logged_out()
+
+    def test_logout_with_custom_redirect_argument(self):
+        "Logout with custom query string redirects to specified resource"
+        self.login()
+        response = self.client.get('/logout/custom_query/?follow=/somewhere/')
+        self.assertEqual(response.status_code, 302)
+        self.assert_(response['Location'].endswith('/somewhere/'))
+        self.confirm_logged_out()
