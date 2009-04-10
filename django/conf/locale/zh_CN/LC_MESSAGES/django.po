@@ -3715,7 +3715,7 @@ msgstr "这个值必须小于或等于 %s。"
 #: forms/fields.py:168 forms/fields.py:197 forms/fields.py:226
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
-msgstr "这个值必须小于或等于 %s。"
+msgstr "这个值必须大于或等于 %s。"
 
 #: forms/fields.py:195 forms/fields.py:224
 msgid "Enter a number."
