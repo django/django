@@ -124,6 +124,7 @@ class Signal(object):
             (r_key, _) = self.receivers[index]
             if r_key == lookup_key:
                 del self.receivers[index]
+                break
 
     def send(self, sender, **named):
         """Send signal from sender to all connected receivers.
