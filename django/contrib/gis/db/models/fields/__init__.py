@@ -13,6 +13,10 @@ def deprecated_property(func):
     warn('This attribute has been deprecated, please use "%s" instead.' % func.__name__[1:])
     return property(func)
 
+# Local cache of the spatial_ref_sys table, which holds static data.
+# This exists so that we don't have to hit the database each time.
+SRID_CACHE = {}
+
 class GeometryField(SpatialBackend.Field):
     "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 
@@ -60,7 +64,9 @@ class GeometryField(SpatialBackend.Field):
         super(GeometryField, self).__init__(**kwargs) # Calling the parent initializtion function
 
     def _populate_srid_info(self):
-        self._units_cache, self._units_name_cache, self._spheroid_cache = get_srid_info(self.srid)
+        if self.srid not in SRID_CACHE:
+            SRID_CACHE[self.srid] = get_srid_info(self.srid)
+        self._units_cache, self._units_name_cache, self._spheroid_cache = SRID_CACHE[self.srid]
 
     def _get_units(self):
         if self._units_cache is None:
