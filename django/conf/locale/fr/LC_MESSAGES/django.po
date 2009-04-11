@@ -4147,7 +4147,7 @@ msgstr "juillet"
 
 #: utils/dates.py:19
 msgid "August"
-msgstr "août"
+msgstr "aoû"
 
 #: utils/dates.py:19
 msgid "September"
