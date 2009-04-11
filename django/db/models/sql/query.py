@@ -123,12 +123,18 @@ class BaseQuery(object):
         obj_dict['related_select_fields'] = []
         obj_dict['related_select_cols'] = []
         del obj_dict['connection']
+
+        # Fields can't be pickled, so we pickle the list of field names instead.
+        obj_dict['select_fields'] = [f.name for f in obj_dict['select_fields']]
         return obj_dict
 
     def __setstate__(self, obj_dict):
         """
         Unpickling support.
         """
+        # Rebuild list of field instances
+        obj_dict['select_fields'] = [obj_dict['model']._meta.get_field(name) for name in obj_dict['select_fields']]
+
         self.__dict__.update(obj_dict)
         # XXX: Need a better solution for this when multi-db stuff is
         # supported. It's the only class-reference to the module-level

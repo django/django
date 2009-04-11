@@ -1,4 +1,6 @@
 # coding: utf-8
+import pickle
+
 from django.db import models
 from django.conf import settings
 
@@ -241,6 +243,19 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, conta
 >>> ids = Book.objects.filter(pages__gt=100).annotate(n_authors=Count('authors')).filter(n_authors__gt=2).order_by('n_authors')
 >>> Book.objects.filter(id__in=ids)
 [<Book: Python Web Development with Django>]
+
+# Regression for #10197 -- Queries with aggregates can be pickled.
+# First check that pickling is possible at all. No crash = success
+>>> qs = Book.objects.annotate(num_authors=Count('authors'))
+>>> out = pickle.dumps(qs)
+
+# Then check that the round trip works.
+>>> query = qs.query.as_sql()[0]
+>>> select_fields = qs.query.select_fields
+>>> query2 = pickle.loads(pickle.dumps(qs))
+>>> query2.query.as_sql()[0] == query
+True
+>>> query2.query.select_fields = select_fields
 
 # Regression for #10199 - Aggregate calls clone the original query so the original query can still be used
 >>> books = Book.objects.all()
