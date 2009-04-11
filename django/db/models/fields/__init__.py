@@ -370,6 +370,7 @@ class AutoField(Field):
         return None
 
 class BooleanField(Field):
+    empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
         if 'default' not in kwargs and not kwargs.get('null'):
