@@ -7,7 +7,7 @@ class ContentTypeManager(models.Manager):
     # Cache to avoid re-looking up ContentType objects all over the place.
     # This cache is shared by all the get_for_* methods.
     _cache = {}
-    
+
     def get_for_model(self, model):
         """
         Returns the ContentType object for a given model, creating the
@@ -15,22 +15,25 @@ class ContentTypeManager(models.Manager):
         for the same model don't hit the database.
         """
         opts = model._meta
+        while opts.proxy:
+            model = opts.proxy_for_model
+            opts = model._meta
         key = (opts.app_label, opts.object_name.lower())
         try:
             ct = self.__class__._cache[key]
         except KeyError:
-            # Load or create the ContentType entry. The smart_unicode() is 
+            # Load or create the ContentType entry. The smart_unicode() is
             # needed around opts.verbose_name_raw because name_raw might be a
             # django.utils.functional.__proxy__ object.
             ct, created = self.get_or_create(
                 app_label = opts.app_label,
-                model = opts.object_name.lower(), 
+                model = opts.object_name.lower(),
                 defaults = {'name': smart_unicode(opts.verbose_name_raw)},
             )
             self._add_to_cache(ct)
-            
+
         return ct
-        
+
     def get_for_id(self, id):
         """
         Lookup a ContentType by ID. Uses the same shared cache as get_for_model
@@ -44,7 +47,7 @@ class ContentTypeManager(models.Manager):
             ct = self.get(pk=id)
             self._add_to_cache(ct)
         return ct
-            
+
     def clear_cache(self):
         """
         Clear out the content-type cache. This needs to happen during database
@@ -53,7 +56,7 @@ class ContentTypeManager(models.Manager):
         this gets called).
         """
         self.__class__._cache.clear()
-        
+
     def _add_to_cache(self, ct):
         """Insert a ContentType into the cache."""
         model = ct.model_class()
@@ -66,7 +69,7 @@ class ContentType(models.Model):
     app_label = models.CharField(max_length=100)
     model = models.CharField(_('python model class name'), max_length=100)
     objects = ContentTypeManager()
-    
+
     class Meta:
         verbose_name = _('content type')
         verbose_name_plural = _('content types')

@@ -5,6 +5,7 @@ than using a new table of their own. This allows them to act as simple proxies,
 providing a modified interface to the data from the base class.
 """
 
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
@@ -171,6 +172,12 @@ FieldError: Proxy model 'NoNewFields' contains model fields.
 [<OtherPerson: barney>, <OtherPerson: fred>]
 >>> OtherPerson._default_manager.all()
 [<OtherPerson: barney>, <OtherPerson: wilma>]
+
+# A proxy has the same content type as the model it is proxying for (at the
+# storage level, it is meant to be essentially indistinguishable).
+>>> ctype = ContentType.objects.get_for_model
+>>> ctype(Person) is ctype(OtherPerson)
+True
 """}
 
 

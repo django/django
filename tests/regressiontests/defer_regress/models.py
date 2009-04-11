@@ -3,6 +3,7 @@ Regression tests for defer() / only() behavior.
 """
 
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.db import connection, models
 
 class Item(models.Model):
@@ -90,6 +91,15 @@ Some further checks for select_related() and inherited model behaviour
 u'c1'
 >>> Leaf.objects.select_related().only("child__name", "second_child__name")
 [<Leaf_Deferred_name_value: l1>]
+
+Models instances with deferred fields should still return the same content
+types as their non-deferred versions (bug #10738).
+>>> ctype = ContentType.objects.get_for_model
+>>> c1 = ctype(Item.objects.all()[0])
+>>> c2 = ctype(Item.objects.defer("name")[0])
+>>> c3 = ctype(Item.objects.only("name")[0])
+>>> c1 is c2 is c3
+True
 
 """
 }
