@@ -6,7 +6,7 @@ from django.db import connection
 def spatialite_init_file():
     # SPATIALITE_SQL may be placed in settings to tell
     # GeoDjango to use a specific user-supplied file.
-    return getattr(settings, 'SPATIALITE_SQL', 'init_spatialite-2.2.sql')
+    return getattr(settings, 'SPATIALITE_SQL', 'init_spatialite-2.3.sql')
 
 def create_test_spatial_db(verbosity=1, autoclobber=False, interactive=False):
     "Creates a spatial database based on the settings."
