@@ -412,3 +412,36 @@ class SessionTests(TestCase):
         self.failUnless(login, 'Could not log in')
         self.client.logout()
         self.client.logout()
+
+class UnicodePayloadTests(TestCase):
+    def test_simple_unicode_payload(self):
+        "A simple ASCII-only unicode JSON document can be POSTed"
+        # Regression test for #10571
+        json = u'{"english": "mountain pass"}'
+        response = self.client.post("/test_client_regress/parse_unicode_json/", json,
+                                    content_type="application/json")
+        self.assertEqual(response.content, json)
+
+    def test_unicode_payload_utf8(self):
+        "A non-ASCII unicode data encoded as UTF-8 can be POSTed"
+        # Regression test for #10571
+        json = u'{"dog": "собака"}'
+        response = self.client.post("/test_client_regress/parse_unicode_json/", json,
+                                    content_type="application/json; charset=utf-8")
+        self.assertEqual(response.content, json.encode('utf-8'))
+
+    def test_unicode_payload_utf16(self):
+        "A non-ASCII unicode data encoded as UTF-16 can be POSTed"
+        # Regression test for #10571
+        json = u'{"dog": "собака"}'
+        response = self.client.post("/test_client_regress/parse_unicode_json/", json,
+                                    content_type="application/json; charset=utf-16")
+        self.assertEqual(response.content, json.encode('utf-16'))
+
+    def test_unicode_payload_non_utf(self):
+        "A non-ASCII unicode data as a non-UTF based encoding can be POSTed"
+        #Regression test for #10571
+        json = u'{"dog": "собака"}'
+        response = self.client.post("/test_client_regress/parse_unicode_json/", json,
+                                    content_type="application/json; charset=koi8-r")
+        self.assertEqual(response.content, json.encode('koi8-r'))

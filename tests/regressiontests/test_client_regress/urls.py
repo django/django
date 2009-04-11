@@ -10,4 +10,5 @@ urlpatterns = patterns('',
     (r'^set_session/$', views.set_session_view),
     (r'^check_session/$', views.check_session_view),
     (r'^check_unicode/$', views.return_unicode),
+    (r'^parse_unicode_json/$', views.return_json_file),
 )
