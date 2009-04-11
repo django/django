@@ -8,15 +8,17 @@ var Actions = {
             });
         }
         var changelistTable = document.getElementsBySelector('#changelist table')[0];
-        addEvent(changelistTable, 'click', function(e) {
-            if (!e) { var e = window.event; }
-            var target = e.target ? e.target : e.srcElement;
-            if (target.nodeType == 3) { target = target.parentNode; }
-            if (target.className == 'action-select') {
-                var tr = target.parentNode.parentNode;
-                Actions.toggleRow(tr, target.checked);
-            }
-        });
+        if (changelistTable) {
+            addEvent(changelistTable, 'click', function(e) {
+                if (!e) { var e = window.event; }
+                var target = e.target ? e.target : e.srcElement;
+                if (target.nodeType == 3) { target = target.parentNode; }
+                if (target.className == 'action-select') {
+                    var tr = target.parentNode.parentNode;
+                    Actions.toggleRow(tr, target.checked);
+                }
+            });
+        }
     },
     toggleRow: function(tr, checked) {
         if (checked && tr.className.indexOf('selected') == -1) {
