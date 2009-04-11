@@ -1,6 +1,6 @@
 import re
 
-from django.template import Node, Variable, VariableNode
+from django.template import Node, Variable, VariableNode, _render_value_in_context
 from django.template import TemplateSyntaxError, TokenParser, Library
 from django.template import TOKEN_TEXT, TOKEN_VAR
 from django.utils import translation
@@ -43,7 +43,7 @@ class TranslateNode(Node):
         if self.noop:
             return value
         else:
-            return translation.ugettext(value)
+            return _render_value_in_context(translation.ugettext(value), context)
 
 class BlockTranslateNode(Node):
     def __init__(self, extra_context, singular, plural=None, countervar=None,
@@ -82,7 +82,7 @@ class BlockTranslateNode(Node):
             result = translation.ugettext(singular)
         # Escape all isolated '%' before substituting in the context.
         result = re.sub(u'%(?!\()', u'%%', result)
-        data = dict([(v, force_unicode(context[v])) for v in vars])
+        data = dict([(v, _render_value_in_context(context[v], context)) for v in vars])
         context.pop()
         return result % data
 

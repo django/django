@@ -801,6 +801,18 @@ class TextNode(Node):
 
     def render(self, context):
         return self.s
+    
+def _render_value_in_context(value, context):
+    """
+    Converts any value to a string to become part of a rendered template. This
+    means escaping, if required, and conversion to a unicode object. If value
+    is a string, it is expected to have already been translated.
+    """
+    value = force_unicode(value)
+    if (context.autoescape and not isinstance(value, SafeData)) or isinstance(value, EscapeData):
+        return escape(value)
+    else:
+        return value
 
 class VariableNode(Node):
     def __init__(self, filter_expression):
@@ -811,15 +823,12 @@ class VariableNode(Node):
 
     def render(self, context):
         try:
-            output = force_unicode(self.filter_expression.resolve(context))
+            output = self.filter_expression.resolve(context)
         except UnicodeDecodeError:
             # Unicode conversion can fail sometimes for reasons out of our
             # control (e.g. exception rendering). In that case, we fail quietly.
             return ''
-        if (context.autoescape and not isinstance(output, SafeData)) or isinstance(output, EscapeData):
-            return force_unicode(escape(output))
-        else:
-            return force_unicode(output)
+        return _render_value_in_context(output, context)
 
 def generic_tag_compiler(params, defaults, name, node_class, parser, token):
     "Returns a template.Node subclass."
