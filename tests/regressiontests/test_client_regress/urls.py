@@ -23,4 +23,5 @@ urlpatterns = patterns('',
     (r'^check_session/$', views.check_session_view),
     (r'^request_methods/$', views.request_methods_view),
     (r'^check_unicode/$', views.return_unicode),
+    (r'^parse_unicode_json/$', views.return_json_file),
 )

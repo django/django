@@ -1,7 +1,12 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import SuspiciousOperation
 from django.shortcuts import render_to_response
+from django.utils import simplejson
+from django.utils.encoding import smart_str
+from django.core.serializers.json import DjangoJSONEncoder
+from django.test.client import CONTENT_TYPE_RE
 
 def no_template_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -63,3 +68,21 @@ def request_methods_view(request):
 
 def return_unicode(request):
     return render_to_response('unicode.html')
+
+def return_json_file(request):
+    "A view that parses and returns a JSON string as a file."
+    match = CONTENT_TYPE_RE.match(request.META['CONTENT_TYPE'])
+    if match:
+        charset = match.group(1)
+    else:
+        charset = settings.DEFAULT_CHARSET
+
+    # This just checks that the uploaded data is JSON
+    obj_dict = simplejson.loads(request.raw_post_data.decode(charset))
+    obj_json = simplejson.dumps(obj_dict, encoding=charset,
+                                cls=DjangoJSONEncoder,
+                                ensure_ascii=False)
+    response = HttpResponse(smart_str(obj_json, encoding=charset), status=200,
+                            mimetype='application/json; charset=' + charset)
+    response['Content-Disposition'] = 'attachment; filename=testfile.json'
+    return response
