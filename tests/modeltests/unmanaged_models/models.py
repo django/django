@@ -91,19 +91,33 @@ class Intermediate(models.Model):
 
 #
 # These next models test the creation (or not) of many to many join tables
-# between managed and unmanaged models. A join table between two unmanaged 
-# models shouldn't be automatically created (see #10647). 
+# between managed and unmanaged models. A join table between two unmanaged
+# models shouldn't be automatically created (see #10647).
 #
-class Unmanaged1(models.Model):    
+
+# Firstly, we need some models that will create the tables, purely so that the
+# tables are created. This is a test setup, not a requirement for unmanaged
+# models.
+class Proxy1(models.Model):
+    class Meta:
+        db_table = "unmanaged_models_proxy1"
+
+class Proxy2(models.Model):
+    class Meta:
+        db_table = "unmanaged_models_proxy2"
+
+class Unmanaged1(models.Model):
     class Meta:
         managed = False
+        db_table = "unmanaged_models_proxy1"
 
 # Unmanged with an m2m to unmanaged: the intermediary table won't be created.
 class Unmanaged2(models.Model):
     mm = models.ManyToManyField(Unmanaged1)
-    
+
     class Meta:
         managed = False
+        db_table = "unmanaged_models_proxy2"
 
 # Here's an unmanaged model with an m2m to a managed one; the intermediary
 # table *will* be created (unless given a custom `through` as for C02 above).
