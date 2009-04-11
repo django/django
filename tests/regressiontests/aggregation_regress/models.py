@@ -297,6 +297,11 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, conta
 >>> HardbackBook.objects.annotate(n_authors=Count('authors')).values('name','n_authors')
 [{'n_authors': 2, 'name': u'Artificial Intelligence: A Modern Approach'}, {'n_authors': 1, 'name': u'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp'}]
 
+# Regression for #10766 - Shouldn't be able to reference an aggregate fields in an an aggregate() call.
+>>> Book.objects.all().annotate(mean_age=Avg('authors__age')).annotate(Avg('mean_age'))
+Traceback (most recent call last):
+...
+FieldError: Cannot compute Avg('mean_age'): 'mean_age' is an aggregate
 
 """
 }

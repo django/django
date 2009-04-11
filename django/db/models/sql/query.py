@@ -1403,6 +1403,9 @@ class BaseQuery(object):
             field_name = field_list[0]
             col = field_name
             source = self.aggregates[field_name]
+            if not is_summary:
+                raise FieldError("Cannot compute %s('%s'): '%s' is an aggregate" % (
+                    aggregate.name, field_name, field_name))
         elif ((len(field_list) > 1) or
             (field_list[0] not in [i.name for i in opts.fields]) or
             self.group_by is None or
