@@ -1,12 +1,13 @@
 from django.db.backends import BaseDatabaseClient
 from django.conf import settings
 import os
+import sys
 
 class DatabaseClient(BaseDatabaseClient):
     executable_name = 'mysql'
 
     def runshell(self):
-        args = ['']
+        args = [self.executable_name]
         db = settings.DATABASE_OPTIONS.get('db', settings.DATABASE_NAME)
         user = settings.DATABASE_OPTIONS.get('user', settings.DATABASE_USER)
         passwd = settings.DATABASE_OPTIONS.get('passwd', settings.DATABASE_PASSWORD)
@@ -28,4 +29,7 @@ class DatabaseClient(BaseDatabaseClient):
         if db:
             args += [db]
 
-        os.execvp(self.executable_name, args)
+        if os.name == 'nt':
+            sys.exit(os.system(" ".join(args)))
+        else:
+            os.execvp(self.executable_name, args)

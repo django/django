@@ -1,6 +1,7 @@
 from django.db.backends import BaseDatabaseClient
 from django.conf import settings
 import os
+import sys
 
 class DatabaseClient(BaseDatabaseClient):
     executable_name = 'psql'
@@ -14,4 +15,7 @@ class DatabaseClient(BaseDatabaseClient):
         if settings.DATABASE_PORT:
             args.extend(["-p", str(settings.DATABASE_PORT)])
         args += [settings.DATABASE_NAME]
-        os.execvp(self.executable_name, args)
+        if os.name == 'nt':
+            sys.exit(os.system(" ".join(args)))
+        else:
+            os.execvp(self.executable_name, args)
