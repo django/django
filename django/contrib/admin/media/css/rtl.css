@@ -193,3 +193,14 @@ fieldset .field-box {
     text-align: right
 }
 
+.inline-related h3 span.delete {
+    padding-right: 20px;
+    padding-left: inherit;
+    left: 10px;
+    right: inherit;
+}
+
+.inline-related h3 span.delete label {
+    margin-left: inherit;
+    margin-right: 2px;
+}
