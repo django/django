@@ -59,17 +59,17 @@ class BaseDatabaseWrapper(local):
     def _savepoint(self, sid):
         if not self.features.uses_savepoints:
             return
-        self.connection.cursor().execute(self.ops.savepoint_create_sql(sid))
+        self.cursor().execute(self.ops.savepoint_create_sql(sid))
 
     def _savepoint_rollback(self, sid):
         if not self.features.uses_savepoints:
             return
-        self.connection.cursor().execute(self.ops.savepoint_rollback_sql(sid))
+        self.cursor().execute(self.ops.savepoint_rollback_sql(sid))
 
     def _savepoint_commit(self, sid):
         if not self.features.uses_savepoints:
             return
-        self.connection.cursor().execute(self.ops.savepoint_commit_sql(sid))
+        self.cursor().execute(self.ops.savepoint_commit_sql(sid))
 
     def close(self):
         if self.connection is not None:
