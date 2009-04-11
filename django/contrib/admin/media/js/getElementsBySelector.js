@@ -38,8 +38,8 @@ document.getElementsBySelector = function(selector) {
       var tagName = bits[0];
       var id = bits[1];
       var element = document.getElementById(id);
-      if (tagName && element.nodeName.toLowerCase() != tagName) {
-        // tag with that ID not found, return false
+      if (!element || (tagName && element.nodeName.toLowerCase() != tagName)) {
+        // ID not found or tag with that ID not found, return false.
         return new Array();
       }
       // Set currentContext to contain just this element
