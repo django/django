@@ -17,7 +17,7 @@ checkbox = forms.CheckboxInput({'class': 'action-select'}, lambda value: False)
 
 class AdminForm(object):
     def __init__(self, form, fieldsets, prepopulated_fields):
-        self.form, self.fieldsets = form, fieldsets
+        self.form, self.fieldsets = form, normalize_fieldsets(fieldsets)
         self.prepopulated_fields = [{
             'field': form[field_name],
             'dependencies': [form[f] for f in dependencies]
@@ -196,3 +196,25 @@ class AdminErrorList(forms.util.ErrorList):
                 self.extend(inline_formset.non_form_errors())
                 for errors_in_inline_form in inline_formset.errors:
                     self.extend(errors_in_inline_form.values())
+
+def normalize_fieldsets(fieldsets):
+    """
+    Make sure the keys in fieldset dictionaries are strings. Returns the
+    normalized data.
+    """
+    result = []
+    for name, options in fieldsets:
+        result.append((name, normalize_dictionary(options)))
+    return result
+
+def normalize_dictionary(data_dict):
+    """
+    Converts all the keys in "data_dict" to strings. The keys must be
+    convertible using str().
+    """
+    for key, value in data_dict.items():
+        if not isinstance(key, str):
+            del data_dict[key]
+            data_dict[str(key)] = value
+    return data_dict
+

@@ -276,7 +276,7 @@ class BaseModelForm(BaseForm):
                 # using it in a lookup.
                 if isinstance(self.fields[field_name], ModelChoiceField):
                     lookup_value =  lookup_value.pk
-                lookup_kwargs[field_name] = lookup_value
+                lookup_kwargs[str(field_name)] = lookup_value
 
             qs = self.instance.__class__._default_manager.filter(**lookup_kwargs)
 

@@ -169,7 +169,7 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'gender', 'alive')
     list_editable = ('gender', 'alive')
     list_filter = ('gender',)
-    search_fields = ('name',)
+    search_fields = (u'name',)
     ordering = ["id"]
 
 class Persona(models.Model):
