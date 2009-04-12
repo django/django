@@ -620,9 +620,12 @@ class DecimalField(Field):
         from django.db.backends import util
         return util.format_number(value, self.max_digits, self.decimal_places)
 
-    def get_db_prep_value(self, value):
+    def get_db_prep_save(self, value):
         return connection.ops.value_to_db_decimal(self.to_python(value),
                 self.max_digits, self.decimal_places)
+
+    def get_db_prep_value(self, value):
+        return self.to_python(value)
 
     def formfield(self, **kwargs):
         defaults = {
