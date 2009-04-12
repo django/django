@@ -56,6 +56,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             'tblspace_temp': TEST_DATABASE_TBLSPACE_TMP,
         }
 
+        self.remember['name'] = settings.DATABASE_NAME
         self.remember['user'] = settings.DATABASE_USER
         self.remember['passwd'] = settings.DATABASE_PASSWORD
 
@@ -108,6 +109,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                     print "Tests cancelled."
                     sys.exit(1)
 
+        settings.DATABASE_NAME = self.connection.settings_dict["DATABASE_NAME"] = TEST_DATABASE_NAME
         settings.DATABASE_USER = self.connection.settings_dict["DATABASE_USER"] = TEST_DATABASE_USER
         settings.DATABASE_PASSWORD = self.connection.settings_dict["DATABASE_PASSWORD"] = TEST_DATABASE_PASSWD
 
@@ -124,6 +126,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         TEST_DATABASE_TBLSPACE = self._test_database_tblspace(settings)
         TEST_DATABASE_TBLSPACE_TMP = self._test_database_tblspace_tmp(settings)
 
+        settings.DATABASE_NAME = self.connection.settings_dict["DATABASE_NAME"] = self.remember['name']
         settings.DATABASE_USER = self.connection.settings_dict["DATABASE_USER"] = self.remember['user']
         settings.DATABASE_PASSWORD = self.connection.settings_dict["DATABASE_PASSWORD"] = self.remember['passwd']
 
@@ -135,6 +138,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             'tblspace_temp': TEST_DATABASE_TBLSPACE_TMP,
         }
 
+        self.remember['name'] = settings.DATABASE_NAME
         self.remember['user'] = settings.DATABASE_USER
         self.remember['passwd'] = settings.DATABASE_PASSWORD
 
@@ -244,8 +248,8 @@ class DatabaseCreation(BaseDatabaseCreation):
             raise
         return name
 
-    def _test_database_user(self, ettings):
-        name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
+    def _test_database_user(self, settings):
+        name = TEST_DATABASE_PREFIX + settings.DATABASE_USER
         try:
             if settings.TEST_DATABASE_USER:
                 name = settings.TEST_DATABASE_USER
