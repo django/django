@@ -187,7 +187,7 @@ def _sqlite_extract(lookup_type, dt):
         dt = util.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
-    return unicode(getattr(dt, lookup_type))
+    return getattr(dt, lookup_type)
 
 def _sqlite_date_trunc(lookup_type, dt):
     try:

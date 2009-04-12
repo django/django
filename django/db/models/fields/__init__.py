@@ -494,7 +494,7 @@ class DateField(Field):
         # For "__month" and "__day" lookups, convert the value to a string so
         # the database backend always sees a consistent type.
         if lookup_type in ('month', 'day'):
-            return [force_unicode(value)]
+            return [int(value)]
         return super(DateField, self).get_db_prep_lookup(lookup_type, value)
 
     def get_db_prep_value(self, value):
