@@ -22,11 +22,10 @@ class GZipMiddleware(object):
         if response.has_header('Content-Encoding'):
             return response
 
-        # Older versions of IE have issues with gzipped pages containing either
-        # Javascript and PDF.
+        # MSIE have issues with gzipped respones of various content types.
         if "msie" in request.META.get('HTTP_USER_AGENT', '').lower():
             ctype = response.get('Content-Type', '').lower()
-            if "javascript" in ctype or ctype == "application/pdf":
+            if not ctype.startswith("text/") or "javascript" in ctype:
                 return response
 
         ae = request.META.get('HTTP_ACCEPT_ENCODING', '')
