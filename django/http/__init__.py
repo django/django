@@ -72,7 +72,7 @@ class HttpRequest(object):
             current_uri = '%s://%s%s' % (self.is_secure() and 'https' or 'http',
                                          self.get_host(), self.path)
             location = urljoin(current_uri, location)
-        return location
+        return iri_to_uri(location)
 
     def is_secure(self):
         return os.environ.get("HTTPS") == "on"
@@ -398,14 +398,14 @@ class HttpResponseRedirect(HttpResponse):
 
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
-        self['Location'] = iri_to_uri(redirect_to)
+        self['Location'] = redirect_to
 
 class HttpResponsePermanentRedirect(HttpResponse):
     status_code = 301
 
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
-        self['Location'] = iri_to_uri(redirect_to)
+        self['Location'] = redirect_to
 
 class HttpResponseNotModified(HttpResponse):
     status_code = 304

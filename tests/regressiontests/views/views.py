@@ -1,6 +1,6 @@
 import sys
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django import forms
 from django.views.debug import technical_500_response
 from django.views.generic.create_update import create_object
@@ -36,3 +36,10 @@ def raises(request):
         raise Exception
     except Exception:
         return technical_500_response(request, *sys.exc_info())
+
+def redirect(request):
+    """
+    Forces an HTTP redirect.
+    """
+    return HttpResponseRedirect("target/")
+

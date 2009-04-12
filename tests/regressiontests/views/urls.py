@@ -1,3 +1,4 @@
+# coding: utf-8
 from os import path
 
 from django.conf.urls.defaults import *
@@ -38,6 +39,10 @@ urlpatterns = patterns('',
 
     # Static views
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': media_dir}),
+
+    # Special URLs for particular regression cases.
+    url(u'^中文/$', 'regressiontests.views.views.redirect'),
+    url(u'^中文/target/$', 'regressiontests.views.views.index_page'),
 )
 
 # Date-based generic views.
