@@ -222,7 +222,7 @@ in which the clauses are applied to the ``QuerySet``.
 When an ``annotate()`` clause is applied to a query, the annotation is
 computed over the state of the query up to the point where the annotation
 is requested. The practical implication of this is that ``filter()`` and
-``annotate()`` are not transitive operations -- that is, there is a
+``annotate()`` are not commutative operations -- that is, there is a
 difference between the query::
 
     >>> Publisher.objects.annotate(num_books=Count('book')).filter(book__rating__gt=3.0)
