@@ -83,6 +83,9 @@ u'and lots of whitespace: \\x0D\\x0A\\x09\\x0B\\x0C\\x08'
 >>> escapejs(ur'<script>and this</script>')
 u'\\x3Cscript\\x3Eand this\\x3C/script\\x3E'
 
+>>> escapejs(u'paragraph separator:\u2029and line separator:\u2028')
+u'paragraph separator:\\u2029and line separator:\\u2028'
+
 >>> fix_ampersands(u'Jack & Jill & Jeroboam')
 u'Jack &amp; Jill &amp; Jeroboam'
 

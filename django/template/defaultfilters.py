@@ -76,7 +76,9 @@ _base_js_escapes = (
     ('&', r'\x26'),
     ('=', r'\x3D'),
     ('-', r'\x2D'),
-    (';', r'\x3B')
+    (';', r'\x3B'),
+    (u'\u2028', r'\u2028'),
+    (u'\u2029', r'\u2029')
 )
 
 # Escape every ASCII character with a value less than 32.
