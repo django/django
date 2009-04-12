@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django import forms
 from django.views.generic.create_update import create_object
 
@@ -27,3 +27,10 @@ def custom_create(request):
     return create_object(request,
         post_save_redirect='/views/create_update/view/article/%(slug)s/',
         form_class=SlugChangingArticleForm)
+
+def redirect(request):
+    """
+    Forces an HTTP redirect.
+    """
+    return HttpResponseRedirect("target/")
+
