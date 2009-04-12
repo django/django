@@ -27,9 +27,8 @@ class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
         # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
         if lookup_type == 'week_day':
-            # Using EXTRACT(), PostgreSQL days are indexed as Sunday=0, Saturday=6.
-            # If we instead us TO_CHAR, they're indexed with Sunday=1, Saturday=7
-            return "TO_CHAR(%s, 'D')" % field_name
+            # For consistency across backends, we return Sunday=1, Saturday=7.
+            return "EXTRACT('dow' FROM %s) + 1" % field_name
         else:
             return "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
 

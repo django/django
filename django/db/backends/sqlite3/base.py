@@ -211,9 +211,9 @@ def _sqlite_extract(lookup_type, dt):
     except (ValueError, TypeError):
         return None
     if lookup_type == 'week_day':
-        return unicode((dt.isoweekday() % 7) + 1)
+        return (dt.isoweekday() % 7) + 1
     else:
-        return unicode(getattr(dt, lookup_type))
+        return getattr(dt, lookup_type)
 
 def _sqlite_date_trunc(lookup_type, dt):
     try:
