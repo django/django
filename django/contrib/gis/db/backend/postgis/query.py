@@ -2,16 +2,30 @@
  This module contains the spatial lookup types, and the get_geo_where_clause()
  routine for PostGIS.
 """
+
 import re
 from decimal import Decimal
 from django.db import connection
+from django.conf import settings
 from django.contrib.gis.measure import Distance
-from django.contrib.gis.db.backend.postgis.management import postgis_version_tuple
 from django.contrib.gis.db.backend.util import SpatialOperation, SpatialFunction
+
 qn = connection.ops.quote_name
 
-# Getting the PostGIS version information
-POSTGIS_VERSION, MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2 = postgis_version_tuple()
+# Get the PostGIS version information.
+# To avoid the need to do a database query to determine the PostGIS version
+# each time the server starts up, one can optionally specify a
+# POSTGIS_VERSION setting. This setting is intentionally undocumented and
+# should be considered experimental, because an upcoming GIS backend
+# refactoring might remove the need for it.
+if hasattr(settings, 'POSTGIS_VERSION') and settings.POSTGIS_VERSION is not None:
+    version_tuple = settings.POSTGIS_VERSION
+else:
+    # This import is intentionally within the 'else' so that it isn't executed
+    # if the POSTGIS_VERSION setting is available.
+    from django.contrib.gis.db.backend.postgis.management import postgis_version_tuple
+    version_tuple = postgis_version_tuple()
+POSTGIS_VERSION, MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2 = version_tuple
 
 # The supported PostGIS versions.
 #  TODO: Confirm tests with PostGIS versions 1.1.x -- should work.  
