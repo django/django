@@ -1126,6 +1126,23 @@ Bug #10432 (see also the Python 2.4+ tests for this, below). Testing an empty
 >>> list(Note.objects.filter(pk__in=g())) == [n_obj]
 True
 
+Make sure that updates which only filter on sub-tables don't inadvertently
+update the wrong records (bug #9848).
+
+# Make sure that the IDs from different tables don't happen to match.
+>>> Ranking.objects.filter(author__name='a1')
+[<Ranking: 3: a1>]
+>>> Ranking.objects.filter(author__name='a1').update(rank='4')
+1
+>>> r = Ranking.objects.filter(author__name='a1')[0]
+>>> r.id != r.author.id
+True
+>>> r.rank
+4
+>>> r.rank = 3
+>>> r.save()
+>>> Ranking.objects.all()
+[<Ranking: 3: a1>, <Ranking: 2: a2>, <Ranking: 1: a3>]
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
