@@ -22,7 +22,7 @@ if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
 from MySQLdb.converters import conversions
-from MySQLdb.constants import FIELD_TYPE, FLAG
+from MySQLdb.constants import FIELD_TYPE, FLAG, CLIENT
 
 from django.db.backends import *
 from django.db.backends.mysql.client import DatabaseClient
@@ -258,6 +258,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 kwargs['host'] = settings.DATABASE_HOST
             if settings.DATABASE_PORT:
                 kwargs['port'] = int(settings.DATABASE_PORT)
+            # We need the number of potentially affected rows after an
+            # "UPDATE", not the number of changed rows.
+            kwargs['client_flag'] = CLIENT.FOUND_ROWS
             kwargs.update(self.options)
             self.connection = Database.connect(**kwargs)
             self.connection.encoders[SafeUnicode] = self.connection.encoders[unicode]
