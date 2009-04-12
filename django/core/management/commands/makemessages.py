@@ -145,7 +145,11 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
                 if file_ext in extensions:
                     src = open(os.path.join(dirpath, file), "rU").read()
                     thefile = '%s.py' % file
-                    open(os.path.join(dirpath, thefile), "w").write(templatize(src))
+                    try:
+                        open(os.path.join(dirpath, thefile), "w").write(templatize(src))
+                    except SyntaxError, msg:
+                        msg = "%s (file: %s)" % (msg, os.path.join(dirpath, file))
+                        raise SyntaxError(msg)
                 if verbosity > 1:
                     sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
                 cmd = 'xgettext -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --keyword=ugettext_noop --keyword=ugettext_lazy --keyword=ungettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (
