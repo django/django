@@ -101,7 +101,6 @@ class ExceptionReporter:
             'frames': frames,
             'lastframe': frames[-1],
             'request': self.request,
-            'request_protocol': self.request.is_secure() and "https" or "http",
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
             'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
@@ -260,7 +259,6 @@ def technical_404_response(request, exception):
         'urlpatterns': tried,
         'reason': smart_str(exception, errors='replace'),
         'request': request,
-        'request_protocol': request.is_secure() and "https" or "http",
         'settings': get_safe_settings(),
     })
     return HttpResponseNotFound(t.render(c), mimetype='text/html')
@@ -399,7 +397,7 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
     <tr>
       <th>Request URL:</th>
-      <td>{{ request_protocol }}://{{ request.META.HTTP_HOST }}{{ request.path_info|escape }}</td>
+      <td>{{ request.build_absolute_uri|escape }}</td>
     </tr>
     <tr>
       <th>Exception Type:</th>
@@ -529,7 +527,7 @@ TECHNICAL_500_TEMPLATE = """
 Environment:
 
 Request Method: {{ request.META.REQUEST_METHOD }}
-Request URL: {{ request_protocol }}://{{ request.META.HTTP_HOST }}{{ request.path_info|escape }}
+Request URL: {{ request.build_absolute_uri|escape }}
 Django Version: {{ django_version_info }}
 Python Version: {{ sys_version_info }}
 Installed Applications:
@@ -741,7 +739,7 @@ TECHNICAL_404_TEMPLATE = """
       </tr>
       <tr>
         <th>Request URL:</th>
-      <td>{{ request_protocol }}://{{ request.META.HTTP_HOST }}{{ request.path_info|escape }}</td>
+      <td>{{ request.build_absolute_uri|escape }}</td>
       </tr>
     </table>
   </div>
