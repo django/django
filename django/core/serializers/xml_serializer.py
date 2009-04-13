@@ -65,11 +65,9 @@ class Serializer(base.Serializer):
             "type" : field.get_internal_type()
         })
 
-        # Get a "string version" of the object's data (this is handled by the
-        # serializer base class).
+        # Get a "string version" of the object's data.
         if getattr(obj, field.name) is not None:
-            value = self.get_string_value(obj, field)
-            self.xml.characters(smart_unicode(value))
+            self.xml.characters(field.value_to_string(obj))
         else:
             self.xml.addQuickElement("None")
 
