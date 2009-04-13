@@ -144,11 +144,17 @@ def archive_month(request, year, month, queryset, date_field,
 
     # Calculate the next month, if applicable.
     if allow_future:
-        next_month = last_day + datetime.timedelta(days=1)
-    elif last_day < datetime.date.today():
-        next_month = last_day + datetime.timedelta(days=1)
+        next_month = last_day
+    elif last_day <= datetime.date.today():
+        next_month = last_day
     else:
         next_month = None
+
+    # Calculate the previous month
+    if first_day.month == 1:
+        previous_month = first_day.replace(year=first_day.year-1,month=12)
+    else:
+        previous_month = first_day.replace(month=first_day.month-1)
 
     if not template_name:
         template_name = "%s/%s_archive_month.html" % (model._meta.app_label, model._meta.object_name.lower())
@@ -157,7 +163,7 @@ def archive_month(request, year, month, queryset, date_field,
         '%s_list' % template_object_name: object_list,
         'month': date,
         'next_month': next_month,
-        'previous_month': first_day - datetime.timedelta(days=1),
+        'previous_month': previous_month,
     }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
@@ -239,7 +245,7 @@ def archive_day(request, year, month, day, queryset, date_field,
     """
     if extra_context is None: extra_context = {}
     try:
-        tt = time.strptime('%s-%s-%s' % (year, month, day), 
+        tt = time.strptime('%s-%s-%s' % (year, month, day),
                            '%s-%s-%s' % ('%Y', month_format, day_format))
         date = datetime.date(*tt[:3])
     except ValueError:
@@ -311,7 +317,7 @@ def object_detail(request, year, month, day, queryset, date_field,
     """
     if extra_context is None: extra_context = {}
     try:
-        tt = time.strptime('%s-%s-%s' % (year, month, day), 
+        tt = time.strptime('%s-%s-%s' % (year, month, day),
                            '%s-%s-%s' % ('%Y', month_format, day_format))
         date = datetime.date(*tt[:3])
     except ValueError:

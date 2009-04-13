@@ -1,6 +1,6 @@
 # coding: utf-8
 from django.test import TestCase
-from datetime import datetime
+from datetime import datetime, date
 from datetime import timedelta
 from regressiontests.views.models import Article, Author, DateArticle
 
@@ -52,6 +52,8 @@ class MonthArchiveTest(TestCase):
         article.save()
         response = self.client.get('/views/date_based/archive_month/2004/02/')
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['next_month'], date(2004, 3, 1))
+        self.assertEqual(response.context['previous_month'], date(2004, 1, 1))
 
         article.date_created = first_second_of_feb-two_seconds
         article.save()
@@ -62,6 +64,8 @@ class MonthArchiveTest(TestCase):
         article.save()
         response = self.client.get('/views/date_based/archive_month/2004/02/')
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['next_month'], date(2004, 3, 1))
+        self.assertEqual(response.context['previous_month'], date(2004, 1, 1))
 
         article.date_created = first_second_of_mar
         article.save()
@@ -74,6 +78,8 @@ class MonthArchiveTest(TestCase):
         article2.save()
         response = self.client.get('/views/date_based/datefield/archive_month/2004/02/')
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['next_month'], date(2004, 3, 1))
+        self.assertEqual(response.context['previous_month'], date(2004, 1, 1))
 
         article2.date_created = (first_second_of_feb-two_seconds).date()
         article2.save()
@@ -84,11 +90,26 @@ class MonthArchiveTest(TestCase):
         article2.save()
         response = self.client.get('/views/date_based/datefield/archive_month/2004/02/')
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['next_month'], date(2004, 3, 1))
+        self.assertEqual(response.context['previous_month'], date(2004, 1, 1))
 
         article2.date_created = first_second_of_mar.date()
         article2.save()
         response = self.client.get('/views/date_based/datefield/archive_month/2004/02/')
         self.assertEqual(response.status_code, 404)
+
+        now = datetime.now()
+        prev_month = now.date().replace(day=1)
+        if prev_month.month == 11:
+            prev_month = prev_month.replace(year=prev_month.year-1, month=12)
+        else:
+            prev_month = prev_month.replace(month=prev_month.month-1)
+        article2.date_created = now
+        article2.save()
+        response = self.client.get('/views/date_based/datefield/archive_month/%s/' % now.strftime('%Y/%m'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['next_month'], None)
+        self.assertEqual(response.context['previous_month'], prev_month)
 
 class DayArchiveTests(TestCase):
 
