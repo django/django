@@ -26,6 +26,13 @@ class Entry(models.Model):
     def __unicode__(self):
         return self.name
 
+# Two models both inheriting from a base model with a self-referential m2m field
+class SelfReferChild(SelfRefer):
+    pass
+
+class SelfReferChildSibling(SelfRefer):
+    pass
+
 __test__ = {"regressions": """
 # Multiple m2m references to the same model or a different model must be
 # distinguished when accessing the relations through an instance attribute.
@@ -57,7 +64,20 @@ __test__ = {"regressions": """
 >>> SelfRefer.objects.filter(porcupine='fred')
 Traceback (most recent call last):
 ...
-FieldError: Cannot resolve keyword 'porcupine' into field. Choices are: id, name, references, related
+FieldError: Cannot resolve keyword 'porcupine' into field. Choices are: id, name, references, related, selfreferchild, selfreferchildsibling
+
+# Test to ensure that the relationship between two inherited models
+# with a self-referential m2m field maintains symmetry
+>>> sr_child = SelfReferChild(name="Hanna")
+>>> sr_child.save()
+
+>>> sr_sibling = SelfReferChildSibling(name="Beth")
+>>> sr_sibling.save()
+>>> sr_child.related.add(sr_sibling)
+>>> sr_child.related.all()
+[<SelfRefer: Beth>]
+>>> sr_sibling.related.all()
+[<SelfRefer: Hanna>]
 
 """
 }
