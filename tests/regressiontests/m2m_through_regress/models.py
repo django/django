@@ -35,6 +35,22 @@ class Group(models.Model):
     def __unicode__(self):
         return self.name
 
+# A set of models that use an non-abstract inherited model as the 'through' model.
+class A(models.Model):
+    a_text = models.CharField(max_length=20)
+
+class ThroughBase(models.Model):
+    a = models.ForeignKey(A)
+    b = models.ForeignKey('B')
+
+class Through(ThroughBase):
+    extra = models.CharField(max_length=20)
+
+class B(models.Model):
+    b_text = models.CharField(max_length=20)
+    a_list = models.ManyToManyField(A, through=Through)
+
+
 __test__ = {'API_TESTS':"""
 # Create some dummy data
 >>> bob = Person.objects.create(name='Bob')
@@ -175,5 +191,9 @@ doing a join.
 ## Regression test for #8254
 >>> bob.group_set.filter(membership__price=50)
 [<Group: Roll>]
+
+## Regression test for #9804
+# Flush the database, just to make sure we can.
+>>> management.call_command('flush', verbosity=0, interactive=False)
 
 """}

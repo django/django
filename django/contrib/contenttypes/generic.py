@@ -193,9 +193,9 @@ class ReverseGenericRelatedObjectsDescriptor(object):
         rel_model = self.field.rel.to
         superclass = rel_model._default_manager.__class__
         RelatedManager = create_generic_related_manager(superclass)
-        
+
         qn = connection.ops.quote_name
-                
+
         manager = RelatedManager(
             model = rel_model,
             instance = instance,
@@ -285,6 +285,7 @@ class GenericRel(ManyToManyRel):
         self.limit_choices_to = limit_choices_to or {}
         self.symmetrical = symmetrical
         self.multiple = True
+        self.through = None
 
 class BaseGenericInlineFormSet(BaseModelFormSet):
     """
