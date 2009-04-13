@@ -7,15 +7,15 @@ other serializers.
 from django.conf import settings
 from django.core.serializers import base
 from django.db import models
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_unicode, is_protected_type
 
 class Serializer(base.Serializer):
     """
     Serializes a QuerySet to basic Python objects.
     """
-    
+
     internal_use_only = True
-    
+
     def start_serialization(self):
         self._current = None
         self.objects = []
@@ -35,7 +35,14 @@ class Serializer(base.Serializer):
         self._current = None
 
     def handle_field(self, obj, field):
-        self._current[field.name] = smart_unicode(getattr(obj, field.name), strings_only=True)
+        value = field._get_val_from_obj(obj)
+        # Protected types (i.e., primitives like None, numbers, dates,
+        # and Decimals) are passed through as is. All other values are
+        # converted to string first.
+        if is_protected_type(value):
+            self._current[field.name] = value
+        else:
+            self._current[field.name] = field.value_to_string(obj)
 
     def handle_fk_field(self, obj, field):
         related = getattr(obj, field.name)
