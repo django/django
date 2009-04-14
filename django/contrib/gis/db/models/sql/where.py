@@ -76,17 +76,18 @@ class GeoWhereNode(WhereNode):
             # the `get_geo_where_clause` to construct the appropriate
             # spatial SQL when `make_atom` is called.
             annotation = GeoAnnotation(field, value, where)
-            return super(WhereNode, self).add((obj, lookup_type, annotation, params), connector)
+            return super(WhereNode, self).add(((alias, col, field.db_type()), lookup_type, annotation, params), connector)
 
     def make_atom(self, child, qn):
-        lvalue, lookup_type, value_annot, params = child
+        obj, lookup_type, value_annot, params = child
 
         if isinstance(value_annot, GeoAnnotation):
             if lookup_type in SpatialBackend.gis_terms:
                 # Getting the geographic where clause; substitution parameters
                 # will be populated in the GeoFieldSQL object returned by the
                 # GeometryField.
-                gwc = get_geo_where_clause(lvalue.alias, lvalue.col, lookup_type, value_annot)
+                alias, col, db_type = obj
+                gwc = get_geo_where_clause(alias, col, lookup_type, value_annot)
                 return gwc % value_annot.where, params
             else:
                 raise TypeError('Invalid lookup type: %r' % lookup_type)

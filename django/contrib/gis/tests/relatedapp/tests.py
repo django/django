@@ -210,6 +210,18 @@ class RelatedGeoModelTest(unittest.TestCase):
             self.assertEqual(val_dict['id'], c_id)
             self.assertEqual(val_dict['location__id'], l_id)
 
+    def test10_combine(self):
+        "Testing the combination of two GeoQuerySets.  See #10807."
+        buf1 = City.objects.get(name='Aurora').location.point.buffer(0.1)
+        buf2 = City.objects.get(name='Kecksburg').location.point.buffer(0.1)
+        qs1 = City.objects.filter(location__point__within=buf1)
+        qs2 = City.objects.filter(location__point__within=buf2)
+        combined = qs1 | qs2
+        names = [c.name for c in combined]
+        self.assertEqual(2, len(names))
+        self.failUnless('Aurora' in names)
+        self.failUnless('Kecksburg' in names)
+
     # TODO: Related tests for KML, GML, and distance lookups.
 
 def suite():
