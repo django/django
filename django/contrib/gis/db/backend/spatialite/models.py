@@ -15,7 +15,9 @@ class GeometryColumns(models.Model):
     spatial_index_enabled = models.IntegerField()
 
     class Meta:
+        app_label = 'gis'
         db_table = 'geometry_columns'
+        managed = False
 
     @classmethod
     def table_name_col(cls):
@@ -56,3 +58,4 @@ class SpatialRefSys(models.Model):
     class Meta:
         abstract = True
         db_table = 'spatial_ref_sys'
+        managed = False

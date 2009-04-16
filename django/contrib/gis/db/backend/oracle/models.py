@@ -16,7 +16,9 @@ class GeometryColumns(models.Model):
     srid = models.IntegerField(primary_key=True)
     # TODO: Add support for `diminfo` column (type MDSYS.SDO_DIM_ARRAY).
     class Meta:
+        app_label = 'gis'
         db_table = 'USER_SDO_GEOM_METADATA'
+        managed = False
 
     @classmethod
     def table_name_col(cls):
@@ -49,7 +51,7 @@ class SpatialRefSys(models.Model):
     class Meta:
         abstract = True
         db_table = 'CS_SRS'
-        app_label = '_mdsys' # Hack so that syncdb won't try to create "CS_SRS" table.
+        managed = False
 
     @property
     def wkt(self):
