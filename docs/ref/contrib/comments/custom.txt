@@ -25,7 +25,7 @@ settings file would contain::
         'my_comment_app',
         ...
     ]
-    
+
     COMMENTS_APP = 'my_comment_app'
 
 The app named in :setting:`COMMENTS_APP` provides its custom behavior by
@@ -45,13 +45,13 @@ To make this kind of customization, we'll need to do three things:
 
     #. Create a custom comment :class:`~django.db.models.Model` that adds on the
        "title" field.
-    
+
     #. Create a custom comment :class:`~django.forms.Form` that also adds this
        "title" field.
-    
+
     #. Inform Django of these objects by defining a few functions in a
        custom :setting:`COMMENTS_APP`.
-       
+
 So, carrying on the example above, we're dealing with a typical app structure in
 the ``my_custom_app`` directory::
 
@@ -63,12 +63,15 @@ the ``my_custom_app`` directory::
 In the ``models.py`` we'll define a ``CommentWithTitle`` model::
 
     from django.db import models
-    from django.contrib.comments.models import BaseCommentAbstractModel
+    from django.contrib.comments.models import Comment
 
-    class CommentWithTitle(BaseCommentAbstractModel):
+    class CommentWithTitle(Comment):
         title = models.CharField(max_length=300)
-    
-All custom comment models must subclass :class:`BaseCommentAbstractModel`.
+
+Most custom comment models will subclass the :class:`Comment` model. However,
+if you want to substantially remove or change the fields available in the
+:class:`Comment` model, but don't want to rewrite the templates, you could
+try subclassing from :class:`BaseCommentAbstractModel`.
 
 Next, we'll define a custom comment form in ``forms.py``. This is a little more
 tricky: we have to both create a form and override
@@ -82,11 +85,11 @@ field::
 
     class CommentFormWithTitle(CommentForm):
         title = forms.CharField(max_length=300)
-        
+
         def get_comment_model(self):
             # Use our custom comment model instead of the built-in one.
             return CommentWithTitle
-        
+
         def get_comment_create_data(self):
             # Use the data of the superclass, and add in the title field
             data = super(CommentFormWithTitle, self).get_comment_create_data()
