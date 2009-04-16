@@ -689,6 +689,10 @@ default length of 50.
 
 Implies setting :attr:`Field.db_index` to ``True``.
 
+It is often useful to automatically prepopulate a SlugField based on the value
+of some other value.  You can do this automatically in the admin using
+:attr:`~django.contrib.admin.ModelAdmin.prepopulated_fields`.
+
 ``SmallIntegerField``
 ---------------------
 

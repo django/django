@@ -7,6 +7,8 @@ The Django admin site
 .. module:: django.contrib.admin
    :synopsis: Django's admin site.
 
+.. currentmodule:: django.contrib.admin
+
 One of the most powerful parts of Django is the automatic admin interface. It
 reads metadata in your model to provide a powerful and production-ready
 interface that content producers can immediately use to start adding content to
@@ -46,7 +48,7 @@ Other topics
    :maxdepth: 1
 
    actions
-   
+
 .. seealso::
 
     For information about serving the media files (images, JavaScript, and CSS)
@@ -54,6 +56,8 @@ Other topics
 
 ``ModelAdmin`` objects
 ======================
+
+.. class:: ModelAdmin
 
 The ``ModelAdmin`` class is the representation of a model in the admin
 interface. These are stored in a file named ``admin.py`` in your application.
@@ -90,8 +94,7 @@ subclass::
     class AuthorAdmin(admin.ModelAdmin):
         date_hierarchy = 'pub_date'
 
-``date_hierarchy``
-~~~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.date_hierarchy
 
 Set ``date_hierarchy`` to the name of a ``DateField`` or ``DateTimeField`` in
 your model, and the change list page will include a date-based drilldown
@@ -101,8 +104,7 @@ Example::
 
     date_hierarchy = 'pub_date'
 
-``form``
-~~~~~~~~
+.. attribute:: ModelAdmin.form
 
 By default a ``ModelForm`` is dynamically created for your model. It is used
 to create the form presented on both the add/change pages. You can easily
@@ -111,8 +113,7 @@ add/change pages.
 
 For an example see the section `Adding custom validation to the admin`_.
 
-``fieldsets``
-~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.fieldsets
 
 Set ``fieldsets`` to control the layout of admin "add" and "change" pages.
 
@@ -191,8 +192,7 @@ The ``field_options`` dictionary can have the following keys:
         ``django.utils.html.escape()`` to escape any HTML special
         characters.
 
-``fields``
-~~~~~~~~~~
+.. attribute:: ModelAdmin.fields
 
 Use this option as an alternative to ``fieldsets`` if the layout does not
 matter and if you want to only show a subset of the available fields in the
@@ -211,8 +211,7 @@ displayed, sequentially, in the form.
     dictionary key that is within the ``fieldsets`` option, as described in
     the previous section.
 
-``exclude``
-~~~~~~~~~~~
+.. attribute:: ModelAdmin.exclude
 
 This attribute, if given, should be a list of field names to exclude from the
 form.
@@ -237,22 +236,19 @@ Since the Author model only has three fields, ``name``, ``title``, and
 ``birth_date``, the forms resulting from the above declarations will contain
 exactly the same fields.
 
-``filter_horizontal``
-~~~~~~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.filter_horizontal
 
 Use a nifty unobtrusive JavaScript "filter" interface instead of the
 usability-challenged ``<select multiple>`` in the admin form. The value is a
 list of fields that should be displayed as a horizontal filter interface. See
 ``filter_vertical`` to use a vertical interface.
 
-``filter_vertical``
-~~~~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.filter_vertical
 
 Same as ``filter_horizontal``, but is a vertical display of the filter
 interface.
 
-``list_display``
-~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.list_display
 
 Set ``list_display`` to control which fields are displayed on the change list
 page of the admin.
@@ -389,8 +385,7 @@ A few special cases to note about ``list_display``:
       The above will tell Django to order by the ``first_name`` field when
       trying to sort by ``colored_first_name`` in the admin.
 
-``list_display_links``
-~~~~~~~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.list_display_links
 
 Set ``list_display_links`` to control which fields in ``list_display`` should
 be linked to the "change" page for an object.
@@ -415,8 +410,7 @@ the change list page::
 
 .. _admin-list-editable:
 
-``list_editable``
-~~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.list_editable
 
 .. versionadded:: 1.1
 
@@ -441,8 +435,7 @@ edit and save multiple rows at once.
 
     You'll get a validation error if any of these rules are broken.
 
-``list_filter``
-~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.list_filter
 
 Set ``list_filter`` to activate filters in the right sidebar of the change list
 page of the admin. This should be a list of field names, and each specified
@@ -462,14 +455,12 @@ The above code results in an admin change list page that looks like this:
 
 (This example also has ``search_fields`` defined. See below.)
 
-``list_per_page``
-~~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.list_per_page
 
 Set ``list_per_page`` to control how many items appear on each paginated admin
 change list page. By default, this is set to ``100``.
 
-``list_select_related``
-~~~~~~~~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.list_select_related
 
 Set ``list_select_related`` to tell Django to use ``select_related()`` in
 retrieving the list of objects on the admin change list page. This can save you
@@ -483,13 +474,11 @@ if one of the ``list_display`` fields is a ``ForeignKey``.
 For more on ``select_related()``, see
 :ref:`the select_related() docs <select-related>`.
 
-``inlines``
-~~~~~~~~~~~
+.. attribute:: ModelAdmin.inlines
 
 See ``InlineModelAdmin`` objects below.
 
-``ordering``
-~~~~~~~~~~~~
+.. attribute:: ModelAdmin.ordering
 
 Set ``ordering`` to specify how objects on the admin change list page should be
 ordered. This should be a list or tuple in the same format as a model's
@@ -502,8 +491,7 @@ If this isn't provided, the Django admin will use the model's default ordering.
     Django will only honor the first element in the list/tuple; any others
     will be ignored.
 
-``prepopulated_fields``
-~~~~~~~~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.prepopulated_fields
 
 Set ``prepopulated_fields`` to a dictionary mapping field names to the fields
 it should prepopulate from::
@@ -521,8 +509,7 @@ dashes for spaces).
 ``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``, nor
 ``ManyToManyField`` fields.
 
-``radio_fields``
-~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.radio_fields
 
 By default, Django's admin uses a select-box interface (<select>) for
 fields that are ``ForeignKey`` or have ``choices`` set. If a field is present
@@ -538,8 +525,7 @@ You have the choice of using ``HORIZONTAL`` or ``VERTICAL`` from the
 Don't include a field in ``radio_fields`` unless it's a ``ForeignKey`` or has
 ``choices`` set.
 
-``raw_id_fields``
-~~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.raw_id_fields
 
 By default, Django's admin uses a select-box interface (<select>) for
 fields that are ``ForeignKey``. Sometimes you don't want to incur the
@@ -552,8 +538,7 @@ into a ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
     class ArticleAdmin(admin.ModelAdmin):
         raw_id_fields = ("newspaper",)
 
-``save_as``
-~~~~~~~~~~~
+.. attribute:: ModelAdmin.save_as
 
 Set ``save_as`` to enable a "save as" feature on admin change forms.
 
@@ -566,8 +551,7 @@ rather than the old object.
 
 By default, ``save_as`` is set to ``False``.
 
-``save_on_top``
-~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.save_on_top
 
 Set ``save_on_top`` to add save buttons across the top of your admin change
 forms.
@@ -577,8 +561,7 @@ Normally, the save buttons appear only at the bottom of the forms. If you set
 
 By default, ``save_on_top`` is set to ``False``.
 
-``search_fields``
-~~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.search_fields
 
 Set ``search_fields`` to enable a search box on the admin change list page.
 This should be set to a list of field names that will be searched whenever
@@ -635,8 +618,7 @@ with an operator:
     Performs a full-text match. This is like the default search method but uses
     an index. Currently this is only available for MySQL.
 
-``formfield_overrides``
-~~~~~~~~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.formfield_overrides
 
 This provides a quick-and-dirty way to override some of the
 :class:`~django.forms.Field` options for use in the admin.
@@ -676,14 +658,13 @@ The value is another dictionary; these arguments will be passed to
     that have ``raw_id_fields`` or ``radio_fields`` set. That's because
     ``raw_id_fields`` and ``radio_fields`` imply custom widgets of their own.
 
-``actions``
-~~~~~~~~~~~
+.. attribute:: ModelAdmin.actions
 
 A list of actions to make available on the change list page. See
 :ref:`ref-contrib-admin-actions` for details.
 
-``actions_on_top``, ``actions_on_bottom``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. attribute:: ModelAdmin.actions_on_top
+.. attribute:: ModelAdmin.actions_on_bottom
 
 Controls where on the page the actions bar appears. By default, the admin
 changelist displays actions at the top of the page (``actions_on_top = True;
@@ -692,8 +673,7 @@ actions_on_bottom = False``).
 ``ModelAdmin`` methods
 ----------------------
 
-``save_model(self, request, obj, form, change)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. method:: ModelAdmin.save_model(self, request, obj, form, change)
 
 The ``save_model`` method is given the ``HttpRequest``, a model instance,
 a ``ModelForm`` instance and a boolean value based on whether it is adding or
@@ -706,8 +686,7 @@ For example to attach ``request.user`` to the object prior to saving::
             obj.user = request.user
             obj.save()
 
-``save_formset(self, request, form, formset, change)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. method:: ModelAdmin.save_formset(self, request, form, formset, change)
 
 The ``save_formset`` method is given the ``HttpRequest``, the parent
 ``ModelForm`` instance and a boolean value based on whether it is adding or
@@ -724,8 +703,7 @@ model instance::
                 instance.save()
             formset.save_m2m()
 
-``get_urls(self)``
-~~~~~~~~~~~~~~~~~~~
+.. method:: ModelAdmin.get_urls(self)
 
 .. versionadded:: 1.1
 
@@ -769,8 +747,7 @@ Notice the wrapped view in the fifth line above::
 
 This wrapping will protect ``self.my_view`` from unauthorized access.
 
-``formfield_for_foreignkey(self, db_field, request, **kwargs)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. method:: ModelAdmin.formfield_for_foreignkey(self, db_field, request, **kwargs)
 
 .. versionadded:: 1.1
 
@@ -846,7 +823,7 @@ parent model. These are called inlines. Suppose you have these two models::
         author = models.ForeignKey(Author)
         title = models.CharField(max_length=100)
 
-You can edit the books authored by an author on the author page. You add 
+You can edit the books authored by an author on the author page. You add
 inlines to a model by specifying them in a ``ModelAdmin.inlines``::
 
     class BookInline(admin.TabularInline):
@@ -1167,7 +1144,7 @@ Linking to admin views
 
 All the admin views use :ref:`named URL patterns <naming-url-patterns>` so it's
 easy to link to admin views with ``urlresolvers.reverse`` or the :ttag:`url`
-template tag. 
+template tag.
 
 Each model gets its own set of views and its own name using the model's app name
 and model name. For example, the "add" view for a ``Choice`` model in a
@@ -1274,8 +1251,9 @@ Adding views to admin sites
 
 .. versionadded:: 1.1
 
-It possible to add additional views to the admin site in the same way one can
-add them to ``ModelAdmins``.  This by using the ``get_urls()`` method on an
-AdminSite in the same way as `described above`__
-
-__ `get_urls(self)`_
+Just like ``ModelAdmin``, ``AdminSite`` provides a
+:meth:`~django.contrib.admin.ModelAdmin.get_urls()` method
+that can be overridden to define additional views for the site. To add
+a new view to your admin site, extend the base
+:meth:`~django.contrib.admin.ModelAdmin.get_urls()` method to include
+a pattern for your new view.
