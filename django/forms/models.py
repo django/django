@@ -334,7 +334,8 @@ class BaseModelForm(BaseForm):
             fail_message = 'created'
         else:
             fail_message = 'changed'
-        return save_instance(self, self.instance, self._meta.fields, fail_message, commit)
+        return save_instance(self, self.instance, self._meta.fields,
+                             fail_message, commit, exclude=self._meta.exclude)
 
     save.alters_data = True
 

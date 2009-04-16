@@ -42,7 +42,7 @@ True
 {'file1': <SimpleUploadedFile: 我隻氣墊船裝滿晒鱔.txt (text/plain)>}
 >>> m = FileModel.objects.create(file=f.cleaned_data['file1'])
 
-# It's enough that m gets created without error.  Preservation of the exotic name is checked 
+# It's enough that m gets created without error.  Preservation of the exotic name is checked
 # in a file_uploads test; it's hard to do that correctly with doctest's unicode issues. So
 # we create and then immediately delete m so as to not leave the exotically named file around
 # for shutil.rmtree (on Windows) to have trouble with later.
@@ -85,5 +85,24 @@ u'instance value'
 datetime.date(1969, 4, 4)
 >>> instance_form.initial['value']
 12
+
+>>> from django.forms import CharField
+>>> class ExcludingForm(ModelForm):
+...     name = CharField(max_length=256)
+...     class Meta:
+...         model = Defaults
+...         exclude = ['name']
+>>> f = ExcludingForm({'name': u'Hello', 'value': 99, 'def_date': datetime.date(1999, 3, 2)})
+>>> f.is_valid()
+True
+>>> f.cleaned_data['name']
+u'Hello'
+>>> obj = f.save()
+>>> obj.name
+u'class default value'
+>>> obj.value
+99
+>>> obj.def_date
+datetime.date(1999, 3, 2)
 >>> shutil.rmtree(temp_storage_location)
 """}
