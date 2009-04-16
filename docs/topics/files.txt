@@ -25,7 +25,7 @@ When you use a :class:`~django.db.models.FileField` or
 :class:`~django.db.models.ImageField`, Django provides a set of APIs you can use
 to deal with that file.
 
-Consider the following model, using a ``FileField`` to store a photo::
+Consider the following model, using an ``ImageField`` to store a photo::
 
     class Car(models.Model):
         name = models.CharField(max_length=255)
@@ -111,7 +111,7 @@ useful -- you can use the global default storage system::
     >>> default_storage.exists(path)
     False
 
-See :ref:`ref-files-storage` for the file storage API. 
+See :ref:`ref-files-storage` for the file storage API.
 
 The built-in filesystem storage class
 -------------------------------------
