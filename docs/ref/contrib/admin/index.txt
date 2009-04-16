@@ -1137,39 +1137,10 @@ If you wish to change the index or login templates, you are better off creating
 your own ``AdminSite`` instance (see below), and changing the ``index_template``
 or ``login_template`` properties.
 
-Linking to admin views
-======================
-
-.. versionadded:: 1.1
-
-All the admin views use :ref:`named URL patterns <naming-url-patterns>` so it's
-easy to link to admin views with ``urlresolvers.reverse`` or the :ttag:`url`
-template tag.
-
-Each model gets its own set of views and its own name using the model's app name
-and model name. For example, the "add" view for a ``Choice`` model in a
-``polls`` app would be named ``"admin_polls_choice_add"``.
-
-All the available views and their names are:
-
-    ==============  ======================================  ===================
-    View            View name                               Parameters
-    ==============  ======================================  ===================
-    Change list     ``"admin_<app>_<model>_changelist"``    None
-    Add object      ``"admin_<app>_<model>_add"``           None
-    Change object   ``"admin_<app>_<model>_change"``        ``object_id``
-    Delete object   ``"admin_<app>_<model>_delete"``        ``object_id``
-    Object history  ``"admin_<app>_<model>_history"``       ``object_id``
-    ==============  ======================================  ===================
-
-For example, to get the change URL for a particular ``Choice`` object::
-
-    >>> from django.core import urlresolvers
-    >>> c = Choice.objects.get(...)
-    >>> change_url = urlresolvers.reverse('admin_polls_choice_change', (c.id,))
-
 ``AdminSite`` objects
 =====================
+
+.. class:: AdminSite
 
 A Django administrative site is represented by an instance of
 ``django.contrib.admin.sites.AdminSite``; by default, an instance of
@@ -1246,14 +1217,82 @@ respectively::
         ('^advanced-admin/', include(advanced_site.urls)),
     )
 
+``AdminSite`` instances take a single argument to their constructor, their
+name, which can be anything you like. This argument becomes the prefix to the
+URL names for the purposes of :ref:`reversing them<admin-reverse-urls>`. This
+is only necessary if you are using more than one ``AdminSite``.
+
 Adding views to admin sites
 ---------------------------
 
 .. versionadded:: 1.1
 
-Just like ``ModelAdmin``, ``AdminSite`` provides a
+Just like :class:`ModelAdmin`, :class:`AdminSite` provides a
 :meth:`~django.contrib.admin.ModelAdmin.get_urls()` method
 that can be overridden to define additional views for the site. To add
 a new view to your admin site, extend the base
 :meth:`~django.contrib.admin.ModelAdmin.get_urls()` method to include
 a pattern for your new view.
+
+.. note::
+    Any view you render that uses the admin templates, or extends the base
+    admin template, should include in it's context a variable named
+    ``admin_site`` that contains the name of the :class:`AdminSite` instance. For
+    :class:`AdminSite` instances, this means ``self.name``; for :class:`ModelAdmin`
+    instances, this means ``self.admin_site.name``.
+
+.. _admin-reverse-urls:
+
+Reversing Admin URLs
+====================
+
+.. versionadded:: 1.1
+
+When an :class:`AdminSite` is deployed, the views provided by that site are
+accessible using Django's :ref:`URL reversing system <naming-url-patterns>`.
+
+The :class:`AdminSite` provides the following named URL patterns:
+
+    ======================  =============================== =============
+    Page                    URL name                        Parameters
+    ======================  =============================== =============
+    Index                   ``admin_index``
+    Logout                  ``admin_logout``
+    Password change         ``admin_password_change``
+    Password change done    ``admin_password_change_done``
+    i18n javascript         ``admin_jsi18n``
+    Application index page  ``admin_app_list``              ``app_label``
+    ======================  =============================== =============
+
+These names will be prefixed with the name of the :class:`AdminSite` instance,
+plus an underscore. For example, if your :class:`AdminSite` was named
+``custom``, then the Logout view would be served using a URL with the name
+``custom_admin_logout``. The default :class:`AdminSite` doesn't use a prefix
+in it's URL names.
+
+Each :class:`ModelAdmin` instance provides an additional set of named URLs:
+
+    ======================  =====================================================   =============
+    Page                    URL name                                                Parameters
+    ======================  =====================================================   =============
+    Changelist              ``admin_{{ app_label }}_{{ model_name }}_changelist``
+    Add                     ``admin_{{ app_label }}_{{ model_name }}_add``
+    History                 ``admin_{{ app_label }}_{{ model_name }}_history``      ``object_id``
+    Delete                  ``admin_{{ app_label }}_{{ model_name }}_delete``       ``object_id``
+    Change                  ``admin_{{ app_label }}_{{ model_name }}_change``       ``object_id``
+    ======================  =====================================================   =============
+
+Again, these names will be prefixed by the name of the :class:`AdminSite` in
+which they are deployed.
+
+So - if you wanted to get a reference to the Change view for a particular
+``Choice`` object (from the polls application) in the default admin, you would
+call::
+
+    >>> from django.core import urlresolvers
+    >>> c = Choice.objects.get(...)
+    >>> change_url = urlresolvers.reverse('admin_polls_choice_change', (c.id,))
+
+However, if the admin instance was named ``custom``, you would need to call::
+
+    >>> change_url = urlresolvers.reverse('custom_admin_polls_choice_change', (c.id,))
