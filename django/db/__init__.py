@@ -14,7 +14,7 @@ def load_backend(backend_name):
     try:
         # Most of the time, the database backend will be one of the official
         # backends that ships with Django, so look there first.
-        return import_module('.base', 'django.db.backends.%s' % settings.DATABASE_ENGINE)
+        return import_module('.base', 'django.db.backends.%s' % backend_name)
     except ImportError, e:
         # If the import failed, we might be looking for a database backend
         # distributed external to Django. So we'll try that next.
