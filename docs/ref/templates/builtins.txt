@@ -359,6 +359,19 @@ The 'ifchanged' block tag is used within a loop. It has two possible uses.
             {% endifchanged %}
         {% endfor %}
 
+The ``ifchanged`` tag can also take an optional ``{% else %}`` clause that
+will be displayed if the value has not changed::
+
+        {% for match in matches %}
+            <div style="background-color:
+                {% ifchanged match.ballot_id %}
+                    {% cycle red,blue %}
+                {% else %}
+                    grey
+                {% endifchanged %}
+            ">{{ match }}</div>
+        {% endfor %}
+
 .. templatetag:: ifequal
 
 ifequal
