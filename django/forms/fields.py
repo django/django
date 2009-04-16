@@ -256,8 +256,8 @@ class DecimalField(Field):
         digits = len(digittuple)
         if decimals > digits:
             # We have leading zeros up to or past the decimal point.  Count
-            # everything past the decimal point as a digit.  We do not count 
-            # 0 before the decimal point as a digit since that would mean 
+            # everything past the decimal point as a digit.  We do not count
+            # 0 before the decimal point as a digit since that would mean
             # we would not allow max_digits = decimal_places.
             digits = decimals
         whole_digits = digits - decimals
@@ -283,7 +283,7 @@ DEFAULT_DATE_INPUT_FORMATS = (
 )
 
 class DateField(Field):
-    widget = DateInput 
+    widget = DateInput
     default_error_messages = {
         'invalid': _(u'Enter a valid date.'),
     }
@@ -422,7 +422,7 @@ class RegexField(CharField):
 email_re = re.compile(
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
     r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-011\013\014\016-\177])*"' # quoted-string
-    r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
+    r')@(?:[A-Z0-9]+(?:-*[A-Z0-9]+)*\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
 
 class EmailField(RegexField):
     default_error_messages = {
@@ -829,7 +829,7 @@ class FilePathField(ChoiceField):
         super(FilePathField, self).__init__(choices=(), required=required,
             widget=widget, label=label, initial=initial, help_text=help_text,
             *args, **kwargs)
-            
+
         if self.required:
             self.choices = []
         else:
