@@ -50,10 +50,10 @@ class IntrospectionTests(TestCase):
 
     def test_django_table_names(self):
         cursor = connection.cursor()
-        cursor.execute('CREATE TABLE django_introspection_test_table (id INTEGER);');
+        cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);');
         tl = connection.introspection.django_table_names()
-        cursor.execute("DROP TABLE django_introspection_test_table;")
-        self.assert_('django_introspection_testcase_table' not in tl,
+        cursor.execute("DROP TABLE django_ixn_test_table;")
+        self.assert_('django_ixn_testcase_table' not in tl,
                      "django_table_names() returned a non-Django table")
 
     def test_installed_models(self):
@@ -83,9 +83,9 @@ class IntrospectionTests(TestCase):
     if settings.DATABASE_ENGINE.startswith('postgresql'):
         def test_postgresql_real_type(self):
             cursor = connection.cursor()
-            cursor.execute("CREATE TABLE django_introspection_real_test_table (number REAL);")
-            desc = connection.introspection.get_table_description(cursor, 'django_introspection_real_test_table')
-            cursor.execute('DROP TABLE django_introspection_real_test_table;')
+            cursor.execute("CREATE TABLE django_ixn_real_test_table (number REAL);")
+            desc = connection.introspection.get_table_description(cursor, 'django_ixn_real_test_table')
+            cursor.execute('DROP TABLE django_ixn_real_test_table;')
             self.assertEqual(datatype(desc[0][1]), 'FloatField')
 
     def test_get_relations(self):
