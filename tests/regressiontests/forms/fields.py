@@ -900,6 +900,10 @@ u'http://example.com/'
 u'http://www.example.com/'
 >>> f.clean('http://www.example.com:8000/test')
 u'http://www.example.com:8000/test'
+>>> f.clean('valid-with-hyphens.com')
+u'http://valid-with-hyphens.com/'
+>>> f.clean('subdomain.domain.com')
+u'http://subdomain.domain.com/'
 >>> f.clean('http://200.8.9.10')
 u'http://200.8.9.10/'
 >>> f.clean('http://200.8.9.10:8000/test')
@@ -924,6 +928,24 @@ ValidationError: [u'Enter a valid URL.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
+>>> f.clean('http://invalid-.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.clean('http://-invalid.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.clean('http://inv-.alid-.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.clean('http://inv-.-alid.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.clean('http://valid-----hyphens.com')
+u'http://valid-----hyphens.com/'
 
 >>> f = URLField(required=False)
 >>> f.clean('')
