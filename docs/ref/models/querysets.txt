@@ -188,7 +188,7 @@ to determine how many entries have been made in each blog::
     >>> q[0].entry__count
     42
 
-The ``Blog`` model doesn't define an ``entry_count`` attribute by itself,
+The ``Blog`` model doesn't define an ``entry__count`` attribute by itself,
 but by using a keyword argument to specify the aggregate function, you can
 control the name of the annotation::
 
@@ -1485,7 +1485,7 @@ A boolean full-text search, taking advantage of full-text indexing. This is
 like ``contains`` but is significantly faster due to full-text indexing.
 
 Example::
-    
+
     Entry.objects.filter(headline__search="+Django -jazz Python")
 
 SQL equivalent::
