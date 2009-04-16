@@ -1,6 +1,5 @@
 from itertools import izip
 from django.db.models.query import sql
-from django.db.models.fields import FieldDoesNotExist
 from django.db.models.fields.related import ForeignKey
 
 from django.contrib.gis.db.backend import SpatialBackend
