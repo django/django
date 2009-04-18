@@ -20,11 +20,55 @@ class Media(models.Model):
 
 class MediaInline(generic.GenericTabularInline):
     model = Media
-    extra = 1
     
 class EpisodeAdmin(admin.ModelAdmin):
     inlines = [
         MediaInline,
     ]
-
 admin.site.register(Episode, EpisodeAdmin)
+
+#
+# These models let us test the different GenericInline settings at
+# different urls in the admin site.
+#
+
+#
+# Generic inline with extra = 0
+#
+
+class EpisodeExtra(Episode):
+    pass
+
+class MediaExtraInline(generic.GenericTabularInline):
+    model = Media
+    extra = 0
+
+admin.site.register(EpisodeExtra, inlines=[MediaExtraInline])
+
+#
+# Generic inline with extra and max_num
+#
+
+class EpisodeMaxNum(Episode):
+    pass
+
+class MediaMaxNumInline(generic.GenericTabularInline):
+    model = Media
+    extra = 5
+    max_num = 2
+    
+admin.site.register(EpisodeMaxNum, inlines=[MediaMaxNumInline])
+
+#
+# Generic inline with exclude
+#
+
+class EpisodeExclude(Episode):
+    pass
+
+class MediaExcludeInline(generic.GenericTabularInline):
+    model = Media
+    exclude = ['url']
+
+admin.site.register(EpisodeExclude, inlines=[MediaExcludeInline])
+

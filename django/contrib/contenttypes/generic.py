@@ -389,6 +389,8 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "can_delete": True,
             "can_order": False,
             "fields": fields,
+            "max_num": self.max_num,
+            "exclude": self.exclude
         }
         return generic_inlineformset_factory(self.model, **defaults)
 
