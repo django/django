@@ -20,13 +20,15 @@ class SelectDateWidget(Widget):
     This also serves as an example of a Widget that has more than one HTML
     element and hence implements value_from_datadict.
     """
+    none_value = (0, '---')
     month_field = '%s_month'
     day_field = '%s_day'
     year_field = '%s_year'
 
-    def __init__(self, attrs=None, years=None):
+    def __init__(self, attrs=None, years=None, required=True):
         # years is an optional list/tuple of years to use in the "year" select box.
         self.attrs = attrs or {}
+        self.required = required
         if years:
             self.years = years
         else:
@@ -51,19 +53,28 @@ class SelectDateWidget(Widget):
             id_ = 'id_%s' % name
 
         month_choices = MONTHS.items()
+        if not (self.required and value):
+            month_choices.append(self.none_value)
         month_choices.sort()
         local_attrs = self.build_attrs(id=self.month_field % id_)
-        select_html = Select(choices=month_choices).render(self.month_field % name, month_val, local_attrs)
+        s = Select(choices=month_choices)
+        select_html = s.render(self.month_field % name, month_val, local_attrs)
         output.append(select_html)
 
         day_choices = [(i, i) for i in range(1, 32)]
+        if not (self.required and value):
+            day_choices.insert(0, self.none_value)
         local_attrs['id'] = self.day_field % id_
-        select_html = Select(choices=day_choices).render(self.day_field % name, day_val, local_attrs)
+        s = Select(choices=day_choices)
+        select_html = s.render(self.day_field % name, day_val, local_attrs)
         output.append(select_html)
 
         year_choices = [(i, i) for i in self.years]
+        if not (self.required and value):
+            year_choices.insert(0, self.none_value)
         local_attrs['id'] = self.year_field % id_
-        select_html = Select(choices=year_choices).render(self.year_field % name, year_val, local_attrs)
+        s = Select(choices=year_choices)
+        select_html = s.render(self.year_field % name, year_val, local_attrs)
         output.append(select_html)
 
         return mark_safe(u'\n'.join(output))
@@ -73,7 +84,11 @@ class SelectDateWidget(Widget):
     id_for_label = classmethod(id_for_label)
 
     def value_from_datadict(self, data, files, name):
-        y, m, d = data.get(self.year_field % name), data.get(self.month_field % name), data.get(self.day_field % name)
+        y = data.get(self.year_field % name)
+        m = data.get(self.month_field % name)
+        d = data.get(self.day_field % name)
+        if y == m == d == "0":
+            return None
         if y and m and d:
             return '%s-%s-%s' % (y, m, d)
         return data.get(name, None)
