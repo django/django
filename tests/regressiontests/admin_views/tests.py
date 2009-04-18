@@ -2,6 +2,7 @@
 
 import re
 
+from django.core.files import temp as tempfile
 from django.test import TestCase
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -11,7 +12,9 @@ from django.contrib.admin.util import quote
 from django.utils.html import escape
 
 # local test models
-from models import Article, CustomArticle, Section, ModelWithStringPrimaryKey, Persona, FooAccount, BarAccount, EmptyModel
+from models import (Article, BarAccount, CustomArticle, EmptyModel,
+                    FooAccount, Gallery, ModelWithStringPrimaryKey,
+                    Persona, Picture, Section)
 
 try:
     set
@@ -868,7 +871,6 @@ class TestInlineNotEditable(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/parent/add/')
         self.failUnlessEqual(response.status_code, 200)
 
-
 class AdminCustomQuerysetTest(TestCase):
     fixtures = ['admin-views-users.xml']
 
@@ -891,3 +893,47 @@ class AdminCustomQuerysetTest(TestCase):
                 self.assertEqual(response.status_code, 200)
             else:
                 self.assertEqual(response.status_code, 404)
+
+class AdminInlineFileUploadTest(TestCase):
+    fixtures = ['admin-views-users.xml', 'admin-views-actions.xml']
+    urlbit = 'admin'
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+        
+        # Set up test Picture and Gallery.
+        # These must be set up here instead of in fixtures in order to allow Picture
+        # to use a NamedTemporaryFile.
+        tdir = tempfile.gettempdir()
+        file1 = tempfile.NamedTemporaryFile(suffix=".file1", dir=tdir)
+        file1.write('a' * (2 ** 21))
+        filename = file1.name
+        file1.close()
+        g = Gallery(name="Test Gallery")
+        g.save()
+        p = Picture(name="Test Picture", image=filename, gallery=g)
+        p.save()
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_inline_file_upload_edit_validation_error_post(self):
+        """
+        Test that inline file uploads correctly display prior data (#10002). 
+        """
+        post_data = {
+            "name": u"Test Gallery",
+            "pictures-TOTAL_FORMS": u"2",
+            "pictures-INITIAL_FORMS": u"1",
+            "pictures-0-id": u"1",
+            "pictures-0-gallery": u"1",
+            "pictures-0-name": "Test Picture",
+            "pictures-0-image": "",
+            "pictures-1-id": "",
+            "pictures-1-gallery": "1",
+            "pictures-1-name": "Test Picture 2",
+            "pictures-1-image": "",
+        }
+        response = self.client.post('/test_admin/%s/admin_views/gallery/1/' % self.urlbit, post_data)
+        self.failUnless(response._container[0].find("Currently:") > -1)
+
