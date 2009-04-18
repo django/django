@@ -96,7 +96,7 @@ class UserAdmin(admin.ModelAdmin):
         }, context_instance=template.RequestContext(request))
 
     def user_change_password(self, request, id):
-        if not request.user.has_perm('auth.change_user'):
+        if not self.has_change_permission(request):
             raise PermissionDenied
         user = get_object_or_404(self.model, pk=id)
         if request.method == 'POST':
