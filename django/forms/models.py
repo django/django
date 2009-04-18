@@ -470,7 +470,10 @@ class BaseModelFormSet(BaseFormSet):
         # data back. Generally, pk.editable should be false, but for some
         # reason, auto_created pk fields and AutoField's editable attribute is
         # True, so check for that as well.
-        if (not pk.editable) or (pk.auto_created or isinstance(pk, AutoField)):
+        def pk_is_editable(pk):
+            return ((not pk.editable) or (pk.auto_created or isinstance(pk, AutoField))
+                or (pk.rel and pk.rel.parent_link and pk_is_editable(pk.rel.to._meta.pk)))
+        if pk_is_editable(pk):
             try:
                 pk_value = self.get_queryset()[index].pk
             except IndexError:

@@ -269,6 +269,16 @@ class PodcastAdmin(admin.ModelAdmin):
 
     ordering = ('name',)
 
+class Vodcast(Media):
+    media = models.OneToOneField(Media, primary_key=True, parent_link=True)
+    released = models.BooleanField(default=False)
+
+class VodcastAdmin(admin.ModelAdmin):
+    list_display = ('name', 'released')
+    list_editable = ('released',)
+
+    ordering = ('name',)
+
 class Parent(models.Model):
     name = models.CharField(max_length=128)
 
@@ -327,6 +337,7 @@ admin.site.register(Subscriber, SubscriberAdmin)
 admin.site.register(ExternalSubscriber, ExternalSubscriberAdmin)
 admin.site.register(OldSubscriber, OldSubscriberAdmin)
 admin.site.register(Podcast, PodcastAdmin)
+admin.site.register(Vodcast, VodcastAdmin)
 admin.site.register(Parent, ParentAdmin)
 admin.site.register(EmptyModel, EmptyModelAdmin)
 admin.site.register(Fabric, FabricAdmin)

@@ -108,6 +108,10 @@ class Price(models.Model):
 class MexicanRestaurant(Restaurant):
     serves_tacos = models.BooleanField()
 
+class ClassyMexicanRestaurant(MexicanRestaurant):
+    restaurant = models.OneToOneField(MexicanRestaurant, parent_link=True, primary_key=True)
+    tacos_are_yummy = models.BooleanField()
+
 # models for testing unique_together validation when a fk is involved and
 # using inlineformset_factory.
 class Repository(models.Model):
@@ -934,4 +938,9 @@ True
 >>> formset.get_queryset()
 [<Player: Bobby>]
 
+# a formset for a Model that has a custom primary key that still needs to be
+# added to the formset automatically
+>>> FormSet = modelformset_factory(ClassyMexicanRestaurant, fields=["tacos_are_yummy"])
+>>> sorted(FormSet().forms[0].fields.keys())
+['restaurant', 'tacos_are_yummy']
 """}

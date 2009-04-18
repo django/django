@@ -2,8 +2,6 @@
 
 import re
 import datetime
-import os
-
 from django.core.files import temp as tempfile
 from django.test import TestCase
 from django.contrib.auth.models import User, Permission
@@ -18,7 +16,7 @@ from django.utils.html import escape
 from models import (Article, BarAccount, CustomArticle, EmptyModel,
                     ExternalSubscriber, FooAccount, Gallery,
                     ModelWithStringPrimaryKey, Person, Persona, Picture,
-                    Podcast, Section, Subscriber)
+                    Podcast, Section, Subscriber, Vodcast)
 
 try:
     set
@@ -799,6 +797,11 @@ class AdminViewListEditable(TestCase):
         Podcast.objects.create(name="This Week in Django",
             release_date=datetime.date.today())
         response = self.client.get('/test_admin/admin/admin_views/podcast/')
+        self.failUnlessEqual(response.status_code, 200)
+
+    def test_inheritance_2(self):
+        Vodcast.objects.create(name="This Week in Django", released=True)
+        response = self.client.get('/test_admin/admin/admin_views/vodcast/')
         self.failUnlessEqual(response.status_code, 200)
 
     def test_changelist_input_html(self):
