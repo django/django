@@ -794,14 +794,14 @@ class ModelMultipleChoiceField(ModelChoiceField):
             return []
         if not isinstance(value, (list, tuple)):
             raise ValidationError(self.error_messages['list'])
-        final_values = []
-        for val in value:
+        for pk in value:
             try:
-                obj = self.queryset.get(pk=val)
-            except self.queryset.model.DoesNotExist:
-                raise ValidationError(self.error_messages['invalid_choice'] % val)
+                self.queryset.filter(pk=pk)
             except ValueError:
-                raise ValidationError(self.error_messages['invalid_pk_value'] % val)
-            else:
-                final_values.append(obj)
-        return final_values
+                raise ValidationError(self.error_messages['invalid_pk_value'] % pk)
+        qs = self.queryset.filter(pk__in=value)
+        pks = set([force_unicode(o.pk) for o in qs])
+        for val in value:
+            if force_unicode(val) not in pks:
+                raise ValidationError(self.error_messages['invalid_choice'] % val)
+        return qs
