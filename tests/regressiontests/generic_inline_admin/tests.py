@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.contenttypes.generic import generic_inlineformset_factory
 
 # local test models
-from models import Episode, Media
+from models import Episode, EpisodeExtra, EpisodeMaxNum, EpisodeExclude, Media
 
 class GenericAdminViewTest(TestCase):
     fixtures = ['users.xml']
@@ -80,3 +80,62 @@ class GenericAdminViewTest(TestCase):
         # Regression test for #10522.
         inline_formset = generic_inlineformset_factory(Media,
             exclude=('url',))
+
+class GenericInlineAdminParametersTest(TestCase):
+    fixtures = ['users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+        
+        # Can't load content via a fixture (since the GenericForeignKey
+        # relies on content type IDs, which will vary depending on what
+        # other tests have been run), thus we do it here.
+        test_classes = [
+            Episode,
+            EpisodeExtra,
+            EpisodeMaxNum,
+            EpisodeExclude,
+        ]
+        for klass in test_classes:
+            e = klass.objects.create(name='This Week in Django')
+            m = Media(content_object=e, url='http://example.com/podcast.mp3')
+            m.save()
+    
+    def tearDown(self):
+        self.client.logout()
+
+    def testNoParam(self):
+        """
+        With one initial form, extra (default) at 3, there should be 4 forms.
+        """
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/1/')
+        formset = response.context['inline_admin_formsets'][0].formset
+        self.assertEqual(formset.total_form_count(), 4)
+        self.assertEqual(formset.initial_form_count(), 1)
+
+    def testExtraParam(self):
+        """
+        With extra=0, there should be one form.
+        """
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodeextra/2/')
+        formset = response.context['inline_admin_formsets'][0].formset
+        self.assertEqual(formset.total_form_count(), 1)
+        self.assertEqual(formset.initial_form_count(), 1)
+
+    def testMaxNumParam(self):
+        """
+        With extra=5 and max_num=2, there should be only 2 forms.
+        """
+        inline_form_data = '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" value="2" id="id_generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" value="1" id="id_generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" />'
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodemaxnum/3/')
+        formset = response.context['inline_admin_formsets'][0].formset
+        self.assertEqual(formset.total_form_count(), 2)
+        self.assertEqual(formset.initial_form_count(), 1)
+
+    def testExcludeParam(self):
+        """
+        Generic inline formsets should respect include.
+        """
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodeexclude/4/')
+        formset = response.context['inline_admin_formsets'][0].formset
+        self.failIf('url' in formset.forms[0], 'The formset has excluded "url" field.')
