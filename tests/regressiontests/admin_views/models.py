@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import tempfile
+import os
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.contrib import admin
 from django.core.mail import EmailMessage
@@ -291,6 +294,27 @@ class EmptyModelAdmin(admin.ModelAdmin):
 class OldSubscriberAdmin(admin.ModelAdmin):
     actions = None
 
+temp_storage = FileSystemStorage(tempfile.mkdtemp())
+UPLOAD_TO = os.path.join(temp_storage.location, 'test_upload')
+
+class Gallery(models.Model):
+    name = models.CharField(max_length=100)
+
+class Picture(models.Model):
+    name = models.CharField(max_length=100)
+    image = models.FileField(storage=temp_storage, upload_to='test_upload')
+    gallery = models.ForeignKey(Gallery, related_name="pictures")
+
+class PictureInline(admin.TabularInline):
+    model = Picture
+    extra = 1
+
+class GalleryAdmin(admin.ModelAdmin):
+    inlines = [PictureInline]
+
+class PictureAdmin(admin.ModelAdmin):
+    pass
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -306,6 +330,8 @@ admin.site.register(Podcast, PodcastAdmin)
 admin.site.register(Parent, ParentAdmin)
 admin.site.register(EmptyModel, EmptyModelAdmin)
 admin.site.register(Fabric, FabricAdmin)
+admin.site.register(Gallery, GalleryAdmin)
+admin.site.register(Picture, PictureAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
