@@ -18,6 +18,10 @@ class AuthViewsTestCase(TestCase):
     urls = 'django.contrib.auth.urls'
 
     def setUp(self):
+        self.old_LANGUAGES = settings.LANGUAGES
+        self.old_LANGUAGE_CODE = settings.LANGUAGE_CODE
+        settings.LANGUAGES = (('en', 'English'),)
+        settings.LANGUAGE_CODE = 'en'
         self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
         settings.TEMPLATE_DIRS = (
             os.path.join(
@@ -27,9 +31,21 @@ class AuthViewsTestCase(TestCase):
         ,)
 
     def tearDown(self):
+        settings.LANGUAGES = self.old_LANGUAGES
+        settings.LANGUAGE_CODE = self.old_LANGUAGE_CODE
         settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
 
 class PasswordResetTest(AuthViewsTestCase):
+
+    def setUp(self):
+        self.old_LANGUAGES = settings.LANGUAGES
+        self.old_LANGUAGE_CODE = settings.LANGUAGE_CODE
+        settings.LANGUAGES = (('en', 'English'),)
+        settings.LANGUAGE_CODE = 'en'
+
+    def tearDown(self):
+        settings.LANGUAGES = self.old_LANGUAGES
+        settings.LANGUAGE_CODE = self.old_LANGUAGE_CODE
 
     def test_email_not_found(self):
         "Error is raised if the provided email address isn't currently registered"
