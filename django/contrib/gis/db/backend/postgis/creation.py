@@ -46,16 +46,19 @@ def _create_with_cursor(db_name, verbosity=1, autoclobber=False):
         # Trying to create the database first.
         cursor.execute(create_sql)
     except Exception, e:
-        # Drop and recreate, if necessary.
-        if not autoclobber:
-            confirm = raw_input("\nIt appears the database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % db_name)
-        if autoclobber or confirm == 'yes':
-            if verbosity >= 1: print 'Destroying old spatial database...'
-            drop_db(db_name)
-            if verbosity >= 1: print 'Creating new spatial database...'
-            cursor.execute(create_sql)
+        if 'already exists' in e.pgerror.lower():
+            # Database already exists, drop and recreate if user agrees.
+            if not autoclobber:
+                confirm = raw_input("\nIt appears the database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % db_name)
+            if autoclobber or confirm == 'yes':
+                if verbosity >= 1: print 'Destroying old spatial database...'
+                drop_db(db_name)
+                if verbosity >= 1: print 'Creating new spatial database...'
+                cursor.execute(create_sql)
+            else:
+                raise Exception('Spatial database creation canceled.')
         else:
-            raise Exception('Spatial Database Creation canceled.')
+            raise Exception('Spatial database creation failed: "%s"' % e.pgerror.strip())
 
 created_regex = re.compile(r'^createdb: database creation failed: ERROR:  database ".+" already exists')
 def _create_with_shell(db_name, verbosity=1, autoclobber=False):
