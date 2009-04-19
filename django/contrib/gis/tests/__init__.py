@@ -1,4 +1,5 @@
 import sys, unittest
+from django.test.simple import reorder_suite, TestCase
 from django.utils.importlib import import_module
 
 def geo_suite():
@@ -15,6 +16,10 @@ def geo_suite():
 
     # The test suite.
     s = unittest.TestSuite()
+
+    # Adding the GEOS tests.
+    from django.contrib.gis.geos import tests as geos_tests
+    s.addTest(geos_tests.suite())
 
     # Tests that require use of a spatial database (e.g., creation of models)
     test_apps = ['geoapp', 'relatedapp']
@@ -47,14 +52,6 @@ def geo_suite():
     for suite_name in test_suite_names:
         tsuite = import_module('django.contrib.gis.tests.' + suite_name)
         s.addTest(tsuite.suite())
-
-    # Adding the GEOS tests _last_.  Doing this because if suite starts
-    # immediately with this test while after running syncdb, it will cause a
-    # segmentation fault.  My initial guess is that SpatiaLite is still in
-    # critical areas of non thread-safe GEOS code when the test suite is run.
-    # TODO: Confirm my reasoning. Are there other consequences?
-    from django.contrib.gis.geos import tests as geos_tests
-    s.addTest(geos_tests.suite())
 
     return s, test_apps
 
@@ -157,6 +154,8 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[], suite=
 
         for test in extra_tests:
             suite.addTest(test)
+
+    suite = reorder_suite(suite, (TestCase,))
 
     # Executing the tests (including the model tests), and destorying the
     # test database after the tests have completed.
