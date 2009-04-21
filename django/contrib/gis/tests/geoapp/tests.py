@@ -150,7 +150,7 @@ class GeoModelTest(unittest.TestCase):
         if SpatialBackend.oracle:
             # No precision parameter for Oracle :-/
             import re
-            gml_regex = re.compile(r'<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml"><gml:coordinates decimal="\." cs="," ts=" ">-104.60925199\d+,38.25500\d+ </gml:coordinates></gml:Point>')
+            gml_regex = re.compile(r'<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml"><gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ </gml:coordinates></gml:Point>')
             for ptown in [ptown1, ptown2]:
                 self.assertEqual(True, bool(gml_regex.match(ptown.gml)))
         else:

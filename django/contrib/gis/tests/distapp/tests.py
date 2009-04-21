@@ -115,8 +115,12 @@ class DistanceTest(unittest.TestCase):
         # with different projected coordinate systems.
         dist1 = SouthTexasCity.objects.distance(lagrange, field_name='point')
         dist2 = SouthTexasCity.objects.distance(lagrange)  # Using GEOSGeometry parameter
-        dist3 = SouthTexasCityFt.objects.distance(lagrange.ewkt) # Using EWKT string parameter.
-        dist4 = SouthTexasCityFt.objects.distance(lagrange)
+        if oracle:
+            dist_qs = [dist1, dist2]
+        else:
+            dist3 = SouthTexasCityFt.objects.distance(lagrange.ewkt) # Using EWKT string parameter.
+            dist4 = SouthTexasCityFt.objects.distance(lagrange)
+            dist_qs = [dist1, dist2, dist3, dist4]
 
         # Original query done on PostGIS, have to adjust AlmostEqual tolerance
         # for Oracle.
@@ -124,7 +128,7 @@ class DistanceTest(unittest.TestCase):
         else: tol = 5
 
         # Ensuring expected distances are returned for each distance queryset.
-        for qs in [dist1, dist2, dist3, dist4]:
+        for qs in dist_qs:
             for i, c in enumerate(qs):
                 self.assertAlmostEqual(m_distances[i], c.distance.m, tol)
                 self.assertAlmostEqual(ft_distances[i], c.distance.survey_ft, tol)
@@ -194,8 +198,16 @@ class DistanceTest(unittest.TestCase):
         # (thus, Houston and Southside place will be excluded as tested in
         # the `test02_dwithin` above).
         qs1 = SouthTexasCity.objects.filter(point__distance_gte=(self.stx_pnt, D(km=7))).filter(point__distance_lte=(self.stx_pnt, D(km=20)))
-        qs2 = SouthTexasCityFt.objects.filter(point__distance_gte=(self.stx_pnt, D(km=7))).filter(point__distance_lte=(self.stx_pnt, D(km=20)))
-        for qs in qs1, qs2:
+
+        # Oracle 11 incorrectly thinks spatial reference system for the
+        # SouthTexasCityFt model is not projected, so omit.
+        if oracle:
+            dist_qs = (qs1,)
+        else:
+            qs2 = SouthTexasCityFt.objects.filter(point__distance_gte=(self.stx_pnt, D(km=7))).filter(point__distance_lte=(self.stx_pnt, D(km=20)))
+            dist_qs = (qs1, qs2)
+
+        for qs in dist_qs:
             cities = self.get_names(qs)
             self.assertEqual(cities, ['Bellaire', 'Pearland', 'West University Place'])
 

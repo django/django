@@ -1,6 +1,6 @@
 import os, unittest
 from django.contrib.gis.geos import *
-from django.contrib.gis.tests.utils import no_mysql, postgis
+from django.contrib.gis.tests.utils import no_mysql, no_oracle, oracle, postgis
 from django.conf import settings
 from models import City, Location, DirectoryEntry
 
@@ -19,6 +19,7 @@ class RelatedGeoModelTest(unittest.TestCase):
             c = City(name=name, state=state, location=loc)
             c.save()
             
+    @no_oracle # There are problems w/spatial Oracle pagination and select_related()
     def test02_select_related(self):
         "Testing `select_related` on geographic models (see #7126)."
         qs1 = City.objects.all()
@@ -33,6 +34,7 @@ class RelatedGeoModelTest(unittest.TestCase):
                 self.assertEqual(Point(lon, lat), c.location.point)
         
     @no_mysql
+    @no_oracle # Pagination problem is implicated in this test as well.
     def test03_transform_related(self):
         "Testing the `transform` GeoQuerySet method on related geographic models."
         # All the transformations are to state plane coordinate systems using
@@ -71,22 +73,42 @@ class RelatedGeoModelTest(unittest.TestCase):
         #self.assertEqual(nqueries, len(connection.queries))
 
     @no_mysql
-    def test04_related_aggregate(self):
-        "Testing the `extent` and `unionagg` GeoQuerySet aggregates on related geographic models."
-        if postgis:
-            # One for all locations, one that excludes Roswell.
-            all_extent = (-104.528060913086, 33.0583305358887,-79.4607315063477, 40.1847610473633)
-            txpa_extent = (-97.51611328125, 33.0583305358887,-79.4607315063477, 40.1847610473633)
-            e1 = City.objects.extent(field_name='location__point')
-            e2 = City.objects.exclude(name='Roswell').extent(field_name='location__point')
-            for ref, e in [(all_extent, e1), (txpa_extent, e2)]:
-                for ref_val, e_val in zip(ref, e): self.assertAlmostEqual(ref_val, e_val)
+    @no_oracle
+    def test04a_related_extent_aggregate(self):
+        "Testing the `extent` GeoQuerySet aggregates on related geographic models."
+        # One for all locations, one that excludes Roswell.
+        all_extent = (-104.528060913086, 33.0583305358887,-79.4607315063477, 40.1847610473633)
+        txpa_extent = (-97.51611328125, 33.0583305358887,-79.4607315063477, 40.1847610473633)
+        e1 = City.objects.extent(field_name='location__point')
+        e2 = City.objects.exclude(name='Roswell').extent(field_name='location__point')
+        tol = 9
+        for ref, e in [(all_extent, e1), (txpa_extent, e2)]:
+            for ref_val, e_val in zip(ref, e): self.assertAlmostEqual(ref_val, e_val, tol)
 
-        # The second union is for a query that has something in the WHERE clause.
-        ref_u1 = GEOSGeometry('MULTIPOINT(-104.528056 33.387222,-97.516111 33.058333,-79.460734 40.18476)', 4326)
-        ref_u2 = GEOSGeometry('MULTIPOINT(-97.516111 33.058333,-79.460734 40.18476)', 4326)
+    @no_mysql
+    def test04b_related_union_aggregate(self):
+        "Testing the `unionagg` GeoQuerySet aggregates on related geographic models."
+        # These are the points that are components of the aggregate geographic
+        # union that is returned.
+        p1 = Point(-104.528056, 33.387222)
+        p2 = Point(-97.516111, 33.058333)
+        p3 = Point(-79.460734, 40.18476)
+
+        # Creating the reference union geometry depending on the spatial backend,
+        # as Oracle will have a different internal ordering of the component
+        # geometries than PostGIS.  The second union aggregate is for a union
+        # query that includes limiting information in the WHERE clause (in other
+        # words a `.filter()` precedes the call to `.unionagg()`).
+        if oracle:
+            ref_u1 = MultiPoint(p3, p1, p2, srid=4326)
+            ref_u2 = MultiPoint(p3, p2, srid=4326)
+        else:
+            ref_u1 = MultiPoint(p1, p2, p3, srid=4326)
+            ref_u2 = MultiPoint(p2, p3, srid=4326)
+
         u1 = City.objects.unionagg(field_name='location__point')
         u2 = City.objects.exclude(name='Roswell').unionagg(field_name='location__point')
+
         self.assertEqual(ref_u1, u1)
         self.assertEqual(ref_u2, u2)
         

@@ -201,7 +201,7 @@ class GeoQuery(sql.Query):
         """
         if SpatialBackend.oracle:
             # Running through Oracle's first.
-            value = super(GeoQuery, self).convert_values(value, field)
+            value = super(GeoQuery, self).convert_values(value, field or GeomField())
         if isinstance(field, DistanceField):
             # Using the field's distance attribute, can instantiate
             # `Distance` with the right context.
@@ -325,15 +325,22 @@ class GeoQuery(sql.Query):
             return self._check_geo_field(self.model, field_name)
 
 ### Field Classes for `convert_values` ####
-class AreaField(object):
+class BaseField(object):
+    def get_internal_type(self):
+        "Overloaded method so OracleQuery.convert_values doesn't balk."
+        return None
+
+if SpatialBackend.oracle: BaseField.empty_strings_allowed = False
+
+class AreaField(BaseField):
     def __init__(self, area_att):
         self.area_att = area_att
 
-class DistanceField(object):
+class DistanceField(BaseField):
     def __init__(self, distance_att):
         self.distance_att = distance_att
 
 # Rather than use GeometryField (which requires a SQL query
 # upon instantiation), use this lighter weight class.
-class GeomField(object): 
+class GeomField(BaseField): 
     pass

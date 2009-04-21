@@ -13,7 +13,7 @@ def geo_suite():
     from django.contrib.gis.utils import HAS_GEOIP
 
     # Tests that require use of a spatial database (e.g., creation of models)
-    test_models = ['geoapp',]
+    test_models = ['geoapp', 'layermap', 'relatedapp']
 
     # Tests that do not require setting up and tearing down a spatial database.
     test_suite_names = [
@@ -21,15 +21,8 @@ def geo_suite():
         'test_measure',
         ]
     if HAS_GDAL:
-        if oracle:
-            # TODO: There's a problem with `select_related` and GeoQuerySet on
-            # Oracle -- e.g., GeoModel.objects.distance(geom, field_name='fk__point')
-            # doesn't work so we don't test `relatedapp`.
-            test_models += ['distapp', 'layermap']
-        elif postgis:
-            test_models += ['distapp', 'layermap', 'relatedapp']
-        elif mysql:
-            test_models += ['relatedapp', 'layermap']
+        if oracle or postgis:
+            test_models.append('distapp')
 
         test_suite_names += [
             'test_gdal_driver',
