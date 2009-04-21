@@ -193,7 +193,7 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[], suite=
             suite.addTest(test)
 
     # Creating the test spatial database.
-    create_spatial_db(test=True, verbosity=verbosity)
+    create_spatial_db(test=True, verbosity=verbosity, autoclobber=not interactive)
 
     # Executing the tests (including the model tests), and destorying the
     # test database after the tests have completed.
