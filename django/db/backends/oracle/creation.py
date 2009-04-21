@@ -56,7 +56,6 @@ class DatabaseCreation(BaseDatabaseCreation):
             'tblspace_temp': TEST_DATABASE_TBLSPACE_TMP,
         }
 
-        self.remember['name'] = settings.DATABASE_NAME
         self.remember['user'] = settings.DATABASE_USER
         self.remember['passwd'] = settings.DATABASE_PASSWORD
 
@@ -109,8 +108,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                     print "Tests cancelled."
                     sys.exit(1)
 
-        settings.DATABASE_NAME = self.connection.settings_dict["DATABASE_NAME"] = TEST_DATABASE_NAME
-        settings.DATABASE_USER = self.connection.settings_dict["DATABASE_USER"] = TEST_DATABASE_USER
+        settings.TEST_DATABASE_USER = settings.DATABASE_USER = self.connection.settings_dict["DATABASE_USER"] = TEST_DATABASE_USER
         settings.DATABASE_PASSWORD = self.connection.settings_dict["DATABASE_PASSWORD"] = TEST_DATABASE_PASSWD
 
         return settings.DATABASE_NAME
@@ -126,7 +124,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         TEST_DATABASE_TBLSPACE = self._test_database_tblspace(settings)
         TEST_DATABASE_TBLSPACE_TMP = self._test_database_tblspace_tmp(settings)
 
-        settings.DATABASE_NAME = self.connection.settings_dict["DATABASE_NAME"] = self.remember['name']
         settings.DATABASE_USER = self.connection.settings_dict["DATABASE_USER"] = self.remember['user']
         settings.DATABASE_PASSWORD = self.connection.settings_dict["DATABASE_PASSWORD"] = self.remember['passwd']
 
@@ -138,7 +135,6 @@ class DatabaseCreation(BaseDatabaseCreation):
             'tblspace_temp': TEST_DATABASE_TBLSPACE_TMP,
         }
 
-        self.remember['name'] = settings.DATABASE_NAME
         self.remember['user'] = settings.DATABASE_USER
         self.remember['passwd'] = settings.DATABASE_PASSWORD
 
