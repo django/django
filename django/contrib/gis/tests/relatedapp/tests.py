@@ -222,6 +222,15 @@ class RelatedGeoModelTest(unittest.TestCase):
         self.failUnless('Aurora' in names)
         self.failUnless('Kecksburg' in names)
 
+    def test11_geoquery_pickle(self):
+        "Ensuring GeoQuery objects are unpickled correctly.  See #10839."
+        import pickle
+        from django.contrib.gis.db.models.sql import GeoQuery
+        qs = City.objects.all()
+        q_str = pickle.dumps(qs.query)
+        q = pickle.loads(q_str)
+        self.assertEqual(GeoQuery, q.__class__)
+
     # TODO: Related tests for KML, GML, and distance lookups.
 
 def suite():
