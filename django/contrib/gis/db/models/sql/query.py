@@ -30,6 +30,13 @@ class GeoQuery(sql.Query):
         self.transformed_srid = None
         self.extra_select_fields = {}
 
+    if SpatialBackend.oracle:
+        # Have to override this so that GeoQuery, instead of OracleQuery,
+        # is returned when unpickling.
+        def __reduce__(self):
+            callable, args, data = super(GeoQuery, self).__reduce__()
+            return (unpickle_geoquery, (), data)
+
     def clone(self, *args, **kwargs):
         obj = super(GeoQuery, self).clone(*args, **kwargs)
         # Customized selection dictionary and transformed srid flag have
@@ -323,6 +330,15 @@ class GeoQuery(sql.Query):
             # Otherwise, check by the given field name -- which may be
             # a lookup to a _related_ geographic field.
             return self._check_geo_field(self.model, field_name)
+
+if SpatialBackend.oracle:
+    def unpickle_geoquery():
+        """
+        Utility function, called by Python's unpickling machinery, that handles
+        unpickling of GeoQuery subclasses of OracleQuery.
+        """
+        return GeoQuery.__new__(GeoQuery)
+    unpickle_geoquery.__safe_for_unpickling__ = True
 
 ### Field Classes for `convert_values` ####
 class BaseField(object):
