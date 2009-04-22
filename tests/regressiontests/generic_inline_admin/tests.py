@@ -86,29 +86,27 @@ class GenericInlineAdminParametersTest(TestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')
-        
-        # Can't load content via a fixture (since the GenericForeignKey
-        # relies on content type IDs, which will vary depending on what
-        # other tests have been run), thus we do it here.
-        test_classes = [
-            Episode,
-            EpisodeExtra,
-            EpisodeMaxNum,
-            EpisodeExclude,
-        ]
-        for klass in test_classes:
-            e = klass.objects.create(name='This Week in Django')
-            m = Media(content_object=e, url='http://example.com/podcast.mp3')
-            m.save()
-    
+
     def tearDown(self):
         self.client.logout()
+
+    def _create_object(self, model):
+        """
+        Create a model with an attached Media object via GFK. We can't
+        load content via a fixture (since the GenericForeignKey relies on
+        content type IDs, which will vary depending on what other tests
+        have been run), thus we do it here.
+        """
+        e = model.objects.create(name='This Week in Django')
+        Media.objects.create(content_object=e, url='http://example.com/podcast.mp3')
+        return e
 
     def testNoParam(self):
         """
         With one initial form, extra (default) at 3, there should be 4 forms.
         """
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/1/')
+        e = self._create_object(Episode)
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
         formset = response.context['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 4)
         self.assertEqual(formset.initial_form_count(), 1)
@@ -117,7 +115,8 @@ class GenericInlineAdminParametersTest(TestCase):
         """
         With extra=0, there should be one form.
         """
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodeextra/2/')
+        e = self._create_object(EpisodeExtra)
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodeextra/%s/' % e.pk)
         formset = response.context['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 1)
         self.assertEqual(formset.initial_form_count(), 1)
@@ -126,8 +125,9 @@ class GenericInlineAdminParametersTest(TestCase):
         """
         With extra=5 and max_num=2, there should be only 2 forms.
         """
+        e = self._create_object(EpisodeMaxNum)
         inline_form_data = '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" value="2" id="id_generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" value="1" id="id_generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" />'
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodemaxnum/3/')
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodemaxnum/%s/' % e.pk)
         formset = response.context['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 2)
         self.assertEqual(formset.initial_form_count(), 1)
@@ -136,6 +136,7 @@ class GenericInlineAdminParametersTest(TestCase):
         """
         Generic inline formsets should respect include.
         """
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodeexclude/4/')
+        e = self._create_object(EpisodeExclude)
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodeexclude/%s/' % e.pk)
         formset = response.context['inline_admin_formsets'][0].formset
         self.failIf('url' in formset.forms[0], 'The formset has excluded "url" field.')
