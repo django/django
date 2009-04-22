@@ -615,7 +615,24 @@ class QuerySet(object):
         clone = self._clone()
         clone.query.add_immediate_loading(fields)
         return clone
+        
+    ###################################
+    # PUBLIC INTROSPECTION ATTRIBUTES #
+    ###################################
 
+    def ordered(self):
+        """
+        Returns True if the QuerySet is ordered -- i.e. has an order_by()
+        clause or a default ordering on the model.
+        """
+        if self.query.extra_order_by or self.query.order_by:
+            return True
+        elif self.query.default_ordering and self.query.model._meta.ordering:
+            return True
+        else:
+            return False
+    ordered = property(ordered)
+    
     ###################
     # PRIVATE METHODS #
     ###################

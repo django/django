@@ -268,6 +268,12 @@ There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
 
+.. versionadded:: 1.1
+
+You can tell if a query is ordered or not by checking the
+:attr:`QuerySet.ordered` attribute, which will be ``True`` if the
+``QuerySet`` has been ordered in any way.
+
 ``reverse()``
 ~~~~~~~~~~~~~
 
