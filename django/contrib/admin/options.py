@@ -336,10 +336,12 @@ class ModelAdmin(BaseModelAdmin):
             exclude = []
         else:
             exclude = list(self.exclude)
+        # if exclude is an empty list we pass None to be consistant with the
+        # default on modelform_factory
         defaults = {
             "form": self.form,
             "fields": fields,
-            "exclude": exclude + kwargs.get("exclude", []),
+            "exclude": (exclude + kwargs.get("exclude", [])) or None,
             "formfield_callback": curry(self.formfield_for_dbfield, request=request),
         }
         defaults.update(kwargs)
@@ -1138,12 +1140,14 @@ class InlineModelAdmin(BaseModelAdmin):
             exclude = []
         else:
             exclude = list(self.exclude)
+        # if exclude is an empty list we use None, since that's the actual
+        # default
         defaults = {
             "form": self.form,
             "formset": self.formset,
             "fk_name": self.fk_name,
             "fields": fields,
-            "exclude": exclude + kwargs.get("exclude", []),
+            "exclude": (exclude + kwargs.get("exclude", [])) or None,
             "formfield_callback": curry(self.formfield_for_dbfield, request=request),
             "extra": self.extra,
             "max_num": self.max_num,

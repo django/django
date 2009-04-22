@@ -37,7 +37,7 @@ class ValidationTestInlineModel(models.Model):
 
 __test__ = {'API_TESTS': """
 
->>> from django.contrib.admin.options import ModelAdmin, HORIZONTAL, VERTICAL
+>>> from django.contrib.admin.options import ModelAdmin, TabularInline, HORIZONTAL, VERTICAL
 >>> from django.contrib.admin.sites import AdminSite
 
 None of the following tests really depend on the content of the request, so
@@ -261,6 +261,46 @@ blank=True for the model field.  Finally, the widget should have the
 {'class': 'radiolist inline'}
 >>> list(cmafa.base_fields['transport'].widget.choices)
 [('', u'None'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')]
+
+>>> class AdminConcertForm(forms.ModelForm):
+...     class Meta:
+...         model = Concert
+...         exclude = ('transport',)
+
+>>> class ConcertAdmin(ModelAdmin):
+...     form = AdminConcertForm
+
+>>> ma = ConcertAdmin(Concert, site)
+>>> ma.get_form(request).base_fields.keys()
+['main_band', 'opening_band', 'day']
+
+>>> class AdminConcertForm(forms.ModelForm):
+...     extra = forms.CharField()
+...     class Meta:
+...         model = Concert
+...         fields = ['extra', 'transport']
+
+>>> class ConcertAdmin(ModelAdmin):
+...     form = AdminConcertForm
+
+>>> ma = ConcertAdmin(Concert, site)
+>>> ma.get_form(request).base_fields.keys()
+['extra', 'transport']
+
+>>> class ConcertInline(TabularInline):
+...     form = AdminConcertForm
+...     model = Concert
+...     fk_name = 'main_band'
+
+>>> class BandAdmin(ModelAdmin):
+...     inlines = [
+...         ConcertInline
+...     ]
+
+>>> ma = BandAdmin(Band, site)
+>>> list(ma.get_formsets(request))[0]().forms[0].fields.keys()
+['extra', 'transport', 'id', 'DELETE', 'main_band']
+
 
 >>> band.delete()
 
