@@ -34,6 +34,7 @@ real_enter_transaction_management = transaction.enter_transaction_management
 real_leave_transaction_management = transaction.leave_transaction_management
 real_savepoint_commit = transaction.savepoint_commit
 real_savepoint_rollback = transaction.savepoint_rollback
+real_managed = transaction.managed
 
 def nop(*args, **kwargs):
     return
@@ -45,6 +46,7 @@ def disable_transaction_methods():
     transaction.savepoint_rollback = nop
     transaction.enter_transaction_management = nop
     transaction.leave_transaction_management = nop
+    transaction.managed = nop
 
 def restore_transaction_methods():
     transaction.commit = real_commit
@@ -53,6 +55,7 @@ def restore_transaction_methods():
     transaction.savepoint_rollback = real_savepoint_rollback
     transaction.enter_transaction_management = real_enter_transaction_management
     transaction.leave_transaction_management = real_leave_transaction_management
+    transaction.managed = real_managed
 
 class OutputChecker(doctest.OutputChecker):
     def check_output(self, want, got, optionflags):
