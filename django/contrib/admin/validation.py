@@ -67,10 +67,6 @@ def validate(cls, model):
     # list_editable
     if hasattr(cls, 'list_editable') and cls.list_editable:
         check_isseq(cls, 'list_editable', cls.list_editable)
-        if not (opts.ordering or cls.ordering):
-            raise ImproperlyConfigured("'%s.list_editable' cannot be used "
-                "without a default ordering. Please define ordering on either %s or %s."
-                % (cls.__name__, cls.__name__, model.__name__))
         for idx, field_name in enumerate(cls.list_editable):
             try:
                 field = opts.get_field_by_name(field_name)[0]

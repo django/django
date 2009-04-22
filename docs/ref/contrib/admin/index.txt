@@ -424,16 +424,13 @@ edit and save multiple rows at once.
     ``list_editable`` interacts with a couple of other options in particular
     ways; you should note the following rules:
 
-        * To use ``list_editable`` you must have defined ``ordering`` on either
-          your model's or your ``ModelAdmin``'s inner ``Meta``.
-
         * Any field in ``list_editable`` must also be in ``list_display``. You
           can't edit a field that's not displayed!
 
         * The same field can't be listed in both ``list_editable`` and
           ``list_display_links`` -- a field can't be both a form and a link.
 
-    You'll get a validation error if any of these rules are broken.
+    You'll get a validation error if either of these rules are broken.
 
 .. attribute:: ModelAdmin.list_filter
 
