@@ -406,6 +406,13 @@ class BaseModelFormSet(BaseFormSet):
                 qs = self.queryset
             else:
                 qs = self.model._default_manager.get_query_set()
+
+            # If the queryset isn't already ordered we need to add an
+            # artificial ordering here to make sure that all formsets
+            # constructed from this queryset have the same form order.
+            if not qs.ordered:
+                qs = qs.order_by(self.model._meta.pk.name)
+
             if self.max_num > 0:
                 self._queryset = qs[:self.max_num]
             else:
