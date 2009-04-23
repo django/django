@@ -388,6 +388,24 @@ class BaseModelFormSet(BaseFormSet):
                 qs = self.queryset
             else:
                 qs = self.model._default_manager.get_query_set()
+
+            # If the queryset isn't already ordered we need to add an
+            # artificial ordering here to make sure that all formsets
+            # constructed from this queryset have the same form order.
+            #
+            # This logic is in the wrong place here on the 1.0.X branch.
+            # In the 1.1 series this logic exists as the QuerySet.ordered
+            # property, but since that's new in 1.1 here in 1.0 we just 
+            # have to deal with this slightly smelly code here.
+            if qs.query.extra_order_by or qs.query.order_by:
+                ordered = True
+            elif qs.query.default_ordering and qs.query.model._meta.ordering:
+                ordered = True
+            else:
+                ordered = False
+            if not ordered:
+                qs = qs.order_by(qs.model._meta.pk.name)
+
             if self.max_num > 0:
                 self._queryset = qs[:self.max_num]
             else:
