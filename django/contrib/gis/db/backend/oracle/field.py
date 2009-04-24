@@ -94,7 +94,7 @@ class OracleSpatialField(Field):
         SDO_CS.TRANSFORM() function call.
         """
         if value is None:
-            return '%s'
+            return 'NULL'
         elif value.srid != self.srid:
             # Adding Transform() to the SQL placeholder.
             return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (TRANSFORM, value.srid, self.srid)
