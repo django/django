@@ -66,29 +66,29 @@ class GeoModelAdmin(ModelAdmin):
         in the `widget` attribute) using the settings from the attributes set 
         in this class.
         """
-        is_collection = db_field._geom in ('MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON', 'GEOMETRYCOLLECTION')
+        is_collection = db_field.geom_type in ('MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON', 'GEOMETRYCOLLECTION')
         if is_collection:
-            if db_field._geom == 'GEOMETRYCOLLECTION': collection_type = 'Any'
-            else: collection_type = OGRGeomType(db_field._geom.replace('MULTI', ''))
+            if db_field.geom_type == 'GEOMETRYCOLLECTION': collection_type = 'Any'
+            else: collection_type = OGRGeomType(db_field.geom_type.replace('MULTI', ''))
         else:
             collection_type = 'None'
 
         class OLMap(self.widget):
             template = self.map_template
-            geom_type = db_field._geom
+            geom_type = db_field.geom_type
             params = {'default_lon' : self.default_lon,
                       'default_lat' : self.default_lat,
                       'default_zoom' : self.default_zoom,
                       'display_wkt' : self.debug or self.display_wkt,
-                      'geom_type' : OGRGeomType(db_field._geom),
+                      'geom_type' : OGRGeomType(db_field.geom_type),
                       'field_name' : db_field.name,
                       'is_collection' : is_collection,
                       'scrollable' : self.scrollable,
                       'layerswitcher' : self.layerswitcher,
                       'collection_type' : collection_type,
-                      'is_linestring' : db_field._geom in ('LINESTRING', 'MULTILINESTRING'),
-                      'is_polygon' : db_field._geom in ('POLYGON', 'MULTIPOLYGON'),
-                      'is_point' : db_field._geom in ('POINT', 'MULTIPOINT'),
+                      'is_linestring' : db_field.geom_type in ('LINESTRING', 'MULTILINESTRING'),
+                      'is_polygon' : db_field.geom_type in ('POLYGON', 'MULTIPOLYGON'),
+                      'is_point' : db_field.geom_type in ('POINT', 'MULTIPOINT'),
                       'num_zoom' : self.num_zoom,
                       'max_zoom' : self.max_zoom,
                       'min_zoom' : self.min_zoom,
