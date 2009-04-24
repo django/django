@@ -27,7 +27,7 @@ class GeoModelTest(unittest.TestCase):
             data_dir = os.path.join(os.path.dirname(__file__), 'sql')
             def get_file(wkt_file):
                 return os.path.join(data_dir, wkt_file)
-
+            State(name='Puerto Rico', poly=None).save()
             State(name='Colorado', poly=fromfile(get_file('co.wkt'))).save()
             State(name='Kansas', poly=fromfile(get_file('ks.wkt'))).save()
             Country(name='Texas', mpoly=fromfile(get_file('tx.wkt'))).save()
@@ -36,11 +36,7 @@ class GeoModelTest(unittest.TestCase):
         # Ensuring that data was loaded from initial SQL.
         self.assertEqual(2, Country.objects.count())
         self.assertEqual(8, City.objects.count())
-
-        # Oracle cannot handle NULL geometry values w/certain queries.
-        if SpatialBackend.oracle: n_state = 2
-        else: n_state = 3
-        self.assertEqual(n_state, State.objects.count())
+        self.assertEqual(3, State.objects.count())
 
     def test02_proxy(self):
         "Testing Lazy-Geometry support (using the GeometryProxy)."
@@ -308,9 +304,6 @@ class GeoModelTest(unittest.TestCase):
         m1.save()
         self.assertEqual(-1, m1.geom.srid)
 
-    # Oracle does not support NULL geometries in its spatial index for
-    # some routines (e.g., SDO_GEOM.RELATE).
-    @no_oracle
     def test12_null_geometries(self):
         "Testing NULL geometry support, and the `isnull` lookup type."
         if DISABLE: return
@@ -329,9 +322,14 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual(True, 'Kansas' in state_names)
 
         # Saving another commonwealth w/a NULL geometry.
-        if not SpatialBackend.oracle:
-            # TODO: Fix saving w/NULL geometry on Oracle.
-            State(name='Northern Mariana Islands', poly=None).save()
+        nmi = State.objects.create(name='Northern Mariana Islands', poly=None)
+        self.assertEqual(nmi.poly, None)
+
+        # Assigning a geomery and saving -- then UPDATE back to NULL.
+        nmi.poly = 'POLYGON((0 0,1 0,1 1,1 0,0 0))'
+        nmi.save()
+        State.objects.filter(name='Northern Mariana Islands').update(poly=None)
+        self.assertEqual(None, State.objects.get(name='Northern Mariana Islands').poly)
 
     @no_oracle # No specific `left` or `right` operators in Oracle.
     def test13_left_right(self):
