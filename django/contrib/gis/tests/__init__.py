@@ -35,7 +35,7 @@ def geo_suite():
 
     if HAS_GDAL:
         # These tests require GDAL.
-        test_suite_names.append('test_spatialrefsys')
+        test_suite_names.extend(['test_spatialrefsys', 'test_geoforms'])
         test_apps.append('layermap')
 
         # Adding the GDAL tests.
