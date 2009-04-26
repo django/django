@@ -38,9 +38,14 @@ class OpenLayersWidget(Textarea):
         # Constructing the dictionary of the map options.
         self.params['map_options'] = self.map_options()
 
-        # Constructing the JavaScript module name using the ID of
+        # Constructing the JavaScript module name using the name of
         # the GeometryField (passed in via the `attrs` keyword).
-        self.params['module'] = 'geodjango_%s' % self.params['field_name']
+        # Use the 'name' attr for the field name (rather than 'field')
+        self.params['name'] = name
+        # note: we must switch out dashes for underscores since js
+        # functions are created using the module variable
+        js_safe_name = self.params['name'].replace('-','_')
+        self.params['module'] = 'geodjango_%s' % js_safe_name
 
         if value:
             # Transforming the geometry to the projection used on the

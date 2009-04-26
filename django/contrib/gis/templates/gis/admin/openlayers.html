@@ -32,6 +32,6 @@
 <div id="{{ id }}_map"{% if LANGUAGE_BIDI %} dir="ltr"{% endif %}></div>
 <a href="javascript:{{ module }}.clearFeatures()">Delete all Features</a>
 {% if display_wkt %}<p> WKT debugging window:</p>{% endif %}
-<textarea id="{{ id }}" class="vWKTField required" cols="150" rows="10" name="{{ field_name }}">{{ wkt }}</textarea>
+<textarea id="{{ id }}" class="vWKTField required" cols="150" rows="10" name="{{ name }}">{{ wkt }}</textarea>
 <script type="text/javascript">{% block init_function %}{{ module }}.init();{% endblock %}</script>
 </span>
