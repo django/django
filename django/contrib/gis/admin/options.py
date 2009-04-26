@@ -33,6 +33,7 @@ class GeoModelAdmin(ModelAdmin):
     map_srid = 4326
     map_template = 'gis/admin/openlayers.html'
     openlayers_url = 'http://openlayers.org/api/2.7/OpenLayers.js'
+    point_zoom = num_zoom - 6
     wms_url = 'http://labs.metacarta.com/wms/vmap0'
     wms_layer = 'basic'
     wms_name = 'OpenLayers WMS'
@@ -100,6 +101,7 @@ class GeoModelAdmin(ModelAdmin):
                       'scale_text' : self.scale_text,
                       'map_width' : self.map_width,
                       'map_height' : self.map_height,
+                      'point_zoom' : self.point_zoom,
                       'srid' : self.map_srid,
                       'display_srid' : self.display_srid,
                       'wms_url' : self.wms_url,
@@ -124,4 +126,5 @@ if gdal.HAS_GDAL:
         map_srid = 900913
         max_extent = '-20037508,-20037508,20037508,20037508'
         max_resolution = 156543.0339
+        point_zoom = num_zoom - 6
         units = 'm'

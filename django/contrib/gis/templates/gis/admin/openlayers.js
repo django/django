@@ -127,6 +127,9 @@
       }
       // Zooming to the bounds.
       {{ module }}.map.zoomToExtent(admin_geom.geometry.getBounds());
+      if ({{ module }}.is_point){
+          {{ module }}.map.zoomTo({{ point_zoom }}); 
+      }
     } else {
       {{ module }}.map.setCenter(new OpenLayers.LonLat({{ default_lon }}, {{ default_lat }}), {{ default_zoom }});
     }
