@@ -394,6 +394,18 @@ True
 {'votes': 500, 'ORDER': None, 'choice': u'The Decemberists'}
 {'votes': 50, 'ORDER': None, 'choice': u'Basia Bulat'}
 
+Ordering should work with blank fieldsets.
+
+>>> data = {
+...     'choices-TOTAL_FORMS': '3', # the number of forms rendered
+...     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+... }
+
+>>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+>>> formset.is_valid()
+True
+>>> for form in formset.ordered_forms:
+...    print form.cleaned_data
 
 # FormSets with ordering + deletion ###########################################
 

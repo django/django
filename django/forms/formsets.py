@@ -170,18 +170,18 @@ class BaseFormSet(StrAndUnicode):
                 # don't add data marked for deletion to self.ordered_data
                 if self.can_delete and form.cleaned_data[DELETION_FIELD_NAME]:
                     continue
-                # A sort function to order things numerically ascending, but
-                # None should be sorted below anything else. Allowing None as
-                # a comparison value makes it so we can leave ordering fields
-                # blamk.
-                def compare_ordering_values(x, y):
-                    if x[1] is None:
-                        return 1
-                    if y[1] is None:
-                        return -1
-                    return x[1] - y[1]
                 self._ordering.append((i, form.cleaned_data[ORDERING_FIELD_NAME]))
             # After we're done populating self._ordering, sort it.
+            # A sort function to order things numerically ascending, but
+            # None should be sorted below anything else. Allowing None as
+            # a comparison value makes it so we can leave ordering fields
+            # blamk.
+            def compare_ordering_values(x, y):
+                if x[1] is None:
+                    return 1
+                if y[1] is None:
+                    return -1
+                return x[1] - y[1]
             self._ordering.sort(compare_ordering_values)
         # Return a list of form.cleaned_data dicts in the order spcified by
         # the form data.
