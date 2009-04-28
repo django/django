@@ -1076,9 +1076,11 @@ Use 'date_format' and 'time_format' to change the way a value is displayed.
 >>> w.render('date', datetime.datetime(2006, 1, 10, 7, 30))
 u'<input type="text" name="date_0" value="10/01/2006" /><input type="text" name="date_1" value="07:30" />'
 
->>> w._has_changed(datetime.datetime(2008, 5, 5, 12, 40, 00), [u'2008-05-05', u'12:40:00'])
+>>> w._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), [u'2008-05-06', u'12:40:00'])
+True
+>>> w._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), [u'06/05/2008', u'12:40'])
 False
->>> w._has_changed(datetime.datetime(2008, 5, 5, 12, 40, 00), [u'2008-05-05', u'12:41:00'])
+>>> w._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), [u'06/05/2008', u'12:41'])
 True
 
 # DateTimeInput ###############################################################
@@ -1102,6 +1104,8 @@ Use 'format' to change the way a value is displayed.
 >>> w = DateTimeInput(format='%d/%m/%Y %H:%M')
 >>> w.render('date', d)
 u'<input type="text" name="date" value="17/09/2007 12:51" />'
+>>> w._has_changed(d, '17/09/2007 12:51')
+False
 
 # DateInput ###################################################################
 
@@ -1125,6 +1129,8 @@ Use 'format' to change the way a value is displayed.
 >>> w = DateInput(format='%d/%m/%Y')
 >>> w.render('date', d)
 u'<input type="text" name="date" value="17/09/2007" />'
+>>> w._has_changed(d, '17/09/2007')
+False
 
 # TimeInput ###################################################################
 
@@ -1151,6 +1157,8 @@ Use 'format' to change the way a value is displayed.
 >>> w = TimeInput(format='%H:%M')
 >>> w.render('time', t)
 u'<input type="text" name="time" value="12:51" />'
+>>> w._has_changed(t, '12:51')
+False
 
 # SplitHiddenDateTimeWidget ###################################################
 
