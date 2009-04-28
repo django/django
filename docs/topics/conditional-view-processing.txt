@@ -59,10 +59,10 @@ The ``condition`` decorator's signature looks like this::
 The two functions, to compute the ETag and the last modified time, will be
 passed the incoming ``request`` object and the same parameters, in the same
 order, as the view function they are helping to wrap. The function passed
-``last_modified`` should return a standard datetime value specifying the last
-time the resource was modified, or ``None`` if the resource doesn't exist. The
-function passed to the ``etag`` decorator should return a string representing
-the `Etag`_ for the resource, or ``None`` if it doesn't exist.
+``last_modified_func`` should return a standard datetime value specifying the
+last time the resource was modified, or ``None`` if the resource doesn't
+exist. The function passed to the ``etag`` decorator should return a string
+representing the `Etag`_ for the resource, or ``None`` if it doesn't exist.
 
 Using this feature usefully is probably best explained with an example.
 Suppose you have this pair of models, representing a simple blog system::
@@ -83,10 +83,8 @@ add a new blog entry, you can compute the last modified time very quickly. You
 need the latest ``published`` date for every entry associated with that blog.
 One way to do this would be::
 
-    from django.db.models import Max
-
     def latest_entry(request, blog_id):
-        return Entry.objects.filter(blog=blog_id).aggregate(Max("published"))
+        return Entry.objects.filter(blog=blog_id).latest("published").published
 
 You can then use this function to provide early detection of an unchanged page
 for your front page view::
