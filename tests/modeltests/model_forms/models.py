@@ -102,7 +102,7 @@ class ImageFile(models.Model):
     def custom_upload_path(self, filename):
         path = self.path or 'tests'
         return '%s/%s' % (path, filename)
-    
+
     description = models.CharField(max_length=20)
     try:
         # If PIL is available, try testing PIL.
@@ -155,18 +155,27 @@ class Book(models.Model):
     title = models.CharField(max_length=40)
     author = models.ForeignKey(Writer, blank=True, null=True)
     special_id = models.IntegerField(blank=True, null=True, unique=True)
-    
+
     class Meta:
         unique_together = ('title', 'author')
-        
+
 class ExplicitPK(models.Model):
     key = models.CharField(max_length=20, primary_key=True)
     desc = models.CharField(max_length=20, blank=True, unique=True)
     class Meta:
         unique_together = ('key', 'desc')
-    
+
     def __unicode__(self):
         return self.key
+
+class Post(models.Model):
+    title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
+    slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
+    subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
+    posted = models.DateField()
+
+    def __unicode__(self):
+        return self.name
 
 __test__ = {'API_TESTS': """
 >>> from django import forms
@@ -1253,8 +1262,8 @@ False
 True
 
 # Unique & unique together with null values
->>> class BookForm(ModelForm): 
-...     class Meta: 
+>>> class BookForm(ModelForm):
+...     class Meta:
 ...        model = Book
 >>> w = Writer.objects.get(name='Mike Royko')
 >>> form = BookForm({'title': 'I May Be Wrong But I Doubt It', 'author' : w.pk})
@@ -1348,6 +1357,38 @@ ValidationError: [u'Select a valid choice. z is not one of the available choices
 >>> core = form.save()
 >>> core.parent
 <Inventory: Pear>
+
+### Validation on unique_for_date
+
+>>> p = Post.objects.create(title="Django 1.0 is released", slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
+>>> class PostForm(ModelForm):
+...     class Meta:
+...         model = Post
+
+>>> f = PostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+>>> f.is_valid()
+False
+>>> f.errors
+{'title': [u'Title must be unique for Posted date.']}
+>>> f = PostForm({'title': "Work on Django 1.1 begins", 'posted': '2008-09-03'})
+>>> f.is_valid()
+True
+>>> f = PostForm({'title': "Django 1.0 is released", 'posted': '2008-09-04'})
+>>> f.is_valid()
+True
+>>> f = PostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
+>>> f.is_valid()
+False
+>>> f.errors
+{'slug': [u'Slug must be unique for Posted year.']}
+>>> f = PostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
+>>> f.is_valid()
+False
+>>> f.errors
+{'subtitle': [u'Subtitle must be unique for Posted month.']}
+>>> f = PostForm({'subtitle': "Finally", "title": "Django 1.0 is released", "slug": "Django 1.0", 'posted': '2008-09-03'}, instance=p)
+>>> f.is_valid()
+True
 
 # Clean up
 >>> import shutil
