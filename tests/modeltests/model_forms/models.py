@@ -189,6 +189,15 @@ class ExplicitPK(models.Model):
     def __unicode__(self):
         return self.key
 
+class Post(models.Model):
+    title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
+    slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
+    subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
+    posted = models.DateField()
+
+    def __unicode__(self):
+        return self.name
+
 __test__ = {'API_TESTS': """
 >>> from django import forms
 >>> from django.forms.models import ModelForm, model_to_dict
@@ -1471,6 +1480,38 @@ ValidationError: [u'Select a valid choice. z is not one of the available choices
 >>> print CategoryForm()
 <tr><th><label for="id_description">Description:</label></th><td><input type="text" name="description" id="id_description" /></td></tr>
 <tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>
+
+### Validation on unique_for_date
+
+>>> p = Post.objects.create(title="Django 1.0 is released", slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
+>>> class PostForm(ModelForm):
+...     class Meta:
+...         model = Post
+
+>>> f = PostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+>>> f.is_valid()
+False
+>>> f.errors
+{'title': [u'Title must be unique for Posted date.']}
+>>> f = PostForm({'title': "Work on Django 1.1 begins", 'posted': '2008-09-03'})
+>>> f.is_valid()
+True
+>>> f = PostForm({'title': "Django 1.0 is released", 'posted': '2008-09-04'})
+>>> f.is_valid()
+True
+>>> f = PostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
+>>> f.is_valid()
+False
+>>> f.errors
+{'slug': [u'Slug must be unique for Posted year.']}
+>>> f = PostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
+>>> f.is_valid()
+False
+>>> f.errors
+{'subtitle': [u'Subtitle must be unique for Posted month.']}
+>>> f = PostForm({'subtitle': "Finally", "title": "Django 1.0 is released", "slug": "Django 1.0", 'posted': '2008-09-03'}, instance=p)
+>>> f.is_valid()
+True
 
 # Clean up
 >>> import shutil

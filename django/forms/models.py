@@ -225,6 +225,7 @@ class BaseModelForm(BaseForm):
             object_data.update(initial)
         super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
                                             error_class, label_suffix, empty_permitted)
+
     def clean(self):
         self.validate_unique()
         return self.cleaned_data
@@ -239,16 +240,16 @@ class BaseModelForm(BaseForm):
         # not make sense to check data that didn't validate, and since NULL does not
         # equal NULL in SQL we should not do any unique checking for NULL values.
         unique_checks = []
+        # these are checks for the unique_for_<date/year/month>
+        date_checks = []
         for check in self.instance._meta.unique_together[:]:
             fields_on_form = [field for field in check if self.cleaned_data.get(field) is not None]
             if len(fields_on_form) == len(check):
                 unique_checks.append(check)
 
-        form_errors = []
-
         # Gather a list of checks for fields declared as unique and add them to
         # the list of checks. Again, skip empty fields and any that did not validate.
-        for name, field in self.fields.items():
+        for name in self.fields:
             try:
                 f = self.instance._meta.get_field_by_name(name)[0]
             except FieldDoesNotExist:
@@ -260,10 +261,39 @@ class BaseModelForm(BaseForm):
                 # get_field_by_name found it, but it is not a Field so do not proceed
                 # to use it as if it were.
                 continue
-            if f.unique and self.cleaned_data.get(name) is not None:
+            if self.cleaned_data.get(name) is None:
+                continue
+            if f.unique:
                 unique_checks.append((name,))
+            if f.unique_for_date and self.cleaned_data.get(f.unique_for_date) is not None:
+                date_checks.append(('date', name, f.unique_for_date))
+            if f.unique_for_year and self.cleaned_data.get(f.unique_for_year) is not None:
+                date_checks.append(('year', name, f.unique_for_year))
+            if f.unique_for_month and self.cleaned_data.get(f.unique_for_month) is not None:
+                date_checks.append(('month', name, f.unique_for_month))
 
+        form_errors = []
         bad_fields = set()
+
+        field_errors, global_errors = self._perform_unique_checks(unique_checks)
+        bad_fields.union(field_errors)
+        form_errors.extend(global_errors)
+
+        field_errors, global_errors = self._perform_date_checks(date_checks)
+        bad_fields.union(field_errors)
+        form_errors.extend(global_errors)
+
+        for field_name in bad_fields:
+            del self.cleaned_data[field_name]
+        if form_errors:
+            # Raise the unique together errors since they are considered
+            # form-wide.
+            raise ValidationError(form_errors)
+
+    def _perform_unique_checks(self, unique_checks):
+        bad_fields = set()
+        form_errors = []
+
         for unique_check in unique_checks:
             # Try to look up an existing object with the same values as this
             # object's values for all the unique field.
@@ -288,39 +318,74 @@ class BaseModelForm(BaseForm):
             # This cute trick with extra/values is the most efficient way to
             # tell if a particular query returns any results.
             if qs.extra(select={'a': 1}).values('a').order_by():
-                model_name = capfirst(self.instance._meta.verbose_name)
-
-                # A unique field
                 if len(unique_check) == 1:
-                    field_name = unique_check[0]
-                    field_label = self.fields[field_name].label
-                    # Insert the error into the error dict, very sneaky
-                    self._errors[field_name] = ErrorList([
-                        _(u"%(model_name)s with this %(field_label)s already exists.") % \
-                        {'model_name': unicode(model_name),
-                         'field_label': unicode(field_label)}
-                    ])
-                # unique_together
+                    self._errors[unique_check[0]] = ErrorList([self.unique_error_message(unique_check)])
                 else:
-                    field_labels = [self.fields[field_name].label for field_name in unique_check]
-                    field_labels = get_text_list(field_labels, _('and'))
-                    form_errors.append(
-                        _(u"%(model_name)s with this %(field_label)s already exists.") % \
-                        {'model_name': unicode(model_name),
-                         'field_label': unicode(field_labels)}
-                    )
+                    form_errors.append(self.unique_error_message(unique_check))
 
                 # Mark these fields as needing to be removed from cleaned data
                 # later.
                 for field_name in unique_check:
                     bad_fields.add(field_name)
+        return bad_fields, form_errors
 
-        for field_name in bad_fields:
-            del self.cleaned_data[field_name]
-        if form_errors:
-            # Raise the unique together errors since they are considered
-            # form-wide.
-            raise ValidationError(form_errors)
+    def _perform_date_checks(self, date_checks):
+        bad_fields = set()
+        for lookup_type, field, unique_for in date_checks:
+            lookup_kwargs = {}
+            # there's a ticket to add a date lookup, we can remove this special
+            # case if that makes it's way in
+            if lookup_type == 'date':
+                date = self.cleaned_data[unique_for]
+                lookup_kwargs['%s__day' % unique_for] = date.day
+                lookup_kwargs['%s__month' % unique_for] = date.month
+                lookup_kwargs['%s__year' % unique_for] = date.year
+            else:
+                lookup_kwargs['%s__%s' % (unique_for, lookup_type)] = getattr(self.cleaned_data[unique_for], lookup_type)
+            lookup_kwargs[field] = self.cleaned_data[field]
+
+            qs = self.instance.__class__._default_manager.filter(**lookup_kwargs)
+            # Exclude the current object from the query if we are editing an
+            # instance (as opposed to creating a new one)
+            if self.instance.pk is not None:
+                qs = qs.exclude(pk=self.instance.pk)
+
+            # This cute trick with extra/values is the most efficient way to
+            # tell if a particular query returns any results.
+            if qs.extra(select={'a': 1}).values('a').order_by():
+                self._errors[field] = ErrorList([
+                    self.date_error_message(lookup_type, field, unique_for)
+                ])
+                bad_fields.add(field)
+        return bad_fields, []
+
+    def date_error_message(self, lookup_type, field, unique_for):
+        return _(u"%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
+            'field_name': unicode(self.fields[field].label),
+            'date_field': unicode(self.fields[unique_for].label),
+            'lookup': lookup_type,
+        }
+
+    def unique_error_message(self, unique_check):
+        model_name = capfirst(self.instance._meta.verbose_name)
+
+        # A unique field
+        if len(unique_check) == 1:
+            field_name = unique_check[0]
+            field_label = self.fields[field_name].label
+            # Insert the error into the error dict, very sneaky
+            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
+                'model_name': unicode(model_name),
+                'field_label': unicode(field_label)
+            }
+        # unique_together
+        else:
+            field_labels = [self.fields[field_name].label for field_name in unique_check]
+            field_labels = get_text_list(field_labels, _('and'))
+            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
+                'model_name': unicode(model_name),
+                'field_label': unicode(field_labels)
+            }
 
     def save(self, commit=True):
         """
