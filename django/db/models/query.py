@@ -715,9 +715,6 @@ class ValuesQuerySet(QuerySet):
 
     def iterator(self):
         # Purge any extra columns that haven't been explicitly asked for
-        if self.extra_names is not None:
-            self.query.trim_extra_select(self.extra_names)
-
         extra_names = self.query.extra_select.keys()
         field_names = self.field_names
         aggregate_names = self.query.aggregate_select.keys()
@@ -741,13 +738,18 @@ class ValuesQuerySet(QuerySet):
         if self._fields:
             self.extra_names = []
             self.aggregate_names = []
-            if not self.query.extra_select and not self.query.aggregate_select:
+            if not self.query.extra and not self.query.aggregates:
+                # Short cut - if there are no extra or aggregates, then
+                # the values() clause must be just field names.
                 self.field_names = list(self._fields)
             else:
                 self.query.default_cols = False
                 self.field_names = []
                 for f in self._fields:
-                    if self.query.extra_select.has_key(f):
+                    # we inspect the full extra_select list since we might
+                    # be adding back an extra select item that we hadn't
+                    # had selected previously.
+                    if self.query.extra.has_key(f):
                         self.extra_names.append(f)
                     elif self.query.aggregate_select.has_key(f):
                         self.aggregate_names.append(f)
@@ -760,6 +762,8 @@ class ValuesQuerySet(QuerySet):
             self.aggregate_names = None
 
         self.query.select = []
+        if self.extra_names is not None:
+            self.query.set_extra_mask(self.extra_names)
         self.query.add_fields(self.field_names, False)
         if self.aggregate_names is not None:
             self.query.set_aggregate_mask(self.aggregate_names)
@@ -816,9 +820,6 @@ class ValuesQuerySet(QuerySet):
 
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
-        if self.extra_names is not None:
-            self.query.trim_extra_select(self.extra_names)
-
         if self.flat and len(self._fields) == 1:
             for row in self.query.results_iter():
                 yield row[0]

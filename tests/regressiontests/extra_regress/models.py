@@ -35,6 +35,9 @@ class TestObject(models.Model):
     second = models.CharField(max_length=20)
     third = models.CharField(max_length=20)
 
+    def __unicode__(self):
+        return u'TestObject: %s,%s,%s' % (self.first,self.second,self.third)
+
 __test__ = {"API_TESTS": """
 # Regression tests for #7314 and #7372
 
@@ -189,6 +192,19 @@ True
 >>> TestObject.objects.extra(select=SortedDict((('foo','first'),('bar','second'),('whiz','third')))).values_list('whiz', 'first', 'bar', 'id')
 [(u'third', u'first', u'second', 1)]
 
+# Regression for #10847: the list of extra columns can always be accurately evaluated.
+# Using an inner query ensures that as_sql() is producing correct output
+# without requiring full evaluation and execution of the inner query.
+>>> TestObject.objects.extra(select={'extra': 1}).values('pk')
+[{'pk': 1}]
+
+>>> TestObject.objects.filter(pk__in=TestObject.objects.extra(select={'extra': 1}).values('pk'))
+[<TestObject: TestObject: first,second,third>]
+
+>>> TestObject.objects.values('pk').extra(select={'extra': 1})
+[{'pk': 1}]
+
+>>> TestObject.objects.filter(pk__in=TestObject.objects.values('pk').extra(select={'extra': 1}))
+[<TestObject: TestObject: first,second,third>]
+
 """}
-
-

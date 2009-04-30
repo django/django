@@ -178,7 +178,7 @@ class UpdateQuery(Query):
         # from other tables.
         query = self.clone(klass=Query)
         query.bump_prefix()
-        query.extra_select = {}
+        query.extra = {}
         query.select = []
         query.add_fields([query.model._meta.pk.name])
         must_pre_select = count > 1 and not self.connection.features.update_can_self_select
@@ -409,7 +409,7 @@ class DateQuery(Query):
         self.select = [select]
         self.select_fields = [None]
         self.select_related = False # See #7097.
-        self.extra_select = {}
+        self.extra = {}
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
 
