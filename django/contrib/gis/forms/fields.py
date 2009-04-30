@@ -17,7 +17,7 @@ class GeometryField(forms.Field):
         'no_geom' : _(u'No geometry value provided.'),
         'invalid_geom' : _(u'Invalid geometry value.'),
         'invalid_geom_type' : _(u'Invalid geometry type.'),
-        'transform_error' : _(u'An error occurred when transforming the geometry'
+        'transform_error' : _(u'An error occurred when transforming the geometry '
                               'to the SRID of the geometry form field.'),
         }
 
