@@ -10,10 +10,10 @@ if you're using a database that supports transactions.
 Django's default transaction behavior
 =====================================
 
-Django's default behavior is to commit automatically when any built-in,
-data-altering model function is called. For example, if you call
-``model.save()`` or ``model.delete()``, the change will be committed
-immediately.
+Django's default behavior is to run with an open transaction which it
+commits automatically when any built-in, data-altering model function is
+called. For example, if you call ``model.save()`` or ``model.delete()``, the
+change will be committed immediately.
 
 This is much like the auto-commit setting for most databases. As soon as you
 perform an action that needs to write to the database, Django produces the
@@ -165,3 +165,29 @@ they're called. If your MySQL setup *does* support transactions, Django will
 handle transactions as explained in this document.
 
 .. _information on MySQL transactions: http://dev.mysql.com/doc/refman/5.0/en/sql-syntax-transactions.html
+
+Transactions and savepoints in PostgreSQL 8
+===========================================
+
+When a call to a PostgreSQL 8 cursor raises an exception, all subsequent SQL
+in the same transaction fails with the error "current transaction is aborted,
+queries ignored until end of transaction block". Whilst simple use of save()
+is unlikely to raise an exception in PostgreSQL, there are many more advanced
+usage patterns which might: for example, saving objects with unique fields,
+saving using the force_insert/force_update flag, or invoking custom SQL.
+
+In any of these cases, you can wrap the command which may throw
+IntegrityError inside savepoints, which will then allow subsequent commands
+to proceed. Example::
+
+    try:
+      sid = transaction.savepoint()
+      x.save()
+      transaction.savepoint_commit(sid)
+    except IntegrityError:
+      transaction.savepoint_rollback(sid)
+      raise
+
+Savepoints are not implemented in PostgreSQL 7. If you experience an
+IntegrityError when using PostgreSQL 7, you will need to rollback to the
+start of the transaction.

@@ -5,16 +5,28 @@ Performing raw SQL queries
 
 Feel free to write custom SQL statements in custom model methods and
 module-level methods. The object ``django.db.connection`` represents the
-current database connection. To use it, call ``connection.cursor()`` to get a
-cursor object. Then, call ``cursor.execute(sql, [params])`` to execute the SQL
-and ``cursor.fetchone()`` or ``cursor.fetchall()`` to return the resulting
-rows. Example::
+current database connection, and ``django.db.transaction`` represents the
+current database transaction. To use the database connection, call
+``connection.cursor()`` to get a cursor object. Then, call
+``cursor.execute(sql, [params])`` to execute the SQL and ``cursor.fetchone()``
+or ``cursor.fetchall()`` to return the resulting rows. After performing a data
+changing operation, you should then call
+``transaction.commit_unless_managed()`` to ensure your changes are committed
+to the database. If your query is purely a data retrieval operation, no commit
+is required. For example::
 
     def my_custom_sql(self):
-        from django.db import connection
+        from django.db import connection, transaction
         cursor = connection.cursor()
+
+        # Data modifying operation - commit required
+        cursor.execute("UPDATE bar SET foo = 1 WHERE baz = %s", [self.baz])
+        transaction.commit_unless_managed()
+
+        # Data retrieval operation - no commit required
         cursor.execute("SELECT foo FROM bar WHERE baz = %s", [self.baz])
         row = cursor.fetchone()
+
         return row
 
 ``connection`` and ``cursor`` mostly implement the standard `Python DB-API`_
@@ -29,7 +41,7 @@ the sake of consistency and sanity.)
 
 A final note: If all you want to do is a custom ``WHERE`` clause, you can just
 use the ``where``, ``tables`` and ``params`` arguments to the standard lookup
-API. 
+API.
 
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
 

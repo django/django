@@ -171,15 +171,15 @@ ones:
                 (u'SR', u'Senior'),
                 (u'GR', u'Graduate'),
             )
-        
+
         The first element in each tuple is the value that will be stored in the
         database, the second element will be displayed by the admin interface,
         or in a ModelChoiceField. Given an instance of a model object, the
         display value for a choices field can be accessed using the
         ``get_FOO_display`` method. For example::
-        
+
             from django.db import models
-            
+
             class Person(models.Model):
                 GENDER_CHOICES = (
                     (u'M', u'Male'),
@@ -187,9 +187,9 @@ ones:
                 )
                 name = models.CharField(max_length=60)
                 gender = models.CharField(max_length=2, choices=GENDER_CHOICES)
-        
+
         ::
-        
+
             >>> p = Person(name="Fred Flinstone", gender="M")
             >>> p.save()
             >>> p.gender
@@ -752,37 +752,8 @@ Executing custom SQL
 --------------------
 
 Another common pattern is writing custom SQL statements in model methods and
-module-level methods. The object :class:`django.db.connection
-<django.db.backends.DatabaseWrapper>` represents the current database
-connection. To use it, call :meth:`connection.cursor()
-<django.db.backends.DatabaseWrapper.cursor>` to get a cursor object. Then, call
-``cursor.execute(sql, [params])`` to execute the SQL and
-:meth:`cursor.fetchone() <django.db.backends.CursorWrapper.fetchone>` or
-:meth:`cursor.fetchall() <django.db.backends.CursorWrapper.fetchall>` to return
-the resulting rows. For example::
-
-    def my_custom_sql(self):
-        from django.db import connection
-        cursor = connection.cursor()
-        cursor.execute("SELECT foo FROM bar WHERE baz = %s", [self.baz])
-        row = cursor.fetchone()
-        return row
-
-:class:`connection <django.db.backends.DatabaseWrapper>` and :class:`cursor
-<django.db.backends.CursorWrapper>` mostly implement the standard Python
-DB-API -- see :pep:`249` -- with the addition of Django's :ref:`transaction
-handling <topics-db-transactions>`. If you're not familiar with the Python
-DB-API, note that the SQL statement in :meth:`cursor.execute()
-<django.db.backends.CursorWrapper.execute>` uses placeholders, ``"%s"``, rather
-than adding parameters directly within the SQL. If you use this technique, the
-underlying database library will automatically add quotes and escaping to your
-parameter(s) as necessary. (Also note that Django expects the ``"%s"``
-placeholder, *not* the ``"?"`` placeholder, which is used by the SQLite Python
-bindings. This is for the sake of consistency and sanity.)
-
-A final note: If all you want to do is a custom ``WHERE`` clause, you can use
-the :meth:`~QuerySet.extra` lookup method, which lets you add custom SQL to a
-query.
+module-level methods. For more details on using raw SQL, see the documentation
+on :ref:`using raw SQL<topics-db-sql>`.
 
 .. _model-inheritance:
 
