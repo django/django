@@ -187,7 +187,7 @@ them. Something like this will work::
         def default(self, obj):
             if isinstance(obj, Promise):
                 return force_unicode(obj)
-            return obj
+            return super(LazyEncoder, self).default(obj)
 
 .. _special encoder: http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7/docs/index.html
 
