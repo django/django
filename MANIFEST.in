@@ -23,7 +23,4 @@ recursive-include django/contrib/formtools/templates *
 recursive-include django/contrib/gis/templates *
 recursive-include django/contrib/gis/tests/data *
 recursive-include django/contrib/gis/tests/geoapp/sql *
-recursive-include django/contrib/gis/tests/layermap/cities *
-recursive-include django/contrib/gis/tests/layermap/counties *
-recursive-include django/contrib/gis/tests/layermap/interstates *
 recursive-include django/contrib/sitemaps/templates *
