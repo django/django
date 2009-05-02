@@ -313,7 +313,7 @@ referred to above used fields named ``content_type_fk`` and
 ``object_primary_key`` to create its generic foreign key, then a
 ``GenericRelation`` back to it would need to be defined like so::
 
-    tags = generic.GenericRelation('content_type_fk', 'object_primary_key')
+    tags = generic.GenericRelation(TaggedItem, content_type_field='content_type_fk', object_id_field='object_primary_key')
 
 Of course, if you don't add the reverse relationship, you can do the
 same types of lookups manually::
@@ -324,14 +324,14 @@ same types of lookups manually::
     ...                           object_id=b.id)
     [<TaggedItem: django>, <TaggedItem: python>]
 
-Note that if the model with a :class:`~django.contrib.contenttypes.generic.GenericForeignKey` 
-that you're referring to uses a non-default value for ``ct_field`` or ``fk_field`` 
-(e.g. the :mod:`django.contrib.comments` app uses ``ct_field="object_pk"``), 
+Note that if the model with a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
+that you're referring to uses a non-default value for ``ct_field`` or ``fk_field``
+(e.g. the :mod:`django.contrib.comments` app uses ``ct_field="object_pk"``),
 you'll need to pass ``content_type_field`` and ``object_id_field`` to
 :class:`~django.contrib.contenttypes.generic.GenericRelation`.::
 
 	comments = generic.GenericRelation(Comment, content_type_field="content_type", object_id_field="object_pk")
-	
+
 Note that if you delete an object that has a
 :class:`~django.contrib.contenttypes.generic.GenericRelation`, any objects
 which have a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
@@ -342,7 +342,7 @@ it would be deleted at the same time.
 Generic relations in forms and admin
 ------------------------------------
 
-:mod:`django.contrib.contenttypes.generic` provides both a 
+:mod:`django.contrib.contenttypes.generic` provides both a
 :class:`~django.contrib.contenttypes.generic.GenericInlineFormSet`
 and :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`.
 This enables the use of generic relations in forms and the admin. See the
@@ -361,8 +361,8 @@ This enables the use of generic relations in forms and the admin. See the
         The name of the
         :class:`~django.contrib.contenttypes.models.ContentType` foreign key
         field on the model. Defaults to ``content_type``.
-    
+
     .. attribute:: generic.GenericInlineModelAdmin.ct_fk_field
-    
+
         The name of the integer field that represents the ID of the related
         object. Defaults to ``object_id``.
