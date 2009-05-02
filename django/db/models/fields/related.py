@@ -948,7 +948,10 @@ class ManyToManyField(RelatedField, Field):
         # If initial is passed in, it's a list of related objects, but the
         # MultipleChoiceField takes a list of IDs.
         if defaults.get('initial') is not None:
-            defaults['initial'] = [i._get_pk_val() for i in defaults['initial']]
+            initial = defaults['initial']
+            if callable(initial):
+                initial = initial()
+            defaults['initial'] = [i._get_pk_val() for i in initial]
         return super(ManyToManyField, self).formfield(**defaults)
 
     def db_type(self):

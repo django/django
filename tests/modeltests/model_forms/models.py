@@ -613,6 +613,30 @@ Add some categories and test the many-to-many form output.
 <option value="3">Third test</option>
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
 
+Initial values can be provided for model forms
+>>> f = TestArticleForm(auto_id=False, initial={'headline': 'Your headline here', 'categories': ['1','2']})
+>>> print f.as_ul()
+<li>Headline: <input type="text" name="headline" value="Your headline here" maxlength="50" /></li>
+<li>Slug: <input type="text" name="slug" maxlength="50" /></li>
+<li>Pub date: <input type="text" name="pub_date" /></li>
+<li>Writer: <select name="writer">
+<option value="" selected="selected">---------</option>
+<option value="1">Mike Royko</option>
+<option value="2">Bob Woodward</option>
+</select></li>
+<li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
+<li>Status: <select name="status">
+<option value="" selected="selected">---------</option>
+<option value="1">Draft</option>
+<option value="2">Pending</option>
+<option value="3">Live</option>
+</select></li>
+<li>Categories: <select multiple="multiple" name="categories">
+<option value="1" selected="selected">Entertainment</option>
+<option value="2" selected="selected">It&#39;s a test</option>
+<option value="3">Third test</option>
+</select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
+
 >>> f = TestArticleForm({'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
 ...     'writer': u'1', 'article': u'Hello.', 'categories': [u'1', u'2']}, instance=new_art)
 >>> new_art = f.save()
