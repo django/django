@@ -1,18 +1,22 @@
+from datetime import date
+
 from django import db
 from django import forms
+from django.forms.models import modelform_factory
 from django.conf import settings
 from django.test import TestCase
-from models import Person, Triple, FilePathModel
+
+from models import Person, Triple, FilePathModel, Article, Publication
 
 class ModelMultipleChoiceFieldTests(TestCase):
-    
+
     def setUp(self):
         self.old_debug = settings.DEBUG
         settings.DEBUG = True
-        
+
     def tearDown(self):
         settings.DEBUG = self.old_debug
-    
+
     def test_model_multiple_choice_number_of_queries(self):
         """
         Test that ModelMultipleChoiceField does O(1) queries instead of
@@ -20,11 +24,11 @@ class ModelMultipleChoiceFieldTests(TestCase):
         """
         for i in range(30):
             Person.objects.create(name="Person %s" % i)
-        
+
         db.reset_queries()
         f = forms.ModelMultipleChoiceField(queryset=Person.objects.all())
         selected = f.clean([1, 3, 5, 7, 9])
-        self.assertEquals(len(db.connection.queries), 1)        
+        self.assertEquals(len(db.connection.queries), 1)
 
 class TripleForm(forms.ModelForm):
     class Meta:
@@ -59,3 +63,30 @@ class FilePathFieldTests(TestCase):
         names = [p[1] for p in form['path'].field.choices]
         names.sort()
         self.assertEqual(names, ['---------', '__init__.py', 'models.py', 'tests.py'])
+
+class ManyToManyCallableInitialTests(TestCase):
+    def test_callable(self):
+        "Regression for #10349: A callable can be provided as the initial value for an m2m field"
+
+        # Set up a callable initial value
+        def formfield_for_dbfield(db_field, **kwargs):
+            if db_field.name == 'publications':
+                kwargs['initial'] = lambda: Publication.objects.all().order_by('date')[:2]
+            return db_field.formfield(**kwargs)
+
+        # Set up some Publications to use as data
+        Publication(title="First Book", date=date(2007,1,1)).save()
+        Publication(title="Second Book", date=date(2008,1,1)).save()
+        Publication(title="Third Book", date=date(2009,1,1)).save()
+
+        # Create a ModelForm, instantiate it, and check that the output is as expected
+        ModelForm = modelform_factory(Article, formfield_callback=formfield_for_dbfield)
+        form = ModelForm()
+        self.assertEquals(form.as_ul(), u"""<li><label for="id_headline">Headline:</label> <input id="id_headline" type="text" name="headline" maxlength="100" /></li>
+<li><label for="id_publications">Publications:</label> <select multiple="multiple" name="publications" id="id_publications">
+<option value="1" selected="selected">First Book</option>
+<option value="2" selected="selected">Second Book</option>
+<option value="3">Third Book</option>
+</select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>""")
+
+

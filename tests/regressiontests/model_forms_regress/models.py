@@ -14,3 +14,17 @@ class Triple(models.Model):
 
 class FilePathModel(models.Model):
     path = models.FilePathField(path=os.path.dirname(__file__), match=".*\.py$", blank=True)
+
+class Publication(models.Model):
+    title = models.CharField(max_length=30)
+    date = models.DateField()
+
+    def __unicode__(self):
+        return self.title
+
+class Article(models.Model):
+    headline = models.CharField(max_length=100)
+    publications = models.ManyToManyField(Publication)
+
+    def __unicode__(self):
+        return self.headline
