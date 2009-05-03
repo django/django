@@ -14,7 +14,7 @@
      {% endfor %}
      {% if inline_admin_formset.formset.can_delete %}<th>{% trans "Delete?" %}</th>{% endif %}
      </tr></thead>
-   
+
      {% for inline_admin_form in inline_admin_formset %}
         {% if inline_admin_form.form.non_field_errors %}
         <tr><td colspan="{{ inline_admin_form.field_count }}">{{ inline_admin_form.form.non_field_errors }}</td></tr>
@@ -26,7 +26,8 @@
           {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
           {% if inline_admin_form.show_url %}<a href="../../../r/{{ inline_admin_form.original.content_type_id }}/{{ inline_admin_form.original.id }}/">{% trans "View on site" %}</a>{% endif %}
             </p>{% endif %}
-          {{ inline_admin_form.pk_field.field }} {{ inline_admin_form.fk_field.field }}
+          {% if inline_admin_form.has_auto_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
+          {{ inline_admin_form.fk_field.field }}
           {% spaceless %}
           {% for fieldset in inline_admin_form %}
             {% for line in fieldset %}
@@ -48,22 +49,22 @@
             {% endfor %}
           {% endfor %}
         {% endfor %}
-                
+
         {% if inline_admin_formset.formset.can_delete %}
           <td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
         {% endif %}
-        
+
         </tr>
 
      {% endfor %}
-   
+
    </table>
-   
+
 </fieldset>
   </div>
-  
+
   {# <ul class="tools"> #}
   {#   <li><a class="add" href="">Add another {{ inline_admin_formset.opts.verbose_name|title }}</a></li> #}
   {# </ul> #}
-  
+
 </div>
