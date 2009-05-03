@@ -5,7 +5,7 @@ except NameError:
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.forms.models import BaseModelForm, BaseModelFormSet, fields_for_model
+from django.forms.models import BaseModelForm, BaseModelFormSet, fields_for_model, _get_foreign_key
 from django.contrib.admin.options import flatten_fieldsets, BaseModelAdmin
 from django.contrib.admin.options import HORIZONTAL, VERTICAL
 
@@ -146,9 +146,9 @@ def validate(cls, model):
                 raise ImproperlyConfigured("'%s.inlines[%d].model' does not "
                         "inherit from models.Model." % (cls.__name__, idx))
             validate_base(inline, inline.model)
-            validate_inline(inline)
+            validate_inline(inline, cls, model)
 
-def validate_inline(cls):
+def validate_inline(cls, parent, parent_model):
     # model is already verified to exist and be a Model
     if cls.fk_name: # default value is None
         f = get_field(cls, cls.model, cls.model._meta, 'fk_name', cls.fk_name)
@@ -166,6 +166,14 @@ def validate_inline(cls):
     if hasattr(cls, 'formset') and not issubclass(cls.formset, BaseModelFormSet):
         raise ImproperlyConfigured("'%s.formset' does not inherit from "
                 "BaseModelFormSet." % cls.__name__)
+
+    # exclude
+    if hasattr(cls, 'exclude') and cls.exclude:
+        fk_name = _get_foreign_key(parent_model, cls.model).name
+        if fk_name in cls.exclude:
+            raise ImproperlyConfigured("%s cannot exclude the field "
+                    "'%s' - this is the foreign key to the parent model "
+                    "%s." % (cls.__name__, fk_name, parent_model.__name__))
 
 def validate_base(cls, model):
     opts = model._meta
