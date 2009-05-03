@@ -137,7 +137,7 @@ class InlineAdminForm(AdminForm):
         self.formset = formset
         self.original = original
         if original is not None:
-            self.original.content_type_id = ContentType.objects.get_for_model(original).pk
+            self.original_content_type_id = ContentType.objects.get_for_model(original).pk
         self.show_url = original and hasattr(original, 'get_absolute_url')
         super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields)
 
