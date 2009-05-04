@@ -8,6 +8,7 @@ from django.test import TestCase
 
 class RemoteUserTest(TestCase):
 
+    urls = 'django.contrib.auth.tests.urls'
     middleware = 'django.contrib.auth.middleware.RemoteUserMiddleware'
     backend = 'django.contrib.auth.backends.RemoteUserBackend'
 
@@ -28,15 +29,15 @@ class RemoteUserTest(TestCase):
         """
         num_users = User.objects.count()
 
-        response = self.client.get('/')
+        response = self.client.get('/remote_user/')
         self.assert_(isinstance(response.context['user'], AnonymousUser))
         self.assertEqual(User.objects.count(), num_users)
 
-        response = self.client.get('/', REMOTE_USER=None)
+        response = self.client.get('/remote_user/', REMOTE_USER=None)
         self.assert_(isinstance(response.context['user'], AnonymousUser))
         self.assertEqual(User.objects.count(), num_users)
 
-        response = self.client.get('/', REMOTE_USER='')
+        response = self.client.get('/remote_user/', REMOTE_USER='')
         self.assert_(isinstance(response.context['user'], AnonymousUser))
         self.assertEqual(User.objects.count(), num_users)
 
@@ -46,13 +47,13 @@ class RemoteUserTest(TestCase):
         as a User.
         """
         num_users = User.objects.count()
-        response = self.client.get('/', REMOTE_USER='newuser')
+        response = self.client.get('/remote_user/', REMOTE_USER='newuser')
         self.assertEqual(response.context['user'].username, 'newuser')
         self.assertEqual(User.objects.count(), num_users + 1)
         User.objects.get(username='newuser')
 
         # Another request with same user should not create any new users.
-        response = self.client.get('/', REMOTE_USER='newuser')
+        response = self.client.get('/remote_user/', REMOTE_USER='newuser')
         self.assertEqual(User.objects.count(), num_users + 1)
 
     def test_known_user(self):
@@ -62,12 +63,12 @@ class RemoteUserTest(TestCase):
         User.objects.create(username='knownuser')
         User.objects.create(username='knownuser2')
         num_users = User.objects.count()
-        response = self.client.get('/', REMOTE_USER=self.known_user)
+        response = self.client.get('/remote_user/', REMOTE_USER=self.known_user)
         self.assertEqual(response.context['user'].username, 'knownuser')
         self.assertEqual(User.objects.count(), num_users)
         # Test that a different user passed in the headers causes the new user
         # to be logged in.
-        response = self.client.get('/', REMOTE_USER=self.known_user2)
+        response = self.client.get('/remote_user/', REMOTE_USER=self.known_user2)
         self.assertEqual(response.context['user'].username, 'knownuser2')
         self.assertEqual(User.objects.count(), num_users)
 
@@ -82,13 +83,13 @@ class RemoteUserTest(TestCase):
         user.last_login = default_login
         user.save()
 
-        response = self.client.get('/', REMOTE_USER=self.known_user)
+        response = self.client.get('/remote_user/', REMOTE_USER=self.known_user)
         self.assertNotEqual(default_login, response.context['user'].last_login)
 
         user = User.objects.get(username='knownuser')
         user.last_login = default_login
         user.save()
-        response = self.client.get('/', REMOTE_USER=self.known_user)
+        response = self.client.get('/remote_user/', REMOTE_USER=self.known_user)
         self.assertEqual(default_login, response.context['user'].last_login)
 
     def tearDown(self):
@@ -113,7 +114,7 @@ class RemoteUserNoCreateTest(RemoteUserTest):
 
     def test_unknown_user(self):
         num_users = User.objects.count()
-        response = self.client.get('/', REMOTE_USER='newuser')
+        response = self.client.get('/remote_user/', REMOTE_USER='newuser')
         self.assert_(isinstance(response.context['user'], AnonymousUser))
         self.assertEqual(User.objects.count(), num_users)
 
