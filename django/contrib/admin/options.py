@@ -18,7 +18,7 @@ from django.utils.safestring import mark_safe
 from django.utils.functional import curry
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
-from django.utils.translation import ngettext, ugettext_lazy
+from django.utils.translation import ungettext, ugettext_lazy
 from django.utils.encoding import force_unicode
 try:
     set
@@ -108,10 +108,10 @@ class BaseModelAdmin(object):
 
         # If we've got overrides for the formfield defined, use 'em. **kwargs
         # passed to formfield_for_dbfield override the defaults.
-        for klass in db_field.__class__.mro(): 
-            if klass in self.formfield_overrides: 
-                kwargs = dict(self.formfield_overrides[klass], **kwargs) 
-                return db_field.formfield(**kwargs) 
+        for klass in db_field.__class__.mro():
+            if klass in self.formfield_overrides:
+                kwargs = dict(self.formfield_overrides[klass], **kwargs)
+                return db_field.formfield(**kwargs)
 
         # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)
@@ -439,26 +439,26 @@ class ModelAdmin(BaseModelAdmin):
         # want *any* actions enabled on this page.
         if self.actions is None:
             return []
-            
+
         actions = []
-        
+
         # Gather actions from the admin site first
         for (name, func) in self.admin_site.actions:
             description = getattr(func, 'short_description', name.replace('_', ' '))
             actions.append((func, name, description))
-        
-        # Then gather them from the model admin and all parent classes, 
+
+        # Then gather them from the model admin and all parent classes,
         # starting with self and working back up.
         for klass in self.__class__.mro()[::-1]:
             class_actions = getattr(klass, 'actions', [])
             # Avoid trying to iterate over None
             if not class_actions:
-                continue 
+                continue
             actions.extend([self.get_action(action) for action in class_actions])
-        
+
         # get_action might have returned None, so filter any of those out.
         actions = filter(None, actions)
-        
+
         # Convert the actions into a SortedDict keyed by name
         # and sorted by description.
         actions.sort(lambda a,b: cmp(a[2].lower(), b[2].lower()))
@@ -466,7 +466,7 @@ class ModelAdmin(BaseModelAdmin):
             (name, (func, name, desc))
             for func, name, desc in actions
         ])
-        
+
         return actions
 
     def get_action_choices(self, request, default_choices=BLANK_CHOICE_DASH):
@@ -490,20 +490,20 @@ class ModelAdmin(BaseModelAdmin):
         if callable(action):
             func = action
             action = action.__name__
-            
+
         # Next, look for a method. Grab it off self.__class__ to get an unbound
         # method instead of a bound one; this ensures that the calling
         # conventions are the same for functions and methods.
         elif hasattr(self.__class__, action):
             func = getattr(self.__class__, action)
-        
+
         # Finally, look for a named method on the admin site
         else:
             try:
                 func = self.admin_site.get_action(action)
             except KeyError:
                 return None
-            
+
         if hasattr(func, 'short_description'):
             description = func.short_description
         else:
@@ -666,7 +666,7 @@ class ModelAdmin(BaseModelAdmin):
         data = request.POST.copy()
         data.pop(helpers.ACTION_CHECKBOX_NAME, None)
         data.pop("index", None)
-        
+
         # Use the action whose button was pushed
         try:
             data.update({'action': data.getlist('action')[action_index]})
@@ -675,7 +675,7 @@ class ModelAdmin(BaseModelAdmin):
             # POST data, so by deleting action it'll fail the validation check
             # below. So no need to do anything here
             pass
-        
+
         action_form = self.action_form(data, auto_id=None)
         action_form.fields['action'].choices = self.get_action_choices(request)
 
@@ -879,10 +879,10 @@ class ModelAdmin(BaseModelAdmin):
         app_label = opts.app_label
         if not self.has_change_permission(request, None):
             raise PermissionDenied
-        
+
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
-        
+
         # Remove action checkboxes if there aren't any actions available.
         list_display = list(self.list_display)
         if not actions:
@@ -890,7 +890,7 @@ class ModelAdmin(BaseModelAdmin):
                 list_display.remove('action_checkbox')
             except ValueError:
                 pass
-        
+
         try:
             cl = ChangeList(request, self.model, list_display, self.list_display_links, self.list_filter,
                 self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
@@ -903,7 +903,7 @@ class ModelAdmin(BaseModelAdmin):
             if ERROR_FLAG in request.GET.keys():
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
-                
+
         # If the request was POSTed, this might be a bulk action or a bulk edit.
         # Try to look up an action first, but if this isn't an action the POST
         # will fall through to the bulk edit check, below.
@@ -937,11 +937,11 @@ class ModelAdmin(BaseModelAdmin):
                         name = force_unicode(opts.verbose_name)
                     else:
                         name = force_unicode(opts.verbose_name_plural)
-                    msg = ngettext("%(count)s %(name)s was changed successfully.",
-                                   "%(count)s %(name)s were changed successfully.",
-                                   changecount) % {'count': changecount,
-                                                   'name': name,
-                                                   'obj': force_unicode(obj)}
+                    msg = ungettext("%(count)s %(name)s was changed successfully.",
+                                    "%(count)s %(name)s were changed successfully.",
+                                    changecount) % {'count': changecount,
+                                                    'name': name,
+                                                    'obj': force_unicode(obj)}
                     self.message_user(request, msg)
 
                 return HttpResponseRedirect(request.get_full_path())
