@@ -579,6 +579,26 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (quote(self.pk), escape(self.pk))
         self.assertContains(response, should_contain)
 
+    def test_recentactions_without_content_type(self):
+        "If a LogEntry is missing content_type it will not display it in span tag under the hyperlink."
+        response = self.client.get('/test_admin/admin/')
+        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (quote(self.pk), escape(self.pk))
+        self.assertContains(response, should_contain)
+        should_contain = "Model with string primary key" # capitalized in Recent Actions
+        self.assertContains(response, should_contain)
+        logentry = LogEntry.objects.get(content_type__name__iexact=should_contain)
+        # http://code.djangoproject.com/ticket/10275
+        # if the log entry doesn't have a content type it should still be
+        # possible to view the Recent Actions part
+        logentry.content_type = None
+        logentry.save()
+
+        counted_presence_before = response.content.count(should_contain)
+        response = self.client.get('/test_admin/admin/')
+        counted_presence_after = response.content.count(should_contain)
+        self.assertEquals(counted_presence_before - 1,
+                          counted_presence_after)
+
     def test_deleteconfirmation_link(self):
         "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/delete/' % quote(self.pk))
@@ -1003,7 +1023,7 @@ class AdminActionsTest(TestCase):
         }
         response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
         self.failUnlessEqual(response.status_code, 302)
-        
+
     def test_model_without_action(self):
         "Tests a ModelAdmin without any action"
         response = self.client.get('/test_admin/admin/admin_views/oldsubscriber/')
@@ -1012,7 +1032,7 @@ class AdminActionsTest(TestCase):
             '<input type="checkbox" class="action-select"' not in response.content,
             "Found an unexpected action toggle checkboxbox in response"
         )
-        
+
     def test_multiple_actions_form(self):
         """
         Test that actions come from the form whose submit button was pressed (#10618).
@@ -1076,7 +1096,7 @@ class AdminInlineFileUploadTest(TestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')
-        
+
         # Set up test Picture and Gallery.
         # These must be set up here instead of in fixtures in order to allow Picture
         # to use a NamedTemporaryFile.
@@ -1095,7 +1115,7 @@ class AdminInlineFileUploadTest(TestCase):
 
     def test_inline_file_upload_edit_validation_error_post(self):
         """
-        Test that inline file uploads correctly display prior data (#10002). 
+        Test that inline file uploads correctly display prior data (#10002).
         """
         post_data = {
             "name": u"Test Gallery",
