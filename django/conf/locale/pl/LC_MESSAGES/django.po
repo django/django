@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-27 11:32+0200\n"
+"POT-Creation-Date: 2009-05-06 09:30+0200\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -266,15 +266,15 @@ msgstr "Ten miesiąc"
 msgid "This year"
 msgstr "Ten rok"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:413
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:434
 msgid "Yes"
 msgstr "Tak"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:413
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:434
 msgid "No"
 msgstr "Nie"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:413
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:434
 msgid "Unknown"
 msgstr "Nieznany"
 
@@ -320,7 +320,7 @@ msgid "Changed %s."
 msgstr "Zmieniono %s"
 
 #: contrib/admin/options.py:519 contrib/admin/options.py:529
-#: contrib/comments/templates/comments/preview.html:16 forms/models.py:306
+#: contrib/comments/templates/comments/preview.html:16 forms/models.py:384
 msgid "and"
 msgstr "i"
 
@@ -543,7 +543,6 @@ msgid "Run the selected action"
 msgstr "Wykonaj wybraną akcję"
 
 #: contrib/admin/templates/admin/actions.html:4
-#: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
 msgstr "Szukaj"
 
@@ -703,6 +702,10 @@ msgstr "Moje akcje"
 msgid "None available"
 msgstr "Brak"
 
+#: contrib/admin/templates/admin/index.html:72
+msgid "Unknown content"
+msgstr "Zawartość nieznana"
+
 #: contrib/admin/templates/admin/invalid_setup.html:7
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
@@ -750,6 +753,10 @@ msgstr ""
 #: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Pokaż wszystko"
+
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Search"
+msgstr "Szukaj"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
@@ -1793,7 +1800,7 @@ msgstr "Błędny typ geometrii."
 
 #: contrib/gis/forms/fields.py:20
 msgid ""
-"An error occurred when transforming the geometryto the SRID of the geometry "
+"An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
 "Wystąpił błąd podczas przekształcania geometrii do SRID pola formularza "
@@ -3989,11 +3996,11 @@ msgstr "Upewnij się, że jest nie więcej niż %s miejsc po przecinku."
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Upewnij się, że jest nie więcej niż %s miejsc przed przecinkiem."
 
-#: forms/fields.py:288 forms/fields.py:862
+#: forms/fields.py:288 forms/fields.py:863
 msgid "Enter a valid date."
 msgstr "Wpisz poprawną datę."
 
-#: forms/fields.py:322 forms/fields.py:863
+#: forms/fields.py:322 forms/fields.py:864
 msgid "Enter a valid time."
 msgstr "Wpisz poprawną godzinę."
 
@@ -4037,21 +4044,21 @@ msgstr "Wpisz poprawny URL."
 msgid "This URL appears to be a broken link."
 msgstr "Ten odnośnik jest nieprawidłowy."
 
-#: forms/fields.py:624 forms/fields.py:702
+#: forms/fields.py:625 forms/fields.py:703
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Wybierz poprawną wartość. %(value)s nie jest jednym z dostępnych wyborów."
 
-#: forms/fields.py:703 forms/fields.py:764 forms/models.py:798
+#: forms/fields.py:704 forms/fields.py:765 forms/models.py:863
 msgid "Enter a list of values."
 msgstr "Podaj listę wartości."
 
-#: forms/fields.py:891
+#: forms/fields.py:892
 msgid "Enter a valid IPv4 address."
 msgstr "Wprowadź poprawny adres IPv4."
 
-#: forms/fields.py:901
+#: forms/fields.py:902
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "To pole może zawierać jedynie litery, cyfry, podkreślenia i myślniki."
@@ -4060,25 +4067,32 @@ msgstr "To pole może zawierać jedynie litery, cyfry, podkreślenia i myślniki
 msgid "Order"
 msgstr "Porządek"
 
-#: forms/models.py:299 forms/models.py:308
+#: forms/models.py:363
+#, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr ""
+"Wartości w %(field_name)s muszą być unikalne dla wyszukiwań %(lookup)s "
+"w %(date_field)s"
+
+#: forms/models.py:377 forms/models.py:385
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(field_label)s już istnieje w %(model_name)s."
 
-#: forms/models.py:673
+#: forms/models.py:738
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "Osadzony klucz obcy nie pasuje do klucza głównego obiektu rodzica."
 
-#: forms/models.py:728
+#: forms/models.py:793
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wyborów."
 
-#: forms/models.py:799
+#: forms/models.py:864
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Wybierz poprawną wartość. %s nie jest jednym z dostępnych wyborów."
 
-#: forms/models.py:801
+#: forms/models.py:866
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" nie jest poprawną wartością klucza głównego."
