@@ -70,13 +70,13 @@ ValueError: The 'normal' attribute has no file associated with it.
 []
 >>> files.sort()
 >>> files
-[u'default.txt', u'django_test.txt']
+['default.txt', 'django_test.txt']
 
 >>> obj1.save()
 >>> dirs, files = temp_storage.listdir('tests')
 >>> files.sort()
 >>> files
-[u'assignment.txt', u'default.txt', u'django_test.txt']
+['assignment.txt', 'default.txt', 'django_test.txt']
 
 # Files can be read in a little at a time, if necessary.
 

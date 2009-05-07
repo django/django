@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.core.files import locks, File
 from django.core.files.move import file_move_safe
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_unicode, smart_str
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
 from django.utils.text import get_valid_filename
@@ -212,7 +212,7 @@ class FileSystemStorage(Storage):
             path = safe_join(self.location, name)
         except ValueError:
             raise SuspiciousOperation("Attempted access to '%s' denied." % name)
-        return os.path.normpath(path)
+        return smart_str(os.path.normpath(path))
 
     def size(self, name):
         return os.path.getsize(self.path(name))
