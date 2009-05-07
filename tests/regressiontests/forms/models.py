@@ -10,7 +10,7 @@ class BoundaryModel(models.Model):
     positive_integer = models.PositiveIntegerField(null=True, blank=True)
 
 class Defaults(models.Model):
-    name = models.CharField(max_length=256, default='class default value')
+    name = models.CharField(max_length=255, default='class default value')
     def_date = models.DateField(default = datetime.date(1980, 1, 1))
     value = models.IntegerField(default=42)
 
