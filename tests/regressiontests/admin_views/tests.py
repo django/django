@@ -16,7 +16,7 @@ from django.utils.html import escape
 from models import (Article, BarAccount, CustomArticle, EmptyModel,
                     ExternalSubscriber, FooAccount, Gallery,
                     ModelWithStringPrimaryKey, Person, Persona, Picture,
-                    Podcast, Section, Subscriber, Vodcast)
+                    Podcast, Section, Subscriber, Vodcast, Language)
 
 try:
     set
@@ -824,6 +824,11 @@ class AdminViewListEditable(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/vodcast/')
         self.failUnlessEqual(response.status_code, 200)
 
+    def test_custom_pk(self):
+        Language.objects.create(iso='en', name='English', english_name='English')
+        response = self.client.get('/test_admin/admin/admin_views/language/')
+        self.failUnlessEqual(response.status_code, 200)
+
     def test_changelist_input_html(self):
         response = self.client.get('/test_admin/admin/admin_views/person/')
         # 2 inputs per object(the field and the hidden id field) = 6
@@ -1132,4 +1137,3 @@ class AdminInlineFileUploadTest(TestCase):
         }
         response = self.client.post('/test_admin/%s/admin_views/gallery/1/' % self.urlbit, post_data)
         self.failUnless(response._container[0].find("Currently:") > -1)
-
