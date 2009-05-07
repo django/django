@@ -45,61 +45,61 @@ the full list of conversions:
     Model field                      Form field
     ===============================  ========================================
     ``AutoField``                    Not represented in the form
-    
+
     ``BooleanField``                 ``BooleanField``
-    
+
     ``CharField``                    ``CharField`` with ``max_length`` set to
                                      the model field's ``max_length``
-    
+
     ``CommaSeparatedIntegerField``   ``CharField``
-    
+
     ``DateField``                    ``DateField``
-    
+
     ``DateTimeField``                ``DateTimeField``
-    
+
     ``DecimalField``                 ``DecimalField``
-    
+
     ``EmailField``                   ``EmailField``
-    
+
     ``FileField``                    ``FileField``
-    
+
     ``FilePathField``                ``CharField``
-    
+
     ``FloatField``                   ``FloatField``
-    
+
     ``ForeignKey``                   ``ModelChoiceField`` (see below)
-    
+
     ``ImageField``                   ``ImageField``
-    
+
     ``IntegerField``                 ``IntegerField``
-    
+
     ``IPAddressField``               ``IPAddressField``
-    
+
     ``ManyToManyField``              ``ModelMultipleChoiceField`` (see
                                      below)
-    
+
     ``NullBooleanField``             ``CharField``
-    
+
     ``PhoneNumberField``             ``USPhoneNumberField``
                                      (from ``django.contrib.localflavor.us``)
-    
+
     ``PositiveIntegerField``         ``IntegerField``
-    
+
     ``PositiveSmallIntegerField``    ``IntegerField``
-    
+
     ``SlugField``                    ``SlugField``
-    
+
     ``SmallIntegerField``            ``IntegerField``
-    
-    ``TextField``                    ``CharField`` with 
+
+    ``TextField``                    ``CharField`` with
                                      ``widget=forms.Textarea``
-    
+
     ``TimeField``                    ``TimeField``
-    
+
     ``URLField``                     ``URLField`` with ``verify_exists`` set
                                      to the model field's ``verify_exists``
-    
-    ``XMLField``                     ``CharField`` with 
+
+    ``XMLField``                     ``CharField`` with
                                      ``widget=forms.Textarea``
     ===============================  ========================================
 
@@ -487,7 +487,7 @@ queryset that includes all objects in the model (e.g.,
 
 Alternatively, you can create a subclass that sets ``self.queryset`` in
 ``__init__``::
-    
+
     from django.forms.models import BaseModelFormSet
 
     class BaseAuthorFormSet(BaseModelFormSet):
@@ -514,6 +514,22 @@ exclude::
     >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
 
 .. _saving-objects-in-the-formset:
+
+Overriding clean() method
+-------------------------
+
+You can override the ``clean()`` method to provide custom validation to
+the whole formset at once. By default, the ``clean()`` method will validate
+that none of the data in the formsets violate the unique constraints on your
+model (both field ``unique`` and model ``unique_together``). To maintain this
+default behavior be sure you call the parent's ``clean()`` method::
+
+    class MyModelFormSet(BaseModelFormSet):
+        def clean(self):
+            super(MyModelFormSet, self).clean()
+            # example custom validation across forms in the formset:
+            for form in self.forms:
+                # your custom formset validation
 
 Saving objects in the formset
 -----------------------------
@@ -598,6 +614,17 @@ As you can see, the view logic of a model formset isn't drastically different
 than that of a "normal" formset. The only difference is that we call
 ``formset.save()`` to save the data into the database. (This was described
 above, in :ref:`saving-objects-in-the-formset`.)
+
+
+Overiding ``clean()`` on a ``model_formset``
+--------------------------------------------
+
+Just like with ``ModelForms``, by default the ``clean()`` method of a
+``model_formset`` will validate that none of the items in the formset validate
+the unique constraints on your model(either unique or unique_together).  If you
+want to overide the ``clean()`` method on a ``model_formset`` and maintain this
+validation, you must call the parent classes ``clean`` method.
+
 
 Using a custom queryset
 ~~~~~~~~~~~~~~~~~~~~~~~

@@ -6,10 +6,10 @@ and database field objects.
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.datastructures import SortedDict
 from django.utils.text import get_text_list, capfirst
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 from util import ValidationError, ErrorList
-from forms import BaseForm, get_declared_fields
+from forms import BaseForm, get_declared_fields, NON_FIELD_ERRORS
 from fields import Field, ChoiceField, IntegerField, EMPTY_VALUES
 from widgets import Select, SelectMultiple, HiddenInput, MultipleHiddenInput
 from widgets import media_property
@@ -231,6 +231,26 @@ class BaseModelForm(BaseForm):
         return self.cleaned_data
 
     def validate_unique(self):
+        unique_checks, date_checks = self._get_unique_checks()
+        form_errors = []
+        bad_fields = set()
+
+        field_errors, global_errors = self._perform_unique_checks(unique_checks)
+        bad_fields.union(field_errors)
+        form_errors.extend(global_errors)
+
+        field_errors, global_errors = self._perform_date_checks(date_checks)
+        bad_fields.union(field_errors)
+        form_errors.extend(global_errors)
+
+        for field_name in bad_fields:
+            del self.cleaned_data[field_name]
+        if form_errors:
+            # Raise the unique together errors since they are considered
+            # form-wide.
+            raise ValidationError(form_errors)
+
+    def _get_unique_checks(self):
         from django.db.models.fields import FieldDoesNotExist, Field as ModelField
 
         # Gather a list of checks to perform. We only perform unique checks
@@ -271,24 +291,8 @@ class BaseModelForm(BaseForm):
                 date_checks.append(('year', name, f.unique_for_year))
             if f.unique_for_month and self.cleaned_data.get(f.unique_for_month) is not None:
                 date_checks.append(('month', name, f.unique_for_month))
+        return unique_checks, date_checks
 
-        form_errors = []
-        bad_fields = set()
-
-        field_errors, global_errors = self._perform_unique_checks(unique_checks)
-        bad_fields.union(field_errors)
-        form_errors.extend(global_errors)
-
-        field_errors, global_errors = self._perform_date_checks(date_checks)
-        bad_fields.union(field_errors)
-        form_errors.extend(global_errors)
-
-        for field_name in bad_fields:
-            del self.cleaned_data[field_name]
-        if form_errors:
-            # Raise the unique together errors since they are considered
-            # form-wide.
-            raise ValidationError(form_errors)
 
     def _perform_unique_checks(self, unique_checks):
         bad_fields = set()
@@ -504,6 +508,96 @@ class BaseModelFormSet(BaseFormSet):
             self.save_m2m = save_m2m
         return self.save_existing_objects(commit) + self.save_new_objects(commit)
 
+    def clean(self):
+        self.validate_unique()
+
+    def validate_unique(self):
+        # Iterate over the forms so that we can find one with potentially valid
+        # data from which to extract the error checks
+        for form in self.forms:
+            if hasattr(form, 'cleaned_data'):
+                break
+        else:
+            return
+        unique_checks, date_checks = form._get_unique_checks()
+        errors = []
+        # Do each of the unique checks (unique and unique_together)
+        for unique_check in unique_checks:
+            seen_data = set()
+            for form in self.forms:
+                # if the form doesn't have cleaned_data then we ignore it,
+                # it's already invalid
+                if not hasattr(form, "cleaned_data"):
+                    continue
+                # get each of the fields for which we have data on this form
+                if [f for f in unique_check if f in form.cleaned_data and form.cleaned_data[f] is not None]:
+                    # get the data itself
+                    row_data = tuple([form.cleaned_data[field] for field in unique_check])
+                    # if we've aready seen it then we have a uniqueness failure
+                    if row_data in seen_data:
+                        # poke error messages into the right places and mark
+                        # the form as invalid
+                        errors.append(self.get_unique_error_message(unique_check))
+                        form._errors[NON_FIELD_ERRORS] = self.get_form_error()
+                        del form.cleaned_data
+                        break
+                    # mark the data as seen
+                    seen_data.add(row_data)
+        # iterate over each of the date checks now
+        for date_check in date_checks:
+            seen_data = set()
+            lookup, field, unique_for = date_check
+            for form in self.forms:
+                # if the form doesn't have cleaned_data then we ignore it,
+                # it's already invalid
+                if not hasattr(self, 'cleaned_data'):
+                    continue
+                # see if we have data for both fields
+                if (form.cleaned_data and form.cleaned_data[field] is not None
+                    and form.cleaned_data[unique_for] is not None):
+                    # if it's a date lookup we need to get the data for all the fields
+                    if lookup == 'date':
+                        date = form.cleaned_data[unique_for]
+                        date_data = (date.year, date.month, date.day)
+                    # otherwise it's just the attribute on the date/datetime
+                    # object
+                    else:
+                        date_data = (getattr(form.cleaned_data[unique_for], lookup),)
+                    data = (form.cleaned_data[field],) + date_data
+                    # if we've aready seen it then we have a uniqueness failure
+                    if data in seen_data:
+                        # poke error messages into the right places and mark
+                        # the form as invalid
+                        errors.append(self.get_date_error_message(date_check))
+                        form._errors[NON_FIELD_ERRORS] = self.get_form_error()
+                        del form.cleaned_data
+                        break
+                    seen_data.add(data)
+        if errors:
+            raise ValidationError(errors)
+
+    def get_unique_error_message(self, unique_check):
+        if len(unique_check) == 1:
+            return ugettext("Please correct the duplicate data for %(field)s.") % {
+                "field": unique_check[0],
+            }
+        else:
+            return ugettext("Please correct the duplicate data for %(field)s, "
+                "which must be unique.") % {
+                    "field": get_text_list(unique_check, _("and")),
+                }
+
+    def get_date_error_message(self, date_check):
+        return ugettext("Please correct the duplicate data for %(field_name)s "
+            "which must be unique for the %(lookup)s in %(date_field)s.") % {
+            'field_name': date_check[1],
+            'date_field': date_check[2],
+            'lookup': unicode(date_check[0]),
+        }
+
+    def get_form_error(self):
+        return ugettext("Please correct the duplicate values below.")
+
     def save_existing_objects(self, commit=True):
         self.changed_objects = []
         self.deleted_objects = []
@@ -656,6 +750,10 @@ class BaseInlineFormSet(BaseModelFormSet):
             form.fields[self.fk.name] = InlineForeignKeyField(self.instance,
                 label=getattr(form.fields.get(self.fk.name), 'label', capfirst(self.fk.verbose_name))
             )
+
+    def get_unique_error_message(self, unique_check):
+        unique_check = [field for field in unique_check if field != self.fk.name]
+        return super(BaseInlineFormSet, self).get_unique_error_message(unique_check)
 
 def _get_foreign_key(parent_model, model, fk_name=None):
     """
