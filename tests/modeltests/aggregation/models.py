@@ -15,7 +15,7 @@ class Author(models.Model):
         return self.name
 
 class Publisher(models.Model):
-    name = models.CharField(max_length=300)
+    name = models.CharField(max_length=255)
     num_awards = models.IntegerField()
 
     def __unicode__(self):
@@ -23,7 +23,7 @@ class Publisher(models.Model):
 
 class Book(models.Model):
     isbn = models.CharField(max_length=9)
-    name = models.CharField(max_length=300)
+    name = models.CharField(max_length=255)
     pages = models.IntegerField()
     rating = models.FloatField()
     price = models.DecimalField(decimal_places=2, max_digits=6)
@@ -36,7 +36,7 @@ class Book(models.Model):
         return self.name
 
 class Store(models.Model):
-    name = models.CharField(max_length=300)
+    name = models.CharField(max_length=255)
     books = models.ManyToManyField(Book)
     original_opening = models.DateTimeField()
     friday_night_closing = models.TimeField()
