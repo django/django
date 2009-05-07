@@ -71,13 +71,13 @@ class ManyToManyCallableInitialTests(TestCase):
         # Set up a callable initial value
         def formfield_for_dbfield(db_field, **kwargs):
             if db_field.name == 'publications':
-                kwargs['initial'] = lambda: Publication.objects.all().order_by('date')[:2]
+                kwargs['initial'] = lambda: Publication.objects.all().order_by('date_published')[:2]
             return db_field.formfield(**kwargs)
 
         # Set up some Publications to use as data
-        Publication(title="First Book", date=date(2007,1,1)).save()
-        Publication(title="Second Book", date=date(2008,1,1)).save()
-        Publication(title="Third Book", date=date(2009,1,1)).save()
+        Publication(title="First Book", date_published=date(2007,1,1)).save()
+        Publication(title="Second Book", date_published=date(2008,1,1)).save()
+        Publication(title="Third Book", date_published=date(2009,1,1)).save()
 
         # Create a ModelForm, instantiate it, and check that the output is as expected
         ModelForm = modelform_factory(Article, formfield_callback=formfield_for_dbfield)
@@ -88,5 +88,3 @@ class ManyToManyCallableInitialTests(TestCase):
 <option value="2" selected="selected">Second Book</option>
 <option value="3">Third Book</option>
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>""")
-
-
