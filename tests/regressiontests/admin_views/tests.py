@@ -890,6 +890,21 @@ class AdminViewListEditable(TestCase):
 
         self.failUnlessEqual(Person.objects.get(name="John Mauchly").alive, False)
 
+class AdminSearchTest(TestCase):
+    fixtures = ['admin-views-users','multiple-child-classes']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_search_on_sibling_models(self):
+        "Check that a search that mentions sibling models"
+        response = self.client.get('/test_admin/admin/admin_views/recommendation/?q=bar')
+        # confirm the search returned 1 object
+        self.assertContains(response, "\n1 recommendation\n")
+
 class AdminInheritedInlinesTest(TestCase):
     fixtures = ['admin-views-users.xml',]
 

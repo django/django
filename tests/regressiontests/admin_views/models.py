@@ -339,6 +339,24 @@ class LanguageAdmin(admin.ModelAdmin):
     list_display = ['iso', 'shortlist', 'english_name', 'name']
     list_editable = ['shortlist']
 
+# a base class for Recommender and Recommendation
+class Title(models.Model):
+    pass
+
+class TitleTranslation(models.Model):
+    title = models.ForeignKey(Title)
+    text = models.CharField(max_length=100)
+
+class Recommender(Title):
+    pass
+
+class Recommendation(Title):
+    recommender = models.ForeignKey(Recommender)
+
+class RecommendationAdmin(admin.ModelAdmin):
+    search_fields = ('titletranslation__text', 'recommender__titletranslation__text',)
+
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -358,6 +376,8 @@ admin.site.register(Fabric, FabricAdmin)
 admin.site.register(Gallery, GalleryAdmin)
 admin.site.register(Picture, PictureAdmin)
 admin.site.register(Language, LanguageAdmin)
+admin.site.register(Recommendation, RecommendationAdmin)
+admin.site.register(Recommender)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

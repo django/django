@@ -229,10 +229,7 @@ class ChangeList(object):
         if self.search_fields and self.query:
             for bit in self.query.split():
                 or_queries = [models.Q(**{construct_search(str(field_name)): bit}) for field_name in self.search_fields]
-                other_qs = QuerySet(self.model)
-                other_qs.dup_select_related(qs)
-                other_qs = other_qs.filter(reduce(operator.or_, or_queries))
-                qs = qs & other_qs
+                qs = qs.filter(reduce(operator.or_, or_queries))
             for field_name in self.search_fields:
                 if '__' in field_name:
                     qs = qs.distinct()
