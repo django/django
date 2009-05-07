@@ -1012,9 +1012,9 @@ class ModelAdmin(BaseModelAdmin):
             if perms_needed:
                 raise PermissionDenied
             obj_display = force_unicode(obj)
+            self.log_deletion(request, obj, obj_display)
             obj.delete()
 
-            self.log_deletion(request, obj, obj_display)
             self.message_user(request, _('The %(name)s "%(obj)s" was deleted successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
 
             if not self.has_change_permission(request, None):

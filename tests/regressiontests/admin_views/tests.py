@@ -6,7 +6,7 @@ from django.core.files import temp as tempfile
 from django.test import TestCase
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.admin.models import LogEntry
+from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
 from django.contrib.admin.util import quote
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
@@ -544,6 +544,9 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post('/test_admin/admin/admin_views/article/1/delete/', delete_dict)
         self.assertRedirects(post, '/test_admin/admin/')
         self.failUnlessEqual(Article.objects.all().count(), 2)
+        article_ct = ContentType.objects.get_for_model(Article)
+        logged = LogEntry.objects.get(content_type=article_ct, action_flag=DELETION)
+        self.failUnlessEqual(logged.object_id, u'1')
         self.client.get('/test_admin/admin/logout/')
 
 class AdminViewStringPrimaryKeyTest(TestCase):
