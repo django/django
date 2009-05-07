@@ -306,14 +306,15 @@ class ServerHandler(object):
             env.setdefault('SERVER_SOFTWARE',self.server_software)
 
     def finish_response(self):
-        """Send any iterable data, then close self and the iterable
-
-        Subclasses intended for use in asynchronous servers will
-        want to redefine this method, such that it sets up callbacks
-        in the event loop to iterate over the data, and to call
-        'self.close()' once the response is finished.
         """
-        if not self.result_is_file() and not self.sendfile():
+        Send any iterable data, then close self and the iterable
+
+        Subclasses intended for use in asynchronous servers will want to
+        redefine this method, such that it sets up callbacks in the event loop
+        to iterate over the data, and to call 'self.close()' once the response
+        is finished.
+        """
+        if not self.result_is_file() or not self.sendfile():
             for data in self.result:
                 self.write(data)
             self.finish_content()
