@@ -980,7 +980,7 @@ def regroup(parser, token):
     that ``grouper``.  In this case, ``grouper`` would be ``Male``, ``Female``
     and ``Unknown``, and ``list`` is the list of people with those genders.
 
-    Note that `{% regroup %}`` does not work when the list to be grouped is not
+    Note that ``{% regroup %}`` does not work when the list to be grouped is not
     sorted by the key you are grouping by!  This means that if your list of
     people was not sorted by gender, you'd need to make sure it is sorted
     before using it, i.e.::
