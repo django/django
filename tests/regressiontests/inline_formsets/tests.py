@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.forms.models import inlineformset_factory
-from regressiontests.inline_formsets.models import Poet, Poem
+from regressiontests.inline_formsets.models import Poet, Poem, School, Parent, Child
 
 class DeletionTests(TestCase):
     def test_deletion(self):
@@ -74,3 +74,28 @@ class DeletionTests(TestCase):
         self.assertEqual(formset.is_valid(), True)
         formset.save()
         self.assertEqual(Poem.objects.count(), 0)
+
+    def test_save_new(self):
+        """
+        Make sure inlineformsets respect commit=False
+        regression for #10750
+        """
+        # exclude some required field from the forms
+        ChildFormSet = inlineformset_factory(School, Child, exclude=['father', 'mother'])
+        school = School.objects.create(name=u'test')
+        mother = Parent.objects.create(name=u'mother')
+        father = Parent.objects.create(name=u'father')
+        data = {
+            'child_set-TOTAL_FORMS': u'1',
+            'child_set-INITIAL_FORMS': u'0',
+            'child_set-0-name': u'child',
+        }
+        formset = ChildFormSet(data, instance=school)
+        self.assertEqual(formset.is_valid(), True)
+        objects = formset.save(commit=False)
+        for obj in objects:
+            obj.mother = mother
+            obj.father = father
+            obj.save()
+        self.assertEqual(school.child_set.count(), 1)
+
