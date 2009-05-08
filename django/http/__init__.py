@@ -304,16 +304,17 @@ class HttpResponse(object):
     def _convert_to_ascii(self, *values):
         """Converts all values to ascii strings."""
         for value in values:
-            if '\n' in value or '\r' in value:
-                raise BadHeaderError("Header values can't contain newlines (got %r)" % (value))
             if isinstance(value, unicode):
                 try:
-                    yield value.encode('us-ascii')
+                    value = value.encode('us-ascii')
                 except UnicodeError, e:
                     e.reason += ', HTTP response headers must be in US-ASCII format'
                     raise
             else:
-                yield str(value)
+                value = str(value)
+            if '\n' in value or '\r' in value:
+                raise BadHeaderError("Header values can't contain newlines (got %r)" % (value))
+            yield value
 
     def __setitem__(self, header, value):
         header, value = self._convert_to_ascii(header, value)
