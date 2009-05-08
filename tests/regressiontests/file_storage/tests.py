@@ -84,11 +84,12 @@ u'custom_storage.2'
 """
 
 # Tests for a race condition on file saving (#4948).
-# This is written in such a way that it'll always pass on platforms 
+# This is written in such a way that it'll always pass on platforms
 # without threading.
 import os
 import time
 import shutil
+import sys
 import tempfile
 from unittest import TestCase
 from django.conf import settings
@@ -109,13 +110,13 @@ class FileSaveRaceConditionTest(TestCase):
         self.storage_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(self.storage_dir)
         self.thread = threading.Thread(target=self.save_file, args=['conflict'])
-    
+
     def tearDown(self):
         shutil.rmtree(self.storage_dir)
-    
+
     def save_file(self, name):
         name = self.storage.save(name, SlowFile("Data"))
-    
+
     def test_race_condition(self):
         self.thread.start()
         name = self.save_file('conflict')
@@ -141,3 +142,41 @@ class FileStoragePermissions(TestCase):
         actual_mode = os.stat(self.storage.path(name))[0] & 0777
         self.assertEqual(actual_mode, 0666)
 
+
+class FileStoragePathParsing(TestCase):
+    def setUp(self):
+        self.storage_dir = tempfile.mkdtemp()
+        self.storage = FileSystemStorage(self.storage_dir)
+
+    def tearDown(self):
+        shutil.rmtree(self.storage_dir)
+
+    def test_directory_with_dot(self):
+        """Regression test for #9610.
+
+        If the directory name contains a dot and the file name doesn't, make
+        sure we still mangle the file name instead of the directory name.
+        """
+
+        self.storage.save('dotted.path/test', ContentFile("1"))
+        self.storage.save('dotted.path/test', ContentFile("2"))
+
+        self.assertFalse(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
+        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test')))
+        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test_')))
+
+    def test_first_character_dot(self):
+        """
+        File names with a dot as their first character don't have an extension,
+        and the underscore should get added to the end.
+        """
+        self.storage.save('dotted.path/.test', ContentFile("1"))
+        self.storage.save('dotted.path/.test', ContentFile("2"))
+
+        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test')))
+        # Before 2.6, a leading dot was treated as an extension, and so
+        # underscore gets added to beginning instead of end.
+        if sys.version_info < (2, 6):
+            self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/_.test')))
+        else:
+            self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_')))
