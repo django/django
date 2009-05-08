@@ -6,6 +6,7 @@ and where files should be stored.
 """
 
 import shutil
+import random
 import tempfile
 from django.db import models
 from django.core.files.base import ContentFile
@@ -26,7 +27,6 @@ class Storage(models.Model):
     def random_upload_to(self, filename):
         # This returns a different result each time,
         # to make sure it only gets called once.
-        import random
         return '%s/%s' % (random.randint(100, 999), filename)
 
     normal = models.FileField(storage=temp_storage, upload_to='tests')

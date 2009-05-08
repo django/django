@@ -1,20 +1,23 @@
 import os
 
-from django.utils.encoding import smart_str, smart_unicode
-
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
 
-class File(object):
+from django.utils.encoding import smart_str, smart_unicode
+from django.core.files.utils import FileProxyMixin
+
+class File(FileProxyMixin):
     DEFAULT_CHUNK_SIZE = 64 * 2**10
 
-    def __init__(self, file):
+    def __init__(self, file, name=None):
         self.file = file
-        self._name = file.name
-        self._mode = file.mode
-        self._closed = False
+        if name is None:
+            name = getattr(file, 'name', None)
+        self.name = name
+        self.mode = getattr(file, 'mode', None)
+        self.closed = False
 
     def __str__(self):
         return smart_str(self.name or '')
@@ -26,24 +29,10 @@ class File(object):
         return "<%s: %s>" % (self.__class__.__name__, self or "None")
 
     def __nonzero__(self):
-        return not not self.name
+        return bool(self.name)
 
     def __len__(self):
         return self.size
-
-    def _get_name(self):
-        if not hasattr(self, '_name'):
-            raise ValueError("This operation requires the file to have a name.")
-        return self._name
-    name = property(_get_name)
-
-    def _get_mode(self):
-        return self._mode
-    mode = property(_get_mode)
-
-    def _get_closed(self):
-        return self._closed
-    closed = property(_get_closed)
 
     def _get_size(self):
         if not hasattr(self, '_size'):
@@ -66,7 +55,7 @@ class File(object):
         ``UploadedFile.DEFAULT_CHUNK_SIZE``).
         """
         if not chunk_size:
-            chunk_size = self.__class__.DEFAULT_CHUNK_SIZE
+            chunk_size = self.DEFAULT_CHUNK_SIZE
 
         if hasattr(self, 'seek'):
             self.seek(0)
@@ -88,12 +77,6 @@ class File(object):
         if not chunk_size:
             chunk_size = self.DEFAULT_CHUNK_SIZE
         return self.size > chunk_size
-
-    def xreadlines(self):
-        return iter(self)
-
-    def readlines(self):
-        return list(self.xreadlines())
 
     def __iter__(self):
         # Iterate over this file-like object by newlines
@@ -121,43 +104,22 @@ class File(object):
             self.seek(0)
         elif os.path.exists(self.file.name):
             self.file = open(self.file.name, mode or self.file.mode)
+            self.closed = False
         else:
             raise ValueError("The file cannot be reopened.")
 
-    def seek(self, position):
-        self.file.seek(position)
-
-    def tell(self):
-        return self.file.tell()
-
-    def read(self, num_bytes=None):
-        if num_bytes is None:
-            return self.file.read()
-        return self.file.read(num_bytes)
-
-    def write(self, content):
-        if not self.mode.startswith('w'):
-            raise IOError("File was not opened with write access.")
-        self.file.write(content)
-
-    def flush(self):
-        if not self.mode.startswith('w'):
-            raise IOError("File was not opened with write access.")
-        self.file.flush()
-
     def close(self):
         self.file.close()
-        self._closed = True
+        self.closed = True
 
 class ContentFile(File):
     """
     A File-like object that takes just raw content, rather than an actual file.
     """
     def __init__(self, content):
-        self.file = StringIO(content or '')
-        self.size = len(content or '')
-        self.file.seek(0)
-        self._closed = False
+        content = content or ''
+        super(ContentFile, self).__init__(StringIO(content))
+        self.size = len(content)
 
     def __str__(self):
         return 'Raw content'
@@ -166,6 +128,6 @@ class ContentFile(File):
         return True
 
     def open(self, mode=None):
-        if self._closed:
-            self._closed = False
+        if self.closed:
+            self.closed = False
         self.seek(0)

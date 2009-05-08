@@ -17,11 +17,10 @@ from django.db.models.loading import cache
 
 class FieldFile(File):
     def __init__(self, instance, field, name):
+        super(FieldFile, self).__init__(None, name)
         self.instance = instance
         self.field = field
         self.storage = field.storage
-        self._name = name or u''
-        self._closed = False
         self._committed = True
 
     def __eq__(self, other):
@@ -48,10 +47,17 @@ class FieldFile(File):
 
     def _get_file(self):
         self._require_file()
-        if not hasattr(self, '_file'):
+        if not hasattr(self, '_file') or self._file is None:
             self._file = self.storage.open(self.name, 'rb')
         return self._file
-    file = property(_get_file)
+
+    def _set_file(self, file):
+        self._file = file
+
+    def _del_file(self):
+        del self._file
+
+    file = property(_get_file, _set_file, _del_file)
 
     def _get_path(self):
         self._require_file()
@@ -65,6 +71,8 @@ class FieldFile(File):
 
     def _get_size(self):
         self._require_file()
+        if not self._committed:
+            return len(self.file)
         return self.storage.size(self.name)
     size = property(_get_size)
 
@@ -80,7 +88,7 @@ class FieldFile(File):
 
     def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
-        self._name = self.storage.save(name, content)
+        self.name = self.storage.save(name, content)
         setattr(self.instance, self.field.name, self.name)
 
         # Update the filesize cache
@@ -97,11 +105,11 @@ class FieldFile(File):
         # presence of self._file
         if hasattr(self, '_file'):
             self.close()
-            del self._file
-            
+            del self.file
+
         self.storage.delete(self.name)
 
-        self._name = None
+        self.name = None
         setattr(self.instance, self.field.name, self.name)
 
         # Delete the filesize cache
@@ -113,12 +121,18 @@ class FieldFile(File):
             self.instance.save()
     delete.alters_data = True
 
+    def close(self):
+        file = getattr(self, '_file', None)
+        if file is not None:
+            file.close()
+            self.closed = True
+
     def __getstate__(self):
         # FieldFile needs access to its associated model field and an instance
         # it's attached to in order to work properly, but the only necessary
         # data to be pickled is the file's name itself. Everything else will
         # be restored later, by FileDescriptor below.
-        return {'_name': self.name, '_closed': False, '_committed': True}
+        return {'name': self.name, 'closed': False, '_committed': True, '_file': None}
 
 class FileDescriptor(object):
     def __init__(self, field):
@@ -134,12 +148,8 @@ class FileDescriptor(object):
         elif isinstance(file, File) and not isinstance(file, FieldFile):
             # Other types of files may be assigned as well, but they need to
             # have the FieldFile interface added to them
-            file_copy = copy.copy(file)
-            file_copy.__class__ = type(file.__class__.__name__, 
-                                       (file.__class__, self.field.attr_class), {})
-            file_copy.instance = instance
-            file_copy.field = self.field
-            file_copy.storage = self.field.storage
+            file_copy = self.field.attr_class(instance, self.field, file.name)
+            file_copy.file = file
             file_copy._committed = False
             instance.__dict__[self.field.name] = file_copy
         elif isinstance(file, FieldFile) and not hasattr(file, 'field'):

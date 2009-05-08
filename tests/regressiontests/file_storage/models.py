@@ -29,7 +29,7 @@ if Image:
         mug_width = models.PositiveSmallIntegerField()
 
     __test__ = {'API_TESTS': """
-
+>>> from django.core.files import File
 >>> image_data = open(os.path.join(os.path.dirname(__file__), "test.png"), 'rb').read()
 >>> p = Person(name="Joe")
 >>> p.mugshot.save("mug", ContentFile(image_data))
@@ -76,14 +76,15 @@ True
 # It won't have an opened file. This is a bit brittle since it depends on the
 # the internals of FieldFile, but there's no other way of telling if the
 # file's been opened or not.
->>> hasattr(p3.mugshot, '_file')
+>>> p3.mugshot._file is not None
 False
 
 # After asking for the size, the file should still be closed.
 >>> _ = p3.mugshot.size
->>> hasattr(p3.mugshot, '_file')
+>>> p3.mugshot._file is not None
 False
+
+>>> p = Person.objects.create(name="Bob", mugshot=File(p3.mugshot.file))
 
 >>> shutil.rmtree(temp_storage_dir)
 """}
-
