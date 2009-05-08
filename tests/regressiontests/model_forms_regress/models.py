@@ -17,7 +17,7 @@ class FilePathModel(models.Model):
 
 class Publication(models.Model):
     title = models.CharField(max_length=30)
-    date = models.DateField()
+    date_published = models.DateField()
 
     def __unicode__(self):
         return self.title
