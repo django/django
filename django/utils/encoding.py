@@ -1,6 +1,8 @@
 import types
 import urllib
+import locale
 import datetime
+import codecs
 
 from django.utils.functional import Promise
 
@@ -136,3 +138,12 @@ def iri_to_uri(iri):
         return iri
     return urllib.quote(smart_str(iri), safe='/#%[]=:;$&()+,!?*')
 
+
+# The encoding of the default system locale but falls back to the
+# given fallback encoding if the encoding is unsupported by python or could
+# not be determined.  See tickets #10335 and #5846
+try:
+    DEFAULT_LOCALE_ENCODING = locale.getdefaultlocale()[1] or 'ascii'
+    codecs.lookup(DEFAULT_LOCALE_ENCODING)
+except:
+    DEFAULT_LOCALE_ENCODING = 'ascii'
