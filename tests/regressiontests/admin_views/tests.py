@@ -816,6 +816,21 @@ class AdminViewUnicodeTest(TestCase):
         response = self.client.post('/test_admin/admin/admin_views/book/1/delete/', delete_dict)
         self.assertRedirects(response, '/test_admin/admin/admin_views/book/')
 
+class AdminSearchTest(TestCase):
+    fixtures = ['admin-views-users','multiple-child-classes']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_search_on_sibling_models(self):
+        "Check that a search that mentions sibling models"
+        response = self.client.get('/test_admin/admin/admin_views/recommendation/', data={'q':'bar'})
+        # confirm the search returned 1 object
+        self.assertContains(response, "\n1 recommendation\n")
+
 class AdminInheritedInlinesTest(TestCase):
     fixtures = ['admin-views-users.xml',]
 

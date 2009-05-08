@@ -190,7 +190,7 @@ class ChangeList(object):
         # Naked except! Because we don't have any other way of validating "params".
         # They might be invalid if the keyword arguments are incorrect, or if the
         # values are not in the correct type, so we might get FieldError, ValueError,
-        # ValicationError, or ? from a custom field that raises yet something else 
+        # ValicationError, or ? from a custom field that raises yet something else
         # when handed impossible data.
         except:
             raise IncorrectLookupParameters
@@ -227,11 +227,8 @@ class ChangeList(object):
 
         if self.search_fields and self.query:
             for bit in self.query.split():
-                or_queries = [models.Q(**{construct_search(field_name): bit}) for field_name in self.search_fields]
-                other_qs = QuerySet(self.model)
-                other_qs.dup_select_related(qs)
-                other_qs = other_qs.filter(reduce(operator.or_, or_queries))
-                qs = qs & other_qs
+                or_queries = [models.Q(**{construct_search(str(field_name)): bit}) for field_name in self.search_fields]
+                qs = qs.filter(reduce(operator.or_, or_queries))
             for field_name in self.search_fields:
                 if '__' in field_name:
                     qs = qs.distinct()
