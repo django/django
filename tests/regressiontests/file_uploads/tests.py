@@ -3,12 +3,14 @@ import os
 import errno
 import shutil
 import unittest
+from StringIO import StringIO
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, client
 from django.utils import simplejson
 from django.utils.hashcompat import sha_constructor
+from django.http.multipartparser import MultiPartParser
 
 from models import FileModel, temp_storage, UPLOAD_TO
 import uploadhandler
@@ -290,3 +292,13 @@ class DirectoryCreationTests(unittest.TestCase):
                               "%s exists and is not a directory." % UPLOAD_TO)
         except:
             self.fail("IOError not raised")
+
+class MultiParserTests(unittest.TestCase):
+
+    def test_empty_upload_handlers(self):
+        # We're not actually parsing here; just checking if the parser properly
+        # instantiates with empty upload handlers.
+        parser = MultiPartParser({
+            'CONTENT_TYPE':     'multipart/form-data; boundary=_foo',
+            'CONTENT_LENGTH':   '1'
+        }, StringIO('x'), [], 'utf-8')

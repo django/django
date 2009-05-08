@@ -1,5 +1,4 @@
 import os
-
 try:
     from cStringIO import StringIO
 except ImportError:
