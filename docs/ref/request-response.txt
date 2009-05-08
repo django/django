@@ -445,6 +445,11 @@ To set a header in your response, just treat it like a dictionary::
     >>> response = HttpResponse()
     >>> response['Pragma'] = 'no-cache'
 
+.. versionadded:: 1.1
+
+HTTP headers cannot contain newlines. An attempt to set a header containing a
+newline character (CR or LF) will raise ``BadHeaderError``
+
 Telling the browser to treat the response as a file attachment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

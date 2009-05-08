@@ -444,6 +444,17 @@ Traceback (most recent call last):
 ...
 UnicodeEncodeError: ..., HTTP response headers must be in US-ASCII format
 
+# Bug #10188: Do not allow newlines in headers (CR or LF)
+>>> r['test\\rstr'] = 'test'
+Traceback (most recent call last):
+...
+BadHeaderError: Header values can't contain newlines (got 'test\\rstr')
+
+>>> r['test\\nstr'] = 'test'
+Traceback (most recent call last):
+...
+BadHeaderError: Header values can't contain newlines (got 'test\\nstr')
+
 #
 # Regression test for #8278: QueryDict.update(QueryDict)
 #
