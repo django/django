@@ -174,6 +174,7 @@ class PersonAdmin(admin.ModelAdmin):
     list_filter = ('gender',)
     search_fields = (u'name',)
     ordering = ["id"]
+    save_as = True
 
 class Persona(models.Model):
     """

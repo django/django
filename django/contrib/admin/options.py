@@ -780,7 +780,7 @@ class ModelAdmin(BaseModelAdmin):
             'app_label': opts.app_label,
         }
         context.update(extra_context or {})
-        return self.render_change_form(request, context, add=True)
+        return self.render_change_form(request, context, form_url=form_url, add=True)
     add_view = transaction.commit_on_success(add_view)
 
     def change_view(self, request, object_id, extra_context=None):
@@ -803,7 +803,7 @@ class ModelAdmin(BaseModelAdmin):
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_unicode(opts.verbose_name), 'key': escape(object_id)})
 
         if request.method == 'POST' and request.POST.has_key("_saveasnew"):
-            return self.add_view(request, form_url='../../add/')
+            return self.add_view(request, form_url='../add/')
 
         ModelForm = self.get_form(request, obj)
         formsets = []
