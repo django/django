@@ -48,12 +48,11 @@ if os.name == 'nt':
         def __del__(self):
             self.close()
 
-        def read(self, *args):          return self.file.read(*args)
-        def seek(self, offset):         return self.file.seek(offset)
-        def write(self, s):             return self.file.write(s)
-        def __iter__(self):             return iter(self.file)
-        def readlines(self, size=None): return self.file.readlines(size)
-        def xreadlines(self):           return self.file.xreadlines()
+        # Proxy to the file object.
+        def __getattr__(self, name):
+            return getattr(self.file, name)
+        def __iter__(self):
+            return iter(self.file)
 
     NamedTemporaryFile = TemporaryFile
 else:
