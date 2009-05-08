@@ -8,6 +8,7 @@ from django.utils import html, checksums
 
 import timesince
 import datastructures
+import dateformat
 import itercompat
 from decorators import DecoratorFromMiddlewareTests
 
@@ -22,6 +23,7 @@ except NameError:
 __test__ = {
     'timesince': timesince,
     'datastructures': datastructures,
+    'dateformat': dateformat,
     'itercompat': itercompat,
 }
 

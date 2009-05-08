@@ -506,7 +506,8 @@ Available format strings:
                       month, 2 characters.
     t                 Number of days in the given month.        ``28`` to ``31``
     T                 Time zone of this machine.                ``'EST'``, ``'MDT'``
-    U                 Not implemented.
+    U                 Seconds since the Unix Epoch
+                      (January 1 1970 00:00:00 UTC).
     w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
                       leading zeros.
     W                 ISO-8601 week number of year, with        ``1``, ``53``

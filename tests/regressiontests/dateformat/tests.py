@@ -37,7 +37,7 @@ u'th'
 u'31'
 >>> no_tz or format(my_birthday, 'T') == 'CET'
 True
->>> no_tz or format(my_birthday, 'U') == '300531600'
+>>> no_tz or format(my_birthday, 'U') == '300315600'
 True
 >>> format(my_birthday, 'w')
 u'0'
