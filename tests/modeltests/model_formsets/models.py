@@ -25,9 +25,15 @@ class Book(models.Model):
     author = models.ForeignKey(Author)
     title = models.CharField(max_length=100)
 
+    class Meta:
+        unique_together = (
+            ('author', 'title'),
+        )
+        ordering = ['id']
+
     def __unicode__(self):
         return self.title
-    
+
 class BookWithCustomPK(models.Model):
     my_pk = models.DecimalField(max_digits=5, decimal_places=0, primary_key=True)
     author = models.ForeignKey(Author)
@@ -35,13 +41,13 @@ class BookWithCustomPK(models.Model):
 
     def __unicode__(self):
         return u'%s: %s' % (self.my_pk, self.title)
-    
+
 class AlternateBook(Book):
     notes = models.CharField(max_length=100)
-    
+
     def __unicode__(self):
         return u'%s - %s' % (self.title, self.notes)
-    
+
 class AuthorMeeting(models.Model):
     name = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author)
@@ -60,7 +66,7 @@ class CustomPrimaryKey(models.Model):
 class Place(models.Model):
     name = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
-    
+
     def __unicode__(self):
         return self.name
 
@@ -68,7 +74,7 @@ class Owner(models.Model):
     auto_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     place = models.ForeignKey(Place)
-    
+
     def __unicode__(self):
         return "%s at %s" % (self.name, self.place)
 
@@ -81,13 +87,13 @@ class Location(models.Model):
 class OwnerProfile(models.Model):
     owner = models.OneToOneField(Owner, primary_key=True)
     age = models.PositiveIntegerField()
-    
+
     def __unicode__(self):
         return "%s is %d" % (self.owner.name, self.age)
 
 class Restaurant(Place):
     serves_pizza = models.BooleanField()
-    
+
     def __unicode__(self):
         return self.name
 
@@ -114,17 +120,17 @@ class MexicanRestaurant(Restaurant):
 # using inlineformset_factory.
 class Repository(models.Model):
     name = models.CharField(max_length=25)
-    
+
     def __unicode__(self):
         return self.name
 
 class Revision(models.Model):
     repository = models.ForeignKey(Repository)
     revision = models.CharField(max_length=40)
-    
+
     class Meta:
         unique_together = (("repository", "revision"),)
-    
+
     def __unicode__(self):
         return u"%s (%s)" % (self.revision, unicode(self.repository))
 
@@ -146,7 +152,7 @@ class Team(models.Model):
 class Player(models.Model):
     team = models.ForeignKey(Team, null=True)
     name = models.CharField(max_length=100)
-    
+
     def __unicode__(self):
         return self.name
 
@@ -159,6 +165,15 @@ class Poet(models.Model):
 class Poem(models.Model):
     poet = models.ForeignKey(Poet)
     name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
+class Post(models.Model):
+    title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
+    slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
+    subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
+    posted = models.DateField()
 
     def __unicode__(self):
         return self.name
@@ -539,7 +554,7 @@ True
 ...     print book.title
 Les Fleurs du Mal
 
-Test inline formsets where the inline-edited object uses multi-table inheritance, thus 
+Test inline formsets where the inline-edited object uses multi-table inheritance, thus
 has a non AutoField yet auto-created primary key.
 
 >>> AuthorBooksFormSet3 = inlineformset_factory(Author, AlternateBook, can_delete=False, extra=1)
@@ -676,7 +691,7 @@ True
 >>> formset.save()
 [<OwnerProfile: Joe Perry is 55>]
 
-# ForeignKey with unique=True should enforce max_num=1 
+# ForeignKey with unique=True should enforce max_num=1
 
 >>> FormSet = inlineformset_factory(Place, Location, can_delete=False)
 >>> formset = FormSet(instance=place)
@@ -874,4 +889,128 @@ True
 >>> formset.get_queryset()
 [<Player: Bobby>]
 
+# Prevent duplicates from within the same formset
+>>> FormSet = modelformset_factory(Product, extra=2)
+>>> data = {
+...     'form-TOTAL_FORMS': 2,
+...     'form-INITIAL_FORMS': 0,
+...     'form-0-slug': 'red_car',
+...     'form-1-slug': 'red_car',
+... }
+>>> formset = FormSet(data)
+>>> formset.is_valid()
+False
+>>> formset._non_form_errors
+[u'Please correct the duplicate data for slug.']
+
+>>> FormSet = modelformset_factory(Price, extra=2)
+>>> data = {
+...     'form-TOTAL_FORMS': 2,
+...     'form-INITIAL_FORMS': 0,
+...     'form-0-price': '25',
+...     'form-0-quantity': '7',
+...     'form-1-price': '25',
+...     'form-1-quantity': '7',
+... }
+>>> formset = FormSet(data)
+>>> formset.is_valid()
+False
+>>> formset._non_form_errors
+[u'Please correct the duplicate data for price and quantity, which must be unique.']
+
+# only the price field is specified, this should skip any unique checks since the unique_together is not fulfilled.
+# this will fail with a KeyError if broken.
+>>> FormSet = modelformset_factory(Price, fields=("price",), extra=2)
+>>> data = {
+...     'form-TOTAL_FORMS': '2',
+...     'form-INITIAL_FORMS': '0',
+...     'form-0-price': '24',
+...     'form-1-price': '24',
+... }
+>>> formset = FormSet(data)
+>>> formset.is_valid()
+True
+
+>>> FormSet = inlineformset_factory(Author, Book, extra=0)
+>>> author = Author.objects.order_by('id')[0]
+>>> book_ids = author.book_set.values_list('id', flat=True)
+>>> data = {
+...     'book_set-TOTAL_FORMS': '2',
+...     'book_set-INITIAL_FORMS': '2',
+...
+...     'book_set-0-title': 'The 2008 Election',
+...     'book_set-0-author': str(author.id),
+...     'book_set-0-id': str(book_ids[0]),
+...
+...     'book_set-1-title': 'The 2008 Election',
+...     'book_set-1-author': str(author.id),
+...     'book_set-1-id': str(book_ids[1]),
+... }
+>>> formset = FormSet(data=data, instance=author)
+>>> formset.is_valid()
+False
+>>> formset._non_form_errors
+[u'Please correct the duplicate data for title.']
+>>> formset.errors
+[{}, {'__all__': u'Please correct the duplicate values below.'}]
+
+>>> FormSet = modelformset_factory(Post, extra=2)
+>>> data = {
+...     'form-TOTAL_FORMS': '2',
+...     'form-INITIAL_FORMS': '0',
+...
+...     'form-0-title': 'blah',
+...     'form-0-slug': 'Morning',
+...     'form-0-subtitle': 'foo',
+...     'form-0-posted': '2009-01-01',
+...     'form-1-title': 'blah',
+...     'form-1-slug': 'Morning in Prague',
+...     'form-1-subtitle': 'rawr',
+...     'form-1-posted': '2009-01-01'
+... }
+>>> formset = FormSet(data)
+>>> formset.is_valid()
+False
+>>> formset._non_form_errors
+[u'Please correct the duplicate data for title which must be unique for the date in posted.']
+>>> formset.errors
+[{}, {'__all__': u'Please correct the duplicate values below.'}]
+
+>>> data = {
+...     'form-TOTAL_FORMS': '2',
+...     'form-INITIAL_FORMS': '0',
+...
+...     'form-0-title': 'foo',
+...     'form-0-slug': 'Morning in Prague',
+...     'form-0-subtitle': 'foo',
+...     'form-0-posted': '2009-01-01',
+...     'form-1-title': 'blah',
+...     'form-1-slug': 'Morning in Prague',
+...     'form-1-subtitle': 'rawr',
+...     'form-1-posted': '2009-08-02'
+... }
+>>> formset = FormSet(data)
+>>> formset.is_valid()
+False
+>>> formset._non_form_errors
+[u'Please correct the duplicate data for slug which must be unique for the year in posted.']
+
+>>> data = {
+...     'form-TOTAL_FORMS': '2',
+...     'form-INITIAL_FORMS': '0',
+...
+...     'form-0-title': 'foo',
+...     'form-0-slug': 'Morning in Prague',
+...     'form-0-subtitle': 'rawr',
+...     'form-0-posted': '2008-08-01',
+...     'form-1-title': 'blah',
+...     'form-1-slug': 'Prague',
+...     'form-1-subtitle': 'rawr',
+...     'form-1-posted': '2009-08-02'
+... }
+>>> formset = FormSet(data)
+>>> formset.is_valid()
+False
+>>> formset._non_form_errors
+[u'Please correct the duplicate data for subtitle which must be unique for the month in posted.']
 """}
