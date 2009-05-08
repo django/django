@@ -28,15 +28,21 @@ def get_image_dimensions(file_or_path):
     """Returns the (width, height) of an image, given an open file or a path."""
     from PIL import ImageFile as PILImageFile
     p = PILImageFile.Parser()
+    close = False
     if hasattr(file_or_path, 'read'):
         file = file_or_path
     else:
         file = open(file_or_path, 'rb')
-    while 1:
-        data = file.read(1024)
-        if not data:
-            break
-        p.feed(data)
-        if p.image:
-            return p.image.size
-    return None
+        close = True
+    try:
+        while 1:
+            data = file.read(1024)
+            if not data:
+                break
+            p.feed(data)
+            if p.image:
+                return p.image.size
+        return None
+    finally:
+        if close:
+            file.close()
