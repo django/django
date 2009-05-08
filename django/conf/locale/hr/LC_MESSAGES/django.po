@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-13 15:41+0200\n"
-"PO-Revision-Date: 2009-04-13 17:13+0200\n"
+"POT-Creation-Date: 2009-05-08 18:09+0200\n"
+"PO-Revision-Date: 2009-05-08 18:19+0200\n"
 "Last-Translator: Aljosa Mohorovic <aljosa.mohorovic@gmail.com>\n"
 "Language-Team: Hrvatski Jezik <Django-i18n <django-i18n@googlegroups.com>>\n"
 "MIME-Version: 1.0\n"
@@ -225,7 +225,7 @@ msgstr "Tradicionalni kineski"
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Uspješno izbrisano %(count)d %(items)s."
 
-#: contrib/admin/actions.py:63 contrib/admin/options.py:1023
+#: contrib/admin/actions.py:63 contrib/admin/options.py:1025
 msgid "Are you sure?"
 msgstr "Jeste li sigurni?"
 
@@ -268,15 +268,15 @@ msgstr "Ovaj mjesec"
 msgid "This year"
 msgstr "Ova godina"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:413
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:434
 msgid "Yes"
 msgstr "Da"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:413
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:434
 msgid "No"
 msgstr "Ne"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:413
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:434
 msgid "Unknown"
 msgstr "Nepoznat pojam"
 
@@ -316,81 +316,83 @@ msgstr "zapisi"
 msgid "None"
 msgstr "Nijedan"
 
-#: contrib/admin/options.py:517
+#: contrib/admin/options.py:519
 #, python-format
 msgid "Changed %s."
 msgstr "Promijenjeno %s."
 
-#: contrib/admin/options.py:517 contrib/admin/options.py:527
-#: contrib/comments/templates/comments/preview.html:16 forms/models.py:306
+#: contrib/admin/options.py:519 contrib/admin/options.py:529
+#: contrib/comments/templates/comments/preview.html:16 forms/models.py:384
 msgid "and"
 msgstr "i"
 
-#: contrib/admin/options.py:522
+#: contrib/admin/options.py:524
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Dodano %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:526
+#: contrib/admin/options.py:528
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Promijeni %(list)s za %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:531
+#: contrib/admin/options.py:533
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Izbrisani %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:535
+#: contrib/admin/options.py:537
 msgid "No fields changed."
 msgstr "Nije bilo promjena polja."
 
-#: contrib/admin/options.py:596 contrib/auth/admin.py:67
+#: contrib/admin/options.py:598 contrib/auth/admin.py:67
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno je dodano."
 
-#: contrib/admin/options.py:600 contrib/admin/options.py:633
+#: contrib/admin/options.py:602 contrib/admin/options.py:635
 #: contrib/auth/admin.py:75
 msgid "You may edit it again below."
 msgstr "Možete ponovo urediti unos dolje."
 
-#: contrib/admin/options.py:610 contrib/admin/options.py:643
+#: contrib/admin/options.py:612 contrib/admin/options.py:645
 #, python-format
 msgid "You may add another %s below."
 msgstr "Možete dodati još jedan %s ispod."
 
-#: contrib/admin/options.py:631
+#: contrib/admin/options.py:633
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno promijenjeno."
 
-#: contrib/admin/options.py:639
+#: contrib/admin/options.py:641
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" uspješno dodan. Možete ponovo urediti unos dolje."
+msgstr ""
+"%(name)s \"%(obj)s\" uspješno dodan. Možete ponovo urediti unos dolje."
 
-#: contrib/admin/options.py:770
+#: contrib/admin/options.py:772
 #, python-format
 msgid "Add %s"
 msgstr "Novi unos (%s)"
 
-#: contrib/admin/options.py:801 contrib/admin/options.py:1001
+#: contrib/admin/options.py:803 contrib/admin/options.py:1003
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Unos %(name)s sa primarnim ključem %(key)r ne postoji."
 
-#: contrib/admin/options.py:858
+#: contrib/admin/options.py:860
 #, python-format
 msgid "Change %s"
 msgstr "Promijeni %s"
 
-#: contrib/admin/options.py:902
+#: contrib/admin/options.py:904
 msgid "Database error"
 msgstr "Pogreška u bazi"
 
-#: contrib/admin/options.py:938
+#: contrib/admin/options.py:940
+#, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s uspješno promijenjen."
@@ -398,12 +400,12 @@ msgstr[1] "%(count)s %(name)s uspješno promijenjeno."
 msgstr[2] "%(count)s %(name)s uspješno promijenjeno."
 msgstr[3] "%(count)s %(name)s uspješno promijenjeno."
 
-#: contrib/admin/options.py:1016
+#: contrib/admin/options.py:1018
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno izbrisan."
 
-#: contrib/admin/options.py:1052
+#: contrib/admin/options.py:1054
 #, python-format
 msgid "Change history: %s"
 msgstr "Promijeni povijest: %s"
@@ -499,7 +501,7 @@ msgstr "Ispričavamo se, ali tražena stranica nije pronađena."
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:33
+#: contrib/admin/templates/admin/base.html:31
 #: contrib/admin/templates/admin/change_form.html:17
 #: contrib/admin/templates/admin/change_list.html:25
 #: contrib/admin/templates/admin/delete_confirmation.html:6
@@ -543,7 +545,6 @@ msgid "Run the selected action"
 msgstr "Izvrši odabranu akciju"
 
 #: contrib/admin/templates/admin/actions.html:4
-#: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
 msgstr "Idi"
 
@@ -553,18 +554,18 @@ msgstr "Idi"
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:28
+#: contrib/admin/templates/admin/base.html:26
 msgid "Welcome,"
 msgstr "Dobrodošli,"
 
-#: contrib/admin/templates/admin/base.html:28
+#: contrib/admin/templates/admin/base.html:26
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Dokumentacija"
 
-#: contrib/admin/templates/admin/base.html:28
+#: contrib/admin/templates/admin/base.html:26
 #: contrib/admin/templates/admin/auth/user/change_password.html:14
 #: contrib/admin/templates/admin/auth/user/change_password.html:47
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -572,7 +573,7 @@ msgstr "Dokumentacija"
 msgid "Change password"
 msgstr "Promijeni lozinku"
 
-#: contrib/admin/templates/admin/base.html:28
+#: contrib/admin/templates/admin/base.html:26
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
@@ -655,21 +656,23 @@ msgid "Delete multiple objects"
 msgstr "Izbriši više unosa."
 
 #: contrib/admin/templates/admin/delete_selected_confirmation.html:15
+#, python-format
 msgid ""
 "Deleting the %(object_name)s would result in deleting related objects, but "
 "your account doesn't have permission to delete the following types of "
 "objects:"
 msgstr ""
-"Brisanje %(object_name)s rezultiralo bi brisanjem "
-"povezanih objekta, ali vi nemate privilegije za brisanje navedenih objekta: "
+"Brisanje %(object_name)s rezultiralo bi brisanjem povezanih objekta, ali vi "
+"nemate privilegije za brisanje navedenih objekta: "
 
 #: contrib/admin/templates/admin/delete_selected_confirmation.html:22
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(object_name)s objects? All of "
 "the following objects and it's related items will be deleted:"
 msgstr ""
-"Jeste li sigurni da želite izbrisati %(object_name)s? "
-"Svi navedeni objekti i povezani unosi biti će izbrisani:"
+"Jeste li sigurni da želite izbrisati %(object_name)s? Svi navedeni objekti i "
+"povezani unosi biti će izbrisani:"
 
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
@@ -700,6 +703,10 @@ msgstr "Moje promjene"
 #: contrib/admin/templates/admin/index.html:58
 msgid "None available"
 msgstr "Nije dostupno"
+
+#: contrib/admin/templates/admin/index.html:72
+msgid "Unknown content"
+msgstr "Sadržaj nepoznat"
 
 #: contrib/admin/templates/admin/invalid_setup.html:7
 msgid ""
@@ -747,6 +754,10 @@ msgstr ""
 #: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Prikaži sve"
+
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Search"
+msgstr "Traži"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
@@ -1435,10 +1446,12 @@ msgid "Metadata"
 msgstr "Metadata"
 
 #: contrib/comments/feeds.py:13
+#, python-format
 msgid "%(site_name)s comments"
 msgstr "komentari za %(site_name)s"
 
 #: contrib/comments/feeds.py:23
+#, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "Najnoviji komentari na %(site_name)s"
 
@@ -1594,7 +1607,9 @@ msgstr "Hvala na odobrenju"
 #: contrib/comments/templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
-msgstr "Hvala što ste izdvojili vrijeme da poboljšate kvalitetu rasprava na stranicama"
+msgstr ""
+"Hvala što ste izdvojili vrijeme da poboljšate kvalitetu rasprava na "
+"stranicama"
 
 #: contrib/comments/templates/comments/delete.html:4
 msgid "Remove a comment"
@@ -1776,17 +1791,24 @@ msgstr ""
 "Ispričavamo se, ali vaš obrazac je istekao. Molimo nastavite ispunjavati "
 "obrazac od ove stranice."
 
-#: contrib/gis/forms/fields.py:14
+#: contrib/gis/forms/fields.py:17
 msgid "No geometry value provided."
 msgstr "Geometrijska vrijednost nije priložena."
 
-#: contrib/gis/forms/fields.py:15
+#: contrib/gis/forms/fields.py:18
 msgid "Invalid geometry value."
 msgstr "Neispravna geometrijska vrijednost."
 
-#: contrib/gis/forms/fields.py:16
+#: contrib/gis/forms/fields.py:19
 msgid "Invalid geometry type."
 msgstr "Neispravan geometrijski tip."
+
+#: contrib/gis/forms/fields.py:20
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Došlo je do greške pri transformaciji geometrije na SRID geometrijskog polja forme."
 
 #: contrib/humanize/templatetags/humanize.py:19
 msgid "th"
@@ -2175,7 +2197,8 @@ msgstr "Unesite datum rođenja formata XXXXXX/XXXX ili XXXXXXXXXX."
 
 #: contrib/localflavor/cz/forms.py:48
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
-msgstr "Neispravnan opcijonalni parametar spol, ispravne vrijednosti su 'f' i 'm'"
+msgstr ""
+"Neispravnan opcijonalni parametar spol, ispravne vrijednosti su 'f' i 'm'"
 
 #: contrib/localflavor/cz/forms.py:49
 msgid "Enter a valid birth number."
@@ -3975,11 +3998,11 @@ msgstr ""
 "Osigurajte da ukupno nema više od %s numeričkih znakova prije decimalne "
 "točke."
 
-#: forms/fields.py:288 forms/fields.py:862
+#: forms/fields.py:288 forms/fields.py:863
 msgid "Enter a valid date."
 msgstr "Unesite ispravan datum."
 
-#: forms/fields.py:322 forms/fields.py:863
+#: forms/fields.py:322 forms/fields.py:864
 msgid "Enter a valid time."
 msgstr "Unesite ispravno vrijeme."
 
@@ -4000,10 +4023,12 @@ msgid "The submitted file is empty."
 msgstr "Poslana datoteka je prazna."
 
 #: forms/fields.py:450
+#, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr ""
-"Osigurajte da ova datoteka ima najviše %(max)d znakova (trenutno ima %(length)d)."
+"Osigurajte da ova datoteka ima najviše %(max)d znakova (trenutno ima %"
+"(length)d)."
 
 #: forms/fields.py:483
 msgid ""
@@ -4021,20 +4046,20 @@ msgstr "Unesite ispravan URL."
 msgid "This URL appears to be a broken link."
 msgstr "Izgleda da je URL neispravan."
 
-#: forms/fields.py:624 forms/fields.py:702
+#: forms/fields.py:625 forms/fields.py:703
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Odaberite iz ponuđenog. %(value)s nije ponuđen kao opcija."
 
-#: forms/fields.py:703 forms/fields.py:764 forms/models.py:776
+#: forms/fields.py:704 forms/fields.py:765 forms/models.py:863
 msgid "Enter a list of values."
 msgstr "Unesite listu vrijednosti."
 
-#: forms/fields.py:891
+#: forms/fields.py:892
 msgid "Enter a valid IPv4 address."
 msgstr "Unesite ispravnu IPv4 adresu."
 
-#: forms/fields.py:901
+#: forms/fields.py:902
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -4045,25 +4070,30 @@ msgstr ""
 msgid "Order"
 msgstr "Redoslijed:"
 
-#: forms/models.py:299 forms/models.py:308
+#: forms/models.py:363
+#, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr "%(field_name)s mora biti jedinstven pojam za %(date_field)s %(lookup)s."
+
+#: forms/models.py:377 forms/models.py:385
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s sa navedenim %(field_label)s već postoji."
 
-#: forms/models.py:651
+#: forms/models.py:738
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "The inline foreign key did not match the parent instance primary key."
 
-#: forms/models.py:706
+#: forms/models.py:793
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Izaberite ispravnu opciju. Ta opcija nije jedna od dostupnih opcija."
 
-#: forms/models.py:777
+#: forms/models.py:864
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Odaberite iz ponuđenog. %s nije ponuđen kao opcija."
 
-#: forms/models.py:779
+#: forms/models.py:866
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" nije ispravna vrijednost za primarni kluč."
@@ -4638,9 +4668,6 @@ msgstr "%(verbose_name)s je izbrisano."
 #~ msgid "Please enter both fields or leave them both empty."
 #~ msgstr ""
 #~ "Molim unesite vrijednosti za oba polja ili ostavite oba polja prazna."
-
-#~ msgid "This field must be given if %(field)s is %(value)s"
-#~ msgstr "Ovo polje mora biti ispunjeno ako je %(field)s %(value)s"
 
 #~ msgid "This field must be given if %(field)s is not %(value)s"
 #~ msgstr "Ovo polje je obavezno ako je %(field)s različito od %(value)s"
