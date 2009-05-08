@@ -63,15 +63,15 @@ class Storage(object):
         Returns a filename that's free on the target storage system, and
         available for new content to be written to.
         """
-        # If the filename already exists, keep adding an underscore to the name
-        # of the file until the filename doesn't exist.
+        dir_name, file_name = os.path.split(name)
+        file_root, file_ext = os.path.splitext(file_name)
+        # If the filename already exists, keep adding an underscore (before the
+        # file extension, if one exists) to the filename until the generated
+        # filename doesn't exist.
         while self.exists(name):
-            try:
-                dot_index = name.rindex('.')
-            except ValueError: # filename has no dot
-                name += '_'
-            else:
-                name = name[:dot_index] + '_' + name[dot_index:]
+            file_root += '_'
+            # file_ext includes the dot.
+            name = os.path.join(dir_name, file_root + file_ext)
         return name
 
     def path(self, name):
