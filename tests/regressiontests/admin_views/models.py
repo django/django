@@ -357,6 +357,52 @@ class Recommendation(Title):
 class RecommendationAdmin(admin.ModelAdmin):
     search_fields = ('titletranslation__text', 'recommender__titletranslation__text',)
 
+class Collector(models.Model):
+    name = models.CharField(max_length=100)
+
+class Widget(models.Model):
+    owner = models.ForeignKey(Collector)
+    name = models.CharField(max_length=100)
+
+class DooHickey(models.Model):
+    code = models.CharField(max_length=10, primary_key=True)
+    owner = models.ForeignKey(Collector)
+    name = models.CharField(max_length=100)
+
+class Grommet(models.Model):
+    code = models.AutoField(primary_key=True)
+    owner = models.ForeignKey(Collector)
+    name = models.CharField(max_length=100)
+
+class Whatsit(models.Model):
+    index = models.IntegerField(primary_key=True)
+    owner = models.ForeignKey(Collector)
+    name = models.CharField(max_length=100)
+
+class Doodad(models.Model):
+    name = models.CharField(max_length=100)
+
+class FancyDoodad(Doodad):
+    owner = models.ForeignKey(Collector)
+    expensive = models.BooleanField(default=True)
+
+class WidgetInline(admin.StackedInline):
+    model = Widget
+
+class DooHickeyInline(admin.StackedInline):
+    model = DooHickey
+
+class GrommetInline(admin.StackedInline):
+    model = Grommet
+
+class WhatsitInline(admin.StackedInline):
+    model = Whatsit
+
+class FancyDoodadInline(admin.StackedInline):
+    model = FancyDoodad
+
+class CollectorAdmin(admin.ModelAdmin):
+    inlines = [WidgetInline, DooHickeyInline, GrommetInline, WhatsitInline, FancyDoodadInline]
 
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
@@ -379,6 +425,7 @@ admin.site.register(Picture, PictureAdmin)
 admin.site.register(Language, LanguageAdmin)
 admin.site.register(Recommendation, RecommendationAdmin)
 admin.site.register(Recommender)
+admin.site.register(Collector, CollectorAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

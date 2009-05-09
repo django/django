@@ -146,7 +146,13 @@ class InlineAdminForm(AdminForm):
             yield InlineFieldset(self.formset, self.form, name, **options)
 
     def has_auto_field(self):
-        return self.form._meta.model._meta.has_auto_field
+        if self.form._meta.model._meta.has_auto_field:
+            return True
+        # Also search any parents for an auto field.
+        for parent in self.form._meta.model._meta.get_parent_list():
+            if parent._meta.has_auto_field:
+                return True
+        return False
 
     def field_count(self):
         # tabular.html uses this function for colspan value.

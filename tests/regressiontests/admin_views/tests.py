@@ -16,7 +16,8 @@ from django.utils.html import escape
 from models import (Article, BarAccount, CustomArticle, EmptyModel,
                     ExternalSubscriber, FooAccount, Gallery,
                     ModelWithStringPrimaryKey, Person, Persona, Picture,
-                    Podcast, Section, Subscriber, Vodcast, Language)
+                    Podcast, Section, Subscriber, Vodcast, Language,
+                    Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit)
 
 try:
     set
@@ -236,20 +237,20 @@ class AdminViewBasicTest(TestCase):
 
 class SaveAsTests(TestCase):
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
-    
+
     def setUp(self):
         self.client.login(username='super', password='secret')
 
     def tearDown(self):
         self.client.logout()
-    
+
     def test_save_as_duplication(self):
         """Ensure save as actually creates a new person"""
         post_data = {'_saveasnew':'', 'name':'John M', 'gender':1}
         response = self.client.post('/test_admin/admin/admin_views/person/1/', post_data)
         self.assertEqual(len(Person.objects.filter(name='John M')), 1)
         self.assertEqual(len(Person.objects.filter(id=1)), 1)
-    
+
     def test_save_as_display(self):
         """
         Ensure that 'save as' is displayed when activated and after submitting
@@ -1183,3 +1184,239 @@ class AdminInlineFileUploadTest(TestCase):
         }
         response = self.client.post('/test_admin/%s/admin_views/gallery/1/' % self.urlbit, post_data)
         self.failUnless(response._container[0].find("Currently:") > -1)
+
+
+class AdminInlineTests(TestCase):
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.post_data = {
+            "name": u"Test Name",
+
+            "widget_set-TOTAL_FORMS": "3",
+            "widget_set-INITIAL_FORMS": u"0",
+            "widget_set-0-id": "",
+            "widget_set-0-owner": "1",
+            "widget_set-0-name": "",
+            "widget_set-1-id": "",
+            "widget_set-1-owner": "1",
+            "widget_set-1-name": "",
+            "widget_set-2-id": "",
+            "widget_set-2-owner": "1",
+            "widget_set-2-name": "",
+
+            "doohickey_set-TOTAL_FORMS": "3",
+            "doohickey_set-INITIAL_FORMS": u"0",
+            "doohickey_set-0-owner": "1",
+            "doohickey_set-0-code": "",
+            "doohickey_set-0-name": "",
+            "doohickey_set-1-owner": "1",
+            "doohickey_set-1-code": "",
+            "doohickey_set-1-name": "",
+            "doohickey_set-2-owner": "1",
+            "doohickey_set-2-code": "",
+            "doohickey_set-2-name": "",
+
+            "grommet_set-TOTAL_FORMS": "3",
+            "grommet_set-INITIAL_FORMS": u"0",
+            "grommet_set-0-code": "",
+            "grommet_set-0-owner": "1",
+            "grommet_set-0-name": "",
+            "grommet_set-1-code": "",
+            "grommet_set-1-owner": "1",
+            "grommet_set-1-name": "",
+            "grommet_set-2-code": "",
+            "grommet_set-2-owner": "1",
+            "grommet_set-2-name": "",
+
+            "whatsit_set-TOTAL_FORMS": "3",
+            "whatsit_set-INITIAL_FORMS": u"0",
+            "whatsit_set-0-owner": "1",
+            "whatsit_set-0-index": "",
+            "whatsit_set-0-name": "",
+            "whatsit_set-1-owner": "1",
+            "whatsit_set-1-index": "",
+            "whatsit_set-1-name": "",
+            "whatsit_set-2-owner": "1",
+            "whatsit_set-2-index": "",
+            "whatsit_set-2-name": "",
+
+            "fancydoodad_set-TOTAL_FORMS": "3",
+            "fancydoodad_set-INITIAL_FORMS": u"0",
+            "fancydoodad_set-0-doodad_ptr": "",
+            "fancydoodad_set-0-owner": "1",
+            "fancydoodad_set-0-name": "",
+            "fancydoodad_set-0-expensive": "on",
+            "fancydoodad_set-1-doodad_ptr": "",
+            "fancydoodad_set-1-owner": "1",
+            "fancydoodad_set-1-name": "",
+            "fancydoodad_set-1-expensive": "on",
+            "fancydoodad_set-2-doodad_ptr": "",
+            "fancydoodad_set-2-owner": "1",
+            "fancydoodad_set-2-name": "",
+            "fancydoodad_set-2-expensive": "on",
+        }
+
+        result = self.client.login(username='super', password='secret')
+        self.failUnlessEqual(result, True)
+        Collector(pk=1,name='John Fowles').save()
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_simple_inline(self):
+        "A simple model can be saved as inlines"
+        # First add a new inline
+        self.post_data['widget_set-0-name'] = "Widget 1"
+        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        self.failUnlessEqual(response.status_code, 302)
+        self.failUnlessEqual(Widget.objects.count(), 1)
+        self.failUnlessEqual(Widget.objects.all()[0].name, "Widget 1")
+
+        # Check that the PK link exists on the rendered form
+        response = self.client.get('/test_admin/admin/admin_views/collector/1/')
+        self.assertContains(response, 'name="widget_set-0-id"')
+
+        # Now resave that inline
+        self.post_data['widget_set-INITIAL_FORMS'] = "1"
+        self.post_data['widget_set-0-id'] = "1"
+        self.post_data['widget_set-0-name'] = "Widget 1"
+        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        self.failUnlessEqual(response.status_code, 302)
+        self.failUnlessEqual(Widget.objects.count(), 1)
+        self.failUnlessEqual(Widget.objects.all()[0].name, "Widget 1")
+
+        # Now modify that inline
+        self.post_data['widget_set-INITIAL_FORMS'] = "1"
+        self.post_data['widget_set-0-id'] = "1"
+        self.post_data['widget_set-0-name'] = "Widget 1 Updated"
+        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        self.failUnlessEqual(response.status_code, 302)
+        self.failUnlessEqual(Widget.objects.count(), 1)
+        self.failUnlessEqual(Widget.objects.all()[0].name, "Widget 1 Updated")
+
+    def test_explicit_autofield_inline(self):
+        "A model with an explicit autofield primary key can be saved as inlines. Regression for #8093"
+        # First add a new inline
+        self.post_data['grommet_set-0-name'] = "Grommet 1"
+        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        self.failUnlessEqual(response.status_code, 302)
+        self.failUnlessEqual(Grommet.objects.count(), 1)
+        self.failUnlessEqual(Grommet.objects.all()[0].name, "Grommet 1")
+
+        # Check that the PK link exists on the rendered form
+        response = self.client.get('/test_admin/admin/admin_views/collector/1/')
+        self.assertContains(response, 'name="grommet_set-0-code"')
+
+        # Now resave that inline
+        self.post_data['grommet_set-INITIAL_FORMS'] = "1"
+        self.post_data['grommet_set-0-code'] = "1"
+        self.post_data['grommet_set-0-name'] = "Grommet 1"
+        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        self.failUnlessEqual(response.status_code, 302)
+        self.failUnlessEqual(Grommet.objects.count(), 1)
+        self.failUnlessEqual(Grommet.objects.all()[0].name, "Grommet 1")
+
+        # Now modify that inline
+        self.post_data['grommet_set-INITIAL_FORMS'] = "1"
+        self.post_data['grommet_set-0-code'] = "1"
+        self.post_data['grommet_set-0-name'] = "Grommet 1 Updated"
+        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        self.failUnlessEqual(response.status_code, 302)
+        self.failUnlessEqual(Grommet.objects.count(), 1)
+        self.failUnlessEqual(Grommet.objects.all()[0].name, "Grommet 1 Updated")
+
+    # def test_char_pk_inline(self):
+    #     "A model with a character PK can be saved as inlines. Regression for #10992"
+    #     # First add a new inline
+    #     self.post_data['doohickey_set-0-code'] = "DH1"
+    #     self.post_data['doohickey_set-0-name'] = "Doohickey 1"
+    #     response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+    #     self.failUnlessEqual(response.status_code, 302)
+    #     self.failUnlessEqual(DooHickey.objects.count(), 1)
+    #     self.failUnlessEqual(DooHickey.objects.all()[0].name, "Doohickey 1")
+    #
+    #     # Check that the PK link exists on the rendered form
+    #     response = self.client.get('/test_admin/admin/admin_views/collector/1/')
+    #     self.assertContains(response, 'name="doohickey_set-0-code"')
+    #
+    #     # Now resave that inline
+    #     self.post_data['doohickey_set-INITIAL_FORMS'] = "1"
+    #     self.post_data['doohickey_set-0-code'] = "DH1"
+    #     self.post_data['doohickey_set-0-name'] = "Doohickey 1"
+    #     response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+    #     self.failUnlessEqual(response.status_code, 302)
+    #     self.failUnlessEqual(DooHickey.objects.count(), 1)
+    #     self.failUnlessEqual(DooHickey.objects.all()[0].name, "Doohickey 1")
+    #
+    #     # Now modify that inline
+    #     self.post_data['doohickey_set-INITIAL_FORMS'] = "1"
+    #     self.post_data['doohickey_set-0-code'] = "DH1"
+    #     self.post_data['doohickey_set-0-name'] = "Doohickey 1 Updated"
+    #     response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+    #     self.failUnlessEqual(response.status_code, 302)
+    #     self.failUnlessEqual(DooHickey.objects.count(), 1)
+    #     self.failUnlessEqual(DooHickey.objects.all()[0].name, "Doohickey 1 Updated")
+
+    # def test_integer_pk_inline(self):
+    #     "A model with an integer PK can be saved as inlines. Regression for #10992"
+    #     # First add a new inline
+    #     self.post_data['whatsit_set-0-index'] = "42"
+    #     self.post_data['whatsit_set-0-name'] = "Whatsit 1"
+    #     response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+    #     self.failUnlessEqual(response.status_code, 302)
+    #     self.failUnlessEqual(Whatsit.objects.count(), 1)
+    #     self.failUnlessEqual(Whatsit.objects.all()[0].name, "Whatsit 1")
+    #
+    #     # Check that the PK link exists on the rendered form
+    #     response = self.client.get('/test_admin/admin/admin_views/collector/1/')
+    #     self.assertContains(response, 'name="whatsit_set-0-index"')
+    #
+    #     # Now resave that inline
+    #     self.post_data['whatsit_set-INITIAL_FORMS'] = "1"
+    #     self.post_data['whatsit_set-0-index'] = "42"
+    #     self.post_data['whatsit_set-0-name'] = "Whatsit 1"
+    #     response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+    #     self.failUnlessEqual(response.status_code, 302)
+    #     self.failUnlessEqual(Whatsit.objects.count(), 1)
+    #     self.failUnlessEqual(Whatsit.objects.all()[0].name, "Whatsit 1")
+    #
+    #     # Now modify that inline
+    #     self.post_data['whatsit_set-INITIAL_FORMS'] = "1"
+    #     self.post_data['whatsit_set-0-index'] = "42"
+    #     self.post_data['whatsit_set-0-name'] = "Whatsit 1 Updated"
+    #     response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+    #     self.failUnlessEqual(response.status_code, 302)
+    #     self.failUnlessEqual(Whatsit.objects.count(), 1)
+    #     self.failUnlessEqual(Whatsit.objects.all()[0].name, "Whatsit 1 Updated")
+
+    def test_inherited_inline(self):
+        "An inherited model can be saved as inlines. Regression for #11042"
+        # First add a new inline
+        self.post_data['fancydoodad_set-0-name'] = "Fancy Doodad 1"
+        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        self.failUnlessEqual(response.status_code, 302)
+        self.failUnlessEqual(FancyDoodad.objects.count(), 1)
+        self.failUnlessEqual(FancyDoodad.objects.all()[0].name, "Fancy Doodad 1")
+
+        # Check that the PK link exists on the rendered form
+        response = self.client.get('/test_admin/admin/admin_views/collector/1/')
+        self.assertContains(response, 'name="fancydoodad_set-0-doodad_ptr"')
+
+        # Now resave that inline
+        self.post_data['fancydoodad_set-INITIAL_FORMS'] = "1"
+        self.post_data['fancydoodad_set-0-doodad_ptr'] = "1"
+        self.post_data['fancydoodad_set-0-name'] = "Fancy Doodad 1"
+        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        self.failUnlessEqual(response.status_code, 302)
+        self.failUnlessEqual(FancyDoodad.objects.count(), 1)
+        self.failUnlessEqual(FancyDoodad.objects.all()[0].name, "Fancy Doodad 1")
+
+        # Now modify that inline
+        self.post_data['fancydoodad_set-INITIAL_FORMS'] = "1"
+        self.post_data['fancydoodad_set-0-doodad_ptr'] = "1"
+        self.post_data['fancydoodad_set-0-name'] = "Fancy Doodad 1 Updated"
+        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        self.failUnlessEqual(response.status_code, 302)
+        self.failUnlessEqual(FancyDoodad.objects.count(), 1)
+        self.failUnlessEqual(FancyDoodad.objects.all()[0].name, "Fancy Doodad 1 Updated")
