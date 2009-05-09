@@ -87,6 +87,7 @@ Time for an example. Edit ``mysite/urls.py`` so it looks like this::
         (r'^polls/(?P<poll_id>\d+)/$', 'mysite.polls.views.detail'),
         (r'^polls/(?P<poll_id>\d+)/results/$', 'mysite.polls.views.results'),
         (r'^polls/(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
+        (r'^admin/', include(admin.site.urls)),
     )
 
 This is worth a review. When somebody requests a page from your Web site -- say,
