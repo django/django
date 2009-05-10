@@ -97,6 +97,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 conn_params['port'] = settings_dict['DATABASE_PORT']
             self.connection = Database.connect(**conn_params)
             self.connection.set_client_encoding('UTF8')
+            self.connection.set_isolation_level(self.isolation_level)
             connection_created.send(sender=self.__class__)
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = None
