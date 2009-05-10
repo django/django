@@ -1,7 +1,7 @@
 # coding: utf-8
 import pickle
 
-from django.db import models
+from django.db import connection, models
 from django.conf import settings
 
 try:
@@ -321,10 +321,26 @@ FieldError: Cannot compute Avg('mean_age'): 'mean_age' is an aggregate
 """
 }
 
-if settings.DATABASE_ENGINE != 'sqlite3':
-    __test__['API_TESTS'] += """
-# Stddev and Variance are not guaranteed to be available for SQLite.
+def run_stddev_tests():
+    """Check to see if StdDev/Variance tests should be run.
 
+    Stddev and Variance are not guaranteed to be available for SQLite, and
+    are not available for PostgreSQL before 8.2.
+    """
+    if settings.DATABASE_ENGINE == 'sqlite3':
+        return False
+
+    class StdDevPop(object):
+        sql_function = 'STDDEV_POP'
+
+    try:
+        connection.ops.check_aggregate_support(StdDevPop())
+    except:
+        return False
+    return True
+
+if run_stddev_tests():
+    __test__['API_TESTS'] += """
 >>> Book.objects.aggregate(StdDev('pages'))
 {'pages__stddev': 311.46...}
 
