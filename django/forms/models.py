@@ -896,7 +896,10 @@ class ModelChoiceField(ChoiceField):
     def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
                  required=True, widget=None, label=None, initial=None,
                  help_text=None, to_field_name=None, *args, **kwargs):
-        self.empty_label = empty_label
+        if required and (initial is not None):
+            self.empty_label = None
+        else:
+            self.empty_label = empty_label
         self.cache_choices = cache_choices
 
         # Call Field instead of ChoiceField __init__() because we don't need

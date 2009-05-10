@@ -24,6 +24,17 @@ class ChoiceModel(models.Model):
     """For ModelChoiceField and ModelMultipleChoiceField tests."""
     name = models.CharField(max_length=10)
 
+class ChoiceOptionModel(models.Model):
+    """Destination for ChoiceFieldModel's ForeignKey.
+    Can't reuse ChoiceModel because error_message tests require that it have no instances."""
+    name = models.CharField(max_length=10)
+
+class ChoiceFieldModel(models.Model):
+    """Model with ForeignKey to another model, for testing ModelForm
+    generation with ModelChoiceField."""
+    choice = models.ForeignKey(ChoiceOptionModel, blank=False,
+                               default=lambda: ChoiceOptionModel.objects.all()[0])
+
 class FileModel(models.Model):
     file = models.FileField(storage=temp_storage, upload_to='tests')
 
@@ -105,4 +116,19 @@ u'class default value'
 >>> obj.def_date
 datetime.date(1999, 3, 2)
 >>> shutil.rmtree(temp_storage_location)
+
+In a ModelForm with a ModelChoiceField, if the model's ForeignKey has blank=False and a default,
+no empty option is created (regression test for #10792).
+
+First we need at least one instance of ChoiceOptionModel:
+
+>>> ChoiceOptionModel.objects.create(name='default')
+<ChoiceOptionModel: ChoiceOptionModel object>
+
+>>> class ChoiceFieldForm(ModelForm):
+...     class Meta:
+...         model = ChoiceFieldModel
+>>> list(ChoiceFieldForm().fields['choice'].choices)
+[(1, u'ChoiceOptionModel object')]
+
 """}
