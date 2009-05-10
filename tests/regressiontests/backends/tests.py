@@ -21,7 +21,29 @@ class Callproc(unittest.TestCase):
 def connection_created_test(sender, **kwargs):
     print 'connection_created signal'
 
-__test__ = {'API_TESTS': ''}
+__test__ = {'API_TESTS': """
+# Check Postgres version parsing
+>>> from django.db.backends.postgresql import version as pg_version
+
+>>> pg_version._parse_version("PostgreSQL 8.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)")
+(8, 3, 1)
+
+>>> pg_version._parse_version("PostgreSQL 8.3.6")
+(8, 3, 6)
+
+>>> pg_version._parse_version("PostgreSQL 8.3")
+(8, 3, None)
+
+>>> pg_version._parse_version("EnterpriseDB 8.3")
+(8, 3, None)
+
+>>> pg_version._parse_version("PostgreSQL 8.3 beta4")
+(8, 3, None)
+
+>>> pg_version._parse_version("PostgreSQL 8.4beta1")
+(8, 4, None)
+
+"""}
 
 # Unfortunately with sqlite3 the in-memory test database cannot be
 # closed, and so it cannot be re-opened during testing, and so we

@@ -121,7 +121,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor.execute("SET TIME ZONE %s", [settings_dict['TIME_ZONE']])
             if not hasattr(self, '_version'):
                 self.__class__._version = get_version(cursor)
-            if self._version < (8, 0):
+            if self._version[0:2] < [8, 0]:
                 # No savepoint support for earlier version of PostgreSQL.
                 self.features.uses_savepoints = False
         cursor.execute("SET client_encoding to 'UNICODE'")
