@@ -180,6 +180,7 @@ class MemoryFileUploadHandler(FileUploadHandler):
         if not self.activated:
             return
 
+        self.file.seek(0)
         return InMemoryUploadedFile(
             file = self.file,
             field_name = self.field_name,
