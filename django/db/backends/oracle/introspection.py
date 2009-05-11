@@ -24,17 +24,20 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_table_list(self, cursor):
         "Returns a list of table names in the current database."
         cursor.execute("SELECT TABLE_NAME FROM USER_TABLES")
-        return [row[0].upper() for row in cursor.fetchall()]
+        return [row[0].lower() for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
         cursor.execute("SELECT * FROM %s WHERE ROWNUM < 2" % self.connection.ops.quote_name(table_name))
-        return cursor.description
+        description = []
+        for desc in cursor.description:
+            description.append((desc[0].lower(),) + desc[1:])
+        return description
 
     def table_name_converter(self, name):
         "Table name comparison is case insensitive under Oracle"
-        return name.upper()
-        
+        return name.lower()
+
     def _name_to_index(self, cursor, table_name):
         """
         Returns a dictionary of {field_name: field_index} for the given table.
@@ -76,33 +79,27 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # This query retrieves each index on the given table, including the
         # first associated field name
         # "We were in the nick of time; you were in great peril!"
-        sql = """
-    WITH primarycols AS (
-     SELECT user_cons_columns.table_name, user_cons_columns.column_name, 1 AS PRIMARYCOL
-     FROM   user_cons_columns, user_constraints
-     WHERE  user_cons_columns.constraint_name = user_constraints.constraint_name AND
-            user_constraints.constraint_type = 'P' AND
-            user_cons_columns.table_name = %s),
-     uniquecols AS (
-     SELECT user_ind_columns.table_name, user_ind_columns.column_name, 1 AS UNIQUECOL
-     FROM   user_indexes, user_ind_columns
-     WHERE  uniqueness = 'UNIQUE' AND
-            user_indexes.index_name = user_ind_columns.index_name AND
-            user_ind_columns.table_name = %s)
-    SELECT allcols.column_name, primarycols.primarycol, uniquecols.UNIQUECOL
-    FROM   (SELECT column_name FROM primarycols UNION SELECT column_name FROM
-    uniquecols) allcols,
-          primarycols, uniquecols
-    WHERE  allcols.column_name = primarycols.column_name (+) AND
-          allcols.column_name = uniquecols.column_name (+)
-        """
-        cursor.execute(sql, [table_name, table_name])
+        sql = """\
+SELECT LOWER(all_tab_cols.column_name) AS column_name,
+       CASE user_constraints.constraint_type
+           WHEN 'P' THEN 1 ELSE 0
+       END AS is_primary_key,
+       CASE user_indexes.uniqueness
+           WHEN 'UNIQUE' THEN 1 ELSE 0
+       END AS is_unique
+FROM   all_tab_cols, user_cons_columns, user_constraints, user_ind_columns, user_indexes
+WHERE  all_tab_cols.column_name = user_cons_columns.column_name (+)
+  AND  all_tab_cols.table_name = user_cons_columns.table_name (+)
+  AND  user_cons_columns.constraint_name = user_constraints.constraint_name (+)
+  AND  user_constraints.constraint_type (+) = 'P'
+  AND  user_ind_columns.column_name (+) = all_tab_cols.column_name
+  AND  user_ind_columns.table_name (+) = all_tab_cols.table_name
+  AND  user_indexes.uniqueness (+) = 'UNIQUE'
+  AND  user_indexes.index_name (+) = user_ind_columns.index_name
+  AND  all_tab_cols.table_name = UPPER(%s)
+"""
+        cursor.execute(sql, [table_name])
         indexes = {}
         for row in cursor.fetchall():
-            # row[1] (idx.indkey) is stored in the DB as an array. It comes out as
-            # a string of space-separated integers. This designates the field
-            # indexes (1-based) of the fields that have indexes on the table.
-            # Here, we skip any indexes across multiple fields.
             indexes[row[0]] = {'primary_key': row[1], 'unique': row[2]}
         return indexes
-
