@@ -16,7 +16,6 @@ class File(FileProxyMixin):
             name = getattr(file, 'name', None)
         self.name = name
         self.mode = getattr(file, 'mode', None)
-        self.closed = False
 
     def __str__(self):
         return smart_str(self.name or '')
@@ -47,6 +46,10 @@ class File(FileProxyMixin):
         self._size = size
 
     size = property(_get_size, _set_size)
+
+    def _get_closed(self):
+        return not self.file or self.file.closed
+    closed = property(_get_closed)
 
     def chunks(self, chunk_size=None):
         """
@@ -101,15 +104,13 @@ class File(FileProxyMixin):
     def open(self, mode=None):
         if not self.closed:
             self.seek(0)
-        elif os.path.exists(self.file.name):
-            self.file = open(self.file.name, mode or self.file.mode)
-            self.closed = False
+        elif self.name and os.path.exists(self.name):
+            self.file = open(self.name, mode or self.mode)
         else:
             raise ValueError("The file cannot be reopened.")
 
     def close(self):
         self.file.close()
-        self.closed = True
 
 class ContentFile(File):
     """
@@ -127,6 +128,7 @@ class ContentFile(File):
         return True
 
     def open(self, mode=None):
-        if self.closed:
-            self.closed = False
         self.seek(0)
+
+    def close(self):
+        pass

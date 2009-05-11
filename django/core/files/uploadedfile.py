@@ -74,16 +74,13 @@ class TemporaryUploadedFile(UploadedFile):
 
     def close(self):
         try:
-            try:
-                return self.file.close()
-            except OSError, e:
-                if e.errno != 2:
-                    # Means the file was moved or deleted before the tempfile
-                    # could unlink it.  Still sets self.file.close_called and
-                    # calls self.file.file.close() before the exception
-                    raise
-        finally:
-            self.closed = True
+            return self.file.close()
+        except OSError, e:
+            if e.errno != 2:
+                # Means the file was moved or deleted before the tempfile
+                # could unlink it.  Still sets self.file.close_called and
+                # calls self.file.file.close() before the exception
+                raise
 
 class InMemoryUploadedFile(UploadedFile):
     """
@@ -93,9 +90,11 @@ class InMemoryUploadedFile(UploadedFile):
         super(InMemoryUploadedFile, self).__init__(file, name, content_type, size, charset)
         self.field_name = field_name
 
-    def open(self):
-        self.closed = False
+    def open(self, mode=None):
         self.file.seek(0)
+
+    def close(self):
+        pass
 
     def chunks(self, chunk_size=None):
         self.file.seek(0)

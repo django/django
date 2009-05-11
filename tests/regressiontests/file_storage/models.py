@@ -73,18 +73,20 @@ True
 # Get a "clean" model instance
 >>> p3 = Person.objects.get(name="Joan")
 
-# It won't have an opened file. This is a bit brittle since it depends on the
-# the internals of FieldFile, but there's no other way of telling if the
-# file's been opened or not.
->>> p3.mugshot._file is not None
-False
+# It won't have an opened file.
+>>> p3.mugshot.closed
+True
 
 # After asking for the size, the file should still be closed.
 >>> _ = p3.mugshot.size
->>> p3.mugshot._file is not None
-False
+>>> p3.mugshot.closed
+True
 
->>> p = Person.objects.create(name="Bob", mugshot=File(p3.mugshot.file))
+# Make sure that wrapping the file in a file still works
+>>> p3.mugshot.file.open()
+>>> p = Person.objects.create(name="Bob The Builder", mugshot=File(p3.mugshot.file))
+>>> p.save()
 
+# Delete all test files
 >>> shutil.rmtree(temp_storage_dir)
 """}

@@ -21,7 +21,11 @@ class ImageFile(File):
 
     def _get_image_dimensions(self):
         if not hasattr(self, '_dimensions_cache'):
+            close = self.closed
+            self.open()
             self._dimensions_cache = get_image_dimensions(self)
+            if close:
+                self.close()
         return self._dimensions_cache
 
 def get_image_dimensions(file_or_path):

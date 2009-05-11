@@ -112,10 +112,13 @@ try:
             return '%s/%s' % (path, filename)
 
         description = models.CharField(max_length=20)
-        image = models.ImageField(storage=temp_storage, upload_to=custom_upload_path,
-                                  width_field='width', height_field='height')
+
+        # Deliberately put the image field *after* the width/height fields to
+        # trigger the bug in #10404 with width/height not getting assigned.
         width = models.IntegerField(editable=False)
         height = models.IntegerField(editable=False)
+        image = models.ImageField(storage=temp_storage, upload_to=custom_upload_path,
+                                  width_field='width', height_field='height')
         path = models.CharField(max_length=16, blank=True, default='')
 
         def __unicode__(self):
