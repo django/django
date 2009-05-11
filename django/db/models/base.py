@@ -116,6 +116,8 @@ class ModelBase(type):
                     new_class._meta.local_many_to_many):
                 raise FieldError("Proxy model '%s' contains model fields."
                         % name)
+            while base._meta.proxy:
+                base = base._meta.proxy_for_model
             new_class._meta.setup_proxy(base)
 
         # Do the appropriate setup for any model parents.
@@ -123,6 +125,7 @@ class ModelBase(type):
                 if isinstance(f, OneToOneField)])
 
         for base in parents:
+            original_base = base
             if not hasattr(base, '_meta'):
                 # Things without _meta aren't functional models, so they're
                 # uninteresting parents.
@@ -167,7 +170,7 @@ class ModelBase(type):
             # Proxy models inherit the non-abstract managers from their base,
             # unless they have redefined any of them.
             if is_proxy:
-                new_class.copy_managers(base._meta.concrete_managers)
+                new_class.copy_managers(original_base._meta.concrete_managers)
 
             # Inherit virtual fields (like GenericForeignKey) from the parent
             # class

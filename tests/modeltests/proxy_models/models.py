@@ -82,6 +82,87 @@ class MyPersonProxy(MyPerson):
 class LowerStatusPerson(MyPersonProxy):
     status = models.CharField(max_length=80)
 
+class User(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
+class UserProxy(User):
+    class Meta:
+        proxy = True
+
+class UserProxyProxy(UserProxy):
+    class Meta:
+        proxy = True
+
+# We can still use `select_related()` to include related models in our querysets.
+class Country(models.Model):
+	name = models.CharField(max_length=50)
+
+class State(models.Model):
+	name = models.CharField(max_length=50)
+	country = models.ForeignKey(Country)
+
+	def __unicode__(self):
+		return self.name
+
+class StateProxy(State):
+	class Meta:
+		proxy = True
+
+# Proxy models still works with filters (on related fields)
+# and select_related, even when mixed with model inheritance
+class BaseUser(models.Model):
+    name = models.CharField(max_length=255)
+
+class TrackerUser(BaseUser):
+    status = models.CharField(max_length=50)
+
+class ProxyTrackerUser(TrackerUser):
+    class Meta:
+        proxy = True
+
+
+class Issue(models.Model):
+    summary = models.CharField(max_length=255)
+    assignee = models.ForeignKey(TrackerUser)
+
+    def __unicode__(self):
+        return ':'.join((self.__class__.__name__,self.summary,))
+
+class Bug(Issue):
+    version = models.CharField(max_length=50)
+    reporter = models.ForeignKey(BaseUser)
+
+class ProxyBug(Bug):
+    """
+    Proxy of an inherited class
+    """
+    class Meta:
+        proxy = True
+
+
+class ProxyProxyBug(ProxyBug):
+    """
+    A proxy of proxy model with related field
+    """
+    class Meta:
+        proxy = True
+
+class Improvement(Issue):
+    """
+    A model that has relation to a proxy model
+    or to a proxy of proxy model
+    """
+    version = models.CharField(max_length=50)
+    reporter = models.ForeignKey(ProxyTrackerUser)
+    associated_bug = models.ForeignKey(ProxyProxyBug)
+
+class ProxyImprovement(Improvement):
+    class Meta:
+        proxy = True
+
 __test__ = {'API_TESTS' : """
 # The MyPerson model should be generating the same database queries as the
 # Person model (when the same manager is used in each case).
@@ -118,6 +199,11 @@ False
 >>> _ = LowerStatusPerson.objects.create(status="low", name="homer")
 >>> LowerStatusPerson.objects.all()
 [<LowerStatusPerson: homer>]
+
+# Correct type when querying a proxy of proxy
+
+>>> MyPersonProxy.objects.all()
+[<MyPersonProxy: Bazza del Frob>, <MyPersonProxy: Foo McBar>, <MyPersonProxy: homer>]
 
 # And now for some things that shouldn't work...
 #
@@ -178,6 +264,58 @@ FieldError: Proxy model 'NoNewFields' contains model fields.
 >>> ctype = ContentType.objects.get_for_model
 >>> ctype(Person) is ctype(OtherPerson)
 True
+
+>>> MyPersonProxy.objects.all()
+[<MyPersonProxy: barney>, <MyPersonProxy: fred>]
+
+>>> u = User.objects.create(name='Bruce')
+>>> User.objects.all()
+[<User: Bruce>]
+>>> UserProxy.objects.all()
+[<UserProxy: Bruce>]
+>>> UserProxyProxy.objects.all()
+[<UserProxyProxy: Bruce>]
+
+# We can still use `select_related()` to include related models in our querysets.
+>>> country = Country.objects.create(name='Australia')
+>>> state = State.objects.create(name='New South Wales', country=country)
+
+>>> State.objects.select_related()
+[<State: New South Wales>]
+>>> StateProxy.objects.select_related()
+[<StateProxy: New South Wales>]
+>>> StateProxy.objects.get(name='New South Wales')
+<StateProxy: New South Wales>
+>>> StateProxy.objects.select_related().get(name='New South Wales')
+<StateProxy: New South Wales>
+
+>>> contributor = TrackerUser.objects.create(name='Contributor',status='contrib')
+>>> someone = BaseUser.objects.create(name='Someone')
+>>> _ = Bug.objects.create(summary='fix this', version='1.1beta',
+...                        assignee=contributor, reporter=someone)
+>>> pcontributor = ProxyTrackerUser.objects.create(name='OtherContributor',
+...                                                status='proxy')
+>>> _ = Improvement.objects.create(summary='improve that', version='1.1beta',
+...                                assignee=contributor, reporter=pcontributor,
+...                                associated_bug=ProxyProxyBug.objects.all()[0])
+
+# Related field filter on proxy
+>>> ProxyBug.objects.get(version__icontains='beta')
+<ProxyBug: ProxyBug:fix this>
+
+# Select related + filter on proxy
+>>> ProxyBug.objects.select_related().get(version__icontains='beta')
+<ProxyBug: ProxyBug:fix this>
+
+# Proxy of proxy, select_related + filter
+>>> ProxyProxyBug.objects.select_related().get(version__icontains='beta')
+<ProxyProxyBug: ProxyProxyBug:fix this>
+
+# Select related + filter on a related proxy field
+>>> ProxyImprovement.objects.select_related().get(reporter__name__icontains='butor')
+<ProxyImprovement: ProxyImprovement:improve that>
+
+# Select related + filter on a related proxy of proxy field
+>>> ProxyImprovement.objects.select_related().get(associated_bug__summary__icontains='fix')
+<ProxyImprovement: ProxyImprovement:improve that>
 """}
-
-

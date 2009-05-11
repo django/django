@@ -778,7 +778,9 @@ class BaseQuery(object):
         qn2 = self.connection.ops.quote_name
         aliases = set()
         only_load = self.deferred_to_columns()
-        proxied_model = opts.proxy and opts.proxy_for_model or 0
+        # Skip all proxy to the root proxied model
+        proxied_model = get_proxied_model(opts)
+
         if start_alias:
             seen = {None: start_alias}
         for field, model in opts.get_fields_with_model():
@@ -1301,7 +1303,10 @@ class BaseQuery(object):
         opts = self.model._meta
         root_alias = self.tables[0]
         seen = {None: root_alias}
-        proxied_model = opts.proxy and opts.proxy_for_model or 0
+        
+        # Skip all proxy to the root proxied model
+        proxied_model = get_proxied_model(opts)
+
         for field, model in opts.get_fields_with_model():
             if model not in seen:
                 if model is proxied_model:
@@ -1376,6 +1381,13 @@ class BaseQuery(object):
                 alias = root_alias
                 alias_chain = []
                 for int_model in opts.get_base_chain(model):
+                    # Proxy model have elements in base chain
+                    # with no parents, assign the new options
+                    # object and skip to the next base in that
+                    # case
+                    if not int_opts.parents[int_model]:
+                        int_opts = int_model._meta
+                        continue
                     lhs_col = int_opts.parents[int_model].column
                     dedupe = lhs_col in opts.duplicate_targets
                     if dedupe:
@@ -1720,7 +1732,9 @@ class BaseQuery(object):
                 raise MultiJoin(pos + 1)
             if model:
                 # The field lives on a base class of the current model.
-                proxied_model = opts.proxy and opts.proxy_for_model or 0
+                # Skip the chain of proxy to the concrete proxied model                
+                proxied_model = get_proxied_model(opts)
+
                 for int_model in opts.get_base_chain(model):
                     if int_model is proxied_model:
                         opts = int_model._meta
@@ -2423,3 +2437,11 @@ def add_to_dict(data, key, value):
         data[key].add(value)
     else:
         data[key] = set([value])
+
+def get_proxied_model(opts):
+    int_opts = opts
+    proxied_model = None
+    while int_opts.proxy:
+        proxied_model = int_opts.proxy_for_model
+        int_opts = proxied_model._meta
+    return proxied_model

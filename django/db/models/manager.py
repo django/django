@@ -57,7 +57,7 @@ class Manager(object):
         setattr(model, name, ManagerDescriptor(self))
         if not getattr(model, '_default_manager', None) or self.creation_counter < model._default_manager.creation_counter:
             model._default_manager = self
-        if model._meta.abstract or self._inherited:
+        if model._meta.abstract or (self._inherited and not self.model._meta.proxy):
             model._meta.abstract_managers.append((self.creation_counter, name,
                     self))
         else:

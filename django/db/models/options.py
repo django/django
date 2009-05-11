@@ -461,8 +461,13 @@ class Options(object):
         if ancestor in self.parents:
             return self.parents[ancestor]
         for parent in self.parents:
-            if parent._meta.get_ancestor_link(ancestor):
-                return self.parents[parent]
+            # Tries to get a link field from the immediate parent
+            parent_link = parent._meta.get_ancestor_link(ancestor)
+            if parent_link:
+                # In case of a proxied model, the first link
+                # of the chain to the ancestor is that parent
+                # links
+                return self.parents[parent] or parent_link
 
     def get_ordered_objects(self):
         "Returns a list of Options objects that are ordered with respect to this object."
