@@ -86,6 +86,7 @@ True
 >>> p3.mugshot.file.open()
 >>> p = Person.objects.create(name="Bob The Builder", mugshot=File(p3.mugshot.file))
 >>> p.save()
+>>> p3.mugshot.file.close() 
 
 # Delete all test files
 >>> shutil.rmtree(temp_storage_dir)
