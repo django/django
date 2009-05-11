@@ -51,14 +51,14 @@ def query_class(QueryClass, Database):
                       for v in row[rn_offset:index_start]]
             for value, field in map(None, row[index_start:], fields):
                 values.append(self.convert_values(value, field))
-            return values
+            return tuple(values)
 
         def convert_values(self, value, field):
             if isinstance(value, Database.LOB):
                 value = value.read()
                 if field and field.get_internal_type() == 'TextField':
                     value = force_unicode(value)
-                    
+
             # Oracle stores empty strings as null. We need to undo this in
             # order to adhere to the Django convention of using the empty
             # string instead of null, but only if the field accepts the
@@ -148,4 +148,3 @@ def unpickle_query_class(QueryClass):
     klass = query_class(QueryClass, cx_Oracle)
     return klass.__new__(klass)
 unpickle_query_class.__safe_for_unpickling__ = True
-
