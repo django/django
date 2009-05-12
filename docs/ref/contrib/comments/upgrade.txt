@@ -25,6 +25,15 @@ The main changes from the old system are:
       functions: ``{% get_comment_form %}``, which returns a form for posting a
       new comment, and ``{% render_comment_form %}``, which renders said form
       using the ``comments/form.html`` template.
+      
+    * The way comments are include in your URLconf have changed; you'll need to
+      replace::
+    
+            (r'^comments/', include('django.contrib.comments.urls.comments')),
+      
+      with::
+
+            (r'^comments/', include('django.contrib.comments.urls')),
 
 Upgrading data
 --------------
