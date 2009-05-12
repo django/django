@@ -26,31 +26,33 @@ probably already have it installed.
 
 .. _jython: http://jython.org/
 
-Install Apache and mod_python
+Install Apache and mod_wsgi
 =============================
 
-If you just want to experiment with Django, skip ahead to the next
-section; Django includes a lightweight web server you can use for
-testing, so you won't need to set up Apache until you're ready to
-deploy Django in production.
+If you just want to experiment with Django, skip ahead to the next section;
+Django includes a lightweight web server you can use for testing, so you won't
+need to set up Apache until you're ready to deploy Django in production.
 
-If you want to use Django on a production site, use Apache with `mod_python`_.
-mod_python is similar to mod_perl -- it embeds Python within Apache and loads
+If you want to use Django on a production site, use Apache with `mod_wsgi`_.
+mod_wsgi is similar to mod_perl -- it embeds Python within Apache and loads
 Python code into memory when the server starts. Code stays in memory throughout
-the life of an Apache process, which leads to significant performance gains
-over other server arrangements. Make sure you have Apache installed, with the
-mod_python module activated. Django requires Apache 2.x and mod_python 3.x.
+the life of an Apache process, which leads to significant performance gains over
+other server arrangements. Make sure you have Apache installed, with the
+mod_wsgi module activated. Django will work with any version of Apache that
+supports mod_wsgi.
 
-See :ref:`How to use Django with mod_python <howto-deployment-modpython>` for
-information on how to configure mod_python once you have it installed.
+See :ref:`How to use Django with mod_wsgi <howto-deployment-modwsgi>` for
+information on how to configure mod_wsgi once you have it installed.
 
-If you can't use mod_python for some reason, fear not: Django follows the WSGI_
-spec, which allows it to run on a variety of server platforms. See the
-`server-arrangements wiki page`_ for specific installation instructions for
-each platform.
+If you can't use mod_wsgi for some reason, fear not: Django supports many other
+deployment options. A great second choice is :ref:`mod_python
+<howto-deployment-modpython>`, the predecessor to mod_wsgi. Additionally, Django
+follows the WSGI_ spec, which allows it to run on a variety of server platforms.
+See the `server-arrangements wiki page`_ for specific installation instructions
+for each platform.
 
 .. _Apache: http://httpd.apache.org/
-.. _mod_python: http://www.modpython.org/
+.. _mod_wsgi: http://code.google.com/p/modwsgi/
 .. _WSGI: http://www.python.org/peps/pep-0333.html
 .. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
