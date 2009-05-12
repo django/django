@@ -105,10 +105,9 @@ def get_commands():
         # Find the project directory
         try:
             from django.conf import settings
-            module = import_module(settings.SETTINGS_MODULE.split('.', 1)[0])
-            project_directory = setup_environ(module,
-                                                settings.SETTINGS_MODULE)
-        except (AttributeError, EnvironmentError, ImportError):
+            module = import_module(settings.SETTINGS_MODULE)
+            project_directory = setup_environ(module, settings.SETTINGS_MODULE)
+        except (AttributeError, EnvironmentError, ImportError, KeyError):
             project_directory = None
 
         # Find and load the management module for each installed app.
@@ -156,11 +155,11 @@ def call_command(name, *args, **options):
         raise CommandError, "Unknown command: %r" % name
 
     # Grab out a list of defaults from the options. optparse does this for us
-    # when the script runs from the command line, but since call_command can 
+    # when the script runs from the command line, but since call_command can
     # be called programatically, we need to simulate the loading and handling
     # of defaults (see #10080 for details).
     defaults = dict([(o.dest, o.default)
-                     for o in klass.option_list 
+                     for o in klass.option_list
                      if o.default is not NO_DEFAULT])
     defaults.update(options)
 
@@ -316,7 +315,11 @@ def setup_environ(settings_mod, original_settings_path=None):
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory
     # "myproject", this code would add "/path/to/myproject" to sys.path.
-    project_directory, settings_filename = os.path.split(settings_mod.__file__)
+    if '__init__.py' in settings_mod.__file__:
+        p = os.path.dirname(settings_mod.__file__)
+    else:
+        p = settings_mod.__file__
+    project_directory, settings_filename = os.path.split(p)
     if project_directory == os.curdir or not project_directory:
         project_directory = os.getcwd()
     project_name = os.path.basename(project_directory)
