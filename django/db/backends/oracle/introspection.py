@@ -21,6 +21,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     except AttributeError:
         pass
 
+    try:
+        data_types_reverse[cx_Oracle.UNICODE] = 'CharField'
+    except AttributeError:
+        pass
+
     def get_table_list(self, cursor):
         "Returns a list of table names in the current database."
         cursor.execute("SELECT TABLE_NAME FROM USER_TABLES")
