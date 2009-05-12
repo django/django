@@ -1,5 +1,6 @@
+import unittest
 from django import forms
-from django.contrib.formtools import preview, wizard
+from django.contrib.formtools import preview, wizard, utils
 from django import http
 from django.test import TestCase
 
@@ -100,6 +101,24 @@ class PreviewTests(TestCase):
         self.test_data.update({'hash':hash, 'bool1':u'False'})
         response = self.client.post('/test1/', self.test_data)
         self.assertEqual(response.content, success_string)
+
+class SecurityHashTests(unittest.TestCase):
+
+    def test_textfield_hash(self):
+        """
+        Regression test for #10034: the hash generation function should ignore
+        leading/trailing whitespace so as to be friendly to broken browsers that
+        submit it (usually in textareas).
+        """
+        class TestForm(forms.Form):
+            name = forms.CharField()
+            bio = forms.CharField()
+        
+        f1 = TestForm({'name': 'joe', 'bio': 'Nothing notable.'})
+        f2 = TestForm({'name': '  joe', 'bio': 'Nothing notable.  '})
+        hash1 = utils.security_hash(None, f1)
+        hash2 = utils.security_hash(None, f2)
+        self.assertEqual(hash1, hash2)
 
 #
 # FormWizard tests
