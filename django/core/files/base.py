@@ -1,7 +1,5 @@
 import os
-
 from django.utils.encoding import smart_str, smart_unicode
-
 try:
     from cStringIO import StringIO
 except ImportError:
