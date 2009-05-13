@@ -295,13 +295,20 @@ class DateTimeInput(Input):
         if format:
             self.format = format
 
-    def render(self, name, value, attrs=None):
+    def _format_value(self, value):
         if value is None:
-            value = ''
+            return ''
         elif hasattr(value, 'strftime'):
             value = datetime_safe.new_datetime(value)
-            value = value.strftime(self.format)
+            return value.strftime(self.format)
+        return value
+
+    def render(self, name, value, attrs=None):
+        value = self._format_value(value)
         return super(DateTimeInput, self).render(name, value, attrs)
+
+    def _has_changed(self, initial, data):
+        return super(DateTimeInput, self)._has_changed(self._format_value(initial), data)
 
 class TimeInput(Input):
     input_type = 'text'
@@ -400,11 +407,11 @@ class NullBooleanSelect(Select):
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name, None)
-        return {u'2': True, 
-                True: True, 
-                'True': True, 
-                u'3': False, 
-                'False': False, 
+        return {u'2': True,
+                True: True,
+                'True': True,
+                u'3': False,
+                'False': False,
                 False: False}.get(value, None)
 
     def _has_changed(self, initial, data):
