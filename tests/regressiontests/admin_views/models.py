@@ -152,6 +152,29 @@ class FabricAdmin(admin.ModelAdmin):
     list_display = ('surface',)
     list_filter = ('surface',)
 
+class Person(models.Model):
+    GENDER_CHOICES = (
+        (1, "Male"),
+        (2, "Female"),
+    )
+    name = models.CharField(max_length=100)
+    gender = models.IntegerField(choices=GENDER_CHOICES)
+    alive = models.BooleanField()
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["id"]
+
+class PersonAdmin(admin.ModelAdmin):
+    list_display = ('name', 'gender', 'alive')
+    list_editable = ('gender', 'alive')
+    list_filter = ('gender',)
+    search_fields = (u'name',)
+    ordering = ["id"]
+    save_as = True
+
 class Persona(models.Model):
     """
     A simple persona associated with accounts, to test inlining of related
@@ -308,6 +331,7 @@ admin.site.register(Section, save_as=True, inlines=[ArticleInline])
 admin.site.register(ModelWithStringPrimaryKey)
 admin.site.register(Color)
 admin.site.register(Thing, ThingAdmin)
+admin.site.register(Person, PersonAdmin)
 admin.site.register(Persona, PersonaAdmin)
 admin.site.register(Parent, ParentAdmin)
 admin.site.register(EmptyModel, EmptyModelAdmin)

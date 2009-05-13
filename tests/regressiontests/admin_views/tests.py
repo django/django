@@ -14,7 +14,7 @@ from django.utils.html import escape
 # local test models
 from models import (Article, BarAccount, CustomArticle, EmptyModel,
                     FooAccount, Gallery, ModelWithStringPrimaryKey,
-                    Persona, Picture, Section,
+                    Person, Persona, Picture, Section,
                     Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit)
 
 try:
@@ -228,6 +228,34 @@ class AdminViewBasicTest(TestCase):
             '<a href="?surface__exact=y">Vertical</a>' in response.content,
             "Changelist filter isn't showing options contained inside a model field 'choices' option named group."
         )
+
+class SaveAsTests(TestCase):
+    fixtures = ['admin-views-users.xml','admin-views-person.xml']
+    
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+    
+    def test_save_as_duplication(self):
+        """Ensure save as actually creates a new person"""
+        post_data = {'_saveasnew':'', 'name':'John M', 'gender':1}
+        response = self.client.post('/test_admin/admin/admin_views/person/1/', post_data)
+        self.assertEqual(len(Person.objects.filter(name='John M')), 1)
+        self.assertEqual(len(Person.objects.filter(id=1)), 1)
+    
+    def test_save_as_display(self):
+        """
+        Ensure that 'save as' is displayed when activated and after submitting
+        invalid data aside save_as_new will not show us a form to overwrite the
+        initial model.
+        """
+        response = self.client.get('/test_admin/admin/admin_views/person/1/')
+        self.assert_(response.context[-1]['save_as'])
+        post_data = {'_saveasnew':'', 'name':'John M', 'gender':3, 'alive':'checked'}
+        response = self.client.post('/test_admin/admin/admin_views/person/1/', post_data)
+        self.assertEqual(response.context[-1]['form_url'], '../add/')
 
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
