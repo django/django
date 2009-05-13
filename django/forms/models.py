@@ -464,7 +464,7 @@ class BaseModelFormSet(BaseFormSet):
             #
             # This logic is in the wrong place here on the 1.0.X branch.
             # In the 1.1 series this logic exists as the QuerySet.ordered
-            # property, but since that's new in 1.1 here in 1.0 we just 
+            # property, but since that's new in 1.1 here in 1.0 we just
             # have to deal with this slightly smelly code here.
             if qs.query.extra_order_by or qs.query.order_by:
                 ordered = True
@@ -675,7 +675,11 @@ class BaseInlineFormSet(BaseModelFormSet):
         self.save_as_new = save_as_new
         # is there a better way to get the object descriptor?
         self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
-        qs = self.model._default_manager.filter(**{self.fk.name: self.instance})
+        if self.fk.rel.field_name == self.fk.rel.to._meta.pk.name:
+            backlink_value = self.instance
+        else:
+            backlink_value = getattr(self.instance, self.fk.rel.field_name)
+        qs = self.model._default_manager.filter(**{self.fk.name: backlink_value})
         super(BaseInlineFormSet, self).__init__(data, files, prefix=prefix,
                                                 queryset=qs)
 
@@ -704,7 +708,7 @@ class BaseInlineFormSet(BaseModelFormSet):
 
     def save_new(self, form, commit=True):
         fk_attname = self.fk.get_attname()
-        kwargs = {fk_attname: self.instance.pk}
+        kwargs = {fk_attname: getattr(self.instance, self.fk.rel.field_name)}
         new_obj = self.model(**kwargs)
         if fk_attname == self._pk_field.attname or self._pk_field.auto_created:
             exclude =  [self._pk_field.name]
@@ -720,6 +724,7 @@ class BaseInlineFormSet(BaseModelFormSet):
             # The foreign key field might not be on the form, so we poke at the
             # Model field to get the label, since we need that for error messages.
             form.fields[self.fk.name] = InlineForeignKeyField(self.instance,
+                to_field=self.fk.rel.field_name,
                 label=getattr(form.fields.get(self.fk.name), 'label', capfirst(self.fk.verbose_name))
             )
 
@@ -816,8 +821,12 @@ class InlineForeignKeyField(Field):
     def __init__(self, parent_instance, *args, **kwargs):
         self.parent_instance = parent_instance
         self.pk_field = kwargs.pop("pk_field", False)
+        self.to_field = kwargs.pop("to_field", None)
         if self.parent_instance is not None:
-            kwargs["initial"] = self.parent_instance.pk
+            if self.to_field:
+                kwargs["initial"] = getattr(self.parent_instance, self.to_field)
+            else:
+                kwargs["initial"] = self.parent_instance.pk
         kwargs["required"] = False
         kwargs["widget"] = InlineForeignKeyHiddenInput
         super(InlineForeignKeyField, self).__init__(*args, **kwargs)
@@ -829,7 +838,11 @@ class InlineForeignKeyField(Field):
             # if there is no value act as we did before.
             return self.parent_instance
         # ensure the we compare the values as equal types.
-        if force_unicode(value) != force_unicode(self.parent_instance.pk):
+        if self.to_field:
+            orig = getattr(self.parent_instance, self.to_field)
+        else:
+            orig = self.parent_instance.pk
+        if force_unicode(value) != force_unicode(orig):
             raise ValidationError(self.error_messages['invalid_choice'])
         if self.pk_field:
             return self.parent_instance.pk
