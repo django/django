@@ -1288,8 +1288,8 @@ call::
 
     >>> from django.core import urlresolvers
     >>> c = Choice.objects.get(...)
-    >>> change_url = urlresolvers.reverse('admin_polls_choice_change', (c.id,))
+    >>> change_url = urlresolvers.reverse('admin_polls_choice_change', args=(c.id,))
 
 However, if the admin instance was named ``custom``, you would need to call::
 
-    >>> change_url = urlresolvers.reverse('custom_admin_polls_choice_change', (c.id,))
+    >>> change_url = urlresolvers.reverse('custom_admin_polls_choice_change', args=(c.id,))
