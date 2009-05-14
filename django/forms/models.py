@@ -612,7 +612,12 @@ class BaseModelFormSet(BaseFormSet):
         for form in self.initial_forms:
             pk_name = self._pk_field.name
             raw_pk_value = form._raw_value(pk_name)
-            pk_value = form.fields[pk_name].clean(raw_pk_value).pk
+
+            # clean() for different types of PK fields can sometimes return
+            # the model instance, and sometimes the PK. Handle either.
+            pk_value = form.fields[pk_name].clean(raw_pk_value)
+            pk_value = getattr(pk_value, 'pk', pk_value)
+                
             obj = existing_objects[pk_value]
             if self.can_delete:
                 raw_delete_value = form._raw_value(DELETION_FIELD_NAME)
