@@ -697,7 +697,7 @@ the following line to your URLconf::
 
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
-.. function:: views.login()
+.. function:: views.login(request, [template_name, redirect_field_name])
 
     Here's what ``django.contrib.auth.views.login`` does:
 
@@ -712,7 +712,7 @@ the following line to your URLconf::
           redisplays the login form.
 
     It's your responsibility to provide the login form in a template called
-    ``registration/login.html`` by default. This template gets passed three
+    ``registration/login.html`` by default. This template gets passed four
     template context variables:
 
         * ``form``: A :class:`~django.forms.Form` object representing the login
@@ -721,14 +721,18 @@ the following line to your URLconf::
 
         * ``next``: The URL to redirect to after successful login. This may
           contain a query string, too.
-
-        * ``site_name``: The name of the current
-          :class:`~django.contrib.sites.models.Site`, according to the
-          :setting:`SITE_ID` setting. If you're using the Django development
-          version and you don't have the site framework installed, this will be
-          set to the value of :attr:`request.META['SERVER_NAME']
-          <django.http.HttpRequest.META>`. For more on sites, see
-          :ref:`ref-contrib-sites`.
+        
+        * ``site``: The current :class:`~django.contrib.sites.models.Site`,
+          according to the :setting:`SITE_ID` setting. If you don't have the
+          site framework installed, this will be set to an instance of
+          :class:`~django.contrib.sites.models.RequestSite`, which derives the
+          site name and domain from the current
+          :class:`~django.http.HttpRequest`.
+        
+        * ``site_name``: An alias for ``site.name``. If you don't have the site
+          framework installed, this will be set to the value of
+          :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+          For more on sites, see :ref:`ref-contrib-sites`.
 
     If you'd prefer not to call the template :file:`registration/login.html`,
     you can pass the ``template_name`` parameter via the extra arguments to
@@ -736,7 +740,11 @@ the following line to your URLconf::
     :file:`myapp/login.html` instead::
 
         (r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'myapp/login.html'}),
-
+        
+    You can also specify the name of the ``GET`` field which contains the URL
+    to redirect to after login by passing ``redirect_field_name`` to the view.
+    By default, the field is called ``next``.
+        
     Here's a sample :file:`registration/login.html` template you can use as a
     starting point. It assumes you have a :file:`base.html` template that
     defines a ``content`` block:
@@ -818,7 +826,7 @@ includes a few other useful built-in views located in
           displaying the password change form. This will default to
           :file:`registration/password_change_form.html` if not supplied.
 
-        * ``post_change_redirect``: The URL to redirect to after successful
+        * ``post_change_redirect``: The URL to redirect to after a successful
           password change.
 
     **Template context:**
@@ -835,7 +843,7 @@ includes a few other useful built-in views located in
           default to :file:`registration/password_change_done.html` if not
           supplied.
 
-.. function:: views.password_reset
+.. function:: views.password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect])
 
     Allows a user to reset their password, and sends them the new password
     in an e-mail.
@@ -849,12 +857,22 @@ includes a few other useful built-in views located in
         * ``email_template_name``: The full name of a template to use for
           generating the e-mail with the new password. This will default to
           :file:`registration/password_reset_email.html` if not supplied.
-
+        
+        * ``password_reset_form``: Form that will be used to set the password.
+          Defaults to ``SetPasswordForm``.
+        
+        * ``token_generator``: Instance of the class to check the password. This
+          will default to ``default_token_generator``, it's an instance of
+          ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
+          
+        * ``post_reset_redirect``: The URL to redirect to after a successful
+          password change.
+          
     **Template context:**
 
         * ``form``: The form for resetting the user's password.
 
-.. function:: views.password_reset_done
+.. function:: views.password_reset_done(request[, template_name])
 
     The page shown after a user has reset their password.
 
@@ -864,7 +882,7 @@ includes a few other useful built-in views located in
           default to :file:`registration/password_reset_done.html` if not
           supplied.
 
-.. function:: views.redirect_to_login
+.. function:: views.redirect_to_login(next[, login_url, redirect_field_name])
 
     Redirects to the login page, and then back to another URL after a
     successful login.
@@ -877,8 +895,12 @@ includes a few other useful built-in views located in
 
         * ``login_url``: The URL of the login page to redirect to. This will
           default to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
-
-.. function:: password_reset_confirm(request[,uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
+          
+        * ``redirect_field_name``: The name of a ``GET`` field containing the
+          URL to redirect to after log out. Overrides ``next`` if the given
+          ``GET`` parameter is passed.
+          
+.. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
 
     Presents a form for entering a new password.
 
@@ -892,14 +914,15 @@ includes a few other useful built-in views located in
         * ``token_generator``: Instance of the class to check the password. This
           will default to ``default_token_generator``, it's an instance of
           ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
-        * ``set_password_form``: Form that will use to set the password. This will 
-          default to ``SetPasswordForm``.
+        * ``set_password_form``: Form that will be used to set the password.
+          This will default to ``SetPasswordForm``.
         * ``post_reset_redirect``: URL to redirect after the password reset
           done. This will default to ``None``.
 
 .. function:: password_reset_complete(request[,template_name])
 
-   Presents a view that informs that the password has been changed very well.
+   Presents a view which informs the user that the password has been
+   successfully changed.
 
    **Optional arguments:** 
 
