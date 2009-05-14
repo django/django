@@ -2,8 +2,6 @@
 A generic comment-moderation system which allows configuration of
 moderation options on a per-model basis.
 
-Originally part of django-comment-utils, by James Bennett.
-
 To use, do two things:
 
 1. Create or import a subclass of ``CommentModerator`` defining the
@@ -41,7 +39,7 @@ And finally register it for moderation::
 
     moderator.register(Entry, EntryModerator)
 
-This sample class would apply several moderation steps to each new
+This sample class would apply two moderation steps to each new
 comment submitted on an Entry:
 
 * If the entry's ``enable_comments`` field is set to ``False``, the
@@ -54,19 +52,13 @@ For a full list of built-in moderation options and other
 configurability, see the documentation for the ``CommentModerator``
 class.
 
-Several example subclasses of ``CommentModerator`` are provided in
-`django-comment-utils`_, both to provide common moderation options and to
-demonstrate some of the ways subclasses can customize moderation
-behavior.
-
-.. _`django-comment-utils`: http://code.google.com/p/django-comment-utils/
 """
 
 import datetime
 
 from django.conf import settings
 from django.core.mail import send_mail
-from django.db.models import signals
+from django.contrib.comments import signals
 from django.db.models.base import ModelBase
 from django.template import Context, loader
 from django.contrib import comments
@@ -145,9 +137,10 @@ class CommentModerator(object):
     Most common moderation needs can be covered by changing these
     attributes, but further customization can be obtained by
     subclassing and overriding the following methods. Each method will
-    be called with two arguments: ``comment``, which is the comment
-    being submitted, and ``content_object``, which is the object the
-    comment will be attached to::
+    be called with three arguments: ``comment``, which is the comment
+    being submitted, ``content_object``, which is the object the
+    comment will be attached to, and ``request``, which is the
+    ``HttpRequest`` in which the comment is being submitted::
 
     ``allow``
         Should return ``True`` if the comment should be allowed to
@@ -200,7 +193,7 @@ class CommentModerator(object):
             raise ValueError("Cannot determine moderation rules because date field is set to a value in the future")
         return now - then
 
-    def allow(self, comment, content_object):
+    def allow(self, comment, content_object, request):
         """
         Determine whether a given comment is allowed to be posted on
         a given object.
@@ -217,7 +210,7 @@ class CommentModerator(object):
                 return False
         return True
 
-    def moderate(self, comment, content_object):
+    def moderate(self, comment, content_object, request):
         """
         Determine whether a given comment on a given object should be
         allowed to show up immediately, or should be marked non-public
@@ -232,57 +225,7 @@ class CommentModerator(object):
                 return True
         return False
 
-    def comments_open(self, obj):
-        """
-        Return ``True`` if new comments are being accepted for
-        ``obj``, ``False`` otherwise.
-
-        The algorithm for determining this is as follows:
-
-        1. If ``enable_field`` is set and the relevant field on
-           ``obj`` contains a false value, comments are not open.
-
-        2. If ``close_after`` is set and the relevant date field on
-           ``obj`` is far enough in the past, comments are not open.
-
-        3. If neither of the above checks determined that comments are
-           not open, comments are open.
-
-        """
-        if self.enable_field:
-            if not getattr(obj, self.enable_field):
-                return False
-        if self.auto_close_field and self.close_after:
-            if self._get_delta(datetime.datetime.now(), getattr(obj, self.auto_close_field)).days >= self.close_after:
-                return False
-        return True
-
-    def comments_moderated(self, obj):
-        """
-        Return ``True`` if new comments for ``obj`` are being
-        automatically sent to moderation, ``False`` otherwise.
-
-        The algorithm for determining this is as follows:
-
-        1. If ``moderate_field`` is set and the relevant field on
-           ``obj`` contains a true value, comments are moderated.
-
-        2. If ``moderate_after`` is set and the relevant date field on
-           ``obj`` is far enough in the past, comments are moderated.
-
-        3. If neither of the above checks decided that comments are
-           moderated, comments are not moderated.
-
-        """
-        if self.moderate_field:
-            if getattr(obj, self.moderate_field):
-                return True
-        if self.auto_moderate_field and self.moderate_after:
-            if self._get_delta(datetime.datetime.now(), getattr(obj, self.auto_moderate_field)).days >= self.moderate_after:
-                return True
-        return False
-
-    def email(self, comment, content_object):
+    def email(self, comment, content_object, request):
         """
         Send email notification of a new comment to site staff when email
         notifications have been requested.
@@ -341,8 +284,8 @@ class Moderator(object):
         from the comment models.
 
         """
-        signals.pre_save.connect(self.pre_save_moderation, sender=comments.get_model())
-        signals.post_save.connect(self.post_save_moderation, sender=comments.get_model())
+        signals.comment_will_be_posted.connect(self.pre_save_moderation, sender=comments.get_model())
+        signals.comment_was_posted.connect(self.post_save_moderation, sender=comments.get_model())
 
     def register(self, model_or_iterable, moderation_class):
         """
@@ -376,66 +319,35 @@ class Moderator(object):
                 raise NotModerated("The model '%s' is not currently being moderated" % model._meta.module_name)
             del self._registry[model]
 
-    def pre_save_moderation(self, sender, instance, **kwargs):
+    def pre_save_moderation(self, sender, comment, request, **kwargs):
         """
         Apply any necessary pre-save moderation steps to new
         comments.
 
         """
-        model = instance.content_type.model_class()
-        if instance.id or (model not in self._registry):
+        model = comment.content_type.model_class()
+        if model not in self._registry:
             return
-        content_object = instance.content_object
+        content_object = comment.content_object
         moderation_class = self._registry[model]
-        if not moderation_class.allow(instance, content_object): # Comment will get deleted in post-save hook.
-            instance.moderation_disallowed = True
-            return
-        if moderation_class.moderate(instance, content_object):
-            instance.is_public = False
 
-    def post_save_moderation(self, sender, instance, **kwargs):
+        # Comment will be disallowed outright (HTTP 403 response)
+        if not moderation_class.allow(comment, content_object, request): 
+            return False
+
+        if moderation_class.moderate(comment, content_object, request):
+            comment.is_public = False
+
+    def post_save_moderation(self, sender, comment, request, **kwargs):
         """
         Apply any necessary post-save moderation steps to new
         comments.
 
         """
-        model = instance.content_type.model_class()
+        model = comment.content_type.model_class()
         if model not in self._registry:
             return
-        if hasattr(instance, 'moderation_disallowed'):
-            instance.delete()
-            return
-        self._registry[model].email(instance, instance.content_object)
-
-    def comments_open(self, obj):
-        """
-        Return ``True`` if new comments are being accepted for
-        ``obj``, ``False`` otherwise.
-
-        If no moderation rules have been registered for the model of
-        which ``obj`` is an instance, comments are assumed to be open
-        for that object.
-
-        """
-        model = obj.__class__
-        if model not in self._registry:
-            return True
-        return self._registry[model].comments_open(obj)
-
-    def comments_moderated(self, obj):
-        """
-        Return ``True`` if new comments for ``obj`` are being
-        automatically sent to moderation, ``False`` otherwise.
-
-        If no moderation rules have been registered for the model of
-        which ``obj`` is an instance, comments for that object are
-        assumed not to be moderated.
-
-        """
-        model = obj.__class__
-        if model not in self._registry:
-            return False
-        return self._registry[model].comments_moderated(obj)
+        self._registry[model].email(comment, comment.content_object, request)
 
 # Import this instance in your own code to use in registering
 # your models for moderation.

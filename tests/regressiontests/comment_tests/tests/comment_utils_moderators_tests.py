@@ -1,4 +1,5 @@
 from regressiontests.comment_tests.tests import CommentTestCase, CT, Site
+from django.contrib.comments.forms import CommentForm
 from django.contrib.comments.models import Comment
 from django.contrib.comments.moderation import moderator, CommentModerator, AlreadyModerated
 from regressiontests.comment_tests.models import Entry
@@ -22,24 +23,26 @@ class CommentUtilsModeratorTests(CommentTestCase):
     fixtures = ["comment_utils.xml"]
 
     def createSomeComments(self):
-        c1 = Comment.objects.create(
-            content_type = CT(Entry),
-            object_pk = "1",
-            user_name = "Joe Somebody",
-            user_email = "jsomebody@example.com",
-            user_url = "http://example.com/~joe/",
-            comment = "First!",
-            site = Site.objects.get_current(),
-        )
-        c2 = Comment.objects.create(
-            content_type = CT(Entry),
-            object_pk = "2",
-            user_name = "Joe the Plumber",
-            user_email = "joetheplumber@whitehouse.gov",
-            user_url = "http://example.com/~joe/",
-            comment = "Second!",
-            site = Site.objects.get_current(),
-        )
+        # Tests for the moderation signals must actually post data
+        # through the comment views, because only the comment views
+        # emit the custom signals moderation listens for.
+        e = Entry.objects.get(pk=1)
+        data = self.getValidData(e)
+        self.client.post("/post/", data, REMOTE_ADDR="1.2.3.4")
+        self.client.post("/post/", data, REMOTE_ADDR="1.2.3.4")
+
+        # We explicitly do a try/except to get the comment we've just
+        # posted because moderation may have disallowed it, in which
+        # case we can just return it as None.
+        try:
+            c1 = Comment.objects.all()[0]
+        except IndexError:
+            c1 = None
+
+        try:
+            c2 = Comment.objects.all()[0]
+        except IndexError:
+            c2 = None
         return c1, c2
 
     def tearDown(self):
@@ -51,17 +54,17 @@ class CommentUtilsModeratorTests(CommentTestCase):
 
     def testEmailNotification(self):
         moderator.register(Entry, EntryModerator1)
-        c1, c2 = self.createSomeComments()
+        self.createSomeComments()
         self.assertEquals(len(mail.outbox), 2)
 
     def testCommentsEnabled(self):
         moderator.register(Entry, EntryModerator2)
-        c1, c2 = self.createSomeComments()
+        self.createSomeComments()
         self.assertEquals(Comment.objects.all().count(), 1)
 
     def testAutoCloseField(self):
         moderator.register(Entry, EntryModerator3)
-        c1, c2 = self.createSomeComments()
+        self.createSomeComments()
         self.assertEquals(Comment.objects.all().count(), 0)
 
     def testAutoModerateField(self):

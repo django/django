@@ -12,12 +12,10 @@ but the amount of comment spam circulating on the Web today
 essentially makes it necessary to have some sort of automatic
 moderation system in place for any application which makes use of
 comments. To make this easier to handle in a consistent fashion,
-``django.contrib.comments.moderation`` (based on `comment_utils`_)
-provides a generic, extensible comment-moderation system which can
-be applied to any model or set of models which want to make use of
-Django's comment system.
+``django.contrib.comments.moderation`` provides a generic, extensible
+comment-moderation system which can be applied to any model or set of
+models which want to make use of Django's comment system.
 
-.. _`comment_utils`: http://code.google.com/p/django-comment-utils/
 
 Overview
 ========
@@ -140,29 +138,28 @@ Adding custom moderation methods
 --------------------------------
 
 For situations where the built-in options listed above are not
-sufficient, subclasses of
-:class:`CommentModerator` can also
-override the methods which actually perform the moderation, and apply any
-logic they desire.
-:class:`CommentModerator` defines three
-methods which determine how moderation will take place; each method will be
-called by the moderation system and passed two arguments: ``comment``, which
-is the new comment being posted, and ``content_object``, which is the
-object the comment will be attached to:
+sufficient, subclasses of :class:`CommentModerator` can also override
+the methods which actually perform the moderation, and apply any logic
+they desire.  :class:`CommentModerator` defines three methods which
+determine how moderation will take place; each method will be called
+by the moderation system and passed two arguments: ``comment``, which
+is the new comment being posted, ``content_object``, which is the
+object the comment will be attached to, and ``request``, which is the
+``HttpRequest`` in which the comment is being submitted:
 
-.. method:: CommentModerator.allow(comment, content_object)
+.. method:: CommentModerator.allow(comment, content_object, request)
 
     Should return ``True`` if the comment should be allowed to
     post on the content object, and ``False`` otherwise (in which
     case the comment will be immediately deleted).
 
-.. method:: CommentModerator.email(comment, content_object)
+.. method:: CommentModerator.email(comment, content_object, request)
 
     If email notification of the new comment should be sent to
     site staff or moderators, this method is responsible for
     sending the email.
 
-.. method:: CommentModerator.moderate(comment, content_object)
+.. method:: CommentModerator.moderate(comment, content_object, request)
 
     Should return ``True`` if the comment should be moderated (in
     which case its ``is_public`` field will be set to ``False``
@@ -217,18 +214,18 @@ models with an instance of the subclass.
         Determines how moderation is set up globally. The base
         implementation in
         :class:`Moderator` does this by
-        attaching listeners to the :data:`~django.db.models.signals.pre_save`
-        and :data:`~django.db.models.signals.post_save` signals from the
+        attaching listeners to the :data:`~django.contrib.comments.signals.comment_will_be_posted`
+        and :data:`~django.contrib.comments.signals.comment_was_posted` signals from the
         comment models.
 
-    .. method:: pre_save_moderation(sender, instance, **kwargs)
+    .. method:: pre_save_moderation(sender, comment, request, **kwargs)
 
         In the base implementation, applies all pre-save moderation
         steps (such as determining whether the comment needs to be
         deleted, or whether it needs to be marked as non-public or
         generate an email).
 
-    .. method:: post_save_moderation(sender, instance, **kwargs)
+    .. method:: post_save_moderation(sender, comment, request, **kwargs)
 
         In the base implementation, applies all post-save moderation
         steps (currently this consists entirely of deleting comments
