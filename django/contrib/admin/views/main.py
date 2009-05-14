@@ -197,19 +197,21 @@ class ChangeList(object):
             raise IncorrectLookupParameters
 
         # Use select_related() if one of the list_display options is a field
-        # with a relationship.
-        if self.list_select_related:
-            qs = qs.select_related()
-        else:
-            for field_name in self.list_display:
-                try:
-                    f = self.lookup_opts.get_field(field_name)
-                except models.FieldDoesNotExist:
-                    pass
-                else:
-                    if isinstance(f.rel, models.ManyToOneRel):
-                        qs = qs.select_related()
-                        break
+        # with a relationship and the provided queryset doesn't already have
+        # select_related defined.
+        if not qs.query.select_related:
+            if self.list_select_related:
+                qs = qs.select_related()
+            else:
+                for field_name in self.list_display:
+                    try:
+                        f = self.lookup_opts.get_field(field_name)
+                    except models.FieldDoesNotExist:
+                        pass
+                    else:
+                        if isinstance(f.rel, models.ManyToOneRel):
+                            qs = qs.select_related()
+                            break
 
         # Set ordering.
         if self.order_field:
