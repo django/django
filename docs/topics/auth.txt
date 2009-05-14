@@ -955,6 +955,16 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     A form for resetting a user's password and e-mailing the new password to
     them.
 
+.. class:: SetPasswordForm
+
+    A form that lets a user change his/her password without entering the old
+    password.
+
+.. class:: UserChangeForm
+
+    A form used in the admin interface to change a user's information and
+    permissions.
+
 .. class:: UserCreationForm
 
     A form for creating a new user.
