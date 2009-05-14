@@ -63,6 +63,10 @@ There are now a total of three forms showing above. One for the initial data
 that was passed in and two extra forms. Also note that we are passing in a
 list of dictionaries as the initial data.
 
+.. seealso::
+
+    :ref:`Creating formsets from models with model formsets <model-formsets>`.
+
 Limiting the maximum number of forms
 ------------------------------------
 
