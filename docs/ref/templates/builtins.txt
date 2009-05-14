@@ -365,7 +365,7 @@ will be displayed if the value has not changed::
         {% for match in matches %}
             <div style="background-color:
                 {% ifchanged match.ballot_id %}
-                    {% cycle red,blue %}
+                    {% cycle "red" "blue" %}
                 {% else %}
                     grey
                 {% endifchanged %}
