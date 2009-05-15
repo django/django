@@ -12,10 +12,9 @@ from django.contrib.admin.util import quote
 from django.utils.html import escape
 
 # local test models
-from models import (Article, BarAccount, CustomArticle, EmptyModel,
-                    FooAccount, Gallery, ModelWithStringPrimaryKey,
-                    Person, Persona, Picture, Section,
-                    Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit)
+from models import Article, BarAccount, CustomArticle, EmptyModel, \
+    FooAccount, Gallery, ModelWithStringPrimaryKey, Person, Persona, Picture, \
+    Section, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit
 
 try:
     set
@@ -231,20 +230,20 @@ class AdminViewBasicTest(TestCase):
 
 class SaveAsTests(TestCase):
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
-    
+
     def setUp(self):
         self.client.login(username='super', password='secret')
 
     def tearDown(self):
         self.client.logout()
-    
+
     def test_save_as_duplication(self):
         """Ensure save as actually creates a new person"""
         post_data = {'_saveasnew':'', 'name':'John M', 'gender':1}
         response = self.client.post('/test_admin/admin/admin_views/person/1/', post_data)
         self.assertEqual(len(Person.objects.filter(name='John M')), 1)
         self.assertEqual(len(Person.objects.filter(id=1)), 1)
-    
+
     def test_save_as_display(self):
         """
         Ensure that 'save as' is displayed when activated and after submitting
@@ -1173,11 +1172,11 @@ class AdminInlineTests(TestCase):
         self.failUnlessEqual(response.status_code, 302)
         self.failUnlessEqual(DooHickey.objects.count(), 1)
         self.failUnlessEqual(DooHickey.objects.all()[0].name, "Doohickey 1")
-    
+
         # Check that the PK link exists on the rendered form
         response = self.client.get('/test_admin/admin/admin_views/collector/1/')
         self.assertContains(response, 'name="doohickey_set-0-code"')
-    
+
         # Now resave that inline
         self.post_data['doohickey_set-INITIAL_FORMS'] = "1"
         self.post_data['doohickey_set-0-code'] = "DH1"
@@ -1186,7 +1185,7 @@ class AdminInlineTests(TestCase):
         self.failUnlessEqual(response.status_code, 302)
         self.failUnlessEqual(DooHickey.objects.count(), 1)
         self.failUnlessEqual(DooHickey.objects.all()[0].name, "Doohickey 1")
-    
+
         # Now modify that inline
         self.post_data['doohickey_set-INITIAL_FORMS'] = "1"
         self.post_data['doohickey_set-0-code'] = "DH1"
@@ -1195,7 +1194,7 @@ class AdminInlineTests(TestCase):
         self.failUnlessEqual(response.status_code, 302)
         self.failUnlessEqual(DooHickey.objects.count(), 1)
         self.failUnlessEqual(DooHickey.objects.all()[0].name, "Doohickey 1 Updated")
-    
+
     def test_integer_pk_inline(self):
         "A model with an integer PK can be saved as inlines. Regression for #10992"
         # First add a new inline
@@ -1205,11 +1204,11 @@ class AdminInlineTests(TestCase):
         self.failUnlessEqual(response.status_code, 302)
         self.failUnlessEqual(Whatsit.objects.count(), 1)
         self.failUnlessEqual(Whatsit.objects.all()[0].name, "Whatsit 1")
-    
+
         # Check that the PK link exists on the rendered form
         response = self.client.get('/test_admin/admin/admin_views/collector/1/')
         self.assertContains(response, 'name="whatsit_set-0-index"')
-    
+
         # Now resave that inline
         self.post_data['whatsit_set-INITIAL_FORMS'] = "1"
         self.post_data['whatsit_set-0-index'] = "42"
@@ -1218,7 +1217,7 @@ class AdminInlineTests(TestCase):
         self.failUnlessEqual(response.status_code, 302)
         self.failUnlessEqual(Whatsit.objects.count(), 1)
         self.failUnlessEqual(Whatsit.objects.all()[0].name, "Whatsit 1")
-    
+
         # Now modify that inline
         self.post_data['whatsit_set-INITIAL_FORMS'] = "1"
         self.post_data['whatsit_set-0-index'] = "42"
