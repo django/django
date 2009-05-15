@@ -610,7 +610,7 @@ class BaseModelFormSet(BaseFormSet):
             # the model instance, and sometimes the PK. Handle either.
             pk_value = form.fields[pk_name].clean(raw_pk_value)
             pk_value = getattr(pk_value, 'pk', pk_value)
-                
+
             obj = existing_objects[pk_value]
             if self.can_delete:
                 raw_delete_value = form._raw_value(DELETION_FIELD_NAME)
@@ -713,7 +713,8 @@ class BaseInlineFormSet(BaseModelFormSet):
 
     def save_new(self, form, commit=True):
         fk_attname = self.fk.get_attname()
-        kwargs = {fk_attname: getattr(self.instance, self.fk.rel.field_name)}
+        pk_value = getattr(self.instance, self.fk.rel.field_name)
+        kwargs = {fk_attname: getattr(pk_value, 'pk', pk_value)}
         new_obj = self.model(**kwargs)
         if fk_attname == self._pk_field.attname or self._pk_field.auto_created:
             exclude =  [self._pk_field.name]
@@ -728,10 +729,12 @@ class BaseInlineFormSet(BaseModelFormSet):
         else:
             # The foreign key field might not be on the form, so we poke at the
             # Model field to get the label, since we need that for error messages.
-            form.fields[self.fk.name] = InlineForeignKeyField(self.instance,
-                to_field=self.fk.rel.field_name,
-                label=getattr(form.fields.get(self.fk.name), 'label', capfirst(self.fk.verbose_name))
-            )
+            kwargs = {
+                'label': getattr(form.fields.get(self.fk.name), 'label', capfirst(self.fk.verbose_name))
+            }
+            if self.fk.rel.field_name != self.fk.rel.to._meta.pk.name:
+                kwargs['to_field'] = self.fk.rel.field_name
+            form.fields[self.fk.name] = InlineForeignKeyField(self.instance, **kwargs)
 
     def get_unique_error_message(self, unique_check):
         unique_check = [field for field in unique_check if field != self.fk.name]

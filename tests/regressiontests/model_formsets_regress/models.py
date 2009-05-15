@@ -7,3 +7,13 @@ class User(models.Model):
 class UserSite(models.Model):
     user = models.ForeignKey(User, to_field="username")
     data = models.IntegerField()
+
+class Place(models.Model):
+    name = models.CharField(max_length=50)
+
+class Restaurant(Place):
+    pass
+
+class Manager(models.Model):
+    retaurant = models.ForeignKey(Restaurant)
+    name = models.CharField(max_length=50)
