@@ -145,7 +145,7 @@ determine how moderation will take place; each method will be called
 by the moderation system and passed two arguments: ``comment``, which
 is the new comment being posted, ``content_object``, which is the
 object the comment will be attached to, and ``request``, which is the
-``HttpRequest`` in which the comment is being submitted:
+:class:`~django.http.HttpRequest` in which the comment is being submitted:
 
 .. method:: CommentModerator.allow(comment, content_object, request)
 
