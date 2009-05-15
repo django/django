@@ -28,7 +28,7 @@ class CommentUtilsModeratorTests(CommentTestCase):
         # emit the custom signals moderation listens for.
         e = Entry.objects.get(pk=1)
         data = self.getValidData(e)
-        self.client.post("/post/", data, REMOTE_ADDR="1.2.3.4")
+
         self.client.post("/post/", data, REMOTE_ADDR="1.2.3.4")
 
         # We explicitly do a try/except to get the comment we've just
@@ -38,6 +38,8 @@ class CommentUtilsModeratorTests(CommentTestCase):
             c1 = Comment.objects.all()[0]
         except IndexError:
             c1 = None
+
+        self.client.post("/post/", data, REMOTE_ADDR="1.2.3.4")
 
         try:
             c2 = Comment.objects.all()[0]
