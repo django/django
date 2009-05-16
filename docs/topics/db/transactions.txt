@@ -150,6 +150,67 @@ transaction-controlling middleware or do something really strange. In almost
 all situations, you'll be better off using the default behavior, or the
 transaction middleware, and only modify selected functions as needed.
 
+.. _topics-db-transactions-savepoints:
+
+Savepoints
+==========
+
+A savepoint is a marker within a transaction that enables you to roll back
+part of a transaction, rather than the full transaction. Savepoints are
+available to the PostgreSQL 8 and Oracle backends. Other backends will
+provide the savepoint functions, but they are empty operations - they won't
+actually do anything.
+
+Savepoints aren't especially useful if you are using the default
+``autocommit`` behaviour of Django. However, if you are using
+``commit_on_success`` or ``commit_manually``, each open transaction will build
+up a series of database operations, awaiting a commit or rollback. If you
+issue a rollback, the entire transaction is rolled back. Savepoints provide
+the ability to perform a fine-grained rollback, rather than the full rollback
+that would be performed by ``transaction.rollback()``.
+
+Savepoints are controlled by three methods on the transaction object:
+
+.. method:: transaction.savepoint()
+
+    Creates a new savepoint. This marks a point in the transaction that
+    is known to be in a "good" state.
+
+    Returns the savepoint ID (sid).
+
+.. method:: transaction.savepoint_commit(sid)
+
+    Updates the savepoint to include any operations that have been performed
+    since the savepoint was created, or since the last commit.
+
+.. method:: transaction.savepoint_rollback(sid)
+
+    Rolls the transaction back to the last point at which the savepoint was
+    committed.
+
+The following example demonstrates the use of savepoints::
+
+    from django.db import transaction
+
+    @transaction.commit_manually
+    def viewfunc(request):
+
+      a.save()
+      # open transaction now contains a.save()
+      sid = transaction.savepoint()
+
+      b.save()
+      # open transaction now contains a.save() and b.save()
+
+      if want_to_keep_b:
+          transaction.savepoint_commit(sid)
+          # open transaction still contains a.save() and b.save()
+      else:
+          transaction.savepoint_rollback(sid)
+          # open transaction now contains only a.save()
+
+      transaction.commit()
+
 Transactions in MySQL
 =====================
 
@@ -166,28 +227,78 @@ handle transactions as explained in this document.
 
 .. _information on MySQL transactions: http://dev.mysql.com/doc/refman/5.0/en/sql-syntax-transactions.html
 
-Transactions and savepoints in PostgreSQL 8
-===========================================
+Handling exceptions within PostgreSQL transactions
+==================================================
 
-When a call to a PostgreSQL 8 cursor raises an exception, all subsequent SQL
-in the same transaction fails with the error "current transaction is aborted,
-queries ignored until end of transaction block". Whilst simple use of save()
-is unlikely to raise an exception in PostgreSQL, there are many more advanced
-usage patterns which might: for example, saving objects with unique fields,
-saving using the force_insert/force_update flag, or invoking custom SQL.
+When a call to a PostgreSQL cursor raises an exception (typically
+``IntegrityError``), all subsequent SQL in the same transaction will fail with
+the error "current transaction is aborted, queries ignored until end of
+transaction block". Whilst simple use of ``save()`` is unlikely to raise an
+exception in PostgreSQL, there are more advanced usage patterns which
+might, such as saving objects with unique fields, saving using the
+force_insert/force_update flag, or invoking custom SQL.
 
-In any of these cases, you can wrap the command which may throw
-IntegrityError inside savepoints, which will then allow subsequent commands
-to proceed. Example::
+There are several ways to recover from this sort of error.
 
+Transaction rollback
+--------------------
+
+The first option is to roll back the entire transaction. For example::
+
+    a.save() # Succeeds, but may be undone by transaction rollback
     try:
-      sid = transaction.savepoint()
-      x.save()
-      transaction.savepoint_commit(sid)
+        b.save() # Could throw exception
     except IntegrityError:
-      transaction.savepoint_rollback(sid)
-      raise
+        transaction.rollback()
+    c.save() # Succeeds, but a.save() may have been undone
 
-Savepoints are not implemented in PostgreSQL 7. If you experience an
-IntegrityError when using PostgreSQL 7, you will need to rollback to the
-start of the transaction.
+Calling ``transaction.rollback()`` rolls back the entire transaction. Any
+uncommitted database operations will be lost. In this example, the changes
+made by ``a.save()`` would be lost, even though that operation raised no error
+itself.
+
+Savepoint rollback
+------------------
+
+If you are using PostgreSQL 8 or later, you can use :ref:`savepoints
+<topics-db-transactions-savepoints>` to control the extent of a rollback.
+Before performing a database operation that could fail, you can set or update
+the savepoint; that way, if the operation fails, you can roll back the single
+offending operation, rather than the entire transaction. For example::
+
+    a.save() # Succeeds, and never undone by savepoint rollback
+    try:
+        sid = transaction.savepoint()
+        b.save() # Could throw exception
+        transaction.savepoint_commit(sid)
+    except IntegrityError:
+        transaction.savepoint_rollback(sid)
+    c.save() # Succeeds, and a.save() is never undone
+
+In this example, ``a.save()`` will not be undone in the case where
+``b.save()`` raises an exception.
+
+Database-level autocommit
+-------------------------
+
+.. versionadded:: 1.1
+
+With PostgreSQL 8.2 or later, there is an advanced option to run PostgreSQL
+with :ref:`database-level autocommit <ref-databases>`. If you use this option,
+there is no constantly open transaction, so it is always possible to continue
+after catching an exception. For example::
+
+    a.save() # succeeds
+    try:
+        b.save() # Could throw exception
+    except IntegrityError:
+        pass
+    c.save() # succeeds
+
+.. note::
+
+    This is not the same as the :ref:`autocommit decorator
+    <topics-db-transactions-autocommit>`. When using database level autocommit
+    there is no database transaction at all. The ``autocommit`` decorator
+    still uses transactions, automatically committing each transaction when
+    a database modifying operation occurs.
