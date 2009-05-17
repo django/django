@@ -86,7 +86,9 @@ Enter the admin site
 ====================
 
 Now, try logging in. (You created a superuser account in the first part of this
-tutorial, remember?) You should see the Django admin index page:
+tutorial, remember?  If you didn't create one or forgot the password you can 
+:ref:`create another one <topics-auth-creating-superusers>`.) You should see 
+the Django admin index page:
 
 .. image:: _images/admin02t.png
    :alt: Django admin index page

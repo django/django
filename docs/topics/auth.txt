@@ -398,6 +398,8 @@ In practice, you probably won't need to use
 :class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
 they're used by Web requests, as explained in the next section.
 
+.. _topics-auth-creating-superusers:
+
 Creating superusers
 -------------------
 
