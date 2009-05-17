@@ -31,7 +31,7 @@ and add::
 
     WSGIScriptAlias / /path/to/mysite/apache/django.wsgi
 
-The first bit aboveis the url you want to be serving your application at (``/``
+The first bit above is the url you want to be serving your application at (``/``
 indicates the root url), and the second is the location of a "WSGI file" -- see
 below -- on your system, usually inside of your project. This tells Apache
 to serve any request below the given URL using the WSGI application defined by that file.
