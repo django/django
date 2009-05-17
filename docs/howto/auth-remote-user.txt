@@ -22,7 +22,7 @@ When the Web server takes care of authentication it typically sets the
 Django, ``REMOTE_USER`` is made available in the :attr:`request.META
 <django.http.HttpRequest.META>` attribute.  Django can be configured to make
 use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware`` and
-``RemoteUserBackend`` classes found in :mod:`django.contirb.auth`.
+``RemoteUserBackend`` classes found in :mod:`django.contrib.auth`.
 
 Configuration
 =============
