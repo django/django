@@ -216,7 +216,7 @@ objects as JSON::
 
     def export_as_json(modeladmin, request, queryset):
         response = HttpResponse(mimetype="text/javascript")
-        serialize.serialize(queryset, stream=response)
+        serializers.serialize("json", queryset, stream=response)
         return response
 
 Generally, something like the above isn't considered a great idea. Most of the
