@@ -30,7 +30,7 @@ elif os.name == 'posix':
 else:
     raise ImportError('Unsupported OS "%s"' % os.name)
 
-# Using the ctypes `find_library` utility to find the the path to the GEOS
+# Using the ctypes `find_library` utility to find the path to the GEOS
 # shared library.  This is better than manually specifiying each library name
 # and extension (e.g., libgeos_c.[so|so.1|dylib].).
 if lib_names:

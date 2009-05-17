@@ -59,7 +59,7 @@ class CsrfMiddlewareTest(TestCase):
     # Check the post processing
     def test_process_response_no_session(self):
         """
-        Check the the post-processor does nothing if no session active
+        Check the post-processor does nothing if no session active
         """
         req = self._get_GET_no_session_request()
         resp = self._get_post_form_response()

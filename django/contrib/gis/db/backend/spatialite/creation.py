@@ -15,7 +15,7 @@ def create_test_spatial_db(verbosity=1, autoclobber=False, interactive=False):
     if settings.DATABASE_ENGINE != 'sqlite3':
         raise Exception('SpatiaLite database creation only supported on sqlite3 platform.')
 
-    # Getting the test database name using the the SQLite backend's
+    # Getting the test database name using the SQLite backend's
     # `_create_test_db`.  Unless `TEST_DATABASE_NAME` is defined,
     # it returns ":memory:".
     db_name = connection.creation._create_test_db(verbosity, autoclobber)

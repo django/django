@@ -71,7 +71,7 @@ def redirect(post_save_redirect, obj):
 def lookup_object(model, object_id, slug, slug_field):
     """
     Return the ``model`` object with the passed ``object_id``.  If
-    ``object_id`` is None, then return the the object whose ``slug_field``
+    ``object_id`` is None, then return the object whose ``slug_field``
     equals the passed ``slug``.  If ``slug`` and ``slug_field`` are not passed,
     then raise Http404 exception.
     """

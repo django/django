@@ -152,7 +152,7 @@ class MemoryFileUploadHandler(FileUploadHandler):
         Use the content_length to signal whether or not this handler should be in use.
         """
         # Check the content-length header to see if we should
-        # If the the post is too large, we cannot use the Memory handler.
+        # If the post is too large, we cannot use the Memory handler.
         if content_length > settings.FILE_UPLOAD_MAX_MEMORY_SIZE:
             self.activated = False
         else:

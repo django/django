@@ -45,7 +45,7 @@ def create_egg(name, resources):
     Creates a mock egg with a list of resources.
 
     name: The name of the module.
-    resources: A dictionary of resources. Keys are the names and values the the data.
+    resources: A dictionary of resources. Keys are the names and values the data.
     """
     egg = imp.new_module(name)
     egg.__loader__ = MockLoader()

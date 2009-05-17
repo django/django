@@ -1,5 +1,5 @@
 # This is a slightly modified version of the doctest.py that shipped with Python 2.4
-# It incorporates changes that have been submitted the the Python ticket tracker
+# It incorporates changes that have been submitted to the Python ticket tracker
 # as ticket #1521051. These changes allow for a DoctestRunner and Doctest base
 # class to be specified when constructing a DoctestSuite.
 

@@ -325,7 +325,7 @@ A ticket can be resolved in a number of ways:
         tickets, we keep all the discussion in one place, which helps everyone.
 
     "worksforme"
-        Used when the the ticket doesn't contain enough detail to replicate
+        Used when the ticket doesn't contain enough detail to replicate
         the original bug.
 
 If you believe that the ticket was closed in error -- because you're

@@ -22,7 +22,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 .. class:: ModelBackend
 
     This is the default authentication backend used by Django.  It
-    authenticates using usernames and passwords stored in the the
+    authenticates using usernames and passwords stored in the
     :class:`~django.contrib.auth.models.User` model.
 
 

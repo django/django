@@ -41,7 +41,7 @@ from decimal import Decimal
 class MeasureBase(object):
     def default_units(self, kwargs):
         """
-        Return the unit value and the the default units specified
+        Return the unit value and the default units specified
         from the given keyword arguments dictionary.
         """
         val = 0.0

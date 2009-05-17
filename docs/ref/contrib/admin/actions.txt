@@ -200,7 +200,7 @@ Actions that provide intermediate pages
 ---------------------------------------
 
 By default, after an action is performed the user is simply redirected back
-the the original change list page. However, some actions, especially more
+to the original change list page. However, some actions, especially more
 complex ones, will need to return intermediate pages. For example, the
 built-in delete action asks for confirmation before deleting the selected
 objects.
