@@ -30,6 +30,10 @@ is a dictionary containing a key for each ``FileField`` (or ``ImageField``, or
 other ``FileField`` subclass) in the form. So the data from the above form would
 be accessible as ``request.FILES['file']``.
 
+Note that ``request.FILES`` will only contain data if the request method was 
+``POST`` and the ``<form>`` that posted the request has the attribute
+``enctype="multipart/form-data"``. Otherwise, ``request.FILES`` will be empty.
+
 Most of the time, you'll simply pass the file data from ``request`` into the
 form as described in :ref:`binding-uploaded-files`. This would look
 something like::
