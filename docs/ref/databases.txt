@@ -493,6 +493,8 @@ To run Django's test suite, the user needs these *additional* privileges:
     * DROP USER
     * CREATE TABLESPACE
     * DROP TABLESPACE
+    * CONNECT WITH ADMIN OPTION
+    * RESOURCE WITH ADMIN OPTION
 
 Connecting to the database
 --------------------------
