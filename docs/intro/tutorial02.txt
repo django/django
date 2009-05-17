@@ -344,7 +344,7 @@ case of the ``was_published_today`` header, because sorting by the output of
 an arbitrary method is not supported. Also note that the column header for
 ``was_published_today`` is, by default, the name of the method (with
 underscores replaced with spaces). But you can change that by giving that
-method a ``short_description`` attribute::
+method (in ``models.py``) a ``short_description`` attribute::
 
     def was_published_today(self):
         return self.pub_date.date() == datetime.date.today()
