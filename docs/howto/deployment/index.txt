@@ -21,7 +21,7 @@ fastest, and most stable deployment choice.
 
 .. seealso::
 
-    * `Chapter 20 of The Django Book`_ discusses deployment and especially
+    * `Chapter 12 of The Django Book`_ discusses deployment and especially
       scaling in more detail.
       
-.. _chapter 20 of the django book: http://djangobook.com/en/1.0/chapter20/
+.. _chapter 12 of the django book: http://djangobook.com/en/2.0/chapter12/
