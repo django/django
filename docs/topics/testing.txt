@@ -514,7 +514,7 @@ arguments at time of construction:
         If you had an url ``/redirect_me/`` that redirected to ``/next/``, that
         redirected to ``/final/``, this is what you'd see::
 
-            >>> response = c.get('/redirect_me/')
+            >>> response = c.get('/redirect_me/', follow=True)
             >>> response.redirect_chain
             [(u'http://testserver/next/', 302), (u'http://testserver/final/', 302)]
 
