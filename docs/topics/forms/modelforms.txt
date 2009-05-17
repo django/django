@@ -400,10 +400,10 @@ Overriding the clean() method
 
 You can override the ``clean()`` method on a model form to provide additional
 validation in the same way you can on a normal form. However, by default the
-``clean()`` method validates the uniqueness of fields that are marked as unique
-or unique_together on the model. Therefore, if you would like to override
-the ``clean()`` method and maintain the default validation, you must call the
-parent class's ``clean()`` method.
+``clean()`` method validates the uniqueness of fields that are marked as
+``unique``, ``unique_together`` or ``unique_for_date|month|year`` on the model.
+Therefore, if you would like to override the ``clean()`` method and maintain the
+default validation, you must call the parent class's ``clean()`` method.
 
 Form inheritance
 ----------------
@@ -515,22 +515,6 @@ exclude::
 
 .. _saving-objects-in-the-formset:
 
-Overriding clean() method
--------------------------
-
-You can override the ``clean()`` method to provide custom validation to
-the whole formset at once. By default, the ``clean()`` method will validate
-that none of the data in the formsets violate the unique constraints on your
-model (both field ``unique`` and model ``unique_together``). To maintain this
-default behavior be sure you call the parent's ``clean()`` method::
-
-    class MyModelFormSet(BaseModelFormSet):
-        def clean(self):
-            super(MyModelFormSet, self).clean()
-            # example custom validation across forms in the formset:
-            for form in self.forms:
-                # your custom formset validation
-
 Saving objects in the formset
 -----------------------------
 
@@ -615,19 +599,25 @@ than that of a "normal" formset. The only difference is that we call
 ``formset.save()`` to save the data into the database. (This was described
 above, in :ref:`saving-objects-in-the-formset`.)
 
-
 Overiding ``clean()`` on a ``model_formset``
 --------------------------------------------
 
 Just like with ``ModelForms``, by default the ``clean()`` method of a
-``model_formset`` will validate that none of the items in the formset validate
-the unique constraints on your model(either unique or unique_together).  If you
-want to overide the ``clean()`` method on a ``model_formset`` and maintain this
-validation, you must call the parent classes ``clean`` method.
+``model_formset`` will validate that none of the items in the formset violate
+the unique constraints on your model (either ``unique``, ``unique_together`` or
+``unique_for_date|month|year``).  If you want to overide the ``clean()`` method
+on a ``model_formset`` and maintain this validation, you must call the parent
+classes ``clean`` method::
 
+    class MyModelFormSet(BaseModelFormSet):
+        def clean(self):
+            super(MyModelFormSet, self).clean()
+            # example custom validation across forms in the formset:
+            for form in self.forms:
+                # your custom formset validation
 
 Using a custom queryset
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 As stated earlier, you can override the default queryset used by the model
 formset::
@@ -650,7 +640,9 @@ Note that we pass the ``queryset`` argument in both the ``POST`` and ``GET``
 cases in this example.
 
 Using the formset in the template
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
+
+.. highlight:: html+django
 
 There are three ways to render a formset in a Django template.
 
@@ -705,6 +697,8 @@ the model formset, in the ``POST`` case, will work correctly. (This example
 assumes a primary key named ``id``. If you've explicitly defined your own
 primary key that isn't called ``id``, make sure it gets rendered.)
 
+.. highlight:: python
+
 Inline formsets
 ===============
 
@@ -745,7 +739,7 @@ the following model::
 
 To resolve this, you can use ``fk_name`` to ``inlineformset_factory``::
 
-    >>> FrienshipFormSet = inlineformset_factory(Friend, Friendship, fk_name="from_friend")
+    >>> FriendshipFormSet = inlineformset_factory(Friend, Friendship, fk_name="from_friend")
 
 Using an inline formset in a view
 ---------------------------------
