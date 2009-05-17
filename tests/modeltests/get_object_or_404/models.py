@@ -55,7 +55,7 @@ Http404: No Article matches the given query.
 >>> get_object_or_404(Article, title__contains="Run")
 <Article: Run away!>
 
-# We can also use the the Article manager through an Author object.
+# We can also use the Article manager through an Author object.
 >>> get_object_or_404(a.article_set, title__contains="Run")
 <Article: Run away!>
 
