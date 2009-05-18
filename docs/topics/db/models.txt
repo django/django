@@ -1101,7 +1101,7 @@ manager <custom-managers-and-inheritance>` documentation: create a base class
 containing the new managers and inherit that after the primary base class::
 
     # Create an abstract class for the new manager.
-    class ExtraManagers:
+    class ExtraManagers(models.Model):
         secondary = NewManager()
 
         class Meta:
