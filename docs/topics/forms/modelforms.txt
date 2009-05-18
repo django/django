@@ -552,7 +552,7 @@ Limiting the number of editable objects
 
 As with regular formsets, you can use the ``max_num`` parameter to
 ``modelformset_factory`` to limit the number of forms displayed. With
-model formsets, this properly limits the query to select only the maximum
+model formsets, this property limits the query to select only the maximum
 number of objects needed::
 
     >>> Author.objects.order_by('name')
@@ -563,10 +563,11 @@ number of objects needed::
     >>> formset.initial
     [{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}]
 
-If the value of ``max_num`` is less than the total objects returned, the
-formset will fill the rest with extra forms::
+If the value of ``max_num`` is higher than the number of objects returned, up to 
+``extra`` additional blank forms will be added to the formset, so long as the 
+total number of forms does not exceed ``max_num``::
 
-    >>> AuthorFormSet = modelformset_factory(Author, max_num=4, extra=1)
+    >>> AuthorFormSet = modelformset_factory(Author, max_num=4, extra=2)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
     >>> for form in formset.forms:
     ...     print form.as_table()
