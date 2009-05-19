@@ -867,7 +867,7 @@ def delete_objects(seen_objs):
         update_query = sql.UpdateQuery(cls, connection)
         for field, model in cls._meta.get_fields_with_model():
             if (field.rel and field.null and field.rel.to in seen_objs and
-                    filter(lambda f: f.column == field.column,
+                    filter(lambda f: f.column == field.rel.get_related_field().column,
                     field.rel.to._meta.fields)):
                 if model:
                     sql.UpdateQuery(model, connection).clear_related(field,
