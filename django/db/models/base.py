@@ -538,7 +538,7 @@ class Model(object):
         # traversing to the most remote parent classes -- those with no parents
         # themselves -- and then adding those instances to the collection. That
         # will include all the child instances down to "self".
-        parent_stack = self._meta.parents.values()
+        parent_stack = [p for p in self._meta.parents.values() if p is not None]
         while parent_stack:
             link = parent_stack.pop()
             parent_obj = getattr(self, link.name)

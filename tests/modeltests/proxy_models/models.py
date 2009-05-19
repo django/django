@@ -276,6 +276,15 @@ True
 >>> UserProxyProxy.objects.all()
 [<UserProxyProxy: Bruce>]
 
+# Proxy objects can be deleted
+>>> u2 = UserProxy.objects.create(name='George')
+>>> UserProxy.objects.all()
+[<UserProxy: Bruce>, <UserProxy: George>]
+>>> u2.delete()
+>>> UserProxy.objects.all()
+[<UserProxy: Bruce>]
+
+
 # We can still use `select_related()` to include related models in our querysets.
 >>> country = Country.objects.create(name='Australia')
 >>> state = State.objects.create(name='New South Wales', country=country)
