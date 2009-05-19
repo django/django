@@ -30,7 +30,7 @@ class D(DefaultRepr, models.Model):
 # D -> A
 
 # So, we must delete Ds first of all, then Cs then Bs then As.
-# However, if we start at As, we might find Bs first (in which 
+# However, if we start at As, we might find Bs first (in which
 # case things will be nice), or find Ds first.
 
 # Some mutually dependent models, but nullable
@@ -96,7 +96,7 @@ CyclicDependency: There is a cyclic dependency of items to be processed.
 
 >>> def clear_rel_obj_caches(models):
 ...     for m in models:
-...         if hasattr(m._meta, '_related_objects_cache'): 
+...         if hasattr(m._meta, '_related_objects_cache'):
 ...             del m._meta._related_objects_cache
 
 # Nice order
@@ -168,7 +168,16 @@ True
 >>> o.keys()
 [<class 'modeltests.delete.models.F'>, <class 'modeltests.delete.models.E'>]
 
+# temporarily replace the UpdateQuery class to verify that E.f is actually nulled out first
+>>> import django.db.models.sql
+>>> class LoggingUpdateQuery(django.db.models.sql.UpdateQuery):
+...     def clear_related(self, related_field, pk_list):
+...         print "CLEARING FIELD",related_field.name
+...         return super(LoggingUpdateQuery, self).clear_related(related_field, pk_list)
+>>> original_class = django.db.models.sql.UpdateQuery
+>>> django.db.models.sql.UpdateQuery = LoggingUpdateQuery
 >>> e1.delete()
+CLEARING FIELD f
 
 >>> e2 = E()
 >>> e2.save()
@@ -185,6 +194,9 @@ True
 [<class 'modeltests.delete.models.F'>, <class 'modeltests.delete.models.E'>]
 
 >>> f2.delete()
+CLEARING FIELD f
 
+# Put this back to normal
+>>> django.db.models.sql.UpdateQuery = original_class
 """
 }
