@@ -6,7 +6,7 @@ from django.forms.models import modelform_factory
 from django.conf import settings
 from django.test import TestCase
 
-from models import Person, Triple, FilePathModel, Article, Publication
+from models import Person, Triple, FilePathModel, Article, Publication, CustomFF
 
 class ModelMultipleChoiceFieldTests(TestCase):
 
@@ -88,3 +88,16 @@ class ManyToManyCallableInitialTests(TestCase):
 <option value="2" selected="selected">Second Book</option>
 <option value="3">Third Book</option>
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>""")
+
+class CFFForm(forms.ModelForm):
+    class Meta:
+        model = CustomFF
+
+class CustomFieldSaveTests(TestCase):
+    def test_save(self):
+        "Regression for #11149: save_form_data should be called only once"
+        
+        # It's enough that the form saves without error -- the custom save routine will
+        # generate an AssertionError if it is called more than once during save.
+        form = CFFForm(data = {'f': None})
+        form.save()

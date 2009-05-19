@@ -50,14 +50,14 @@ def save_instance(form, instance, fields=None, fail_message='saved',
             continue
         if exclude and f.name in exclude:
             continue
+        # OneToOneField doesn't allow assignment of None. Guard against that
+        # instead of allowing it and throwing an error.
+        if isinstance(f, models.OneToOneField) and cleaned_data[f.name] is None:
+            continue
         # Defer saving file-type fields until after the other fields, so a
         # callable upload_to can use the values from other fields.
         if isinstance(f, models.FileField):
             file_field_list.append(f)
-        # OneToOneField doesn't allow assignment of None. Guard against that
-        # instead of allowing it and throwing an error.
-        if isinstance(f, models.OneToOneField) and cleaned_data[f.name] is None:
-            pass
         else:
             f.save_form_data(instance, cleaned_data[f.name])
 
