@@ -69,7 +69,7 @@ class InlineFormsetTests(TestCase):
         form_set = FormSet(data, instance=user)
         if form_set.is_valid():
             form_set.save()
-            usersite = UserSite.objects.all().values().order_by('user')
+            usersite = UserSite.objects.all().values().order_by('data')
             self.assertEqual(usersite[0]['data'], 11)
             self.assertEqual(usersite[0]['user_id'], u'apollo13')
             self.assertEqual(usersite[1]['data'], 42)
