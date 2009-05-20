@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-05-06 09:30+0200\n"
+"POT-Creation-Date: 2009-05-20 12:58+0200\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -218,16 +218,16 @@ msgstr "chiński uproszczony"
 msgid "Traditional Chinese"
 msgstr "chiński tradycyjny"
 
-#: contrib/admin/actions.py:56
+#: contrib/admin/actions.py:60
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Usunięto %(count)d %(items)s."
 
-#: contrib/admin/actions.py:63 contrib/admin/options.py:1025
+#: contrib/admin/actions.py:67 contrib/admin/options.py:1025
 msgid "Are you sure?"
 msgstr "Jesteś pewien?"
 
-#: contrib/admin/actions.py:81
+#: contrib/admin/actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Usuń wybrane %(verbose_name_plural)s"
@@ -320,7 +320,8 @@ msgid "Changed %s."
 msgstr "Zmieniono %s"
 
 #: contrib/admin/options.py:519 contrib/admin/options.py:529
-#: contrib/comments/templates/comments/preview.html:16 forms/models.py:384
+#: contrib/comments/templates/comments/preview.html:16 forms/models.py:388
+#: forms/models.py:587
 msgid "and"
 msgstr "i"
 
@@ -4050,7 +4051,7 @@ msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Wybierz poprawną wartość. %(value)s nie jest jednym z dostępnych wyborów."
 
-#: forms/fields.py:704 forms/fields.py:765 forms/models.py:863
+#: forms/fields.py:704 forms/fields.py:765 forms/models.py:991
 msgid "Enter a list of values."
 msgstr "Podaj listę wartości."
 
@@ -4067,32 +4068,55 @@ msgstr "To pole może zawierać jedynie litery, cyfry, podkreślenia i myślniki
 msgid "Order"
 msgstr "Porządek"
 
-#: forms/models.py:363
+#: forms/models.py:367
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
-"Wartości w %(field_name)s muszą być unikalne dla wyszukiwań %(lookup)s "
-"w %(date_field)s"
+"Wartości w %(field_name)s muszą być unikalne dla wyszukiwań %(lookup)s w %"
+"(date_field)s"
 
-#: forms/models.py:377 forms/models.py:385
+#: forms/models.py:381 forms/models.py:389
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(field_label)s już istnieje w %(model_name)s."
 
-#: forms/models.py:738
+#: forms/models.py:581
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Popraw zduplikowane dane w %(field)s."
+
+#: forms/models.py:585
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "Popraw zduplikowane dane w %(field)s, które wymaga unikalności."
+
+#: forms/models.py:591
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Popraw zduplikowane dane w %(field_name)s, które wymaga unikalności dla "
+"%(lookup)s w polu %(date_field)s."
+
+#: forms/models.py:599
+msgid "Please correct the duplicate values below."
+msgstr "Popraw poniższe zduplikowane wartości."
+
+#: forms/models.py:855
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "Osadzony klucz obcy nie pasuje do klucza głównego obiektu rodzica."
 
-#: forms/models.py:793
+#: forms/models.py:918
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wyborów."
 
-#: forms/models.py:864
+#: forms/models.py:992
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Wybierz poprawną wartość. %s nie jest jednym z dostępnych wyborów."
 
-#: forms/models.py:866
+#: forms/models.py:994
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" nie jest poprawną wartością klucza głównego."
@@ -4124,27 +4148,27 @@ msgstr "%.1f MB"
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: utils/dateformat.py:41
+#: utils/dateformat.py:42
 msgid "p.m."
 msgstr "po południu"
 
-#: utils/dateformat.py:42
+#: utils/dateformat.py:43
 msgid "a.m."
 msgstr "rano"
 
-#: utils/dateformat.py:47
+#: utils/dateformat.py:48
 msgid "PM"
 msgstr "po południu"
 
-#: utils/dateformat.py:48
+#: utils/dateformat.py:49
 msgid "AM"
 msgstr "rano"
 
-#: utils/dateformat.py:97
+#: utils/dateformat.py:98
 msgid "midnight"
 msgstr "północ"
 
-#: utils/dateformat.py:99
+#: utils/dateformat.py:100
 msgid "noon"
 msgstr "południe"
 
