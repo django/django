@@ -1,6 +1,7 @@
 import re
 import os
 import sys
+import glob
 import warnings
 from itertools import dropwhile
 from optparse import make_option
@@ -95,8 +96,9 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
     if locale is not None:
         languages.append(locale)
     elif all:
-        languages = [el for el in os.listdir(localedir) if not el.startswith('.')]
-
+        locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % localedir)) 
+        languages = [os.path.basename(l) for l in locale_dirs]
+    
     for locale in languages:
         if verbosity > 0:
             print "processing language", locale
