@@ -271,7 +271,7 @@ exactly the same way as any other ``forms`` form. For example, the
 ``is_valid()`` method is used to check for validity, the ``is_multipart()``
 method is used to determine whether a form requires multipart file upload (and
 hence whether ``request.FILES`` must be passed to the form), etc. See
-:ref:`topics-forms-index` for more information.
+:ref:`binding-uploaded-files` for more information.
 
 Using a subset of fields on the form
 ------------------------------------

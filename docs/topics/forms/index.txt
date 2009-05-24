@@ -128,6 +128,12 @@ they went wrong.
 See :ref:`ref-forms-api-bound-unbound` for further information on the
 differences between bound and unbound forms.
 
+Handling file uploads with a form
+---------------------------------
+
+To see how to handle file uploads with your form see
+:ref:`binding-uploaded-files` for more information.
+
 Processing the data from a form
 -------------------------------
 
