@@ -24,18 +24,19 @@ usage.
 
 For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
-own lightweight development server. For a production environment, we recommend
-`Apache 2`_ and mod_python_, although Django follows the WSGI_ spec, which
-means it can run on a variety of server platforms.
+own lightweight development server. For a production environment, Django
+follows the WSGI_ spec, which means it can run on a variety of server
+platforms.  See :ref:`Deplying Django <howto-deployment-index>` for some
+popular alternatives.  Also, the `server arrangements wiki page`_ contains
+details for several deployment strategies.
 
 If you want to use Django with a database, which is probably the case, you'll
 also need a database engine. PostgreSQL_ is recommended, because we're
 PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 
 .. _Python: http://www.python.org/
-.. _Apache 2: http://httpd.apache.org/
-.. _mod_python: http://www.modpython.org/
 .. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/
@@ -78,40 +79,6 @@ In the meantime, Python 2.x releases will be supported and provided
 with bug fixes and security updates by the Python development team, so
 continuing to use a Python 2.x release during the transition should
 not present any risk.
-
-Do I have to use mod_python?
-----------------------------
-
-Although we recommend mod_python for production use, you don't have to use it,
-thanks to the fact that Django uses an arrangement called WSGI_. Django can
-talk to any WSGI-enabled server. Other non-mod_python deployment setups are
-FastCGI, SCGI or AJP. See
-:ref:`How to use Django with FastCGI, SCGI or AJP <howto-deployment-fastcgi>`
-for full information.
-
-Also, see the `server arrangements wiki page`_ for other deployment strategies.
-
-If you just want to play around and develop things on your local computer, use
-the development Web server that comes with Django. Things should Just Work.
-
-.. _WSGI: http://www.python.org/peps/pep-0333.html
-.. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
-
-How do I install mod_python on Windows?
----------------------------------------
-
-    * For Python 2.4, grab mod_python from `win32 build of mod_python for
-      Python 2.4`_.
-    * For Python 2.4, check out this `Django on Windows howto`_.
-    * For Python 2.3, grab mod_python from http://www.modpython.org/ and read
-      `Running mod_python on Apache on Windows2000`_.
-    * Also, try this (not Windows-specific) `guide to getting mod_python
-      working`_.
-
-.. _`win32 build of mod_python for Python 2.4`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
-.. _`Django on Windows howto`: http://thinkhole.org/wp/django-on-windows/
-.. _`Running mod_python on Apache on Windows2000`: http://groups-beta.google.com/group/comp.lang.python/msg/139af8c83a5a9d4f
-.. _`guide to getting mod_python working`: http://www.dscpl.com.au/articles/modpython-001.html
 
 Will Django run under shared hosting (like TextDrive or Dreamhost)?
 -------------------------------------------------------------------
