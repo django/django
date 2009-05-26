@@ -595,16 +595,16 @@ prompt, but also because objects' representations are used throughout Django's
 automatically-generated admin.
 
 .. admonition:: Why :meth:`~django.db.models.Model.__unicode__` and not 
-                :meth:`django.db.models.Model.__str__`?
+                :meth:`~django.db.models.Model.__str__`?
 
     If you're familiar with Python, you might be in the habit of adding
-    :meth:`django.db.models.Model.__str__` methods to your classes, not
+    :meth:`~django.db.models.Model.__str__` methods to your classes, not
     :meth:`~django.db.models.Model.__unicode__` methods. We use
     :meth:`~django.db.models.Model.__unicode__` here because Django models deal
     with Unicode by default. All data stored in your database is converted to
     Unicode when it's returned.
 
-    Django models have a default :meth:`django.db.models.Model.__str__` method
+    Django models have a default :meth:`~django.db.models.Model.__str__` method
     that calls :meth:`~django.db.models.Model.__unicode__` and converts the
     result to a UTF-8 bytestring. This means that ``unicode(p)`` will return a
     Unicode string, and ``str(p)`` will return a normal string, with characters
