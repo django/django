@@ -225,9 +225,6 @@ IGNORABLE_404_ENDS = ('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'fav
 # loudly.
 SECRET_KEY = ''
 
-# Path to the "jing" executable -- needed to validate XMLFields
-JING_PATH = "/usr/bin/jing"
-
 # Default file storage mechanism that holds media.
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 

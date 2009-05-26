@@ -594,17 +594,6 @@ A tuple of IP addresses, as strings, that:
     * Receive X headers if the ``XViewMiddleware`` is installed (see
       :ref:`topics-http-middleware`)
 
-.. setting:: JING_PATH
-
-JING_PATH
----------
-
-Default: ``'/usr/bin/jing'``
-
-Path to the "Jing" executable. Jing is a RELAX NG validator, and Django uses it
-to validate each ``XMLField`` in your models.
-See http://www.thaiopensource.com/relaxng/jing.html .
-
 .. setting:: LANGUAGE_CODE
 
 LANGUAGE_CODE
