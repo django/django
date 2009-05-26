@@ -141,7 +141,7 @@ It also has these methods:
 
       .. versionadded:: 1.0
 
-      Delete the current session data from the database and regenerate the
+      Delete the current session data from the session and regenerate the
       session key value that is sent back to the user in the cookie. This is
       used if you want to ensure that the previous session data can't be
       accessed again from the user's browser (for example, the
@@ -383,9 +383,9 @@ by explicitly calling ``request.session.set_expiry()`` as described above in
 Clearing the session table
 ==========================
 
-Note that session data can accumulate in the ``django_session`` database table
-and Django does *not* provide automatic purging. Therefore, it's your job to
-purge expired sessions on a regular basis.
+If you're using the database backend, note that session data can accumulate in
+the ``django_session`` database table and Django does *not* provide automatic
+purging. Therefore, it's your job to purge expired sessions on a regular basis.
 
 To understand this problem, consider what happens when a user uses a session.
 When a user logs in, Django adds a row to the ``django_session`` database
@@ -393,7 +393,7 @@ table. Django updates this row each time the session data changes. If the user
 logs out manually, Django deletes the row. But if the user does *not* log out,
 the row never gets deleted.
 
-Django provides a sample clean-up script in ``django-admin.py cleanup``.
+Django provides a sample clean-up script: ``django-admin.py cleanup``.
 That script deletes any session in the session table whose ``expire_date`` is
 in the past -- but your application may have different requirements.
 
@@ -440,8 +440,8 @@ SESSION_COOKIE_DOMAIN
 Default: ``None``
 
 The domain to use for session cookies. Set this to a string such as
-``".lawrence.com"`` for cross-domain cookies, or use ``None`` for a standard
-domain cookie.
+``".lawrence.com"`` (note the leading dot!) for cross-domain cookies, or use
+``None`` for a standard domain cookie.
 
 SESSION_COOKIE_NAME
 -------------------
