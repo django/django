@@ -752,7 +752,7 @@ Exceptions
 ~~~~~~~~~~
 
 If you point the test client at a view that raises an exception, that exception
-will be visible in the test case. You can then use a standard ``try...catch``
+will be visible in the test case. You can then use a standard ``try...except``
 block or ``unittest.TestCase.assertRaises()`` to test for exceptions.
 
 The only exceptions that are not visible to the test client are ``Http404``,
