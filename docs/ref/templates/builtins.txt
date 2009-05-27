@@ -1289,7 +1289,7 @@ suffix as a parameter to the filter.
 
 Example::
 
-    You have {{ num_walruses }} walrus{{ num_walrus|pluralize:"es" }}.
+    You have {{ num_walruses }} walrus{{ num_walruses|pluralize:"es" }}.
 
 For words that don't pluralize by simple suffix, you can specify both a
 singular and plural suffix, separated by a comma.
