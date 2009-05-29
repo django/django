@@ -150,6 +150,23 @@ if Image:
             _ = p.mugshot.size
             self.assertEqual(p.mugshot.closed, True)
 
+        def test_pickle(self):
+            """
+            Tests that ImageField can be pickled, unpickled, and that the
+            image of the unpickled version is the same as the original.
+            """
+            import pickle
+
+            p = Person(name="Joe")
+            p.mugshot.save("mug", self.file1)
+            dump = pickle.dumps(p)
+
+            p2 = Person(name="Bob")
+            p2.mugshot = self.file1
+
+            loaded_p = pickle.loads(dump)
+            self.assertEqual(p.mugshot, loaded_p.mugshot)
+
 
     class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
         """
