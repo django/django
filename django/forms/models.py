@@ -584,7 +584,7 @@ class BaseModelFormSet(BaseFormSet):
         else:
             return ugettext("Please correct the duplicate data for %(field)s, "
                 "which must be unique.") % {
-                    "field": get_text_list(unique_check, _("and")),
+                    "field": get_text_list(unique_check, unicode(_("and"))),
                 }
 
     def get_date_error_message(self, date_check):
