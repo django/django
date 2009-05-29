@@ -425,7 +425,7 @@ class BaseQuery(object):
 
         If 'with_aliases' is true, any column names that are duplicated
         (without the table names) are given unique aliases. This is needed in
-        some cases to avoid ambiguitity with nested queries.
+        some cases to avoid ambiguity with nested queries.
         """
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
@@ -1823,7 +1823,7 @@ class BaseQuery(object):
             return cursor
         if result_type == SINGLE:
             if self.ordering_aliases:
-                return cursor.fetchone()[:-len(results.ordering_aliases)]
+                return cursor.fetchone()[:-len(self.ordering_aliases)]
             return cursor.fetchone()
 
         # The MULTI case.
