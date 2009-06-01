@@ -74,7 +74,7 @@ class ImprovedArticleWithParentLink(models.Model):
     article = models.OneToOneField(Article, parent_link=True)
 
 class BetterWriter(Writer):
-    pass
+    score = models.IntegerField()
 
 class WriterProfile(models.Model):
     writer = models.OneToOneField(Writer, primary_key=True)
@@ -969,10 +969,20 @@ ValidationError: [u'Select a valid choice. 4 is not one of the available choices
 >>> ImprovedArticleWithParentLinkForm.base_fields.keys()
 []
 
->>> bw = BetterWriter(name=u'Joe Better')
+>>> bw = BetterWriter(name=u'Joe Better', score=10)
 >>> bw.save()
 >>> sorted(model_to_dict(bw).keys())
-['id', 'name', 'writer_ptr']
+['id', 'name', 'score', 'writer_ptr']
+
+>>> class BetterWriterForm(ModelForm):
+...     class Meta:
+...         model = BetterWriter
+>>> form = BetterWriterForm({'name': 'Some Name', 'score': 12})
+>>> form.is_valid()
+True
+>>> bw2 = form.save()
+>>> bw2.delete()
+
 
 >>> class WriterProfileForm(ModelForm):
 ...     class Meta:
@@ -1390,6 +1400,8 @@ False
 >>> form = PriceForm({'price': '6.00'})
 >>> form.is_valid()
 False
+>>> form.errors
+{'quantity': [u'This field cannot be null.']}
 
 # Unique & unique together with null values
 >>> class BookForm(ModelForm):
