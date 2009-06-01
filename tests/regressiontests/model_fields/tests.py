@@ -133,8 +133,12 @@ class SlugFieldTests(django.test.TestCase):
         self.assertEqual(bs.s, 'slug'*50)
 
 class ValidationTest(django.test.TestCase):
-    def test_charfield_cleans_empty_string(self):
+    def test_charfield_raises_error_on_empty_string(self):
         f = models.CharField()
+        self.assertRaises(ValidationError, f.clean, "", None)
+
+    def test_charfield_cleans_empty_string_when_blank_true(self):
+        f = models.CharField(blank=True)
         self.assertEqual('', f.clean('', None))
 
     def test_integerfield_cleans_valid_string(self):
@@ -153,8 +157,12 @@ class ValidationTest(django.test.TestCase):
         f = models.CharField(choices=[('a','A'), ('b','B')])
         self.assertRaises(ValidationError, f.clean, "not a", None)
 
-    def test_nullable_integerfield_cleans_none(self):
-        f = models.IntegerField(null=True)
+    def test_nullable_integerfield_raises_error_with_blank_false(self):
+        f = models.IntegerField(null=True, blank=False)
+        self.assertRaises(ValidationError, f.clean, None, None)
+
+    def test_nullable_integerfield_cleans_none_on_null_and_blank_true(self):
+        f = models.IntegerField(null=True, blank=True)
         self.assertEqual(None, f.clean(None, None))
 
     def test_integerfield_raises_error_on_empty_input(self):

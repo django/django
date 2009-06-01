@@ -449,9 +449,9 @@ u'third-test'
 If you call save() with invalid data, you'll get a ValueError.
 >>> f = CategoryForm({'name': '', 'slug': 'not a slug!', 'url': 'foo'})
 >>> f.errors['name']
-[u'This field is required.']
+[u'This field is required.', u'This field cannot be blank.']
 >>> f.errors['slug']
-[u"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."]
+[u"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.", u'This field cannot be blank.']
 >>> f.cleaned_data
 Traceback (most recent call last):
 ...
@@ -555,6 +555,8 @@ inserted as 'initial' data in each Field.
 <option value="3">Third test</option>
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
 >>> f = TestArticleForm({'headline': u'Test headline', 'slug': 'test-headline', 'pub_date': u'1984-02-06', 'writer': u'1', 'article': 'Hello.'}, instance=art)
+>>> f.errors
+{}
 >>> f.is_valid()
 True
 >>> test_art = f.save()
@@ -1102,16 +1104,6 @@ True
 
 >>> instance.delete()
 
-# Test the non-required FileField
-
->>> f = TextFileForm(data={'description': u'Assistance'})
->>> f.fields['file'].required = False
->>> f.is_valid()
-True
->>> instance = f.save()
->>> instance.file
-<FieldFile: None>
-
 >>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': SimpleUploadedFile('test3.txt', 'hello world')}, instance=instance)
 >>> f.is_valid()
 True
@@ -1390,13 +1382,14 @@ False
 >>> form._errors
 {'__all__': [u'Price with this Price and Quantity already exists.']}
 
+# this form is never valid because quantity is blank=False
 >>> class PriceForm(ModelForm):
 ...     class Meta:
 ...         model = Price
 ...         exclude = ('quantity',)
 >>> form = PriceForm({'price': '6.00'})
 >>> form.is_valid()
-True
+False
 
 # Unique & unique together with null values
 >>> class BookForm(ModelForm):

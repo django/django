@@ -134,6 +134,12 @@ class Field(object):
             raise exceptions.ValidationError(
                 ugettext_lazy("This field cannot be null."))
 
+        # cannot do if not value because of 0 passed to integer fields
+        if not self.blank and value in ( None, '' ):
+            raise exceptions.ValidationError(
+                ugettext_lazy("This field cannot be blank."))
+
+
     def clean(self, value, model_instance):
         """
         Convert the value's type and wun validation. Validation errors from to_python

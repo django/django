@@ -242,6 +242,22 @@ class BaseModelForm(BaseForm):
         opts = self._meta
         self.instance = make_instance(self, self.instance, opts.fields, opts.exclude)
         self.validate_unique()
+        try:
+            # FIMXE: what to do about duplicate errors? (is required etc.)
+            self.instance.clean()
+        except ValidationError, e:
+            for k, v in e.message_dict.items():
+                if k != NON_FIELD_ERRORS:
+                    self._errors.setdefault(k, []).extend(v)
+
+                    # Remove the data from the cleaned_data dict since it was invalid
+                    if k in self.cleaned_data:
+                        del self.cleaned_data[k]
+
+            # what about fields that don't validate but aren't present on the form?
+            if NON_FIELD_ERRORS in e.message_dict:
+                raise ValidationError(e.message_dict[NON_FIELD_ERRORS])
+            
         return self.cleaned_data
 
     def validate_unique(self):
