@@ -543,12 +543,12 @@ class ModelAdmin(BaseModelAdmin):
         """
         request.user.message_set.create(message=message)
 
-    def save_form(self, request, form, change):
+    def save_form(self, request, form, change, commit=False):
         """
         Given a ModelForm return an unsaved instance. ``change`` is True if
         the object is being changed, and False if it's being added.
         """
-        return form.save(commit=False)
+        return form.save(commit=commit)
 
     def save_model(self, request, obj, form, change):
         """
@@ -714,7 +714,10 @@ class ModelAdmin(BaseModelAdmin):
             form = ModelForm(request.POST, request.FILES)
             if form.is_valid():
                 form_validated = True
-                new_object = self.save_form(request, form, change=False)
+                # save the object, even if inline formsets haven't been validated yet
+                # We need to pass the valid model to the formsets for validation. If
+                # the formsets do not validate, we will delete the object.
+                new_object = self.save_form(request, form, change=False, commit=True)
             else:
                 form_validated = False
                 new_object = self.model()
@@ -730,13 +733,14 @@ class ModelAdmin(BaseModelAdmin):
                                   prefix=prefix)
                 formsets.append(formset)
             if all_valid(formsets) and form_validated:
-                self.save_model(request, new_object, form, change=False)
-                form.save_m2m()
                 for formset in formsets:
                     self.save_formset(request, form, formset, change=False)
 
                 self.log_addition(request, new_object)
                 return self.response_add(request, new_object)
+            elif form_validated:
+                # delete the saved object
+                new_object.delete()
         else:
             # Prepare the dict of initial data from the request.
             # We have to special-case M2Ms as a list of comma-separated PKs.
