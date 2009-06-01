@@ -606,13 +606,15 @@ class Model(object):
         """
         pass
 
-    def clean(self):
+    def clean(self, exclude=[]):
         """
         Cleans all fields and raises ValidationError containing message_dict of 
         all validation errors if any occur.
         """
         errors = {}
         for f in self._meta.fields:
+            if f.name in exclude:
+                continue
             try:
                 # TODO: is the [sg]etattr correct?
                 setattr(self, f.attname, f.clean(getattr(self, f.attname), self))

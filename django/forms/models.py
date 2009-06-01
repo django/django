@@ -243,8 +243,7 @@ class BaseModelForm(BaseForm):
         self.instance = make_instance(self, self.instance, opts.fields, opts.exclude)
         self.validate_unique()
         try:
-            # FIMXE: what to do about duplicate errors? (is required etc.)
-            self.instance.clean()
+            self.instance.clean(exclude=self._errors.keys())
         except ValidationError, e:
             for k, v in e.message_dict.items():
                 if k != NON_FIELD_ERRORS:

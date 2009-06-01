@@ -16,7 +16,7 @@ FORM_TESTS = """
 >>> form.is_valid()
 False
 >>> form["username"].errors
-[u'A user with that username already exists.', u'This field cannot be blank.']
+[u'A user with that username already exists.']
 
 # The username contains invalid data.
 
@@ -29,7 +29,7 @@ False
 >>> form.is_valid()
 False
 >>> form["username"].errors
-[u'This value must contain only letters, numbers and underscores.', u'This field cannot be blank.']
+[u'This value must contain only letters, numbers and underscores.']
 
 # The verification password is incorrect.
 

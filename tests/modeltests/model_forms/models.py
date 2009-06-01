@@ -449,9 +449,9 @@ u'third-test'
 If you call save() with invalid data, you'll get a ValueError.
 >>> f = CategoryForm({'name': '', 'slug': 'not a slug!', 'url': 'foo'})
 >>> f.errors['name']
-[u'This field is required.', u'This field cannot be blank.']
+[u'This field is required.']
 >>> f.errors['slug']
-[u"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.", u'This field cannot be blank.']
+[u"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."]
 >>> f.cleaned_data
 Traceback (most recent call last):
 ...
