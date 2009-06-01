@@ -8,6 +8,7 @@ class ModelToValidate(models.Model):
     name = models.CharField(max_length=100)
     created = models.DateTimeField(default=datetime.now)
     number = models.IntegerField()
+    parent = models.ForeignKey('self', blank=True, null=True)
 
     def validate(self):
         super(ModelToValidate, self).validate()

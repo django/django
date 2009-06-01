@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.test import TestCase
 
 from models import ModelToValidate
@@ -19,4 +19,21 @@ class BaseModelValidationTests(TestCase):
     def test_custom_validate_method_is_called(self):
         mtv = ModelToValidate(number=11)
         self.assertRaises(ValidationError, mtv.clean)
+        try:
+            mtv.clean()
+        except ValidationError, e:
+            self.assertEquals(sorted([NON_FIELD_ERRORS, 'name']), sorted(e.message_dict.keys()))
+
+    def test_wrong_FK_value_raises_error(self):
+        mtv=ModelToValidate(number=10, name='Some Name', parent_id=3)
+        self.assertRaises(ValidationError, mtv.clean)
+        try:
+            mtv.clean()
+        except ValidationError, e:
+            self.assertEquals(['parent'], e.message_dict.keys())
+
+    def test_correct_FK_value_cleans(self):
+        parent = ModelToValidate.objects.create(number=10, name='Some Name')
+        mtv=ModelToValidate(number=10, name='Some Name', parent_id=parent.pk)
+        self.assertEqual(None, mtv.clean())
 
