@@ -9,7 +9,7 @@ except NameError:
     from sets import Set as set     # Python 2.3 fallback.
 
 import django.db.models.manager     # Imported to register signal handler.
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
 from django.db.models.query import delete_objects, Q
@@ -596,6 +596,36 @@ class Model(object):
 
     def prepare_database_save(self, unused):
         return self.pk
+
+    def validate(self):
+        """
+        Hook for doing any extra model-wide validation after Model.clean() been
+        called on every field. Any ValidationError raised by this method will
+        not be associated with a particular field; it will have a special-case
+        association with the field named '__all__'.
+        """
+        pass
+
+    def clean(self):
+        """
+        Cleans all fields and raises ValidationError containing message_dict of 
+        all validation errors if any occur.
+        """
+        errors = {}
+        for f in self._meta.fields:
+            try:
+                # TODO: is the [sg]etattr correct?
+                setattr(self, f.attname, f.clean(getattr(self, f.attname), self))
+            except ValidationError, e:
+                errors[f.name] = e.messages
+        try:
+            # TODO: run this only if not errors??
+            self.validate()
+        except ValidationError, e:
+            errors[NON_FIELD_ERRORS] = e.messages
+
+        if errors:
+            raise ValidationError(errors)
 
 
 ############################################
