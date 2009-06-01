@@ -34,14 +34,8 @@ class UserCreationForm(forms.ModelForm):
         password2 = self.cleaned_data["password2"]
         if password1 != password2:
             raise forms.ValidationError(_("The two password fields didn't match."))
+        self.instance.set_password(password1)
         return password2
-
-    def save(self, commit=True):
-        user = super(UserCreationForm, self).save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
-        if commit:
-            user.save()
-        return user
 
 class UserChangeForm(forms.ModelForm):
     username = forms.RegexField(label=_("Username"), max_length=30, regex=r'^\w+$',
