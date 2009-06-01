@@ -682,6 +682,12 @@ class ForeignKey(RelatedField, Field):
         if self.rel.parent_link:
             return
         super(ForeignKey, self).validate(value, model_instance)
+        if not value:
+            return 
+        try:
+            self.rel.to._default_manager.get(**{self.rel.field_name:value})
+        except self.rel.to.DoesNotExist, e:
+            raise exceptions.ValidationError('Model %s with pk %r does not exist.' % (self.rel.to._meta.verbose_name, value))
 
     def get_attname(self):
         return '%s_id' % self.name
