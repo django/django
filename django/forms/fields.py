@@ -23,12 +23,14 @@ try:
 except NameError:
     from sets import Set as set
 
-import django.core.exceptions
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
 
-from util import ErrorList, ValidationError
-from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput, SplitDateTimeWidget, SplitHiddenDateTimeWidget
+from util import ErrorList
+from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, \
+        FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, \
+        DateInput, DateTimeInput, TimeInput, SplitDateTimeWidget, SplitHiddenDateTimeWidget
 from django.core.files.uploadedfile import SimpleUploadedFile as UploadedFile
 
 __all__ = (
@@ -683,16 +685,9 @@ class TypedChoiceField(ChoiceField):
         value = super(TypedChoiceField, self).clean(value)
         if value == self.empty_value or value in EMPTY_VALUES:
             return self.empty_value
-
-        # Hack alert: This field is purpose-made to use with Field.to_python as
-        # a coercion function so that ModelForms with choices work. However,
-        # Django's Field.to_python raises
-        # django.core.exceptions.ValidationError, which is a *different*
-        # exception than django.forms.util.ValidationError. So we need to catch
-        # both.
         try:
             value = self.coerce(value)
-        except (ValueError, TypeError, django.core.exceptions.ValidationError):
+        except (ValueError, TypeError, ValidationError):
             raise ValidationError(self.error_messages['invalid_choice'] % {'value': value})
         return value
 

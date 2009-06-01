@@ -8,7 +8,8 @@ from django.utils.datastructures import SortedDict
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
 
-from util import ValidationError, ErrorList
+from django.core.exceptions import ValidationError
+from util import ErrorList
 from forms import BaseForm, get_declared_fields, NON_FIELD_ERRORS
 from fields import Field, ChoiceField, IntegerField, EMPTY_VALUES
 from widgets import Select, SelectMultiple, HiddenInput, MultipleHiddenInput
