@@ -117,6 +117,32 @@ class Field(object):
         Returns the converted value. Subclasses should override this.
         """
         return value
+    
+    def validate(self, value, model_instance):
+        """
+        Validates value and throws ValidationError. Subclasses should override
+        this to provide validation logic.
+        """
+        if not self.editable:
+            # skip validation for non-editable fields
+            return
+        if self._choices and value:
+            if not value in dict(self.choices):
+                raise exceptions.ValidationError(_('Value %r is not a valid choice.') % value)
+
+        if value is None and not self.null:
+            raise exceptions.ValidationError(
+                ugettext_lazy("This field cannot be null."))
+
+    def clean(self, value, model_instance):
+        """
+        Convert the value's type and wun validation. Validation errors from to_python
+        and validate are propagated. The correct value is returned if no error is 
+        raised.
+        """
+        value = self.to_python(value)
+        self.validate(value, model_instance)
+        return value
 
     def db_type(self):
         """
@@ -354,6 +380,9 @@ class AutoField(Field):
         except (TypeError, ValueError):
             raise exceptions.ValidationError(
                 _("This value must be an integer."))
+        
+    def validate(self, value, model_instance):
+        pass
 
     def get_db_prep_value(self, value):
         if value is None:
@@ -417,14 +446,8 @@ class CharField(Field):
         return "CharField"
 
     def to_python(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, basestring) or value is None:
             return value
-        if value is None:
-            if self.null:
-                return value
-            else:
-                raise exceptions.ValidationError(
-                    ugettext_lazy("This field cannot be null."))
         return smart_unicode(value)
 
     def formfield(self, **kwargs):

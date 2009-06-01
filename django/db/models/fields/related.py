@@ -678,6 +678,11 @@ class ForeignKey(RelatedField, Field):
 
         self.db_index = True
 
+    def validate(self, value, model_instance):
+        if self.rel.parent_link:
+            return
+        super(ForeignKey, self).validate(value, model_instance)
+
     def get_attname(self):
         return '%s_id' % self.name
 
@@ -765,6 +770,14 @@ class OneToOneField(ForeignKey):
         if self.rel.parent_link:
             return None
         return super(OneToOneField, self).formfield(**kwargs)
+
+    def save_form_data(self, instance, data):
+        # FIXME: is this a hack, or what? it works, but I don't really know why 
+        if isinstance(data, self.rel.to):
+            setattr(instance, self.name, data)
+        else:
+            setattr(instance, self.attname, data)
+
 
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):

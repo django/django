@@ -132,3 +132,45 @@ class SlugFieldTests(django.test.TestCase):
         bs = BigS.objects.get(pk=bs.pk)
         self.assertEqual(bs.s, 'slug'*50)
 
+class ValidationTest(django.test.TestCase):
+    def test_charfield_cleans_empty_string(self):
+        f = models.CharField()
+        self.assertEqual('', f.clean('', None))
+
+    def test_integerfield_cleans_valid_string(self):
+        f = models.IntegerField()
+        self.assertEqual(2, f.clean('2', None))
+
+    def test_integerfield_raises_error_on_invalid_intput(self):
+        f = models.IntegerField()
+        self.assertRaises(ValidationError, f.clean, "a", None)
+
+    def test_charfield_with_choices_cleans_valid_choice(self):
+        f = models.CharField(choices=[('a','A'), ('b','B')])
+        self.assertEqual('a', f.clean('a', None))
+
+    def test_charfield_with_choices_raises_error_on_invalid_choice(self):
+        f = models.CharField(choices=[('a','A'), ('b','B')])
+        self.assertRaises(ValidationError, f.clean, "not a", None)
+
+    def test_nullable_integerfield_cleans_none(self):
+        f = models.IntegerField(null=True)
+        self.assertEqual(None, f.clean(None, None))
+
+    def test_integerfield_raises_error_on_empty_input(self):
+        f = models.IntegerField(null=False)
+        self.assertRaises(ValidationError, f.clean, None, None)
+        self.assertRaises(ValidationError, f.clean, '', None)
+
+    def test_charfield_raises_error_on_empty_input(self):
+        f = models.CharField(null=False)
+        self.assertRaises(ValidationError, f.clean, None, None)
+
+    def test_datefield_cleans_date(self):
+        f = models.DateField()
+        self.assertEqual(datetime.date(2008, 10, 10), f.clean('2008-10-10', None))
+
+    def test_boolean_field_doesnt_accept_empty_input(self):
+        f = models.BooleanField()
+        self.assertRaises(ValidationError, f.clean, None, None)
+
