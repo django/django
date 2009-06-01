@@ -296,7 +296,11 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
 
     def __init__(self, data=None, files=None, instance=None, save_as_new=None, prefix=None):
         opts = self.model._meta
-        self.instance = instance
+        if instance is None:
+            self.instance = self.model()
+        else:
+            self.instance = instance
+        self.save_as_new = save_as_new
         self.rel_name = '-'.join((
             opts.app_label, opts.object_name.lower(),
             self.ct_field.name, self.ct_fk_field.name,
@@ -324,15 +328,20 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
             self.ct_fk_field.name: self.instance.pk,
         })
 
-    def save_new(self, form, commit=True):
+    def _construct_form(self, i, **kwargs):
         # Avoid a circular import.
         from django.contrib.contenttypes.models import ContentType
-        kwargs = {
-            self.ct_field.get_attname(): ContentType.objects.get_for_model(self.instance).pk,
-            self.ct_fk_field.get_attname(): self.instance.pk,
-        }
-        new_obj = self.model(**kwargs)
-        return save_instance(form, new_obj, commit=commit)
+        form = super(BaseGenericInlineFormSet, self)._construct_form(i, **kwargs)
+        if self.save_as_new:
+            # Remove the key from the form's data, we are only
+            # creating new instances
+            form.data[form.add_prefix(self.ct_fk_field.name)] = None
+            form.data[form.add_prefix(self.ct_field.name)] = None
+
+        # set the GenericFK value here so that the form can do it's validation
+        setattr(form.instance, self.ct_fk_field.attname, self.instance.pk)
+        setattr(form.instance, self.ct_field.attname, ContentType.objects.get_for_model(self.instance).pk)
+        return form
 
 def generic_inlineformset_factory(model, form=ModelForm,
                                   formset=BaseGenericInlineFormSet,

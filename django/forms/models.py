@@ -8,7 +8,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from util import ErrorList
 from forms import BaseForm, get_declared_fields, NON_FIELD_ERRORS
 from fields import Field, ChoiceField, IntegerField, EMPTY_VALUES
@@ -27,20 +27,10 @@ __all__ = (
     'ModelMultipleChoiceField',
 )
 
-
-def save_instance(form, instance, fields=None, fail_message='saved',
-                  commit=True, exclude=None):
-    """
-    Saves bound Form ``form``'s cleaned_data into model instance ``instance``.
-
-    If commit=True, then the changes to ``instance`` will be saved to the
-    database. Returns ``instance``.
-    """
+def make_instance(form, instance, fields=None, exclude=None):
     from django.db import models
     opts = instance._meta
-    if form.errors:
-        raise ValueError("The %s could not be %s because the data didn't"
-                         " validate." % (opts.object_name, fail_message))
+
     cleaned_data = form.cleaned_data
     file_field_list = []
     for f in opts.fields:
@@ -65,9 +55,16 @@ def save_instance(form, instance, fields=None, fail_message='saved',
     for f in file_field_list:
         f.save_form_data(instance, cleaned_data[f.name])
 
+    return instance
+
+def save_made_instance(form, instance, fields=None, commit=True, fail_message='saved'):
+    opts = instance._meta
+    if form.errors:
+        raise ValueError("The %s could not be %s because the data didn't"
+                         " validate." % (opts.object_name, fail_message))
+
     # Wrap up the saving of m2m data as a function.
     def save_m2m():
-        opts = instance._meta
         cleaned_data = form.cleaned_data
         for f in opts.many_to_many:
             if fields and f.name not in fields:
@@ -83,6 +80,18 @@ def save_instance(form, instance, fields=None, fail_message='saved',
         # saving of m2m data.
         form.save_m2m = save_m2m
     return instance
+
+
+def save_instance(form, instance, fields=None, fail_message='saved',
+                  commit=True, exclude=None):
+    """
+    Saves bound Form ``form``'s cleaned_data into model instance ``instance``.
+
+    If commit=True, then the changes to ``instance`` will be saved to the
+    database. Returns ``instance``.
+    """
+    instance = make_instance(form, instance, fields, exclude)
+    return save_made_instance(form, instance, fields, commit, fail_message)
 
 def make_model_save(model, fields, fail_message):
     """Returns the save() method for a Form."""
@@ -218,7 +227,9 @@ class BaseModelForm(BaseForm):
             # if we didn't get an instance, instantiate a new one
             self.instance = opts.model()
             object_data = {}
+            self.__adding = True
         else:
+            self.__adding = False
             self.instance = instance
             object_data = model_to_dict(instance, opts.fields, opts.exclude)
         # if initial was provided, it should override the values from instance
@@ -228,6 +239,8 @@ class BaseModelForm(BaseForm):
                                             error_class, label_suffix, empty_permitted)
 
     def clean(self):
+        opts = self._meta
+        self.instance = make_instance(self, self.instance, opts.fields, opts.exclude)
         self.validate_unique()
         return self.cleaned_data
 
@@ -317,7 +330,7 @@ class BaseModelForm(BaseForm):
 
             # Exclude the current object from the query if we are editing an
             # instance (as opposed to creating a new one)
-            if self.instance.pk is not None:
+            if not self.__adding and self.instance.pk is not None:
                 qs = qs.exclude(pk=self.instance.pk)
 
             # This cute trick with extra/values is the most efficient way to
@@ -404,8 +417,8 @@ class BaseModelForm(BaseForm):
             fail_message = 'created'
         else:
             fail_message = 'changed'
-        return save_instance(self, self.instance, self._meta.fields,
-                             fail_message, commit, exclude=self._meta.exclude)
+
+        return save_made_instance(self, self.instance, self._meta.fields, commit, fail_message)
 
     save.alters_data = True
 
@@ -731,6 +744,9 @@ class BaseInlineFormSet(BaseModelFormSet):
 
             # Remove the foreign key from the form's data
             form.data[form.add_prefix(self.fk.name)] = None
+
+        # set the FK value here so that the form can do it's validation
+        setattr(form.instance, self.fk.get_attname(), self.instance.pk)
         return form
 
     #@classmethod

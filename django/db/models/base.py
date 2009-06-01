@@ -622,7 +622,14 @@ class Model(object):
             # TODO: run this only if not errors??
             self.validate()
         except ValidationError, e:
-            errors[NON_FIELD_ERRORS] = e.messages
+            if hasattr(e, 'message_dict'):
+                if errors:
+                    for k, v in e.message_dict.items():
+                        errors.set_default(k, []).extend(v)
+                else:
+                    errors = e.message_dict
+            else:
+                errors[NON_FIELD_ERRORS] = e.messages
 
         if errors:
             raise ValidationError(errors)

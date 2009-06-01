@@ -24,7 +24,7 @@ def custom_create(request):
             model = Article
 
         def save(self, *args, **kwargs):
-            self.cleaned_data['slug'] = 'some-other-slug'
+            self.instance.slug = 'some-other-slug'
             return super(SlugChangingArticleForm, self).save(*args, **kwargs)
 
     return create_object(request,
