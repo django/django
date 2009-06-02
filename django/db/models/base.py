@@ -18,8 +18,10 @@ from django.db.models.options import Options
 from django.db import connection, transaction, DatabaseError
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
+from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
+from django.utils.text import get_text_list, capfirst
 from django.conf import settings
 
 
@@ -649,20 +651,22 @@ class Model(object):
 
             lookup_kwargs = {}
             for field_name in unique_check:
-                lookup_value = getattr(self, field_name)
-                # ModelChoiceField will return an object instance rather than
-                # a raw primary key value, so convert it to a pk value before
-                # using it in a lookup.
-                if isinstance(lookup_value, Model):
-                    lookup_value =  lookup_value.pk
+                f = self._meta.get_field(field_name)
+                lookup_value = getattr(self, f.attname)
+                if f.null and lookup_value is None:
+                    continue
                 lookup_kwargs[str(field_name)] = lookup_value
+
+            # some fields were skipped, no reason to do the check
+            if len(unique_check) != len(lookup_kwargs.keys()):
+                continue
 
             qs = self.__class__._default_manager.filter(**lookup_kwargs)
 
             # Exclude the current object from the query if we are editing an
             # instance (as opposed to creating a new one)
-            if not getattr(self, '__adding', False) and self.pk is not None:
-                qs = qs.exclude(pk=self.instance.pk)
+            if not getattr(self, '_adding', False) and self.pk is not None:
+                qs = qs.exclude(pk=self.pk)
 
             # This cute trick with extra/values is the most efficient way to
             # tell if a particular query returns any results.
@@ -681,20 +685,20 @@ class Model(object):
             lookup_kwargs = {}
             # there's a ticket to add a date lookup, we can remove this special
             # case if that makes it's way in
+            date = getattr(self, unique_for)
             if lookup_type == 'date':
-                date = self.cleaned_data[unique_for]
                 lookup_kwargs['%s__day' % unique_for] = date.day
                 lookup_kwargs['%s__month' % unique_for] = date.month
                 lookup_kwargs['%s__year' % unique_for] = date.year
             else:
-                lookup_kwargs['%s__%s' % (unique_for, lookup_type)] = getattr(self.cleaned_data[unique_for], lookup_type)
-            lookup_kwargs[field] = self.cleaned_data[field]
+                lookup_kwargs['%s__%s' % (unique_for, lookup_type)] = getattr(date, lookup_type)
+            lookup_kwargs[field] = getattr(self, field)
 
-            qs = self.instance.__class__._default_manager.filter(**lookup_kwargs)
+            qs = self.__class__._default_manager.filter(**lookup_kwargs)
             # Exclude the current object from the query if we are editing an
             # instance (as opposed to creating a new one)
-            if self.instance.pk is not None:
-                qs = qs.exclude(pk=self.instance.pk)
+            if not getattr(self, '_adding', False) and self.pk is not None:
+                qs = qs.exclude(pk=self.pk)
 
             # This cute trick with extra/values is the most efficient way to
             # tell if a particular query returns any results.
@@ -705,19 +709,21 @@ class Model(object):
         return errors
 
     def date_error_message(self, lookup_type, field, unique_for):
+        opts = self._meta
         return _(u"%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
-            'field_name': unicode(self.fields[field].label),
-            'date_field': unicode(self.fields[unique_for].label),
+            'field_name': unicode(capfirst(opts.get_field(field).verbose_name)),
+            'date_field': unicode(capfirst(opts.get_field(unique_for).verbose_name)),
             'lookup': lookup_type,
         }
 
     def unique_error_message(self, unique_check):
-        model_name = capfirst(self.instance._meta.verbose_name)
+        opts = self._meta
+        model_name = capfirst(opts.verbose_name)
 
         # A unique field
         if len(unique_check) == 1:
             field_name = unique_check[0]
-            field_label = self.fields[field_name].label
+            field_label = capfirst(opts.get_field(field_name).verbose_name)
             # Insert the error into the error dict, very sneaky
             return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
                 'model_name': unicode(model_name),
@@ -725,7 +731,7 @@ class Model(object):
             }
         # unique_together
         else:
-            field_labels = [self.fields[field_name].label for field_name in unique_check]
+            field_labels = map(lambda f: capfirst(opts.get_field(f).verbose_name), unique_check)
             field_labels = get_text_list(field_labels, _('and'))
             return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
                 'model_name': unicode(model_name),
