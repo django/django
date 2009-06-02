@@ -2,7 +2,7 @@
 
 import os, sys, traceback
 import unittest
-
+import coverage
 import django.contrib as contrib
 
 try:
@@ -100,7 +100,7 @@ def django_tests(verbosity, interactive, test_labels):
     # Redirect some settings for the duration of these tests.
     settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
     settings.ROOT_URLCONF = 'urls'
-    settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), TEST_TEMPLATE_DIR),)
+    settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), TEST_TEMPLATE_DIR), )
     settings.USE_I18N = True
     settings.LANGUAGE_CODE = 'en'
     settings.LOGIN_URL = '/accounts/login/'
@@ -113,7 +113,7 @@ def django_tests(verbosity, interactive, test_labels):
     # For testing comment-utils, we require the MANAGERS attribute
     # to be set, so that a test email is sent out which we catch
     # in our tests.
-    settings.MANAGERS = ("admin@djangoproject.com",)
+    settings.MANAGERS = ("admin@djangoproject.com", )
 
     # Load all the ALWAYS_INSTALLED_APPS.
     # (This import statement is intentionally delayed until after we
@@ -156,7 +156,11 @@ def django_tests(verbosity, interactive, test_labels):
     from django.test.utils import get_runner
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.simple.run_tests'
-    test_runner = get_runner(settings)
+    settings.COVERAGE_MODULE_EXCLUDES = ['modeltests', 'regressiontests', '__init__']
+    settings.COVERAGE_CODE_EXCLUDES = ['def __unicode__\(self\):', 'def get_absolute_url\(self\):', ]
+    settings.COVERAGE_ADDITIONAL_MODULES = ['django']
+    # 'from .* import .*', 'import .*',
+    test_runner = get_runner(settings, coverage=True)
 
     failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
     if failures:
@@ -175,7 +179,7 @@ if __name__ == "__main__":
     from optparse import OptionParser
     usage = "%prog [options] [model model model ...]"
     parser = OptionParser(usage=usage)
-    parser.add_option('-v','--verbosity', action='store', dest='verbosity', default='0',
+    parser.add_option('-v', '--verbosity', action='store', dest='verbosity', default='0',
         type='choice', choices=['0', '1', '2'],
         help='Verbosity level; 0=minimal output, 1=normal output, 2=all output')
     parser.add_option('--noinput', action='store_false', dest='interactive', default=True,

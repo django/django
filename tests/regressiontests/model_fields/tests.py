@@ -6,12 +6,25 @@ from django import forms
 from django.db import models
 from django.core.exceptions import ValidationError
 
-from models import Foo, Bar, Whiz, BigD, BigS
+from models import Foo, Bar, Whiz, BigD, BigS, Image
 
 try:
     from decimal import Decimal
 except ImportError:
     from django.utils._decimal import Decimal
+
+
+# If PIL available, do these tests.
+if Image:
+    from imagefield import \
+            ImageFieldTests, \
+            ImageFieldTwoDimensionsTests, \
+            ImageFieldNoDimensionsTests, \
+            ImageFieldOneDimensionTests, \
+            ImageFieldDimensionsFirstTests, \
+            ImageFieldUsingFileTests, \
+            TwoImageFieldTests
+
 
 class DecimalFieldTests(django.test.TestCase):
     def test_to_python(self):
@@ -131,4 +144,3 @@ class SlugFieldTests(django.test.TestCase):
         bs = BigS.objects.create(s = 'slug'*50)
         bs = BigS.objects.get(pk=bs.pk)
         self.assertEqual(bs.s, 'slug'*50)
-

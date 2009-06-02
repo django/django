@@ -379,7 +379,7 @@ PASSWORD_RESET_TIMEOUT_DAYS = 3
 ###########
 
 # The name of the method to use to invoke the test suite
-TEST_RUNNER = 'django.test.simple.run_tests'
+TEST_RUNNER = 'django.test.simple.DefaultTestRunner'
 
 # The name of the database to use for testing purposes.
 # If None, a name of 'test_' + DATABASE_NAME will be assumed
@@ -391,6 +391,55 @@ TEST_DATABASE_NAME = None
 # used).
 TEST_DATABASE_CHARSET = None
 TEST_DATABASE_COLLATION = None
+
+############
+# COVERAGE #
+############
+
+
+# Specify the coverage test runner
+COVERAGE_TEST_RUNNER = 'django.test.test_coverage.BaseCoverageRunner'
+
+# Specify regular expressions of code blocks the coverage analyzer should
+# ignore as statements (e.g. ``raise NotImplemented``).
+# These statements are not figured in as part of the coverage statistics.
+# This setting is optional.
+COVERAGE_CODE_EXCLUDES = [
+    'def __unicode__\(self\):', 'def get_absolute_url\(self\):',
+    'from .* import .*', 'import .*',
+    ]
+
+# Specify a list of regular expressions of paths to exclude from
+# coverage analysis.
+# Note these paths are ignored by the module introspection tool and take
+# precedence over any package/module settings such as:
+# TODO: THE SETTING FOR MODULES
+# Use this to exclude subdirectories like ``r'.svn'``, for example.
+# This setting is optional.
+COVERAGE_PATH_EXCLUDES = [r'.svn']
+
+# Specify a list of additional module paths to include
+# in the coverage analysis. By default, only modules within installed
+# apps are reported. If you have utility modules outside of the app
+# structure, you can include them here.
+# Note this list is *NOT* regular expression, so you have to be explicit,
+# such as 'myproject.utils', and not 'utils$'.
+# This setting is optional.
+COVERAGE_ADDITIONAL_MODULES = []
+
+# Specify a list of regular expressions of module paths to exclude
+# from the coverage analysis. Examples are ``'tests$'`` and ``'urls$'``.
+# This setting is optional.
+COVERAGE_MODULE_EXCLUDES = ['tests$', 'settings$','urls$', 'common.views.test',
+                            '__init__', 'django']
+
+# Specify the directory where you would like the coverage report to create
+# the HTML files.
+# You'll need to make sure this directory exists and is writable by the
+# user account running the test.
+# You should probably set this one explicitly in your own settings file.
+COVERAGE_REPORT_HTML_OUTPUT_DIR = 'test_html'
+
 
 ############
 # FIXTURES #

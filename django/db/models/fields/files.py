@@ -142,13 +142,13 @@ class FileDescriptor(object):
     """
     The descriptor for the file attribute on the model instance. Returns a
     FieldFile when accessed so you can do stuff like::
-    
+
         >>> instance.file.size
-        
+
     Assigns a file object on assignment so you can do::
-    
+
         >>> instance.file = File(...)
-        
+
     """
     def __init__(self, field):
         self.field = field
@@ -156,9 +156,9 @@ class FileDescriptor(object):
     def __get__(self, instance=None, owner=None):
         if instance is None:
             raise AttributeError(
-                "The '%s' attribute can only be accessed from %s instances." 
+                "The '%s' attribute can only be accessed from %s instances."
                 % (self.field.name, owner.__name__))
-                
+
         # This is slightly complicated, so worth an explanation.
         # instance.file`needs to ultimately return some instance of `File`,
         # probably a subclass. Additionally, this returned object needs to have
@@ -168,8 +168,8 @@ class FileDescriptor(object):
         # peek below you can see that we're not. So depending on the current
         # value of the field we have to dynamically construct some sort of
         # "thing" to return.
-        
-        # The instance dict contains whatever was originally assigned 
+
+        # The instance dict contains whatever was originally assigned
         # in __set__.
         file = instance.__dict__[self.field.name]
 
@@ -186,14 +186,14 @@ class FileDescriptor(object):
 
         # Other types of files may be assigned as well, but they need to have
         # the FieldFile interface added to the. Thus, we wrap any other type of
-        # File inside a FieldFile (well, the field's attr_class, which is 
+        # File inside a FieldFile (well, the field's attr_class, which is
         # usually FieldFile).
         elif isinstance(file, File) and not isinstance(file, FieldFile):
             file_copy = self.field.attr_class(instance, self.field, file.name)
             file_copy.file = file
             file_copy._committed = False
             instance.__dict__[self.field.name] = file_copy
-            
+
         # Finally, because of the (some would say boneheaded) way pickle works,
         # the underlying FieldFile might not actually itself have an associated
         # file. So we need to reset the details of the FieldFile in those cases.
@@ -201,7 +201,7 @@ class FileDescriptor(object):
             file.instance = instance
             file.field = self.field
             file.storage = self.field.storage
-        
+
         # That was fun, wasn't it?
         return instance.__dict__[self.field.name]
 
@@ -212,7 +212,7 @@ class FileField(Field):
     # The class to wrap instance attributes in. Accessing the file object off
     # the instance will always return an instance of attr_class.
     attr_class = FieldFile
-    
+
     # The descriptor to use for accessing the attribute off of the class.
     descriptor_class = FileDescriptor
 
@@ -300,40 +300,20 @@ class ImageFileDescriptor(FileDescriptor):
     assigning the width/height to the width_field/height_field, if appropriate.
     """
     def __set__(self, instance, value):
+        previous_file = instance.__dict__.get(self.field.name)
         super(ImageFileDescriptor, self).__set__(instance, value)
-        
-        # The rest of this method deals with width/height fields, so we can
-        # bail early if neither is used.
-        if not self.field.width_field and not self.field.height_field:
-            return
-        
-        # We need to call the descriptor's __get__ to coerce this assigned 
-        # value into an instance of the right type (an ImageFieldFile, in this
-        # case).
-        value = self.__get__(instance)
-        
-        if not value:
-            return
-        
-        # Get the image dimensions, making sure to leave the file in the same
-        # state (opened or closed) that we got it in. However, we *don't* rewind
-        # the file pointer if the file is already open. This is in keeping with
-        # most Python standard library file operations that leave it up to the
-        # user code to reset file pointers after operations that move it.
-        from django.core.files.images import get_image_dimensions
-        close = value.closed
-        value.open()
-        try:
-            width, height = get_image_dimensions(value)
-        finally:
-            if close:
-                value.close()
-        
-        # Update the width and height fields
-        if self.field.width_field:
-            setattr(value.instance, self.field.width_field, width)
-        if self.field.height_field:
-            setattr(value.instance, self.field.height_field, height)
+
+        # To prevent recalculating image dimensions when we are instantiating
+        # an object from the database (bug #11084), only update dimensions if
+        # the field had a value before this assignment.  Since the default
+        # value for FileField subclasses is an instance of field.attr_class,
+        # previous_file will only be None when we are called from
+        # Model.__init__().  The ImageField.update_dimension_fields method
+        # hooked up to the post_init signal handles the Model.__init__() cases.
+        # Assignment happening outside of Model.__init__() will trigger the
+        # update right here.
+        if previous_file is not None:
+            self.field.update_dimension_fields(instance, force=True)
 
 class ImageFieldFile(ImageFile, FieldFile):
     def delete(self, save=True):
@@ -349,6 +329,69 @@ class ImageField(FileField):
     def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
         self.width_field, self.height_field = width_field, height_field
         FileField.__init__(self, verbose_name, name, **kwargs)
+
+    def contribute_to_class(self, cls, name):
+        super(ImageField, self).contribute_to_class(cls, name)
+        # Attach update_dimension_fields so that dimension fields declared
+        # after their corresponding image field don't stay cleared by
+        # Model.__init__, see bug #11196.
+        signals.post_init.connect(self.update_dimension_fields, sender=cls)
+
+    def update_dimension_fields(self, instance, force=False, *args, **kwargs):
+        """
+        Updates field's width and height fields, if defined.
+
+        This method is hooked up to model's post_init signal to update
+        dimensions after instantiating a model instance.  However, dimensions
+        won't be updated if the dimensions fields are already populated.  This
+        avoids unnecessary recalculation when loading an object from the
+        database.
+
+        Dimensions can be forced to update with force=True, which is how
+        ImageFileDescriptor.__set__ calls this method.
+        """
+        # Nothing to update if the field doesn't have have dimension fields.
+        has_dimension_fields = self.width_field or self.height_field
+        if not has_dimension_fields:
+            return
+
+        # getattr will call the ImageFileDescriptor's __get__ method, which
+        # coerces the assigned value into an instance of self.attr_class
+        # (ImageFieldFile in this case).
+        file = getattr(instance, self.attname)
+
+        # Nothing to update if we have no file and not being forced to update.
+        if not file and not force:
+            return
+
+        dimension_fields_filled = not(
+            (self.width_field and not getattr(instance, self.width_field))
+            or (self.height_field and not getattr(instance, self.height_field))
+        )
+        # When both dimension fields have values, we are most likely loading
+        # data from the database or updating an image field that already had
+        # an image stored.  In the first case, we don't want to update the
+        # dimension fields because we are already getting their values from the
+        # database.  In the second case, we do want to update the dimensions
+        # fields and will skip this return because force will be True since we
+        # were called from ImageFileDescriptor.__set__.
+        if dimension_fields_filled and not force:
+            return
+
+        # file should be an instance of ImageFieldFile or should be None.
+        if file:
+            width = file.width
+            height = file.height
+        else:
+            # No file, so clear dimensions fields.
+            width = None
+            height = None
+
+        # Update the width and height fields.
+        if self.width_field:
+            setattr(instance, self.width_field, width)
+        if self.height_field:
+            setattr(instance, self.height_field, height)
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.ImageField}
