@@ -536,7 +536,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         args = ['startapp','settings_test']
         out, err = self.run_django_admin(args,'settings')
         self.assertNoOutput(err)
-        self.assertTrue(os.path.exists(os.path.join(test_dir, 'settings_test')))
+        self.assert_(os.path.exists(os.path.join(test_dir, 'settings_test')))
         shutil.rmtree(os.path.join(test_dir, 'settings_test'))
 
     def test_builtin_command(self):
