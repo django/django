@@ -1,3 +1,5 @@
+import unittest
+
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.test import TestCase
 from django.db import models
@@ -38,7 +40,7 @@ class BaseModelValidationTests(TestCase):
         mtv=ModelToValidate(number=10, name='Some Name', parent_id=parent.pk)
         self.assertEqual(None, mtv.clean())
 
-class GetUniqueCheckTests(TestCase):
+class GetUniqueCheckTests(unittest.TestCase):
     def test_unique_fields_get_collected(self):
         m = UniqueFieldsModel()
         self.assertEqual(([('id',), ('unique_charfield',), ('unique_integerfield',)], []), m._get_unique_checks())
