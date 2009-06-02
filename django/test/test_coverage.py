@@ -6,7 +6,7 @@ from django.db.models import get_app, get_apps
 from django.test.simple import DefaultTestRunner as base_run_tests
 
 from django.utils.module_tools import get_all_modules
-from django.test.coverage_report import html_report
+#from django.test.coverage_report import html_report
 from django.utils.translation import ugettext as _
 
 def _get_app_package(app_model_module):
@@ -99,7 +99,7 @@ class ReportingCoverageRunner(BaseCoverageRunner):
         with the results
         """
         res = BaseCoverageRunner.run_tests(self, *args, **kwargs)
-        html_report(self.outdir, self.modules, self.excludes, self.errors)
+        coverage._the_coverage.html_report(self.modules.values(), self.outdir)
         print >>sys.stdout
         print >>sys.stdout, _("HTML reports were output to '%s'") %self.outdir
 

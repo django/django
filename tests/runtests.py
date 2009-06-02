@@ -160,9 +160,9 @@ def django_tests(verbosity, interactive, test_labels):
     settings.COVERAGE_CODE_EXCLUDES = ['def __unicode__\(self\):', 'def get_absolute_url\(self\):', ]
     settings.COVERAGE_ADDITIONAL_MODULES = ['django']
     # 'from .* import .*', 'import .*',
-    test_runner = get_runner(settings, coverage=True)
-
-    failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
+    test_runner = get_runner(settings, coverage=True, reports=True)
+    tr = test_runner()
+    failures = tr.run_tests(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
     if failures:
         sys.exit(failures)
 
