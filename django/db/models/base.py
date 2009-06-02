@@ -608,71 +608,40 @@ class Model(object):
 
     def validate_unique(self):
         unique_checks, date_checks = self._get_unique_checks()
-        form_errors = []
-        bad_fields = set()
 
-        field_errors, global_errors = self._perform_unique_checks(unique_checks)
-        bad_fields.union(field_errors)
-        form_errors.extend(global_errors)
+        errors = self._perform_unique_checks(unique_checks)
+        date_errors = self._perform_date_checks(date_checks)
 
-        field_errors, global_errors = self._perform_date_checks(date_checks)
-        bad_fields.union(field_errors)
-        form_errors.extend(global_errors)
+        for k, v in date_errors.items():
+             errors.setdefault(k, []).extend(v)
 
-        for field_name in bad_fields:
-            del self.cleaned_data[field_name]
-        if form_errors:
-            # Raise the unique together errors since they are considered
-            # form-wide.
-            raise ValidationError(form_errors)
+        if errors:
+            raise ValidationError(errors)
 
     def _get_unique_checks(self):
         from django.db.models.fields import FieldDoesNotExist, Field as ModelField
 
-        # Gather a list of checks to perform. We only perform unique checks
-        # for fields present and not None in cleaned_data.  Since this is a
-        # ModelForm, some fields may have been excluded; we can't perform a unique
-        # check on a form that is missing fields involved in that check.  It also does
-        # not make sense to check data that didn't validate, and since NULL does not
-        # equal NULL in SQL we should not do any unique checking for NULL values.
-        unique_checks = []
+        unique_checks = self._meta.unique_together[:]
         # these are checks for the unique_for_<date/year/month>
         date_checks = []
-        for check in self.instance._meta.unique_together[:]:
-            fields_on_form = [field for field in check if self.cleaned_data.get(field) is not None]
-            if len(fields_on_form) == len(check):
-                unique_checks.append(check)
 
         # Gather a list of checks for fields declared as unique and add them to
         # the list of checks. Again, skip empty fields and any that did not validate.
-        for name in self.fields:
-            try:
-                f = self.instance._meta.get_field_by_name(name)[0]
-            except FieldDoesNotExist:
-                # This is an extra field that's not on the ModelForm, ignore it
-                continue
-            if not isinstance(f, ModelField):
-                # This is an extra field that happens to have a name that matches,
-                # for example, a related object accessor for this model.  So
-                # get_field_by_name found it, but it is not a Field so do not proceed
-                # to use it as if it were.
-                continue
-            if self.cleaned_data.get(name) is None:
-                continue
+        for f in self._meta.fields:
+            name = f.name
             if f.unique:
                 unique_checks.append((name,))
-            if f.unique_for_date and self.cleaned_data.get(f.unique_for_date) is not None:
+            if f.unique_for_date:
                 date_checks.append(('date', name, f.unique_for_date))
-            if f.unique_for_year and self.cleaned_data.get(f.unique_for_year) is not None:
+            if f.unique_for_year:
                 date_checks.append(('year', name, f.unique_for_year))
-            if f.unique_for_month and self.cleaned_data.get(f.unique_for_month) is not None:
+            if f.unique_for_month:
                 date_checks.append(('month', name, f.unique_for_month))
         return unique_checks, date_checks
 
 
     def _perform_unique_checks(self, unique_checks):
-        bad_fields = set()
-        form_errors = []
+        errors = {}
 
         for unique_check in unique_checks:
             # Try to look up an existing object with the same values as this
@@ -680,37 +649,34 @@ class Model(object):
 
             lookup_kwargs = {}
             for field_name in unique_check:
-                lookup_value = self.cleaned_data[field_name]
+                lookup_value = getattr(self, field_name)
                 # ModelChoiceField will return an object instance rather than
                 # a raw primary key value, so convert it to a pk value before
                 # using it in a lookup.
-                if isinstance(self.fields[field_name], ModelChoiceField):
+                if isinstance(lookup_value, Model):
                     lookup_value =  lookup_value.pk
                 lookup_kwargs[str(field_name)] = lookup_value
 
-            qs = self.instance.__class__._default_manager.filter(**lookup_kwargs)
+            qs = self.__class__._default_manager.filter(**lookup_kwargs)
 
             # Exclude the current object from the query if we are editing an
             # instance (as opposed to creating a new one)
-            if not self.__adding and self.instance.pk is not None:
+            if not getattr(self, '__adding', False) and self.pk is not None:
                 qs = qs.exclude(pk=self.instance.pk)
 
             # This cute trick with extra/values is the most efficient way to
             # tell if a particular query returns any results.
             if qs.extra(select={'a': 1}).values('a').order_by():
                 if len(unique_check) == 1:
-                    self._errors[unique_check[0]] = ErrorList([self.unique_error_message(unique_check)])
+                    key = unique_check[0]
                 else:
-                    form_errors.append(self.unique_error_message(unique_check))
+                    key = NON_FIELD_ERRORS
+                errors.setdefault(key, []).append(self.unique_error_message(unique_check))
 
-                # Mark these fields as needing to be removed from cleaned data
-                # later.
-                for field_name in unique_check:
-                    bad_fields.add(field_name)
-        return bad_fields, form_errors
+        return errors
 
     def _perform_date_checks(self, date_checks):
-        bad_fields = set()
+        errors = {}
         for lookup_type, field, unique_for in date_checks:
             lookup_kwargs = {}
             # there's a ticket to add a date lookup, we can remove this special
@@ -733,11 +699,10 @@ class Model(object):
             # This cute trick with extra/values is the most efficient way to
             # tell if a particular query returns any results.
             if qs.extra(select={'a': 1}).values('a').order_by():
-                self._errors[field] = ErrorList([
+                errors.setdefault(field, []).append(
                     self.date_error_message(lookup_type, field, unique_for)
-                ])
-                bad_fields.add(field)
-        return bad_fields, []
+                )
+        return errors
 
     def date_error_message(self, lookup_type, field, unique_for):
         return _(u"%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
