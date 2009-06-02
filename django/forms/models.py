@@ -241,7 +241,6 @@ class BaseModelForm(BaseForm):
     def clean(self):
         opts = self._meta
         self.instance = make_instance(self, self.instance, opts.fields, opts.exclude)
-        self.validate_unique()
         try:
             self.instance.clean(exclude=self._errors.keys())
         except ValidationError, e:
@@ -387,7 +386,7 @@ class BaseModelFormSet(BaseFormSet):
                 break
         else:
             return
-        unique_checks, date_checks = form._get_unique_checks()
+        unique_checks, date_checks = form.instance._get_unique_checks()
         errors = []
         # Do each of the unique checks (unique and unique_together)
         for unique_check in unique_checks:
