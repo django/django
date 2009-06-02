@@ -621,7 +621,7 @@ class Model(object):
     def _get_unique_checks(self):
         from django.db.models.fields import FieldDoesNotExist, Field as ModelField
 
-        unique_checks = self._meta.unique_together[:]
+        unique_checks = list(self._meta.unique_together)
         # these are checks for the unique_for_<date/year/month>
         date_checks = []
 
