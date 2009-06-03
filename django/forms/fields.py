@@ -426,17 +426,16 @@ class RegexField(CharField):
             regex = re.compile(regex)
         self.regex = regex
 
-    def clean(self, value):
+    def validate(self, value):
         """
         Validates that the input matches the regular expression. Returns a
         Unicode object.
         """
-        value = super(RegexField, self).clean(value)
+        super(RegexField, self).validate(value)
         if value == u'':
             return value
         if not self.regex.search(value):
             raise ValidationError(self.error_messages['invalid'])
-        return value
 
 email_re = re.compile(
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
@@ -571,14 +570,17 @@ class URLField(RegexField):
         self.verify_exists = verify_exists
         self.user_agent = validator_user_agent
 
-    def clean(self, value):
+    def to_python(self, value):
         # If no URL scheme given, assume http://
         if value and '://' not in value:
             value = u'http://%s' % value
         # If no URL path given, assume /
         if value and not urlparse.urlsplit(value)[2]:
             value += '/'
-        value = super(URLField, self).clean(value)
+        return super(URLField, self).to_python(value)
+
+    def validate(self, value):
+        super(URLField, self).validate(value)
         if value == u'':
             return value
         if self.verify_exists:
@@ -597,12 +599,11 @@ class URLField(RegexField):
                 raise ValidationError(self.error_messages['invalid'])
             except: # urllib2.URLError, httplib.InvalidURL, etc.
                 raise ValidationError(self.error_messages['invalid_link'])
-        return value
 
 class BooleanField(Field):
     widget = CheckboxInput
 
-    def clean(self, value):
+    def to_python(self, value):
         """Returns a Python boolean object."""
         # Explicitly check for the string 'False', which is what a hidden field
         # will submit for False. Also check for '0', since this is what
@@ -612,7 +613,7 @@ class BooleanField(Field):
             value = False
         else:
             value = bool(value)
-        super(BooleanField, self).clean(value)
+        value = super(BooleanField, self).to_python(value)
         if not value and self.required:
             raise ValidationError(self.error_messages['required'])
         return value
@@ -624,7 +625,7 @@ class NullBooleanField(BooleanField):
     """
     widget = NullBooleanSelect
 
-    def clean(self, value):
+    def to_python(self, value):
         """
         Explicitly checks for the string 'True' and 'False', which is what a
         hidden field will submit for True and False, and for '1' and '0', which
@@ -638,6 +639,9 @@ class NullBooleanField(BooleanField):
         else:
             return None
 
+    def validate(self, value):
+        pass
+
 class ChoiceField(Field):
     widget = Select
     default_error_messages = {
@@ -646,8 +650,8 @@ class ChoiceField(Field):
 
     def __init__(self, choices=(), required=True, widget=None, label=None,
                  initial=None, help_text=None, *args, **kwargs):
-        super(ChoiceField, self).__init__(required, widget, label, initial,
-                                          help_text, *args, **kwargs)
+        super(ChoiceField, self).__init__(required=required, widget=widget, label=label, 
+                                        initial=initial, help_text=help_text, *args, **kwargs)
         self.choices = choices
 
     def _get_choices(self):
@@ -661,19 +665,19 @@ class ChoiceField(Field):
 
     choices = property(_get_choices, _set_choices)
 
-    def clean(self, value):
+    def to_python(self, value):
+        "Returns a Unicode object."
+        if value in EMPTY_VALUES:
+            return u''
+        return smart_unicode(value)
+    
+    def validate(self, value):
         """
         Validates that the input is in self.choices.
         """
-        value = super(ChoiceField, self).clean(value)
-        if value in EMPTY_VALUES:
-            value = u''
-        value = smart_unicode(value)
-        if value == u'':
-            return value
-        if not self.valid_value(value):
+        super(ChoiceField, self).validate(value)
+        if value and not self.valid_value(value):
             raise ValidationError(self.error_messages['invalid_choice'] % {'value': value})
-        return value
 
     def valid_value(self, value):
         "Check to see if the provided value is a valid choice"
@@ -716,22 +720,23 @@ class MultipleChoiceField(ChoiceField):
         'invalid_list': _(u'Enter a list of values.'),
     }
 
-    def clean(self, value):
+    def to_python(self, value):
+        if not value:
+            return []
+        elif not isinstance(value, (list, tuple)):
+            raise ValidationError(self.error_messages['invalid_list'])
+        return [smart_unicode(val) for val in value]
+
+    def validate(self, value):
         """
         Validates that the input is a list or tuple.
         """
         if self.required and not value:
             raise ValidationError(self.error_messages['required'])
-        elif not self.required and not value:
-            return []
-        if not isinstance(value, (list, tuple)):
-            raise ValidationError(self.error_messages['invalid_list'])
-        new_value = [smart_unicode(val) for val in value]
         # Validate that each value in the value list is in self.choices.
-        for val in new_value:
+        for val in value:
             if not self.valid_value(val):
                 raise ValidationError(self.error_messages['invalid_choice'] % {'value': val})
-        return new_value
 
 class ComboField(Field):
     """
