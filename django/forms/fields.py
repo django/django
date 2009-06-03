@@ -191,23 +191,27 @@ class IntegerField(Field):
         self.max_value, self.min_value = max_value, min_value
         super(IntegerField, self).__init__(*args, **kwargs)
 
-    def clean(self, value):
+    def to_python(self, value):
         """
         Validates that int() can be called on the input. Returns the result
         of int(). Returns None for empty values.
         """
-        super(IntegerField, self).clean(value)
+        value = super(IntegerField, self).to_python(value)
         if value in EMPTY_VALUES:
             return None
+
         try:
             value = int(str(value))
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'])
+        return value
+
+    def validate(self, value):
+        super(IntegerField, self).validate(value)
         if self.max_value is not None and value > self.max_value:
             raise ValidationError(self.error_messages['max_value'] % self.max_value)
         if self.min_value is not None and value < self.min_value:
             raise ValidationError(self.error_messages['min_value'] % self.min_value)
-        return value
 
 class FloatField(Field):
     default_error_messages = {
