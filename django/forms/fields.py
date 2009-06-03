@@ -314,12 +314,11 @@ class DateField(Field):
         super(DateField, self).__init__(*args, **kwargs)
         self.input_formats = input_formats or DEFAULT_DATE_INPUT_FORMATS
 
-    def clean(self, value):
+    def to_python(self, value):
         """
         Validates that the input can be converted to a date. Returns a Python
         datetime.date object.
         """
-        super(DateField, self).clean(value)
         if value in EMPTY_VALUES:
             return None
         if isinstance(value, datetime.datetime):
@@ -348,12 +347,11 @@ class TimeField(Field):
         super(TimeField, self).__init__(*args, **kwargs)
         self.input_formats = input_formats or DEFAULT_TIME_INPUT_FORMATS
 
-    def clean(self, value):
+    def to_python(self, value):
         """
         Validates that the input can be converted to a time. Returns a Python
         datetime.time object.
         """
-        super(TimeField, self).clean(value)
         if value in EMPTY_VALUES:
             return None
         if isinstance(value, datetime.time):
@@ -387,12 +385,11 @@ class DateTimeField(Field):
         super(DateTimeField, self).__init__(*args, **kwargs)
         self.input_formats = input_formats or DEFAULT_DATETIME_INPUT_FORMATS
 
-    def clean(self, value):
+    def to_python(self, value):
         """
         Validates that the input can be converted to a datetime. Returns a
         Python datetime.datetime object.
         """
-        super(DateTimeField, self).clean(value)
         if value in EMPTY_VALUES:
             return None
         if isinstance(value, datetime.datetime):
