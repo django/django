@@ -32,3 +32,13 @@ class Parcel(models.Model):
     border2 = models.PolygonField(srid=2276)
     objects = models.GeoManager()
     def __unicode__(self): return self.name
+
+# These use the GeoManager but do not have any geographic fields.
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+    objects = models.GeoManager()
+
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    author = models.ForeignKey(Author, related_name='books')
+    objects = models.GeoManager()
