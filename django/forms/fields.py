@@ -472,12 +472,9 @@ class FileField(Field):
         self.max_length = kwargs.pop('max_length', None)
         super(FileField, self).__init__(*args, **kwargs)
 
-    def clean(self, data, initial=None):
-        super(FileField, self).clean(initial or data)
-        if not self.required and data in EMPTY_VALUES:
+    def to_python(self, data):
+        if data in EMPTY_VALUES:
             return None
-        elif not data and initial:
-            return initial
 
         # UploadedFile objects should have name and size attributes.
         try:
@@ -496,21 +493,25 @@ class FileField(Field):
 
         return data
 
+    def clean(self, data, initial=None):
+        if not data and initial:
+            return initial
+        return super(FileField, self).clean(data)
+
+
 class ImageField(FileField):
     default_error_messages = {
         'invalid_image': _(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."),
     }
 
-    def clean(self, data, initial=None):
+    def to_python(self, data):
         """
         Checks that the file-upload field data contains a valid image (GIF, JPG,
         PNG, possibly others -- whatever the Python Imaging Library supports).
         """
-        f = super(ImageField, self).clean(data, initial)
+        f = super(ImageField, self).to_python(data)
         if f is None:
             return None
-        elif not data and initial:
-            return initial
         from PIL import Image
 
         # We need to get a file object for PIL. We might have a path or we might
