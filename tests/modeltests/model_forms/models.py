@@ -1177,8 +1177,9 @@ True
 >>> instance.height
 16
 
-# Delete the current file since this is not done by Django.
->>> instance.image.delete()
+# Delete the current file since this is not done by Django, but don't save
+# because the dimension fields are not null=True.
+>>> instance.image.delete(save=False)
 
 >>> f = ImageFileForm(data={'description': u'An image'}, files={'image': SimpleUploadedFile('test.png', image_data)})
 >>> f.is_valid()
@@ -1209,9 +1210,9 @@ True
 >>> instance.width
 16
 
-# Delete the current image since this is not done by Django.
-
->>> instance.image.delete()
+# Delete the current file since this is not done by Django, but don't save
+# because the dimension fields are not null=True.
+>>> instance.image.delete(save=False)
 
 # Override the file by uploading a new one.
 
@@ -1226,8 +1227,9 @@ True
 >>> instance.width
 48
 
-# Delete the current file since this is not done by Django.
->>> instance.image.delete()
+# Delete the current file since this is not done by Django, but don't save
+# because the dimension fields are not null=True.
+>>> instance.image.delete(save=False)
 >>> instance.delete()
 
 >>> f = ImageFileForm(data={'description': u'Changed it'}, files={'image': SimpleUploadedFile('test2.png', image_data2)})
@@ -1241,8 +1243,9 @@ True
 >>> instance.width
 48
 
-# Delete the current file since this is not done by Django.
->>> instance.image.delete()
+# Delete the current file since this is not done by Django, but don't save
+# because the dimension fields are not null=True.
+>>> instance.image.delete(save=False)
 >>> instance.delete()
 
 # Test the non-required ImageField
