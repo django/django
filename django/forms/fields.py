@@ -180,7 +180,6 @@ class CharField(Field):
             return {'maxlength': str(self.max_length)}
 
 class IntegerField(Field):
-    default_validators = [validators.validate_integer]
     default_error_messages = {
         'invalid': _(u'Enter a whole number.'),
         'max_value': _(u'Ensure this value is less than or equal to %s.'),

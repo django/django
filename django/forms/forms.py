@@ -247,6 +247,20 @@ class BaseForm(StrAndUnicode):
                 self._errors[name] = self.error_class(e.messages)
                 if name in self.cleaned_data:
                     del self.cleaned_data[name]
+
+        # run all the validators after the fields have been cleaned since they
+        # need access to all_values
+        for name, field in self.fields.items():
+            if not name in self.cleaned_data:
+                continue
+            for v in field.validators:
+                try:
+                    v(self.cleaned_data[name], all_values=self.cleaned_data)
+                except ValidationError, e:
+                    self._errors.setdefault(name, self.error_class()).extend(e.messages)
+                    if name in self.cleaned_data:
+                        del self.cleaned_data[name]
+
         try:
             self.cleaned_data = self.clean()
         except ValidationError, e:
