@@ -698,12 +698,13 @@ class TypedChoiceField(ChoiceField):
         self.empty_value = kwargs.pop('empty_value', '')
         super(TypedChoiceField, self).__init__(*args, **kwargs)
 
-    def clean(self, value):
+    def to_python(self, value):
         """
         Validate that the value is in self.choices and can be coerced to the
         right type.
         """
-        value = super(TypedChoiceField, self).clean(value)
+        value = super(TypedChoiceField, self).to_python(value)
+        super(TypedChoiceField, self).validate(value)
         if value == self.empty_value or value in EMPTY_VALUES:
             return self.empty_value
         try:
@@ -711,6 +712,9 @@ class TypedChoiceField(ChoiceField):
         except (ValueError, TypeError, ValidationError):
             raise ValidationError(self.error_messages['invalid_choice'] % {'value': value})
         return value
+    
+    def validate(self, value):
+        pass
 
 class MultipleChoiceField(ChoiceField):
     hidden_widget = MultipleHiddenInput
@@ -791,6 +795,9 @@ class MultiValueField(Field):
             f.required = False
         self.fields = fields
 
+    def validate(self, value):
+        pass
+
     def clean(self, value):
         """
         Validates every value in the given list. A value is validated against
@@ -826,7 +833,10 @@ class MultiValueField(Field):
                 errors.extend(e.messages)
         if errors:
             raise ValidationError(errors)
-        return self.compress(clean_data)
+
+        out = self.compress(clean_data)
+        self.validate(out)
+        return out
 
     def compress(self, data_list):
         """
