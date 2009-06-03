@@ -752,20 +752,20 @@ To run the tests, ``cd`` to the ``tests/`` directory and type:
     ./runtests.py --settings=path.to.django.settings
 
 Yes, the unit tests need a settings module, but only for database connection
-info, with the ``DATABASE_ENGINE`` setting.
+info, with the ``DATABASES`` setting.
 
 If you're using the ``sqlite3`` database backend, no further settings are
 needed. A temporary database will be created in memory when running the tests.
 
 If you're using another backend:
 
-    * Your :setting:`DATABASE_USER` setting needs to specify an existing user account
-      for the database engine.
+    * Your the ``DATABASE_USER`` option for the ``'default'`` datbase setting
+      needs to specify an existing user account for the database engine.
 
-    * The :setting:`DATABASE_NAME` setting must be the name of an existing database to
+    * The ``DATABASE_NAME`` option must be the name of an existing database to
       which the given user has permission to connect. The unit tests will not
       touch this database; the test runner creates a new database whose name is
-      :setting:`DATABASE_NAME` prefixed with ``test_``, and this test database is
+      ``DATABASE_NAME`` prefixed with ``test_``, and this test database is
       deleted when the tests are finished. This means your user account needs
       permission to execute ``CREATE DATABASE``.
 

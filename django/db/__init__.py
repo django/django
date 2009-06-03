@@ -1,44 +1,25 @@
-import os
 from django.conf import settings
 from django.core import signals
 from django.core.exceptions import ImproperlyConfigured
+from django.db.utils import ConnectionHandler, load_backend
 from django.utils.functional import curry
-from django.utils.importlib import import_module
 
 __all__ = ('backend', 'connection', 'DatabaseError', 'IntegrityError')
 
-if not settings.DATABASE_ENGINE:
-    settings.DATABASE_ENGINE = 'dummy'
+if not settings.DATABASES or 'default' not in settings.DATABASES:
+    settings.DATABASES['default'] = {
+        'DATABASE_ENGINE': settings.DATABASE_ENGINE,
+        'DATABASE_HOST': settings.DATABASE_HOST,
+        'DATABASE_NAME': settings.DATABASE_NAME,
+        'DATABASE_OPTIONS': settings.DATABASE_OPTIONS,
+        'DATABASE_PASSWORD': settings.DATABASE_PASSWORD,
+        'DATABASE_PORT': settings.DATABASE_PORT,
+        'DATABASE_USER': settings.DATABASE_USER,
+        'TIME_ZONE': settings.TIME_ZONE,
+    }
 
-def load_backend(backend_name):
-    try:
-        # Most of the time, the database backend will be one of the official
-        # backends that ships with Django, so look there first.
-        return import_module('.base', 'django.db.backends.%s' % backend_name)
-    except ImportError, e:
-        # If the import failed, we might be looking for a database backend
-        # distributed external to Django. So we'll try that next.
-        try:
-            return import_module('.base', backend_name)
-        except ImportError, e_user:
-            # The database backend wasn't found. Display a helpful error message
-            # listing all possible (built-in) database backends.
-            backend_dir = os.path.join(__path__[0], 'backends')
-            try:
-                available_backends = [f for f in os.listdir(backend_dir)
-                        if os.path.isdir(os.path.join(backend_dir, f))
-                        and not f.startswith('.')]
-            except EnvironmentError:
-                available_backends = []
-            available_backends.sort()
-            if backend_name not in available_backends:
-                error_msg = "%r isn't an available database backend. Available options are: %s\nError was: %s" % \
-                    (backend_name, ", ".join(map(repr, available_backends)), e_user)
-                raise ImproperlyConfigured(error_msg)
-            else:
-                raise # If there's some other error, this must be an error in Django itself.
+connections = ConnectionHandler(settings.DATABASES)
 
-backend = load_backend(settings.DATABASE_ENGINE)
 
 # `connection`, `DatabaseError` and `IntegrityError` are convenient aliases
 # for backend bits.
@@ -47,15 +28,10 @@ backend = load_backend(settings.DATABASE_ENGINE)
 # we manually create the dictionary from the settings, passing only the
 # settings that the database backends care about. Note that TIME_ZONE is used
 # by the PostgreSQL backends.
-connection = backend.DatabaseWrapper({
-    'DATABASE_HOST': settings.DATABASE_HOST,
-    'DATABASE_NAME': settings.DATABASE_NAME,
-    'DATABASE_OPTIONS': settings.DATABASE_OPTIONS,
-    'DATABASE_PASSWORD': settings.DATABASE_PASSWORD,
-    'DATABASE_PORT': settings.DATABASE_PORT,
-    'DATABASE_USER': settings.DATABASE_USER,
-    'TIME_ZONE': settings.TIME_ZONE,
-})
+# we load all these up for backwards compatibility, you should use
+# connections['default'] instead.
+connection = connections['default']
+backend = load_backend(settings.DATABASE_ENGINE)
 DatabaseError = backend.DatabaseError
 IntegrityError = backend.IntegrityError
 

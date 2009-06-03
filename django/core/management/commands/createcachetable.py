@@ -1,14 +1,23 @@
+from optparse import make_option
+
 from django.core.management.base import LabelCommand
+from django.db import connections, transaction, models
 
 class Command(LabelCommand):
     help = "Creates the table needed to use the SQL cache backend."
     args = "<tablename>"
     label = 'tablename'
 
+    options_list = LabelCommand.options_list + (
+        make_option('--database', action='store', dest='database',
+            default='default', help='Selects what database to install the cache table to.'),
+    )
+
     requires_model_validation = False
 
     def handle_label(self, tablename, **options):
-        from django.db import connection, transaction, models
+        alias = options['alias']
+        connection = connections[alias]
         fields = (
             # "key" is a reserved word in MySQL, so use "cache_key" instead.
             models.CharField(name='cache_key', max_length=255, unique=True, primary_key=True),
@@ -17,7 +26,7 @@ class Command(LabelCommand):
         )
         table_output = []
         index_output = []
-        qn = connection.ops.quote_name
+        qn = connections.ops.quote_name
         for f in fields:
             field_output = [qn(f.name), f.db_type()]
             field_output.append("%sNULL" % (not f.null and "NOT " or ""))

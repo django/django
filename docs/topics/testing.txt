@@ -139,8 +139,8 @@ In the case of model tests, note that the test runner takes care of creating
 its own test database. That is, any test that accesses a database -- by
 creating and saving model instances, for example -- will not affect your
 production database. However, the database is not refreshed between doctests,
-so if your doctest requires a certain state you should consider flushin the 
-database or loading a fixture. (See the section on fixtures, below, for more 
+so if your doctest requires a certain state you should consider flushin the
+database or loading a fixture. (See the section on fixtures, below, for more
 on this.) Note that to use this feature, the database user Django is connecting
 as must have ``CREATE DATABASE`` rights.
 
@@ -284,7 +284,7 @@ Regardless of whether the tests pass or fail, the test database is destroyed
 when all the tests have been executed.
 
 By default this test database gets its name by prepending ``test_`` to the
-value of the :setting:`DATABASE_NAME` setting. When using the SQLite database
+value of the ``DATABASE_NAME`` setting. When using the SQLite database
 engine the tests will by default use an in-memory database (i.e., the database
 will be created in memory, bypassing the filesystem entirely!). If you want to
 use a different database name, specify the :setting:`TEST_DATABASE_NAME`
@@ -292,9 +292,9 @@ setting.
 
 Aside from using a separate database, the test runner will otherwise use all of
 the same database settings you have in your settings file:
-:setting:`DATABASE_ENGINE`, :setting:`DATABASE_USER`, :setting:`DATABASE_HOST`,
+``DATABASE_ENGINE``, ``DATABASE_USER``, ``DATABASE_HOST``,
 etc. The test database is created by the user specified by
-:setting:`DATABASE_USER`, so you'll need to make sure that the given user
+``DATABASE_USER``, so you'll need to make sure that the given user
 account has sufficient privileges to create a new database on the system.
 
 .. versionadded:: 1.0
