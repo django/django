@@ -502,7 +502,8 @@ def create_many_related_manager(superclass, through=False):
                     (self.join_table, source_col_name,
                     target_col_name, ",".join(['%s'] * len(old_ids))),
                     [self._pk_val] + list(old_ids))
-                transaction.commit_unless_managed()
+                # TODO
+                transaction.commit_unless_managed(using=DEFAULT_DB_ALIAS)
 
         def _clear_items(self, source_col_name):
             # source_col_name: the PK colname in join_table for the source object
