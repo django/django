@@ -32,18 +32,7 @@ class WhereNode(tree.Node):
     relabel_aliases() methods.
     """
     default = AND
-
-    def __init__(self, *args, **kwargs):
-        self.connection = kwargs.pop('connection', None)
-        super(WhereNode, self).__init__(*args, **kwargs)
-
-    def __getstate__(self):
-        """
-        Don't try to pickle the connection, our Query will restore it for us.
-        """
-        data = self.__dict__.copy()
-        del data['connection']
-        return data
+    as_sql_takes_connection = True
 
     def add(self, data, connector):
         """
@@ -62,20 +51,6 @@ class WhereNode(tree.Node):
             # Consume any generators immediately, so that we can determine
             # emptiness and transform any non-empty values correctly.
             value = list(value)
-        if hasattr(obj, "process"):
-            try:
-                # FIXME We're calling process too early, the connection could
-                # change
-                obj, params = obj.process(lookup_type, value, self.connection)
-            except (EmptyShortCircuit, EmptyResultSet):
-                # There are situations where we want to short-circuit any
-                # comparisons and make sure that nothing is returned. One
-                # example is when checking for a NULL pk value, or the
-                # equivalent.
-                super(WhereNode, self).add(NothingNode(), connector)
-                return
-        else:
-            params = Field().get_db_prep_lookup(lookup_type, value)
 
         # The "annotation" parameter is used to pass auxilliary information
         # about the value(s) to the query construction. Specifically, datetime
@@ -88,18 +63,19 @@ class WhereNode(tree.Node):
         else:
             annotation = bool(value)
 
+        if hasattr(obj, "process"):
+            obj.validate(lookup_type, value)
+            super(WhereNode, self).add((obj, lookup_type, annotation, value),
+                connector)
+            return
+        else:
+            # TODO: Make this lazy just like the above code for constraints.
+            params = Field().get_db_prep_lookup(lookup_type, value)
+
         super(WhereNode, self).add((obj, lookup_type, annotation, params),
                 connector)
 
-    def update_connection(self, connection):
-        self.connection = connection
-        for child in self.children:
-            if hasattr(child, 'update_connection'):
-                child.update_connection(connection)
-            elif hasattr(child[3], 'update_connection'):
-                child[3].update_connection(connection)
-
-    def as_sql(self, qn=None):
+    def as_sql(self, qn, connection):
         """
         Returns the SQL version of the where clause and the value to be
         substituted in. Returns None, None if this node is empty.
@@ -108,8 +84,6 @@ class WhereNode(tree.Node):
         (generally not needed except by the internal implementation for
         recursion).
         """
-        if not qn:
-            qn = self.connection.ops.quote_name
         if not self.children:
             return None, []
         result = []
@@ -118,10 +92,13 @@ class WhereNode(tree.Node):
         for child in self.children:
             try:
                 if hasattr(child, 'as_sql'):
-                    sql, params = child.as_sql(qn=qn)
+                    if getattr(child, 'as_sql_takes_connection', False):
+                        sql, params = child.as_sql(qn=qn, connection=connection)
+                    else:
+                        sql, params = child.as_sql(qn=qn)
                 else:
                     # A leaf node in the tree.
-                    sql, params = self.make_atom(child, qn)
+                    sql, params = self.make_atom(child, qn, connection)
 
             except EmptyResultSet:
                 if self.connector == AND and not self.negated:
@@ -157,7 +134,7 @@ class WhereNode(tree.Node):
                 sql_string = '(%s)' % sql_string
         return sql_string, result_params
 
-    def make_atom(self, child, qn):
+    def make_atom(self, child, qn, connection):
         """
         Turn a tuple (table_alias, column_name, db_type, lookup_type,
         value_annot, params) into valid SQL.
@@ -165,29 +142,39 @@ class WhereNode(tree.Node):
         Returns the string for the SQL fragment and the parameters to use for
         it.
         """
-        lvalue, lookup_type, value_annot, params = child
+        lvalue, lookup_type, value_annot, params_or_value = child
+        if hasattr(lvalue, 'process'):
+            try:
+                lvalue, params = lvalue.process(lookup_type, params_or_value, connection)
+            except EmptyShortCircuit:
+                raise EmptyResultSet
+        else:
+            params = params_or_value
         if isinstance(lvalue, tuple):
             # A direct database column lookup.
-            field_sql = self.sql_for_columns(lvalue, qn)
+            field_sql = self.sql_for_columns(lvalue, qn, connection)
         else:
             # A smart object with an as_sql() method.
             field_sql = lvalue.as_sql(quote_func=qn)
 
         if value_annot is datetime.datetime:
-            cast_sql = self.connection.ops.datetime_cast_sql()
+            cast_sql = connection.ops.datetime_cast_sql()
         else:
             cast_sql = '%s'
 
         if hasattr(params, 'as_sql'):
-            extra, params = params.as_sql(qn)
+            if getattr(params, 'as_sql_takes_connection', False):
+                extra, params = params.as_sql(qn, connection)
+            else:
+                extra, params = params.as_sql(qn)
             cast_sql = ''
         else:
             extra = ''
 
-        if lookup_type in self.connection.operators:
-            format = "%s %%s %%s" % (self.connection.ops.lookup_cast(lookup_type),)
+        if lookup_type in connection.operators:
+            format = "%s %%s %%s" % (connection.ops.lookup_cast(lookup_type),)
             return (format % (field_sql,
-                              self.connection.operators[lookup_type] % cast_sql,
+                              connection.operators[lookup_type] % cast_sql,
                               extra), params)
 
         if lookup_type == 'in':
@@ -200,19 +187,19 @@ class WhereNode(tree.Node):
         elif lookup_type in ('range', 'year'):
             return ('%s BETWEEN %%s and %%s' % field_sql, params)
         elif lookup_type in ('month', 'day', 'week_day'):
-            return ('%s = %%s' % self.connection.ops.date_extract_sql(lookup_type, field_sql),
+            return ('%s = %%s' % connection.ops.date_extract_sql(lookup_type, field_sql),
                     params)
         elif lookup_type == 'isnull':
             return ('%s IS %sNULL' % (field_sql,
                 (not value_annot and 'NOT ' or '')), ())
         elif lookup_type == 'search':
-            return (self.connection.ops.fulltext_search_sql(field_sql), params)
+            return (connection.ops.fulltext_search_sql(field_sql), params)
         elif lookup_type in ('regex', 'iregex'):
-            return self.connection.ops.regex_lookup(lookup_type) % (field_sql, cast_sql), params
+            return connection.ops.regex_lookup(lookup_type) % (field_sql, cast_sql), params
 
         raise TypeError('Invalid lookup_type: %r' % lookup_type)
 
-    def sql_for_columns(self, data, qn):
+    def sql_for_columns(self, data, qn, connection):
         """
         Returns the SQL fragment used for the left-hand side of a column
         constraint (for example, the "T1.foo" portion in the clause
@@ -223,7 +210,7 @@ class WhereNode(tree.Node):
             lhs = '%s.%s' % (qn(table_alias), qn(name))
         else:
             lhs = qn(name)
-        return self.connection.ops.field_cast_sql(db_type) % lhs
+        return connection.ops.field_cast_sql(db_type) % lhs
 
     def relabel_aliases(self, change_map, node=None):
         """
@@ -299,3 +286,11 @@ class Constraint(object):
             raise EmptyShortCircuit
 
         return (self.alias, self.col, db_type), params
+
+    def relabel_aliases(self, change_map):
+        if self.alias in change_map:
+            self.alias = change_map[self.alias]
+
+    def validate(self, lookup_type, value):
+        if hasattr(self.field, 'validate'):
+            self.field.validate(lookup_type, value)

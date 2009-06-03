@@ -67,10 +67,10 @@ class BaseQuery(object):
         # SQL-related attributes
         self.select = []
         self.tables = []    # Aliases in the order they are created.
-        self.where = where(connection=self.connection)
+        self.where = where()
         self.where_class = where
         self.group_by = None
-        self.having = where(connection=self.connection)
+        self.having = where()
         self.order_by = []
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
         self.distinct = False
@@ -151,8 +151,6 @@ class BaseQuery(object):
         # supported. It's the only class-reference to the module-level
         # connection variable.
         self.connection = connection
-        self.where.update_connection(self.connection)
-        self.having.update_connection(self.connection)
 
     def get_meta(self):
         """
@@ -245,8 +243,6 @@ class BaseQuery(object):
             obj.used_aliases = set()
         obj.filter_is_sticky = False
         obj.__dict__.update(kwargs)
-        obj.where.update_connection(obj.connection) # where and having track their own connection
-        obj.having.update_connection(obj.connection)# we need to keep this up to date
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
         return obj
@@ -405,8 +401,8 @@ class BaseQuery(object):
         from_, f_params = self.get_from_clause()
 
         qn = self.quote_name_unless_alias
-        where, w_params = self.where.as_sql(qn=qn)
-        having, h_params = self.having.as_sql(qn=qn)
+        where, w_params = self.where.as_sql(qn=qn, connection=self.connection)
+        having, h_params = self.having.as_sql(qn=qn, connection=self.connection)
         params = []
         for val in self.extra_select.itervalues():
             params.extend(val[1])
@@ -534,10 +530,10 @@ class BaseQuery(object):
                 self.where.add(EverythingNode(), AND)
         elif self.where:
             # rhs has an empty where clause.
-            w = self.where_class(connection=self.connection)
+            w = self.where_class()
             w.add(EverythingNode(), AND)
         else:
-            w = self.where_class(connection=self.connection)
+            w = self.where_class()
         self.where.add(w, connector)
 
         # Selection columns and extra extensions are those provided by 'rhs'.
@@ -1550,7 +1546,7 @@ class BaseQuery(object):
 
         for alias, aggregate in self.aggregates.items():
             if alias == parts[0]:
-                entry = self.where_class(connection=self.connection)
+                entry = self.where_class()
                 entry.add((aggregate, lookup_type, value), AND)
                 if negate:
                     entry.negate()
@@ -1618,7 +1614,7 @@ class BaseQuery(object):
                     for alias in join_list:
                         if self.alias_map[alias][JOIN_TYPE] == self.LOUTER:
                             j_col = self.alias_map[alias][RHS_JOIN_COL]
-                            entry = self.where_class(connection=self.connection)
+                            entry = self.where_class()
                             entry.add((Constraint(alias, j_col, None), 'isnull', True), AND)
                             entry.negate()
                             self.where.add(entry, AND)
@@ -1627,7 +1623,7 @@ class BaseQuery(object):
                     # Leaky abstraction artifact: We have to specifically
                     # exclude the "foo__in=[]" case from this handling, because
                     # it's short-circuited in the Where class.
-                    entry = self.where_class(connection=self.connection)
+                    entry = self.where_class()
                     entry.add((Constraint(alias, col, None), 'isnull', True), AND)
                     entry.negate()
                     self.where.add(entry, AND)
@@ -2336,6 +2332,9 @@ class BaseQuery(object):
             select_col = join_info[RHS_JOIN_COL]
         self.select = [(select_alias, select_col)]
         self.remove_inherited_models()
+
+    def set_connection(self, connection):
+        self.connection = connection
 
     def execute_sql(self, result_type=MULTI):
         """

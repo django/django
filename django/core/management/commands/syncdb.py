@@ -32,9 +32,9 @@ class Command(NoArgsCommand):
         self.style = no_style()
 
         if not options['database']:
-            dbs = connections.all()
+            dbs = connections
         else:
-            dbs = [connections[options['database']]]
+            dbs = [options['database']]
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
@@ -55,7 +55,8 @@ class Command(NoArgsCommand):
                 if not msg.startswith('No module named') or 'management' not in msg:
                     raise
 
-        for connection in dbs:
+        for db in dbs:
+            connection = connections[db]
             cursor = connection.cursor()
 
             # Get a list of already installed *models* so that references work right.
@@ -102,11 +103,11 @@ class Command(NoArgsCommand):
                             for statement in sql:
                                 cursor.execute(statement)
 
-            transaction.commit_unless_managed()
+            transaction.commit_unless_managed(using=db)
 
             # Send the post_syncdb signal, so individual apps can do whatever they need
             # to do at this point.
-            emit_post_sync_signal(created_models, verbosity, interactive, connection)
+            emit_post_sync_signal(created_models, verbosity, interactive, db)
 
             # The connection may have been closed by a syncdb handler.
             cursor = connection.cursor()
@@ -130,9 +131,9 @@ class Command(NoArgsCommand):
                                 if show_traceback:
                                     import traceback
                                     traceback.print_exc()
-                                transaction.rollback_unless_managed()
+                                transaction.rollback_unless_managed(using=db)
                             else:
-                                transaction.commit_unless_managed()
+                                transaction.commit_unless_managed(using=db)
                         else:
                             if verbosity >= 2:
                                 print "No custom SQL for %s.%s model" % (app_name, model._meta.object_name)
@@ -151,13 +152,9 @@ class Command(NoArgsCommand):
                             except Exception, e:
                                 sys.stderr.write("Failed to install index for %s.%s model: %s\n" % \
                                                     (app_name, model._meta.object_name, e))
-                                transaction.rollback_unless_managed()
+                                transaction.rollback_unless_managed(using=db)
                             else:
-                                transaction.commit_unless_managed()
+                                transaction.commit_unless_managed(using=db)
 
-        # Install the 'initial_data' fixture, using format discovery
-        # FIXME we only load the fixture data for one DB right now, since we
-        # can't control what DB it does into, once we can control this we
-        # should move it back into the DB loop
-        from django.core.management import call_command
-        call_command('loaddata', 'initial_data', verbosity=verbosity)
+            from django.core.management import call_command
+            call_command('loaddata', 'initial_data', verbosity=verbosity, database=db)

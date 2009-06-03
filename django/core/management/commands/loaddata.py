@@ -4,8 +4,13 @@ import gzip
 import zipfile
 from optparse import make_option
 
+from django.conf import settings
+from django.core import serializers
 from django.core.management.base import BaseCommand
 from django.core.management.color import no_style
+from django.db import connections, transaction, DEFAULT_DB_ALIAS
+from django.db.models import get_apps
+
 
 try:
     set
@@ -22,12 +27,15 @@ class Command(BaseCommand):
     help = 'Installs the named fixture(s) in the database.'
     args = "fixture [fixture ...]"
 
-    def handle(self, *fixture_labels, **options):
-        from django.db.models import get_apps
-        from django.core import serializers
-        from django.db import connection, transaction
-        from django.conf import settings
+    option_list = BaseCommand.option_list + (
+        make_option('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a specific database to load '
+                'fixtures into.  By default uses the "default" database.'),
+    )
 
+    def handle(self, *fixture_labels, **options):
+        using = options['database']
+        connection = connections[using]
         self.style = no_style()
 
         verbosity = int(options.get('verbosity', 1))
@@ -56,9 +64,9 @@ class Command(BaseCommand):
         # Start transaction management. All fixtures are installed in a
         # single transaction to ensure that all references are resolved.
         if commit:
-            transaction.commit_unless_managed()
-            transaction.enter_transaction_management()
-            transaction.managed(True)
+            transaction.commit_unless_managed(using=using)
+            transaction.enter_transaction_management(using=using)
+            transaction.managed(True, using=using)
 
         class SingleZipReader(zipfile.ZipFile):
             def __init__(self, *args, **kwargs):
@@ -103,8 +111,8 @@ class Command(BaseCommand):
                 sys.stderr.write(
                     self.style.ERROR("Problem installing fixture '%s': %s is not a known serialization format." %
                         (fixture_name, format)))
-                transaction.rollback()
-                transaction.leave_transaction_management()
+                transaction.rollback(using=using)
+                transaction.leave_transaction_management(using=using)
                 return
 
             if os.path.isabs(fixture_name):
@@ -119,25 +127,25 @@ class Command(BaseCommand):
                 label_found = False
                 for format in formats:
                     for compression_format in compression_formats:
-                        if compression_format: 
-                            file_name = '.'.join([fixture_name, format, 
+                        if compression_format:
+                            file_name = '.'.join([fixture_name, format,
                                                   compression_format])
-                        else: 
+                        else:
                             file_name = '.'.join([fixture_name, format])
-                    
+
                         if verbosity > 1:
                             print "Trying %s for %s fixture '%s'..." % \
                                 (humanize(fixture_dir), file_name, fixture_name)
                         full_path = os.path.join(fixture_dir, file_name)
-                        open_method = compression_types[compression_format]                                
-                        try: 
+                        open_method = compression_types[compression_format]
+                        try:
                             fixture = open_method(full_path, 'r')
                             if label_found:
                                 fixture.close()
                                 print self.style.ERROR("Multiple fixtures named '%s' in %s. Aborting." %
                                     (fixture_name, humanize(fixture_dir)))
-                                transaction.rollback()
-                                transaction.leave_transaction_management()
+                                transaction.rollback(using=using)
+                                transaction.leave_transaction_management(using=using)
                                 return
                             else:
                                 fixture_count += 1
@@ -150,7 +158,7 @@ class Command(BaseCommand):
                                     for obj in objects:
                                         objects_in_fixture += 1
                                         models.add(obj.object.__class__)
-                                        obj.save()
+                                        obj.save(using=using)
                                     object_count += objects_in_fixture
                                     label_found = True
                                 except (SystemExit, KeyboardInterrupt):
@@ -158,15 +166,15 @@ class Command(BaseCommand):
                                 except Exception:
                                     import traceback
                                     fixture.close()
-                                    transaction.rollback()
-                                    transaction.leave_transaction_management()
+                                    transaction.rollback(using=using)
+                                    transaction.leave_transaction_management(using=using)
                                     if show_traceback:
                                         traceback.print_exc()
                                     else:
                                         sys.stderr.write(
                                             self.style.ERROR("Problem installing fixture '%s': %s\n" %
-                                                 (full_path, ''.join(traceback.format_exception(sys.exc_type, 
-                                                     sys.exc_value, sys.exc_traceback))))) 
+                                                 (full_path, ''.join(traceback.format_exception(sys.exc_type,
+                                                     sys.exc_value, sys.exc_traceback)))))
                                     return
                                 fixture.close()
 
@@ -176,8 +184,8 @@ class Command(BaseCommand):
                                     sys.stderr.write(
                                         self.style.ERROR("No fixture data found for '%s'. (File format may be invalid.)" %
                                             (fixture_name)))
-                                    transaction.rollback()
-                                    transaction.leave_transaction_management()
+                                    transaction.rollback(using=using)
+                                    transaction.leave_transaction_management(using=using)
                                     return
 
                         except Exception, e:
@@ -196,8 +204,8 @@ class Command(BaseCommand):
                     cursor.execute(line)
 
         if commit:
-            transaction.commit()
-            transaction.leave_transaction_management()
+            transaction.commit(using=using)
+            transaction.leave_transaction_management(using=using)
 
         if object_count == 0:
             if verbosity > 1:

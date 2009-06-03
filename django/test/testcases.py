@@ -201,7 +201,8 @@ class DocTestRunner(doctest.DocTestRunner):
                                                           example, exc_info)
         # Rollback, in case of database errors. Otherwise they'd have
         # side effects on other tests.
-        transaction.rollback_unless_managed()
+        for conn in connections:
+            transaction.rollback_unless_managed(using=conn)
 
 class TransactionTestCase(unittest.TestCase):
     def _pre_setup(self):
@@ -446,8 +447,9 @@ class TestCase(TransactionTestCase):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_setup()
 
-        transaction.enter_transaction_management()
-        transaction.managed(True)
+        for conn in connections:
+            transaction.enter_transaction_management(using=conn)
+            transaction.managed(True, using=conn)
         disable_transaction_methods()
 
         from django.contrib.sites.models import Site
@@ -464,7 +466,8 @@ class TestCase(TransactionTestCase):
             return super(TestCase, self)._fixture_teardown()
 
         restore_transaction_methods()
-        transaction.rollback()
-        transaction.leave_transaction_management()
+        for conn in connections:
+            transaction.rollback(using=conn)
+            transaction.leave_transaction_management(using=conn)
         for connection in connections.all():
             connection.close()

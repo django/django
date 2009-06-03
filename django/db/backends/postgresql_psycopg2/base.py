@@ -66,7 +66,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         autocommit = self.settings_dict["DATABASE_OPTIONS"].get('autocommit', False)
         self.features.uses_autocommit = autocommit
         self._set_isolation_level(int(not autocommit))
-        self.ops = DatabaseOperations()
+        self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)

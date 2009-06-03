@@ -2,7 +2,7 @@ import datetime
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, transaction, DEFAULT_DB_ALIAS
 from django.utils.encoding import force_unicode
 
 class SessionStore(SessionBase):
@@ -53,12 +53,13 @@ class SessionStore(SessionBase):
             session_data = self.encode(self._get_session(no_load=must_create)),
             expire_date = self.get_expiry_date()
         )
-        sid = transaction.savepoint()
+        # TODO update for multidb
+        sid = transaction.savepoint(using=DEFAULT_DB_ALIAS)
         try:
             obj.save(force_insert=must_create)
         except IntegrityError:
             if must_create:
-                transaction.savepoint_rollback(sid)
+                transaction.savepoint_rollback(sid, using=DEFAULT_DB_ALIAS)
                 raise CreateError
             raise
 

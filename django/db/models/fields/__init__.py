@@ -233,6 +233,24 @@ class Field(object):
 
         raise TypeError("Field has invalid lookup: %s" % lookup_type)
 
+    def validate(self, lookup_type, value):
+        """
+        Validate that the data is valid, as much so as possible without knowing
+        what connection we are using.  Returns True if the value was
+        successfully validated and false if the value wasn't validated (this
+        doesn't consider whether the value was actually valid, an exception is
+        raised in those circumstances).
+        """
+        if hasattr(value, 'validate') or hasattr(value, '_validate'):
+            if hasattr(value, 'validate'):
+                value.validate()
+            else:
+                value._validate()
+            return True
+        if lookup_type == 'isnull':
+            return True
+        return False
+
     def has_default(self):
         "Returns a boolean of whether this field has a default value."
         return self.default is not NOT_PROVIDED
@@ -360,6 +378,17 @@ class AutoField(Field):
             return None
         return int(value)
 
+    def validate(self, lookup_type, value):
+        if super(AutoField, self).validate(lookup_type, value):
+            return
+        if value is None or hasattr(value, 'as_sql'):
+            return
+        if lookup_type in ('range', 'in'):
+            for val in value:
+                int(val)
+        else:
+            int(value)
+
     def contribute_to_class(self, cls, name):
         assert not cls._meta.has_auto_field, "A model can't have more than one AutoField."
         super(AutoField, self).contribute_to_class(cls, name)
@@ -395,6 +424,13 @@ class BooleanField(Field):
         if value in ('1', '0'):
             value = bool(int(value))
         return super(BooleanField, self).get_db_prep_lookup(lookup_type, value)
+
+    def validate(self, lookup_type, value):
+        if super(BooleanField, self).validate(lookup_type, value):
+            return
+        if value in ('1', '0'):
+            value = int(value)
+        bool(value)
 
     def get_db_prep_value(self, value):
         if value is None:
@@ -509,6 +545,20 @@ class DateField(Field):
     def get_db_prep_value(self, value):
         # Casts dates into the format expected by the backend
         return connection.ops.value_to_db_date(self.to_python(value))
+
+    def validate(self, lookup_type, value):
+        if super(DateField, self).validate(lookup_type, value):
+            return
+        if value is None:
+            return
+        if lookup_type in ('month', 'day', 'year', 'week_day'):
+            int(value)
+            return
+        if lookup_type in ('in', 'range'):
+            for val in value:
+                self.to_python(val)
+            return
+        self.to_python(value)
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)
@@ -753,6 +803,11 @@ class NullBooleanField(Field):
         if value in ('1', '0'):
             value = bool(int(value))
         return super(NullBooleanField, self).get_db_prep_lookup(lookup_type, value)
+
+    def validate(self, lookup_type, value):
+        if value in ('1', '0'):
+            value = int(value)
+        bool(value)
 
     def get_db_prep_value(self, value):
         if value is None:

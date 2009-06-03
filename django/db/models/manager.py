@@ -173,6 +173,9 @@ class Manager(object):
     def only(self, *args, **kwargs):
         return self.get_query_set().only(*args, **kwargs)
 
+    def using(self, *args, **kwargs):
+        return self.get_query_set().using(*args, **kwargs)
+
     def _insert(self, values, **kwargs):
         return insert_query(self.model, values, **kwargs)
 

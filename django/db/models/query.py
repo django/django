@@ -7,7 +7,7 @@ try:
 except NameError:
     from sets import Set as set     # Python 2.3 fallback
 
-from django.db import connection, transaction, IntegrityError
+from django.db import connections, transaction, IntegrityError, DEFAULT_DB_ALIAS
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import DateField
 from django.db.models.query_utils import Q, select_related_descend, CollectedObjects, CyclicDependency, deferred_class_factory
@@ -31,10 +31,13 @@ class QuerySet(object):
     """
     def __init__(self, model=None, query=None):
         self.model = model
+        connection = connections[DEFAULT_DB_ALIAS]
         self.query = query or sql.Query(self.model, connection)
         self._result_cache = None
         self._iter = None
         self._sticky_filter = False
+        self._using = DEFAULT_DB_ALIAS # this will be wrong if a custom Query
+                                       # is provided with a non default connection
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -300,12 +303,12 @@ class QuerySet(object):
                 params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
                 params.update(defaults)
                 obj = self.model(**params)
-                sid = transaction.savepoint()
-                obj.save(force_insert=True)
-                transaction.savepoint_commit(sid)
+                sid = transaction.savepoint(using=self._using)
+                obj.save(force_insert=True, using=self._using)
+                transaction.savepoint_commit(sid, using=self._using)
                 return obj, True
             except IntegrityError, e:
-                transaction.savepoint_rollback(sid)
+                transaction.savepoint_rollback(sid, using=self._using)
                 try:
                     return self.get(**kwargs), False
                 except self.model.DoesNotExist:
@@ -364,7 +367,7 @@ class QuerySet(object):
 
             if not seen_objs:
                 break
-            delete_objects(seen_objs)
+            delete_objects(seen_objs, del_query._using)
 
         # Clear the result cache, in case this QuerySet gets reused.
         self._result_cache = None
@@ -379,20 +382,20 @@ class QuerySet(object):
                 "Cannot update a query once a slice has been taken."
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
-        if not transaction.is_managed():
-            transaction.enter_transaction_management()
+        if not transaction.is_managed(using=self._using):
+            transaction.enter_transaction_management(using=self._using)
             forced_managed = True
         else:
             forced_managed = False
         try:
             rows = query.execute_sql(None)
             if forced_managed:
-                transaction.commit()
+                transaction.commit(using=self._using)
             else:
-                transaction.commit_unless_managed()
+                transaction.commit_unless_managed(using=self._using)
         finally:
             if forced_managed:
-                transaction.leave_transaction_management()
+                transaction.leave_transaction_management(using=self._using)
         self._result_cache = None
         return rows
     update.alters_data = True
@@ -616,6 +619,16 @@ class QuerySet(object):
         clone.query.add_immediate_loading(fields)
         return clone
 
+    def using(self, alias):
+        """
+        Selects which database this QuerySet should excecute it's query against.
+        """
+        clone = self._clone()
+        clone._using = alias
+        connection = connections[alias]
+        clone.query.set_connection(connection)
+        return clone
+
     ###################################
     # PUBLIC INTROSPECTION ATTRIBUTES #
     ###################################
@@ -644,6 +657,7 @@ class QuerySet(object):
         if self._sticky_filter:
             query.filter_is_sticky = True
         c = klass(model=self.model, query=query)
+        c._using = self._using
         c.__dict__.update(kwargs)
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
@@ -699,6 +713,13 @@ class QuerySet(object):
         """
         obj = self.values("pk")
         return obj.query.as_nested_sql()
+
+    def _validate(self):
+        """
+        A normal QuerySet is always valid when used as the RHS of a filter,
+        since it automatically gets filtered down to 1 field.
+        """
+        pass
 
     # When used as part of a nested query, a queryset will never be an "always
     # empty" result.
@@ -817,6 +838,17 @@ class ValuesQuerySet(QuerySet):
             raise TypeError('Cannot use a multi-field %s as a filter value.'
                     % self.__class__.__name__)
         return self._clone().query.as_nested_sql()
+
+    def _validate(self):
+        """
+        Validates that we aren't trying to do a query like
+        value__in=qs.values('value1', 'value2'), which isn't valid.
+        """
+        if ((self._fields and len(self._fields) > 1) or
+                (not self._fields and len(self.model._meta.fields) > 1)):
+            raise TypeError('Cannot use a multi-field %s as a filter value.'
+                    % self.__class__.__name__)
+
 
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
@@ -970,13 +1002,14 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
                 setattr(obj, f.get_cache_name(), rel_obj)
     return obj, index_end
 
-def delete_objects(seen_objs):
+def delete_objects(seen_objs, using):
     """
     Iterate through a list of seen classes, and remove any instances that are
     referred to.
     """
-    if not transaction.is_managed():
-        transaction.enter_transaction_management()
+    connection = connections[using]
+    if not transaction.is_managed(using=using):
+        transaction.enter_transaction_management(using=using)
         forced_managed = True
     else:
         forced_managed = False
@@ -1036,20 +1069,21 @@ def delete_objects(seen_objs):
                 setattr(instance, cls._meta.pk.attname, None)
 
         if forced_managed:
-            transaction.commit()
+            transaction.commit(using=using)
         else:
-            transaction.commit_unless_managed()
+            transaction.commit_unless_managed(using=using)
     finally:
         if forced_managed:
-            transaction.leave_transaction_management()
+            transaction.leave_transaction_management(using=using)
 
 
-def insert_query(model, values, return_id=False, raw_values=False):
+def insert_query(model, values, return_id=False, raw_values=False, using=None):
     """
     Inserts a new record for the given model. This provides an interface to
     the InsertQuery class and is how Model.save() is implemented. It is not
     part of the public API.
     """
+    connection = connections[using]
     query = sql.InsertQuery(model, connection)
     query.insert_values(values, raw_values)
     return query.execute_sql(return_id)

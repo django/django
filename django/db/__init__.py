@@ -54,12 +54,13 @@ def reset_queries(**kwargs):
     connection.queries = []
 signals.request_started.connect(reset_queries)
 
-# Register an event that rolls back the connection
+# Register an event that rolls back the connections
 # when a Django request has an exception.
 def _rollback_on_exception(**kwargs):
     from django.db import transaction
-    try:
-        transaction.rollback_unless_managed()
-    except DatabaseError:
-        pass
+    for conn in connections:
+        try:
+            transaction.rollback_unless_managed(using=conn)
+        except DatabaseError:
+            pass
 signals.got_request_exception.connect(_rollback_on_exception)

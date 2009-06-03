@@ -3,24 +3,22 @@ from django.db.models.fields import FieldDoesNotExist
 from django.db.models.sql.constants import LOOKUP_SEP
 
 class SQLEvaluator(object):
+    as_sql_takes_connection = True
+
     def __init__(self, expression, query, allow_joins=True):
         self.expression = expression
         self.opts = query.get_meta()
         self.cols = {}
 
         self.contains_aggregate = False
-        self.connection = query.connection
         self.expression.prepare(self, query, allow_joins)
 
-    def as_sql(self, qn=None):
-        return self.expression.evaluate(self, qn)
+    def as_sql(self, qn, connection):
+        return self.expression.evaluate(self, qn, connection)
 
     def relabel_aliases(self, change_map):
         for node, col in self.cols.items():
             self.cols[node] = (change_map.get(col[0], col[0]), col[1])
-
-    def update_connection(self, connection):
-        self.connection = connection
 
     #####################################################
     # Vistor methods for initial expression preparation #
@@ -57,15 +55,12 @@ class SQLEvaluator(object):
     # Vistor methods for final expression evaluation #
     ##################################################
 
-    def evaluate_node(self, node, qn):
-        if not qn:
-            qn = self.connection.ops.quote_name
-
+    def evaluate_node(self, node, qn, connection):
         expressions = []
         expression_params = []
         for child in node.children:
             if hasattr(child, 'evaluate'):
-                sql, params = child.evaluate(self, qn)
+                sql, params = child.evaluate(self, qn, connection)
             else:
                 sql, params = '%s', (child,)
 
@@ -78,12 +73,9 @@ class SQLEvaluator(object):
                 expressions.append(format % sql)
                 expression_params.extend(params)
 
-        return self.connection.ops.combine_expression(node.connector, expressions), expression_params
+        return connection.ops.combine_expression(node.connector, expressions), expression_params
 
-    def evaluate_leaf(self, node, qn):
-        if not qn:
-            qn = self.connection.ops.quote_name
-
+    def evaluate_leaf(self, node, qn, connection):
         col = self.cols[node]
         if hasattr(col, 'as_sql'):
             return col.as_sql(qn), ()

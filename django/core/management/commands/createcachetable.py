@@ -27,9 +27,9 @@ class Command(LabelCommand):
         )
         table_output = []
         index_output = []
-        qn = connections.ops.quote_name
+        qn = connection.ops.quote_name
         for f in fields:
-            field_output = [qn(f.name), f.db_type()]
+            field_output = [qn(f.name), f.db_type(connection)]
             field_output.append("%sNULL" % (not f.null and "NOT " or ""))
             if f.primary_key:
                 field_output.append("PRIMARY KEY")

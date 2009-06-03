@@ -4,6 +4,11 @@ TODO
 The follow is a list, more or less in the order I intend to do them of things
 that need to be done.  I'm trying to be as granular as possible.
 
+***
+Immediate TODOs:
+Finish refactor of WhereNode so that it just takes connection in as_sql.
+***
+
 2)  Update all old references to ``settings.DATABASE_*`` to reference
     ``settings.DATABASES``.  This includes the following locations
 
@@ -20,29 +25,21 @@ that need to be done.  I'm trying to be as granular as possible.
 
     * ``dumpdata``: By default dump the ``default`` database.  Later add a
       ``--database`` flag.
-    * ``loaddata``: Leave as is, will use the standard mechanisms for
-      determining what DB to save the objects to.  Should it get a
-      ``--database`` flag to overide that?
 
     These items will be fixed pending both community consensus, and the API
-    that will go in that's actually necessary for these to happen.  Due to
-    internal APIs loaddata probably will need an update to load stuff into a
-    specific DB.
+    that will go in that's actually necessary for these to happen.
 
-4)  Rig up the test harness to work with multiple databases.  This includes:
+    flush, reset, and syncdb need to not prompt the user multiple times.
 
-    * The current strategy is to test on N dbs, where N is however many the
-      user defines and ensuring the data all stays seperate and no exceptions
-      are raised.  Practically speaking this means we're only going to have
-      good coverage if we write a lot of tests that can break.  That's life.
+9)  Fix transaction support.  In practice this means changing all the
+    dictionaries that currently map thread to a boolean to being a dictionary
+    mapping thread to a set of the affected DBs, and changing all the functions
+    that use these dictionaries to handle the changes appropriately.
 
 7)  Remove any references to the global ``django.db.connection`` object in the
     SQL creation process.  This includes(but is probably not limited to):
 
     * The way we create ``Query`` from ``BaseQuery`` is awkward and hacky.
-    * ``django.db.models.query.delete_objects``
-    * ``django.db.models.query.insert_query``
-    * ``django.db.models.base.Model`` -- in ``save_base``
     * ``django.db.models.fields.Field`` This uses it, as do it's subclasses.
     * ``django.db.models.fields.related`` It's used all over the place here,
       including opening a cursor and executing queries, so that's going to
@@ -50,13 +47,9 @@ that need to be done.  I'm trying to be as granular as possible.
       raw SQL and execution to ``Query``/``QuerySet`` so hopefully that makes
       it in before I need to tackle this.
 
+
 5)  Add the ``using`` Meta option.  Tests and docs(these are to be assumed at
     each stage from here on out).
-5)  Implement using kwarg on save() method.
-6)  Add the ``using`` method to ``QuerySet``.  This will more or less "just
-    work" across multiple databases that use the same backend.  However, it
-    will fail gratuitously when trying to use 2 different backends.
-
 8)  Implement some way to create a new ``Query`` for a different backend when
     we switch.  There are several checks against ``self.connection`` prior to
     SQL construction, so we either need to defer all these(which will be
@@ -80,8 +73,4 @@ that need to be done.  I'm trying to be as granular as possible.
       every single one of them, then when it's time excecute the query just
       pick the right ``Query`` object to use.  This *does* not scale, though it
       could probably be done fairly easily.
-9)  Fix transaction support.  In practice this means changing all the
-    dictionaries that currently map thread to a boolean to being a dictionary
-    mapping thread to a set of the affected DBs, and changing all the functions
-    that use these dictionaries to handle the changes appropriately.
 10) Time permitting add support for a ``DatabaseManager``.

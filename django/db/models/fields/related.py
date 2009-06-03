@@ -1,4 +1,4 @@
-from django.db import connection, transaction
+from django.db import connection, transaction, DEFAULT_DB_ALIAS
 from django.db.backends import util
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist
@@ -478,7 +478,9 @@ def create_many_related_manager(superclass, through=False):
                     cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
                         (self.join_table, source_col_name, target_col_name),
                         [self._pk_val, obj_id])
-                transaction.commit_unless_managed()
+                # FIXME, once this isn't in related.py it should conditionally
+                # use the right DB.
+                transaction.commit_unless_managed(using=DEFAULT_DB_ALIAS)
 
         def _remove_items(self, source_col_name, target_col_name, *objs):
             # source_col_name: the PK colname in join_table for the source object
@@ -508,7 +510,8 @@ def create_many_related_manager(superclass, through=False):
             cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
                 (self.join_table, source_col_name),
                 [self._pk_val])
-            transaction.commit_unless_managed()
+            # TODO
+            transaction.commit_unless_managed(using=DEFAULT_DB_ALIAS)
 
     return ManyRelatedManager
 
