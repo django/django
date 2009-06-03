@@ -1,5 +1,6 @@
 import os
 
+from django.conf import settings
 from django.utils.importlib import import_module
 
 def load_backend(backend_name):
@@ -39,6 +40,10 @@ class ConnectionHandler(object):
         conn = self.databases[alias]
         conn.setdefault('DATABASE_ENGINE', 'dummy')
         conn.setdefault('DATABASE_OPTIONS', {})
+        conn.setdefault('TEST_DATABASE_CHARSET', None)
+        conn.setdefault('TEST_DATABASE_COLLATION', None)
+        conn.setdefault('TEST_DATABASE_NAME', None)
+        conn.setdefault('TIME_ZONE', settings.TIME_ZONE)
         for setting in ('DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD',
             'DATABASE_HOST', 'DATABASE_PORT'):
             conn.setdefault(setting, '')
@@ -53,6 +58,9 @@ class ConnectionHandler(object):
         conn = backend.DatabaseWrapper(db)
         self._connections[alias] = conn
         return conn
+
+    def __iter__(self):
+        return iter(self.databases)
 
     def all(self):
         return [self[alias] for alias in self.databases]

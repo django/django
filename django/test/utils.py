@@ -1,6 +1,5 @@
 import sys, time, os
 from django.conf import settings
-from django.db import connection
 from django.core import mail
 from django.test import signals
 from django.template import Template

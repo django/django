@@ -186,11 +186,15 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
 
     suite = reorder_suite(suite, (TestCase,))
 
-    old_name = settings.DATABASE_NAME
-    from django.db import connection
-    connection.creation.create_test_db(verbosity, autoclobber=not interactive)
+    old_names = []
+    from django.db import connections
+    for alias in connections:
+        connection = connections[alias]
+        old_names.append((connection, connection.settings_dict['DATABASE_NAME']))
+        connection.creation.create_test_db(verbosity, autoclobber=not interactive, alias=alias)
     result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
-    connection.creation.destroy_test_db(old_name, verbosity)
+    for connection, old_name in old_names:
+        connection.creation.destroy_test_db(old_name, verbosity)
 
     teardown_test_environment()
 

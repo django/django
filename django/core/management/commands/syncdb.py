@@ -33,7 +33,7 @@ class Command(NoArgsCommand):
         if not options['database']:
             dbs = connections.all()
         else:
-            dbs = [options['database']]
+            dbs = [connections[options['database']]]
         for connection in dbs:
 
             # Import the 'management' module within each installed app, to register
@@ -154,6 +154,15 @@ class Command(NoArgsCommand):
                             else:
                                 transaction.commit_unless_managed()
 
+<<<<<<< HEAD:django/core/management/commands/syncdb.py
             # Install the 'initial_data' fixture, using format discovery
             from django.core.management import call_command
             call_command('loaddata', 'initial_data', verbosity=verbosity)
+=======
+        # Install the 'initial_data' fixture, using format discovery
+        # FIXME we only load the fixture data for one DB right now, since we
+        # can't control what DB it does into, once we can control this we
+        # should move it back into the DB loop
+        from django.core.management import call_command
+        call_command('loaddata', 'initial_data', verbosity=verbosity)
+>>>>>>> 2c764d3ff7cb665ec919d1f3e2977587752c6f2c:django/core/management/commands/syncdb.py

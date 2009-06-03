@@ -118,10 +118,10 @@ class Field(object):
         """
         return value
 
-    def db_type(self):
+    def db_type(self, connection):
         """
-        Returns the database column data type for this field, taking into
-        account the DATABASE_ENGINE setting.
+        Returns the database column data type for this field, for the provided
+        connection.
         """
         # The default implementation of this method looks at the
         # backend-specific DATA_TYPES dictionary, looking up the field by its

@@ -263,10 +263,10 @@ approximately decreasing order of importance, so start from the top.
 Custom database types
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: db_type(self)
+.. method:: db_type(self, connection)
 
 Returns the database column data type for the :class:`~django.db.models.Field`,
-taking into account the current :setting:`DATABASE_ENGINE` setting.
+taking into account the connection object, and the settings associated with it.
 
 Say you've created a PostgreSQL custom type called ``mytype``. You can use this
 field with Django by subclassing ``Field`` and implementing the :meth:`db_type`
@@ -275,7 +275,7 @@ method, like so::
     from django.db import models
 
     class MytypeField(models.Field):
-        def db_type(self):
+        def db_type(self, connection):
             return 'mytype'
 
 Once you have ``MytypeField``, you can use it in any model, just like any other
@@ -290,13 +290,13 @@ If you aim to build a database-agnostic application, you should account for
 differences in database column types. For example, the date/time column type
 in PostgreSQL is called ``timestamp``, while the same column in MySQL is called
 ``datetime``. The simplest way to handle this in a ``db_type()`` method is to
-import the Django settings module and check the :setting:`DATABASE_ENGINE` setting.
+check the ``connection.settings_dict['DATABASE_ENGINE']`` attribute.
+
 For example::
 
     class MyDateField(models.Field):
-        def db_type(self):
-            from django.conf import settings
-            if settings.DATABASE_ENGINE == 'mysql':
+        def db_type(self, connection):
+            if connection.settings_dict['DATABASE_ENGINE'] == 'mysql':
                 return 'datetime'
             else:
                 return 'timestamp'
@@ -304,7 +304,7 @@ For example::
 The :meth:`db_type` method is only called by Django when the framework
 constructs the ``CREATE TABLE`` statements for your application -- that is, when
 you first create your tables. It's not called at any other time, so it can
-afford to execute slightly complex code, such as the :setting:`DATABASE_ENGINE`
+afford to execute slightly complex code, such as the ``connection.settings_dict``
 check in the above example.
 
 Some database column types accept parameters, such as ``CHAR(25)``, where the
@@ -315,7 +315,7 @@ sense to have a ``CharMaxlength25Field``, shown here::
 
     # This is a silly example of hard-coded parameters.
     class CharMaxlength25Field(models.Field):
-        def db_type(self):
+        def db_type(self, connection):
             return 'char(25)'
 
     # In the model:
@@ -333,7 +333,7 @@ time -- i.e., when the class is instantiated. To do that, just implement
             self.max_length = max_length
             super(BetterCharField, self).__init__(*args, **kwargs)
 
-        def db_type(self):
+        def db_type(self, connection):
             return 'char(%s)' % self.max_length
 
     # In the model:

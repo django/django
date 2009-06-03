@@ -267,7 +267,9 @@ class Constraint(object):
         try:
             if self.field:
                 params = self.field.get_db_prep_lookup(lookup_type, value)
-                db_type = self.field.db_type()
+                # FIXME, we're using the global connection object here, once a
+                # WhereNode know's it's connection we should pass that through
+                db_type = self.field.db_type(connection)
             else:
                 # This branch is used at times when we add a comparison to NULL
                 # (we don't really want to waste time looking up the associated
@@ -278,4 +280,3 @@ class Constraint(object):
             raise EmptyShortCircuit
 
         return (self.alias, self.col, db_type), params
-

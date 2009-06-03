@@ -7,7 +7,6 @@ that need to be done.  I'm trying to be as granular as possible.
 2)  Update all old references to ``settings.DATABASE_*`` to reference
     ``settings.DATABASES``.  This includes the following locations
 
-    * howto/custom-model-fields -- defered since it refers to custom model fields
     * internals/contributing -- still needs an update on TEST_*
     * ref/settings -- needs to be upddated for TEST_*
     * topics/testing -- needs update for the TEST_* settings, plus test refactor
@@ -24,22 +23,17 @@ that need to be done.  I'm trying to be as granular as possible.
       ``--database`` flag to overide that?
 
     These items will be fixed pending both community consensus, and the API
-    that will go in that's actually necessary for these to happen.
+    that will go in that's actually necessary for these to happen.  Due to
+    internal APIs loaddata probably will need an update to load stuff into a
+    specific DB.
 
 4)  Rig up the test harness to work with multiple databases.  This includes:
 
-    * Figure out how we can actually test multiple databases.  If the user has
-      more than one database in ``settings.DATABASES`` we can just use the test
-      database for each of them.  Otherwise we are going to have to make some
-      assumptions.  Either just go for SQLite, since that's going to be easiest
-      (and going forward it will be included in all versions of Python we work
-      with), or we can try to create a database with ``test_2_`` prefix.
-      Similar to how we use a ``test_`` prefix by default.
-5)  Add the ``using`` Meta option.  Tests and docs(these are to be assumed at
-    each stage from here on out).
-6)  Add the ``using`` method to ``QuerySet``.  This will more or less "just
-    work" across multiple databases that use the same backend.  However, it
-    will fail gratuitously when trying to use 2 different backends.
+    * The current strategy is to test on N dbs, where N is however many the
+      user defines and ensuring the data all stays seperate and no exceptions
+      are raised.  Practically speaking this means we're only going to have
+      good coverage if we write a lot of tests that can break.  That's life.
+
 7)  Remove any references to the global ``django.db.connection`` object in the
     SQL creation process.  This includes(but is probably not limited to):
 
@@ -57,6 +51,13 @@ that need to be done.  I'm trying to be as granular as possible.
       need to be totally refactored.  There's a ticket to at least move that
       raw SQL and execution to ``Query``/``QuerySet`` so hopefully that makes
       it in before I need to tackle this.
+
+5)  Add the ``using`` Meta option.  Tests and docs(these are to be assumed at
+    each stage from here on out).
+6)  Add the ``using`` method to ``QuerySet``.  This will more or less "just
+    work" across multiple databases that use the same backend.  However, it
+    will fail gratuitously when trying to use 2 different backends.
+
 8)  Implement some way to create a new ``Query`` for a different backend when
     we switch.  There are several checks against ``self.connection`` prior to
     SQL construction, so we either need to defer all these(which will be

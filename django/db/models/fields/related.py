@@ -731,7 +731,7 @@ class ForeignKey(RelatedField, Field):
         defaults.update(kwargs)
         return super(ForeignKey, self).formfield(**defaults)
 
-    def db_type(self):
+    def db_type(self, connection):
         # The database column type of a ForeignKey is the column type
         # of the field to which it points. An exception is if the ForeignKey
         # points to an AutoField/PositiveIntegerField/PositiveSmallIntegerField,
@@ -743,8 +743,8 @@ class ForeignKey(RelatedField, Field):
                 (not connection.features.related_fields_match_type and
                 isinstance(rel_field, (PositiveIntegerField,
                                        PositiveSmallIntegerField)))):
-            return IntegerField().db_type()
-        return rel_field.db_type()
+            return IntegerField().db_type(connection)
+        return rel_field.db_type(connection)
 
 class OneToOneField(ForeignKey):
     """
@@ -954,8 +954,7 @@ class ManyToManyField(RelatedField, Field):
             defaults['initial'] = [i._get_pk_val() for i in initial]
         return super(ManyToManyField, self).formfield(**defaults)
 
-    def db_type(self):
+    def db_type(self, connection):
         # A ManyToManyField is not represented by a single column,
         # so return None.
         return None
-

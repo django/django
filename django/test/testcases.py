@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core import mail
 from django.core.management import call_command
 from django.core.urlresolvers import clear_url_caches
-from django.db import transaction, connection
+from django.db import transaction, connections
 from django.http import QueryDict
 from django.test import _doctest as doctest
 from django.test.client import Client
@@ -427,6 +427,13 @@ class TransactionTestCase(unittest.TestCase):
             (u"Template '%s' was used unexpectedly in rendering the"
              u" response") % template_name)
 
+def connections_support_transactions():
+    """
+    Returns True if all connections support transactions.  This is messy
+    because 2.4 doesn't support any or all.
+    """
+    return len([None for conn in connections.all() if conn.settings_dict['DATABASE_SUPPORTS_TRANSACTIONS']]) == len(connections.all())
+
 class TestCase(TransactionTestCase):
     """
     Does basically the same as TransactionTestCase, but surrounds every test
@@ -436,7 +443,7 @@ class TestCase(TransactionTestCase):
     """
 
     def _fixture_setup(self):
-        if not connection.settings_dict['DATABASE_SUPPORTS_TRANSACTIONS']:
+        if not connections_support_transactions():
             return super(TestCase, self)._fixture_setup()
 
         transaction.enter_transaction_management()
@@ -453,10 +460,11 @@ class TestCase(TransactionTestCase):
                                                         })
 
     def _fixture_teardown(self):
-        if not connection.settings_dict['DATABASE_SUPPORTS_TRANSACTIONS']:
+        if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
 
         restore_transaction_methods()
         transaction.rollback()
         transaction.leave_transaction_management()
-        connection.close()
+        for connection in connections.all():
+            connection.close()
