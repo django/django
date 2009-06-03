@@ -208,6 +208,8 @@ class IntegerField(Field):
 
     def validate(self, value):
         super(IntegerField, self).validate(value)
+        if value in EMPTY_VALUES:
+            return
         if self.max_value is not None and value > self.max_value:
             raise ValidationError(self.error_messages['max_value'] % self.max_value)
         if self.min_value is not None and value < self.min_value:
@@ -250,22 +252,26 @@ class DecimalField(Field):
         self.max_digits, self.decimal_places = max_digits, decimal_places
         Field.__init__(self, *args, **kwargs)
 
-    def clean(self, value):
+    def to_python(self, value):
         """
         Validates that the input is a decimal number. Returns a Decimal
         instance. Returns None for empty values. Ensures that there are no more
         than max_digits in the number, and no more than decimal_places digits
         after the decimal point.
         """
-        super(DecimalField, self).clean(value)
-        if not self.required and value in EMPTY_VALUES:
+        if value in EMPTY_VALUES:
             return None
         value = smart_str(value).strip()
         try:
             value = Decimal(value)
         except DecimalException:
             raise ValidationError(self.error_messages['invalid'])
+        return value
 
+    def validate(self, value):
+        super(DecimalField, self).validate(value)
+        if value in EMPTY_VALUES:
+            return
         sign, digittuple, exponent = value.as_tuple()
         decimals = abs(exponent)
         # digittuple doesn't include any leading zeros.
