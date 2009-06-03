@@ -25,6 +25,7 @@ except NameError:
 
 from django.core.exceptions import ValidationError
 from django.core import validators
+from django.core.validators import EMPTY_VALUES
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
 
@@ -45,9 +46,6 @@ __all__ = (
     'SplitDateTimeField', 'IPAddressField', 'FilePathField', 'SlugField',
     'TypedChoiceField'
 )
-
-# These values, if given to to_python(), will trigger the self.required check.
-EMPTY_VALUES = (None, '')
 
 
 class Field(object):
@@ -115,6 +113,14 @@ class Field(object):
         self.error_messages = messages
         self.validators = self.default_validators + validators
 
+    def to_python(self, value):
+        return value
+    
+    def validate(self, value):
+        if value in EMPTY_VALUES and self.required:
+            raise ValidationError(self.error_messages['required'])
+
+
     def clean(self, value):
         """
         Validates the given value and returns its "cleaned" value as an
@@ -122,8 +128,8 @@ class Field(object):
 
         Raises ValidationError for any errors.
         """
-        if self.required and value in EMPTY_VALUES:
-            raise ValidationError(self.error_messages['required'])
+        value = self.to_python(value)
+        self.validate(value)
         return value
 
     def widget_attrs(self, widget):
@@ -150,18 +156,23 @@ class CharField(Field):
         self.max_length, self.min_length = max_length, min_length
         super(CharField, self).__init__(*args, **kwargs)
 
-    def clean(self, value):
-        "Validates max_length and min_length. Returns a Unicode object."
-        super(CharField, self).clean(value)
+    def to_python(self, value):
+        "Returns a Unicode object."
         if value in EMPTY_VALUES:
             return u''
-        value = smart_unicode(value)
+        return smart_unicode(value)
+    
+    def validate(self, value):
+        "Validates max_length and min_length."
+        super(CharField, self).validate(value)
+        if value in EMPTY_VALUES:
+            # non-required field, no need for further validation
+            return
         value_length = len(value)
         if self.max_length is not None and value_length > self.max_length:
             raise ValidationError(self.error_messages['max_length'] % {'max': self.max_length, 'length': value_length})
         if self.min_length is not None and value_length < self.min_length:
             raise ValidationError(self.error_messages['min_length'] % {'min': self.min_length, 'length': value_length})
-        return value
 
     def widget_attrs(self, widget):
         if self.max_length is not None and isinstance(widget, (TextInput, PasswordInput)):
