@@ -242,7 +242,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
-        self.validation = DatabaseValidation()
+        self.validation = DatabaseValidation(self)
 
     def _valid_connection(self):
         if self.connection is not None:

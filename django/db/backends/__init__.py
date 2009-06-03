@@ -557,7 +557,9 @@ class BaseDatabaseValidation(object):
     """
     This class encapsualtes all backend-specific model validation.
     """
+    def __init__(self, connection):
+        self.connection = connection
+
     def validate_field(self, errors, opts, f):
         "By default, there is no backend-specific validation"
         pass
-

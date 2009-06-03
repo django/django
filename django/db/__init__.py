@@ -4,10 +4,13 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.utils import ConnectionHandler, load_backend
 from django.utils.functional import curry
 
-__all__ = ('backend', 'connection', 'DatabaseError', 'IntegrityError')
+__all__ = ('backend', 'connection', 'connections', 'DatabaseError',
+    'IntegrityError', 'DEFAULT_DB_ALIAS')
 
-if not settings.DATABASES or 'default' not in settings.DATABASES:
-    settings.DATABASES['default'] = {
+DEFAULT_DB_ALIAS = 'default'
+
+if not settings.DATABASES or DEFAULT_DB_ALIAS not in settings.DATABASES:
+    settings.DATABASES[DEFAULT_DB_ALIAS] = {
         'DATABASE_ENGINE': settings.DATABASE_ENGINE,
         'DATABASE_HOST': settings.DATABASE_HOST,
         'DATABASE_NAME': settings.DATABASE_NAME,
@@ -16,6 +19,10 @@ if not settings.DATABASES or 'default' not in settings.DATABASES:
         'DATABASE_PORT': settings.DATABASE_PORT,
         'DATABASE_USER': settings.DATABASE_USER,
         'TIME_ZONE': settings.TIME_ZONE,
+
+        'TEST_DATABASE_CHARSET': settings.TEST_DATABASE_CHARSET,
+        'TEST_DATABASE_COLLATION': settings.TEST_DATABASE_COLLATION,
+        'TEST_DATABASE_NAME': settings.TEST_DATABASE_NAME,
     }
 
 connections = ConnectionHandler(settings.DATABASES)

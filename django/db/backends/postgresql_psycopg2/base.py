@@ -4,7 +4,6 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
-from django.conf import settings
 from django.db.backends import *
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql.operations import DatabaseOperations as PostgresqlDatabaseOperations
@@ -71,7 +70,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
-        self.validation = BaseDatabaseValidation()
+        self.validation = BaseDatabaseValidation(self)
 
     def _cursor(self):
         set_tz = False
@@ -150,4 +149,3 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         finally:
             self.isolation_level = level
             self.features.uses_savepoints = bool(level)
-

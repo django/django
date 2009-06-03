@@ -28,7 +28,6 @@ that need to be done.  I'm trying to be as granular as possible.
 
 4)  Rig up the test harness to work with multiple databases.  This includes:
 
-    * Move all ``TEST_*`` settings to go in ``DATABASE_OPTIONS``.
     * Figure out how we can actually test multiple databases.  If the user has
       more than one database in ``settings.DATABASES`` we can just use the test
       database for each of them.  Otherwise we are going to have to make some

@@ -436,7 +436,7 @@ class TestCase(TransactionTestCase):
     """
 
     def _fixture_setup(self):
-        if not settings.DATABASE_SUPPORTS_TRANSACTIONS:
+        if not connection.settings_dict['DATABASE_SUPPORTS_TRANSACTIONS']:
             return super(TestCase, self)._fixture_setup()
 
         transaction.enter_transaction_management()
@@ -453,7 +453,7 @@ class TestCase(TransactionTestCase):
                                                         })
 
     def _fixture_teardown(self):
-        if not settings.DATABASE_SUPPORTS_TRANSACTIONS:
+        if not connection.settings_dict['DATABASE_SUPPORTS_TRANSACTIONS']:
             return super(TestCase, self)._fixture_teardown()
 
         restore_transaction_methods()
