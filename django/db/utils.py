@@ -36,7 +36,11 @@ class ConnectionHandler(object):
         self.databases = databases
         self._connections = {}
 
-    def check_connection(self, alias):
+    def ensure_defaults(self, alias):
+        """
+        Puts the defaults into the settings dictionary for a given connection
+        where no settings is provided.
+        """
         conn = self.databases[alias]
         conn.setdefault('DATABASE_ENGINE', 'dummy')
         conn.setdefault('DATABASE_OPTIONS', {})
@@ -52,7 +56,7 @@ class ConnectionHandler(object):
         if alias in self._connections:
             return self._connections[alias]
 
-        self.check_connection(alias)
+        self.ensure_defaults(alias)
         db = self.databases[alias]
         backend = load_backend(db['DATABASE_ENGINE'])
         conn = backend.DatabaseWrapper(db)
@@ -63,4 +67,4 @@ class ConnectionHandler(object):
         return iter(self.databases)
 
     def all(self):
-        return [self[alias] for alias in self.databases]
+        return [self[alias] for alias in self]

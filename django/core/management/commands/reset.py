@@ -11,7 +11,8 @@ class Command(AppCommand):
         make_option('--noinput', action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.'),
         make_option('--database', action='store', dest='database',
-            default='', help='Selects what database reset.'),
+            default='', help='Nominates a database to reset.  Defaults to '
+                'reseting all databases.'),
     )
     help = "Executes ``sqlreset`` for the given app(s) in the current database."
     args = '[appname ...]'
@@ -23,10 +24,11 @@ class Command(AppCommand):
             dbs = connections.all()
         else:
             dbs = [options['database']]
-        for connection in dbs:
-            app_name = app.__name__.split('.')[-2]
 
-            self.style = no_style()
+        app_name = app.__name__.split('.')[-2]
+        self.style = no_style()
+
+        for connection in dbs:
 
             sql_list = sql_reset(app, self.style, connection)
 

@@ -10,7 +10,8 @@ class Command(LabelCommand):
 
     option_list = LabelCommand.option_list + (
         make_option('--database', action='store', dest='database',
-            default='default', help='Selects what database to install the cache table to.'),
+            default='default', help='Nominates a specific database to install '
+                'the cache table to.  Defaults to the "default" database.'),
     )
 
     requires_model_validation = False

@@ -9,7 +9,8 @@ class Command(NoArgsCommand):
 
     option_list = NoArgsCommand.option_list + (
         make_option('--database', action='store', dest='database',
-            default='default', help='Selects what database to print the SQL for.'),
+            default='default', help='Nominates a database to print the SQL '
+                'for.  Defaults to the "default" database.'),
     )
 
     output_transaction = True

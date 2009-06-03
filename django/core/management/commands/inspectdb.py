@@ -9,7 +9,8 @@ class Command(NoArgsCommand):
 
     option_list = NoArgsCommand.option_list + (
         make_option('--database', action='store', dest='database',
-            default='default', help='Selects what database to introspect.'),
+            default='default', help='Nominates a database to introspect.  '
+                'Defaults to using the "default" database.'),
     )
 
     requires_model_validation = False

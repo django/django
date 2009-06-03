@@ -13,6 +13,8 @@ that need to be done.  I'm trying to be as granular as possible.
 
     The remaining items will be fixed as the code for them enters the code base.
 
+    Replace old instances of :setting:`DATABASE_` with a new tag or something.
+
 
 3)  Update all management commands in the following way:
 

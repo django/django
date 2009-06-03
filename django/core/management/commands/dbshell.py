@@ -9,7 +9,8 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option('--database', action='store', dest='database',
-            default='default', help='Selects what database to connection to.'),
+            default='default', help='Nominates a database to open a shell for.'
+                ' Defaults to the "default" database.'),
     )
 
     requires_model_validation = False
