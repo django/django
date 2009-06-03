@@ -580,17 +580,16 @@ class Model(object):
     def _get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next
         if not hasattr(self, cachename):
-            qn = connection.ops.quote_name
-            op = is_next and '>' or '<'
+            op = is_next and 'gt' or 'lt'
             order = not is_next and '-_order' or '_order'
             order_field = self._meta.order_with_respect_to
-            # FIXME: When querysets support nested queries, this can be turned
-            # into a pure queryset operation.
-            where = ['%s %s (SELECT %s FROM %s WHERE %s=%%s)' % \
-                (qn('_order'), op, qn('_order'),
-                qn(self._meta.db_table), qn(self._meta.pk.column))]
-            params = [self.pk]
-            obj = self._default_manager.filter(**{order_field.name: getattr(self, order_field.attname)}).extra(where=where, params=params).order_by(order)[:1].get()
+            obj = self._default_manager.filter(**{
+                order_field.name: getattr(self, order_field.attname)
+            }).filter(**{
+                '_order__%s' % op: self._default_manager.values('_order').filter(**{
+                    self._meta.pk.name: self.pk
+                })
+            }).order_by(order)[:1].get()
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 

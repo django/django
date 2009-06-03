@@ -48,7 +48,7 @@ class DeleteQuery(Query):
         for related in cls._meta.get_all_related_many_to_many_objects():
             if not isinstance(related.field, generic.GenericRelation):
                 for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-                    where = self.where_class()
+                    where = self.where_class(connection=self.connection)
                     where.add((Constraint(None,
                             related.field.m2m_reverse_name(), related.field),
                             'in',
@@ -57,14 +57,14 @@ class DeleteQuery(Query):
                     self.do_query(related.field.m2m_db_table(), where)
 
         for f in cls._meta.many_to_many:
-            w1 = self.where_class()
+            w1 = self.where_class(connection=self.connection)
             if isinstance(f, generic.GenericRelation):
                 from django.contrib.contenttypes.models import ContentType
                 field = f.rel.to._meta.get_field(f.content_type_field_name)
                 w1.add((Constraint(None, field.column, field), 'exact',
                         ContentType.objects.get_for_model(cls).id), AND)
             for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-                where = self.where_class()
+                where = self.where_class(connection=self.connection)
                 where.add((Constraint(None, f.m2m_column_name(), f), 'in',
                         pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
                         AND)
@@ -81,7 +81,7 @@ class DeleteQuery(Query):
         lot of values in pk_list.
         """
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-            where = self.where_class()
+            where = self.where_class(connection=self.connection)
             field = self.model._meta.pk
             where.add((Constraint(None, field.column, field), 'in',
                     pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]), AND)
@@ -185,7 +185,7 @@ class UpdateQuery(Query):
 
         # Now we adjust the current query: reset the where clause and get rid
         # of all the tables we don't need (since they're in the sub-select).
-        self.where = self.where_class()
+        self.where = self.where_class(connection=self.connection)
         if self.related_updates or must_pre_select:
             # Either we're using the idents in multiple update queries (so
             # don't want them to change), or the db backend doesn't support
@@ -209,7 +209,7 @@ class UpdateQuery(Query):
         This is used by the QuerySet.delete_objects() method.
         """
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-            self.where = self.where_class()
+            self.where = self.where_class(connection=self.connection)
             f = self.model._meta.pk
             self.where.add((Constraint(None, f.column, f), 'in',
                     pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),

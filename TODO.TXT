@@ -37,14 +37,10 @@ that need to be done.  I'm trying to be as granular as possible.
 7)  Remove any references to the global ``django.db.connection`` object in the
     SQL creation process.  This includes(but is probably not limited to):
 
-    * ``django.db.models.sql.where.Where``
-    * ``django.db.models.sql.expressions.SQLEvaluator``
-    * ``django.db.models.sql.query.Query`` uses ``connection`` in place of
-      ``self.connection`` in ``self.add_filter``
     * The way we create ``Query`` from ``BaseQuery`` is awkward and hacky.
     * ``django.db.models.query.delete_objects``
     * ``django.db.models.query.insert_query``
-    * ``django.db.models.base.Model``
+    * ``django.db.models.base.Model`` -- in ``save_base``
     * ``django.db.models.fields.Field`` This uses it, as do it's subclasses.
     * ``django.db.models.fields.related`` It's used all over the place here,
       including opening a cursor and executing queries, so that's going to
@@ -54,6 +50,7 @@ that need to be done.  I'm trying to be as granular as possible.
 
 5)  Add the ``using`` Meta option.  Tests and docs(these are to be assumed at
     each stage from here on out).
+5)  Implement using kwarg on save() method.
 6)  Add the ``using`` method to ``QuerySet``.  This will more or less "just
     work" across multiple databases that use the same backend.  However, it
     will fail gratuitously when trying to use 2 different backends.

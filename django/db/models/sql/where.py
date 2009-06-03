@@ -4,7 +4,6 @@ Code to manage the creation and SQL rendering of 'where' constraints.
 import datetime
 
 from django.utils import tree
-from django.db import connection
 from django.db.models.fields import Field
 from django.db.models.query_utils import QueryWrapper
 from datastructures import EmptyResultSet, FullResultSet
@@ -34,6 +33,18 @@ class WhereNode(tree.Node):
     """
     default = AND
 
+    def __init__(self, *args, **kwargs):
+        self.connection = kwargs.pop('connection', None)
+        super(WhereNode, self).__init__(*args, **kwargs)
+
+    def __getstate__(self):
+        """
+        Don't try to pickle the connection, our Query will restore it for us.
+        """
+        data = self.__dict__.copy()
+        del data['connection']
+        return data
+
     def add(self, data, connector):
         """
         Add a node to the where-tree. If the data is a list or tuple, it is
@@ -53,7 +64,9 @@ class WhereNode(tree.Node):
             value = list(value)
         if hasattr(obj, "process"):
             try:
-                obj, params = obj.process(lookup_type, value)
+                # FIXME We're calling process too early, the connection could
+                # change
+                obj, params = obj.process(lookup_type, value, self.connection)
             except (EmptyShortCircuit, EmptyResultSet):
                 # There are situations where we want to short-circuit any
                 # comparisons and make sure that nothing is returned. One
@@ -78,6 +91,14 @@ class WhereNode(tree.Node):
         super(WhereNode, self).add((obj, lookup_type, annotation, params),
                 connector)
 
+    def update_connection(self, connection):
+        self.connection = connection
+        for child in self.children:
+            if hasattr(child, 'update_connection'):
+                child.update_connection(connection)
+            elif hasattr(child[3], 'update_connection'):
+                child[3].update_connection(connection)
+
     def as_sql(self, qn=None):
         """
         Returns the SQL version of the where clause and the value to be
@@ -88,7 +109,7 @@ class WhereNode(tree.Node):
         recursion).
         """
         if not qn:
-            qn = connection.ops.quote_name
+            qn = self.connection.ops.quote_name
         if not self.children:
             return None, []
         result = []
@@ -153,7 +174,7 @@ class WhereNode(tree.Node):
             field_sql = lvalue.as_sql(quote_func=qn)
 
         if value_annot is datetime.datetime:
-            cast_sql = connection.ops.datetime_cast_sql()
+            cast_sql = self.connection.ops.datetime_cast_sql()
         else:
             cast_sql = '%s'
 
@@ -163,10 +184,10 @@ class WhereNode(tree.Node):
         else:
             extra = ''
 
-        if lookup_type in connection.operators:
-            format = "%s %%s %%s" % (connection.ops.lookup_cast(lookup_type),)
+        if lookup_type in self.connection.operators:
+            format = "%s %%s %%s" % (self.connection.ops.lookup_cast(lookup_type),)
             return (format % (field_sql,
-                              connection.operators[lookup_type] % cast_sql,
+                              self.connection.operators[lookup_type] % cast_sql,
                               extra), params)
 
         if lookup_type == 'in':
@@ -179,15 +200,15 @@ class WhereNode(tree.Node):
         elif lookup_type in ('range', 'year'):
             return ('%s BETWEEN %%s and %%s' % field_sql, params)
         elif lookup_type in ('month', 'day', 'week_day'):
-            return ('%s = %%s' % connection.ops.date_extract_sql(lookup_type, field_sql),
+            return ('%s = %%s' % self.connection.ops.date_extract_sql(lookup_type, field_sql),
                     params)
         elif lookup_type == 'isnull':
             return ('%s IS %sNULL' % (field_sql,
                 (not value_annot and 'NOT ' or '')), ())
         elif lookup_type == 'search':
-            return (connection.ops.fulltext_search_sql(field_sql), params)
+            return (self.connection.ops.fulltext_search_sql(field_sql), params)
         elif lookup_type in ('regex', 'iregex'):
-            return connection.ops.regex_lookup(lookup_type) % (field_sql, cast_sql), params
+            return self.connection.ops.regex_lookup(lookup_type) % (field_sql, cast_sql), params
 
         raise TypeError('Invalid lookup_type: %r' % lookup_type)
 
@@ -202,7 +223,7 @@ class WhereNode(tree.Node):
             lhs = '%s.%s' % (qn(table_alias), qn(name))
         else:
             lhs = qn(name)
-        return connection.ops.field_cast_sql(db_type) % lhs
+        return self.connection.ops.field_cast_sql(db_type) % lhs
 
     def relabel_aliases(self, change_map, node=None):
         """
@@ -257,7 +278,7 @@ class Constraint(object):
     def __init__(self, alias, col, field):
         self.alias, self.col, self.field = alias, col, field
 
-    def process(self, lookup_type, value):
+    def process(self, lookup_type, value, connection):
         """
         Returns a tuple of data suitable for inclusion in a WhereNode
         instance.

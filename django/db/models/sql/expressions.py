@@ -1,5 +1,4 @@
 from django.core.exceptions import FieldError
-from django.db import connection
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models.sql.constants import LOOKUP_SEP
 
@@ -10,6 +9,7 @@ class SQLEvaluator(object):
         self.cols = {}
 
         self.contains_aggregate = False
+        self.connection = query.connection
         self.expression.prepare(self, query, allow_joins)
 
     def as_sql(self, qn=None):
@@ -18,6 +18,9 @@ class SQLEvaluator(object):
     def relabel_aliases(self, change_map):
         for node, col in self.cols.items():
             self.cols[node] = (change_map.get(col[0], col[0]), col[1])
+
+    def update_connection(self, connection):
+        self.connection = connection
 
     #####################################################
     # Vistor methods for initial expression preparation #
@@ -56,7 +59,7 @@ class SQLEvaluator(object):
 
     def evaluate_node(self, node, qn):
         if not qn:
-            qn = connection.ops.quote_name
+            qn = self.connection.ops.quote_name
 
         expressions = []
         expression_params = []
@@ -75,11 +78,11 @@ class SQLEvaluator(object):
                 expressions.append(format % sql)
                 expression_params.extend(params)
 
-        return connection.ops.combine_expression(node.connector, expressions), expression_params
+        return self.connection.ops.combine_expression(node.connector, expressions), expression_params
 
     def evaluate_leaf(self, node, qn):
         if not qn:
-            qn = connection.ops.quote_name
+            qn = self.connection.ops.quote_name
 
         col = self.cols[node]
         if hasattr(col, 'as_sql'):
