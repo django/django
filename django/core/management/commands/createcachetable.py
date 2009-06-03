@@ -49,4 +49,4 @@ class Command(LabelCommand):
         curs.execute("\n".join(full_statement))
         for statement in index_output:
             curs.execute(statement)
-        transaction.commit_unless_managed()
+        transaction.commit_unless_managed(using=alias)
