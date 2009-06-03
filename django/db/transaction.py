@@ -54,7 +54,7 @@ def enter_transaction_management(managed=True, using=None):
     when no current block is running).
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     connection = connections[using]
     thread_ident = thread.get_ident()
     if thread_ident in state and state[thread_ident].get(using):
@@ -74,7 +74,7 @@ def leave_transaction_management(using=None):
     those from outside. (Commits are on connection level.)
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     connection = connections[using]
     connection._leave_transaction_management(is_managed(using=using))
     thread_ident = thread.get_ident()
@@ -93,7 +93,7 @@ def is_dirty(using=None):
     happen.
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     return dirty.get(thread.get_ident(), {}).get(using, False)
 
 def set_dirty(using=None):
@@ -103,7 +103,7 @@ def set_dirty(using=None):
     changes waiting for commit.
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     thread_ident = thread.get_ident()
     if thread_ident in dirty and using in dirty[thread_ident]:
         dirty[thread_ident][using] = True
@@ -117,7 +117,7 @@ def set_clean(using=None):
     should happen.
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     thread_ident = thread.get_ident()
     if thread_ident in dirty and using in dirty[thread_ident]:
         dirty[thread_ident][using] = False
@@ -127,7 +127,7 @@ def set_clean(using=None):
 
 def clean_savepoints(using=None):
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     thread_ident = thread.get_ident()
     if thread_ident in savepoint_state and using in savepoint_state[thread_ident]:
         del savepoint_state[thread_ident][using]
@@ -137,7 +137,7 @@ def is_managed(using=None):
     Checks whether the transaction manager is in manual or in auto state.
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     thread_ident = thread.get_ident()
     if thread_ident in state and using in state[thread_ident]:
         if state[thread_ident][using]:
@@ -152,7 +152,7 @@ def managed(flag=True, using=None):
     commited.
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     connection = connections[using]
     thread_ident = thread.get_ident()
     top = state.get(thread_ident, {}).get(using, None)
@@ -169,7 +169,7 @@ def commit_unless_managed(using=None):
     Commits changes if the system is not in managed transaction mode.
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     connection = connections[using]
     if not is_managed(using=using):
         connection._commit()
@@ -182,7 +182,7 @@ def rollback_unless_managed(using=None):
     Rolls back changes if the system is not in managed transaction mode.
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     connection = connections[using]
     if not is_managed(using=using):
         connection._rollback()
@@ -194,7 +194,7 @@ def commit(using=None):
     Does the commit itself and resets the dirty flag.
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     connection = connections[using]
     connection._commit()
     set_clean(using=using)
@@ -204,7 +204,7 @@ def rollback(using=None):
     This function does the rollback itself and resets the dirty flag.
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     connection = connections[using]
     connection._rollback()
     set_clean(using=using)
@@ -216,7 +216,7 @@ def savepoint(using=None):
     used for the subsequent rollback or commit.
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     connection = connections[using]
     thread_ident = thread.get_ident()
     if thread_ident in savepoint_state and using in savepoint_state[thread_ident]:
@@ -235,7 +235,7 @@ def savepoint_rollback(sid, using=None):
     savepoints are not supported.
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     connection = connections[using]
     thread_ident = thread.get_ident()
     if thread_ident in savepoint_state and using in savepoint_state[thread_ident]:
@@ -247,7 +247,7 @@ def savepoint_commit(sid, using=None):
     savepoints are not supported.
     """
     if using is None:
-        raise ValueError # TODO use default
+        using = DEFAULT_DB_ALIAS
     connection = connections[using]
     thread_ident = thread.get_ident()
     if thread_ident in savepoint_state and using in savepoint_state[thread_ident]:
