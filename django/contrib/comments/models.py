@@ -185,7 +185,7 @@ class CommentFlag(models.Model):
         return "%s flag of comment ID %s by %s" % \
             (self.flag, self.comment_id, self.user.username)
 
-    def save(self, force_insert=False, force_update=False):
+    def save(self, *args, **kwargs):
         if self.flag_date is None:
             self.flag_date = datetime.datetime.now()
-        super(CommentFlag, self).save(force_insert, force_update)
+        super(CommentFlag, self).save(*args, **kwargs)
