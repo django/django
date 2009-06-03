@@ -11,6 +11,7 @@ class Command(AppCommand):
         make_option('--database', action='store', dest='database',
             default='default', help='Nominates a database to print the SQL '
                 'for.  Defaults to the "default" database.'),
+
     )
 
     output_transaction = True
