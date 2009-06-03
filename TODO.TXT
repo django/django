@@ -1,0 +1,88 @@
+TODO
+====
+
+The follow is a list, more or less in the order I intend to do them of things
+that need to be done.  I'm trying to be as granular as possible.
+
+2)  Update all old references to ``settings.DATABASE_*`` to reference
+    ``settings.DATABASES``.  This includes the following locations
+
+    * howto/custom-model-fields -- defered since it refers to custom model fields
+    * internals/contributing -- still needs an update on TEST_*
+    * ref/settings -- needs to be upddated for TEST_*
+    * topics/testing -- needs update for the TEST_* settings, plus test refactor
+
+    The remaining items will be fixed as the code for them enters the code base.
+
+
+3)  Update all management commands in the following way:
+
+    * ``dumpdata``: By default dump the ``default`` database.  Later add a
+      ``--database`` flag.
+    * ``loaddata``: Leave as is, will use the standard mechanisms for
+      determining what DB to save the objects to.  Should it get a
+      ``--database`` flag to overide that?
+
+    These items will be fixed pending both community consensus, and the API
+    that will go in that's actually necessary for these to happen.
+
+4)  Rig up the test harness to work with multiple databases.  This includes:
+
+    * Move all ``TEST_*`` settings to go in ``DATABASE_OPTIONS``.
+    * Figure out how we can actually test multiple databases.  If the user has
+      more than one database in ``settings.DATABASES`` we can just use the test
+      database for each of them.  Otherwise we are going to have to make some
+      assumptions.  Either just go for SQLite, since that's going to be easiest
+      (and going forward it will be included in all versions of Python we work
+      with), or we can try to create a database with ``test_2_`` prefix.
+      Similar to how we use a ``test_`` prefix by default.
+5)  Add the ``using`` Meta option.  Tests and docs(these are to be assumed at
+    each stage from here on out).
+6)  Add the ``using`` method to ``QuerySet``.  This will more or less "just
+    work" across multiple databases that use the same backend.  However, it
+    will fail gratuitously when trying to use 2 different backends.
+7)  Remove any references to the global ``django.db.connection`` object in the
+    SQL creation process.  This includes(but is probably not limited to):
+
+    * ``django.db.models.sql.where.Where``
+    * ``django.db.models.sql.expressions.SQLEvaluator``
+    * ``django.db.models.sql.query.Query`` uses ``connection`` in place of
+      ``self.connection`` in ``self.add_filter``
+    * The way we create ``Query`` from ``BaseQuery`` is awkward and hacky.
+    * ``django.db.models.query.delete_objects``
+    * ``django.db.models.query.insert_query``
+    * ``django.db.models.base.Model``
+    * ``django.db.models.fields.Field`` This uses it, as do it's subclasses.
+    * ``django.db.models.fields.related`` It's used all over the place here,
+      including opening a cursor and executing queries, so that's going to
+      need to be totally refactored.  There's a ticket to at least move that
+      raw SQL and execution to ``Query``/``QuerySet`` so hopefully that makes
+      it in before I need to tackle this.
+8)  Implement some way to create a new ``Query`` for a different backend when
+    we switch.  There are several checks against ``self.connection`` prior to
+    SQL construction, so we either need to defer all these(which will be
+    difficult, but probably not impossible), or have an alternate strategy,
+    such as:
+
+    * Remove all tests against ``Query.connection`` before the SQL generation
+      phase.  This involves changing the following methods:
+
+        * ``Query.add_aggregate``
+        * ``Query.set_group_by``
+        * ``DateQuery.add_date_select``
+        * ``Field.get_db_prep_lookup``
+        * ``DateField.get_db_prep_value``
+        * ``DateTimeField.get_db_prep_value``
+        * ``DecimalField.get_db_prep_save``
+        * ``TimeField.get_db_prep_value``
+    * Implementing the command pattern.
+    * Having the ``QuerySet`` actually store ``Query`` objects for every
+      database in ``settings.DATABASES`` and do all the operations against
+      every single one of them, then when it's time excecute the query just
+      pick the right ``Query`` object to use.  This *does* not scale, though it
+      could probably be done fairly easily.
+9)  Fix transaction support.  In practice this means changing all the
+    dictionaries that currently map thread to a boolean to being a dictionary
+    mapping thread to a set of the affected DBs, and changing all the functions
+    that use these dictionaries to handle the changes appropriately.
+10) Time permitting add support for a ``DatabaseManager``.

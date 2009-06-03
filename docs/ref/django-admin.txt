@@ -122,6 +122,12 @@ createcachetable
 Creates a cache table named ``tablename`` for use with the database cache
 backend. See :ref:`topics-cache` for more information.
 
+--database
+~~~~~~~~~~
+
+The alias for the database to install the cachetable to.  By default uses the
+``'default'`` alias.
+
 createsuperuser
 ---------------
 
@@ -167,6 +173,13 @@ This command assumes the programs are on your ``PATH`` so that a simple call to
 the program name (``psql``, ``mysql``, ``sqlite3``) will find the program in
 the right place. There's no way to specify the location of the program
 manually.
+
+--database
+~~~~~~~~~~
+
+The alias for the database to open the shell for.  By default uses the
+``'default'`` alias.
+
 
 diffsettings
 ------------
@@ -252,6 +265,12 @@ fixture will be re-installed.
     you sure?" confirmation messages. This is useful if ``django-admin.py`` is
     being executed as an unattended, automated script.
 
+--database
+~~~~~~~~~~
+
+The alias for the database to flush.  By default flushes all databases.
+
+
 inspectdb
 ---------
 
@@ -292,6 +311,13 @@ needed.
 
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
 only works in PostgreSQL and with certain types of MySQL tables.
+
+--database
+~~~~~~~~~~
+
+The alias for the database to introspect.  By default uses the ``'default'``
+alias.
+
 
 loaddata <fixture fixture ...>
 ------------------------------
@@ -448,6 +474,11 @@ Use the ``--noinput`` option to suppress all user prompting, such as
 "Are you sure?" confirmation messages. This is useful if ``django-admin.py``
 is being executed as an unattended, automated script.
 
+--database
+~~~~~~~~~~
+
+The alias for the database to reset.  By default resets all databases.
+
 runfcgi [options]
 -----------------
 
@@ -559,6 +590,13 @@ sql <appname appname ...>
 
 Prints the CREATE TABLE SQL statements for the given app name(s).
 
+--database
+~~~~~~~~~~
+
+The alias for the database to print the SQL for.  By default uses the
+``'default'`` alias.
+
+
 sqlall <appname appname ...>
 ----------------------------
 
@@ -567,10 +605,22 @@ Prints the CREATE TABLE and initial-data SQL statements for the given app name(s
 Refer to the description of ``sqlcustom`` for an explanation of how to
 specify initial data.
 
+--database
+~~~~~~~~~~
+
+The alias for the database to print the SQL for.  By default uses the
+``'default'`` alias.
+
 sqlclear <appname appname ...>
 ------------------------------
 
 Prints the DROP TABLE SQL statements for the given app name(s).
+
+--database
+~~~~~~~~~~
+
+The alias for the database to print the SQL for.  By default uses the
+``'default'`` alias.
 
 sqlcustom <appname appname ...>
 -------------------------------
@@ -591,20 +641,44 @@ table modifications, or insert any SQL functions into the database.
 
 Note that the order in which the SQL files are processed is undefined.
 
+--database
+~~~~~~~~~~
+
+The alias for the database to print the SQL for.  By default uses the
+``'default'`` alias.
+
 sqlflush
 --------
 
 Prints the SQL statements that would be executed for the `flush`_ command.
+
+--database
+~~~~~~~~~~
+
+The alias for the database to print the SQL for.  By default uses the
+``'default'`` alias.
 
 sqlindexes <appname appname ...>
 --------------------------------
 
 Prints the CREATE INDEX SQL statements for the given app name(s).
 
+--database
+~~~~~~~~~~
+
+The alias for the database to print the SQL for.  By default uses the
+``'default'`` alias.
+
 sqlreset <appname appname ...>
 ------------------------------
 
 Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app name(s).
+
+--database
+~~~~~~~~~~
+
+The alias for the database to print the SQL for.  By default uses the
+``'default'`` alias.
 
 sqlsequencereset <appname appname ...>
 --------------------------------------
@@ -612,6 +686,12 @@ sqlsequencereset <appname appname ...>
 Prints the SQL statements for resetting sequences for the given app name(s).
 
 See http://simon.incutio.com/archive/2004/04/21/postgres for more information.
+
+--database
+~~~~~~~~~~
+
+The alias for the database to print the SQL for.  By default uses the
+``'default'`` alias.
 
 startapp <appname>
 ------------------
@@ -664,6 +744,12 @@ give you the option of creating a superuser immediately.
 with an appropriate extension (e.g. ``json`` or ``xml``). See the
 documentation for ``loaddata`` for details on the specification of fixture
 data files.
+
+--database
+~~~~~~~~~~
+
+The alias for the database install the tables for.  By default uses the
+``'default'`` alias.
 
 --noinput
 ~~~~~~~~~

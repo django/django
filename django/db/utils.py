@@ -53,3 +53,6 @@ class ConnectionHandler(object):
         conn = backend.DatabaseWrapper(db)
         self._connections[alias] = conn
         return conn
+
+    def all(self):
+        return [self[alias] for alias in self.databases]

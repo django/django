@@ -8,7 +8,7 @@ class Command(LabelCommand):
     args = "<tablename>"
     label = 'tablename'
 
-    options_list = LabelCommand.options_list + (
+    option_list = LabelCommand.option_list + (
         make_option('--database', action='store', dest='database',
             default='default', help='Selects what database to install the cache table to.'),
     )
@@ -16,7 +16,7 @@ class Command(LabelCommand):
     requires_model_validation = False
 
     def handle_label(self, tablename, **options):
-        alias = options['alias']
+        alias = options['database']
         connection = connections[alias]
         fields = (
             # "key" is a reserved word in MySQL, so use "cache_key" instead.
