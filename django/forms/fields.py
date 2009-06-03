@@ -213,33 +213,26 @@ class IntegerField(Field):
         if self.min_value is not None and value < self.min_value:
             raise ValidationError(self.error_messages['min_value'] % self.min_value)
 
-class FloatField(Field):
+class FloatField(IntegerField):
     default_error_messages = {
         'invalid': _(u'Enter a number.'),
         'max_value': _(u'Ensure this value is less than or equal to %s.'),
         'min_value': _(u'Ensure this value is greater than or equal to %s.'),
     }
 
-    def __init__(self, max_value=None, min_value=None, *args, **kwargs):
-        self.max_value, self.min_value = max_value, min_value
-        Field.__init__(self, *args, **kwargs)
-
-    def clean(self, value):
+    def to_python(self, value):
         """
-        Validates that float() can be called on the input. Returns a float.
-        Returns None for empty values.
+        Validates that float() can be called on the input. Returns the result
+        of float(). Returns None for empty values.
         """
-        super(FloatField, self).clean(value)
-        if not self.required and value in EMPTY_VALUES:
+        value = super(IntegerField, self).to_python(value)
+        if value in EMPTY_VALUES:
             return None
+
         try:
-            value = float(value)
+            value = float(str(value))
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'])
-        if self.max_value is not None and value > self.max_value:
-            raise ValidationError(self.error_messages['max_value'] % self.max_value)
-        if self.min_value is not None and value < self.min_value:
-            raise ValidationError(self.error_messages['min_value'] % self.min_value)
         return value
 
 class DecimalField(Field):
