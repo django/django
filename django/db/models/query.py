@@ -37,11 +37,21 @@ class CollectedObjects(object):
 
     This is used for the database object deletion routines so that we can
     calculate the 'leaf' objects which should be deleted first.
+
+    previously_seen is an optional argument. It must be a CollectedObjects
+    instance itself; any previously_seen collected object will be blocked from
+    being added to this instance.
     """
 
-    def __init__(self):
+    def __init__(self, previously_seen=None):
         self.data = {}
         self.children = {}
+        if previously_seen:
+            self.blocked = previously_seen.blocked
+            for cls, seen in previously_seen.data.items():
+                self.blocked.setdefault(cls, SortedDict()).update(seen)
+        else:
+            self.blocked = {}
 
     def add(self, model, pk, obj, parent_model, nullable=False):
         """
@@ -58,6 +68,9 @@ class CollectedObjects(object):
         Returns True if the item already existed in the structure and
         False otherwise.
         """
+        if pk in self.blocked.get(model, {}):
+            return True
+
         d = self.data.setdefault(model, SortedDict())
         retval = pk in d
         d[pk] = obj
@@ -390,10 +403,11 @@ class QuerySet(object):
 
         # Delete objects in chunks to prevent the list of related objects from
         # becoming too long.
+        seen_objs = None
         while 1:
             # Collect all the objects to be deleted in this chunk, and all the
             # objects that are related to the objects that are to be deleted.
-            seen_objs = CollectedObjects()
+            seen_objs = CollectedObjects(seen_objs)
             for object in del_query[:CHUNK_SIZE]:
                 object._collect_sub_objects(seen_objs)
 
