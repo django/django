@@ -24,6 +24,7 @@ except NameError:
     from sets import Set as set
 
 from django.core.exceptions import ValidationError
+from django.core import validators
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
 
@@ -52,6 +53,7 @@ EMPTY_VALUES = (None, '')
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
     hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
+    default_validators = [] # Default set of validators
     default_error_messages = {
         'required': _(u'This field is required.'),
         'invalid': _(u'Enter a valid value.'),
@@ -61,7 +63,8 @@ class Field(object):
     creation_counter = 0
 
     def __init__(self, required=True, widget=None, label=None, initial=None,
-                 help_text=None, error_messages=None, show_hidden_initial=False):
+                 help_text=None, error_messages=None, show_hidden_initial=False,
+                 validators=[]):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
         # widget -- A Widget class, or instance of a Widget class, that should
@@ -77,6 +80,7 @@ class Field(object):
         # help_text -- An optional string to use as "help text" for this Field.
         # show_hidden_initial -- Boolean that specifies if it is needed to render a
         #                        hidden widget with initial value after widget.
+        # validators -- List of addtional validators to use
         if label is not None:
             label = smart_unicode(label)
         self.required, self.label, self.initial = required, label, initial
@@ -109,6 +113,7 @@ class Field(object):
         set_class_error_messages(messages, self.__class__)
         messages.update(error_messages or {})
         self.error_messages = messages
+        self.validators = self.default_validators + validators
 
     def clean(self, value):
         """
@@ -164,6 +169,7 @@ class CharField(Field):
             return {'maxlength': str(self.max_length)}
 
 class IntegerField(Field):
+    default_validators = [validators.validate_integer]
     default_error_messages = {
         'invalid': _(u'Enter a whole number.'),
         'max_value': _(u'Ensure this value is less than or equal to %s.'),
