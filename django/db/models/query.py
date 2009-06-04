@@ -284,7 +284,7 @@ class QuerySet(object):
         and returning the created object.
         """
         obj = self.model(**kwargs)
-        obj.save(force_insert=True)
+        obj.save(force_insert=True, using=self._using)
         return obj
 
     def get_or_create(self, **kwargs):

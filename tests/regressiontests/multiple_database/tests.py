@@ -20,17 +20,11 @@ class DatabaseSettingTestCase(TestCase):
 
 class ConnectionTestCase(TestCase):
     def test_queries(self):
-        for connection in connections.all():
-            qn = connection.ops.quote_name
-            cursor = connection.cursor()
-            cursor.execute("""INSERT INTO %(table)s (%(col)s) VALUES (%%s)""" % {
-                'table': qn(Book._meta.db_table),
-                'col': qn(Book._meta.get_field_by_name('title')[0].column),
-            }, ('Dive Into Python',))
+        for db in connections:
+            Book.objects.using(db).create(title="Dive into Python")
 
-        for connection in connections.all():
-            qn = connection.ops.quote_name
-            cursor = connection.cursor()
-            cursor.execute("""SELECT * FROM %(table)s""" % {'table': qn(Book._meta.db_table)})
-            data = cursor.fetchall()
-            self.assertEqual('Dive Into Python', data[0][1])
+        for db in connections:
+            books = Book.objects.all().using(db)
+            self.assertEqual(books.count(), 1)
+            self.assertEqual(len(books), 1)
+            self.assertEqual(books[0].title, "Dive into Python")

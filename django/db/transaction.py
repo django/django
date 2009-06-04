@@ -257,8 +257,6 @@ def savepoint_commit(sid, using=None):
 # DECORATORS #
 ##############
 
-# TODO update all of these for multi-db
-
 def autocommit(using_or_func=None):
     """
     Decorator that activates commit on save. This is Django's default behavior;
