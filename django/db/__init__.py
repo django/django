@@ -51,7 +51,8 @@ signals.request_finished.connect(close_connection)
 # Register an event that resets connection.queries
 # when a Django request is started.
 def reset_queries(**kwargs):
-    connection.queries = []
+    for connection in connections.all():
+        connection.queries = []
 signals.request_started.connect(reset_queries)
 
 # Register an event that rolls back the connections
