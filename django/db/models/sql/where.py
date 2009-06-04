@@ -68,11 +68,8 @@ class WhereNode(tree.Node):
             super(WhereNode, self).add((obj, lookup_type, annotation, value),
                 connector)
             return
-        else:
-            # TODO: Make this lazy just like the above code for constraints.
-            params = Field().get_db_prep_lookup(lookup_type, value)
 
-        super(WhereNode, self).add((obj, lookup_type, annotation, params),
+        super(WhereNode, self).add((obj, lookup_type, annotation, value),
                 connector)
 
     def as_sql(self, qn, connection):
@@ -149,7 +146,7 @@ class WhereNode(tree.Node):
             except EmptyShortCircuit:
                 raise EmptyResultSet
         else:
-            params = params_or_value
+            params = Field().get_db_prep_lookup(lookup_type, params_or_value)
         if isinstance(lvalue, tuple):
             # A direct database column lookup.
             field_sql = self.sql_for_columns(lvalue, qn, connection)
