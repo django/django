@@ -231,6 +231,14 @@ class GIcon(object):
         self.iconanchor = iconanchor
         self.infowindowanchor = infowindowanchor
 
+    def __cmp__(self, other):
+        return cmp(self.varname, other.varname)
+    
+    def __hash__(self):
+        # XOR with hash of GIcon type so that hash('varname') won't 
+        # equal hash(GIcon('varname')).
+        return hash(self.__class__) ^ hash(self.varname)
+
 class GMarker(GOverlayBase):
     """
     A Python wrapper for the Google GMarker object.  For more information

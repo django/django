@@ -35,7 +35,7 @@ class GeoWhereNode(WhereNode):
             return super(WhereNode, self).add(data, connector)
 
         obj, lookup_type, value = data
-        alias, col, field = obj.alias, obj.col, obj.field
+        col, field = obj.col, obj.field
 
         if not hasattr(field, "geom_type"):
             # Not a geographic field, so call `WhereNode.add`.
@@ -76,7 +76,7 @@ class GeoWhereNode(WhereNode):
             # the `get_geo_where_clause` to construct the appropriate
             # spatial SQL when `make_atom` is called.
             annotation = GeoAnnotation(field, value, where)
-            return super(WhereNode, self).add(((alias, col, field.db_type()), lookup_type, annotation, params), connector)
+            return super(WhereNode, self).add(((obj.alias, col, field.db_type()), lookup_type, annotation, params), connector)
 
     def make_atom(self, child, qn):
         obj, lookup_type, value_annot, params = child
