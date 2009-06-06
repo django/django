@@ -7,6 +7,8 @@ try:
 except NameError:
     from sets import Set as set     # Python 2.3 fallback
 
+from copy import deepcopy
+
 from django.db import connection, transaction, IntegrityError
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import DateField
@@ -39,6 +41,17 @@ class QuerySet(object):
     ########################
     # PYTHON MAGIC METHODS #
     ########################
+
+    def __deepcopy__(self, memo):
+        """
+        Deep copy of a QuerySet doesn't populate the cache
+        """
+        obj_dict = deepcopy(self.__dict__, memo)
+        obj_dict['_iter'] = None
+
+        obj = self.__class__()
+        obj.__dict__.update(obj_dict)
+        return obj
 
     def __getstate__(self):
         """
