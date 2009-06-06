@@ -635,10 +635,10 @@ class BaseQuery(object):
             # models.
             workset = {}
             for model, values in seen.iteritems():
-                for field, f_model in model._meta.get_fields_with_model():
+                for field in model._meta.local_fields:
                     if field in values:
                         continue
-                    add_to_dict(workset, f_model or model, field)
+                    add_to_dict(workset, model, field)
             for model, values in must_include.iteritems():
                 # If we haven't included a model in workset, we don't add the
                 # corresponding must_include fields for that model, since an
@@ -657,6 +657,12 @@ class BaseQuery(object):
                     # included any fields, we have to make sure it's mentioned
                     # so that only the "must include" fields are pulled in.
                     seen[model] = values
+            # Now ensure that every model in the inheritance chain is mentioned
+            # in the parent list. Again, it must be mentioned to ensure that
+            # only "must include" fields are pulled in.
+            for model in orig_opts.get_parent_list():
+                if model not in seen:
+                    seen[model] = set()
             for model, values in seen.iteritems():
                 callback(target, model, values)
 
