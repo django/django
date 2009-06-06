@@ -204,6 +204,7 @@ class Field(object):
                 sql, params = value._as_sql()
             return QueryWrapper(('(%s)' % sql), params)
 
+
         if lookup_type in ('regex', 'iregex', 'month', 'day', 'week_day', 'search'):
             return [value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):

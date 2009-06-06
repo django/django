@@ -49,3 +49,10 @@ class QueryTestCase(TestCase):
 
             dive = Book.objects.using(db).get(title__icontains="dive")
             self.assertEqual(dive.title, "Dive into Python")
+
+            dive = Book.objects.using(db).get(title__iexact="dive INTO python")
+            self.assertEqual(dive.title, "Dive into Python")
+
+            pro = Book.objects.using(db).get(published__year=2008)
+            self.assertEqual(pro.title, "Pro Django")
+            self.assertEqual(pro.published, datetime.date(2008, 12, 16))

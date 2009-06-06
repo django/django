@@ -878,6 +878,9 @@ class BaseQuery(object):
         qn = self.quote_name_unless_alias
         result, params = [], []
         if self.group_by is not None:
+            if len(self.model._meta.fields) == len(self.group_by) and \
+                self.connection.features.allows_group_by_pk:
+                self.group_by = [(self.model._meta.db_table, self.model._meta.pk.column)]
             group_by = self.group_by or []
 
             extra_selects = []
@@ -2099,11 +2102,6 @@ class BaseQuery(object):
         will be made automatically.
         """
         self.group_by = []
-        if self.connection.features.allows_group_by_pk:
-            if len(self.select) == len(self.model._meta.fields):
-                self.group_by.append((self.model._meta.db_table,
-                                      self.model._meta.pk.column))
-                return
 
         for sel in self.select:
             self.group_by.append(sel)
