@@ -17,6 +17,12 @@ class Primary(models.Model):
     def __unicode__(self):
         return self.name
 
+class Child(Primary):
+    pass
+
+class BigChild(Primary):
+    other = models.CharField(max_length=50)
+
 def count_delayed_fields(obj, debug=False):
     """
     Returns the number of delayed attributes on the given model instance.
@@ -33,7 +39,7 @@ def count_delayed_fields(obj, debug=False):
 
 __test__ = {"API_TEST": """
 To all outward appearances, instances with deferred fields look the same as
-normal instances when we examine attribut values. Therefore we test for the
+normal instances when we examine attribute values. Therefore we test for the
 number of deferred fields on returned instances (by poking at the internals),
 as a way to observe what is going on.
 
@@ -98,5 +104,89 @@ Using defer() and only() with get() is also valid.
 >>> Primary.objects.all()
 [<Primary: a new name>]
 
+# Regression for #10572 - A subclass with no extra fields can defer fields from the base class
+>>> _ = Child.objects.create(name="c1", value="foo", related=s1)
+
+# You can defer a field on a baseclass when the subclass has no fields
+>>> obj = Child.objects.defer("value").get(name="c1")
+>>> count_delayed_fields(obj)
+1
+>>> obj.name
+u"c1"
+>>> obj.value
+u"foo"
+>>> obj.name = "c2"
+>>> obj.save()
+
+# You can retrive a single column on a base class with no fields
+>>> obj = Child.objects.only("name").get(name="c2")
+>>> count_delayed_fields(obj)
+3
+>>> obj.name
+u"c2"
+>>> obj.value
+u"foo"
+>>> obj.name = "cc"
+>>> obj.save()
+
+>>> _ = BigChild.objects.create(name="b1", value="foo", related=s1, other="bar")
+
+# You can defer a field on a baseclass
+>>> obj = BigChild.objects.defer("value").get(name="b1")
+>>> count_delayed_fields(obj)
+1
+>>> obj.name
+u"b1"
+>>> obj.value
+u"foo"
+>>> obj.other
+u"bar"
+>>> obj.name = "b2"
+>>> obj.save()
+
+# You can defer a field on a subclass
+>>> obj = BigChild.objects.defer("other").get(name="b2")
+>>> count_delayed_fields(obj)
+1
+>>> obj.name
+u"b2"
+>>> obj.value
+u"foo"
+>>> obj.other
+u"bar"
+>>> obj.name = "b3"
+>>> obj.save()
+
+# You can retrieve a single field on a baseclass
+>>> obj = BigChild.objects.only("name").get(name="b3")
+>>> count_delayed_fields(obj)
+4
+>>> obj.name
+u"b3"
+>>> obj.value
+u"foo"
+>>> obj.other
+u"bar"
+>>> obj.name = "b4"
+>>> obj.save()
+
+# You can retrieve a single field on a baseclass
+>>> obj = BigChild.objects.only("other").get(name="b4")
+>>> count_delayed_fields(obj)
+4
+>>> obj.name
+u"b4"
+>>> obj.value
+u"foo"
+>>> obj.other
+u"bar"
+>>> obj.name = "bb"
+>>> obj.save()
+
+# Finally, we need to flush the app cache for the defer module.
+# Using only/defer creates some artifical entries in the app cache
+# that messes up later tests. Purge all entries, just to be sure.
+>>> from django.db.models.loading import cache
+>>> cache.app_models['defer'] = {}
 
 """}

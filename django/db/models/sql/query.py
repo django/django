@@ -635,10 +635,10 @@ class BaseQuery(object):
             # models.
             workset = {}
             for model, values in seen.iteritems():
-                for field, f_model in model._meta.get_fields_with_model():
+                for field in model._meta.local_fields:
                     if field in values:
                         continue
-                    add_to_dict(workset, f_model or model, field)
+                    add_to_dict(workset, model, field)
             for model, values in must_include.iteritems():
                 # If we haven't included a model in workset, we don't add the
                 # corresponding must_include fields for that model, since an
@@ -657,6 +657,12 @@ class BaseQuery(object):
                     # included any fields, we have to make sure it's mentioned
                     # so that only the "must include" fields are pulled in.
                     seen[model] = values
+            # Now ensure that every model in the inheritance chain is mentioned
+            # in the parent list. Again, it must be mentioned to ensure that
+            # only "must include" fields are pulled in.
+            for model in orig_opts.get_parent_list():
+                if model not in seen:
+                    seen[model] = set()
             for model, values in seen.iteritems():
                 callback(target, model, values)
 
@@ -689,7 +695,7 @@ class BaseQuery(object):
 
         If 'with_aliases' is true, any column names that are duplicated
         (without the table names) are given unique aliases. This is needed in
-        some cases to avoid ambiguitity with nested queries.
+        some cases to avoid ambiguity with nested queries.
         """
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
@@ -1303,7 +1309,7 @@ class BaseQuery(object):
         opts = self.model._meta
         root_alias = self.tables[0]
         seen = {None: root_alias}
-        
+
         # Skip all proxy to the root proxied model
         proxied_model = get_proxied_model(opts)
 
@@ -1619,10 +1625,14 @@ class BaseQuery(object):
                             entry.negate()
                             self.where.add(entry, AND)
                             break
-                elif not (lookup_type == 'in' and not value) and field.null:
+                elif not (lookup_type == 'in'
+                            and not hasattr(value, 'as_sql')
+                            and not hasattr(value, '_as_sql')
+                            and not value) and field.null:
                     # Leaky abstraction artifact: We have to specifically
                     # exclude the "foo__in=[]" case from this handling, because
                     # it's short-circuited in the Where class.
+                    # We also need to handle the case where a subquery is provided
                     entry = self.where_class()
                     entry.add((Constraint(alias, col, None), 'isnull', True), AND)
                     entry.negate()
@@ -1732,7 +1742,7 @@ class BaseQuery(object):
                 raise MultiJoin(pos + 1)
             if model:
                 # The field lives on a base class of the current model.
-                # Skip the chain of proxy to the concrete proxied model                
+                # Skip the chain of proxy to the concrete proxied model
                 proxied_model = get_proxied_model(opts)
 
                 for int_model in opts.get_base_chain(model):
@@ -2362,7 +2372,7 @@ class BaseQuery(object):
             return cursor
         if result_type == SINGLE:
             if self.ordering_aliases:
-                return cursor.fetchone()[:-len(results.ordering_aliases)]
+                return cursor.fetchone()[:-len(self.ordering_aliases)]
             return cursor.fetchone()
 
         # The MULTI case.

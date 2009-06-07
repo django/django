@@ -143,7 +143,7 @@ class GoogleMap(object):
     @property
     def icons(self):
         "Returns a sequence of GIcon objects in this map."
-        return [marker.icon for marker in self.markers if marker.icon]
+        return set([marker.icon for marker in self.markers if marker.icon])
 
 class GoogleMapSet(GoogleMap):
 
@@ -221,6 +221,6 @@ class GoogleMapSet(GoogleMap):
     @property
     def icons(self):
         "Returns a sequence of all icons in each map of the set."
-        icons = []
-        for map in self.maps: icons.extend(map.icons)
+        icons = set()
+        for map in self.maps: icons |= map.icons
         return icons
