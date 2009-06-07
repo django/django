@@ -56,3 +56,9 @@ class QueryTestCase(TestCase):
             pro = Book.objects.using(db).get(published__year=2008)
             self.assertEqual(pro.title, "Pro Django")
             self.assertEqual(pro.published, datetime.date(2008, 12, 16))
+
+            years = Book.objects.using(db).dates('published', 'year')
+            self.assertEqual([o.year for o in years], [2008, 2009])
+
+            months = Book.objects.dates('published', 'month').using(db)
+            self.assertEqual(sorted(o.month for o in months), [5, 12])

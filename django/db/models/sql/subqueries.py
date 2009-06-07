@@ -408,8 +408,7 @@ class DateQuery(Query):
         result = self.setup_joins([field.name], self.get_meta(),
                 self.get_initial_alias(), False)
         alias = result[3][-1]
-        select = Date((alias, field.column), lookup_type,
-                self.connection.ops.date_trunc_sql)
+        select = Date((alias, field.column), lookup_type)
         self.select = [select]
         self.select_fields = [None]
         self.select_related = False # See #7097.

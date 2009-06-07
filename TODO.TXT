@@ -48,7 +48,6 @@ that need to be done.  I'm trying to be as granular as possible.
       phase.  This involves changing the following methods:
 
         * ``Query.add_aggregate``
-        * ``DateQuery.add_date_select``
         * ``Field.get_db_prep_lookup``
         * ``DateField.get_db_prep_value``
         * ``DateTimeField.get_db_prep_value``
