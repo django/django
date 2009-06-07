@@ -56,7 +56,10 @@ Controlling transaction management in views
 For most people, implicit request-based transactions work wonderfully. However,
 if you need more fine-grained control over how transactions are managed, you
 can use Python decorators to change the way transactions are handled by a
-particular view function.
+particular view function.  All of the decorators take an option ``using``
+parameter which should be the alias for a database connection for which the
+behavior applies to.  If no alias is specified then the ``"default"`` database
+is used.
 
 .. note::
 
@@ -79,9 +82,14 @@ Example::
     def viewfunc(request):
         ....
 
+    @transaction.autocommit(using="my_other_database")
+    def viewfunc2(request):
+        ....
+
 Within ``viewfunc()``, transactions will be committed as soon as you call
 ``model.save()``, ``model.delete()``, or any other function that writes to the
-database.
+database.  ``viewfunc2()`` will have this same behavior, but for the
+``"my_other_database"`` connection.
 
 ``django.db.transaction.commit_on_success``
 -------------------------------------------
@@ -93,6 +101,10 @@ all the work done in a function::
 
     @transaction.commit_on_success
     def viewfunc(request):
+        ....
+
+    @transaction.commit_on_success(using="my_other_database")
+    def viewfunc2(request):
         ....
 
 If the function returns successfully, then Django will commit all work done
@@ -126,6 +138,10 @@ Manual transaction management looks like this::
             transaction.rollback()
         else:
             transaction.commit()
+
+    @transaction.commit_manually(using="my_other_database")
+    def viewfunc2(request):
+        ....
 
 .. admonition:: An important note to users of earlier Django releases:
 
@@ -169,21 +185,25 @@ issue a rollback, the entire transaction is rolled back. Savepoints provide
 the ability to perform a fine-grained rollback, rather than the full rollback
 that would be performed by ``transaction.rollback()``.
 
+Each of these functions takes a ``using`` argument which should be the name of
+a database for which the behavior applies.  If no ``using`` argument is
+provided then the ``"default"`` database is used.
+
 Savepoints are controlled by three methods on the transaction object:
 
-.. method:: transaction.savepoint()
+.. method:: transaction.savepoint(using=None)
 
     Creates a new savepoint. This marks a point in the transaction that
     is known to be in a "good" state.
 
     Returns the savepoint ID (sid).
 
-.. method:: transaction.savepoint_commit(sid)
+.. method:: transaction.savepoint_commit(sid, using=None)
 
     Updates the savepoint to include any operations that have been performed
     since the savepoint was created, or since the last commit.
 
-.. method:: transaction.savepoint_rollback(sid)
+.. method:: transaction.savepoint_rollback(sid, using=None)
 
     Rolls the transaction back to the last point at which the savepoint was
     committed.
