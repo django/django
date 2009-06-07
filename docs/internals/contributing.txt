@@ -759,8 +759,8 @@ needed. A temporary database will be created in memory when running the tests.
 
 If you're using another backend:
 
-    * Your the ``DATABASE_USER`` option for the ``'default'`` datbase setting
-      needs to specify an existing user account for the database engine.
+    * Your the ``DATABASE_USER`` option for each of your databases needs to
+      specify an existing user account for the database.
 
     * The ``DATABASE_NAME`` option must be the name of an existing database to
       which the given user has permission to connect. The unit tests will not
@@ -771,8 +771,8 @@ If you're using another backend:
 
 You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
-you will need to include a value for ``TEST_DATABASE_CHARSET`` in your settings
-file.
+you will need to include a value for ``TEST_DATABASE_CHARSET`` in the settings
+dictionary for the applicable database.
 
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:

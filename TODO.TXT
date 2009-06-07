@@ -8,7 +8,6 @@ that need to be done.  I'm trying to be as granular as possible.
 2)  Update all old references to ``settings.DATABASE_*`` to reference
     ``settings.DATABASES``.  This includes the following locations
 
-    * internals/contributing -- still needs an update on TEST_*
     * ref/settings -- needs to be upddated for TEST_*
     * topics/testing -- needs update for the TEST_* settings, plus test refactor
 
