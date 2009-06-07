@@ -1,5 +1,5 @@
 {% load i18n %}
-<div class="inline-group">
+<div class="inline-group" id="{{ inline_admin_formset.opts.verbose_name}}-group">
   <h2>{{ inline_admin_formset.opts.verbose_name_plural|title }}</h2>
 {{ inline_admin_formset.formset.management_form }}
 {{ inline_admin_formset.formset.non_form_errors }}
@@ -47,8 +47,15 @@ $(function() {
     
     // clicking on the "add" link will add a blank form to add a new inline object
     $('#' + id_prefix + "-add").click(function() {
+        {# TODO Zain: this will not work if extra = 0 for the inline #}
         total_forms++;
-        $('#' + id_prefix + (total_forms)).show();
+        
+        // clone the first hidden extra-inline field and append it to the inline list
+        $('#' + id_prefix + (initial_forms + 1)).clone().fadeIn('normal')
+            .insertAfter('#' + id_prefix + "-group .inline-related:last")
+            .attr("id", id_prefix + total_forms)
+        
+        return false;
     });
 });
 </script>

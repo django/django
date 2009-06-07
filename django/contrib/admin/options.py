@@ -868,7 +868,6 @@ class ModelAdmin(BaseModelAdmin):
             'root_path': self.admin_site.root_path,
             'app_label': opts.app_label,
         }
-        #import ipdb; ipdb.set_trace()
         context.update(extra_context or {})
         return self.render_change_form(request, context, change=True, obj=obj)
     change_view = transaction.commit_on_success(change_view)
