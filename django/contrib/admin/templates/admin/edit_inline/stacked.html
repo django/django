@@ -5,7 +5,7 @@
 {{ inline_admin_formset.formset.non_form_errors }}
 
 {% for inline_admin_form in inline_admin_formset %}
-<div class="inline-related{% if forloop.last %} last-related{% endif %}">
+<div class="inline-related{% if forloop.last %} last-related{% endif %}" id="{{ inline_admin_formset.opts.verbose_name}}{{ forloop.counter }}">
   <h3><b>{{ inline_admin_formset.opts.verbose_name|title }}:</b>&nbsp;{% if inline_admin_form.original %}{{ inline_admin_form.original }}{% else %} #{{ forloop.counter }}{% endif %}
     {% if inline_admin_formset.formset.can_delete and inline_admin_form.original %}<span class="delete">{{ inline_admin_form.deletion_field.field }} {{ inline_admin_form.deletion_field.label_tag }}</span>{% endif %}
   </h3>
@@ -22,7 +22,33 @@
 </div>
 {% endfor %}
 
-{# <ul class="tools"> #}
-{#   <li><a class="add" href="">Add another {{ inline_admin_formset.opts.verbose_name|title }}</a></li> #}
-{# </ul> #}
+<ul class="tools add_inline">
+  <li><a id="{{ inline_admin_formset.opts.verbose_name }}-add" class="add" href="#">Add a {{ inline_admin_formset.opts.verbose_name }}</a></li>
+</ul>
+
 </div>
+
+<script type="text/javascript">
+$(function() {
+    {# TODO Zain: properly set the TOTAL_FORMS hidden input field #}
+    
+    var id_prefix = "{{ inline_admin_formset.opts.verbose_name }}";
+    var total_forms = {{ inline_admin_formset.formset.management_form.initial.TOTAL_FORMS }};
+    var initial_forms = {{ inline_admin_formset.formset.management_form.initial.INITIAL_FORMS }};
+    
+    // since javascript is turned on, unhide the "add new <inline>" link and hide the extras
+    $('.add_inline').show();
+    
+    for(var i = initial_forms + 1; i <= total_forms; i++) {
+        $('#' + id_prefix + i).hide();
+    }
+    
+    total_forms = initial_forms;
+    
+    // clicking on the "add" link will add a blank form to add a new inline object
+    $('#' + id_prefix + "-add").click(function() {
+        total_forms++;
+        $('#' + id_prefix + (total_forms)).show();
+    });
+});
+</script>

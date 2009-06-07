@@ -868,6 +868,7 @@ class ModelAdmin(BaseModelAdmin):
             'root_path': self.admin_site.root_path,
             'app_label': opts.app_label,
         }
+        #import ipdb; ipdb.set_trace()
         context.update(extra_context or {})
         return self.render_change_form(request, context, change=True, obj=obj)
     change_view = transaction.commit_on_success(change_view)
@@ -1122,7 +1123,7 @@ class InlineModelAdmin(BaseModelAdmin):
 
     def _media(self):
         from django.conf import settings
-        js = []
+        js = ['js/jquery.js']
         if self.prepopulated_fields:
             js.append('js/urlify.js')
         if self.filter_vertical or self.filter_horizontal:
