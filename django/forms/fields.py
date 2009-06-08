@@ -119,12 +119,19 @@ class Field(object):
     def validate(self, value):
         if value in EMPTY_VALUES and self.required:
             raise ValidationError(self.error_messages['required'])
+
+    def run_validators(self, value):
+        errors = []
         for v in self.validators:
             # don't run complex validators since they need all_values
             # and must therefore be run on the form level
             if not isinstance(v, validators.ComplexValidator):
-                v(value)
-
+                try:
+                    v(value)
+                except ValidationError, e:
+                    errors.extend(e.messages)
+        if errors:
+            raise ValidationError(errors)
 
     def clean(self, value):
         """
@@ -135,6 +142,7 @@ class Field(object):
         """
         value = self.to_python(value)
         self.validate(value)
+        self.run_validators(value)
         return value
 
     def widget_attrs(self, widget):
