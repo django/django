@@ -303,6 +303,15 @@ be useful for some test setups, and should never be used on a live
 site.
 
 
+.. setting:: DECIMAL_SEPARATOR
+
+DECIMAL_SEPARATOR
+-----------------
+
+Default: ``'.'`` (Dot)
+
+The default decimal separator used when formatting decimal numbers.
+
 .. setting:: DEFAULT_CHARSET
 
 DEFAULT_CHARSET

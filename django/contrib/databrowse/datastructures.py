@@ -6,7 +6,6 @@ convenience functionality and permalink functions for the databrowse app.
 from django.db import models
 from django.utils import dateformat
 from django.utils.text import capfirst
-from django.utils.translation import get_date_formats
 from django.utils.encoding import smart_unicode, smart_str, iri_to_uri
 from django.utils.safestring import mark_safe
 from django.db.models.query import QuerySet
@@ -156,7 +155,9 @@ class EasyInstanceField(object):
             objs = dict(self.field.choices).get(self.raw_value, EMPTY_VALUE)
         elif isinstance(self.field, models.DateField) or isinstance(self.field, models.TimeField):
             if self.raw_value:
-                date_format, datetime_format, time_format = get_date_formats()
+                date_format = getformat('DATE_FORMAT')
+                datetime_format = getformat('DATETIME_FORMAT')
+                time_format = getformat('TIME_FORMAT')
                 if isinstance(self.field, models.DateTimeField):
                     objs = capfirst(dateformat.format(self.raw_value, datetime_format))
                 elif isinstance(self.field, models.TimeField):

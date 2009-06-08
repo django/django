@@ -18,10 +18,10 @@ activate = lambda x: None
 deactivate = deactivate_all = lambda: None
 get_language = lambda: settings.LANGUAGE_CODE
 get_language_bidi = lambda: settings.LANGUAGE_CODE in settings.LANGUAGES_BIDI
-get_date_formats = lambda: (settings.DATE_FORMAT, settings.DATETIME_FORMAT, settings.TIME_FORMAT)
-get_partial_date_formats = lambda: (settings.YEAR_MONTH_FORMAT, settings.MONTH_DAY_FORMAT)
 check_for_language = lambda x: True
 
+# date formats shouldn't be used using gettext anymore. This
+# is kept for backward compatibility
 TECHNICAL_ID_MAP = {
     "DATE_WITH_TIME_FULL": settings.DATETIME_FORMAT,
     "DATE_FORMAT": settings.DATE_FORMAT,
@@ -51,3 +51,8 @@ def to_locale(language):
 
 def get_language_from_request(request):
     return settings.LANGUAGE_CODE
+
+# get_date_formats and get_partial_date_formats aren't used anymore from django
+# itself, and are kept for backward compatibility.
+get_date_formats = lambda: (settings.DATE_FORMAT, settings.DATETIME_FORMAT, settings.TIME_FORMAT)
+get_partial_date_formats = lambda: (settings.YEAR_MONTH_FORMAT, settings.MONTH_DAY_FORMAT)

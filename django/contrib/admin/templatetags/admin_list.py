@@ -7,7 +7,8 @@ from django.utils import dateformat
 from django.utils.html import escape, conditional_escape
 from django.utils.text import capfirst
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_date_formats, get_partial_date_formats, ugettext as _
+from django.utils.translation import ugettext as _
+from django.utils.formats import getformat
 from django.utils.encoding import smart_unicode, smart_str, force_unicode
 from django.template import Library
 import datetime
@@ -184,7 +185,9 @@ def items_for_result(cl, result, form):
             # Dates and times are special: They're formatted in a certain way.
             elif isinstance(f, models.DateField) or isinstance(f, models.TimeField):
                 if field_val:
-                    (date_format, datetime_format, time_format) = get_date_formats()
+                    date_format = getformat('DATE_FORMAT')
+                    datetime_format = getformat('DATETIME_FORMAT')
+                    time_format = getformat('TIME_FORMAT')
                     if isinstance(f, models.DateTimeField):
                         result_repr = capfirst(dateformat.format(field_val, datetime_format))
                     elif isinstance(f, models.TimeField):
@@ -263,7 +266,8 @@ def date_hierarchy(cl):
         year_lookup = cl.params.get(year_field)
         month_lookup = cl.params.get(month_field)
         day_lookup = cl.params.get(day_field)
-        year_month_format, month_day_format = get_partial_date_formats()
+        year_month_format = getformat('YEAR_MONTH_FORMAT')
+        month_day_format = getformat('MONTH_DAY_FORMAT')
 
         link = lambda d: mark_safe(cl.get_query_string(d, [field_generic]))
 

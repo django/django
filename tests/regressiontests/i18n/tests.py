@@ -64,6 +64,15 @@ status.
 'as'
 >>> print s
 Password
+
+>>> from django.utils.formats import getformat
+>>> activate('en')
+>>> getformat('DATE_FORMAT')
+'N j, Y'
+>>> activate('ca')
+>>> getformat('DATE_FORMAT')
+'j \de N \de Y'
+
 """
 
 __test__ = {

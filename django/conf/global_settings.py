@@ -103,6 +103,10 @@ USE_I18N = True
 LOCALE_PATHS = ()
 LANGUAGE_COOKIE_NAME = 'django_language'
 
+# If you set this to True, Django will format dates, numbers and calendars
+# according to user current locale
+USE_FORMAT_I18N = False
+
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various e-mails.
 MANAGERS = ADMINS
@@ -276,6 +280,25 @@ YEAR_MONTH_FORMAT = 'F Y'
 # See all available format strings here:
 # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 MONTH_DAY_FORMAT = 'F j'
+
+# Default shortformatting for date objects. See all available format strings here:
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
+SHORT_DATE_FORMAT = 'N j, Y'
+
+# Default short formatting for datetime objects.
+# See all available format strings here:
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
+SHORT_DATETIME_FORMAT = 'N j, Y, P'
+
+# Default first day of week, to be used on calendars
+# 0 means Sunday
+FIRST_DAY_OF_WEEK = 0
+
+# Default decimal separator symbol
+DECIMAL_SEPARATOR = '.'
+
+# Default thousand separator symbol
+THOUSAND_SEPARATOR = ','
 
 # Do you want to manage transactions manually?
 # Hint: you really don't!
