@@ -21,6 +21,7 @@ class Aggregate(object):
     is_ordinal = False
     is_computed = False
     sql_template = '%(function)s(%(field)s)'
+    as_sql_takes_connection = True
 
     def __init__(self, col, source=None, is_summary=False, **extra):
         """Instantiate an SQL aggregate
@@ -72,15 +73,16 @@ class Aggregate(object):
         if isinstance(self.col, (list, tuple)):
             self.col = (change_map.get(self.col[0], self.col[0]), self.col[1])
 
-    def as_sql(self, quote_func=None):
+    def as_sql(self, qn, connection):
         "Return the aggregate, rendered as SQL."
-        if not quote_func:
-            quote_func = lambda x: x
 
         if hasattr(self.col, 'as_sql'):
-            field_name = self.col.as_sql(quote_func)
+            if getattr(self.col, 'as_sql_takes_connection', False):
+                field_name = self.col.as_sql(qn, connection)
+            else:
+                field_name = self.col.as_sql(qn)
         elif isinstance(self.col, (list, tuple)):
-            field_name = '.'.join([quote_func(c) for c in self.col])
+            field_name = '.'.join([qn(c) for c in self.col])
         else:
             field_name = self.col
 
@@ -127,4 +129,3 @@ class Variance(Aggregate):
     def __init__(self, col, sample=False, **extra):
         super(Variance, self).__init__(col, **extra)
         self.sql_function = sample and 'VAR_SAMP' or 'VAR_POP'
-

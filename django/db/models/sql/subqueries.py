@@ -421,17 +421,21 @@ class AggregateQuery(Query):
     An AggregateQuery takes another query as a parameter to the FROM
     clause and only selects the elements in the provided list.
     """
+    as_sql_takes_connection = True
+
     def add_subquery(self, query):
         self.subquery, self.sub_params = query.as_sql(with_col_aliases=True)
 
-    def as_sql(self, quote_func=None):
+    def as_sql(self, qn=None):
         """
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
         """
+        if qn is None:
+            qn = self.quote_name_unless_alias
         sql = ('SELECT %s FROM (%s) subquery' % (
             ', '.join([
-                aggregate.as_sql()
+                aggregate.as_sql(qn, self.connection)
                 for aggregate in self.aggregate_select.values()
             ]),
             self.subquery)

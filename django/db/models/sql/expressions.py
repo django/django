@@ -78,6 +78,9 @@ class SQLEvaluator(object):
     def evaluate_leaf(self, node, qn, connection):
         col = self.cols[node]
         if hasattr(col, 'as_sql'):
-            return col.as_sql(qn), ()
+            if getattr(col, 'as_sql_takes_connection', False):
+                return col.as_sql(qn, connection), ()
+            else:
+                return col.as_sql(qn)
         else:
             return '%s.%s' % (qn(col[0]), qn(col[1])), ()

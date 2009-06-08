@@ -746,7 +746,7 @@ class BaseQuery(object):
 
         result.extend([
             '%s%s' % (
-                aggregate.as_sql(quote_func=qn),
+                aggregate.as_sql(qn, self.connection),
                 alias is not None and ' AS %s' % qn(alias) or ''
             )
             for alias, aggregate in self.aggregate_select.items()

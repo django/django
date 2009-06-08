@@ -152,7 +152,11 @@ class WhereNode(tree.Node):
             field_sql = self.sql_for_columns(lvalue, qn, connection)
         else:
             # A smart object with an as_sql() method.
-            field_sql = lvalue.as_sql(quote_func=qn)
+            if getattr(lvalue, 'as_sql_takes_connection', False):
+                field_sql = lvalue.as_sql(qn, connection)
+            else:
+                field_sql = lvalue.as_sql(qn)
+
 
         if value_annot is datetime.datetime:
             cast_sql = connection.ops.datetime_cast_sql()
