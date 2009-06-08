@@ -42,4 +42,4 @@ class RequiredIfOtherFieldBlank(ComplexValidator):
     def __call__(self, value, all_values={}, obj=None):
         if self.get_value(self.other_field, all_values, obj) in EMPTY_VALUES:
             if value in EMPTY_VALUES:
-                raise ValidationError('This field is required if %n is blank.' % self.other_field)
+                raise ValidationError('This field is required if %s is blank.' % self.other_field)
