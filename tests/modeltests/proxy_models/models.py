@@ -286,6 +286,13 @@ MyPerson post save
 MyPersonProxy pre save
 MyPersonProxy post save
 
+>>> signals.pre_save.disconnect(h1, sender=MyPerson)
+>>> signals.post_save.disconnect(h2, sender=MyPerson)
+>>> signals.pre_save.disconnect(h3, sender=Person)
+>>> signals.post_save.disconnect(h4, sender=Person)
+>>> signals.pre_save.disconnect(h5, sender=MyPersonProxy)
+>>> signals.post_save.disconnect(h6, sender=MyPersonProxy)
+
 # A proxy has the same content type as the model it is proxying for (at the
 # storage level, it is meant to be essentially indistinguishable).
 >>> ctype = ContentType.objects.get_for_model
@@ -354,4 +361,11 @@ True
 # Select related + filter on a related proxy of proxy field
 >>> ProxyImprovement.objects.select_related().get(associated_bug__summary__icontains='fix')
 <ProxyImprovement: ProxyImprovement:improve that>
+
+Proxy models can be loaded from fixtures (Regression for #11194)
+>>> from django.core import management
+>>> management.call_command('loaddata', 'mypeople.json', verbosity=0)
+>>> MyPerson.objects.get(pk=100)
+<MyPerson: Elvis Presley>
+
 """}

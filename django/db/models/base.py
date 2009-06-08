@@ -435,7 +435,9 @@ class Model(object):
         # That means that we don't try to be smart about saving attributes
         # that might have come from the parent class - we just save the
         # attributes we have been given to the class we have been given.
-        if not raw:
+        # We also go through this process to defer the save of proxy objects
+        # to their actual underlying model.
+        if not raw or meta.proxy:
             if meta.proxy:
                 org = cls
             else:
