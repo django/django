@@ -259,6 +259,33 @@ FieldError: Proxy model 'NoNewFields' contains model fields.
 >>> OtherPerson._default_manager.all()
 [<OtherPerson: barney>, <OtherPerson: wilma>]
 
+# Test save signals for proxy models
+>>> from django.db.models import signals
+>>> def make_handler(model, event):
+...     def _handler(*args, **kwargs):
+...         print u"%s %s save" % (model, event)
+...     return _handler
+>>> h1 = make_handler('MyPerson', 'pre')
+>>> h2 = make_handler('MyPerson', 'post')
+>>> h3 = make_handler('Person', 'pre')
+>>> h4 = make_handler('Person', 'post')
+>>> signals.pre_save.connect(h1, sender=MyPerson)
+>>> signals.post_save.connect(h2, sender=MyPerson)
+>>> signals.pre_save.connect(h3, sender=Person)
+>>> signals.post_save.connect(h4, sender=Person)
+>>> dino = MyPerson.objects.create(name=u"dino")
+MyPerson pre save
+MyPerson post save
+
+# Test save signals for proxy proxy models
+>>> h5 = make_handler('MyPersonProxy', 'pre')
+>>> h6 = make_handler('MyPersonProxy', 'post')
+>>> signals.pre_save.connect(h5, sender=MyPersonProxy)
+>>> signals.post_save.connect(h6, sender=MyPersonProxy)
+>>> dino = MyPersonProxy.objects.create(name=u"pebbles")
+MyPersonProxy pre save
+MyPersonProxy post save
+
 # A proxy has the same content type as the model it is proxying for (at the
 # storage level, it is meant to be essentially indistinguishable).
 >>> ctype = ContentType.objects.get_for_model
@@ -266,7 +293,7 @@ FieldError: Proxy model 'NoNewFields' contains model fields.
 True
 
 >>> MyPersonProxy.objects.all()
-[<MyPersonProxy: barney>, <MyPersonProxy: fred>]
+[<MyPersonProxy: barney>, <MyPersonProxy: dino>, <MyPersonProxy: fred>, <MyPersonProxy: pebbles>]
 
 >>> u = User.objects.create(name='Bruce')
 >>> User.objects.all()
