@@ -5,6 +5,7 @@ Form classes
 from copy import deepcopy
 
 from django.core.exceptions import ValidationError
+from django.core.validators import ComplexValidator
 from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
@@ -254,6 +255,9 @@ class BaseForm(StrAndUnicode):
             if not name in self.cleaned_data:
                 continue
             for v in field.validators:
+                # skip noncomplex validators, they have already been run on the Field
+                if not isinstance(v, ComplexValidator):
+                    continue
                 try:
                     v(self.cleaned_data[name], all_values=self.cleaned_data)
                 except ValidationError, e:

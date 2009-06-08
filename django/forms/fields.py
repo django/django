@@ -119,6 +119,11 @@ class Field(object):
     def validate(self, value):
         if value in EMPTY_VALUES and self.required:
             raise ValidationError(self.error_messages['required'])
+        for v in self.validators:
+            # don't run complex validators since they need all_values
+            # and must therefore be run on the form level
+            if not isinstance(v, validators.ComplexValidator):
+                v(value)
 
 
     def clean(self, value):
