@@ -14,7 +14,7 @@ from django.db.models.query_utils import QueryWrapper
 from django.dispatch import dispatcher
 from django.conf import settings
 from django import forms
-from django.core import exceptions
+from django.core import exceptions, validators
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import curry
 from django.utils.itercompat import tee
@@ -135,7 +135,7 @@ class Field(object):
                 ugettext_lazy("This field cannot be null."))
 
         # cannot do if not value because of 0 passed to integer fields
-        if not self.blank and value in ( None, '' ):
+        if not self.blank and value in validators.EMPTY_VALUES:
             raise exceptions.ValidationError(
                 ugettext_lazy("This field cannot be blank."))
 
