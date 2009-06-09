@@ -30,14 +30,14 @@ class BaseCoverageRunner(object):
         Runs the specified tests while generating code coverage statistics. Upon
         the tests' completion, the results are printed to stdout.
         """
-        coverage.erase()
+        #coverage.erase()
         #Allow an on-disk cache of coverage stats.
         #coverage.use_cache(0)
         for e in getattr(settings, 'COVERAGE_CODE_EXCLUDES', []):
             coverage.exclude(e)
 
-        coverage.start()
         brt = base_run_tests()
+        coverage.start()
         results = brt.run_tests(test_labels, verbosity, interactive, extra_tests)
         coverage.stop()
 
@@ -71,7 +71,7 @@ class BaseCoverageRunner(object):
             for e in self.errors:
                 print >> sys.stderr, e,
             print >> sys.stdout
-        coverage._the_coverage.save()
+        #coverage._the_coverage.save()
         return results
 
 
@@ -83,6 +83,7 @@ class ReportingCoverageRunner(BaseCoverageRunner):
         Constructor, overrides BaseCoverageRunner. Sets output directory
         for reports. Parameter or setting.
         """
+        super(ReportingCoverageRunner, self).__init__()
         if(outdir):
             self.outdir = outdir
         else:
@@ -100,8 +101,8 @@ class ReportingCoverageRunner(BaseCoverageRunner):
         Overrides BaseCoverageRunner.run_tests, and adds html report generation
         with the results
         """
-        res = BaseCoverageRunner.run_tests(self, *args, **kwargs)
-        coverage._the_coverage.load()
+        res = super(ReportingCoverageRunner, self).run_tests( *args, **kwargs)
+        #coverage._the_coverage.load()
         cov = coverage.html.HtmlReporter(coverage._the_coverage)
         cov.report(self.modules.values(), self.outdir)
         #coverage._the_coverage.html_report(self.modules.values(), self.outdir)
