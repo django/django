@@ -132,12 +132,13 @@ class RelatedField(object):
                     v, field = getattr(v, v._meta.pk.name), v._meta.pk
             except AttributeError:
                 pass
-            if field:
-                if lookup_type in ('range', 'in'):
-                    v = [v]
-                v = field.get_db_prep_lookup(lookup_type, v)
-                if isinstance(v, list):
-                    v = v[0]
+            if not field:
+                field = self.rel.get_related_field()
+            if lookup_type in ('range', 'in'):
+                v = [v]
+            v = field.get_db_prep_lookup(lookup_type, v)
+            if isinstance(v, list):
+                v = v[0]
             return v
 
         if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
@@ -958,4 +959,3 @@ class ManyToManyField(RelatedField, Field):
         # A ManyToManyField is not represented by a single column,
         # so return None.
         return None
-

@@ -7,6 +7,8 @@ try:
 except NameError:
     from sets import Set as set     # Python 2.3 fallback
 
+from copy import deepcopy
+
 from django.db import connection, transaction, IntegrityError
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import DateField
@@ -39,6 +41,17 @@ class QuerySet(object):
     ########################
     # PYTHON MAGIC METHODS #
     ########################
+
+    def __deepcopy__(self, memo):
+        """
+        Deep copy of a QuerySet doesn't populate the cache
+        """
+        obj_dict = deepcopy(self.__dict__, memo)
+        obj_dict['_iter'] = None
+
+        obj = self.__class__()
+        obj.__dict__.update(obj_dict)
+        return obj
 
     def __getstate__(self):
         """
@@ -190,7 +203,25 @@ class QuerySet(object):
         index_start = len(extra_select)
         aggregate_start = index_start + len(self.model._meta.fields)
 
-        load_fields = only_load.get(self.model)
+        load_fields = []
+        # If only/defer clauses have been specified,
+        # build the list of fields that are to be loaded.
+        if only_load:
+            for field, model in self.model._meta.get_fields_with_model():
+                if model is None:
+                    model = self.model
+                if field == self.model._meta.pk:
+                    # Record the index of the primary key when it is found
+                    pk_idx = len(load_fields)
+                try:
+                    if field.name in only_load[model]:
+                        # Add a field that has been explicitly included
+                        load_fields.append(field.name)
+                except KeyError:
+                    # Model wasn't explicitly listed in the only_load table
+                    # Therefore, we need to load all fields from this model
+                    load_fields.append(field.name)
+
         skip = None
         if load_fields and not fill_cache:
             # Some fields have been deferred, so we have to initialise
@@ -355,10 +386,11 @@ class QuerySet(object):
 
         # Delete objects in chunks to prevent the list of related objects from
         # becoming too long.
+        seen_objs = None
         while 1:
             # Collect all the objects to be deleted in this chunk, and all the
             # objects that are related to the objects that are to be deleted.
-            seen_objs = CollectedObjects()
+            seen_objs = CollectedObjects(seen_objs)
             for object in del_query[:CHUNK_SIZE]:
                 object._collect_sub_objects(seen_objs)
 

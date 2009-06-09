@@ -1,10 +1,10 @@
 import os, unittest
 from django.contrib.gis.geos import *
 from django.contrib.gis.db.backend import SpatialBackend
-from django.contrib.gis.db.models import F, Extent, Union
+from django.contrib.gis.db.models import Count, Extent, F, Union
 from django.contrib.gis.tests.utils import no_mysql, no_oracle, no_spatialite
 from django.conf import settings
-from models import City, Location, DirectoryEntry, Parcel
+from models import City, Location, DirectoryEntry, Parcel, Book, Author
 
 cities = (('Aurora', 'TX', -97.516111, 33.058333),
           ('Roswell', 'NM', -104.528056, 33.387222),
@@ -196,8 +196,8 @@ class RelatedGeoModelTest(unittest.TestCase):
         # ID values do not match their City ID values.
         loc1 = Location.objects.create(point='POINT (-95.363151 29.763374)')
         loc2 = Location.objects.create(point='POINT (-96.801611 32.782057)')
-        dallas = City.objects.create(name='Dallas', location=loc2)
-        houston = City.objects.create(name='Houston', location=loc1)
+        dallas = City.objects.create(name='Dallas', state='TX', location=loc2)
+        houston = City.objects.create(name='Houston', state='TX', location=loc1)
 
         # The expected ID values -- notice the last two location IDs
         # are out of order.  We want to make sure that the related
@@ -230,6 +230,32 @@ class RelatedGeoModelTest(unittest.TestCase):
         q_str = pickle.dumps(qs.query)
         q = pickle.loads(q_str)
         self.assertEqual(GeoQuery, q.__class__)
+
+    def test12_count(self):
+        "Testing `Count` aggregate use with the `GeoManager`. See #11087."
+        # Creating a new City, 'Fort Worth', that uses the same location
+        # as Dallas.
+        dallas = City.objects.get(name='Dallas')
+        ftworth = City.objects.create(name='Fort Worth', state='TX', location=dallas.location)
+        
+        # Count annotation should be 2 for the Dallas location now.
+        loc = Location.objects.annotate(num_cities=Count('city')).get(id=dallas.location.id)
+        self.assertEqual(2, loc.num_cities)
+
+        # Creating some data for the Book/Author non-geo models that
+        # use GeoManager.  See #11087.
+        tp = Author.objects.create(name='Trevor Paglen')
+        Book.objects.create(title='Torture Taxi', author=tp)
+        Book.objects.create(title='I Could Tell You But Then You Would Have to be Destroyed by Me', author=tp)
+        Book.objects.create(title='Blank Spots on the Map', author=tp)
+        wp = Author.objects.create(name='William Patry')
+        Book.objects.create(title='Patry on Copyright', author=wp)
+        
+        # Should only be one author (Trevor Paglen) returned by this query, and
+        # the annotation should have 3 for the number of books.
+        qs = Author.objects.annotate(num_books=Count('books')).filter(num_books__gt=1)
+        self.assertEqual(1, len(qs))
+        self.assertEqual(3, qs[0].num_books)
 
     # TODO: Related tests for KML, GML, and distance lookups.
 

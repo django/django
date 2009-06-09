@@ -62,9 +62,7 @@ class BaseCoverageRunner(object):
         packages, self.modules, self.excludes, self.errors = get_all_modules(
             coverage_modules, getattr(settings, 'COVERAGE_MODULE_EXCLUDES', []),
             getattr(settings, 'COVERAGE_PATH_EXCLUDES', []))
-        #for mods in self.modules.keys():
-        #    self.cov.analysis2(ModuleVars(mods, self.modules[mods]).source_file)
-            #coverage.analysis2(self.modules[mods])
+
         self.cov.report(self.modules.values(), show_missing=1)
 
         if self.excludes:
@@ -110,12 +108,10 @@ class ReportingCoverageRunner(BaseCoverageRunner):
         with the results
         """
         res = super(ReportingCoverageRunner, self).run_tests( *args, **kwargs)
-        #coverage._the_coverage.load()
-        #covss = coverage.html.HtmlReporter(self.cov)
-        self.cov.html_report(self.modules.values(), directory=self.outdir, ignore_errors=True, omit_prefixes='modeltests')
-        #cov.report(self.modules.values(), self.outdir)
-        #coverage._the_coverage.html_report(self.modules.values(), self.outdir)
-
+        self.cov.html_report(self.modules.values(),
+                                directory=self.outdir,
+                                ignore_errors=True,
+                                omit_prefixes='modeltests')
         print >>sys.stdout
         print >>sys.stdout, _("HTML reports were output to '%s'") %self.outdir
 
