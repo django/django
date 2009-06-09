@@ -9,6 +9,9 @@ class Animal(models.Model):
     count = models.IntegerField()
     weight = models.FloatField()
 
+    # use a non-default name for the default manager
+    specimens = models.Manager()
+
     def __unicode__(self):
         return self.common_name
 
@@ -160,5 +163,11 @@ Count = 42 (<type 'int'>)
 Weight = 1.2 (<type 'float'>)
 
 >>> models.signals.pre_save.disconnect(animal_pre_save_check)
+
+###############################################
+# Regression for #11286 -- Ensure that dumpdata honors the default manager
+# Dump the current contents of the database as a JSON fixture
+>>> management.call_command('dumpdata', 'fixtures_regress.animal', format='json')
+[{"pk": 1, "model": "fixtures_regress.animal", "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}}, {"pk": 2, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.29..., "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}}, {"pk": 10, "model": "fixtures_regress.animal", "fields": {"count": 42, "weight": 1.2, "name": "Emu", "latin_name": "Dromaius novaehollandiae"}}]
 
 """}
