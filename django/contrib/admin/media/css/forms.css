@@ -334,6 +334,10 @@ fieldset.monospace textarea {
     width: 19%;
 }
 
+.inline-selector a, .inline-selector a:visited {
+    color: #000;
+}
+
 .inline-selector-item {
     background-color: #F6F6F6;
     border: 1px solid #E7E7E7;
@@ -342,15 +346,26 @@ fieldset.monospace textarea {
     font-size: 0.9em;
 }
 
+.inline-selector-item:hover {
+    background-color: #C1DBFD;
+}
+
 .inline-detail {
     float: right;
     width: 80%;
-    background: #c9c;
     border-left: 1px solid #EEE;
 }
 
 .inline-selector-delete {
     float: right;
+}
+
+.inline-selected {
+    background-color: #9EB7D5;
+}
+
+.inline-selected a, .inline-selected a:visited {
+    color: #FFF;
 }
 
 .clear {
