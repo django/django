@@ -57,7 +57,7 @@ class BaseCoverageRunner(object):
             coverage_modules, getattr(settings, 'COVERAGE_MODULE_EXCLUDES', []),
             getattr(settings, 'COVERAGE_PATH_EXCLUDES', []))
         for mods in self.modules.keys():
-            coverage.analysis2(ModuleVars(mods, self.modules[mods]))
+            coverage.analysis2(ModuleVars(mods, self.modules[mods]).source_file)
         coverage.report(self.modules.values(), show_missing=1)
         if self.excludes:
             print >> sys.stdout
