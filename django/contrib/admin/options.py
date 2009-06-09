@@ -1166,3 +1166,6 @@ class StackedInline(InlineModelAdmin):
 
 class TabularInline(InlineModelAdmin):
     template = 'admin/edit_inline/tabular.html'
+
+class SelectorInline(InlineModelAdmin):
+    template = 'admin/edit_inline/selector.html'

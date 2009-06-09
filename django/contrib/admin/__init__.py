@@ -1,6 +1,6 @@
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.options import ModelAdmin, HORIZONTAL, VERTICAL
-from django.contrib.admin.options import StackedInline, TabularInline
+from django.contrib.admin.options import StackedInline, TabularInline, SelectorInline
 from django.contrib.admin.sites import AdminSite, site
 from django.utils.importlib import import_module
 

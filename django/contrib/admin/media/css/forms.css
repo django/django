@@ -328,3 +328,31 @@ fieldset.monospace textarea {
 .add_inline {
     display: none;
 }
+
+.inline-selector {
+    float: left;
+    width: 19%;
+}
+
+.inline-selector-item {
+    background-color: #F6F6F6;
+    border: 1px solid #E7E7E7;
+    padding: 5px;
+    margin: 7px 0px 7px 5px;
+    font-size: 0.9em;
+}
+
+.inline-detail {
+    float: right;
+    width: 80%;
+    background: #c9c;
+    border-left: 1px solid #EEE;
+}
+
+.inline-selector-delete {
+    float: right;
+}
+
+.clear {
+    clear: both;
+}

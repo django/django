@@ -1,0 +1,84 @@
+{% load i18n %}
+<div class="inline-group">
+    <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
+        {{ inline_admin_formset.formset.management_form }}
+            <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
+            
+            {{ inline_admin_formset.formset.non_form_errors }}
+            
+            <div class="inline-selector">
+                {% for inline_admin_form in inline_admin_formset %}
+                    <div class="inline-selector-item">
+                        {% if inline_admin_form.original or inline_admin_form.show_url %}
+                            {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
+                            {% if inline_admin_form.show_url %}<a href="../../../r/{{ inline_admin_form.original_content_type_id }}/{{ inline_admin_form.original.id }}/">{% trans "View on site" %}</a>{% endif %}
+                        {% else %}
+                            New Inline
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="inline-detail">
+            {% for inline_admin_form in inline_admin_formset %}
+                <h3>
+                    {% if inline_admin_form.original or inline_admin_form.show_url %}
+                        {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
+                        {% if inline_admin_form.show_url %}<a href="../../../r/{{ inline_admin_form.original_content_type_id }}/{{ inline_admin_form.original.id }}/">{% trans "View on site" %}</a>{% endif %}
+                    {% else %}
+                        [New Inline]
+                    {% endif %}
+            
+                    {% if inline_admin_formset.formset.can_delete %}
+                        <span class="inline-selector-delete">
+                            {% if inline_admin_form.original %}
+                                {{ inline_admin_form.deletion_field.field }} {{ inline_admin_form.deletion_field.label_tag }}
+                            {% endif %}
+                        </span>
+                    {% endif %}
+                </h3>
+                
+                {% if inline_admin_form.form.non_field_errors %}
+                    {{ inline_admin_form.form.non_field_errors }}
+                {% endif %}
+                
+                <div class="selector-item-detail">
+                    {% if inline_admin_form.has_auto_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
+                    {{ inline_admin_form.fk_field.field }}
+                    {% spaceless %}
+                    {% for fieldset in inline_admin_form %}
+                      {% for line in fieldset %}
+                     {% for field in line %}
+                       {% if field.is_hidden %} {{ field.field }} {% endif %}
+                     {% endfor %}
+                      {% endfor %}
+                    {% endfor %}
+                    {% endspaceless %}
+
+                    {% for fieldset in inline_admin_form %}
+                    <fieldset class="module aligned {{ fieldset.classes }}">
+                      {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
+                      {% if fieldset.description %}<div class="description">{{ fieldset.description|safe }}</div>{% endif %}
+                      {% for line in fieldset %}
+                          <div class="form-row{% if line.errors %} errors{% endif %} {% for field in line %}{{ field.field.name }} {% endfor %} ">
+                          {{ line.errors }}
+                          {% for field in line %}
+                          <div{% if not line.fields|length_is:"1" %} class="field-box"{% endif %}>
+                              {% if field.is_checkbox %}
+                                  {{ field.field }}{{ field.label_tag }}
+                              {% else %}
+                                  {{ field.label_tag }}{{ field.field }}
+                              {% endif %}
+                              {% if field.field.field.help_text %}<p class="help">{{ field.field.field.help_text|safe }}</p>{% endif %}
+                          </div>
+                          {% endfor %}
+                          </div>
+                      {% endfor %}
+                    </fieldset>
+                    {% endfor %}
+               </div>
+            {% endfor %}
+            </div>
+        <div class="clear"></div>
+    </div>
+</div>

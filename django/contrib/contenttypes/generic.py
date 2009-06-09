@@ -399,3 +399,6 @@ class GenericStackedInline(GenericInlineModelAdmin):
 
 class GenericTabularInline(GenericInlineModelAdmin):
     template = 'admin/edit_inline/tabular.html'
+
+class GenericSelectorInline(GenericInlineModelAdmin):
+    template = 'admin/edit_inline/selector.html'
