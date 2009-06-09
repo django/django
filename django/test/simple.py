@@ -156,7 +156,7 @@ class DefaultTestRunner(object):
         Placeholder constructor. Want to make it obvious that it can
         be overridden.
         """
-        pass
+        self.isloaded = True
 
     def run_tests(self, test_labels, verbosity=1, interactive=True, extra_tests=[]):
         """

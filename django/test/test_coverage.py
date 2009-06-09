@@ -3,7 +3,7 @@ import os, sys
 
 from django.conf import settings
 from django.db.models import get_app, get_apps
-from django.test.simple import DefaultTestRunner as base_run_tests
+from django.test.simple import DefaultTestRunner
 
 from django.utils.module_tools import get_all_modules, find_or_load_module
 from django.utils.translation import ugettext as _
@@ -22,7 +22,8 @@ class BaseCoverageRunner(object):
 
     def __init__(self):
         """Placeholder (since it is overrideable)"""
-        pass
+        self.cov = coverage.coverage(cover_pylib=True)
+        self.cov.erase()
 
     def run_tests(self, test_labels, verbosity=1, interactive=True,
                   extra_tests=[]):
@@ -30,16 +31,17 @@ class BaseCoverageRunner(object):
         Runs the specified tests while generating code coverage statistics. Upon
         the tests' completion, the results are printed to stdout.
         """
-        #coverage.erase()
+        self.cov.erase()
         #Allow an on-disk cache of coverage stats.
-        #coverage.use_cache(0)
-        for e in getattr(settings, 'COVERAGE_CODE_EXCLUDES', []):
-            coverage.exclude(e)
+        self.cov.use_cache(0)
+        #for e in getattr(settings, 'COVERAGE_CODE_EXCLUDES', []):
+        #    self.cov.exclude(e)
 
-        brt = base_run_tests()
-        coverage.start()
+
+        self.cov.start()
+        brt = DefaultTestRunner()
         results = brt.run_tests(test_labels, verbosity, interactive, extra_tests)
-        coverage.stop()
+        self.cov.stop()
 
         coverage_modules = []
         if test_labels:
@@ -56,9 +58,10 @@ class BaseCoverageRunner(object):
         packages, self.modules, self.excludes, self.errors = get_all_modules(
             coverage_modules, getattr(settings, 'COVERAGE_MODULE_EXCLUDES', []),
             getattr(settings, 'COVERAGE_PATH_EXCLUDES', []))
-        for mods in self.modules.keys():
-            coverage.analysis2(ModuleVars(mods, self.modules[mods]).source_file)
-        coverage.report(self.modules.values(), show_missing=1)
+        #for mods in self.modules.keys():
+        #    self.cov.analysis2(ModuleVars(mods, self.modules[mods]).source_file)
+            #coverage.analysis2(self.modules[mods])
+        self.cov.report(self.modules.values(), show_missing=1)
         if self.excludes:
             print >> sys.stdout
             print >> sys.stdout, _("The following packages or modules were excluded:"),
@@ -103,8 +106,9 @@ class ReportingCoverageRunner(BaseCoverageRunner):
         """
         res = super(ReportingCoverageRunner, self).run_tests( *args, **kwargs)
         #coverage._the_coverage.load()
-        cov = coverage.html.HtmlReporter(coverage._the_coverage)
-        cov.report(self.modules.values(), self.outdir)
+        #covss = coverage.html.HtmlReporter(self.cov)
+        self.cov.html_report(self.modules.values(), directory=self.outdir, ignore_errors=True, omit_prefixes='modeltests')
+        #cov.report(self.modules.values(), self.outdir)
         #coverage._the_coverage.html_report(self.modules.values(), self.outdir)
         print >>sys.stdout
         print >>sys.stdout, _("HTML reports were output to '%s'") %self.outdir

@@ -156,9 +156,9 @@ def django_tests(verbosity, interactive, test_labels):
     from django.test.utils import get_runner
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.simple.run_tests'
-    settings.COVERAGE_MODULE_EXCLUDES = []
-    #['modeltests', 'regressiontests']
-    settings.COVERAGE_CODE_EXCLUDES = ['def __unicode__\(self\):', 'def get_absolute_url\(self\):', ]
+    settings.COVERAGE_MODULE_EXCLUDES = ['modeltests*', 'regressiontests*']
+    settings.COVERAGE_CODE_EXCLUDES = ['def __unicode__\(self\):', 'def get_absolute_url\(self\):']
+    #'from .* import .*', 'import .*', ]
     settings.COVERAGE_ADDITIONAL_MODULES = ['django']
     # 'from .* import .*', 'import .*',
     test_runner = get_runner(settings, coverage=True, reports=True)
