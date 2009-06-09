@@ -1,11 +1,13 @@
 import coverage, time
+
 import os, sys
 
 from django.conf import settings
 from django.db.models import get_app, get_apps
-from django.test.simple import DefaultTestRunner
 
-from django.utils.module_tools import get_all_modules, find_or_load_module
+from django.test.simple import DefaultTestRunner as base_run_tests
+
+from django.utils.module_tools import get_all_modules
 from django.utils.translation import ugettext as _
 
 def _get_app_package(app_model_module):
@@ -25,6 +27,7 @@ class BaseCoverageRunner(object):
         self.cov = coverage.coverage(cover_pylib=True)
         self.cov.erase()
 
+
     def run_tests(self, test_labels, verbosity=1, interactive=True,
                   extra_tests=[]):
         """
@@ -42,6 +45,7 @@ class BaseCoverageRunner(object):
         brt = DefaultTestRunner()
         results = brt.run_tests(test_labels, verbosity, interactive, extra_tests)
         self.cov.stop()
+
 
         coverage_modules = []
         if test_labels:
@@ -62,6 +66,7 @@ class BaseCoverageRunner(object):
         #    self.cov.analysis2(ModuleVars(mods, self.modules[mods]).source_file)
             #coverage.analysis2(self.modules[mods])
         self.cov.report(self.modules.values(), show_missing=1)
+
         if self.excludes:
             print >> sys.stdout
             print >> sys.stdout, _("The following packages or modules were excluded:"),
@@ -74,7 +79,7 @@ class BaseCoverageRunner(object):
             for e in self.errors:
                 print >> sys.stderr, e,
             print >> sys.stdout
-        #coverage._the_coverage.save()
+
         return results
 
 
@@ -110,6 +115,7 @@ class ReportingCoverageRunner(BaseCoverageRunner):
         self.cov.html_report(self.modules.values(), directory=self.outdir, ignore_errors=True, omit_prefixes='modeltests')
         #cov.report(self.modules.values(), self.outdir)
         #coverage._the_coverage.html_report(self.modules.values(), self.outdir)
+
         print >>sys.stdout
         print >>sys.stdout, _("HTML reports were output to '%s'") %self.outdir
 
