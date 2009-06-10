@@ -20,7 +20,7 @@ tutorial, so that the template contains an HTML ``<form>`` element:
 
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-    <form action="vote/" method="post">
+    <form action="/polls/{{ poll.id }}/vote/" method="post">
     {% for choice in poll.choice_set.all %}
         <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
         <label for="choice{{ forloop.counter }}">{{ choice.choice }}</label><br />
@@ -36,12 +36,12 @@ A quick rundown:
       selects one of the radio buttons and submits the form, it'll send the
       POST data ``choice=3``. This is HTML Forms 101.
 
-    * We set the form's ``action`` to ``vote/``, and we set ``method="post"``.
-      Using ``method="post"`` (as opposed to ``method="get"``) is very
-      important, because the act of submitting this form will alter data
-      server-side. Whenever you create a form that alters data server-side, use
-      ``method="post"``. This tip isn't specific to Django; it's just good Web
-      development practice.
+    * We set the form's ``action`` to ``/polls/{{ poll.id }}/vote/``, and we
+      set ``method="post"``. Using ``method="post"`` (as opposed to
+      ``method="get"``) is very important, because the act of submitting this
+      form will alter data server-side. Whenever you create a form that alters
+      data server-side, use ``method="post"``. This tip isn't specific to
+      Django; it's just good Web development practice.
 
     * ``forloop.counter`` indicates how many times the :ttag:`for` tag has gone
       through its loop
@@ -173,11 +173,11 @@ bunch of our own code. We'll just have to take a few steps to make the
 conversion. We will:
 
     1. Convert the URLconf.
-    
+
     2. Rename a few templates.
-    
+
     3. Delete some the old, now unneeded views.
-    
+
     4. Fix up URL handling for the new views.
 
 Read on for details.
