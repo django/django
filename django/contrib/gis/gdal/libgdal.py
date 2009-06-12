@@ -14,7 +14,7 @@ if lib_path:
     lib_names = None
 elif os.name == 'nt':
     # Windows NT shared library
-    lib_names = ['gdal15']
+    lib_names = ['gdal16', 'gdal15']
 elif os.name == 'posix':
     # *NIX library names.
     lib_names = ['gdal', 'GDAL', 'gdal1.6.0', 'gdal1.5.0', 'gdal1.4.0']
