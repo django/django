@@ -161,9 +161,9 @@ class FileStoragePathParsing(TestCase):
         self.storage.save('dotted.path/test', ContentFile("1"))
         self.storage.save('dotted.path/test', ContentFile("2"))
 
-        self.assertFalse(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test')))
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test_')))
+        self.failIf(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
+        self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test')))
+        self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test_')))
 
     def test_first_character_dot(self):
         """
@@ -173,13 +173,13 @@ class FileStoragePathParsing(TestCase):
         self.storage.save('dotted.path/.test', ContentFile("1"))
         self.storage.save('dotted.path/.test', ContentFile("2"))
 
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test')))
+        self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test')))
         # Before 2.6, a leading dot was treated as an extension, and so
         # underscore gets added to beginning instead of end.
         if sys.version_info < (2, 6):
-            self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/_.test')))
+            self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/_.test')))
         else:
-            self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_')))
+            self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_')))
 
 if Image is not None:
     class DimensionClosingBug(TestCase):
