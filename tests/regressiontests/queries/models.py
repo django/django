@@ -1151,6 +1151,7 @@ True
 >>> qs = Author.objects.filter(pk__in=subq)
 >>> list(qs)
 [<Author: a1>, <Author: a2>]
+
 # The subquery result cache should not be populated
 >>> subq._result_cache is None
 True
@@ -1159,6 +1160,7 @@ True
 >>> qs = Author.objects.exclude(pk__in=subq)
 >>> list(qs)
 [<Author: a3>, <Author: a4>]
+
 # The subquery result cache should not be populated
 >>> subq._result_cache is None
 True
@@ -1166,6 +1168,7 @@ True
 >>> subq = Author.objects.filter(num__lt=3000)
 >>> list(Author.objects.filter(Q(pk__in=subq) & Q(name='a1')))
 [<Author: a1>]
+
 # The subquery result cache should not be populated
 >>> subq._result_cache is None
 True
