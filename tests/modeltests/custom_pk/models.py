@@ -9,6 +9,8 @@ this behavior by explicitly adding ``primary_key=True`` to a field.
 from django.conf import settings
 from django.db import models, transaction, IntegrityError
 
+from fields import MyAutoField
+
 class Employee(models.Model):
     employee_code = models.IntegerField(primary_key=True, db_column = 'code')
     first_name = models.CharField(max_length=20)
@@ -27,6 +29,16 @@ class Business(models.Model):
 
     def __unicode__(self):
         return self.name
+
+class Bar(models.Model):
+    id = MyAutoField(primary_key=True, db_index=True)
+
+    def __unicode__(self):
+        return repr(self.pk)
+
+
+class Foo(models.Model):
+    bar = models.ForeignKey(Bar)
 
 __test__ = {'API_TESTS':"""
 >>> dan = Employee(employee_code=123, first_name='Dan', last_name='Jones')
@@ -120,6 +132,21 @@ DoesNotExist: Employee matching query does not exist.
 ...    else:
 ...        print "Fail with %s" % type(e)
 Pass
+
+# Regression for #10785 -- Custom fields can be used for primary keys.
+>>> new_bar = Bar.objects.create()
+>>> new_foo = Foo.objects.create(bar=new_bar)
+>>> f = Foo.objects.get(bar=new_bar.pk)
+>>> f == new_foo
+True
+>>> f.bar == new_bar
+True
+
+>>> f = Foo.objects.get(bar=new_bar)
+>>> f == new_foo
+True
+>>> f.bar == new_bar
+True
 
 """}
 
