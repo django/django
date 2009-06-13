@@ -355,10 +355,11 @@ class QuerySet(object):
 
         # Delete objects in chunks to prevent the list of related objects from
         # becoming too long.
+        seen_objs = None
         while 1:
             # Collect all the objects to be deleted in this chunk, and all the
             # objects that are related to the objects that are to be deleted.
-            seen_objs = CollectedObjects()
+            seen_objs = CollectedObjects(seen_objs)
             for object in del_query[:CHUNK_SIZE]:
                 object._collect_sub_objects(seen_objs)
 
