@@ -1625,10 +1625,14 @@ class BaseQuery(object):
                             entry.negate()
                             self.where.add(entry, AND)
                             break
-                elif not (lookup_type == 'in' and not value) and field.null:
+                elif not (lookup_type == 'in'
+                            and not hasattr(value, 'as_sql')
+                            and not hasattr(value, '_as_sql')
+                            and not value) and field.null:
                     # Leaky abstraction artifact: We have to specifically
                     # exclude the "foo__in=[]" case from this handling, because
                     # it's short-circuited in the Where class.
+                    # We also need to handle the case where a subquery is provided
                     entry = self.where_class()
                     entry.add((Constraint(alias, col, None), 'isnull', True), AND)
                     entry.negate()

@@ -1143,6 +1143,33 @@ True
 >>> r.save()
 >>> Ranking.objects.all()
 [<Ranking: 3: a1>, <Ranking: 2: a2>, <Ranking: 1: a3>]
+
+# Regression test for #10742:
+# Queries used in an __in clause don't execute subqueries
+
+>>> subq = Author.objects.filter(num__lt=3000)
+>>> qs = Author.objects.filter(pk__in=subq)
+>>> list(qs)
+[<Author: a1>, <Author: a2>]
+# The subquery result cache should not be populated
+>>> subq._result_cache is None
+True
+
+>>> subq = Author.objects.filter(num__lt=3000)
+>>> qs = Author.objects.exclude(pk__in=subq)
+>>> list(qs)
+[<Author: a3>, <Author: a4>]
+# The subquery result cache should not be populated
+>>> subq._result_cache is None
+True
+
+>>> subq = Author.objects.filter(num__lt=3000)
+>>> list(Author.objects.filter(Q(pk__in=subq) & Q(name='a1')))
+[<Author: a1>]
+# The subquery result cache should not be populated
+>>> subq._result_cache is None
+True
+
 """}
 
 # In Python 2.3 and the Python 2.6 beta releases, exceptions raised in __len__
