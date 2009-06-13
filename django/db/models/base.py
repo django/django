@@ -411,29 +411,35 @@ class Model(object):
 
     save.alters_data = True
 
-    def save_base(self, raw=False, cls=None, force_insert=False,
-            force_update=False):
+    def save_base(self, raw=False, cls=None, origin=None,
+            force_insert=False, force_update=False):
         """
         Does the heavy-lifting involved in saving. Subclasses shouldn't need to
         override this method. It's separate from save() in order to hide the
         need for overrides of save() to pass around internal-only parameters
-        ('raw' and 'cls').
+        ('raw', 'cls', and 'origin').
         """
         assert not (force_insert and force_update)
-        if not cls:
+        if cls is None:
             cls = self.__class__
-            meta = self._meta
-            signal = True
-            signals.pre_save.send(sender=self.__class__, instance=self, raw=raw)
+            meta = cls._meta
+            if not meta.proxy:
+                origin = cls
         else:
             meta = cls._meta
-            signal = False
+
+        if origin:
+            signals.pre_save.send(sender=origin, instance=self, raw=raw)
 
         # If we are in a raw save, save the object exactly as presented.
         # That means that we don't try to be smart about saving attributes
         # that might have come from the parent class - we just save the
         # attributes we have been given to the class we have been given.
         if not raw:
+            if meta.proxy:
+                org = cls
+            else:
+                org = None
             for parent, field in meta.parents.items():
                 # At this point, parent's primary key field may be unknown
                 # (for example, from administration form which doesn't fill
@@ -441,7 +447,8 @@ class Model(object):
                 if field and getattr(self, parent._meta.pk.attname) is None and getattr(self, field.attname) is not None:
                     setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
 
-                self.save_base(cls=parent)
+                self.save_base(cls=parent, origin=org)
+
                 if field:
                     setattr(self, field.attname, self._get_pk_val(parent._meta))
             if meta.proxy:
@@ -492,8 +499,8 @@ class Model(object):
                     setattr(self, meta.pk.attname, result)
             transaction.commit_unless_managed()
 
-        if signal:
-            signals.post_save.send(sender=self.__class__, instance=self,
+        if origin:
+            signals.post_save.send(sender=origin, instance=self,
                 created=(not record_exists), raw=raw)
 
     save_base.alters_data = True
