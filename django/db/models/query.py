@@ -190,7 +190,25 @@ class QuerySet(object):
         index_start = len(extra_select)
         aggregate_start = index_start + len(self.model._meta.fields)
 
-        load_fields = only_load.get(self.model)
+        load_fields = []
+        # If only/defer clauses have been specified,
+        # build the list of fields that are to be loaded.
+        if only_load:
+            for field, model in self.model._meta.get_fields_with_model():
+                if model is None:
+                    model = self.model
+                if field == self.model._meta.pk:
+                    # Record the index of the primary key when it is found
+                    pk_idx = len(load_fields)
+                try:
+                    if field.name in only_load[model]:
+                        # Add a field that has been explicitly included
+                        load_fields.append(field.name)
+                except KeyError:
+                    # Model wasn't explicitly listed in the only_load table
+                    # Therefore, we need to load all fields from this model
+                    load_fields.append(field.name)
+
         skip = None
         if load_fields and not fill_cache:
             # Some fields have been deferred, so we have to initialise
