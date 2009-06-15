@@ -84,7 +84,8 @@ Some further checks for select_related() and inherited model behaviour
 (regression for #10710).
 
 >>> c1 = Child.objects.create(name="c1", value=42)
->>> obj = Leaf.objects.create(name="l1", child=c1)
+>>> c2 = Child.objects.create(name="c2", value=37)
+>>> obj = Leaf.objects.create(name="l1", child=c1, second_child=c2)
 
 >>> obj = Leaf.objects.only("name", "child").select_related()[0]
 >>> obj.child.name
@@ -100,6 +101,25 @@ types as their non-deferred versions (bug #10738).
 >>> c3 = ctype(Item.objects.only("name")[0])
 >>> c1 is c2 is c3
 True
+
+# Regression for #10733 - only() can be used on a model with two foreign keys.
+>>> results = Leaf.objects.all().only('name', 'child', 'second_child').select_related()
+>>> results[0].child.name
+u'c1'
+>>> results[0].second_child.name
+u'c2'
+
+>>> results = Leaf.objects.all().only('name', 'child', 'second_child', 'child__name', 'second_child__name').select_related()
+>>> results[0].child.name
+u'c1'
+>>> results[0].second_child.name
+u'c2'
+
+# Finally, we need to flush the app cache for the defer module.
+# Using only/defer creates some artifical entries in the app cache
+# that messes up later tests. Purge all entries, just to be sure.
+>>> from django.db.models.loading import cache
+>>> cache.app_models['defer_regress'] = {}
 
 """
 }

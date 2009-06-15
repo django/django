@@ -323,16 +323,19 @@ Since the Author model has only 3 fields, 'name', 'title', and
     to be empty, and does not provide a default value for the missing fields,
     any attempt to ``save()`` a ``ModelForm`` with missing fields will fail.
     To avoid this failure, you must instantiate your model with initial values
-    for the missing, but required fields, or use ``save(commit=False)`` and
-    manually set any extra required fields::
+    for the missing, but required fields::
 
-        instance = Instance(required_field='value')
-        form = InstanceForm(request.POST, instance=instance)
-        new_instance = form.save()
+        author = Author(title='Mr')
+        form = PartialAuthorForm(request.POST, instance=author)
+        form.save()
 
-        instance = form.save(commit=False)
-        instance.required_field = 'new value'
-        new_instance = instance.save()
+    Alternatively, you can use ``save(commit=False)`` and manually set
+    any extra required fields::
+
+        form = PartialAuthorForm(request.POST)
+        author = form.save(commit=False)
+        author.title = 'Mr'
+        author.save()
 
     See the `section on saving forms`_ for more details on using
     ``save(commit=False)``.
@@ -563,8 +566,8 @@ number of objects needed::
     >>> formset.initial
     [{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}]
 
-If the value of ``max_num`` is higher than the number of objects returned, up to 
-``extra`` additional blank forms will be added to the formset, so long as the 
+If the value of ``max_num`` is higher than the number of objects returned, up to
+``extra`` additional blank forms will be added to the formset, so long as the
 total number of forms does not exceed ``max_num``::
 
     >>> AuthorFormSet = modelformset_factory(Author, max_num=4, extra=2)

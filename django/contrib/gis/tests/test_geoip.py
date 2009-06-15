@@ -84,16 +84,15 @@ class GeoIPTest(unittest.TestCase):
             self.assertEqual('USA', d['country_code3'])
             self.assertEqual('Houston', d['city'])
             self.assertEqual('TX', d['region'])
-            self.assertEqual('77002', d['postal_code'])
             self.assertEqual(713, d['area_code'])
             geom = g.geos(query)
             self.failIf(not isinstance(geom, GEOSGeometry))
-            lon, lat = (-95.366996765, 29.752300262)
+            lon, lat = (-95.4152, 29.7755)
             lat_lon = g.lat_lon(query)
             lat_lon = (lat_lon[1], lat_lon[0])
             for tup in (geom.tuple, g.coords(query), g.lon_lat(query), lat_lon):
-                self.assertAlmostEqual(lon, tup[0], 9)
-                self.assertAlmostEqual(lat, tup[1], 9)
+                self.assertAlmostEqual(lon, tup[0], 4)
+                self.assertAlmostEqual(lat, tup[1], 4)
 
 def suite():
     s = unittest.TestSuite()
