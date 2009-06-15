@@ -6,7 +6,7 @@
 
 {% for inline_admin_form in inline_admin_formset %}
 <div class="inline-related{% if forloop.last %} last-related{% endif %}" id="{{ inline_admin_formset.opts.verbose_name}}{{ forloop.counter }}">
-  <h3><b>{{ inline_admin_formset.opts.verbose_name|title }}:</b>&nbsp;{% if inline_admin_form.original %}{{ inline_admin_form.original }}{% else %} #{{ forloop.counter }}{% endif %}
+  <h3><b>{{ inline_admin_formset.opts.verbose_name|title }}:</b>&nbsp;<span class="inline_label">{% if inline_admin_form.original %}{{ inline_admin_form.original }}{% else %} #{{ forloop.counter }}{% endif %}</span>
     {% if inline_admin_formset.formset.can_delete and inline_admin_form.original %}<span class="delete">{{ inline_admin_form.deletion_field.field }} {{ inline_admin_form.deletion_field.label_tag }}</span>{% endif %}
   </h3>
   {% if inline_admin_form.show_url %}
@@ -29,31 +29,55 @@
 </div>
 
 <script type="text/javascript">
-$(function() {
-    {# TODO Zain: properly set the TOTAL_FORMS hidden input field #}
+function increment_fields(el) {
+    el.attr('id', el.attr('id').replace(/-(\d+)-/, function (num) {
+        var newnum = parseInt(num.replace(/-/g,''))+1;
+        return '-' + newnum + '-';
+    }));
     
+    el.attr('name', el.attr('name').replace(/-(\d+)-/, function (num) {
+        var newnum = parseInt(num.replace(/-/g,''))+1;
+        return '-' + newnum + '-';
+    }));
+}
+
+$(function() {
     var id_prefix = "{{ inline_admin_formset.opts.verbose_name }}";
-    var total_forms = {{ inline_admin_formset.formset.management_form.initial.TOTAL_FORMS }};
-    var initial_forms = {{ inline_admin_formset.formset.management_form.initial.INITIAL_FORMS }};
+    var total_forms = $('#' + id_prefix + '-group input[id$="TOTAL_FORMS"]');
+    var initial_forms = $('#' + id_prefix + '-group').find('input[id$="INITIAL_FORMS"]');
     
     // since javascript is turned on, unhide the "add new <inline>" link and hide the extras
     $('.add_inline').show();
     
-    for(var i = initial_forms + 1; i <= total_forms; i++) {
-        $('#' + id_prefix + i).hide();
+    if (parseInt(initial_forms.val()) > 0) {
+        $('#' + id_prefix + '-group .inline-related:gt(' + (initial_forms.val() - 1) + ')').remove();
     }
-    
-    total_forms = initial_forms;
+    else {
+        $('#' + id_prefix + '-group .inline-related:gt(0)').remove();
+        $('#' + id_prefix + '-group .inline-related:first').hide();
+    }
+
+    total_forms.val(parseInt(initial_forms.val()));
     
     // clicking on the "add" link will add a blank form to add a new inline object
     $('#' + id_prefix + "-add").click(function() {
-        {# TODO Zain: this will not work if extra = 0 for the inline #}
-        total_forms++;
+        if (parseInt(total_forms.val()) == 0) {
+            $('#' + id_prefix + '-group .inline-related:first').fadeIn('normal');
+            total_forms.val(parseInt(total_forms.val()) + 1);
+            return false;
+        }
         
-        // clone the first hidden extra-inline field and append it to the inline list
-        $('#' + id_prefix + (initial_forms + 1)).clone().fadeIn('normal')
-            .insertAfter('#' + id_prefix + "-group .inline-related:last")
-            .attr("id", id_prefix + total_forms)
+        var last_inline = $('#' + id_prefix + '-group .inline-related:last');
+        var new_inline = last_inline.clone(true).hide().insertAfter(last_inline).fadeIn('normal');
+        
+        new_inline.find('input, select').each(function(i) { 
+            increment_fields($(this));
+            $(this).val("");
+        });
+        
+        total_forms.val(parseInt(total_forms.val()) + 1);
+        
+        new_inline.find(".inline_label").text('#' + total_forms.val());
         
         return false;
     });
