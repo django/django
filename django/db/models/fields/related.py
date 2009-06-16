@@ -112,9 +112,9 @@ class RelatedField(object):
 
     def do_related_class(self, other, cls):
         self.set_attributes_from_rel()
-        related = RelatedObject(other, cls, self)
+        self.related = RelatedObject(other, cls, self)
         if not cls._meta.abstract:
-            self.contribute_to_related_class(other, related)
+            self.contribute_to_related_class(other, self.related)
 
     def get_db_prep_lookup(self, lookup_type, value):
         # If we are doing a lookup on a Related Field, we must be
@@ -132,13 +132,13 @@ class RelatedField(object):
                     v, field = getattr(v, v._meta.pk.name), v._meta.pk
             except AttributeError:
                 pass
-            if not field:
-                field = self.rel.get_related_field()
-            if lookup_type in ('range', 'in'):
-                v = [v]
-            v = field.get_db_prep_lookup(lookup_type, v)
-            if isinstance(v, list):
-                v = v[0]
+
+            if field:
+                if lookup_type in ('range', 'in'):
+                    v = [v]
+                v = field.get_db_prep_lookup(lookup_type, v)
+                if isinstance(v, list):
+                    v = v[0]
             return v
 
         if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
@@ -184,7 +184,6 @@ class SingleRelatedObjectDescriptor(object):
     def __get__(self, instance, instance_type=None):
         if instance is None:
             return self
-
         try:
             return getattr(instance, self.cache_name)
         except AttributeError:
@@ -232,6 +231,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
     def __get__(self, instance, instance_type=None):
         if instance is None:
             return self
+
         cache_name = self.field.get_cache_name()
         try:
             return getattr(instance, cache_name)
@@ -271,6 +271,29 @@ class ReverseSingleRelatedObjectDescriptor(object):
             raise ValueError('Cannot assign "%r": "%s.%s" must be a "%s" instance.' %
                                 (value, instance._meta.object_name,
                                  self.field.name, self.field.rel.to._meta.object_name))
+
+        # If we're setting the value of a OneToOneField to None, we need to clear
+        # out the cache on any old related object. Otherwise, deleting the
+        # previously-related object will also cause this object to be deleted,
+        # which is wrong.
+        if value is None:
+            # Look up the previously-related object, which may still be available
+            # since we've not yet cleared out the related field.
+            # Use the cache directly, instead of the accessor; if we haven't
+            # populated the cache, then we don't care - we're only accessing
+            # the object to invalidate the accessor cache, so there's no
+            # need to populate the cache just to expire it again.
+            related = getattr(instance, self.field.get_cache_name(), None)
+
+            # If we've got an old related object, we need to clear out its
+            # cache. This cache also might not exist if the related object
+            # hasn't been accessed yet.
+            if related:
+                cache_name = '_%s_cache' % self.field.related.get_accessor_name()
+                try:
+                    delattr(related, cache_name)
+                except AttributeError:
+                    pass
 
         # Set the value of the related field
         try:

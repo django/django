@@ -6,7 +6,7 @@
  GeoIP(R) is a registered trademark of MaxMind, LLC of Boston, Massachusetts.
 
  For IP-based geolocation, this module requires the GeoLite Country and City
- datasets, in binary format (CSV will not work!).  The datasets may be 
+ datasets, in binary format (CSV will not work!).  The datasets may be
  downloaded from MaxMind at http://www.maxmind.com/download/geoip/database/.
  Grab GeoIP.dat.gz and GeoLiteCity.dat.gz, and unzip them in the directory
  corresponding to settings.GEOIP_PATH.  See the GeoIP docstring and examples
@@ -34,7 +34,7 @@
  >>> g.lat_lon('salon.com')
  (37.789798736572266, -122.39420318603516)
  >>> g.lon_lat('uh.edu')
- (-95.415199279785156, 29.77549934387207) 
+ (-95.415199279785156, 29.77549934387207)
  >>> g.geos('24.124.1.80').wkt
  'POINT (-95.2087020874023438 39.0392990112304688)'
 """
@@ -45,7 +45,7 @@ from django.conf import settings
 if not settings.configured: settings.configure()
 
 # Creating the settings dictionary with any settings, if needed.
-GEOIP_SETTINGS = dict((key, getattr(settings, key)) 
+GEOIP_SETTINGS = dict((key, getattr(settings, key))
                       for key in ('GEOIP_PATH', 'GEOIP_LIBRARY_PATH', 'GEOIP_COUNTRY', 'GEOIP_CITY')
                       if hasattr(settings, key))
 lib_path = GEOIP_SETTINGS.get('GEOIP_LIBRARY_PATH', None)
@@ -83,8 +83,17 @@ class GeoIPRecord(Structure):
                 ('postal_code', c_char_p),
                 ('latitude', c_float),
                 ('longitude', c_float),
+                # TODO: In 1.4.6 this changed from `int dma_code;` to
+                # `union {int metro_code; int dma_code;};`.  Change
+                # to a `ctypes.Union` in to accomodate in future when
+                # pre-1.4.6 versions are no longer distributed.
                 ('dma_code', c_int),
                 ('area_code', c_int),
+                # TODO: The following structure fields were added in 1.4.3 --
+                # uncomment these fields when sure previous versions are no
+                # longer distributed by package maintainers.
+                #('charset', c_int),
+                #('continent_code', c_char_p),
                 ]
 class GeoIPTag(Structure): pass
 
@@ -99,9 +108,12 @@ def record_output(func):
 rec_by_addr = record_output(lgeoip.GeoIP_record_by_addr)
 rec_by_name = record_output(lgeoip.GeoIP_record_by_name)
 
-# For opening up GeoIP databases.
+# For opening & closing GeoIP database files.
 geoip_open = lgeoip.GeoIP_open
 geoip_open.restype = DBTYPE
+geoip_close = lgeoip.GeoIP_delete
+geoip_close.argtypes = [DBTYPE]
+geoip_close.restype = None
 
 # String output routines.
 def string_output(func):
@@ -136,6 +148,12 @@ class GeoIP(object):
     GEOIP_CHECK_CACHE = 2
     GEOIP_INDEX_CACHE = 4
     cache_options = dict((opt, None) for opt in (0, 1, 2, 4))
+    _city_file = ''
+    _country_file = ''
+
+    # Initially, pointers to GeoIP file references are NULL.
+    _city = None
+    _country = None
 
     def __init__(self, path=None, cache=0, country=None, city=None):
         """
@@ -174,13 +192,19 @@ class GeoIP(object):
         if not isinstance(path, basestring):
             raise TypeError('Invalid path type: %s' % type(path).__name__)
 
-        cntry_ptr, city_ptr = (None, None)
         if os.path.isdir(path):
-            # Getting the country and city files using the settings
-            # dictionary.  If no settings are provided, default names
-            # are assigned.
-            country = os.path.join(path, country or GEOIP_SETTINGS.get('GEOIP_COUNTRY', 'GeoIP.dat'))
-            city = os.path.join(path, city or GEOIP_SETTINGS.get('GEOIP_CITY', 'GeoLiteCity.dat'))
+            # Constructing the GeoIP database filenames using the settings
+            # dictionary.  If the database files for the GeoLite country
+            # and/or city datasets exist, then try and open them.
+            country_db = os.path.join(path, country or GEOIP_SETTINGS.get('GEOIP_COUNTRY', 'GeoIP.dat'))
+            if os.path.isfile(country_db):
+                self._country = geoip_open(country_db, cache)
+                self._country_file = country_db
+
+            city_db = os.path.join(path, city or GEOIP_SETTINGS.get('GEOIP_CITY', 'GeoLiteCity.dat'))
+            if os.path.isfile(city_db):
+                self._city = geoip_open(city_db, cache)
+                self._city_file = city_db
         elif os.path.isfile(path):
             # Otherwise, some detective work will be needed to figure
             # out whether the given database path is for the GeoIP country
@@ -188,29 +212,22 @@ class GeoIP(object):
             ptr = geoip_open(path, cache)
             info = geoip_dbinfo(ptr)
             if lite_regex.match(info):
-                # GeoLite City database.
-                city, city_ptr = path, ptr
+                # GeoLite City database detected.
+                self._city = ptr
+                self._city_file = path
             elif free_regex.match(info):
-                # GeoIP Country database.
-                country, cntry_ptr = path, ptr
+                # GeoIP Country database detected.
+                self._country = ptr
+                self._country_file = path
             else:
                 raise GeoIPException('Unable to recognize database edition: %s' % info)
         else:
             raise GeoIPException('GeoIP path must be a valid file or directory.')
-        
-        # `_init_db` does the dirty work.
-        self._init_db(country, cache, '_country', cntry_ptr)
-        self._init_db(city, cache, '_city', city_ptr)
 
-    def _init_db(self, db_file, cache, attname, ptr=None):
-        "Helper routine for setting GeoIP ctypes database properties."
-        if ptr:
-            # Pointer already retrieved.
-            pass
-        elif os.path.isfile(db_file or ''):
-            ptr = geoip_open(db_file, cache)
-        setattr(self, attname, ptr)
-        setattr(self, '%s_file' % attname, db_file)
+    def __del__(self):
+        # Cleaning any GeoIP file handles lying around.
+        if self._country: geoip_close(self._country)
+        if self._city: geoip_close(self._city)
 
     def _check_query(self, query, country=False, city=False, city_or_country=False):
         "Helper routine for checking the query and database availability."
@@ -219,11 +236,11 @@ class GeoIP(object):
             raise TypeError('GeoIP query must be a string, not type %s' % type(query).__name__)
 
         # Extra checks for the existence of country and city databases.
-        if city_or_country and self._country is None and self._city is None:
+        if city_or_country and not (self._country or self._city):
             raise GeoIPException('Invalid GeoIP country and city data files.')
-        elif country and self._country is None:
+        elif country and not self._country:
             raise GeoIPException('Invalid GeoIP country data file: %s' % self._country_file)
-        elif city and self._city is None:
+        elif city and not self._city:
             raise GeoIPException('Invalid GeoIP city data file: %s' % self._city_file)
 
     def city(self, query):
@@ -247,7 +264,7 @@ class GeoIP(object):
             return dict((tup[0], getattr(record, tup[0])) for tup in record._fields_)
         else:
             return None
-    
+
     def country_code(self, query):
         "Returns the country code for the given IP Address or FQDN."
         self._check_query(query, city_or_country=True)
@@ -268,12 +285,12 @@ class GeoIP(object):
 
     def country(self, query):
         """
-        Returns a dictonary with with the country code and name when given an 
+        Returns a dictonary with with the country code and name when given an
         IP address or a Fully Qualified Domain Name (FQDN).  For example, both
         '24.124.1.80' and 'djangoproject.com' are valid parameters.
         """
         # Returning the country code and name
-        return {'country_code' : self.country_code(query), 
+        return {'country_code' : self.country_code(query),
                 'country_name' : self.country_name(query),
                 }
 
@@ -318,7 +335,7 @@ class GeoIP(object):
             ci = geoip_dbinfo(self._city)
         return ci
     city_info = property(city_info)
-        
+
     def info(self):
         "Returns information about all GeoIP databases in use."
         return 'Country:\n\t%s\nCity:\n\t%s' % (self.country_info, self.city_info)

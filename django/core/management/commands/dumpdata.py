@@ -73,7 +73,7 @@ class Command(BaseCommand):
                 model_list = get_models(app)
 
             for model in model_list:
-                objects.extend(model.objects.all())
+                objects.extend(model._default_manager.all())
 
         try:
             return serializers.serialize(format, objects, indent=indent)
