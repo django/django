@@ -13,6 +13,7 @@ except ImportError:
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 from django.http.multipartparser import MultiPartParser
+from django.http.charsets import determine_charset
 from django.conf import settings
 from django.core.files import uploadhandler
 from utils import *
@@ -272,14 +273,16 @@ class HttpResponse(object):
     status_code = 200
 
     def __init__(self, content='', mimetype=None, status=None,
-            content_type=None):
+            content_type=None, origin_request=None):
         from django.conf import settings
         self._charset = settings.DEFAULT_CHARSET
         if mimetype:
-            content_type = mimetype     # For backwards compatibility
+            content_type = mimetype     # Mimetype is an alias for content-type 
+        if origin_request or content_type:
+           self._charset, self._codec = determine_charset(content_type, origin_request)
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
-                    settings.DEFAULT_CHARSET)
+                    self._charset)
         if not isinstance(content, basestring) and hasattr(content, '__iter__'):
             self._container = content
             self._is_string = False
@@ -431,6 +434,12 @@ class HttpResponseNotAllowed(HttpResponse):
     def __init__(self, permitted_methods):
         HttpResponse.__init__(self)
         self['Allow'] = ', '.join(permitted_methods)
+
+class HttpResponseNotAcceptable(HttpResponse):
+    status_code = 406
+
+    # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+    # if we want to make this more verbose (compliant, actually)
 
 class HttpResponseGone(HttpResponse):
     status_code = 410
