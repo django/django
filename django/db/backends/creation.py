@@ -26,8 +26,11 @@ class BaseDatabaseCreation(object):
         self.connection = connection
 
     def _digest(self, *args):
-        "Generate a 32 bit digest of a set of arguments that can be used to shorten identifying names"
-        return '%x' % (abs(hash(args)) % (1<<32))
+        """
+        Generates a 32-bit digest of a set of arguments that can be used to
+        shorten identifying names.
+        """
+        return '%x' % (abs(hash(args)) % 4294967296L)  # 2**32
 
     def sql_create_model(self, model, style, known_models=set()):
         """

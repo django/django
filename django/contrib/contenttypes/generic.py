@@ -317,7 +317,7 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
     def get_queryset(self):
         # Avoid a circular import.
         from django.contrib.contenttypes.models import ContentType
-        if self.instance is None:
+        if self.instance is None or self.instance.pk is None:
             return self.model._default_manager.none()
         return self.model._default_manager.filter(**{
             self.ct_field.name: ContentType.objects.get_for_model(self.instance),
