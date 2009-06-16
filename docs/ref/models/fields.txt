@@ -800,20 +800,21 @@ you can use the name of the model, rather than the model object itself::
     class Manufacturer(models.Model):
         # ...
 
-Note, however, that this only refers to models in the same ``models.py`` file --
-you cannot use a string to reference a model defined in another application or
-imported from elsewhere.
+.. versionadded:: 1.0
 
-.. versionchanged:: 1.0
-   Refering models in other applications must include the application label.
-
-To refer to models defined in another
-application, you must instead explicitly specify the application label. For
-example, if the ``Manufacturer`` model above is defined in another application
-called ``production``, you'd need to use::
+To refer to models defined in another application, you can explicitly specify
+a model with the full application label. For example, if the ``Manufacturer``
+model above is defined in another application called ``production``, you'd
+need to use::
 
     class Car(models.Model):
         manufacturer = models.ForeignKey('production.Manufacturer')
+
+This sort of reference can be useful when resolving circular import
+dependencies between two applications.
+
+Database Representation
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Behind the scenes, Django appends ``"_id"`` to the field name to create its
 database column name. In the above example, the database table for the ``Car``
@@ -823,6 +824,9 @@ deal with the database column name, unless you write custom SQL. You'll always
 deal with the field names of your model object.
 
 .. _foreign-key-arguments:
+
+Arguments
+~~~~~~~~~
 
 :class:`ForeignKey` accepts an extra set of arguments -- all optional -- that
 define the details of how the relation works.
@@ -871,6 +875,9 @@ the model is related. This works exactly the same as it does for
 :class:`ForeignKey`, including all the options regarding :ref:`recursive
 <recursive-relationships>` and :ref:`lazy <lazy-relationships>` relationships.
 
+Database Representation
+~~~~~~~~~~~~~~~~~~~~~~~
+
 Behind the scenes, Django creates an intermediary join table to represent the
 many-to-many relationship. By default, this table name is generated using the
 names of the two tables being joined. Since some databases don't support table
@@ -881,6 +888,9 @@ You can manually provide the name of the join table using the
 :attr:`~ManyToManyField.db_table` option.
 
 .. _manytomany-arguments:
+
+Arguments
+~~~~~~~~~
 
 :class:`ManyToManyField` accepts an extra set of arguments -- all optional --
 that control how the relationship functions.

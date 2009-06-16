@@ -42,7 +42,7 @@ class BaseCoverageRunner(object):
 
 
         self.cov.start()
-        brt = DefaultTestRunner()
+        brt = base_run_tests()
         results = brt.run_tests(test_labels, verbosity, interactive, extra_tests)
         self.cov.stop()
 

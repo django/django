@@ -33,6 +33,14 @@ class SelfReferChild(SelfRefer):
 class SelfReferChildSibling(SelfRefer):
     pass
 
+# Many-to-Many relation between models, where one of the PK's isn't an Autofield
+class Line(models.Model):
+    name = models.CharField(max_length=100)
+
+class Worksheet(models.Model):
+    id = models.CharField(primary_key=True, max_length=100)
+    lines = models.ManyToManyField(Line, blank=True, null=True)
+
 __test__ = {"regressions": """
 # Multiple m2m references to the same model or a different model must be
 # distinguished when accessing the relations through an instance attribute.
@@ -78,6 +86,12 @@ FieldError: Cannot resolve keyword 'porcupine' into field. Choices are: id, name
 [<SelfRefer: Beth>]
 >>> sr_sibling.related.all()
 [<SelfRefer: Hanna>]
+
+# Regression for #11311 - The primary key for models in a m2m relation
+# doesn't have to be an AutoField
+>>> w = Worksheet(id='abc')
+>>> w.save()
+>>> w.delete()
 
 """
 }
