@@ -1,0 +1,503 @@
+.. _topics-generic-views:
+
+=============
+Generic views
+=============
+
+Writing Web applications can be monotonous, because we repeat certain patterns
+again and again. Django tries to take away some of that monotony at the model
+and template layers, but Web developers also experience this boredom at the view
+level.
+
+Django's *generic views* were developed to ease that pain. They take certain
+common idioms and patterns found in view development and abstract them so that
+you can quickly write common views of data without having to write too much
+code.
+
+We can recognize certain common tasks, like displaying a list of objects, and
+write code that displays a list of *any* object. Then the model in question can
+be passed as an extra argument to the URLconf.
+
+Django ships with generic views to do the following:
+
+    * Perform common "simple" tasks: redirect to a different page and
+      render a given template.
+
+    * Display list and detail pages for a single object. If we were creating an
+      application to manage conferences then a ``talk_list`` view and a
+      ``registered_user_list`` view would be examples of list views. A single
+      talk page is an example of what we call a "detail" view.
+
+    * Present date-based objects in year/month/day archive pages,
+      associated detail, and "latest" pages. The Django Weblog's
+      (http://www.djangoproject.com/weblog/) year, month, and
+      day archives are built with these, as would be a typical
+      newspaper's archives.
+
+    * Allow users to create, update, and delete objects -- with or
+      without authorization.
+
+Taken together, these views provide easy interfaces to perform the most common
+tasks developers encounter.
+
+Using generic views
+===================
+
+All of these views are used by creating configuration dictionaries in
+your URLconf files and passing those dictionaries as the third member of the
+URLconf tuple for a given pattern.
+
+For example, here's a simple URLconf you could use to present a static "about"
+page::
+
+    from django.conf.urls.defaults import *
+    from django.views.generic.simple import direct_to_template
+
+    urlpatterns = patterns('',
+        ('^about/$', direct_to_template, {
+            'template': 'about.html'
+        })
+    )
+
+Though this might seem a bit "magical" at first glance  -- look, a view with no
+code! --, actually the ``direct_to_template`` view simply grabs information from
+the extra-parameters dictionary and uses that information when rendering the
+view.
+
+Because this generic view -- and all the others -- is a regular view functions
+like any other, we can reuse it inside our own views. As an example, let's
+extend our "about" example to map URLs of the form ``/about/<whatever>/`` to
+statically rendered ``about/<whatever>.html``. We'll do this by first modifying
+the URLconf to point to a view function:
+
+.. parsed-literal::
+
+    from django.conf.urls.defaults import *
+    from django.views.generic.simple import direct_to_template
+    **from mysite.books.views import about_pages**
+
+    urlpatterns = patterns('',
+        ('^about/$', direct_to_template, {
+            'template': 'about.html'
+        }),
+        **('^about/(\w+)/$', about_pages),**
+    )
+
+Next, we'll write the ``about_pages`` view::
+
+    from django.http import Http404
+    from django.template import TemplateDoesNotExist
+    from django.views.generic.simple import direct_to_template
+
+    def about_pages(request, page):
+        try:
+            return direct_to_template(request, template="about/%s.html" % page)
+        except TemplateDoesNotExist:
+            raise Http404()
+
+Here we're treating ``direct_to_template`` like any other function. Since it
+returns an ``HttpResponse``, we can simply return it as-is. The only slightly
+tricky business here is dealing with missing templates. We don't want a
+nonexistent template to cause a server error, so we catch
+``TemplateDoesNotExist`` exceptions and return 404 errors instead.
+
+.. admonition:: Is there a security vulnerability here?
+
+    Sharp-eyed readers may have noticed a possible security hole: we're
+    constructing the template name using interpolated content from the browser
+    (``template="about/%s.html" % page``). At first glance, this looks like a
+    classic *directory traversal* vulnerability. But is it really?
+
+    Not exactly. Yes, a maliciously crafted value of ``page`` could cause
+    directory traversal, but although ``page`` *is* taken from the request URL,
+    not every value will be accepted. The key is in the URLconf: we're using
+    the regular expression ``\w+`` to match the ``page`` part of the URL, and
+    ``\w`` only accepts letters and numbers. Thus, any malicious characters
+    (dots and slashes, here) will be rejected by the URL resolver before they
+    reach the view itself.
+
+Generic views of objects
+========================
+
+The ``direct_to_template`` certainly is useful, but Django's generic views
+really shine when it comes to presenting views on your database content. Because
+it's such a common task, Django comes with a handful of built-in generic views
+that make generating list and detail views of objects incredibly easy.
+
+Let's take a look at one of these generic views: the "object list" view. We'll
+be using these models::
+
+    # models.py
+    from django.db import models
+
+    class Publisher(models.Model):
+        name = models.CharField(max_length=30)
+        address = models.CharField(max_length=50)
+        city = models.CharField(max_length=60)
+        state_province = models.CharField(max_length=30)
+        country = models.CharField(max_length=50)
+        website = models.URLField()
+
+        def __unicode__(self):
+            return self.name
+
+        class Meta:
+            ordering = ["-name"]
+
+    class Book(models.Model):
+        title = models.CharField(max_length=100)
+        authors = models.ManyToManyField('Author')
+        publisher = models.ForeignKey(Publisher)
+        publication_date = models.DateField()
+
+To build a list page of all books, we'd use a URLconf along these lines::
+
+    from django.conf.urls.defaults import *
+    from django.views.generic import list_detail
+    from mysite.books.models import Publisher
+
+    publisher_info = {
+        "queryset" : Publisher.objects.all(),
+    }
+
+    urlpatterns = patterns('',
+        (r'^publishers/$', list_detail.object_list, publisher_info)
+    )
+
+That's all the Python code we need to write. We still need to write a template,
+however. We could explicitly tell the ``object_list`` view which template to use
+by including a ``template_name`` key in the extra arguments dictionary, but in
+the absence of an explicit template Django will infer one from the object's
+name. In this case, the inferred template will be
+``"books/publisher_list.html"`` -- the "books" part comes from the name of the
+app that defines the model, while the "publisher" bit is just the lowercased
+version of the model's name.
+
+.. highlightlang:: html+django
+
+This template will be rendered against a context containing a variable called
+``object_list`` that contains all the book objects. A very simple template
+might look like the following::
+
+    {% extends "base.html" %}
+
+    {% block content %}
+        <h2>Publishers</h2>
+        <ul>
+            {% for publisher in object_list %}
+                <li>{{ publisher.name }}</li>
+            {% endfor %}
+        </ul>
+    {% endblock %}
+
+That's really all there is to it. All the cool features of generic views come
+from changing the "info" dictionary passed to the generic view. The
+:ref:`generic views reference<ref-generic-views>` documents all the generic
+views and all their options in detail; the rest of this document will consider
+some of the common ways you might customize and extend generic views.
+
+Extending generic views
+=======================
+
+.. highlightlang:: python
+
+There's no question that using generic views can speed up development
+substantially. In most projects, however, there comes a moment when the
+generic views no longer suffice. Indeed, the most common question asked by new
+Django developers is how to make generic views handle a wider array of
+situations.
+
+Luckily, in nearly every one of these cases, there are ways to simply extend
+generic views to handle a larger array of use cases. These situations usually
+fall into a handful of patterns dealt with in the sections that follow.
+
+Making "friendly" template contexts
+-----------------------------------
+
+You might have noticed that our sample publisher list template stores all the
+books in a variable named ``object_list``. While this works just fine, it isn't
+all that "friendly" to template authors: they have to "just know" that they're
+dealing with books here. A better name for that variable would be
+``publisher_list``; that variable's content is pretty obvious.
+
+We can change the name of that variable easily with the ``template_object_name``
+argument:
+
+.. parsed-literal::
+
+    publisher_info = {
+        "queryset" : Publisher.objects.all(),
+        **"template_object_name" : "publisher",**
+    }
+
+    urlpatterns = patterns('',
+        (r'^publishers/$', list_detail.object_list, publisher_info)
+    )
+
+Providing a useful ``template_object_name`` is always a good idea. Your
+coworkers who design templates will thank you.
+
+Adding extra context
+--------------------
+
+Often you simply need to present some extra information beyond that provided by
+the generic view. For example, think of showing a list of all the other
+publishers on each publisher detail page. The ``object_detail`` generic view
+provides the publisher to the context, but it seems there's no way to get a list
+of *all* publishers in that template.
+
+But there is: all generic views take an extra optional parameter,
+``extra_context``. This is a dictionary of extra objects that will be added to
+the template's context. So, to provide the list of all publishers on the detail
+detail view, we'd use an info dict like this:
+
+.. parsed-literal::
+
+    from mysite.books.models import Publisher, **Book**
+
+    publisher_info = {
+        "queryset" : Publisher.objects.all(),
+        "template_object_name" : "publisher",
+        **"extra_context" : {"book_list" : Book.objects.all()}**
+    }
+
+This would populate a ``{{ book_list }}`` variable in the template context.
+This pattern can be used to pass any information down into the template for the
+generic view. It's very handy.
+
+However, there's actually a subtle bug here -- can you spot it?
+
+The problem has to do with when the queries in ``extra_context`` are evaluated.
+Because this example puts ``Publisher.objects.all()`` in the URLconf, it will
+be evaluated only once (when the URLconf is first loaded). Once you add or
+remove publishers, you'll notice that the generic view doesn't reflect those
+changes until you reload the Web server (see :ref:`caching-and-querysets`
+for more information about when QuerySets are cached and evaluated).
+
+.. note::
+
+    This problem doesn't apply to the ``queryset`` generic view argument. Since
+    Django knows that particular QuerySet should *never* be cached, the generic
+    view takes care of clearing the cache when each view is rendered.
+
+The solution is to use a callback in ``extra_context`` instead of a value. Any
+callable (i.e., a function) that's passed to ``extra_context`` will be evaluated
+when the view is rendered (instead of only once). You could do this with an
+explicitly defined function:
+
+.. parsed-literal::
+
+    def get_books():
+        return Book.objects.all()
+
+    publisher_info = {
+        "queryset" : Publisher.objects.all(),
+        "template_object_name" : "publisher",
+        "extra_context" : **{"book_list" : get_books}**
+    }
+
+or you could use a less obvious but shorter version that relies on the fact that
+``Publisher.objects.all`` is itself a callable:
+
+.. parsed-literal::
+
+    publisher_info = {
+        "queryset" : Publisher.objects.all(),
+        "template_object_name" : "publisher",
+        "extra_context" : **{"book_list" : Book.objects.all}**
+    }
+
+Notice the lack of parentheses after ``Book.objects.all``; this references
+the function without actually calling it (which the generic view will do later).
+
+Viewing subsets of objects
+--------------------------
+
+Now let's take a closer look at this ``queryset`` key we've been using all
+along. Most generic views take one of these ``queryset`` arguments -- it's how
+the view knows which set of objects to display (see :ref:`topics-db-queries` for
+more information about ``QuerySet`` objects, and see the
+:ref:`generic views reference<ref-generic-views>` for the complete details).
+
+To pick a simple example, we might want to order a list of books by
+publication date, with the most recent first:
+
+.. parsed-literal::
+
+    book_info = {
+        "queryset" : Book.objects.all().order_by("-publication_date"),
+    }
+
+    urlpatterns = patterns('',
+        (r'^publishers/$', list_detail.object_list, publisher_info),
+        **(r'^books/$', list_detail.object_list, book_info),**
+    )
+
+
+That's a pretty simple example, but it illustrates the idea nicely. Of course,
+you'll usually want to do more than just reorder objects. If you want to
+present a list of books by a particular publisher, you can use the same
+technique:
+
+.. parsed-literal::
+
+    **acme_books = {**
+        **"queryset": Book.objects.filter(publisher__name="Acme Publishing"),**
+        **"template_name" : "books/acme_list.html"**
+    **}**
+
+    urlpatterns = patterns('',
+        (r'^publishers/$', list_detail.object_list, publisher_info),
+        **(r'^books/acme/$', list_detail.object_list, acme_books),**
+    )
+
+Notice that along with a filtered ``queryset``, we're also using a custom
+template name. If we didn't, the generic view would use the same template as the
+"vanilla" object list, which might not be what we want.
+
+Also notice that this isn't a very elegant way of doing publisher-specific
+books. If we want to add another publisher page, we'd need another handful of
+lines in the URLconf, and more than a few publishers would get unreasonable.
+We'll deal with this problem in the next section.
+
+.. note::
+
+    If you get a 404 when requesting ``/books/acme/``, check to ensure you
+    actually have a Publisher with the name 'ACME Publishing'.  Generic
+    views have an ``allow_empty`` parameter for this case.  See the
+    :ref:`generic views reference<ref-generic-views>` for more details.
+
+Complex filtering with wrapper functions
+----------------------------------------
+
+Another common need is to filter down the objects given in a list page by some
+key in the URL. Earlier we hard-coded the publisher's name in the URLconf, but
+what if we wanted to write a view that displayed all the books by some arbitrary
+publisher? We can "wrap" the ``object_list`` generic view to avoid writing a lot
+of code by hand. As usual, we'll start by writing a URLconf:
+
+.. parsed-literal::
+
+    from mysite.books.views import books_by_publisher
+
+    urlpatterns = patterns('',
+        (r'^publishers/$', list_detail.object_list, publisher_info),
+        **(r'^books/(\w+)/$', books_by_publisher),**
+    )
+
+Next, we'll write the ``books_by_publisher`` view itself::
+
+    from django.http import Http404
+    from django.views.generic import list_detail
+    from mysite.books.models import Book, Publisher
+
+    def books_by_publisher(request, name):
+
+        # Look up the publisher (and raise a 404 if it can't be found).
+        try:
+            publisher = Publisher.objects.get(name__iexact=name)
+        except Publisher.DoesNotExist:
+            raise Http404
+
+        # Use the object_list view for the heavy lifting.
+        return list_detail.object_list(
+            request,
+            queryset = Book.objects.filter(publisher=publisher),
+            template_name = "books/books_by_publisher.html",
+            template_object_name = "books",
+            extra_context = {"publisher" : publisher}
+        )
+
+This works because there's really nothing special about generic views -- they're
+just Python functions. Like any view function, generic views expect a certain
+set of arguments and return ``HttpResponse`` objects. Thus, it's incredibly easy
+to wrap a small function around a generic view that does additional work before
+(or after; see the next section) handing things off to the generic view.
+
+.. note::
+
+    Notice that in the preceding example we passed the current publisher being
+    displayed in the ``extra_context``. This is usually a good idea in wrappers
+    of this nature; it lets the template know which "parent" object is currently
+    being browsed.
+
+Performing extra work
+---------------------
+
+The last common pattern we'll look at involves doing some extra work before
+or after calling the generic view.
+
+Imagine we had a ``last_accessed`` field on our ``Author`` object that we were
+using to keep track of the last time anybody looked at that author::
+
+    # models.py
+
+    class Author(models.Model):
+        salutation = models.CharField(max_length=10)
+        first_name = models.CharField(max_length=30)
+        last_name = models.CharField(max_length=40)
+        email = models.EmailField()
+        headshot = models.ImageField(upload_to='/tmp')
+        last_accessed = models.DateTimeField()
+
+The generic ``object_detail`` view, of course, wouldn't know anything about this
+field, but once again we could easily write a custom view to keep that field
+updated.
+
+First, we'd need to add an author detail bit in the URLconf to point to a
+custom view:
+
+.. parsed-literal::
+
+    from mysite.books.views import author_detail
+
+    urlpatterns = patterns('',
+        #...
+        **(r'^authors/(?P<author_id>\d+)/$', author_detail),**
+    )
+
+Then we'd write our wrapper function::
+
+    import datetime
+    from mysite.books.models import Author
+    from django.views.generic import list_detail
+    from django.shortcuts import get_object_or_404
+
+    def author_detail(request, author_id):
+        # Look up the Author (and raise a 404 if she's not found)
+        author = get_object_or_404(Author, pk=author_id)
+
+        # Record the last accessed date
+        author.last_accessed = datetime.datetime.now()
+        author.save()
+
+        # Show the detail page
+        return list_detail.object_detail(
+            request,
+            queryset = Author.objects.all(),
+            object_id = author_id,
+        )
+
+.. note::
+
+    This code won't actually work unless you create a
+    ``books/author_detail.html`` template.
+
+We can use a similar idiom to alter the response returned by the generic view.
+If we wanted to provide a downloadable plain-text version of the list of
+authors, we could use a view like this::
+
+    def author_list_plaintext(request):
+        response = list_detail.object_list(
+            request,
+            queryset = Author.objects.all(),
+            mimetype = "text/plain",
+            template_name = "books/author_list.txt"
+        )
+        response["Content-Disposition"] = "attachment; filename=authors.txt"
+        return response
+
+This works because the generic views return simple ``HttpResponse`` objects
+that can be treated like dictionaries to set HTTP headers. This
+``Content-Disposition`` business, by the way, instructs the browser to
+download and save the page instead of displaying it in the browser.
