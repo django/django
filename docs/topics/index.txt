@@ -14,6 +14,7 @@ Introductions to all the key parts of Django you'll need to know:
    forms/index
    forms/modelforms
    templates
+   generic-views
    files
    testing
    auth

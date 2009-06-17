@@ -98,10 +98,13 @@ The view layer
       :ref:`Storage API <ref-files-storage>` | 
       :ref:`Managing files <topics-files>` | 
       :ref:`Custom storage <howto-custom-file-storage>`
-          
-    * **Advanced:** 
-      :ref:`Generic views <ref-generic-views>` | 
-      :ref:`Generating CSV <howto-outputting-csv>` | 
+
+    * **Generic views:**
+      :ref:`Overview<topics-generic-views>` |
+      :ref:`Built-in generic views<ref-generic-views>`
+
+    * **Advanced:**
+      :ref:`Generating CSV <howto-outputting-csv>` |
       :ref:`Generating PDF <howto-outputting-pdf>`
     
     * **Middleware:** 

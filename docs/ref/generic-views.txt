@@ -9,66 +9,17 @@ again and again. In Django, the most common of these patterns have been
 abstracted into "generic views" that let you quickly provide common views of
 an object without actually needing to write any Python code.
 
-Django's generic views contain the following:
+A general introduction to generic views can be found in the :ref:`topic guide
+<topics-generic-views>`.
 
-    * A set of views for doing list/detail interfaces.
-
-    * A set of views for year/month/day archive pages and associated
-      detail and "latest" pages (for example, the Django weblog's year_,
-      month_, day_, detail_, and latest_ pages).
-
-    * A set of views for creating, editing, and deleting objects.
-
-.. _year: http://www.djangoproject.com/weblog/2005/
-.. _month: http://www.djangoproject.com/weblog/2005/jul/
-.. _day: http://www.djangoproject.com/weblog/2005/jul/20/
-.. _detail: http://www.djangoproject.com/weblog/2005/jul/20/autoreload/
-.. _latest: http://www.djangoproject.com/weblog/
-
-All of these views are used by creating configuration dictionaries in
-your URLconf files and passing those dictionaries as the third member of the
-URLconf tuple for a given pattern. For example, here's the URLconf for the
-simple weblog app that drives the blog on djangoproject.com::
-
-    from django.conf.urls.defaults import *
-    from django_website.apps.blog.models import Entry
-
-    info_dict = {
-        'queryset': Entry.objects.all(),
-        'date_field': 'pub_date',
-    }
-
-    urlpatterns = patterns('django.views.generic.date_based',
-       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/(?P<slug>[-\w]+)/$', 'object_detail', info_dict),
-       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/$',               'archive_day',   info_dict),
-       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$',                                'archive_month', info_dict),
-       (r'^(?P<year>\d{4})/$',                                                    'archive_year',  info_dict),
-       (r'^$',                                                                    'archive_index', info_dict),
-    )
-
-As you can see, this URLconf defines a few options in ``info_dict``.
-``'queryset'`` gives the generic view a ``QuerySet`` of objects to use (in this
-case, all of the ``Entry`` objects) and tells the generic view which model is
-being used.
-
-Documentation of each generic view follows, along with a list of all keyword
-arguments that a generic view expects. Remember that as in the example above,
-arguments may either come from the URL pattern (as ``month``, ``day``,
-``year``, etc. do above) or from the additional-information dictionary (as for
-``queryset``, ``date_field``, etc.).
+This reference contains details of Django's built-in generic views, along with
+a list of all keyword arguments that a generic view expects. Remember that
+arguments may either come from the URL pattern or from the ``extra_context``
+additional-information dictionary.
 
 Most generic views require the ``queryset`` key, which is a ``QuerySet``
 instance; see :ref:`topics-db-queries` for more information about ``QuerySet``
 objects.
-
-Most views also take an optional ``extra_context`` dictionary that you can use
-to pass any auxiliary information you wish to the view. The values in the
-``extra_context`` dictionary can be either functions (or other callables) or
-other objects. Functions are evaluated just before they are passed to the
-template. However, note that QuerySets retrieve and cache their data when they
-are first evaluated, so if you want to pass in a QuerySet via
-``extra_context`` that is always fresh you need to wrap it in a function or
-lambda that returns the QuerySet.
 
 "Simple" generic views
 ======================
@@ -801,12 +752,12 @@ specify the page number in the URL in one of two ways:
 
         /objects/?page=3
 
-    * To loop over all the available page numbers, use the ``page_range`` 
-      variable. You can iterate over the list provided by ``page_range`` 
+    * To loop over all the available page numbers, use the ``page_range``
+      variable. You can iterate over the list provided by ``page_range``
       to create a link to every page of results.
 
 These values and lists are 1-based, not 0-based, so the first page would be
-represented as page ``1``. 
+represented as page ``1``.
 
 For more on pagination, read the :ref:`pagination documentation
 <topics-pagination>`.
@@ -818,7 +769,7 @@ As a special case, you are also permitted to use ``last`` as a value for
 
     /objects/?page=last
 
-This allows you to access the final page of results without first having to 
+This allows you to access the final page of results without first having to
 determine how many pages there are.
 
 Note that ``page`` *must* be either a valid page number or the value ``last``;
@@ -909,7 +860,7 @@ library <topics-forms-index>` to build and display the form.
 **Description:**
 
 A page that displays a form for creating an object, redisplaying the form with
-validation errors (if there are any) and saving the object. 
+validation errors (if there are any) and saving the object.
 
 **Required arguments:**
 
