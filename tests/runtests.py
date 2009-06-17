@@ -166,6 +166,9 @@ def django_tests(verbosity, interactive, test_labels):
     failures = tr.run_tests(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
     if failures:
         sys.exit(failures)
+    from django.core.management.commands.test_windmill import Command as testwm_cmd
+    windmill_runner = testwm_cmd()
+    windmill_runner.handle()
 
     # Restore the old settings.
     settings.INSTALLED_APPS = old_installed_apps
