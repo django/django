@@ -13,7 +13,7 @@ except ImportError:
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 from django.http.multipartparser import MultiPartParser
-from django.http.charsets import determine_charset
+from django.http.charsets import determine_charset, get_codec
 from django.conf import settings
 from django.core.files import uploadhandler
 from utils import *
@@ -273,13 +273,20 @@ class HttpResponse(object):
     status_code = 200
 
     def __init__(self, content='', mimetype=None, status=None,
-            content_type=None, origin_request=None):
+            content_type=None, request=None):
         from django.conf import settings
         self._charset = settings.DEFAULT_CHARSET
+        accept_charset = None
         if mimetype:
             content_type = mimetype     # Mimetype is an alias for content-type 
-        if origin_request or content_type:
-           self._charset, self._codec = determine_charset(content_type, origin_request)
+        if request:
+            accept_charset = request.META.get("ACCEPT_CHARSET")
+        if accept_charset or content_type:
+            charset, codec = determine_charset(content_type, accept_charset)
+            if charset:
+                self._charset = charset
+            if codec:
+                self._codec = codec
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
@@ -365,7 +372,10 @@ class HttpResponse(object):
     def _get_content(self):
         if self.has_header('Content-Encoding'):
             return ''.join(self._container)
-        return smart_str(''.join(self._container), self._charset)
+        
+        if not self._codec:
+            self._codec = get_codec(self._charset)
+        return smart_str(''.join(self._container), self._codec.name)
 
     def _set_content(self, value):
         self._container = [value]
@@ -379,8 +389,10 @@ class HttpResponse(object):
 
     def next(self):
         chunk = self._iterator.next()
+        if not self._codec:
+            self._codec = get_codec(self._charset)
         if isinstance(chunk, unicode):
-            chunk = chunk.encode(self._charset)
+            chunk = chunk.encode(self._codec.name)
         return str(chunk)
 
     def close(self):

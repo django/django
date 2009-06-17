@@ -252,7 +252,7 @@ max_dict_key = lambda l:sorted(l.iteritems(), key=itemgetter(1), reverse=True)[0
 
 CONTENT_TYPE_RE = re.compile('.*; charset=([\w\d-]+);?')
 ACCEPT_CHARSET_RE = re.compile('(?P<charset>([\w\d-]+)|(\*))(;q=(?P<q>[01](\.\d{1,3})?))?,?')
-def determine_charset(content_type, request):
+def determine_charset(content_type, accept_charset_header):
     """
     Searches request headers from clients and mimetype settings (which may be set 
     by users) for indicators of which charset and encoding the response should use.
@@ -270,7 +270,6 @@ def determine_charset(content_type, request):
     """
     codec = None
     charset = None
-    
     # Attempt to get the codec from a content-type, and verify that the charset is valid.
     if content_type:
         match = CONTENT_TYPE_RE.match(content_type)
@@ -279,14 +278,19 @@ def determine_charset(content_type, request):
             codec = get_codec(charset)
             if not codec:   # Unsupported charset
                 # we should throw an exception here
-                print "No CODEC ON MIMETYPE"
+                # print "No CODEC ON MIMETYPE"
+                pass
+        # If we don't match a content-type header WITH charset, we give the default
+        else:
+            charset = settings.DEFAULT_CHARSET
+            codec = get_codec(settings.DEFAULT_CHARSET)
     
     # Handle Accept-Charset (which we only do if we do not deal with content_type).
     else:
-        if request and "ACCEPT_CHARSET" in request.META:
+        if accept_charset_header:
             # Get list of matches for Accepted-Charsets.
             # [{ charset : q }, { charset : q }]
-            match_iterator = ACCEPT_CHARSET_RE.finditer(request.META["ACCEPT_CHARSET"])
+            match_iterator = ACCEPT_CHARSET_RE.finditer(accept_charset_header)
             accept_charset = [m.groupdict() for m in match_iterator]
         else:
             accept_charset = []    # use settings.DEFAULT_CHARSET
