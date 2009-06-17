@@ -30,6 +30,7 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.comments',
     'django.contrib.admin',
+    'windmill',
 ]
 
 def get_test_models():
