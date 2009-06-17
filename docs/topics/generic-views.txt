@@ -297,7 +297,7 @@ explicitly defined function:
     }
 
 or you could use a less obvious but shorter version that relies on the fact that
-``Publisher.objects.all`` is itself a callable:
+``Book.objects.all`` is itself a callable:
 
 .. parsed-literal::
 
