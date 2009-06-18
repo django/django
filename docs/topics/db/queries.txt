@@ -278,7 +278,7 @@ For example, this returns the first 5 objects (``LIMIT 5``)::
 This returns the sixth through tenth objects (``OFFSET 5 LIMIT 5``)::
 
     >>> Entry.objects.all()[5:10]
-    
+
 Negative indexing (i.e. ``Entry.objects.all()[-1]``) is not supported.
 
 Generally, slicing a ``QuerySet`` returns a new ``QuerySet`` -- it doesn't
@@ -945,10 +945,16 @@ in the :ref:`related objects reference <ref-models-relations>`.
     Removes all objects from the related object set.
 
 To assign the members of a related set in one fell swoop, just assign to it
-from any iterable object. Example::
+from any iterable object. The iterable can contain object instances, or just
+a list of primary key values. For Example::
+
+Example::
 
     b = Blog.objects.get(id=1)
     b.entry_set = [e1, e2]
+
+In this example, ``e1`` and ``e2`` can be full Entry instances, or integer
+values representing primary keys.
 
 If the ``clear()`` method is available, any pre-existing objects will be
 removed from the ``entry_set`` before all objects in the iterable (in this
