@@ -276,6 +276,7 @@ class HttpResponse(object):
             content_type=None, request=None):
         from django.conf import settings
         self._charset = settings.DEFAULT_CHARSET
+        self._codec = None
         accept_charset = None
         if mimetype:
             content_type = mimetype     # Mimetype is an alias for content-type 
