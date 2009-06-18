@@ -347,8 +347,8 @@ doesn't work with a
 :class:`~django.contrib.contenttypes.generic.GenericRelation`. For example, you
 might be tempted to try something like::
 
-    Bookmark.objects.aggregate(Count('tags')) 
-     
+    Bookmark.objects.aggregate(Count('tags'))
+
 This will not work correctly, however. The generic relation adds extra filters
 to the queryset to ensure the correct content type, but the ``aggregate`` method
 doesn't take them into account. For now, if you need aggregates on generic

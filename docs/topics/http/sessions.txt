@@ -4,6 +4,9 @@
 How to use sessions
 ===================
 
+.. module:: django.contrib.sessions
+   :synopsis: Provides session management for Django projects.
+
 Django provides full support for anonymous sessions. The session framework lets
 you store and retrieve arbitrary data on a per-site-visitor basis. It stores
 data on the server side and abstracts the sending and receiving of cookies.
