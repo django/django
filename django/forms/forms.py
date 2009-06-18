@@ -261,7 +261,11 @@ class BaseForm(StrAndUnicode):
                 try:
                     v(self.cleaned_data[name], all_values=self.cleaned_data)
                 except ValidationError, e:
-                    self._errors.setdefault(name, self.error_class()).extend(e.messages)
+                    error_list = self._errors.setdefault(name, self.error_class())
+                    if hasattr(e, 'code'):
+                        error_list.append(field.error_messages.get(e.code, e.messages[0]))
+                    else:
+                        error_list.extend(e.messages)
                     if name in self.cleaned_data:
                         del self.cleaned_data[name]
 
