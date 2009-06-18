@@ -451,19 +451,11 @@ class RegexField(CharField):
         if not self.regex.search(value):
             raise ValidationError(self.error_messages['invalid'])
 
-email_re = re.compile(
-    r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
-    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-011\013\014\016-\177])*"' # quoted-string
-    r')@(?:[A-Z0-9]+(?:-*[A-Z0-9]+)*\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
-
-class EmailField(RegexField):
+class EmailField(CharField):
     default_error_messages = {
         'invalid': _(u'Enter a valid e-mail address.'),
     }
-
-    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
-        RegexField.__init__(self, email_re, max_length, min_length, *args,
-                            **kwargs)
+    default_validators = [validators.validate_email]
 
 try:
     from django.conf import settings
