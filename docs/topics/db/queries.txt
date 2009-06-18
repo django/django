@@ -8,8 +8,8 @@ Making queries
 
 Once you've created your :ref:`data models <topics-db-models>`, Django
 automatically gives you a database-abstraction API that lets you create,
-retrieve, update and delete objects. This document explains how to use this 
-API. Refer to the :ref:`data model reference <ref-models-index>` for full 
+retrieve, update and delete objects. This document explains how to use this
+API. Refer to the :ref:`data model reference <ref-models-index>` for full
 details of all the various model lookup options.
 
 Throughout this guide (and in the reference), we'll refer to the following
@@ -94,11 +94,11 @@ Saving ``ForeignKey`` and ``ManyToManyField`` fields
 ----------------------------------------------------
 
 Updating ``ForeignKey`` fields works exactly the same way as saving a normal
-field; simply assign an object of the right type to the field in question:: 
+field; simply assign an object of the right type to the field in question::
 
-    >>> cheese_blog = Blog.objects.get(name="Cheddar Talk") 
-    >>> entry.blog = cheese_blog 
-    >>> entry.save() 
+    >>> cheese_blog = Blog.objects.get(name="Cheddar Talk")
+    >>> entry.blog = cheese_blog
+    >>> entry.save()
 
 Updating a ``ManyToManyField`` works a little differently; use the ``add()``
 method on the field to add a record to the relation::
@@ -245,7 +245,7 @@ this example::
     >>> q = q.filter(pub_date__lte=datetime.now())
     >>> q = q.exclude(body_text__icontains="food")
     >>> print q
-    
+
 Though this looks like three database hits, in fact it hits the database only
 once, at the last line (``print q``). In general, the results of a ``QuerySet``
 aren't fetched from the database until you "ask" for them. When you do, the
@@ -275,7 +275,7 @@ For example, this returns the first 5 objects (``LIMIT 5``)::
 This returns the sixth through tenth objects (``OFFSET 5 LIMIT 5``)::
 
     >>> Entry.objects.all()[5:10]
-    
+
 Negative indexing (i.e. ``Entry.objects.all()[-1]``) is not supported.
 
 Generally, slicing a ``QuerySet`` returns a new ``QuerySet`` -- it doesn't
@@ -335,15 +335,15 @@ you'll probably use:
 
     :lookup:`exact`
         An "exact" match. For example::
-        
+
             >>> Entry.objects.get(headline__exact="Man bites dog")
 
         Would generate SQL along these lines:
-        
+
         .. code-block:: sql
 
             SELECT ... WHERE headline = 'Man bites dog';
-            
+
         If you don't provide a lookup type -- that is, if your keyword argument
         doesn't contain a double underscore -- the lookup type is assumed to be
         ``exact``.
@@ -354,36 +354,36 @@ you'll probably use:
             >>> Blog.objects.get(id=14)         # __exact is implied
 
         This is for convenience, because ``exact`` lookups are the common case.
-        
+
     :lookup:`iexact`
         A case-insensitive match. So, the query::
-        
+
             >>> Blog.objects.get(name__iexact="beatles blog")
-            
+
         Would match a ``Blog`` titled "Beatles Blog", "beatles blog", or even
         "BeAtlES blOG".
-    
+
     :lookup:`contains`
         Case-sensitive containment test. For example::
 
             Entry.objects.get(headline__contains='Lennon')
 
         Roughly translates to this SQL:
-        
+
         .. code-block:: sql
 
             SELECT ... WHERE headline LIKE '%Lennon%';
 
         Note this will match the headline ``'Today Lennon honored'`` but not
         ``'today lennon honored'``.
-        
+
         There's also a case-insensitive version, :lookup:`icontains`.
-        
+
     :lookup:`startswith`, :lookup:`endswith`
         Starts-with and ends-with search, respectively. There are also
         case-insensitive versions called :lookup:`istartswith` and
         :lookup:`iendswith`.
-    
+
 Again, this only scratches the surface. A complete reference can be found in the
 :ref:`field lookup reference <field-lookups>`.
 
@@ -506,7 +506,7 @@ can be combined with ``pk`` to perform a query on the primary key of a model::
 
     # Get blogs entries with id 1, 4 and 7
     >>> Blog.objects.filter(pk__in=[1,4,7])
-    
+
     # Get all blog entries with id > 14
     >>> Blog.objects.filter(pk__gt=14)
 
@@ -731,7 +731,7 @@ To update ``ForeignKey`` fields, set the new value to be the new model
 instance you want to point to. Example::
 
     >>> b = Blog.objects.get(pk=1)
-    
+
     # Change every Entry so that it belongs to this Blog.
     >>> Entry.objects.all().update(blog=b)
 
@@ -880,10 +880,14 @@ in the :ref:`related objects reference <ref-models-relations>`.
     Removes all objects from the related object set.
 
 To assign the members of a related set in one fell swoop, just assign to it
-from any iterable object. Example::
+from any iterable object. The iterable can contain object instances, or just
+a list of primary key values. For example::
 
     b = Blog.objects.get(id=1)
     b.entry_set = [e1, e2]
+
+In this example, ``e1`` and ``e2`` can be full Entry instances, or integer
+primary key values.
 
 If the ``clear()`` method is available, any pre-existing objects will be
 removed from the ``entry_set`` before all objects in the iterable (in this
