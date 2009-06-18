@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from models import Book
 
-class DatabaseSettingTestCase(TestCase):
+class ConnectionHandlerTestCase(TestCase):
     def setUp(self):
         settings.DATABASES['__test_db'] = {
             'DATABASE_ENGINE': 'sqlite3',
@@ -19,6 +19,11 @@ class DatabaseSettingTestCase(TestCase):
     def test_db_connection(self):
         connections['default'].cursor()
         connections['__test_db'].cursor()
+
+    def test_alias_for_connection(self):
+        for db in connections:
+            self.assertEqual(db, connections.alias_for_connection(connections[db]))
+
 
 class QueryTestCase(TestCase):
     def test_basic_queries(self):

@@ -38,8 +38,7 @@ class QuerySet(object):
         self._result_cache = None
         self._iter = None
         self._sticky_filter = False
-        self._using = DEFAULT_DB_ALIAS # this will be wrong if a custom Query
-                                       # is provided with a non default connection
+        self._using = connections.alias_for_connection(self.query.connection)
 
     ########################
     # PYTHON MAGIC METHODS #

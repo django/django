@@ -68,3 +68,13 @@ class ConnectionHandler(object):
 
     def all(self):
         return [self[alias] for alias in self]
+
+    def alias_for_connection(self, connection):
+        """
+        Returns the alias for the given connection object.
+        """
+        for alias in self:
+            conn_settings = self.databases[alias]
+            if conn_settings == connection.settings_dict:
+                return alias
+        return None
