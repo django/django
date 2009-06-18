@@ -27,13 +27,6 @@ that need to be done.  I'm trying to be as granular as possible.
     SQL creation process.  This includes(but is probably not limited to):
 
     * The way we create ``Query`` from ``BaseQuery`` is awkward and hacky.
-    * ``django.db.models.fields.Field`` This uses it, as do it's subclasses.
-    * ``django.db.models.fields.related`` It's used all over the place here,
-      including opening a cursor and executing queries, so that's going to
-      need to be totally refactored.  There's a ticket to at least move that
-      raw SQL and execution to ``Query``/``QuerySet`` so hopefully that makes
-      it in before I need to tackle this.
-
 
 5)  Add the ``using`` Meta option.  Tests and docs(these are to be assumed at
     each stage from here on out).
@@ -47,7 +40,6 @@ that need to be done.  I'm trying to be as granular as possible.
     * Remove all tests against ``Query.connection`` before the SQL generation
       phase.  This involves changing the following methods:
 
-        * ``Query.add_aggregate``
         * ``Field.get_db_prep_lookup``
         * ``DateField.get_db_prep_value``
         * ``DateTimeField.get_db_prep_value``
