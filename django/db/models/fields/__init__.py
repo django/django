@@ -58,13 +58,14 @@ class Field(object):
     # creates, creation_counter is used for all user-specified fields.
     creation_counter = 0
     auto_creation_counter = -1
+    default_validators = []
 
     def __init__(self, verbose_name=None, name=None, primary_key=False,
             max_length=None, unique=False, blank=False, null=False,
             db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
             serialize=True, unique_for_date=None, unique_for_month=None,
             unique_for_year=None, choices=None, help_text='', db_column=None,
-            db_tablespace=None, auto_created=False):
+            db_tablespace=None, auto_created=False, validators=[]):
         self.name = name
         self.verbose_name = verbose_name
         self.primary_key = primary_key
@@ -97,6 +98,8 @@ class Field(object):
             self.creation_counter = Field.creation_counter
             Field.creation_counter += 1
 
+        self.validators = self.default_validators + validators
+
     def __cmp__(self, other):
         # This is needed because bisect does not take a comparison function.
         return cmp(self.creation_counter, other.creation_counter)
@@ -117,6 +120,22 @@ class Field(object):
         Returns the converted value. Subclasses should override this.
         """
         return value
+
+    def run_validators(self, value):
+        if value in validators.EMPTY_VALUES:
+            return
+
+        errors = []
+        for v in self.validators:
+            # don't run complex validators since they need model_instance
+            # and must therefore be run on the model level
+            if not isinstance(v, validators.ComplexValidator):
+                try:
+                    v(value)
+                except exceptions.ValidationError, e:
+                    errors.extend(e.messages)
+        if errors:
+            raise exceptions.ValidationError(errors)
     
     def validate(self, value, model_instance):
         """
@@ -140,6 +159,7 @@ class Field(object):
                 ugettext_lazy("This field cannot be blank."))
 
 
+
     def clean(self, value, model_instance):
         """
         Convert the value's type and wun validation. Validation errors from to_python
@@ -148,6 +168,7 @@ class Field(object):
         """
         value = self.to_python(value)
         self.validate(value, model_instance)
+        self.run_validators(value)
         return value
 
     def db_type(self):
@@ -666,14 +687,10 @@ class DecimalField(Field):
         return super(DecimalField, self).formfield(**defaults)
 
 class EmailField(CharField):
+    default_validators = [validators.validate_email]
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 75)
         CharField.__init__(self, *args, **kwargs)
-
-    def formfield(self, **kwargs):
-        defaults = {'form_class': forms.EmailField}
-        defaults.update(kwargs)
-        return super(EmailField, self).formfield(**defaults)
 
 class FilePathField(Field):
     def __init__(self, verbose_name=None, name=None, path='', match=None, recursive=False, **kwargs):

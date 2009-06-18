@@ -7,13 +7,16 @@ from django.db import models
 from models import *
 
 class BaseModelValidationTests(TestCase):
+    def assertFailsValidation(self, clean, failed_fields):
+        self.assertRaises(ValidationError, clean)
+        try:
+            clean()
+        except ValidationError, e:
+            self.assertEquals(sorted(failed_fields), sorted(e.message_dict.keys()))
+
     def test_missing_required_field_raises_error(self):
         mtv = ModelToValidate()
-        self.assertRaises(ValidationError, mtv.clean)
-        try:
-            mtv.clean()
-        except ValidationError, e:
-            self.assertEquals(['name', 'number'], sorted(e.message_dict.keys()))
+        self.assertFailsValidation(mtv.clean, ['name', 'number'])
     
     def test_with_correct_value_model_validates(self):
         mtv = ModelToValidate(number=10, name='Some Name')
@@ -21,24 +24,32 @@ class BaseModelValidationTests(TestCase):
 
     def test_custom_validate_method_is_called(self):
         mtv = ModelToValidate(number=11)
-        self.assertRaises(ValidationError, mtv.clean)
-        try:
-            mtv.clean()
-        except ValidationError, e:
-            self.assertEquals(sorted([NON_FIELD_ERRORS, 'name']), sorted(e.message_dict.keys()))
+        self.assertFailsValidation(mtv.clean, [NON_FIELD_ERRORS, 'name'])
 
     def test_wrong_FK_value_raises_error(self):
         mtv=ModelToValidate(number=10, name='Some Name', parent_id=3)
-        self.assertRaises(ValidationError, mtv.clean)
-        try:
-            mtv.clean()
-        except ValidationError, e:
-            self.assertEquals(['parent'], e.message_dict.keys())
+        self.assertFailsValidation(mtv.clean, ['parent'])
 
     def test_correct_FK_value_cleans(self):
         parent = ModelToValidate.objects.create(number=10, name='Some Name')
         mtv=ModelToValidate(number=10, name='Some Name', parent_id=parent.pk)
         self.assertEqual(None, mtv.clean())
+
+    def test_wrong_email_value_raises_error(self):
+        mtv = ModelToValidate(number=10, name='Some Name', email='not-an-email')
+        self.assertFailsValidation(mtv.clean, ['email'])
+
+    def test_correct_email_value_passes(self):
+        mtv = ModelToValidate(number=10, name='Some Name', email='valid@email.com')
+        self.assertEqual(None, mtv.clean())
+
+    def test_custom_validator_passes_for_correct_value(self):
+        mtv = ModelToValidate(number=10, name='Some Name', f_with_custom_validator=42)
+        self.assertEqual(None, mtv.clean())
+
+    def test_custom_validator_raises_error_for_incorrect_value(self):
+        mtv = ModelToValidate(number=10, name='Some Name', f_with_custom_validator=12)
+        self.assertFailsValidation(mtv.clean, ['f_with_custom_validator'])
 
 class GetUniqueCheckTests(unittest.TestCase):
     def test_unique_fields_get_collected(self):

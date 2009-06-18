@@ -4,11 +4,17 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import TestCase
 
+def validate_answer_to_universe(value):
+    if value != 42:
+        raise ValidationError('This is not the answer to life, universe and everything!')
+
 class ModelToValidate(models.Model):
     name = models.CharField(max_length=100)
     created = models.DateTimeField(default=datetime.now)
     number = models.IntegerField()
     parent = models.ForeignKey('self', blank=True, null=True)
+    email = models.EmailField(blank=True)
+    f_with_custom_validator = models.IntegerField(blank=True, null=True, validators=[validate_answer_to_universe])
 
     def validate(self):
         super(ModelToValidate, self).validate()
