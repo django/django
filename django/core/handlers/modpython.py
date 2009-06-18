@@ -2,7 +2,6 @@ import os
 from pprint import pformat
 
 from django import http
-from django.core import signals
 from django.core.handlers.base import BaseHandler
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
@@ -191,21 +190,7 @@ class ModPythonHandler(BaseHandler):
             self.load_middleware()
 
         set_script_prefix(req.get_options().get('django.root', ''))
-        signals.request_started.send(sender=self.__class__)
-        try:
-            try:
-                request = self.request_class(req)
-            except UnicodeDecodeError:
-                response = http.HttpResponseBadRequest()
-            else:
-                response = self.get_response(request)
-
-                # Apply response middleware
-                for middleware_method in self._response_middleware:
-                    response = middleware_method(request, response)
-                response = self.apply_response_fixes(request, response)
-        finally:
-            signals.request_finished.send(sender=self.__class__)
+        response = self.process_request(req)
 
         # Convert our custom HttpResponse object back into the mod_python req.
         req.content_type = response['Content-Type']

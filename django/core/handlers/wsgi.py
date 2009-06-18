@@ -6,7 +6,6 @@ except ImportError:
     from StringIO import StringIO
 
 from django import http
-from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
@@ -231,21 +230,7 @@ class WSGIHandler(base.BaseHandler):
             self.initLock.release()
 
         set_script_prefix(base.get_script_name(environ))
-        signals.request_started.send(sender=self.__class__)
-        try:
-            try:
-                request = self.request_class(environ)
-            except UnicodeDecodeError:
-                response = http.HttpResponseBadRequest()
-            else:
-                response = self.get_response(request)
-
-                # Apply response middleware
-                for middleware_method in self._response_middleware:
-                    response = middleware_method(request, response)
-                response = self.apply_response_fixes(request, response)
-        finally:
-            signals.request_finished.send(sender=self.__class__)
+        response = self.process_request(environ)
 
         try:
             status_text = STATUS_CODE_TEXT[response.status_code]
