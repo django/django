@@ -121,6 +121,8 @@ class Field(object):
             raise ValidationError(self.error_messages['required'])
 
     def run_validators(self, value):
+        if value in validators.EMPTY_VALUES:
+            return
         errors = []
         for v in self.validators:
             # don't run complex validators since they need all_values
