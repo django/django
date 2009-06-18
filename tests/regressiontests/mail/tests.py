@@ -4,7 +4,7 @@ r"""
 
 >>> from django.conf import settings
 >>> from django.core import mail
->>> from django.core.mail import EmailMessage, mail_admins, mail_managers
+>>> from django.core.mail import EmailMessage, mail_admins, mail_managers, EmailMultiAlternatives
 >>> from django.utils.translation import ugettext_lazy
 
 # Test normal ascii character case:
@@ -94,5 +94,49 @@ BadHeaderError: Header values can't contain newlines (got u'Subject\nInjection T
 >>> message = email.message() 
 >>> message['From']
 'from@example.com'
+
+# Handle attachments within an multipart/alternative mail correctly (#9367)
+# (test is not as precise/clear as it could be w.r.t. email tree structure,
+#  but it's good enough.)
+
+>>> headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
+>>> subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
+>>> text_content = 'This is an important message.'
+>>> html_content = '<p>This is an <strong>important</strong> message.</p>'
+>>> msg = EmailMultiAlternatives(subject, text_content, from_email, [to], headers=headers)
+>>> msg.attach_alternative(html_content, "text/html")
+>>> msg.attach("an attachment.pdf", "%PDF-1.4.%...", mimetype="application/pdf")
+>>> print msg.message().as_string()
+Content-Type: multipart/mixed; boundary="..."
+MIME-Version: 1.0
+Subject: hello
+From: from@example.com
+To: to@example.com
+Date: Fri, 09 Nov 2001 01:08:47 -0000
+Message-ID: foo
+...
+Content-Type: multipart/alternative; boundary="..."
+MIME-Version: 1.0
+...
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+...
+This is an important message.
+...
+Content-Type: text/html; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+...
+<p>This is an <strong>important</strong> message.</p>
+...
+...
+Content-Type: application/pdf
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="an attachment.pdf"
+...
+JVBERi0xLjQuJS4uLg==
+...
 
 """

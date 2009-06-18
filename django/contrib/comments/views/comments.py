@@ -37,6 +37,9 @@ def post_comment(request, next=None):
         if not data.get('email', ''):
             data["email"] = request.user.email
 
+    # Check to see if the POST data overrides the view's next argument.
+    next = data.get("next", next)
+
     # Look up the object we're trying to comment about
     ctype = data.get("content_type")
     object_pk = data.get("object_pk")

@@ -16,28 +16,28 @@ a specific function and has a specific template. For example, in a weblog
 application, you might have the following views:
 
     * Blog homepage -- displays the latest few entries.
-    
+
     * Entry "detail" page -- permalink page for a single entry.
-    
+
     * Year-based archive page -- displays all months with entries in the
       given year.
-      
+
     * Month-based archive page -- displays all days with entries in the
       given month.
-      
+
     * Day-based archive page -- displays all entries in the given day.
-    
+
     * Comment action -- handles posting comments to a given entry.
 
 In our poll application, we'll have the following four views:
 
     * Poll "archive" page -- displays the latest few polls.
-    
+
     * Poll "detail" page -- displays a poll question, with no results but
       with a form to vote.
-    
+
     * Poll "results" page -- displays results for a particular poll.
-    
+
     * Vote action -- handles voting for a particular choice in a particular
       poll.
 
@@ -81,6 +81,9 @@ point at that file::
 Time for an example. Edit ``mysite/urls.py`` so it looks like this::
 
     from django.conf.urls.defaults import *
+
+    from django.contrib import admin
+    admin.autodiscover()
 
     urlpatterns = patterns('',
         (r'^polls/$', 'mysite.polls.views.index'),
@@ -307,7 +310,7 @@ We'll discuss what you could put in that ``polls/detail.html`` template a bit
 later, but if you'd like to quickly get the above example working, just::
 
     {{ poll }}
-    
+
 will get you started for now.
 
 A shortcut: get_object_or_404()
@@ -371,12 +374,12 @@ Three more things to note about 404 views:
 
     * The 404 view is also called if Django doesn't find a match after checking
       every regular expression in the URLconf.
-      
+
     * If you don't define your own 404 view -- and simply use the default, which
       is recommended -- you still have one obligation: To create a ``404.html``
       template in the root of your template directory. The default 404 view will
       use that template for all 404 errors.
-      
+
     * If :setting:`DEBUG` is set to ``False`` (in your settings module) and if
       you didn't create a ``404.html`` file, an ``Http500`` is raised instead.
       So remember to create a ``404.html``.
