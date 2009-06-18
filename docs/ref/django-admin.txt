@@ -697,12 +697,6 @@ of sync with its automatically incremented field data.
 The alias for the database to print the SQL for.  By default uses the
 ``'default'`` alias.
 
---database
-~~~~~~~~~~
-
-The alias for the database to print the SQL for.  By default uses the
-``'default'`` alias.
-
 startapp <appname>
 ------------------
 
