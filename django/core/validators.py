@@ -20,7 +20,7 @@ email_re = re.compile(
 
 def validate_email(value):
     if not email_re.search(smart_unicode(value)):
-        raise ValidationError(_(u'Enter a valid e-mail address.'))
+        raise ValidationError(_(u'Enter a valid e-mail address.'), code='invalid')
 
 class ComplexValidator(object):
     def get_value(self, name, all_values, obj):

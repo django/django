@@ -131,7 +131,10 @@ class Field(object):
                 try:
                     v(value)
                 except ValidationError, e:
-                    errors.extend(e.messages)
+                    if hasattr(e, 'code'):
+                        errors.append(self.error_messages.get(e.code, e.messages[0]))
+                    else:
+                        errors.extend(e.messages)
         if errors:
             raise ValidationError(errors)
 
