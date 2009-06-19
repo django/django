@@ -28,6 +28,8 @@ class ConnectionHandlerTestCase(TestCase):
 class QueryTestCase(TestCase):
     def test_basic_queries(self):
         for db in connections:
+            self.assertRaises(Book.DoesNotExist,
+                lambda: Book.objects.using(db).get(title="Dive into Python"))
             Book.objects.using(db).create(title="Dive into Python",
                 published=datetime.date(2009, 5, 4))
 
@@ -39,6 +41,8 @@ class QueryTestCase(TestCase):
             self.assertEqual(books[0].published, datetime.date(2009, 5, 4))
 
         for db in connections:
+            self.assertRaises(Book.DoesNotExist,
+                lambda: Book.objects.using(db).get(title="Pro Django"))
             book = Book(title="Pro Django", published=datetime.date(2008, 12, 16))
             book.save(using=db)
 
