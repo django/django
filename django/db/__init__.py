@@ -38,7 +38,7 @@ connections = ConnectionHandler(settings.DATABASES)
 # we load all these up for backwards compatibility, you should use
 # connections['default'] instead.
 connection = connections['default']
-backend = load_backend(settings.DATABASE_ENGINE)
+backend = load_backend(connection.settings_dict['DATABASE_ENGINE'])
 DatabaseError = backend.DatabaseError
 IntegrityError = backend.IntegrityError
 
