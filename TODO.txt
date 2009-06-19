@@ -5,7 +5,7 @@ The follow is a list, more or less in the order I intend to do them of things
 that need to be done.  I'm trying to be as granular as possible.
 
 
-2)  Update all old references to ``settings.DATABASE_*`` to reference
+1)  Update all old references to ``settings.DATABASE_*`` to reference
     ``settings.DATABASES``.  This includes the following locations
 
     * ref/settings -- needs to be upddated for TEST_*
@@ -16,34 +16,26 @@ that need to be done.  I'm trying to be as granular as possible.
     Replace old instances of :setting:`DATABASE_` with a new tag or something.
 
 
-3)  Update all management commands in the following way:
+2)  Update all management commands in the following way:
 
     * ``dumpdata``: By default dump the ``default`` database.  Later add a
       ``--database`` flag.
 
     flush, reset, and syncdb need to not prompt the user multiple times.
 
-7)  Remove any references to the global ``django.db.connection`` object in the
+3)  Remove any references to the global ``django.db.connection`` object in the
     SQL creation process.  This includes(but is probably not limited to):
 
     * The way we create ``Query`` from ``BaseQuery`` is awkward and hacky.
+    * ``Field.get_db_prep_lookup``
+    * ``DateField.get_db_prep_value``
+    * ``DateTimeField.get_db_prep_value``
+    * ``DecimalField.get_db_prep_save``
+    * ``TimeField.get_db_prep_value``
+
+4)  Wait on the merge of the m2m stuff.
 
 5)  Add the ``using`` Meta option.  Tests and docs(these are to be assumed at
     each stage from here on out).
 
-8)  Implement some way to create a new ``Query`` for a different backend when
-    we switch.  There are several checks against ``self.connection`` prior to
-    SQL construction, so we either need to defer all these(which will be
-    difficult, but probably not impossible), or have an alternate strategy,
-    such as:
-
-    * Remove all tests against ``Query.connection`` before the SQL generation
-      phase.  This involves changing the following methods:
-
-        * ``Field.get_db_prep_lookup``
-        * ``DateField.get_db_prep_value``
-        * ``DateTimeField.get_db_prep_value``
-        * ``DecimalField.get_db_prep_save``
-        * ``TimeField.get_db_prep_value``
-
-10) Time permitting add support for a ``DatabaseManager``.
+6) Time permitting add support for a ``DatabaseManager``.
