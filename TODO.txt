@@ -9,7 +9,6 @@ that need to be done.  I'm trying to be as granular as possible.
     ``settings.DATABASES``.  This includes the following locations
 
     * ref/settings -- needs to be upddated for TEST_*
-    * topics/testing -- needs update for the TEST_* settings, plus test refactor
 
     The remaining items will be fixed as the code for them enters the code base.
 
