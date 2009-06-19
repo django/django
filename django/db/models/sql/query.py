@@ -729,10 +729,7 @@ class BaseQuery(object):
                         aliases.add(r)
                         col_aliases.add(col[1])
                 else:
-                    if getattr(col, 'as_sql_takes_connection', False):
-                        result.append(col.as_sql(qn, self.connection))
-                    else:
-                        result.append(col.as_sql(qn))
+                    result.append(col.as_sql(qn, self.connection))
 
                     if hasattr(col, 'alias'):
                         aliases.add(col.alias)

@@ -32,7 +32,6 @@ class WhereNode(tree.Node):
     relabel_aliases() methods.
     """
     default = AND
-    as_sql_takes_connection = True
 
     def add(self, data, connector):
         """
@@ -89,10 +88,7 @@ class WhereNode(tree.Node):
         for child in self.children:
             try:
                 if hasattr(child, 'as_sql'):
-                    if getattr(child, 'as_sql_takes_connection', False):
-                        sql, params = child.as_sql(qn=qn, connection=connection)
-                    else:
-                        sql, params = child.as_sql(qn=qn)
+                    sql, params = child.as_sql(qn=qn, connection=connection)
                 else:
                     # A leaf node in the tree.
                     sql, params = self.make_atom(child, qn, connection)
@@ -152,11 +148,7 @@ class WhereNode(tree.Node):
             field_sql = self.sql_for_columns(lvalue, qn, connection)
         else:
             # A smart object with an as_sql() method.
-            if getattr(lvalue, 'as_sql_takes_connection', False):
-                field_sql = lvalue.as_sql(qn, connection)
-            else:
-                field_sql = lvalue.as_sql(qn)
-
+            field_sql = lvalue.as_sql(qn, connection)
 
         if value_annot is datetime.datetime:
             cast_sql = connection.ops.datetime_cast_sql()
@@ -164,10 +156,7 @@ class WhereNode(tree.Node):
             cast_sql = '%s'
 
         if hasattr(params, 'as_sql'):
-            if getattr(params, 'as_sql_takes_connection', False):
-                extra, params = params.as_sql(qn, connection)
-            else:
-                extra, params = params.as_sql(qn)
+            extra, params = params.as_sql(qn, connection)
             cast_sql = ''
         else:
             extra = ''
@@ -242,7 +231,8 @@ class EverythingNode(object):
     """
     A node that matches everything.
     """
-    def as_sql(self, qn=None):
+
+    def as_sql(self, qn=None, connection=None):
         raise FullResultSet
 
     def relabel_aliases(self, change_map, node=None):
@@ -252,7 +242,7 @@ class NothingNode(object):
     """
     A node that matches nothing.
     """
-    def as_sql(self, qn=None):
+    def as_sql(self, qn=None, connection=None):
         raise EmptyResultSet
 
     def relabel_aliases(self, change_map, node=None):

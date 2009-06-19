@@ -144,10 +144,7 @@ class UpdateQuery(Query):
         values, update_params = [], []
         for name, val, placeholder in self.values:
             if hasattr(val, 'as_sql'):
-                if getattr(val, 'as_sql_takes_connection', False):
-                    sql, params = val.as_sql(qn, self.connection)
-                else:
-                    sql, params = val.as_sql(qn)
+                sql, params = val.as_sql(qn, self.connection)
                 values.append('%s = %s' % (qn(name), sql))
                 update_params.extend(params)
             elif val is not None:
@@ -421,7 +418,6 @@ class AggregateQuery(Query):
     An AggregateQuery takes another query as a parameter to the FROM
     clause and only selects the elements in the provided list.
     """
-    as_sql_takes_connection = True
 
     def add_subquery(self, query):
         self.subquery, self.sub_params = query.as_sql(with_col_aliases=True)

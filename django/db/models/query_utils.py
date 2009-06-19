@@ -132,7 +132,7 @@ class QueryWrapper(object):
     def __init__(self, sql, params):
         self.data = sql, params
 
-    def as_sql(self, qn=None):
+    def as_sql(self, qn=None, connection=None):
         return self.data
 
 class Q(tree.Node):

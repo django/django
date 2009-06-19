@@ -29,8 +29,6 @@ class Date(object):
     """
     Add a date selection column.
     """
-    as_sql_takes_connection = True
-
     def __init__(self, col, lookup_type):
         self.col = col
         self.lookup_type = lookup_type

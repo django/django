@@ -21,7 +21,6 @@ class Aggregate(object):
     is_ordinal = False
     is_computed = False
     sql_template = '%(function)s(%(field)s)'
-    as_sql_takes_connection = True
 
     def __init__(self, col, source=None, is_summary=False, **extra):
         """Instantiate an SQL aggregate
@@ -77,10 +76,7 @@ class Aggregate(object):
         "Return the aggregate, rendered as SQL."
 
         if hasattr(self.col, 'as_sql'):
-            if getattr(self.col, 'as_sql_takes_connection', False):
-                field_name = self.col.as_sql(qn, connection)
-            else:
-                field_name = self.col.as_sql(qn)
+            field_name = self.col.as_sql(qn, connection)
         elif isinstance(self.col, (list, tuple)):
             field_name = '.'.join([qn(c) for c in self.col])
         else:

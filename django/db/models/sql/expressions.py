@@ -3,8 +3,6 @@ from django.db.models.fields import FieldDoesNotExist
 from django.db.models.sql.constants import LOOKUP_SEP
 
 class SQLEvaluator(object):
-    as_sql_takes_connection = True
-
     def __init__(self, expression, query, allow_joins=True):
         self.expression = expression
         self.opts = query.get_meta()
@@ -78,9 +76,6 @@ class SQLEvaluator(object):
     def evaluate_leaf(self, node, qn, connection):
         col = self.cols[node]
         if hasattr(col, 'as_sql'):
-            if getattr(col, 'as_sql_takes_connection', False):
-                return col.as_sql(qn, connection), ()
-            else:
-                return col.as_sql(qn)
+            return col.as_sql(qn, connection), ()
         else:
             return '%s.%s' % (qn(col[0]), qn(col[1])), ()
