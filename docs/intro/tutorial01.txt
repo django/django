@@ -42,13 +42,13 @@ code, then run the command ``django-admin.py startproject mysite``. This will
 create a ``mysite`` directory in your current directory.
 
 .. admonition:: Mac OS X permissions
-   
+
    If you're using Mac OS X, you may see the message "permission denied" when
    you try to run ``django-admin.py startproject``. This is because, on
    Unix-based systems like OS X, a file must be marked as "executable" before it
    can be run as a program. To do this, open Terminal.app and navigate (using
    the ``cd`` command) to the directory where :ref:`django-admin.py
-   <ref-django-admin>` is installed, then run the command 
+   <ref-django-admin>` is installed, then run the command
    ``chmod +x django-admin.py``.
 
 .. note::
@@ -90,14 +90,14 @@ These files are:
     * :file:`__init__.py`: An empty file that tells Python that this directory
       should be considered a Python package. (Read `more about packages`_ in the
       official Python docs if you're a Python beginner.)
-      
+
     * :file:`manage.py`: A command-line utility that lets you interact with this
       Django project in various ways. You can read all the details about
       :file:`manage.py` in :ref:`ref-django-admin`.
-      
+
     * :file:`settings.py`: Settings/configuration for this Django project.
       :ref:`topics-settings` will tell you all about how settings work.
-    
+
     * :file:`urls.py`: The URL declarations for this Django project; a "table of
       contents" of your Django-powered site. You can read more about URLs in
       :ref:`topics-http-urls`.
@@ -134,22 +134,22 @@ It worked!
 .. admonition:: Changing the port
 
     By default, the :djadmin:`runserver` command starts the development server
-    on the internal IP at port 8000. 
-    
+    on the internal IP at port 8000.
+
     If you want to change the server's port, pass
     it as a command-line argument. For instance, this command starts the server
     on port 8080:
-    
+
     .. code-block:: bash
 
         python manage.py runserver 8080
-        
+
     If you want to change the server's IP, pass it along with the port. So to
     listen on all public IPs (useful if you want to show off your work on other
     computers), use:
-    
+
     .. code-block:: bash
-    
+
         python manage.py runserver 0.0.0.0:8000
 
     Full docs for the development server can be found in the
@@ -164,21 +164,21 @@ database's connection parameters:
 
     * :setting:`DATABASE_ENGINE` -- Either 'postgresql_psycopg2', 'mysql' or
       'sqlite3'. Other backends are :setting:`also available <DATABASE_ENGINE>`.
-      
+
     * :setting:`DATABASE_NAME` -- The name of your database. If you're using
       SQLite, the database will be a file on your computer; in that case,
       ``DATABASE_NAME`` should be the full absolute path, including filename, of
       that file. If the file doesn't exist, it will automatically be created
       when you synchronize the database for the first time (see below).
-      
-      When specifying the path, always use forward slashes, even on Windows 
+
+      When specifying the path, always use forward slashes, even on Windows
       (e.g. ``C:/homes/user/mysite/sqlite3.db``).
-      
+
     * :setting:`DATABASE_USER` -- Your database username (not used for SQLite).
-    
+
     * :setting:`DATABASE_PASSWORD` -- Your database password (not used for
       SQLite).
-    
+
     * :setting:`DATABASE_HOST` -- The host your database is on. Leave this as an
       empty string if your database server is on the same physical machine (not
       used for SQLite).
@@ -594,7 +594,7 @@ your models, not only for your own sanity when dealing with the interactive
 prompt, but also because objects' representations are used throughout Django's
 automatically-generated admin.
 
-.. admonition:: Why :meth:`~django.db.models.Model.__unicode__` and not 
+.. admonition:: Why :meth:`~django.db.models.Model.__unicode__` and not
                 :meth:`~django.db.models.Model.__str__`?
 
     If you're familiar with Python, you might be in the habit of adding

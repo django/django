@@ -71,7 +71,7 @@ For more on :class:`~django.http.HttpRequest` objects, see the
 :ref:`ref-request-response`. For more details on URLconfs, see the
 :ref:`topics-http-urls`.
 
-When you ran ``python django-admin.py startproject mysite`` at the beginning of
+When you ran ``django-admin.py startproject mysite`` at the beginning of
 Tutorial 1, it created a default URLconf in ``mysite/urls.py``. It also
 automatically set your :setting:`ROOT_URLCONF` setting (in ``settings.py``) to
 point at that file::
@@ -98,8 +98,7 @@ This is worth a review. When somebody requests a page from your Web site -- say,
 the :setting:`ROOT_URLCONF` setting. It finds the variable named ``urlpatterns``
 and traverses the regular expressions in order. When it finds a regular
 expression that matches -- ``r'^polls/(?P<poll_id>\d+)/$'`` -- it loads the
-associated Python package/module: ``mysite.polls.views.detail``. That
-corresponds to the function ``detail()`` in ``mysite/polls/views.py``. Finally,
+function ``detail()`` from ``mysite/polls/views.py``. Finally,
 it calls that ``detail()`` function like so::
 
     detail(request=<HttpRequest object>, poll_id='23')
@@ -468,7 +467,10 @@ Copy the file ``mysite/urls.py`` to ``mysite/polls/urls.py``. Then, change
 ``mysite/urls.py`` to remove the poll-specific URLs and insert an
 :func:`~django.conf.urls.defaults.include`::
 
-    (r'^polls/', include('mysite.polls.urls')),
+    ...
+    urlpatterns = patterns('',
+        (r'^polls/', include('mysite.polls.urls')),
+        ...
 
 :func:`~django.conf.urls.defaults.include`, simply, references another URLconf.
 Note that the regular expression doesn't have a ``$`` (end-of-string match
@@ -486,7 +488,8 @@ Here's what happens if a user goes to "/polls/34/" in this system:
       further processing.
 
 Now that we've decoupled that, we need to decouple the 'mysite.polls.urls'
-URLconf by removing the leading "polls/" from each line::
+URLconf by removing the leading "polls/" from each line, and removing the
+lines registering the admin site::
 
     urlpatterns = patterns('mysite.polls.views',
         (r'^$', 'index'),

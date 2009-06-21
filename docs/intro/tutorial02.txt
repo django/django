@@ -86,8 +86,8 @@ Enter the admin site
 ====================
 
 Now, try logging in. (You created a superuser account in the first part of this
-tutorial, remember?  If you didn't create one or forgot the password you can 
-:ref:`create another one <topics-auth-creating-superusers>`.) You should see 
+tutorial, remember?  If you didn't create one or forgot the password you can
+:ref:`create another one <topics-auth-creating-superusers>`.) You should see
 the Django admin index page:
 
 .. image:: _images/admin02t.png
@@ -238,8 +238,8 @@ the admin page doesn't display choices.
 
 Yet.
 
-There are two ways to solve this problem. The first register ``Choice`` with the
-admin just as we did with ``Poll``. That's easy::
+There are two ways to solve this problem. The first is to register ``Choice``
+with the admin just as we did with ``Poll``. That's easy::
 
     from mysite.polls.models import Choice
 
