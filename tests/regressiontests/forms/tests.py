@@ -32,6 +32,8 @@ from widgets import tests as widgets_tests
 from formsets import tests as formset_tests
 from media import media_tests
 
+from fields_unit import TestFields
+
 __test__ = {
     'extra_tests': extra_tests,
     'fields_tests': fields_tests,
