@@ -25,7 +25,10 @@ class Command(BaseCommand):
         cover = options.get('coverage', False)
         report = options.get('reports', False)
         test_runner = get_runner(settings, coverage=cover, reports=report)
-        tr = test_runner()
-        failures = tr.run_tests(test_labels, verbosity=verbosity, interactive=interactive)
+        if(type(test_runner) == 'function'):
+            failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive)
+        else:
+            tr = test_runner()
+            failures = tr.run_tests(test_labels, verbosity=verbosity, interactive=interactive)
         if failures:
             sys.exit(failures)

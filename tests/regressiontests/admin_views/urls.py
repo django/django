@@ -3,6 +3,10 @@ from django.contrib import admin
 import views
 import customadmin
 
+from django.contrib import admin
+admin.autodiscover()
+
+
 urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/secure-view/$', views.secure_view),

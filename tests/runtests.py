@@ -170,9 +170,16 @@ def django_tests(verbosity, interactive, test_labels):
     #'from .* import .*', 'import .*', ]
     settings.COVERAGE_ADDITIONAL_MODULES = ['django']
     # 'from .* import .*', 'import .*',
-    test_runner = get_runner(settings, coverage=True, reports=True)
-    tr = test_runner()
-    failures = tr.run_tests(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
+    if(do_std):
+        if(do_coverage):
+            test_runner = get_runner(settings, coverage=True, reports=True)
+        else:
+            test_runner = get_runner(settings, coverage=False, reports=False)
+        if(type(test_runner) == 'function'):
+            failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
+        else:
+            tr = test_runner()
+            failures = tr.run_tests(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
     #from windmill.authoring import djangotest
     from time import sleep
 
@@ -191,9 +198,15 @@ def django_tests(verbosity, interactive, test_labels):
         #      print cache.app_store
         # m = cache.app_models['invalid_models']
         #        print m
-        mod = import_module('.models','modeltests.invalid_models')
-        del cache.app_store[mod]
-        del cache.app_models['invalid_models']
+        if(do_std):
+            mod = import_module('.models','modeltests.invalid_models')
+            try:
+                del cache.app_store[mod]
+                del cache.app_models['invalid_models']
+            except Exception, e:
+                print e
+                pass
+
 
 
         # print cache.app_models
@@ -291,7 +304,9 @@ def django_tests(verbosity, interactive, test_labels):
     settings.LOGIN_URL = old_login_url
     settings.MIDDLEWARE_CLASSES = old_middleware_classes
 
-global do_windmill
+# global do_windmill
+# global do_coverage
+# global do_std
 if __name__ == "__main__":
     from optparse import OptionParser
     usage = "%prog [options] [model model model ...]"
@@ -303,6 +318,10 @@ if __name__ == "__main__":
         help='Tells Django to NOT prompt the user for input of any kind.')
     parser.add_option('--windmill', action='store_true', dest='windmill', default=False,
             help='Tells Django to run the Windmill functional tests as well.')
+    parser.add_option('--coverage', action='store_true', dest='coverage', default=False,
+            help='Tells Django to run the tests with code coverage as well.')
+    parser.add_option('--nostd', action='store_false', dest='standard', default=True,
+            help='Tells Django to not run the standard regression suite.')
     parser.add_option('--settings',
         help='Python path to settings module, e.g. "myproject.settings". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
     options, args = parser.parse_args()
@@ -312,4 +331,6 @@ if __name__ == "__main__":
         parser.error("DJANGO_SETTINGS_MODULE is not set in the environment. "
                       "Set it or use --settings.")
     do_windmill = options.windmill
+    do_coverage = options.coverage
+    do_std = options.standard
     django_tests(int(options.verbosity), options.interactive, args)
