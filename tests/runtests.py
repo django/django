@@ -35,7 +35,7 @@ ALWAYS_INSTALLED_APPS = [
 ]
 
 
-ALWAYS_INSTALLED_APPS.extend(('%s.%s' % (REGRESSION_TESTS_DIR_NAME,a)  for a in os.listdir(REGRESSION_TEST_DIR) if not('.py' in a or '.svn' in a) ))
+#ALWAYS_INSTALLED_APPS.extend(('%s.%s' % (REGRESSION_TESTS_DIR_NAME,a)  for a in os.listdir(REGRESSION_TEST_DIR) if not('.py' in a or '.svn' in a) ))
 
 def get_test_models():
     models = []
@@ -127,6 +127,7 @@ def django_tests(verbosity, interactive, test_labels):
     # (This import statement is intentionally delayed until after we
     # access settings because of the USE_I18N dependency.)
     from django.db.models.loading import get_apps, load_app
+    #print settings.INSTALLED_APPS
     get_apps()
 
     # Load all the test model apps.
@@ -174,21 +175,36 @@ def django_tests(verbosity, interactive, test_labels):
     failures = tr.run_tests(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
     #from windmill.authoring import djangotest
     from time import sleep
+
     if do_windmill:
 
         #from django.test import windmill_tests as djangotest
         import types
         import logging
         from windmill.conf import global_settings
-        from django.test.windmill_tests import WindmillDjangoUnitTest
         from django.core.management.commands.test_windmill import ServerContainer, attempt_import
+        from django.test.windmill_tests import WindmillDjangoUnitTest
+        from django.db.models.loading import cache
+        from django.utils.importlib import import_module
+
+        # print cache.app_models
+        #      print cache.app_store
+        # m = cache.app_models['invalid_models']
+        #        print m
+        mod = import_module('.models','modeltests.invalid_models')
+        del cache.app_store[mod]
+        del cache.app_models['invalid_models']
+
+
+        # print cache.app_models
+        #        print cache.app_store
         #from django.test import windmill_tests
         # as testwm_cmd
         #    windmill_runner = testwm_cmd()
         #    windmill_runner.handle()
 
 
-
+        #settings.INSTALLED_APPS = [ia for ia in settings.INSTALLED_APPS if True]
         # from windmill.authoring.djangotest import WindmillDjangoUnitTest
         # if 'ie' in labels:
         #        global_settings.START_IE = True
@@ -209,19 +225,19 @@ def django_tests(verbosity, interactive, test_labels):
         #     if 'test_windmill' in sys.argv:
         #         sys.argv.remove('test_windmill')
         server_container = ServerContainer()
-        server_container.fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml', 'admin-views-unicode.xml',
-                'multiple-child-classes', 'admin-views-actions.xml', 'string-primary-key.xml', 'admin-views-person.xml']
+        server_container.__setattr__('fixtures',[ 'regressiontests/admin_views/fixtures/%s'%fix for fix in ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml', 'admin-views-unicode.xml',
+                'multiple-child-classes', 'admin-views-actions.xml', 'string-primary-key.xml', 'admin-views-person.xml']])
         server_container.start_test_server()
 
         global_settings.TEST_URL = 'http://localhost:%d' % server_container.server_thread.port
 
-        # import windmill
+        import windmill
         # windmill.stdout, windmill.stdin = sys.stdout, sys.stdin
         from windmill.authoring import setup_module, teardown_module
 
         # from django.conf import settings
         tests = []
-        for name in [ app for app in settings.INSTALLED_APPS if not('invalid_models' in app)]:
+        for name in [ app for app in settings.INSTALLED_APPS if not('invalid' in app)]:
             for suffix in ['tests', 'wmtests', 'windmilltests']:
                 x = attempt_import(name, suffix)
                 if x is not None: tests.append((suffix,x,));

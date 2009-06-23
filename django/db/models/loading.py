@@ -178,6 +178,25 @@ class AppCache(object):
                     continue
             model_dict[model_name] = model
 
+    def clear_apps(self):
+        """Clears cache so on next call, it will be reloaded."""
+        self.loaded = False
+        self.write_lock.acquire()
+        self.handled.clear()
+        try:
+            if self.loaded:
+                return
+            for app_name in settings.INSTALLED_APPS:
+                if app_name in self.handled:
+                    continue
+                self.load_app(app_name, True)
+            if not self.nesting_level:
+                for app_name in self.postponed:
+                    self.load_app(app_name)
+                self.loaded = True
+        finally:
+            self.write_lock.release()
+
 cache = AppCache()
 
 # These methods were always module level, so are kept that way for backwards
