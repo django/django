@@ -221,7 +221,7 @@ def django_tests(verbosity, interactive, test_labels):
 
         # from django.conf import settings
         tests = []
-        for name in settings.INSTALLED_APPS:
+        for name in [ app for app in settings.INSTALLED_APPS if not('invalid_models' in app)]:
             for suffix in ['tests', 'wmtests', 'windmilltests']:
                 x = attempt_import(name, suffix)
                 if x is not None: tests.append((suffix,x,));
