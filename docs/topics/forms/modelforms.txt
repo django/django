@@ -611,7 +611,7 @@ Just like with ``ModelForms``, by default the ``clean()`` method of a
 the unique constraints on your model (either ``unique``, ``unique_together`` or
 ``unique_for_date|month|year``).  If you want to overide the ``clean()`` method
 on a ``model_formset`` and maintain this validation, you must call the parent
-classes ``clean`` method::
+class's ``clean`` method::
 
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):

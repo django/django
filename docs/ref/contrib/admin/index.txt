@@ -347,7 +347,7 @@ A few special cases to note about ``list_display``:
               birthday = models.DateField()
 
               def born_in_fifties(self):
-                  return self.birthday.strftime('%Y')[:3] == 5
+                  return self.birthday.strftime('%Y')[:3] == '195'
               born_in_fifties.boolean = True
 
           class PersonAdmin(admin.ModelAdmin):

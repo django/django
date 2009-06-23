@@ -616,6 +616,8 @@ call, since they are conflicting options.
 Both the ``depth`` argument and the ability to specify field names in the call
 to ``select_related()`` are new in Django version 1.0.
 
+.. _extra:
+
 ``extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

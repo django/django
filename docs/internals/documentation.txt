@@ -130,11 +130,6 @@ TODO
 
 The work is mostly done, but here's what's left, in rough order of priority.
 
-    * Fix up generic view docs: adapt Chapter 9 of the Django Book (consider
-      this TODO item my permission and license) into
-      ``topics/generic-views.txt``; remove the intro material from
-      ``ref/generic-views.txt`` and just leave the function reference.
-
     * Change the "Added/changed in development version" callouts to proper
       Sphinx ``.. versionadded::`` or ``.. versionchanged::`` directives.
 

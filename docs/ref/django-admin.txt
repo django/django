@@ -611,7 +611,11 @@ sqlsequencereset <appname appname ...>
 
 Prints the SQL statements for resetting sequences for the given app name(s).
 
-See http://simon.incutio.com/archive/2004/04/21/postgres for more information.
+Sequences are indexes used by some database engines to track the next available
+number for automatically incremented fields.
+
+Use this command to generate SQL which will fix cases where a sequence is out
+of sync with its automatically incremented field data.
 
 startapp <appname>
 ------------------
