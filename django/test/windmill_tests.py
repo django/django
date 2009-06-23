@@ -92,6 +92,7 @@ def start_test_server(self, address='localhost', port=8000):
     """Creates a live test server object (instance of WSGIServer)."""
     self.server_thread = TestServerThread(address, port)
     if hasattr(self, 'fixtures'):
+        print 'loading fixtures %s' % self.fixtures
         self.server_thread.__setattr__('fixtures', self.fixtures)
     self.server_thread.start()
     self.server_thread.started.wait()
