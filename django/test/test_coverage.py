@@ -63,6 +63,15 @@ class BaseCoverageRunner(object):
             coverage_modules, getattr(settings, 'COVERAGE_MODULE_EXCLUDES', []),
             getattr(settings, 'COVERAGE_PATH_EXCLUDES', []))
 
+
+
+        return results
+
+class ConsoleReportCoverageRunner(BaseCoverageRunner):
+
+    def run_tests(self, *args, **kwargs):
+        """docstring for run_tests"""
+        res = super(ConsoleReportCoverageRunner, self).run_tests( *args, **kwargs)
         self.cov.report(self.modules.values(), show_missing=1)
 
         if self.excludes:
@@ -77,9 +86,7 @@ class BaseCoverageRunner(object):
             for e in self.errors:
                 print >> sys.stderr, e,
             print >> sys.stdout
-
-        return results
-
+        return res
 
 class ReportingCoverageRunner(BaseCoverageRunner):
     """Runs coverage.py analysis, as well as generating detailed HTML reports."""

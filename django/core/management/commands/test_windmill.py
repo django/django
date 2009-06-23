@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
-from windmill.authoring import djangotest
+#from windmill.authoring import djangotest
+from  django.test import windmill_tests as djangotest
 import sys, os
 from time import sleep
 import types
@@ -18,7 +19,10 @@ def attempt_import(name, suffix):
             s = name.split('.')
             mod = __import__(s.pop(0))
             for x in s+[suffix]:
-                mod = getattr(mod, x)
+                try:
+                    mod = getattr(mod, x)
+                except Exception, e:
+                    pass
         return mod
 
 class Command(BaseCommand):
@@ -31,7 +35,7 @@ class Command(BaseCommand):
     def handle(self, *labels, **options):
 
         from windmill.conf import global_settings
-        from windmill.authoring.djangotest import WindmillDjangoUnitTest
+        from django.test.windmill_tests import WindmillDjangoUnitTest
         if 'ie' in labels:
             global_settings.START_IE = True
             sys.argv.remove('ie')

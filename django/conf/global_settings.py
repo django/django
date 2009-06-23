@@ -398,7 +398,7 @@ TEST_DATABASE_COLLATION = None
 
 
 # Specify the coverage test runner
-COVERAGE_TEST_RUNNER = 'django.test.test_coverage.BaseCoverageRunner'
+COVERAGE_TEST_RUNNER = 'django.test.test_coverage.ConsoleReportCoverageRunner'
 
 # Specify regular expressions of code blocks the coverage analyzer should
 # ignore as statements (e.g. ``raise NotImplemented``).

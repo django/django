@@ -4,7 +4,9 @@ import os, sys, traceback
 import unittest
 import coverage
 import django.contrib as contrib
+from django.core.servers import basehttp
 
+import django
 try:
     set
 except NameError:
@@ -30,8 +32,10 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.comments',
     'django.contrib.admin',
-    'windmill',
 ]
+
+
+ALWAYS_INSTALLED_APPS.extend(('%s.%s' % (REGRESSION_TESTS_DIR_NAME,a)  for a in os.listdir(REGRESSION_TEST_DIR) if not('.py' in a or '.svn' in a) ))
 
 def get_test_models():
     models = []
@@ -89,6 +93,7 @@ class InvalidModelTestCase(unittest.TestCase):
 def django_tests(verbosity, interactive, test_labels):
     from django.conf import settings
 
+
     old_installed_apps = settings.INSTALLED_APPS
     old_test_database_name = settings.TEST_DATABASE_NAME
     old_root_urlconf = getattr(settings, "ROOT_URLCONF", "")
@@ -100,6 +105,8 @@ def django_tests(verbosity, interactive, test_labels):
 
     # Redirect some settings for the duration of these tests.
     settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
+    if do_windmill:
+        settings.INSTALLED_APPS.append('windmill')
     settings.ROOT_URLCONF = 'urls'
     settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), TEST_TEMPLATE_DIR), )
     settings.USE_I18N = True
@@ -165,83 +172,100 @@ def django_tests(verbosity, interactive, test_labels):
     test_runner = get_runner(settings, coverage=True, reports=True)
     tr = test_runner()
     failures = tr.run_tests(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
-    from django.core.management.commands.test_windmill import ServerContainer, attempt_import
-    # as testwm_cmd
-    #    windmill_runner = testwm_cmd()
-    #    windmill_runner.handle()
+    #from windmill.authoring import djangotest
+    from time import sleep
+    if do_windmill:
 
-    from windmill.conf import global_settings
-    from windmill.authoring.djangotest import WindmillDjangoUnitTest
-    # if 'ie' in labels:
-    #        global_settings.START_IE = True
-    #        sys.argv.remove('ie')
-    #    elif 'safari' in labels:
-    #        global_settings.START_SAFARI = True
-    #        sys.argv.remove('safari')
-    #    elif 'chrome' in labels:
-    #        global_settings.START_CHROME = True
-    #        sys.argv.remove('chrome')
-    #    else:
-    global_settings.START_FIREFOX = True
-        # if 'firefox' in labels:
-        #     sys.argv.remove('firefox')
+        #from django.test import windmill_tests as djangotest
+        import types
+        import logging
+        from windmill.conf import global_settings
+        from django.test.windmill_tests import WindmillDjangoUnitTest
+        from django.core.management.commands.test_windmill import ServerContainer, attempt_import
+        #from django.test import windmill_tests
+        # as testwm_cmd
+        #    windmill_runner = testwm_cmd()
+        #    windmill_runner.handle()
 
-    # if 'manage.py' in sys.argv:
-    #         sys.argv.remove('manage.py')
-    #     if 'test_windmill' in sys.argv:
-    #         sys.argv.remove('test_windmill')
-    server_container = ServerContainer()
-    server_container.start_test_server()
 
-    global_settings.TEST_URL = 'http://localhost:%d' % server_container.server_thread.port
 
-    # import windmill
-    # windmill.stdout, windmill.stdin = sys.stdout, sys.stdin
-    from windmill.authoring import setup_module, teardown_module
+        # from windmill.authoring.djangotest import WindmillDjangoUnitTest
+        # if 'ie' in labels:
+        #        global_settings.START_IE = True
+        #        sys.argv.remove('ie')
+        #    elif 'safari' in labels:
+        #        global_settings.START_SAFARI = True
+        #        sys.argv.remove('safari')
+        #    elif 'chrome' in labels:
+        #        global_settings.START_CHROME = True
+        #        sys.argv.remove('chrome')
+        #    else:
+        global_settings.START_FIREFOX = True
+            # if 'firefox' in labels:
+            #     sys.argv.remove('firefox')
 
-    # from django.conf import settings
-    tests = []
-    for name in settings.INSTALLED_APPS:
-        for suffix in ['tests', 'wmtests', 'windmilltests']:
-            x = attempt_import(name, suffix)
-            if x is not None: tests.append((suffix,x,));
+        # if 'manage.py' in sys.argv:
+        #         sys.argv.remove('manage.py')
+        #     if 'test_windmill' in sys.argv:
+        #         sys.argv.remove('test_windmill')
+        server_container = ServerContainer()
+        server_container.fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml', 'admin-views-unicode.xml',
+                'multiple-child-classes', 'admin-views-actions.xml', 'string-primary-key.xml', 'admin-views-person.xml']
+        server_container.start_test_server()
 
-    wmtests = []
-    for (ttype, mod,) in tests:
-        if ttype == 'tests':
-            for ucls in [getattr(mod, x) for x in dir(mod)
-                         if ( type(getattr(mod, x, None)) in (types.ClassType,
-                                                           types.TypeType) ) and
-                         issubclass(getattr(mod, x), WindmillDjangoUnitTest)
-                         ]:
-                wmtests.append(ucls.test_dir)
+        global_settings.TEST_URL = 'http://localhost:%d' % server_container.server_thread.port
 
-        else:
-            if mod.__file__.endswith('__init__.py') or mod.__file__.endswith('__init__.pyc'):
-                wmtests.append(os.path.join(*os.path.split(os.path.abspath(mod.__file__))[:-1]))
+        # import windmill
+        # windmill.stdout, windmill.stdin = sys.stdout, sys.stdin
+        from windmill.authoring import setup_module, teardown_module
+
+        # from django.conf import settings
+        tests = []
+        for name in settings.INSTALLED_APPS:
+            for suffix in ['tests', 'wmtests', 'windmilltests']:
+                x = attempt_import(name, suffix)
+                if x is not None: tests.append((suffix,x,));
+
+        wmtests = []
+        for (ttype, mod,) in tests:
+            if ttype == 'tests':
+                for ucls in [getattr(mod, x) for x in dir(mod)
+                             if ( type(getattr(mod, x, None)) in (types.ClassType,
+                                                               types.TypeType) ) and
+                             issubclass(getattr(mod, x), WindmillDjangoUnitTest)
+                             ]:
+                    wmtests.append(ucls.test_dir)
+
             else:
-                wmtests.append(os.path.abspath(mod.__file__))
+                if mod.__file__.endswith('__init__.py') or mod.__file__.endswith('__init__.pyc'):
+                    wmtests.append(os.path.join(*os.path.split(os.path.abspath(mod.__file__))[:-1]))
+                else:
+                    wmtests.append(os.path.abspath(mod.__file__))
 
-    if len(wmtests) is 0:
-        print 'Sorry, no windmill tests found.'
-    else:
-        testtotals = {}
-        x = logging.getLogger()
-        x.setLevel(0)
-        from windmill.server.proxy import logger
-        from functest import bin
-        from functest import runner
-        runner.CLIRunner.final = classmethod(lambda self, totals: testtotals.update(totals) )
-        import windmill
-        setup_module(tests[0][1])
-        sys.argv = sys.argv + wmtests
-        bin.cli()
-        teardown_module(tests[0][1])
-        # if testtotals['fail'] is not 0:
-        #             sleep(.5)
-        #             sys.exit(1)
-    if failures or testtotals['fail'] is not 0:
-        sys.exit(failures + testtotals['fail'])
+
+        if len(wmtests) is 0:
+            print 'Sorry, no windmill tests found.'
+        else:
+            testtotals = {}
+            x = logging.getLogger()
+            x.setLevel(0)
+            from windmill.server.proxy import logger
+            from functest import bin
+            from functest import runner
+            runner.CLIRunner.final = classmethod(lambda self, totals: testtotals.update(totals) )
+            import windmill
+            setup_module(tests[0][1])
+            #sys.argv = sys.argv + wmtests
+            sys.argv = wmtests
+            bin.cli()
+            teardown_module(tests[0][1])
+            if testtotals['fail'] is not 0:
+                sleep(.5)
+                sys.exit(1)
+    if failures:
+        sleep(.5)
+        sys.exit(failures)
+
     # Restore the old settings.
     settings.INSTALLED_APPS = old_installed_apps
     settings.ROOT_URLCONF = old_root_urlconf
@@ -251,6 +275,7 @@ def django_tests(verbosity, interactive, test_labels):
     settings.LOGIN_URL = old_login_url
     settings.MIDDLEWARE_CLASSES = old_middleware_classes
 
+global do_windmill
 if __name__ == "__main__":
     from optparse import OptionParser
     usage = "%prog [options] [model model model ...]"
@@ -260,6 +285,8 @@ if __name__ == "__main__":
         help='Verbosity level; 0=minimal output, 1=normal output, 2=all output')
     parser.add_option('--noinput', action='store_false', dest='interactive', default=True,
         help='Tells Django to NOT prompt the user for input of any kind.')
+    parser.add_option('--windmill', action='store_true', dest='windmill', default=False,
+            help='Tells Django to run the Windmill functional tests as well.')
     parser.add_option('--settings',
         help='Python path to settings module, e.g. "myproject.settings". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
     options, args = parser.parse_args()
@@ -268,4 +295,5 @@ if __name__ == "__main__":
     elif "DJANGO_SETTINGS_MODULE" not in os.environ:
         parser.error("DJANGO_SETTINGS_MODULE is not set in the environment. "
                       "Set it or use --settings.")
+    do_windmill = options.windmill
     django_tests(int(options.verbosity), options.interactive, args)
