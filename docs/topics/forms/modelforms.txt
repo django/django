@@ -397,16 +397,26 @@ to be rendered first, we could specify the following ``ModelForm``::
     ...         model = Book
     ...         fields = ['title', 'author']
 
+.. _overriding-modelform-clean-method:
 
 Overriding the clean() method
 -----------------------------
 
 You can override the ``clean()`` method on a model form to provide additional
-validation in the same way you can on a normal form. However, by default the
-``clean()`` method validates the uniqueness of fields that are marked as
-``unique``, ``unique_together`` or ``unique_for_date|month|year`` on the model.
-Therefore, if you would like to override the ``clean()`` method and maintain the
-default validation, you must call the parent class's ``clean()`` method.
+validation in the same way you can on a normal form.
+
+In this regard, model forms have two specific characteristics when compared to
+forms:
+
+By default the ``clean()`` method validates the uniqueness of fields that are
+marked as ``unique``, ``unique_together`` or ``unique_for_date|month|year`` on
+the model.  Therefore, if you would like to override the ``clean()`` method and
+maintain the default validation, you must call the parent class's ``clean()``
+method.
+
+Also, a model form instance bound to a model object will contain a
+``self.instance`` attribute that gives model form methods access to that
+specific model instance.
 
 Form inheritance
 ----------------

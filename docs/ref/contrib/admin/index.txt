@@ -870,7 +870,7 @@ Adding custom validation to the admin
 -------------------------------------
 
 Adding custom validation of data in the admin is quite easy. The automatic admin
-interfaces reuses :mod:`django.forms`, and the ``ModelAdmin`` class gives you
+interface reuses :mod:`django.forms`, and the ``ModelAdmin`` class gives you
 the ability define your own form::
 
     class ArticleAdmin(admin.ModelAdmin):
@@ -890,7 +890,9 @@ any field::
 
 It is important you use a ``ModelForm`` here otherwise things can break. See the
 :ref:`forms <ref-forms-index>` documentation on :ref:`custom validation
-<ref-forms-validation>` for more information.
+<ref-forms-validation>` and, more specifically, the
+:ref:`model form validation notes <overriding-modelform-clean-method>` for more
+information.
 
 .. _admin-inlines:
 
