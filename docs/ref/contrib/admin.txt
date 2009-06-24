@@ -583,6 +583,43 @@ with an operator:
     Performs a full-text match. This is like the default search method but uses
     an index. Currently this is only available for MySQL.
 
+.. attribute:: ModelAdmin.change_list_template
+
+Path to a custom template that will be used by the model objects "change list"
+view. Templates can override or extend base admin templates as described in
+`Overriding Admin Templates`_.
+
+If you don't specify this attribute, a default template shipped with Django
+that provides the standard appearance is used.
+
+.. attribute:: ModelAdmin.change_form_template
+
+Path to a custom template that will be used by both the model object creation
+and change views. Templates can override or extend base admin templates as
+described in `Overriding Admin Templates`_.
+
+If you don't specify this attribute, a default template shipped with Django
+that provides the standard appearance is used.
+
+.. attribute:: ModelAdmin.object_history_template
+
+Path to a custom template that will be used by the model object change history
+display view. Templates can override or extend base admin templates as
+described in `Overriding Admin Templates`_.
+
+If you don't specify this attribute, a default template shipped with Django
+that provides the standard appearance is used.
+
+.. attribute:: ModelAdmin.delete_confirmation_template
+
+Path to a custom template that will be used by the view responsible of showing
+the confirmation page when the user decides to delete one or more model
+objects. Templates can override or extend base admin templates as described in
+`Overriding Admin Templates`_.
+
+If you don't specify this attribute, a default template shipped with Django
+that provides the standard appearance is used.
+
 ``ModelAdmin`` methods
 ----------------------
 
@@ -615,6 +652,56 @@ model instance::
                 instance.user = request.user
                 instance.save()
             formset.save_m2m()
+
+Other methods
+~~~~~~~~~~~~~
+
+.. method:: ModelAdmin.add_view(self, request, form_url='', extra_context=None)
+
+Django view for the model instance addition page. See note below.
+
+.. method:: ModelAdmin.change_view(self, request, object_id, extra_context=None)
+
+Django view for the model instance edition page. See note below.
+
+.. method:: ModelAdmin.changelist_view(self, request, extra_context=None)
+
+Django view for the model instances change list/actions page. See note below.
+
+.. method:: ModelAdmin.delete_view(self, request, object_id, extra_context=None)
+
+Django view for the model instance(s) deletion confirmation page. See note below.
+
+.. method:: ModelAdmin.history_view(self, request, object_id, extra_context=None)
+
+Django view for the page that shows the modification history for a given model
+instance.
+
+Unlike the hook-type ``ModelAdmin`` methods detailed in the previous section,
+these five methods are in reality designed to be invoked as Django views from
+the admin application URL dispatching handler to render the pages that deal
+with model instances CRUD operations. As a result, completely overriding these
+methods will significantly change the behavior of the admin application.
+
+One comon reason for overriding these methods is to augment the context data
+that is provided to the template that renders the view. In the following
+example, the change view is overridden so that the rendered template is
+provided some extra mapping data that would not otherwise be available::
+
+    class MyModelAdmin(admin.ModelAdmin):
+
+        # A template for a very customized change view:
+        change_form_template = 'admin/myapp/extras/openstreetmap_change_form.html'
+
+        def get_osm_info(self):
+            # ...
+
+        def change_view(self, request, object_id, extra_context=None):
+            my_context = {
+                'osm_data': self.get_osm_info(),
+            }
+            return super(MyModelAdmin, self).change_view(request, object_id,
+                extra_context=my_context))
 
 ``ModelAdmin`` media definitions
 --------------------------------
@@ -960,7 +1047,7 @@ directory, our link would appear on every model's change form.
 Templates which may be overridden per app or model
 --------------------------------------------------
 
-Not every template in ``contrib\admin\templates\admin`` may be overridden per
+Not every template in ``contrib/admin/templates/admin`` may be overridden per
 app or per model. The following can:
 
     * ``change_form.html``
@@ -983,9 +1070,10 @@ and 500 pages.
 Root and login templates
 ------------------------
 
-If you wish to change the index or login templates, you are better off creating
-your own ``AdminSite`` instance (see below), and changing the ``index_template``
-or ``login_template`` properties.
+If you wish to change the index or login templates, you are better off
+creating your own ``AdminSite`` instance (see below), and changing the
+:attr:`AdminSite.index_template` or :attr:`AdminSite.login_template`
+properties.
 
 ``AdminSite`` objects
 =====================
@@ -1002,6 +1090,20 @@ or add anything you like. Then, simply create an instance of your
 Python class), and register your models and ``ModelAdmin`` subclasses
 with it instead of using the default.
 
+``AdminSite`` attributes
+------------------------
+
+.. attribute:: AdminSite.index_template
+
+Path to a custom template that will be used by the admin site main index view.
+Templates can override or extend base admin templates as described in
+`Overriding Admin Templates`_.
+
+.. attribute:: AdminSite.login_template
+
+Path to a custom template that will be used by the admin site login view.
+Templates can override or extend base admin templates as described in
+`Overriding Admin Templates`_.
 
 Hooking ``AdminSite`` instances into your URLconf
 -------------------------------------------------
