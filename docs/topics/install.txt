@@ -61,13 +61,27 @@ for each platform.
 Get your database running
 =========================
 
-If you plan to use Django's database API functionality, you'll need to
-make sure a database server is running. Django works with PostgreSQL_,
-MySQL_, Oracle_ and SQLite_ (although SQLite doesn't require a separate server
-to be running).
+If you plan to use Django's database API functionality, you'll need to make
+sure a database server is running. Django supports many different database
+servers and is officially supported with PostgreSQL_, MySQL_, Oracle_ and
+SQLite_ (although SQLite doesn't require a separate server to be running).
 
-Additionally, you'll need to make sure your Python database bindings are
-installed.
+In addition to the officially supported databases, there are backends provided
+by 3rd parties that allow you to use other databases with Django:
+
+* `Sybase SQL Anywhere`_
+* `IBM DB2`_
+* `Microsoft SQL Server 2005`_
+* Firebird_
+* ODBC_
+
+The Django versions and ORM features supported by these unofficial backends
+vary considerably. Queries regarding the specific capabilities of these
+unofficial backends, along with any support queries, should be directed to the
+support channels provided by each 3rd party project.
+
+In addition to a database backend, you'll need to make sure your Python
+database bindings are installed.
 
 * If you're using PostgreSQL, you'll need the psycopg_ package. Django supports
   both version 1 and 2. (When you configure Django's database layer, specify
@@ -88,6 +102,9 @@ installed.
   read the database-specific notes for the
   :ref:`Oracle backend <oracle-notes>` for important information
   regarding supported versions of both Oracle and ``cx_Oracle``.
+
+* If you're using an unofficial 3rd party backend, please consult the
+  documentation provided for any additional requirements.
 
 If you plan to use Django's ``manage.py syncdb`` command to
 automatically create database tables for your models, you'll need to
@@ -111,7 +128,11 @@ Django will need permission to create a test database.
 .. _pysqlite: http://pysqlite.org/
 .. _cx_Oracle: http://cx-oracle.sourceforge.net/
 .. _Oracle: http://www.oracle.com/
-
+.. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/
+.. _IBM DB2: http://code.google.com/p/ibm-db/
+.. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
+.. _Firebird: http://code.google.com/p/django-firebird/
+.. _ODBC: http://code.google.com/p/django-pyodbc/
 .. _removing-old-versions-of-django:
 
 Remove any old versions of Django
