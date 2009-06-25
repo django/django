@@ -648,7 +648,7 @@ class UnicodePayloadTests(TestCase):
         json = u'{"dog": "собака"}'
         response = self.client.post("/test_client_regress/parse_unicode_json/", json,
                                     content_type="application/json; charset=utf-16")
-        self.assertEqual(response.content, json.encode('utf-16'))
+        self.assertEqual(response.content, json.encode(settings.DEFAULT_CHARSET))
 
     def test_unicode_payload_non_utf(self):
         "A non-ASCII unicode data as a non-UTF based encoding can be POSTed"
@@ -656,4 +656,4 @@ class UnicodePayloadTests(TestCase):
         json = u'{"dog": "собака"}'
         response = self.client.post("/test_client_regress/parse_unicode_json/", json,
                                     content_type="application/json; charset=koi8-r")
-        self.assertEqual(response.content, json.encode('koi8-r'))
+        self.assertEqual(response.content, json.encode(settings.DEFAULT_CHARSET))

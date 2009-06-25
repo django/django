@@ -79,10 +79,11 @@ def return_json_file(request):
 
     # This just checks that the uploaded data is JSON
     obj_dict = simplejson.loads(request.raw_post_data.decode(charset))
-    obj_json = simplejson.dumps(obj_dict, encoding=charset,
+    obj_json = simplejson.dumps(obj_dict, encoding=settings.DEFAULT_CHARSET,
                                 cls=DjangoJSONEncoder,
                                 ensure_ascii=False)
-    response = HttpResponse(smart_str(obj_json, encoding=charset), status=200,
-                            mimetype='application/json; charset=' + charset)
+
+    response = HttpResponse(smart_str(obj_json), status=200,
+                            mimetype='application/json')
     response['Content-Disposition'] = 'attachment; filename=testfile.json'
     return response
