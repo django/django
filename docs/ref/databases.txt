@@ -251,7 +251,7 @@ Here's a sample configuration which uses a MySQL option file::
     DATABASE_OPTIONS = {
         'read_default_file': '/path/to/my.cnf',
     }
-    
+
     # my.cnf
     [client]
     database = DATABASE_NAME
@@ -445,10 +445,10 @@ If you're getting this error, you can solve it by:
     * Switching to another database backend. At a certain point SQLite becomes
       too "lite" for real-world applications, and these sorts of concurrency
       errors indicate you've reached that point.
-      
-    * Rewriting your code to reduce concurrency and ensure that database 
+
+    * Rewriting your code to reduce concurrency and ensure that database
       transactions are short-lived.
-      
+
     * Increase the default timeout value by setting the ``timeout`` database
       option option::
 
@@ -457,7 +457,7 @@ If you're getting this error, you can solve it by:
              "timeout": 20,
               # ...
           }
-      
+
       This will simply make SQLite wait a bit longer before throwing "database
       is locked" errors; it won't really do anything to solve them.
 
@@ -601,3 +601,28 @@ some limitations on the usage of such LOB columns in general:
     Oracle. A workaround to this is to keep ``TextField`` columns out of any
     models that you foresee performing ``distinct()`` queries on, and to
     include the ``TextField`` in a related model instead.
+
+.. _third-party-notes:
+
+Using a 3rd-party database backend
+==================================
+
+In addition to the officially supported databases, there are backends provided
+by 3rd parties that allow you to use other databases with Django:
+
+* `Sybase SQL Anywhere`_
+* `IBM DB2`_
+* `Microsoft SQL Server 2005`_
+* Firebird_
+* ODBC_
+
+The Django versions and ORM features supported by these unofficial backends
+vary considerably. Queries regarding the specific capabilities of these
+unofficial backends, along with any support queries, should be directed to
+the support channels provided by each 3rd party project.
+
+.. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/
+.. _IBM DB2: http://code.google.com/p/ibm-db/
+.. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
+.. _Firebird: http://code.google.com/p/django-firebird/
+.. _ODBC: http://code.google.com/p/django-pyodbc/

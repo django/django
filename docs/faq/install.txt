@@ -26,7 +26,7 @@ For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
 own lightweight development server. For a production environment, Django
 follows the WSGI_ spec, which means it can run on a variety of server
-platforms.  See :ref:`Deplying Django <howto-deployment-index>` for some
+platforms.  See :ref:`Deploying Django <howto-deployment-index>` for some
 popular alternatives.  Also, the `server arrangements wiki page`_ contains
 details for several deployment strategies.
 

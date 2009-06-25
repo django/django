@@ -195,7 +195,7 @@ DATABASE_NAME
 Default: ``''`` (Empty string)
 
 The name of the database to use. For SQLite, it's the full path to the database
-file. When specifying the path, always use forward slashes, even on Windows  
+file. When specifying the path, always use forward slashes, even on Windows
 (e.g. ``C:/homes/user/mysite/sqlite3.db``).
 
 .. setting:: DATABASE_OPTIONS
@@ -228,7 +228,7 @@ The port to use when connecting to the database. An empty string means the
 default port. Not used with SQLite.
 
 .. setting:: DATABASE_USER
-   
+
 DATABASE_USER
 -------------
 
@@ -251,7 +251,7 @@ See also ``DATETIME_FORMAT``, ``TIME_FORMAT``, ``YEAR_MONTH_FORMAT``
 and ``MONTH_DAY_FORMAT``.
 
 .. setting:: DATETIME_FORMAT
-   
+
 DATETIME_FORMAT
 ---------------
 
@@ -330,7 +330,7 @@ isn't manually specified. Used with ``DEFAULT_CHARSET`` to construct the
 DEFAULT_FILE_STORAGE
 --------------------
 
-Default: ``django.core.files.storage.FileSystemStorage``
+Default: ``'django.core.files.storage.FileSystemStorage'``
 
 Default file storage class to be used for any file-related operations that don't
 specify a particular storage system. See :ref:`topics-files`.
@@ -519,14 +519,14 @@ system's standard umask.
 .. warning::
 
     **Always prefix the mode with a 0.**
-    
+
     If you're not familiar with file modes, please note that the leading
     ``0`` is very important: it indicates an octal number, which is the
     way that modes must be specified. If you try to use ``644``, you'll
     get totally incorrect behavior.
-    
 
-.. _documentation for os.chmod: http://docs.python.org/lib/os-file-dir.html 
+
+.. _documentation for os.chmod: http://docs.python.org/lib/os-file-dir.html
 
 .. setting:: FIXTURE_DIRS
 
@@ -1153,7 +1153,7 @@ running in the correct environment.
     Django cannot reliably use alternate time zones in a Windows environment.
     If you're running Django on Windows, this variable must be set to match the
     system timezone.
-    
+
 .. _See available choices: http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
 
 .. setting:: URL_VALIDATOR_USER_AGENT
