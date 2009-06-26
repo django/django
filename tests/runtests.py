@@ -2,9 +2,10 @@
 
 import os, sys, traceback
 import unittest
+import django
 import django.contrib as contrib
 from django.core.servers import basehttp
-import django
+from time import sleep
 
 try:
     set
@@ -14,7 +15,7 @@ except NameError:
 try:
     import coverage
 except Exception, e:
-    print "coverage module not available"
+    print "coverage.py module not available"
 
 CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'
@@ -37,7 +38,7 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.admin',
 ]
 
-WINDMILL_FIXTURES = [ 'regressiontests/admin_views/fixtures/%s' % fix for fix in ['admin-views-users.xml',
+WINDMILL_FIXTURES = ['regressiontests/admin_views/fixtures/%s' % fix for fix in ['admin-views-users.xml',
     'admin-views-colors.xml',
     'admin-views-fabrics.xml',
     'admin-views-unicode.xml',
@@ -46,7 +47,6 @@ WINDMILL_FIXTURES = [ 'regressiontests/admin_views/fixtures/%s' % fix for fix in
     'string-primary-key.xml',
     'admin-views-person.xml']]
 
-#ALWAYS_INSTALLED_APPS.extend(('%s.%s' % (REGRESSION_TESTS_DIR_NAME,a)  for a in os.listdir(REGRESSION_TEST_DIR) if not('.py' in a or '.svn' in a) ))
 
 def get_test_models():
     models = []
@@ -115,6 +115,7 @@ def django_tests(verbosity, interactive, test_labels):
 
     # Redirect some settings for the duration of these tests.
     settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
+    # Try and include windmill application if specified on command line.
     if do_windmill:
         settings.INSTALLED_APPS.append('windmill')
     settings.ROOT_URLCONF = 'urls'
@@ -139,7 +140,7 @@ def django_tests(verbosity, interactive, test_labels):
     # Load all the ALWAYS_INSTALLED_APPS.
     # (This import statement is intentionally delayed until after we
     # access settings because of the USE_I18N dependency.)
-    from django.db.models.loading import get_apps, load_app, get_app
+    from django.db.models.loading import get_apps, load_app
     get_apps()
 
     # Load all the test model apps.
@@ -180,11 +181,13 @@ def django_tests(verbosity, interactive, test_labels):
     #establish coverage settings for the regression suite
     settings.COVERAGE_MODULE_EXCLUDES = ['modeltests*', 'regressiontests*']
     settings.COVERAGE_CODE_EXCLUDES = ['def __unicode__\(self\):', 'def get_absolute_url\(self\):']
-    #'from .* import .*', 'import .*', ]
+    # depending on how this is run, we might need to tell the coverage libraries to consider django.*
     settings.COVERAGE_ADDITIONAL_MODULES = ['django']
-    # 'from .* import .*', 'import .*',
+
+    # Default number of failures is 0
     failures = 0
-    #Run the appropriate test runner based on parameters.
+
+    #Run the appropriate test runner based on command line params.
     if(do_std):
         if(do_coverage):
             test_runner = get_runner(settings, coverage=True, reports=True)
@@ -196,114 +199,69 @@ def django_tests(verbosity, interactive, test_labels):
         else:
             tr = test_runner()
             failures = tr.run_tests(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
-    #from windmill.authoring import djangotest
-    from time import sleep
+
     #Run windmill tests if --windmill parameter was passed.
     if do_windmill:
-
-        #from django.test import windmill_tests as djangotest
+        # Our bank of windmill-specific imports. Only loaded when used.
         import types
         import logging
+        import threading
         from windmill.conf import global_settings
+        from windmill.authoring import setup_module, teardown_module
         from django.core.management.commands.test_windmill import ServerContainer, attempt_import
         from django.test.windmill_tests import WindmillDjangoUnitTest
         from django.db.models.loading import remove_model
+
+
+        # We don't want to try and parse models that we know are invalid.
         remove_model('invalid_models')
-        #from django.utils.importlib import import_module
-        #from django.contrib import admin
-        # print cache.app_models
-        #      print cache.app_store
-        # m = cache.app_models['invalid_models']
-        #        print m
-        # if do_std:
-        #             #mod = import_module('.models','modeltests.invalid_models')
-        #             try:
-        #                #  print '1'
-        #                #  print mod
-        #                #  print '2'
-        #                #  print cache.app_store
-        #                #  print '3'
-        #                # # print cache.app_models
-        #                #  print '4'
-        #                #  print cache.app_models['invalid_models']
-        #
-        #                 if 'invalid_models' in cache.app_models:
-        #                     del cache.app_models['invalid_models']
-        #                 #del cache.app_store[mod]
-        #             except Exception, e:
-        #                 print e
+
+        # Determine which browser to run the tests in.
+        if 'ie' == wm_browser:
+            global_settings.START_IE = True
+        elif 'safari' == wm_browser:
+            global_settings.START_SAFARI = True
+        elif 'chrome' == wm_browser:
+            global_settings.START_CHROME = True
+        else:
+            global_settings.START_FIREFOX = True
 
 
-
-
-        # print cache.app_models
-        #        print cache.app_store
-        #from django.test import windmill_tests
-        # as testwm_cmd
-        #    windmill_runner = testwm_cmd()
-        #    windmill_runner.handle()
-
-
-        #settings.INSTALLED_APPS = [ia for ia in settings.INSTALLED_APPS if True]
-        # from windmill.authoring.djangotest import WindmillDjangoUnitTest
-        # if 'ie' in labels:
-        #        global_settings.START_IE = True
-        #        sys.argv.remove('ie')
-        #    elif 'safari' in labels:
-        #        global_settings.START_SAFARI = True
-        #        sys.argv.remove('safari')
-        #    elif 'chrome' in labels:
-        #        global_settings.START_CHROME = True
-        #        sys.argv.remove('chrome')
-        #    else:
-        global_settings.START_FIREFOX = True
-            # if 'firefox' in labels:
-            #     sys.argv.remove('firefox')
-
-        # if 'manage.py' in sys.argv:
-        #         sys.argv.remove('manage.py')
-        #     if 'test_windmill' in sys.argv:
-        #         sys.argv.remove('test_windmill')
-        #tempapps = settings.INSTALLED_APPS
-
-        #get_apps()
-        #admin.autodiscover()
-        #settings.INSTALLED_APPS = tempapps
-        # from django.contrib import admin
-        #       admin.autodiscover()
-        import threading
-        #Create the threaded server.
+        # Create the threaded server.
         server_container = ServerContainer()
-        #Set the server's 'fixtures' attribute so they can be loaded in-thread if using sqlite's memory backend.
-        server_container.__setattr__('fixtures', WINDMILL_FIXTURES )
-        #Start the server thread.
+        # Set the server's 'fixtures' attribute so they can be loaded in-thread if using sqlite's memory backend.
+        server_container.__setattr__('fixtures', WINDMILL_FIXTURES)
+        # Start the server thread.
         started = server_container.start_test_server()
-        print 'Waiting for server to get online'
+
+        print 'Waiting for threaded server to come online.'
         started.wait()
-        print 'Database ready'
-        #sleep(5)
+        print 'DB Ready, Server online.'
+
+        # These 2 unit tests can't be used while running our admin. Explicitly remove.
         if 'regressiontests.bug8245' in settings.INSTALLED_APPS:
             settings.INSTALLED_APPS.remove('regressiontests.bug8245')
         if 'django.contrib.gis' in settings.INSTALLED_APPS:
             settings.INSTALLED_APPS.remove('django.contrib.gis')
+
+        # Set the testing URL based on what available port we get.
         global_settings.TEST_URL = 'http://localhost:%d' % server_container.server_thread.port
 
-        #import windmill
-        # windmill.stdout, windmill.stdin = sys.stdout, sys.stdin
-        from windmill.authoring import setup_module, teardown_module
 
-        # from django.conf import settings
+        # Find which of our INSTALLED_APPS have tests.
         tests = []
-        for name in [ app for app in settings.INSTALLED_APPS if not('invalid' in app)]:
+        for name in [app for app in settings.INSTALLED_APPS if not('invalid' in app)]:
             for suffix in ['tests', 'wmtests', 'windmilltests']:
                 x = attempt_import(name, suffix)
-                if x is not None: tests.append((suffix,x,));
+                if x is not None:
+                    tests.append((suffix, x, ))
 
+        # Collect the WindmillDjangoUnitTest from tests.py and any 'wmtests' or 'windmilltests' modules.
         wmtests = []
-        for (ttype, mod,) in tests:
+        for (ttype, mod, ) in tests:
             if ttype == 'tests':
                 for ucls in [getattr(mod, x) for x in dir(mod)
-                             if ( type(getattr(mod, x, None)) in (types.ClassType,
+                             if (type(getattr(mod, x, None)) in (types.ClassType,
                                                                types.TypeType) ) and
                              issubclass(getattr(mod, x), WindmillDjangoUnitTest)
                              ]:
@@ -315,27 +273,27 @@ def django_tests(verbosity, interactive, test_labels):
                 else:
                     wmtests.append(os.path.abspath(mod.__file__))
 
-
+        # Make sure we even need to run tests.
         if len(wmtests) is 0:
             print 'Sorry, no windmill tests found.'
         else:
+            # Setup and run unittests.
             testtotals = {}
             x = logging.getLogger()
             x.setLevel(0)
             from windmill.server.proxy import logger
             from functest import bin
             from functest import runner
-            runner.CLIRunner.final = classmethod(lambda self, totals: testtotals.update(totals) )
+            runner.CLIRunner.final = classmethod(lambda self, totals: testtotals.update(totals))
             import windmill
-            #for t in tests:
             setup_module(tests[0][1])
-            #sys.argv = sys.argv + wmtests
             sys.argv = wmtests
             bin.cli()
             teardown_module(tests[0][1])
             if testtotals['fail'] is not 0:
                 sleep(.5)
                 sys.exit(1)
+    # If there where failures then report them, but give the server thread .5 seconds.
     if failures:
         sleep(.5)
         sys.exit(failures)
@@ -349,9 +307,7 @@ def django_tests(verbosity, interactive, test_labels):
     settings.LOGIN_URL = old_login_url
     settings.MIDDLEWARE_CLASSES = old_middleware_classes
 
-# global do_windmill
-# global do_coverage
-# global do_std
+
 if __name__ == "__main__":
     from optparse import OptionParser
     usage = "%prog [options] [model model model ...]"
@@ -369,6 +325,10 @@ if __name__ == "__main__":
             help='Tells Django to not run the standard regression suite.')
     parser.add_option('--settings',
         help='Python path to settings module, e.g. "myproject.settings". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
+    parser.add_option('--wmbrowser',
+            help='The browser for windmill to run its tests in.',
+            default='firefox', action='store', dest='wmbrowser', type='choice',
+            choices=['firefox', 'chrome', 'safari', 'ie'])
     options, args = parser.parse_args()
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
@@ -378,4 +338,5 @@ if __name__ == "__main__":
     do_windmill = options.windmill
     do_coverage = options.coverage
     do_std = options.standard
+    wm_browser = options.wmbrowser
     django_tests(int(options.verbosity), options.interactive, args)
