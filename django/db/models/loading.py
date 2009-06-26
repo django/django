@@ -10,7 +10,7 @@ import os
 import threading
 
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
-        'load_app', 'app_cache_ready')
+        'load_app', 'app_cache_ready', 'remove_model')
 
 class AppCache(object):
     """
@@ -197,6 +197,19 @@ class AppCache(object):
         finally:
             self.write_lock.release()
 
+    def remove_model(self, model_name):
+        """Removes a model from the cache. Used when loading test-only models."""
+        try:
+            self.write_lock.acquire()
+            if model_name in self.app_models:
+                del self.app_models[model_name]
+        except Exception, e:
+            raise e
+        finally:
+            self.write_lock.release()
+
+
+
 cache = AppCache()
 
 # These methods were always module level, so are kept that way for backwards
@@ -209,3 +222,4 @@ get_model = cache.get_model
 register_models = cache.register_models
 load_app = cache.load_app
 app_cache_ready = cache.app_cache_ready
+remove_model = cache.remove_model

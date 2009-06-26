@@ -2,9 +2,9 @@
 # from django.test import windmill_tests as djangotest
 # #from windmill.authoring import djangotest
 
-#from windmill.conf import global_settings
-#ADMIN_URL =  "%s/test_admin/admin" % global_settings.TEST_URL
-ADMIN_URL = 'http://localhost:8000/test_admin/admin/'
+from windmill.conf import global_settings
+ADMIN_URL =  "%s/test_admin/admin" % global_settings.TEST_URL
+#ADMIN_URL = 'http://localhost:8000/test_admin/admin/'
 
 #
 # class TestProjectWindmillTest(djangotest.WindmillDjangoUnitTest):
@@ -21,6 +21,7 @@ ADMIN_URL = 'http://localhost:8000/test_admin/admin/'
 #     #     pass
 #
 from windmill.authoring import WindmillTestClient
+#from django.test.windmill_tests import calling_func_name
 
 def test_loginAndSetup():
     '''Mostly just a proof of concept to test working order of tests.'''

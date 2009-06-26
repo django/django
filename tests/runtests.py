@@ -183,6 +183,7 @@ def django_tests(verbosity, interactive, test_labels):
     #'from .* import .*', 'import .*', ]
     settings.COVERAGE_ADDITIONAL_MODULES = ['django']
     # 'from .* import .*', 'import .*',
+    failures = 0
     #Run the appropriate test runner based on parameters.
     if(do_std):
         if(do_coverage):
@@ -206,7 +207,8 @@ def django_tests(verbosity, interactive, test_labels):
         from windmill.conf import global_settings
         from django.core.management.commands.test_windmill import ServerContainer, attempt_import
         from django.test.windmill_tests import WindmillDjangoUnitTest
-        #from django.db.models.loading import cache
+        from django.db.models.loading import remove_model
+        remove_model('invalid_models')
         #from django.utils.importlib import import_module
         #from django.contrib import admin
         # print cache.app_models
@@ -325,12 +327,12 @@ def django_tests(verbosity, interactive, test_labels):
             from functest import runner
             runner.CLIRunner.final = classmethod(lambda self, totals: testtotals.update(totals) )
             import windmill
-            for t in tests:
-                setup_module(t[1])
-                #sys.argv = sys.argv + wmtests
-                sys.argv = wmtests
-                bin.cli()
-                teardown_module(t[1])
+            #for t in tests:
+            setup_module(tests[0][1])
+            #sys.argv = sys.argv + wmtests
+            sys.argv = wmtests
+            bin.cli()
+            teardown_module(tests[0][1])
             if testtotals['fail'] is not 0:
                 sleep(.5)
                 sys.exit(1)

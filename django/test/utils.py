@@ -5,6 +5,7 @@ from django.core import mail
 from django.test import signals
 from django.template import Template
 from django.utils.translation import deactivate
+import inspect
 
 class ContextList(list):
     """A wrapper that provides direct key access to context items contained
@@ -100,3 +101,9 @@ def get_runner(settings, coverage = False, reports = False):
     test_module = __import__(test_module_name, {}, {}, test_path[-1])
     test_runner = getattr(test_module, test_path[-1])
     return test_runner
+
+def calling_func_name():
+    """
+    Inspect's on the stack to determine the calling functions name.
+    """
+    return inspect.stack()[1][3]
