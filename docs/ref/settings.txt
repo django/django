@@ -234,6 +234,53 @@ Default: ``''`` (Empty string)
 
 The username to use when connecting to the database. Not used with SQLite.
 
+
+TEST_DATABASE_CHARSET
+~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.0
+
+Default: ``None``
+
+The character set encoding used to create the test database. The value of this
+string is passed directly through to the database, so its format is
+backend-specific.
+
+Supported for the PostgreSQL_ (``postgresql``, ``postgresql_psycopg2``) and
+MySQL_ (``mysql``) backends.
+
+.. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
+.. _MySQL: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
+
+
+TEST_DATABASE_COLLATION
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.0
+
+Default: ``None``
+
+The collation order to use when creating the test database. This value is
+passed directly to the backend, so its format is backend-specific.
+
+Only supported for the ``mysql`` backend (see `section 10.3.2`_ of the MySQL
+manual for details).
+
+.. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
+
+TEST_DATABASE_NAME
+~~~~~~~~~~~~~~~~~~
+
+Default: ``None``
+
+The name of database to use when running the test suite.
+
+If the default value (``None``) is used with the SQLite database engine, the
+tests will use a memory resident database. For all other database engines the
+test database will use the name ``'test_' + DATABASE_NAME``.
+
+See :ref:`topics-testing`.
+
 .. setting:: DATE_FORMAT
 
 DATE_FORMAT
@@ -1045,56 +1092,6 @@ Default: ``''`` (Empty string)
 
 Output, as a string, that the template system should use for invalid (e.g.
 misspelled) variables. See :ref:`invalid-template-variables`..
-
-.. setting:: TEST_DATABASE_CHARSET
-
-TEST_DATABASE_CHARSET
----------------------
-
-.. versionadded:: 1.0
-
-Default: ``None``
-
-The character set encoding used to create the test database. The value of this
-string is passed directly through to the database, so its format is
-backend-specific.
-
-Supported for the PostgreSQL_ (``postgresql``, ``postgresql_psycopg2``) and MySQL_ (``mysql``) backends.
-
-.. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
-.. _MySQL: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
-
-.. setting:: TEST_DATABASE_COLLATION
-
-TEST_DATABASE_COLLATION
-------------------------
-
-.. versionadded:: 1.0
-
-Default: ``None``
-
-The collation order to use when creating the test database. This value is
-passed directly to the backend, so its format is backend-specific.
-
-Only supported for the ``mysql`` backend (see `section 10.3.2`_ of the MySQL
-manual for details).
-
-.. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
-
-.. setting:: TEST_DATABASE_NAME
-
-TEST_DATABASE_NAME
-------------------
-
-Default: ``None``
-
-The name of database to use when running the test suite.
-
-If the default value (``None``) is used with the SQLite database engine, the
-tests will use a memory resident database. For all other database engines the
-test database will use the name ``'test_' + settings.DATABASE_NAME``.
-
-See :ref:`topics-testing`.
 
 .. setting:: TEST_RUNNER
 

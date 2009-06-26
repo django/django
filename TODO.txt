@@ -5,15 +5,7 @@ The follow is a list, more or less in the order I intend to do them of things
 that need to be done.  I'm trying to be as granular as possible.
 
 
-1)  Update all old references to ``settings.DATABASE_*`` to reference
-    ``settings.DATABASES``.  This includes the following locations
-
-    * ref/settings -- needs to be upddated for TEST_*
-
-    The remaining items will be fixed as the code for them enters the code base.
-
-    Replace old instances of :setting:`DATABASE_` with a new tag or something.
-
+1)  Replace old instances of :setting:`DATABASE_` with a new tag or something.
 
 2)  Update all management commands in the following way:
 
