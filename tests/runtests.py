@@ -2,16 +2,19 @@
 
 import os, sys, traceback
 import unittest
-import coverage
 import django.contrib as contrib
 from django.core.servers import basehttp
-
 import django
+
 try:
     set
 except NameError:
     from sets import Set as set     # For Python 2.3
 
+try:
+    import coverage
+except Exception, e:
+    print "coverage module not available"
 
 CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'
@@ -34,6 +37,14 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.admin',
 ]
 
+WINDMILL_FIXTURES = [ 'regressiontests/admin_views/fixtures/%s' % fix for fix in ['admin-views-users.xml',
+    'admin-views-colors.xml',
+    'admin-views-fabrics.xml',
+    'admin-views-unicode.xml',
+    'multiple-child-classes',
+    'admin-views-actions.xml',
+    'string-primary-key.xml',
+    'admin-views-person.xml']]
 
 #ALWAYS_INSTALLED_APPS.extend(('%s.%s' % (REGRESSION_TESTS_DIR_NAME,a)  for a in os.listdir(REGRESSION_TEST_DIR) if not('.py' in a or '.svn' in a) ))
 
@@ -116,6 +127,9 @@ def django_tests(verbosity, interactive, test_labels):
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.middleware.common.CommonMiddleware',
+        #Add the following 2 middleware so we can test them in Windmill.
+        'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+        'django.contrib.redirects.middleware.RedirectFallbackMiddleware',
     )
     settings.SITE_ID = 1
     # For testing comment-utils, we require the MANAGERS attribute
@@ -127,7 +141,6 @@ def django_tests(verbosity, interactive, test_labels):
     # (This import statement is intentionally delayed until after we
     # access settings because of the USE_I18N dependency.)
     from django.db.models.loading import get_apps, load_app
-    #print settings.INSTALLED_APPS
     get_apps()
 
     # Load all the test model apps.
@@ -165,16 +178,19 @@ def django_tests(verbosity, interactive, test_labels):
     from django.test.utils import get_runner
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.simple.run_tests'
+    #establish coverage settings for the regression suite
     settings.COVERAGE_MODULE_EXCLUDES = ['modeltests*', 'regressiontests*']
     settings.COVERAGE_CODE_EXCLUDES = ['def __unicode__\(self\):', 'def get_absolute_url\(self\):']
     #'from .* import .*', 'import .*', ]
     settings.COVERAGE_ADDITIONAL_MODULES = ['django']
     # 'from .* import .*', 'import .*',
+    #Run the appropriate test runner based on parameters.
     if(do_std):
         if(do_coverage):
             test_runner = get_runner(settings, coverage=True, reports=True)
         else:
             test_runner = get_runner(settings, coverage=False, reports=False)
+        #Check if this is an old-style testrunner, and behave accordingly.
         if(type(test_runner) == 'function'):
             failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
         else:
@@ -182,7 +198,7 @@ def django_tests(verbosity, interactive, test_labels):
             failures = tr.run_tests(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
     #from windmill.authoring import djangotest
     from time import sleep
-
+    #Run windmill tests if --windmill parameter was passed.
     if do_windmill:
 
         #from django.test import windmill_tests as djangotest
@@ -198,14 +214,24 @@ def django_tests(verbosity, interactive, test_labels):
         #      print cache.app_store
         # m = cache.app_models['invalid_models']
         #        print m
-        if(do_std):
+        if do_std:
             mod = import_module('.models','modeltests.invalid_models')
             try:
+               #  print '1'
+               #  print mod
+               #  print '2'
+               #  print cache.app_store
+               #  print '3'
+               # # print cache.app_models
+               #  print '4'
+               #  print cache.app_models['invalid_models']
+
+                if 'invalid_models' in cache.app_models:
+                    del cache.app_models['invalid_models']
                 del cache.app_store[mod]
-                del cache.app_models['invalid_models']
             except Exception, e:
                 print e
-                pass
+
 
 
 
@@ -237,9 +263,16 @@ def django_tests(verbosity, interactive, test_labels):
         #         sys.argv.remove('manage.py')
         #     if 'test_windmill' in sys.argv:
         #         sys.argv.remove('test_windmill')
+
+        #Load the admin interface
+        from django.contrib import admin
+        admin.autodiscover()
+
+        #Create the threaded server.
         server_container = ServerContainer()
-        server_container.__setattr__('fixtures',[ 'regressiontests/admin_views/fixtures/%s'%fix for fix in ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml', 'admin-views-unicode.xml',
-                'multiple-child-classes', 'admin-views-actions.xml', 'string-primary-key.xml', 'admin-views-person.xml']])
+        #Set the server's 'fixtures' attribute so they can be loaded in-thread if using sqlite's memory backend.
+        server_container.__setattr__('fixtures', WINDMILL_FIXTURES )
+        #Start the server thread.
         server_container.start_test_server()
 
         global_settings.TEST_URL = 'http://localhost:%d' % server_container.server_thread.port

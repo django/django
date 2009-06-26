@@ -68,9 +68,10 @@ class TestServerThread(threading.Thread):
         # Must do database stuff in this new thread if database in memory.
         from django.conf import settings
         if settings.DATABASE_ENGINE == 'sqlite3' \
-            and (not settings.TEST_DATABASE_NAME or settings.TEST_DATABASE_NAME == ':memory:'):
+                          and (not settings.TEST_DATABASE_NAME or settings.TEST_DATABASE_NAME == ':memory:'):
             from django.db import connection
             db_name = connection.creation.create_test_db(0)
+            #call_command('syncdb', 0, 0)
             # Import the fixture data into the test database.
             if hasattr(self, 'fixtures'):
                 # We have to use this slightly awkward syntax due to the fact
@@ -107,18 +108,22 @@ def stop_test_server(self):
 
 TestCase.start_test_server = classmethod(start_test_server)
 TestCase.stop_test_server = classmethod(stop_test_server)
+try:
+    from windmill.authoring import unit
+    class WindmillDjangoUnitTest(TestCase, unit.WindmillUnitTestCase):
+        test_port = 8000
+        def setUp(self):
+            self.start_test_server('localhost', self.test_port)
+            self.test_url = 'http://localhost:%d' % self.server_thread.port
+            unit.WindmillUnitTestCase.setUp(self)
 
-from windmill.authoring import unit
+        def tearDown(self):
+            unit.WindmillUnitTestCase.tearDown(self)
+            self.stop_test_server()
 
-class WindmillDjangoUnitTest(TestCase, unit.WindmillUnitTestCase):
-    test_port = 8000
-    def setUp(self):
-        self.start_test_server('localhost', self.test_port)
-        self.test_url = 'http://localhost:%d' % self.server_thread.port
-        unit.WindmillUnitTestCase.setUp(self)
+    WindmillDjangoTransactionUnitTest = WindmillDjangoUnitTest
 
-    def tearDown(self):
-        unit.WindmillUnitTestCase.tearDown(self)
-        self.stop_test_server()
+except Exception, e:
+    print "You don't appear to have windmill installed, please install before trying to run windmill tests again."
 
-WindmillDjangoTransactionUnitTest = WindmillDjangoUnitTest
+

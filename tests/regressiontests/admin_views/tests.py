@@ -1423,7 +1423,7 @@ class AdminInlineTests(TestCase):
 import os
 from django.test import windmill_tests as djangotest
 #from windmill.authoring import djangotest
-from windmill.conf import global_settings
+#from windmill.conf import global_settings
 
 # class TestProjectWindmillTest(djangotest.WindmillDjangoUnitTest):
 #     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml', 'admin-views-unicode.xml',
