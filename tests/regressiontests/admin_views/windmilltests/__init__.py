@@ -1,8 +1,11 @@
 # import os
 # from django.test import windmill_tests as djangotest
 # #from windmill.authoring import djangotest
-from windmill.conf import global_settings
-ADMIN_URL =  "%s/test_admin/admin" % global_settings.TEST_URL
+
+#from windmill.conf import global_settings
+#ADMIN_URL =  "%s/test_admin/admin" % global_settings.TEST_URL
+ADMIN_URL = 'http://localhost:8000/test_admin/admin/'
+
 #
 # class TestProjectWindmillTest(djangotest.WindmillDjangoUnitTest):
 #     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml', 'admin-views-unicode.xml',
@@ -377,7 +380,7 @@ def test_AdminAuthContrib():
     client.waits.forElement(link=u'Users', timeout=u'8000')
     client.click(link=u'Users')
     client.waits.forPageLoad(timeout=u'20000')
-    print client.commands.getPageText()
+    #print client.commands.getPageText()
     client.asserts.assertNode(link=u'adduser')
     client.asserts.assertNode(link=u'changeuser')
     client.asserts.assertNode(link=u'deleteuser')
@@ -423,10 +426,10 @@ def test_contribFlatSitesRedirect():
 
     client.open(url=ADMIN_URL)
     client.waits.forPageLoad(timeout=u'20000')
-    print client.commands.getPageText()
-    client.click(xpath=u"//div[@id='content-main']/div[5]/table/tbody/tr[1]/td/a")
+    #print client.commands.getPageText()
+    client.click(xpath=u"//div[@id='content-main']/div[table/caption/a/text()='Flatpages']/table/tbody/tr[1]/td/a")
     client.waits.forPageLoad(timeout=u'20000')
-    print client.commands.getPageText()
+    #print client.commands.getPageText()
     client.click(id=u'id_url')
     client.type(text=u'/testflat/test/', id=u'id_url')
     client.type(text=u'Test Flat', id=u'id_title')
@@ -466,7 +469,7 @@ def test_contribFlatSitesRedirect():
     client.waits.forPageLoad(timeout=u'20000')
     client.click(link=u'Home')
     client.waits.forPageLoad(timeout=u'20000')
-    client.click(xpath=u"//div[@id='content-main']/div[6]/table/tbody/tr[1]/th/a")
+    client.click(xpath=u"//div[@id='content-main']/div[table/caption/a/text()='Redirects']/table/tbody/tr[1]/th/a")
     client.waits.forPageLoad(timeout=u'20000')
     client.click(link=u'              Add redirect             ')
     client.waits.forPageLoad(timeout=u'20000')
@@ -489,6 +492,6 @@ def test_contribFlatSitesRedirect():
     client.waits.forPageLoad(timeout=u'20000')
     client.open(url=u'http://localhost:8000/events/test')
     client.waits.forPageLoad(timeout=u'8000')
-    client.asserts.assertText(xpath=u'/html/body', validator=u'This is some unique test content. ')
+    client.asserts.assertText(xpath=u'/html/body', validator=u'\nThis is some unique test content.\n')
     client.open(url=u'http://localhost:8000/test_admin/admin/')
     client.waits.forPageLoad(timeout=u'8000')

@@ -1421,7 +1421,7 @@ class AdminInlineTests(TestCase):
         self.failUnlessEqual(FancyDoodad.objects.all()[0].name, "Fancy Doodad 1 Updated")
 
 import os
-from django.test import windmill_tests as djangotest
+#from django.test import windmill_tests as djangotest
 #from windmill.authoring import djangotest
 #from windmill.conf import global_settings
 

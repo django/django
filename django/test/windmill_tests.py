@@ -16,6 +16,11 @@ try:
 except ImportError:
     from django.test.testcases import TestCase
 
+try:
+    from windmill.authoring import unit
+except Exception, e:
+    print "You don't appear to have windmill installed, please install before trying to run windmill tests again."
+    unit = None
 class StoppableWSGIServer(basehttp.WSGIServer):
     """WSGIServer with short timeout, so that server thread can stop this server."""
 
@@ -46,7 +51,24 @@ class TestServerThread(threading.Thread):
 
     def run(self):
         """Sets up test server and database and loops over handling http requests."""
+
+        # Must do database stuff in this new thread if database in memory.
+        from django.conf import settings
+        if settings.DATABASE_ENGINE == 'sqlite3' \
+            and (not settings.TEST_DATABASE_NAME or settings.TEST_DATABASE_NAME == ':memory:'):
+            from django.db import connection
+            print 'Creating test DB'
+            db_name = connection.creation.create_test_db(0)
+            #call_command('syncdb', 0, 0)
+            # Import the fixture data into the test database.
+            if hasattr(self, 'fixtures'):
+                print 'Loading fixtures.'
+                # We have to use this slightly awkward syntax due to the fact
+                # that we're using *args and **kwargs together.
+                call_command('loaddata', *self.fixtures, **{'verbosity': 0})
+
         try:
+            print "running thread"
             handler = basehttp.AdminMediaHandler(WSGIHandler())
             httpd = None
             while httpd is None:
@@ -55,6 +77,7 @@ class TestServerThread(threading.Thread):
                     httpd = StoppableWSGIServer(server_address, basehttp.WSGIRequestHandler)
                 except basehttp.WSGIServerException, e:
                     if "Address already in use" in str(e):
+                        print "Address already in use"
                         self.port +=1
                     else:
                         raise e
@@ -65,18 +88,6 @@ class TestServerThread(threading.Thread):
             self.started.set()
             return
 
-        # Must do database stuff in this new thread if database in memory.
-        from django.conf import settings
-        if settings.DATABASE_ENGINE == 'sqlite3' \
-                          and (not settings.TEST_DATABASE_NAME or settings.TEST_DATABASE_NAME == ':memory:'):
-            from django.db import connection
-            db_name = connection.creation.create_test_db(0)
-            #call_command('syncdb', 0, 0)
-            # Import the fixture data into the test database.
-            if hasattr(self, 'fixtures'):
-                # We have to use this slightly awkward syntax due to the fact
-                # that we're using *args and **kwargs together.
-                call_command('loaddata', *self.fixtures, **{'verbosity': 0})
 
         # Loop until we get a stop event.
         while not self._stopevent.isSet():
@@ -99,6 +110,7 @@ def start_test_server(self, address='localhost', port=8000):
     self.server_thread.started.wait()
     if self.server_thread.error:
         raise self.server_thread.error
+    return self.server_thread.started
 
 def stop_test_server(self):
     if self.server_thread:
@@ -108,22 +120,17 @@ def stop_test_server(self):
 
 TestCase.start_test_server = classmethod(start_test_server)
 TestCase.stop_test_server = classmethod(stop_test_server)
-try:
-    from windmill.authoring import unit
-    class WindmillDjangoUnitTest(TestCase, unit.WindmillUnitTestCase):
-        test_port = 8000
-        def setUp(self):
-            self.start_test_server('localhost', self.test_port)
-            self.test_url = 'http://localhost:%d' % self.server_thread.port
-            unit.WindmillUnitTestCase.setUp(self)
-
-        def tearDown(self):
-            unit.WindmillUnitTestCase.tearDown(self)
-            self.stop_test_server()
-
-    WindmillDjangoTransactionUnitTest = WindmillDjangoUnitTest
-
-except Exception, e:
-    print "You don't appear to have windmill installed, please install before trying to run windmill tests again."
 
 
+class WindmillDjangoUnitTest(TestCase, unit.WindmillUnitTestCase):
+    test_port = 8000
+    def setUp(self):
+        self.start_test_server('localhost', self.test_port)
+        self.test_url = 'http://localhost:%d' % self.server_thread.port
+        unit.WindmillUnitTestCase.setUp(self)
+
+    def tearDown(self):
+        unit.WindmillUnitTestCase.tearDown(self)
+        self.stop_test_server()
+
+WindmillDjangoTransactionUnitTest = WindmillDjangoUnitTest

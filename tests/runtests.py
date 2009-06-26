@@ -104,7 +104,6 @@ class InvalidModelTestCase(unittest.TestCase):
 def django_tests(verbosity, interactive, test_labels):
     from django.conf import settings
 
-
     old_installed_apps = settings.INSTALLED_APPS
     old_test_database_name = settings.TEST_DATABASE_NAME
     old_root_urlconf = getattr(settings, "ROOT_URLCONF", "")
@@ -140,7 +139,7 @@ def django_tests(verbosity, interactive, test_labels):
     # Load all the ALWAYS_INSTALLED_APPS.
     # (This import statement is intentionally delayed until after we
     # access settings because of the USE_I18N dependency.)
-    from django.db.models.loading import get_apps, load_app
+    from django.db.models.loading import get_apps, load_app, get_app
     get_apps()
 
     # Load all the test model apps.
@@ -207,30 +206,30 @@ def django_tests(verbosity, interactive, test_labels):
         from windmill.conf import global_settings
         from django.core.management.commands.test_windmill import ServerContainer, attempt_import
         from django.test.windmill_tests import WindmillDjangoUnitTest
-        from django.db.models.loading import cache
-        from django.utils.importlib import import_module
-
+        #from django.db.models.loading import cache
+        #from django.utils.importlib import import_module
+        #from django.contrib import admin
         # print cache.app_models
         #      print cache.app_store
         # m = cache.app_models['invalid_models']
         #        print m
-        if do_std:
-            mod = import_module('.models','modeltests.invalid_models')
-            try:
-               #  print '1'
-               #  print mod
-               #  print '2'
-               #  print cache.app_store
-               #  print '3'
-               # # print cache.app_models
-               #  print '4'
-               #  print cache.app_models['invalid_models']
-
-                if 'invalid_models' in cache.app_models:
-                    del cache.app_models['invalid_models']
-                del cache.app_store[mod]
-            except Exception, e:
-                print e
+        # if do_std:
+        #             #mod = import_module('.models','modeltests.invalid_models')
+        #             try:
+        #                #  print '1'
+        #                #  print mod
+        #                #  print '2'
+        #                #  print cache.app_store
+        #                #  print '3'
+        #                # # print cache.app_models
+        #                #  print '4'
+        #                #  print cache.app_models['invalid_models']
+        #
+        #                 if 'invalid_models' in cache.app_models:
+        #                     del cache.app_models['invalid_models']
+        #                 #del cache.app_store[mod]
+        #             except Exception, e:
+        #                 print e
 
 
 
@@ -263,21 +262,31 @@ def django_tests(verbosity, interactive, test_labels):
         #         sys.argv.remove('manage.py')
         #     if 'test_windmill' in sys.argv:
         #         sys.argv.remove('test_windmill')
+        #tempapps = settings.INSTALLED_APPS
 
-        #Load the admin interface
-        from django.contrib import admin
-        admin.autodiscover()
-
+        #get_apps()
+        #admin.autodiscover()
+        #settings.INSTALLED_APPS = tempapps
+        # from django.contrib import admin
+        #       admin.autodiscover()
+        import threading
         #Create the threaded server.
         server_container = ServerContainer()
         #Set the server's 'fixtures' attribute so they can be loaded in-thread if using sqlite's memory backend.
         server_container.__setattr__('fixtures', WINDMILL_FIXTURES )
         #Start the server thread.
-        server_container.start_test_server()
-
+        started = server_container.start_test_server()
+        print 'Waiting for server to get online'
+        started.wait()
+        print 'Database ready'
+        #sleep(5)
+        if 'regressiontests.bug8245' in settings.INSTALLED_APPS:
+            settings.INSTALLED_APPS.remove('regressiontests.bug8245')
+        if 'django.contrib.gis' in settings.INSTALLED_APPS:
+            settings.INSTALLED_APPS.remove('django.contrib.gis')
         global_settings.TEST_URL = 'http://localhost:%d' % server_container.server_thread.port
 
-        import windmill
+        #import windmill
         # windmill.stdout, windmill.stdin = sys.stdout, sys.stdin
         from windmill.authoring import setup_module, teardown_module
 
@@ -316,11 +325,12 @@ def django_tests(verbosity, interactive, test_labels):
             from functest import runner
             runner.CLIRunner.final = classmethod(lambda self, totals: testtotals.update(totals) )
             import windmill
-            setup_module(tests[0][1])
-            #sys.argv = sys.argv + wmtests
-            sys.argv = wmtests
-            bin.cli()
-            teardown_module(tests[0][1])
+            for t in tests:
+                setup_module(t[1])
+                #sys.argv = sys.argv + wmtests
+                sys.argv = wmtests
+                bin.cli()
+                teardown_module(t[1])
             if testtotals['fail'] is not 0:
                 sleep(.5)
                 sys.exit(1)
