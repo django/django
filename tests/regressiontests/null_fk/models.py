@@ -22,6 +22,9 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, null=True)
     comment_text = models.CharField(max_length=250)
 
+    class Meta:
+        ordering = ('comment_text',)
+
     def __unicode__(self):
         return self.comment_text
 
