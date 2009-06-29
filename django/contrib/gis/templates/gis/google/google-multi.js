@@ -1,4 +1,4 @@
-{% extends "gis/google/google-base.js" %}
+{% extends "gis/google/google-map.js" %}
 {% block functions %}
 {{ load_map_js }}
 {{ js_module }}.load = function(){
