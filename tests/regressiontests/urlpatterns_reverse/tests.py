@@ -2,7 +2,9 @@
 Unit tests for reverse URL lookups.
 """
 
-from django.core.urlresolvers import reverse, NoReverseMatch
+import unittest
+
+from django.core.urlresolvers import reverse, resolve, NoReverseMatch, Resolver404
 from django.test import TestCase
 
 test_data = (
@@ -96,3 +98,17 @@ class URLPatternReverse(TestCase):
             else:
                 self.assertEquals(got, expected)
 
+class ResolverTests(unittest.TestCase):
+    def test_non_regex(self):
+        """
+        Verifies that we raise a Resolver404 if what we are resolving doesn't
+        meet the basic requirements of a path to match - i.e., at the very
+        least, it matches the root pattern '^/'. We must never return None
+        from resolve, or we will get a TypeError further down the line.
+
+        Regression for #10834.
+        """
+        self.assertRaises(Resolver404, resolve, '')
+        self.assertRaises(Resolver404, resolve, 'a')
+        self.assertRaises(Resolver404, resolve, '\\')
+        self.assertRaises(Resolver404, resolve, '.')
