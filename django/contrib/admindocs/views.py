@@ -214,6 +214,22 @@ def model_detail(request, app_label, model_name):
             'help_text': field.help_text,
         })
 
+    # Gather many-to-many fields.
+    for field in opts.many_to_many:
+        data_type = related_object_name = field.rel.to.__name__
+        app_label = field.rel.to._meta.app_label
+        verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': app_label, 'object_name': data_type}
+        fields.append({
+            'name': "%s.all" % field.name,
+            "data_type": 'List',
+            'verbose': utils.parse_rst(_("all %s") % verbose , 'model', _('model:') + opts.module_name),
+        })
+        fields.append({
+            'name'      : "%s.count" % field.name,
+            'data_type' : 'Integer',
+            'verbose'   : utils.parse_rst(_("number of %s") % verbose , 'model', _('model:') + opts.module_name),
+        })
+
     # Gather model methods.
     for func_name, func in model.__dict__.items():
         if (inspect.isfunction(func) and len(inspect.getargspec(func)[0]) == 1):
@@ -233,7 +249,7 @@ def model_detail(request, app_label, model_name):
             })
 
     # Gather related objects
-    for rel in opts.get_all_related_objects():
+    for rel in opts.get_all_related_objects() + opts.get_all_related_many_to_many_objects():
         verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': rel.opts.app_label, 'object_name': rel.opts.object_name}
         accessor = rel.get_accessor_name()
         fields.append({
