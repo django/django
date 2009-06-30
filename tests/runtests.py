@@ -38,14 +38,14 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.admin',
 ]
 
-WINDMILL_FIXTURES = ['regressiontests/admin_views/fixtures/%s' % fix for fix in ['admin-views-users.xml',
-    'admin-views-colors.xml',
-    'admin-views-fabrics.xml',
-    'admin-views-unicode.xml',
-    'multiple-child-classes',
-    'admin-views-actions.xml',
-    'string-primary-key.xml',
-    'admin-views-person.xml']]
+# WINDMILL_FIXTURES = ['regressiontests/admin_views/fixtures/%s' % fix for fix in ['admin-views-users.xml',
+#     'admin-views-colors.xml',
+#     'admin-views-fabrics.xml',
+#     'admin-views-unicode.xml',
+#     'multiple-child-classes',
+#     'admin-views-actions.xml',
+#     'string-primary-key.xml',
+#     'admin-views-person.xml']]
 
 
 def get_test_models():
@@ -179,7 +179,7 @@ def django_tests(verbosity, interactive, test_labels):
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.simple.run_tests'
     #establish coverage settings for the regression suite
-    settings.COVERAGE_MODULE_EXCLUDES = ['modeltests*', 'regressiontests*']
+    settings.COVERAGE_MODULE_EXCLUDES = ['modeltests*', 'regressiontests*', 'from .* import .*', 'import .*',]
     settings.COVERAGE_CODE_EXCLUDES = ['def __unicode__\(self\):', 'def get_absolute_url\(self\):']
     # depending on how this is run, we might need to tell the coverage libraries to consider django.*
     settings.COVERAGE_ADDITIONAL_MODULES = ['django']
@@ -226,37 +226,18 @@ def django_tests(verbosity, interactive, test_labels):
         else:
             global_settings.START_FIREFOX = True
 
-
-        # Create the threaded server.
-        server_container = ServerContainer()
-        # Set the server's 'fixtures' attribute so they can be loaded in-thread if using sqlite's memory backend.
-        server_container.__setattr__('fixtures', WINDMILL_FIXTURES)
-        # Start the server thread.
-        started = server_container.start_test_server()
-
-        print 'Waiting for threaded server to come online.'
-        started.wait()
-        print 'DB Ready, Server online.'
-
-        # These 2 unit tests can't be used while running our admin. Explicitly remove.
-        if 'regressiontests.bug8245' in settings.INSTALLED_APPS:
-            settings.INSTALLED_APPS.remove('regressiontests.bug8245')
-        if 'django.contrib.gis' in settings.INSTALLED_APPS:
-            settings.INSTALLED_APPS.remove('django.contrib.gis')
-
-        # Set the testing URL based on what available port we get.
-        global_settings.TEST_URL = 'http://localhost:%d' % server_container.server_thread.port
-
-
+            #
         # Find which of our INSTALLED_APPS have tests.
         tests = []
         for name in [app for app in settings.INSTALLED_APPS if not('invalid' in app)]:
             for suffix in ['tests', 'wmtests', 'windmilltests']:
                 x = attempt_import(name, suffix)
                 if x is not None:
+                    print "Adding %s %s to tests" % (suffix, x, )
                     tests.append((suffix, x, ))
 
         # Collect the WindmillDjangoUnitTest from tests.py and any 'wmtests' or 'windmilltests' modules.
+        wmfixs = []
         wmtests = []
         for (ttype, mod, ) in tests:
             if ttype == 'tests':
@@ -272,6 +253,33 @@ def django_tests(verbosity, interactive, test_labels):
                     wmtests.append(os.path.join(*os.path.split(os.path.abspath(mod.__file__))[:-1]))
                 else:
                     wmtests.append(os.path.abspath(mod.__file__))
+            # Look for any attribute named fixtures and try to load it.
+            if hasattr(mod, 'fixtures'):
+                for fixture in getattr(mod, 'fixtures'):
+                    wmfixs.append(fixture)
+
+        # Create the threaded server.
+        server_container = ServerContainer()
+        # Set the server's 'fixtures' attribute so they can be loaded in-thread if using sqlite's memory backend.
+        server_container.__setattr__('fixtures', wmfixs)
+        # Start the server thread.
+        started = server_container.start_test_server()
+                # These 2 unit tests can't be used while running our admin. Explicitly remove.
+        if 'regressiontests.bug8245' in settings.INSTALLED_APPS:
+            settings.INSTALLED_APPS.remove('regressiontests.bug8245')
+        if 'django.contrib.gis' in settings.INSTALLED_APPS:
+            settings.INSTALLED_APPS.remove('django.contrib.gis')
+
+        print 'Waiting for threaded server to come online.'
+        started.wait()
+        print 'DB Ready, Server online.'
+
+
+
+        # Set the testing URL based on what available port we get.
+        global_settings.TEST_URL = 'http://localhost:%d' % server_container.server_thread.port
+
+
 
         # Make sure we even need to run tests.
         if len(wmtests) is 0:
@@ -280,16 +288,51 @@ def django_tests(verbosity, interactive, test_labels):
             # Setup and run unittests.
             testtotals = {}
             x = logging.getLogger()
-            x.setLevel(0)
+            x.setLevel(logging.DEBUG)
             from windmill.server.proxy import logger
-            from functest import bin
-            from functest import runner
-            runner.CLIRunner.final = classmethod(lambda self, totals: testtotals.update(totals))
-            import windmill
+            #from functest import bin
+            #from functest import runner
+            #runner.CLIRunner.final = classmethod(lambda self, totals: testtotals.update(totals))
+            #import windmill
+            #count = 0
+            #print wmtests
+            #for wmt in wmtests:
+                #print wmt
+                #print tests[count][1]
+                #count = count + 1
+            #count = 0
+            bin = None
+            runner = None
             setup_module(tests[0][1])
-            sys.argv = wmtests
-            bin.cli()
+            for wmt in wmtests:
+                print sys.argv
+                sys.argv = [wmt,]
+                print sys.argv
+                for k in (k for k in sys.modules.keys() if k.startswith('functest')):
+                    del(sys.modules[k])
+                #dbin)
+                #del(runner)
+                import functest
+                from functest import bin
+                from functest import runner
+                runner.CLIRunner.final = classmethod(lambda self, totals: testtotals.update(totals) )
+                bin.cli()
+                bin = None
+                runner = None
+                print sys.argv
+                # import functest
+                #                 functest.modules_passed = []
+                #                 functest.modules_failed = []
+                #                 from functest import frame
+                #                 frame.totals = {'pass':0, 'fail':0, 'skip':0}
+                #teardown_module(tests[count][1])
+                #sleep(.5)
+                #count = count + 1
+                #setup_module(tests[count][1])
             teardown_module(tests[0][1])
+            # sys.argv = [wmtests[0],]
+            #             bin.cli()
+            
             if testtotals['fail'] is not 0:
                 sleep(.5)
                 sys.exit(1)
@@ -340,3 +383,4 @@ if __name__ == "__main__":
     do_std = options.standard
     wm_browser = options.wmbrowser
     django_tests(int(options.verbosity), options.interactive, args)
+

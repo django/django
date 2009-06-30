@@ -25,6 +25,7 @@ you quickly accomplish common tasks.
    outputting-csv
    outputting-pdf
    static-files
+   windmill-tests
 
 .. seealso::
 

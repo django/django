@@ -5,25 +5,26 @@ import sys, os
 from time import sleep
 import types
 import logging
+import threading
 
 class ServerContainer(object):
     start_test_server = djangotest.start_test_server
     stop_test_server = djangotest.stop_test_server
 
 def attempt_import(name, suffix):
-        try:
-            mod = __import__(name+'.'+suffix)
-        except ImportError:
-            mod = None
-        if mod is not None:
-            s = name.split('.')
-            mod = __import__(s.pop(0))
-            for x in s+[suffix]:
-                try:
-                    mod = getattr(mod, x)
-                except Exception, e:
-                    pass
-        return mod
+    try:
+        mod = __import__(name+'.'+suffix)
+    except ImportError:
+        mod = None
+    if mod is not None:
+        s = name.split('.')
+        mod = __import__(s.pop(0))
+        for x in s+[suffix]:
+            try:
+                mod = getattr(mod, x)
+            except Exception, e:
+                pass
+    return mod
 
 class Command(BaseCommand):
 
@@ -54,14 +55,6 @@ class Command(BaseCommand):
             sys.argv.remove('manage.py')
         if 'test_windmill' in sys.argv:
             sys.argv.remove('test_windmill')
-        server_container = ServerContainer()
-        server_container.start_test_server()
-
-        global_settings.TEST_URL = 'http://localhost:%d' % server_container.server_thread.port
-
-        # import windmill
-        # windmill.stdout, windmill.stdin = sys.stdout, sys.stdin
-        from windmill.authoring import setup_module, teardown_module
 
         from django.conf import settings
         tests = []
@@ -69,7 +62,7 @@ class Command(BaseCommand):
             for suffix in ['tests', 'wmtests', 'windmilltests']:
                 x = attempt_import(name, suffix)
                 if x is not None: tests.append((suffix,x,));
-
+                wmfixs = []
         wmtests = []
         for (ttype, mod,) in tests:
             if ttype == 'tests':
@@ -85,6 +78,28 @@ class Command(BaseCommand):
                     wmtests.append(os.path.join(*os.path.split(os.path.abspath(mod.__file__))[:-1]))
                 else:
                     wmtests.append(os.path.abspath(mod.__file__))
+			# Look for any attribute named fixtures and try to load it.
+            if hasattr(mod, 'fixtures'):
+                for fixture in getattr(mod, 'fixtures'):
+                    wmfixs.append(fixture)
+
+        # Create the threaded server.
+        server_container = ServerContainer()
+        # Set the server's 'fixtures' attribute so they can be loaded in-thread if using sqlite's memory backend.
+        server_container.__setattr__('fixtures', wmfixs)
+        # Start the server thread.
+        started = server_container.start_test_server()
+
+        print 'Waiting for threaded server to come online.'
+        started.wait()
+        print 'DB Ready, Server online.'
+
+        global_settings.TEST_URL = 'http://localhost:%d' % server_container.server_thread.port
+
+        # import windmill
+        # windmill.stdout, windmill.stdin = sys.stdout, sys.stdin
+        from windmill.authoring import setup_module, teardown_module
+
 
         if len(wmtests) is 0:
             print 'Sorry, no windmill tests found.'

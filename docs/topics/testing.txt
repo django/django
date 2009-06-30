@@ -400,7 +400,7 @@ Some of the things you can do with the test client are:
       a template context that contains certain values.
 
 Note that the test client is not intended to be a replacement for Twill_,
-Selenium_, or other "in-browser" frameworks. Django's test client has
+Windmill_, or other "in-browser" frameworks. Django's test client has
 a different focus. In short:
 
     * Use Django's test client to establish that the correct view is being
@@ -409,10 +409,15 @@ a different focus. In short:
     * Use in-browser frameworks such as Twill and Selenium to test *rendered*
       HTML and the *behavior* of Web pages, namely JavaScript functionality.
 
-A comprehensive test suite should use a combination of both test types.
+A comprehensive test suite should use a combination of both test types. Which 
+is why Django makes it easy to integrate with 3rd party test runners via the 
+:setting:`TEST_RUNNER` setting. For convenience, Django ships a runner for
+the framework used in testing the :ref:`admin interface, <ref-contrib-admin>`
+Windmill_. Details on integrating Windmill tests with Django are available 
+:ref:`here. <howto-windmill-test>`
 
 .. _Twill: http://twill.idyll.org/
-.. _Selenium: http://www.openqa.org/selenium/
+.. _Windmill: http://www.getwindmill.com/
 
 Overview and a quick example
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

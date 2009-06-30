@@ -125,3 +125,23 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
     def test_changelist_foreignkey(self):
         response = self.client.get('/widget_admin/admin_widgets/car/')
         self.failUnless('/widget_admin/auth/user/add/' in response.content)
+
+
+
+# import os
+# from django.test import windmill_tests as djangotest
+# #from windmill.authoring import djangotest
+# #from windmill.conf import global_settings
+# 
+# class TestProjectWindmillTest(djangotest.WindmillDjangoUnitTest):
+#     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml', 'admin-views-unicode.xml',
+#      'multiple-child-classes', 'admin-views-actions.xml', 'string-primary-key.xml', 'admin-views-person.xml']
+#     test_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'windmilltests')
+#     #test_dir = os.path.dirname(os.path.abspath(__file__))
+#     #test_dir = os.path.dirname(os.path.abspath(__file__))
+#     browser = 'firefox'
+#     test_url = 'http://localhost:8000/test_admin/admin/'
+#     #global_settings.TEST_URL = test_url
+# 
+#     # def test_tryout(self):
+#     #     pass

@@ -142,7 +142,9 @@ The development process
       :ref:`Overview <ref-django-admin>` |
       :ref:`Adding custom commands <howto-custom-management-commands>`
 
-    * **Testing:**  :ref:`Overview <topics-testing>`
+    * **Testing:** 
+      :ref:`Overview <topics-testing>` |
+      :ref:`Windmill <howto-windmill-tests>`
 
     * **Deployment:**
       :ref:`Overview <howto-deployment-index>` |

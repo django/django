@@ -20,4 +20,3 @@ API Reference
    signals
    templates/index
    unicode
-

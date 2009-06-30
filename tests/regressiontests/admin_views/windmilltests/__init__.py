@@ -1,3 +1,12 @@
+fixtures = ['admin-views-users.xml',
+    'admin-views-colors.xml',
+    'admin-views-fabrics.xml',
+    'admin-views-unicode.xml',
+    'multiple-child-classes',
+    'admin-views-actions.xml',
+    'string-primary-key.xml',
+    'admin-views-person.xml']
+
 # import os
 # from django.test import windmill_tests as djangotest
 # #from windmill.authoring import djangotest
@@ -5,6 +14,7 @@
 from windmill.conf import global_settings
 ADMIN_URL =  "%s/test_admin/admin" % global_settings.TEST_URL
 #ADMIN_URL = 'http://localhost:8000/test_admin/admin/'
+#['regressiontests/admin_views/fixtures/%s' % fix for fix in ]
 
 #
 # class TestProjectWindmillTest(djangotest.WindmillDjangoUnitTest):
@@ -21,11 +31,15 @@ ADMIN_URL =  "%s/test_admin/admin" % global_settings.TEST_URL
 #     #     pass
 #
 from windmill.authoring import WindmillTestClient
-#from django.test.windmill_tests import calling_func_name
+from django.test.utils import calling_func_name
+
+# import functest
+# functest.modules_passed = []
+# functest.modules_failed = []
 
 def test_loginAndSetup():
     '''Mostly just a proof of concept to test working order of tests.'''
-    client = WindmillTestClient(__name__)
+    client = WindmillTestClient(calling_func_name())
 
     # print dir(client)
     #    print dir(client.open)
@@ -83,7 +97,7 @@ def test_loginAndSetup():
 
 def test_changeListNamingLinkingHistory():
     '''Creating a Model with strings for pk, and checking history.'''
-    client = WindmillTestClient(__name__)
+    client = WindmillTestClient(calling_func_name())
     client.open(url=ADMIN_URL)
     client.waits.forPageLoad(timeout=u'20000')
     # client.open(url=ADMIN_URL)
@@ -118,7 +132,7 @@ def test_changeListNamingLinkingHistory():
 
 def test_filtersSearchOnChangeList():
     '''Testing Updates and Filters/Search on Person Models'''
-    client = WindmillTestClient(__name__)
+    client = WindmillTestClient(calling_func_name())
 
     client.open(url=ADMIN_URL)
     client.waits.forPageLoad(timeout=u'20000')
@@ -165,7 +179,7 @@ def test_filtersSearchOnChangeList():
 
 def test_defaultDeleteAdminAction():
     '''Admin Actions test. Test the default delete action.'''
-    client = WindmillTestClient(__name__)
+    client = WindmillTestClient(calling_func_name())
 
     client.open(url=ADMIN_URL)
     client.waits.forPageLoad(timeout=u'20000')
@@ -180,7 +194,7 @@ def test_defaultDeleteAdminAction():
     client.asserts.assertNode(link=u'Horizontal')
 
 def test_dateTimeModelsandWidgets():
-    client = WindmillTestClient(__name__)
+    client = WindmillTestClient(calling_func_name())
 
     client.open(url=ADMIN_URL)
     client.waits.forPageLoad(timeout=u'20000')
@@ -250,7 +264,7 @@ def test_dateTimeModelsandWidgets():
     client.waits.forPageLoad(timeout=u'20000')
 
 def test_inlineEditandCreate():
-    client = WindmillTestClient(__name__)
+    client = WindmillTestClient(calling_func_name())
 
     client.open(url=ADMIN_URL)
     client.waits.forPageLoad(timeout=u'20000')
@@ -276,7 +290,7 @@ def test_inlineEditandCreate():
 
 
 def test_adminActionEmptyModels():
-    client = WindmillTestClient(__name__)
+    client = WindmillTestClient(calling_func_name())
 
     client.open(url=ADMIN_URL)
     client.waits.forPageLoad(timeout=u'20000')
@@ -339,7 +353,7 @@ def test_adminActionEmptyModels():
     client.waits.forPageLoad(timeout=u'20000')
 
 def test_parentChildRelationship():
-    client = WindmillTestClient(__name__)
+    client = WindmillTestClient(calling_func_name())
 
     client.open(url=ADMIN_URL)
     client.waits.forPageLoad(timeout=u'20000')
@@ -374,7 +388,7 @@ def test_parentChildRelationship():
     client.waits.forPageLoad(timeout=u'20000')
 
 def test_AdminAuthContrib():
-    client = WindmillTestClient(__name__)
+    client = WindmillTestClient(calling_func_name())
 
     client.open(url=ADMIN_URL)
     client.waits.forPageLoad(timeout=u'20000')
@@ -423,7 +437,7 @@ def test_AdminAuthContrib():
 
 
 def test_contribFlatSitesRedirect():
-    client = WindmillTestClient(__name__)
+    client = WindmillTestClient(calling_func_name())
 
     client.open(url=ADMIN_URL)
     client.waits.forPageLoad(timeout=u'20000')
@@ -496,3 +510,17 @@ def test_contribFlatSitesRedirect():
     client.asserts.assertText(xpath=u'/html/body', validator=u'\nThis is some unique test content.\n')
     client.open(url=u'http://localhost:8000/test_admin/admin/')
     client.waits.forPageLoad(timeout=u'8000')
+    client.click(link=u'Log out')
+    client.waits.forPageLoad(timeout=u'20000')
+
+
+def test_ensureLogout():
+    client = WindmillTestClient(calling_func_name())
+
+    client.open(url=ADMIN_URL)
+    client.waits.forPageLoad(timeout=u'20000')
+    client.open(url="%s/accounts/logout"% global_settings.TEST_URL)
+    client.waits.forPageLoad(timeout=u'20000')
+    client.asserts.assertText(xpath=u"//div[@id='content']/h1", validator=u'Logged out')
+    client.asserts.assertText(xpath=u"//div[@id='content']/p", validator=u'Thanks for spending some quality time with the Web site today.')
+    client.asserts.assertNode(link=u'Log in again')
