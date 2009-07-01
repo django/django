@@ -3,7 +3,7 @@ from django.contrib.admin.views.main import ALL_VAR, EMPTY_CHANGELIST_VALUE
 from django.contrib.admin.views.main import ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.utils import dateformat
+from django.utils import formats
 from django.utils.html import escape, conditional_escape
 from django.utils.text import capfirst
 from django.utils.safestring import mark_safe
@@ -185,15 +185,12 @@ def items_for_result(cl, result, form):
             # Dates and times are special: They're formatted in a certain way.
             elif isinstance(f, models.DateField) or isinstance(f, models.TimeField):
                 if field_val:
-                    date_format = getformat('DATE_FORMAT')
-                    datetime_format = getformat('DATETIME_FORMAT')
-                    time_format = getformat('TIME_FORMAT')
                     if isinstance(f, models.DateTimeField):
-                        result_repr = capfirst(dateformat.format(field_val, datetime_format))
+                        result_repr = capfirst(formats.date_and_time_format(field_val, 'DATETIME_FORMAT'))
                     elif isinstance(f, models.TimeField):
-                        result_repr = capfirst(dateformat.time_format(field_val, time_format))
+                        result_repr = capfirst(formats.date_and_time_format(field_val, 'TIME_FORMAT'))
                     else:
-                        result_repr = capfirst(dateformat.format(field_val, date_format))
+                        result_repr = capfirst(formats.format(field_val, 'DATE_FORMAT'))
                 else:
                     result_repr = EMPTY_CHANGELIST_VALUE
                 row_class = ' class="nowrap"'
@@ -266,8 +263,6 @@ def date_hierarchy(cl):
         year_lookup = cl.params.get(year_field)
         month_lookup = cl.params.get(month_field)
         day_lookup = cl.params.get(day_field)
-        year_month_format = getformat('YEAR_MONTH_FORMAT')
-        month_day_format = getformat('MONTH_DAY_FORMAT')
 
         link = lambda d: mark_safe(cl.get_query_string(d, [field_generic]))
 
@@ -277,9 +272,9 @@ def date_hierarchy(cl):
                 'show': True,
                 'back': {
                     'link': link({year_field: year_lookup, month_field: month_lookup}),
-                    'title': dateformat.format(day, year_month_format)
+                    'title': formats.date_and_time_format(day, 'YEAR_MONTH_FORMAT')
                 },
-                'choices': [{'title': dateformat.format(day, month_day_format)}]
+                'choices': [{'title': formats.date_and_time_format(day, 'MONTH_DAY_FORMAT')}]
             }
         elif year_lookup and month_lookup:
             days = cl.query_set.filter(**{year_field: year_lookup, month_field: month_lookup}).dates(field_name, 'day')
@@ -291,7 +286,7 @@ def date_hierarchy(cl):
                 },
                 'choices': [{
                     'link': link({year_field: year_lookup, month_field: month_lookup, day_field: day.day}),
-                    'title': dateformat.format(day, month_day_format)
+                    'title': formats.date_and_time_format(day, 'MONTH_DAY_FORMAT')
                 } for day in days]
             }
         elif year_lookup:
@@ -304,7 +299,7 @@ def date_hierarchy(cl):
                 },
                 'choices': [{
                     'link': link({year_field: year_lookup, month_field: month.month}),
-                    'title': dateformat.format(month, year_month_format)
+                    'title': formats.date_and_time_format(month, 'YEAR_MONTH_FORMAT')
                 } for month in months]
             }
         else:
