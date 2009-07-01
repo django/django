@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.core import mail
 from django.core.urlresolvers import reverse
+from django.test.decorators import views_required
 
 class AuthViewsTestCase(TestCase):
     """
@@ -49,22 +50,26 @@ class PasswordResetTest(AuthViewsTestCase):
 
     def test_email_not_found(self):
         "Error is raised if the provided email address isn't currently registered"
-        response = self.client.get('/password_reset/')
+        response = self.client.get(reverse('django.contrib.auth.views.password_reset'))
         self.assertEquals(response.status_code, 200)
-        response = self.client.post('/password_reset/', {'email': 'not_a_real_email@email.com'})
+        response = self.client.post(reverse('django.contrib.auth.views.password_reset'), {'email': 'not_a_real_email@email.com'})
         self.assertContains(response, "That e-mail address doesn&#39;t have an associated user account")
         self.assertEquals(len(mail.outbox), 0)
-
+        
+    test_email_not_found = views_required(required_views=['django.contrib.auth.views.password_reset'])(test_email_not_found)
+    
     def test_email_found(self):
         "Email is sent if a valid email address is provided for password reset"
-        response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
+        response = self.client.post(reverse('django.contrib.auth.views.password_reset'), {'email': 'staffmember@example.com'})
         self.assertEquals(response.status_code, 302)
         self.assertEquals(len(mail.outbox), 1)
         self.assert_("http://" in mail.outbox[0].body)
+    
+    test_email_found = views_required(required_views=['django.contrib.auth.views.password_reset'])(test_email_found)
 
     def _test_confirm_start(self):
         # Start by creating the email
-        response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
+        response = self.client.post(reverse('django.contrib.auth.views.password_reset'), {'email': 'staffmember@example.com'})
         self.assertEquals(response.status_code, 302)
         self.assertEquals(len(mail.outbox), 1)
         return self._read_signup_email(mail.outbox[0])
@@ -80,6 +85,8 @@ class PasswordResetTest(AuthViewsTestCase):
         # redirect to a 'complete' page:
         self.assertEquals(response.status_code, 200)
         self.assert_("Please enter your new password" in response.content)
+    test_confirm_valid = views_required(required_views=['django.contrib.auth.views.password_reset'])(test_confirm_valid)
+
 
     def test_confirm_invalid(self):
         url, path = self._test_confirm_start()
@@ -90,6 +97,7 @@ class PasswordResetTest(AuthViewsTestCase):
         response = self.client.get(path)
         self.assertEquals(response.status_code, 200)
         self.assert_("The password reset link was invalid" in response.content)
+    test_confirm_invalid = views_required(required_views=['django.contrib.auth.views.password_reset'])(test_confirm_invalid)
 
     def test_confirm_invalid_post(self):
         # Same as test_confirm_invalid, but trying
@@ -102,6 +110,7 @@ class PasswordResetTest(AuthViewsTestCase):
         # Check the password has not been changed
         u = User.objects.get(email='staffmember@example.com')
         self.assert_(not u.check_password("anewpassword"))
+    test_confirm_invalid_post = views_required(required_views=['django.contrib.auth.views.password_reset'])(test_confirm_invalid_post)
 
     def test_confirm_complete(self):
         url, path = self._test_confirm_start()
@@ -117,6 +126,7 @@ class PasswordResetTest(AuthViewsTestCase):
         response = self.client.get(path)
         self.assertEquals(response.status_code, 200)
         self.assert_("The password reset link was invalid" in response.content)
+    test_confirm_complete = views_required(required_views=['django.contrib.auth.views.password_reset'])(test_confirm_complete)
 
     def test_confirm_different_passwords(self):
         url, path = self._test_confirm_start()
@@ -124,7 +134,8 @@ class PasswordResetTest(AuthViewsTestCase):
                                            'new_password2':' x'})
         self.assertEquals(response.status_code, 200)
         self.assert_("The two password fields didn&#39;t match" in response.content)
-
+        
+    test_confirm_different_passwords = views_required(required_views=['django.contrib.auth.views.password_reset'])(test_confirm_different_passwords)
 class ChangePasswordTest(AuthViewsTestCase):
 
     def login(self, password='password'):

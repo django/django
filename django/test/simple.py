@@ -1,4 +1,4 @@
-import unittest
+import sys, time, traceback, unittest
 from django.conf import settings
 from django.db.models import get_app, get_apps
 from django.test import _doctest as doctest
@@ -202,9 +202,95 @@ class DefaultTestRunner(object):
         old_name = settings.DATABASE_NAME
         from django.db import connection
         connection.creation.create_test_db(verbosity, autoclobber=not interactive)
-        result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
+        result = SkipTestRunner(verbosity=verbosity).run(suite)
         connection.creation.destroy_test_db(old_name, verbosity)
 
         teardown_test_environment()
 
         return len(result.failures) + len(result.errors)
+
+
+class SkipTestRunner:
+    """
+    A test runner class that adds a Skipped category in the output layer.
+    
+    Modeled after unittest.TextTestRunner.
+
+    Similarly to unittest.TextTestRunner, prints summary of the results at the end.
+    (Including a count of skipped tests.)
+    """
+
+    def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1):
+        self.stream = unittest._WritelnDecorator(stream)
+        self.descriptions = descriptions
+        self.verbosity = verbosity
+        self.result = _SkipTestResult(self.stream, descriptions, verbosity)
+
+    def run(self, test):
+        "Run the given test case or test suite."
+        startTime = time.time()
+        test.run(self.result)
+        stopTime = time.time()
+        timeTaken = stopTime - startTime
+        
+        self.result.printErrors()
+        self.stream.writeln(self.result.separator2)
+        run = self.result.testsRun
+        self.stream.writeln('Ran %d test%s in %.3fs' %
+                (run, run != 1 and 's' or '', timeTaken))
+        self.stream.writeln()
+        if not self.result.wasSuccessful():
+            self.stream.write('FAILED (')
+            failed, errored, skipped = map(len, (self.result.failures, self.result.errors, self.result.skipped))
+            if failed:
+                self.stream.write('failures=%d' % failed)
+            if errored:
+                if failed: self.stream.write(', ')
+                self.stream.write('errors=%d' % errored)
+            if skipped:
+                if errored or failed: self.stream.write(', ')
+                self.stream.write('skipped=%d' % skipped)
+            self.stream.writeln(')')
+        else:
+            self.stream.writeln('OK')
+        return self.result
+
+class _SkipTestResult(unittest._TextTestResult):
+    """
+    A test result class that adds a Skipped category in the output layer.
+    
+    Modeled after unittest._TextTestResult.
+    
+    Similarly to unittest._TextTestResult, prints out the names of tests as they are
+    run and errors as they occur.
+    """
+
+    def __init__(self, stream, descriptions, verbosity):
+        unittest._TextTestResult.__init__(self, stream, descriptions, verbosity)
+        self.skipped = []
+
+    def addError(self, test, err):
+        # Determine if this is a skipped test
+        tracebacks = traceback.extract_tb(err[2])
+        if tracebacks[-1][-1].startswith('raise SkippedTest'):
+            self.skipped.append((test, self._exc_info_to_string(err, test)))
+            if self.showAll:
+                self.stream.writeln('SKIPPED')
+            elif self.dots:
+                self.stream.write('S')
+                self.stream.flush()
+        else:
+            unittest.TestResult.addError(self, test, err)
+            if self.showAll:
+                self.stream.writeln('ERROR')
+            elif self.dots:
+                self.stream.write('E')
+                self.stream.flush()
+
+    def printErrors(self):
+        if self.dots or self.showAll:
+            self.stream.writeln()
+        self.printErrorList('SKIPPED', self.skipped)
+        self.printErrorList('ERROR', self.errors)
+        self.printErrorList('FAIL', self.failures)
+

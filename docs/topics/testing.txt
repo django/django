@@ -1045,6 +1045,58 @@ For example::
 This test case will load the contents of ``myapp.test_models`` and add
 any subclass of ``django.db.models.Model`` to ``myapp.models``.
 
+Skipping tests bound to fail
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded: 1.1
+
+Occasionally it's helpful to specify tests that are skipped under certain
+circumstances. To accomplish this, the Django test framework offers decorators
+that you can apply to your test methods for them to be conditionally skipped.
+
+You can supply your own condition function as follows::
+
+    from django.tests.decorators import *
+    
+    class TestUnderCondition(TestCase):
+    
+        def _my_condition():
+            # Condition returning True if test should be run and False if it
+            # should be skipped.
+
+        @conditional_skip(_my_condition, reason='This test should be skipped sometimes')
+        def testOnlyOnTuesday(self):
+            # Test to run if _my_condition evaluates to True
+
+In addition, the Django test framework supplies a handful of skip conditions that
+handle commonly used conditions for skipping tests.
+
+``views_required(required_views=[])``
+    Does a ``urlresolver.Reverse`` on the required views supplied. Runs test only if
+    all views in ``required_views`` are in use.
+
+``modules_required(required_modules=[])``
+    Runs tests only if all modules in ``required_modules`` can be imported.
+
+``skip_specific_database(database_engine)``
+    Skips test if ``settings.DATABASE_ENGINE`` is equal to database_engine.
+
+If a test is skipped, it is added to a skipped category in the test runner and
+the test results are reported as such::
+
+    ======================================================================
+    SKIPPED: test_email_found (django.contrib.auth.tests.basic.PasswordResetTest)
+    ----------------------------------------------------------------------
+    Traceback (most recent call last):
+      File "/Users/dnaquin/Dropbox/Sandbox/django/django/test/decorators.py", line 43, in _skip
+        raise SkippedTest(reason=reason)
+    SkippedTest: Required view for this test not found: django.contrib.auth.views.password_reset
+
+    ----------------------------------------------------------------------
+    Ran 408 tests in 339.663s
+
+    FAILED (failures=1, skipped=2)
+
 .. _emptying-test-outbox:
 
 Emptying the test outbox
