@@ -200,11 +200,14 @@ class ModPythonHandler(BaseHandler):
         for c in response.cookies.values():
             req.headers_out.add('Set-Cookie', c.output(header=''))
         req.status = response.status_code
-        try:
-            for chunk in response:
-                req.write(chunk)
-        finally:
-            response.close()
+        if isinstance(response, http.HttpResponseSendFile): 
+            req.sendfile(response.sendfile_filename) 
+        else:
+            try:
+                for chunk in response:
+                    req.write(chunk)
+            finally:
+                response.close()
 
         return 0 # mod_python.apache.OK
 

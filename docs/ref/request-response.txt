@@ -560,9 +560,22 @@ Methods
 HttpResponse subclasses
 -----------------------
 
-Django includes a number of ``HttpResponse`` subclasses that handle different
-types of HTTP responses. Like ``HttpResponse``, these subclasses live in
-:mod:`django.http`.
+Django includes a number of :class:`HttpResponse` subclasses that handle
+different types of HTTP responses. Like :class:`HttpResponse`, these subclasses
+live in :mod:`django.http`.
+
+.. class:: HttpResponseSendFile
+
+    .. versionadded:: 1.1
+
+    A special response class for efficient file serving. It informs the HTTP
+    protocol handler to use platform-specific file serving mechanism (if
+    available). The constructor takes three arguments -- the file path and,
+    optionally, the file's content type and block size hint for handlers that
+    need it.
+
+    Note that response middleware will be bypassed if you use
+    :class:`HttpResponseSendFile`.
 
 .. class:: HttpResponseRedirect
 

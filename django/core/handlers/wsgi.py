@@ -241,5 +241,16 @@ class WSGIHandler(base.BaseHandler):
         for c in response.cookies.values():
             response_headers.append(('Set-Cookie', str(c.output(header=''))))
         start_response(status, response_headers)
+        
+        if isinstance(response, http.HttpResponseSendFile): 
+            filelike = open(response.sendfile_filename, 'rb') 
+            if 'wsgi.file_wrapper' in environ: 
+                return environ['wsgi.file_wrapper'](filelike, 
+                        response.block_size) 
+            else: 
+                # wraps close() as well 
+                from django.core.servers.basehttp import FileWrapper 
+                return FileWrapper(filelike, response.block_size) 
+                
         return response
 

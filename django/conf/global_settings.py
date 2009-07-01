@@ -236,6 +236,10 @@ MEDIA_ROOT = ''
 # Example: "http://media.lawrence.com"
 MEDIA_URL = ''
 
+# Header to use in HttpResponseSendFile to inform the handler to serve the 
+# file with efficient handler-specific routines. 
+HTTPRESPONSE_SENDFILE_HEADER = 'X-Sendfile' 
+
 # List of upload handler classes to be applied in order.
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',

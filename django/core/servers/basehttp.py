@@ -314,10 +314,9 @@ class ServerHandler(object):
         to iterate over the data, and to call 'self.close()' once the response
         is finished.
         """
-        if not self.result_is_file() or not self.sendfile():
-            for data in self.result:
-                self.write(data)
-            self.finish_content()
+        for data in self.result:
+            self.write(data)
+        self.finish_content()
         self.close()
 
     def get_scheme(self):

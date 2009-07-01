@@ -33,6 +33,9 @@ urlpatterns = patterns('',
     # test urlconf for syndication tests
     (r'^syndication/', include('regressiontests.syndication.urls')),
 
+    # HttpResponseSendfile tests 
+ 	(r'^sendfile/', include('regressiontests.sendfile.urls')), 
+
     # conditional get views
     (r'condition/', include('regressiontests.conditional_processing.urls')),
 )
