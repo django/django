@@ -212,8 +212,11 @@ class TransactionTestCase(unittest.TestCase):
               named fixtures.
             * If the Test Case class has a 'urls' member, replace the
               ROOT_URLCONF with it.
+            * If the Test Case class has a 'test_models' member, load the relivent
+              named models.
             * Clearing the mail test outbox.
         """
+        self._test_model_setup()
         self._fixture_setup()
         self._urlconf_setup()
         mail.outbox = []
@@ -225,6 +228,35 @@ class TransactionTestCase(unittest.TestCase):
             # that we're using *args and **kwargs together.
             call_command('loaddata', *self.fixtures, **{'verbosity': 0})
 
+    def _test_model_setup(self):
+        if hasattr(self, 'test_models'):
+            print self.test_models
+            if self.__module__.endswith('tests'):
+                app_label = self.__module__.split('.')[:-1][-1]
+            else:
+                app_label = self.__module__.split('.')[:-2][-1]
+            from django.db.models.loading import cache
+            from django.utils import importlib
+            from django.db import models
+            #importlib.import_module()
+            cache.write_lock.acquire()
+            try:
+                app_mods = cache.app_models[app_label]
+                for tm in self.test_models:
+                    print "importing %s " % tm
+                    im = importlib.import_module(tm)
+                    #cache.app_store[im] = len(cache.app_store)
+                    print "finding model classes"
+                    mod_classes =  [f for f in im.__dict__.values() if hasattr(f,'__bases__') and issubclass(f,models.Model)]
+                    print "Found models %s " % mod_classes
+                    for mc in mod_classes:
+                        print "Adding %s to AppCache" % mc
+                        app_mods[mc.__name__.lower()] = mc
+            finally:
+                cache.write_lock.release()
+            #call_command('syncdb', **{'verbosity': 0})
+        
+        
     def _urlconf_setup(self):
         if hasattr(self, 'urls'):
             self._old_root_urlconf = settings.ROOT_URLCONF
@@ -261,12 +293,53 @@ class TransactionTestCase(unittest.TestCase):
 
             * Putting back the original ROOT_URLCONF if it was changed.
         """
+        self._test_model_teardown()
         self._fixture_teardown()
         self._urlconf_teardown()
 
     def _fixture_teardown(self):
         pass
 
+    def _test_model_teardown(self):
+        if hasattr(self, 'test_models'):
+            print self.test_models
+            if self.__module__.endswith('tests'):
+                app_label = self.__module__.split('.')[:-1][-1]
+            else:
+                app_label = self.__module__.split('.')[:-2][-1]
+            from django.db.models.loading import cache
+            from django.utils import importlib
+            from django.db import models
+            #importlib.import_module()
+            # cc = cache.get_app(app_label)
+            #            del cache.app_store[cc]
+            #            #del cache.app_models[app_label]
+            #            cache.loaded = False
+            #            print cache.handled
+            #            print '.'.join(cc.__name__.split('.')[:-1])
+            #            print cc.__package__
+            #            del cache.handled[cc.__package__]
+            #            cache._populate()
+            #            print cache.get_app(app_label)
+            #cc = cache.get_app(app_label)
+            
+            #reload(cache.get_app(app_label))
+            cache.write_lock.acquire()
+            try:
+               app_mods = cache.app_models[app_label]
+               print app_mods
+               for tm in self.test_models:
+                   print "importing %s " % tm
+                   im = importlib.import_module(tm)
+                   #cache.app_store[im] = len(cache.app_store)
+                   print "finding model classes"
+                   mod_classes =  [f for f in im.__dict__.values() if hasattr(f,'__bases__') and issubclass(f,models.Model)]
+                   print "Found models %s " % mod_classes
+                   for mc in mod_classes:
+                       print "Deleting %s from AppCache" % mc
+                       del app_mods[mc.__name__.lower()]
+            finally:
+               cache.write_lock.release()
     def _urlconf_teardown(self):
         if hasattr(self, '_old_root_urlconf'):
             settings.ROOT_URLCONF = self._old_root_urlconf

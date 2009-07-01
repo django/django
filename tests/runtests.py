@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import os, sys, traceback
 import unittest
 import django

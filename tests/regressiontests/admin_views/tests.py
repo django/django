@@ -18,6 +18,8 @@ from models import Article, BarAccount, CustomArticle, EmptyModel, \
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast, \
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit
 
+from test_models import SectionTest
+
 try:
     set
 except NameError:
@@ -25,16 +27,20 @@ except NameError:
 
 class AdminViewBasicTest(TestCase):
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml']
-
+    test_models = ['regressiontests.admin_views.test_models']
     # Store the bit of the URL where the admin is registered as a class
     # variable. That way we can test a second AdminSite just by subclassing
     # this test case and changing urlbit.
     urlbit = 'admin'
 
     def setUp(self):
+        from django.contrib import admin
+        admin.autodiscover()
         self.client.login(username='super', password='secret')
 
     def tearDown(self):
+        from django.contrib import admin
+        admin.autodiscover()
         self.client.logout()
 
     def testTrailingSlashRequired(self):
@@ -53,6 +59,13 @@ class AdminViewBasicTest(TestCase):
         response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit)
         self.failUnlessEqual(response.status_code, 200)
 
+    def testBasicAddGetTest(self):
+        """
+        A smoke test to ensure GET on the add_view works.
+        """
+        response = self.client.get('/test_admin/%s/admin_views/sectiontest/add/' % self.urlbit)
+        self.failUnlessEqual(response.status_code, 200)
+    
     def testAddWithGETArgs(self):
         response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit, {'name': 'My Section'})
         self.failUnlessEqual(response.status_code, 200)
@@ -280,6 +293,13 @@ class CustomModelAdminTest(AdminViewBasicTest):
         self.client.login(username='super', password='secret')
         response = self.client.get('/test_admin/%s/my_view/' % self.urlbit)
         self.assert_(response.content == "Django is a magical pony!", response.content)
+    
+    def testBasicAddGetTest(self):
+        """
+        A smoke test to ensure GET on the add_view works.
+        """
+        response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit)
+        self.failUnlessEqual(response.status_code, 200)
 
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
@@ -591,7 +611,18 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
     def tearDown(self):
         self.client.logout()
-
+        
+    def testBasicAddGetTest(self):
+        """
+        A smoke test to ensure GET on the add_view works.
+        """
+        from django.contrib import admin
+        admin.site.unregister(SectionTest)
+        import regressiontests.admin_views.urls
+        reload(regressiontests.admin_views.urls)
+        response = self.client.get('/test_admin/admin/admin_views/sectiontest/add/')
+        self.failUnlessEqual(response.status_code, 404)
+        
     def test_get_change_view(self):
         "Retrieving the object using urlencoded form of primary key should work"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(self.pk))
