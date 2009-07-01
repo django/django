@@ -200,11 +200,12 @@ class AppCache(object):
     def remove_model(self, model_name):
         """Removes a model from the cache. Used when loading test-only models."""
         try:
-            self.write_lock.acquire()
-            if model_name in self.app_models:
-                del self.app_models[model_name]
-        except Exception, e:
-            raise e
+            try:
+                self.write_lock.acquire()
+                if model_name in self.app_models:
+                    del self.app_models[model_name]
+            except Exception, e:
+                raise e
         finally:
             self.write_lock.release()
 

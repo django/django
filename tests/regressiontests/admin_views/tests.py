@@ -74,6 +74,14 @@ class AdminViewBasicTest(TestCase):
             "Couldn't find an input with the right value in the response."
         )
 
+    def testAddWithGETArgsTestModel(self):
+        response = self.client.get('/test_admin/%s/admin_views/sectiontest/add/' % self.urlbit, {'name': 'My TestSection'})
+        self.failUnlessEqual(response.status_code, 200)
+        self.failUnless(
+            'value="My TestSection"' in response.content,
+            "Couldn't find an input with the right value in the response."
+        )
+        
     def testBasicEditGet(self):
         """
         A smoke test to ensureGET on the change_view works.
@@ -300,6 +308,10 @@ class CustomModelAdminTest(AdminViewBasicTest):
         """
         response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit)
         self.failUnlessEqual(response.status_code, 200)
+    def testAddWithGETArgsTestModel(self):
+        response = self.client.get('/test_admin/%s/admin_views/sectiontest/add/' % self.urlbit, {'name': 'My TestSection'})
+        self.failUnlessEqual(response.status_code, 404)
+        
 
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
