@@ -195,6 +195,7 @@ class RegexURLResolver(object):
                         return sub_match[0], sub_match[1], sub_match_dict
                     tried.append(pattern.regex.pattern)
             raise Resolver404, {'tried': tried, 'path': new_path}
+        raise Resolver404, {'tried': [], 'path' : path}
 
     def _get_urlconf_module(self):
         try:

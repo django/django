@@ -257,6 +257,13 @@ class RelatedGeoModelTest(unittest.TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual(3, qs[0].num_books)
 
+    def test13_select_related_null_fk(self):
+        "Testing `select_related` on a nullable ForeignKey via `GeoManager`. See #11381."
+        no_author = Book.objects.create(title='Without Author')
+        b = Book.objects.select_related('author').get(title='Without Author')
+        # Should be `None`, and not a 'dummy' model.
+        self.assertEqual(None, b.author)
+
     # TODO: Related tests for KML, GML, and distance lookups.
 
 def suite():
