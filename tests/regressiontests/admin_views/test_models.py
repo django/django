@@ -13,4 +13,4 @@ class SectionTest(models.Model):
     """
     name = models.CharField(max_length=100)
 
-admin.site.register(SectionTest, save_as=True)
+#admin.site.register(SectionTest, save_as=True)

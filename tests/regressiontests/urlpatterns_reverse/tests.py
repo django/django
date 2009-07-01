@@ -14,8 +14,9 @@ Traceback (most recent call last):
 ImproperlyConfigured: The included urlconf regressiontests.urlpatterns_reverse.no_urls doesn't have any patterns in it
 """}
 
+import unittest
 
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import reverse, resolve, NoReverseMatch, Resolver404
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 from django.test import TestCase
@@ -111,6 +112,21 @@ class URLPatternReverse(TestCase):
                 self.assertEqual(expected, NoReverseMatch)
             else:
                 self.assertEquals(got, expected)
+
+class ResolverTests(unittest.TestCase):
+    def test_non_regex(self):
+        """
+        Verifies that we raise a Resolver404 if what we are resolving doesn't
+        meet the basic requirements of a path to match - i.e., at the very
+        least, it matches the root pattern '^/'. We must never return None
+        from resolve, or we will get a TypeError further down the line.
+
+        Regression for #10834.
+        """
+        self.assertRaises(Resolver404, resolve, '')
+        self.assertRaises(Resolver404, resolve, 'a')
+        self.assertRaises(Resolver404, resolve, '\\')
+        self.assertRaises(Resolver404, resolve, '.')
 
 class ReverseShortcutTests(TestCase):
     urls = 'regressiontests.urlpatterns_reverse.urls'

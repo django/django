@@ -18,7 +18,7 @@ from models import Article, BarAccount, CustomArticle, EmptyModel, \
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast, \
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit
 
-from test_models import SectionTest
+
 
 try:
     set
@@ -34,13 +34,23 @@ class AdminViewBasicTest(TestCase):
     urlbit = 'admin'
 
     def setUp(self):
+        # from django.contrib import admin
+        #        admin.register(TestSection)
+        from test_models import SectionTest
         from django.contrib import admin
-        admin.register(TestSection)
+        admin.site.register(SectionTest)
+        import regressiontests.admin_views.urls
+        reload(regressiontests.admin_views.urls)
         self.client.login(username='super', password='secret')
 
     def tearDown(self):
+        # from django.contrib import admin
+        #        admin.unregister(TestSection)
+        from test_models import SectionTest
         from django.contrib import admin
-        admin.unregister(TestSection)
+        admin.site.unregister(SectionTest)
+        import regressiontests.admin_views.urls
+        reload(regressiontests.admin_views.urls)
         self.client.logout()
 
     def testTrailingSlashRequired(self):
@@ -308,6 +318,7 @@ class CustomModelAdminTest(AdminViewBasicTest):
         """
         response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit)
         self.failUnlessEqual(response.status_code, 200)
+        
     def testAddWithGETArgsTestModel(self):
         response = self.client.get('/test_admin/%s/admin_views/sectiontest/add/' % self.urlbit, {'name': 'My TestSection'})
         self.failUnlessEqual(response.status_code, 404)
@@ -623,17 +634,6 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
     def tearDown(self):
         self.client.logout()
-        
-    def testBasicAddGetTest(self):
-        """
-        A smoke test to ensure GET on the add_view works.
-        """
-        from django.contrib import admin
-        admin.site.unregister(SectionTest)
-        import regressiontests.admin_views.urls
-        reload(regressiontests.admin_views.urls)
-        response = self.client.get('/test_admin/admin/admin_views/sectiontest/add/')
-        self.failUnlessEqual(response.status_code, 404)
         
     def test_get_change_view(self):
         "Retrieving the object using urlencoded form of primary key should work"
