@@ -21,6 +21,7 @@ try:
 except Exception, e:
     print "You don't appear to have windmill installed, please install before trying to run windmill tests again."
     unit = None
+    
 class StoppableWSGIServer(basehttp.WSGIServer):
     """WSGIServer with short timeout, so that server thread can stop this server."""
 
