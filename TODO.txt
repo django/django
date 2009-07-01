@@ -26,7 +26,4 @@ that need to be done.  I'm trying to be as granular as possible.
 
 4)  Wait on the merge of the m2m stuff.
 
-5)  Add the ``using`` Meta option.  Tests and docs(these are to be assumed at
-    each stage from here on out).
-
 6) Time permitting add support for a ``DatabaseManager``.

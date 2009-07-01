@@ -103,7 +103,7 @@ model handling are exactly the same as normal. This includes
        unmanaged model, then the intermediate table for the many-to-many join
        will also not be created. However, a the intermediary table between one
        managed and one unmanaged model *will* be created.
-       
+
        If you need to change this default behavior, create the intermediary
        table as an explicit model (with ``managed`` set as needed) and use the
        :attr:`ManyToManyField.through` attribute to make the relation use your
@@ -210,6 +210,17 @@ set of fields::
 
     unique_together = ("driver", "restaurant")
 
+``using``
+---------
+
+.. attribute:: Options.using
+
+The alias for the default database to be used for this model.  If this is not
+provided the default is ``'default'``.  If it is porvided it can be overidden
+at the ``QuerySet`` level with the ``using()`` method.
+
+.. versionadded:: TODO
+
 ``verbose_name``
 ----------------
 
@@ -232,4 +243,3 @@ The plural name for the object::
     verbose_name_plural = "stories"
 
 If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
-

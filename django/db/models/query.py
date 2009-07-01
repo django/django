@@ -33,12 +33,14 @@ class QuerySet(object):
     """
     def __init__(self, model=None, query=None):
         self.model = model
-        connection = connections[DEFAULT_DB_ALIAS]
+        using = model._meta.using or DEFAULT_DB_ALIAS
+        connection = connections[using]
         self.query = query or sql.Query(self.model, connection)
         self._result_cache = None
         self._iter = None
         self._sticky_filter = False
-        self._using = connections.alias_for_connection(self.query.connection)
+        self._using = (query and
+            connections.alias_for_connection(self.query.connection) or using)
 
     ########################
     # PYTHON MAGIC METHODS #

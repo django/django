@@ -419,8 +419,7 @@ class Model(object):
         need for overrides of save() to pass around internal-only parameters
         ('raw', 'cls', and 'origin').
         """
-        if using is None:
-            using = DEFAULT_DB_ALIAS
+        using = using or self._meta.using or DEFAULT_DB_ALIAS
         connection = connections[using]
         assert not (force_insert and force_update)
         if cls is None:
@@ -563,8 +562,7 @@ class Model(object):
             parent_obj._collect_sub_objects(seen_objs)
 
     def delete(self, using=None):
-        if using is None:
-            using = DEFAULT_DB_ALIAS
+        using = using or self._meta.using or DEFAULT_DB_ALIAS
         connection = connections[using]
         assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
 

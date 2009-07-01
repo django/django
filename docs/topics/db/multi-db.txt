@@ -25,6 +25,15 @@ thing to note is that your primary database should have the alias
 ``'default'``, and any additional databases you have can have whatever alias
 you choose.
 
+Selecting a Database for a ``Model``
+====================================
+
+In addition to the global default database for all models, it is possible to
+select a default database on a per-model level.  This is done using the
+``using`` option in a model's inner ``Meta`` class.  When provided this
+database becomes the default database for all lookups, saves, and deletes for
+this model.  It can be overiden on a per-query basis as described below.
+
 Selecting a Database for a ``QuerySet``
 =======================================
 

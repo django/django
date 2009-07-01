@@ -6,6 +6,13 @@ from django.test import TestCase
 
 from models import Book
 
+try:
+    # we only have these models if the user is using multi-db, it's safe the
+    # run the tests without them though.
+    from models import Article, article_using
+except ImportError:
+    pass
+
 class ConnectionHandlerTestCase(TestCase):
     def setUp(self):
         settings.DATABASES['__test_db'] = {
@@ -71,3 +78,18 @@ class QueryTestCase(TestCase):
 
             months = Book.objects.dates('published', 'month').using(db)
             self.assertEqual(sorted(o.month for o in months), [5, 12])
+
+if len(settings.DATABASES) > 1:
+    class MetaUsingTestCase(TestCase):
+        def test_meta_using_queries(self):
+            a = Article.objects.create(title="Django Rules!")
+            self.assertEqual(Article.objects.get(title="Django Rules!"), a)
+            for db in connections:
+                if db == article_using:
+                    self.assertEqual(Article.objects.using(db).get(title="Django Rules!"), a)
+                else:
+                    self.assertRaises(Article.DoesNotExist,
+                        lambda: Article.objects.using(db).get(title="Django Rules!"))
+            a.delete()
+            self.assertRaises(Article.DoesNotExist,
+                lambda: Article.objects.get(title="Django Rules!"))
