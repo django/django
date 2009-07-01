@@ -1,12 +1,13 @@
 from django.core.management.base import BaseCommand
 #from windmill.authoring import djangotest
-from  django.test import windmill_tests as djangotest
+from django.utils import importlib
+from django.test import windmill_tests as djangotest
 import sys, os
 from time import sleep
 import types
 import logging
 import threading
-from django.utils import importlib
+
 class ServerContainer(object):
     start_test_server = djangotest.start_test_server
     stop_test_server = djangotest.stop_test_server

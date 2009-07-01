@@ -185,10 +185,19 @@ def django_tests(verbosity, interactive, test_labels):
 
     # Default number of failures is 0
     failures = 0
-
+    if do_windmill:
+        # Our bank of windmill-specific imports. Only loaded when used.
+        import types
+        import logging
+        import threading
+        from windmill.conf import global_settings
+        from windmill.authoring import setup_module, teardown_module
+        from django.core.management.commands.test_windmill import ServerContainer, attempt_import
+        from django.test.windmill_tests import WindmillDjangoUnitTest
+        from django.db.models.loading import remove_model
     #Run the appropriate test runner based on command line params.
-    if(do_std):
-        if(do_coverage):
+    if do_std:
+        if do_coverage:
             test_runner = get_runner(settings, coverage=True, reports=True)
         else:
             test_runner = get_runner(settings, coverage=False, reports=False)
@@ -201,17 +210,6 @@ def django_tests(verbosity, interactive, test_labels):
 
     #Run windmill tests if --windmill parameter was passed.
     if do_windmill:
-        # Our bank of windmill-specific imports. Only loaded when used.
-        import types
-        import logging
-        import threading
-        from windmill.conf import global_settings
-        from windmill.authoring import setup_module, teardown_module
-        from django.core.management.commands.test_windmill import ServerContainer, attempt_import
-        from django.test.windmill_tests import WindmillDjangoUnitTest
-        from django.db.models.loading import remove_model
-
-
         # We don't want to try and parse models that we know are invalid.
         remove_model('invalid_models')
 
