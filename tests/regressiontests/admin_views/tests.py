@@ -35,12 +35,12 @@ class AdminViewBasicTest(TestCase):
 
     def setUp(self):
         from django.contrib import admin
-        admin.autodiscover()
+        admin.register(TestSection)
         self.client.login(username='super', password='secret')
 
     def tearDown(self):
         from django.contrib import admin
-        admin.autodiscover()
+        admin.unregister(TestSection)
         self.client.logout()
 
     def testTrailingSlashRequired(self):

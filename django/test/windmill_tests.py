@@ -55,18 +55,18 @@ class TestServerThread(threading.Thread):
 
         # Must do database stuff in this new thread if database in memory.
         from django.conf import settings
-        if settings.DATABASE_ENGINE == 'sqlite3' \
-            and (not settings.TEST_DATABASE_NAME or settings.TEST_DATABASE_NAME == ':memory:'):
-            from django.db import connection
-            print 'Creating test DB'
-            db_name = connection.creation.create_test_db(0)
-            #call_command('syncdb', 0, 0)
-            # Import the fixture data into the test database.
-            if hasattr(self, 'fixtures'):
-                print 'Loading fixtures.'
-                # We have to use this slightly awkward syntax due to the fact
-                # that we're using *args and **kwargs together.
-                call_command('loaddata', *self.fixtures, **{'verbosity': 0})
+        #if settings.DATABASE_ENGINE == 'sqlite3' \
+        #    and (not settings.TEST_DATABASE_NAME or settings.TEST_DATABASE_NAME == ':memory:'):
+        from django.db import connection
+        print 'Creating test DB'
+        db_name = connection.creation.create_test_db(0,autoclobber=True)
+        #call_command('syncdb', 0, 0)
+        # Import the fixture data into the test database.
+        if hasattr(self, 'fixtures'):
+            print 'Loading fixtures.'
+            # We have to use this slightly awkward syntax due to the fact
+            # that we're using *args and **kwargs together.
+            call_command('loaddata', *self.fixtures, **{'verbosity': 0})
 
         try:
             print "running thread"

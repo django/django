@@ -274,7 +274,8 @@ def django_tests(verbosity, interactive, test_labels):
         print 'Waiting for threaded server to come online.'
         started.wait()
         print 'DB Ready, Server online.'
-
+        from django.contrib import admin
+        admin.autodiscover()
 
 
         # Set the testing URL based on what available port we get.
@@ -331,6 +332,7 @@ def django_tests(verbosity, interactive, test_labels):
                 #count = count + 1
                 #setup_module(tests[count][1])
             teardown_module(tests[0][1])
+            server_container.stop_test_server()
             # sys.argv = [wmtests[0],]
             #             bin.cli()
             
