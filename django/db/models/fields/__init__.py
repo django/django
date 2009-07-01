@@ -768,6 +768,16 @@ class NullBooleanField(Field):
         defaults.update(kwargs)
         return super(NullBooleanField, self).formfield(**defaults)
 
+class OrderField(IntegerField):
+    def __init__(self, *args, **kwargs):
+        kwargs['default'] = 0
+        Field.__init__(self, *args, **kwargs)
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.OrderField}
+        defaults.update(kwargs)
+        return super(OrderField, self).formfield(**defaults)
+
 class PositiveIntegerField(IntegerField):
     def get_internal_type(self):
         return "PositiveIntegerField"

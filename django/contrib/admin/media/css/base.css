@@ -260,7 +260,6 @@ tfoot td {
     padding: 2px 5px;
     font-size: 11px;
     background: #e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x;
-    border-left: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
 }
 
@@ -328,18 +327,27 @@ table thead th.descending a {
 
 /* ORDERABLE TABLES */
 
-table.orderable tbody tr td:hover {
-    cursor: move;
+table.orderable tbody tr.hover {
+    background-color: #F6F6F6;
 }
 
-table.orderable tbody tr td:first-child {
-    padding-left: 14px;
+table.orderable tbody tr td:nth-child(2) {
+    padding-left: 15px;
     background-image: url(../img/admin/nav-bg-grabber.gif);
     background-repeat: repeat-y;
 }
 
+table.orderable tbody tr td.original p {
+    margin-left: 9px;
+}
+
 table.orderable-initalized .order-cell, body>tr>td.order-cell {
     display: none;
+}
+
+.tDnD_whileDrag {
+    border: 2px dashed #CCC;
+    background-color: #F6F6F6;
 }
 
 /* FORM DEFAULTS */

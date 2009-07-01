@@ -1106,6 +1106,7 @@ class InlineModelAdmin(BaseModelAdmin):
     formset = BaseInlineFormSet
     extra = 3
     max_num = 0
+    order_field = None
     template = None
     verbose_name = None
     verbose_name_plural = None
@@ -1127,6 +1128,8 @@ class InlineModelAdmin(BaseModelAdmin):
             js.append('js/urlify.js')
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
+        if self.order_field:
+            js.append('js/jquery-tablednd.js')
         return forms.Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
     media = property(_media)
 

@@ -40,7 +40,7 @@ __all__ = (
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
     'SplitDateTimeField', 'IPAddressField', 'FilePathField', 'SlugField',
-    'TypedChoiceField'
+    'TypedChoiceField', 'OrderField'
 )
 
 # These values, if given to to_python(), will trigger the self.required check.
@@ -189,6 +189,9 @@ class IntegerField(Field):
         if self.min_value is not None and value < self.min_value:
             raise ValidationError(self.error_messages['min_value'] % self.min_value)
         return value
+
+class OrderField(IntegerField):
+    pass
 
 class FloatField(Field):
     default_error_messages = {

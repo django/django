@@ -5,7 +5,7 @@
 <fieldset class="module">
    <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
    {{ inline_admin_formset.formset.non_form_errors }}
-   <table>
+   <table class="{% if inline_admin_formset.opts.order_field %}orderable{% endif %}">
      <thead><tr>
      {% for field in inline_admin_formset.fields %}
        {% if not field.is_hidden %}
@@ -19,7 +19,7 @@
         {% if inline_admin_form.form.non_field_errors %}
         <tr><td colspan="{{ inline_admin_form.field_count }}">{{ inline_admin_form.form.non_field_errors }}</td></tr>
         {% endif %}
-        <tr class="{% cycle row1,row2 %} {% if inline_admin_form.original or inline_admin_form.show_url %}has_original{% endif %}">
+        <tr class="{% if not inline_admin_formset.opts.order_field %}{% cycle 'row1' 'row2' %} {% endif %}{% if inline_admin_form.original or inline_admin_form.show_url %}has_original{% endif %}">
 
         <td class="original">
           {% if inline_admin_form.original or inline_admin_form.show_url %}<p>
@@ -68,3 +68,47 @@
   {# </ul> #}
 
 </div>
+
+<script type="text/javascript">
+$(function() {
+    {% if inline_admin_formset.opts.order_field %}
+        // highlight each row on hover
+        $("table.orderable tbody tr").hover(
+            function() {
+                $(this).addClass('hover');
+            }, 
+            function() {
+                $(this).removeClass('hover');
+            }
+        );
+    
+        $('table.orderable').tableDnD({
+            onDragStart: function(table, row_obj) {
+                // once you start dragging a row, stop the hover() highlighting. 
+                // this is needed because the highlighting from onDragStyle isn't always in 
+                // sync with the hover() highlighting, which results in times where you have 
+                // two rows highlighted. 
+                $("table.orderable tbody tr").unbind('mouseenter').unbind('mouseleave');
+            },
+            onDrop: function(table, row_obj) {
+                var counter = 0;
+            
+                $(row_obj).parent().find('input[id$="{{ inline_admin_formset.opts.order_field }}"]')
+                    .each(function (i) {
+                        $(this).val(counter++);
+                    });
+            
+                // rebind hover
+                $("table.orderable tbody tr").hover(
+                    function() {
+                        $(this).addClass('hover');
+                    }, 
+                    function() {
+                        $(this).removeClass('hover');
+                    }
+                );
+            }
+        });
+    {% endif %}
+});
+</script>
