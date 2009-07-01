@@ -243,12 +243,12 @@ class TransactionTestCase(unittest.TestCase):
             try:
                 app_mods = cache.app_models[app_label]
                 for tm in self.test_models:
-                    print "importing %s " % tm
+                    #print "importing %s " % tm
                     im = importlib.import_module(tm)
                     #cache.app_store[im] = len(cache.app_store)
-                    print "finding model classes"
+                    #print "finding model classes"
                     mod_classes =  [f for f in im.__dict__.values() if hasattr(f,'__bases__') and issubclass(f,models.Model)]
-                    print "Found models %s " % mod_classes
+                    #print "Found models %s " % mod_classes
                     for mc in mod_classes:
                         print "Adding %s to AppCache" % mc
                         app_mods[mc.__name__.lower()] = mc
@@ -329,12 +329,12 @@ class TransactionTestCase(unittest.TestCase):
                app_mods = cache.app_models[app_label]
                print app_mods
                for tm in self.test_models:
-                   print "importing %s " % tm
+                   #print "importing %s " % tm
                    im = importlib.import_module(tm)
                    #cache.app_store[im] = len(cache.app_store)
-                   print "finding model classes"
+                   #print "finding model classes"
                    mod_classes =  [f for f in im.__dict__.values() if hasattr(f,'__bases__') and issubclass(f,models.Model)]
-                   print "Found models %s " % mod_classes
+                   #print "Found models %s " % mod_classes
                    for mc in mod_classes:
                        print "Deleting %s from AppCache" % mc
                        del app_mods[mc.__name__.lower()]
