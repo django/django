@@ -29,6 +29,45 @@ is required. For example::
 
         return row
 
+.. _transactions-and-raw-sql:
+
+Transactions and raw SQL
+------------------------
+If you are using transaction decorators (such as ``commit_on_success``) to
+wrap your views and provide transaction control, you don't have to make a
+manual call to ``transaction.commit_unless_managed()`` -- you can manually
+commit if you want to, but you aren't required to, since the decorator will
+commit for you. However, if you don't manually commit your changes, you will
+need to manually mark the transaction as dirty, using
+``transaction.set_dirty()``::
+
+    @commit_on_success
+    def my_custom_sql_view(request, value):
+        from django.db import connection, transaction
+        cursor = connection.cursor()
+
+        # Data modifying operation
+        cursor.execute("UPDATE bar SET foo = 1 WHERE baz = %s", [value])
+
+        # Since we modified data, mark the transaction as dirty
+        transaction.set_dirty()
+
+        # Data retrieval operation. This doesn't dirty the transaction,
+        # so no call to set_dirty() is required.
+        cursor.execute("SELECT foo FROM bar WHERE baz = %s", [value])
+        row = cursor.fetchone()
+
+        return render_to_response('template.html', {'row': row})
+
+The call to ``set_dirty()`` is made automatically when you use the Django ORM
+to make data modifying database calls. However, when you use raw SQL, Django
+has no way of knowing if your SQL modifies data or not. The manual call to
+``set_dirty()`` ensures that Django knows that there are modifications that
+must be committed.
+
+Connections and cursors
+-----------------------
+
 ``connection`` and ``cursor`` mostly implement the standard `Python DB-API`_
 (except when it comes to :ref:`transaction handling <topics-db-transactions>`).
 If you're not familiar with the Python DB-API, note that the SQL statement in
@@ -39,9 +78,12 @@ necessary. (Also note that Django expects the ``"%s"`` placeholder, *not* the
 ``"?"`` placeholder, which is used by the SQLite Python bindings. This is for
 the sake of consistency and sanity.)
 
+An easier option?
+-----------------
+
 A final note: If all you want to do is a custom ``WHERE`` clause, you can just
-use the ``where``, ``tables`` and ``params`` arguments to the standard lookup
-API.
+use the ``where``, ``tables`` and ``params`` arguments to the
+:ref:`extra clause <extra>` in the standard queryset API.
 
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
 

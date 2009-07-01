@@ -40,5 +40,5 @@ class Author(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=100)
-    author = models.ForeignKey(Author, related_name='books')
+    author = models.ForeignKey(Author, related_name='books', null=True)
     objects = models.GeoManager()

@@ -323,16 +323,19 @@ Since the Author model has only 3 fields, 'name', 'title', and
     to be empty, and does not provide a default value for the missing fields,
     any attempt to ``save()`` a ``ModelForm`` with missing fields will fail.
     To avoid this failure, you must instantiate your model with initial values
-    for the missing, but required fields, or use ``save(commit=False)`` and
-    manually set any extra required fields::
+    for the missing, but required fields::
 
-        instance = Instance(required_field='value')
-        form = InstanceForm(request.POST, instance=instance)
-        new_instance = form.save()
+        author = Author(title='Mr')
+        form = PartialAuthorForm(request.POST, instance=author)
+        form.save()
 
-        instance = form.save(commit=False)
-        instance.required_field = 'new value'
-        new_instance = instance.save()
+    Alternatively, you can use ``save(commit=False)`` and manually set
+    any extra required fields::
+
+        form = PartialAuthorForm(request.POST)
+        author = form.save(commit=False)
+        author.title = 'Mr'
+        author.save()
 
     See the `section on saving forms`_ for more details on using
     ``save(commit=False)``.
@@ -394,16 +397,26 @@ to be rendered first, we could specify the following ``ModelForm``::
     ...         model = Book
     ...         fields = ['title', 'author']
 
+.. _overriding-modelform-clean-method:
 
 Overriding the clean() method
 -----------------------------
 
 You can override the ``clean()`` method on a model form to provide additional
-validation in the same way you can on a normal form. However, by default the
-``clean()`` method validates the uniqueness of fields that are marked as
-``unique``, ``unique_together`` or ``unique_for_date|month|year`` on the model.
-Therefore, if you would like to override the ``clean()`` method and maintain the
-default validation, you must call the parent class's ``clean()`` method.
+validation in the same way you can on a normal form.
+
+In this regard, model forms have two specific characteristics when compared to
+forms:
+
+By default the ``clean()`` method validates the uniqueness of fields that are
+marked as ``unique``, ``unique_together`` or ``unique_for_date|month|year`` on
+the model.  Therefore, if you would like to override the ``clean()`` method and
+maintain the default validation, you must call the parent class's ``clean()``
+method.
+
+Also, a model form instance bound to a model object will contain a
+``self.instance`` attribute that gives model form methods access to that
+specific model instance.
 
 Form inheritance
 ----------------
@@ -563,8 +576,8 @@ number of objects needed::
     >>> formset.initial
     [{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}]
 
-If the value of ``max_num`` is higher than the number of objects returned, up to 
-``extra`` additional blank forms will be added to the formset, so long as the 
+If the value of ``max_num`` is higher than the number of objects returned, up to
+``extra`` additional blank forms will be added to the formset, so long as the
 total number of forms does not exceed ``max_num``::
 
     >>> AuthorFormSet = modelformset_factory(Author, max_num=4, extra=2)
@@ -608,7 +621,7 @@ Just like with ``ModelForms``, by default the ``clean()`` method of a
 the unique constraints on your model (either ``unique``, ``unique_together`` or
 ``unique_for_date|month|year``).  If you want to overide the ``clean()`` method
 on a ``model_formset`` and maintain this validation, you must call the parent
-classes ``clean`` method::
+class's ``clean`` method::
 
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
