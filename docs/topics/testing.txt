@@ -688,6 +688,28 @@ arguments at time of construction:
         and session data cleared to defaults. Subsequent requests will appear
         to come from an AnonymousUser.
 
+
+Making mock requests
+~~~~~~~~~~~~~~~~~~~~
+.. versionadded:: 1.1
+
+Use the ``django.test.mocks.RequestFactory`` class to create mock requests. Usage is as follows.
+::
+    rf = RequestFactory()
+    get_request = rf.get('/hello/')
+    post_request = rf.post('/submit/', {'foo': 'bar'})
+
+Once you have a request object you can pass it to any view function, just as if
+ that view had been hooked up using a URLconf.
+
+
+.. class:: RequestFactory()
+    There is only one method on a ``RequestFactory``.
+    
+    .. method:: RequestFactory.request(path, **request)
+        This will return a request object with the proper environment.
+
+
 Testing responses
 ~~~~~~~~~~~~~~~~~
 
@@ -919,6 +941,8 @@ This means, instead of instantiating a ``Client`` in each test::
         def test_index(self):
             response = self.client.get('/customer/index/')
             self.failUnlessEqual(response.status_code, 200)
+
+
 
 .. _topics-testing-fixtures:
 

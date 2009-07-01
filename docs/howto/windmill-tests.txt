@@ -11,80 +11,48 @@ popular `Windmill`_ framework. Writing a windmill test
 is simple, following these steps:
 
 .. _Windmill: http://getwindmill.com
+
 #. Your windmill tests must be their own module, named ``wmtests`` or ``windmilltests``.
-  
 
-#. Django must be able to run any function in the module without arguments.
-::
-        from windmill.conf import global_settings
-        ADMIN_URL =  "%s/test_admin/admin" % global_settings.TEST_URL
-        from windmill.authoring import WindmillTestClient
-        from django.test.utils import calling_func_name
+#. Django must be able to run any function in the module without arguments.::
 
-        def test_loginAndSetup():
-           '''Mostly just a proof of concept to test working order of tests.'''
-           client = WindmillTestClient(calling_func_name())
+    from windmill.conf import global_settings
+    ADMIN_URL =  "%s/test_admin/admin" % global_settings.TEST_URL
+    from windmill.authoring import WindmillTestClient
+    from django.test.utils import calling_func_name
 
-           client.open(url='http://localhost:8000/admin')
-           client.waits.forPageLoad(timeout=u'20000')
-           ...
+    def test_loginAndSetup():
+       '''Mostly just a proof of concept to test working order of tests.'''
+       client = WindmillTestClient(calling_func_name())
 
-#. Your windmill testing module must load any files other than the module loader 
-    in ``__init__.py``. 
-    ::
-        from primary.py import * 
+       client.open(url='http://localhost:8000/admin')
+       client.waits.forPageLoad(timeout=u'20000')
+       ...
 
-Your custom storage system may override any of the storage methods explained in
-:ref:`ref-files-storage`, but you **must** implement the following methods:
+#. Your windmill testing module must load any files other than the module loader in ``__init__.py``.::
 
-    * :meth:`Storage.delete`
-    * :meth:`Storage.exists`
-    * :meth:`Storage.listdir`
-    * :meth:`Storage.size`
-    * :meth:`Storage.url`
+    from primary import * 
+    ...
 
-You'll also usually want to use hooks specifically designed for custom storage
-objects. These are:
+Setup and Teardown are done differently for windmill tests, and consist of the following
+functions. :
 
-``_open(name, mode='rb')``
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+    * :meth:`setup_module`
+    * :meth:`teardown_module`
+   
+A sample implementation, in ``__init__.py``.::
 
-**Required**.
+    from primary import *
+    
+    def setup_module(module):
+        module.property = fetch_property()
+    
+    def teardown_module(module):
+        module.property = None
+    
 
-Called by ``Storage.open()``, this is the actual mechanism the storage class
-uses to open the file. This must return a ``File`` object, though in most cases,
-you'll want to return some subclass here that implements logic specific to the
-backend storage system.
 
-``_save(name, content)``
-~~~~~~~~~~~~~~~~~~~~~~~~
+These methods can be included in any file with windmill tests. See `functest`_
+for more information. 
 
-Called by ``Storage.save()``. The ``name`` will already have gone through
-``get_valid_name()`` and ``get_available_name()``, and the ``content`` will be a
-``File`` object itself. 
-
-Should return the actual name of name of the file saved (usually the ``name``
-passed in, but if the storage needs to change the file name return the new name
-instead).
-
-``get_valid_name(name)``
-------------------------
-
-Returns a filename suitable for use with the underlying storage system. The
-``name`` argument passed to this method is the original filename sent to the
-server, after having any path information removed. Override this to customize
-how non-standard characters are converted to safe filenames.
-
-The code provided on ``Storage`` retains only alpha-numeric characters, periods
-and underscores from the original filename, removing everything else.
-
-``get_available_name(name)``
-----------------------------
-
-Returns a filename that is available in the storage mechanism, possibly taking
-the provided filename into account. The ``name`` argument passed to this method
-will have already cleaned to a filename valid for the storage system, according
-to the ``get_valid_name()`` method described above.
-
-The code provided on ``Storage`` simply appends underscores to the filename
-until it finds one that's available in the destination directory.
+.. _functest : http://functest.pythonesque.org/
