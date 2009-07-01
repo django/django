@@ -6,19 +6,19 @@ from time import sleep
 import types
 import logging
 import threading
-
+from django.utils import importlib
 class ServerContainer(object):
     start_test_server = djangotest.start_test_server
     stop_test_server = djangotest.stop_test_server
 
 def attempt_import(name, suffix):
     try:
-        mod = __import__(name+'.'+suffix)
+        mod = importlib.import_module(name+'.'+suffix)
     except ImportError:
         mod = None
     if mod is not None:
         s = name.split('.')
-        mod = __import__(s.pop(0))
+        mod = importlib.import_module(s.pop(0))
         for x in s+[suffix]:
             try:
                 mod = getattr(mod, x)
