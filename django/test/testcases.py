@@ -230,11 +230,13 @@ class TransactionTestCase(unittest.TestCase):
 
     def _test_model_setup(self):
         if hasattr(self, 'test_models'):
-            print self.test_models
+            #print self.test_models
             if self.__module__.endswith('tests'):
                 app_label = self.__module__.split('.')[:-1][-1]
+                app_path = '.'.join(self.__module__.split('.')[:-1])
             else:
                 app_label = self.__module__.split('.')[:-2][-1]
+                app_path = '.'.join(self.__module__.split('.')[:-2])
             from django.db.models.loading import cache
             from django.utils import importlib
             from django.db import models
@@ -244,7 +246,7 @@ class TransactionTestCase(unittest.TestCase):
                 app_mods = cache.app_models[app_label]
                 for tm in self.test_models:
                     #print "importing %s " % tm
-                    im = importlib.import_module(tm)
+                    im = importlib.import_module(app_path + '.' + tm)
                     #cache.app_store[im] = len(cache.app_store)
                     #print "finding model classes"
                     mod_classes =  [f for f in im.__dict__.values() if hasattr(f,'__bases__') and issubclass(f,models.Model)]
@@ -302,11 +304,13 @@ class TransactionTestCase(unittest.TestCase):
 
     def _test_model_teardown(self):
         if hasattr(self, 'test_models'):
-            print self.test_models
+            #print self.test_models
             if self.__module__.endswith('tests'):
                 app_label = self.__module__.split('.')[:-1][-1]
+                app_path = '.'.join(self.__module__.split('.')[:-1])
             else:
                 app_label = self.__module__.split('.')[:-2][-1]
+                app_path = '.'.join(self.__module__.split('.')[:-2])
             from django.db.models.loading import cache
             from django.utils import importlib
             from django.db import models
@@ -327,10 +331,10 @@ class TransactionTestCase(unittest.TestCase):
             cache.write_lock.acquire()
             try:
                app_mods = cache.app_models[app_label]
-               print app_mods
+               #print app_mods
                for tm in self.test_models:
                    #print "importing %s " % tm
-                   im = importlib.import_module(tm)
+                   im = importlib.import_module(app_path + '.' + tm)
                    #cache.app_store[im] = len(cache.app_store)
                    #print "finding model classes"
                    mod_classes =  [f for f in im.__dict__.values() if hasattr(f,'__bases__') and issubclass(f,models.Model)]

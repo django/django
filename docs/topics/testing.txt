@@ -414,7 +414,7 @@ is why Django makes it easy to integrate with 3rd party test runners via the
 :setting:`TEST_RUNNER` setting. For convenience, Django ships a runner for
 the framework used in testing the :ref:`admin interface, <ref-contrib-admin>`
 Windmill_. Details on integrating Windmill tests with Django are available 
-:ref:`here. <howto-windmill-test>`
+:ref:`here. <howto-windmill-tests>`
 
 .. _Twill: http://twill.idyll.org/
 .. _Windmill: http://www.getwindmill.com/
@@ -981,6 +981,8 @@ This flush/load procedure is repeated for each test in the test case, so you
 can be certain that the outcome of a test will not be affected by another test,
 or by the order of test execution.
 
+.. _topics-testing-urlconf:
+
 URLconf configuration
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -1013,6 +1015,35 @@ For example::
 
 This test case will use the contents of ``myapp.test_urls`` as the
 URLconf for the duration of the test case.
+
+.. _topics-testing-testmodels:
+
+Test-Only Models configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.1
+
+.. attribute:: TransactionTestCase.test_models
+
+If you want to test your application with models that are only available during specific
+test cases, ``django.test.TransactionTestCase`` provides the ability to customize the models
+configuration for the duration of the execution of a test suite. If your
+``TransactionTestCase`` instance defines an ``test_models`` attribute, the ``TransactionTestCase`` will load
+the value of that attribute as a module, and load the models contained within for the 
+duration of that test.
+
+For example::
+
+    from django.test import TransactionTestCase
+
+    class TestMyViews(TransactionTestCase):
+        test_models = ['test_models']
+
+        def testIndexPageView(self):
+            # Here you'd test your view using ``Client``.
+
+This test case will load the contents of ``myapp.test_models`` and add
+any subclass of ``django.db.models.Model`` to ``myapp.models``.
 
 .. _emptying-test-outbox:
 

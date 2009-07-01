@@ -178,8 +178,12 @@ def django_tests(verbosity, interactive, test_labels):
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.simple.run_tests'
     #establish coverage settings for the regression suite
-    settings.COVERAGE_MODULE_EXCLUDES = ['modeltests*', 'regressiontests*', 'from .* import .*', 'import .*',]
-    settings.COVERAGE_CODE_EXCLUDES = ['def __unicode__\(self\):', 'def get_absolute_url\(self\):']
+    settings.COVERAGE_MODULE_EXCLUDES = ['modeltests*', 'regressiontests*']
+    settings.COVERAGE_CODE_EXCLUDES = ['def __unicode__\(self\):', 
+                                        'def get_absolute_url\(self\):', 
+                                        'from .* import .*',
+                                        'import .*',
+                                        'from *']
     # depending on how this is run, we might need to tell the coverage libraries to consider django.*
     settings.COVERAGE_ADDITIONAL_MODULES = ['django']
 

@@ -27,7 +27,7 @@ except NameError:
 
 class AdminViewBasicTest(TestCase):
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml']
-    test_models = ['regressiontests.admin_views.test_models']
+    test_models = ['test_models']
     # Store the bit of the URL where the admin is registered as a class
     # variable. That way we can test a second AdminSite just by subclassing
     # this test case and changing urlbit.
