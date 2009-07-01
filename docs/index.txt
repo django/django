@@ -65,7 +65,8 @@ The model layer
       :ref:`Raw SQL <topics-db-sql>` |
       :ref:`Transactions <topics-db-transactions>` |
       :ref:`Aggregation <topics-db-aggregation>` |
-      :ref:`Custom fields <howto-custom-model-fields>`
+      :ref:`Custom fields <howto-custom-model-fields>` |
+      :ref:`Multiple databases <topics-db-multi-db>`
 
     * **Other:**
       :ref:`Supported databases <ref-databases>` |

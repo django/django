@@ -877,7 +877,7 @@ logically::
 ``using(alias)``
 ~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.2
+.. versionadded:: TODO
 
 This method is for controlling which database the ``QuerySet`` will be
 evaluated against if you are using more than one database.  The only argument
