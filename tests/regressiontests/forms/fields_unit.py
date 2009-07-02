@@ -26,14 +26,14 @@ def fix_os_paths(x):
 
 
 class TestFields(TestCase):
-    # CharField ###################################################################
-
     def assertRaisesErrorWithMessage(self, error, message, callable, *args, **kwargs):
         self.assertRaises(error, callable, *args, **kwargs)
         try:
             callable(*args, **kwargs)
         except error, e:
             self.assertEqual(message, str(e))
+
+    # CharField ###################################################################
 
     def test_converted_0(self):
         f = CharField()
