@@ -198,7 +198,7 @@ def django_tests(verbosity, interactive, test_labels):
         from windmill.authoring import setup_module, teardown_module
         from django.core.management.commands.test_windmill import ServerContainer, attempt_import
         from django.test.windmill_tests import WindmillDjangoUnitTest
-        from django.db.models.loading import remove_model
+        from django.db.models.loading import remove_model, get_app
     #Run the appropriate test runner based on command line params.
     if do_std:
         if do_coverage:
@@ -258,7 +258,7 @@ def django_tests(verbosity, interactive, test_labels):
             if hasattr(mod, 'fixtures'):
                 for fixture in getattr(mod, 'fixtures'):
                     wmfixs.append(fixture)
-
+        
         # Create the threaded server.
         server_container = ServerContainer()
         # Set the server's 'fixtures' attribute so they can be loaded in-thread if using sqlite's memory backend.
@@ -270,12 +270,12 @@ def django_tests(verbosity, interactive, test_labels):
             settings.INSTALLED_APPS.remove('regressiontests.bug8245')
         if 'django.contrib.gis' in settings.INSTALLED_APPS:
             settings.INSTALLED_APPS.remove('django.contrib.gis')
-
+            
+        
         print 'Waiting for threaded server to come online.'
         started.wait()
         print 'DB Ready, Server online.'
-        from django.contrib import admin
-        admin.autodiscover()
+        
 
 
         # Set the testing URL based on what available port we get.

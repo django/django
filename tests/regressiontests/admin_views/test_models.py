@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import tempfile
 import os
-from django.core.files.storage import FileSystemStorage
+# from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.contrib import admin
-from django.core.mail import EmailMessage
+# from django.contrib import admin
+# from django.core.mail import EmailMessage
 
 class SectionTest(models.Model):
     """

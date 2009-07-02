@@ -2,7 +2,10 @@ from django.conf.urls.defaults import *
 from django.contrib import admin
 import views
 import customadmin
-#admin.autodiscover()
+try:
+    admin.autodiscover()
+except Exception, e:
+    print 'Autodiscover Error'
 urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/secure-view/$', views.secure_view),
