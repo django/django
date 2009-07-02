@@ -1,7 +1,7 @@
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connections
+from django.db import connections, DEFAULT_DB_ALIAS
 
 class Command(BaseCommand):
     help = ("Runs the command-line client for specified database, or the "
@@ -9,8 +9,8 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option('--database', action='store', dest='database',
-            default='default', help='Nominates a database to open a shell for.'
-                ' Defaults to the "default" database.'),
+            default=DEFAULT_DB_ALIAS, help='Nominates a database to open a '
+                'shell for.  Defaults to the "default" database.'),
     )
 
     requires_model_validation = False

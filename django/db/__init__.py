@@ -37,7 +37,7 @@ connections = ConnectionHandler(settings.DATABASES)
 # by the PostgreSQL backends.
 # we load all these up for backwards compatibility, you should use
 # connections['default'] instead.
-connection = connections['default']
+connection = connections[DEFAULT_DB_ALIAS]
 backend = load_backend(connection.settings_dict['DATABASE_ENGINE'])
 DatabaseError = backend.DatabaseError
 IntegrityError = backend.IntegrityError

@@ -2,15 +2,15 @@ import keyword
 from optparse import make_option
 
 from django.core.management.base import NoArgsCommand, CommandError
-from django.db import connections
+from django.db import connections, DEFAULT_DB_ALIAS
 
 class Command(NoArgsCommand):
     help = "Introspects the database tables in the given database and outputs a Django model module."
 
     option_list = NoArgsCommand.option_list + (
         make_option('--database', action='store', dest='database',
-            default='default', help='Nominates a database to introspect.  '
-                'Defaults to using the "default" database.'),
+            default=DEFAULT_DB_ALIAS, help='Nominates a database to '
+                'introspect.  Defaults to using the "default" database.'),
     )
 
     requires_model_validation = False

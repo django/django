@@ -1,7 +1,7 @@
 from optparse import make_option
 
 from django.core.management.base import LabelCommand
-from django.db import connections, transaction, models
+from django.db import connections, transaction, models, DEFAULT_DB_ALIAS
 
 class Command(LabelCommand):
     help = "Creates the table needed to use the SQL cache backend."
@@ -10,8 +10,9 @@ class Command(LabelCommand):
 
     option_list = LabelCommand.option_list + (
         make_option('--database', action='store', dest='database',
-            default='default', help='Nominates a specific database to install '
-                'the cache table to.  Defaults to the "default" database.'),
+            default=DEFAULT_DB_ALIAS, help='Nominates a specific database to '
+                'install the cache table to.  Defaults to the "default" '
+                'database.'),
     )
 
     requires_model_validation = False
