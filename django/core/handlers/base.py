@@ -63,25 +63,25 @@ class BaseHandler(object):
         # as a flag for initialization being complete.
         self._request_middleware = request_middleware
 
- 	def process_request(self, request_env): 
- 	    signals.request_started.send(sender=self.__class__) 
- 	    try: 
- 	        try: 
- 	            request = self.request_class(request_env) 
- 	        except UnicodeDecodeError: 
- 	            response = http.HttpResponseBadRequest() 
- 	        else: 
- 	            response = self.get_response(request) 
+    def process_request(self, request_env):
+        signals.request_started.send(sender=self.__class__)
+        try:
+            try:
+                request = self.request_class(request_env)
+            except UnicodeDecodeError:
+                response = http.HttpResponseBadRequest()
+            else:
+                response = self.get_response(request)
 
- 	            # Apply response middleware 
- 	            if not isinstance(response, http.HttpResponseSendFile): 
- 	                for middleware_method in self._response_middleware: 
- 	                    response = middleware_method(request, response) 
- 	                response = self.apply_response_fixes(request, response) 
- 	    finally: 
- 	        signals.request_finished.send(sender=self.__class__) 
+                # Apply response middleware
+                if not isinstance(response, http.HttpResponseSendFile):
+                    for middleware_method in self._response_middleware:
+                        response = middleware_method(request, response)
+                    response = self.apply_response_fixes(request, response)
+        finally:
+            signals.request_finished.send(sender=self.__class__)
 
- 	    return response 
+        return response
 
     def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
