@@ -14,6 +14,9 @@ class Reporter(models.Model):
     last_name = models.CharField(max_length=30)
     email = models.EmailField()
 
+    class Meta:
+        ordering = ('first_name', 'last_name')
+
     def __unicode__(self):
         return u"%s %s" % (self.first_name, self.last_name)
 

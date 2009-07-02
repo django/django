@@ -225,7 +225,7 @@ class GeoQuery(sql.Query):
                 values.append(self.convert_values(value, field))
         else:
             values.extend(row[index_start:])
-        return values
+        return tuple(values)
 
     def convert_values(self, value, field):
         """
