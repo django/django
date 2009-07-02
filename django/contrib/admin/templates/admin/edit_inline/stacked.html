@@ -53,7 +53,7 @@ $(function() {
     
     $(id_prefix + "-add").click(function() {
         var new_inline = $(id_prefix + '-empty').clone(true)
-                            .insertBefore(id_prefix + '-addinline').fadeIn('normal');
+                            .insertBefore(id_prefix + '-empty').fadeIn('normal');
         
         var inline_template = $(new_inline).html();
         var new_inline_html = inline_template.replace(/__prefix__/g, total_forms.val().toString());
