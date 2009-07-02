@@ -664,7 +664,10 @@ class BaseModelFormSet(BaseFormSet):
                 or (pk.rel and pk.rel.parent_link and pk_is_not_editable(pk.rel.to._meta.pk)))
         if pk_is_not_editable(pk) or pk.name not in form.fields:
             try:
-                pk_value = self.get_queryset()[index].pk
+                if index:
+                    pk_value = self.get_queryset()[index].pk
+                else:
+                    pk_value = None
             except IndexError:
                 pk_value = None
             if isinstance(pk, OneToOneField) or isinstance(pk, ForeignKey):

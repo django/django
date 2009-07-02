@@ -118,6 +118,21 @@ class BaseFormSet(StrAndUnicode):
         return self.forms[self.initial_form_count():]
     extra_forms = property(_get_extra_forms)
 
+    def _get_empty_form(self, **kwargs):
+        defaults = {'auto_id': self.auto_id, 'prefix': self.add_prefix("__prefix__")}
+        if self.data or self.files:
+            defaults['data'] = self.data
+            defaults['files'] = self.files
+        
+        defaults['empty_permitted'] = True
+        defaults.update(kwargs)
+
+        form = self.form(**defaults)
+        self.add_fields(form, None)
+        
+        return form
+    empty_form = property(_get_empty_form)
+
     # Maybe this should just go away?
     def _get_cleaned_data(self):
         """
@@ -133,7 +148,7 @@ class BaseFormSet(StrAndUnicode):
         Returns a list of forms that have been marked for deletion. Raises an
         AttributeError if deletion is not allowed.
         """
-        if not self.can_delete:
+        if not self.is_valid or not self.can_delete:
             raise AttributeError("'%s' object has no attribute 'deleted_forms'" % self.__class__.__name__)
         # construct _deleted_form_indexes which is just a list of form indexes
         # that have had their deletion widget set to True
@@ -154,7 +169,7 @@ class BaseFormSet(StrAndUnicode):
         Returns a list of form in the order specified by the incoming data.
         Raises an AttributeError if ordering is not allowed.
         """
-        if not self.can_order:
+        if not self.is_valid or not self.can_order:
             raise AttributeError("'%s' object has no attribute 'ordered_forms'" % self.__class__.__name__)
         # Construct _ordering, which is a list of (form_index, order_field_value)
         # tuples. After constructing this list, we'll sort it by order_field_value
@@ -267,7 +282,7 @@ class BaseFormSet(StrAndUnicode):
         """A hook for adding extra fields on to each form instance."""
         if self.can_order:
             # Only pre-fill the ordering field for initial forms.
-            if index < self.initial_form_count():
+            if index != None and index < self.initial_form_count():
                 form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_(u'Order'), initial=index+1, required=False)
             else:
                 form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_(u'Order'), required=False)

@@ -350,6 +350,10 @@ table.orderable-initalized .order-cell, body>tr>td.order-cell {
     background-color: #F6F6F6;
 }
 
+.empty_form {
+    display: none;
+}
+
 /* FORM DEFAULTS */
 
 input, textarea, select {

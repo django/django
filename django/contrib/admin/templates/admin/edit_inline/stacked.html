@@ -5,7 +5,7 @@
 {{ inline_admin_formset.formset.non_form_errors }}
 
 {% for inline_admin_form in inline_admin_formset %}
-<div class="inline-related{% if forloop.last %} last-related{% endif %}" id="{{ inline_admin_formset.opts.verbose_name}}{{ forloop.counter }}">
+<div class="inline-related{% if forloop.last %} empty_form{% endif %}" id="{{ inline_admin_formset.opts.verbose_name}}{% if not forloop.last %}{{ forloop.counter }}{% else %}-empty{% endif %}">
   <h3><b>{{ inline_admin_formset.opts.verbose_name|title }}:</b>&nbsp;<span class="inline_label">{% if inline_admin_form.original %}{{ inline_admin_form.original }}{% else %} #{{ forloop.counter }}{% endif %}</span>
     {% if inline_admin_formset.formset.can_delete and inline_admin_form.original %}<span class="delete">{{ inline_admin_form.deletion_field.field }} {{ inline_admin_form.deletion_field.label_tag }}</span>{% endif %}
   </h3>
@@ -22,62 +22,48 @@
 </div>
 {% endfor %}
 
-<ul class="tools add_inline">
+<ul class="tools add_inline" id="{{ inline_admin_formset.opts.verbose_name}}-addinline">
   <li><a id="{{ inline_admin_formset.opts.verbose_name }}-add" class="add" href="#">Add a {{ inline_admin_formset.opts.verbose_name }}</a></li>
 </ul>
 
 </div>
 
 <script type="text/javascript">
-function increment_fields(el) {
-    el.attr('id', el.attr('id').replace(/-(\d+)-/, function (num) {
-        var newnum = parseInt(num.replace(/-/g,''))+1;
-        return '-' + newnum + '-';
-    }));
-    
-    el.attr('name', el.attr('name').replace(/-(\d+)-/, function (num) {
-        var newnum = parseInt(num.replace(/-/g,''))+1;
-        return '-' + newnum + '-';
-    }));
-}
-
 $(function() {
-    var id_prefix = "{{ inline_admin_formset.opts.verbose_name }}";
-    var total_forms = $('#' + id_prefix + '-group input[id$="TOTAL_FORMS"]');
-    var initial_forms = $('#' + id_prefix + '-group').find('input[id$="INITIAL_FORMS"]');
+    var prefix = "{{ inline_admin_formset.opts.verbose_name }}";
+    var id_prefix = "#" + prefix;
+    var total_forms = $(id_prefix + '-group input[id$="TOTAL_FORMS"]');
+    var initial_forms = $(id_prefix + '-group').find('input[id$="INITIAL_FORMS"]');
     
-    // since javascript is turned on, unhide the "add new <inline>" link and hide the extras
+    // since javascript is turned on, unhide the "add new <inline>" link
     $('.add_inline').show();
     
-    if (parseInt(initial_forms.val()) > 0) {
-        $('#' + id_prefix + '-group .inline-related:gt(' + (initial_forms.val() - 1) + ')').remove();
-    }
-    else {
-        $('#' + id_prefix + '-group .inline-related:gt(0)').remove();
-        $('#' + id_prefix + '-group .inline-related:first').hide();
-    }
-
-    total_forms.val(parseInt(initial_forms.val()));
-    
-    // clicking on the "add" link will add a blank form to add a new inline object
-    $('#' + id_prefix + "-add").click(function() {
-        if (parseInt(total_forms.val()) == 0) {
-            $('#' + id_prefix + '-group .inline-related:first').fadeIn('normal');
-            total_forms.val(parseInt(total_forms.val()) + 1);
-            return false;
+    // hide the extras, but only if there were no form errors
+    if (!$('.errornote').html()) {
+        if (parseInt(initial_forms.val()) > 0) {
+            $(id_prefix + '-group .inline-related:gt(' + (initial_forms.val() - 1) + ')')
+                .not('.empty_form').remove();
+        }
+        else {
+            $(id_prefix + '-group .inline-related').not('.empty_form').remove();
         }
         
-        var last_inline = $('#' + id_prefix + '-group .inline-related:last');
-        var new_inline = last_inline.clone(true).hide().insertAfter(last_inline).fadeIn('normal');
+        total_forms.val(parseInt(initial_forms.val()));
+    }
+    
+    $(id_prefix + "-add").click(function() {
+        var new_inline = $(id_prefix + '-empty').clone(true)
+                            .insertBefore(id_prefix + '-addinline').fadeIn('normal');
         
-        new_inline.find('input, select').each(function(i) { 
-            increment_fields($(this));
-            $(this).val("");
-        });
+        var inline_template = $(new_inline).html();
+        var new_inline_html = inline_template.replace(/__prefix__/g, total_forms.val().toString());
         
         total_forms.val(parseInt(total_forms.val()) + 1);
         
-        new_inline.find(".inline_label").text('#' + total_forms.val());
+        $(new_inline).html(new_inline_html);
+        $(new_inline).attr('id', prefix + total_forms.val().toString());
+        $(new_inline).find('.inline_label').html('#' + total_forms.val().toString());
+        $(new_inline).removeClass('empty_form');
         
         return false;
     });
