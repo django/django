@@ -36,7 +36,7 @@
 <ul>
 {% regroup models by app_label as grouped_models %}
 {% for group in grouped_models %}
-    <li><a href="#{{ group.grouper }}">{{ group.grouper|capfirst }}</a></li>
+    <li><a href="#app-{{ group.grouper }}">{{ group.grouper|capfirst }}</a></li>
 {% endfor %}
 </ul>
 </div>

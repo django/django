@@ -144,10 +144,10 @@ as registering your model in the admin site::
         headline = models.CharField(max_length=200)
         content = models.TextField()
         reporter = models.ForeignKey(Reporter)
-        
+
 
     # In admin.py in the same directory...
-    
+
     import models
     from django.contrib import admin
 
@@ -243,9 +243,9 @@ might look like:
     <h1>Articles for {{ year }}</h1>
 
     {% for article in article_list %}
-    <p>{{ article.headline }}</p>
-    <p>By {{ article.reporter.full_name }}</p>
-    <p>Published {{ article.pub_date|date:"F j, Y" }}</p>
+        <p>{{ article.headline }}</p>
+        <p>By {{ article.reporter.full_name }}</p>
+        <p>Published {{ article.pub_date|date:"F j, Y" }}</p>
     {% endfor %}
     {% endblock %}
 

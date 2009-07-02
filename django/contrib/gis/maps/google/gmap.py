@@ -21,7 +21,7 @@ class GoogleMap(object):
     def __init__(self, key=None, api_url=None, version=None,
                  center=None, zoom=None, dom_id='map',
                  kml_urls=[], polylines=None, polygons=None, markers=None,
-                 template='gis/google/google-single.js',
+                 template='gis/google/google-map.js',
                  js_module='geodjango',
                  extra_context={}):
 
@@ -162,7 +162,7 @@ class GoogleMapSet(GoogleMap):
 
         # This is the template used to generate the GMap load JavaScript for
         # each map in the set.
-        self.map_template = kwargs.pop('map_template', 'gis/google/google-map.js')
+        self.map_template = kwargs.pop('map_template', 'gis/google/google-single.js')
 
         # Running GoogleMap.__init__(), and resetting the template
         # value with default obtained above.

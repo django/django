@@ -51,8 +51,9 @@ If your project is not on your ``PYTHONPATH`` by default you can add::
 
     sys.path.append('/usr/local/django')
 
-just above the ``import`` line to place your project on the path. Remember to
-replace 'mysite.settings' with your correct settings file.
+just above the final ``import`` line to place your project on the path. Remember to
+replace 'mysite.settings' with your correct settings file, and '/usr/local/django'
+with your own project's location.
 
 See the :ref:`Apache/mod_python documentation<howto-deployment-modpython>` for 
 directions on serving static media, and the `mod_wsgi documentation`_ for an 

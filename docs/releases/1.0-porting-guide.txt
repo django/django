@@ -677,7 +677,7 @@ load_data::
       management.call_command('flush', verbosity=0, interactive=False)
       management.call_command('loaddata', 'test_data', verbosity=0)
 
-Subcommands must now preceed options
+Subcommands must now precede options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``django-admin.py`` and ``manage.py`` now require subcommands to precede
