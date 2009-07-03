@@ -744,7 +744,10 @@ class Variable(object):
                     else:
                         raise
 
-        return current
+        if hasattr(current, 'localize'):
+            return current.localize()
+        else:
+            return current
 
 class Node(object):
     # Set this to True for nodes that must be first in the template (although

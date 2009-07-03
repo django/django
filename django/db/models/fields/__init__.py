@@ -339,6 +339,34 @@ class Field(object):
         "Returns the value of this field in the given model instance."
         return getattr(obj, self.attname)
 
+    def localize(self, value):
+        """
+        Returns the value with a localize method that can be used when
+        representing the object as a string, to get the value formatted
+        using the current locale
+        """
+        # FIXME: is there a way to to cast an instance to a class that works for
+        # datetime.datetime objects?
+        import datetime
+        localized_class = type('localized_class', (type(value),), dict(localize=None))
+        if isinstance(value, datetime.date):
+            localized_value = localized_class(value.year, value.month, value.day)
+        elif isinstance(value, datetime.datetime):
+            localized_value = localized_class(value.year, value.month, value.day,
+                value.hour, value.minute, value.second)
+        else:
+            localized_value = localized_class(value)
+
+        localized_value.localize = lambda : self._localize_funct(value)
+        return localized_value
+
+    def _localize_funct(self, value):
+        """
+        Localizable field types should overwrite this method to specify
+        how to localize field representation
+        """
+        return unicode(value)
+
 class AutoField(Field):
     empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
@@ -635,6 +663,10 @@ class DecimalField(Field):
         }
         defaults.update(kwargs)
         return super(DecimalField, self).formfield(**defaults)
+
+    def _localize_funct(self, value):
+        from django.utils.formats import number_format
+        return number_format(value)
 
 class EmailField(CharField):
     def __init__(self, *args, **kwargs):

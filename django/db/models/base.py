@@ -260,11 +260,11 @@ class Model(object):
             # is *not* consumed. We rely on this, so don't change the order
             # without changing the logic.
             for val, field in izip(args, fields_iter):
-                setattr(self, field.attname, val)
+                setattr(self, field.attname, field.localize(val))
         else:
             # Slower, kwargs-ready version.
             for val, field in izip(args, fields_iter):
-                setattr(self, field.attname, val)
+                setattr(self, field.attname, field.localize(val))
                 kwargs.pop(field.name, None)
                 # Maintain compatibility with existing calls.
                 if isinstance(field.rel, ManyToOneRel):
