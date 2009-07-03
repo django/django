@@ -704,6 +704,8 @@ objects. Templates can override or extend base admin templates as described in
 If you don't specify this attribute, a default template shipped with Django
 that provides the standard appearance is used.
 
+.. _model-admin-methods:
+
 ``ModelAdmin`` methods
 ----------------------
 
