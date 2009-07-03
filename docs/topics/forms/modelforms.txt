@@ -366,6 +366,8 @@ parameter when declaring the form field::
    ...     class Meta:
    ...         model = Article
 
+.. _overriding-modelform-clean-method:
+
 Overriding the clean() method
 -----------------------------
 
