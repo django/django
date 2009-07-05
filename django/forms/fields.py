@@ -172,6 +172,11 @@ class CharField(Field):
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         self.max_length, self.min_length = max_length, min_length
         super(CharField, self).__init__(*args, **kwargs)
+        # TODO: use this as soon as you make regex validator and use it in RegexField
+        #if min_length is not None:
+        #    self.validators.append(validators.MinLengthValidator(min_length))
+        #if max_length is not None:
+        #    self.validators.append(validators.MaxLengthValidator(max_length))
 
     def to_python(self, value):
         "Returns a Unicode object."

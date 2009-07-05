@@ -469,6 +469,10 @@ class BooleanField(Field):
         return super(BooleanField, self).formfield(**defaults)
 
 class CharField(Field):
+    def __init__(self, *args, **kwargs):
+        super(CharField, self).__init__(*args, **kwargs)
+        self.validators.append(validators.MaxLengthValidator(self.max_length))
+
     def get_internal_type(self):
         return "CharField"
 
@@ -478,6 +482,9 @@ class CharField(Field):
         return smart_unicode(value)
 
     def formfield(self, **kwargs):
+        # passing of max_length to forms.CharField means that the value's length
+        # will be validated twice. This is considered acceptable since we want
+        # the value in the form field (to pass into widget for example).
         defaults = {'max_length': self.max_length}
         defaults.update(kwargs)
         return super(CharField, self).formfield(**defaults)

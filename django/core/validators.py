@@ -40,6 +40,7 @@ def validate_ipv4_address(value):
             code="invalid"
         )
 
+
 class MaxValueValidator(object):
     def __init__(self, max_value):
         self.max_value = max_value
@@ -51,6 +52,7 @@ class MaxValueValidator(object):
                 code='max_value',
                 params=(self.max_value,)
             )
+
 class MinValueValidator(object):
     def __init__(self, min_value):
         self.min_value = min_value
@@ -61,6 +63,32 @@ class MinValueValidator(object):
                 _(u'Ensure this value is greater than or equal to %s.') % self.min_value,
                 code='min_value',
                 params=(self.min_value,)
+            )
+
+class MinLengthValidator(object):
+    def __init__(self, min_length):
+        self.min_length = min_length
+
+    def __call__(self, value):
+        value_len = len(value)
+        if value_len < self.min_length:
+            raise ValidationError(
+                _(u'Ensure this value has at least %(min)d characters (it has %(length)d).'),
+                code='min_length',
+                params={ 'min': self.min_length, 'length': value_len}
+            )
+
+class MaxLengthValidator(object):
+    def __init__(self, max_length):
+        self.max_length = max_length
+
+    def __call__(self, value):
+        value_len = len(value)
+        if value_len > self.max_length:
+            raise ValidationError(
+                _(u'Ensure this value has at most %(max)d characters (it has %(length)d).'),
+                code='max_length',
+                params={ 'max': self.max_length, 'length': value_len}
             )
 
 class ComplexValidator(object):

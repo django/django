@@ -39,6 +39,10 @@ class BaseModelValidationTests(ValidationTestCase):
         mtv = ModelToValidate(number=10, name='Some Name', email='valid@email.com')
         self.assertEqual(None, mtv.clean())
 
+    def test_text_greater_that_charfields_max_length_eaises_erros(self):
+        mtv = ModelToValidate(number=10, name='Some Name'*100)
+        self.assertFailsValidation(mtv.clean, ['name',])
+
 class GetUniqueCheckTests(unittest.TestCase):
     def test_unique_fields_get_collected(self):
         m = UniqueFieldsModel()
