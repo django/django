@@ -101,15 +101,12 @@ class Field(object):
         self.creation_counter = Field.creation_counter
         Field.creation_counter += 1
 
-        def set_class_error_messages(messages, klass):
-            for base_class in klass.__bases__:
-                set_class_error_messages(messages, base_class)
-            messages.update(getattr(klass, 'default_error_messages', {}))
-
         messages = {}
-        set_class_error_messages(messages, self.__class__)
+        for c in reversed(self.__class__.__mro__):
+            messages.update(getattr(c, 'default_error_messages', {}))
         messages.update(error_messages or {})
         self.error_messages = messages
+
         self.validators = self.default_validators + validators
 
     def to_python(self, value):
