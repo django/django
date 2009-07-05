@@ -229,8 +229,6 @@ class IntegerField(Field):
 class FloatField(IntegerField):
     default_error_messages = {
         'invalid': _(u'Enter a number.'),
-        'max_value': _(u'Ensure this value is less than or equal to %s.'),
-        'min_value': _(u'Ensure this value is greater than or equal to %s.'),
     }
 
     def to_python(self, value):
