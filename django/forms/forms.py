@@ -254,6 +254,7 @@ class BaseForm(StrAndUnicode):
         for name, field in self.fields.items():
             if not name in self.cleaned_data:
                 continue
+            failed = False
             for v in field.validators:
                 # skip noncomplex validators, they have already been run on the Field
                 if not isinstance(v, ComplexValidator):
@@ -261,14 +262,14 @@ class BaseForm(StrAndUnicode):
                 try:
                     v(self.cleaned_data[name], all_values=self.cleaned_data)
                 except ValidationError, e:
+                    failed = True
                     error_list = self._errors.setdefault(name, self.error_class())
                     if hasattr(e, 'code'):
                         error_list.append(field.error_messages.get(e.code, e.messages[0]))
                     else:
                         error_list.extend(e.messages)
-                    if name in self.cleaned_data:
-                        del self.cleaned_data[name]
-
+            if failed:
+                del self.cleaned_data[name]
         try:
             self.cleaned_data = self.clean()
         except ValidationError, e:
