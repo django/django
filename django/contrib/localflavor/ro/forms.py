@@ -5,8 +5,8 @@ Romanian specific form helpers.
 
 import re
 
+from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError, Field, RegexField, Select
-from django.forms.fields import EMPTY_VALUES
 from django.utils.translation import ugettext_lazy as _
 
 class ROCIFField(RegexField):

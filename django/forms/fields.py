@@ -25,7 +25,6 @@ except NameError:
 
 from django.core.exceptions import ValidationError
 from django.core import validators
-from django.core.validators import EMPTY_VALUES
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
 
@@ -117,7 +116,7 @@ class Field(object):
         return value
     
     def validate(self, value):
-        if value in EMPTY_VALUES and self.required:
+        if value in validators.EMPTY_VALUES and self.required:
             raise ValidationError(self.error_messages['required'])
 
     def run_validators(self, value):
@@ -176,14 +175,14 @@ class CharField(Field):
 
     def to_python(self, value):
         "Returns a Unicode object."
-        if value in EMPTY_VALUES:
+        if value in validators.EMPTY_VALUES:
             return u''
         return smart_unicode(value)
     
     def validate(self, value):
         "Validates max_length and min_length."
         super(CharField, self).validate(value)
-        if value in EMPTY_VALUES:
+        if value in validators.EMPTY_VALUES:
             # non-required field, no need for further validation
             return
         value_length = len(value)
@@ -214,7 +213,7 @@ class IntegerField(Field):
         of int(). Returns None for empty values.
         """
         value = super(IntegerField, self).to_python(value)
-        if value in EMPTY_VALUES:
+        if value in validators.EMPTY_VALUES:
             return None
 
         try:
@@ -225,7 +224,7 @@ class IntegerField(Field):
 
     def validate(self, value):
         super(IntegerField, self).validate(value)
-        if value in EMPTY_VALUES:
+        if value in validators.EMPTY_VALUES:
             return
         if self.max_value is not None and value > self.max_value:
             raise ValidationError(self.error_messages['max_value'] % self.max_value)
@@ -245,7 +244,7 @@ class FloatField(IntegerField):
         of float(). Returns None for empty values.
         """
         value = super(IntegerField, self).to_python(value)
-        if value in EMPTY_VALUES:
+        if value in validators.EMPTY_VALUES:
             return None
 
         try:
@@ -276,7 +275,7 @@ class DecimalField(Field):
         than max_digits in the number, and no more than decimal_places digits
         after the decimal point.
         """
-        if value in EMPTY_VALUES:
+        if value in validators.EMPTY_VALUES:
             return None
         value = smart_str(value).strip()
         try:
@@ -287,7 +286,7 @@ class DecimalField(Field):
 
     def validate(self, value):
         super(DecimalField, self).validate(value)
-        if value in EMPTY_VALUES:
+        if value in validators.EMPTY_VALUES:
             return
         sign, digittuple, exponent = value.as_tuple()
         decimals = abs(exponent)
@@ -336,7 +335,7 @@ class DateField(Field):
         Validates that the input can be converted to a date. Returns a Python
         datetime.date object.
         """
-        if value in EMPTY_VALUES:
+        if value in validators.EMPTY_VALUES:
             return None
         if isinstance(value, datetime.datetime):
             return value.date()
@@ -369,7 +368,7 @@ class TimeField(Field):
         Validates that the input can be converted to a time. Returns a Python
         datetime.time object.
         """
-        if value in EMPTY_VALUES:
+        if value in validators.EMPTY_VALUES:
             return None
         if isinstance(value, datetime.time):
             return value
@@ -407,7 +406,7 @@ class DateTimeField(Field):
         Validates that the input can be converted to a datetime. Returns a
         Python datetime.datetime object.
         """
-        if value in EMPTY_VALUES:
+        if value in validators.EMPTY_VALUES:
             return None
         if isinstance(value, datetime.datetime):
             return value
@@ -482,7 +481,7 @@ class FileField(Field):
         super(FileField, self).__init__(*args, **kwargs)
 
     def to_python(self, data):
-        if data in EMPTY_VALUES:
+        if data in validators.EMPTY_VALUES:
             return None
 
         # UploadedFile objects should have name and size attributes.
@@ -677,7 +676,7 @@ class ChoiceField(Field):
 
     def to_python(self, value):
         "Returns a Unicode object."
-        if value in EMPTY_VALUES:
+        if value in validators.EMPTY_VALUES:
             return u''
         return smart_unicode(value)
     
@@ -715,7 +714,7 @@ class TypedChoiceField(ChoiceField):
         """
         value = super(TypedChoiceField, self).to_python(value)
         super(TypedChoiceField, self).validate(value)
-        if value == self.empty_value or value in EMPTY_VALUES:
+        if value == self.empty_value or value in validators.EMPTY_VALUES:
             return self.empty_value
         try:
             value = self.coerce(value)
@@ -820,7 +819,7 @@ class MultiValueField(Field):
         clean_data = []
         errors = ErrorList()
         if not value or isinstance(value, (list, tuple)):
-            if not value or not [v for v in value if v not in EMPTY_VALUES]:
+            if not value or not [v for v in value if v not in validators.EMPTY_VALUES]:
                 if self.required:
                     raise ValidationError(self.error_messages['required'])
                 else:
@@ -832,7 +831,7 @@ class MultiValueField(Field):
                 field_value = value[i]
             except IndexError:
                 field_value = None
-            if self.required and field_value in EMPTY_VALUES:
+            if self.required and field_value in validators.EMPTY_VALUES:
                 raise ValidationError(self.error_messages['required'])
             try:
                 clean_data.append(field.clean(field_value))
@@ -915,9 +914,9 @@ class SplitDateTimeField(MultiValueField):
         if data_list:
             # Raise a validation error if time or date is empty
             # (possible if SplitDateTimeField has required=False).
-            if data_list[0] in EMPTY_VALUES:
+            if data_list[0] in validators.EMPTY_VALUES:
                 raise ValidationError(self.error_messages['invalid_date'])
-            if data_list[1] in EMPTY_VALUES:
+            if data_list[1] in validators.EMPTY_VALUES:
                 raise ValidationError(self.error_messages['invalid_time'])
             return datetime.datetime.combine(*data_list)
         return None

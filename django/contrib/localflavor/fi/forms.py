@@ -3,8 +3,9 @@ FI-specific Form helpers
 """
 
 import re
+from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
-from django.forms.fields import Field, RegexField, Select, EMPTY_VALUES
+from django.forms.fields import Field, RegexField, Select
 from django.utils.translation import ugettext_lazy as _
 
 class FIZipCodeField(RegexField):

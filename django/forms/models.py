@@ -9,9 +9,10 @@ from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+from django.core.validators import EMPTY_VALUES
 from util import ErrorList
 from forms import BaseForm, get_declared_fields, NON_FIELD_ERRORS
-from fields import Field, ChoiceField, IntegerField, EMPTY_VALUES
+from fields import Field, ChoiceField, IntegerField
 from widgets import Select, SelectMultiple, HiddenInput, MultipleHiddenInput
 from widgets import media_property
 from formsets import BaseFormSet, formset_factory, DELETION_FIELD_NAME
