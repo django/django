@@ -22,6 +22,29 @@ def validate_email(value):
     if not email_re.search(smart_unicode(value)):
         raise ValidationError(_(u'Enter a valid e-mail address.'), code='invalid')
 
+class MaxValueValidator(object):
+    def __init__(self, max_value):
+        self.max_value = max_value
+
+    def __call__(self, value):
+        if value > self.max_value:
+            raise ValidationError(
+                _(u'Ensure this value is less than or equal to %s.') % self.max_value,
+                code='max_value',
+                params=(self.max_value,)
+            )
+class MinValueValidator(object):
+    def __init__(self, min_value):
+        self.min_value = min_value
+
+    def __call__(self, value):
+        if value < self.min_value:
+            raise ValidationError(
+                _(u'Ensure this value is greater than or equal to %s.') % self.min_value,
+                code='min_value',
+                params=(self.min_value,)
+            )
+
 class ComplexValidator(object):
     def get_value(self, name, all_values, obj):
         assert all_values or obj, "Either all_values or obj must be supplied"

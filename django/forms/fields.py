@@ -128,7 +128,10 @@ class Field(object):
                     v(value)
                 except ValidationError, e:
                     if hasattr(e, 'code'):
-                        errors.append(self.error_messages.get(e.code, e.messages[0]))
+                        message = self.error_messages.get(e.code, e.messages[0])
+                        if e.params:
+                            message = message % e.params
+                        errors.append(message)
                     else:
                         errors.extend(e.messages)
         if errors:
@@ -201,8 +204,12 @@ class IntegerField(Field):
     }
 
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
-        self.max_value, self.min_value = max_value, min_value
         super(IntegerField, self).__init__(*args, **kwargs)
+
+        if max_value is not None:
+            self.validators.append(validators.MaxValueValidator(max_value))
+        if min_value is not None:
+            self.validators.append(validators.MinValueValidator(min_value))
 
     def to_python(self, value):
         """
@@ -218,15 +225,6 @@ class IntegerField(Field):
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'])
         return value
-
-    def validate(self, value):
-        super(IntegerField, self).validate(value)
-        if value in validators.EMPTY_VALUES:
-            return
-        if self.max_value is not None and value > self.max_value:
-            raise ValidationError(self.error_messages['max_value'] % self.max_value)
-        if self.min_value is not None and value < self.min_value:
-            raise ValidationError(self.error_messages['min_value'] % self.min_value)
 
 class FloatField(IntegerField):
     default_error_messages = {
@@ -261,9 +259,13 @@ class DecimalField(Field):
     }
 
     def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
-        self.max_value, self.min_value = max_value, min_value
         self.max_digits, self.decimal_places = max_digits, decimal_places
         Field.__init__(self, *args, **kwargs)
+
+        if max_value is not None:
+            self.validators.append(validators.MaxValueValidator(max_value))
+        if min_value is not None:
+            self.validators.append(validators.MinValueValidator(min_value))
 
     def to_python(self, value):
         """
@@ -297,10 +299,6 @@ class DecimalField(Field):
             digits = decimals
         whole_digits = digits - decimals
 
-        if self.max_value is not None and value > self.max_value:
-            raise ValidationError(self.error_messages['max_value'] % self.max_value)
-        if self.min_value is not None and value < self.min_value:
-            raise ValidationError(self.error_messages['min_value'] % self.min_value)
         if self.max_digits is not None and digits > self.max_digits:
             raise ValidationError(self.error_messages['max_digits'] % self.max_digits)
         if self.decimal_places is not None and decimals > self.decimal_places:

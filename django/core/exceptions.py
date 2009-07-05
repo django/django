@@ -35,7 +35,7 @@ class FieldError(Exception):
 NON_FIELD_ERRORS = '__all__'
 class ValidationError(Exception):
     """An error while validating data."""
-    def __init__(self, message, code=None):
+    def __init__(self, message, code=None, params=None):
         import operator
         from django.utils.encoding import force_unicode
         """
@@ -50,6 +50,7 @@ class ValidationError(Exception):
             self.messages = [force_unicode(msg) for msg in message]
         else:
             self.code = code
+            self.params = params
             message = force_unicode(message)
             self.messages = [message]
 
