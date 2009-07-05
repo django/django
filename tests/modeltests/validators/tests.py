@@ -1,7 +1,11 @@
+# -*- coding: utf-8 -*-
 from unittest import TestCase
 
 from django.core.exceptions import ValidationError
-from django.core.validators import validate_integer, validate_email, RequiredIfOtherFieldBlank
+from django.core.validators import (
+        validate_integer, validate_email, RequiredIfOtherFieldBlank,
+        validate_slug, validate_ipv4_address
+    )
 
 class TestSimpleValidators(TestCase):
     pass
@@ -12,15 +16,42 @@ SIMPLE_VALIDATORS_VALUES = (
     (validate_integer, '-42', None),
     (validate_integer, -42, None),
     (validate_integer, -42.5, None),
+
     (validate_integer, None, ValidationError),
     (validate_integer, 'a', ValidationError),
+
+
     (validate_email, 'email@here.com', None),
     (validate_email, 'weirder-email@here.and.there.com', None),
+
     (validate_email, None, ValidationError),
     (validate_email, '', ValidationError),
     (validate_email, 'abc', ValidationError),
     (validate_email, 'a @x.cz', ValidationError),
     (validate_email, 'something@@somewhere.com', ValidationError),
+
+
+    (validate_slug, 'slug-ok', None),
+    (validate_slug, 'longer-slug-still-ok', None),
+    (validate_slug, '--------', None),
+    (validate_slug, 'nohyphensoranything', None),
+
+    (validate_slug, '', ValidationError),
+    (validate_slug, ' text ', ValidationError),
+    (validate_slug, ' ', ValidationError),
+    (validate_slug, 'some@mail.com', ValidationError),
+    (validate_slug, '你好', ValidationError),
+    (validate_slug, '\n', ValidationError),
+
+
+    (validate_ipv4_address, '1.1.1.1', None),
+    (validate_ipv4_address, '255.0.0.0', None),
+    (validate_ipv4_address, '0.0.0.0', None),
+
+    (validate_ipv4_address, '256.1.1.1', ValidationError),
+    (validate_ipv4_address, '25.1.1.', ValidationError),
+    (validate_ipv4_address, '25,1,1,1', ValidationError),
+    (validate_ipv4_address, '25.1 .1.1', ValidationError),
 )
 
 def get_simple_test_func(validator, expected, value, num):

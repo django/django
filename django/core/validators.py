@@ -22,6 +22,24 @@ def validate_email(value):
     if not email_re.search(smart_unicode(value)):
         raise ValidationError(_(u'Enter a valid e-mail address.'), code='invalid')
 
+slug_re = re.compile(r'^[-\w]+$')
+
+def validate_slug(value):
+    if not slug_re.search(smart_unicode(value)):
+        raise ValidationError(
+            _(u"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."),
+            code='invalid'
+        )
+
+ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
+
+def validate_ipv4_address(value):
+    if not ipv4_re.search(smart_unicode(value)):
+        raise ValidationError(
+            _(u'Enter a valid IPv4 address.'),
+            code="invalid"
+        )
+
 class MaxValueValidator(object):
     def __init__(self, max_value):
         self.max_value = max_value

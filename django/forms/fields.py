@@ -914,23 +914,17 @@ class SplitDateTimeField(MultiValueField):
             return datetime.datetime.combine(*data_list)
         return None
 
-ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
 
-class IPAddressField(RegexField):
+class IPAddressField(CharField):
     default_error_messages = {
         'invalid': _(u'Enter a valid IPv4 address.'),
     }
+    default_validators = [validators.validate_ipv4_address]
 
-    def __init__(self, *args, **kwargs):
-        super(IPAddressField, self).__init__(ipv4_re, *args, **kwargs)
 
-slug_re = re.compile(r'^[-\w]+$')
-
-class SlugField(RegexField):
+class SlugField(CharField):
     default_error_messages = {
         'invalid': _(u"Enter a valid 'slug' consisting of letters, numbers,"
                      u" underscores or hyphens."),
     }
-
-    def __init__(self, *args, **kwargs):
-        super(SlugField, self).__init__(slug_re, *args, **kwargs)
+    default_validators = [validators.validate_slug]
