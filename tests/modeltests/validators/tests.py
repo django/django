@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import types
 from unittest import TestCase
 
 from django.core.exceptions import ValidationError
@@ -63,13 +64,17 @@ def get_simple_test_func(validator, expected, value, num):
         test_mask = 'test_%s_%d'
         def test_func(self):
             self.assertEqual(expected, validator(value))
-    test_name = test_mask % (validator.__name__, num)
+    if isinstance(validator, types.FunctionType):
+        val_name = validator.__name__
+    else:
+        val_name = validator.__class__.__name__
+    test_name = test_mask % (val_name, num)
     return test_name, test_func
 
-test_counter = {}
+test_counter = 0
 for validator, value, expected in SIMPLE_VALIDATORS_VALUES:
-    num = test_counter[validator] = test_counter.setdefault(validator, 0) + 1
-    setattr(TestSimpleValidators, *get_simple_test_func(validator, expected, value, num))
+    setattr(TestSimpleValidators, *get_simple_test_func(validator, expected, value, test_counter))
+    test_counter += 1
 
 class TestComplexValidators(TestCase):
     pass
