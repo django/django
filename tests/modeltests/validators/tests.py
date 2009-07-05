@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 import types
 from unittest import TestCase
+from datetime import datetime, timedelta
 
 from django.core.exceptions import ValidationError
 from django.core.validators import (
         validate_integer, validate_email, RequiredIfOtherFieldBlank,
-        validate_slug, validate_ipv4_address
+        validate_slug, validate_ipv4_address, MaxValueValidator,
+        MinValueValidator
     )
 
+now = datetime.now()
 class TestSimpleValidators(TestCase):
     pass
 
@@ -53,6 +56,15 @@ SIMPLE_VALIDATORS_VALUES = (
     (validate_ipv4_address, '25.1.1.', ValidationError),
     (validate_ipv4_address, '25,1,1,1', ValidationError),
     (validate_ipv4_address, '25.1 .1.1', ValidationError),
+
+    (MaxValueValidator(10), 10, None),
+    (MaxValueValidator(10), -10, None),
+    (MaxValueValidator(10), 0, None),
+    (MaxValueValidator(now), now, None),
+    (MaxValueValidator(now), now - timedelta(days=1), None),
+
+    (MaxValueValidator(0), 1, ValidationError),
+    (MaxValueValidator(now), now + timedelta(days=1), ValidationError),
 )
 
 def get_simple_test_func(validator, expected, value, num):
