@@ -1,25 +1,26 @@
 {% load i18n %}
-<div class="inline-group">
-    <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
+
+<div class="selector-inline inline-group" id="{{ inline_admin_formset.opts.verbose_name}}-group">
+    <div class="inline-related">
         {{ inline_admin_formset.formset.management_form }}
             <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
             
             {{ inline_admin_formset.formset.non_form_errors }}
             
-            <div class="inline-selector">
+            <ul class="inline-selector">
                 {% for inline_admin_form in inline_admin_formset %}
-                    <div class="inline-selector-item">
+                    <li class="inline-selector-item">
                         <a href="#" class="inline-select" title="{{ inline_admin_formset.opts.verbose_name}}{{ forloop.counter }}">
                         {% if inline_admin_form.original or inline_admin_form.show_url %}
                             {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
                             {% if inline_admin_form.show_url %}<a href="../../../r/{{ inline_admin_form.original_content_type_id }}/{{ inline_admin_form.original.id }}/">{% trans "View on site" %}</a>{% endif %}
                         {% else %}
-                            [New Inline]
+                        {{ inline_admin_formset.opts.verbose_name|title}}: #{{ forloop.counter }}
                         {% endif %}
                         </a>
-                    </div>
+                    </li>
                 {% endfor %}
-            </div>
+            </ul>
             
             <div class="inline-detail">
             {% for inline_admin_form in inline_admin_formset %}
@@ -29,7 +30,7 @@
                             {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
                             {% if inline_admin_form.show_url %}<a href="../../../r/{{ inline_admin_form.original_content_type_id }}/{{ inline_admin_form.original.id }}/">{% trans "View on site" %}</a>{% endif %}
                         {% else %}
-                            [New Inline]
+                            {{ inline_admin_formset.opts.verbose_name|title}}: #{{ forloop.counter }}
                         {% endif %}
 
                         {% if inline_admin_formset.formset.can_delete %}
@@ -104,5 +105,22 @@ $(function() {
         
         return false;
     });
+
+    {% if inline_admin_formset.opts.order_field %}
+    /* Reordering Inlines */
+    var list = $('ul.inline-selector').ListReorder({ useDefaultDragHandle: true});
+    var id_prefix = '#{{ inline_admin_formset.opts.verbose_name}}';
+    
+    list.bind('listorderchanged', function(evt, jq_list, list_order) {
+        counter = 1;
+        $(id_prefix + '-group a.inline-select').each(function (i) {
+            if (counter < list_order.length) {
+                $('.inline-detail #' + $(this).attr('title') + 
+                    ' input[id$="{{ inline_admin_formset.opts.order_field }}"]').val(counter++);
+            }
+        });
+    });
+    
+    {% endif %}
 });
 </script>

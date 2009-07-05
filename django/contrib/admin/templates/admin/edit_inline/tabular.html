@@ -132,7 +132,7 @@ $(function() {
             $("table.orderable tbody tr").unbind('mouseenter').unbind('mouseleave');
         },
         onDrop: function(table, row_obj) {
-            var counter = 0;
+            var counter = 1;
         
             $(row_obj).parent().find('input[id$="{{ inline_admin_formset.opts.order_field }}"]')
                 .each(function (i) {

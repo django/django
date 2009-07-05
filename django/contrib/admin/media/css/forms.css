@@ -233,10 +233,6 @@ fieldset.monospace textarea {
     width: 8em;
 }
 
-.inline-related {
-    position: relative;
-}
-
 .inline-related h3 {
     margin: 0;
     color: #666;
@@ -247,10 +243,7 @@ fieldset.monospace textarea {
 }
 
 .inline-related h3 span.delete {
-    padding-left: 20px;
-    position: absolute;
-    top: 2px;
-    right: 10px;
+    float: right;
 }
 
 .inline-related h3 span.delete label {
@@ -329,24 +322,26 @@ fieldset.monospace textarea {
     display: none;
 }
 
-.inline-selector {
+ul.inline-selector {
     float: left;
     width: 19%;
+    padding: 0;
 }
 
 .inline-selector a, .inline-selector a:visited {
     color: #000;
 }
 
-.inline-selector-item {
+li.inline-selector-item {
     background-color: #F6F6F6;
     border: 1px solid #E7E7E7;
     padding: 5px;
     margin: 7px 0px 7px 5px;
     font-size: 0.9em;
+    list-style-type: none;
 }
 
-.inline-selector-item:hover {
+li.inline-selector-item:hover {
     background-color: #C1DBFD;
 }
 
@@ -360,7 +355,7 @@ fieldset.monospace textarea {
     float: right;
 }
 
-.inline-selected {
+li.inline-selected {
     background-color: #9EB7D5;
 }
 

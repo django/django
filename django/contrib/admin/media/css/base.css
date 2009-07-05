@@ -350,6 +350,16 @@ table.orderable-initalized .order-cell, body>tr>td.order-cell {
     background-color: #F6F6F6;
 }
 
+.dragHandle {
+    height: 20px;
+    width: 20px;
+    float: right;
+	cursor: move;
+	background-color: #fff;
+	border: 1px solid #f00;
+	display: block;
+}
+
 .empty_form {
     display: none;
 }
