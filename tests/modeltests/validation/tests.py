@@ -1,18 +1,14 @@
 import unittest
 
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
-from django.test import TestCase
 from django.db import models
 
+from modeltests.validation import ValidationTestCase
 from models import *
 
-class BaseModelValidationTests(TestCase):
-    def assertFailsValidation(self, clean, failed_fields):
-        self.assertRaises(ValidationError, clean)
-        try:
-            clean()
-        except ValidationError, e:
-            self.assertEquals(sorted(failed_fields), sorted(e.message_dict.keys()))
+from validators import TestModelsWithValidators
+
+class BaseModelValidationTests(ValidationTestCase):
 
     def test_missing_required_field_raises_error(self):
         mtv = ModelToValidate()
@@ -42,14 +38,6 @@ class BaseModelValidationTests(TestCase):
     def test_correct_email_value_passes(self):
         mtv = ModelToValidate(number=10, name='Some Name', email='valid@email.com')
         self.assertEqual(None, mtv.clean())
-
-    def test_custom_validator_passes_for_correct_value(self):
-        mtv = ModelToValidate(number=10, name='Some Name', f_with_custom_validator=42)
-        self.assertEqual(None, mtv.clean())
-
-    def test_custom_validator_raises_error_for_incorrect_value(self):
-        mtv = ModelToValidate(number=10, name='Some Name', f_with_custom_validator=12)
-        self.assertFailsValidation(mtv.clean, ['f_with_custom_validator'])
 
 class GetUniqueCheckTests(unittest.TestCase):
     def test_unique_fields_get_collected(self):
