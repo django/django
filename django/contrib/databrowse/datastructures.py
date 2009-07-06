@@ -156,11 +156,11 @@ class EasyInstanceField(object):
         elif isinstance(self.field, models.DateField) or isinstance(self.field, models.TimeField):
             if self.raw_value:
                 if isinstance(self.field, models.DateTimeField):
-                    objs = capfirst(formats.date_and_time_format(self.raw_value, 'DATETIME_FORMAT'))
+                    objs = capfirst(formats.date_format(self.raw_value, 'DATETIME_FORMAT'))
                 elif isinstance(self.field, models.TimeField):
-                    objs = capfirst(formats.date_and_time_format(self.raw_value, 'TIME_FORMAT'))
+                    objs = capfirst(formats.date_format(self.raw_value, 'TIME_FORMAT'))
                 else:
-                    objs = capfirst(formats.date_and_time_format(self.raw_value, 'DATE_FORMAT'))
+                    objs = capfirst(formats.date_format(self.raw_value, 'DATE_FORMAT'))
             else:
                 objs = EMPTY_VALUE
         elif isinstance(self.field, models.BooleanField) or isinstance(self.field, models.NullBooleanField):

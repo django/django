@@ -1,4 +1,9 @@
+import decimal
+import datetime
+
 from django.utils.importlib import import_module
+from django.utils import dateformat
+from django.utils import numberformat 
 
 def getformat_null(format_type):
     """
@@ -38,24 +43,10 @@ if settings.USE_I18N and settings.USE_FORMAT_I18N:
 else:
     getformat = getformat_null
 
-def date_and_time_format(value, format):
-    import dateformat
-    return dateformat.format(value, getformat('DATE_FORMAT'))
-
-def date_format(value):
-    import dateformat
-    return dateformat.format(value, getformat('DATE_FORMAT'))
-
-def datetime_format(value):
-    import dateformat
-    return dateformat.format(value, getformat('DATE_FORMAT'))
-
-def time_format(value):
-    import dateformat
-    return dateformat.time_format(value, getformat('TIME_FORMAT'))
+def date_format(value, format=None):
+    return dateformat.format(value, getformat(format or 'DATE_FORMAT'))
 
 def number_format(value):
-    import numberformat
     return numberformat.format(
         value,
         getformat('DECIMAL_SEPARATOR'),
@@ -63,4 +54,14 @@ def number_format(value):
         3, # TODO: get it from formats
         getformat('THOUSAND_SEPARATOR'),
     )
+
+def localize(value):
+    if settings.USE_I18N and settings.USE_FORMAT_I18N:
+        if isinstance(value, decimal.Decimal):
+            return number_format(value)
+        elif isinstance(value, datetime.datetime):
+            return date_format(value, 'DATETIME_FORMAT')
+        elif isinstance(value, datetime.date):
+            return date_format(value)
+    return value
 

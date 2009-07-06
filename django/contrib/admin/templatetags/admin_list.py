@@ -8,7 +8,7 @@ from django.utils.html import escape, conditional_escape
 from django.utils.text import capfirst
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from django.utils.formats import getformat
+from django.utils.formats import localize
 from django.utils.encoding import smart_unicode, smart_str, force_unicode
 from django.template import Library
 import datetime
@@ -183,26 +183,17 @@ def items_for_result(cl, result, form):
                 else:
                     result_repr = EMPTY_CHANGELIST_VALUE
             # Dates and times are special: They're formatted in a certain way.
-            elif isinstance(f, models.DateField) or isinstance(f, models.TimeField):
+            elif isinstance(f, models.DateField) or isinstance(f, models.TimeField) or isinstance(f, models.DecimalField):
                 if field_val:
-                    if isinstance(f, models.DateTimeField):
-                        result_repr = capfirst(formats.date_and_time_format(field_val, 'DATETIME_FORMAT'))
-                    elif isinstance(f, models.TimeField):
-                        result_repr = capfirst(formats.date_and_time_format(field_val, 'TIME_FORMAT'))
-                    else:
-                        result_repr = capfirst(formats.format(field_val, 'DATE_FORMAT'))
+                    result_repr = localize(field_val)
+                    # result_repr = ('%%.%sf' % f.decimal_places) % field_val
                 else:
                     result_repr = EMPTY_CHANGELIST_VALUE
-                row_class = ' class="nowrap"'
+                if not isinstance(f, models.DecimalField):
+                    row_class = ' class="nowrap"'
             # Booleans are special: We use images.
             elif isinstance(f, models.BooleanField) or isinstance(f, models.NullBooleanField):
                 result_repr = _boolean_icon(field_val)
-            # DecimalFields are special: Zero-pad the decimals.
-            elif isinstance(f, models.DecimalField):
-                if field_val is not None:
-                    result_repr = ('%%.%sf' % f.decimal_places) % field_val
-                else:
-                    result_repr = EMPTY_CHANGELIST_VALUE
             # Fields with choices are special: Use the representation
             # of the choice.
             elif f.flatchoices:
@@ -272,9 +263,9 @@ def date_hierarchy(cl):
                 'show': True,
                 'back': {
                     'link': link({year_field: year_lookup, month_field: month_lookup}),
-                    'title': formats.date_and_time_format(day, 'YEAR_MONTH_FORMAT')
+                    'title': capfirst(formats.date_format(day, 'YEAR_MONTH_FORMAT'))
                 },
-                'choices': [{'title': formats.date_and_time_format(day, 'MONTH_DAY_FORMAT')}]
+                'choices': [{'title': capfirst(formats.date_format(day, 'MONTH_DAY_FORMAT'))}]
             }
         elif year_lookup and month_lookup:
             days = cl.query_set.filter(**{year_field: year_lookup, month_field: month_lookup}).dates(field_name, 'day')
@@ -286,7 +277,7 @@ def date_hierarchy(cl):
                 },
                 'choices': [{
                     'link': link({year_field: year_lookup, month_field: month_lookup, day_field: day.day}),
-                    'title': formats.date_and_time_format(day, 'MONTH_DAY_FORMAT')
+                    'title': capfirst(formats.date_format(day, 'MONTH_DAY_FORMAT'))
                 } for day in days]
             }
         elif year_lookup:
@@ -299,7 +290,7 @@ def date_hierarchy(cl):
                 },
                 'choices': [{
                     'link': link({year_field: year_lookup, month_field: month.month}),
-                    'title': formats.date_and_time_format(month, 'YEAR_MONTH_FORMAT')
+                    'title': capfirst(formats.date_format(month, 'YEAR_MONTH_FORMAT'))
                 } for month in months]
             }
         else:
