@@ -185,7 +185,11 @@ class RegexURLResolver(object):
                 try:
                     sub_match = pattern.resolve(new_path)
                 except Resolver404, e:
-                    tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['tried']])
+                    sub_tried = e.args[0].get('tried')
+                    if sub_tried is not None:
+                        tried.extend([(pattern.regex.pattern + '   ' + t) for t in sub_tried])
+                    else:
+                        tried.append(pattern.regex.pattern)
                 else:
                     if sub_match:
                         sub_match_dict = dict([(smart_str(k), v) for k, v in match.groupdict().items()])
@@ -195,7 +199,7 @@ class RegexURLResolver(object):
                         return sub_match[0], sub_match[1], sub_match_dict
                     tried.append(pattern.regex.pattern)
             raise Resolver404, {'tried': tried, 'path': new_path}
-        raise Resolver404, {'tried': [], 'path' : path}
+        raise Resolver404, {'path' : path}
 
     def _get_urlconf_module(self):
         try:

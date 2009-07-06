@@ -101,6 +101,14 @@ You can use any number of values in a ``{% cycle %}`` tag, separated by spaces.
 Values enclosed in single (``'``) or double quotes (``"``) are treated as
 string literals, while values without quotes are treated as template variables.
 
+Note that the variables included in the cycle will not be escaped. This is
+because template tags do not escape their content. If you want to escape the
+variables in the cycle, you must do so explicitly::
+
+    {% filter force_escape %}
+        {% cycle var1 var2 var3 %}
+    {% endfilter %}
+
 For backwards compatibility, the ``{% cycle %}`` tag supports the much inferior
 old syntax from previous Django versions. You shouldn't use this in any new
 projects, but for the sake of the people who are still using it, here's what it
@@ -160,8 +168,9 @@ Sample usage::
 firstof
 ~~~~~~~
 
-Outputs the first variable passed that is not False.  Outputs nothing if all the
-passed variables are False.
+Outputs the first variable passed that is not False, without escaping.
+
+Outputs nothing if all the passed variables are False.
 
 Sample usage::
 
@@ -170,17 +179,25 @@ Sample usage::
 This is equivalent to::
 
     {% if var1 %}
-        {{ var1 }}
+        {{ var1|safe }}
     {% else %}{% if var2 %}
-        {{ var2 }}
+        {{ var2|safe }}
     {% else %}{% if var3 %}
-        {{ var3 }}
+        {{ var3|safe }}
     {% endif %}{% endif %}{% endif %}
 
 You can also use a literal string as a fallback value in case all
 passed variables are False::
 
     {% firstof var1 var2 var3 "fallback value" %}
+
+Note that the variables included in the firstof tag will not be escaped. This
+is because template tags do not escape their content. If you want to escape
+the variables in the firstof tag, you must do so explicitly::
+
+    {% filter force_escape %}
+        {% firstof var1 var2 var3 "fallback value" %}
+    {% endfilter %}
 
 .. templatetag:: for
 
