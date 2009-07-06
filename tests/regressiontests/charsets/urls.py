@@ -19,4 +19,5 @@ urlpatterns = patterns('',
     (r'^good_content_type/', views.good_content_type),
     (r'^bad_content_type/', views.bad_content_type),
     (r'^content_type_no_charset/', views.content_type_no_charset),
+    (r'^basic_response/', views.basic_response),
 )

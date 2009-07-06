@@ -13,7 +13,7 @@ except ImportError:
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 from django.http.multipartparser import MultiPartParser
-from django.http.charsets import determine_charset, get_codec
+from django.http.charsets import get_response_encoding, get_codec
 from django.conf import settings
 from django.core.files import uploadhandler
 from utils import *
@@ -270,24 +270,21 @@ class BadHeaderError(ValueError):
 class HttpResponse(object):
     """A basic HTTP response, with content and dictionary-accessed headers."""
 
-    status_code = 200
+    _status_code = 200
+    _codec = None
+    _charset = settings.DEFAULT_CHARSET
 
     def __init__(self, content='', mimetype=None, status=None,
             content_type=None, request=None):
         from django.conf import settings
-        self._charset = settings.DEFAULT_CHARSET
-        self._codec = None
         accept_charset = None
         if mimetype:
-            content_type = mimetype     # Mimetype is an alias for content-type 
+            content_type = mimetype  # Mimetype arg is an alias for content-type
         if request:
             accept_charset = request.META.get("ACCEPT_CHARSET")
         if accept_charset or content_type:
-            charset, codec = determine_charset(content_type, accept_charset)
-            if charset:
-                self._charset = charset
-            if codec:
-                self._codec = codec
+            encoding = get_response_encoding(content_type, accept_charset)
+            (self._charset, self._codec) = encoding
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
@@ -370,12 +367,27 @@ class HttpResponse(object):
         self.set_cookie(key, max_age=0, path=path, domain=domain,
                         expires='Thu, 01-Jan-1970 00:00:00 GMT')
 
+    def _get_status_code(self):
+        if not self._valid_codec():
+            self._status_code = 406
+            self._container = ['']
+        return self._status_code
+
+    def _set_status_code(self, value):
+        self._status_code = value
+
+    status_code = property(_get_status_code, _set_status_code)
+
+    def _valid_codec(self):
+        if not self._codec:
+            self._codec = get_codec(self._charset)
+        if not self._codec:
+            return False
+        return True
+
     def _get_content(self):
         if self.has_header('Content-Encoding'):
             return ''.join(self._container)
-        
-        if not self._codec:
-            self._codec = get_codec(self._charset)
         return smart_str(''.join(self._container), self._codec.name)
 
     def _set_content(self, value):
@@ -390,8 +402,6 @@ class HttpResponse(object):
 
     def next(self):
         chunk = self._iterator.next()
-        if not self._codec:
-            self._codec = get_codec(self._charset)
         if isinstance(chunk, unicode):
             chunk = chunk.encode(self._codec.name)
         return str(chunk)
@@ -432,57 +442,57 @@ class HttpResponseSendFile(HttpResponse):
  	    self[settings.HTTPRESPONSE_SENDFILE_HEADER] = path_to_file 
 
     def _get_content(self):
-        return open(self.sendfile_filename)
+        return open(self.sendfile_filename).read()
 
     content = property(_get_content)
 
 class HttpResponseRedirect(HttpResponse):
-    status_code = 302
+    _status_code = 302
 
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
         self['Location'] = redirect_to
 
 class HttpResponsePermanentRedirect(HttpResponse):
-    status_code = 301
+    _status_code = 301
 
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
         self['Location'] = redirect_to
 
 class HttpResponseNotModified(HttpResponse):
-    status_code = 304
+    _status_code = 304
 
 class HttpResponseBadRequest(HttpResponse):
-    status_code = 400
+    _status_code = 400
 
 class HttpResponseNotFound(HttpResponse):
-    status_code = 404
+    _status_code = 404
 
 class HttpResponseForbidden(HttpResponse):
-    status_code = 403
+    _status_code = 403
 
 class HttpResponseNotAllowed(HttpResponse):
-    status_code = 405
+    _status_code = 405
 
     def __init__(self, permitted_methods):
         HttpResponse.__init__(self)
         self['Allow'] = ', '.join(permitted_methods)
 
 class HttpResponseNotAcceptable(HttpResponse):
-    status_code = 406
+    _status_code = 406
 
     # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
     # if we want to make this more verbose (compliant, actually)
 
 class HttpResponseGone(HttpResponse):
-    status_code = 410
+    _status_code = 410
 
     def __init__(self, *args, **kwargs):
         HttpResponse.__init__(self, *args, **kwargs)
 
 class HttpResponseServerError(HttpResponse):
-    status_code = 500
+    _status_code = 500
 
     def __init__(self, *args, **kwargs):
         HttpResponse.__init__(self, *args, **kwargs)

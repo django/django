@@ -15,3 +15,6 @@ def content_type_no_charset(request):
 
 def encode_response(request):
     return HttpResponse(u"\ue863", content_type="text/html; charset=GBK")
+
+def basic_response(request):
+    return HttpResponse("ASCII.")

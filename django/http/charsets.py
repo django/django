@@ -235,16 +235,14 @@ def get_codec(charset):
     
     CODEC_CHARSETS above has the codecs that correspond to character sets.
     """
-    try:
-        codec_name = CHARSET_CODECS[charset.strip().lower()]
-        codec = codecs.lookup(codec_name)     
-    except KeyError:
-        #print "The charset %s is not supported by Django." % charset
-        codec = None
-    except LookupError:
-        #print "The encoding '%s' is not supported in this version of Python." % codec_name
-        codec = None 
-    
+    codec = None
+    if charset:
+        try:
+            codec_name = CHARSET_CODECS[charset.strip().lower()]
+            codec = codecs.lookup(codec_name)
+        except LookupError:
+            # The encoding is not supported in this version of Python.
+            pass
     return codec
 
 # Returns the key for the maximum value in a dictionary
@@ -252,7 +250,7 @@ max_dict_key = lambda l:sorted(l.iteritems(), key=itemgetter(1), reverse=True)[0
 
 CONTENT_TYPE_RE = re.compile('.*; charset=([\w\d-]+);?')
 ACCEPT_CHARSET_RE = re.compile('(?P<charset>([\w\d-]+)|(\*))(;q=(?P<q>[01](\.\d{1,3})?))?,?')
-def determine_charset(content_type, accept_charset_header):
+def get_response_encoding(content_type, accept_charset_header):
     """
     Searches request headers from clients and mimetype settings (which may be set 
     by users) for indicators of which charset and encoding the response should use.
@@ -268,56 +266,54 @@ def determine_charset(content_type, accept_charset_header):
                 406 error
             
     """
-    codec = None
+    used_content_type = False
     charset = None
-    # Attempt to get the codec from a content-type, and verify that the charset is valid.
+    codec = None
+    # Try to get the codec from a content-type, verify that the charset is valid.
     if content_type:
         match = CONTENT_TYPE_RE.match(content_type)
         if match:
             charset = match.group(1)
             codec = get_codec(charset)
             if not codec:   # Unsupported charset
-                # we should throw an exception here
-                # print "No CODEC ON MIMETYPE"
-                pass
-        # If we don't match a content-type header WITH charset, we give the default
+                raise Exception("Unsupported charset in Content-Type header.")
         else:
             charset = settings.DEFAULT_CHARSET
-            codec = get_codec(settings.DEFAULT_CHARSET)
-    
-    # Handle Accept-Charset (which we only do if we do not deal with content_type).
-    else:
-        if accept_charset_header:
-            # Get list of matches for Accepted-Charsets.
-            # [{ charset : q }, { charset : q }]
-            match_iterator = ACCEPT_CHARSET_RE.finditer(accept_charset_header)
-            accept_charset = [m.groupdict() for m in match_iterator]
-        else:
-            accept_charset = []    # use settings.DEFAULT_CHARSET
-            charset = settings.DEFAULT_CHARSET
-            
+        used_content_type = True
+
+    # Handle Accept-Charset (only if we have not gotten one with content_type).
+    if not used_content_type:
+        if not accept_charset_header: # No information to find a charset with.
+            return None, None
+        # Get list of matches for Accepted-Charsets.
+        # [{ charset : q }, { charset : q }]
+        match_iterator = ACCEPT_CHARSET_RE.finditer(accept_charset_header)
+        accept_charset = [m.groupdict() for m in match_iterator]
+
         # Remove charsets we cannot encode and whose q values are 0
         charsets = _process_accept_charset(accept_charset)
         
-        # If we did not get a charset from the content type, we get it from accept_charset.
-        if not charset:
-            default_charset = settings.DEFAULT_CHARSET
-            fallback_charset = "ISO-8859-1"
-            # Prefer default_charset if its q value is 1 or we have no valid acceptable charsets.
-            max_q_charset = max_dict_key(charsets)
-            max_q_value = charsets[max_q_charset]
-            if max_q_value == 0 and fallback_charset not in charsets:
+        # Establish the prioritized charsets (ones we know about beforehand)
+        default_charset = settings.DEFAULT_CHARSET
+        fallback_charset = "ISO-8859-1"
+
+        # Prefer default_charset if its q value is 1 or we have no valid acceptable charsets.
+        max_q_charset = max_dict_key(charsets)
+        max_q_value = charsets[max_q_charset]
+        if max_q_value == 0:
+            if fallback_charset not in charsets or charsets[fallback_charset] > 0:
                 charset = fallback_charset
-            elif charsets[default_charset] == 1 or charsets[default_charset] == max_q_value:
-                charset = default_charset
-            # Get the highest valued acceptable charset (if we aren't going to the fallback
-            # or defaulting)
-            else:
-                charset = max_q_charset
+        elif charsets[default_charset] == 1 or charsets[default_charset] == max_q_value:
+            charset = default_charset
+        # Get the highest valued acceptable charset (if we aren't going to the fallback
+        # or defaulting)
+        else:
+            charset = max_q_charset
             
-        codec = get_codec(charset)
+    codec = get_codec(charset)
     # We may reach here with no codec or no charset. We will change the status 
     # code in the HttpResponse.
+    #print charset, codec
     return charset, codec
 
 # NOTE -- make sure we are not duping the processing of q values
