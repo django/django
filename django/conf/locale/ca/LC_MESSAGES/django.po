@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-05-07 19:38+0200\n"
-"PO-Revision-Date: 2009-05-07 19:46+0200\n"
+"POT-Creation-Date: 2009-07-07 15:24+0200\n"
+"PO-Revision-Date: 2009-07-07 15:28+0200\n"
 "Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
 "Language-Team: Catalan <ca@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -252,15 +252,15 @@ msgstr "Aquest mes"
 msgid "This year"
 msgstr "Aquest any"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:398
 msgid "Yes"
 msgstr "Si"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:398
 msgid "No"
 msgstr "No"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:398
 msgid "Unknown"
 msgstr "Desconegut"
 
@@ -302,7 +302,8 @@ msgid "Changed %s."
 msgstr "Modificat %s."
 
 #: contrib/admin/options.py:340 contrib/admin/options.py:350
-#: contrib/comments/templates/comments/preview.html:16 forms/models.py:372
+#: contrib/comments/templates/comments/preview.html:16 forms/models.py:376
+#: forms/models.py:580
 msgid "and"
 msgstr "i"
 
@@ -979,114 +980,115 @@ msgstr "El model %(model_name)r no s'ha trobat en l'aplicació %(app_label)r"
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "l'objecte relacionat `%(app_label)s.%(data_type)s`"
 
-#: contrib/admindocs/views.py:205 contrib/admindocs/views.py:227
-#: contrib/admindocs/views.py:241 contrib/admindocs/views.py:246
+#: contrib/admindocs/views.py:205 contrib/admindocs/views.py:224
+#: contrib/admindocs/views.py:229 contrib/admindocs/views.py:243
+#: contrib/admindocs/views.py:257 contrib/admindocs/views.py:262
 msgid "model:"
 msgstr "model:"
 
-#: contrib/admindocs/views.py:236
+#: contrib/admindocs/views.py:220 contrib/admindocs/views.py:252
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "objectes relacionats `%(app_label)s.%(object_name)s`"
 
-#: contrib/admindocs/views.py:241
+#: contrib/admindocs/views.py:224 contrib/admindocs/views.py:257
 #, python-format
 msgid "all %s"
 msgstr "tots %s"
 
-#: contrib/admindocs/views.py:246
+#: contrib/admindocs/views.py:229 contrib/admindocs/views.py:262
 #, python-format
 msgid "number of %s"
 msgstr "nombre de %s"
 
-#: contrib/admindocs/views.py:251
+#: contrib/admindocs/views.py:267
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Camps en objectes %s"
 
-#: contrib/admindocs/views.py:314 contrib/admindocs/views.py:325
-#: contrib/admindocs/views.py:327 contrib/admindocs/views.py:333
-#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:336
+#: contrib/admindocs/views.py:330 contrib/admindocs/views.py:341
+#: contrib/admindocs/views.py:343 contrib/admindocs/views.py:349
+#: contrib/admindocs/views.py:350 contrib/admindocs/views.py:352
 msgid "Integer"
 msgstr "Enter"
 
-#: contrib/admindocs/views.py:315
+#: contrib/admindocs/views.py:331
 msgid "Boolean (Either True or False)"
 msgstr "Booleà (Verdader o Fals)"
 
-#: contrib/admindocs/views.py:316 contrib/admindocs/views.py:335
+#: contrib/admindocs/views.py:332 contrib/admindocs/views.py:351
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Cadena (de fins a %(max_length)s)"
 
-#: contrib/admindocs/views.py:317
+#: contrib/admindocs/views.py:333
 msgid "Comma-separated integers"
 msgstr "Enters separats per comes"
 
-#: contrib/admindocs/views.py:318
+#: contrib/admindocs/views.py:334
 msgid "Date (without time)"
 msgstr "Data (sense hora)"
 
-#: contrib/admindocs/views.py:319
+#: contrib/admindocs/views.py:335
 msgid "Date (with time)"
 msgstr "Data (amb hora)"
 
-#: contrib/admindocs/views.py:320
+#: contrib/admindocs/views.py:336
 msgid "Decimal number"
 msgstr "Número decimal"
 
-#: contrib/admindocs/views.py:321
+#: contrib/admindocs/views.py:337
 msgid "E-mail address"
 msgstr "Adreça de correu electrònic"
 
-#: contrib/admindocs/views.py:322 contrib/admindocs/views.py:323
-#: contrib/admindocs/views.py:326
+#: contrib/admindocs/views.py:338 contrib/admindocs/views.py:339
+#: contrib/admindocs/views.py:342
 msgid "File path"
 msgstr "Ruta del fitxer"
 
-#: contrib/admindocs/views.py:324
+#: contrib/admindocs/views.py:340
 msgid "Floating point number"
 msgstr "Número amb punt de coma flotant"
 
-#: contrib/admindocs/views.py:328 contrib/comments/models.py:60
+#: contrib/admindocs/views.py:344 contrib/comments/models.py:60
 msgid "IP address"
 msgstr "Adreça IP"
 
-#: contrib/admindocs/views.py:330
+#: contrib/admindocs/views.py:346
 msgid "Boolean (Either True, False or None)"
 msgstr "Booleà (Verdader, Fals o 'None' (cap))"
 
-#: contrib/admindocs/views.py:331
+#: contrib/admindocs/views.py:347
 msgid "Relation to parent model"
 msgstr "Relació amb el model pare"
 
-#: contrib/admindocs/views.py:332
+#: contrib/admindocs/views.py:348
 msgid "Phone number"
 msgstr "Número de telèfon"
 
-#: contrib/admindocs/views.py:337
+#: contrib/admindocs/views.py:353
 msgid "Text"
 msgstr "Text"
 
-#: contrib/admindocs/views.py:338
+#: contrib/admindocs/views.py:354
 msgid "Time"
 msgstr "Hora"
 
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:19
+#: contrib/admindocs/views.py:355 contrib/comments/forms.py:19
 #: contrib/comments/templates/comments/moderation_queue.html:37
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admindocs/views.py:340
+#: contrib/admindocs/views.py:356
 msgid "U.S. state (two uppercase letters)"
 msgstr "Estat dels E.U.A. (dues lletres majúscules)"
 
-#: contrib/admindocs/views.py:341
+#: contrib/admindocs/views.py:357
 msgid "XML text"
 msgstr "Text XML"
 
-#: contrib/admindocs/views.py:367
+#: contrib/admindocs/views.py:383
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s no sembla ser un objecte 'urlpattern'"
@@ -2908,7 +2910,8 @@ msgstr "Validació invàlida del número tributari (NIP)."
 #: contrib/localflavor/pl/forms.py:109
 msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
 msgstr ""
-"El número nacional de registre de negocis (REGON) consisteix en 9 o 14 dígits."
+"El número nacional de registre de negocis (REGON) consisteix en 9 o 14 "
+"dígits."
 
 #: contrib/localflavor/pl/forms.py:110
 msgid "Wrong checksum for the National Business Register Number (REGON)."
@@ -3756,60 +3759,60 @@ msgstr "nom per mostrar"
 msgid "sites"
 msgstr "llocs"
 
-#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:701
+#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:702
 msgid "This value must be an integer."
 msgstr "Aquest valor ha de ser un enter."
 
-#: db/models/fields/__init__.py:379
+#: db/models/fields/__init__.py:380
 msgid "This value must be either True or False."
 msgstr "Aquest valor ha de ser True (Veritat) o False (Fals)"
 
-#: db/models/fields/__init__.py:418
+#: db/models/fields/__init__.py:419
 msgid "This field cannot be null."
 msgstr "Aquest camp no pot ser nul."
 
-#: db/models/fields/__init__.py:434
+#: db/models/fields/__init__.py:435
 msgid "Enter only digits separated by commas."
 msgstr "Introduïu només dígits separats per comes."
 
-#: db/models/fields/__init__.py:465
+#: db/models/fields/__init__.py:466
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Introduïu una data vàlida en el forma AAAA-MM-DD."
 
-#: db/models/fields/__init__.py:474
+#: db/models/fields/__init__.py:475
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Data invàlida: %s"
 
-#: db/models/fields/__init__.py:538 db/models/fields/__init__.py:556
+#: db/models/fields/__init__.py:539 db/models/fields/__init__.py:557
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr ""
 "Introduïu un data/hora vàlida en format YYYY-MM-DD HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:592
+#: db/models/fields/__init__.py:593
 msgid "This value must be a decimal number."
 msgstr "Aquest valor ha de ser un número decimal."
 
-#: db/models/fields/__init__.py:677
+#: db/models/fields/__init__.py:678
 msgid "This value must be a float."
 msgstr "Aquest valor ha de ser un número amb punt de coma flotant."
 
-#: db/models/fields/__init__.py:737
+#: db/models/fields/__init__.py:738
 msgid "This value must be either None, True or False."
 msgstr "Aquest valor ha de ser None (Cap), True (Veritat) o False (Fals)"
 
-#: db/models/fields/__init__.py:840 db/models/fields/__init__.py:854
+#: db/models/fields/__init__.py:841 db/models/fields/__init__.py:855
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Introduïu una hora vàlida en el format HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:787
+#: db/models/fields/related.py:811
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Premeu la tecla \"Control\" -o \"Command\" en un Mac- per seleccionar més "
 "d'un valor."
 
-#: db/models/fields/related.py:865
+#: db/models/fields/related.py:889
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3930,7 +3933,7 @@ msgstr "Aquesta URL sembla ser un enllaç trencat."
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Esculliu una opció vàlida. %(value)s no és una de les opcions vàlides."
 
-#: forms/fields.py:703 forms/fields.py:764 forms/models.py:837
+#: forms/fields.py:703 forms/fields.py:764 forms/models.py:964
 msgid "Enter a list of values."
 msgstr "Introduïu una llista de valors."
 
@@ -3949,33 +3952,56 @@ msgstr ""
 msgid "Order"
 msgstr "Ordre"
 
-#: forms/models.py:351
-#, fuzzy, python-format
+#: forms/models.py:355
+#, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr "El camp %(field_name)s ha de ser únic per a %(date_field)s %(lookup)s."
 
-#: forms/models.py:365 forms/models.py:373
+#: forms/models.py:369 forms/models.py:377
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Ja existeix %(model_name)s amb aquest %(field_label)s."
 
-#: forms/models.py:710
+#: forms/models.py:574
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Si us plau, corregiu la dada duplicada per a %(field)s."
+
+#: forms/models.py:578
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "Si us plau, corregiu la dada duplicada per a %(field)s, la qual ha de ser única."
+
+#: forms/models.py:584
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Si us plau, corregiu la dada duplicada per %(field_name)s la qual ha de ser "
+"única per a %(lookup)s en %(date_field)s."
+
+#: forms/models.py:592
+msgid "Please correct the duplicate values below."
+msgstr "Si us plau, corregiu els valors duplicats a baix."
+
+#: forms/models.py:826
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 "La clau forànea en línea no coincideix amb la clau primària de la instància "
 "del pare"
 
-#: forms/models.py:767
+#: forms/models.py:891
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Escolli una opció vàlida; Aquesta opció no és una de les opcions disponibles."
 
-#: forms/models.py:838
+#: forms/models.py:965
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Escolliu una opció vàlida; %s' no és una de les opcions vàlides."
 
-#: forms/models.py:840
+#: forms/models.py:967
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" no és un valor vàlid per a una clau primària."
