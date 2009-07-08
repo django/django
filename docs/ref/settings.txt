@@ -302,7 +302,6 @@ will be suppressed, and exceptions will propagate upwards.  This can
 be useful for some test setups, and should never be used on a live
 site.
 
-
 .. setting:: DECIMAL_SEPARATOR
 
 DECIMAL_SEPARATOR
@@ -310,7 +309,7 @@ DECIMAL_SEPARATOR
 
 Default: ``'.'`` (Dot)
 
-The default decimal separator used when formatting decimal numbers.
+Default decimal separator used when formatting decimal numbers.
 
 .. setting:: DEFAULT_CHARSET
 
@@ -536,6 +535,21 @@ system's standard umask.
 
 
 .. _documentation for os.chmod: http://docs.python.org/lib/os-file-dir.html
+
+.. setting:: FIRST_DAY_OF_WEEK
+
+FIRST_DAY_OF_WEEK
+-----------------
+
+Default: ``0`` (Sunday)
+
+Number representing the first day of the week. This is specially useful
+when displaying a calendar. This value is only used when not using
+format internationalization, or when a format cannot be found for the
+current locale.
+
+The value must be an integer from 0 to 6, where 0 means Sunday, 1 means
+Monday and so on.
 
 .. setting:: FIXTURE_DIRS
 
@@ -782,6 +796,21 @@ locales have different formats. For example, U.S. English would say
 
 See :ttag:`allowed date format strings <now>`. See also ``DATE_FORMAT``,
 ``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``YEAR_MONTH_FORMAT``.
+
+.. setting:: NUMBER_GROUPING
+
+NUMBER_GROUPING
+----------------
+
+Default: ``0``
+
+Number of digits grouped together on the integer part of a number. Common use
+is to display a thousand separator. If this setting is ``0``, then, no grouping
+will be applied to the number. If this setting is greater than ``0`` then the
+setting ``THOUSAND_SEPARATOR`` will be used as the separator between those
+groups.
+
+See also ``THOUSAND_SEPARATOR``
 
 .. setting:: PREPEND_WWW
 
@@ -1119,6 +1148,18 @@ The name of the method to use for starting the test suite. See
 
 .. _Testing Django Applications: ../testing/
 
+.. setting:: THOUSAND_SEPARATOR
+
+THOUSAND_SEPARATOR
+------------------
+
+Default ``,`` (Comma)
+
+Default thousand separator used when formatting numbers. This setting is
+used only when ``NUMBER_GROUPPING`` is set.
+
+See also ``NUMBER_GROUPPING``, ``DECIMAL_SEPARATOR``
+
 .. setting:: TIME_FORMAT
 
 TIME_FORMAT
@@ -1186,6 +1227,20 @@ A boolean that specifies whether to output the "Etag" header. This saves
 bandwidth but slows down performance. This is only used if ``CommonMiddleware``
 is installed (see :ref:`topics-http-middleware`).
 
+.. setting:: USE_FORMAT_I18N
+
+USE_FORMAT_I18N
+---------------
+
+Default ``False``
+
+A boolean that specifies if data will be localized by default or not. If this is
+set to ``True``, Django will display numbers and dates using the format of the
+current locale. It is required to set ``USE_I18N`` to ``True`` to allow data
+format localization.
+
+See also ``USE_I18N``
+
 .. setting:: USE_I18N
 
 USE_I18N
@@ -1197,6 +1252,8 @@ A boolean that specifies whether Django's internationalization system should be
 enabled. This provides an easy way to turn it off, for performance. If this is
 set to ``False``, Django will make some optimizations so as not to load the
 internationalization machinery.
+
+See also ``USE_FORMAT_I18N``
 
 .. setting:: YEAR_MONTH_FORMAT
 

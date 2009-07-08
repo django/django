@@ -65,13 +65,70 @@ status.
 >>> print s
 Password
 
->>> from django.utils.formats import getformat
+Localization of dates and numbers
+
+>>> import datetime
+>>> import decimal
+>>> from django.utils.formats import getformat, date_format, number_format, localize
+
+>>> n = decimal.Decimal('66666.666')
+>>> d = datetime.date(2009, 7, 6)
+>>> dt = datetime.datetime(2009, 7, 6, 20, 50)
+
+Locale independent
+
+>>> number_format(n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=',')
+'66,666.66'
+>>> number_format(n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B')
+'6B6B6B6B6BA6'
+
+English locale
+
 >>> activate('en')
 >>> getformat('DATE_FORMAT')
 'N j, Y'
+>>> getformat('FIRST_DAY_OF_WEEK')
+0
+>>> getformat('DECIMAL_SEPARATOR')
+'.'
+>>> date_format(d)
+'July 6, 2009'
+>>> date_format(d, 'YEAR_MONTH_FORMAT')
+'July 2009'
+>>> date_format(d, 'SHORT_DATETIME_FORMAT')
+'07/06/2009 8:50 p.m.'
+>>> localize('No localizable')
+'No localizable'
+>>> localize(n)
+'66666.666'
+>>> localize(d)
+'July 6, 2009'
+>>> localize(dt)
+'July 6, 2009, 8:50 p.m.'
+
+Catalan locale
+
 >>> activate('ca')
 >>> getformat('DATE_FORMAT')
 'j \de N \de Y'
+>>> getformat('FIRST_DAY_OF_WEEK')
+1
+>>> getformat('DECIMAL_SEPARATOR')
+','
+>>> date_format(d)
+'6 de juliol de 2009'
+>>> date_format(d, 'YEAR_MONTH_FORMAT')
+'juliol de 2009'
+>>> date_format(d, 'SHORT_DATETIME_FORMAT')
+'06/07/2009 20:50'
+>>> localize('No localizable')
+'No localizable'
+>>> localize(n)
+'66.666,666'
+>>> localize(d)
+'6 de juliol de 2009'
+>>> localize(dt)
+'6 de juliol de 2009 a les 20:50'
 
 """
 

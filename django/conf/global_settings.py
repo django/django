@@ -259,6 +259,12 @@ FILE_UPLOAD_TEMP_DIR = None
 # you'd pass directly to os.chmod; see http://docs.python.org/lib/os-file-dir.html.
 FILE_UPLOAD_PERMISSIONS = None
 
+# Python module path where user will place custom format definition.
+# The directory where this setting is pointing should contain subdirectories
+# named as the locales, containing a formats.py file
+# (i.e. "myproject.locale" for myproject/locale/en/formats.py etc. use)
+FORMAT_MODULE_PATH = None
+
 # Default formatting for date objects. See all available format strings here:
 # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 DATE_FORMAT = 'N j, Y'
@@ -283,21 +289,28 @@ MONTH_DAY_FORMAT = 'F j'
 
 # Default shortformatting for date objects. See all available format strings here:
 # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
-SHORT_DATE_FORMAT = 'N j, Y'
+SHORT_DATE_FORMAT = 'm/d/Y'
 
 # Default short formatting for datetime objects.
 # See all available format strings here:
 # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
-SHORT_DATETIME_FORMAT = 'N j, Y, P'
+SHORT_DATETIME_FORMAT = 'm/d/Y P'
 
-# Default first day of week, to be used on calendars
-# 0 means Sunday
+# First day of week, to be used on calendars
+# 0 means Sunday, 1 means Monday...
 FIRST_DAY_OF_WEEK = 0
 
-# Default decimal separator symbol
+# Decimal separator symbol
 DECIMAL_SEPARATOR = '.'
 
-# Default thousand separator symbol
+# Boolean that sets whether to add thousand separator when formatting numbers
+USE_THOUSAND_SEPARATOR = False
+
+# Number of digits that will be togheter, when spliting them by THOUSAND_SEPARATOR
+# 0 means no grouping, 3 means splitting by thousands...
+NUMBER_GROUPING = 0
+
+# Thousand separator symbol
 THOUSAND_SEPARATOR = ','
 
 # Do you want to manage transactions manually?

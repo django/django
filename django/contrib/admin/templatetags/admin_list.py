@@ -8,7 +8,6 @@ from django.utils.html import escape, conditional_escape
 from django.utils.text import capfirst
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from django.utils.formats import localize
 from django.utils.encoding import smart_unicode, smart_str, force_unicode
 from django.template import Library
 import datetime
@@ -183,14 +182,17 @@ def items_for_result(cl, result, form):
                 else:
                     result_repr = EMPTY_CHANGELIST_VALUE
             # Dates and times are special: They're formatted in a certain way.
-            elif isinstance(f, models.DateField) or isinstance(f, models.TimeField) or isinstance(f, models.DecimalField):
+            elif isinstance(f, models.DateField) or isinstance(f, models.TimeField):
                 if field_val:
-                    result_repr = localize(field_val)
-                    # result_repr = ('%%.%sf' % f.decimal_places) % field_val
+                    result_repr = formats.localize(field_val)
                 else:
                     result_repr = EMPTY_CHANGELIST_VALUE
-                if not isinstance(f, models.DecimalField):
-                    row_class = ' class="nowrap"'
+            elif isinstance(f, models.DecimalField):
+                if field_val:
+                    result_repr = formats.number_format(field_val, f.decimal_places)
+                else:
+                    result_repr = EMPTY_CHANGELIST_VALUE
+                row_class = ' class="nowrap"'
             # Booleans are special: We use images.
             elif isinstance(f, models.BooleanField) or isinstance(f, models.NullBooleanField):
                 result_repr = _boolean_icon(field_val)

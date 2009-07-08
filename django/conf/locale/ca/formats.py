@@ -3,7 +3,7 @@
 
 DATE_FORMAT = 'j \de F \de Y'
 DATETIME_FORMAT = 'j \de F \de Y \\a \le\s H:i'
-TIME_FORMAT = 'P'
+TIME_FORMAT = 'H:i'
 YEAR_MONTH_FORMAT = 'F \de Y'
 MONTH_DAY_FORMAT = 'j \de F'
 
@@ -14,5 +14,5 @@ FIRST_DAY_OF_WEEK = 1 # 0 means Sunday
 
 DECIMAL_SEPARATOR = ','
 THOUSAND_SEPARATOR = '.'
-
+NUMBER_GROUPING = 3
 
