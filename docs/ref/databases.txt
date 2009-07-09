@@ -220,7 +220,7 @@ bytestrings (which shouldn't be too difficult) is the recommended solution.
 Should you decide to use ``utf8_bin`` collation for some of your tables with
 MySQLdb 1.2.1p2, you should still use ``utf8_collation_ci_swedish`` (the
 default) collation for the :class:`django.contrib.sessions.models.Session`
-table (usually called ``django_session`` and the table
+table (usually called ``django_session``) and the
 :class:`django.contrib.admin.models.LogEntry` table (usually called
 ``django_admin_log``). Those are the two standard tables that use
 :class:`~django.db.model.TextField` internally.
