@@ -5,6 +5,7 @@
 from ctypes import c_char_p, c_double, c_int
 from django.contrib.gis.geos.libgeos import lgeos, GEOM_PTR
 from django.contrib.gis.geos.prototypes.errcheck import check_geom, check_string
+from django.contrib.gis.geos.prototypes.geom import geos_char_p
 
 def topology(func, *args):
     "For GEOS unary topology functions."
@@ -32,4 +33,5 @@ geos_union = topology(lgeos.GEOSUnion, GEOM_PTR)
 # GEOSRelate returns a string, not a geometry.
 geos_relate = lgeos.GEOSRelate
 geos_relate.argtypes = [GEOM_PTR, GEOM_PTR]
+geos_relate.restype = geos_char_p
 geos_relate.errcheck = check_string
