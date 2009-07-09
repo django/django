@@ -26,6 +26,7 @@ except NameError:
 import django.core.exceptions
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
+from django.utils.formats import get_format
 
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput, SplitDateTimeWidget, SplitHiddenDateTimeWidget
@@ -33,9 +34,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile as UploadedFile
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
-    'DEFAULT_DATE_INPUT_FORMATS', 'DateField',
-    'DEFAULT_TIME_INPUT_FORMATS', 'TimeField',
-    'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField', 'TimeField',
+    'DateField', 'TimeField', 'DateTimeField', 'TimeField',
     'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
@@ -274,14 +273,6 @@ class DecimalField(Field):
             raise ValidationError(self.error_messages['max_whole_digits'] % (self.max_digits - self.decimal_places))
         return value
 
-DEFAULT_DATE_INPUT_FORMATS = (
-    '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
-    '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
-    '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
-    '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
-    '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
-)
-
 class DateField(Field):
     widget = DateInput
     default_error_messages = {
@@ -290,7 +281,7 @@ class DateField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(DateField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats or DEFAULT_DATE_INPUT_FORMATS
+        self.input_formats = input_formats or get_format('DATE_INPUT_FORMATS')
 
     def clean(self, value):
         """
@@ -311,11 +302,6 @@ class DateField(Field):
                 continue
         raise ValidationError(self.error_messages['invalid'])
 
-DEFAULT_TIME_INPUT_FORMATS = (
-    '%H:%M:%S',     # '14:30:59'
-    '%H:%M',        # '14:30'
-)
-
 class TimeField(Field):
     widget = TimeInput
     default_error_messages = {
@@ -324,7 +310,7 @@ class TimeField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(TimeField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats or DEFAULT_TIME_INPUT_FORMATS
+        self.input_formats = input_formats or get_format('TIME_INPUT_FORMATS')
 
     def clean(self, value):
         """
@@ -343,18 +329,6 @@ class TimeField(Field):
                 continue
         raise ValidationError(self.error_messages['invalid'])
 
-DEFAULT_DATETIME_INPUT_FORMATS = (
-    '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
-    '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
-    '%Y-%m-%d',              # '2006-10-25'
-    '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
-    '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
-    '%m/%d/%Y',              # '10/25/2006'
-    '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
-    '%m/%d/%y %H:%M',        # '10/25/06 14:30'
-    '%m/%d/%y',              # '10/25/06'
-)
-
 class DateTimeField(Field):
     widget = DateTimeInput
     default_error_messages = {
@@ -363,7 +337,7 @@ class DateTimeField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(DateTimeField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats or DEFAULT_DATETIME_INPUT_FORMATS
+        self.input_formats = input_formats or get_format('DATETIME_INPUT_FORMATS')
 
     def clean(self, value):
         """
