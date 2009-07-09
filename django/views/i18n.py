@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils import importlib
 from django.utils.translation import check_for_language, activate, to_locale, get_language
 from django.utils.text import javascript_quote
+from django.utils.formats import formats_module
 import os
 import gettext as gettext_module
 
@@ -32,6 +33,17 @@ def set_language(request):
                 response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
     return response
 
+def get_formats():
+    """
+    Returns an iterator over all formats in formats file
+    """
+    module = formats_module()
+    result = {}
+    for attr in dir(module):
+        if attr[:2] != '__':
+            result[attr] = getattr(module, attr)
+    return result
+    
 NullSource = """
 /* gettext identity library */
 
@@ -185,10 +197,13 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         else:
             raise TypeError, k
     csrc.sort()
-    for k,v in pdict.items():
+    for k, v in pdict.items():
         src.append("catalog['%s'] = [%s];\n" % (javascript_quote(k), ','.join(["''"]*(v+1))))
+    for k, v in get_formats().items():
+        src.append("catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(unicode(v))))
     src.extend(csrc)
     src.append(LibFoot)
     src.append(InterPolate)
     src = ''.join(src)
     return http.HttpResponse(src, 'text/javascript')
+

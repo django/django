@@ -25,6 +25,7 @@ function quickElement() {
 var CalendarNamespace = {
     monthsOfYear: gettext('January February March April May June July August September October November December').split(' '),
     daysOfWeek: gettext('S M T W T F S').split(' '),
+    firstDayOfWeek: parseInt(gettext('FIRST_DAY_OF_WEEK')),
     isLeapYear: function(year) {
         return (((year % 4)==0) && ((year % 100)!=0) || ((year % 400)==0));
     },
@@ -56,10 +57,10 @@ var CalendarNamespace = {
         // Draw days-of-week header
         var tableRow = quickElement('tr', tableBody);
         for (var i = 0; i < 7; i++) {
-            quickElement('th', tableRow, CalendarNamespace.daysOfWeek[i]);
+            quickElement('th', tableRow, CalendarNamespace.daysOfWeek[(i + CalendarNamespace.firstDayOfWeek) % 7]);
         }
 
-        var startingPos = new Date(year, month-1, 1).getDay();
+        var startingPos = new Date(year, month-1, 1 - CalendarNamespace.firstDayOfWeek).getDay();
         var days = CalendarNamespace.getDaysInMonth(month, year);
 
         // Draw blanks before first of month
