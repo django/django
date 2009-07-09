@@ -10,15 +10,12 @@ CONTENT = 'a' * FILE_SIZE
 class SendFileTests(TestCase):
     def test_sendfile(self):
         tdir = tempfile.gettempdir()
-
         file1 = tempfile.NamedTemporaryFile(suffix=".pdf", dir=tdir)
         file1.write(CONTENT)
         file1.seek(0)
 
         response = self.client.get('/sendfile/serve_file/%s/' %
                 urllib.quote(file1.name))
-
-        file1.close()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response[settings.HTTPRESPONSE_SENDFILE_HEADER],
@@ -29,8 +26,9 @@ class SendFileTests(TestCase):
         self.assertEqual(response['Content-Type'], 'application/pdf')
 
         # *if* the degraded case is to be supported, add this instead:
-        # self.assertEqual(response.content, CONTENT)
-        get_content = lambda: response.content
-        self.assertRaises(TypeError, get_content)
+        self.assertEqual(response.content, CONTENT)
+        get_content = lambda: response.content.read()
+        #self.assertRaises(TypeError, get_content)
 
+        file1.close()
         # TODO: test middleware bypass etc
