@@ -13,7 +13,7 @@ except ImportError:
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 from django.http.multipartparser import MultiPartParser
-from django.http.charsets import get_response_encoding, get_codec
+from django.http.charsets import get_response_encoding, get_codec, UnsupportedCharset
 from django.conf import settings
 from django.core.files import uploadhandler
 from utils import *
@@ -367,8 +367,15 @@ class HttpResponse(object):
         self.set_cookie(key, max_age=0, path=path, domain=domain,
                         expires='Thu, 01-Jan-1970 00:00:00 GMT')
 
+    def _configure_body_encoding(self):
+        if not self._codec:
+            self._codec = get_codec(self._charset)
+        if not self._codec:
+            self._codec = UnsupportedCharset
+
     def _get_status_code(self):
-        if not self._valid_codec():
+        self._configure_body_encoding()
+        if self._codec is UnsupportedCharset:
             self._status_code = 406
             self._container = ['']
         return self._status_code
@@ -378,14 +385,9 @@ class HttpResponse(object):
 
     status_code = property(_get_status_code, _set_status_code)
 
-    def _valid_codec(self):
-        if not self._codec:
-            self._codec = get_codec(self._charset)
-        if not self._codec:
-            return False
-        return True
-
     def _get_content(self):
+        # Evaluate status_code for side effects
+        self._get_status_code()
         if self.has_header('Content-Encoding'):
             return ''.join(self._container)
         return smart_str(''.join(self._container), self._codec.name)
@@ -397,6 +399,8 @@ class HttpResponse(object):
     content = property(_get_content, _set_content)
 
     def __iter__(self):
+        # Evaluate status_code for side effects
+        self._get_status_code()
         self._iterator = iter(self._container)
         return self
 

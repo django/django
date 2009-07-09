@@ -226,6 +226,13 @@ CHARSET_CODECS = {
     'windows-936': 'gbk'
 }
 
+class UnsupportedCharset(object):
+    """
+    Singleton class to indicate that our codec cannot be set due to an
+    unsupported charset in an Accept-Charset header.
+    """
+    pass
+
 def get_codec(charset):
     """
     Given the name or alias of a character set, find its Python codec if there is one.
@@ -285,6 +292,7 @@ def get_response_encoding(content_type, accept_charset_header):
     if not used_content_type:
         if not accept_charset_header: # No information to find a charset with.
             return None, None
+
         # Get list of matches for Accepted-Charsets.
         # [{ charset : q }, { charset : q }]
         match_iterator = ACCEPT_CHARSET_RE.finditer(accept_charset_header)
@@ -292,7 +300,7 @@ def get_response_encoding(content_type, accept_charset_header):
 
         # Remove charsets we cannot encode and whose q values are 0
         charsets = _process_accept_charset(accept_charset)
-        
+
         # Establish the prioritized charsets (ones we know about beforehand)
         default_charset = settings.DEFAULT_CHARSET
         fallback_charset = "ISO-8859-1"
@@ -309,11 +317,11 @@ def get_response_encoding(content_type, accept_charset_header):
         # or defaulting)
         else:
             charset = max_q_charset
-            
+
     codec = get_codec(charset)
+
     # We may reach here with no codec or no charset. We will change the status 
     # code in the HttpResponse.
-    #print charset, codec
     return charset, codec
 
 # NOTE -- make sure we are not duping the processing of q values
@@ -324,10 +332,10 @@ def _process_accept_charset(accept_charset):
     names, and excludes charsets without Python codecs and whose q values are 0.
     '''
     accepted_charsets = {}
-    
+
     default_value = 1
     wildcard = False
-    
+
     for potential in accept_charset:
         charset = potential["charset"].strip()            
         # The default quality value is 1
@@ -341,11 +349,10 @@ def _process_accept_charset(accept_charset):
         elif charset == "*" and q >= 0 and q <= 1:
             default_value = q
             wildcard = True
-            
+
     if settings.DEFAULT_CHARSET not in accepted_charsets:
         accepted_charsets[settings.DEFAULT_CHARSET] = default_value 
     if "ISO-8859-1" not in accepted_charsets and wildcard: 
         accepted_charsets["ISO-8859-1"] = default_value
-      
-      
+
     return accepted_charsets
