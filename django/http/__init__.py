@@ -13,7 +13,7 @@ except ImportError:
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 from django.http.multipartparser import MultiPartParser
-from django.http.charsets import get_response_encoding, get_codec, UnsupportedCharset
+from django.http.charsets import *
 from django.conf import settings
 from django.core.files import uploadhandler
 from utils import *

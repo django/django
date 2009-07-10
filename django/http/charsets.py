@@ -5,7 +5,7 @@ import re
 from operator import itemgetter
 from django.conf import settings
 
-CHARSET_CODECS = {
+_CHARSET_CODECS = {
     '437': 'cp437',
     '850': 'cp850',
     '852': 'cp852',
@@ -245,7 +245,7 @@ def get_codec(charset):
     codec = None
     if charset:
         try:
-            codec_name = CHARSET_CODECS[charset.strip().lower()]
+            codec_name = _CHARSET_CODECS[charset.strip().lower()]
             codec = codecs.lookup(codec_name)
         except LookupError:
             # The encoding is not supported in this version of Python.
@@ -255,8 +255,8 @@ def get_codec(charset):
 # Returns the key for the maximum value in a dictionary
 max_dict_key = lambda l:sorted(l.iteritems(), key=itemgetter(1), reverse=True)[0][0]
 
-CONTENT_TYPE_RE = re.compile('.*; charset=([\w\d-]+);?')
-ACCEPT_CHARSET_RE = re.compile('(?P<charset>([\w\d-]+)|(\*))(;q=(?P<q>[01](\.\d{1,3})?))?,?')
+_CONTENT_TYPE_RE = re.compile('.*; charset=([\w\d-]+);?')
+_ACCEPT_CHARSET_RE = re.compile('(?P<charset>([\w\d-]+)|(\*))(;q=(?P<q>[01](\.\d{1,3})?))?,?')
 def get_response_encoding(content_type, accept_charset_header):
     """
     Searches request headers from clients and mimetype settings (which may be set 
@@ -278,7 +278,7 @@ def get_response_encoding(content_type, accept_charset_header):
     codec = None
     # Try to get the codec from a content-type, verify that the charset is valid.
     if content_type:
-        match = CONTENT_TYPE_RE.match(content_type)
+        match = _CONTENT_TYPE_RE.match(content_type)
         if match:
             charset = match.group(1)
             codec = get_codec(charset)
@@ -295,7 +295,7 @@ def get_response_encoding(content_type, accept_charset_header):
 
         # Get list of matches for Accepted-Charsets.
         # [{ charset : q }, { charset : q }]
-        match_iterator = ACCEPT_CHARSET_RE.finditer(accept_charset_header)
+        match_iterator = _ACCEPT_CHARSET_RE.finditer(accept_charset_header)
         accept_charset = [m.groupdict() for m in match_iterator]
 
         # Remove charsets we cannot encode and whose q values are 0
