@@ -25,10 +25,11 @@ class SendFileTests(TestCase):
         self.assertEqual(response['Content-Length'], str(FILE_SIZE))
         self.assertEqual(response['Content-Type'], 'application/pdf')
 
-        # *if* the degraded case is to be supported, add this instead:
-        self.assertEqual(response.content, CONTENT)
+        # Test the fallback file transfer -- we use FileWrapper to iterate through
+        # the file, this also wraps close(). This appears to mitigate performance
+        # issues.
+        self.assertEqual("".join(iter(response)), CONTENT)
         get_content = lambda: response.content.read()
-        #self.assertRaises(TypeError, get_content)
 
         file1.close()
         # TODO: test middleware bypass etc

@@ -430,6 +430,8 @@ class HttpResponse(object):
         return sum([len(chunk) for chunk in self._container])
 
 class HttpResponseSendFile(HttpResponse): 
+    sendfile_fh = None
+
     def __init__(self, path_to_file, content_type=None, block_size=8192): 
  	    if not content_type: 
  	        from mimetypes import guess_type 
@@ -445,10 +447,14 @@ class HttpResponseSendFile(HttpResponse):
  	            os.path.basename(path_to_file)) 
  	    self[settings.HTTPRESPONSE_SENDFILE_HEADER] = path_to_file 
 
-    def _get_content(self):
-        return open(self.sendfile_filename).read()
+    def __iter__(self):
+        from django.core.servers.basehttp import FileWrapper
+        return FileWrapper(self.get_file_handler(), self.block_size)
 
-    content = property(_get_content)
+    def get_file_handler(self):
+        if not self.sendfile_fh:
+            self.sendfile_fh = open(self.sendfile_filename, 'rb')
+        return self.sendfile_fh
 
 class HttpResponseRedirect(HttpResponse):
     _status_code = 302
