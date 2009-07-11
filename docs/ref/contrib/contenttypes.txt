@@ -177,9 +177,9 @@ The ``ContentTypeManager``
     .. method:: models.ContentTypeManager.clear_cache()
 
         Clears an internal cache used by
-        :class:`~django.contrib.contenttypes.models.ContentType>` to keep track
+        :class:`~django.contrib.contenttypes.models.ContentType` to keep track
         of which models for which it has created
-        :class:`django.contrib.contenttypes.models.ContentType>` instances. You
+        :class:`django.contrib.contenttypes.models.ContentType` instances. You
         probably won't ever need to call this method yourself; Django will call
         it automatically when it's needed.
 
