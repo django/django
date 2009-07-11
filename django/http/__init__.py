@@ -373,6 +373,15 @@ class HttpResponse(object):
         if not self._codec:
             self._codec = UnsupportedCharset
 
+    def _get_codec(self):
+        return self._codec
+
+    def _set_codec(self, value):
+        if hasattr(value, "name"):
+            self._codec = value
+
+    codec = property(_get_codec, _set_codec)
+
     def _get_status_code(self):
         self._configure_body_encoding()
         if self._codec is UnsupportedCharset:

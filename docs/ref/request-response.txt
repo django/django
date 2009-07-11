@@ -471,10 +471,19 @@ Attributes
     A normal Python string representing the content, encoded from a Unicode
     object if necessary.
 
+.. attribute :: HttpResponse.codec
+
+    A class that contains the attribute ``name``, which contains an alias or
+    name of a codec (from the module ``codecs``) that will be used to encode
+    the response content. This value is set automatically in response to a
+    ``request`` argument that contains an Accept-Charset header or content_type
+    argument that contains a charset value. The priority for setting the codec/
+    charset is specified in HttpResponse.charsets.
+
 Methods
 -------
 
-.. method:: HttpResponse.__init__(content='', mimetype=None, status=200, content_type=DEFAULT_CONTENT_TYPE)
+.. method:: HttpResponse.__init__(content='', mimetype=None, status=200, content_type=DEFAULT_CONTENT_TYPE, request=None)
 
     Instantiates an ``HttpResponse`` object with the given page content (a
     string) and MIME type. The ``DEFAULT_CONTENT_TYPE`` is ``'text/html'``.
@@ -494,6 +503,10 @@ Methods
     If ``mimetype`` is specified (not ``None``), that value is used.
     Otherwise, ``content_type`` is used. If neither is given, the
     ``DEFAULT_CONTENT_TYPE`` setting is used.
+
+    ``request`` is the request that triggered this response. It can be used in
+    the event that a view cares about dealing with request headers, in
+    particular the Accept-Charset header.
 
 .. method:: HttpResponse.__setitem__(header, value)
 
