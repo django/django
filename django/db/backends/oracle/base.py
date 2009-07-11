@@ -217,12 +217,13 @@ WHEN (new.%(col_name)s IS NULL)
                     # continue to loop
                     break
             for f in model._meta.many_to_many:
-                table_name = self.quote_name(f.m2m_db_table())
-                sequence_name = get_sequence_name(f.m2m_db_table())
-                column_name = self.quote_name('id')
-                output.append(query % {'sequence': sequence_name,
-                                       'table': table_name,
-                                       'column': column_name})
+                if not f.rel.through:
+                    table_name = self.quote_name(f.m2m_db_table())
+                    sequence_name = get_sequence_name(f.m2m_db_table())
+                    column_name = self.quote_name('id')
+                    output.append(query % {'sequence': sequence_name,
+                                           'table': table_name,
+                                           'column': column_name})
         return output
 
     def start_transaction_sql(self):
