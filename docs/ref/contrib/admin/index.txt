@@ -849,7 +849,7 @@ provided some extra mapping data that would not otherwise be available::
                 'osm_data': self.get_osm_info(),
             }
             return super(MyModelAdmin, self).change_view(request, object_id,
-                extra_context=my_context))
+                extra_context=my_context)
 
 ``ModelAdmin`` media definitions
 --------------------------------
