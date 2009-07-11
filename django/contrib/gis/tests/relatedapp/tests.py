@@ -1,7 +1,7 @@
 import os, unittest
 from django.contrib.gis.geos import *
 from django.contrib.gis.db.backend import SpatialBackend
-from django.contrib.gis.db.models import Count, Extent, F, Union
+from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
 from django.contrib.gis.tests.utils import no_mysql, no_oracle, no_spatialite
 from django.conf import settings
 from models import City, Location, DirectoryEntry, Parcel, Book, Author
@@ -263,6 +263,26 @@ class RelatedGeoModelTest(unittest.TestCase):
         b = Book.objects.select_related('author').get(title='Without Author')
         # Should be `None`, and not a 'dummy' model.
         self.assertEqual(None, b.author)
+
+    @no_mysql
+    @no_oracle
+    @no_spatialite
+    def test14_collect(self):
+        "Testing the `collect` GeoQuerySet method and `Collect` aggregate."
+        # Reference query:
+        # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN 
+        #    "relatedapp_location" ON ("relatedapp_city"."location_id" = "relatedapp_location"."id") 
+        #    WHERE "relatedapp_city"."state" = 'TX';
+        ref_geom = fromstr('MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,-95.363151 29.763374,-96.801611 32.782057)')
+        
+        c1 = City.objects.filter(state='TX').collect(field_name='location__point')
+        c2 = City.objects.filter(state='TX').aggregate(Collect('location__point'))['location__point__collect']
+
+        for coll in (c1, c2):
+            # Even though Dallas and Ft. Worth share same point, Collect doesn't
+            # consolidate -- that's why 4 points in MultiPoint.
+            self.assertEqual(4, len(coll))
+            self.assertEqual(ref_geom, coll)
 
     # TODO: Related tests for KML, GML, and distance lookups.
 
