@@ -26,7 +26,7 @@ except NameError:
 import django.core.exceptions
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
-from django.utils.formats import get_format
+from django.utils.formats import getformat
 
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput, SplitDateTimeWidget, SplitHiddenDateTimeWidget
@@ -209,7 +209,8 @@ class FloatField(Field):
         if not self.required and value in EMPTY_VALUES:
             return None
         try:
-            value = float(value)
+            # We always accept dot as decimal separator
+            value = float(value.replace(getformat('DECIMAL_SEPARATOR'), '.'))
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'])
         if self.max_value is not None and value > self.max_value:
@@ -245,7 +246,8 @@ class DecimalField(Field):
             return None
         value = smart_str(value).strip()
         try:
-            value = Decimal(value)
+            # We always accept dot as decimal separator
+            value = Decimal(value.replace(getformat('DECIMAL_SEPARATOR'), '.'))
         except DecimalException:
             raise ValidationError(self.error_messages['invalid'])
 
@@ -281,7 +283,7 @@ class DateField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(DateField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats or get_format('DATE_INPUT_FORMATS')
+        self.input_formats = input_formats or getformat('DATE_INPUT_FORMATS')
 
     def clean(self, value):
         """
@@ -310,7 +312,7 @@ class TimeField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(TimeField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats or get_format('TIME_INPUT_FORMATS')
+        self.input_formats = input_formats or getformat('TIME_INPUT_FORMATS')
 
     def clean(self, value):
         """
@@ -337,7 +339,7 @@ class DateTimeField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(DateTimeField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats or get_format('DATETIME_INPUT_FORMATS')
+        self.input_formats = input_formats or getformat('DATETIME_INPUT_FORMATS')
 
     def clean(self, value):
         """

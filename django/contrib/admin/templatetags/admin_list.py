@@ -193,6 +193,12 @@ def items_for_result(cl, result, form):
                 else:
                     result_repr = EMPTY_CHANGELIST_VALUE
                 row_class = ' class="nowrap"'
+            elif isinstance(f, models.FloatField):
+                if field_val:
+                    result_repr = formats.number_format(field_val)
+                else:
+                    result_repr = EMPTY_CHANGELIST_VALUE
+                row_class = ' class="nowrap"'
             # Booleans are special: We use images.
             elif isinstance(f, models.BooleanField) or isinstance(f, models.NullBooleanField):
                 result_repr = _boolean_icon(field_val)

@@ -72,7 +72,7 @@ def number_format(value, decimal_pos=None):
         getformat('THOUSAND_SEPARATOR'),
     )
 
-def localize(value):
+def localize(value, is_input=False):
     """
     Checks value, and if it has a localizable type (date,
     number...) it returns the value as a string using
@@ -86,8 +86,19 @@ def localize(value):
         elif isinstance(value, int):
             return number_format(value)
         elif isinstance(value, datetime.datetime):
-            return date_format(value, 'DATETIME_FORMAT')
+            if not is_input:
+                return date_format(value, 'DATETIME_FORMAT')
+            else:
+                return value.strftime(getformat('DATETIME_INPUT_FORMATS')[0])
         elif isinstance(value, datetime.date):
-            return date_format(value)
+            if not is_input:
+                return date_format(value)
+            else:
+                return value.strftime(getformat('DATE_INPUT_FORMATS')[0])
+        elif isinstance(value, datetime.time):
+            if not is_input:
+                return date_format(value, 'TIME_FORMAT')
+            else:
+                return value.strftime(getformat('TIME_INPUT_FORMATS')[0])
     return value
 

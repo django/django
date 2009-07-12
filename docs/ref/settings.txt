@@ -243,12 +243,11 @@ DATE_FORMAT
 
 Default: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
 
-The default formatting to use for date fields on Django admin change-list
-pages -- and, possibly, by other parts of the system. See
-:ttag:`allowed date format strings <now>`.
+The default formatting to use for date fields in any part of the system.
+Note that if ``USE_FORMAT_I18N`` is set to ``True``, then locale format will
+be applied. See :ttag:`allowed date format strings <now>`.
 
-See also ``DATETIME_FORMAT``, ``TIME_FORMAT``, ``YEAR_MONTH_FORMAT``
-and ``MONTH_DAY_FORMAT``.
+See also ``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``SHORT_DATE_FORMAT``.
 
 .. setting:: DATETIME_FORMAT
 
@@ -257,12 +256,11 @@ DATETIME_FORMAT
 
 Default: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
 
-The default formatting to use for datetime fields on Django admin change-list
-pages -- and, possibly, by other parts of the system. See
-:ttag:`allowed date format strings <now>`.
+The default formatting to use for datetime fields in any part of the system.
+Note that if ``USE_FORMAT_I18N`` is set to ``True``, then locale format will
+be applied. See :ttag:`allowed date format strings <now>`.
 
-See also ``DATE_FORMAT``, ``DATETIME_FORMAT``, ``TIME_FORMAT``,
-``YEAR_MONTH_FORMAT`` and ``MONTH_DAY_FORMAT``.
+See also ``DATE_FORMAT``, ``TIME_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
 
 .. setting:: DEBUG
 
@@ -1003,6 +1001,32 @@ Default: ``False``
 Whether to save the session data on every request. See
 :ref:`topics-http-sessions`.
 
+.. setting:: SHORT_DATE_FORMAT
+
+SHORT_DATE_FORMAT
+-----------------
+
+Default: ``m/d/Y`` (e.g. ``12/31/2003``)
+
+An available formatting that can be used for date fields on templates.
+Note that if ``USE_FORMAT_I18N`` is set to ``True``, then locale format will
+be applied. See :ttag:`allowed date format strings <now>`.
+
+See also ``DATE_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
+
+.. setting:: SHORT_DATETIME_FORMAT
+
+SHORT_DATETIME_FORMAT
+---------------------
+
+Default: ``m/d/Y P`` (e.g. ``12/31/2003 4 p.m.``)
+
+An available formatting that can be used for datetime fields on templates.
+Note that if ``USE_FORMAT_I18N`` is set to ``True``, then locale format will
+be applied. See :ttag:`allowed date format strings <now>`.
+
+See also ``DATE_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
+
 .. setting:: SITE_ID
 
 SITE_ID
@@ -1167,12 +1191,11 @@ TIME_FORMAT
 
 Default: ``'P'`` (e.g. ``4 p.m.``)
 
-The default formatting to use for time fields on Django admin change-list
-pages -- and, possibly, by other parts of the system. See
-:ttag:`allowed date format strings <now>`.
+The default formatting to use for time fields in any part of the system.
+Note that if ``USE_FORMAT_I18N`` is set to ``True``, then locale format will
+be applied. See :ttag:`allowed date format strings <now>`.
 
-See also ``DATE_FORMAT``, ``DATETIME_FORMAT``, ``TIME_FORMAT``,
-``YEAR_MONTH_FORMAT`` and ``MONTH_DAY_FORMAT``.
+See also ``DATE_FORMAT`` and ``DATETIME_FORMAT``.
 
 .. setting:: TIME_ZONE
 
