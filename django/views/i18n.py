@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils import importlib
 from django.utils.translation import check_for_language, activate, to_locale, get_language
 from django.utils.text import javascript_quote
-from django.utils.formats import formats_module
+from django.utils.formats import project_formats_module, django_formats_module
 import os
 import gettext as gettext_module
 
@@ -37,11 +37,19 @@ def get_formats():
     """
     Returns an iterator over all formats in formats file
     """
-    module = formats_module()
+    FORMAT_SETTINGS = ('DATE_FORMAT', 'DATETIME_FORMAT', 'TIME_FORMAT',
+        'YEAR_MONTH_FORMAT', 'MONTH_DAY_FORMAT', 'SHORT_DATE_FORMAT',
+        'SHORT_DATETIME_FORMAT', 'FIRST_DAY_OF_WEEK', 'DECIMAL_SEPARATOR',
+        'THOUSAND_SEPARATOR', 'NUMBER_GROUPING')
+
     result = {}
-    for attr in dir(module):
-        if attr[:2] != '__':
-            result[attr] = getattr(module, attr)
+    for module in (settings, django_formats_module(), project_formats_module()):
+        if module:
+            for attr in FORMAT_SETTINGS:
+                try:
+                    result[attr] = getattr(module, attr)
+                except AttributeError:
+                    pass
     return result
     
 NullSource = """

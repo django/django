@@ -18,7 +18,7 @@ from django.conf import settings
 from django.utils.translation import ugettext, ungettext
 from django.utils.encoding import force_unicode, iri_to_uri
 from django.utils.safestring import mark_safe, SafeData
-from django.utils.formats import number_format
+from django.utils.formats import date_format, number_format
 
 register = Library()
 
@@ -685,9 +685,12 @@ def date(value, arg=None):
     if arg is None:
         arg = settings.DATE_FORMAT
     try:
-        return format(value, arg)
+        return date_format(value, arg)
     except AttributeError:
-        return ''
+        try:
+            return format(value, arg)
+        except AttributeError:
+            return ''
 date.is_safe = False
 
 def time(value, arg=None):
@@ -698,9 +701,12 @@ def time(value, arg=None):
     if arg is None:
         arg = settings.TIME_FORMAT
     try:
-        return time_format(value, arg)
+        return date_format(value, arg)
     except AttributeError:
-        return ''
+        try:
+            return time_format(value, arg)
+        except AttributeError:
+            return ''
 time.is_safe = False
 
 def timesince(value, arg=None):

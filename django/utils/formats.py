@@ -15,22 +15,27 @@ def getformat_null(format_type):
     """
     return getattr(settings, format_type)
 
-def formats_module():
+def project_formats_module():
     """
-    Returns the formats module for the current locale. It can be the
-    custom one from the user, or Django's default.
+    Returns the formats module for the current locale, defined
+    on the project
     """
     if settings.FORMAT_MODULE_PATH:
         try:
             return import_module('.formats', '%s.%s' % (settings.FORMAT_MODULE_PATH, get_language()))
         except ImportError:
             pass
+    return None
 
+def django_formats_module():
+    """
+    Returns the formats module for the current locale, defined
+    on Django
+    """
     try:
         return import_module('.formats', 'django.conf.locale.%s' % get_language())
     except ImportError:
         return None
-
 
 def getformat_real(format_type):
     """
@@ -38,12 +43,12 @@ def getformat_real(format_type):
     current language (locale) defaulting to the format on settings.
     format_type is the name of the format, for example 'DATE_FORMAT'
     """
-    module = formats_module()
-    if module:
-        try:
-            return getattr(module, format_type)
-        except AttributeError:
-            pass
+    for module in (project_formats_module(), django_formats_module()):
+        if module:
+            try:
+                return getattr(module, format_type)
+            except AttributeError:
+                pass
     return getformat_null(format_type)
 
 # getformat will just return the value on setings if
