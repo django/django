@@ -10,6 +10,7 @@ from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
 from django.contrib.admin.util import quote
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from django.utils.cache import get_max_age
 from django.utils.html import escape
 
 # local test models
@@ -1527,3 +1528,76 @@ class AdminInlineTests(TestCase):
         self.failUnlessEqual(Category.objects.get(id=2).order, 13)
         self.failUnlessEqual(Category.objects.get(id=3).order, 1)
         self.failUnlessEqual(Category.objects.get(id=4).order, 0)
+
+
+class NeverCacheTests(TestCase):
+    fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def testAdminIndex(self):
+        "Check the never-cache status of the main index"
+        response = self.client.get('/test_admin/admin/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testAppIndex(self):
+        "Check the never-cache status of an application index"
+        response = self.client.get('/test_admin/admin/admin_views/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testModelIndex(self):
+        "Check the never-cache status of a model index"
+        response = self.client.get('/test_admin/admin/admin_views/fabric/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testModelAdd(self):
+        "Check the never-cache status of a model add page"
+        response = self.client.get('/test_admin/admin/admin_views/fabric/add/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testModelView(self):
+        "Check the never-cache status of a model edit page"
+        response = self.client.get('/test_admin/admin/admin_views/section/1/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testModelHistory(self):
+        "Check the never-cache status of a model history page"
+        response = self.client.get('/test_admin/admin/admin_views/section/1/history/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testModelDelete(self):
+        "Check the never-cache status of a model delete page"
+        response = self.client.get('/test_admin/admin/admin_views/section/1/delete/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testLogin(self):
+        "Check the never-cache status of login views"
+        self.client.logout()
+        response = self.client.get('/test_admin/admin/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testLogout(self):
+        "Check the never-cache status of logout view"
+        response = self.client.get('/test_admin/admin/logout/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testPasswordChange(self):
+        "Check the never-cache status of the password change view"
+        self.client.logout()
+        response = self.client.get('/test_admin/password_change/')
+        self.failUnlessEqual(get_max_age(response), None)
+
+    def testPasswordChangeDone(self):
+        "Check the never-cache status of the password change done view"
+        response = self.client.get('/test_admin/admin/password_change/done/')
+        self.failUnlessEqual(get_max_age(response), None)
+
+    def testJsi18n(self):
+        "Check the never-cache status of the Javascript i18n view"
+        response = self.client.get('/test_admin/jsi18n/')
+        self.failUnlessEqual(get_max_age(response), None)
+

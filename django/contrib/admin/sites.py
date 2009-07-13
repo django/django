@@ -114,20 +114,20 @@ class AdminSite(object):
         name = name or action.__name__
         self._actions[name] = action
         self._global_actions[name] = action
-        
+
     def disable_action(self, name):
         """
         Disable a globally-registered action. Raises KeyError for invalid names.
         """
         del self._actions[name]
-        
+
     def get_action(self, name):
         """
         Explicitally get a registered global action wheather it's enabled or
         not. Raises KeyError for invalid names.
         """
         return self._global_actions[name]
-    
+
     def actions(self):
         """
         Get all the enabled actions as an iterable of (name, func).
@@ -159,9 +159,9 @@ class AdminSite(object):
         if 'django.core.context_processors.auth' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
             raise ImproperlyConfigured("Put 'django.core.context_processors.auth' in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
 
-    def admin_view(self, view):
+    def admin_view(self, view, cacheable=False):
         """
-        Decorator to create an "admin view attached to this ``AdminSite``. This
+        Decorator to create an admin view attached to this ``AdminSite``. This
         wraps the view and provides permission checking by calling
         ``self.has_permission``.
 
@@ -177,19 +177,25 @@ class AdminSite(object):
                         url(r'^my_view/$', self.admin_view(some_view))
                     )
                     return urls
+
+        By default, admin_views are marked non-cacheable using the
+        ``never_cache`` decorator. If the view can be safely cached, set
+        cacheable=True.
         """
         def inner(request, *args, **kwargs):
             if not self.has_permission(request):
                 return self.login(request)
             return view(request, *args, **kwargs)
+        if not cacheable:
+            inner = never_cache(inner)
         return update_wrapper(inner, view)
 
     def get_urls(self):
         from django.conf.urls.defaults import patterns, url, include
 
-        def wrap(view):
+        def wrap(view, cacheable=False):
             def wrapper(*args, **kwargs):
-                return self.admin_view(view)(*args, **kwargs)
+                return self.admin_view(view, cacheable)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
         # Admin-site-wide views.
@@ -201,13 +207,13 @@ class AdminSite(object):
                 wrap(self.logout),
                 name='%sadmin_logout'),
             url(r'^password_change/$',
-                wrap(self.password_change),
+                wrap(self.password_change, cacheable=True),
                 name='%sadmin_password_change' % self.name),
             url(r'^password_change/done/$',
-                wrap(self.password_change_done),
+                wrap(self.password_change_done, cacheable=True),
                 name='%sadmin_password_change_done' % self.name),
             url(r'^jsi18n/$',
-                wrap(self.i18n_javascript),
+                wrap(self.i18n_javascript, cacheable=True),
                 name='%sadmin_jsi18n' % self.name),
             url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$',
                 'django.views.defaults.shortcut'),
