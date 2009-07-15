@@ -774,7 +774,7 @@ problems:
 Since this is usually not what you want, Django provides a convenience wrapper
 to check permissions and mark the view as non-cacheable. This wrapper is
 :meth:`AdminSite.admin_view` (i.e.  ``self.admin_site.admin_view`` inside a
-``ModelAdmin`` instance); use it like so:
+``ModelAdmin`` instance); use it like so::
 
     class MyModelAdmin(admin.ModelAdmin):
         def get_urls(self):
