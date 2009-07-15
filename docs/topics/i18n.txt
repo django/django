@@ -959,11 +959,11 @@ Using the JavaScript translation catalog
 
 To use the catalog, just pull in the dynamically generated script like this::
 
-    <script type="text/javascript" src="/path/to/jsi18n/"></script>
+    <script type="text/javascript" src="{% url django.views.i18n.javascript_catalog %}"></script>
 
-This is how the admin fetches the translation catalog from the server. When the
-catalog is loaded, your JavaScript code can use the standard ``gettext``
-interface to access it::
+This uses reverse URL lookup to find the URL of the JavaScript catalog view.
+When the catalog is loaded, your JavaScript code can use the standard
+``gettext`` interface to access it::
 
     document.write(gettext('this is to be translated'));
 
