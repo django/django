@@ -8,6 +8,9 @@ from django.contrib.gis.gdal.prototypes.errcheck import \
     check_arg_errcode, check_errcode, check_geom, check_geom_offset, \
     check_pointer, check_srs, check_str_arg, check_string, check_const_string
 
+class gdal_char_p(c_char_p):
+    pass
+
 def double_output(func, argtypes, errcheck=False, strarg=False):
     "Generates a ctypes function that returns a double value."
     func.argtypes = argtypes
@@ -77,9 +80,9 @@ def string_output(func, argtypes, offset=-1, str_result=False):
     """
     func.argtypes = argtypes
     if str_result:
-        # String is the result, don't explicitly define
-        # the argument type so we can get the pointer.
-        pass
+        # Use subclass of c_char_p so the error checking routine
+        # can free the memory at the pointer's address.
+        func.restype = gdal_char_p
     else:
         # Error code is returned
         func.restype = c_int

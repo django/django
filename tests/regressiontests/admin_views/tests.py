@@ -10,13 +10,15 @@ from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
 from django.contrib.admin.util import quote
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from django.utils.cache import get_max_age
 from django.utils.html import escape
 
 # local test models
 from models import Article, BarAccount, CustomArticle, EmptyModel, \
     ExternalSubscriber, FooAccount, Gallery, ModelWithStringPrimaryKey, \
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast, \
-    Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit
+    Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit, \
+    Category
 
 try:
     set
@@ -921,6 +923,45 @@ class AdminViewListEditable(TestCase):
 
         self.failUnlessEqual(Person.objects.get(name="John Mauchly").alive, False)
 
+    def test_list_editable_ordering(self):
+        collector = Collector.objects.create(id=1, name="Frederick Clegg")
+
+        Category.objects.create(id=1, order=1, collector=collector)
+        Category.objects.create(id=2, order=2, collector=collector)
+        Category.objects.create(id=3, order=0, collector=collector)
+        Category.objects.create(id=4, order=0, collector=collector)
+
+        # NB: The order values must be changed so that the items are reordered.
+        data = {
+            "form-TOTAL_FORMS": "4",
+            "form-INITIAL_FORMS": "4",
+
+            "form-0-order": "14",
+            "form-0-id": "1",
+            "form-0-collector": "1",
+
+            "form-1-order": "13",
+            "form-1-id": "2",
+            "form-1-collector": "1",
+
+            "form-2-order": "1",
+            "form-2-id": "3",
+            "form-2-collector": "1",
+
+            "form-3-order": "0",
+            "form-3-id": "4",
+            "form-3-collector": "1",
+        }
+        response = self.client.post('/test_admin/admin/admin_views/category/', data)
+        # Successful post will redirect
+        self.failUnlessEqual(response.status_code, 302)
+
+        # Check that the order values have been applied to the right objects
+        self.failUnlessEqual(Category.objects.get(id=1).order, 14)
+        self.failUnlessEqual(Category.objects.get(id=2).order, 13)
+        self.failUnlessEqual(Category.objects.get(id=3).order, 1)
+        self.failUnlessEqual(Category.objects.get(id=4).order, 0)
+
 class AdminSearchTest(TestCase):
     fixtures = ['admin-views-users','multiple-child-classes']
 
@@ -1254,11 +1295,24 @@ class AdminInlineTests(TestCase):
             "fancydoodad_set-2-owner": "1",
             "fancydoodad_set-2-name": "",
             "fancydoodad_set-2-expensive": "on",
+
+            "category_set-TOTAL_FORMS": "3",
+            "category_set-INITIAL_FORMS": "0",
+            "category_set-0-order": "",
+            "category_set-0-id": "",
+            "category_set-0-collector": "1",
+            "category_set-1-order": "",
+            "category_set-1-id": "",
+            "category_set-1-collector": "1",
+            "category_set-2-order": "",
+            "category_set-2-id": "",
+            "category_set-2-collector": "1",
         }
 
         result = self.client.login(username='super', password='secret')
         self.failUnlessEqual(result, True)
-        Collector(pk=1,name='John Fowles').save()
+        self.collector = Collector(pk=1,name='John Fowles')
+        self.collector.save()
 
     def tearDown(self):
         self.client.logout()
@@ -1419,3 +1473,131 @@ class AdminInlineTests(TestCase):
         self.failUnlessEqual(response.status_code, 302)
         self.failUnlessEqual(FancyDoodad.objects.count(), 1)
         self.failUnlessEqual(FancyDoodad.objects.all()[0].name, "Fancy Doodad 1 Updated")
+
+    def test_ordered_inline(self):
+        """Check that an inline with an editable ordering fields is
+        updated correctly. Regression for #10922"""
+        # Create some objects with an initial ordering
+        Category.objects.create(id=1, order=1, collector=self.collector)
+        Category.objects.create(id=2, order=2, collector=self.collector)
+        Category.objects.create(id=3, order=0, collector=self.collector)
+        Category.objects.create(id=4, order=0, collector=self.collector)
+
+        # NB: The order values must be changed so that the items are reordered.
+        self.post_data.update({
+            "name": "Frederick Clegg",
+
+            "category_set-TOTAL_FORMS": "7",
+            "category_set-INITIAL_FORMS": "4",
+
+            "category_set-0-order": "14",
+            "category_set-0-id": "1",
+            "category_set-0-collector": "1",
+
+            "category_set-1-order": "13",
+            "category_set-1-id": "2",
+            "category_set-1-collector": "1",
+
+            "category_set-2-order": "1",
+            "category_set-2-id": "3",
+            "category_set-2-collector": "1",
+
+            "category_set-3-order": "0",
+            "category_set-3-id": "4",
+            "category_set-3-collector": "1",
+
+            "category_set-4-order": "",
+            "category_set-4-id": "",
+            "category_set-4-collector": "1",
+
+            "category_set-5-order": "",
+            "category_set-5-id": "",
+            "category_set-5-collector": "1",
+
+            "category_set-6-order": "",
+            "category_set-6-id": "",
+            "category_set-6-collector": "1",
+        })
+        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        # Successful post will redirect
+        self.failUnlessEqual(response.status_code, 302)
+
+        # Check that the order values have been applied to the right objects
+        self.failUnlessEqual(self.collector.category_set.count(), 4)
+        self.failUnlessEqual(Category.objects.get(id=1).order, 14)
+        self.failUnlessEqual(Category.objects.get(id=2).order, 13)
+        self.failUnlessEqual(Category.objects.get(id=3).order, 1)
+        self.failUnlessEqual(Category.objects.get(id=4).order, 0)
+
+
+class NeverCacheTests(TestCase):
+    fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def testAdminIndex(self):
+        "Check the never-cache status of the main index"
+        response = self.client.get('/test_admin/admin/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testAppIndex(self):
+        "Check the never-cache status of an application index"
+        response = self.client.get('/test_admin/admin/admin_views/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testModelIndex(self):
+        "Check the never-cache status of a model index"
+        response = self.client.get('/test_admin/admin/admin_views/fabric/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testModelAdd(self):
+        "Check the never-cache status of a model add page"
+        response = self.client.get('/test_admin/admin/admin_views/fabric/add/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testModelView(self):
+        "Check the never-cache status of a model edit page"
+        response = self.client.get('/test_admin/admin/admin_views/section/1/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testModelHistory(self):
+        "Check the never-cache status of a model history page"
+        response = self.client.get('/test_admin/admin/admin_views/section/1/history/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testModelDelete(self):
+        "Check the never-cache status of a model delete page"
+        response = self.client.get('/test_admin/admin/admin_views/section/1/delete/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testLogin(self):
+        "Check the never-cache status of login views"
+        self.client.logout()
+        response = self.client.get('/test_admin/admin/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testLogout(self):
+        "Check the never-cache status of logout view"
+        response = self.client.get('/test_admin/admin/logout/')
+        self.failUnlessEqual(get_max_age(response), 0)
+
+    def testPasswordChange(self):
+        "Check the never-cache status of the password change view"
+        self.client.logout()
+        response = self.client.get('/test_admin/password_change/')
+        self.failUnlessEqual(get_max_age(response), None)
+
+    def testPasswordChangeDone(self):
+        "Check the never-cache status of the password change done view"
+        response = self.client.get('/test_admin/admin/password_change/done/')
+        self.failUnlessEqual(get_max_age(response), None)
+
+    def testJsi18n(self):
+        "Check the never-cache status of the Javascript i18n view"
+        response = self.client.get('/test_admin/jsi18n/')
+        self.failUnlessEqual(get_max_age(response), None)
+

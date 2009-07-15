@@ -1,6 +1,6 @@
 {% extends "!layout.html" %}
 
-{%- macro secondnav %}
+{%- macro secondnav() %}
   {%- if prev %}
     &laquo; <a href="{{ prev.link|e }}" title="{{ prev.title|e }}">previous</a> 
     {{ reldelim2 }}
