@@ -55,15 +55,64 @@ just above the final ``import`` line to place your project on the path. Remember
 replace 'mysite.settings' with your correct settings file, and '/usr/local/django'
 with your own project's location.
 
-See the :ref:`Apache/mod_python documentation<howto-deployment-modpython>` for 
-directions on serving static media, and the `mod_wsgi documentation`_ for an 
-explanation of other directives and configuration options you can use.
+Serving media files
+===================
+
+Django doesn't serve media files itself; it leaves that job to whichever Web
+server you choose.
+
+We recommend using a separate Web server -- i.e., one that's not also running
+Django -- for serving media. Here are some good choices:
+
+    * lighttpd_
+    * Nginx_
+    * TUX_
+    * A stripped-down version of Apache_
+    * Cherokee_
+
+If, however, you have no option but to serve media files on the same Apache
+``VirtualHost`` as Django, you can set up Apache to serve some URLs as
+static media, and others using the mod_wsgi interface to Django.
+
+This example sets up Django at the site root, but explicitly serves ``robots.txt``,
+``favicon.ico``, any CSS file, and anything in the ``/media/`` URL space as a static
+file. All other URLs will be served using mod_wsgi::
+
+    Alias /robots.txt /usr/local/wsgi/static/robots.txt
+    Alias /favicon.ico /usr/local/wsgi/static/favicon.ico
+
+    AliasMatch /([^/]*\.css) /usr/local/wsgi/static/styles/$1
+
+    Alias /media/ /usr/local/wsgi/static/media/
+
+    <Directory /usr/local/wsgi/static>
+    Order deny,allow
+    Allow from all
+    </Directory>
+
+    WSGIScriptAlias / /usr/local/wsgi/scripts/django.wsgi
+
+    <Directory /usr/local/wsgi/scripts>
+    Order allow,deny
+    Allow from all
+    </Directory>
+
+.. _lighttpd: http://www.lighttpd.net/
+.. _Nginx: http://wiki.codemongers.com/Main
+.. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
+.. _Apache: http://httpd.apache.org/
+.. _Cherokee: http://www.cherokee-project.com/
+
+More details on configuring a mod_wsgi site to serve static files can be found
+in the mod_wsgi documentation on `hosting static files`_.
+
+.. _hosting static files: http://code.google.com/p/modwsgi/wiki/ConfigurationGuidelines#Hosting_Of_Static_Files
 
 Details
 =======
 
-For more details, see the `mod_wsgi documentation`_, which explains the above in
-more detail, and walks through all the various options you've got when deploying
-under mod_wsgi.
+For more details, see the `mod_wsgi documentation on Django integration`_,
+which explains the above in more detail, and walks through all the various
+options you've got when deploying under mod_wsgi.
 
-.. _mod_wsgi documentation: http://code.google.com/p/modwsgi/wiki/IntegrationWithDjango
+.. _mod_wsgi documentation on Django integration: http://code.google.com/p/modwsgi/wiki/IntegrationWithDjango
