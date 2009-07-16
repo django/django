@@ -400,7 +400,7 @@ further processing.
 
 .. versionadded:: 1.1
 
-Another posibility is to include additional URL patterns not by specifying the
+Another possibility is to include additional URL patterns not by specifying the
 URLconf Python module defining them as the `include`_ argument but by using
 directly the pattern list as returned by `patterns`_ instead. For example::
 
@@ -416,6 +416,13 @@ directly the pattern list as returned by `patterns`_ instead. For example::
         (r'^help/',   include('apps.help.urls')),
         (r'^credit/', include(extra_patterns)),
     )
+
+This approach can be seen in use when you deploy an instance of the Django
+Admin application. The Django Admin is deployed as instances of a
+:class:`AdminSite`; each :class:`AdminSite` instance has an attribute
+``urls`` that returns the url patterns available to that instance. It is this
+attribute that you ``included()`` into your projects ``urlpatterns`` when you
+deploy the admin instance.
 
 .. _`Django Web site`: http://www.djangoproject.com/
 
@@ -438,6 +445,58 @@ the following example is valid::
 
 In the above example, the captured ``"username"`` variable is passed to the
 included URLconf, as expected.
+
+.. _topics-http-defining-url-namespaces:
+
+Defining URL Namespaces
+-----------------------
+
+When you need to deploying multiple instances of a single application, it can
+be helpful to be able to differentiate between instances. This is especially
+important when using _`named URL patterns <naming-url-patterns>`, since
+multiple instances of a single application will share named URLs. Namespaces
+provide a way to tell these named URLs apart.
+
+A URL namespace comes in two parts, both of which are strings:
+
+    * An **application namespace**. This describes the name of the application
+      that is being deployed. Every instance of a single application will have
+      the same application namespace. For example, Django's admin application
+      has the somewhat predictable application namespace of ``admin``.
+
+    * An **instance namespace**. This identifies a specific instance of an
+      application. Instance namespaces should be unique across your entire
+      project. However, and instance namespace can be the same as the
+      application namespace. This is used to specify a default instance of an
+      application. For example, the default Django Admin instance has an
+      instance namespace of ``admin``.
+
+URL Namespaces can be specified in two ways.
+
+Firstly, you can provide the applicaiton and instance namespace as arguments
+to the ``include()`` when you construct your URL patterns. For example,::
+
+    (r'^help/', include('apps.help.urls', namespace='foo', app_name='bar')),
+
+This will include the URLs defined in ``apps.help.urls`` into the application
+namespace ``bar``, with the instance namespace ``foo``.
+
+Secondly, you can include an object that contains embedded namespace data. If
+you ``include()`` a ``patterns`` object, that object will be added to the
+global namespace. However, you can also ``include()`` an object that contains
+a 3-tuple containing::
+
+    (<patterns object>, <application namespace>, <instance namespace>)
+
+This will include the nominated URL patterns into the given application and
+instance namespace. For example, the ``urls`` attribute of Django's
+:class:`AdminSite` object returns a 3-tuple that contains all the patterns in
+an admin site, plus the name of the admin instance, and the application
+namespace ``admin``.
+
+Once you have defined namespace URLs, you can reverse them. For details on
+reversing namespaced urls, see the documentation on :ref:`reversing namespaced
+URLs <topics-http-reversing-url-namespaces>`.
 
 Passing extra options to view functions
 =======================================
@@ -613,6 +672,86 @@ not restricted to valid Python names.
     name, will decrease the chances of collision. We recommend something like
     ``myapp-comment`` instead of ``comment``.
 
+.. _topics-http-reversing-url-namespaces:
+
+URL namespaces
+--------------
+
+.. versionadded:: 1.1
+
+Namespaced URLs are specified using the `:` operator. For example, the main index
+page of the admin application is referenced using ``admin:index``. This indicates
+a namespace of ``admin``, and a named URL of ``index``.
+
+Namespaces can also be nested. The named URL ``foo:bar:whiz`` would look for
+a pattern named ``whiz`` in the namespace ``bar`` that is itself defined within
+the top-level namespace ``foo``.
+
+When given a namespaced URL (e.g.,, `myapp:index`) to resolve, Django splits
+the fully qualified name into parts, and then tries the following lookup:
+
+    1. Django then looks for a matching application namespace (in this
+       example, ``myapp``). This will yield a list of instances of that
+       application.
+
+    2. If there is a ``current`` application defined, Django finds and returns
+       the URL resolver for that instance. The ``current`` can be specified
+       as an attribute on the template context - applications that expect to
+       have multiple deployments should set the ``current_app`` attribute on
+       any ``Context`` or ``RequestContext`` that is used to render a
+       template.
+
+       The current application can also be specified manually as an argument
+       to the :method:``reverse()`` function.
+
+    3. If there is no current application. Django looks for a default
+       application instance. The default application instance is the instance
+       that has an instance namespace matching the application namespace (in
+       this example, an instance of the ``myapp`` called ``myapp``)
+
+    4. If there is no default application instance, Django will pick the first
+       deployed instance of the application, whatever it's instance name may be.
+
+    5. If the provided namespace doesn't match an application namespace in
+       step 2, Django will attempt a direct lookup of the namespace as an
+       instance namespace.
+
+If there are nested namespaces, these steps are repeated for each part of the
+namespace until only the view name is unresolved. The view name will then be
+resolved into a URL in the namespace that has been found.
+
+To show this resolution strategy in action, consider an example of two instances
+of ``myapp``: one called ``foo``, and one called ``bar``. ``myapp`` has a main
+index page with a URL named `index`. Using this setup, the following lookups are
+possible:
+
+    * If one of the instances is current - say, if we were rendering a utility page
+      in the instance ``bar`` - ``myapp:index`` will resolve to the index page of
+      the instance ``bar``.
+
+    * If there is no current instance - say, if we were rendering a page
+      somewhere else on the site - ``myapp:index`` will resolve to the first
+      registered instance of ``myapp``. Since there is no default instance,
+      the first instance of ``myapp`` that is registered will be used. This could
+      be ``foo`` or ``bar``, depending on the order they are introduced into the
+      urlpatterns of the project.
+
+    * ``foo:index`` will always resolve to the index page of the instance ``foo``.
+
+If there was also a default instance - i.e., an instance named `myapp` - the
+following would happen:
+
+    * If one of the instances is current - say, if we were rendering a utility page
+      in the instance ``bar`` - ``myapp:index`` will resolve to the index page of
+      the instance ``bar``.
+
+    * If there is no current instance - say, if we were rendering a page somewhere
+      else on the site - ``myapp:index`` will resolve to the index page of the
+      default instance.
+
+    * ``foo:index`` will again resolve to the index page of the instance ``foo``.
+
+
 Utility methods
 ===============
 
@@ -624,7 +763,7 @@ your code, Django provides the following method (in the
 ``django.core.urlresolvers`` module):
 
 .. currentmodule:: django.core.urlresolvers
-.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None)
+.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
 
 ``viewname`` is either the function name (either a function reference, or the
 string version of the name, if you used that form in ``urlpatterns``) or the
@@ -645,6 +784,14 @@ moment is that the pattern cannot contain alternative choices using the
 vertical bar (``"|"``) character. You can quite happily use such patterns for
 matching against incoming URLs and sending them off to views, but you cannot
 reverse such patterns.
+
+.. versionadded:: 1.1
+
+The ``current_app`` argument allows you to provide a hint to the resolver
+indicating the application to which the currently executing view belongs.
+This ``current_app`` argument is used as a hint to resolve application
+namespaces into URLs on specific application instances, according to the
+:ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`.
 
 .. admonition:: Make sure your views are all correct
 

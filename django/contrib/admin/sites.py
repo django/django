@@ -5,6 +5,7 @@ from django.contrib.admin import actions
 from django.contrib.auth import authenticate, login
 from django.db.models.base import ModelBase
 from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.utils.functional import update_wrapper
 from django.utils.safestring import mark_safe
@@ -38,17 +39,14 @@ class AdminSite(object):
     login_template = None
     app_index_template = None
 
-    def __init__(self, name=None):
+    def __init__(self, name=None, app_name='admin'):
         self._registry = {} # model_class class -> admin_class instance
-        # TODO Root path is used to calculate urls under the old root() method
-        # in order to maintain backwards compatibility we are leaving that in
-        # so root_path isn't needed, not sure what to do about this.
-        self.root_path = 'admin/'
+        self.root_path = None
         if name is None:
-            name = ''
+            self.name = 'admin'
         else:
-            name += '_'
-        self.name = name
+            self.name = name
+        self.app_name = app_name
         self._actions = {'delete_selected': actions.delete_selected}
         self._global_actions = self._actions.copy()
 
@@ -202,24 +200,24 @@ class AdminSite(object):
         urlpatterns = patterns('',
             url(r'^$',
                 wrap(self.index),
-                name='%sadmin_index' % self.name),
+                name='index'),
             url(r'^logout/$',
                 wrap(self.logout),
-                name='%sadmin_logout'),
+                name='logout'),
             url(r'^password_change/$',
                 wrap(self.password_change, cacheable=True),
-                name='%sadmin_password_change' % self.name),
+                name='password_change'),
             url(r'^password_change/done/$',
                 wrap(self.password_change_done, cacheable=True),
-                name='%sadmin_password_change_done' % self.name),
+                name='password_change_done'),
             url(r'^jsi18n/$',
                 wrap(self.i18n_javascript, cacheable=True),
-                name='%sadmin_jsi18n' % self.name),
+                name='jsi18n'),
             url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$',
                 'django.views.defaults.shortcut'),
             url(r'^(?P<app_label>\w+)/$',
                 wrap(self.app_index),
-                name='%sadmin_app_list' % self.name),
+                name='app_list')
         )
 
         # Add in each model's views.
@@ -231,7 +229,7 @@ class AdminSite(object):
         return urlpatterns
 
     def urls(self):
-        return self.get_urls()
+        return self.get_urls(), self.app_name, self.name
     urls = property(urls)
 
     def password_change(self, request):
@@ -239,8 +237,11 @@ class AdminSite(object):
         Handles the "change password" task -- both form display and validation.
         """
         from django.contrib.auth.views import password_change
-        return password_change(request,
-            post_change_redirect='%spassword_change/done/' % self.root_path)
+        if self.root_path is not None:
+            url = '%spassword_change/done/' % self.root_path
+        else:
+            url = reverse('admin:password_change_done', current_app=self.name)
+        return password_change(request, post_change_redirect=url)
 
     def password_change_done(self, request):
         """
@@ -368,8 +369,9 @@ class AdminSite(object):
             'root_path': self.root_path,
         }
         context.update(extra_context or {})
+        context_instance = template.RequestContext(request, current_app=self.name)
         return render_to_response(self.index_template or 'admin/index.html', context,
-            context_instance=template.RequestContext(request)
+            context_instance=context_instance
         )
     index = never_cache(index)
 
@@ -382,8 +384,9 @@ class AdminSite(object):
             'root_path': self.root_path,
         }
         context.update(extra_context or {})
+        context_instance = template.RequestContext(request, current_app=self.name)
         return render_to_response(self.login_template or 'admin/login.html', context,
-            context_instance=template.RequestContext(request)
+            context_instance=context_instance
         )
 
     def app_index(self, request, app_label, extra_context=None):
@@ -425,9 +428,10 @@ class AdminSite(object):
             'root_path': self.root_path,
         }
         context.update(extra_context or {})
+        context_instance = template.RequestContext(request, current_app=self.name)
         return render_to_response(self.app_index_template or ('admin/%s/app_index.html' % app_label,
             'admin/app_index.html'), context,
-            context_instance=template.RequestContext(request)
+            context_instance=context_instance
         )
 
     def root(self, request, url):

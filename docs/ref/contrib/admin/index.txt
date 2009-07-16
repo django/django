@@ -1242,7 +1242,7 @@ or :attr:`AdminSite.login_template` properties.
 ``AdminSite`` objects
 =====================
 
-.. class:: AdminSite
+.. class:: AdminSite(name=None)
 
 A Django administrative site is represented by an instance of
 ``django.contrib.admin.sites.AdminSite``; by default, an instance of
@@ -1255,6 +1255,14 @@ or add anything you like. Then, simply create an instance of your
 ``AdminSite`` subclass (the same way you'd instantiate any other
 Python class), and register your models and ``ModelAdmin`` subclasses
 with it instead of using the default.
+
+.. versionadded:: 1.1
+
+When constructing an instance of an ``AdminSite``, you are able to provide
+a unique instance name using the ``name`` argument to the constructor. This
+instance name is used to identify the instance, especially when
+:ref:`reversing admin URLs <admin-reverse-urls>`. If no instance name is
+provided, a default instance name of ``admin`` will be used.
 
 ``AdminSite`` attributes
 ------------------------
@@ -1353,10 +1361,10 @@ a pattern for your new view.
 
 .. note::
     Any view you render that uses the admin templates, or extends the base
-    admin template, should include in it's context a variable named
-    ``admin_site`` that contains the name of the :class:`AdminSite` instance. For
-    :class:`AdminSite` instances, this means ``self.name``; for :class:`ModelAdmin`
-    instances, this means ``self.admin_site.name``.
+    admin template, should provide the ``current_app`` argument to
+    ``RequestContext`` or ``Context`` when rendering the template.  It should
+    be set to either ``self.name`` if your view is on an ``AdminSite`` or
+    ``self.admin_site.name`` if your view is on a ``ModelAdmin``.
 
 .. _admin-reverse-urls:
 
@@ -1370,37 +1378,31 @@ accessible using Django's :ref:`URL reversing system <naming-url-patterns>`.
 
 The :class:`AdminSite` provides the following named URL patterns:
 
-    ======================  =============================== =============
-    Page                    URL name                        Parameters
-    ======================  =============================== =============
-    Index                   ``admin_index``
-    Logout                  ``admin_logout``
-    Password change         ``admin_password_change``
-    Password change done    ``admin_password_change_done``
-    i18n javascript         ``admin_jsi18n``
-    Application index page  ``admin_app_list``              ``app_label``
-    ======================  =============================== =============
-
-These names will be prefixed with the name of the :class:`AdminSite` instance,
-plus an underscore. For example, if your :class:`AdminSite` was named
-``custom``, then the Logout view would be served using a URL with the name
-``custom_admin_logout``. The default :class:`AdminSite` doesn't use a prefix
-in it's URL names.
+    ======================  ========================  =============
+    Page                    URL name                  Parameters
+    ======================  ========================  =============
+    Index                   ``index``
+    Logout                  ``logout``
+    Password change         ``password_change``
+    Password change done    ``password_change_done``
+    i18n javascript         ``jsi18n``
+    Application index page  ``app_list``              ``app_label``
+    ======================  ========================  =============
 
 Each :class:`ModelAdmin` instance provides an additional set of named URLs:
 
-    ======================  =====================================================   =============
-    Page                    URL name                                                Parameters
-    ======================  =====================================================   =============
-    Changelist              ``admin_{{ app_label }}_{{ model_name }}_changelist``
-    Add                     ``admin_{{ app_label }}_{{ model_name }}_add``
-    History                 ``admin_{{ app_label }}_{{ model_name }}_history``      ``object_id``
-    Delete                  ``admin_{{ app_label }}_{{ model_name }}_delete``       ``object_id``
-    Change                  ``admin_{{ app_label }}_{{ model_name }}_change``       ``object_id``
-    ======================  =====================================================   =============
+    ======================  ===============================================   =============
+    Page                    URL name                                          Parameters
+    ======================  ===============================================   =============
+    Changelist              ``{{ app_label }}_{{ model_name }}_changelist``
+    Add                     ``{{ app_label }}_{{ model_name }}_add``
+    History                 ``{{ app_label }}_{{ model_name }}_history``      ``object_id``
+    Delete                  ``{{ app_label }}_{{ model_name }}_delete``       ``object_id``
+    Change                  ``{{ app_label }}_{{ model_name }}_change``       ``object_id``
+    ======================  ===============================================   =============
 
-Again, these names will be prefixed by the name of the :class:`AdminSite` in
-which they are deployed.
+These named URLs are registered with the application namespace ``admin``, and
+with an instance namespace corresponding to the name of the Site instance.
 
 So - if you wanted to get a reference to the Change view for a particular
 ``Choice`` object (from the polls application) in the default admin, you would
@@ -1408,8 +1410,16 @@ call::
 
     >>> from django.core import urlresolvers
     >>> c = Choice.objects.get(...)
-    >>> change_url = urlresolvers.reverse('admin_polls_choice_change', args=(c.id,))
+    >>> change_url = urlresolvers.reverse('admin:polls_choice_change', args=(c.id,))
 
-However, if the admin instance was named ``custom``, you would need to call::
+This will find the first registered instance of the admin application (whatever the instance
+name), and resolve to the view for changing ``poll.Choice`` instances in that instance.
 
-    >>> change_url = urlresolvers.reverse('custom_admin_polls_choice_change', args=(c.id,))
+If you want to find a URL in a specific admin instance, provide the name of that instance
+as a ``current_app`` hint to the reverse call. For example, if you specifically wanted
+the admin view from the admin instance named ``custom``, you would need to call::
+
+    >>> change_url = urlresolvers.reverse('custom:polls_choice_change', args=(c.id,))
+
+For more details, see the documentation on :ref:`reversing namespaced URLs
+<topics-http-reversing-url-namespaces>`.
