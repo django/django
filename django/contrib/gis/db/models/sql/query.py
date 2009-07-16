@@ -13,7 +13,9 @@ from django.contrib.gis.measure import Area, Distance
 ALL_TERMS = sql.constants.QUERY_TERMS.copy()
 ALL_TERMS.update(SpatialBackend.gis_terms)
 
+# Pulling out other needed constants/routines to avoid attribute lookups.
 TABLE_NAME = sql.constants.TABLE_NAME
+get_proxied_model = sql.query.get_proxied_model
 
 class GeoQuery(sql.Query):
     """
@@ -153,7 +155,9 @@ class GeoQuery(sql.Query):
             opts = self.model._meta
         aliases = set()
         only_load = self.deferred_to_columns()
-        proxied_model = opts.proxy and opts.proxy_for_model or 0
+        # Skip all proxy to the root proxied model
+        proxied_model = get_proxied_model(opts)
+
         if start_alias:
             seen = {None: start_alias}
         for field, model in opts.get_fields_with_model():
@@ -205,6 +209,10 @@ class GeoQuery(sql.Query):
         """
         values = []
         aliases = self.extra_select.keys()
+        if self.aggregates:
+            # If we have an aggregate annotation, must extend the aliases
+            # so their corresponding row values are included.
+            aliases.extend([None for i in xrange(len(self.aggregates))])
 
         # Have to set a starting row number offset that is used for
         # determining the correct starting row index -- needed for
