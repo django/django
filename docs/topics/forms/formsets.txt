@@ -86,9 +86,9 @@ displayed.
 Formset validation
 ------------------
 
-Validation with a formset is about identical to a regular ``Form``. There is
+Validation with a formset is almost identical to a regular ``Form``. There is
 an ``is_valid`` method on the formset to provide a convenient way to validate
-each form in the formset::
+all forms in the formset::
 
     >>> ArticleFormSet = formset_factory(ArticleForm)
     >>> formset = ArticleFormSet({})
@@ -97,22 +97,25 @@ each form in the formset::
 
 We passed in no data to the formset which is resulting in a valid form. The
 formset is smart enough to ignore extra forms that were not changed. If we
-attempt to provide an article, but fail to do so::
+provide an invalid article::
 
     >>> data = {
-    ...     'form-TOTAL_FORMS': u'1',
-    ...     'form-INITIAL_FORMS': u'1',
+    ...     'form-TOTAL_FORMS': u'2',
+    ...     'form-INITIAL_FORMS': u'0',
     ...     'form-0-title': u'Test',
-    ...     'form-0-pub_date': u'',
+    ...     'form-0-pub_date': u'16 June 1904',
+    ...     'form-1-title': u'Test',
+    ...     'form-1-pub_date': u'', # <-- this date is missing but required
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
     False
     >>> formset.errors
-    [{'pub_date': [u'This field is required.']}]
+    [{}, {'pub_date': [u'This field is required.']}]
 
-As we can see the formset properly performed validation and gave us the
-expected errors.
+As we can see, ``formset.errors`` is a list whose entries correspond to the
+forms in the formset. Validation was performed for each of the two forms, and
+the expected error message appears for the second item.
 
 .. _understanding-the-managementform:
 
@@ -155,20 +158,40 @@ Custom formset validation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A formset has a ``clean`` method similar to the one on a ``Form`` class. This
-is where you define your own validation that deals at the formset level::
+is where you define your own validation that works at the formset level::
 
     >>> from django.forms.formsets import BaseFormSet
 
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def clean(self):
-    ...         raise forms.ValidationError, u'An error occured.'
+    ...         """Checks that no two articles have the same title."""
+    ...         if any(self.errors):
+    ...             # Don't bother validating the formset unless each form is valid on its own
+    ...             return
+    ...         titles = []
+    ...         for i in range(0, self.total_form_count()):
+    ...             form = self.forms[i]
+    ...             title = form.cleaned_data['title']
+    ...             if title in titles:
+    ...                 raise forms.ValidationError, "Articles in a set must have distinct titles."
+    ...             titles.append(title)
 
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
-    >>> formset = ArticleFormSet({})
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'2',
+    ...     'form-INITIAL_FORMS': u'0',
+    ...     'form-0-title': u'Test',
+    ...     'form-0-pub_date': u'16 June 1904',
+    ...     'form-1-title': u'Test',
+    ...     'form-1-pub_date': u'23 June 1912',
+    ... }
+    >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
     False
+    >>> formset.errors
+    [{}, {}]
     >>> formset.non_form_errors()
-    [u'An error occured.']
+    [u'Articles in a set must have distinct titles.']
 
 The formset ``clean`` method is called after all the ``Form.clean`` methods
 have been called. The errors will be found using the ``non_form_errors()``

@@ -365,7 +365,7 @@ That takes care of setting ``handler404`` in the current module. As you can see
 in ``django/conf/urls/defaults.py``, ``handler404`` is set to
 :func:`django.views.defaults.page_not_found` by default.
 
-Three more things to note about 404 views:
+Four more things to note about 404 views:
 
     * If :setting:`DEBUG` is set to ``True`` (in your settings module) then your
       404 view will never be used (and thus the ``404.html`` template will never

@@ -464,7 +464,7 @@ should raise either a ``ValueError`` if the ``value`` is of the wrong sort (a
 list when you were expecting an object, for example) or a ``TypeError`` if
 your field does not support that type of lookup. For many fields, you can get
 by with handling the lookup types that need special handling for your field
-and pass the rest of the :meth:`get_db_prep_lookup` method of the parent class.
+and pass the rest to the :meth:`get_db_prep_lookup` method of the parent class.
 
 If you needed to implement ``get_db_prep_save()``, you will usually need to
 implement ``get_db_prep_lookup()``. If you don't, ``get_db_prep_value`` will be

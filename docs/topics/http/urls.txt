@@ -40,14 +40,14 @@ algorithm the system follows to determine which Python code to execute:
        this is the value of the ``ROOT_URLCONF`` setting, but if the incoming
        ``HttpRequest`` object has an attribute called ``urlconf``, its value
        will be used in place of the ``ROOT_URLCONF`` setting.
-    
+
     2. Django loads that Python module and looks for the variable
        ``urlpatterns``. This should be a Python list, in the format returned by
        the function ``django.conf.urls.defaults.patterns()``.
-    
+
     3. Django runs through each URL pattern, in order, and stops at the first
        one that matches the requested URL.
-    
+
     4. Once one of the regexes matches, Django imports and calls the given
        view, which is a simple Python function. The view gets passed an
        :class:`~django.http.HttpRequest` as its first argument and any values
@@ -263,8 +263,15 @@ value should suffice.
 include
 -------
 
-A function that takes a full Python import path to another URLconf that should
-be "included" in this place. See `Including other URLconfs`_ below.
+A function that takes a full Python import path to another URLconf module that
+should be "included" in this place.
+
+.. versionadded:: 1.1
+
+:meth:``include`` also accepts as an argument an iterable that returns URL
+patterns.
+
+See `Including other URLconfs`_ below.
 
 Notes on capturing text in URLs
 ===============================
@@ -390,6 +397,25 @@ Note that the regular expressions in this example don't have a ``$``
 Django encounters ``include()``, it chops off whatever part of the URL matched
 up to that point and sends the remaining string to the included URLconf for
 further processing.
+
+.. versionadded:: 1.1
+
+Another posibility is to include additional URL patterns not by specifying the
+URLconf Python module defining them as the `include`_ argument but by using
+directly the pattern list as returned by `patterns`_ instead. For example::
+
+    from django.conf.urls.defaults import *
+
+    extra_patterns = patterns('',
+        url(r'reports/(?P<id>\d+)/$', 'credit.views.report', name='credit-reports'),
+        url(r'charge/$', 'credit.views.charge', name='credit-charge'),
+    )
+
+    urlpatterns = patterns('',
+        url(r'^$',    'apps.main.views.homepage', name='site-homepage'),
+        (r'^help/',   include('apps.help.urls')),
+        (r'^credit/', include(extra_patterns)),
+    )
 
 .. _`Django Web site`: http://www.djangoproject.com/
 

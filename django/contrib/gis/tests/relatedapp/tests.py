@@ -1,7 +1,7 @@
 import os, unittest
 from django.contrib.gis.geos import *
 from django.contrib.gis.db.backend import SpatialBackend
-from django.contrib.gis.db.models import Count, Extent, F, Union
+from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
 from django.contrib.gis.tests.utils import no_mysql, no_oracle, no_spatialite
 from django.conf import settings
 from models import City, Location, DirectoryEntry, Parcel, Book, Author
@@ -237,7 +237,7 @@ class RelatedGeoModelTest(unittest.TestCase):
         # as Dallas.
         dallas = City.objects.get(name='Dallas')
         ftworth = City.objects.create(name='Fort Worth', state='TX', location=dallas.location)
-        
+
         # Count annotation should be 2 for the Dallas location now.
         loc = Location.objects.annotate(num_cities=Count('city')).get(id=dallas.location.id)
         self.assertEqual(2, loc.num_cities)
@@ -250,7 +250,7 @@ class RelatedGeoModelTest(unittest.TestCase):
         Book.objects.create(title='Blank Spots on the Map', author=tp)
         wp = Author.objects.create(name='William Patry')
         Book.objects.create(title='Patry on Copyright', author=wp)
-        
+
         # Should only be one author (Trevor Paglen) returned by this query, and
         # the annotation should have 3 for the number of books.
         qs = Author.objects.annotate(num_books=Count('books')).filter(num_books__gt=1)
@@ -263,6 +263,27 @@ class RelatedGeoModelTest(unittest.TestCase):
         b = Book.objects.select_related('author').get(title='Without Author')
         # Should be `None`, and not a 'dummy' model.
         self.assertEqual(None, b.author)
+
+    @no_mysql
+    @no_oracle
+    @no_spatialite
+    def test14_collect(self):
+        "Testing the `collect` GeoQuerySet method and `Collect` aggregate."
+        # Reference query:
+        # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN
+        #    "relatedapp_location" ON ("relatedapp_city"."location_id" = "relatedapp_location"."id")
+        #    WHERE "relatedapp_city"."state" = 'TX';
+        ref_geom = fromstr('MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,-95.363151 29.763374,-96.801611 32.782057)')
+
+        c1 = City.objects.filter(state='TX').collect(field_name='location__point')
+        c2 = City.objects.filter(state='TX').aggregate(Collect('location__point'))['location__point__collect']
+
+        for coll in (c1, c2):
+            # Even though Dallas and Ft. Worth share same point, Collect doesn't
+            # consolidate -- that's why 4 points in MultiPoint.
+            self.assertEqual(4, len(coll))
+            self.assertEqual(ref_geom, coll)
+
 
     # TODO: Related tests for KML, GML, and distance lookups.
 
