@@ -686,7 +686,13 @@ arguments at time of construction:
         user accounts that are valid on your production site will not work
         under test conditions. You'll need to create users as part of the test
         suite -- either manually (using the Django model API) or with a test
-        fixture.
+        fixture. Remember that if you want your test user to have a password,
+        you can't set the user's password by setting the password attribute
+        directly -- you must use the
+        :meth:`~django.contrib.auth.models.User.set_password()` function to
+        store a correctly hashed password. Alternatively, you can use the
+        :meth:`~django.contrib.auth.models.UserManager.create_user` helper
+        method to create a new user with a correctly hashed password.
 
     .. method:: Client.logout()
 

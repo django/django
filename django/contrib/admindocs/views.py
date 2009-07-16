@@ -22,11 +22,14 @@ class GenericSite(object):
     name = 'my site'
 
 def get_root_path():
-    from django.contrib import admin
     try:
-        return urlresolvers.reverse(admin.site.root, args=[''])
+        return urlresolvers.reverse('admin:index')
     except urlresolvers.NoReverseMatch:
-        return getattr(settings, "ADMIN_SITE_ROOT_URL", "/admin/")
+        from django.contrib import admin
+        try:
+            return urlresolvers.reverse(admin.site.root, args=[''])
+        except urlresolvers.NoReverseMatch:
+            return getattr(settings, "ADMIN_SITE_ROOT_URL", "/admin/")
 
 def doc_index(request):
     if not utils.docutils_is_available:
@@ -179,7 +182,7 @@ model_index = staff_member_required(model_index)
 def model_detail(request, app_label, model_name):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
-        
+
     # Get the model class.
     try:
         app_mod = models.get_app(app_label)
