@@ -451,8 +451,8 @@ included URLconf, as expected.
 Defining URL Namespaces
 -----------------------
 
-When you need to deploying multiple instances of a single application, it can
-be helpful to be able to differentiate between instances. This is especially
+When you need to deploy multiple instances of a single application, it can be
+helpful to be able to differentiate between instances. This is especially
 important when using _`named URL patterns <naming-url-patterns>`, since
 multiple instances of a single application will share named URLs. Namespaces
 provide a way to tell these named URLs apart.
