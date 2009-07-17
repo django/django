@@ -16,12 +16,20 @@ def get_charset(response):
 
 class ClientTest(TestCase):
     urls = 'regressiontests.charsets.urls'
-    
+    test_string = u'\u82cf\u8054\u961f'
+    codec = get_codec("GBK")
+
+    def encode(self, string):
+        return self.codec.encode(string)[0]
+
+    def decode(self, string):
+        return self.codec.decode(string)[0]
+
     def test_good_accept_charset(self):
         "Use Accept-Charset, with a quality value that throws away default_charset"
         # The data is ignored, but let's check it doesn't crash the system
         # anyway.
-        
+
         response = self.client.post('/accept_charset/', ACCEPT_CHARSET="ascii,utf-8;q=0")
         
         self.assertEqual(response.status_code, 200)
@@ -91,3 +99,27 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(get_charset(response), settings.DEFAULT_CHARSET)
 
+    def test_encode_content_type(self):
+        "Make sure a request gets encoded according to the content type in the view."
+        response = self.client.post('/encode_response_content_type/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(get_codec(get_charset(response)).name, self.codec.name)
+        self.assertEqual(response.content, self.encode(self.test_string))
+
+    def test_encode_accept_charset(self):
+        "Make sure a request gets encoded according to the Accept-Charset request header."
+        response = self.client.post('/encode_response_accept_charset/',
+                                     ACCEPT_CHARSET="gbk;q=1,utf-8;q=0.9")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(get_codec(get_charset(response)).name, self.codec.name)
+        self.assertEqual(response.content, self.encode(self.test_string))
+
+    def test_bad_codec(self):
+        "Assure we get an Exception for setting a bad codec in the view."
+        self.assertRaises(Exception, self.client.post, '/bad_codec/')
+
+    def test_good_codecs(self):
+        response = self.client.post('/good_codec/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, self.encode(self.test_string))

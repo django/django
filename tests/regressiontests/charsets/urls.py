@@ -20,4 +20,8 @@ urlpatterns = patterns('',
     (r'^bad_content_type/', views.bad_content_type),
     (r'^content_type_no_charset/', views.content_type_no_charset),
     (r'^basic_response/', views.basic_response),
+    (r'^good_codec/', views.good_codec),
+    (r'^bad_codec/', views.bad_codec),
+    (r'^encode_response_content_type/', views.encode_response_content_type),
+    (r'^encode_response_accept_charset/', views.encode_response_accept_charset),
 )

@@ -373,8 +373,11 @@ class HttpResponse(object):
         return self._codec
 
     def _set_codec(self, value):
-        if hasattr(value, "name"):
-            self._codec = value
+        if not hasattr(value, "name"):
+            # This is slightly more permissive, allowing any object with the
+            # "name" attribute.
+            raise Exception("Codec should be provided with a CodecInfo object.")
+        self._codec = value
 
     codec = property(_get_codec, _set_codec)
 
