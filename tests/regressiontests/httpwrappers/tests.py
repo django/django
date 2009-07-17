@@ -463,6 +463,45 @@ BadHeaderError: Header values can't contain newlines (got 'test\\nstr')
 >>> x.update(y)
 >>> x.getlist('a')
 [u'1', u'2', u'3', u'4']
+
+######################################
+# HttpResponse with iterable content #
+######################################
+
+>>> from django.http import HttpResponse
+>>> response = HttpResponse(file('regressiontests/httpwrappers/helloworld.txt','r'))
+>>> print response
+Content-Type: text/html; charset=utf-8
+<BLANKLINE>
+Hello world.
+<BLANKLINE>
+
+>>> print response
+Content-Type: text/html; charset=utf-8
+<BLANKLINE>
+Hello world.
+<BLANKLINE>
+
+>>> print response
+Content-Type: text/html; charset=utf-8
+<BLANKLINE>
+Hello world.
+<BLANKLINE>
+
+>>> response = HttpResponse("abc")
+>>> print response
+Content-Type: text/html; charset=utf-8
+<BLANKLINE>
+abc
+>>> print response
+Content-Type: text/html; charset=utf-8
+<BLANKLINE>
+abc
+>>> print response
+Content-Type: text/html; charset=utf-8
+<BLANKLINE>
+abc
+
 """
 
 from django.http import QueryDict, HttpResponse

@@ -275,7 +275,7 @@ class HttpResponse(object):
     _charset = settings.DEFAULT_CHARSET
 
     def __init__(self, content='', mimetype=None, status=None,
-            content_type=None, request=None):
+                 content_type=None, request=None):
         from django.conf import settings
         accept_charset = None
         if mimetype:
@@ -288,16 +288,12 @@ class HttpResponse(object):
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
-        if not isinstance(content, basestring) and hasattr(content, '__iter__'):
-            self._container = content
-            self._is_string = False
-        else:
-            self._container = [content]
-            self._is_string = True
+        self._container = [''.join(content)]
+        if hasattr(content, 'close'):
+            content.close()
         self.cookies = SimpleCookie()
         if status:
             self.status_code = status
-
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value.
@@ -305,9 +301,8 @@ class HttpResponse(object):
 
     def __str__(self):
         """Full HTTP message, including headers."""
-        return '\n'.join(['%s: %s' % (key, value)
-            for key, value in self._headers.values()]) \
-            + '\n\n' + self.content
+        headers = ['%s: %s' % (k, v) for k, v in self._headers.values()]
+        return '\n'.join(headers) + '\n\n' + self.content
 
     def _convert_to_ascii(self, *values):
         """Converts all values to ascii strings."""
@@ -402,8 +397,7 @@ class HttpResponse(object):
         return smart_str(''.join(self._container), self._codec.name)
 
     def _set_content(self, value):
-        self._container = [value]
-        self._is_string = True
+        self._container = [''.join(value)]
 
     content = property(_get_content, _set_content)
 
@@ -420,22 +414,18 @@ class HttpResponse(object):
         return str(chunk)
 
     def close(self):
-        if hasattr(self._container, 'close'):
-            self._container.close()
+        "No-op that remains for backwards compatibility. Ref #6527"
+        pass
 
     # The remaining methods partially implement the file-like object interface.
     # See http://docs.python.org/lib/bltin-file-objects.html
     def write(self, content):
-        if not self._is_string:
-            raise Exception("This %s instance is not writable" % self.__class__)
         self._container.append(content)
 
     def flush(self):
         pass
 
     def tell(self):
-        if not self._is_string:
-            raise Exception("This %s instance cannot tell its position" % self.__class__)
         return sum([len(chunk) for chunk in self._container])
 
 class HttpResponseSendFile(HttpResponse): 
