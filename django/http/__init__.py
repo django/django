@@ -442,19 +442,18 @@ class HttpResponseSendFile(HttpResponse):
     sendfile_fh = None
 
     def __init__(self, path_to_file, content_type=None, block_size=8192): 
- 	    if not content_type: 
- 	        from mimetypes import guess_type 
- 	        content_type = guess_type(path_to_file)[0] 
- 	        if content_type is None: 
- 	            content_type = "application/octet-stream" 
- 	    super(HttpResponseSendFile, self).__init__(None, 
- 	            content_type=content_type) 
- 	    self.sendfile_filename = path_to_file 
- 	    self.block_size = block_size 
- 	    self['Content-Length'] = os.path.getsize(path_to_file) 
- 	    self['Content-Disposition'] = ('attachment; filename=%s' % 
- 	            os.path.basename(path_to_file)) 
- 	    self[settings.HTTPRESPONSE_SENDFILE_HEADER] = path_to_file 
+        if not content_type:
+            from mimetypes import guess_type
+            content_type = guess_type(path_to_file)[0]
+            if content_type is None:
+                content_type = "application/octet-stream"
+        super(HttpResponseSendFile, self).__init__('', content_type=content_type)
+        self.sendfile_filename = path_to_file
+        self.block_size = block_size
+        self['Content-Length'] = os.path.getsize(path_to_file)
+        self['Content-Disposition'] = ('attachment; filename=%s' %
+             os.path.basename(path_to_file))
+        self[settings.HTTPRESPONSE_SENDFILE_HEADER] = path_to_file
 
     def __iter__(self):
         from django.core.servers.basehttp import FileWrapper
