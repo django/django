@@ -6,6 +6,7 @@ import datetime
 from django.utils import tree
 from django.db.models.fields import Field
 from django.db.models.query_utils import QueryWrapper
+from django.db.utils import call_with_connection
 from datastructures import EmptyResultSet, FullResultSet
 
 # Connection types
@@ -266,7 +267,7 @@ class Constraint(object):
         try:
             if self.field:
                 params = self.field.get_db_prep_lookup(lookup_type, value)
-                db_type = self.field.db_type(connection)
+                db_type = call_with_connection(self.field.db_type, connection=connection)
             else:
                 # This branch is used at times when we add a comparison to NULL
                 # (we don't really want to waste time looking up the associated

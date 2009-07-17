@@ -8,6 +8,7 @@ except NameError:
 
 from django.conf import settings
 from django.core.management import call_command
+from django.db.utils import call_with_connection
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -47,7 +48,7 @@ class BaseDatabaseCreation(object):
         pending_references = {}
         qn = self.connection.ops.quote_name
         for f in opts.local_fields:
-            col_type = f.db_type(self.connection)
+            col_type = call_with_connection(f.db_type, connection=self.connection)
             tablespace = f.db_tablespace or opts.db_tablespace
             if col_type is None:
                 # Skip ManyToManyFields, because they're not represented as

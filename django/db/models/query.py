@@ -33,7 +33,12 @@ class QuerySet(object):
     """
     def __init__(self, model=None, query=None):
         self.model = model
-        using = model._meta.using or DEFAULT_DB_ALIAS
+        # EmptyQuerySet instantiates QuerySet with model as None
+        if model:
+            using = model._meta.using
+        else:
+            using = None
+        using = using or DEFAULT_DB_ALIAS
         connection = connections[using]
         self.query = query or sql.Query(self.model, connection)
         self._result_cache = None
