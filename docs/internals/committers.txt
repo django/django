@@ -154,6 +154,19 @@ Gary Wilson
     broken windows. He's continued to do that necessary tidying up work
     throughout the code base since then.
 
+Justin Bronn
+    Justin Bronn is a computer scientist and attorney specializing
+    in legal topics related to intellectual property and spatial law.
+
+    In 2007, Justin began developing ``django.contrib.gis`` in a branch,
+    a.k.a. GeoDjango_, which was merged in time for Django 1.0.  While
+    implementing GeoDjango, Justin obtained a deep knowledge of Django's
+    internals including the ORM, the admin, and Oracle support.
+
+    Justin lives in Houston, Texas.
+
+.. _GeoDjango: http://geodjango.org/
+
 Karen Tracey
     Karen has a background in distributed operating systems (graduate school),
     communications software (industry) and crossword puzzle construction
@@ -186,16 +199,6 @@ Ian Kelly
 
 Matt Boersma
     Matt is also responsible for Django's Oracle support.
-
-Justin Bronn
-    Justin Bronn is a computer scientist and third-year law student at the
-    University of Houston who enjoys studying legal topics related to
-    intellectual property and spatial law.
-
-    Justin is the primary developer of ``django.contrib.gis``, a.k.a.
-    GeoDjango_.
-
-.. _GeoDjango: http://geodjango.org/
 
 Jeremy Dunck
     Jeremy the lead developer of Pegasus News, a personalized local site based
