@@ -668,7 +668,7 @@ of the arguments is required, but you should use at least one of them.
 
     The resulting SQL of the above example would be::
 
-        SELECT blog_blog.*, (SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id)
+        SELECT blog_blog.*, (SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id) AS entry_count
         FROM blog_blog;
 
     Note that the parenthesis required by most database engines around

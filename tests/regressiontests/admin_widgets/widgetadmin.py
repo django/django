@@ -19,7 +19,7 @@ class CarTireAdmin(admin.ModelAdmin):
             return db_field.formfield(**kwargs)
         return super(CarTireAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
-site = WidgetAdmin()
+site = WidgetAdmin(name='widget-admin')
 
 site.register(models.User)
 site.register(models.Car, CarAdmin)

@@ -125,7 +125,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         if value:
             output.append(self.label_for_value(value))
         return mark_safe(u''.join(output))
-    
+
     def base_url_parameters(self):
         params = {}
         if self.rel.limit_choices_to:
@@ -137,14 +137,14 @@ class ForeignKeyRawIdWidget(forms.TextInput):
                     v = str(v)
                 items.append((k, v))
             params.update(dict(items))
-        return params    
-    
+        return params
+
     def url_parameters(self):
         from django.contrib.admin.views.main import TO_FIELD_VAR
         params = self.base_url_parameters()
         params.update({TO_FIELD_VAR: self.rel.get_related_field().name})
         return params
-            
+
     def label_for_value(self, value):
         key = self.rel.get_related_field().name
         obj = self.rel.to._default_manager.get(**{key: value})
@@ -165,10 +165,10 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         else:
             value = ''
         return super(ManyToManyRawIdWidget, self).render(name, value, attrs)
-    
+
     def url_parameters(self):
         return self.base_url_parameters()
-    
+
     def label_for_value(self, value):
         return ''
 
@@ -222,8 +222,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         rel_to = self.rel.to
         info = (rel_to._meta.app_label, rel_to._meta.object_name.lower())
         try:
-            related_info = (self.admin_site.name,) + info
-            related_url = reverse('%sadmin_%s_%s_add' % related_info)
+            related_url = reverse('admin:%s_%s_add' % info, current_app=self.admin_site.name)
         except NoReverseMatch:
             related_url = '../../../%s/%s/add/' % info
         self.widget.choices = self.choices

@@ -62,6 +62,14 @@ class GeoQuerySet(QuerySet):
         """
         return self._geom_attribute('centroid', **kwargs)
 
+    def collect(self, **kwargs):
+        """
+        Performs an aggregate collect operation on the given geometry field.
+        This is analagous to a union operation, but much faster because
+        boundaries are not dissolved.
+        """
+        return self._spatial_aggregate(aggregates.Collect, **kwargs)
+
     def difference(self, geom, **kwargs):
         """
         Returns the spatial difference of the geographic field in a `difference`

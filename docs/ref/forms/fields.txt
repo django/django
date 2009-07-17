@@ -275,7 +275,7 @@ For each field, we describe the default widget used if you don't specify
     * Default widget: ``CheckboxInput``
     * Empty value: ``False``
     * Normalizes to: A Python ``True`` or ``False`` value.
-    * Validates that the check box is checked (i.e. the value is ``True``) if
+    * Validates that the value is ``True`` (e.g. the check box is checked) if
       the field has ``required=True``.
     * Error message keys: ``required``
 
@@ -287,9 +287,10 @@ For each field, we describe the default widget used if you don't specify
 .. note::
 
     Since all ``Field`` subclasses have ``required=True`` by default, the
-    validation condition here is important. If you want to include a checkbox
-    in your form that can be either checked or unchecked, you must remember to
-    pass in ``required=False`` when creating the ``BooleanField``.
+    validation condition here is important. If you want to include a boolean
+    in your form that can be either ``True`` or ``False`` (e.g. a checked or
+    unchecked checkbox), you must remember to pass in ``required=False`` when
+    creating the ``BooleanField``.
 
 ``CharField``
 ~~~~~~~~~~~~~
@@ -328,7 +329,7 @@ Takes one extra required argument:
 
     An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
     field.
-    
+
 ``TypedChoiceField``
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -437,7 +438,7 @@ If no ``input_formats`` argument is provided, the default input formats are::
       ``min_value``, ``max_digits``, ``max_decimal_places``,
       ``max_whole_digits``
 
-Takes four optional arguments: 
+Takes four optional arguments:
 
 .. attribute:: DecimalField.max_value
 .. attribute:: DecimalField.min_value
@@ -449,7 +450,7 @@ Takes four optional arguments:
     The maximum number of digits (those before the decimal point plus those
     after the decimal point, with leading zeros stripped) permitted in the
     value.
-    
+
 .. attribute:: DecimalField.decimal_places
 
     The maximum number of decimal places permitted.
@@ -522,18 +523,18 @@ extra arguments; only ``path`` is required:
     A regular expression pattern; only files with names matching this expression
     will be allowed as choices.
 
-``FloatField`` 
-~~~~~~~~~~~~~~ 
+``FloatField``
+~~~~~~~~~~~~~~
 
-    * Default widget: ``TextInput`` 
-    * Empty value: ``None`` 
-    * Normalizes to: A Python float. 
-    * Validates that the given value is an float. Leading and trailing 
-      whitespace is allowed, as in Python's ``float()`` function. 
-    * Error message keys: ``required``, ``invalid``, ``max_value``, 
-      ``min_value`` 
-	 
-Takes two optional arguments for validation, ``max_value`` and ``min_value``. 
+    * Default widget: ``TextInput``
+    * Empty value: ``None``
+    * Normalizes to: A Python float.
+    * Validates that the given value is an float. Leading and trailing
+      whitespace is allowed, as in Python's ``float()`` function.
+    * Error message keys: ``required``, ``invalid``, ``max_value``,
+      ``min_value``
+
+Takes two optional arguments for validation, ``max_value`` and ``min_value``.
 These control the range of values permitted in the field.
 
 ``ImageField``
@@ -779,10 +780,10 @@ example::
    (which is ``"---------"`` by default) with the ``empty_label`` attribute, or
    you can disable the empty label entirely by setting ``empty_label`` to
    ``None``::
-   
+
         # A custom empty label
         field1 = forms.ModelChoiceField(queryset=..., empty_label="(Nothing)")
-        
+
         # No empty label
         field2 = forms.ModelChoiceField(queryset=..., empty_label=None)
 
