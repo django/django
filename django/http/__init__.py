@@ -288,6 +288,7 @@ class HttpResponse(object):
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
+        # Expects content to be an iterable container or a string.
         self._container = [''.join(content)]
         if hasattr(content, 'close'):
             content.close()
@@ -301,8 +302,8 @@ class HttpResponse(object):
 
     def __str__(self):
         """Full HTTP message, including headers."""
-        headers = ['%s: %s' % (k, v) for k, v in self._headers.values()]
-        return '\n'.join(headers) + '\n\n' + self.content
+        return '\n'.join(['%s: %s' % (k, v) for k, v in self._headers.values()]) \
+               + "\n\n" + self.content
 
     def _convert_to_ascii(self, *values):
         """Converts all values to ascii strings."""
@@ -414,7 +415,7 @@ class HttpResponse(object):
         return str(chunk)
 
     def close(self):
-        "No-op that remains for backwards compatibility. Ref #6527"
+        "No-op. Remains for backwards compatibility. Refs #6527"
         pass
 
     # The remaining methods partially implement the file-like object interface.
