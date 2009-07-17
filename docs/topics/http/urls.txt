@@ -4,6 +4,8 @@
 URL dispatcher
 ==============
 
+.. module:: django.core.urlresolvers
+
 A clean, elegant URL scheme is an important detail in a high-quality Web
 application. Django lets you design URLs however you want, with no framework
 limitations.
@@ -40,14 +42,14 @@ algorithm the system follows to determine which Python code to execute:
        this is the value of the ``ROOT_URLCONF`` setting, but if the incoming
        ``HttpRequest`` object has an attribute called ``urlconf``, its value
        will be used in place of the ``ROOT_URLCONF`` setting.
-    
+
     2. Django loads that Python module and looks for the variable
        ``urlpatterns``. This should be a Python list, in the format returned by
        the function ``django.conf.urls.defaults.patterns()``.
-    
+
     3. Django runs through each URL pattern, in order, and stops at the first
        one that matches the requested URL.
-    
+
     4. Once one of the regexes matches, Django imports and calls the given
        view, which is a simple Python function. The view gets passed an
        :class:`~django.http.HttpRequest` as its first argument and any values
@@ -182,11 +184,13 @@ your URLconf. This gives your module access to these objects:
 patterns
 --------
 
+.. function:: patterns(prefix, pattern_description, ...)
+
 A function that takes a prefix, and an arbitrary number of URL patterns, and
 returns a list of URL patterns in the format Django needs.
 
 The first argument to ``patterns()`` is a string ``prefix``. See
-"The view prefix" below.
+`The view prefix`_ below.
 
 The remaining arguments should be tuples in this format::
 
@@ -222,6 +226,8 @@ url
 
 .. versionadded:: 1.0
 
+.. function:: url(regex, view, kwargs=None, name=None, prefix='')
+
 You can use the ``url()`` function, instead of a tuple, as an argument to
 ``patterns()``. This is convenient if you want to specify a name without the
 optional extra arguments dictionary. For example::
@@ -244,6 +250,8 @@ The ``prefix`` parameter has the same meaning as the first argument to
 handler404
 ----------
 
+.. data:: handler404
+
 A string representing the full Python import path to the view that should be
 called if none of the URL patterns match.
 
@@ -252,6 +260,8 @@ value should suffice.
 
 handler500
 ----------
+
+.. data:: handler500
 
 A string representing the full Python import path to the view that should be
 called in case of server errors. Server errors happen when you have runtime
@@ -262,6 +272,8 @@ value should suffice.
 
 include
 -------
+
+.. function:: include(<module or pattern_list>)
 
 A function that takes a full Python import path to another URLconf that should
 be "included" in this place. See `Including other URLconfs`_ below.
@@ -597,7 +609,6 @@ If you need to use something similar to the :ttag:`url` template tag in
 your code, Django provides the following method (in the
 ``django.core.urlresolvers`` module):
 
-.. currentmodule:: django.core.urlresolvers
 .. function:: reverse(viewname, urlconf=None, args=None, kwargs=None)
 
 ``viewname`` is either the function name (either a function reference, or the
@@ -639,7 +650,6 @@ resolve()
 The :func:`django.core.urlresolvers.resolve` function can be used for resolving
 URL paths to the corresponding view functions. It has the following signature:
 
-.. currentmodule:: django.core.urlresolvers
 .. function:: resolve(path, urlconf=None)
 
 ``path`` is the URL path you want to resolve. As with ``reverse()`` above, you
