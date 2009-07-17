@@ -4,6 +4,8 @@
 URL dispatcher
 ==============
 
+.. module:: django.core.urlresolvers
+
 A clean, elegant URL scheme is an important detail in a high-quality Web
 application. Django lets you design URLs however you want, with no framework
 limitations.
@@ -182,11 +184,13 @@ your URLconf. This gives your module access to these objects:
 patterns
 --------
 
+.. function:: patterns(prefix, pattern_description, ...)
+
 A function that takes a prefix, and an arbitrary number of URL patterns, and
 returns a list of URL patterns in the format Django needs.
 
 The first argument to ``patterns()`` is a string ``prefix``. See
-"The view prefix" below.
+`The view prefix`_ below.
 
 The remaining arguments should be tuples in this format::
 
@@ -222,6 +226,8 @@ url
 
 .. versionadded:: 1.0
 
+.. function:: url(regex, view, kwargs=None, name=None, prefix='')
+
 You can use the ``url()`` function, instead of a tuple, as an argument to
 ``patterns()``. This is convenient if you want to specify a name without the
 optional extra arguments dictionary. For example::
@@ -244,6 +250,8 @@ The ``prefix`` parameter has the same meaning as the first argument to
 handler404
 ----------
 
+.. data:: handler404
+
 A string representing the full Python import path to the view that should be
 called if none of the URL patterns match.
 
@@ -252,6 +260,8 @@ value should suffice.
 
 handler500
 ----------
+
+.. data:: handler500
 
 A string representing the full Python import path to the view that should be
 called in case of server errors. Server errors happen when you have runtime
@@ -263,12 +273,14 @@ value should suffice.
 include
 -------
 
+.. function:: include(<module or pattern_list>)
+
 A function that takes a full Python import path to another URLconf module that
 should be "included" in this place.
 
 .. versionadded:: 1.1
 
-:meth:``include`` also accepts as an argument an iterable that returns URL
+:func:`include` also accepts as an argument an iterable that returns URL
 patterns.
 
 See `Including other URLconfs`_ below.
@@ -421,7 +433,7 @@ This approach can be seen in use when you deploy an instance of the Django
 Admin application. The Django Admin is deployed as instances of a
 :class:`AdminSite`; each :class:`AdminSite` instance has an attribute
 ``urls`` that returns the url patterns available to that instance. It is this
-attribute that you ``included()`` into your projects ``urlpatterns`` when you
+attribute that you ``include()`` into your projects ``urlpatterns`` when you
 deploy the admin instance.
 
 .. _`Django Web site`: http://www.djangoproject.com/
@@ -466,15 +478,15 @@ A URL namespace comes in two parts, both of which are strings:
 
     * An **instance namespace**. This identifies a specific instance of an
       application. Instance namespaces should be unique across your entire
-      project. However, and instance namespace can be the same as the
+      project. However, an instance namespace can be the same as the
       application namespace. This is used to specify a default instance of an
       application. For example, the default Django Admin instance has an
       instance namespace of ``admin``.
 
 URL Namespaces can be specified in two ways.
 
-Firstly, you can provide the applicaiton and instance namespace as arguments
-to the ``include()`` when you construct your URL patterns. For example,::
+Firstly, you can provide the application and instance namespace as arguments
+to ``include()`` when you construct your URL patterns. For example,::
 
     (r'^help/', include('apps.help.urls', namespace='foo', app_name='bar')),
 
@@ -494,7 +506,7 @@ instance namespace. For example, the ``urls`` attribute of Django's
 an admin site, plus the name of the admin instance, and the application
 namespace ``admin``.
 
-Once you have defined namespace URLs, you can reverse them. For details on
+Once you have defined namespaced URLs, you can reverse them. For details on
 reversing namespaced urls, see the documentation on :ref:`reversing namespaced
 URLs <topics-http-reversing-url-namespaces>`.
 
@@ -679,18 +691,18 @@ URL namespaces
 
 .. versionadded:: 1.1
 
-Namespaced URLs are specified using the `:` operator. For example, the main index
-page of the admin application is referenced using ``admin:index``. This indicates
-a namespace of ``admin``, and a named URL of ``index``.
+Namespaced URLs are specified using the ``:`` operator. For example, the main
+index page of the admin application is referenced using ``admin:index``. This
+indicates a namespace of ``admin``, and a named URL of ``index``.
 
 Namespaces can also be nested. The named URL ``foo:bar:whiz`` would look for
 a pattern named ``whiz`` in the namespace ``bar`` that is itself defined within
 the top-level namespace ``foo``.
 
-When given a namespaced URL (e.g.,, `myapp:index`) to resolve, Django splits
+When given a namespaced URL (e.g. ``myapp:index``) to resolve, Django splits
 the fully qualified name into parts, and then tries the following lookup:
 
-    1. Django then looks for a matching application namespace (in this
+    1. First, Django looks for a matching application namespace (in this
        example, ``myapp``). This will yield a list of instances of that
        application.
 
@@ -702,15 +714,15 @@ the fully qualified name into parts, and then tries the following lookup:
        template.
 
        The current application can also be specified manually as an argument
-       to the :method:``reverse()`` function.
+       to the :func:`reverse()` function.
 
     3. If there is no current application. Django looks for a default
        application instance. The default application instance is the instance
        that has an instance namespace matching the application namespace (in
-       this example, an instance of the ``myapp`` called ``myapp``)
+       this example, an instance of the ``myapp`` called ``myapp``).
 
     4. If there is no default application instance, Django will pick the first
-       deployed instance of the application, whatever it's instance name may be.
+       deployed instance of the application, whatever its instance name may be.
 
     5. If the provided namespace doesn't match an application namespace in
        step 2, Django will attempt a direct lookup of the namespace as an
@@ -762,7 +774,6 @@ If you need to use something similar to the :ttag:`url` template tag in
 your code, Django provides the following method (in the
 ``django.core.urlresolvers`` module):
 
-.. currentmodule:: django.core.urlresolvers
 .. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
 
 ``viewname`` is either the function name (either a function reference, or the
@@ -812,7 +823,6 @@ resolve()
 The :func:`django.core.urlresolvers.resolve` function can be used for resolving
 URL paths to the corresponding view functions. It has the following signature:
 
-.. currentmodule:: django.core.urlresolvers
 .. function:: resolve(path, urlconf=None)
 
 ``path`` is the URL path you want to resolve. As with ``reverse()`` above, you
