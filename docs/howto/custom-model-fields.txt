@@ -399,24 +399,27 @@ mentioned earlier. Otherwise :meth:`to_python` won't be called automatically.
 Converting Python objects to database values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: get_db_prep_value(self, value)
+.. method:: get_db_prep_value(self, value, connection)
 
 This is the reverse of :meth:`to_python` when working with the database backends
 (as opposed to serialization). The ``value`` parameter is the current value of
 the model's attribute (a field has no reference to its containing model, so it
 cannot retrieve the value itself), and the method should return data in a format
-that can be used as a parameter in a query for the database backend.
+that can be used as a parameter in a query for the database backend.  The
+specific connection that will be used for the query is passed as the
+``connection`` parameter, this allows you to generate the value in a backend
+specific mannner if necessary.
 
 For example::
 
     class HandField(models.Field):
         # ...
 
-        def get_db_prep_value(self, value):
+        def get_db_prep_value(self, value, connection):
             return ''.join([''.join(l) for l in (value.north,
                     value.east, value.south, value.west)])
 
-.. method:: get_db_prep_save(self, value)
+.. method:: get_db_prep_save(self, value, connection)
 
 Same as the above, but called when the Field value must be *saved* to the
 database. As the default implementation just calls ``get_db_prep_value``, you
@@ -450,7 +453,7 @@ correct value.
 Preparing values for use in database lookups
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: get_db_prep_lookup(self, lookup_type, value)
+.. method:: get_db_prep_lookup(self, lookup_type, value, connection)
 
 Prepares the ``value`` for passing to the database when used in a lookup (a
 ``WHERE`` constraint in SQL). The ``lookup_type`` will be one of the valid

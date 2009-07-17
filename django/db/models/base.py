@@ -18,6 +18,7 @@ from django.db.models.options import Options
 from django.db import connections, transaction, DatabaseError, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
+from django.db.utils import call_with_connection
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.conf import settings
@@ -483,9 +484,11 @@ class Model(object):
                 if not pk_set:
                     if force_update:
                         raise ValueError("Cannot force an update in save() with no primary key.")
-                    values = [(f, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in meta.local_fields if not isinstance(f, AutoField)]
+                    values = [(f, call_with_connection(f.get_db_prep_save, raw and getattr(self, f.attname) or f.pre_save(self, True), connection=connection))
+                        for f in meta.local_fields if not isinstance(f, AutoField)]
                 else:
-                    values = [(f, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in meta.local_fields]
+                    values = [(f, call_with_connection(f.get_db_prep_save, raw and getattr(self, f.attname) or f.pre_save(self, True), connection=connection))
+                        for f in meta.local_fields]
 
                 if meta.order_with_respect_to:
                     field = meta.order_with_respect_to

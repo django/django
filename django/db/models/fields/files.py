@@ -10,6 +10,7 @@ from django.core.files.images import ImageFile, get_image_dimensions
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.functional import curry
 from django.db.models import signals
+from django.db.utils import call_with_connection
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django import forms
@@ -232,12 +233,13 @@ class FileField(Field):
     def get_internal_type(self):
         return "FileField"
 
-    def get_db_prep_lookup(self, lookup_type, value):
+    def get_db_prep_lookup(self, lookup_type, value, connection):
         if hasattr(value, 'name'):
             value = value.name
-        return super(FileField, self).get_db_prep_lookup(lookup_type, value)
+        return call_with_connection(super(FileField, self).get_db_prep_lookup,
+            lookup_type, value, connection=connection)
 
-    def get_db_prep_value(self, value):
+    def get_db_prep_value(self, value, connection):
         "Returns field's value prepared for saving into a database."
         # Need to convert File objects provided via a form to unicode for database insertion
         if value is None:

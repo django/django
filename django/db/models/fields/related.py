@@ -117,7 +117,7 @@ class RelatedField(object):
         if not cls._meta.abstract:
             self.contribute_to_related_class(other, self.related)
 
-    def get_db_prep_lookup(self, lookup_type, value):
+    def get_db_prep_lookup(self, lookup_type, value, connection):
         # If we are doing a lookup on a Related Field, we must be
         # comparing object instances. The value should be the PK of value,
         # not value itself.
@@ -137,7 +137,8 @@ class RelatedField(object):
             if field:
                 if lookup_type in ('range', 'in'):
                     v = [v]
-                v = field.get_db_prep_lookup(lookup_type, v)
+                v = call_with_connection(field.get_db_prep_lookup,
+                    lookup_type, v, connection=connection)
                 if isinstance(v, list):
                     v = v[0]
             return v
@@ -720,11 +721,12 @@ class ForeignKey(RelatedField, Field):
             return getattr(field_default, self.rel.get_related_field().attname)
         return field_default
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, connection):
         if value == '' or value == None:
             return None
         else:
-            return self.rel.get_related_field().get_db_prep_save(value)
+            return call_with_connection(self.rel.get_related_field().get_db_prep_save,
+                value, connection=connection)
 
     def value_to_string(self, obj):
         if not obj:

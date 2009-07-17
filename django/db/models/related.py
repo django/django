@@ -18,7 +18,7 @@ class RelatedObject(object):
         self.name = '%s:%s' % (self.opts.app_label, self.opts.module_name)
         self.var_name = self.opts.object_name.lower()
 
-    def get_db_prep_lookup(self, lookup_type, value):
+    def get_db_prep_lookup(self, lookup_type, value, connection):
         # Defer to the actual field definition for db prep
         return self.field.get_db_prep_lookup(lookup_type, value)
 
