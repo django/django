@@ -236,9 +236,13 @@ MEDIA_ROOT = ''
 # Example: "http://media.lawrence.com"
 MEDIA_URL = ''
 
-# Header to use in HttpResponseSendFile to inform the handler to serve the 
-# file with efficient handler-specific routines. 
-HTTPRESPONSE_SENDFILE_HEADER = 'X-Sendfile' 
+# Header to use in HttpResponseSendFile to inform the handler to serve the
+# file with efficient handler-specific routines. None causes HttpResponseSendFile
+# to fall back to, first, mechanisms in the handler (wsgi.filewrapper and
+# req.sendfile.
+# Examples: 'X-Sendfile' (FastCGI, lighttpd, Apache with mod_xsendfile),
+#           'X-Accel-Redirect' (nginx)
+HTTPRESPONSE_SENDFILE_METHOD = None
 
 # List of upload handler classes to be applied in order.
 FILE_UPLOAD_HANDLERS = (

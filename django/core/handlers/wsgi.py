@@ -243,14 +243,11 @@ class WSGIHandler(base.BaseHandler):
         start_response(status, response_headers)
         
         if isinstance(response, http.HttpResponseSendFile): 
-            filelike = open(response.sendfile_filename, 'rb') 
-            if 'wsgi.file_wrapper' in environ: 
+            if settings.HTTPRESPONSE_SENDFILE_METHOD:
+                response[settings.HTTPRESPONSE_SENDFILE_METHOD] = response.sendfile_filename
+            elif 'wsgi.file_wrapper' in environ:
+                filelike = open(response.sendfile_filename, 'rb')
                 return environ['wsgi.file_wrapper'](filelike, 
-                        response.block_size) 
-            else: 
-                # wraps close() as well 
-                from django.core.servers.basehttp import FileWrapper 
-                return FileWrapper(filelike, response.block_size) 
-                
+                        response.block_size)
         return response
 
