@@ -14,12 +14,12 @@ that need to be done.  I'm trying to be as granular as possible.
 
     flush, reset, and syncdb need to not prompt the user multiple times.
 
-3)  Handle nesting of Querysets using __in across multiple dbs.
+3)  Handle backends with custom Query classes.
 
-4)  Handle backends with custom Query classes.
+4)  Wait on the merge of the m2m stuff.
 
-5)  Wait on the merge of the m2m stuff.
+5)  Fix django.contrib.gis, it's broken in all sorts of ways.
 
-6)  Fix django.contrib.gis, it's broken in all sorts of ways.
+6)  Generate SQL, instead of an error for nesting on different DBs.
 
 7) Time permitting add support for a ``DatabaseManager``.

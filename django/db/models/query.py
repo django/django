@@ -745,12 +745,14 @@ class QuerySet(object):
             self.query.add_fields(field_names, False)
             self.query.set_group_by()
 
-    def _as_sql(self):
+    def _as_sql(self, connection):
         """
         Returns the internal query's SQL and parameters (as a tuple).
         """
         obj = self.values("pk")
-        return obj.query.as_nested_sql()
+        if connection.settings_dict == obj.query.connection.settings_dict:
+            return obj.query.as_nested_sql()
+        raise ValueError("Can't do subqueries with queries on different DBs.")
 
     def _validate(self):
         """
@@ -863,7 +865,7 @@ class ValuesQuerySet(QuerySet):
 
         super(ValuesQuerySet, self)._setup_aggregate_query(aggregates)
 
-    def _as_sql(self):
+    def _as_sql(self, connection):
         """
         For ValueQuerySet (and subclasses like ValuesListQuerySet), they can
         only be used as nested queries if they're already set up to select only
@@ -875,7 +877,11 @@ class ValuesQuerySet(QuerySet):
                 (not self._fields and len(self.model._meta.fields) > 1)):
             raise TypeError('Cannot use a multi-field %s as a filter value.'
                     % self.__class__.__name__)
-        return self._clone().query.as_nested_sql()
+
+        obj = self._clone()
+        if connection.settings_dict == obj.query.connection.settings_dict:
+            return obj.query.as_nested_sql()
+        raise ValueError("Can't do subqueries with queries on different DBs.")
 
     def _validate(self):
         """

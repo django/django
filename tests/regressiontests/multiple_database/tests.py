@@ -93,3 +93,5 @@ if len(settings.DATABASES) > 1:
             a.delete()
             self.assertRaises(Article.DoesNotExist,
                 lambda: Article.objects.get(title="Django Rules!"))
+            self.assertRaises(ValueError,
+                lambda: list(Article.objects.get(pk__in=Article.objects.using('default'))))

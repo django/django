@@ -201,9 +201,9 @@ class Field(object):
             if hasattr(value, 'relabel_aliases'):
                 return value
             if hasattr(value, 'as_sql'):
-                sql, params = value.as_sql()
+                sql, params = value.as_sql(connection)
             else:
-                sql, params = value._as_sql()
+                sql, params = value._as_sql(connection)
             return QueryWrapper(('(%s)' % sql), params)
 
 
