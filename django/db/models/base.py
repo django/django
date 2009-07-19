@@ -757,7 +757,6 @@ class Model(object):
             if f.name in exclude:
                 continue
             try:
-                # TODO: is the [sg]etattr correct?
                 setattr(self, f.attname, f.clean(getattr(self, f.attname), self))
             except ValidationError, e:
                 errors[f.name] = e.messages
