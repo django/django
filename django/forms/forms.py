@@ -249,7 +249,7 @@ class BaseForm(StrAndUnicode):
                 if name in self.cleaned_data:
                     del self.cleaned_data[name]
 
-        # run all the validators after the fields have been cleaned since they
+        # run complex validators after the fields have been cleaned since they
         # need access to all_values
         for name, field in self.fields.items():
             if not name in self.cleaned_data:
