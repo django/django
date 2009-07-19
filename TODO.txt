@@ -14,16 +14,12 @@ that need to be done.  I'm trying to be as granular as possible.
 
     flush, reset, and syncdb need to not prompt the user multiple times.
 
-3)  Remove any references to the global ``django.db.connection`` object in the
-    SQL creation process.  This includes(but is probably not limited to):
+3)  Handle nesting of Querysets using __in across multiple dbs.
 
-    * The way we create ``Query`` from ``BaseQuery`` is awkward and hacky.
-    * ``Field.get_db_prep_lookup``
-    * ``DateField.get_db_prep_value``
-    * ``DateTimeField.get_db_prep_value``
-    * ``DecimalField.get_db_prep_save``
-    * ``TimeField.get_db_prep_value``
+4)  Handle backends with custom Query classes.
 
-4)  Wait on the merge of the m2m stuff.
+5)  Wait on the merge of the m2m stuff.
 
-6) Time permitting add support for a ``DatabaseManager``.
+6)  Fix django.contrib.gis, it's broken in all sorts of ways.
+
+7) Time permitting add support for a ``DatabaseManager``.
