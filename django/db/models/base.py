@@ -10,6 +10,7 @@ except NameError:
 
 import django.db.models.manager     # Imported to register signal handler.
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS
+from django.core import validators
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
 from django.db.models.query import delete_objects, Q
@@ -760,6 +761,20 @@ class Model(object):
                 setattr(self, f.attname, f.clean(getattr(self, f.attname), self))
             except ValidationError, e:
                 errors[f.name] = e.messages
+
+        # run complex validators after the fields have been cleaned since they
+        # need access to model_instance.
+        for f in self._meta.fields:
+            if f.name in errors:
+                continue
+
+            value = getattr(self, f.attname)
+            for v in f.validators:
+                if isinstance(v, validators.ComplexValidator):
+                    try:
+                        v(value, obj=self)
+                    except ValidationError, e:
+                        errors.setdefault(f.name, []).extend(e.messages)
         try:
             # TODO: run this only if not errors??
             self.validate()

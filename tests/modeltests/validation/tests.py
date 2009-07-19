@@ -11,7 +11,7 @@ from validators import TestModelsWithValidators
 class BaseModelValidationTests(ValidationTestCase):
 
     def test_missing_required_field_raises_error(self):
-        mtv = ModelToValidate()
+        mtv = ModelToValidate(f_with_custom_validator=42)
         self.assertFailsValidation(mtv.clean, ['name', 'number'])
     
     def test_with_correct_value_model_validates(self):
