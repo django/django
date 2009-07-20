@@ -750,7 +750,7 @@ class QuerySet(object):
         Returns the internal query's SQL and parameters (as a tuple).
         """
         obj = self.values("pk")
-        if connection.settings_dict == obj.query.connection.settings_dict:
+        if connection == obj.query.connection:
             return obj.query.as_nested_sql()
         raise ValueError("Can't do subqueries with queries on different DBs.")
 
@@ -879,7 +879,7 @@ class ValuesQuerySet(QuerySet):
                     % self.__class__.__name__)
 
         obj = self._clone()
-        if connection.settings_dict == obj.query.connection.settings_dict:
+        if connection == obj.query.connection:
             return obj.query.as_nested_sql()
         raise ValueError("Can't do subqueries with queries on different DBs.")
 

@@ -1,4 +1,5 @@
 import datetime
+import pickle
 
 from django.conf import settings
 from django.db import connections
@@ -78,6 +79,15 @@ class QueryTestCase(TestCase):
 
             months = Book.objects.dates('published', 'month').using(db)
             self.assertEqual(sorted(o.month for o in months), [5, 12])
+
+class PickleQuerySetTestCase(TestCase):
+    def test_pickling(self):
+        for db in connections:
+            qs = Book.objects.all()
+            self.assertEqual(qs.query.connection,
+                pickle.loads(pickle.dumps(qs)).query.connection)
+            self.assertEqual(qs._using, pickle.loads(pickle.dumps(qs))._using)
+
 
 if len(settings.DATABASES) > 1:
     class MetaUsingTestCase(TestCase):

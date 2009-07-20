@@ -22,4 +22,4 @@ that need to be done.  I'm trying to be as granular as possible.
 
 6)  Generate SQL, instead of an error for nesting on different DBs.
 
-7) Time permitting add support for a ``DatabaseManager``.
+7)  Time permitting add support for a ``DatabaseManager``.

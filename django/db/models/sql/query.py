@@ -13,7 +13,7 @@ from django.utils.tree import Node
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode
 from django.db.backends.util import truncate_name
-from django.db import connection
+from django.db import connection, connections
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models.query_utils import select_related_descend
@@ -126,6 +126,7 @@ class BaseQuery(object):
         obj_dict['related_select_fields'] = []
         obj_dict['related_select_cols'] = []
         del obj_dict['connection']
+        obj_dict['connection_settings'] = self.connection.settings_dict
 
         # Fields can't be pickled, so if a field list has been
         # specified, we pickle the list of field names instead.
@@ -147,10 +148,8 @@ class BaseQuery(object):
         ]
 
         self.__dict__.update(obj_dict)
-        # XXX: Need a better solution for this when multi-db stuff is
-        # supported. It's the only class-reference to the module-level
-        # connection variable.
-        self.connection = connection
+        self.connection = connections[connections.alias_for_settings(
+            obj_dict['connection_settings'])]
 
     def get_meta(self):
         """

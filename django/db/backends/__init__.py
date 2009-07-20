@@ -33,6 +33,12 @@ class BaseDatabaseWrapper(local):
         self.queries = []
         self.settings_dict = settings_dict
 
+    def __eq__(self, other):
+        return self.settings_dict == other.settings_dict
+
+    def __ne__(self, other):
+        return not self == other
+
     def _commit(self):
         if self.connection is not None:
             return self.connection.commit()

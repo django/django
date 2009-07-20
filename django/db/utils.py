@@ -81,8 +81,14 @@ class ConnectionHandler(object):
         """
         Returns the alias for the given connection object.
         """
+        return self.alias_for_settings(connection.settings_dict)
+
+    def alias_for_settings(self, settings_dict):
+        """
+        Returns the alias for the given settings dictionary.
+        """
         for alias in self:
             conn_settings = self.databases[alias]
-            if conn_settings == connection.settings_dict:
+            if conn_settings == settings_dict:
                 return alias
         return None
