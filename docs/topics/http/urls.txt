@@ -465,7 +465,7 @@ Defining URL Namespaces
 
 When you need to deploy multiple instances of a single application, it can be
 helpful to be able to differentiate between instances. This is especially
-important when using _`named URL patterns <naming-url-patterns>`, since
+important when using :ref:`named URL patterns <naming-url-patterns>`, since
 multiple instances of a single application will share named URLs. Namespaces
 provide a way to tell these named URLs apart.
 
@@ -642,7 +642,7 @@ view::
 
 This is completely valid, but it leads to problems when you try to do reverse
 URL matching (through the ``permalink()`` decorator or the :ttag:`url` template
-tag. Continuing this example, if you wanted to retrieve the URL for the
+tag). Continuing this example, if you wanted to retrieve the URL for the
 ``archive`` view, Django's reverse URL matcher would get confused, because *two*
 URLpatterns point at that view.
 
@@ -706,12 +706,12 @@ the fully qualified name into parts, and then tries the following lookup:
        example, ``myapp``). This will yield a list of instances of that
        application.
 
-    2. If there is a ``current`` application defined, Django finds and returns
-       the URL resolver for that instance. The ``current`` can be specified
-       as an attribute on the template context - applications that expect to
-       have multiple deployments should set the ``current_app`` attribute on
-       any ``Context`` or ``RequestContext`` that is used to render a
-       template.
+    2. If there is a *current* application defined, Django finds and returns
+       the URL resolver for that instance. The *current* application can be
+       specified as an attribute on the template context - applications that
+       expect to have multiple deployments should set the ``current_app``
+       attribute on any ``Context`` or ``RequestContext`` that is used to
+       render a template.
 
        The current application can also be specified manually as an argument
        to the :func:`reverse()` function.
@@ -725,7 +725,7 @@ the fully qualified name into parts, and then tries the following lookup:
        deployed instance of the application, whatever its instance name may be.
 
     5. If the provided namespace doesn't match an application namespace in
-       step 2, Django will attempt a direct lookup of the namespace as an
+       step 1, Django will attempt a direct lookup of the namespace as an
        instance namespace.
 
 If there are nested namespaces, these steps are repeated for each part of the
