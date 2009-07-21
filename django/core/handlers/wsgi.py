@@ -240,14 +240,16 @@ class WSGIHandler(base.BaseHandler):
         response_headers = [(str(k), str(v)) for k, v in response.items()]
         for c in response.cookies.values():
             response_headers.append(('Set-Cookie', str(c.output(header=''))))
-        start_response(status, response_headers)
         
         if isinstance(response, http.HttpResponseSendFile): 
             if settings.HTTPRESPONSE_SENDFILE_METHOD:
-                response[settings.HTTPRESPONSE_SENDFILE_METHOD] = response.sendfile_filename
+                response_headers.append((settings.HTTPRESPONSE_SENDFILE_METHOD,
+                    response.sendfile_filename))
             elif 'wsgi.file_wrapper' in environ:
                 filelike = open(response.sendfile_filename, 'rb')
                 return environ['wsgi.file_wrapper'](filelike, 
                         response.block_size)
+
+        start_response(status, response_headers)
         return response
 
