@@ -405,7 +405,7 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
     <tr>
       <th>Exception Value:</th>
-      <td><pre>{{ exception_value|escape }}<pre></td>
+      <td><pre>{{ exception_value|escape }}</pre></td>
     </tr>
     <tr>
       <th>Exception Location:</th>
@@ -630,7 +630,7 @@ Exception Value: {{ exception_value|escape }}
   {% else %}
     <p>No FILES data</p>
   {% endif %}
-  
+
 
   <h3 id="cookie-info">COOKIES</h3>
   {% if request.COOKIES %}
