@@ -48,14 +48,16 @@ Minor releases
 --------------
 
 Minor release (1.1, 1.2, etc.) will happen roughly every six months -- see
-`release process`_, below for details. 
+`release process`_, below for details.
+
+.. _internal-release-deprecation-policy:
 
 These releases will contain new features, improvements to existing features, and
 such. A minor release may deprecate certain features from previous releases. If a
 feature in version ``A.B`` is deprecated, it will continue to work in version
 ``A.B+1``. In version ``A.B+2``, use of the feature will raise a
 ``PendingDeprecationWarning`` but will continue to work. Version ``A.B+3`` will
-remove the feature entirely. 
+remove the feature entirely.
 
 So, for example, if we decided to remove a function that existed in Django 1.0:
 
@@ -66,9 +68,9 @@ So, for example, if we decided to remove a function that existed in Django 1.0:
     * Django 1.2 will contain the backwards-compatible replica, but the warning
       will be promoted to a full-fledged ``DeprecationWarning``. This warning is
       *loud* by default, and will likely be quite annoying.
-      
+
     * Django 1.3 will remove the feature outright.
-    
+
 Micro releases
 --------------
 
@@ -92,21 +94,21 @@ varying levels:
 
     * The current development trunk will get new features and bug fixes
       requiring major refactoring.
-    
+
     * All bug fixes applied to the trunk will also be applied to the last
       minor release, to be released as the next micro release.
-      
+
     * Security fixes will be applied to the current trunk and the previous two
       minor releases.
-      
+
 As a concrete example, consider a moment in time halfway between the release of
 Django 1.3 and 1.4. At this point in time:
 
     * Features will be added to development trunk, to be released as Django 1.4.
-    
+
     * Bug fixes will be applied to a ``1.3.X`` branch, and released as 1.3.1,
       1.3.2, etc.
-      
+
     * Security releases will be applied to trunk, a ``1.3.X`` branch and a
       ``1.2.X`` branch. Security fixes will trigger the release of ``1.3.1``,
       ``1.2.1``, etc.
@@ -117,7 +119,7 @@ Release process
 ===============
 
 Django uses a time-based release schedule, with minor (i.e. 1.1, 1.2, etc.)
-releases every six months, or more, depending on features. 
+releases every six months, or more, depending on features.
 
 After each previous release (and after a suitable cooling-off period of a week
 or two), the core development team will examine the landscape and announce a
@@ -174,12 +176,12 @@ and an rc complete with string freeze two weeks before the end of the schedule.
 Bug-fix releases
 ----------------
 
-After a minor release (i.e 1.1), the previous release will go into bug-fix mode. 
+After a minor release (i.e 1.1), the previous release will go into bug-fix mode.
 
 A branch will be created of the form ``branches/releases/1.0.X`` to track
 bug-fixes to the previous release. When possible, bugs fixed on trunk must
 *also* be fixed on the bug-fix branch; this means that commits need to cleanly
-separate bug fixes from feature additions. The developer who commits a fix to 
+separate bug fixes from feature additions. The developer who commits a fix to
 trunk will be responsible for also applying the fix to the current bug-fix
 branch.  Each bug-fix branch will have a maintainer who will work with the
 committers to keep them honest on backporting bug fixes.
@@ -193,14 +195,13 @@ development will be happening in a bunch of places:
 
     * On trunk, development towards 1.2 proceeds with small additions, bugs
       fixes, etc. being checked in daily.
-      
+
     * On the branch "branches/releases/1.1.X", bug fixes found in the 1.1
       release are checked in as needed. At some point, this branch will be
       released as "1.1.1", "1.1.2", etc.
 
     * On the branch "branches/releases/1.0.X", security fixes are made if
       needed and released as "1.0.2", "1.0.3", etc.
-    
+
     * On feature branches, development of major features is done. These
       branches will be merged into trunk before the end of phase two.
-
