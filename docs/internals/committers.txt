@@ -149,10 +149,20 @@ Joseph Kocherhans
 .. _brian rosner: http://oebfare.com/
 .. _this week in django: http://thisweekindjango.com/
 
-Gary Wilson
-    In early 2007, Gary started contributing a lot of cleanup fixes and fixing
-    broken windows. He's continued to do that necessary tidying up work
-    throughout the code base since then.
+`Gary Wilson`_
+    Gary starting contributing patches to Django in 2006 while developing Web
+    applications for `The University of Texas`_ (UT).  Since, he has made
+    contributions to the e-mail and forms systems, as well as many other
+    improvements and code cleanups throughout the code base.
+
+    Gary is currently a developer and software engineering graduate student at
+    UT, where his dedication to spreading the ways of Python and Django never
+    ceases.
+
+    Gary lives in Austin, Texas, USA.
+
+.. _Gary Wilson: http://gdub.wordpress.com/
+.. _The University of Texas: http://www.utexas.edu/
 
 Justin Bronn
     Justin Bronn is a computer scientist and attorney specializing
