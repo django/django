@@ -24,8 +24,11 @@ class BaseCoverageRunner(object):
 
     def __init__(self):
         """Placeholder (since it is overrideable)"""
-        self.cov = coverage.coverage(cover_pylib=True)
-        self.cov.erase()
+        self.cov = coverage.coverage(cover_pylib=True, auto_data=True)
+        self.cov.use_cache(True)
+        self.cov.load()
+        #self.cov.combine()
+        
 
 
     def run_tests(self, test_labels, verbosity=1, interactive=True,
@@ -36,7 +39,7 @@ class BaseCoverageRunner(object):
         """
         #self.cov.erase()
         #Allow an on-disk cache of coverage stats.
-        self.cov.use_cache(0)
+        #self.cov.use_cache(0)
         #for e in getattr(settings, 'COVERAGE_CODE_EXCLUDES', []):
         #    self.cov.exclude(e)
 
@@ -45,7 +48,7 @@ class BaseCoverageRunner(object):
         brt = base_run_tests()
         results = brt.run_tests(test_labels, verbosity, interactive, extra_tests)
         self.cov.stop()
-
+        #self.cov.erase()
 
         coverage_modules = []
         if test_labels:

@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+try:
+    import coverage
+    global _dj_cover
+    _dj_cover = coverage.coverage(cover_pylib=True, auto_data=True)
+    _dj_cover.erase()
+    _dj_cover.use_cache(True)
+    _dj_cover.start()
+except Exception, e:
+    print "coverage.py module not available"
+
 import os, sys, traceback
 import unittest
 import django
@@ -11,10 +21,7 @@ try:
 except NameError:
     from sets import Set as set     # For Python 2.3
 
-try:
-    import coverage
-except Exception, e:
-    print "coverage.py module not available"
+
 
 CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'
@@ -202,6 +209,8 @@ def django_tests(verbosity, interactive, test_labels):
     #Run the appropriate test runner based on command line params.
     if do_std:
         if do_coverage:
+            _dj_cover.save()
+            _dj_cover.stop()
             test_runner = get_runner(settings, coverage=True, reports=True)
         else:
             test_runner = get_runner(settings, coverage=False, reports=False)
