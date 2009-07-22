@@ -1,0 +1,117 @@
+.. _releases-1.1-rc-1:
+
+=============================
+Django 1.1 RC 1 release notes
+=============================
+
+
+July 21, 2009
+
+Welcome to the first Django 1.1 release candidate!
+
+This is the third -- and likely last -- in a series of
+preview/development releases leading up to the eventual release of
+Django 1.1, currently scheduled to take place approximately one week
+after this release candidate. This release is targeted primarily at
+developers who are interested in trying out new features and testing
+the Django codebase to help identify and resolve any critical bugs
+prior to the final 1.1 release.
+
+As such, this release is not yet intended for production use, and any
+such use is discouraged.
+
+
+What's new in Django 1.1 RC 1
+=============================
+
+The Django codebase has been in feature freeze since the first 1.1
+beta release, and so this release candidate contains only one new
+feature (introduced as part of the resolution of a larger bug; see
+below for a description); work leading up to this release candidate
+has instead been focused on bugfixing, particularly on the new
+features introduced prior to the 1.1 beta.
+
+For an overview of those features, consult :ref:`the Django 1.1 beta
+release notes <releases-1.1-beta-1>`.
+
+
+URL namespaces
+--------------
+
+The 1.1 beta release introduced the ability to use reverse URL
+resolution with Django's admin application, which exposed a set of
+:ref:`named URLs <naming-url-patterns>`. This feature still exists,
+but in order to provide consistent resolution of admin URLs, including
+support for multiple :class:`~django.contrib.admin.AdminSite` objects
+in use in a single installation, a new feature has been introduced:
+URL "namespaces".
+
+This takes the form of an additional supported argument --
+``namespace`` -- to the ``include()`` function used to include groups
+of URL patterns in a Django URLConf. When this argument is used,
+pattern names supplied for reverse resolution may specify the
+namespace in addition to the pattern name (using a colon as separator;
+e.g., ``namespace-name:pattern-name``), and the reverse resolver will
+take the namespace into account when searching for a match.
+
+For more details, see :ref:`the documentation on defining URL
+namespaces <topics-http-defining-url-namespaces>`.
+
+Due to the changes needed to support this feature, the URL pattern
+names used when reversing admin URLs have changed since the 1.1 beta
+release; if you were developing applications which took advantage of
+this new feature, you will need to update your code to reflect the new
+names (for most purposes, changing ``admin_`` to ``admin:`` in names
+to be reversed will suffice). For a full list of URL pattern names
+used by the admin and information on how namespaces are applied to
+them, consult the documentation on :ref:`reversing admin URLs
+<admin-reverse-urls>`.
+
+
+The Django 1.1 roadmap
+======================
+
+As of this release candidate, Django 1.1 is in both feature freeze and
+"string freeze" -- all strings marked for translation in the Django
+codebase will retain their current form in the final Django 1.1
+release. Only critical release-blocking bugs will receive attention
+between now and the final 1.1 release.
+
+If no such bugs are discovered, Django 1.1 will be released
+approximately one week after this release candidate, on or about July
+28, 2009.
+
+
+What you can do to help
+=======================
+
+In order to provide a high-quality 1.1 release, we need your
+help. Although this release candidate is, again, *not* intended for
+production use, you can help the Django team by trying out this
+release candidate in a safe testing environment and reporting any bugs
+or issues you encounter. The Django ticket tracker is the central
+place to search for open issues:
+
+    * http://code.djangoproject.com/timeline
+
+Please open a new ticket only if no existing ticket corresponds to a
+problem you're running into.
+
+Additionally, discussion of Django development, including progress
+toward the 1.1 release, takes place daily on the django-developers
+mailing list:
+
+    * http://groups.google.com/group/django-developers
+
+... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
+interested in helping out with Django's development, feel free to join the
+discussions there.
+
+Django's online documentation also includes pointers on how to contribute to
+Django: 
+
+    * :ref:`How to contribute to Django <internals-contributing>`
+
+Contributions on any level -- developing code, writing documentation or simply
+triaging tickets and helping to test proposed bugfixes -- are always welcome and
+appreciated.
