@@ -6,8 +6,8 @@ How to use Django with Apache and mod_python
 
 .. highlight:: apache
 
-The `mod_python`_ module for Apache_ can be used to deploy Django to a 
-production server, although it has been mostly superseded by the simpler 
+The `mod_python`_ module for Apache_ can be used to deploy Django to a
+production server, although it has been mostly superseded by the simpler
 :ref:`mod_wsgi deployment option <howto-deployment-modwsgi>`.
 
 mod_python is similar to (and inspired by) `mod_perl`_ : It embeds Python within
@@ -378,3 +378,24 @@ as necessary.
 .. _Expat Causing Apache Crash: http://www.dscpl.com.au/articles/modpython-006.html
 .. _mod_python FAQ entry: http://modpython.org/FAQ/faqw.py?req=show&file=faq02.013.htp
 .. _Getting mod_python Working: http://www.dscpl.com.au/articles/modpython-001.html
+
+If you get a UnicodeEncodeError
+===============================
+
+If you're taking advantage of the internationalization features of Django (see
+:ref:`topics-i18n`) and you intend to allow users to upload files, you must
+ensure that the environment used to start Apache is configured to accept
+non-ASCII file names. If your environment is not correctly configured, you
+will trigger ``UnicodeEncodeError`` exceptions when calling functions like
+``os.path()`` on filenames that contain non-ASCII characters.
+
+To avoid these problems, the environment used to start Apache should contain
+settings analogous to the following::
+
+    export LANG='en_US.UTF-8'
+    export LC_ALL='en_US.UTF-8'
+
+Consult the documentation for your operating system for the appropriate syntax
+and location to put these configuration items; ``/etc/apache2/envvars`` is a
+common location on Unix platforms. Once you have added these statements
+to your environment, restart Apache.

@@ -464,8 +464,21 @@ class BaseModelFormSet(BaseFormSet):
             return len(self.get_queryset())
         return super(BaseModelFormSet, self).initial_form_count()
 
+    def _existing_object(self, pk):
+        if not hasattr(self, '_object_dict'):
+            self._object_dict = dict([(o.pk, o) for o in self.get_queryset()])
+        return self._object_dict.get(pk)
+
     def _construct_form(self, i, **kwargs):
-        if i < self.initial_form_count():
+        if self.is_bound and i < self.initial_form_count():
+            pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
+            pk = self.data[pk_key]
+            pk_field = self.model._meta.pk
+            pk = pk_field.get_db_prep_lookup('exact', pk)
+            if isinstance(pk, list):
+                pk = pk[0]
+            kwargs['instance'] = self._existing_object(pk)
+        if i < self.initial_form_count() and not kwargs.get('instance'):
             kwargs['instance'] = self.get_queryset()[i]
         return super(BaseModelFormSet, self)._construct_form(i, **kwargs)
 
@@ -604,10 +617,6 @@ class BaseModelFormSet(BaseFormSet):
         if not self.get_queryset():
             return []
 
-        # Put the objects from self.get_queryset into a dict so they are easy to lookup by pk
-        existing_objects = {}
-        for obj in self.get_queryset():
-            existing_objects[obj.pk] = obj
         saved_instances = []
         for form in self.initial_forms:
             pk_name = self._pk_field.name
@@ -618,7 +627,7 @@ class BaseModelFormSet(BaseFormSet):
             pk_value = form.fields[pk_name].clean(raw_pk_value)
             pk_value = getattr(pk_value, 'pk', pk_value)
 
-            obj = existing_objects[pk_value]
+            obj = self._existing_object(pk_value)
             if self.can_delete:
                 raw_delete_value = form._raw_value(DELETION_FIELD_NAME)
                 should_delete = form.fields[DELETION_FIELD_NAME].clean(raw_delete_value)
@@ -663,10 +672,13 @@ class BaseModelFormSet(BaseFormSet):
             return ((not pk.editable) or (pk.auto_created or isinstance(pk, AutoField))
                 or (pk.rel and pk.rel.parent_link and pk_is_not_editable(pk.rel.to._meta.pk)))
         if pk_is_not_editable(pk) or pk.name not in form.fields:
-            try:
-                pk_value = self.get_queryset()[index].pk
-            except IndexError:
-                pk_value = None
+            if form.is_bound:
+                pk_value = form.instance.pk
+            else:
+                try:
+                    pk_value = self.get_queryset()[index].pk
+                except IndexError:
+                    pk_value = None
             if isinstance(pk, OneToOneField) or isinstance(pk, ForeignKey):
                 qs = pk.rel.to._default_manager.get_query_set()
             else:

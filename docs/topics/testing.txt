@@ -484,7 +484,7 @@ arguments at time of construction:
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
-    .. method:: Client.get(path, data={}, follow=False)
+    .. method:: Client.get(path, data={}, follow=False, **extra)
 
 
         Makes a GET request on the provided ``path`` and returns a ``Response``
@@ -499,6 +499,17 @@ arguments at time of construction:
         ...will result in the evaluation of a GET request equivalent to::
 
             /customers/details/?name=fred&age=7
+
+        The ``extra`` keyword arguments parameter can be used to specify
+        headers to be sent in the request. For example::
+
+            >>> c = Client()
+            >>> c.get('/customers/details/', {'name': 'fred', 'age': 7},
+            ...       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        ...will send the HTTP header ``HTTP_X_REQUESTED_WITH`` to the
+        details	view, which is a good way to test code paths that use the
+        :meth:`django.http.HttpRequest.is_ajax()` method.
 
         .. versionadded:: 1.1
 
@@ -523,7 +534,7 @@ arguments at time of construction:
             >>> response.redirect_chain
             [(u'http://testserver/next/', 302), (u'http://testserver/final/', 302)]
 
-    .. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT, follow=False)
+    .. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT, follow=False, **extra)
 
         Makes a POST request on the provided ``path`` and returns a
         ``Response`` object, which is documented below.
@@ -574,6 +585,8 @@ arguments at time of construction:
         Note that you should manually close the file after it has been provided
         to ``post()``.
 
+        The ``extra`` argument acts the same as for :meth:`Client.get`.
+
         .. versionchanged:: 1.1
 
         If the URL you request with a POST contains encoded parameters, these
@@ -590,7 +603,7 @@ arguments at time of construction:
         and a ``redirect_chain`` attribute will be set in the response object
         containing tuples of the intermediate urls and status codes.
 
-    .. method:: Client.head(path, data={}, follow=False)
+    .. method:: Client.head(path, data={}, follow=False, **extra)
 
         .. versionadded:: 1.1
 
@@ -602,7 +615,7 @@ arguments at time of construction:
         and a ``redirect_chain`` attribute will be set in the response object
         containing tuples of the intermediate urls and status codes.
 
-    .. method:: Client.options(path, data={}, follow=False)
+    .. method:: Client.options(path, data={}, follow=False, **extra)
 
         .. versionadded:: 1.1
 
@@ -613,7 +626,9 @@ arguments at time of construction:
         and a ``redirect_chain`` attribute will be set in the response object
         containing tuples of the intermediate urls and status codes.
 
-    .. method:: Client.put(path, data={}, content_type=MULTIPART_CONTENT, follow=False)
+        The ``extra`` argument acts the same as for :meth:`Client.get`.
+
+    .. method:: Client.put(path, data={}, content_type=MULTIPART_CONTENT, follow=False, **extra)
 
         .. versionadded:: 1.1
 
@@ -625,7 +640,7 @@ arguments at time of construction:
         and a ``redirect_chain`` attribute will be set in the response object
         containing tuples of the intermediate urls and status codes.
 
-    .. method:: Client.delete(path, follow=False)
+    .. method:: Client.delete(path, follow=False, **extra)
 
         .. versionadded:: 1.1
 
@@ -635,6 +650,8 @@ arguments at time of construction:
         If you set ``follow`` to ``True`` the client will follow any redirects
         and a ``redirect_chain`` attribute will be set in the response object
         containing tuples of the intermediate urls and status codes.
+
+        The ``extra`` argument acts the same as for :meth:`Client.get`.
 
     .. method:: Client.login(**credentials)
 
