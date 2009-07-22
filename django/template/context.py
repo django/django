@@ -9,10 +9,11 @@ class ContextPopException(Exception):
 
 class Context(object):
     "A stack container for variable context"
-    def __init__(self, dict_=None, autoescape=True):
+    def __init__(self, dict_=None, autoescape=True, current_app=None):
         dict_ = dict_ or {}
         self.dicts = [dict_]
         self.autoescape = autoescape
+        self.current_app = current_app
 
     def __repr__(self):
         return repr(self.dicts)
@@ -96,8 +97,8 @@ class RequestContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
-    def __init__(self, request, dict=None, processors=None):
-        Context.__init__(self, dict)
+    def __init__(self, request, dict=None, processors=None, current_app=None):
+        Context.__init__(self, dict, current_app=current_app)
         if processors is None:
             processors = ()
         else:
