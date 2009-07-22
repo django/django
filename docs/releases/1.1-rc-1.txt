@@ -24,12 +24,11 @@ such use is discouraged.
 What's new in Django 1.1 RC 1
 =============================
 
-The Django codebase has been in feature freeze since the first 1.1
-beta release, and so this release candidate contains only one new
-feature (introduced as part of the resolution of a larger bug; see
-below for a description); work leading up to this release candidate
-has instead been focused on bugfixing, particularly on the new
-features introduced prior to the 1.1 beta.
+The Django codebase has -- with one exception -- been in feature
+freeze since the first 1.1 beta release, and so this release candidate
+contains only one new feature (see below); work leading up to this
+release candidate has instead been focused on bugfixing, particularly
+on the new features introduced prior to the 1.1 beta.
 
 For an overview of those features, consult :ref:`the Django 1.1 beta
 release notes <releases-1.1-beta-1>`.
@@ -40,22 +39,17 @@ URL namespaces
 
 The 1.1 beta release introduced the ability to use reverse URL
 resolution with Django's admin application, which exposed a set of
-:ref:`named URLs <naming-url-patterns>`. This feature still exists,
-but in order to provide consistent resolution of admin URLs, including
-support for multiple :class:`~django.contrib.admin.AdminSite` objects
-in use in a single installation, a new feature has been introduced:
-URL "namespaces".
+:ref:`named URLs <naming-url-patterns>`. Unfortunately, achieving
+consistent and correct reverse resolution for admin URLs proved
+extremely difficult, and so one additional feature was added to Django
+to resolve this issue: URL namespaces.
 
-This takes the form of an additional supported argument --
-``namespace`` -- to the ``include()`` function used to include groups
-of URL patterns in a Django URLConf. When this argument is used,
-pattern names supplied for reverse resolution may specify the
-namespace in addition to the pattern name (using a colon as separator;
-e.g., ``namespace-name:pattern-name``), and the reverse resolver will
-take the namespace into account when searching for a match.
-
-For more details, see :ref:`the documentation on defining URL
-namespaces <topics-http-defining-url-namespaces>`.
+In short, this feature allows the same group of URLs, from the same
+application, to be included in a Django URLConf multiple times, with
+varying (and potentially nested) named prefixes which will be used
+when performing reverse resolution. For full details, see :ref:`the
+documentation on defining URL namespaces
+<topics-http-defining-url-namespaces>`.
 
 Due to the changes needed to support this feature, the URL pattern
 names used when reversing admin URLs have changed since the 1.1 beta
