@@ -19,32 +19,32 @@ msgstr ""
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "Доступни %s"
+msgstr "Dostupni %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
-msgstr "Додај све"
+msgstr "Dodaj sve"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
-msgstr "Додај"
+msgstr "Dodaj"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr "Уклони"
+msgstr "Ukloni"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr "Одабрани %s"
+msgstr "Odabrani %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "Направите избор и кликните "
+msgstr "Napravite izbor i kliknite "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr "Врати све"
+msgstr "Vrati sve"
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
@@ -52,69 +52,69 @@ msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
-"јануар фебруар март април мај јун јул август септембар октобар новембар "
-"децембар"
+"januar februar mart april maj jun jul avgust septembar oktobar novembar "
+"decembar"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
-msgstr "Н П У С Ч П С"
+msgstr "N P U S Č P S"
 
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "недеља понедељак уторак среда четвртак петак субота"
+msgstr "nedelja ponedeljak utorak sreda četvrtak petak subota"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
 msgid "Show"
-msgstr "Покажи"
+msgstr "Pokaži"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
 msgid "Hide"
-msgstr "Сакриј"
+msgstr "Sakrij"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Now"
-msgstr "Тренутно време"
+msgstr "Trenutno vreme"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
 msgid "Clock"
-msgstr "Сат"
+msgstr "Sat"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
 msgid "Choose a time"
-msgstr "Одабир времена"
+msgstr "Odabir vremena"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "Midnight"
-msgstr "Поноћ"
+msgstr "Ponoć"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
-msgstr "18ч"
+msgstr "18č"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
-msgstr "Подне"
+msgstr "Podne"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
 msgid "Cancel"
-msgstr "Поништи"
+msgstr "Poništi"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
 msgid "Today"
-msgstr "Данас"
+msgstr "Danas"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
 msgid "Calendar"
-msgstr "Календар"
+msgstr "Kalendar"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
 msgid "Yesterday"
-msgstr "Јуче"
+msgstr "Juče"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
-msgstr "Сутра"
+msgstr "Sutra"
