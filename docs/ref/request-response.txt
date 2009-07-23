@@ -585,6 +585,16 @@ live in :mod:`django.http`.
     optionally, the file's content type and block size hint for handlers that
     need it.
 
+    If the setting ``HTTPRESPONSE_SENDFILE_HEADER`` is overridden (default None),
+    HttpResponseSendFile will return that response header set as the file name given.
+    If the file is unavailable, no content will be returned. Since certain servers
+    do not allow direct access to the file system, it is not feasible to verify
+    the file's existence beforehand.
+
+    Be very careful with this method. It provides access to the filesystem that 
+    must be controlled, and performs no verification of a file's existence in most
+    cases.
+
     Note that response middleware will be bypassed if you use
     :class:`HttpResponseSendFile`.
 

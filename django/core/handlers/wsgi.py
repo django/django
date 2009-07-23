@@ -242,14 +242,21 @@ class WSGIHandler(base.BaseHandler):
             response_headers.append(('Set-Cookie', str(c.output(header=''))))
         
         if isinstance(response, http.HttpResponseSendFile): 
-            if settings.HTTPRESPONSE_SENDFILE_METHOD:
-                response_headers.append((settings.HTTPRESPONSE_SENDFILE_METHOD,
-                    response.sendfile_filename))
+            filename = response.sendfile_filename
+            if settings.HTTPRESPONSE_SENDFILE_HEADER:
+                response.set_empty_content()
+                response_headers.append((settings.HTTPRESPONSE_SENDFILE_HEADER,
+                    filename))
             elif 'wsgi.file_wrapper' in environ:
-                filelike = open(response.sendfile_filename, 'rb')
+                filelike = open(filename, 'rb')
                 return environ['wsgi.file_wrapper'](filelike, 
                         response.block_size)
-
+            else:
+                import os.path
+                if not os.path.exists(filename):
+                     raise Exception("Filename provided to HttpResponseSendFile does not exist.")
+                response_headers.append(('Content-Length', 
+                                         str(os.path.getsize(filename))))
         start_response(status, response_headers)
         return response
 

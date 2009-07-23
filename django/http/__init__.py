@@ -444,7 +444,6 @@ class HttpResponseSendFile(HttpResponse):
         super(HttpResponseSendFile, self).__init__('', content_type=content_type)
         self.sendfile_filename = path_to_file
         self.block_size = block_size
-        self['Content-Length'] = os.path.getsize(path_to_file)
         self['Content-Disposition'] = ('attachment; filename=%s' %
              os.path.basename(path_to_file))
         self._empty_content = False

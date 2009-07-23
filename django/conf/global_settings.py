@@ -240,9 +240,9 @@ MEDIA_URL = ''
 # file with efficient handler-specific routines. None causes HttpResponseSendFile
 # to fall back to, first, mechanisms in the handler (wsgi.filewrapper and
 # req.sendfile.
-# Examples: 'X-Sendfile' (FastCGI, lighttpd, Apache with mod_xsendfile),
+# Examples: 'X-Sendfile' (lighttpd & Cherokee with FastCGI/SCGI, Apache with mod_xsendfile),
 #           'X-Accel-Redirect' (nginx)
-HTTPRESPONSE_SENDFILE_METHOD = None
+HTTPRESPONSE_SENDFILE_HEADER = None
 
 # List of upload handler classes to be applied in order.
 FILE_UPLOAD_HANDLERS = (
