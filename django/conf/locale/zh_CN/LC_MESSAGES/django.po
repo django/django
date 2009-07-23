@@ -5,9 +5,9 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-12-02 22:52+0800\n"
-"PO-Revision-Date: 2008-11-19 17:38+0800\n"
-"Last-Translator: Liang Feng <hutuworm@gmail.com>\n"
-"Language-Team: Simplified Chinese <hutuworm@gmail.com>\n"
+"PO-Revision-Date: 2009-07-23 11:47+0800\n"
+"Last-Translator: Qing Feng <paradise.qingfeng@gmail.com>\n"
+"Language-Team: Simplified Chinese <paradise.qingfeng@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -220,6 +220,20 @@ msgstr "简体中文"
 msgid "Traditional Chinese"
 msgstr "繁体中文"
 
+#: contrib/admin/actions.py:60
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "删除了%(count)d的%(items)s"
+
+#: contrib/admin/actions.py:67 contrib/admin/options.py:1027
+msgid "Are you sure?"
+msgstr "你确认吗？"
+
+#: contrib/admin/actions.py:85
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "删除了选择的%(verbose_name_plural)s"
+
 #: contrib/admin/filterspecs.py:44
 #, python-format
 msgid ""
@@ -376,10 +390,6 @@ msgstr "数据库错误"
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" 删除成功。"
-
-#: contrib/admin/options.py:695
-msgid "Are you sure?"
-msgstr "你确认吗？"
 
 #: contrib/admin/options.py:724
 #, python-format
@@ -640,6 +650,10 @@ msgstr "我的动作"
 msgid "None available"
 msgstr "无可用的"
 
+#: contrib/admin/templates/admin/index.html:72
+msgid "Unknown content"
+msgstr "未知内容"
+
 #: contrib/admin/templates/admin/invalid_setup.html:7
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
@@ -685,6 +699,15 @@ msgstr "该对象没有变更历史记录。可能从未通过这个管理站点
 msgid "Show all"
 msgstr "显示全部"
 
+#: contrib/admin/templates/admin/pagination.html:11
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "保存"
+
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Search"
+msgstr "搜索"
+
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
 msgstr "执行"
@@ -700,10 +723,6 @@ msgstr[1] "%(counter)s 条结果"
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "总共 %(full_result_count)s"
-
-#: contrib/admin/templates/admin/submit_line.html:3
-msgid "Save"
-msgstr "保存"
 
 #: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save as new"
@@ -1347,6 +1366,16 @@ msgstr "内容"
 msgid "Metadata"
 msgstr "元数据"
 
+#: contrib/comments/feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s的评论"
+
+#: contrib/comments/feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "%(site_name)s的最新评论"
+
 #: contrib/comments/forms.py:19
 #: contrib/comments/templates/comments/moderation_queue.html:34
 msgid "Name"
@@ -1423,6 +1452,12 @@ msgid ""
 "only."
 msgstr "此评论由一位验证用户发表，因此该用户名是只读的。"
 
+#: contrib/comments/models.py:77
+msgid "comments"
+msgstr "评论"
+
+#: contrib/comments/models.py:119
+
 #: contrib/comments/models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
@@ -1443,6 +1478,22 @@ msgstr ""
 "%(comment)s\n"
 "\n"
 "http://%(domain)s%(url)s"
+
+#: contrib/comments/models.py:170
+msgid "flag"
+msgstr "标记"
+
+#: contrib/comments/models.py:171
+msgid "date"
+msgstr "标记时间"
+
+#: contrib/comments/models.py:181
+msgid "comment flag"
+msgstr "评论标记"
+
+#: contrib/comments/models.py:182
+msgid "comment flags"
+msgstr "评论标记"
 
 #: contrib/comments/templates/comments/approve.html:4
 msgid "Approve a comment"
@@ -1574,10 +1625,6 @@ msgstr "或进行修改"
 msgid "python model class name"
 msgstr "python 模型类名"
 
-#: contrib/contenttypes/models.py:71
-msgid "content type"
-msgstr "内容类型"
-
 #: contrib/contenttypes/models.py:72
 msgid "content types"
 msgstr "内容类型"
@@ -1654,6 +1701,14 @@ msgstr "无效几何信息。"
 #: contrib/gis/forms/fields.py:16
 msgid "Invalid geometry type."
 msgstr "无效几何类型。"
+
+#: contrib/gis/forms/fields.py:20
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"几何形状的SRID字段发生试图转换错误"
+"ました。"
 
 #: contrib/humanize/templatetags/humanize.py:19
 msgid "th"
@@ -2789,8 +2844,8 @@ msgid "Wrong checksum for the Tax Number (NIP)."
 msgstr "税号（NIP）校验和错误。"
 
 #: contrib/localflavor/pl/forms.py:111
-msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
-msgstr "国家商业注册号码（REGON）由 7 位或 9 位数字组成。"
+msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
+msgstr "国家商业注册号码（REGON）由 9 位或 14 位数字组成。"
 
 #: contrib/localflavor/pl/forms.py:112
 msgid "Wrong checksum for the National Business Register Number (REGON)."
@@ -3795,6 +3850,36 @@ msgstr "输入一个有效的 'slug'，由字母、数字、下划线或横线�
 #: forms/formsets.py:242 forms/formsets.py:244
 msgid "Order"
 msgstr "排序"
+
+#: forms/models.py:367
+#, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr ""
+"在%(date_field)s %(lookup)s 需要唯一的 %(field_name)s"
+
+#: forms/models.py:594
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "请修改%(field)s的重复数据"
+
+#: forms/models.py:598
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "请修改%(field)s的重复数据.这个字段必须唯一"
+
+#: forms/models.py:604
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr "%(field_name)s の重複したデータを修正してください。%(date_field)s %(lookup)s では %(field_name)s がユニークである必要があります。"
+
+#: forms/models.py:612
+msgid "Please correct the duplicate values below."
+msgstr "下記の重複したデータを修正してください。"
+
+#: forms/models.py:381 forms/models.py:389
+#, python-format
 
 #: forms/models.py:281 forms/models.py:290
 #, python-format
