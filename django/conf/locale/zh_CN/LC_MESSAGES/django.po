@@ -3872,11 +3872,11 @@ msgstr "请修改%(field)s的重复数据.这个字段必须唯一"
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
-msgstr "%(field_name)s の重複したデータを修正してください。%(date_field)s %(lookup)s では %(field_name)s がユニークである必要があります。"
+msgstr "请修正%(field_name)s的重复数据。%(date_field)s %(lookup)s 在 %(field_name)s 必须保证唯一."
 
 #: forms/models.py:612
 msgid "Please correct the duplicate values below."
-msgstr "下記の重複したデータを修正してください。"
+msgstr "请修正重复的数据."
 
 #: forms/models.py:381 forms/models.py:389
 #, python-format
