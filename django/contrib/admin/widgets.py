@@ -224,7 +224,8 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         try:
             related_url = reverse('admin:%s_%s_add' % info, current_app=self.admin_site.name)
         except NoReverseMatch:
-            related_url = '../../../%s/%s/add/' % info
+            info = (self.admin_site.root_path, rel_to._meta.app_label, rel_to._meta.object_name.lower())
+            related_url = '%s%s/%s/add/' % info
         self.widget.choices = self.choices
         output = [self.widget.render(name, value, *args, **kwargs)]
         if rel_to in self.admin_site._registry: # If the related object has an admin interface:
