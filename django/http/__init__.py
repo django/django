@@ -272,6 +272,7 @@ class HttpResponse(object):
 
     _status_code = 200
     _codec = None
+    _charset = None
 
     def __init__(self, content='', mimetype=None, status=None,
                  content_type=None, request=None):
@@ -446,6 +447,8 @@ class HttpResponseSendFile(HttpResponse):
         self.block_size = block_size
         self['Content-Disposition'] = ('attachment; filename=%s' %
              os.path.basename(path_to_file))
+        if not settings.HTTPRESPONSE_SENDFILE_HEADER and os.path.exists(path_to_file):
+            self['Content-Length'] = str(os.path.getsize(path_to_file))
         self._empty_content = False
 
     def set_empty_content(self):
@@ -456,6 +459,11 @@ class HttpResponseSendFile(HttpResponse):
             return iter([''])
         from django.core.servers.basehttp import FileWrapper
         return FileWrapper(self.get_file_handler(), self.block_size)
+
+    def _get_content(self):
+        return "".join(self.iter())
+
+    content = property(_get_content)    
 
     def get_file_handler(self):
         if not self.sendfile_fh:

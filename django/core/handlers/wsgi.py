@@ -251,12 +251,7 @@ class WSGIHandler(base.BaseHandler):
                 filelike = open(filename, 'rb')
                 return environ['wsgi.file_wrapper'](filelike, 
                         response.block_size)
-            else:
-                import os.path
-                if not os.path.exists(filename):
-                     raise Exception("Filename provided to HttpResponseSendFile does not exist.")
-                response_headers.append(('Content-Length', 
-                                         str(os.path.getsize(filename))))
+        
         start_response(status, response_headers)
         return response
 
