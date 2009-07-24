@@ -272,12 +272,12 @@ class HttpResponse(object):
 
     _status_code = 200
     _codec = None
-    _charset = settings.DEFAULT_CHARSET
 
     def __init__(self, content='', mimetype=None, status=None,
                  content_type=None, request=None):
         from django.conf import settings
         accept_charset = None
+        _charset = settings.DEFAULT_CHARSET
         if mimetype:
             content_type = mimetype  # Mimetype arg is an alias for content-type
         if request:
