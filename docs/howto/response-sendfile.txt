@@ -1,0 +1,131 @@
+.. _howto-response-sendfile:
+
+=================================================
+How to serve large files via HttpResponseSendFile
+=================================================
+
+.. module:: django.http
+   :synopsis: Serving of large files via handler-specific mechanisms.
+
+There are cases when you may wish to serve files in a response, but only want
+to provide access to them through your application. As discussed in :ref:`the how-to for serving static
+files <howto-static-files>`, Django is not tuned at all for this sort of serving. Thus, 
+:func:`~django.http.HttpResponseSendFile` provides access to handler-specific mechanisms and server headers to
+shunt this processing to more efficient methods.
+
+Server configurations that have been verified to support efficient file transfers
+through the use of these headers include Apache_, lighttpd_, Cherokee_, and nginx_.
+A brief overview of the use of these will be described below.
+
+In the event that :func:`~django.http.HttpResponseSendFile` is used without setting a handler-specific
+mechanism, an inefficient fallback (using :class:`~django.core.servers.basehttp.FileWrapper`).
+This will work but you will want to consider using one of the options below for
+greater efficiency.
+
+.. _Apache: http://httpd.apache.org/
+.. _lighttpd: http://www.lighttpd.net/
+.. _Cherokee: http://www.cherokee-project.com/
+.. _nginx: http://www.nginx.net
+
+.. seealso::
+
+    See :ref:`the how-to for serving static files <howto-static-files>` for serving static files 
+    that do not require protection.
+
+Disclaimer
+==========
+
+Using this method is **insecure**. You should be very careful to restrict the 
+filenames that reach ``HttpResponseSendFile``, or you have a gaping hole (read-only)
+into your filesystem.
+
+General use
+===========
+
+Instead of returning an :func:`HttpResponse` in a view, use :func:`~django.http.HttpResponseSendFile`,
+like so::
+
+    def send_protected(request):
+        return HttpResponseSendFile("/protected/safe.zip")
+
+How the server treats the path varies. For example, on nginx, the root of the paths
+sent through :func:`~django.http.HttpResponseSendFile` is defined inside its configuration file. However,
+in most other instances it is treated as the root of the server's file system.
+
+The header used is defined by the setting :setting:`HTTPRESPONSE_SENDFILE_HEADER`. If it is
+left as a default, the fallback method will be used. Otherwise, it should be set as a
+string containing the header used by the server.
+
+
+How to use HttpResponseSendFile with Apache
+===========================================
+
+Apache supports efficient file transfer using ``mod_xsendfile_``. Once this module is in 
+place, add the following line to ``settings.py``::
+
+    HTTPRESPONSE_SENDFILE_HEADER = "X-Sendfile"
+
+This will inform :func:`~django.http.HttpResponseSendFile` that it should allow the server to handle serving
+the file passed to it.
+
+.. _mod_xsendfile: http://tn123.ath.cx/mod_xsendfile/
+
+**Note:** This works using both ``mod_wsgi`` and ``mod_python``.
+
+How to use HttpResponseSendFile with lighttpd
+=============================================
+
+lighttpd_ supports the ``X-Sendfile`` header natively (under ``FastCGI``). To enable it, simply 
+add the line::
+
+    "allow-x-send-file" => "enable"
+    
+... in the ``main`` section under the ``check-local`` line.
+
+For further information about lighttpd, see `documentation of lighttpd's configuration options`_. 
+
+.. _lighttpd: http://www.lighttpd.net/
+.. _`documentation of lighttpd's configuration options`: http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ConfigurationOptions
+
+Add the following line to ``settings.py``::
+
+    HTTPRESPONSE_SENDFILE_HEADER = "X-Sendfile"
+
+
+How to use HttpResponseSendFile with Cherokee
+=============================================
+
+``Cherokee`` supports the ``X-Sendfile`` header natively (under FastCGI and SCGI). To enable it,
+use the administration interface. Under Common CGI options, simply enable the 
+``Allow X-Sendfile`` option. For more info, visit the `cookbook for Django support in 
+Cherokee`_.
+
+.. _Cherokee: http://www.cherokee-project.com/
+.. _`cookbook for Django support in Cherokee`: http://www.cherokee-project.com/doc/cookbook_django.html
+
+Add the following line to ``settings.py``::
+
+    HTTPRESPONSE_SENDFILE_HEADER = "X-Sendfile"
+
+Then, follow the directions under General Use, above.
+
+**Note:** Though the documentation for Cherokee states that it supports the ``X-Accel-Redirect``
+header, it is actually just an alias for ``X-Sendfile``. Additionally, the support for ``X-Accel-Redirect``
+was non-functional until after at least one release after its inclusion. Therefore, there is no
+good reason to use ``X-Accel-Redirect`` header with Cherokee, though it is technically supported.
+
+How to use HttpResponseSendFile with nginx
+==========================================
+
+nginx_ uses a different header, ``X-Accel-Redirect``, that behaves slightly different than the
+``X-Sendfile`` used on other server configurations.
+
+To enable its use in nginx_, follow the directions in `nginx's documentation for X-Accel-Redirect`_.
+
+.. _`nginx's documentation for X-Accel-Redirect`: http://wiki.nginx.org/NginxXSendfile
+.. _nginx: http://www.nginx.net
+
+Add the following line to ``settings.py``::
+
+    HTTPRESPONSE_SENDFILE_HEADER = "X-Accel-Redirect"
+

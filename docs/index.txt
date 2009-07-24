@@ -151,6 +151,7 @@ The development process
       :ref:`FastCGI/SCGI/AJP <howto-deployment-fastcgi>` |
       :ref:`Apache authentication <howto-apache-auth>` |
       :ref:`Serving static files <howto-static-files>` |
+      :ref:`Serving large files from within views <howto-response-sendfile>` |
       :ref:`Tracking code errors by e-mail <howto-error-reporting>`
 
 Other batteries included
