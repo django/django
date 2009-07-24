@@ -204,9 +204,9 @@ class ModPythonHandler(BaseHandler):
             req.sendfile(response.sendfile_filename)
         else:
             # If we are using a header to do sendfile, set the header and send empty content
-            if settings.RESPONSE_SENDFILE_HEADER:
+            if settings.SENDFILE_HEADER:
                 response.set_empty_content()
-                response[settings.HTTPRESPONSE_SENDFILE_HEADER] = response.sendfile_filename
+                response[settings.SENDFILE_HEADER] = response.sendfile_filename
             for chunk in response:
                 req.write(chunk)
         return 0 # mod_python.apache.OK

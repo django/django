@@ -52,7 +52,7 @@ How the server treats the path varies. For example, on nginx, the root of the pa
 sent through :func:`~django.http.HttpResponseSendFile` is defined inside its configuration file. However,
 in most other instances it is treated as the root of the server's file system.
 
-The header used is defined by the setting :setting:`HTTPRESPONSE_SENDFILE_HEADER`. If it is
+The header used is defined by the setting :setting:`SENDFILE_HEADER`. If it is
 left as a default, the fallback method will be used. Otherwise, it should be set as a
 string containing the header used by the server.
 
@@ -63,7 +63,7 @@ How to use HttpResponseSendFile with Apache
 Apache supports efficient file transfer using ``mod_xsendfile_``. Once this module is in 
 place, add the following line to ``settings.py``::
 
-    HTTPRESPONSE_SENDFILE_HEADER = "X-Sendfile"
+    SENDFILE_HEADER = "X-Sendfile"
 
 This will inform :func:`~django.http.HttpResponseSendFile` that it should allow the server to handle serving
 the file passed to it.
@@ -89,7 +89,7 @@ For further information about lighttpd, see `documentation of lighttpd's configu
 
 Add the following line to ``settings.py``::
 
-    HTTPRESPONSE_SENDFILE_HEADER = "X-Sendfile"
+    SENDFILE_HEADER = "X-Sendfile"
 
 
 How to use HttpResponseSendFile with Cherokee
@@ -105,7 +105,7 @@ Cherokee`_.
 
 Add the following line to ``settings.py``::
 
-    HTTPRESPONSE_SENDFILE_HEADER = "X-Sendfile"
+    SENDFILE_HEADER = "X-Sendfile"
 
 Then, follow the directions under General Use, above.
 
@@ -127,5 +127,5 @@ To enable its use in nginx_, follow the directions in `nginx's documentation for
 
 Add the following line to ``settings.py``::
 
-    HTTPRESPONSE_SENDFILE_HEADER = "X-Accel-Redirect"
+    SENDFILE_HEADER = "X-Accel-Redirect"
 

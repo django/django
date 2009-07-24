@@ -242,7 +242,7 @@ MEDIA_URL = ''
 # req.sendfile.
 # Examples: 'X-Sendfile' (lighttpd & Cherokee with FastCGI/SCGI, Apache with mod_xsendfile),
 #           'X-Accel-Redirect' (nginx)
-HTTPRESPONSE_SENDFILE_HEADER = None
+SENDFILE_HEADER = None
 
 # List of upload handler classes to be applied in order.
 FILE_UPLOAD_HANDLERS = (

@@ -243,10 +243,9 @@ class WSGIHandler(base.BaseHandler):
         
         if isinstance(response, http.HttpResponseSendFile): 
             filename = response.sendfile_filename
-            if settings.HTTPRESPONSE_SENDFILE_HEADER:
+            if settings.SENDFILE_HEADER:
                 response.set_empty_content()
-                response_headers.append((settings.HTTPRESPONSE_SENDFILE_HEADER,
-                    filename))
+                response_headers.append((settings.SENDFILE_HEADER, filename))
             elif 'wsgi.file_wrapper' in environ:
                 filelike = open(filename, 'rb')
                 return environ['wsgi.file_wrapper'](filelike, 

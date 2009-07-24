@@ -447,7 +447,7 @@ class HttpResponseSendFile(HttpResponse):
         self.block_size = block_size
         self['Content-Disposition'] = ('attachment; filename=%s' %
              os.path.basename(path_to_file))
-        if not settings.HTTPRESPONSE_SENDFILE_HEADER and os.path.exists(path_to_file):
+        if not settings.SENDFILE_HEADER and os.path.exists(path_to_file):
             self['Content-Length'] = str(os.path.getsize(path_to_file))
         self._empty_content = False
 

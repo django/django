@@ -835,6 +835,21 @@ link). This is only used if ``CommonMiddleware`` is installed (see
 
 .. setting:: SERIALIZATION_MODULES
 
+SENDFILE_HEADER
+-----------------------------
+
+Default: ``None``
+
+If not ``None``, this defines the header that an :func:`~django.http.HttpResponseSendFile`
+filename is put into, such as ``X-SendFile``. If it is set, the response's content is
+blank, and the responsibility to send the file is left to the server.
+
+If ``None``, and the handler does not do anything special for :func:`~django.http.HttpResponseSendFile`,
+then :func:`~django.http.HttpResponseSendFile` will behave like :func:`~django.http.HttpResponse`,
+but ensure that the file gets closed.
+
+.. setting:: SENDFILE_HEADER
+
 SERIALIZATION_MODULES
 ---------------------
 
