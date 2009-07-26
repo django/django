@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: Django 1.0.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-26 18:55+0200\n"
-"PO-Revision-Date: 2009-04-10 08:14+0200\n"
+"PO-Revision-Date: 2009-07-26 19:15+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
-"Language-Team: Italian\n"
+"Language-Team: Italian <django-it@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
-"X-Generator: KBabel 1.11.4\n"
+"X-Generator: Lokalize 0.3\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -301,7 +301,7 @@ msgstr "Nessuno"
 #: contrib/admin/options.py:340
 #, python-format
 msgid "Changed %s."
-msgstr "%s modificato."
+msgstr "%s modificato/a."
 
 #: contrib/admin/options.py:340 contrib/admin/options.py:350
 #: contrib/comments/templates/comments/preview.html:16 forms/models.py:376
@@ -312,17 +312,17 @@ msgstr "e"
 #: contrib/admin/options.py:345
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr "Aggiunti %(name)s \"%(object)s\"."
+msgstr "Aggiunto/a %(name)s \"%(object)s\"."
 
 #: contrib/admin/options.py:349
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Cambiati %(list)s per %(name)s \"%(object)s\"."
+msgstr "Cambiato/i %(list)s per %(name)s \"%(object)s\"."
 
 #: contrib/admin/options.py:354
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Cancellati %(name)s \"%(object)s\"."
+msgstr "Cancellato/a %(name)s \"%(object)s\"."
 
 #: contrib/admin/options.py:358
 msgid "No fields changed."
@@ -331,29 +331,29 @@ msgstr "Nessun campo modificato."
 #: contrib/admin/options.py:419 contrib/auth/admin.py:61
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" è stato aggiunto correttamente."
+msgstr "%(name)s \"%(obj)s\" aggiunto/a correttamente."
 
 #: contrib/admin/options.py:423 contrib/admin/options.py:456
 #: contrib/auth/admin.py:69
 msgid "You may edit it again below."
-msgstr "È possibile modificarlo nuovamente qui sotto."
+msgstr "È possibile modificare nuovamente qui sotto."
 
 #: contrib/admin/options.py:433 contrib/admin/options.py:466
 #, python-format
 msgid "You may add another %s below."
-msgstr "Puoi aggiungere un altro %s qui sotto."
+msgstr "Puoi aggiungere un altro/a %s qui sotto."
 
 #: contrib/admin/options.py:454
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" modificato correttamente."
+msgstr "%(name)s \"%(obj)s\" modificato/a correttamente."
 
 #: contrib/admin/options.py:462
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" aggiunto correttamente. Puoi modificarlo ancora qui "
+"%(name)s \"%(obj)s\" aggiunto/a correttamente. Puoi modificare ancora qui "
 "sotto."
 
 #: contrib/admin/options.py:541
@@ -378,7 +378,7 @@ msgstr "Errore nel database"
 #: contrib/admin/options.py:711
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" cancellato correttamente."
+msgstr "%(name)s \"%(obj)s\" cancellato/a correttamente."
 
 #: contrib/admin/options.py:718
 msgid "Are you sure?"
@@ -515,7 +515,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Si è verificato un errore. È stato riportato agli amministratori del sito "
+"Si è verificato un errore. Gli amministratori del sito ne sono stati "
+"informati"
 "via e-mail e verrà corretto a breve. Grazie per la tua pazienza."
 
 #: contrib/admin/templates/admin/app_index.html:10
@@ -526,7 +527,7 @@ msgstr "%(name)s"
 
 #: contrib/admin/templates/admin/base.html:25
 msgid "Welcome,"
-msgstr "Benvenuto,"
+msgstr "Benvenuto/a,"
 
 #: contrib/admin/templates/admin/base.html:25
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -649,9 +650,8 @@ msgid "None available"
 msgstr "Nessuna disponibile"
 
 #: contrib/admin/templates/admin/index.html:72
-#, fuzzy
 msgid "Unknown content"
-msgstr "Sconosciuto"
+msgstr "Contenuto sconosciuto"
 
 #: contrib/admin/templates/admin/invalid_setup.html:7
 msgid ""
@@ -791,7 +791,7 @@ msgstr "Cambio password"
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
 msgid "Password change successful"
-msgstr "Cambio di password avvenuto correttamente"
+msgstr "Cambio password avvenuto correttamente"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
@@ -860,7 +860,7 @@ msgstr ""
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
-msgstr "Password NON reimpostata"
+msgstr "Password non reimpostata"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:28
 msgid ""
@@ -899,7 +899,7 @@ msgstr "Vai alla pagina seguente e scegli una nuova password:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:9
 msgid "Your username, in case you've forgotten:"
-msgstr "Il tuo nome utente, in caso l'abbia dimenticato:"
+msgstr "Il tuo nome utente, in caso tu l'abbia dimenticato:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Thanks for using our site!"
@@ -915,7 +915,7 @@ msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr ""
-"Dimenticata la password? Inserisci il tuo indirizzo email qui sotto, e ti "
+"Password dimenticata? Inserisci il tuo indirizzo email qui sotto, e ti "
 "invieremo per email le istruzioni per impostarne una nuova."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
@@ -1211,7 +1211,7 @@ msgstr "Conferma password"
 
 #: contrib/auth/forms.py:30
 msgid "A user with that username already exists."
-msgstr "Un utente con questo nome·è già presente."
+msgstr "Un utente con questo nome è già presente."
 
 #: contrib/auth/forms.py:36 contrib/auth/forms.py:155
 #: contrib/auth/forms.py:197
@@ -1432,7 +1432,7 @@ msgstr ""
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Modera i termini: la parola %s non è ammessa."
-msgstr[1] "Modera i termini: le parole %s non sono ammesse."
+msgstr[1] "Modera i termini: le parole %s non sono ammesse qui."
 
 #: contrib/comments/models.py:22 contrib/contenttypes/models.py:71
 msgid "content type"
@@ -3650,7 +3650,7 @@ msgstr "Inserisci un codice postale nel formato XXXXX o XXXXX-XXXX ."
 #: contrib/localflavor/us/forms.py:54
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr ""
-"Inserisci un numero di assistenza sociale statunitense valido, nel formato "
+"Inserisci un numero di assistenza sociale USA valido, nel formato "
 "XXX-XX-XXXX ."
 
 #: contrib/localflavor/za/forms.py:20
@@ -3954,22 +3954,21 @@ msgstr "Ordine"
 #: forms/models.py:355
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
-msgstr ""
+msgstr "%(field_name)s deve essere unico per %(lookup)s %(date_field)s."
 
 #: forms/models.py:369 forms/models.py:377
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s con questo %(field_label)s esiste già."
 
-#: forms/models.py:574
-#, fuzzy, python-format
+#: forms/models.py:574, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr "Correggi l'errore qui sotto."
+msgstr "Correggi i dati duplicati di %(field)s."
 
 #: forms/models.py:578
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
-msgstr ""
+msgstr "Correggi i dati duplicati di %(field)s, che deve essere unico."
 
 #: forms/models.py:584
 #, python-format
@@ -3977,17 +3976,19 @@ msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
+"Correggi i dati duplicati di %(field_name)s che deve essere unico/a per "
+"%(lookup)s "
+"in %(date_field)s."
 
 #: forms/models.py:592
-#, fuzzy
 msgid "Please correct the duplicate values below."
-msgstr "Correggi l'errore qui sotto."
+msgstr "Correggi i dati duplicati qui sotto."
 
 #: forms/models.py:826
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 "La foreign key inline non concorda con la chiave primaria dell'istanza "
-"principale."
+"padre."
 
 #: forms/models.py:891
 msgid "Select a valid choice. That choice is not one of the available choices."
@@ -4308,14 +4309,15 @@ msgstr "F j"
 #: views/generic/create_update.py:114
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
-msgstr "%(verbose_name)s creato correttamente."
+msgstr "%(verbose_name)s creato/a correttamente."
 
 #: views/generic/create_update.py:156
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
-msgstr "%(verbose_name)s aggiornato correttamente."
+msgstr "%(verbose_name)s aggiornato/a correttamente."
 
 #: views/generic/create_update.py:198
 #, python-format
 msgid "The %(verbose_name)s was deleted."
-msgstr "%(verbose_name)s è stato cancellato."
+msgstr "%(verbose_name)s cancellato/a."
+
