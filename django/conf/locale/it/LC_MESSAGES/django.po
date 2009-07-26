@@ -7,9 +7,9 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-26 17:43+0200\n"
-"PO-Revision-Date: 2009-07-26 18:30+0200\n"
+"PO-Revision-Date: 2009-07-26 19:15+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
-"Language-Team: Italian\n"
+"Language-Team: Italian <django-it@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -368,8 +368,7 @@ msgstr "%(name)s \"%(obj)s\" modificato/a correttamente."
 
 #: contrib/admin/options.py:642
 #, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" aggiunto/a correttamente. Puoi modificare ancora qui "
 "sotto."
@@ -557,7 +556,7 @@ msgstr "%(name)s"
 
 #: contrib/admin/templates/admin/base.html:27
 msgid "Welcome,"
-msgstr "Benvenuto,"
+msgstr "Benvenuto/a,"
 
 #: contrib/admin/templates/admin/base.html:32
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -823,8 +822,7 @@ msgstr "Inserisci la stessa password inserita sopra, come verifica."
 #: contrib/admin/templates/admin/auth/user/change_password.html:27
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr ""
-"Inserisci una nuova password per l'utente <strong>%(username)s</strong>."
+msgstr "Inserisci una nuova password per l'utente <strong>%(username)s</strong>."
 
 #: contrib/admin/templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
@@ -848,7 +846,7 @@ msgstr "Cambio password"
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
 msgid "Password change successful"
-msgstr "Cambio di password avvenuto correttamente"
+msgstr "Cambio password avvenuto correttamente"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
@@ -917,7 +915,7 @@ msgstr ""
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
-msgstr "Password NON reimpostata"
+msgstr "Password non reimpostata"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:28
 msgid ""
@@ -942,8 +940,7 @@ msgstr ""
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr ""
-"Hai ricevuto questa e-mail perché hai chiesto di reimpostare la password"
+msgstr "Hai ricevuto questa e-mail perché hai chiesto di reimpostare la password"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -1217,8 +1214,7 @@ msgstr "Modifica quest'oggetto (in una nuova finestra)"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
-msgstr ""
-"Come sopra, ma apre la pagina di amministrazione in una nuova finestra."
+msgstr "Come sopra, ma apre la pagina di amministrazione in una nuova finestra."
 
 #: contrib/auth/admin.py:21
 msgid "Personal info"
@@ -1486,10 +1482,8 @@ msgstr[0] "Modera i termini: la parola %s non è ammessa qui."
 msgstr[1] "Modera i termini: le parole %s non sono ammesse qui."
 
 #: contrib/comments/forms.py:180
-msgid ""
-"If you enter anything in this field your comment will be treated as spam"
-msgstr ""
-"Se inserisci qualcosa in questo campo il tuo commento verrà considerato spam"
+msgid "If you enter anything in this field your comment will be treated as spam"
+msgstr "Se inserisci qualcosa in questo campo il tuo commento verrà considerato spam"
 
 #: contrib/comments/models.py:22 contrib/contenttypes/models.py:74
 msgid "content type"
@@ -1525,10 +1519,8 @@ msgid "is public"
 msgstr "è pubblico"
 
 #: contrib/comments/models.py:62
-msgid ""
-"Uncheck this box to make the comment effectively disappear from the site."
-msgstr ""
-"Deseleziona questa casella per far sparire del tutto il commento dal sito."
+msgid "Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Deseleziona questa casella per far sparire del tutto il commento dal sito."
 
 #: contrib/comments/models.py:64
 msgid "is removed"
@@ -1613,8 +1605,7 @@ msgstr "Grazie per aver approvato"
 #: contrib/comments/templates/comments/approved.html:7
 #: contrib/comments/templates/comments/deleted.html:7
 #: contrib/comments/templates/comments/flagged.html:7
-msgid ""
-"Thanks for taking the time to improve the quality of discussion on our site"
+msgid "Thanks for taking the time to improve the quality of discussion on our site"
 msgstr ""
 "Grazie per aver speso tempo a migliorare la qualità della discussione sul "
 "nostro sito"
@@ -1731,8 +1722,7 @@ msgid "content types"
 msgstr "content type"
 
 #: contrib/flatpages/admin.py:9
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "Esempio: '/about/contact/'. Assicurati di inserire le barre diagonali "
 "iniziali e finali."
@@ -2209,8 +2199,7 @@ msgstr "Inserisci un numero di nascita nel formato XXXXXX/XXXX o XXXXXXXXXX."
 
 #: contrib/localflavor/cz/forms.py:48
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
-msgstr ""
-"Parametro opzionale 'Sesso' non valido, i valori validi sono 'f' ed 'm'"
+msgstr "Parametro opzionale 'Sesso' non valido, i valori validi sono 'f' ed 'm'"
 
 #: contrib/localflavor/cz/forms.py:49
 msgid "Enter a valid birth number."
@@ -2566,8 +2555,7 @@ msgstr "Comunità di Valenza"
 
 #: contrib/localflavor/es/forms.py:19
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr ""
-"Inserisci un codice postale valido nell'intervallo e formato 01XXX - 52XXX."
+msgstr "Inserisci un codice postale valido nell'intervallo e formato 01XXX - 52XXX."
 
 #: contrib/localflavor/es/forms.py:39
 msgid ""
@@ -2598,8 +2586,7 @@ msgid "Invalid checksum for CIF."
 msgstr "Checksum non valido per il CIF."
 
 #: contrib/localflavor/es/forms.py:142
-msgid ""
-"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
+msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr ""
 "Inserisci un numero di conto corrente bancario valido nel formato XXXX-XXXX-"
 "XX-XXXXXXXXXX."
@@ -2617,8 +2604,7 @@ msgid "Enter a zip code in the format XXXXXXX."
 msgstr "Inserisci un codice postale nel formato XXXXXXX."
 
 #: contrib/localflavor/is_/forms.py:17
-msgid ""
-"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+msgid "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
 msgstr ""
 "Inserisci un numero di identificazione islandese valido. Il formato è XXXXXX-"
 "XXXX ."
@@ -3040,8 +3026,7 @@ msgid "Wrong checksum for the National Identification Number."
 msgstr "Checksum errato per il Numero Identificativo Nazionale."
 
 #: contrib/localflavor/pl/forms.py:71
-msgid ""
-"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
+msgid "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgstr ""
 "Inserisci un campo di numero d'imposta (NIP) nel formato XXX-XXX-XX-XX o XX-"
 "XX-XXX-XXX."
@@ -3138,8 +3123,7 @@ msgstr "Inserisci un codice CNP valido."
 
 #: contrib/localflavor/ro/forms.py:141
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr ""
-"Inserisci un codice IBAN valido nel formato ROXX-XXXX-XXXX-XXXX-XXXX-XXXX."
+msgstr "Inserisci un codice IBAN valido nel formato ROXX-XXXX-XXXX-XXXX-XXXX-XXXX."
 
 #: contrib/localflavor/ro/forms.py:171
 msgid "Phone numbers must be in XXXX-XXXXXX format."
@@ -3926,8 +3910,7 @@ msgstr "Data non valida: %s"
 
 #: db/models/fields/__init__.py:547 db/models/fields/__init__.py:565
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr ""
-"Inserisci una data/ora valida nel formato AAAA-MM-GG OO:MM[ss[.uuuuuu]]."
+msgstr "Inserisci una data/ora valida nel formato AAAA-MM-GG OO:MM[ss[.uuuuuu]]."
 
 #: db/models/fields/__init__.py:601
 msgid "This value must be a decimal number."
@@ -3946,20 +3929,16 @@ msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Inserisci un'ora valida nel formato OO:MM[ss[.uuuuuu]]."
 
 #: db/models/fields/related.py:816
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Tieni premuto \"Control\", o \"Command\" su Mac, per selezionarne più di uno."
 
 #: db/models/fields/related.py:894
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] ""
-"Inserisci un ID valido per %(self)s. Il valore %(value)r non è valido."
-msgstr[1] ""
-"Inserisci ID validi per %(self)s. I valori %(value)r non sono validi."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "Inserisci un ID valido per %(self)s. Il valore %(value)r non è valido."
+msgstr[1] "Inserisci ID validi per %(self)s. I valori %(value)r non sono validi."
 
 #: forms/fields.py:54
 msgid "This field is required."
@@ -4030,8 +4009,7 @@ msgstr "Inserisci una coppia data/ora valida."
 
 #: forms/fields.py:447
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
-"Non è stato inviato alcun file. Verifica il tipo di codifica della form."
+msgstr "Non è stato inviato alcun file. Verifica il tipo di codifica della form."
 
 #: forms/fields.py:448
 msgid "No file was submitted."
@@ -4043,8 +4021,7 @@ msgstr "Il file inviato è vuoto."
 
 #: forms/fields.py:450
 #, python-format
-msgid ""
-"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgid "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Assicurarsi che questo nome di file non contenga più di %(max)d caratteri "
 "(ne ha %(length)d)."
@@ -4053,8 +4030,7 @@ msgstr ""
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
-msgstr ""
-"Carica un'immagine valida. Il file caricato non è un'immagine o è corrotto."
+msgstr "Carica un'immagine valida. Il file caricato non è un'immagine o è corrotto."
 
 #: forms/fields.py:544
 msgid "Enter a valid URL."
@@ -4067,8 +4043,7 @@ msgstr "Questa URL non sembra funzionare."
 #: forms/fields.py:625 forms/fields.py:703
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr ""
-"Scegli un'opzione valida. '%(value)s non compare tra quelle disponibili."
+msgstr "Scegli un'opzione valida. '%(value)s non compare tra quelle disponibili."
 
 #: forms/fields.py:704 forms/fields.py:765 forms/models.py:1003
 msgid "Enter a list of values."
@@ -4079,8 +4054,7 @@ msgid "Enter a valid IPv4 address."
 msgstr "Inserisci un indirizzo IPv4 valido."
 
 #: forms/fields.py:902
-msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Inserisci uno 'slug' valido contenente lettere, cifre, sottolineati o "
 "trattini."
