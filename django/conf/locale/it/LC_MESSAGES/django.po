@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-07-26 17:43+0200\n"
-"PO-Revision-Date: 2009-07-26 19:15+0200\n"
+"POT-Creation-Date: 2009-07-27 11:12+0200\n"
+"PO-Revision-Date: 2009-07-27 11:10+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "Language-Team: Italian <django-it@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -202,7 +202,7 @@ msgstr "telugu"
 
 #: conf/global_settings.py:90
 msgid "Thai"
-msgstr "thai"
+msgstr "tailandese"
 
 #: conf/global_settings.py:91
 msgid "Turkish"
@@ -2271,7 +2271,7 @@ msgstr "Schleswig-Holstein"
 
 #: contrib/localflavor/de/de_states.py:20
 msgid "Thuringia"
-msgstr "Thuringia"
+msgstr "Turingia"
 
 #: contrib/localflavor/de/forms.py:14 contrib/localflavor/fi/forms.py:12
 #: contrib/localflavor/fr/forms.py:15
@@ -3647,27 +3647,27 @@ msgstr "Worcestershire"
 
 #: contrib/localflavor/uk/uk_regions.py:55
 msgid "County Antrim"
-msgstr "County Antrim"
+msgstr "Contea di Antrim"
 
 #: contrib/localflavor/uk/uk_regions.py:56
 msgid "County Armagh"
-msgstr "County Armagh"
+msgstr "Contea di Armagh"
 
 #: contrib/localflavor/uk/uk_regions.py:57
 msgid "County Down"
-msgstr "County Down"
+msgstr "Contea di Down"
 
 #: contrib/localflavor/uk/uk_regions.py:58
 msgid "County Fermanagh"
-msgstr "County Fermanagh"
+msgstr "Contea di Fermanagh"
 
 #: contrib/localflavor/uk/uk_regions.py:59
 msgid "County Londonderry"
-msgstr "County Londonderry"
+msgstr "Contea di Londonderry"
 
 #: contrib/localflavor/uk/uk_regions.py:60
 msgid "County Tyrone"
-msgstr "County Tyrone"
+msgstr "Contea di Tyrone"
 
 #: contrib/localflavor/uk/uk_regions.py:64
 msgid "Clwyd"
