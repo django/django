@@ -326,8 +326,8 @@ shortcut. Here's the ``detail()`` view, rewritten::
         return render_to_response('polls/detail.html', {'poll': p})
 
 The :func:`~django.shortcuts.get_object_or_404` function takes a Django model
-module as its first argument and an arbitrary number of keyword arguments, which
-it passes to the module's :meth:`~django.db.models.QuerySet.get` function. It
+as its first argument and an arbitrary number of keyword arguments, which it
+passes to the module's :meth:`~django.db.models.QuerySet.get` function. It
 raises :exc:`~django.http.Http404` if the object doesn't exist.
 
 .. admonition:: Philosophy
