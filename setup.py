@@ -76,6 +76,7 @@ setup(
     url = 'http://www.djangoproject.com/',
     author = 'Django Software Foundation',
     author_email = 'foundation@djangoproject.com',
+    download_url = 'http://media.djangoproject.com/releases/1.0.3/Django-1.0.3.tar.gz',
     description = 'A high-level Python Web framework that encourages rapid development and clean, pragmatic design.',
     packages = packages,
     cmdclass = cmdclasses,
