@@ -5,9 +5,9 @@ msgstr ""
 "Project-Id-Version: Django-1.1-rc-1\n"
 "Report-Msgid-Bugs-To: kowito@felspar.com\n"
 "POT-Creation-Date: 2008-09-02 22:36-0700\n"
-"PO-Revision-Date: 2009-07-27 21:29+0700\n"
+"PO-Revision-Date: 2009-07-28 22:31+0700\n"
 "Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
-"Language-Team: Kowit Charoenratchatabhan,Kadsarin Sanjek, Felspar <kowito@felspar.com>\n"
+"Language-Team: Kowit Charoenratchatabhan<kowito@felspar.com>,Kadsarin Sanjek, Felspar,Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -66,7 +66,7 @@ msgstr "เอสโตเนีย"
 
 #: conf/global_settings.py:56
 msgid "Argentinean Spanish"
-msgstr "สเปน(อาร์เจนตินา)"
+msgstr "สเปน (อาร์เจนตินา)"
 
 #: conf/global_settings.py:57
 msgid "Basque"
@@ -142,7 +142,7 @@ msgstr "ลิทัวเนีย"
 
 #: conf/global_settings.py:75
 msgid "Macedonian"
-msgstr "มาซีโดเนีย"
+msgstr "มาซิโดเนีย"
 
 #: conf/global_settings.py:76
 msgid "Dutch"
@@ -174,7 +174,7 @@ msgstr "รัสเซีย"
 
 #: conf/global_settings.py:83
 msgid "Slovak"
-msgstr "สโลวะเกีย"
+msgstr "สโลวัก"
 
 #: conf/global_settings.py:84
 msgid "Slovenian"
@@ -310,12 +310,12 @@ msgstr "และ"
 #: contrib/admin/options.py:343
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr "เพิ่ม %(name)s \"%(object)s\"."
+msgstr "เพิ่ม %(name)s \"%(object)s\" แล้ว"
 
 #: contrib/admin/options.py:347
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "เปลี่ยน %(list)s เพื่อ %(name)s \"%(object)s\""
+msgstr "เปลี่ยน %(list)s สำหรับ %(name)s \"%(object)s\" แล้ว"
 
 #: contrib/admin/options.py:352
 #, python-format
@@ -330,34 +330,34 @@ msgstr "ไม่มีฟิลด์ใดถูกเปลี่ยน"
 #: contrib/auth/admin.py:51
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" ได้ถูกเพิ่มเรียบร้อยแล้ว"
+msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
 
 #: contrib/admin/options.py:421
 #: contrib/admin/options.py:454
 #: contrib/auth/admin.py:59
 msgid "You may edit it again below."
-msgstr "สามารถแก้ไขเพิ่มเติมได้ด้านล่าง"
+msgstr "สามารถแก้ไขเพิ่มเติมได้ที่ด้านล่าง"
 
 #: contrib/admin/options.py:431
 #: contrib/admin/options.py:464
 #, python-format
 msgid "You may add another %s below."
-msgstr "คุณสามารถเพิ่ม %s ได้อีกด้านล่าง"
+msgstr "คุณสามารถเพิ่ม %s ได้อีกที่ด้านล่าง"
 
 #: contrib/admin/options.py:452
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" ได้ถูกเปลี่ยนแปลงเรียบร้อยแล้ว"
+msgstr "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
 
 #: contrib/admin/options.py:460
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr " %(name)s \"%(obj)s\" ได้ถูกเพิ่มเรียบร้อยแล้ว, แก้ไขอีกครั้งได้ด้านล่าง"
+msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว แก้ไขได้อีกที่ด้านล่าง"
 
 #: contrib/admin/options.py:536
 #, python-format
 msgid "Add %s"
-msgstr "เพิ่ม%s"
+msgstr "เพิ่ม %s"
 
 #: contrib/admin/options.py:614
 #, python-format
@@ -371,7 +371,7 @@ msgstr "เกิดความผิดพลาดที่ฐานข้อ
 #: contrib/admin/options.py:696
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" ได้ถูกลบเรียบร้อยแล้ว"
+msgstr "ลบ %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
 
 #: contrib/admin/options.py:703
 msgid "Are you sure?"
@@ -396,19 +396,19 @@ msgstr "กรุณาลงชื่อเข้าใช้อีกครั
 #: contrib/admin/sites.py:234
 #: contrib/admin/views/decorators.py:47
 msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
-msgstr "ดูเหมือนบราวเซอร์ของคุณจะไม่เปิดระบบคุกกี้ กรุณาเปิดระบบคุกกี้และลองเรียกหน้านี้ใหม่อีกครั้ง"
+msgstr "ดูเหมือนเบราว์เซอร์ของคุณจะไม่เปิดรับคุกกี้ กรุณาเปิดรับคุกกี้และลองเรียกหน้านี้ใหม่อีกครั้ง"
 
 #: contrib/admin/sites.py:250
 #: contrib/admin/sites.py:256
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
-msgstr "ชื่อผู้ใช้ไม่สามารถใช้สัญลักษณ์ '@' นี้ได้"
+msgstr "ชื่อผู้ใช้ไม่สามารถใช้อักขระ '@' ได้"
 
 #: contrib/admin/sites.py:253
 #: contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "อีเมลไม่ใช่ชื่อผู้ใช้ของคุณ ลองใช้ '%s' แทน"
+msgstr "ที่อยู่อีเมลไม่ใช่ชื่อผู้ใช้ของคุณ ลองใช้ '%s' แทน"
 
 #: contrib/admin/sites.py:313
 msgid "Site administration"
@@ -3901,11 +3901,11 @@ msgstr ", %(number)d %(type)s"
 
 #: utils/translation/trans_real.py:403
 msgid "DATE_FORMAT"
-msgstr "N j, Y"
+msgstr "j N Y"
 
 #: utils/translation/trans_real.py:405
 msgid "TIME_FORMAT"
-msgstr "P"
+msgstr "G:i"
 
 #: utils/translation/trans_real.py:421
 msgid "YEAR_MONTH_FORMAT"
@@ -3913,7 +3913,7 @@ msgstr "F Y"
 
 #: utils/translation/trans_real.py:422
 msgid "MONTH_DAY_FORMAT"
-msgstr "F j"
+msgstr "j F"
 
 #: views/generic/create_update.py:114
 #, python-format
