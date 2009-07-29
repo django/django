@@ -1192,9 +1192,7 @@ def runserver(addr, port, use_reloader=True, admin_media_dir=''):
         print "Development server is running at http://%s:%s/" % (addr, port)
         print "Quit the server with %s." % quit_command
         try:
-            import django
-            path = admin_media_dir or django.__path__[0] + '/contrib/admin/media'
-            handler = AdminMediaHandler(WSGIHandler(), path)
+            handler = AdminMediaHandler(WSGIHandler(), admin_media_path)
             run(addr, int(port), handler)
         except WSGIServerException, e:
             # Use helpful error messages instead of ugly tracebacks.
