@@ -34,10 +34,11 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
 
 setup(
     name = "Django",
-    version = "0.96.3",
+    version = "0.96.4",
     url = 'http://www.djangoproject.com/',
-    author = 'Lawrence Journal-World',
-    author_email = 'holovaty@gmail.com',
+    author = 'Django Software Foundation',
+    author_email = 'foundation@djangoproject.com',
+    download_url = 'http://media.djangoproject.com/releases/0.96/Django-0.96.4.tar.gz',
     description = 'A high-level Python Web framework that encourages rapid development and clean, pragmatic design.',
     packages = packages,
     data_files = data_files,
