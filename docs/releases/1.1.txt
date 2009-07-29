@@ -4,6 +4,9 @@
 Django 1.1 release notes
 ========================
 
+
+July 29, 2009
+
 Welcome to Django 1.1!
 
 Django 1.1 includes a number of nifty `new features`_, lots of bug
