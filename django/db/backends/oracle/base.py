@@ -345,7 +345,7 @@ class OracleParam(object):
     """
     Wrapper object for formatting parameters for Oracle. If the string
     representation of the value is large enough (greater than 4000 characters)
-    the input size needs to be set as NCLOB. Alternatively, if the parameter
+    the input size needs to be set as CLOB. Alternatively, if the parameter
     has an `input_size` attribute, then the value of the `input_size` attribute
     will be used instead. Otherwise, no input size will be set for the
     parameter when executing the query.
@@ -360,8 +360,8 @@ class OracleParam(object):
             # If parameter has `input_size` attribute, use that.
             self.input_size = param.input_size
         elif isinstance(param, basestring) and len(param) > 4000:
-            # Mark any string param greater than 4000 characters as an NCLOB.
-            self.input_size = Database.NCLOB
+            # Mark any string param greater than 4000 characters as a CLOB.
+            self.input_size = Database.CLOB
         else:
             self.input_size = None
 

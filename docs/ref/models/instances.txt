@@ -188,6 +188,46 @@ almost always do the right thing and trying to override that will lead to
 errors that are difficult to track down. This feature is for advanced use
 only.
 
+Updating attributes based on existing fields
+--------------------------------------------
+
+Sometimes you'll need to perform a simple arithmetic task on a field, such
+as incrementing or decrementing the current value. The obvious way to
+achieve this is to do something like::
+
+    >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
+    >>> product.number_sold += 1
+    >>> product.save()
+
+If the old ``number_sold`` value retrieved from the database was 10, then
+the value of 11 will be written back to the database.
+
+This can be optimized slightly by expressing the update relative to the
+original field value, rather than as an explicit assignment of a new value.
+Django provides :ref:`F() expressions <query-expressions>` as a way of
+performing this kind of relative update. Using ``F()`` expressions, the
+previous example would be expressed as::
+
+    >>> from django.db.models import F
+    >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
+    >>> product.number_sold = F('number_sold') + 1
+    >>> product.save()
+
+This approach doesn't use the initial value from the database. Instead, it
+makes the database do the update based on whatever value is current at the
+time that the save() is executed.
+
+Once the object has been saved, you must reload the object in order to access
+the actual value that was applied to the updated field::
+
+    >>> product = Products.objects.get(pk=product.pk)
+    >>> print product.number_sold
+    42
+
+For more details, see the documentation on :ref:`F() expressions
+<query-expressions>` and their :ref:`use in update queries
+<topics-db-queries-update>`.
+
 Deleting objects
 ================
 
@@ -196,7 +236,7 @@ Deleting objects
    Issues a SQL ``DELETE`` for the object. This only deletes the object in the
    database; the Python instance will still be around, and will still have data
    in its fields.
-   
+
    For more details, including how to delete objects in bulk, see
    :ref:`topics-db-queries-delete`.
 
