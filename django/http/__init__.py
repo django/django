@@ -278,7 +278,7 @@ class HttpResponse(object):
                  content_type=None, request=None):
         from django.conf import settings
         accept_charset = None
-        _charset = settings.DEFAULT_CHARSET
+        self._charset = settings.DEFAULT_CHARSET
         if mimetype:
             content_type = mimetype  # Mimetype arg is an alias for content-type
         if request:
@@ -502,12 +502,6 @@ class HttpResponseNotAllowed(HttpResponse):
     def __init__(self, permitted_methods):
         HttpResponse.__init__(self)
         self['Allow'] = ', '.join(permitted_methods)
-
-class HttpResponseNotAcceptable(HttpResponse):
-    _status_code = 406
-
-    # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-    # if we want to make this more verbose (compliant, actually)
 
 class HttpResponseGone(HttpResponse):
     _status_code = 410

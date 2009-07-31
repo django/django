@@ -240,7 +240,7 @@ def get_codec(charset):
     http://www.iana.org/assignments/character-sets contains valid aliases.
     The documentation for the codecs module has the list of codecs.
     
-    CODEC_CHARSETS above has the codecs that correspond to character sets.
+    _CHARSET_CODECS above has the codecs that correspond to character sets.
     """
     codec = None
     if charset:
@@ -324,7 +324,6 @@ def get_response_encoding(content_type, accept_charset_header):
     # code in the HttpResponse.
     return charset, codec
 
-# NOTE -- make sure we are not duping the processing of q values
 def _process_accept_charset(accept_charset):
     '''
     HTTP RFC 2616 section 14.2 dictates that q must be between 0 and 1.
