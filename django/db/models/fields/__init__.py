@@ -10,8 +10,8 @@ except ImportError:
 
 from django.db import connection
 from django.db.models import signals
+from django.db.models.fields.subclassing import LegacyConnection
 from django.db.models.query_utils import QueryWrapper
-from django.db.utils import call_with_connection
 from django.dispatch import dispatcher
 from django.conf import settings
 from django import forms
@@ -50,6 +50,7 @@ class FieldDoesNotExist(Exception):
 #     getattr(obj, opts.pk.attname)
 
 class Field(object):
+    __metaclass__ = LegacyConnection
     # Designates whether empty strings fundamentally are allowed at the
     # database level.
     empty_strings_allowed = True
@@ -190,8 +191,7 @@ class Field(object):
 
     def get_db_prep_save(self, value, connection):
         "Returns field's value prepared for saving into a database."
-        return call_with_connection(self.get_db_prep_value, value,
-            connection=connection)
+        return self.get_db_prep_value(value, connection=connection)
 
     def get_db_prep_lookup(self, lookup_type, value, connection):
         "Returns field's value prepared for database lookup."
@@ -210,9 +210,9 @@ class Field(object):
         if lookup_type in ('regex', 'iregex', 'month', 'day', 'week_day', 'search'):
             return [value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
-            return [call_with_connection(self.get_db_prep_value, value, connection=connection)]
+            return [self.get_db_prep_value(value, connection=connection)]
         elif lookup_type in ('range', 'in'):
-            return [call_with_connection(self.get_db_prep_value, v, connection=connection) for v in value]
+            return [self.get_db_prep_value(v, connection=connection) for v in value]
         elif lookup_type in ('contains', 'icontains'):
             return ["%%%s%%" % connection.ops.prep_for_like_query(value)]
         elif lookup_type == 'iexact':
@@ -426,8 +426,8 @@ class BooleanField(Field):
         # constructing the list.
         if value in ('1', '0'):
             value = bool(int(value))
-        return call_with_connection(super(BooleanField, self).get_db_prep_lookup,
-            lookup_type, value, connection=connection)
+        return super(BooleanField, self).get_db_prep_lookup(lookup_type, value,
+            connection=connection)
 
     def validate(self, lookup_type, value):
         if super(BooleanField, self).validate(lookup_type, value):
@@ -544,8 +544,8 @@ class DateField(Field):
         # to an int so the database backend always sees a consistent type.
         if lookup_type in ('month', 'day', 'week_day'):
             return [int(value)]
-        return call_with_connection(super(DateField, self).get_db_prep_lookup,
-            lookup_type, value, connection=connection)
+        return super(DateField, self).get_db_prep_lookup(lookup_type, value,
+            connection=connection)
 
     def get_db_prep_value(self, value, connection):
         # Casts dates into the format expected by the backend
@@ -807,8 +807,8 @@ class NullBooleanField(Field):
         # constructing the list.
         if value in ('1', '0'):
             value = bool(int(value))
-        return call_with_connection(super(NullBooleanField, self).get_db_prep_lookup,
-            lookup_type, value, connection=connection)
+        return super(NullBooleanField, self).get_db_prep_lookup(lookup_type,
+            value, connection=connection)
 
     def validate(self, lookup_type, value):
         if value in ('1', '0'):

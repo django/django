@@ -6,7 +6,6 @@ import datetime
 from django.utils import tree
 from django.db.models.fields import Field
 from django.db.models.query_utils import QueryWrapper
-from django.db.utils import call_with_connection
 from datastructures import EmptyResultSet, FullResultSet
 
 # Connection types
@@ -143,8 +142,8 @@ class WhereNode(tree.Node):
             except EmptyShortCircuit:
                 raise EmptyResultSet
         else:
-            params = call_with_connection(Field().get_db_prep_lookup,
-                lookup_type, params_or_value, connection=connection)
+            params = Field().get_db_prep_lookup(lookup_type, params_or_value,
+                connection=connection)
         if isinstance(lvalue, tuple):
             # A direct database column lookup.
             field_sql = self.sql_for_columns(lvalue, qn, connection)
@@ -267,15 +266,15 @@ class Constraint(object):
         from django.db.models.base import ObjectDoesNotExist
         try:
             if self.field:
-                params = call_with_connection(self.field.get_db_prep_lookup,
-                    lookup_type, value, connection=connection)
-                db_type = call_with_connection(self.field.db_type, connection=connection)
+                params = self.field.get_db_prep_lookup(lookup_type, value,
+                    connection=connection)
+                db_type = self.field.db_type(connection=connection)
             else:
                 # This branch is used at times when we add a comparison to NULL
                 # (we don't really want to waste time looking up the associated
                 # field object at the calling location).
-                params = call_with_connection(Field().get_db_prep_lookup,
-                    lookup_type, value, connection=connection)
+                params = Field().get_db_prep_lookup(lookup_type, value,
+                    connection=connection)
                 db_type = None
         except ObjectDoesNotExist:
             raise EmptyShortCircuit

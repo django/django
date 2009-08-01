@@ -116,7 +116,7 @@ def sql_delete(app, style, connection):
 
 def sql_reset(app, style, connection):
     "Returns a list of the DROP TABLE SQL, then the CREATE TABLE SQL, for the given module."
-    return sql_delete(app, style) + sql_all(app, style)
+    return sql_delete(app, style, connection) + sql_all(app, style, connection)
 
 def sql_flush(style, connection, only_django=False):
     """

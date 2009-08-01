@@ -8,7 +8,6 @@ except NameError:
 
 from django.conf import settings
 from django.core.management import call_command
-from django.db.utils import call_with_connection
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -48,7 +47,7 @@ class BaseDatabaseCreation(object):
         pending_references = {}
         qn = self.connection.ops.quote_name
         for f in opts.local_fields:
-            col_type = call_with_connection(f.db_type, connection=self.connection)
+            col_type = f.db_type(connection=self.connection)
             tablespace = f.db_tablespace or opts.db_tablespace
             if col_type is None:
                 # Skip ManyToManyFields, because they're not represented as
@@ -76,7 +75,7 @@ class BaseDatabaseCreation(object):
             table_output.append(' '.join(field_output))
         if opts.order_with_respect_to:
             table_output.append(style.SQL_FIELD(qn('_order')) + ' ' + \
-                style.SQL_COLTYPE(models.IntegerField().db_type(self.connection)))
+                style.SQL_COLTYPE(models.IntegerField().db_type(connection=self.connection)))
         for field_constraints in opts.unique_together:
             table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' % \
                 ", ".join([style.SQL_FIELD(qn(opts.get_field(f).column)) for f in field_constraints]))
@@ -174,7 +173,7 @@ class BaseDatabaseCreation(object):
                 style.SQL_TABLE(qn(f.m2m_db_table())) + ' (']
             table_output.append('    %s %s %s%s,' %
                 (style.SQL_FIELD(qn('id')),
-                style.SQL_COLTYPE(models.AutoField(primary_key=True).db_type(self.connection)),
+                style.SQL_COLTYPE(models.AutoField(primary_key=True).db_type(connection=self.connection)),
                 style.SQL_KEYWORD('NOT NULL PRIMARY KEY'),
                 tablespace_sql))
 
@@ -218,14 +217,14 @@ class BaseDatabaseCreation(object):
         table_output = [
             '    %s %s %s %s (%s)%s,' %
                 (style.SQL_FIELD(qn(field.m2m_column_name())),
-                style.SQL_COLTYPE(models.ForeignKey(model).db_type(self.connection)),
+                style.SQL_COLTYPE(models.ForeignKey(model).db_type(connection=self.connection)),
                 style.SQL_KEYWORD('NOT NULL REFERENCES'),
                 style.SQL_TABLE(qn(opts.db_table)),
                 style.SQL_FIELD(qn(opts.pk.column)),
                 self.connection.ops.deferrable_sql()),
             '    %s %s %s %s (%s)%s,' %
                 (style.SQL_FIELD(qn(field.m2m_reverse_name())),
-                style.SQL_COLTYPE(models.ForeignKey(field.rel.to).db_type(self.connection)),
+                style.SQL_COLTYPE(models.ForeignKey(field.rel.to).db_type(connection=self.connection)),
                 style.SQL_KEYWORD('NOT NULL REFERENCES'),
                 style.SQL_TABLE(qn(field.rel.to._meta.db_table)),
                 style.SQL_FIELD(qn(field.rel.to._meta.pk.column)),

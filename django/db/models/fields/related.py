@@ -5,7 +5,6 @@ from django.db.models.fields import AutoField, Field, IntegerField, PositiveInte
 from django.db.models.related import RelatedObject
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import QueryWrapper
-from django.db.utils import call_with_connection
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy, string_concat, ungettext, ugettext as _
 from django.utils.functional import curry
@@ -137,8 +136,7 @@ class RelatedField(object):
             if field:
                 if lookup_type in ('range', 'in'):
                     v = [v]
-                v = call_with_connection(field.get_db_prep_lookup,
-                    lookup_type, v, connection=connection)
+                v = field.get_db_prep_lookup(lookup_type, v, connection=connection)
                 if isinstance(v, list):
                     v = v[0]
             return v
@@ -725,8 +723,8 @@ class ForeignKey(RelatedField, Field):
         if value == '' or value == None:
             return None
         else:
-            return call_with_connection(self.rel.get_related_field().get_db_prep_save,
-                value, connection=connection)
+            return self.rel.get_related_field().get_db_prep_save(value,
+                connection=connection)
 
     def value_to_string(self, obj):
         if not obj:
@@ -774,8 +772,8 @@ class ForeignKey(RelatedField, Field):
                 (not connection.features.related_fields_match_type and
                 isinstance(rel_field, (PositiveIntegerField,
                                        PositiveSmallIntegerField)))):
-            return IntegerField().db_type(connection)
-        return call_with_connection(rel_field.db_type, connection=connection)
+            return IntegerField().db_type(connection=connection)
+        return rel_field.db_type(connection=connection)
 
 class OneToOneField(ForeignKey):
     """

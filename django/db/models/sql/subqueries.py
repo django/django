@@ -8,7 +8,6 @@ from django.db.models.sql.datastructures import Date
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
-from django.db.utils import call_with_connection
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
         'AggregateQuery']
@@ -244,8 +243,7 @@ class UpdateQuery(Query):
             if hasattr(val, 'prepare_database_save'):
                 val = val.prepare_database_save(field)
             else:
-                val = call_with_connection(field.get_db_prep_save,
-                    val, connection=self.connection)
+                val = field.get_db_prep_save(val, connection=self.connection)
 
             # Getting the placeholder for the field.
             if hasattr(field, 'get_placeholder'):

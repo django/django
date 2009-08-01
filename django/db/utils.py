@@ -32,12 +32,6 @@ def load_backend(backend_name):
             else:
                 raise # If there's some other error, this must be an error in Django itself.
 
-def call_with_connection(func, *args, **kwargs):
-    arg_names, varargs, varkwargs, defaults = inspect.getargspec(func)
-    if 'connection' not in arg_names and varkwargs is None:
-        del kwargs['connection']
-    return func(*args, **kwargs)
-
 
 class ConnectionHandler(object):
     def __init__(self, databases):

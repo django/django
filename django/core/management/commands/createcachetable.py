@@ -2,7 +2,6 @@ from optparse import make_option
 
 from django.core.management.base import LabelCommand
 from django.db import connections, transaction, models, DEFAULT_DB_ALIAS
-from django.db.utils import call_with_connection
 
 class Command(LabelCommand):
     help = "Creates the table needed to use the SQL cache backend."
@@ -31,7 +30,7 @@ class Command(LabelCommand):
         index_output = []
         qn = connection.ops.quote_name
         for f in fields:
-            field_output = [qn(f.name), call_with_connection(f.db_type, connection=connection)]
+            field_output = [qn(f.name), f.db_type(connection=connection)]
             field_output.append("%sNULL" % (not f.null and "NOT " or ""))
             if f.primary_key:
                 field_output.append("PRIMARY KEY")

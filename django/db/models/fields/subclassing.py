@@ -1,11 +1,48 @@
 """
-Convenience routines for creating non-trivial Field subclasses.
+Convenience routines for creating non-trivial Field subclasses, as well as
+backwards compatibility utilities.
 
 Add SubfieldBase as the __metaclass__ for your Field subclass, implement
 to_python() and the other necessary methods and everything will work seamlessly.
 """
 
-class SubfieldBase(type):
+from inspect import getargspec
+from warnings import warn
+
+def call_with_connection(func):
+    arg_names, varargs, varkwargs, defaults = getargspec(func)
+    takes_connection = 'connection' in arg_names or varkwargs
+    if not takes_connection:
+        warn("A Field class who's %s method doesn't take connection has been "
+            "defined, please add a connection argument" % func.__name__,
+            PendingDeprecationWarning, depth=2)
+    def inner(*args, **kwargs):
+        if 'connection' not in kwargs:
+            from django.db import connection
+            kwargs['connection'] = connection
+            warn("%s has been called without providing a connection argument, "
+                "please provide one" % func.__name__, PendingDeprecationWarning,
+                depth=1)
+        if takes_connection:
+            return func(*args, **kwargs)
+        if 'connection' in kwargs:
+            del kwargs['connection']
+        return func(*args, **kwargs)
+    return inner
+
+class LegacyConnection(type):
+    """
+    A metaclass to normalize arguments give to the get_db_prep_* and db_type
+    methods on fields.
+    """
+    def __new__(cls, names, bases, attrs):
+        new_cls = super(LegacyConnection, cls).__new__(cls, names, bases, attrs)
+        for attr in ('db_type', 'get_db_prep_save', 'get_db_prep_lookup',
+            'get_db_prep_value'):
+            setattr(new_cls, attr, call_with_connection(getattr(new_cls, attr)))
+        return new_cls
+
+class SubfieldBase(LegacyConnection):
     """
     A metaclass for custom Field subclasses. This ensures the model's attribute
     has the descriptor protocol attached to it.
@@ -26,7 +63,7 @@ class Creator(object):
     def __get__(self, obj, type=None):
         if obj is None:
             raise AttributeError('Can only be accessed via an instance.')
-        return obj.__dict__[self.field.name]        
+        return obj.__dict__[self.field.name]
 
     def __set__(self, obj, value):
         obj.__dict__[self.field.name] = self.field.to_python(value)
