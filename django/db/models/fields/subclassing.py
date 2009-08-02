@@ -15,14 +15,14 @@ def call_with_connection(func):
     if not takes_connection:
         warn("A Field class who's %s method doesn't take connection has been "
             "defined, please add a connection argument" % func.__name__,
-            PendingDeprecationWarning, depth=2)
+            PendingDeprecationWarning, stacklevel=2)
     def inner(*args, **kwargs):
         if 'connection' not in kwargs:
             from django.db import connection
             kwargs['connection'] = connection
             warn("%s has been called without providing a connection argument, "
                 "please provide one" % func.__name__, PendingDeprecationWarning,
-                depth=1)
+                stacklevel=1)
         if takes_connection:
             return func(*args, **kwargs)
         if 'connection' in kwargs:
