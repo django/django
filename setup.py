@@ -91,6 +91,7 @@ setup(
                    'Topic :: Internet :: WWW/HTTP',
                    'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
                    'Topic :: Internet :: WWW/HTTP :: WSGI',
+                   'Topic :: Software Development :: Libraries :: Application Frameworks',
                    'Topic :: Software Development :: Libraries :: Python Modules',
                    ],
 )
