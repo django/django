@@ -135,19 +135,21 @@ Joseph Kocherhans
 .. _michael meeks: http://en.wikipedia.org/wiki/Michael_Meeks_(software)
 
 `Brian Rosner`_
-    Brian is currently a web developer working on an e-commerce system in
-    Django. He spends his free time contributing to Django and enjoys to learn
-    more about programming languages and system architectures. Brian is the
-    co-host of the weekly podcast, `This Week in Django`_.
-
+    Brian is currently the tech lead at Eldarion_ managing and developing
+    Django / Pinax_ based websites. He enjoys learning more about programming
+    languages and system architectures and contributing to open source
+    projects. Brian is the host of the `Django Dose`_ podcasts.
+    
     Brian helped immensely in getting Django's "newforms-admin" branch finished
     in time for Django 1.0; he's now a full committer, continuing to improve on
     the admin and forms system.
 
-    Brian lives in Denver, USA.
+    Brian lives in Denver, Colorado, USA.
 
 .. _brian rosner: http://oebfare.com/
-.. _this week in django: http://thisweekindjango.com/
+.. _eldarion: http://eldarion.com/
+.. _pinax: http://pinaxproject.com/
+.. _django dose: http://djangodose.com/
 
 `Gary Wilson`_
     Gary starting contributing patches to Django in 2006 while developing Web
