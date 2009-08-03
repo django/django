@@ -326,7 +326,6 @@ class GalleryAdmin(admin.ModelAdmin):
 class PictureAdmin(admin.ModelAdmin):
     pass
 
-
 class Language(models.Model):
     iso = models.CharField(max_length=5, primary_key=True)
     name = models.CharField(max_length=50)
@@ -401,8 +400,25 @@ class WhatsitInline(admin.StackedInline):
 class FancyDoodadInline(admin.StackedInline):
     model = FancyDoodad
 
+class Category(models.Model):
+    collector = models.ForeignKey(Collector)
+    order = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ('order',)
+
+    def __unicode__(self):
+        return u'%s:o%s' % (self.id, self.order)
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'collector', 'order')
+    list_editable = ('order',)
+
+class CategoryInline(admin.StackedInline):
+    model = Category
+
 class CollectorAdmin(admin.ModelAdmin):
-    inlines = [WidgetInline, DooHickeyInline, GrommetInline, WhatsitInline, FancyDoodadInline]
+    inlines = [WidgetInline, DooHickeyInline, GrommetInline, WhatsitInline, FancyDoodadInline, CategoryInline]
 
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
@@ -426,6 +442,7 @@ admin.site.register(Language, LanguageAdmin)
 admin.site.register(Recommendation, RecommendationAdmin)
 admin.site.register(Recommender)
 admin.site.register(Collector, CollectorAdmin)
+admin.site.register(Category, CategoryAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
