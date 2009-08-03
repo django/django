@@ -11,12 +11,13 @@ from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.core import urlresolvers
 
+accepted_kwargs = ('content_type', 'mimetype', 'request')
 def render_to_response(*args, **kwargs):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
-    httpresponse_kwargs = {'mimetype': kwargs.pop('mimetype', None)}
+    httpresponse_kwargs = dict([(k, kwargs.pop(k, None)) for k in accepted_kwargs])
     return HttpResponse(loader.render_to_string(*args, **kwargs), **httpresponse_kwargs)
 
 def redirect(to, *args, **kwargs):

@@ -17,7 +17,7 @@ introduce controlled coupling for convenience's sake.
 ``render_to_response``
 ======================
 
-.. function:: render_to_response(template[, dictionary][, context_instance][, mimetype])
+.. function:: render_to_response(template[, dictionary][, context_instance][, mimetype, content_type, status])
 
    Renders a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -48,11 +48,24 @@ Optional arguments
                                   my_data_dictionary,
                                   context_instance=RequestContext(request))
 
+``content_type``
+    .. versionadded:: 1.2
+
+    The value for the Content-Type header to use in the resulting document. Can
+    also contain a MIME type. Defaults to the value of the :setting:`DEFAULT_CONTENT_TYPE` setting.
+
 ``mimetype``
     .. versionadded:: 1.0
 
-    The MIME type to use for the resulting document. Defaults to the value of
+    Alias for content_type, for backwards compatibility. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
+
+``request``
+    .. versionadded:: 1.2
+
+    The request can be passed to HttpResponse for handling the Accept-Charset
+    header, which allows clients to specify the encoding in which they wish to
+    receive the content.
 
 Example
 -------
