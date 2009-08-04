@@ -84,26 +84,6 @@ def datetime(nodes, name, locale, previous):
     else:
         return None
 
-def first_day(nodes, name, locale, previous):
-    DAY_MAP = {
-        'sun': '0',
-        'mon': '1',
-        'tue': '2',
-        'wed': '3',
-        'thu': '4',
-        'fri': '5',
-        'sat': '6',
-    }
-    for node in nodes:
-        territories = node.attrib['territories']
-        day = node.attrib['day']
-        if territories == '001':
-            result = day
-        if locale.upper() in territories.split():
-            result = day
-            break
-    return DAY_MAP.get(result)
-
 FORMATS_MAP = [
     {
         'name': 'DATE_FORMAT',
@@ -148,6 +128,9 @@ FORMATS_MAP = [
         'conversion': datetime,
     },
     {'name': 'FIRST_DAY_OF_WEEK'},
+    {'name': 'DATE_INPUT_FORMATS'},
+    {'name': 'TIME_INPUT_FORMATS'},
+    {'name': 'DATETIME_INPUT_FORMATS'},
     {
         'name': 'DECIMAL_SEPARATOR',
         'file': os.path.join('common', 'main', '%(locale)s.xml'),
