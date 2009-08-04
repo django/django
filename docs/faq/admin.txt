@@ -37,20 +37,19 @@ Set the :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY` setting to ``True``. See the
 How do I automatically set a field's value to the user who last edited the object in the admin?
 -----------------------------------------------------------------------------------------------
 
-At this point, Django doesn't have an official way to do this. But it's an oft-requested
-feature, so we're discussing how it can be implemented. The problem is we don't want to couple
-the model layer with the admin layer with the request layer (to get the current user). It's a
-tricky problem.
-
-One person hacked up a `solution that doesn't require patching Django`_, but note that it's an
-unofficial solution, and there's no guarantee it won't break at some point.
-
-.. _solution that doesn't require patching Django: http://lukeplant.me.uk/blog.php?id=1107301634
+The :class:`ModelAdmin` class provides customization hooks that allow you to transform
+an object as it saved, using details from the request. By extracting the current user
+from the request, and customizing the :meth:`ModelAdmin.save_model` hook, you can update
+an object to reflect the user that edited it. See :ref:`the documentation on ModelAdmin
+methods <model-admin-methods>` for an example.
 
 How do I limit admin access so that objects can only be edited by the users who created them?
 ---------------------------------------------------------------------------------------------
 
-See the answer to the previous question.
+The :class:`ModelAdmin` class also provides customization hooks that allow you to control the
+visibility and editability of objects in the admin. Using the same trick of extracting the
+user from the request, the :meth:`ModelAdmin.queryset` and :meth:`ModelAdmin.has_change_permission`
+can be used to control the visibility and editability of objects in the admin.
 
 My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_python.
 ---------------------------------------------------------------------------------------------------------------------------

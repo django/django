@@ -12,7 +12,9 @@ class Membership(models.Model):
     def __unicode__(self):
         return "%s is a member of %s" % (self.person.name, self.group.name)
 
+# using custom id column to test ticket #11107
 class UserMembership(models.Model):
+    id = models.AutoField(db_column='usermembership_id', primary_key=True)
     user = models.ForeignKey(User)
     group = models.ForeignKey('Group')
     price = models.IntegerField(default=100)
@@ -195,5 +197,13 @@ doing a join.
 ## Regression test for #9804
 # Flush the database, just to make sure we can.
 >>> management.call_command('flush', verbosity=0, interactive=False)
+
+## Regression test for #11107
+Ensure that sequences on m2m_through tables are being created for the through
+model, not for a phantom auto-generated m2m table.
+
+>>> management.call_command('loaddata', 'm2m_through', verbosity=0)
+>>> management.call_command('dumpdata', 'm2m_through_regress', format='json')
+[{"pk": 1, "model": "m2m_through_regress.usermembership", "fields": {"price": 100, "group": 1, "user": 1}}, {"pk": 1, "model": "m2m_through_regress.person", "fields": {"name": "Guido"}}, {"pk": 1, "model": "m2m_through_regress.group", "fields": {"name": "Python Core Group"}}]
 
 """}

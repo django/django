@@ -135,24 +135,49 @@ Joseph Kocherhans
 .. _michael meeks: http://en.wikipedia.org/wiki/Michael_Meeks_(software)
 
 `Brian Rosner`_
-    Brian is currently a web developer working on an e-commerce system in
-    Django. He spends his free time contributing to Django and enjoys to learn
-    more about programming languages and system architectures. Brian is the
-    co-host of the weekly podcast, `This Week in Django`_.
-
+    Brian is currently the tech lead at Eldarion_ managing and developing
+    Django / Pinax_ based websites. He enjoys learning more about programming
+    languages and system architectures and contributing to open source
+    projects. Brian is the host of the `Django Dose`_ podcasts.
+    
     Brian helped immensely in getting Django's "newforms-admin" branch finished
     in time for Django 1.0; he's now a full committer, continuing to improve on
     the admin and forms system.
 
-    Brian lives in Denver, USA.
+    Brian lives in Denver, Colorado, USA.
 
 .. _brian rosner: http://oebfare.com/
-.. _this week in django: http://thisweekindjango.com/
+.. _eldarion: http://eldarion.com/
+.. _pinax: http://pinaxproject.com/
+.. _django dose: http://djangodose.com/
 
-Gary Wilson
-    In early 2007, Gary started contributing a lot of cleanup fixes and fixing
-    broken windows. He's continued to do that necessary tidying up work
-    throughout the code base since then.
+`Gary Wilson`_
+    Gary starting contributing patches to Django in 2006 while developing Web
+    applications for `The University of Texas`_ (UT).  Since, he has made
+    contributions to the e-mail and forms systems, as well as many other
+    improvements and code cleanups throughout the code base.
+
+    Gary is currently a developer and software engineering graduate student at
+    UT, where his dedication to spreading the ways of Python and Django never
+    ceases.
+
+    Gary lives in Austin, Texas, USA.
+
+.. _Gary Wilson: http://gdub.wordpress.com/
+.. _The University of Texas: http://www.utexas.edu/
+
+Justin Bronn
+    Justin Bronn is a computer scientist and attorney specializing
+    in legal topics related to intellectual property and spatial law.
+
+    In 2007, Justin began developing ``django.contrib.gis`` in a branch,
+    a.k.a. GeoDjango_, which was merged in time for Django 1.0.  While
+    implementing GeoDjango, Justin obtained a deep knowledge of Django's
+    internals including the ORM, the admin, and Oracle support.
+
+    Justin lives in Houston, Texas.
+
+.. _GeoDjango: http://geodjango.org/
 
 Karen Tracey
     Karen has a background in distributed operating systems (graduate school),
@@ -186,16 +211,6 @@ Ian Kelly
 
 Matt Boersma
     Matt is also responsible for Django's Oracle support.
-
-Justin Bronn
-    Justin Bronn is a computer scientist and third-year law student at the
-    University of Houston who enjoys studying legal topics related to
-    intellectual property and spatial law.
-
-    Justin is the primary developer of ``django.contrib.gis``, a.k.a.
-    GeoDjango_.
-
-.. _GeoDjango: http://geodjango.org/
 
 Jeremy Dunck
     Jeremy the lead developer of Pegasus News, a personalized local site based

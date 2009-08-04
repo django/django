@@ -6,7 +6,16 @@ __all__ = ['handler404', 'handler500', 'include', 'patterns', 'url']
 handler404 = 'django.views.defaults.page_not_found'
 handler500 = 'django.views.defaults.server_error'
 
-include = lambda urlconf_module: [urlconf_module]
+def include(arg, namespace=None, app_name=None):
+    if isinstance(arg, tuple):
+        # callable returning a namespace hint
+        if namespace:
+            raise ImproperlyConfigured('Cannot override the namespace for a dynamic module that provides a namespace')
+        urlconf_module, app_name, namespace = arg
+    else:
+        # No namespace hint - use manually provided namespace
+        urlconf_module = arg
+    return (urlconf_module, app_name, namespace)
 
 def patterns(prefix, *args):
     pattern_list = []
@@ -19,9 +28,10 @@ def patterns(prefix, *args):
     return pattern_list
 
 def url(regex, view, kwargs=None, name=None, prefix=''):
-    if type(view) == list:
+    if isinstance(view, (list,tuple)):
         # For include(...) processing.
-        return RegexURLResolver(regex, view[0], kwargs)
+        urlconf_module, app_name, namespace = view
+        return RegexURLResolver(regex, urlconf_module, kwargs, app_name=app_name, namespace=namespace)
     else:
         if isinstance(view, basestring):
             if not view:

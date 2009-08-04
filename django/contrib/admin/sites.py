@@ -5,6 +5,7 @@ from django.contrib.admin import actions
 from django.contrib.auth import authenticate, login
 from django.db.models.base import ModelBase
 from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.utils.functional import update_wrapper
 from django.utils.safestring import mark_safe
@@ -38,17 +39,14 @@ class AdminSite(object):
     login_template = None
     app_index_template = None
 
-    def __init__(self, name=None):
+    def __init__(self, name=None, app_name='admin'):
         self._registry = {} # model_class class -> admin_class instance
-        # TODO Root path is used to calculate urls under the old root() method
-        # in order to maintain backwards compatibility we are leaving that in
-        # so root_path isn't needed, not sure what to do about this.
-        self.root_path = 'admin/'
+        self.root_path = None
         if name is None:
-            name = ''
+            self.name = 'admin'
         else:
-            name += '_'
-        self.name = name
+            self.name = name
+        self.app_name = app_name
         self._actions = {'delete_selected': actions.delete_selected}
         self._global_actions = self._actions.copy()
 
@@ -114,20 +112,20 @@ class AdminSite(object):
         name = name or action.__name__
         self._actions[name] = action
         self._global_actions[name] = action
-        
+
     def disable_action(self, name):
         """
         Disable a globally-registered action. Raises KeyError for invalid names.
         """
         del self._actions[name]
-        
+
     def get_action(self, name):
         """
         Explicitally get a registered global action wheather it's enabled or
         not. Raises KeyError for invalid names.
         """
         return self._global_actions[name]
-    
+
     def actions(self):
         """
         Get all the enabled actions as an iterable of (name, func).
@@ -159,9 +157,9 @@ class AdminSite(object):
         if 'django.core.context_processors.auth' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
             raise ImproperlyConfigured("Put 'django.core.context_processors.auth' in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
 
-    def admin_view(self, view):
+    def admin_view(self, view, cacheable=False):
         """
-        Decorator to create an "admin view attached to this ``AdminSite``. This
+        Decorator to create an admin view attached to this ``AdminSite``. This
         wraps the view and provides permission checking by calling
         ``self.has_permission``.
 
@@ -177,43 +175,49 @@ class AdminSite(object):
                         url(r'^my_view/$', self.admin_view(some_view))
                     )
                     return urls
+
+        By default, admin_views are marked non-cacheable using the
+        ``never_cache`` decorator. If the view can be safely cached, set
+        cacheable=True.
         """
         def inner(request, *args, **kwargs):
             if not self.has_permission(request):
                 return self.login(request)
             return view(request, *args, **kwargs)
+        if not cacheable:
+            inner = never_cache(inner)
         return update_wrapper(inner, view)
 
     def get_urls(self):
         from django.conf.urls.defaults import patterns, url, include
 
-        def wrap(view):
+        def wrap(view, cacheable=False):
             def wrapper(*args, **kwargs):
-                return self.admin_view(view)(*args, **kwargs)
+                return self.admin_view(view, cacheable)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
         # Admin-site-wide views.
         urlpatterns = patterns('',
             url(r'^$',
                 wrap(self.index),
-                name='%sadmin_index' % self.name),
+                name='index'),
             url(r'^logout/$',
                 wrap(self.logout),
-                name='%sadmin_logout'),
+                name='logout'),
             url(r'^password_change/$',
-                wrap(self.password_change),
-                name='%sadmin_password_change' % self.name),
+                wrap(self.password_change, cacheable=True),
+                name='password_change'),
             url(r'^password_change/done/$',
-                wrap(self.password_change_done),
-                name='%sadmin_password_change_done' % self.name),
+                wrap(self.password_change_done, cacheable=True),
+                name='password_change_done'),
             url(r'^jsi18n/$',
-                wrap(self.i18n_javascript),
-                name='%sadmin_jsi18n' % self.name),
+                wrap(self.i18n_javascript, cacheable=True),
+                name='jsi18n'),
             url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$',
                 'django.views.defaults.shortcut'),
             url(r'^(?P<app_label>\w+)/$',
                 wrap(self.app_index),
-                name='%sadmin_app_list' % self.name),
+                name='app_list')
         )
 
         # Add in each model's views.
@@ -225,7 +229,7 @@ class AdminSite(object):
         return urlpatterns
 
     def urls(self):
-        return self.get_urls()
+        return self.get_urls(), self.app_name, self.name
     urls = property(urls)
 
     def password_change(self, request):
@@ -233,8 +237,11 @@ class AdminSite(object):
         Handles the "change password" task -- both form display and validation.
         """
         from django.contrib.auth.views import password_change
-        return password_change(request,
-            post_change_redirect='%spassword_change/done/' % self.root_path)
+        if self.root_path is not None:
+            url = '%spassword_change/done/' % self.root_path
+        else:
+            url = reverse('admin:password_change_done', current_app=self.name)
+        return password_change(request, post_change_redirect=url)
 
     def password_change_done(self, request):
         """
@@ -362,8 +369,9 @@ class AdminSite(object):
             'root_path': self.root_path,
         }
         context.update(extra_context or {})
+        context_instance = template.RequestContext(request, current_app=self.name)
         return render_to_response(self.index_template or 'admin/index.html', context,
-            context_instance=template.RequestContext(request)
+            context_instance=context_instance
         )
     index = never_cache(index)
 
@@ -376,8 +384,9 @@ class AdminSite(object):
             'root_path': self.root_path,
         }
         context.update(extra_context or {})
+        context_instance = template.RequestContext(request, current_app=self.name)
         return render_to_response(self.login_template or 'admin/login.html', context,
-            context_instance=template.RequestContext(request)
+            context_instance=context_instance
         )
 
     def app_index(self, request, app_label, extra_context=None):
@@ -419,9 +428,10 @@ class AdminSite(object):
             'root_path': self.root_path,
         }
         context.update(extra_context or {})
+        context_instance = template.RequestContext(request, current_app=self.name)
         return render_to_response(self.app_index_template or ('admin/%s/app_index.html' % app_label,
             'admin/app_index.html'), context,
-            context_instance=template.RequestContext(request)
+            context_instance=context_instance
         )
 
     def root(self, request, url):

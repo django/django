@@ -40,7 +40,7 @@ class BaseDatabaseCreation(object):
         from django.db import models
 
         opts = model._meta
-        if not opts.managed:
+        if not opts.managed or opts.proxy:
             return [], {}
         final_output = []
         table_output = []
@@ -121,7 +121,7 @@ class BaseDatabaseCreation(object):
         "Returns any ALTER TABLE statements to add constraints after the fact."
         from django.db.backends.util import truncate_name
 
-        if not model._meta.managed:
+        if not model._meta.managed or model._meta.proxy:
             return []
         qn = self.connection.ops.quote_name
         final_output = []
@@ -236,7 +236,7 @@ class BaseDatabaseCreation(object):
 
     def sql_indexes_for_model(self, model, style):
         "Returns the CREATE INDEX SQL statements for a single model"
-        if not model._meta.managed:
+        if not model._meta.managed or model._meta.proxy:
             return []
         output = []
         for f in model._meta.local_fields:
@@ -268,7 +268,7 @@ class BaseDatabaseCreation(object):
 
     def sql_destroy_model(self, model, references_to_delete, style):
         "Return the DROP TABLE and restraint dropping statements for a single model"
-        if not model._meta.managed:
+        if not model._meta.managed or model._meta.proxy:
             return []
         # Drop the table now
         qn = self.connection.ops.quote_name
@@ -286,7 +286,7 @@ class BaseDatabaseCreation(object):
     def sql_remove_table_constraints(self, model, references_to_delete, style):
         from django.db.backends.util import truncate_name
 
-        if not model._meta.managed:
+        if not model._meta.managed or model._meta.proxy:
             return []
         output = []
         qn = self.connection.ops.quote_name

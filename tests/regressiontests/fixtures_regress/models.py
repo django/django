@@ -54,7 +54,7 @@ class Parent(models.Model):
 class Child(Parent):
     data = models.CharField(max_length=10)
 
-# Models to regresison check #7572
+# Models to regression test #7572
 class Channel(models.Model):
     name = models.CharField(max_length=255)
 
@@ -64,6 +64,14 @@ class Article(models.Model):
 
     class Meta:
         ordering = ('id',)
+
+# Models to regression test #11428
+class Widget(models.Model):
+    name = models.CharField(max_length=255)
+
+class WidgetProxy(Widget):
+    class Meta:
+        proxy = True
 
 __test__ = {'API_TESTS':"""
 >>> from django.core import management
@@ -169,5 +177,19 @@ Weight = 1.2 (<type 'float'>)
 # Dump the current contents of the database as a JSON fixture
 >>> management.call_command('dumpdata', 'fixtures_regress.animal', format='json')
 [{"pk": 1, "model": "fixtures_regress.animal", "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}}, {"pk": 2, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.29..., "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}}, {"pk": 10, "model": "fixtures_regress.animal", "fields": {"count": 42, "weight": 1.2, "name": "Emu", "latin_name": "Dromaius novaehollandiae"}}]
+
+###############################################
+# Regression for #11428 - Proxy models aren't included
+# when you run dumpdata over an entire app
+
+# Flush out the database first
+>>> management.call_command('reset', 'fixtures_regress', interactive=False, verbosity=0)
+
+# Create an instance of the concrete class
+>>> Widget(name='grommet').save()
+
+# Dump data for the entire app. The proxy class shouldn't be included
+>>> management.call_command('dumpdata', 'fixtures_regress', format='json')
+[{"pk": 1, "model": "fixtures_regress.widget", "fields": {"name": "grommet"}}]
 
 """}

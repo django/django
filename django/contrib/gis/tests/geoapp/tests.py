@@ -148,15 +148,16 @@ class GeoModelTest(unittest.TestCase):
         ptown1 = City.objects.gml(field_name='point', precision=9).get(name='Pueblo')
         ptown2 = City.objects.gml(precision=9).get(name='Pueblo')
 
+        import re
         if SpatialBackend.oracle:
             # No precision parameter for Oracle :-/
-            import re
-            gml_regex = re.compile(r'<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml"><gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ </gml:coordinates></gml:Point>')
+            gml_regex = re.compile(r'^<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml"><gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ </gml:coordinates></gml:Point>')
             for ptown in [ptown1, ptown2]:
-                self.assertEqual(True, bool(gml_regex.match(ptown.gml)))
+                self.failUnless(gml_regex.match(ptown.gml))
         else:
+            gml_regex = re.compile(r'^<gml:Point srsName="EPSG:4326"><gml:coordinates>-104\.60925\d+,38\.255001</gml:coordinates></gml:Point>')
             for ptown in [ptown1, ptown2]:
-                self.assertEqual('<gml:Point srsName="EPSG:4326"><gml:coordinates>-104.609252,38.255001</gml:coordinates></gml:Point>', ptown.gml)
+                self.failUnless(gml_regex.match(ptown.gml))
 
     @no_spatialite
     @no_oracle
@@ -167,28 +168,38 @@ class GeoModelTest(unittest.TestCase):
         if not SpatialBackend.geojson:
             return
 
+        major, minor1, minor2 = SpatialBackend.version
+        if major >=1 and minor1 >= 4:
+            pueblo_json = '{"type":"Point","coordinates":[-104.609252,38.255001]}'
+            houston_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"coordinates":[-95.363151,29.763374]}'
+            victoria_json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.305196,48.462611]}'
+            chicago_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
+        else:
+            pueblo_json = '{"type":"Point","coordinates":[-104.60925200,38.25500100]}'
+            houston_json = '{"type":"Point","crs":{"type":"EPSG","properties":{"EPSG":4326}},"coordinates":[-95.36315100,29.76337400]}'
+            victoria_json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.30519600,48.46261100]}'
+            chicago_json = '{"type":"Point","crs":{"type":"EPSG","properties":{"EPSG":4326}},"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
+            
         # Precision argument should only be an integer
         self.assertRaises(TypeError, City.objects.geojson, precision='foo')
         
         # Reference queries and values.
         # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 0) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Pueblo';
-        json = '{"type":"Point","coordinates":[-104.60925200,38.25500100]}'
-        self.assertEqual(City.objects.geojson().get(name='Pueblo').geojson, json)
+        self.assertEqual(pueblo_json, City.objects.geojson().get(name='Pueblo').geojson)
 
-        # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 1) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Houston';
-        json = '{"type":"Point","crs":{"type":"EPSG","properties":{"EPSG":4326}},"coordinates":[-95.36315100,29.76337400]}'
+        # 1.3.x: SELECT ST_AsGeoJson("geoapp_city"."point", 8, 1) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Houston';
+        # 1.4.x: SELECT ST_AsGeoJson("geoapp_city"."point", 8, 2) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Houston';
         # This time we want to include the CRS by using the `crs` keyword.
-        self.assertEqual(City.objects.geojson(crs=True, model_att='json').get(name='Houston').json, json)
+        self.assertEqual(houston_json, City.objects.geojson(crs=True, model_att='json').get(name='Houston').json)
 
-        # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 2) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Victoria';
-        json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.30519600,48.46261100]}'
+        # 1.3.x: SELECT ST_AsGeoJson("geoapp_city"."point", 8, 2) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Victoria';
+        # 1.4.x: SELECT ST_AsGeoJson("geoapp_city"."point", 8, 1) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Houston';
         # This time we include the bounding box by using the `bbox` keyword.
-        self.assertEqual(City.objects.geojson(bbox=True).get(name='Victoria').geojson, json)
+        self.assertEqual(victoria_json, City.objects.geojson(bbox=True).get(name='Victoria').geojson)
 
-        # SELECT ST_AsGeoJson("geoapp_city"."point", 5, 3) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Chicago';
-        json = '{"type":"Point","crs":{"type":"EPSG","properties":{"EPSG":4326}},"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
+        # 1.(3|4).x: SELECT ST_AsGeoJson("geoapp_city"."point", 5, 3) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Chicago';
         # Finally, we set every available keyword.
-        self.assertEqual(City.objects.geojson(bbox=True, crs=True, precision=5).get(name='Chicago').geojson, json)
+        self.assertEqual(chicago_json, City.objects.geojson(bbox=True, crs=True, precision=5).get(name='Chicago').geojson)
         
     @no_oracle
     def test03d_svg(self):

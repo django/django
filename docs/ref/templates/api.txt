@@ -86,9 +86,16 @@ Rendering a context
 
 Once you have a compiled ``Template`` object, you can render a context -- or
 multiple contexts -- with it. The ``Context`` class lives at
-``django.template.Context``, and the constructor takes one (optional)
-argument: a dictionary mapping variable names to variable values. Call the
-``Template`` object's ``render()`` method with the context to "fill" the
+``django.template.Context``, and the constructor takes two (optional)
+arguments:
+
+    * A dictionary mapping variable names to variable values.
+
+    * The name of the current application. This application name is used
+      to help :ref:`resolve namespaced URLs<topics-http-reversing-url-namespaces>`.
+      If you're not using namespaced URLs, you can ignore this argument.
+
+Call the ``Template`` object's ``render()`` method with the context to "fill" the
 template::
 
     >>> from django.template import Context, Template
@@ -549,13 +556,13 @@ Here are the template loaders that come with Django:
     Note that the loader performs an optimization when it is first imported: It
     caches a list of which :setting:`INSTALLED_APPS` packages have a
     ``templates`` subdirectory.
-    
+
     This loader is enabled by default.
 
 ``django.template.loaders.eggs.load_template_source``
     Just like ``app_directories`` above, but it loads templates from Python
     eggs rather than from the filesystem.
-    
+
     This loader is disabled by default.
 
 Django uses the template loaders in order according to the
