@@ -70,10 +70,16 @@ Localization of dates and numbers
 >>> import datetime
 >>> import decimal
 >>> from django.utils.formats import getformat, date_format, number_format, localize
+>>> from django import template
 
 >>> n = decimal.Decimal('66666.666')
->>> d = datetime.date(2009, 7, 6)
->>> dt = datetime.datetime(2009, 7, 6, 20, 50)
+>>> f = 99999.999
+>>> d = datetime.date(2009, 12, 31)
+>>> dt = datetime.datetime(2009, 12, 31, 20, 50)
+>>> ctxt = template.Context({'n': n, 'd': d, 'dt': dt, 'f': f})
+
+>>> tplt = template.Template('{{ n }} # {{ f }} # {{ d }} # {{ dt }}')
+>>> tplt_filters = template.Template('{{ n|floatformat:2 }} # {{ f|floatformat:2 }} # {{ d }} # {{ dt }}')
 
 Locale independent
 
@@ -92,19 +98,37 @@ English locale
 >>> getformat('DECIMAL_SEPARATOR')
 '.'
 >>> date_format(d)
-'July 6, 2009'
+'December 31, 2009'
 >>> date_format(d, 'YEAR_MONTH_FORMAT')
-'July 2009'
+'December 2009'
 >>> date_format(d, 'SHORT_DATETIME_FORMAT')
-'07/06/2009 8:50 p.m.'
+'12/31/2009 8:50 p.m.'
 >>> localize('No localizable')
 'No localizable'
 >>> localize(n)
 '66666.666'
+>>> localize(f)
+'99999.999'
 >>> localize(d)
-'July 6, 2009'
+'December 31, 2009'
 >>> localize(dt)
-'July 6, 2009, 8:50 p.m.'
+'December 31, 2009, 8:50 p.m.'
+>>> template.Template('{{ n }}').render(ctxt)
+'66666.666'
+>>> template.Template('{{ f }}').render(ctxt)
+'99999.999'
+>>> template.Template('{{ d }}').render(ctxt)
+'December 31, 2009'
+>>> template.Template('{{ dt }}').render(ctxt)
+'December 31, 2009, 8:50 p.m.'
+>>> template.Template('{{ n|floatformat:2 }}').render(ctxt)
+'66666.66'
+>>> template.Template('{{ f|floatformat }}').render(ctxt)
+'99999.9'
+>>> template.Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(ctxt)
+'12/31/2009'
+>>> template.Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(ctxt)
+'12/31/2009 8:50 p.m.'
 
 Catalan locale
 
@@ -116,19 +140,39 @@ Catalan locale
 >>> getformat('DECIMAL_SEPARATOR')
 ','
 >>> date_format(d)
-'6 de juliol de 2009'
+'31 de desembre de 2009'
 >>> date_format(d, 'YEAR_MONTH_FORMAT')
-'juliol de 2009'
+'desembre de 2009'
 >>> date_format(d, 'SHORT_DATETIME_FORMAT')
-'06/07/2009 20:50'
+'31/12/2009 20:50'
 >>> localize('No localizable')
 'No localizable'
 >>> localize(n)
 '66.666,666'
+>>> localize(f)
+'99.999,999'
 >>> localize(d)
-'6 de juliol de 2009'
+'31 de desembre de 2009'
 >>> localize(dt)
-'6 de juliol de 2009 a les 20:50'
+'31 de desembre de 2009 a les 20:50'
+>>> tplt.render(ctxt)
+'66.666,666 # 99.999,999 # 6 de juliol de 2009 # 6 de juliol de 2009 a les 20:50'
+>>> template.Template('{{ n }}').render(ctxt)
+'66666,666'
+>>> template.Template('{{ f }}').render(ctxt)
+'99999,999'
+>>> template.Template('{{ d }}').render(ctxt)
+'31 de desembre de 2009'
+>>> template.Template('{{ dt }}').render(ctxt)
+'31 de desembre de 2009 a les 20:50'
+>>> template.Template('{{ n|floatformat:2 }}').render(ctxt)
+'66666,66'
+>>> template.Template('{{ f|floatformat }}').render(ctxt)
+'99999,9'
+>>> template.Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(ctxt)
+'31/12/2009'
+>>> template.Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(ctxt)
+'31/12/2009 20:50'
 
 """
 
