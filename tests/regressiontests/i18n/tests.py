@@ -71,15 +71,19 @@ Localization of dates and numbers
 >>> import decimal
 >>> from django.utils.formats import getformat, date_format, number_format, localize
 >>> from django import template
+>>> from django import forms
 
 >>> n = decimal.Decimal('66666.666')
 >>> f = 99999.999
 >>> d = datetime.date(2009, 12, 31)
 >>> dt = datetime.datetime(2009, 12, 31, 20, 50)
 >>> ctxt = template.Context({'n': n, 'd': d, 'dt': dt, 'f': f})
-
->>> tplt = template.Template('{{ n }} # {{ f }} # {{ d }} # {{ dt }}')
->>> tplt_filters = template.Template('{{ n|floatformat:2 }} # {{ f|floatformat:2 }} # {{ d }} # {{ dt }}')
+>>> class I18nForm(forms.Form):
+...     decimal_field = forms.DecimalField()
+...     float_field = forms.FloatField()
+...     date_field = forms.DateField()
+...     datetime_field = forms.DateTimeField()
+...     time_field = forms.TimeField()
 
 Locale independent
 
@@ -129,6 +133,17 @@ English locale
 '12/31/2009'
 >>> template.Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(ctxt)
 '12/31/2009 8:50 p.m.'
+>>> form = I18nForm({'decimal_field': u'66666.666', 'float_field': u'99999.999', 'date_field': u'12/31/2009', 'datetime_field': u'12/31/2009 20:50', 'time_field': u'20:50'})
+>>> form.cleaned_data['decimal_field']
+decimal.Decimal('66666.666')
+>>> form.cleaned_data['float_field']
+99999.999
+>>> form.cleaned_data['date_field']
+datetime.date(2009, 12, 31)
+>>> form.cleaned_data['datetime_field']
+datetime.datetime(2009, 12, 31, 20, 50)
+>>> form.cleaned_data['time_field']
+datetime.time(20, 50)
 
 Catalan locale
 
@@ -173,6 +188,17 @@ Catalan locale
 '31/12/2009'
 >>> template.Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(ctxt)
 '31/12/2009 20:50'
+>>> form = I18nForm({'decimal_field': u'66666,666', 'float_field': u'99999,999', 'date_field': u'31/12/2009', 'datetime_field': u'31/12/2009 20:50', 'time_field': u'20:50'})
+>>> form.cleaned_data['decimal_field']
+decimal.Decimal('66666.666')
+>>> form.cleaned_data['float_field']
+99999.999
+>>> form.cleaned_data['date_field']
+datetime.date(2009, 12, 31)
+>>> form.cleaned_data['datetime_field']
+datetime.datetime(2009, 12, 31, 20, 50)
+>>> form.cleaned_data['time_field']
+datetime.time(20, 50)
 
 """
 
