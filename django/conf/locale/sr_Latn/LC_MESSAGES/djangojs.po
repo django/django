@@ -2,116 +2,119 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django-1.1-rc-1\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-02 22:36-0700\n"
-"PO-Revision-Date: 2009-07-27 21:47+0700\n"
-"Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
-"Language-Team: Kowit Charoenratchatabhan,Kadsarin Sanjek, Felspar <kowito@felspar.com>\n"
+"POT-Creation-Date: 2009-03-30 14:00+0200\n"
+"PO-Revision-Date: 2009-03-30 14:04+0200\n"
+"Last-Translator: Janos Guljas <janos@janos.in.rs>\n"
+"Language-Team: Branko Vukelic <bg.branko@gmail.com> & Janos Guljas "
+"<janos@janos.in.rs> & Nesh <djnesh@gmail.com> & Petar <petar.maric@gmail."
+"com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Thai\n"
-"X-Poedit-Country: THAILAND\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "%sที่มีอยู่"
+msgstr "Dostupni %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
-msgstr "เลือกทั้งหมด"
+msgstr "Dodaj sve"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
-msgstr "เพิ่ม"
+msgstr "Dodaj"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr "ลบออก"
+msgstr "Ukloni"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr "%sที่ถูกเลือก"
+msgstr "Odabrani %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "เลือกและคลิก"
+msgstr "Napravite izbor i kliknite "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr "ลบทั้งหมด"
+msgstr "Vrati sve"
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
-msgid "January February March April May June July August September October November December"
-msgstr "มกราคม กุมภาพันธ์ มีนาคม เมษายน พฤษภาคม มิถุนายน กรกฎาคม สิงหาคม กันยายน ตุลาคม พฤศจิกายน ธันวาคม"
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"januar februar mart april maj jun jul avgust septembar oktobar novembar "
+"decembar"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
-msgstr "อา. จ. อ. พ. พฤ. ศ. ส."
+msgstr "N P U S Č P S"
 
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "อาทิตย์ จันทร์ อังคาร พุธ พฤหัสบดี ศุกร์ เสาร์"
+msgstr "nedelja ponedeljak utorak sreda četvrtak petak subota"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
 msgid "Show"
-msgstr "แสดง"
+msgstr "Pokaži"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
 msgid "Hide"
-msgstr "ซ่อน"
+msgstr "Sakrij"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Now"
-msgstr "ขณะนี้"
+msgstr "Trenutno vreme"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
 msgid "Clock"
-msgstr "นาฬิกา"
+msgstr "Sat"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
 msgid "Choose a time"
-msgstr "เลือกเวลา"
+msgstr "Odabir vremena"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "Midnight"
-msgstr "เที่ยงคืน"
+msgstr "Ponoć"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
-msgstr "หกโมงเช้า"
+msgstr "18č"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
-msgstr "เที่ยงวัน"
+msgstr "Podne"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
 msgid "Cancel"
-msgstr "ยกเลิก"
+msgstr "Poništi"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
 msgid "Today"
-msgstr "วันนี้"
+msgstr "Danas"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
 msgid "Calendar"
-msgstr "ปฏิทิน"
+msgstr "Kalendar"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
 msgid "Yesterday"
-msgstr "เมื่อวาน"
+msgstr "Juče"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
-msgstr "พรุ่งนี้"
-
+msgstr "Sutra"

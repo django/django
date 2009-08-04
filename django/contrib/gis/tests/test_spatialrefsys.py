@@ -1,4 +1,5 @@
 import unittest
+from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.tests.utils import mysql, no_mysql, oracle, postgis, spatialite
 if not mysql:
     from django.contrib.gis.models import SpatialRefSys
@@ -7,6 +8,7 @@ test_srs = ({'srid' : 4326,
              'auth_name' : ('EPSG', True),
              'auth_srid' : 4326,
              'srtext' : 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]',
+             'srtext14' : 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]',
              'proj4' : '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ',
              'spheroid' : 'WGS 84', 'name' : 'WGS 84', 
              'geographic' : True, 'projected' : False, 'spatialite' : True,
@@ -17,6 +19,7 @@ test_srs = ({'srid' : 4326,
              'auth_name' : ('EPSG', False),
              'auth_srid' : 32140,
              'srtext' : 'PROJCS["NAD83 / Texas South Central",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["standard_parallel_1",30.28333333333333],PARAMETER["standard_parallel_2",28.38333333333333],PARAMETER["latitude_of_origin",27.83333333333333],PARAMETER["central_meridian",-99],PARAMETER["false_easting",600000],PARAMETER["false_northing",4000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","32140"]]',
+             'srtext14': 'PROJCS["NAD83 / Texas South Central",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],UNIT["metre",1,AUTHORITY["EPSG","9001"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["standard_parallel_1",30.28333333333333],PARAMETER["standard_parallel_2",28.38333333333333],PARAMETER["latitude_of_origin",27.83333333333333],PARAMETER["central_meridian",-99],PARAMETER["false_easting",600000],PARAMETER["false_northing",4000000],AUTHORITY["EPSG","32140"],AXIS["X",EAST],AXIS["Y",NORTH]]',
              'proj4' : '+proj=lcc +lat_1=30.28333333333333 +lat_2=28.38333333333333 +lat_0=27.83333333333333 +lon_0=-99 +x_0=600000 +y_0=4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs ',
              'spheroid' : 'GRS 1980', 'name' : 'NAD83 / Texas South Central',
              'geographic' : False, 'projected' : True, 'spatialite' : False,
@@ -24,6 +27,10 @@ test_srs = ({'srid' : 4326,
              'eprec' : (1, 5, 10),
              },
             )
+
+if SpatialBackend.postgis:
+    major, minor1, minor2 = SpatialBackend.version
+    POSTGIS_14 = major >=1 and minor1 >= 4
 
 class SpatialRefSysTest(unittest.TestCase):
 
@@ -45,7 +52,11 @@ class SpatialRefSysTest(unittest.TestCase):
 
             # No proj.4 and different srtext on oracle backends :(
             if postgis:
-                self.assertEqual(sd['srtext'], srs.wkt)
+                if POSTGIS_14:
+                    srtext = sd['srtext14']
+                else:
+                    srtext = sd['srtext']
+                self.assertEqual(srtext, srs.wkt)
                 self.assertEqual(sd['proj4'], srs.proj4text)
 
     @no_mysql
@@ -68,7 +79,11 @@ class SpatialRefSysTest(unittest.TestCase):
                 self.assertEqual(sd['proj4'], srs.proj4)
                 # No `srtext` field in the `spatial_ref_sys` table in SpatiaLite
                 if not spatialite:
-                    self.assertEqual(sd['srtext'], srs.wkt)
+                    if POSTGIS_14:
+                        srtext = sd['srtext14']
+                    else:
+                        srtext = sd['srtext']
+                    self.assertEqual(srtext, srs.wkt)
 
     @no_mysql
     def test03_ellipsoid(self):
