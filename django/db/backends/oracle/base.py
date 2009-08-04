@@ -138,7 +138,7 @@ WHEN (new.%(col_name)s IS NULL)
             return self._cache[DefaultQueryClass, subclass]
         Query = query.query_class(DefaultQueryClass, Database)
         if subclass is not None:
-            Query = type('Query', (subclsas, Query), {})
+            Query = type('Query', (subclass, Query), {})
         self._cache[DefaultQueryClass, subclass] = Query
         return Query
 

@@ -666,8 +666,12 @@ class QuerySet(object):
         connection = connections[alias]
         clone.query.set_connection(connection)
         cls = clone.query.get_query_class()
+        if cls is sql.Query:
+            subclass = None
+        else:
+            subclass = cls
         clone.query.__class__ = connection.ops.query_class(
-            sql.Query, cls is sql.Query and None or cls
+            sql.Query, subclass
         )
         return clone
 

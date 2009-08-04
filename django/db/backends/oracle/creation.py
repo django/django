@@ -206,7 +206,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 sys.stderr.write("Failed (%s)\n" % (err))
                 raise
 
-    def _test_database_name(self, settings):
+    def _test_database_name(self):
         name = TEST_DATABASE_PREFIX + self.connection.settings_dict['DATABASE_NAME']
         try:
             if self.connection.settings_dict['TEST_DATABASE_NAME']:
@@ -217,10 +217,10 @@ class DatabaseCreation(BaseDatabaseCreation):
             raise
         return name
 
-    def _test_database_create(self, settings):
+    def _test_database_create(self):
         name = True
         try:
-            if self.connection.setting_dict['TEST_DATABASE_CREATE']:
+            if self.connection.settings_dict['TEST_DATABASE_CREATE']:
                 name = True
             else:
                 name = False
@@ -230,7 +230,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             raise
         return name
 
-    def _test_user_create(self, settings):
+    def _test_user_create(self):
         name = True
         try:
             if self.connection.settings_dict['TEST_USER_CREATE']:
@@ -244,11 +244,11 @@ class DatabaseCreation(BaseDatabaseCreation):
         return name
 
     def _test_database_user(self):
-        name = TEST_DATABASE_PREFIX + self.settings_dict['DATABASE_USER']
+        name = TEST_DATABASE_PREFIX + self.connection.settings_dict['DATABASE_USER']
         try:
             if self.connection.settings_dict['TEST_DATABASE_USER']:
                 name = self.connection.settings_dict['TEST_DATABASE_USER']
-        except AttributeError:
+        except KeyError:
             pass
         except:
             raise
@@ -259,29 +259,29 @@ class DatabaseCreation(BaseDatabaseCreation):
         try:
             if self.connection.settings_dict['TEST_DATABASE_PASSWD']:
                 name = self.connection.settings_dict['TEST_DATABASE_PASSWD']
-        except AttributeError:
+        except KeyError:
             pass
         except:
             raise
         return name
 
-    def _test_database_tblspace(self, settings):
+    def _test_database_tblspace(self):
         name = TEST_DATABASE_PREFIX + self.connection.settings_dict['DATABASE_NAME']
         try:
             if self.connection.settings_dict['TEST_DATABASE_TBLSPACE']:
                 name = self.connection.settings_dict['TEST_DATABASE_TBLSPACE']
-        except AttributeError:
+        except KeyError:
             pass
         except:
             raise
         return name
 
-    def _test_database_tblspace_tmp(self, settings):
+    def _test_database_tblspace_tmp(self):
         name = TEST_DATABASE_PREFIX + self.connection.settings_dict['DATABASE_NAME'] + '_temp'
         try:
             if self.connection.settings_dict['TEST_DATABASE_TBLSPACE_TMP']:
                 name = self.connection.settings_dict['TEST_DATABASE_TBLSPACE_TMP']
-        except AttributeError:
+        except KeyError:
             pass
         except:
             raise
