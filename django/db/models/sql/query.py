@@ -29,9 +29,9 @@ try:
 except NameError:
     from sets import Set as set     # Python 2.3 fallback
 
-__all__ = ['Query', 'BaseQuery']
+__all__ = ['Query']
 
-class BaseQuery(object):
+class Query(object):
     """
     A single SQL query.
     """
@@ -150,6 +150,9 @@ class BaseQuery(object):
         self.__dict__.update(obj_dict)
         self.connection = connections[connections.alias_for_settings(
             obj_dict['connection_settings'])]
+
+    def get_query_class(self):
+        return Query
 
     def get_meta(self):
         """
@@ -319,7 +322,7 @@ class BaseQuery(object):
         # over the subquery instead.
         if self.group_by is not None:
             from subqueries import AggregateQuery
-            query = AggregateQuery(self.model, self.connection)
+            query = self.connection.ops.query_class(Query, AggregateQuery)(self.model, self.connection)
 
             obj = self.clone()
 
@@ -368,7 +371,7 @@ class BaseQuery(object):
             subquery.clear_ordering(True)
             subquery.clear_limits()
 
-            obj = AggregateQuery(obj.model, obj.connection)
+            obj = self.connection.ops.query_class(Query, AggregateQuery)(obj.model, obj.connection)
             obj.add_subquery(subquery)
 
         obj.add_count_column()
@@ -1962,7 +1965,7 @@ class BaseQuery(object):
         original exclude filter (filter_expr) and the portion up to the first
         N-to-many relation field.
         """
-        query = Query(self.model, self.connection)
+        query = self.connection.ops.query_class(Query)(self.model, self.connection)
         query.add_filter(filter_expr, can_reuse=can_reuse)
         query.bump_prefix()
         query.clear_ordering(True)
@@ -2388,13 +2391,6 @@ class BaseQuery(object):
             # before going any further.
             return list(result)
         return result
-
-# Use the backend's custom Query class if it defines one. Otherwise, use the
-# default.
-if connection.features.uses_custom_query_class:
-    Query = connection.ops.query_class(BaseQuery)
-else:
-    Query = BaseQuery
 
 def get_order_dir(field, default='ASC'):
     """

@@ -133,8 +133,14 @@ WHEN (new.%(col_name)s IS NULL)
             return u''
         return force_unicode(value.read())
 
-    def query_class(self, DefaultQueryClass):
-        return query.query_class(DefaultQueryClass, Database)
+    def query_class(self, DefaultQueryClass, subclass=None):
+        if (DefaultQueryClass, subclass) in self._cache:
+            return self._cache[DefaultQueryClass, subclass]
+        Query = query.query_class(DefaultQueryClass, Database)
+        if subclass is not None:
+            Query = type('Query', (subclsas, Query), {})
+        self._cache[DefaultQueryClass, subclass] = Query
+        return Query
 
     def quote_name(self, name):
         # SQL92 requires delimited (quoted) names to be case-sensitive.  When

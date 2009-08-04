@@ -40,7 +40,7 @@ class QuerySet(object):
             using = None
         using = using or DEFAULT_DB_ALIAS
         connection = connections[using]
-        self.query = query or sql.Query(self.model, connection)
+        self.query = query or connection.ops.query_class(sql.Query)(self.model, connection)
         self._result_cache = None
         self._iter = None
         self._sticky_filter = False
@@ -665,6 +665,10 @@ class QuerySet(object):
         clone._using = alias
         connection = connections[alias]
         clone.query.set_connection(connection)
+        cls = clone.query.get_query_class()
+        clone.query.__class__ = connection.ops.query_class(
+            sql.Query, cls is sql.Query and None or cls
+        )
         return clone
 
     ###################################
@@ -1078,16 +1082,16 @@ def delete_objects(seen_objs, using):
                 signals.pre_delete.send(sender=cls, instance=instance)
 
             pk_list = [pk for pk,instance in items]
-            del_query = sql.DeleteQuery(cls, connection)
+            del_query = connection.ops.query_class(sql.Query, sql.DeleteQuery)(cls, connection)
             del_query.delete_batch_related(pk_list)
 
-            update_query = sql.UpdateQuery(cls, connection)
+            update_query = connection.ops.query_class(sql.Query, sql.UpdateQuery)(cls, connection)
             for field, model in cls._meta.get_fields_with_model():
                 if (field.rel and field.null and field.rel.to in seen_objs and
                         filter(lambda f: f.column == field.rel.get_related_field().column,
                         field.rel.to._meta.fields)):
                     if model:
-                        sql.UpdateQuery(model, connection).clear_related(field,
+                        connection.ops.query_class(sql.Query, sql.UpdateQuery)(model, connection).clear_related(field,
                                 pk_list)
                     else:
                         update_query.clear_related(field, pk_list)
@@ -1098,7 +1102,7 @@ def delete_objects(seen_objs, using):
             items.reverse()
 
             pk_list = [pk for pk,instance in items]
-            del_query = sql.DeleteQuery(cls, connection)
+            del_query = connection.ops.query_class(sql.Query, sql.DeleteQuery)(cls, connection)
             del_query.delete_batch(pk_list)
 
             # Last cleanup; set NULLs where there once was a reference to the
@@ -1128,6 +1132,6 @@ def insert_query(model, values, return_id=False, raw_values=False, using=None):
     part of the public API.
     """
     connection = connections[using]
-    query = sql.InsertQuery(model, connection)
+    query = connection.ops.query_class(sql.Query, sql.InsertQuery)(model, connection)
     query.insert_values(values, raw_values)
     return query.execute_sql(return_id)

@@ -17,6 +17,9 @@ class DeleteQuery(Query):
     Delete queries are done through this class, since they are more constrained
     than general queries.
     """
+    def get_query_class(self):
+        return DeleteQuery
+
     def as_sql(self):
         """
         Creates the SQL for this query. Returns the SQL string and list of
@@ -95,6 +98,9 @@ class UpdateQuery(Query):
     def __init__(self, *args, **kwargs):
         super(UpdateQuery, self).__init__(*args, **kwargs)
         self._setup_query()
+
+    def get_query_class(self):
+        return UpdateQuery
 
     def _setup_query(self):
         """
@@ -279,7 +285,7 @@ class UpdateQuery(Query):
             return []
         result = []
         for model, values in self.related_updates.iteritems():
-            query = UpdateQuery(model, self.connection)
+            query = self.connection.ops.query_class(Query, UpdateQuery)(model, self.connection)
             query.values = values
             if self.related_ids:
                 query.add_filter(('pk__in', self.related_ids))
@@ -293,6 +299,9 @@ class InsertQuery(Query):
         self.values = []
         self.params = ()
         self.return_id = False
+
+    def get_query_class(self):
+        return InsertQuery
 
     def clone(self, klass=None, **kwargs):
         extras = {'columns': self.columns[:], 'values': self.values[:],
@@ -376,6 +385,9 @@ class DateQuery(Query):
             if isinstance(elt, Date):
                 self.date_sql_func = self.connection.ops.date_trunc_sql
 
+    def get_query_class(self):
+        return DateQuery
+
     def results_iter(self):
         """
         Returns an iterator over the results from executing this query.
@@ -418,6 +430,8 @@ class AggregateQuery(Query):
     An AggregateQuery takes another query as a parameter to the FROM
     clause and only selects the elements in the provided list.
     """
+    def get_query_class(self):
+        return AggregateQuery
 
     def add_subquery(self, query):
         self.subquery, self.sub_params = query.as_sql(with_col_aliases=True)

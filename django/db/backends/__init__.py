@@ -97,7 +97,6 @@ class BaseDatabaseFeatures(object):
     # True if django.db.backend.utils.typecast_timestamp is used on values
     # returned from dates() calls.
     needs_datetime_string_cast = True
-    uses_custom_query_class = False
     empty_fetchmany_value = []
     update_can_self_select = True
     interprets_empty_strings_as_nulls = False
@@ -115,6 +114,10 @@ class BaseDatabaseOperations(object):
     a backend performs ordering or calculates the ID of a recently-inserted
     row.
     """
+    def __init__(self):
+        # this cache is used for backends that provide custom Queyr classes
+        self._cache = {}
+
     def autoinc_sql(self, table, column):
         """
         Returns any SQL needed to support auto-incrementing primary keys, or
@@ -277,14 +280,15 @@ class BaseDatabaseOperations(object):
         """
         pass
 
-    def query_class(self, DefaultQueryClass):
+    def query_class(self, DefaultQueryClass, subclass=None):
         """
         Given the default Query class, returns a custom Query class
-        to use for this backend. Returns None if a custom Query isn't used.
-        See also BaseDatabaseFeatures.uses_custom_query_class, which regulates
-        whether this method is called at all.
+        to use for this backend. Returns the Query class unmodified if the
+        backend doesn't need a custom Query clsas.
         """
-        return None
+        if subclass is not None:
+            return subclass
+        return DefaultQueryClass
 
     def quote_name(self, name):
         """
