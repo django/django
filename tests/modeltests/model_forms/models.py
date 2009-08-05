@@ -1338,27 +1338,35 @@ __test__['API_TESTS'] += """
 ...    class Meta:
 ...        model = CommaSeparatedInteger
 
->>> f = CommaSeparatedIntegerForm().fields['field']
->>> f.clean('1,2,3')
-u'1,2,3'
->>> f.clean('1a,2')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter only digits separated by commas.']
->>> f.clean(',,,,')
-u',,,,'
->>> f.clean('1.2')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter only digits separated by commas.']
->>> f.clean('1,a,2')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter only digits separated by commas.']
->>> f.clean('1,,2')
-u'1,,2'
->>> f.clean('1')
-u'1'
+>>> f = CommaSeparatedIntegerForm({'field': '1,2,3'})
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'field': u'1,2,3'}
+>>> f = CommaSeparatedIntegerForm({'field': '1a,2'})
+>>> f.errors
+{'field': [u'Enter only digits separated by commas.']}
+>>> f = CommaSeparatedIntegerForm({'field': ',,,,'})
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'field': u',,,,'}
+>>> f = CommaSeparatedIntegerForm({'field': '1.2'})
+>>> f.errors
+{'field': [u'Enter only digits separated by commas.']}
+>>> f = CommaSeparatedIntegerForm({'field': '1,a,2'})
+>>> f.errors
+{'field': [u'Enter only digits separated by commas.']}
+>>> f = CommaSeparatedIntegerForm({'field': '1,,2'})
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'field': u'1,,2'}
+>>> f = CommaSeparatedIntegerForm({'field': '1'})
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'field': u'1'}
 
 # unique/unique_together validation
 
