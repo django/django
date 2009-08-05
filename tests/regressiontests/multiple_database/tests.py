@@ -15,19 +15,6 @@ except ImportError:
     pass
 
 class ConnectionHandlerTestCase(TestCase):
-    def setUp(self):
-        settings.DATABASES['__test_db'] = {
-            'DATABASE_ENGINE': 'sqlite3',
-            'DATABASE_NAME': ':memory:',
-        }
-
-    def tearDown(self):
-        del settings.DATABASES['__test_db']
-
-    def test_db_connection(self):
-        connections['default'].cursor()
-        connections['__test_db'].cursor()
-
     def test_alias_for_connection(self):
         for db in connections:
             self.assertEqual(db, connections.alias_for_connection(connections[db]))
