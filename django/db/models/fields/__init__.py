@@ -491,11 +491,9 @@ class CharField(Field):
 
 # TODO: Maybe move this into contrib, because it's specialized.
 class CommaSeparatedIntegerField(CharField):
+    default_validators = [validators.validate_comma_separated_integer_list]
     def formfield(self, **kwargs):
         defaults = {
-            'form_class': forms.RegexField,
-            'regex': '^[\d,]+$',
-            'max_length': self.max_length,
             'error_messages': {
                 'invalid': _(u'Enter only digits separated by commas.'),
             }

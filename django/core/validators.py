@@ -40,6 +40,14 @@ def validate_ipv4_address(value):
             code="invalid"
         )
 
+comma_separated_int_list_re = re.compile('^[\d,]+$')
+
+def validate_comma_separated_integer_list(value):
+    if not comma_separated_int_list_re.search(smart_unicode(value)):
+        raise ValidationError(
+            _(u'Enter only digits separated by commas.'),
+            code="invalid"
+        )
 
 class MaxValueValidator(object):
     def __init__(self, max_value):
