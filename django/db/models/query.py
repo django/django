@@ -949,7 +949,10 @@ class DateQuerySet(QuerySet):
         instance.
         """
         self.query.clear_deferred_loading()
-        self.query = self.query.clone(klass=sql.DateQuery, setup=True)
+        self.query = self.query.clone(
+            klass=self.query.connection.ops.query_class(sql.Query, sql.DateQuery),
+            setup=True
+        )
         self.query.select = []
         field = self.model._meta.get_field(self._field_name, many_to_many=False)
         assert isinstance(field, DateField), "%r isn't a DateField." \
