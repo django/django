@@ -6,7 +6,7 @@ from django.db.models.related import RelatedObject
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import QueryWrapper
 from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext_lazy, string_concat, ungettext, ugettext as _
+from django.utils.translation import ugettext_lazy as _, string_concat, ungettext, ugettext
 from django.utils.functional import curry
 from django.core import exceptions
 from django import forms
@@ -683,6 +683,9 @@ class ManyToManyRel(object):
 
 class ForeignKey(RelatedField, Field):
     empty_strings_allowed = False
+    default_error_messages = {
+        'invalid': _('Model %(model)s with pk %(pk)r does not exist.')
+    }
     def __init__(self, to, to_field=None, rel_class=ManyToOneRel, **kwargs):
         try:
             to_name = to._meta.object_name.lower()
@@ -711,7 +714,8 @@ class ForeignKey(RelatedField, Field):
         try:
             self.rel.to._default_manager.get(**{self.rel.field_name:value})
         except self.rel.to.DoesNotExist, e:
-            raise exceptions.ValidationError('Model %s with pk %r does not exist.' % (self.rel.to._meta.verbose_name, value))
+            raise exceptions.ValidationError(
+                    self.error_messages['invalid'] % {'model': self.rel.to._meta.verbose_name, 'pk': value})
 
     def get_attname(self):
         return '%s_id' % self.name
@@ -832,7 +836,7 @@ class ManyToManyField(RelatedField, Field):
 
         Field.__init__(self, **kwargs)
 
-        msg = ugettext_lazy('Hold down "Control", or "Command" on a Mac, to select more than one.')
+        msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
         self.help_text = string_concat(self.help_text, ' ', msg)
 
     def get_choices_default(self):
