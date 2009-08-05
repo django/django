@@ -48,11 +48,11 @@ class DatabaseCreation(BaseDatabaseCreation):
         table_output = [
             '    %s %s %s,' %
                 (style.SQL_FIELD(qn(field.m2m_column_name())),
-                style.SQL_COLTYPE(models.ForeignKey(model).db_type(self.connection)),
+                style.SQL_COLTYPE(models.ForeignKey(model).db_type(connection=self.connection)),
                 style.SQL_KEYWORD('NOT NULL')),
             '    %s %s %s,' %
             (style.SQL_FIELD(qn(field.m2m_reverse_name())),
-            style.SQL_COLTYPE(models.ForeignKey(field.rel.to).db_type(self.connection)),
+            style.SQL_COLTYPE(models.ForeignKey(field.rel.to).db_type(connection=self.connection)),
             style.SQL_KEYWORD('NOT NULL'))
         ]
         deferred = [
