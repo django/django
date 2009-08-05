@@ -121,14 +121,15 @@ class DatabaseOperations(BaseDatabaseOperations):
                         style.SQL_TABLE(qn(model._meta.db_table))))
                     break # Only one AutoField is allowed per model, so don't bother continuing.
             for f in model._meta.many_to_many:
-                output.append("%s setval('%s', coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
-                    (style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD(qn('%s_id_seq' % f.m2m_db_table())),
-                    style.SQL_FIELD(qn('id')),
-                    style.SQL_FIELD(qn('id')),
-                    style.SQL_KEYWORD('IS NOT'),
-                    style.SQL_KEYWORD('FROM'),
-                    style.SQL_TABLE(qn(f.m2m_db_table()))))
+                if not f.rel.through:
+                    output.append("%s setval('%s', coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
+                        (style.SQL_KEYWORD('SELECT'),
+                        style.SQL_FIELD(qn('%s_id_seq' % f.m2m_db_table())),
+                        style.SQL_FIELD(qn('id')),
+                        style.SQL_FIELD(qn('id')),
+                        style.SQL_KEYWORD('IS NOT'),
+                        style.SQL_KEYWORD('FROM'),
+                        style.SQL_TABLE(qn(f.m2m_db_table()))))
         return output
 
     def savepoint_create_sql(self, sid):

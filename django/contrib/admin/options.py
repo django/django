@@ -226,24 +226,24 @@ class ModelAdmin(BaseModelAdmin):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
-        info = self.admin_site.name, self.model._meta.app_label, self.model._meta.module_name
+        info = self.model._meta.app_label, self.model._meta.module_name
 
         urlpatterns = patterns('',
             url(r'^$',
                 wrap(self.changelist_view),
-                name='%sadmin_%s_%s_changelist' % info),
+                name='%s_%s_changelist' % info),
             url(r'^add/$',
                 wrap(self.add_view),
-                name='%sadmin_%s_%s_add' % info),
+                name='%s_%s_add' % info),
             url(r'^(.+)/history/$',
                 wrap(self.history_view),
-                name='%sadmin_%s_%s_history' % info),
+                name='%s_%s_history' % info),
             url(r'^(.+)/delete/$',
                 wrap(self.delete_view),
-                name='%sadmin_%s_%s_delete' % info),
+                name='%s_%s_delete' % info),
             url(r'^(.+)/$',
                 wrap(self.change_view),
-                name='%sadmin_%s_%s_change' % info),
+                name='%s_%s_change' % info),
         )
         return urlpatterns
 
@@ -582,11 +582,12 @@ class ModelAdmin(BaseModelAdmin):
             'save_on_top': self.save_on_top,
             'root_path': self.admin_site.root_path,
         })
+        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
         return render_to_response(self.change_form_template or [
             "admin/%s/%s/change_form.html" % (app_label, opts.object_name.lower()),
             "admin/%s/change_form.html" % app_label,
             "admin/change_form.html"
-        ], context, context_instance=template.RequestContext(request))
+        ], context, context_instance=context_instance)
 
     def response_add(self, request, obj, post_url_continue='../%s/'):
         """
@@ -977,11 +978,12 @@ class ModelAdmin(BaseModelAdmin):
             'actions_on_bottom': self.actions_on_bottom,
         }
         context.update(extra_context or {})
+        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
         return render_to_response(self.change_list_template or [
             'admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
             'admin/%s/change_list.html' % app_label,
             'admin/change_list.html'
-        ], context, context_instance=template.RequestContext(request))
+        ], context, context_instance=context_instance)
 
     def delete_view(self, request, object_id, extra_context=None):
         "The 'delete' admin view for this model."
@@ -1032,11 +1034,12 @@ class ModelAdmin(BaseModelAdmin):
             "app_label": app_label,
         }
         context.update(extra_context or {})
+        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
         return render_to_response(self.delete_confirmation_template or [
             "admin/%s/%s/delete_confirmation.html" % (app_label, opts.object_name.lower()),
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
-        ], context, context_instance=template.RequestContext(request))
+        ], context, context_instance=context_instance)
 
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
@@ -1059,11 +1062,12 @@ class ModelAdmin(BaseModelAdmin):
             'app_label': app_label,
         }
         context.update(extra_context or {})
+        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
         return render_to_response(self.object_history_template or [
             "admin/%s/%s/object_history.html" % (app_label, opts.object_name.lower()),
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
-        ], context, context_instance=template.RequestContext(request))
+        ], context, context_instance=context_instance)
 
     #
     # DEPRECATED methods.

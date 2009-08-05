@@ -122,17 +122,10 @@ Reverse proxy middleware
 
 .. class:: django.middleware.http.SetRemoteAddrFromForwardedFor
 
-Sets ``request.META['REMOTE_ADDR']`` based on
-``request.META['HTTP_X_FORWARDED_FOR']``, if the latter is set. This is useful
-if you're sitting behind a reverse proxy that causes each request's
-``REMOTE_ADDR`` to be set to ``127.0.0.1``.
+.. versionchanged: 1.1
 
-**Important note:** This does NOT validate ``HTTP_X_FORWARDED_FOR``. If you're
-not behind a reverse proxy that sets ``HTTP_X_FORWARDED_FOR`` automatically, do
-not use this middleware. Anybody can spoof the value of
-``HTTP_X_FORWARDED_FOR``, and because this sets ``REMOTE_ADDR`` based on
-``HTTP_X_FORWARDED_FOR``, that means anybody can "fake" their IP address. Only
-use this when you can absolutely trust the value of ``HTTP_X_FORWARDED_FOR``.
+This middleware was removed in Django 1.1. See :ref:`the release notes
+<removed-setremoteaddrfromforwardedfor-middleware>` for details.
 
 Locale middleware
 -----------------

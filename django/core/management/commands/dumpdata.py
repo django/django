@@ -73,7 +73,8 @@ class Command(BaseCommand):
                 model_list = get_models(app)
 
             for model in model_list:
-                objects.extend(model._default_manager.all())
+                if not model._meta.proxy:
+                    objects.extend(model._default_manager.all())
 
         try:
             return serializers.serialize(format, objects, indent=indent)

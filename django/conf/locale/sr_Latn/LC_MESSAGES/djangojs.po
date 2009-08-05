@@ -1,0 +1,120 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-03-30 14:00+0200\n"
+"PO-Revision-Date: 2009-03-30 14:04+0200\n"
+"Last-Translator: Janos Guljas <janos@janos.in.rs>\n"
+"Language-Team: Branko Vukelic <bg.branko@gmail.com> & Janos Guljas "
+"<janos@janos.in.rs> & Nesh <djnesh@gmail.com> & Petar <petar.maric@gmail."
+"com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: contrib/admin/media/js/SelectFilter2.js:33
+#, perl-format
+msgid "Available %s"
+msgstr "Dostupni %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:41
+msgid "Choose all"
+msgstr "Dodaj sve"
+
+#: contrib/admin/media/js/SelectFilter2.js:46
+msgid "Add"
+msgstr "Dodaj"
+
+#: contrib/admin/media/js/SelectFilter2.js:48
+msgid "Remove"
+msgstr "Ukloni"
+
+#: contrib/admin/media/js/SelectFilter2.js:53
+#, perl-format
+msgid "Chosen %s"
+msgstr "Odabrani %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:54
+msgid "Select your choice(s) and click "
+msgstr "Napravite izbor i kliknite "
+
+#: contrib/admin/media/js/SelectFilter2.js:59
+msgid "Clear all"
+msgstr "Vrati sve"
+
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"januar februar mart april maj jun jul avgust septembar oktobar novembar "
+"decembar"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "N P U S Č P S"
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "nedelja ponedeljak utorak sreda četvrtak petak subota"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "Pokaži"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "Sakrij"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+msgid "Now"
+msgstr "Trenutno vreme"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
+msgid "Clock"
+msgstr "Sat"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
+msgid "Choose a time"
+msgstr "Odabir vremena"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+msgid "Midnight"
+msgstr "Ponoć"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+msgid "6 a.m."
+msgstr "18č"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+msgid "Noon"
+msgstr "Podne"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
+msgid "Cancel"
+msgstr "Poništi"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
+msgid "Today"
+msgstr "Danas"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
+msgid "Calendar"
+msgstr "Kalendar"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
+msgid "Yesterday"
+msgstr "Juče"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
+msgid "Tomorrow"
+msgstr "Sutra"

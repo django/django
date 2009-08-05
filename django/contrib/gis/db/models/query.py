@@ -62,6 +62,14 @@ class GeoQuerySet(QuerySet):
         """
         return self._geom_attribute('centroid', **kwargs)
 
+    def collect(self, **kwargs):
+        """
+        Performs an aggregate collect operation on the given geometry field.
+        This is analagous to a union operation, but much faster because
+        boundaries are not dissolved.
+        """
+        return self._spatial_aggregate(aggregates.Collect, **kwargs)
+
     def difference(self, geom, **kwargs):
         """
         Returns the spatial difference of the geographic field in a `difference`
@@ -117,11 +125,19 @@ class GeoQuerySet(QuerySet):
         if not isinstance(precision, (int, long)):
             raise TypeError('Precision keyword must be set with an integer.')
         
-        # Setting the options flag 
-        options = 0
-        if crs and bbox: options = 3
-        elif crs: options = 1
-        elif bbox: options = 2
+        # Setting the options flag -- which depends on which version of
+        # PostGIS we're using.
+        major, minor1, minor2 = SpatialBackend.version
+        if major >=1 and (minor1 >= 4):
+            options = 0
+            if crs and bbox: options = 3
+            elif bbox: options = 1
+            elif crs: options = 2
+        else:
+            options = 0
+            if crs and bbox: options = 3
+            elif crs: options = 1
+            elif bbox: options = 2
         s = {'desc' : 'GeoJSON', 
              'procedure_args' : {'precision' : precision, 'options' : options},
              'procedure_fmt' : '%(geo_col)s,%(precision)s,%(options)s',

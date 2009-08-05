@@ -1,7 +1,7 @@
 import os, unittest
 from django.contrib.gis.geos import *
 from django.contrib.gis.db.backend import SpatialBackend
-from django.contrib.gis.db.models import Count, Extent, F, Union
+from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
 from django.contrib.gis.tests.utils import no_mysql, no_oracle, no_spatialite
 from django.conf import settings
 from models import City, Location, DirectoryEntry, Parcel, Book, Author
@@ -39,10 +39,7 @@ class RelatedGeoModelTest(unittest.TestCase):
         "Testing the `transform` GeoQuerySet method on related geographic models."
         # All the transformations are to state plane coordinate systems using
         # US Survey Feet (thus a tolerance of 0 implies error w/in 1 survey foot).
-        if SpatialBackend.postgis:
-            tol = 3
-        else:
-            tol = 0
+        tol = 0
 
         def check_pnt(ref, pnt):
             self.assertAlmostEqual(ref.x, pnt.x, tol)
@@ -231,8 +228,12 @@ class RelatedGeoModelTest(unittest.TestCase):
         q = pickle.loads(q_str)
         self.assertEqual(GeoQuery, q.__class__)
 
-    def test12_count(self):
-        "Testing `Count` aggregate use with the `GeoManager`. See #11087."
+    # TODO: fix on Oracle -- get the following error because the SQL is ordered
+    # by a geometry object, which Oracle apparently doesn't like:
+    #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
+    @no_oracle
+    def test12a_count(self):
+        "Testing `Count` aggregate use with the `GeoManager` on geo-fields."
         # Creating a new City, 'Fort Worth', that uses the same location
         # as Dallas.
         dallas = City.objects.get(name='Dallas')
@@ -242,6 +243,8 @@ class RelatedGeoModelTest(unittest.TestCase):
         loc = Location.objects.annotate(num_cities=Count('city')).get(id=dallas.location.id)
         self.assertEqual(2, loc.num_cities)
 
+    def test12b_count(self):
+        "Testing `Count` aggregate use with the `GeoManager` on non geo-fields. See #11087."
         # Creating some data for the Book/Author non-geo models that
         # use GeoManager.  See #11087.
         tp = Author.objects.create(name='Trevor Paglen')
@@ -250,19 +253,45 @@ class RelatedGeoModelTest(unittest.TestCase):
         Book.objects.create(title='Blank Spots on the Map', author=tp)
         wp = Author.objects.create(name='William Patry')
         Book.objects.create(title='Patry on Copyright', author=wp)
-        
+
         # Should only be one author (Trevor Paglen) returned by this query, and
-        # the annotation should have 3 for the number of books.
+        # the annotation should have 3 for the number of books.  Also testing
+        # with a `GeoValuesQuerySet` (see #11489).
         qs = Author.objects.annotate(num_books=Count('books')).filter(num_books__gt=1)
+        vqs = Author.objects.values('name').annotate(num_books=Count('books')).filter(num_books__gt=1)
         self.assertEqual(1, len(qs))
         self.assertEqual(3, qs[0].num_books)
+        self.assertEqual(1, len(vqs))
+        self.assertEqual(3, vqs[0]['num_books'])
 
+    # TODO: The phantom model does appear on Oracle.
+    @no_oracle
     def test13_select_related_null_fk(self):
         "Testing `select_related` on a nullable ForeignKey via `GeoManager`. See #11381."
         no_author = Book.objects.create(title='Without Author')
         b = Book.objects.select_related('author').get(title='Without Author')
         # Should be `None`, and not a 'dummy' model.
         self.assertEqual(None, b.author)
+
+    @no_mysql
+    @no_oracle
+    @no_spatialite
+    def test14_collect(self):
+        "Testing the `collect` GeoQuerySet method and `Collect` aggregate."
+        # Reference query:
+        # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN 
+        #    "relatedapp_location" ON ("relatedapp_city"."location_id" = "relatedapp_location"."id") 
+        #    WHERE "relatedapp_city"."state" = 'TX';
+        ref_geom = fromstr('MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,-95.363151 29.763374,-96.801611 32.782057)')
+        
+        c1 = City.objects.filter(state='TX').collect(field_name='location__point')
+        c2 = City.objects.filter(state='TX').aggregate(Collect('location__point'))['location__point__collect']
+
+        for coll in (c1, c2):
+            # Even though Dallas and Ft. Worth share same point, Collect doesn't
+            # consolidate -- that's why 4 points in MultiPoint.
+            self.assertEqual(4, len(coll))
+            self.assertEqual(ref_geom, coll)
 
     # TODO: Related tests for KML, GML, and distance lookups.
 
