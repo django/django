@@ -19,6 +19,9 @@ class GeoManager(Manager):
     def centroid(self, *args, **kwargs):
         return self.get_query_set().centroid(*args, **kwargs)
 
+    def collect(self, *args, **kwargs):
+        return self.get_query_set().collect(*args, **kwargs)
+
     def difference(self, *args, **kwargs):
         return self.get_query_set().difference(*args, **kwargs)
 

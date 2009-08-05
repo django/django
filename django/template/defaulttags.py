@@ -367,17 +367,17 @@ class URLNode(Node):
         # {% url ... as var %} construct in which cause return nothing.
         url = ''
         try:
-            url = reverse(self.view_name, args=args, kwargs=kwargs)
+            url = reverse(self.view_name, args=args, kwargs=kwargs, current_app=context.current_app)
         except NoReverseMatch, e:
             if settings.SETTINGS_MODULE:
                 project_name = settings.SETTINGS_MODULE.split('.')[0]
                 try:
                     url = reverse(project_name + '.' + self.view_name,
-                              args=args, kwargs=kwargs)
+                              args=args, kwargs=kwargs, current_app=context.current_app)
                 except NoReverseMatch:
                     if self.asvar is None:
                         # Re-raise the original exception, not the one with
-                        # the path relative to the project. This makes a 
+                        # the path relative to the project. This makes a
                         # better error message.
                         raise e
             else:

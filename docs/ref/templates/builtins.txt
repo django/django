@@ -795,6 +795,16 @@ missing. In practice you'll use this to link to views that are optional::
       <a href="{{ the_url }}">Link to optional stuff</a>
     {% endif %}
 
+.. versionadded:: 1.1
+
+If you'd like to retrieve a namespaced URL, specify the fully qualified name::
+
+    {% url myapp:view-name %}
+
+This will follow the normal :ref:`namespaced URL resolution strategy
+<topics-http-reversing-url-namespaces>`, including using any hints provided
+by the context as to the current application.
+
 .. templatetag:: widthratio
 
 widthratio
