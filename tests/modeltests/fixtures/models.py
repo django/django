@@ -8,7 +8,7 @@ in the application directory, on in one of the directories named in the
 ``FIXTURE_DIRS`` setting.
 """
 
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 from django.conf import settings
 
 class Category(models.Model):
@@ -100,7 +100,7 @@ __test__ = {'API_TESTS': """
 
 # Database flushing does not work on MySQL with the default storage engine
 # because it requires transaction support.
-if settings.DATABASE_ENGINE != 'mysql':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] != 'mysql':
     __test__['API_TESTS'] += \
 """
 # Reset the database representation of this app. This will delete all data.
