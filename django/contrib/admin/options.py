@@ -55,6 +55,7 @@ class BaseModelAdmin(object):
     """Functionality common to both ModelAdmin and InlineAdmin."""
 
     raw_id_fields = ()
+    autocomplete_fields = {}
     fields = None
     exclude = None
     fieldsets = None
@@ -140,6 +141,9 @@ class BaseModelAdmin(object):
         """
         if db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.rel)
+        elif db_field.name in self.autocomplete_fields:
+            kwargs['widget'] = widgets.ForeignKeySearchInput(db_field.rel, 
+                self.autocomplete_fields[db_field.name])
         elif db_field.name in self.radio_fields:
             kwargs['widget'] = widgets.AdminRadioSelect(attrs={
                 'class': get_ul_class(self.radio_fields[db_field.name]),

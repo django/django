@@ -11,6 +11,7 @@ from django.utils.text import truncate_words
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_unicode
+from django.template.loader import render_to_string
 from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 
@@ -149,6 +150,76 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         key = self.rel.get_related_field().name
         obj = self.rel.to._default_manager.get(**{key: value})
         return '&nbsp;<strong>%s</strong>' % truncate_words(obj, 14)
+
+class ForeignKeySearchInput(ForeignKeyRawIdWidget):
+    """
+    A Widget for displaying ForeignKeys in an autocomplete search input
+    instead in a <select> box.
+    """
+    # Set in subclass to render the widget with a different template
+    widget_template = 'widget/foreignkey_searchinput.html'
+    # Set this to the path of the search view
+    search_path = '../../../foreignkey_autocomplete/'
+ 
+    class Media:
+        css = {
+            'all': (settings.ADMIN_MEDIA_PREFIX + 'css/jquery.autocomplete.css',)
+        }
+        js = (
+            settings.ADMIN_MEDIA_PREFIX + 'js/jquery.js',
+            settings.ADMIN_MEDIA_PREFIX + 'js/jquery.bgiframe.min.js',
+            settings.ADMIN_MEDIA_PREFIX + 'js/jquery.ajaxQueue.js',
+            settings.ADMIN_MEDIA_PREFIX + 'js/jquery.autocomplete.js',
+        )
+ 
+    def label_for_value(self, value):
+        key = self.rel.get_related_field().name
+        obj = self.rel.to._default_manager.get(**{key: value})
+        return truncate_words(obj, 14)
+ 
+    def __init__(self, rel, search_fields, attrs=None):
+        self.search_fields = search_fields
+        super(ForeignKeySearchInput, self).__init__(rel, attrs)
+ 
+    def render(self, name, value, attrs=None):
+        if attrs is None:
+            attrs = {}
+        output = [super(ForeignKeySearchInput, self).render(name, value, attrs)]
+        opts = self.rel.to._meta
+        app_label = opts.app_label
+        model_name = opts.object_name.lower()
+        related_url = '../../../%s/%s/' % (app_label, model_name)
+        params = self.url_parameters()
+        if params:
+            url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
+        else:
+            url = ''
+        if not attrs.has_key('class'):
+            attrs['class'] = 'vForeignKeyRawIdAdminField'
+        # Call the TextInput render method directly to have more control
+        output = [forms.TextInput.render(self, name, value, attrs)]
+        if value:
+            label = self.label_for_value(value)
+        else:
+            label = u''
+        context = {
+            'url': url,
+            'related_url': related_url,
+            'admin_media_prefix': settings.ADMIN_MEDIA_PREFIX,
+            'search_path': self.search_path,
+            'search_fields': ','.join(self.search_fields),
+            'model_name': model_name,
+            'app_label': app_label,
+            'label': label,
+            'name': name,
+        }
+        output.append(render_to_string(self.widget_template or (
+            'templates/widget/%s/%s/foreignkey_searchinput.html' % (app_label, model_name),
+            'templates/widget/%s/foreignkey_searchinput.html' % app_label,
+            'templates/widget/foreignkey_searchinput.html',
+        ), context))
+        output.reverse()
+        return mark_safe(u''.join(output))
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """

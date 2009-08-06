@@ -1,0 +1,60 @@
+{% load i18n %}
+<input type="text" id="lookup_{{ name }}" value="{{ label }}" style="display:none;" />
+<a href="{{ related_url }}{{ url }}" class="related-lookup" id="lookup_id_{{ name }}" onclick="return showRelatedObjectLookupPopup(this);">
+  <img src="{{ admin_media_prefix }}img/admin/selector-search.gif" width="16" height="16" alt="{% trans "Lookup" %}" />
+</a>
+<script type="text/javascript">
+$(document).ready(function() {
+    // Show lookup input
+    $("#lookup_{{ name }}").show();
+    function reset() {
+        $('#id_{{ name }}').val('');
+        $('#lookup_{{ name }}').val('');
+    };
+    function lookup(query) {
+        $.get('{{ search_path }}', {
+            'search_fields': '{{ search_fields }}',
+            'app_label': '{{ app_label }}',
+            'model_name': '{{ model_name }}',
+            'object_pk': query
+        }, function(data){
+            $('#lookup_{{ name }}').val(data);
+            {{ name }}_value = query;
+        });
+    };
+    $('#id_{{ name }}').bind(($.browser.opera ? "keypress" : "keyup"), function(event) {
+        if ($(this).val()) {
+            if (event.keyCode == 27) {
+                reset();
+            } else {
+                lookup($(this).val());
+            };
+        };
+    });
+    $('#lookup_{{ name }}').autocomplete('{{ search_path }}', {
+        extraParams: {
+            'search_fields': '{{ search_fields }}',
+            'app_label': '{{ app_label }}',
+            'model_name': '{{ model_name }}'
+        }
+    }).result(function(event, data, formatted) {
+        if (data) {
+            $('#id_{{ name }}').val(data[1]);
+        }
+    }).keyup(function(event){
+        if (event.keyCode == 27) {
+            reset();
+        };
+    });
+    var {{ name }}_value = $('#id_{{ name }}').val();
+    function check() {
+        {{ name }}_check = $('#id_{{ name }}').val();
+        if ({{ name }}_check) {
+            if ({{ name }}_check != {{ name }}_value) {
+                lookup({{ name }}_check);
+            }
+        }
+    }
+    timeout = window.setInterval(check, 300);
+});
+</script>

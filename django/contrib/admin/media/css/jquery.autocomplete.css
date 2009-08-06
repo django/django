@@ -1,0 +1,43 @@
+/*****************************************************************************
+ * jQuery autocomplete
+ ****************************************************************************/
+.ac_results {
+    padding: 0px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    overflow: hidden;
+    z-index: 99999;
+    text-align: left;
+}
+
+.ac_results ul {
+    width: 100%;
+    list-style-position: outside;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ac_results li {
+    margin: 0px;
+    padding: 3px 5px;
+    cursor: default;
+    display: block;
+    font: menu;
+    font-size: 12px;
+    line-height: 14px;
+    overflow: hidden;
+}
+
+.ac_loading {
+    background: white url('../img/indicator.gif') right center no-repeat;
+}
+
+.ac_odd {
+    background-color: #eee;
+}
+
+.ac_over {
+    background-color: #999;
+    color: white;
+}
