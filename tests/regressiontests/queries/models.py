@@ -7,7 +7,7 @@ import pickle
 import sys
 
 from django.conf import settings
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models.query import Q, ITER_CHUNK_SIZE
 
 # Python 2.3 doesn't have sorted()
@@ -1209,13 +1209,13 @@ FieldError: Infinite loop caused by ordering.
 
 
 # In Oracle, we expect a null CharField to return u'' instead of None.
-if settings.DATABASE_ENGINE == "oracle":
+if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == "oracle":
     __test__["API_TESTS"] = __test__["API_TESTS"].replace("<NONE_OR_EMPTY_UNICODE>", "u''")
 else:
     __test__["API_TESTS"] = __test__["API_TESTS"].replace("<NONE_OR_EMPTY_UNICODE>", "None")
 
 
-if settings.DATABASE_ENGINE == "mysql":
+if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == "mysql":
     __test__["API_TESTS"] += """
 When grouping without specifying ordering, we add an explicit "ORDER BY NULL"
 portion in MySQL to prevent unnecessary sorting.
