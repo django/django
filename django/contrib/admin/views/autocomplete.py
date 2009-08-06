@@ -21,7 +21,7 @@ def foreignkey_autocomplete(request, related_string_functions=None):
     try:
         to_string_function = related_string_functions[model_name]
     except KeyError:
-        to_string_function = lambda x: x.__unicode__()
+        to_string_function = lambda x: unicode(x)
     if search_fields and app_label and model_name and (query or object_pk):
         def construct_search(field_name):
             # use different lookup methods depending on the notation
