@@ -8,6 +8,7 @@ import re
 from django.forms.widgets import Widget, Select
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
+from django.utils.formats import getformat
 
 __all__ = ('SelectDateWidget',)
 
@@ -45,38 +46,22 @@ class SelectDateWidget(Widget):
                 if match:
                     year_val, month_val, day_val = [int(v) for v in match.groups()]
 
+        choices = [(i, i) for i in self.years]
+        year_html = self.create_select(name, self.year_field, value, year_val, choices)
+        choices = MONTHS.items()
+        month_html = self.create_select(name, self.month_field, value, month_val, choices)
+        choices = [(i, i) for i in range(1, 32)]
+        day_html = self.create_select(name, self.day_field, value, day_val,  choices)
+
+        format = getformat('DATE_FORMAT')
         output = []
-
-        if 'id' in self.attrs:
-            id_ = self.attrs['id']
-        else:
-            id_ = 'id_%s' % name
-
-        month_choices = MONTHS.items()
-        if not (self.required and value):
-            month_choices.append(self.none_value)
-        month_choices.sort()
-        local_attrs = self.build_attrs(id=self.month_field % id_)
-        s = Select(choices=month_choices)
-        select_html = s.render(self.month_field % name, month_val, local_attrs)
-        output.append(select_html)
-
-        day_choices = [(i, i) for i in range(1, 32)]
-        if not (self.required and value):
-            day_choices.insert(0, self.none_value)
-        local_attrs['id'] = self.day_field % id_
-        s = Select(choices=day_choices)
-        select_html = s.render(self.day_field % name, day_val, local_attrs)
-        output.append(select_html)
-
-        year_choices = [(i, i) for i in self.years]
-        if not (self.required and value):
-            year_choices.insert(0, self.none_value)
-        local_attrs['id'] = self.year_field % id_
-        s = Select(choices=year_choices)
-        select_html = s.render(self.year_field % name, year_val, local_attrs)
-        output.append(select_html)
-
+        for char in format:
+            if char in 'Yy':
+                output.append(year_html)
+            elif char in 'bFMmNn':
+                output.append(month_html)
+            elif char in 'dj':
+                output.append(day_html)
         return mark_safe(u'\n'.join(output))
 
     def id_for_label(self, id_):
@@ -92,3 +77,16 @@ class SelectDateWidget(Widget):
         if y and m and d:
             return '%s-%s-%s' % (y, m, d)
         return data.get(name, None)
+
+    def create_select(self, name, field, value, val, choices):
+        if 'id' in self.attrs:
+            id_ = self.attrs['id']
+        else:
+            id_ = 'id_%s' % name
+        if not (self.required and value):
+            choices.insert(0, self.none_value)
+        local_attrs = self.build_attrs(id=field % id_)
+        s = Select(choices=choices)
+        select_html = s.render(field % name, val, local_attrs)
+        return select_html
+
