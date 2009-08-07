@@ -4,6 +4,7 @@ from django.db.models.query import QuerySet
 from django.utils.encoding import smart_str
 from django.http import HttpResponse, HttpResponseNotFound
 from django.conf import settings
+from django.contrib.admin.views import staff_member_required
  
 def foreignkey_autocomplete(request, related_string_functions=None):
     """
@@ -56,3 +57,4 @@ def foreignkey_autocomplete(request, related_string_functions=None):
                 data = to_string_function(obj)
         return HttpResponse(data)
     return HttpResponseNotFound()
+foreignkey_autocomplete = staff_member_required(foreignkey_autocomplete)
