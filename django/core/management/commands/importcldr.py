@@ -11,7 +11,8 @@ except ImportError:
     raise CommandError('You need to install `python-lxml` to run this script')
 
 FORMATS_FILE_NAME = 'formats.py'
-FORMATS_FILE_HEADER = '''# This file is distributed under the same license as the Django package.
+FORMATS_FILE_HEADER = '''# -*- encoding: utf-8 -*-
+# This file is distributed under the same license as the Django package.
 #
 
 '''

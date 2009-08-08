@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 # This file is distributed under the same license as the Django package.
 #
 

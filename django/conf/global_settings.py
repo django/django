@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 # Default Django settings. Override these with settings in the module
 # pointed-to by the DJANGO_SETTINGS_MODULE environment variable.
 
@@ -75,7 +76,7 @@ LANGUAGES = (
     ('lt', gettext_noop('Lithuanian')),
     ('mk', gettext_noop('Macedonian')),
     ('nl', gettext_noop('Dutch')),
-    ('no', gettext_noop('Norwegian')),
+    ('nb', gettext_noop(u'Norwegian Bokmål')),
     ('pl', gettext_noop('Polish')),
     ('pt', gettext_noop('Portuguese')),
     ('pt-br', gettext_noop('Brazilian Portuguese')),

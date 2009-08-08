@@ -210,7 +210,8 @@ class FloatField(Field):
             return None
         try:
             # We always accept dot as decimal separator
-            value = float(value.replace(getformat('DECIMAL_SEPARATOR'), '.'))
+            if isinstance(value, str) or isinstance(value, unicode):
+                value = float(value.replace(getformat('DECIMAL_SEPARATOR'), '.'))
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'])
         if self.max_value is not None and value > self.max_value:
@@ -247,7 +248,8 @@ class DecimalField(Field):
         value = smart_str(value).strip()
         try:
             # We always accept dot as decimal separator
-            value = Decimal(value.replace(getformat('DECIMAL_SEPARATOR'), '.'))
+            if isinstance(value, str) or isinstance(value, unicode):
+                value = Decimal(value.replace(getformat('DECIMAL_SEPARATOR'), '.'))
         except DecimalException:
             raise ValidationError(self.error_messages['invalid'])
 
