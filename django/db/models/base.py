@@ -468,7 +468,6 @@ class Model(object):
             manager = cls._base_manager
             if pk_set:
                 # Determine whether a record with the primary key already exists.
-                # FIXME work with the using parameter
                 if (force_update or (not force_insert and
                         manager.using(using).filter(pk=pk_val).extra(select={'a': 1}).values('a').order_by())):
                     # It does already exist, so do an UPDATE.
@@ -619,15 +618,16 @@ class Model(object):
 
 # ORDERING METHODS #########################
 
-def method_set_order(ordered_obj, self, id_list):
+def method_set_order(ordered_obj, self, id_list, using=None):
+    if using is None:
+        using = DEFAULT_DB_ALIAS
     rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
     order_name = ordered_obj._meta.order_with_respect_to.name
     # FIXME: It would be nice if there was an "update many" version of update
     # for situations like this.
     for i, j in enumerate(id_list):
         ordered_obj.objects.filter(**{'pk': j, order_name: rel_val}).update(_order=i)
-    # TODO
-    transaction.commit_unless_managed(using=DEFAULT_DB_ALIAS)
+    transaction.commit_unless_managed(using=using)
 
 
 def method_get_order(ordered_obj, self):
