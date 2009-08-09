@@ -73,3 +73,8 @@ def sorted(in_value):
     out_value.sort()
     return out_value
 
+def all(iterable):
+    for item in iterable:
+        if not item:
+            return False
+    return True

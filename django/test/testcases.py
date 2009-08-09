@@ -14,6 +14,11 @@ from django.test.client import Client
 from django.utils import simplejson
 from django.utils.encoding import smart_str
 
+try:
+    all
+except NameError:
+    from django.utils.itercompat import all
+
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
 normalize_decimals = lambda s: re.sub(r"Decimal\('(\d+(\.\d*)?)'\)", lambda m: "Decimal(\"%s\")" % m.groups()[0], s)
 
@@ -433,7 +438,8 @@ def connections_support_transactions():
     Returns True if all connections support transactions.  This is messy
     because 2.4 doesn't support any or all.
     """
-    return len([None for conn in connections.all() if conn.settings_dict['DATABASE_SUPPORTS_TRANSACTIONS']]) == len(connections.all())
+    return all(conn.settings_dict['DATABASE_SUPPORTS_TRANSACTIONS']
+        for conn in connections.all())
 
 class TestCase(TransactionTestCase):
     """
