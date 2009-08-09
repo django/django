@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db import connections
 from django.test import TestCase
 
-from models import Book
+from models import Book, Author
 
 try:
     # we only have these models if the user is using multi-db, it's safe the
@@ -79,11 +79,14 @@ class PickleQuerySetTestCase(TestCase):
 if len(settings.DATABASES) > 1:
     class MetaUsingTestCase(TestCase):
         def test_meta_using_queries(self):
-            a = Article.objects.create(title="Django Rules!")
+            auth = Author.objects.create(name="Zed Shaw")
+            a = Article.objects.create(title="Django Rules!", author=auth)
             self.assertEqual(Article.objects.get(title="Django Rules!"), a)
             for db in connections:
                 if db == article_using:
-                    self.assertEqual(Article.objects.using(db).get(title="Django Rules!"), a)
+                    a1 = Article.objects.using(db).get(title="Django Rules!")
+                    self.assertEqual(a1, a)
+                    self.assertEqual(a1.author, auth)
                 else:
                     self.assertRaises(Article.DoesNotExist,
                         lambda: Article.objects.using(db).get(title="Django Rules!"))
