@@ -8,9 +8,6 @@ import datetime
 from django.db.backends import util
 from django.utils.encoding import force_unicode
 
-# Cache. Maps default query class to new Oracle query class.
-_classes = {}
-
 def query_class(QueryClass, Database):
     """
     Returns a custom django.db.models.sql.query.Query subclass that is
@@ -19,12 +16,6 @@ def query_class(QueryClass, Database):
     The 'Database' module (cx_Oracle) is passed in here so that all the setup
     required to import it only needs to be done by the calling module.
     """
-    global _classes
-    try:
-        return _classes[QueryClass]
-    except KeyError:
-        pass
-
     class OracleQuery(QueryClass):
         def __reduce__(self):
             """
@@ -133,7 +124,6 @@ def query_class(QueryClass, Database):
 
             return sql, params
 
-    _classes[QueryClass] = OracleQuery
     return OracleQuery
 
 def unpickle_query_class(QueryClass):
