@@ -32,6 +32,8 @@ def load_backend(backend_name):
             else:
                 raise # If there's some other error, this must be an error in Django itself.
 
+class ConnectionDoesNotExist(Exception):
+    pass
 
 class ConnectionHandler(object):
     def __init__(self, databases):
@@ -43,7 +45,10 @@ class ConnectionHandler(object):
         Puts the defaults into the settings dictionary for a given connection
         where no settings is provided.
         """
-        conn = self.databases[alias]
+        try:
+            conn = self.databases[alias]
+        except KeyError:
+            raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
         conn.setdefault('DATABASE_ENGINE', 'dummy')
         conn.setdefault('DATABASE_OPTIONS', {})
         conn.setdefault('TEST_DATABASE_CHARSET', None)

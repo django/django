@@ -23,7 +23,9 @@ settings for that specific connection.  The settings in the inner dictionaries
 are described fully in the :settings:`DATABASES` documentation.  The important
 thing to note is that your primary database should have the alias
 ``'default'``, and any additional databases you have can have whatever alias
-you choose.
+you choose.  If at any time you attempt to access a database that isn't defined
+in your :settings:`DATABASES` setting then Django will raise a
+``django.db.utils.ConnectionDoesNotExist`` exception.
 
 Selecting a Database for a ``Model``
 ====================================
@@ -62,4 +64,4 @@ keyword argument to ``save()``.  For example if you were migrating a user from
 the ``'legacy_users'`` database to the ``'new_users'`` database you might do::
 
     >>> user_obj.save(using='new_users')
-    >>> usre_obj.delete(using='legacy_users')
+    >>> user_obj.delete(using='legacy_users')
