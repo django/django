@@ -4,7 +4,7 @@ from django.db.models.query import QuerySet
 from django.utils.encoding import smart_str
 from django.http import HttpResponse, HttpResponseNotFound
 from django.conf import settings
-from django.contrib.admin.views import staff_member_required
+from django.contrib.admin.views.decorators import staff_member_required
  
 def foreignkey_autocomplete(request, related_string_functions=None):
     """
