@@ -257,7 +257,7 @@ def savepoint_commit(sid, using=None):
 # DECORATORS #
 ##############
 
-def autocommit(using_or_func=None):
+def autocommit(func_or_using=None):
     """
     Decorator that activates commit on save. This is Django's default behavior;
     this decorator is useful if you globally activated transaction management in
