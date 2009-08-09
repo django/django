@@ -74,7 +74,6 @@ setup(
     name = "Django",
     version = version.replace(' ', '-'),
     url = 'http://www.djangoproject.com/',
-    download_url = 'http://media.djangoproject.com/releases/1.1/Django-1.1.tar.gz',
     author = 'Django Software Foundation',
     author_email = 'foundation@djangoproject.com',
     description = 'A high-level Python Web framework that encourages rapid development and clean, pragmatic design.',
@@ -92,6 +91,7 @@ setup(
                    'Topic :: Internet :: WWW/HTTP',
                    'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
                    'Topic :: Internet :: WWW/HTTP :: WSGI',
+                   'Topic :: Software Development :: Libraries :: Application Frameworks',
                    'Topic :: Software Development :: Libraries :: Python Modules',
                    ],
 )
