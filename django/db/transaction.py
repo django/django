@@ -272,11 +272,11 @@ def autocommit(func_or_using=None):
             finally:
                 leave_transaction_management(using=using)
         return wraps(func)(_autocommit)
-    if using_or_func is None:
-        using_or_func = DEFAULT_DB_ALIAS
-    if callable(using_or_func):
-        return inner_autocommit(using_or_func, DEFAULT_DB_ALIAS)
-    return lambda func: inner_autocommit(func,  using_or_func)
+    if func_or_using is None:
+        func_or_using = DEFAULT_DB_ALIAS
+    if callable(func_or_using):
+        return inner_autocommit(func_or_using, DEFAULT_DB_ALIAS)
+    return lambda func: inner_autocommit(func,  func_or_using)
 
 
 def commit_on_success(func_or_using=None):
