@@ -25,11 +25,16 @@ $(document).ready(function() {
             'model_name': '{{ model_name }}'
         },
         multiple: true,
-        mustMatch: true,
-        autoFill: true
+        mustMatch: true
     }).result(function(event, data, formatted) {
         if (data) {
-            $('#id_{{ name }}').val($('#id_{{ name }}').val() + data[1] + ",");
+            if ($('#id_{{ name }}').val()) {
+                $('#id_{{ name }}').val($('#id_{{ name }}').val() + "," + data[1]);
+            }
+            else {
+                $('#id_{{ name }}').val(data[1]);
+            }
+            
         }
     });
 });
