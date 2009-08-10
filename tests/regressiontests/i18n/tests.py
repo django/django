@@ -65,6 +65,20 @@ status.
 >>> print s
 Password
 
+Translations on files with mac or dos end of lines will be converted
+to unix eof in .po catalogs, and they have to match when retrieved
+
+>>> from django.utils.translation.trans_real import translation
+>>> ca_translation = translation('ca')
+>>> ca_translation._catalog[u'Mac\nEOF\n'] = u'Catalan Mac\nEOF\n'
+>>> ca_translation._catalog[u'Win\nEOF\n'] = u'Catalan Win\nEOF\n'
+>>> activate('ca')
+>>> ugettext(u'Mac\rEOF\r')
+u'Catalan Mac\nEOF\n'
+>>> ugettext(u'Win\r\nEOF\r\n')
+u'Catalan Win\nEOF\n'
+>>> deactivate()
+
 Localization of dates and numbers
 
 >>> import datetime

@@ -266,15 +266,16 @@ def do_translate(message, translation_function):
     translation object to use. If no current translation is activated, the
     message will be run through the default translation object.
     """
+    eol_message = message.replace('\r\n', '\n').replace('\r', '\n')
     global _default, _active
     t = _active.get(currentThread(), None)
     if t is not None:
-        result = getattr(t, translation_function)(message)
+        result = getattr(t, translation_function)(eol_message)
     else:
         if _default is None:
             from django.conf import settings
             _default = translation(settings.LANGUAGE_CODE)
-        result = getattr(_default, translation_function)(message)
+        result = getattr(_default, translation_function)(eol_message)
     if isinstance(message, SafeData):
         return mark_safe(result)
     return result
