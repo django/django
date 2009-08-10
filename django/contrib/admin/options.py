@@ -163,6 +163,9 @@ class BaseModelAdmin(object):
         if db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.rel)
             kwargs['help_text'] = ''
+        elif db_field.name in self.autocomplete_fields:
+            kwargs['widget'] = widgets.ManyToManySearchInput(db_field.rel, 
+                self.autocomplete_fields[db_field.name])
         elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
             kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
 

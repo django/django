@@ -1,0 +1,36 @@
+{% load i18n %}
+<textarea id="lookup_{{ name }}" style="display:none;">{{ label }}</textarea>
+<a href="{{ related_url }}{{ url }}" class="related-lookup" id="lookup_id_{{ name }}" onclick="return showRelatedObjectLookupPopup(this);">
+  <img src="{{ admin_media_prefix }}img/admin/selector-search.gif" width="16" height="16" alt="{% trans "Lookup" %}" />
+</a>
+<script type="text/javascript">
+$(document).ready(function() {
+    // Show lookup input
+    $("#lookup_{{ name }}").show();
+    
+    function lookup(query) {
+        $.get('{{ search_path }}', {
+            'search_fields': '{{ search_fields }}',
+            'app_label': '{{ app_label }}',
+            'model_name': '{{ model_name }}',
+            'object_pk': query
+        }, function(data){
+            $('#lookup_{{ name }}').val(data);
+        });
+    };
+    $('#lookup_{{ name }}').autocomplete('{{ search_path }}', {
+        extraParams: {
+            'search_fields': '{{ search_fields }}',
+            'app_label': '{{ app_label }}',
+            'model_name': '{{ model_name }}'
+        },
+        multiple: true,
+        mustMatch: true,
+        autoFill: true
+    }).result(function(event, data, formatted) {
+        if (data) {
+            $('#id_{{ name }}').val($('#id_{{ name }}').val() + data[1] + ",");
+        }
+    });
+});
+</script>
