@@ -3,6 +3,8 @@
 Form and field validation
 =========================
 
+.. versionchanged:: 1.2
+
 Form validation happens when the data is cleaned. If you want to customize
 this process, there are various places you can change, each one serving a
 different purpose. Three types of cleaning methods are run during form
@@ -20,13 +22,67 @@ If you detect multiple errors during a cleaning method and wish to signal all
 of them to the form submitter, it is possible to pass a list of errors to the
 ``ValidationError`` constructor.
 
-The three types of cleaning methods are:
+Most validation can be done using `validators`_ - simple helpers that can be
+reused easily. There are two types of validators:
 
-    * The ``clean()`` method on a Field subclass. This is responsible
-      for cleaning the data in a way that is generic for that type of field.
-      For example, a FloatField will turn the data into a Python ``float`` or
-      raise a ``ValidationError``. This method returns the clean data, which
-      is then inserted into the ``cleaned_data`` dictionary of the form.
+    * Simple validators are simple functions (or callables) that take a single
+      argument and raises ``ValidationError`` on invalid input::
+
+        def validate_answer_to_life_universe_and_everything(value):
+            if value != '42': 
+                raise ValidationError(
+                    'This is not the answer to life, universe and everything!')
+
+      Simple validators are run inside the ``run_validators`` method that is
+      called from ``Field.clean`` once the value is validated by the field's
+      methods.
+
+    * Complex validators are instances of ``ComplexValidator`` class and,
+      unlike simple validators, can access not just one value, but all at once::
+
+        class ValidateFieldNotEqualsOtherField(ComplexValidator):
+            def __init__(self, other_field):
+                self.other_field = other_field
+        
+            def __call__(self, value, all_values={}, obj=None):
+                if value == self.get_value(self.other_field, all_values, obj):
+                    raise ValidationError(
+                        "Must not equal to %r's value" % self.other_field)
+
+
+.. warning::
+
+    Since complex validators must have access to all cleaned values, they must
+    be run after individual fields have been cleaned. This means that these are run
+    in ``Form.full_clean`` and not inside ``Field.clean`` with simple validators.
+
+
+Validation of a Form is split into several steps, which can be customized or
+overridden:
+
+    * The ``to_python()`` method on a Field is the first step in every
+      validation. It coerces the value to correct datatype and raises
+      ``ValidationError`` if that is not possible. This method accepts the raw
+      value from the widget and returns the converted value. For example, a
+      FloatField will turn the data into a Python ``float`` or raise a
+      ``ValidationError``.
+
+    * Next step resides in ``validate()`` method. This is a method where all
+      field-specific validation, that cannot be abstracted into a validator,
+      should take place. It takes the value coerced to correct datatype and
+      raises ``ValidationError`` on any error. This method does not return
+      anything and shouldn't alter the value.
+
+    * Simple validators are run in the ``run_validators`` method. This method
+      aggregates all the errors from all validators run into a single
+      ``ValidationError``.
+    
+    * The ``clean()`` method on a Field subclass. This is responsible for
+      running ``to_python``, ``validate`` and ``run_validators`` in the correct
+      order and propagate their errors. If, at any time, any of the methods
+      raise ValidationError, the validation stops and that error is raised.
+      This method returns the clean data, which is then inserted into the
+      ``cleaned_data`` dictionary of the form.
 
     * The ``clean_<fieldname>()`` method in a form subclass -- where
       ``<fieldname>`` is replaced with the name of the form field attribute.
@@ -49,6 +105,11 @@ The three types of cleaning methods are:
       should return the cleaned data, regardless of whether it changed
       anything or not.
 
+    * The Field's complex validators are run after all the fields have been
+      cleaned and only on those fields that passed validation. Errors from
+      individual validators are aggregated and all the errors are raised for a
+      given field.
+
     * The Form subclass's ``clean()`` method. This method can perform
       any validation that requires access to multiple fields from the form at
       once. This is where you might put in things to check that if field ``A``
@@ -68,8 +129,9 @@ The three types of cleaning methods are:
 These methods are run in the order given above, one field at a time.  That is,
 for each field in the form (in the order they are declared in the form
 definition), the ``Field.clean()`` method (or its override) is run, then
-``clean_<fieldname>()``. Finally, once those two methods are run for every
-field, the ``Form.clean()`` method, or its override, is executed.
+``clean_<fieldname>()``. Once those two methods are run for every
+field, the complex validators are run for every field and, finally,
+``Form.clean()`` method, or its override, is executed.
 
 Examples of each of these methods are provided below.
 
@@ -140,6 +202,12 @@ The previous sections explained how validation works in general for forms.
 Since it can sometimes be easier to put things into place by seeing each
 feature in use, here are a series of small examples that use each of the
 previous features.
+
+.. _validators:
+
+Using validators
+~~~~~~~~~~~~~~~~
+.. versionadded::
 
 Form field default cleaning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
