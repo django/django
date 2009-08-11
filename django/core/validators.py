@@ -4,8 +4,8 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 
-# These values, if given to to_python(), will trigger the self.required check.
-EMPTY_VALUES = (None, '')
+# These values, if given to validate(), will trigger the self.required check.
+EMPTY_VALUES = (None, '', [], (), {})
 
 def validate_integer(value):
     try:
