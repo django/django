@@ -26,28 +26,14 @@ Most validation can be done using `validators`_ - simple helpers that can be
 reused easily. There are two types of validators:
 
     * Simple validators are simple functions (or callables) that take a single
-      argument and raises ``ValidationError`` on invalid input::
-
-        def validate_answer_to_life_universe_and_everything(value):
-            if value != '42': 
-                raise ValidationError(
-                    'This is not the answer to life, universe and everything!')
-
-      Simple validators are run inside the ``run_validators`` method that is
-      called from ``Field.clean`` once the value is validated by the field's
-      methods.
+      argument and raises ``ValidationError`` on invalid input.  Simple
+      validators are run inside the ``run_validators`` method that is called
+      from ``Field.clean`` once the value is validated by the field's methods.
 
     * Complex validators are instances of ``ComplexValidator`` class and,
-      unlike simple validators, can access not just one value, but all at once::
-
-        class ValidateFieldNotEqualsOtherField(ComplexValidator):
-            def __init__(self, other_field):
-                self.other_field = other_field
-        
-            def __call__(self, value, all_values={}, obj=None):
-                if value == self.get_value(self.other_field, all_values, obj):
-                    raise ValidationError(
-                        "Must not equal to %r's value" % self.other_field)
+      unlike simple validators, can access not just one value, but all at once.
+      These are perfectly suited for cross field validation (one of N fields
+      must be supplied, this field must equal that etc.)
 
 
 .. warning::
@@ -209,35 +195,61 @@ Using validators
 ~~~~~~~~~~~~~~~~
 .. versionadded::
 
+Django's form- (and model-) fields support use of simple uitility functions and
+classes known as validators. These can be added to fields on their declaration
+as argument to ``__init__`` or defined on the Field class itself.
+
+Simple validators can be used to validate values inside the field, let's have a
+look at Django's ``EmailField``::
+
+    class EmailField(CharField):
+        default_error_messages = {
+            'invalid': _(u'Enter a valid e-mail address.'),
+        }
+        default_validators = [validators.validate_email]
+
+As you can see, ``EmailField`` is just a ``CharField`` with customized error
+message and a validator that validates e-mail addresses. This can also be done on field definition so::
+
+    email = forms.EmailField()
+
+is equivalent to::
+
+    email = forms.CharField(
+            error_messages={
+                'invalid': _(u'Enter a valid e-mail address.'),
+            },
+            validators=[validators.validate_email]
+        )
+
+
 Form field default cleaning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Let's firstly create a custom form field that validates its input is a string
-containing comma-separated e-mail addresses, with at least one address. We'll
-keep it simple and assume e-mail validation is contained in a function called
-``is_valid_email()``. The full class looks like this::
+containing comma-separated e-mail addresses, with at least one address. The
+full class looks like this::
 
     from django import forms
+    from django.core.validators import validate_email
 
     class MultiEmailField(forms.Field):
-        def clean(self, value):
-            """
-            Check that the field contains one or more comma-separated emails
-            and normalizes the data to a list of the email strings.
-            """
-            if not value:
-                raise forms.ValidationError('Enter at least one e-mail address.')
-            emails = value.split(',')
-            for email in emails:
-                if not is_valid_email(email):
-                    raise forms.ValidationError('%s is not a valid e-mail address.' % email)
+        def to_python(self, value):
+            "Normalize data to a list of strings."
+            return value.split(',')
 
-            # Always return the cleaned data.
-            return emails
+        def validate(self, value):
+            "Check if value consists only of valid emails."
 
-Every form that uses this field will have this ``clean()`` method run before
-anything else can be done with the field's data. This is cleaning that is
-specific to this type of field, regardless of how it is subsequently used.
+            # check if value is given if the field is required
+            super(MultiEmailField, self).validate()
+
+            for email in value:
+                validate_email(email)
+
+Every form that uses this field will have these methods run before anything
+else can be done with the field's data. This is cleaning that is specific to
+this type of field, regardless of how it is subsequently used.
 
 Let's create a simple ``ContactForm`` to demonstrate how you'd use this
 field::
@@ -251,7 +263,8 @@ field::
 
 Simply use ``MultiEmailField`` like any other form field. When the
 ``is_valid()`` method is called on the form, the ``MultiEmailField.clean()``
-method will be run as part of the cleaning process.
+method will be run as part of the cleaning process and it will, in turn, call
+the custom ``to_python()`` and ``validate()`` methods.
 
 Cleaning a specific field attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
