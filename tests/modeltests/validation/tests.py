@@ -1,5 +1,3 @@
-import unittest
-
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.db import models
 
@@ -8,6 +6,7 @@ from models import *
 
 from validators import TestModelsWithValidators
 from test_unique import GetUniqueCheckTests
+from test_custom_messages import CustomMessagesTest
 
 class BaseModelValidationTests(ValidationTestCase):
 

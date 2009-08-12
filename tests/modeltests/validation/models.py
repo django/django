@@ -7,7 +7,7 @@ from django.test import TestCase
 
 def validate_answer_to_universe(value):
     if value != 42:
-        raise ValidationError('This is not the answer to life, universe and everything!')
+        raise ValidationError('This is not the answer to life, universe and everything!', code='not42')
 
 class ValidateFieldNotEqualsOtherField(ComplexValidator):
     def __init__(self, other_field):
@@ -15,7 +15,7 @@ class ValidateFieldNotEqualsOtherField(ComplexValidator):
 
     def __call__(self, value, all_values={}, obj=None):
         if value == self.get_value(self.other_field, all_values, obj):
-            raise ValidationError("Must not equal to %r's value" % self.other_field)
+            raise ValidationError("Must not equal to %r's value" % self.other_field, code='not_equal', params=(self.other_field,))
 
 class ModelToValidate(models.Model):
     name = models.CharField(max_length=100)
@@ -52,3 +52,15 @@ class UniqueForDateModel(models.Model):
     count = models.IntegerField(unique_for_date="start_date", unique_for_year="end_date")
     order = models.IntegerField(unique_for_month="end_date")
     name = models.CharField(max_length=100)
+
+class CustomMessagesModel(models.Model):
+    other  = models.IntegerField(blank=True, null=True)
+    number = models.IntegerField(
+            error_messages={'null': 'NULL', 'not42': 'AAARGH', 'not_equal': '%s != me'},
+            validators=[validate_answer_to_universe, ValidateFieldNotEqualsOtherField('other')]
+        )
+
+
+
+
+

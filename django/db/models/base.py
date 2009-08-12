@@ -774,7 +774,14 @@ class Model(object):
                     try:
                         v(value, obj=self)
                     except ValidationError, e:
-                        errors.setdefault(f.name, []).extend(e.messages)
+                        error_list = errors.setdefault(f.name, [])
+                        if hasattr(e, 'code') and e.code in f.error_messages:
+                            message = f.error_messages[e.code]
+                            if e.params:
+                                message = message % e.params
+                            error_list.append(message)
+                        else:
+                            error_list.extend(e.messages)
         try:
             # TODO: run this only if not errors??
             self.validate()
