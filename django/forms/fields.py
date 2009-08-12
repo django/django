@@ -127,8 +127,8 @@ class Field(object):
                 try:
                     v(value)
                 except ValidationError, e:
-                    if hasattr(e, 'code'):
-                        message = self.error_messages.get(e.code, e.messages[0])
+                    if hasattr(e, 'code') and e.code in self.error_messages:
+                        message = self.error_messages[e.code]
                         if e.params:
                             message = message % e.params
                         errors.append(message)

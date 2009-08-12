@@ -264,8 +264,11 @@ class BaseForm(StrAndUnicode):
                 except ValidationError, e:
                     failed = True
                     error_list = self._errors.setdefault(name, self.error_class())
-                    if hasattr(e, 'code'):
-                        error_list.append(field.error_messages.get(e.code, e.messages[0]))
+                    if hasattr(e, 'code') and e.code in field.error_messages:
+                        message = field.error_messages[e.code]
+                        if e.params:
+                            message = message % e.params
+                        error_list.append(message)
                     else:
                         error_list.extend(e.messages)
             if failed:
