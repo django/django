@@ -277,15 +277,9 @@ class HttpResponse(object):
     def __init__(self, content='', mimetype=None, status=None,
                  content_type=None, request=None):
         from django.conf import settings
-        accept_charset = None
-        self._charset = settings.DEFAULT_CHARSET
         if mimetype:
             content_type = mimetype  # Mimetype arg is an alias for content-type
-        if request:
-            accept_charset = request.META.get("ACCEPT_CHARSET")
-        if accept_charset or content_type:
-            encoding = get_response_encoding(content_type, accept_charset)
-            (self._charset, self._codec) = encoding
+        self.determine_charset(content_type, request)
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
@@ -294,8 +288,7 @@ class HttpResponse(object):
         if hasattr(content, 'close'):
             content.close()
         self.cookies = SimpleCookie()
-        if status:
-            self.status_code = status
+        self.status_code = status
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value.
@@ -305,6 +298,15 @@ class HttpResponse(object):
         """Full HTTP message, including headers."""
         return '\n'.join(['%s: %s' % (k, v) for k, v in self._headers.values()]) \
                + "\n\n" + self.content
+
+    def determine_charset(self, content_type, request):
+        self._charset = settings.DEFAULT_CHARSET
+        accept_charset = None
+        if request:
+            accept_charset = request.META.get("ACCEPT_CHARSET")
+        if accept_charset or content_type:
+            encoding = get_response_encoding(content_type, accept_charset)
+            (self._charset, self._codec) = encoding
 
     def _convert_to_ascii(self, *values):
         """Converts all values to ascii strings."""
@@ -390,7 +392,8 @@ class HttpResponse(object):
         return self._status_code
 
     def _set_status_code(self, value):
-        self._status_code = value
+        if value:
+            self._status_code = value
 
     status_code = property(_get_status_code, _set_status_code)
 
