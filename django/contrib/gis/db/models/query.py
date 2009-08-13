@@ -125,11 +125,19 @@ class GeoQuerySet(QuerySet):
         if not isinstance(precision, (int, long)):
             raise TypeError('Precision keyword must be set with an integer.')
         
-        # Setting the options flag 
-        options = 0
-        if crs and bbox: options = 3
-        elif crs: options = 1
-        elif bbox: options = 2
+        # Setting the options flag -- which depends on which version of
+        # PostGIS we're using.
+        major, minor1, minor2 = SpatialBackend.version
+        if major >=1 and (minor1 >= 4):
+            options = 0
+            if crs and bbox: options = 3
+            elif bbox: options = 1
+            elif crs: options = 2
+        else:
+            options = 0
+            if crs and bbox: options = 3
+            elif crs: options = 1
+            elif bbox: options = 2
         s = {'desc' : 'GeoJSON', 
              'procedure_args' : {'precision' : precision, 'options' : options},
              'procedure_fmt' : '%(geo_col)s,%(precision)s,%(options)s',

@@ -39,10 +39,7 @@ class RelatedGeoModelTest(unittest.TestCase):
         "Testing the `transform` GeoQuerySet method on related geographic models."
         # All the transformations are to state plane coordinate systems using
         # US Survey Feet (thus a tolerance of 0 implies error w/in 1 survey foot).
-        if SpatialBackend.postgis:
-            tol = 3
-        else:
-            tol = 0
+        tol = 0
 
         def check_pnt(ref, pnt):
             self.assertAlmostEqual(ref.x, pnt.x, tol)

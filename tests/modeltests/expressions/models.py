@@ -80,4 +80,43 @@ Traceback (most recent call last):
 ...
 FieldError: Joined field references are not permitted in this query
 
+# F expressions can be used to update attributes on single objects
+>>> test_gmbh = Company.objects.get(name='Test GmbH')
+>>> test_gmbh.num_employees
+32
+>>> test_gmbh.num_employees = F('num_employees') + 4
+>>> test_gmbh.save()
+>>> test_gmbh = Company.objects.get(pk=test_gmbh.pk)
+>>> test_gmbh.num_employees
+36
+
+# F expressions cannot be used to update attributes which are foreign keys, or
+# attributes which involve joins.
+>>> test_gmbh.point_of_contact = None
+>>> test_gmbh.save()
+>>> test_gmbh.point_of_contact is None
+True
+>>> test_gmbh.point_of_contact = F('ceo')
+Traceback (most recent call last):
+...
+ValueError: Cannot assign "<django.db.models.expressions.F object at ...>": "Company.point_of_contact" must be a "Employee" instance.
+
+>>> test_gmbh.point_of_contact = test_gmbh.ceo
+>>> test_gmbh.save()
+>>> test_gmbh.name = F('ceo__last_name')
+>>> test_gmbh.save()
+Traceback (most recent call last):
+...
+FieldError: Joined field references are not permitted in this query
+
+# F expressions cannot be used to update attributes on objects which do not yet
+# exist in the database
+>>> acme = Company(name='The Acme Widget Co.', num_employees=12, num_chairs=5,
+...     ceo=test_gmbh.ceo)
+>>> acme.num_employees = F('num_employees') + 16
+>>> acme.save()
+Traceback (most recent call last):
+...
+TypeError: int() argument must be a string or a number, not 'ExpressionNode'
+
 """}
