@@ -17,7 +17,7 @@ introduce controlled coupling for convenience's sake.
 ``render_to_response``
 ======================
 
-.. function:: render_to_response(template[, dictionary][, context_instance][, mimetype, content_type, status])
+.. function:: render_to_response(template[, dictionary][, context_instance][, mimetype, content_type, request])
 
    Renders a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.

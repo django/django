@@ -838,6 +838,8 @@ link). This is only used if ``CommonMiddleware`` is installed (see
 SENDFILE_HEADER
 -----------------------------
 
+.. versionadded:: 1.2
+
 Default: ``None``
 
 If not ``None``, this defines the header that an :func:`~django.http.HttpResponseSendFile`

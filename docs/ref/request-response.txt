@@ -502,6 +502,8 @@ Methods
     Otherwise, ``content_type`` is used. If neither is given, the
     ``DEFAULT_CONTENT_TYPE`` setting is used.
 
+    .. versionadded:: 1.2
+
     ``request`` is the request that triggered this response. It can be used in
     the event that a view cares about dealing with request headers, in
     particular the Accept-Charset header.
@@ -577,7 +579,7 @@ live in :mod:`django.http`.
 
 .. class:: HttpResponseSendFile
 
-    .. versionadded:: 1.1
+    .. versionadded:: 1.2
 
     A special response class for efficient file serving. It informs the HTTP
     protocol handler to use platform-specific file serving mechanism (if
@@ -599,7 +601,7 @@ live in :mod:`django.http`.
 
 .. class:: HttpResponseStreaming
 
-    .. versionadded:: 1.1
+    .. versionadded:: 1.2
 
     A special response class that does not consume generators before returning
     the response. To do this, it bypasses middleware that is not useful for

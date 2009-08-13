@@ -7,6 +7,8 @@ How to serve large files via HttpResponseSendFile
 .. module:: django.http
    :synopsis: Serving of large files via handler-specific mechanisms.
 
+.. versionadded:: 1.2
+
 There are cases when you may wish to serve files in a response, but only want
 to provide access to them through your application. As discussed in :ref:`the how-to for serving static
 files <howto-static-files>`, Django is not tuned at all for this sort of serving. Thus, 
