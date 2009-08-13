@@ -36,6 +36,9 @@ urlpatterns = patterns('',
     # HttpResponseSendfile tests 
  	(r'^sendfile/', include('regressiontests.sendfile.urls')), 
 
+    # HttpResponseStreaming tests
+    (r'^streaming/', include('regressiontests.response_streaming.urls')),
+
     # conditional get views
     (r'condition/', include('regressiontests.conditional_processing.urls')),
 )

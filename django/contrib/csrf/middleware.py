@@ -64,6 +64,8 @@ class CsrfResponseMiddleware(object):
     csrfmiddlewaretoken if the response/request have an active
     session.
     """
+    streaming_safe = True
+
     def process_response(self, request, response):
         if getattr(response, 'csrf_exempt', False):
             return response
@@ -102,6 +104,11 @@ class CsrfResponseMiddleware(object):
 
             # Modify any POST forms
             response.content = _POST_FORM_RE.sub(add_csrf_field, response.content)
+            # Handle streaming responses
+            if getattr(response, "content_generator", False):
+                response.content = (_POST_FORM_RE.sub(add_csrf_field, chunk) for chunk in response.content_generator)
+            else:
+                response.content = _POST_FORM_RE.sub(add_csrf_field, response.content)
         return response
 
 class CsrfMiddleware(CsrfViewMiddleware, CsrfResponseMiddleware):

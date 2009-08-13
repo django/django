@@ -8,9 +8,12 @@ class ConditionalGetMiddleware(object):
 
     Also sets the Date and Content-Length response-headers.
     """
+    streaming_safe = True
+
     def process_response(self, request, response):
         response['Date'] = http_date()
-        if not response.has_header('Content-Length'):
+        streaming = getattr(response, "content_generator", False)
+        if not response.has_header('Content-Length') and not streaming:
             response['Content-Length'] = str(len(response.content))
 
         if response.has_header('ETag'):

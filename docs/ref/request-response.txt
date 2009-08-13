@@ -597,6 +597,35 @@ live in :mod:`django.http`.
 
     **Note:** Response middleware is bypassed by HttpResponseSendFile.
 
+.. class:: HttpResponseStreaming
+
+    .. versionadded:: 1.1
+
+    A special response class that does not consume generators before returning
+    the response. To do this, it bypasses middleware that is not useful for
+    chunked responses, and is treated specially by middleware that is useful.
+
+    It is primarily useful for sending large responses that would cause
+    timeouts if sent with a normal HttpResponse.
+
+    **Note:** Of the built-in response middleware, this class works correctly with:
+
+    * :class:`django.middleware.common.CommonMiddleware`
+
+    * :class:`django.middleware.gzip.GZipMiddleware`
+
+    * :class:`django.middleware.http.ConditionalGetMiddleware`
+
+    * :class:`django.contrib.csrf.middleware.CsrfMiddleware`
+
+    Developers of third-party middleware who wish to make it work with this class
+    should note that any time they access :class:`HttpResponseStreaming.content`, it will
+    break the functionality of this class. Instead, replace :attr:`HttpResponseStreaming.content`
+    by wrapping the value of :attr:`HttpResponseStreaming.content_generator`. :class:`django.middleware.gzip.GZipMiddleware`
+    is a good example to follow. To inform the handler to send :class:`HttpResponseStreaming`
+    responses through your middleware, add the class attribute ``streaming_safe = True``
+    to your middleware class.
+
 .. class:: HttpResponseRedirect
 
     The constructor takes a single argument -- the path to redirect to. This

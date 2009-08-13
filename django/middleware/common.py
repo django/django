@@ -27,6 +27,7 @@ class CommonMiddleware(object):
           the entire page content and Not Modified responses will be returned
           appropriately.
     """
+    streaming_safe = True
 
     def process_request(self, request):
         """
@@ -100,14 +101,15 @@ class CommonMiddleware(object):
         if settings.USE_ETAGS:
             if response.has_header('ETag'):
                 etag = response['ETag']
-            else:
+            # Do not consume the content of HttpResponseStreaming
+            elif not getattr(response, "content_generator", False):
                 etag = '"%s"' % md5_constructor(response.content).hexdigest()
-            if response.status_code >= 200 and response.status_code < 300 and request.META.get('HTTP_IF_NONE_MATCH') == etag:
-                cookies = response.cookies
-                response = http.HttpResponseNotModified()
-                response.cookies = cookies
-            else:
-                response['ETag'] = etag
+                if response.status_code >= 200 and response.status_code < 300 and request.META.get('HTTP_IF_NONE_MATCH') == etag:
+                    cookies = response.cookies
+                    response = http.HttpResponseNotModified()
+                    response.cookies = cookies
+                else:
+                    response['ETag'] = etag
 
         return response
 

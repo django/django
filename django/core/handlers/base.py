@@ -74,9 +74,13 @@ class BaseHandler(object):
                 response = self.get_response(request)
 
                 # Apply response middleware
+                streaming = getattr(response, "content_generator", False)
+                streaming_safe = lambda x: getattr(x.im_self, "streaming_safe", False)
                 if not isinstance(response, http.HttpResponseSendFile):
                     for middleware_method in self._response_middleware:
-                        response = middleware_method(request, response)
+                        if not streaming or streaming_safe(middleware_method):
+                            print middleware_method
+                            response = middleware_method(request, response)
                     response = self.apply_response_fixes(request, response)
         finally:
             signals.request_finished.send(sender=self.__class__)

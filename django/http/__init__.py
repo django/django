@@ -436,6 +436,47 @@ class HttpResponse(object):
     def tell(self):
         return sum([len(chunk) for chunk in self._container])
 
+class HttpResponseStreaming(HttpResponse):
+    """
+        This class behaves the same as HttpResponse, except that the content
+        attribute is an unconsumed generator or iterator.
+    """
+    def __init__(self, content='', mimetype=None, status=None,
+                 content_type=None, request=None):
+        super(HttpResponseStreaming, self).__init__('', mimetype,
+            status, content_type, request)
+
+        self._container = content
+        self._is_string = False
+
+    def _consume_content(self):
+        if not self._is_string:
+            content = self._container
+            self._container = [''.join(content)]
+            if hasattr(content, 'close'):
+                content.close()
+            self._is_string = True
+
+    def _get_content(self):
+        self._consume_content()
+        return super(HttpResponseStreaming, self)._get_content()
+
+    def _set_content(self, value):
+        if not isinstance(value, basestring) and hasattr(value, "__iter__"):
+            self._container = value
+            self._is_string = False
+        else:
+            self._container = [value]
+            self._is_string = True
+
+    content = property(_get_content, _set_content)
+
+    def _get_content_generator(self):
+        if not self._is_string:
+            return self._container
+
+    content_generator = property(_get_content_generator)
+
 class HttpResponseSendFile(HttpResponse): 
     sendfile_fh = None
 
