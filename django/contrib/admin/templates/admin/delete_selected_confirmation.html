@@ -19,7 +19,7 @@
     {% endfor %}
     </ul>
 {% else %}
-    <p>{% blocktrans %}Are you sure you want to delete the selected {{ object_name }} objects? All of the following objects and it's related items will be deleted:{% endblocktrans %}</p>
+    <p>{% blocktrans %}Are you sure you want to delete the selected {{ object_name }} objects? All of the following objects and their related items will be deleted:{% endblocktrans %}</p>
     {% for deleteable_object in deletable_objects %}
         <ul>{{ deleteable_object|unordered_list }}</ul>
     {% endfor %}
