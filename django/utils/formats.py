@@ -7,14 +7,6 @@ from django.utils.importlib import import_module
 from django.utils import dateformat
 from django.utils import numberformat 
 
-def getformat_null(format_type):
-    """
-    For a specific format type, returns the default format as
-    set on the settings.
-    format_type is the name of the format, for example 'DATE_FORMAT'
-    """
-    return getattr(settings, format_type)
-
 def project_formats_module():
     """
     Returns the formats module for the current locale, defined
@@ -37,26 +29,20 @@ def django_formats_module():
     except ImportError:
         return None
 
-def getformat_real(format_type):
+def getformat(format_type):
     """
     For a specific format type, returns the format for the
     current language (locale) defaulting to the format on settings.
     format_type is the name of the format, for example 'DATE_FORMAT'
     """
-    for module in (project_formats_module(), django_formats_module()):
-        if module:
-            try:
-                return getattr(module, format_type)
-            except AttributeError:
-                pass
-    return getformat_null(format_type)
-
-# getformat will just return the value on setings if
-# we don't use i18n in our project
-if settings.USE_I18N and settings.USE_FORMAT_I18N:
-    getformat = getformat_real
-else:
-    getformat = getformat_null
+    if settings.USE_I18N and settings.USE_FORMAT_I18N:
+        for module in (project_formats_module(), django_formats_module()):
+            if module:
+                try:
+                    return getattr(module, format_type)
+                except AttributeError:
+                    pass
+    return getattr(settings, format_type)
 
 def date_format(value, format=None):
     """

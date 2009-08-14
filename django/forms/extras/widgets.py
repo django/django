@@ -9,6 +9,7 @@ from django.forms.widgets import Widget, Select
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 from django.utils.formats import getformat
+from django.conf import settings
 
 __all__ = ('SelectDateWidget',)
 
@@ -54,9 +55,14 @@ class SelectDateWidget(Widget):
         day_html = self.create_select(name, self.day_field, value, day_val,  choices)
 
         format = getformat('DATE_FORMAT')
+        escaped = False
         output = []
         for char in format:
-            if char in 'Yy':
+            if escaped:
+                escaped = False
+            elif char == '\\':
+                escaped = True
+            elif char in 'Yy':
                 output.append(year_html)
             elif char in 'bFMmNn':
                 output.append(month_html)
@@ -75,7 +81,16 @@ class SelectDateWidget(Widget):
         if y == m == d == "0":
             return None
         if y and m and d:
-            return '%s-%s-%s' % (y, m, d)
+            if settings.USE_FORMAT_I18N:
+                input_format = getformat('DATE_INPUT_FORMATS')[0]
+                try:
+                    date_value = datetime.date(int(y), int(m), int(d))
+                except ValueError:
+                    pass
+                else:
+                    return date_value.strftime(input_format)
+            else:
+                return '%s-%s-%s' % (y, m, d)
         return data.get(name, None)
 
     def create_select(self, name, field, value, val, choices):

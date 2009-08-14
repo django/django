@@ -4,7 +4,7 @@
 
 DATE_FORMAT = 'j \de F \de Y'
 TIME_FORMAT = 'G:i:s'
-DATETIME_FORMAT = 'j \de F \de Y \a \le\s G:i'
+DATETIME_FORMAT = 'j \de F \de Y \\a \le\s G:i'
 YEAR_MONTH_FORMAT = 'F \de\l Y'
 MONTH_DAY_FORMAT = 'j \de F'
 SHORT_DATE_FORMAT = 'd/m/Y'

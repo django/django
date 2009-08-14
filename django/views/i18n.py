@@ -208,7 +208,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     for k, v in pdict.items():
         src.append("catalog['%s'] = [%s];\n" % (javascript_quote(k), ','.join(["''"]*(v+1))))
     for k, v in get_formats().items():
-        src.append("catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(unicode(v)).encode('utf-8')))
+        src.append("catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(unicode(v))))
     src.extend(csrc)
     src.append(LibFoot)
     src.append(InterPolate)

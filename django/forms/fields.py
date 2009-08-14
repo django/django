@@ -285,7 +285,7 @@ class DateField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(DateField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats or getformat('DATE_INPUT_FORMATS')
+        self.input_formats = input_formats
 
     def clean(self, value):
         """
@@ -299,7 +299,7 @@ class DateField(Field):
             return value.date()
         if isinstance(value, datetime.date):
             return value
-        for format in self.input_formats:
+        for format in self.input_formats or getformat('DATE_INPUT_FORMATS'):
             try:
                 return datetime.date(*time.strptime(value, format)[:3])
             except ValueError:
@@ -314,7 +314,7 @@ class TimeField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(TimeField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats or getformat('TIME_INPUT_FORMATS')
+        self.input_formats = input_formats
 
     def clean(self, value):
         """
@@ -326,7 +326,7 @@ class TimeField(Field):
             return None
         if isinstance(value, datetime.time):
             return value
-        for format in self.input_formats:
+        for format in self.input_formats or getformat('TIME_INPUT_FORMATS'):
             try:
                 return datetime.time(*time.strptime(value, format)[3:6])
             except ValueError:
@@ -341,7 +341,7 @@ class DateTimeField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(DateTimeField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats or getformat('DATETIME_INPUT_FORMATS')
+        self.input_formats = input_formats
 
     def clean(self, value):
         """
@@ -361,7 +361,7 @@ class DateTimeField(Field):
             if len(value) != 2:
                 raise ValidationError(self.error_messages['invalid'])
             value = '%s %s' % tuple(value)
-        for format in self.input_formats:
+        for format in self.input_formats or getformat('DATETIME_INPUT_FORMATS'):
             try:
                 return datetime.datetime(*time.strptime(value, format)[:6])
             except ValueError:
