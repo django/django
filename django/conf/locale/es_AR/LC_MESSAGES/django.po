@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-08-14 11:20-0300\n"
-"PO-Revision-Date: 2009-08-11 21:45-0300\n"
+"PO-Revision-Date: 2009-08-14 11:29-0300\n"
 "Last-Translator: Ramiro Morales <rm0@gmx.net>\n"
 "Language-Team: Django-I18N <django-i18n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -704,7 +704,7 @@ msgstr "Mostrar todos/as"
 
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
-msgstr "Ejecutar"
+msgstr "Buscar"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
