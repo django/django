@@ -345,6 +345,12 @@ li.inline-selector-item:hover {
     background-color: #C1DBFD;
 }
 
+.selector-error {
+    font-weight: bold;
+    border: 2px solid #F00000 !important;
+}
+
+
 .inline-detail {
     float: right;
     width: 80%;

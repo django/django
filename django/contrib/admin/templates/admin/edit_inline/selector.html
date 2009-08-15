@@ -96,19 +96,33 @@
 <script type="text/javascript">
 $(function() {
     /* Selector */
-    $('.inline-detail .selector-item-detail').hide();
-    $('.inline-detail .selector-item-detail:first').show();
-    $('.inline-selector .inline-selector-item:first').addClass('inline-selected');
-    
-    $('.inline-selector-item').click(function () {
+    function select_inline(inline) {
         $('.inline-detail .selector-item-detail').hide();
         $('.inline-selector .inline-selector-item').removeClass('inline-selected');
 
-        $(this).addClass('inline-selected');
+        $(inline).addClass('inline-selected');
         
-        var div_to_show = '#' + $(this).find('a').attr('title');
+        var div_to_show = '#' + $(inline).find('a').attr('title');
         $(div_to_show).show();
-        
+    }
+    
+    $('.inline-detail .selector-item-detail').hide();
+    $('.inline-detail .selector-item-detail:first').show();
+    $('.inline-selector .inline-selector-item:first').addClass('inline-selected');
+    $('.form-row.errors').each(function() {
+        var id = $(this).parents('.selector-item-detail').attr('id').substring({{ inline_admin_formset.opts.verbose_name|length}});
+        $("#{{ inline_admin_formset.opts.verbose_name}}" + id + "-selector").addClass('selector-error');
+    });
+    
+    if ($('.form-row.errors').html()) {
+        select_inline('.selector-error:first');
+    }
+    else {
+        select_inline('.inline-selector-item:first');
+    }
+    
+    $('.inline-selector-item').click(function () {
+        select_inline(this);
         return false;
     });
     
