@@ -5,10 +5,9 @@ from datetime import datetime, timedelta
 
 from django.core.exceptions import ValidationError
 from django.core.validators import (
-        validate_integer,
-        validate_email, validate_slug, validate_ipv4_address,
-        MaxValueValidator, MinValueValidator,
-        MaxLengthValidator, MinLengthValidator,
+        validate_integer, validate_email, validate_slug, validate_ipv4_address,
+        validate_comma_separated_integer_list, MaxValueValidator,
+        MinValueValidator, MaxLengthValidator, MinLengthValidator,
         RequiredIfOtherFieldBlank,
     )
 
@@ -58,6 +57,14 @@ SIMPLE_VALIDATORS_VALUES = (
     (validate_ipv4_address, '25.1.1.', ValidationError),
     (validate_ipv4_address, '25,1,1,1', ValidationError),
     (validate_ipv4_address, '25.1 .1.1', ValidationError),
+
+    (validate_comma_separated_integer_list, '1', None),
+    (validate_comma_separated_integer_list, '1,2,3', None),
+    (validate_comma_separated_integer_list, '1,2,3,', None),
+
+    (validate_comma_separated_integer_list, '', ValidationError),
+    (validate_comma_separated_integer_list, 'a,b,c', ValidationError),
+    (validate_comma_separated_integer_list, '1, 2, 3', ValidationError),
 
     (MaxValueValidator(10), 10, None),
     (MaxValueValidator(10), -10, None),
