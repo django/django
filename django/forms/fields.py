@@ -457,14 +457,6 @@ class EmailField(CharField):
     }
     default_validators = [validators.validate_email]
 
-try:
-    from django.conf import settings
-    URL_VALIDATOR_USER_AGENT = settings.URL_VALIDATOR_USER_AGENT
-except ImportError:
-    # It's OK if Django settings aren't configured.
-    URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
-
-
 class FileField(Field):
     widget = FileInput
     default_error_messages = {
@@ -556,26 +548,17 @@ class ImageField(FileField):
             f.seek(0)
         return f
 
-url_re = re.compile(
-    r'^https?://' # http:// or https://
-    r'(?:(?:[A-Z0-9]+(?:-*[A-Z0-9]+)*\.)+[A-Z]{2,6}|' #domain...
-    r'localhost|' #localhost...
-    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-    r'(?::\d+)?' # optional port
-    r'(?:/?|/\S+)$', re.IGNORECASE)
-
-class URLField(RegexField):
+class URLField(CharField):
     default_error_messages = {
         'invalid': _(u'Enter a valid URL.'),
         'invalid_link': _(u'This URL appears to be a broken link.'),
     }
 
     def __init__(self, max_length=None, min_length=None, verify_exists=False,
-            validator_user_agent=URL_VALIDATOR_USER_AGENT, *args, **kwargs):
-        super(URLField, self).__init__(url_re, max_length, min_length, *args,
+            validator_user_agent=validators.URL_VALIDATOR_USER_AGENT, *args, **kwargs):
+        super(URLField, self).__init__(max_length, min_length, *args,
                                        **kwargs)
-        self.verify_exists = verify_exists
-        self.user_agent = validator_user_agent
+        self.validators.append(validators.URLValidator(verify_exists=verify_exists, validator_user_agent=validator_user_agent))
 
     def to_python(self, value):
         # If no URL scheme given, assume http://
@@ -585,27 +568,6 @@ class URLField(RegexField):
         if value and not urlparse.urlsplit(value)[2]:
             value += '/'
         return super(URLField, self).to_python(value)
-
-    def validate(self, value):
-        super(URLField, self).validate(value)
-        if value == u'':
-            return value
-        if self.verify_exists:
-            import urllib2
-            headers = {
-                "Accept": "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5",
-                "Accept-Language": "en-us,en;q=0.5",
-                "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
-                "Connection": "close",
-                "User-Agent": self.user_agent,
-            }
-            try:
-                req = urllib2.Request(value, None, headers)
-                u = urllib2.urlopen(req)
-            except ValueError:
-                raise ValidationError(self.error_messages['invalid'])
-            except: # urllib2.URLError, httplib.InvalidURL, etc.
-                raise ValidationError(self.error_messages['invalid_link'])
 
 class BooleanField(Field):
     widget = CheckboxInput

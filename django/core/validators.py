@@ -7,6 +7,54 @@ from django.utils.encoding import smart_unicode
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
 
+try:
+    from django.conf import settings
+    URL_VALIDATOR_USER_AGENT = settings.URL_VALIDATOR_USER_AGENT
+except ImportError:
+    # It's OK if Django settings aren't configured.
+    URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
+
+url_re = re.compile(
+    r'^https?://' # http:// or https://
+    r'(?:(?:[A-Z0-9]+(?:-*[A-Z0-9]+)*\.)+[A-Z]{2,6}|' #domain...
+    r'localhost|' #localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+    r'(?::\d+)?' # optional port
+    r'(?:/?|/\S+)$', re.IGNORECASE)
+
+class RegexValidator(object):
+    def __call__(self, value):
+        """
+        Validates that the input matches the regular expression.
+        """
+        if not self.regex.search(smart_unicode(value)):
+            raise ValidationError(_(u'Enter a valid value.'), code='invalid')
+
+class URLValidator(RegexValidator):
+    def __init__(self, regex=url_re, verify_exists=False, validator_user_agent=URL_VALIDATOR_USER_AGENT):
+        self.regex = regex
+        self.verify_exists = verify_exists
+        self.user_agent = validator_user_agent
+
+    def __call__(self, value):
+        super(URLValidator, self).__call__(value)
+        if self.verify_exists:
+            import urllib2
+            headers = {
+                "Accept": "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5",
+                "Accept-Language": "en-us,en;q=0.5",
+                "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+                "Connection": "close",
+                "User-Agent": self.user_agent,
+            }
+            try:
+                req = urllib2.Request(value, None, headers)
+                u = urllib2.urlopen(req)
+            except ValueError:
+                raise ValidationError(_(u'Enter a valid URL.'), code='invalid')
+            except: # urllib2.URLError, httplib.InvalidURL, etc.
+                raise ValidationError(_(u'This URL appears to be a broken link.'), code='invalid_link')
+
 def validate_integer(value):
     try:
         int(value)
