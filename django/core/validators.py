@@ -95,7 +95,7 @@ validate_comma_separated_integer_list = RegexValidator(comma_separated_int_list_
 
 
 class BaseValidator(object):
-    compare = lambda self, a, b: a is b
+    compare = lambda self, a, b: a is not b
     clean   = lambda self, x: x
     message = _(u'Ensure this value is %(limit_value)s (it is %(show_value)s).')
     code = 'limit_value'
@@ -105,11 +105,12 @@ class BaseValidator(object):
 
     def __call__(self, value):
         cleaned = self.clean(value)
+        params = {'limit_value': self.limit_value, 'show_value': cleaned}
         if self.compare(cleaned, self.limit_value):
             raise ValidationError(
-                self.message,
+                self.message % params,
                 code=self.code,
-                params={'limit_value': self.limit_value, 'show_value': cleaned}
+                params=params,
             )
 
 class MaxValueValidator(BaseValidator):

@@ -2,14 +2,16 @@
 import types
 from unittest import TestCase
 from datetime import datetime, timedelta
+import re
 
 from django.core.exceptions import ValidationError
 from django.core.validators import (
         validate_integer, validate_email, validate_slug, validate_ipv4_address,
         validate_comma_separated_integer_list, MaxValueValidator,
         MinValueValidator, MaxLengthValidator, MinLengthValidator,
-        RequiredIfOtherFieldBlank,
-    )
+        RequiredIfOtherFieldBlank, URLValidator, BaseValidator,
+        RegexValidator,
+)
 
 now = datetime.now()
 class TestSimpleValidators(TestCase):
@@ -94,7 +96,39 @@ SIMPLE_VALIDATORS_VALUES = (
 
     (MinLengthValidator(10), '', ValidationError),
 
+    (URLValidator(), 'http://www.djangoproject.com/', None),
+    (URLValidator(), 'http://localhost/', None),
+    (URLValidator(), 'http://example.com/', None),
+    (URLValidator(), 'http://www.example.com/', None),
+    (URLValidator(), 'http://www.example.com:8000/test', None),
+    (URLValidator(), 'http://valid-with-hyphens.com/', None),
+    (URLValidator(), 'http://subdomain.domain.com/', None),
+    (URLValidator(), 'http://200.8.9.10/', None),
+    (URLValidator(), 'http://200.8.9.10:8000/test', None),
+    (URLValidator(), 'http://valid-----hyphens.com/', None),
+
+    (URLValidator(), 'foo', ValidationError),
+    (URLValidator(), 'http://', ValidationError),
+    (URLValidator(), 'http://example', ValidationError),
+    (URLValidator(), 'http://example.', ValidationError),
+    (URLValidator(), 'http://.com', ValidationError),
+    (URLValidator(), 'http://invalid-.com', ValidationError),
+    (URLValidator(), 'http://-invalid.com', ValidationError),
+    (URLValidator(), 'http://inv-.alid-.com', ValidationError),
+    (URLValidator(), 'http://inv-.-alid.com', ValidationError),
+
+    (BaseValidator(True), True, None),
+    (BaseValidator(True), False, ValidationError),
+
+    (RegexValidator('.*'), '', None),
+    (RegexValidator(re.compile('.*')), '', None),
+    (RegexValidator('.*'), 'xxxxx', None),
+
+    (RegexValidator('x'), 'y', ValidationError),
+    (RegexValidator(re.compile('x')), 'y', ValidationError),
+
 )
+
 
 def get_simple_test_func(validator, expected, value, num):
     if isinstance(expected, type) and issubclass(expected, Exception):
