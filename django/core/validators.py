@@ -24,10 +24,17 @@ url_re = re.compile(
 
 class RegexValidator(object):
     regex = ''
+    message = _(u'Enter a valid value.')
+    code = 'invalid'
 
-    def __init__(self, regex=None):
+    def __init__(self, regex=None, message=None, code=None):
         if regex is not None:
             self.regex = regex
+        if message is not None:
+            self.message = message
+        if code is not None:
+            self.code = code
+
         if isinstance(self.regex, basestring):
             self.regex = re.compile(regex)
 
@@ -36,7 +43,7 @@ class RegexValidator(object):
         Validates that the input matches the regular expression.
         """
         if not self.regex.search(smart_unicode(value)):
-            raise ValidationError(_(u'Enter a valid value.'), code='invalid')
+            raise ValidationError(self.message, code=self.code)
 
 class URLValidator(RegexValidator):
     regex = url_re

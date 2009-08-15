@@ -39,6 +39,18 @@ class BaseModelValidationTests(ValidationTestCase):
         mtv = ModelToValidate(number=10, name='Some Name', email='valid@email.com')
         self.assertEqual(None, mtv.clean())
 
+    def test_wrong_url_value_raises_error(self):
+        mtv = ModelToValidate(number=10, name='Some Name', url='not a url')
+        self.assertFieldFailsValidationWithMessage(mtv.clean, 'url', [u'Enter a valid value.'])
+
+    def test_correct_url_but_nonexisting_gives_404(self):
+        mtv = ModelToValidate(number=10, name='Some Name', url='http://google.com/we-love-microsoft.html')
+        self.assertFieldFailsValidationWithMessage(mtv.clean, 'url', [u'This URL appears to be a broken link.'])
+
+    def test_correct_url_value_passes(self):
+        mtv = ModelToValidate(number=10, name='Some Name', url='http://www.djangoproject.com/')
+        self.assertEqual(None, mtv.clean()) # This will fail if there's no Internet connection
+
     def test_text_greater_that_charfields_max_length_eaises_erros(self):
         mtv = ModelToValidate(number=10, name='Some Name'*100)
         self.assertFailsValidation(mtv.clean, ['name',])

@@ -1003,13 +1003,8 @@ class TimeField(Field):
 class URLField(CharField):
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 200)
-        self.verify_exists = verify_exists
         CharField.__init__(self, verbose_name, name, **kwargs)
-
-    def formfield(self, **kwargs):
-        defaults = {'form_class': forms.URLField, 'verify_exists': self.verify_exists}
-        defaults.update(kwargs)
-        return super(URLField, self).formfield(**defaults)
+        self.validators.append(validators.URLValidator(verify_exists=verify_exists))
 
 class XMLField(TextField):
     def __init__(self, verbose_name=None, name=None, schema_path=None, **kwargs):
