@@ -439,17 +439,7 @@ class RegexField(CharField):
         if isinstance(regex, basestring):
             regex = re.compile(regex)
         self.regex = regex
-
-    def validate(self, value):
-        """
-        Validates that the input matches the regular expression. Returns a
-        Unicode object.
-        """
-        super(RegexField, self).validate(value)
-        if value == u'':
-            return value
-        if not self.regex.search(value):
-            raise ValidationError(self.error_messages['invalid'])
+        self.validators.append(validators.RegexValidator(regex=regex))
 
 class EmailField(CharField):
     default_error_messages = {

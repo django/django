@@ -23,6 +23,14 @@ url_re = re.compile(
     r'(?:/?|/\S+)$', re.IGNORECASE)
 
 class RegexValidator(object):
+    regex = ''
+
+    def __init__(self, regex=None):
+        if regex is not None:
+            self.regex = regex
+        if isinstance(self.regex, basestring):
+            self.regex = re.compile(regex)
+
     def __call__(self, value):
         """
         Validates that the input matches the regular expression.
@@ -31,8 +39,10 @@ class RegexValidator(object):
             raise ValidationError(_(u'Enter a valid value.'), code='invalid')
 
 class URLValidator(RegexValidator):
-    def __init__(self, regex=url_re, verify_exists=False, validator_user_agent=URL_VALIDATOR_USER_AGENT):
-        self.regex = regex
+    regex = url_re
+
+    def __init__(self, verify_exists=False, validator_user_agent=URL_VALIDATOR_USER_AGENT):
+        super(URLValidator, self).__init__()
         self.verify_exists = verify_exists
         self.user_agent = validator_user_agent
 
