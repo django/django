@@ -5,9 +5,11 @@ from datetime import datetime, timedelta
 
 from django.core.exceptions import ValidationError
 from django.core.validators import (
-        validate_integer, validate_email, RequiredIfOtherFieldBlank,
-        validate_slug, validate_ipv4_address, MaxValueValidator,
-        MinValueValidator
+        validate_integer,
+        validate_email, validate_slug, validate_ipv4_address,
+        MaxValueValidator, MinValueValidator,
+        MaxLengthValidator, MinLengthValidator,
+        RequiredIfOtherFieldBlank,
     )
 
 now = datetime.now()
@@ -65,6 +67,26 @@ SIMPLE_VALIDATORS_VALUES = (
 
     (MaxValueValidator(0), 1, ValidationError),
     (MaxValueValidator(now), now + timedelta(days=1), ValidationError),
+
+    (MinValueValidator(-10), -10, None),
+    (MinValueValidator(-10), 10, None),
+    (MinValueValidator(-10), 0, None),
+    (MinValueValidator(now), now, None),
+    (MinValueValidator(now), now + timedelta(days=1), None),
+
+    (MinValueValidator(0), -1, ValidationError),
+    (MinValueValidator(now), now - timedelta(days=1), ValidationError),
+
+    (MaxLengthValidator(10), '', None),
+    (MaxLengthValidator(10), 10*'x', None),
+
+    (MaxLengthValidator(10), 15*'x', ValidationError),
+
+    (MinLengthValidator(10), 15*'x', None),
+    (MinLengthValidator(10), 10*'x', None),
+
+    (MinLengthValidator(10), '', ValidationError),
+
 )
 
 def get_simple_test_func(validator, expected, value, num):
