@@ -204,8 +204,8 @@ class CharField(Field):
 class IntegerField(Field):
     default_error_messages = {
         'invalid': _(u'Enter a whole number.'),
-        'max_value': _(u'Ensure this value is less than or equal to %s.'),
-        'min_value': _(u'Ensure this value is greater than or equal to %s.'),
+        'max_value': _(u'Ensure this value is less than or equal to %(limit_value)s.'),
+        'min_value': _(u'Ensure this value is greater than or equal to %(limit_value)s.'),
     }
 
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
@@ -254,8 +254,8 @@ class FloatField(IntegerField):
 class DecimalField(Field):
     default_error_messages = {
         'invalid': _(u'Enter a number.'),
-        'max_value': _(u'Ensure this value is less than or equal to %s.'),
-        'min_value': _(u'Ensure this value is greater than or equal to %s.'),
+        'max_value': _(u'Ensure this value is less than or equal to %(limit_value)s.'),
+        'min_value': _(u'Ensure this value is greater than or equal to %(limit_value)s.'),
         'max_digits': _('Ensure that there are no more than %s digits in total.'),
         'max_decimal_places': _('Ensure that there are no more than %s decimal places.'),
         'max_whole_digits': _('Ensure that there are no more than %s digits before the decimal point.')

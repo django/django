@@ -26,8 +26,8 @@ ValidationError: [u'LENGTH 11, MAX LENGTH 10']
 
 >>> e = {'required': 'REQUIRED'}
 >>> e['invalid'] = 'INVALID'
->>> e['min_value'] = 'MIN VALUE IS %s'
->>> e['max_value'] = 'MAX VALUE IS %s'
+>>> e['min_value'] = 'MIN VALUE IS %(limit_value)s'
+>>> e['max_value'] = 'MAX VALUE IS %(limit_value)s'
 >>> f = IntegerField(min_value=5, max_value=10, error_messages=e)
 >>> f.clean('')
 Traceback (most recent call last):
@@ -50,8 +50,8 @@ ValidationError: [u'MAX VALUE IS 10']
 
 >>> e = {'required': 'REQUIRED'}
 >>> e['invalid'] = 'INVALID'
->>> e['min_value'] = 'MIN VALUE IS %s'
->>> e['max_value'] = 'MAX VALUE IS %s'
+>>> e['min_value'] = 'MIN VALUE IS %(limit_value)s'
+>>> e['max_value'] = 'MAX VALUE IS %(limit_value)s'
 >>> f = FloatField(min_value=5, max_value=10, error_messages=e)
 >>> f.clean('')
 Traceback (most recent call last):
@@ -74,8 +74,8 @@ ValidationError: [u'MAX VALUE IS 10']
 
 >>> e = {'required': 'REQUIRED'}
 >>> e['invalid'] = 'INVALID'
->>> e['min_value'] = 'MIN VALUE IS %s'
->>> e['max_value'] = 'MAX VALUE IS %s'
+>>> e['min_value'] = 'MIN VALUE IS %(limit_value)s'
+>>> e['max_value'] = 'MAX VALUE IS %(limit_value)s'
 >>> e['max_digits'] = 'MAX DIGITS IS %s'
 >>> e['max_decimal_places'] = 'MAX DP IS %s'
 >>> e['max_whole_digits'] = 'MAX DIGITS BEFORE DP IS %s'
