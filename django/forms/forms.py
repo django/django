@@ -9,7 +9,7 @@ from django.utils.html import conditional_escape
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
 from django.utils.safestring import mark_safe
 
-from fields import Field, FileField
+from fields import Field, FileField, OrderField
 from widgets import Media, media_property, TextInput, Textarea
 from util import flatatt, ErrorDict, ErrorList, ValidationError
 
@@ -271,6 +271,7 @@ class BaseForm(StrAndUnicode):
     def _get_changed_data(self):
         if self._changed_data is None:
             self._changed_data = []
+            order_fields = []
             # XXX: For now we're asking the individual widgets whether or not the
             # data has changed. It would probably be more efficient to hash the
             # initial data, store it in a hidden field, and compare a hash of the
@@ -288,7 +289,17 @@ class BaseForm(StrAndUnicode):
                     initial_value = hidden_widget.value_from_datadict(
                         self.data, self.files, initial_prefixed_name)
                 if field.widget._has_changed(initial_value, data_value):
+                    if isinstance(field, OrderField):
+                        order_fields.append(name)
                     self._changed_data.append(name)
+        
+            # if this is an empty form and only the OrderField is changed, we want to treat 
+            # it as untouched
+            if self.empty_permitted and order_fields != []:
+                difference = filter(lambda x: x not in self._changed_data, order_fields)
+                if difference == []:
+                    self._changed_data = []
+        
         return self._changed_data
     changed_data = property(_get_changed_data)
 
