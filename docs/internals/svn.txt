@@ -35,10 +35,10 @@ available, though when using Subversion you'll always want to use the
 repository address instead. At the top level of the repository are two
 directories: ``django`` contains the full source code for all Django
 releases, while ``djangoproject.com`` contains the source code and
-templates for for the `djangoproject.com
-<http://www.djangoproject.com/>` web site. For trying out
-in-development Django code, or contributing to Django, you'll always
-want to check out code from some location in the ``django`` directory.
+templates for the `djangoproject.com <http://www.djangoproject.com/>`_
+web site. For trying out in-development Django code, or contributing
+to Django, you'll always want to check out code from some location in
+the ``django`` directory.
 
 Inside the ``django`` directory, Django's source code is organized
 into three areas:
