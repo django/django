@@ -1,0 +1,258 @@
+.. _internals-svn:
+
+=================================
+The Django source code repository
+=================================
+
+
+When deploying a Django application into a real production
+environment, you will almost always want to use `an official packaged
+release of Django`_. However, if you'd like to try out in-development
+code from an upcoming release or contribute to the development of
+Django, you'll need to obtain a checkout from Django's source code
+repository. This document covers the way the code repository is laid
+out and how to work with and find things in it.
+
+
+.. _an official packaged release of Django: http://www.djangoproject.com/download/
+
+
+High-level overview
+===================
+
+The Django source code repository uses `Subversion`_ to track changes
+to the code over time, so you'll need a copy of the Subversion client
+(a program called ``svn``) on your computer, and you'll want to
+familiarize yourself with the basics of how Subversion
+works. Subversion's web site offers downloads for various operating
+systems, and `a free online book`_ is available to help you get up to
+speed with using Subversion.
+
+The Django Subversion repository is located online at
+`code.djangoproject.com/svn <http://code.djangoproject.com/svn/>`_. `A
+friendly Web-based interface for browsing the code`_ is also
+available, though when using Subversion you'll always want to use the
+repository address instead. At the top level of the repository are two
+directories: ``django`` contains the full source code for all Django
+releases, while ``djangoproject.com`` contains the source code and
+templates for for the `djangoproject.com
+<http://www.djangoproject.com/>` web site. For trying out
+in-development Django code, or contributing to Django, you'll always
+want to check out code from some location in the ``django`` directory.
+
+Inside the ``django`` directory, Django's source code is organized
+into three areas:
+
+* ``branches`` contains branched copies of Django's code, which are
+  (or were) maintained for various purposes. Some branches exist to
+  provide a place to develop major or experimental new features
+  without affecting the rest of Django's code, while others serve to
+  provide bug fixes or support for older Django releases.
+
+* ``tags`` contains snapshots of Django's code at various important
+  points in its history; mostly these are the exact revisions from
+  which packaged Django releases were produced.
+
+* ``trunk`` contains the main in-development code which will become
+  the next packaged release of Django, and is where most development
+  activity is focused.
+
+
+.. _Subversion: http://subversion.tigris.org/
+.. _a free online book: http://svnbook.red-bean.com/
+.. _A friendly web-based interface for browsing the code: http://code.djangoproject.com/browser/
+
+
+Working with Django's trunk
+===========================
+
+If you'd like to try out the in-development code for the next release
+of Django, or if you'd like to contribute to Django by fixing bugs or
+developing new features, you'll want to get the code from trunk. You
+can get a complete copy of this code (a "Subversion checkout") by
+typing::
+
+    svn co http://code.djangoproject.com/svn/django/trunk/
+
+Note that this will get *all* of Django: in addition to the top-level
+``django`` module containing Python code, you'll also get a copy of
+Django's documentation, unit-test suite, packaging scripts and other
+miscellaneous bits. Django's code will be present in your checkout as
+a directory named ``django``.
+
+To try out the in-development trunk code with your own applications,
+simply place the directory containing your checkout on your Python
+import path. Then ``import`` statements which look for Django will find
+the ``django`` module within your checkout.
+
+If you're going to be working on Django's code (say, to fix a bug or
+develop a new feature), you can probably stop reading here and move
+over to :ref:`the documentation for contributing to Django
+<internals-contributing>`, which covers things like the preferred
+coding style and how to generate and submit a patch.
+
+
+Branches
+========
+
+Django uses branches for two main purposes:
+
+1. Development of major or experimental features, to keep them from
+   affecting progress on other work in trunk.
+
+2. Security and bug-fix support for older releases of Django, during
+   their support lifetimes.
+
+
+Feature-development branches
+----------------------------
+
+Feature-development branches tend by their nature to be
+temporary. Some produce successful features which are merged back into
+Django's trunk to become part of an official release, but others do
+not; in either case there comes a time when the branch is no longer
+being actively worked on by any developer. At this point the branch is
+considered closed.
+
+Unfortunately, Subversion has no standard way of indicating
+this. Generally, you can recognize a dead branch by viewing it through
+the web interface, which lists the date of the most recent change to
+the branch. Branches which have gone more than a month or two with no
+activity can usually be assumed to be closed. In the future, the
+layout of branches in the repository may be rearranged to make it
+easier to tell which branches are still active (e.g., by moving closed
+or abandoned branches into the ``django/branches/attic`` directory).
+
+For reference, the following are branches whose code eventually became
+part of Django itself, and so are no longer separately maintained:
+
+* ``boulder-oracle-sprint``: Added support for Oracle databases to
+  Django's object-relational mapper. This has been part of Django
+  since the 1.0 release.
+
+* ``gis``: Added support for geographic/spatial queries to Django's
+  object-relational mapper. This has been part of Django since the 1.0
+  release, as the bundled application ``django.contrib.gis``.
+
+* ``i18n``: Added :ref:`internationalization support <topics-i18n>` to
+  Django. This has been part of Django since the 0.90 release.
+
+* ``magic-removal``: A major refactoring of both the internals and
+  public APIs of Django's object-relational mapper. This has been part
+  of Django since the 0.95 release.
+
+* ``multi-auth``: A refactoring of :ref:`Django's bundled
+  authentication framework <topics-auth>` which added support for
+  :ref:`authentication backends <authentication-backends>`. This has
+  been part of Django since the 0.95 release.
+
+* ``new-admin``: A refactoring of :ref:`Django's bundled
+  administrative application <ref-contrib-admin>`. This became part of
+  Django as of the 0.91 release, but was superseded by another
+  refactoring (see next listing) prior to the Django 1.0 release.
+
+* ``newforms-admin``: The second refactoring of Django's bundled
+  administrative application. This became part of Django as of the 1.0
+  release, and is the basis of the current incarnation of
+  ``django.contrib.admin``.
+
+* ``queryset-refactor``: A refactoring of the internals of Django's
+  object-relational mapper. This became part of Django as of the 1.0
+  release.
+
+* ``unicode``: A refactoring of Django's internals to consistently use
+  Unicode-based strings in most places within Django and Django
+  applications. This became part of Django as of the 1.0 release.
+
+Additionally, the following branches are closed, but their code was
+never merged into Django and the features they aimed to implement
+were never finished:
+
+* ``full-history``
+
+* ``generic-auth``
+
+* ``multiple-db-support``
+
+* ``per-object-permissions``
+
+* ``schema-evolution``
+
+* ``schema-evolution-ng``
+
+* ``search-api``
+
+* ``sqlalchemy``
+
+
+Support and bugfix branches
+---------------------------
+
+In addition to fixing bugs in current trunk, the Django project
+provides official bug-fix support for the most recent released version
+of Django, and security support for the two most recently-released
+versions of Django. This support is provided via branches in which the
+necessary bug or security fixes are applied; the branches are then
+used as the basis for issuing bugfix or security releases.
+
+As of the Django 1.0 release, these branches can be found in the
+repository in the directory ``django/branches/releases``, and new branches
+will be created there approximately one month after each new Django
+release. For example, shortly after the release of Django 1.0, the
+branch ``django/branches/releases/1.0.X`` was created to receive bug
+fixes, and shortly after the release of Django 1.1 the branch
+``django/branches/releases/1.1.X`` will be created.
+
+Prior to the Django 1.0 release, these branches were maintaind within
+the top-level ``django/branches`` directory, and so the following
+branches exist there and provided support for older Django releases:
+
+* ``0.90-bugfixes``
+
+* ``0.91-bugfixes``
+
+* ``0.95-bugfixes``
+
+* ``0.96-bugfixes``
+
+Official support for those releases has expired, and so they no longer
+receive direct maintenance from the Django project. However, the
+branches continue to exist and interested community members have
+occasionally used them to provide unofficial support for old Django
+releases.
+
+
+Tags
+====
+
+The directory ``django/tags`` within the repository contains complete
+copies of the Django source code as it existed at various points in
+its history. These "tagged" copies of Django are *never* changed or
+updated; new tags may be added as needed, but once added they are
+considered read-only and serve as useful guides to Django's
+development history.
+
+Within ``django/tags/releases`` are copies of the code which formed each
+packaged release of Django, and each tag is named with the version
+number of the release to which it corresponds. So, for example,
+``django/tags/releases/1.1`` is a complete copy of the code which was
+packaged as the Django 1.1 release.
+
+Within ``django/tags/notable_moments`` are copies of the Django code from
+points which do not directly correspond to releases, but which are
+nonetheless important historical milestones for Django
+development. The current "notable moments" marked there are:
+
+* ``ipo``: Django's code as it existed at the moment Django was first
+  publicly announced in 2005.
+
+* ``pre-magic-removal``: The state of Django's code just before the
+  merging of the ``magic-removal`` branch (described above), which
+  significantly updated Django's object-relational mapper.
+
+* ``pre-newforms-admin``: The state of Django's code just before the
+  merging of the ``newforms-admin`` branch (see above), which
+  significantly updated Django's bundled administrative application.
+
+* Tags corresponding to each of the alpha, beta and release-candidate
+  packages in the run up to the Django 1.0 release.

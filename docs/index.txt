@@ -187,7 +187,8 @@ The Django open-source project
     * **Community:**
       :ref:`How to get involved <internals-contributing>` |
       :ref:`The release process <internals-release-process>` |
-      :ref:`Team of committers <internals-committers>`
+      :ref:`Team of committers <internals-committers>` |
+      :ref:`The Django source code repository <internals-svn>`
 
     * **Design philosophies:**
       :ref:`Overview <misc-design-philosophies>`
