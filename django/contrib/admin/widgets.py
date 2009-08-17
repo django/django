@@ -158,8 +158,6 @@ class ForeignKeySearchInput(ForeignKeyRawIdWidget):
     """
     # Set in subclass to render the widget with a different template
     widget_template = 'widget/foreignkey_searchinput.html'
-    # Set this to the path of the search view
-    search_path = '../../../foreignkey_autocomplete/'
  
     class Media:
         css = {
@@ -181,6 +179,9 @@ class ForeignKeySearchInput(ForeignKeyRawIdWidget):
         self.search_fields = search_fields
         super(ForeignKeySearchInput, self).__init__(rel, attrs)
  
+    def get_search_path(self, name):
+        return '../autocomplete/%s/' % name
+    
     def render(self, name, value, attrs=None):
         if attrs is None:
             attrs = {}
@@ -206,7 +207,7 @@ class ForeignKeySearchInput(ForeignKeyRawIdWidget):
             'url': url,
             'related_url': related_url,
             'admin_media_prefix': settings.ADMIN_MEDIA_PREFIX,
-            'search_path': self.search_path,
+            'search_path': self.get_search_path(name),
             'search_fields': ','.join(self.search_fields),
             'model_name': model_name,
             'app_label': app_label,
@@ -270,8 +271,6 @@ class ManyToManySearchInput(ManyToManyRawIdWidget):
     """
     # Set in subclass to render the widget with a different template
     widget_template = 'widget/m2m_searchinput.html'
-    # Set this to the path of the search view
-    search_path = '../../../foreignkey_autocomplete/'
  
     class Media:
         css = {
@@ -293,6 +292,8 @@ class ManyToManySearchInput(ManyToManyRawIdWidget):
         objs = self.rel.to._default_manager.filter(**{key + '__in': value.split(',')})
         return ','.join([str(o) for o in objs])
         
+    def get_search_path(self, name):
+        return '../autocomplete/%s/' % name
     
     def render(self, name, value, attrs=None):
         if attrs is None:
@@ -323,7 +324,7 @@ class ManyToManySearchInput(ManyToManyRawIdWidget):
             'url': url,
             'related_url': related_url,
             'admin_media_prefix': settings.ADMIN_MEDIA_PREFIX,
-            'search_path': self.search_path,
+            'search_path': self.get_search_path(name),
             'search_fields': ','.join(self.search_fields),
             'model_name': model_name,
             'app_label': app_label,

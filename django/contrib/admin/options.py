@@ -1,3 +1,4 @@
+import operator
 from django import forms, template
 from django.forms.formsets import all_valid
 from django.forms.models import modelform_factory, modelformset_factory, inlineformset_factory
@@ -9,6 +10,7 @@ from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_ob
 from django.core.exceptions import PermissionDenied
 from django.db import models, transaction
 from django.db.models.fields import BLANK_CHOICE_DASH
+from django.db.models.query import QuerySet
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.datastructures import SortedDict
@@ -19,7 +21,7 @@ from django.utils.functional import curry
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext, ugettext_lazy
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_unicode, smart_str
 try:
     set
 except NameError:
@@ -242,6 +244,9 @@ class ModelAdmin(BaseModelAdmin):
             url(r'^add/$',
                 wrap(self.add_view),
                 name='%s_%s_add' % info),
+            url(r'^autocomplete/(?P<field>[\w-]+)/$',
+                wrap(self.autocomplete_view),
+                name='%s_%s_autocomplete' % info),
             url(r'^(.+)/history/$',
                 wrap(self.history_view),
                 name='%s_%s_history' % info),
@@ -708,6 +713,42 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 return HttpResponseRedirect(".")
 
+    def autocomplete_view(self, request, field, extra_content=None):
+        """
+        Used by the JQuery Autocomplete plugin to do searches on fields of the related model
+        """
+        query = request.GET.get('q', None)
+        
+        if field not in self.autocomplete_fields or query is None:
+            raise Http404
+        
+        related = getattr(self.model, field)
+        rel_model = related.field.rel.to
+        queryset = rel_model._default_manager.all()
+        search_fields = self.autocomplete_fields[field]
+        
+        def construct_search(field_name):
+            # use different lookup methods depending on the notation
+            if field_name.startswith('^'):
+                return "%s__istartswith" % field_name[1:]
+            elif field_name.startswith('='):
+                return "%s__iexact" % field_name[1:]
+            elif field_name.startswith('@'):
+                return "%s__search" % field_name[1:]
+            else:
+                return "%s__icontains" % field_name
+        
+        for bit in query.split():
+            or_queries = [models.Q(**{construct_search(
+                smart_str(field_name)): smart_str(bit)})
+                    for field_name in search_fields]
+            other_qs = QuerySet(rel_model)
+            other_qs.dup_select_related(queryset)
+            other_qs = other_qs.filter(reduce(operator.or_, or_queries))
+            queryset = queryset & other_qs
+        
+        return HttpResponse(''.join([u'%s|%s\n' % (unicode(f), f.pk) for f in queryset]))
+    
     def add_view(self, request, form_url='', extra_context=None):
         "The 'add' admin view for this model."
         model = self.model

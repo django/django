@@ -213,8 +213,6 @@ class AdminSite(object):
             url(r'^jsi18n/$',
                 wrap(self.i18n_javascript, cacheable=True),
                 name='jsi18n'),
-            url(r'^foreignkey_autocomplete/$',
-                'django.contrib.admin.views.autocomplete.foreignkey_autocomplete'),
             url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$',
                 'django.views.defaults.shortcut'),
             url(r'^(?P<app_label>\w+)/$',
