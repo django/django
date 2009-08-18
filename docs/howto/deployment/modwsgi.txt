@@ -98,7 +98,7 @@ file. All other URLs will be served using mod_wsgi::
     </Directory>
 
 .. _lighttpd: http://www.lighttpd.net/
-.. _Nginx: http://wiki.codemongers.com/Main
+.. _Nginx: http://wiki.nginx.org/Main
 .. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
 .. _Apache: http://httpd.apache.org/
 .. _Cherokee: http://www.cherokee-project.com/
