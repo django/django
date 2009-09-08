@@ -24,6 +24,13 @@ commonly used groups of widgets:
 
     Password input: ``<input type='password' ...>``
 
+    Takes one optional argument:
+
+    .. attribute:: PasswordInput.render_value
+
+        Determines whether the widget will have a value filled in when the
+        form is re-displayed after a validation error (default is ``True``).
+
 .. class:: HiddenInput
 
     Hidden input: ``<input type='hidden' ...>``
@@ -87,6 +94,14 @@ commonly used groups of widgets:
 .. class:: CheckboxInput
 
     Checkbox: ``<input type='checkbox' ...>``
+
+    Takes one optional argument:
+
+    .. attribute:: CheckboxInput.check_test
+     
+        A callable that takes the value of the CheckBoxInput 
+        and returns ``True`` if the checkbox should be checked for
+        that value. 
 
 .. class:: Select
 

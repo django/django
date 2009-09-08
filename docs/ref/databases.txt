@@ -476,6 +476,10 @@ version of the driver should **not** be used with Django;
 ``cx_Oracle`` 5.0.1 resolved this issue, so if you'd like to use a
 more recent ``cx_Oracle``, use version 5.0.1.
 
+``cx_Oracle`` 5.0.1 or greater can optionally be compiled with the
+``WITH_UNICODE`` environment variable.  This is recommended but not
+required.
+
 .. _`Oracle Database Server`: http://www.oracle.com/
 .. _`cx_Oracle`: http://cx-oracle.sourceforge.net/
 

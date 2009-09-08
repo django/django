@@ -482,7 +482,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_action(self, action):
         """
-        Return a given action from a parameter, which can either be a calable,
+        Return a given action from a parameter, which can either be a callable,
         or the name of a method on the ModelAdmin.  Return is a tuple of
         (callable, name, description).
         """

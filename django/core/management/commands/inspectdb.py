@@ -15,8 +15,9 @@ class Command(NoArgsCommand):
     def handle_inspection(self):
         from django.db import connection
         import keyword
-
-        table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '').replace('-', '')
+        
+        table2model = lambda table_name: table_name.title()
+            .replace('_', '').replace(' ', '').replace('-', '').replace('*','_').replace(',','_')
 
         cursor = connection.cursor()
         yield "# This is an auto-generated Django model module."
@@ -73,7 +74,7 @@ class Command(NoArgsCommand):
                         extra_params['db_column'] = column_name
                 else:
                     try:
-                        field_type = connection.introspection.data_types_reverse[row[1]]
+                        field_type = connection.introspection.get_field_type(row[1], row)
                     except KeyError:
                         field_type = 'TextField'
                         comment_notes.append('This field type is a guess.')

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
 import unittest
-from django.db import connection
+from django.db import backend, connection
 from django.db.backends.signals import connection_created
 from django.conf import settings
 
@@ -11,9 +11,10 @@ class Callproc(unittest.TestCase):
         # If the backend is Oracle, test that we can call a standard
         # stored procedure through our cursor wrapper.
         if settings.DATABASE_ENGINE == 'oracle':
+            convert_unicode = backend.convert_unicode
             cursor = connection.cursor()
-            cursor.callproc('DBMS_SESSION.SET_IDENTIFIER',
-                            ['_django_testing!',])
+            cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
+                            [convert_unicode('_django_testing!'),])
             return True
         else:
             return True
