@@ -117,8 +117,7 @@ class SortedDict(dict):
         return iter(self.keyOrder)
 
     def values(self):
-        super_get = super(SortedDict, self).__getitem__
-        return [super_get(k) for k in self.keyOrder]
+        return map(super(SortedDict, self).__getitem__, self.keyOrder)
 
     def itervalues(self):
         for key in self.keyOrder:
