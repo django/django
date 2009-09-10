@@ -353,6 +353,9 @@ class AdminViewPermissionsTest(TestCase):
                      LOGIN_FORM_KEY: 1,
                      'username': 'joepublic',
                      'password': 'secret'}
+        self.no_username_login = {
+                     LOGIN_FORM_KEY: 1,
+                     'password': 'secret'}
 
     def testLogin(self):
         """
@@ -412,6 +415,14 @@ class AdminViewPermissionsTest(TestCase):
         request = self.client.get('/test_admin/admin/')
         self.failUnlessEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/', self.joepublic_login)
+        self.failUnlessEqual(login.status_code, 200)
+        # Login.context is a list of context dicts we just need to check the first one.
+        self.assert_(login.context[0].get('error_message'))
+
+        # Requests without username should not return 500 errors.
+        request = self.client.get('/test_admin/admin/')
+        self.failUnlessEqual(request.status_code, 200)
+        login = self.client.post('/test_admin/admin/', self.no_username_login)
         self.failUnlessEqual(login.status_code, 200)
         # Login.context is a list of context dicts we just need to check the first one.
         self.assert_(login.context[0].get('error_message'))

@@ -300,7 +300,7 @@ class AdminSite(object):
         user = authenticate(username=username, password=password)
         if user is None:
             message = ERROR_MESSAGE
-            if u'@' in username:
+            if username is not None and u'@' in username:
                 # Mistakenly entered e-mail address instead of username? Look it up.
                 try:
                     user = User.objects.get(email=username)
