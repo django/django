@@ -139,6 +139,7 @@ class Widget(object):
             self.attrs = attrs.copy()
         else:
             self.attrs = {}
+        super(Widget, self).__init__(attrs)
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
@@ -275,9 +276,10 @@ class FileInput(Input):
 class Textarea(Widget):
     def __init__(self, attrs=None):
         # The 'rows' and 'cols' attributes are required for HTML correctness.
-        self.attrs = {'cols': '40', 'rows': '10'}
+        default_attrs = {'cols': '40', 'rows': '10'}
         if attrs:
-            self.attrs.update(attrs)
+            default_attrs.update(attrs)
+        super(Textarea, self).__init__(default_attrs)
 
     def render(self, name, value, attrs=None):
         if value is None: value = ''
