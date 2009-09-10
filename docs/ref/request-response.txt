@@ -232,16 +232,7 @@ Methods
 
    Returns ``True`` if the request was made via an ``XMLHttpRequest``, by
    checking the ``HTTP_X_REQUESTED_WITH`` header for the string
-   ``'XMLHttpRequest'``. The following major JavaScript libraries all send this
-   header:
-
-       * jQuery
-       * Dojo
-       * MochiKit
-       * MooTools
-       * Prototype
-       * YUI
-
+   ``'XMLHttpRequest'``. Most modern JavaScript libraries send this header.
    If you write your own XMLHttpRequest call (on the browser side), you'll
    have to set this header manually if you want ``is_ajax()`` to work.
 
