@@ -268,9 +268,9 @@ generic view. It's very handy.
 However, there's actually a subtle bug here -- can you spot it?
 
 The problem has to do with when the queries in ``extra_context`` are evaluated.
-Because this example puts ``Publisher.objects.all()`` in the URLconf, it will
+Because this example puts ``Book.objects.all()`` in the URLconf, it will
 be evaluated only once (when the URLconf is first loaded). Once you add or
-remove publishers, you'll notice that the generic view doesn't reflect those
+remove books, you'll notice that the generic view doesn't reflect those
 changes until you reload the Web server (see :ref:`caching-and-querysets`
 for more information about when QuerySets are cached and evaluated).
 
