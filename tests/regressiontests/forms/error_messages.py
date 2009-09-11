@@ -358,4 +358,42 @@ ValidationError: [u'NOT A LIST OF VALUES']
 Traceback (most recent call last):
 ...
 ValidationError: [u'4 IS INVALID CHOICE']
+
+# Subclassing ErrorList #######################################################
+
+>>> from django.utils.safestring import mark_safe
+>>>
+>>> class TestForm(Form):
+...      first_name = CharField()
+...      last_name = CharField()
+...      birthday = DateField()
+...
+...      def clean(self):
+...          raise ValidationError("I like to be awkward.")
+...
+>>> class CustomErrorList(util.ErrorList):
+...      def __unicode__(self):
+...          return self.as_divs()
+...      def as_divs(self):
+...          if not self: return u''
+...          return mark_safe(u'<div class="error">%s</div>'
+...                    % ''.join([u'<p>%s</p>' % e for e in self]))
+...
+
+This form should print errors the default way.
+
+>>> form1 = TestForm({'first_name': 'John'})
+>>> print form1['last_name'].errors
+<ul class="errorlist"><li>This field is required.</li></ul>
+>>> print form1.errors['__all__']
+<ul class="errorlist"><li>I like to be awkward.</li></ul>
+
+This one should wrap error groups in the customized way.
+
+>>> form2 = TestForm({'first_name': 'John'}, error_class=CustomErrorList)
+>>> print form2['last_name'].errors
+<div class="error"><p>This field is required.</p></div>
+>>> print form2.errors['__all__']
+<div class="error"><p>I like to be awkward.</p></div>
+
 """

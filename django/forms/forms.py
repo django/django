@@ -243,13 +243,13 @@ class BaseForm(StrAndUnicode):
                     value = getattr(self, 'clean_%s' % name)()
                     self.cleaned_data[name] = value
             except ValidationError, e:
-                self._errors[name] = e.messages
+                self._errors[name] = self.error_class(e.messages)
                 if name in self.cleaned_data:
                     del self.cleaned_data[name]
         try:
             self.cleaned_data = self.clean()
         except ValidationError, e:
-            self._errors[NON_FIELD_ERRORS] = e.messages
+            self._errors[NON_FIELD_ERRORS] = self.error_class(e.messages)
         if self._errors:
             delattr(self, 'cleaned_data')
 
