@@ -551,12 +551,15 @@ class URLField(CharField):
         self.validators.append(validators.URLValidator(verify_exists=verify_exists, validator_user_agent=validator_user_agent))
 
     def to_python(self, value):
-        # If no URL scheme given, assume http://
-        if value and '://' not in value:
-            value = u'http://%s' % value
-        # If no URL path given, assume /
-        if value and not urlparse.urlsplit(value)[2]:
-            value += '/'
+        if value: 
+            if '://' not in value: 
+                # If no URL scheme given, assume http:// 
+                value = u'http://%s' % value 
+            url_fields = list(urlparse.urlsplit(value)) 
+            if not url_fields[2]: 
+                # the path portion may need to be added before query params 
+                url_fields[2] = '/' 
+                value = urlparse.urlunsplit(url_fields) 
         return super(URLField, self).to_python(value)
 
 class BooleanField(Field):

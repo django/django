@@ -106,6 +106,8 @@ SIMPLE_VALIDATORS_VALUES = (
     (URLValidator(), 'http://200.8.9.10/', None),
     (URLValidator(), 'http://200.8.9.10:8000/test', None),
     (URLValidator(), 'http://valid-----hyphens.com/', None),
+    (URLValidator(), 'http://example.com?something=value', None),
+    (URLValidator(), 'http://example.com/index.php?something=value&another=value2', None),
 
     (URLValidator(), 'foo', ValidationError),
     (URLValidator(), 'http://', ValidationError),

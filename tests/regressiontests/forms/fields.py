@@ -496,6 +496,10 @@ class TestFields(TestCase):
         f = URLField()
         self.assertEqual(u'http://example.com/', f.clean('http://example.com'))
         self.assertEqual(u'http://example.com/test', f.clean('http://example.com/test'))
+
+    def test_urlfield_ticket11826(self):
+        f = URLField()
+        self.assertEqual(u'http://example.com/?some_param=some_value', f.clean('http://example.com?some_param=some_value'))
         
     # BooleanField ################################################################
 

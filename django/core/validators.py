@@ -44,7 +44,7 @@ class URLValidator(RegexValidator):
         r'localhost|' #localhost...
         r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
         r'(?::\d+)?' # optional port
-        r'(?:/?|/\S+)$', re.IGNORECASE)
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
     def __init__(self, verify_exists=False, validator_user_agent=URL_VALIDATOR_USER_AGENT):
         super(URLValidator, self).__init__()
