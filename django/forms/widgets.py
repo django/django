@@ -139,7 +139,6 @@ class Widget(object):
             self.attrs = attrs.copy()
         else:
             self.attrs = {}
-        super(Widget, self).__init__(attrs)
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
