@@ -159,6 +159,16 @@ commonly used groups of widgets:
     .. versionchanged:: 1.1
        The ``date_format`` and ``time_format`` arguments were not supported in Django 1.0.
 
+.. class:: SelectDateWidget
+
+    Wrapper around three select widgets: one each for month, day, and year.
+    Note that this widget lives in a separate file from the standard widgets.
+
+    .. code-block:: python
+
+        from django.forms.extras.widgets import SelectDateWidget
+
+        date = forms.DateField(widget=SelectDateWidget())
 
 Specifying widgets
 ------------------
