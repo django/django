@@ -150,7 +150,7 @@ be using these models::
         publisher = models.ForeignKey(Publisher)
         publication_date = models.DateField()
 
-To build a list page of all books, we'd use a URLconf along these lines::
+To build a list page of all publishers, we'd use a URLconf along these lines::
 
     from django.conf.urls.defaults import *
     from django.views.generic import list_detail
@@ -176,7 +176,7 @@ version of the model's name.
 .. highlightlang:: html+django
 
 This template will be rendered against a context containing a variable called
-``object_list`` that contains all the book objects. A very simple template
+``object_list`` that contains all the publisher objects. A very simple template
 might look like the following::
 
     {% extends "base.html" %}
@@ -217,7 +217,7 @@ Making "friendly" template contexts
 You might have noticed that our sample publisher list template stores all the
 books in a variable named ``object_list``. While this works just fine, it isn't
 all that "friendly" to template authors: they have to "just know" that they're
-dealing with books here. A better name for that variable would be
+dealing with publishers here. A better name for that variable would be
 ``publisher_list``; that variable's content is pretty obvious.
 
 We can change the name of that variable easily with the ``template_object_name``
@@ -241,14 +241,14 @@ Adding extra context
 --------------------
 
 Often you simply need to present some extra information beyond that provided by
-the generic view. For example, think of showing a list of all the other
-publishers on each publisher detail page. The ``object_detail`` generic view
-provides the publisher to the context, but it seems there's no way to get a list
-of *all* publishers in that template.
+the generic view. For example, think of showing a list of all the books on each
+publisher detail page. The ``object_detail`` generic view provides the
+publisher to the context, but it seems there's no way to get additional
+information in that template.
 
 But there is: all generic views take an extra optional parameter,
 ``extra_context``. This is a dictionary of extra objects that will be added to
-the template's context. So, to provide the list of all publishers on the detail
+the template's context. So, to provide the list of all books on the detail
 detail view, we'd use an info dict like this:
 
 .. parsed-literal::
