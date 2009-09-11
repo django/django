@@ -114,14 +114,9 @@ not; in either case there comes a time when the branch is no longer
 being actively worked on by any developer. At this point the branch is
 considered closed.
 
-Unfortunately, Subversion has no standard way of indicating
-this. Generally, you can recognize a dead branch by viewing it through
-the web interface, which lists the date of the most recent change to
-the branch. Branches which have gone more than a month or two with no
-activity can usually be assumed to be closed. In the future, the
-layout of branches in the repository may be rearranged to make it
-easier to tell which branches are still active (e.g., by moving closed
-or abandoned branches into the ``django/branches/attic`` directory).
+Unfortunately, Subversion has no standard way of indicating this. As a
+workaround, branches of Django which are closed and no longer
+maintained are moved into the directory ``django/branches/attic``.
 
 For reference, the following are branches whose code eventually became
 part of Django itself, and so are no longer separately maintained:
@@ -183,6 +178,9 @@ were never finished:
 * ``search-api``
 
 * ``sqlalchemy``
+
+All of the above-mentioned branches now reside in
+``django/branches/attic``.
 
 
 Support and bugfix branches
