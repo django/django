@@ -265,7 +265,7 @@ def date_hierarchy(cl):
         day_lookup = cl.params.get(day_field)
         year_month_format, month_day_format = get_partial_date_formats()
 
-        link = lambda d: mark_safe(cl.get_query_string(d, [field_generic]))
+        link = lambda d: cl.get_query_string(d, [field_generic])
 
         if year_lookup and month_lookup and day_lookup:
             day = datetime.date(int(year_lookup), int(month_lookup), int(day_lookup))
