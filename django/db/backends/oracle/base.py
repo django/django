@@ -36,6 +36,14 @@ DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 
+# Check whether cx_Oracle was compiled with the WITH_UNICODE option.  This will
+# also be True in Python 3.0.
+if int(Database.version.split('.', 1)[0]) >= 5 and not hasattr(Database, 'UNICODE'):
+    convert_unicode = force_unicode
+else:
+    convert_unicode = smart_str
+
+
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
     needs_datetime_string_cast = False
@@ -170,10 +178,10 @@ WHEN (new.%(col_name)s IS NULL)
         return "RETURNING %s INTO %%s", (InsertIdVar(),)
 
     def savepoint_create_sql(self, sid):
-        return "SAVEPOINT " + self.quote_name(sid)
+        return convert_unicode("SAVEPOINT " + self.quote_name(sid))
 
     def savepoint_rollback_sql(self, sid):
-        return "ROLLBACK TO SAVEPOINT " + self.quote_name(sid)
+        return convert_unicode("ROLLBACK TO SAVEPOINT " + self.quote_name(sid))
 
     def sql_flush(self, style, tables, sequences):
         # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
@@ -304,7 +312,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def _cursor(self):
         cursor = None
         if not self._valid_connection():
-            conn_string = self._connect_string()
+            conn_string = convert_unicode(self._connect_string())
             self.connection = Database.connect(conn_string, **self.settings_dict['DATABASE_OPTIONS'])
             cursor = FormatStylePlaceholderCursor(self.connection)
             # Set oracle date to ansi date format.  This only needs to execute
@@ -355,7 +363,8 @@ class OracleParam(object):
         if hasattr(param, 'bind_parameter'):
             self.smart_str = param.bind_parameter(cursor)
         else:
-            self.smart_str = smart_str(param, cursor.charset, strings_only)
+            self.smart_str = convert_unicode(param, cursor.charset,
+                                             strings_only)
         if hasattr(param, 'input_size'):
             # If parameter has `input_size` attribute, use that.
             self.input_size = param.input_size
@@ -423,7 +432,7 @@ class FormatStylePlaceholderCursor(object):
         # is being passed to SQL*Plus.
         if query.endswith(';') or query.endswith('/'):
             query = query[:-1]
-        query = smart_str(query, self.charset) % tuple(args)
+        query = convert_unicode(query % tuple(args), self.charset)
         self._guess_input_sizes([params])
         try:
             return self.cursor.execute(query, self._param_generator(params))
@@ -445,7 +454,7 @@ class FormatStylePlaceholderCursor(object):
         # is being passed to SQL*Plus.
         if query.endswith(';') or query.endswith('/'):
             query = query[:-1]
-        query = smart_str(query, self.charset) % tuple(args)
+        query = convert_unicode(query % tuple(args), self.charset)
         formatted = [self._format_params(i) for i in params]
         self._guess_input_sizes(formatted)
         try:

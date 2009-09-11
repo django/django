@@ -117,6 +117,6 @@ FieldError: Joined field references are not permitted in this query
 >>> acme.save()
 Traceback (most recent call last):
 ...
-TypeError: int() argument must be a string or a number, not 'ExpressionNode'
+TypeError: int() argument must be a string or a number...
 
 """}

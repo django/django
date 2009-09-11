@@ -95,7 +95,7 @@ Creating a ``FormWizard`` class
 The next step is to create a :class:`~django.contrib.formtools.wizard.FormWizard`
 class, which should be a subclass of ``django.contrib.formtools.wizard.FormWizard``.
 
-As your :class:`~django.forms.forms.Form` classes, this
+As with your :class:`~django.forms.forms.Form` classes, this
 :class:`~django.contrib.formtools.wizard.FormWizard` class can live anywhere
 in your codebase, but convention is to put it in :file:`forms.py`.
 
