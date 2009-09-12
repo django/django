@@ -20,7 +20,7 @@ Throughout this reference we'll use the :ref:`example weblog models
 When QuerySets are evaluated
 ============================
 
-Internally, a ``QuerySet`` can be constructed, filter, sliced, and generally
+Internally, a ``QuerySet`` can be constructed, filtered, sliced, and generally
 passed around without actually hitting the database. No database activity
 actually occurs until you do something to evaluate the queryset.
 
