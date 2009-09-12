@@ -8,6 +8,9 @@ A list of all the signals that Django sends.
 
 .. seealso::
 
+    See the documentation on the :ref:`signal dispatcher <topics-signals>` for
+ 	information regarding how to register for and receive signals.
+
     The :ref:`comment framework <ref-contrib-comments-index>` sends a :ref:`set
     of comment-related signals <ref-contrib-comments-signals>`.
 
@@ -98,7 +101,7 @@ pre_save
 
 .. data:: django.db.models.signals.pre_save
    :module:
-   
+
 This is sent at the beginning of a model's :meth:`~django.db.models.Model.save`
 method.
 
@@ -114,8 +117,8 @@ post_save
 ---------
 
 .. data:: django.db.models.signals.post_save
-   :module: 
-   
+   :module:
+
 Like :data:`pre_save`, but sent at the end of the
 :meth:`~django.db.models.Model.save` method.
 
@@ -135,7 +138,7 @@ pre_delete
 
 .. data:: django.db.models.signals.pre_delete
    :module:
-   
+
 Sent at the beginning of a model's :meth:`~django.db.models.Model.delete`
 method.
 
@@ -151,8 +154,8 @@ post_delete
 -----------
 
 .. data:: django.db.models.signals.post_delete
-   :module: 
-   
+   :module:
+
 Like :data:`pre_delete`, but sent at the end of the
 :meth:`~django.db.models.Model.delete` method.
 
@@ -172,7 +175,7 @@ class_prepared
 
 .. data:: django.db.models.signals.class_prepared
    :module:
-   
+
 Sent whenever a model class has been "prepared" -- that is, once model has
 been defined and registered with Django's model system. Django uses this
 signal internally; it's not generally used in third-party applications.
@@ -241,8 +244,8 @@ request_started
 ---------------
 
 .. data:: django.core.signals.request_started
-   :module: 
-   
+   :module:
+
 Sent when Django begins processing an HTTP request.
 
 Arguments sent with this signal:
@@ -258,7 +261,7 @@ request_finished
 
 .. data:: django.core.signals.request_finished
    :module:
-   
+
 Sent when Django finishes processing an HTTP request.
 
 Arguments sent with this signal:
@@ -271,7 +274,7 @@ got_request_exception
 
 .. data:: django.core.signals.got_request_exception
    :module:
-   
+
 This signal is sent whenever Django encounters an exception while processing an incoming HTTP request.
 
 Arguments sent with this signal:
@@ -295,7 +298,7 @@ template_rendered
 
 .. data:: django.test.signals.template_rendered
    :module:
-   
+
 Sent when the test system renders a template. This signal is not emitted during
 normal operation of a Django server -- it is only available during testing.
 
