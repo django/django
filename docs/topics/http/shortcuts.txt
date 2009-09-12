@@ -147,7 +147,7 @@ will be returned::
 ``get_object_or_404``
 =====================
 
-.. function:: get_object_or_404(Model, *args, **kwargs)
+.. function:: get_object_or_404(klass, *args, **kwargs)
 
    Calls :meth:`~django.db.models.QuerySet.get()` on a given model manager,
    but it raises ``django.http.Http404`` instead of the model's
