@@ -134,8 +134,8 @@ class ModPythonRequest(http.HttpRequest):
         if not hasattr(self, '_meta'):
             self._meta = {
                 'AUTH_TYPE':         self._req.ap_auth_type,
-                'CONTENT_LENGTH':    self._req.clength, # This may be wrong
-                'CONTENT_TYPE':      self._req.content_type, # This may be wrong
+                'CONTENT_LENGTH':    self._req.headers_in.get('content-length', 0),
+                'CONTENT_TYPE':      self._req.headers_in.get('content-type'),
                 'GATEWAY_INTERFACE': 'CGI/1.1',
                 'PATH_INFO':         self.path_info,
                 'PATH_TRANSLATED':   None, # Not supported
