@@ -1512,9 +1512,10 @@ regex
 
 Case-sensitive regular expression match.
 
-The regular expression syntax is that of the database backend in use. In the
-case of SQLite, which doesn't natively support regular-expression lookups, the
-syntax is that of Python's ``re`` module.
+The regular expression syntax is that of the database backend in use.
+In the case of SQLite, which has no built in regular expression support,
+this feature is provided by a (Python) user-defined REGEXP function, and
+the regular expression syntax is therefore that of Python's ``re`` module.
 
 Example::
 
