@@ -9,7 +9,7 @@ A list of all the signals that Django sends.
 .. seealso::
 
     See the documentation on the :ref:`signal dispatcher <topics-signals>` for
- 	information regarding how to register for and receive signals.
+    information regarding how to register for and receive signals.
 
     The :ref:`comment framework <ref-contrib-comments-index>` sends a :ref:`set
     of comment-related signals <ref-contrib-comments-signals>`.
