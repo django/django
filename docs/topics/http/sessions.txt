@@ -453,6 +453,20 @@ Default: ``'sessionid'``
 
 The name of the cookie to use for sessions. This can be whatever you want.
 
+SESSION_COOKIE_PATH
+-------------------
+
+.. versionadded:: 1.0
+
+Default: ``'/'``
+
+The path set on the session cookie. This should either match the URL path of
+your Django installation or be parent of that path.
+
+This is useful if you have multiple Django instances running under the same
+hostname. They can use different cookie paths, and each instance will only see
+its own session cookie.
+
 SESSION_COOKIE_SECURE
 ---------------------
 
