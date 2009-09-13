@@ -212,14 +212,15 @@ Methods
     .. method:: models.User.has_perm(perm)
 
         Returns ``True`` if the user has the specified permission, where perm is
-        in the format ``"<application name>.<lowercased model name>"``. If the
-        user is inactive, this method will always return ``False``.
+        in the format ``"<app label>.<permission codename>"``.
+        If the user is inactive, this method will always return ``False``.
 
     .. method:: models.User.has_perms(perm_list)
 
         Returns ``True`` if the user has each of the specified permissions,
-        where each perm is in the format ``"package.codename"``. If the user is
-        inactive, this method will always return ``False``.
+        where each perm is in the format 
+        ``"<app label>.<permission codename>"``. If the user is inactive,
+        this method will always return ``False``.
 
     .. method:: models.User.has_module_perms(package_name)
 
@@ -1062,8 +1063,8 @@ The permission_required decorator
         my_view = permission_required('polls.can_vote')(my_view)
 
     As for the :meth:`User.has_perm` method, permission names take the form
-    ``"<application name>.<lowercased model name>"`` (i.e. ``polls.choice`` for
-    a ``Choice`` model in the ``polls`` application).
+    ``"<app label>.<permission codename>"`` (i.e. ``polls.can_vote`` for a
+    permission on a model in the ``polls`` application).
 
     Note that :func:`~django.contrib.auth.decorators.permission_required()`
     also takes an optional ``login_url`` parameter. Example::
