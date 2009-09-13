@@ -21,7 +21,7 @@ Django has a policy of :ref:`API stability <misc-api-stability>`. This means
 that, in general, code you develop against Django 1.0 should continue to work
 against 1.1 unchanged. However, we do sometimes make backwards-incompatible
 changes if they're necessary to resolve bugs, and there are a handful of such
-(minor) changes between Django 1.0 and Django 1.1. 
+(minor) changes between Django 1.0 and Django 1.1.
 
 Before upgrading to Django 1.1 you should double-check that the following
 changes don't impact you, and upgrade your code if they do.
@@ -41,12 +41,12 @@ However, **users on 64-bit platforms may experience some problems** using the
 would generate a 64-bit, 16 character digest in the constraint name; for
 example::
 
-    ALTER TABLE myapp_sometable ADD CONSTRAINT object_id_refs_id_5e8f10c132091d1e FOREIGN KEY ... 
-    
+    ALTER TABLE myapp_sometable ADD CONSTRAINT object_id_refs_id_5e8f10c132091d1e FOREIGN KEY ...
+
 Following this change, all platforms, regardless of word size, will generate a
 32-bit, 8 character digest in the constraint name; for example::
 
-    ALTER TABLE myapp_sometable ADD CONSTRAINT object_id_refs_id_32091d1e FOREIGN KEY ... 
+    ALTER TABLE myapp_sometable ADD CONSTRAINT object_id_refs_id_32091d1e FOREIGN KEY ...
 
 As a result of this change, you will not be able to use the :djadmin:`reset`
 management command on any table made by a 64-bit machine. This is because the
@@ -94,13 +94,13 @@ other than raise a ``DeprecationWarning``.
 If you've been relying on this middleware, the easiest upgrade path is:
 
     * Examine `the code as it existed before it was removed`__.
-    
+
     * Verify that it works correctly with your upstream proxy, modifying
       it to support your particular proxy (if necessary).
-      
+
     * Introduce your modified version of ``SetRemoteAddrFromForwardedFor`` as a
       piece of middleware in your own project.
-    
+
 __ http://code.djangoproject.com/browser/django/trunk/django/middleware/http.py?rev=11000#L33
 
 Names of uploaded files are available later
@@ -115,7 +115,7 @@ it was available in a model's pre-save signal handler.
 
 In Django 1.1 the file is saved as part of saving the model in the database, so
 the actual file name used on disk cannot be relied on until *after* the model
-has been saved saved.
+has been saved.
 
 Changes to how model formsets are saved
 ---------------------------------------
@@ -132,8 +132,8 @@ public methods.
 Fixed the ``join`` filter's escaping behavior
 ---------------------------------------------
 
-The :ttag:`join` filter no longer escapes the literal value that is 
-passed in for the connector. 
+The :ttag:`join` filter no longer escapes the literal value that is
+passed in for the connector.
 
 This is backwards incompatible for the special situation of the literal string
 containing one of the five special HTML characters. Thus, if you were writing
@@ -157,13 +157,13 @@ One feature has been marked as deprecated in Django 1.1:
 
     * You should no longer use ``AdminSite.root()`` to register that admin
       views. That is, if your URLconf contains the line::
-      
+
             (r'^admin/(.*)', admin.site.root),
-            
+
       You should change it to read::
-        
+
             (r'^admin/', include(admin.site.urls)),
-            
+
 You should begin to remove use of this features from your code immediately.
 
 ``AdminSite.root`` will will raise a ``PendingDeprecationWarning`` if used in
@@ -289,7 +289,7 @@ test client:
     * The test :class:`Client` now can automatically follow redirects with the
       ``follow`` argument to :meth:`Client.get` and :meth:`Client.post`. This
       makes testing views that issue redirects simpler.
-      
+
     * It's now easier to get at the template context in the response returned
       the test client: you'll simply access the context as
       ``request.context[key]``. The old way, which treats ``request.context`` as
@@ -351,13 +351,13 @@ features:
 
     * Support for SpatiaLite_ -- a spatial database for SQLite -- as a spatial
       backend.
-      
+
     * Geographic aggregates (``Collect``, ``Extent``, ``MakeLine``, ``Union``)
       and ``F`` expressions.
-    
+
     * New ``GeoQuerySet`` methods: ``collect``, ``geojson``, and
       ``snap_to_grid``.
-      
+
     * A new list interface methods for ``GEOSGeometry`` objects.
 
 For more details, see the `GeoDjango documentation`_.
@@ -412,23 +412,23 @@ Other new features and changes introduced since Django 1.0 include:
 * The :djadmin:`dumpdata` management command now accepts individual
   model names as arguments, allowing you to export the data just from
   particular models.
-  
+
 * There's a new :tfilter:`safeseq` template filter which works just like
   :tfilter:`safe` for lists, marking each item in the list as safe.
-  
+
 * :ref:`Cache backends <topics-cache>` now support ``incr()`` and
   ``decr()`` commands to increment and decrement the value of a cache key.
   On cache backends that support atomic increment/decrement -- most
   notably, the memcached backend -- these operations will be atomic, and
   quite fast.
-  
+
 * Django now can :ref:`easily delegate authentication to the web server
   <howto-auth-remote-user>` via a new authentication backend that supports
   the standard ``REMOTE_USER`` environment variable used for this purpose.
-  
+
 * There's a new :func:`django.shortcuts.redirect` function that makes it
   easier to issue redirects given an object, a view name, or a URL.
-  
+
 * The ``postgresql_psycopg2`` backend now supports :ref:`native PostgreSQL
   autocommit <postgresql-notes>`. This is an advanced, PostgreSQL-specific
   feature, that can make certain read-heavy applications a good deal
@@ -448,7 +448,7 @@ mailing list:
 join the discussions!
 
 Django's online documentation also includes pointers on how to contribute to
-Django: 
+Django:
 
     * :ref:`How to contribute to Django <internals-contributing>`
 
