@@ -371,6 +371,35 @@ parameter when declaring the form field::
    ...     class Meta:
    ...         model = Article
 
+.. note::
+
+    If you explicitly instantiate a form field like this, Django assumes that you
+    want to completely define its behavior; therefore, default attributes (such as 
+    ``max_length`` or ``required``) are not drawn from the corresponding model. If 
+    you want to maintain the behavior specified in the model, you must set the
+    relevant arguments explicitly when declaring the form field.
+
+    For example, if the ``Article`` model looks like this::
+
+        class Article(models.Model):
+            headline = models.CharField(max_length=200, null=True, blank=True, 
+                                        help_text="Use puns liberally")
+            content = models.TextField()
+
+    and you want to do some custom validation for ``headline``, while keeping
+    the ``blank`` and ``help_text`` values as specified, you might define 
+    ``ArticleForm`` like this::
+
+        class ArticleForm(ModelForm):
+            headline = MyFormField(max_length=200, required=False, 
+                                   help_text="Use puns liberally")
+
+            class Meta:
+                model = Article
+
+    See the :ref:`form field documentation <ref-forms-fields>` for more information
+    on fields and their arguments.
+
 Changing the order of fields
 ----------------------------
 
