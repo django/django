@@ -374,24 +374,24 @@ parameter when declaring the form field::
 .. note::
 
     If you explicitly instantiate a form field like this, Django assumes that you
-    want to completely define its behavior; therefore, default attributes (such as 
-    ``max_length`` or ``required``) are not drawn from the corresponding model. If 
+    want to completely define its behavior; therefore, default attributes (such as
+    ``max_length`` or ``required``) are not drawn from the corresponding model. If
     you want to maintain the behavior specified in the model, you must set the
     relevant arguments explicitly when declaring the form field.
 
     For example, if the ``Article`` model looks like this::
 
         class Article(models.Model):
-            headline = models.CharField(max_length=200, null=True, blank=True, 
+            headline = models.CharField(max_length=200, null=True, blank=True,
                                         help_text="Use puns liberally")
             content = models.TextField()
 
     and you want to do some custom validation for ``headline``, while keeping
-    the ``blank`` and ``help_text`` values as specified, you might define 
+    the ``blank`` and ``help_text`` values as specified, you might define
     ``ArticleForm`` like this::
 
         class ArticleForm(ModelForm):
-            headline = MyFormField(max_length=200, required=False, 
+            headline = MyFormField(max_length=200, required=False,
                                    help_text="Use puns liberally")
 
             class Meta:
@@ -540,6 +540,12 @@ Alternatively, you can create a subclass that sets ``self.queryset`` in
 Then, pass your ``BaseAuthorFormSet`` class to the factory function::
 
     >>> AuthorFormSet = modelformset_factory(Author, formset=BaseAuthorFormSet)
+
+If you want to return a formset that doesn't include *any* pre-existing
+instances of the model, you can specify an empty QuerySet::
+
+   >>> AuthorFormSet(queryset=Author.objects.none())
+
 
 Controlling which fields are used with ``fields`` and ``exclude``
 -----------------------------------------------------------------
