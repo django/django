@@ -845,7 +845,7 @@ the admin application URL dispatching handler to render the pages that deal
 with model instances CRUD operations. As a result, completely overriding these
 methods will significantly change the behavior of the admin application.
 
-One comon reason for overriding these methods is to augment the context data
+One common reason for overriding these methods is to augment the context data
 that is provided to the template that renders the view. In the following
 example, the change view is overridden so that the rendered template is
 provided some extra mapping data that would not otherwise be available::
