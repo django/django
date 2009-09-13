@@ -643,8 +643,7 @@ Save these changes and start a new Python interactive shell by running
     >>> Poll.objects.filter(question__startswith='What')
     [<Poll: What's up?>]
 
-    # Get the poll whose year is 2007. Of course, if you're going through this
-    # tutorial in another year, change as appropriate.
+    # Get the poll whose year is 2007.
     >>> Poll.objects.get(pub_date__year=2007)
     <Poll: What's up?>
 
