@@ -6,7 +6,7 @@
         <field type="BooleanField" name="alive">True</field>
     </object>
     <object pk="2" model="admin_views.person">
-        <field type="CharField" name="name">Grace Hooper</field>
+        <field type="CharField" name="name">Grace Hopper</field>
         <field type="IntegerField" name="gender">1</field>
         <field type="BooleanField" name="alive">False</field>
     </object>
