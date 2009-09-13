@@ -689,8 +689,10 @@ The login_required decorator
 
         * If the user isn't logged in, redirect to
           :setting:`settings.LOGIN_URL <LOGIN_URL>` (``/accounts/login/`` by
-          default), passing the current absolute URL in the query string as
-          ``next`` or the value of ``redirect_field_name``. For example:
+          default), passing the current absolute URL in the query string. The
+          name of the GET argument is determined by the ``redirect_field_name``
+          argument provided to the decorator. The default argument name is
+          ``next``. For example:
           ``/accounts/login/?next=/polls/3/``.
 
         * If the user is logged in, execute the view normally. The view code is
@@ -726,14 +728,14 @@ the following line to your URLconf::
 
         * ``next``: The URL to redirect to after successful login. This may
           contain a query string, too.
-        
+
         * ``site``: The current :class:`~django.contrib.sites.models.Site`,
           according to the :setting:`SITE_ID` setting. If you don't have the
           site framework installed, this will be set to an instance of
           :class:`~django.contrib.sites.models.RequestSite`, which derives the
           site name and domain from the current
           :class:`~django.http.HttpRequest`.
-        
+
         * ``site_name``: An alias for ``site.name``. If you don't have the site
           framework installed, this will be set to the value of
           :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
@@ -745,11 +747,11 @@ the following line to your URLconf::
     :file:`myapp/login.html` instead::
 
         (r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'myapp/login.html'}),
-        
+
     You can also specify the name of the ``GET`` field which contains the URL
     to redirect to after login by passing ``redirect_field_name`` to the view.
     By default, the field is called ``next``.
-        
+
     Here's a sample :file:`registration/login.html` template you can use as a
     starting point. It assumes you have a :file:`base.html` template that
     defines a ``content`` block:
@@ -803,7 +805,7 @@ includes a few other useful built-in views located in
         * ``template_name``: The full name of a template to display after
           logging the user out. This will default to
           :file:`registration/logged_out.html` if no argument is supplied.
-          
+
         * ``redirect_field_name``: The name of a ``GET`` field containing the
           URL to redirect to after log out. Overrides ``next_page`` if the given
           ``GET`` parameter is passed.
@@ -862,17 +864,17 @@ includes a few other useful built-in views located in
         * ``email_template_name``: The full name of a template to use for
           generating the e-mail with the new password. This will default to
           :file:`registration/password_reset_email.html` if not supplied.
-        
+
         * ``password_reset_form``: Form that will be used to set the password.
           Defaults to ``SetPasswordForm``.
-        
+
         * ``token_generator``: Instance of the class to check the password. This
           will default to ``default_token_generator``, it's an instance of
           ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
-          
+
         * ``post_reset_redirect``: The URL to redirect to after a successful
           password change.
-          
+
     **Template context:**
 
         * ``form``: The form for resetting the user's password.
@@ -900,11 +902,11 @@ includes a few other useful built-in views located in
 
         * ``login_url``: The URL of the login page to redirect to. This will
           default to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
-          
+
         * ``redirect_field_name``: The name of a ``GET`` field containing the
           URL to redirect to after log out. Overrides ``next`` if the given
           ``GET`` parameter is passed.
-          
+
 .. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
 
     Presents a form for entering a new password.
@@ -929,7 +931,7 @@ includes a few other useful built-in views located in
    Presents a view which informs the user that the password has been
    successfully changed.
 
-   **Optional arguments:** 
+   **Optional arguments:**
 
        * ``template_name``: The full name of a template to display the view.
          This will default to :file:`registration/password_reset_complete.html`.
