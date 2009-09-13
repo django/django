@@ -64,7 +64,7 @@ code! --, actually the ``direct_to_template`` view simply grabs information from
 the extra-parameters dictionary and uses that information when rendering the
 view.
 
-Because this generic view -- and all the others -- is a regular view functions
+Because this generic view -- and all the others -- is a regular view function
 like any other, we can reuse it inside our own views. As an example, let's
 extend our "about" example to map URLs of the form ``/about/<whatever>/`` to
 statically rendered ``about/<whatever>.html``. We'll do this by first modifying
