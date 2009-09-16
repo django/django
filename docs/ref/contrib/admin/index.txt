@@ -25,7 +25,7 @@ Django's admin interface.
 Overview
 ========
 
-There are five steps in activating the Django admin site:
+There are six steps in activating the Django admin site:
 
     1. Add :class:``django.contrib.admin`` to your :setting:``INSTALLED_APPS``
        setting.
