@@ -41,7 +41,7 @@ def decorator_from_middleware_with_args(middleware_class):
     that accepts the arguments to be passed to the middleware_class.
     Use like::
 
-         cache_page = decorator_from_middleware(CacheMiddleware)
+         cache_page = decorator_from_middleware_with_args(CacheMiddleware)
          # ...
 
          @cache_page(3600)
