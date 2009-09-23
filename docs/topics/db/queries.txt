@@ -622,6 +622,8 @@ To avoid this problem, simply save the ``QuerySet`` and reuse it::
     >>> print [p.headline for p in queryset] # Evaluate the query set.
     >>> print [p.pub_date for p in queryset] # Re-use the cache from the evaluation.
 
+.. _complex-lookups-with-q:
+
 Complex lookups with Q objects
 ==============================
 
