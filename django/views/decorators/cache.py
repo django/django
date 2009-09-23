@@ -20,15 +20,20 @@ from django.utils.decorators import decorator_from_middleware_with_args, auto_ad
 from django.utils.cache import patch_cache_control, add_never_cache_headers
 from django.middleware.cache import CacheMiddleware
 
-def cache_page(*args, **kwargs):
+def cache_page(*args):
     # We need backwards compatibility with code which spells it this way:
     #   def my_view(): pass
     #   my_view = cache_page(123, my_view)
     # and this way:
     #   my_view = cache_page(123)(my_view)
+
+    # We also add some asserts to give better error messages in case people are
+    # using other ways to call cache_page that no longer work.
     timeout = args[0]
     if len(args) > 1:
+        assert len(args) == 2, "cache_page accepts at most 2 arguments"
         fn = args[1]
+        assert callable(fn), "cache_page is expecting 2nd argument to be a callable"
         return decorator_from_middleware_with_args(CacheMiddleware)(timeout)(fn)
     else:
         return decorator_from_middleware_with_args(CacheMiddleware)(timeout)
