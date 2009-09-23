@@ -844,7 +844,7 @@ define the details of how the relation works.
     current date/time to be chosen.
 
     Instead of a dictionary this can also be a :class:`~django.db.models.Q`
-    object (an object with a :meth:`get_sql` method) for more complex queries.
+    object for more :ref:`complex queries <complex-lookups-with-q>`.
 
     ``limit_choices_to`` has no effect on the inline FormSets that are created
     to display related objects in the admin.
