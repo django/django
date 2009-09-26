@@ -105,7 +105,7 @@ class DecoratorsTest(TestCase):
         """
         def my_view(request):
             return "response"
-        my_view_cached = cache_page(123, my_view)
+        my_view_cached = cache_page(my_view, 123)
         self.assertEqual(my_view_cached(HttpRequest()), "response")
 
 class MethodDecoratorAdapterTests(TestCase):

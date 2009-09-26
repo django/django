@@ -23,20 +23,24 @@ from django.middleware.cache import CacheMiddleware
 def cache_page(*args):
     # We need backwards compatibility with code which spells it this way:
     #   def my_view(): pass
-    #   my_view = cache_page(123, my_view)
+    #   my_view = cache_page(my_view, 123)
     # and this way:
     #   my_view = cache_page(123)(my_view)
+    # and possibly this way (?):
+    #   my_view = cache_page(123, my_view)
 
     # We also add some asserts to give better error messages in case people are
     # using other ways to call cache_page that no longer work.
-    timeout = args[0]
     if len(args) > 1:
         assert len(args) == 2, "cache_page accepts at most 2 arguments"
-        fn = args[1]
-        assert callable(fn), "cache_page is expecting 2nd argument to be a callable"
-        return decorator_from_middleware_with_args(CacheMiddleware)(timeout)(fn)
+        if callable(args[0]):
+            return decorator_from_middleware_with_args(CacheMiddleware)(args[1])(args[0])
+        elif callable(args[1]):
+            return decorator_from_middleware_with_args(CacheMiddleware)(args[0])(args[1])
+        else:
+            assert False, "cache_page must be passed either a single argument (timeout) or a view function and a timeout"
     else:
-        return decorator_from_middleware_with_args(CacheMiddleware)(timeout)
+        return decorator_from_middleware_with_args(CacheMiddleware)(args[0])
 
 def cache_control(**kwargs):
 
