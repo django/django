@@ -361,6 +361,17 @@ then requests to ``/foo/1/`` and ``/foo/23/`` will be cached separately, as
 you may expect. But once a particular URL (e.g., ``/foo/23/``) has been
 requested, subsequent requests to that URL will use the cache.
 
+``cache_page`` can also take an optional keyword argument, ``key_prefix``, which
+works in the same way as the ``CACHE_MIDDLEWARE_KEY_PREFIX`` setting for the
+middleware.  It can be used like this::
+
+    my_view = cache_page(my_view, 60 * 15, key_prefix="site1")
+
+Or, using Python 2.4's decorator syntax::
+
+    @cache_page(60 * 15, key_prefix="site1")
+    def my_view(request):
+
 Specifying per-view cache in the URLconf
 ----------------------------------------
 

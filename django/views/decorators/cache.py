@@ -20,27 +20,33 @@ from django.utils.decorators import decorator_from_middleware_with_args, auto_ad
 from django.utils.cache import patch_cache_control, add_never_cache_headers
 from django.middleware.cache import CacheMiddleware
 
-def cache_page(*args):
+def cache_page(*args, **kwargs):
     # We need backwards compatibility with code which spells it this way:
     #   def my_view(): pass
     #   my_view = cache_page(my_view, 123)
     # and this way:
     #   my_view = cache_page(123)(my_view)
+    # and this:
+    #   my_view = cache_page(my_view, 123, key_prefix="foo")
+    # and this:
+    #   my_view = cache_page(123, key_prefix="foo")(my_view)
     # and possibly this way (?):
     #   my_view = cache_page(123, my_view)
 
     # We also add some asserts to give better error messages in case people are
     # using other ways to call cache_page that no longer work.
+    key_prefix = kwargs.pop('key_prefix', None)
+    assert not kwargs, "The only keyword argument accepted is key_prefix"
     if len(args) > 1:
         assert len(args) == 2, "cache_page accepts at most 2 arguments"
         if callable(args[0]):
-            return decorator_from_middleware_with_args(CacheMiddleware)(args[1])(args[0])
+            return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[1], key_prefix=key_prefix)(args[0])
         elif callable(args[1]):
-            return decorator_from_middleware_with_args(CacheMiddleware)(args[0])(args[1])
+            return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[0], key_prefix=key_prefix)(args[1])
         else:
             assert False, "cache_page must be passed either a single argument (timeout) or a view function and a timeout"
     else:
-        return decorator_from_middleware_with_args(CacheMiddleware)(args[0])
+        return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[0], key_prefix=key_prefix)
 
 def cache_control(**kwargs):
 
