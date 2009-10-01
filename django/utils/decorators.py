@@ -23,14 +23,12 @@ class MethodDecoratorAdaptor(object):
         return self.decorator(self.func)(*args, **kwargs)
     def __get__(self, instance, owner):
         return self.decorator(self.func.__get__(instance, owner))
-    def _get_name(self):
-        return self.func.__name__
-    def _get_doc(self):
-        return self.func.__doc__
 
 def auto_adapt_to_methods(decorator):
-    """Allows you to use the same decorator on methods and functions,
-    hiding the self argument from the decorator."""
+    """
+    Takes a decorator function, and returns a decorator-like callable that can
+    be used on methods as well as functions.
+    """
     def adapt(func):
         return MethodDecoratorAdaptor(decorator, func)
     return wraps(decorator)(adapt)
