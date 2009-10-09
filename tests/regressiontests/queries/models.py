@@ -67,6 +67,9 @@ class Author(models.Model):
     num = models.IntegerField(unique=True)
     extra = models.ForeignKey(ExtraInfo)
 
+    class Meta:
+        ordering = ['name']
+
     def __unicode__(self):
         return self.name
 

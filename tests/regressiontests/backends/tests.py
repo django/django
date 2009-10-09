@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
 import unittest
-from django.db import connection, DEFAULT_DB_ALIAS
+from django.db import backend, connection, DEFAULT_DB_ALIAS
 from django.db.backends.signals import connection_created
 from django.conf import settings
 
@@ -11,19 +11,20 @@ class Callproc(unittest.TestCase):
         # If the backend is Oracle, test that we can call a standard
         # stored procedure through our cursor wrapper.
         if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == 'oracle':
+            convert_unicode = backend.convert_unicode
             cursor = connection.cursor()
-            cursor.callproc('DBMS_SESSION.SET_IDENTIFIER',
-                            ['_django_testing!',])
+            cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
+                            [convert_unicode('_django_testing!'),])
             return True
         else:
             return True
-
+            
 class LongString(unittest.TestCase):
 
     def test_long_string(self):
         # If the backend is Oracle, test that we can save a text longer
         # than 4000 chars and read it properly
-        if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == 'oracle':
+        if settings.DATABASE_ENGINE == 'oracle':
             c = connection.cursor()
             c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
             long_str = ''.join([unicode(x) for x in xrange(4000)])

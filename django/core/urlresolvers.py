@@ -287,8 +287,17 @@ class RegexURLResolver(object):
                     candidate = result % unicode_kwargs
                 if re.search(u'^%s' % pattern, candidate, re.UNICODE):
                     return candidate
+        # lookup_view can be URL label, or dotted path, or callable, Any of
+        # these can be passed in at the top, but callables are not friendly in
+        # error messages.
+        m = getattr(lookup_view, '__module__', None)
+        n = getattr(lookup_view, '__name__', None)
+        if m is not None and n is not None:
+            lookup_view_s = "%s.%s" % (m, n)
+        else:
+            lookup_view_s = lookup_view
         raise NoReverseMatch("Reverse for '%s' with arguments '%s' and keyword "
-                "arguments '%s' not found." % (lookup_view, args, kwargs))
+                "arguments '%s' not found." % (lookup_view_s, args, kwargs))
 
 def resolve(path, urlconf=None):
     return get_resolver(urlconf).resolve(path)

@@ -767,6 +767,13 @@ u'example@valid-----hyphens.com'
 >>> f.clean('example@valid-with-hyphens.com')
 u'example@valid-with-hyphens.com'
 
+# Check for runaway regex security problem. This will take for-freeking-ever
+# if the security fix isn't in place.
+>>> f.clean('viewx3dtextx26qx3d@yahoo.comx26latlngx3d15854521645943074058')
+Traceback (most recent call last):
+    ...
+ValidationError: [u'Enter a valid e-mail address.']
+
 >>> f = EmailField(required=False)
 >>> f.clean('')
 u''
@@ -972,6 +979,32 @@ ValidationError: [u'Enter a valid URL.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
+>>> f.clean('.')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.clean('com.')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.clean('http://example.com.')
+u'http://example.com./'
+>>> f.clean('example.com.')
+u'http://example.com./'
+
+# hangs "forever" if catastrophic backtracking in ticket:#11198 not fixed
+>>> f.clean('http://%s' % ("X"*200,))
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+
+# a second test, to make sure the problem is really addressed, even on 
+# domains that don't fail the domain label length check in the regex
+>>> f.clean('http://%s' % ("X"*60,))
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+
 >>> f.clean('http://.com')
 Traceback (most recent call last):
 ...

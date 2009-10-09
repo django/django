@@ -25,21 +25,26 @@ Django's admin interface.
 Overview
 ========
 
-There are five steps in activating the Django admin site:
+There are six steps in activating the Django admin site:
 
-    1. Add ``django.contrib.admin`` to your ``INSTALLED_APPS`` setting.
+    1. Add ``'django.contrib.admin'`` to your :setting:`INSTALLED_APPS`
+       setting.
 
-    2. Determine which of your application's models should be editable in the
+    2. Admin has two dependencies - ``django.contrib.auth`` and
+       ``django.contrib.contenttypes``. If these applications are not
+       in your :setting:`INSTALLED_APPS` list, add them.
+
+    3. Determine which of your application's models should be editable in the
        admin interface.
 
-    3. For each of those models, optionally create a ``ModelAdmin`` class that
+    4. For each of those models, optionally create a ``ModelAdmin`` class that
        encapsulates the customized admin functionality and options for that
        particular model.
 
-    4. Instantiate an ``AdminSite`` and tell it about each of your models and
+    5. Instantiate an ``AdminSite`` and tell it about each of your models and
        ``ModelAdmin`` classes.
 
-    5. Hook the ``AdminSite`` instance into your URLconf.
+    6. Hook the ``AdminSite`` instance into your URLconf.
 
 Other topics
 ------------
@@ -845,7 +850,7 @@ the admin application URL dispatching handler to render the pages that deal
 with model instances CRUD operations. As a result, completely overriding these
 methods will significantly change the behavior of the admin application.
 
-One comon reason for overriding these methods is to augment the context data
+One common reason for overriding these methods is to augment the context data
 that is provided to the template that renders the view. In the following
 example, the change view is overridden so that the rendered template is
 provided some extra mapping data that would not otherwise be available::

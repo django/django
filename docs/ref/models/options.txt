@@ -19,6 +19,17 @@ Available ``Meta`` options
 
 If ``True``, this model will be an :ref:`abstract base class <abstract-base-classes>`.
 
+``app_label``
+-------------
+
+.. attribute:: Options.app_label
+
+If a model exists outside of the standard :file:`models.py` (for instance, if
+the app's models are in submodules of ``myapp.models``), the model must define
+which app it is part of::
+
+    app_label = 'myapp'
+
 ``db_table``
 ------------
 

@@ -196,7 +196,7 @@ def get_filter_tests():
         'filter-force-escape05': ('{% autoescape off %}{{ a|force_escape|escape }}{% endautoescape %}', {"a": "x&y"}, u"x&amp;y"),
         'filter-force-escape06': ('{{ a|force_escape|escape }}', {"a": "x&y"}, u"x&amp;y"),
         'filter-force-escape07': ('{% autoescape off %}{{ a|escape|force_escape }}{% endautoescape %}', {"a": "x&y"}, u"x&amp;y"),
-        'filter-force-escape07': ('{{ a|escape|force_escape }}', {"a": "x&y"}, u"x&amp;y"),
+        'filter-force-escape08': ('{{ a|escape|force_escape }}', {"a": "x&y"}, u"x&amp;y"),
 
         # The contents in "linebreaks" and "linebreaksbr" are escaped
         # according to the current autoescape setting.

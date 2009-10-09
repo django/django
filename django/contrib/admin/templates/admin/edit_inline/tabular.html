@@ -15,6 +15,7 @@
      {% if inline_admin_formset.formset.can_delete %}<th>{% trans "Delete?" %}</th>{% endif %}
      </tr></thead>
 
+     <tbody>
      {% for inline_admin_form in inline_admin_formset %}
         {% if inline_admin_form.form.non_field_errors %}
         <tr><td colspan="{{ inline_admin_form.field_count }}">{{ inline_admin_form.form.non_field_errors }}</td></tr>
@@ -57,7 +58,7 @@
         </tr>
 
      {% endfor %}
-
+     </tbody>
    </table>
 
 </fieldset>

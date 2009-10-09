@@ -126,7 +126,7 @@ Here's the default ``static/directory_index.html`` template:
     listings. The template that was loaded had to be called
     ``static/directory_listing`` (with no ``.html`` extension). For backwards
     compatibility with earlier versions, Django will still load templates with
-    the older (no extension) name, but it will prefer a the
+    the older (no extension) name, but it will prefer the
     ``directory_index.html`` version.
 
 Limiting use to DEBUG=True

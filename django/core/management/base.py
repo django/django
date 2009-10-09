@@ -398,7 +398,9 @@ def copy_helper(style, app_or_project, name, directory, other_name=''):
             if subdir.startswith('.'):
                 del subdirs[i]
         for f in files:
-            if f.endswith('.pyc'):
+            if not f.endswith('.py'):
+                # Ignore .pyc, .pyo, .py.class etc, as they cause various
+                # breakages.
                 continue
             path_old = os.path.join(d, f)
             path_new = os.path.join(top_dir, relative_dir, f.replace('%s_name' % app_or_project, name))

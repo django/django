@@ -62,7 +62,7 @@ class SQLEvaluator(object):
             else:
                 sql, params = '%s', (child,)
 
-            if hasattr(child, 'children') > 1:
+            if len(getattr(child, 'children', [])) > 1:
                 format = '(%s)'
             else:
                 format = '%s'

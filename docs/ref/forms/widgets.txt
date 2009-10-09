@@ -24,6 +24,13 @@ commonly used groups of widgets:
 
     Password input: ``<input type='password' ...>``
 
+    Takes one optional argument:
+
+    .. attribute:: PasswordInput.render_value
+
+        Determines whether the widget will have a value filled in when the
+        form is re-displayed after a validation error (default is ``True``).
+
 .. class:: HiddenInput
 
     Hidden input: ``<input type='hidden' ...>``
@@ -88,6 +95,14 @@ commonly used groups of widgets:
 
     Checkbox: ``<input type='checkbox' ...>``
 
+    Takes one optional argument:
+
+    .. attribute:: CheckboxInput.check_test
+     
+        A callable that takes the value of the CheckBoxInput 
+        and returns ``True`` if the checkbox should be checked for
+        that value. 
+
 .. class:: Select
 
     Select widget: ``<select><option ...>...</select>``
@@ -144,6 +159,16 @@ commonly used groups of widgets:
     .. versionchanged:: 1.1
        The ``date_format`` and ``time_format`` arguments were not supported in Django 1.0.
 
+.. class:: SelectDateWidget
+
+    Wrapper around three select widgets: one each for month, day, and year.
+    Note that this widget lives in a separate file from the standard widgets.
+
+    .. code-block:: python
+
+        from django.forms.extras.widgets import SelectDateWidget
+
+        date = forms.DateField(widget=SelectDateWidget())
 
 Specifying widgets
 ------------------

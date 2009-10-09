@@ -232,16 +232,7 @@ Methods
 
    Returns ``True`` if the request was made via an ``XMLHttpRequest``, by
    checking the ``HTTP_X_REQUESTED_WITH`` header for the string
-   ``'XMLHttpRequest'``. The following major JavaScript libraries all send this
-   header:
-
-       * jQuery
-       * Dojo
-       * MochiKit
-       * MooTools
-       * Prototype
-       * YUI
-
+   ``'XMLHttpRequest'``. Most modern JavaScript libraries send this header.
    If you write your own XMLHttpRequest call (on the browser side), you'll
    have to set this header manually if you want ``is_ajax()`` to work.
 
@@ -271,7 +262,7 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Returns the value for the given key. If the key has more than one value,
     ``__getitem__()`` returns the last value. Raises
-    ``django.utils.datastructure.MultiValueDictKeyError`` if the key does not
+    ``django.utils.datastructures.MultiValueDictKeyError`` if the key does not
     exist. (This is a subclass of Python's standard ``KeyError``, so you can
     stick to catching ``KeyError``.)
 
@@ -319,7 +310,7 @@ a subclass of dictionary. Exceptions are outlined here:
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.items()
            [('a', '3')]
-           
+
 .. method:: QueryDict.iteritems()
 
     Just like the standard dictionary ``iteritems()`` method. Like

@@ -27,7 +27,7 @@ class FRPhoneNumberField(Field):
     '0X XX XX XX XX'.
     """
     default_error_messages = {
-        'invalid': u'Phone numbers must be in 0X XX XX XX XX format.',
+        'invalid': _('Phone numbers must be in 0X XX XX XX XX format.'),
     }
 
     def clean(self, value):
