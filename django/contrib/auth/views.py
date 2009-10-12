@@ -14,11 +14,13 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.views.decorators.cache import never_cache
 
-def login(request, template_name='registration/login.html', redirect_field_name=REDIRECT_FIELD_NAME):
+def login(request, template_name='registration/login.html',
+          redirect_field_name=REDIRECT_FIELD_NAME,
+          authentication_form=AuthenticationForm):
     "Displays the login form and handles the login action."
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     if request.method == "POST":
-        form = AuthenticationForm(data=request.POST)
+        form = authentication_form(data=request.POST)
         if form.is_valid():
             # Light security check -- make sure redirect_to isn't garbage.
             if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
@@ -29,7 +31,7 @@ def login(request, template_name='registration/login.html', redirect_field_name=
                 request.session.delete_test_cookie()
             return HttpResponseRedirect(redirect_to)
     else:
-        form = AuthenticationForm(request)
+        form = authentication_form(request)
     request.session.set_test_cookie()
     if Site._meta.installed:
         current_site = Site.objects.get_current()
@@ -137,7 +139,7 @@ def password_reset_confirm(request, uidb36=None, token=None, template_name='regi
     else:
         context_instance['validlink'] = False
         form = None
-    context_instance['form'] = form    
+    context_instance['form'] = form
     return render_to_response(template_name, context_instance=context_instance)
 
 def password_reset_complete(request, template_name='registration/password_reset_complete.html'):
@@ -145,16 +147,16 @@ def password_reset_complete(request, template_name='registration/password_reset_
                                                                              {'login_url': settings.LOGIN_URL}))
 
 def password_change(request, template_name='registration/password_change_form.html',
-                    post_change_redirect=None):
+                    post_change_redirect=None, password_change_form=PasswordChangeForm):
     if post_change_redirect is None:
         post_change_redirect = reverse('django.contrib.auth.views.password_change_done')
     if request.method == "POST":
-        form = PasswordChangeForm(request.user, request.POST)
+        form = password_change_form(user=request.user, data=request.POST)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(post_change_redirect)
     else:
-        form = PasswordChangeForm(request.user)
+        form = password_change_form(user=request.user)
     return render_to_response(template_name, {
         'form': form,
     }, context_instance=RequestContext(request))

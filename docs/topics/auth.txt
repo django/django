@@ -262,8 +262,8 @@ Manager functions
         Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
         The :attr:`~django.contrib.auth.models.User.username`,
         :attr:`~django.contrib.auth.models.User.email` and
-        :attr:`~django.contrib.auth.models.User.password` are set as given, and
-        the :class:`~django.contrib.auth.models.User` gets ``is_active=True``.
+        :attr:`~django.contrib.auth.models.User.password` are set as given, and the
+        :class:`~django.contrib.auth.models.User` gets ``is_active=True``.
 
         If no password is provided,
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` will
@@ -705,7 +705,7 @@ the following line to your URLconf::
 
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
-.. function:: views.login(request, [template_name, redirect_field_name])
+.. function:: views.login(request, [template_name, redirect_field_name, authentication_form])
 
     Here's what ``django.contrib.auth.views.login`` does:
 
@@ -785,6 +785,15 @@ the following line to your URLconf::
 
         {% endblock %}
 
+    .. versionadded:: 1.2
+
+    If you are using alternate authentication (see
+    :ref:`authentication-backends`) you can pass a custom authentication form
+    to the login view via the ``authentication_form`` parameter. This form must
+    accept a ``request`` keyword argument in its ``__init__`` method, and
+    provide a ``get_user`` argument which returns the authenticated user object
+    (this method is only ever called after successful form validation).
+
     .. _forms documentation: ../forms/
     .. _site framework docs: ../sites/
 
@@ -824,7 +833,7 @@ includes a few other useful built-in views located in
         * ``login_url``: The URL of the login page to redirect to. This will
           default to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
-.. function:: views.password_change(request[, template_name, post_change_redirect])
+.. function:: views.password_change(request[, template_name, post_change_redirect, password_change_form])
 
     Allows a user to change their password.
 
@@ -836,6 +845,13 @@ includes a few other useful built-in views located in
 
         * ``post_change_redirect``: The URL to redirect to after a successful
           password change.
+
+        * .. versionadded:: 1.2
+
+          ``password_change_form``: A custom "change password" form which must
+          accept a ``user`` keyword argument. The form is responsible for
+          actually changing the user's password.
+
 
     **Template context:**
 
