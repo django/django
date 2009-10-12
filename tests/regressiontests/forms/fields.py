@@ -381,6 +381,17 @@ class TestFields(TestCase):
         self.assertEqual(u'example@valid-----hyphens.com', f.clean('example@valid-----hyphens.com'))
         self.assertEqual(u'example@valid-with-hyphens.com', f.clean('example@valid-with-hyphens.com'))
 
+    def test_email_regexp_for_performance(self):
+        f = EmailField()
+        # Check for runaway regex security problem. This will take for-freeking-ever
+        # if the security fix isn't in place.
+        self.assertRaisesErrorWithMessage(
+                ValidationError,
+                "[u'Enter a valid e-mail address.']",
+                f.clean,
+                'viewx3dtextx26qx3d@yahoo.comx26latlngx3d15854521645943074058'
+            )
+
     def test_emailfield_33(self):
         f = EmailField(required=False)
         self.assertEqual(u'', f.clean(''))
@@ -431,6 +442,7 @@ class TestFields(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
         self.assertEqual(u'http://localhost/', f.clean('http://localhost'))
         self.assertEqual(u'http://example.com/', f.clean('http://example.com'))
+        self.assertEqual(u'http://example.com./', f.clean('http://example.com.'))
         self.assertEqual(u'http://www.example.com/', f.clean('http://www.example.com'))
         self.assertEqual(u'http://www.example.com:8000/test', f.clean('http://www.example.com:8000/test'))
         self.assertEqual(u'http://valid-with-hyphens.com/', f.clean('valid-with-hyphens.com'))
@@ -441,12 +453,23 @@ class TestFields(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://example')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://example.')
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'com.')
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, '.')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://.com')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://invalid-.com')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://-invalid.com')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://inv-.alid-.com')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://inv-.-alid.com')
         self.assertEqual(u'http://valid-----hyphens.com/', f.clean('http://valid-----hyphens.com'))
+
+    def test_url_regexp_for_performance(self):
+        f = URLField()
+        # hangs "forever" if catastrophic backtracking in ticket:#11198 not fixed
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://%s' % ("X"*200,))
+        
+        # a second test, to make sure the problem is really addressed, even on 
+        # domains that don't fail the domain label length check in the regex
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://%s' % ("X"*60,))
 
     def test_urlfield_38(self):
         f = URLField(required=False)

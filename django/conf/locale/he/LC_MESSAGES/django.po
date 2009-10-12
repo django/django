@@ -391,7 +391,7 @@ msgstr "הוספת %s"
 #: contrib/admin/options.py:1003
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "הפריט %(name)s עם המקש %(key)r אינו קיים."
+msgstr "הפריט %(name)s עם המפתח הראשי %(key)r אינו קיים."
 
 #: contrib/admin/options.py:860
 #, python-format

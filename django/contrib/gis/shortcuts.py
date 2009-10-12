@@ -1,4 +1,5 @@
 import cStringIO, zipfile
+from django.conf import settings
 from django.http import HttpResponse
 from django.template import loader
 
@@ -6,7 +7,7 @@ def compress_kml(kml):
     "Returns compressed KMZ from the given KML string."
     kmz = cStringIO.StringIO()
     zf = zipfile.ZipFile(kmz, 'a', zipfile.ZIP_DEFLATED)
-    zf.writestr('doc.kml', kml)
+    zf.writestr('doc.kml', kml.encode(settings.DEFAULT_CHARSET))
     zf.close()
     kmz.seek(0)
     return kmz.read()

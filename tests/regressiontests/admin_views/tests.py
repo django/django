@@ -908,7 +908,7 @@ class AdminViewListEditable(TestCase):
         self.client.post('/test_admin/admin/admin_views/person/', data)
 
         self.failUnlessEqual(Person.objects.get(name="John Mauchly").alive, False)
-        self.failUnlessEqual(Person.objects.get(name="Grace Hooper").gender, 2)
+        self.failUnlessEqual(Person.objects.get(name="Grace Hopper").gender, 2)
 
         # test a filtered page
         data = {
@@ -1616,4 +1616,3 @@ class NeverCacheTests(TestCase):
         "Check the never-cache status of the Javascript i18n view"
         response = self.client.get('/test_admin/jsi18n/')
         self.failUnlessEqual(get_max_age(response), None)
-

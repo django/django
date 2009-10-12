@@ -24,13 +24,13 @@ Quick start guide
 
 To get started using the ``comments`` app, follow these steps:
 
-    #. Install the comments framework by adding ``'django.contrib.comments'`` to    
+    #. Install the comments framework by adding ``'django.contrib.comments'`` to
        :setting:`INSTALLED_APPS`.
 
     #. Run ``manage.py syncdb`` so that Django will create the comment tables.
 
     #. Add the comment app's URLs to your project's ``urls.py``:
-   
+
        .. code-block:: python
 
             urlpatterns = patterns('',
@@ -41,9 +41,9 @@ To get started using the ``comments`` app, follow these steps:
 
     #. Use the `comment template tags`_ below to embed comments in your
        templates.
-    
+
 You might also want to examine :ref:`ref-contrib-comments-settings`.
-    
+
 Comment template tags
 =====================
 
@@ -67,20 +67,20 @@ different ways you can specify which object to attach to:
     #. Refer to the object directly -- the more common method. Most of the
        time, you'll have some object in the template's context you want
        to attach the comment to; you can simply use that object.
-       
-       For example, in a blog entry page that has a variable named ``entry``, 
+
+       For example, in a blog entry page that has a variable named ``entry``,
        you could use the following to load the number of comments::
-       
+
             {% get_comment_count for entry as comment_count %}.
-            
+
     #. Refer to the object by content-type and object id. You'd use this method
        if you, for some reason, don't actually have direct access to the object.
-       
+
        Following the above example, if you knew the object ID was ``14`` but
        didn't have access to the actual object, you could do something like::
-       
+
             {% get_comment_count for blog.entry 14 as comment_count %}
-            
+
        In the above, ``blog.entry`` is the app label and (lower-cased) model
        name of the model class.
 
@@ -89,7 +89,7 @@ different ways you can specify which object to attach to:
 Displaying comments
 -------------------
 
-To get a the list of comments for some object, use :ttag:`get_comment_list`::
+To get the list of comments for some object, use :ttag:`get_comment_list`::
 
     {% get_comment_list for [object] as [varname] %}
 
@@ -99,7 +99,7 @@ For example::
     {% for comment in comment_list %}
         ...
     {% endfor %}
-    
+
 This returns a list of :class:`~django.contrib.comments.models.Comment` objects;
 see :ref:`the comment model documentation <ref-contrib-comments-models>` for
 details.
@@ -116,9 +116,9 @@ To count comments attached to an object, use :ttag:`get_comment_count`::
 For example::
 
         {% get_comment_count for event as comment_count %}
-        
+
         <p>This event has {{ comment_count }} comments.</p>
-        
+
 
 Displaying the comment post form
 --------------------------------
@@ -153,7 +153,7 @@ If you want more control over the look and feel of the comment form, you use use
 you can use in the template::
 
     {% get_comment_form for [object] as [varname] %}
-    
+
 A complete form might look like::
 
     {% get_comment_form for event as form %}
@@ -164,7 +164,7 @@ A complete form might look like::
         <td><input type="submit" name="preview" class="submit-post" value="Preview"></td>
       </tr>
     </form>
-    
+
 Be sure to read the `notes on the comment form`_, below, for some special
 considerations you'll need to make if you're using this approach.
 
@@ -185,7 +185,7 @@ Redirecting after the comment post
 
 To specify the URL you want to redirect to after the comment has been posted,
 you can include a hidden form input called ``next`` in your comment form. For example::
- 
+
     <input type="hidden" name="next" value="{% url my_comment_was_posted %}" />
 
 .. _notes-on-the-comment-form:
@@ -198,24 +198,24 @@ should know about:
 
     * It contains a number of hidden fields that contain timestamps, information
       about the object the comment should be attached to, and a "security hash"
-      used to validate this information. If someone tampers with this data -- 
+      used to validate this information. If someone tampers with this data --
       something comment spammers will try -- the comment submission will fail.
-      
+
       If you're rendering a custom comment form, you'll need to make sure to
       pass these values through unchanged.
-      
+
     * The timestamp is used to ensure that "reply attacks" can't continue very
       long. Users who wait too long between requesting the form and posting a
       comment will have their submissions refused.
-      
+
     * The comment form includes a "honeypot_" field. It's a trap: if any data is
       entered in that field, the comment will be considered spam (spammers often
       automatically fill in all fields in an attempt to make valid submissions).
-      
+
       The default form hides this field with a piece of CSS and further labels
       it with a warning field; if you use the comment form with a custom
       template you should be sure to do the same.
-    
+
 .. _honeypot: http://en.wikipedia.org/wiki/Honeypot_(computing)
 
 More information

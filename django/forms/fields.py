@@ -32,7 +32,6 @@ from util import ErrorList
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, \
         FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, \
         DateInput, DateTimeInput, TimeInput, SplitDateTimeWidget, SplitHiddenDateTimeWidget
-from django.core.files.uploadedfile import SimpleUploadedFile as UploadedFile
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
