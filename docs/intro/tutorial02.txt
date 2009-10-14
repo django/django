@@ -34,11 +34,11 @@ activate the admin site for your installation, do these three things:
     * Run ``python manage.py syncdb``. Since you have added a new application
       to :setting:`INSTALLED_APPS`, the database tables need to be updated.
 
-    * Edit your ``mysite/urls.py`` file and uncomment the lines below the
-      "Uncomment the next two lines..." comment. This file is a URLconf;
-      we'll dig into URLconfs in the next tutorial. For now, all you need to
-      know is that it maps URL roots to applications. In the end, you should
-      have a ``urls.py`` file that looks like this:
+    * Edit your ``mysite/urls.py`` file and uncomment the lines that reference
+      the admin -- there are three lines in total to uncomment. This file is a
+      URLconf; we'll dig into URLconfs in the next tutorial. For now, all you
+      need to know is that it maps URL roots to applications. In the end, you
+      should have a ``urls.py`` file that looks like this:
 
     .. versionchanged:: 1.1
         The method for adding admin urls has changed in Django 1.1.
