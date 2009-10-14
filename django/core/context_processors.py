@@ -8,6 +8,27 @@ RequestContext.
 """
 
 from django.conf import settings
+from django.utils.functional import lazy, memoize, LazyObject
+
+class ContextLazyObject(LazyObject):
+    """
+    A lazy object initialised from any function, useful for lazily
+    adding things to the Context.
+
+    Designed for compound objects of unknown type. For simple objects of known
+    type, use django.utils.functional.lazy.
+    """
+    def __init__(self, func):
+        """
+        Pass in a callable that returns the actual value to be used
+        """
+        self.__dict__['_setupfunc'] = func
+        # For some reason, we have to inline LazyObject.__init__ here to avoid
+        # recursion
+        self._wrapped = None
+
+    def _setup(self):
+        self._wrapped = self._setupfunc()
 
 def auth(request):
     """
@@ -17,15 +38,26 @@ def auth(request):
     If there is no 'user' attribute in the request, uses AnonymousUser (from
     django.contrib.auth).
     """
-    if hasattr(request, 'user'):
-        user = request.user
-    else:
-        from django.contrib.auth.models import AnonymousUser
-        user = AnonymousUser()
+    # If we access request.user, request.session is accessed, which results in
+    # 'Vary: Cookie' being sent in every request that uses this context
+    # processor, which can easily be every request on a site if
+    # TEMPLATE_CONTEXT_PROCESSORS has this context processor added.  This kills
+    # the ability to cache.  So, we carefully ensure these attributes are lazy.
+    # We don't use django.utils.functional.lazy() for User, because that
+    # requires knowing the class of the object we want to proxy, which could
+    # break with custom auth backends.  LazyObject is a less complete but more
+    # flexible solution that is a good enough wrapper for 'User'.
+    def get_user():
+        if hasattr(request, 'user'):
+            return request.user
+        else:
+            from django.contrib.auth.models import AnonymousUser
+            return AnonymousUser()
+
     return {
-        'user': user,
-        'messages': user.get_and_delete_messages(),
-        'perms': PermWrapper(user),
+        'user': ContextLazyObject(get_user),
+        'messages': lazy(memoize(lambda: get_user().get_and_delete_messages(), {}, 0), list)(),
+        'perms':  lazy(lambda: PermWrapper(get_user()), PermWrapper)(),
     }
 
 def debug(request):
@@ -79,7 +111,7 @@ class PermWrapper(object):
 
     def __getitem__(self, module_name):
         return PermLookupDict(self.user, module_name)
-        
+
     def __iter__(self):
         # I am large, I contain multitudes.
         raise TypeError("PermWrapper is not iterable.")
