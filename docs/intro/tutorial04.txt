@@ -52,10 +52,11 @@ created a URLconf for the polls application that includes this line::
 
     (r'^(?P<poll_id>\d+)/vote/$', 'vote'),
 
-So let's create a ``vote()`` function in ``mysite/polls/views.py``::
+We also created a dummy implementation of the ``vote()`` function. Let's
+create a real version. Add the following to ``mysite/polls/views.py``::
 
     from django.shortcuts import get_object_or_404, render_to_response
-    from django.http import HttpResponseRedirect
+    from django.http import HttpResponseRedirect, HttpResponse
     from django.core.urlresolvers import reverse
     from mysite.polls.models import Choice, Poll
     # ...
