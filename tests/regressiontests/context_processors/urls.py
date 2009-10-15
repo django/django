@@ -10,4 +10,5 @@ urlpatterns = patterns('',
     (r'^auth_processor_user/$', views.auth_processor_user),
     (r'^auth_processor_perms/$', views.auth_processor_perms),
     (r'^auth_processor_messages/$', views.auth_processor_messages),
+    url(r'^userpage/(.+)/$', views.userpage, name="userpage"),
 )
