@@ -8,27 +8,7 @@ RequestContext.
 """
 
 from django.conf import settings
-from django.utils.functional import lazy, memoize, LazyObject
-
-class ContextLazyObject(LazyObject):
-    """
-    A lazy object initialised from any function, useful for lazily
-    adding things to the Context.
-
-    Designed for compound objects of unknown type. For simple objects of known
-    type, use django.utils.functional.lazy.
-    """
-    def __init__(self, func):
-        """
-        Pass in a callable that returns the actual value to be used
-        """
-        self.__dict__['_setupfunc'] = func
-        # For some reason, we have to inline LazyObject.__init__ here to avoid
-        # recursion
-        self._wrapped = None
-
-    def _setup(self):
-        self._wrapped = self._setupfunc()
+from django.utils.functional import lazy, memoize, SimpleLazyObject
 
 def auth(request):
     """
@@ -55,7 +35,7 @@ def auth(request):
             return AnonymousUser()
 
     return {
-        'user': ContextLazyObject(get_user),
+        'user': SimpleLazyObject(get_user),
         'messages': lazy(memoize(lambda: get_user().get_and_delete_messages(), {}, 0), list)(),
         'perms':  lazy(lambda: PermWrapper(get_user()), PermWrapper)(),
     }

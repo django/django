@@ -32,3 +32,6 @@ def auth_processor_messages(request):
     request.user.message_set.create(message="Message 1")
     return render_to_response('context_processors/auth_attrs_messages.html',
          RequestContext(request, {}, processors=[context_processors.auth]))
+
+def userpage(request):
+    pass

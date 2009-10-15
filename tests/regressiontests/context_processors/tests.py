@@ -4,7 +4,7 @@ Tests for Django's bundled context processors.
 
 from django.conf import settings
 from django.test import TestCase
-
+from django.template import Template
 
 class RequestContextProcessorTests(TestCase):
     """
@@ -79,3 +79,5 @@ class AuthContextProcessorTests(TestCase):
         self.assertContains(response, "unicode: super")
         self.assertContains(response, "id: 100")
         self.assertContains(response, "username: super")
+        # bug #12037 is tested by the {% url %} in the template:
+        self.assertContains(response, "url: /userpage/super/")

@@ -257,9 +257,8 @@ class LazyObject(object):
     A wrapper for another class that can be used to delay instantiation of the
     wrapped class.
 
-    This is useful, for example, if the wrapped class needs to use Django
-    settings at creation time: we want to permit it to be imported without
-    accessing settings.
+    By subclassing, you have the opportunity to intercept and alter the
+    instantiation. If you don't need to do that, use SimpleLazyObject.
     """
     def __init__(self):
         self._wrapped = None
@@ -287,3 +286,26 @@ class LazyObject(object):
         """
         raise NotImplementedError
 
+
+class SimpleLazyObject(LazyObject):
+    """
+    A lazy object initialised from any function.
+
+    Designed for compound objects of unknown type. For builtins or objects of
+    known type, use django.utils.functional.lazy.
+    """
+    def __init__(self, func):
+        """
+        Pass in a callable that returns the object to be wrapped.
+        """
+        self.__dict__['_setupfunc'] = func
+        # For some reason, we have to inline LazyObject.__init__ here to avoid
+        # recursion
+        self._wrapped = None
+
+    def __str__(self):
+        if self._wrapped is None: self._setup()
+        return str(self._wrapped)
+
+    def _setup(self):
+        self._wrapped = self._setupfunc()
