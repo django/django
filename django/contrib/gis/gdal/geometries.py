@@ -29,7 +29,7 @@
   +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
   >>> print mpnt
   MULTIPOINT (-89.999930378602485 29.999797886557641,-89.999930378602485 29.999797886557641)
-  
+
   The OGRGeomType class is to make it easy to specify an OGR geometry type:
   >>> from django.contrib.gis.gdal import OGRGeomType
   >>> gt1 = OGRGeomType(3) # Using an integer for the type
@@ -78,7 +78,7 @@ class OGRGeometry(GDALBase):
             geom_input = buffer(a2b_hex(geom_input.upper()))
             str_instance = False
 
-        # Constructing the geometry, 
+        # Constructing the geometry,
         if str_instance:
             # Checking if unicode
             if isinstance(geom_input, unicode):
@@ -130,12 +130,12 @@ class OGRGeometry(GDALBase):
         self.__class__ = GEO_CLASSES[self.geom_type.num]
 
     @classmethod
-    def from_bbox(cls, bbox):   
+    def from_bbox(cls, bbox):
         "Constructs a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
         return OGRGeometry( 'POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' %  (
                 x0, y0, x0, y1, x1, y1, x1, y0, x0, y0) )
- 
+
     def __del__(self):
         "Deletes this Geometry."
         if self._ptr: capi.destroy_geom(self._ptr)
@@ -179,10 +179,17 @@ class OGRGeometry(GDALBase):
         "Returns 0 for points, 1 for lines, and 2 for surfaces."
         return capi.get_dims(self.ptr)
 
-    @property
-    def coord_dim(self):
+    def _get_coord_dim(self):
         "Returns the coordinate dimension of the Geometry."
-        return capi.get_coord_dims(self.ptr)
+        return capi.get_coord_dim(self.ptr)
+
+    def _set_coord_dim(self, dim):
+        "Sets the coordinate dimension of this Geometry."
+        if not dim in (2, 3):
+            raise ValueError('Geometry dimension must be either 2 or 3')
+        capi.set_coord_dim(self.ptr, dim)
+
+    coord_dim = property(_get_coord_dim, _set_coord_dim)
 
     @property
     def geom_count(self):
@@ -237,7 +244,7 @@ class OGRGeometry(GDALBase):
         return self.envelope.tuple
 
     #### SpatialReference-related Properties ####
-    
+
     # The SRS property
     def _get_srs(self):
         "Returns the Spatial Reference for this Geometry."
@@ -298,7 +305,7 @@ class OGRGeometry(GDALBase):
         Returns the GeoJSON representation of this Geometry (requires
         GDAL 1.5+).
         """
-        if GEOJSON: 
+        if GEOJSON:
             return capi.to_json(self.ptr)
         else:
             raise NotImplementedError('GeoJSON output only supported on GDAL 1.5+.')
@@ -335,7 +342,7 @@ class OGRGeometry(GDALBase):
     def wkt(self):
         "Returns the WKT representation of the Geometry."
         return capi.to_wkt(self.ptr, byref(c_char_p()))
-    
+
     #### Geometry Methods ####
     def clone(self):
         "Clones this OGR Geometry."
@@ -363,6 +370,16 @@ class OGRGeometry(GDALBase):
             klone = self.clone()
             klone.transform(coord_trans)
             return klone
+
+        # Have to get the coordinate dimension of the original geometry
+        # so it can be used to reset the transformed geometry's dimension
+        # afterwards.  This is done because of GDAL bug (in versions prior
+        # to 1.7) that turns geometries 3D after transformation, see:
+        #  http://trac.osgeo.org/gdal/changeset/17792
+        orig_dim = self.coord_dim
+
+        # Depending on the input type, use the appropriate OGR routine
+        # to perform the transformation.
         if isinstance(coord_trans, CoordTransform):
             capi.geom_transform(self.ptr, coord_trans.ptr)
         elif isinstance(coord_trans, SpatialReference):
@@ -372,6 +389,10 @@ class OGRGeometry(GDALBase):
             capi.geom_transform_to(self.ptr, sr.ptr)
         else:
             raise TypeError('Transform only accepts CoordTransform, SpatialReference, string, and integer objects.')
+
+        # Setting with original dimension, see comment above.
+        if self.coord_dim != orig_dim:
+            self.coord_dim = orig_dim
 
     def transform_to(self, srs):
         "For backwards-compatibility."
@@ -391,7 +412,7 @@ class OGRGeometry(GDALBase):
     def intersects(self, other):
         "Returns True if this geometry intersects with the other."
         return self._topology(capi.ogr_intersects, other)
-    
+
     def equals(self, other):
         "Returns True if this geometry is equivalent to the other."
         return self._topology(capi.ogr_equals, other)
@@ -436,7 +457,7 @@ class OGRGeometry(GDALBase):
     @property
     def convex_hull(self):
         """
-        Returns the smallest convex Polygon that contains all the points in 
+        Returns the smallest convex Polygon that contains all the points in
         this Geometry.
         """
         return self._geomgen(capi.geom_convex_hull)
@@ -456,7 +477,7 @@ class OGRGeometry(GDALBase):
         return self._geomgen(capi.geom_intersection, other)
 
     def sym_difference(self, other):
-        """                                                                                                                                                
+        """
         Returns a new geometry which is the symmetric difference of this
         geometry and the other.
         """
@@ -545,7 +566,7 @@ class LineString(OGRGeometry):
     def y(self):
         "Returns the Y coordinates in a list."
         return self._listarr(capi.gety)
-    
+
     @property
     def z(self):
         "Returns the Z coordinates in a list."
@@ -610,7 +631,7 @@ class GeometryCollection(OGRGeometry):
             raise OGRIndexError('index out of range: %s' % index)
         else:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
-        
+
     def __iter__(self):
         "Iterates over each Geometry."
         for i in xrange(self.geom_count):
@@ -658,5 +679,5 @@ GEO_CLASSES = {1 : Point,
                5 : MultiLineString,
                6 : MultiPolygon,
                7 : GeometryCollection,
-               101: LinearRing, 
+               101: LinearRing,
                }
