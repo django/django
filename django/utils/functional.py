@@ -266,9 +266,6 @@ class LazyObject(object):
     def __getattr__(self, name):
         if self._wrapped is None:
             self._setup()
-        if name == "__members__":
-            # Used to implement dir(obj)
-            return self._wrapped.get_all_members()
         return getattr(self._wrapped, name)
 
     def __setattr__(self, name, value):
@@ -286,6 +283,13 @@ class LazyObject(object):
         """
         raise NotImplementedError
 
+    # introspection support:
+    __members__ = property(lambda self: self.__dir__())
+
+    def __dir__(self):
+        if self._wrapped is None:
+            self._setup()
+        return  dir(self._wrapped)
 
 class SimpleLazyObject(LazyObject):
     """

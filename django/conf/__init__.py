@@ -108,9 +108,6 @@ class Settings(object):
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
 
-    def get_all_members(self):
-        return dir(self)
-
 class UserSettingsHolder(object):
     """
     Holder for user configured settings.
@@ -129,8 +126,11 @@ class UserSettingsHolder(object):
     def __getattr__(self, name):
         return getattr(self.default_settings, name)
 
-    def get_all_members(self):
+    def __dir__(self):
         return dir(self) + dir(self.default_settings)
+
+    # For Python < 2.6:
+    __members__ = property(lambda self: self.__dir__())
 
 settings = LazySettings()
 

@@ -118,10 +118,6 @@ class Storage(object):
         """
         raise NotImplementedError()
 
-    # Needed by django.utils.functional.LazyObject (via DefaultStorage).
-    def get_all_members(self):
-        return self.__members__
-
 class FileSystemStorage(Storage):
     """
     Standard filesystem storage
