@@ -20,7 +20,7 @@ class Song(models.Model):
         return self.title
 
 
-class Model11709(models.Model):
+class TwoAlbumFKAndAnE(models.Model):
     album1 = models.ForeignKey(Album, related_name="album1_set")
     album2 = models.ForeignKey(Album, related_name="album2_set")
     e = models.CharField(max_length=1)
@@ -72,11 +72,27 @@ ImproperlyConfigured: SongInline cannot exclude the field 'album' - this is the 
 # given) make sure fk_name is honored or things blow up when there is more
 # than one fk to the parent model.
 
->>> class Model11709Inline(admin.TabularInline):
-...     model = Model11709
+>>> class TwoAlbumFKAndAnEInline(admin.TabularInline):
+...     model = TwoAlbumFKAndAnE
 ...     exclude = ("e",)
 ...     fk_name = "album1"
 
->>> validate_inline(Model11709Inline, None, Album)
+>>> validate_inline(TwoAlbumFKAndAnEInline, None, Album)
+
+# Ensure inlines validate that they can be used correctly.
+
+>>> class TwoAlbumFKAndAnEInline(admin.TabularInline):
+...     model = TwoAlbumFKAndAnE
+
+>>> validate_inline(TwoAlbumFKAndAnEInline, None, Album)
+Traceback (most recent call last):
+    ...
+Exception: <class 'regressiontests.admin_validation.models.TwoAlbumFKAndAnE'> has more than 1 ForeignKey to <class 'regressiontests.admin_validation.models.Album'>
+
+>>> class TwoAlbumFKAndAnEInline(admin.TabularInline):
+...     model = TwoAlbumFKAndAnE
+...     fk_name = "album1"
+
+>>> validate_inline(TwoAlbumFKAndAnEInline, None, Album)
 
 """}
