@@ -169,7 +169,7 @@ def validate_inline(cls, parent, parent_model):
 
     # exclude
     if hasattr(cls, 'exclude') and cls.exclude:
-        fk = _get_foreign_key(parent_model, cls.model, can_fail=True)
+        fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
         if fk and fk.name in cls.exclude:
             raise ImproperlyConfigured("%s cannot exclude the field "
                     "'%s' - this is the foreign key to the parent model "

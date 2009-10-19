@@ -4,8 +4,10 @@ Tests of ModelAdmin validation logic.
 
 from django.db import models
 
+
 class Album(models.Model):
     title = models.CharField(max_length=150)
+
 
 class Song(models.Model):
     title = models.CharField(max_length=150)
@@ -17,11 +19,19 @@ class Song(models.Model):
     def __unicode__(self):
         return self.title
 
+
+class Model11709(models.Model):
+    album1 = models.ForeignKey(Album, related_name="album1_set")
+    album2 = models.ForeignKey(Album, related_name="album2_set")
+    e = models.CharField(max_length=1)
+
+
+
 __test__ = {'API_TESTS':"""
 
 >>> from django import forms
 >>> from django.contrib import admin
->>> from django.contrib.admin.validation import validate
+>>> from django.contrib.admin.validation import validate, validate_inline
 
 # Regression test for #8027: custom ModelForms with fields/fieldsets
 
@@ -57,5 +67,16 @@ ImproperlyConfigured: 'InvalidFields.fields' refers to field 'spam' that is miss
 Traceback (most recent call last):
     ...
 ImproperlyConfigured: SongInline cannot exclude the field 'album' - this is the foreign key to the parent model Album.
+
+# Regression test for #11709 - when testing for fk excluding (when exclude is
+# given) make sure fk_name is honored or things blow up when there is more
+# than one fk to the parent model.
+
+>>> class Model11709Inline(admin.TabularInline):
+...     model = Model11709
+...     exclude = ("e",)
+...     fk_name = "album1"
+
+>>> validate_inline(Model11709Inline, None, Album)
 
 """}
