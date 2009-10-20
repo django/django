@@ -3,7 +3,7 @@ Tests for Django's bundled context processors.
 """
 
 from django.conf import settings
-from django.contrib.auth.models import Group
+from django.contrib.auth import authenticate
 from django.db.models import Q
 from django.test import TestCase
 from django.template import Template
@@ -74,9 +74,13 @@ class AuthContextProcessorTests(TestCase):
 
     def test_user_attrs(self):
         """
-        Test that ContextLazyObject wraps objects properly
+        Test that the lazy objects returned behave just like the wrapped objects.
         """
+        # These are 'functional' level tests for common use cases.  Direct
+        # testing of the implementation (SimpleLazyObject) is in the 'utils'
+        # tests.
         self.client.login(username='super', password='secret')
+        user = authenticate(username='super', password='secret')
         response = self.client.get('/auth_processor_user/')
         self.assertContains(response, "unicode: super")
         self.assertContains(response, "id: 100")
@@ -100,3 +104,9 @@ class AuthContextProcessorTests(TestCase):
         #    calling a Python object' in <type 'exceptions.AttributeError'>
         #    ignored"
         query = Q(user=response.context['user']) & Q(someflag=True)
+
+        # Tests for user equality.  This is hard because User defines
+        # equality in a non-duck-typing way
+        # See bug #12060
+        self.assertEqual(response.context['user'], user)
+        self.assertEqual(user, response.context['user'])

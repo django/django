@@ -316,14 +316,35 @@ class SimpleLazyObject(LazyObject):
         if self._wrapped is None: self._setup()
         return str(self._wrapped)
 
+    def __unicode__(self):
+        if self._wrapped is None: self._setup()
+        return unicode(self._wrapped)
+
     def __deepcopy__(self, memo):
         if self._wrapped is None:
-            result = self.__class__(self._setupfunc)
+            # We have to use SimpleLazyObject, not self.__class__, because the
+            # latter is proxied.
+            result = SimpleLazyObject(self._setupfunc)
             memo[id(self)] = result
             return result
         else:
             import copy
             return copy.deepcopy(self._wrapped, memo)
+
+    # Need to pretend to be the wrapped class, for the sake of objects that care
+    # about this (especially in equality tests)
+    def __get_class(self):
+        if self._wrapped is None: self._setup()
+        return self._wrapped.__class__
+    __class__ = property(__get_class)
+
+    def __eq__(self, other):
+        if self._wrapped is None: self._setup()
+        return self._wrapped == other
+
+    def __hash__(self):
+        if self._wrapped is None: self._setup()
+        return hash(self._wrapped)
 
     def _setup(self):
         self._wrapped = self._setupfunc()
