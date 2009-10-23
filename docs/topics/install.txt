@@ -93,10 +93,10 @@ database bindings are installed.
   will also want to read the database-specific notes for the :ref:`MySQL
   backend <ref-databases>`.
 
-* If you're using SQLite and either Python 2.4 or Python 2.4, you'll need
-  pysqlite_. Use version 2.0.3 or higher. Python 2.5 ships with an SQLite
-  wrapper in the standard library, so you don't need to install anything extra
-  in that case. Please read the SQLite backend :ref:`notes<sqlite-notes>`.
+* If you're using SQLite and Python 2.4, you'll need pysqlite_. Use version
+  2.0.3 or higher. Python 2.5 ships with an SQLite wrapper in the standard
+  library, so you don't need to install anything extra in that case. Please
+  read the SQLite backend :ref:`notes<sqlite-notes>`.
 
 * If you're using Oracle, you'll need a copy of cx_Oracle_, but please
   read the database-specific notes for the
