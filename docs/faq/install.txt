@@ -43,25 +43,23 @@ PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 .. _Oracle: http://www.oracle.com/
 
 Do I lose anything by using Python 2.4 versus newer Python versions, such as Python 2.5 or 2.6?
-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
 
-Not in the core framework. Currently, Django itself officially
-supports any version of Python from 2.4 through 2.6,
-inclusive. However, some add-on components may require a more recent
-Python version; the ``django.contrib.gis`` component, for example,
-requires at least Python 2.4, and third-party applications for use
-with Django are, of course, free to set their own version
-requirements.
+Not in the core framework. Currently, Django itself officially supports any
+version of Python from 2.4 through 2.6, inclusive. However, newer versions of
+Python are often faster, have more features, and are better supported.
+Third-party applications for use with Django are, of course, free to set their
+own version requirements.
 
-Please note, however, that over the next year or two Django will begin
-dropping support for older Python versions as part of a migration
-which will end with Django running on Python 3.0 (see next question
-for details). So if you're just starting out with Python, it's
-recommended that you use the latest 2.x release (currently, Python
-2.6). This will let you take advantage of the numerous improvements
-and optimizations to the Python language since version 2.4, and will
-help ease the process of dropping support for older Python versions on
-the road to Python 3.0.
+Over the next year or two Django will begin dropping support for older Python
+versions as part of a migration which will end with Django running on Python 3
+(see below for details). 
+
+All else being equal, we recommend that you use the latest 2.x release
+(currently Python 2.6). This will let you take advantage of the numerous
+improvements and optimizations to the Python language since version 2.4, and
+will help ease the process of dropping support for older Python versions on
+the road to Python 3.
 
 Can I use Django with Python 2.3?
 ---------------------------------
@@ -70,8 +68,8 @@ Django 1.1 (and earlier) supported Python 2.3. Django 1.2 and newer does not.
 We highly recommend you upgrade Python if at all possible, but Django 1.1 will
 continue to work on Python 2.3.
 
-Can I use Django with Python 3.0?
----------------------------------
+Can I use Django with Python 3?
+-------------------------------
 
 Not at the moment. Python 3.0 introduced a number of
 backwards-incompatible changes to the Python language, and although
