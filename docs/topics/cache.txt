@@ -616,12 +616,6 @@ like so::
 
     from django.views.decorators.vary import vary_on_headers
 
-    # Python 2.3 syntax.
-    def my_view(request):
-        # ...
-    my_view = vary_on_headers(my_view, 'User-Agent')
-
-    # Python 2.4+ decorator syntax.
     @vary_on_headers('User-Agent')
     def my_view(request):
         # ...

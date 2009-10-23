@@ -1046,15 +1046,7 @@ checks to make sure the user is logged in and has the permission
     optional ``login_url`` argument, which lets you specify the URL for your
     login page (:setting:`settings.LOGIN_URL <LOGIN_URL>` by default).
 
-    Example in Python 2.3 syntax::
-
-        from django.contrib.auth.decorators import user_passes_test
-
-        def my_view(request):
-            # ...
-        my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')(my_view)
-
-    Example in Python 2.4 syntax::
+    For example::
 
         from django.contrib.auth.decorators import user_passes_test
 
