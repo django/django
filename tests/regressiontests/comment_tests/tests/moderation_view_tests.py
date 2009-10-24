@@ -168,9 +168,12 @@ class AdminActionsTests(CommentTestCase):
         # Make "normaluser" a moderator
         u = User.objects.get(username="normaluser")
         u.is_staff = True
-        u.user_permissions.add(Permission.objects.get(codename='add_comment'))
-        u.user_permissions.add(Permission.objects.get(codename='change_comment'))
-        u.user_permissions.add(Permission.objects.get(codename='delete_comment'))
+        perms = Permission.objects.filter(
+            content_type__app_label = 'comments', 
+            codename__endswith = 'comment'
+        )
+        for perm in perms:
+            u.user_permissions.add(perm)
         u.save()
 
     def testActionsNonModerator(self):
