@@ -3,11 +3,6 @@ import types
 import sys
 import os
 from itertools import izip
-try:
-    set
-except NameError:
-    from sets import Set as set     # Python 2.3 fallback.
-
 import django.db.models.manager     # Imported to register signal handler.
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
 from django.db.models.fields import AutoField, FieldDoesNotExist
@@ -21,7 +16,6 @@ from django.db.models.loading import register_models, get_model
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.conf import settings
-
 
 class ModelBase(type):
     """
@@ -235,7 +229,6 @@ class ModelBase(type):
             cls.get_absolute_url = curry(get_absolute_url, opts, cls.get_absolute_url)
 
         signals.class_prepared.send(sender=cls)
-
 
 class Model(object):
     __metaclass__ = ModelBase
@@ -467,7 +460,7 @@ class Model(object):
             if pk_set:
                 # Determine whether a record with the primary key already exists.
                 if (force_update or (not force_insert and
-                        manager.filter(pk=pk_val).extra(select={'a': 1}).values('a').order_by())):
+                        manager.filter(pk=pk_val).exists())):
                     # It does already exist, so do an UPDATE.
                     if force_update or non_pks:
                         values = [(f, None, (raw and getattr(self, f.attname) or f.pre_save(self, False))) for f in non_pks]

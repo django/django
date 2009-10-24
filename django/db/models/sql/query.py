@@ -8,7 +8,6 @@ all about the internals of models in order to get the information it needs.
 """
 
 from copy import deepcopy
-
 from django.utils.tree import Node
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode
@@ -23,11 +22,6 @@ from django.db.models.sql.where import WhereNode, Constraint, EverythingNode, AN
 from django.core.exceptions import FieldError
 from datastructures import EmptyResultSet, Empty, MultiJoin
 from constants import *
-
-try:
-    set
-except NameError:
-    from sets import Set as set     # Python 2.3 fallback
 
 __all__ = ['Query', 'BaseQuery']
 
@@ -383,6 +377,15 @@ class BaseQuery(object):
             number = min(number, self.high_mark - self.low_mark)
 
         return number
+
+    def has_results(self):
+        q = self.clone()
+        q.add_extra({'a': 1}, None, None, None, None, None)
+        q.add_fields(())
+        q.set_extra_mask(('a',))
+        q.set_aggregate_mask(())
+        q.clear_ordering()
+        return bool(q.execute_sql())
 
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """

@@ -1,5 +1,4 @@
 import copy
-
 from django.db.models.query import QuerySet, EmptyQuerySet, insert_query
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
@@ -172,6 +171,9 @@ class Manager(object):
 
     def only(self, *args, **kwargs):
         return self.get_query_set().only(*args, **kwargs)
+
+    def exists(self, *args, **kwargs):
+        return self.get_query_ste().exists(*args, **kwargs)
 
     def _insert(self, values, **kwargs):
         return insert_query(self.model, values, **kwargs)
