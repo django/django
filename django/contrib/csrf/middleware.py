@@ -101,7 +101,13 @@ class CsrfResponseMiddleware(object):
                 "' /></div>")
 
             # Modify any POST forms
-            response.content = _POST_FORM_RE.sub(add_csrf_field, response.content)
+            response.content, n = _POST_FORM_RE.subn(add_csrf_field, response.content)
+            if n > 0:
+                # Since the content has been modified, any Etag will now be
+                # incorrect.  We could recalculate, but only is we assume that
+                # the Etag was set by CommonMiddleware. The safest thing is just
+                # to delete. See bug #9163
+                del response['ETag']
         return response
 
 class CsrfMiddleware(CsrfViewMiddleware, CsrfResponseMiddleware):

@@ -22,12 +22,12 @@ middleware into your list of installed middleware.
 How to use it
 =============
 
-Add the middleware ``'django.contrib.csrf.middleware.CsrfMiddleware'`` to
-your list of middleware classes, :setting:`MIDDLEWARE_CLASSES`. It needs to process
-the response after the SessionMiddleware, so must come before it in the
-list. It also must process the response before things like compression
-happen to the response, so it must come after GZipMiddleware in the
-list.
+Add the middleware ``'django.contrib.csrf.middleware.CsrfMiddleware'`` to your
+list of middleware classes, :setting:`MIDDLEWARE_CLASSES`. It needs to process
+the response after the SessionMiddleware, so must come before it in the list. It
+also must process the response before things like compression or setting of
+ETags happen to the response, so it must come after GZipMiddleware,
+CommonMiddleware and ConditionalGetMiddleware in the list.
 
 The ``CsrfMiddleware`` class is actually composed of two middleware:
 ``CsrfViewMiddleware`` which performs the checks on incoming requests,
