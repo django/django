@@ -191,6 +191,9 @@ class AdminSite(object):
     def get_urls(self):
         from django.conf.urls.defaults import patterns, url, include
 
+        if settings.DEBUG:
+            self.check_dependencies()
+
         def wrap(view, cacheable=False):
             def wrapper(*args, **kwargs):
                 return self.admin_view(view, cacheable)(*args, **kwargs)
