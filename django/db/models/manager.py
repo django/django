@@ -173,7 +173,7 @@ class Manager(object):
         return self.get_query_set().only(*args, **kwargs)
 
     def exists(self, *args, **kwargs):
-        return self.get_query_ste().exists(*args, **kwargs)
+        return self.get_query_set().exists(*args, **kwargs)
 
     def _insert(self, values, **kwargs):
         return insert_query(self.model, values, **kwargs)

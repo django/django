@@ -17,6 +17,10 @@ class Article(models.Model):
         return self.headline
 
 __test__ = {'API_TESTS': r"""
+# We can use .exists() to check that there are none yet
+>>> Article.objects.exists()
+False
+
 # Create a couple of Articles.
 >>> from datetime import datetime
 >>> a1 = Article(headline='Article 1', pub_date=datetime(2005, 7, 26))
@@ -33,6 +37,10 @@ __test__ = {'API_TESTS': r"""
 >>> a6.save()
 >>> a7 = Article(headline='Article 7', pub_date=datetime(2005, 7, 27))
 >>> a7.save()
+
+# There should be some now!
+>>> Article.objects.exists()
+True
 """}
 
 if settings.DATABASE_ENGINE in ('postgresql', 'postgresql_pysycopg2'):
