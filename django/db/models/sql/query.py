@@ -385,7 +385,8 @@ class BaseQuery(object):
         q.set_extra_mask(('a',))
         q.set_aggregate_mask(())
         q.clear_ordering()
-        return bool(q.execute_sql())
+        q.set_limits(high=1)
+        return bool(q.execute_sql(SINGLE))
 
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """
