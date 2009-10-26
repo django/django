@@ -515,7 +515,7 @@ arguments at time of construction:
         >>> c = Client()
         >>> c.get('/customers/details/?name=fred&age=7')
 
-        If you provide URL both an encoded GET data and a data argument,
+        If you provide a URL with both an encoded GET data and a data argument,
         the data argument will take precedence.
 
         If you set ``follow`` to ``True`` the client will follow any redirects
@@ -627,7 +627,7 @@ arguments at time of construction:
 
         .. versionadded:: 1.1
 
-        Makes an PUT request on the provided ``path`` and returns a
+        Makes a PUT request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces. Acts just
         like :meth:`Client.post` except with the PUT request method.
 
@@ -1127,11 +1127,11 @@ Django, such as your machine's mail server, if you're running one.)
 
 During test running, each outgoing e-mail is saved in
 ``django.core.mail.outbox``. This is a simple list of all
-:class:`<~django.core.mail.EmailMessage>` instances that have been sent.
+:class:`~django.core.mail.EmailMessage` instances that have been sent.
 It does not exist under normal execution conditions, i.e., when you're not
 running unit tests. The outbox is created during test setup, along with the
-dummy :class:`<~django.core.mail.SMTPConnection>`. When the test framework is
-torn down, the standard :class:`<~django.core.mail.SMTPConnection>` class is
+dummy :class:`~django.core.mail.SMTPConnection`. When the test framework is
+torn down, the standard :class:`~django.core.mail.SMTPConnection` class is
 restored, and the test outbox is destroyed.
 
 The ``outbox`` attribute is a special attribute that is created *only* when
