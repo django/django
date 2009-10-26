@@ -21,6 +21,7 @@ tutorial, so that the template contains an HTML ``<form>`` element:
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
     <form action="/polls/{{ poll.id }}/vote/" method="post">
+    {% csrf_token %}
     {% for choice in poll.choice_set.all %}
         <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
         <label for="choice{{ forloop.counter }}">{{ choice.choice }}</label><br />
@@ -46,6 +47,28 @@ A quick rundown:
     * ``forloop.counter`` indicates how many times the :ttag:`for` tag has gone
       through its loop
 
+    * Since we are creating a POST form (which can have the effect of modifying
+      data), we unfortunately need to worry about Cross Site Request Forgeries.
+      Thankfully, you don't have to worry too hard, because Django comes with
+      very easy-to-use system for protecting against it.  In short, all POST
+      forms that are targetted at internal URLs need the ``{% csrf_token %}``
+      template tag adding.
+
+The ``{% csrf_token %}`` tag requires information from the request object, which
+is not normally accessible from within the template context.  To fix this, a
+small adjustment needs to be made to the ``detail`` view, so that it looks like
+the following::
+
+    from django.template import RequestContext
+    # ...
+    def detail(request, poll_id):
+        p = get_object_or_404(Poll, pk=poll_id)
+        return render_to_response('polls/detail.html', {'poll': p},
+                                   context_instance=RequestContext(request))
+
+The details of how this works are explained in the documentation for
+:ref:`RequestContext <subclassing-context-requestcontext>`.
+
 Now, let's create a Django view that handles the submitted data and does
 something with it. Remember, in :ref:`Tutorial 3 <intro-tutorial03>`, we
 created a URLconf for the polls application that includes this line::
@@ -58,6 +81,7 @@ create a real version. Add the following to ``mysite/polls/views.py``::
     from django.shortcuts import get_object_or_404, render_to_response
     from django.http import HttpResponseRedirect, HttpResponse
     from django.core.urlresolvers import reverse
+    from django.template import RequestContext
     from mysite.polls.models import Choice, Poll
     # ...
     def vote(request, poll_id):
@@ -69,7 +93,7 @@ create a real version. Add the following to ``mysite/polls/views.py``::
             return render_to_response('polls/detail.html', {
                 'poll': p,
                 'error_message': "You didn't select a choice.",
-            })
+            }, context_instance=RequestContext(request))
         else:
             selected_choice.votes += 1
             selected_choice.save()

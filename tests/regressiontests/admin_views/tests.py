@@ -885,8 +885,9 @@ class AdminViewListEditable(TestCase):
         # 4 action inputs (3 regular checkboxes, 1 checkbox to select all)
         # main form submit button = 1
         # search field and search submit button = 2
-        # 6 + 2 + 1 + 2 = 11 inputs
-        self.failUnlessEqual(response.content.count("<input"), 15)
+        # CSRF field = 1
+        # 6 + 2 + 4 + 1 + 2 + 1 = 16 inputs
+        self.failUnlessEqual(response.content.count("<input"), 16)
         # 1 select per object = 3 selects
         self.failUnlessEqual(response.content.count("<select"), 4)
 

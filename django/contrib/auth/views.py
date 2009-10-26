@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, PasswordChangeForm
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.csrf.decorators import csrf_protect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.sites.models import Site, RequestSite
@@ -14,6 +15,8 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.views.decorators.cache import never_cache
 
+@csrf_protect
+@never_cache
 def login(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm):
@@ -43,7 +46,6 @@ def login(request, template_name='registration/login.html',
         'site': current_site,
         'site_name': current_site.name,
     }, context_instance=RequestContext(request))
-login = never_cache(login)
 
 def logout(request, next_page=None, template_name='registration/logged_out.html', redirect_field_name=REDIRECT_FIELD_NAME):
     "Logs out the user and displays 'You are logged out' message."
@@ -80,6 +82,7 @@ def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_N
 #   prompts for a new password
 # - password_reset_complete shows a success message for the above
 
+@csrf_protect
 def password_reset(request, is_admin_site=False, template_name='registration/password_reset_form.html',
         email_template_name='registration/password_reset_email.html',
         password_reset_form=PasswordResetForm, token_generator=default_token_generator,
@@ -109,6 +112,7 @@ def password_reset(request, is_admin_site=False, template_name='registration/pas
 def password_reset_done(request, template_name='registration/password_reset_done.html'):
     return render_to_response(template_name, context_instance=RequestContext(request))
 
+# Doesn't need csrf_protect since no-one can guess the URL
 def password_reset_confirm(request, uidb36=None, token=None, template_name='registration/password_reset_confirm.html',
                            token_generator=default_token_generator, set_password_form=SetPasswordForm,
                            post_reset_redirect=None):
@@ -146,6 +150,8 @@ def password_reset_complete(request, template_name='registration/password_reset_
     return render_to_response(template_name, context_instance=RequestContext(request,
                                                                              {'login_url': settings.LOGIN_URL}))
 
+@csrf_protect
+@login_required
 def password_change(request, template_name='registration/password_change_form.html',
                     post_change_redirect=None, password_change_form=PasswordChangeForm):
     if post_change_redirect is None:
@@ -160,7 +166,6 @@ def password_change(request, template_name='registration/password_change_form.ht
     return render_to_response(template_name, {
         'form': form,
     }, context_instance=RequestContext(request))
-password_change = login_required(password_change)
 
 def password_change_done(request, template_name='registration/password_change_done.html'):
     return render_to_response(template_name, context_instance=RequestContext(request))

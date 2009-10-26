@@ -313,6 +313,13 @@ and return a dictionary of items to be merged into the context. By default,
     "django.core.context_processors.i18n",
     "django.core.context_processors.media")
 
+.. versionadded:: 1.2
+   In addition to these, ``RequestContext`` always uses
+   ``'django.contrib.csrf.context_processors.csrf'``.  This is a security
+   related context processor required by the admin and other contrib apps, and,
+   in case of accidental misconfiguration, it is deliberately hardcoded in and
+   cannot be turned off by the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+
 Each processor is applied in order. That means, if one processor adds a
 variable to the context and a second processor adds a variable with the same
 name, the second will override the first. The default processors are explained
@@ -403,6 +410,14 @@ django.core.context_processors.media
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
 value of the :setting:`MEDIA_URL` setting.
+
+django.contrib.csrf.context_processors.csrf
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.2
+
+This processor adds a token that is needed by the ``csrf_token`` template tag
+for protection against :ref:`Cross Site Request Forgeries <ref-contrib-csrf>`.
 
 django.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -144,6 +144,44 @@ Default: ``600``
 The default number of seconds to cache a page when the caching middleware or
 ``cache_page()`` decorator is used.
 
+.. setting:: CSRF_COOKIE_NAME
+
+CSRF_COOKIE_NAME
+----------------
+Default: ``'csrftoken'``
+
+The name of the cookie to use for the CSRF authentication token. This can be whatever you
+want.  See :ref:`ref-contrib-csrf`.
+
+.. setting:: CSRF_COOKIE_DOMAIN
+
+CSRF_COOKIE_DOMAIN
+------------------
+
+Default: ``None``
+
+The domain to be used when setting the CSRF cookie.  This can be useful for
+allowing cross-subdomain requests to be exluded from the normal cross site
+request forgery protection.  It should be set to a string such as
+``".lawrence.com"`` to allow a POST request from a form on one subdomain to be
+accepted by accepted by a view served from another subdomain.
+
+.. setting:: CSRF_FAILURE_VIEW
+
+CSRF_FAILURE_VIEW
+-----------------
+
+Default: ``'django.contrib.csrf.views.csrf_failure'``
+
+A dotted path to the view function to be used when an incoming request
+is rejected by the CSRF protection.  The function should have this signature::
+
+  def csrf_failure(request, reason="")
+
+where ``reason`` is a short message (intended for developers or logging, not for
+end users) indicating the reason the request was rejected.  See
+:ref:`ref-contrib-csrf`.
+
 .. setting:: DATABASE_ENGINE
 
 DATABASE_ENGINE
@@ -751,6 +789,7 @@ Default::
 
     ('django.middleware.common.CommonMiddleware',
      'django.contrib.sessions.middleware.SessionMiddleware',
+     'django.contrib.csrf.middleware.CsrfViewMiddleware',
      'django.contrib.auth.middleware.AuthenticationMiddleware',)
 
 A tuple of middleware classes to use. See :ref:`topics-http-middleware`.

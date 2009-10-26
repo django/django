@@ -53,6 +53,13 @@ Ignore everything between ``{% comment %}`` and ``{% endcomment %}``
 
 .. templatetag:: cycle
 
+csrf_token
+~~~~~~~~~~
+
+.. versionadded:: 1.2
+
+This is described in the documentation for :ref:`Cross Site Request Forgeries <ref-contrib-csrf>`.
+
 cycle
 ~~~~~
 

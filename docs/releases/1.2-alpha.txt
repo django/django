@@ -2,6 +2,22 @@
 Backwards-incompatible changes
 ==============================
 
+CSRF Protection
+---------------
+
+There have been large changes to the way that CSRF protection works, detailed in
+:ref:`the CSRF documentaton <ref-contrib-csrf>`.  The following are the major
+changes that developers must be aware of:
+
+ * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated, and
+   will be removed completely in Django 1.4, in favour of a template tag that
+   should be inserted into forms.
+
+ * ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
+   default. This turns on CSRF protection by default, so that views that accept
+   POST requests need to be written to work with the middleware.  Instructions
+   on how to do this are found in the CSRF docs.
+
 LazyObject
 ----------
 

@@ -14,6 +14,7 @@ from django.template.context import RequestContext
 from django.utils.hashcompat import md5_constructor
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.formtools.utils import security_hash
+from django.contrib.csrf.decorators import csrf_protect
 
 class FormWizard(object):
     # Dictionary of extra template context variables.
@@ -44,6 +45,7 @@ class FormWizard(object):
         # hook methods might alter self.form_list.
         return len(self.form_list)
 
+    @csrf_protect
     def __call__(self, request, *args, **kwargs):
         """
         Main method that does all the hard work, conforming to the Django view

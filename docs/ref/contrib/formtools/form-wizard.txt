@@ -177,7 +177,7 @@ Here's a full example template:
 
     {% block content %}
     <p>Step {{ step }} of {{ step_count }}</p>
-    <form action="." method="post">
+    <form action="." method="post">{% csrf_token %}
     <table>
     {{ form }}
     </table>

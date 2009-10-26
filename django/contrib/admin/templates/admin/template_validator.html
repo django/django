@@ -4,7 +4,7 @@
 
 <div id="content-main">
 
-<form action="" method="post">
+<form action="" method="post">{% csrf_token %}
 
 {% if form.errors %}
 <p class="errornote">Your template had {{ form.errors|length }} error{{ form.errors|pluralize }}:</p>

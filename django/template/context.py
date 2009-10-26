@@ -1,7 +1,12 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 
+# Cache of actual callables.
 _standard_context_processors = None
+# We need the CSRF processor no matter what the user has in their settings,
+# because otherwise it is a security vulnerability, and we can't afford to leave
+# this to human error or failure to read migration instructions.
+_builtin_context_processors =  ('django.contrib.csrf.context_processors.csrf',)
 
 class ContextPopException(Exception):
     "pop() has been called more times than push()"
@@ -75,7 +80,10 @@ def get_standard_processors():
     global _standard_context_processors
     if _standard_context_processors is None:
         processors = []
-        for path in settings.TEMPLATE_CONTEXT_PROCESSORS:
+        collect = []
+        collect.extend(_builtin_context_processors)
+        collect.extend(settings.TEMPLATE_CONTEXT_PROCESSORS)
+        for path in collect:
             i = path.rfind('.')
             module, attr = path[:i], path[i+1:]
             try:
