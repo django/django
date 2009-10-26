@@ -574,6 +574,23 @@ class RequestMethodTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, 'request method: DELETE')
 
+class RequestMethodStringDataTests(TestCase):
+    def test_post(self):
+        "Request a view with string data via request method POST"
+        # Regression test for #11371
+        data = u'{"test": "json"}'
+        response = self.client.post('/test_client_regress/request_methods/', data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'request method: POST')
+
+    def test_put(self):
+        "Request a view with string data via request method PUT"
+        # Regression test for #11371
+        data = u'{"test": "json"}'
+        response = self.client.put('/test_client_regress/request_methods/', data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'request method: PUT')
+
 class QueryStringTests(TestCase):
     def test_get_like_requests(self):
         for method_name in ('get','head','options','put','delete'):

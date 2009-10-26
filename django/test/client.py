@@ -362,12 +362,18 @@ class Client(object):
         else:
             post_data = data
 
+        # Make `data` into a querystring only if it's not already a string. If
+        # it is a string, we'll assume that the caller has already encoded it.
+        query_string = None
+        if not isinstance(data, basestring):
+            query_string = urlencode(data, doseq=True)
+
         parsed = urlparse(path)
         r = {
             'CONTENT_LENGTH': len(post_data),
             'CONTENT_TYPE':   content_type,
             'PATH_INFO':      urllib.unquote(parsed[2]),
-            'QUERY_STRING':   urlencode(data, doseq=True) or parsed[4],
+            'QUERY_STRING':   query_string or parsed[4],
             'REQUEST_METHOD': 'PUT',
             'wsgi.input':     FakePayload(post_data),
         }
