@@ -174,7 +174,7 @@ views (just as you had before). It is strongly recommended to install
 
 Note that contrib apps, such as the admin, have been updated to use the
 ``csrf_protect`` decorator, so that they are secured even if you do not add the
-``CsrfViewMiddleware`` to your settings.  However, if you have suuplied
+``CsrfViewMiddleware`` to your settings.  However, if you have supplied
 customised templates to any of the view functions of contrib apps (whether
 explicitly via a keyword argument, or by overriding built-in templates), **you
 MUST update them** to include the ``csrf_token`` template tag as described
