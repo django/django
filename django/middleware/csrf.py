@@ -8,10 +8,6 @@ against request forgeries from other sites.
 import itertools
 import re
 import random
-try:
-    from functools import wraps
-except ImportError:
-    from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
 
 from django.conf import settings
 from django.core.urlresolvers import get_callable
