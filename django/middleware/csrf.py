@@ -145,14 +145,18 @@ class CsrfViewMiddleware(object):
                     # No CSRF cookie and no session cookie. For POST requests,
                     # we insist on a CSRF cookie, and in this way we can avoid
                     # all CSRF attacks, including login CSRF.
-                    return reject("No CSRF cookie.")
+                    return reject("No CSRF or session cookie.")
             else:
                 csrf_token = request.META["CSRF_COOKIE"]
 
             # check incoming token
             request_csrf_token = request.POST.get('csrfmiddlewaretoken', None)
             if request_csrf_token != csrf_token:
-                return reject("CSRF token missing or incorrect.")
+                if cookie_is_new:
+                    # probably a problem setting the CSRF cookie
+                    return reject("CSRF cookie not set.")
+                else:
+                    return reject("CSRF token missing or incorrect.")
 
         return accept()
 
