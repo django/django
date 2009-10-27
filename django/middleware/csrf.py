@@ -83,8 +83,11 @@ class CsrfViewMiddleware(object):
             request.META["CSRF_COOKIE"] = request.COOKIES[settings.CSRF_COOKIE_NAME]
             cookie_is_new = False
         except KeyError:
-            # No cookie, so create one.
+            # No cookie, so create one.  This will be sent with the next
+            # response.
             request.META["CSRF_COOKIE"] = _get_new_csrf_key()
+            # Set a flag to allow us to fall back and allow the session id in
+            # place of a CSRF cookie for this request only.
             cookie_is_new = True
 
         if request.method == 'POST':
@@ -133,10 +136,10 @@ class CsrfViewMiddleware(object):
                     return reject("Referer checking failed - %s does not match %s." %
                                   (referer, good_referer))
 
-            # If the user didn't already have a CSRF key, then accept the
-            # session key for the middleware token, so CSRF protection isn't lost
-            # for the period between upgrading to CSRF cookes to the first time
-            # each user comes back to the site to receive one.
+            # If the user didn't already have a CSRF cookie, then fall back to
+            # the Django 1.1 method (hash of session ID), so a request is not
+            # rejected if the form was sent to the user before upgrading to the
+            # Django 1.2 method (session independent nonce)
             if cookie_is_new:
                 try:
                     session_id = request.COOKIES[settings.SESSION_COOKIE_NAME]
@@ -226,7 +229,7 @@ class CsrfResponseMiddleware(object):
                 patch_vary_headers(response, ('Cookie',))
 
                 # Since the content has been modified, any Etag will now be
-                # incorrect.  We could recalculate, but only if we assume that              
+                # incorrect.  We could recalculate, but only if we assume that
                 # the Etag was set by CommonMiddleware. The safest thing is just
                 # to delete. See bug #9163
                 del response['ETag']
