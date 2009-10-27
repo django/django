@@ -46,6 +46,8 @@ CSRF_FAILRE_TEMPLATE = """
   and only the initial error message will be displayed.  </p>
 
   <p>You can customize this page using the CSRF_FAILURE_VIEW setting.</p>
+  {% else %}
+  <p><small>More information is available with DEBUG=True.</small></p>
 
   {% endif %}
 </body>
