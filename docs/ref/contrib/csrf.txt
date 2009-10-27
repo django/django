@@ -91,8 +91,8 @@ effects (see `9.1.1 Safe Methods, HTTP 1.1, RFC 2616`_), and so a
 CSRF attack with a GET request ought to be harmless.
 
 POST requests that are not accompanied by a session cookie are not protected,
-but they do not need to be protected, since the 'attacking' Web site
-could make these kind of requests anyway.
+but since these requests are not authenticated, they will usually be of limited
+risk.
 
 The Content-Type is checked before modifying the response, and only
 pages that are served as 'text/html' or 'application/xml+xhtml'
@@ -115,6 +115,12 @@ Limitations
 CsrfMiddleware requires Django's session framework to work. If you have
 a custom authentication system that manually sets cookies and the like,
 it won't help you.
+
+The middleware only partially protects against 'Login CSRF'.  If you have used
+standard Django views for logging in, then you will be protected, due to the way
+they work (the session must be established in the step before actually logging
+in, so the login step itself is protected).  If you have used a different way to
+log in, you may be vulnerable to Login CSRF.
 
 If your app creates HTML pages and forms in some unusual way, (e.g.
 it sends fragments of HTML in JavaScript document.write statements)
