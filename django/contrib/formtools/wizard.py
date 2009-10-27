@@ -14,7 +14,7 @@ from django.template.context import RequestContext
 from django.utils.hashcompat import md5_constructor
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.formtools.utils import security_hash
-from django.contrib.csrf.decorators import csrf_protect
+from django.views.decorators.csrf import csrf_protect
 
 class FormWizard(object):
     # Dictionary of extra template context variables.

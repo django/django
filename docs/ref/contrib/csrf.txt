@@ -4,7 +4,7 @@
 Cross Site Request Forgery protection
 =====================================
 
-.. module:: django.contrib.csrf
+.. module:: django.middleware.csrf
    :synopsis: Protects against Cross Site Request Forgeries
 
 The CSRF middleware and template tag provides easy-to-use protection against
@@ -37,13 +37,13 @@ How to use it
 To enable CSRF protection for your views, follow these steps:
 
     1. Add the middleware
-       ``'django.contrib.csrf.middleware.CsrfViewMiddleware'`` to your list of
+       ``'django.middleware.csrf.CsrfViewMiddleware'`` to your list of
        middleware classes, :setting:`MIDDLEWARE_CLASSES`.  (It should come
        before ``CsrfResponseMiddleware`` if that is being used, and before any
        view middleware that assume that CSRF attacks have been dealt with.)
 
        Alternatively, you can use the decorator
-       ``django.contrib.csrf.decorators.csrf_protect`` on particular views you
+       ``django.views.decorators.csrf.csrf_protect`` on particular views you
        want to protect.  This is **not recommended** by itself, since if you
        forget to use it, you will have a security hole.  The 'belt and braces'
        strategy of using both is fine, and will incur minimal overhead.
@@ -57,11 +57,11 @@ To enable CSRF protection for your views, follow these steps:
        that would cause the CSRF token to be leaked, leading to a vulnerability.
 
     3. In the corresponding view functions, ensure that the
-       ``'django.contrib.csrf.context_processors.csrf'`` context processor is
+       ``'django.core.context_processors.csrf'`` context processor is
        being used. Usually, this can be done in one of two ways:
 
        1. Use RequestContext, which always uses
-          ``'django.contrib.csrf.context_processors.csrf'`` (no matter what your
+          ``'django.core.context_processors.csrf'`` (no matter what your
           TEMPLATE_CONTEXT_PROCESSORS setting).  If you are using
           generic views or contrib apps, you are covered already, since these
           apps use RequestContext throughout.
@@ -69,7 +69,7 @@ To enable CSRF protection for your views, follow these steps:
        2. Manually import and use the processor to generate the CSRF token and
           add it to the template context. e.g.::
 
-              from django.contrib.csrf.context_processors import csrf
+              from django.core.context_processors import csrf
               from django.shortcuts import render_to_response
 
               def my_view(request):
@@ -96,7 +96,7 @@ as ``CsrfResponseMiddleware``, and it can be used by following these steps:
 
     1. Follow step 1 above to install ``CsrfViewMiddleware``.
 
-    2. Add ``'django.contrib.csrf.middleware.CsrfResponseMiddleware'`` to your
+    2. Add ``'django.middleware.csrf.CsrfResponseMiddleware'`` to your
        :setting:`MIDDLEWARE_CLASSES` setting.
 
        ``CsrfResponseMiddleware`` needs to process the response before things
@@ -139,6 +139,28 @@ the old post-processing functionality for CSRF protection, or you may not have
 enabled any CSRF protection.  This section outlines the steps necessary for a
 smooth upgrade, without having to fix all the applications to use the new
 template tag method immediately.
+
+First of all, the location of the middleware and related functions have
+changed.  There are backwards compatible stub files so that old imports will
+continue to work for now, but they are deprecated and will be removed in Django
+1.4.  The following changes have been made:
+
+ * Middleware have been moved to ``django.middleware.csrf``
+ * Decorators have been moved to ``django.views.decorators.csrf``
+
+======================================================  ==============================================
+   Old                                                       New
+======================================================  ==============================================
+django.contrib.csrf.middleware.CsrfMiddleware           django.middleware.csrf.CsrfMiddleware
+django.contrib.csrf.middleware.CsrfViewMiddleware       django.middleware.csrf.CsrfViewMiddleware
+django.contrib.csrf.middleware.CsrfResponseMiddleware   django.middleware.csrf.CsrfResponseMiddleware
+django.contrib.csrf.middleware.csrf_exempt              django.views.decorators.csrf_exempt
+django.contrib.csrf.middleware.csrf_view_exempt         django.views.decorators.csrf_view_exempt
+django.contrib.csrf.middleware.csrf_response_exempt     django.views.decorators.csrf_response_exempt
+======================================================  ==============================================
+
+You should update any imports, and also the paths in your
+:setting:`MIDDLEWARE_CLASSES`.
 
 If you have ``CsrfMiddleware`` in your :setting:`MIDDLEWARE_CLASSES`, you will now
 have a working installation with CSRF protection.  It is recommended at this
@@ -186,9 +208,9 @@ Exceptions
 
 To manually exclude a view function from being handled by either of the two CSRF
 middleware, you can use the ``csrf_exempt`` decorator, found in the
-``django.contrib.csrf.middleware`` module. For example::
+``django.views.decorators.csrf`` module. For example::
 
-    from django.contrib.csrf.middleware import csrf_exempt
+    from django.views.decorators.csrf import csrf_exempt
 
     def my_view(request):
         return HttpResponse('Hello world')
@@ -246,7 +268,7 @@ The CSRF protection is based on the following things:
 
    This cookie is set by ``CsrfViewMiddleware``.  It is meant to be permanent,
    but since there is no way to set a cookie that never expires, it is sent with
-   every response that has called ``django.contrib.csrf.middleware.get_token()``
+   every response that has called ``django.middleware.csrf.get_token()``
    (the function used internally to retrieve the CSRF token).
 
 2. A hidden form field with the name 'csrfmiddlewaretoken' present in all
@@ -352,7 +374,7 @@ If you are using ``CsrfResponseMiddleware`` and your app creates HTML pages and
 forms in some unusual way, (e.g.  it sends fragments of HTML in JavaScript
 document.write statements) you might bypass the filter that adds the hidden
 field to the form, in which case form submission will always fail.  You should
-use the template tag or :meth:`django.contrib.csrf.middleware.get_token` to get
+use the template tag or :meth:`django.middleware.csrf.get_token` to get
 the CSRF token and ensure it is included when your form is submitted.
 
 Contrib and reusable apps

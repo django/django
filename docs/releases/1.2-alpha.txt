@@ -18,6 +18,9 @@ changes that developers must be aware of:
    POST requests need to be written to work with the middleware.  Instructions
    on how to do this are found in the CSRF docs.
 
+ * All of the CSRF has moved from contrib to core (with backwards compatible
+   imports in the old locations, which are deprecated).
+
 LazyObject
 ----------
 

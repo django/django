@@ -6,7 +6,7 @@ _standard_context_processors = None
 # We need the CSRF processor no matter what the user has in their settings,
 # because otherwise it is a security vulnerability, and we can't afford to leave
 # this to human error or failure to read migration instructions.
-_builtin_context_processors =  ('django.contrib.csrf.context_processors.csrf',)
+_builtin_context_processors =  ('django.core.context_processors.csrf',)
 
 class ContextPopException(Exception):
     "pop() has been called more times than push()"

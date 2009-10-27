@@ -315,7 +315,7 @@ and return a dictionary of items to be merged into the context. By default,
 
 .. versionadded:: 1.2
    In addition to these, ``RequestContext`` always uses
-   ``'django.contrib.csrf.context_processors.csrf'``.  This is a security
+   ``'django.core.context_processors.csrf'``.  This is a security
    related context processor required by the admin and other contrib apps, and,
    in case of accidental misconfiguration, it is deliberately hardcoded in and
    cannot be turned off by the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
@@ -411,8 +411,8 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
 value of the :setting:`MEDIA_URL` setting.
 
-django.contrib.csrf.context_processors.csrf
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.core.context_processors.csrf
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 1.2
 

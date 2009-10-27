@@ -171,7 +171,7 @@ accepted by accepted by a view served from another subdomain.
 CSRF_FAILURE_VIEW
 -----------------
 
-Default: ``'django.contrib.csrf.views.csrf_failure'``
+Default: ``'django.views.csrf.csrf_failure'``
 
 A dotted path to the view function to be used when an incoming request
 is rejected by the CSRF protection.  The function should have this signature::
@@ -789,7 +789,7 @@ Default::
 
     ('django.middleware.common.CommonMiddleware',
      'django.contrib.sessions.middleware.SessionMiddleware',
-     'django.contrib.csrf.middleware.CsrfViewMiddleware',
+     'django.middleware.csrf.CsrfViewMiddleware',
      'django.contrib.auth.middleware.AuthenticationMiddleware',)
 
 A tuple of middleware classes to use. See :ref:`topics-http-middleware`.

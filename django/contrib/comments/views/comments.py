@@ -10,7 +10,7 @@ from django.utils.html import escape
 from django.views.decorators.http import require_POST
 from django.contrib import comments
 from django.contrib.comments import signals
-from django.contrib.csrf.decorators import csrf_protect
+from django.views.decorators.csrf import csrf_protect
 
 class CommentPostBadRequest(http.HttpResponseBadRequest):
     """

@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, PasswordChangeForm
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.csrf.decorators import csrf_protect
+from django.views.decorators.csrf import csrf_protect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.sites.models import Site, RequestSite

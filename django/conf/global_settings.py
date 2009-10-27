@@ -300,7 +300,7 @@ DEFAULT_INDEX_TABLESPACE = ''
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.csrf.middleware.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 #     'django.middleware.http.ConditionalGetMiddleware',
 #     'django.middleware.gzip.GZipMiddleware',
@@ -381,7 +381,7 @@ PASSWORD_RESET_TIMEOUT_DAYS = 3
 
 # Dotted path to callable to be used as view when a request is
 # rejected by the CSRF middleware.
-CSRF_FAILURE_VIEW = 'django.contrib.csrf.views.csrf_failure'
+CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 
 # Name and domain for CSRF cookie.
 CSRF_COOKIE_NAME = 'csrftoken'

@@ -19,6 +19,9 @@ their deprecation, as per the :ref:`Django deprecation policy
           token.  ``CsrfMiddleware``, which combines ``CsrfResponseMiddleware``
           and ``CsrfViewMiddleware``, is also deprecated.
 
+        * The old imports for CSRF functionality (``django.contrib.csrf.*``),
+          which moved to core in 1.2, will be removed.
+
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the

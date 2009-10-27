@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets
 from django.contrib.admin import helpers
 from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_ngettext, model_format_dict
-from django.contrib.csrf.decorators import csrf_protect
+from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied
 from django.db import models, transaction
 from django.db.models.fields import BLANK_CHOICE_DASH

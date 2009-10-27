@@ -2,8 +2,9 @@
 
 from django.test import TestCase
 from django.http import HttpRequest, HttpResponse
-from django.contrib.csrf.middleware import CsrfMiddleware, CsrfViewMiddleware, csrf_exempt
-from django.contrib.csrf.context_processors import csrf
+from django.middleware.csrf import CsrfMiddleware, CsrfViewMiddleware
+from django.views.decorators.csrf import csrf_exempt
+from django.core.context_processors import csrf
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.utils.importlib import import_module
 from django.conf import settings

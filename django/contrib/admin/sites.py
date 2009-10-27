@@ -3,8 +3,7 @@ from django import http, template
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin import actions
 from django.contrib.auth import authenticate, login
-from django.contrib.csrf.middleware import csrf_response_exempt
-from django.contrib.csrf.decorators import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_response_exempt
 from django.db.models.base import ModelBase
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse

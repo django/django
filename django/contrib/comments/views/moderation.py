@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from utils import next_redirect, confirmation_view
 from django.contrib import comments
 from django.contrib.comments import signals
-from django.contrib.csrf.decorators import csrf_protect
+from django.views.decorators.csrf import csrf_protect
 
 @csrf_protect
 @login_required
