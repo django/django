@@ -148,6 +148,9 @@ The default number of seconds to cache a page when the caching middleware or
 
 CSRF_COOKIE_NAME
 ----------------
+
+.. versionadded:: 1.2
+
 Default: ``'csrftoken'``
 
 The name of the cookie to use for the CSRF authentication token. This can be whatever you
@@ -157,6 +160,8 @@ want.  See :ref:`ref-contrib-csrf`.
 
 CSRF_COOKIE_DOMAIN
 ------------------
+
+.. versionadded:: 1.2
 
 Default: ``None``
 
@@ -170,6 +175,8 @@ accepted by accepted by a view served from another subdomain.
 
 CSRF_FAILURE_VIEW
 -----------------
+
+.. versionadded:: 1.2
 
 Default: ``'django.views.csrf.csrf_failure'``
 
