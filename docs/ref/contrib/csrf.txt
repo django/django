@@ -188,9 +188,12 @@ applications in your project will meet its requirements by virtue of the
 
 The next step is to update all your applications to use the template tag, as
 described in `How to use it`_, steps 2-3.  This can be done as soon as is
-practical. Any applications that are updated will now require Django 1.2 or
+practical. Any applications that are updated will now require Django 1.1.2 or
 later, since they will use the CSRF template tag which was not available in
-earlier versions.
+earlier versions. (The template tag in 1.1.2 is actually a no-op that exists
+solely to ease the transition to 1.2 — it allows apps to be created that have
+CSRF protection under 1.2 without requiring users of the apps to upgrade to the
+Django 1.2.X series).
 
 The utility script ``extras/csrf_migration_helper.py`` can help to automate the
 finding of code and templates that may need to be upgraded.  It contains full
