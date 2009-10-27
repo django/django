@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.contrib.csrf.middleware import CsrfMiddleware, _make_token, csrf_exempt
 from django.conf import settings
+from django.template import Template
 
 
 def post_form_response():
@@ -142,3 +143,9 @@ class CsrfMiddlewareTest(TestCase):
         req.META['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
         req2 = CsrfMiddleware().process_view(req, self.get_view(), (), {})
         self.assertEquals(None, req2)
+
+    def test_template_tag_noop(self):
+        """
+        Check that the {% csrf_token %} works in 1.1.2 and later
+        """
+        self.assertEquals(u"", Template("{% csrf_token %}").render({}))

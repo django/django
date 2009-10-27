@@ -37,6 +37,11 @@ class CommentNode(Node):
     def render(self, context):
         return ''
 
+class CsrfTokenNode(Node):
+    # This no-op tag exists to allow 1.1.X code to be compatible with Django 1.2
+    def render(self, context):
+        return u''
+
 class CycleNode(Node):
     def __init__(self, cyclevars, variable_name=None):
         self.cycle_iter = itertools_cycle(cyclevars)
@@ -522,6 +527,11 @@ def cycle(parser, token):
         node = CycleNode(values)
     return node
 cycle = register.tag(cycle)
+
+def csrf_token(parser, token):
+    # This no-op tag exists to allow 1.1.X code to be compatible with Django 1.2
+    return CsrfTokenNode()
+register.tag(csrf_token)
 
 def debug(parser, token):
     """
