@@ -1141,6 +1141,16 @@ class AdminActionsTest(TestCase):
             '<input type="checkbox" class="action-select"' not in response.content,
             "Found an unexpected action toggle checkboxbox in response"
         )
+        self.assert_('action-checkbox-column' not in response.content,
+            "Found unexpected action-checkbox-column class in response")
+
+    def test_action_column_class(self):
+        "Tests that the checkbox column class is present in the response"
+        response = self.client.get('/test_admin/admin/admin_views/subscriber/')
+        self.assertNotEquals(response.context["action_form"], None)
+        self.assert_('action-checkbox-column' in response.content,
+            "Expected an action-checkbox-column in response")
+
 
     def test_multiple_actions_form(self):
         """
