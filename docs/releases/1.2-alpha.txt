@@ -13,6 +13,11 @@ changes that developers must be aware of:
    will be removed completely in Django 1.4, in favour of a template tag that
    should be inserted into forms.
 
+ * All contrib apps use a ``csrf_protect`` decorator to protect the view.  This
+   requires the use of the csrf_token template tag in the template, so if you
+   have used custom templates for contrib views, you MUST READ THE UPGRADE
+   INSTRUCTIONS to fix those templates.
+
  * ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
    default. This turns on CSRF protection by default, so that views that accept
    POST requests need to be written to work with the middleware.  Instructions
