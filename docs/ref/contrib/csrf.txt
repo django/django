@@ -89,7 +89,7 @@ Legacy method
 -------------
 
 In Django 1.1, the template tag did not exist.  Instead, a post-processing
-middleware that re-wrote POST forms to include the CRSF token was used.  If you
+middleware that re-wrote POST forms to include the CSRF token was used.  If you
 are upgrading a site from version 1.1 or earlier, please read this section and
 the `Upgrading notes`_ below.  The post-processing middleware is still available
 as ``CsrfResponseMiddleware``, and it can be used by following these steps:
@@ -108,7 +108,7 @@ as ``CsrfResponseMiddleware``, and it can be used by following these steps:
 Use of the ``CsrfResponseMiddleware`` is not recommended because of the
 performance hit it imposes, and because of a potential security problem (see
 below).  It can be used as an interim measure until applications have been
-updated to use the ``{% crsf_token %}`` tag.  It is deprecated and will be
+updated to use the ``{% csrf_token %}`` tag.  It is deprecated and will be
 removed in Django 1.4.
 
 Django 1.1 and earlier provided a single ``CsrfMiddleware`` class.  This is also
