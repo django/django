@@ -212,9 +212,9 @@ middleware, you can use the ``csrf_exempt`` decorator, found in the
 
     from django.views.decorators.csrf import csrf_exempt
 
+    @csrf_exempt
     def my_view(request):
         return HttpResponse('Hello world')
-    my_view = csrf_exempt(my_view)
 
 Like the middleware, the ``csrf_exempt`` decorator is composed of two parts: a
 ``csrf_view_exempt`` decorator and a ``csrf_response_exempt`` decorator, found
