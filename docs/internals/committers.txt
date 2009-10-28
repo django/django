@@ -148,7 +148,6 @@ Joseph Kocherhans
 
 .. _brian rosner: http://oebfare.com/
 .. _eldarion: http://eldarion.com/
-.. _pinax: http://pinaxproject.com/
 .. _django dose: http://djangodose.com/
 
 `Gary Wilson`_
@@ -188,6 +187,18 @@ Karen Tracey
     problems, etc. -- because coding puzzles are as much fun as word puzzles.
 
     Karen lives in Apex, NC, USA.
+
+`Jannis Leidel`_
+    Jannis graduated in media design from `Bauhaus-University Weimar`_,
+    is the author of a number of pluggable Django apps and likes to
+    contribute to Open Source projects like Pinax_. He currently works as
+    a freelance web developer and designer.
+
+    Jannis lives in Berlin, Germany.
+
+.. _Jannis Leidel: http://jezdez.com/
+.. _Bauhaus-University Weimar: http://www.uni-weimar.de/
+.. _pinax: http://pinaxproject.com/
 
 Specialists
 -----------
