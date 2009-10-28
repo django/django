@@ -16,6 +16,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Brian Rosner
     * Justin Bronn
     * Karen Tracey
+    * Jannis Leidel
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -267,7 +268,6 @@ answer newbie questions, and generally made Django that much better:
     lcordier@point45.com
     Jeong-Min Lee <falsetru@gmail.com>
     Tai Lee <real.human@mrmachine.net>
-    Jannis Leidel <jl@websushi.org>
     Christopher Lenz <http://www.cmlenz.net/>
     lerouxb@gmail.com
     Piotr Lewandowski <piotr.lewandowski@gmail.com>
