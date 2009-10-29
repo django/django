@@ -293,7 +293,14 @@ class Model(object):
                         if rel_obj is None and field.null:
                             val = None
                 else:
-                    val = kwargs.pop(field.attname, field.get_default())
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
             else:
                 val = field.get_default()
             if is_related_object:
@@ -346,7 +353,7 @@ class Model(object):
         """
         data = self.__dict__
         if not self._deferred:
-            return (self.__class__, (), data)
+            return super(Model, self).__reduce__()
         defers = []
         pk_val = None
         for field in self._meta.fields:
@@ -359,6 +366,7 @@ class Model(object):
                     # once.
                     obj = self.__class__.__dict__[field.attname]
                     model = obj.model_ref()
+
         return (model_unpickle, (model, defers), data)
 
     def _get_pk_val(self, meta=None):
