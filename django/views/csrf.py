@@ -33,11 +33,11 @@ CSRF_FAILRE_TEMPLATE = """
 
   <ul>
     <li>The view function uses <a
-    href='http://docs.djangoproject.com/en/dev/ref/templates/api/#subclassing-context-requestcontext'><tt>RequestContext</tt></a>
-    for the template, instead of <tt>Context</tt>.</li>
+    href='http://docs.djangoproject.com/en/dev/ref/templates/api/#subclassing-context-requestcontext'><code>RequestContext</code></a>
+    for the template, instead of <code>Context</code>.</li>
 
-    <li>In the template, there is a <tt>{% templatetag openblock %} csrf_token
-    {% templatetag closeblock %}</tt> template tag inside each POST form that
+    <li>In the template, there is a <code>{% templatetag openblock %} csrf_token
+    {% templatetag closeblock %}</code> template tag inside each POST form that
     targets an internal URL.</li>
   </ul>
 
