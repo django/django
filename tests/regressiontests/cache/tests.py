@@ -16,6 +16,7 @@ from django.core.cache.backends.base import InvalidCacheBackendError
 from django.http import HttpResponse, HttpRequest
 from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key
 from django.utils.hashcompat import md5_constructor
+from regressiontests.cache.models import Poll, expensive_calculation
 
 # functions/classes for complex data type tests
 def f():
@@ -210,6 +211,47 @@ class BaseCacheTests(object):
         }
         self.cache.set("stuff", stuff)
         self.assertEqual(self.cache.get("stuff"), stuff)
+
+    def test_cache_read_for_model_instance(self):
+        # Don't want fields with callable as default to be called on cache read
+        expensive_calculation.num_runs = 0
+        Poll.objects.all().delete()
+        my_poll = Poll.objects.create(question="Well?")
+        self.assertEqual(Poll.objects.count(), 1)
+        pub_date = my_poll.pub_date
+        self.cache.set('question', my_poll)
+        cached_poll = self.cache.get('question')
+        self.assertEqual(cached_poll.pub_date, pub_date)
+        # We only want the default expensive calculation run once
+        self.assertEqual(expensive_calculation.num_runs, 1)
+
+    def test_cache_write_for_model_instance_with_deferred(self):
+        # Don't want fields with callable as default to be called on cache write
+        expensive_calculation.num_runs = 0
+        Poll.objects.all().delete()
+        my_poll = Poll.objects.create(question="What?")
+        self.assertEqual(expensive_calculation.num_runs, 1)
+        defer_qs = Poll.objects.all().defer('question')
+        self.assertEqual(defer_qs.count(), 1)
+        self.assertEqual(expensive_calculation.num_runs, 1)
+        self.cache.set('deferred_queryset', defer_qs)
+        # cache set should not re-evaluate default functions
+        self.assertEqual(expensive_calculation.num_runs, 1)
+
+    def test_cache_read_for_model_instance_with_deferred(self):
+        # Don't want fields with callable as default to be called on cache read
+        expensive_calculation.num_runs = 0
+        Poll.objects.all().delete()
+        my_poll = Poll.objects.create(question="What?")
+        self.assertEqual(expensive_calculation.num_runs, 1)
+        defer_qs = Poll.objects.all().defer('question')
+        self.assertEqual(defer_qs.count(), 1)
+        self.cache.set('deferred_queryset', defer_qs)
+        self.assertEqual(expensive_calculation.num_runs, 1)
+        runs_before_cache_read = expensive_calculation.num_runs
+        cached_polls = self.cache.get('deferred_queryset')
+        # We only want the default expensive calculation run on creation and set
+        self.assertEqual(expensive_calculation.num_runs, runs_before_cache_read)
 
     def test_expiration(self):
         # Cache values can be set to expire
