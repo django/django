@@ -3,7 +3,7 @@ from django import http, template
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin import actions
 from django.contrib.auth import authenticate, login
-from django.views.decorators.csrf import csrf_protect, csrf_response_exempt
+from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
@@ -189,7 +189,7 @@ class AdminSite(object):
             inner = never_cache(inner)
         # We add csrf_protect here so this function can be used as a utility
         # function for any view, without having to repeat 'csrf_protect'.
-        inner = csrf_response_exempt(csrf_protect(inner))
+        inner = csrf_protect(inner)
         return update_wrapper(inner, view)
 
     def get_urls(self):

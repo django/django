@@ -178,7 +178,9 @@ Note that contrib apps, such as the admin, have been updated to use the
 customised templates to any of the view functions of contrib apps (whether
 explicitly via a keyword argument, or by overriding built-in templates), **you
 MUST update them** to include the ``csrf_token`` template tag as described
-above, or they will stop working.
+above, or they will stop working.  (If you cannot update these templates for
+some reason, you will be forced to use ``CsrfResponseMiddleware`` for these
+views to continue working).
 
 Assuming you have followed the above, all views in your Django site will now be
 protected by the ``CsrfViewMiddleware``.  Contrib apps meet the requirements
