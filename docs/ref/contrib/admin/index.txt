@@ -770,7 +770,7 @@ documented in :ref:`topics-http-urls`::
 However, the ``self.my_view`` function registered above suffers from two
 problems:
 
-  * It will *not* perform and permission checks, so it will be accessible to
+  * It will *not* perform any permission checks, so it will be accessible to
     the general public.
   * It will *not* provide any header details to prevent caching. This means if
     the page retrieves data from the database, and caching middleware is
