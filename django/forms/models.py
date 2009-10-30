@@ -705,7 +705,7 @@ class BaseInlineFormSet(BaseModelFormSet):
                  save_as_new=False, prefix=None):
         from django.db.models.fields.related import RelatedObject
         if instance is None:
-            self.instance = self.model()
+            self.instance = self.fk.rel.to()
         else:
             self.instance = instance
         self.save_as_new = save_as_new
