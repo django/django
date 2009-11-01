@@ -1,48 +1,42 @@
-"""
->>> from datetime import datetime, date
->>> from django.utils.dateformat import format
->>> from django.utils.tzinfo import FixedOffset, LocalTimezone
+import os
+from unittest import TestCase
+from datetime import datetime, date
+from django.utils.dateformat import format
+from django.utils.tzinfo import FixedOffset, LocalTimezone
 
-# date
->>> d = date(2009, 5, 16)
->>> date.fromtimestamp(int(format(d, 'U'))) == d
-True
+class DateFormatTests(TestCase):
+    def setUp(self):
+        self.old_TZ = os.environ['TZ']
+        os.environ['TZ'] = 'Europe/Copenhagen'
 
-# Naive datetime
->>> dt = datetime(2009, 5, 16, 5, 30, 30)
->>> datetime.fromtimestamp(int(format(dt, 'U'))) == dt
-True
+    def tearDown(self):
+        os.environ['TZ'] = self.old_TZ
 
-# datetime with local tzinfo
->>> ltz = LocalTimezone(datetime.now())
->>> dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=ltz)
->>> datetime.fromtimestamp(int(format(dt, 'U')), ltz) == dt
-True
->>> datetime.fromtimestamp(int(format(dt, 'U'))) == dt.replace(tzinfo=None)
-True
+    def test_date(self):
+        d = date(2009, 5, 16)
+        self.assertEquals(date.fromtimestamp(int(format(d, 'U'))), d)
 
-# datetime with arbitrary tzinfo
->>> tz = FixedOffset(-510)
->>> ltz = LocalTimezone(datetime.now())
->>> dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=tz)
->>> datetime.fromtimestamp(int(format(dt, 'U')), tz) == dt
-True
->>> datetime.fromtimestamp(int(format(dt, 'U')), ltz) == dt
-True
->>> datetime.fromtimestamp(int(format(dt, 'U'))) == dt.astimezone(ltz).replace(tzinfo=None)
-True
->>> datetime.fromtimestamp(int(format(dt, 'U')), tz).utctimetuple() == dt.utctimetuple()
-True
->>> datetime.fromtimestamp(int(format(dt, 'U')), ltz).utctimetuple() == dt.utctimetuple()
-True
+    def test_naive_datetime(self):
+        dt = datetime(2009, 5, 16, 5, 30, 30)
+        self.assertEquals(datetime.fromtimestamp(int(format(dt, 'U'))), dt)
 
-# Epoch
->>> utc = FixedOffset(0)
->>> udt = datetime(1970, 1, 1, tzinfo=utc)
->>> format(udt, 'U')
-u'0'
-"""
+    def test_datetime_with_local_tzinfo(self):
+        ltz = LocalTimezone(datetime.now())
+        dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=ltz)
+        self.assertEquals(datetime.fromtimestamp(int(format(dt, 'U')), ltz), dt)
+        self.assertEquals(datetime.fromtimestamp(int(format(dt, 'U'))), dt.replace(tzinfo=None))
 
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+    def test_datetime_with_tzinfo(self):
+        tz = FixedOffset(-510)
+        ltz = LocalTimezone(datetime.now())
+        dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=tz)
+        self.assertEquals(datetime.fromtimestamp(int(format(dt, 'U')), tz), dt)
+        self.assertEquals(datetime.fromtimestamp(int(format(dt, 'U')), ltz), dt)
+        self.assertEquals(datetime.fromtimestamp(int(format(dt, 'U'))), dt.astimezone(ltz).replace(tzinfo=None))
+        self.assertEquals(datetime.fromtimestamp(int(format(dt, 'U')), tz).utctimetuple(), dt.utctimetuple())
+        self.assertEquals(datetime.fromtimestamp(int(format(dt, 'U')), ltz).utctimetuple(), dt.utctimetuple())
+
+    def test_epoch(self):
+        utc = FixedOffset(0)
+        udt = datetime(1970, 1, 1, tzinfo=utc)
+        self.assertEquals(format(udt, 'U'), u'0')

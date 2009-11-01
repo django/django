@@ -24,9 +24,10 @@ except NameError:
 __test__ = {
     'timesince': timesince,
     'datastructures': datastructures,
-    'dateformat': dateformat,
     'itercompat': itercompat,
 }
+
+from dateformat import *
 
 class TestUtilsHtml(TestCase):
 
