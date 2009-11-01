@@ -5,12 +5,15 @@ import datetime, os, time
 
 class DateFormatTests(TestCase):
     def setUp(self):
-        self.old_TZ = os.environ['TZ']
+        self.old_TZ = os.environ.get('TZ')
         os.environ['TZ'] = 'Europe/Copenhagen'
         translation.activate('en-us')
 
     def tearDown(self):
-        os.environ['TZ'] = self.old_TZ
+        if self.old_TZ is None:
+            del os.environ['TZ']
+        else:
+            os.environ['TZ'] = self.old_TZ
 
     def test_empty_format(self):
         my_birthday = datetime.datetime(1979, 7, 8, 22, 00)
