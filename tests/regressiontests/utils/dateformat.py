@@ -5,16 +5,6 @@ from django.utils.dateformat import format
 from django.utils.tzinfo import FixedOffset, LocalTimezone
 
 class DateFormatTests(TestCase):
-    def setUp(self):
-        self.old_TZ = os.environ.get('TZ')
-        os.environ['TZ'] = 'Europe/Copenhagen'
-
-    def tearDown(self):
-        if self.old_TZ is None:
-            del os.environ['TZ']
-        else:
-            os.environ['TZ'] = self.old_TZ
-
     def test_date(self):
         d = date(2009, 5, 16)
         self.assertEquals(date.fromtimestamp(int(format(d, 'U'))), d)

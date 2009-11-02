@@ -9,11 +9,23 @@ class DateFormatTests(TestCase):
         os.environ['TZ'] = 'Europe/Copenhagen'
         translation.activate('en-us')
 
+        try:
+            # Check if a timezone has been set
+            time.tzset()
+            self.tz_tests = True
+        except AttributeError:
+            # No timezone available. Don't run the tests that require a TZ
+            self.tz_tests = False
+
     def tearDown(self):
         if self.old_TZ is None:
             del os.environ['TZ']
         else:
             os.environ['TZ'] = self.old_TZ
+
+        # Cleanup - force re-evaluation of TZ environment variable.
+        if self.tz_tests:
+            time.tzset()
 
     def test_empty_format(self):
         my_birthday = datetime.datetime(1979, 7, 8, 22, 00)
@@ -68,10 +80,7 @@ class DateFormatTests(TestCase):
         summertime = datetime.datetime(2005, 10, 30, 1, 00)
         wintertime = datetime.datetime(2005, 10, 30, 4, 00)
 
-        try:
-            # Check if a timezone has been set
-            time.tzset()
-
+        if self.tz_tests:
             self.assertEquals(dateformat.format(my_birthday, 'O'), u'+0100')
             self.assertEquals(dateformat.format(my_birthday, 'r'), u'Sun, 8 Jul 1979 22:00:00 +0100')
             self.assertEquals(dateformat.format(my_birthday, 'T'), u'CET')
@@ -81,6 +90,3 @@ class DateFormatTests(TestCase):
             self.assertEquals(dateformat.format(summertime, 'O'), u'+0200')
             self.assertEquals(dateformat.format(wintertime, 'I'), u'0')
             self.assertEquals(dateformat.format(wintertime, 'O'), u'+0100')
-        except AttributeError:
-            # No timezone available. Don't run the tests
-            pass
