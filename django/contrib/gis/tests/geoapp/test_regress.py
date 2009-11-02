@@ -28,6 +28,7 @@ class GeoRegressionTests(unittest.TestCase):
         kmz = render_to_kmz('gis/kml/placemarks.kml', {'places' : places})
 
     @no_spatialite
+    @no_mysql
     def test03_extent(self):
         "Testing `extent` on a table with a single point, see #11827."
         pnt = City.objects.get(name='Pueblo').point
