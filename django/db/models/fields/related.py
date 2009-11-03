@@ -819,7 +819,7 @@ def create_many_to_many_intermediary_model(field, klass):
     name = '%s_%s' % (klass._meta.object_name, field.name)
     if field.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT or field.rel.to == klass._meta.object_name:
         from_ = 'from_%s' % to.lower()
-        to = to.lower()
+        to = 'to_%s' % to.lower()
     else:
         from_ = klass._meta.object_name.lower()
         to = to.lower()
