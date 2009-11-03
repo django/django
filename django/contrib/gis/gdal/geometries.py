@@ -256,11 +256,15 @@ class OGRGeometry(GDALBase):
 
     def _set_srs(self, srs):
         "Sets the SpatialReference for this geometry."
+        # Do not have to clone the `SpatialReference` object pointer because
+        # when it is assigned to this `OGRGeometry` it's internal OGR
+        # reference count is incremented, and will likewise be released
+        # (decremented) when this geometry's destructor is called.
         if isinstance(srs, SpatialReference):
-            srs_ptr = srs_api.clone_srs(srs.ptr)
+            srs_ptr = srs.ptr
         elif isinstance(srs, (int, long, basestring)):
             sr = SpatialReference(srs)
-            srs_ptr = srs_api.clone_srs(sr.ptr)
+            srs_ptr = sr.ptr
         else:
             raise TypeError('Cannot assign spatial reference with object of type: %s' % type(srs))
         capi.assign_srs(self.ptr, srs_ptr)
