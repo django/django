@@ -182,6 +182,7 @@ class UniqueM2M(models.Model):
     """ Model to test for unique ManyToManyFields, which are invalid. """
     unique_people = models.ManyToManyField( Person, unique=True )
 
+
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute.
 invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute.
 invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute.

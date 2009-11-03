@@ -23,7 +23,7 @@ def sql_create(app, style):
     # We trim models from the current app so that the sqlreset command does not
     # generate invalid SQL (leaving models out of known_models is harmless, so
     # we can be conservative).
-    app_models = models.get_models(app)
+    app_models = models.get_models(app, include_auto_created=True)
     final_output = []
     tables = connection.introspection.table_names()
     known_models = set([model for model in connection.introspection.installed_models(tables) if model not in app_models])
@@ -39,10 +39,6 @@ def sql_create(app, style):
         final_output.extend(connection.creation.sql_for_pending_references(model, style, pending_references))
         # Keep track of the fact that we've created the table for this model.
         known_models.add(model)
-
-    # Create the many-to-many join tables.
-    for model in app_models:
-        final_output.extend(connection.creation.sql_for_many_to_many(model, style))
 
     # Handle references to tables that are from other apps
     # but don't exist physically.
@@ -82,7 +78,7 @@ def sql_delete(app, style):
     to_delete = set()
 
     references_to_delete = {}
-    app_models = models.get_models(app)
+    app_models = models.get_models(app, include_auto_created=True)
     for model in app_models:
         if cursor and connection.introspection.table_name_converter(model._meta.db_table) in table_names:
             # The table exists, so it needs to be dropped
@@ -96,13 +92,6 @@ def sql_delete(app, style):
     for model in app_models:
         if connection.introspection.table_name_converter(model._meta.db_table) in table_names:
             output.extend(connection.creation.sql_destroy_model(model, references_to_delete, style))
-
-    # Output DROP TABLE statements for many-to-many tables.
-    for model in app_models:
-        opts = model._meta
-        for f in opts.local_many_to_many:
-            if cursor and connection.introspection.table_name_converter(f.m2m_db_table()) in table_names:
-                output.extend(connection.creation.sql_destroy_many_to_many(model, f, style))
 
     # Close database connection explicitly, in case this output is being piped
     # directly into a database client, to avoid locking issues.

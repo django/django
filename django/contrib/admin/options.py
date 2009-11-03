@@ -153,8 +153,9 @@ class BaseModelAdmin(object):
         """
         Get a form Field for a ManyToManyField.
         """
-        # If it uses an intermediary model, don't show field in admin.
-        if db_field.rel.through is not None:
+        # If it uses an intermediary model that isn't auto created, don't show
+        # a field in admin.
+        if not db_field.rel.through._meta.auto_created:
             return None
 
         if db_field.name in self.raw_id_fields:

@@ -57,12 +57,15 @@ class Command(NoArgsCommand):
         # Create the tables for each model
         for app in models.get_apps():
             app_name = app.__name__.split('.')[-2]
-            model_list = models.get_models(app)
+            model_list = models.get_models(app, include_auto_created=True)
             for model in model_list:
                 # Create the model's database table, if it doesn't already exist.
                 if verbosity >= 2:
                     print "Processing %s.%s model" % (app_name, model._meta.object_name)
-                if connection.introspection.table_name_converter(model._meta.db_table) in tables:
+                opts = model._meta
+                if (connection.introspection.table_name_converter(opts.db_table) in tables or
+                    (opts.auto_created and
+                    connection.introspection.table_name_converter(opts.auto_created._meta.db_table in tables))):
                     continue
                 sql, references = connection.creation.sql_create_model(model, self.style, seen_models)
                 seen_models.add(model)
@@ -78,19 +81,6 @@ class Command(NoArgsCommand):
                     cursor.execute(statement)
                 tables.append(connection.introspection.table_name_converter(model._meta.db_table))
 
-        # Create the m2m tables. This must be done after all tables have been created
-        # to ensure that all referred tables will exist.
-        for app in models.get_apps():
-            app_name = app.__name__.split('.')[-2]
-            model_list = models.get_models(app)
-            for model in model_list:
-                if model in created_models:
-                    sql = connection.creation.sql_for_many_to_many(model, self.style)
-                    if sql:
-                        if verbosity >= 2:
-                            print "Creating many-to-many tables for %s.%s model" % (app_name, model._meta.object_name)
-                        for statement in sql:
-                            cursor.execute(statement)
 
         transaction.commit_unless_managed()
 

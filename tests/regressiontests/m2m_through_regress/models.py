@@ -84,22 +84,22 @@ __test__ = {'API_TESTS':"""
 >>> bob.group_set = []
 Traceback (most recent call last):
 ...
-AttributeError: Cannot set values on a ManyToManyField which specifies an intermediary model.  Use Membership's Manager instead.
+AttributeError: Cannot set values on a ManyToManyField which specifies an intermediary model.  Use m2m_through_regress.Membership's Manager instead.
 
 >>> roll.members = []
 Traceback (most recent call last):
 ...
-AttributeError: Cannot set values on a ManyToManyField which specifies an intermediary model.  Use Membership's Manager instead.
+AttributeError: Cannot set values on a ManyToManyField which specifies an intermediary model.  Use m2m_through_regress.Membership's Manager instead.
 
 >>> rock.members.create(name='Anne')
 Traceback (most recent call last):
 ...
-AttributeError: Cannot use create() on a ManyToManyField which specifies an intermediary model.  Use Membership's Manager instead.
+AttributeError: Cannot use create() on a ManyToManyField which specifies an intermediary model.  Use m2m_through_regress.Membership's Manager instead.
 
 >>> bob.group_set.create(name='Funk')
 Traceback (most recent call last):
 ...
-AttributeError: Cannot use create() on a ManyToManyField which specifies an intermediary model.  Use Membership's Manager instead.
+AttributeError: Cannot use create() on a ManyToManyField which specifies an intermediary model.  Use m2m_through_regress.Membership's Manager instead.
 
 # Now test that the intermediate with a relationship outside
 # the current app (i.e., UserMembership) workds

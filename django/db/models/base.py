@@ -434,7 +434,7 @@ class Model(object):
         else:
             meta = cls._meta
 
-        if origin:
+        if origin and not meta.auto_created:
             signals.pre_save.send(sender=origin, instance=self, raw=raw)
 
         # If we are in a raw save, save the object exactly as presented.
@@ -507,7 +507,7 @@ class Model(object):
                     setattr(self, meta.pk.attname, result)
             transaction.commit_unless_managed()
 
-        if origin:
+        if origin and not meta.auto_created:
             signals.post_save.send(sender=origin, instance=self,
                 created=(not record_exists), raw=raw)
 
@@ -544,7 +544,12 @@ class Model(object):
                         rel_descriptor = cls.__dict__[rel_opts_name]
                         break
                 else:
-                    raise AssertionError("Should never get here.")
+                    # in the case of a hidden fkey just skip it, it'll get
+                    # processed as an m2m
+                    if not related.field.rel.is_hidden():
+                        raise AssertionError("Should never get here.")
+                    else:
+                        continue
                 delete_qs = rel_descriptor.delete_manager(self).all()
                 for sub_obj in delete_qs:
                     sub_obj._collect_sub_objects(seen_objs, self.__class__, related.field.null)
