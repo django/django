@@ -424,6 +424,29 @@ are not allowed to visit any page, systemwide. Use this for bad robots/crawlers.
 This is only used if ``CommonMiddleware`` is installed (see
 :ref:`topics-http-middleware`).
 
+.. setting:: EMAIL_BACKEND
+
+EMAIL_BACKEND
+-------------
+
+.. versionadded:: 1.2
+
+Default: ``'smtp'``
+
+The backend to use for sending emails. For the list of available backends see
+:ref:`topics-email`.
+
+.. setting:: EMAIL_FILE_PATH
+
+EMAIL_FILE_PATH
+---------------
+
+.. versionadded:: 1.2
+
+Default: Not defined
+
+The directory used by the ``file`` email backend to store output files.
+
 .. setting:: EMAIL_HOST
 
 EMAIL_HOST
