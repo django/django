@@ -44,9 +44,7 @@ To enable CSRF protection for your views, follow these steps:
 
        Alternatively, you can use the decorator
        ``django.views.decorators.csrf.csrf_protect`` on particular views you
-       want to protect.  This is **not recommended** by itself, since if you
-       forget to use it, you will have a security hole.  The 'belt and braces'
-       strategy of using both is fine, and will incur minimal overhead.
+       want to protect (see below).
 
     2. In any template that uses a POST form, use the ``csrf_token`` tag inside
        the ``<form>`` element if the form is for an internal URL, e.g.::
@@ -84,6 +82,30 @@ To enable CSRF protection for your views, follow these steps:
 The utility script ``extras/csrf_migration_helper.py`` can help to automate the
 finding of code and templates that may need to be upgraded.  It contains full
 help on how to use it.
+
+The decorator method
+--------------------
+
+Rather than adding ``CsrfViewMiddleware`` as a blanket protection, you can use
+the ``csrf_protect`` decorator, which has exactly the same functionality, on
+particular views that need the protection.  It must be used **both** on views
+that insert the CSRF token in the output, and on those that accept the POST form
+data. (These are often the same view function, but not always).  It is used like
+this::
+
+    from django.views.decorators.csrf import csrf_protect
+    from django.template import RequestContext
+
+    @csrf_protect
+    def my_view(request):
+        c = {}
+        # ...
+        return render_to_response("a_template.html", c,
+                                   context_instance=RequestContext(request))
+
+Use of the decorator is **not recommended** by itself, since if you forget to
+use it, you will have a security hole.  The 'belt and braces' strategy of using
+both is fine, and will incur minimal overhead.
 
 Legacy method
 -------------
@@ -181,6 +203,12 @@ MUST update them** to include the ``csrf_token`` template tag as described
 above, or they will stop working.  (If you cannot update these templates for
 some reason, you will be forced to use ``CsrfResponseMiddleware`` for these
 views to continue working).
+
+Note also, if you are using the comments app, and you are not going to add
+``CsrfViewMiddleware`` to your settings (not recommended), you will need to add
+the ``csrf_protect`` decorator to any views that include the comment forms and
+target the comment views (usually using the :ttag:`comment_form_target` template
+tag).
 
 Assuming you have followed the above, all views in your Django site will now be
 protected by the ``CsrfViewMiddleware``.  Contrib apps meet the requirements

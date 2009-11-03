@@ -39,6 +39,11 @@ CSRF_FAILRE_TEMPLATE = """
     <li>In the template, there is a <code>{% templatetag openblock %} csrf_token
     {% templatetag closeblock %}</code> template tag inside each POST form that
     targets an internal URL.</li>
+
+    <li>If you are not using <code>CsrfViewMiddleware</code>, then you must use
+    <code>csrf_protect</code> on any views that use the <code>csrf_token</code>
+    template tag, as well as those that accept the POST data.</li>
+
   </ul>
 
   <p>You're seeing the help section of this page because you have <code>DEBUG =
