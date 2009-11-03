@@ -1048,16 +1048,68 @@ automatically::
             FriendshipInline,
         ]
 
+Working with Many-to-Many Models
+--------------------------------
+
+By default, admin widgets for many-to-many relations will be displayed
+on whichever model contains the actual reference to the ``ManyToManyField``.
+Depending on your ``ModelAdmin`` definition, each many-to-many field in your
+model will be represented by a standard HTML ``<select multiple>``, a
+horizontal or vertical filter, or a ``raw_id_admin`` widget. However, it is
+also possible to to replace these widgets with inlines.
+
+Suppose we have the following models::
+
+    class Person(models.Model):
+        name = models.CharField(max_length=128)
+
+    class Group(models.Model):
+        name = models.CharField(max_length=128)
+        members = models.ManyToManyField(Person, related_name='groups')
+
+If you want to display many-to-many relations using an inline, you can do
+so by defining an ``InlineModelAdmin`` object for the relationship.
+
+    class MembershipInline(admin.TabularInline):
+        model = Group.members.through
+
+    class PersonAdmin(admin.ModelAdmin):
+        inlines = [
+            MembershipInline,
+        ]
+
+    class GroupAdmin(admin.ModelAdmin):
+        inlines = [
+            MembershipInline,
+        ]
+        exclude = ('members',)
+
+There are two features worth noting in this example.
+
+Firstly - the ``MembershipInline`` class references ``Group.members.through``.
+The ``through`` attribute is a reference to the model that manages the
+many-to-many relation. This model is automatically created by Django when you
+define a many-to-many field.
+
+Secondly, the ``GroupAdmin`` must manually exclude the ``members`` field.
+Django displays an admin widget for a many-to-many field on the model that
+defines the relation (in this case, ``Group``). If you want to use an inline
+model to represent the many-to-many relationship, you must tell Django's admin
+to *not* display this widget - otherwise you will end up with two widgets on
+your admin page for managing the relation.
+
+In all other respects, the ``InlineModelAdmin`` is exactly the same as any
+other. You can customize the appearance using any of the normal
+``InlineModelAdmin`` properties.
+
 Working with Many-to-Many Intermediary Models
 ----------------------------------------------
 
-By default, admin widgets for many-to-many relations will be displayed inline
-on whichever model contains the actual reference to the ``ManyToManyField``.
-However, when you specify an intermediary model using the ``through``
-argument to a ``ManyToManyField``, the admin will not display a widget by
-default. This is because each instance of that intermediary model requires
-more information than could be displayed in a single widget, and the layout
-required for multiple widgets will vary depending on the intermediate model.
+When you specify an intermediary model using the ``through`` argument to a
+``ManyToManyField``, the admin will not display a widget by default. This is
+because each instance of that intermediary model requires more information
+than could be displayed in a single widget, and the layout required for
+multiple widgets will vary depending on the intermediate model.
 
 However, we still want to be able to edit that information inline. Fortunately,
 this is easy to do with inline admin models. Suppose we have the following
