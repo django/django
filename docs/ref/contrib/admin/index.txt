@@ -1070,7 +1070,7 @@ Suppose we have the following models::
         members = models.ManyToManyField(Person, related_name='groups')
 
 If you want to display many-to-many relations using an inline, you can do
-so by defining an ``InlineModelAdmin`` object for the relationship.
+so by defining an ``InlineModelAdmin`` object for the relationship::
 
     class MembershipInline(admin.TabularInline):
         model = Group.members.through
