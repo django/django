@@ -112,7 +112,10 @@ class SMTPConnection(object):
         self.port = port or settings.EMAIL_PORT
         self.username = username or settings.EMAIL_HOST_USER
         self.password = password or settings.EMAIL_HOST_PASSWORD
-        self.use_tls = (use_tls is not None) and use_tls or settings.EMAIL_USE_TLS
+        if use_tls is None:
+            self.use_tls = settings.EMAIL_USE_TLS
+        else:
+            self.use_tls = use_tls
         self.fail_silently = fail_silently
         self.connection = None
 
