@@ -43,8 +43,8 @@ def setup_test_environment():
     mail.original_SMTPConnection = mail.SMTPConnection
     mail.SMTPConnection = locmem.EmailBackend
 
-    settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem'
     mail.original_email_backend = settings.EMAIL_BACKEND
+    settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem'
 
     mail.outbox = []
 
