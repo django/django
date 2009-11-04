@@ -7,7 +7,7 @@ from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email.Header import Header
-from email.Utils import formatdate, parseaddr, formataddr
+from email.Utils import formatdate, getaddresses, formataddr
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
@@ -64,8 +64,7 @@ def forbid_multi_line_headers(name, val):
     except UnicodeEncodeError:
         if name.lower() in ('to', 'from', 'cc'):
             result = []
-            for item in val.split(', '):
-                nm, addr = parseaddr(item)
+            for nm, addr in getaddresses((val,)):
                 nm = str(Header(nm, settings.DEFAULT_CHARSET))
                 result.append(formataddr((nm, str(addr))))
             val = ', '.join(result)

@@ -101,6 +101,17 @@ BadHeaderError: Header values can't contain newlines (got u'Subject\nInjection T
 >>> message['From']
 'from@example.com'
 
+# Regression for #11144 - When a to/from/cc header contains unicode,
+# make sure the email addresses are parsed correctly (especially
+# with regards to commas)
+>>> email = EmailMessage('Subject', 'Content', 'from@example.com', ['"Firstname Sürname" <to@example.com>','other@example.com'])
+>>> email.message()['To']
+'=?utf-8?q?Firstname_S=C3=BCrname?= <to@example.com>, other@example.com'
+
+>>> email = EmailMessage('Subject', 'Content', 'from@example.com', ['"Sürname, Firstname" <to@example.com>','other@example.com'])
+>>> email.message()['To']
+'=?utf-8?q?S=C3=BCrname=2C_Firstname?= <to@example.com>, other@example.com'
+
 # Handle attachments within an multipart/alternative mail correctly (#9367)
 # (test is not as precise/clear as it could be w.r.t. email tree structure,
 #  but it's good enough.)
