@@ -1051,6 +1051,8 @@ automatically::
 Working with Many-to-Many Models
 --------------------------------
 
+.. versionadded:: 1.2
+
 By default, admin widgets for many-to-many relations will be displayed
 on whichever model contains the actual reference to the ``ManyToManyField``.
 Depending on your ``ModelAdmin`` definition, each many-to-many field in your
