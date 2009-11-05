@@ -829,9 +829,18 @@ def create_many_to_many_intermediary_model(field, klass):
         'auto_created': klass,
         'unique_together': (from_, to)
     })
+    # If the models have been split into subpackages, klass.__module__
+    # will be the subpackge, not the models module for the app. (See #12168)
+    # Compose the actual models module name by stripping the trailing parts
+    # of the namespace until we find .models
+    parts = klass.__module__.split('.')
+    while parts[-1] != 'models':
+        parts.pop()
+    module = '.'.join(parts)
+    # Construct and return the new class.
     return type(name, (models.Model,), {
         'Meta': meta,
-        '__module__': klass.__module__,
+        '__module__': module,
         from_: models.ForeignKey(klass, related_name='%s+' % name),
         to: models.ForeignKey(to_model, related_name='%s+' % name)
     })
