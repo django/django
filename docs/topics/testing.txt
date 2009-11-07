@@ -1104,6 +1104,8 @@ applications:
     ``target_status_code`` will be the url and status code for the final
     point of the redirect chain.
 
+.. _topics-testing-email:
+
 E-mail services
 ---------------
 
@@ -1117,7 +1119,7 @@ test every aspect of sending e-mail -- from the number of messages sent to the
 contents of each message -- without actually sending the messages.
 
 The test runner accomplishes this by transparently replacing the normal
-:class:`~django.core.mail.SMTPConnection` class with a different version.
+email backend with a testing backend.
 (Don't worry -- this has no effect on any other e-mail senders outside of
 Django, such as your machine's mail server, if you're running one.)
 
@@ -1128,14 +1130,8 @@ Django, such as your machine's mail server, if you're running one.)
 During test running, each outgoing e-mail is saved in
 ``django.core.mail.outbox``. This is a simple list of all
 :class:`~django.core.mail.EmailMessage` instances that have been sent.
-It does not exist under normal execution conditions, i.e., when you're not
-running unit tests. The outbox is created during test setup, along with the
-dummy :class:`~django.core.mail.SMTPConnection`. When the test framework is
-torn down, the standard :class:`~django.core.mail.SMTPConnection` class is
-restored, and the test outbox is destroyed.
-
 The ``outbox`` attribute is a special attribute that is created *only* when
-the tests are run. It doesn't normally exist as part of the
+the ``locmem`` e-mail backend is used. It doesn't normally exist as part of the
 :mod:`django.core.mail` module and you can't import it directly. The code
 below shows how to access this attribute correctly.
 

@@ -165,11 +165,11 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
 CSRF protection middleware
 --------------------------
 
-.. module:: django.contrib.csrf.middleware
+.. module:: django.middleware.csrf
    :synopsis: Middleware adding protection against Cross Site Request
               Forgeries.
 
-.. class:: django.contrib.csrf.middleware.CsrfMiddleware
+.. class:: django.middleware.csrf.CsrfMiddleware
 
 .. versionadded:: 1.0
 

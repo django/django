@@ -1,0 +1,52 @@
+
+Backwards-incompatible changes
+==============================
+
+CSRF Protection
+---------------
+
+There have been large changes to the way that CSRF protection works, detailed in
+:ref:`the CSRF documentaton <ref-contrib-csrf>`.  The following are the major
+changes that developers must be aware of:
+
+ * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated, and
+   will be removed completely in Django 1.4, in favour of a template tag that
+   should be inserted into forms.
+
+ * All contrib apps use a ``csrf_protect`` decorator to protect the view.  This
+   requires the use of the csrf_token template tag in the template, so if you
+   have used custom templates for contrib views, you MUST READ THE UPGRADE
+   INSTRUCTIONS to fix those templates.
+
+ * ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
+   default. This turns on CSRF protection by default, so that views that accept
+   POST requests need to be written to work with the middleware.  Instructions
+   on how to do this are found in the CSRF docs.
+
+ * All of the CSRF has moved from contrib to core (with backwards compatible
+   imports in the old locations, which are deprecated).
+
+LazyObject
+----------
+
+``LazyObject`` is an undocumented utility class used for lazily wrapping other
+objects of unknown type.  In Django 1.1 and earlier, it handled introspection in
+a non-standard way, depending on wrapped objects implementing a public method
+``get_all_members()``. Since this could easily lead to name clashes, it has been
+changed to use the standard method, involving ``__members__`` and ``__dir__()``.
+If you used ``LazyObject`` in your own code, and implemented the
+``get_all_members()`` method for wrapped objects, you need to make the following
+changes:
+
+ * If your class does not have special requirements for introspection (i.e. you
+   have not implemented ``__getattr__()`` or other methods that allow for
+   attributes not discoverable by normal mechanisms), you can simply remove the
+   ``get_all_members()`` method.  The default implementation on ``LazyObject``
+   will do the right thing.
+
+ * If you have more complex requirements for introspection, first rename the
+   ``get_all_members()`` method to ``__dir__()``.  This is the standard method,
+   from Python 2.6 onwards, for supporting introspection.  If you are require
+   support for Python < 2.6, add the following code to the class::
+
+       __members__ = property(lambda self: self.__dir__())

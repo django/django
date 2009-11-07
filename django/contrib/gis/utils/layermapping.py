@@ -514,16 +514,26 @@ class LayerMapping(object):
     def geometry_column(self):
         "Returns the GeometryColumn model associated with the geographic column."
         from django.contrib.gis.models import GeometryColumns
-        # Getting the GeometryColumn object.
+        # Use the `get_field_by_name` on the model's options so that we
+        # get the correct model if there's model inheritance -- otherwise
+        # the returned model is None.
+        opts = self.model._meta
+        fld, model, direct, m2m = opts.get_field_by_name(self.geom_field)
+        if model is None: model = self.model
+
+        # Trying to get the `GeometryColumns` object that corresponds to the
+        # the geometry field.
         try:
-            db_table = self.model._meta.db_table
-            geo_col = self.geom_field
+            db_table = model._meta.db_table
+            geo_col = fld.column
+
             if SpatialBackend.oracle:
                 # Making upper case for Oracle.
                 db_table = db_table.upper()
                 geo_col = geo_col.upper()
-            gc_kwargs = {GeometryColumns.table_name_col() : db_table,
-                         GeometryColumns.geom_col_name() : geo_col,
+
+            gc_kwargs = { GeometryColumns.table_name_col() : db_table,
+                          GeometryColumns.geom_col_name() : geo_col,
                          }
             return GeometryColumns.objects.get(**gc_kwargs)
         except Exception, msg:

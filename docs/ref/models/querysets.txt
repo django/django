@@ -1114,6 +1114,17 @@ Aggregation <topics-db-aggregation>`.
 
 .. _field-lookups:
 
+``exists()``
+~~~~~~~~~~~~
+
+.. versionadded:: 1.2
+
+Returns ``True`` if the :class:`QuerySet` contains any results, and ``False``
+if not. This tries to perform the query in the simplest and fastest way
+possible, but it *does* execute nearly the same query. This means that calling
+:meth:`QuerySet.exists()` is faster that ``bool(some_query_set)``, but not by
+a large degree.
+
 Field lookups
 -------------
 

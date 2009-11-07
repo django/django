@@ -942,8 +942,14 @@ class Library(object):
                         else:
                             t = get_template(file_name)
                         self.nodelist = t.nodelist
-                    return self.nodelist.render(context_class(dict,
-                            autoescape=context.autoescape))
+                    new_context = context_class(dict, autoescape=context.autoescape)
+                    # Copy across the CSRF token, if present, because inclusion
+                    # tags are often used for forms, and we need instructions
+                    # for using CSRF protection to be as simple as possible.
+                    csrf_token = context.get('csrf_token', None)
+                    if csrf_token is not None:
+                        new_context['csrf_token'] = csrf_token
+                    return self.nodelist.render(new_context)
 
             compile_func = curry(generic_tag_compiler, params, defaults, getattr(func, "_decorated_function", func).__name__, InclusionNode)
             compile_func.__doc__ = func.__doc__

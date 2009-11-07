@@ -56,7 +56,7 @@ These releases will contain new features, improvements to existing features, and
 such. A minor release may deprecate certain features from previous releases. If a
 feature in version ``A.B`` is deprecated, it will continue to work in version
 ``A.B+1``. In version ``A.B+2``, use of the feature will raise a
-``PendingDeprecationWarning`` but will continue to work. Version ``A.B+3`` will
+``DeprecationWarning`` but will continue to work. Version ``A.B+3`` will
 remove the feature entirely.
 
 So, for example, if we decided to remove a function that existed in Django 1.0:

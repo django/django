@@ -259,6 +259,163 @@ class BaseModelForm(BaseForm):
             
         return self.cleaned_data
 
+    def validate_unique(self):
+        unique_checks, date_checks = self._get_unique_checks()
+        form_errors = []
+        bad_fields = set()
+
+        field_errors, global_errors = self._perform_unique_checks(unique_checks)
+        bad_fields.union(field_errors)
+        form_errors.extend(global_errors)
+
+        field_errors, global_errors = self._perform_date_checks(date_checks)
+        bad_fields.union(field_errors)
+        form_errors.extend(global_errors)
+
+        for field_name in bad_fields:
+            del self.cleaned_data[field_name]
+        if form_errors:
+            # Raise the unique together errors since they are considered
+            # form-wide.
+            raise ValidationError(form_errors)
+
+    def _get_unique_checks(self):
+        from django.db.models.fields import FieldDoesNotExist, Field as ModelField
+
+        # Gather a list of checks to perform. We only perform unique checks
+        # for fields present and not None in cleaned_data.  Since this is a
+        # ModelForm, some fields may have been excluded; we can't perform a unique
+        # check on a form that is missing fields involved in that check.  It also does
+        # not make sense to check data that didn't validate, and since NULL does not
+        # equal NULL in SQL we should not do any unique checking for NULL values.
+        unique_checks = []
+        # these are checks for the unique_for_<date/year/month>
+        date_checks = []
+        for check in self.instance._meta.unique_together[:]:
+            fields_on_form = [field for field in check if self.cleaned_data.get(field) is not None]
+            if len(fields_on_form) == len(check):
+                unique_checks.append(check)
+
+        # Gather a list of checks for fields declared as unique and add them to
+        # the list of checks. Again, skip empty fields and any that did not validate.
+        for name in self.fields:
+            try:
+                f = self.instance._meta.get_field_by_name(name)[0]
+            except FieldDoesNotExist:
+                # This is an extra field that's not on the ModelForm, ignore it
+                continue
+            if not isinstance(f, ModelField):
+                # This is an extra field that happens to have a name that matches,
+                # for example, a related object accessor for this model.  So
+                # get_field_by_name found it, but it is not a Field so do not proceed
+                # to use it as if it were.
+                continue
+            if self.cleaned_data.get(name) is None:
+                continue
+            if f.unique:
+                unique_checks.append((name,))
+            if f.unique_for_date and self.cleaned_data.get(f.unique_for_date) is not None:
+                date_checks.append(('date', name, f.unique_for_date))
+            if f.unique_for_year and self.cleaned_data.get(f.unique_for_year) is not None:
+                date_checks.append(('year', name, f.unique_for_year))
+            if f.unique_for_month and self.cleaned_data.get(f.unique_for_month) is not None:
+                date_checks.append(('month', name, f.unique_for_month))
+        return unique_checks, date_checks
+
+
+    def _perform_unique_checks(self, unique_checks):
+        bad_fields = set()
+        form_errors = []
+
+        for unique_check in unique_checks:
+            # Try to look up an existing object with the same values as this
+            # object's values for all the unique field.
+
+            lookup_kwargs = {}
+            for field_name in unique_check:
+                lookup_value = self.cleaned_data[field_name]
+                # ModelChoiceField will return an object instance rather than
+                # a raw primary key value, so convert it to a pk value before
+                # using it in a lookup.
+                if isinstance(self.fields[field_name], ModelChoiceField):
+                    lookup_value =  lookup_value.pk
+                lookup_kwargs[str(field_name)] = lookup_value
+
+            qs = self.instance.__class__._default_manager.filter(**lookup_kwargs)
+
+            # Exclude the current object from the query if we are editing an
+            # instance (as opposed to creating a new one)
+            if self.instance.pk is not None:
+                qs = qs.exclude(pk=self.instance.pk)
+
+            if qs.exists():
+                if len(unique_check) == 1:
+                    self._errors[unique_check[0]] = ErrorList([self.unique_error_message(unique_check)])
+                else:
+                    form_errors.append(self.unique_error_message(unique_check))
+
+                # Mark these fields as needing to be removed from cleaned data
+                # later.
+                for field_name in unique_check:
+                    bad_fields.add(field_name)
+        return bad_fields, form_errors
+
+    def _perform_date_checks(self, date_checks):
+        bad_fields = set()
+        for lookup_type, field, unique_for in date_checks:
+            lookup_kwargs = {}
+            # there's a ticket to add a date lookup, we can remove this special
+            # case if that makes it's way in
+            if lookup_type == 'date':
+                date = self.cleaned_data[unique_for]
+                lookup_kwargs['%s__day' % unique_for] = date.day
+                lookup_kwargs['%s__month' % unique_for] = date.month
+                lookup_kwargs['%s__year' % unique_for] = date.year
+            else:
+                lookup_kwargs['%s__%s' % (unique_for, lookup_type)] = getattr(self.cleaned_data[unique_for], lookup_type)
+            lookup_kwargs[field] = self.cleaned_data[field]
+
+            qs = self.instance.__class__._default_manager.filter(**lookup_kwargs)
+            # Exclude the current object from the query if we are editing an
+            # instance (as opposed to creating a new one)
+            if self.instance.pk is not None:
+                qs = qs.exclude(pk=self.instance.pk)
+
+            if qs.exists():
+                self._errors[field] = ErrorList([
+                    self.date_error_message(lookup_type, field, unique_for)
+                ])
+                bad_fields.add(field)
+        return bad_fields, []
+
+    def date_error_message(self, lookup_type, field, unique_for):
+        return _(u"%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
+            'field_name': unicode(self.fields[field].label),
+            'date_field': unicode(self.fields[unique_for].label),
+            'lookup': lookup_type,
+        }
+
+    def unique_error_message(self, unique_check):
+        model_name = capfirst(self.instance._meta.verbose_name)
+
+        # A unique field
+        if len(unique_check) == 1:
+            field_name = unique_check[0]
+            field_label = self.fields[field_name].label
+            # Insert the error into the error dict, very sneaky
+            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
+                'model_name': unicode(model_name),
+                'field_label': unicode(field_label)
+            }
+        # unique_together
+        else:
+            field_labels = [self.fields[field_name].label for field_name in unique_check]
+            field_labels = get_text_list(field_labels, _('and'))
+            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
+                'model_name': unicode(model_name),
+                'field_label': unicode(field_labels)
+            }
+
     def save(self, commit=True):
         """
         Saves this ``form``'s cleaned_data into model instance
@@ -577,7 +734,7 @@ class BaseInlineFormSet(BaseModelFormSet):
                  save_as_new=False, prefix=None):
         from django.db.models.fields.related import RelatedObject
         if instance is None:
-            self.instance = self.model()
+            self.instance = self.fk.rel.to()
         else:
             self.instance = instance
         self.save_as_new = save_as_new

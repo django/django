@@ -95,13 +95,6 @@ for your front page view::
     def front_page(request, blog_id):
         ...
 
-Of course, if you're using Python 2.3 or prefer not to use the decorator
-syntax, you can write the same code as follows, there is no difference::
-
-    def front_page(request, blog_id):
-        ...
-    front_page = condition(last_modified_func=latest_entry)(front_page)
-
 Shortcuts for only computing one value
 ======================================
 

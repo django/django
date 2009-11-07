@@ -1,7 +1,7 @@
 import os, unittest
 from copy import copy
 from decimal import Decimal
-from models import City, County, CountyFeat, Interstate, State, city_mapping, co_mapping, cofeat_mapping, inter_mapping
+from models import City, County, CountyFeat, Interstate, ICity1, ICity2, State, city_mapping, co_mapping, cofeat_mapping, inter_mapping
 from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.utils.layermapping import LayerMapping, LayerMapError, InvalidDecimal, MissingForeignKey
 from django.contrib.gis.gdal import DataSource
@@ -242,6 +242,26 @@ class LayerMapTest(unittest.TestCase):
             lm.save(step=st, strict=True)
             self.county_helper(county_feat=False)
 
+    def test06_model_inheritance(self):
+        "Tests LayerMapping on inherited models.  See #12093."
+        icity_mapping = {'name' : 'Name',
+                         'population' : 'Population',
+                         'density' : 'Density',
+                         'point' : 'POINT',
+                         'dt' : 'Created',
+                         }
+
+        # Parent model has geometry field.
+        lm1 = LayerMapping(ICity1, city_shp, icity_mapping)
+        lm1.save()
+
+        # Grandparent has geometry field.
+        lm2 = LayerMapping(ICity2, city_shp, icity_mapping)
+        lm2.save()
+
+        self.assertEqual(6, ICity1.objects.count())
+        self.assertEqual(3, ICity2.objects.count())
+        
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(LayerMapTest))

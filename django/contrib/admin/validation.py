@@ -149,12 +149,16 @@ def validate(cls, model):
             validate_inline(inline, cls, model)
 
 def validate_inline(cls, parent, parent_model):
+    
     # model is already verified to exist and be a Model
     if cls.fk_name: # default value is None
         f = get_field(cls, cls.model, cls.model._meta, 'fk_name', cls.fk_name)
         if not isinstance(f, models.ForeignKey):
             raise ImproperlyConfigured("'%s.fk_name is not an instance of "
                     "models.ForeignKey." % cls.__name__)
+
+    fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
+
     # extra = 3
     # max_num = 0
     for attr in ('extra', 'max_num'):
@@ -169,7 +173,6 @@ def validate_inline(cls, parent, parent_model):
 
     # exclude
     if hasattr(cls, 'exclude') and cls.exclude:
-        fk = _get_foreign_key(parent_model, cls.model, can_fail=True)
         if fk and fk.name in cls.exclude:
             raise ImproperlyConfigured("%s cannot exclude the field "
                     "'%s' - this is the foreign key to the parent model "

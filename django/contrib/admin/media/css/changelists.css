@@ -53,7 +53,7 @@
     vertical-align: middle;
 }
 
-#changelist table thead th:first-child {
+#changelist table thead th.action-checkbox-column {
     width: 1.5em;
     text-align: center;
 }

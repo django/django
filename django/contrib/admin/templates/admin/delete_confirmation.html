@@ -22,7 +22,7 @@
 {% else %}
     <p>{% blocktrans with object as escaped_object %}Are you sure you want to delete the {{ object_name }} "{{ escaped_object }}"? All of the following related items will be deleted:{% endblocktrans %}</p>
     <ul>{{ deleted_objects|unordered_list }}</ul>
-    <form action="" method="post">
+    <form action="" method="post">{% csrf_token %}
     <div>
     <input type="hidden" name="post" value="yes" />
     <input type="submit" value="{% trans "Yes, I'm sure" %}" />

@@ -16,6 +16,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Brian Rosner
     * Justin Bronn
     * Karen Tracey
+    * Jannis Leidel
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -26,6 +27,7 @@ answer newbie questions, and generally made Django that much better:
 
     ajs <adi@sieker.info>
     alang@bright-green.com
+    Andi Albrecht <albrecht.andi@gmail.com>
     Marty Alchin <gulopine@gamemusic.org>
     Ahmad Alhashemi <trans@ahmadh.com>
     Daniel Alves Barbosa de Oliveira Vaz <danielvaz@gmail.com>
@@ -268,7 +270,6 @@ answer newbie questions, and generally made Django that much better:
     lcordier@point45.com
     Jeong-Min Lee <falsetru@gmail.com>
     Tai Lee <real.human@mrmachine.net>
-    Jannis Leidel <jl@websushi.org>
     Christopher Lenz <http://www.cmlenz.net/>
     lerouxb@gmail.com
     Piotr Lewandowski <piotr.lewandowski@gmail.com>
@@ -423,7 +424,7 @@ answer newbie questions, and generally made Django that much better:
     Travis Terry <tdterry7@gmail.com>
     thebjorn <bp@datakortet.no>
     Zach Thompson <zthompson47@gmail.com>
-    Michael Thornhill
+    Michael Thornhill <michael.thornhill@gmail.com>
     Deepak Thukral <deep.thukral@gmail.com>
     tibimicu@gmx.net
     tobias@neuyork.de
@@ -471,6 +472,8 @@ answer newbie questions, and generally made Django that much better:
     Gasper Zejn <zejn@kiberpipa.org>
     Jarek Zgoda <jarek.zgoda@gmail.com>
     Cheng Zhang
+    Glenn Maynard <glenn@zewt.org>
+    bthomas
 
 A big THANK YOU goes to:
 

@@ -79,27 +79,28 @@ def get_validation_errors(outfile, app=None):
                 rel_opts = f.rel.to._meta
                 rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
                 rel_query_name = f.related_query_name()
-                for r in rel_opts.fields:
-                    if r.name == rel_name:
-                        e.add(opts, "Accessor for field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
-                    if r.name == rel_query_name:
-                        e.add(opts, "Reverse query name for field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
-                for r in rel_opts.local_many_to_many:
-                    if r.name == rel_name:
-                        e.add(opts, "Accessor for field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
-                    if r.name == rel_query_name:
-                        e.add(opts, "Reverse query name for field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
-                for r in rel_opts.get_all_related_many_to_many_objects():
-                    if r.get_accessor_name() == rel_name:
-                        e.add(opts, "Accessor for field '%s' clashes with related m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
-                    if r.get_accessor_name() == rel_query_name:
-                        e.add(opts, "Reverse query name for field '%s' clashes with related m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
-                for r in rel_opts.get_all_related_objects():
-                    if r.field is not f:
+                if not f.rel.is_hidden():
+                    for r in rel_opts.fields:
+                        if r.name == rel_name:
+                            e.add(opts, "Accessor for field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                        if r.name == rel_query_name:
+                            e.add(opts, "Reverse query name for field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                    for r in rel_opts.local_many_to_many:
+                        if r.name == rel_name:
+                            e.add(opts, "Accessor for field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                        if r.name == rel_query_name:
+                            e.add(opts, "Reverse query name for field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                    for r in rel_opts.get_all_related_many_to_many_objects():
                         if r.get_accessor_name() == rel_name:
-                            e.add(opts, "Accessor for field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                            e.add(opts, "Accessor for field '%s' clashes with related m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
                         if r.get_accessor_name() == rel_query_name:
-                            e.add(opts, "Reverse query name for field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                            e.add(opts, "Reverse query name for field '%s' clashes with related m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                    for r in rel_opts.get_all_related_objects():
+                        if r.field is not f:
+                            if r.get_accessor_name() == rel_name:
+                                e.add(opts, "Accessor for field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                            if r.get_accessor_name() == rel_query_name:
+                                e.add(opts, "Reverse query name for field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
 
         seen_intermediary_signatures = []
         for i, f in enumerate(opts.local_many_to_many):
@@ -117,48 +118,80 @@ def get_validation_errors(outfile, app=None):
             if f.unique:
                 e.add(opts, "ManyToManyFields cannot be unique.  Remove the unique argument on '%s'." % f.name)
 
-            if getattr(f.rel, 'through', None) is not None:
-                if hasattr(f.rel, 'through_model'):
-                    from_model, to_model = cls, f.rel.to
-                    if from_model == to_model and f.rel.symmetrical:
-                        e.add(opts, "Many-to-many fields with intermediate tables cannot be symmetrical.")
-                    seen_from, seen_to, seen_self = False, False, 0
-                    for inter_field in f.rel.through_model._meta.fields:
-                        rel_to = getattr(inter_field.rel, 'to', None)
-                        if from_model == to_model: # relation to self
-                            if rel_to == from_model:
-                                seen_self += 1
-                            if seen_self > 2:
-                                e.add(opts, "Intermediary model %s has more than two foreign keys to %s, which is ambiguous and is not permitted." % (f.rel.through_model._meta.object_name, from_model._meta.object_name))
-                        else:
-                            if rel_to == from_model:
-                                if seen_from:
-                                    e.add(opts, "Intermediary model %s has more than one foreign key to %s, which is ambiguous and is not permitted." % (f.rel.through_model._meta.object_name, from_model._meta.object_name))
-                                else:
-                                    seen_from = True
-                            elif rel_to == to_model:
-                                if seen_to:
-                                    e.add(opts, "Intermediary model %s has more than one foreign key to %s, which is ambiguous and is not permitted." % (f.rel.through_model._meta.object_name, rel_to._meta.object_name))
-                                else:
-                                    seen_to = True
-                    if f.rel.through_model not in models.get_models():
-                        e.add(opts, "'%s' specifies an m2m relation through model %s, which has not been installed." % (f.name, f.rel.through))
-                    signature = (f.rel.to, cls, f.rel.through_model)
-                    if signature in seen_intermediary_signatures:
-                        e.add(opts, "The model %s has two manually-defined m2m relations through the model %s, which is not permitted. Please consider using an extra field on your intermediary model instead." % (cls._meta.object_name, f.rel.through_model._meta.object_name))
+            if f.rel.through is not None and not isinstance(f.rel.through, basestring):
+                from_model, to_model = cls, f.rel.to
+                if from_model == to_model and f.rel.symmetrical and not f.rel.through._meta.auto_created:
+                    e.add(opts, "Many-to-many fields with intermediate tables cannot be symmetrical.")
+                seen_from, seen_to, seen_self = False, False, 0
+                for inter_field in f.rel.through._meta.fields:
+                    rel_to = getattr(inter_field.rel, 'to', None)
+                    if from_model == to_model: # relation to self
+                        if rel_to == from_model:
+                            seen_self += 1
+                        if seen_self > 2:
+                            e.add(opts, "Intermediary model %s has more than "
+                                "two foreign keys to %s, which is ambiguous "
+                                "and is not permitted." % (
+                                    f.rel.through._meta.object_name,
+                                    from_model._meta.object_name
+                                )
+                            )
                     else:
-                        seen_intermediary_signatures.append(signature)
-                    seen_related_fk, seen_this_fk = False, False
-                    for field in f.rel.through_model._meta.fields:
-                        if field.rel:
-                            if not seen_related_fk and field.rel.to == f.rel.to:
-                                seen_related_fk = True
-                            elif field.rel.to == cls:
-                                seen_this_fk = True
-                    if not seen_related_fk or not seen_this_fk:
-                        e.add(opts, "'%s' has a manually-defined m2m relation through model %s, which does not have foreign keys to %s and %s" % (f.name, f.rel.through, f.rel.to._meta.object_name, cls._meta.object_name))
+                        if rel_to == from_model:
+                            if seen_from:
+                                e.add(opts, "Intermediary model %s has more "
+                                    "than one foreign key to %s, which is "
+                                    "ambiguous and is not permitted." % (
+                                        f.rel.through._meta.object_name,
+                                         from_model._meta.object_name
+                                     )
+                                 )
+                            else:
+                                seen_from = True
+                        elif rel_to == to_model:
+                            if seen_to:
+                                e.add(opts, "Intermediary model %s has more "
+                                    "than one foreign key to %s, which is "
+                                    "ambiguous and is not permitted." % (
+                                        f.rel.through._meta.object_name,
+                                        rel_to._meta.object_name
+                                    )
+                                )
+                            else:
+                                seen_to = True
+                if f.rel.through not in models.get_models(include_auto_created=True):
+                    e.add(opts, "'%s' specifies an m2m relation through model "
+                        "%s, which has not been installed." % (f.name, f.rel.through)
+                    )
+                signature = (f.rel.to, cls, f.rel.through)
+                if signature in seen_intermediary_signatures:
+                    e.add(opts, "The model %s has two manually-defined m2m "
+                        "relations through the model %s, which is not "
+                        "permitted. Please consider using an extra field on "
+                        "your intermediary model instead." % (
+                            cls._meta.object_name,
+                            f.rel.through._meta.object_name
+                        )
+                    )
                 else:
-                    e.add(opts, "'%s' specifies an m2m relation through model %s, which has not been installed" % (f.name, f.rel.through))
+                    seen_intermediary_signatures.append(signature)
+                seen_related_fk, seen_this_fk = False, False
+                for field in f.rel.through._meta.fields:
+                    if field.rel:
+                        if not seen_related_fk and field.rel.to == f.rel.to:
+                            seen_related_fk = True
+                        elif field.rel.to == cls:
+                            seen_this_fk = True
+                if not seen_related_fk or not seen_this_fk:
+                    e.add(opts, "'%s' has a manually-defined m2m relation "
+                        "through model %s, which does not have foreign keys "
+                        "to %s and %s" % (f.name, f.rel.through._meta.object_name,
+                            f.rel.to._meta.object_name, cls._meta.object_name)
+                    )
+            elif isinstance(f.rel.through, basestring):
+                e.add(opts, "'%s' specifies an m2m relation through model %s, "
+                    "which has not been installed" % (f.name, f.rel.through)
+                )
 
             rel_opts = f.rel.to._meta
             rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()

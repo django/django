@@ -133,7 +133,7 @@ AttributeError: 'ManyRelatedManager' object has no attribute 'add'
 >>> rock.members.create(name='Anne')
 Traceback (most recent call last):
 ...
-AttributeError: Cannot use create() on a ManyToManyField which specifies an intermediary model. Use Membership's Manager instead.
+AttributeError: Cannot use create() on a ManyToManyField which specifies an intermediary model. Use m2m_through.Membership's Manager instead.
 
 # Remove has similar complications, and is not provided either.
 >>> rock.members.remove(jim)
@@ -160,7 +160,7 @@ AttributeError: 'ManyRelatedManager' object has no attribute 'remove'
 >>> rock.members = backup
 Traceback (most recent call last):
 ...
-AttributeError: Cannot set values on a ManyToManyField which specifies an intermediary model.  Use Membership's Manager instead.
+AttributeError: Cannot set values on a ManyToManyField which specifies an intermediary model.  Use m2m_through.Membership's Manager instead.
 
 # Let's re-save those instances that we've cleared.
 >>> m1.save()
@@ -184,7 +184,7 @@ AttributeError: 'ManyRelatedManager' object has no attribute 'add'
 >>> bob.group_set.create(name='Funk')
 Traceback (most recent call last):
 ...
-AttributeError: Cannot use create() on a ManyToManyField which specifies an intermediary model. Use Membership's Manager instead.
+AttributeError: Cannot use create() on a ManyToManyField which specifies an intermediary model. Use m2m_through.Membership's Manager instead.
 
 # Remove has similar complications, and is not provided either.
 >>> jim.group_set.remove(rock)
@@ -209,7 +209,7 @@ AttributeError: 'ManyRelatedManager' object has no attribute 'remove'
 >>> jim.group_set = backup
 Traceback (most recent call last):
 ...
-AttributeError: Cannot set values on a ManyToManyField which specifies an intermediary model.  Use Membership's Manager instead.
+AttributeError: Cannot set values on a ManyToManyField which specifies an intermediary model.  Use m2m_through.Membership's Manager instead.
 
 # Let's re-save those instances that we've cleared.
 >>> m1.save()

@@ -56,7 +56,7 @@ class Serializer(base.Serializer):
         self._current[field.name] = smart_unicode(related, strings_only=True)
 
     def handle_m2m_field(self, obj, field):
-        if field.creates_table:
+        if field.rel.through._meta.auto_created:
             self._current[field.name] = [smart_unicode(related._get_pk_val(), strings_only=True)
                                for related in getattr(obj, field.name).iterator()]
 
