@@ -30,7 +30,7 @@ class PostGISAdaptor(object):
     def getquoted(self):
         "Returns a properly quoted string for use in PostgreSQL/PostGIS."
         # Want to use WKB, so wrap with psycopg2 Binary() to quote properly.
-        return "%s(%s, %s)" % (GEOM_FROM_WKB, Binary(self.wkb), self.srid or -1)
+        return "%s(E%s, %s)" % (GEOM_FROM_WKB, Binary(self.wkb), self.srid or -1)
 
     def prepare_database_save(self, unused):
         return self
