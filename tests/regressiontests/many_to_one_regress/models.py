@@ -167,4 +167,10 @@ Traceback (most recent call last):
     ...
 ValueError: Cannot assign "<Child: Child object>": "Child.parent" must be a "Parent" instance.
 
+# Regression for #12190 -- Should be able to instantiate a FK
+# outside of a model, and interrogate its related field.
+>>> cat = models.ForeignKey(Category)
+>>> cat.rel.get_related_field().name
+'id'
+
 """}
