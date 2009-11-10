@@ -62,17 +62,16 @@ def string_from_geom(func):
 
 ### ctypes prototypes ###
 
-# Deprecated creation routines from WKB, HEX, WKT
+# Deprecated creation and output routines from WKB, HEX, WKT
 from_hex = bin_constructor(lgeos.GEOSGeomFromHEX_buf)
 from_wkb = bin_constructor(lgeos.GEOSGeomFromWKB_buf)
 from_wkt = geom_output(lgeos.GEOSGeomFromWKT, [c_char_p])
 
-# Output routines
 to_hex = bin_output(lgeos.GEOSGeomToHEX_buf)
 to_wkb = bin_output(lgeos.GEOSGeomToWKB_buf)
 to_wkt = string_from_geom(lgeos.GEOSGeomToWKT)
 
-# The GEOS geometry type, typeid, num_coordites and number of geometries
+# The GEOS geometry type, typeid, num_coordinates and number of geometries
 geos_normalize = int_from_geom(lgeos.GEOSNormalize)
 geos_type = string_from_geom(lgeos.GEOSGeomType)
 geos_typeid = int_from_geom(lgeos.GEOSGeomTypeId)

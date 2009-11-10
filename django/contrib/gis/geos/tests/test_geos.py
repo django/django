@@ -71,6 +71,31 @@ class GEOSTest(unittest.TestCase):
             geom = fromstr(g.wkt)
             self.assertEqual(g.hex, geom.hex)
 
+    def test01b_hexewkb(self):
+        "Testing (HEX)EWKB output."
+        from binascii import a2b_hex
+
+        pnt_2d = Point(0, 1, srid=4326)
+        pnt_3d = Point(0, 1, 2, srid=4326)
+        
+        # OGC-compliant HEX will not have SRID nor Z value.
+        self.assertEqual(ogc_hex, pnt_2d.hex)
+        self.assertEqual(ogc_hex, pnt_3d.hex)
+
+        # HEXEWKB should be appropriate for its dimension -- have to use an
+        # a WKBWriter w/dimension set accordingly, else GEOS will insert
+        # garbage into 3D coordinate if there is none.
+        self.assertEqual(hexewkb_2d, pnt_2d.hexewkb)
+        self.assertEqual(hexewkb_3d, pnt_3d.hexewkb)
+
+        # Same for EWKB.
+        self.assertEqual(buffer(a2b_hex(hexewkb_2d)), pnt_2d.ewkb)
+        self.assertEqual(buffer(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
+        
+        # Redundant sanity check.
+        self.assertEqual(True, GEOSGeometry(hexewkb_3d).hasz)
+        self.assertEqual(4326, GEOSGeometry(hexewkb_2d).srid)
+
     def test01c_kml(self):
         "Testing KML output."
         for tg in wkt_out:

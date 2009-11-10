@@ -171,3 +171,10 @@ json_geoms = (TestGeom('POINT(100 0)', json='{ "type": "Point", "coordinates": [
                        not_equal=True,
                        ),
               )
+
+# For testing HEX(EWKB).
+ogc_hex = '01010000000000000000000000000000000000F03F'
+# `SELECT ST_AsHEXEWKB(ST_GeomFromText('POINT(0 1)', 4326));`
+hexewkb_2d = '0101000020E61000000000000000000000000000000000F03F'
+# `SELECT ST_AsHEXEWKB(ST_GeomFromEWKT('SRID=4326;POINT(0 1 2)'));`
+hexewkb_3d = '01010000A0E61000000000000000000000000000000000F03F0000000000000040'

@@ -357,25 +357,41 @@ class GEOSGeometry(GEOSBase, ListMixin):
     #### Output Routines ####
     @property
     def ewkt(self):
-        "Returns the EWKT (WKT + SRID) of the Geometry."
+        """
+        Returns the EWKT (WKT + SRID) of the Geometry.  Note that Z values
+        are *not* included in this representation because GEOS does not yet
+        support serializing them.
+        """
         if self.get_srid(): return 'SRID=%s;%s' % (self.srid, self.wkt)
         else: return self.wkt
 
     @property
     def wkt(self):
-        "Returns the WKT (Well-Known Text) of the Geometry."
+        "Returns the WKT (Well-Known Text) representation of this Geometry."
         return wkt_w.write(self)
 
     @property
     def hex(self):
         """
         Returns the HEX of the Geometry -- please note that the SRID is not
-        included in this representation, because the GEOS C library uses
-        -1 by default, even if the SRID is set.
+        included in this representation, because it is not a part of the
+        OGC specification (use the `hexewkb` property instead).
         """
         # A possible faster, all-python, implementation:
         #  str(self.wkb).encode('hex')
         return wkb_w.write_hex(self)
+
+    @property
+    def hexewkb(self):
+        """
+        Returns the HEXEWKB of this Geometry.  This is an extension of the WKB
+        specification that includes SRID and Z values taht are a part of this
+        geometry.
+        """
+        if self.hasz:
+            return ewkb_w3d.write_hex(self)
+        else:
+            return ewkb_w.write_hex(self)
 
     @property
     def json(self):
@@ -383,7 +399,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Returns GeoJSON representation of this Geometry if GDAL 1.5+
         is installed.
         """
-        if gdal.GEOJSON: 
+        if gdal.GEOJSON:
             return self.ogr.json
         else:
             raise GEOSException('GeoJSON output only supported on GDAL 1.5+.')
@@ -391,8 +407,24 @@ class GEOSGeometry(GEOSBase, ListMixin):
 
     @property
     def wkb(self):
-        "Returns the WKB of the Geometry as a buffer."
+        """
+        Returns the WKB (Well-Known Binary) representation of this Geometry
+        as a Python buffer.  SRID and Z values are not included, use the
+        `ewkb` property instead.
+        """
         return wkb_w.write(self)
+
+    @property
+    def ewkb(self):
+        """
+        Return the EWKB representation of this Geometry as a Python buffer.
+        This is an extension of the WKB specification that includes any SRID
+        and Z values that are a part of this geometry.
+        """
+        if self.hasz:
+            return ewkb_w3d.write(self)
+        else:
+            return ewkb_w.write(self)
 
     @property
     def kml(self):
@@ -617,7 +649,7 @@ GEOS_CLASSES = {0 : Point,
                 }
 
 # Similarly, import the GEOS I/O instances here to avoid conflicts.
-from django.contrib.gis.geos.io import wkt_r, wkt_w, wkb_r, wkb_w
+from django.contrib.gis.geos.io import wkt_r, wkt_w, wkb_r, wkb_w, ewkb_w, ewkb_w3d
 
 # If supported, import the PreparedGeometry class.
 if GEOS_PREPARE:
