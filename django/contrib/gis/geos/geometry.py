@@ -389,6 +389,9 @@ class GEOSGeometry(GEOSBase, ListMixin):
         geometry.
         """
         if self.hasz:
+            if not GEOS_PREPARE:
+                # See: http://trac.osgeo.org/geos/ticket/216
+                raise GEOSException('Upgrade GEOS to 3.1 to get valid 3D HEXEWKB.')               
             return ewkb_w3d.write_hex(self)
         else:
             return ewkb_w.write_hex(self)
@@ -422,6 +425,9 @@ class GEOSGeometry(GEOSBase, ListMixin):
         and Z values that are a part of this geometry.
         """
         if self.hasz:
+            if not GEOS_PREPARE:
+                # See: http://trac.osgeo.org/geos/ticket/216
+                raise GEOSException('Upgrade GEOS to 3.1 to get valid 3D EWKB.')
             return ewkb_w3d.write(self)
         else:
             return ewkb_w.write(self)

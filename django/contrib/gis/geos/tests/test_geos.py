@@ -84,16 +84,34 @@ class GEOSTest(unittest.TestCase):
 
         # HEXEWKB should be appropriate for its dimension -- have to use an
         # a WKBWriter w/dimension set accordingly, else GEOS will insert
-        # garbage into 3D coordinate if there is none.
+        # garbage into 3D coordinate if there is none.  Also, GEOS has a
+        # a bug in versions prior to 3.1 that puts the X coordinate in
+        # place of Z; an exception should be raised on those versions.
         self.assertEqual(hexewkb_2d, pnt_2d.hexewkb)
-        self.assertEqual(hexewkb_3d, pnt_3d.hexewkb)
+        if GEOS_PREPARE:
+            self.assertEqual(hexewkb_3d, pnt_3d.hexewkb)
+            self.assertEqual(True, GEOSGeometry(hexewkb_3d).hasz)
+        else:
+            try:
+                hexewkb = pnt_3d.hexewkb
+            except GEOSException:
+                pass
+            else:
+                self.fail('Should have raised GEOSException.')
 
         # Same for EWKB.
         self.assertEqual(buffer(a2b_hex(hexewkb_2d)), pnt_2d.ewkb)
-        self.assertEqual(buffer(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
+        if GEOS_PREPARE:
+            self.assertEqual(buffer(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
+        else:
+            try:
+                ewkb = pnt_3d.ewkb
+            except GEOSException:
+                pass
+            else:
+                self.fail('Should have raised GEOSException')
         
         # Redundant sanity check.
-        self.assertEqual(True, GEOSGeometry(hexewkb_3d).hasz)
         self.assertEqual(4326, GEOSGeometry(hexewkb_2d).srid)
 
     def test01c_kml(self):
