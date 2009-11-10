@@ -33,4 +33,6 @@ class GeoRegressionTests(unittest.TestCase):
         "Testing `extent` on a table with a single point, see #11827."
         pnt = City.objects.get(name='Pueblo').point
         ref_ext = (pnt.x, pnt.y, pnt.x, pnt.y)
-        self.assertEqual(ref_ext, City.objects.filter(name='Pueblo').extent())
+        extent = City.objects.filter(name='Pueblo').extent()
+        for ref_val, val in zip(ref_ext, extent):
+            self.assertAlmostEqual(ref_val, val, 4)
