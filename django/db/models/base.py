@@ -361,6 +361,8 @@ class Model(object):
         defers = []
         pk_val = None
         if self._deferred:
+            from django.db.models.query_utils import deferred_class_factory
+            factory = deferred_class_factory
             for field in self._meta.fields:
                 if isinstance(self.__class__.__dict__.get(field.attname),
                         DeferredAttribute):
@@ -371,8 +373,9 @@ class Model(object):
                         # once.
                         obj = self.__class__.__dict__[field.attname]
                         model = obj.model_ref()
-
-        return (model_unpickle, (model, defers), data)
+        else:
+            factory = simple_class_factory
+        return (model_unpickle, (model, defers, factory), data)
 
     def _get_pk_val(self, meta=None):
         if not meta:
@@ -657,12 +660,20 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 class Empty(object):
     pass
 
-def model_unpickle(model, attrs):
+def simple_class_factory(model, attrs):
+    """Used to unpickle Models without deferred fields.
+
+    We need to do this the hard way, rather than just using
+    the default __reduce__ implementation, because of a
+    __deepcopy__ problem in Python 2.4
+    """
+    return model
+
+def model_unpickle(model, attrs, factory):
     """
     Used to unpickle Model subclasses with deferred fields.
     """
-    from django.db.models.query_utils import deferred_class_factory
-    cls = deferred_class_factory(model, attrs)
+    cls = factory(model, attrs)
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
 

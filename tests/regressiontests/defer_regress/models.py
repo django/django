@@ -115,6 +115,23 @@ u'c1'
 >>> results[0].second_child.name
 u'c2'
 
+# Test for #12163 - Pickling error saving session with unsaved model instances.
+>>> from django.contrib.sessions.backends.db import SessionStore
+>>> SESSION_KEY = '2b1189a188b44ad18c35e1baac6ceead'
+>>> item = Item()
+>>> item._deferred
+False
+>>> s = SessionStore(SESSION_KEY)
+>>> s.clear()
+>>> s['item'] = item
+>>> s.save()
+>>> s = SessionStore(SESSION_KEY)
+>>> s.modified = True
+>>> s.save()
+>>> i2 = s['item']
+>>> i2._deferred # Item must still be non-deferred
+False
+
 # Finally, we need to flush the app cache for the defer module.
 # Using only/defer creates some artifical entries in the app cache
 # that messes up later tests. Purge all entries, just to be sure.
