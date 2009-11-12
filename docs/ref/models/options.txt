@@ -94,9 +94,8 @@ See the docs for :meth:`~django.db.models.QuerySet.latest` for more.
 .. versionadded:: 1.1
 
 Defaults to ``True``, meaning Django will create the appropriate database
-tables in :ref:`django-admin-syncdb` and remove them as part of a :ref:`reset
-<django-admin-reset>` management command. That is, Django *manages* the
-database tables' lifecycles.
+tables in :djadmin:`syncdb` and remove them as part of a :djadmin:`reset`
+management command. That is, Django *manages* the database tables' lifecycles.
 
 If ``False``, no database table creation or deletion operations will be
 performed for this model. This is useful if the model represents an existing
@@ -114,7 +113,7 @@ model handling are exactly the same as normal. This includes
        unmanaged model, then the intermediate table for the many-to-many join
        will also not be created. However, a the intermediary table between one
        managed and one unmanaged model *will* be created.
-       
+
        If you need to change this default behavior, create the intermediary
        table as an explicit model (with ``managed`` set as needed) and use the
        :attr:`ManyToManyField.through` attribute to make the relation use your
