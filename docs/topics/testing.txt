@@ -980,19 +980,21 @@ subclass::
 
         def setUp(self):
             # Test definitions as before.
+            call_setup_methods()
 
         def testFluffyAnimals(self):
             # A test that uses the fixtures.
+            call_some_test_code()
 
 Here's specifically what will happen:
 
     * At the start of each test case, before ``setUp()`` is run, Django will
       flush the database, returning the database to the state it was in
-      directly after ``syncdb`` was called.
+      directly after :djadmin:`syncdb` was called.
 
     * Then, all the named fixtures are installed. In this example, Django will
       install any JSON fixture named ``mammals``, followed by any fixture named
-      ``birds``. See the :djadmin:`loaddata documentation<loaddata>` for more
+      ``birds``. See the :djadmin:`loaddata` documentation for more
       details on defining and installing fixtures.
 
 This flush/load procedure is repeated for each test in the test case, so you
@@ -1028,6 +1030,7 @@ For example::
 
         def testIndexPageView(self):
             # Here you'd test your view using ``Client``.
+            call_some_test_code()
 
 This test case will use the contents of ``myapp.test_urls`` as the
 URLconf for the duration of the test case.
