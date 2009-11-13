@@ -586,9 +586,13 @@ class ReverseManyRelatedObjectsDescriptor(object):
     # ReverseManyRelatedObjectsDescriptor instance.
     def __init__(self, m2m_field):
         self.field = m2m_field
+
+    def _through(self):
         # through is provided so that you have easy access to the through
-        # model (Book.authors.through) for inlines, etc.
-        self.through = m2m_field.rel.through
+        # model (Book.authors.through) for inlines, etc. This is done as
+        # a property to ensure that the fully resolved value is returned.
+        return self.field.rel.through
+    through = property(_through)
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
