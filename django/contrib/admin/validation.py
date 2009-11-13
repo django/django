@@ -149,7 +149,7 @@ def validate(cls, model):
             validate_inline(inline, cls, model)
 
 def validate_inline(cls, parent, parent_model):
-    
+
     # model is already verified to exist and be a Model
     if cls.fk_name: # default value is None
         f = get_field(cls, cls.model, cls.model._meta, 'fk_name', cls.fk_name)
@@ -196,6 +196,9 @@ def validate_base(cls, model):
         check_isseq(cls, 'fields', cls.fields)
         for field in cls.fields:
             check_formfield(cls, model, opts, 'fields', field)
+            f = get_field(cls, model, opts, 'fields', field)
+            if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:
+                raise ImproperlyConfigured("'%s.fields' can't include the ManyToManyField field '%s' because '%s' manually specifies a 'through' model." % (cls.__name__, field, field))
         if cls.fieldsets:
             raise ImproperlyConfigured('Both fieldsets and fields are specified in %s.' % cls.__name__)
         if len(cls.fields) > len(set(cls.fields)):

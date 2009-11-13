@@ -108,7 +108,18 @@ Exception: <class 'regressiontests.admin_validation.models.TwoAlbumFKAndAnE'> ha
 
 >>> validate_inline(TwoAlbumFKAndAnEInline, None, Album)
 
-# Regression test for #12203 -- If the explicitly provided through model
+# Regression test for #12203 - Fail more gracefully when a M2M field that
+# specifies the 'through' option is included in the 'fields' ModelAdmin option.
+
+>>> class BookAdmin(admin.ModelAdmin):
+...     fields = ['authors']
+
+>>> validate(BookAdmin, Book)
+Traceback (most recent call last):
+    ...
+ImproperlyConfigured: 'BookAdmin.fields' can't include the ManyToManyField field 'authors' because 'authors' manually specifies a 'through' model.
+
+# Regression test for #12209 -- If the explicitly provided through model
 # is specified as a string, the admin should still be able use
 # Model.m2m_field.through
 
