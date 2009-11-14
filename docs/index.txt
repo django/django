@@ -201,7 +201,5 @@ The Django open-source project
 
     * **Django over time:**
       :ref:`API stability <misc-api-stability>` |
-      :ref:`Archive of release notes <releases-index>` | `Backwards-incompatible changes`_ |
+      :ref:`Release notes <releases-index>` |
       :ref:`Deprecation Timeline <internals-deprecation>`
-
-.. _Backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges

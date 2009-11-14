@@ -14,8 +14,10 @@ fixes, and an easy upgrade path from Django 1.0.
 
 .. _new features: `What's new in Django 1.1`_
 
-Backwards-incompatible changes
-==============================
+.. _backwards-incompatible-changes-1.1:
+
+Backwards-incompatible changes in 1.1
+=====================================
 
 Django has a policy of :ref:`API stability <misc-api-stability>`. This means
 that, in general, code you develop against Django 1.0 should continue to work
@@ -149,6 +151,8 @@ Django 1.1 adds a ``permanent`` argument to the
 :func:`django.views.generic.simple.redirect_to()` view. This is technically
 backwards-incompatible if you were using the ``redirect_to`` view with a
 format-string key called 'permanent', which is highly unlikely.
+
+.. _deprecated-features-1.1:
 
 Features deprecated in 1.1
 ==========================

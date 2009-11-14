@@ -1,6 +1,17 @@
+.. _releases-1.2:
 
-Backwards-incompatible changes
-==============================
+============================================
+Django 1.2 release notes — UNDER DEVELOPMENT
+============================================
+
+This page documents release notes for the as-yet-unreleased Django 1.2.  As such
+it is tentative and subject to change.  It provides up-to-date information for
+those who are following trunk.
+
+.. _backwards-incompatible-changes-1.2:
+
+Backwards-incompatible changes in 1.2
+=====================================
 
 CSRF Protection
 ---------------
@@ -50,3 +61,10 @@ changes:
    support for Python < 2.6, add the following code to the class::
 
        __members__ = property(lambda self: self.__dir__())
+
+.. _deprecated-features-1.2:
+
+Features deprecated in 1.2
+==========================
+
+None.
