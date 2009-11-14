@@ -214,13 +214,7 @@ class OGRGeometry(GDALBase):
     @property
     def geom_type(self):
         "Returns the Type for this Geometry."
-        try:
-            return OGRGeomType(capi.get_geom_type(self.ptr))
-        except OGRException:
-            # VRT datasources return an invalid geometry type
-            # number, but a valid name -- we'll try that instead.
-            # See: http://trac.osgeo.org/gdal/ticket/2491
-            return OGRGeomType(capi.get_geom_name(self.ptr))
+        return OGRGeomType(capi.get_geom_type(self.ptr))
 
     @property
     def geom_name(self):
@@ -684,4 +678,11 @@ GEO_CLASSES = {1 : Point,
                6 : MultiPolygon,
                7 : GeometryCollection,
                101: LinearRing,
+               1 + OGRGeomType.wkb25bit : Point,
+               2 + OGRGeomType.wkb25bit : LineString,
+               3 + OGRGeomType.wkb25bit : Polygon,
+               4 + OGRGeomType.wkb25bit : MultiPoint,
+               5 + OGRGeomType.wkb25bit : MultiLineString,
+               6 + OGRGeomType.wkb25bit : MultiPolygon,
+               7 + OGRGeomType.wkb25bit : GeometryCollection,
                }

@@ -23,7 +23,7 @@ ds_list = (TestDS('test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='
                   srs_wkt='GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
                   field_values={'dbl' : [float(i) for i in range(1, 6)], 'int' : range(1, 6), 'str' : [str(i) for i in range(1, 6)]},
                   fids=range(5)),
-           TestDS('test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype=1, driver='VRT',
+           TestDS('test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D', driver='VRT',
                   fields={'POINT_X' : OFTString, 'POINT_Y' : OFTString, 'NUM' : OFTString}, # VRT uses CSV, which all types are OFTString.
                   extent=(1.0, 2.0, 100.0, 523.5), # Min/Max from CSV
                   field_values={'POINT_X' : ['1.0', '5.0', '100.0'], 'POINT_Y' : ['2.0', '23.0', '523.5'], 'NUM' : ['5', '17', '23']},

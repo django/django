@@ -4,6 +4,8 @@ from django.contrib.gis.gdal.error import OGRException
 class OGRGeomType(object):
     "Encapulates OGR Geometry Types."
 
+    wkb25bit = -2147483648
+
     # Dictionary of acceptable OGRwkbGeometryType s and their string names.
     _types = {0 : 'Unknown',
               1 : 'Point',
@@ -15,6 +17,13 @@ class OGRGeomType(object):
               7 : 'GeometryCollection',
               100 : 'None',
               101 : 'LinearRing',
+              1 + wkb25bit: 'Point25D',
+              2 + wkb25bit: 'LineString25D',
+              3 + wkb25bit: 'Polygon25D',
+              4 + wkb25bit: 'MultiPoint25D',
+              5 + wkb25bit : 'MultiLineString25D',
+              6 + wkb25bit : 'MultiPolygon25D',
+              7 + wkb25bit : 'GeometryCollection25D',
               }
     # Reverse type dictionary, keyed by lower-case of the name.
     _str_types = dict([(v.lower(), k) for k, v in _types.items()])
@@ -68,7 +77,7 @@ class OGRGeomType(object):
     @property
     def django(self):
         "Returns the Django GeometryField for this OGR Type."
-        s = self.name
+        s = self.name.replace('25D', '')
         if s in ('LinearRing', 'None'):
             return None
         elif s == 'Unknown':
