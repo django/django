@@ -40,7 +40,8 @@ algorithm the system follows to determine which Python code to execute:
 
     1. Django determines the root URLconf module to use. Ordinarily,
        this is the value of the ``ROOT_URLCONF`` setting, but if the incoming
-       ``HttpRequest`` object has an attribute called ``urlconf``, its value
+       ``HttpRequest`` object has an attribute called ``urlconf`` (set by
+       middleware :ref:`request processing <request-middleware>`), its value
        will be used in place of the ``ROOT_URLCONF`` setting.
 
     2. Django loads that Python module and looks for the variable

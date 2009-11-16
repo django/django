@@ -10,6 +10,7 @@ a string) and returns a tuple in this format:
 import re
 
 from django.http import Http404
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import iri_to_uri, force_unicode, smart_str
@@ -31,6 +32,9 @@ _callable_cache = {} # Maps view and url pattern names to their view functions.
 # the current thread (which is the only one we ever access), it is assumed to
 # be empty.
 _prefixes = {}
+
+# Overridden URLconfs for each thread are stored here.
+_urlconfs = {}
 
 class Resolver404(Http404):
     pass
@@ -300,9 +304,13 @@ class RegexURLResolver(object):
                 "arguments '%s' not found." % (lookup_view_s, args, kwargs))
 
 def resolve(path, urlconf=None):
+    if urlconf is None:
+        urlconf = get_urlconf()
     return get_resolver(urlconf).resolve(path)
 
 def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current_app=None):
+    if urlconf is None:
+        urlconf = get_urlconf()
     resolver = get_resolver(urlconf)
     args = args or []
     kwargs = kwargs or {}
@@ -371,3 +379,25 @@ def get_script_prefix():
     """
     return _prefixes.get(currentThread(), u'/')
 
+def set_urlconf(urlconf_name):
+    """
+    Sets the URLconf for the current thread (overriding the default one in
+    settings). Set to None to revert back to the default.
+    """
+    thread = currentThread()
+    if urlconf_name:
+        _urlconfs[thread] = urlconf_name
+    else:
+        # faster than wrapping in a try/except
+        if thread in _urlconfs:
+            del _urlconfs[thread]
+
+def get_urlconf(default=None):
+    """
+    Returns the root URLconf to use for the current thread if it has been
+    changed from the default one.
+    """
+    thread = currentThread()
+    if thread in _urlconfs:
+        return _urlconfs[thread]
+    return default
