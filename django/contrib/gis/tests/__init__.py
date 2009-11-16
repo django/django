@@ -9,9 +9,10 @@ def geo_suite():
     some backends).
     """
     from django.conf import settings
+    from django.contrib.gis.geos import GEOS_PREPARE
     from django.contrib.gis.gdal import HAS_GDAL
     from django.contrib.gis.utils import HAS_GEOIP
-    from django.contrib.gis.tests.utils import mysql
+    from django.contrib.gis.tests.utils import postgis, mysql
 
     # The test suite.
     s = unittest.TestSuite()
@@ -31,6 +32,10 @@ def geo_suite():
     # Tests applications that require a test spatial db.
     if not mysql:
         test_apps.append('distapp')
+
+    # Only PostGIS using GEOS 3.1+ can support 3D so far.
+    if postgis and GEOS_PREPARE:
+        test_apps.append('geo3d')
 
     if HAS_GDAL:
         # These tests require GDAL.

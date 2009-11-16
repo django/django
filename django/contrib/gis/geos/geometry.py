@@ -373,9 +373,10 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def hex(self):
         """
-        Returns the HEX of the Geometry -- please note that the SRID is not
-        included in this representation, because it is not a part of the
-        OGC specification (use the `hexewkb` property instead).
+        Returns the WKB of this Geometry in hexadecimal form.  Please note
+        that the SRID and Z values are not included in this representation
+        because it is not a part of the OGC specification (use the `hexewkb` 
+        property instead).
         """
         # A possible faster, all-python, implementation:
         #  str(self.wkb).encode('hex')
@@ -384,9 +385,9 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def hexewkb(self):
         """
-        Returns the HEXEWKB of this Geometry.  This is an extension of the WKB
-        specification that includes SRID and Z values taht are a part of this
-        geometry.
+        Returns the EWKB of this Geometry in hexadecimal form.  This is an 
+        extension of the WKB specification that includes SRID and Z values 
+        that are a part of this geometry.
         """
         if self.hasz:
             if not GEOS_PREPARE:

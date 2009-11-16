@@ -2,7 +2,7 @@
  This object provides quoting for GEOS geometries into PostgreSQL/PostGIS.
 """
 
-from django.contrib.gis.db.backend.postgis.query import GEOM_FROM_WKB
+from django.contrib.gis.db.backend.postgis.query import GEOM_FROM_EWKB
 from psycopg2 import Binary
 from psycopg2.extensions import ISQLQuote
 
@@ -11,7 +11,7 @@ class PostGISAdaptor(object):
         "Initializes on the geometry."
         # Getting the WKB (in string form, to allow easy pickling of
         # the adaptor) and the SRID from the geometry.
-        self.wkb = str(geom.wkb)
+        self.ewkb = str(geom.ewkb)
         self.srid = geom.srid
 
     def __conform__(self, proto):
@@ -30,7 +30,7 @@ class PostGISAdaptor(object):
     def getquoted(self):
         "Returns a properly quoted string for use in PostgreSQL/PostGIS."
         # Want to use WKB, so wrap with psycopg2 Binary() to quote properly.
-        return "%s(E%s, %s)" % (GEOM_FROM_WKB, Binary(self.wkb), self.srid or -1)
+        return "%s(E%s)" % (GEOM_FROM_EWKB, Binary(self.ewkb))
 
     def prepare_database_save(self, unused):
         return self

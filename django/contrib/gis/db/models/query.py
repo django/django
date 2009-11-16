@@ -110,6 +110,14 @@ class GeoQuerySet(QuerySet):
         """
         return self._spatial_aggregate(aggregates.Extent, **kwargs)
 
+    def extent3d(self, **kwargs):
+        """
+        Returns the aggregate extent, in 3D, of the features in the
+        GeoQuerySet. It is returned as a 6-tuple, comprising:
+          (xmin, ymin, zmin, xmax, ymax, zmax).
+        """
+        return self._spatial_aggregate(aggregates.Extent3D, **kwargs)
+
     def geojson(self, precision=8, crs=False, bbox=False, **kwargs):
         """
         Returns a GeoJSON representation of the geomtry field in a `geojson`
@@ -524,12 +532,14 @@ class GeoQuerySet(QuerySet):
         else:
             dist_att = Distance.unit_attname(geo_field.units_name)
 
-        # Shortcut booleans for what distance function we're using.
+        # Shortcut booleans for what distance function we're using and
+        # whether the geometry field is 3D.
         distance = func == 'distance'
         length = func == 'length'
         perimeter = func == 'perimeter'
         if not (distance or length or perimeter):
             raise ValueError('Unknown distance function: %s' % func)
+        geom_3d = geo_field.dim == 3
 
         # The field's get_db_prep_lookup() is used to get any
         # extra distance parameters.  Here we set up the
@@ -604,7 +614,7 @@ class GeoQuerySet(QuerySet):
                     # some error checking is required.
                     if not isinstance(geo_field, PointField):
                         raise ValueError('Spherical distance calculation only supported on PointFields.')
-                    if not str(SpatialBackend.Geometry(buffer(params[0].wkb)).geom_type) == 'Point':
+                    if not str(SpatialBackend.Geometry(buffer(params[0].ewkb)).geom_type) == 'Point':
                         raise ValueError('Spherical distance calculation only supported with Point Geometry parameters')
                     # The `function` procedure argument needs to be set differently for
                     # geodetic distance calculations.
@@ -617,9 +627,16 @@ class GeoQuerySet(QuerySet):
             elif length or perimeter:
                 procedure_fmt = '%(geo_col)s'
                 if geodetic and length:
-                    # There's no `length_sphere`
+                    # There's no `length_sphere`, and `length_spheroid` also
+                    # works on 3D geometries.
                     procedure_fmt += ',%(spheroid)s'
                     procedure_args.update({'function' : SpatialBackend.length_spheroid, 'spheroid' : where[1]})
+                elif geom_3d and SpatialBackend.postgis:
+                    # Use 3D variants of perimeter and length routines on PostGIS.
+                    if perimeter:
+                        procedure_args.update({'function' : SpatialBackend.perimeter3d})
+                    elif length:
+                        procedure_args.update({'function' : SpatialBackend.length3d})
 
         # Setting up the settings for `_spatial_attribute`.
         s = {'select_field' : DistanceField(dist_att),

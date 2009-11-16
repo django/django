@@ -133,6 +133,9 @@ class LayerMapping(object):
     MULTI_TYPES = {1 : OGRGeomType('MultiPoint'),
                    2 : OGRGeomType('MultiLineString'),
                    3 : OGRGeomType('MultiPolygon'),
+                   OGRGeomType('Point25D').num : OGRGeomType('MultiPoint25D'),
+                   OGRGeomType('LineString25D').num : OGRGeomType('MultiLineString25D'),
+                   OGRGeomType('Polygon25D').num : OGRGeomType('MultiPolygon25D'),
                    }
 
     # Acceptable Django field types and corresponding acceptable OGR
@@ -282,19 +285,28 @@ class LayerMapping(object):
                 if self.geom_field:
                     raise LayerMapError('LayerMapping does not support more than one GeometryField per model.')
 
+                # Getting the coordinate dimension of the geometry field.
+                coord_dim = model_field.dim
+
                 try:
-                    gtype = OGRGeomType(ogr_name)
+                    if coord_dim == 3:
+                        gtype = OGRGeomType(ogr_name + '25D')
+                    else:
+                        gtype = OGRGeomType(ogr_name)
                 except OGRException:
                     raise LayerMapError('Invalid mapping for GeometryField "%s".' % field_name)
 
                 # Making sure that the OGR Layer's Geometry is compatible.
                 ltype = self.layer.geom_type
-                if not (gtype == ltype or self.make_multi(ltype, model_field)):
-                    raise LayerMapError('Invalid mapping geometry; model has %s, feature has %s.' % (fld_name, gtype))
+                if not (ltype.name.startswith(gtype.name) or self.make_multi(ltype, model_field)):
+                    raise LayerMapError('Invalid mapping geometry; model has %s%s, layer is %s.' % 
+                                        (fld_name, (coord_dim == 3 and '(dim=3)') or '', ltype))
 
                 # Setting the `geom_field` attribute w/the name of the model field
-                # that is a Geometry.
+                # that is a Geometry.  Also setting the coordinate dimension
+                # attribute.
                 self.geom_field = field_name
+                self.coord_dim = coord_dim
                 fields_val = model_field
             elif isinstance(model_field, models.ForeignKey):
                 if isinstance(ogr_name, dict):
@@ -482,6 +494,10 @@ class LayerMapping(object):
         if necessary (for example if the model field is MultiPolygonField while
         the mapped shapefile only contains Polygons).
         """
+        # Downgrade a 3D geom to a 2D one, if necessary.
+        if self.coord_dim != geom.coord_dim:
+            geom.coord_dim = self.coord_dim
+
         if self.make_multi(geom.geom_type, model_field):
             # Constructing a multi-geometry type to contain the single geometry
             multi_type = self.MULTI_TYPES[geom.geom_type.num]
