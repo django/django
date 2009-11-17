@@ -169,20 +169,3 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[], suite=
 
     # Returning the total failures and errors
     return len(result.failures) + len(result.errors)
-
-# Class for creating a fake module with a run method.  This is for the
-# GEOS and GDAL tests that were moved to their respective modules.
-class _DeprecatedTestModule(object):
-    def __init__(self, mod_name):
-        self.mod_name = mod_name
-
-    def run(self):
-        from warnings import warn
-        warn('This test module is deprecated because it has moved to ' \
-             '`django.contrib.gis.%s.tests` and will disappear in 1.2.' %
-             self.mod_name, DeprecationWarning)
-        tests = import_module('django.contrib.gis.%s.tests' % self.mod_name)
-        tests.run()
-
-test_geos = _DeprecatedTestModule('geos')
-test_gdal = _DeprecatedTestModule('gdal')
