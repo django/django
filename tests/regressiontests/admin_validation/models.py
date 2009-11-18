@@ -108,8 +108,9 @@ Exception: <class 'regressiontests.admin_validation.models.TwoAlbumFKAndAnE'> ha
 
 >>> validate_inline(TwoAlbumFKAndAnEInline, None, Album)
 
-# Regression test for #12203 - Fail more gracefully when a M2M field that
-# specifies the 'through' option is included in the 'fields' ModelAdmin option.
+# Regression test for #12203/#12237 - Fail more gracefully when a M2M field that
+# specifies the 'through' option is included in the 'fields' or the 'fieldsets'
+# ModelAdmin options.
 
 >>> class BookAdmin(admin.ModelAdmin):
 ...     fields = ['authors']
@@ -118,6 +119,17 @@ Exception: <class 'regressiontests.admin_validation.models.TwoAlbumFKAndAnE'> ha
 Traceback (most recent call last):
     ...
 ImproperlyConfigured: 'BookAdmin.fields' can't include the ManyToManyField field 'authors' because 'authors' manually specifies a 'through' model.
+
+>>> class FieldsetBookAdmin(admin.ModelAdmin):
+...     fieldsets = (
+...         ('Header 1', {'fields': ('name',)}),
+...         ('Header 2', {'fields': ('authors',)}),
+...     )
+
+>>> validate(FieldsetBookAdmin, Book)
+Traceback (most recent call last):
+   ...
+ImproperlyConfigured: 'FieldsetBookAdmin.fieldsets[1][1]['fields']' can't include the ManyToManyField field 'authors' because 'authors' manually specifies a 'through' model.
 
 # Regression test for #12209 -- If the explicitly provided through model
 # is specified as a string, the admin should still be able use
