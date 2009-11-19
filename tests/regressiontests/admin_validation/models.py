@@ -32,6 +32,8 @@ class Author(models.Model):
 
 class Book(models.Model):
     name = models.CharField(max_length=100)
+    subtitle = models.CharField(max_length=100)
+    price = models.FloatField()
     authors = models.ManyToManyField(Author, through='AuthorsBooks')
 
 
@@ -130,6 +132,13 @@ ImproperlyConfigured: 'BookAdmin.fields' can't include the ManyToManyField field
 Traceback (most recent call last):
    ...
 ImproperlyConfigured: 'FieldsetBookAdmin.fieldsets[1][1]['fields']' can't include the ManyToManyField field 'authors' because 'authors' manually specifies a 'through' model.
+
+>>> class NestedFieldsetAdmin(admin.ModelAdmin):
+...    fieldsets = (
+...        ('Main', {'fields': ('price', ('name', 'subtitle'))}),
+...    )
+
+>>> validate(NestedFieldsetAdmin, Book)
 
 # Regression test for #12209 -- If the explicitly provided through model
 # is specified as a string, the admin should still be able use

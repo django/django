@@ -219,19 +219,24 @@ def validate_base(cls, model):
                 raise ImproperlyConfigured("'fields' key is required in "
                         "%s.fieldsets[%d][1] field options dict."
                         % (cls.__name__, idx))
-            for field in fieldset[1]['fields']:
-                check_formfield(cls, model, opts, "fieldsets[%d][1]['fields']" % idx, field)
-                try:
-                    f = opts.get_field(field)
-                    if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:
-                        raise ImproperlyConfigured("'%s.fieldsets[%d][1]['fields']' "
-                            "can't include the ManyToManyField field '%s' because "
-                            "'%s' manually specifies a 'through' model." % (
-                                cls.__name__, idx, field, field))
-                except models.FieldDoesNotExist:
-                    # If we can't find a field on the model that matches,
-                    # it could be an extra field on the form.
-                    pass
+            for fields in fieldset[1]['fields']:
+                # The entry in fields might be a tuple. If it is a standalone
+                # field, make it into a tuple to make processing easier.
+                if type(fields) != tuple:
+                    fields = (fields,)
+                for field in fields:
+                    check_formfield(cls, model, opts, "fieldsets[%d][1]['fields']" % idx, field)
+                    try:
+                        f = opts.get_field(field)
+                        if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:
+                            raise ImproperlyConfigured("'%s.fieldsets[%d][1]['fields']' "
+                                "can't include the ManyToManyField field '%s' because "
+                                "'%s' manually specifies a 'through' model." % (
+                                    cls.__name__, idx, field, field))
+                    except models.FieldDoesNotExist:
+                        # If we can't find a field on the model that matches,
+                        # it could be an extra field on the form.
+                        pass
         flattened_fieldsets = flatten_fieldsets(cls.fieldsets)
         if len(flattened_fieldsets) > len(set(flattened_fieldsets)):
             raise ImproperlyConfigured('There are duplicate field(s) in %s.fieldsets' % cls.__name__)
