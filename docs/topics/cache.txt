@@ -179,9 +179,9 @@ Local-memory caching
 If you want the speed advantages of in-memory caching but don't have the
 capability of running Memcached, consider the local-memory cache backend. This
 cache is multi-process and thread-safe. To use it, set ``CACHE_BACKEND`` to
-``"locmem:///"``. For example::
+``"locmem://"``. For example::
 
-    CACHE_BACKEND = 'locmem:///'
+    CACHE_BACKEND = 'locmem://'
 
 Note that each process will have its own private cache instance, which means no
 cross-process caching is possible. This obviously also means the local memory
@@ -199,7 +199,7 @@ various places but a development/test environment where you don't want to cache
 and don't want to have to change your code to special-case the latter. To
 activate dummy caching, set ``CACHE_BACKEND`` like so::
 
-    CACHE_BACKEND = 'dummy:///'
+    CACHE_BACKEND = 'dummy://'
 
 Using a custom cache backend
 ----------------------------
@@ -249,7 +249,7 @@ In this example, ``timeout`` is set to ``60``::
 
 In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
 
-    CACHE_BACKEND = "locmem:///?timeout=30&max_entries=400"
+    CACHE_BACKEND = "locmem://?timeout=30&max_entries=400"
 
 Invalid arguments are silently ignored, as are invalid values of known
 arguments.
@@ -451,11 +451,11 @@ The low-level cache API
 Sometimes, caching an entire rendered page doesn't gain you very much and is,
 in fact, inconvenient overkill.
 
-Perhaps, for instance, your site includes a view whose results depend on 
+Perhaps, for instance, your site includes a view whose results depend on
 several expensive queries, the results of which change at different intervals.
-In this case, it would not be ideal to use the full-page caching that the 
-per-site or per-view cache strategies offer, because you wouldn't want to 
-cache the entire result (since some of the data changes often), but you'd still 
+In this case, it would not be ideal to use the full-page caching that the
+per-site or per-view cache strategies offer, because you wouldn't want to
+cache the entire result (since some of the data changes often), but you'd still
 want to cache the results that rarely change.
 
 For cases like this, Django exposes a simple, low-level cache API. You can use
@@ -757,10 +757,10 @@ Django comes with a few other pieces of middleware that can help optimize your
 apps' performance:
 
     * ``django.middleware.http.ConditionalGetMiddleware`` adds support for
-      modern browsers to conditionally GET responses based on the ``ETag`` 
+      modern browsers to conditionally GET responses based on the ``ETag``
       and ``Last-Modified`` headers.
 
-    * ``django.middleware.gzip.GZipMiddleware`` compresses responses for all 
+    * ``django.middleware.gzip.GZipMiddleware`` compresses responses for all
       moderns browsers, saving bandwidth and transfer time.
 
 Order of MIDDLEWARE_CLASSES
