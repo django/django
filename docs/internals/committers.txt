@@ -200,6 +200,19 @@ Karen Tracey
 .. _Bauhaus-University Weimar: http://www.uni-weimar.de/
 .. _pinax: http://pinaxproject.com/
 
+`James Tauber`_
+    James is the lead developer of Pinax_ and the CEO and founder of
+    Eldarion_. He has been doing open source software since 1993, Python
+    since 1998 and Django since 2006. He serves on the board of the Python
+    Software Foundation and is currently on a leave of absence from a PhD in
+    linguistics.
+    
+    James currently lives in Boston, MA, USA but originally hails from 
+    Perth, Western Australia where he attended the same high school as 
+    Russell Keith-Magee.
+
+.. _James Tauber: http://jtauber.com/
+
 Specialists
 -----------
 
