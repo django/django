@@ -14,19 +14,19 @@ class IOBase(GEOSBase):
     "Base class for GEOS I/O objects."
     def __init__(self):
         # Getting the pointer with the constructor.
-        self.ptr = self.constructor()
+        self.ptr = self._constructor()
 
     def __del__(self):
         # Cleaning up with the appropriate destructor.
-        if self._ptr: self.destructor(self._ptr)
+        if self._ptr: self._destructor(self._ptr)
 
 ### WKT Reading and Writing objects ###
 
 # Non-public class for internal use because its `read` method returns
 # _pointers_ instead of a GEOSGeometry object.
 class _WKTReader(IOBase):
-    constructor = capi.wkt_reader_create
-    destructor = capi.wkt_reader_destroy
+    _constructor = capi.wkt_reader_create
+    _destructor = capi.wkt_reader_destroy
     ptr_type = capi.WKT_READ_PTR
 
     def read(self, wkt):
@@ -39,8 +39,8 @@ class WKTReader(_WKTReader):
         return GEOSGeometry(super(WKTReader, self).read(wkt))
 
 class WKTWriter(IOBase):
-    constructor = capi.wkt_writer_create
-    destructor = capi.wkt_writer_destroy
+    _constructor = capi.wkt_writer_create
+    _destructor = capi.wkt_writer_destroy
     ptr_type = capi.WKT_WRITE_PTR
 
     def write(self, geom):
@@ -51,8 +51,8 @@ class WKTWriter(IOBase):
 
 # Non-public class for the same reason as _WKTReader above.
 class _WKBReader(IOBase):
-    constructor = capi.wkb_reader_create
-    destructor = capi.wkb_reader_destroy
+    _constructor = capi.wkb_reader_create
+    _destructor = capi.wkb_reader_destroy
     ptr_type = capi.WKB_READ_PTR
 
     def read(self, wkb):
@@ -71,8 +71,8 @@ class WKBReader(_WKBReader):
         return GEOSGeometry(super(WKBReader, self).read(wkb))
 
 class WKBWriter(IOBase):
-    constructor = capi.wkb_writer_create
-    destructor = capi.wkb_writer_destroy
+    _constructor = capi.wkb_writer_create
+    _destructor = capi.wkb_writer_destroy
     ptr_type = capi.WKB_WRITE_PTR
 
     def write(self, geom):
@@ -121,3 +121,10 @@ wkt_r = _WKTReader()
 wkt_w = WKTWriter()
 wkb_r = _WKBReader()
 wkb_w = WKBWriter()
+
+# These instances are for writing EWKB in 2D and 3D.
+ewkb_w = WKBWriter()
+ewkb_w.srid = True
+ewkb_w3d = WKBWriter()
+ewkb_w3d.srid = True
+ewkb_w3d.outdim = 3

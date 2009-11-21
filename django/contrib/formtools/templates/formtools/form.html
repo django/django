@@ -4,7 +4,7 @@
 
 {% if form.errors %}<h1>Please correct the following errors</h1>{% else %}<h1>Submit</h1>{% endif %}
 
-<form action="" method="post">
+<form action="" method="post">{% csrf_token %}
 <table>
 {{ form }}
 </table>

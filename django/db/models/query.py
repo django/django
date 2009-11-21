@@ -2,11 +2,6 @@
 The main QuerySet implementation. This provides the public API for the ORM.
 """
 
-try:
-    set
-except NameError:
-    from sets import Set as set     # Python 2.3 fallback
-
 from copy import deepcopy
 
 from django.db import connections, transaction, IntegrityError, DEFAULT_DB_ALIAS
@@ -14,7 +9,6 @@ from django.db.models.aggregates import Aggregate
 from django.db.models.fields import DateField
 from django.db.models.query_utils import Q, select_related_descend, CollectedObjects, CyclicDependency, deferred_class_factory
 from django.db.models import signals, sql
-
 
 # Used to control how many objects are worked with at once in some cases (e.g.
 # when deleting objects).
@@ -452,6 +446,11 @@ class QuerySet(object):
         self._result_cache = None
         return query.execute_sql(None)
     _update.alters_data = True
+
+    def exists(self):
+        if self._result_cache is None:
+            return self.query.has_results()
+        return bool(self._result_cache)
 
     ##################################################
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
@@ -1086,7 +1085,8 @@ def delete_objects(seen_objs, using):
 
             # Pre-notify all instances to be deleted.
             for pk_val, instance in items:
-                signals.pre_delete.send(sender=cls, instance=instance)
+                if not cls._meta.auto_created:
+                    signals.pre_delete.send(sender=cls, instance=instance)
 
             pk_list = [pk for pk,instance in items]
             del_query = connection.ops.query_class(sql.Query, sql.DeleteQuery)(cls, connection)
@@ -1120,7 +1120,8 @@ def delete_objects(seen_objs, using):
                     if field.rel and field.null and field.rel.to in seen_objs:
                         setattr(instance, field.attname, None)
 
-                signals.post_delete.send(sender=cls, instance=instance)
+                if not cls._meta.auto_created:
+                    signals.post_delete.send(sender=cls, instance=instance)
                 setattr(instance, cls._meta.pk.attname, None)
 
         if forced_managed:

@@ -262,7 +262,10 @@ class GeoQuery(sql.Query):
         """
         if isinstance(aggregate, self.aggregates_module.GeoAggregate):
             if aggregate.is_extent:
-                return self.aggregates_module.convert_extent(value)
+                if aggregate.is_extent == '3D':
+                    return self.aggregates_module.convert_extent3d(value)
+                else:
+                    return self.aggregates_module.convert_extent(value)
             else:
                 return self.aggregates_module.convert_geom(value, aggregate.source)
         else:

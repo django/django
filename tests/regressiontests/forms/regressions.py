@@ -102,4 +102,34 @@ u'<ul class="errorlist"><li>(Hidden field data) This field is required.</li></ul
 >>> f.as_table()
 u'<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field data) This field is required.</li></ul><input type="hidden" name="data" id="id_data" /></td></tr>'
 
+###################################################
+# Tests for XSS vulnerabilities in error messages # 
+###################################################
+
+# The forms layer doesn't escape input values directly because error messages
+# might be presented in non-HTML contexts. Instead, the message is just marked
+# for escaping by the template engine. So we'll need to construct a little
+# silly template to trigger the escaping.
+
+>>> from django.template import Template, Context
+>>> t = Template('{{ form.errors }}')
+
+>>> class SomeForm(Form):
+...     field = ChoiceField(choices=[('one', 'One')])
+>>> f = SomeForm({'field': '<script>'})
+>>> t.render(Context({'form': f}))
+u'<ul class="errorlist"><li>field<ul class="errorlist"><li>Select a valid choice. &lt;script&gt; is not one of the available choices.</li></ul></li></ul>'
+    
+>>> class SomeForm(Form):
+...     field = MultipleChoiceField(choices=[('one', 'One')])
+>>> f = SomeForm({'field': ['<script>']})
+>>> t.render(Context({'form': f}))
+u'<ul class="errorlist"><li>field<ul class="errorlist"><li>Select a valid choice. &lt;script&gt; is not one of the available choices.</li></ul></li></ul>'
+
+>>> from regressiontests.forms.models import ChoiceModel
+>>> class SomeForm(Form):
+...     field = ModelMultipleChoiceField(ChoiceModel.objects.all())
+>>> f = SomeForm({'field': ['<script>']})
+>>> t.render(Context({'form': f}))
+u'<ul class="errorlist"><li>field<ul class="errorlist"><li>&quot;&lt;script&gt;&quot; is not a valid value for a primary key.</li></ul></li></ul>'
 """

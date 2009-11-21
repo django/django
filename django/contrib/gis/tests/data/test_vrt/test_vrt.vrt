@@ -1,7 +1,7 @@
 <OGRVRTDataSource>
 <OGRVRTLayer name="test_vrt">
 <SrcDataSource relativeToVRT="1">test_vrt.csv</SrcDataSource>
-<GeometryType>wkbPoint</GeometryType>
+<GeometryType>wkbPoint25D</GeometryType>
 <GeometryField encoding="PointFromColumns" x="POINT_X" y="POINT_Y" z="NUM"/>
 </OGRVRTLayer>
 </OGRVRTDataSource>

@@ -257,9 +257,8 @@ class LazyObject(object):
     A wrapper for another class that can be used to delay instantiation of the
     wrapped class.
 
-    This is useful, for example, if the wrapped class needs to use Django
-    settings at creation time: we want to permit it to be imported without
-    accessing settings.
+    By subclassing, you have the opportunity to intercept and alter the
+    instantiation. If you don't need to do that, use SimpleLazyObject.
     """
     def __init__(self):
         self._wrapped = None
@@ -267,9 +266,6 @@ class LazyObject(object):
     def __getattr__(self, name):
         if self._wrapped is None:
             self._setup()
-        if name == "__members__":
-            # Used to implement dir(obj)
-            return self._wrapped.get_all_members()
         return getattr(self._wrapped, name)
 
     def __setattr__(self, name, value):
@@ -287,3 +283,68 @@ class LazyObject(object):
         """
         raise NotImplementedError
 
+    # introspection support:
+    __members__ = property(lambda self: self.__dir__())
+
+    def __dir__(self):
+        if self._wrapped is None:
+            self._setup()
+        return  dir(self._wrapped)
+
+class SimpleLazyObject(LazyObject):
+    """
+    A lazy object initialised from any function.
+
+    Designed for compound objects of unknown type. For builtins or objects of
+    known type, use django.utils.functional.lazy.
+    """
+    def __init__(self, func):
+        """
+        Pass in a callable that returns the object to be wrapped.
+
+        If copies are made of the resulting SimpleLazyObject, which can happen
+        in various circumstances within Django, then you must ensure that the
+        callable can be safely run more than once and will return the same
+        value.
+        """
+        self.__dict__['_setupfunc'] = func
+        # For some reason, we have to inline LazyObject.__init__ here to avoid
+        # recursion
+        self._wrapped = None
+
+    def __str__(self):
+        if self._wrapped is None: self._setup()
+        return str(self._wrapped)
+
+    def __unicode__(self):
+        if self._wrapped is None: self._setup()
+        return unicode(self._wrapped)
+
+    def __deepcopy__(self, memo):
+        if self._wrapped is None:
+            # We have to use SimpleLazyObject, not self.__class__, because the
+            # latter is proxied.
+            result = SimpleLazyObject(self._setupfunc)
+            memo[id(self)] = result
+            return result
+        else:
+            import copy
+            return copy.deepcopy(self._wrapped, memo)
+
+    # Need to pretend to be the wrapped class, for the sake of objects that care
+    # about this (especially in equality tests)
+    def __get_class(self):
+        if self._wrapped is None: self._setup()
+        return self._wrapped.__class__
+    __class__ = property(__get_class)
+
+    def __eq__(self, other):
+        if self._wrapped is None: self._setup()
+        return self._wrapped == other
+
+    def __hash__(self):
+        if self._wrapped is None: self._setup()
+        return hash(self._wrapped)
+
+    def _setup(self):
+        self._wrapped = self._setupfunc()

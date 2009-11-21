@@ -98,7 +98,7 @@ class Serializer(base.Serializer):
         serialized as references to the object's PK (i.e. the related *data*
         is not dumped, just the relation).
         """
-        if field.creates_table:
+        if field.rel.through._meta.auto_created:
             self._start_relational_field(field)
             for relobj in getattr(obj, field.name).iterator():
                 self.xml.addQuickElement("object", attrs={"pk" : smart_unicode(relobj._get_pk_val())})
@@ -233,4 +233,3 @@ def getInnerText(node):
         else:
            pass
     return u"".join(inner_text)
-

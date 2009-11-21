@@ -29,6 +29,20 @@ class Interstate(models.Model):
     path = models.LineStringField()
     objects = models.GeoManager()
 
+# Same as `City` above, but for testing model inheritance.
+class CityBase(models.Model):
+    name = models.CharField(max_length=25)
+    population = models.IntegerField()
+    density = models.DecimalField(max_digits=7, decimal_places=1)
+    point = models.PointField()
+    objects = models.GeoManager()
+
+class ICity1(CityBase):
+    dt = models.DateField()
+    
+class ICity2(ICity1):
+    dt_time = models.DateTimeField(auto_now=True)
+
 # Mapping dictionaries for the models above.
 co_mapping = {'name' : 'Name',
               'state' : {'name' : 'State'}, # ForeignKey's use another mapping dictionary for the _related_ Model (State in this case).

@@ -6,6 +6,19 @@ try:
 except ImportError:
     from django.utils.functional import wraps, update_wrapper  # Python 2.3, 2.4 fallback.
 
+
+# Licence for MethodDecoratorAdaptor and auto_adapt_to_methods
+#
+# This code is taken from stackoverflow.com [1], the code being supplied by
+# users 'Ants Aasma' [2] and 'Silent Ghost' [3] with modifications.  It is
+# legally included here under the terms of the Creative Commons
+# Attribution-Share Alike 2.5 Generic Licence [4]
+#
+# [1] http://stackoverflow.com/questions/1288498/using-the-same-decorator-with-arguments-with-functions-and-methods
+# [2] http://stackoverflow.com/users/107366/ants-aasma
+# [3] http://stackoverflow.com/users/12855/silentghost
+# [4] http://creativecommons.org/licenses/by-sa/2.5/
+
 class MethodDecoratorAdaptor(object):
     """
     Generic way of creating decorators that adapt to being

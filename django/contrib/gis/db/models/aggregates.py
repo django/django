@@ -24,6 +24,9 @@ class Collect(GeoAggregate):
 class Extent(GeoAggregate):
     name = 'Extent'
 
+class Extent3D(GeoAggregate):
+    name = 'Extent3D'
+
 class MakeLine(GeoAggregate):
     name = 'MakeLine'
 

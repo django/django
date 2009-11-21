@@ -755,9 +755,19 @@ Bug #6180, #6203 -- dates with limits and/or counts
 >>> Item.objects.dates('created', 'day')[0]
 datetime.datetime(2007, 12, 19, 0, 0)
 
-Bug #7087 -- dates with extra select columns
+Bug #7087/#12242 -- dates with extra select columns
 >>> Item.objects.dates('created', 'day').extra(select={'a': 1})
 [datetime.datetime(2007, 12, 19, 0, 0), datetime.datetime(2007, 12, 20, 0, 0)]
+
+>>> Item.objects.extra(select={'a': 1}).dates('created', 'day')
+[datetime.datetime(2007, 12, 19, 0, 0), datetime.datetime(2007, 12, 20, 0, 0)]
+
+>>> name="one"
+>>> Item.objects.dates('created', 'day').extra(where=['name=%s'], params=[name])
+[datetime.datetime(2007, 12, 19, 0, 0)]
+
+>>> Item.objects.extra(where=['name=%s'], params=[name]).dates('created', 'day')
+[datetime.datetime(2007, 12, 19, 0, 0)]
 
 Bug #7155 -- nullable dates
 >>> Item.objects.dates('modified', 'day')

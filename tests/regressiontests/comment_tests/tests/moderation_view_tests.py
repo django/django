@@ -159,31 +159,32 @@ class ApproveViewTests(CommentTestCase):
         response = self.client.get("/approved/", data={"c":pk})
         self.assertTemplateUsed(response, "comments/approved.html")
 
+class AdminActionsTests(CommentTestCase):
+    urls = "regressiontests.comment_tests.urls_admin"
+    
+    def setUp(self):
+        super(AdminActionsTests, self).setUp()
+        
+        # Make "normaluser" a moderator
+        u = User.objects.get(username="normaluser")
+        u.is_staff = True
+        perms = Permission.objects.filter(
+            content_type__app_label = 'comments', 
+            codename__endswith = 'comment'
+        )
+        for perm in perms:
+            u.user_permissions.add(perm)
+        u.save()
 
-class ModerationQueueTests(CommentTestCase):
-
-    def testModerationQueuePermissions(self):
-        """Only moderators can view the moderation queue"""
+    def testActionsNonModerator(self):
+        comments = self.createSomeComments()
         self.client.login(username="normaluser", password="normaluser")
-        response = self.client.get("/moderate/")
-        self.assertEqual(response["Location"], "http://testserver/accounts/login/?next=/moderate/")
+        response = self.client.get("/admin/comments/comment/")
+        self.assertEquals("approve_comments" in response.content, False)
 
-        makeModerator("normaluser")
-        response = self.client.get("/moderate/")
-        self.assertEqual(response.status_code, 200)
-
-    def testModerationQueueContents(self):
-        """Moderation queue should display non-public, non-removed comments."""
-        c1, c2, c3, c4 = self.createSomeComments()
+    def testActionsModerator(self):
+        comments = self.createSomeComments()
         makeModerator("normaluser")
         self.client.login(username="normaluser", password="normaluser")
-
-        c1.is_public = c2.is_public = False
-        c1.save(); c2.save()
-        response = self.client.get("/moderate/")
-        self.assertEqual(list(response.context[0]["comments"]), [c1, c2])
-
-        c2.is_removed = True
-        c2.save()
-        response = self.client.get("/moderate/")
-        self.assertEqual(list(response.context[0]["comments"]), [c1])
+        response = self.client.get("/admin/comments/comment/")
+        self.assertEquals("approve_comments" in response.content, True)

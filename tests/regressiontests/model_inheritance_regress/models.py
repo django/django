@@ -110,6 +110,36 @@ class DerivedM(BaseM):
         return "PK = %d, base_name = %s, derived_name = %s" \
                 % (self.customPK, self.base_name, self.derived_name)
 
+# Check that abstract classes don't get m2m tables autocreated.
+class Person(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ('name',)
+
+    def __unicode__(self):
+        return self.name
+
+class AbstractEvent(models.Model):
+    name = models.CharField(max_length=100)
+    attendees = models.ManyToManyField(Person, related_name="%(class)s_set")
+
+    class Meta:
+        abstract = True
+        ordering = ('name',)
+
+    def __unicode__(self):
+        return self.name
+
+class BirthdayParty(AbstractEvent):
+    pass
+
+class BachelorParty(AbstractEvent):
+    pass
+
+class MessyBachelorParty(BachelorParty):
+    pass
+
 __test__ = {'API_TESTS':"""
 # Regression for #7350, #7202
 # Check that when you create a Parent object with a specific reference to an
@@ -317,6 +347,42 @@ True
 "primary_key"
 >>> ParkingLot3._meta.get_ancestor_link(Place).name  # the child->parent link
 "parent"
+
+# Check that many-to-many relations defined on an abstract base class
+# are correctly inherited (and created) on the child class.
+>>> p1 = Person.objects.create(name='Alice')
+>>> p2 = Person.objects.create(name='Bob')
+>>> p3 = Person.objects.create(name='Carol')
+>>> p4 = Person.objects.create(name='Dave')
+
+>>> birthday = BirthdayParty.objects.create(name='Birthday party for Alice')
+>>> birthday.attendees = [p1, p3]
+
+>>> bachelor = BachelorParty.objects.create(name='Bachelor party for Bob')
+>>> bachelor.attendees = [p2, p4]
+
+>>> print p1.birthdayparty_set.all()
+[<BirthdayParty: Birthday party for Alice>]
+
+>>> print p1.bachelorparty_set.all()
+[]
+
+>>> print p2.bachelorparty_set.all()
+[<BachelorParty: Bachelor party for Bob>]
+
+# Check that a subclass of a subclass of an abstract model
+# doesn't get it's own accessor.
+>>> p2.messybachelorparty_set.all()
+Traceback (most recent call last):
+...
+AttributeError: 'Person' object has no attribute 'messybachelorparty_set'
+
+# ... but it does inherit the m2m from it's parent
+>>> messy = MessyBachelorParty.objects.create(name='Bachelor party for Dave')
+>>> messy.attendees = [p4]
+
+>>> p4.bachelorparty_set.all()
+[<BachelorParty: Bachelor party for Bob>, <BachelorParty: Bachelor party for Dave>]
 
 """}
 

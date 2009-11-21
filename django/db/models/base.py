@@ -3,11 +3,6 @@ import types
 import sys
 import os
 from itertools import izip
-try:
-    set
-except NameError:
-    from sets import Set as set     # Python 2.3 fallback.
-
 import django.db.models.manager     # Imported to register signal handler.
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
 from django.db.models.fields import AutoField, FieldDoesNotExist
@@ -21,7 +16,6 @@ from django.db.models.loading import register_models, get_model
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.conf import settings
-
 
 class ModelBase(type):
     """
@@ -236,7 +230,6 @@ class ModelBase(type):
 
         signals.class_prepared.send(sender=cls)
 
-
 class Model(object):
     __metaclass__ = ModelBase
     _deferred = False
@@ -300,7 +293,14 @@ class Model(object):
                         if rel_obj is None and field.null:
                             val = None
                 else:
-                    val = kwargs.pop(field.attname, field.get_default())
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
             else:
                 val = field.get_default()
             if is_related_object:
@@ -352,21 +352,30 @@ class Model(object):
         only module-level classes can be pickled by the default path.
         """
         data = self.__dict__
-        if not self._deferred:
-            return (self.__class__, (), data)
+        model = self.__class__
+        # The obvious thing to do here is to invoke super().__reduce__()
+        # for the non-deferred case. Don't do that.
+        # On Python 2.4, there is something wierd with __reduce__,
+        # and as a result, the super call will cause an infinite recursion.
+        # See #10547 and #12121.
         defers = []
         pk_val = None
-        for field in self._meta.fields:
-            if isinstance(self.__class__.__dict__.get(field.attname),
-                    DeferredAttribute):
-                defers.append(field.attname)
-                if pk_val is None:
-                    # The pk_val and model values are the same for all
-                    # DeferredAttribute classes, so we only need to do this
-                    # once.
-                    obj = self.__class__.__dict__[field.attname]
-                    model = obj.model_ref()
-        return (model_unpickle, (model, defers), data)
+        if self._deferred:
+            from django.db.models.query_utils import deferred_class_factory
+            factory = deferred_class_factory
+            for field in self._meta.fields:
+                if isinstance(self.__class__.__dict__.get(field.attname),
+                        DeferredAttribute):
+                    defers.append(field.attname)
+                    if pk_val is None:
+                        # The pk_val and model values are the same for all
+                        # DeferredAttribute classes, so we only need to do this
+                        # once.
+                        obj = self.__class__.__dict__[field.attname]
+                        model = obj.model_ref()
+        else:
+            factory = simple_class_factory
+        return (model_unpickle, (model, defers, factory), data)
 
     def _get_pk_val(self, meta=None):
         if not meta:
@@ -430,7 +439,7 @@ class Model(object):
         else:
             meta = cls._meta
 
-        if origin:
+        if origin and not meta.auto_created:
             signals.pre_save.send(sender=origin, instance=self, raw=raw)
 
         # If we are in a raw save, save the object exactly as presented.
@@ -469,7 +478,7 @@ class Model(object):
             if pk_set:
                 # Determine whether a record with the primary key already exists.
                 if (force_update or (not force_insert and
-                        manager.using(using).filter(pk=pk_val).extra(select={'a': 1}).values('a').order_by())):
+                        manager.using(using).filter(pk=pk_val).exists())):
                     # It does already exist, so do an UPDATE.
                     if force_update or non_pks:
                         values = [(f, None, (raw and getattr(self, f.attname) or f.pre_save(self, False))) for f in non_pks]
@@ -505,7 +514,7 @@ class Model(object):
                     setattr(self, meta.pk.attname, result)
             transaction.commit_unless_managed(using=using)
 
-        if origin:
+        if origin and not meta.auto_created:
             signals.post_save.send(sender=origin, instance=self,
                 created=(not record_exists), raw=raw)
 
@@ -542,7 +551,12 @@ class Model(object):
                         rel_descriptor = cls.__dict__[rel_opts_name]
                         break
                 else:
-                    raise AssertionError("Should never get here.")
+                    # in the case of a hidden fkey just skip it, it'll get
+                    # processed as an m2m
+                    if not related.field.rel.is_hidden():
+                        raise AssertionError("Should never get here.")
+                    else:
+                        continue
                 delete_qs = rel_descriptor.delete_manager(self).all()
                 for sub_obj in delete_qs:
                     sub_obj._collect_sub_objects(seen_objs, self.__class__, related.field.null)
@@ -653,12 +667,20 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 class Empty(object):
     pass
 
-def model_unpickle(model, attrs):
+def simple_class_factory(model, attrs):
+    """Used to unpickle Models without deferred fields.
+
+    We need to do this the hard way, rather than just using
+    the default __reduce__ implementation, because of a
+    __deepcopy__ problem in Python 2.4
+    """
+    return model
+
+def model_unpickle(model, attrs, factory):
     """
     Used to unpickle Model subclasses with deferred fields.
     """
-    from django.db.models.query_utils import deferred_class_factory
-    cls = deferred_class_factory(model, attrs)
+    cls = factory(model, attrs)
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
 

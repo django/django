@@ -94,9 +94,8 @@ See the docs for :meth:`~django.db.models.QuerySet.latest` for more.
 .. versionadded:: 1.1
 
 Defaults to ``True``, meaning Django will create the appropriate database
-tables in :ref:`django-admin-syncdb` and remove them as part of a :ref:`reset
-<django-admin-reset>` management command. That is, Django *manages* the
-database tables' lifecycles.
+tables in :djadmin:`syncdb` and remove them as part of a :djadmin:`reset`
+management command. That is, Django *manages* the database tables' lifecycles.
 
 If ``False``, no database table creation or deletion operations will be
 performed for this model. This is useful if the model represents an existing

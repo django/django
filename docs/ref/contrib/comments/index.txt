@@ -216,6 +216,13 @@ should know about:
       it with a warning field; if you use the comment form with a custom
       template you should be sure to do the same.
 
+The comments app also depends on the more general :ref:`Cross Site Request
+Forgery protection < ref-contrib-csrf>` that comes with Django.  As described in
+the documentation, it is best to use ``CsrfViewMiddleware``.  However, if you
+are not using that, you will need to use the ``csrf_protect`` decorator on any
+views that include the comment form, in order for those views to be able to
+output the CSRF token and cookie.
+
 .. _honeypot: http://en.wikipedia.org/wiki/Honeypot_(computing)
 
 More information

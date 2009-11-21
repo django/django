@@ -147,15 +147,18 @@ class WizardPageTwoForm(forms.Form):
 
 class WizardClass(wizard.FormWizard):
     def render_template(self, *args, **kw):
-        return ""
+        return http.HttpResponse("")
 
     def done(self, request, cleaned_data):
         return http.HttpResponse(success_string)
 
-class DummyRequest(object):
+class DummyRequest(http.HttpRequest):
     def __init__(self, POST=None):
+        super(DummyRequest, self).__init__()
         self.method = POST and "POST" or "GET"
-        self.POST = POST
+        if POST is not None:
+            self.POST.update(POST)
+        self._dont_enforce_csrf_checks = True
 
 class WizardTests(TestCase):
     def test_step_starts_at_zero(self):

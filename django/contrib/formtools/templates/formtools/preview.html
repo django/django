@@ -15,7 +15,7 @@
 
 <p>Security hash: {{ hash_value }}</p>
 
-<form action="" method="post">
+<form action="" method="post">{% csrf_token %}
 {% for field in form %}{{ field.as_hidden }}
 {% endfor %}
 <input type="hidden" name="{{ stage_field }}" value="2" />
@@ -25,7 +25,7 @@
 
 <h1>Or edit it again</h1>
 
-<form action="" method="post">
+<form action="" method="post">{% csrf_token %}
 <table>
 {{ form }}
 </table>

@@ -140,3 +140,13 @@ class InlineFormsetTests(TestCase):
             self.assertEqual(manager[1]['name'], 'Terry Gilliam')
         else:
             self.fail('Errors found on formset:%s' % form_set.errors)
+
+    def test_formset_with_none_instance(self):
+        "A formset with instance=None can be created. Regression for #11872"
+        Form = modelform_factory(User)
+        FormSet = inlineformset_factory(User, UserSite)
+
+        # Instantiate the Form and FormSet to prove
+        # you can create a formset with an instance of None
+        form = Form(instance=None)
+        formset = FormSet(instance=None)

@@ -319,9 +319,7 @@ class BaseModelForm(BaseForm):
             if self.instance.pk is not None:
                 qs = qs.exclude(pk=self.instance.pk)
 
-            # This cute trick with extra/values is the most efficient way to
-            # tell if a particular query returns any results.
-            if qs.extra(select={'a': 1}).values('a').order_by():
+            if qs.exists():
                 if len(unique_check) == 1:
                     self._errors[unique_check[0]] = ErrorList([self.unique_error_message(unique_check)])
                 else:
@@ -354,9 +352,7 @@ class BaseModelForm(BaseForm):
             if self.instance.pk is not None:
                 qs = qs.exclude(pk=self.instance.pk)
 
-            # This cute trick with extra/values is the most efficient way to
-            # tell if a particular query returns any results.
-            if qs.extra(select={'a': 1}).values('a').order_by():
+            if qs.exists():
                 self._errors[field] = ErrorList([
                     self.date_error_message(lookup_type, field, unique_for)
                 ])
@@ -476,6 +472,7 @@ class BaseModelFormSet(BaseFormSet):
             pk_field = self.model._meta.pk
             pk = pk_field.get_db_prep_lookup('exact', pk,
                 connection=self.get_queryset().query.connection)
+            pk = pk_field.get_db_prep_lookup('exact', pk)
             if isinstance(pk, list):
                 pk = pk[0]
             kwargs['instance'] = self._existing_object(pk)
@@ -710,7 +707,7 @@ class BaseInlineFormSet(BaseModelFormSet):
                  save_as_new=False, prefix=None):
         from django.db.models.fields.related import RelatedObject
         if instance is None:
-            self.instance = self.model()
+            self.instance = self.fk.rel.to()
         else:
             self.instance = instance
         self.save_as_new = save_as_new

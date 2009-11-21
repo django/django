@@ -162,7 +162,7 @@ def floatformat(text, arg=-1):
 
     try:
         m = int(d) - d
-    except (OverflowError, InvalidOperation):
+    except (ValueError, OverflowError, InvalidOperation):
         return input_val
 
     if not m and p < 0:

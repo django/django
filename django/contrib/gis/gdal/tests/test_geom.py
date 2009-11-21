@@ -46,6 +46,13 @@ class OGRGeomTest(unittest.TestCase):
         self.assertEqual(0, gt.num)
         self.assertEqual('Unknown', gt.name)
 
+    def test00b_geomtype_25d(self):
+        "Testing OGRGeomType object with 25D types."
+        wkb25bit = OGRGeomType.wkb25bit
+        self.failUnless(OGRGeomType(wkb25bit + 1) == 'Point25D')
+        self.failUnless(OGRGeomType('MultiLineString25D') == (5 + wkb25bit))
+        self.assertEqual('GeometryCollectionField', OGRGeomType('GeometryCollection25D').django)
+
     def test01a_wkt(self):
         "Testing WKT output."
         for g in wkt_out:
@@ -319,6 +326,18 @@ class OGRGeomTest(unittest.TestCase):
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
 
+    def test09c_transform_dim(self):
+        "Testing coordinate dimension is the same on transformed geometries."
+        ls_orig = OGRGeometry('LINESTRING(-104.609 38.255)', 4326)
+        ls_trans = OGRGeometry('LINESTRING(992385.4472045 481455.4944650)', 2774)
+        
+        prec = 3
+        ls_orig.transform(ls_trans.srs)
+        # Making sure the coordinate dimension is still 2D.
+        self.assertEqual(2, ls_orig.coord_dim)
+        self.assertAlmostEqual(ls_trans.x[0], ls_orig.x[0], prec)
+        self.assertAlmostEqual(ls_trans.y[0], ls_orig.y[0], prec)
+
     def test10_difference(self):
         "Testing difference()."
         for i in xrange(len(topology_geoms)):
@@ -405,6 +424,17 @@ class OGRGeomTest(unittest.TestCase):
         xmin, ymin = min(x), min(y)
         xmax, ymax = max(x), max(y)
         self.assertEqual((xmin, ymin, xmax, ymax), poly.extent)
+
+    def test16_25D(self):
+        "Testing 2.5D geometries."
+        pnt_25d = OGRGeometry('POINT(1 2 3)')
+        self.assertEqual('Point25D', pnt_25d.geom_type.name)
+        self.assertEqual(3.0, pnt_25d.z)
+        self.assertEqual(3, pnt_25d.coord_dim)
+        ls_25d = OGRGeometry('LINESTRING(1 1 1,2 2 2,3 3 3)')
+        self.assertEqual('LineString25D', ls_25d.geom_type.name)
+        self.assertEqual([1.0, 2.0, 3.0], ls_25d.z)
+        self.assertEqual(3, ls_25d.coord_dim)
 
 def suite():
     s = unittest.TestSuite()

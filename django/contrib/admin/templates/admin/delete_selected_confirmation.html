@@ -23,7 +23,7 @@
     {% for deleteable_object in deletable_objects %}
         <ul>{{ deleteable_object|unordered_list }}</ul>
     {% endfor %}
-    <form action="" method="post">
+    <form action="" method="post">{% csrf_token %}
     <div>
     {% for obj in queryset %}
     <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk }}" />

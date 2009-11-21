@@ -100,7 +100,7 @@ class MonthArchiveTest(TestCase):
 
         now = datetime.now()
         prev_month = now.date().replace(day=1)
-        if prev_month.month == 11:
+        if prev_month.month == 1:
             prev_month = prev_month.replace(year=prev_month.year-1, month=12)
         else:
             prev_month = prev_month.replace(month=prev_month.month-1)

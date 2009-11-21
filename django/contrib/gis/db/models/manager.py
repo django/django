@@ -34,6 +34,9 @@ class GeoManager(Manager):
     def extent(self, *args, **kwargs):
         return self.get_query_set().extent(*args, **kwargs)
 
+    def extent3d(self, *args, **kwargs):
+        return self.get_query_set().extent3d(*args, **kwargs)
+
     def geojson(self, *args, **kwargs):
         return self.get_query_set().geojson(*args, **kwargs)
 

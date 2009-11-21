@@ -299,7 +299,7 @@ class ManagementUtility(object):
 
         # subcommand
         if cword == 1:
-            print ' '.join(filter(lambda x: x.startswith(curr), subcommands))
+            print ' '.join(sorted(filter(lambda x: x.startswith(curr), subcommands)))
         # subcommand options
         # special case: the 'help' subcommand has no options
         elif cwords[0] in subcommands and cwords[0] != 'help':
@@ -328,7 +328,7 @@ class ManagementUtility(object):
             options = filter(lambda (x, v): x not in prev_opts, options)
 
             # filter options by current input
-            options = [(k, v) for k, v in options if k.startswith(curr)]
+            options = sorted([(k, v) for k, v in options if k.startswith(curr)])
             for option in options:
                 opt_label = option[0]
                 # append '=' to options which require args

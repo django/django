@@ -106,6 +106,11 @@ def result_headers(cl):
                     else:
                         header = field_name
                     header = header.replace('_', ' ')
+            # if the field is the action checkbox: no sorting and special class
+            if field_name == 'action_checkbox':
+                yield {"text": header,
+                       "class_attrib": mark_safe(' class="action-checkbox-column"')}
+                continue
 
             # It is a non-field, but perhaps one that is sortable
             admin_order_field = getattr(attr, "admin_order_field", None)

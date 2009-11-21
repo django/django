@@ -134,6 +134,12 @@ DATABASE_OPTIONS = {}          # Set to empty dictionary for default.
 DATABASES = {
 }
 
+# The email backend to use. For possible shortcuts see django.core.mail.
+# The default is to use the SMTP backend.
+# Third-party backends can be specified by providing a Python path
+# to a module that defines an EmailBackend class.
+EMAIL_BACKEND = 'django.core.mail.backends.smtp'
+
 # Host for sending e-mail.
 EMAIL_HOST = 'localhost'
 
@@ -303,6 +309,7 @@ DEFAULT_INDEX_TABLESPACE = ''
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 #     'django.middleware.http.ConditionalGetMiddleware',
 #     'django.middleware.gzip.GZipMiddleware',
@@ -376,6 +383,18 @@ LOGIN_REDIRECT_URL = '/accounts/profile/'
 
 # The number of days a password reset link is valid for
 PASSWORD_RESET_TIMEOUT_DAYS = 3
+
+########
+# CSRF #
+########
+
+# Dotted path to callable to be used as view when a request is
+# rejected by the CSRF middleware.
+CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
+
+# Name and domain for CSRF cookie.
+CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_COOKIE_DOMAIN = None
 
 ###########
 # TESTING #

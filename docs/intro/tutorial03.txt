@@ -171,15 +171,23 @@ and put the following Python code in it::
 This is the simplest view possible. Go to "/polls/" in your browser, and you
 should see your text.
 
-Now add the following view. It's slightly different, because it takes an
-argument (which, remember, is passed in from whatever was captured by the
-regular expression in the URLconf)::
+Now lets add a few more views. These views are slightly different, because
+they take an argument (which, remember, is passed in from whatever was
+captured by the regular expression in the URLconf)::
 
     def detail(request, poll_id):
         return HttpResponse("You're looking at poll %s." % poll_id)
 
-Take a look in your browser, at "/polls/34/". It'll display whatever ID you
-provide in the URL.
+    def results(request, poll_id):
+        return HttpResponse("You're looking at the results of poll %s." % poll_id)
+
+    def vote(request, poll_id):
+        return HttpResponse("You're voting on poll %s." % poll_id)
+
+Take a look in your browser, at "/polls/34/". It'll run the `detail()` method
+and display whatever ID you provide in the URL. Try "/polls/34/results/" and
+"/polls/34/vote/" too -- these will display the placeholder results and voting
+pages.
 
 Write views that actually do something
 ======================================
@@ -467,10 +475,10 @@ Copy the file ``mysite/urls.py`` to ``mysite/polls/urls.py``. Then, change
 ``mysite/urls.py`` to remove the poll-specific URLs and insert an
 :func:`~django.conf.urls.defaults.include`::
 
-    ...
+    # ...
     urlpatterns = patterns('',
         (r'^polls/', include('mysite.polls.urls')),
-        ...
+        # ...
 
 :func:`~django.conf.urls.defaults.include`, simply, references another URLconf.
 Note that the regular expression doesn't have a ``$`` (end-of-string match

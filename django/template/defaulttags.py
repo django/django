@@ -37,6 +37,23 @@ class CommentNode(Node):
     def render(self, context):
         return ''
 
+class CsrfTokenNode(Node):
+    def render(self, context):
+        csrf_token = context.get('csrf_token', None)
+        if csrf_token:
+            if csrf_token == 'NOTPROVIDED':
+                return mark_safe(u"")
+            else:
+                return mark_safe(u"<div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='%s' /></div>" % (csrf_token))
+        else:
+            # It's very probable that the token is missing because of
+            # misconfiguration, so we raise a warning
+            from django.conf import settings
+            if settings.DEBUG:
+                import warnings
+                warnings.warn("A {% csrf_token %} was used in a template, but the context did not provide the value.  This is usually caused by not using RequestContext.")
+            return u''
+
 class CycleNode(Node):
     def __init__(self, cyclevars, variable_name=None):
         self.cycle_iter = itertools_cycle(cyclevars)
@@ -522,6 +539,10 @@ def cycle(parser, token):
         node = CycleNode(values)
     return node
 cycle = register.tag(cycle)
+
+def csrf_token(parser, token):
+    return CsrfTokenNode()
+register.tag(csrf_token)
 
 def debug(parser, token):
     """
